@@ -823,14 +823,14 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 			@Override
 			public void mouseDown(final MouseEvent e) {
-				onMouse_MoveDown(e);
+				onMouse_Down(e);
 			}
 		});
 
 		addMouseMoveListener(new MouseMoveListener() {
 			@Override
 			public void mouseMove(final MouseEvent e) {
-				onMouse_MoveDown(e);
+				onMouse_Move(e);
 			}
 		});
 
@@ -3030,42 +3030,22 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 	}
 
-	private void onMouse_Exit() {
-
-		/*
-		 * Remove hovered item that when entering, the same item is displayed again otherwise it
-		 * will not work
-		 */
-		_hoveredItem = _emptyItem;
-
-		redraw();
-	}
-
 	/**
 	 * Mouse move/down event handler
 	 * 
 	 * @param event
 	 */
-	private void onMouse_MoveDown(final MouseEvent event) {
+	private void onMouse_Down(final MouseEvent event) {
 
-		if (_calendarImage == null || _calendarImage.isDisposed()) {
-			return;
-		}
-
-		final CalendarSelectItem oldHoveredItem = _hoveredItem;
 		final CalendarSelectItem oldSelectedItem = _selectedItem;
 
-		if (1 == event.button || 3 == event.button) {
+		if (event.button == 1 || event.button == 3) {
 
 			// reset selection
 			_selectedItem = _emptyItem;
 		}
 
-		// reset hover state
-		_hoveredTour = null;
-
 		boolean isTourHovered = false;
-		boolean isDayHovered = false;
 
 		// check if a tour is hovered
 		for (final FocusItem tourFocusItem : _allTourFocusItems) {
@@ -3074,7 +3054,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 				final long id = tourFocusItem.id;
 
-				if (1 == event.button || 3 == event.button) {
+				if (event.button == 1 || event.button == 3) {
 
 					// set new selection
 
@@ -3084,16 +3064,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 					_selectedItem.calendarTourData = calendarTourData;
 					_selectedItem.canItemBeDragged = calendarTourData.isManualTour;
-
-				} else if (oldHoveredItem.id != id) {
-
-					// a new item is hovered
-
-					_hoveredItem = new CalendarSelectItem(id, ItemType.TOUR);
 				}
-
-				_hoveredTour = new CalendarSelectItem(id, ItemType.TOUR);
-				_hoveredTour.itemRectangle = tourFocusItem.rect;
 
 				isTourHovered = true;
 
@@ -3110,16 +3081,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 					final long dayId = dayFocusItem.id;
 
-					if (1 == event.button || 3 == event.button) {
+					if (event.button == 1 || event.button == 3) {
 
 						_selectedItem = new CalendarSelectItem(dayId, ItemType.DAY);
-
-					} else if (oldHoveredItem.id != dayId) { // a new object is highlighted
-
-						_hoveredItem = new CalendarSelectItem(dayId, ItemType.DAY);
 					}
-
-					isDayHovered = true;
 
 					break;
 				}
@@ -3131,21 +3096,99 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			// selection is modified -> redraw calendar
 
 			redraw();
-			return;
+		}
+	}
+
+	private void onMouse_Exit() {
+
+		/*
+		 * Remove hovered item that when entering, the same item is displayed again otherwise it
+		 * will not work
+		 */
+		_hoveredItem = _emptyItem;
+
+		redraw();
+	}
+
+	/**
+	 * Mouse move/down event handler
+	 * 
+	 * @param event
+	 */
+	private void onMouse_Move(final MouseEvent event) {
+
+		final CalendarSelectItem oldHoveredItem = _hoveredItem;
+
+		// reset hover state
+		_hoveredTour = null;
+
+		boolean isTourHovered = false;
+		boolean isDayHovered = false;
+
+		/*
+		 * Check if a tour is hovered
+		 */
+		for (final FocusItem tourFocusItem : _allTourFocusItems) {
+
+			if (tourFocusItem.rect.contains(event.x, event.y)) {
+
+				final long id = tourFocusItem.id;
+
+				if (oldHoveredItem.id != id) {
+
+					// a new item is hovered
+
+					_hoveredItem = new CalendarSelectItem(id, ItemType.TOUR);
+				}
+
+				_hoveredTour = new CalendarSelectItem(id, ItemType.TOUR);
+				_hoveredTour.itemRectangle = tourFocusItem.rect;
+
+				isTourHovered = true;
+
+				break;
+			}
 		}
 
-		if (!isDayHovered && !isTourHovered) {
+		/*
+		 * Check if a day is hovered
+		 */
+		if (!isTourHovered) {
 
-			// only draw base calendar, remove highlighting when it was set
+			for (final FocusItem dayFocusItem : _allDayFocusItems) {
 
-			redraw();
-			return;
+				if (dayFocusItem.rect.contains(event.x, event.y)) {
+
+					final long dayId = dayFocusItem.id;
+
+					if (oldHoveredItem.id != dayId) { // a new object is highlighted
+
+						_hoveredItem = new CalendarSelectItem(dayId, ItemType.DAY);
+					}
+
+					isDayHovered = true;
+
+					break;
+				}
+			}
 		}
 
-		setHoveredModified(!oldHoveredItem.equals(_hoveredItem));
-		if (_isHoveredModified) {
+		if (isDayHovered || isTourHovered) {
 
-			// only draw the highlighting on top of the calendar image
+			setHoveredModified(!oldHoveredItem.equals(_hoveredItem));
+
+			if (_isHoveredModified) {
+
+				// only draw the highlighting on top of the calendar image
+				redraw();
+			}
+
+		} else {
+
+			// nothing is hovered, remove highlighting when it was set
+
+			_hoveredItem = _emptyItem;
+
 			redraw();
 		}
 
