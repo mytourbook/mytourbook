@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -82,48 +82,60 @@ import org.eclipse.ui.part.PageBook;
 public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLayer {
 
 	// 40 is the largest size that the mouse wheel can adjust the scale by 1 (windows)
-	public static final int					MAX_ADJUST_GEO_POS_SLICES			= 40;
+	public static final int				MAX_ADJUST_GEO_POS_SLICES			= 40;
 
-	private static final String				WIDGET_DATA_ALTI_ID					= "altiId";								//$NON-NLS-1$
-	private static final String				WIDGET_DATA_METRIC_ALTITUDE			= "metricAltitude";						//$NON-NLS-1$
+	private static final String			WIDGET_DATA_ALTI_ID					= "altiId";									//$NON-NLS-1$
+	private static final String			WIDGET_DATA_METRIC_ALTITUDE			= "metricAltitude";							//$NON-NLS-1$
 
-	private static final int				ALTI_ID_START						= 1;
-	private static final int				ALTI_ID_END							= 2;
-	private static final int				ALTI_ID_MAX							= 3;
+	private static final int			ALTI_ID_START						= 1;
+	private static final int			ALTI_ID_END							= 2;
+	private static final int			ALTI_ID_MAX							= 3;
 
-	private static final int				ADJUST_TYPE_SRTM					= 1010;
-	private static final int				ADJUST_TYPE_SRTM_SPLINE				= 1020;
-	private static final int				ADJUST_TYPE_WHOLE_TOUR				= 1030;
-	private static final int				ADJUST_TYPE_START_AND_END			= 1040;
-	private static final int				ADJUST_TYPE_MAX_HEIGHT				= 1050;
-	private static final int				ADJUST_TYPE_END						= 1060;
-	private static final int				ADJUST_TYPE_HORIZONTAL_GEO_POSITION	= 1100;
+	private static final int			ADJUST_TYPE_SRTM					= 1010;
+	private static final int			ADJUST_TYPE_SRTM_SPLINE				= 1020;
+	private static final int			ADJUST_TYPE_WHOLE_TOUR				= 1030;
+	private static final int			ADJUST_TYPE_START_AND_END			= 1040;
+	private static final int			ADJUST_TYPE_MAX_HEIGHT				= 1050;
+	private static final int			ADJUST_TYPE_END						= 1060;
+	private static final int			ADJUST_TYPE_HORIZONTAL_GEO_POSITION	= 1100;
 
-	private static AdjustmentType[]			ALL_ADJUSTMENT_TYPES				= new AdjustmentType[] {
-			new AdjustmentType(ADJUST_TYPE_SRTM_SPLINE, Messages.adjust_altitude_type_srtm_spline),
-			new AdjustmentType(ADJUST_TYPE_SRTM, Messages.adjust_altitude_type_srtm),
-			new AdjustmentType(ADJUST_TYPE_START_AND_END, Messages.adjust_altitude_type_start_and_end),
-			new AdjustmentType(ADJUST_TYPE_MAX_HEIGHT, Messages.adjust_altitude_type_adjust_height),
-			new AdjustmentType(ADJUST_TYPE_END, Messages.adjust_altitude_type_adjust_end),
-			new AdjustmentType(ADJUST_TYPE_WHOLE_TOUR, Messages.adjust_altitude_type_adjust_whole_tour),
-			new AdjustmentType(ADJUST_TYPE_HORIZONTAL_GEO_POSITION, Messages.Adjust_Altitude_Type_HorizontalGeoPosition),
-																				//
-																				};
+// SET_FORMATTING_OFF
 
-	private static final String				PREF_ADJUST_TYPE					= "adjust.altitude.adjust_type";			//$NON-NLS-1$
-	private static final String				PREF_KEEP_START						= "adjust.altitude.keep_start";			//$NON-NLS-1$
-	private static final String				PREF_SCALE_GEO_POSITION				= "Dialog_AdjustAltitude_GeoPositionScale"; //$NON-NLS-1$
+	private static AdjustmentType[]		ALL_ADJUSTMENT_TYPES				= new AdjustmentType[] {
+	
+			new AdjustmentType(ADJUST_TYPE_SRTM_SPLINE, 			Messages.adjust_altitude_type_srtm_spline),
+			new AdjustmentType(ADJUST_TYPE_SRTM, 					Messages.adjust_altitude_type_srtm),
+			new AdjustmentType(ADJUST_TYPE_START_AND_END, 			Messages.adjust_altitude_type_start_and_end),
+			new AdjustmentType(ADJUST_TYPE_MAX_HEIGHT, 				Messages.adjust_altitude_type_adjust_height),
+			new AdjustmentType(ADJUST_TYPE_END, 					Messages.adjust_altitude_type_adjust_end),
+			new AdjustmentType(ADJUST_TYPE_WHOLE_TOUR, 				Messages.adjust_altitude_type_adjust_whole_tour),
+			new AdjustmentType(ADJUST_TYPE_HORIZONTAL_GEO_POSITION,	Messages.Adjust_Altitude_Type_HorizontalGeoPosition),
+			//
+	};
+
+	private static final String			PREF_ADJUST_TYPE					= "adjust.altitude.adjust_type";	//$NON-NLS-1$
+	private static final String			PREF_KEEP_START						= "adjust.altitude.keep_start";		//$NON-NLS-1$
+	private static final String			PREF_SCALE_GEO_POSITION				= "Dialog_AdjustAltitude_GeoPositionScale";		//$NON-NLS-1$
+	
+// SET_FORMATTING_ON
 
 //	private static final String				STATE_IS_SRTM_SELECT_WHOLE_TOUR		= "State_IsSRTMSelectWholeTour";			//$NON-NLS-1$
 //	private static final String				STATE_IS_SRTM_SELECT_SYNC_START_END	= "State_IsSRTMSyncStartEnd";				//$NON-NLS-1$
 
-	private final IPreferenceStore			_prefStore							= TourbookPlugin.getPrefStore();
+	private static final NumberFormat	_nf									= NumberFormat.getNumberInstance();
+
+	static {
+		_nf.setMinimumFractionDigits(0);
+		_nf.setMaximumFractionDigits(3);
+	}
+
+	private final IPreferenceStore			_prefStore					= TourbookPlugin.getPrefStore();
 
 	/*
 	 * data
 	 */
 	private boolean							_isSliderEventDisabled;
-	private boolean							_isTourSaved						= false;
+	private boolean							_isTourSaved				= false;
 	private final boolean					_isSaveTour;
 	private final boolean					_isCreateDummyAltitude;
 
@@ -136,10 +148,10 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 	private float[]							_metricAdjustedAltitudeWithoutSRTM;
 
-	private int								_oldAdjustmentType					= -1;
-	private final ArrayList<AdjustmentType>	_availableAdjustmentTypes			= new ArrayList<AdjustmentType>();
+	private int								_oldAdjustmentType			= -1;
+	private final ArrayList<AdjustmentType>	_availableAdjustmentTypes	= new ArrayList<>();
 
-	private int								_pointHitIndex						= -1;
+	private int								_pointHitIndex				= -1;
 	private float							_altiDiff;
 	private double							_sliderXAxisValue;
 
@@ -153,14 +165,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 	private float							_altiStartDiff;
 
 	private float							_prevAltiMax;
-	private float							_prevAltiStart;
-
-	private static final NumberFormat		_nf									= NumberFormat.getNumberInstance();
-
-	static {
-		_nf.setMinimumFractionDigits(0);
-		_nf.setMaximumFractionDigits(3);
-	};
+	private float							_prevAltiStart;;
 
 	/*
 	 * UI controls
@@ -1074,11 +1079,11 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		for (final AdjustmentType adjustType : ALL_ADJUSTMENT_TYPES) {
 
 			if (_backupSrtmSerie == null && (//
-					adjustType.__id == ADJUST_TYPE_SRTM_SPLINE //
-							|| adjustType.__id == ADJUST_TYPE_SRTM //
+			adjustType.__id == ADJUST_TYPE_SRTM_SPLINE //
+					|| adjustType.__id == ADJUST_TYPE_SRTM //
 					|| adjustType.__id == ADJUST_TYPE_HORIZONTAL_GEO_POSITION
-					//
-					)) {
+			//
+			)) {
 
 				// skip types which require srtm data
 				continue;
@@ -1160,8 +1165,11 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		_tourChartConfig.isSRTMDataVisible = true;
 
 		// overwrite x-axis from pref store
-		_tourChartConfig.setIsShowTimeOnXAxis(_prefStore.getString(
-				ITourbookPreferences.ADJUST_ALTITUDE_CHART_X_AXIS_UNIT).equals(TourManager.X_AXIS_TIME));
+		_tourChartConfig.setIsShowTimeOnXAxis(
+				_prefStore
+						.getString(
+								ITourbookPreferences.ADJUST_ALTITUDE_CHART_X_AXIS_UNIT)
+						.equals(TourManager.X_AXIS_TIME));
 	}
 
 	/**
@@ -1377,7 +1385,8 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 	private void createUI_62_Max(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
+		GridDataFactory
+				.fillDefaults()//
 				.align(SWT.BEGINNING, SWT.FILL)
 				.indent(40, 0)
 				.grab(true, false)
@@ -1774,16 +1783,20 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 			 * slider is not moved because of slider optimization
 			 */
 
-			_tourChart.setXSliderPosition(new SelectionChartXSliderPosition(_tourChart, //
-					maxIndex,
-					maxIndex));
+			_tourChart.setXSliderPosition(
+					new SelectionChartXSliderPosition(
+							_tourChart, //
+							maxIndex,
+							maxIndex));
 		} else {
 
 			// position the right slider in the horizontal center
 
-			_tourChart.setXSliderPosition(new SelectionChartXSliderPosition(_tourChart, //
-					maxIndex / 2,
-					maxIndex));
+			_tourChart.setXSliderPosition(
+					new SelectionChartXSliderPosition(
+							_tourChart, //
+							maxIndex / 2,
+							maxIndex));
 		}
 
 		_tourChart.getDisplay().timerExec(100, new Runnable() {
@@ -2131,7 +2144,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 			typeIndex++;
 		}
 		_comboAdjustmentType.select(comboIndex);
-		
+
 		/*
 		 * A selection event is not fired, this is necessary that the layout of the dialog is run,
 		 * otherwise the options can be hidden
@@ -2187,9 +2200,11 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		_prefStore.setValue(PREF_ADJUST_TYPE, getSelectedAdjustmentType().__id);
 
-		_prefStore.setValue(ITourbookPreferences.ADJUST_ALTITUDE_CHART_X_AXIS_UNIT, _tourChartConfig.isShowTimeOnXAxis
-				? TourManager.X_AXIS_TIME
-				: TourManager.X_AXIS_DISTANCE);
+		_prefStore.setValue(
+				ITourbookPreferences.ADJUST_ALTITUDE_CHART_X_AXIS_UNIT,
+				_tourChartConfig.isShowTimeOnXAxis
+						? TourManager.X_AXIS_TIME
+						: TourManager.X_AXIS_DISTANCE);
 
 		_prefStore.setValue(PREF_KEEP_START, _rdoKeepStart.getSelection());
 
@@ -2297,6 +2312,8 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 				newLonSerie[serieIndex] = endLon;
 			}
 		}
+
+		_tourData.computeGeoBounds();
 	}
 
 	private CubicSpline updateSplineData() {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -48,7 +48,7 @@ import org.eclipse.osgi.util.NLS;
  */
 public class Polar_PDD_DataReader extends TourbookDevice {
 
-	private static final String		DATA_DELIMITER				= "\t";										//$NON-NLS-1$
+	private static final String		DATA_DELIMITER				= "\t";											//$NON-NLS-1$
 
 	private static final String		SECTION_DAY_INFO			= "[DayInfo]";									//$NON-NLS-1$
 	private static final String		SECTION_EXERCISE_INFO		= "[ExerciseInfo";								//$NON-NLS-1$
@@ -72,7 +72,7 @@ public class Polar_PDD_DataReader extends TourbookDevice {
 
 	private class Day {
 
-		private ZonedDateTime	date;
+		private ZonedDateTime date;
 	}
 
 	private class Exercise {
@@ -248,15 +248,19 @@ public class Polar_PDD_DataReader extends TourbookDevice {
 		final File importFile = importFilePath.toFile();
 
 		if (importFile.exists() == false) {
-			throw new Exception(NLS.bind("File {0} is not available but is defined in file {1}", //$NON-NLS-1$
-					importFile.toString(),
-					_importFilePath));
+			throw new Exception(
+					NLS.bind(
+							"File {0} is not available but is defined in file {1}", //$NON-NLS-1$
+							importFile.toString(),
+							_importFilePath));
 		}
 
 		if (deviceDataReader.validateRawData(importFilePath.toOSString()) == false) {
-			throw new Exception(NLS.bind("File {0} in parent file {1} is invalid", //$NON-NLS-1$
-					importFile.toString(),
-					_importFilePath));
+			throw new Exception(
+					NLS.bind(
+							"File {0} in parent file {1} is invalid", //$NON-NLS-1$
+							importFile.toString(),
+							_importFilePath));
 		}
 
 		final HashMap<Long, TourData> alreadyImportedTours = new HashMap<Long, TourData>();
@@ -376,6 +380,8 @@ public class Polar_PDD_DataReader extends TourbookDevice {
 				}
 			}
 		}
+
+		hrmTourData.computeGeoBounds();
 	}
 
 	private void createExercise_22_AdjustTimeSlices(final TourData hrmTourData, final TourData gpxTourData) {
@@ -506,9 +512,11 @@ public class Polar_PDD_DataReader extends TourbookDevice {
 
 					// check version
 					if (_fileVersionDayInfo != 100) {
-						throw new Exception(NLS.bind("File {0} has an invalid version in section {1}", //$NON-NLS-1$
-								_importFilePath,
-								SECTION_DAY_INFO));
+						throw new Exception(
+								NLS.bind(
+										"File {0} has an invalid version in section {1}", //$NON-NLS-1$
+										_importFilePath,
+										SECTION_DAY_INFO));
 					}
 
 				} else if (line.startsWith(SECTION_EXERCISE_INFO)) {
@@ -519,9 +527,11 @@ public class Polar_PDD_DataReader extends TourbookDevice {
 
 					// check version
 					if (_currentExercise.fileVersion != 101) {
-						throw new Exception(NLS.bind("File {0} has an invalid version in section {1}", //$NON-NLS-1$
-								_importFilePath,
-								SECTION_EXERCISE_INFO));
+						throw new Exception(
+								NLS.bind(
+										"File {0} has an invalid version in section {1}", //$NON-NLS-1$
+										_importFilePath,
+										SECTION_EXERCISE_INFO));
 					}
 				}
 
@@ -585,7 +595,6 @@ public class Polar_PDD_DataReader extends TourbookDevice {
 			 * Nbr Of Num Columns  		6
 			 * Nbr Of Text Rows  		1
 			 * Max Char Per Text Row  512
-			 * 
 			 * </pre>
 			 */
 			line = fileReader.readLine();
@@ -625,7 +634,6 @@ public class Polar_PDD_DataReader extends TourbookDevice {
 			 * ?
 			 * ?
 			 * ?
-			 * 
 			 * </pre>
 			 */
 			line = fileReader.readLine();
@@ -711,7 +719,6 @@ public class Polar_PDD_DataReader extends TourbookDevice {
 			 * 4:	Nbr Of Num Columns  		6
 			 * 5:	Nbr Of Text Rows  		12
 			 * 6:	Max Char Per Text Row  	512
-			 * 
 			 * </pre>
 			 */
 			String line = fileReader.readLine();
@@ -803,7 +810,6 @@ public class Polar_PDD_DataReader extends TourbookDevice {
 			 * 4:	Recovery  				0 ... 4  	0 = Fully Recovered ... 4 = Exhausted
 			 * 5:	- Reserved -  			0
 			 * 6:	Energy consumption  	376
-			 * 
 			 * </pre>
 			 */
 
@@ -846,7 +852,6 @@ public class Polar_PDD_DataReader extends TourbookDevice {
 			 * 4:	?
 			 * 5:	?
 			 * 6:	?
-			 * 
 			 * </pre>
 			 */
 
@@ -898,7 +903,6 @@ public class Polar_PDD_DataReader extends TourbookDevice {
 			 * Row 7  previous multisport file
 			 * Row 8  next multisport file
 			 * Row n  - Reserved -
-			 * 
 			 * </pre>
 			 */
 

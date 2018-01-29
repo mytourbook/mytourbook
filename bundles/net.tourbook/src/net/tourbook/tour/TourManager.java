@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1582,6 +1582,8 @@ public class TourManager {
 		doubleSerie = tourData.longitudeSerie;
 		if (doubleSerie != null) {
 			tourData.longitudeSerie = removeTimeSlices_Double(doubleSerie, firstIndex, lastIndex);
+
+			tourData.computeGeoBounds();
 		}
 
 		/*
