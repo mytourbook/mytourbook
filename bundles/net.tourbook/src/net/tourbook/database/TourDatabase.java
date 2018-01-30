@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -54,7 +54,6 @@ import net.tourbook.Messages;
 import net.tourbook.application.MyTourbookSplashHandler;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.NIO;
-import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
@@ -105,9 +104,9 @@ public class TourDatabase {
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int			TOURBOOK_DB_VERSION							= 34;
-//	private static final int			TOURBOOK_DB_VERSION							= 34;	// 18.?
-//	private static final int			TOURBOOK_DB_VERSION							= 33;	// 17.12
+//	private static final int			TOURBOOK_DB_VERSION							= 34;
+////	private static final int			TOURBOOK_DB_VERSION							= 34;	// 18.?
+	private static final int			TOURBOOK_DB_VERSION							= 33;	// 17.12
 //	private static final int			TOURBOOK_DB_VERSION							= 32;	// 16.10
 
 //	private static final int			TOURBOOK_DB_VERSION							= 31;	// 16.5
@@ -4226,11 +4225,11 @@ public class TourDatabase {
 			/*
 			 * 33 -> 34
 			 */
-			boolean isPostUpdate34 = false;
-			if (currentDbVersion == 33) {
-				isPostUpdate34 = true;
-				currentDbVersion = newVersion = updateDbDesign_033_to_034(conn, monitor);
-			}
+//			boolean isPostUpdate34 = false;
+//			if (currentDbVersion == 33) {
+//				isPostUpdate34 = true;
+//				currentDbVersion = newVersion = updateDbDesign_033_to_034(conn, monitor);
+//			}
 
 			/*
 			 * update version number
@@ -4278,9 +4277,9 @@ public class TourDatabase {
 			if (isPostUpdate32) {
 				updateDbDesign_031_to_032_PostUpdate(conn, monitor);
 			}
-			if (isPostUpdate34) {
-				updateDbDesign_033_to_034_PostUpdate(conn, monitor);
-			}
+//			if (isPostUpdate34) {
+//				updateDbDesign_033_to_034_PostUpdate(conn, monitor);
+//			}
 
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
@@ -6258,94 +6257,94 @@ public class TourDatabase {
 		return newDbVersion;
 	}
 
-	private int updateDbDesign_033_to_034(final Connection conn, final IProgressMonitor monitor) throws SQLException {
-
-		final int newDbVersion = 34;
-
-		logDb_UpdateStart(newDbVersion);
-		updateMonitor(monitor, newDbVersion);
-
-		final Statement stmt = conn.createStatement();
-		{
-			// check if db is updated to version 34
-			if (isColumnAvailable(conn, TABLE_TOUR_DATA, "LatitudeMin") == false) { //$NON-NLS-1$
-
-				// TABLE_TOUR_DATA: add column min/max lat/lon
-
-				SQL.AddCol_Double(stmt, TABLE_TOUR_DATA, "LatitudeMin", SQL_DOUBLE_MIN_VALUE); //$NON-NLS-1$
-				SQL.AddCol_Double(stmt, TABLE_TOUR_DATA, "LatitudeMax", SQL_DOUBLE_MIN_VALUE); //$NON-NLS-1$
-				SQL.AddCol_Double(stmt, TABLE_TOUR_DATA, "LongitudeMin", SQL_DOUBLE_MIN_VALUE); //$NON-NLS-1$
-				SQL.AddCol_Double(stmt, TABLE_TOUR_DATA, "LongitudeMax", SQL_DOUBLE_MIN_VALUE); //$NON-NLS-1$
-			}
-		}
-		stmt.close();
-
-		logDb_UpdateEnd(newDbVersion);
-
-		return newDbVersion;
-	}
-
-	/**
-	 * Set lat/lon min/max values
-	 * 
-	 * @param conn
-	 * @param monitor
-	 * @throws SQLException
-	 */
-	private void updateDbDesign_033_to_034_PostUpdate(final Connection conn, final IProgressMonitor monitor)
-			throws SQLException {
-
-		int tourIdx = 1;
-		final ArrayList<Long> tourList = getAllTourIds();
-
-		final EntityManager em = TourDatabase.getInstance().getEntityManager();
-		try {
-
-			long lastUpdateTime = System.currentTimeMillis();
-
-			// loop: all tours
-			for (final Long tourId : tourList) {
-
-				if (monitor != null) {
-
-					final long currentTime = System.currentTimeMillis();
-					final float timeDiff = currentTime - lastUpdateTime;
-
-					// reduce logging
-					if (timeDiff > 100) {
-
-						lastUpdateTime = currentTime;
-
-						final String percent = String.format("%.1f", (float) tourIdx / tourList.size() * 100.0);//$NON-NLS-1$
-
-						monitor.subTask(
-								NLS.bind(//
-										Messages.Tour_Database_PostUpdate_034_SetMinMaxLatLon,
-										new Object[] { tourIdx, tourList.size(), percent }));
-					}
-
-					tourIdx++;
-				}
-
-				final TourData tourData = em.find(TourData.class, tourId);
-
-				if (tourData != null) {
-
-					final GeoPosition[] geoBounds = tourData.computeGeoBounds();
-
-					if (geoBounds != null) {
-						TourDatabase.saveEntity(tourData, tourId, TourData.class);
-					}
-				}
-			}
-
-		} catch (final Exception e) {
-			e.printStackTrace();
-		} finally {
-
-			em.close();
-		}
-	}
+//	private int updateDbDesign_033_to_034(final Connection conn, final IProgressMonitor monitor) throws SQLException {
+//
+//		final int newDbVersion = 34;
+//
+//		logDb_UpdateStart(newDbVersion);
+//		updateMonitor(monitor, newDbVersion);
+//
+//		final Statement stmt = conn.createStatement();
+//		{
+//			// check if db is updated to version 34
+//			if (isColumnAvailable(conn, TABLE_TOUR_DATA, "LatitudeMin") == false) { //$NON-NLS-1$
+//
+//				// TABLE_TOUR_DATA: add column min/max lat/lon
+//
+//				SQL.AddCol_Double(stmt, TABLE_TOUR_DATA, "LatitudeMin", SQL_DOUBLE_MIN_VALUE); //$NON-NLS-1$
+//				SQL.AddCol_Double(stmt, TABLE_TOUR_DATA, "LatitudeMax", SQL_DOUBLE_MIN_VALUE); //$NON-NLS-1$
+//				SQL.AddCol_Double(stmt, TABLE_TOUR_DATA, "LongitudeMin", SQL_DOUBLE_MIN_VALUE); //$NON-NLS-1$
+//				SQL.AddCol_Double(stmt, TABLE_TOUR_DATA, "LongitudeMax", SQL_DOUBLE_MIN_VALUE); //$NON-NLS-1$
+//			}
+//		}
+//		stmt.close();
+//
+//		logDb_UpdateEnd(newDbVersion);
+//
+//		return newDbVersion;
+//	}
+//
+//	/**
+//	 * Set lat/lon min/max values
+//	 *
+//	 * @param conn
+//	 * @param monitor
+//	 * @throws SQLException
+//	 */
+//	private void updateDbDesign_033_to_034_PostUpdate(final Connection conn, final IProgressMonitor monitor)
+//			throws SQLException {
+//
+//		int tourIdx = 1;
+//		final ArrayList<Long> tourList = getAllTourIds();
+//
+//		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+//		try {
+//
+//			long lastUpdateTime = System.currentTimeMillis();
+//
+//			// loop: all tours
+//			for (final Long tourId : tourList) {
+//
+//				if (monitor != null) {
+//
+//					final long currentTime = System.currentTimeMillis();
+//					final float timeDiff = currentTime - lastUpdateTime;
+//
+//					// reduce logging
+//					if (timeDiff > 100) {
+//
+//						lastUpdateTime = currentTime;
+//
+//						final String percent = String.format("%.1f", (float) tourIdx / tourList.size() * 100.0);//$NON-NLS-1$
+//
+//						monitor.subTask(
+//								NLS.bind(//
+//										Messages.Tour_Database_PostUpdate_034_SetMinMaxLatLon,
+//										new Object[] { tourIdx, tourList.size(), percent }));
+//					}
+//
+//					tourIdx++;
+//				}
+//
+//				final TourData tourData = em.find(TourData.class, tourId);
+//
+//				if (tourData != null) {
+//
+//					final GeoPosition[] geoBounds = tourData.computeGeoBounds();
+//
+//					if (geoBounds != null) {
+//						TourDatabase.saveEntity(tourData, tourId, TourData.class);
+//					}
+//				}
+//			}
+//
+//		} catch (final Exception e) {
+//			e.printStackTrace();
+//		} finally {
+//
+//			em.close();
+//		}
+//	}
 
 	private void updateDbDesign_VersionNumber(final Connection conn, final int newVersion) throws SQLException {
 

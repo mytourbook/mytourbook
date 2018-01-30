@@ -870,6 +870,8 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 		final TourData tourData = TourManager.getInstance().getTourData(tourId);
 
+		tourData.createGeoPartitions();
+
 		updateChart(tourData);
 
 		fireSliderPosition();

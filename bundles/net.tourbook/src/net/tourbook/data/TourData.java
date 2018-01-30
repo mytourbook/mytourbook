@@ -20,6 +20,7 @@ import static javax.persistence.FetchType.*;
 
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.map.hash.TLongLongHashMap;
 
 import java.awt.Point;
 import java.io.File;
@@ -629,10 +630,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	// ############################################# GEO POSITIONS #############################################
 
-	private double						latitudeMin							= Double.MIN_VALUE;				// db-version 34
-	private double						latitudeMax							= Double.MIN_VALUE;				// db-version 34
-	private double						longitudeMin						= Double.MIN_VALUE;				// db-version 34
-	private double						longitudeMax						= Double.MIN_VALUE;				// db-version 34
+//	private double						latitudeMin							= Double.MIN_VALUE;				// db-version 34
+//	private double						latitudeMax							= Double.MIN_VALUE;				// db-version 34
+//	private double						longitudeMin						= Double.MIN_VALUE;				// db-version 34
+//	private double						longitudeMax						= Double.MIN_VALUE;				// db-version 34
 
 	// ############################################# UNUSED FIELDS - START #############################################
 	/**
@@ -2588,10 +2589,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			}
 		}
 
-		latitudeMin = minLatitude;
-		latitudeMax = maxLatitude;
-		longitudeMin = minLongitude;
-		longitudeMax = maxLongitude;
+//		latitudeMin = minLatitude;
+//		latitudeMax = maxLatitude;
+//		longitudeMin = minLongitude;
+//		longitudeMax = maxLongitude;
 
 		return _gpsBounds = new GeoPosition[] {
 				new GeoPosition(minLatitude, minLongitude),
@@ -3634,6 +3635,62 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		}
 
 		Collections.sort(_galleryPhotos, TourPhotoManager.AdjustTimeComparatorTour);
+	}
+
+	public void createGeoPartitions() {
+
+		// TODO Auto-generated method stub
+
+		if (latitudeSerie == null || longitudeSerie == null) {
+			return;
+		}
+
+		final TLongLongHashMap latLonPartition = new TLongLongHashMap();
+
+		for (int serieIndex = 0; serieIndex < latitudeSerie.length; serieIndex++) {
+
+			final double latitude = latitudeSerie[serieIndex];
+			final double longitude = longitudeSerie[serieIndex];
+
+			final int latPart = (int) (latitude * 100);
+			final int lonPart = (int) (longitude * 100);
+
+//			lat  -90 ...  +90
+//			lon -180 ... +180
+
+//			lat		(-90 + 90)   * 100 = -9_000  + 9_000  = 18_000
+//			lon		(-180 + 180) * 100 = -18_000 + 18_000 = 36_000
+
+//			max		(9_000 + 9_000) * 100_000 = 18_000 * 100_000  = 1_800_000_000
+
+//												Integer.MAX_VALUE = 2_147_483_647
+
+			final long latLonPart = (latPart + 9_000) * 100_000 + (lonPart + 18_000);
+			latLonPartition.put(latLonPart, latLonPart);
+		}
+
+		System.out.println();
+		System.out.println();
+		System.out.println();
+
+		for (final long latLonPart : latLonPartition.values()) {
+
+			final long lat = (latLonPart / 100_000) - 9_000;
+			final long lon = (latLonPart % 100_000) - 18_000;
+
+			System.out.println(
+					(net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+							+ ("\t: " + latLonPart)
+							+ ("\tlat: " + lat)
+							+ ("\tlon: " + lon));
+// TODO remove SYSTEM.OUT.PRINTLN
+		}
+		System.out.println();
+		System.out.println(
+				(net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+						+ ("\tsize: " + latLonPartition.values().length));
+// TODO remove SYSTEM.OUT.PRINTLN
+
 	}
 
 	public void createHistoryTimeSerie(final ArrayList<HistoryData> historySlices) {
