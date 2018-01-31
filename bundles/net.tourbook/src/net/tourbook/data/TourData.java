@@ -20,7 +20,7 @@ import static javax.persistence.FetchType.*;
 
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.map.hash.TLongLongHashMap;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.awt.Point;
 import java.io.File;
@@ -684,7 +684,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 */
 	@OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-	private Set<TourPhoto>				tourPhotos							= new HashSet<TourPhoto>();
+	private Set<TourPhoto>				tourPhotos							= new HashSet<>();
 
 	// ############################################# ASSOCIATED ENTITIES #############################################
 
@@ -695,29 +695,29 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	@XmlElementWrapper(name = "TourMarkers")
 	@XmlElement(name = "TourMarker")
-	private Set<TourMarker>				tourMarkers							= new HashSet<TourMarker>();
+	private Set<TourMarker>				tourMarkers							= new HashSet<>();
 
 	/**
 	 * Contains the tour way points
 	 */
 	@OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-	private final Set<TourWayPoint>		tourWayPoints						= new HashSet<TourWayPoint>();
+	private final Set<TourWayPoint>		tourWayPoints						= new HashSet<>();
 
 	/**
 	 * Reference tours
 	 */
 	@OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-	private final Set<TourReference>	tourReferences						= new HashSet<TourReference>();
+	private final Set<TourReference>	tourReferences						= new HashSet<>();
 
 	/**
 	 * Tags
 	 */
 	@ManyToMany(fetch = EAGER)
 	@JoinTable(inverseJoinColumns = @JoinColumn(name = "TOURTAG_TagID", referencedColumnName = "TagID"))
-	private Set<TourTag>				tourTags							= new HashSet<TourTag>();
-
+	private Set<TourTag>				tourTags							= new HashSet<>();
+	
 //	/**
 //	 * SharedMarker
 //	 */
@@ -969,6 +969,26 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 */
 	@Transient
 	private GeoPosition[]				_gpsBounds;
+
+	/**
+	 * Contains the geo parts of the tour or <code>null</code> when geo data are not available. A
+	 * part is an integer of lat and lon * 100
+	 * 
+	 * <pre>
+	
+		int latPart = (int) (latitude * 100);
+		int lonPart = (int) (longitude * 100);
+		
+		lat		( -90 ... + 90) * 100 =  -9_000 +  9_000 = 18_000
+		lon		(-180 ... +180) * 100 = -18_000 + 18_000 = 36_000
+	
+		max		(9_000 + 9_000) * 100_000 = 18_000 * 100_000  = 1_800_000_000
+	
+											Integer.MAX_VALUE = 2_147_483_647
+	 * </pre>
+	 */
+	@Transient
+	public TIntHashSet					geoParts;
 
 	/**
 	 * Index of the segmented data in the data series
@@ -1442,6 +1462,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		if (isLatitudeValid == false) {
 			latitudeSerie = null;
 			longitudeSerie = null;
+			geoParts = null;
 		}
 	}
 
@@ -2550,7 +2571,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		computeAvg_Temperature();
 
 		computeHrZones();
-		computeGeoBounds();
+
+		computeGeo_Bounds();
+		computeGeo_Partitions();
 	}
 
 	/**
@@ -2558,7 +2581,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * 
 	 * @return Returns geo min/max positions when data are available, otherwise <code>null</code>.
 	 */
-	public GeoPosition[] computeGeoBounds() {
+	public GeoPosition[] computeGeo_Bounds() {
 
 		if (latitudeSerie == null || longitudeSerie == null) {
 			return null;
@@ -2597,6 +2620,75 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		return _gpsBounds = new GeoPosition[] {
 				new GeoPosition(minLatitude, minLongitude),
 				new GeoPosition(maxLatitude, maxLongitude) };
+	}
+
+	/**
+	 * Computes geo partitions into {@link #geoParts} when geo data are available
+	 */
+	public void computeGeo_Partitions() {
+
+		geoParts = computeGeo_Partitions(latitudeSerie, longitudeSerie);
+	}
+
+	/**
+	 * Computes geo partitions when geo data are available
+	 * 
+	 * @param allLatitude
+	 * @param allLongitude
+	 * @return Returns all geo partitions or <code>null</code> when geo data are not available.
+	 */
+	public TIntHashSet computeGeo_Partitions(final double[] allLatitude, final double[] allLongitude) {
+
+		if (allLatitude == null || allLongitude == null) {
+			return null;
+		}
+
+		final TIntHashSet allGeoParts = new TIntHashSet();
+
+		for (int serieIndex = 0; serieIndex < allLatitude.length; serieIndex++) {
+
+//			int latPart = (int) (latitude * 100);
+//			int lonPart = (int) (longitude * 100);
+//
+//			lat		( -90 ... + 90) * 100 =  -9_000 +  9_000 = 18_000
+//			lon		(-180 ... +180) * 100 = -18_000 + 18_000 = 36_000
+//
+//			max		(9_000 + 9_000) * 100_000 = 18_000 * 100_000  = 1_800_000_000
+//
+//												Integer.MAX_VALUE = 2_147_483_647
+
+			final double latitude = allLatitude[serieIndex];
+			final double longitude = allLongitude[serieIndex];
+
+			final int latPart = (int) (latitude * 100);
+			final int lonPart = (int) (longitude * 100);
+
+			final int latLonPart = (latPart + 9_000) * 100_000 + (lonPart + 18_000);
+
+			allGeoParts.add(latLonPart);
+		}
+
+//		System.out.println();
+//		System.out.println();
+//		System.out.println();
+//
+//		for (final int latLonPart : allGeoParts.toArray()) {
+//
+//			final int lat = (latLonPart / 100_000) - 9_000;
+//			final int lon = (latLonPart % 100_000) - 18_000;
+//
+//			System.out.println(
+//					(net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//							+ ("\t: " + latLonPart)
+//							+ ("\tlat: " + lat)
+//							+ ("\tlon: " + lon));
+//		}
+//		System.out.println();
+//		System.out.println(
+//				(net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//						+ ("\tsize: " + allGeoParts.toArray().length));
+
+		return allGeoParts;
 	}
 
 	/**
@@ -3635,62 +3727,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		}
 
 		Collections.sort(_galleryPhotos, TourPhotoManager.AdjustTimeComparatorTour);
-	}
-
-	public void createGeoPartitions() {
-
-		// TODO Auto-generated method stub
-
-		if (latitudeSerie == null || longitudeSerie == null) {
-			return;
-		}
-
-		final TLongLongHashMap latLonPartition = new TLongLongHashMap();
-
-		for (int serieIndex = 0; serieIndex < latitudeSerie.length; serieIndex++) {
-
-			final double latitude = latitudeSerie[serieIndex];
-			final double longitude = longitudeSerie[serieIndex];
-
-			final int latPart = (int) (latitude * 100);
-			final int lonPart = (int) (longitude * 100);
-
-//			lat  -90 ...  +90
-//			lon -180 ... +180
-
-//			lat		(-90 + 90)   * 100 = -9_000  + 9_000  = 18_000
-//			lon		(-180 + 180) * 100 = -18_000 + 18_000 = 36_000
-
-//			max		(9_000 + 9_000) * 100_000 = 18_000 * 100_000  = 1_800_000_000
-
-//												Integer.MAX_VALUE = 2_147_483_647
-
-			final long latLonPart = (latPart + 9_000) * 100_000 + (lonPart + 18_000);
-			latLonPartition.put(latLonPart, latLonPart);
-		}
-
-		System.out.println();
-		System.out.println();
-		System.out.println();
-
-		for (final long latLonPart : latLonPartition.values()) {
-
-			final long lat = (latLonPart / 100_000) - 9_000;
-			final long lon = (latLonPart % 100_000) - 18_000;
-
-			System.out.println(
-					(net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-							+ ("\t: " + latLonPart)
-							+ ("\tlat: " + lat)
-							+ ("\tlon: " + lon));
-// TODO remove SYSTEM.OUT.PRINTLN
-		}
-		System.out.println();
-		System.out.println(
-				(net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-						+ ("\tsize: " + latLonPartition.values().length));
-// TODO remove SYSTEM.OUT.PRINTLN
-
 	}
 
 	public void createHistoryTimeSerie(final ArrayList<HistoryData> historySlices) {
@@ -5465,7 +5501,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	public GeoPosition[] getGeoBounds() {
 
 		if (_gpsBounds == null) {
-			computeGeoBounds();
+			computeGeo_Bounds();
 		}
 
 		return _gpsBounds;
@@ -6738,6 +6774,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 		latitudeSerie = serieData.latitude;
 		longitudeSerie = serieData.longitude;
+		computeGeo_Partitions();
 
 		gearSerie = serieData.gears;
 

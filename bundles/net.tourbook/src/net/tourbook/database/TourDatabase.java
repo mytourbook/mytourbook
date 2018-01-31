@@ -104,11 +104,10 @@ public class TourDatabase {
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-//	private static final int			TOURBOOK_DB_VERSION							= 34;
-////	private static final int			TOURBOOK_DB_VERSION							= 34;	// 18.?
-	private static final int			TOURBOOK_DB_VERSION							= 33;	// 17.12
+	private static final int			TOURBOOK_DB_VERSION							= 34;
+//	private static final int			TOURBOOK_DB_VERSION							= 34;	// 18.?
+//	private static final int			TOURBOOK_DB_VERSION							= 33;	// 17.12
 //	private static final int			TOURBOOK_DB_VERSION							= 32;	// 16.10
-
 //	private static final int			TOURBOOK_DB_VERSION							= 31;	// 16.5
 //	private static final int			TOURBOOK_DB_VERSION							= 30;	// 16.1
 //	private static final int			TOURBOOK_DB_VERSION							= 29;	// 15.12
@@ -167,6 +166,7 @@ public class TourDatabase {
 	public static final String			TABLE_TOUR_TAG_CATEGORY						= "TOURTAGCATEGORY";											//$NON-NLS-1$
 	public static final String			TABLE_TOUR_TYPE								= "TOURTYPE";													//$NON-NLS-1$
 	public static final String			TABLE_TOUR_WAYPOINT							= "TOURWAYPOINT";												//$NON-NLS-1$
+	public static final String			TABLE_TOUR_GEO_PARTS						= "Tour_GeoParts";												//$NON-NLS-1$
 	
 //	public static final String			JOINTABLE__TOURDATA__SHAREDMARKER			= TABLE_TOUR_DATA			+ "_" + TABLE_SHARED_MARKER;		//$NON-NLS-1$
 	public static final String			JOINTABLE__TOURDATA__TOURTAG				= TABLE_TOUR_DATA			+ "_" + TABLE_TOUR_TAG;				//$NON-NLS-1$
@@ -300,7 +300,7 @@ public class TourDatabase {
 	public static final double	DEFAULT_DOUBLE	= -1E+300;
 
 	private static final String	SQL_LONG_MIN_VALUE;
-	private static final String	SQL_INT_MIN_VALUE;
+//	private static final String	SQL_INT_MIN_VALUE;
 	private static final String	SQL_FLOAT_MIN_VALUE;
 	private static final String	SQL_DOUBLE_MIN_VALUE;
 
@@ -318,7 +318,7 @@ public class TourDatabase {
 //
 ////////////////////////////////////////////////////////////////////////////////////////
 
-		SQL_INT_MIN_VALUE = Integer.toString(Integer.MIN_VALUE);
+//		SQL_INT_MIN_VALUE = Integer.toString(Integer.MIN_VALUE);
 		SQL_LONG_MIN_VALUE = Long.toString(Long.MIN_VALUE);
 
 		SQL_FLOAT_MIN_VALUE = (new Float(DEFAULT_FLOAT)).toString();
@@ -540,8 +540,9 @@ public class TourDatabase {
 		private static void CreateIndex(final Statement stmt, final String tableName, final String indexAndColumnName)
 				throws SQLException {
 
-			final String sql = "CREATE INDEX " + indexAndColumnName + " ON " + tableName + " (" + indexAndColumnName //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
-					+ ")"; //$NON-NLS-1$
+			final String sql = "CREATE INDEX " + indexAndColumnName
+					+ " ON " + tableName
+					+ " (" + indexAndColumnName + ")"; //$NON-NLS-1$
 
 			exec(stmt, sql);
 		}
@@ -1026,23 +1027,20 @@ public class TourDatabase {
 			final String sqlWhere_TourId = " WHERE tourId=?";//$NON-NLS-1$
 			final String sqlWhere_TourData_TourId = " WHERE " + TABLE_TOUR_DATA + "_tourId=?"; //$NON-NLS-1$ //$NON-NLS-2$
 
+// SET_FORMATTING_OFF
 			final String allSql[] = {
 					//
-					"DELETE FROM " + TABLE_TOUR_DATA + sqlWhere_TourId, //$NON-NLS-1$
-					//
-					"DELETE FROM " + TABLE_TOUR_MARKER + sqlWhere_TourData_TourId, //$NON-NLS-1$
-					//
-					"DELETE FROM " + TABLE_TOUR_PHOTO + sqlWhere_TourData_TourId, //$NON-NLS-1$
-					//
-					"DELETE FROM " + TABLE_TOUR_WAYPOINT + sqlWhere_TourData_TourId, //$NON-NLS-1$
-					//
-					"DELETE FROM " + TABLE_TOUR_REFERENCE + sqlWhere_TourData_TourId, //$NON-NLS-1$
-					//
-					"DELETE FROM " + JOINTABLE__TOURDATA__TOURTAG + sqlWhere_TourData_TourId, //$NON-NLS-1$
-					//
-					"DELETE FROM " + TABLE_TOUR_COMPARED + sqlWhere_TourId, //$NON-NLS-1$
+					"DELETE FROM " + TABLE_TOUR_DATA 				+ sqlWhere_TourId, //$NON-NLS-1$
+					"DELETE FROM " + TABLE_TOUR_MARKER 				+ sqlWhere_TourData_TourId, //$NON-NLS-1$
+					"DELETE FROM " + TABLE_TOUR_PHOTO 				+ sqlWhere_TourData_TourId, //$NON-NLS-1$
+					"DELETE FROM " + TABLE_TOUR_WAYPOINT 			+ sqlWhere_TourData_TourId, //$NON-NLS-1$
+					"DELETE FROM " + TABLE_TOUR_REFERENCE 			+ sqlWhere_TourData_TourId, //$NON-NLS-1$
+					"DELETE FROM " + JOINTABLE__TOURDATA__TOURTAG 	+ sqlWhere_TourData_TourId, //$NON-NLS-1$
+					"DELETE FROM " + TABLE_TOUR_COMPARED 			+ sqlWhere_TourId, //$NON-NLS-1$
+					"DELETE FROM " + TABLE_TOUR_GEO_PARTS			+ sqlWhere_TourId, //$NON-NLS-1$
 					//
 			};
+// SET_FORMATTING_ON
 
 			for (final String sqlExec : allSql) {
 
@@ -1425,7 +1423,6 @@ public class TourDatabase {
 //						System.out.println(sqlQuery);
 //						System.out.println(UI.NEW_LINE);
 //						System.out.println(sb.toString());
-//						// TODO remove SYSTEM.OUT.PRINTLN
 					}
 				});
 			}
@@ -2019,9 +2016,70 @@ public class TourDatabase {
 			TourManager.getInstance().updateTourInCache(persistedEntity);
 
 			updateCachedFields(persistedEntity);
+
+			saveTour_GeoParts(persistedEntity);
 		}
 
 		return persistedEntity;
+	}
+
+	private static void saveTour_GeoParts(final TourData tourData) {
+		// TODO Auto-generated method stub
+
+		Connection conn = null;
+
+		String sql = UI.EMPTY_STRING;
+
+		try {
+
+			final long tourId = tourData.getTourId();
+
+			conn = TourDatabase.getInstance().getConnection();
+
+			/*
+			 * Delete old geo parts
+			 */
+
+			sql = "DELETE FROM " + TABLE_TOUR_GEO_PARTS + " WHERE tourId=?";
+
+			final PreparedStatement deleteStmt = conn.prepareStatement(sql);
+			deleteStmt.setLong(1, tourId);
+			deleteStmt.execute();
+			deleteStmt.close();
+
+			/*
+			 * Save new geo parts
+			 */
+
+			tourData.computeGeo_Partitions();
+
+			sql = "INSERT INTO " + TABLE_TOUR_GEO_PARTS
+					+ " (TourId, GeoPart)"
+					+ " VALUES (?, ?)";
+
+			final PreparedStatement insertStmt = conn.prepareStatement(sql);
+
+			conn.setAutoCommit(false);
+
+			for (final int geoPart : tourData.geoParts.toArray()) {
+
+				insertStmt.setLong(1, tourId);
+				insertStmt.setInt(2, geoPart);
+
+				insertStmt.addBatch();
+			}
+
+			insertStmt.executeBatch();
+			conn.commit();
+
+			insertStmt.close();
+
+		} catch (final SQLException e) {
+			System.out.println(sql);
+			UI.showSQLException(e);
+		} finally {
+			Util.closeSql(conn);
+		}
 	}
 
 	public static void updateActiveTourTypeList(final TourTypeFilter tourTypeFilter) {
@@ -2299,51 +2357,6 @@ public class TourDatabase {
 		 */
 		sql = "CREATE INDEX StartWeekYear ON " + TABLE_TOUR_DATA + " (StartWeekYear)"; //$NON-NLS-1$ //$NON-NLS-2$
 		exec(stmt, sql);
-	}
-
-	/**
-	 * Create table {@link #TABLE_SHARED_MARKER} for {@link SharedMarker} entities.
-	 * 
-	 * @param stmt
-	 * @throws SQLException
-	 * @since DB version 25
-	 */
-	private void createTable_SharedMarker_DISABLED(final Statement stmt) throws SQLException {
-
-//		/*
-//		 * Create table: SharedMarker
-//		 */
-//		exec(stmt, "CREATE TABLE " + TABLE_SHARED_MARKER + "	(											\n" //$NON-NLS-1$ //$NON-NLS-2$
-//				//
-//				+ SQL.CreateField_EntityId(ENTITY_ID_SHARED_MARKER, true)
-//				//
-//				+ "	name				VARCHAR(" + TourWayPoint.DB_LENGTH_NAME + "),						\n" //$NON-NLS-1$ //$NON-NLS-2$
-//				+ "	description			VARCHAR(" + TourWayPoint.DB_LENGTH_DESCRIPTION + "),				\n" //$NON-NLS-1$ //$NON-NLS-2$
-//				+ "	comment				VARCHAR(" + TourWayPoint.DB_LENGTH_COMMENT + "),					\n" //$NON-NLS-1$ //$NON-NLS-2$
-//				+ "	urlText				VARCHAR(" + TourMarker.DB_LENGTH_URL_TEXT + "),						\n" //$NON-NLS-1$ //$NON-NLS-2$
-//				+ "	urlAddress			VARCHAR(" + TourMarker.DB_LENGTH_URL_ADDRESS + "),					\n" //$NON-NLS-1$ //$NON-NLS-2$
-//				+ "	latitude 			DOUBLE NOT NULL,													\n" //$NON-NLS-1$
-//				+ "	longitude 			DOUBLE NOT NULL,													\n" //$NON-NLS-1$
-//				+ "	altitude			FLOAT																\n" //$NON-NLS-1$
-//				//
-//				+ ")"); //$NON-NLS-1$
-//
-//		/**
-//		 * Create table: SHAREDMARKER_TOURDATA
-//		 */
-//		exec(stmt, "CREATE TABLE " + JOINTABLE__TOURDATA__SHAREDMARKER + "	(								\n" //$NON-NLS-1$ //$NON-NLS-2$
-//				//
-//				+ "	" + KEY_SHARED_MARKER + "	BIGINT NOT NULL,											\n"//$NON-NLS-1$ //$NON-NLS-2$
-//				+ "	" + KEY_TOUR + "			BIGINT NOT NULL												\n"//$NON-NLS-1$ //$NON-NLS-2$
-//				//
-//				+ ")"); //$NON-NLS-1$
-//
-//		// Add Constraint
-//		final String fkName = "fk_" + JOINTABLE__TOURDATA__SHAREDMARKER + "_" + KEY_TOUR; //							//$NON-NLS-1$ //$NON-NLS-2$
-//		exec(stmt, "ALTER TABLE " + JOINTABLE__TOURDATA__SHAREDMARKER + "									\n" //$NON-NLS-1$ //$NON-NLS-2$
-//				+ "	ADD CONSTRAINT " + fkName + "															\n" //$NON-NLS-1$ //$NON-NLS-2$
-//				+ "	FOREIGN KEY (" + KEY_TOUR + ")															\n" //$NON-NLS-1$ //$NON-NLS-2$
-//				+ "	REFERENCES " + TABLE_TOUR_DATA + " (" + ENTITY_ID_TOUR + ")								"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	/**
@@ -2657,15 +2670,6 @@ public class TourDatabase {
 				//
 				// version 32 end ---------
 
-				// version 34 start  -  18.3
-				//
-				+ "	LatitudeMin 			DOUBLE DEFAULT " + SQL_DOUBLE_MIN_VALUE + ",					\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "	LatitudeMax 			DOUBLE DEFAULT " + SQL_DOUBLE_MIN_VALUE + ",					\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "	LongitudeMin 			DOUBLE DEFAULT " + SQL_DOUBLE_MIN_VALUE + ",					\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "	LongitudeMax 			DOUBLE DEFAULT " + SQL_DOUBLE_MIN_VALUE + ",					\n" //$NON-NLS-1$ //$NON-NLS-2$
-				//
-				// version 34 end ---------
-
 				+ "	serieData				BLOB 															\n" //$NON-NLS-1$
 
 				+ ")"); //$NON-NLS-1$
@@ -2674,6 +2678,28 @@ public class TourDatabase {
 		createIndex_TourData_022(stmt);
 		createIndex_TourData_029(stmt);
 		createIndex_TourData_033(stmt);
+	}
+
+	/**
+	 * create table {@link #}
+	 * 
+	 * @param stmt
+	 * @throws SQLException
+	 */
+	private void createTable_TourGeoParts(final Statement stmt) throws SQLException {
+
+		/*
+		 * CREATE TABLE TourGeoParts
+		 */
+		exec(stmt, "CREATE TABLE " + TABLE_TOUR_GEO_PARTS + "	(											\n" //$NON-NLS-1$ //$NON-NLS-2$
+		//
+				+ "	TourId				BIGINT	NOT NULL,													\n" //$NON-NLS-1$
+				+ "	GeoPart 			INTEGER NOT NULL													\n" //$NON-NLS-1$
+				//
+				+ ")"); //$NON-NLS-1$
+
+		SQL.CreateIndex(stmt, TABLE_TOUR_GEO_PARTS, "TourId"); //$NON-NLS-1$
+		SQL.CreateIndex(stmt, TABLE_TOUR_GEO_PARTS, "GeoPart"); //$NON-NLS-1$
 	}
 
 	/**
@@ -2895,31 +2921,6 @@ public class TourDatabase {
 				+ "	endIndex 			INTEGER NOT NULL,													\n" //$NON-NLS-1$
 				+ "	label				VARCHAR(" + TourReference.DB_LENGTH_LABEL + ")						\n" //$NON-NLS-1$ //$NON-NLS-2$
 				+ ")"); //$NON-NLS-1$
-	}
-
-	/**
-	 * Create table {@link #TABLE_TOUR_SIGN} for {@link TourSign}.
-	 * 
-	 * @param stmt
-	 * @throws SQLException
-	 * @since DB version 24
-	 */
-	private void createTable_TourSign_DISABLED(final Statement stmt) throws SQLException {
-
-//		/*
-//		 * Create table: TourSign
-//		 */
-//		exec(stmt, "CREATE TABLE " + TABLE_TOUR_SIGN + "	(												\n" //$NON-NLS-1$ //$NON-NLS-2$
-//				//
-//				+ SQL.CreateField_EntityId(ENTITY_ID_SIGN, true)
-//				//
-//				+ "	name				VARCHAR(" + TourSign.DB_LENGTH_NAME + "),							\n" //$NON-NLS-1$ //$NON-NLS-2$
-//				+ "	imageFilePathName	VARCHAR(" + TourSign.DB_LENGTH_IMAGE_FILE_PATH + "),				\n" //$NON-NLS-1$ //$NON-NLS-2$
-//				+ "	expandType			INT DEFAULT " + TourSign.EXPAND_TYPE_DEFAULT + ",					\n" //$NON-NLS-1$ //$NON-NLS-2$
-//				//
-//				+ "	isRoot 				INT DEFAULT 0														\n" //$NON-NLS-1$
-//				//
-//				+ ")"); //$NON-NLS-1$
 	}
 
 	/**
@@ -3757,6 +3758,7 @@ public class TourDatabase {
 				createTable_TourReference(stmt);
 				createTable_TourCompared(stmt);
 				createTable_TourBike(stmt);
+				createTable_TourGeoParts(stmt);
 
 				createTable_Version(stmt);
 
@@ -4225,11 +4227,11 @@ public class TourDatabase {
 			/*
 			 * 33 -> 34
 			 */
-//			boolean isPostUpdate34 = false;
-//			if (currentDbVersion == 33) {
-//				isPostUpdate34 = true;
-//				currentDbVersion = newVersion = updateDbDesign_033_to_034(conn, monitor);
-//			}
+			boolean isPostUpdate34 = false;
+			if (currentDbVersion == 33) {
+				isPostUpdate34 = true;
+				currentDbVersion = newVersion = updateDbDesign_033_to_034(conn, monitor);
+			}
 
 			/*
 			 * update version number
@@ -4277,9 +4279,9 @@ public class TourDatabase {
 			if (isPostUpdate32) {
 				updateDbDesign_031_to_032_PostUpdate(conn, monitor);
 			}
-//			if (isPostUpdate34) {
-//				updateDbDesign_033_to_034_PostUpdate(conn, monitor);
-//			}
+			if (isPostUpdate34) {
+				updateDbDesign_033_to_034_PostUpdate(conn, monitor);
+			}
 
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
@@ -6257,52 +6259,45 @@ public class TourDatabase {
 		return newDbVersion;
 	}
 
-//	private int updateDbDesign_033_to_034(final Connection conn, final IProgressMonitor monitor) throws SQLException {
-//
-//		final int newDbVersion = 34;
-//
-//		logDb_UpdateStart(newDbVersion);
-//		updateMonitor(monitor, newDbVersion);
-//
-//		final Statement stmt = conn.createStatement();
-//		{
-//			// check if db is updated to version 34
-//			if (isColumnAvailable(conn, TABLE_TOUR_DATA, "LatitudeMin") == false) { //$NON-NLS-1$
-//
-//				// TABLE_TOUR_DATA: add column min/max lat/lon
-//
-//				SQL.AddCol_Double(stmt, TABLE_TOUR_DATA, "LatitudeMin", SQL_DOUBLE_MIN_VALUE); //$NON-NLS-1$
-//				SQL.AddCol_Double(stmt, TABLE_TOUR_DATA, "LatitudeMax", SQL_DOUBLE_MIN_VALUE); //$NON-NLS-1$
-//				SQL.AddCol_Double(stmt, TABLE_TOUR_DATA, "LongitudeMin", SQL_DOUBLE_MIN_VALUE); //$NON-NLS-1$
-//				SQL.AddCol_Double(stmt, TABLE_TOUR_DATA, "LongitudeMax", SQL_DOUBLE_MIN_VALUE); //$NON-NLS-1$
-//			}
-//		}
-//		stmt.close();
-//
-//		logDb_UpdateEnd(newDbVersion);
-//
-//		return newDbVersion;
-//	}
-//
-//	/**
-//	 * Set lat/lon min/max values
-//	 *
-//	 * @param conn
-//	 * @param monitor
-//	 * @throws SQLException
-//	 */
-//	private void updateDbDesign_033_to_034_PostUpdate(final Connection conn, final IProgressMonitor monitor)
-//			throws SQLException {
-//
-//		int tourIdx = 1;
-//		final ArrayList<Long> tourList = getAllTourIds();
-//
-//		final EntityManager em = TourDatabase.getInstance().getEntityManager();
-//		try {
-//
-//			long lastUpdateTime = System.currentTimeMillis();
-//
-//			// loop: all tours
+	private int updateDbDesign_033_to_034(final Connection conn, final IProgressMonitor monitor) throws SQLException {
+
+		final int newDbVersion = 34;
+
+		logDb_UpdateStart(newDbVersion);
+		updateMonitor(monitor, newDbVersion);
+
+		final Statement stmt = conn.createStatement();
+		{
+			if (!isTableAvailable(conn, TABLE_TOUR_GEO_PARTS)) {
+				createTable_TourGeoParts(stmt);
+			}
+		}
+		stmt.close();
+
+		logDb_UpdateEnd(newDbVersion);
+
+		return newDbVersion;
+	}
+
+	/**
+	 * Set lat/lon min/max values
+	 *
+	 * @param conn
+	 * @param monitor
+	 * @throws SQLException
+	 */
+	private void updateDbDesign_033_to_034_PostUpdate(final Connection conn, final IProgressMonitor monitor)
+			throws SQLException {
+
+		final int tourIdx = 1;
+		final ArrayList<Long> tourList = getAllTourIds();
+
+		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+		try {
+
+			final long lastUpdateTime = System.currentTimeMillis();
+
+			// loop: all tours
 //			for (final Long tourId : tourList) {
 //
 //				if (monitor != null) {
@@ -6337,14 +6332,14 @@ public class TourDatabase {
 //					}
 //				}
 //			}
-//
-//		} catch (final Exception e) {
-//			e.printStackTrace();
-//		} finally {
-//
-//			em.close();
-//		}
-//	}
+
+		} catch (final Exception e) {
+			e.printStackTrace();
+		} finally {
+
+			em.close();
+		}
+	}
 
 	private void updateDbDesign_VersionNumber(final Connection conn, final int newVersion) throws SQLException {
 

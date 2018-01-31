@@ -1065,7 +1065,7 @@ public class RawDataManager {
 			oldTourData.longitudeSerie = reimportedTourData.longitudeSerie;
 			oldTourData.timeSerie = reimportedTourData.timeSerie;
 
-			oldTourData.computeGeoBounds();
+			oldTourData.computeGeo_Bounds();
 		}
 	}
 

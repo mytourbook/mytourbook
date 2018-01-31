@@ -2313,7 +2313,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 			}
 		}
 
-		_tourData.computeGeoBounds();
+		_tourData.computeGeo_Bounds();
 	}
 
 	private CubicSpline updateSplineData() {

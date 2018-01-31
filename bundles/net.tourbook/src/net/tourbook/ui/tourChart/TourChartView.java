@@ -196,7 +196,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 				 */
 				property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)
 
-				// multiple tours can have the wrong person for hr zones
+						// multiple tours can have the wrong person for hr zones
 						|| property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 
 					clearView();
@@ -547,10 +547,11 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 							// set slider positions
 
-							_tourChart.setXSliderPosition(new SelectionChartXSliderPosition(//
-									_tourChart,
-									tourDataSelection.getLeftSliderValueIndex(),
-									tourDataSelection.getRightSliderValueIndex()));
+							_tourChart.setXSliderPosition(
+									new SelectionChartXSliderPosition(//
+											_tourChart,
+											tourDataSelection.getLeftSliderValueIndex(),
+											tourDataSelection.getRightSliderValueIndex()));
 						}
 					}
 				}
@@ -869,8 +870,6 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 		}
 
 		final TourData tourData = TourManager.getInstance().getTourData(tourId);
-
-		tourData.createGeoPartitions();
 
 		updateChart(tourData);
 

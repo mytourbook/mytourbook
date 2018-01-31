@@ -1583,7 +1583,7 @@ public class TourManager {
 		if (doubleSerie != null) {
 			tourData.longitudeSerie = removeTimeSlices_Double(doubleSerie, firstIndex, lastIndex);
 
-			tourData.computeGeoBounds();
+			tourData.computeGeo_Bounds();
 		}
 
 		/*

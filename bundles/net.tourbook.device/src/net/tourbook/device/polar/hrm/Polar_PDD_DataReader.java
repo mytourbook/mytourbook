@@ -381,7 +381,7 @@ public class Polar_PDD_DataReader extends TourbookDevice {
 			}
 		}
 
-		hrmTourData.computeGeoBounds();
+		hrmTourData.computeGeo_Bounds();
 	}
 
 	private void createExercise_22_AdjustTimeSlices(final TourData hrmTourData, final TourData gpxTourData) {
