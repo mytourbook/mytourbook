@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.database;
 
+import gnu.trove.set.hash.TIntHashSet;
+
 import java.beans.PropertyVetoException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
@@ -540,9 +542,9 @@ public class TourDatabase {
 		private static void CreateIndex(final Statement stmt, final String tableName, final String indexAndColumnName)
 				throws SQLException {
 
-			final String sql = "CREATE INDEX " + indexAndColumnName
-					+ " ON " + tableName
-					+ " (" + indexAndColumnName + ")"; //$NON-NLS-1$
+			final String sql = "CREATE INDEX " + indexAndColumnName //$NON-NLS-1$
+					+ " ON " + tableName //$NON-NLS-1$
+					+ " (" + indexAndColumnName + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 
 			exec(stmt, sql);
 		}
@@ -2024,11 +2026,16 @@ public class TourDatabase {
 	}
 
 	private static void saveTour_GeoParts(final TourData tourData) {
-		// TODO Auto-generated method stub
+
+		final long startTime = System.nanoTime();
 
 		Connection conn = null;
+		PreparedStatement deleteStmt = null;
+		PreparedStatement insertStmt = null;
 
 		String sql = UI.EMPTY_STRING;
+
+		TIntHashSet tourGeoParts = null;
 
 		try {
 
@@ -2040,46 +2047,68 @@ public class TourDatabase {
 			 * Delete old geo parts
 			 */
 
-			sql = "DELETE FROM " + TABLE_TOUR_GEO_PARTS + " WHERE tourId=?";
+			sql = "DELETE FROM " + TABLE_TOUR_GEO_PARTS + " WHERE tourId=?"; //$NON-NLS-1$ //$NON-NLS-2$
 
-			final PreparedStatement deleteStmt = conn.prepareStatement(sql);
+			deleteStmt = conn.prepareStatement(sql);
 			deleteStmt.setLong(1, tourId);
 			deleteStmt.execute();
-			deleteStmt.close();
 
 			/*
 			 * Save new geo parts
 			 */
 
 			tourData.computeGeo_Partitions();
+			tourGeoParts = tourData.geoParts;
 
-			sql = "INSERT INTO " + TABLE_TOUR_GEO_PARTS
-					+ " (TourId, GeoPart)"
-					+ " VALUES (?, ?)";
+			if (tourGeoParts != null) {
 
-			final PreparedStatement insertStmt = conn.prepareStatement(sql);
+				sql = "INSERT INTO " + TABLE_TOUR_GEO_PARTS //$NON-NLS-1$
+						+ " (TourId, GeoPart)" //$NON-NLS-1$
+						+ " VALUES (?, ?)"; //$NON-NLS-1$
 
-			conn.setAutoCommit(false);
+				insertStmt = conn.prepareStatement(sql);
 
-			for (final int geoPart : tourData.geoParts.toArray()) {
+				conn.setAutoCommit(false);
+				{
+					for (final int geoPart : tourGeoParts.toArray()) {
 
-				insertStmt.setLong(1, tourId);
-				insertStmt.setInt(2, geoPart);
+						insertStmt.setLong(1, tourId);
+						insertStmt.setInt(2, geoPart);
 
-				insertStmt.addBatch();
+						insertStmt.addBatch();
+					}
+
+					insertStmt.executeBatch();
+				}
+				conn.commit();
 			}
 
-			insertStmt.executeBatch();
-			conn.commit();
-
-			insertStmt.close();
-
 		} catch (final SQLException e) {
-			System.out.println(sql);
 			UI.showSQLException(e);
 		} finally {
+			Util.closeSql(deleteStmt);
+			Util.closeSql(insertStmt);
 			Util.closeSql(conn);
 		}
+
+		System.out.println(
+				String.format(
+						"%s" // tour date
+								+ "\t%s" // tour time
+
+								+ "\t%d" // time slices
+								+ "\t%d" // parts
+								+ "\t%.3f", // sql time
+
+						TourManager.getTourDateShort(tourData),
+						TourManager.getTourTimeShort(tourData),
+
+						tourData.timeSerie == null ? 0 : tourData.timeSerie.length,
+						tourGeoParts == null ? 0 : tourGeoParts.size(),
+						(System.nanoTime() - startTime) / 1_000_000.0)
+
+		);
+// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 	public static void updateActiveTourTypeList(final TourTypeFilter tourTypeFilter) {
@@ -6289,56 +6318,71 @@ public class TourDatabase {
 	private void updateDbDesign_033_to_034_PostUpdate(final Connection conn, final IProgressMonitor monitor)
 			throws SQLException {
 
-		final int tourIdx = 1;
-		final ArrayList<Long> tourList = getAllTourIds();
+		final ArrayList<Long> allTours = getAllTourIds();
+
+		final int numTours = allTours.size();
+		int tourIndex = 1;
 
 		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+
+		final long startTime = System.currentTimeMillis();
+
 		try {
 
-			final long lastUpdateTime = System.currentTimeMillis();
+			System.out.println("Tour Date\tTour Time\tTime Slices\tGeo Parts\tSql Time");
+			// TODO remove SYSTEM.OUT.PRINTLN
+
+			long lastUpdateTime = startTime;
 
 			// loop: all tours
-//			for (final Long tourId : tourList) {
-//
-//				if (monitor != null) {
-//
-//					final long currentTime = System.currentTimeMillis();
-//					final float timeDiff = currentTime - lastUpdateTime;
-//
-//					// reduce logging
-//					if (timeDiff > 100) {
-//
-//						lastUpdateTime = currentTime;
-//
-//						final String percent = String.format("%.1f", (float) tourIdx / tourList.size() * 100.0);//$NON-NLS-1$
-//
-//						monitor.subTask(
-//								NLS.bind(//
-//										Messages.Tour_Database_PostUpdate_034_SetMinMaxLatLon,
-//										new Object[] { tourIdx, tourList.size(), percent }));
-//					}
-//
-//					tourIdx++;
-//				}
-//
-//				final TourData tourData = em.find(TourData.class, tourId);
-//
-//				if (tourData != null) {
-//
-//					final GeoPosition[] geoBounds = tourData.computeGeoBounds();
-//
-//					if (geoBounds != null) {
-//						TourDatabase.saveEntity(tourData, tourId, TourData.class);
-//					}
-//				}
-//			}
+			for (final Long tourId : allTours) {
+
+				if (monitor != null) {
+
+					final long currentTime = System.currentTimeMillis();
+					final float timeDiff = currentTime - lastUpdateTime;
+
+					// reduce logging
+					if (timeDiff > 200) {
+
+						lastUpdateTime = currentTime;
+
+						final String percent = String.format("%.1f", (float) tourIndex / numTours * 100.0);//$NON-NLS-1$
+
+						monitor.subTask(
+								NLS.bind(//
+										Messages.Tour_Database_PostUpdate_034_SetTourGeoParts,
+										new Object[] { tourIndex, numTours, percent }));
+					}
+
+					tourIndex++;
+				}
+
+				final TourData tourData = em.find(TourData.class, tourId);
+
+				if (tourData != null) {
+					saveTour_GeoParts(tourData);
+				}
+			}
+
+			// update UI otherwise < 100% is displayed
+			monitor.subTask(
+					NLS.bind(//
+							Messages.Tour_Database_PostUpdate_034_SetTourGeoParts,
+							new Object[] { tourIndex - 1, numTours, 100 }));
 
 		} catch (final Exception e) {
-			e.printStackTrace();
+			StatusUtil.log(e);
 		} finally {
-
 			em.close();
 		}
+
+		final long timeDiff = System.currentTimeMillis() - startTime;
+
+		StatusUtil.logInfo(
+				String.format(
+						"Database postupdate 33->34 in %s mm:ss", //$NON-NLS-1$
+						net.tourbook.common.UI.formatHhMmSs(timeDiff / 1000)));
 	}
 
 	private void updateDbDesign_VersionNumber(final Connection conn, final int newVersion) throws SQLException {

@@ -2623,7 +2623,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	}
 
 	/**
-	 * Computes geo partitions into {@link #geoParts} when geo data are available
+	 * Computes geo partitions from {@link #latitudeSerie} and {@link #latitudeSerie} into
+	 * {@link #geoParts} when geo data are available, otherwise {@link #geoParts} is
+	 * <code>null</code>.
 	 */
 	public void computeGeo_Partitions() {
 
