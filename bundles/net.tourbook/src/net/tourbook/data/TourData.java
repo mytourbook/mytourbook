@@ -2629,25 +2629,48 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 */
 	public void computeGeo_Partitions() {
 
-		geoParts = computeGeo_Partitions(latitudeSerie, longitudeSerie);
+		if (latitudeSerie == null || longitudeSerie == null) {
+			return;
+		}
+
+		geoParts = computeGeo_Partitions(latitudeSerie, longitudeSerie, 0, latitudeSerie.length);
 	}
 
 	/**
 	 * Computes geo partitions when geo data are available
 	 * 
-	 * @param allLatitude
-	 * @param allLongitude
+	 * @param partLatitude
+	 * @param partLongitude
+	 * @param indexStart
+	 * @param indexEnd
+	 *            Last index + 1
 	 * @return Returns all geo partitions or <code>null</code> when geo data are not available.
 	 */
-	public TIntHashSet computeGeo_Partitions(final double[] allLatitude, final double[] allLongitude) {
+	public TIntHashSet computeGeo_Partitions(	final double[] partLatitude,
+												final double[] partLongitude,
+												final int indexStart,
+												final int indexEnd) {
 
-		if (allLatitude == null || allLongitude == null) {
+		if (partLatitude == null || partLongitude == null) {
 			return null;
+		}
+
+		// ensure the indicies are valid
+
+		int firstIndex = indexStart < indexEnd ? indexStart : indexEnd;
+		int lastIndex = indexStart > indexEnd ? indexStart : indexEnd;
+
+		if (firstIndex < 0) {
+			firstIndex = 0;
+		}
+
+		if (lastIndex > partLatitude.length) {
+			lastIndex = partLatitude.length;
 		}
 
 		final TIntHashSet allGeoParts = new TIntHashSet();
 
-		for (int serieIndex = 0; serieIndex < allLatitude.length; serieIndex++) {
+		for (int serieIndex = firstIndex; serieIndex < lastIndex; serieIndex++) {
 
 //			int latPart = (int) (latitude * 100);
 //			int lonPart = (int) (longitude * 100);
@@ -2659,8 +2682,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 //
 //												Integer.MAX_VALUE = 2_147_483_647
 
-			final double latitude = allLatitude[serieIndex];
-			final double longitude = allLongitude[serieIndex];
+			final double latitude = partLatitude[serieIndex];
+			final double longitude = partLongitude[serieIndex];
 
 			final int latPart = (int) (latitude * 100);
 			final int lonPart = (int) (longitude * 100);
@@ -2691,6 +2714,26 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 //						+ ("\tsize: " + allGeoParts.toArray().length));
 
 		return allGeoParts;
+	}
+
+	/**
+	 * @param firstIndex
+	 * @param lastIndex
+	 * @return Returns the geo partitions or <code>null</code> when geo data are not available
+	 */
+	public int[] computeGeo_Partitions(final int firstIndex, final int lastIndex) {
+
+		if (latitudeSerie == null || longitudeSerie == null) {
+			return null;
+		}
+
+		final TIntHashSet computedGeoParts = computeGeo_Partitions(
+				latitudeSerie,
+				longitudeSerie,
+				firstIndex,
+				lastIndex);
+
+		return computedGeoParts.toArray();
 	}
 
 	/**

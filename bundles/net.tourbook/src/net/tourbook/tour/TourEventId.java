@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
+import net.tourbook.chart.SelectionChartInfo;
+import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.tag.ChangedTags;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
@@ -80,8 +82,8 @@ public enum TourEventId {
 	TAG_STRUCTURE_CHANGED,
 
 	/**
-	 * Sliders in the tour chart moved. Property data contains {@link SelectionChartInfo2} with the
-	 * position of the sliders.
+	 * Sliders in the tour chart moved. Property data contains {@link SelectionChartInfo} or
+	 * {@link SelectionChartXSliderPosition} with the position of the sliders.
 	 */
 	SLIDER_POSITION_CHANGED,
 
