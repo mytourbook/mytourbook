@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog;
 
-import java.text.NumberFormat;
 import java.util.HashMap;
 
 import net.tourbook.application.TourbookPlugin;
@@ -26,6 +25,7 @@ import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
 import net.tourbook.importdata.RawDataManager;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
@@ -34,8 +34,14 @@ import net.tourbook.ui.tourChart.TourChart;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
@@ -44,29 +50,32 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
-public class GeoPartsView extends ViewPart {
+public class GeoPart_View extends ViewPart {
 
-	public static final String				ID		= "net.tourbook.ui.views.tourCatalog.GeoPartsView";	//$NON-NLS-1$
+	public static final String				ID			= "net.tourbook.ui.views.tourCatalog.GeoPart_View";	//$NON-NLS-1$
 
-	private static final IDialogSettings	_state	= TourbookPlugin.getState(ID);
+	private static final IDialogSettings	_state		= TourbookPlugin.getState(ID);
+	private final IPreferenceStore			_prefStore	= TourbookPlugin.getPrefStore();
 
-	private final static NumberFormat		_nf2	= NumberFormat.getNumberInstance();
-	{
-		_nf2.setMinimumIntegerDigits(2);
-		_nf2.setMaximumFractionDigits(2);
-	}
+	private IPartListener2					_partListener;
+	private ITourEventListener				_tourEventListener;
+	private SelectionAdapter				_defaultSelectionListener;
+	private IPropertyChangeListener			_prefChangeListener;
 
-	private IPartListener2		_partListener;
-	private ITourEventListener	_tourEventListener;
-
-	private int					_lastSelectionHash;
+	private int								_lastSelectionHash;
 
 	/*
 	 * UI controls
 	 */
-	private Label				_lblNumGeoParts;
-	private Label				_lblNumSlices;
-	private Label				_lblNumTours;
+	private Composite						_parent;
+
+	private Label							_lblNumGeoParts;
+	private Label							_lblNumSlices;
+	private Label							_lblNumTours;
+
+	private Button							_chkUseAppFilter;
+
+	private int[]							_geoParts;
 
 	private void addPartListener() {
 
@@ -80,7 +89,7 @@ public class GeoPartsView extends ViewPart {
 
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == GeoPartsView.this) {}
+				if (partRef.getPart(false) == GeoPart_View.this) {}
 			}
 
 			@Override
@@ -88,7 +97,7 @@ public class GeoPartsView extends ViewPart {
 
 			@Override
 			public void partHidden(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == GeoPartsView.this) {}
+				if (partRef.getPart(false) == GeoPart_View.this) {}
 			}
 
 			@Override
@@ -99,10 +108,29 @@ public class GeoPartsView extends ViewPart {
 
 			@Override
 			public void partVisible(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == GeoPartsView.this) {}
+				if (partRef.getPart(false) == GeoPart_View.this) {}
 			}
 		};
 		getViewSite().getPage().addPartListener(_partListener);
+	}
+
+	private void addPrefListener() {
+
+		_prefChangeListener = new IPropertyChangeListener() {
+			@Override
+			public void propertyChange(final PropertyChangeEvent event) {
+
+				final String property = event.getProperty();
+
+				if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
+
+					onChangeUI();
+				}
+			}
+		};
+
+		// register the listener
+		_prefStore.addPropertyChangeListener(_prefChangeListener);
 	}
 
 	private void addTourEventListener() {
@@ -111,7 +139,7 @@ public class GeoPartsView extends ViewPart {
 			@Override
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
-				if (part == GeoPartsView.this) {
+				if (part == GeoPart_View.this) {
 					return;
 				}
 
@@ -132,10 +160,17 @@ public class GeoPartsView extends ViewPart {
 	@Override
 	public void createPartControl(final Composite parent) {
 
+		_parent = parent;
+
+		initUI();
+
 		createUI(parent);
 
 		addPartListener();
+		addPrefListener();
 		addTourEventListener();
+
+		GeoPart_TourLoader.geoPartView = this;
 	}
 
 	private void createUI(final Composite parent) {
@@ -145,10 +180,24 @@ public class GeoPartsView extends ViewPart {
 		GridLayoutFactory
 				.swtDefaults()//
 				.numColumns(2)
-				.spacing(10, 2)
+				//				.spacing(10, 2)
 				.applyTo(container);
 		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		{
+			{
+				/*
+				 * Show break time values
+				 */
+				_chkUseAppFilter = new Button(container, SWT.CHECK);
+				_chkUseAppFilter.setText("Use app &filter");
+
+				GridDataFactory
+						.fillDefaults()//
+						.span(2, 1)
+						.applyTo(_chkUseAppFilter);
+
+				_chkUseAppFilter.addSelectionListener(_defaultSelectionListener);
+			}
 			{
 				/*
 				 * Number of time slices
@@ -197,7 +246,27 @@ public class GeoPartsView extends ViewPart {
 		getViewSite().getPage().removePartListener(_partListener);
 		TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
+		_prefStore.removePropertyChangeListener(_prefChangeListener);
+
 		super.dispose();
+	}
+
+	private void initUI() {
+
+		_defaultSelectionListener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				onChangeUI();
+			}
+		};
+	}
+
+	private void onChangeUI() {
+
+		if (_geoParts != null) {
+			GeoPart_TourLoader.loadToursFromGeoParts(_geoParts, _chkUseAppFilter.getSelection());
+		}
+
 	}
 
 	private void onMoveSlider(	final TourData tourData,
@@ -211,14 +280,16 @@ public class GeoPartsView extends ViewPart {
 		final int firstIndex = leftIndex < rightIndex ? leftIndex : rightIndex;
 		final int lastIndex = leftIndex > rightIndex ? leftIndex : rightIndex;
 
-		final int[] geoPartitions = tourData.computeGeo_Partitions(firstIndex, lastIndex);
+		_geoParts = tourData.computeGeo_Partitions(firstIndex, lastIndex);
 
-		if (geoPartitions == null) {
+		if (_geoParts == null) {
 			return;
 		}
 
 		_lblNumSlices.setText(Integer.toString(lastIndex - firstIndex));
-		_lblNumGeoParts.setText(Integer.toString(geoPartitions.length));
+		_lblNumGeoParts.setText(Integer.toString(_geoParts.length));
+
+		GeoPart_TourLoader.loadToursFromGeoParts(_geoParts, _chkUseAppFilter.getSelection());
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
@@ -318,5 +389,27 @@ public class GeoPartsView extends ViewPart {
 
 	@Override
 	public void setFocus() {}
+
+	private void updateUI(final GeoPart_LoaderItem loaderItem) {
+
+		_lblNumTours.setText(Integer.toString(loaderItem.tourIds.length));
+	}
+
+	void updateUI_AfterDataLoading(final GeoPart_LoaderItem loaderItem) {
+
+		// update UI
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+
+				if (_parent.isDisposed()) {
+					return;
+				}
+
+				updateUI(loaderItem);
+			}
+		});
+
+	}
 
 }
