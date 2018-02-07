@@ -13,20 +13,25 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views.tourCatalog;
+package net.tourbook.ui.views.tourCatalog.geo;
 
-public class GeoPart_ComparerItem {
+public class GeoPartComparerItem {
 
-	long				executorId;
 	long				tourId;
 
-	GeoPart_LoaderItem	loaderItem;
+	GeoPartLoaderItem	loaderItem;
 
-	public GeoPart_ComparerItem(final long executorId, final long tourId, final GeoPart_LoaderItem loaderItem) {
+	public GeoPartComparerItem(final long tourId, final GeoPartLoaderItem loaderItem) {
 
-		this.executorId = executorId;
 		this.tourId = tourId;
 		this.loaderItem = loaderItem;
+	}
+
+	@Override
+	public String toString() {
+		return "GeoPartComparerItem ["
+				+ "tourId=" + tourId + ", "
+				+ "loaderItem=" + loaderItem + "]";
 	}
 
 }

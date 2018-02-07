@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.database;
 
-import gnu.trove.set.hash.TIntHashSet;
-
 import java.beans.PropertyVetoException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
@@ -2035,7 +2033,7 @@ public class TourDatabase {
 
 		String sql = UI.EMPTY_STRING;
 
-		TIntHashSet tourGeoParts = null;
+		int[] tourGeoParts = null;
 
 		try {
 
@@ -2070,7 +2068,7 @@ public class TourDatabase {
 
 				conn.setAutoCommit(false);
 				{
-					for (final int geoPart : tourGeoParts.toArray()) {
+					for (final int geoPart : tourGeoParts) {
 
 						insertStmt.setLong(1, tourId);
 						insertStmt.setInt(2, geoPart);
@@ -2104,7 +2102,7 @@ public class TourDatabase {
 						TourManager.getTourTimeShort(tourData),
 
 						tourData.timeSerie == null ? 0 : tourData.timeSerie.length,
-						tourGeoParts == null ? 0 : tourGeoParts.size(),
+						tourGeoParts == null ? 0 : tourGeoParts.length,
 						(System.nanoTime() - startTime) / 1_000_000.0)
 
 		);

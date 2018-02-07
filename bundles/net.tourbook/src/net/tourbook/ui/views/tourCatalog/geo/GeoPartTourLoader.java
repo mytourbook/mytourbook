@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views.tourCatalog;
+package net.tourbook.ui.views.tourCatalog.geo;
 
 import gnu.trove.list.array.TLongArrayList;
 
@@ -30,17 +30,18 @@ import java.util.concurrent.atomic.AtomicLong;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
+import net.tourbook.data.NormalizedGeoData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.SQLFilter;
 
-public class GeoPart_TourLoader {
+public class GeoPartTourLoader {
 
-	private static final AtomicLong									_loaderExecuterId	= new AtomicLong();
-	private static final LinkedBlockingDeque<GeoPart_LoaderItem>	_waitingQueue		= new LinkedBlockingDeque<>();
+	private static final AtomicLong								_loaderExecuterId	= new AtomicLong();
+	private static final LinkedBlockingDeque<GeoPartLoaderItem>	_waitingQueue		= new LinkedBlockingDeque<>();
 
-	private static ExecutorService									_loadingExecutor;
+	private static ExecutorService								_loadingExecutor;
 
-	static GeoPart_View												geoPartView;
+	static GeoPartView											geoPartView;
 
 	static {
 
@@ -62,26 +63,26 @@ public class GeoPart_TourLoader {
 		_loadingExecutor = Executors.newSingleThreadExecutor(threadFactory);
 	}
 
-	private static boolean isLoaderValid(final GeoPart_LoaderItem loaderItem) {
+	static boolean isLoaderValid(final long executorId) {
 
-		if (loaderItem.executorId < _loaderExecuterId.get()) {
+//		System.out.println(
+//				(UI.timeStampNano() + " [" + GeoPartTourLoader.class.getSimpleName() + "] ")
+//						+ ("\tloader item id: " + loaderItem.executorId)
+//						+ ("\tcurrent id: " + _loaderExecuterId.get()));
 
-			// current executer was invalidated
+		if (executorId == _loaderExecuterId.get()) {
 
-//			System.out.println(
-//					(UI.timeStampNano() + " [" + GeoPart_TourLoader.class.getSimpleName() + "] ")
-//							+ ("\trunning id: " + loaderItem.executorId)
-//							+ ("\tcurrent id: " + _loaderExecuterId.get()));
+			// current executer is valid
 
-			return false;
+			return true;
 		}
 
-		return true;
+		return false;
 	}
 
-	private static boolean loadTourGeoPartsFromDB(final GeoPart_LoaderItem loaderItem) {
+	private static boolean loadTourGeoPartsFromDB(final GeoPartLoaderItem loaderItem) {
 
-		if (isLoaderValid(loaderItem) == false) {
+		if (isLoaderValid(loaderItem.executorId) == false) {
 			return false;
 		}
 
@@ -193,7 +194,7 @@ public class GeoPart_TourLoader {
 //						+ "loadTourGeoPartsFromDB\t" + timeDiff + " ms");
 //// TODO remove SYSTEM.OUT.PRINTLN
 
-		if (isLoaderValid(loaderItem) == false) {
+		if (isLoaderValid(loaderItem.executorId) == false) {
 			return false;
 		}
 
@@ -203,24 +204,30 @@ public class GeoPart_TourLoader {
 	/**
 	 * @param geoParts
 	 *            Requested geo parts
-	 * @param lonPartSerie5
-	 * @param latPartSerie5
+	 * @param lonPartNormalized
+	 * @param latPartNormalized
 	 * @param useAppFilter
 	 */
-	static void loadToursFromGeoParts(	final int[] geoParts,
-										final int[] latPartSerie5,
-										final int[] lonPartSerie5,
-										final boolean useAppFilter) {
+	static synchronized void loadToursFromGeoParts(	final int[] geoParts,
+													final NormalizedGeoData normalizedTourPart,
+													final boolean useAppFilter) {
+
+		final long executerId = _loaderExecuterId.incrementAndGet();
+
+		System.out.println(
+				("[" + GeoPartTourLoader.class.getSimpleName() + "] loadToursFromGeoParts()")
+						+ ("\texecuterId: " + executerId));
+// TODO remove SYSTEM.OUT.PRINTLN
 
 		_waitingQueue.add(
-				new GeoPart_LoaderItem(
+
+				new GeoPartLoaderItem(
 
 						// invalidate old requests
-						_loaderExecuterId.incrementAndGet(),
+						executerId,
 
 						geoParts,
-						latPartSerie5,
-						lonPartSerie5,
+						normalizedTourPart,
 						useAppFilter));
 
 		final Runnable executorTask = new Runnable() {
@@ -228,19 +235,25 @@ public class GeoPart_TourLoader {
 			public void run() {
 
 				// get last added loader item
-				final GeoPart_LoaderItem loaderItem = _waitingQueue.pollFirst();
+				final GeoPartLoaderItem loaderItem = _waitingQueue.pollFirst();
 
 				if (loaderItem == null) {
 					return;
 				}
 
 				if (loadTourGeoPartsFromDB(loaderItem)) {
-					geoPartView.updateUI_AfterLoadingGeoParts(loaderItem);
+					geoPartView.compare_30_CompareTours(loaderItem);
 				}
 			}
 		};
 
 		_loadingExecutor.submit(executorTask);
+	}
+
+	static void stopLoading() {
+
+		// invalidate old requests
+		_loaderExecuterId.incrementAndGet();
 	}
 
 }

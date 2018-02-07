@@ -1642,9 +1642,9 @@
 
 			<view
 				category="net.tourbook.category.compareTours"
-				class="net.tourbook.ui.views.tourCatalog.GeoPart_View"
+				class="net.tourbook.ui.views.tourCatalog.geo.GeoPartView"
 				icon="icons/tour-map-statistic.png"
-				id="net.tourbook.ui.views.tourCatalog.GeoPart_View"
+				id="net.tourbook.ui.views.tourCatalog.geo.GeoPartView"
 				name="%View_Name_Compare_GeoParts"
 			/>
 

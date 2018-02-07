@@ -157,6 +157,21 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 */
 	public static final double			MAX_GEO_DIFF						= 0.0001;
 
+	/**
+	 * Factor to normalize lat/lon
+	 * 
+	 * <pre>
+	 * 
+	 * Degree * INT    resolution
+	   ---------------------------------------
+	   Deg * 100	   1570 m
+	   Deg * 1000		157 m
+	   Deg * 10000		 16 m
+	   Deg * 100000		  1.6 m
+	 * </pre>
+	 */
+	private static final int 			NORMALIZED_GEO_DATA_FACTOR 			= 10000;
+
 	private static final String			TIME_ZONE_ID_EUROPE_BERLIN			= "Europe/Berlin";				//$NON-NLS-1$
 
 	public static final int				MIN_TIMEINTERVAL_FOR_MAX_SPEED		= 20;
@@ -992,19 +1007,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * </pre>
 	 */
 	@Transient
-	public TIntHashSet					geoParts;
+	public int[]						geoParts;
 
 	/**
-	 * Latitude multiplied with 10'000 -> 10-17 m accuracy
+	 * Latitude/longitude multiplied with 10'000 -> 10-17 m accuracy
 	 */
 	@Transient
-	private int[] _latitudeSerie5;
-
-	/**
-	 * Longitude multiplied with 10'000 -> 10-17 m accuracy
-	 */
-	@Transient
-	private int[] _longitudeSerie5;
+	private NormalizedGeoData					_normalizedLatLon;
 
 	/**
 	 * Index of the segmented data in the data series
@@ -1478,8 +1487,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		if (isLatitudeValid == false) {
 			latitudeSerie = null;
 			longitudeSerie = null;
-			_latitudeSerie5 = null;
-			_longitudeSerie5 = null;
+			_normalizedLatLon = null;
 			geoParts = null;
 		}
 	}
@@ -1537,8 +1545,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		srtmSerieImperial = null;
 
 		_gpsBounds = null;
-		_latitudeSerie5 = null;
-		_longitudeSerie5 = null;
+		_normalizedLatLon = null;
+		geoParts = null;
 
 		_hrZones = null;
 		_hrZoneContext = null;
@@ -2643,6 +2651,60 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	}
 
 	/**
+	 * @param indexStart
+	 * @param indexEnd
+	 * @return Returns tour lat/lon data from first to last index, multiplied by
+	 *         {@link #NORMALIZED_GEO_DATA_FACTOR} and normalized (removed duplicates), or
+	 *         <code>null</code> when not available
+	 */
+	public NormalizedGeoData computeGeo_NormalizedLatLon(	final int indexStart,
+															final int indexEnd) {
+
+		if (latitudeSerie == null) {
+			return null;
+		}
+
+		// validate indices
+		int firstIndex = indexStart < indexEnd ? indexStart : indexEnd;
+		int lastIndex = indexStart > indexEnd ? indexStart : indexEnd;
+
+		if (firstIndex < 0) {
+			firstIndex = 0;
+		}
+
+		if (lastIndex > latitudeSerie.length) {
+			lastIndex = latitudeSerie.length;
+		}
+
+		final TIntArrayList allNormalizedLat = new TIntArrayList();
+		final TIntArrayList allNormalizedLon = new TIntArrayList();
+
+		int prevLatNormalized = Integer.MIN_VALUE;
+		int prevLonNormalized = Integer.MIN_VALUE;
+
+		for (int serieIndex = firstIndex; serieIndex < lastIndex; serieIndex++) {
+
+			final int latNormalized = (int) (latitudeSerie[serieIndex] * NORMALIZED_GEO_DATA_FACTOR);
+			final int lonNormalized = (int) (longitudeSerie[serieIndex] * NORMALIZED_GEO_DATA_FACTOR);
+
+			if (latNormalized != prevLatNormalized || lonNormalized != prevLonNormalized) {
+
+				// lat/lon have changed
+
+				allNormalizedLat.add(latNormalized);
+				allNormalizedLon.add(lonNormalized);
+			}
+
+			prevLatNormalized = latNormalized;
+			prevLonNormalized = lonNormalized;
+		}
+
+		return new NormalizedGeoData(
+				allNormalizedLat.toArray(),
+				allNormalizedLon.toArray());
+	}
+
+	/**
 	 * Computes geo partitions from {@link #latitudeSerie} and {@link #latitudeSerie} into
 	 * {@link #geoParts} when geo data are available, otherwise {@link #geoParts} is
 	 * <code>null</code>.
@@ -2653,7 +2715,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			return;
 		}
 
-		geoParts = computeGeo_Partitions(latitudeSerie, longitudeSerie, 0, latitudeSerie.length);
+		geoParts = computeGeo_Partitions(latitudeSerie, longitudeSerie, 0, latitudeSerie.length).toArray();
 	}
 
 	/**
@@ -2675,8 +2737,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			return null;
 		}
 
-		// ensure the indicies are valid
-
+		// validate indices
 		int firstIndex = indexStart < indexEnd ? indexStart : indexEnd;
 		int lastIndex = indexStart > indexEnd ? indexStart : indexEnd;
 
@@ -5684,50 +5745,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	}
 
 	/**
-	 * @return Returns latitude serie multiplied by 10'000 -> 10-17 m accuracy or returns
-	 *         <code>null</code> when not available
-	 */
-	public int[] getLatitudeSerie5() {
-
-		if (latitudeSerie == null) {
-			return null;
-		}
-
-		if (_latitudeSerie5 == null) {
-
-			_latitudeSerie5 = new int[latitudeSerie.length];
-
-			for (int serieIndex = 0; serieIndex < latitudeSerie.length; serieIndex++) {
-				_latitudeSerie5[serieIndex] = (int) (latitudeSerie[serieIndex] * 10000);
-			}
-		}
-
-		return _latitudeSerie5;
-	}
-
-	/**
-	 * @return Returns longitude serie multiplied by 10'000 -> 10-17 m accuracy or returns
-	 *         <code>null</code> when not available
-	 */
-	public int[] getLongitudeSerie5() {
-
-		if (longitudeSerie == null) {
-			return null;
-		}
-
-		if (_longitudeSerie5 == null) {
-
-			_longitudeSerie5 = new int[longitudeSerie.length];
-
-			for (int serieIndex = 0; serieIndex < longitudeSerie.length; serieIndex++) {
-				_longitudeSerie5[serieIndex] = (int) (longitudeSerie[serieIndex] * 10000);
-			}
-		}
-
-		return _longitudeSerie5;
-	}
-
-	/**
 	 * @return the maxAltitude
 	 */
 	public float getMaxAltitude() {
@@ -5781,6 +5798,23 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 */
 	public float[] getMetricDistanceSerie() {
 		return distanceSerie;
+	}
+
+	/**
+	 * @return Returns tour lat/lon data multiplied by {@link #NORMALIZED_GEO_DATA_FACTOR} and
+	 *         normalized (removed duplicates), or <code>null</code> when not available
+	 */
+	public NormalizedGeoData getNormalizedLatLon() {
+
+		if (latitudeSerie == null) {
+			return null;
+		}
+
+		if (_normalizedLatLon == null) {
+			_normalizedLatLon = computeGeo_NormalizedLatLon(0, latitudeSerie.length);
+		}
+
+		return _normalizedLatLon;
 	}
 
 	/**

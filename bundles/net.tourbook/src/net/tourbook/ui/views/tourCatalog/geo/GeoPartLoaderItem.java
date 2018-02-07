@@ -13,7 +13,9 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views.tourCatalog;
+package net.tourbook.ui.views.tourCatalog.geo;
+
+import net.tourbook.data.NormalizedGeoData;
 
 /**
  * Loads tour id's which are contained in the {@link #geoParts}
@@ -28,51 +30,55 @@ package net.tourbook.ui.views.tourCatalog;
    Deg*100000		  1.6 m
  * </pre>
  */
-public class GeoPart_LoaderItem {
+public class GeoPartLoaderItem {
 
-	long	executorId;
+	long				executorId;
 
 	/**
 	 * Requested geo parts
 	 */
-	int[]	geoParts;
+	int[]				geoParts;
 
 	/**
-	 * Latatitudes which should be compared
+	 * Geo part which should be compared
 	 */
-	int[]	latPartSerie5;
-
-	/**
-	 * Longitudes which should be compared
-	 */
-	int[]	lonPartSerie5;
+	NormalizedGeoData	normalizedTourPart;
 
 	/**
 	 * Tour id's which are having at least one of the {@link #geoParts}
 	 */
-	long[]	tourIds;
+	long[]				tourIds;
 
-	boolean	isUseAppFilter;
+	boolean				isUseAppFilter;
 
 	/**
 	 * Time in ms to calculate sql data
 	 */
-	long	sqlRunningTime;
+	long				sqlRunningTime;
 
-	public GeoPart_LoaderItem(	final long executorId,
+	public GeoPartLoaderItem(	final long executorId,
 								final int[] geoParts,
-								final int[] latPartSerie5,
-								final int[] lonPartSerie5,
+								final NormalizedGeoData normalizedTourPart,
 								final boolean useAppFilter) {
 
 		this.executorId = executorId;
 
 		this.geoParts = geoParts;
-
-		this.latPartSerie5 = latPartSerie5;
-		this.lonPartSerie5 = lonPartSerie5;
+		this.normalizedTourPart = normalizedTourPart;
 
 		this.isUseAppFilter = useAppFilter;
+	}
+
+	@Override
+	public String toString() {
+		return "GeoPartLoaderItem ["
+				+ "executorId=" + executorId + ", "
+				//				+ "geoParts=" + Arrays.toString(geoParts) + ", "
+				//				+ "latPartSerie5=" + Arrays.toString(latPartSerie5) + ", "
+				//				+ "lonPartSerie5=" + Arrays.toString(lonPartSerie5) + ", tourIds=" + Arrays.toString(tourIds) + ", "
+				//				+ "isUseAppFilter=" + isUseAppFilter + ", "
+				//				+ "sqlRunningTime=" + sqlRunningTime
+				+ "]";
 	}
 
 }

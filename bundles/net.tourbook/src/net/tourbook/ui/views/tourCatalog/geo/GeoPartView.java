@@ -13,10 +13,10 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views.tourCatalog;
+package net.tourbook.ui.views.tourCatalog.geo;
 
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
@@ -24,6 +24,7 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.UI;
+import net.tourbook.data.NormalizedGeoData;
 import net.tourbook.data.TourData;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -38,9 +39,12 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.wizard.ProgressMonitorPart;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -50,12 +54,12 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
-public class GeoPart_View extends ViewPart {
+public class GeoPartView extends ViewPart {
 
-	public static final String		ID			= "net.tourbook.ui.views.tourCatalog.GeoPart_View";	//$NON-NLS-1$
+	public static final String		ID				= "net.tourbook.ui.views.tourCatalog.geo.GeoPartView";	//$NON-NLS-1$
 
 //	private static final IDialogSettings	_state		= TourbookPlugin.getState(ID);
-	private final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
+	private final IPreferenceStore	_prefStore		= TourbookPlugin.getPrefStore();
 
 	private IPartListener2			_partListener;
 	private ITourEventListener		_tourEventListener;
@@ -65,8 +69,10 @@ public class GeoPart_View extends ViewPart {
 	private int						_lastSelectionHash;
 
 	private int[]					_geoParts;
-	private int[]					_latPartSerie5;
-	private int[]					_lonPartSerie5;
+	private NormalizedGeoData		_normalizedTourPart;
+
+	private int						_geoPartTours;
+	private AtomicInteger			_workedTours	= new AtomicInteger();
 
 	/*
 	 * UI controls
@@ -80,6 +86,8 @@ public class GeoPart_View extends ViewPart {
 
 	private Button					_chkUseAppFilter;
 
+	private ProgressMonitorPart		_progMonitor;
+
 	private void addPartListener() {
 
 		_partListener = new IPartListener2() {
@@ -92,7 +100,9 @@ public class GeoPart_View extends ViewPart {
 
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == GeoPart_View.this) {}
+				if (partRef.getPart(false) == GeoPartView.this) {
+					onCancelProgress();
+				}
 			}
 
 			@Override
@@ -100,7 +110,7 @@ public class GeoPart_View extends ViewPart {
 
 			@Override
 			public void partHidden(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == GeoPart_View.this) {}
+				if (partRef.getPart(false) == GeoPartView.this) {}
 			}
 
 			@Override
@@ -111,7 +121,7 @@ public class GeoPart_View extends ViewPart {
 
 			@Override
 			public void partVisible(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == GeoPart_View.this) {}
+				if (partRef.getPart(false) == GeoPartView.this) {}
 			}
 		};
 		getViewSite().getPage().addPartListener(_partListener);
@@ -142,7 +152,7 @@ public class GeoPart_View extends ViewPart {
 			@Override
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
-				if (part == GeoPart_View.this) {
+				if (part == GeoPartView.this) {
 					return;
 				}
 
@@ -160,6 +170,82 @@ public class GeoPart_View extends ViewPart {
 		TourManager.getInstance().addTourEventListener(_tourEventListener);
 	}
 
+	private void compare_20_LoadGeoParts(final TourData tourData, final int firstIndex, final int lastIndex) {
+
+		// 1. get geo partitions from lat/lon first/last index
+		_geoParts = tourData.computeGeo_Partitions(firstIndex, lastIndex);
+
+		if (_geoParts == null) {
+			return;
+		}
+
+		// update UI
+		_lblNumSlices.setText(Integer.toString(lastIndex - firstIndex));
+		_lblNumGeoParts.setText(Integer.toString(_geoParts.length));
+
+		/*
+		 * Create geo data which should be compared
+		 */
+		_normalizedTourPart = tourData.computeGeo_NormalizedLatLon(firstIndex, lastIndex);
+
+		// 2. load tour id's in the geo parts
+		GeoPartTourLoader.loadToursFromGeoParts(
+				_geoParts,
+				_normalizedTourPart,
+				_chkUseAppFilter.getSelection());
+	}
+
+	void compare_30_CompareTours(final GeoPartLoaderItem loaderItem) {
+
+		_geoPartTours = loaderItem.tourIds.length;
+
+		if (_geoPartTours > 0) {
+			GeoPartTourComparer.compareGeoTours(loaderItem);
+		}
+
+		// update UI
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+
+				if (_parent.isDisposed()) {
+					return;
+				}
+
+				if (_geoPartTours > 0) {
+
+					_workedTours.set(0);
+
+					// enable cancel button
+					_progMonitor.attachToCancelComponent(null);
+
+					_progMonitor.beginTask(NLS.bind("Comparing tours", _geoPartTours), _geoPartTours);
+				}
+
+				updateUI(loaderItem);
+			}
+		});
+
+	}
+
+	void compare_40_TourIsCompared(final GeoPartComparerItem comparerItem) {
+
+		_workedTours.incrementAndGet();
+
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+
+				if (_parent.isDisposed()) {
+					return;
+				}
+
+				_progMonitor.subTask(NLS.bind("{0} / {1}", _workedTours, _geoPartTours));
+				_progMonitor.worked(1);
+			}
+		});
+	}
+
 	@Override
 	public void createPartControl(final Composite parent) {
 
@@ -173,7 +259,8 @@ public class GeoPart_View extends ViewPart {
 		addPrefListener();
 		addTourEventListener();
 
-		GeoPart_TourLoader.geoPartView = this;
+		GeoPartTourLoader.geoPartView = this;
+		GeoPartTourComparer.geoPartView = this;
 	}
 
 	private void createUI(final Composite parent) {
@@ -253,6 +340,28 @@ public class GeoPart_View extends ViewPart {
 				_lblSqlRuntime.setText(UI.EMPTY_STRING);
 				GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblSqlRuntime);
 			}
+			{
+				/*
+				 * Progress monitor with cancel button
+				 */
+				_progMonitor = new ProgressMonitorPart(container, new GridLayout(), true) {
+
+					@Override
+					public void setCanceled(final boolean isCanceled) {
+
+						onCancelProgress();
+
+						super.setCanceled(isCanceled);
+					}
+
+//					@Override
+//					public void done() {
+//						super.done();
+//					}
+				};
+
+				GridDataFactory.fillDefaults().span(2, 1).applyTo(_progMonitor);
+			}
 		}
 	}
 
@@ -277,14 +386,18 @@ public class GeoPart_View extends ViewPart {
 		};
 	}
 
+	private void onCancelProgress() {
+
+		GeoPartTourLoader.stopLoading();
+	}
+
 	private void onChangeUI() {
 
 		if (_geoParts != null) {
 
-			GeoPart_TourLoader.loadToursFromGeoParts(
+			GeoPartTourLoader.loadToursFromGeoParts(
 					_geoParts,
-					_latPartSerie5,
-					_lonPartSerie5,
+					_normalizedTourPart,
 					_chkUseAppFilter.getSelection());
 		}
 
@@ -300,7 +413,7 @@ public class GeoPart_View extends ViewPart {
 		}
 
 		/*
-		 * Ensure first/last indices are valid
+		 * Validate first/last indices
 		 */
 		int firstIndex = leftIndex < rightIndex ? leftIndex : rightIndex;
 		int lastIndex = leftIndex > rightIndex ? leftIndex : rightIndex;
@@ -311,29 +424,7 @@ public class GeoPart_View extends ViewPart {
 			lastIndex = latSerie.length;
 		}
 
-		// 1. get geo parts from lat/lon first/last index
-		_geoParts = tourData.computeGeo_Partitions(firstIndex, lastIndex);
-
-		if (_geoParts == null) {
-			return;
-		}
-
-		// update UI
-		_lblNumSlices.setText(Integer.toString(lastIndex - firstIndex));
-		_lblNumGeoParts.setText(Integer.toString(_geoParts.length));
-
-		/*
-		 * Create geo data which should be compared
-		 */
-		_latPartSerie5 = Arrays.copyOfRange(tourData.getLatitudeSerie5(), firstIndex, lastIndex);
-		_lonPartSerie5 = Arrays.copyOfRange(tourData.getLongitudeSerie5(), firstIndex, lastIndex);
-
-		// 2. load tour id's in the geo parts
-		GeoPart_TourLoader.loadToursFromGeoParts(
-				_geoParts,
-				_latPartSerie5,
-				_lonPartSerie5,
-				_chkUseAppFilter.getSelection());
+		compare_20_LoadGeoParts(tourData, firstIndex, lastIndex);
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
@@ -434,38 +525,10 @@ public class GeoPart_View extends ViewPart {
 	@Override
 	public void setFocus() {}
 
-	private void updateUI(final GeoPart_LoaderItem loaderItem) {
+	private void updateUI(final GeoPartLoaderItem loaderItem) {
 
 		_lblNumTours.setText(Integer.toString(loaderItem.tourIds.length));
 		_lblSqlRuntime.setText(Long.toString(loaderItem.sqlRunningTime) + " ms");
-	}
-
-	void updateUI_AfterComparingTours(final GeoPart_ComparerItem comparerItem) {
-		// TODO Auto-generated method stub
-
-	}
-
-	void updateUI_AfterLoadingGeoParts(final GeoPart_LoaderItem loaderItem) {
-
-		if (loaderItem.tourIds.length > 0) {
-
-			// 3. compare tours
-			GeoPart_TourComparer.compareGeoTours(loaderItem);
-		}
-
-		// update UI
-		Display.getDefault().asyncExec(new Runnable() {
-			@Override
-			public void run() {
-
-				if (_parent.isDisposed()) {
-					return;
-				}
-
-				updateUI(loaderItem);
-			}
-		});
-
 	}
 
 }
