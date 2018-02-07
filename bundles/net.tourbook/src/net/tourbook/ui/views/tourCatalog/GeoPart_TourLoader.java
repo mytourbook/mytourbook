@@ -21,10 +21,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicLong;
 
 import net.tourbook.common.UI;
@@ -38,7 +38,7 @@ public class GeoPart_TourLoader {
 	private static final AtomicLong									_loaderExecuterId	= new AtomicLong();
 	private static final LinkedBlockingDeque<GeoPart_LoaderItem>	_waitingQueue		= new LinkedBlockingDeque<>();
 
-	private static ThreadPoolExecutor								_loadingExecutor;
+	private static ExecutorService									_loadingExecutor;
 
 	static GeoPart_View												geoPartView;
 
@@ -58,7 +58,8 @@ public class GeoPart_TourLoader {
 			}
 		};
 
-		_loadingExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10, threadFactory);
+//		_loadingExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10, threadFactory);
+		_loadingExecutor = Executors.newSingleThreadExecutor(threadFactory);
 	}
 
 	private static boolean isLoaderValid(final GeoPart_LoaderItem loaderItem) {
@@ -183,10 +184,14 @@ public class GeoPart_TourLoader {
 			Util.closeSql(conn);
 		}
 
-		System.out.println(
-				(UI.timeStampNano() + " [" + GeoPart_TourLoader.class.getSimpleName() + "] ")
-						+ "loadTourGeoPartsFromDB\t" + (System.currentTimeMillis() - start) + " ms");
-// TODO remove SYSTEM.OUT.PRINTLN
+		final long timeDiff = System.currentTimeMillis() - start;
+
+		loaderItem.sqlRunningTime = timeDiff;
+
+//		System.out.println(
+//				(UI.timeStampNano() + " [" + GeoPart_TourLoader.class.getSimpleName() + "] ")
+//						+ "loadTourGeoPartsFromDB\t" + timeDiff + " ms");
+//// TODO remove SYSTEM.OUT.PRINTLN
 
 		if (isLoaderValid(loaderItem) == false) {
 			return false;
@@ -198,9 +203,14 @@ public class GeoPart_TourLoader {
 	/**
 	 * @param geoParts
 	 *            Requested geo parts
+	 * @param lonPartSerie5
+	 * @param latPartSerie5
 	 * @param useAppFilter
 	 */
-	static void loadToursFromGeoParts(final int[] geoParts, final boolean useAppFilter) {
+	static void loadToursFromGeoParts(	final int[] geoParts,
+										final int[] latPartSerie5,
+										final int[] lonPartSerie5,
+										final boolean useAppFilter) {
 
 		_waitingQueue.add(
 				new GeoPart_LoaderItem(
@@ -209,6 +219,8 @@ public class GeoPart_TourLoader {
 						_loaderExecuterId.incrementAndGet(),
 
 						geoParts,
+						latPartSerie5,
+						lonPartSerie5,
 						useAppFilter));
 
 		final Runnable executorTask = new Runnable() {
@@ -223,7 +235,7 @@ public class GeoPart_TourLoader {
 				}
 
 				if (loadTourGeoPartsFromDB(loaderItem)) {
-					geoPartView.updateUI_AfterDataLoading(loaderItem);
+					geoPartView.updateUI_AfterLoadingGeoParts(loaderItem);
 				}
 			}
 		};

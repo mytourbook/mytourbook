@@ -140,13 +140,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	/**
 	 * <pre>
 	 * 
-		0 	1.0 		1° 00′ 0″ 		country or large region 		111.32 km 	102.47 km 	78.71 km 	43.496 km
-		1 	0.1 		0° 06′ 0″ 		large city or district 			11.132 km 	10.247 km 	7.871 km 	4.3496 km
-		2 	0.01 		0° 00′ 36″ 		town or village 				1.1132 km 	1.0247 km 	787.1 m 	434.96 m
-		3 	0.001 		0° 00′ 3.6″ 	neighborhood, street 			111.32 m 	102.47 m 	78.71 m 	43.496 m
-		4 	0.0001 		0° 00′ 0.36″ 	individual street, land parcel 	11.132 m 	10.247 m 	7.871 m 	4.3496 m
-		5 	0.00001 	0° 00′ 0.036″ 	individual trees 				1.1132 m 	1.0247 m 	787.1 mm 	434.96 mm
-		6 	0.000001 	0° 00′ 0.0036″ 	individual humans 				111.32 mm 	102.47 mm 	78.71 mm 	43.496 mm
+	 *	decimal	decimal
+	 *	places	degrees 	DMS 			qualitative scale that          N/S or E/W		E/W at		E/W at		E/W at
+	 *										can be identified 				at equator		23N/S 		45N/S 		67N/S
+	 * 
+	 * 	0 		1.0 		1° 00′ 0″ 		country or large region 		111.32 km 		102.47 km 	78.71 km 	43.496 km
+	 * 	1 		0.1 		0° 06′ 0″ 		large city or district 			11.132 km 		10.247 km 	7.871 km 	4.3496 km
+	 * 	2 		0.01 		0° 00′ 36″ 		town or village 				1.1132 km 		1.0247 km 	787.1 m 	434.96 m
+	 * 	3 		0.001 		0° 00′ 3.6″ 	neighborhood, street 			111.32 m 		102.47 m 	78.71 m 	43.496 m
+	 * 	4 		0.0001 		0° 00′ 0.36″ 	individual street, land parcel 	11.132 m 		10.247 m 	7.871 m 	4.3496 m
+	 * 	5 		0.00001 	0° 00′ 0.036″ 	individual trees 				1.1132 m 		1.0247 m 	787.1 mm 	434.96 mm
+	 * 	6 		0.000001 	0° 00′ 0.0036″ 	individual humans 				111.32 mm 		102.47 mm 	78.71 mm 	43.496 mm
 	 * </pre>
 	 * 
 	 * https://en.wikipedia.org/wiki/Decimal_degrees
@@ -991,6 +995,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	public TIntHashSet					geoParts;
 
 	/**
+	 * Latitude multiplied with 10'000 -> 10-17 m accuracy
+	 */
+	@Transient
+	private int[] _latitudeSerie5;
+
+	/**
+	 * Longitude multiplied with 10'000 -> 10-17 m accuracy
+	 */
+	@Transient
+	private int[] _longitudeSerie5;
+
+	/**
 	 * Index of the segmented data in the data series
 	 */
 	@Transient
@@ -1462,6 +1478,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		if (isLatitudeValid == false) {
 			latitudeSerie = null;
 			longitudeSerie = null;
+			_latitudeSerie5 = null;
+			_longitudeSerie5 = null;
 			geoParts = null;
 		}
 	}
@@ -1519,6 +1537,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		srtmSerieImperial = null;
 
 		_gpsBounds = null;
+		_latitudeSerie5 = null;
+		_longitudeSerie5 = null;
 
 		_hrZones = null;
 		_hrZoneContext = null;
@@ -5661,6 +5681,50 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		}
 
 		return UI.EMPTY_STRING;
+	}
+
+	/**
+	 * @return Returns latitude serie multiplied by 10'000 -> 10-17 m accuracy or returns
+	 *         <code>null</code> when not available
+	 */
+	public int[] getLatitudeSerie5() {
+
+		if (latitudeSerie == null) {
+			return null;
+		}
+
+		if (_latitudeSerie5 == null) {
+
+			_latitudeSerie5 = new int[latitudeSerie.length];
+
+			for (int serieIndex = 0; serieIndex < latitudeSerie.length; serieIndex++) {
+				_latitudeSerie5[serieIndex] = (int) (latitudeSerie[serieIndex] * 10000);
+			}
+		}
+
+		return _latitudeSerie5;
+	}
+
+	/**
+	 * @return Returns longitude serie multiplied by 10'000 -> 10-17 m accuracy or returns
+	 *         <code>null</code> when not available
+	 */
+	public int[] getLongitudeSerie5() {
+
+		if (longitudeSerie == null) {
+			return null;
+		}
+
+		if (_longitudeSerie5 == null) {
+
+			_longitudeSerie5 = new int[longitudeSerie.length];
+
+			for (int serieIndex = 0; serieIndex < longitudeSerie.length; serieIndex++) {
+				_longitudeSerie5[serieIndex] = (int) (longitudeSerie[serieIndex] * 10000);
+			}
+		}
+
+		return _longitudeSerie5;
 	}
 
 	/**
