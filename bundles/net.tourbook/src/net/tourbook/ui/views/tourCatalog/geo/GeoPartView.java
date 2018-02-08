@@ -73,6 +73,7 @@ public class GeoPartView extends ViewPart {
 
 	private int						_geoPartTours;
 	private AtomicInteger			_workedTours	= new AtomicInteger();
+	private long					_workerId;
 
 	/*
 	 * UI controls
@@ -200,6 +201,8 @@ public class GeoPartView extends ViewPart {
 		_geoPartTours = loaderItem.tourIds.length;
 
 		if (_geoPartTours > 0) {
+			_workedTours.set(0);
+			_workerId = loaderItem.executorId;
 			GeoPartTourComparer.compareGeoTours(loaderItem);
 		}
 
@@ -214,8 +217,6 @@ public class GeoPartView extends ViewPart {
 
 				if (_geoPartTours > 0) {
 
-					_workedTours.set(0);
-
 					// enable cancel button
 					_progMonitor.attachToCancelComponent(null);
 
@@ -229,6 +230,12 @@ public class GeoPartView extends ViewPart {
 	}
 
 	void compare_40_TourIsCompared(final GeoPartComparerItem comparerItem) {
+
+		final GeoPartLoaderItem loaderItem = comparerItem.loaderItem;
+
+		if (loaderItem.isCanceled || loaderItem.executorId != _workerId) {
+			return;
+		}
 
 		_workedTours.incrementAndGet();
 

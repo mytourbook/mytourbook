@@ -59,30 +59,12 @@ public class GeoPartTourLoader {
 			}
 		};
 
-//		_loadingExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10, threadFactory);
 		_loadingExecutor = Executors.newSingleThreadExecutor(threadFactory);
-	}
-
-	static boolean isLoaderValid(final long executorId) {
-
-//		System.out.println(
-//				(UI.timeStampNano() + " [" + GeoPartTourLoader.class.getSimpleName() + "] ")
-//						+ ("\tloader item id: " + loaderItem.executorId)
-//						+ ("\tcurrent id: " + _loaderExecuterId.get()));
-
-		if (executorId == _loaderExecuterId.get()) {
-
-			// current executer is valid
-
-			return true;
-		}
-
-		return false;
 	}
 
 	private static boolean loadTourGeoPartsFromDB(final GeoPartLoaderItem loaderItem) {
 
-		if (isLoaderValid(loaderItem.executorId) == false) {
+		if (loaderItem.isCanceled) {
 			return false;
 		}
 
@@ -194,7 +176,7 @@ public class GeoPartTourLoader {
 //						+ "loadTourGeoPartsFromDB\t" + timeDiff + " ms");
 //// TODO remove SYSTEM.OUT.PRINTLN
 
-		if (isLoaderValid(loaderItem.executorId) == false) {
+		if (loaderItem.isCanceled) {
 			return false;
 		}
 
@@ -212,6 +194,10 @@ public class GeoPartTourLoader {
 													final NormalizedGeoData normalizedTourPart,
 													final boolean useAppFilter) {
 
+		stopLoading();
+		_waitingQueue.clear();
+
+		// invalidate old requests
 		final long executerId = _loaderExecuterId.incrementAndGet();
 
 		System.out.println(
@@ -223,7 +209,6 @@ public class GeoPartTourLoader {
 
 				new GeoPartLoaderItem(
 
-						// invalidate old requests
 						executerId,
 
 						geoParts,
@@ -250,10 +235,24 @@ public class GeoPartTourLoader {
 		_loadingExecutor.submit(executorTask);
 	}
 
+	/**
+	 * Stop loading and comparing of the tours in the waiting queue.
+	 */
 	static void stopLoading() {
 
 		// invalidate old requests
-		_loaderExecuterId.incrementAndGet();
+		synchronized (_waitingQueue) {
+
+			for (final GeoPartLoaderItem loaderItem : _waitingQueue) {
+
+//				System.out.println("stopLoading()\t: " + loaderItem);
+//// TODO remove SYSTEM.OUT.PRINTLN
+
+				loaderItem.isCanceled = true;
+			}
+
+			GeoPartTourComparer.stopComparing();
+		}
 	}
 
 }

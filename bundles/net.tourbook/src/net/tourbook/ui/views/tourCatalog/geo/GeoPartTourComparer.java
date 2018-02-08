@@ -26,10 +26,11 @@ import net.tourbook.tour.TourManager;
 
 public class GeoPartTourComparer {
 
-	private static final int										COMPARATOR_THREADS	= 8;
+	private static final int										COMPARATOR_THREADS	= Runtime
+			.getRuntime()
+			.availableProcessors();;
 
 	private static final LinkedBlockingDeque<GeoPartComparerItem>	_waitingQueue		= new LinkedBlockingDeque<>();
-
 	private static ThreadPoolExecutor								_comparerExecutor;
 
 	static GeoPartView												geoPartView;
@@ -50,6 +51,13 @@ public class GeoPartTourComparer {
 			}
 		};
 
+		System.out.println(
+				(String.format(
+						"[%s] Comparing tours with %d threads",
+						GeoPartTourComparer.class.getSimpleName(),
+						COMPARATOR_THREADS)));
+// TODO remove SYSTEM.OUT.PRINTLN
+
 		_comparerExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(COMPARATOR_THREADS, threadFactory);
 	}
 
@@ -58,15 +66,13 @@ public class GeoPartTourComparer {
 	 */
 	static void compareGeoTours(final GeoPartLoaderItem loaderItem) {
 
-		synchronized (_waitingQueue) {
-			_waitingQueue.removeAll(_waitingQueue);
-		}
+		_waitingQueue.clear();
 
 		for (final long tourId : loaderItem.tourIds) {
 
 			_waitingQueue.add(new GeoPartComparerItem(tourId, loaderItem));
 
-			final Runnable executorTask = new Runnable() {
+			_comparerExecutor.submit(new Runnable() {
 				@Override
 				public void run() {
 
@@ -77,20 +83,16 @@ public class GeoPartTourComparer {
 						return;
 					}
 
-					final long executorId = comparatorItem.loaderItem.executorId;
-
-					if (isComparatorValid(executorId)) {
+					if (loaderItem.isCanceled == false) {
 
 						compareTour(comparatorItem);
 
-						if (isComparatorValid(executorId)) {
+						if (loaderItem.isCanceled == false) {
 							geoPartView.compare_40_TourIsCompared(comparatorItem);
 						}
 					}
 				}
-			};
-
-			_comparerExecutor.submit(executorTask);
+			});
 		}
 	}
 
@@ -103,8 +105,9 @@ public class GeoPartTourComparer {
 		final long startConvert = System.nanoTime();
 
 		final GeoPartLoaderItem loaderItem = comparatorItem.loaderItem;
-		final int[] partLatSerie = loaderItem.normalizedTourPart.normalizedLat;
-		final int[] partLonSerie = loaderItem.normalizedTourPart.normalizedLon;
+		final NormalizedGeoData normalizedTourPart = loaderItem.normalizedTourPart;
+		final int[] partLatSerie = normalizedTourPart.normalizedLat;
+		final int[] partLonSerie = normalizedTourPart.normalizedLon;
 
 		final NormalizedGeoData normalizedLatLon = tourData.getNormalizedLatLon();
 		final int[] tourLatSerie = normalizedLatLon.normalizedLat;
@@ -122,27 +125,59 @@ public class GeoPartTourComparer {
 				final int tourLat = tourLatSerie[tourIndex];
 				final int tourLon = tourLonSerie[tourIndex];
 
+				if (loaderItem.isCanceled) {
+
+//				System.out.println("compareTour() is canceled: " + comparatorItem);
+//// TODO remove SYSTEM.OUT.PRINTLN
+
+					return;
+				}
 			}
 		}
 
 		System.out.println(
 				String.format(
-						"tourId %-20s   id %5d   # %5d / %5d   load %10.4f   convert %10.4f   compare %10.4f   all %10.4f ms",
+						"[%5d]"
+								+ " tourId %-20s"
+								+ "   id %5d"
+								+ "   # %5d / %5d"
+
+								+ "   compare %10.4f"
+								+ "   load %10.4f"
+								+ "   convert %10.4f"
+								+ "   all %10.4f ms",
+
+						Thread.currentThread().getId(),
 						comparatorItem.tourId,
 						loaderItem.executorId,
 						tourLatSerie.length,
 						partLatSerie.length,
+
+						(float) (System.nanoTime() - startComparing) / 1000000, // compare
 						(float) (startConvert - startLoading) / 1000000, // load
 						(float) (startComparing - startConvert) / 1000000, // convert
-						(float) (System.nanoTime() - startComparing) / 1000000, // compare
 						(float) (System.nanoTime() - startLoading) / 1000000) // all
 		);
 		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
-	private static boolean isComparatorValid(final long executorId) {
+	/**
+	 * Stop comparing of the tours in the waiting queue.
+	 */
+	static void stopComparing() {
 
-		return GeoPartTourLoader.isLoaderValid(executorId);
+		// invalidate old requests
+		synchronized (_waitingQueue) {
+
+			for (final GeoPartComparerItem comparerItem : _waitingQueue) {
+
+//				System.out.println("stopComparing()\t: " + comparerItem);
+//				// TODO remove SYSTEM.OUT.PRINTLN
+
+				comparerItem.loaderItem.isCanceled = true;
+			}
+
+			_waitingQueue.clear();
+		}
 	}
-
 }

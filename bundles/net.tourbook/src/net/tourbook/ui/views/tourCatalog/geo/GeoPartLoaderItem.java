@@ -35,6 +35,11 @@ public class GeoPartLoaderItem {
 	long				executorId;
 
 	/**
+	 * When <code>true</code> then the loading/comparing of tours in this loader is canceled.
+	 */
+	boolean				isCanceled;
+
+	/**
 	 * Requested geo parts
 	 */
 	int[]				geoParts;
