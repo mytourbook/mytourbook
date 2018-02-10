@@ -21,6 +21,12 @@ public class GeoPartComparerItem {
 
 	GeoPartLoaderItem	loaderItem;
 
+	/*
+	 * Compare result
+	 */
+	long[]				tourLatLonDiff;
+	int					tourMinDiffIndex;
+
 	public GeoPartComparerItem(final long tourId, final GeoPartLoaderItem loaderItem) {
 
 		this.tourId = tourId;

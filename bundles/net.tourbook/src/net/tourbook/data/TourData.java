@@ -170,7 +170,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	   Deg * 100000		  1.6 m
 	 * </pre>
 	 */
-	private static final int 			NORMALIZED_GEO_DATA_FACTOR 			= 10000;
+	private static final int 			NORMALIZED_GEO_DATA_FACTOR 			= 100_000;
+
+	public static final double			NORMALIZED_LATITUDE_OFFSET			= 90.0;
+	public static final double			NORMALIZED_LONGITUDE_OFFSET			= 180.0;
 
 	private static final String			TIME_ZONE_ID_EUROPE_BERLIN			= "Europe/Berlin";				//$NON-NLS-1$
 
@@ -2651,11 +2654,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	}
 
 	/**
+	 * Normalizes lat/lon tour data
+	 * <ul>
+	 * <li>from first to last index</li>
+	 * <li>added lat:90 or lon:180 to have positive values</li>
+	 * <li>multiplied by {@link #NORMALIZED_GEO_DATA_FACTOR}</li>
+	 * <li>removed subsequent duplicates</li>
+	 * </ul>
+	 * 
 	 * @param indexStart
 	 * @param indexEnd
-	 * @return Returns tour lat/lon data from first to last index, multiplied by
-	 *         {@link #NORMALIZED_GEO_DATA_FACTOR} and normalized (removed duplicates), or
-	 *         <code>null</code> when not available
+	 * @return Returns normalized tour lat/lon data or <code>null</code> when not available
 	 */
 	public NormalizedGeoData computeGeo_NormalizedLatLon(	final int indexStart,
 															final int indexEnd) {
@@ -2684,8 +2693,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 		for (int serieIndex = firstIndex; serieIndex < lastIndex; serieIndex++) {
 
-			final int latNormalized = (int) (latitudeSerie[serieIndex] * NORMALIZED_GEO_DATA_FACTOR);
-			final int lonNormalized = (int) (longitudeSerie[serieIndex] * NORMALIZED_GEO_DATA_FACTOR);
+			final int latNormalized = (int) ((latitudeSerie[serieIndex] + NORMALIZED_LATITUDE_OFFSET)
+					* NORMALIZED_GEO_DATA_FACTOR);
+
+			final int lonNormalized = (int) ((longitudeSerie[serieIndex] + NORMALIZED_LONGITUDE_OFFSET)
+					* NORMALIZED_GEO_DATA_FACTOR);
 
 			if (latNormalized != prevLatNormalized || lonNormalized != prevLonNormalized) {
 

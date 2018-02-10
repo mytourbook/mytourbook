@@ -15,6 +15,9 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog.geo;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -56,38 +59,40 @@ import org.eclipse.ui.part.ViewPart;
 
 public class GeoPartView extends ViewPart {
 
-	public static final String		ID				= "net.tourbook.ui.views.tourCatalog.geo.GeoPartView";	//$NON-NLS-1$
+	public static final String				ID				= "net.tourbook.ui.views.tourCatalog.geo.GeoPartView";	//$NON-NLS-1$
 
 //	private static final IDialogSettings	_state		= TourbookPlugin.getState(ID);
-	private final IPreferenceStore	_prefStore		= TourbookPlugin.getPrefStore();
+	private final IPreferenceStore			_prefStore		= TourbookPlugin.getPrefStore();
 
-	private IPartListener2			_partListener;
-	private ITourEventListener		_tourEventListener;
-	private SelectionAdapter		_defaultSelectionListener;
-	private IPropertyChangeListener	_prefChangeListener;
+	private IPartListener2					_partListener;
+	private ITourEventListener				_tourEventListener;
+	private SelectionAdapter				_defaultSelectionListener;
+	private IPropertyChangeListener			_prefChangeListener;
 
-	private int						_lastSelectionHash;
+	private int								_lastSelectionHash;
 
-	private int[]					_geoParts;
-	private NormalizedGeoData		_normalizedTourPart;
+	private int[]							_geoParts;
+	private NormalizedGeoData				_normalizedTourPart;
 
-	private int						_geoPartTours;
-	private AtomicInteger			_workedTours	= new AtomicInteger();
-	private long					_workerId;
+	private int								_geoPartTours;
+	private AtomicInteger					_workedTours	= new AtomicInteger();
+	private long							_workerId;
 
 	/*
 	 * UI controls
 	 */
-	private Composite				_parent;
+	private Composite						_parent;
 
-	private Label					_lblNumGeoParts;
-	private Label					_lblNumSlices;
-	private Label					_lblNumTours;
-	private Label					_lblSqlRuntime;
+	private Label							_lblNumGeoParts;
+	private Label							_lblNumSlices;
+	private Label							_lblNumTours;
+	private Label							_lblSqlRuntime;
 
-	private Button					_chkUseAppFilter;
+	private Button							_chkUseAppFilter;
 
-	private ProgressMonitorPart		_progMonitor;
+	private ProgressMonitorPart				_progMonitor;
+
+	private ArrayList<GeoPartComparerItem>	_comparedTours	= new ArrayList<>();
 
 	private void addPartListener() {
 
@@ -201,8 +206,12 @@ public class GeoPartView extends ViewPart {
 		_geoPartTours = loaderItem.tourIds.length;
 
 		if (_geoPartTours > 0) {
+
 			_workedTours.set(0);
 			_workerId = loaderItem.executorId;
+
+			_comparedTours.clear();
+
 			GeoPartTourComparer.compareGeoTours(loaderItem);
 		}
 
@@ -237,7 +246,10 @@ public class GeoPartView extends ViewPart {
 			return;
 		}
 
-		_workedTours.incrementAndGet();
+		final int workedTours = _workedTours.incrementAndGet();
+
+		// keep compared tour
+		_comparedTours.add(comparerItem);
 
 		Display.getDefault().asyncExec(new Runnable() {
 			@Override
@@ -247,8 +259,12 @@ public class GeoPartView extends ViewPart {
 					return;
 				}
 
-				_progMonitor.subTask(NLS.bind("{0} / {1}", _workedTours, _geoPartTours));
+				_progMonitor.subTask(NLS.bind("{0} / {1}", workedTours, _geoPartTours));
 				_progMonitor.worked(1);
+
+				if (workedTours == _geoPartTours) {
+					updateUI_CompareResult();
+				}
 			}
 		});
 	}
@@ -536,6 +552,52 @@ public class GeoPartView extends ViewPart {
 
 		_lblNumTours.setText(Integer.toString(loaderItem.tourIds.length));
 		_lblSqlRuntime.setText(Long.toString(loaderItem.sqlRunningTime) + " ms");
+	}
+
+	private void updateUI_CompareResult() {
+
+		Collections.sort(_comparedTours, new Comparator<GeoPartComparerItem>() {
+
+			@Override
+			public int compare(final GeoPartComparerItem compItem1, final GeoPartComparerItem compItem2) {
+
+				final int minIndex1 = compItem1.tourMinDiffIndex;
+				final int minIndex2 = compItem2.tourMinDiffIndex;
+
+				final long diff1 = compItem1.tourLatLonDiff[minIndex1];
+				final long diff2 = compItem2.tourLatLonDiff[minIndex2];
+
+//				return (int) (diff1 - diff2);
+				return (int) (diff2 - diff1);
+			}
+		});
+
+		for (final GeoPartComparerItem comparerItem : _comparedTours) {
+
+			final int tourMinDiffIndex = comparerItem.tourMinDiffIndex;
+			final long[] tourLatLonDiff = comparerItem.tourLatLonDiff;
+
+			System.out.println(
+					String.format(
+
+							" tourId %-20s"
+									+ "%5d   "
+									+ "%12d   "
+							//									+ "%s"
+
+							,
+
+							comparerItem.tourId,
+
+							tourMinDiffIndex,
+							tourLatLonDiff[tourMinDiffIndex]
+
+					//							Arrays.toString(tourLatLonDiff)
+
+					));
+// TODO remove SYSTEM.OUT.PRINTLN
+
+		}
 	}
 
 }
