@@ -792,7 +792,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	public int[]						timeSerie;
 
 	/**
-	 * contains the absolute distance in m (metric system)
+	 * Contains the absolute distance in m (metric system) or <code>null</code> when not available
 	 */
 	@Transient
 	public float[]						distanceSerie;
@@ -2354,6 +2354,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		avgPulse = computeAvg_PulseSegment(0, timeSerie.length - 1);
 	}
 
+	/**
+	 * @param firstIndex
+	 * @param lastIndex
+	 * @return Returns the average pulse or 0 when not available.
+	 */
 	public float computeAvg_PulseSegment(final int firstIndex, final int lastIndex) {
 
 		// check if data are available
@@ -2687,6 +2692,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 		final TIntArrayList allNormalizedLat = new TIntArrayList();
 		final TIntArrayList allNormalizedLon = new TIntArrayList();
+		final TIntArrayList allNormalized2OriginalIndices = new TIntArrayList();
 
 		int prevLatNormalized = Integer.MIN_VALUE;
 		int prevLonNormalized = Integer.MIN_VALUE;
@@ -2705,6 +2711,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 				allNormalizedLat.add(latNormalized);
 				allNormalizedLon.add(lonNormalized);
+
+				// keep original index
+				allNormalized2OriginalIndices.add(serieIndex + firstIndex);
 			}
 
 			prevLatNormalized = latNormalized;
@@ -2712,8 +2721,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		}
 
 		return new NormalizedGeoData(
+
 				allNormalizedLat.toArray(),
-				allNormalizedLon.toArray());
+				allNormalizedLon.toArray(),
+
+				allNormalized2OriginalIndices.toArray());
 	}
 
 	/**

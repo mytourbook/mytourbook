@@ -38,7 +38,6 @@ public class GeoPartTourLoader {
 
 	private static final AtomicLong								_loaderExecuterId	= new AtomicLong();
 	private static final LinkedBlockingDeque<GeoPartLoaderItem>	_waitingQueue		= new LinkedBlockingDeque<>();
-
 	private static ExecutorService								_loadingExecutor;
 
 	static GeoPartView											geoPartView;
@@ -195,7 +194,6 @@ public class GeoPartTourLoader {
 													final boolean useAppFilter) {
 
 		stopLoading();
-		_waitingQueue.clear();
 
 		// invalidate old requests
 		final long executerId = _loaderExecuterId.incrementAndGet();
@@ -245,11 +243,10 @@ public class GeoPartTourLoader {
 
 			for (final GeoPartLoaderItem loaderItem : _waitingQueue) {
 
-//				System.out.println("stopLoading()\t: " + loaderItem);
-//// TODO remove SYSTEM.OUT.PRINTLN
-
 				loaderItem.isCanceled = true;
 			}
+
+			_waitingQueue.clear();
 
 			GeoPartTourComparer.stopComparing();
 		}

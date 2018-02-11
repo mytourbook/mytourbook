@@ -20,6 +20,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.NormalizedGeoData;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourManager;
@@ -84,9 +85,16 @@ public class GeoPartTourComparer {
 						return;
 					}
 
-					if (compareTour(comparatorItem)) {
-						geoPartView.compare_40_TourIsCompared(comparatorItem);
+					try {
+
+						compareTour(comparatorItem);
+
+					} catch (final Exception e) {
+
+						StatusUtil.log(e);
 					}
+
+					geoPartView.compare_40_TourIsCompared(comparatorItem);
 				}
 			});
 		}
@@ -131,15 +139,12 @@ public class GeoPartTourComparer {
 		final long startComparing = System.nanoTime();
 
 		long minDiffValue = Long.MAX_VALUE;
-		int minDiffIndex = 0;
+		int minDiffIndex = -1;
 
 		// loop: all tour slices
 		for (int tourIndex = 0; tourIndex < numTourSlices; tourIndex++) {
 
-			final int tourLat = tourLatSerie[tourIndex];
-			final int tourLon = tourLonSerie[tourIndex];
-
-			long latLonDiff = 0;
+			long latLonDiff = -1;
 
 			// loop: all part slices
 			for (int partIndex = 0; partIndex < numPartSlices; partIndex++) {
@@ -148,60 +153,87 @@ public class GeoPartTourComparer {
 					return false;
 				}
 
-				final int partLat = partLatSerie[partIndex];
-				final int partLon = partLonSerie[partIndex];
+				final int compareIndex = tourIndex + partIndex;
 
-				final int latDiff = partLat - tourLat;
-				final int lonDiff = partLon - tourLon;
+				/*
+				 * Make sure the compare index is not larger than the tour index, this happens when
+				 * the part slices has exeeded the tour slices
+				 */
+				if (compareIndex == numTourSlices) {
+					latLonDiff = -1;
+					break;
+				}
+
+				final int latDiff = partLatSerie[partIndex] - tourLatSerie[compareIndex];
+				final int lonDiff = partLonSerie[partIndex] - tourLonSerie[compareIndex];
 
 				// optimize Math.abs() !!!
 				final int latDiffAbs = latDiff < 0 ? -latDiff : latDiff;
 				final int lonDiffAbs = lonDiff >= 0 ? lonDiff : -lonDiff;
 
-				final int partDiff = latDiffAbs + lonDiffAbs;
-
-				latLonDiff += partDiff;
-
-				// keep min diff value/index
-				if (partDiff < minDiffValue) {
-
-					minDiffValue = latLonDiff;
-
-					// keep tour index where the min diff occured
-					minDiffIndex = tourIndex;
-				}
+				// summarize all diffs for one tour slice
+				latLonDiff += (latDiffAbs + lonDiffAbs);
 			}
 
+			// keep diff value
 			tourDiff[tourIndex] = latLonDiff;
+
+			// keep min diff value/index
+			if (latLonDiff < minDiffValue && latLonDiff != -1) {
+
+				minDiffValue = latLonDiff;
+
+				// keep tour index where the min diff occured
+				minDiffIndex = tourIndex;
+			}
+
+		}
+
+		// a tour is available
+		if (minDiffIndex != -1) {
+
+			final int[] normalizedIndices = normalizedTour.normalized2OriginalIndices;
+
+			final int startIndex = normalizedIndices[minDiffIndex];
+			final int endIndex = normalizedIndices[minDiffIndex + numPartSlices - 1];
+
+			comparatorItem.avgPulse = tourData.computeAvg_PulseSegment(startIndex, endIndex);
+			comparatorItem.speed = TourManager.computeTourSpeed(tourData, startIndex, endIndex);
+
 		}
 
 		comparatorItem.tourLatLonDiff = tourDiff;
 		comparatorItem.tourMinDiffIndex = minDiffIndex;
 
-		System.out.println(
-				String.format(
-						"[%5d]"
-								+ " tourId %-20s"
-								+ "   id %5d"
-								+ "   # %5d / %5d"
-
-								+ "   cmp %10.4f"
-								+ "   ld %10.4f"
-								+ "   cnvrt %10.4f"
-								+ "   all %10.4f ms",
-
-						Thread.currentThread().getId(),
-						comparatorItem.tourId,
-						loaderItem.executorId,
-						numTourSlices,
-						numPartSlices,
-
-						(float) (System.nanoTime() - startComparing) / 1000000, // compare
-						(float) (startConvert - startLoading) / 1000000, // load
-						(float) (startComparing - startConvert) / 1000000, // convert
-						(float) (System.nanoTime() - startLoading) / 1000000) // all
-		);
-		// TODO remove SYSTEM.OUT.PRINTLN
+//		System.out.println(
+//				String.format(
+//						""
+//								+ "[%5d]" // thread
+//								+ " tourId %-20s"
+//								+ "   exec %5d"
+//
+//								+ "   diff %8d"
+//								+ "   # %5d / %5d"
+//
+//								+ "   cmp %10.4f"
+//								+ "   ld %10.4f"
+//								+ "   cnvrt %10.4f"
+//								+ "   all %10.4f ms",
+//
+//						Thread.currentThread().getId(),
+//						comparatorItem.tourId,
+//						loaderItem.executorId,
+//
+//						minDiffIndex < 0 ? minDiffIndex : tourDiff[minDiffIndex],
+//						numTourSlices,
+//						numPartSlices,
+//
+//						(float) (System.nanoTime() - startComparing) / 1000000, // compare
+//						(float) (startConvert - startLoading) / 1000000, // load
+//						(float) (startComparing - startConvert) / 1000000, // convert
+//						(float) (System.nanoTime() - startLoading) / 1000000) // all
+//		);
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		return true;
 	}
@@ -215,9 +247,6 @@ public class GeoPartTourComparer {
 		synchronized (_waitingQueue) {
 
 			for (final GeoPartComparerItem comparerItem : _waitingQueue) {
-
-//				System.out.println("stopComparing()\t: " + comparerItem);
-//				// TODO remove SYSTEM.OUT.PRINTLN
 
 				comparerItem.loaderItem.isCanceled = true;
 			}

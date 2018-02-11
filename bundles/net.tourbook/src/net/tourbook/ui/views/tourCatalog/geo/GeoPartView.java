@@ -59,40 +59,41 @@ import org.eclipse.ui.part.ViewPart;
 
 public class GeoPartView extends ViewPart {
 
-	public static final String				ID				= "net.tourbook.ui.views.tourCatalog.geo.GeoPartView";	//$NON-NLS-1$
+	public static final String		ID				= "net.tourbook.ui.views.tourCatalog.geo.GeoPartView";	//$NON-NLS-1$
 
-//	private static final IDialogSettings	_state		= TourbookPlugin.getState(ID);
-	private final IPreferenceStore			_prefStore		= TourbookPlugin.getPrefStore();
+//	private static final IDialogSettings	_state			= TourbookPlugin.getState(ID);
+	private final IPreferenceStore	_prefStore		= TourbookPlugin.getPrefStore();
 
-	private IPartListener2					_partListener;
-	private ITourEventListener				_tourEventListener;
-	private SelectionAdapter				_defaultSelectionListener;
-	private IPropertyChangeListener			_prefChangeListener;
+	private IPartListener2			_partListener;
+	private ITourEventListener		_tourEventListener;
+	private SelectionAdapter		_defaultSelectionListener;
+	private IPropertyChangeListener	_prefChangeListener;
 
-	private int								_lastSelectionHash;
+	private int						_lastSelectionHash;
+	private TourData				_lastTourData;
+	private int						_lastLeftIndex;
+	private int						_lastRightIndex;
 
-	private int[]							_geoParts;
-	private NormalizedGeoData				_normalizedTourPart;
+	private int[]					_geoParts;
+	private int						_geoPartTours;
+	private NormalizedGeoData		_normalizedTourPart;
 
-	private int								_geoPartTours;
-	private AtomicInteger					_workedTours	= new AtomicInteger();
-	private long							_workerId;
+	private AtomicInteger			_workedTours	= new AtomicInteger();
+	private long					_workerExecutorId;
 
 	/*
 	 * UI controls
 	 */
-	private Composite						_parent;
+	private Composite				_parent;
 
-	private Label							_lblNumGeoParts;
-	private Label							_lblNumSlices;
-	private Label							_lblNumTours;
-	private Label							_lblSqlRuntime;
+	private Label					_lblNumGeoParts;
+	private Label					_lblNumSlices;
+	private Label					_lblNumTours;
+	private Label					_lblSqlRuntime;
 
-	private Button							_chkUseAppFilter;
+	private Button					_chkUseAppFilter;
 
-	private ProgressMonitorPart				_progMonitor;
-
-	private ArrayList<GeoPartComparerItem>	_comparedTours	= new ArrayList<>();
+	private ProgressMonitorPart		_progMonitor;
 
 	private void addPartListener() {
 
@@ -208,9 +209,7 @@ public class GeoPartView extends ViewPart {
 		if (_geoPartTours > 0) {
 
 			_workedTours.set(0);
-			_workerId = loaderItem.executorId;
-
-			_comparedTours.clear();
+			_workerExecutorId = loaderItem.executorId;
 
 			GeoPartTourComparer.compareGeoTours(loaderItem);
 		}
@@ -242,14 +241,19 @@ public class GeoPartView extends ViewPart {
 
 		final GeoPartLoaderItem loaderItem = comparerItem.loaderItem;
 
-		if (loaderItem.isCanceled || loaderItem.executorId != _workerId) {
+		if (loaderItem.isCanceled || loaderItem.executorId != _workerExecutorId) {
+			System.out.println(
+					(UI.timeStampNano() + " [" + getClass().getSimpleName()
+							+ "] compare_40_TourIsCompared() is canceled"));
+// TODO remove SYSTEM.OUT.PRINTLN
+
 			return;
 		}
 
 		final int workedTours = _workedTours.incrementAndGet();
 
 		// keep compared tour
-		_comparedTours.add(comparerItem);
+		loaderItem.comparedTours.add(comparerItem);
 
 		Display.getDefault().asyncExec(new Runnable() {
 			@Override
@@ -263,7 +267,7 @@ public class GeoPartView extends ViewPart {
 				_progMonitor.worked(1);
 
 				if (workedTours == _geoPartTours) {
-					updateUI_CompareResult();
+					updateUI_CompareResult(loaderItem.comparedTours);
 				}
 			}
 		});
@@ -447,6 +451,15 @@ public class GeoPartView extends ViewPart {
 			lastIndex = latSerie.length;
 		}
 
+		// skip same data
+		if (tourData == _lastTourData && leftIndex == _lastLeftIndex && rightIndex == _lastRightIndex) {
+			return;
+		}
+
+		_lastTourData = tourData;
+		_lastLeftIndex = leftIndex;
+		_lastRightIndex = rightIndex;
+
 		compare_20_LoadGeoParts(tourData, firstIndex, lastIndex);
 	}
 
@@ -554,25 +567,44 @@ public class GeoPartView extends ViewPart {
 		_lblSqlRuntime.setText(Long.toString(loaderItem.sqlRunningTime) + " ms");
 	}
 
-	private void updateUI_CompareResult() {
+	private void updateUI_CompareResult(final ArrayList<GeoPartComparerItem> comparedTours) {
 
-		Collections.sort(_comparedTours, new Comparator<GeoPartComparerItem>() {
+		Collections.sort(comparedTours, new Comparator<GeoPartComparerItem>() {
 
 			@Override
 			public int compare(final GeoPartComparerItem compItem1, final GeoPartComparerItem compItem2) {
 
+				if (compItem1 == null || compItem1.tourLatLonDiff == null) {
+					return Integer.MAX_VALUE;
+				}
+				if (compItem2 == null || compItem2.tourLatLonDiff == null) {
+					return Integer.MAX_VALUE;
+				}
+
 				final int minIndex1 = compItem1.tourMinDiffIndex;
 				final int minIndex2 = compItem2.tourMinDiffIndex;
 
-				final long diff1 = compItem1.tourLatLonDiff[minIndex1];
-				final long diff2 = compItem2.tourLatLonDiff[minIndex2];
+				final long diff1 = minIndex1 < 0 ? Integer.MAX_VALUE : compItem1.tourLatLonDiff[minIndex1];
+				final long diff2 = minIndex2 < 0 ? Integer.MAX_VALUE : compItem2.tourLatLonDiff[minIndex2];
 
-//				return (int) (diff1 - diff2);
-				return (int) (diff2 - diff1);
+//				return (int) (diff1 - diff2); // smallest first
+				return (int) (diff2 - diff1); // smallest last
 			}
 		});
 
-		for (final GeoPartComparerItem comparerItem : _comparedTours) {
+		for (final GeoPartComparerItem comparerItem : comparedTours) {
+
+			if (comparerItem == null) {
+
+				System.out.println("comparerItem == null");
+				continue;
+			}
+
+			if (comparerItem.tourLatLonDiff == null) {
+
+				System.out.println("tourLatLonDiff == null");
+				continue;
+			}
 
 			final int tourMinDiffIndex = comparerItem.tourMinDiffIndex;
 			final long[] tourLatLonDiff = comparerItem.tourLatLonDiff;
@@ -580,19 +612,22 @@ public class GeoPartView extends ViewPart {
 			System.out.println(
 					String.format(
 
-							" tourId %-20s"
-									+ "%5d   "
-									+ "%12d   "
-							//									+ "%s"
+							"tourId %-20s"
+									+ "   idx %5d"
+									+ "   diff %8d"
+
+									+ "   speed %5.1f"
+									+ "   pulse %6.1f"
 
 							,
 
 							comparerItem.tourId,
 
 							tourMinDiffIndex,
-							tourLatLonDiff[tourMinDiffIndex]
+							tourMinDiffIndex < 0 ? -1 : tourLatLonDiff[tourMinDiffIndex],
 
-					//							Arrays.toString(tourLatLonDiff)
+							comparerItem.speed,
+							comparerItem.avgPulse
 
 					));
 // TODO remove SYSTEM.OUT.PRINTLN

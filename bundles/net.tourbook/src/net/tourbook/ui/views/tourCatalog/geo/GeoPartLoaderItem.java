@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog.geo;
 
+import java.util.ArrayList;
+
 import net.tourbook.data.NormalizedGeoData;
 
 /**
@@ -32,34 +34,36 @@ import net.tourbook.data.NormalizedGeoData;
  */
 public class GeoPartLoaderItem {
 
-	long				executorId;
+	long							executorId;
 
 	/**
 	 * When <code>true</code> then the loading/comparing of tours in this loader is canceled.
 	 */
-	boolean				isCanceled;
+	boolean							isCanceled;
 
 	/**
 	 * Requested geo parts
 	 */
-	int[]				geoParts;
+	int[]							geoParts;
 
 	/**
 	 * Geo part which should be compared
 	 */
-	NormalizedGeoData	normalizedTourPart;
+	NormalizedGeoData				normalizedTourPart;
 
 	/**
 	 * Tour id's which are having at least one of the {@link #geoParts}
 	 */
-	long[]				tourIds;
+	long[]							tourIds;
 
-	boolean				isUseAppFilter;
+	boolean							isUseAppFilter;
 
 	/**
 	 * Time in ms to calculate sql data
 	 */
-	long				sqlRunningTime;
+	long							sqlRunningTime;
+
+	ArrayList<GeoPartComparerItem>	comparedTours	= new ArrayList<>();
 
 	public GeoPartLoaderItem(	final long executorId,
 								final int[] geoParts,

@@ -22,10 +22,13 @@ public class GeoPartComparerItem {
 	GeoPartLoaderItem	loaderItem;
 
 	/*
-	 * Compare result
+	 * Compare results
 	 */
 	long[]				tourLatLonDiff;
 	int					tourMinDiffIndex;
+
+	float				avgPulse;
+	float				speed;
 
 	public GeoPartComparerItem(final long tourId, final GeoPartLoaderItem loaderItem) {
 

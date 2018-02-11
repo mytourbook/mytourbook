@@ -539,6 +539,12 @@ public class TourManager {
 		return true;
 	}
 
+	/**
+	 * @param tourData
+	 * @param startIndex
+	 * @param endIndex
+	 * @return Returns the metric speed or 0 when not available.
+	 */
 	public static float computeTourSpeed(final TourData tourData, final int startIndex, final int endIndex) {
 
 		final float[] distanceSerie = tourData.getMetricDistanceSerie();

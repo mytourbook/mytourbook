@@ -20,10 +20,19 @@ public class NormalizedGeoData {
 	public int[]	normalizedLat;
 	public int[]	normalizedLon;
 
-	public NormalizedGeoData(final int[] normalizedLat, final int[] normalizedLon) {
+	/**
+	 * Contains the index of the original data
+	 */
+	public int[]	normalized2OriginalIndices;
+
+	public NormalizedGeoData(	final int[] normalizedLat,
+								final int[] normalizedLon,
+								final int[] normalized2OriginalIndices) {
 
 		this.normalizedLat = normalizedLat;
 		this.normalizedLon = normalizedLon;
+
+		this.normalized2OriginalIndices = normalized2OriginalIndices;
 	}
 
 }
