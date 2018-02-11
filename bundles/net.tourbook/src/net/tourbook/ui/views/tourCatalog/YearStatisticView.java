@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -74,33 +74,35 @@ import org.eclipse.ui.part.ViewPart;
 
 public class YearStatisticView extends ViewPart {
 
-	public static final String					ID									= "net.tourbook.views.tourCatalog.yearStatisticView";									//$NON-NLS-1$
+// SET_FORMATTING_OFF
+	
+	public static final String					ID									= "net.tourbook.views.tourCatalog.yearStatisticView";								//$NON-NLS-1$
 
 	private static final String					GRAPH_LABEL_HEARTBEAT				= net.tourbook.common.Messages.Graph_Label_Heartbeat;
 	private static final String					GRAPH_LABEL_HEARTBEAT_UNIT			= net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
 
-	private final boolean						_isOSX								= net.tourbook.common.UI.IS_OSX;
-	private final boolean						_isLinux							= net.tourbook.common.UI.IS_LINUX;
-
 	static final String							STATE_NUMBER_OF_YEARS				= "numberOfYearsToDisplay";															//$NON-NLS-1$
-
+	
 	private static final String					GRID_PREF_PREFIX					= "GRID_REF_TOUR_YEAR_STATISTIC__";													//$NON-NLS-1$
-
 	private static final String					GRID_IS_SHOW_VERTICAL_GRIDLINES		= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
 	private static final String					GRID_IS_SHOW_HORIZONTAL_GRIDLINES	= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
 	private static final String					GRID_VERTICAL_DISTANCE				= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
 	private static final String					GRID_HORIZONTAL_DISTANCE			= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
+	
+	private static final boolean				_isOSX								= net.tourbook.common.UI.IS_OSX;
+	private static final boolean				_isLinux							= net.tourbook.common.UI.IS_LINUX;
 
-	private final IPreferenceStore				_prefStore							= TourbookPlugin.getPrefStore();
-	private final IDialogSettings				_state								= TourbookPlugin
-																							.getState("TourCatalogViewYearStatistic");										//$NON-NLS-1$
+	private static final IDialogSettings		_state								= TourbookPlugin.getState("TourCatalogViewYearStatistic");							//$NON-NLS-1$
+	private static final IPreferenceStore		_prefStore							= TourbookPlugin.getPrefStore();
+	
+// SET_FORMATTING_ON
 
-	private IPropertyChangeListener				_prefChangeListener;
-	private IPartListener2						_partListener;
-	private ISelectionListener					_postSelectionListener;
-	private PostSelectionProvider				_postSelectionProvider;
+	private IPropertyChangeListener			_prefChangeListener;
+	private IPartListener2					_partListener;
+	private ISelectionListener				_postSelectionListener;
+	private PostSelectionProvider			_postSelectionProvider;
 
-	private NumberFormat						_nf1								= NumberFormat.getNumberInstance();
+	private NumberFormat					_nf1								= NumberFormat.getNumberInstance();
 	{
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
@@ -113,33 +115,33 @@ public class YearStatisticView extends ViewPart {
 	/**
 	 * contains all {@link TVICatalogComparedTour} tour objects for all years
 	 */
-	private ArrayList<TVICatalogComparedTour>	_allTours							= new ArrayList<TVICatalogComparedTour>();
+	private ArrayList<TVICatalogComparedTour>	_allTours					= new ArrayList<TVICatalogComparedTour>();
 
 	/**
 	 * Years which the user can select as start year in the combo box
 	 */
-	private ArrayList<Integer>					_comboYears							= new ArrayList<Integer>();
+	private ArrayList<Integer>					_comboYears					= new ArrayList<Integer>();
 
 	/**
 	 * Day of year values for all displayed years<br>
 	 * DOY...Day Of Year
 	 */
-	private ArrayList<Integer>					_DOYValues							= new ArrayList<Integer>();
+	private ArrayList<Integer>					_DOYValues					= new ArrayList<Integer>();
 
 	/**
 	 * Tour speed for all years
 	 */
-	private ArrayList<Float>					_tourSpeed							= new ArrayList<Float>();
+	private ArrayList<Float>					_tourSpeed					= new ArrayList<Float>();
 
 	/**
 	 * Average pulse for all years.
 	 */
-	private ArrayList<Float>					_avgPulse							= new ArrayList<Float>();
+	private ArrayList<Float>					_avgPulse					= new ArrayList<Float>();
 
 	/**
 	 * this is the last year (on the right side) which is displayed in the statistics
 	 */
-	private int									_lastYear							= TimeTools.now().getYear();
+	private int									_lastYear					= TimeTools.now().getYear();
 
 	/**
 	 * year item for the visible statistics
@@ -166,7 +168,7 @@ public class YearStatisticView extends ViewPart {
 	private ActionToolbarSlideout				_actionYearStatOptions;
 
 	private YearStatisticTourToolTip			_tourToolTip;
-	private TourInfoIconToolTipProvider			_tourInfoToolTipProvider			= new TourInfoIconToolTipProvider();
+	private TourInfoIconToolTipProvider			_tourInfoToolTipProvider	= new TourInfoIconToolTipProvider();
 
 	/*
 	 * UI controls
@@ -289,12 +291,15 @@ public class YearStatisticView extends ViewPart {
 
 		_tourEventListener = new ITourEventListener() {
 			@Override
-			public void tourChanged(final IWorkbenchPart part, final TourEventId propertyId, final Object propertyData) {
+			public void tourChanged(final IWorkbenchPart part,
+									final TourEventId propertyId,
+									final Object propertyData) {
 
 				if (propertyId == TourEventId.COMPARE_TOUR_CHANGED
 						&& propertyData instanceof TourPropertyCompareTourChanged) {
 
-					final TourPropertyCompareTourChanged compareTourProperty = (TourPropertyCompareTourChanged) propertyData;
+					final TourPropertyCompareTourChanged compareTourProperty =
+							(TourPropertyCompareTourChanged) propertyData;
 
 					if (compareTourProperty.isDataSaved) {
 						updateUI_YearChart(false);
@@ -492,11 +497,13 @@ public class YearStatisticView extends ViewPart {
 		final PixelConverter pc = new PixelConverter(parent);
 
 		_toolbar = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
+		GridDataFactory
+				.fillDefaults()//
 				.grab(true, false)
 				.align(SWT.BEGINNING, SWT.FILL)
 				.applyTo(_toolbar);
-		GridLayoutFactory.fillDefaults()//
+		GridLayoutFactory
+				.fillDefaults()//
 				.numColumns(3)
 				.margins(3, 3)
 				.applyTo(_toolbar);
@@ -505,7 +512,8 @@ public class YearStatisticView extends ViewPart {
 			 * combo: last year
 			 */
 			_cboLastYear = new Combo(_toolbar, SWT.DROP_DOWN | SWT.READ_ONLY);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.hint(pc.convertWidthInCharsToPixels(_isOSX ? 12 : _isLinux ? 12 : 5), SWT.DEFAULT)
 					.applyTo(_cboLastYear);
 			_cboLastYear.setToolTipText(Messages.Year_Statistic_Combo_LastYears_Tooltip);
@@ -522,7 +530,8 @@ public class YearStatisticView extends ViewPart {
 			 */
 			// label
 			final Label label = new Label(_toolbar, SWT.NONE);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.align(SWT.FILL, SWT.CENTER)
 					.indent(10, 0)
 					.applyTo(label);
@@ -530,7 +539,8 @@ public class YearStatisticView extends ViewPart {
 
 			// combo
 			_cboNumberOfYears = new Combo(_toolbar, SWT.DROP_DOWN | SWT.READ_ONLY);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.indent(2, 0)
 					.hint(pc.convertWidthInCharsToPixels(_isOSX ? 8 : _isLinux ? 8 : 4), SWT.DEFAULT)
 					.applyTo(_cboNumberOfYears);
@@ -984,12 +994,14 @@ public class YearStatisticView extends ViewPart {
 				ChartType.BAR,
 				ArrayListToArray.toFloat(_tourSpeed),
 				true);
+
 		computeMinMaxValues(yDataSpeed);
 
 		TourManager.setGraphColor(yDataSpeed, GraphColorManager.PREF_GRAPH_SPEED);
 
 		yDataSpeed.setYTitle(Messages.tourCatalog_view_label_year_chart_title);
 		yDataSpeed.setUnitLabel(UI.UNIT_LABEL_SPEED);
+		yDataSpeed.setShowYSlider(true);
 
 		/*
 		 * ensure that painting of the bar is started at the bottom and not at the visible min which
@@ -1003,13 +1015,18 @@ public class YearStatisticView extends ViewPart {
 		 * Pulse
 		 */
 		// set the bar low/high data
-		final ChartDataYSerie yDataPulse = new ChartDataYSerie(ChartType.BAR, ArrayListToArray.toFloat(_avgPulse), true);
+		final ChartDataYSerie yDataPulse = new ChartDataYSerie(
+				ChartType.BAR,
+				ArrayListToArray.toFloat(_avgPulse),
+				true);
+		
 		computeMinMaxValues(yDataPulse);
 
 		TourManager.setGraphColor(yDataPulse, GraphColorManager.PREF_GRAPH_HEARTBEAT);
 
 		yDataPulse.setYTitle(GRAPH_LABEL_HEARTBEAT);
 		yDataPulse.setUnitLabel(GRAPH_LABEL_HEARTBEAT_UNIT);
+		yDataPulse.setShowYSlider(true);
 
 		/*
 		 * ensure that painting of the bar is started at the bottom and not at the visible min which
