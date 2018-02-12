@@ -37,7 +37,7 @@ import net.tourbook.ui.SQLFilter;
 public class GeoPartTourLoader {
 
 	private static final AtomicLong								_loaderExecuterId	= new AtomicLong();
-	private static final LinkedBlockingDeque<GeoPartLoaderItem>	_waitingQueue		= new LinkedBlockingDeque<>();
+	private static final LinkedBlockingDeque<GeoPartLoaderItem>	_loaderWaitingQueue	= new LinkedBlockingDeque<>();
 	private static ExecutorService								_loadingExecutor;
 
 	static GeoPartView											geoPartView;
@@ -189,7 +189,7 @@ public class GeoPartTourLoader {
 	 * @param latPartNormalized
 	 * @param useAppFilter
 	 */
-	static synchronized void loadToursFromGeoParts(	final int[] geoParts,
+	static /* synchronized */ void loadToursFromGeoParts(	final int[] geoParts,
 													final NormalizedGeoData normalizedTourPart,
 													final boolean useAppFilter) {
 
@@ -203,7 +203,7 @@ public class GeoPartTourLoader {
 						+ ("\texecuterId: " + executerId));
 // TODO remove SYSTEM.OUT.PRINTLN
 
-		_waitingQueue.add(
+		_loaderWaitingQueue.add(
 
 				new GeoPartLoaderItem(
 
@@ -218,7 +218,7 @@ public class GeoPartTourLoader {
 			public void run() {
 
 				// get last added loader item
-				final GeoPartLoaderItem loaderItem = _waitingQueue.pollFirst();
+				final GeoPartLoaderItem loaderItem = _loaderWaitingQueue.pollFirst();
 
 				if (loaderItem == null) {
 					return;
@@ -239,14 +239,14 @@ public class GeoPartTourLoader {
 	static void stopLoading() {
 
 		// invalidate old requests
-		synchronized (_waitingQueue) {
+		synchronized (_loaderWaitingQueue) {
 
-			for (final GeoPartLoaderItem loaderItem : _waitingQueue) {
+			for (final GeoPartLoaderItem loaderItem : _loaderWaitingQueue) {
 
 				loaderItem.isCanceled = true;
 			}
 
-			_waitingQueue.clear();
+			_loaderWaitingQueue.clear();
 
 			GeoPartTourComparer.stopComparing();
 		}

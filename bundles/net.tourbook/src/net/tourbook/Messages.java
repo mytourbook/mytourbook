@@ -726,6 +726,9 @@ public class Messages extends NLS {
 	public static String		Format_rawdata_file_yyyy_mm_dd;
 	public static String		Format_yyyymmdd_hhmmss;
 
+	public static String		GeoPart_View_Action_AppFilter_Tooltip;
+	public static String		GeoPart_View_Action_OnOff_Tooltip;
+
 	public static String		HR_Zone_01_060_Moderate;
 	public static String		HR_Zone_01_060_Moderate_Shortcut;
 	public static String		HR_Zone_01_070_FatBurning;
@@ -771,6 +774,7 @@ public class Messages extends NLS {
 	public static String		Image__App_Cancel;
 	public static String		Image__App_Close;
 	public static String		Image__App_Edit_Paste;
+	public static String		Image__App_Filter;
 	public static String		Image__App_OK;
 	public static String		Image__App_RestoreDefault;
 	public static String		Image__App_Sort;
@@ -778,6 +782,8 @@ public class Messages extends NLS {
 	public static String		Image__App_Trash;
 	public static String		Image__App_Trash_Disabled;
 	public static String		Image__App_Trash_Themed;
+	public static String		Image__App_Turn_Off;
+	public static String		Image__App_Turn_On;
 	public static String		Image__ArrowDown;
 	public static String		Image__ArrowDown_Themed;
 	public static String		Image__ArrowUp;

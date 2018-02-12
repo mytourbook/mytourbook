@@ -21,12 +21,14 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.UI;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.NormalizedGeoData;
 import net.tourbook.data.TourData;
 import net.tourbook.importdata.RawDataManager;
@@ -36,6 +38,9 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.tourChart.TourChart;
 
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -59,41 +64,97 @@ import org.eclipse.ui.part.ViewPart;
 
 public class GeoPartView extends ViewPart {
 
-	public static final String		ID				= "net.tourbook.ui.views.tourCatalog.geo.GeoPartView";	//$NON-NLS-1$
+// SET_FORMATTING_OFF
+	
+	public static final String		ID									= "net.tourbook.ui.views.tourCatalog.geo.GeoPartView";	//$NON-NLS-1$
 
-//	private static final IDialogSettings	_state			= TourbookPlugin.getState(ID);
-	private final IPreferenceStore	_prefStore		= TourbookPlugin.getPrefStore();
+	private static final String		STATE_IS_LISTEN_TO_SLIDER_POSITION	= "STATE_IS_LISTEN_TO_SLIDER_POSITION";	//$NON-NLS-1$
+	
+// SET_FORMATTING_ON
 
-	private IPartListener2			_partListener;
-	private ITourEventListener		_tourEventListener;
-	private SelectionAdapter		_defaultSelectionListener;
-	private IPropertyChangeListener	_prefChangeListener;
+	private static final IDialogSettings	_state								= TourbookPlugin.getState(ID);
+	private final IPreferenceStore			_prefStore							= TourbookPlugin.getPrefStore();
 
-	private int						_lastSelectionHash;
-	private TourData				_lastTourData;
-	private int						_lastLeftIndex;
-	private int						_lastRightIndex;
+	private IPartListener2					_partListener;
 
-	private int[]					_geoParts;
-	private int						_geoPartTours;
-	private NormalizedGeoData		_normalizedTourPart;
+	private ITourEventListener				_tourEventListener;
+	private SelectionAdapter				_defaultSelectionListener;
+	private IPropertyChangeListener			_prefChangeListener;
+	private int								_lastSelectionHash;
 
-	private AtomicInteger			_workedTours	= new AtomicInteger();
-	private long					_workerExecutorId;
+	private TourData						_lastTourData;
+	private int								_lastLeftIndex;
+	private int								_lastRightIndex;
+	private int[]							_geoParts;
+
+	private int								_geoPartTours;
+	private NormalizedGeoData				_normalizedTourPart;
+	private AtomicInteger					_workedTours						= new AtomicInteger();
+
+	private long							_workerExecutorId;
+
+	private boolean							_isListenToSliderPosition;
 
 	/*
 	 * UI controls
 	 */
-	private Composite				_parent;
+	private Composite						_parent;
 
-	private Label					_lblNumGeoParts;
-	private Label					_lblNumSlices;
-	private Label					_lblNumTours;
-	private Label					_lblSqlRuntime;
+	private Label							_lblNumGeoParts;
 
-	private Button					_chkUseAppFilter;
+	private Label							_lblNumSlices;
+	private Label							_lblNumTours;
+	private Label							_lblSqlRuntime;
+	private Button							_chkUseAppFilter;
 
-	private ProgressMonitorPart		_progMonitor;
+	private ProgressMonitorPart				_progMonitor;
+
+	private ActionAppTourFilter				_actionAppTourFilter;
+
+	private ActionOnOff						_actionOnOff;
+
+	private class ActionAppTourFilter extends Action {
+
+		public ActionAppTourFilter() {
+
+			super(null, AS_CHECK_BOX);
+
+			setToolTipText(Messages.GeoPart_View_Action_AppFilter_Tooltip);
+			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Filter));
+		}
+
+		@Override
+		public void run() {
+			onAction_AppFilter(isChecked());
+		}
+	}
+
+	private class ActionOnOff extends Action {
+
+		public ActionOnOff() {
+
+			super(null, AS_CHECK_BOX);
+
+			setToolTipText(Messages.GeoPart_View_Action_OnOff_Tooltip);
+			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Turn_On));
+		}
+
+		@Override
+		public void run() {
+			onAction_OnOff();
+		}
+
+		private void setIcon(final boolean isSelected) {
+
+			// switch icon
+			if (isSelected) {
+				setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Turn_On));
+			} else {
+				setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Turn_Off));
+			}
+		}
+
+	}
 
 	private void addPartListener() {
 
@@ -108,6 +169,7 @@ public class GeoPartView extends ViewPart {
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == GeoPartView.this) {
+					saveState();
 					onCancelProgress();
 				}
 			}
@@ -228,7 +290,7 @@ public class GeoPartView extends ViewPart {
 					// enable cancel button
 					_progMonitor.attachToCancelComponent(null);
 
-					_progMonitor.beginTask(NLS.bind("Comparing tours", _geoPartTours), _geoPartTours);
+					_progMonitor.beginTask(NLS.bind("Comparing tours", _geoPartTours), _geoPartTours); //$NON-NLS-1$
 				}
 
 				updateUI(loaderItem);
@@ -242,9 +304,9 @@ public class GeoPartView extends ViewPart {
 		final GeoPartLoaderItem loaderItem = comparerItem.loaderItem;
 
 		if (loaderItem.isCanceled || loaderItem.executorId != _workerExecutorId) {
-			System.out.println(
-					(UI.timeStampNano() + " [" + getClass().getSimpleName()
-							+ "] compare_40_TourIsCompared() is canceled"));
+//			System.out.println(
+//					(UI.timeStampNano() + " [" + getClass().getSimpleName() //$NON-NLS-1$
+//							+ "] compare_40_TourIsCompared() is canceled")); //$NON-NLS-1$
 // TODO remove SYSTEM.OUT.PRINTLN
 
 			return;
@@ -263,7 +325,7 @@ public class GeoPartView extends ViewPart {
 					return;
 				}
 
-				_progMonitor.subTask(NLS.bind("{0} / {1}", workedTours, _geoPartTours));
+				_progMonitor.subTask(NLS.bind("{0} / {1}", workedTours, _geoPartTours)); //$NON-NLS-1$
 				_progMonitor.worked(1);
 
 				if (workedTours == _geoPartTours) {
@@ -271,6 +333,12 @@ public class GeoPartView extends ViewPart {
 				}
 			}
 		});
+	}
+
+	private void createActions() {
+
+		_actionAppTourFilter = new ActionAppTourFilter();
+		_actionOnOff = new ActionOnOff();
 	}
 
 	@Override
@@ -281,6 +349,9 @@ public class GeoPartView extends ViewPart {
 		initUI();
 
 		createUI(parent);
+		createActions();
+
+		fillToolbar();
 
 		addPartListener();
 		addPrefListener();
@@ -288,6 +359,8 @@ public class GeoPartView extends ViewPart {
 
 		GeoPartTourLoader.geoPartView = this;
 		GeoPartTourComparer.geoPartView = this;
+
+		restoreState();
 	}
 
 	private void createUI(final Composite parent) {
@@ -306,7 +379,7 @@ public class GeoPartView extends ViewPart {
 				 * Show break time values
 				 */
 				_chkUseAppFilter = new Button(container, SWT.CHECK);
-				_chkUseAppFilter.setText("Use app &filter");
+				_chkUseAppFilter.setText("Use app &filter"); //$NON-NLS-1$
 
 				GridDataFactory
 						.fillDefaults()//
@@ -403,6 +476,16 @@ public class GeoPartView extends ViewPart {
 		super.dispose();
 	}
 
+	private void fillToolbar() {
+		
+		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+
+		tbm.add(_actionOnOff);
+		tbm.add(_actionAppTourFilter);
+
+		tbm.update(true);
+	}
+
 	private void initUI() {
 
 		_defaultSelectionListener = new SelectionAdapter() {
@@ -411,6 +494,18 @@ public class GeoPartView extends ViewPart {
 				onChangeUI();
 			}
 		};
+	}
+
+	private void onAction_AppFilter(final boolean isSelected) {
+		// TODO Auto-generated method stub
+
+	}
+
+	private void onAction_OnOff() {
+
+		_isListenToSliderPosition = !_isListenToSliderPosition;
+		_actionOnOff.setIcon(_isListenToSliderPosition);
+
 	}
 
 	private void onCancelProgress() {
@@ -433,6 +528,12 @@ public class GeoPartView extends ViewPart {
 	private void onMoveSlider(	final TourData tourData,
 								final int leftIndex,
 								final int rightIndex) {
+
+		if (_isListenToSliderPosition == false) {
+
+			// ignore slider position
+			return;
+		}
 
 		final double[] latSerie = tourData.latitudeSerie;
 		if (latSerie == null) {
@@ -558,13 +659,24 @@ public class GeoPartView extends ViewPart {
 		}
 	}
 
+	private void restoreState() {
+
+		_isListenToSliderPosition = Util.getStateBoolean(_state, STATE_IS_LISTEN_TO_SLIDER_POSITION, true);
+		_actionOnOff.setIcon(_isListenToSliderPosition);
+	}
+
+	private void saveState() {
+
+		_state.put(STATE_IS_LISTEN_TO_SLIDER_POSITION, _isListenToSliderPosition);
+	}
+
 	@Override
 	public void setFocus() {}
 
 	private void updateUI(final GeoPartLoaderItem loaderItem) {
 
 		_lblNumTours.setText(Integer.toString(loaderItem.tourIds.length));
-		_lblSqlRuntime.setText(Long.toString(loaderItem.sqlRunningTime) + " ms");
+		_lblSqlRuntime.setText(Long.toString(loaderItem.sqlRunningTime) + " ms"); //$NON-NLS-1$
 	}
 
 	private void updateUI_CompareResult(final ArrayList<GeoPartComparerItem> comparedTours) {
@@ -596,13 +708,13 @@ public class GeoPartView extends ViewPart {
 
 			if (comparerItem == null) {
 
-				System.out.println("comparerItem == null");
+				System.out.println("comparerItem == null"); //$NON-NLS-1$
 				continue;
 			}
 
 			if (comparerItem.tourLatLonDiff == null) {
 
-				System.out.println("tourLatLonDiff == null");
+				System.out.println("tourLatLonDiff == null"); //$NON-NLS-1$
 				continue;
 			}
 
@@ -612,12 +724,12 @@ public class GeoPartView extends ViewPart {
 			System.out.println(
 					String.format(
 
-							"tourId %-20s"
-									+ "   idx %5d"
-									+ "   diff %8d"
+							"tourId %-20s" //$NON-NLS-1$
+									+ "   idx %5d" //$NON-NLS-1$
+									+ "   diff %8d" //$NON-NLS-1$
 
-									+ "   speed %5.1f"
-									+ "   pulse %6.1f"
+									+ "   speed %5.1f" //$NON-NLS-1$
+									+ "   pulse %6.1f" //$NON-NLS-1$
 
 							,
 

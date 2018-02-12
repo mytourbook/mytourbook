@@ -32,7 +32,8 @@ public class GeoPartTourComparer {
 
 	static {}
 
-	private static final LinkedBlockingDeque<GeoPartComparerItem>	_waitingQueue	= new LinkedBlockingDeque<>();
+	private static final LinkedBlockingDeque<GeoPartComparerItem>	_compareWaitingQueue	=
+			new LinkedBlockingDeque<>();
 	private static ThreadPoolExecutor								_comparerExecutor;
 
 	static GeoPartView												geoPartView;
@@ -68,18 +69,18 @@ public class GeoPartTourComparer {
 	 */
 	static void compareGeoTours(final GeoPartLoaderItem loaderItem) {
 
-		_waitingQueue.clear();
+		_compareWaitingQueue.clear();
 
 		for (final long tourId : loaderItem.tourIds) {
 
-			_waitingQueue.add(new GeoPartComparerItem(tourId, loaderItem));
+			_compareWaitingQueue.add(new GeoPartComparerItem(tourId, loaderItem));
 
 			_comparerExecutor.submit(new Runnable() {
 				@Override
 				public void run() {
 
 					// get last added loader item
-					final GeoPartComparerItem comparatorItem = _waitingQueue.pollFirst();
+					final GeoPartComparerItem comparatorItem = _compareWaitingQueue.pollFirst();
 
 					if (comparatorItem == null) {
 						return;
@@ -244,14 +245,14 @@ public class GeoPartTourComparer {
 	static void stopComparing() {
 
 		// invalidate old requests
-		synchronized (_waitingQueue) {
+		synchronized (_compareWaitingQueue) {
 
-			for (final GeoPartComparerItem comparerItem : _waitingQueue) {
+			for (final GeoPartComparerItem comparerItem : _compareWaitingQueue) {
 
 				comparerItem.loaderItem.isCanceled = true;
 			}
 
-			_waitingQueue.clear();
+			_compareWaitingQueue.clear();
 		}
 	}
 }
