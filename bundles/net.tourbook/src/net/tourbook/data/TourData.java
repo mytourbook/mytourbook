@@ -2686,16 +2686,20 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			firstIndex = 0;
 		}
 
-		if (lastIndex > latitudeSerie.length) {
-			lastIndex = latitudeSerie.length;
+		final int numSlices = latitudeSerie.length;
+
+		if (lastIndex > numSlices) {
+			lastIndex = numSlices;
 		}
 
-		final TIntArrayList allNormalizedLat = new TIntArrayList();
-		final TIntArrayList allNormalizedLon = new TIntArrayList();
-		final TIntArrayList allNormalized2OriginalIndices = new TIntArrayList();
+		final int[] allNormalizedLat = new int[numSlices];
+		final int[] allNormalizedLon = new int[numSlices];
+		final int[] allNormalized2OriginalIndices = new int[numSlices];
 
 		int prevLatNormalized = Integer.MIN_VALUE;
 		int prevLonNormalized = Integer.MIN_VALUE;
+
+		int normalizedIndex = -1;
 
 		for (int serieIndex = firstIndex; serieIndex < lastIndex; serieIndex++) {
 
@@ -2709,23 +2713,27 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 				// lat/lon have changed
 
-				allNormalizedLat.add(latNormalized);
-				allNormalizedLon.add(lonNormalized);
+				normalizedIndex++;
+
+				allNormalizedLat[normalizedIndex] = latNormalized;
+				allNormalizedLon[normalizedIndex] = lonNormalized;
 
 				// keep original index
-				allNormalized2OriginalIndices.add(serieIndex + firstIndex);
+				allNormalized2OriginalIndices[normalizedIndex] = serieIndex + firstIndex;
 			}
 
 			prevLatNormalized = latNormalized;
 			prevLonNormalized = lonNormalized;
 		}
 
+		final int normalizedLength = normalizedIndex + 1;
+
 		return new NormalizedGeoData(
 
-				allNormalizedLat.toArray(),
-				allNormalizedLon.toArray(),
+				Arrays.copyOf(allNormalizedLat, normalizedLength),
+				Arrays.copyOf(allNormalizedLon, normalizedLength),
 
-				allNormalized2OriginalIndices.toArray());
+				Arrays.copyOf(allNormalized2OriginalIndices, normalizedLength));
 	}
 
 	/**

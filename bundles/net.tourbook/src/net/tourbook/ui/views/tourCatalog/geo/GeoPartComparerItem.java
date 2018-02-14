@@ -19,7 +19,7 @@ public class GeoPartComparerItem {
 
 	long				tourId;
 
-	GeoPartLoaderItem	loaderItem;
+	GeoPartItem	loaderItem;
 
 	/*
 	 * Compare results
@@ -30,7 +30,7 @@ public class GeoPartComparerItem {
 	float				avgPulse;
 	float				speed;
 
-	public GeoPartComparerItem(final long tourId, final GeoPartLoaderItem loaderItem) {
+	public GeoPartComparerItem(final long tourId, final GeoPartItem loaderItem) {
 
 		this.tourId = tourId;
 		this.loaderItem = loaderItem;

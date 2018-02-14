@@ -27,18 +27,25 @@ import net.tourbook.tour.TourManager;
 
 public class GeoPartTourComparer {
 
+// SET_FORMATTING_OFF
+	
 	private static final int COMPARATOR_THREADS = Runtime.getRuntime().availableProcessors();
 //	private static final int COMPARATOR_THREADS = 1;
 
+	private static final LinkedBlockingDeque<GeoPartComparerItem>	_compareWaitingQueue	= new LinkedBlockingDeque<>();
+	private static ThreadPoolExecutor								_comparerExecutor;
+	
+// SET_FORMATTING_ON
+
 	static {}
 
-	private static final LinkedBlockingDeque<GeoPartComparerItem>	_compareWaitingQueue	=
-			new LinkedBlockingDeque<>();
-	private static ThreadPoolExecutor								_comparerExecutor;
-
-	static GeoPartView												geoPartView;
+	static GeoPartView geoPartView;
 
 	static {
+
+		/*
+		 * Setup comparer executer
+		 */
 
 		final ThreadFactory threadFactory = new ThreadFactory() {
 
@@ -67,13 +74,16 @@ public class GeoPartTourComparer {
 	/**
 	 * @param loaderItem
 	 */
-	static void compareGeoTours(final GeoPartLoaderItem loaderItem) {
-
-		_compareWaitingQueue.clear();
+	static void compareGeoTours(final GeoPartItem loaderItem) {
 
 		for (final long tourId : loaderItem.tourIds) {
 
-			_compareWaitingQueue.add(new GeoPartComparerItem(tourId, loaderItem));
+			final GeoPartComparerItem comparerItem = new GeoPartComparerItem(tourId, loaderItem);
+
+			// keep compared tour
+			loaderItem.comparedTours.add(comparerItem);
+
+			_compareWaitingQueue.add(comparerItem);
 
 			_comparerExecutor.submit(new Runnable() {
 				@Override
@@ -95,7 +105,7 @@ public class GeoPartTourComparer {
 						StatusUtil.log(e);
 					}
 
-					geoPartView.compare_40_TourIsCompared(comparatorItem);
+					geoPartView.compare_30_TourIsCompared(comparatorItem);
 				}
 			});
 		}
@@ -103,7 +113,7 @@ public class GeoPartTourComparer {
 
 	private static boolean compareTour(final GeoPartComparerItem comparatorItem) {
 
-		final GeoPartLoaderItem loaderItem = comparatorItem.loaderItem;
+		final GeoPartItem loaderItem = comparatorItem.loaderItem;
 
 		if (loaderItem.isCanceled) {
 			return false;
@@ -151,6 +161,14 @@ public class GeoPartTourComparer {
 			for (int partIndex = 0; partIndex < numPartSlices; partIndex++) {
 
 				if (loaderItem.isCanceled) {
+
+//					System.out.println(
+//							(" [" + GeoPartTourComparer.class.getSimpleName() + "] isCanceled")
+//									+ ("\texecId: " + loaderItem.executorId)
+////							+ ("\t: " + )
+//					);
+//// TODO remove SYSTEM.OUT.PRINTLN
+
 					return false;
 				}
 
@@ -210,16 +228,16 @@ public class GeoPartTourComparer {
 //				String.format(
 //						""
 //								+ "[%5d]" // thread
-//								+ " tourId %-20s"
+//								+ " tour %-20s"
 //								+ "   exec %5d"
 //
-//								+ "   diff %8d"
+//								+ "   diff %12d"
 //								+ "   # %5d / %5d"
 //
-//								+ "   cmp %10.4f"
+//								+ "   cmp %7.0f"
+//								+ "   all %7.0f ms"
 //								+ "   ld %10.4f"
-//								+ "   cnvrt %10.4f"
-//								+ "   all %10.4f ms",
+//								+ "   cnvrt %10.4f",
 //
 //						Thread.currentThread().getId(),
 //						comparatorItem.tourId,
@@ -230,29 +248,13 @@ public class GeoPartTourComparer {
 //						numPartSlices,
 //
 //						(float) (System.nanoTime() - startComparing) / 1000000, // compare
+//						(float) (System.nanoTime() - startLoading) / 1000000, // all
 //						(float) (startConvert - startLoading) / 1000000, // load
-//						(float) (startComparing - startConvert) / 1000000, // convert
-//						(float) (System.nanoTime() - startLoading) / 1000000) // all
+//						(float) (startComparing - startConvert) / 1000000) // convert
 //		);
 //		// TODO remove SYSTEM.OUT.PRINTLN
 
 		return true;
 	}
 
-	/**
-	 * Stop comparing of the tours in the waiting queue.
-	 */
-	static void stopComparing() {
-
-		// invalidate old requests
-		synchronized (_compareWaitingQueue) {
-
-			for (final GeoPartComparerItem comparerItem : _compareWaitingQueue) {
-
-				comparerItem.loaderItem.isCanceled = true;
-			}
-
-			_compareWaitingQueue.clear();
-		}
-	}
 }

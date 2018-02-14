@@ -36,11 +36,11 @@ import net.tourbook.ui.SQLFilter;
 
 public class GeoPartTourLoader {
 
-	private static final AtomicLong								_loaderExecuterId	= new AtomicLong();
-	private static final LinkedBlockingDeque<GeoPartLoaderItem>	_loaderWaitingQueue	= new LinkedBlockingDeque<>();
-	private static ExecutorService								_loadingExecutor;
+	private static final AtomicLong							_loaderExecuterId	= new AtomicLong();
+	private static final LinkedBlockingDeque<GeoPartItem>	_loaderWaitingQueue	= new LinkedBlockingDeque<>();
+	private static ExecutorService							_loadingExecutor;
 
-	static GeoPartView											geoPartView;
+	static GeoPartView										geoPartView;
 
 	static {
 
@@ -61,7 +61,7 @@ public class GeoPartTourLoader {
 		_loadingExecutor = Executors.newSingleThreadExecutor(threadFactory);
 	}
 
-	private static boolean loadTourGeoPartsFromDB(final GeoPartLoaderItem loaderItem) {
+	private static boolean loadTourGeoPartsFromDB(final GeoPartItem loaderItem) {
 
 		if (loaderItem.isCanceled) {
 			return false;
@@ -188,12 +188,15 @@ public class GeoPartTourLoader {
 	 * @param lonPartNormalized
 	 * @param latPartNormalized
 	 * @param useAppFilter
+	 * @param previousLoaderItem
+	 * @return
 	 */
-	static /* synchronized */ void loadToursFromGeoParts(	final int[] geoParts,
-													final NormalizedGeoData normalizedTourPart,
-													final boolean useAppFilter) {
+	static GeoPartItem loadToursFromGeoParts(	final int[] geoParts,
+												final NormalizedGeoData normalizedTourPart,
+												final boolean useAppFilter,
+												final GeoPartItem previousLoaderItem) {
 
-		stopLoading();
+		stopLoading(previousLoaderItem);
 
 		// invalidate old requests
 		final long executerId = _loaderExecuterId.incrementAndGet();
@@ -203,52 +206,45 @@ public class GeoPartTourLoader {
 						+ ("\texecuterId: " + executerId));
 // TODO remove SYSTEM.OUT.PRINTLN
 
-		_loaderWaitingQueue.add(
+		final GeoPartItem loaderItem = new GeoPartItem(
+				executerId,
+				geoParts,
+				normalizedTourPart,
+				useAppFilter);
 
-				new GeoPartLoaderItem(
-
-						executerId,
-
-						geoParts,
-						normalizedTourPart,
-						useAppFilter));
+		_loaderWaitingQueue.add(loaderItem);
 
 		final Runnable executorTask = new Runnable() {
 			@Override
 			public void run() {
 
 				// get last added loader item
-				final GeoPartLoaderItem loaderItem = _loaderWaitingQueue.pollFirst();
+				final GeoPartItem loaderItem = _loaderWaitingQueue.pollFirst();
 
 				if (loaderItem == null) {
 					return;
 				}
 
 				if (loadTourGeoPartsFromDB(loaderItem)) {
-					geoPartView.compare_30_CompareTours(loaderItem);
+					geoPartView.compare_20_CompareTours(loaderItem);
 				}
 			}
 		};
 
 		_loadingExecutor.submit(executorTask);
+
+		return loaderItem;
 	}
 
 	/**
 	 * Stop loading and comparing of the tours in the waiting queue.
+	 * 
+	 * @param oldLoaderItem
 	 */
-	static void stopLoading() {
+	static void stopLoading(final GeoPartItem oldLoaderItem) {
 
-		// invalidate old requests
-		synchronized (_loaderWaitingQueue) {
-
-			for (final GeoPartLoaderItem loaderItem : _loaderWaitingQueue) {
-
-				loaderItem.isCanceled = true;
-			}
-
-			_loaderWaitingQueue.clear();
-
-			GeoPartTourComparer.stopComparing();
+		if (oldLoaderItem != null) {
+			oldLoaderItem.isCanceled = true;
 		}
 	}
 

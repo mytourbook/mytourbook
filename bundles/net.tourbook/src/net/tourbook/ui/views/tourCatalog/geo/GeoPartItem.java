@@ -32,7 +32,7 @@ import net.tourbook.data.NormalizedGeoData;
    Deg*100000		  1.6 m
  * </pre>
  */
-public class GeoPartLoaderItem {
+public class GeoPartItem {
 
 	long							executorId;
 
@@ -65,10 +65,10 @@ public class GeoPartLoaderItem {
 
 	ArrayList<GeoPartComparerItem>	comparedTours	= new ArrayList<>();
 
-	public GeoPartLoaderItem(	final long executorId,
-								final int[] geoParts,
-								final NormalizedGeoData normalizedTourPart,
-								final boolean useAppFilter) {
+	public GeoPartItem(	final long executorId,
+						final int[] geoParts,
+						final NormalizedGeoData normalizedTourPart,
+						final boolean useAppFilter) {
 
 		this.executorId = executorId;
 
@@ -80,7 +80,7 @@ public class GeoPartLoaderItem {
 
 	@Override
 	public String toString() {
-		return "GeoPartLoaderItem ["
+		return "GeoPartItem ["
 				+ "executorId=" + executorId + ", "
 				//				+ "geoParts=" + Arrays.toString(geoParts) + ", "
 				//				+ "latPartSerie5=" + Arrays.toString(latPartSerie5) + ", "
