@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,7 @@ package net.tourbook.ui.tourChart;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.data.NormalizedGeoData;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
@@ -24,6 +25,7 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
+import net.tourbook.ui.views.tourCatalog.geo.GeoPartItem;
 import net.tourbook.ui.views.tourSegmenter.TourSegmenterView;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -184,6 +186,25 @@ public abstract class TourChartViewPart extends ViewPart {
 
 						updateChart();
 					}
+
+				} else if (eventId == TourEventId.GEO_PART_COMPARE && eventData instanceof GeoPartItem) {
+
+					final GeoPartItem geoPartItem = (GeoPartItem) eventData;
+					
+					final NormalizedGeoData normalizedTourPart = geoPartItem.normalizedTourPart;
+					final long tourId = normalizedTourPart.tourId;
+
+					_tourData = TourManager.getInstance().getTourData(tourId);
+
+					if (_tourChartConfig == null) {
+						_tourChartConfig = TourManager.createDefaultTourChartConfig();
+					}
+
+//					TourManager.fireEventWithCustomData(
+//							TourEventId.GEO_PART_COMPARE,
+//							comparerItem,
+//							GeoPartView.this);
+
 				}
 			}
 		};

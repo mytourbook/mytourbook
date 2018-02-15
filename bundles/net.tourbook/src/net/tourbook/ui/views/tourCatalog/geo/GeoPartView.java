@@ -278,8 +278,8 @@ public class GeoPartView extends ViewPart {
 		if (_geoPartTours > 0) {
 
 			_workedTours.set(0);
-			_workerExecutorId = loaderItem.executorId;
 
+			_workerExecutorId = loaderItem.executorId;
 			workerExecutorId[0] = _workerExecutorId;
 
 			GeoPartTourComparer.compareGeoTours(loaderItem);
@@ -315,14 +315,9 @@ public class GeoPartView extends ViewPart {
 
 	void compare_30_TourIsCompared(final GeoPartComparerItem comparerItem) {
 
-		final GeoPartItem geoPartItem = comparerItem.loaderItem;
+		final GeoPartItem geoPartItem = comparerItem.geoPartItem;
 
 		if (geoPartItem.isCanceled || geoPartItem.executorId != _workerExecutorId) {
-//			System.out.println(
-//					(UI.timeStampNano() + " [" + getClass().getSimpleName() //$NON-NLS-1$
-//							+ "] compare_40_TourIsCompared() is canceled")); //$NON-NLS-1$
-// TODO remove SYSTEM.OUT.PRINTLN
-
 			return;
 		}
 
@@ -352,8 +347,14 @@ public class GeoPartView extends ViewPart {
 				_progMonitor.subTask(NLS.bind("{0} / {1}", workedTours, _geoPartTours)); //$NON-NLS-1$
 				_progMonitor.worked(workedDiff);
 
+				// fire geo part compare result
+				TourManager.fireEventWithCustomData(
+						TourEventId.GEO_PART_COMPARE,
+						comparerItem.geoPartItem,
+						GeoPartView.this);
+
 				if (workedTours == _geoPartTours) {
-					updateUI_CompareResult(geoPartItem);
+					logCompareResult(geoPartItem);
 				}
 			}
 		});
@@ -501,6 +502,78 @@ public class GeoPartView extends ViewPart {
 		};
 	}
 
+	private void logCompareResult(final GeoPartItem geoPartItem) {
+
+		final ArrayList<GeoPartComparerItem> comparedTours = geoPartItem.comparedTours;
+
+		// sort by compare min diff value
+		Collections.sort(comparedTours, new Comparator<GeoPartComparerItem>() {
+
+			@Override
+			public int compare(final GeoPartComparerItem compItem1, final GeoPartComparerItem compItem2) {
+
+				if (compItem1 == null || compItem1.tourLatLonDiff == null) {
+					return Integer.MAX_VALUE;
+				}
+				if (compItem2 == null || compItem2.tourLatLonDiff == null) {
+					return Integer.MAX_VALUE;
+				}
+
+				final int minIndex1 = compItem1.tourMinDiffIndex;
+				final int minIndex2 = compItem2.tourMinDiffIndex;
+
+				final long diff1 = minIndex1 < 0 ? Integer.MAX_VALUE : compItem1.tourLatLonDiff[minIndex1];
+				final long diff2 = minIndex2 < 0 ? Integer.MAX_VALUE : compItem2.tourLatLonDiff[minIndex2];
+
+//				return (int) (diff1 - diff2); // smallest first
+				return (int) (diff2 - diff1); // smallest last
+			}
+		});
+
+		System.out.println("updateUI_CompareResult()  execId " + geoPartItem.executorId);
+
+		for (final GeoPartComparerItem comparerItem : comparedTours) {
+
+			if (comparerItem == null) {
+
+				System.out.println("comparerItem == null"); //$NON-NLS-1$
+				continue;
+			}
+
+			if (comparerItem.tourLatLonDiff == null) {
+
+				System.out.println("tourLatLonDiff == null"); //$NON-NLS-1$
+				continue;
+			}
+
+			final int tourMinDiffIndex = comparerItem.tourMinDiffIndex;
+			final long[] tourLatLonDiff = comparerItem.tourLatLonDiff;
+
+			System.out.println(
+					String.format(
+
+							"tourId %-20s" //$NON-NLS-1$
+									+ "   idx %5d" //$NON-NLS-1$
+									+ "   diff %12d" //$NON-NLS-1$
+
+									+ "   speed %5.1f" //$NON-NLS-1$
+									+ "   pulse %6.1f" //$NON-NLS-1$
+
+							,
+
+							comparerItem.tourId,
+
+							tourMinDiffIndex,
+							tourMinDiffIndex < 0 ? -1 : tourLatLonDiff[tourMinDiffIndex],
+
+							comparerItem.speed,
+							comparerItem.avgPulse
+
+					));
+// TODO remove SYSTEM.OUT.PRINTLN
+		}
+	}
+
 	private void onAction_AppFilter(final boolean isSelected) {
 
 		_isUseAppFilter = isSelected;
@@ -513,17 +586,15 @@ public class GeoPartView extends ViewPart {
 		_isListenToSliderPosition = isSelected;
 		_actionOnOff.setIcon(_isListenToSliderPosition);
 
-//		if (isSelected) {
-//
-//			// start comparing with the last slider position
-//
-//			compare_10_LoadGeoParts(_lastTourData, _lastLeftIndex, _lastRightIndex);
-//		}
+		if (isSelected == false) {
+			onCancelProgress();
+		}
 	}
 
 	private void onCancelProgress() {
 
 		_progMonitor.setTaskName("Comparing is canceled");
+		_progMonitor.subTask(UI.EMPTY_STRING);
 
 		GeoPartTourLoader.stopLoading(_previousGeoPartItem);
 	}
@@ -698,78 +769,6 @@ public class GeoPartView extends ViewPart {
 
 		_lblNumTours.setText(Integer.toString(loaderItem.tourIds.length));
 		_lblSqlRuntime.setText(Long.toString(loaderItem.sqlRunningTime) + " ms"); //$NON-NLS-1$
-	}
-
-	private void updateUI_CompareResult(final GeoPartItem geoPartItem) {
-
-		final ArrayList<GeoPartComparerItem> comparedTours = geoPartItem.comparedTours;
-
-		Collections.sort(comparedTours, new Comparator<GeoPartComparerItem>() {
-
-			@Override
-			public int compare(final GeoPartComparerItem compItem1, final GeoPartComparerItem compItem2) {
-
-				if (compItem1 == null || compItem1.tourLatLonDiff == null) {
-					return Integer.MAX_VALUE;
-				}
-				if (compItem2 == null || compItem2.tourLatLonDiff == null) {
-					return Integer.MAX_VALUE;
-				}
-
-				final int minIndex1 = compItem1.tourMinDiffIndex;
-				final int minIndex2 = compItem2.tourMinDiffIndex;
-
-				final long diff1 = minIndex1 < 0 ? Integer.MAX_VALUE : compItem1.tourLatLonDiff[minIndex1];
-				final long diff2 = minIndex2 < 0 ? Integer.MAX_VALUE : compItem2.tourLatLonDiff[minIndex2];
-
-//				return (int) (diff1 - diff2); // smallest first
-				return (int) (diff2 - diff1); // smallest last
-			}
-		});
-
-		System.out.println("updateUI_CompareResult()  execId " + geoPartItem.executorId);
-
-		for (final GeoPartComparerItem comparerItem : comparedTours) {
-
-			if (comparerItem == null) {
-
-				System.out.println("comparerItem == null"); //$NON-NLS-1$
-				continue;
-			}
-
-			if (comparerItem.tourLatLonDiff == null) {
-
-				System.out.println("tourLatLonDiff == null"); //$NON-NLS-1$
-				continue;
-			}
-
-			final int tourMinDiffIndex = comparerItem.tourMinDiffIndex;
-			final long[] tourLatLonDiff = comparerItem.tourLatLonDiff;
-
-			System.out.println(
-					String.format(
-
-							"tourId %-20s" //$NON-NLS-1$
-									+ "   idx %5d" //$NON-NLS-1$
-									+ "   diff %12d" //$NON-NLS-1$
-
-									+ "   speed %5.1f" //$NON-NLS-1$
-									+ "   pulse %6.1f" //$NON-NLS-1$
-
-							,
-
-							comparerItem.tourId,
-
-							tourMinDiffIndex,
-							tourMinDiffIndex < 0 ? -1 : tourLatLonDiff[tourMinDiffIndex],
-
-							comparerItem.speed,
-							comparerItem.avgPulse
-
-					));
-// TODO remove SYSTEM.OUT.PRINTLN
-
-		}
 	}
 
 }

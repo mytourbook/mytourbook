@@ -239,12 +239,12 @@ public class GeoPartTourLoader {
 	/**
 	 * Stop loading and comparing of the tours in the waiting queue.
 	 * 
-	 * @param oldLoaderItem
+	 * @param loaderItem
 	 */
-	static void stopLoading(final GeoPartItem oldLoaderItem) {
+	static void stopLoading(final GeoPartItem loaderItem) {
 
-		if (oldLoaderItem != null) {
-			oldLoaderItem.isCanceled = true;
+		if (loaderItem != null) {
+			loaderItem.isCanceled = true;
 		}
 	}
 

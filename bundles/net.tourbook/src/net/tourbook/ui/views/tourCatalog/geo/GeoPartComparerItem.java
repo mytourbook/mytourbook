@@ -17,30 +17,35 @@ package net.tourbook.ui.views.tourCatalog.geo;
 
 public class GeoPartComparerItem {
 
-	long				tourId;
+	long		tourId;
 
-	GeoPartItem	loaderItem;
+	GeoPartItem	geoPartItem;
 
 	/*
 	 * Compare results
 	 */
-	long[]				tourLatLonDiff;
-	int					tourMinDiffIndex;
+	long[]		tourLatLonDiff;
+	int			tourMinDiffIndex;
 
-	float				avgPulse;
-	float				speed;
+	float		avgPulse;
+	float		speed;
+
+	/**
+	 * Is <code>true</code> when compare result is computed, otherwise <code>false</code>
+	 */
+	boolean		isCompared;
 
 	public GeoPartComparerItem(final long tourId, final GeoPartItem loaderItem) {
 
 		this.tourId = tourId;
-		this.loaderItem = loaderItem;
+		this.geoPartItem = loaderItem;
 	}
 
 	@Override
 	public String toString() {
 		return "GeoPartComparerItem ["
 				+ "tourId=" + tourId + ", "
-				+ "loaderItem=" + loaderItem + "]";
+				+ "geoPartItem=" + geoPartItem + "]";
 	}
 
 }

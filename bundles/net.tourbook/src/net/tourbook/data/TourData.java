@@ -2730,6 +2730,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 		return new NormalizedGeoData(
 
+				tourId,
+				firstIndex,
+				lastIndex,
+
 				Arrays.copyOf(allNormalizedLat, normalizedLength),
 				Arrays.copyOf(allNormalizedLon, normalizedLength),
 

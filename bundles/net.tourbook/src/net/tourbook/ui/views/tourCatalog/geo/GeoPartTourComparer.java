@@ -33,13 +33,16 @@ public class GeoPartTourComparer {
 //	private static final int COMPARATOR_THREADS = 1;
 
 	private static final LinkedBlockingDeque<GeoPartComparerItem>	_compareWaitingQueue	= new LinkedBlockingDeque<>();
+
 	private static ThreadPoolExecutor								_comparerExecutor;
 	
 // SET_FORMATTING_ON
 
 	static {}
 
-	static GeoPartView geoPartView;
+	private static final boolean	LOG_TOUR_COMPARING	= true;
+
+	static GeoPartView				geoPartView;
 
 	static {
 
@@ -111,12 +114,12 @@ public class GeoPartTourComparer {
 		}
 	}
 
-	private static boolean compareTour(final GeoPartComparerItem comparatorItem) {
+	private static void compareTour(final GeoPartComparerItem comparerItem) {
 
-		final GeoPartItem loaderItem = comparatorItem.loaderItem;
+		final GeoPartItem loaderItem = comparerItem.geoPartItem;
 
 		if (loaderItem.isCanceled) {
-			return false;
+			return;
 		}
 
 		/*
@@ -124,7 +127,7 @@ public class GeoPartTourComparer {
 		 */
 		final long startLoading = System.nanoTime();
 
-		final TourData tourData = TourManager.getInstance().getTourData(comparatorItem.tourId);
+		final TourData tourData = TourManager.getInstance().getTourData(comparerItem.tourId);
 
 		/*
 		 * Normalize data
@@ -151,6 +154,7 @@ public class GeoPartTourComparer {
 
 		long minDiffValue = Long.MAX_VALUE;
 		int minDiffIndex = -1;
+		int numCompares = 0;
 
 		// loop: all tour slices
 		for (int tourIndex = 0; tourIndex < numTourSlices; tourIndex++) {
@@ -169,8 +173,10 @@ public class GeoPartTourComparer {
 //					);
 //// TODO remove SYSTEM.OUT.PRINTLN
 
-					return false;
+					return;
 				}
+
+				numCompares++;
 
 				final int compareIndex = tourIndex + partIndex;
 
@@ -216,45 +222,63 @@ public class GeoPartTourComparer {
 			final int startIndex = normalizedIndices[minDiffIndex];
 			final int endIndex = normalizedIndices[minDiffIndex + numPartSlices - 1];
 
-			comparatorItem.avgPulse = tourData.computeAvg_PulseSegment(startIndex, endIndex);
-			comparatorItem.speed = TourManager.computeTourSpeed(tourData, startIndex, endIndex);
+			comparerItem.avgPulse = tourData.computeAvg_PulseSegment(startIndex, endIndex);
+			comparerItem.speed = TourManager.computeTourSpeed(tourData, startIndex, endIndex);
 
 		}
 
-		comparatorItem.tourLatLonDiff = tourDiff;
-		comparatorItem.tourMinDiffIndex = minDiffIndex;
+		comparerItem.isCompared = true;
 
-//		System.out.println(
-//				String.format(
-//						""
-//								+ "[%5d]" // thread
-//								+ " tour %-20s"
-//								+ "   exec %5d"
-//
-//								+ "   diff %12d"
-//								+ "   # %5d / %5d"
-//
-//								+ "   cmp %7.0f"
-//								+ "   all %7.0f ms"
-//								+ "   ld %10.4f"
-//								+ "   cnvrt %10.4f",
-//
-//						Thread.currentThread().getId(),
-//						comparatorItem.tourId,
-//						loaderItem.executorId,
-//
-//						minDiffIndex < 0 ? minDiffIndex : tourDiff[minDiffIndex],
-//						numTourSlices,
-//						numPartSlices,
-//
-//						(float) (System.nanoTime() - startComparing) / 1000000, // compare
-//						(float) (System.nanoTime() - startLoading) / 1000000, // all
-//						(float) (startConvert - startLoading) / 1000000, // load
-//						(float) (startComparing - startConvert) / 1000000) // convert
-//		);
-//		// TODO remove SYSTEM.OUT.PRINTLN
+		comparerItem.tourLatLonDiff = tourDiff;
+		comparerItem.tourMinDiffIndex = minDiffIndex;
 
-		return true;
+		if (LOG_TOUR_COMPARING) {
+
+			final float time_Compare = (float) (System.nanoTime() - startComparing) / 1000000;
+			final float time_All = (float) (System.nanoTime() - startLoading) / 1000000;
+			final float time_Load = (float) (startConvert - startLoading) / 1000000;
+			final float time_Convert = (float) (startComparing - startConvert) / 1000000;
+
+			final float cmpAvgTime = numCompares / time_Compare;
+
+			System.out.println(
+					String.format(
+							""
+									+ "[%3d]" // thread
+									+ " tour %-20s"
+									// + "   exec %5d"
+
+									+ "   diff %12d"
+									+ "   # %5d / %5d"
+
+									+ "   cmp %7.0f"
+									+ "   #cmp %10d"
+									+ "   #cmpAvg %8.0f"
+
+									+ "   all %7.0f ms"
+									+ "   ld %10.4f"
+									+ "   cnvrt %10.4f",
+
+							Thread.currentThread().getId(),
+							comparerItem.tourId,
+							//							loaderItem.executorId,
+
+							minDiffIndex < 0 ? minDiffIndex : tourDiff[minDiffIndex],
+							numTourSlices,
+							numPartSlices,
+
+							time_Compare,
+							numCompares,
+							cmpAvgTime,
+
+							time_All,
+							time_Load,
+							time_Convert
+
+					));
+		}
+
+		return;
 	}
 
 }

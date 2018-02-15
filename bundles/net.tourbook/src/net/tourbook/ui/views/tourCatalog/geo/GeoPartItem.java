@@ -49,7 +49,7 @@ public class GeoPartItem {
 	/**
 	 * Geo part which should be compared
 	 */
-	NormalizedGeoData				normalizedTourPart;
+	public NormalizedGeoData		normalizedTourPart;
 
 	/**
 	 * Tour id's which are having at least one of the {@link #geoParts}
