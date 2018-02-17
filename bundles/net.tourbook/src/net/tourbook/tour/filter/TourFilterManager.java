@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import net.tourbook.Messages;
-import net.tourbook.application.ActionTourFilter;
+import net.tourbook.application.ActionTourDataFilter;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -343,7 +343,7 @@ public class TourFilterManager {
 
 	private static int[]						_fireEventCounter	= new int[1];
 
-	private static ActionTourFilter				_actionTourFilter;
+	private static ActionTourDataFilter				_actionTourFilter;
 
 	private static void createConfig_Altitude(final ArrayList<TourFilterFieldConfig> allConfigs) {
 
@@ -1662,7 +1662,7 @@ public class TourFilterManager {
 		_selectedProfile = selectedProfile;
 	}
 
-	public static void setTourFilterAction(final ActionTourFilter actionTourFilterAdv) {
+	public static void setTourFilterAction(final ActionTourDataFilter actionTourFilterAdv) {
 		_actionTourFilter = actionTourFilterAdv;
 	}
 

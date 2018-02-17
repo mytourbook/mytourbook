@@ -935,6 +935,8 @@ public class Messages extends NLS {
 	public static String		Image__TourMarker;
 	public static String		Image__TourSegments;
 	public static String		Image__TourSegments_Disabled;
+	public static String		Image__TourTagFilter;
+	public static String		Image__TourTagFilter_Disabled;
 	public static String		Image__undo_edit;
 	public static String		Image__undo_edit_disabled;
 	public static String		Image__undo_tour_type_filter;
@@ -1770,9 +1772,9 @@ public class Messages extends NLS {
 	public static String		Slideout_Map25MapOptions_Checkbox_Layer_ScaleBar;
 	public static String		Slideout_Map25MapOptions_Checkbox_Layer_TileInfo;
 
-	public static String Slideout_Map25MapOptions_Checkbox_UseDraggedKeyNavigation;
+	public static String		Slideout_Map25MapOptions_Checkbox_UseDraggedKeyNavigation;
 
-	public static String Slideout_Map25MapOptions_Checkbox_UseDraggedKeyNavigation_Tooltip;
+	public static String		Slideout_Map25MapOptions_Checkbox_UseDraggedKeyNavigation_Tooltip;
 	public static String		Slideout_Map25MapOptions_Group_MapLayer;
 	public static String		Slideout_Map25MapOptions_Label_MapOptions;
 //	public static String		Slideout_Map25MapOptions_Checkbox_IsAnimationLocation;
@@ -1892,6 +1894,8 @@ public class Messages extends NLS {
 	public static String		Slideout_TourMarkerFilter_Label_GeoFilter_Tooltip;
 	public static String		Slideout_TourMarkerFilter_Label_GeoFilterArea;
 	public static String		Slideout_TourMarkerFilter_Label_GeoFilterNotAvailable;
+
+	public static String		Slideout_TourTagFilter_Label_Title;
 
 	public static String		Slideout_TrainingOptions_Label_Title;
 
@@ -2163,6 +2167,8 @@ public class Messages extends NLS {
 	public static String		Tour_Segmenter_Type_ByBreakTime;
 
 	public static String		Tour_Statistic_Combo_BarVOrder_Tooltip;
+
+	public static String		Tour_Tag_Filter_Action_Tooltip;
 
 	public static String		tag_view_action_refresh_view_tooltip;
 	public static String		tag_view_title_tag;
