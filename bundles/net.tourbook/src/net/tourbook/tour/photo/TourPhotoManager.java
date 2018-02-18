@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -55,6 +56,7 @@ import net.tourbook.photo.TourPhotoReference;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.SQLAppFilter;
 import net.tourbook.ui.SQLFilter;
 
 import org.apache.commons.imaging.ImageReadException;
@@ -85,34 +87,31 @@ import org.eclipse.ui.PlatformUI;
 
 public class TourPhotoManager implements IPhotoServiceProvider {
 
-	private static final String						STATE_CAMERA_ADJUSTMENT_NAME	= "STATE_CAMERA_ADJUSTMENT_NAME";	//$NON-NLS-1$
-	private static final String						STATE_CAMERA_ADJUSTMENT_TIME	= "STATE_CAMERA_ADJUSTMENT_TIME";	//$NON-NLS-1$
-	private static final String						STATE_REPLACE_IMAGE_FOLDER		= "STATE_REPLACE_IMAGE_FOLDER";	//$NON-NLS-1$
+// SET_FORMATTING_OFF
+	
+	private static final String				STATE_CAMERA_ADJUSTMENT_NAME	= "STATE_CAMERA_ADJUSTMENT_NAME";	//$NON-NLS-1$
+	private static final String				STATE_CAMERA_ADJUSTMENT_TIME	= "STATE_CAMERA_ADJUSTMENT_TIME";	//$NON-NLS-1$
+	private static final String				STATE_REPLACE_IMAGE_FOLDER		= "STATE_REPLACE_IMAGE_FOLDER";		//$NON-NLS-1$
 
-	private static final String						CAMERA_UNKNOWN_KEY				= "CAMERA_UNKNOWN_KEY";			//$NON-NLS-1$
+	private static final String				CAMERA_UNKNOWN_KEY				= "CAMERA_UNKNOWN_KEY";				//$NON-NLS-1$
 
-	private final IPreferenceStore					_prefStore						= TourbookPlugin.getDefault() //
-																							.getPreferenceStore();
-
-	private static final IDialogSettings			_state							= TourbookPlugin.getDefault() //
-																							.getDialogSettingsSection(
-																									"PhotoManager");	//$NON-NLS-1$
+	
+	private static final IDialogSettings	_state							= TourbookPlugin.getState("PhotoManager");		//$NON-NLS-1$
+	private static final IPreferenceStore	_prefStore						= TourbookPlugin.getPrefStore();
+	
+// SET_FORMATTING_ON
 
 	private static TourPhotoManager					_instance;
+
+	/**
+	 * Exclude all special app filter
+	 */
+	private static final Set<SQLAppFilter>			NO_PHOTOS						= new HashSet<>();
+
 	/**
 	 * Contains all cameras which are every used, key is the camera name.
 	 */
 	private static HashMap<String, Camera>			_allAvailableCameras			= new HashMap<String, Camera>();
-
-	private Connection								_sqlConnection;
-
-	private PreparedStatement						_sqlStatement;
-	private long									_sqlTourStart					= Long.MAX_VALUE;
-	private long									_sqlTourEnd						= Long.MIN_VALUE;
-	private ArrayList<TourPhotoLink>				_allDbTourPhotoLinks			= new ArrayList<TourPhotoLink>();
-
-	private ArrayList<TourPhotoLink>				_dbTourPhotoLinks				= new ArrayList<TourPhotoLink>();
-
 	private static String							_replaceImageFolder;
 
 	/**
@@ -145,6 +144,15 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 			}
 		};
 	}
+	
+	private Connection					_sqlConnection;
+	private PreparedStatement			_sqlStatement;
+
+	private long						_sqlTourStart			= Long.MAX_VALUE;
+	private long						_sqlTourEnd				= Long.MIN_VALUE;
+
+	private ArrayList<TourPhotoLink>	_allDbTourPhotoLinks	= new ArrayList<TourPhotoLink>();
+	private ArrayList<TourPhotoLink>	_dbTourPhotoLinks		= new ArrayList<TourPhotoLink>();
 
 	private TourPhotoManager() {
 
@@ -928,7 +936,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
 			if (_sqlConnection == null) {
 
-				final SQLFilter sqlFilter = new SQLFilter(false);
+				final SQLFilter sqlFilter = new SQLFilter(NO_PHOTOS);
 
 				final String sql = UI.EMPTY_STRING //
 
@@ -1046,7 +1054,8 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 		 */
 		if (tourPhotoImageNames.size() == 0) {
 
-			MessageDialog.openInformation(shell, //
+			MessageDialog.openInformation(
+					shell, //
 					Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_Title,
 					NLS.bind(//
 							Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_NoImage_Message,
@@ -1060,7 +1069,8 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 		final int numberOfTourPhotoTours = getTourPhotoTours(oldImageFolder);
 		final ArrayList<IPath> modifiedImages = new ArrayList<IPath>();
 
-		if (MessageDialog.openQuestion(shell, //
+		if (MessageDialog.openQuestion(
+				shell, //
 				Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_Title,
 				NLS.bind(//
 						Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_Message,
@@ -1071,10 +1081,11 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 			final DirectoryDialog dialog = new DirectoryDialog(shell, SWT.SAVE);
 
 			dialog.setText(Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_Title);
-			dialog.setMessage(NLS.bind(
-					Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_SelectFolder_Message,
-					sourcePhoto.imageFileName,
-					oldImageFolder));
+			dialog.setMessage(
+					NLS.bind(
+							Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_SelectFolder_Message,
+							sourcePhoto.imageFileName,
+							oldImageFolder));
 
 			if (_replaceImageFolder != null) {
 				dialog.setFilterPath(_replaceImageFolder);
@@ -1112,7 +1123,8 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
 					// there are no images in the new selected folder
 
-					MessageDialog.openInformation(shell, //
+					MessageDialog.openInformation(
+							shell, //
 							Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_Title,
 							NLS.bind(//
 									Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_NoValidImages_Message,
@@ -1127,7 +1139,8 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
 						// all images can be replaced
 
-						if (MessageDialog.openQuestion(shell, //
+						if (MessageDialog.openQuestion(
+								shell, //
 								Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_Title,
 								NLS.bind(//
 										Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_ReplaceAll_Message,
@@ -1142,7 +1155,8 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
 						// some images are not available
 
-						if (MessageDialog.openQuestion(shell, //
+						if (MessageDialog.openQuestion(
+								shell, //
 								Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_Title,
 								NLS.bind(//
 										Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_ReplacePartly_Message,
@@ -1187,9 +1201,10 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
 			final StringBuilder sb = new StringBuilder();
 
-			sb.append(NLS.bind(
-					Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_NoValidImageNames,
-					newImageFolder[0]));
+			sb.append(
+					NLS.bind(
+							Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_NoValidImageNames,
+							newImageFolder[0]));
 
 			for (final String invalidName : inValidImageNames) {
 				sb.append(UI.NEW_LINE + invalidName);
@@ -1418,7 +1433,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 	 * -1 when <b>SERIOUS</b> error occured
 	 *  0 when image file is read only
 	 *  1 when geo coordinates are written into the image file
-	 * </pre>
+	 *         </pre>
 	 */
 	private int setExifGPSTag_IntoImageFile(final File originalJpegImageFile,
 											final double latitude,
@@ -1641,7 +1656,6 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 			 * 	at org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter.updateExifMetadataLossless(ExifRewriter.java:293)
 			 * 	at net.tourbook.photo.PhotosAndToursView.setExifGPSTag_IntoPhoto(PhotosAndToursView.java:2309)
 			 * 	at net.tourbook.photo.PhotosAndToursView.setExifGPSTag(PhotosAndToursView.java:2141)
-			 * 
 			 * </pre>
 			 */
 //			new ExifRewriter().updateExifMetadataLossless(jpegImageFile, os, outputSet);
@@ -1850,7 +1864,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 			conn = TourDatabase.getInstance().getConnection();
 
 			final String sql = "SELECT " // 																//$NON-NLS-1$
-											//
+					//
 					+ " photoId, " //											1 //$NON-NLS-1$
 					+ (" " + TourDatabase.TABLE_TOUR_DATA + "_tourId, ") // 	2 //$NON-NLS-1$ //$NON-NLS-2$
 					//

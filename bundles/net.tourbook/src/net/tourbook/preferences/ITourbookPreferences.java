@@ -261,7 +261,8 @@ public interface ITourbookPreferences {
 
 	public static final String	APP_DATA_SPEED_MIN_TIMESLICE_VALUE				= "application.data-speed-min-timeslice-value";				//$NON-NLS-1$
 
-	public static final String	APP_TOUR_FILTER_IS_SELECTED						= "APP_TOUR_FILTER_IS_SELECTED";							//$NON-NLS-1$
+	public static final String	APP_TOUR_DATA_FILTER_IS_SELECTED				= "APP_TOUR_DATA_FILTER_IS_SELECTED";							//$NON-NLS-1$
+	public static final String	APP_TOUR_TAG_FILTER_IS_SELECTED					= "APP_TOUR_TAG_FILTER_IS_SELECTED";							//$NON-NLS-1$
 
 	/**
 	 * initially this was an int value, with 2 it's a string

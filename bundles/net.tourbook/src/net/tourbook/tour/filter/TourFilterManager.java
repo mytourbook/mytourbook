@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1628,7 +1628,7 @@ public class TourFilterManager {
 
 	public static void restoreState() {
 
-		_isTourFilterEnabled = _prefStore.getBoolean(ITourbookPreferences.APP_TOUR_FILTER_IS_SELECTED);
+		_isTourFilterEnabled = _prefStore.getBoolean(ITourbookPreferences.APP_TOUR_DATA_FILTER_IS_SELECTED);
 
 		_actionTourFilter.setSelection(_isTourFilterEnabled);
 
@@ -1637,7 +1637,7 @@ public class TourFilterManager {
 
 	public static void saveState() {
 
-		_prefStore.setValue(ITourbookPreferences.APP_TOUR_FILTER_IS_SELECTED, _actionTourFilter.getSelection());
+		_prefStore.setValue(ITourbookPreferences.APP_TOUR_DATA_FILTER_IS_SELECTED, _actionTourFilter.getSelection());
 
 		final XMLMemento xmlRoot = writeFilterProfile();
 		final File xmlFile = getXmlFile();

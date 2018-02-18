@@ -16,14 +16,14 @@
 package net.tourbook.tag.tour.filter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Set;
 
 import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.tooltip.AdvancedSlideout;
-import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.ui.ITourProvider2;
 
@@ -34,14 +34,9 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
@@ -53,57 +48,39 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ToolItem;
 
 /**
- * Tour chart marker properties slideout.
+ * Slideout for the tour tag filter
  */
 public class SlideoutTourTagFilter extends AdvancedSlideout implements ITourProvider2 {
 
-// SET_FORMATTING_OFF
+	private PixelConverter		_pc;
 
-	private static final String		STATE_IS_LIVE_UPDATE	= "STATE_IS_LIVE_UPDATE";			//$NON-NLS-1$
+	private ToolItem			_tourTagFilterItem;
 
-// SET_FORMATTING_ON
+	private TagMenuManager		_tagMenuMgr;
 
-	private final IPreferenceStore	_prefStore				= TourbookPlugin.getPrefStore();
-	private final IDialogSettings	_state;
-
-	private ModifyListener			_defaultModifyListener;
-	private FocusListener			_keepOpenListener;
-
-	private boolean					_isUpdateUI;
-	private boolean					_isLiveUpdate;
-
-	private PixelConverter			_pc;
-
-	private ToolItem				_tourTagFilterItem;
-
-	private TagMenuManager			_tagMenuMgr;
-
-	private TourData				_dummyTourData;
-	private ArrayList<TourData>		_dummyTourDataList;
+	private TourData			_dummyTourData;
+	private ArrayList<TourData>	_dummyTourDataList;
 
 	/*
 	 * UI controls
 	 */
-	private Composite				_innerContainer;
+	private Composite			_innerContainer;
 
-//	private Button			_chkLiveUpdate;
-	private Label					_lblTags;
-	private Link					_linkTag;
-
+	private Label				_lblTags;
+	private Link				_linkTag;
 
 	public SlideoutTourTagFilter(	final ToolItem toolItem,
 									final IDialogSettings state) {
 
 		super(toolItem.getParent(), state, new int[] { 400, 300, 400, 400 });
 
-		_state = state;
 		_tourTagFilterItem = toolItem;
 
 		setShellFadeOutDelaySteps(30);
 		setTitleText(Messages.Slideout_TourTagFilter_Label_Title);
 
 		/*
-		 * Create dummy tour data to handle successfully setting of the tags
+		 * Create dummy tour data to handle setting of the tags
 		 */
 		_dummyTourData = new TourData();
 
@@ -200,6 +177,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITourProv
 			GridLayoutFactory
 					.swtDefaults()
 					.numColumns(2)
+					.spacing(20, 5)
 					.applyTo(_innerContainer);
 			{
 				{
@@ -234,26 +212,8 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITourProv
 		}
 	}
 
-	private void doLiveUpdate() {
-
-//		_isLiveUpdate = _chkLiveUpdate.getSelection();
-
-		_state.put(STATE_IS_LIVE_UPDATE, _isLiveUpdate);
-
-		enableControls();
-
-		fireModifyEvent();
-	}
-
 	private void enableControls() {
 
-	}
-
-	private void fireModifyEvent() {
-
-		if (_isLiveUpdate) {
-			TourTagFilterManager.fireFilterModifyEvent();
-		}
 	}
 
 	@Override
@@ -277,51 +237,6 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITourProv
 
 		_pc = new PixelConverter(parent);
 
-		_defaultModifyListener = new ModifyListener() {
-			@Override
-			public void modifyText(final ModifyEvent e) {
-				if (_isUpdateUI) {
-					return;
-				}
-//					onProfile_Modify();
-			}
-		};
-
-		_keepOpenListener = new FocusListener() {
-
-			@Override
-			public void focusGained(final FocusEvent e) {
-
-				/*
-				 * This will fix the problem that when the list of a combobox is displayed, then the
-				 * slideout will disappear :-(((
-				 */
-				setIsKeepOpenInternally(true);
-			}
-
-			@Override
-			public void focusLost(final FocusEvent e) {
-				setIsKeepOpenInternally(false);
-			}
-		};
-	}
-
-	private boolean isFilterDisposed() {
-
-//		if (_filterOuterContainer != null && _filterOuterContainer.isDisposed()) {
-//
-//			/*
-//			 * This can happen when a sub dialog was closed and the mouse is outside of the slideout
-//			 * -> this is closing the slideout
-//			 */
-//			return true;
-//		}
-
-		return false;
-	}
-
-	private void onDisposeSlideout() {
-
 	}
 
 	@Override
@@ -329,17 +244,27 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITourProv
 
 	}
 
-	private void onResizeFilterContent() {
-
-	}
-
 	private void restoreState() {
 
-		/*
-		 * Other states
-		 */
-		_isLiveUpdate = Util.getStateBoolean(_state, STATE_IS_LIVE_UPDATE, false);
-//		_chkLiveUpdate.setSelection(_isLiveUpdate);
+		final Set<TourTag> filterTags = _dummyTourData.getTourTags();
+		filterTags.clear();
+
+		final HashMap<Long, TourTag> allTags = TourDatabase.getAllTourTags();
+
+		final long[] tourTagFilterIds = TourTagFilterManager.getTourTagFilterIds();
+
+		for (final long filterTagId : tourTagFilterIds) {
+
+			final TourTag tag = allTags.get(filterTagId);
+			if (tag != null) {
+				filterTags.add(tag);
+			}
+		}
+	}
+
+	private void saveStateTags() {
+
+		TourTagFilterManager.updateTourTagFilter(_dummyTourData.getTourTags());
 	}
 
 	@Override
@@ -349,15 +274,19 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITourProv
 
 			// check if it's the correct tour
 			if (_dummyTourData == modifiedTours.get(0)) {
+
 				updateUI_Tags();
+
+				saveStateTags();
+
+				TourTagFilterManager.fireFilterModifyEvent();
 			}
 		}
 	}
 
 	private void updateUI_Tags() {
 
-		// tour type or tags can have been changed within this dialog
-		net.tourbook.ui.UI.updateUI_Tags(_dummyTourData, _lblTags);
+		net.tourbook.ui.UI.updateUI_Tags(_dummyTourData, _lblTags, true);
 
 		// reflow layout that the tags are aligned correctly
 		_innerContainer.layout(true);

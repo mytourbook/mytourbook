@@ -331,6 +331,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		_personContribItem.saveState(state);
 		TourTypeFilterManager.saveState(state);
 		TourFilterManager.saveState();
+		TourTagFilterManager.saveState();
 		MapBookmarkManager.saveState();
 
 		return super.saveState(state);

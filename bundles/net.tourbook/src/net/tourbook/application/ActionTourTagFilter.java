@@ -33,7 +33,7 @@ public class ActionTourTagFilter extends ActionToolbarSlideoutAdv {
 	private static final ImageDescriptor	_actionImageDescriptor			= TourbookPlugin.getImageDescriptor(Messages.Image__TourTagFilter);
 	private static final ImageDescriptor	_actionImageDisabledDescriptor	= TourbookPlugin.getImageDescriptor(Messages.Image__TourTagFilter_Disabled);
 
-	private static final IDialogSettings	_state	= TourbookPlugin.getState("TourTagFilter");//$NON-NLS-1$
+	private static final IDialogSettings	_state	= TourbookPlugin.getState("TourTagFilterSlideout");//$NON-NLS-1$
 	
 	private SlideoutTourTagFilter _slideoutTourTagFilter;
 	

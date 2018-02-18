@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,9 +18,12 @@ package net.tourbook.ui;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourPerson;
+import net.tourbook.tag.tour.filter.TourTagFilterManager;
 import net.tourbook.tour.filter.TourFilterManager;
 import net.tourbook.tour.filter.TourFilterSQLData;
 
@@ -30,24 +33,41 @@ import net.tourbook.tour.filter.TourFilterSQLData;
  */
 public class SQLFilter {
 
-	private String				_sqlWhereClause	= UI.EMPTY_STRING;
+	private static final HashSet<SQLAppFilter>	_defaultAppFilter	= new HashSet<>();
 
+	/**
+	 * Use sql app filter with {@link SQLAppFilter#Photo} and {@link SQLAppFilter#Tag}
+	 */
+	public static final HashSet<SQLAppFilter>	TAG_FILTER			= new HashSet<>();
+
+	static {
+
+		// default is using the photo filter
+		_defaultAppFilter.add(SQLAppFilter.Photo);
+
+		TAG_FILTER.add(SQLAppFilter.Photo);
+		TAG_FILTER.add(SQLAppFilter.Tag);
+	}
+
+	private String				_sqlWhereClause	= UI.EMPTY_STRING;
 	private ArrayList<Object>	_parameters		= new ArrayList<>();
 
+	/**
+	 * Create sql app filter with the photo filter
+	 */
 	public SQLFilter() {
-		this(true);
+		this(_defaultAppFilter);
 	}
 
 	/**
-	 * @param isUsePhotoFilter
-	 *            When <code>false</code>, the photo filter is disabled.
+	 * @param appFilter
 	 */
-	public SQLFilter(final boolean isUsePhotoFilter) {
+	public SQLFilter(final Set<SQLAppFilter> appFilter) {
 
 		final StringBuilder sb = new StringBuilder();
 
 		/*
-		 * app filter: person
+		 * App filter: Person
 		 */
 		final TourPerson activePerson = TourbookPlugin.getActivePerson();
 		if (activePerson == null) {
@@ -63,15 +83,15 @@ public class SQLFilter {
 		}
 
 		/*
-		 * app filter: photo
+		 * App filter: Photo
 		 */
-		if (isUsePhotoFilter && TourbookPlugin.getActivePhotoFilter()) {
+		if (appFilter.contains(SQLAppFilter.Photo) && TourbookPlugin.getActivePhotoFilter()) {
 
 			sb.append(" AND TourData.numberOfPhotos > 0\n"); //$NON-NLS-1$
 		}
 
 		/*
-		 * app filter: tour type
+		 * App filter: Tour type
 		 */
 		final TourTypeFilter activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
 		if (activeTourTypeFilter != null) {
@@ -83,13 +103,26 @@ public class SQLFilter {
 		}
 
 		/*
-		 * Advanced tour filter
+		 * App Filter: Tour data
 		 */
-		final TourFilterSQLData sqlData = TourFilterManager.getSQL();
-		if (sqlData != null) {
+		final TourFilterSQLData tourDataSqlData = TourFilterManager.getSQL();
+		if (tourDataSqlData != null) {
 
-			sb.append(sqlData.getWhereString());
-			_parameters.addAll(sqlData.getParameters());
+			sb.append(tourDataSqlData.getWhereString());
+			_parameters.addAll(tourDataSqlData.getParameters());
+		}
+
+		/*
+		 * App Filter: Tour tags
+		 */
+		if (appFilter.contains(SQLAppFilter.Tag)) {
+
+			final TourFilterSQLData tourTagSqlData = TourTagFilterManager.getSQL();
+			if (tourTagSqlData != null) {
+
+				sb.append(tourTagSqlData.getWhereString());
+				_parameters.addAll(tourTagSqlData.getParameters());
+			}
 		}
 
 		_sqlWhereClause = sb.toString();
