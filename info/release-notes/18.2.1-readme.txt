@@ -1,0 +1,11 @@
+Version 18.2.1                                         ?. February 2018
+
+
+New
+============	
+
+* Tour Tag Filter
+
+  - Filter tours by tags
+    This is a very simple filter, it does not have any sophisticated 
+    features like the tour filter, it's just a quick and dirty solution 
