@@ -75,6 +75,10 @@ public class TourTagFilterManager {
 
 	}
 
+	/**
+	 * @return Returns sql where part for the tag filter or <code>null</code> when tag filter is
+	 *         disabled.
+	 */
 	public static TourFilterSQLData getSQL() {
 
 		if (_isTourTagFilterEnabled == false || _tourTagFilterIds.length == 0) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,7 +31,7 @@ public class DataProvider_HrZone_Month extends DataProvider {
 
 	private static DataProvider_HrZone_Month	_instance;
 
-	private TourData_MonthHrZones			_monthData;
+	private TourData_MonthHrZones				_monthData;
 
 	private DataProvider_HrZone_Month() {}
 
@@ -45,7 +45,7 @@ public class DataProvider_HrZone_Month extends DataProvider {
 	TourData_MonthHrZones getMonthData(	final TourPerson person,
 										final TourTypeFilter tourTypeFilter,
 										final int lastYear,
-										final int numberOfYears,
+										final int numYears,
 										final boolean refreshData) {
 
 		/*
@@ -54,7 +54,7 @@ public class DataProvider_HrZone_Month extends DataProvider {
 		if (_activePerson == person
 				&& _activeTourTypeFilter == tourTypeFilter
 				&& lastYear == _lastYear
-				&& numberOfYears == _numberOfYears
+				&& numYears == _numberOfYears
 				&& refreshData == false) {
 			return _monthData;
 		}
@@ -62,43 +62,94 @@ public class DataProvider_HrZone_Month extends DataProvider {
 		_activePerson = person;
 		_activeTourTypeFilter = tourTypeFilter;
 		_lastYear = lastYear;
-		_numberOfYears = numberOfYears;
+		_numberOfYears = numYears;
 
 		_monthData = new TourData_MonthHrZones();
 
-		final SQLFilter sqlFilter = new SQLFilter();
+		String fromTourData;
 
-		final String sqlString = "SELECT " // //$NON-NLS-1$
+		final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+		if (sqlFilter.isTagFilterActive()) {
 
-				+ "startYear," // 											1 //$NON-NLS-1$
-				+ "startMonth," // 											2 //$NON-NLS-1$
+			// with tag filter
 
-				+ "SUM(CASE WHEN hrZone0 > 0 THEN hrZone0 ELSE 0 END), \n" //  3 //$NON-NLS-1$
-				+ "SUM(CASE WHEN hrZone1 > 0 THEN hrZone1 ELSE 0 END), \n" //  4 //$NON-NLS-1$
-				+ "SUM(CASE WHEN hrZone2 > 0 THEN hrZone2 ELSE 0 END), \n" //  5 //$NON-NLS-1$
-				+ "SUM(CASE WHEN hrZone3 > 0 THEN hrZone3 ELSE 0 END), \n" //  6 //$NON-NLS-1$
-				+ "SUM(CASE WHEN hrZone4 > 0 THEN hrZone4 ELSE 0 END), \n" //  7 //$NON-NLS-1$
-				+ "SUM(CASE WHEN hrZone5 > 0 THEN hrZone5 ELSE 0 END), \n" //  8 //$NON-NLS-1$
-				+ "SUM(CASE WHEN hrZone6 > 0 THEN hrZone6 ELSE 0 END), \n" //  9 //$NON-NLS-1$
-				+ "SUM(CASE WHEN hrZone7 > 0 THEN hrZone7 ELSE 0 END), \n" //  10 //$NON-NLS-1$
-				+ "SUM(CASE WHEN hrZone8 > 0 THEN hrZone8 ELSE 0 END), \n" //  11 //$NON-NLS-1$
-				+ "SUM(CASE WHEN hrZone9 > 0 THEN hrZone9 ELSE 0 END)  \n" //  12 //$NON-NLS-1$
+			fromTourData = NL
 
-				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
+					+ "FROM (			" + NL //$NON-NLS-1$
 
-				+ (" WHERE startYear IN (" + getYearList(lastYear, numberOfYears) + ") \n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ (" AND NumberOfHrZones > 0  \n") //$NON-NLS-1$
-				+ sqlFilter.getWhereClause()
+					+ " SELECT			" + NL //$NON-NLS-1$
 
-				+ (" GROUP BY startYear, startMonth \n") //$NON-NLS-1$
+					+ "  StartYear,		" + NL //$NON-NLS-1$
+					+ "  StartMonth,					" + NL //$NON-NLS-1$
 
-				+ (" ORDER BY startYear, startMonth \n"); //$NON-NLS-1$
+					+ "  HrZone0,		" + NL //$NON-NLS-1$
+					+ "  HrZone1,		" + NL //$NON-NLS-1$
+					+ "  HrZone2,		" + NL //$NON-NLS-1$
+					+ "  HrZone3,		" + NL //$NON-NLS-1$
+					+ "  HrZone4,		" + NL //$NON-NLS-1$
+					+ "  HrZone5,		" + NL //$NON-NLS-1$
+					+ "  HrZone6,		" + NL //$NON-NLS-1$
+					+ "  HrZone7,		" + NL //$NON-NLS-1$
+					+ "  HrZone8,		" + NL //$NON-NLS-1$
+					+ "  HrZone9		" + NL //$NON-NLS-1$
+
+					+ (" FROM " + TourDatabase.TABLE_TOUR_DATA) + NL//$NON-NLS-1$
+
+					// get tag id's
+					+ (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag") + NL //$NON-NLS-1$ //$NON-NLS-2$
+					+ (" ON tourID = jTdataTtag.TourData_tourId") + NL //$NON-NLS-1$
+
+					+ (" WHERE StartYear IN (" + getYearList(lastYear, numYears) + ")") + NL //$NON-NLS-1$ //$NON-NLS-2$
+					+ (" AND NumberOfHrZones > 0") + NL //$NON-NLS-1$
+					+ sqlFilter.getWhereClause() + NL
+
+					+ ") td" //$NON-NLS-1$
+			;
+
+		} else {
+
+			// without tag filter
+
+			fromTourData = NL
+
+					+ (" FROM " + TourDatabase.TABLE_TOUR_DATA) + NL //$NON-NLS-1$
+
+					+ (" WHERE StartYear IN (" + getYearList(lastYear, numYears) + ")") + NL //$NON-NLS-1$ //$NON-NLS-2$
+					+ (" AND NumberOfHrZones > 0") + NL //$NON-NLS-1$
+					+ sqlFilter.getWhereClause() + NL
+
+			;
+		}
+
+		final String sqlString = NL +
+
+				"SELECT" + NL //$NON-NLS-1$
+
+				+ " StartYear,		" + NL // 										1 //$NON-NLS-1$
+				+ " StartMonth,		" + NL // 										2 //$NON-NLS-1$
+
+				+ " SUM(CASE WHEN hrZone0 > 0 THEN hrZone0 ELSE 0 END)," + NL //	3 //$NON-NLS-1$
+				+ " SUM(CASE WHEN hrZone1 > 0 THEN hrZone1 ELSE 0 END)," + NL //	4 //$NON-NLS-1$
+				+ " SUM(CASE WHEN hrZone2 > 0 THEN hrZone2 ELSE 0 END)," + NL //	5 //$NON-NLS-1$
+				+ " SUM(CASE WHEN hrZone3 > 0 THEN hrZone3 ELSE 0 END)," + NL //	6 //$NON-NLS-1$
+				+ " SUM(CASE WHEN hrZone4 > 0 THEN hrZone4 ELSE 0 END)," + NL //	7 //$NON-NLS-1$
+				+ " SUM(CASE WHEN hrZone5 > 0 THEN hrZone5 ELSE 0 END)," + NL //	8 //$NON-NLS-1$
+				+ " SUM(CASE WHEN hrZone6 > 0 THEN hrZone6 ELSE 0 END)," + NL //	9 //$NON-NLS-1$
+				+ " SUM(CASE WHEN hrZone7 > 0 THEN hrZone7 ELSE 0 END)," + NL //	10 //$NON-NLS-1$
+				+ " SUM(CASE WHEN hrZone8 > 0 THEN hrZone8 ELSE 0 END)," + NL //	11 //$NON-NLS-1$
+				+ " SUM(CASE WHEN hrZone9 > 0 THEN hrZone9 ELSE 0 END)" + NL //		12 //$NON-NLS-1$
+
+				+ fromTourData
+
+				+ (" GROUP BY StartYear, StartMonth") + NL //							//$NON-NLS-1$
+				+ (" ORDER BY StartYear, StartMonth") + NL //							//$NON-NLS-1$
+		;
 
 		try {
 
 			final int maxZones = 10; // hr zones: 0...9
 			final int serieLength = maxZones;
-			final int valueLength = 12 * numberOfYears;
+			final int valueLength = 12 * numYears;
 
 			final int[][] dbHrZones = new int[serieLength][valueLength];
 
@@ -113,7 +164,7 @@ public class DataProvider_HrZone_Month extends DataProvider {
 					final int dbYear = result.getInt(1);
 					final int dbMonth = result.getInt(2);
 
-					final int yearIndex = numberOfYears - (lastYear - dbYear + 1);
+					final int yearIndex = numYears - (lastYear - dbYear + 1);
 					final int monthIndex = (dbMonth - 1) + yearIndex * 12;
 
 					dbHrZones[0][monthIndex] = result.getInt(3);

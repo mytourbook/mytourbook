@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -48,7 +48,7 @@ public class DataProvider_Tour_Month extends DataProvider {
 	TourData_Month getMonthData(final TourPerson person,
 								final TourTypeFilter tourTypeFilter,
 								final int lastYear,
-								final int numberOfYears,
+								final int numYears,
 								final boolean refreshData) {
 
 		/*
@@ -57,7 +57,7 @@ public class DataProvider_Tour_Month extends DataProvider {
 		if (_activePerson == person
 				&& _activeTourTypeFilter == tourTypeFilter
 				&& lastYear == _lastYear
-				&& numberOfYears == _numberOfYears
+				&& numYears == _numberOfYears
 				&& refreshData == false) {
 			return _tourMonthData;
 		}
@@ -65,34 +65,81 @@ public class DataProvider_Tour_Month extends DataProvider {
 		_activePerson = person;
 		_activeTourTypeFilter = tourTypeFilter;
 		_lastYear = lastYear;
-		_numberOfYears = numberOfYears;
+		_numberOfYears = numYears;
 
 		// get the tour types
 		final ArrayList<TourType> allTourTypes = TourDatabase.getActiveTourTypes();
 		final TourType[] tourTypes = allTourTypes.toArray(new TourType[allTourTypes.size()]);
 
 		_tourMonthData = new TourData_Month();
-		final SQLFilter sqlFilter = new SQLFilter();
 
-		final String sqlString = "SELECT " // //$NON-NLS-1$
+		String fromTourData;
 
-				+ "startYear, " // 						1 //$NON-NLS-1$
-				+ "startMonth, " // 					2 //$NON-NLS-1$
-				+ "SUM(tourDistance), " //				3 //$NON-NLS-1$
-				+ "SUM(tourAltUp), " // 				4 //$NON-NLS-1$
-				+ "SUM(CASE WHEN tourDrivingTime > 0 THEN tourDrivingTime ELSE tourRecordingTime END), " // 5 //$NON-NLS-1$
-				+ "SUM(tourRecordingTime), " // 		6 //$NON-NLS-1$
-				+ "SUM(tourDrivingTime), " // 			7 //$NON-NLS-1$
-				+ "SUM(1), " //							8 //$NON-NLS-1$
-				+ "tourType_typeId" // 					9 //$NON-NLS-1$
+		final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+		if (sqlFilter.isTagFilterActive()) {
 
-				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
+			// with tag filter
 
-				+ (" WHERE startYear IN (" + getYearList(lastYear, numberOfYears) + ")") //$NON-NLS-1$ //$NON-NLS-2$
-				+ sqlFilter.getWhereClause()
+			fromTourData = NL
 
-				+ (" GROUP BY startYear, startMonth, tourType_typeId") //$NON-NLS-1$
-				+ (" ORDER BY startYear, startMonth"); //$NON-NLS-1$
+					+ "FROM (						" + NL //$NON-NLS-1$
+
+					+ " SELECT						" + NL //$NON-NLS-1$
+
+					+ "  StartYear,					" + NL //$NON-NLS-1$
+					+ "  StartMonth,				" + NL //$NON-NLS-1$
+					+ "  TourDistance,				" + NL //$NON-NLS-1$
+					+ "  TourAltUp,					" + NL //$NON-NLS-1$
+					+ "  TourRecordingTime,			" + NL //$NON-NLS-1$
+					+ "  TourDrivingTime,			" + NL //$NON-NLS-1$
+
+					+ "  TourType_TypeId 			" + NL //$NON-NLS-1$
+
+					+ (" FROM " + TourDatabase.TABLE_TOUR_DATA) + NL//$NON-NLS-1$
+
+					// get tag id's
+					+ (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag") + NL //$NON-NLS-1$ //$NON-NLS-2$
+					+ (" ON tourID = jTdataTtag.TourData_tourId") + NL //$NON-NLS-1$
+
+					+ (" WHERE StartYear IN (" + getYearList(lastYear, numYears) + ")") + NL //$NON-NLS-1$ //$NON-NLS-2$
+					+ sqlFilter.getWhereClause() + NL
+
+					+ ") td" //$NON-NLS-1$
+			;
+
+		} else {
+
+			// without tag filter
+
+			fromTourData = NL
+
+					+ (" FROM " + TourDatabase.TABLE_TOUR_DATA) + NL //$NON-NLS-1$
+
+					+ (" WHERE StartWeekYear IN (" + getYearList(lastYear, numYears) + ")") + NL //$NON-NLS-1$ //$NON-NLS-2$
+					+ sqlFilter.getWhereClause()
+
+			;
+		}
+
+		final String sqlString = NL +
+
+				"SELECT" + NL //$NON-NLS-1$
+
+				+ " StartYear,					" + NL // 1 //$NON-NLS-1$
+				+ " StartMonth,					" + NL // 2 //$NON-NLS-1$
+				+ " SUM(TourDistance),			" + NL // 3 //$NON-NLS-1$
+				+ " SUM(TourAltUp),				" + NL // 4 //$NON-NLS-1$
+				+ " SUM(CASE WHEN TourDrivingTime > 0 THEN TourDrivingTime ELSE TourRecordingTime END)," + NL // 5 //$NON-NLS-1$
+				+ " SUM(TourRecordingTime),		" + NL // 6 //$NON-NLS-1$
+				+ " SUM(TourDrivingTime),		" + NL // 7 //$NON-NLS-1$
+				+ " SUM(1), 					" + NL // 8 //$NON-NLS-1$
+				+ " TourType_TypeId 			" + NL // 9 //$NON-NLS-1$
+
+				+ fromTourData
+
+				+ (" GROUP BY StartYear, StartMonth, tourType_typeId ") + NL//$NON-NLS-1$
+				+ (" ORDER BY StartYear, StartMonth") + NL //$NON-NLS-1$
+		;
 
 		int colorOffset = 0;
 		if (tourTypeFilter.showUndefinedTourTypes()) {
@@ -101,7 +148,7 @@ public class DataProvider_Tour_Month extends DataProvider {
 
 		int numTourTypes = colorOffset + tourTypes.length;
 		numTourTypes = numTourTypes == 0 ? 1 : numTourTypes;
-		final int numMonths = 12 * numberOfYears;
+		final int numMonths = 12 * numYears;
 
 		try {
 
@@ -136,7 +183,7 @@ public class DataProvider_Tour_Month extends DataProvider {
 				final int numTours = result.getInt(8);
 				final Long tourTypeIdObject = (Long) result.getObject(9);
 
-				final int yearIndex = numberOfYears - (lastYear - year + 1);
+				final int yearIndex = numYears - (lastYear - year + 1);
 				final int monthIndex = (month - 1) + yearIndex * 12;
 
 				/*

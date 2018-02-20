@@ -52,6 +52,8 @@ public class SQLFilter {
 	private String				_sqlWhereClause	= UI.EMPTY_STRING;
 	private ArrayList<Object>	_parameters		= new ArrayList<>();
 
+	private boolean				_isTagFilterActive;
+
 	/**
 	 * Create sql app filter with the photo filter
 	 */
@@ -115,10 +117,15 @@ public class SQLFilter {
 		/*
 		 * App Filter: Tour tags
 		 */
+		_isTagFilterActive = false;
+
 		if (appFilter.contains(SQLAppFilter.Tag)) {
 
 			final TourFilterSQLData tourTagSqlData = TourTagFilterManager.getSQL();
+
 			if (tourTagSqlData != null) {
+
+				_isTagFilterActive = true;
 
 				sb.append(tourTagSqlData.getWhereString());
 				_parameters.addAll(tourTagSqlData.getParameters());
@@ -129,10 +136,19 @@ public class SQLFilter {
 	}
 
 	/**
-	 * @return Returns the WHERE clause to filter tours by person and tour types
+	 * @return Returns the WHERE clause to filter tours by the app filter, e.g. person, tour types,
+	 *         ...
 	 */
 	public String getWhereClause() {
 		return _sqlWhereClause;
+	}
+
+	/**
+	 * @return Returns <code>true</code> when the tag filter is being used, it is enabled and has at
+	 *         least 1 tag
+	 */
+	public boolean isTagFilterActive() {
+		return _isTagFilterActive;
 	}
 
 	/**
