@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -80,12 +80,14 @@ public class StatisticView extends ViewPart implements ITourProvider {
 	private static final String				STATE_SELECTED_YEAR			= "statistic.container.selected-year";				//$NON-NLS-1$
 	private static final String				STATE_NUMBER_OF_YEARS		= "statistic.container.number_of_years";			//$NON-NLS-1$
 
+	private static final char				NL							= net.tourbook.common.UI.NEW_LINE;
+
+	private static final boolean			_isOSX						= net.tourbook.common.UI.IS_OSX;
+	private static final boolean			_isLinux					= net.tourbook.common.UI.IS_LINUX;
+
 	private final IPreferenceStore			_prefStore					= TourbookPlugin.getPrefStore();
 	private final IPreferenceStore			_prefStoreCommon			= CommonActivator.getPrefStore();
 	private final IDialogSettings			_state						= TourbookPlugin.getState("TourStatisticsView");	//$NON-NLS-1$
-
-	private final boolean					_isOSX						= net.tourbook.common.UI.IS_OSX;
-	private final boolean					_isLinux					= net.tourbook.common.UI.IS_LINUX;
 
 	private IPartListener2					_partListener;
 	private IPropertyChangeListener			_prefChangeListener;
@@ -154,11 +156,12 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
 		_activeStatistic.setSynchScale(_isSynchScaleEnabled);
 
-		_activeStatistic.updateStatistic(new StatisticContext(//
-				_activePerson,
-				_activeTourTypeFilter,
-				_selectedYear,
-				getNumberOfYears()));
+		_activeStatistic.updateStatistic(
+				new StatisticContext(//
+						_activePerson,
+						_activeTourTypeFilter,
+						_selectedYear,
+						getNumberOfYears()));
 	}
 
 	private void addPartListener() {
@@ -315,7 +318,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
 					_isInUpdateUI = false;
 
 				} else if (eventId == TourEventId.UPDATE_UI || //
-				eventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
+						eventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
 
 					updateStatistic();
 				}
@@ -474,7 +477,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
 				GridDataFactory
 						.fillDefaults()//
 						.indent(widgetSpacing, 0)
-//						.hint(defaultTextSize.x, SWT.DEFAULT)
+						//						.hint(defaultTextSize.x, SWT.DEFAULT)
 						.applyTo(_comboBarVerticalOrder);
 
 				_comboBarVerticalOrder.addSelectionListener(new SelectionAdapter() {
@@ -675,22 +678,64 @@ public class StatisticView extends ViewPart implements ITourProvider {
 	 */
 	private void refreshYearCombobox() {
 
-		final SQLFilter sqlFilter = new SQLFilter();
+		final SQLFilter filter = new SQLFilter(SQLFilter.TAG_FILTER);
 
-		final String sqlString = "\n\n" //								//$NON-NLS-1$
-				+ "SELECT" // 											//$NON-NLS-1$
-				+ " startYear " //										//$NON-NLS-1$
-				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA) //			//$NON-NLS-1$
-				+ (" WHERE 1=1 " + sqlFilter.getWhereClause()) //		//$NON-NLS-1$
-				+ " GROUP BY STARTYEAR ORDER BY STARTYEAR" //			//$NON-NLS-1$
-				+ "\n\n"; //											//$NON-NLS-1$
+		String fromTourData;
 
+		final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+		if (sqlFilter.isTagFilterActive()) {
+
+			// with tag filter
+
+			fromTourData = NL
+
+					+ "FROM (			" + NL //$NON-NLS-1$
+
+					+ " SELECT			" + NL //$NON-NLS-1$
+
+					+ "  StartYear		" + NL //$NON-NLS-1$
+
+					+ ("  FROM " + TourDatabase.TABLE_TOUR_DATA) + NL//$NON-NLS-1$
+
+					// get tag id's
+					+ "  LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + NL //$NON-NLS-1$ //$NON-NLS-2$
+					+ "  ON tourID = jTdataTtag.TourData_tourId	" + NL //$NON-NLS-1$
+
+					+ "  WHERE 1=1		" + NL //$NON-NLS-1$
+					+ sqlFilter.getWhereClause()
+
+					+ ") td				" + NL//$NON-NLS-1$
+			;
+
+		} else {
+
+			// without tag filter
+
+			fromTourData = NL
+
+					+ " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //$NON-NLS-1$
+
+					+ " WHERE 1=1			" + NL //$NON-NLS-1$
+					+ sqlFilter.getWhereClause() + NL;
+		}
+
+		final String sqlString = NL +
+
+				"SELECT						" + NL //$NON-NLS-1$
+
+				+ " StartYear				" + NL //$NON-NLS-1$
+
+				+ fromTourData
+
+				+ " GROUP BY STARTYEAR		" + NL
+				+ " ORDER BY STARTYEAR		" + NL//			//$NON-NLS-1$
+		;
 		_availableYears = new TIntArrayList();
 
 		try {
 			final Connection conn = TourDatabase.getInstance().getConnection();
 			final PreparedStatement statement = conn.prepareStatement(sqlString);
-			sqlFilter.setParameters(statement, 1);
+			filter.setParameters(statement, 1);
 
 			final ResultSet result = statement.executeQuery();
 

@@ -33,12 +33,17 @@ import net.tourbook.tour.filter.TourFilterSQLData;
  */
 public class SQLFilter {
 
-	private static final HashSet<SQLAppFilter>	_defaultAppFilter	= new HashSet<>();
+	private static final Set<SQLAppFilter>	_defaultAppFilter	= new HashSet<>();
+
+	/**
+	 * Exclude all special app filter
+	 */
+	public static final Set<SQLAppFilter>	NO_PHOTOS			= new HashSet<>();
 
 	/**
 	 * Use sql app filter with {@link SQLAppFilter#Photo} and {@link SQLAppFilter#Tag}
 	 */
-	public static final HashSet<SQLAppFilter>	TAG_FILTER			= new HashSet<>();
+	public static final Set<SQLAppFilter>	TAG_FILTER			= new HashSet<>();
 
 	static {
 

@@ -29,7 +29,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -56,7 +55,6 @@ import net.tourbook.photo.TourPhotoReference;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.SQLAppFilter;
 import net.tourbook.ui.SQLFilter;
 
 import org.apache.commons.imaging.ImageReadException;
@@ -103,10 +101,6 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
 	private static TourPhotoManager					_instance;
 
-	/**
-	 * Exclude all special app filter
-	 */
-	private static final Set<SQLAppFilter>			NO_PHOTOS						= new HashSet<>();
 
 	/**
 	 * Contains all cameras which are every used, key is the camera name.
@@ -936,7 +930,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
 			if (_sqlConnection == null) {
 
-				final SQLFilter sqlFilter = new SQLFilter(NO_PHOTOS);
+				final SQLFilter sqlFilter = new SQLFilter(SQLFilter.NO_PHOTOS);
 
 				final String sql = UI.EMPTY_STRING //
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,47 +23,87 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.tour.ITourItem;
-import net.tourbook.ui.UI;
 
 public abstract class TVITourBookItem extends TreeViewerItem implements ITourItem {
 
 	static ZonedDateTime	calendar8	= ZonedDateTime.now().with(TimeTools.calendarWeek.dayOfWeek(), 1);
 
+	static final char		NL			= net.tourbook.common.UI.NEW_LINE;
+
 	static final String		SQL_SUM_COLUMNS;
+	static final String		SQL_SUM_FIELDS;
 
+// SET_FORMATTING_OFF
+	
 	static {
+		
+		SQL_SUM_FIELDS = NL
+				
+			+ "TourDistance,					" + NL //$NON-NLS-1$
+			+ "TourRecordingTime,				" + NL //$NON-NLS-1$
+			+ "TourDrivingTime,					" + NL //$NON-NLS-1$
+			+ "TourAltUp,						" + NL //$NON-NLS-1$
+			+ "TourAltDown,						" + NL //$NON-NLS-1$
+                                                
+			+ "MaxAltitude,						" + NL //$NON-NLS-1$
+			+ "MaxPulse,						" + NL //$NON-NLS-1$
+			+ "MaxSpeed,						" + NL //$NON-NLS-1$
+                                                
+			+ "AvgCadence,						" + NL //$NON-NLS-1$
+			+ "AvgPulse,						" + NL //$NON-NLS-1$
+			+ "AvgTemperature,					" + NL //$NON-NLS-1$
+			+ "CadenceMultiplier,				" + NL //$NON-NLS-1$
+			+ "TemperatureScale,				" + NL //$NON-NLS-1$
+			+ "WeatherWindDir,					" + NL //$NON-NLS-1$
+			+ "WeatherWindSpd,					" + NL //$NON-NLS-1$
+                                              
+			+ "Calories,						" + NL //$NON-NLS-1$
+			+ "RestPulse,						" + NL //$NON-NLS-1$
+                                              
+			+ "Power_TotalWork,					" + NL //$NON-NLS-1$
+                                              
+			+ "NumberOfTimeSlices,				" + NL //$NON-NLS-1$
+			+ "NumberOfPhotos,					" + NL //$NON-NLS-1$
+                                              
+			+ "FrontShiftCount,					" + NL //$NON-NLS-1$
+			+ "RearShiftCount					" + NL //$NON-NLS-1$
+		;
+		
+		
+		SQL_SUM_COLUMNS = NL
 
-		SQL_SUM_COLUMNS = UI.EMPTY_STRING
-				//
-				+ "SUM(TOURDISTANCE),\n" // 							0	//$NON-NLS-1$
-				+ "SUM(TOURRECORDINGTIME),\n" //						1	//$NON-NLS-1$
-				+ "SUM(TOURDRIVINGTIME),\n" //							2	//$NON-NLS-1$
-				+ "SUM(TOURALTUP),\n" //								3	//$NON-NLS-1$
-				+ "SUM(TOURALTDOWN),\n" //								4	//$NON-NLS-1$
-				+ "SUM(1),\n" //										5	//$NON-NLS-1$
-				//
-				+ "MAX(MAXSPEED),\n" //									6	//$NON-NLS-1$
-				+ "SUM(TOURDISTANCE),\n" //								7	//$NON-NLS-1$
-				+ "SUM(TOURDRIVINGTIME),\n" //							8	//$NON-NLS-1$
-				+ "MAX(MAXALTITUDE),\n" //								9	//$NON-NLS-1$
-				+ "MAX(MAXPULSE),\n" //									10	//$NON-NLS-1$
-				//
-				+ "AVG( CASE WHEN AVGPULSE = 0			THEN NULL ELSE AVGPULSE END),\n" //										11	//$NON-NLS-1$
-				+ "AVG( CASE WHEN AVGCADENCE = 0		THEN NULL ELSE DOUBLE(AvgCadence) * CadenceMultiplier END ),\n" //		12	//$NON-NLS-1$
-				+ "AVG( CASE WHEN AvgTemperature = 0	THEN NULL ELSE DOUBLE(AvgTemperature) / TemperatureScale END ),\n" //	13	//$NON-NLS-1$
-				+ "AVG( CASE WHEN WEATHERWINDDIR = 0	THEN NULL ELSE WEATHERWINDDIR END ),\n" //								14	//$NON-NLS-1$
-				+ "AVG( CASE WHEN WEATHERWINDSPD = 0	THEN NULL ELSE WEATHERWINDSPD END ),\n" //								15	//$NON-NLS-1$
-				+ "AVG( CASE WHEN RESTPULSE = 0			THEN NULL ELSE RESTPULSE END ),\n" //									16	//$NON-NLS-1$
-				//
-				+ "SUM(CALORIES),\n" //									17	//$NON-NLS-1$
-				+ "SUM(power_TotalWork),\n" //							18	//$NON-NLS-1$
+			+ "SUM(TourDistance),				" + NL // 0	//$NON-NLS-1$
+			+ "SUM(TourRecordingTime),			" + NL // 1	//$NON-NLS-1$
+			+ "SUM(TourDrivingTime),			" + NL // 2	//$NON-NLS-1$
+			+ "SUM(TourAltUp),					" + NL // 3	//$NON-NLS-1$
+			+ "SUM(TourAltDown),				" + NL // 4	//$NON-NLS-1$
+			+ "SUM(1),							" + NL // 5	//$NON-NLS-1$
+			//
+			+ "MAX(MaxSpeed),					" + NL // 6	//$NON-NLS-1$
+			+ "SUM(TourDistance),				" + NL // 7	//$NON-NLS-1$
+			+ "SUM(TourDrivingTime),			" + NL // 8	//$NON-NLS-1$
+			+ "MAX(MaxAltitude),				" + NL // 9	//$NON-NLS-1$
+			+ "MAX(MaxPulse),					" + NL // 10 //$NON-NLS-1$
+			//
+			+ "AVG( CASE WHEN AvgPulse = 0			THEN NULL ELSE AvgPulse END),			" + NL //								11	//$NON-NLS-1$
+			+ "AVG( CASE WHEN AvgCadence = 0		THEN NULL ELSE DOUBLE(AvgCadence) * CadenceMultiplier END ),		" + NL //	12	//$NON-NLS-1$
+			+ "AVG( CASE WHEN AvgTemperature = 0	THEN NULL ELSE DOUBLE(AvgTemperature) / TemperatureScale END ),		" + NL //	13	//$NON-NLS-1$
+			+ "AVG( CASE WHEN WeatherWindDir = 0	THEN NULL ELSE WeatherWindDir END ),	" + NL //								14	//$NON-NLS-1$
+			+ "AVG( CASE WHEN WeatherWindSpd = 0	THEN NULL ELSE WeatherWindSpd END ),	" + NL //								15	//$NON-NLS-1$
+			+ "AVG( CASE WHEN RestPulse = 0			THEN NULL ELSE RestPulse END ),			" + NL //								16	//$NON-NLS-1$
+			//
+			+ "SUM(Calories),					" + NL // 17	//$NON-NLS-1$
+			+ "SUM(Power_TotalWork),			" + NL // 18	//$NON-NLS-1$
 
-				+ "SUM(numberOfTimeSlices),\n" //						19	//$NON-NLS-1$
-				+ "SUM(numberOfPhotos),\n" //							20	//$NON-NLS-1$
-				//
-				+ "SUM(frontShiftCount),\n" //							21	//$NON-NLS-1$
-				+ "SUM(rearShiftCount)\n"; //							22	//$NON-NLS-1$
+			+ "SUM(NumberOfTimeSlices),			" + NL // 19	//$NON-NLS-1$
+			+ "SUM(NumberOfPhotos),				" + NL // 20	//$NON-NLS-1$
+			//
+			+ "SUM(FrontShiftCount),			" + NL // 21	//$NON-NLS-1$
+			+ "SUM(RearShiftCount)				" + NL // 22	//$NON-NLS-1$
+		;
 	}
+	
+// SET_FORMATTING_ON
 
 	TourBookView	tourBookView;
 
@@ -72,7 +112,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 	int				tourYear;
 
 	/**
-	 * month starts with 1 for january
+	 * Month starts with 1 for January
 	 */
 	int				tourMonth;
 	int				tourWeek;
