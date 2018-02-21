@@ -1685,6 +1685,10 @@ public abstract class AdvancedSlideoutShell {
 	 */
 	private void ttHide_NoFlags() {
 
+		if (_visibleShell == null || _visibleShell.isDisposed()) {
+			return;
+		}
+
 		closeInternalShells();
 
 		_visibleShell.setAlpha(0);
