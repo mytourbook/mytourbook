@@ -18,10 +18,18 @@ package net.tourbook.tag.tour.filter;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.form.SashLeftFixedForm;
 import net.tourbook.common.tooltip.AdvancedSlideout;
+import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.common.util.Util;
+import net.tourbook.data.TourTag;
+import net.tourbook.data.TourTagCategory;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tag.TVIPrefTag;
+import net.tourbook.tag.TVIPrefTagCategory;
+import net.tourbook.tag.TVIPrefTagRoot;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -29,6 +37,8 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.layout.TableColumnLayout;
+import org.eclipse.jface.layout.TreeColumnLayout;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
@@ -36,18 +46,23 @@ import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.StyledCellLabelProvider;
+import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
@@ -56,6 +71,7 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
@@ -67,6 +83,9 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
 
 /**
  * Slideout for the tour tag filter
@@ -77,8 +96,12 @@ public class SlideoutTourTagFilter extends AdvancedSlideout {
 	private static final String						STATE_SASH_WIDTH		= "STATE_SASH_WIDTH";					//$NON-NLS-1$
 
 	private IDialogSettings							_state;
+	private final IPreferenceStore					_prefStore				= TourbookPlugin.getPrefStore();
 
 	private TableViewer								_profileViewer;
+	private ContainerCheckedTreeViewer				_tagViewer;
+
+	private TVIPrefTagRoot							_rootItem;
 
 	private final ArrayList<TourTagFilterProfile>	_filterProfiles			= TourTagFilterManager.getProfiles();
 	private TourTagFilterProfile					_selectedProfile;
@@ -90,8 +113,6 @@ public class SlideoutTourTagFilter extends AdvancedSlideout {
 	private boolean									_isLiveUpdate;
 
 	private ModifyListener							_defaultModifyListener;
-	private FocusListener							_keepOpenListener;
-
 	{
 		_defaultModifyListener = new ModifyListener() {
 			@Override
@@ -99,30 +120,11 @@ public class SlideoutTourTagFilter extends AdvancedSlideout {
 				onProfile_Modify();
 			}
 		};
-
-		_keepOpenListener = new FocusListener() {
-
-			@Override
-			public void focusGained(final FocusEvent e) {
-
-				/*
-				 * This will fix the problem that when the list of a combobox is displayed, then the
-				 * slideout will disappear :-(((
-				 */
-				setIsKeepOpenInternally(true);
-			}
-
-			@Override
-			public void focusLost(final FocusEvent e) {
-				setIsKeepOpenInternally(false);
-			}
-		};
 	}
 
 	/*
 	 * UI controls
 	 */
-	private Composite			_filterOuterContainer;
 	private Composite			_containerFilter;
 	private Composite			_containerProfiles;
 
@@ -136,6 +138,10 @@ public class SlideoutTourTagFilter extends AdvancedSlideout {
 	private Text				_txtProfileName;
 
 	private SashLeftFixedForm	_sashForm;
+
+	private Image				_imgTag;
+	private Image				_imgTagRoot;
+	private Image				_imgTagCategory;
 
 	private class FilterProfileComparator extends ViewerComparator {
 
@@ -174,6 +180,86 @@ public class SlideoutTourTagFilter extends AdvancedSlideout {
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
+	/**
+	 * Sort the tags and categories
+	 */
+	private final static class TagViewerComparator extends ViewerComparator {
+		@Override
+		public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
+			if (obj1 instanceof TVIPrefTag && obj2 instanceof TVIPrefTag) {
+
+				// sort tags by name
+				final TourTag tourTag1 = ((TVIPrefTag) (obj1)).getTourTag();
+				final TourTag tourTag2 = ((TVIPrefTag) (obj2)).getTourTag();
+
+				return tourTag1.getTagName().compareTo(tourTag2.getTagName());
+
+			} else if (obj1 instanceof TVIPrefTag && obj2 instanceof TVIPrefTagCategory) {
+
+				// sort category before tag
+				return 1;
+
+			} else if (obj2 instanceof TVIPrefTag && obj1 instanceof TVIPrefTagCategory) {
+
+				// sort category before tag
+				return -1;
+
+			} else if (obj1 instanceof TVIPrefTagCategory && obj2 instanceof TVIPrefTagCategory) {
+
+				// sort categories by name
+				final TourTagCategory tourTagCat1 = ((TVIPrefTagCategory) (obj1)).getTourTagCategory();
+				final TourTagCategory tourTagCat2 = ((TVIPrefTagCategory) (obj2)).getTourTagCategory();
+
+				return tourTagCat1.getCategoryName().compareTo(tourTagCat2.getCategoryName());
+			}
+
+			return 0;
+		}
+
+		@Override
+		public boolean isSorterProperty(final Object element, final String property) {
+			// sort when the name has changed
+			return true;
+		}
+	}
+
+	private final class TagViewerContentProvicer implements ITreeContentProvider {
+
+		@Override
+		public void dispose() {}
+
+		@Override
+		public Object[] getChildren(final Object parentElement) {
+			return ((TreeViewerItem) parentElement).getFetchedChildrenAsArray();
+		}
+
+		@Override
+		public Object[] getElements(final Object inputElement) {
+			return _rootItem.getFetchedChildrenAsArray();
+		}
+
+		@Override
+		public Object getParent(final Object element) {
+			return ((TreeViewerItem) element).getParentItem();
+		}
+
+//		public TreeViewerItem getRootItem() {
+//			return _rootItem;
+//		}
+
+		@Override
+		public boolean hasChildren(final Object element) {
+			return ((TreeViewerItem) element).hasChildren();
+		}
+
+		@Override
+		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
+	}
+
+	/**
+	 * @param toolItem
+	 * @param state
+	 */
 	public SlideoutTourTagFilter(	final ToolItem toolItem,
 									final IDialogSettings state) {
 
@@ -198,8 +284,12 @@ public class SlideoutTourTagFilter extends AdvancedSlideout {
 
 		createUI(parent);
 
-		// load viewer
+		// load profile viewer
 		_profileViewer.setInput(new Object());
+
+		// load tag viewer and show content
+		_rootItem = new TVIPrefTagRoot(_tagViewer);
+		_tagViewer.setInput(this);
 
 		restoreState();
 		enableControls();
@@ -453,7 +543,8 @@ public class SlideoutTourTagFilter extends AdvancedSlideout {
 				.applyTo(container);
 		{
 			createUI_310_FilterName(container);
-			createUI_400_FilterOuterContainer(container);
+//			createUI_400_FilterOuterContainer(container);
+			createUI_450_TagViewer(container);
 			createUI_500_FilterActions(container);
 		}
 
@@ -491,15 +582,151 @@ public class SlideoutTourTagFilter extends AdvancedSlideout {
 		}
 	}
 
-	private void createUI_400_FilterOuterContainer(final Composite parent) {
+	private void createUI_450_TagViewer(final Composite parent) {
 
-		_filterOuterContainer = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults().applyTo(_filterOuterContainer);
+		/*
+		 * create tree layout
+		 */
+
+		final Composite layoutContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory
 				.fillDefaults()//
 				.grab(true, true)
-				.hint(SWT.DEFAULT, _pc.convertHeightInCharsToPixels(2))
-				.applyTo(_filterOuterContainer);
+				.hint(200, 100)
+				.applyTo(layoutContainer);
+
+		final TreeColumnLayout treeLayout = new TreeColumnLayout();
+		layoutContainer.setLayout(treeLayout);
+
+		/*
+		 * create viewer
+		 */
+		final Tree tree = new Tree(layoutContainer, SWT.H_SCROLL | SWT.V_SCROLL
+//				| SWT.BORDER
+				| SWT.MULTI
+				| SWT.FULL_SELECTION);
+
+		tree.setHeaderVisible(false);
+		tree.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+
+		_tagViewer = new ContainerCheckedTreeViewer(tree);
+
+		_tagViewer.setContentProvider(new TagViewerContentProvicer());
+		_tagViewer.setComparator(new TagViewerComparator());
+
+		_tagViewer.setUseHashlookup(true);
+
+		_tagViewer.addDoubleClickListener(new IDoubleClickListener() {
+			@Override
+			public void doubleClick(final DoubleClickEvent event) {
+
+				final Object selection = ((IStructuredSelection) event.getSelection()).getFirstElement();
+
+				if (selection instanceof TVIPrefTag) {
+
+					// tag is selected
+
+//					onRenameTourTag();
+
+				} else if (selection instanceof TVIPrefTagCategory) {
+
+					// expand/collapse current item
+
+					final TreeViewerItem tourItem = (TreeViewerItem) selection;
+
+					if (_tagViewer.getExpandedState(tourItem)) {
+						_tagViewer.collapseToLevel(tourItem, 1);
+					} else {
+						_tagViewer.expandToLevel(tourItem, 1);
+					}
+				}
+			}
+		});
+
+		_tagViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
+			public void selectionChanged(final SelectionChangedEvent event) {
+
+				final Object selection = ((IStructuredSelection) event.getSelection()).getFirstElement();
+
+				if (selection instanceof TVIPrefTag) {
+
+					// tag is selected
+
+//					onRenameTourTag();
+
+				} else if (selection instanceof TVIPrefTagCategory) {
+
+					// expand/collapse current item
+
+					final TreeViewerItem tourItem = (TreeViewerItem) selection;
+
+					if (_tagViewer.getExpandedState(tourItem)) {
+						_tagViewer.collapseToLevel(tourItem, 1);
+					} else {
+						_tagViewer.expandToLevel(tourItem, 1);
+					}
+				}
+			}
+		});
+
+		/*
+		 * create columns
+		 */
+		TreeViewerColumn tvc;
+		TreeColumn tvcColumn;
+
+		// column: tags + tag categories
+		tvc = new TreeViewerColumn(_tagViewer, SWT.TRAIL);
+		tvcColumn = tvc.getColumn();
+		tvc.setLabelProvider(new StyledCellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final StyledString styledString = new StyledString();
+
+				final Object element = cell.getElement();
+				if (element instanceof TVIPrefTag) {
+
+					final TourTag tourTag = ((TVIPrefTag) element).getTourTag();
+
+					styledString.append(tourTag.getTagName(), net.tourbook.ui.UI.TAG_STYLER);
+					cell.setImage(tourTag.isRoot() ? _imgTagRoot : _imgTag);
+
+				} else if (element instanceof TVIPrefTagCategory) {
+
+					final TVIPrefTagCategory tourTagCategoryItem = (TVIPrefTagCategory) element;
+					final TourTagCategory tourTagCategory = tourTagCategoryItem.getTourTagCategory();
+
+					cell.setImage(_imgTagCategory);
+
+					styledString.append(tourTagCategory.getCategoryName(), net.tourbook.ui.UI.TAG_CATEGORY_STYLER);
+
+					// get number of categories
+					final int categoryCounter = tourTagCategory.getCategoryCounter();
+					final int tagCounter = tourTagCategory.getTagCounter();
+					if (categoryCounter == -1 && tagCounter == -1) {
+
+//						styledString.append("  ...", StyledString.COUNTER_STYLER);
+
+					} else {
+
+						String categoryString = UI.EMPTY_STRING;
+						if (categoryCounter > 0) {
+							categoryString = "/" + categoryCounter; //$NON-NLS-1$
+						}
+						styledString.append("   " + tagCounter + categoryString, StyledString.QUALIFIER_STYLER); //$NON-NLS-1$
+					}
+
+				} else {
+					styledString.append(element.toString());
+				}
+
+				cell.setText(styledString.getString());
+				cell.setStyleRanges(styledString.getStyleRanges());
+			}
+		});
+		treeLayout.setColumnData(tvcColumn, new ColumnWeightData(100, true));
 	}
 
 	private void createUI_500_FilterActions(final Composite parent) {
@@ -590,6 +817,23 @@ public class SlideoutTourTagFilter extends AdvancedSlideout {
 
 		_pc = new PixelConverter(parent);
 
+		_imgTag = TourbookPlugin.getImageDescriptor(Messages.Image__tag).createImage();
+		_imgTagRoot = TourbookPlugin.getImageDescriptor(Messages.Image__tag_root).createImage();
+		_imgTagCategory = TourbookPlugin.getImageDescriptor(Messages.Image__tag_category).createImage();
+
+		parent.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(final DisposeEvent e) {
+				onDisposeSlideout();
+			}
+		});
+	}
+
+	private void onDisposeSlideout() {
+
+		_imgTag.dispose();
+		_imgTagRoot.dispose();
+		_imgTagCategory.dispose();
 	}
 
 	@Override
@@ -757,6 +1001,17 @@ public class SlideoutTourTagFilter extends AdvancedSlideout {
 
 		fireModifyEvent();
 	}
+
+//	private void onResizeFilterContent() {
+//
+//		if (_filterScrolled_Content == null || _filterScrolled_Content.isDisposed()) {
+//			return;
+//		}
+//
+//		final Point contentSize = _filterScrolled_Content.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+//
+//		_filterScrolled_Container.setMinSize(contentSize);
+//	}
 
 	private void restoreState() {
 
