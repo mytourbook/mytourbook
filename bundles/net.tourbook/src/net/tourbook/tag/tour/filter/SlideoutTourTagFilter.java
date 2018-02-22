@@ -16,58 +16,163 @@
 package net.tourbook.tag.tour.filter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Set;
 
 import net.tourbook.Messages;
+import net.tourbook.common.UI;
+import net.tourbook.common.form.SashLeftFixedForm;
 import net.tourbook.common.tooltip.AdvancedSlideout;
-import net.tourbook.data.TourData;
-import net.tourbook.data.TourTag;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.tag.TagMenuManager;
-import net.tourbook.ui.ITourProvider2;
+import net.tourbook.common.util.Util;
 
-import org.eclipse.jface.action.IMenuListener;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.jface.layout.TableColumnLayout;
+import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.ColumnPixelData;
+import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TableLayout;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MenuAdapter;
-import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Link;
-import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Sash;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolItem;
 
 /**
  * Slideout for the tour tag filter
  */
-public class SlideoutTourTagFilter extends AdvancedSlideout implements ITourProvider2 {
+public class SlideoutTourTagFilter extends AdvancedSlideout {
 
-	private PixelConverter		_pc;
+	private static final String						STATE_IS_LIVE_UPDATE	= "STATE_IS_LIVE_UPDATE";				//$NON-NLS-1$
+	private static final String						STATE_SASH_WIDTH		= "STATE_SASH_WIDTH";					//$NON-NLS-1$
 
-	private ToolItem			_tourTagFilterItem;
+	private IDialogSettings							_state;
 
-	private TagMenuManager		_tagMenuMgr;
+	private TableViewer								_profileViewer;
 
-	private TourData			_dummyTourData;
-	private ArrayList<TourData>	_dummyTourDataList;
+	private final ArrayList<TourTagFilterProfile>	_filterProfiles			= TourTagFilterManager.getProfiles();
+	private TourTagFilterProfile					_selectedProfile;
+
+	private PixelConverter							_pc;
+
+	private ToolItem								_tourTagFilterItem;
+
+	private boolean									_isLiveUpdate;
+
+	private ModifyListener							_defaultModifyListener;
+	private FocusListener							_keepOpenListener;
+
+	{
+		_defaultModifyListener = new ModifyListener() {
+			@Override
+			public void modifyText(final ModifyEvent e) {
+				onProfile_Modify();
+			}
+		};
+
+		_keepOpenListener = new FocusListener() {
+
+			@Override
+			public void focusGained(final FocusEvent e) {
+
+				/*
+				 * This will fix the problem that when the list of a combobox is displayed, then the
+				 * slideout will disappear :-(((
+				 */
+				setIsKeepOpenInternally(true);
+			}
+
+			@Override
+			public void focusLost(final FocusEvent e) {
+				setIsKeepOpenInternally(false);
+			}
+		};
+	}
 
 	/*
 	 * UI controls
 	 */
-	private Composite			_innerContainer;
+	private Composite			_filterOuterContainer;
+	private Composite			_containerFilter;
+	private Composite			_containerProfiles;
 
-	private Label				_lblTags;
-	private Link				_linkTag;
+	private Button				_btnApply;
+	private Button				_btnCopyProfile;
+	private Button				_btnDeleteProfile;
+	private Button				_chkLiveUpdate;
+
+	private Label				_lblProfileName;
+
+	private Text				_txtProfileName;
+
+	private SashLeftFixedForm	_sashForm;
+
+	private class FilterProfileComparator extends ViewerComparator {
+
+		@Override
+		public int compare(final Viewer viewer, final Object e1, final Object e2) {
+
+			if (e1 == null || e2 == null) {
+				return 0;
+			}
+
+			final TourTagFilterProfile profile1 = (TourTagFilterProfile) e1;
+			final TourTagFilterProfile profile2 = (TourTagFilterProfile) e2;
+
+			return profile1.name.compareTo(profile2.name);
+		}
+
+		@Override
+		public boolean isSorterProperty(final Object element, final String property) {
+
+			// force resorting when a name is renamed
+			return true;
+		}
+	}
+
+	private class FilterProfileProvider implements IStructuredContentProvider {
+
+		@Override
+		public void dispose() {}
+
+		@Override
+		public Object[] getElements(final Object inputElement) {
+			return _filterProfiles.toArray();
+		}
+
+		@Override
+		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
+	}
 
 	public SlideoutTourTagFilter(	final ToolItem toolItem,
 									final IDialogSettings state) {
@@ -75,92 +180,29 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITourProv
 		super(toolItem.getParent(), state, new int[] { 400, 300, 400, 400 });
 
 		_tourTagFilterItem = toolItem;
+		_state = state;
 
 		setShellFadeOutDelaySteps(30);
 		setTitleText(Messages.Slideout_TourTagFilter_Label_Title);
-
-		/*
-		 * Create dummy tour data to handle setting of the tags
-		 */
-		_dummyTourData = new TourData();
-
-		/*
-		 * create a dummy tour id because setting of the tags and tour type works requires it
-		 * otherwise it would cause a NPE when a tour has no id
-		 */
-		_dummyTourData.createTourIdDummy();
-
-		_dummyTourDataList = new ArrayList<>();
-		_dummyTourDataList.add(_dummyTourData);
-	}
-
-	/**
-	 * create the drop down menus, this must be created after the parent control is created
-	 */
-	private void createMenus() {
-
-		MenuManager menuMgr;
-
-		/*
-		 * Tag menu
-		 */
-		menuMgr = new MenuManager();
-
-		menuMgr.setRemoveAllWhenShown(true);
-
-		menuMgr.addMenuListener(new IMenuListener() {
-			@Override
-			public void menuAboutToShow(final IMenuManager menuMgr) {
-
-				final Set<TourTag> tourTags = _dummyTourData.getTourTags();
-				final boolean isTagInTour = tourTags.size() > 0;
-
-				_tagMenuMgr.fillTagMenu(menuMgr);
-				_tagMenuMgr.enableTagActions(true, isTagInTour, tourTags);
-			}
-		});
-
-		// set menu for the tag item
-
-		final Menu tagContextMenu = menuMgr.createContextMenu(_linkTag);
-		tagContextMenu.addMenuListener(new MenuAdapter() {
-			@Override
-			public void menuHidden(final MenuEvent e) {
-				_tagMenuMgr.onHideMenu();
-			}
-
-			@Override
-			public void menuShown(final MenuEvent menuEvent) {
-
-				final Rectangle rect = _linkTag.getBounds();
-				Point pt = new Point(rect.x, rect.y + rect.height);
-				pt = _linkTag.getParent().toDisplay(pt);
-
-				_tagMenuMgr.onShowMenu(menuEvent, _linkTag, pt, null);
-			}
-		});
-
-		_linkTag.setMenu(tagContextMenu);
 	}
 
 	@Override
 	protected void createSlideoutContent(final Composite parent) {
 
+		/*
+		 * Reset to a valid state when the slideout is opened again
+		 */
+		_selectedProfile = null;
+
 		initUI(parent);
 
 		createUI(parent);
-		createTagActions();
-		createMenus();
+
+		// load viewer
+		_profileViewer.setInput(new Object());
 
 		restoreState();
 		enableControls();
-
-		updateUI_Tags();
-	}
-
-	private void createTagActions() {
-
-		_tagMenuMgr = new TagMenuManager(this, false);
 	}
 
 	private void createUI(final Composite parent) {
@@ -169,51 +211,367 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITourProv
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(shellContainer);
 		GridLayoutFactory.fillDefaults().applyTo(shellContainer);
 		{
-			_innerContainer = new Composite(shellContainer, SWT.NONE);
+			final Composite container = new Composite(shellContainer, SWT.NONE);
 			GridDataFactory
 					.fillDefaults()//
 					.grab(true, true)
-					.applyTo(_innerContainer);
-			GridLayoutFactory
-					.swtDefaults()
-					.numColumns(2)
-					.spacing(20, 5)
-					.applyTo(_innerContainer);
+					.applyTo(container);
+			GridLayoutFactory.swtDefaults().applyTo(container);
 			{
+				// left part
+				_containerProfiles = createUI_200_Profiles(container);
+
+				// sash
+				final Sash sash = new Sash(container, SWT.VERTICAL);
 				{
-					/*
-					 * tags
-					 */
-					_linkTag = new Link(_innerContainer, SWT.NONE);
-					_linkTag.setText(Messages.tour_editor_label_tour_tag);
-					GridDataFactory
-							.fillDefaults()//
-							.align(SWT.BEGINNING, SWT.BEGINNING)
-							.applyTo(_linkTag);
-					_linkTag.addSelectionListener(new SelectionAdapter() {
+					UI.addSashColorHandler(sash);
+
+					// save sash width
+					sash.addMouseListener(new MouseAdapter() {
 						@Override
-						public void widgetSelected(final SelectionEvent e) {
-							net.tourbook.common.UI.openControlMenu(_linkTag);
+						public void mouseUp(final MouseEvent e) {
+							_state.put(STATE_SASH_WIDTH, _containerProfiles.getSize().x);
 						}
 					});
-
-					_lblTags = new Label(_innerContainer, SWT.WRAP);
-					GridDataFactory
-							.fillDefaults()//
-							.grab(true, true)
-							/*
-							 * hint is necessary that the width is not expanded when the text is
-							 * long
-							 */
-							.hint(_pc.convertWidthInCharsToPixels(100), SWT.DEFAULT)
-							.applyTo(_lblTags);
 				}
+
+				// right part
+				_containerFilter = createUI_300_Filter(container);
+
+				_sashForm = new SashLeftFixedForm(//
+						container,
+						_containerProfiles,
+						sash,
+						_containerFilter,
+						30);
 			}
 		}
 	}
 
+	private Composite createUI_200_Profiles(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory
+				.fillDefaults()//
+				.applyTo(container);
+		GridLayoutFactory
+				.fillDefaults()//
+				.numColumns(1)
+				.extendedMargins(0, 3, 0, 0)
+				.applyTo(container);
+		{
+			{
+				final Label label = new Label(container, SWT.NONE);
+				GridDataFactory.fillDefaults().applyTo(label);
+				label.setText(Messages.Slideout_TourFilter_Label_Profiles);
+			}
+
+			createUI_210_ProfileViewer(container);
+			createUI_220_ProfileActions(container);
+		}
+
+		return container;
+	}
+
+	private void createUI_210_ProfileViewer(final Composite parent) {
+
+		final Composite layoutContainer = new Composite(parent, SWT.NONE);
+		GridDataFactory
+				.fillDefaults()//
+				.grab(true, true)
+				.applyTo(layoutContainer);
+
+		final TableColumnLayout tableLayout = new TableColumnLayout();
+		layoutContainer.setLayout(tableLayout);
+
+		/*
+		 * create table
+		 */
+		final Table table = new Table(layoutContainer, SWT.FULL_SELECTION);
+
+		table.setLayout(new TableLayout());
+
+		// !!! this prevents that the horizontal scrollbar is displayed, but is not always working :-(
+		table.setHeaderVisible(false);
+//		table.setHeaderVisible(true);
+
+		_profileViewer = new TableViewer(table);
+
+		/*
+		 * create columns
+		 */
+		TableViewerColumn tvc;
+		TableColumn tc;
+
+		{
+			// Column: Profile name
+
+			tvc = new TableViewerColumn(_profileViewer, SWT.LEAD);
+			tc = tvc.getColumn();
+			tc.setText(Messages.Slideout_TourFilter_Column_ProfileName);
+			tvc.setLabelProvider(new CellLabelProvider() {
+				@Override
+				public void update(final ViewerCell cell) {
+
+					final TourTagFilterProfile profile = (TourTagFilterProfile) cell.getElement();
+
+					cell.setText(profile.name);
+				}
+			});
+			tableLayout.setColumnData(tc, new ColumnWeightData(1, false));
+		}
+
+		{
+			// Column: Number of properties
+
+			tvc = new TableViewerColumn(_profileViewer, SWT.TRAIL);
+			tc = tvc.getColumn();
+			tc.setText(Messages.Slideout_TourFilter_Column_Properties);
+			tc.setToolTipText(Messages.Slideout_TourFilter_Column_Properties_Tooltip);
+			tvc.setLabelProvider(new CellLabelProvider() {
+				@Override
+				public void update(final ViewerCell cell) {
+
+					final TourTagFilterProfile profile = (TourTagFilterProfile) cell.getElement();
+
+					cell.setText(Integer.toString(profile.tagFilterIds.size()));
+				}
+			});
+			tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(6), false));
+		}
+
+		/*
+		 * create table viewer
+		 */
+		_profileViewer.setContentProvider(new FilterProfileProvider());
+		_profileViewer.setComparator(new FilterProfileComparator());
+
+		_profileViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
+			public void selectionChanged(final SelectionChangedEvent event) {
+				onProfile_Select();
+			}
+		});
+
+		_profileViewer.addDoubleClickListener(new IDoubleClickListener() {
+
+			@Override
+			public void doubleClick(final DoubleClickEvent event) {
+
+				// set focus to  profile name
+				_txtProfileName.setFocus();
+				_txtProfileName.selectAll();
+			}
+		});
+
+		_profileViewer.getTable().addKeyListener(new KeyListener() {
+
+			@Override
+			public void keyPressed(final KeyEvent e) {
+
+				if (e.keyCode == SWT.DEL) {
+					onProfile_Delete();
+				}
+			}
+
+			@Override
+			public void keyReleased(final KeyEvent e) {}
+		});
+	}
+
+	private void createUI_220_ProfileActions(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+		{
+			{
+				/*
+				 * Button: New
+				 */
+				final Button button = new Button(container, SWT.PUSH);
+				button.setText(Messages.Slideout_TourFilter_Action_AddProfile);
+				button.setToolTipText(Messages.Slideout_TourFilter_Action_AddProfile_Tooltip);
+				button.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onProfile_Add();
+					}
+				});
+
+				// set button default width
+				UI.setButtonLayoutData(button);
+			}
+			{
+				/*
+				 * Button: Copy
+				 */
+				_btnCopyProfile = new Button(container, SWT.PUSH);
+				_btnCopyProfile.setText(Messages.Slideout_TourFilter_Action_CopyProfile);
+				_btnCopyProfile.setToolTipText(Messages.Slideout_TourFilter_Action_CopyProfile_Tooltip);
+				_btnCopyProfile.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onProfile_Copy();
+					}
+				});
+
+				// set button default width
+				UI.setButtonLayoutData(_btnCopyProfile);
+			}
+			{
+				/*
+				 * Button: Delete
+				 */
+				_btnDeleteProfile = new Button(container, SWT.PUSH);
+				_btnDeleteProfile.setText(Messages.Slideout_TourFilter_Action_DeleteProfile);
+				_btnDeleteProfile.setToolTipText(Messages.Slideout_TourFilter_Action_DeleteProfile_Tooltip);
+				_btnDeleteProfile.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onProfile_Delete();
+					}
+				});
+
+				// set button default width
+				UI.setButtonLayoutData(_btnDeleteProfile);
+			}
+		}
+	}
+
+	private Composite createUI_300_Filter(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory
+				.fillDefaults()//
+				.grab(true, true)
+				.applyTo(container);
+		GridLayoutFactory
+				.fillDefaults()//
+				.numColumns(1)
+				.extendedMargins(3, 0, 0, 0)
+				.applyTo(container);
+		{
+			createUI_310_FilterName(container);
+			createUI_400_FilterOuterContainer(container);
+			createUI_500_FilterActions(container);
+		}
+
+		return container;
+	}
+
+	private void createUI_310_FilterName(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory
+				.fillDefaults()//
+				.grab(true, false)
+				.applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+			{
+				// Label: Profile name
+				_lblProfileName = new Label(container, SWT.NONE);
+				_lblProfileName.setText(Messages.Slideout_TourFilter_Label_ProfileName);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.FILL, SWT.CENTER)
+						.applyTo(_lblProfileName);
+			}
+			{
+				// Text: Profile name
+				_txtProfileName = new Text(container, SWT.BORDER);
+				_txtProfileName.addModifyListener(_defaultModifyListener);
+				GridDataFactory
+						.fillDefaults()//
+						.grab(true, false)
+						.hint(_pc.convertWidthInCharsToPixels(30), SWT.DEFAULT)
+						.applyTo(_txtProfileName);
+			}
+		}
+	}
+
+	private void createUI_400_FilterOuterContainer(final Composite parent) {
+
+		_filterOuterContainer = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.fillDefaults().applyTo(_filterOuterContainer);
+		GridDataFactory
+				.fillDefaults()//
+				.grab(true, true)
+				.hint(SWT.DEFAULT, _pc.convertHeightInCharsToPixels(2))
+				.applyTo(_filterOuterContainer);
+	}
+
+	private void createUI_500_FilterActions(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(5).applyTo(container);
+		{
+			{
+				/*
+				 * Checkbox: live update
+				 */
+				_chkLiveUpdate = new Button(container, SWT.CHECK);
+				_chkLiveUpdate.setText(Messages.Slideout_TourFilter_Checkbox_IsLiveUpdate);
+				_chkLiveUpdate.setToolTipText(Messages.Slideout_TourFilter_Checkbox_IsLiveUpdate_Tooltip);
+				_chkLiveUpdate.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						doLiveUpdate();
+					}
+				});
+
+				GridDataFactory
+						.fillDefaults()//
+						.grab(true, false)
+						.align(SWT.END, SWT.CENTER)
+						.applyTo(_chkLiveUpdate);
+			}
+			{
+				/*
+				 * Button: Apply
+				 */
+				_btnApply = new Button(container, SWT.PUSH);
+				_btnApply.setText(Messages.Slideout_TourFilter_Action_Apply);
+				_btnApply.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						doApply();
+					}
+				});
+
+				// set button default width
+				UI.setButtonLayoutData(_btnApply);
+			}
+		}
+	}
+
+	private void doApply() {
+
+		TourTagFilterManager.fireFilterModifyEvent();
+	}
+
+	private void doLiveUpdate() {
+
+		_isLiveUpdate = _chkLiveUpdate.getSelection();
+
+		_state.put(STATE_IS_LIVE_UPDATE, _isLiveUpdate);
+
+		enableControls();
+
+		fireModifyEvent();
+	}
+
 	private void enableControls() {
 
+	}
+
+	private void fireModifyEvent() {
+
+		if (_isLiveUpdate) {
+			TourTagFilterManager.fireFilterModifyEvent();
+		}
 	}
 
 	@Override
@@ -228,11 +586,6 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITourProv
 		return itemBounds;
 	}
 
-	@Override
-	public ArrayList<TourData> getSelectedTours() {
-		return _dummyTourDataList;
-	}
-
 	private void initUI(final Composite parent) {
 
 		_pc = new PixelConverter(parent);
@@ -242,54 +595,204 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITourProv
 	@Override
 	protected void onFocus() {
 
+		if (_selectedProfile != null
+				&& _selectedProfile.name != null
+				&& _selectedProfile.name.equals(Messages.Tour_Filter_Default_ProfileName)) {
+
+			// default profile is selected, make it easy to rename it
+
+			_txtProfileName.selectAll();
+			_txtProfileName.setFocus();
+
+		} else {
+
+			_profileViewer.getTable().setFocus();
+		}
+	}
+
+	private void onProfile_Add() {
+
+		final TourTagFilterProfile filterProfile = new TourTagFilterProfile();
+
+		// update model
+		_filterProfiles.add(filterProfile);
+
+		// update viewer
+		_profileViewer.refresh();
+
+		// select new profile
+		selectProfile(filterProfile);
+
+		_txtProfileName.setFocus();
+	}
+
+	private void onProfile_Copy() {
+
+		if (_selectedProfile == null) {
+			// ignore
+			return;
+		}
+
+		final TourTagFilterProfile filterProfile = _selectedProfile.clone();
+
+		// update model
+		_filterProfiles.add(filterProfile);
+
+		// update viewer
+		_profileViewer.refresh();
+
+		// select new profile
+		selectProfile(filterProfile);
+
+		_txtProfileName.setFocus();
+	}
+
+	private void onProfile_Delete() {
+
+		if (_selectedProfile == null) {
+			// ignore
+			return;
+		}
+
+		/*
+		 * Confirm deletion
+		 */
+		boolean isDeleteProfile;
+		setIsKeepOpenInternally(true);
+		{
+			isDeleteProfile = MessageDialog.openConfirm(
+					Display.getCurrent().getActiveShell(),
+					Messages.Slideout_TourFilter_Confirm_DeleteProfile_Title,
+					NLS.bind(Messages.Slideout_TourFilter_Confirm_DeleteProfile_Message, _selectedProfile.name));
+		}
+		setIsKeepOpenInternally(false);
+
+		if (isDeleteProfile == false) {
+			return;
+		}
+
+		// keep currently selected position
+		final int lastIndex = _profileViewer.getTable().getSelectionIndex();
+
+		// update model
+		_filterProfiles.remove(_selectedProfile);
+		TourTagFilterManager.setSelectedProfile(null);
+
+		// update UI
+		_profileViewer.remove(_selectedProfile);
+
+		/*
+		 * Select another filter at the same position
+		 */
+		final int numFilters = _filterProfiles.size();
+		final int nextFilterIndex = Math.min(numFilters - 1, lastIndex);
+
+		final Object nextSelectedProfile = _profileViewer.getElementAt(nextFilterIndex);
+		if (nextSelectedProfile == null) {
+
+			_selectedProfile = null;
+
+		} else {
+
+			selectProfile((TourTagFilterProfile) nextSelectedProfile);
+		}
+
+		enableControls();
+
+		// set focus back to the viewer
+		_profileViewer.getTable().setFocus();
+	}
+
+	private void onProfile_Modify() {
+
+		if (_selectedProfile == null) {
+			return;
+		}
+
+		final String profileName = _txtProfileName.getText();
+
+		_selectedProfile.name = profileName;
+
+		_profileViewer.refresh();
+	}
+
+	private void onProfile_Select() {
+
+		TourTagFilterProfile selectedProfile = null;
+
+		// get selected profile from viewer
+		final StructuredSelection selection = (StructuredSelection) _profileViewer.getSelection();
+		final Object firstElement = selection.getFirstElement();
+		if (firstElement != null) {
+			selectedProfile = (TourTagFilterProfile) firstElement;
+		}
+
+		if (_selectedProfile != null && _selectedProfile == selectedProfile) {
+			// a new profile is not selected
+			return;
+		}
+
+		_selectedProfile = selectedProfile;
+
+		// update model
+		TourTagFilterManager.setSelectedProfile(_selectedProfile);
+
+		// update UI
+		if (_selectedProfile == null) {
+
+			_txtProfileName.setText(UI.EMPTY_STRING);
+
+		} else {
+
+			_txtProfileName.setText(_selectedProfile.name);
+
+			if (_selectedProfile.name.equals(Messages.Tour_Filter_Default_ProfileName)) {
+
+				// a default profile is selected, make is easy to rename it
+
+				_txtProfileName.selectAll();
+				_txtProfileName.setFocus();
+			}
+		}
+
+		fireModifyEvent();
 	}
 
 	private void restoreState() {
 
-		final Set<TourTag> filterTags = _dummyTourData.getTourTags();
-		filterTags.clear();
+		/*
+		 * Get previous selected profile
+		 */
+		TourTagFilterProfile selectedProfile = TourTagFilterManager.getSelectedProfile();
 
-		final HashMap<Long, TourTag> allTags = TourDatabase.getAllTourTags();
+		if (selectedProfile == null) {
 
-		final long[] tourTagFilterIds = TourTagFilterManager.getTourTagFilterIds();
+			// select first profile
 
-		for (final long filterTagId : tourTagFilterIds) {
-
-			final TourTag tag = allTags.get(filterTagId);
-			if (tag != null) {
-				filterTags.add(tag);
-			}
+			selectedProfile = (TourTagFilterProfile) _profileViewer.getElementAt(0);
 		}
-	}
 
-	private void saveStateTags() {
-
-		TourTagFilterManager.updateTourTagFilter(_dummyTourData.getTourTags());
-	}
-
-	@Override
-	public void toursAreModified(final ArrayList<TourData> modifiedTours) {
-
-		if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
-
-			// check if it's the correct tour
-			if (_dummyTourData == modifiedTours.get(0)) {
-
-				updateUI_Tags();
-
-				saveStateTags();
-
-				TourTagFilterManager.fireFilterModifyEvent();
-			}
+		if (selectedProfile != null) {
+			selectProfile(selectedProfile);
 		}
+
+		/*
+		 * Other states
+		 */
+		_isLiveUpdate = Util.getStateBoolean(_state, STATE_IS_LIVE_UPDATE, false);
+		_chkLiveUpdate.setSelection(_isLiveUpdate);
+
+		// restore width for the profile list
+		final int leftPartWidth = Util.getStateInt(_state, STATE_SASH_WIDTH, _pc.convertWidthInCharsToPixels(50));
+		_sashForm.setViewerWidth(leftPartWidth);
 	}
 
-	private void updateUI_Tags() {
+	private void selectProfile(final TourTagFilterProfile selectedProfile) {
 
-		net.tourbook.ui.UI.updateUI_Tags(_dummyTourData, _lblTags, true);
+		_profileViewer.setSelection(new StructuredSelection(selectedProfile));
 
-		// reflow layout that the tags are aligned correctly
-		_innerContainer.layout(true);
+		final Table table = _profileViewer.getTable();
+		table.setSelection(table.getSelectionIndices());
 	}
 
 }

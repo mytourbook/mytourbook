@@ -15,38 +15,65 @@
  *******************************************************************************/
 package net.tourbook.tag.tour.filter;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Set;
 
 import net.tourbook.application.ActionTourTagFilter;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
-import net.tourbook.data.TourTag;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.filter.TourFilterSQLData;
 
-import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IMemento;
+import org.eclipse.ui.XMLMemento;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.Version;
 
 public class TourTagFilterManager {
 
-	private final static IPreferenceStore	_prefStore					= TourbookPlugin.getPrefStore();
-	private static final IDialogSettings	_state						= TourbookPlugin.getState(
-			"TourTagFilterSlideout");																	//$NON-NLS-1$
+	private static final String	TOUR_FILTER_FILE_NAME		= "tour-tag-filter.xml";	//$NON-NLS-1$
+	private static final int	TOUR_FILTER_VERSION			= 1;
+	private static final String	TAG_PROFILE					= "Profile";				//$NON-NLS-1$
 
-	private static final String				STATE_TOUR_TAG_FILTER_IDS	= "STATE_TOUR_TAG_FILTER_IDS";
+	private static final String	TAG_PROPERTY				= "Property";				//$NON-NLS-1$
+	private static final String	TAG_ROOT					= "TourFilterProfiles";		//$NON-NLS-1$
+	private static final String	ATTR_TOUR_FILTER_VERSION	= "tourFilterVersion";		//$NON-NLS-1$
 
+	static {}
+
+// SET_FORMATTING_OFF
+
+	private static final Bundle				_bundle			= TourbookPlugin.getDefault().getBundle();
+	
+	private static final IPath				_stateLocation	= Platform.getStateLocation(_bundle);
+	private static final IPreferenceStore	_prefStore		= TourbookPlugin.getPrefStore();
+	
 	private static boolean					_isTourTagFilterEnabled;
-
-	private static int[]					_fireEventCounter			= new int[1];
-
-	private static ActionTourTagFilter		_actionTourTagFilter;
+	
+// SET_FORMATTING_ON
 
 	/**
-	 * Contains all tour tag id's which are filtering the tours
+	 * Contains all available profiles.
 	 */
-	private static long[]					_tourTagFilterIds			= new long[0];
+	private static ArrayList<TourTagFilterProfile>	_filterProfiles		= new ArrayList<>();
+
+	/**
+	 * Contains the selected profile or <code>null</code> when a profile is not selected.
+	 */
+	private static TourTagFilterProfile				_selectedProfile;
+
+	private static int[]							_fireEventCounter	= new int[1];
+
+	private static ActionTourTagFilter				_actionTourTagFilter;
 
 	/**
 	 * Fire event that the tour filter has changed.
@@ -75,48 +102,124 @@ public class TourTagFilterManager {
 
 	}
 
+	static ArrayList<TourTagFilterProfile> getProfiles() {
+		return _filterProfiles;
+	}
+
+	/**
+	 * @return Returns the selected profile or <code>null</code> when a profile is not selected.
+	 */
+	public static TourTagFilterProfile getSelectedProfile() {
+		return _selectedProfile;
+	}
+
 	/**
 	 * @return Returns sql where part for the tag filter or <code>null</code> when tag filter is
 	 *         disabled.
 	 */
 	public static TourFilterSQLData getSQL() {
 
-		if (_isTourTagFilterEnabled == false || _tourTagFilterIds.length == 0) {
+//		if (_isTourTagFilterEnabled == false || _tourTagFilterIds.length == 0) {
+//
+//			// tour tag filter is not enabled
+//
+//			return null;
+//		}
+//
+//		final ArrayList<Object> sqlParameters = new ArrayList<>();
+//
+//		boolean isFirst = true;
+//		final StringBuilder sb = new StringBuilder();
+//
+//		for (final long tourTagId : _tourTagFilterIds) {
+//
+//			if (isFirst) {
+//				isFirst = false;
+//				sb.append(" ?"); //$NON-NLS-1$
+//			} else {
+//				sb.append(", ?"); //$NON-NLS-1$
+//			}
+//
+//			sqlParameters.add(tourTagId);
+//		}
+//
+//		final String sqlWhere = " AND jTdataTtag.TourTag_tagId IN (" + sb.toString() + ") \n"; //$NON-NLS-1$ //$NON-NLS-2$
+//
+//		final TourFilterSQLData tourFilterSQLData = new TourFilterSQLData(sqlWhere, sqlParameters);
 
-			// tour tag filter is not enabled
-
-			return null;
-		}
-
-		final ArrayList<Object> sqlParameters = new ArrayList<>();
-
-		boolean isFirst = true;
-		final StringBuilder sb = new StringBuilder();
-
-		for (final long tourTagId : _tourTagFilterIds) {
-
-			if (isFirst) {
-				isFirst = false;
-				sb.append(" ?"); //$NON-NLS-1$
-			} else {
-				sb.append(", ?"); //$NON-NLS-1$
-			}
-
-			sqlParameters.add(tourTagId);
-		}
-
-		final String sqlWhere = " AND jTdataTtag.TourTag_tagId IN (" + sb.toString() + ") \n"; //$NON-NLS-1$ //$NON-NLS-2$
-
-		final TourFilterSQLData tourFilterSQLData = new TourFilterSQLData(sqlWhere, sqlParameters);
-
+		final TourFilterSQLData tourFilterSQLData = null;
 		return tourFilterSQLData;
 	}
 
+	private static File getXmlFile() {
+
+		return _stateLocation.append(TOUR_FILTER_FILE_NAME).toFile();
+	}
+
 	/**
-	 * @return Returns all tour tag id's which are filtering the tours
+	 * Read filter profile xml file.
+	 * 
+	 * @return
 	 */
-	static long[] getTourTagFilterIds() {
-		return _tourTagFilterIds;
+	private static void readFilterProfile() {
+
+		final File xmlFile = getXmlFile();
+
+		if (xmlFile.exists()) {
+
+			try (InputStreamReader reader = new InputStreamReader(new FileInputStream(xmlFile), UI.UTF_8)) {
+
+				final XMLMemento xmlRoot = XMLMemento.createReadRoot(reader);
+				for (final IMemento mementoChild : xmlRoot.getChildren()) {
+
+					final XMLMemento xmlProfile = (XMLMemento) mementoChild;
+//					if (TAG_PROFILE.equals(xmlProfile.getType())) {
+//
+//						final TourFilterProfile tourFilterProfile = new TourFilterProfile();
+//
+//						tourFilterProfile.name = Util.getXmlString(xmlProfile, ATTR_NAME, UI.EMPTY_STRING);
+//
+//						_filterProfiles.add(tourFilterProfile);
+//
+//						// set selected profile
+//						if (Util.getXmlBoolean(xmlProfile, ATTR_IS_SELECTED, false)) {
+//							_selectedProfile = tourFilterProfile;
+//						}
+//
+//						// loop: all properties
+//						for (final IMemento mementoProperty : xmlProfile.getChildren(TAG_PROPERTY)) {
+//
+//							final XMLMemento xmlProperty = (XMLMemento) mementoProperty;
+//
+//							final TourFilterFieldId fieldId = (TourFilterFieldId) Util.getXmlEnum(//
+//									xmlProperty,
+//									ATTR_FIELD_ID,
+//									TourFilterFieldId.TIME_TOUR_DATE);
+//
+//							final TourFilterFieldOperator fieldOperator = (TourFilterFieldOperator) Util.getXmlEnum(//
+//									xmlProperty,
+//									ATTR_FIELD_OPERATOR,
+//									TourFilterFieldOperator.EQUALS);
+//
+//							final TourFilterFieldConfig fieldConfig = getFieldConfig(fieldId);
+//
+//							final TourFilterProperty filterProperty = new TourFilterProperty();
+//
+//							filterProperty.fieldConfig = fieldConfig;
+//							filterProperty.fieldOperator = fieldOperator;
+//							filterProperty.isEnabled = Util.getXmlBoolean(xmlProperty, ATTR_IS_ENABLED, true);
+//
+//							readFilterProfile_10_PropertyDetail(xmlProperty, filterProperty);
+//
+//							tourFilterProfile.filterProperties.add(filterProperty);
+//						}
+//					}
+				}
+
+			} catch (final Exception e) {
+				StatusUtil.log(e);
+			}
+		}
 	}
 
 	public static void restoreState() {
@@ -125,19 +228,17 @@ public class TourTagFilterManager {
 		_isTourTagFilterEnabled = _prefStore.getBoolean(ITourbookPreferences.APP_TOUR_TAG_FILTER_IS_SELECTED);
 		_actionTourTagFilter.setSelection(_isTourTagFilterEnabled);
 
-		// tour tag id's
-		final long[] tagFilterIds = Util.getStateLongArray(_state, STATE_TOUR_TAG_FILTER_IDS, null);
-		if (tagFilterIds != null) {
-			_tourTagFilterIds = tagFilterIds;
-		}
+		readFilterProfile();
 	}
 
 	public static void saveState() {
 
 		_prefStore.setValue(ITourbookPreferences.APP_TOUR_TAG_FILTER_IS_SELECTED, _actionTourTagFilter.getSelection());
 
-		Util.setState(_state, STATE_TOUR_TAG_FILTER_IDS, _tourTagFilterIds);
+		final XMLMemento xmlRoot = writeFilterProfile();
+		final File xmlFile = getXmlFile();
 
+		Util.writeXml(xmlRoot, xmlFile);
 	}
 
 	/**
@@ -152,20 +253,80 @@ public class TourTagFilterManager {
 		fireFilterModifyEvent();
 	}
 
+	static void setSelectedProfile(final TourTagFilterProfile _selectedProfile) {
+		// TODO Auto-generated method stub
+
+	}
+
 	public static void setTourTagFilterAction(final ActionTourTagFilter actionTourTagFilter) {
 
 		_actionTourTagFilter = actionTourTagFilter;
 	}
 
-	static void updateTourTagFilter(final Set<TourTag> tourTags) {
+	/**
+	 * @return
+	 */
+	private static XMLMemento writeFilterProfile() {
 
-		_tourTagFilterIds = new long[tourTags.size()];
+		XMLMemento xmlRoot = null;
 
-		int tagIndex = 0;
+		try {
 
-		for (final TourTag tourTag : tourTags) {
-			_tourTagFilterIds[tagIndex++] = tourTag.getTagId();
+			xmlRoot = writeFilterProfile_10_Root();
+
+			// loop: profiles
+//			for (final TourFilterProfile tourFilterProfile : _filterProfiles) {
+//
+//				final IMemento xmlProfile = xmlRoot.createChild(TAG_PROFILE);
+//
+//				xmlProfile.putString(ATTR_NAME, tourFilterProfile.name);
+//
+//				// set flag for active profile
+//				if (tourFilterProfile == _selectedProfile) {
+//					xmlProfile.putBoolean(ATTR_IS_SELECTED, true);
+//				}
+//
+//				// loop: properties
+//				for (final TourFilterProperty filterProperty : tourFilterProfile.filterProperties) {
+//
+//					final TourFilterFieldConfig fieldConfig = filterProperty.fieldConfig;
+//					final TourFilterFieldOperator fieldOperator = filterProperty.fieldOperator;
+//
+//					final IMemento xmlProperty = xmlProfile.createChild(TAG_PROPERTY);
+//
+//					Util.setXmlEnum(xmlProperty, ATTR_FIELD_ID, fieldConfig.fieldId);
+//					Util.setXmlEnum(xmlProperty, ATTR_FIELD_OPERATOR, fieldOperator);
+//					xmlProperty.putBoolean(ATTR_IS_ENABLED, filterProperty.isEnabled);
+//
+//					writeFilterProfile_20_PropertyDetail(xmlProperty, filterProperty);
+//				}
+//			}
+
+		} catch (final Exception e) {
+			StatusUtil.log(e);
 		}
+
+		return xmlRoot;
+	}
+
+	private static XMLMemento writeFilterProfile_10_Root() {
+
+		final XMLMemento xmlRoot = XMLMemento.createWriteRoot(TAG_ROOT);
+
+		// date/time
+		xmlRoot.putString(Util.ATTR_ROOT_DATETIME, TimeTools.now().toString());
+
+		// plugin version
+		final Version version = _bundle.getVersion();
+		xmlRoot.putInteger(Util.ATTR_ROOT_VERSION_MAJOR, version.getMajor());
+		xmlRoot.putInteger(Util.ATTR_ROOT_VERSION_MINOR, version.getMinor());
+		xmlRoot.putInteger(Util.ATTR_ROOT_VERSION_MICRO, version.getMicro());
+		xmlRoot.putString(Util.ATTR_ROOT_VERSION_QUALIFIER, version.getQualifier());
+
+		// layer structure version
+		xmlRoot.putInteger(ATTR_TOUR_FILTER_VERSION, TOUR_FILTER_VERSION);
+
+		return xmlRoot;
 	}
 
 }

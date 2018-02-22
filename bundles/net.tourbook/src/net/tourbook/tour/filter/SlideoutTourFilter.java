@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -120,15 +120,10 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
 	private SelectionAdapter		_fieldSelectionListener_DateTime;
 
-	private boolean					_isUpdateUI;
-
 	{
 		_defaultModifyListener = new ModifyListener() {
 			@Override
 			public void modifyText(final ModifyEvent e) {
-				if (_isUpdateUI) {
-					return;
-				}
 				onProfile_Modify();
 			}
 		};

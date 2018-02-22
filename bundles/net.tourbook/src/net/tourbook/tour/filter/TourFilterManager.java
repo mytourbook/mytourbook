@@ -1629,7 +1629,6 @@ public class TourFilterManager {
 	public static void restoreState() {
 
 		_isTourFilterEnabled = _prefStore.getBoolean(ITourbookPreferences.APP_TOUR_DATA_FILTER_IS_SELECTED);
-
 		_actionTourFilter.setSelection(_isTourFilterEnabled);
 
 		readFilterProfile();
