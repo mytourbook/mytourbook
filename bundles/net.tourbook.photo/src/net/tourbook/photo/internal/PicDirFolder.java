@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -94,77 +94,31 @@ import org.eclipse.ui.progress.UIJob;
  */
 public class PicDirFolder {
 
-	private static final String								MENU_ID_PIC_DIR_VIEW_IN_FOLDER			= "menu.net.tourbook.photo.PicDirView.InFolder";	//$NON-NLS-1$
+// SET_FORMATTING_OFF
+	
+	private static final String				MENU_ID_PIC_DIR_VIEW_IN_FOLDER			= "menu.net.tourbook.photo.PicDirView.InFolder";	//$NON-NLS-1$
 
-	static String											WIN_PROGRAMFILES						= System
-																											.getenv("programfiles");					//$NON-NLS-1$
+	static String							WIN_PROGRAMFILES						= System.getenv("programfiles");					//$NON-NLS-1$
+	static String							FILE_SEPARATOR							= System.getProperty("file.separator");			//$NON-NLS-1$
 
-	static String											FILE_SEPARATOR							= System
-																											.getProperty("file.separator");			//$NON-NLS-1$
+	private static final String				STATE_SELECTED_FOLDER					= "STATE_SELECTED_FOLDER";							//$NON-NLS-1$
+	private static final String				STATE_IS_SINGLE_CLICK_EXPAND			= "STATE_IS_SINGLE_CLICK_EXPAND";					//$NON-NLS-1$
+	private static final String				STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS	= "STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS";		//$NON-NLS-1$
 
-	private static final String								STATE_SELECTED_FOLDER					= "STATE_SELECTED_FOLDER";							//$NON-NLS-1$
-	private static final String								STATE_IS_SINGLE_CLICK_EXPAND			= "STATE_IS_SINGLE_CLICK_EXPAND";					//$NON-NLS-1$
-
-	private static final String								STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS	= "STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS";		//$NON-NLS-1$
-	private static final LinkedBlockingDeque<FolderLoader>	_folderWaitingQueue						= new LinkedBlockingDeque<FolderLoader>();
-
+	private static final LinkedBlockingDeque<FolderLoader>	_folderWaitingQueue		= new LinkedBlockingDeque<FolderLoader>();
 	/**
 	 * This executer is running only in one thread because accessing the file system with multiple
 	 * thread is slowing it down.
 	 */
 	private static ThreadPoolExecutor						_folderExecutor;
-
-	private IDialogSettings									_state;
-	private final IPreferenceStore							_prefStore								= Activator
-																											.getDefault()
-																											.getPreferenceStore();
-
-	private PicDirView										_picDirView;
-	private PicDirImages									_picDirImages;
-
-	private long											_expandRunnableCounter;
-
-	private boolean											_isExpandingSelection;
-	private boolean											_isBehaviourAutoExpandCollapse;
-	private boolean											_isBehaviourSingleExpandedOthersCollapse;
-	private boolean											_isStateShowFileFolderInFolderItem;
-
-	/**
-	 * Is true when the mouse click is for the context menu
-	 */
-	private boolean											_isMouseContextMenu;
-	private boolean											_doAutoCollapseExpand;
-
-	private boolean											_isFromNavigationHistory;
-	private TVIFolderRoot									_rootItem;
-	private TVIFolderFolder									_selectedTVIFolder;
-
-	private FileFilter										_imageFileFilter						= ImageUtils
-																											.createImageFileFilter();
-
-	private File											_selectedFolder;
-	private ActionRefreshFolder								_actionRefreshFolder;
-
-	private ActionRunExternalAppTitle						_actionRunExternalAppTitle;
-	private ActionRunExternalApp							_actionRunExternalAppDefault;
-	private ActionRunExternalApp							_actionRunExternalApp1;
-	private ActionRunExternalApp							_actionRunExternalApp2;
-	private ActionRunExternalApp							_actionRunExternalApp3;
-	private ActionPreferences								_actionPreferences;
-	private ActionSingleClickExpand							_actionAutoExpandCollapse;
-	private ActionSingleExpandCollapseOthers				_actionSingleExpandCollapseOthers;
-
-	/*
-	 * UI controls
-	 */
-	private Display											_display;
-
-	private TreeViewer										_folderViewer;
+	
+// SET_FORMATTING_ON
 
 	static {
 
 		final ThreadFactory threadFactoryFolder = new ThreadFactory() {
 
+			@Override
 			public Thread newThread(final Runnable r) {
 
 				final String threadName = "LoadingFolder"; //$NON-NLS-1$
@@ -177,8 +131,52 @@ public class PicDirFolder {
 				return thread;
 			}
 		};
+
 		_folderExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(1, threadFactoryFolder);
 	}
+
+	private IDialogSettings						_state;
+	private final IPreferenceStore				_prefStore			= Activator.getDefault().getPreferenceStore();
+
+	private PicDirView							_picDirView;
+	private PicDirImages						_picDirImages;
+
+	private long								_expandRunnableCounter;
+
+	private boolean								_isExpandingSelection;
+	private boolean								_isBehaviourAutoExpandCollapse;
+	private boolean								_isBehaviourSingleExpandedOthersCollapse;
+	private boolean								_isStateShowFileFolderInFolderItem;
+
+	/**
+	 * Is true when the mouse click is for the context menu
+	 */
+	private boolean								_isMouseContextMenu;
+	private boolean								_isFromNavigationHistory;
+	private boolean								_doAutoCollapseExpand;
+
+	private TVIFolderRoot						_rootItem;
+	private TVIFolderFolder						_selectedTVIFolder;
+
+	private FileFilter							_imageFileFilter	= ImageUtils.createImageFileFilter();
+	private File								_selectedFolder;
+
+	private ActionRefreshFolder					_actionRefreshFolder;
+	private ActionRunExternalAppTitle			_actionRunExternalAppTitle;
+	private ActionRunExternalApp				_actionRunExternalAppDefault;
+	private ActionRunExternalApp				_actionRunExternalApp1;
+	private ActionRunExternalApp				_actionRunExternalApp2;
+	private ActionRunExternalApp				_actionRunExternalApp3;
+	private ActionPreferences					_actionPreferences;
+	private ActionSingleClickExpand				_actionAutoExpandCollapse;
+	private ActionSingleExpandCollapseOthers	_actionSingleExpandCollapseOthers;
+
+	/*
+	 * UI controls
+	 */
+	private Display								_display;
+
+	private TreeViewer							_folderViewer;
 
 	private class ActionRunExternalAppTitle extends Action {
 
@@ -221,8 +219,10 @@ public class PicDirFolder {
 
 	private class FolderContentProvider implements ITreeContentProvider {
 
+		@Override
 		public void dispose() {}
 
+		@Override
 		public Object[] getChildren(final Object parentElement) {
 
 			/*
@@ -232,14 +232,17 @@ public class PicDirFolder {
 			return ((TreeViewerItem) parentElement).getFetchedChildrenAsArray();
 		}
 
+		@Override
 		public Object[] getElements(final Object inputElement) {
 			return _rootItem.getFetchedChildrenAsArray();
 		}
 
+		@Override
 		public Object getParent(final Object element) {
 			return ((TreeViewerItem) element).getParentItem();
 		}
 
+		@Override
 		public boolean hasChildren(final Object element) {
 
 			boolean hasChildren = false;
@@ -266,6 +269,7 @@ public class PicDirFolder {
 			return hasChildren;
 		}
 
+		@Override
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
@@ -287,6 +291,7 @@ public class PicDirFolder {
 		}
 
 		BusyIndicator.showWhile(_display, new Runnable() {
+			@Override
 			public void run() {
 
 				final boolean isExpanded = _folderViewer.getExpandedState(_selectedTVIFolder);
@@ -355,11 +360,13 @@ public class PicDirFolder {
 		// check if an app is defined
 		if (actionRunExternalApp == _actionRunExternalAppDefault) {
 
-			PreferencesUtil.createPreferenceDialogOn(
-					Display.getCurrent().getActiveShell(),
-					PrefPagePhotoExternalApp.ID,
-					null,
-					null).open();
+			PreferencesUtil
+					.createPreferenceDialogOn(
+							Display.getCurrent().getActiveShell(),
+							PrefPagePhotoExternalApp.ID,
+							null,
+							null)
+					.open();
 			return;
 		}
 
@@ -488,7 +495,8 @@ public class PicDirFolder {
 		 */
 
 		final Composite layoutContainer = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
+		GridDataFactory
+				.fillDefaults()//
 				.grab(true, true)
 				.hint(200, 100)
 				.applyTo(layoutContainer);
@@ -518,6 +526,7 @@ public class PicDirFolder {
 		_folderViewer.setUseHashlookup(true);
 
 		_folderViewer.addDoubleClickListener(new IDoubleClickListener() {
+			@Override
 			public void doubleClick(final DoubleClickEvent event) {
 
 				// expand/collapse current item
@@ -530,6 +539,7 @@ public class PicDirFolder {
 		});
 
 		_folderViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
 				onSelectFolder((ITreeSelection) event.getSelection());
 			}
@@ -682,10 +692,12 @@ public class PicDirFolder {
 		final String prefExtApp1 = _prefStore.getString(IPhotoPreferences.PHOTO_EXTERNAL_PHOTO_VIEWER_1).trim();
 		if (prefExtApp1.length() > 0) {
 
-			_actionRunExternalApp1.setText(NLS.bind(Messages.Pic_Dir_Label_ExternalApp, //
-					1,
-					new Path(prefExtApp1).lastSegment()
-//					prefExtApp1
+			_actionRunExternalApp1.setText(
+					NLS.bind(
+							Messages.Pic_Dir_Label_ExternalApp, //
+							1,
+							new Path(prefExtApp1).lastSegment()
+					//					prefExtApp1
 					//
 					));
 
@@ -698,10 +710,12 @@ public class PicDirFolder {
 		final String prefExtApp2 = _prefStore.getString(IPhotoPreferences.PHOTO_EXTERNAL_PHOTO_VIEWER_2).trim();
 		if (prefExtApp2.length() > 0) {
 
-			_actionRunExternalApp2.setText(NLS.bind(Messages.Pic_Dir_Label_ExternalApp, //
-					2,
-					new Path(prefExtApp2).lastSegment()
-//					prefExtApp2
+			_actionRunExternalApp2.setText(
+					NLS.bind(
+							Messages.Pic_Dir_Label_ExternalApp, //
+							2,
+							new Path(prefExtApp2).lastSegment()
+					//					prefExtApp2
 					//
 					));
 
@@ -714,10 +728,12 @@ public class PicDirFolder {
 		final String prefExtApp3 = _prefStore.getString(IPhotoPreferences.PHOTO_EXTERNAL_PHOTO_VIEWER_3).trim();
 		if (prefExtApp3.length() > 0) {
 
-			_actionRunExternalApp3.setText(NLS.bind(Messages.Pic_Dir_Label_ExternalApp, //
-					3,
-					new Path(prefExtApp3).lastSegment()
-//					prefExtApp3
+			_actionRunExternalApp3.setText(
+					NLS.bind(
+							Messages.Pic_Dir_Label_ExternalApp, //
+							3,
+							new Path(prefExtApp3).lastSegment()
+					//					prefExtApp3
 					//
 					));
 
@@ -903,6 +919,7 @@ public class PicDirFolder {
 				private TreePath		__selectedTreePath			= selectedTreePath;
 				private boolean			__isFromNavigationHistory	= _isFromNavigationHistory;
 
+				@Override
 				public void run() {
 
 					// check if a newer expand event occured
@@ -910,7 +927,7 @@ public class PicDirFolder {
 						return;
 					}
 
-					onSelectFolder_10_AutoExpandCollapse_Runnable(
+					onSelectFolder_20_AutoExpandCollapse_Runnable(
 							__selectedFolderItem,
 							__treeSelection,
 							__selectedTreePath,
@@ -938,7 +955,7 @@ public class PicDirFolder {
 	 * @param selectedTreePath
 	 * @param isFromNavigationHistory
 	 */
-	private void onSelectFolder_10_AutoExpandCollapse_Runnable(	final TVIFolderFolder selectedFolderItem,
+	private void onSelectFolder_20_AutoExpandCollapse_Runnable(	final TVIFolderFolder selectedFolderItem,
 																final ITreeSelection treeSelection,
 																final TreePath selectedTreePath,
 																final boolean isFromNavigationHistory) {
@@ -1004,6 +1021,7 @@ public class PicDirFolder {
 		_folderWaitingQueue.add(treeFolderLoader);
 
 		final Runnable executorTask = new Runnable() {
+			@Override
 			public void run() {
 
 				// get last added loader item
@@ -1021,6 +1039,7 @@ public class PicDirFolder {
 
 					// update UI
 					_display.syncExec(new Runnable() {
+						@Override
 						public void run() {
 
 							if (_folderViewer.getTree().isDisposed()) {
@@ -1060,7 +1079,8 @@ public class PicDirFolder {
 	}
 
 	/**
-	 * this feature is not very simple to be implemented, stopped for implementing now 2012-07-18<br>
+	 * this feature is not very simple to be implemented, stopped for implementing now
+	 * 2012-07-18<br>
 	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
 	 * recursive <br>
 	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
@@ -1128,6 +1148,7 @@ public class PicDirFolder {
 	private void restoreStateFolder(final String restoreFolderName) {
 
 		BusyIndicator.showWhile(_display, new Runnable() {
+			@Override
 			public void run() {
 
 				// set root item
@@ -1218,9 +1239,10 @@ public class PicDirFolder {
 
 			// restored folder is not available
 
-			_picDirImages.updateUI_StatusMessage(NLS.bind(
-					Messages.Pic_Dir_StatusLable_LoadingFolder_FolderIsNotAvailable,
-					requestedFolderName));
+			_picDirImages.updateUI_StatusMessage(
+					NLS.bind(
+							Messages.Pic_Dir_StatusLable_LoadingFolder_FolderIsNotAvailable,
+							requestedFolderName));
 		}
 
 		if (selectedFolder == null) {
