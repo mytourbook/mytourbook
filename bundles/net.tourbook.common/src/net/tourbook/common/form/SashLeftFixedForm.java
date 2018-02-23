@@ -212,6 +212,9 @@ public class SashLeftFixedForm {
 				_parent.layout();
 			}
 
+			final Rectangle sashBounds = _sash.getBounds();
+			_sash.setBounds(sashBounds.x, sashBounds.y, sashBounds.width + 10, sashBounds.height);
+
 			// System.out.println("isInit==true: "+fSashData.left);
 		}
 	}
