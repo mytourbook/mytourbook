@@ -48,6 +48,7 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
@@ -55,6 +56,8 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.TreePath;
+import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
@@ -85,6 +88,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
 
 /**
@@ -92,19 +96,23 @@ import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
  */
 public class SlideoutTourTagFilter extends AdvancedSlideout {
 
-	private static final String						STATE_IS_LIVE_UPDATE	= "STATE_IS_LIVE_UPDATE";				//$NON-NLS-1$
-	private static final String						STATE_SASH_WIDTH		= "STATE_SASH_WIDTH";					//$NON-NLS-1$
+// SET_FORMATTING_OFF
+	
+	private static final String						STATE_IS_LIVE_UPDATE		= "STATE_IS_LIVE_UPDATE";																						//$NON-NLS-1$
+	private static final String						STATE_SASH_WIDTH			= "STATE_SASH_WIDTH";	//$NON-NLS-1$
 
-	private IDialogSettings							_state;
-	private final IPreferenceStore					_prefStore				= TourbookPlugin.getPrefStore();
+	private static IDialogSettings					_state;
 
-	private TableViewer								_profileViewer;
-	private ContainerCheckedTreeViewer				_tagViewer;
 
-	private TVIPrefTagRoot							_rootItem;
+	private static final IPreferenceStore			_prefStore					= TourbookPlugin.getPrefStore();
+	private final ArrayList<TourTagFilterProfile>	_filterProfiles				= TourTagFilterManager.getProfiles();
 
-	private final ArrayList<TourTagFilterProfile>	_filterProfiles			= TourTagFilterManager.getProfiles();
 	private TourTagFilterProfile					_selectedProfile;
+	private TableViewer								_profileViewer;
+	
+
+	private ContainerCheckedTreeViewer				_tagViewer;
+	private TVIPrefTagRoot							_rootItem;
 
 	private PixelConverter							_pc;
 
@@ -112,7 +120,19 @@ public class SlideoutTourTagFilter extends AdvancedSlideout {
 
 	private boolean									_isLiveUpdate;
 
+	private boolean									_doAutoCollapseExpand;
+	private long									_expandRunnableCounter;
+
+	private boolean									_isExpandingSelection;
+
+	private boolean									_isBehaviourSingleExpandedOthersCollapse	= true;
+	private boolean									_isBehaviourAutoExpandCollapse;
 	private ModifyListener							_defaultModifyListener;
+
+// SET_FORMATTING_ON
+// SET_FORMATTING_OFF
+// SET_FORMATTING_ON
+
 	{
 		_defaultModifyListener = new ModifyListener() {
 			@Override
@@ -121,18 +141,17 @@ public class SlideoutTourTagFilter extends AdvancedSlideout {
 			}
 		};
 	}
-
 	/*
 	 * UI controls
 	 */
-	private Composite			_containerFilter;
-	private Composite			_containerProfiles;
+	private Composite			_containerTags;
 
+	private Composite			_containerProfiles;
 	private Button				_btnApply;
+
 	private Button				_btnCopyProfile;
 	private Button				_btnDeleteProfile;
 	private Button				_chkLiveUpdate;
-
 	private Label				_lblProfileName;
 
 	private Text				_txtProfileName;
@@ -140,6 +159,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout {
 	private SashLeftFixedForm	_sashForm;
 
 	private Image				_imgTag;
+
 	private Image				_imgTagRoot;
 	private Image				_imgTagCategory;
 
@@ -326,13 +346,13 @@ public class SlideoutTourTagFilter extends AdvancedSlideout {
 				}
 
 				// right part
-				_containerFilter = createUI_300_Filter(container);
+				_containerTags = createUI_300_Tags(container);
 
 				_sashForm = new SashLeftFixedForm(//
 						container,
 						_containerProfiles,
 						sash,
-						_containerFilter,
+						_containerTags,
 						30);
 			}
 		}
@@ -368,7 +388,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout {
 		final Composite layoutContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory
 				.fillDefaults()//
-				.grab(true, true)
+				.grab(false, true)
 				.applyTo(layoutContainer);
 
 		final TableColumnLayout tableLayout = new TableColumnLayout();
@@ -529,7 +549,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout {
 		}
 	}
 
-	private Composite createUI_300_Filter(final Composite parent) {
+	private Composite createUI_300_Tags(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory
@@ -543,10 +563,17 @@ public class SlideoutTourTagFilter extends AdvancedSlideout {
 				.applyTo(container);
 		{
 			createUI_310_FilterName(container);
-//			createUI_400_FilterOuterContainer(container);
 			createUI_450_TagViewer(container);
 			createUI_500_FilterActions(container);
 		}
+
+		/**
+		 * Very Important !
+		 * <p>
+		 * Do a layout NOW, otherwise the initial profile container is using the whole width of the
+		 * slideout :-(
+		 */
+		container.layout(true, true);
 
 		return container;
 	}
@@ -599,7 +626,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout {
 		layoutContainer.setLayout(treeLayout);
 
 		/*
-		 * create viewer
+		 * create viewer tree
 		 */
 		final Tree tree = new Tree(layoutContainer, SWT.H_SCROLL | SWT.V_SCROLL
 //				| SWT.BORDER
@@ -609,6 +636,15 @@ public class SlideoutTourTagFilter extends AdvancedSlideout {
 		tree.setHeaderVisible(false);
 		tree.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
+		tree.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseDown(final MouseEvent e) {
+				_doAutoCollapseExpand = true;
+			}
+		});
+		/*
+		 * Create viewer
+		 */
 		_tagViewer = new ContainerCheckedTreeViewer(tree);
 
 		_tagViewer.setContentProvider(new TagViewerContentProvicer());
@@ -659,13 +695,15 @@ public class SlideoutTourTagFilter extends AdvancedSlideout {
 
 					// expand/collapse current item
 
-					final TreeViewerItem tourItem = (TreeViewerItem) selection;
+					onTag_SelectCategory((TreeSelection) event.getSelection());
 
-					if (_tagViewer.getExpandedState(tourItem)) {
-						_tagViewer.collapseToLevel(tourItem, 1);
-					} else {
-						_tagViewer.expandToLevel(tourItem, 1);
-					}
+//					final TreeViewerItem tourItem = (TreeViewerItem) selection;
+//
+//					if (_tagViewer.getExpandedState(tourItem)) {
+//						_tagViewer.collapseToLevel(tourItem, 1);
+//					} else {
+//						_tagViewer.expandToLevel(tourItem, 1);
+//					}
 				}
 			}
 		});
@@ -792,6 +830,31 @@ public class SlideoutTourTagFilter extends AdvancedSlideout {
 
 	private void enableControls() {
 
+	}
+
+	private void expandCollapseFolder(final TVIPrefTagCategory treeItem) {
+
+		if (_tagViewer.getExpandedState(treeItem)) {
+
+			// collapse folder
+
+			_tagViewer.collapseToLevel(treeItem, 1);
+
+//			removeFolderFromWaitingQueue(treeItem);
+
+		} else {
+
+			// expand folder
+
+//			if (treeItem.isFolderLoaded()) {
+//
+//				_tagViewer.expandToLevel(treeItem, 1);
+//
+//			} else {
+//
+//				putFolderInWaitingQueue(treeItem, true);
+//			}
+		}
 	}
 
 	private void fireModifyEvent() {
@@ -1002,16 +1065,142 @@ public class SlideoutTourTagFilter extends AdvancedSlideout {
 		fireModifyEvent();
 	}
 
-//	private void onResizeFilterContent() {
-//
-//		if (_filterScrolled_Content == null || _filterScrolled_Content.isDisposed()) {
-//			return;
-//		}
-//
-//		final Point contentSize = _filterScrolled_Content.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-//
-//		_filterScrolled_Container.setMinSize(contentSize);
-//	}
+	private void onTag_SelectCategory(final TreeSelection treeSelection) {
+
+		if (_isExpandingSelection) {
+			// prevent entless loops
+			return;
+		}
+
+		// keep & reset mouse event
+		final boolean doAutoCollapseExpand = _doAutoCollapseExpand;
+		_doAutoCollapseExpand = false;
+
+		final TreePath[] selectedTreePaths = treeSelection.getPaths();
+		if (selectedTreePaths.length == 0) {
+			return;
+		}
+		final TreePath selectedTreePath = selectedTreePaths[0];
+		if (selectedTreePath == null) {
+			return;
+		}
+
+		final TVIPrefTagCategory tviFolder = (TVIPrefTagCategory) selectedTreePath.getLastSegment();
+
+		onTag_SelectCategory_10_AutoExpandCollapse(treeSelection, selectedTreePath, tviFolder);
+	}
+
+	/**
+	 * This is not yet working thoroughly because the expanded position moves up or down and all
+	 * expanded childrens are not visible (but they could) like when the triangle (+/-) icon in the
+	 * tree is clicked.
+	 * 
+	 * @param treeSelection
+	 * @param selectedTreePath
+	 * @param tviFolder
+	 */
+	private void onTag_SelectCategory_10_AutoExpandCollapse(final ITreeSelection treeSelection,
+															final TreePath selectedTreePath,
+															final TVIPrefTagCategory tviFolder) {
+
+		if (_isBehaviourSingleExpandedOthersCollapse) {
+
+			/*
+			 * run async because this is doing a reselection which cannot be done within the current
+			 * selection event
+			 */
+			Display.getCurrent().asyncExec(new Runnable() {
+
+				private long				__expandRunnableCounter	= ++_expandRunnableCounter;
+
+				private TVIPrefTagCategory	__selectedFolderItem	= tviFolder;
+				private ITreeSelection		__treeSelection			= treeSelection;
+				private TreePath			__selectedTreePath		= selectedTreePath;
+
+				@Override
+				public void run() {
+
+					// check if a newer expand event occured
+					if (__expandRunnableCounter != _expandRunnableCounter) {
+						return;
+					}
+
+					onTag_SelectCategory_20_AutoExpandCollapse_Runnable(
+							__selectedFolderItem,
+							__treeSelection,
+							__selectedTreePath);
+				}
+			});
+
+		} else {
+
+			if (_isBehaviourAutoExpandCollapse) {
+
+				// expand folder with one mouse click but not with the keyboard
+				expandCollapseFolder(tviFolder);
+			}
+
+//			displayFolderImages(tviFolder, _isFromNavigationHistory, false);
+		}
+	}
+
+	/**
+	 * This behavior is complex and still have possible problems.
+	 * 
+	 * @param selectedFolderItem
+	 * @param treeSelection
+	 * @param selectedTreePath
+	 */
+	private void onTag_SelectCategory_20_AutoExpandCollapse_Runnable(	final TVIPrefTagCategory selectedFolderItem,
+																		final ITreeSelection treeSelection,
+																		final TreePath selectedTreePath) {
+		_isExpandingSelection = true;
+		{
+			final Tree tree = _tagViewer.getTree();
+
+			tree.setRedraw(false);
+			{
+				final TreeItem topItem = tree.getTopItem();
+
+				final boolean isExpanded = _tagViewer.getExpandedState(selectedTreePath);
+
+				/*
+				 * collapse all tree paths
+				 */
+				final TreePath[] allExpandedTreePaths = _tagViewer.getExpandedTreePaths();
+				for (final TreePath treePath : allExpandedTreePaths) {
+					_tagViewer.setExpandedState(treePath, false);
+				}
+
+				/*
+				 * expand and select selected folder
+				 */
+				_tagViewer.setExpandedTreePaths(new TreePath[] { selectedTreePath });
+				_tagViewer.setSelection(treeSelection, true);
+
+				if (_isBehaviourAutoExpandCollapse && isExpanded) {
+
+					// auto collapse expanded folder
+					_tagViewer.setExpandedState(selectedTreePath, false);
+				}
+
+				/**
+				 * set top item to the previous top item, otherwise the expanded/collapse item is
+				 * positioned at the bottom and the UI is jumping all the time
+				 * <p>
+				 * win behaviour: when an item is set to top which was collapsed bevore, it will be
+				 * expanded
+				 */
+				if (topItem.isDisposed() == false) {
+					tree.setTopItem(topItem);
+				}
+			}
+			tree.setRedraw(true);
+		}
+		_isExpandingSelection = false;
+
+//		displayFolderImages(selectedFolderItem, isFromNavigationHistory, false);
+	}
 
 	private void restoreState() {
 
@@ -1038,7 +1227,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout {
 		_chkLiveUpdate.setSelection(_isLiveUpdate);
 
 		// restore width for the profile list
-		final int leftPartWidth = Util.getStateInt(_state, STATE_SASH_WIDTH, _pc.convertWidthInCharsToPixels(50));
+		final int leftPartWidth = Util.getStateInt(_state, STATE_SASH_WIDTH, _pc.convertWidthInCharsToPixels(5));
 		_sashForm.setViewerWidth(leftPartWidth);
 	}
 
