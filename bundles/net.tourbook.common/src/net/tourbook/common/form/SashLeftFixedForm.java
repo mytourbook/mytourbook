@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,10 +15,16 @@
  *******************************************************************************/
 package net.tourbook.common.form;
 
+import net.tourbook.common.UI;
+import net.tourbook.common.util.Util;
+
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -27,27 +33,60 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Sash;
 
 /**
  * The class provides the ability to keep the width of the viewer when the parent is resized
  */
 public class SashLeftFixedForm {
 
-	private static int	MINIMUM_PART_WIDTH	= 100;
+	/**
+	 * Width of the sash slider
+	 */
+	private static final int	SASH_WIDTH			= 8;
 
-	private Composite	_parent;
+	private static int			MINIMUM_PART_WIDTH	= 100;
 
-	private Control		_maximizedPart;
+	private boolean				_isInitialResize	= true;
 
-	private Control		_fixed;
-	private Control		_sash;
-	private Control		_flex;
+	/*
+	 * UI controls
+	 */
+	private Composite			_parent;
 
-	private Integer		_viewerWidth;
-	private Integer		_sashWidth;
-	private FormData	_sashLayoutData;
+	private Control				_maximizedPart;
 
-	private boolean		_isInitialResize	= true;
+	private Control				_fixed;
+	private Control				_sash;
+	private Control				_flex;
+
+	private Integer				_viewerWidth;
+	private Integer				_sashWidth;
+	private FormData			_sashLayoutData;
+
+	public SashLeftFixedForm(	final Composite parent,
+								final Composite leftPart,
+								final Sash sash,
+								final Composite rightPart,
+								final IDialogSettings state,
+								final String stateSashWidth) {
+
+		this(parent, leftPart, sash, rightPart, 50);
+
+		// restore width
+		setViewerWidth(Util.getStateInt(state, stateSashWidth, 100));
+
+		UI.addSashColorHandler(sash);
+
+		// save sash width
+		sash.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseUp(final MouseEvent e) {
+				state.put(stateSashWidth, leftPart.getSize().x);
+			}
+		});
+
+	}
 
 	public SashLeftFixedForm(final Composite parent, final Control viewer, final Control sash, final Control detail) {
 
@@ -56,84 +95,73 @@ public class SashLeftFixedForm {
 
 	/**
 	 * @param parent
-	 * @param fixed
+	 * @param fixedPart
 	 * @param sash
-	 * @param flex
-	 * @param fixedSize
-	 *            Relative size of the fixed part in %.
+	 * @param flexPart
+	 * @param defaultSize
+	 *            Relative size of the fixed (left) part in %.
 	 */
 	public SashLeftFixedForm(	final Composite parent,
-								final Control fixed,
+								final Control fixedPart,
 								final Control sash,
-								final Control flex,
-								final int fixedSize) {
+								final Control flexPart,
+								final int defaultSize) {
+
+		setViewerWidth_Internal(defaultSize);
 
 		final PixelConverter pc = new PixelConverter(parent);
 		MINIMUM_PART_WIDTH = pc.convertWidthInCharsToPixels(15);
 
+		final ControlAdapter resizeListener = new ControlAdapter() {
+			@Override
+			public void controlResized(final ControlEvent e) {
+				onResize();
+			}
+		};
+
 		_parent = parent;
 
-		_fixed = fixed;
+		_fixed = fixedPart;
 		_sash = sash;
-		_flex = flex;
+		_flex = flexPart;
 
 		parent.setLayout(new FormLayout());
 
 		final FormAttachment topAttachment = new FormAttachment(0, 0);
 		final FormAttachment bottomAttachment = new FormAttachment(100, 0);
 
+		/*
+		 * Fixed (left) part
+		 */
 		final FormData fixedLayoutData = new FormData();
 		fixedLayoutData.left = new FormAttachment(0, 0);
 		fixedLayoutData.right = new FormAttachment(sash, 0);
 		fixedLayoutData.top = topAttachment;
 		fixedLayoutData.bottom = bottomAttachment;
-		fixed.setLayoutData(fixedLayoutData);
+		fixedPart.setLayoutData(fixedLayoutData);
+		fixedPart.addControlListener(resizeListener);
 
+		/*
+		 * Sash
+		 */
 		_sashLayoutData = new FormData();
-		_sashLayoutData.left = new FormAttachment(fixedSize, 0);
+		_sashLayoutData.left = new FormAttachment(defaultSize, 0);
 		_sashLayoutData.top = topAttachment;
 		_sashLayoutData.bottom = bottomAttachment;
+		_sashLayoutData.width = SASH_WIDTH;
 		sash.setLayoutData(_sashLayoutData);
+		sash.addListener(SWT.Selection, onSelectSash(parent, sash));
 
+		/*
+		 * Flex (right) part
+		 */
 		final FormData flexLayoutData = new FormData();
 		flexLayoutData.left = new FormAttachment(sash, 0);
 		flexLayoutData.right = new FormAttachment(100, 0);
 		flexLayoutData.top = topAttachment;
 		flexLayoutData.bottom = bottomAttachment;
-		flex.setLayoutData(flexLayoutData);
-
-		fixed.addControlListener(new ControlAdapter() {
-			@Override
-			public void controlResized(final ControlEvent e) {
-				onResize();
-			}
-		});
-
-		flex.addControlListener(new ControlAdapter() {
-			@Override
-			public void controlResized(final ControlEvent e) {
-				onResize();
-			}
-		});
-
-		sash.addListener(SWT.Selection, new Listener() {
-			@Override
-			public void handleEvent(final Event e) {
-
-				final Rectangle sashRect = sash.getBounds();
-				final Rectangle parentRect = parent.getClientArea();
-
-				final int right = parentRect.width - sashRect.width - MINIMUM_PART_WIDTH;
-				_sashWidth = Math.max(Math.min(e.x, right), MINIMUM_PART_WIDTH);
-
-				if (_sashWidth != sashRect.x) {
-					_sashLayoutData.left = new FormAttachment(0, _sashWidth);
-					parent.layout();
-				}
-
-				_viewerWidth = _sashWidth;
-			}
-		});
+		flexPart.setLayoutData(flexLayoutData);
+		flexPart.addControlListener(resizeListener);
 	}
 
 	/**
@@ -147,7 +175,7 @@ public class SashLeftFixedForm {
 		return _sashWidth == null ? MINIMUM_PART_WIDTH : _sashWidth;
 	}
 
-	public void onResize() {
+	private void onResize() {
 
 		if (_isInitialResize) {
 
@@ -166,10 +194,6 @@ public class SashLeftFixedForm {
 
 			_sashLayoutData.left = new FormAttachment(0, viewerWidth);
 
-			_parent.layout();
-
-			// System.out.println("isInit==false: "+viewerWidth);
-
 		} else {
 
 			if (_maximizedPart != null) {
@@ -177,12 +201,10 @@ public class SashLeftFixedForm {
 				if (_maximizedPart == _fixed) {
 
 					_sashLayoutData.left = new FormAttachment(100, 0);
-					_parent.layout();
 
 				} else if (_maximizedPart == _flex) {
 
 					_sashLayoutData.left = new FormAttachment(0, -_sash.getSize().x);
-					_parent.layout();
 				}
 
 			} else {
@@ -209,14 +231,32 @@ public class SashLeftFixedForm {
 
 					_sashLayoutData.left = new FormAttachment(0, viewerWidth);
 				}
-				_parent.layout();
 			}
 
-			final Rectangle sashBounds = _sash.getBounds();
-			_sash.setBounds(sashBounds.x, sashBounds.y, sashBounds.width + 10, sashBounds.height);
-
-			// System.out.println("isInit==true: "+fSashData.left);
+			_parent.layout();
 		}
+	}
+
+	private Listener onSelectSash(final Composite parent, final Control sash) {
+
+		return new Listener() {
+			@Override
+			public void handleEvent(final Event e) {
+
+				final Rectangle sashRect = sash.getBounds();
+				final Rectangle parentRect = parent.getClientArea();
+
+				final int right = parentRect.width - sashRect.width - MINIMUM_PART_WIDTH;
+				_sashWidth = Math.max(Math.min(e.x, right), MINIMUM_PART_WIDTH);
+
+				if (_sashWidth != sashRect.x) {
+					_sashLayoutData.left = new FormAttachment(0, _sashWidth);
+					parent.layout();
+				}
+
+				_viewerWidth = _sashWidth;
+			}
+		};
 	}
 
 	/**
@@ -236,9 +276,14 @@ public class SashLeftFixedForm {
 	 */
 	public void setViewerWidth(final Integer viewerWidth) {
 
-		_viewerWidth = viewerWidth == null ? null : Math.max(MINIMUM_PART_WIDTH, viewerWidth);
-		_sashWidth = _viewerWidth;
+		setViewerWidth_Internal(viewerWidth);
 
 		onResize();
+	}
+
+	private void setViewerWidth_Internal(final Integer viewerWidth) {
+
+		_viewerWidth = viewerWidth == null ? null : Math.max(MINIMUM_PART_WIDTH, viewerWidth);
+		_sashWidth = _viewerWidth;
 	}
 }

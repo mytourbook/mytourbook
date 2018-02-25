@@ -91,6 +91,15 @@ public class Util {
 	public static final String	UNIQUE_ID_SUFFIX_SUUNTO3				= "73198";				//$NON-NLS-1$
 
 	/*
+	 * Default xml tags
+	 */
+	private static final String	TAG_ITEM								= "item";				//$NON-NLS-1$
+	private static final String	TAG_LIST								= "list";				//$NON-NLS-1$
+
+	private static final String	ATTR_KEY								= "key";				//$NON-NLS-1$
+	private static final String	ATTR_VALUE								= "value";				//$NON-NLS-1$
+
+	/*
 	 * default xml attributes
 	 */
 	public static final String	ATTR_ROOT_DATETIME						= "Created";			//$NON-NLS-1$
@@ -102,6 +111,7 @@ public class Util {
 	public static final String	ATTR_COLOR_RED							= "red";				//$NON-NLS-1$
 	public static final String	ATTR_COLOR_GREEN						= "green";				//$NON-NLS-1$
 	public static final String	ATTR_COLOR_BLUE							= "blue";				//$NON-NLS-1$
+
 
 	public static final String	CSV_FILE_EXTENSION						= "csv";				//$NON-NLS-1$
 
@@ -810,14 +820,6 @@ public class Util {
 
 		final long unitFinal = (long) (unitRounded * multiplier);
 
-//		System.out.println(UI.timeStampNano());
-//		System.out.println(UI.timeStampNano() + ("\tdefaultUnitValue\t" + defaultUnitValue));
-//		System.out.println(UI.timeStampNano() + ("\tunit\t\t\t" + unit));
-//		System.out.println(UI.timeStampNano() + ("\tunitRounded\t\t" + unitRounded));
-//		System.out.println(UI.timeStampNano() + ("\tunitFinal\t\t" + unitFinal));
-//		System.out.println(UI.timeStampNano() + ("\tmultiplier\t\t" + multiplier));
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
 		return unitFinal;
 	}
 
@@ -1501,6 +1503,47 @@ public class Util {
 	}
 
 	/**
+	 * Get long array from xml list/item tags.
+	 * 
+	 * @param memento
+	 * @param listKeyName
+	 * @return
+	 */
+	public static long[] getXmlLongArray(final XMLMemento memento, final String listKeyName) {
+
+		// setup return value
+		long[] values = new long[] {};
+
+		final IMemento[] mementoAllList = memento.getChildren(TAG_LIST);
+
+		// loop: all <list>
+		for (final IMemento mementoList : mementoAllList) {
+
+			final String listKey = mementoList.getString(ATTR_KEY);
+
+			if (listKeyName.equals(listKey)) {
+
+				final IMemento[] mementoAllItem = mementoList.getChildren(TAG_ITEM);
+
+				// adjust return value
+				values = new long[mementoAllItem.length];
+
+				// loop: all <item>
+				for (int valueIndex = 0; valueIndex < mementoAllItem.length; valueIndex++) {
+
+					final String valueText = mementoAllItem[valueIndex].getString(ATTR_VALUE);
+
+					if (valueText != null) {
+						values[valueIndex] = Long.valueOf(valueText);
+					}
+				}
+			}
+		}
+
+		return values;
+	}
+
+	/**
 	 * @param xmlMemento
 	 * @param defaultValue
 	 * @return Returns {@link RGB} from the attributes red, green and blue attributes.
@@ -1960,14 +2003,6 @@ public class Util {
 
 		final long unitFinal = (long) (unitRounded * multiplier);
 
-//		System.out.println(UI.timeStampNano());
-//		System.out.println(UI.timeStampNano() + ("\tdefaultUnitValue\t" + defaultUnitValue));
-//		System.out.println(UI.timeStampNano() + ("\tunit\t\t\t" + unit));
-//		System.out.println(UI.timeStampNano() + ("\tunitRounded\t\t" + unitRounded));
-//		System.out.println(UI.timeStampNano() + ("\tunitFinal\t\t" + unitFinal));
-//		System.out.println(UI.timeStampNano() + ("\tmultiplier\t\t" + multiplier));
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
 		return unitFinal;
 	}
 
@@ -2271,6 +2306,25 @@ public class Util {
 	}
 
 	/**
+	 * Set values into xml list/item tags.
+	 * 
+	 * @param memento
+	 * @param listKeyName
+	 * @param values
+	 */
+	public static void setXmlLongArray(final IMemento memento, final String listKeyName, final long[] values) {
+
+		final IMemento mementoList = memento.createChild(TAG_LIST);
+
+		mementoList.putString(ATTR_KEY, listKeyName);
+
+		for (final long value : values) {
+
+			mementoList.createChild(TAG_ITEM).putString(ATTR_VALUE, Long.toString(value));
+		}
+	}
+
+	/**
 	 * Creates a child for the color.
 	 * 
 	 * @param xmlColor
@@ -2380,4 +2434,5 @@ public class Util {
 			StatusUtil.log(e);
 		}
 	}
+
 }

@@ -42,11 +42,17 @@ public class TourTagFilterManager {
 
 	private static final String	TOUR_FILTER_FILE_NAME		= "tour-tag-filter.xml";	//$NON-NLS-1$
 	private static final int	TOUR_FILTER_VERSION			= 1;
-	private static final String	TAG_PROFILE					= "Profile";				//$NON-NLS-1$
 
-	private static final String	TAG_PROPERTY				= "Property";				//$NON-NLS-1$
-	private static final String	TAG_ROOT					= "TourFilterProfiles";		//$NON-NLS-1$
-	private static final String	ATTR_TOUR_FILTER_VERSION	= "tourFilterVersion";		//$NON-NLS-1$
+	private static final String	TAG_PROFILE					= "Profile";				//$NON-NLS-1$
+	private static final String	TAG_ROOT					= "TourTagFilterProfiles";	//$NON-NLS-1$
+
+	private static final String	ATTR_TOUR_FILTER_VERSION	= "tourTagFilterVersion";	//$NON-NLS-1$
+	private static final String	ATTR_IS_ENABLED				= "isEnabled";				//$NON-NLS-1$
+	private static final String	ATTR_IS_SELECTED			= "isSelected";				//$NON-NLS-1$
+	private static final String	ATTR_FIELD_ID				= "fieldId";				//$NON-NLS-1$
+	private static final String	ATTR_FIELD_OPERATOR			= "fieldOperator";			//$NON-NLS-1$
+	private static final String	ATTR_NAME					= "name";					//$NON-NLS-1$
+	private static final String	ATTR_TAG_ID					= "tagIds";					//$NON-NLS-1$
 
 	static {}
 
@@ -173,47 +179,23 @@ public class TourTagFilterManager {
 				for (final IMemento mementoChild : xmlRoot.getChildren()) {
 
 					final XMLMemento xmlProfile = (XMLMemento) mementoChild;
-//					if (TAG_PROFILE.equals(xmlProfile.getType())) {
-//
-//						final TourFilterProfile tourFilterProfile = new TourFilterProfile();
-//
-//						tourFilterProfile.name = Util.getXmlString(xmlProfile, ATTR_NAME, UI.EMPTY_STRING);
-//
-//						_filterProfiles.add(tourFilterProfile);
-//
-//						// set selected profile
-//						if (Util.getXmlBoolean(xmlProfile, ATTR_IS_SELECTED, false)) {
-//							_selectedProfile = tourFilterProfile;
-//						}
-//
-//						// loop: all properties
-//						for (final IMemento mementoProperty : xmlProfile.getChildren(TAG_PROPERTY)) {
-//
-//							final XMLMemento xmlProperty = (XMLMemento) mementoProperty;
-//
-//							final TourFilterFieldId fieldId = (TourFilterFieldId) Util.getXmlEnum(//
-//									xmlProperty,
-//									ATTR_FIELD_ID,
-//									TourFilterFieldId.TIME_TOUR_DATE);
-//
-//							final TourFilterFieldOperator fieldOperator = (TourFilterFieldOperator) Util.getXmlEnum(//
-//									xmlProperty,
-//									ATTR_FIELD_OPERATOR,
-//									TourFilterFieldOperator.EQUALS);
-//
-//							final TourFilterFieldConfig fieldConfig = getFieldConfig(fieldId);
-//
-//							final TourFilterProperty filterProperty = new TourFilterProperty();
-//
-//							filterProperty.fieldConfig = fieldConfig;
-//							filterProperty.fieldOperator = fieldOperator;
-//							filterProperty.isEnabled = Util.getXmlBoolean(xmlProperty, ATTR_IS_ENABLED, true);
-//
-//							readFilterProfile_10_PropertyDetail(xmlProperty, filterProperty);
-//
-//							tourFilterProfile.filterProperties.add(filterProperty);
-//						}
-//					}
+					if (TAG_PROFILE.equals(xmlProfile.getType())) {
+
+						final TourTagFilterProfile tagFilterProfile = new TourTagFilterProfile();
+
+						tagFilterProfile.name = Util.getXmlString(xmlProfile, ATTR_NAME, UI.EMPTY_STRING);
+
+						_filterProfiles.add(tagFilterProfile);
+
+						// set selected profile
+						if (Util.getXmlBoolean(xmlProfile, ATTR_IS_SELECTED, false)) {
+							_selectedProfile = tagFilterProfile;
+						}
+
+						final long[] tagIds = Util.getXmlLongArray(xmlProfile, ATTR_TAG_ID);
+
+						tagFilterProfile.tagFilterIds.addAll(tagIds);
+					}
 				}
 
 			} catch (final Exception e) {
@@ -253,9 +235,9 @@ public class TourTagFilterManager {
 		fireFilterModifyEvent();
 	}
 
-	static void setSelectedProfile(final TourTagFilterProfile _selectedProfile) {
-		// TODO Auto-generated method stub
+	static void setSelectedProfile(final TourTagFilterProfile selectedProfile) {
 
+		_selectedProfile = selectedProfile;
 	}
 
 	public static void setTourTagFilterAction(final ActionTourTagFilter actionTourTagFilter) {
@@ -275,32 +257,19 @@ public class TourTagFilterManager {
 			xmlRoot = writeFilterProfile_10_Root();
 
 			// loop: profiles
-//			for (final TourFilterProfile tourFilterProfile : _filterProfiles) {
-//
-//				final IMemento xmlProfile = xmlRoot.createChild(TAG_PROFILE);
-//
-//				xmlProfile.putString(ATTR_NAME, tourFilterProfile.name);
-//
-//				// set flag for active profile
-//				if (tourFilterProfile == _selectedProfile) {
-//					xmlProfile.putBoolean(ATTR_IS_SELECTED, true);
-//				}
-//
-//				// loop: properties
-//				for (final TourFilterProperty filterProperty : tourFilterProfile.filterProperties) {
-//
-//					final TourFilterFieldConfig fieldConfig = filterProperty.fieldConfig;
-//					final TourFilterFieldOperator fieldOperator = filterProperty.fieldOperator;
-//
-//					final IMemento xmlProperty = xmlProfile.createChild(TAG_PROPERTY);
-//
-//					Util.setXmlEnum(xmlProperty, ATTR_FIELD_ID, fieldConfig.fieldId);
-//					Util.setXmlEnum(xmlProperty, ATTR_FIELD_OPERATOR, fieldOperator);
-//					xmlProperty.putBoolean(ATTR_IS_ENABLED, filterProperty.isEnabled);
-//
-//					writeFilterProfile_20_PropertyDetail(xmlProperty, filterProperty);
-//				}
-//			}
+			for (final TourTagFilterProfile tagFilterProfile : _filterProfiles) {
+
+				final IMemento xmlProfile = xmlRoot.createChild(TAG_PROFILE);
+
+				xmlProfile.putString(ATTR_NAME, tagFilterProfile.name);
+
+				// set flag for active profile
+				if (tagFilterProfile == _selectedProfile) {
+					xmlProfile.putBoolean(ATTR_IS_SELECTED, true);
+				}
+
+				Util.setXmlLongArray(xmlProfile, ATTR_TAG_ID, tagFilterProfile.tagFilterIds.toArray());
+			}
 
 		} catch (final Exception e) {
 			StatusUtil.log(e);
