@@ -1895,6 +1895,8 @@ public class Messages extends NLS {
 	public static String		Slideout_TourMarkerFilter_Label_GeoFilterArea;
 	public static String		Slideout_TourMarkerFilter_Label_GeoFilterNotAvailable;
 
+	public static String		Slideout_TourTagFilter_Label_AllTags;
+	public static String		Slideout_TourTagFilter_Label_SelectedTags;
 	public static String		Slideout_TourTagFilter_Label_Title;
 
 	public static String		Slideout_TrainingOptions_Label_Title;

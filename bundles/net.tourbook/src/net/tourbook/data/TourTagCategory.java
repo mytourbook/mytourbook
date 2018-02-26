@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -49,16 +49,15 @@ public class TourTagCategory implements Comparable<Object> {
 	private String						name;
 
 	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(
-	joinColumns = @JoinColumn(name = "TOURTAGCATEGORY_TagCategoryID", referencedColumnName = "TagCategoryId"), //
-	inverseJoinColumns = @JoinColumn(name = "TOURTAG_TagID", referencedColumnName = "TagId") //
+	@JoinTable(joinColumns = @JoinColumn(name = "TOURTAGCATEGORY_TagCategoryID", referencedColumnName = "TagCategoryId"), //
+			inverseJoinColumns = @JoinColumn(name = "TOURTAG_TagID", referencedColumnName = "TagId") //
 	)
 	private final Set<TourTag>			tourTags			= new HashSet<TourTag>();
 
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(//
-	joinColumns = @JoinColumn(name = "TOURTAGCATEGORY_TagCategoryID1", referencedColumnName = "TagCategoryId"), //
-	inverseJoinColumns = @JoinColumn(name = "TOURTAGCATEGORY_TagCategoryID2", referencedColumnName = "TagCategoryId")//
+			joinColumns = @JoinColumn(name = "TOURTAGCATEGORY_TagCategoryID1", referencedColumnName = "TagCategoryId"), //
+			inverseJoinColumns = @JoinColumn(name = "TOURTAGCATEGORY_TagCategoryID2", referencedColumnName = "TagCategoryId")//
 	)
 	private final Set<TourTagCategory>	tourTagCategory		= new HashSet<TourTagCategory>();
 
@@ -83,6 +82,7 @@ public class TourTagCategory implements Comparable<Object> {
 		name = categoryName;
 	}
 
+	@Override
 	public int compareTo(final Object obj) {
 
 		if (obj instanceof TourTagCategory) {
@@ -152,13 +152,14 @@ public class TourTagCategory implements Comparable<Object> {
 
 	@Override
 	public String toString() {
-		final String category = "TourTagCategory ID:" + tagCategoryId + "\tisRoot:" + isRoot + "\t" + name; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-//		if (tourTagCategory.size() > 0) {
-//			category += UI.NEW_LINE + "\tchildren:";
-//			for (final TourTagCategory ttCategory : tourTagCategory) {
-//				category += UI.NEW_LINE + "\t" + ttCategory.toString();
-//			}
-//		}
+
+		final String category = "TourTagCategory" //$NON-NLS-1$
+
+				+ "\t" + name //$NON-NLS-1$
+				+ "\tID:" + tagCategoryId //$NON-NLS-1$
+				+ "\tisRoot:" + isRoot //$NON-NLS-1$
+		;
+
 		return category;
 	}
 

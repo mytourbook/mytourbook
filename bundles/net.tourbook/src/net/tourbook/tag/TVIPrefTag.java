@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,7 +21,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 
 public class TVIPrefTag extends TVIPrefTagItem {
 
-	private TourTag	_tourTag;
+	private TourTag _tourTag;
 
 	public TVIPrefTag(final TreeViewer tagViewer, final TourTag tourTag) {
 		super(tagViewer);
@@ -44,6 +44,16 @@ public class TVIPrefTag extends TVIPrefTagItem {
 
 	public void setTourTag(final TourTag savedTag) {
 		_tourTag = savedTag;
+	}
+
+	@Override
+	public String toString() {
+
+		return "TVIPrefTag [" //$NON-NLS-1$
+
+				+ "_tourTag=" + _tourTag //$NON-NLS-1$
+
+				+ "]"; //$NON-NLS-1$
 	}
 
 }
