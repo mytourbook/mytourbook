@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tag.tour.filter;
 
-import gnu.trove.list.array.TLongArrayList;
+import gnu.trove.set.hash.TLongHashSet;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -138,6 +138,10 @@ public class SlideoutTourTagFilter extends AdvancedSlideout {
 	private boolean			_tagViewerItem_IsChecked;
 	private boolean			_tagViewerItem_IsKeyPressed;
 	private Object			_tagViewerItem_Data;
+
+	private boolean			_tagCloudViewerItem_IsChecked;
+	private boolean			_tagCloudViewerItem_IsKeyPressed;
+	private Object			_tagCloudViewerItem_Data;
 
 	private long			_expandRunnableCounter;
 	private boolean			_isLiveUpdate;
@@ -657,6 +661,28 @@ public class SlideoutTourTagFilter extends AdvancedSlideout {
 
 		table.setLayout(new TableLayout());
 
+		table.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(final SelectionEvent event) {
+
+				/*
+				 * The tag cloud viewer selection event can have another selection !!!
+				 */
+
+				_tagCloudViewerItem_IsChecked = event.detail == SWT.CHECK;
+				_tagCloudViewerItem_Data = event.item.getData();
+			}
+		});
+
+		table.addKeyListener(new KeyAdapter() {
+
+			@Override
+			public void keyPressed(final KeyEvent e) {
+				_tagCloudViewerItem_IsKeyPressed = true;
+			}
+		});
+
 		_tagCloudViewer = new CheckboxTableViewer(table);
 
 		/*
@@ -692,15 +718,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout {
 		_tagCloudViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
-
-			}
-		});
-
-		_tagCloudViewer.addDoubleClickListener(new IDoubleClickListener() {
-
-			@Override
-			public void doubleClick(final DoubleClickEvent event) {
-
+				onTagCloud_Select(event);
 			}
 		});
 	}
@@ -789,7 +807,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout {
 		_tagViewer.addCheckStateListener(new ICheckStateListener() {
 			@Override
 			public void checkStateChanged(final CheckStateChangedEvent event) {
-				updateUI();
+				update_FromTagViewer();
 			}
 		});
 
@@ -1039,6 +1057,42 @@ public class SlideoutTourTagFilter extends AdvancedSlideout {
 		return itemBounds;
 	}
 
+	private long[] getTagIds_FromTagCloud() {
+
+		final TLongHashSet tagIds = new TLongHashSet();
+
+		final Object[] checkedElements = _tagCloudViewer.getCheckedElements();
+
+		for (final Object object : checkedElements) {
+
+			if (object instanceof TagCloud) {
+				tagIds.add(((TagCloud) object).tagId);
+			}
+		}
+
+		return tagIds.toArray();
+	}
+
+	private long[] getTagIds_FromTagViewer() {
+
+		final TLongHashSet tagIds = new TLongHashSet();
+
+		final Object[] checkedElements = _tagViewer.getCheckedElements();
+
+		for (final Object object : checkedElements) {
+
+			if (object instanceof TVIPrefTag) {
+
+				final TVIPrefTag tagItem = (TVIPrefTag) object;
+				final long tagId = tagItem.getTourTag().getTagId();
+
+				tagIds.add(tagId);
+			}
+		}
+
+		return tagIds.toArray();
+	}
+
 	/**
 	 * Traverses all tag viewer items until a tag items is found Recursive !
 	 * 
@@ -1273,32 +1327,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout {
 				_txtProfileName.setFocus();
 			}
 
-			final long[] tagIds = selectedProfile.tagFilterIds.toArray();
-
-			/*
-			 * Update tag cloud
-			 */
-			updateUI_TagCloud(tagIds);
-
-			/*
-			 * Update tag viewer
-			 */
-			final ArrayList<TVIPrefTag> tagItems = new ArrayList<>(tagIds.length);
-
-			if (tagIds.length > 0) {
-
-				// get all tag viewer items which should be checked
-
-				final ArrayList<TreeViewerItem> rootItems = _tagViewerRootItem.getFetchedChildren();
-
-				for (final long tagId : tagIds) {
-
-					// Recursive !!!
-					getTagItems(rootItems, tagItems, tagId);
-				}
-			}
-
-			_tagViewer.setCheckedElements(tagItems.toArray());
+			update_FromProfile();
 		}
 
 		fireModifyEvent();
@@ -1342,7 +1371,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout {
 				_tagViewer.setChecked(tviTag, !isChecked);
 			}
 
-			updateUI();
+			update_FromTagViewer();
 
 		} else if (selection instanceof TVIPrefTagCategory) {
 
@@ -1488,6 +1517,48 @@ public class SlideoutTourTagFilter extends AdvancedSlideout {
 		_isExpandingSelection = false;
 	}
 
+	private void onTagCloud_Select(final SelectionChangedEvent event) {
+
+		if (_tagCloudViewerItem_IsKeyPressed && _tagCloudViewerItem_IsChecked == false) {
+
+			// ignore when only selected with keyboard and not checked
+
+			return;
+		}
+
+		Object selection;
+
+		if (_tagCloudViewerItem_IsChecked) {
+
+			// a checkbox is checked
+
+			selection = _tagCloudViewerItem_Data;
+
+		} else {
+
+			selection = ((IStructuredSelection) event.getSelection()).getFirstElement();
+		}
+
+		if (selection instanceof TagCloud) {
+
+			// tag is selected
+
+			final TagCloud tagCloud = (TagCloud) selection;
+
+			// toggle tag
+			if (_tagCloudViewerItem_IsChecked == false) {
+
+				// tag is selected and NOT the checkbox !!!
+
+				final boolean isChecked = _tagCloudViewer.getChecked(tagCloud);
+
+				_tagCloudViewer.setChecked(tagCloud, !isChecked);
+			}
+
+			update_FromTagCloud();
+		}
+	}
+
 	private void restoreState() {
 
 		/*
@@ -1520,43 +1591,43 @@ public class SlideoutTourTagFilter extends AdvancedSlideout {
 		table.setSelection(table.getSelectionIndices());
 	}
 
-	private void updateUI() {
+	private void update_FromProfile() {
+
+		final long[] tagIds = _selectedProfile.tagFilterIds.toArray();
+
+		updateTags_TagCloud(tagIds);
+		updateTags_TagViewer(tagIds);
+	}
+
+	private void update_FromTagCloud() {
 
 		if (_selectedProfile == null) {
 			return;
 		}
 
-		final long[] tagIds = updateUI_Profile(_selectedProfile);
+		final long[] tagIds = getTagIds_FromTagCloud();
 
-		updateUI_TagCloud(tagIds);
+		updateTags_TagProfile(_selectedProfile, tagIds);
+		updateTags_TagViewer(tagIds);
 	}
 
-	private long[] updateUI_Profile(final TourTagFilterProfile profile) {
+	private void update_FromTagViewer() {
 
-		final Object[] checkedElements = _tagViewer.getCheckedElements();
-
-		final TLongArrayList tagIds = profile.tagFilterIds;
-
-		tagIds.clear();
-
-		for (final Object object : checkedElements) {
-
-			if (object instanceof TVIPrefTag) {
-
-				final TVIPrefTag tagItem = (TVIPrefTag) object;
-				final long tagId = tagItem.getTourTag().getTagId();
-
-				tagIds.add(tagId);
-			}
+		if (_selectedProfile == null) {
+			return;
 		}
 
-		_profileViewer.update(profile, null);
+		final long[] tagIds = getTagIds_FromTagViewer();
 
-		return tagIds.toArray();
+		updateTags_TagProfile(_selectedProfile, tagIds);
+		updateTags_TagCloud(tagIds);
 	}
 
-	private void updateUI_TagCloud(final long[] tagIds) {
+	private void updateTags_TagCloud(final long[] tagIds) {
 
+		/*
+		 * Update model
+		 */
 		_tagCloudItems.clear();
 
 		final HashMap<Long, TourTag> allTourTags = TourDatabase.getAllTourTags();
@@ -1568,10 +1639,48 @@ public class SlideoutTourTagFilter extends AdvancedSlideout {
 			_tagCloudItems.add(new TagCloud(tagId, tourTag.getTagName()));
 		}
 
+		/*
+		 * Update UI
+		 */
+		// reload viewer
 		_tagCloudViewer.setInput(EMPTY_LIST);
 
 		// check all
 		_tagCloudViewer.setCheckedElements(_tagCloudItems.toArray());
+	}
+
+	private void updateTags_TagProfile(final TourTagFilterProfile profile, final long[] tagIds) {
+
+		// update model
+		final TLongHashSet profileTagFilterIds = profile.tagFilterIds;
+		profileTagFilterIds.clear();
+		profileTagFilterIds.addAll(tagIds);
+
+		// update UI
+		_profileViewer.update(profile, null);
+	}
+
+	private void updateTags_TagViewer(final long[] tagIds) {
+
+		/*
+		 * Update UI
+		 */
+		final ArrayList<TVIPrefTag> tagItems = new ArrayList<>(tagIds.length);
+
+		if (tagIds.length > 0) {
+
+			// get all tag viewer items which should be checked
+
+			final ArrayList<TreeViewerItem> rootItems = _tagViewerRootItem.getFetchedChildren();
+
+			for (final long tagId : tagIds) {
+
+				// Is recursive !!!
+				getTagItems(rootItems, tagItems, tagId);
+			}
+		}
+
+		_tagViewer.setCheckedElements(tagItems.toArray());
 	}
 
 }

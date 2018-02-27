@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tag.tour.filter;
 
-import gnu.trove.list.array.TLongArrayList;
+import gnu.trove.set.hash.TLongHashSet;
 
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
@@ -23,16 +23,16 @@ import net.tourbook.common.util.StatusUtil;
 
 public class TourTagFilterProfile {
 
-	private static int	_idCounter			= 0;
+	private static int	_idCounter		= 0;
 
 	int					profileId;
 
 	/**
 	 * Profile name
 	 */
-	String				name				= Messages.Tour_Filter_Default_ProfileName;
+	String				name			= Messages.Tour_Filter_Default_ProfileName;
 
-	TLongArrayList		tagFilterIds	= new TLongArrayList();
+	TLongHashSet		tagFilterIds	= new TLongHashSet();
 
 	public TourTagFilterProfile() {
 
@@ -53,7 +53,7 @@ public class TourTagFilterProfile {
 			// create a unique name
 			clonedObject.name = name + UI.SPACE + Integer.toString(clonedObject.profileId);
 
-			clonedObject.tagFilterIds = new TLongArrayList(tagFilterIds.toArray());
+			clonedObject.tagFilterIds = new TLongHashSet(tagFilterIds.toArray());
 
 		} catch (final CloneNotSupportedException e) {
 			StatusUtil.log(e);
