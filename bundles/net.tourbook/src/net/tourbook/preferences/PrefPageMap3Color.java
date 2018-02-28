@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,6 +31,7 @@ import net.tourbook.common.color.RGBVertex;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
+import net.tourbook.common.util.ITreeViewer;
 import net.tourbook.common.util.TreeColumnDefinition;
 import net.tourbook.common.util.Util;
 import net.tourbook.map2.view.TourMapPainter;
@@ -70,6 +71,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.osgi.util.NLS;
@@ -101,7 +103,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPreferencePage, IMap3ColorUpdater,
-		ITourViewer {
+		ITourViewer, ITreeViewer {
 
 	public static final String							ID									= "net.tourbook.preferences.PrefPageMap3Color";	//$NON-NLS-1$
 
@@ -1204,6 +1206,11 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 		}
 
 		return image;
+	}
+
+	@Override
+	public TreeViewer getTreeViewer() {
+		return _colorProfileViewer;
 	}
 
 	@Override

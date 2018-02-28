@@ -26,6 +26,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
+import net.tourbook.common.util.ITreeViewer;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
@@ -93,7 +94,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 
-public class PrefPageTags extends PreferencePage implements IWorkbenchPreferencePage, ITourViewer {
+public class PrefPageTags extends PreferencePage implements IWorkbenchPreferencePage, ITourViewer, ITreeViewer {
 
 	public static final String		ID				= "net.tourbook.preferences.PrefPageTags";			//$NON-NLS-1$
 
@@ -640,6 +641,11 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 	public TVIPrefTagRoot getRootItem() {
 		return _rootItem;
+	}
+
+	@Override
+	public TreeViewer getTreeViewer() {
+		return _tagViewer;
 	}
 
 	@Override

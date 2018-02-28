@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,42 +19,41 @@ import java.util.Iterator;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.util.ITourViewer;
+import net.tourbook.common.util.ITreeViewer;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Tree;
 
 public class ActionExpandSelection extends Action {
 
-	private ITourViewer	_tourViewer;
+	private ITreeViewer	_treeViewerProvider;
 
 	private int			_expandLevels	= 2;
 
-	public ActionExpandSelection(final ITourViewer tourViewer) {
+	public ActionExpandSelection(final ITreeViewer treeViewerProvider) {
 
 		super(null, AS_PUSH_BUTTON);
 
-		_tourViewer = tourViewer;
+		_treeViewerProvider = treeViewerProvider;
 
 		setText(Messages.app_action_expand_selection_tooltip);
-
 		setToolTipText(Messages.app_action_expand_selection_tooltip);
+
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__expand_all));
 	}
 
 	/**
-	 * @param tourViewer
+	 * @param treeViewer
 	 * @param expandLevels
 	 *            Number of tree levels which should be expanded, default is 2.
 	 *            <p>
 	 *            All levels can be expanded with {@link TreeViewer#ALL_LEVELS}.
 	 */
-	public ActionExpandSelection(final ITourViewer tourViewer, final int expandLevels) {
+	public ActionExpandSelection(final ITreeViewer treeViewer, final int expandLevels) {
 
-		this(tourViewer);
+		this(treeViewer);
 
 		_expandLevels = expandLevels;
 	}
@@ -62,28 +61,29 @@ public class ActionExpandSelection extends Action {
 	@Override
 	public void run() {
 
-		if (_tourViewer == null) {
+		if (_treeViewerProvider == null) {
 			return;
 		}
 
-		final ColumnViewer viewer = _tourViewer.getViewer();
-		if (viewer instanceof TreeViewer) {
+		final TreeViewer treeViewer = _treeViewerProvider.getTreeViewer();
 
-			final TreeViewer treeViewer = (TreeViewer) viewer;
-			final ITreeSelection selection = (ITreeSelection) treeViewer.getSelection();
-
-			if (selection.size() == 0) {
-				return;
-			}
-
-			final Tree tree = treeViewer.getTree();
-			tree.setRedraw(false);
-			{
-				for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
-					treeViewer.expandToLevel(iterator.next(), _expandLevels);
-				}
-			}
-			tree.setRedraw(true);
+		if (treeViewer == null) {
+			return;
 		}
+
+		final ITreeSelection selection = (ITreeSelection) treeViewer.getSelection();
+
+		if (selection.size() == 0) {
+			return;
+		}
+
+		final Tree tree = treeViewer.getTree();
+		tree.setRedraw(false);
+		{
+			for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
+				treeViewer.expandToLevel(iterator.next(), _expandLevels);
+			}
+		}
+		tree.setRedraw(true);
 	}
 }

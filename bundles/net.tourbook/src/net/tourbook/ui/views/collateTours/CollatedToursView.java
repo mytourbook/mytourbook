@@ -32,6 +32,7 @@ import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer3;
+import net.tourbook.common.util.ITreeViewer;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.TreeColumnDefinition;
 import net.tourbook.common.util.TreeViewerItem;
@@ -124,34 +125,34 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
-public class CollatedToursView extends ViewPart implements ITourProvider, ITourViewer3, ITourProviderByID {
+public class CollatedToursView extends ViewPart implements ITourProvider, ITourViewer3, ITourProviderByID, ITreeViewer {
 
-	static public final String							ID						= "net.tourbook.ui.views.collateTours.CollatedToursView";	//$NON-NLS-1$
+	static public final String	ID	= "net.tourbook.ui.views.collateTours.CollatedToursView";	//$NON-NLS-1$
 
-	private static Styler								DATE_STYLER;
+	private static Styler		DATE_STYLER;
 
 	static {
 
 		DATE_STYLER = StyledString.createColorRegistryStyler(net.tourbook.ui.UI.VIEW_COLOR_SUB, null);
 	}
 
-	private final IPreferenceStore						_prefStore				= TourbookPlugin.getPrefStore();
-	private final IDialogSettings						_state					= TourbookPlugin.getState(ID);
+	private final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
+	private final IDialogSettings	_state		= TourbookPlugin.getState(ID);
 	//
-	private ColumnManager								_columnManager;
-	private OpenDialogManager							_openDlgMgr				= new OpenDialogManager();
+	private ColumnManager			_columnManager;
+	private OpenDialogManager		_openDlgMgr	= new OpenDialogManager();
 	//
-	private PostSelectionProvider						_postSelectionProvider;
-	private ISelectionListener							_postSelectionListener;
-	private IPartListener2								_partListener;
-	private ITourEventListener							_tourPropertyListener;
-	private IPropertyChangeListener						_prefChangeListener;
+	private PostSelectionProvider	_postSelectionProvider;
+	private ISelectionListener		_postSelectionListener;
+	private IPartListener2			_partListener;
+	private ITourEventListener		_tourPropertyListener;
+	private IPropertyChangeListener	_prefChangeListener;
 	//
-	private TVICollatedTour_Root						_rootItem;
+	private TVICollatedTour_Root	_rootItem;
 	//
-	private final NumberFormat							_nf0;
-	private final NumberFormat							_nf1;
-	private final NumberFormat							_nf1_NoGroup;
+	private final NumberFormat		_nf0;
+	private final NumberFormat		_nf1;
+	private final NumberFormat		_nf1_NoGroup;
 
 	{
 		_nf0 = NumberFormat.getNumberInstance();
@@ -694,9 +695,10 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				if (element instanceof TVICollatedTour_Tour) {
 
 					// tour item
-					cell.setText(TimeTools//
-							.getZonedDateTime(tourItem.colTourStartTime)
-							.format(TimeTools.Formatter_Date_S));
+					cell.setText(
+							TimeTools//
+									.getZonedDateTime(tourItem.colTourStartTime)
+									.format(TimeTools.Formatter_Date_S));
 
 				} else if (element instanceof TVICollatedTour_Event) {
 
@@ -1682,7 +1684,8 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
-				final int windSpeed = (int) (((TVICollatedTour) element).colWindSpd / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
+				final int windSpeed = (int) (((TVICollatedTour) element).colWindSpd
+						/ net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
 
 				if (windSpeed == 0) {
 					cell.setText(UI.EMPTY_STRING);
@@ -1782,11 +1785,12 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 		_actionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
 
 		_actionCollapseOthers.setEnabled(selectedItems == 1 && firstElementHasChildren);
-		_actionExpandSelection.setEnabled(firstElement == null //
-				? false
-				: selectedItems == 1 //
-						? firstElementHasChildren
-						: true);
+		_actionExpandSelection.setEnabled(
+				firstElement == null //
+						? false
+						: selectedItems == 1 //
+								? firstElementHasChildren
+								: true);
 
 		_tagMenuMgr.enableTagActions(isTourSelected, isOneTour, firstTour == null ? null : firstTour.getTagIds());
 
@@ -1949,6 +1953,11 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	 */
 	Shell getShell() {
 		return _tourViewer.getTree().getShell();
+	}
+
+	@Override
+	public TreeViewer getTreeViewer() {
+		return _tourViewer;
 	}
 
 	@Override

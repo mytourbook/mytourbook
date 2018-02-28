@@ -29,6 +29,7 @@ import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
+import net.tourbook.common.util.ITreeViewer;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.TreeColumnDefinition;
 import net.tourbook.common.util.TreeViewerItem;
@@ -115,7 +116,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
-public class TaggingView extends ViewPart implements ITourProvider, ITourViewer {
+public class TaggingView extends ViewPart implements ITourProvider, ITourViewer, ITreeViewer {
 
 	static public final String				ID								= "net.tourbook.views.tagViewID";					//$NON-NLS-1$
 
@@ -1436,6 +1437,11 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 //
 //		return Platform.getAdapterManager().getAdapter(this, adapter);
 //	}
+
+	@Override
+	public TreeViewer getTreeViewer() {
+		return _tagViewer;
+	}
 
 	@Override
 	public ColumnViewer getViewer() {

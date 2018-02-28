@@ -21,7 +21,7 @@ import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 
-public class TourTagFilterProfile {
+public class TourTagFilterProfile implements Cloneable {
 
 	private static int	_idCounter		= 0;
 

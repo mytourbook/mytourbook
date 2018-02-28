@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,22 +17,25 @@ package net.tourbook.ui.action;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.util.ITourViewer;
+import net.tourbook.common.util.ITreeViewer;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Tree;
 
 public class ActionExpandAll extends Action {
 
-	private ITourViewer	_tourViewer;
+	private ITreeViewer _treeViewerProvider;
 
-	public ActionExpandAll(final ITourViewer tourViewer) {
+	/**
+	 * @param treeViewerProvider
+	 *            {@link TreeViewer} which should be expanded.
+	 */
+	public ActionExpandAll(final ITreeViewer treeViewerProvider) {
 
 		super(null, AS_PUSH_BUTTON);
 
-		_tourViewer = tourViewer;
+		_treeViewerProvider = treeViewerProvider;
 
 		setText(Messages.App_Action_Expand_All_Tooltip);
 		setToolTipText(Messages.App_Action_Expand_All_Tooltip);
@@ -43,23 +46,22 @@ public class ActionExpandAll extends Action {
 	@Override
 	public void run() {
 
-		if (_tourViewer == null) {
+		if (_treeViewerProvider == null) {
 			return;
 		}
 
-		final ColumnViewer viewer = _tourViewer.getViewer();
-		if (viewer instanceof TreeViewer) {
-
-			final TreeViewer treeViewer = (TreeViewer) viewer;
-			final Tree tree = treeViewer.getTree();
-
-			// disable redraw that the UI in not flickering
-			tree.setRedraw(false);
-			{
-				treeViewer.expandAll();
-			}
-			tree.setRedraw(true);
-
+		final TreeViewer treeViewer = _treeViewerProvider.getTreeViewer();
+		if (treeViewer == null) {
+			return;
 		}
+
+		final Tree tree = treeViewer.getTree();
+
+		// disable redraw that the UI in not flickering
+		tree.setRedraw(false);
+		{
+			treeViewer.expandAll();
+		}
+		tree.setRedraw(true);
 	}
 }
