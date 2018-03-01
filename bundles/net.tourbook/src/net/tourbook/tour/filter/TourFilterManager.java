@@ -825,7 +825,7 @@ public class TourFilterManager {
 	 * @return Returns sql data for the selected tour filter profile or <code>null</code> when not
 	 *         available.
 	 */
-	public static TourFilterSQLData getSQL() {
+	public static SQLFilterData getSQL() {
 
 		if (_isTourFilterEnabled == false || _selectedProfile == null) {
 
@@ -1014,7 +1014,7 @@ public class TourFilterManager {
 			}
 		}
 
-		final TourFilterSQLData tourFilterSQLData = new TourFilterSQLData(sqlWhere.toString(), sqlParameters);
+		final SQLFilterData tourFilterSQLData = new SQLFilterData(sqlWhere.toString(), sqlParameters);
 
 		return tourFilterSQLData;
 	}

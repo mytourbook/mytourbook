@@ -27,7 +27,7 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.filter.TourFilterSQLData;
+import net.tourbook.tour.filter.SQLFilterData;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
@@ -47,12 +47,12 @@ public class TourTagFilterManager {
 	private static final String	TAG_ROOT					= "TourTagFilterProfiles";	//$NON-NLS-1$
 
 	private static final String	ATTR_TOUR_FILTER_VERSION	= "tourTagFilterVersion";	//$NON-NLS-1$
-	private static final String	ATTR_IS_ENABLED				= "isEnabled";				//$NON-NLS-1$
 	private static final String	ATTR_IS_SELECTED			= "isSelected";				//$NON-NLS-1$
-	private static final String	ATTR_FIELD_ID				= "fieldId";				//$NON-NLS-1$
-	private static final String	ATTR_FIELD_OPERATOR			= "fieldOperator";			//$NON-NLS-1$
 	private static final String	ATTR_NAME					= "name";					//$NON-NLS-1$
 	private static final String	ATTR_TAG_ID					= "tagIds";					//$NON-NLS-1$
+
+	private static final String	PARAMETER_FIRST				= " ?";						//$NON-NLS-1$
+	private static final String	PARAMETER_FOLLOWING			= ", ?";					//$NON-NLS-1$
 
 	static {}
 
@@ -123,38 +123,41 @@ public class TourTagFilterManager {
 	 * @return Returns sql where part for the tag filter or <code>null</code> when tag filter is
 	 *         disabled.
 	 */
-	public static TourFilterSQLData getSQL() {
+	public static SQLFilterData getSQL() {
 
-//		if (_isTourTagFilterEnabled == false || _tourTagFilterIds.length == 0) {
-//
-//			// tour tag filter is not enabled
-//
-//			return null;
-//		}
-//
-//		final ArrayList<Object> sqlParameters = new ArrayList<>();
-//
-//		boolean isFirst = true;
-//		final StringBuilder sb = new StringBuilder();
-//
-//		for (final long tourTagId : _tourTagFilterIds) {
-//
-//			if (isFirst) {
-//				isFirst = false;
-//				sb.append(" ?"); //$NON-NLS-1$
-//			} else {
-//				sb.append(", ?"); //$NON-NLS-1$
-//			}
-//
-//			sqlParameters.add(tourTagId);
-//		}
-//
-//		final String sqlWhere = " AND jTdataTtag.TourTag_tagId IN (" + sb.toString() + ") \n"; //$NON-NLS-1$ //$NON-NLS-2$
-//
-//		final TourFilterSQLData tourFilterSQLData = new TourFilterSQLData(sqlWhere, sqlParameters);
+		if (_selectedProfile == null) {
+			return null;
+		}
 
-		final TourFilterSQLData tourFilterSQLData = null;
-		return tourFilterSQLData;
+		final long[] tagIds = _selectedProfile.tagFilterIds.toArray();
+
+		if (_isTourTagFilterEnabled == false || tagIds.length == 0) {
+
+			// tour tag filter is not enabled
+
+			return null;
+		}
+
+		final ArrayList<Object> sqlParameters = new ArrayList<>();
+
+		boolean isFirst = true;
+		final StringBuilder parameterTagIds = new StringBuilder();
+
+		for (final long tagId : tagIds) {
+
+			if (isFirst) {
+				isFirst = false;
+				parameterTagIds.append(PARAMETER_FIRST);
+			} else {
+				parameterTagIds.append(PARAMETER_FOLLOWING);
+			}
+
+			sqlParameters.add(tagId);
+		}
+
+		final String sqlWhere = " AND jTdataTtag.TourTag_tagId IN (" + parameterTagIds.toString() + ") \n"; //$NON-NLS-1$ //$NON-NLS-2$
+
+		return new SQLFilterData(sqlWhere, sqlParameters);
 	}
 
 	private static File getXmlFile() {

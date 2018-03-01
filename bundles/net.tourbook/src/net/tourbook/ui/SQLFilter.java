@@ -25,7 +25,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourPerson;
 import net.tourbook.tag.tour.filter.TourTagFilterManager;
 import net.tourbook.tour.filter.TourFilterManager;
-import net.tourbook.tour.filter.TourFilterSQLData;
+import net.tourbook.tour.filter.SQLFilterData;
 
 /**
  * The filter provides a sql WHERE which contains all tour filter, e.g. selected person, tour type,
@@ -112,7 +112,7 @@ public class SQLFilter {
 		/*
 		 * App Filter: Tour data
 		 */
-		final TourFilterSQLData tourDataSqlData = TourFilterManager.getSQL();
+		final SQLFilterData tourDataSqlData = TourFilterManager.getSQL();
 		if (tourDataSqlData != null) {
 
 			sb.append(tourDataSqlData.getWhereString());
@@ -126,7 +126,7 @@ public class SQLFilter {
 
 		if (appFilter.contains(SQLAppFilter.Tag)) {
 
-			final TourFilterSQLData tourTagSqlData = TourTagFilterManager.getSQL();
+			final SQLFilterData tourTagSqlData = TourTagFilterManager.getSQL();
 
 			if (tourTagSqlData != null) {
 
