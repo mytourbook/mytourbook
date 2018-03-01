@@ -1,0 +1,9 @@
+Version 18.3.0                                         ?. March 2018
+
+
+New
+============	
+
+* Tour Tag Filter
+
+  Filter tours by tags and the other selected tour filters
