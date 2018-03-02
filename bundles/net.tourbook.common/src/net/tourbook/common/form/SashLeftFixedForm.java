@@ -49,6 +49,12 @@ public class SashLeftFixedForm {
 
 	private boolean				_isInitialResize	= true;
 
+	private Integer				_pxFixedWidth;
+	private Integer				_pxSashWidth;
+	private FormData			_sashLayoutData;
+
+	private ControlAdapter		_resizeListener;
+
 	/*
 	 * UI controls
 	 */
@@ -56,25 +62,37 @@ public class SashLeftFixedForm {
 
 	private Control				_maximizedPart;
 
-	private Control				_fixed;
+	private Control				_fixedLeftPart;
 	private Control				_sash;
-	private Control				_flex;
+	private Control				_flexRightPart;
 
-	private Integer				_viewerWidth;
-	private Integer				_sashWidth;
-	private FormData			_sashLayoutData;
+	private int					_relFixedDefaultSize;
 
+	/**
+	 * @param parent
+	 * @param leftPart
+	 * @param sash
+	 * @param rightPart
+	 * @param state
+	 * @param stateSashWidth
+	 * @param relDefaultSize
+	 *            Relative size of the fixed (left) part in %.
+	 */
 	public SashLeftFixedForm(	final Composite parent,
 								final Composite leftPart,
 								final Sash sash,
 								final Composite rightPart,
 								final IDialogSettings state,
-								final String stateSashWidth) {
+								final String stateSashWidth,
+								final int relDefaultSize) {
 
-		this(parent, leftPart, sash, rightPart, 50);
+		this(parent, leftPart, sash, rightPart, relDefaultSize);
 
 		// restore width
-		setViewerWidth(Util.getStateInt(state, stateSashWidth, 100));
+		final int restoredWidth = Util.getStateInt(state, stateSashWidth, Integer.MIN_VALUE);
+		if (restoredWidth != Integer.MIN_VALUE) {
+			setViewerWidth(restoredWidth);
+		}
 
 		UI.addSashColorHandler(sash);
 
@@ -95,36 +113,31 @@ public class SashLeftFixedForm {
 
 	/**
 	 * @param parent
-	 * @param fixedPart
+	 * @param fixedLeftPart
 	 * @param sash
-	 * @param flexPart
-	 * @param defaultSize
-	 *            Relative size of the fixed (left) part in %.
+	 * @param flexRightPart
+	 * @param relFixedDefaultSize
+	 *            The initial size of the fixed (left) part is relative in %.
 	 */
 	public SashLeftFixedForm(	final Composite parent,
-								final Control fixedPart,
+								final Control fixedLeftPart,
 								final Control sash,
-								final Control flexPart,
-								final int defaultSize) {
+								final Control flexRightPart,
+								final int relFixedDefaultSize) {
 
-		setViewerWidth_Internal(defaultSize);
-
-		final PixelConverter pc = new PixelConverter(parent);
-		MINIMUM_PART_WIDTH = pc.convertWidthInCharsToPixels(15);
-
-		final ControlAdapter resizeListener = new ControlAdapter() {
-			@Override
-			public void controlResized(final ControlEvent e) {
-				onResize();
-			}
-		};
+		initUI(parent);
 
 		_parent = parent;
 
-		_fixed = fixedPart;
+		_fixedLeftPart = fixedLeftPart;
 		_sash = sash;
-		_flex = flexPart;
+		_flexRightPart = flexRightPart;
 
+		_relFixedDefaultSize = relFixedDefaultSize;
+
+		/*
+		 * Setup layout
+		 */
 		parent.setLayout(new FormLayout());
 
 		final FormAttachment topAttachment = new FormAttachment(0, 0);
@@ -138,19 +151,19 @@ public class SashLeftFixedForm {
 		fixedLayoutData.right = new FormAttachment(sash, 0);
 		fixedLayoutData.top = topAttachment;
 		fixedLayoutData.bottom = bottomAttachment;
-		fixedPart.setLayoutData(fixedLayoutData);
-		fixedPart.addControlListener(resizeListener);
+		_fixedLeftPart.setLayoutData(fixedLayoutData);
+		_fixedLeftPart.addControlListener(_resizeListener);
 
 		/*
 		 * Sash
 		 */
 		_sashLayoutData = new FormData();
-		_sashLayoutData.left = new FormAttachment(defaultSize, 0);
+		_sashLayoutData.left = new FormAttachment(relFixedDefaultSize, 0);
 		_sashLayoutData.top = topAttachment;
 		_sashLayoutData.bottom = bottomAttachment;
 		_sashLayoutData.width = SASH_WIDTH;
-		sash.setLayoutData(_sashLayoutData);
-		sash.addListener(SWT.Selection, onSelectSash(parent, sash));
+		_sash.setLayoutData(_sashLayoutData);
+		_sash.addListener(SWT.Selection, onSelectSash(parent, sash));
 
 		/*
 		 * Flex (right) part
@@ -160,8 +173,8 @@ public class SashLeftFixedForm {
 		flexLayoutData.right = new FormAttachment(100, 0);
 		flexLayoutData.top = topAttachment;
 		flexLayoutData.bottom = bottomAttachment;
-		flexPart.setLayoutData(flexLayoutData);
-		flexPart.addControlListener(resizeListener);
+		_flexRightPart.setLayoutData(flexLayoutData);
+		_flexRightPart.addControlListener(_resizeListener);
 	}
 
 	/**
@@ -172,44 +185,93 @@ public class SashLeftFixedForm {
 	}
 
 	public int getViewerWidth() {
-		return _sashWidth == null ? MINIMUM_PART_WIDTH : _sashWidth;
+		return _pxSashWidth == null ? MINIMUM_PART_WIDTH : _pxSashWidth;
+	}
+
+	private void initUI(final Composite parent) {
+
+		final PixelConverter pc = new PixelConverter(parent);
+		MINIMUM_PART_WIDTH = pc.convertWidthInCharsToPixels(15);
+
+		_resizeListener = new ControlAdapter() {
+			@Override
+			public void controlResized(final ControlEvent e) {
+				onResize();
+			}
+		};
 	}
 
 	private void onResize() {
 
 		if (_isInitialResize) {
 
+			final Rectangle parentRect = _parent.getClientArea();
+			final int parentWidth = parentRect.width;
+
+			if (parentWidth == 0) {
+				return;
+			}
+
 			/*
-			 * set the initial width for the viewer sash, this is a bit of hacking but it works
+			 * Set the initial width for the viewer sash, this must be done lately because the
+			 * client area size is not set before
 			 */
 
 			// execute only the first time
 			_isInitialResize = false;
 
-			Integer viewerWidth = _viewerWidth;
+			/*
+			 * Get absolute width of the fixed part from relative width
+			 */
 
-			if (viewerWidth == null) {
-				_viewerWidth = viewerWidth = _fixed.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
+			int pxFixedWidth;
+			if (_pxFixedWidth == null) {
+
+//				final int pxDefaultWidth = _fixedLeftPart.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
+
+				pxFixedWidth = parentWidth * _relFixedDefaultSize / 100;
+
+			} else {
+
+				pxFixedWidth = _pxFixedWidth;
 			}
 
-			_sashLayoutData.left = new FormAttachment(0, viewerWidth);
+
+			// adjust width when too large
+			if (pxFixedWidth + MINIMUM_PART_WIDTH >= parentWidth) {
+				pxFixedWidth = Math.max(parentWidth - MINIMUM_PART_WIDTH, MINIMUM_PART_WIDTH / 2);
+			}
+
+			_pxFixedWidth = pxFixedWidth;
+			_sashLayoutData.left = new FormAttachment(0, pxFixedWidth);
+
+//			Integer viewerWidth = _pxFixedWidth;
+//
+//			if (viewerWidth == null) {
+//
+//				final int defaultPixWidth = _fixed.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
+//
+//				_pxFixedWidth = viewerWidth = Math.max(MINIMUM_PART_WIDTH, defaultPixWidth);
+//			}
+//
+//			_sashLayoutData.left = new FormAttachment(0, viewerWidth);
 
 		} else {
 
 			if (_maximizedPart != null) {
 
-				if (_maximizedPart == _fixed) {
+				if (_maximizedPart == _fixedLeftPart) {
 
 					_sashLayoutData.left = new FormAttachment(100, 0);
 
-				} else if (_maximizedPart == _flex) {
+				} else if (_maximizedPart == _flexRightPart) {
 
 					_sashLayoutData.left = new FormAttachment(0, -_sash.getSize().x);
 				}
 
 			} else {
 
-				if (_viewerWidth == null) {
+				if (_pxFixedWidth == null) {
 
 					_sashLayoutData.left = new FormAttachment(50, 0);
 
@@ -219,17 +281,17 @@ public class SashLeftFixedForm {
 
 					// set the minimum width
 
-					int viewerWidth = 0;
+					int pxViewerWidth = 0;
 
-					if (_viewerWidth + MINIMUM_PART_WIDTH >= parentRect.width) {
+					if (_pxFixedWidth + MINIMUM_PART_WIDTH >= parentRect.width) {
 
-						viewerWidth = Math.max(parentRect.width - MINIMUM_PART_WIDTH, MINIMUM_PART_WIDTH / 2);
+						pxViewerWidth = Math.max(parentRect.width - MINIMUM_PART_WIDTH, MINIMUM_PART_WIDTH / 2);
 
 					} else {
-						viewerWidth = _viewerWidth;
+						pxViewerWidth = _pxFixedWidth;
 					}
 
-					_sashLayoutData.left = new FormAttachment(0, viewerWidth);
+					_sashLayoutData.left = new FormAttachment(0, pxViewerWidth);
 				}
 			}
 
@@ -247,14 +309,17 @@ public class SashLeftFixedForm {
 				final Rectangle parentRect = parent.getClientArea();
 
 				final int right = parentRect.width - sashRect.width - MINIMUM_PART_WIDTH;
-				_sashWidth = Math.max(Math.min(e.x, right), MINIMUM_PART_WIDTH);
 
-				if (_sashWidth != sashRect.x) {
-					_sashLayoutData.left = new FormAttachment(0, _sashWidth);
+				_pxSashWidth = Math.max(Math.min(e.x, right), MINIMUM_PART_WIDTH);
+
+				if (_pxSashWidth != sashRect.x) {
+
+					_sashLayoutData.left = new FormAttachment(0, _pxSashWidth);
+
 					parent.layout();
 				}
 
-				_viewerWidth = _sashWidth;
+				_pxFixedWidth = _pxSashWidth;
 			}
 		};
 	}
@@ -272,18 +337,18 @@ public class SashLeftFixedForm {
 	}
 
 	/**
-	 * @param viewerWidth
+	 * @param pxViewerWidth
 	 */
-	public void setViewerWidth(final Integer viewerWidth) {
+	public void setViewerWidth(final Integer pxViewerWidth) {
 
-		setViewerWidth_Internal(viewerWidth);
+		setViewerWidth_Internal(pxViewerWidth);
 
 		onResize();
 	}
 
 	private void setViewerWidth_Internal(final Integer viewerWidth) {
 
-		_viewerWidth = viewerWidth == null ? null : Math.max(MINIMUM_PART_WIDTH, viewerWidth);
-		_sashWidth = _viewerWidth;
+		_pxFixedWidth = viewerWidth == null ? null : Math.max(MINIMUM_PART_WIDTH, viewerWidth);
+		_pxSashWidth = _pxFixedWidth;
 	}
 }

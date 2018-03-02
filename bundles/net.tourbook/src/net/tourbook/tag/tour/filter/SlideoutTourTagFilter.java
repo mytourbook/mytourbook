@@ -376,7 +376,10 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 	public SlideoutTourTagFilter(	final ToolItem toolItem,
 									final IDialogSettings state) {
 
-		super(toolItem.getParent(), state, new int[] { 400, 300, 400, 400 });
+		super(
+				toolItem.getParent(),
+				state,
+				new int[] { 700, 400, 700, 400 });
 
 		_tourTagFilterItem = toolItem;
 		_state = state;
@@ -469,7 +472,8 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 						sash,
 						containerTags,
 						_state,
-						STATE_SASH_WIDTH_CONTAINER);
+						STATE_SASH_WIDTH_CONTAINER,
+						30);
 			}
 
 			createUI_800_Actions(shellContainer);
@@ -492,7 +496,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory
 				.fillDefaults()
-				//				.hint(leftPartWidth, SWT.DEFAULT)
+				//				.hint(_pc.convertWidthInCharsToPixels(30), SWT.DEFAULT)
 				.applyTo(container);
 		GridLayoutFactory
 				.fillDefaults()//
@@ -517,7 +521,11 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 	private void createUI_210_ProfileViewer(final Composite parent) {
 
 		final Composite layoutContainer = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(layoutContainer);
+		GridDataFactory
+				.fillDefaults()
+				.grab(true, true)
+				.hint(_pc.convertWidthInCharsToPixels(15), _pc.convertHeightInCharsToPixels(8))
+				.applyTo(layoutContainer);
 
 		final TableColumnLayout tableLayout = new TableColumnLayout();
 		layoutContainer.setLayout(tableLayout);
@@ -699,7 +707,8 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 					sash,
 					containerTagViewer,
 					_state,
-					STATE_SASH_WIDTH_TAG_CONTAINER);
+					STATE_SASH_WIDTH_TAG_CONTAINER,
+					50);
 		}
 	}
 
@@ -1155,7 +1164,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 
 		final boolean isProfileSelected = _selectedProfile != null;
 
-		_btnApply.setEnabled(_isLiveUpdate == false);
+		_btnApply.setEnabled(isProfileSelected && _isLiveUpdate == false);
 		_btnCopyProfile.setEnabled(isProfileSelected);
 		_btnDeleteProfile.setEnabled(isProfileSelected);
 
