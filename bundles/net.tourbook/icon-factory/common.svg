@@ -3672,21 +3672,21 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="24.877293"
-     inkscape:cx="34.119308"
-     inkscape:cy="840.05548"
+     inkscape:cx="30.392567"
+     inkscape:cy="912.53689"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
-     inkscape:window-width="1657"
+     inkscape:window-width="1356"
      inkscape:window-height="1377"
      inkscape:window-x="318"
-     inkscape:window-y="27"
+     inkscape:window-y="25"
      inkscape:window-maximized="0"
      inkscape:snap-grids="true"
      inkscape:snap-page="true"
      inkscape:snap-to-guides="true"
-     inkscape:snap-nodes="false"
-     inkscape:snap-global="true"
+     inkscape:snap-nodes="true"
+     inkscape:snap-global="false"
      inkscape:snap-bbox="true"
      showguides="true"
      inkscape:guide-bbox="true"
@@ -3701,7 +3701,7 @@
      inkscape:snap-midpoints="true"
      inkscape:snap-object-midpoints="true"
      inkscape:snap-center="true"
-     inkscape:snap-others="false"
+     inkscape:snap-others="true"
      inkscape:snap-text-baseline="true">
     <inkscape:grid
        type="xygrid"
@@ -6392,5 +6392,56 @@
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\app-turn-off.png"
        inkscape:export-xdpi="96"
        inkscape:export-ydpi="96" />
+    <rect
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:0.98999999;fill:none;fill-opacity:1;stroke:#535353;stroke-width:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       id="rect4525-1-0-2-33-0-5"
+       width="16"
+       height="16"
+       x="15.000001"
+       y="126.36218"
+       ry="0"
+       rx="0"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\checkbox-checked.png"
+       inkscape:export-xdpi="95.999863"
+       inkscape:export-ydpi="95.999863" />
+    <path
+       style="fill:none;stroke:#2c2c2c;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 16.5,128.86218 v 12 h 12 v -12 z"
+       id="path5516"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\checkbox-checked.png"
+       inkscape:export-xdpi="95.999863"
+       inkscape:export-ydpi="95.999863" />
+    <rect
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:0.98999999;fill:none;fill-opacity:1;stroke:#535353;stroke-width:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       id="rect4525-1-0-2-33-0-5-5"
+       width="16"
+       height="16"
+       x="35.000008"
+       y="126.36217"
+       ry="0"
+       rx="0"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\checkbox-unchecked.png"
+       inkscape:export-xdpi="95.999863"
+       inkscape:export-ydpi="95.999863" />
+    <path
+       style="display:inline;fill:none;stroke:#2c2c2c;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 36.5,128.86218 v 12 h 12 v -12 z"
+       id="path5516-1"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\checkbox-unchecked.png"
+       inkscape:export-xdpi="95.999863"
+       inkscape:export-ydpi="95.999863" />
+    <path
+       style="fill:none;stroke:#2c2c2c;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 18.517632,135.83961 2.397041,2.43724 5.482368,-6.39211"
+       id="path5539"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccc"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\checkbox-checked.png"
+       inkscape:export-xdpi="95.999863"
+       inkscape:export-ydpi="95.999863" />
   </g>
 </svg>

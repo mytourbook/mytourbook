@@ -13,13 +13,10 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.tag.tour.filter;
+package net.tourbook.common.tooltip;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.form.SashLeftFixedForm;
-import net.tourbook.common.tooltip.AdvancedSlideout;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -61,7 +58,7 @@ public class SlideoutTest extends AdvancedSlideout {
 		_state = state;
 
 		setShellFadeOutDelaySteps(30);
-		setTitleText(Messages.Slideout_TourTagFilter_Label_Title);
+//		setTitleText(Messages.Slideout_TourTagFilter_Label_Title);
 	}
 
 	@Override
@@ -75,7 +72,7 @@ public class SlideoutTest extends AdvancedSlideout {
 						+ ("\t: " + stateSectionName));
 // TODO remove SYSTEM.OUT.PRINTLN
 
-		_state = TourbookPlugin.getState(stateSectionName);
+//		_state = TourbookPlugin.getState(stateSectionName);
 
 
 		initUI(parent);

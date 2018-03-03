@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -76,7 +76,7 @@ import org.eclipse.ui.part.PageBook;
 public class WizardPage_10_CompareTour extends WizardPage {
 
 	private static final String		COMP_TOUR_VIEWER_WIDTH		= "CompTour.viewerWidth";			//$NON-NLS-1$
-	private static final String		COMP_TOUR_SELECT_ALL		= "CompTour.selectAll";			//$NON-NLS-1$
+	private static final String		COMP_TOUR_SELECT_ALL		= "CompTour.selectAll";				//$NON-NLS-1$
 
 	final IPreferenceStore			_prefStore					= TourbookPlugin.getPrefStore();
 
@@ -94,13 +94,13 @@ public class WizardPage_10_CompareTour extends WizardPage {
 	/*
 	 * UI controls
 	 */
-	private PageBook				_pageBook;
-	private Label					_pageTourIsNotSelected;
+	private PageBook			_pageBook;
+	private Label				_pageTourIsNotSelected;
 
-	private Button					_chkSelectAll;
-	private Chart					_compareTourChart;
-	private Group					_groupChart;
-	private CheckboxTreeViewer		_tourViewer;
+	private Button				_chkSelectAll;
+	private Chart				_compareTourChart;
+	private Group				_groupChart;
+	private CheckboxTreeViewer	_tourViewer;
 
 	private class TourContentProvider implements ITreeContentProvider {
 
@@ -196,12 +196,14 @@ public class WizardPage_10_CompareTour extends WizardPage {
 		layoutContainer.setLayout(treeLayout);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(layoutContainer);
 
-		final Tree tree = new Tree(layoutContainer, SWT.H_SCROLL
-				| SWT.V_SCROLL
-				| SWT.MULTI
-				| SWT.BORDER
-				| SWT.FULL_SELECTION
-				| SWT.CHECK);
+		final Tree tree = new Tree(
+				layoutContainer,
+				SWT.H_SCROLL
+						| SWT.V_SCROLL
+						| SWT.MULTI
+						| SWT.BORDER
+						| SWT.FULL_SELECTION
+						| SWT.CHECK);
 
 		tree.setHeaderVisible(true);
 
@@ -394,10 +396,11 @@ public class WizardPage_10_CompareTour extends WizardPage {
 
 					final long recordingTime = tourItem.colRecordingTime;
 
-					cell.setText(String.format(//
-							Messages.Format_hhmm,
-							(recordingTime / 3600),
-							((recordingTime % 3600) / 60)));
+					cell.setText(
+							String.format(//
+									Messages.Format_hhmm,
+									(recordingTime / 3600),
+									((recordingTime % 3600) / 60)));
 
 				} else {
 
@@ -489,11 +492,10 @@ public class WizardPage_10_CompareTour extends WizardPage {
 		final IDialogSettings wizardSettings = getDialogSettings();
 
 		// restore viewer width
-		Integer viewerWidth = null;
 		try {
-			viewerWidth = wizardSettings.getInt(COMP_TOUR_VIEWER_WIDTH);
+			final int viewerWidth = wizardSettings.getInt(COMP_TOUR_VIEWER_WIDTH);
+			_viewerDetailForm.setViewerWidth(viewerWidth);
 		} catch (final NumberFormatException e) {}
-		_viewerDetailForm.setViewerWidth(viewerWidth);
 
 		// restore checkbox: select all tours
 		final boolean isSelectAllTours = wizardSettings.getBoolean(COMP_TOUR_SELECT_ALL);
@@ -560,9 +562,10 @@ public class WizardPage_10_CompareTour extends WizardPage {
 
 			_compareTourChart.updateChart(chartDataModel, false);
 
-			_groupChart.setText(NLS.bind(
-					Messages.tourCatalog_wizard_Group_selected_tour_2,
-					TourManager.getTourDateShort(tourData)));
+			_groupChart.setText(
+					NLS.bind(
+							Messages.tourCatalog_wizard_Group_selected_tour_2,
+							TourManager.getTourDateShort(tourData)));
 
 			_pageBook.showPage(_compareTourChart);
 

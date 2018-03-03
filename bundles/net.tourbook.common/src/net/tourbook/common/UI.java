@@ -1461,9 +1461,18 @@ public class UI {
 		final GridData data = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
 
 		final int widthHint = convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH);
-		final Point minSize = button.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
 
-		data.widthHint = Math.max(widthHint, minSize.x);
+		final Point minSize = button.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+		final int defaultWidth = minSize.x;
+
+//		System.out.println(
+//				(UI.timeStampNano() + " [" + UI.class.getSimpleName() + "] ")
+//						+ ("\twidthHint: " + widthHint)
+//						+ ("\tminSize: " + minSize)
+//						+ ("\tdefaultWidth: " + defaultWidth));
+//// TODO remove SYSTEM.OUT.PRINTLN
+
+		data.widthHint = Math.max(widthHint, defaultWidth);
 
 		button.setLayoutData(data);
 	}

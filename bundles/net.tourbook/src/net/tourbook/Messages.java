@@ -769,6 +769,10 @@ public class Messages extends NLS {
 	public static String		Image__App_Add;
 	public static String		Image__App_Add_2x;
 	public static String		Image__App_Cancel;
+	public static String		Image__App_Checkbox_Checked;
+	public static String		Image__App_Checkbox_Checked_Disabled;
+	public static String		Image__App_Checkbox_Uncheck;
+	public static String		Image__App_Checkbox_Uncheck_Disabled;
 	public static String		Image__App_Close;
 	public static String		Image__App_Edit_Paste;
 	public static String		Image__App_OK;
@@ -1896,6 +1900,8 @@ public class Messages extends NLS {
 	public static String		Slideout_TourMarkerFilter_Label_GeoFilterNotAvailable;
 
 	public static String		Slideout_TourTagFilter_Action_AddProfile_Tooltip;
+	public static String		Slideout_TourTagFilter_Action_CheckAllTags_Tooltip;
+	public static String		Slideout_TourTagFilter_Action_UncheckAllTags_Tooltip;
 	public static String		Slideout_TourTagFilter_Checkbox_IsLiveUpdate_Tooltip;
 	public static String		Slideout_TourTagFilter_Column_Properties_Tooltip;
 	public static String		Slideout_TourTagFilter_Label_AllTags;

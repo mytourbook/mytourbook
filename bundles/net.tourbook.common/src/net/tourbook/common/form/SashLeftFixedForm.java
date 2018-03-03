@@ -43,14 +43,22 @@ public class SashLeftFixedForm {
 	/**
 	 * Width of the sash slider
 	 */
-	private static final int	SASH_WIDTH			= 8;
+	private static final int	SASH_SLIDER_WIDTH	= 8;
 
 	private static int			MINIMUM_PART_WIDTH	= 100;
 
-	private boolean				_isInitialResize	= true;
+	private boolean				_isFirstResize		= true;
 
-	private Integer				_pxFixedWidth;
-	private Integer				_pxSashWidth;
+	/**
+	 * Width in pixel for the left fixed part
+	 */
+	private int					_pxFixedWidth		= -1;
+
+	/**
+	 * Relative size of the left fixed part in %
+	 */
+	private int					_relFixedDefaultSize;
+
 	private FormData			_sashLayoutData;
 
 	private ControlAdapter		_resizeListener;
@@ -66,31 +74,33 @@ public class SashLeftFixedForm {
 	private Control				_sash;
 	private Control				_flexRightPart;
 
-	private int					_relFixedDefaultSize;
-
 	/**
 	 * @param parent
-	 * @param leftPart
+	 * @param leftFixedPart
+	 *            Left fixed part
 	 * @param sash
-	 * @param rightPart
+	 * @param rightFlexPart
+	 *            Right flex part
 	 * @param state
+	 *            State where the left fixed width is saved
 	 * @param stateSashWidth
-	 * @param relDefaultSize
-	 *            Relative size of the fixed (left) part in %.
+	 *            State key for the left fixed width
+	 * @param relDefaultWidth
+	 *            Relative width of the left fixed part in %
 	 */
 	public SashLeftFixedForm(	final Composite parent,
-								final Composite leftPart,
+								final Composite leftFixedPart,
 								final Sash sash,
-								final Composite rightPart,
+								final Composite rightFlexPart,
 								final IDialogSettings state,
 								final String stateSashWidth,
-								final int relDefaultSize) {
+								final int relDefaultWidth) {
 
-		this(parent, leftPart, sash, rightPart, relDefaultSize);
+		this(parent, leftFixedPart, sash, rightFlexPart, relDefaultWidth);
 
 		// restore width
-		final int restoredWidth = Util.getStateInt(state, stateSashWidth, Integer.MIN_VALUE);
-		if (restoredWidth != Integer.MIN_VALUE) {
+		final int restoredWidth = Util.getStateInt(state, stateSashWidth, -1);
+		if (restoredWidth != -1) {
 			setViewerWidth(restoredWidth);
 		}
 
@@ -100,7 +110,7 @@ public class SashLeftFixedForm {
 		sash.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseUp(final MouseEvent e) {
-				state.put(stateSashWidth, leftPart.getSize().x);
+				state.put(stateSashWidth, leftFixedPart.getSize().x);
 			}
 		});
 
@@ -144,7 +154,7 @@ public class SashLeftFixedForm {
 		final FormAttachment bottomAttachment = new FormAttachment(100, 0);
 
 		/*
-		 * Fixed (left) part
+		 * Left fixed part
 		 */
 		final FormData fixedLayoutData = new FormData();
 		fixedLayoutData.left = new FormAttachment(0, 0);
@@ -158,15 +168,15 @@ public class SashLeftFixedForm {
 		 * Sash
 		 */
 		_sashLayoutData = new FormData();
-		_sashLayoutData.left = new FormAttachment(relFixedDefaultSize, 0);
+		_sashLayoutData.left = null; // this is set later - new FormAttachment(relFixedDefaultSize, 0);
 		_sashLayoutData.top = topAttachment;
 		_sashLayoutData.bottom = bottomAttachment;
-		_sashLayoutData.width = SASH_WIDTH;
+		_sashLayoutData.width = SASH_SLIDER_WIDTH;
 		_sash.setLayoutData(_sashLayoutData);
 		_sash.addListener(SWT.Selection, onSelectSash(parent, sash));
 
 		/*
-		 * Flex (right) part
+		 * Right flex part
 		 */
 		final FormData flexLayoutData = new FormData();
 		flexLayoutData.left = new FormAttachment(sash, 0);
@@ -185,7 +195,8 @@ public class SashLeftFixedForm {
 	}
 
 	public int getViewerWidth() {
-		return _pxSashWidth == null ? MINIMUM_PART_WIDTH : _pxSashWidth;
+
+		return _pxFixedWidth < 0 ? MINIMUM_PART_WIDTH : _pxFixedWidth;
 	}
 
 	private void initUI(final Composite parent) {
@@ -203,39 +214,35 @@ public class SashLeftFixedForm {
 
 	private void onResize() {
 
-		if (_isInitialResize) {
+		final Rectangle parentRect = _parent.getClientArea();
 
-			final Rectangle parentRect = _parent.getClientArea();
+		if (_isFirstResize) {
+
 			final int parentWidth = parentRect.width;
 
+			// ignore resize when shell is not yet setup
 			if (parentWidth == 0) {
 				return;
 			}
+
+			// run only the first time
+			_isFirstResize = false;
 
 			/*
 			 * Set the initial width for the viewer sash, this must be done lately because the
 			 * client area size is not set before
 			 */
-
-			// execute only the first time
-			_isInitialResize = false;
-
-			/*
-			 * Get absolute width of the fixed part from relative width
-			 */
-
 			int pxFixedWidth;
-			if (_pxFixedWidth == null) {
 
-//				final int pxDefaultWidth = _fixedLeftPart.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
+			if (_pxFixedWidth < 0) {
 
+				// get absolute width of the fixed part from relative width
 				pxFixedWidth = parentWidth * _relFixedDefaultSize / 100;
 
 			} else {
 
 				pxFixedWidth = _pxFixedWidth;
 			}
-
 
 			// adjust width when too large
 			if (pxFixedWidth + MINIMUM_PART_WIDTH >= parentWidth) {
@@ -244,17 +251,6 @@ public class SashLeftFixedForm {
 
 			_pxFixedWidth = pxFixedWidth;
 			_sashLayoutData.left = new FormAttachment(0, pxFixedWidth);
-
-//			Integer viewerWidth = _pxFixedWidth;
-//
-//			if (viewerWidth == null) {
-//
-//				final int defaultPixWidth = _fixed.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
-//
-//				_pxFixedWidth = viewerWidth = Math.max(MINIMUM_PART_WIDTH, defaultPixWidth);
-//			}
-//
-//			_sashLayoutData.left = new FormAttachment(0, viewerWidth);
 
 		} else {
 
@@ -271,13 +267,11 @@ public class SashLeftFixedForm {
 
 			} else {
 
-				if (_pxFixedWidth == null) {
+				if (_pxFixedWidth < 0) {
 
 					_sashLayoutData.left = new FormAttachment(50, 0);
 
 				} else {
-
-					final Rectangle parentRect = _parent.getClientArea();
 
 					// set the minimum width
 
@@ -299,6 +293,13 @@ public class SashLeftFixedForm {
 		}
 	}
 
+	/**
+	 * Setup listener when the sash slider is moved
+	 * 
+	 * @param parent
+	 * @param sash
+	 * @return
+	 */
 	private Listener onSelectSash(final Composite parent, final Control sash) {
 
 		return new Listener() {
@@ -308,24 +309,29 @@ public class SashLeftFixedForm {
 				final Rectangle sashRect = sash.getBounds();
 				final Rectangle parentRect = parent.getClientArea();
 
-				final int right = parentRect.width - sashRect.width - MINIMUM_PART_WIDTH;
+				final int draggedWidth = e.x;
+				final int minWidth = parentRect.width - sashRect.width - MINIMUM_PART_WIDTH;
 
-				_pxSashWidth = Math.max(Math.min(e.x, right), MINIMUM_PART_WIDTH);
+				// set new fixed width
+				final int minFixedWidth = Math.min(draggedWidth, minWidth);
+				final int newFixedWidth = Math.max(minFixedWidth, MINIMUM_PART_WIDTH);
 
-				if (_pxSashWidth != sashRect.x) {
+				final int oldFixedWidth = sashRect.x;
 
-					_sashLayoutData.left = new FormAttachment(0, _pxSashWidth);
+				if (newFixedWidth != oldFixedWidth) {
+
+					_pxFixedWidth = newFixedWidth;
+
+					_sashLayoutData.left = new FormAttachment(0, newFixedWidth);
 
 					parent.layout();
 				}
-
-				_pxFixedWidth = _pxSashWidth;
 			}
 		};
 	}
 
 	/**
-	 * sets the control which is maximized, set <code>null</code> to reset the maximized control
+	 * Set the control which is maximized, set <code>null</code> to reset the maximized control
 	 * 
 	 * @param control
 	 */
@@ -337,18 +343,14 @@ public class SashLeftFixedForm {
 	}
 
 	/**
+	 * Set width for the left fix part, this is mainly used to restore the width
+	 * 
 	 * @param pxViewerWidth
 	 */
-	public void setViewerWidth(final Integer pxViewerWidth) {
+	public void setViewerWidth(final int pxViewerWidth) {
 
-		setViewerWidth_Internal(pxViewerWidth);
+		_pxFixedWidth = Math.max(MINIMUM_PART_WIDTH, pxViewerWidth);
 
 		onResize();
-	}
-
-	private void setViewerWidth_Internal(final Integer viewerWidth) {
-
-		_pxFixedWidth = viewerWidth == null ? null : Math.max(MINIMUM_PART_WIDTH, viewerWidth);
-		_pxSashWidth = _pxFixedWidth;
 	}
 }

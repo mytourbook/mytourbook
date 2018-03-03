@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -403,13 +403,11 @@ public class WizardPage_20_ReferenceTour extends WizardPage {
 		final IDialogSettings state = getDialogSettings();
 
 		// restore viewer width
-		Integer viewerWidth = null;
 		try {
-			viewerWidth = state.getInt(REF_TOUR_VIEWER_WIDTH);
+			final int viewerWidth = state.getInt(REF_TOUR_VIEWER_WIDTH);
+			_viewerDetailForm.setViewerWidth(viewerWidth);
 		} catch (final NumberFormatException e) {
-			viewerWidth = 200;
 		}
-		_viewerDetailForm.setViewerWidth(viewerWidth);
 
 		RefTourItem firstCheckedRefTour = null;
 

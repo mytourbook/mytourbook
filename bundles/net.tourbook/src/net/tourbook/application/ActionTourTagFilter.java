@@ -18,7 +18,7 @@ package net.tourbook.application;
 import net.tourbook.Messages;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.tooltip.SlideoutLocation;
-import net.tourbook.tag.tour.filter.SlideoutTest;
+import net.tourbook.tag.tour.filter.SlideoutTourTagFilter;
 import net.tourbook.tag.tour.filter.TourTagFilterManager;
 import net.tourbook.tour.filter.ActionToolbarSlideoutAdv;
 
@@ -50,9 +50,7 @@ public class ActionTourTagFilter extends ActionToolbarSlideoutAdv {
 	@Override
 	protected AdvancedSlideout createSlideout(final ToolItem toolItem) {
 
-		_slideoutTourTagFilter = new SlideoutTest(toolItem, _state);
-
-//		_slideoutTourTagFilter = new SlideoutTourTagFilter(toolItem, _state);
+		_slideoutTourTagFilter = new SlideoutTourTagFilter(toolItem, _state);
 		_slideoutTourTagFilter.setSlideoutLocation(SlideoutLocation.ABOVE_CENTER);
 
 		return _slideoutTourTagFilter;
