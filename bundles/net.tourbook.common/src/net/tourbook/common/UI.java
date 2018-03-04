@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -360,6 +360,8 @@ public class UI {
 	public static final int				DECORATOR_HORIZONTAL_INDENT				= 2;
 
 	static {
+
+		setupUI_FontMetrics();
 
 		IMAGE_REGISTRY = CommonActivator.getDefault().getImageRegistry();
 
@@ -1700,9 +1702,12 @@ public class UI {
 	}
 
 	public static GridData setFieldWidth(final Composite parent, final StringFieldEditor field, final int width) {
+
 		final GridData gd = new GridData();
 		gd.widthHint = width;
+
 		field.getTextControl(parent).setLayoutData(gd);
+
 		return gd;
 	}
 
@@ -1715,6 +1720,13 @@ public class UI {
 		// Compute and keep a font metric
 
 		final Shell activeShell = Display.getDefault().getActiveShell();
+
+//		System.out.println((UI.timeStampNano() + " [" + UI.class.getSimpleName() + "] setupUI_FontMetrics()")
+//						+ ("\tactiveShell: " + activeShell)
+////		+ ("\t: " + )
+//		);
+//// TODO remove SYSTEM.OUT.PRINTLN
+
 		if (activeShell == null) {
 
 			// this can occure when called too early
