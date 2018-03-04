@@ -1257,6 +1257,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 
 		_actionCollapseAll.setEnabled(isProfileSelected);
 		_actionExpandAll.setEnabled(isProfileSelected);
+		_actionOpenPrefTags.setEnabled(isProfileSelected);
 		_actionTag_LayoutFlat.setEnabled(isProfileSelected);
 		_actionTag_LayoutHierarchical.setEnabled(isProfileSelected);
 		_actionTagCloud_CheckAll.setEnabled(isProfileSelected && canCheckTags);

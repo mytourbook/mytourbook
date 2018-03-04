@@ -1467,13 +1467,6 @@ public class UI {
 		final Point minSize = button.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
 		final int defaultWidth = minSize.x;
 
-//		System.out.println(
-//				(UI.timeStampNano() + " [" + UI.class.getSimpleName() + "] ")
-//						+ ("\twidthHint: " + widthHint)
-//						+ ("\tminSize: " + minSize)
-//						+ ("\tdefaultWidth: " + defaultWidth));
-//// TODO remove SYSTEM.OUT.PRINTLN
-
 		data.widthHint = Math.max(widthHint, defaultWidth);
 
 		button.setLayoutData(data);
@@ -1651,9 +1644,6 @@ public class UI {
 			Assert.isNotNull(layoutData);
 
 			((GridData) layoutData).widthHint = maxWidth;
-
-//			System.out.println(String.format("%-30s", control) + ("\t" + maxWidth));
-//			// TODO remove SYSTEM.OUT.PRINTLN
 		}
 	}
 
@@ -1720,12 +1710,6 @@ public class UI {
 		// Compute and keep a font metric
 
 		final Shell activeShell = Display.getDefault().getActiveShell();
-
-//		System.out.println((UI.timeStampNano() + " [" + UI.class.getSimpleName() + "] setupUI_FontMetrics()")
-//						+ ("\tactiveShell: " + activeShell)
-////		+ ("\t: " + )
-//		);
-//// TODO remove SYSTEM.OUT.PRINTLN
 
 		if (activeShell == null) {
 
