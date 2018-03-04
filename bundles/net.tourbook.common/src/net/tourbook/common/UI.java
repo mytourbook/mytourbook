@@ -1467,12 +1467,12 @@ public class UI {
 		final Point minSize = button.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
 		final int defaultWidth = minSize.x;
 
-		System.out.println(
-				(UI.timeStampNano() + " [" + UI.class.getSimpleName() + "] ")
-						+ ("\twidthHint: " + widthHint)
-						+ ("\tminSize: " + minSize)
-						+ ("\tdefaultWidth: " + defaultWidth));
-// TODO remove SYSTEM.OUT.PRINTLN
+//		System.out.println(
+//				(UI.timeStampNano() + " [" + UI.class.getSimpleName() + "] ")
+//						+ ("\twidthHint: " + widthHint)
+//						+ ("\tminSize: " + minSize)
+//						+ ("\tdefaultWidth: " + defaultWidth));
+//// TODO remove SYSTEM.OUT.PRINTLN
 
 		data.widthHint = Math.max(widthHint, defaultWidth);
 
