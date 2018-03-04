@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1178,6 +1178,10 @@ public abstract class AnimatedToolTipShell2 {
 
 				@Override
 				public void run() {
+
+					if (_currentShell == null || _currentShell.isDisposed()) {
+						return;
+					}
 
 					// hide tooltip when another shell is activated
 
