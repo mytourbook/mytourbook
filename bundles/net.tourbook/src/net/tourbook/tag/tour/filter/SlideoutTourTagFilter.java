@@ -1659,6 +1659,11 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 	 */
 	private void onTag_Layout(final boolean isHierarchicalLayout) {
 
+		// ignore layout when it is already set
+		if (_isHierarchicalLayout == isHierarchicalLayout) {
+			return;
+		}
+
 		_isHierarchicalLayout = isHierarchicalLayout;
 
 		updateTagModel();
