@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -114,14 +114,14 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 	 * image resources
 	 */
 	private Image					_imgTag			= TourbookPlugin
-															.getImageDescriptor(Messages.Image__tag)
-															.createImage();
+			.getImageDescriptor(Messages.Image__tag)
+			.createImage();
 	private Image					_imgTagRoot		= TourbookPlugin
-															.getImageDescriptor(Messages.Image__tag_root)
-															.createImage();
+			.getImageDescriptor(Messages.Image__tag_root)
+			.createImage();
 	private Image					_imgTagCategory	= TourbookPlugin
-															.getImageDescriptor(Messages.Image__tag_category)
-															.createImage();
+			.getImageDescriptor(Messages.Image__tag_category)
+			.createImage();
 
 	/*
 	 * UI constrols
@@ -260,7 +260,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		fillToolbar();
 
 		// set root item
-		_rootItem = new TVIPrefTagRoot(_tagViewer);
+		_rootItem = new TVIPrefTagRoot(_tagViewer, true);
 
 		updateTagViewer();
 		enableButtons();
@@ -274,9 +274,10 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		// container
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-		GridLayoutFactory.fillDefaults()//
+		GridLayoutFactory
+				.fillDefaults()//
 				.margins(0, 0)
-//				.spacing(SWT.DEFAULT, 0)
+				//				.spacing(SWT.DEFAULT, 0)
 				.numColumns(2)
 				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
@@ -321,7 +322,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		 */
 
 		final Composite layoutContainer = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
+		GridDataFactory
+				.fillDefaults()//
 				.grab(true, true)
 				.hint(200, 100)
 				.applyTo(layoutContainer);
@@ -409,7 +411,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 						final LocalSelectionTransfer transfer = LocalSelectionTransfer.getTransfer();
 						final ISelection selection = _tagViewer.getSelection();
 
-//						System.out.println("dragStart");
+						//						System.out.println("dragStart");
 						transfer.setSelection(selection);
 						transfer.setSelectionSetTime(_dragStartTime = event.time & 0xFFFFFFFFL);
 
@@ -484,7 +486,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 	private void createUI_30_Buttons(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
+		GridDataFactory
+				.fillDefaults()//
 				.indent(5, 0)
 				.applyTo(container);
 		GridLayoutFactory.fillDefaults().applyTo(container);
@@ -541,14 +544,16 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 	private void createUI_40_Bottom(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
+		GridDataFactory
+				.fillDefaults()//
 				.grab(true, false)
 				.span(2, 1)
-//				.indent(0, _pc.convertVerticalDLUsToPixels(4))
+				//				.indent(0, _pc.convertVerticalDLUsToPixels(4))
 				.applyTo(container);
-		GridLayoutFactory.fillDefaults()//
+		GridLayoutFactory
+				.fillDefaults()//
 				.numColumns(1)
-//				.extendedMargins(0, 0, top, bottom)
+				//				.extendedMargins(0, 0, top, bottom)
 				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
@@ -799,7 +804,6 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 	 * 			+-- tag
 	 * tag
 	 * tag
-	 * 
 	 * </pre>
 	 */
 	private void onNewTag() {
@@ -1040,10 +1044,11 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 			sb.append("DELETE FROM "); //$NON-NLS-1$
 			sb.append(TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAG);
 			int result = conn.createStatement().executeUpdate(sb.toString());
-			System.out.println("Deleted " //$NON-NLS-1$
-					+ result
-					+ " entries from " //$NON-NLS-1$
-					+ TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAG);
+			System.out.println(
+					"Deleted " //$NON-NLS-1$
+							+ result
+							+ " entries from " //$NON-NLS-1$
+							+ TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAG);
 
 			/*
 			 * remove jointable category<->category
@@ -1052,10 +1057,11 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 			sb.append("DELETE FROM "); //$NON-NLS-1$
 			sb.append(TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY);
 			result = conn.createStatement().executeUpdate(sb.toString());
-			System.out.println("Deleted " //$NON-NLS-1$
-					+ result
-					+ " entries from " //$NON-NLS-1$
-					+ TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY);
+			System.out.println(
+					"Deleted " //$NON-NLS-1$
+							+ result
+							+ " entries from " //$NON-NLS-1$
+							+ TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY);
 
 			/*
 			 * set tags to root
@@ -1080,7 +1086,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 			conn.close();
 
 			// update the tag viewer
-			_rootItem = new TVIPrefTagRoot(_tagViewer);
+			_rootItem = new TVIPrefTagRoot(_tagViewer, true);
 			updateTagViewer();
 
 			_isModified = true;
@@ -1125,7 +1131,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 	@Override
 	public void updateColumnHeader(final ColumnDefinition colDef) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	private void updateTagViewer() {

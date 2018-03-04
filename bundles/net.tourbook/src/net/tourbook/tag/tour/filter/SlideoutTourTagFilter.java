@@ -81,8 +81,6 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyAdapter;
@@ -120,6 +118,7 @@ import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
  */
 public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeViewer {
 
+	private static final String		STATE_IS_HIERARCHICAL_LAYOUT	= "STATE_IS_HIERARCHICAL_LAYOUT";	//$NON-NLS-1$
 	private static final String		STATE_IS_LIVE_UPDATE			= "STATE_IS_LIVE_UPDATE";			//$NON-NLS-1$
 	private static final String		STATE_SASH_WIDTH_CONTAINER		= "STATE_SASH_WIDTH_CONTAINER";		//$NON-NLS-1$
 	private static final String		STATE_SASH_WIDTH_TAG_CONTAINER	= "STATE_SASH_WIDTH_TAG_CONTAINER";	//$NON-NLS-1$
@@ -164,20 +163,22 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 	private Object								_tagCloudViewerItem_Data;
 
 	private long								_expandRunnableCounter;
-	private boolean								_isLiveUpdate;
 	private boolean								_isExpandingSelection;
 	private boolean								_isBehaviourSingleExpandedOthersCollapse	= true;
 	private boolean								_isBehaviourAutoExpandCollapse				= true;
+	private boolean								_isInCollapseAll;
+	private boolean								_isHierarchicalLayout;
+	private boolean								_isLiveUpdate;
 
 	private PixelConverter						_pc;
 
 	private ActionCollapseAllWithoutSelection	_actionCollapseAll;
 	private ActionExpandAll						_actionExpandAll;
 	private ActionOpenPrefDialog				_actionOpenPrefTags;
-	private ActionTagCloud_UncheckAllTags		_actionTagCloud_UncheckAll;
+	private ActionTag_LayoutFlat				_actionTag_LayoutFlat;
+	private ActionTag_LayoutHierarchical		_actionTag_LayoutHierarchical;
 	private ActionTagCloud_CheckAllTags			_actionTagCloud_CheckAll;
-
-	private boolean								_isInCollapseAll;
+	private ActionTagCloud_UncheckAllTags		_actionTagCloud_UncheckAll;
 
 	/*
 	 * UI controls
@@ -217,6 +218,36 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 			_isInCollapseAll = false;
 		}
 
+	}
+
+	private class ActionTag_LayoutFlat extends Action {
+
+		ActionTag_LayoutFlat() {
+
+			super(Messages.action_tagView_flat_layout, AS_RADIO_BUTTON);
+
+			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__layout_flat));
+		}
+
+		@Override
+		public void run() {
+			onTag_Layout(false);
+		}
+	}
+
+	private class ActionTag_LayoutHierarchical extends Action {
+
+		ActionTag_LayoutHierarchical() {
+
+			super(Messages.action_tagView_flat_hierarchical, AS_RADIO_BUTTON);
+
+			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__layout_hierarchical));
+		}
+
+		@Override
+		public void run() {
+			onTag_Layout(true);
+		}
 	}
 
 	private class ActionTagCloud_CheckAllTags extends Action {
@@ -458,6 +489,8 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 		_actionExpandAll = new ActionExpandAll(this);
 		_actionCollapseAll = new ActionCollapseAllWithoutSelection(this);
 		_actionOpenPrefTags = new ActionOpenPrefDialog(Messages.action_tag_open_tagging_structure, PrefPageTags.ID);
+		_actionTag_LayoutFlat = new ActionTag_LayoutFlat();
+		_actionTag_LayoutHierarchical = new ActionTag_LayoutHierarchical();
 		_actionTagCloud_CheckAll = new ActionTagCloud_CheckAllTags();
 		_actionTagCloud_UncheckAll = new ActionTagCloud_UncheckAllTags();
 
@@ -477,6 +510,8 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 		fillToolbar();
 
 		addTourEventListener();
+
+		restoreStateBeforeUI();
 
 		// load profile viewer
 		_profileViewer.setInput(new Object());
@@ -1068,22 +1103,22 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 
 		final Composite container = new Composite(parent, SWT.NONE);
 
-		container.addControlListener(new ControlAdapter() {
-
-			@Override
-			public void controlResized(final ControlEvent e) {
-
-				final Rectangle containerSize = container.getClientArea();
-
-				System.out.println(
-						(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //$NON-NLS-1$ //$NON-NLS-2$
-								+ ("\tcontainerSize: " + containerSize) //$NON-NLS-1$
-//						+ ("\t: " + )
-				);
-// TODO remove SYSTEM.OUT.PRINTLN
-
-			}
-		});
+//		container.addControlListener(new ControlAdapter() {
+//
+//			@Override
+//			public void controlResized(final ControlEvent e) {
+//
+//				final Rectangle containerSize = container.getClientArea();
+//
+//				System.out.println(
+//						(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //$NON-NLS-1$ //$NON-NLS-2$
+//								+ ("\tcontainerSize: " + containerSize) //$NON-NLS-1$
+////						+ ("\t: " + )
+//				);
+//// TODO remove SYSTEM.OUT.PRINTLN
+//
+//			}
+//		});
 
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
@@ -1202,8 +1237,6 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 
 		_isLiveUpdate = _chkLiveUpdate.getSelection();
 
-		_state.put(STATE_IS_LIVE_UPDATE, _isLiveUpdate);
-
 		enableControls();
 
 		fireModifyEvent();
@@ -1224,6 +1257,8 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 
 		_actionCollapseAll.setEnabled(isProfileSelected);
 		_actionExpandAll.setEnabled(isProfileSelected);
+		_actionTag_LayoutFlat.setEnabled(isProfileSelected);
+		_actionTag_LayoutHierarchical.setEnabled(isProfileSelected);
 		_actionTagCloud_CheckAll.setEnabled(isProfileSelected && canCheckTags);
 		_actionTagCloud_UncheckAll.setEnabled(isProfileSelected && canUncheckTags);
 
@@ -1269,6 +1304,8 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 		 */
 		final ToolBarManager tbmAllTags = new ToolBarManager(_toolBarAllTags);
 
+		tbmAllTags.add(_actionTag_LayoutFlat);
+		tbmAllTags.add(_actionTag_LayoutHierarchical);
 		tbmAllTags.add(_actionExpandAll);
 		tbmAllTags.add(_actionCollapseAll);
 		tbmAllTags.add(_actionOpenPrefTags);
@@ -1429,6 +1466,8 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 		_imgTag.dispose();
 		_imgTagRoot.dispose();
 		_imgTagCategory.dispose();
+
+		saveState();
 	}
 
 	@Override
@@ -1612,6 +1651,20 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 		}
 
 		fireModifyEvent();
+	}
+
+	/**
+	 * @param isHierarchicalLayout
+	 *            Is <code>true</code> when the layout is flat, otherwise it is hierarchical
+	 */
+	private void onTag_Layout(final boolean isHierarchicalLayout) {
+
+		_isHierarchicalLayout = isHierarchicalLayout;
+
+		updateTagModel();
+
+		// reselect profile
+		onProfile_Select(false);
 	}
 
 	private void onTag_Select(final SelectionChangedEvent event) {
@@ -1920,9 +1973,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 
 	private void restoreState() {
 
-		/*
-		 * Other states
-		 */
+		// live update
 		_isLiveUpdate = Util.getStateBoolean(_state, STATE_IS_LIVE_UPDATE, false);
 		_chkLiveUpdate.setSelection(_isLiveUpdate);
 
@@ -1940,6 +1991,30 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 		if (selectedProfile != null) {
 			selectProfile(selectedProfile);
 		}
+
+		/*
+		 * Set layout actions after the UI is created
+		 */
+		if (_isHierarchicalLayout) {
+			_actionTag_LayoutHierarchical.setChecked(true);
+		} else {
+			_actionTag_LayoutFlat.setChecked(true);
+		}
+	}
+
+	private void restoreStateBeforeUI() {
+
+		// layout
+		_isHierarchicalLayout = Util.getStateBoolean(_state, STATE_IS_HIERARCHICAL_LAYOUT, true);
+	}
+
+	@Override
+	protected void saveState() {
+
+		_state.put(STATE_IS_HIERARCHICAL_LAYOUT, _isHierarchicalLayout);
+		_state.put(STATE_IS_LIVE_UPDATE, _isLiveUpdate);
+
+		super.saveState();
 	}
 
 	private void selectProfile(final TourTagFilterProfile selectedProfile) {
@@ -1994,7 +2069,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 
 	private void updateTagModel() {
 
-		_tagViewerRootItem = new TVIPrefTagRoot(_tagViewer);
+		_tagViewerRootItem = new TVIPrefTagRoot(_tagViewer, _isHierarchicalLayout);
 		_tagViewer.setInput(this);
 
 		loadAllTagItems();

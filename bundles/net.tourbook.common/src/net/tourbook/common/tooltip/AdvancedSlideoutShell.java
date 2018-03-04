@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1425,7 +1425,10 @@ public abstract class AdvancedSlideoutShell {
 	 */
 	protected void restoreState_SlideoutIsPinned(final boolean isSlideoutPinned) {}
 
-	private void saveState() {
+	/**
+	 * 
+	 */
+	protected void saveState() {
 
 		_state.put(STATE_HORIZ_SLIDEOUT_WIDTH, _horizContentWidth);
 		_state.put(STATE_HORIZ_SLIDEOUT_HEIGHT, _horizContentHeight);
