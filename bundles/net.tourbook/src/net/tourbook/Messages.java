@@ -772,6 +772,10 @@ public class Messages extends NLS {
 	public static String		Image__App_Add;
 	public static String		Image__App_Add_2x;
 	public static String		Image__App_Cancel;
+	public static String		Image__App_Checkbox_Checked;
+	public static String		Image__App_Checkbox_Checked_Disabled;
+	public static String		Image__App_Checkbox_Uncheck;
+	public static String		Image__App_Checkbox_Uncheck_Disabled;
 	public static String		Image__App_Close;
 	public static String		Image__App_Edit_Paste;
 	public static String		Image__App_Filter;
@@ -941,6 +945,8 @@ public class Messages extends NLS {
 	public static String		Image__TourMarker;
 	public static String		Image__TourSegments;
 	public static String		Image__TourSegments_Disabled;
+	public static String		Image__TourTagFilter;
+	public static String		Image__TourTagFilter_Disabled;
 	public static String		Image__undo_edit;
 	public static String		Image__undo_edit_disabled;
 	public static String		Image__undo_tour_type_filter;
@@ -1899,6 +1905,15 @@ public class Messages extends NLS {
 	public static String		Slideout_TourMarkerFilter_Label_GeoFilterArea;
 	public static String		Slideout_TourMarkerFilter_Label_GeoFilterNotAvailable;
 
+	public static String		Slideout_TourTagFilter_Action_AddProfile_Tooltip;
+	public static String		Slideout_TourTagFilter_Action_CheckAllTags_Tooltip;
+	public static String		Slideout_TourTagFilter_Action_UncheckAllTags_Tooltip;
+	public static String		Slideout_TourTagFilter_Checkbox_IsLiveUpdate_Tooltip;
+	public static String		Slideout_TourTagFilter_Column_Properties_Tooltip;
+	public static String		Slideout_TourTagFilter_Label_AllTags;
+	public static String		Slideout_TourTagFilter_Label_SelectedTags;
+	public static String		Slideout_TourTagFilter_Label_Title;
+
 	public static String		Slideout_TrainingOptions_Label_Title;
 
 	public static String		Tooltip_ValuePoint_Action_CloseContextMenu;
@@ -2170,6 +2185,8 @@ public class Messages extends NLS {
 	public static String		Tour_Segmenter_Type_ByBreakTime;
 
 	public static String		Tour_Statistic_Combo_BarVOrder_Tooltip;
+
+	public static String		Tour_Tag_Filter_Action_Tooltip;
 
 	public static String		tag_view_action_refresh_view_tooltip;
 	public static String		tag_view_title_tag;

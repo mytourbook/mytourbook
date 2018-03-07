@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,7 +21,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import net.tourbook.common.UI;
 import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.TreeViewerItem;
@@ -44,20 +43,58 @@ public class TVITourBookRoot extends TVITourBookItem {
 		final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
 		setChildren(children);
 
-		final SQLFilter sqlFilter = new SQLFilter();
+		final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+		String fromTourData;
 
-		final String sql = UI.NEW_LINE
-				//
-				+ "SELECT \n" //						 //$NON-NLS-1$
-				+ "startYear,\n" // //$NON-NLS-1$
+		if (sqlFilter.isTagFilterActive()) {
+
+			// with tag filter
+
+			fromTourData = NL
+
+					+ "FROM (			" + NL //$NON-NLS-1$
+
+					+ " SELECT			" + NL //$NON-NLS-1$
+
+					+ "  StartYear,		" + NL //$NON-NLS-1$
+					+ SQL_SUM_FIELDS + NL
+
+					+ "  FROM " + TourDatabase.TABLE_TOUR_DATA + NL//$NON-NLS-1$
+
+					// get tag id's
+					+ "  LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + NL //$NON-NLS-1$ //$NON-NLS-2$
+					+ "  ON tourID = jTdataTtag.TourData_tourId	" + NL //$NON-NLS-1$
+
+					+ "  WHERE 1=1		" + NL //$NON-NLS-1$
+					+ sqlFilter.getWhereClause()
+
+					+ ") td				" + NL//$NON-NLS-1$
+			;
+
+		} else {
+
+			// without tag filter
+
+			fromTourData = NL
+
+					+ " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //$NON-NLS-1$
+
+					+ " WHERE 1=1			" + NL //$NON-NLS-1$
+					+ sqlFilter.getWhereClause() + NL;
+		}
+
+		final String sql = NL +
+
+				"SELECT						" + NL //$NON-NLS-1$
+
+				+ " StartYear,				" + NL //$NON-NLS-1$
 				+ SQL_SUM_COLUMNS
 
-				+ " FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE //$NON-NLS-1$
+				+ fromTourData
 
-				+ (" WHERE 1=1\n" + sqlFilter.getWhereClause()) // //$NON-NLS-1$
-
-				+ " GROUP BY startYear\n" //			//$NON-NLS-1$
-				+ " ORDER BY startYear\n";//			//$NON-NLS-1$
+				+ " GROUP BY StartYear		" + NL
+				+ " ORDER BY StartYear		" + NL//			//$NON-NLS-1$
+		;
 
 		Connection conn = null;
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,6 +27,7 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
+import net.tourbook.common.util.ITreeViewer;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.TreeColumnDefinition;
 import net.tourbook.common.util.TreeViewerItem;
@@ -101,22 +102,24 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
-public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvider, IReferenceTourProvider {
+public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvider, IReferenceTourProvider,
+		ITreeViewer {
 
-	public static final String			ID									= "net.tourbook.views.tourCatalog.TourCatalogView"; //$NON-NLS-1$
+	public static final String		ID									=
+			"net.tourbook.views.tourCatalog.TourCatalogView";												//$NON-NLS-1$
 
-	public static final int				COLUMN_LABEL						= 0;
-	public static final int				COLUMN_SPEED						= 1;
+	public static final int			COLUMN_LABEL						= 0;
+	public static final int			COLUMN_SPEED						= 1;
 
-	private static final String			MEMENTO_TOUR_CATALOG_ACTIVE_REF_ID	= "tour.catalog.active.ref.id";					//$NON-NLS-1$
-	private static final String			MEMENTO_TOUR_CATALOG_LINK_TOUR		= "tour.catalog.link.tour";						//$NON-NLS-1$
+	private static final String		MEMENTO_TOUR_CATALOG_ACTIVE_REF_ID	= "tour.catalog.active.ref.id";		//$NON-NLS-1$
+	private static final String		MEMENTO_TOUR_CATALOG_LINK_TOUR		= "tour.catalog.link.tour";			//$NON-NLS-1$
 
-	private final IPreferenceStore		_prefStore							= TourbookPlugin.getPrefStore();
-	private final IDialogSettings		_state								= TourbookPlugin.getState(ID);
+	private final IPreferenceStore	_prefStore							= TourbookPlugin.getPrefStore();
+	private final IDialogSettings	_state								= TourbookPlugin.getState(ID);
 
-	private TVICatalogRootItem			_rootItem;
+	private TVICatalogRootItem		_rootItem;
 
-	private final NumberFormat			_nf1								= NumberFormat.getNumberInstance();
+	private final NumberFormat		_nf1								= NumberFormat.getNumberInstance();
 	{
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
@@ -142,7 +145,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	/**
 	 * flag if actions are added to the toolbar
 	 */
-	private boolean						_isToolbarCreated					= false;
+	private boolean						_isToolbarCreated		= false;
 
 	private ColumnManager				_columnManager;
 
@@ -152,7 +155,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 	private TagMenuManager				_tagMenuMgr;
 	private TreeViewerTourInfoToolTip	_tourInfoToolTip;
-	private TourDoubleClickState		_tourDoubleClickState				= new TourDoubleClickState();
+	private TourDoubleClickState		_tourDoubleClickState	= new TourDoubleClickState();
 
 	private PixelConverter				_pc;
 
@@ -306,9 +309,11 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 				// update the view when a new tour reference was created
 				if (selection instanceof SelectionPersistedCompareResults) {
 
-					final SelectionPersistedCompareResults selectionPersisted = (SelectionPersistedCompareResults) selection;
+					final SelectionPersistedCompareResults selectionPersisted =
+							(SelectionPersistedCompareResults) selection;
 
-					final ArrayList<TVICompareResultComparedTour> persistedCompareResults = selectionPersisted.persistedCompareResults;
+					final ArrayList<TVICompareResultComparedTour> persistedCompareResults =
+							selectionPersisted.persistedCompareResults;
 
 					if (persistedCompareResults.size() > 0) {
 						updateTourViewer(persistedCompareResults);
@@ -422,9 +427,11 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 					return;
 				}
 
-				if (eventId == TourEventId.COMPARE_TOUR_CHANGED && eventData instanceof TourPropertyCompareTourChanged) {
+				if (eventId == TourEventId.COMPARE_TOUR_CHANGED
+						&& eventData instanceof TourPropertyCompareTourChanged) {
 
-					final TourPropertyCompareTourChanged compareTourProperty = (TourPropertyCompareTourChanged) eventData;
+					final TourPropertyCompareTourChanged compareTourProperty =
+							(TourPropertyCompareTourChanged) eventData;
 
 					// check if the compared tour was saved in the database
 					if (compareTourProperty.isDataSaved) {
@@ -949,9 +956,11 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 		_tagMenuMgr.enableTagActions(isTourSelected, isOneTour, firstTourItem == null ? null : firstTourItem.tagIds);
 
-		TourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, isOneTour
-				? firstTourItem.tourTypeId
-				: TourDatabase.ENTITY_IS_NOT_SAVED);
+		TourTypeMenuManager.enableRecentTourTypeActions(
+				isTourSelected,
+				isOneTour
+						? firstTourItem.tourTypeId
+						: TourDatabase.ENTITY_IS_NOT_SAVED);
 	}
 
 	private void fillContextMenu(final IMenuManager menuMgr) {
@@ -1138,6 +1147,11 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	public TreeViewer getTourViewer() {
 		return _tourViewer;
 	}
+
+	@Override
+	public TreeViewer getTreeViewer() {
+		return _tourViewer;
+ 	}
 
 	@Override
 	public ColumnViewer getViewer() {

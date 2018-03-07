@@ -277,8 +277,8 @@ public class TourDatabase {
 		System.setProperty("derby.system.home", _databasePath); //$NON-NLS-1$
 
 // set derby debug properties
-//		System.setProperty("derby.language.logQueryPlan", "true");
 //		System.setProperty("derby.language.logStatementText", "true");
+//		System.setProperty("derby.language.logQueryPlan", "true");
 	}
 
 	private static final Object	DB_LOCK			= new Object();
@@ -1572,7 +1572,7 @@ public class TourDatabase {
 			}
 		}
 
-		return getTagNamesText(tagNames);
+		return getTagNamesText(tagNames, false);
 	}
 
 	/**
@@ -1592,10 +1592,26 @@ public class TourDatabase {
 			tagNames.add(tag.getTagName());
 		}
 
-		return getTagNamesText(tagNames);
+		return getTagNamesText(tagNames, false);
 	}
 
-	private static String getTagNamesText(final ArrayList<String> tagNames) {
+	public static String getTagNames(final Set<TourTag> tourTags, final boolean isVertical) {
+
+		if (tourTags.size() == 0) {
+			return UI.EMPTY_STRING;
+		}
+
+		final ArrayList<String> tagNames = new ArrayList<String>();
+
+		// get tag name for each tag id
+		for (final TourTag tag : tourTags) {
+			tagNames.add(tag.getTagName());
+		}
+
+		return getTagNamesText(tagNames, isVertical);
+	}
+
+	private static String getTagNamesText(final ArrayList<String> tagNames, final boolean isVertical) {
 
 		// sort tags by name
 		Collections.sort(tagNames);
@@ -1606,7 +1622,11 @@ public class TourDatabase {
 
 		for (final String tagName : tagNames) {
 			if (tagIndex++ > 0) {
-				sb.append(", ");//$NON-NLS-1$
+				if (isVertical) {
+					sb.append("\n");//$NON-NLS-1$
+				} else {
+					sb.append(", ");//$NON-NLS-1$
+				}
 			}
 			sb.append(tagName);
 		}

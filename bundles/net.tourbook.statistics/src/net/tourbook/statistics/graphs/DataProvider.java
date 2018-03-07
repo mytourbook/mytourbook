@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,10 +23,15 @@ import net.tourbook.ui.TourTypeFilter;
 
 public abstract class DataProvider {
 
+	static final char		NL			= net.tourbook.common.UI.NEW_LINE;
+
+	static ZonedDateTime	calendar8	= ZonedDateTime.now().with(TimeTools.calendarWeek.dayOfWeek(), 1);
+
 	TourPerson				_activePerson;
 	TourTypeFilter			_activeTourTypeFilter;
 
 	int						_lastYear;
+
 	int						_numberOfYears;
 
 	/**
@@ -43,8 +48,6 @@ public abstract class DataProvider {
 	 * number of weeks in a year
 	 */
 	int[]					_yearWeeks;
-
-	static ZonedDateTime	calendar8	= ZonedDateTime.now().with(TimeTools.calendarWeek.dayOfWeek(), 1);
 
 	/**
 	 * @param finalYear

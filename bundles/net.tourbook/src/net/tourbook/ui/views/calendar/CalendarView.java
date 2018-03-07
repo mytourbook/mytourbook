@@ -151,7 +151,12 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
 			@Override
-			public void partHidden(final IWorkbenchPartReference partRef) {}
+			public void partHidden(final IWorkbenchPartReference partRef) {
+
+				if (partRef.getPart(false) == CalendarView.this) {
+					onPartHidden();
+				}
+			}
 
 			@Override
 			public void partInputChanged(final IWorkbenchPartReference partRef) {}
@@ -549,6 +554,14 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 	boolean isShowTourTooltip() {
 
 		return _actionTourInfo.isChecked();
+	}
+
+	private void onPartHidden() {
+
+		// hide config slideout
+		final SlideoutCalendarOptions slideout = getConfigSlideout();
+
+		slideout.close();
 	}
 
 	private void onSelectionChanged(final ISelection selection) {

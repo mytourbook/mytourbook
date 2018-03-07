@@ -43,6 +43,7 @@ import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer3;
+import net.tourbook.common.util.ITreeViewer;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TreeColumnDefinition;
@@ -146,7 +147,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
-public class TourBookView extends ViewPart implements ITourProvider2, ITourViewer3, ITourProviderByID {
+public class TourBookView extends ViewPart implements ITourProvider2, ITourViewer3, ITourProviderByID, ITreeViewer {
 
 // SET_FORMATTING_OFF
 	//
@@ -3314,6 +3315,11 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 	IDialogSettings getState() {
 		return _state;
+	}
+
+	@Override
+	public TreeViewer getTreeViewer() {
+		return _tourViewer;
 	}
 
 	@Override

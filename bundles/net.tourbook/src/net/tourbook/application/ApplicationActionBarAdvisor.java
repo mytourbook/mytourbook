@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,7 @@ package net.tourbook.application;
 import net.tourbook.Messages;
 import net.tourbook.map.bookmark.MapBookmarkManager;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tag.tour.filter.TourTagFilterManager;
 import net.tourbook.tour.TourTypeFilterManager;
 import net.tourbook.tour.filter.TourFilterManager;
 
@@ -48,6 +49,8 @@ import org.eclipse.ui.application.IActionBarConfigurer;
  */
 public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
+	private static final String					MENU_CONTRIB_TOOLBAR_APP_FILTER	= "mc_tb_AppFilter";//$NON-NLS-1$
+
 	private IWorkbenchWindow					_window;
 
 	private IWorkbenchAction					_actionPreferences;
@@ -73,7 +76,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 //	private IWorkbenchAction					_actionEditActionSets;
 
 	PersonContributionItem						_personContribItem;
-	private ActionTourFilter					_actionTourFilter;
+	private ActionTourDataFilter				_actionTourDataFilter;
+	private ActionTourTagFilter					_actionTourTagFilter;
 	private TourTypeContributionItem			_tourTypeContribItem;
 	private MeasurementSystemContributionItem	_measurementContribItem;
 
@@ -201,14 +205,32 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 			 * Toolbar: Tour filter
 			 */
 			final IToolBarManager tbMgr_TourFilter = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-			final ToolBarContributionItem tbItemTourFilter = new ToolBarContributionItem(
-					tbMgr_TourFilter,
-					"mc_tb_AppFilter"); //$NON-NLS-1$
+			{
+				/*
+				 * Tour data filter
+				 */
+				final ToolBarContributionItem tbItemTourDataFilter = new ToolBarContributionItem(
+						tbMgr_TourFilter,
+						MENU_CONTRIB_TOOLBAR_APP_FILTER);
 
-			coolBar.add(tbItemTourFilter);
-			tbMgr_TourFilter.add(_actionTourFilter);
+				coolBar.add(tbItemTourDataFilter);
+				tbMgr_TourFilter.add(_actionTourDataFilter);
 
-			TourFilterManager.setTourFilterAction(_actionTourFilter);
+				TourFilterManager.setTourFilterAction(_actionTourDataFilter);
+			}
+			{
+				/*
+				 * Tour tag filter
+				 */
+				final ToolBarContributionItem tbItemTourTagFilter = new ToolBarContributionItem(
+						tbMgr_TourFilter,
+						MENU_CONTRIB_TOOLBAR_APP_FILTER);
+
+				coolBar.add(tbItemTourTagFilter);
+				tbMgr_TourFilter.add(_actionTourTagFilter);
+
+				TourTagFilterManager.setTourTagFilterAction(_actionTourTagFilter);
+			}
 		}
 
 		{
@@ -259,7 +281,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		_window = window;
 
 		_personContribItem = new PersonContributionItem();
-		_actionTourFilter = new ActionTourFilter();
+		_actionTourDataFilter = new ActionTourDataFilter();
+		_actionTourTagFilter = new ActionTourTagFilter();
 		_tourTypeContribItem = new TourTypeContributionItem();
 		_measurementContribItem = new MeasurementSystemContributionItem();
 
@@ -308,6 +331,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		_personContribItem.saveState(state);
 		TourTypeFilterManager.saveState(state);
 		TourFilterManager.saveState();
+		TourTagFilterManager.saveState();
 		MapBookmarkManager.saveState();
 
 		return super.saveState(state);

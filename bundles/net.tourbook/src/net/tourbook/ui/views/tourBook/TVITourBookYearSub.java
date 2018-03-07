@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -64,7 +64,7 @@ public class TVITourBookYearSub extends TVITourBookItem {
 		final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
 		setChildren(children);
 
-		final SQLFilter sqlFilter = new SQLFilter();
+		final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
 
 		final String sqlString = UI.NEW_LINE
 				//

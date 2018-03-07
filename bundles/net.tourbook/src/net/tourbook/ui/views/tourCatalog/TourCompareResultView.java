@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -30,6 +30,7 @@ import net.tourbook.common.formatter.ValueFormatSet;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
+import net.tourbook.common.util.ITreeViewer;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.TreeColumnDefinition;
 import net.tourbook.common.util.TreeViewerItem;
@@ -84,6 +85,7 @@ import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeSelection;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
@@ -104,13 +106,12 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
 import org.eclipse.ui.part.ViewPart;
 
-public class TourCompareResultView extends ViewPart implements ITourViewer, ITourProvider {
+public class TourCompareResultView extends ViewPart implements ITourViewer, ITourProvider, ITreeViewer {
 
 	public static final String					ID					= "net.tourbook.views.tourCatalog.CompareResultView";	//$NON-NLS-1$
 
-	private final IPreferenceStore				_prefStore			= TourbookPlugin.getDefault().getPreferenceStore();
-	private final IDialogSettings				_state				= TourbookPlugin.getDefault() //
-																			.getDialogSettingsSection(ID);
+	private final IPreferenceStore				_prefStore			= TourbookPlugin.getPrefStore();
+	private final IDialogSettings				_state				= TourbookPlugin.getState(ID);
 
 	private TVICompareResultRootItem			_rootItem;
 
@@ -1174,6 +1175,11 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		return selectedTourData;
 	}
 
+	@Override
+	public TreeViewer getTreeViewer() {
+		return _tourViewer;
+	}
+
 	/**
 	 * @return Returns the tour viewer
 	 */
@@ -1551,10 +1557,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	}
 
 	@Override
-	public void updateColumnHeader(final ColumnDefinition colDef) {
-		// TODO Auto-generated method stub
-
-	}
+	public void updateColumnHeader(final ColumnDefinition colDef) {}
 
 	/**
 	 * !!!Recursive !!! update all tour items with new data

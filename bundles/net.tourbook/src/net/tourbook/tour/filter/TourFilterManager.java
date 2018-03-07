@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import net.tourbook.Messages;
-import net.tourbook.application.ActionTourFilter;
+import net.tourbook.application.ActionTourDataFilter;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -343,7 +343,7 @@ public class TourFilterManager {
 
 	private static int[]						_fireEventCounter	= new int[1];
 
-	private static ActionTourFilter				_actionTourFilter;
+	private static ActionTourDataFilter				_actionTourFilter;
 
 	private static void createConfig_Altitude(final ArrayList<TourFilterFieldConfig> allConfigs) {
 
@@ -825,7 +825,7 @@ public class TourFilterManager {
 	 * @return Returns sql data for the selected tour filter profile or <code>null</code> when not
 	 *         available.
 	 */
-	public static TourFilterSQLData getSQL() {
+	public static SQLFilterData getSQL() {
 
 		if (_isTourFilterEnabled == false || _selectedProfile == null) {
 
@@ -1014,7 +1014,7 @@ public class TourFilterManager {
 			}
 		}
 
-		final TourFilterSQLData tourFilterSQLData = new TourFilterSQLData(sqlWhere.toString(), sqlParameters);
+		final SQLFilterData tourFilterSQLData = new SQLFilterData(sqlWhere.toString(), sqlParameters);
 
 		return tourFilterSQLData;
 	}
@@ -1628,8 +1628,7 @@ public class TourFilterManager {
 
 	public static void restoreState() {
 
-		_isTourFilterEnabled = _prefStore.getBoolean(ITourbookPreferences.APP_TOUR_FILTER_IS_SELECTED);
-
+		_isTourFilterEnabled = _prefStore.getBoolean(ITourbookPreferences.APP_TOUR_DATA_FILTER_IS_SELECTED);
 		_actionTourFilter.setSelection(_isTourFilterEnabled);
 
 		readFilterProfile();
@@ -1637,7 +1636,7 @@ public class TourFilterManager {
 
 	public static void saveState() {
 
-		_prefStore.setValue(ITourbookPreferences.APP_TOUR_FILTER_IS_SELECTED, _actionTourFilter.getSelection());
+		_prefStore.setValue(ITourbookPreferences.APP_TOUR_DATA_FILTER_IS_SELECTED, _actionTourFilter.getSelection());
 
 		final XMLMemento xmlRoot = writeFilterProfile();
 		final File xmlFile = getXmlFile();
@@ -1662,7 +1661,7 @@ public class TourFilterManager {
 		_selectedProfile = selectedProfile;
 	}
 
-	public static void setTourFilterAction(final ActionTourFilter actionTourFilterAdv) {
+	public static void setTourFilterAction(final ActionTourDataFilter actionTourFilterAdv) {
 		_actionTourFilter = actionTourFilterAdv;
 	}
 

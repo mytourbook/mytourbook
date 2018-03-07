@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -88,13 +88,13 @@ public class UI {
 
 // SET_FORMATTING_OFF
 	
-	public static final boolean								IS_LINUX						= "gtk".equals(SWT.getPlatform());			//$NON-NLS-1$
+	public static final boolean			IS_LINUX						= "gtk".equals(SWT.getPlatform());			//$NON-NLS-1$
 	
-	public static final boolean								IS_OSX							= "carbon".equals(SWT.getPlatform()) || 	//$NON-NLS-1$
-																							  "cocoa".equals(SWT.getPlatform());		//$NON-NLS-1$
+	public static final boolean			IS_OSX							= "carbon".equals(SWT.getPlatform()) || 	//$NON-NLS-1$
+																		  "cocoa".equals(SWT.getPlatform());		//$NON-NLS-1$
 	
-	public static final boolean								IS_WIN							= "win32".equals(SWT.getPlatform()) || 		//$NON-NLS-1$
-																							  "wpf".equals(SWT.getPlatform());			//$NON-NLS-1$
+	public static final boolean			IS_WIN							= "win32".equals(SWT.getPlatform()) || 		//$NON-NLS-1$
+																		  "wpf".equals(SWT.getPlatform());			//$NON-NLS-1$
 // SET_FORMATTING_ON
 
 	private static final String			ICONS_PATH						= "/icons/";											//$NON-NLS-1$
@@ -124,8 +124,7 @@ public class UI {
 	 */
 	public static final String			NEW_LINE2						= "\n\n";												//$NON-NLS-1$
 
-	public static final String			SYSTEM_NEW_LINE					= System
-			.getProperty("line.separator");																						//$NON-NLS-1$
+	public static final String			SYSTEM_NEW_LINE					= System.getProperty("line.separator");					//$NON-NLS-1$
 
 	public static final String			IS_NOT_INITIALIZED				= "IS NOT INITIALIZED";									//$NON-NLS-1$
 
@@ -144,8 +143,7 @@ public class UI {
 	public static final String			VIEW_COLOR_SUB					= "view.color.sub";										//$NON-NLS-1$
 	public static final String			VIEW_COLOR_SUB_SUB				= "view.color.sub-sub";									//$NON-NLS-1$
 	public static final String			VIEW_COLOR_TOUR					= "view.color.tour";									//$NON-NLS-1$
-	public static final String			VIEW_COLOR_BG_HISTORY_TOUR		=
-			"VIEW_COLOR_BG_HISTORY_TOUR";																						//$NON-NLS-1$
+	public static final String			VIEW_COLOR_BG_HISTORY_TOUR		= "VIEW_COLOR_BG_HISTORY_TOUR";							//$NON-NLS-1$
 
 	public static final String			SYMBOL_AVERAGE					= "\u00f8";												//$NON-NLS-1$
 	public static final String			SYMBOL_AVERAGE_WITH_SPACE		= "\u00f8 ";											//$NON-NLS-1$
@@ -1104,6 +1102,17 @@ public class UI {
 
 	public static void updateUI_Tags(final TourData tourData, final Label tourTagLabel) {
 
+		updateUI_Tags(tourData, tourTagLabel, false);
+	}
+
+	/**
+	 * @param tourData
+	 * @param tourTagLabel
+	 * @param isVertical
+	 *            When <code>true</code> the tags are displayed as a list, otherwise horizontally
+	 */
+	public static void updateUI_Tags(final TourData tourData, final Label tourTagLabel, final boolean isVertical) {
+
 		// tour tags
 		final Set<TourTag> tourTags = tourData.getTourTags();
 
@@ -1113,13 +1122,11 @@ public class UI {
 
 		} else {
 
-			final String tagLabels = TourDatabase.getTagNames(tourTags);
+			final String tagLabels = TourDatabase.getTagNames(tourTags, isVertical);
 
 			tourTagLabel.setText(tagLabels);
 			tourTagLabel.setToolTipText(tagLabels);
 		}
-
-//		tourTagLabel.pack(true);
 	}
 
 	/**

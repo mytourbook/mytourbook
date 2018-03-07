@@ -26,7 +26,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.ToolItem;
 
-public class ActionTourFilter extends ActionToolbarSlideoutAdv {
+public class ActionTourDataFilter extends ActionToolbarSlideoutAdv {
 
 // SET_FORMATTING_OFF
 
@@ -39,7 +39,7 @@ public class ActionTourFilter extends ActionToolbarSlideoutAdv {
 	
 // SET_FORMATTING_ON
 
-	public ActionTourFilter() {
+	public ActionTourDataFilter() {
 
 		super(_actionImageDescriptor, _actionImageDisabledDescriptor);
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -360,6 +360,8 @@ public class UI {
 	public static final int				DECORATOR_HORIZONTAL_INDENT				= 2;
 
 	static {
+
+		setupUI_FontMetrics();
 
 		IMAGE_REGISTRY = CommonActivator.getDefault().getImageRegistry();
 
@@ -1461,9 +1463,11 @@ public class UI {
 		final GridData data = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
 
 		final int widthHint = convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH);
-		final Point minSize = button.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
 
-		data.widthHint = Math.max(widthHint, minSize.x);
+		final Point minSize = button.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+		final int defaultWidth = minSize.x;
+
+		data.widthHint = Math.max(widthHint, defaultWidth);
 
 		button.setLayoutData(data);
 	}
@@ -1640,9 +1644,6 @@ public class UI {
 			Assert.isNotNull(layoutData);
 
 			((GridData) layoutData).widthHint = maxWidth;
-
-//			System.out.println(String.format("%-30s", control) + ("\t" + maxWidth));
-//			// TODO remove SYSTEM.OUT.PRINTLN
 		}
 	}
 
@@ -1691,9 +1692,12 @@ public class UI {
 	}
 
 	public static GridData setFieldWidth(final Composite parent, final StringFieldEditor field, final int width) {
+
 		final GridData gd = new GridData();
 		gd.widthHint = width;
+
 		field.getTextControl(parent).setLayoutData(gd);
+
 		return gd;
 	}
 
@@ -1706,6 +1710,7 @@ public class UI {
 		// Compute and keep a font metric
 
 		final Shell activeShell = Display.getDefault().getActiveShell();
+
 		if (activeShell == null) {
 
 			// this can occure when called too early

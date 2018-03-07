@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -101,7 +101,7 @@ public class DataProvider_Tour_Time extends DataProvider {
 		final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
 		final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
 
-		final SQLFilter sqlFilter = new SQLFilter();
+		final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
 
 		final String sqlString = "SELECT " //$NON-NLS-1$
 

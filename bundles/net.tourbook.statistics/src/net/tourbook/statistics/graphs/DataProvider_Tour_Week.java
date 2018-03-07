@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -86,26 +86,75 @@ public class DataProvider_Tour_Week extends DataProvider {
 		int serieLength = colorOffset + tourTypes.length;
 		serieLength = serieLength == 0 ? 1 : serieLength;
 
-		final SQLFilter sqlFilter = new SQLFilter();
+		String fromTourData;
 
-		final String sqlString = "SELECT \n" //$NON-NLS-1$
-				+ "StartWeekYear,			\n" // 1 //$NON-NLS-1$
-				+ "StartWeek,				\n" // 2 //$NON-NLS-1$
-				+ "SUM(TourDistance),		\n" // 3 //$NON-NLS-1$
-				+ "SUM(TourAltUp),			\n" // 4 //$NON-NLS-1$
-				+ "SUM(CASE WHEN TourDrivingTime > 0 THEN TourDrivingTime ELSE TourRecordingTime END),\n" // 5 //$NON-NLS-1$
-				+ "SUM(TourRecordingTime),	\n" // 6 //$NON-NLS-1$
-				+ "SUM(TourDrivingTime),	\n" // 7 //$NON-NLS-1$
-				+ "SUM(1), 					\n" // 8 //$NON-NLS-1$
-				+ "TourType_TypeId 			\n" // 9 //$NON-NLS-1$
-				//
-				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
+		final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+		if (sqlFilter.isTagFilterActive()) {
 
-				+ (" WHERE StartWeekYear IN (" + getYearList(lastYear, numberOfYears) + ")\n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ sqlFilter.getWhereClause()
+			// with tag filter
 
-				+ (" GROUP BY StartWeekYear, StartWeek, tourType_typeId \n") //$NON-NLS-1$
-				+ (" ORDER BY StartWeekYear, StartWeek"); //$NON-NLS-1$
+			fromTourData = NL
+
+					+ "FROM (						" + NL //$NON-NLS-1$
+
+					+ " SELECT						" + NL //$NON-NLS-1$
+
+					+ "  StartWeekYear,				" + NL //$NON-NLS-1$
+					+ "  StartWeek,					" + NL //$NON-NLS-1$
+					+ "  TourDistance,				" + NL //$NON-NLS-1$
+					+ "  TourAltUp,					" + NL //$NON-NLS-1$
+					+ "  TourRecordingTime,			" + NL //$NON-NLS-1$
+					+ "  TourDrivingTime,			" + NL //$NON-NLS-1$
+
+					+ "  TourType_TypeId 			" + NL //$NON-NLS-1$
+
+					+ (" FROM " + TourDatabase.TABLE_TOUR_DATA) + NL//$NON-NLS-1$
+
+					// get tag id's
+					+ (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag") + NL //$NON-NLS-1$ //$NON-NLS-2$
+					+ (" ON tourID = jTdataTtag.TourData_tourId") + NL //$NON-NLS-1$
+
+					+ (" WHERE StartWeekYear IN (" + getYearList(lastYear, numberOfYears) + ")") + NL //$NON-NLS-1$ //$NON-NLS-2$
+					+ sqlFilter.getWhereClause() + NL
+
+					+ ") td" //$NON-NLS-1$
+			;
+
+		} else {
+
+			// without tag filter
+
+			fromTourData = NL
+
+					+ (" FROM " + TourDatabase.TABLE_TOUR_DATA) + NL //$NON-NLS-1$
+
+					+ (" WHERE StartWeekYear IN (" + getYearList(lastYear, numberOfYears) + ")") + NL //$NON-NLS-1$ //$NON-NLS-2$
+					+ sqlFilter.getWhereClause()
+
+			;
+		}
+
+		final String sqlString = NL +
+
+				"SELECT" + NL //$NON-NLS-1$
+
+				+ " StartWeekYear,				" + NL // 1 //$NON-NLS-1$
+				+ " StartWeek,					" + NL // 2 //$NON-NLS-1$
+
+				+ " SUM(TourDistance),			" + NL // 3 //$NON-NLS-1$
+				+ " SUM(TourAltUp),				" + NL // 4 //$NON-NLS-1$
+				+ " SUM(CASE WHEN TourDrivingTime > 0 THEN TourDrivingTime ELSE TourRecordingTime END)," + NL // 5 //$NON-NLS-1$
+				+ " SUM(TourRecordingTime),		" + NL // 6 //$NON-NLS-1$
+				+ " SUM(TourDrivingTime),		" + NL // 7 //$NON-NLS-1$
+				+ " SUM(1), 					" + NL // 8 //$NON-NLS-1$
+
+				+ " TourType_TypeId 			" + NL // 9 //$NON-NLS-1$
+
+				+ fromTourData
+
+				+ (" GROUP BY StartWeekYear, StartWeek, tourType_typeId ") + NL//$NON-NLS-1$
+				+ (" ORDER BY StartWeekYear, StartWeek") + NL //$NON-NLS-1$
+		;
 
 		try {
 
