@@ -31,12 +31,18 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.NormalizedGeoData;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourReference;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.tourChart.TourChart;
+import net.tourbook.ui.views.tourCatalog.ReferenceTourManager;
+import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
+import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
+import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
+import net.tourbook.ui.views.tourCatalog.TourCompareConfig;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
@@ -47,6 +53,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.ProgressMonitorPart;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -57,6 +64,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
@@ -81,9 +89,10 @@ public class GeoPartView extends ViewPart {
 	private ITourEventListener				_tourEventListener;
 	private SelectionAdapter				_defaultSelectionListener;
 	private IPropertyChangeListener			_prefChangeListener;
+	private ISelectionListener				_postSelectionListener;
 	private int								_lastSelectionHash;
 
-	private TourData						_lastTourData;
+	private long							_lastTourId							= Long.MIN_VALUE;
 	private int								_lastLeftIndex;
 	private int								_lastRightIndex;
 	private int[]							_geoParts;
@@ -91,6 +100,7 @@ public class GeoPartView extends ViewPart {
 	private int								_geoPartTours;
 	private NormalizedGeoData				_normalizedTourPart;
 	private AtomicInteger					_workedTours						= new AtomicInteger();
+	private AtomicInteger					_runningId							= new AtomicInteger();
 
 	private long							_workerExecutorId;
 
@@ -125,6 +135,7 @@ public class GeoPartView extends ViewPart {
 
 			setToolTipText(Messages.GeoPart_View_Action_AppFilter_Tooltip);
 			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Filter));
+			setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Filter_Disabled));
 		}
 
 		@Override
@@ -217,6 +228,25 @@ public class GeoPartView extends ViewPart {
 
 		// register the listener
 		_prefStore.addPropertyChangeListener(_prefChangeListener);
+	}
+
+	/**
+	 * listen for events when a tour is selected
+	 */
+	private void addSelectionListener() {
+
+		_postSelectionListener = new ISelectionListener() {
+			@Override
+			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
+
+				if (part == GeoPartView.this) {
+					return;
+				}
+
+				onSelectionChanged(selection);
+			}
+		};
+		getSite().getPage().addPostSelectionListener(_postSelectionListener);
 	}
 
 	private void addTourEventListener() {
@@ -381,6 +411,7 @@ public class GeoPartView extends ViewPart {
 		addPartListener();
 		addPrefListener();
 		addTourEventListener();
+		addSelectionListener();
 
 		GeoPartTourLoader.geoPartView = this;
 		GeoPartTourComparer.geoPartView = this;
@@ -474,12 +505,19 @@ public class GeoPartView extends ViewPart {
 	@Override
 	public void dispose() {
 
-		getViewSite().getPage().removePartListener(_partListener);
+		getSite().getPage().removePostSelectionListener(_postSelectionListener);
+		getSite().getPage().removePartListener(_partListener);
+
 		TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
 		_prefStore.removePropertyChangeListener(_prefChangeListener);
 
 		super.dispose();
+	}
+
+	private void enableControls() {
+
+		_actionAppTourFilter.setEnabled(_isListenToSliderPosition);
 	}
 
 	private void fillToolbar() {
@@ -584,17 +622,34 @@ public class GeoPartView extends ViewPart {
 	private void onAction_OnOff(final boolean isSelected) {
 
 		_isListenToSliderPosition = isSelected;
+
+		_isListenToSliderPosition = isSelected;
 		_actionOnOff.setIcon(_isListenToSliderPosition);
 
-		if (isSelected == false) {
+		if (isSelected) {
+
+			// enable comparing
+
+			recompareTours();
+
+		} else {
+
+			// cancel comparing
+
 			onCancelProgress();
 		}
+
+		enableControls();
 	}
 
 	private void onCancelProgress() {
 
-		_progMonitor.setTaskName("Comparing is canceled");
-		_progMonitor.subTask(UI.EMPTY_STRING);
+		_progMonitor.beginTask("Comparing is canceled", 1);
+//		_progMonitor.setTaskName("Comparing is canceled");
+//		_progMonitor.subTask(UI.EMPTY_STRING);
+		_progMonitor.worked(0);
+
+//		_progMonitor.setEnabled(false);
 
 		GeoPartTourLoader.stopLoading(_previousGeoPartItem);
 	}
@@ -627,15 +682,43 @@ public class GeoPartView extends ViewPart {
 		}
 
 		// skip same data
-		if (tourData == _lastTourData && leftIndex == _lastLeftIndex && rightIndex == _lastRightIndex) {
+		if (tourData.getTourId() == _lastTourId //
+				&& leftIndex == _lastLeftIndex
+				&& rightIndex == _lastRightIndex) {
 			return;
 		}
 
-		_lastTourData = tourData;
+		_lastTourId = tourData.getTourId();
 		_lastLeftIndex = leftIndex;
 		_lastRightIndex = rightIndex;
 
-		compare_10_LoadGeoParts(tourData, firstIndex, lastIndex);
+		final int firstIndexFinal = firstIndex;
+		final int lastIndexFinal = lastIndex;
+
+		GeoPartTourLoader.stopLoading(_previousGeoPartItem);
+
+		// delay tour comparator, moving the slider can occure very often
+		_parent.getDisplay().timerExec(100, new Runnable() {
+
+			private int __runningId = _runningId.incrementAndGet();
+
+			@Override
+			public void run() {
+
+				if (_parent.isDisposed()) {
+					return;
+				}
+
+				if (__runningId != _runningId.get()) {
+
+					// a newer runnable is created
+
+					return;
+				}
+
+				compare_10_LoadGeoParts(tourData, firstIndexFinal, lastIndexFinal);
+			}
+		});
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
@@ -730,12 +813,28 @@ public class GeoPartView extends ViewPart {
 				}
 			}
 
+		} else if (selection instanceof SelectionTourCatalogView) {
+
+			showRefTour(((SelectionTourCatalogView) selection).getRefId());
+
+		} else if (selection instanceof StructuredSelection) {
+
+			final Object firstElement = ((StructuredSelection) selection).getFirstElement();
+
+			if (firstElement instanceof TVICatalogComparedTour) {
+
+				showRefTour(((TVICatalogComparedTour) firstElement).getRefId());
+
+			} else if (firstElement instanceof TVICompareResultComparedTour) {
+
+				showRefTour(((TVICompareResultComparedTour) firstElement).refTour.refId);
+			}
 		}
 	}
 
 	private void recompareTours() {
 
-		if (_geoParts != null) {
+		if (_geoParts != null && _isListenToSliderPosition) {
 
 			_previousGeoPartItem = GeoPartTourLoader.loadToursFromGeoParts(
 					_geoParts,
@@ -754,6 +853,8 @@ public class GeoPartView extends ViewPart {
 
 		_isUseAppFilter = Util.getStateBoolean(_state, STATE_IS_USE_APP_FILTER, true);
 		_actionAppTourFilter.setChecked(_isUseAppFilter);
+
+		enableControls();
 	}
 
 	private void saveState() {
@@ -764,6 +865,31 @@ public class GeoPartView extends ViewPart {
 
 	@Override
 	public void setFocus() {}
+
+	private void showRefTour(final long refId) {
+		// TODO Auto-generated method stub
+
+		final TourCompareConfig tourCompareConfig = ReferenceTourManager.getInstance().getTourCompareConfig(refId);
+
+		if (tourCompareConfig == null) {
+			return;
+		}
+
+		final TourData tourData = tourCompareConfig.getRefTourData();
+		if (tourData != null) {
+
+			final TourReference refTour = tourCompareConfig.getRefTour();
+
+			final int leftSliderValueIndex = refTour.getStartValueIndex();
+			final int rightSliderValueIndex = refTour.getEndValueIndex();
+
+			onMoveSlider(
+					tourData,
+					leftSliderValueIndex,
+					rightSliderValueIndex);
+		}
+
+	}
 
 	private void updateUI(final GeoPartItem loaderItem) {
 

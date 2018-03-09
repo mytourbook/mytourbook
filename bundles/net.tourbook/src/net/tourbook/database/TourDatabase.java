@@ -2111,12 +2111,12 @@ public class TourDatabase {
 
 		System.out.println(
 				String.format(
-						"%s" // tour date
-								+ "\t%s" // tour time
+						"%s" // tour date //$NON-NLS-1$
+								+ "  %s tour" // tour time //$NON-NLS-1$
 
-								+ "\t%d" // time slices
-								+ "\t%d" // parts
-								+ "\t%.3f", // sql time
+								+ "  %5d time slices" // time slices //$NON-NLS-1$
+								+ "  %5d parts" // parts //$NON-NLS-1$
+								+ "  %5.2f ms", // sql time //$NON-NLS-1$
 
 						TourManager.getTourDateShort(tourData),
 						TourManager.getTourTimeShort(tourData),
@@ -6347,7 +6347,7 @@ public class TourDatabase {
 
 		try {
 
-			System.out.println("Tour Date\tTour Time\tTime Slices\tGeo Parts\tSql Time");
+			System.out.println("Tour Date\tTour Time\tTime Slices\tGeo Parts\tSql Time"); //$NON-NLS-1$
 			// TODO remove SYSTEM.OUT.PRINTLN
 
 			long lastUpdateTime = startTime;

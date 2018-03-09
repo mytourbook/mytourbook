@@ -779,6 +779,8 @@ public class Messages extends NLS {
 	public static String		Image__App_Close;
 	public static String		Image__App_Edit_Paste;
 	public static String		Image__App_Filter;
+
+	public static String Image__App_Filter_Disabled;
 	public static String		Image__App_OK;
 	public static String		Image__App_RestoreDefault;
 	public static String		Image__App_Sort;

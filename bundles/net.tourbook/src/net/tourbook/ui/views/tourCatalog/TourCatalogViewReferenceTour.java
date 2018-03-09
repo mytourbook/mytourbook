@@ -52,6 +52,11 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart implements I
 
 	private long				_activeRefId	= -1;
 
+	private boolean				_isInSelectionChanged;
+
+	/*
+	 * UI controls
+	 */
 	private PageBook			_pageBook;
 	private Label				_pageNoChart;
 
@@ -89,6 +94,11 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart implements I
 		_tourChart.addSliderMoveListener(new ISliderMoveListener() {
 			@Override
 			public void sliderMoved(final SelectionChartInfo chartInfo) {
+
+				// prevent refireing selection
+				if (_isInSelectionChanged) {
+					return;
+				}
 
 				TourManager.fireEventWithCustomData(
 						TourEventId.SLIDER_POSITION_CHANGED,
@@ -152,7 +162,11 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart implements I
 			return;
 		}
 
-		onSelectionChanged(selection);
+		_isInSelectionChanged = true;
+		{
+			onSelectionChanged(selection);
+		}
+		_isInSelectionChanged = false;
 	}
 
 	@Override
@@ -183,8 +197,7 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart implements I
 			oldRefTourConfig.setXSliderPosition(
 					new SelectionChartXSliderPosition(
 							_tourChart,
-							oldXSliderPosition
-									.getLeftSliderValueIndex(),
+							oldXSliderPosition.getLeftSliderValueIndex(),
 							oldXSliderPosition.getRightSliderValueIndex()));
 		}
 
