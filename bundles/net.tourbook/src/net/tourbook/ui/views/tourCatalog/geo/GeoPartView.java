@@ -81,11 +81,9 @@ public class GeoPartView extends ViewPart {
 // SET_FORMATTING_ON
 
 	private static final IDialogSettings	_state								= TourbookPlugin.getState(ID);
-
 	private final IPreferenceStore			_prefStore							= TourbookPlugin.getPrefStore();
 
 	private IPartListener2					_partListener;
-
 	private ITourEventListener				_tourEventListener;
 	private SelectionAdapter				_defaultSelectionListener;
 	private IPropertyChangeListener			_prefChangeListener;
@@ -96,8 +94,8 @@ public class GeoPartView extends ViewPart {
 	private int								_lastLeftIndex;
 	private int								_lastRightIndex;
 	private int[]							_geoParts;
-
 	private int								_geoPartTours;
+
 	private NormalizedGeoData				_normalizedTourPart;
 	private AtomicInteger					_workedTours						= new AtomicInteger();
 	private AtomicInteger					_runningId							= new AtomicInteger();
@@ -120,7 +118,6 @@ public class GeoPartView extends ViewPart {
 	private Composite						_parent;
 
 	private Label							_lblNumGeoParts;
-
 	private Label							_lblNumSlices;
 	private Label							_lblNumTours;
 	private Label							_lblSqlRuntime;
@@ -334,7 +331,7 @@ public class GeoPartView extends ViewPart {
 					// enable cancel button
 					_progMonitor.attachToCancelComponent(null);
 
-					_progMonitor.beginTask(NLS.bind("Comparing tours", _geoPartTours), _geoPartTours); //$NON-NLS-1$
+					_progMonitor.beginTask("Comparing tours", _geoPartTours); //$NON-NLS-1$
 				}
 
 				updateUI(loaderItem);
@@ -363,8 +360,9 @@ public class GeoPartView extends ViewPart {
 			return;
 		}
 
+		// reset paused time
 		_lastUIUpdate = now;
-		_workedDiff = 1;
+		_workedDiff = 0;
 
 		Display.getDefault().asyncExec(new Runnable() {
 			@Override
@@ -645,13 +643,12 @@ public class GeoPartView extends ViewPart {
 	private void onCancelProgress() {
 
 		_progMonitor.beginTask("Comparing is canceled", 1);
-//		_progMonitor.setTaskName("Comparing is canceled");
-//		_progMonitor.subTask(UI.EMPTY_STRING);
 		_progMonitor.worked(0);
 
-//		_progMonitor.setEnabled(false);
-
 		GeoPartTourLoader.stopLoading(_previousGeoPartItem);
+
+		// reset last id that the same compare can be restarted
+		_lastTourId = Long.MIN_VALUE;
 	}
 
 	private void onMoveSlider(	final TourData tourData,
@@ -867,7 +864,6 @@ public class GeoPartView extends ViewPart {
 	public void setFocus() {}
 
 	private void showRefTour(final long refId) {
-		// TODO Auto-generated method stub
 
 		final TourCompareConfig tourCompareConfig = ReferenceTourManager.getInstance().getTourCompareConfig(refId);
 

@@ -726,6 +726,12 @@
 					mnemonic="%command_tourCompare_wizard_mnemonic"/>
 				
 				<command
+					commandId	="net.tourbook.command.GeoParts"
+					icon		="icons/geo-parts.png"
+					label		="%Command_GeoParts"
+					mnemonic	="%Command_GeoParts_Mnemonic"/>
+				
+				<command
 					commandId="command.net.tourbook.ui.views.TourChartSmoothingView"
 					icon="icons/smooth.png"
 					label="%View_Name_TourChartSmoothing"
@@ -1229,10 +1235,18 @@
             name="%command_tourChart_options">
       </command>
 
-      <command
-            id="net.tourbook.command.tourCompareWizard"
-            name="%command_tourCompare_wizard"
-            />
+		<command
+			id				="net.tourbook.command.tourCompareWizard"
+			name			="%command_tourCompare_wizard"
+			defaultHandler	="net.tourbook.ui.views.tourCatalog.ActionHandlerTourCompareWizard"
+		/>
+		
+		<command
+			id				="net.tourbook.command.GeoParts"
+			name			="%Command_GeoParts"
+			defaultHandler	="net.tourbook.ui.views.tourCatalog.geo.ActionHandler_OpenView_GeoParts"
+		/>
+		
       <command
             id="net.tourbook.command.tourChart.tool.graphAnalyzer"
             name="%command_tourChart_tool_graphAnalyzer"
@@ -1374,15 +1388,6 @@
 			
 	</extension>
 			
-   <extension
-         point="org.eclipse.ui.handlers">
-
-      <handler
-            class="net.tourbook.ui.views.tourCatalog.ActionHandlerTourCompareWizard"
-            commandId="net.tourbook.command.tourCompareWizard">
-      </handler>
-   </extension>
-
    <extension
          point="org.eclipse.ui.contexts">
       <context
@@ -1643,7 +1648,7 @@
 			<view
 				category="net.tourbook.category.compareTours"
 				class="net.tourbook.ui.views.tourCatalog.geo.GeoPartView"
-				icon="icons/tour-map-statistic.png"
+				icon="icons/geo-parts.png"
 				id="net.tourbook.ui.views.tourCatalog.geo.GeoPartView"
 				name="%View_Name_Compare_GeoParts"
 			/>
