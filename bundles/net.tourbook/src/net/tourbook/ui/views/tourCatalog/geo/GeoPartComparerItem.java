@@ -26,6 +26,7 @@ public class GeoPartComparerItem {
 	 */
 	long[]		tourLatLonDiff;
 	int			tourMinDiffIndex;
+	long		minDiffValue;
 
 	float		avgPulse;
 	float		speed;
@@ -35,10 +36,10 @@ public class GeoPartComparerItem {
 	 */
 	boolean		isCompared;
 
-	public GeoPartComparerItem(final long tourId, final GeoPartItem loaderItem) {
+	public GeoPartComparerItem(final long tourId, final GeoPartItem geoPartItem) {
 
 		this.tourId = tourId;
-		this.geoPartItem = loaderItem;
+		this.geoPartItem = geoPartItem;
 	}
 
 	@Override

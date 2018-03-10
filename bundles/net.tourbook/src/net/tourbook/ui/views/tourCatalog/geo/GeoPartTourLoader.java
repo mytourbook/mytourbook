@@ -226,7 +226,7 @@ public class GeoPartTourLoader {
 				}
 
 				if (loadTourGeoPartsFromDB(loaderItem)) {
-					geoPartView.compare_20_CompareTours(loaderItem);
+					geoPartView.compare_40_CompareTours(loaderItem);
 				}
 			}
 		};

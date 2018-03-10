@@ -108,7 +108,7 @@ public class GeoPartTourComparer {
 						StatusUtil.log(e);
 					}
 
-					geoPartView.compare_30_TourIsCompared(comparatorItem);
+					geoPartView.compare_50_TourIsCompared(comparatorItem);
 				}
 			});
 		}
@@ -116,9 +116,9 @@ public class GeoPartTourComparer {
 
 	private static void compareTour(final GeoPartComparerItem comparerItem) {
 
-		final GeoPartItem loaderItem = comparerItem.geoPartItem;
+		final GeoPartItem geoPartItem = comparerItem.geoPartItem;
 
-		if (loaderItem.isCanceled) {
+		if (geoPartItem.isCanceled) {
 			return;
 		}
 
@@ -134,7 +134,7 @@ public class GeoPartTourComparer {
 		 */
 		final long startConvert = System.nanoTime();
 
-		final NormalizedGeoData normalizedPart = loaderItem.normalizedTourPart;
+		final NormalizedGeoData normalizedPart = geoPartItem.normalizedTourPart;
 		final int[] partLatSerie = normalizedPart.normalizedLat;
 		final int[] partLonSerie = normalizedPart.normalizedLon;
 
@@ -145,7 +145,7 @@ public class GeoPartTourComparer {
 		final int numPartSlices = partLatSerie.length;
 		final int numTourSlices = tourLatSerie.length;
 
-		final long[] tourDiff = new long[numTourSlices];
+		final long[] tourLatLonDiff = new long[numTourSlices];
 
 		/*
 		 * Compare
@@ -164,7 +164,7 @@ public class GeoPartTourComparer {
 			// loop: all part slices
 			for (int partIndex = 0; partIndex < numPartSlices; partIndex++) {
 
-				if (loaderItem.isCanceled) {
+				if (geoPartItem.isCanceled) {
 
 //					System.out.println(
 //							(" [" + GeoPartTourComparer.class.getSimpleName() + "] isCanceled")
@@ -201,7 +201,7 @@ public class GeoPartTourComparer {
 			}
 
 			// keep diff value
-			tourDiff[tourIndex] = latLonDiff;
+			tourLatLonDiff[tourIndex] = latLonDiff;
 
 			// keep min diff value/index
 			if (latLonDiff < minDiffValue && latLonDiff != -1) {
@@ -229,8 +229,9 @@ public class GeoPartTourComparer {
 
 		comparerItem.isCompared = true;
 
-		comparerItem.tourLatLonDiff = tourDiff;
+		comparerItem.tourLatLonDiff = tourLatLonDiff;
 		comparerItem.tourMinDiffIndex = minDiffIndex;
+		comparerItem.minDiffValue = minDiffIndex < 0 ? Long.MAX_VALUE : tourLatLonDiff[minDiffIndex];
 
 		if (LOG_TOUR_COMPARING) {
 
@@ -263,7 +264,7 @@ public class GeoPartTourComparer {
 							comparerItem.tourId,
 							//							loaderItem.executorId,
 
-							minDiffIndex < 0 ? minDiffIndex : tourDiff[minDiffIndex],
+							minDiffIndex < 0 ? minDiffIndex : tourLatLonDiff[minDiffIndex],
 							numTourSlices,
 							numPartSlices,
 
@@ -277,8 +278,6 @@ public class GeoPartTourComparer {
 
 					));
 		}
-
-		return;
 	}
 
 }
