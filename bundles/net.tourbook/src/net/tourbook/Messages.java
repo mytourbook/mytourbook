@@ -728,6 +728,7 @@ public class Messages extends NLS {
 
 	public static String		GeoPart_View_Action_AppFilter_Tooltip;
 	public static String		GeoPart_View_Action_OnOff_Tooltip;
+	public static String		GeoPart_View_Label_NoTourWithGeoData;
 
 	public static String		HR_Zone_01_060_Moderate;
 	public static String		HR_Zone_01_060_Moderate_Shortcut;
@@ -780,7 +781,7 @@ public class Messages extends NLS {
 	public static String		Image__App_Edit_Paste;
 	public static String		Image__App_Filter;
 
-	public static String Image__App_Filter_Disabled;
+	public static String		Image__App_Filter_Disabled;
 	public static String		Image__App_OK;
 	public static String		Image__App_RestoreDefault;
 	public static String		Image__App_Sort;

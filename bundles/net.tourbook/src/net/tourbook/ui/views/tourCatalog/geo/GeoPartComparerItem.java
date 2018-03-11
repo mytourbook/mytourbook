@@ -15,26 +15,34 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog.geo;
 
+import java.time.ZonedDateTime;
+
 public class GeoPartComparerItem {
 
-	long		tourId;
+	long			tourId;
 
-	GeoPartItem	geoPartItem;
-
-	/*
-	 * Compare results
-	 */
-	long[]		tourLatLonDiff;
-	int			tourMinDiffIndex;
-	long		minDiffValue;
-
-	float		avgPulse;
-	float		speed;
+	GeoPartItem		geoPartItem;
 
 	/**
 	 * Is <code>true</code> when compare result is computed, otherwise <code>false</code>
 	 */
-	boolean		isCompared;
+	boolean			isCompared;
+
+	/**
+	 * Is <code>true</code> when the tour is valid after a comparison, otherwise <code>false</code>
+	 */
+	boolean			isValid;
+
+	/*
+	 * Compare results
+	 */
+	long[]			tourLatLonDiff;
+	int				tourMinDiffIndex;
+	long			minDiffValue;
+
+	float			avgPulse;
+	float			speed;
+	ZonedDateTime	tourStartTime;
 
 	public GeoPartComparerItem(final long tourId, final GeoPartItem geoPartItem) {
 

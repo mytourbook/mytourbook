@@ -1151,7 +1151,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	@Override
 	public TreeViewer getTreeViewer() {
 		return _tourViewer;
- 	}
+	}
 
 	@Override
 	public ColumnViewer getViewer() {
@@ -1315,14 +1315,12 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 	@Override
 	public void setFocus() {
-//		fTourViewer.getTree().setFocus();
+
+		_tourViewer.getTree().setFocus();
 	}
 
 	@Override
-	public void updateColumnHeader(final ColumnDefinition colDef) {
-		// TODO Auto-generated method stub
-
-	}
+	public void updateColumnHeader(final ColumnDefinition colDef) {}
 
 	private void updateToolTipState() {
 

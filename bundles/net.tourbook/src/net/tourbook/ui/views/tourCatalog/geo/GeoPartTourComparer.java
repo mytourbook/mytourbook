@@ -215,7 +215,9 @@ public class GeoPartTourComparer {
 		}
 
 		// a tour is available
-		if (minDiffIndex != -1) {
+		if (minDiffIndex > -1) {
+
+			comparerItem.isValid = true;
 
 			final int[] normalizedIndices = normalizedTour.normalized2OriginalIndices;
 
@@ -224,14 +226,14 @@ public class GeoPartTourComparer {
 
 			comparerItem.avgPulse = tourData.computeAvg_PulseSegment(startIndex, endIndex);
 			comparerItem.speed = TourManager.computeTourSpeed(tourData, startIndex, endIndex);
-
 		}
 
+		comparerItem.tourStartTime = tourData.getTourStartTime();
 		comparerItem.isCompared = true;
 
 		comparerItem.tourLatLonDiff = tourLatLonDiff;
 		comparerItem.tourMinDiffIndex = minDiffIndex;
-		comparerItem.minDiffValue = minDiffIndex < 0 ? Long.MAX_VALUE : tourLatLonDiff[minDiffIndex];
+		comparerItem.minDiffValue = minDiffIndex < 0 ? -1 : tourLatLonDiff[minDiffIndex];
 
 		if (LOG_TOUR_COMPARING) {
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -62,6 +62,9 @@ import org.eclipse.ui.part.PageBook;
 public class TourCatalogViewComparedTour extends TourChartViewPart implements ISynchedChart, ITourChartViewer {
 
 	public static final String					ID				= "net.tourbook.views.tourCatalog.comparedTourView";	//$NON-NLS-1$
+
+	private boolean								_isInRefTourChanged;
+	private boolean								_isInSelectionChanged;
 
 	/*
 	 * keep data from the reference tour view
@@ -232,7 +235,9 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 		_refTourPropertyListener = new ITourEventListener() {
 			@Override
-			public void tourChanged(final IWorkbenchPart part, final TourEventId propertyId, final Object propertyData) {
+			public void tourChanged(final IWorkbenchPart part,
+									final TourEventId propertyId,
+									final Object propertyData) {
 
 				if (propertyId == TourEventId.REFERENCE_TOUR_CHANGED
 						&& propertyData instanceof TourPropertyRefTourChanged) {
@@ -247,9 +252,13 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 					_refTourTourChart = tourProperty.refTourChart;
 					_refTourXMarkerValueDifference = tourProperty.xMarkerValue;
 
-					if (updateTourChart() == false) {
-						enableSynchronization();
+					_isInRefTourChanged = true;
+					{
+						if (updateTourChart() == false) {
+							enableSynchronization();
+						}
 					}
+					_isInRefTourChanged = false;
 				}
 			}
 		};
@@ -319,6 +328,11 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 		_tourChart.addSliderMoveListener(new ISliderMoveListener() {
 			@Override
 			public void sliderMoved(final SelectionChartInfo chartInfoSelection) {
+
+				// prevent refireing selection
+				if (_isInSelectionChanged || _isInRefTourChanged) {
+					return;
+				}
 
 				TourManager.fireEventWithCustomData(//
 						TourEventId.SLIDER_POSITION_CHANGED,
@@ -518,7 +532,11 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 			return;
 		}
 
-		onSelectionChanged(selection);
+		_isInSelectionChanged = true;
+		{
+			onSelectionChanged(selection);
+		}
+		_isInSelectionChanged = false;
 	}
 
 	/**
@@ -536,14 +554,16 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 				if (_comparedTourItem instanceof TVICompareResultComparedTour) {
 
-					final TVICompareResultComparedTour comparedTourItem = (TVICompareResultComparedTour) _comparedTourItem;
+					final TVICompareResultComparedTour comparedTourItem =
+							(TVICompareResultComparedTour) _comparedTourItem;
 
 					TourCompareManager.saveComparedTourItem(comparedTourItem, em, ts);
 
 					_ctCompareId = comparedTourItem.compId;
 
 					// update tour map view
-					final SelectionPersistedCompareResults persistedCompareResults = new SelectionPersistedCompareResults();
+					final SelectionPersistedCompareResults persistedCompareResults =
+							new SelectionPersistedCompareResults();
 					persistedCompareResults.persistedCompareResults.add(comparedTourItem);
 
 					_postSelectionProvider.setSelection(persistedCompareResults);
@@ -633,13 +653,15 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 			return true;
 		}
 
-		final MessageBox msgBox = new MessageBox(Display.getDefault().getActiveShell(), //
+		final MessageBox msgBox = new MessageBox(
+				Display.getDefault().getActiveShell(), //
 				SWT.ICON_QUESTION | SWT.YES | SWT.NO);
 
 		msgBox.setText(Messages.tourCatalog_view_dlg_save_compared_tour_title);
-		msgBox.setMessage(NLS.bind(
-				Messages.tourCatalog_view_dlg_save_compared_tour_message,
-				TourManager.getTourTitleDetailed(_tourData)));
+		msgBox.setMessage(
+				NLS.bind(
+						Messages.tourCatalog_view_dlg_save_compared_tour_message,
+						TourManager.getTourTitleDetailed(_tourData)));
 
 		final int answer = msgBox.open();
 
@@ -681,9 +703,11 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 		} else if (_comparedTourItem instanceof TVICompareResultComparedTour) {
 
-			xData.setRangeMarkers(new int[] { _defaultStartIndex, _computedStartIndex }, new int[] {
-					_defaultEndIndex,
-					_computedEndIndex });
+			xData.setRangeMarkers(
+					new int[] { _defaultStartIndex, _computedStartIndex },
+					new int[] {
+							_defaultEndIndex,
+							_computedEndIndex });
 		}
 	}
 

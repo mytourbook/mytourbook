@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog.geo;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -28,6 +29,7 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
@@ -41,6 +43,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.tourCatalog.ReferenceTourManager;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
@@ -49,10 +52,7 @@ import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 import net.tourbook.ui.views.tourCatalog.TourCompareConfig;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuListener;
-import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -73,33 +73,32 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
-import org.eclipse.jface.wizard.ProgressMonitorPart;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
 public class GeoPartView extends ViewPart implements ITourViewer {
 
 // SET_FORMATTING_OFF
 	
-	public static final String		ID									= "net.tourbook.ui.views.tourCatalog.geo.GeoPartView";	//$NON-NLS-1$
-
-	private static final String		STATE_IS_LISTEN_TO_SLIDER_POSITION	= "STATE_IS_LISTEN_TO_SLIDER_POSITION";		//$NON-NLS-1$
-	private static final String		STATE_IS_USE_APP_FILTER				= "STATE_IS_USE_APP_FILTER";				//$NON-NLS-1$
+	public static final String				ID									= "net.tourbook.ui.views.tourCatalog.geo.GeoPartView";	//$NON-NLS-1$
+                                            
+	private static final String				STATE_IS_LISTEN_TO_SLIDER_POSITION	= "STATE_IS_LISTEN_TO_SLIDER_POSITION";		//$NON-NLS-1$
+	private static final String				STATE_IS_USE_APP_FILTER				= "STATE_IS_USE_APP_FILTER";				//$NON-NLS-1$
 	
 // SET_FORMATTING_ON
 
@@ -113,9 +112,9 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 	private ISelectionListener				_postSelectionListener;
 	private int								_lastSelectionHash;
 
-	private long							_lastTourId							= Long.MIN_VALUE;
-	private int								_lastLeftIndex;
-	private int								_lastRightIndex;
+	private long							_prevTourId							= Long.MIN_VALUE;
+	private int								_prevFirstIndex;
+	private int								_prevLastIndex;
 	private int[]							_geoParts;
 	private int								_geoPartTours;
 
@@ -125,7 +124,7 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 
 	private long							_workerExecutorId;
 
-	private boolean							_isListenToSliderPosition;
+	private boolean							_isCompareEnabled;
 	private boolean							_isUseAppFilter;
 
 	/**
@@ -134,7 +133,6 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 	private ArrayList<GeoPartComparerItem>	_comparedTours						= new ArrayList<>();
 
 	private GeoPartItem						_previousGeoPartItem;
-	private int								_workedDiff;
 	private long							_lastUIUpdate;
 
 	private ActionAppTourFilter				_actionAppTourFilter;
@@ -151,12 +149,17 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 	private Composite						_parent;
 	private Composite						_viewerContainer;
 
+	private PageBook						_pageBook;
+	private Composite						_pageNoData;
+	private Composite						_pageContent;
+
 	private Label							_lblNumGeoParts;
 	private Label							_lblNumSlices;
 	private Label							_lblNumTours;
+	private Label							_lblProgressBar;
 	private Label							_lblSqlRuntime;
 
-	private ProgressMonitorPart				_progMonitor;
+	private ProgressBar						_progressBar;
 
 	private class ActionAppTourFilter extends Action {
 
@@ -207,24 +210,34 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 		@Override
 		public int compare(final Viewer viewer, final Object e1, final Object e2) {
 
-			if (e1 == null || e2 == null) {
-				return 0;
-			}
-
 			final GeoPartComparerItem item1 = (GeoPartComparerItem) e1;
 			final GeoPartComparerItem item2 = (GeoPartComparerItem) e2;
 
-			if (item1.isCompared == false && item2.isCompared == false) {
-				return Integer.MIN_VALUE;
-			}
+			final boolean is1Compared = item1.isCompared;
+			final boolean is2Compared = item2.isCompared;
 
-//			if (item1.isCompared || item2.isCompared == false) {
-//				return (int) item1.minDiffValue;
+			final boolean is1Valid = item1.isValid;
+			final boolean is2Valid = item2.isValid;
+
+//			if (is1Compared && !is2Compared) {
+//
+//				// show compared before not compared
+////				return is1Valid ? Integer.MAX_VALUE : Integer.MIN_VALUE;
+//				return -Integer.MAX_VALUE;
 //			}
 //
-//			if (item2.isCompared || item1.isCompared == false) {
-//				return (int) item2.minDiffValue;
+//			if (is2Compared && !is1Compared) {
+//
+//				// show compared before not compared
+////				return is2Valid ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+//				return -Integer.MIN_VALUE;
 //			}
+
+//			if (is1Compared && is2Compared) {
+//			return (int) (item1.minDiffValue - item2.minDiffValue);
+//			}
+//
+//			return 0;
 
 			return (int) (item1.minDiffValue - item2.minDiffValue);
 		}
@@ -257,14 +270,13 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 
 			@Override
 			public void partActivated(final IWorkbenchPartReference partRef) {
-				
+
 				if (partRef.getPart(false) == GeoPartView.this) {
 
 					int a = 0;
 					a++;
 				}
-				
-				
+
 			}
 
 			@Override
@@ -272,9 +284,11 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
+
 				if (partRef.getPart(false) == GeoPartView.this) {
+
 					saveState();
-					onCancelProgress();
+					setState_CancelComparing();
 				}
 			}
 
@@ -366,14 +380,25 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 									final int leftIndex,
 									final int rightIndex) {
 
-		if (_isListenToSliderPosition == false) {
+		if (_isCompareEnabled == false) {
 
 			// ignore slider position
 			return;
 		}
 
+		/*
+		 * !!! This must be very early because it is running with a delay which could cause that an
+		 * old is running !!!
+		 */
+		final int runnableRunningId = _runningId.incrementAndGet();
+
 		final double[] latSerie = tourData.latitudeSerie;
 		if (latSerie == null) {
+
+			setState_StopComparing();
+
+			_pageBook.showPage(_pageNoData);
+
 			return;
 		}
 
@@ -389,31 +414,29 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 			lastIndex = latSerie.length;
 		}
 
-		// skip same data
-		if (tourData.getTourId() == _lastTourId //
-				&& leftIndex == _lastLeftIndex
-				&& rightIndex == _lastRightIndex) {
+		final long tourId = tourData.getTourId();
+
+		// skip same data or continue current comparison
+		if (tourId == _prevTourId //
+				&& leftIndex == _prevFirstIndex
+				&& rightIndex == _prevLastIndex) {
 			return;
 		}
 
-		_lastTourId = tourData.getTourId();
-		_lastLeftIndex = leftIndex;
-		_lastRightIndex = rightIndex;
-
-		final int firstIndexFinal = firstIndex;
-		final int lastIndexFinal = lastIndex;
-
 		GeoPartTourLoader.stopLoading(_previousGeoPartItem);
 
-		// update UI
-		_comparedTours.clear();
-		updateUI_Viewer();
-		updateUI(null);
+		final int runnableFirstIndex = firstIndex;
+		final int runnableLastIndex = lastIndex;
+		final TourData runnableTourData = tourData;
+
+		_prevTourId = tourId;
+		_prevFirstIndex = runnableFirstIndex;
+		_prevLastIndex = runnableLastIndex;
 
 		// delay tour comparator, moving the slider can occure very often
-		_parent.getDisplay().timerExec(100, new Runnable() {
+		_parent.getDisplay().timerExec(300, new Runnable() {
 
-			private int __runningId = _runningId.incrementAndGet();
+			private int __runningId = runnableRunningId;
 
 			@Override
 			public void run() {
@@ -429,7 +452,7 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 					return;
 				}
 
-				compare_20_LoadGeoParts(tourData, firstIndexFinal, lastIndexFinal);
+				compare_20_LoadGeoParts(runnableTourData, runnableFirstIndex, runnableLastIndex);
 			}
 		});
 	}
@@ -440,12 +463,23 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 		_geoParts = tourData.computeGeo_Partitions(firstIndex, lastIndex);
 
 		if (_geoParts == null) {
+
+			_pageBook.showPage(_pageNoData);
+
 			return;
 		}
 
+		_pageBook.showPage(_pageContent);
+
+		_comparedTours.clear();
+		updateUI_Viewer();
+
 		// update UI
-		_lblNumSlices.setText(Integer.toString(lastIndex - firstIndex));
+		final int numSlices = lastIndex - firstIndex;
+		_lblNumSlices.setText(Integer.toString(numSlices));
 		_lblNumGeoParts.setText(Integer.toString(_geoParts.length));
+		updateUI_GeoItem(null);
+		updateUI_Progress(0);
 
 		/*
 		 * Create geo data which should be compared
@@ -490,15 +524,9 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 					return;
 				}
 
-				if (_geoPartTours > 0) {
+				_progressBar.setMaximum(_geoPartTours);
 
-					// enable cancel button
-					_progMonitor.attachToCancelComponent(null);
-
-					_progMonitor.beginTask("Comparing tours", _geoPartTours); //$NON-NLS-1$
-				}
-
-				updateUI(loaderItem);
+				updateUI_GeoItem(loaderItem);
 			}
 		});
 
@@ -516,19 +544,15 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 
 		final int workedTours = _workedTours.incrementAndGet();
 
-		_workedDiff++;
-		final int workedDiff = _workedDiff;
-
 		final long now = System.currentTimeMillis();
 
-		// update UI every 100 ms or when comparation is done
-		if (now - _lastUIUpdate < 100 && workedTours != _geoPartTours) {
+		// update UI not too often until comparison is done
+		if (now - _lastUIUpdate < 300 && workedTours != _geoPartTours) {
 			return;
 		}
 
 		// reset paused time
 		_lastUIUpdate = now;
-		_workedDiff = 0;
 
 		Display.getDefault().asyncExec(new Runnable() {
 			@Override
@@ -538,17 +562,7 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 					return;
 				}
 
-				if (workedTours == _geoPartTours) {
-
-					_progMonitor.beginTask("Comparing is done", 5);
-					_progMonitor.worked(0);
-
-				} else {
-
-					_progMonitor.subTask(NLS.bind("{0} / {1}", workedTours, _geoPartTours)); //$NON-NLS-1$
-					_progMonitor.worked(workedDiff);
-				}
-
+				updateUI_Progress(workedTours);
 				updateUI_Viewer();
 
 				// fire geo part compare result
@@ -593,21 +607,32 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 		GeoPartTourComparer.geoPartView = this;
 
 		restoreState();
+
+		_pageBook.showPage(_pageNoData);
 	}
 
 	private void createUI(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-		{
-			createUI_10_Comparator(container);
+		_pageBook = new PageBook(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBook);
 
-			_viewerContainer = new Composite(container, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, true).applyTo(_viewerContainer);
-			GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
+		_pageNoData = UI.createUI_PageNoData(_pageBook, Messages.GeoPart_View_Label_NoTourWithGeoData);
+
+		_pageContent = new Composite(_pageBook, SWT.NONE);
+		GridLayoutFactory.fillDefaults().applyTo(_pageContent);
+		{
+			final Composite container = new Composite(_pageContent, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+			GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 			{
-				createUI_20_TableViewer(_viewerContainer);
+				createUI_10_Comparator(container);
+
+				_viewerContainer = new Composite(container, SWT.NONE);
+				GridDataFactory.fillDefaults().grab(true, true).applyTo(_viewerContainer);
+				GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
+				{
+					createUI_20_TableViewer(_viewerContainer);
+				}
 			}
 		}
 	}
@@ -621,8 +646,21 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 				.numColumns(2)
 				//				.spacing(10, 2)
 				.applyTo(container);
-		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		{
+			{
+				/*
+				 * Number of tours
+				 */
+
+				final Label label = new Label(container, SWT.NONE);
+				label.setText("Tours"); //$NON-NLS-1$
+				GridDataFactory.fillDefaults().applyTo(label);
+
+				_lblNumTours = new Label(container, SWT.NONE);
+				_lblNumTours.setText(UI.EMPTY_STRING);
+				GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblNumTours);
+			}
 			{
 				/*
 				 * Number of time slices
@@ -651,19 +689,6 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 			}
 			{
 				/*
-				 * Number of tours
-				 */
-
-				final Label label = new Label(container, SWT.NONE);
-				label.setText("Part Tours"); //$NON-NLS-1$
-				GridDataFactory.fillDefaults().applyTo(label);
-
-				_lblNumTours = new Label(container, SWT.NONE);
-				_lblNumTours.setText(UI.EMPTY_STRING);
-				GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblNumTours);
-			}
-			{
-				/*
 				 * SQL runtime
 				 */
 
@@ -677,20 +702,28 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 			}
 			{
 				/*
-				 * Progress monitor with cancel button
+				 * Progress bar label
 				 */
-				_progMonitor = new ProgressMonitorPart(container, new GridLayout(), true) {
+				_lblProgressBar = new Label(container, SWT.NONE);
 
-					@Override
-					public void setCanceled(final boolean isCanceled) {
+				GridDataFactory
+						.fillDefaults()
+						.span(2, 1)
+						.grab(true, false)
+						.applyTo(_lblProgressBar);
+			}
+			{
+				/*
+				 * Progress bar
+				 */
+				_progressBar = new ProgressBar(container, SWT.HORIZONTAL);
+				_progressBar.setMinimum(0);
 
-						onCancelProgress();
-
-						super.setCanceled(isCanceled);
-					}
-				};
-
-				GridDataFactory.fillDefaults().span(2, 1).applyTo(_progMonitor);
+				GridDataFactory
+						.fillDefaults()
+						.span(2, 1)
+						.grab(true, false)
+						.applyTo(_progressBar);
 			}
 		}
 	}
@@ -704,19 +737,12 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
 
 		table.setHeaderVisible(true);
-//		table.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 		table.setLinesVisible(false);
 
 		/*
 		 * create table viewer
 		 */
 		_geoPartViewer = new TableViewer(table);
-
-//		// set editing support after the viewer is created but before the columns are created
-//		net.tourbook.common.UI.setCellEditSupport(_markerViewer);
-//
-//		_colDefName.setEditingSupport(new MarkerEditingSupportLabel(_markerViewer));
-//		_colDefVisibility.setEditingSupport(new MarkerEditingSupportVisibility(_markerViewer));
 
 		_columnManager.createColumns(_geoPartViewer);
 
@@ -763,32 +789,12 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 			@Override
 			public void keyReleased(final KeyEvent e) {}
 		});
-		createUI_30_ContextMenu();
-	}
-
-	/**
-	 * create the views context menu
-	 */
-	private void createUI_30_ContextMenu() {
-
-		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
-		menuMgr.setRemoveAllWhenShown(true);
-		menuMgr.addMenuListener(new IMenuListener() {
-			@Override
-			public void menuAboutToShow(final IMenuManager manager) {
-//				fillContextMenu(manager);
-			}
-		});
-
-		final Table table = (Table) _geoPartViewer.getControl();
-		final Menu tableContextMenu = menuMgr.createContextMenu(table);
-
-		_columnManager.createHeaderContextMenu(table, tableContextMenu);
 	}
 
 	private void defineAllColumns() {
 
 		defineColumn_10_Name();
+		defineColumn_Time_TourStartDate();
 	}
 
 	/**
@@ -818,6 +824,28 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 		});
 	}
 
+	/**
+	 * column: Tour start date
+	 */
+	private void defineColumn_Time_TourStartDate() {
+
+		final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_START_DATE.createColumn(_columnManager, _pc);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
+
+				final ZonedDateTime tourStartTime = item.tourStartTime;
+				cell.setText(
+						tourStartTime == null
+								? UI.EMPTY_STRING
+								: tourStartTime.format(TimeTools.Formatter_Date_S));
+			}
+		});
+	}
+
 	@Override
 	public void dispose() {
 
@@ -833,7 +861,7 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 
 	private void enableControls() {
 
-		_actionAppTourFilter.setEnabled(_isListenToSliderPosition);
+		_actionAppTourFilter.setEnabled(_isCompareEnabled);
 	}
 
 	private void fillToolbar() {
@@ -951,10 +979,9 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 
 	private void onAction_OnOff(final boolean isSelected) {
 
-		_isListenToSliderPosition = isSelected;
+		_isCompareEnabled = isSelected;
 
-		_isListenToSliderPosition = isSelected;
-		_actionOnOff.setIcon(_isListenToSliderPosition);
+		_actionOnOff.setIcon(_isCompareEnabled);
 
 		if (isSelected) {
 
@@ -966,21 +993,10 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 
 			// cancel comparing
 
-			onCancelProgress();
+			setState_CancelComparing();
 		}
 
 		enableControls();
-	}
-
-	private void onCancelProgress() {
-
-		_progMonitor.beginTask("Comparing is canceled", 1);
-		_progMonitor.worked(0);
-
-		GeoPartTourLoader.stopLoading(_previousGeoPartItem);
-
-		// reset last id that the same compare can be restarted
-		_lastTourId = Long.MIN_VALUE;
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
@@ -1096,7 +1112,7 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 
 	private void recompareTours() {
 
-		if (_geoParts != null && _isListenToSliderPosition) {
+		if (_geoParts != null && _isCompareEnabled) {
 
 			_previousGeoPartItem = GeoPartTourLoader.loadToursFromGeoParts(
 					_geoParts,
@@ -1133,9 +1149,9 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 
 	private void restoreState() {
 
-		_isListenToSliderPosition = Util.getStateBoolean(_state, STATE_IS_LISTEN_TO_SLIDER_POSITION, true);
-		_actionOnOff.setIcon(_isListenToSliderPosition);
-		_actionOnOff.setChecked(_isListenToSliderPosition);
+		_isCompareEnabled = Util.getStateBoolean(_state, STATE_IS_LISTEN_TO_SLIDER_POSITION, true);
+		_actionOnOff.setIcon(_isCompareEnabled);
+		_actionOnOff.setChecked(_isCompareEnabled);
 
 		_isUseAppFilter = Util.getStateBoolean(_state, STATE_IS_USE_APP_FILTER, true);
 		_actionAppTourFilter.setChecked(_isUseAppFilter);
@@ -1145,12 +1161,29 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 
 	private void saveState() {
 
-		_state.put(STATE_IS_LISTEN_TO_SLIDER_POSITION, _isListenToSliderPosition);
+		_state.put(STATE_IS_LISTEN_TO_SLIDER_POSITION, _isCompareEnabled);
 		_state.put(STATE_IS_USE_APP_FILTER, _isUseAppFilter);
+
+		_columnManager.saveState(_state);
 	}
 
 	@Override
 	public void setFocus() {}
+
+	private void setState_CancelComparing() {
+
+		_lblProgressBar.setText("Comparing is canceled");
+
+		setState_StopComparing();
+	}
+
+	private void setState_StopComparing() {
+
+		GeoPartTourLoader.stopLoading(_previousGeoPartItem);
+
+		// reset last id that the same compare can be restarted
+		_prevTourId = Long.MIN_VALUE;
+	}
 
 	private void showRefTour(final long refId) {
 
@@ -1175,17 +1208,31 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 	@Override
 	public void updateColumnHeader(final ColumnDefinition colDef) {}
 
-	private void updateUI(final GeoPartItem loaderItem) {
+	private void updateUI_GeoItem(final GeoPartItem geoItem) {
 
-		if (loaderItem == null) {
+		if (geoItem == null) {
 
 			_lblNumTours.setText(UI.EMPTY_STRING);
 			_lblSqlRuntime.setText(UI.EMPTY_STRING);
 
 		} else {
 
-			_lblNumTours.setText(Integer.toString(loaderItem.tourIds.length));
-			_lblSqlRuntime.setText(Long.toString(loaderItem.sqlRunningTime) + " ms"); //$NON-NLS-1$
+			_lblNumTours.setText(Integer.toString(geoItem.tourIds.length));
+			_lblSqlRuntime.setText(Long.toString(geoItem.sqlRunningTime) + " ms"); //$NON-NLS-1$
+		}
+	}
+
+	private void updateUI_Progress(final int workedTours) {
+
+		_progressBar.setSelection(workedTours);
+
+		if (workedTours == _geoPartTours) {
+
+			_lblProgressBar.setText("Comparing is done");
+
+		} else {
+
+			_lblProgressBar.setText(NLS.bind("Comparing tours: {0} / {1}", workedTours, _geoPartTours)); //$NON-NLS-1$
 		}
 	}
 
