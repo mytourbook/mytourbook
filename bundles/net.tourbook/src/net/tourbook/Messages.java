@@ -728,6 +728,8 @@ public class Messages extends NLS {
 
 	public static String		GeoPart_View_Action_AppFilter_Tooltip;
 	public static String		GeoPart_View_Action_OnOff_Tooltip;
+	public static String		GeoPart_View_Column_GeoDiff_Header;
+	public static String		GeoPart_View_Column_GeoDiff_Label;
 	public static String		GeoPart_View_Label_NoTourWithGeoData;
 
 	public static String		HR_Zone_01_060_Moderate;

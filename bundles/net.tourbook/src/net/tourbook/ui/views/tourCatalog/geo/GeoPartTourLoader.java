@@ -201,10 +201,10 @@ public class GeoPartTourLoader {
 		// invalidate old requests
 		final long executerId = _loaderExecuterId.incrementAndGet();
 
-		System.out.println(
-				("[" + GeoPartTourLoader.class.getSimpleName() + "] loadToursFromGeoParts()")
-						+ ("\texecuterId: " + executerId));
-// TODO remove SYSTEM.OUT.PRINTLN
+//		System.out.println(
+//				("[" + GeoPartTourLoader.class.getSimpleName() + "] loadToursFromGeoParts()")
+//						+ ("\texecuterId: " + executerId));
+//// TODO remove SYSTEM.OUT.PRINTLN
 
 		final GeoPartItem loaderItem = new GeoPartItem(
 				executerId,

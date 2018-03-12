@@ -15,11 +15,13 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog.geo;
 
+import java.time.ZonedDateTime;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.NormalizedGeoData;
 import net.tourbook.data.TourData;
@@ -40,7 +42,7 @@ public class GeoPartTourComparer {
 
 	static {}
 
-	private static final boolean	LOG_TOUR_COMPARING	= true;
+	private static final boolean	LOG_TOUR_COMPARING	= false;
 
 	static GeoPartView				geoPartView;
 
@@ -217,8 +219,6 @@ public class GeoPartTourComparer {
 		// a tour is available
 		if (minDiffIndex > -1) {
 
-			comparerItem.isValid = true;
-
 			final int[] normalizedIndices = normalizedTour.normalized2OriginalIndices;
 
 			final int startIndex = normalizedIndices[minDiffIndex];
@@ -228,11 +228,14 @@ public class GeoPartTourComparer {
 			comparerItem.speed = TourManager.computeTourSpeed(tourData, startIndex, endIndex);
 		}
 
-		comparerItem.tourStartTime = tourData.getTourStartTime();
-		comparerItem.isCompared = true;
+		final ZonedDateTime tourStartTime = tourData.getTourStartTime();
+
+		comparerItem.tourStartTime = tourStartTime;
+		comparerItem.tourStartTimeMS = TimeTools.toEpochMilli(tourStartTime);
 
 		comparerItem.tourLatLonDiff = tourLatLonDiff;
 		comparerItem.tourMinDiffIndex = minDiffIndex;
+
 		comparerItem.minDiffValue = minDiffIndex < 0 ? -1 : tourLatLonDiff[minDiffIndex];
 
 		if (LOG_TOUR_COMPARING) {
@@ -279,6 +282,7 @@ public class GeoPartTourComparer {
 							time_Convert
 
 					));
+			// TODO remove SYSTEM.OUT.PRINTLN
 		}
 	}
 

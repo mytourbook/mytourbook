@@ -23,26 +23,26 @@ public class GeoPartComparerItem {
 
 	GeoPartItem		geoPartItem;
 
-	/**
-	 * Is <code>true</code> when compare result is computed, otherwise <code>false</code>
-	 */
-	boolean			isCompared;
-
-	/**
-	 * Is <code>true</code> when the tour is valid after a comparison, otherwise <code>false</code>
-	 */
-	boolean			isValid;
-
 	/*
 	 * Compare results
 	 */
 	long[]			tourLatLonDiff;
 	int				tourMinDiffIndex;
-	long			minDiffValue;
+
+	/**
+	 * <ul>
+	 * <li>-2 : Value is not yet set</li>
+	 * <li>-1 : Value is invalid</li>
+	 * <li>0...max : A Valid value is set</li>
+	 * </ul>
+	 */
+	long			minDiffValue	= -2;
 
 	float			avgPulse;
 	float			speed;
+
 	ZonedDateTime	tourStartTime;
+	long			tourStartTimeMS;
 
 	public GeoPartComparerItem(final long tourId, final GeoPartItem geoPartItem) {
 
