@@ -523,15 +523,28 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		// set selection provider
 		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
-		_tourViewer.setInput(_rootItem = new TVICatalogRootItem(this));
+		_rootItem = new TVICatalogRootItem(this);
 
-		restoreState();
+		// delay loading, that the UI and app filters are initialized
+		Display.getCurrent().asyncExec(new Runnable() {
+			@Override
+			public void run() {
 
-		// move the horizontal scrollbar to the left border
-		final ScrollBar horizontalBar = _tourViewer.getTree().getHorizontalBar();
-		if (horizontalBar != null) {
-			horizontalBar.setSelection(0);
-		}
+				if (_tourViewer.getTree().isDisposed()) {
+					return;
+				}
+
+				_tourViewer.setInput(this);
+
+				restoreState();
+
+				// move the horizontal scrollbar to the left border
+				final ScrollBar horizontalBar = _tourViewer.getTree().getHorizontalBar();
+				if (horizontalBar != null) {
+					horizontalBar.setSelection(0);
+				}
+			}
+		});
 	}
 
 	private void createUI(final Composite parent) {
