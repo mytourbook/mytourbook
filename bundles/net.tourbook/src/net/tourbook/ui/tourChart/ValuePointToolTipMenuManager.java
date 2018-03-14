@@ -35,31 +35,41 @@ import org.eclipse.swt.widgets.Widget;
 
 public class ValuePointToolTipMenuManager {
 
-	static final int					VALUE_ID_ALTIMETER							= 1 << 1;
-	static final int					VALUE_ID_ALTITUDE							= 1 << 2;
-	static final int					VALUE_ID_CADENCE							= 1 << 3;
-	static final int					VALUE_ID_DISTANCE							= 1 << 4;
-	static final int					VALUE_ID_GRADIENT							= 1 << 5;
-	static final int					VALUE_ID_PACE								= 1 << 6;
-	static final int					VALUE_ID_POWER								= 1 << 7;
-	static final int					VALUE_ID_PULSE								= 1 << 8;
-	static final int					VALUE_ID_SPEED								= 1 << 9;
-	static final int					VALUE_ID_TEMPERATURE						= 1 << 10;
-	static final int					VALUE_ID_TIME_DURATION						= 1 << 11;
-	static final int					VALUE_ID_TIME_OF_DAY						= 1 << 12;
-	static final int					VALUE_ID_TIME_SLICES						= 1 << 13;
-	static final int					VALUE_ID_CHART_ZOOM_FACTOR					= 1 << 14;
-	static final int					VALUE_ID_GEARS								= 1 << 15;
+// SET_FORMATTING_OFF
 
 	static final String					STATE_VALUE_POINT_TOOLTIP_VISIBLE_GRAPHS	= "ValuePoint_ToolTip_VisibleGraphs";		//$NON-NLS-1$
 	static final String					STATE_VALUE_POINT_TOOLTIP_ORIENTATION		= "ValuePoint_ToolTip_Orientation";		//$NON-NLS-1$
-
-	static final int					DEFAULT_GRAPHS								= VALUE_ID_TIME_SLICES
-																							| VALUE_ID_TIME_DURATION
-																							| VALUE_ID_DISTANCE
-																					//
-																					;
+	
 	static ValuePointToolTipOrientation	DEFAULT_ORIENTATION							= ValuePointToolTipOrientation.Horizontal;
+	
+// SET_FORMATTING_ON
+
+	static final long					VALUE_ID_ALTIMETER							= 1 << 1;
+	static final long					VALUE_ID_ALTITUDE							= 1 << 2;
+	static final long					VALUE_ID_CADENCE							= 1 << 3;
+	static final long					VALUE_ID_DISTANCE							= 1 << 4;
+	static final long					VALUE_ID_GRADIENT							= 1 << 5;
+	static final long					VALUE_ID_PACE								= 1 << 6;
+	static final long					VALUE_ID_POWER								= 1 << 7;
+	static final long					VALUE_ID_PULSE								= 1 << 8;
+	static final long					VALUE_ID_SPEED								= 1 << 9;
+	static final long					VALUE_ID_TEMPERATURE						= 1 << 10;
+	static final long					VALUE_ID_TIME_DURATION						= 1 << 11;
+	static final long					VALUE_ID_TIME_OF_DAY						= 1 << 12;
+	static final long					VALUE_ID_TIME_SLICES						= 1 << 13;
+	static final long					VALUE_ID_CHART_ZOOM_FACTOR					= 1 << 14;
+	static final long					VALUE_ID_GEARS								= 1 << 15;
+	static final long					VALUE_ID_TOUR_COMPARE_RESULT				= 1 << 16;
+
+	static final long					DEFAULT_GRAPHS								=									//
+
+			VALUE_ID_TIME_SLICES
+					| VALUE_ID_TIME_DURATION
+					| VALUE_ID_DISTANCE
+	//
+	;
+
+	private long						_allVisibleValueIds;
 
 	private IDialogSettings				_state;
 	private TourData					_tourData;
@@ -68,7 +78,6 @@ public class ValuePointToolTipMenuManager {
 
 	private Menu						_menu										= null;
 
-	private int							_allVisibleValueIds;
 	private boolean						_isHorizontal;
 
 	/**
@@ -83,30 +92,31 @@ public class ValuePointToolTipMenuManager {
 	private ActionOrientation			_actionHorizontalOrientation;
 	private ActionOrientation			_actionVerticalOrientation;
 
-	private ActionValueItem				_actionValueAltimeter;
-	private ActionValueItem				_actionValueAltitude;
-	private ActionValueItem				_actionValueCadence;
-	private ActionValueItem				_actionValueChartZoomFactor;
-	private ActionValueItem				_actionValueDistance;
-	private ActionValueItem				_actionValueGears;
-	private ActionValueItem				_actionValueGradient;
-	private ActionValueItem				_actionValueHeader;
-	private ActionValueItem				_actionValuePace;
-	private ActionValueItem				_actionValuePower;
-	private ActionValueItem				_actionValuePulse;
-	private ActionValueItem				_actionValueSpeed;
-	private ActionValueItem				_actionValueTemperature;
-	private ActionValueItem				_actionValueTimeDuration;
-	private ActionValueItem				_actionValueTimeOfDay;
-	private ActionValueItem				_actionValueTimeSlices;
+	private ActionValueItem				_actionValue_Altimeter;
+	private ActionValueItem				_actionValue_Altitude;
+	private ActionValueItem				_actionValue_Cadence;
+	private ActionValueItem				_actionValue_ChartZoomFactor;
+	private ActionValueItem				_actionValue_Distance;
+	private ActionValueItem				_actionValue_Gears;
+	private ActionValueItem				_actionValue_Gradient;
+	private ActionValueItem				_actionValue_Header;
+	private ActionValueItem				_actionValue_Pace;
+	private ActionValueItem				_actionValue_Power;
+	private ActionValueItem				_actionValue_Pulse;
+	private ActionValueItem				_actionValue_Speed;
+	private ActionValueItem				_actionValue_Temperature;
+	private ActionValueItem				_actionValue_TimeDuration;
+	private ActionValueItem				_actionValue_TimeOfDay;
+	private ActionValueItem				_actionValue_TimeSlices;
+	private ActionValueItem				_actionValue_TourCompareResult;
 
-	private Action						_actionPinLocationHeader;
-	private ActionPinLocation			_actionPinLocationScreen;
-	private ActionPinLocation			_actionPinLocationTopRight;
-	private ActionPinLocation			_actionPinLocationTopLeft;
-	private ActionPinLocation			_actionPinLocationBottomLeft;
-	private ActionPinLocation			_actionPinLocationBottomRight;
-	private ActionPinLocation			_actionPinLocationMouseXPosition;
+	private Action						_actionPinLocation_Header;
+	private ActionPinLocation			_actionPinLocation_Screen;
+	private ActionPinLocation			_actionPinLocation_TopRight;
+	private ActionPinLocation			_actionPinLocation_TopLeft;
+	private ActionPinLocation			_actionPinLocation_BottomLeft;
+	private ActionPinLocation			_actionPinLocation_BottomRight;
+	private ActionPinLocation			_actionPinLocation_MouseXPosition;
 
 	private final class ActionCloseTTContextMenu extends Action {
 
@@ -136,7 +146,7 @@ public class ValuePointToolTipMenuManager {
 
 	private final class ActionOrientation extends Action {
 
-		private ValuePointToolTipOrientation	_orientation;
+		private ValuePointToolTipOrientation _orientation;
 
 		public ActionOrientation(final ValuePointToolTipOrientation orientation) {
 
@@ -160,7 +170,7 @@ public class ValuePointToolTipMenuManager {
 
 	private class ActionPinLocation extends Action {
 
-		public ValuePointToolTipPinLocation	_locationId;
+		public ValuePointToolTipPinLocation _locationId;
 
 		public ActionPinLocation(final ValuePointToolTipPinLocation locationId, final String text) {
 			setText(text);
@@ -211,12 +221,12 @@ public class ValuePointToolTipMenuManager {
 
 	private class ActionValueItem extends Action {
 
-		private int				_graphId;
+		private long			_graphId;
 
 		private ImageDescriptor	_graphImage;
 		private ImageDescriptor	_graphImageDisabled;
 
-		public ActionValueItem(	final int graphId,
+		public ActionValueItem(	final long graphId,
 								final String name,
 								final String graphImageName,
 								final String graphImageNameDisabled) {
@@ -264,9 +274,9 @@ public class ValuePointToolTipMenuManager {
 	 *            Graph id which should be displayed/hidden.
 	 * @param isChecked
 	 */
-	private void actionValueItem(final int graphId, final boolean isChecked) {
+	private void actionValueItem(final long graphId, final boolean isChecked) {
 
-		final int currentVisibleValues = _allVisibleValueIds;
+		final long currentVisibleValues = _allVisibleValueIds;
 
 		if (isChecked) {
 
@@ -320,128 +330,134 @@ public class ValuePointToolTipMenuManager {
 
 	private void createGraphActions() {
 
-		_actionValueHeader = new ActionValueItem(//
+		_actionValue_Header = new ActionValueItem(//
 				-1,
 				Messages.Tooltip_ValuePoint_Action_Value_Header,
 				null,
 				null);
 
-		_actionValueTimeSlices = new ActionValueItem(//
+		_actionValue_TimeSlices = new ActionValueItem(//
 				VALUE_ID_TIME_SLICES,
 				Messages.Tooltip_ValuePoint_Action_Value_TimeSlices,
 				null,
 				null);
 
-		_actionValueChartZoomFactor = new ActionValueItem(//
+		_actionValue_ChartZoomFactor = new ActionValueItem(//
 				VALUE_ID_CHART_ZOOM_FACTOR,
 				Messages.Tooltip_ValuePoint_Action_Value_ChartZoomFactor,
 				null,
 				null);
 
-		_actionValueTimeDuration = new ActionValueItem(//
+		_actionValue_TimeDuration = new ActionValueItem(//
 				VALUE_ID_TIME_DURATION,
 				Messages.Tooltip_ValuePoint_Action_Value_TimeDuration,
 				null,
 				null);
 
-		_actionValueTimeOfDay = new ActionValueItem(//
+		_actionValue_TimeOfDay = new ActionValueItem(//
 				VALUE_ID_TIME_OF_DAY,
 				Messages.Tooltip_ValuePoint_Action_Value_TimeOfDay,
 				null,
 				null);
 
-		_actionValueDistance = new ActionValueItem(
+		_actionValue_Distance = new ActionValueItem(
 				VALUE_ID_DISTANCE,
 				Messages.Tooltip_ValuePoint_Action_Value_Distance,
 				null,
 				null);
 
-		_actionValueAltitude = new ActionValueItem(
+		_actionValue_Altitude = new ActionValueItem(
 				VALUE_ID_ALTITUDE,
 				Messages.Tooltip_ValuePoint_Action_Value_Altitude,
 				Messages.Image__graph_altitude,
 				Messages.Image__graph_altitude_disabled);
 
-		_actionValueAltimeter = new ActionValueItem(
+		_actionValue_Altimeter = new ActionValueItem(
 				VALUE_ID_ALTIMETER,
 				Messages.Tooltip_ValuePoint_Action_Value_Altimeter,
 				Messages.Image__graph_altimeter,
 				Messages.Image__graph_altimeter_disabled);
 
-		_actionValueCadence = new ActionValueItem(
+		_actionValue_Cadence = new ActionValueItem(
 				VALUE_ID_CADENCE,
 				Messages.Tooltip_ValuePoint_Action_Value_Cadence,
 				Messages.Image__graph_cadence,
 				Messages.Image__graph_cadence_disabled);
 
-		_actionValueGears = new ActionValueItem(
+		_actionValue_Gears = new ActionValueItem(
 				VALUE_ID_GEARS,
 				Messages.Tooltip_ValuePoint_Action_Value_Gears,
 				Messages.Image__Graph_Gears,
 				Messages.Image__Graph_Gears_disabled);
 
-		_actionValueGradient = new ActionValueItem(
+		_actionValue_Gradient = new ActionValueItem(
 				VALUE_ID_GRADIENT,
 				Messages.Tooltip_ValuePoint_Action_Value_Gradient,
 				Messages.Image__graph_gradient,
 				Messages.Image__graph_gradient_disabled);
 
-		_actionValuePace = new ActionValueItem(
+		_actionValue_Pace = new ActionValueItem(
 				VALUE_ID_PACE,
 				Messages.Tooltip_ValuePoint_Action_Value_Pace,
 				Messages.Image__graph_pace,
 				Messages.Image__graph_pace_disabled);
 
-		_actionValuePower = new ActionValueItem(
+		_actionValue_Power = new ActionValueItem(
 				VALUE_ID_POWER,
 				Messages.Tooltip_ValuePoint_Action_Value_Power,
 				Messages.Image__graph_power,
 				Messages.Image__graph_power_disabled);
 
-		_actionValuePulse = new ActionValueItem(
+		_actionValue_Pulse = new ActionValueItem(
 				VALUE_ID_PULSE,
 				Messages.Tooltip_ValuePoint_Action_Value_Pulse,
 				Messages.Image__graph_heartbeat,
 				Messages.Image__graph_heartbeat_disabled);
 
-		_actionValueSpeed = new ActionValueItem(
+		_actionValue_Speed = new ActionValueItem(
 				VALUE_ID_SPEED,
 				Messages.Tooltip_ValuePoint_Action_Value_Speed,
 				Messages.Image__graph_speed,
 				Messages.Image__graph_speed_disabled);
 
-		_actionValueTemperature = new ActionValueItem(
+		_actionValue_Temperature = new ActionValueItem(
 				VALUE_ID_TEMPERATURE,
 				Messages.Tooltip_ValuePoint_Action_Value_Temperature,
 				Messages.Image__graph_temperature,
 				Messages.Image__graph_temperature_disabled);
+
+		_actionValue_TourCompareResult = new ActionValueItem(
+				VALUE_ID_TOUR_COMPARE_RESULT,
+				Messages.Tooltip_ValuePoint_Action_Value_TourCompareResult,
+				Messages.Image__graph_tour_compare,
+				Messages.Image__graph_tour_compare_disabled);
 	}
 
 	private void createPinActions() {
 
-		_actionPinLocationHeader = new Action(Messages.Tooltip_ValuePoint_Action_PinLocation_Header) {};
+		_actionPinLocation_Header = new Action(Messages.Tooltip_ValuePoint_Action_PinLocation_Header) {};
 
-		_actionPinLocationScreen = new ActionPinLocation(
+		_actionPinLocation_Screen = new ActionPinLocation(
 				ValuePointToolTipPinLocation.Screen,
 				Messages.Tooltip_ValuePoint_Action_PinLocation_Screen);
 
-		_actionPinLocationTopLeft = new ActionPinLocation(
+		_actionPinLocation_TopLeft = new ActionPinLocation(
 				ValuePointToolTipPinLocation.TopLeft,
 				Messages.Tooltip_ValuePoint_Action_PinLocation_TopLeft);
 
-		_actionPinLocationTopRight = new ActionPinLocation(
+		_actionPinLocation_TopRight = new ActionPinLocation(
 				ValuePointToolTipPinLocation.TopRight,
 				Messages.Tooltip_ValuePoint_Action_PinLocation_TopRight);
 
-		_actionPinLocationBottomLeft = new ActionPinLocation(
+		_actionPinLocation_BottomLeft = new ActionPinLocation(
 				ValuePointToolTipPinLocation.BottomLeft,
 				Messages.Tooltip_ValuePoint_Action_PinLocation_BottomLeft);
 
-		_actionPinLocationBottomRight = new ActionPinLocation(
+		_actionPinLocation_BottomRight = new ActionPinLocation(
 				ValuePointToolTipPinLocation.BottomRight,
 				Messages.Tooltip_ValuePoint_Action_PinLocation_BottomRight);
 
-		_actionPinLocationMouseXPosition = new ActionPinLocation(
+		_actionPinLocation_MouseXPosition = new ActionPinLocation(
 				ValuePointToolTipPinLocation.MouseXPosition,
 				Messages.Tooltip_ValuePoint_Action_PinLocation_MouseXPosition);
 	}
@@ -457,76 +473,80 @@ public class ValuePointToolTipMenuManager {
 
 		final ValuePointToolTipPinLocation pinnedLocation = _valuePointToolTipUI.getPinnedLocation();
 
-		_actionPinLocationHeader.setEnabled(false);
+		_actionPinLocation_Header.setEnabled(false);
 
-		_actionPinLocationScreen.setChecked(pinnedLocation == ValuePointToolTipPinLocation.Screen);
-		_actionPinLocationTopLeft.setChecked(pinnedLocation == ValuePointToolTipPinLocation.TopLeft);
-		_actionPinLocationTopRight.setChecked(pinnedLocation == ValuePointToolTipPinLocation.TopRight);
-		_actionPinLocationBottomLeft.setChecked(pinnedLocation == ValuePointToolTipPinLocation.BottomLeft);
-		_actionPinLocationBottomRight.setChecked(pinnedLocation == ValuePointToolTipPinLocation.BottomRight);
-		_actionPinLocationMouseXPosition.setChecked(pinnedLocation == ValuePointToolTipPinLocation.MouseXPosition);
+		_actionPinLocation_Screen.setChecked(pinnedLocation == ValuePointToolTipPinLocation.Screen);
+		_actionPinLocation_TopLeft.setChecked(pinnedLocation == ValuePointToolTipPinLocation.TopLeft);
+		_actionPinLocation_TopRight.setChecked(pinnedLocation == ValuePointToolTipPinLocation.TopRight);
+		_actionPinLocation_BottomLeft.setChecked(pinnedLocation == ValuePointToolTipPinLocation.BottomLeft);
+		_actionPinLocation_BottomRight.setChecked(pinnedLocation == ValuePointToolTipPinLocation.BottomRight);
+		_actionPinLocation_MouseXPosition.setChecked(pinnedLocation == ValuePointToolTipPinLocation.MouseXPosition);
 
-		_actionValueHeader.setEnabled(false);
+		_actionValue_Header.setEnabled(false);
 
-		_actionValueAltimeter.setState(
+		_actionValue_Altimeter.setState(
 				(_allVisibleValueIds & VALUE_ID_ALTIMETER) > 0,
 				_tourData.getAltimeterSerie() != null);
 
-		_actionValueAltitude.setState( //
+		_actionValue_Altitude.setState( //
 				(_allVisibleValueIds & VALUE_ID_ALTITUDE) > 0,
 				_tourData.getAltitudeSerie() != null);
 
-		_actionValueCadence.setState( //
+		_actionValue_Cadence.setState( //
 				(_allVisibleValueIds & VALUE_ID_CADENCE) > 0,
 				_tourData.cadenceSerie != null);
 
-		_actionValueChartZoomFactor.setState( //
+		_actionValue_ChartZoomFactor.setState( //
 				(_allVisibleValueIds & VALUE_ID_CHART_ZOOM_FACTOR) > 0,
 				true);
 
-		_actionValueDistance.setState( //
+		_actionValue_Distance.setState( //
 				(_allVisibleValueIds & VALUE_ID_DISTANCE) > 0,
 				_tourData.distanceSerie != null);
 
-		_actionValueGears.setState( //
+		_actionValue_Gears.setState( //
 				(_allVisibleValueIds & VALUE_ID_GEARS) > 0,
 				_tourData.getGears() != null);
 
-		_actionValueGradient.setState( //
+		_actionValue_Gradient.setState( //
 				(_allVisibleValueIds & VALUE_ID_GRADIENT) > 0,
 				_tourData.getGradientSerie() != null);
 
-		_actionValuePace.setState( //
+		_actionValue_Pace.setState( //
 				(_allVisibleValueIds & VALUE_ID_PACE) > 0,
 				_tourData.getPaceSerie() != null);
 
-		_actionValuePower.setState( //
+		_actionValue_Power.setState( //
 				(_allVisibleValueIds & VALUE_ID_POWER) > 0,
 				_tourData.getPowerSerie() != null);
 
-		_actionValuePulse.setState( //
+		_actionValue_Pulse.setState( //
 				(_allVisibleValueIds & VALUE_ID_PULSE) > 0,
 				_tourData.pulseSerie != null);
 
-		_actionValueSpeed.setState( //
+		_actionValue_Speed.setState( //
 				(_allVisibleValueIds & VALUE_ID_SPEED) > 0,
 				_tourData.getSpeedSerie() != null);
 
-		_actionValueTemperature.setState( //
+		_actionValue_Temperature.setState( //
 				(_allVisibleValueIds & VALUE_ID_TEMPERATURE) > 0,
 				_tourData.temperatureSerie != null);
 
-		_actionValueTimeDuration.setState( //
+		_actionValue_TimeDuration.setState( //
 				(_allVisibleValueIds & VALUE_ID_TIME_DURATION) > 0,
 				_tourData.timeSerie != null);
 
-		_actionValueTimeOfDay.setState( //
+		_actionValue_TimeOfDay.setState( //
 				(_allVisibleValueIds & VALUE_ID_TIME_OF_DAY) > 0,
 				_tourData.timeSerie != null);
 
-		_actionValueTimeSlices.setState( //
+		_actionValue_TimeSlices.setState( //
 				(_allVisibleValueIds & VALUE_ID_TIME_SLICES) > 0,
 				true);
+
+		_actionValue_TourCompareResult.setState( //
+				(_allVisibleValueIds & VALUE_ID_TOUR_COMPARE_RESULT) > 0,
+				_tourData.tourCompareSerie != null && _tourData.tourCompareSerie.length > 0);
 	}
 
 	private Menu getMenu(final Control parent) {
@@ -542,33 +562,34 @@ public class ValuePointToolTipMenuManager {
 		_menu = new Menu(parent);
 
 //		(new Separator()).fill(_menu, -1);
-		addItem(_actionValueHeader);
+		addItem(_actionValue_Header);
 
-		addItem(_actionValueTimeSlices);
-		addItem(_actionValueTimeDuration);
-		addItem(_actionValueTimeOfDay);
-		addItem(_actionValueDistance);
-		addItem(_actionValueAltitude);
-		addItem(_actionValuePulse);
-		addItem(_actionValueSpeed);
-		addItem(_actionValuePace);
-		addItem(_actionValuePower);
-		addItem(_actionValueTemperature);
-		addItem(_actionValueGradient);
-		addItem(_actionValueAltimeter);
-		addItem(_actionValueCadence);
-		addItem(_actionValueGears);
-		addItem(_actionValueChartZoomFactor);
+		addItem(_actionValue_TimeSlices);
+		addItem(_actionValue_TimeDuration);
+		addItem(_actionValue_TimeOfDay);
+		addItem(_actionValue_Distance);
+		addItem(_actionValue_Altitude);
+		addItem(_actionValue_Pulse);
+		addItem(_actionValue_Speed);
+		addItem(_actionValue_Pace);
+		addItem(_actionValue_Power);
+		addItem(_actionValue_Temperature);
+		addItem(_actionValue_Gradient);
+		addItem(_actionValue_Altimeter);
+		addItem(_actionValue_Cadence);
+		addItem(_actionValue_Gears);
+		addItem(_actionValue_TourCompareResult);
+		addItem(_actionValue_ChartZoomFactor);
 		addItem(_actionCloseTTContextMenu);
 
 		(new Separator()).fill(_menu, -1);
-		addItem(_actionPinLocationHeader);
-		addItem(_actionPinLocationMouseXPosition);
-		addItem(_actionPinLocationTopLeft);
-		addItem(_actionPinLocationTopRight);
-		addItem(_actionPinLocationBottomLeft);
-		addItem(_actionPinLocationBottomRight);
-		addItem(_actionPinLocationScreen);
+		addItem(_actionPinLocation_Header);
+		addItem(_actionPinLocation_MouseXPosition);
+		addItem(_actionPinLocation_TopLeft);
+		addItem(_actionPinLocation_TopRight);
+		addItem(_actionPinLocation_BottomLeft);
+		addItem(_actionPinLocation_BottomRight);
+		addItem(_actionPinLocation_Screen);
 
 		(new Separator()).fill(_menu, -1);
 
@@ -601,7 +622,7 @@ public class ValuePointToolTipMenuManager {
 	 */
 	void openToolTipMenu(	final Event event,
 							final TourData tourData,
-							final int allVisibleValueIds,
+							final long allVisibleValueIds,
 							final boolean isHorizontal) {
 
 		_tourData = tourData;

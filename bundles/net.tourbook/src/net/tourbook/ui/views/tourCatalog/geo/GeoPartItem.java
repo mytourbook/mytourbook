@@ -18,19 +18,10 @@ package net.tourbook.ui.views.tourCatalog.geo;
 import java.util.ArrayList;
 
 import net.tourbook.data.NormalizedGeoData;
+import net.tourbook.data.TourReference;
 
 /**
- * Loads tour id's which are contained in the {@link #geoParts}
- * 
- * <pre>
- * 
- * Degree*INT    resolution
-   ---------------------------------------
-   Deg*100		   1570 m
-   Deg*1000			157 m
-   Deg*10000		 16 m
-   Deg*100000		  1.6 m
- * </pre>
+ * Contains all data for a tour comparison
  */
 public class GeoPartItem {
 
@@ -41,10 +32,7 @@ public class GeoPartItem {
 	 */
 	boolean							isCanceled;
 
-	/**
-	 * Requested geo parts
-	 */
-	int[]							geoParts;
+	boolean							isUseAppFilter;
 
 	/**
 	 * Geo part which should be compared
@@ -52,18 +40,38 @@ public class GeoPartItem {
 	public NormalizedGeoData		normalizedTourPart;
 
 	/**
+	 * Geo parts which are affected
+	 * 
+	 * <pre>
+	 * 	Degree*INT    resolution
+		---------------------------------------
+		Deg*100		   1570 m
+		Deg*1000		157 m
+		Deg*10000		 16 m
+		Deg*100000		1.6 m
+	 * </pre>
+	 */
+	int[]							geoParts;
+
+	/**
 	 * Tour id's which are having at least one of the {@link #geoParts}
 	 */
 	long[]							tourIds;
 
-	boolean							isUseAppFilter;
+	/**
+	 * Results of the compared tours
+	 */
+	ArrayList<GeoPartComparerItem>	comparedTours	= new ArrayList<>();
+
+	/**
+	 * Id of the {@link TourReference}, is -1 when not available
+	 */
+	public long						refId;
 
 	/**
 	 * Time in ms to calculate sql data
 	 */
 	long							sqlRunningTime;
-
-	ArrayList<GeoPartComparerItem>	comparedTours	= new ArrayList<>();
 
 	public GeoPartItem(	final long executorId,
 						final int[] geoParts,
@@ -80,14 +88,14 @@ public class GeoPartItem {
 
 	@Override
 	public String toString() {
-		return "GeoPartItem ["
-				+ "executorId=" + executorId + ", "
+		return "GeoPartItem [" //$NON-NLS-1$
+				+ "executorId=" + executorId + ", " //$NON-NLS-1$ //$NON-NLS-2$
 				//				+ "geoParts=" + Arrays.toString(geoParts) + ", "
 				//				+ "latPartSerie5=" + Arrays.toString(latPartSerie5) + ", "
 				//				+ "lonPartSerie5=" + Arrays.toString(lonPartSerie5) + ", tourIds=" + Arrays.toString(tourIds) + ", "
 				//				+ "isUseAppFilter=" + isUseAppFilter + ", "
 				//				+ "sqlRunningTime=" + sqlRunningTime
-				+ "]";
+				+ "]"; //$NON-NLS-1$
 	}
 
 }

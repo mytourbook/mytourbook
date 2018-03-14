@@ -17,17 +17,20 @@ package net.tourbook.ui.views.tourCatalog.geo;
 
 import java.time.ZonedDateTime;
 
+/**
+ * Contains data for one comapred tour
+ */
 public class GeoPartComparerItem {
 
-	long			tourId;
+	public long			tourId;
 
-	GeoPartItem		geoPartItem;
+	public GeoPartItem	geoPartItem;
 
 	/*
 	 * Compare results
 	 */
-	long[]			tourLatLonDiff;
-	int				tourMinDiffIndex;
+	public float[]		tourLatLonDiff;
+	int					tourMinDiffIndex;
 
 	/**
 	 * <ul>
@@ -36,13 +39,13 @@ public class GeoPartComparerItem {
 	 * <li>0...max : A Valid value is set</li>
 	 * </ul>
 	 */
-	long			minDiffValue	= -2;
+	long				minDiffValue	= -2;
 
-	float			avgPulse;
-	float			speed;
+	float				avgPulse;
+	float				avgSpeed;
 
-	ZonedDateTime	tourStartTime;
-	long			tourStartTimeMS;
+	ZonedDateTime		tourStartTime;
+	long				tourStartTimeMS;
 
 	public GeoPartComparerItem(final long tourId, final GeoPartItem geoPartItem) {
 

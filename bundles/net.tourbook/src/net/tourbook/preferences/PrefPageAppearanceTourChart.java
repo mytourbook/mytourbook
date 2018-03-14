@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -67,7 +67,9 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	public static final String		ID											= "net.tourbook.preferences.PrefPageChartGraphs";							//$NON-NLS-1$
 
 	private static final String		STATE_PREF_PAGE_CHART_GRAPHS_SELECTED_TAB	= "PrefPage.ChartGraphs.SelectedTab";										//$NON-NLS-1$
-
+	
+// SET_FORMATTING_OFF
+	
 	private static final String		GRAPH_LABEL_ALTIMETER						= net.tourbook.common.Messages.Graph_Label_Altimeter;
 	private static final String		GRAPH_LABEL_ALTITUDE						= net.tourbook.common.Messages.Graph_Label_Altitude;
 	private static final String		GRAPH_LABEL_CADENCE							= net.tourbook.common.Messages.Graph_Label_Cadence;
@@ -80,6 +82,9 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	private static final String		GRAPH_LABEL_SHOW_HR_ZONE_BACKGROUND			= net.tourbook.common.Messages.Graph_Label_ShowHrZoneBackground;
 	private static final String		GRAPH_LABEL_SPEED							= net.tourbook.common.Messages.Graph_Label_Speed;
 	private static final String		GRAPH_LABEL_TEMPERATURE						= net.tourbook.common.Messages.Graph_Label_Temperature;
+	private static final String		GRAPH_LABEL_TOUR_COMPARE_RESULT				= net.tourbook.common.Messages.Graph_Label_Tour_Compare;
+	
+// SET_FORMATTING_ON
 
 	private final IPreferenceStore	_prefStore									= TourbookPlugin.getPrefStore();
 
@@ -724,41 +729,49 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 			}
 		};
 
+// SET_FORMATTING_OFF
+		
 		// create a map and list with all available graphs
-		final Graph graphAltitude = new Graph(TourManager.GRAPH_ALTITUDE, GRAPH_LABEL_ALTITUDE);
-		final Graph graphSpeed = new Graph(TourManager.GRAPH_SPEED, GRAPH_LABEL_SPEED);
-		final Graph graphPace = new Graph(TourManager.GRAPH_PACE, GRAPH_LABEL_PACE);
-		final Graph graphPower = new Graph(TourManager.GRAPH_POWER, GRAPH_LABEL_POWER);
-		final Graph graphPulse = new Graph(TourManager.GRAPH_PULSE, GRAPH_LABEL_HEARTBEAT);
-		final Graph graphTemperature = new Graph(TourManager.GRAPH_TEMPERATURE, GRAPH_LABEL_TEMPERATURE);
-		final Graph graphCadence = new Graph(TourManager.GRAPH_CADENCE, GRAPH_LABEL_CADENCE);
-		final Graph graphGears = new Graph(TourManager.GRAPH_GEARS, GRAPH_LABEL_GEARS);
-		final Graph graphAltimeter = new Graph(TourManager.GRAPH_ALTIMETER, GRAPH_LABEL_ALTIMETER);
-		final Graph graphGradient = new Graph(TourManager.GRAPH_GRADIENT, GRAPH_LABEL_GRADIENT);
+		final Graph graph_Altitude 				= new Graph(TourManager.GRAPH_ALTITUDE, 		GRAPH_LABEL_ALTITUDE);
+		final Graph graph_Speed 				= new Graph(TourManager.GRAPH_SPEED, 			GRAPH_LABEL_SPEED);
+		final Graph graph_Pace 					= new Graph(TourManager.GRAPH_PACE, 			GRAPH_LABEL_PACE);
+		final Graph graph_Power 				= new Graph(TourManager.GRAPH_POWER, 			GRAPH_LABEL_POWER);
+		final Graph graph_Pulse 				= new Graph(TourManager.GRAPH_PULSE, 			GRAPH_LABEL_HEARTBEAT);
+		final Graph graph_Temperature 			= new Graph(TourManager.GRAPH_TEMPERATURE, 		GRAPH_LABEL_TEMPERATURE);
+		final Graph graph_Cadence 				= new Graph(TourManager.GRAPH_CADENCE, 			GRAPH_LABEL_CADENCE);
+		final Graph graph_Gears 				= new Graph(TourManager.GRAPH_GEARS, 			GRAPH_LABEL_GEARS);
+		final Graph graph_Altimeter 			= new Graph(TourManager.GRAPH_ALTIMETER, 		GRAPH_LABEL_ALTIMETER);
+		final Graph graph_Gradient 				= new Graph(TourManager.GRAPH_GRADIENT, 		GRAPH_LABEL_GRADIENT);
+		final Graph graph_TourCompareResult 	= new Graph(TourManager.GRAPH_TOUR_COMPARE, 	GRAPH_LABEL_TOUR_COMPARE_RESULT);
 
 		_graphMap = new HashMap<Integer, Graph>();
-		_graphMap.put(TourManager.GRAPH_ALTITUDE, graphAltitude);
-		_graphMap.put(TourManager.GRAPH_SPEED, graphSpeed);
-		_graphMap.put(TourManager.GRAPH_PACE, graphPace);
-		_graphMap.put(TourManager.GRAPH_POWER, graphPower);
-		_graphMap.put(TourManager.GRAPH_PULSE, graphPulse);
-		_graphMap.put(TourManager.GRAPH_TEMPERATURE, graphTemperature);
-		_graphMap.put(TourManager.GRAPH_CADENCE, graphCadence);
-		_graphMap.put(TourManager.GRAPH_GEARS, graphGears);
-		_graphMap.put(TourManager.GRAPH_ALTIMETER, graphAltimeter);
-		_graphMap.put(TourManager.GRAPH_GRADIENT, graphGradient);
+		
+		_graphMap.put(TourManager.GRAPH_ALTITUDE,		graph_Altitude);
+		_graphMap.put(TourManager.GRAPH_SPEED, 			graph_Speed);
+		_graphMap.put(TourManager.GRAPH_PACE, 			graph_Pace);
+		_graphMap.put(TourManager.GRAPH_POWER, 			graph_Power);
+		_graphMap.put(TourManager.GRAPH_PULSE, 			graph_Pulse);
+		_graphMap.put(TourManager.GRAPH_TEMPERATURE, 	graph_Temperature);
+		_graphMap.put(TourManager.GRAPH_CADENCE, 		graph_Cadence);
+		_graphMap.put(TourManager.GRAPH_GEARS, 			graph_Gears);
+		_graphMap.put(TourManager.GRAPH_ALTIMETER, 		graph_Altimeter);
+		_graphMap.put(TourManager.GRAPH_GRADIENT, 		graph_Gradient);
+		_graphMap.put(TourManager.GRAPH_TOUR_COMPARE,	graph_TourCompareResult);
+		
+// SET_FORMATTING_ON
 
 		_graphList = new ArrayList<Graph>();
-		_graphList.add(graphAltitude);
-		_graphList.add(graphSpeed);
-		_graphList.add(graphPace);
-		_graphList.add(graphPower);
-		_graphList.add(graphPulse);
-		_graphList.add(graphTemperature);
-		_graphList.add(graphCadence);
-		_graphList.add(graphGears);
-		_graphList.add(graphAltimeter);
-		_graphList.add(graphGradient);
+		_graphList.add(graph_Altitude);
+		_graphList.add(graph_Speed);
+		_graphList.add(graph_Pace);
+		_graphList.add(graph_Power);
+		_graphList.add(graph_Pulse);
+		_graphList.add(graph_Temperature);
+		_graphList.add(graph_Cadence);
+		_graphList.add(graph_Gears);
+		_graphList.add(graph_Altimeter);
+		_graphList.add(graph_Gradient);
+		_graphList.add(graph_TourCompareResult);
 	}
 
 	/**

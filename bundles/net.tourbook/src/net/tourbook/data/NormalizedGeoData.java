@@ -30,7 +30,14 @@ public class NormalizedGeoData {
 	 */
 	public long		tourId;
 
+	/**
+	 * First index of the original (not normalized) data
+	 */
 	public int		firstIndex;
+
+	/**
+	 * Last index of the original (not normalized) data
+	 */
 	public int		lastIndex;
 
 	public NormalizedGeoData(	final Long tourId,

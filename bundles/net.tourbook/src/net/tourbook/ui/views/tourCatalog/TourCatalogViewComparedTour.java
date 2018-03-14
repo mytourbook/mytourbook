@@ -29,6 +29,7 @@ import net.tourbook.chart.IChartListener;
 import net.tourbook.chart.ISliderMoveListener;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.common.UI;
+import net.tourbook.data.NormalizedGeoData;
 import net.tourbook.data.TourCompared;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
@@ -42,6 +43,8 @@ import net.tourbook.ui.ITourChartViewer;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartContextProvider;
 import net.tourbook.ui.tourChart.TourChartViewPart;
+import net.tourbook.ui.views.tourCatalog.geo.GeoPartComparerItem;
+import net.tourbook.ui.views.tourCatalog.geo.GeoPartItem;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
@@ -79,7 +82,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 	 */
 
 	/**
-	 * key for the {@link TourCompared} instance or <code>-1</code> when it's not saved in the
+	 * Key for the {@link TourCompared} instance or <code>-1</code> when it's not saved in the
 	 * database
 	 */
 	private long								_ctCompareId	= -1;
@@ -521,6 +524,10 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 			} else if (firstElement instanceof TVICompareResultComparedTour) {
 
 				updateTourChart((TVICompareResultComparedTour) firstElement);
+
+			} else if (firstElement instanceof GeoPartComparerItem) {
+
+				updateTourChart((GeoPartComparerItem) firstElement);
 			}
 		}
 	}
@@ -690,6 +697,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 	@Override
 	public void setFocus() {
+
 		_tourChart.setFocus();
 
 		_postSelectionProvider.setSelection(new SelectionTourChart(_tourChart));
@@ -803,6 +811,49 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 		}
 
 		return false;
+	}
+
+	private void updateTourChart(final GeoPartComparerItem comparerItem) {
+
+		if (saveComparedTourDialog() == false) {
+			return;
+		}
+
+		final long ctTourId = comparerItem.tourId;
+
+		// check if the compared tour is already displayed
+		if (_ctTourId == ctTourId && _comparedTourItem instanceof GeoPartComparerItem) {
+			return;
+		}
+
+		// load the tourdata of the compared tour from the database
+		final TourData compTourData = TourManager.getInstance().getTourData(ctTourId);
+		if (compTourData == null) {
+			return;
+		}
+
+		final GeoPartItem geoPartItem = comparerItem.geoPartItem;
+		final NormalizedGeoData normalizedTourPart = geoPartItem.normalizedTourPart;
+
+		// set data from the selection
+		_ctTourId = ctTourId;
+		_ctRefId = geoPartItem.refId;
+		_ctCompareId = -1;
+
+		_tourData = compTourData;
+
+		// set tour compare data, this will enable the action button to see the graph for this data
+		_tourData.tourCompareSerie = comparerItem.tourLatLonDiff;
+
+		_defaultStartIndex = _movedStartIndex = _computedStartIndex = normalizedTourPart.firstIndex;
+		_defaultEndIndex = _movedEndIndex = _computedEndIndex = normalizedTourPart.lastIndex;
+
+		_comparedTourItem = comparerItem;
+
+		updateTourChart();
+
+		// disable action after the chart was created
+		_tourChart.enableGraphAction(TourManager.GRAPH_TOUR_COMPARE, true);
 	}
 
 	/**

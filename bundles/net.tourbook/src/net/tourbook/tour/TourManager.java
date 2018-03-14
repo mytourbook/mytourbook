@@ -3168,7 +3168,7 @@ public class TourManager {
 		}
 
 		/*
-		 * tour compare altitude difference
+		 * Tour compare altitude or lat/lon difference
 		 */
 		final float[] tourCompareSerie = tourData.tourCompareSerie;
 		ChartDataYSerie yDataTourCompare = null;

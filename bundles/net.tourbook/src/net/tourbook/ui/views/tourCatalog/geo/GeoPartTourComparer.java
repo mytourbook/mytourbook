@@ -147,7 +147,7 @@ public class GeoPartTourComparer {
 		final int numPartSlices = partLatSerie.length;
 		final int numTourSlices = tourLatSerie.length;
 
-		final long[] tourLatLonDiff = new long[numTourSlices];
+		final float[] tourLatLonDiff = new float[numTourSlices];
 
 		/*
 		 * Compare
@@ -216,7 +216,7 @@ public class GeoPartTourComparer {
 
 		}
 
-		// a tour is available
+		// a tour is available and could be compared
 		if (minDiffIndex > -1) {
 
 			final int[] normalizedIndices = normalizedTour.normalized2OriginalIndices;
@@ -225,7 +225,7 @@ public class GeoPartTourComparer {
 			final int endIndex = normalizedIndices[minDiffIndex + numPartSlices - 1];
 
 			comparerItem.avgPulse = tourData.computeAvg_PulseSegment(startIndex, endIndex);
-			comparerItem.speed = TourManager.computeTourSpeed(tourData, startIndex, endIndex);
+			comparerItem.avgSpeed = TourManager.computeTourSpeed(tourData, startIndex, endIndex);
 		}
 
 		final ZonedDateTime tourStartTime = tourData.getTourStartTime();
@@ -236,7 +236,29 @@ public class GeoPartTourComparer {
 		comparerItem.tourLatLonDiff = tourLatLonDiff;
 		comparerItem.tourMinDiffIndex = minDiffIndex;
 
-		comparerItem.minDiffValue = minDiffIndex < 0 ? -1 : tourLatLonDiff[minDiffIndex];
+		comparerItem.minDiffValue = (long) (minDiffIndex < 0 ? -1 : tourLatLonDiff[minDiffIndex]);
+
+//		/*
+//		 * create data serie for altitude difference
+//		 */
+//		final float[] normDistanceSerie = compareTourNormalizer.getNormalizedDistance();
+//		final float[] compAltiDif = new float[numTourSlices];
+//
+//		final int maxNormIndex = normDistanceSerie.length - 1;
+//		int normIndex = 0;
+//
+//		for (int compIndex = 0; compIndex < numTourSlices; compIndex++) {
+//
+//			final float compDistance = compareTourDataDistance[compIndex];
+//			float normDistance = normDistanceSerie[normIndex];
+//
+//			while (compDistance > normDistance && normIndex < maxNormIndex) {
+//				normDistance = normDistanceSerie[++normIndex];
+//			}
+//
+//			compAltiDif[compIndex] = normCompAltiDiff[normIndex];
+//		}
+//		comparerItem.altitudeDiffSerie = compAltiDif;
 
 		if (LOG_TOUR_COMPARING) {
 

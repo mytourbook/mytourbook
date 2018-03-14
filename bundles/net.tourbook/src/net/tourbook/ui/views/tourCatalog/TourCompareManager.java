@@ -234,8 +234,11 @@ public class TourCompareManager {
 		if (compareTourDataDistance == null || compareTourDataTime == null) {
 			return compareResultItem;
 		}
+
+		final int numTourSlices = compareTourDataDistance.length;
+
 		// normalize the tour which will be compared
-		compareTourNormalizer.normalizeAltitude(compareTourData, 0, compareTourDataDistance.length - 1);
+		compareTourNormalizer.normalizeAltitude(compareTourData, 0, numTourSlices - 1);
 
 		final float[] normCompDistances = compareTourNormalizer.getNormalizedDistance();
 		final float[] normCompAltitudes = compareTourNormalizer.getNormalizedAltitude();
@@ -244,7 +247,9 @@ public class TourCompareManager {
 			return compareResultItem;
 		}
 
-		final float[] normCompAltiDiff = new float[normCompAltitudes.length];
+		final int numCompareSlices = normCompAltitudes.length;
+
+		final float[] normCompAltiDiff = new float[numCompareSlices];
 
 		/*
 		 * reference tour
@@ -273,9 +278,9 @@ public class TourCompareManager {
 		// start index of the reference tour in the compare tour
 		int normCompareIndexStart = -1;
 
-		final int compareLastIndex = normCompAltitudes.length;
+		final int compareLastIndex = numCompareSlices;
 
-		for (int normCompareIndex = 0; normCompareIndex < normCompAltitudes.length; normCompareIndex++) {
+		for (int normCompareIndex = 0; normCompareIndex < numCompareSlices; normCompareIndex++) {
 
 			float altitudeDiff = -1;
 
@@ -327,7 +332,7 @@ public class TourCompareManager {
 		 * get the start point in the compare tour
 		 */
 		int compareStartIndex = 0;
-		for (; compareStartIndex < compareTourDataDistance.length; compareStartIndex++) {
+		for (; compareStartIndex < numTourSlices; compareStartIndex++) {
 			if (compareTourDataDistance[compareStartIndex] >= compDistanceStart) {
 				break;
 			}
@@ -338,7 +343,7 @@ public class TourCompareManager {
 		 */
 		int compareEndIndex = compareStartIndex;
 		float oldDistance = compareTourDataDistance[compareEndIndex];
-		for (; compareEndIndex < compareTourDataDistance.length; compareEndIndex++) {
+		for (; compareEndIndex < numTourSlices; compareEndIndex++) {
 			if (compareTourDataDistance[compareEndIndex] >= compDistanceEnd) {
 				break;
 			}
@@ -349,18 +354,18 @@ public class TourCompareManager {
 				oldDistance = newDistance;
 			}
 		}
-		compareEndIndex = Math.min(compareEndIndex, compareTourDataDistance.length - 1);
+		compareEndIndex = Math.min(compareEndIndex, numTourSlices - 1);
 
 		/*
 		 * create data serie for altitude difference
 		 */
 		final float[] normDistanceSerie = compareTourNormalizer.getNormalizedDistance();
-		final float[] compAltiDif = new float[compareTourDataDistance.length];
+		final float[] compAltiDif = new float[numTourSlices];
 
 		final int maxNormIndex = normDistanceSerie.length - 1;
 		int normIndex = 0;
 
-		for (int compIndex = 0; compIndex < compareTourDataDistance.length; compIndex++) {
+		for (int compIndex = 0; compIndex < numTourSlices; compIndex++) {
 
 			final float compDistance = compareTourDataDistance[compIndex];
 			float normDistance = normDistanceSerie[normIndex];
