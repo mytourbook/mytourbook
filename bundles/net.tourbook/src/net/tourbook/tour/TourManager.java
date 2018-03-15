@@ -562,7 +562,7 @@ public class TourManager {
 				0,
 				timeSerie[endIndex] - timeSerie[startIndex] - tourData.getBreakTime(startIndex, endIndex));
 
-		return distance / time * 3.6f;
+		return time == 0 ? 0 : distance / time * 3.6f;
 	}
 
 	/**

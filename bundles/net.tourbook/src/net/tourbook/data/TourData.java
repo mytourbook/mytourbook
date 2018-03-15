@@ -170,7 +170,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	   Deg * 100000		  1.6 m
 	 * </pre>
 	 */
-	private static final int 			NORMALIZED_GEO_DATA_FACTOR 			= 100_000;
+//	private static final int 			NORMALIZED_GEO_DATA_FACTOR 			= 10;
+//	private static final int 			NORMALIZED_GEO_DATA_FACTOR 			= 100;
+	private static final int 			NORMALIZED_GEO_DATA_FACTOR 			= 1_000;
+//	private static final int 			NORMALIZED_GEO_DATA_FACTOR 			= 10_000;
+//	private static final int 			NORMALIZED_GEO_DATA_FACTOR 			= 100_000;
 
 	public static final double			NORMALIZED_LATITUDE_OFFSET			= 90.0;
 	public static final double			NORMALIZED_LONGITUDE_OFFSET			= 180.0;
@@ -2703,11 +2707,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 		for (int serieIndex = firstIndex; serieIndex < lastIndex; serieIndex++) {
 
-			final int latNormalized = (int) ((latitudeSerie[serieIndex] + NORMALIZED_LATITUDE_OFFSET)
-					* NORMALIZED_GEO_DATA_FACTOR);
+			final double latValueWithOffset = latitudeSerie[serieIndex] + NORMALIZED_LATITUDE_OFFSET;
+			final double lonValueWithOffset = longitudeSerie[serieIndex] + NORMALIZED_LONGITUDE_OFFSET;
 
-			final int lonNormalized = (int) ((longitudeSerie[serieIndex] + NORMALIZED_LONGITUDE_OFFSET)
-					* NORMALIZED_GEO_DATA_FACTOR);
+			final int latNormalized = (int) (latValueWithOffset * NORMALIZED_GEO_DATA_FACTOR);
+			final int lonNormalized = (int) (lonValueWithOffset * NORMALIZED_GEO_DATA_FACTOR);
 
 			if (latNormalized != prevLatNormalized || lonNormalized != prevLonNormalized) {
 
@@ -2728,16 +2732,19 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 		final int normalizedLength = normalizedIndex + 1;
 
-		return new NormalizedGeoData(
+		final NormalizedGeoData normGeoData = new NormalizedGeoData();
 
-				tourId,
-				firstIndex,
-				lastIndex,
+		normGeoData.tourId = tourId;
 
-				Arrays.copyOf(allNormalizedLat, normalizedLength),
-				Arrays.copyOf(allNormalizedLon, normalizedLength),
+		normGeoData.firstIndex = firstIndex;
+		normGeoData.lastIndex = lastIndex;
 
-				Arrays.copyOf(allNormalized2OriginalIndices, normalizedLength));
+		normGeoData.normalizedLat = Arrays.copyOf(allNormalizedLat, normalizedLength);
+		normGeoData.normalizedLon = Arrays.copyOf(allNormalizedLon, normalizedLength);
+
+		normGeoData.normalized2OriginalIndices = Arrays.copyOf(allNormalized2OriginalIndices, normalizedLength);
+
+		return normGeoData;
 	}
 
 	/**

@@ -137,17 +137,17 @@ public class GeoPartTourComparer {
 		final long startConvert = System.nanoTime();
 
 		final NormalizedGeoData normalizedPart = geoPartItem.normalizedTourPart;
-		final int[] partLatSerie = normalizedPart.normalizedLat;
+		final int[] normPartLatSerie = normalizedPart.normalizedLat;
 		final int[] partLonSerie = normalizedPart.normalizedLon;
 
 		final NormalizedGeoData normalizedTour = tourData.getNormalizedLatLon();
-		final int[] tourLatSerie = normalizedTour.normalizedLat;
+		final int[] normTourLatSerie = normalizedTour.normalizedLat;
 		final int[] tourLonSerie = normalizedTour.normalizedLon;
 
-		final int numPartSlices = partLatSerie.length;
-		final int numTourSlices = tourLatSerie.length;
+		final int numNormPartSlices = normPartLatSerie.length;
+		final int numNormTourSlices = normTourLatSerie.length;
 
-		final float[] tourLatLonDiff = new float[numTourSlices];
+		final float[] normLatLonDiff = new float[numNormTourSlices];
 
 		/*
 		 * Compare
@@ -158,13 +158,13 @@ public class GeoPartTourComparer {
 		int minDiffIndex = -1;
 		int numCompares = 0;
 
-		// loop: all tour slices
-		for (int tourIndex = 0; tourIndex < numTourSlices; tourIndex++) {
+		// loop: all normalized tour slices
+		for (int normTourIndex = 0; normTourIndex < numNormTourSlices; normTourIndex++) {
 
 			long latLonDiff = -1;
 
 			// loop: all part slices
-			for (int partIndex = 0; partIndex < numPartSlices; partIndex++) {
+			for (int normPartIndex = 0; normPartIndex < numNormPartSlices; normPartIndex++) {
 
 				if (geoPartItem.isCanceled) {
 
@@ -180,19 +180,19 @@ public class GeoPartTourComparer {
 
 				numCompares++;
 
-				final int compareIndex = tourIndex + partIndex;
+				final int compareIndex = normTourIndex + normPartIndex;
 
 				/*
 				 * Make sure the compare index is not larger than the tour index, this happens when
 				 * the part slices has exeeded the tour slices
 				 */
-				if (compareIndex == numTourSlices) {
+				if (compareIndex == numNormTourSlices) {
 					latLonDiff = -1;
 					break;
 				}
 
-				final int latDiff = partLatSerie[partIndex] - tourLatSerie[compareIndex];
-				final int lonDiff = partLonSerie[partIndex] - tourLonSerie[compareIndex];
+				final int latDiff = normPartLatSerie[normPartIndex] - normTourLatSerie[compareIndex];
+				final int lonDiff = partLonSerie[normPartIndex] - tourLonSerie[compareIndex];
 
 				// optimize Math.abs() !!!
 				final int latDiffAbs = latDiff < 0 ? -latDiff : latDiff;
@@ -203,7 +203,7 @@ public class GeoPartTourComparer {
 			}
 
 			// keep diff value
-			tourLatLonDiff[tourIndex] = latLonDiff;
+			normLatLonDiff[normTourIndex] = latLonDiff;
 
 			// keep min diff value/index
 			if (latLonDiff < minDiffValue && latLonDiff != -1) {
@@ -211,18 +211,18 @@ public class GeoPartTourComparer {
 				minDiffValue = latLonDiff;
 
 				// keep tour index where the min diff occured
-				minDiffIndex = tourIndex;
+				minDiffIndex = normTourIndex;
 			}
 
 		}
 
+		final int[] norm2origIndices = normalizedTour.normalized2OriginalIndices;
+
 		// a tour is available and could be compared
 		if (minDiffIndex > -1) {
 
-			final int[] normalizedIndices = normalizedTour.normalized2OriginalIndices;
-
-			final int startIndex = normalizedIndices[minDiffIndex];
-			final int endIndex = normalizedIndices[minDiffIndex + numPartSlices - 1];
+			final int startIndex = norm2origIndices[minDiffIndex];
+			final int endIndex = norm2origIndices[minDiffIndex + numNormPartSlices - 1];
 
 			comparerItem.avgPulse = tourData.computeAvg_PulseSegment(startIndex, endIndex);
 			comparerItem.avgSpeed = TourManager.computeTourSpeed(tourData, startIndex, endIndex);
@@ -233,32 +233,38 @@ public class GeoPartTourComparer {
 		comparerItem.tourStartTime = tourStartTime;
 		comparerItem.tourStartTimeMS = TimeTools.toEpochMilli(tourStartTime);
 
-		comparerItem.tourLatLonDiff = tourLatLonDiff;
 		comparerItem.tourMinDiffIndex = minDiffIndex;
+		comparerItem.minDiffValue = (long) (minDiffIndex < 0 ? -1 : normLatLonDiff[minDiffIndex]);
 
-		comparerItem.minDiffValue = (long) (minDiffIndex < 0 ? -1 : tourLatLonDiff[minDiffIndex]);
+		/*
+		 * Create data serie for the chart graph from the normalized diff data serie
+		 */
+		final int numTourSlices = tourData.latitudeSerie.length;
 
-//		/*
-//		 * create data serie for altitude difference
-//		 */
-//		final float[] normDistanceSerie = compareTourNormalizer.getNormalizedDistance();
-//		final float[] compAltiDif = new float[numTourSlices];
-//
-//		final int maxNormIndex = normDistanceSerie.length - 1;
-//		int normIndex = 0;
-//
-//		for (int compIndex = 0; compIndex < numTourSlices; compIndex++) {
-//
-//			final float compDistance = compareTourDataDistance[compIndex];
-//			float normDistance = normDistanceSerie[normIndex];
-//
-//			while (compDistance > normDistance && normIndex < maxNormIndex) {
-//				normDistance = normDistanceSerie[++normIndex];
-//			}
-//
-//			compAltiDif[compIndex] = normCompAltiDiff[normIndex];
-//		}
-//		comparerItem.altitudeDiffSerie = compAltiDif;
+		final float[] tourLatLonDiff = new float[numTourSlices];
+
+		int serieIndex = 0;
+
+		// loop: all normalized tour slices
+		for (int normIndex = 0; normIndex < numNormTourSlices; normIndex++) {
+
+			final float latLonDiff = normLatLonDiff[normIndex];
+
+			int nextNormIndex = normIndex++;
+
+			if (nextNormIndex >= numNormTourSlices) {
+				nextNormIndex = numNormTourSlices - 1;
+			}
+
+			final int nextSerieIndex = norm2origIndices[nextNormIndex];
+
+			while (serieIndex < nextSerieIndex && serieIndex < numTourSlices) {
+
+				tourLatLonDiff[serieIndex++] = latLonDiff;
+			}
+		}
+
+		comparerItem.tourLatLonDiff = tourLatLonDiff;
 
 		if (LOG_TOUR_COMPARING) {
 
@@ -291,9 +297,9 @@ public class GeoPartTourComparer {
 							comparerItem.tourId,
 							//							loaderItem.executorId,
 
-							minDiffIndex < 0 ? minDiffIndex : tourLatLonDiff[minDiffIndex],
-							numTourSlices,
-							numPartSlices,
+							minDiffIndex < 0 ? minDiffIndex : normLatLonDiff[minDiffIndex],
+							numNormTourSlices,
+							numNormPartSlices,
 
 							time_Compare,
 							numCompares,

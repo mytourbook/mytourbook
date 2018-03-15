@@ -2727,7 +2727,9 @@ public class ChartComponentGraph extends Canvas {
 		/*
 		 * draw the lines into the paths
 		 */
-		for (int valueIndex = startIndex; valueIndex < endIndex; valueIndex++) {
+		int valueIndex = startIndex;
+		double devX = 999;
+		for (; valueIndex < endIndex; valueIndex++) {
 
 			// check array bounds
 			if (valueIndex >= yValueLength) {
@@ -2735,7 +2737,7 @@ public class ChartComponentGraph extends Canvas {
 			}
 
 			final double graphX = xValues[valueIndex] - graphValueOffset;
-			final double devX = graphX * scaleX;
+			devX = graphX * scaleX;
 			final float devXf = (float) devX;
 
 			final float graphY1 = yValues[valueIndex];
@@ -2964,6 +2966,12 @@ public class ChartComponentGraph extends Canvas {
 
 			// check if last visible position + 1 is reached
 					devX > devXVisibleWidth) {
+
+//				System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] draw last point")
+////						+ ("\t: " + )
+////						+ ("\t: " + )
+//				);
+//// TODO remove SYSTEM.OUT.PRINTLN
 
 				/*
 				 * this is the last point for a filled graph

@@ -40,22 +40,4 @@ public class NormalizedGeoData {
 	 */
 	public int		lastIndex;
 
-	public NormalizedGeoData(	final Long tourId,
-								final int firstIndex,
-								final int lastIndex,
-								final int[] normalizedLat,
-								final int[] normalizedLon,
-								final int[] normalized2OriginalIndices) {
-
-		this.tourId = tourId;
-
-		this.firstIndex = firstIndex;
-		this.lastIndex = lastIndex;
-
-		this.normalizedLat = normalizedLat;
-		this.normalizedLon = normalizedLon;
-
-		this.normalized2OriginalIndices = normalized2OriginalIndices;
-	}
-
 }

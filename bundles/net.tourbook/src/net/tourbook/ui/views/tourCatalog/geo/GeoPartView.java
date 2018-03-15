@@ -569,7 +569,7 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 		_lblNumSlices.setText(Integer.toString(numSlices));
 		_lblNumGeoParts.setText(Integer.toString(_geoParts.length));
 
-		updateUI_Progress(0);
+		updateUI_Progress(0, 0);
 
 		/*
 		 * Create geo data which should be compared
@@ -591,17 +591,39 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 
 		_geoPartTours = loaderItem.tourIds.length;
 
+		if (_geoPartTours == 0) {
+
+			// update UI
+			Display.getDefault().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+
+					if (_parent.isDisposed()) {
+						return;
+					}
+
+					// this can happen when the tour filter is active and no tours are found -> show empty result
+
+					_comparedTours.clear();
+
+					updateUI_Progress(0, 0);
+					updateUI_Viewer();
+
+					updateUI_GeoItem(loaderItem);
+				}
+			});
+
+			return;
+		}
+
 		final long workerExecutorId[] = { 0 };
 
-		if (_geoPartTours > 0) {
+		_workedTours.set(0);
 
-			_workedTours.set(0);
+		_workerExecutorId = loaderItem.executorId;
+		workerExecutorId[0] = _workerExecutorId;
 
-			_workerExecutorId = loaderItem.executorId;
-			workerExecutorId[0] = _workerExecutorId;
-
-			GeoPartTourComparer.compareGeoTours(loaderItem);
-		}
+		GeoPartTourComparer.compareGeoTours(loaderItem);
 
 		// update UI
 		Display.getDefault().asyncExec(new Runnable() {
@@ -653,7 +675,7 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 					return;
 				}
 
-				updateUI_Progress(workedTours);
+				updateUI_Progress(workedTours, _geoPartTours);
 				updateUI_Viewer();
 
 				// set focus to the viewer
@@ -1513,15 +1535,15 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 		}
 	}
 
-	private void updateUI_Progress(final int workedTours) {
+	private void updateUI_Progress(final int workedTours, final int numTours) {
 
-		if (workedTours == _geoPartTours) {
+		if (workedTours == numTours) {
 
 			_lblProgressBar.setText("Comparing is done");
 
 		} else {
 
-			_lblProgressBar.setText(NLS.bind("Comparing tours: {0} / {1}", workedTours, _geoPartTours)); //$NON-NLS-1$
+			_lblProgressBar.setText(NLS.bind("Comparing tours: {0} / {1}", workedTours, numTours)); //$NON-NLS-1$
 		}
 	}
 
