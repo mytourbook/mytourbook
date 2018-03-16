@@ -30,7 +30,9 @@ public class GeoPartComparerItem {
 	 * Compare results
 	 */
 	public float[]		tourLatLonDiff;
-	int					tourMinDiffIndex;
+
+	public int			tourFirstIndex;
+	public int			tourLastIndex;
 
 	/**
 	 * <ul>

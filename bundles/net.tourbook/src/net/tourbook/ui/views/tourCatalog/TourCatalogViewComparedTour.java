@@ -705,7 +705,8 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 	private void setRangeMarkers(final ChartDataXSerie xData) {
 
-		if (_comparedTourItem instanceof TVICatalogComparedTour) {
+		if (_comparedTourItem instanceof TVICatalogComparedTour
+				|| _comparedTourItem instanceof GeoPartComparerItem) {
 
 			xData.setRangeMarkers(new int[] { _defaultStartIndex }, new int[] { _defaultEndIndex });
 
@@ -845,8 +846,8 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 		// set tour compare data, this will enable the action button to see the graph for this data
 		_tourData.tourCompareSerie = comparerItem.tourLatLonDiff;
 
-		_defaultStartIndex = _movedStartIndex = _computedStartIndex = normalizedTourPart.firstIndex;
-		_defaultEndIndex = _movedEndIndex = _computedEndIndex = normalizedTourPart.lastIndex;
+		_defaultStartIndex = _movedStartIndex = _computedStartIndex = comparerItem.tourFirstIndex;
+		_defaultEndIndex = _movedEndIndex = _computedEndIndex = comparerItem.tourLastIndex;
 
 		_comparedTourItem = comparerItem;
 

@@ -27,7 +27,7 @@ import net.tourbook.data.NormalizedGeoData;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourManager;
 
-public class GeoPartTourComparer {
+public class GeoCompareManager {
 
 // SET_FORMATTING_OFF
 	
@@ -69,7 +69,7 @@ public class GeoPartTourComparer {
 		System.out.println(
 				(String.format(
 						"[%s] Comparing tours with %d threads",
-						GeoPartTourComparer.class.getSimpleName(),
+						GeoCompareManager.class.getSimpleName(),
 						COMPARATOR_THREADS)));
 // TODO remove SYSTEM.OUT.PRINTLN
 
@@ -140,7 +140,7 @@ public class GeoPartTourComparer {
 		final int[] normPartLatSerie = normalizedPart.normalizedLat;
 		final int[] partLonSerie = normalizedPart.normalizedLon;
 
-		final NormalizedGeoData normalizedTour = tourData.getNormalizedLatLon();
+		final NormalizedGeoData normalizedTour = tourData.getNormalizedLatLon(normalizedPart.geoAccuracy);
 		final int[] normTourLatSerie = normalizedTour.normalizedLat;
 		final int[] tourLonSerie = normalizedTour.normalizedLon;
 
@@ -155,7 +155,7 @@ public class GeoPartTourComparer {
 		final long startComparing = System.nanoTime();
 
 		long minDiffValue = Long.MAX_VALUE;
-		int minDiffIndex = -1;
+		int normMinDiffIndex = -1;
 		int numCompares = 0;
 
 		// loop: all normalized tour slices
@@ -167,14 +167,6 @@ public class GeoPartTourComparer {
 			for (int normPartIndex = 0; normPartIndex < numNormPartSlices; normPartIndex++) {
 
 				if (geoPartItem.isCanceled) {
-
-//					System.out.println(
-//							(" [" + GeoPartTourComparer.class.getSimpleName() + "] isCanceled")
-//									+ ("\texecId: " + loaderItem.executorId)
-////							+ ("\t: " + )
-//					);
-//// TODO remove SYSTEM.OUT.PRINTLN
-
 					return;
 				}
 
@@ -211,7 +203,7 @@ public class GeoPartTourComparer {
 				minDiffValue = latLonDiff;
 
 				// keep tour index where the min diff occured
-				minDiffIndex = normTourIndex;
+				normMinDiffIndex = normTourIndex;
 			}
 
 		}
@@ -219,13 +211,16 @@ public class GeoPartTourComparer {
 		final int[] norm2origIndices = normalizedTour.normalized2OriginalIndices;
 
 		// a tour is available and could be compared
-		if (minDiffIndex > -1) {
+		if (normMinDiffIndex > -1) {
 
-			final int startIndex = norm2origIndices[minDiffIndex];
-			final int endIndex = norm2origIndices[minDiffIndex + numNormPartSlices - 1];
+			final int origStartIndex = norm2origIndices[normMinDiffIndex];
+			final int origEndIndex = norm2origIndices[normMinDiffIndex + numNormPartSlices - 1];
 
-			comparerItem.avgPulse = tourData.computeAvg_PulseSegment(startIndex, endIndex);
-			comparerItem.avgSpeed = TourManager.computeTourSpeed(tourData, startIndex, endIndex);
+			comparerItem.avgPulse = tourData.computeAvg_PulseSegment(origStartIndex, origEndIndex);
+			comparerItem.avgSpeed = TourManager.computeTourSpeed(tourData, origStartIndex, origEndIndex);
+
+			comparerItem.tourFirstIndex = origStartIndex;
+			comparerItem.tourLastIndex = origEndIndex;
 		}
 
 		final ZonedDateTime tourStartTime = tourData.getTourStartTime();
@@ -233,8 +228,8 @@ public class GeoPartTourComparer {
 		comparerItem.tourStartTime = tourStartTime;
 		comparerItem.tourStartTimeMS = TimeTools.toEpochMilli(tourStartTime);
 
-		comparerItem.tourMinDiffIndex = minDiffIndex;
-		comparerItem.minDiffValue = (long) (minDiffIndex < 0 ? -1 : normLatLonDiff[minDiffIndex]);
+		comparerItem.minDiffValue = (long) (normMinDiffIndex < 0 ? -1 : normLatLonDiff[normMinDiffIndex]);
+
 
 		/*
 		 * Create data serie for the chart graph from the normalized diff data serie
@@ -297,7 +292,7 @@ public class GeoPartTourComparer {
 							comparerItem.tourId,
 							//							loaderItem.executorId,
 
-							minDiffIndex < 0 ? minDiffIndex : normLatLonDiff[minDiffIndex],
+							normMinDiffIndex < 0 ? normMinDiffIndex : normLatLonDiff[normMinDiffIndex],
 							numNormTourSlices,
 							numNormPartSlices,
 

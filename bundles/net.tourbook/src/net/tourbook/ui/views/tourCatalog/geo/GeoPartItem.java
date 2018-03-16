@@ -25,6 +25,11 @@ import net.tourbook.data.TourReference;
  */
 public class GeoPartItem {
 
+	/**
+	 * Id of the {@link TourReference}, is -1 when not available
+	 */
+	public long						refId			= -1;
+
 	long							executorId;
 
 	/**
@@ -41,15 +46,6 @@ public class GeoPartItem {
 
 	/**
 	 * Geo parts which are affected
-	 * 
-	 * <pre>
-	 * 	Degree*INT    resolution
-		---------------------------------------
-		Deg*100		   1570 m
-		Deg*1000		157 m
-		Deg*10000		 16 m
-		Deg*100000		1.6 m
-	 * </pre>
 	 */
 	int[]							geoParts;
 
@@ -64,14 +60,12 @@ public class GeoPartItem {
 	ArrayList<GeoPartComparerItem>	comparedTours	= new ArrayList<>();
 
 	/**
-	 * Id of the {@link TourReference}, is -1 when not available
-	 */
-	public long						refId;
-
-	/**
 	 * Time in ms to calculate sql data
 	 */
 	long							sqlRunningTime;
+
+	@SuppressWarnings("unused")
+	private GeoPartItem() {}
 
 	public GeoPartItem(	final long executorId,
 						final int[] geoParts,

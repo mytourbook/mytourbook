@@ -170,11 +170,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	   Deg * 100000		  1.6 m
 	 * </pre>
 	 */
-//	private static final int 			NORMALIZED_GEO_DATA_FACTOR 			= 10;
-//	private static final int 			NORMALIZED_GEO_DATA_FACTOR 			= 100;
-	private static final int 			NORMALIZED_GEO_DATA_FACTOR 			= 1_000;
-//	private static final int 			NORMALIZED_GEO_DATA_FACTOR 			= 10_000;
-//	private static final int 			NORMALIZED_GEO_DATA_FACTOR 			= 100_000;
 
 	public static final double			NORMALIZED_LATITUDE_OFFSET			= 90.0;
 	public static final double			NORMALIZED_LONGITUDE_OFFSET			= 180.0;
@@ -1017,10 +1012,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	public int[]						geoParts;
 
 	/**
-	 * Latitude/longitude multiplied with 10'000 -> 10-17 m accuracy
+	 * Latitude/longitude multiplied with {@link #_normalizedGeoAccuracy}
 	 */
 	@Transient
-	private NormalizedGeoData					_normalizedLatLon;
+	private NormalizedGeoData			_normalizedLatLon;
+	
+	@Transient
+	private int							_normalizedGeoAccuracy;
 
 	/**
 	 * Index of the segmented data in the data series
@@ -1218,8 +1216,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * Contains photos which are displayed in photo galleries.
 	 */
 	@Transient
-	private ArrayList<Photo>		_galleryPhotos	=
-			new ArrayList<Photo>();
+	private ArrayList<Photo>		_galleryPhotos	= new ArrayList<Photo>();
 
 	/**
 	 * 
@@ -2667,16 +2664,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * <ul>
 	 * <li>from first to last index</li>
 	 * <li>added lat:90 or lon:180 to have positive values</li>
-	 * <li>multiplied by {@link #NORMALIZED_GEO_DATA_FACTOR}</li>
+	 * <li>multiplied with {@link #NORMALIZED_GEO_DATA_FACTOR}</li>
 	 * <li>removed subsequent duplicates</li>
 	 * </ul>
 	 * 
 	 * @param indexStart
 	 * @param indexEnd
+	 * @param geoAccuracy
 	 * @return Returns normalized tour lat/lon data or <code>null</code> when not available
 	 */
 	public NormalizedGeoData computeGeo_NormalizedLatLon(	final int indexStart,
-															final int indexEnd) {
+															final int indexEnd,
+															final int geoAccuracy) {
 
 		if (latitudeSerie == null) {
 			return null;
@@ -2710,8 +2709,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			final double latValueWithOffset = latitudeSerie[serieIndex] + NORMALIZED_LATITUDE_OFFSET;
 			final double lonValueWithOffset = longitudeSerie[serieIndex] + NORMALIZED_LONGITUDE_OFFSET;
 
-			final int latNormalized = (int) (latValueWithOffset * NORMALIZED_GEO_DATA_FACTOR);
-			final int lonNormalized = (int) (lonValueWithOffset * NORMALIZED_GEO_DATA_FACTOR);
+			final int latNormalized = (int) (latValueWithOffset * geoAccuracy);
+			final int lonNormalized = (int) (lonValueWithOffset * geoAccuracy);
 
 			if (latNormalized != prevLatNormalized || lonNormalized != prevLonNormalized) {
 
@@ -2736,13 +2735,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 		normGeoData.tourId = tourId;
 
-		normGeoData.firstIndex = firstIndex;
-		normGeoData.lastIndex = lastIndex;
+		normGeoData.originalFirstIndex = firstIndex;
+		normGeoData.originalLastIndex = lastIndex;
 
 		normGeoData.normalizedLat = Arrays.copyOf(allNormalizedLat, normalizedLength);
 		normGeoData.normalizedLon = Arrays.copyOf(allNormalizedLon, normalizedLength);
 
 		normGeoData.normalized2OriginalIndices = Arrays.copyOf(allNormalized2OriginalIndices, normalizedLength);
+
+		normGeoData.geoAccuracy = geoAccuracy;
 
 		return normGeoData;
 	}
@@ -5844,17 +5845,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	}
 
 	/**
+	 * @param geoAccuracy
 	 * @return Returns tour lat/lon data multiplied by {@link #NORMALIZED_GEO_DATA_FACTOR} and
 	 *         normalized (removed duplicates), or <code>null</code> when not available
 	 */
-	public NormalizedGeoData getNormalizedLatLon() {
+	public NormalizedGeoData getNormalizedLatLon(final int geoAccuracy) {
 
 		if (latitudeSerie == null) {
 			return null;
 		}
 
-		if (_normalizedLatLon == null) {
-			_normalizedLatLon = computeGeo_NormalizedLatLon(0, latitudeSerie.length);
+		if (_normalizedLatLon == null || _normalizedGeoAccuracy != geoAccuracy) {
+			_normalizedLatLon = computeGeo_NormalizedLatLon(0, latitudeSerie.length, geoAccuracy);
 		}
 
 		return _normalizedLatLon;
