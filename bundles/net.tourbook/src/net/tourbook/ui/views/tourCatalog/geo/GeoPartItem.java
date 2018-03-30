@@ -17,7 +17,7 @@ package net.tourbook.ui.views.tourCatalog.geo;
 
 import java.util.ArrayList;
 
-import net.tourbook.data.NormalizedGeoData;
+import net.tourbook.data.RasterizedGeoData;
 import net.tourbook.data.TourReference;
 
 /**
@@ -42,7 +42,7 @@ public class GeoPartItem {
 	/**
 	 * Geo part which should be compared
 	 */
-	public NormalizedGeoData		normalizedTourPart;
+	public RasterizedGeoData		normalizedTourPart;
 
 	/**
 	 * Geo parts which are affected
@@ -69,7 +69,7 @@ public class GeoPartItem {
 
 	public GeoPartItem(	final long executorId,
 						final int[] geoParts,
-						final NormalizedGeoData normalizedTourPart,
+						final RasterizedGeoData normalizedTourPart,
 						final boolean useAppFilter) {
 
 		this.executorId = executorId;

@@ -17,7 +17,7 @@ package net.tourbook.ui.tourChart;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.PostSelectionProvider;
-import net.tourbook.data.NormalizedGeoData;
+import net.tourbook.data.RasterizedGeoData;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
@@ -191,7 +191,7 @@ public abstract class TourChartViewPart extends ViewPart {
 
 					final GeoPartItem geoPartItem = (GeoPartItem) eventData;
 					
-					final NormalizedGeoData normalizedTourPart = geoPartItem.normalizedTourPart;
+					final RasterizedGeoData normalizedTourPart = geoPartItem.normalizedTourPart;
 					final long tourId = normalizedTourPart.tourId;
 
 					_tourData = TourManager.getInstance().getTourData(tourId);

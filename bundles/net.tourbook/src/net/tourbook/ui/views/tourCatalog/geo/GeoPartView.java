@@ -31,10 +31,11 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
+import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.common.util.Util;
-import net.tourbook.data.NormalizedGeoData;
+import net.tourbook.data.RasterizedGeoData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
 import net.tourbook.importdata.RawDataManager;
@@ -160,8 +161,8 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 	private long							_compareData_TourId				= Long.MIN_VALUE;
 	private int								_compareData_FirstIndex;
 	private int								_compareData_LastIndex;
-	private int[]							_compareData_GeoParts;
-	private NormalizedGeoData				_compareData_NormalizedTourPart;
+	private int								_compareData_LastGeoAccuracy;
+	private int[]							_compareData_RoughGeoParts;
 	private GeoPartItem						_compareData_PreviousGeoPartItem;
 	private long							_compareData_RefId;
 	private String							_compareData_TourTitle;
@@ -188,6 +189,7 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 	private Composite						_pageNoData;
 	private Composite						_pageContent;
 
+	private Label							_lblGeoAccuracy;
 	private Label							_lblNumGeoParts;
 	private Label							_lblNumSlices;
 	private Label							_lblNumTours;
@@ -422,6 +424,10 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 				if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 
 					recompareTours();
+
+				} else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
+
+					updateUI_GeoAccuracy();
 				}
 			}
 		};
@@ -473,6 +479,13 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 		TourManager.getInstance().addTourEventListener(_tourEventListener);
 	}
 
+	/**
+	 * @param tourData
+	 * @param leftIndex
+	 * @param rightIndex
+	 * @param refId
+	 *            Reference tour id or <code>-1</code> when not available
+	 */
 	private void compare_10_Compare(final TourData tourData,
 									final int leftIndex,
 									final int rightIndex,
@@ -485,11 +498,14 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 		}
 
 		/*
-		 * !!! This must be very early because it is running with a delay which could cause that an
-		 * old is running !!!
+		 * !!! This must be very early because the comparison is running with a delay which could
+		 * cause that an old is running !!!
 		 */
 		final int runnableRunningId = _runningId.incrementAndGet();
 
+		/*
+		 * Show no data page
+		 */
 		final double[] latSerie = tourData.latitudeSerie;
 		if (latSerie == null) {
 
@@ -514,13 +530,18 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 
 		final long tourId = tourData.getTourId();
 
-		// skip same data or continue current comparison
-		if (tourId == _compareData_TourId //
-				&& leftIndex == _compareData_FirstIndex
-				&& rightIndex == _compareData_LastIndex) {
+		// skip same data and continue current comparison
+		if (_compareData_TourId == tourId
+				&& _compareData_FirstIndex == leftIndex
+				&& _compareData_LastIndex == rightIndex
+				&& _compareData_LastGeoAccuracy == _geoAccuracy) {
+
 			return;
 		}
 
+		/*
+		 * New data should be compared
+		 */
 		GeoPartTourLoader.stopLoading(_compareData_PreviousGeoPartItem);
 
 		_compareData_TourId = tourId;
@@ -550,19 +571,19 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 					return;
 				}
 
-				compare_20_LoadGeoParts();
+				compare_20_SetupComparing();
 			}
 		});
 	}
 
-	private void compare_20_LoadGeoParts() {
+	private void compare_20_SetupComparing() {
 
 		// 1. get geo partitions from lat/lon first/last index
-		_compareData_GeoParts = _compareData_TourData.computeGeo_Partitions(
+		_compareData_RoughGeoParts = _compareData_TourData.computeGeo_RoughPartitions(
 				_compareData_FirstIndex,
 				_compareData_LastIndex);
 
-		if (_compareData_GeoParts == null) {
+		if (_compareData_RoughGeoParts == null) {
 
 			_pageBook.showPage(_pageNoData);
 
@@ -571,41 +592,44 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 
 		_pageBook.showPage(_pageContent);
 
+		/*
+		 * Update UI
+		 */
 		_comparedTours.clear();
 		updateUI_Viewer();
 
-		// update UI
 		final int numSlices = _compareData_LastIndex - _compareData_FirstIndex;
 		_lblNumSlices.setText(Integer.toString(numSlices));
-		_lblNumGeoParts.setText(Integer.toString(_compareData_GeoParts.length));
+		_lblNumGeoParts.setText(Integer.toString(_compareData_RoughGeoParts.length));
 
 		updateUI_Progress(0, 0);
 
 		_compareData_TourTitle = TourManager.getTourTitleDetailed(_compareData_TourData);
 
-		compare_30_StartLoading();
+		compare_30_StartComparing();
 	}
 
-	private void compare_30_StartLoading() {
+	private void compare_30_StartComparing() {
 
 		/*
 		 * Create geo data which should be compared
 		 */
-		_compareData_NormalizedTourPart = _compareData_TourData.computeGeo_NormalizedLatLon(
+		final RasterizedGeoData rasterizedTourPart = _compareData_TourData.computeGeo_RasterizeLatLon(
 				_compareData_FirstIndex,
 				_compareData_LastIndex,
 				_geoAccuracy);
 
 		// 2. load tour id's in the geo parts
-		final GeoPartItem geoPartItem = GeoPartTourLoader.loadToursFromGeoParts(
-				_compareData_GeoParts,
-				_compareData_NormalizedTourPart,
+		final GeoPartItem newGeoPartItem = GeoPartTourLoader.loadToursFromGeoParts(
+				_compareData_RoughGeoParts,
+				rasterizedTourPart,
 				_compareData_IsUseAppFilter,
-				_compareData_PreviousGeoPartItem);
+				_compareData_PreviousGeoPartItem,
+				this);
 
-		geoPartItem.refId = _compareData_RefId;
+		newGeoPartItem.refId = _compareData_RefId;
 
-		_compareData_PreviousGeoPartItem = geoPartItem;
+		_compareData_PreviousGeoPartItem = newGeoPartItem;
 	}
 
 	void compare_40_CompareTours(final GeoPartItem geoPartItem) {
@@ -644,7 +668,7 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 		_workerExecutorId = geoPartItem.executorId;
 		workerExecutorId[0] = _workerExecutorId;
 
-		GeoCompareManager.compareGeoTours(geoPartItem);
+		GeoCompareManager.compareGeoTours(geoPartItem, this);
 
 		// update UI
 		Display.getDefault().asyncExec(new Runnable() {
@@ -708,9 +732,12 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 						comparerItem.geoPartItem,
 						GeoPartView.this);
 
-//				if (workedTours == _geoPartTours) {
-//					logCompareResult(geoPartItem);
-//				}
+				if (workedTours == _compareData_NumGeoPartTours) {
+
+					// keep state after compare is done
+
+					_compareData_LastGeoAccuracy = _geoAccuracy;
+				}
 			}
 		});
 	}
@@ -744,10 +771,9 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 		// set selection provider
 		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
-		GeoPartTourLoader.geoPartView = this;
-		GeoCompareManager.geoPartView = this;
-
 		restoreState();
+
+		updateUI_GeoAccuracy();
 
 		_pageBook.showPage(_pageNoData);
 	}
@@ -837,15 +863,31 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 				 */
 				// Label
 				final Label label = new Label(container, SWT.NONE);
-				label.setText("Geo accuracy");
+				label.setText("Geo &Accuracy");
 
-				// Spinner
-				_spinnerGeoAccuracy = new Spinner(container, SWT.BORDER);
-				_spinnerGeoAccuracy.setMinimum(100);
-				_spinnerGeoAccuracy.setMaximum(100_000);
-				_spinnerGeoAccuracy.setPageIncrement(100);
-				_spinnerGeoAccuracy.addSelectionListener(_defaultSelectionListener);
-				_spinnerGeoAccuracy.addMouseWheelListener(_defaultMouseWheelListener);
+				final Composite containerGeo = new Composite(container, SWT.NONE);
+				GridDataFactory.fillDefaults().grab(true, false).applyTo(containerGeo);
+				GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerGeo);
+				{
+					{
+						// Spinner
+						_spinnerGeoAccuracy = new Spinner(containerGeo, SWT.BORDER);
+						_spinnerGeoAccuracy.setMinimum(100);
+						_spinnerGeoAccuracy.setMaximum(100_000);
+						_spinnerGeoAccuracy.setPageIncrement(100);
+						_spinnerGeoAccuracy.addSelectionListener(_defaultSelectionListener);
+						_spinnerGeoAccuracy.addMouseWheelListener(_defaultMouseWheelListener);
+					}
+					{
+						// geo distance
+						_lblGeoAccuracy = new Label(containerGeo, SWT.NONE);
+						GridDataFactory
+								.fillDefaults()
+								.grab(true, false)
+								.align(SWT.FILL, SWT.CENTER)
+								.applyTo(_lblGeoAccuracy);
+					}
+				}
 			}
 //			{
 //				/*
@@ -986,6 +1028,7 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 
 		defineColumn_80_StartIndex();
 		defineColumn_82_EndIndex();
+		defineColumn_84_IndexDiff();
 	}
 
 	/**
@@ -1129,23 +1172,48 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 	 * Column: End index
 	 */
 	private void defineColumn_82_EndIndex() {
-		
+
 		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "endIndex", SWT.TRAIL);
-		
+
 		colDef.setColumnLabel("End Idx");
 		colDef.setColumnHeaderText("End Idx");
-		
+
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
-		
+
 		colDef.setIsDefaultColumn();
-		
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
-				
+
 				final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
-				
+
 				cell.setText(Integer.toString(item.tourLastIndex));
+			}
+		});
+	}
+
+	/**
+	 * Column: End index
+	 */
+	private void defineColumn_84_IndexDiff() {
+
+		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "indexDiff", SWT.TRAIL);
+
+		colDef.setColumnLabel("Idx ∆");
+		colDef.setColumnHeaderText("Idx ∆");
+
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
+
+		colDef.setIsDefaultColumn();
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
+
+				cell.setText(Integer.toString(item.tourLastIndex - item.tourFirstIndex));
 			}
 		});
 	}
@@ -1297,7 +1365,14 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 
 		_geoAccuracy = _spinnerGeoAccuracy.getSelection();
 
-		recompareTours();
+		if (_compareData_LastGeoAccuracy != _geoAccuracy) {
+
+			// accuracy is modified
+
+			updateUI_GeoAccuracy();
+
+			recompareTours();
+		}
 	}
 
 	private void onGeoPart_Select(final Event event) {
@@ -1438,9 +1513,8 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 
 	private void recompareTours() {
 
-		if (_compareData_GeoParts != null && _isCompareEnabled) {
-
-			compare_30_StartLoading();
+		if (_compareData_RoughGeoParts != null && _isCompareEnabled) {
+			compare_30_StartComparing();
 		}
 	}
 
@@ -1553,6 +1627,29 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 
 	@Override
 	public void updateColumnHeader(final ColumnDefinition colDef) {}
+
+	private void updateUI_GeoAccuracy() {
+
+		final double latStart = 0;
+		final double latEnd = 1.0 / _geoAccuracy;
+
+		final double lonStart = 0;
+		final double lonEnd = 1.0 / _geoAccuracy;
+
+		final double distDiff = MtMath.distanceVincenty(latStart, lonStart, latEnd, lonEnd);
+
+		final double distValue = distDiff / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_SMALL;
+
+		final String valueFormatting = distValue > 100
+				? "%1.0f %s"
+				: distValue > 10
+						? "%1.1f %s"//
+						: "%1.2f %s";
+
+		final String geoDistance = String.format(valueFormatting, distValue, UI.UNIT_LABEL_DISTANCE_SMALL);
+
+		_lblGeoAccuracy.setText(geoDistance);
+	}
 
 	private void updateUI_GeoItem(final GeoPartItem geoItem) {
 

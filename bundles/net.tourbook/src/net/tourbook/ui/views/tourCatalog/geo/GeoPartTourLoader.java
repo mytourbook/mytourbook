@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
-import net.tourbook.data.NormalizedGeoData;
+import net.tourbook.data.RasterizedGeoData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.SQLFilter;
 
@@ -39,8 +39,6 @@ public class GeoPartTourLoader {
 	private static final AtomicLong							_loaderExecuterId	= new AtomicLong();
 	private static final LinkedBlockingDeque<GeoPartItem>	_loaderWaitingQueue	= new LinkedBlockingDeque<>();
 	private static ExecutorService							_loadingExecutor;
-
-	static GeoPartView										geoPartView;
 
 	static {
 
@@ -189,12 +187,14 @@ public class GeoPartTourLoader {
 	 * @param latPartNormalized
 	 * @param useAppFilter
 	 * @param previousLoaderItem
+	 * @param geoPartView
 	 * @return
 	 */
 	static GeoPartItem loadToursFromGeoParts(	final int[] geoParts,
-												final NormalizedGeoData normalizedTourPart,
+												final RasterizedGeoData normalizedTourPart,
 												final boolean useAppFilter,
-												final GeoPartItem previousLoaderItem) {
+												final GeoPartItem previousLoaderItem,
+												final GeoPartView geoPartView) {
 
 		stopLoading(previousLoaderItem);
 

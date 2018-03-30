@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.data;
 
-public class NormalizedGeoData {
+public class RasterizedGeoData {
 
 	/**
 	 * <pre>
@@ -46,13 +46,13 @@ public class NormalizedGeoData {
 	 */
 	public int		geoAccuracy	= 100_000;
 
-	public int[]	normalizedLat;
-	public int[]	normalizedLon;
+	public int[]	rasterizedLat;
+	public int[]	rasterizedLon;
 
 	/**
 	 * Contains the index of the original data
 	 */
-	public int[]	normalized2OriginalIndices;
+	public int[]	rasterized2OriginalIndices;
 
 	/**
 	 * Normalized tour

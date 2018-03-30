@@ -154,10 +154,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * </pre>
 	 * 
 	 * https://en.wikipedia.org/wiki/Decimal_degrees
-	 */
-	public static final double			MAX_GEO_DIFF						= 0.0001;
-
-	/**
+	 *
 	 * Factor to normalize lat/lon
 	 * 
 	 * <pre>
@@ -170,6 +167,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	   Deg * 100000		  1.6 m
 	 * </pre>
 	 */
+	public static final double			MAX_GEO_DIFF						= 0.0001;
 
 	public static final double			NORMALIZED_LATITUDE_OFFSET			= 90.0;
 	public static final double			NORMALIZED_LONGITUDE_OFFSET			= 180.0;
@@ -992,8 +990,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	private GeoPosition[]				_gpsBounds;
 
 	/**
-	 * Contains the geo parts of the tour or <code>null</code> when geo data are not available. A
-	 * part is an integer of lat and lon * 100
+	 * Contains the rough geo parts of the tour or <code>null</code> when geo data are not available. A
+	 * part is an integer of lat and lon * 100 (1570 m)
 	 * 
 	 * <pre>
 	
@@ -1006,16 +1004,26 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		max		(9_000 + 9_000) * 100_000 = 18_000 * 100_000  = 1_800_000_000
 	
 											Integer.MAX_VALUE = 2_147_483_647
+		
+		Factor to normalize lat/lon
+		
+		Degree * Integer = Resolution
+		---------------------------------------
+		Deg *     100      1570 m
+		Deg *   1_000       157 m
+		Deg *  10_000        16 m
+		Deg * 100_000         1.6 m
+											
 	 * </pre>
 	 */
 	@Transient
-	public int[]						geoParts;
+	public int[]						roughGeoParts;
 
 	/**
 	 * Latitude/longitude multiplied with {@link #_normalizedGeoAccuracy}
 	 */
 	@Transient
-	private NormalizedGeoData			_normalizedLatLon;
+	private RasterizedGeoData			_rasterizedLatLon;
 	
 	@Transient
 	private int							_normalizedGeoAccuracy;
@@ -1491,8 +1499,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		if (isLatitudeValid == false) {
 			latitudeSerie = null;
 			longitudeSerie = null;
-			_normalizedLatLon = null;
-			geoParts = null;
+			_rasterizedLatLon = null;
+			roughGeoParts = null;
 		}
 	}
 
@@ -1549,8 +1557,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		srtmSerieImperial = null;
 
 		_gpsBounds = null;
-		_normalizedLatLon = null;
-		geoParts = null;
+		_rasterizedLatLon = null;
+		roughGeoParts = null;
 
 		_hrZones = null;
 		_hrZoneContext = null;
@@ -2610,7 +2618,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		computeHrZones();
 
 		computeGeo_Bounds();
-		computeGeo_Partitions();
+		computeGeo_RoughPartitions();
 	}
 
 	/**
@@ -2660,22 +2668,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	}
 
 	/**
-	 * Normalizes lat/lon tour data
+	 * Rasterize lat/lon tour data
 	 * <ul>
 	 * <li>from first to last index</li>
 	 * <li>added lat:90 or lon:180 to have positive values</li>
-	 * <li>multiplied with {@link #NORMALIZED_GEO_DATA_FACTOR}</li>
+	 * <li>multiplied with geo accuracy</li>
 	 * <li>removed subsequent duplicates</li>
 	 * </ul>
 	 * 
 	 * @param indexStart
 	 * @param indexEnd
 	 * @param geoAccuracy
-	 * @return Returns normalized tour lat/lon data or <code>null</code> when not available
+	 * @return Returns rasterized lat/lon data of the tour or <code>null</code> when not available
 	 */
-	public NormalizedGeoData computeGeo_NormalizedLatLon(	final int indexStart,
-															final int indexEnd,
-															final int geoAccuracy) {
+	public RasterizedGeoData computeGeo_RasterizeLatLon(final int indexStart,
+														final int indexEnd,
+														final int geoAccuracy) {
 
 		if (latitudeSerie == null) {
 			return null;
@@ -2695,71 +2703,72 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			lastIndex = numSlices;
 		}
 
-		final int[] allNormalizedLat = new int[numSlices];
-		final int[] allNormalizedLon = new int[numSlices];
-		final int[] allNormalized2OriginalIndices = new int[numSlices];
+		final int[] allRasterizedLat = new int[numSlices];
+		final int[] allRasterizedLon = new int[numSlices];
+		final int[] allRasterizedOriginalIndices = new int[numSlices];
 
-		int prevLatNormalized = Integer.MIN_VALUE;
-		int prevLonNormalized = Integer.MIN_VALUE;
+		int prevLatRasterized = Integer.MIN_VALUE;
+		int prevLonRasterized = Integer.MIN_VALUE;
 
-		int normalizedIndex = -1;
+		int rasterizedIndex = -1;
 
 		for (int serieIndex = firstIndex; serieIndex < lastIndex; serieIndex++) {
 
+			// convert lat + lon to a positive value
 			final double latValueWithOffset = latitudeSerie[serieIndex] + NORMALIZED_LATITUDE_OFFSET;
 			final double lonValueWithOffset = longitudeSerie[serieIndex] + NORMALIZED_LONGITUDE_OFFSET;
 
-			final int latNormalized = (int) (latValueWithOffset * geoAccuracy);
-			final int lonNormalized = (int) (lonValueWithOffset * geoAccuracy);
+			final int latRasterized = (int) (latValueWithOffset * geoAccuracy);
+			final int lonRasterized = (int) (lonValueWithOffset * geoAccuracy);
 
-			if (latNormalized != prevLatNormalized || lonNormalized != prevLonNormalized) {
+			if (latRasterized != prevLatRasterized || lonRasterized != prevLonRasterized) {
 
 				// lat/lon have changed
 
-				normalizedIndex++;
+				rasterizedIndex++;
 
-				allNormalizedLat[normalizedIndex] = latNormalized;
-				allNormalizedLon[normalizedIndex] = lonNormalized;
+				allRasterizedLat[rasterizedIndex] = latRasterized;
+				allRasterizedLon[rasterizedIndex] = lonRasterized;
 
 				// keep original index
-				allNormalized2OriginalIndices[normalizedIndex] = serieIndex + firstIndex;
+				allRasterizedOriginalIndices[rasterizedIndex] = serieIndex + firstIndex;
 			}
 
-			prevLatNormalized = latNormalized;
-			prevLonNormalized = lonNormalized;
+			prevLatRasterized = latRasterized;
+			prevLonRasterized = lonRasterized;
 		}
 
-		final int normalizedLength = normalizedIndex + 1;
+		final int rasterizedLength = rasterizedIndex + 1;
 
-		final NormalizedGeoData normGeoData = new NormalizedGeoData();
+		final RasterizedGeoData rasterGeoData = new RasterizedGeoData();
 
-		normGeoData.tourId = tourId;
+		rasterGeoData.tourId = tourId;
 
-		normGeoData.originalFirstIndex = firstIndex;
-		normGeoData.originalLastIndex = lastIndex;
+		rasterGeoData.originalFirstIndex = firstIndex;
+		rasterGeoData.originalLastIndex = lastIndex;
 
-		normGeoData.normalizedLat = Arrays.copyOf(allNormalizedLat, normalizedLength);
-		normGeoData.normalizedLon = Arrays.copyOf(allNormalizedLon, normalizedLength);
+		rasterGeoData.rasterizedLat = Arrays.copyOf(allRasterizedLat, rasterizedLength);
+		rasterGeoData.rasterizedLon = Arrays.copyOf(allRasterizedLon, rasterizedLength);
 
-		normGeoData.normalized2OriginalIndices = Arrays.copyOf(allNormalized2OriginalIndices, normalizedLength);
+		rasterGeoData.rasterized2OriginalIndices = Arrays.copyOf(allRasterizedOriginalIndices, rasterizedLength);
 
-		normGeoData.geoAccuracy = geoAccuracy;
+		rasterGeoData.geoAccuracy = geoAccuracy;
 
-		return normGeoData;
+		return rasterGeoData;
 	}
 
 	/**
 	 * Computes geo partitions from {@link #latitudeSerie} and {@link #latitudeSerie} into
-	 * {@link #geoParts} when geo data are available, otherwise {@link #geoParts} is
+	 * {@link #roughGeoParts} when geo data are available, otherwise {@link #roughGeoParts} is
 	 * <code>null</code>.
 	 */
-	public void computeGeo_Partitions() {
+	public void computeGeo_RoughPartitions() {
 
 		if (latitudeSerie == null || longitudeSerie == null) {
 			return;
 		}
 
-		geoParts = computeGeo_Partitions(latitudeSerie, longitudeSerie, 0, latitudeSerie.length).toArray();
+		roughGeoParts = computeGeo_RoughPartitions(latitudeSerie, longitudeSerie, 0, latitudeSerie.length).toArray();
 	}
 
 	/**
@@ -2772,10 +2781,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 *            Last index + 1
 	 * @return Returns all geo partitions or <code>null</code> when geo data are not available.
 	 */
-	public TIntHashSet computeGeo_Partitions(	final double[] partLatitude,
-												final double[] partLongitude,
-												final int indexStart,
-												final int indexEnd) {
+	private TIntHashSet computeGeo_RoughPartitions(	final double[] partLatitude,
+													final double[] partLongitude,
+													final int indexStart,
+													final int indexEnd) {
 
 		if (partLatitude == null || partLongitude == null) {
 			return null;
@@ -2846,13 +2855,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * @param lastIndex
 	 * @return Returns the geo partitions or <code>null</code> when geo data are not available
 	 */
-	public int[] computeGeo_Partitions(final int firstIndex, final int lastIndex) {
+	public int[] computeGeo_RoughPartitions(final int firstIndex, final int lastIndex) {
 
 		if (latitudeSerie == null || longitudeSerie == null) {
 			return null;
 		}
 
-		final TIntHashSet computedGeoParts = computeGeo_Partitions(
+		final TIntHashSet computedGeoParts = computeGeo_RoughPartitions(
 				latitudeSerie,
 				longitudeSerie,
 				firstIndex,
@@ -5845,24 +5854,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	}
 
 	/**
-	 * @param geoAccuracy
-	 * @return Returns tour lat/lon data multiplied by {@link #NORMALIZED_GEO_DATA_FACTOR} and
-	 *         normalized (removed duplicates), or <code>null</code> when not available
-	 */
-	public NormalizedGeoData getNormalizedLatLon(final int geoAccuracy) {
-
-		if (latitudeSerie == null) {
-			return null;
-		}
-
-		if (_normalizedLatLon == null || _normalizedGeoAccuracy != geoAccuracy) {
-			_normalizedLatLon = computeGeo_NormalizedLatLon(0, latitudeSerie.length, geoAccuracy);
-		}
-
-		return _normalizedLatLon;
-	}
-
-	/**
 	 * @return Returns number of HR zones which are available for this tour. Will be 0 when HR zones
 	 *         are not defined.
 	 */
@@ -6077,6 +6068,24 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		computePulseSmoothed();
 
 		return pulseSerieSmoothed;
+	}
+
+	/**
+	 * @param geoAccuracy
+	 * @return Returns tour lat/lon data multiplied by {@link #NORMALIZED_GEO_DATA_FACTOR} and
+	 *         normalized (removed duplicates), or <code>null</code> when not available
+	 */
+	public RasterizedGeoData getRasterizedLatLon(final int geoAccuracy) {
+
+		if (latitudeSerie == null) {
+			return null;
+		}
+
+		if (_rasterizedLatLon == null || _normalizedGeoAccuracy != geoAccuracy) {
+			_rasterizedLatLon = computeGeo_RasterizeLatLon(0, latitudeSerie.length, geoAccuracy);
+		}
+
+		return _rasterizedLatLon;
 	}
 
 	public int getRearShiftCount() {
@@ -6962,7 +6971,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 		latitudeSerie = serieData.latitude;
 		longitudeSerie = serieData.longitude;
-		computeGeo_Partitions();
+		computeGeo_RoughPartitions();
 
 		gearSerie = serieData.gears;
 
