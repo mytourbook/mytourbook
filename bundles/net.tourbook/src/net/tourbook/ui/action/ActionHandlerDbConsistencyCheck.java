@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.action;
 
@@ -20,6 +20,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 import net.tourbook.Messages;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.UI;
 
@@ -39,17 +40,18 @@ public class ActionHandlerDbConsistencyCheck extends AbstractHandler {
 		final String[] error = new String[1];
 
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+			@Override
 			public void run() {
 
 				final StringBuilder sbSQL = new StringBuilder();
 
 				sbSQL.append("SELECT"); //$NON-NLS-1$
-				//				
+				//
 				sbSQL.append(" schemaname || '.' || tablename as TableName,"); //$NON-NLS-1$
 				sbSQL.append(" SYSCS_UTIL.SYSCS_CHECK_TABLE(schemaname, tablename) AS OK"); //$NON-NLS-1$
-				//				
+				//
 				sbSQL.append(" FROM sys.sysschemas s, sys.systables t"); //$NON-NLS-1$
-				//				
+				//
 				sbSQL.append(" WHERE s.schemaid = t.schemaid"); //$NON-NLS-1$
 				sbSQL.append("   and t.tabletype = 'T'"); //$NON-NLS-1$
 
@@ -75,7 +77,17 @@ public class ActionHandlerDbConsistencyCheck extends AbstractHandler {
 					conn.close();
 
 				} catch (final Exception e) {
-					error[0] = NLS.bind(Messages.app_db_consistencyCheck_checkFailed, e.getMessage());
+
+					StatusUtil.log(e);
+
+					String message = e.getMessage();
+
+					final int maxLength = 3000;
+					if (message.length() > maxLength) {
+						message = message.substring(0, maxLength) + "\n...\n...\n..."; //$NON-NLS-1$
+					}
+
+					error[0] = NLS.bind(Messages.app_db_consistencyCheck_checkFailed, message);
 				}
 			}
 		});
@@ -95,6 +107,7 @@ public class ActionHandlerDbConsistencyCheck extends AbstractHandler {
 		}
 	}
 
+	@Override
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 
 		checkConsistency();
