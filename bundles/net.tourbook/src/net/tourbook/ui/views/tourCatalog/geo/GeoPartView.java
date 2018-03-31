@@ -35,7 +35,7 @@ import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.common.util.Util;
-import net.tourbook.data.RasterizedGeoData;
+import net.tourbook.data.NormalizedGeoData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
 import net.tourbook.importdata.RawDataManager;
@@ -118,6 +118,7 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 	private static final String				STATE_IS_COMPARE_ENABLED		= "STATE_IS_COMPARE_ENABLED";		//$NON-NLS-1$
 	private static final String				STATE_IS_USE_APP_FILTER			= "STATE_IS_USE_APP_FILTER";		//$NON-NLS-1$
 
+	private static final String				STATE_DISTANCE_INTERVAL			= "STATE_DISTANCE_INTERVAL";		//$NON-NLS-1$
 	private static final String				STATE_GEO_ACCURACY				= "STATE_GEO_ACCURACY";				//$NON-NLS-1$
 	private static final String				STATE_SORT_COLUMN_DIRECTION		= "STATE_SORT_COLUMN_DIRECTION";	//$NON-NLS-1$
 	private static final String				STATE_SORT_COLUMN_ID			= "STATE_SORT_COLUMN_ID";			//$NON-NLS-1$
@@ -161,8 +162,9 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 	private long							_compareData_TourId				= Long.MIN_VALUE;
 	private int								_compareData_FirstIndex;
 	private int								_compareData_LastIndex;
+	private int								_compareData_LastDistanceInterval;
 	private int								_compareData_LastGeoAccuracy;
-	private int[]							_compareData_RoughGeoParts;
+	private int[]							_compareData_GeoGrid;
 	private GeoPartItem						_compareData_PreviousGeoPartItem;
 	private long							_compareData_RefId;
 	private String							_compareData_TourTitle;
@@ -175,6 +177,7 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 	private ColumnManager					_columnManager;
 	private CompareResultComparator			_geoPartComparator				= new CompareResultComparator();
 
+	private int								_distanceInterval				= 100;
 	private int								_geoAccuracy					= 100_000;
 
 	private PixelConverter					_pc;
@@ -190,7 +193,7 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 	private Composite						_pageContent;
 
 	private Label							_lblGeoAccuracy;
-	private Label							_lblNumGeoParts;
+	private Label							_lblNumGeoGrid;
 	private Label							_lblNumSlices;
 	private Label							_lblNumTours;
 	private Label							_lblProgressBar;
@@ -198,6 +201,7 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 	private Label							_lblTitle;
 
 	private Spinner							_spinnerGeoAccuracy;
+	private Spinner							_spinnerDistanceInterval;
 
 	private class ActionAppTourFilter extends Action {
 
@@ -534,7 +538,8 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 		if (_compareData_TourId == tourId
 				&& _compareData_FirstIndex == leftIndex
 				&& _compareData_LastIndex == rightIndex
-				&& _compareData_LastGeoAccuracy == _geoAccuracy) {
+				&& _compareData_LastGeoAccuracy == _geoAccuracy
+				&& _compareData_LastDistanceInterval == _distanceInterval) {
 
 			return;
 		}
@@ -578,12 +583,12 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 
 	private void compare_20_SetupComparing() {
 
-		// 1. get geo partitions from lat/lon first/last index
-		_compareData_RoughGeoParts = _compareData_TourData.computeGeo_RoughPartitions(
+		// 1. get geo grid from lat/lon first/last index
+		_compareData_GeoGrid = _compareData_TourData.computeGeo_Grid(
 				_compareData_FirstIndex,
 				_compareData_LastIndex);
 
-		if (_compareData_RoughGeoParts == null) {
+		if (_compareData_GeoGrid == null) {
 
 			_pageBook.showPage(_pageNoData);
 
@@ -600,7 +605,7 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 
 		final int numSlices = _compareData_LastIndex - _compareData_FirstIndex;
 		_lblNumSlices.setText(Integer.toString(numSlices));
-		_lblNumGeoParts.setText(Integer.toString(_compareData_RoughGeoParts.length));
+		_lblNumGeoGrid.setText(Integer.toString(_compareData_GeoGrid.length));
 
 		updateUI_Progress(0, 0);
 
@@ -614,14 +619,15 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 		/*
 		 * Create geo data which should be compared
 		 */
-		final RasterizedGeoData rasterizedTourPart = _compareData_TourData.computeGeo_RasterizeLatLon(
+		final NormalizedGeoData rasterizedTourPart = _compareData_TourData.computeGeo_NormalizeLatLon(
 				_compareData_FirstIndex,
 				_compareData_LastIndex,
-				_geoAccuracy);
+				_geoAccuracy,
+				_distanceInterval);
 
 		// 2. load tour id's in the geo parts
 		final GeoPartItem newGeoPartItem = GeoPartTourLoader.loadToursFromGeoParts(
-				_compareData_RoughGeoParts,
+				_compareData_GeoGrid,
 				rasterizedTourPart,
 				_compareData_IsUseAppFilter,
 				_compareData_PreviousGeoPartItem,
@@ -737,6 +743,7 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 					// keep state after compare is done
 
 					_compareData_LastGeoAccuracy = _geoAccuracy;
+					_compareData_LastDistanceInterval = _distanceInterval;
 				}
 			}
 		});
@@ -821,6 +828,44 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 				_lblTitle = new Label(container, SWT.NONE);
 				GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_lblTitle);
 			}
+
+			createUI_12_Left(container);
+			createUI_14_Right(container);
+
+//			{
+//				/*
+//				 * SQL runtime
+//				 */
+//
+//				final Label label = new Label(container, SWT.NONE);
+//				label.setText("SQL Runtime"); //$NON-NLS-1$
+//				GridDataFactory.fillDefaults().applyTo(label);
+//
+//				_lblSqlRuntime = new Label(container, SWT.NONE);
+//				_lblSqlRuntime.setText(UI.EMPTY_STRING);
+//				GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblSqlRuntime);
+//			}
+			{
+				/*
+				 * Progress bar label
+				 */
+				_lblProgressBar = new Label(container, SWT.NONE);
+
+				GridDataFactory
+						.fillDefaults()
+						.span(2, 1)
+						.grab(true, false)
+						.applyTo(_lblProgressBar);
+			}
+		}
+	}
+
+	private void createUI_12_Left(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
 			{
 				/*
 				 * Number of tours
@@ -851,68 +896,81 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 				 */
 
 				final Label label = new Label(container, SWT.NONE);
-				label.setText("Geo Parts"); //$NON-NLS-1$
+				label.setText("Geo Grid"); //$NON-NLS-1$
 
-				_lblNumGeoParts = new Label(container, SWT.NONE);
-				_lblNumGeoParts.setText(UI.EMPTY_STRING);
-				GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblNumGeoParts);
+				_lblNumGeoGrid = new Label(container, SWT.NONE);
+				_lblNumGeoGrid.setText(UI.EMPTY_STRING);
+				GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblNumGeoGrid);
 			}
+		}
+	}
+
+	private void createUI_14_Right(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+		{
 			{
 				/*
 				 * Normalized geo data factor
 				 */
-				// Label
-				final Label label = new Label(container, SWT.NONE);
-				label.setText("Geo &Accuracy");
-
-				final Composite containerGeo = new Composite(container, SWT.NONE);
-				GridDataFactory.fillDefaults().grab(true, false).applyTo(containerGeo);
-				GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerGeo);
 				{
-					{
-						// Spinner
-						_spinnerGeoAccuracy = new Spinner(containerGeo, SWT.BORDER);
-						_spinnerGeoAccuracy.setMinimum(100);
-						_spinnerGeoAccuracy.setMaximum(100_000);
-						_spinnerGeoAccuracy.setPageIncrement(100);
-						_spinnerGeoAccuracy.addSelectionListener(_defaultSelectionListener);
-						_spinnerGeoAccuracy.addMouseWheelListener(_defaultMouseWheelListener);
-					}
-					{
-						// geo distance
-						_lblGeoAccuracy = new Label(containerGeo, SWT.NONE);
-						GridDataFactory
-								.fillDefaults()
-								.grab(true, false)
-								.align(SWT.FILL, SWT.CENTER)
-								.applyTo(_lblGeoAccuracy);
-					}
+					// Label
+					final Label label = new Label(container, SWT.NONE);
+					label.setText("Geo &Accuracy");
+				}
+				{
+					// Spinner
+					_spinnerGeoAccuracy = new Spinner(container, SWT.BORDER);
+					_spinnerGeoAccuracy.setMinimum(100);
+					_spinnerGeoAccuracy.setMaximum(100_000);
+					_spinnerGeoAccuracy.setPageIncrement(100);
+					_spinnerGeoAccuracy.addSelectionListener(_defaultSelectionListener);
+					_spinnerGeoAccuracy.addMouseWheelListener(_defaultMouseWheelListener);
+				}
+				{
+					// geo distance
+					_lblGeoAccuracy = new Label(container, SWT.NONE);
+					GridDataFactory
+							.fillDefaults()
+							.grab(true, false)
+							.align(SWT.FILL, SWT.CENTER)
+							.applyTo(_lblGeoAccuracy);
 				}
 			}
-//			{
-//				/*
-//				 * SQL runtime
-//				 */
-//
-//				final Label label = new Label(container, SWT.NONE);
-//				label.setText("SQL Runtime"); //$NON-NLS-1$
-//				GridDataFactory.fillDefaults().applyTo(label);
-//
-//				_lblSqlRuntime = new Label(container, SWT.NONE);
-//				_lblSqlRuntime.setText(UI.EMPTY_STRING);
-//				GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblSqlRuntime);
-//			}
+		}
+		{
+			/*
+			 * Distance interval
+			 */
 			{
-				/*
-				 * Progress bar label
-				 */
-				_lblProgressBar = new Label(container, SWT.NONE);
-
+				// Label
+				final Label label = new Label(container, SWT.NONE);
+				label.setText("&Distance Interval");
+			}
+			{
+				// Spinner
+				_spinnerDistanceInterval = new Spinner(container, SWT.BORDER);
+				_spinnerDistanceInterval.setMinimum(10);
+				_spinnerDistanceInterval.setMaximum(1_000);
+				_spinnerDistanceInterval.setPageIncrement(10);
+				_spinnerDistanceInterval.addSelectionListener(_defaultSelectionListener);
+				_spinnerDistanceInterval.addMouseWheelListener(_defaultMouseWheelListener);
 				GridDataFactory
 						.fillDefaults()
-						.span(2, 1)
+						.align(SWT.END, SWT.FILL)
+						.applyTo(_spinnerDistanceInterval);
+			}
+			{
+				// Label: Distance unit
+				final Label labelDistanceUnit = new Label(container, SWT.NONE);
+				labelDistanceUnit.setText("m");
+				GridDataFactory
+						.fillDefaults()
 						.grab(true, false)
-						.applyTo(_lblProgressBar);
+						.align(SWT.FILL, SWT.CENTER)
+						.applyTo(labelDistanceUnit);
 			}
 		}
 	}
@@ -1364,8 +1422,9 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 	private void onChangeUI() {
 
 		_geoAccuracy = _spinnerGeoAccuracy.getSelection();
+		_distanceInterval = _spinnerDistanceInterval.getSelection();
 
-		if (_compareData_LastGeoAccuracy != _geoAccuracy) {
+		if (_compareData_LastGeoAccuracy != _geoAccuracy || _compareData_LastDistanceInterval != _distanceInterval) {
 
 			// accuracy is modified
 
@@ -1513,7 +1572,7 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 
 	private void recompareTours() {
 
-		if (_compareData_RoughGeoParts != null && _isCompareEnabled) {
+		if (_compareData_GeoGrid != null && _isCompareEnabled) {
 			compare_30_StartComparing();
 		}
 	}
@@ -1554,6 +1613,9 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 		_geoAccuracy = Util.getStateInt(_state, STATE_GEO_ACCURACY, 100_000);
 		_spinnerGeoAccuracy.setSelection(_geoAccuracy);
 
+		_distanceInterval = Util.getStateInt(_state, STATE_DISTANCE_INTERVAL, 100);
+		_spinnerDistanceInterval.setSelection(_distanceInterval);
+
 		enableControls();
 	}
 
@@ -1576,6 +1638,7 @@ public class GeoPartView extends ViewPart implements ITourViewer {
 		_state.put(STATE_IS_COMPARE_ENABLED, _isCompareEnabled);
 		_state.put(STATE_IS_USE_APP_FILTER, _compareData_IsUseAppFilter);
 		_state.put(STATE_GEO_ACCURACY, _geoAccuracy);
+		_state.put(STATE_DISTANCE_INTERVAL, _distanceInterval);
 
 		_state.put(STATE_SORT_COLUMN_ID, _geoPartComparator.__sortColumnId);
 		_state.put(STATE_SORT_COLUMN_DIRECTION, _geoPartComparator.__sortDirection);

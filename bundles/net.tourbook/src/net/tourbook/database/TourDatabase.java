@@ -2075,8 +2075,8 @@ public class TourDatabase {
 			 * Save new geo parts
 			 */
 
-			tourData.computeGeo_RoughPartitions();
-			tourGeoParts = tourData.roughGeoParts;
+			tourData.computeGeo_Grid();
+			tourGeoParts = tourData.geoGrid;
 
 			if (tourGeoParts != null) {
 

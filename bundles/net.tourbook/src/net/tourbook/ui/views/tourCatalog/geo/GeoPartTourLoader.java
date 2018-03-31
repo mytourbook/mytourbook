@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
-import net.tourbook.data.RasterizedGeoData;
+import net.tourbook.data.NormalizedGeoData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.SQLFilter;
 
@@ -191,7 +191,7 @@ public class GeoPartTourLoader {
 	 * @return
 	 */
 	static GeoPartItem loadToursFromGeoParts(	final int[] geoParts,
-												final RasterizedGeoData normalizedTourPart,
+												final NormalizedGeoData normalizedTourPart,
 												final boolean useAppFilter,
 												final GeoPartItem previousLoaderItem,
 												final GeoPartView geoPartView) {

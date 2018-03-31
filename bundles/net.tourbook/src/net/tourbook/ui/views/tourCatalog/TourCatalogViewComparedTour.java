@@ -29,7 +29,7 @@ import net.tourbook.chart.IChartListener;
 import net.tourbook.chart.ISliderMoveListener;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.common.UI;
-import net.tourbook.data.RasterizedGeoData;
+import net.tourbook.data.NormalizedGeoData;
 import net.tourbook.data.TourCompared;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
@@ -834,7 +834,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 		}
 
 		final GeoPartItem geoPartItem = comparerItem.geoPartItem;
-		final RasterizedGeoData normalizedTourPart = geoPartItem.normalizedTourPart;
+		final NormalizedGeoData normalizedTourPart = geoPartItem.normalizedTourPart;
 
 		// set data from the selection
 		_ctTourId = ctTourId;

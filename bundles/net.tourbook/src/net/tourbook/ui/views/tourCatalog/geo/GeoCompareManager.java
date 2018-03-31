@@ -23,7 +23,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
-import net.tourbook.data.RasterizedGeoData;
+import net.tourbook.data.NormalizedGeoData;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourManager;
 
@@ -42,7 +42,7 @@ public class GeoCompareManager {
 
 	static {}
 
-	private static final boolean	LOG_TOUR_COMPARING	= false;
+	private static final boolean LOG_TOUR_COMPARING = false;
 
 	static {
 
@@ -135,13 +135,15 @@ public class GeoCompareManager {
 		 */
 		final long startConvert = System.nanoTime();
 
-		final RasterizedGeoData normalizedPart = geoPartItem.normalizedTourPart;
-		final int[] normPartLatSerie = normalizedPart.rasterizedLat;
-		final int[] partLonSerie = normalizedPart.rasterizedLon;
+		final NormalizedGeoData normalizedPart = geoPartItem.normalizedTourPart;
+		final int[] normPartLatSerie = normalizedPart.normalizedLat;
+		final int[] partLonSerie = normalizedPart.normalizedLon;
 
-		final RasterizedGeoData normalizedTour = tourData.getRasterizedLatLon(normalizedPart.geoAccuracy);
-		final int[] normTourLatSerie = normalizedTour.rasterizedLat;
-		final int[] tourLonSerie = normalizedTour.rasterizedLon;
+		final NormalizedGeoData normalizedTour = tourData.getNormalizedLatLon(
+				normalizedPart.geoAccuracy,
+				normalizedPart.distanceAccuracy);
+		final int[] normTourLatSerie = normalizedTour.normalizedLat;
+		final int[] tourLonSerie = normalizedTour.normalizedLon;
 
 		final int numNormPartSlices = normPartLatSerie.length;
 		final int numNormTourSlices = normTourLatSerie.length;
@@ -207,7 +209,7 @@ public class GeoCompareManager {
 
 		}
 
-		final int[] norm2origIndices = normalizedTour.rasterized2OriginalIndices;
+		final int[] norm2origIndices = normalizedTour.normalized2OriginalIndices;
 
 		// a tour is available and could be compared
 		if (normMinDiffIndex > -1) {
@@ -228,7 +230,6 @@ public class GeoCompareManager {
 		comparerItem.tourStartTimeMS = TimeTools.toEpochMilli(tourStartTime);
 
 		comparerItem.minDiffValue = (long) (normMinDiffIndex < 0 ? -1 : normLatLonDiff[normMinDiffIndex]);
-
 
 		/*
 		 * Create data serie for the chart graph from the normalized diff data serie
