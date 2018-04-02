@@ -18,7 +18,6 @@ package net.tourbook.ui.tourChart;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.action.ActionOpenPrefDialog;
-import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceTourChart;
@@ -29,6 +28,7 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -148,7 +148,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
 		final Label label = new Label(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().applyTo(label);
 		label.setText(Messages.Slideout_TourChartOptions_Label_Title);
-		MTFont.setBannerFont(label);
+		label.setFont(JFaceResources.getBannerFont());
 	}
 
 	private void createUI_12_Actions(final Composite parent) {

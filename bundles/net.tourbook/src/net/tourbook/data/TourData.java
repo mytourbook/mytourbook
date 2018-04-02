@@ -2786,87 +2786,73 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 														final int geoAccuracy,
 														final int distanceInterval) {
 
-		final double[] measureAllLatitude = latitudeSerie;
 		final float[] measureAllDistance = distanceSerie;
+		final double[] measureAllLat = latitudeSerie;
+		final double[] measureAllLon = longitudeSerie;
 
-		if (measureAllLatitude == null || measureAllDistance == null) {
+		if (measureAllLat == null || measureAllDistance == null) {
 			return null;
 		}
 
 		// create normalized data, the distance will be normalized to 100m
-		final float normStartDistance = measureAllDistance[measureStartIndex] / distanceInterval;
-		final float normEndDistance = measureAllDistance[measureEndIndex] / distanceInterval;
-		final int normalizedSize = (int) (normEndDistance - normStartDistance + 1);
+		final float normalizedStartDistance = measureAllDistance[measureStartIndex] / distanceInterval;
+		final float normalizedEndDistance = measureAllDistance[measureEndIndex] / distanceInterval;
+		final int normalizedSize = (int) (normalizedEndDistance - normalizedStartDistance + 1);
 
 		final float[] normalizedAllDist = new float[normalizedSize];
-		final double[] normalizedAllLat = new double[normalizedSize];
-		final int[] normalizedLat = new int[normalizedSize];
+		final int[] normalizedAllLat = new int[normalizedSize];
+		final int[] normalizedAllLon = new int[normalizedSize];
+		final int[] allNormalized2OriginalIndex = new int[normalizedSize];
 
-		float normDistance = normStartDistance * distanceInterval;
-		double normAltitude = 0;
+		float normalizedDistance = normalizedStartDistance * distanceInterval;
 
 		int measureIndex = measureStartIndex;
-		float measureLastDistance = measureAllDistance[measureStartIndex];
-		double measureLastAltitude = measureAllLatitude[measureStartIndex];
 
 		float measureNextDistance = 0;
-		double measureNextAltitude = 0;
-
-		float measureDistanceDiff;
-		double measureAltitudeDiff;
-
-		float distanceDiff = 0;
 
 		for (int normIndex = 0; normIndex < normalizedSize; normIndex++) {
 
 			// get the last measure point before the next normalized distance
-			while (measureNextDistance <= normDistance && measureIndex < measureAllDistance.length - 1) {
+			while (measureNextDistance <= normalizedDistance && measureIndex < measureAllDistance.length - 1) {
 
-				// set the index to the next measure point
+				// move index to the next measure point
 				measureIndex++;
 
 				measureNextDistance = measureAllDistance[measureIndex];
-				measureNextAltitude = measureAllLatitude[measureIndex];
 			}
 
-			// make sure to get data which are not out of the array range
-			if (measureIndex > 0 && measureIndex < measureAllDistance.length) {
-				measureLastDistance = measureAllDistance[measureIndex - 1];
-				measureLastAltitude = measureAllLatitude[measureIndex - 1];
-			}
+			// convert lat + lon into a positive value
+			final double latValueWithOffset = measureAllLat[measureIndex] + NORMALIZED_LATITUDE_OFFSET;
+			final double lonValueWithOffset = measureAllLon[measureIndex] + NORMALIZED_LONGITUDE_OFFSET;
 
-			if (measureNextDistance == normDistance) {
+			final int latNormalized = (int) (latValueWithOffset * geoAccuracy);
+			final int lonNormalized = (int) (lonValueWithOffset * geoAccuracy);
 
-				// normalized distance is the current measure distance
+			normalizedAllDist[normIndex] = normalizedDistance;
 
-				normAltitude = measureLastAltitude;
+			normalizedAllLat[normIndex] = latNormalized;
+			normalizedAllLon[normIndex] = lonNormalized;
 
-			} else {
-
-				// measured distance is not at a normalized distance but still
-				// below the normalized distance
-
-				measureDistanceDiff = measureNextDistance - measureLastDistance;
-				measureAltitudeDiff = measureNextAltitude - measureLastAltitude;
-				distanceDiff = normDistance - measureLastDistance;
-
-				if (measureDistanceDiff == 0 || distanceDiff == 0) {
-					normAltitude = 0;
-				} else {
-					normAltitude = measureAltitudeDiff / measureDistanceDiff * distanceDiff;
-				}
-			}
-
-			normalizedAllDist[normIndex] = normDistance;
-			normalizedAllLat[normIndex] = measureLastAltitude + normAltitude;
+			allNormalized2OriginalIndex[normIndex] = measureIndex;
 
 			// next normalized distance
-			normDistance += distanceInterval;
+			normalizedDistance += distanceInterval;
 		}
 
 		final NormalizedGeoData returnData = new NormalizedGeoData();
 
-		returnData.normalizedLat = normalizedLat;
+		returnData.tourId = tourId;
+
+		returnData.originalFirstIndex = measureStartIndex;
+		returnData.originalLastIndex = measureEndIndex;
+
+		returnData.normalizedLat = normalizedAllLat;
+		returnData.normalizedLon = normalizedAllLon;
+
+		returnData.normalized2OriginalIndices = allNormalized2OriginalIndex;
+
+		returnData.geoAccuracy = geoAccuracy;
+		returnData.distanceAccuracy = distanceInterval;
 
 		return returnData;
 	}
@@ -5959,7 +5945,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		}
 
 		if (_rasterizedLatLon == null || _normalizedGeoAccuracy != geoAccuracy) {
-			_rasterizedLatLon = computeGeo_NormalizeLatLon(0, latitudeSerie.length, geoAccuracy, distanceAccuracy);
+			_rasterizedLatLon = computeGeo_NormalizeLatLon(0, latitudeSerie.length - 1, geoAccuracy, distanceAccuracy);
 		}
 
 		return _rasterizedLatLon;

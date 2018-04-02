@@ -78,7 +78,7 @@ public class GeoCompareManager {
 	 * @param loaderItem
 	 * @param geoPartView
 	 */
-	static void compareGeoTours(final GeoPartItem loaderItem, final GeoPartView geoPartView) {
+	static void compareGeoTours(final GeoPartItem loaderItem, final GeoCompareView geoPartView) {
 
 		for (final long tourId : loaderItem.tourIds) {
 
@@ -135,15 +135,15 @@ public class GeoCompareManager {
 		 */
 		final long startConvert = System.nanoTime();
 
-		final NormalizedGeoData normalizedPart = geoPartItem.normalizedTourPart;
-		final int[] normPartLatSerie = normalizedPart.normalizedLat;
-		final int[] partLonSerie = normalizedPart.normalizedLon;
+		final NormalizedGeoData normalizedTourPart = geoPartItem.normalizedTourPart;
+		final int[] normPartLatSerie = normalizedTourPart.normalizedLat;
+		final int[] normPartLonSerie = normalizedTourPart.normalizedLon;
 
 		final NormalizedGeoData normalizedTour = tourData.getNormalizedLatLon(
-				normalizedPart.geoAccuracy,
-				normalizedPart.distanceAccuracy);
+				normalizedTourPart.geoAccuracy,
+				normalizedTourPart.distanceAccuracy);
 		final int[] normTourLatSerie = normalizedTour.normalizedLat;
-		final int[] tourLonSerie = normalizedTour.normalizedLon;
+		final int[] normTourLonSerie = normalizedTour.normalizedLon;
 
 		final int numNormPartSlices = normPartLatSerie.length;
 		final int numNormTourSlices = normTourLatSerie.length;
@@ -185,7 +185,7 @@ public class GeoCompareManager {
 				}
 
 				final int latDiff = normPartLatSerie[normPartIndex] - normTourLatSerie[compareIndex];
-				final int lonDiff = partLonSerie[normPartIndex] - tourLonSerie[compareIndex];
+				final int lonDiff = normPartLonSerie[normPartIndex] - normTourLonSerie[compareIndex];
 
 				// optimize Math.abs() !!!
 				final int latDiffAbs = latDiff < 0 ? -latDiff : latDiff;

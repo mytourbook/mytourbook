@@ -26,7 +26,7 @@ public class ActionHandler_OpenView_GeoParts extends AbstractHandler {
 	@Override
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 
-		Util.showView(GeoPartView.ID, true);
+		Util.showView(GeoCompareView.ID, true);
 
 		return null;
 	}

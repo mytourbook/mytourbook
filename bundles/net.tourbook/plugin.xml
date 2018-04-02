@@ -1647,9 +1647,9 @@
 
 			<view
 				category="net.tourbook.category.compareTours"
-				class="net.tourbook.ui.views.tourCatalog.geo.GeoPartView"
+				class="net.tourbook.ui.views.tourCatalog.geo.GeoCompareView"
 				icon="icons/geo-parts.png"
-				id="net.tourbook.ui.views.tourCatalog.geo.GeoPartView"
+				id="net.tourbook.ui.views.tourCatalog.geo.GeoCompareView"
 				name="%View_Name_Compare_GeoParts"
 			/>
 

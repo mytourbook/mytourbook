@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.data;
 
+import java.util.Arrays;
+
 public class NormalizedGeoData {
 
 	/**
@@ -52,8 +54,8 @@ public class NormalizedGeoData {
 	public int		distanceAccuracy	= 100;
 
 	public int[]	normalizedLat;
-	public int[]	normalizedLon;
 
+	public int[]	normalizedLon;
 	/**
 	 * Contains the index of the original data
 	 */
@@ -73,5 +75,25 @@ public class NormalizedGeoData {
 	 * Last index of the original (not normalized) data
 	 */
 	public int		originalLastIndex;
+
+	@Override
+	public String toString() {
+
+		return "NormalizedGeoData ["
+
+				+ "tourId=" + tourId + ", "
+
+				+ "geoAccuracy=" + geoAccuracy + ", "
+				+ "distanceAccuracy=" + distanceAccuracy + ", "
+
+				+ "normalizedLat=" + Arrays.toString(normalizedLat) + ", "
+				+ "normalizedLon=" + Arrays.toString(normalizedLon) + ", "
+				+ "normalized2OriginalIndices=" + Arrays.toString(normalized2OriginalIndices) + ", "
+
+				+ "originalFirstIndex=" + originalFirstIndex + ", "
+				+ "originalLastIndex=" + originalLastIndex
+
+				+ "]";
+	}
 
 }

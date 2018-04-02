@@ -98,7 +98,10 @@ public class GeoPartTourLoader {
 
 		try {
 
+// this is very slow
+//			final SQLFilter appFilter = new SQLFilter(SQLFilter.TAG_FILTER);
 			final SQLFilter appFilter = new SQLFilter();
+
 			final char NL = UI.NEW_LINE;
 
 			final String selectGeoPart = "SELECT" + NL //		  					//$NON-NLS-1$
@@ -109,20 +112,27 @@ public class GeoPartTourLoader {
 					+ (" WHERE GeoPart IN (" + sqlInParameters + ")") + NL //		//$NON-NLS-1$
 			;
 
-			select = selectGeoPart;
-
 			if (isAppFilter) {
 
 				final String selectAppFilter = "SELECT" + NL //			  			//$NON-NLS-1$
 
 						+ " TourId" + NL //											//$NON-NLS-1$
 						+ " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //			//$NON-NLS-1$
+
+// this is very slow
+//						// get tag id's
+//						+ (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag") + NL //$NON-NLS-1$ //$NON-NLS-2$
+//						+ (" ON tourID = jTdataTtag.TourData_tourId") + NL //$NON-NLS-1$
+
 						+ " WHERE 1=1 " + appFilter.getWhereClause() + NL//			//$NON-NLS-1$
 				;
 
 				select = selectGeoPart
 
 						+ " AND TourId IN (" + selectAppFilter + ")";
+			} else {
+
+				select = selectGeoPart;
 			}
 
 			conn = TourDatabase.getInstance().getConnection();
@@ -137,7 +147,6 @@ public class GeoPartTourLoader {
 			}
 
 			if (isAppFilter) {
-
 				appFilter.setParameters(statement, 1 + numGeoParts);
 			}
 
@@ -194,7 +203,7 @@ public class GeoPartTourLoader {
 												final NormalizedGeoData normalizedTourPart,
 												final boolean useAppFilter,
 												final GeoPartItem previousLoaderItem,
-												final GeoPartView geoPartView) {
+												final GeoCompareView geoPartView) {
 
 		stopLoading(previousLoaderItem);
 
