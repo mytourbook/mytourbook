@@ -28,10 +28,10 @@ import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.tooltip.ActionToolbarSlideout;
+import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
-import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.common.tooltip.SlideoutLocation;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
@@ -46,6 +46,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.filter.ActionToolbarSlideoutAdv;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.tourCatalog.ReferenceTourManager;
@@ -97,7 +98,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
@@ -188,6 +189,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 	private long							_maxMinDiff;
 
 	private OpenDialogManager				_openDlgMgr						= new OpenDialogManager();
+	private AdvancedSlideout				_slideoutGeoCompareOptions;
 
 	private PixelConverter					_pc;
 
@@ -229,17 +231,15 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 		}
 	}
 
-	private class ActionGeoCompareOptions extends ActionToolbarSlideout {
+	public class ActionGeoCompareOptions extends ActionToolbarSlideoutAdv {
 
 		@Override
-		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+		protected AdvancedSlideout createSlideout(final ToolItem toolItem) {
 
-			return new SlideoutGeoCompareOptions(_parent, toolbar, GeoCompareView.this, _state);
-		}
+			_slideoutGeoCompareOptions = new SlideoutGeoCompareOptions(toolItem, _state, GeoCompareView.this);
+			_slideoutGeoCompareOptions.setSlideoutLocation(SlideoutLocation.BELOW_RIGHT);
 
-		@Override
-		protected void onBeforeOpenSlideout() {
-			closeOpenedDialogs(this);
+			return _slideoutGeoCompareOptions;
 		}
 	}
 
@@ -1268,7 +1268,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 		_actionAppTourFilter.setEnabled(_isCompareEnabled);
 		_actionGeoCompareOptions.setEnabled(_isCompareEnabled);
 
-		_geoPartViewer.getTable().setEnabled(_isCompareEnabled);
+//		_geoPartViewer.getTable().setEnabled(_isCompareEnabled);
 	}
 
 	private void enableControls_HideFalsePositive() {

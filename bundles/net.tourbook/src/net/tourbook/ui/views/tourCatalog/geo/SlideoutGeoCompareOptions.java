@@ -18,8 +18,7 @@ package net.tourbook.ui.views.tourCatalog.geo;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.common.font.MTFont;
-import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.Util;
 
@@ -28,57 +27,69 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 
 /**
- * Geo compare properties slideout.
+ * Slideout for the tour tag filter
  */
-public class SlideoutGeoCompareOptions extends ToolbarSlideout {
+public class SlideoutGeoCompareOptions extends AdvancedSlideout {
 
-	private IDialogSettings		_state;
+	private static IDialogSettings	_state;
 
-	private SelectionAdapter	_compareSelectionListener;
-	private MouseWheelListener	_compareMouseWheelListener;
+	private PixelConverter			_pc;
+	private ToolItem				_actionToolItem;
 
-	private Action				_actionRestoreDefaults;
+	private SelectionAdapter		_compareSelectionListener;
+	private MouseWheelListener		_compareMouseWheelListener;
 
-	private GeoCompareView		_geoCompareView;
+	private Action					_actionRestoreDefaults;
 
-	private int					_geoAccuracy;
+	private GeoCompareView			_geoCompareView;
+
+	private int						_geoAccuracy;
 
 	/*
 	 * UI controls
 	 */
-	private Label				_lblGeoAccuracy;
+	private Label					_lblGeoAccuracy;
 
-	private Spinner				_spinnerGeoAccuracy;
-	private Spinner				_spinnerDistanceInterval;
+	private Spinner					_spinnerGeoAccuracy;
+	private Spinner					_spinnerDistanceInterval;
 
 	/**
-	 * @param ownerControl
-	 * @param toolBar
-	 * @param geoCompareView
+	 * @param actionToolItem
 	 * @param state
+	 * @param geoCompareView
 	 */
-	public SlideoutGeoCompareOptions(	final Control ownerControl,
-										final ToolBar toolBar,
-										final GeoCompareView geoCompareView,
-										final IDialogSettings state) {
+	public SlideoutGeoCompareOptions(	final ToolItem actionToolItem,
+										final IDialogSettings state,
+										final GeoCompareView geoCompareView) {
 
-		super(ownerControl, toolBar);
+		super(
+				actionToolItem.getParent(),
+				state,
+				new int[] { 700, 400, 700, 400 });
 
-		_geoCompareView = geoCompareView;
+		_actionToolItem = actionToolItem;
 		_state = state;
+		_geoCompareView = geoCompareView;
 
+		setShellFadeOutDelaySteps(10);
+		setTitleText("Geo Compare Options");
 	}
 
 	private void createActions() {
@@ -99,69 +110,33 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout {
 	}
 
 	@Override
-	protected Composite createToolTipContentArea(final Composite parent) {
+	protected void createSlideoutContent(final Composite parent) {
 
-		initUI();
+		initUI(parent);
 
 		createActions();
 
-		final Composite ui = createUI(parent);
+		createUI(parent);
 
 		restoreState();
-
 		updateUI_GeoAccuracy();
 
-		return ui;
+		enableControls();
 	}
 
-	private Composite createUI(final Composite parent) {
+	private void createUI(final Composite parent) {
 
-		final Composite shellContainer = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.swtDefaults().applyTo(shellContainer);
-		{
-			final Composite container = new Composite(shellContainer, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-			GridLayoutFactory
-					.fillDefaults()//
-					.numColumns(2)
-					.applyTo(container);
-//			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-			{
-				createUI_10_Title(container);
-				createUI_12_Actions(container);
-				createUI_20_Controls(container);
-
-			}
-		}
-
-		return shellContainer;
-	}
-
-	private void createUI_10_Title(final Composite parent) {
-
-		/*
-		 * Label: Slideout title
-		 */
-		final Label label = new Label(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().applyTo(label);
-		label.setText("Geo Compare Options");
-		MTFont.setBannerFont(label);
-	}
-
-	private void createUI_12_Actions(final Composite parent) {
-
-		final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
-		GridDataFactory
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+		GridLayoutFactory
 				.fillDefaults()//
-				.grab(true, false)
-				.align(SWT.END, SWT.BEGINNING)
-				.applyTo(toolbar);
-
-		final ToolBarManager tbm = new ToolBarManager(toolbar);
-
-		tbm.add(_actionRestoreDefaults);
-
-		tbm.update(true);
+				.numColumns(1)
+				.applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+		{
+			createUI_20_Controls(container);
+			createUI_90_Actions(container);
+		}
 	}
 
 	private void createUI_20_Controls(final Composite parent) {
@@ -169,7 +144,7 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout {
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory
 				.fillDefaults()//
-				.grab(true, false)
+				.grab(true, true)
 				.span(2, 1)
 				.applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
@@ -178,51 +153,6 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout {
 			createUI_24_Right(container);
 		}
 	}
-
-//	private void createUI_22_Left(final Composite parent) {
-//
-//		final Composite container = new Composite(parent, SWT.NONE);
-//		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-//		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-//		{
-//			{
-//				/*
-//				 * Number of tours
-//				 */
-//
-//				final Label label = new Label(container, SWT.NONE);
-//				label.setText("Tours"); //$NON-NLS-1$
-//
-//				_lblNumTours = new Label(container, SWT.NONE);
-//				_lblNumTours.setText(UI.EMPTY_STRING);
-//				GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblNumTours);
-//			}
-//			{
-//				/*
-//				 * Number of time slices
-//				 */
-//
-//				final Label label = new Label(container, SWT.NONE);
-//				label.setText("Time slices"); //$NON-NLS-1$
-//
-//				_lblNumSlices = new Label(container, SWT.NONE);
-//				_lblNumSlices.setText(UI.EMPTY_STRING);
-//				GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblNumSlices);
-//			}
-//			{
-//				/*
-//				 * Number of geo parts
-//				 */
-//
-//				final Label label = new Label(container, SWT.NONE);
-//				label.setText("Geo grids"); //$NON-NLS-1$
-//
-//				_lblNumGeoGrid = new Label(container, SWT.NONE);
-//				_lblNumGeoGrid.setText(UI.EMPTY_STRING);
-//				GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblNumGeoGrid);
-//			}
-//		}
-//	}
 
 	private void createUI_24_Right(final Composite parent) {
 
@@ -294,7 +224,49 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout {
 		}
 	}
 
-	private void initUI() {
+	private void createUI_90_Actions(final Composite parent) {
+
+		final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
+		GridDataFactory
+				.fillDefaults()//
+				.grab(true, false)
+				.align(SWT.END, SWT.BEGINNING)
+				.applyTo(toolbar);
+
+		final ToolBarManager tbm = new ToolBarManager(toolbar);
+
+		tbm.add(_actionRestoreDefaults);
+
+		tbm.update(true);
+	}
+
+	private void enableControls() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected Rectangle getParentBounds() {
+
+		final Rectangle itemBounds = _actionToolItem.getBounds();
+		final Point itemDisplayPosition = _actionToolItem.getParent().toDisplay(itemBounds.x, itemBounds.y);
+
+		itemBounds.x = itemDisplayPosition.x;
+		itemBounds.y = itemDisplayPosition.y;
+
+		return itemBounds;
+	}
+
+	private void initUI(final Composite parent) {
+
+		_pc = new PixelConverter(parent);
+
+		parent.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(final DisposeEvent e) {
+				onDisposeSlideout();
+			}
+		});
 
 		_compareSelectionListener = new SelectionAdapter() {
 			@Override
@@ -314,11 +286,67 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout {
 
 	private void onChange_CompareParameter() {
 
-		saveState();
+		saveStateSlideout();
 
 		updateUI_GeoAccuracy();
 
 		_geoCompareView.onChange_CompareParameter();
+	}
+
+//	private void createUI_22_Left(final Composite parent) {
+//
+//		final Composite container = new Composite(parent, SWT.NONE);
+//		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+//		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+//		{
+//			{
+//				/*
+//				 * Number of tours
+//				 */
+//
+//				final Label label = new Label(container, SWT.NONE);
+//				label.setText("Tours"); //$NON-NLS-1$
+//
+//				_lblNumTours = new Label(container, SWT.NONE);
+//				_lblNumTours.setText(UI.EMPTY_STRING);
+//				GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblNumTours);
+//			}
+//			{
+//				/*
+//				 * Number of time slices
+//				 */
+//
+//				final Label label = new Label(container, SWT.NONE);
+//				label.setText("Time slices"); //$NON-NLS-1$
+//
+//				_lblNumSlices = new Label(container, SWT.NONE);
+//				_lblNumSlices.setText(UI.EMPTY_STRING);
+//				GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblNumSlices);
+//			}
+//			{
+//				/*
+//				 * Number of geo parts
+//				 */
+//
+//				final Label label = new Label(container, SWT.NONE);
+//				label.setText("Geo grids"); //$NON-NLS-1$
+//
+//				_lblNumGeoGrid = new Label(container, SWT.NONE);
+//				_lblNumGeoGrid.setText(UI.EMPTY_STRING);
+//				GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblNumGeoGrid);
+//			}
+//		}
+//	}
+
+	private void onDisposeSlideout() {
+
+		saveStateSlideout();
+	}
+
+	@Override
+	protected void onFocus() {
+
+		_spinnerGeoAccuracy.setFocus();
 	}
 
 	private void resetToDefaults() {
@@ -345,7 +373,7 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout {
 						GeoCompareView.DEFAULT_DISTANCE_INTERVAL));
 	}
 
-	private void saveState() {
+	private void saveStateSlideout() {
 
 		_geoAccuracy = _spinnerGeoAccuracy.getSelection();
 
@@ -376,5 +404,4 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout {
 
 		_lblGeoAccuracy.setText(geoDistance);
 	}
-
 }

@@ -225,7 +225,7 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 				.swtDefaults() //
 				.spacing(0, 0)
 				.applyTo(shellContainer);
-//		shellContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+//		shellContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 		{
 			createUI_10_ActionBar(shellContainer);
 			createSlideoutContent(shellContainer);
