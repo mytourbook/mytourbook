@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -67,7 +67,9 @@ import org.eclipse.ui.IWorkbenchPart;
 
 public abstract class StatisticDay extends TourbookStatistic implements IBarSelectionProvider, ITourProvider {
 
+// SET_FORMATTING_OFF
 	private static final String			TOUR_TOOLTIP_FORMAT_DATE_WEEK_TIME	= net.tourbook.ui.Messages.Tour_Tooltip_Format_DateWeekTime;
+// SET_FORMATTING_ON
 
 	private TourTypeFilter				_activeTourTypeFilter;
 	private TourPerson					_activePerson;
@@ -82,6 +84,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 	private final MinMaxKeeper_YData	_minMaxKeeper						= new MinMaxKeeper_YData();
 	private TourData_Day				_tourDayData;
 
+	private boolean						_isInUpdateUI;
 	private boolean						_isSynchScaleEnabled;
 
 	private ITourEventListener			_tourPropertyListener;
@@ -93,7 +96,9 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 
 		_tourPropertyListener = new ITourEventListener() {
 			@Override
-			public void tourChanged(final IWorkbenchPart part, final TourEventId propertyId, final Object propertyData) {
+			public void tourChanged(final IWorkbenchPart part,
+									final TourEventId propertyId,
+									final Object propertyData) {
 
 				if (propertyId == TourEventId.TOUR_CHANGED && propertyData instanceof TourEvent) {
 
@@ -193,6 +198,17 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 
 					_selectedTourId = _tourDayData.tourIds[valueIndex];
 					_tourInfoToolTipProvider.setTourId(_selectedTourId);
+
+					if (_isInUpdateUI) {
+
+						/*
+						 * Do not fire an event when this is running already in an update event.
+						 * This occures when a tour is modified (marker) in the toubook view and the
+						 * stat view is opened !!!
+						 */
+
+						return;
+					}
 
 					// this view can be inactive -> selection is not fired with the SelectionProvider interface
 					TourManager.fireEventWithCustomData(
@@ -317,9 +333,11 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 		final int tourStartTime = startValue[valueIndex];
 		final int tourEndTime = endValue[valueIndex];
 
-		final String toolTipLabel = String.format(toolTipFormat.toString(),
-		//
-		// date/time
+		final String toolTipLabel = String.format(
+
+				toolTipFormat.toString(),
+				//
+				// date/time
 				zdtTourStart.format(TimeTools.Formatter_Date_F),
 				zdtTourStart.format(TimeTools.Formatter_Time_M),
 				zdtTourEnd.format(TimeTools.Formatter_Time_M),
@@ -365,7 +383,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 				//
 				tourDescription
 		//
-				);
+		);
 
 		// set title
 		String tourTitle = _tourDayData.tourTitle.get(valueIndex);
@@ -656,6 +674,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 		_activeTourTypeFilter = statContext.appTourTypeFilter;
 		_currentYear = statContext.statFirstYear;
 		_numberOfYears = statContext.statNumberOfYears;
+		_isInUpdateUI = statContext.isInUpdateUI;
 
 		/*
 		 * get currently selected tour id

@@ -2109,23 +2109,23 @@ public class TourDatabase {
 			Util.closeSql(conn);
 		}
 
-		System.out.println(
-				String.format(
-						"%s" // tour date //$NON-NLS-1$
-								+ "  %s tour" // tour time //$NON-NLS-1$
-
-								+ "  %5d time slices" // time slices //$NON-NLS-1$
-								+ "  %5d parts" // parts //$NON-NLS-1$
-								+ "  %5.2f ms", // sql time //$NON-NLS-1$
-
-						TourManager.getTourDateShort(tourData),
-						TourManager.getTourTimeShort(tourData),
-
-						tourData.timeSerie == null ? 0 : tourData.timeSerie.length,
-						tourGeoParts == null ? 0 : tourGeoParts.length,
-						(System.nanoTime() - startTime) / 1_000_000.0)
-
-		);
+//		System.out.println(
+//				String.format(
+//						"%s" // tour date //$NON-NLS-1$
+//								+ "  %s tour" // tour time //$NON-NLS-1$
+//
+//								+ "  %5d time slices" // time slices //$NON-NLS-1$
+//								+ "  %5d parts" // parts //$NON-NLS-1$
+//								+ "  %5.2f ms", // sql time //$NON-NLS-1$
+//
+//						TourManager.getTourDateShort(tourData),
+//						TourManager.getTourTimeShort(tourData),
+//
+//						tourData.timeSerie == null ? 0 : tourData.timeSerie.length,
+//						tourGeoParts == null ? 0 : tourGeoParts.length,
+//						(System.nanoTime() - startTime) / 1_000_000.0)
+//
+//		);
 // TODO remove SYSTEM.OUT.PRINTLN
 	}
 

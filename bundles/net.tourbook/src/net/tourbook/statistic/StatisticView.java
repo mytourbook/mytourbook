@@ -948,6 +948,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
 		statContext.isRefreshData = true;
 		statContext.eventManager = this;
+		statContext.isInUpdateUI = _isInUpdateUI;
 
 		_activeStatistic.updateStatistic(statContext);
 
