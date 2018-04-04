@@ -244,6 +244,7 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 				.fillDefaults()//
 				.numColumns(3)
 				.extendedMargins(0, 0, 0, 5)
+				.spacing(0, 0)
 				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 		{

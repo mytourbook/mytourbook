@@ -189,7 +189,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 	private long							_maxMinDiff;
 
 	private OpenDialogManager				_openDlgMgr						= new OpenDialogManager();
-	private AdvancedSlideout				_slideoutGeoCompareOptions;
+	private SlideoutGeoCompareOptions		_slideoutGeoCompareOptions;
+	private GeoCompareSlideoutState			_geoCompareSlideoutState;
 
 	private PixelConverter					_pc;
 
@@ -206,9 +207,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 	private Button							_chkHideFalsePositive;
 
 	private Label							_lblHideFalsePositiveValue;
-//	private Label							_lblNumGeoGrid;
-//	private Label							_lblNumSlices;
-//	private Label							_lblNumTours;
 	private Label							_lblCompareStatus;
 	private Label							_lblTitle;
 
@@ -638,9 +636,9 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 		_comparedTours.clear();
 		updateUI_Viewer();
 
-//		final int numSlices = _compareData_LastIndex - _compareData_FirstIndex;
-//		_lblNumSlices.setText(Integer.toString(numSlices));
-//		_lblNumGeoGrid.setText(Integer.toString(_compareData_GeoGrid.length));
+		final int numSlices = _compareData_LastIndex - _compareData_FirstIndex;
+		final int numGeoGrids = _compareData_GeoGrid.length;
+		_slideoutGeoCompareOptions.updateUI_SlicesGrids(numSlices, numGeoGrids);
 
 		updateUI_State_Progress(-1, -1);
 		updateUI_HideFalsePositive();
@@ -1670,12 +1668,14 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 		if (geoItem == null) {
 
 			_lblTitle.setText(UI.EMPTY_STRING);
-//			_lblNumTours.setText(UI.EMPTY_STRING);
+
+			_slideoutGeoCompareOptions.updateUI_ResetInfo();
 
 		} else {
 
 			_lblTitle.setText(_compareData_TourTitle);
-//			_lblNumTours.setText(Integer.toString(geoItem.tourIds.length));
+
+			_slideoutGeoCompareOptions.updateUI_Tours(Integer.toString(geoItem.tourIds.length));
 		}
 	}
 
@@ -1721,6 +1721,17 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 
 		table.setSortColumn(tc);
 		table.setSortDirection(sortDirection == CompareResultComparator.ASCENDING ? SWT.UP : SWT.DOWN);
+	}
+
+	void updateUI_SlideoutOptions() {
+		
+replace with slideout state
+
+		_slideoutGeoCompareOptions.updateUI_Tours(_slideoutCompareOptions_NumTours);
+		_slideoutGeoCompareOptions.updateUI_SlicesGrids(
+				_slideoutCompareOptions_NumSlices,
+				_slideoutCompareOptions_NNumGeoGrids);
+
 	}
 
 	private void updateUI_State_CancelComparing() {

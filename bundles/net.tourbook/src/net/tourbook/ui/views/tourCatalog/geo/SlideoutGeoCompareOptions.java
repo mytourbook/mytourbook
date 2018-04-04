@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog.geo;
 
+import java.util.ArrayList;
+
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -38,6 +40,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
@@ -48,27 +51,39 @@ import org.eclipse.swt.widgets.ToolItem;
  */
 public class SlideoutGeoCompareOptions extends AdvancedSlideout {
 
-	private static IDialogSettings	_state;
+	private static IDialogSettings		_state;
 
-	private PixelConverter			_pc;
-	private ToolItem				_actionToolItem;
+	private PixelConverter				_pc;
+	private ToolItem					_actionToolItem;
 
-	private SelectionAdapter		_compareSelectionListener;
-	private MouseWheelListener		_compareMouseWheelListener;
+	private SelectionAdapter			_compareSelectionListener;
+	private MouseWheelListener			_compareMouseWheelListener;
 
-	private Action					_actionRestoreDefaults;
+	private Action						_actionRestoreDefaults;
 
-	private GeoCompareView			_geoCompareView;
+	private GeoCompareView				_geoCompareView;
 
-	private int						_geoAccuracy;
+	private int							_geoAccuracy;
+
+	/**
+	 * contains the controls which are displayed in the first column, these controls are used to get
+	 * the maximum width and set the first column within the different section to the same width
+	 */
+	private final ArrayList<Control>	_firstColumnControls			= new ArrayList<Control>();
+	private final ArrayList<Control>	_firstColumnContainerControls	= new ArrayList<Control>();
 
 	/*
 	 * UI controls
 	 */
-	private Label					_lblGeoAccuracy;
+	private Composite					_parent;
 
-	private Spinner					_spinnerGeoAccuracy;
-	private Spinner					_spinnerDistanceInterval;
+	private Label						_lblGeoAccuracy;
+	private Label						_lblNumGeoGrids;
+	private Label						_lblNumSlices;
+	private Label						_lblNumTours;
+
+	private Spinner						_spinnerGeoAccuracy;
+	private Spinner						_spinnerDistanceInterval;
 
 	/**
 	 * @param actionToolItem
@@ -112,6 +127,8 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout {
 	@Override
 	protected void createSlideoutContent(final Composite parent) {
 
+		_parent = parent;
+
 		initUI(parent);
 
 		createActions();
@@ -120,6 +137,7 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout {
 
 		restoreState();
 		updateUI_GeoAccuracy();
+		_geoCompareView.updateUI_SlideoutOptions();
 
 		enableControls();
 	}
@@ -128,37 +146,109 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-		GridLayoutFactory
-				.fillDefaults()//
-				.numColumns(1)
-				.applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
-			createUI_20_Controls(container);
+			createUI_20_CompareOptions(container);
 			createUI_90_Actions(container);
 		}
+
+		// compute width for all controls and equalize column width for the different sections
+		container.layout(true, true);
+		UI.setEqualizeColumWidths(_firstColumnControls);
+
+		container.layout(true, true);
+		UI.setEqualizeColumWidths(_firstColumnContainerControls);
+
 	}
 
-	private void createUI_20_Controls(final Composite parent) {
+	private void createUI_20_CompareOptions(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory
 				.fillDefaults()//
 				.grab(true, true)
-				.span(2, 1)
 				.applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 		{
-//			createUI_22_Left(container);
-			createUI_24_Right(container);
+			createUI_30_Info(container);
+			createUI_40_Options(container);
 		}
 	}
 
-	private void createUI_24_Right(final Composite parent) {
+	private void createUI_30_Info(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+
+		_firstColumnContainerControls.add(container);
+
+		{
+			{
+				/*
+				 * Number of tours
+				 */
+				{
+					final Label label = new Label(container, SWT.NONE);
+					label.setText("Tours"); //$NON-NLS-1$
+
+					_firstColumnControls.add(label);
+				}
+				{
+					_lblNumTours = new Label(container, SWT.NONE);
+					_lblNumTours.setText(UI.EMPTY_STRING);
+					GridDataFactory
+							.fillDefaults()
+							.grab(true, false)
+							//							.align(SWT.END, SWT.FILL)
+							.applyTo(_lblNumTours);
+				}
+			}
+			{
+				/*
+				 * Number of geo parts
+				 */
+				{
+					final Label label = new Label(container, SWT.NONE);
+					label.setText("Geo grids"); //$NON-NLS-1$
+
+					_firstColumnControls.add(label);
+				}
+				{
+					_lblNumGeoGrids = new Label(container, SWT.NONE);
+					_lblNumGeoGrids.setText(UI.EMPTY_STRING);
+					GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblNumGeoGrids);
+				}
+			}
+			{
+				/*
+				 * Number of time slices
+				 */
+				{
+					final Label label = new Label(container, SWT.NONE);
+					label.setText("Time slices"); //$NON-NLS-1$
+
+					_firstColumnControls.add(label);
+				}
+				{
+					_lblNumSlices = new Label(container, SWT.NONE);
+					_lblNumSlices.setText(UI.EMPTY_STRING);
+					GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblNumSlices);
+				}
+			}
+		}
+	}
+
+	private void createUI_40_Options(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+
+		_firstColumnContainerControls.add(container);
+
 		{
 			{
 				/*
@@ -168,6 +258,8 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout {
 					// Label
 					final Label label = new Label(container, SWT.NONE);
 					label.setText("Geo &accuracy");
+
+					_firstColumnControls.add(label);
 				}
 				{
 					// Spinner
@@ -188,38 +280,40 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout {
 							.applyTo(_lblGeoAccuracy);
 				}
 			}
-		}
-		{
-			/*
-			 * Distance interval
-			 */
 			{
-				// Label
-				final Label label = new Label(container, SWT.NONE);
-				label.setText("&Distance interval");
-			}
-			{
-				// Spinner
-				_spinnerDistanceInterval = new Spinner(container, SWT.BORDER);
-				_spinnerDistanceInterval.setMinimum(10);
-				_spinnerDistanceInterval.setMaximum(1_000);
-				_spinnerDistanceInterval.setPageIncrement(10);
-				_spinnerDistanceInterval.addSelectionListener(_compareSelectionListener);
-				_spinnerDistanceInterval.addMouseWheelListener(_compareMouseWheelListener);
-				GridDataFactory
-						.fillDefaults()
-						.align(SWT.END, SWT.FILL)
-						.applyTo(_spinnerDistanceInterval);
-			}
-			{
-				// Label: Distance unit
-				final Label labelDistanceUnit = new Label(container, SWT.NONE);
-				labelDistanceUnit.setText("m");
-				GridDataFactory
-						.fillDefaults()
-						.grab(true, false)
-						.align(SWT.FILL, SWT.CENTER)
-						.applyTo(labelDistanceUnit);
+				/*
+				 * Distance interval
+				 */
+				{
+					// Label
+					final Label label = new Label(container, SWT.NONE);
+					label.setText("&Distance interval");
+
+					_firstColumnControls.add(label);
+				}
+				{
+					// Spinner
+					_spinnerDistanceInterval = new Spinner(container, SWT.BORDER);
+					_spinnerDistanceInterval.setMinimum(10);
+					_spinnerDistanceInterval.setMaximum(1_000);
+					_spinnerDistanceInterval.setPageIncrement(10);
+					_spinnerDistanceInterval.addSelectionListener(_compareSelectionListener);
+					_spinnerDistanceInterval.addMouseWheelListener(_compareMouseWheelListener);
+					GridDataFactory
+							.fillDefaults()
+							.align(SWT.END, SWT.FILL)
+							.applyTo(_spinnerDistanceInterval);
+				}
+				{
+					// Label: Distance unit
+					final Label labelDistanceUnit = new Label(container, SWT.NONE);
+					labelDistanceUnit.setText("m");
+					GridDataFactory
+							.fillDefaults()
+							.grab(true, false)
+							.align(SWT.FILL, SWT.CENTER)
+							.applyTo(labelDistanceUnit);
+				}
 			}
 		}
 	}
@@ -293,54 +387,11 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout {
 		_geoCompareView.onChange_CompareParameter();
 	}
 
-//	private void createUI_22_Left(final Composite parent) {
-//
-//		final Composite container = new Composite(parent, SWT.NONE);
-//		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-//		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-//		{
-//			{
-//				/*
-//				 * Number of tours
-//				 */
-//
-//				final Label label = new Label(container, SWT.NONE);
-//				label.setText("Tours"); //$NON-NLS-1$
-//
-//				_lblNumTours = new Label(container, SWT.NONE);
-//				_lblNumTours.setText(UI.EMPTY_STRING);
-//				GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblNumTours);
-//			}
-//			{
-//				/*
-//				 * Number of time slices
-//				 */
-//
-//				final Label label = new Label(container, SWT.NONE);
-//				label.setText("Time slices"); //$NON-NLS-1$
-//
-//				_lblNumSlices = new Label(container, SWT.NONE);
-//				_lblNumSlices.setText(UI.EMPTY_STRING);
-//				GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblNumSlices);
-//			}
-//			{
-//				/*
-//				 * Number of geo parts
-//				 */
-//
-//				final Label label = new Label(container, SWT.NONE);
-//				label.setText("Geo grids"); //$NON-NLS-1$
-//
-//				_lblNumGeoGrid = new Label(container, SWT.NONE);
-//				_lblNumGeoGrid.setText(UI.EMPTY_STRING);
-//				GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblNumGeoGrid);
-//			}
-//		}
-//	}
-
 	private void onDisposeSlideout() {
 
 		saveStateSlideout();
+
+		_firstColumnControls.clear();
 	}
 
 	@Override
@@ -403,5 +454,35 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout {
 		final String geoDistance = String.format(valueFormatting, distValue, UI.UNIT_LABEL_DISTANCE_SMALL);
 
 		_lblGeoAccuracy.setText(geoDistance);
+	}
+
+	void updateUI_ResetInfo() {
+
+		if (_parent == null || _parent.isDisposed()) {
+			return;
+		}
+
+		_lblNumGeoGrids.setText(UI.EMPTY_STRING);
+		_lblNumSlices.setText(UI.EMPTY_STRING);
+		_lblNumTours.setText(UI.EMPTY_STRING);
+	}
+
+	void updateUI_SlicesGrids(final int numSlices, final int numGeoGrids) {
+
+		if (_parent == null || _parent.isDisposed()) {
+			return;
+		}
+
+		_lblNumSlices.setText(Integer.toString(numSlices));
+		_lblNumGeoGrids.setText(Integer.toString(numGeoGrids));
+	}
+
+	void updateUI_Tours(final String numTours) {
+
+		if (_parent == null || _parent.isDisposed()) {
+			return;
+		}
+
+		_lblNumTours.setText(numTours);
 	}
 }
