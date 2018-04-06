@@ -1639,6 +1639,11 @@ public class UI {
 		// set width for all first column controls
 		for (final Control control : columnControls) {
 
+			// skip spinner controls, they already have the correct width
+			if (control instanceof Spinner) {
+				continue;
+			}
+
 			final Object layoutData = control.getLayoutData();
 
 			Assert.isNotNull(layoutData);

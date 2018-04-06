@@ -62,6 +62,11 @@ public class NormalizedGeoData {
 	public int[]	normalized2OriginalIndices;
 
 	/**
+	 * Normalized distance in meters
+	 */
+	public float	normalizedDistance;
+
+	/**
 	 * Normalized tour
 	 */
 	public long		tourId;

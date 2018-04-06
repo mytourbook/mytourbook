@@ -2795,7 +2795,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		}
 
 		// create normalized data, the distance will be normalized to 100m
-		final float normalizedStartDistance = measureAllDistance[measureStartIndex] / distanceInterval;
+		final float measureStartDistance = measureAllDistance[measureStartIndex];
+		final float normalizedStartDistance = measureStartDistance / distanceInterval;
 		final float normalizedEndDistance = measureAllDistance[measureEndIndex] / distanceInterval;
 		final int normalizedSize = (int) (normalizedEndDistance - normalizedStartDistance + 1);
 
@@ -2853,6 +2854,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 		returnData.geoAccuracy = geoAccuracy;
 		returnData.distanceAccuracy = distanceInterval;
+		returnData.normalizedDistance = normalizedDistance - measureStartDistance;
 
 		return returnData;
 	}

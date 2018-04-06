@@ -15,6 +15,17 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog.geo;
 
-public class GeoCompareSlideoutState {
+public class SlideoutGeoCompareState {
+
+	/**
+	 * Reset UI when <code>true</code>, otherwise the values are displayed.
+	 */
+	boolean	isReset;
+
+	int		numGeoGrids;
+	int		numSlices;
+	int		numTours;
+
+	float	normalizedDistance;
 
 }
