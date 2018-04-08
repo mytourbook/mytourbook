@@ -33,6 +33,8 @@ import net.tourbook.ui.ITourChartViewer;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartContextProvider;
 import net.tourbook.ui.tourChart.TourChartViewPart;
+import net.tourbook.ui.views.tourCatalog.geo.GeoPartComparerItem;
+import net.tourbook.ui.views.tourCatalog.geo.GeoPartItem;
 
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -151,6 +153,12 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart implements I
 			} else if (firstElement instanceof TVICompareResultComparedTour) {
 
 				showRefTour(((TVICompareResultComparedTour) firstElement).refTour.refId);
+
+			} else if (firstElement instanceof GeoPartComparerItem) {
+
+				final GeoPartItem geoPartItem = ((GeoPartComparerItem) firstElement).geoPartItem;
+
+				showRefTour(geoPartItem.refId);
 			}
 		}
 	}
@@ -186,9 +194,7 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart implements I
 	private void setTourCompareConfig(final TourCompareConfig compareConfig) {
 
 		// save the chart slider positions for the old ref tour
-		final TourCompareConfig oldRefTourConfig = ReferenceTourManager
-				.getInstance()
-				.getTourCompareConfig(_activeRefId);
+		final TourCompareConfig oldRefTourConfig = ReferenceTourManager.getTourCompareConfig(_activeRefId);
 
 		if (oldRefTourConfig != null) {
 
@@ -244,7 +250,7 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart implements I
 			return;
 		}
 
-		final TourCompareConfig tourCompareConfig = ReferenceTourManager.getInstance().getTourCompareConfig(refId);
+		final TourCompareConfig tourCompareConfig = ReferenceTourManager.getTourCompareConfig(refId);
 		if (tourCompareConfig == null) {
 			return;
 		}

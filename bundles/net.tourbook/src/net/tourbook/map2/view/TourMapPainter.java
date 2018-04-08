@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -56,6 +56,7 @@ import net.tourbook.photo.PhotoUI;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageMap2Appearance;
 import net.tourbook.ui.UI;
+import net.tourbook.ui.views.tourCatalog.ReferenceTourManager;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -85,50 +86,39 @@ import de.byteholder.geoclipse.mapprovider.MP;
  */
 public class TourMapPainter extends MapPainter {
 
-	private static final int				MARKER_MARGIN		= 2;
-	private static final int				MARKER_POLE			= 16;
+	private static final int				MARKER_MARGIN				= 2;
+	private static final int				MARKER_POLE					= 16;
 
-	private static final Font				DEFAULT_FONT		= net.tourbook.common.UI.AWT_FONT_ARIAL_12;
+	private static final Font				DEFAULT_FONT				= net.tourbook.common.UI.AWT_FONT_ARIAL_12;
 
-	final static IPreferenceStore			_prefStore			= TourbookPlugin.getPrefStore();
+	final static IPreferenceStore			_prefStore					= TourbookPlugin.getPrefStore();
 
 	private static IPropertyChangeListener	_prefChangeListener;
 
-	private float[]							_dataSerie;
-
-	private IMapColorProvider				_legendProvider;
-
-	// painting parameter
-	private int								_lineWidth;
-	private int								_lineWidth2;
 	private static float					_borderBrightness;
 
 	private static RGB						_prefBorderRGB;
+	private static RGB						_prefGeoCompareRefTourRGB	= new RGB(80, 80, 80);
+
 	private static int						_prefBorderType;
 	private static int						_prefBorderWidth;
 	private static boolean					_prefIsDrawLine;
+
 	private static boolean					_prefIsDrawSquare;
 	private static boolean					_prefIsWithBorder;
 	private static int						_prefLineWidth;
-
-	private static boolean					_isImageAvailable	= false;
+	private static boolean					_isImageAvailable			= false;
 	private static boolean					_isErrorLogged;
-
 	/**
 	 * Tour start/end image
 	 */
 	private static Image					_tourStartMarker;
-
 	private static Image					_tourEndMarker;
 
 	private static Rectangle				_twpImageBounds;
 	private static TourPainterConfiguration	_tourPaintConfig;
 
-	private final static NumberFormat		_nf1				= NumberFormat.getNumberInstance();
-	{
-		_nf1.setMinimumFractionDigits(1);
-		_nf1.setMaximumFractionDigits(1);
-	}
+	private final static NumberFormat		_nf1						= NumberFormat.getNumberInstance();
 
 	/*
 	 * UI resources
@@ -139,8 +129,20 @@ public class TourMapPainter extends MapPainter {
 	 * Tour Way Point image
 	 */
 	private static Image					_twpImage;
+	private final static ColorCacheSWT		_colorCache					= new ColorCacheSWT();
 
-	private final static ColorCacheSWT		_colorCache			= new ColorCacheSWT();
+	private float[]							_dataSerie;
+	private IMapColorProvider				_legendProvider;
+
+	// painting parameter
+	private int								_lineWidth;
+
+	private int								_lineWidth2;
+
+	{
+		_nf1.setMinimumFractionDigits(1);
+		_nf1.setMaximumFractionDigits(1);
+	}
 
 	private class LoadCallbackImage implements ILoadCallBack {
 
@@ -501,11 +503,12 @@ public class TourMapPainter extends MapPainter {
 			 * draw color line
 			 */
 			final int rgba = colorProvider.getRGBValue(config, legendValue);
-			g2.setColor(new java.awt.Color(
-					(rgba & 0xFF) >>> 0,
-					(rgba & 0xFF00) >>> 8,
-					(rgba & 0xFF0000) >>> 16,
-					(rgba & 0xFF000000) >>> 24));
+			g2.setColor(
+					new java.awt.Color(
+							(rgba & 0xFF) >>> 0,
+							(rgba & 0xFF00) >>> 8,
+							(rgba & 0xFF0000) >>> 16,
+							(rgba & 0xFF000000) >>> 24));
 
 			if (isDrawVertical) {
 
@@ -857,7 +860,9 @@ public class TourMapPainter extends MapPainter {
 		};
 
 		// add pref listener, dispose is not removing it because it is static !!!
-		TourbookPlugin.getDefault().getPreferenceStore()//
+		TourbookPlugin
+				.getDefault()
+				.getPreferenceStore()//
 				.addPropertyChangeListener(_prefChangeListener);
 	}
 
@@ -909,6 +914,8 @@ public class TourMapPainter extends MapPainter {
 
 			final Color systemColorBlue = gcTile.getDevice().getSystemColor(SWT.COLOR_BLUE);
 
+			final long geoCompareRefTourId = ReferenceTourManager.getGeoCompareReferenceTourId();
+
 			for (final TourData tourData : tourDataList) {
 
 				if (tourData == null) {
@@ -924,7 +931,17 @@ public class TourMapPainter extends MapPainter {
 
 				setDataSerie(tourData);
 
-				final boolean isDrawTourInTile = drawTour_10_InTile(gcTile, map, tile, tourData, parts, systemColorBlue);
+				final boolean isGeoCompareRefTour = geoCompareRefTourId >= 0
+						&& geoCompareRefTourId == tourData.getTourId();
+
+				final boolean isDrawTourInTile = drawTour_10_InTile(
+						gcTile,
+						map,
+						tile,
+						tourData,
+						parts,
+						systemColorBlue,
+						isGeoCompareRefTour);
 
 				isContentInTile = isContentInTile || isDrawTourInTile;
 
@@ -1070,13 +1087,7 @@ public class TourMapPainter extends MapPainter {
 
 			int photoCounter = 0;
 
-//			System.out.println(net.tourbook.common.UI.timeStampNano() + " Photo\t");
-//			// TODO remove SYSTEM.OUT.PRINTLN
-
 			for (final Photo photo : photoList) {
-
-//				System.out.println(net.tourbook.common.UI.timeStampNano() + "\t" + photo);
-//				// TODO remove SYSTEM.OUT.PRINTLN
 
 				final Point photoWorldPixel = photo.getWorldPosition(
 						mp,
@@ -1241,7 +1252,6 @@ public class TourMapPainter extends MapPainter {
 
 		if (isPhotoInTile) {
 
-//			final int zoomLevel = map.getZoom();
 			final int devPartOffset = ((parts - 1) / 2) * tileSize;
 
 			final Image image = getPhotoImage(photo, map, tile);
@@ -1261,7 +1271,8 @@ public class TourMapPainter extends MapPainter {
 			devX += devPartOffset;
 			devY += devPartOffset;
 
-			gcTile.drawImage(image, //
+			gcTile.drawImage(
+					image,
 					0,
 					0,
 					imageSize.width,
@@ -1276,11 +1287,6 @@ public class TourMapPainter extends MapPainter {
 			gcTile.setForeground(_bgColor);
 			gcTile.setLineWidth(1);
 			gcTile.drawRectangle(devX, devY, photoWidth, photoHeight);
-
-//			System.out.println(net.tourbook.common.UI.timeStampNano()
-//					+ (" image: " + imageSize.width + "x" + imageSize.height)
-//					+ ("\tphoto: " + photoWidth + " x " + photoHeight));
-//			// TODO remove SYSTEM.OUT.PRINTLN
 		}
 
 		return isPhotoInTile;
@@ -1323,7 +1329,8 @@ public class TourMapPainter extends MapPainter {
 			final int markerWidth2 = markerWidth / 2;
 			final int markerHeight = bounds.height;
 
-			gcTile.drawImage(markerImage, //
+			gcTile.drawImage(
+					markerImage,
 					devMarkerPosX - markerWidth2 + devPartOffset,
 					devMarkerPosY - markerHeight + devPartOffset);
 		}
@@ -1336,7 +1343,8 @@ public class TourMapPainter extends MapPainter {
 										final Tile tile,
 										final TourData tourData,
 										final int parts,
-										final Color systemColorBlue) {
+										final Color systemColorBlue,
+										final boolean isGeoCompareRefTour) {
 
 		boolean isTourInTile = false;
 
@@ -1407,6 +1415,15 @@ public class TourMapPainter extends MapPainter {
 				break;
 			}
 
+			if (isGeoCompareRefTour) {
+
+				/*
+				 * Draw more visible
+				 */
+
+				_lineWidth += 4;
+			}
+
 			_lineWidth2 = _lineWidth / 2;
 
 			gcTile.setLineWidth(_lineWidth);
@@ -1454,9 +1471,10 @@ public class TourMapPainter extends MapPainter {
 
 							isTourInTile = true;
 
-							color = getTourColor(tourData, serieIndex, isBorder, true);
+							color = getTourColor(tourData, serieIndex, isBorder, true, isGeoCompareRefTour);
 
-							drawTour_20_Line(gcTile, //
+							drawTour_20_Line(
+									gcTile,
 									devFromWithOffsetX,
 									devFromWithOffsetY,
 									devToWithOffsetX,
@@ -1476,7 +1494,8 @@ public class TourMapPainter extends MapPainter {
 						 * the last inside to the first outside position
 						 */
 
-						drawTour_20_Line(gcTile, //
+						drawTour_20_Line(
+								gcTile,
 								devFromWithOffsetX,
 								devFromWithOffsetY,
 								devToWithOffsetX,
@@ -1510,7 +1529,12 @@ public class TourMapPainter extends MapPainter {
 							devX += devPartOffset;
 							devY += devPartOffset;
 
-							final Color color = getTourColor(tourData, serieIndex, isBorder, false);
+							final Color color = getTourColor(
+									tourData,
+									serieIndex,
+									isBorder,
+									false,
+									isGeoCompareRefTour);
 
 							if (_prefIsDrawSquare) {
 								drawTour_30_Square(gcTile, devX, devY, color);
@@ -1701,7 +1725,8 @@ public class TourMapPainter extends MapPainter {
 
 			// draw text
 			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
-			gc.drawText(markerLabel, //
+			gc.drawText(
+					markerLabel,
 					MARKER_MARGIN + 1,
 					MARKER_MARGIN,
 					true);
@@ -1806,7 +1831,7 @@ public class TourMapPainter extends MapPainter {
 										final int valueIndex) {
 
 		if (_dataSerie == null || valueIndex >= _dataSerie.length || //
-				// check legend provider type
+		// check legend provider type
 				_legendProvider instanceof IGradientColorProvider == false//
 		) {
 			return Integer.MIN_VALUE;
@@ -1894,17 +1919,25 @@ public class TourMapPainter extends MapPainter {
 	private Color getTourColor(	final TourData tourData,
 								final int serieIndex,
 								final boolean isBorder,
-								final boolean isDrawLine) {
+								final boolean isDrawLine,
+								final boolean isGeoCompareRefTour) {
 
 		if (_dataSerie == null) {
 			return null;
 		}
 
 		/*
-		 * Get border color.
+		 * Get border color
 		 */
 		if (isBorder && _prefBorderType == PrefPageMap2Appearance.BORDER_TYPE_COLOR) {
 			return _colorCache.getColor(_prefBorderRGB);
+		}
+
+		/*
+		 * Geo compare ref tour
+		 */
+		if (isGeoCompareRefTour) {
+			return _colorCache.getColor(_prefGeoCompareRefTourRGB);
 		}
 
 		/*
@@ -2022,8 +2055,10 @@ public class TourMapPainter extends MapPainter {
 		// image position top is in the opposite direction
 		final int devImagePosTop = devImagePosY - imageHeight;
 
-		if (((devImagePosLeft >= 0 && devImagePosLeft <= tileSize) || (devImagePosRight >= 0 && devImagePosRight <= tileSize))
-				&& (devImagePosY >= 0 && devImagePosY <= tileSize || devImagePosTop >= 0 && devImagePosTop <= tileSize)) {
+		if (((devImagePosLeft >= 0 && devImagePosLeft <= tileSize) || (devImagePosRight >= 0
+				&& devImagePosRight <= tileSize))
+				&& (devImagePosY >= 0 && devImagePosY <= tileSize || devImagePosTop >= 0
+						&& devImagePosTop <= tileSize)) {
 			return true;
 		}
 
@@ -2260,7 +2295,8 @@ public class TourMapPainter extends MapPainter {
 		// image position top is in the opposite direction
 		final int devImagePosTop = devYPhoto - imageHeight;
 
-		if (((devImagePosLeft >= 0 && devImagePosLeft <= tileSize) || (devImagePosRight >= 0 && devImagePosRight <= tileSize))
+		if (((devImagePosLeft >= 0 && devImagePosLeft <= tileSize) || (devImagePosRight >= 0
+				&& devImagePosRight <= tileSize))
 				&& (devYPhoto >= 0 && devYPhoto <= tileSize || devImagePosTop >= 0 && devImagePosTop <= tileSize)) {
 			return true;
 		}

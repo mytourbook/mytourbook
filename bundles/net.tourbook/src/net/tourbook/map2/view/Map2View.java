@@ -110,10 +110,12 @@ import net.tourbook.tour.photo.TourPhotoLink;
 import net.tourbook.tour.photo.TourPhotoLinkSelection;
 import net.tourbook.training.TrainingManager;
 import net.tourbook.ui.tourChart.TourChart;
+import net.tourbook.ui.views.tourCatalog.ReferenceTourManager;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
+import net.tourbook.ui.views.tourCatalog.geo.GeoPartComparerItem;
 import net.tourbook.ui.views.tourSegmenter.SelectedTourSegmenterSegments;
 
 import org.eclipse.jface.action.IMenuManager;
@@ -2058,6 +2060,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 				final long tourId = comparedTour.getTourId();
 
 				final TourData tourData = TourManager.getInstance().getTourData(tourId);
+
 				paintTours_20_One(tourData, false);
 
 			} else if (firstElement instanceof TVICompareResultComparedTour) {
@@ -2065,7 +2068,30 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 				final TVICompareResultComparedTour compareResultItem = (TVICompareResultComparedTour) firstElement;
 				final TourData tourData = TourManager.getInstance().getTourData(
 						compareResultItem.getComparedTourData().getTourId());
+
 				paintTours_20_One(tourData, false);
+
+			} else if (firstElement instanceof GeoPartComparerItem) {
+
+				final TourData refTourData = ReferenceTourManager.getGeoCompareReferenceTour();
+
+				final GeoPartComparerItem geoCompareItem = (GeoPartComparerItem) firstElement;
+				final long comparedTourId = geoCompareItem.tourId;
+				final TourData comparedTourData = TourManager.getInstance().getTourData(comparedTourId);
+
+				_allTourData.clear();
+
+				/*
+				 * Do not draw the same tour twice, this occures when the compared tour is also the
+				 * geo compare ref tour
+				 */
+				if (refTourData != comparedTourData) {
+					_allTourData.add(refTourData);
+				}
+
+				_allTourData.add(comparedTourData);
+
+				paintTours_10_All();
 
 			} else if (firstElement instanceof TourWayPoint) {
 

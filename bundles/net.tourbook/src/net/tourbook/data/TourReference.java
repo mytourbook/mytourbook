@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -52,8 +52,10 @@ public class TourReference {
 	public TourReference() {}
 
 	public TourReference(final String label, final TourData tourData, final int startIndex, final int endIndex) {
+
 		this.tourData = tourData;
 		this.label = label;
+
 		this.startIndex = startIndex;
 		this.endIndex = endIndex;
 	}

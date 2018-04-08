@@ -95,6 +95,7 @@ import net.tourbook.ui.views.TourInfoToolTipStyledCellLabelProvider;
 import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
 import net.tourbook.ui.views.rawData.ActionMergeTour;
 import net.tourbook.ui.views.rawData.ActionReimportSubMenu;
+import net.tourbook.ui.views.tourCatalog.geo.GeoPartComparerItem;
 
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.IMenuListener;
@@ -3366,98 +3367,21 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 		// show and select the selected tour
 		if (selection instanceof SelectionTourId) {
 
-			final Long newTourId = ((SelectionTourId) selection).getTourId();
-			final Long oldTourId = _selectedTourIds.size() == 1 ? _selectedTourIds.get(0) : null;
+			final long newTourId = ((SelectionTourId) selection).getTourId();
 
-			if (newTourId != oldTourId) {
+			selectTour(newTourId);
 
-				// tour id has changed
+		} else if (selection instanceof StructuredSelection) {
 
-				if (_actionLinkWithOtherViews.getSelection()) {
+			final Object firstElement = ((StructuredSelection) selection).getFirstElement();
 
-					// link with other views
+			if (firstElement instanceof GeoPartComparerItem) {
 
-					final TourData tourData = TourManager.getTour(newTourId);
+				// show selected compared tour
 
-					if (tourData == null) {
-						return;
-					}
+				final GeoPartComparerItem comparerItem = (GeoPartComparerItem) firstElement;
 
-					_selectedTourIds.clear();
-					_selectedTourIds.add(newTourId);
-
-					if (getYearSub() == YearSubCategory.WEEK) {
-
-						_selectedYear = tourData.getStartWeekYear();
-						_selectedYearSub = tourData.getStartWeek();
-
-					} else {
-
-						final ZonedDateTime tourStartTime = tourData.getTourStartTime();
-
-						_selectedYear = tourStartTime.getYear();
-						_selectedYearSub = tourStartTime.getMonthValue();
-					}
-
-					// run async otherwise an internal NPE occures
-					_parent.getDisplay().asyncExec(new Runnable() {
-						@Override
-						public void run() {
-
-							final Tree tree = _tourViewer.getTree();
-							tree.setRedraw(false);
-							_isInReload = true;
-							{
-								if (_isCollapseOthers) {
-
-									try {
-
-										_tourViewer.collapseAll();
-
-									} catch (final Exception e) {
-
-										/**
-										 * <code>
-										 
-											Caused by: java.lang.NullPointerException
-											at org.eclipse.jface.viewers.AbstractTreeViewer.getSelection(AbstractTreeViewer.java:2956)
-											at org.eclipse.jface.viewers.StructuredViewer.handleSelect(StructuredViewer.java:1211)
-											at org.eclipse.jface.viewers.StructuredViewer$4.widgetSelected(StructuredViewer.java:1241)
-											at org.eclipse.jface.util.OpenStrategy.fireSelectionEvent(OpenStrategy.java:239)
-											at org.eclipse.jface.util.OpenStrategy.access$4(OpenStrategy.java:233)
-											at org.eclipse.jface.util.OpenStrategy$1.handleEvent(OpenStrategy.java:403)
-											at org.eclipse.swt.widgets.EventTable.sendEvent(EventTable.java:84)
-											at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1053)
-											at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1077)
-											at org.eclipse.swt.widgets.Widget.sendSelectionEvent(Widget.java:1094)
-											at org.eclipse.swt.widgets.TreeItem.setExpanded(TreeItem.java:1385)
-											at org.eclipse.jface.viewers.TreeViewer.setExpanded(TreeViewer.java:332)
-											at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1571)
-											at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1586)
-											at org.eclipse.jface.viewers.AbstractTreeViewer.collapseToLevel(AbstractTreeViewer.java:751)
-											at org.eclipse.jface.viewers.AbstractTreeViewer.collapseAll(AbstractTreeViewer.java:733)
-											
-											at net.tourbook.ui.views.tourBook.TourBookView$70.run(TourBookView.java:3406)
-											
-											at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:35)
-											at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:135)
-											... 22 more
-										 
-										 * </code>
-										 */
-
-										// this occures sometimes but it seems that it's an eclipse internal problem
-										StatusUtil.log(e);
-									}
-								}
-
-								reselectTourViewer();
-							}
-							_isInReload = false;
-							tree.setRedraw(true);
-						}
-					});
-				}
+				selectTour(comparerItem.tourId);
 			}
 
 		} else if (selection instanceof SelectionDeletedTours) {
@@ -3832,6 +3756,109 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 		_state.put(STATE_YEAR_SUB_CATEGORY, _yearSubCategory.name());
 
 		_columnManager.saveState(_state);
+	}
+
+	private void selectTour(final long tourId) {
+
+		// check if enabled
+		if (_actionLinkWithOtherViews.getSelection() == false) {
+
+			// linking is disabled
+
+			return;
+		}
+
+		// check with old id
+		final long oldTourId = _selectedTourIds.size() == 1 ? _selectedTourIds.get(0) : null;
+		if (tourId == oldTourId) {
+
+			// tour id is the same
+
+			return;
+		}
+
+		// link with other views
+
+		final TourData tourData = TourManager.getTour(tourId);
+
+		if (tourData == null) {
+			return;
+		}
+
+		_selectedTourIds.clear();
+		_selectedTourIds.add(tourId);
+
+		if (getYearSub() == YearSubCategory.WEEK) {
+
+			_selectedYear = tourData.getStartWeekYear();
+			_selectedYearSub = tourData.getStartWeek();
+
+		} else {
+
+			final ZonedDateTime tourStartTime = tourData.getTourStartTime();
+
+			_selectedYear = tourStartTime.getYear();
+			_selectedYearSub = tourStartTime.getMonthValue();
+		}
+
+		// run async otherwise an internal NPE occures
+		_parent.getDisplay().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+
+				final Tree tree = _tourViewer.getTree();
+				tree.setRedraw(false);
+				_isInReload = true;
+				{
+					if (_isCollapseOthers) {
+
+						try {
+
+							_tourViewer.collapseAll();
+
+						} catch (final Exception e) {
+
+							/**
+							 * <code>
+							 
+								Caused by: java.lang.NullPointerException
+								at org.eclipse.jface.viewers.AbstractTreeViewer.getSelection(AbstractTreeViewer.java:2956)
+								at org.eclipse.jface.viewers.StructuredViewer.handleSelect(StructuredViewer.java:1211)
+								at org.eclipse.jface.viewers.StructuredViewer$4.widgetSelected(StructuredViewer.java:1241)
+								at org.eclipse.jface.util.OpenStrategy.fireSelectionEvent(OpenStrategy.java:239)
+								at org.eclipse.jface.util.OpenStrategy.access$4(OpenStrategy.java:233)
+								at org.eclipse.jface.util.OpenStrategy$1.handleEvent(OpenStrategy.java:403)
+								at org.eclipse.swt.widgets.EventTable.sendEvent(EventTable.java:84)
+								at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1053)
+								at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1077)
+								at org.eclipse.swt.widgets.Widget.sendSelectionEvent(Widget.java:1094)
+								at org.eclipse.swt.widgets.TreeItem.setExpanded(TreeItem.java:1385)
+								at org.eclipse.jface.viewers.TreeViewer.setExpanded(TreeViewer.java:332)
+								at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1571)
+								at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1586)
+								at org.eclipse.jface.viewers.AbstractTreeViewer.collapseToLevel(AbstractTreeViewer.java:751)
+								at org.eclipse.jface.viewers.AbstractTreeViewer.collapseAll(AbstractTreeViewer.java:733)
+								
+								at net.tourbook.ui.views.tourBook.TourBookView$70.run(TourBookView.java:3406)
+								
+								at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:35)
+								at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:135)
+								... 22 more
+							 
+							 * </code>
+							 */
+
+							// this occures sometimes but it seems that it's an eclipse internal problem
+							StatusUtil.log(e);
+						}
+					}
+
+					reselectTourViewer();
+				}
+				_isInReload = false;
+				tree.setRedraw(true);
+			}
+		});
 	}
 
 	public void setActiveYear(final int activeYear) {

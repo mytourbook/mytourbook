@@ -732,6 +732,7 @@ public class Messages extends NLS {
 	public static String		GeoPart_View_Column_GeoDiff_Label;
 	public static String		GeoPart_View_Column_GeoDiff_Relative_Header;
 	public static String		GeoPart_View_Column_GeoDiff_Relative_Label;
+	public static String		GeoPart_View_Column_GeoDiff_Relative_Tooltip;
 	public static String		GeoPart_View_Column_SequenceNumber_Header;
 	public static String		GeoPart_View_Column_SequenceNumber_Label;
 	public static String		GeoPart_View_Label_NoTourWithGeoData;

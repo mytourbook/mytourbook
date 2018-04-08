@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,7 +19,6 @@
 package net.tourbook.ui.views.tourCatalog;
 
 import java.util.HashMap;
-import java.util.List;
 
 import javax.persistence.EntityManager;
 
@@ -35,36 +34,79 @@ import net.tourbook.ui.tourChart.TourChartConfiguration;
  */
 public class ReferenceTourManager {
 
-	private static ReferenceTourManager				_instance			= null;
+	private static final HashMap<Long, TourCompareConfig>	_compareConfigCache	= new HashMap<>();
 
-	private final HashMap<Long, TourCompareConfig>	_compareConfigCache	= new HashMap<Long, TourCompareConfig>();
+	private static long										_geoCompare_RefId;
+	private static TourReference							_geoCompare_RefTour;
+	private static TourCompareConfig						_geoCompare_RefConfig;
 
 	private ReferenceTourManager() {}
 
-	public static ReferenceTourManager getInstance() {
-		if (_instance == null) {
-			_instance = new ReferenceTourManager();
-		}
-		return _instance;
+	/**
+	 * Creates a special {@link TourReference} which is NOT saved in the db
+	 * 
+	 * @param tourData
+	 * @param startIndex
+	 * @param endIndex
+	 * @return Returns the special ref id
+	 */
+	public static long createGeoCompareRefTour(final TourData tourData, final int startIndex, final int endIndex) {
+
+		final String refTourLabel = "Geo Compare Ref Tour";
+
+		_geoCompare_RefId = System.nanoTime();
+
+		_geoCompare_RefTour = new TourReference(
+				refTourLabel,
+				tourData,
+				startIndex,
+				endIndex);
+
+		_geoCompare_RefConfig = createTourCompareConfig(_geoCompare_RefTour);
+		_geoCompare_RefConfig.isGeoCompareRefTour = true;
+
+		return _geoCompare_RefId;
 	}
 
 	/**
-	 * @return Returns an array with all reference tours
+	 * Create a new reference tour configuration
 	 */
-	public Object[] getAllReferenceTours() {
+	private static TourCompareConfig createTourCompareConfig(final TourReference refTour) {
 
-		List<?> referenceTours = null;
+		final TourData refTourData = refTour.getTourData();
 
-		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+		final TourChartConfiguration refTourChartConfig = TourManager.createDefaultTourChartConfig();
+		final TourChartConfiguration compTourchartConfig = TourManager.createDefaultTourChartConfig();
 
-		if (em != null) {
+		final ChartDataModel chartDataModel = TourManager.getInstance().createChartDataModel(
+				refTourData,
+				refTourChartConfig);
 
-			referenceTours = em.createQuery("SELECT refTour FROM TourReference AS refTour").getResultList(); //$NON-NLS-1$
+		final TourCompareConfig compareConfig = new TourCompareConfig(
+				refTour,
+				chartDataModel,
+				refTourData.getTourId(),
+				refTourChartConfig,
+				compTourchartConfig);
 
-			em.close();
+		return compareConfig;
+	}
+
+	public static TourData getGeoCompareReferenceTour() {
+
+		return _geoCompare_RefTour.getTourData();
+	}
+
+	/**
+	 * @return Returns tour id of the geo compare ref tour or -1 when not available
+	 */
+	public static long getGeoCompareReferenceTourId() {
+
+		if (_geoCompare_RefTour == null) {
+			return -1;
 		}
 
-		return referenceTours.toArray();
+		return _geoCompare_RefTour.getTourData().getTourId();
 	}
 
 	/**
@@ -75,9 +117,13 @@ public class ReferenceTourManager {
 	 *            Reference Id
 	 * @return
 	 */
-	public TourCompareConfig getTourCompareConfig(final long refId) {
+	public static TourCompareConfig getTourCompareConfig(final long refId) {
 
-		TourCompareConfig compareConfig = _compareConfigCache.get(refId);
+		if (refId == _geoCompare_RefId) {
+			return _geoCompare_RefConfig;
+		}
+
+		final TourCompareConfig compareConfig = _compareConfigCache.get(refId);
 
 		if (compareConfig != null) {
 			return compareConfig;
@@ -90,32 +136,14 @@ public class ReferenceTourManager {
 
 		if (refTour == null) {
 			return null;
-		} else {
-
-			/*
-			 * create a new reference tour configuration
-			 */
-
-			final TourData refTourData = refTour.getTourData();
-
-			final TourChartConfiguration refTourChartConfig = TourManager.createDefaultTourChartConfig();
-			final TourChartConfiguration compTourchartConfig = TourManager.createDefaultTourChartConfig();
-
-			final ChartDataModel chartDataModel = TourManager.getInstance().createChartDataModel(
-					refTourData,
-					refTourChartConfig);
-
-			compareConfig = new TourCompareConfig(
-					refTour,
-					chartDataModel,
-					refTourData.getTourId(),
-					refTourChartConfig,
-					compTourchartConfig);
-
-			// keep ref config in the cache
-			_compareConfigCache.put(refId, compareConfig);
 		}
 
-		return compareConfig;
+		final TourCompareConfig newCompareConfig = createTourCompareConfig(refTour);
+
+		// keep ref config in the cache
+		_compareConfigCache.put(refId, newCompareConfig);
+
+		return newCompareConfig;
 	}
+
 }

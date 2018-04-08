@@ -1151,7 +1151,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 
 		colDef.setColumnLabel(Messages.GeoPart_View_Column_GeoDiff_Relative_Label);
 		colDef.setColumnHeaderText(Messages.GeoPart_View_Column_GeoDiff_Relative_Header);
-		colDef.setColumnHeaderToolTipText(Messages.GeoPart_View_Column_GeoDiff_Relative_Label);
+		colDef.setColumnHeaderToolTipText(Messages.GeoPart_View_Column_GeoDiff_Relative_Tooltip);
 
 		colDef.setIsDefaultColumn();
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
@@ -1572,11 +1572,16 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 
 			if (tourData != null) {
 
+				final long geoCompareRefId = ReferenceTourManager.createGeoCompareRefTour(
+						tourData,
+						chartInfo.leftSliderValuesIndex,
+						chartInfo.rightSliderValuesIndex);
+
 				compare_10_Compare(
 						tourData,
 						chartInfo.leftSliderValuesIndex,
 						chartInfo.rightSliderValuesIndex,
-						-1);
+						geoCompareRefId);
 			}
 
 		} else if (selection instanceof SelectionChartXSliderPosition) {
@@ -1603,11 +1608,16 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 									? leftSliderValueIndex
 									: rightSliderValueIndex;
 
+					final long geoCompareRefId = ReferenceTourManager.createGeoCompareRefTour(
+							tourData,
+							leftSliderValueIndex,
+							rightSliderValueIndex);
+
 					compare_10_Compare(
 							tourData,
 							leftSliderValueIndex,
 							rightSliderValueIndex,
-							-1);
+							geoCompareRefId);
 				}
 			}
 
@@ -1717,7 +1727,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 
 	private void showRefTour(final long refId) {
 
-		final TourCompareConfig tourCompareConfig = ReferenceTourManager.getInstance().getTourCompareConfig(refId);
+		final TourCompareConfig tourCompareConfig = ReferenceTourManager.getTourCompareConfig(refId);
 
 		if (tourCompareConfig == null) {
 			return;
@@ -1728,11 +1738,22 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 
 			final TourReference refTour = tourCompareConfig.getRefTour();
 
+			/*
+			 * Convert real ref tour into a geo compare ref tour that the behaviour is the same,
+			 * however this will disable features in the tour compare chart but this is already very
+			 * complex.
+			 */
+
+			final long geoCompareRefId = ReferenceTourManager.createGeoCompareRefTour(
+					tourData,
+					refTour.getStartValueIndex(),
+					refTour.getEndValueIndex());
+
 			compare_10_Compare(
 					tourData,
 					refTour.getStartValueIndex(),
 					refTour.getEndValueIndex(),
-					refTour.getRefId());
+					geoCompareRefId);
 		}
 	}
 

@@ -77,6 +77,8 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 	private double								_refTourXMarkerValueDifference;
 
+	private boolean								_isGeoCompareRefTour;
+
 	/*
 	 * CT ... (c)ompared (t)our which is displayed in this view
 	 */
@@ -394,8 +396,9 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 	private void enableActions() {
 
 		final boolean isNotMoved = _defaultStartIndex == _movedStartIndex && _defaultEndIndex == _movedEndIndex;
+		final boolean isMoved = isNotMoved == false;
 
-		_actionSaveComparedTour.setEnabled(isNotMoved == false || _ctCompareId == -1);
+		_actionSaveComparedTour.setEnabled(_isGeoCompareRefTour == false && (isMoved || _ctCompareId == -1));
 	}
 
 	private void enableSynchronization() {
@@ -790,7 +793,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 	 */
 	private boolean updateTourChart() {
 
-		final TourCompareConfig tourCompareConfig = ReferenceTourManager.getInstance().getTourCompareConfig(_ctRefId);
+		final TourCompareConfig tourCompareConfig = ReferenceTourManager.getTourCompareConfig(_ctRefId);
 
 		if (tourCompareConfig != null) {
 
@@ -798,6 +801,8 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 			_tourChartConfig.setMinMaxKeeper(true);
 			_tourChartConfig.canShowTourCompareGraph = true;
+
+			_isGeoCompareRefTour = tourCompareConfig.isGeoCompareRefTour;
 
 			updateChart();
 			enableSynchronization();

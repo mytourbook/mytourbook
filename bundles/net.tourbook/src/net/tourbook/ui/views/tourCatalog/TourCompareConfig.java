@@ -35,6 +35,8 @@ public class TourCompareConfig {
 
 	private SelectionChartXSliderPosition	_xSliderPosition;
 
+	public boolean							isGeoCompareRefTour;
+
 	TourCompareConfig(	final TourReference refTour,
 						final ChartDataModel refChartDataModel,
 						final Long refTourTourId,
@@ -76,6 +78,20 @@ public class TourCompareConfig {
 
 	void setXSliderPosition(final SelectionChartXSliderPosition sliderPosition) {
 		_xSliderPosition = sliderPosition;
+	}
+
+	@Override
+	public String toString() {
+		return "TourCompareConfig ["
+
+				+ "_refTour=" + _refTour + ", "
+				+ "_refTourTourId=" + _refTourTourId + ", "
+				+ "_refTourChartConfig=" + _refTourChartConfig + ", "
+				+ "_compareTourChartConfig=" + _compareTourChartConfig + ", "
+				+ "_xSliderPosition=" + _xSliderPosition + ", "
+				+ "isGeoCompareRefTour=" + isGeoCompareRefTour
+
+				+ "]";
 	}
 
 }
