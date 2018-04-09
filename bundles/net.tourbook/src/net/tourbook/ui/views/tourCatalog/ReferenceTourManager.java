@@ -92,9 +92,8 @@ public class ReferenceTourManager {
 		return compareConfig;
 	}
 
-	public static TourData getGeoCompareReferenceTour() {
-
-		return _geoCompare_RefTour.getTourData();
+	public static TourReference getGeoCompareReferenceTour() {
+		return _geoCompare_RefTour;
 	}
 
 	/**

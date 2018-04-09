@@ -2073,7 +2073,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 			} else if (firstElement instanceof GeoPartComparerItem) {
 
-				final TourData refTourData = ReferenceTourManager.getGeoCompareReferenceTour();
+				final TourData refTourData = ReferenceTourManager.getGeoCompareReferenceTour().getTourData();
 
 				final GeoPartComparerItem geoCompareItem = (GeoPartComparerItem) firstElement;
 				final long comparedTourId = geoCompareItem.tourId;
@@ -2085,10 +2085,10 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 				 * Do not draw the same tour twice, this occures when the compared tour is also the
 				 * geo compare ref tour
 				 */
-				if (refTourData != comparedTourData) {
-					_allTourData.add(refTourData);
-				}
+//				if (refTourData != comparedTourData) {
+//				}
 
+				_allTourData.add(refTourData);
 				_allTourData.add(comparedTourData);
 
 				paintTours_10_All();

@@ -42,6 +42,7 @@ import net.tourbook.common.util.ImageConverter;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourReference;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.map2.Messages;
 import net.tourbook.map3.layer.TourLegendLabel;
@@ -86,19 +87,24 @@ import de.byteholder.geoclipse.mapprovider.MP;
  */
 public class TourMapPainter extends MapPainter {
 
-	private static final int				MARKER_MARGIN				= 2;
-	private static final int				MARKER_POLE					= 16;
+// SET_FORMATTING_OFF
+	
+	private static final Font				DEFAULT_FONT						= net.tourbook.common.UI.AWT_FONT_ARIAL_12;
+	
+// SET_FORMATTING_ON
 
-	private static final Font				DEFAULT_FONT				= net.tourbook.common.UI.AWT_FONT_ARIAL_12;
+	private static final int				MARKER_MARGIN						= 2;
+	private static final int				MARKER_POLE							= 16;
 
-	final static IPreferenceStore			_prefStore					= TourbookPlugin.getPrefStore();
+	final static IPreferenceStore			_prefStore							= TourbookPlugin.getPrefStore();
 
 	private static IPropertyChangeListener	_prefChangeListener;
 
 	private static float					_borderBrightness;
 
 	private static RGB						_prefBorderRGB;
-	private static RGB						_prefGeoCompareRefTourRGB	= new RGB(80, 80, 80);
+	private static RGB						_prefGeoCompare_RefTour_RGB			= new RGB(0x80, 0x80, 0x80);
+	private static RGB						_prefGeoCompare_RefTour_InPart_RGB	= new RGB(0xff, 0, 0);
 
 	private static int						_prefBorderType;
 	private static int						_prefBorderWidth;
@@ -107,7 +113,7 @@ public class TourMapPainter extends MapPainter {
 	private static boolean					_prefIsDrawSquare;
 	private static boolean					_prefIsWithBorder;
 	private static int						_prefLineWidth;
-	private static boolean					_isImageAvailable			= false;
+	private static boolean					_isImageAvailable					= false;
 	private static boolean					_isErrorLogged;
 	/**
 	 * Tour start/end image
@@ -118,7 +124,7 @@ public class TourMapPainter extends MapPainter {
 	private static Rectangle				_twpImageBounds;
 	private static TourPainterConfiguration	_tourPaintConfig;
 
-	private final static NumberFormat		_nf1						= NumberFormat.getNumberInstance();
+	private final static NumberFormat		_nf1								= NumberFormat.getNumberInstance();
 
 	/*
 	 * UI resources
@@ -129,7 +135,7 @@ public class TourMapPainter extends MapPainter {
 	 * Tour Way Point image
 	 */
 	private static Image					_twpImage;
-	private final static ColorCacheSWT		_colorCache					= new ColorCacheSWT();
+	private final static ColorCacheSWT		_colorCache							= new ColorCacheSWT();
 
 	private float[]							_dataSerie;
 	private IMapColorProvider				_legendProvider;
@@ -914,6 +920,7 @@ public class TourMapPainter extends MapPainter {
 
 			final Color systemColorBlue = gcTile.getDevice().getSystemColor(SWT.COLOR_BLUE);
 
+			TourData prevTourData = null;
 			final long geoCompareRefTourId = ReferenceTourManager.getGeoCompareReferenceTourId();
 
 			for (final TourData tourData : tourDataList) {
@@ -931,8 +938,32 @@ public class TourMapPainter extends MapPainter {
 
 				setDataSerie(tourData);
 
-				final boolean isGeoCompareRefTour = geoCompareRefTourId >= 0
+				boolean isGeoCompareRefTour = geoCompareRefTourId >= 0
 						&& geoCompareRefTourId == tourData.getTourId();
+
+				int refTourStartIndex = 0;
+				int refTourEndIndex = 0;
+
+				if (isGeoCompareRefTour) {
+
+					if (tourData == prevTourData) {
+
+						/*
+						 * This can occure when a compared tour is compared with it's own reference
+						 * tour -> paint 2nd time as normal tour
+						 */
+						isGeoCompareRefTour = false;
+
+					} else {
+
+						final TourReference refTour = ReferenceTourManager.getGeoCompareReferenceTour();
+
+						refTourStartIndex = refTour.getStartValueIndex();
+						refTourEndIndex = refTour.getEndValueIndex();
+					}
+				}
+
+				prevTourData = tourData;
 
 				final boolean isDrawTourInTile = drawTour_10_InTile(
 						gcTile,
@@ -941,7 +972,9 @@ public class TourMapPainter extends MapPainter {
 						tourData,
 						parts,
 						systemColorBlue,
-						isGeoCompareRefTour);
+						isGeoCompareRefTour,
+						refTourStartIndex,
+						refTourEndIndex);
 
 				isContentInTile = isContentInTile || isDrawTourInTile;
 
@@ -1344,7 +1377,9 @@ public class TourMapPainter extends MapPainter {
 										final TourData tourData,
 										final int parts,
 										final Color systemColorBlue,
-										final boolean isGeoCompareRefTour) {
+										final boolean isGeoCompareRefTour,
+										final int refTourStartIndex,
+										final int refTourEndIndex) {
 
 		boolean isTourInTile = false;
 
@@ -1417,9 +1452,7 @@ public class TourMapPainter extends MapPainter {
 
 			if (isGeoCompareRefTour) {
 
-				/*
-				 * Draw more visible
-				 */
+				// draw more visible
 
 				_lineWidth += 4;
 			}
@@ -1436,6 +1469,15 @@ public class TourMapPainter extends MapPainter {
 
 				int devX = tourWorldPixelX - tileWorldPixelX;
 				int devY = tourWorldPixelY - tileWorldPixelY;
+
+				boolean isInRefTourPart = false;
+
+				if (isGeoCompareRefTour) {
+
+					// paint ref tour part with a different color
+
+					isInRefTourPart = serieIndex >= refTourStartIndex && serieIndex <= refTourEndIndex;
+				}
 
 				if (_prefIsDrawLine) {
 
@@ -1471,7 +1513,13 @@ public class TourMapPainter extends MapPainter {
 
 							isTourInTile = true;
 
-							color = getTourColor(tourData, serieIndex, isBorder, true, isGeoCompareRefTour);
+							color = getTourColor(
+									tourData,
+									serieIndex,
+									isBorder,
+									true,
+									isGeoCompareRefTour,
+									isInRefTourPart);
 
 							drawTour_20_Line(
 									gcTile,
@@ -1534,7 +1582,8 @@ public class TourMapPainter extends MapPainter {
 									serieIndex,
 									isBorder,
 									false,
-									isGeoCompareRefTour);
+									isGeoCompareRefTour,
+									isInRefTourPart);
 
 							if (_prefIsDrawSquare) {
 								drawTour_30_Square(gcTile, devX, devY, color);
@@ -1920,7 +1969,8 @@ public class TourMapPainter extends MapPainter {
 								final int serieIndex,
 								final boolean isBorder,
 								final boolean isDrawLine,
-								final boolean isGeoCompareRefTour) {
+								final boolean isGeoCompareRefTour,
+								final boolean isInRefTourPart) {
 
 		if (_dataSerie == null) {
 			return null;
@@ -1937,7 +1987,9 @@ public class TourMapPainter extends MapPainter {
 		 * Geo compare ref tour
 		 */
 		if (isGeoCompareRefTour) {
-			return _colorCache.getColor(_prefGeoCompareRefTourRGB);
+
+			return _colorCache.getColor(
+					isInRefTourPart ? _prefGeoCompare_RefTour_InPart_RGB : _prefGeoCompare_RefTour_RGB);
 		}
 
 		/*
