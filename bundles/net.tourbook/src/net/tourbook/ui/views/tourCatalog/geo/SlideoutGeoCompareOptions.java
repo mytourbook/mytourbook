@@ -20,10 +20,13 @@ import java.util.ArrayList;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.color.ColorSelectorExtended;
+import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.Util;
+import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
@@ -31,6 +34,10 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceConverter;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -42,6 +49,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
@@ -50,8 +58,9 @@ import org.eclipse.swt.widgets.ToolItem;
 /**
  * Slideout for the tour tag filter
  */
-public class SlideoutGeoCompareOptions extends AdvancedSlideout {
+public class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColorSelectorListener {
 
+	final static IPreferenceStore		_prefStore						= TourbookPlugin.getPrefStore();
 	private static IDialogSettings		_state;
 
 	private PixelConverter				_pc;
@@ -59,6 +68,9 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout {
 
 	private SelectionAdapter			_compareSelectionListener;
 	private MouseWheelListener			_compareMouseWheelListener;
+	private MouseWheelListener			_mapOptions_MouseWheelListener;
+	private IPropertyChangeListener		_mapOptions_PropertyListener;
+	private SelectionAdapter			_mapOptions_SelectionListener;
 
 	private Action						_actionRestoreDefaults;
 
@@ -79,6 +91,9 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout {
 	 */
 	private Composite					_parent;
 
+	private ColorSelectorExtended		_colorMapOption_RefTour;
+	private ColorSelectorExtended		_colorMapOption_ComparedTourPart;
+
 	private Label						_lblGeoAccuracy;
 	private Label						_lblDistanceIntervalUnit;
 	private Label						_lblNormalizedDistance;
@@ -89,6 +104,7 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout {
 
 	private Spinner						_spinnerGeoAccuracy;
 	private Spinner						_spinnerDistanceInterval;
+	private Spinner						_spinnerMapOption_LineWidth;
 
 	/**
 	 * @param actionToolItem
@@ -110,6 +126,12 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout {
 
 		setShellFadeOutDelaySteps(10);
 		setTitleText("Geo Compare Options");
+	}
+
+	@Override
+	public void colorDialogOpened(final boolean isAnotherDialogOpened) {
+
+		setIsAnotherDialogOpened(isAnotherDialogOpened);
 	}
 
 	private void createActions() {
@@ -178,6 +200,7 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout {
 		{
 			createUI_30_Info(container);
 			createUI_40_Options(container);
+			createUI_50_MapOptions(container);
 		}
 	}
 
@@ -197,7 +220,7 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout {
 				 */
 				{
 					final Label label = new Label(container, SWT.NONE);
-					label.setText("Possible tours"); //$NON-NLS-1$
+					label.setText("Possible tours");
 
 					_firstColumnControls.add(label);
 				}
@@ -217,7 +240,7 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout {
 				 */
 				{
 					final Label label = new Label(container, SWT.NONE);
-					label.setText("Geo grid items"); //$NON-NLS-1$
+					label.setText("Geo grid items");
 
 					_firstColumnControls.add(label);
 				}
@@ -233,7 +256,7 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout {
 				 */
 				{
 					final Label label = new Label(container, SWT.NONE);
-					label.setText("Time slices"); //$NON-NLS-1$
+					label.setText("Time slices");
 
 					_firstColumnControls.add(label);
 				}
@@ -266,7 +289,7 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout {
 				 */
 				{
 					final Label label = new Label(container, SWT.NONE);
-					label.setText("Distance"); //$NON-NLS-1$
+					label.setText("Distance");
 
 					_firstColumnControls.add(label);
 				}
@@ -368,6 +391,78 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout {
 		}
 	}
 
+	private void createUI_50_MapOptions(final Composite parent) {
+
+		final Group group = new Group(parent, SWT.NONE);
+		group.setText("Map Options for the Reference Tour");
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
+
+		_firstColumnContainerControls.add(group);
+
+		{
+			{
+				/*
+				 * Ref tour line width
+				 */
+				{
+					// label
+					final Label label = new Label(group, SWT.NONE);
+					label.setText("Line width");
+
+					_firstColumnControls.add(label);
+				}
+				{
+					// spinner
+					_spinnerMapOption_LineWidth = new Spinner(group, SWT.BORDER);
+					_spinnerMapOption_LineWidth.setMinimum(1);
+					_spinnerMapOption_LineWidth.setMaximum(100);
+					_spinnerMapOption_LineWidth.setPageIncrement(5);
+					_spinnerMapOption_LineWidth.addSelectionListener(_mapOptions_SelectionListener);
+					_spinnerMapOption_LineWidth.addMouseWheelListener(_mapOptions_MouseWheelListener);
+
+					_secondColumnControls.add(_spinnerMapOption_LineWidth);
+				}
+			}
+			{
+				/*
+				 * Ref tour in map
+				 */
+				{
+					// label
+					final Label label = new Label(group, SWT.NONE);
+					label.setText("Reference tour");
+
+					_firstColumnControls.add(label);
+				}
+				{
+					// color
+					_colorMapOption_RefTour = new ColorSelectorExtended(group);
+					_colorMapOption_RefTour.addListener(_mapOptions_PropertyListener);
+					_colorMapOption_RefTour.addOpenListener(this);
+				}
+			}
+			{
+				/*
+				 * Compared tour part in map
+				 */
+				{
+					// label
+					final Label label = new Label(group, SWT.NONE);
+					label.setText("Compared tour part");
+
+					_firstColumnControls.add(label);
+				}
+				{
+					// color
+					_colorMapOption_ComparedTourPart = new ColorSelectorExtended(group);
+					_colorMapOption_ComparedTourPart.addListener(_mapOptions_PropertyListener);
+					_colorMapOption_ComparedTourPart.addOpenListener(this);
+				}
+			}
+		}
+	}
+
 	private void createUI_90_Actions(final Composite parent) {
 
 		final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
@@ -425,6 +520,28 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout {
 				onChange_CompareParameter();
 			}
 		};
+
+		_mapOptions_SelectionListener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				onChange_MapOptions();
+			}
+		};
+
+		_mapOptions_MouseWheelListener = new MouseWheelListener() {
+			@Override
+			public void mouseScrolled(final MouseEvent event) {
+				UI.adjustSpinnerValueOnMouseScroll(event);
+				onChange_MapOptions();
+			}
+		};
+
+		_mapOptions_PropertyListener = new IPropertyChangeListener() {
+			@Override
+			public void propertyChange(final PropertyChangeEvent event) {
+				onChange_MapOptions();
+			}
+		};
 	}
 
 	private void onChange_CompareParameter() {
@@ -434,6 +551,26 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout {
 		updateUI_GeoAccuracy();
 
 		_geoCompareView.onChange_CompareParameter();
+	}
+
+	private void onChange_MapOptions() {
+
+		_prefStore.setValue(
+				ITourbookPreferences.GEO_COMPARE_REF_TOUR_LINE_WIDTH, //
+				_spinnerMapOption_LineWidth.getSelection());
+
+		PreferenceConverter.setValue(
+				_prefStore,
+				ITourbookPreferences.GEO_COMPARE_REF_TOUR_RGB, //
+				_colorMapOption_RefTour.getColorValue());
+
+		PreferenceConverter.setValue(
+				_prefStore,
+				ITourbookPreferences.GEO_COMPARE_COMPARED_TOUR_PART_RGB, //
+				_colorMapOption_ComparedTourPart.getColorValue());
+
+		// force repainting
+		TourbookPlugin.getPrefStore().setValue(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED, Math.random());
 	}
 
 	private void onDisposeSlideout() {
@@ -455,7 +592,24 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout {
 		_spinnerDistanceInterval.setSelection(GeoCompareView.DEFAULT_DISTANCE_INTERVAL);
 		_spinnerGeoAccuracy.setSelection(GeoCompareView.DEFAULT_GEO_ACCURACY);
 
+		/*
+		 * Map options
+		 */
+		_spinnerMapOption_LineWidth.setSelection(
+				_prefStore.getDefaultInt(ITourbookPreferences.GEO_COMPARE_REF_TOUR_LINE_WIDTH));
+
+		_colorMapOption_RefTour.setColorValue(
+				PreferenceConverter.getDefaultColor(
+						_prefStore,
+						ITourbookPreferences.GEO_COMPARE_REF_TOUR_RGB));
+
+		_colorMapOption_ComparedTourPart.setColorValue(
+				PreferenceConverter.getDefaultColor(
+						_prefStore,
+						ITourbookPreferences.GEO_COMPARE_COMPARED_TOUR_PART_RGB));
+
 		onChange_CompareParameter();
+		onChange_MapOptions();
 	}
 
 	private void restoreState() {
@@ -472,6 +626,18 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout {
 						_state,
 						GeoCompareView.STATE_DISTANCE_INTERVAL,
 						GeoCompareView.DEFAULT_DISTANCE_INTERVAL));
+
+		/*
+		 * Map options
+		 */
+		_spinnerMapOption_LineWidth.setSelection(
+				_prefStore.getInt(ITourbookPreferences.GEO_COMPARE_REF_TOUR_LINE_WIDTH));
+
+		_colorMapOption_RefTour.setColorValue(
+				PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GEO_COMPARE_REF_TOUR_RGB));
+
+		_colorMapOption_ComparedTourPart.setColorValue(
+				PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GEO_COMPARE_COMPARED_TOUR_PART_RGB));
 	}
 
 	private void saveStateSlideout() {

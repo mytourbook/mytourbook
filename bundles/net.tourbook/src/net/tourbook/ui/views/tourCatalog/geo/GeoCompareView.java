@@ -45,6 +45,10 @@ import net.tourbook.data.TourReference;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.SelectionDeletedTours;
+import net.tourbook.tour.SelectionTourData;
+import net.tourbook.tour.SelectionTourId;
+import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.filter.ActionToolbarSlideoutAdv;
@@ -514,6 +518,13 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 		TourManager.getInstance().addTourEventListener(_tourEventListener);
 	}
 
+	private void clearView() {
+
+		setState_StopComparing();
+
+		_pageBook.showPage(_pageNoData);
+	}
+
 	/**
 	 * Close all opened dialogs except the opening dialog.
 	 * 
@@ -553,9 +564,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 		final double[] latSerie = tourData.latitudeSerie;
 		if (latSerie == null) {
 
-			setState_StopComparing();
-
-			_pageBook.showPage(_pageNoData);
+			clearView();
 
 			return;
 		}
@@ -821,6 +830,47 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 		updateUI_HideFalsePositive();
 	}
 
+	/**
+	 * @param tourData
+	 * @return Returns <code>true</code> when tour comparing could be started, otherwise
+	 *         <code>false</code>
+	 */
+	private boolean compareWholeTour(final TourData tourData) {
+
+		if (tourData == null) {
+			return false;
+		}
+
+		// skip manual tours
+		if (tourData.isManualTour()) {
+			return false;
+		}
+
+		// compare the whole tour from 0 to max time slices
+		final int numTimeSlices = tourData.timeSerie.length - 1;
+		if (numTimeSlices < 1) {
+			return false;
+		}
+
+		/*
+		 * Convert real ref tour into a geo compare ref tour that the behaviour is the same, however
+		 * this will disable features in the tour compare chart but this is already very complex.
+		 */
+
+		final long geoCompareRefId = ReferenceTourManager.createGeoCompareRefTour(
+				tourData,
+				0,
+				numTimeSlices);
+
+		compare_10_Compare(
+				tourData,
+				0,
+				numTimeSlices,
+				geoCompareRefId);
+
+		return true;
+	}
+
 	private void createActions() {
 
 		_actionAppTourFilter = new ActionAppTourFilter();
@@ -852,6 +902,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
 		restoreState();
+
+		restoreSelection();
 
 		_pageBook.showPage(_pageNoData);
 	}
@@ -1519,6 +1571,10 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 
 	private void onSelectionChanged(final ISelection selection) {
 
+		if (selection == null) {
+			return;
+		}
+
 		final int selectionHash = selection.hashCode();
 		if (_lastSelectionHash == selectionHash) {
 
@@ -1625,6 +1681,38 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 
 			showRefTour(((SelectionTourCatalogView) selection).getRefId());
 
+		} else if (selection instanceof SelectionTourData) {
+
+			final SelectionTourData tourDataSelection = (SelectionTourData) selection;
+
+			final TourData selectionTourData = tourDataSelection.getTourData();
+
+			compareWholeTour(selectionTourData);
+
+		} else if (selection instanceof SelectionTourId) {
+
+			final SelectionTourId selectionTourId = (SelectionTourId) selection;
+			final Long tourId = selectionTourId.getTourId();
+
+			compareWholeTour(TourManager.getInstance().getTourData(tourId));
+
+		} else if (selection instanceof SelectionTourIds) {
+
+			// only 1 tour can be compared
+
+			final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+
+			if (tourIds != null) {
+
+				for (final Long tourId : tourIds) {
+
+					final TourData tourData = TourManager.getInstance().getTourData(tourId);
+					if (compareWholeTour(tourData)) {
+						break;
+					}
+				}
+			}
+
 		} else if (selection instanceof StructuredSelection) {
 
 			final Object firstElement = ((StructuredSelection) selection).getFirstElement();
@@ -1637,7 +1725,12 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 
 				showRefTour(((TVICompareResultComparedTour) firstElement).refTour.refId);
 			}
+
+		} else if (selection instanceof SelectionDeletedTours) {
+
+			clearView();
 		}
+
 	}
 
 	private void recompareTours() {
@@ -1669,6 +1762,47 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 	public void reloadViewer() {
 
 		updateUI_Viewer();
+	}
+
+	private void restoreSelection() {
+
+		// try to use selection from selection service
+		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
+
+		if (_compareData_TourData == null) {
+
+			_pageBook.showPage(_pageNoData);
+
+			// a tour is not displayed, find a tour provider which provides a tour
+			Display.getCurrent().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+
+					// validate widget
+					if (_pageBook.isDisposed()) {
+						return;
+					}
+
+					/*
+					 * check if tour was set from a selection provider
+					 */
+					if (_compareData_TourData != null) {
+						return;
+					}
+
+					final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
+					if (selectedTours != null && selectedTours.size() > 0) {
+
+						for (final TourData tourData : selectedTours) {
+
+							if (compareWholeTour(tourData)) {
+								break;
+							}
+						}
+					}
+				}
+			});
+		}
 	}
 
 	private void restoreState() {

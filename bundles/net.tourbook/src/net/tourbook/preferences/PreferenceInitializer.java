@@ -314,6 +314,14 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD, 	PrefPageMap2Appearance.TOUR_PAINT_METHOD_SIMPLE);
 		store.setDefault(ITourbookPreferences.MAP_LAYOUT_LIVE_UPDATE, true);
 
+
+		/*
+		 * Geo compare
+		 */
+		store.setDefault(ITourbookPreferences.GEO_COMPARE_REF_TOUR_LINE_WIDTH, 10);
+		PreferenceConverter.setDefault(store, ITourbookPreferences.GEO_COMPARE_REF_TOUR_RGB, 		new RGB(0x40, 0x0, 0x0));
+		PreferenceConverter.setDefault(store, ITourbookPreferences.GEO_COMPARE_COMPARED_TOUR_PART_RGB, 	new RGB(0xe0, 0x0, 0x0));
+
 		/*
 		 * tour data editor
 		 */

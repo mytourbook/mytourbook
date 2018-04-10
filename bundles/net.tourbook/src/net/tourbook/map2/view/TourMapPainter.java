@@ -89,23 +89,20 @@ public class TourMapPainter extends MapPainter {
 
 // SET_FORMATTING_OFF
 	
-	private static final Font				DEFAULT_FONT						= net.tourbook.common.UI.AWT_FONT_ARIAL_12;
+	private static final Font				DEFAULT_FONT		= net.tourbook.common.UI.AWT_FONT_ARIAL_12;
 	
 // SET_FORMATTING_ON
 
-	private static final int				MARKER_MARGIN						= 2;
-	private static final int				MARKER_POLE							= 16;
+	private static final int				MARKER_MARGIN		= 2;
+	private static final int				MARKER_POLE			= 16;
 
-	final static IPreferenceStore			_prefStore							= TourbookPlugin.getPrefStore();
+	final static IPreferenceStore			_prefStore			= TourbookPlugin.getPrefStore();
 
 	private static IPropertyChangeListener	_prefChangeListener;
 
 	private static float					_borderBrightness;
 
 	private static RGB						_prefBorderRGB;
-	private static RGB						_prefGeoCompare_RefTour_RGB			= new RGB(0x80, 0x80, 0x80);
-	private static RGB						_prefGeoCompare_RefTour_InPart_RGB	= new RGB(0xff, 0, 0);
-
 	private static int						_prefBorderType;
 	private static int						_prefBorderWidth;
 	private static boolean					_prefIsDrawLine;
@@ -113,8 +110,14 @@ public class TourMapPainter extends MapPainter {
 	private static boolean					_prefIsDrawSquare;
 	private static boolean					_prefIsWithBorder;
 	private static int						_prefLineWidth;
-	private static boolean					_isImageAvailable					= false;
+
+	private static int						_prefGeoCompare_LineWidth;
+	private static RGB						_prefGeoCompare_RefTour_RGB;
+	private static RGB						_prefGeoCompare_CompartTourPart_RGB;
+
+	private static boolean					_isImageAvailable	= false;
 	private static boolean					_isErrorLogged;
+
 	/**
 	 * Tour start/end image
 	 */
@@ -124,7 +127,7 @@ public class TourMapPainter extends MapPainter {
 	private static Rectangle				_twpImageBounds;
 	private static TourPainterConfiguration	_tourPaintConfig;
 
-	private final static NumberFormat		_nf1								= NumberFormat.getNumberInstance();
+	private final static NumberFormat		_nf1				= NumberFormat.getNumberInstance();
 
 	/*
 	 * UI resources
@@ -135,7 +138,8 @@ public class TourMapPainter extends MapPainter {
 	 * Tour Way Point image
 	 */
 	private static Image					_twpImage;
-	private final static ColorCacheSWT		_colorCache							= new ColorCacheSWT();
+
+	private final static ColorCacheSWT		_colorCache			= new ColorCacheSWT();
 
 	private float[]							_dataSerie;
 	private IMapColorProvider				_legendProvider;
@@ -830,6 +834,19 @@ public class TourMapPainter extends MapPainter {
 
 		final int prefBorderDimmValue = _prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_BORDER_DIMM_VALUE);
 		_borderBrightness = (float) (1.0 - prefBorderDimmValue / 100.0);
+
+		/*
+		 * Geo compare
+		 */
+		_prefGeoCompare_LineWidth = _prefStore.getInt(ITourbookPreferences.GEO_COMPARE_REF_TOUR_LINE_WIDTH);
+
+		_prefGeoCompare_RefTour_RGB = PreferenceConverter.getColor(
+				_prefStore,
+				ITourbookPreferences.GEO_COMPARE_REF_TOUR_RGB);
+
+		_prefGeoCompare_CompartTourPart_RGB = PreferenceConverter.getColor(
+				_prefStore,
+				ITourbookPreferences.GEO_COMPARE_COMPARED_TOUR_PART_RGB);
 	}
 
 	private static void init() {
@@ -1454,7 +1471,7 @@ public class TourMapPainter extends MapPainter {
 
 				// draw more visible
 
-				_lineWidth += 4;
+				_lineWidth = _prefGeoCompare_LineWidth;
 			}
 
 			_lineWidth2 = _lineWidth / 2;
@@ -1989,7 +2006,7 @@ public class TourMapPainter extends MapPainter {
 		if (isGeoCompareRefTour) {
 
 			return _colorCache.getColor(
-					isInRefTourPart ? _prefGeoCompare_RefTour_InPart_RGB : _prefGeoCompare_RefTour_RGB);
+					isInRefTourPart ? _prefGeoCompare_CompartTourPart_RGB : _prefGeoCompare_RefTour_RGB);
 		}
 
 		/*
