@@ -304,10 +304,10 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		 * map
 		 */
 		store.setDefault(ITourbookPreferences.MAP_LAYOUT_PLOT_TYPE, PrefPageMap2Appearance.DEFAULT_PLOT_TYPE);
-		store.setDefault(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH, 6);
-		store.setDefault(ITourbookPreferences.MAP_LAYOUT_PAINT_WITH_BORDER, true);
-		store.setDefault(ITourbookPreferences.MAP_LAYOUT_BORDER_WIDTH, 1);
-		store.setDefault(ITourbookPreferences.MAP_LAYOUT_BORDER_DIMM_VALUE, 80); // 0...100
+		store.setDefault(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH,			6);
+		store.setDefault(ITourbookPreferences.MAP_LAYOUT_PAINT_WITH_BORDER,		true);
+		store.setDefault(ITourbookPreferences.MAP_LAYOUT_BORDER_WIDTH,			1);
+		store.setDefault(ITourbookPreferences.MAP_LAYOUT_BORDER_DIMM_VALUE,		80); // 0...100
 
 		PreferenceConverter.setDefault(store, ITourbookPreferences.MAP_LAYOUT_BORDER_COLOR, 	new RGB(0x50, 0x50, 0x50));
 		PreferenceConverter.setDefault(store, ITourbookPreferences.MAP_LAYOUT_MAP_DIMM_COLOR, 	new RGB(0x00, 0x00, 0x00));
@@ -318,9 +318,9 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		/*
 		 * Geo compare
 		 */
-		store.setDefault(ITourbookPreferences.GEO_COMPARE_REF_TOUR_LINE_WIDTH, 10);
-		PreferenceConverter.setDefault(store, ITourbookPreferences.GEO_COMPARE_REF_TOUR_RGB, 		new RGB(0x40, 0x0, 0x0));
-		PreferenceConverter.setDefault(store, ITourbookPreferences.GEO_COMPARE_COMPARED_TOUR_PART_RGB, 	new RGB(0xe0, 0x0, 0x0));
+		store.setDefault(ITourbookPreferences.GEO_COMPARE_REF_TOUR_LINE_WIDTH, 20);
+		PreferenceConverter.setDefault(store, ITourbookPreferences.GEO_COMPARE_REF_TOUR_RGB, 			new RGB(0xff, 0xff, 0xff));
+		PreferenceConverter.setDefault(store, ITourbookPreferences.GEO_COMPARE_COMPARED_TOUR_PART_RGB, 	new RGB(0xff, 0x0, 0x0));
 
 		/*
 		 * tour data editor

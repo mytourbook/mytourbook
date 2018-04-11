@@ -64,6 +64,11 @@ public class GeoPartItem {
 	 */
 	long							sqlRunningTime;
 
+	/**
+	 * 
+	 */
+	boolean							isReselectedInUI;
+
 	@SuppressWarnings("unused")
 	private GeoPartItem() {}
 

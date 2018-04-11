@@ -169,6 +169,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 	 */
 	private ArrayList<GeoPartComparerItem>	_comparedTours					= new ArrayList<>();
 
+	private GeoPartComparerItem				_selectedComparerItem;
+
 	private int								_compareData_NumGeoPartTours;
 	private TourData						_compareData_TourData;
 	private long							_compareData_TourId				= Long.MIN_VALUE;
@@ -777,6 +779,23 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 			return;
 		}
 
+		// get previous selected item
+		final GeoPartComparerItem[] reselectedItem = { null };
+		if (geoPartItem.isReselectedInUI == false) {
+
+			geoPartItem.isReselectedInUI = true;
+
+			if (_selectedComparerItem != null) {
+
+				for (final GeoPartComparerItem reselectComparerItem : _comparedTours) {
+
+					if (reselectComparerItem.tourId == _selectedComparerItem.tourId) {
+						reselectedItem[0] = reselectComparerItem;
+					}
+				}
+			}
+		}
+
 		// reset paused time
 		_lastUIUpdate = now;
 
@@ -801,6 +820,29 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 				}
 
 				updateUI_Viewer();
+
+				// reselect previous selection
+				if (reselectedItem[0] != null) {
+
+					_geoPartViewer.setSelection(new StructuredSelection(reselectedItem), true);
+					_geoPartViewer.getTable().showSelection();
+
+//					// focus can have changed when resorted, set focus to the selected item
+//					int selectedIndex = 0;
+//					final Table table = _profileViewer.getTable();
+//					final TableItem[] items = table.getItems();
+//					for (int itemIndex = 0; itemIndex < items.length; itemIndex++) {
+//
+//						final TableItem tableItem = items[itemIndex];
+//
+//						if (tableItem.getData() == selectedProfile) {
+//							selectedIndex = itemIndex;
+//						}
+//					}
+//					table.setSelection(selectedIndex);
+//					table.showSelection();
+
+				}
 			}
 
 		});
@@ -826,6 +868,13 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 				_maxMinDiff = comparerItem.minDiffValue;
 			}
 		}
+
+		// make shure the selection is visible
+//		if (_selectedComparerItem != null) {
+//
+////			_geoPartViewer.setSelection(new StructuredSelection(_selectedComparerItem), true);
+		_geoPartViewer.getTable().showSelection();
+//		}
 
 		updateUI_HideFalsePositive();
 	}
@@ -1057,7 +1106,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 
 			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
-				fireSelection(event.getSelection());
+				onSelect_ComparerItem(event);
 			}
 		});
 
@@ -1553,6 +1602,16 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 		}
 	}
 
+	private void onSelect_ComparerItem(final SelectionChangedEvent event) {
+
+		final ISelection selection = event.getSelection();
+		final Object firstElement = ((StructuredSelection) selection).getFirstElement();
+
+		_selectedComparerItem = (GeoPartComparerItem) firstElement;
+
+		fireSelection(selection);
+	}
+
 	private void onSelect_SortColumn(final SelectionEvent e) {
 
 		_viewerContainer.setRedraw(false);
@@ -1736,6 +1795,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 	private void recompareTours() {
 
 		if (_compareData_GeoGrid != null && _isCompareEnabled) {
+
 			compare_30_StartComparing();
 		}
 	}
@@ -1937,8 +1997,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 		{
 			_geoPartViewer.setSelection(selection, true);
 
-			final Table table = _geoPartViewer.getTable();
-			table.showSelection();
+			_geoPartViewer.getTable().showSelection();
 		}
 		_isInUpdate = false;
 	}
