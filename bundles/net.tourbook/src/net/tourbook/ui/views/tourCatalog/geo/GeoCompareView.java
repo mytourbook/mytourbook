@@ -596,15 +596,15 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 		}
 
 		/*
+		 * Keep index AFTER checking otherwise wrong values are used in the runnable !!!
+		 */
+		final int compareFirstIndex = firstIndex;
+		final int compareLastIndex = lastIndex;
+
+		/*
 		 * New data should be compared
 		 */
 		GeoPartTourLoader.stopLoading(_compareData_PreviousGeoPartItem);
-
-		_compareData_TourId = tourId;
-		_compareData_TourData = tourData;
-		_compareData_RefId = refId;
-		_compareData_FirstIndex = firstIndex;
-		_compareData_LastIndex = lastIndex;
 
 		updateUI_GeoItem(null);
 
@@ -620,12 +620,20 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 					return;
 				}
 
-				if (__runningId != _runningId.get()) {
+				final int currentId = _runningId.get();
+
+				if (__runningId != currentId) {
 
 					// a newer runnable is created
 
 					return;
 				}
+
+				_compareData_TourId = tourId;
+				_compareData_TourData = tourData;
+				_compareData_RefId = refId;
+				_compareData_FirstIndex = compareFirstIndex;
+				_compareData_LastIndex = compareLastIndex;
 
 				compare_20_SetupComparing();
 			}
