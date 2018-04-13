@@ -50,6 +50,7 @@ import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
+import net.tourbook.ui.views.tourCatalog.geo.GeoPartComparerItem;
 import net.tourbook.ui.views.tourSegmenter.TourSegmenterView;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -614,24 +615,13 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 				if (chartDataModel != null) {
 
-					final Object tourId = chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
-					if (tourId instanceof Long) {
+					final Object chartTourId = chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
+					if (chartTourId instanceof Long) {
 
-						final TourData tourData = TourManager.getInstance().getTourData((Long) tourId);
-						if (tourData != null) {
-
-							if (_tourData == null || _tourData.equals(tourData) == false) {
-								updateChart(tourData);
-							}
-
-							// set slider position
-							final SelectionChartXSliderPosition xSliderPosition = new SelectionChartXSliderPosition(
-									_tourChart,
-									chartInfo.leftSliderValuesIndex,
-									chartInfo.rightSliderValuesIndex);
-
-							_tourChart.selectXSliders(xSliderPosition);
-						}
+						updateChart(
+								(Long) chartTourId,
+								chartInfo.leftSliderValuesIndex,
+								chartInfo.rightSliderValuesIndex);
 					}
 				}
 
@@ -662,6 +652,15 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 				_tourChart.selectXSliders(xSliderPosition);
 
+			} else if (selection instanceof SelectionTourCatalogView) {
+
+				final SelectionTourCatalogView tourCatalogSelection = (SelectionTourCatalogView) selection;
+
+				final TVICatalogRefTourItem refItem = tourCatalogSelection.getRefItem();
+				if (refItem != null) {
+					updateChart(refItem.getTourId());
+				}
+
 			} else if (selection instanceof StructuredSelection) {
 
 				final Object firstElement = ((StructuredSelection) selection).getFirstElement();
@@ -675,15 +674,16 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 					final TourData tourData = TourManager.getInstance().getTourData(
 							compareResultItem.getComparedTourData().getTourId());
 					updateChart(tourData);
-				}
 
-			} else if (selection instanceof SelectionTourCatalogView) {
+				} else if (firstElement instanceof GeoPartComparerItem) {
 
-				final SelectionTourCatalogView tourCatalogSelection = (SelectionTourCatalogView) selection;
+					final GeoPartComparerItem geoCompareItem = (GeoPartComparerItem) firstElement;
 
-				final TVICatalogRefTourItem refItem = tourCatalogSelection.getRefItem();
-				if (refItem != null) {
-					updateChart(refItem.getTourId());
+					updateChart(
+							geoCompareItem.tourId,
+							geoCompareItem.tourFirstIndex,
+							geoCompareItem.tourLastIndex);
+
 				}
 
 			} else if (selection instanceof SelectionDeletedTours) {
@@ -874,6 +874,27 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 		updateChart(tourData);
 
 		fireSliderPosition();
+	}
+
+	private void updateChart(final long tourId, final int leftSliderValuesIndex, final int rightSliderValuesIndex) {
+
+		final TourData tourData = TourManager.getInstance().getTourData(tourId);
+		if (tourData != null) {
+
+			if (_tourData == null || _tourData.equals(tourData) == false) {
+				updateChart(tourData);
+			}
+
+			// set slider position
+			final SelectionChartXSliderPosition xSliderPosition = new SelectionChartXSliderPosition(
+					_tourChart,
+					leftSliderValuesIndex,
+					rightSliderValuesIndex);
+
+			xSliderPosition.setCenterSliderPosition(true);
+
+			_tourChart.selectXSliders(xSliderPosition);
+		}
 	}
 
 	private void updateChart(final TourData tourData) {

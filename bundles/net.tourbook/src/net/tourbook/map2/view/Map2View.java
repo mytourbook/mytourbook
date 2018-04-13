@@ -2081,13 +2081,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 				_allTourData.clear();
 
-				/*
-				 * Do not draw the same tour twice, this occures when the compared tour is also the
-				 * geo compare ref tour
-				 */
-//				if (refTourData != comparedTourData) {
-//				}
-
 				_allTourData.add(refTourData);
 				_allTourData.add(comparedTourData);
 
