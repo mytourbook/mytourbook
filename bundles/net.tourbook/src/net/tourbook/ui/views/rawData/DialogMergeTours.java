@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -572,6 +572,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 		shell.setText(Messages.tour_merger_dialog_title);
 
 		shell.addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(final DisposeEvent e) {
 				onDispose();
 			}
@@ -625,6 +626,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
 	}
 
+	@Override
 	public ChartLayer2ndAltiSerie create2ndAltiLayer() {
 
 		if (_targetTour == null) {
@@ -827,6 +829,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 			}
 		});
 		_scaleAdjustSeconds.addListener(SWT.MouseDoubleClick, new Listener() {
+			@Override
 			public void handleEvent(final Event event) {
 				onScaleDoubleClick(event.widget);
 			}
@@ -860,6 +863,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 			}
 		});
 		_scaleAdjustMinutes.addListener(SWT.MouseDoubleClick, new Listener() {
+			@Override
 			public void handleEvent(final Event event) {
 				onScaleDoubleClick(event.widget);
 			}
@@ -902,6 +906,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 			}
 		});
 		_scaleAltitude1.addListener(SWT.MouseDoubleClick, new Listener() {
+			@Override
 			public void handleEvent(final Event event) {
 				onScaleDoubleClick(event.widget);
 			}
@@ -928,6 +933,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 			}
 		});
 		_scaleAltitude10.addListener(SWT.MouseDoubleClick, new Listener() {
+			@Override
 			public void handleEvent(final Event event) {
 				onScaleDoubleClick(event.widget);
 			}
@@ -1279,6 +1285,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
 			public void menuAboutToShow(final IMenuManager menuMgr) {
 
 				// set menu items
@@ -1317,7 +1324,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
 	private void createUITourChart(final Composite dlgContainer) {
 
-		_tourChart = new TourChart(dlgContainer, SWT.BORDER, null);
+		_tourChart = new TourChart(dlgContainer, SWT.BORDER, null, _dialogSettings);
 		GridDataFactory.fillDefaults().grab(true, true).minSize(300, 200).applyTo(_tourChart);
 
 		_tourChart.setShowZoomActions(true);
@@ -1350,6 +1357,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
 		_tourChart.addDataModelListener(new IDataModelListener() {
 
+			@Override
 			public void dataModelChanged(final ChartDataModel changedChartDataModel) {
 
 				// set title
@@ -1358,6 +1366,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 		});
 
 		_tourChart.addSliderMoveListener(new ISliderMoveListener() {
+			@Override
 			public void sliderMoved(final SelectionChartInfo chartInfo) {
 
 				if (_isChartUpdated) {
@@ -1511,6 +1520,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 		return minutes * 60 + seconds;
 	}
 
+	@Override
 	public ArrayList<TourData> getSelectedTours() {
 
 		final ArrayList<TourData> selectedTours = new ArrayList<TourData>();
@@ -1834,6 +1844,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 		}
 	}
 
+	@Override
 	public void toursAreModified(final ArrayList<TourData> modifiedTours) {
 
 		// tour type was modified

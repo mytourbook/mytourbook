@@ -1,0 +1,15 @@
+Version 18.5.0                                             ?. May 2018
+
+
+New
+===	
+
+* Geo compare
+
+
+
+Improvements
+============
+
+* Customize tour chart graph actions
+ 

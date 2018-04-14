@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1230,7 +1230,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 	 */
 	private void createUI_80_TourChart(final Composite parent) {
 
-		_tourChart = new TourChart(parent, SWT.FLAT /* | SWT.BORDER */, null);
+		_tourChart = new TourChart(parent, SWT.FLAT /* | SWT.BORDER */, null, _state);
 		GridDataFactory.fillDefaults()//
 				.grab(true, true)
 				.hint(_pc.convertWidthInCharsToPixels(90), _pc.convertHeightInCharsToPixels(40))

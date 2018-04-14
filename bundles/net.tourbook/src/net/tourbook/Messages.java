@@ -835,6 +835,8 @@ public class Messages extends NLS {
 	public static String		Image__graph_cadence_disabled;
 	public static String		Image__graph_gradient_disabled;
 	public static String		Image__graph_heartbeat_disabled;
+	public static String		Image__Graph;
+	public static String		Image__Graph_Disabled;
 	public static String		Image__Graph_Gears;
 	public static String		Image__Graph_Gears_disabled;
 	public static String		Image__Graph_Overlapped;
@@ -1859,6 +1861,9 @@ public class Messages extends NLS {
 	public static String		Slideout_SegmenterOptions_Label_Totals;
 
 	public static String		Slideout_StatisticOptions_Label_Title;
+
+	public static String		Slideout_TourChartGraph_Checkbox_ShowInChartToolbar_Tooltip;
+	public static String		Slideout_TourChartGraph_Label_Title;
 
 	public static String		Slideout_TourChartOptions_Label_Title;
 

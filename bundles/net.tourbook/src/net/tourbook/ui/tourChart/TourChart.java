@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -92,6 +92,7 @@ import net.tourbook.ui.views.tourSegmenter.TourSegmenterView;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -130,51 +131,105 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 // SET_FORMATTING_OFF
 	
-	private static final String		ID										= "net.tourbook.ui.tourChart";			//$NON-NLS-1$
+	private static final String	ID										= "net.tourbook.ui.tourChart";			//$NON-NLS-1$
 	//
-	private static final int		PAGE_NAVIGATION_SEGMENTS				= 10;
+	private static final int	PAGE_NAVIGATION_SEGMENTS				= 10;
 	//
-	private static final String		GRAPH_LABEL_ALTIMETER					= net.tourbook.common.Messages.Graph_Label_Altimeter;
-	private static final String		GRAPH_LABEL_ALTITUDE					= net.tourbook.common.Messages.Graph_Label_Altitude;
-	private static final String		GRAPH_LABEL_CADENCE						= net.tourbook.common.Messages.Graph_Label_Cadence;
-	private static final String		GRAPH_LABEL_GEARS						= net.tourbook.common.Messages.Graph_Label_Gears;
-	private static final String		GRAPH_LABEL_GRADIENT					= net.tourbook.common.Messages.Graph_Label_Gradient;
-	private static final String		GRAPH_LABEL_HEARTBEAT					= net.tourbook.common.Messages.Graph_Label_Heartbeat;
-	private static final String		GRAPH_LABEL_PACE						= net.tourbook.common.Messages.Graph_Label_Pace;
-	private static final String		GRAPH_LABEL_POWER						= net.tourbook.common.Messages.Graph_Label_Power;
-	private static final String		GRAPH_LABEL_SPEED						= net.tourbook.common.Messages.Graph_Label_Speed;
-	private static final String		GRAPH_LABEL_TEMPERATURE					= net.tourbook.common.Messages.Graph_Label_Temperature;
-	private static final String		GRAPH_LABEL_TOUR_COMPARE				= net.tourbook.common.Messages.Graph_Label_Tour_Compare;
+	private static final String	GRAPH_LABEL_ALTIMETER					= net.tourbook.common.Messages.Graph_Label_Altimeter;
+	private static final String	GRAPH_LABEL_ALTITUDE					= net.tourbook.common.Messages.Graph_Label_Altitude;
+	private static final String	GRAPH_LABEL_CADENCE						= net.tourbook.common.Messages.Graph_Label_Cadence;
+	private static final String	GRAPH_LABEL_GEARS						= net.tourbook.common.Messages.Graph_Label_Gears;
+	private static final String	GRAPH_LABEL_GRADIENT					= net.tourbook.common.Messages.Graph_Label_Gradient;
+	private static final String	GRAPH_LABEL_HEARTBEAT					= net.tourbook.common.Messages.Graph_Label_Heartbeat;
+	private static final String	GRAPH_LABEL_PACE						= net.tourbook.common.Messages.Graph_Label_Pace;
+	private static final String	GRAPH_LABEL_POWER						= net.tourbook.common.Messages.Graph_Label_Power;
+	private static final String	GRAPH_LABEL_SPEED						= net.tourbook.common.Messages.Graph_Label_Speed;
+	private static final String	GRAPH_LABEL_TEMPERATURE					= net.tourbook.common.Messages.Graph_Label_Temperature;
+	private static final String	GRAPH_LABEL_TOUR_COMPARE				= net.tourbook.common.Messages.Graph_Label_Tour_Compare;
 	//
-	public static final String		ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER		= "ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER";					//$NON-NLS-1$
-	public static final String		ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED	= "ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED";				//$NON-NLS-1$
-	public static final String		ACTION_ID_EDIT_CHART_PREFERENCES		= "ACTION_ID_EDIT_CHART_PREFERENCES";					//$NON-NLS-1$
-	private static final String		ACTION_ID_IS_GRAPH_OVERLAPPED			= "ACTION_ID_IS_GRAPH_OVERLAPPED";		//$NON-NLS-1$
-	public static final String		ACTION_ID_IS_SHOW_TOUR_PHOTOS			= "ACTION_ID_IS_SHOW_TOUR_PHOTOS";		//$NON-NLS-1$
-	public static final String		ACTION_ID_HR_ZONE_DROPDOWN_MENU			= "ACTION_ID_HR_ZONE_DROPDOWN_MENU";	//$NON-NLS-1$
-	public static final String		ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP		= "ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP";					//$NON-NLS-1$
-	public static final String		ACTION_ID_HR_ZONE_STYLE_NO_GRADIENT		= "ACTION_ID_HR_ZONE_STYLE_NO_GRADIENT";				//$NON-NLS-1$
-	public static final String		ACTION_ID_HR_ZONE_STYLE_WHITE_BOTTOM	= "ACTION_ID_HR_ZONE_STYLE_WHITE_BOTTOM";				//$NON-NLS-1$
-	public static final String		ACTION_ID_HR_ZONE_STYLE_WHITE_TOP		= "ACTION_ID_HR_ZONE_STYLE_WHITE_TOP";					//$NON-NLS-1$
-	public static final String		ACTION_ID_X_AXIS_DISTANCE				= "ACTION_ID_X_AXIS_DISTANCE";			//$NON-NLS-1$
-	public static final String		ACTION_ID_X_AXIS_TIME					= "ACTION_ID_X_AXIS_TIME";				//$NON-NLS-1$
+	public static final String	ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER		= "ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER";			//$NON-NLS-1$
+	public static final String	ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED	= "ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED";		//$NON-NLS-1$
+	public static final String	ACTION_ID_EDIT_CHART_PREFERENCES		= "ACTION_ID_EDIT_CHART_PREFERENCES";			//$NON-NLS-1$
+	private static final String	ACTION_ID_IS_GRAPH_OVERLAPPED			= "ACTION_ID_IS_GRAPH_OVERLAPPED";				//$NON-NLS-1$
+	public static final String	ACTION_ID_IS_SHOW_TOUR_PHOTOS			= "ACTION_ID_IS_SHOW_TOUR_PHOTOS";				//$NON-NLS-1$
+	public static final String	ACTION_ID_HR_ZONE_DROPDOWN_MENU			= "ACTION_ID_HR_ZONE_DROPDOWN_MENU";			//$NON-NLS-1$
+	public static final String	ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP		= "ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP";			//$NON-NLS-1$
+	public static final String	ACTION_ID_HR_ZONE_STYLE_NO_GRADIENT		= "ACTION_ID_HR_ZONE_STYLE_NO_GRADIENT";		//$NON-NLS-1$
+	public static final String	ACTION_ID_HR_ZONE_STYLE_WHITE_BOTTOM	= "ACTION_ID_HR_ZONE_STYLE_WHITE_BOTTOM";		//$NON-NLS-1$
+	public static final String	ACTION_ID_HR_ZONE_STYLE_WHITE_TOP		= "ACTION_ID_HR_ZONE_STYLE_WHITE_TOP";			//$NON-NLS-1$
+	public static final String	ACTION_ID_X_AXIS_DISTANCE				= "ACTION_ID_X_AXIS_DISTANCE";					//$NON-NLS-1$
+	public static final String	ACTION_ID_X_AXIS_TIME					= "ACTION_ID_X_AXIS_TIME";						//$NON-NLS-1$
 	//
-	private static final String		GRID_PREF_PREFIX						= "GRID_TOUR_CHART__";					//$NON-NLS-1$
-	private static final String		GRID_IS_SHOW_VERTICAL_GRIDLINES			= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
-	private static final String		GRID_IS_SHOW_HORIZONTAL_GRIDLINES		= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
-	private static final String		GRID_VERTICAL_DISTANCE					= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
-	private static final String		GRID_HORIZONTAL_DISTANCE				= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
+	private static final String	GRID_PREF_PREFIX						= "GRID_TOUR_CHART__";							//$NON-NLS-1$
+	private static final String	GRID_IS_SHOW_VERTICAL_GRIDLINES			= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
+	private static final String	GRID_IS_SHOW_HORIZONTAL_GRIDLINES		= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
+	private static final String	GRID_VERTICAL_DISTANCE					= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
+	private static final String	GRID_HORIZONTAL_DISTANCE				= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
+	
+	static final String		STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE				= "STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE";		//$NON-NLS-1$
+	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER			= "STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER"; 		//$NON-NLS-1$
+	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_CADENCE				= "STATE_IS_SHOW_IN_CHART_TOOLBAR_CADENCE"; 		//$NON-NLS-1$
+	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS				= "STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS"; 			//$NON-NLS-1$
+	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT				= "STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT"; 		//$NON-NLS-1$
+	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE 				= "STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE"; 			//$NON-NLS-1$
+	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER 				= "STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER"; 			//$NON-NLS-1$
+	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE 				= "STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE"; 			//$NON-NLS-1$
+	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED 				= "STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED"; 			//$NON-NLS-1$
+	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE			= "STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE";		//$NON-NLS-1$
+	
+	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE_DEFAULT		= true;
+	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER_DEFAULT	= false;
+	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_CADENCE_DEFAULT 		= false;
+	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS_DEFAULT 		= false;
+	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT_DEFAULT 	= false;
+	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_DEFAULT 		= false;
+	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER_DEFAULT 		= false;
+	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE_DEFAULT 		= true;
+	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_DEFAULT 		= true;
+	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE_DEFAULT 	= false;
+	
+	private static final String	GRAPH_CONTRIBUTION_ID_SLIDEOUT			= "GRAPH_CONTRIBUTION_ID_SLIDEOUT";			//$NON-NLS-1$
+	
+	private static final String GRAPH_CONTRIBUTION_ID_ALTIMETER 		= "GRAPH_CONTRIBUTION_ID_ALTIMETER";		//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_ALTITUDE			= "GRAPH_CONTRIBUTION_ID_ALTITUDE";			//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_CADENCE 			= "GRAPH_CONTRIBUTION_ID_CADENCE";			//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_GEARS 			= "GRAPH_CONTRIBUTION_ID_GEARS";			//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_GRADIENT 			= "GRAPH_CONTRIBUTION_ID_GRADIENT";			//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_PACE 				= "GRAPH_CONTRIBUTION_ID_PACE";				//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_POWER 			= "GRAPH_CONTRIBUTION_ID_POWER";			//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_PULSE 			= "GRAPH_CONTRIBUTION_ID_PULSE";			//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_SPEED				= "GRAPH_CONTRIBUTION_ID_SPEED";			//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_TEMPERATURE 		= "GRAPH_CONTRIBUTION_ID_TEMPERATURE";		//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_TOUR_COMPARE 		= "GRAPH_CONTRIBUTION_ID_TOUR_COMPARE";		//$NON-NLS-1$
 	
 //SET_FORMATTING_ON
+
+	private static final String[]	_allGraphContribId									= {
+
+			GRAPH_CONTRIBUTION_ID_ALTIMETER,
+			GRAPH_CONTRIBUTION_ID_ALTITUDE,
+			GRAPH_CONTRIBUTION_ID_CADENCE,
+			GRAPH_CONTRIBUTION_ID_GEARS,
+			GRAPH_CONTRIBUTION_ID_GRADIENT,
+			GRAPH_CONTRIBUTION_ID_PACE,
+			GRAPH_CONTRIBUTION_ID_POWER,
+			GRAPH_CONTRIBUTION_ID_PULSE,
+			GRAPH_CONTRIBUTION_ID_SPEED,
+			GRAPH_CONTRIBUTION_ID_TEMPERATURE,
+			GRAPH_CONTRIBUTION_ID_TOUR_COMPARE,
+	};
+
 	/**
 	 * 1e-5 is too small for the min value, it do not correct the graph.
 	 */
-	public static final double				MIN_ADJUSTMENT							= 1e-3;
-	public static final double				MAX_ADJUSTMENT							= 1e-5;
+	public static final double		MIN_ADJUSTMENT										= 1e-3;
+	public static final double		MAX_ADJUSTMENT										= 1e-5;
 	//
-	private final IPreferenceStore			_prefStore								= TourbookPlugin.getPrefStore();
-	private final IDialogSettings			_state									= TourbookPlugin.getState(ID);
-	private final IDialogSettings			_tourSegmenterState						= TourSegmenterView.getState();
+	{}
+	//
+	private final IDialogSettings			_state;
+	private final IPreferenceStore			_prefStore						= TourbookPlugin.getPrefStore();
+	private final IDialogSettings			_tourSegmenterState				= TourSegmenterView.getState();
 	//
 	/**
 	 * Part in which the tour chart is created, can be <code>null</code> when created in a dialog.
@@ -188,10 +243,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private ActionEditQuick					_actionEditQuick;
 	private ActionGraphMinMax				_actionGraphMinMax;
 	private ActionOpenMarkerDialog			_actionOpenMarkerDialog;
-	private ActionTourChartOptions			_actionTourChartOptions;
-	private ActionTourChartSmoothing		_actionTourChartSmoothing;
+	private ActionTourChartGraphs			_actionTourChartGraphs;
 	private ActionTourChartInfo				_actionTourInfo;
 	private ActionTourChartMarker			_actionTourMarker;
+	private ActionTourChartOptions			_actionTourChartOptions;
+	private ActionTourChartSmoothing		_actionTourChartSmoothing;
 	//
 	/**
 	 * datamodel listener is called when the chart data is created
@@ -199,10 +255,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private IDataModelListener				_chartDataModelListener;
 
 	private IPropertyChangeListener			_prefChangeListener;
-	private final ListenerList				_tourMarkerModifyListener				= new ListenerList();
-	private final ListenerList				_tourMarkerSelectionListener			= new ListenerList();
-	private final ListenerList				_tourModifyListener						= new ListenerList();
-	private final ListenerList				_xAxisSelectionListener					= new ListenerList();
+	private final ListenerList				_tourMarkerModifyListener		= new ListenerList();
+	private final ListenerList				_tourMarkerSelectionListener	= new ListenerList();
+	private final ListenerList				_tourModifyListener				= new ListenerList();
+	private final ListenerList				_xAxisSelectionListener			= new ListenerList();
 	//
 	private boolean							_is2ndAltiLayerVisible;
 	private boolean							_isDisplayedInDialog;
@@ -298,6 +354,28 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
 			return new SlideoutGraphMinMax(_parent, toolbar);
+		}
+
+		@Override
+		protected void onBeforeOpenSlideout() {
+			closeOpenedDialogs(this);
+		}
+	}
+
+	private class ActionTourChartGraphs extends ActionToolbarSlideout {
+
+		public ActionTourChartGraphs(	final ImageDescriptor imageDescriptor,
+										final ImageDescriptor imageDescriptorDisabled) {
+
+			super(imageDescriptor, imageDescriptorDisabled);
+
+			setId(GRAPH_CONTRIBUTION_ID_SLIDEOUT);
+		}
+
+		@Override
+		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+
+			return new SlideoutTourChartGraphs(_parent, toolbar, TourChart.this, _state);
 		}
 
 		@Override
@@ -606,13 +684,15 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	 * @param part
 	 *            Part in which the tour chart is created, can be <code>null</code> when created in
 	 *            a dialog.
+	 * @param state
 	 */
-	public TourChart(final Composite parent, final int style, final IWorkbenchPart part) {
+	public TourChart(final Composite parent, final int style, final IWorkbenchPart part, final IDialogSettings state) {
 
 		super(parent, style);
 
 		_parent = parent;
 		_part = part;
+		_state = state;
 
 //		/*
 //		 * when the focus is changed, fire a tour chart selection, this is neccesarry to update the
@@ -1291,6 +1371,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		 */
 		createActions_10_GraphActions();
 
+		_actionTourChartGraphs = new ActionTourChartGraphs(
+				TourbookPlugin.getImageDescriptor(Messages.Image__Graph),
+				TourbookPlugin.getImageDescriptor(Messages.Image__Graph_Disabled));
+
 		/*
 		 * other actions
 		 */
@@ -1369,77 +1453,88 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				GRAPH_LABEL_ALTITUDE,
 				Messages.Tour_Action_graph_altitude_tooltip,
 				Messages.Image__graph_altitude,
-				Messages.Image__graph_altitude_disabled);
+				Messages.Image__graph_altitude_disabled,
+				GRAPH_CONTRIBUTION_ID_ALTITUDE);
 
 		createActions_12_GraphAction(
 				TourManager.GRAPH_SPEED,
 				GRAPH_LABEL_SPEED,
 				Messages.Tour_Action_graph_speed_tooltip,
 				Messages.Image__graph_speed,
-				Messages.Image__graph_speed_disabled);
+				Messages.Image__graph_speed_disabled,
+				GRAPH_CONTRIBUTION_ID_SPEED);
 
 		createActions_12_GraphAction(
 				TourManager.GRAPH_PACE,
 				GRAPH_LABEL_PACE,
 				Messages.Tour_Action_graph_pace_tooltip,
 				Messages.Image__graph_pace,
-				Messages.Image__graph_pace_disabled);
+				Messages.Image__graph_pace_disabled,
+				GRAPH_CONTRIBUTION_ID_PACE);
 
 		createActions_12_GraphAction(
 				TourManager.GRAPH_POWER,
 				GRAPH_LABEL_POWER,
 				Messages.Tour_Action_graph_power_tooltip,
 				Messages.Image__graph_power,
-				Messages.Image__graph_power_disabled);
+				Messages.Image__graph_power_disabled,
+				GRAPH_CONTRIBUTION_ID_POWER);
 
 		createActions_12_GraphAction(
 				TourManager.GRAPH_ALTIMETER,
 				GRAPH_LABEL_ALTIMETER,
 				Messages.Tour_Action_graph_altimeter_tooltip,
 				Messages.Image__graph_altimeter,
-				Messages.Image__graph_altimeter_disabled);
+				Messages.Image__graph_altimeter_disabled,
+				GRAPH_CONTRIBUTION_ID_ALTIMETER);
 
 		createActions_12_GraphAction(
 				TourManager.GRAPH_PULSE,
 				GRAPH_LABEL_HEARTBEAT,
 				Messages.Tour_Action_graph_heartbeat_tooltip,
 				Messages.Image__graph_heartbeat,
-				Messages.Image__graph_heartbeat_disabled);
+				Messages.Image__graph_heartbeat_disabled,
+				GRAPH_CONTRIBUTION_ID_PULSE);
 
 		createActions_12_GraphAction(
 				TourManager.GRAPH_TEMPERATURE,
 				GRAPH_LABEL_TEMPERATURE,
 				Messages.Tour_Action_graph_temperature_tooltip,
 				Messages.Image__graph_temperature,
-				Messages.Image__graph_temperature_disabled);
+				Messages.Image__graph_temperature_disabled,
+				GRAPH_CONTRIBUTION_ID_TEMPERATURE);
 
 		createActions_12_GraphAction(
 				TourManager.GRAPH_CADENCE,
 				GRAPH_LABEL_CADENCE,
 				Messages.Tour_Action_graph_cadence_tooltip,
 				Messages.Image__graph_cadence,
-				Messages.Image__graph_cadence_disabled);
+				Messages.Image__graph_cadence_disabled,
+				GRAPH_CONTRIBUTION_ID_CADENCE);
 
 		createActions_12_GraphAction(
 				TourManager.GRAPH_GEARS,
 				GRAPH_LABEL_GEARS,
 				Messages.Tour_Action_GraphGears,
 				Messages.Image__Graph_Gears,
-				Messages.Image__Graph_Gears_disabled);
+				Messages.Image__Graph_Gears_disabled,
+				GRAPH_CONTRIBUTION_ID_GEARS);
 
 		createActions_12_GraphAction(
 				TourManager.GRAPH_GRADIENT,
 				GRAPH_LABEL_GRADIENT,
 				Messages.Tour_Action_graph_gradient_tooltip,
 				Messages.Image__graph_gradient,
-				Messages.Image__graph_gradient_disabled);
+				Messages.Image__graph_gradient_disabled,
+				GRAPH_CONTRIBUTION_ID_GRADIENT);
 
 		createActions_12_GraphAction(
 				TourManager.GRAPH_TOUR_COMPARE,
 				GRAPH_LABEL_TOUR_COMPARE,
 				Messages.Tour_Action_graph_tour_compare_tooltip,
 				Messages.Image__graph_tour_compare,
-				Messages.Image__graph_tour_compare_disabled);
+				Messages.Image__graph_tour_compare_disabled,
+				GRAPH_CONTRIBUTION_ID_TOUR_COMPARE);
 	}
 
 	/**
@@ -1450,14 +1545,18 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	 * @param toolTip
 	 * @param imageEnabled
 	 * @param imageDisabled
+	 * @param contributionId
 	 */
 	private void createActions_12_GraphAction(	final int graphId,
 												final String label,
 												final String toolTip,
 												final String imageEnabled,
-												final String imageDisabled) {
+												final String imageDisabled,
+												final String contributionId) {
 
 		final ActionGraph graphAction = new ActionGraph(this, graphId, label, toolTip, imageEnabled, imageDisabled);
+
+		graphAction.setId(contributionId);
 
 		_allTourChartActions.put(getGraphActionId(graphId), graphAction);
 	}
@@ -2489,16 +2588,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		}
 
 		tbm.add(new Separator());
-		tbm.add(_allTourChartActions.get(getGraphActionId(TourManager.GRAPH_ALTITUDE)));
-		tbm.add(_allTourChartActions.get(getGraphActionId(TourManager.GRAPH_PULSE)));
-		tbm.add(_allTourChartActions.get(getGraphActionId(TourManager.GRAPH_SPEED)));
-		tbm.add(_allTourChartActions.get(getGraphActionId(TourManager.GRAPH_PACE)));
-		tbm.add(_allTourChartActions.get(getGraphActionId(TourManager.GRAPH_POWER)));
-		tbm.add(_allTourChartActions.get(getGraphActionId(TourManager.GRAPH_TEMPERATURE)));
-		tbm.add(_allTourChartActions.get(getGraphActionId(TourManager.GRAPH_GRADIENT)));
-		tbm.add(_allTourChartActions.get(getGraphActionId(TourManager.GRAPH_ALTIMETER)));
-		tbm.add(_allTourChartActions.get(getGraphActionId(TourManager.GRAPH_CADENCE)));
-		tbm.add(_allTourChartActions.get(getGraphActionId(TourManager.GRAPH_GEARS)));
+		tbm.add(_actionTourChartGraphs);
+
+		// must be called AFTER the graph slideout action is added !!
+		fillToolbar_Graphs(tbm);
 
 		tbm.add(new Separator());
 		tbm.add(_allTourChartActions.get(ACTION_ID_IS_GRAPH_OVERLAPPED));
@@ -2515,6 +2608,92 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		tbm.add(_actionTourChartOptions);
 
 		tbm.update(true);
+	}
+
+	private void fillToolbar_Graphs(final IToolBarManager tbm) {
+
+		/*
+		 * Remove all previous graph actions
+		 */
+		for (final String contribId : _allGraphContribId) {
+			tbm.remove(contribId);
+		}
+
+		/*
+		 * Add requested graph actions
+		 */
+		fillToolbar_Graphs_Graph(
+				tbm,
+				TourManager.GRAPH_ALTITUDE,
+				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE,
+				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE_DEFAULT);
+
+		fillToolbar_Graphs_Graph(
+				tbm,
+				TourManager.GRAPH_PULSE,
+				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE,
+				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE_DEFAULT);
+
+		fillToolbar_Graphs_Graph(
+				tbm,
+				TourManager.GRAPH_SPEED,
+				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED,
+				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_DEFAULT);
+
+		fillToolbar_Graphs_Graph(
+				tbm,
+				TourManager.GRAPH_PACE,
+				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE,
+				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_DEFAULT);
+
+		fillToolbar_Graphs_Graph(
+				tbm,
+				TourManager.GRAPH_POWER,
+				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER,
+				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER_DEFAULT);
+
+		fillToolbar_Graphs_Graph(
+				tbm,
+				TourManager.GRAPH_TEMPERATURE,
+				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE,
+				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE_DEFAULT);
+
+		fillToolbar_Graphs_Graph(
+				tbm,
+				TourManager.GRAPH_GRADIENT,
+				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT,
+				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT_DEFAULT);
+
+		fillToolbar_Graphs_Graph(
+				tbm,
+				TourManager.GRAPH_ALTIMETER,
+				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER,
+				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER_DEFAULT);
+
+		fillToolbar_Graphs_Graph(
+				tbm,
+				TourManager.GRAPH_CADENCE,
+				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_CADENCE,
+				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_CADENCE_DEFAULT);
+
+		fillToolbar_Graphs_Graph(
+				tbm,
+				TourManager.GRAPH_GEARS,
+				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS,
+				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS_DEFAULT);
+	}
+
+	private void fillToolbar_Graphs_Graph(	final IToolBarManager tbm,
+											final int graphId,
+											final String stateKey,
+											final boolean stateDefaultValue) {
+
+		if (Util.getStateBoolean(_state, stateKey, stateDefaultValue)) {
+
+			tbm.insertBefore(
+					GRAPH_CONTRIBUTION_ID_SLIDEOUT,
+					_allTourChartActions.get(getGraphActionId(graphId)));
+		}
 	}
 
 	/**
@@ -2585,6 +2764,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		}
 	}
 
+	IAction getGraphAction(final int graphId) {
+
+		return _allTourChartActions.get(getGraphActionId(graphId));
+	}
+
 	/**
 	 * Converts the graph Id into an action Id
 	 * 
@@ -2592,6 +2776,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	 * @return
 	 */
 	private String getGraphActionId(final int graphId) {
+
 		return "graphId." + Integer.toString(graphId); //$NON-NLS-1$
 	}
 
@@ -4567,6 +4752,15 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				_actionTourMarker.setEnabled(false);
 			}
 		}
+	}
+
+	void updateGraphToolbar() {
+
+		final IToolBarManager tbm = getToolBarManager();
+
+		fillToolbar_Graphs(tbm);
+
+		tbm.update(true);
 	}
 
 	public void updateLayer2ndAlti(final I2ndAltiLayer alti2ndLayerProvider, final boolean isLayerVisible) {

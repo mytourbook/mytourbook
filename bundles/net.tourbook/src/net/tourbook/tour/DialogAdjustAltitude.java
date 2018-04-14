@@ -81,6 +81,8 @@ import org.eclipse.ui.part.PageBook;
  */
 public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLayer {
 
+	private static final String			ID									= "net.tourbook.tour.DialogAdjustAltitude";	//$NON-NLS-1$
+
 	// 40 is the largest size that the mouse wheel can adjust the scale by 1 (windows)
 	public static final int				MAX_ADJUST_GEO_POS_SLICES			= 40;
 
@@ -129,6 +131,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		_nf.setMaximumFractionDigits(3);
 	}
 
+	private final IDialogSettings			_state						= TourbookPlugin.getState(ID);
 	private final IPreferenceStore			_prefStore					= TourbookPlugin.getPrefStore();
 
 	/*
@@ -1097,7 +1100,8 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 	private void createUI_20_TourChart(final Composite parent) {
 
-		_tourChart = new TourChart(parent, SWT.BORDER, null);
+		_tourChart = new TourChart(parent, SWT.BORDER, null, _state);
+
 		GridDataFactory.fillDefaults().grab(true, true).indent(0, 0).minSize(300, 200).applyTo(_tourChart);
 
 		_tourChart.setShowZoomActions(true);

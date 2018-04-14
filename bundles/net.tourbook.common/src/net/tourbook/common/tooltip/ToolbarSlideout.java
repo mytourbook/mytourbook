@@ -117,7 +117,7 @@ public abstract class ToolbarSlideout extends AnimatedToolTipShell {
 	}
 
 	/**
-	 * @return Returns <code>true</code> to center the slideout horizontal, otherwise it is
+	 * @return Returns <code>true</code> to center the slideout horizontally, otherwise it is
 	 *         displayed to the right of the action button.
 	 */
 	protected boolean isCenterHorizontal() {

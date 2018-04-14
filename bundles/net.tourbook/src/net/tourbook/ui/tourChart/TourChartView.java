@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -53,6 +53,7 @@ import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 import net.tourbook.ui.views.tourCatalog.geo.GeoPartComparerItem;
 import net.tourbook.ui.views.tourSegmenter.TourSegmenterView;
 
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -80,6 +81,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 	public static final String		ID			= "net.tourbook.views.TourChartView";	//$NON-NLS-1$
 
+	private final IDialogSettings	_state		= TourbookPlugin.getState(ID);
 	private final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
 
 	private TourChartConfiguration	_tourChartConfig;
@@ -404,7 +406,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 		_pageNoData = UI.createPage(_tk, _pageBook, Messages.UI_Label_TourIsNotSelected);
 
-		_tourChart = new TourChart(_pageBook, SWT.FLAT, this);
+		_tourChart = new TourChart(_pageBook, SWT.FLAT, this, _state);
 		_tourChart.setCanShowTourSegments(true);
 		_tourChart.setShowZoomActions(true);
 		_tourChart.setShowSlider(true);

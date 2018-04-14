@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,6 +21,7 @@ package net.tourbook.tour;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ISliderMoveListener;
@@ -35,6 +36,7 @@ import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.ui.views.tourSegmenter.TourSegmenterView;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -60,7 +62,9 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 
 	public static final String		ID				= "net.tourbook.tour.TourEditor";	//$NON-NLS-1$
 
-	private static final String		MEMENTO_TOUR_ID	= "tourId";						//$NON-NLS-1$
+	private static final String		MEMENTO_TOUR_ID	= "tourId";							//$NON-NLS-1$
+
+	private final IDialogSettings	_state			= TourbookPlugin.getState(ID);
 
 	private TourEditorInput			_editorInput;
 
@@ -229,7 +233,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 		addTourEventListener();
 		createActions();
 
-		_tourChart = new TourChart(parent, SWT.FLAT, getSite().getPart());
+		_tourChart = new TourChart(parent, SWT.FLAT, getSite().getPart(), _state);
 
 		_tourChart.setCanShowTourSegments(true);
 		_tourChart.setShowZoomActions(true);
@@ -373,10 +377,11 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 						final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
 
 						// set slider position
-						_tourChart.setXSliderPosition(new SelectionChartXSliderPosition(
-								_tourChart,
-								chartInfo.leftSliderValuesIndex,
-								chartInfo.rightSliderValuesIndex));
+						_tourChart.setXSliderPosition(
+								new SelectionChartXSliderPosition(
+										_tourChart,
+										chartInfo.leftSliderValuesIndex,
+										chartInfo.rightSliderValuesIndex));
 					}
 				}
 			}
@@ -429,9 +434,10 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 				public void dataModelChanged(final ChartDataModel changedChartDataModel) {
 
 					// set title
-					changedChartDataModel.setTitle(NLS.bind(
-							Messages.Tour_Book_Label_chart_title,
-							TourManager.getTourTitleDetailed(_tourData)));
+					changedChartDataModel.setTitle(
+							NLS.bind(
+									Messages.Tour_Book_Label_chart_title,
+									TourManager.getTourTitleDetailed(_tourData)));
 				}
 			});
 

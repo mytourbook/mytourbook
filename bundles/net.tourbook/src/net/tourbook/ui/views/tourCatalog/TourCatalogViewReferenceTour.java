@@ -18,6 +18,7 @@ package net.tourbook.ui.views.tourCatalog;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ISliderMoveListener;
@@ -36,6 +37,7 @@ import net.tourbook.ui.tourChart.TourChartViewPart;
 import net.tourbook.ui.views.tourCatalog.geo.GeoPartComparerItem;
 import net.tourbook.ui.views.tourCatalog.geo.GeoPartItem;
 
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.osgi.util.NLS;
@@ -50,17 +52,19 @@ import org.eclipse.ui.part.PageBook;
 
 public class TourCatalogViewReferenceTour extends TourChartViewPart implements ITourChartViewer {
 
-	public static final String	ID				= "net.tourbook.views.tourCatalog.referenceTourView";	//$NON-NLS-1$
+	public static final String		ID				= "net.tourbook.views.tourCatalog.referenceTourView";	//$NON-NLS-1$
 
-	private long				_activeRefId	= -1;
+	private final IDialogSettings	_state			= TourbookPlugin.getState(ID);
 
-	private boolean				_isInSelectionChanged;
+	private long					_activeRefId	= -1;
+
+	private boolean					_isInSelectionChanged;
 
 	/*
 	 * UI controls
 	 */
-	private PageBook			_pageBook;
-	private Label				_pageNoChart;
+	private PageBook				_pageBook;
+	private Label					_pageNoChart;
 
 	@Override
 	public void createPartControl(final Composite parent) {
@@ -72,7 +76,7 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart implements I
 		_pageNoChart = new Label(_pageBook, SWT.NONE);
 		_pageNoChart.setText(Messages.UI_Label_no_chart_is_selected);
 
-		_tourChart = new TourChart(_pageBook, SWT.FLAT, getSite().getPart());
+		_tourChart = new TourChart(_pageBook, SWT.FLAT, getSite().getPart(), _state);
 		_tourChart.setShowZoomActions(true);
 		_tourChart.setShowSlider(true);
 		_tourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);

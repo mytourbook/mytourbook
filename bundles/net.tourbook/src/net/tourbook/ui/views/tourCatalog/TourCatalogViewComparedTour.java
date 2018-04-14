@@ -49,6 +49,7 @@ import net.tourbook.ui.views.tourCatalog.geo.GeoPartItem;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.osgi.util.NLS;
@@ -65,6 +66,8 @@ import org.eclipse.ui.part.PageBook;
 public class TourCatalogViewComparedTour extends TourChartViewPart implements ISynchedChart, ITourChartViewer {
 
 	public static final String					ID				= "net.tourbook.views.tourCatalog.comparedTourView";	//$NON-NLS-1$
+
+	private final IDialogSettings				_state			= TourbookPlugin.getState(ID);
 
 	private boolean								_isInRefTourChanged;
 	private boolean								_isInSelectionChanged;
@@ -322,7 +325,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 	private void createTourChart() {
 
-		_tourChart = new TourChart(_pageBook, SWT.FLAT, getSite().getPart());
+		_tourChart = new TourChart(_pageBook, SWT.FLAT, getSite().getPart(), _state);
 		_tourChart.setShowZoomActions(true);
 		_tourChart.setShowSlider(true);
 		_tourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
