@@ -240,7 +240,8 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColo
 				 */
 				{
 					final Label label = new Label(container, SWT.NONE);
-					label.setText("Geo grid items");
+					label.setText("Geo grids");
+					label.setToolTipText("Number of geo squares (1.57 km / 1 mi)");
 
 					_firstColumnControls.add(label);
 				}

@@ -416,6 +416,8 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 		_tourChartConfig = TourManager.createDefaultTourChartConfig();
 
+		_tourChartConfig.canUseGeoCompareTool = true;
+
 		// set chart title
 		_tourChart.addDataModelListener(new IDataModelListener() {
 			@Override
@@ -476,6 +478,8 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 						chartInfo.selectedSliderValuesIndex = hoveredMarker.getSerieIndex();
 					}
 				}
+
+				chartInfo.isGeoCompare = _tourChart.isGeoCompare();
 
 				TourManager.fireEventWithCustomData(//
 						TourEventId.SLIDER_POSITION_CHANGED,
@@ -797,7 +801,9 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 		} else {
 
-			_postSelectionProvider.setSelection(new SelectionTourData(_tourChart, _tourData));
+			final SelectionTourData selection = new SelectionTourData(_tourChart, _tourData);
+
+			_postSelectionProvider.setSelectionNoFireEvent(selection);
 
 			fireSliderPosition();
 		}

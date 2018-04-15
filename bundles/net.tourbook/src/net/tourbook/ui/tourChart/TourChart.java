@@ -86,6 +86,7 @@ import net.tourbook.ui.tourChart.action.ActionTourChartMarker;
 import net.tourbook.ui.tourChart.action.ActionTourPhotos;
 import net.tourbook.ui.tourChart.action.ActionXAxisDistance;
 import net.tourbook.ui.tourChart.action.ActionXAxisTime;
+import net.tourbook.ui.views.tourCatalog.geo.GeoCompareView;
 import net.tourbook.ui.views.tourSegmenter.SelectedTourSegmenterSegments;
 import net.tourbook.ui.views.tourSegmenter.TourSegmenterView;
 
@@ -131,7 +132,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 // SET_FORMATTING_OFF
 	
-	private static final String	ID										= "net.tourbook.ui.tourChart";			//$NON-NLS-1$
+//	private static final String	ID										= "net.tourbook.ui.tourChart";			//$NON-NLS-1$
+
 	//
 	private static final int	PAGE_NAVIGATION_SEGMENTS				= 10;
 	//
@@ -165,8 +167,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private static final String	GRID_IS_SHOW_HORIZONTAL_GRIDLINES		= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
 	private static final String	GRID_VERTICAL_DISTANCE					= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
 	private static final String	GRID_HORIZONTAL_DISTANCE				= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
-	
 	static final String		STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE				= "STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE";		//$NON-NLS-1$
+	
 	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER			= "STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER"; 		//$NON-NLS-1$
 	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_CADENCE				= "STATE_IS_SHOW_IN_CHART_TOOLBAR_CADENCE"; 		//$NON-NLS-1$
 	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS				= "STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS"; 			//$NON-NLS-1$
@@ -176,8 +178,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE 				= "STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE"; 			//$NON-NLS-1$
 	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED 				= "STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED"; 			//$NON-NLS-1$
 	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE			= "STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE";		//$NON-NLS-1$
-	
 	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE_DEFAULT		= true;
+	
 	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER_DEFAULT	= false;
 	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_CADENCE_DEFAULT 		= false;
 	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS_DEFAULT 		= false;
@@ -185,12 +187,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_DEFAULT 		= false;
 	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER_DEFAULT 		= false;
 	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE_DEFAULT 		= true;
-	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_DEFAULT 		= true;
+	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_DEFAULT 		= false;
 	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE_DEFAULT 	= false;
-	
 	private static final String	GRAPH_CONTRIBUTION_ID_SLIDEOUT			= "GRAPH_CONTRIBUTION_ID_SLIDEOUT";			//$NON-NLS-1$
 	
 	private static final String GRAPH_CONTRIBUTION_ID_ALTIMETER 		= "GRAPH_CONTRIBUTION_ID_ALTIMETER";		//$NON-NLS-1$
+	
 	private static final String GRAPH_CONTRIBUTION_ID_ALTITUDE			= "GRAPH_CONTRIBUTION_ID_ALTITUDE";			//$NON-NLS-1$
 	private static final String GRAPH_CONTRIBUTION_ID_CADENCE 			= "GRAPH_CONTRIBUTION_ID_CADENCE";			//$NON-NLS-1$
 	private static final String GRAPH_CONTRIBUTION_ID_GEARS 			= "GRAPH_CONTRIBUTION_ID_GEARS";			//$NON-NLS-1$
@@ -201,9 +203,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private static final String GRAPH_CONTRIBUTION_ID_SPEED				= "GRAPH_CONTRIBUTION_ID_SPEED";			//$NON-NLS-1$
 	private static final String GRAPH_CONTRIBUTION_ID_TEMPERATURE 		= "GRAPH_CONTRIBUTION_ID_TEMPERATURE";		//$NON-NLS-1$
 	private static final String GRAPH_CONTRIBUTION_ID_TOUR_COMPARE 		= "GRAPH_CONTRIBUTION_ID_TOUR_COMPARE";		//$NON-NLS-1$
-	
-//SET_FORMATTING_ON
-
 	private static final String[]	_allGraphContribId									= {
 
 			GRAPH_CONTRIBUTION_ID_ALTIMETER,
@@ -218,11 +217,14 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			GRAPH_CONTRIBUTION_ID_TEMPERATURE,
 			GRAPH_CONTRIBUTION_ID_TOUR_COMPARE,
 	};
+	
+//SET_FORMATTING_ON
 
 	/**
 	 * 1e-5 is too small for the min value, it do not correct the graph.
 	 */
 	public static final double		MIN_ADJUSTMENT										= 1e-3;
+
 	public static final double		MAX_ADJUSTMENT										= 1e-5;
 	//
 	{}
@@ -234,13 +236,15 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	/**
 	 * Part in which the tour chart is created, can be <code>null</code> when created in a dialog.
 	 */
-	private IWorkbenchPart					_part;;
+	private IWorkbenchPart					_part;
 	//
-	private TourData						_tourData;
+	private TourData						_tourData;;
 	private TourChartConfiguration			_tcc;
 	//
 	private Map<String, Action>				_allTourChartActions;
+	//
 	private ActionEditQuick					_actionEditQuick;
+	private ActionGeoCompare				_actionGeoCompare;
 	private ActionGraphMinMax				_actionGraphMinMax;
 	private ActionOpenMarkerDialog			_actionOpenMarkerDialog;
 	private ActionTourChartGraphs			_actionTourChartGraphs;
@@ -253,8 +257,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	 * datamodel listener is called when the chart data is created
 	 */
 	private IDataModelListener				_chartDataModelListener;
-
 	private IPropertyChangeListener			_prefChangeListener;
+
 	private final ListenerList				_tourMarkerModifyListener		= new ListenerList();
 	private final ListenerList				_tourMarkerSelectionListener	= new ListenerList();
 	private final ListenerList				_tourModifyListener				= new ListenerList();
@@ -262,10 +266,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	//
 	private boolean							_is2ndAltiLayerVisible;
 	private boolean							_isDisplayedInDialog;
+	private boolean							_isGeoCompare;
 	private boolean							_isMouseModeSet;
 	private boolean							_isTourChartToolbarCreated;
 	private TourMarker						_firedTourMarker;
-
+	//
 	/**
 	 * The {@link TourMarker} selection state is <b>only</b> be displayed when the mouse is hovering
 	 * it.
@@ -276,7 +281,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	//
 	private ImageDescriptor					_imagePhoto								= TourbookPlugin.getImageDescriptor(Messages.Image__PhotoPhotos);
 	private ImageDescriptor					_imagePhotoTooltip						= TourbookPlugin.getImageDescriptor(Messages.Image__PhotoImage);
-
 	private IFillPainter					_hrZonePainter;
 
 	private OpenDialogManager				_openDlgMgr								= new OpenDialogManager();
@@ -316,18 +320,17 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private boolean							_isSegmentTitleHovered;
 	private ChartTitleSegment				_chartTitleSegment;
 	private TourMarker						_lastHoveredTourMarker;
-
+	//
 	/**
 	 * Hide tour segments when tour chart is displayed in dialogs.
 	 */
 	private boolean							_canShowTourSegments;
-
 	private boolean							_isTourSegmenterVisible;
 	private boolean							_isShowSegmenterTooltip;
 	private SelectedTourSegmenterSegments	_segmenterSelection;
 	private Font							_segmenterValueFont;
 	private int								_oldTourSegmentsHash;
-
+	//
 	/*
 	 * UI controls
 	 */
@@ -342,6 +345,31 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	//
 	private Color							_photoOverlayBGColorLink;
 	private Color							_photoOverlayBGColorTour;
+
+	public class ActionGeoCompare extends Action {
+
+		public ActionGeoCompare() {
+
+			super(Messages.Tour_Action_GeoCompare_Tooltip, AS_CHECK_BOX);
+
+			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__GeoParts));
+			setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__GeoParts_Disabled));
+		}
+
+		@Override
+		public void run() {
+
+			_isGeoCompare = isChecked();
+
+			if (_isGeoCompare) {
+
+				// open geo compare result view
+				Util.showView(GeoCompareView.ID, false);
+
+				fireSliderMoveEvent();
+			}
+		}
+	}
 
 	private class ActionGraphMinMax extends ActionToolbarSlideout {
 
@@ -1378,6 +1406,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		/*
 		 * other actions
 		 */
+		_actionGeoCompare = new ActionGeoCompare();
 		_actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
 		_actionTourChartOptions = new ActionTourChartOptions();
 		_actionTourChartSmoothing = new ActionTourChartSmoothing(
@@ -2603,6 +2632,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		tbm.add(_allTourChartActions.get(ACTION_ID_IS_SHOW_TOUR_PHOTOS));
 		tbm.add(_actionTourMarker);
 		tbm.add(_actionTourInfo);
+
+		if (_tcc.canUseGeoCompareTool) {
+			tbm.add(_actionGeoCompare);
+		}
 		tbm.add(_actionTourChartSmoothing);
 		tbm.add(_actionGraphMinMax);
 		tbm.add(_actionTourChartOptions);
@@ -2990,6 +3023,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		}
 
 		removeChartMouseListener(_mousePhotoListener);
+	}
+
+	boolean isGeoCompare() {
+		return _isGeoCompare;
 	}
 
 	private void onChart_KeyDown(final ChartKeyEvent keyEvent) {
@@ -4751,6 +4788,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			if (_actionTourMarker != null) {
 				_actionTourMarker.setEnabled(false);
 			}
+
+			if (_actionGeoCompare != null) {
+				_actionGeoCompare.setEnabled(false);
+			}
 		}
 	}
 
@@ -4902,6 +4943,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		tourAction = _allTourChartActions.get(ACTION_ID_IS_GRAPH_OVERLAPPED);
 		tourAction.setEnabled(true);
 		tourAction.setChecked(_tcc.isGraphOverlapped);
+
+		/*
+		 * Geo compare
+		 */
+		final boolean isGeoDataAvailable = _tourData.latitudeSerie != null && _tourData.latitudeSerie.length > 1;
+		_actionGeoCompare.setEnabled(isGeoDataAvailable);
 
 		/*
 		 * x-axis time/distance

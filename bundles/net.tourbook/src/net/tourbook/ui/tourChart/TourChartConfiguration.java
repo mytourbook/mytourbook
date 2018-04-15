@@ -192,7 +192,7 @@ public class TourChartConfiguration {
 	 */
 	public String					hrZoneStyle				= TourChart.ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP;
 
-	public boolean					isShowTourPhotos		= true;											;
+	public boolean					isShowTourPhotos		= true;;
 	public boolean					isShowTourPhotoTooltip	= true;
 
 	/*
@@ -203,6 +203,11 @@ public class TourChartConfiguration {
 	public boolean					isShowInfoTooltip;
 	public boolean					isShowInfoTourSeparator;
 	public int						tourInfoTooltipDelay;
+
+	/**
+	 * Is <code>true</code> when the geo compare action is visible and can be used
+	 */
+	public boolean					canUseGeoCompareTool;
 
 	@SuppressWarnings("unused")
 	private TourChartConfiguration() {}
@@ -241,11 +246,14 @@ public class TourChartConfiguration {
 				ITourbookPreferences.GRAPH_MARKER_IS_SHOW_ONLY_WITH_DESCRIPTION);
 		isShowSignImage = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_SIGN_IMAGE);
 
-		markerColorDefault = PreferenceConverter.getColor(_prefStore,//
+		markerColorDefault = PreferenceConverter.getColor(
+				_prefStore, //
 				ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT);
-		markerColorDevice = PreferenceConverter.getColor(_prefStore,//
+		markerColorDevice = PreferenceConverter.getColor(
+				_prefStore, //
 				ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE);
-		markerColorHidden = PreferenceConverter.getColor(_prefStore,//
+		markerColorHidden = PreferenceConverter.getColor(
+				_prefStore, //
 				ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN);
 
 		/*

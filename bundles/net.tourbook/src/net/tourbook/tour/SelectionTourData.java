@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,6 +34,7 @@ public class SelectionTourData implements ISelection {
 	private int			_rightSliderValueIndex	= SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION;
 
 	public SelectionTourData(final TourChart tourChart, final TourData tourData) {
+
 		_tourChart = tourChart;
 		_tourData = tourData;
 	}
@@ -62,6 +63,7 @@ public class SelectionTourData implements ISelection {
 		return _tourData;
 	}
 
+	@Override
 	public boolean isEmpty() {
 		return false;
 	}

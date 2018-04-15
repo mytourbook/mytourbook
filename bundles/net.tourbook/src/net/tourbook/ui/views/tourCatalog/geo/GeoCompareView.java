@@ -1656,9 +1656,13 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 
 		if (selection instanceof SelectionChartInfo) {
 
-			TourData tourData = null;
-
 			final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
+
+			if (chartInfo.isGeoCompare == false) {
+				return;
+			}
+
+			TourData tourData = null;
 
 			final Chart chart = chartInfo.getChart();
 			if (chart instanceof TourChart) {
