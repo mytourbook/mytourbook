@@ -167,8 +167,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private static final String	GRID_IS_SHOW_HORIZONTAL_GRIDLINES		= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
 	private static final String	GRID_VERTICAL_DISTANCE					= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
 	private static final String	GRID_HORIZONTAL_DISTANCE				= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
+	//
 	static final String		STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE				= "STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE";		//$NON-NLS-1$
-	
 	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER			= "STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER"; 		//$NON-NLS-1$
 	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_CADENCE				= "STATE_IS_SHOW_IN_CHART_TOOLBAR_CADENCE"; 		//$NON-NLS-1$
 	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS				= "STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS"; 			//$NON-NLS-1$
@@ -178,8 +178,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE 				= "STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE"; 			//$NON-NLS-1$
 	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED 				= "STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED"; 			//$NON-NLS-1$
 	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE			= "STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE";		//$NON-NLS-1$
+	//
 	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE_DEFAULT		= true;
-	
 	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER_DEFAULT	= false;
 	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_CADENCE_DEFAULT 		= false;
 	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS_DEFAULT 		= false;
@@ -189,10 +189,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE_DEFAULT 		= true;
 	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_DEFAULT 		= false;
 	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE_DEFAULT 	= false;
+	//
 	private static final String	GRAPH_CONTRIBUTION_ID_SLIDEOUT			= "GRAPH_CONTRIBUTION_ID_SLIDEOUT";			//$NON-NLS-1$
-	
+	//
 	private static final String GRAPH_CONTRIBUTION_ID_ALTIMETER 		= "GRAPH_CONTRIBUTION_ID_ALTIMETER";		//$NON-NLS-1$
-	
 	private static final String GRAPH_CONTRIBUTION_ID_ALTITUDE			= "GRAPH_CONTRIBUTION_ID_ALTITUDE";			//$NON-NLS-1$
 	private static final String GRAPH_CONTRIBUTION_ID_CADENCE 			= "GRAPH_CONTRIBUTION_ID_CADENCE";			//$NON-NLS-1$
 	private static final String GRAPH_CONTRIBUTION_ID_GEARS 			= "GRAPH_CONTRIBUTION_ID_GEARS";			//$NON-NLS-1$
@@ -203,6 +203,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private static final String GRAPH_CONTRIBUTION_ID_SPEED				= "GRAPH_CONTRIBUTION_ID_SPEED";			//$NON-NLS-1$
 	private static final String GRAPH_CONTRIBUTION_ID_TEMPERATURE 		= "GRAPH_CONTRIBUTION_ID_TEMPERATURE";		//$NON-NLS-1$
 	private static final String GRAPH_CONTRIBUTION_ID_TOUR_COMPARE 		= "GRAPH_CONTRIBUTION_ID_TOUR_COMPARE";		//$NON-NLS-1$
+	
 	private static final String[]	_allGraphContribId									= {
 
 			GRAPH_CONTRIBUTION_ID_ALTIMETER,

@@ -12,4 +12,5 @@ Improvements
 ============
 
 * Customize tour chart graph actions
+* Customize map2 tour color actions
  

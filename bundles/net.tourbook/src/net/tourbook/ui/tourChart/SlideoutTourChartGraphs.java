@@ -211,11 +211,6 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
 	private void createUI_GraphAction(final Composite parent, final int graphId) {
 
 		final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
-//		GridDataFactory
-//				.fillDefaults()//
-//				.grab(true, false)
-//				.applyTo(toolbar);
-
 		final ToolBarManager tbm = new ToolBarManager(toolbar);
 
 		tbm.add(_tourChart.getGraphAction(graphId));
@@ -227,9 +222,7 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
 
 		final Button checkbox = new Button(parent, SWT.CHECK);
 
-		checkbox.setToolTipText(
-				Messages.Slideout_TourChartGraph_Checkbox_ShowInChartToolbar_Tooltip);
-
+		checkbox.setToolTipText(Messages.Slideout_TourChartGraph_Checkbox_ShowInChartToolbar_Tooltip);
 		checkbox.addSelectionListener(_defaultSelectionListener);
 
 		GridDataFactory

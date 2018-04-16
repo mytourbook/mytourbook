@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,7 +34,9 @@ import net.tourbook.common.color.IGradientColorProvider;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.MapGraphId;
 import net.tourbook.common.map.GeoPosition;
+import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.IOpeningDialog;
+import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.ITourToolTipProvider;
 import net.tourbook.common.util.TourToolTip;
 import net.tourbook.common.util.Util;
@@ -118,6 +120,8 @@ import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 import net.tourbook.ui.views.tourCatalog.geo.GeoPartComparerItem;
 import net.tourbook.ui.views.tourSegmenter.SelectedTourSegmenterSegments;
 
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
@@ -125,6 +129,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
@@ -142,6 +147,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IViewPart;
@@ -172,49 +178,77 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 // SET_FORMATTING_OFF
 	
-	public static final String			ID											= "net.tourbook.map2.view.Map2ViewId";						//$NON-NLS-1$
 
-	private static final String			IMAGE_ACTION_TOUR_COLOR_ALTITUDE			= net.tourbook.Messages.Image__graph_altitude;
-	private static final String			IMAGE_ACTION_TOUR_COLOR_ALTITUDE_DISABLED	= net.tourbook.Messages.Image__graph_altitude_disabled;
-	private static final String			IMAGE_ACTION_TOUR_COLOR_GRADIENT			= net.tourbook.Messages.Image__graph_gradient;
-	private static final String			IMAGE_ACTION_TOUR_COLOR_GRADIENT_DISABLED	= net.tourbook.Messages.Image__graph_gradient_disabled;
-	private static final String			IMAGE_ACTION_TOUR_COLOR_PACE				= net.tourbook.Messages.Image__graph_pace;
-	private static final String			IMAGE_ACTION_TOUR_COLOR_PACE_DISABLED		= net.tourbook.Messages.Image__graph_pace_disabled;
-	private static final String			IMAGE_ACTION_TOUR_COLOR_PULSE				= net.tourbook.Messages.Image__graph_heartbeat;
-	private static final String			IMAGE_ACTION_TOUR_COLOR_PULSE_DISABLED		= net.tourbook.Messages.Image__graph_heartbeat_disabled;
-	private static final String			IMAGE_ACTION_TOUR_COLOR_SPEED				= net.tourbook.Messages.Image__graph_speed;
-	private static final String			IMAGE_ACTION_TOUR_COLOR_SPEED_DISABLED		= net.tourbook.Messages.Image__graph_speed_disabled;
+	public static final String		ID											= "net.tourbook.map2.view.Map2ViewId";						//$NON-NLS-1$
 
-	private static final String			STATE_IS_SHOW_TOUR_IN_MAP					= "STATE_IS_SHOW_TOUR_IN_MAP";				//$NON-NLS-1$
-	private static final String			STATE_IS_SHOW_PHOTO_IN_MAP					= "STATE_IS_SHOW_PHOTO_IN_MAP";				//$NON-NLS-1$
-	private static final String			STATE_IS_SHOW_LEGEND_IN_MAP					= "STATE_IS_SHOW_LEGEND_IN_MAP";			//$NON-NLS-1$
-	private static final String 		STATE_IS_SYNC_MAP2_WITH_OTHER_MAP			= "STATE_IS_SYNC_MAP2_WITH_OTHER_MAP";		//$NON-NLS-1$
-	private static final String			STATE_SYNC_WITH_PHOTO						= "STATE_SYNC_WITH_PHOTO";					//$NON-NLS-1$
-	private static final String			MEMENTO_SHOW_START_END_IN_MAP				= "action.show-start-end-in-map";			//$NON-NLS-1$
-	private static final String			MEMENTO_SHOW_TOUR_MARKER					= "action.show-tour-marker";				//$NON-NLS-1$
-	private static final String			MEMENTO_SHOW_SLIDER_IN_MAP					= "action.show-slider-in-map";				//$NON-NLS-1$
-	private static final String			MEMENTO_SHOW_SLIDER_IN_LEGEND				= "action.show-slider-in-legend";			//$NON-NLS-1$
-	private static final String			MEMENTO_SHOW_SCALE_IN_MAP					= "action.show-scale-in-map";				//$NON-NLS-1$
-	private static final String			MEMENTO_SHOW_TOUR_INFO_IN_MAP				= "action.show-tour-info-in-map";			//$NON-NLS-1$
-	private static final String			MEMENTO_SHOW_WAY_POINTS						= "action.show-way-points-in-map";			//$NON-NLS-1$
-	private static final String			MEMENTO_SYNCH_WITH_SELECTED_TOUR			= "action.synch-with-selected-tour";		//$NON-NLS-1$
-	private static final String			MEMENTO_SYNCH_WITH_TOURCHART_SLIDER			= "action.synch-with-tourchart-slider";		//$NON-NLS-1$
-	private static final String			MEMENTO_ZOOM_CENTERED						= "action.zoom-centered";					//$NON-NLS-1$
-	private static final String			MEMENTO_MAP_DIM_LEVEL						= "action.map-dim-level";					//$NON-NLS-1$
+	private static final String 	IMAGE_GRAPH									= net.tourbook.Messages.Image__Graph;
+	private static final String 	IMAGE_GRAPH_DISABLED						= net.tourbook.Messages.Image__Graph_Disabled;
+	private static final String		IMAGE_ACTION_TOUR_COLOR_ALTITUDE			= net.tourbook.Messages.Image__graph_altitude;
+	private static final String		IMAGE_ACTION_TOUR_COLOR_ALTITUDE_DISABLED	= net.tourbook.Messages.Image__graph_altitude_disabled;
+	private static final String		IMAGE_ACTION_TOUR_COLOR_GRADIENT			= net.tourbook.Messages.Image__graph_gradient;
+	private static final String		IMAGE_ACTION_TOUR_COLOR_GRADIENT_DISABLED	= net.tourbook.Messages.Image__graph_gradient_disabled;
+	private static final String		IMAGE_ACTION_TOUR_COLOR_PACE				= net.tourbook.Messages.Image__graph_pace;
+	private static final String		IMAGE_ACTION_TOUR_COLOR_PACE_DISABLED		= net.tourbook.Messages.Image__graph_pace_disabled;
+	private static final String		IMAGE_ACTION_TOUR_COLOR_PULSE				= net.tourbook.Messages.Image__graph_heartbeat;
+	private static final String		IMAGE_ACTION_TOUR_COLOR_PULSE_DISABLED		= net.tourbook.Messages.Image__graph_heartbeat_disabled;
+	private static final String		IMAGE_ACTION_TOUR_COLOR_SPEED				= net.tourbook.Messages.Image__graph_speed;
+	private static final String		IMAGE_ACTION_TOUR_COLOR_SPEED_DISABLED		= net.tourbook.Messages.Image__graph_speed_disabled;
 
-	private static final String			MEMENTO_SYNCH_TOUR_ZOOM_LEVEL				= "synch-tour-zoom-level";					//$NON-NLS-1$
-	private static final String			MEMENTO_SELECTED_MAP_PROVIDER_ID			= "selected.map-provider-id";				//$NON-NLS-1$
+	private static final String		STATE_IS_SHOW_TOUR_IN_MAP					= "STATE_IS_SHOW_TOUR_IN_MAP";				//$NON-NLS-1$
+	private static final String		STATE_IS_SHOW_PHOTO_IN_MAP					= "STATE_IS_SHOW_PHOTO_IN_MAP";				//$NON-NLS-1$
+	private static final String		STATE_IS_SHOW_LEGEND_IN_MAP					= "STATE_IS_SHOW_LEGEND_IN_MAP";			//$NON-NLS-1$
+	private static final String 	STATE_IS_SYNC_MAP2_WITH_OTHER_MAP			= "STATE_IS_SYNC_MAP2_WITH_OTHER_MAP";		//$NON-NLS-1$
+	private static final String		STATE_SYNC_WITH_PHOTO						= "STATE_SYNC_WITH_PHOTO";					//$NON-NLS-1$
+	private static final String		MEMENTO_SHOW_START_END_IN_MAP				= "action.show-start-end-in-map";			//$NON-NLS-1$
+	private static final String		MEMENTO_SHOW_TOUR_MARKER					= "action.show-tour-marker";				//$NON-NLS-1$
+	private static final String		MEMENTO_SHOW_SLIDER_IN_MAP					= "action.show-slider-in-map";				//$NON-NLS-1$
+	private static final String		MEMENTO_SHOW_SLIDER_IN_LEGEND				= "action.show-slider-in-legend";			//$NON-NLS-1$
+	private static final String		MEMENTO_SHOW_SCALE_IN_MAP					= "action.show-scale-in-map";				//$NON-NLS-1$
+	private static final String		MEMENTO_SHOW_TOUR_INFO_IN_MAP				= "action.show-tour-info-in-map";			//$NON-NLS-1$
+	private static final String		MEMENTO_SHOW_WAY_POINTS						= "action.show-way-points-in-map";			//$NON-NLS-1$
+	private static final String		MEMENTO_SYNCH_WITH_SELECTED_TOUR			= "action.synch-with-selected-tour";		//$NON-NLS-1$
+	private static final String		MEMENTO_SYNCH_WITH_TOURCHART_SLIDER			= "action.synch-with-tourchart-slider";		//$NON-NLS-1$
+	private static final String		MEMENTO_ZOOM_CENTERED						= "action.zoom-centered";					//$NON-NLS-1$
+	private static final String		MEMENTO_MAP_DIM_LEVEL						= "action.map-dim-level";					//$NON-NLS-1$
 
-	private static final String			MEMENTO_DEFAULT_POSITION_ZOOM				= "default.position.zoom-level";			//$NON-NLS-1$
-	private static final String			MEMENTO_DEFAULT_POSITION_LATITUDE			= "default.position.latitude";				//$NON-NLS-1$
-	private static final String			MEMENTO_DEFAULT_POSITION_LONGITUDE			= "default.position.longitude";				//$NON-NLS-1$
+	private static final String		MEMENTO_SYNCH_TOUR_ZOOM_LEVEL				= "synch-tour-zoom-level";					//$NON-NLS-1$
+	private static final String		MEMENTO_SELECTED_MAP_PROVIDER_ID			= "selected.map-provider-id";				//$NON-NLS-1$
 
-	private static final String			MEMENTO_TOUR_COLOR_ID						= "tour-color-id";							//$NON-NLS-1$
+	private static final String		MEMENTO_DEFAULT_POSITION_ZOOM				= "default.position.zoom-level";			//$NON-NLS-1$
+	private static final String		MEMENTO_DEFAULT_POSITION_LATITUDE			= "default.position.latitude";				//$NON-NLS-1$
+	private static final String		MEMENTO_DEFAULT_POSITION_LONGITUDE			= "default.position.longitude";				//$NON-NLS-1$
 
-	static final String					PREF_SHOW_TILE_INFO							= "MapDebug.ShowTileInfo";					//$NON-NLS-1$
-	static final String					PREF_SHOW_TILE_BORDER						= "MapDebug.ShowTileBorder";				//$NON-NLS-1$
-	static final String					PREF_DEBUG_MAP_DIM_LEVEL					= "MapDebug.MapDimLevel";					//$NON-NLS-1$
+	private static final String		MEMENTO_TOUR_COLOR_ID						= "tour-color-id";							//$NON-NLS-1$
 
+	static final String				PREF_SHOW_TILE_INFO							= "MapDebug.ShowTileInfo";					//$NON-NLS-1$
+	static final String				PREF_SHOW_TILE_BORDER						= "MapDebug.ShowTileBorder";				//$NON-NLS-1$
+	static final String				PREF_DEBUG_MAP_DIM_LEVEL					= "MapDebug.MapDimLevel";					//$NON-NLS-1$
+	//
+	static final String				STATE_IS_SHOW_IN_TOOLBAR_ALTITUDE			= "STATE_IS_SHOW_IN_TOOLBAR_ALTITUDE";		//$NON-NLS-1$
+	static final String 			STATE_IS_SHOW_IN_TOOLBAR_GRADIENT			= "STATE_IS_SHOW_IN_TOOLBAR_GRADIENT"; 		//$NON-NLS-1$
+	static final String 			STATE_IS_SHOW_IN_TOOLBAR_PACE 				= "STATE_IS_SHOW_IN_TOOLBAR_PACE"; 			//$NON-NLS-1$
+	static final String 			STATE_IS_SHOW_IN_TOOLBAR_PULSE 				= "STATE_IS_SHOW_IN_TOOLBAR_PULSE"; 		//$NON-NLS-1$
+	static final String 			STATE_IS_SHOW_IN_TOOLBAR_SPEED 				= "STATE_IS_SHOW_IN_TOOLBAR_SPEED"; 		//$NON-NLS-1$
+	static final String 			STATE_IS_SHOW_IN_TOOLBAR_HR_ZONE 			= "STATE_IS_SHOW_IN_TOOLBAR_HR_ZONE"; 		//$NON-NLS-1$
+	//
+	static final boolean			STATE_IS_SHOW_IN_TOOLBAR_ALTITUDE_DEFAULT	= true;
+	static final boolean			STATE_IS_SHOW_IN_TOOLBAR_GRADIENT_DEFAULT 	= false;
+	static final boolean			STATE_IS_SHOW_IN_TOOLBAR_PACE_DEFAULT 		= false;
+	static final boolean			STATE_IS_SHOW_IN_TOOLBAR_PULSE_DEFAULT 		= true;
+	static final boolean			STATE_IS_SHOW_IN_TOOLBAR_SPEED_DEFAULT 		= false;
+	static final boolean			STATE_IS_SHOW_IN_TOOLBAR_HR_ZONE_DEFAULT 	= false;
+	//
+	private static final String		GRAPH_CONTRIBUTION_ID_SLIDEOUT				= "GRAPH_CONTRIBUTION_ID_SLIDEOUT";			//$NON-NLS-1$
+	//
+	private static final MapGraphId[]	_allGraphContribId									= {
+
+			MapGraphId.Altitude,
+			MapGraphId.Gradient,
+			MapGraphId.Pace,
+			MapGraphId.Pulse,
+			MapGraphId.Speed,
+			MapGraphId.HrZone,
+	};
 
 	private final IPreferenceStore				_prefStore							= TourbookPlugin.getPrefStore();
 	private final IDialogSettings				_state								= TourbookPlugin.getState(ID);
@@ -321,6 +355,8 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	private boolean								_isInMapSync;
 	private long								_lastFiredSyncEventTime;
 
+	private HashMap<MapGraphId, Action>			_allTourColorActions						= new HashMap<>();
+
 	private ActionTourColor						_actionTourColorAltitude;
 	private ActionTourColor						_actionTourColorGradient;
 	private ActionTourColor						_actionTourColorPulse;
@@ -330,6 +366,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 	private ActionDimMap						_actionDimMap;
 	private ActionOpenPrefDialog				_actionEdit2DMapPreferences;
+	private ActionMap2Graphs					_actionMap2TourColors;
 	private ActionMapBookmarks					_actionMapBookmarks;
 	private ActionMap2Color						_actionMapColor;
 	private ActionManageMapProviders			_actionManageProvider;
@@ -367,6 +404,28 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	 */
 	private Composite							_parent;
 	private Map									_map;
+
+	private class ActionMap2Graphs extends ActionToolbarSlideout {
+
+		public ActionMap2Graphs(final ImageDescriptor imageDescriptor,
+								final ImageDescriptor imageDescriptorDisabled) {
+
+			super(imageDescriptor, imageDescriptorDisabled);
+
+			setId(GRAPH_CONTRIBUTION_ID_SLIDEOUT);
+		}
+
+		@Override
+		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+
+			return new SlideoutMap2TourColors(_parent, toolbar, Map2View.this, _state);
+		}
+
+		@Override
+		protected void onBeforeOpenSlideout() {
+			closeOpenedDialogs(this);
+		}
+	}
 
 	public Map2View() {}
 
@@ -506,6 +565,16 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	}
 
 	public void actionSetTourColor(final MapGraphId colorId) {
+
+		/*
+		 * Uncheck all other tour color actions, they could be checked in the slideout because each
+		 * action has it's own toolbar !!!
+		 */
+		for (final MapGraphId graphId : _allGraphContribId) {
+			if (graphId != colorId) {
+				getTourColorAction(graphId).setChecked(false);
+			}
+		}
 
 		setTourPainterColorProvider(colorId);
 
@@ -1039,6 +1108,10 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 	private void createActions(final Composite parent) {
 
+		_actionMap2TourColors = new ActionMap2Graphs(
+				TourbookPlugin.getImageDescriptor(IMAGE_GRAPH),
+				TourbookPlugin.getImageDescriptor(IMAGE_GRAPH_DISABLED));
+
 		_actionTourColorAltitude = new ActionTourColor(
 				this,
 				MapGraphId.Altitude,
@@ -1080,6 +1153,13 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 				Messages.Tour_Action_ShowHrZones_Tooltip,
 				Messages.Image__PulseZones,
 				Messages.Image__PulseZones_Disabled);
+
+		_allTourColorActions.put(MapGraphId.Altitude, _actionTourColorAltitude);
+		_allTourColorActions.put(MapGraphId.Gradient, _actionTourColorGradient);
+		_allTourColorActions.put(MapGraphId.Pulse, _actionTourColorPulse);
+		_allTourColorActions.put(MapGraphId.Speed, _actionTourColorSpeed);
+		_allTourColorActions.put(MapGraphId.Pace, _actionTourColorPace);
+		_allTourColorActions.put(MapGraphId.HrZone, _actionTourColorHrZone);
 
 		_actionZoom_In = new ActionZoomIn(this);
 		_actionZoom_Out = new ActionZoomOut(this);
@@ -1499,37 +1579,36 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		/*
 		 * fill view toolbar
 		 */
-		final IToolBarManager viewTbm = getViewSite().getActionBars().getToolBarManager();
+		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
-		viewTbm.add(_actionTourColorAltitude);
-		viewTbm.add(_actionTourColorPulse);
-		viewTbm.add(_actionTourColorSpeed);
-		viewTbm.add(_actionTourColorPace);
-		viewTbm.add(_actionTourColorGradient);
-		viewTbm.add(_actionTourColorHrZone);
-		viewTbm.add(new Separator());
+		tbm.add(_actionMap2TourColors);
 
-		viewTbm.add(_actionPhotoFilter);
-		viewTbm.add(_actionShowPhotos);
-		viewTbm.add(_actionShowAllFilteredPhotos);
-		viewTbm.add(_actionSyncMap_WithPhoto);
-		viewTbm.add(new Separator());
+		// must be called AFTER the tour color slideout action is added !!
+		fillToolbar_TourColors(tbm);
 
-		viewTbm.add(_actionShowTourInMap);
-		viewTbm.add(_actionZoom_ShowEntireTour);
-		viewTbm.add(_actionSyncMap_WithTour);
-		viewTbm.add(_actionSyncMap_WithChartSlider);
-		viewTbm.add(_actionSyncMap_WithOtherMap);
-		viewTbm.add(new Separator());
+		tbm.add(new Separator());
 
-		viewTbm.add(_actionZoom_In);
-		viewTbm.add(_actionZoom_Out);
-		viewTbm.add(_actionZoom_ShowEntireMap);
-		viewTbm.add(_actionZoom_Centered);
-		viewTbm.add(new Separator());
+		tbm.add(_actionPhotoFilter);
+		tbm.add(_actionShowPhotos);
+		tbm.add(_actionShowAllFilteredPhotos);
+		tbm.add(_actionSyncMap_WithPhoto);
+		tbm.add(new Separator());
 
-		viewTbm.add(_actionMapBookmarks);
-		viewTbm.add(_actionSelectMapProvider);
+		tbm.add(_actionShowTourInMap);
+		tbm.add(_actionZoom_ShowEntireTour);
+		tbm.add(_actionSyncMap_WithTour);
+		tbm.add(_actionSyncMap_WithChartSlider);
+		tbm.add(_actionSyncMap_WithOtherMap);
+		tbm.add(new Separator());
+
+		tbm.add(_actionZoom_In);
+		tbm.add(_actionZoom_Out);
+		tbm.add(_actionZoom_ShowEntireMap);
+		tbm.add(_actionZoom_Centered);
+		tbm.add(new Separator());
+
+		tbm.add(_actionMapBookmarks);
+		tbm.add(_actionSelectMapProvider);
 
 		/*
 		 * fill view menu
@@ -1588,6 +1667,68 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionManageProvider);
 		menuMgr.add(_actionReloadFailedMapImages);
+	}
+
+	private void fillToolbar_TourColors(final IToolBarManager tbm) {
+
+		/*
+		 * Remove all previous tour color actions
+		 */
+		for (final MapGraphId contribId : _allGraphContribId) {
+			tbm.remove(contribId.name());
+		}
+
+		/*
+		 * Add requested tour color actions
+		 */
+		fillToolbar_TourColors_Color(
+				tbm,
+				MapGraphId.Altitude,
+				STATE_IS_SHOW_IN_TOOLBAR_ALTITUDE,
+				STATE_IS_SHOW_IN_TOOLBAR_ALTITUDE_DEFAULT);
+
+		fillToolbar_TourColors_Color(
+				tbm,
+				MapGraphId.Pulse,
+				STATE_IS_SHOW_IN_TOOLBAR_PULSE,
+				STATE_IS_SHOW_IN_TOOLBAR_PULSE_DEFAULT);
+
+		fillToolbar_TourColors_Color(
+				tbm,
+				MapGraphId.Speed,
+				STATE_IS_SHOW_IN_TOOLBAR_SPEED,
+				STATE_IS_SHOW_IN_TOOLBAR_SPEED_DEFAULT);
+
+		fillToolbar_TourColors_Color(
+				tbm,
+				MapGraphId.Pace,
+				STATE_IS_SHOW_IN_TOOLBAR_PACE,
+				STATE_IS_SHOW_IN_TOOLBAR_PACE_DEFAULT);
+
+		fillToolbar_TourColors_Color(
+				tbm,
+				MapGraphId.Gradient,
+				STATE_IS_SHOW_IN_TOOLBAR_GRADIENT,
+				STATE_IS_SHOW_IN_TOOLBAR_GRADIENT_DEFAULT);
+
+		fillToolbar_TourColors_Color(
+				tbm,
+				MapGraphId.HrZone,
+				STATE_IS_SHOW_IN_TOOLBAR_HR_ZONE,
+				STATE_IS_SHOW_IN_TOOLBAR_HR_ZONE_DEFAULT);
+	}
+
+	private void fillToolbar_TourColors_Color(	final IToolBarManager tbm,
+												final MapGraphId graphId,
+												final String stateKey,
+												final boolean stateDefaultValue) {
+
+		if (Util.getStateBoolean(_state, stateKey, stateDefaultValue)) {
+
+			tbm.insertBefore(
+					GRAPH_CONTRIBUTION_ID_SLIDEOUT,
+					_allTourColorActions.get(graphId));
+		}
 	}
 
 	private IMapColorProvider getColorProvider(final MapGraphId colorId) {
@@ -1761,6 +1902,11 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 			return mapPositions;
 		}
+	}
+
+	IAction getTourColorAction(final MapGraphId graphId) {
+
+		return _allTourColorActions.get(graphId);
 	}
 
 	private void keepMapPosition(final TourData tourData) {
@@ -3253,6 +3399,15 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 		_map.disposeOverlayImageCache();
 		_map.paint();
+	}
+
+	void updateTourColorsInToolbar() {
+
+		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+
+		fillToolbar_TourColors(tbm);
+
+		tbm.update(true);
 	}
 
 	/**
