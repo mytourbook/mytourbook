@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,18 +27,19 @@ import org.eclipse.swt.widgets.Display;
 
 public class Util {
 
-	public static final String			EMPTY_STRING	= "";									//$NON-NLS-1$
-	private static final String			SYMBOL_DASH		= "-";									//$NON-NLS-1$
-	public static final String			DASH_WITH_SPACE	= " - ";								//$NON-NLS-1$
+	public static final String			EMPTY_STRING	= "";								//$NON-NLS-1$
+	private static final String			SYMBOL_DASH		= "-";								//$NON-NLS-1$
+	public static final String			DASH_WITH_SPACE	= " - ";							//$NON-NLS-1$
 
-	private static final String			FORMAT_MM_SS	= "%d:%02d";							//$NON-NLS-1$
-	private static final String			FORMAT_HH_MM	= "%d:%02d";							//$NON-NLS-1$
-	private static final String			FORMAT_HH_MM_SS	= "%d:%02d:%02d";						//$NON-NLS-1$
+	private static final String			FORMAT_MM_SS	= "%d:%02d";						//$NON-NLS-1$
+	private static final String			FORMAT_HH_MM	= "%d:%02d";						//$NON-NLS-1$
+	private static final String			FORMAT_HH_MM_SS	= "%d:%02d:%02d";					//$NON-NLS-1$
 
 	private final static NumberFormat	_nf0			= NumberFormat.getNumberInstance();
 	private final static NumberFormat	_nf1			= NumberFormat.getNumberInstance();
 	private final static NumberFormat	_nf2			= NumberFormat.getNumberInstance();
 	private final static NumberFormat	_nf3			= NumberFormat.getNumberInstance();
+	private final static DecimalFormat	_nfE			= new DecimalFormat("0.###E0");
 	private final static NumberFormat	_df				= DecimalFormat.getNumberInstance();
 
 	static {
@@ -58,8 +59,8 @@ public class Util {
 		_df.setMaximumFractionDigits(6);
 	}
 
-	private static StringBuilder		_sbFormatter	= new StringBuilder();
-	private static Formatter			_formatter		= new Formatter(_sbFormatter);
+	private static StringBuilder	_sbFormatter	= new StringBuilder();
+	private static Formatter		_formatter		= new Formatter(_sbFormatter);
 
 	/**
 	 * Checks if an image can be reused, this is true if the image exists and has the same size
@@ -140,9 +141,12 @@ public class Util {
 
 		final long timeAbsolute = time < 0 ? 0 - time : time;
 
-		return _formatter.format(FORMAT_HH_MM, //
-				(timeAbsolute / 3600),
-				(timeAbsolute % 3600) / 60).toString();
+		return _formatter
+				.format(
+						FORMAT_HH_MM, 
+						(timeAbsolute / 3600),
+						(timeAbsolute % 3600) / 60)
+				.toString();
 	}
 
 	public static String format_hh_mm_ss(final long time) {
@@ -155,10 +159,13 @@ public class Util {
 
 		final long timeAbsolute = time < 0 ? 0 - time : time;
 
-		return _formatter.format(FORMAT_HH_MM_SS, //
-				(timeAbsolute / 3600),
-				(timeAbsolute % 3600) / 60,
-				(timeAbsolute % 3600) % 60).toString();
+		return _formatter
+				.format(
+						FORMAT_HH_MM_SS, 
+						(timeAbsolute / 3600),
+						(timeAbsolute % 3600) / 60,
+						(timeAbsolute % 3600) % 60)
+				.toString();
 	}
 
 	public static String format_hh_mm_ss_Optional(final long value) {
@@ -193,9 +200,12 @@ public class Util {
 
 		final long timeAbsolute = time < 0 ? 0 - time : time;
 
-		return _formatter.format(FORMAT_MM_SS, //
-				(timeAbsolute / 60),
-				(timeAbsolute % 60)).toString();
+		return _formatter
+				.format(
+						FORMAT_MM_SS, 
+						(timeAbsolute / 60),
+						(timeAbsolute % 60))
+				.toString();
 	}
 
 	public static String formatNumber(	final double rawValue,
@@ -237,7 +247,10 @@ public class Util {
 		return valueText;
 	}
 
-	public static String formatValue(final double value, final int unitType, final float divisor, boolean isShowSeconds) {
+	public static String formatValue(	final double value,
+										final int unitType,
+										final float divisor,
+										boolean isShowSeconds) {
 
 		String valueText = EMPTY_STRING;
 
@@ -245,9 +258,20 @@ public class Util {
 		switch (unitType) {
 		case ChartDataSerie.AXIS_UNIT_NUMBER:
 		case ChartDataSerie.X_AXIS_UNIT_NUMBER_CENTER:
+
 			final double divValue = value / divisor;
+
 			if (divValue % 1 == 0) {
-				valueText = _nf0.format(divValue);
+
+				if (divValue <= -1_000_000 || divValue >= 1_000_000) {
+
+					valueText = _nfE.format(divValue);
+
+				} else {
+
+					valueText = _nf0.format(divValue);
+				}
+
 			} else {
 				valueText = _nf1.format(divValue);
 			}
