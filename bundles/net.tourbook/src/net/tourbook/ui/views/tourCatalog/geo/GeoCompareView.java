@@ -58,8 +58,8 @@ import net.tourbook.ui.views.tourCatalog.ReferenceTourManager;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
-import net.tourbook.ui.views.tourCatalog.TourCatalogViewComparedTour;
-import net.tourbook.ui.views.tourCatalog.TourCatalogViewReferenceTour;
+import net.tourbook.ui.views.tourCatalog.TourCatalogView_ComparedTour;
+import net.tourbook.ui.views.tourCatalog.TourCatalogView_ReferenceTour;
 import net.tourbook.ui.views.tourCatalog.TourCompareConfig;
 
 import org.eclipse.jface.action.Action;
@@ -93,14 +93,12 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -116,14 +114,13 @@ import org.eclipse.ui.part.ViewPart;
 public class GeoCompareView extends ViewPart implements ITourViewer {
 
 // SET_FORMATTING_OFF
-	
 
 	public static final String				ID			= "net.tourbook.ui.views.tourCatalog.geo.GeoCompareView";	//$NON-NLS-1$
                                             
 // SET_FORMATTING_ON
 
-	private static final int				DELAY_BEFORE_STARTING_COMPARE	= 300;
-	private static final int				UI_UPDATE_INTERVAL				= 500;
+	private static final int				DELAY_BEFORE_STARTING_COMPARE	= 500;
+	private static final int				UI_UPDATE_INTERVAL				= 1000;
 
 	private static final String				STATE_IS_COMPARE_ENABLED		= "STATE_IS_COMPARE_ENABLED";		//$NON-NLS-1$
 	private static final String				STATE_IS_USE_APP_FILTER			= "STATE_IS_USE_APP_FILTER";		//$NON-NLS-1$
@@ -218,13 +215,16 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 	private Composite		_pageNoData;
 	private Composite		_pageContent;
 
-	private Button			_chkHideFalsePositive;
+//	private Button			_chkHideFalsePositive;
 
-	private Label			_lblHideFalsePositiveValue;
 	private Label			_lblCompareStatus;
+//	private Label			_lblHideFalsePositiveValue;
+	private Label			_lblNumTours;
+	private Label			_lblNumGeoGrids;
+	private Label			_lblNumSlices;
 	private Label			_lblTitle;
 
-	private Scale			_scaleHideFalsePositive;
+//	private Scale			_scaleHideFalsePositive;
 
 	private class ActionAppTourFilter extends Action {
 
@@ -267,7 +267,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 
 		@Override
 		public void run() {
-			onAction_OnOff(isChecked());
+			onAction_OnOff(isChecked(), true);
 		}
 
 		private void setIcon(final boolean isSelected) {
@@ -708,6 +708,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 		_slideoutGeoCompareState.normalizedDistance = normalizedGeoData.normalizedDistance;
 
 		_slideoutGeoCompareOptions.updateUI_StateValues(_slideoutGeoCompareState);
+		updateUI_StateValues();
+
 	}
 
 	void compare_40_CompareTours(final GeoPartItem geoPartItem) {
@@ -894,38 +896,41 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 	 */
 	private boolean compareWholeTour(final TourData tourData) {
 
-		if (tourData == null) {
-			return false;
-		}
+		// is currently disabled because it is slowing down
+		return false;
 
-		// skip manual tours
-		if (tourData.isManualTour()) {
-			return false;
-		}
-
-		// compare the whole tour from 0 to max time slices
-		final int numTimeSlices = tourData.timeSerie.length - 1;
-		if (numTimeSlices < 1) {
-			return false;
-		}
-
-		/*
-		 * Convert real ref tour into a geo compare ref tour that the behaviour is the same, however
-		 * this will disable features in the tour compare chart but this is already very complex.
-		 */
-
-		final long geoCompareRefId = ReferenceTourManager.createGeoCompareRefTour(
-				tourData,
-				0,
-				numTimeSlices);
-
-		compare_10_Compare(
-				tourData,
-				0,
-				numTimeSlices,
-				geoCompareRefId);
-
-		return true;
+//		if (tourData == null) {
+//			return false;
+//		}
+//
+//		// skip manual tours
+//		if (tourData.isManualTour()) {
+//			return false;
+//		}
+//
+//		// compare the whole tour from 0 to max time slices
+//		final int numTimeSlices = tourData.timeSerie.length - 1;
+//		if (numTimeSlices < 1) {
+//			return false;
+//		}
+//
+//		/*
+//		 * Convert real ref tour into a geo compare ref tour that the behaviour is the same, however
+//		 * this will disable features in the tour compare chart but this is already very complex.
+//		 */
+//
+//		final long geoCompareRefId = ReferenceTourManager.createGeoCompareRefTour(
+//				tourData,
+//				0,
+//				numTimeSlices);
+//
+//		compare_10_Compare(
+//				tourData,
+//				0,
+//				numTimeSlices,
+//				geoCompareRefId);
+//
+//		return true;
 	}
 
 	private void createActions() {
@@ -1007,7 +1012,9 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 				GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblTitle);
 			}
 
-			createUI_50_HideFalsePositive(container);
+//			createUI_50_HideFalsePositive(container);
+
+			createUI_30_Info(container);
 
 			{
 				/*
@@ -1020,61 +1027,122 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 		}
 	}
 
-	private void createUI_50_HideFalsePositive(final Composite parent) {
-
-		final SelectionAdapter falsePositiveListener = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onChange_HideFalsePositive();
-			}
-		};
-
-		/*
-		 * Hide false positive tours
-		 */
-		{
-			/*
-			 * Checkbox: live update
-			 */
-			_chkHideFalsePositive = new Button(parent, SWT.CHECK);
-			_chkHideFalsePositive.setText("&Hide false positive");
-			_chkHideFalsePositive.setToolTipText(
-					"Hide tours which are found but do not contain the requested tour part");
-			_chkHideFalsePositive.addSelectionListener(falsePositiveListener);
-		}
+	private void createUI_30_Info(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory
-				.fillDefaults()
-				.grab(true, false)
-				.indent(_pc.convertHorizontalDLUsToPixels(6), SWT.DEFAULT)
-				.applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(6).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+
 		{
 			{
 				/*
-				 * Scale: False positive in %
+				 * Number of tours
 				 */
-				_scaleHideFalsePositive = new Scale(container, SWT.NONE);
-				_scaleHideFalsePositive.setIncrement(1);
-				_scaleHideFalsePositive.setPageIncrement(10);
-				_scaleHideFalsePositive.setMinimum(1);
-				_scaleHideFalsePositive.setMaximum(100);
-				_scaleHideFalsePositive.addSelectionListener(falsePositiveListener);
-				GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleHideFalsePositive);
+				{
+					final Label label = new Label(container, SWT.NONE);
+					label.setText("Possible tours");
+
+				}
+				{
+					_lblNumTours = new Label(container, SWT.NONE);
+					_lblNumTours.setText(UI.EMPTY_STRING);
+					GridDataFactory
+							.fillDefaults()
+							.grab(true, false)
+							//							.align(SWT.END, SWT.FILL)
+							.applyTo(_lblNumTours);
+				}
 			}
 			{
 				/*
-				 * Label: %
+				 * Number of geo parts
 				 */
-				_lblHideFalsePositiveValue = new Label(container, SWT.NONE);
-				GridDataFactory
-						.fillDefaults()
-						.align(SWT.FILL, SWT.CENTER)
-						.hint(_pc.convertWidthInCharsToPixels(4), SWT.DEFAULT)
-						.applyTo(_lblHideFalsePositiveValue);
+				{
+					final Label label = new Label(container, SWT.NONE);
+					label.setText("Geo grids");
+					label.setToolTipText("Number of geo squares (1.57 km / 1 mi)");
+
+				}
+				{
+					_lblNumGeoGrids = new Label(container, SWT.NONE);
+					_lblNumGeoGrids.setText(UI.EMPTY_STRING);
+					GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblNumGeoGrids);
+				}
+			}
+			{
+				/*
+				 * Number of time slices
+				 */
+				{
+					final Label label = new Label(container, SWT.NONE);
+					label.setText("Time slices");
+
+				}
+				{
+					_lblNumSlices = new Label(container, SWT.NONE);
+					_lblNumSlices.setText(UI.EMPTY_STRING);
+					GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblNumSlices);
+				}
 			}
 		}
+	}
+
+	private void createUI_50_HideFalsePositive(final Composite parent) {
+
+//		final SelectionAdapter falsePositiveListener = new SelectionAdapter() {
+//			@Override
+//			public void widgetSelected(final SelectionEvent e) {
+//				onChange_HideFalsePositive();
+//			}
+//		};
+//
+//		/*
+//		 * Hide false positive tours
+//		 */
+//		{
+//			/*
+//			 * Checkbox: live update
+//			 */
+//			_chkHideFalsePositive = new Button(parent, SWT.CHECK);
+//			_chkHideFalsePositive.setText("&Hide false positive");
+//			_chkHideFalsePositive.setToolTipText(
+//					"Hide tours which are found but do not contain the requested tour part");
+//			_chkHideFalsePositive.addSelectionListener(falsePositiveListener);
+//		}
+//
+//		final Composite container = new Composite(parent, SWT.NONE);
+//		GridDataFactory
+//				.fillDefaults()
+//				.grab(true, false)
+//				.indent(_pc.convertHorizontalDLUsToPixels(6), SWT.DEFAULT)
+//				.applyTo(container);
+//		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+//		{
+//			{
+//				/*
+//				 * Scale: False positive in %
+//				 */
+//				_scaleHideFalsePositive = new Scale(container, SWT.NONE);
+//				_scaleHideFalsePositive.setIncrement(1);
+//				_scaleHideFalsePositive.setPageIncrement(10);
+//				_scaleHideFalsePositive.setMinimum(1);
+//				_scaleHideFalsePositive.setMaximum(100);
+//				_scaleHideFalsePositive.addSelectionListener(falsePositiveListener);
+//				GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleHideFalsePositive);
+//			}
+//			{
+//				/*
+//				 * Label: %
+//				 */
+//				_lblHideFalsePositiveValue = new Label(container, SWT.NONE);
+//				GridDataFactory
+//						.fillDefaults()
+//						.align(SWT.FILL, SWT.CENTER)
+//						.hint(_pc.convertWidthInCharsToPixels(4), SWT.DEFAULT)
+//						.applyTo(_lblHideFalsePositiveValue);
+//			}
+//		}
 	}
 
 	private void createUI_80_TableViewer(final Composite parent) {
@@ -1452,13 +1520,13 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 
 	private void enableControls_HideFalsePositive() {
 
-		final boolean isHideFalsePositive = _chkHideFalsePositive.getSelection();
-		final boolean isShowHideFalsePositive = isHideFalsePositive && _isComparingDone;
-
-		_chkHideFalsePositive.setEnabled(_isComparingDone);
-
-		_lblHideFalsePositiveValue.setEnabled(isShowHideFalsePositive);
-		_scaleHideFalsePositive.setEnabled(isShowHideFalsePositive);
+//		final boolean isHideFalsePositive = _chkHideFalsePositive.getSelection();
+//		final boolean isShowHideFalsePositive = isHideFalsePositive && _isComparingDone;
+//
+//		_chkHideFalsePositive.setEnabled(_isComparingDone);
+//
+//		_lblHideFalsePositiveValue.setEnabled(isShowHideFalsePositive);
+//		_scaleHideFalsePositive.setEnabled(isShowHideFalsePositive);
 	}
 
 	private void fillToolbar() {
@@ -1540,7 +1608,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 		}
 
 		// ignore other parts to prevent geo part comparing !!!
-		if (part instanceof TourCatalogViewComparedTour || part instanceof TourCatalogViewReferenceTour) {
+		if (part instanceof TourCatalogView_ComparedTour || part instanceof TourCatalogView_ReferenceTour) {
 			return true;
 		}
 
@@ -1554,7 +1622,12 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 		recompareTours();
 	}
 
-	private void onAction_OnOff(final boolean isSelected) {
+	/**
+	 * @param isSelected
+	 *            Turn comparing ON/OFF
+	 * @param isDoRecomparing
+	 */
+	public void onAction_OnOff(final boolean isSelected, final boolean isDoRecomparing) {
 
 		_isCompareEnabled = isSelected;
 
@@ -1564,7 +1637,9 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 
 			// enable comparing
 
-			recompareTours();
+			if (isDoRecomparing) {
+				recompareTours();
+			}
 
 		} else {
 
@@ -1974,28 +2049,28 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 
 			_slideoutGeoCompareState.isReset = true;
 
-			_slideoutGeoCompareOptions.updateUI_StateValues(_slideoutGeoCompareState);
-
 		} else {
 
 			_lblTitle.setText(_compareData_TourTitle);
 
 			_slideoutGeoCompareState.numTours = geoItem.tourIds.length;
 
-			_slideoutGeoCompareOptions.updateUI_StateValues(_slideoutGeoCompareState);
 		}
+
+		_slideoutGeoCompareOptions.updateUI_StateValues(_slideoutGeoCompareState);
+		updateUI_StateValues();
 	}
 
 	private void updateUI_HideFalsePositive() {
 
-		enableControls_HideFalsePositive();
-
-		if (_isComparingDone) {
-
-			final int hidePosValue = _scaleHideFalsePositive.getSelection();
-
-			_lblHideFalsePositiveValue.setText(Integer.toString(hidePosValue));
-		}
+//		enableControls_HideFalsePositive();
+//
+//		if (_isComparingDone) {
+//
+//			final int hidePosValue = _scaleHideFalsePositive.getSelection();
+//
+//			_lblHideFalsePositiveValue.setText(Integer.toString(hidePosValue));
+//		}
 	}
 
 	/**
@@ -2048,6 +2123,23 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 
 			_lblCompareStatus.setText(NLS.bind("Comparing tours: {0} / {1}", workedTours, numTours)); //$NON-NLS-1$
 		}
+	}
+
+	private void updateUI_StateValues() {
+
+		if (_slideoutGeoCompareState.isReset) {
+
+			_lblNumGeoGrids.setText(UI.EMPTY_STRING);
+			_lblNumSlices.setText(UI.EMPTY_STRING);
+			_lblNumTours.setText(UI.EMPTY_STRING);
+
+		} else {
+
+			_lblNumGeoGrids.setText(Integer.toString(_slideoutGeoCompareState.numGeoGrids));
+			_lblNumSlices.setText(Integer.toString(_slideoutGeoCompareState.numSlices));
+			_lblNumTours.setText(Integer.toString(_slideoutGeoCompareState.numTours));
+		}
+
 	}
 
 	private void updateUI_Viewer() {

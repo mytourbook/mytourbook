@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -192,7 +192,7 @@ public class TourChartConfiguration {
 	 */
 	public String					hrZoneStyle				= TourChart.ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP;
 
-	public boolean					isShowTourPhotos		= true;;
+	public boolean					isShowTourPhotos		= true;
 	public boolean					isShowTourPhotoTooltip	= true;
 
 	/*

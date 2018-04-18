@@ -18,6 +18,7 @@ package net.tourbook.ui.tourChart;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceTourChart;
@@ -149,6 +150,8 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
 		GridDataFactory.fillDefaults().applyTo(label);
 		label.setText(Messages.Slideout_TourChartOptions_Label_Title);
 		label.setFont(JFaceResources.getBannerFont());
+
+		MTFont.setBannerFont(label);
 	}
 
 	private void createUI_12_Actions(final Composite parent) {

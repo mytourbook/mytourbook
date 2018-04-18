@@ -63,7 +63,7 @@ import org.eclipse.ui.part.PageBook;
 // author: Wolfgang Schramm
 // create: 06.09.2007
 
-public class TourCatalogViewComparedTour extends TourChartViewPart implements ISynchedChart, ITourChartViewer {
+public class TourCatalogView_ComparedTour extends TourChartViewPart implements ISynchedChart, ITourChartViewer {
 
 	public static final String					ID				= "net.tourbook.views.tourCatalog.comparedTourView";	//$NON-NLS-1$
 
@@ -283,19 +283,6 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 		_actionNavigateNextTour = new ActionNavigateNextTour();
 		_actionSaveComparedTour = new ActionSaveComparedTour();
 		_actionUndoChanges = new ActionUndoChanges();
-
-		final IToolBarManager tbm = _tourChart.getToolBarManager();
-
-		tbm.add(_actionNavigatePrevTour);
-		tbm.add(_actionNavigateNextTour);
-		tbm.add(_actionSaveComparedTour);
-		tbm.add(_actionUndoChanges);
-
-		tbm.add(new Separator());
-		tbm.add(_actionSynchChartsByScale);
-		tbm.add(_actionSynchChartsBySize);
-
-		tbm.update(true);
 	}
 
 	@Override
@@ -309,6 +296,8 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 		createTourChart();
 		createActions();
+
+		fillToolbar();
 
 		addRefTourPropertyListener();
 
@@ -345,7 +334,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 				TourManager.fireEventWithCustomData(//
 						TourEventId.SLIDER_POSITION_CHANGED,
 						chartInfoSelection,
-						TourCatalogViewComparedTour.this);
+						TourCatalogView_ComparedTour.this);
 			}
 		});
 
@@ -438,6 +427,22 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 		_actionSynchChartsByScale.setEnabled(isSynchEnabled);
 		_actionSynchChartsBySize.setEnabled(isSynchEnabled);
+	}
+
+	private void fillToolbar() {
+		
+		final IToolBarManager tbm = _tourChart.getToolBarManager();
+
+		tbm.add(_actionNavigatePrevTour);
+		tbm.add(_actionNavigateNextTour);
+		tbm.add(_actionSaveComparedTour);
+		tbm.add(_actionUndoChanges);
+
+		tbm.add(new Separator());
+		tbm.add(_actionSynchChartsByScale);
+		tbm.add(_actionSynchChartsBySize);
+
+		tbm.update(true);
 	}
 
 	/**
@@ -541,7 +546,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 	@Override
 	protected void onSelectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
-		if (part == TourCatalogViewComparedTour.this) {
+		if (part == TourCatalogView_ComparedTour.this) {
 			return;
 		}
 

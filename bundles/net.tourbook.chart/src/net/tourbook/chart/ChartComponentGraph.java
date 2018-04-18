@@ -227,6 +227,12 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private boolean						_isYSliderVisible;
 
+	/**
+	 * Is <code>true</code> when the area between the vertical x-sliders is filled with a
+	 * translucent background color, this is used for the geo compare area.
+	 */
+	private boolean						_isXSliderAreaVisible;
+
 	/*
 	 * chart slider
 	 */
@@ -2098,9 +2104,10 @@ public class ChartComponentGraph extends Canvas {
 		final String unitLabel = graphDrawingData.getXData().getUnitLabel();
 		final int devUnitLabelWidth = gcChart.textExtent(unitLabel).x;
 
-		gcChart.setForeground(isHistory //
-				? display.getSystemColor(SWT.COLOR_BLACK)
-				: display.getSystemColor(SWT.COLOR_DARK_GRAY));
+		gcChart.setForeground(
+				isHistory //
+						? display.getSystemColor(SWT.COLOR_BLACK)
+						: display.getSystemColor(SWT.COLOR_DARK_GRAY));
 
 		gcGraph.setForeground(_gridColor);
 
@@ -4588,16 +4595,24 @@ public class ChartComponentGraph extends Canvas {
 			 * draw x/y-sliders
 			 */
 			if (_isXSliderVisible) {
+
 				createXSliderLabel(gcOverlay, _xSliderOnTop);
 				createXSliderLabel(gcOverlay, _xSliderOnBottom);
 				updateXSliderYPosition();
 
 				drawSync_410_XSlider(gcOverlay, _xSliderOnBottom);
 				drawSync_410_XSlider(gcOverlay, _xSliderOnTop);
+
+				if (_isXSliderAreaVisible) {
+					drawSync_415_XSliderArea(gcOverlay);
+				}
 			}
+
 			if (_isYSliderVisible) {
 				drawSync_420_YSliders(gcOverlay);
 			}
+
+			// reset x/y slider dirty state
 			_isSliderDirty = false;
 
 			if (_isXMarkerMoved) {
@@ -4755,6 +4770,55 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		colorTxt.dispose();
+	}
+
+	private void drawSync_415_XSliderArea(final GC gc) {
+
+		final Display display = getDisplay();
+
+//		final int rgb = 0xa0;
+//		final Color colorXMarker = new Color(display, rgb, rgb, rgb);
+
+		final Color colorXMarker = new Color(display, 0x91, 0xC7, 0xFF);
+
+		// draw x-marker for each graph
+		for (final GraphDrawingData drawingData : _allGraphDrawingData) {
+
+			// get left/right slider position
+			final int valueIndexA = _xSliderA.getValuesIndex();
+			final int valueIndexB = _xSliderB.getValuesIndex();
+			final int startIndex = valueIndexA < valueIndexB ? valueIndexA : valueIndexB;
+			final int endIndex = valueIndexA > valueIndexB ? valueIndexA : valueIndexB;
+
+			final ChartDataXSerie xData = drawingData.getXData();
+
+			final double scaleX = drawingData.getScaleX();
+
+			final double[] xValues = xData.getHighValuesDouble()[0];
+			final double valueXStart = xValues[startIndex];
+			final double valueXEnd = xValues[endIndex];
+
+			final int devXStart = (int) (scaleX * valueXStart - _xxDevViewPortLeftBorder);
+			final int devXEnd = (int) (scaleX * valueXEnd - _xxDevViewPortLeftBorder);
+
+			final int devYTop = drawingData.getDevYBottom() - drawingData.devGraphHeight;
+			final int devYBottom = drawingData.getDevYBottom();
+
+			// draw area
+			gc.setForeground(colorXMarker);
+			gc.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
+
+			gc.setAlpha(0x80);
+
+			gc.fillGradientRectangle(//
+					devXStart,
+					devYBottom,
+					devXEnd - devXStart,
+					devYTop - devYBottom,
+					true);
+
+			gc.setAlpha(0xff);
+		}
 	}
 
 	/**
@@ -7964,6 +8028,13 @@ public class ChartComponentGraph extends Canvas {
 	void setSelectedLines(final boolean isSelectionVisible) {
 
 		_isSelectionVisible = isSelectionVisible;
+
+		redrawSelection();
+	}
+
+	void setXSliderAreaVisible(final boolean isXSliderAreaVisible) {
+
+		_isXSliderAreaVisible = isXSliderAreaVisible;
 
 		redrawSelection();
 	}

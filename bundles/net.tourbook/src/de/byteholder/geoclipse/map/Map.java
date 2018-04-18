@@ -1857,21 +1857,11 @@ public class Map extends Canvas {
 
 		// draw map image to the screen
 
-//		final long startTime = System.nanoTime();
-//		long imageTime = 0;
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
 		if ((_mapImage != null) && !_mapImage.isDisposed()) {
 
 			final GC gc = event.gc;
 
-//			final long startImage = System.nanoTime();
-//			// TODO remove SYSTEM.OUT.PRINTLN
-
 			gc.drawImage(_mapImage, 0, 0);
-
-//			imageTime = System.nanoTime() - startImage;
-//			// TODO remove SYSTEM.OUT.PRINTLN
 
 			if (_directMapPainter != null) {
 
@@ -1908,16 +1898,6 @@ public class Map extends Canvas {
 			}
 		}
 
-//		final double totalTime = (System.nanoTime() - startTime) / 1000000.0;
-//		final double imageTimeD = imageTime / 1000000.0;
-//		System.out.println("" //
-//				+ ("fps: " + Integer.toString((int) (1000 / totalTime))) //
-//				+ ("\ttotal: " + _nf3.format(totalTime) + "ms")
-//				+ ("\tno-image: " + _nf3.format((totalTime - imageTimeD)) + "ms")
-//				+ ("\timage: " + _nf3.format(imageTimeD) + "ms\t")
-//		//
-//				);
-//		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 	private void onResize() {
@@ -1959,11 +1939,6 @@ public class Map extends Canvas {
 
 		final int redrawCounter = _redrawMapCounter.incrementAndGet();
 
-//		System.out.println(
-//				(net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//						+ ("\tredrawCounter:" + redrawCounter));
-//// TODO remove SYSTEM.OUT.PRINTLN
-
 		if (isDisposed() || _mp == null || _isRedrawEnabled == false) {
 			return;
 		}
@@ -1984,9 +1959,6 @@ public class Map extends Canvas {
 
 			// update display even when this is not the last created runnable
 
-//			System.out.println("queueMapRedraw()-time > 50\t" + (_requestedRedrawTime - _lastMapDrawTime));
-//			// TODO remove SYSTEM.OUT.PRINTLN
-
 			_display.syncExec(new Runnable() {
 
 				@Override
@@ -2000,12 +1972,6 @@ public class Map extends Canvas {
 				}
 			});
 
-			/**
-			 * set an additional asynch runnable because it's possible that the synch runnable do
-			 * not draw all tiles
-			 */
-// TODO check if this is working when disabled
-//			_display.asyncExec(synchImageRunnable);
 
 		} else {
 
@@ -2046,9 +2012,6 @@ public class Map extends Canvas {
 			return;
 		}
 
-//		final long start = System.nanoTime();
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
 		// Draw the map
 		GC gcMapImage = null;
 		try {
@@ -2084,13 +2047,6 @@ public class Map extends Canvas {
 				gcMapImage.dispose();
 			}
 		}
-
-//		System.out.println(net.tourbook.common.UI.timeStamp()
-//				+ " "
-//				+ ((int) (((System.nanoTime() - start) / 1000000)) + " ms\t")
-//				+ ((int) (1000f / ((System.nanoTime() - start) / 1000000)) + " fps") //
-//		);
-//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		redraw();
 

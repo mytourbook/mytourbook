@@ -11,6 +11,13 @@ New
 Improvements
 ============
 
-* Customize tour chart graph actions
-* Customize map2 tour color actions
+* 2D Map
+ 
+  - Sync map with chart sliders (old) and (new) center the map between the sliders
+  - Customize map2 tour color actions
+  
+
+* Tour Chart
+  
+  - Customize tour chart graph actions
  

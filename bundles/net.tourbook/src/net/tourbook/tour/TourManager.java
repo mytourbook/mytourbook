@@ -3172,7 +3172,7 @@ public class TourManager {
 		 */
 		final float[] tourCompareSerie = tourData.tourCompareSerie;
 		ChartDataYSerie yDataTourCompare = null;
-		if (tourCompareSerie != null && tourCompareSerie.length > 0) {
+		if (tourCompareSerie != null && tourCompareSerie.length > 0 && tcc.canShowTourCompareGraph) {
 
 			yDataTourCompare = createChartDataSerie(tourCompareSerie, chartType);
 

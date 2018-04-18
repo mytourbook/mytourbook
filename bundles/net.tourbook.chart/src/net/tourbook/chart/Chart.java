@@ -1182,6 +1182,15 @@ public class Chart extends ViewForm {
 		_chartComponents.setSliderVisible(isSliderVisible);
 	}
 
+	/**
+	 * @param isVisible
+	 *            When <code>true</code> then the area between the vertical x-sliders are filled
+	 *            with a translucent background color.
+	 */
+	public void setShowXSliderArea(final boolean isVisible) {
+		_chartComponents.componentGraph.setXSliderAreaVisible(isVisible);
+	}
+
 	public void setShowZoomActions(final boolean isShowZoomActions) {
 		_isShowZoomActions = isShowZoomActions;
 	}

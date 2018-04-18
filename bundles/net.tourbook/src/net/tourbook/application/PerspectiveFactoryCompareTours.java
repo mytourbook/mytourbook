@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,8 +15,8 @@
  *******************************************************************************/
 package net.tourbook.application;
 
-import net.tourbook.ui.views.tourCatalog.TourCatalogViewComparedTour;
-import net.tourbook.ui.views.tourCatalog.TourCatalogViewReferenceTour;
+import net.tourbook.ui.views.tourCatalog.TourCatalogView_ComparedTour;
+import net.tourbook.ui.views.tourCatalog.TourCatalogView_ReferenceTour;
 import net.tourbook.ui.views.tourCatalog.TourCompareResultView;
 
 import org.eclipse.ui.IFolderLayout;
@@ -31,6 +31,7 @@ public class PerspectiveFactoryCompareTours implements IPerspectiveFactory {
 	private static final String	FOLDER_ID_LIST		= "list";									//$NON-NLS-1$
 	private static final String	FOLDER_ID_REF		= "ref";									//$NON-NLS-1$
 
+	@Override
 	public void createInitialLayout(final IPageLayout layout) {
 
 		layout.setEditorAreaVisible(false);
@@ -51,7 +52,7 @@ public class PerspectiveFactoryCompareTours implements IPerspectiveFactory {
 				0.7f,
 				IPageLayout.ID_EDITOR_AREA);
 
-		refFolder.addView(TourCatalogViewReferenceTour.ID);
+		refFolder.addView(TourCatalogView_ReferenceTour.ID);
 
 		//--------------------------------------------------------------------------------
 
@@ -60,7 +61,7 @@ public class PerspectiveFactoryCompareTours implements IPerspectiveFactory {
 				0.5f,
 				FOLDER_ID_REF);
 
-		compFolder.addView(TourCatalogViewComparedTour.ID);
+		compFolder.addView(TourCatalogView_ComparedTour.ID);
 	}
 
 }

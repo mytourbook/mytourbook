@@ -216,7 +216,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			GRAPH_CONTRIBUTION_ID_PULSE,
 			GRAPH_CONTRIBUTION_ID_SPEED,
 			GRAPH_CONTRIBUTION_ID_TEMPERATURE,
-			GRAPH_CONTRIBUTION_ID_TOUR_COMPARE,
 	};
 	
 //SET_FORMATTING_ON
@@ -362,13 +361,31 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 			_isGeoCompare = isChecked();
 
+			// show geo compare area in the chart
+			setShowXSliderArea(_isGeoCompare);
+
+			final GeoCompareView geoCompareView = (GeoCompareView) Util.getView(GeoCompareView.ID);
+
 			if (_isGeoCompare) {
 
 				// open geo compare result view
 				Util.showView(GeoCompareView.ID, false);
 
+				if (geoCompareView != null) {
+					geoCompareView.onAction_OnOff(true, false);
+				}
+
 				fireSliderMoveEvent();
+
+			} else {
+
+				// stop comparing
+
+				if (geoCompareView != null) {
+					geoCompareView.onAction_OnOff(false, false);
+				}
 			}
+
 		}
 	}
 
