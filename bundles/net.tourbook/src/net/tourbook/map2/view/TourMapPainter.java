@@ -30,6 +30,7 @@ import java.util.Set;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Util;
+import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorCacheSWT;
 import net.tourbook.common.color.ColorProviderConfig;
 import net.tourbook.common.color.IGradientColorProvider;
@@ -56,7 +57,6 @@ import net.tourbook.photo.PhotoLoadingState;
 import net.tourbook.photo.PhotoUI;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageMap2Appearance;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.views.tourCatalog.ReferenceTourManager;
 
 import org.eclipse.core.runtime.Assert;

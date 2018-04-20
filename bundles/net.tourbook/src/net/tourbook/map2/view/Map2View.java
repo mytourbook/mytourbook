@@ -710,9 +710,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 			final TourData firstTourData = _allTourData.get(0);
 
-			paintTours_20_One(firstTourData, false);
-
-			positionMapTo_TourSliders(
+			positionMapTo_0_TourSliders(
 					firstTourData,
 					_currentLeftSliderValueIndex,
 					_currentRightSliderValueIndex,
@@ -1086,7 +1084,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_map.setMapCenter(geoPosition);
 
 		if (isForceZooming) {
-			setBoundsZoomLevel(positionBounds, false);
+			positionMapTo_MapPosition(positionBounds, false);
 		}
 	}
 
@@ -2145,7 +2143,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 			if (tourData != null) {
 
-				positionMapTo_TourSliders(
+				positionMapTo_0_TourSliders(
 						tourData,
 						chartInfo.leftSliderValuesIndex,
 						chartInfo.rightSliderValuesIndex,
@@ -2190,7 +2188,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 										? leftSliderValueIndex
 										: rightSliderValueIndex;
 
-						positionMapTo_TourSliders(//
+						positionMapTo_0_TourSliders(//
 								tourData,
 								leftSliderValueIndex,
 								rightSliderValueIndex,
@@ -2219,7 +2217,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 					? valueIndex1
 					: valueIndex2;
 
-			positionMapTo_TourSliders(//
+			positionMapTo_0_TourSliders(//
 					mapPositionSelection.getTourData(),
 					valueIndex1,
 					valueIndex2,
@@ -2379,7 +2377,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 			if (isDrawSlider) {
 
-				positionMapTo_TourSliders(//
+				positionMapTo_0_TourSliders(//
 						tourData,
 						leftSliderValueIndex,
 						rightSliderValueIndex,
@@ -2449,7 +2447,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			_map.disposeOverlayImageCache();
 		}
 
-		setBoundsZoomLevel(tourBounds, false);
+		positionMapTo_MapPosition(tourBounds, false);
 
 		createLegendImage(_tourPainterConfig.getMapColorProvider());
 
@@ -2577,7 +2575,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 			final Set<GeoPosition> tourBounds = getTourBounds(_allTourData);
 
-			setBoundsZoomLevel(tourBounds, true);
+			positionMapTo_MapPosition(tourBounds, true);
 		}
 
 		createLegendImage(_tourPainterConfig.getMapColorProvider());
@@ -2697,7 +2695,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			if (tourData.mapCenterPositionLatitude == Double.MIN_VALUE) {
 
 				// use default position for the tour
-				setBoundsZoomLevel(tourBoundsSet, true);
+				positionMapTo_MapPosition(tourBoundsSet, true);
 
 			} else {
 
@@ -2805,11 +2803,11 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		updateFilteredPhotos();
 	}
 
-	private void positionMapTo_TourSliders(	final TourData tourData,
-											final int leftSliderValuesIndex,
-											final int rightSliderValuesIndex,
-											final int selectedSliderIndex,
-											final Set<GeoPosition> geoPositions) {
+	private void positionMapTo_0_TourSliders(	final TourData tourData,
+												final int leftSliderValuesIndex,
+												final int rightSliderValuesIndex,
+												final int selectedSliderIndex,
+												final Set<GeoPosition> geoPositions) {
 
 		_isTourOrWayPoint = true;
 
@@ -2837,7 +2835,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 				// center to the left AND right slider
 
-				setBoundsZoomLevel(geoPositions, true);
+				positionMapTo_MapPosition(geoPositions, true);
 
 			} else {
 
@@ -2852,7 +2850,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 							leftSliderValuesIndex,
 							rightSliderValuesIndex);
 
-					setBoundsZoomLevel(mapPositions, true);
+					positionMapTo_MapPosition(mapPositions, true);
 
 				} else {
 
@@ -2866,6 +2864,25 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 			_map.redraw();
 		}
+	}
+
+	/**
+	 * Calculates a zoom level so that all points in the specified set will be visible on screen.
+	 * This is useful if you have a bunch of points in an area like a city and you want to zoom out
+	 * so that the entire city and it's points are visible without panning.
+	 * 
+	 * @param tourPositions
+	 *            A set of GeoPositions to calculate the new zoom from
+	 * @param adjustZoomLevel
+	 *            when <code>true</code> the zoom level will be adjusted to user settings
+	 */
+	private void positionMapTo_MapPosition(final Set<GeoPosition> tourPositions, final boolean isAdjustZoomLevel) {
+
+		if ((tourPositions == null) || (tourPositions.size() < 2)) {
+			return;
+		}
+
+		_map.setMapPosition(tourPositions, isAdjustZoomLevel, _tourPainterConfig.getSynchTourZoomLevel());
 	}
 
 	/**
@@ -3234,7 +3251,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			mapPositions.add(leftPosition);
 			mapPositions.add(rightPosition);
 
-			positionMapTo_TourSliders(//
+			positionMapTo_0_TourSliders(//
 					mapTourData,
 					leftSliderValueIndex,
 					rightSliderValueIndex,
