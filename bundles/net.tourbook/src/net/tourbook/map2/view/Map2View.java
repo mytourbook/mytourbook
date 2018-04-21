@@ -1073,8 +1073,8 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 		final int zoom = _map.getZoom();
 
-		final Rectangle positionRect = _map.getPositionRect(positionBounds, zoom);
-
+		final Rectangle positionRect = _map.getWorldPixelFromGeoPositions(positionBounds, zoom);
+ 
 		final Point center = new Point(//
 				positionRect.x + positionRect.width / 2,
 				positionRect.y + positionRect.height / 2);
@@ -1111,7 +1111,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 				positionBounds.add(_poiPosition);
 			}
 
-			final Rectangle positionRect = _map.getPositionRect(positionBounds, zoom);
+			final Rectangle positionRect = _map.getWorldPixelFromGeoPositions(positionBounds, zoom);
 
 			final Point center = new Point(//
 					positionRect.x + positionRect.width / 2,
@@ -3287,7 +3287,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		final int maximumZoomLevel = mp.getMaximumZoomLevel();
 		int zoom = mp.getMinimumZoomLevel();
 
-		Rectangle positionRect = _map.getPositionRect(positions, zoom);
+		Rectangle positionRect = _map.getWorldPixelFromGeoPositions(positions, zoom);
 		Rectangle viewport = _map.getWorldPixelViewport();
 
 		// zoom in until the tour is larger than the viewport
@@ -3308,7 +3308,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			}
 			_map.setZoom(zoom);
 
-			positionRect = _map.getPositionRect(positions, zoom);
+			positionRect = _map.getWorldPixelFromGeoPositions(positions, zoom);
 			viewport = _map.getWorldPixelViewport();
 		}
 
