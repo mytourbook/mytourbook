@@ -160,6 +160,7 @@ import de.byteholder.geoclipse.GeoclipseExtensions;
 import de.byteholder.geoclipse.map.IMapContextProvider;
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.MapLegend;
+import de.byteholder.geoclipse.map.event.IMapInfoListener;
 import de.byteholder.geoclipse.map.event.IMapPositionListener;
 import de.byteholder.geoclipse.map.event.IPOIListener;
 import de.byteholder.geoclipse.map.event.IPositionListener;
@@ -174,7 +175,7 @@ import de.byteholder.gpx.PointOfInterest;
  * @since 1.3.0
  */
 public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEventListener, IPhotoPropertiesListener,
-		IMapBookmarks, IMapBookmarkListener, IMapPositionListener, IMapSyncListener {
+		IMapBookmarks, IMapBookmarkListener, IMapPositionListener, IMapSyncListener, IMapInfoListener {
 
 // SET_FORMATTING_OFF
 	
@@ -843,6 +844,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 						event.mapGeoPosition.longitude,
 						event.mapZoomLevel);
 			}
+
 		});
 
 		_map.addPOIListener(new IPOIListener() {
@@ -858,6 +860,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			}
 		});
 
+		_map.addMapInfoListener(this);
 		_map.addMapPositionListener(this);
 
 		_map.setMapContextProvider(this);
@@ -1074,7 +1077,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		final int zoom = _map.getZoom();
 
 		final Rectangle positionRect = _map.getWorldPixelFromGeoPositions(positionBounds, zoom);
- 
+
 		final Point center = new Point(//
 				positionRect.x + positionRect.width / 2,
 				positionRect.y + positionRect.height / 2);
@@ -1995,14 +1998,20 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	}
 
 	@Override
-	public void onMapPosition(final GeoPosition geoCenter, final int zoomLevel, final boolean isZoomed) {
+	public void onMapInfo(final GeoPosition mapCenter, final int mapZoomLevel) {
+
+		_mapInfoManager.setMapPosition(mapCenter.latitude, mapCenter.longitude, mapZoomLevel);
+	}
+
+	@Override
+	public void onMapPosition(final GeoPosition geoCenter, final int zoomLevel, final boolean isCenterTour) {
 
 		if (_isInSelectBookmark) {
 			// prevent fire the sync event
 			return;
 		}
 
-		_isInZoom = isZoomed;
+		_isInZoom = isCenterTour;
 		{
 			centerTour();
 		}

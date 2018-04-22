@@ -41,6 +41,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.util.HoveredAreaContext;
 import net.tourbook.common.util.IToolTipHideListener;
@@ -108,6 +109,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
 import de.byteholder.geoclipse.Messages;
+import de.byteholder.geoclipse.map.event.IMapInfoListener;
 import de.byteholder.geoclipse.map.event.IMapPositionListener;
 import de.byteholder.geoclipse.map.event.IPOIListener;
 import de.byteholder.geoclipse.map.event.IPositionListener;
@@ -402,6 +404,7 @@ public class Map extends Canvas {
 	private Rectangle							_clientArea;
 
 // SET_FORMATTING_OFF
+	private final ListenerList					_allMapInfoListener			= new ListenerList(ListenerList.IDENTITY);
 	private final ListenerList					_allMapPositionListener		= new ListenerList(ListenerList.IDENTITY);
 	private final ListenerList					_mousePositionListeners		= new ListenerList(ListenerList.IDENTITY);
 	private final ListenerList					_poiListeners				= new ListenerList(ListenerList.IDENTITY);
@@ -774,6 +777,10 @@ public class Map extends Canvas {
 		});
 	}
 
+	public void addMapInfoListener(final IMapInfoListener mapInfoListener) {
+		_allMapInfoListener.add(mapInfoListener);
+	}
+
 	public void addMapPositionListener(final IMapPositionListener mapPanListener) {
 		_allMapPositionListener.add(mapPanListener);
 	}
@@ -846,27 +853,30 @@ public class Map extends Canvas {
 		}
 
 		// create 9 part image/gc
-		final ImageData transparentImageData = UI.createTransparentImageData(partedTileSize);
+		final ImageData transparentImageData = de.byteholder.geoclipse.map.UI.createTransparentImageData(
+				partedTileSize);
 
 		_9PartImage = new Image(_display, transparentImageData);
 		_9PartGC = new GC(_9PartImage);
 	}
 
 	/**
-	 * Checks world pixel if valid for the current zoom level.
+	 * Checks validation of a world pixel by using the current zoom level and map tile size.
 	 * 
 	 * @param newWorldPixelCenter
 	 * @return Returns adjusted world pixel when necessary.
 	 */
 	private Point2D.Double checkWorldPixel(final Point2D newWorldPixelCenter) {
 
+		final long maxWidth = _mapTileSize.width * _tilePixelSize;
+		final long maxHeight = _mapTileSize.height * _tilePixelSize;
+
 		double newCenterX = newWorldPixelCenter.getX();
 		double newCenterY = newWorldPixelCenter.getY();
 
-		if (newCenterX < 0) { 
+		if (newCenterX < 0) {
 			newCenterX = -1;
 		}
-		final int maxWidth = _mapTileSize.width * _tilePixelSize;
 		if (newCenterX > maxWidth) {
 			newCenterX = maxWidth + 1;
 		}
@@ -875,7 +885,34 @@ public class Map extends Canvas {
 			newCenterY = -1;
 		}
 
-		final int maxHeight = _mapTileSize.height * _tilePixelSize;
+		if (newCenterY > maxHeight) {
+			newCenterY = maxHeight + 1;
+		}
+
+		return new Point2D.Double(newCenterX, newCenterY);
+	}
+
+	private Point2D.Double checkWorldPixel(final Point2D newWorldPixelCenter, final int zoomLevel) {
+
+		final Dimension mapTileSize = _mp.getMapTileSize(zoomLevel);
+
+		final long maxWidth = mapTileSize.width * _tilePixelSize;
+		final long maxHeight = mapTileSize.height * _tilePixelSize;
+
+		double newCenterX = newWorldPixelCenter.getX();
+		double newCenterY = newWorldPixelCenter.getY();
+
+		if (newCenterX < 0) {
+			newCenterX = -1;
+		}
+		if (newCenterX > maxWidth) {
+			newCenterX = maxWidth + 1;
+		}
+
+		if (newCenterY < 0) {
+			newCenterY = -1;
+		}
+
 		if (newCenterY > maxHeight) {
 			newCenterY = maxHeight + 1;
 		}
@@ -953,22 +990,6 @@ public class Map extends Canvas {
 		resetAll();
 	}
 
-	/**
-	 * hide offline area and all states
-	 */
-	private void disableOfflineAreaSelection() {
-
-		_isSelectOfflineArea = false;
-		_isPaintOfflineArea = false;
-		_isOfflineSelectionStarted = false;
-
-		_isContextMenuEnabled = true;
-
-		setCursor(_cursorDefault);
-
-		redraw();
-	}
-
 //	private Composite createPoiToolTip(final Shell shell) {
 //
 //		final Display display = shell.getDisplay();
@@ -987,17 +1008,19 @@ public class Map extends Canvas {
 //	}
 
 	/**
-	 * Disposes all overlay image cache and the overlay painting queue
+	 * hide offline area and all states
 	 */
-	public synchronized void disposeOverlayImageCache() {
+	private void disableOfflineAreaSelection() {
 
-		if (_mp != null) {
-			_mp.resetOverlays();
-		}
+		_isSelectOfflineArea = false;
+		_isPaintOfflineArea = false;
+		_isOfflineSelectionStarted = false;
 
-		_tileOverlayPaintQueue.clear();
+		_isContextMenuEnabled = true;
 
-		_overlayImageCache.dispose();
+		setCursor(_cursorDefault);
+
+		redraw();
 	}
 
 //	/**
@@ -1028,6 +1051,20 @@ public class Map extends Canvas {
 //		queueMapRedraw();
 //	}
 
+	/**
+	 * Disposes all overlay image cache and the overlay painting queue
+	 */
+	public synchronized void disposeOverlayImageCache() {
+
+		if (_mp != null) {
+			_mp.resetOverlays();
+		}
+
+		_tileOverlayPaintQueue.clear();
+
+		_overlayImageCache.dispose();
+	}
+
 	private void disposeResource(final Resource resource) {
 		if ((resource != null) && !resource.isDisposed()) {
 			resource.dispose();
@@ -1036,6 +1073,17 @@ public class Map extends Canvas {
 
 	public void disposeTiles() {
 		_mp.disposeTiles();
+	}
+
+	private void fireMapInfoEvent() {
+
+		final GeoPosition geoCenter = getGeoCenter();
+
+		final Object[] listeners = _allMapInfoListener.getListeners();
+
+		for (final Object listener : listeners) {
+			((IMapInfoListener) listener).onMapInfo(geoCenter, _mapZoomLevel);
+		}
 	}
 
 	/**
@@ -1170,33 +1218,6 @@ public class Map extends Canvas {
 		return _mapLegend;
 	}
 
-	private Point2D.Double getMapCenterInWorldPixel(final Point2D newWorldPixelCenter, final int zoomLevel) {
-
-		final Dimension mapTileSize = _mp.getMapTileSize(zoomLevel);
-
-		double newCenterX = newWorldPixelCenter.getX();
-		double newCenterY = newWorldPixelCenter.getY();
-
-		if (newCenterX < 0) {
-			newCenterX = -1;
-		}
-		final int maxWidth = mapTileSize.width * _tilePixelSize;
-		if (newCenterX > maxWidth) {
-			newCenterX = maxWidth + 1;
-		}
-
-		if (newCenterY < 0) {
-			newCenterY = -1;
-		}
-
-		final int maxHeight = mapTileSize.height * _tilePixelSize;
-		if (newCenterY > maxHeight) {
-			newCenterY = maxHeight + 1;
-		}
-
-		return new Point2D.Double(newCenterX, newCenterY);
-	}
-
 	/**
 	 * @return Returns the overlay map painter which are defined as plugin extension
 	 */
@@ -1273,9 +1294,11 @@ public class Map extends Canvas {
 
 	/**
 	 * @param positions
+	 *            Geo positions
 	 * @param zoom
-	 * @return Returns a rectangle in world positions which contains all geo positions for the zoom
-	 *         level
+	 *            Requested zoom level
+	 * @return Returns a rectangle in world positions which contains all geo positions for the given
+	 *         zoom level
 	 */
 	public Rectangle getWorldPixelFromGeoPositions(final Set<GeoPosition> positions, final int zoom) {
 
@@ -1311,14 +1334,14 @@ public class Map extends Canvas {
 		final int worldX = (int) (worldPixelMapCenter.getX() - (devWidth / 2d));
 		final int worldY = (int) (worldPixelMapCenter.getY() - (devHeight / 2d));
 
-		final Rectangle worldPixelTopLeftViewport = new Rectangle(worldX, worldY, devWidth, devHeight);
-
-		return worldPixelTopLeftViewport;
+		return new Rectangle(worldX, worldY, devWidth, devHeight);
 	}
 
 	/**
-	 * @return Returns the map viewport in world pixel<br>
-	 *         <b>x</b> and <b>y</b> contains the position in world pixel of the map center <br>
+	 * @return Returns the map viewport in world pixel for the current map center
+	 *         <p>
+	 *         <b>x</b> and <b>y</b> contains the position in world pixel of the top left viewport
+	 *         in the map<br>
 	 *         <b>width</b> and <b>height</b> contains the visible area in device pixel
 	 */
 	public Rectangle getWorldPixelViewport() {
@@ -2600,7 +2623,8 @@ public class Map extends Canvas {
 		boolean isOverlayPainted = false;
 
 		// create 1 part image/gc
-		final ImageData transparentImageData = UI.createTransparentImageData(_tilePixelSize);
+		final ImageData transparentImageData = de.byteholder.geoclipse.map.UI.createTransparentImageData(
+				_tilePixelSize);
 
 		final Image overlayImage = new Image(_display, transparentImageData);
 		final GC gc1Part = new GC(overlayImage);
@@ -3378,7 +3402,7 @@ public class Map extends Canvas {
 		}
 
 		// linux has 2 lines: 1: url, 2. text
-		final String[] dndText = text.split(UI.NEW_LINE);
+		final String[] dndText = text.split(de.byteholder.geoclipse.map.UI.NEW_LINE);
 		if (dndText.length == 0) {
 			return false;
 		}
@@ -3795,15 +3819,6 @@ public class Map extends Canvas {
 		fireMousePosition();
 	}
 
-	/**
-	 * Set map context menu provider
-	 * 
-	 * @param mapContextProvider
-	 */
-	public void setMapContextProvider(final IMapContextProvider mapContextProvider) {
-		_mapContextProvider = mapContextProvider;
-	}
-
 	/*
 	 * keep old method because it is not easy to understand
 	 */
@@ -3855,22 +3870,24 @@ public class Map extends Canvas {
 //	}
 
 	/**
+	 * Set map context menu provider
+	 * 
+	 * @param mapContextProvider
+	 */
+	public void setMapContextProvider(final IMapContextProvider mapContextProvider) {
+		_mapContextProvider = mapContextProvider;
+	}
+
+	/**
 	 * Center the map within the geo positions.
 	 * 
 	 * @param geoTourPositions
 	 * @param isAdjustZoomLevel
-	 * @param synchTourZoomLevel
+	 * @param requestedZoomLevelAdjustment
 	 */
 	public void setMapPosition(	final Set<GeoPosition> geoTourPositions,
 								final boolean isAdjustZoomLevel,
-								final int synchTourZoomLevel) {
-
-		final int currentZoomLevel = _mapZoomLevel;
-
-		final int minZoomLevel = _mp.getMinimumZoomLevel();
-		final int maximumZoomLevel = _mp.getMaximumZoomLevel();
-
-		int zoom = maximumZoomLevel;
+								final int requestedZoomLevelAdjustment) {
 
 		Rectangle wpTourRect;
 		Rectangle wpViewportRect;
@@ -3879,21 +3896,34 @@ public class Map extends Canvas {
 		java.awt.Point wpNewMapCenter;
 		java.awt.geom.Point2D.Double wpMapCenter;
 
+		// keep current zoomlevel
+		final int currentZoomLevel = _mapZoomLevel;
+
+		final int minZoomLevel = _mp.getMinimumZoomLevel();
+		final int maximumZoomLevel = _mp.getMaximumZoomLevel();
+
+		int zoom = maximumZoomLevel;
+
 		wpTourRect = getWorldPixelFromGeoPositions(geoTourPositions, zoom);
 
-		// get tour center in world pixel for the current zoom level
+		// get tour center in world pixel for the max zoom level
 		wpTourCenter = new java.awt.Point(//
 				wpTourRect.x + wpTourRect.width / 2,
 				wpTourRect.y + wpTourRect.height / 2);
 
 		geoTourCenter = _mp.pixelToGeo(wpTourCenter, zoom);
-		wpNewMapCenter = _mp.geoToPixel(geoTourCenter, zoom);
 
-		wpMapCenter = getMapCenterInWorldPixel(wpNewMapCenter, zoom);
+		wpNewMapCenter = _mp.geoToPixel(geoTourCenter, zoom);
+		wpMapCenter = checkWorldPixel(wpNewMapCenter, zoom);
+
 		wpViewportRect = getWorldPixelTopLeftViewport(wpMapCenter);
 
+		// use an offset that the slider are not at the map border and almost not visible
+		final int offset = 30;
+
 		// zoom out until the tour is smaller than the viewport
-		while ((wpTourRect.width > wpViewportRect.width) || (wpTourRect.height > wpViewportRect.height)) {
+		while ((wpTourRect.width + offset > wpViewportRect.width) //
+				|| (wpTourRect.height + offset > wpViewportRect.height)) {
 
 			// check zoom level
 			if (zoom - 1 < minZoomLevel) {
@@ -3906,83 +3936,35 @@ public class Map extends Canvas {
 			wpTourRect = getWorldPixelFromGeoPositions(geoTourPositions, zoom);
 
 			wpNewMapCenter = _mp.geoToPixel(geoTourCenter, zoom);
-			wpMapCenter = getMapCenterInWorldPixel(wpNewMapCenter, zoom);
+			wpMapCenter = checkWorldPixel(wpNewMapCenter, zoom);
+
 			wpViewportRect = getWorldPixelTopLeftViewport(wpMapCenter);
 		}
 
-		// set new map center
-		setMapCenterInWorldPixel(wpMapCenter);
-
 		// adjust to requested zoom level
-		int adjustedZoomLevel = 0;
-		if (isAdjustZoomLevel) {
-			adjustedZoomLevel = synchTourZoomLevel;
-		}
+		final int adjustedZoomLevel = isAdjustZoomLevel ? requestedZoomLevelAdjustment : 0;
+		final int newZoomLevel = zoom + adjustedZoomLevel;
 
 		// set zoomlevel ONLY when it was modified
-		final int newZoomLevel = zoom + adjustedZoomLevel;
 		if (newZoomLevel != currentZoomLevel) {
 
 			setZoom(newZoomLevel);
-		} else {
-			updateViewPortData();
 
+		} else {
+
+			// set new map center
+			_worldPixelMapCenter = wpMapCenter;
+
+			// zoom position is the same as previous !!!
+
+			updateViewPortData();
 		}
-//
+
+		fireMapInfoEvent();
+
 //		paint();
 
 //		fireMapPositionEvent(false);
-	}
-
-	public void setMapPosition_OLD(	final Set<GeoPosition> tourPositions,
-									final boolean isAdjustZoomLevel,
-									final int synchTourZoomLevel) {
-
-		final Map ___map = this;
-
-		final int maximumZoomLevel = _mp.getMaximumZoomLevel();
-		int zoom = _mp.getMinimumZoomLevel();
-
-		Rectangle tourRect = ___map.getWorldPixelFromGeoPositions(tourPositions, zoom);
-		Rectangle viewportRect = ___map.getWorldPixelViewport();
-
-		// zoom in until the tour is larger than the viewport
-		while ((tourRect.width < viewportRect.width) && (tourRect.height < viewportRect.height)) {
-
-			// center position in the map
-			final java.awt.Point center = new java.awt.Point(//
-					tourRect.x + tourRect.width / 2,
-					tourRect.y + tourRect.height / 2);
-
-			final GeoPosition centerPosition = _mp.pixelToGeo(center, zoom);
-
-			___map.setMapCenter(centerPosition);
-
-			zoom++;
-
-			// check zoom level
-			if (zoom >= maximumZoomLevel) {
-				break;
-			}
-
-			/*
-			 * Get next zoom level data
-			 */
-			___map.setZoom(zoom);
-
-			tourRect = ___map.getWorldPixelFromGeoPositions(tourPositions, zoom);
-			viewportRect = ___map.getWorldPixelViewport();
-		}
-
-		// the algorithm generated a larger zoom level as necessary
-		zoom--;
-
-		int adjustedZoomLevel = 0;
-		if (isAdjustZoomLevel) {
-			adjustedZoomLevel = synchTourZoomLevel;
-		}
-
-		___map.setZoom(zoom + adjustedZoomLevel);
 	}
 
 	/**
@@ -4317,11 +4299,12 @@ public class Map extends Canvas {
 		// update values for the new zoom level !!!
 		_mapTileSize = _mp.getMapTileSize(_mapZoomLevel);
 
-		final Dimension newMapTileSize = _mp.getMapTileSize(adjustedZoomLevel);
+		final double relativeWidth = (double) _mapTileSize.width / oldMapTileSize.width;
+		final double relativeHeight = (double) _mapTileSize.height / oldMapTileSize.height;
 
 		final Point2D.Double newWorldPixelCenter = new Point2D.Double(//
-				oldCenter.getX() * ((double) newMapTileSize.width / oldMapTileSize.width),
-				oldCenter.getY() * ((double) newMapTileSize.height / oldMapTileSize.height));
+				oldCenter.getX() * relativeWidth,
+				oldCenter.getY() * relativeHeight);
 
 		setMapCenterInWorldPixel(newWorldPixelCenter);
 		updateViewPortData();
