@@ -3893,7 +3893,7 @@ public class Map extends Canvas {
 		Rectangle wpViewportRect;
 		GeoPosition geoTourCenter;
 		java.awt.Point wpTourCenter;
-		java.awt.Point wpNewMapCenter;
+		java.awt.Point wpMapCenterRaw;
 		java.awt.geom.Point2D.Double wpMapCenter;
 
 		// keep current zoomlevel
@@ -3913,8 +3913,8 @@ public class Map extends Canvas {
 
 		geoTourCenter = _mp.pixelToGeo(wpTourCenter, zoom);
 
-		wpNewMapCenter = _mp.geoToPixel(geoTourCenter, zoom);
-		wpMapCenter = checkWorldPixel(wpNewMapCenter, zoom);
+		wpMapCenterRaw = _mp.geoToPixel(geoTourCenter, zoom);
+		wpMapCenter = checkWorldPixel(wpMapCenterRaw, zoom);
 
 		wpViewportRect = getWorldPixelTopLeftViewport(wpMapCenter);
 
@@ -3935,8 +3935,8 @@ public class Map extends Canvas {
 
 			wpTourRect = getWorldPixelFromGeoPositions(geoTourPositions, zoom);
 
-			wpNewMapCenter = _mp.geoToPixel(geoTourCenter, zoom);
-			wpMapCenter = checkWorldPixel(wpNewMapCenter, zoom);
+			wpMapCenterRaw = _mp.geoToPixel(geoTourCenter, zoom);
+			wpMapCenter = checkWorldPixel(wpMapCenterRaw, zoom);
 
 			wpViewportRect = getWorldPixelTopLeftViewport(wpMapCenter);
 		}
@@ -3945,17 +3945,21 @@ public class Map extends Canvas {
 		final int adjustedZoomLevel = isAdjustZoomLevel ? requestedZoomLevelAdjustment : 0;
 		final int newZoomLevel = zoom + adjustedZoomLevel;
 
-		// set zoomlevel ONLY when it was modified
 		if (newZoomLevel != currentZoomLevel) {
+
+			// set new zoomlevel ONLY when it was modified -> this will dispose old overlay images !!!
+
+//			_mapZoomLevel = zoom;
+//			_worldPixelMapCenter = wpMapCenter;
 
 			setZoom(newZoomLevel);
 
 		} else {
 
+			// zoom position is the same as previous !!!
+
 			// set new map center
 			_worldPixelMapCenter = wpMapCenter;
-
-			// zoom position is the same as previous !!!
 
 			updateViewPortData();
 		}

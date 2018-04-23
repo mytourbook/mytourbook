@@ -126,7 +126,7 @@ public class TourPainterConfiguration {
 		isLinkPhotoDisplayed = isLinkPhoto;
 	}
 
-	public void setSynchTourZoomLevel(final int zoomLevel) {
+	public void setSynchZoomLevelAdjustment(final int zoomLevel) {
 		_synchTourZoomLevel = zoomLevel;
 	}
 

@@ -735,7 +735,8 @@ public class Messages extends NLS {
 	public static String		GeoPart_View_Column_GeoDiff_Relative_Tooltip;
 	public static String		GeoPart_View_Column_SequenceNumber_Header;
 	public static String		GeoPart_View_Column_SequenceNumber_Label;
-	public static String		GeoPart_View_Label_NoTourWithGeoData;
+	public static String		GeoPart_View_PageText_MultipleToursNotSupported;
+	public static String		GeoPart_View_PageText_NoTourWithGeoData;
 
 	public static String		HR_Zone_01_060_Moderate;
 	public static String		HR_Zone_01_060_Moderate_Shortcut;

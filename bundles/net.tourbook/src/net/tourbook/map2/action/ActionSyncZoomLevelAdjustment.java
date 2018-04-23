@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,11 +13,9 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.map2.action;
 
 import net.tourbook.map2.Messages;
-import net.tourbook.map2.view.Map2View;
 import net.tourbook.map2.view.TourPainterConfiguration;
 
 import org.eclipse.jface.action.Action;
@@ -27,7 +25,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 
-public class ActionSyncTourZoomLevel extends Action implements IMenuCreator {
+public class ActionSyncZoomLevelAdjustment extends Action implements IMenuCreator {
 
 	private Menu			_menu;
 
@@ -54,13 +52,14 @@ public class ActionSyncTourZoomLevel extends Action implements IMenuCreator {
 		@Override
 		public void run() {
 			_zoomLevel = _actionZoomLevel;
-			TourPainterConfiguration.getInstance().setSynchTourZoomLevel(_actionZoomLevel);
+			TourPainterConfiguration.getInstance().setSynchZoomLevelAdjustment(_actionZoomLevel);
 		}
 	}
 
-	public ActionSyncTourZoomLevel(final Map2View osmView) {
+	public ActionSyncZoomLevelAdjustment() {
 
 		super(Messages.map_action_zoom_level_centered_tour, AS_DROP_DOWN_MENU);
+
 		setMenuCreator(this);
 
 		_actionZoomLevel_0 = new ActionZoomLevel(0, Messages.map_action_zoom_level_default);
@@ -73,21 +72,26 @@ public class ActionSyncTourZoomLevel extends Action implements IMenuCreator {
 	}
 
 	private void addActionToMenu(final Action action) {
+
 		final ActionContributionItem item = new ActionContributionItem(action);
 		item.fill(_menu, -1);
 	}
 
+	@Override
 	public void dispose() {
+
 		if (_menu != null) {
 			_menu.dispose();
 			_menu = null;
 		}
 	}
 
+	@Override
 	public Menu getMenu(final Control parent) {
 		return null;
 	}
 
+	@Override
 	public Menu getMenu(final Menu parent) {
 
 		_menu = new Menu(parent);
@@ -107,7 +111,8 @@ public class ActionSyncTourZoomLevel extends Action implements IMenuCreator {
 	public void setZoomLevel(final int zoomLevel) {
 
 		_zoomLevel = zoomLevel;
-		TourPainterConfiguration.getInstance().setSynchTourZoomLevel(zoomLevel);
+
+		TourPainterConfiguration.getInstance().setSynchZoomLevelAdjustment(zoomLevel);
 
 		_actionZoomLevel_0.setChecked(false);
 		_actionZoomLevel_1.setChecked(false);

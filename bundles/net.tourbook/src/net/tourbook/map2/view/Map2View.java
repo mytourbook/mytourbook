@@ -80,7 +80,7 @@ import net.tourbook.map2.action.ActionSyncMapWithOtherMap;
 import net.tourbook.map2.action.ActionSyncMapWithPhoto;
 import net.tourbook.map2.action.ActionSyncMapWithSlider;
 import net.tourbook.map2.action.ActionSyncMapWithTour;
-import net.tourbook.map2.action.ActionSyncTourZoomLevel;
+import net.tourbook.map2.action.ActionSyncZoomLevelAdjustment;
 import net.tourbook.map2.action.ActionTourColor;
 import net.tourbook.map2.action.ActionZoomCentered;
 import net.tourbook.map2.action.ActionZoomIn;
@@ -273,148 +273,148 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 	{}
 
-	private boolean						_isPartVisible;
+	private boolean							_isPartVisible;
 
 	/**
 	 * contains selection which was set when the part is hidden
 	 */
-	private ISelection					_selectionWhenHidden;
+	private ISelection						_selectionWhenHidden;
 
-	private IPartListener2				_partListener;
-	private ISelectionListener			_postSelectionListener;
-	private IPropertyChangeListener		_prefChangeListener;
-	private ITourEventListener			_tourEventListener;
+	private IPartListener2					_partListener;
+	private ISelectionListener				_postSelectionListener;
+	private IPropertyChangeListener			_prefChangeListener;
+	private ITourEventListener				_tourEventListener;
 	/**
 	 * Contains all tours which are displayed in the map.
 	 */
-	private final ArrayList<TourData>	_allTourData			= new ArrayList<>();
-	private TourData					_previousTourData;
+	private final ArrayList<TourData>		_allTourData			= new ArrayList<>();
+	private TourData						_previousTourData;
 
 	/**
 	 * contains photos which are displayed in the map
 	 */
-	private final ArrayList<Photo>		_allPhotos				= new ArrayList<>();
-	private final ArrayList<Photo>		_filteredPhotos			= new ArrayList<>();
+	private final ArrayList<Photo>			_allPhotos				= new ArrayList<>();
+	private final ArrayList<Photo>			_filteredPhotos			= new ArrayList<>();
 
-	private boolean						_isPhotoFilterActive;
+	private boolean							_isPhotoFilterActive;
 
-	private int							_photoFilterRatingStars;
-	private int							_photoFilterRatingStarOperator;
+	private int								_photoFilterRatingStars;
+	private int								_photoFilterRatingStarOperator;
 
-	private boolean						_isShowTour;
-	private boolean						_isShowPhoto;
-	private boolean						_isShowLegend;
+	private boolean							_isShowTour;
+	private boolean							_isShowPhoto;
+	private boolean							_isShowLegend;
 
-	private boolean						_isMapSynched_WithOtherMap;
-	private boolean						_isMapSynched_WithPhoto;
-	private boolean						_isMapSynched_WithChartSlider;
-	private boolean						_isMapSynched_WithChartSlider_IsCentered;
-	private boolean						_isMapSynched_WithTour;
-	private boolean						_isPositionCentered;
+	private boolean							_isMapSynched_WithOtherMap;
+	private boolean							_isMapSynched_WithPhoto;
+	private boolean							_isMapSynched_WithChartSlider;
+	private boolean							_isMapSynched_WithChartSlider_IsCentered;
+	private boolean							_isMapSynched_WithTour;
+	private boolean							_isPositionCentered;
 
-	private boolean						_isInSelectBookmark;
-	private boolean						_isInZoom;
+	private boolean							_isInSelectBookmark;
+	private boolean							_isInZoom;
 
-	private int							_defaultZoom;
-	private GeoPosition					_defaultPosition;
+	private int								_defaultZoom;
+	private GeoPosition						_defaultPosition;
 
 	/**
 	 * when <code>true</code> a tour is painted, <code>false</code> a point of interrest is painted
 	 */
-	private boolean						_isTourOrWayPoint;
+	private boolean							_isTourOrWayPoint;
 
 	/*
 	 * tool tips
 	 */
-	private TourToolTip					_tourToolTip;
+	private TourToolTip						_tourToolTip;
 
-	private String						_poiName;
-	private GeoPosition					_poiPosition;
-	private int							_poiZoomLevel;
+	private String							_poiName;
+	private GeoPosition						_poiPosition;
+	private int								_poiZoomLevel;
 
 	/*
 	 * current position for the x-sliders
 	 */
-	private int							_currentLeftSliderValueIndex;
-	private int							_currentRightSliderValueIndex;
-	private int							_currentSelectedSliderValueIndex;
+	private int								_currentLeftSliderValueIndex;
+	private int								_currentRightSliderValueIndex;
+	private int								_currentSelectedSliderValueIndex;
 
-	private MapLegend					_mapLegend;
+	private MapLegend						_mapLegend;
 
-	private long						_previousOverlayKey;
+	private long							_previousOverlayKey;
 
-	private int							_mapDimLevel			= -1;
-	private RGB							_mapDimColor;
+	private int								_mapDimLevel			= -1;
+	private RGB								_mapDimColor;
 
-	private int							_selectedProfileKey		= 0;
+	private int								_selectedProfileKey		= 0;
 
-	private MapGraphId					_tourColorId;
+	private MapGraphId						_tourColorId;
 
-	private int							_hashTourId;
-	private int							_hashTourData;
-	private long						_hashTourOverlayKey;
-	private int							_hashAllPhotos;
+	private int								_hashTourId;
+	private int								_hashTourData;
+	private long							_hashTourOverlayKey;
+	private int								_hashAllPhotos;
 
-	private final AtomicInteger			_asyncCounter			= new AtomicInteger();
+	private final AtomicInteger				_asyncCounter			= new AtomicInteger();
 
 	/**
 	 * Is <code>true</code> when a link photo is displayed, otherwise a tour photo (photo which is
 	 * save in a tour) is displayed.
 	 */
-	private boolean						_isLinkPhotoDisplayed;
+	private boolean							_isLinkPhotoDisplayed;
 
-	private boolean						_isInMapSync;
-	private long						_lastFiredSyncEventTime;
+	private boolean							_isInMapSync;
+	private long							_lastFiredSyncEventTime;
 
-	private HashMap<MapGraphId, Action>	_allTourColorActions	= new HashMap<>();
+	private HashMap<MapGraphId, Action>		_allTourColorActions	= new HashMap<>();
 
-	private ActionTourColor				_actionTourColorAltitude;
-	private ActionTourColor				_actionTourColorGradient;
-	private ActionTourColor				_actionTourColorPulse;
-	private ActionTourColor				_actionTourColorSpeed;
-	private ActionTourColor				_actionTourColorPace;
-	private ActionTourColor				_actionTourColorHrZone;
+	private ActionTourColor					_actionTourColorAltitude;
+	private ActionTourColor					_actionTourColorGradient;
+	private ActionTourColor					_actionTourColorPulse;
+	private ActionTourColor					_actionTourColorSpeed;
+	private ActionTourColor					_actionTourColorPace;
+	private ActionTourColor					_actionTourColorHrZone;
 
-	private ActionDimMap				_actionDimMap;
-	private ActionOpenPrefDialog		_actionEdit2DMapPreferences;
-	private ActionMap2Graphs			_actionMap2TourColors;
-	private ActionMapBookmarks			_actionMapBookmarks;
-	private ActionMap2Color				_actionMapColor;
-	private ActionManageMapProviders	_actionManageProvider;
-	private ActionPhotoProperties		_actionPhotoFilter;
-	private ActionReloadFailedMapImages	_actionReloadFailedMapImages;
-	private ActionSaveDefaultPosition	_actionSaveDefaultPosition;
-	private ActionSelectMapProvider		_actionSelectMapProvider;
-	private ActionSetDefaultPosition	_actionSetDefaultPosition;
-	private ActionShowAllFilteredPhotos	_actionShowAllFilteredPhotos;
-	private ActionShowLegendInMap		_actionShowLegendInMap;
-	private ActionShowPhotos			_actionShowPhotos;
-	private ActionShowPOI				_actionShowPOI;
-	private ActionShowScaleInMap		_actionShowScaleInMap;
-	private ActionShowSliderInMap		_actionShowSliderInMap;
-	private ActionShowSliderInLegend	_actionShowSliderInLegend;
-	private ActionShowStartEndInMap		_actionShowStartEndInMap;
-	private ActionShowTourInMap			_actionShowTourInMap;
-	private ActionShowTourInfoInMap		_actionShowTourInfoInMap;
-	private ActionShowTourMarker		_actionShowTourMarker;
-	private ActionShowWayPoints			_actionShowWayPoints;
-	private ActionSyncTourZoomLevel		_actionSyncTourZoomLevel;
-	private ActionSyncMapWithOtherMap	_actionSyncMap_WithOtherMap;
-	private ActionSyncMapWithPhoto		_actionSyncMap_WithPhoto;
-	private ActionSyncMapWithSlider		_actionSyncMap_WithChartSlider;
-	private ActionSyncMapWithTour		_actionSyncMap_WithTour;
+	private ActionDimMap					_actionDimMap;
+	private ActionOpenPrefDialog			_actionEdit2DMapPreferences;
+	private ActionMap2Graphs				_actionMap2TourColors;
+	private ActionMapBookmarks				_actionMapBookmarks;
+	private ActionMap2Color					_actionMapColor;
+	private ActionManageMapProviders		_actionManageProvider;
+	private ActionPhotoProperties			_actionPhotoFilter;
+	private ActionReloadFailedMapImages		_actionReloadFailedMapImages;
+	private ActionSaveDefaultPosition		_actionSaveDefaultPosition;
+	private ActionSelectMapProvider			_actionSelectMapProvider;
+	private ActionSetDefaultPosition		_actionSetDefaultPosition;
+	private ActionShowAllFilteredPhotos		_actionShowAllFilteredPhotos;
+	private ActionShowLegendInMap			_actionShowLegendInMap;
+	private ActionShowPhotos				_actionShowPhotos;
+	private ActionShowPOI					_actionShowPOI;
+	private ActionShowScaleInMap			_actionShowScaleInMap;
+	private ActionShowSliderInMap			_actionShowSliderInMap;
+	private ActionShowSliderInLegend		_actionShowSliderInLegend;
+	private ActionShowStartEndInMap			_actionShowStartEndInMap;
+	private ActionShowTourInMap				_actionShowTourInMap;
+	private ActionShowTourInfoInMap			_actionShowTourInfoInMap;
+	private ActionShowTourMarker			_actionShowTourMarker;
+	private ActionShowWayPoints				_actionShowWayPoints;
+	private ActionSyncZoomLevelAdjustment	_actionSyncZoomLevelAdjustment;
+	private ActionSyncMapWithOtherMap		_actionSyncMap_WithOtherMap;
+	private ActionSyncMapWithPhoto			_actionSyncMap_WithPhoto;
+	private ActionSyncMapWithSlider			_actionSyncMap_WithChartSlider;
+	private ActionSyncMapWithTour			_actionSyncMap_WithTour;
 
-	private ActionZoomIn				_actionZoom_In;
-	private ActionZoomOut				_actionZoom_Out;
-	private ActionZoomCentered			_actionZoom_Centered;
-	private ActionZoomShowEntireMap		_actionZoom_ShowEntireMap;
-	private ActionZoomShowEntireTour	_actionZoom_ShowEntireTour;
+	private ActionZoomIn					_actionZoom_In;
+	private ActionZoomOut					_actionZoom_Out;
+	private ActionZoomCentered				_actionZoom_Centered;
+	private ActionZoomShowEntireMap			_actionZoom_ShowEntireMap;
+	private ActionZoomShowEntireTour		_actionZoom_ShowEntireTour;
 
 	/*
 	 * UI controls
 	 */
-	private Composite					_parent;
-	private Map							_map;
+	private Composite						_parent;
+	private Map								_map;
 
 	private class ActionMap2Graphs extends ActionToolbarSlideout {
 
@@ -1213,7 +1213,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_actionSyncMap_WithPhoto = new ActionSyncMapWithPhoto(this);
 		_actionSyncMap_WithTour = new ActionSyncMapWithTour(this);
 		_actionSyncMap_WithChartSlider = new ActionSyncMapWithSlider(this);
-		_actionSyncTourZoomLevel = new ActionSyncTourZoomLevel(this);
+		_actionSyncZoomLevelAdjustment = new ActionSyncZoomLevelAdjustment();
 
 		_actionEdit2DMapPreferences = new ActionOpenPrefDialog(
 				Messages.Map_Action_Edit2DMapPreferences,
@@ -1569,7 +1569,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_actionShowWayPoints.setEnabled(_isTourOrWayPoint);
 		_actionZoom_Centered.setEnabled(isTourAvailable);
 		_actionZoom_ShowEntireTour.setEnabled(_isTourOrWayPoint && _isShowTour && isTourAvailable);
-		_actionSyncTourZoomLevel.setEnabled(isOneTour);
+		_actionSyncZoomLevelAdjustment.setEnabled(isTourAvailable);
 		_actionSyncMap_WithOtherMap.setEnabled(true);
 		_actionSyncMap_WithChartSlider.setEnabled(isTourAvailable);
 		_actionSyncMap_WithTour.setEnabled(isTourAvailable);
@@ -1704,7 +1704,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 		menuMgr.add(_actionEdit2DMapPreferences);
 		menuMgr.add(_actionDimMap);
-		menuMgr.add(_actionSyncTourZoomLevel);
+		menuMgr.add(_actionSyncZoomLevelAdjustment);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionManageProvider);
@@ -2970,7 +2970,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_actionSyncMap_WithOtherMap.setChecked(_isMapSynched_WithOtherMap);
 
 		//
-		_actionSyncTourZoomLevel.setZoomLevel(Util.getStateInt(_state, MEMENTO_SYNCH_TOUR_ZOOM_LEVEL, 0));
+		_actionSyncZoomLevelAdjustment.setZoomLevel(Util.getStateInt(_state, MEMENTO_SYNCH_TOUR_ZOOM_LEVEL, 0));
 		_mapDimLevel = Util.getStateInt(_state, MEMENTO_MAP_DIM_LEVEL, -1);
 
 		// checkbox: show start/end in map
@@ -3172,7 +3172,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 		_state.put(MEMENTO_ZOOM_CENTERED, _actionZoom_Centered.isChecked());
 		_state.put(MEMENTO_SYNCH_WITH_SELECTED_TOUR, _actionSyncMap_WithTour.isChecked());
-		_state.put(MEMENTO_SYNCH_TOUR_ZOOM_LEVEL, _actionSyncTourZoomLevel.getZoomLevel());
+		_state.put(MEMENTO_SYNCH_TOUR_ZOOM_LEVEL, _actionSyncZoomLevelAdjustment.getZoomLevel());
 
 		_state.put(MEMENTO_MAP_DIM_LEVEL, _mapDimLevel);
 
