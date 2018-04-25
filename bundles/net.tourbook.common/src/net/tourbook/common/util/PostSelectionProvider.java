@@ -140,6 +140,14 @@ public class PostSelectionProvider implements IPostSelectionProvider {
 				}
 			});
 		}
+
+		/**
+		 * Remove selection that it is not refired when a part is activated -> this causes lot of
+		 * confusion
+		 * <p>
+		 * This may be a drastic change but the future tests will tell if it works, may be not 100%.
+		 */
+		_currentSelection = null;
 	}
 
 	public void setSelectionNoFireEvent(final ISelection selection) {
