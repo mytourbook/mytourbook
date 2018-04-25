@@ -851,6 +851,7 @@ public class TourMapPainter extends MapPainter {
 
 	private static void init() {
 
+		// setup only ONCE
 		if (_bgColor != null) {
 			return;
 		}
@@ -883,10 +884,7 @@ public class TourMapPainter extends MapPainter {
 		};
 
 		// add pref listener, dispose is not removing it because it is static !!!
-		TourbookPlugin
-				.getDefault()
-				.getPreferenceStore()//
-				.addPropertyChangeListener(_prefChangeListener);
+		TourbookPlugin.getPrefStore().addPropertyChangeListener(_prefChangeListener);
 	}
 
 	private void createImages() {

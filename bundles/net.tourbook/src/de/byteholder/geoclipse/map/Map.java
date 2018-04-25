@@ -52,6 +52,7 @@ import net.tourbook.common.util.TourToolTip;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.map2.view.WayPointToolTipProvider;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.IInfoToolTipProvider;
 import net.tourbook.ui.IMapToolTipProvider;
 import net.tourbook.ui.MTRectangle;
@@ -223,6 +224,8 @@ public class Map extends Canvas {
 	private static final RGB		MAP_DEFAULT_BACKGROUND_RGB					= new RGB(0x40, 0x40, 0x40);
 
 	private static RGB				MAP_TRANSPARENT_RGB;
+
+	private final IPreferenceStore	_prefStore									= TourbookPlugin.getPrefStore();
 	{
 		MAP_TRANSPARENT_RGB = net.tourbook.common.UI.IS_OSX //
 //				? new RGB(0x7e, 0x7f, 0x80)
@@ -493,6 +496,8 @@ public class Map extends Canvas {
 
 	private HoveredAreaContext					_hoveredAreaContext;
 
+	private int									_overlayAlpha				= 0xff;
+
 	/**
 	 * This observer is called in the {@link Tile} when a tile image is set into the tile
 	 */
@@ -530,10 +535,11 @@ public class Map extends Canvas {
 		_displayThread = _display.getThread();
 
 		addAllListener();
-
 		addDropTarget();
 
 		createContextMenu();
+
+		updateGraphColors();
 
 		_cursorPan = new Cursor(_display, SWT.CURSOR_SIZEALL);
 		_cursorCross = new Cursor(_display, SWT.CURSOR_CROSS);
@@ -2951,7 +2957,12 @@ public class Map extends Canvas {
 		}
 
 		if (_isDrawOverlays) {
+
+			gcMapImage.setAlpha(_overlayAlpha);
+
 			paintTile20_Overlay(gcMapImage, tile, devTileViewport);
+
+			gcMapImage.setAlpha(0xff);
 		}
 
 		if (_isShowTileInfo || _isShowTileBorder) {
@@ -4346,6 +4357,12 @@ public class Map extends Canvas {
 			Job.getJobManager().cancel(_splitJobFamily);
 		}
 		_isCancelSplitJobs = false;
+	}
+
+	public void updateGraphColors() {
+
+		// convert % to 0xff
+		_overlayAlpha = 0xff * _prefStore.getInt(ITourbookPreferences.MAP2_LAYOUT_OPACITY) / 100;
 	}
 
 	private void updateOfflineAreaEndPosition(final MouseEvent mouseEvent) {

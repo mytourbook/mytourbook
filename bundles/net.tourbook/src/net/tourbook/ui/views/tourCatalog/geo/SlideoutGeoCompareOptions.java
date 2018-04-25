@@ -27,6 +27,7 @@ import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageMap2Appearance;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
@@ -105,6 +106,7 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColo
 	private Spinner						_spinnerGeoAccuracy;
 	private Spinner						_spinnerDistanceInterval;
 	private Spinner						_spinnerMapOption_LineWidth;
+	private Spinner						_spinnerMapOption_Opacity;
 
 	/**
 	 * @param actionToolItem
@@ -461,6 +463,29 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColo
 					_colorMapOption_ComparedTourPart.addOpenListener(this);
 				}
 			}
+			{
+				/*
+				 * Opacity
+				 */
+				{
+					// label
+					final Label label = new Label(group, SWT.NONE);
+					label.setText("Opacity");
+					label.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_ClusterOpacity_Tooltip);
+
+					_firstColumnControls.add(label);
+				}
+				{
+					// spinner
+					_spinnerMapOption_Opacity = new Spinner(group, SWT.BORDER);
+					_spinnerMapOption_Opacity.setMinimum(PrefPageMap2Appearance.MAP_OPACITY_MINIMUM);
+					_spinnerMapOption_Opacity.setMaximum(100);
+					_spinnerMapOption_Opacity.setIncrement(1);
+					_spinnerMapOption_Opacity.setPageIncrement(10);
+					_spinnerMapOption_Opacity.addSelectionListener(_mapOptions_SelectionListener);
+					_spinnerMapOption_Opacity.addMouseWheelListener(_mapOptions_MouseWheelListener);
+				}
+			}
 		}
 	}
 
@@ -560,6 +585,10 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColo
 				ITourbookPreferences.GEO_COMPARE_REF_TOUR_LINE_WIDTH, //
 				_spinnerMapOption_LineWidth.getSelection());
 
+		_prefStore.setValue(
+				ITourbookPreferences.MAP2_LAYOUT_OPACITY, //
+				_spinnerMapOption_Opacity.getSelection());
+
 		PreferenceConverter.setValue(
 				_prefStore,
 				ITourbookPreferences.GEO_COMPARE_REF_TOUR_RGB, //
@@ -596,6 +625,9 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColo
 		/*
 		 * Map options
 		 */
+		_spinnerMapOption_Opacity.setSelection(
+				_prefStore.getDefaultInt(ITourbookPreferences.MAP2_LAYOUT_OPACITY));
+
 		_spinnerMapOption_LineWidth.setSelection(
 				_prefStore.getDefaultInt(ITourbookPreferences.GEO_COMPARE_REF_TOUR_LINE_WIDTH));
 
@@ -639,6 +671,8 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColo
 
 		_colorMapOption_ComparedTourPart.setColorValue(
 				PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GEO_COMPARE_COMPARED_TOUR_PART_RGB));
+
+		_spinnerMapOption_Opacity.setSelection(_prefStore.getInt(ITourbookPreferences.MAP2_LAYOUT_OPACITY));
 	}
 
 	private void saveStateSlideout() {

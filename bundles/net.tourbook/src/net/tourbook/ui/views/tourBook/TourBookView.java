@@ -3769,7 +3769,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 		}
 
 		// check with old id
-		final long oldTourId = _selectedTourIds.size() == 1 ? _selectedTourIds.get(0) : null;
+		final long oldTourId = _selectedTourIds != null && _selectedTourIds.size() == 1
+				? _selectedTourIds.get(0)
+				: -1;
+
 		if (tourId == oldTourId) {
 
 			// tour id is the same

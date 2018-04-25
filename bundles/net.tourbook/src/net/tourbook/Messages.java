@@ -1373,6 +1373,9 @@ public class Messages extends NLS {
 	public static String		Pref_LiveUpdate_Checkbox;
 	public static String		Pref_LiveUpdate_Checkbox_Tooltip;
 
+	public static String		Pref_Map2_Label_Opacity;
+	public static String		Pref_Map2_Label_Opacity_Tooltip;
+
 	public static String		Pref_Map25_Encoding_Mapzen;
 	public static String		Pref_Map25_Encoding_OpenScienceMap;
 	public static String		Pref_Map25_Offline_Dialog_Restart_Message;

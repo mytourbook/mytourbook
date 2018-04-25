@@ -313,6 +313,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		PreferenceConverter.setDefault(store, ITourbookPreferences.MAP_LAYOUT_MAP_DIMM_COLOR, 	new RGB(0x00, 0x00, 0x00));
 		store.setDefault(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD, 	PrefPageMap2Appearance.TOUR_PAINT_METHOD_SIMPLE);
 		store.setDefault(ITourbookPreferences.MAP_LAYOUT_LIVE_UPDATE, true);
+		store.setDefault(ITourbookPreferences.MAP2_LAYOUT_OPACITY, 70); // opacity in %
 
 
 		/*

@@ -68,7 +68,9 @@ import org.eclipse.ui.IWorkbenchPart;
 public abstract class StatisticDay extends TourbookStatistic implements IBarSelectionProvider, ITourProvider {
 
 // SET_FORMATTING_OFF
+	
 	private static final String			TOUR_TOOLTIP_FORMAT_DATE_WEEK_TIME	= net.tourbook.ui.Messages.Tour_Tooltip_Format_DateWeekTime;
+	
 // SET_FORMATTING_ON
 
 	private TourTypeFilter				_activeTourTypeFilter;
@@ -80,6 +82,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 	private int							_numberOfYears;
 
 	private Chart						_chart;
+	private StatisticContext			_statContext;
 
 	private final MinMaxKeeper_YData	_minMaxKeeper						= new MinMaxKeeper_YData();
 	private TourData_Day				_tourDayData;
@@ -207,6 +210,11 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 						 * stat view is opened !!!
 						 */
 
+						return;
+					}
+
+					// don't fire an event when preferences are updated
+					if (isInPreferencesUpdate() || _statContext.canFireEvents() == false) {
 						return;
 					}
 
@@ -669,6 +677,8 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 
 	@Override
 	public void updateStatistic(final StatisticContext statContext) {
+
+		_statContext = statContext;
 
 		_activePerson = statContext.appPerson;
 		_activeTourTypeFilter = statContext.appTourTypeFilter;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -54,62 +54,73 @@ import org.eclipse.ui.part.PageBook;
 
 public class PrefPageMap2Appearance extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-	private static final String		LEGEND_COLOR_DIALOG_CHECK_LIVE_UPDATE			= net.tourbook.map2.Messages.LegendColor_Dialog_Check_LiveUpdate;
-	private static final String		LEGEND_COLOR_DIALOG_CHECK_LIVE_UPDATE_TOOLTIP	= net.tourbook.map2.Messages.LegendColor_Dialog_Check_LiveUpdate_Tooltip;
+// SET_FORMATTING_OFF
+	
+	private static final String	LEGEND_COLOR_DIALOG_CHECK_LIVE_UPDATE			= net.tourbook.map2.Messages.LegendColor_Dialog_Check_LiveUpdate;
+	private static final String	LEGEND_COLOR_DIALOG_CHECK_LIVE_UPDATE_TOOLTIP	= net.tourbook.map2.Messages.LegendColor_Dialog_Check_LiveUpdate_Tooltip;
+	
+	public static final String	ID												= "net.tourbook.preferences.PrefPageMap2Appearance";										//$NON-NLS-1$
+	
+// SET_FORMATTING_ON
 
-	public static final String		ID												= "net.tourbook.preferences.PrefPageMap2Appearance";						//$NON-NLS-1$
+	static {}
 
-	public static final String		PLOT_TYPE_LINE									= "line";																	//$NON-NLS-1$
-	public static final String		PLOT_TYPE_DOT									= "dot";																	//$NON-NLS-1$
-	public static final String		PLOT_TYPE_SQUARE								= "square";																//$NON-NLS-1$
-	public static final String		DEFAULT_PLOT_TYPE								= PLOT_TYPE_LINE;
+	public static final String				PLOT_TYPE_LINE				= "line";						//$NON-NLS-1$
 
-	public static final String		TOUR_PAINT_METHOD_SIMPLE						= "simple";																//$NON-NLS-1$
-	public static final String		TOUR_PAINT_METHOD_COMPLEX						= "complex";																//$NON-NLS-1$
+	public static final String				PLOT_TYPE_DOT				= "dot";						//$NON-NLS-1$
 
-	public static final int			BORDER_TYPE_COLOR								= 0;
-	public static final int			BORDER_TYPE_DARKER								= 1;
-	public static final int			DEFAULT_BORDER_TYPE								= BORDER_TYPE_COLOR;
+	public static final String				PLOT_TYPE_SQUARE			= "square";						//$NON-NLS-1$
+	public static final String				DEFAULT_PLOT_TYPE			= PLOT_TYPE_LINE;
+	public static final String				TOUR_PAINT_METHOD_SIMPLE	= "simple";						//$NON-NLS-1$
+	public static final String				TOUR_PAINT_METHOD_COMPLEX	= "complex";					//$NON-NLS-1$
 
-	private final IPreferenceStore	_prefStore										= TourbookPlugin.getPrefStore();
+	public static final int					BORDER_TYPE_COLOR			= 0;
+	public static final int					BORDER_TYPE_DARKER			= 1;
 
-	private boolean					_isModified;
+	public static final int					DEFAULT_BORDER_TYPE			= BORDER_TYPE_COLOR;
 
-	private SelectionAdapter		_defaultSelectionListener;
-	private MouseWheelListener		_defaultMouseWheelListener;
-	private IPropertyChangeListener	_defaultChangePropertyListener;
+	public static int						MAP_OPACITY_MINIMUM			= 20;							// %
 
-	private PixelConverter			_pc;
-	private int						_firstColumnIndent;
+	private static final IPreferenceStore	_prefStore					= TourbookPlugin.getPrefStore();
+
+	private boolean							_isModified;
+
+	private SelectionAdapter				_defaultSelectionListener;
+	private MouseWheelListener				_defaultMouseWheelListener;
+	private IPropertyChangeListener			_defaultChangePropertyListener;
+
+	private PixelConverter					_pc;
+	private int								_firstColumnIndent;
 
 	/*
 	 * UI controls
 	 */
-	private Composite				_containerPage;
-	private PageBook				_pageBookPaintMethod;
+	private Composite						_containerPage;
+	private PageBook						_pageBookPaintMethod;
 
-	private RadioGroupFieldEditor	_editorTourPaintMethod;
+	private RadioGroupFieldEditor			_editorTourPaintMethod;
 
-	private Button					_chkLiveUpdate;
-	private Button					_chkPaintWithBorder;
-	private Button					_rdoBorderColorDarker;
-	private Button					_rdoBorderColorColor;
-	private Button					_rdoSymbolLine;
-	private Button					_rdoSymbolDot;
-	private Button					_rdoSymbolSquare;
+	private Button							_chkLiveUpdate;
+	private Button							_chkPaintWithBorder;
+	private Button							_rdoBorderColorDarker;
+	private Button							_rdoBorderColorColor;
+	private Button							_rdoSymbolLine;
+	private Button							_rdoSymbolDot;
+	private Button							_rdoSymbolSquare;
 
-	private ColorSelector			_colorBorderColor;
-	private ColorSelector			_colorMapDimmColor;
+	private ColorSelector					_colorBorderColor;
+	private ColorSelector					_colorMapDimmColor;
 
-	private Label					_lblBorderWidth;
-	private Label					_lblBorderColor;
+	private Label							_lblBorderWidth;
+	private Label							_lblBorderColor;
 
-	private Spinner					_spinnerLineWidth;
-	private Spinner					_spinnerBorderColorDarker;
-	private Spinner					_spinnerBorderWidth;
+	private Spinner							_spinnerBorderColorDarker;
+	private Spinner							_spinnerBorderWidth;
+	private Spinner							_spinnerLineWidth;
+	private Spinner							_spinnerOpacity;
 
-	private StyledText				_pageSimple;
-	private StyledText				_pageComplex;
+	private StyledText						_pageSimple;
+	private StyledText						_pageComplex;
 
 	@Override
 	protected void createFieldEditors() {
@@ -190,7 +201,27 @@ public class PrefPageMap2Appearance extends FieldEditorPreferencePage implements
 				_spinnerLineWidth.addSelectionListener(_defaultSelectionListener);
 				_spinnerLineWidth.addMouseWheelListener(_defaultMouseWheelListener);
 			}
-
+			{
+				/*
+				 * Opacity
+				 */
+				{
+					// label
+					final Label label = new Label(groupContainer, SWT.NONE);
+					label.setText(Messages.Pref_Map2_Label_Opacity);
+					label.setToolTipText(Messages.Pref_Map2_Label_Opacity_Tooltip);
+				}
+				{
+					// spinner
+					_spinnerOpacity = new Spinner(groupContainer, SWT.BORDER);
+					_spinnerOpacity.setMinimum(MAP_OPACITY_MINIMUM);
+					_spinnerOpacity.setMaximum(100);
+					_spinnerOpacity.setIncrement(1);
+					_spinnerOpacity.setPageIncrement(10);
+					_spinnerOpacity.addSelectionListener(_defaultSelectionListener);
+					_spinnerOpacity.addMouseWheelListener(_defaultMouseWheelListener);
+				}
+			}
 			createUI_50_Border(groupContainer);
 		}
 	}
@@ -202,7 +233,8 @@ public class PrefPageMap2Appearance extends FieldEditorPreferencePage implements
 		 */
 		{
 			_chkPaintWithBorder = new Button(parent, SWT.CHECK);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.grab(true, false)
 					.span(2, 1)
 					.applyTo(_chkPaintWithBorder);
@@ -216,7 +248,8 @@ public class PrefPageMap2Appearance extends FieldEditorPreferencePage implements
 		{
 			// label: border width
 			_lblBorderWidth = new Label(parent, NONE);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.indent(_firstColumnIndent, 0)
 					.applyTo(_lblBorderWidth);
 			_lblBorderWidth.setText(Messages.pref_map_layout_BorderWidth);
@@ -235,14 +268,16 @@ public class PrefPageMap2Appearance extends FieldEditorPreferencePage implements
 		{
 			// label
 			_lblBorderColor = new Label(parent, NONE);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.indent(_firstColumnIndent, 0)
 					.align(SWT.FILL, SWT.BEGINNING)
 					.applyTo(_lblBorderColor);
 			_lblBorderColor.setText(Messages.Pref_MapLayout_Label_BorderColor);
 
 			final Composite containerBorderColor = new Composite(parent, SWT.NONE);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.grab(true, false)
 					.applyTo(containerBorderColor);
 			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerBorderColor);
@@ -297,7 +332,8 @@ public class PrefPageMap2Appearance extends FieldEditorPreferencePage implements
 			addField(_editorTourPaintMethod);
 
 			_pageBookPaintMethod = new PageBook(groupMethod, SWT.NONE);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.grab(true, false)
 					.span(2, 1)
 					.hint(350, SWT.DEFAULT)
@@ -348,7 +384,8 @@ public class PrefPageMap2Appearance extends FieldEditorPreferencePage implements
 		{
 			// label
 			final Label label = new Label(container, SWT.NONE);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.align(SWT.FILL, SWT.CENTER)
 					.applyTo(label);
 			label.setText(Messages.pref_map_layout_dim_color);
@@ -456,6 +493,7 @@ public class PrefPageMap2Appearance extends FieldEditorPreferencePage implements
 		};
 
 		_defaultChangePropertyListener = new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 				onChangeProperty();
 			}
@@ -493,6 +531,8 @@ public class PrefPageMap2Appearance extends FieldEditorPreferencePage implements
 
 		updateUI_SetPlotType(_prefStore.getDefaultString(ITourbookPreferences.MAP_LAYOUT_PLOT_TYPE));
 
+		_spinnerOpacity.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.MAP2_LAYOUT_OPACITY));
+
 		/*
 		 * Line
 		 */
@@ -501,22 +541,25 @@ public class PrefPageMap2Appearance extends FieldEditorPreferencePage implements
 		/*
 		 * Border
 		 */
-		_chkPaintWithBorder.setSelection(_prefStore.getDefaultBoolean(//
-				ITourbookPreferences.MAP_LAYOUT_PAINT_WITH_BORDER));
+		_chkPaintWithBorder.setSelection(
+				_prefStore.getDefaultBoolean(
+						ITourbookPreferences.MAP_LAYOUT_PAINT_WITH_BORDER));
 		_spinnerBorderWidth.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.MAP_LAYOUT_BORDER_WIDTH));
 
 		updateUI_SetBorderType(_prefStore.getDefaultInt(ITourbookPreferences.MAP_LAYOUT_BORDER_TYPE));
-		_spinnerBorderColorDarker.setSelection(_prefStore.getDefaultInt(//
-				ITourbookPreferences.MAP_LAYOUT_BORDER_DIMM_VALUE));
+		_spinnerBorderColorDarker.setSelection(
+				_prefStore.getDefaultInt(ITourbookPreferences.MAP_LAYOUT_BORDER_DIMM_VALUE));
 
-		_colorBorderColor.setColorValue(PreferenceConverter.getDefaultColor(_prefStore,//
-				ITourbookPreferences.MAP_LAYOUT_BORDER_COLOR));
+		_colorBorderColor.setColorValue(
+				PreferenceConverter.getDefaultColor(_prefStore, ITourbookPreferences.MAP_LAYOUT_BORDER_COLOR));
 
 		/*
 		 * Dimming
 		 */
-		_colorMapDimmColor.setColorValue(PreferenceConverter.getDefaultColor(_prefStore,//
-				ITourbookPreferences.MAP_LAYOUT_MAP_DIMM_COLOR));
+		_colorMapDimmColor.setColorValue(
+				PreferenceConverter.getDefaultColor(
+						_prefStore,
+						ITourbookPreferences.MAP_LAYOUT_MAP_DIMM_COLOR));
 
 		_chkLiveUpdate.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.MAP_LAYOUT_LIVE_UPDATE));
 
@@ -587,6 +630,7 @@ public class PrefPageMap2Appearance extends FieldEditorPreferencePage implements
 	private void restoreState() {
 
 		updateUI_SetPlotType(_prefStore.getString(ITourbookPreferences.MAP_LAYOUT_PLOT_TYPE));
+		_spinnerOpacity.setSelection(_prefStore.getInt(ITourbookPreferences.MAP2_LAYOUT_OPACITY));
 
 		/*
 		 * Line
@@ -601,17 +645,19 @@ public class PrefPageMap2Appearance extends FieldEditorPreferencePage implements
 
 		updateUI_SetBorderType(_prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_BORDER_TYPE));
 
-		_spinnerBorderColorDarker.setSelection(_prefStore.getInt(//
-				ITourbookPreferences.MAP_LAYOUT_BORDER_DIMM_VALUE));
+		_spinnerBorderColorDarker.setSelection(
+				_prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_BORDER_DIMM_VALUE));
 
-		_colorBorderColor.setColorValue(PreferenceConverter.getColor(_prefStore,//
-				ITourbookPreferences.MAP_LAYOUT_BORDER_COLOR));
+		_colorBorderColor.setColorValue(
+				PreferenceConverter.getColor(
+						_prefStore,
+						ITourbookPreferences.MAP_LAYOUT_BORDER_COLOR));
 
 		/*
 		 * Map dimming
 		 */
-		_colorMapDimmColor.setColorValue(PreferenceConverter.getColor(_prefStore,//
-				ITourbookPreferences.MAP_LAYOUT_MAP_DIMM_COLOR));
+		_colorMapDimmColor.setColorValue(
+				PreferenceConverter.getColor(_prefStore, ITourbookPreferences.MAP_LAYOUT_MAP_DIMM_COLOR));
 
 		_chkLiveUpdate.setSelection(_prefStore.getBoolean(ITourbookPreferences.MAP_LAYOUT_LIVE_UPDATE));
 
@@ -624,6 +670,7 @@ public class PrefPageMap2Appearance extends FieldEditorPreferencePage implements
 	private void saveState() {
 
 		_prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_PLOT_TYPE, getPlotType());
+		_prefStore.setValue(ITourbookPreferences.MAP2_LAYOUT_OPACITY, _spinnerOpacity.getSelection());
 
 		/*
 		 * Line
@@ -637,15 +684,21 @@ public class PrefPageMap2Appearance extends FieldEditorPreferencePage implements
 		_prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_BORDER_WIDTH, _spinnerBorderWidth.getSelection());
 
 		_prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_BORDER_TYPE, getBorderType());
-		_prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_BORDER_DIMM_VALUE,//
+		_prefStore.setValue(
+				ITourbookPreferences.MAP_LAYOUT_BORDER_DIMM_VALUE,
 				_spinnerBorderColorDarker.getSelection());
-		PreferenceConverter.setValue(_prefStore, ITourbookPreferences.MAP_LAYOUT_BORDER_COLOR,//
+
+		PreferenceConverter.setValue(
+				_prefStore,
+				ITourbookPreferences.MAP_LAYOUT_BORDER_COLOR,
 				_colorBorderColor.getColorValue());
 
 		/*
 		 * Map dimming
 		 */
-		PreferenceConverter.setValue(_prefStore, ITourbookPreferences.MAP_LAYOUT_MAP_DIMM_COLOR,//
+		PreferenceConverter.setValue(
+				_prefStore,
+				ITourbookPreferences.MAP_LAYOUT_MAP_DIMM_COLOR,
 				_colorMapDimmColor.getColorValue());
 
 		_prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_LIVE_UPDATE, _chkLiveUpdate.getSelection());

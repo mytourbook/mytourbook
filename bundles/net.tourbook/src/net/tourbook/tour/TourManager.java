@@ -1000,6 +1000,15 @@ public class TourManager {
 												final Object customData,
 												final IWorkbenchPart part) {
 
+//		System.out.println(
+//				(UI.timeStampNano() + " [" + TourManager.class.getSimpleName() + "] fireEventWithCustomData()()")
+//						+ ("\ttourEventId: " + tourEventId)
+//						+ ("\tpart: " + part)
+//						+ ("\tcustomData: " + customData)
+////				+ ("\t: " + )
+//		);
+//// TODO remove SYSTEM.OUT.PRINTLN
+
 		final Object[] allListeners = _tourEventListeners.getListeners();
 		for (final Object listener : allListeners) {
 			fireEvent_Final((ITourEventListener) listener, tourEventId, part, customData);
