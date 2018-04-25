@@ -3901,10 +3901,11 @@ public class Map extends Canvas {
 								final int requestedZoomLevelAdjustment) {
 
 		Rectangle wpTourRect;
-		Rectangle wpViewportRect;
+		Rectangle wpMapRect;
+
 		GeoPosition geoTourCenter;
+
 		java.awt.Point wpTourCenter;
-		java.awt.Point wpMapCenterRaw;
 		java.awt.geom.Point2D.Double wpMapCenter;
 
 		// keep current zoomlevel
@@ -3915,59 +3916,62 @@ public class Map extends Canvas {
 
 		int zoom = maximumZoomLevel;
 
-		wpTourRect = getWorldPixelFromGeoPositions(geoTourPositions, zoom);
+		/**
+		 * Adjust tour zoom level to the requested zoom level, this is used that the tour is more
+		 * visible and not painted at the map border
+		 */
+		final int zoomLevelDiff = isAdjustZoomLevel ? requestedZoomLevelAdjustment : 0;
+		int tourZoomLevel = zoom - zoomLevelDiff;
+		tourZoomLevel = tourZoomLevel > maximumZoomLevel ? maximumZoomLevel : tourZoomLevel;
+
+		wpTourRect = getWorldPixelFromGeoPositions(geoTourPositions, tourZoomLevel);
 
 		// get tour center in world pixel for the max zoom level
 		wpTourCenter = new java.awt.Point(//
 				wpTourRect.x + wpTourRect.width / 2,
 				wpTourRect.y + wpTourRect.height / 2);
 
+		// set tour geo center in the center of the tour rectangle
 		geoTourCenter = _mp.pixelToGeo(wpTourCenter, zoom);
 
-		wpMapCenterRaw = _mp.geoToPixel(geoTourCenter, zoom);
-		wpMapCenter = checkWorldPixel(wpMapCenterRaw, zoom);
-
-		wpViewportRect = getWorldPixelTopLeftViewport(wpMapCenter);
+		wpMapCenter = checkWorldPixel(_mp.geoToPixel(geoTourCenter, zoom), zoom);
+		wpMapRect = getWorldPixelTopLeftViewport(wpMapCenter);
 
 		// use an offset that the slider are not at the map border and almost not visible
 		final int offset = 30;
 
-		// zoom out until the tour is smaller than the viewport
-		while ((wpTourRect.width + offset > wpViewportRect.width) //
-				|| (wpTourRect.height + offset > wpViewportRect.height)) {
+		// zoom out until the tour is smaller than the map viewport
+		while ((wpTourRect.width + offset > wpMapRect.width) //
+				|| (wpTourRect.height + offset > wpMapRect.height)) {
 
 			// check zoom level
 			if (zoom - 1 < minZoomLevel) {
-				// this should not occure -> a tour should not be larger than the eath
+				// this should not occure -> a tour should not be larger than the earth
 				break;
 			}
 
+			// zoom out
 			zoom--;
 
-			wpTourRect = getWorldPixelFromGeoPositions(geoTourPositions, zoom);
+			tourZoomLevel = zoom - zoomLevelDiff;
+			tourZoomLevel = tourZoomLevel > maximumZoomLevel ? maximumZoomLevel : tourZoomLevel;
 
-			wpMapCenterRaw = _mp.geoToPixel(geoTourCenter, zoom);
-			wpMapCenter = checkWorldPixel(wpMapCenterRaw, zoom);
+			wpTourRect = getWorldPixelFromGeoPositions(geoTourPositions, tourZoomLevel);
 
-			wpViewportRect = getWorldPixelTopLeftViewport(wpMapCenter);
+			wpMapCenter = checkWorldPixel(_mp.geoToPixel(geoTourCenter, zoom), zoom);
+			wpMapRect = getWorldPixelTopLeftViewport(wpMapCenter);
 		}
 
-		// adjust to requested zoom level
-		final int adjustedZoomLevel = isAdjustZoomLevel ? requestedZoomLevelAdjustment : 0;
-		final int newZoomLevel = zoom + adjustedZoomLevel;
-
-		if (newZoomLevel != currentZoomLevel) {
+		if (zoom != currentZoomLevel) {
 
 			// set new zoomlevel ONLY when it was modified -> this will dispose old overlay images !!!
 
-//			_mapZoomLevel = zoom;
-//			_worldPixelMapCenter = wpMapCenter;
-
-			setZoom(newZoomLevel);
+			setZoom(zoom);
 
 		} else {
 
 			// zoom position is the same as previous !!!
+			// _mapZoomLevel == _mapZoomLevel
 
 			// set new map center
 			_worldPixelMapCenter = wpMapCenter;
@@ -3976,9 +3980,6 @@ public class Map extends Canvas {
 		}
 
 		fireMapInfoEvent();
-
-//		paint();
-
 //		fireMapPositionEvent(false);
 	}
 
@@ -4272,6 +4273,8 @@ public class Map extends Canvas {
 			return;
 		}
 
+		final int oldZoomLevel = _mapZoomLevel;
+
 		/*
 		 * check if the requested zoom level is within the bounds of the map provider
 		 */
@@ -4284,44 +4287,44 @@ public class Map extends Canvas {
 		}
 
 		// check if zoom level has changed
-		if (_mapZoomLevel == adjustedZoomLevel) {
+		if (oldZoomLevel == adjustedZoomLevel) {
 			// this is disabled that a double click can set the center of the map
 			// return;
 		}
 
-		if (_mapZoomLevel != adjustedZoomLevel) {
+		if (oldZoomLevel != adjustedZoomLevel) {
 
 			// zoomlevel has changed -> stop downloading images for the old zoom level
 			_mp.resetAll(true);
 		}
 
-		final int oldzoom = _mapZoomLevel;
-		final Dimension oldMapTileSize = _mp.getMapTileSize(oldzoom);
+		final Dimension oldMapTileSize = _mp.getMapTileSize(oldZoomLevel);
 
 		// check if map is initialized or zoom level has not changed
-		Point2D oldCenter = _worldPixelMapCenter;
-		if (oldCenter == null) {
+		Point2D wpOldMapCenter = _worldPixelMapCenter;
+		if (wpOldMapCenter == null) {
 
 			// setup map center
 
 			initMap();
 
-			oldCenter = _worldPixelMapCenter;
+			wpOldMapCenter = _worldPixelMapCenter;
 		}
 
 		_mapZoomLevel = adjustedZoomLevel;
 
 		// update values for the new zoom level !!!
-		_mapTileSize = _mp.getMapTileSize(_mapZoomLevel);
+		_mapTileSize = _mp.getMapTileSize(adjustedZoomLevel);
 
 		final double relativeWidth = (double) _mapTileSize.width / oldMapTileSize.width;
 		final double relativeHeight = (double) _mapTileSize.height / oldMapTileSize.height;
 
 		final Point2D.Double newWorldPixelCenter = new Point2D.Double(//
-				oldCenter.getX() * relativeWidth,
-				oldCenter.getY() * relativeHeight);
+				wpOldMapCenter.getX() * relativeWidth,
+				wpOldMapCenter.getY() * relativeHeight);
 
 		setMapCenterInWorldPixel(newWorldPixelCenter);
+
 		updateViewPortData();
 
 		updateTourToolTip();

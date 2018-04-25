@@ -132,7 +132,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer {
 	private static final String				STATE_SORT_COLUMN_ID			= "STATE_SORT_COLUMN_ID";			//$NON-NLS-1$
 	static final int						DEFAULT_DISTANCE_INTERVAL		= 100;
 
-	static final int						DEFAULT_GEO_ACCURACY			= 100_000;
+	static final int						DEFAULT_GEO_ACCURACY			= 10_000;
 	private static final String				COLUMN_AVG_PULSE				= "avgPulse";						//$NON-NLS-1$
 
 	private static final String				COLUMN_AVG_SPEED				= "avgSpeed";						//$NON-NLS-1$
