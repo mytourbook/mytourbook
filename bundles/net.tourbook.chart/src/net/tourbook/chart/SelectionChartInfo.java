@@ -32,11 +32,6 @@ public class SelectionChartInfo implements ISelection {
 	 */
 	public int				selectedSliderValuesIndex;
 
-	/**
-	 * Is <code>true</code> when geo compare is enabled
-	 */
-	public boolean			isGeoCompare;
-
 	@SuppressWarnings("unused")
 	private SelectionChartInfo() {}
 

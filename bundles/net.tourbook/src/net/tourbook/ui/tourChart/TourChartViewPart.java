@@ -25,7 +25,10 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
+import net.tourbook.ui.views.tourCatalog.geo.GeoCompareEventId;
+import net.tourbook.ui.views.tourCatalog.geo.GeoCompareManager;
 import net.tourbook.ui.views.tourCatalog.geo.GeoPartItem;
+import net.tourbook.ui.views.tourCatalog.geo.IGeoCompareListener;
 import net.tourbook.ui.views.tourSegmenter.TourSegmenterView;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -42,7 +45,7 @@ import org.eclipse.ui.part.ViewPart;
 /**
  * Provides a skeleton for a view which displays a tour chart
  */
-public abstract class TourChartViewPart extends ViewPart {
+public abstract class TourChartViewPart extends ViewPart implements IGeoCompareListener {
 
 	private static final String			ID			= "net.tourbook.ui.tourChart.TourChartViewPart";	//$NON-NLS-1$
 
@@ -187,24 +190,6 @@ public abstract class TourChartViewPart extends ViewPart {
 						updateChart();
 					}
 
-				} else if (eventId == TourEventId.GEO_PART_COMPARE && eventData instanceof GeoPartItem) {
-
-					final GeoPartItem geoPartItem = (GeoPartItem) eventData;
-					
-					final NormalizedGeoData normalizedTourPart = geoPartItem.normalizedTourPart;
-					final long tourId = normalizedTourPart.tourId;
-
-					_tourData = TourManager.getInstance().getTourData(tourId);
-
-					if (_tourChartConfig == null) {
-						_tourChartConfig = TourManager.createDefaultTourChartConfig();
-					}
-
-//					TourManager.fireEventWithCustomData(
-//							TourEventId.GEO_PART_COMPARE,
-//							comparerItem,
-//							GeoPartView.this);
-
 				}
 			}
 		};
@@ -219,10 +204,10 @@ public abstract class TourChartViewPart extends ViewPart {
 		addTourEventListener();
 		addSelectionListener();
 		addPartListeners();
+		GeoCompareManager.addGeoCompareEventListener(this);
 
 		// set this part as selection provider
 		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
-
 	}
 
 	@Override
@@ -232,10 +217,50 @@ public abstract class TourChartViewPart extends ViewPart {
 		getSite().getPage().removePartListener(_partListener);
 
 		TourManager.getInstance().removeTourEventListener(_tourEventListener);
+		GeoCompareManager.removeGeoCompareListener(this);
 
 		_prefStore.removePropertyChangeListener(_prefChangeListener);
 
 		super.dispose();
+	}
+
+	@Override
+	public void geoCompareEvent(final IWorkbenchPart part, final GeoCompareEventId eventId, final Object eventData) {
+
+		if (part == TourChartViewPart.this) {
+			return;
+		}
+
+		switch (eventId) {
+
+		case COMPARE_GEO_PARTS:
+
+			if (eventData instanceof GeoPartItem) {
+
+				final GeoPartItem geoPartItem = (GeoPartItem) eventData;
+
+				final NormalizedGeoData normalizedTourPart = geoPartItem.normalizedTourPart;
+				final long tourId = normalizedTourPart.tourId;
+
+				_tourData = TourManager.getInstance().getTourData(tourId);
+
+				if (_tourChartConfig == null) {
+					_tourChartConfig = TourManager.createDefaultTourChartConfig();
+				}
+
+//				TourManager.fireEventWithCustomData(
+//						TourEventId.GEO_PART_COMPARE,
+//						comparerItem,
+//						GeoPartView.this);
+
+			}
+
+		case SET_COMPARING_ON:
+		case SET_COMPARING_OFF:
+		default:
+			break;
+		}
+
 	}
 
 	/**

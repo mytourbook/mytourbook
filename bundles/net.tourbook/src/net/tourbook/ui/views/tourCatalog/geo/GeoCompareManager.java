@@ -27,12 +27,14 @@ import net.tourbook.data.NormalizedGeoData;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourManager;
 
+import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.ui.IWorkbenchPart;
+
 public class GeoCompareManager {
 
 // SET_FORMATTING_OFF
 	
 	private static final int COMPARATOR_THREADS = Runtime.getRuntime().availableProcessors();
-//	private static final int COMPARATOR_THREADS = 1;
 
 	private static final LinkedBlockingDeque<GeoPartComparerItem>	_compareWaitingQueue	= new LinkedBlockingDeque<>();
 
@@ -42,7 +44,11 @@ public class GeoCompareManager {
 
 	static {}
 
-	private static final boolean LOG_TOUR_COMPARING = false;
+	private static final boolean		LOG_TOUR_COMPARING		= false;
+
+	private static final ListenerList	_geoCompareListeners	= new ListenerList(ListenerList.IDENTITY);
+
+	private static boolean				_isGeoComparingOn;
 
 	static {
 
@@ -72,6 +78,11 @@ public class GeoCompareManager {
 // TODO remove SYSTEM.OUT.PRINTLN
 
 		_comparerExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(COMPARATOR_THREADS, threadFactory);
+	}
+
+	public static void addGeoCompareEventListener(final IGeoCompareListener listener) {
+
+		_geoCompareListeners.add(listener);
 	}
 
 	/**
@@ -307,6 +318,43 @@ public class GeoCompareManager {
 					));
 			// TODO remove SYSTEM.OUT.PRINTLN
 		}
+	}
+
+	public static void fireEvent(final GeoCompareEventId eventId, final Object eventData, final IWorkbenchPart part) {
+
+		for (final Object listener : _geoCompareListeners.getListeners()) {
+			((IGeoCompareListener) listener).geoCompareEvent(part, eventId, eventData);
+		}
+	}
+
+	public static boolean isGeoComparing() {
+		return _isGeoComparingOn;
+	}
+
+	public static void removeGeoCompareListener(final IGeoCompareListener listener) {
+
+		if (listener != null) {
+			_geoCompareListeners.remove(listener);
+		}
+	}
+
+	/**
+	 * Sets geo comparing on/off and fires an {@value GeoCompareEventId#SET_COMPARING_ON} or
+	 * {@value GeoCompareEventId#SET_COMPARING_OFF}
+	 * 
+	 * @param isGeoComparingOn
+	 * @param part
+	 */
+	public static void setIsGeoComparing(final boolean isGeoComparingOn, final IWorkbenchPart part) {
+
+		_isGeoComparingOn = isGeoComparingOn;
+
+		fireEvent(
+				isGeoComparingOn
+						? GeoCompareEventId.SET_COMPARING_ON
+						: GeoCompareEventId.SET_COMPARING_OFF,
+				null,
+				part);
 	}
 
 }

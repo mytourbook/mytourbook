@@ -938,6 +938,8 @@ public class TourMapPainter extends MapPainter {
 			TourData prevTourData = null;
 			final long geoCompareRefTourId = ReferenceTourManager.getGeoCompareReferenceTourId();
 
+//			show ref tour without compared tour
+
 			for (final TourData tourData : tourDataList) {
 
 				if (tourData == null) {
@@ -954,10 +956,11 @@ public class TourMapPainter extends MapPainter {
 				setDataSerie(tourData);
 
 				boolean isGeoCompareRefTour = geoCompareRefTourId >= 0
-						&& geoCompareRefTourId == tourData.getTourId()
+
+						&& geoCompareRefTourId == tourData.getTourId();
 
 						// when only 1 tour is displayed, do not show it as reference tour
-						&& tourDataList.size() > 1;
+//						&& tourDataList.size() > 1;
 
 				int refTourStartIndex = 0;
 				int refTourEndIndex = 0;

@@ -50,7 +50,10 @@ import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
+import net.tourbook.ui.views.tourCatalog.geo.GeoCompareEventId;
+import net.tourbook.ui.views.tourCatalog.geo.GeoCompareManager;
 import net.tourbook.ui.views.tourCatalog.geo.GeoPartComparerItem;
+import net.tourbook.ui.views.tourCatalog.geo.IGeoCompareListener;
 import net.tourbook.ui.views.tourSegmenter.TourSegmenterView;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -77,7 +80,8 @@ import org.eclipse.ui.part.ViewPart;
 /**
  * Shows the selected tour in a chart
  */
-public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoEventListener, ITourModifyListener {
+public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoEventListener, ITourModifyListener,
+		IGeoCompareListener {
 
 	public static final String		ID			= "net.tourbook.views.TourChartView";	//$NON-NLS-1$
 
@@ -391,6 +395,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 		addTourEventListener();
 		addPartListener();
 		PhotoManager.addPhotoEventListener(this);
+		GeoCompareManager.addGeoCompareEventListener(this);
 
 		// set this view part as selection provider
 		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
@@ -447,6 +452,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 		TourManager.getInstance().removeTourEventListener(_tourEventListener);
 		PhotoManager.removePhotoEventListener(this);
+		GeoCompareManager.removeGeoCompareListener(this);
 
 		_prefStore.removePropertyChangeListener(_prefChangeListener);
 
@@ -479,14 +485,35 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 					}
 				}
 
-				chartInfo.isGeoCompare = _tourChart.isGeoCompare();
-
 				TourManager.fireEventWithCustomData(//
 						TourEventId.SLIDER_POSITION_CHANGED,
 						chartInfo,
 						TourChartView.this);
 			}
 			_isInSliderPositionFired = false;
+		}
+	}
+
+	@Override
+	public void geoCompareEvent(final IWorkbenchPart part, final GeoCompareEventId eventId, final Object eventData) {
+		// TODO Auto-generated method stub
+
+		if (part == TourChartView.this) {
+			return;
+		}
+
+		switch (eventId) {
+
+		case SET_COMPARING_ON:
+
+			break;
+
+		case SET_COMPARING_OFF:
+
+			break;
+
+		default:
+			break;
 		}
 	}
 

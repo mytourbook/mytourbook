@@ -86,6 +86,8 @@ import net.tourbook.ui.tourChart.action.ActionTourChartMarker;
 import net.tourbook.ui.tourChart.action.ActionTourPhotos;
 import net.tourbook.ui.tourChart.action.ActionXAxisDistance;
 import net.tourbook.ui.tourChart.action.ActionXAxisTime;
+import net.tourbook.ui.views.tourCatalog.geo.GeoCompareEventId;
+import net.tourbook.ui.views.tourCatalog.geo.GeoCompareManager;
 import net.tourbook.ui.views.tourCatalog.geo.GeoCompareView;
 import net.tourbook.ui.views.tourSegmenter.SelectedTourSegmenterSegments;
 import net.tourbook.ui.views.tourSegmenter.TourSegmenterView;
@@ -266,7 +268,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	//
 	private boolean							_is2ndAltiLayerVisible;
 	private boolean							_isDisplayedInDialog;
-	private boolean							_isGeoCompare;
 	private boolean							_isMouseModeSet;
 	private boolean							_isTourChartToolbarCreated;
 	private TourMarker						_firedTourMarker;
@@ -359,33 +360,23 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		@Override
 		public void run() {
 
-			_isGeoCompare = isChecked();
+			final boolean isGeoCompare = isChecked();
 
 			// show geo compare area in the chart
-			setShowXSliderArea(_isGeoCompare);
+			setShowXSliderArea(isGeoCompare);
 
-			final GeoCompareView geoCompareView = (GeoCompareView) Util.getView(GeoCompareView.ID);
+			if (isGeoCompare) {
 
-			if (_isGeoCompare) {
-
-				// open geo compare result view
+				// show geo compare result view
 				Util.showView(GeoCompareView.ID, false);
 
-				if (geoCompareView != null) {
-					geoCompareView.onAction_OnOff(true, false);
-				}
-
-				fireSliderMoveEvent();
-
-			} else {
-
-				// stop comparing
-
-				if (geoCompareView != null) {
-					geoCompareView.onAction_OnOff(false, false);
-				}
+//				fireSliderMoveEvent();
 			}
 
+			GeoCompareManager.fireEvent(
+					isGeoCompare ? GeoCompareEventId.SET_COMPARING_ON : GeoCompareEventId.SET_COMPARING_OFF,
+					null,
+					_part);
 		}
 	}
 
@@ -3041,10 +3032,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		}
 
 		removeChartMouseListener(_mousePhotoListener);
-	}
-
-	boolean isGeoCompare() {
-		return _isGeoCompare;
 	}
 
 	private void onChart_KeyDown(final ChartKeyEvent keyEvent) {

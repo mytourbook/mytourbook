@@ -103,9 +103,4 @@ public enum TourEventId {
 	 */
 	MARKER_SELECTION,
 
-	/**
-	 * Geo part is comparing
-	 */
-	GEO_PART_COMPARE,
-
 }
