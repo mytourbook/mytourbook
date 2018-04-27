@@ -86,8 +86,8 @@ import net.tourbook.ui.tourChart.action.ActionTourChartMarker;
 import net.tourbook.ui.tourChart.action.ActionTourPhotos;
 import net.tourbook.ui.tourChart.action.ActionXAxisDistance;
 import net.tourbook.ui.tourChart.action.ActionXAxisTime;
-import net.tourbook.ui.views.tourCatalog.geo.GeoCompareManager;
-import net.tourbook.ui.views.tourCatalog.geo.GeoCompareView;
+import net.tourbook.ui.views.geoCompare.GeoCompareManager;
+import net.tourbook.ui.views.geoCompare.GeoCompareView;
 import net.tourbook.ui.views.tourSegmenter.SelectedTourSegmenterSegments;
 import net.tourbook.ui.views.tourSegmenter.TourSegmenterView;
 

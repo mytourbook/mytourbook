@@ -23,12 +23,12 @@ import net.tourbook.statistic.StatisticView;
 import net.tourbook.ui.tourChart.TourChartView;
 import net.tourbook.ui.views.calendar.CalendarView;
 import net.tourbook.ui.views.collateTours.CollatedToursView;
+import net.tourbook.ui.views.geoCompare.GeoCompareView;
 import net.tourbook.ui.views.tourBook.TourBookView;
 import net.tourbook.ui.views.tourCatalog.TourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TourCatalogView_ComparedTour;
 import net.tourbook.ui.views.tourCatalog.TourCatalogView_ReferenceTour;
 import net.tourbook.ui.views.tourCatalog.YearStatisticView;
-import net.tourbook.ui.views.tourCatalog.geo.GeoCompareView;
 
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;

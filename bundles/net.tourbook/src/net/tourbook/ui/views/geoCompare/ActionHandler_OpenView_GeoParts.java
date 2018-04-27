@@ -13,23 +13,22 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views.tourCatalog.geo;
+package net.tourbook.ui.views.geoCompare;
 
-public enum GeoCompareEventId {
+import net.tourbook.common.util.Util;
 
-	/**
-	 * Turn geo comparing on
-	 */
-	SET_COMPARING_ON,
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
 
-	/**
-	 * Turn geo comparing off
-	 */
-	SET_COMPARING_OFF,
+public class ActionHandler_OpenView_GeoParts extends AbstractHandler {
 
-	/**
-	 * Geo part is comparing
-	 */
-	COMPARE_GEO_PARTS,
+	@Override
+	public Object execute(final ExecutionEvent event) throws ExecutionException {
+
+		Util.showView(GeoCompareView.ID, true);
+
+		return null;
+	}
 
 }

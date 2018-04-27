@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views.tourCatalog.geo;
+package net.tourbook.ui.views.geoCompare;
 
 import java.text.NumberFormat;
 import java.time.ZonedDateTime;
@@ -115,7 +115,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
 // SET_FORMATTING_OFF
 
-	public static final String				ID		= "net.tourbook.ui.views.tourCatalog.geo.GeoCompareView";	//$NON-NLS-1$
+	public static final String				ID		= "net.tourbook.ui.views.geoCompare.GeoCompareView";	//$NON-NLS-1$
 
 	private static final int				DELAY_BEFORE_STARTING_COMPARE	= 500;
                                             

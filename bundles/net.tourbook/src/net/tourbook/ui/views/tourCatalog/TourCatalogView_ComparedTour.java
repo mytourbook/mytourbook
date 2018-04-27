@@ -43,8 +43,8 @@ import net.tourbook.ui.ITourChartViewer;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartContextProvider;
 import net.tourbook.ui.tourChart.TourChartViewPart;
-import net.tourbook.ui.views.tourCatalog.geo.GeoPartComparerItem;
-import net.tourbook.ui.views.tourCatalog.geo.GeoPartItem;
+import net.tourbook.ui.views.geoCompare.GeoPartComparerItem;
+import net.tourbook.ui.views.geoCompare.GeoPartItem;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;

@@ -25,10 +25,10 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
-import net.tourbook.ui.views.tourCatalog.geo.GeoCompareEventId;
-import net.tourbook.ui.views.tourCatalog.geo.GeoCompareManager;
-import net.tourbook.ui.views.tourCatalog.geo.GeoPartItem;
-import net.tourbook.ui.views.tourCatalog.geo.IGeoCompareListener;
+import net.tourbook.ui.views.geoCompare.GeoCompareEventId;
+import net.tourbook.ui.views.geoCompare.GeoCompareManager;
+import net.tourbook.ui.views.geoCompare.GeoPartItem;
+import net.tourbook.ui.views.geoCompare.IGeoCompareListener;
 import net.tourbook.ui.views.tourSegmenter.TourSegmenterView;
 
 import org.eclipse.jface.preference.IPreferenceStore;

@@ -93,9 +93,9 @@ import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
 import net.tourbook.ui.views.TourInfoToolTipStyledCellLabelProvider;
 import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
+import net.tourbook.ui.views.geoCompare.GeoPartComparerItem;
 import net.tourbook.ui.views.rawData.ActionMergeTour;
 import net.tourbook.ui.views.rawData.ActionReimportSubMenu;
-import net.tourbook.ui.views.tourCatalog.geo.GeoPartComparerItem;
 
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.IMenuListener;

@@ -46,14 +46,14 @@ import net.tourbook.tour.photo.TourPhotoLink;
 import net.tourbook.tour.photo.TourPhotoLinkSelection;
 import net.tourbook.ui.ITourChartViewer;
 import net.tourbook.ui.UI;
+import net.tourbook.ui.views.geoCompare.GeoCompareEventId;
+import net.tourbook.ui.views.geoCompare.GeoCompareManager;
+import net.tourbook.ui.views.geoCompare.GeoPartComparerItem;
+import net.tourbook.ui.views.geoCompare.IGeoCompareListener;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
-import net.tourbook.ui.views.tourCatalog.geo.GeoCompareEventId;
-import net.tourbook.ui.views.tourCatalog.geo.GeoCompareManager;
-import net.tourbook.ui.views.tourCatalog.geo.GeoPartComparerItem;
-import net.tourbook.ui.views.tourCatalog.geo.IGeoCompareListener;
 import net.tourbook.ui.views.tourSegmenter.TourSegmenterView;
 
 import org.eclipse.jface.dialogs.IDialogSettings;

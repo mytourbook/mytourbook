@@ -23,9 +23,9 @@ import net.tourbook.ui.tourChart.TourChartView;
 import net.tourbook.ui.views.TourWaypointView;
 import net.tourbook.ui.views.calendar.CalendarView;
 import net.tourbook.ui.views.collateTours.CollatedToursView;
+import net.tourbook.ui.views.geoCompare.GeoCompareView;
 import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.ui.views.tourBook.TourBookView;
-import net.tourbook.ui.views.tourCatalog.geo.GeoCompareView;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.ui.views.tourMarker.TourMarkerView;
 

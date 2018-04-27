@@ -13,19 +13,21 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views.tourCatalog.geo;
+package net.tourbook.ui.views.geoCompare;
 
-public class GeoCompareState {
+import org.eclipse.ui.IWorkbenchPart;
+
+public interface IGeoCompareListener {
 
 	/**
-	 * Reset UI when <code>true</code>, otherwise the values are displayed.
+	 * @param part
+	 *            Part where the property was fired, can be <code>null</code> when the part is not
+	 *            set.
+	 * @param eventId
+	 *            Id is required.
+	 * @param eventData
+	 *            Can be <code>null</code>.
 	 */
-	boolean	isReset;
-
-	int		numGeoGrids;
-	int		numSlices;
-	int		numTours;
-
-	float	normalizedDistance;
+	public void geoCompareEvent(final IWorkbenchPart part, GeoCompareEventId eventId, Object eventData);
 
 }

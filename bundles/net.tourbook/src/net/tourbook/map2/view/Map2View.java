@@ -112,12 +112,12 @@ import net.tourbook.tour.photo.TourPhotoLink;
 import net.tourbook.tour.photo.TourPhotoLinkSelection;
 import net.tourbook.training.TrainingManager;
 import net.tourbook.ui.tourChart.TourChart;
+import net.tourbook.ui.views.geoCompare.GeoPartComparerItem;
 import net.tourbook.ui.views.tourCatalog.ReferenceTourManager;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
-import net.tourbook.ui.views.tourCatalog.geo.GeoPartComparerItem;
 import net.tourbook.ui.views.tourSegmenter.SelectedTourSegmenterSegments;
 
 import org.eclipse.jface.action.Action;

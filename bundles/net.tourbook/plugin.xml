@@ -1244,7 +1244,7 @@
 		<command
 			id				="net.tourbook.command.GeoParts"
 			name			="%Command_GeoParts"
-			defaultHandler	="net.tourbook.ui.views.tourCatalog.geo.ActionHandler_OpenView_GeoParts"
+			defaultHandler	="net.tourbook.ui.views.geoCompare.ActionHandler_OpenView_GeoParts"
 		/>
 		
       <command
@@ -1647,9 +1647,9 @@
 
 			<view
 				category="net.tourbook.category.compareTours"
-				class="net.tourbook.ui.views.tourCatalog.geo.GeoCompareView"
+				class="net.tourbook.ui.views.geoCompare.GeoCompareView"
 				icon="icons/geo-parts.png"
-				id="net.tourbook.ui.views.tourCatalog.geo.GeoCompareView"
+				id="net.tourbook.ui.views.geoCompare.GeoCompareView"
 				name="%View_Name_Compare_GeoParts"
 			/>
 
