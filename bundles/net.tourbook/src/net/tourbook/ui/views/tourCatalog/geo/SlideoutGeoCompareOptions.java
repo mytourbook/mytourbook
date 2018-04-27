@@ -707,7 +707,7 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColo
 		_lblGeoAccuracy.setText(geoDistance);
 	}
 
-	void updateUI_StateValues(final SlideoutGeoCompareState slideoutState) {
+	void updateUI_StateValues(final GeoCompareState slideoutState) {
 
 		if (_parent == null || _parent.isDisposed() || slideoutState == null) {
 			return;

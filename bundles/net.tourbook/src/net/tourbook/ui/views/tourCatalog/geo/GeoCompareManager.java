@@ -339,13 +339,13 @@ public class GeoCompareManager {
 	}
 
 	/**
-	 * Sets geo comparing on/off and fires an {@value GeoCompareEventId#SET_COMPARING_ON} or
-	 * {@value GeoCompareEventId#SET_COMPARING_OFF}
+	 * Sets geo comparing on/off internal state and fires an
+	 * {@value GeoCompareEventId#SET_COMPARING_ON} or {@value GeoCompareEventId#SET_COMPARING_OFF}
 	 * 
 	 * @param isGeoComparingOn
 	 * @param part
 	 */
-	public static void setIsGeoComparing(final boolean isGeoComparingOn, final IWorkbenchPart part) {
+	public static void setGeoComparing(final boolean isGeoComparingOn, final IWorkbenchPart part) {
 
 		_isGeoComparingOn = isGeoComparingOn;
 

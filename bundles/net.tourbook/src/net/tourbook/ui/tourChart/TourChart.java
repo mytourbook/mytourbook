@@ -86,7 +86,6 @@ import net.tourbook.ui.tourChart.action.ActionTourChartMarker;
 import net.tourbook.ui.tourChart.action.ActionTourPhotos;
 import net.tourbook.ui.tourChart.action.ActionXAxisDistance;
 import net.tourbook.ui.tourChart.action.ActionXAxisTime;
-import net.tourbook.ui.views.tourCatalog.geo.GeoCompareEventId;
 import net.tourbook.ui.views.tourCatalog.geo.GeoCompareManager;
 import net.tourbook.ui.views.tourCatalog.geo.GeoCompareView;
 import net.tourbook.ui.views.tourSegmenter.SelectedTourSegmenterSegments;
@@ -360,12 +359,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		@Override
 		public void run() {
 
-			final boolean isGeoCompare = isChecked();
+			final boolean isGeoComparingOn = isChecked();
 
 			// show geo compare area in the chart
-			setShowXSliderArea(isGeoCompare);
+			setShowXSliderArea(isGeoComparingOn);
 
-			if (isGeoCompare) {
+			if (isGeoComparingOn) {
 
 				// show geo compare result view
 				Util.showView(GeoCompareView.ID, false);
@@ -373,10 +372,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 //				fireSliderMoveEvent();
 			}
 
-			GeoCompareManager.fireEvent(
-					isGeoCompare ? GeoCompareEventId.SET_COMPARING_ON : GeoCompareEventId.SET_COMPARING_OFF,
-					null,
-					_part);
+			GeoCompareManager.setGeoComparing(isGeoComparingOn, _part);
 		}
 	}
 

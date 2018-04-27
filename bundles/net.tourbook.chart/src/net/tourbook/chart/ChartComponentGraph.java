@@ -240,7 +240,7 @@ public class ChartComponentGraph extends Canvas {
 	private final ChartXSlider			_xSliderB;
 
 	/**
-	 * xSliderDragged is set when the slider is being dragged, otherwise it is to <code>null</code>
+	 * This is set when the x-slider is being dragged, otherwise it is <code>null</code>
 	 */
 	private ChartXSlider				_xSliderDragged;
 
@@ -6122,8 +6122,8 @@ public class ChartComponentGraph extends Canvas {
 	 * @param valueIndex
 	 * @param isCenterSliderPosition
 	 * @param isMoveChartToShowSlider
+	 * @param isFireEvent
 	 * @param isSetKeyCenterZoomPosition
-	 * @param isBorderOffset
 	 */
 	void moveXSlider(	final ChartXSlider xSlider,
 						int valueIndex,

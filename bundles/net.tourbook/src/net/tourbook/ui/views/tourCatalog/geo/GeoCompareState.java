@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog.geo;
 
-public class SlideoutGeoCompareState {
+public class GeoCompareState {
 
 	/**
 	 * Reset UI when <code>true</code>, otherwise the values are displayed.
