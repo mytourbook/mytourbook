@@ -5909,7 +5909,7 @@ public class ChartComponentGraph extends Canvas {
 	private boolean isInXSliderSetArea(final int devYMouse) {
 
 		final int devVisibleChartHeight = _chartComponents.getDevVisibleChartHeight();
-		final int devSetArea = (int) Math.min(100, devVisibleChartHeight * 0.3);
+		final int devSetArea = (int) (devVisibleChartHeight * 0.3);
 
 		Cursor cursor = null;
 
