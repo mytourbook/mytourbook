@@ -13,9 +13,9 @@ Improvements
 
 * 2D Map
  
-  - Sync map with chart sliders (old) and (new) center the map between the sliders
+  - Sync map with both chart sliders and center the map between the sliders
   - Customize map2 tour color actions
-  - Set opacity for the tour track
+  - Set opacity for the tour track, by default tour tracks have now an opacity of 70% !!!, this can be changed in the map preferences or geo compare view slideout
   
 
 * Tour Chart

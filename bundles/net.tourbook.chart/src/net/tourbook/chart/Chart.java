@@ -164,6 +164,11 @@ public class Chart extends ViewForm {
 	private boolean					_isTopMenuPosition;
 
 	/**
+	 * Is <code>true</code> when running in UI update, then events are not fired.
+	 */
+	private boolean					_isInUpdateUI;
+
+	/**
 	 * Chart widget
 	 */
 	public Chart(final Composite parent, int style) {
@@ -593,6 +598,10 @@ public class Chart extends ViewForm {
 
 	public void fireSliderMoveEvent() {
 
+		if (_isInUpdateUI) {
+			return;
+		}
+
 		final SelectionChartInfo chartInfo = createChartInfo();
 
 		final Object[] listeners = _sliderMoveListeners.getListeners();
@@ -776,6 +785,10 @@ public class Chart extends ViewForm {
 		_chartComponents.getChartComponentGraph().handleTooltipMouseEvent(event, mouseDisplayPosition);
 	}
 
+	public boolean isInUpdateUI() {
+		return _isInUpdateUI;
+	}
+
 	/**
 	 * @return Returns <code>true</code> when the x-sliders are visible
 	 */
@@ -950,13 +963,13 @@ public class Chart extends ViewForm {
 		_chartComponents.getChartComponentGraph().redrawLayer();
 	}
 
-	public void removeChartKeyListener(final IKeyListener keyListener) {
-		_chartKeyListener.remove(keyListener);
-	}
-
 //	public void removeFocusListener(final Listener listener) {
 //		_focusListeners.remove(listener);
 //	}
+
+	public void removeChartKeyListener(final IKeyListener keyListener) {
+		_chartKeyListener.remove(keyListener);
+	}
 
 	public void removeChartMouseListener(final IMouseListener mouseListener) {
 		_chartMouseListener.remove(mouseListener);
@@ -1101,6 +1114,10 @@ public class Chart extends ViewForm {
 	 */
 	public void setHoveredTitleSegment(final ChartTitleSegment chartTitleSegment) {
 		_chartComponents.getChartComponentGraph().setHoveredTitleSegment(chartTitleSegment);
+	}
+
+	public void setIsInUpdateUI(final boolean isInUpdateUI) {
+		_isInUpdateUI = isInUpdateUI;
 	}
 
 	public void setLineSelectionPainter(final ILineSelectionPainter lineSelectionPainter) {

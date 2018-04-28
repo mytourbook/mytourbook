@@ -364,15 +364,16 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			// show geo compare area in the chart
 			setShowXSliderArea(isGeoComparingOn);
 
+			GeoCompareManager.setGeoComparing(isGeoComparingOn, _part);
+
 			if (isGeoComparingOn) {
 
 				// show geo compare result view
 				Util.showView(GeoCompareView.ID, false);
 
-//				fireSliderMoveEvent();
+				// start comparing with the current position
+				fireSliderMoveEvent();
 			}
-
-			GeoCompareManager.setGeoComparing(isGeoComparingOn, _part);
 		}
 	}
 
@@ -1089,272 +1090,281 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 					return;
 				}
 
-				final String property = event.getProperty();
+				setIsInUpdateUI(true);
+				try {
 
-				boolean isChartModified = false;
-				boolean keepMinMax = true;
+					final String property = event.getProperty();
 
-				if (property.equals(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED)
-						|| property.equals(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER)) {
+					boolean isChartModified = false;
+					boolean keepMinMax = true;
 
-					// zoom preferences has changed
+					if (property.equals(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED)
+							|| property.equals(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER)) {
 
-					_tcc.updateZoomOptions();
+						// zoom preferences has changed
 
-					isChartModified = true;
+						_tcc.updateZoomOptions();
 
-				} else if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
+						isChartModified = true;
+
+					} else if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
+
+						/*
+						 * when the chart is computed, the modified colors are read from the
+						 * preferences
+						 */
+						isChartModified = true;
+
+						// dispose old colors
+						disposeColors();
+
+					} else if (property.equals(ITourbookPreferences.GRAPH_ANTIALIASING)
+							|| property.equals(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR)
+							|| property.equals(ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR)
+							|| property.equals(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE)
+							|| property.equals(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING)
+
+							|| property.equals(GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
+							|| property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)
+							|| property.equals(GRID_HORIZONTAL_DISTANCE)
+							|| property.equals(GRID_VERTICAL_DISTANCE)
+					//
+					) {
+
+						setupChartConfig();
+
+						isChartModified = true;
+
+					} else if (property.equals(ITourbookPreferences.TOUR_SEGMENTER_CHART_VALUE_FONT)) {
+
+						setupSegmenterValueFont();
+
+					} else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
+
+						// measurement system has changed
+
+						isChartModified = true;
+						keepMinMax = false;
+
+						_valuePointTooltip.reopen();
+					}
+
+					final boolean isMinMaxEnabled = _prefStore.getBoolean(
+							ITourbookPreferences.GRAPH_IS_MIN_MAX_ENABLED);
 
 					/*
-					 * when the chart is computed, the modified colors are read from the preferences
+					 * Altitude
 					 */
-					isChartModified = true;
+					isChartModified |= setMinDefaultValue(
+							property,
+							isChartModified,
+							ITourbookPreferences.GRAPH_ALTITUDE_IS_MIN_ENABLED,
+							ITourbookPreferences.GRAPH_ALTITUDE_MIN_VALUE,
+							TourManager.GRAPH_ALTITUDE,
+							0,
+							MIN_ADJUSTMENT,
+							isMinMaxEnabled);
 
-					// dispose old colors
-					disposeColors();
+					isChartModified |= setMaxDefaultValue(
+							property,
+							isChartModified,
+							ITourbookPreferences.GRAPH_ALTITUDE_IS_MAX_ENABLED,
+							ITourbookPreferences.GRAPH_ALTITUDE_MAX_VALUE,
+							TourManager.GRAPH_ALTITUDE,
+							0,
+							1e-2,
+							isMinMaxEnabled);
 
-				} else if (property.equals(ITourbookPreferences.GRAPH_ANTIALIASING)
-						|| property.equals(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR)
-						|| property.equals(ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR)
-						|| property.equals(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE)
-						|| property.equals(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING)
+					/*
+					 * Altimeter
+					 */
+					isChartModified |= setMinDefaultValue(
+							property,
+							isChartModified,
+							ITourbookPreferences.GRAPH_ALTIMETER_IS_MIN_ENABLED,
+							ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE,
+							TourManager.GRAPH_ALTIMETER,
+							0,
+							MIN_ADJUSTMENT,
+							isMinMaxEnabled);
 
-						|| property.equals(GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
-						|| property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)
-						|| property.equals(GRID_HORIZONTAL_DISTANCE)
-						|| property.equals(GRID_VERTICAL_DISTANCE)
-				//
-				) {
+					isChartModified |= setMaxDefaultValue(
+							property,
+							isChartModified,
+							ITourbookPreferences.GRAPH_ALTIMETER_IS_MAX_ENABLED,
+							ITourbookPreferences.GRAPH_ALTIMETER_MAX_VALUE,
+							TourManager.GRAPH_ALTIMETER,
+							0,
+							1e-2,
+							isMinMaxEnabled);
 
-					setupChartConfig();
+					/*
+					 * Gradient
+					 */
+					isChartModified |= setMinDefaultValue(
+							property,
+							isChartModified,
+							ITourbookPreferences.GRAPH_GRADIENT_IS_MIN_ENABLED,
+							ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
+							TourManager.GRAPH_GRADIENT,
+							0,
+							MIN_ADJUSTMENT,
+							isMinMaxEnabled);
 
-					isChartModified = true;
+					isChartModified |= setMaxDefaultValue(
+							property,
+							isChartModified,
+							ITourbookPreferences.GRAPH_GRADIENT_IS_MAX_ENABLED,
+							ITourbookPreferences.GRAPH_GRADIENT_MAX_VALUE,
+							TourManager.GRAPH_GRADIENT,
+							0,
+							MAX_ADJUSTMENT,
+							isMinMaxEnabled);
 
-				} else if (property.equals(ITourbookPreferences.TOUR_SEGMENTER_CHART_VALUE_FONT)) {
+					/*
+					 * Pulse
+					 */
+					isChartModified |= setMinDefaultValue(
+							property,
+							isChartModified,
+							ITourbookPreferences.GRAPH_PULSE_IS_MIN_ENABLED,
+							ITourbookPreferences.GRAPH_PULSE_MIN_VALUE,
+							TourManager.GRAPH_PULSE,
+							0,
+							MIN_ADJUSTMENT,
+							isMinMaxEnabled);
 
-					setupSegmenterValueFont();
+					isChartModified |= setMaxDefaultValue(
+							property,
+							isChartModified,
+							ITourbookPreferences.GRAPH_PULSE_IS_MAX_ENABLED,
+							ITourbookPreferences.GRAPH_PULSE_MAX_VALUE,
+							TourManager.GRAPH_PULSE,
+							0,
+							1e-3,
+							isMinMaxEnabled);
 
-				} else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
+					/*
+					 * Speed
+					 */
+					isChartModified |= setMinDefaultValue(
+							property,
+							isChartModified,
+							ITourbookPreferences.GRAPH_SPEED_IS_MIN_ENABLED,
+							ITourbookPreferences.GRAPH_SPEED_MIN_VALUE,
+							TourManager.GRAPH_SPEED,
+							0,
+							Double.MIN_VALUE,
+							isMinMaxEnabled);
 
-					// measurement system has changed
+					isChartModified |= setMaxDefaultValue(
+							property,
+							isChartModified,
+							ITourbookPreferences.GRAPH_SPEED_IS_MAX_ENABLED,
+							ITourbookPreferences.GRAPH_SPEED_MAX_VALUE,
+							TourManager.GRAPH_SPEED,
+							0,
+							Double.MIN_VALUE,
+							isMinMaxEnabled);
 
-					isChartModified = true;
-					keepMinMax = false;
+					/*
+					 * Pace
+					 */
+					isChartModified |= setMinDefaultValue(
+							property,
+							isChartModified,
+							ITourbookPreferences.GRAPH_PACE_IS_MIN_ENABLED,
+							ITourbookPreferences.GRAPH_PACE_MIN_VALUE,
+							TourManager.GRAPH_PACE,
+							60,
+							Double.MIN_VALUE,
+							isMinMaxEnabled);
 
-					_valuePointTooltip.reopen();
-				}
+					isChartModified |= setMaxDefaultValue(
+							property,
+							isChartModified,
+							ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED,
+							ITourbookPreferences.GRAPH_PACE_MAX_VALUE,
+							TourManager.GRAPH_PACE,
+							60,
+							Double.MIN_VALUE,
+							isMinMaxEnabled);
 
-				final boolean isMinMaxEnabled = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_MIN_MAX_ENABLED);
+					/*
+					 * Cadence
+					 */
+					isChartModified |= setMinDefaultValue(
+							property,
+							isChartModified,
+							ITourbookPreferences.GRAPH_CADENCE_IS_MIN_ENABLED,
+							ITourbookPreferences.GRAPH_CADENCE_MIN_VALUE,
+							TourManager.GRAPH_CADENCE,
+							0,
+							MIN_ADJUSTMENT,
+							isMinMaxEnabled);
 
-				/*
-				 * Altitude
-				 */
-				isChartModified |= setMinDefaultValue(
-						property,
-						isChartModified,
-						ITourbookPreferences.GRAPH_ALTITUDE_IS_MIN_ENABLED,
-						ITourbookPreferences.GRAPH_ALTITUDE_MIN_VALUE,
-						TourManager.GRAPH_ALTITUDE,
-						0,
-						MIN_ADJUSTMENT,
-						isMinMaxEnabled);
+					isChartModified |= setMaxDefaultValue(
+							property,
+							isChartModified,
+							ITourbookPreferences.GRAPH_CADENCE_IS_MAX_ENABLED,
+							ITourbookPreferences.GRAPH_CADENCE_MAX_VALUE,
+							TourManager.GRAPH_CADENCE,
+							0,
+							1e-3,
+							isMinMaxEnabled);
 
-				isChartModified |= setMaxDefaultValue(
-						property,
-						isChartModified,
-						ITourbookPreferences.GRAPH_ALTITUDE_IS_MAX_ENABLED,
-						ITourbookPreferences.GRAPH_ALTITUDE_MAX_VALUE,
-						TourManager.GRAPH_ALTITUDE,
-						0,
-						1e-2,
-						isMinMaxEnabled);
+					/*
+					 * Power
+					 */
+					isChartModified |= setMinDefaultValue(
+							property,
+							isChartModified,
+							ITourbookPreferences.GRAPH_POWER_IS_MIN_ENABLED,
+							ITourbookPreferences.GRAPH_POWER_MIN_VALUE,
+							TourManager.GRAPH_POWER,
+							0,
+							MIN_ADJUSTMENT,
+							isMinMaxEnabled);
 
-				/*
-				 * Altimeter
-				 */
-				isChartModified |= setMinDefaultValue(
-						property,
-						isChartModified,
-						ITourbookPreferences.GRAPH_ALTIMETER_IS_MIN_ENABLED,
-						ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE,
-						TourManager.GRAPH_ALTIMETER,
-						0,
-						MIN_ADJUSTMENT,
-						isMinMaxEnabled);
+					isChartModified |= setMaxDefaultValue(
+							property,
+							isChartModified,
+							ITourbookPreferences.GRAPH_POWER_IS_MAX_ENABLED,
+							ITourbookPreferences.GRAPH_POWER_MAX_VALUE,
+							TourManager.GRAPH_POWER,
+							0,
+							1e-3,
+							isMinMaxEnabled);
 
-				isChartModified |= setMaxDefaultValue(
-						property,
-						isChartModified,
-						ITourbookPreferences.GRAPH_ALTIMETER_IS_MAX_ENABLED,
-						ITourbookPreferences.GRAPH_ALTIMETER_MAX_VALUE,
-						TourManager.GRAPH_ALTIMETER,
-						0,
-						1e-2,
-						isMinMaxEnabled);
+					/*
+					 * Temperature
+					 */
+					isChartModified |= setMinDefaultValue(
+							property,
+							isChartModified,
+							ITourbookPreferences.GRAPH_TEMPERATURE_IS_MIN_ENABLED,
+							ITourbookPreferences.GRAPH_TEMPERATURE_MIN_VALUE,
+							TourManager.GRAPH_TEMPERATURE,
+							0,
+							MIN_ADJUSTMENT,
+							isMinMaxEnabled);
 
-				/*
-				 * Gradient
-				 */
-				isChartModified |= setMinDefaultValue(
-						property,
-						isChartModified,
-						ITourbookPreferences.GRAPH_GRADIENT_IS_MIN_ENABLED,
-						ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
-						TourManager.GRAPH_GRADIENT,
-						0,
-						MIN_ADJUSTMENT,
-						isMinMaxEnabled);
+					isChartModified |= setMaxDefaultValue(
+							property,
+							isChartModified,
+							ITourbookPreferences.GRAPH_TEMPERATURE_IS_MAX_ENABLED,
+							ITourbookPreferences.GRAPH_TEMPERATURE_MAX_VALUE,
+							TourManager.GRAPH_TEMPERATURE,
+							0,
+							1e-3,
+							isMinMaxEnabled);
 
-				isChartModified |= setMaxDefaultValue(
-						property,
-						isChartModified,
-						ITourbookPreferences.GRAPH_GRADIENT_IS_MAX_ENABLED,
-						ITourbookPreferences.GRAPH_GRADIENT_MAX_VALUE,
-						TourManager.GRAPH_GRADIENT,
-						0,
-						MAX_ADJUSTMENT,
-						isMinMaxEnabled);
+					if (isChartModified) {
+						updateTourChart(keepMinMax);
+					}
 
-				/*
-				 * Pulse
-				 */
-				isChartModified |= setMinDefaultValue(
-						property,
-						isChartModified,
-						ITourbookPreferences.GRAPH_PULSE_IS_MIN_ENABLED,
-						ITourbookPreferences.GRAPH_PULSE_MIN_VALUE,
-						TourManager.GRAPH_PULSE,
-						0,
-						MIN_ADJUSTMENT,
-						isMinMaxEnabled);
-
-				isChartModified |= setMaxDefaultValue(
-						property,
-						isChartModified,
-						ITourbookPreferences.GRAPH_PULSE_IS_MAX_ENABLED,
-						ITourbookPreferences.GRAPH_PULSE_MAX_VALUE,
-						TourManager.GRAPH_PULSE,
-						0,
-						1e-3,
-						isMinMaxEnabled);
-
-				/*
-				 * Speed
-				 */
-				isChartModified |= setMinDefaultValue(
-						property,
-						isChartModified,
-						ITourbookPreferences.GRAPH_SPEED_IS_MIN_ENABLED,
-						ITourbookPreferences.GRAPH_SPEED_MIN_VALUE,
-						TourManager.GRAPH_SPEED,
-						0,
-						Double.MIN_VALUE,
-						isMinMaxEnabled);
-
-				isChartModified |= setMaxDefaultValue(
-						property,
-						isChartModified,
-						ITourbookPreferences.GRAPH_SPEED_IS_MAX_ENABLED,
-						ITourbookPreferences.GRAPH_SPEED_MAX_VALUE,
-						TourManager.GRAPH_SPEED,
-						0,
-						Double.MIN_VALUE,
-						isMinMaxEnabled);
-
-				/*
-				 * Pace
-				 */
-				isChartModified |= setMinDefaultValue(
-						property,
-						isChartModified,
-						ITourbookPreferences.GRAPH_PACE_IS_MIN_ENABLED,
-						ITourbookPreferences.GRAPH_PACE_MIN_VALUE,
-						TourManager.GRAPH_PACE,
-						60,
-						Double.MIN_VALUE,
-						isMinMaxEnabled);
-
-				isChartModified |= setMaxDefaultValue(
-						property,
-						isChartModified,
-						ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED,
-						ITourbookPreferences.GRAPH_PACE_MAX_VALUE,
-						TourManager.GRAPH_PACE,
-						60,
-						Double.MIN_VALUE,
-						isMinMaxEnabled);
-
-				/*
-				 * Cadence
-				 */
-				isChartModified |= setMinDefaultValue(
-						property,
-						isChartModified,
-						ITourbookPreferences.GRAPH_CADENCE_IS_MIN_ENABLED,
-						ITourbookPreferences.GRAPH_CADENCE_MIN_VALUE,
-						TourManager.GRAPH_CADENCE,
-						0,
-						MIN_ADJUSTMENT,
-						isMinMaxEnabled);
-
-				isChartModified |= setMaxDefaultValue(
-						property,
-						isChartModified,
-						ITourbookPreferences.GRAPH_CADENCE_IS_MAX_ENABLED,
-						ITourbookPreferences.GRAPH_CADENCE_MAX_VALUE,
-						TourManager.GRAPH_CADENCE,
-						0,
-						1e-3,
-						isMinMaxEnabled);
-
-				/*
-				 * Power
-				 */
-				isChartModified |= setMinDefaultValue(
-						property,
-						isChartModified,
-						ITourbookPreferences.GRAPH_POWER_IS_MIN_ENABLED,
-						ITourbookPreferences.GRAPH_POWER_MIN_VALUE,
-						TourManager.GRAPH_POWER,
-						0,
-						MIN_ADJUSTMENT,
-						isMinMaxEnabled);
-
-				isChartModified |= setMaxDefaultValue(
-						property,
-						isChartModified,
-						ITourbookPreferences.GRAPH_POWER_IS_MAX_ENABLED,
-						ITourbookPreferences.GRAPH_POWER_MAX_VALUE,
-						TourManager.GRAPH_POWER,
-						0,
-						1e-3,
-						isMinMaxEnabled);
-
-				/*
-				 * Temperature
-				 */
-				isChartModified |= setMinDefaultValue(
-						property,
-						isChartModified,
-						ITourbookPreferences.GRAPH_TEMPERATURE_IS_MIN_ENABLED,
-						ITourbookPreferences.GRAPH_TEMPERATURE_MIN_VALUE,
-						TourManager.GRAPH_TEMPERATURE,
-						0,
-						MIN_ADJUSTMENT,
-						isMinMaxEnabled);
-
-				isChartModified |= setMaxDefaultValue(
-						property,
-						isChartModified,
-						ITourbookPreferences.GRAPH_TEMPERATURE_IS_MAX_ENABLED,
-						ITourbookPreferences.GRAPH_TEMPERATURE_MAX_VALUE,
-						TourManager.GRAPH_TEMPERATURE,
-						0,
-						1e-3,
-						isMinMaxEnabled);
-
-				if (isChartModified) {
-					updateTourChart(keepMinMax);
+				} finally {
+					setIsInUpdateUI(false);
 				}
 			}
 		};

@@ -2854,10 +2854,8 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 					// center to the left AND right slider
 
-					final TourData mapTourData = _allTourData.get(0);
-
 					final Set<GeoPosition> mapPositions = getXSliderGeoPositions(
-							mapTourData,
+							tourData,
 							leftSliderValuesIndex,
 							rightSliderValuesIndex);
 

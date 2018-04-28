@@ -102,6 +102,7 @@ public class PrefPageMap2Appearance extends FieldEditorPreferencePage implements
 
 	private Button							_chkLiveUpdate;
 	private Button							_chkPaintWithBorder;
+	private Button							_chkTrackOpacity;
 	private Button							_rdoBorderColorDarker;
 	private Button							_rdoBorderColorColor;
 	private Button							_rdoSymbolLine;
@@ -117,7 +118,7 @@ public class PrefPageMap2Appearance extends FieldEditorPreferencePage implements
 	private Spinner							_spinnerBorderColorDarker;
 	private Spinner							_spinnerBorderWidth;
 	private Spinner							_spinnerLineWidth;
-	private Spinner							_spinnerOpacity;
+	private Spinner							_spinnerTrackOpacity;
 
 	private StyledText						_pageSimple;
 	private StyledText						_pageComplex;
@@ -203,23 +204,24 @@ public class PrefPageMap2Appearance extends FieldEditorPreferencePage implements
 			}
 			{
 				/*
-				 * Opacity
+				 * Tour track opacity
 				 */
 				{
-					// label
-					final Label label = new Label(groupContainer, SWT.NONE);
-					label.setText(Messages.Pref_Map2_Label_Opacity);
-					label.setToolTipText(Messages.Pref_Map2_Label_Opacity_Tooltip);
+					// checkbox
+					_chkTrackOpacity = new Button(groupContainer, SWT.CHECK);
+					_chkTrackOpacity.setText(Messages.Pref_Map2_Label_TrackOpacity);
+					_chkTrackOpacity.setToolTipText(Messages.Pref_Map2_Label_TrackOpacity_Tooltip);
+					_chkTrackOpacity.addSelectionListener(_defaultSelectionListener);
 				}
 				{
 					// spinner
-					_spinnerOpacity = new Spinner(groupContainer, SWT.BORDER);
-					_spinnerOpacity.setMinimum(MAP_OPACITY_MINIMUM);
-					_spinnerOpacity.setMaximum(100);
-					_spinnerOpacity.setIncrement(1);
-					_spinnerOpacity.setPageIncrement(10);
-					_spinnerOpacity.addSelectionListener(_defaultSelectionListener);
-					_spinnerOpacity.addMouseWheelListener(_defaultMouseWheelListener);
+					_spinnerTrackOpacity = new Spinner(groupContainer, SWT.BORDER);
+					_spinnerTrackOpacity.setMinimum(MAP_OPACITY_MINIMUM);
+					_spinnerTrackOpacity.setMaximum(100);
+					_spinnerTrackOpacity.setIncrement(1);
+					_spinnerTrackOpacity.setPageIncrement(10);
+					_spinnerTrackOpacity.addSelectionListener(_defaultSelectionListener);
+					_spinnerTrackOpacity.addMouseWheelListener(_defaultMouseWheelListener);
 				}
 			}
 			createUI_50_Border(groupContainer);
@@ -228,10 +230,10 @@ public class PrefPageMap2Appearance extends FieldEditorPreferencePage implements
 
 	private void createUI_50_Border(final Composite parent) {
 
-		/*
-		 * Checkbox: paint with border
-		 */
 		{
+			/*
+			 * Checkbox: paint with border
+			 */
 			_chkPaintWithBorder = new Button(parent, SWT.CHECK);
 			GridDataFactory
 					.fillDefaults()//
@@ -242,10 +244,10 @@ public class PrefPageMap2Appearance extends FieldEditorPreferencePage implements
 			_chkPaintWithBorder.addSelectionListener(_defaultSelectionListener);
 		}
 
-		/*
-		 * border width
-		 */
 		{
+			/*
+			 * border width
+			 */
 			// label: border width
 			_lblBorderWidth = new Label(parent, NONE);
 			GridDataFactory
@@ -262,10 +264,11 @@ public class PrefPageMap2Appearance extends FieldEditorPreferencePage implements
 			_spinnerBorderWidth.addMouseWheelListener(_defaultMouseWheelListener);
 		}
 
-		/*
-		 * Border color
-		 */
 		{
+			/*
+			 * Border color
+			 */
+
 			// label
 			_lblBorderColor = new Label(parent, NONE);
 			GridDataFactory
@@ -415,6 +418,7 @@ public class PrefPageMap2Appearance extends FieldEditorPreferencePage implements
 
 	private void enableControls() {
 
+		final boolean isTrackOpacity = _chkTrackOpacity.getSelection();
 		final boolean isWithBorder = _chkPaintWithBorder.getSelection();
 		final boolean isWithBorderColor = _rdoBorderColorColor.getSelection();
 		final boolean isWithBorderDarker = _rdoBorderColorDarker.getSelection();
@@ -429,6 +433,8 @@ public class PrefPageMap2Appearance extends FieldEditorPreferencePage implements
 
 		_colorBorderColor.setEnabled(isWithBorder && isWithBorderColor);
 		_spinnerBorderColorDarker.setEnabled(isWithBorder && isWithBorderDarker);
+
+		_spinnerTrackOpacity.setEnabled(isTrackOpacity);
 	}
 
 	/**
@@ -531,7 +537,11 @@ public class PrefPageMap2Appearance extends FieldEditorPreferencePage implements
 
 		updateUI_SetPlotType(_prefStore.getDefaultString(ITourbookPreferences.MAP_LAYOUT_PLOT_TYPE));
 
-		_spinnerOpacity.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.MAP2_LAYOUT_OPACITY));
+		// opacity
+		_chkTrackOpacity.setSelection(
+				_prefStore.getDefaultBoolean(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY));
+		_spinnerTrackOpacity.setSelection(
+				_prefStore.getDefaultInt(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY));
 
 		/*
 		 * Line
@@ -542,11 +552,12 @@ public class PrefPageMap2Appearance extends FieldEditorPreferencePage implements
 		 * Border
 		 */
 		_chkPaintWithBorder.setSelection(
-				_prefStore.getDefaultBoolean(
-						ITourbookPreferences.MAP_LAYOUT_PAINT_WITH_BORDER));
-		_spinnerBorderWidth.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.MAP_LAYOUT_BORDER_WIDTH));
+				_prefStore.getDefaultBoolean(ITourbookPreferences.MAP_LAYOUT_PAINT_WITH_BORDER));
+		_spinnerBorderWidth.setSelection(
+				_prefStore.getDefaultInt(ITourbookPreferences.MAP_LAYOUT_BORDER_WIDTH));
 
-		updateUI_SetBorderType(_prefStore.getDefaultInt(ITourbookPreferences.MAP_LAYOUT_BORDER_TYPE));
+		updateUI_SetBorderType(
+				_prefStore.getDefaultInt(ITourbookPreferences.MAP_LAYOUT_BORDER_TYPE));
 		_spinnerBorderColorDarker.setSelection(
 				_prefStore.getDefaultInt(ITourbookPreferences.MAP_LAYOUT_BORDER_DIMM_VALUE));
 
@@ -630,7 +641,10 @@ public class PrefPageMap2Appearance extends FieldEditorPreferencePage implements
 	private void restoreState() {
 
 		updateUI_SetPlotType(_prefStore.getString(ITourbookPreferences.MAP_LAYOUT_PLOT_TYPE));
-		_spinnerOpacity.setSelection(_prefStore.getInt(ITourbookPreferences.MAP2_LAYOUT_OPACITY));
+
+		// opacity
+		_chkTrackOpacity.setSelection(_prefStore.getBoolean(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY));
+		_spinnerTrackOpacity.setSelection(_prefStore.getInt(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY));
 
 		/*
 		 * Line
@@ -670,7 +684,10 @@ public class PrefPageMap2Appearance extends FieldEditorPreferencePage implements
 	private void saveState() {
 
 		_prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_PLOT_TYPE, getPlotType());
-		_prefStore.setValue(ITourbookPreferences.MAP2_LAYOUT_OPACITY, _spinnerOpacity.getSelection());
+
+		// opacity
+		_prefStore.setValue(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY, _chkTrackOpacity.getSelection());
+		_prefStore.setValue(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY, _spinnerTrackOpacity.getSelection());
 
 		/*
 		 * Line

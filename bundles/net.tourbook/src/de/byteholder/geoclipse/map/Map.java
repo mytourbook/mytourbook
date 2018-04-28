@@ -4364,8 +4364,13 @@ public class Map extends Canvas {
 
 	public void updateGraphColors() {
 
-		// convert % to 0xff
-		_overlayAlpha = 0xff * _prefStore.getInt(ITourbookPreferences.MAP2_LAYOUT_OPACITY) / 100;
+		_overlayAlpha = _prefStore.getBoolean(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY)
+
+				// convert % to 0xff
+				? 0xff * _prefStore.getInt(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY) / 100
+
+				// no opacity
+				: 0xff;
 	}
 
 	private void updateOfflineAreaEndPosition(final MouseEvent mouseEvent) {

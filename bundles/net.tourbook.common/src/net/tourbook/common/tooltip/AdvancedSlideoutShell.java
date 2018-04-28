@@ -585,6 +585,14 @@ public abstract class AdvancedSlideoutShell {
 	protected abstract void beforeHideToolTip();
 
 	/**
+	 * Is called just before the shell is set to visible or hidden
+	 * 
+	 * @param isVisible
+	 *            Is <code>true</code> when visible otherwise hidden.
+	 */
+	protected void beforeShellVisible(final boolean isVisible) {}
+
+	/**
 	 * <b>VERY IMPORTANT</b>
 	 * <p>
 	 * Do not hide the tooltip when other shells (dialogs) are open, otherwise the app is blocked
@@ -793,7 +801,7 @@ public abstract class AdvancedSlideoutShell {
 
 	protected Color getShellColor_Background(final ColorRegistry colorRegistry) {
 		return Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
-	}
+	};
 
 	protected Color getShellColor_Foreground(final ColorRegistry colorRegistry) {
 		return Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_FOREGROUND);
@@ -801,7 +809,7 @@ public abstract class AdvancedSlideoutShell {
 
 	protected String getShellTitle_NoResize() {
 		return UI.EMPTY_STRING;
-	};
+	}
 
 	protected String getShellTitle_WithResize() {
 		return UI.EMPTY_STRING;
@@ -1514,6 +1522,8 @@ public abstract class AdvancedSlideoutShell {
 	}
 
 	private void setShellVisible(final boolean isVisible) {
+
+		beforeShellVisible(isVisible);
 
 		_visibleShell.setVisible(isVisible);
 

@@ -470,6 +470,11 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
 					recompareTours();
 
+				} else if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
+
+					// map options can have be changed
+					_slideoutGeoCompareOptions.restoreState();
+
 				} else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
 
 //					updateUI_GeoAccuracy();

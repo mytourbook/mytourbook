@@ -957,10 +957,10 @@ public class TourMapPainter extends MapPainter {
 
 				boolean isGeoCompareRefTour = geoCompareRefTourId >= 0
 
-						&& geoCompareRefTourId == tourData.getTourId();
+						&& geoCompareRefTourId == tourData.getTourId()
 
 						// when only 1 tour is displayed, do not show it as reference tour
-//						&& tourDataList.size() > 1;
+						&& tourDataList.size() > 1;
 
 				int refTourStartIndex = 0;
 				int refTourEndIndex = 0;

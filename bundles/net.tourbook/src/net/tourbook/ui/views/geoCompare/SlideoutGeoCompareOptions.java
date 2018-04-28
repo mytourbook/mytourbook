@@ -48,6 +48,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
@@ -92,19 +93,27 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColo
 	 */
 	private Composite					_parent;
 
+	private Button						_chkMapOption_TrackOpacity;
+
 	private ColorSelectorExtended		_colorMapOption_RefTour;
 	private ColorSelectorExtended		_colorMapOption_ComparedTourPart;
 
-	private Label						_lblGeoAccuracy;
-	private Label						_lblDistanceIntervalUnit;
-	private Label						_lblNormalizedDistance;
-	private Label						_lblNormalizedDistanceUnit;
-	private Label						_lblNumGeoGrids;
-	private Label						_lblNumSlices;
-	private Label						_lblNumTours;
+	private Label						_lblGeo_DistanceInterval;
+	private Label						_lblGeo_DistanceInterval_Unit;
+	private Label						_lblGeo_GeoAccuracy;
+	private Label						_lblGeo_GeoAccuracy_Value;
+	private Label						_lblGeo_NormalizedDistance;
+	private Label						_lblGeo_NormalizedDistance_Value;
+	private Label						_lblGeo_NormalizedDistance_Unit;
+	private Label						_lblMapOption_ComparedTourPart;
+	private Label						_lblMapOption_LineWidth;
+	private Label						_lblMapOption_RefTour;
+//	private Label						_lblNumGeoGrids;
+//	private Label						_lblNumSlices;
+//	private Label						_lblNumTours;
 
-	private Spinner						_spinnerGeoAccuracy;
-	private Spinner						_spinnerDistanceInterval;
+	private Spinner						_spinnerGeo_GeoAccuracy;
+	private Spinner						_spinnerGeo_DistanceInterval;
 	private Spinner						_spinnerMapOption_LineWidth;
 	private Spinner						_spinnerMapOption_Opacity;
 
@@ -128,6 +137,12 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColo
 
 		setShellFadeOutDelaySteps(10);
 		setTitleText("Geo Compare Options");
+	}
+
+	@Override
+	protected void beforeShellVisible(final boolean isVisible) {
+
+		enableControls();
 	}
 
 	@Override
@@ -200,77 +215,77 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColo
 				.applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 		{
-			createUI_30_Info(container);
+//			createUI_30_Info(container);
 			createUI_40_Options(container);
 			createUI_50_MapOptions(container);
 		}
 	}
 
-	private void createUI_30_Info(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
-
-		_firstColumnContainerControls.add(container);
-
-		{
-			{
-				/*
-				 * Number of tours
-				 */
-				{
-					final Label label = new Label(container, SWT.NONE);
-					label.setText("Possible tours");
-
-					_firstColumnControls.add(label);
-				}
-				{
-					_lblNumTours = new Label(container, SWT.NONE);
-					_lblNumTours.setText(UI.EMPTY_STRING);
-					GridDataFactory
-							.fillDefaults()
-							.grab(true, false)
-							//							.align(SWT.END, SWT.FILL)
-							.applyTo(_lblNumTours);
-				}
-			}
-			{
-				/*
-				 * Number of geo parts
-				 */
-				{
-					final Label label = new Label(container, SWT.NONE);
-					label.setText("Geo grids");
-					label.setToolTipText("Number of geo squares (1.57 km / 1 mi)");
-
-					_firstColumnControls.add(label);
-				}
-				{
-					_lblNumGeoGrids = new Label(container, SWT.NONE);
-					_lblNumGeoGrids.setText(UI.EMPTY_STRING);
-					GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblNumGeoGrids);
-				}
-			}
-			{
-				/*
-				 * Number of time slices
-				 */
-				{
-					final Label label = new Label(container, SWT.NONE);
-					label.setText("Time slices");
-
-					_firstColumnControls.add(label);
-				}
-				{
-					_lblNumSlices = new Label(container, SWT.NONE);
-					_lblNumSlices.setText(UI.EMPTY_STRING);
-					GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblNumSlices);
-				}
-			}
-		}
-	}
+//	private void createUI_30_Info(final Composite parent) {
+//
+//		final Composite container = new Composite(parent, SWT.NONE);
+//		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+//		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+////		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+//
+//		_firstColumnContainerControls.add(container);
+//
+//		{
+//			{
+//				/*
+//				 * Number of tours
+//				 */
+//				{
+//					final Label label = new Label(container, SWT.NONE);
+//					label.setText("Possible tours");
+//
+//					_firstColumnControls.add(label);
+//				}
+//				{
+//					_lblNumTours = new Label(container, SWT.NONE);
+//					_lblNumTours.setText(UI.EMPTY_STRING);
+//					GridDataFactory
+//							.fillDefaults()
+//							.grab(true, false)
+//							//							.align(SWT.END, SWT.FILL)
+//							.applyTo(_lblNumTours);
+//				}
+//			}
+//			{
+//				/*
+//				 * Number of geo parts
+//				 */
+//				{
+//					final Label label = new Label(container, SWT.NONE);
+//					label.setText("Geo grids");
+//					label.setToolTipText("Number of geo squares (1.57 km / 1 mi)");
+//
+//					_firstColumnControls.add(label);
+//				}
+//				{
+//					_lblNumGeoGrids = new Label(container, SWT.NONE);
+//					_lblNumGeoGrids.setText(UI.EMPTY_STRING);
+//					GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblNumGeoGrids);
+//				}
+//			}
+//			{
+//				/*
+//				 * Number of time slices
+//				 */
+//				{
+//					final Label label = new Label(container, SWT.NONE);
+//					label.setText("Time slices");
+//
+//					_firstColumnControls.add(label);
+//				}
+//				{
+//					_lblNumSlices = new Label(container, SWT.NONE);
+//					_lblNumSlices.setText(UI.EMPTY_STRING);
+//					GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblNumSlices);
+//				}
+//			}
+//		}
+//	}
 
 	private void createUI_40_Options(final Composite parent) {
 
@@ -291,31 +306,31 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColo
 				 * Distance
 				 */
 				{
-					final Label label = new Label(container, SWT.NONE);
-					label.setText("Distance");
+					_lblGeo_NormalizedDistance = new Label(container, SWT.NONE);
+					_lblGeo_NormalizedDistance.setText("Distance");
 
-					_firstColumnControls.add(label);
+					_firstColumnControls.add(_lblGeo_NormalizedDistance);
 				}
 				{
-					_lblNormalizedDistance = new Label(container, SWT.TRAIL);
-					_lblNormalizedDistance.setText(UI.EMPTY_STRING);
+					_lblGeo_NormalizedDistance_Value = new Label(container, SWT.TRAIL);
+					_lblGeo_NormalizedDistance_Value.setText(UI.EMPTY_STRING);
 					GridDataFactory
 							.fillDefaults()
 							//							.grab(true, false)
 							//							.hint(_pc.convertWidthInCharsToPixels(2), SWT.DEFAULT)
 							.align(SWT.END, SWT.FILL)
-							.applyTo(_lblNormalizedDistance);
+							.applyTo(_lblGeo_NormalizedDistance_Value);
 
-					_secondColumnControls.add(_lblNormalizedDistance);
+					_secondColumnControls.add(_lblGeo_NormalizedDistance_Value);
 				}
 				{
 					// Label: Distance unit
-					_lblNormalizedDistanceUnit = new Label(container, SWT.NONE);
-					_lblNormalizedDistanceUnit.setText(UI.EMPTY_STRING);
+					_lblGeo_NormalizedDistance_Unit = new Label(container, SWT.NONE);
+					_lblGeo_NormalizedDistance_Unit.setText(UI.EMPTY_STRING);
 					GridDataFactory
 							.fillDefaults()
 							.grab(true, false)
-							.applyTo(_lblNormalizedDistanceUnit);
+							.applyTo(_lblGeo_NormalizedDistance_Unit);
 				}
 			}
 			{
@@ -324,35 +339,35 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColo
 				 */
 				{
 					// Label
-					final Label label = new Label(container, SWT.NONE);
-					label.setText("&Distance interval");
+					_lblGeo_DistanceInterval = new Label(container, SWT.NONE);
+					_lblGeo_DistanceInterval.setText("&Distance interval");
 
-					_firstColumnControls.add(label);
+					_firstColumnControls.add(_lblGeo_DistanceInterval);
 				}
 				{
 					// Spinner
-					_spinnerDistanceInterval = new Spinner(container, SWT.BORDER);
-					_spinnerDistanceInterval.setMinimum(10);
-					_spinnerDistanceInterval.setMaximum(1_000);
-					_spinnerDistanceInterval.setPageIncrement(10);
-					_spinnerDistanceInterval.addSelectionListener(_compareSelectionListener);
-					_spinnerDistanceInterval.addMouseWheelListener(_compareMouseWheelListener);
+					_spinnerGeo_DistanceInterval = new Spinner(container, SWT.BORDER);
+					_spinnerGeo_DistanceInterval.setMinimum(10);
+					_spinnerGeo_DistanceInterval.setMaximum(1_000);
+					_spinnerGeo_DistanceInterval.setPageIncrement(10);
+					_spinnerGeo_DistanceInterval.addSelectionListener(_compareSelectionListener);
+					_spinnerGeo_DistanceInterval.addMouseWheelListener(_compareMouseWheelListener);
 					GridDataFactory
 							.fillDefaults()
 							.align(SWT.END, SWT.FILL)
-							.applyTo(_spinnerDistanceInterval);
+							.applyTo(_spinnerGeo_DistanceInterval);
 
-					_secondColumnControls.add(_spinnerDistanceInterval);
+					_secondColumnControls.add(_spinnerGeo_DistanceInterval);
 				}
 				{
 					// Label: Distance unit
-					_lblDistanceIntervalUnit = new Label(container, SWT.NONE);
-					_lblDistanceIntervalUnit.setText("m");
+					_lblGeo_DistanceInterval_Unit = new Label(container, SWT.NONE);
+					_lblGeo_DistanceInterval_Unit.setText("m");
 					GridDataFactory
 							.fillDefaults()
 							.grab(true, false)
 							.align(SWT.FILL, SWT.CENTER)
-							.applyTo(_lblDistanceIntervalUnit);
+							.applyTo(_lblGeo_DistanceInterval_Unit);
 				}
 			}
 			{
@@ -361,34 +376,34 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColo
 				 */
 				{
 					// Label
-					final Label label = new Label(container, SWT.NONE);
-					label.setText("Geo &accuracy");
+					_lblGeo_GeoAccuracy = new Label(container, SWT.NONE);
+					_lblGeo_GeoAccuracy.setText("Geo &accuracy");
 
-					_firstColumnControls.add(label);
+					_firstColumnControls.add(_lblGeo_GeoAccuracy);
 				}
 				{
 					// Spinner
-					_spinnerGeoAccuracy = new Spinner(container, SWT.BORDER);
-					_spinnerGeoAccuracy.setMinimum(100);
-					_spinnerGeoAccuracy.setMaximum(100_000);
-					_spinnerGeoAccuracy.setPageIncrement(100);
-					_spinnerGeoAccuracy.addSelectionListener(_compareSelectionListener);
-					_spinnerGeoAccuracy.addMouseWheelListener(_compareMouseWheelListener);
+					_spinnerGeo_GeoAccuracy = new Spinner(container, SWT.BORDER);
+					_spinnerGeo_GeoAccuracy.setMinimum(100);
+					_spinnerGeo_GeoAccuracy.setMaximum(100_000);
+					_spinnerGeo_GeoAccuracy.setPageIncrement(100);
+					_spinnerGeo_GeoAccuracy.addSelectionListener(_compareSelectionListener);
+					_spinnerGeo_GeoAccuracy.addMouseWheelListener(_compareMouseWheelListener);
 //					GridDataFactory
 //							.fillDefaults()
 //							.align(SWT.END, SWT.FILL)
 //							.applyTo(_spinnerGeoAccuracy);
 
-					_secondColumnControls.add(_spinnerGeoAccuracy);
+					_secondColumnControls.add(_spinnerGeo_GeoAccuracy);
 				}
 				{
 					// geo distance
-					_lblGeoAccuracy = new Label(container, SWT.NONE);
+					_lblGeo_GeoAccuracy_Value = new Label(container, SWT.NONE);
 					GridDataFactory
 							.fillDefaults()
 							.grab(true, false)
 							.align(SWT.FILL, SWT.CENTER)
-							.applyTo(_lblGeoAccuracy);
+							.applyTo(_lblGeo_GeoAccuracy_Value);
 				}
 			}
 		}
@@ -410,10 +425,10 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColo
 				 */
 				{
 					// label
-					final Label label = new Label(group, SWT.NONE);
-					label.setText("Line width");
+					_lblMapOption_LineWidth = new Label(group, SWT.NONE);
+					_lblMapOption_LineWidth.setText("Line width");
 
-					_firstColumnControls.add(label);
+					_firstColumnControls.add(_lblMapOption_LineWidth);
 				}
 				{
 					// spinner
@@ -433,10 +448,10 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColo
 				 */
 				{
 					// label
-					final Label label = new Label(group, SWT.NONE);
-					label.setText("Reference tour");
+					_lblMapOption_RefTour = new Label(group, SWT.NONE);
+					_lblMapOption_RefTour.setText("Reference tour");
 
-					_firstColumnControls.add(label);
+					_firstColumnControls.add(_lblMapOption_RefTour);
 				}
 				{
 					// color
@@ -451,10 +466,10 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColo
 				 */
 				{
 					// label
-					final Label label = new Label(group, SWT.NONE);
-					label.setText("Compared tour part");
+					_lblMapOption_ComparedTourPart = new Label(group, SWT.NONE);
+					_lblMapOption_ComparedTourPart.setText("Compared tour part");
 
-					_firstColumnControls.add(label);
+					_firstColumnControls.add(_lblMapOption_ComparedTourPart);
 				}
 				{
 					// color
@@ -465,15 +480,16 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColo
 			}
 			{
 				/*
-				 * Opacity
+				 * Tour track opacity
 				 */
 				{
-					// label
-					final Label label = new Label(group, SWT.NONE);
-					label.setText("Opacity");
-					label.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_ClusterOpacity_Tooltip);
+					// checkbox
+					_chkMapOption_TrackOpacity = new Button(group, SWT.CHECK);
+					_chkMapOption_TrackOpacity.setText(Messages.Pref_Map2_Label_TrackOpacity);
+					_chkMapOption_TrackOpacity.setToolTipText(Messages.Pref_Map2_Label_TrackOpacity_Tooltip);
+					_chkMapOption_TrackOpacity.addSelectionListener(_mapOptions_SelectionListener);
 
-					_firstColumnControls.add(label);
+					_firstColumnControls.add(_chkMapOption_TrackOpacity);
 				}
 				{
 					// spinner
@@ -507,6 +523,21 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColo
 
 	private void enableControls() {
 
+		final boolean isGeoCompareActive = GeoCompareManager.isGeoComparing();
+
+		final boolean isTrackOpacity = _chkMapOption_TrackOpacity.getSelection();
+		_spinnerMapOption_Opacity.setEnabled(isTrackOpacity);
+
+		_lblGeo_DistanceInterval.setEnabled(isGeoCompareActive);
+		_lblGeo_DistanceInterval_Unit.setEnabled(isGeoCompareActive);
+		_lblGeo_GeoAccuracy.setEnabled(isGeoCompareActive);
+		_lblGeo_GeoAccuracy_Value.setEnabled(isGeoCompareActive);
+		_lblGeo_NormalizedDistance.setEnabled(isGeoCompareActive);
+		_lblGeo_NormalizedDistance_Value.setEnabled(isGeoCompareActive);
+		_lblGeo_NormalizedDistance_Unit.setEnabled(isGeoCompareActive);
+
+		_spinnerGeo_DistanceInterval.setEnabled(isGeoCompareActive);
+		_spinnerGeo_GeoAccuracy.setEnabled(isGeoCompareActive);
 	}
 
 	@Override
@@ -581,26 +612,12 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColo
 
 	private void onChange_MapOptions() {
 
-		_prefStore.setValue(
-				ITourbookPreferences.GEO_COMPARE_REF_TOUR_LINE_WIDTH, //
-				_spinnerMapOption_LineWidth.getSelection());
-
-		_prefStore.setValue(
-				ITourbookPreferences.MAP2_LAYOUT_OPACITY, //
-				_spinnerMapOption_Opacity.getSelection());
-
-		PreferenceConverter.setValue(
-				_prefStore,
-				ITourbookPreferences.GEO_COMPARE_REF_TOUR_RGB, //
-				_colorMapOption_RefTour.getColorValue());
-
-		PreferenceConverter.setValue(
-				_prefStore,
-				ITourbookPreferences.GEO_COMPARE_COMPARED_TOUR_PART_RGB, //
-				_colorMapOption_ComparedTourPart.getColorValue());
+		saveState_MapOption();
 
 		// force repainting
 		TourbookPlugin.getPrefStore().setValue(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED, Math.random());
+
+		enableControls();
 	}
 
 	private void onDisposeSlideout() {
@@ -614,73 +631,76 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColo
 	@Override
 	protected void onFocus() {
 
-		_spinnerGeoAccuracy.setFocus();
+		_spinnerGeo_GeoAccuracy.setFocus();
 	}
 
 	private void resetToDefaults() {
 
-		_spinnerDistanceInterval.setSelection(GeoCompareView.DEFAULT_DISTANCE_INTERVAL);
-		_spinnerGeoAccuracy.setSelection(GeoCompareView.DEFAULT_GEO_ACCURACY);
+// SET_FORMATTING_OFF
+		
+		_spinnerGeo_DistanceInterval.setSelection(GeoCompareView.DEFAULT_DISTANCE_INTERVAL);
+		_spinnerGeo_GeoAccuracy.setSelection(GeoCompareView.DEFAULT_GEO_ACCURACY);
 
 		/*
 		 * Map options
 		 */
-		_spinnerMapOption_Opacity.setSelection(
-				_prefStore.getDefaultInt(ITourbookPreferences.MAP2_LAYOUT_OPACITY));
+		_chkMapOption_TrackOpacity.setSelection(	_prefStore.getDefaultBoolean(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY));
 
-		_spinnerMapOption_LineWidth.setSelection(
-				_prefStore.getDefaultInt(ITourbookPreferences.GEO_COMPARE_REF_TOUR_LINE_WIDTH));
+		_spinnerMapOption_Opacity.setSelection(		_prefStore.getDefaultInt(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY));
+		_spinnerMapOption_LineWidth.setSelection(	_prefStore.getDefaultInt(ITourbookPreferences.GEO_COMPARE_REF_TOUR_LINE_WIDTH));
 
-		_colorMapOption_RefTour.setColorValue(
-				PreferenceConverter.getDefaultColor(
-						_prefStore,
-						ITourbookPreferences.GEO_COMPARE_REF_TOUR_RGB));
+		_colorMapOption_RefTour.setColorValue(				PreferenceConverter.getDefaultColor(_prefStore,ITourbookPreferences.GEO_COMPARE_REF_TOUR_RGB));
+		_colorMapOption_ComparedTourPart.setColorValue(		PreferenceConverter.getDefaultColor(_prefStore,ITourbookPreferences.GEO_COMPARE_COMPARED_TOUR_PART_RGB));
 
-		_colorMapOption_ComparedTourPart.setColorValue(
-				PreferenceConverter.getDefaultColor(
-						_prefStore,
-						ITourbookPreferences.GEO_COMPARE_COMPARED_TOUR_PART_RGB));
+// SET_FORMATTING_ON
 
 		onChange_CompareParameter();
 		onChange_MapOptions();
 	}
 
-	private void restoreState() {
+	void restoreState() {
 
-		_geoAccuracy = Util.getStateInt(
-				_state,
-				GeoCompareView.STATE_GEO_ACCURACY,
-				GeoCompareView.DEFAULT_GEO_ACCURACY);
+// SET_FORMATTING_OFF
+		
+		_geoAccuracy = Util.getStateInt(_state, GeoCompareView.STATE_GEO_ACCURACY, GeoCompareView.DEFAULT_GEO_ACCURACY);
 
-		_spinnerGeoAccuracy.setSelection(_geoAccuracy);
-
-		_spinnerDistanceInterval.setSelection(
-				Util.getStateInt(
-						_state,
-						GeoCompareView.STATE_DISTANCE_INTERVAL,
-						GeoCompareView.DEFAULT_DISTANCE_INTERVAL));
+		_spinnerGeo_GeoAccuracy.setSelection(			_geoAccuracy);
+		_spinnerGeo_DistanceInterval.setSelection(		Util.getStateInt(_state, GeoCompareView.STATE_DISTANCE_INTERVAL, GeoCompareView.DEFAULT_DISTANCE_INTERVAL));
 
 		/*
 		 * Map options
 		 */
-		_spinnerMapOption_LineWidth.setSelection(
-				_prefStore.getInt(ITourbookPreferences.GEO_COMPARE_REF_TOUR_LINE_WIDTH));
+		_spinnerMapOption_LineWidth.setSelection(		_prefStore.getInt(ITourbookPreferences.GEO_COMPARE_REF_TOUR_LINE_WIDTH));
 
-		_colorMapOption_RefTour.setColorValue(
-				PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GEO_COMPARE_REF_TOUR_RGB));
+		_colorMapOption_ComparedTourPart.setColorValue(	PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GEO_COMPARE_COMPARED_TOUR_PART_RGB));
+		_colorMapOption_RefTour.setColorValue(			PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GEO_COMPARE_REF_TOUR_RGB));
 
-		_colorMapOption_ComparedTourPart.setColorValue(
-				PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GEO_COMPARE_COMPARED_TOUR_PART_RGB));
+		_chkMapOption_TrackOpacity.setSelection(		_prefStore.getBoolean(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY));
+		_spinnerMapOption_Opacity.setSelection(			_prefStore.getInt(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY));
+		
+// SET_FORMATTING_ON
+	}
 
-		_spinnerMapOption_Opacity.setSelection(_prefStore.getInt(ITourbookPreferences.MAP2_LAYOUT_OPACITY));
+	private void saveState_MapOption() {
+
+// SET_FORMATTING_OFF
+		
+		_prefStore.setValue(ITourbookPreferences.GEO_COMPARE_REF_TOUR_LINE_WIDTH,		_spinnerMapOption_LineWidth.getSelection());
+		_prefStore.setValue(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY,		_chkMapOption_TrackOpacity.getSelection());
+		_prefStore.setValue(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY,		_spinnerMapOption_Opacity.getSelection());
+
+		PreferenceConverter.setValue(_prefStore,	ITourbookPreferences.GEO_COMPARE_COMPARED_TOUR_PART_RGB,	_colorMapOption_ComparedTourPart.getColorValue());
+		PreferenceConverter.setValue(_prefStore,	ITourbookPreferences.GEO_COMPARE_REF_TOUR_RGB,				_colorMapOption_RefTour.getColorValue());
+
+// SET_FORMATTING_ON
 	}
 
 	private void saveStateSlideout() {
 
-		_geoAccuracy = _spinnerGeoAccuracy.getSelection();
+		_geoAccuracy = _spinnerGeo_GeoAccuracy.getSelection();
 
 		_state.put(GeoCompareView.STATE_GEO_ACCURACY, _geoAccuracy);
-		_state.put(GeoCompareView.STATE_DISTANCE_INTERVAL, _spinnerDistanceInterval.getSelection());
+		_state.put(GeoCompareView.STATE_DISTANCE_INTERVAL, _spinnerGeo_DistanceInterval.getSelection());
 
 	}
 
@@ -704,7 +724,7 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColo
 
 		final String geoDistance = String.format(valueFormatting, distValue, UI.UNIT_LABEL_DISTANCE_SMALL);
 
-		_lblGeoAccuracy.setText(geoDistance);
+		_lblGeo_GeoAccuracy_Value.setText(geoDistance);
 	}
 
 	void updateUI_StateValues(final GeoCompareState slideoutState) {
@@ -715,23 +735,25 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColo
 
 		if (slideoutState.isReset) {
 
-			_lblNormalizedDistance.setText(UI.EMPTY_STRING);
-			_lblNumGeoGrids.setText(UI.EMPTY_STRING);
-			_lblNumSlices.setText(UI.EMPTY_STRING);
-			_lblNumTours.setText(UI.EMPTY_STRING);
+			_lblGeo_NormalizedDistance_Value.setText(UI.EMPTY_STRING);
+
+//			_lblNumGeoGrids.setText(UI.EMPTY_STRING);
+//			_lblNumSlices.setText(UI.EMPTY_STRING);
+//			_lblNumTours.setText(UI.EMPTY_STRING);
 
 		} else {
 
 			final float distance = slideoutState.normalizedDistance / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
-			_lblNormalizedDistance.setText(FormatManager.formatDistance(distance / 1000.0));
-			_lblNormalizedDistanceUnit.setText(UI.UNIT_LABEL_DISTANCE);
+			_lblGeo_NormalizedDistance_Value.setText(FormatManager.formatDistance(distance / 1000.0));
+			_lblGeo_NormalizedDistance_Unit.setText(UI.UNIT_LABEL_DISTANCE);
 
-			_lblNumGeoGrids.setText(Integer.toString(slideoutState.numGeoGrids));
-			_lblNumSlices.setText(Integer.toString(slideoutState.numSlices));
-			_lblNumTours.setText(Integer.toString(slideoutState.numTours));
+//			_lblNumGeoGrids.setText(Integer.toString(slideoutState.numGeoGrids));
+//			_lblNumSlices.setText(Integer.toString(slideoutState.numSlices));
+//			_lblNumTours.setText(Integer.toString(slideoutState.numTours));
 		}
 
+		enableControls();
 	}
 
 }

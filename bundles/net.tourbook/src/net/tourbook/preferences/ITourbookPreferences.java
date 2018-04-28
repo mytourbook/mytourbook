@@ -344,14 +344,16 @@ public interface ITourbookPreferences {
 	public static final String	MAP_LAYOUT_PLOT_TYPE							= "map.layout.symbol";										//$NON-NLS-1$
 	public static final String	MAP_LAYOUT_SYMBOL_WIDTH							= "map.layout.symbol-width";								//$NON-NLS-1$
 	public static final String	MAP_LAYOUT_TOUR_PAINT_METHOD					= "map.layout.tour-paint-algorithm";						//$NON-NLS-1$
-	public static final String	MAP2_LAYOUT_OPACITY								= "MAP2_LAYOUT_OPACITY";						//$NON-NLS-1$
+	
+	public static final String	MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY				= "MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY";						//$NON-NLS-1$
+	public static final String	MAP2_LAYOUT_TOUR_TRACK_OPACITY					= "MAP2_LAYOUT_TOUR_TRACK_OPACITY";							//$NON-NLS-1$
 
 	/*
 	 * Geo compare
 	 */
 	public static final String	GEO_COMPARE_COMPARED_TOUR_PART_RGB				= "GEO_COMPARE_COMPARED_TOUR_PART_RGB";						//$NON-NLS-1$
 	public static final String	GEO_COMPARE_REF_TOUR_LINE_WIDTH					= "GEO_COMPARE_REF_TOUR_LINE_WIDTH";						//$NON-NLS-1$
-	public static final String	GEO_COMPARE_REF_TOUR_RGB							= "GEO_COMPARE_REF_TOUR_RGB";								//$NON-NLS-1$
+	public static final String	GEO_COMPARE_REF_TOUR_RGB						= "GEO_COMPARE_REF_TOUR_RGB";								//$NON-NLS-1$
 
 	/*
 	 * id's for preference pages
@@ -504,6 +506,7 @@ public interface ITourbookPreferences {
 	 */
 	public static final String	DIALOG_SET_TIME_ZONE_ACTION						= "DIALOG_SET_TIME_ZONE_ACTION";							//$NON-NLS-1$
 	public static final String	DIALOG_SET_TIME_ZONE_SELECTED_ZONE_ID			= "DIALOG_SET_TIME_ZONE_SELECTED_ZONE_ID";					//$NON-NLS-1$
+
 
 
 // SET_FORMATTING_ON
