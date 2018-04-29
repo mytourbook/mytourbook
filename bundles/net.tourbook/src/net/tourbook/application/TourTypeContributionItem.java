@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -57,9 +57,9 @@ import org.eclipse.ui.PlatformUI;
 
 public class TourTypeContributionItem extends CustomControlContribution {
 
-	private static final String		ID					= "net.tourbook.tourTypeFilter";	//$NON-NLS-1$
+	private static final String		ID			= "net.tourbook.tourTypeFilter";	//$NON-NLS-1$
 
-	private final IPreferenceStore	_prefStore			= TourbookPlugin.getPrefStore();
+	private final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
 
 	private IPropertyChangeListener	_prefListener;
 
@@ -70,11 +70,13 @@ public class TourTypeContributionItem extends CustomControlContribution {
 	private MouseWheelListener		_mouseWheelListener;
 
 	private boolean					_isUIUpdating;
-	private boolean					_isContextOpening	= false;
+	private boolean					_isContextOpening;
 	private boolean					_isShowTourTypeContextMenu;
 
 	private long					_lastOpenTime;
 	private long					_lastHideTime;
+
+	private TourTypeFilter			_ttFilter;
 
 	/*
 	 * UI controls
@@ -116,6 +118,11 @@ public class TourTypeContributionItem extends CustomControlContribution {
 			return new Label(parent, SWT.NONE);
 		}
 
+		// createControl() is called 2 times when app is started and on every perspective reset -> dispose old values !
+		if (_cursorHand != null && _cursorHand.isDisposed() == false) {
+			dispose_ThisResources();
+		}
+
 		initUI(parent);
 
 		final Control ui = createUI(parent);
@@ -124,6 +131,12 @@ public class TourTypeContributionItem extends CustomControlContribution {
 
 		addPrefListener();
 		restoreState();
+
+		// update UI after a perspective reset otherwise it is empty !!!
+		// this bug exist since the beginning :-)
+		if (_ttFilter != null) {
+			updateUI(_ttFilter);
+		}
 
 		return ui;
 	}
@@ -139,13 +152,14 @@ public class TourTypeContributionItem extends CustomControlContribution {
 		container.addMouseWheelListener(_mouseWheelListener);
 		GridLayoutFactory.fillDefaults()//
 				.numColumns(2)
-//				.extendedMargins(10, 10, 10, 50)
+				//				.extendedMargins(10, 10, 10, 50)
 				.spacing(0, 0)
 				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
 			createUI_10_FilterIcon(container);
 			createUI_20_FilterText(container);
+
 			createUI_30_ContextMenu();
 		}
 
@@ -172,6 +186,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 		GridDataFactory.fillDefaults()//
 				.grab(true, true)
 				.hint(_textWidth, SWT.DEFAULT)
+				.indent(3, 0)
 				.align(SWT.FILL, SWT.CENTER)
 				.applyTo(_lnkFilterText);
 
@@ -259,13 +274,19 @@ public class TourTypeContributionItem extends CustomControlContribution {
 	@Override
 	public void dispose() {
 
+		dispose_ThisResources();
+
+		super.dispose();
+	}
+
+	private void dispose_ThisResources() {
+
 		if (_cursorHand != null) {
 			_cursorHand.dispose();
+			_cursorHand = null;
 		}
 
 		_prefStore.removePropertyChangeListener(_prefListener);
-
-		super.dispose();
 	}
 
 	private void initUI(final Composite parent) {
@@ -275,7 +296,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 
 		_mouseWheelListener = new MouseWheelListener() {
 
-			private int	__lastEventTime;
+			private int __lastEventTime;
 
 			@Override
 			public void mouseScrolled(final MouseEvent event) {
@@ -429,6 +450,9 @@ public class TourTypeContributionItem extends CustomControlContribution {
 		if (_isUIUpdating) {
 			return;
 		}
+
+		// keep for repainting the UI
+		_ttFilter = ttFilter;
 
 		_isUIUpdating = true;
 		{
