@@ -2302,6 +2302,13 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 				paintTours_10_All();
 
+				positionMapTo_0_TourSliders(//
+						comparedTourData,
+						geoCompareItem.tourFirstIndex,
+						geoCompareItem.tourLastIndex,
+						geoCompareItem.tourFirstIndex,
+						null);
+
 			} else if (firstElement instanceof TourWayPoint) {
 
 				final TourWayPoint wp = (TourWayPoint) firstElement;
@@ -2814,6 +2821,13 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		updateFilteredPhotos();
 	}
 
+	/**
+	 * @param tourData
+	 * @param leftSliderValuesIndex
+	 * @param rightSliderValuesIndex
+	 * @param selectedSliderIndex
+	 * @param geoPositions
+	 */
 	private void positionMapTo_0_TourSliders(	final TourData tourData,
 												final int leftSliderValuesIndex,
 												final int rightSliderValuesIndex,

@@ -266,8 +266,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 	private final ArrayList<Long>						_selectedTourIds		= new ArrayList<Long>();
 
 	private boolean										_isCollapseOthers;
-	private boolean										_isInStartup;
+	private boolean										_isInFireSelection;
 	private boolean										_isInReload;
+	private boolean										_isInStartup;
 
 	private boolean										_isToolTipInDate;
 	private boolean										_isToolTipInTags;
@@ -3364,6 +3365,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 	private void onSelectionChanged(final ISelection selection) {
 
+		if (_isInFireSelection) {
+			return;
+		}
+
 		// show and select the selected tour
 		if (selection instanceof SelectionTourId) {
 
@@ -3501,19 +3506,23 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 		}
 
-		// _postSelectionProvider should be removed when all parts are listening to the TourManager event
-		if (_isInStartup) {
+		_isInFireSelection = true;
+		{
+			// _postSelectionProvider should be removed when all parts are listening to the TourManager event
+			if (_isInStartup) {
 
-			_isInStartup = false;
+				_isInStartup = false;
 
-			// this view can be inactive -> selection is not fired with the SelectionProvider interface
+				// this view can be inactive -> selection is not fired with the SelectionProvider interface
 
-			TourManager.fireEventWithCustomData(TourEventId.TOUR_SELECTION, selection, this);
+				TourManager.fireEventWithCustomData(TourEventId.TOUR_SELECTION, selection, this);
 
-		} else {
+			} else {
 
-			_postSelectionProvider.setSelection(selection);
+				_postSelectionProvider.setSelection(selection);
+			}
 		}
+		_isInFireSelection = false;
 
 		enableActions();
 	}
@@ -3852,7 +3861,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 							 */
 
 							// this occures sometimes but it seems that it's an eclipse internal problem
-							StatusUtil.log(e);
+							StatusUtil.log("This is a known issue when a treeviewer do a collapseAll()", e);
 						}
 					}
 
