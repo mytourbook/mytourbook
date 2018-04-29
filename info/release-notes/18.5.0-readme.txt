@@ -22,3 +22,12 @@ Improvements
   
   - Customize tour chart graph actions
  
+ 
+Bugfix
+======
+
+* Statistics
+
+  - Fixed out of bounds exception when a tour calendar week year was in the previous year than the tour year.
+    This was introduced with the tour tag filter
+   
