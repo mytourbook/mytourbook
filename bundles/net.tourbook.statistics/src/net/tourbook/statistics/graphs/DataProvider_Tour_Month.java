@@ -115,7 +115,7 @@ public class DataProvider_Tour_Month extends DataProvider {
 
 					+ (" FROM " + TourDatabase.TABLE_TOUR_DATA) + NL //$NON-NLS-1$
 
-					+ (" WHERE StartWeekYear IN (" + getYearList(lastYear, numYears) + ")") + NL //$NON-NLS-1$ //$NON-NLS-2$
+					+ (" WHERE StartYear IN (" + getYearList(lastYear, numYears) + ")") + NL //$NON-NLS-1$ //$NON-NLS-2$
 					+ sqlFilter.getWhereClause()
 
 			;
