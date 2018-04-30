@@ -22,8 +22,9 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
+import net.tourbook.common.font.MTFont;
 import net.tourbook.common.formatter.FormatManager;
-import net.tourbook.common.tooltip.AdvancedSlideout;
+import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -46,8 +47,6 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -55,18 +54,16 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.swt.widgets.ToolItem;
 
 /**
  * Slideout for the tour tag filter
  */
-public class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColorSelectorListener {
+public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColorSelectorListener {
 
 	final static IPreferenceStore		_prefStore						= TourbookPlugin.getPrefStore();
 	private static IDialogSettings		_state;
 
 	private PixelConverter				_pc;
-	private ToolItem					_actionToolItem;
 
 	private SelectionAdapter			_compareSelectionListener;
 	private MouseWheelListener			_compareMouseWheelListener;
@@ -115,34 +112,23 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColo
 	private Spinner						_spinnerGeo_GeoAccuracy;
 	private Spinner						_spinnerGeo_DistanceInterval;
 	private Spinner						_spinnerMapOption_LineWidth;
-	private Spinner						_spinnerMapOption_Opacity;
+	private Spinner						_spinnerMapOption_TrackOpacity;
 
 	/**
-	 * @param actionToolItem
+	 * @param ownerControl
+	 * @param toolbar
 	 * @param state
 	 * @param geoCompareView
 	 */
-	public SlideoutGeoCompareOptions(	final ToolItem actionToolItem,
+	public SlideoutGeoCompareOptions(	final Composite ownerControl,
+										final ToolBar toolbar,
 										final IDialogSettings state,
 										final GeoCompareView geoCompareView) {
 
-		super(
-				actionToolItem.getParent(),
-				state,
-				new int[] { 700, 400, 700, 400 });
+		super(ownerControl, toolbar);
 
-		_actionToolItem = actionToolItem;
 		_state = state;
 		_geoCompareView = geoCompareView;
-
-		setShellFadeOutDelaySteps(10);
-		setTitleText("Geo Compare Options");
-	}
-
-	@Override
-	protected void beforeShellVisible(final boolean isVisible) {
-
-		enableControls();
 	}
 
 	@Override
@@ -169,7 +155,7 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColo
 	}
 
 	@Override
-	protected void createSlideoutContent(final Composite parent) {
+	protected Composite createToolTipContentArea(final Composite parent) {
 
 		_parent = parent;
 
@@ -177,33 +163,77 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColo
 
 		createActions();
 
-		createUI(parent);
+		final Composite ui = createUI(parent);
 
 		restoreState();
 		updateUI_GeoAccuracy();
 		updateUI_StateValues(_geoCompareView.getSlideoutState());
 
 		enableControls();
+
+		return ui;
 	}
 
-	private void createUI(final Composite parent) {
+	private Composite createUI(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+		final Composite shellContainer = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.swtDefaults().applyTo(shellContainer);
 		{
-			createUI_20_CompareOptions(container);
-			createUI_90_Actions(container);
+			final Composite container = new Composite(shellContainer, SWT.NONE);
+			GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+			{
+				createUI_10_Header(container);
+				createUI_20_CompareOptions(container);
+			}
+
+//			// compute width for all controls and equalize column width for the different sections
+//			container.layout(true, true);
+//			UI.setEqualizeColumWidths(_firstColumnControls, 5);
+//			UI.setEqualizeColumWidths(_secondColumnControls);
+//
+//			container.layout(true, true);
+//			UI.setEqualizeColumWidths(_firstColumnContainerControls);
 		}
 
-		// compute width for all controls and equalize column width for the different sections
-		container.layout(true, true);
-		UI.setEqualizeColumWidths(_firstColumnControls, 5);
-		UI.setEqualizeColumWidths(_secondColumnControls);
+		return shellContainer;
+	}
 
-		container.layout(true, true);
-		UI.setEqualizeColumWidths(_firstColumnContainerControls);
+	private void createUI_10_Header(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+//			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+		{
+			{
+				/*
+				 * Slideout title
+				 */
+				final Label label = new Label(container, SWT.NONE);
+				label.setText("Geo Compare Options");
+				MTFont.setBannerFont(label);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.BEGINNING, SWT.CENTER)
+						.applyTo(label);
+			}
+			{
+				/*
+				 * Actionbar
+				 */
+				final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
+				GridDataFactory.fillDefaults()//
+						.grab(true, false)
+						.align(SWT.END, SWT.BEGINNING)
+						.applyTo(toolbar);
+
+				final ToolBarManager tbm = new ToolBarManager(toolbar);
+
+				tbm.add(_actionRestoreDefaults);
+
+				tbm.update(true);
+			}
+		}
 	}
 
 	private void createUI_20_CompareOptions(final Composite parent) {
@@ -493,40 +523,25 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColo
 				}
 				{
 					// spinner
-					_spinnerMapOption_Opacity = new Spinner(group, SWT.BORDER);
-					_spinnerMapOption_Opacity.setMinimum(PrefPageMap2Appearance.MAP_OPACITY_MINIMUM);
-					_spinnerMapOption_Opacity.setMaximum(100);
-					_spinnerMapOption_Opacity.setIncrement(1);
-					_spinnerMapOption_Opacity.setPageIncrement(10);
-					_spinnerMapOption_Opacity.addSelectionListener(_mapOptions_SelectionListener);
-					_spinnerMapOption_Opacity.addMouseWheelListener(_mapOptions_MouseWheelListener);
+					_spinnerMapOption_TrackOpacity = new Spinner(group, SWT.BORDER);
+					_spinnerMapOption_TrackOpacity.setMinimum(PrefPageMap2Appearance.MAP_OPACITY_MINIMUM);
+					_spinnerMapOption_TrackOpacity.setMaximum(100);
+					_spinnerMapOption_TrackOpacity.setIncrement(1);
+					_spinnerMapOption_TrackOpacity.setPageIncrement(10);
+					_spinnerMapOption_TrackOpacity.addSelectionListener(_mapOptions_SelectionListener);
+					_spinnerMapOption_TrackOpacity.addMouseWheelListener(_mapOptions_MouseWheelListener);
 				}
 			}
 		}
 	}
 
-	private void createUI_90_Actions(final Composite parent) {
-
-		final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
-		GridDataFactory
-				.fillDefaults()//
-				.grab(true, false)
-				.align(SWT.END, SWT.BEGINNING)
-				.applyTo(toolbar);
-
-		final ToolBarManager tbm = new ToolBarManager(toolbar);
-
-		tbm.add(_actionRestoreDefaults);
-
-		tbm.update(true);
-	}
 
 	private void enableControls() {
 
 		final boolean isGeoCompareActive = GeoCompareManager.isGeoComparing();
 
 		final boolean isTrackOpacity = _chkMapOption_TrackOpacity.getSelection();
-		_spinnerMapOption_Opacity.setEnabled(isTrackOpacity);
+		_spinnerMapOption_TrackOpacity.setEnabled(isTrackOpacity);
 
 		_lblGeo_DistanceInterval.setEnabled(isGeoCompareActive);
 		_lblGeo_DistanceInterval_Unit.setEnabled(isGeoCompareActive);
@@ -538,18 +553,6 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColo
 
 		_spinnerGeo_DistanceInterval.setEnabled(isGeoCompareActive);
 		_spinnerGeo_GeoAccuracy.setEnabled(isGeoCompareActive);
-	}
-
-	@Override
-	protected Rectangle getParentBounds() {
-
-		final Rectangle itemBounds = _actionToolItem.getBounds();
-		final Point itemDisplayPosition = _actionToolItem.getParent().toDisplay(itemBounds.x, itemBounds.y);
-
-		itemBounds.x = itemDisplayPosition.x;
-		itemBounds.y = itemDisplayPosition.y;
-
-		return itemBounds;
 	}
 
 	private void initUI(final Composite parent) {
@@ -601,6 +604,11 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColo
 		};
 	}
 
+	private boolean isUICreated() {
+
+		return _parent == null || _parent.isDisposed() ? false : true;
+	}
+
 	private void onChange_CompareParameter() {
 
 		saveStateSlideout();
@@ -628,12 +636,6 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColo
 		_secondColumnControls.clear();
 	}
 
-	@Override
-	protected void onFocus() {
-
-		_spinnerGeo_GeoAccuracy.setFocus();
-	}
-
 	private void resetToDefaults() {
 
 // SET_FORMATTING_OFF
@@ -644,10 +646,10 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColo
 		/*
 		 * Map options
 		 */
-		_chkMapOption_TrackOpacity.setSelection(	_prefStore.getDefaultBoolean(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY));
+		_chkMapOption_TrackOpacity.setSelection(		_prefStore.getDefaultBoolean(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY));
+		_spinnerMapOption_TrackOpacity.setSelection(	_prefStore.getDefaultInt(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY));
 
-		_spinnerMapOption_Opacity.setSelection(		_prefStore.getDefaultInt(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY));
-		_spinnerMapOption_LineWidth.setSelection(	_prefStore.getDefaultInt(ITourbookPreferences.GEO_COMPARE_REF_TOUR_LINE_WIDTH));
+		_spinnerMapOption_LineWidth.setSelection(		_prefStore.getDefaultInt(ITourbookPreferences.GEO_COMPARE_REF_TOUR_LINE_WIDTH));
 
 		_colorMapOption_RefTour.setColorValue(				PreferenceConverter.getDefaultColor(_prefStore,ITourbookPreferences.GEO_COMPARE_REF_TOUR_RGB));
 		_colorMapOption_ComparedTourPart.setColorValue(		PreferenceConverter.getDefaultColor(_prefStore,ITourbookPreferences.GEO_COMPARE_COMPARED_TOUR_PART_RGB));
@@ -659,6 +661,11 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColo
 	}
 
 	void restoreState() {
+
+		// check if UI is created
+		if (isUICreated() == false) {
+			return;
+		}
 
 // SET_FORMATTING_OFF
 		
@@ -676,7 +683,7 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColo
 		_colorMapOption_RefTour.setColorValue(			PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GEO_COMPARE_REF_TOUR_RGB));
 
 		_chkMapOption_TrackOpacity.setSelection(		_prefStore.getBoolean(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY));
-		_spinnerMapOption_Opacity.setSelection(			_prefStore.getInt(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY));
+		_spinnerMapOption_TrackOpacity.setSelection(			_prefStore.getInt(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY));
 		
 // SET_FORMATTING_ON
 	}
@@ -687,7 +694,7 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColo
 		
 		_prefStore.setValue(ITourbookPreferences.GEO_COMPARE_REF_TOUR_LINE_WIDTH,		_spinnerMapOption_LineWidth.getSelection());
 		_prefStore.setValue(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY,		_chkMapOption_TrackOpacity.getSelection());
-		_prefStore.setValue(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY,		_spinnerMapOption_Opacity.getSelection());
+		_prefStore.setValue(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY,		_spinnerMapOption_TrackOpacity.getSelection());
 
 		PreferenceConverter.setValue(_prefStore,	ITourbookPreferences.GEO_COMPARE_COMPARED_TOUR_PART_RGB,	_colorMapOption_ComparedTourPart.getColorValue());
 		PreferenceConverter.setValue(_prefStore,	ITourbookPreferences.GEO_COMPARE_REF_TOUR_RGB,				_colorMapOption_RefTour.getColorValue());
@@ -729,7 +736,11 @@ public class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColo
 
 	void updateUI_StateValues(final GeoCompareState slideoutState) {
 
-		if (_parent == null || _parent.isDisposed() || slideoutState == null) {
+		if (isUICreated() == false) {
+			return;
+		}
+
+		if (slideoutState == null) {
 			return;
 		}
 

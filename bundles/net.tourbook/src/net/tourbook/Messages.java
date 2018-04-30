@@ -1837,6 +1837,8 @@ public class Messages extends NLS {
 	public static String		Slideout_Map25MarkerOptions_Label_SwapColor_Tooltip;
 	public static String		Slideout_Map25MarkerOptions_Label_Title;
 
+	public static String		Slideout_Map2MapOptions_Label_MapOptions;
+
 	public static String		Slideout_Map2TourColors_Checkbox_ShowInChartToolbar_Tooltip;
 	public static String		Slideout_Map2TourColors_Label_Title;
 

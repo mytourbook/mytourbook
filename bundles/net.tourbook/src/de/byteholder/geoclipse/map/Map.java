@@ -804,7 +804,9 @@ public class Map extends Canvas {
 	 * @see org.jdesktop.swingx.painters.Painter
 	 */
 	public void addOverlayPainter(final MapPainter overlay) {
+
 		_overlays.add(overlay);
+
 		paint();
 	}
 
@@ -3724,7 +3726,9 @@ public class Map extends Canvas {
 	 * @return the current map overlay
 	 */
 	public void removeOverlayPainter(final MapPainter overlay) {
+
 		_overlays.remove(overlay);
+
 		paint();
 	}
 

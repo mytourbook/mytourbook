@@ -193,6 +193,8 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	private static final String		IMAGE_ACTION_TOUR_COLOR_PULSE_DISABLED		= net.tourbook.Messages.Image__graph_heartbeat_disabled;
 	private static final String		IMAGE_ACTION_TOUR_COLOR_SPEED				= net.tourbook.Messages.Image__graph_speed;
 	private static final String		IMAGE_ACTION_TOUR_COLOR_SPEED_DISABLED		= net.tourbook.Messages.Image__graph_speed_disabled;
+	private static final String 	IMAGE_MAP_OPTIONS 							= net.tourbook.Messages.Image__MapOptions;
+	private static final String 	IMAGE_MAP_OPTIONS_DISABLED 					= net.tourbook.Messages.Image__MapOptions_Disabled;
 
 	private static final String		STATE_IS_SHOW_TOUR_IN_MAP						= "STATE_IS_SHOW_TOUR_IN_MAP";							//$NON-NLS-1$
 	private static final String		STATE_IS_SHOW_PHOTO_IN_MAP						= "STATE_IS_SHOW_PHOTO_IN_MAP";							//$NON-NLS-1$
@@ -377,9 +379,10 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 	private ActionDimMap					_actionDimMap;
 	private ActionOpenPrefDialog			_actionEdit2DMapPreferences;
-	private ActionMap2Graphs				_actionMap2TourColors;
+	private ActionMap2_Options				_actionMap2Options;
+	private ActionMap2_Graphs				_actionMap2TourColors;
 	private ActionMapBookmarks				_actionMapBookmarks;
-	private ActionMap2Color					_actionMapColor;
+	private ActionMap2Color					_actionMap2Color;
 	private ActionManageMapProviders		_actionManageProvider;
 	private ActionPhotoProperties			_actionPhotoFilter;
 	private ActionReloadFailedMapImages		_actionReloadFailedMapImages;
@@ -416,10 +419,10 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	private Composite						_parent;
 	private Map								_map;
 
-	private class ActionMap2Graphs extends ActionToolbarSlideout {
+	private class ActionMap2_Graphs extends ActionToolbarSlideout {
 
-		public ActionMap2Graphs(final ImageDescriptor imageDescriptor,
-								final ImageDescriptor imageDescriptorDisabled) {
+		public ActionMap2_Graphs(	final ImageDescriptor imageDescriptor,
+									final ImageDescriptor imageDescriptorDisabled) {
 
 			super(imageDescriptor, imageDescriptorDisabled);
 
@@ -430,6 +433,26 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
 			return new SlideoutMap2TourColors(_parent, toolbar, Map2View.this, _state);
+		}
+
+		@Override
+		protected void onBeforeOpenSlideout() {
+			closeOpenedDialogs(this);
+		}
+	}
+
+	private class ActionMap2_Options extends ActionToolbarSlideout {
+
+		public ActionMap2_Options() {
+
+			super(
+					TourbookPlugin.getImageDescriptor(IMAGE_MAP_OPTIONS),
+					TourbookPlugin.getImageDescriptor(IMAGE_MAP_OPTIONS_DISABLED));
+		}
+
+		@Override
+		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+			return new SlideoutMap2_MapOptions(_parent, toolbar, Map2View.this);
 		}
 
 		@Override
@@ -1152,7 +1175,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 	private void createActions(final Composite parent) {
 
-		_actionMap2TourColors = new ActionMap2Graphs(
+		_actionMap2TourColors = new ActionMap2_Graphs(
 				TourbookPlugin.getImageDescriptor(IMAGE_GRAPH),
 				TourbookPlugin.getImageDescriptor(IMAGE_GRAPH_DISABLED));
 
@@ -1220,7 +1243,9 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_actionEdit2DMapPreferences = new ActionOpenPrefDialog(
 				Messages.Map_Action_Edit2DMapPreferences,
 				PrefPageMap2Appearance.ID);
-		_actionMapColor = new ActionMap2Color();
+
+		_actionMap2Color = new ActionMap2Color();
+		_actionMap2Options = new ActionMap2_Options();
 		_actionSelectMapProvider = new ActionSelectMapProvider(this);
 		_actionSetDefaultPosition = new ActionSetDefaultPosition(this);
 		_actionSaveDefaultPosition = new ActionSaveDefaultPosition(this);
@@ -1560,7 +1585,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		final boolean isMultipleTours = numberOfTours > 1 && _isShowTour;
 		final boolean isOneTour = _isTourOrWayPoint && (isMultipleTours == false) && _isShowTour;
 
-		_actionMapColor.setEnabled(isTourAvailable);
+		_actionMap2Color.setEnabled(isTourAvailable);
 		_actionShowLegendInMap.setEnabled(_isTourOrWayPoint);
 		_actionShowSliderInLegend.setEnabled(_isTourOrWayPoint && _isShowLegend);
 		_actionShowSliderInMap.setEnabled(_isTourOrWayPoint);
@@ -1652,6 +1677,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		tbm.add(new Separator());
 
 		tbm.add(_actionMapBookmarks);
+		tbm.add(_actionMap2Options);
 		tbm.add(_actionSelectMapProvider);
 
 		/*
@@ -1694,13 +1720,13 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		if (_tourColorId != null) {
 
 			// set color before menu is filled, this sets the action image and color id
-			_actionMapColor.setColorId(_tourColorId);
+			_actionMap2Color.setColorId(_tourColorId);
 
 			if (_tourColorId != MapGraphId.HrZone) {
 
 				// hr zone has a different color provider and is not yet supported
 
-				menuMgr.add(_actionMapColor);
+				menuMgr.add(_actionMap2Color);
 			}
 		}
 

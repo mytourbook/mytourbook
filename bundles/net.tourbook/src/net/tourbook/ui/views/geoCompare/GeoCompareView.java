@@ -29,10 +29,10 @@ import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.tooltip.AdvancedSlideout;
+import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
-import net.tourbook.common.tooltip.SlideoutLocation;
+import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
@@ -51,7 +51,6 @@ import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.filter.ActionToolbarSlideoutAdv;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.tourCatalog.ReferenceTourManager;
@@ -102,7 +101,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
@@ -240,17 +239,21 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 		}
 	}
 
-//	private Scale			_scaleHideFalsePositive;
-
-	public class ActionGeoCompareOptions extends ActionToolbarSlideoutAdv {
+	public class ActionGeoCompareOptions extends ActionToolbarSlideout {
 
 		@Override
-		protected AdvancedSlideout createSlideout(final ToolItem toolItem) {
+		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-			_slideoutGeoCompareOptions = new SlideoutGeoCompareOptions(toolItem, _state, GeoCompareView.this);
-			_slideoutGeoCompareOptions.setSlideoutLocation(SlideoutLocation.BELOW_RIGHT);
+//			return new SlideoutTourChartOptions(_parent, toolbar, TourChart.this, GRID_PREF_PREFIX);
+
+			_slideoutGeoCompareOptions = new SlideoutGeoCompareOptions(_parent, toolbar, _state, GeoCompareView.this);
 
 			return _slideoutGeoCompareOptions;
+		}
+
+		@Override
+		protected void onBeforeOpenSlideout() {
+			closeOpenedDialogs(this);
 		}
 	}
 
