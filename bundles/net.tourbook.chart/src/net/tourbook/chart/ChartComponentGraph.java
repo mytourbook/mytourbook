@@ -4819,6 +4819,8 @@ public class ChartComponentGraph extends Canvas {
 
 			gc.setAlpha(0xff);
 		}
+
+		colorXMarker.dispose();
 	}
 
 	/**
