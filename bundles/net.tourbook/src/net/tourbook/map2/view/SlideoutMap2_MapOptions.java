@@ -22,7 +22,6 @@ import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.PrefPageAppearanceTourChart;
 import net.tourbook.preferences.PrefPageMap2Appearance;
 
 import org.eclipse.jface.action.Action;
@@ -50,7 +49,13 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class SlideoutMap2_MapOptions extends ToolbarSlideout {
 
-	final static IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
+// SET_FORMATTING_OFF
+	
+	private static final String		MAP_ACTION_EDIT2D_MAP_PREFERENCES	= net.tourbook.map2.Messages.Map_Action_Edit2DMapPreferences;
+	
+// SET_FORMATTING_ON
+
+	final static IPreferenceStore	_prefStore							= TourbookPlugin.getPrefStore();
 
 	private SelectionAdapter		_defaultSelectionListener;
 	private MouseWheelListener		_defaultMouseWheelListener;
@@ -69,7 +74,9 @@ public class SlideoutMap2_MapOptions extends ToolbarSlideout {
 	 */
 	private Composite				_parent;
 
+	private Button					_chkSliderConnection;
 	private Button					_chkTrackOpacity;
+
 	private Spinner					_spinnerTrackOpacity;
 
 	/**
@@ -99,9 +106,7 @@ public class SlideoutMap2_MapOptions extends ToolbarSlideout {
 				Messages.Image__App_RestoreDefault));
 		_actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
 
-		_actionPrefDialog = new ActionOpenPrefDialog(
-				Messages.Tour_Action_EditChartPreferences,
-				PrefPageAppearanceTourChart.ID);
+		_actionPrefDialog = new ActionOpenPrefDialog(MAP_ACTION_EDIT2D_MAP_PREFERENCES, PrefPageMap2Appearance.ID);
 		_actionPrefDialog.closeThisTooltip(this);
 		_actionPrefDialog.setShell(_parent.getShell());
 	}
@@ -185,8 +190,8 @@ public class SlideoutMap2_MapOptions extends ToolbarSlideout {
 				{
 					// checkbox
 					_chkTrackOpacity = new Button(container, SWT.CHECK);
-					_chkTrackOpacity.setText(Messages.Pref_Map2_Label_TrackOpacity);
-					_chkTrackOpacity.setToolTipText(Messages.Pref_Map2_Label_TrackOpacity_Tooltip);
+					_chkTrackOpacity.setText(Messages.Pref_Map2_Checkbox_TrackOpacity);
+					_chkTrackOpacity.setToolTipText(Messages.Pref_Map2_Checkbox_TrackOpacity_Tooltip);
 					_chkTrackOpacity.addSelectionListener(_defaultSelectionListener);
 				}
 				{
@@ -199,6 +204,17 @@ public class SlideoutMap2_MapOptions extends ToolbarSlideout {
 					_spinnerTrackOpacity.addSelectionListener(_defaultSelectionListener);
 					_spinnerTrackOpacity.addMouseWheelListener(_defaultMouseWheelListener);
 				}
+			}
+			{
+				/*
+				 * Slider connection
+				 */
+				// checkbox
+				_chkSliderConnection = new Button(container, SWT.CHECK);
+				_chkSliderConnection.setText(Messages.Pref_Map2_Label_SliderConnection);
+				_chkSliderConnection.setToolTipText(Messages.Pref_Map2_Label_SliderConnection_Tooltip);
+				_chkSliderConnection.addSelectionListener(_defaultSelectionListener);
+				GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkSliderConnection);
 			}
 		}
 	}
@@ -261,6 +277,8 @@ public class SlideoutMap2_MapOptions extends ToolbarSlideout {
 
 // SET_FORMATTING_OFF
 
+		_chkSliderConnection.setSelection(	_prefStore.getDefaultBoolean(ITourbookPreferences.MAP2_LAYOUT_IS_DRAW_SLIDER_CONNECTION));
+		
 		_chkTrackOpacity.setSelection(		_prefStore.getDefaultBoolean(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY));
 		_spinnerTrackOpacity.setSelection(	_prefStore.getDefaultInt(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY));
 		
@@ -273,6 +291,8 @@ public class SlideoutMap2_MapOptions extends ToolbarSlideout {
 
 // SET_FORMATTING_OFF
 		
+		_chkSliderConnection.setSelection(		_prefStore.getBoolean(ITourbookPreferences.MAP2_LAYOUT_IS_DRAW_SLIDER_CONNECTION));
+
 		_chkTrackOpacity.setSelection(			_prefStore.getBoolean(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY));
 		_spinnerTrackOpacity.setSelection(		_prefStore.getInt(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY));
 				
@@ -283,13 +303,15 @@ public class SlideoutMap2_MapOptions extends ToolbarSlideout {
 
 // SET_FORMATTING_OFF
 		
+		_prefStore.setValue(ITourbookPreferences.MAP2_LAYOUT_IS_DRAW_SLIDER_CONNECTION,	_chkSliderConnection.getSelection());
+		
 		_prefStore.setValue(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY,		_chkTrackOpacity.getSelection());
 		_prefStore.setValue(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY,		_spinnerTrackOpacity.getSelection());
 
 // SET_FORMATTING_ON
 
 		// force repainting
-		TourbookPlugin.getPrefStore().setValue(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED, Math.random());
+//		TourbookPlugin.getPrefStore().setValue(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED, Math.random());
 	}
 
 }

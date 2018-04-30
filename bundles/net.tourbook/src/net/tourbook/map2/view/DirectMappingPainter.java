@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -48,6 +48,7 @@ public class DirectMappingPainter implements IDirectPainter {
 	private boolean		_isTourVisible;
 	private boolean		_isShowSliderInMap;
 	private boolean		_isShowSliderInLegend;
+	private boolean		_isShowSliderGap;
 
 	private final Image	_imageLeftSlider;
 	private final Image	_imageRightSlider;
@@ -56,6 +57,7 @@ public class DirectMappingPainter implements IDirectPainter {
 	 * 
 	 */
 	public DirectMappingPainter() {
+
 		_imageLeftSlider = TourbookPlugin.getImageDescriptor(Messages.Image_Map_MarkerSliderLeft).createImage();
 		_imageRightSlider = TourbookPlugin.getImageDescriptor(Messages.Image_Map_MarkerSliderRight).createImage();
 	}
@@ -64,6 +66,7 @@ public class DirectMappingPainter implements IDirectPainter {
 	 * set paint context to draw nothing
 	 */
 	public void disablePaintContext() {
+
 		_map = null;
 		_tourData = null;
 		_isTourVisible = false;
@@ -71,19 +74,104 @@ public class DirectMappingPainter implements IDirectPainter {
 
 	@Override
 	public void dispose() {
+
 		disposeImage(_imageLeftSlider);
 		disposeImage(_imageRightSlider);
 	}
 
 	private void disposeImage(final Image image) {
+
 		if ((image != null) && !image.isDisposed()) {
 			image.dispose();
 		}
 	}
 
-	private void drawSliderMarker(	final DirectPainterContext painterContext,
-									int sliderValueIndex,
-									final Image markerImage) {
+	private void drawSliderConnection(final DirectPainterContext painterContext) {
+
+		final MP mp = _map.getMapProvider();
+		final int zoomLevel = _map.getZoom();
+
+		final double[] latitudeSerie = _tourData.latitudeSerie;
+		final double[] longitudeSerie = _tourData.longitudeSerie;
+
+		// force array bounds
+		final int leftSliderValueIndex = Math.min(Math.max(_leftSliderValueIndex, 0), latitudeSerie.length - 1);
+		final int rightSliderValueIndex = Math.min(Math.max(_rightSliderValueIndex, 0), latitudeSerie.length - 1);
+
+		int firstValueIndex;
+		int lastValueIndex;
+		if (leftSliderValueIndex > rightSliderValueIndex) {
+			firstValueIndex = rightSliderValueIndex;
+			lastValueIndex = leftSliderValueIndex;
+		} else {
+			firstValueIndex = leftSliderValueIndex;
+			lastValueIndex = rightSliderValueIndex;
+		}
+
+		final int numMaxSegments = 10;
+		final int numSegments = Math.min(numMaxSegments, lastValueIndex - firstValueIndex);
+
+		final Rectangle viewport = painterContext.viewport;
+		// get world position for the slider coordinates
+		final java.awt.Point wpLeftSliderAWT = mp.geoToPixel(new GeoPosition(
+				latitudeSerie[firstValueIndex],
+				longitudeSerie[firstValueIndex]), zoomLevel);
+
+		// convert awt to swt point
+		final Point wpLeftSlider = new Point(wpLeftSliderAWT.x, wpLeftSliderAWT.y);
+
+		// convert world position into device position
+		int devPosX1 = wpLeftSlider.x - viewport.x;
+		int devPosY1 = wpLeftSlider.y - viewport.y;
+
+		// draw marker for the slider
+		final GC gc = painterContext.gc;
+
+		gc.setAlpha(0x80);
+
+		gc.setLineWidth(21);
+//		gc.setLineCap(SWT.CAP_ROUND);
+//		gc.setLineCap(SWT.CAP_FLAT);
+//		gc.setLineCap(SWT.CAP_SQUARE);
+		gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+
+		for (int segmentIndex = 1; segmentIndex <= numSegments; segmentIndex++) {
+
+			int nextValueIndex = (lastValueIndex - firstValueIndex) / numSegments * segmentIndex;
+			nextValueIndex += firstValueIndex;
+
+			// get world position for the slider coordinates
+			final java.awt.Point wpRightSliderAWT = mp.geoToPixel(new GeoPosition(
+					latitudeSerie[nextValueIndex],
+					longitudeSerie[nextValueIndex]), zoomLevel);
+
+			// convert awt to swt point
+			final Point wpRightSlider = new Point(wpRightSliderAWT.x, wpRightSliderAWT.y);
+
+			// convert world position into device position
+			final int devPosX2 = wpRightSlider.x - viewport.x;
+			final int devPosY2 = wpRightSlider.y - viewport.y;
+
+			gc.drawLine(devPosX1, devPosY1, devPosX2, devPosY2);
+
+			// advance to the next
+			devPosX1 = devPosX2;
+			devPosY1 = devPosY2;
+		}
+
+		gc.setAlpha(0xff);
+
+	}
+
+	/**
+	 * @param painterContext
+	 * @param sliderValueIndex
+	 * @param markerImage
+	 * @return Returns <code>true</code> when the marker is visible and painted
+	 */
+	private boolean drawSliderMarker(	final DirectPainterContext painterContext,
+										int sliderValueIndex,
+										final Image markerImage) {
 
 		final MP mp = _map.getMapProvider();
 		final int zoomLevel = _map.getZoom();
@@ -119,7 +207,11 @@ public class DirectMappingPainter implements IDirectPainter {
 
 			// draw marker for the slider
 			painterContext.gc.drawImage(markerImage, devMarkerPosX - markerWidth2, devMarkerPosY - markerHeight);
+
+			return true;
 		}
+
+		return false;
 	}
 
 	private void drawValueMarkerInLegend(final DirectPainterContext painterContext) {
@@ -199,8 +291,16 @@ public class DirectMappingPainter implements IDirectPainter {
 		}
 
 		if (_isShowSliderInMap) {
+
 			drawSliderMarker(painterContext, _rightSliderValueIndex, _imageRightSlider);
 			drawSliderMarker(painterContext, _leftSliderValueIndex, _imageLeftSlider);
+
+			if (_isShowSliderGap) {
+
+				// draw it even when the sliders are not visible but the tour can be visible !
+
+				drawSliderConnection(painterContext);
+			}
 		}
 
 		if (_isShowSliderInLegend) {
@@ -217,7 +317,7 @@ public class DirectMappingPainter implements IDirectPainter {
 	 * @param rightSliderValuesIndex
 	 * @param isShowSliderInLegend
 	 * @param isShowSliderInMap
-	 * @param legendImageBounds
+	 * @param isShowSliderGap
 	 */
 	public void setPaintContext(final Map map,
 								final boolean isTourVisible,
@@ -225,7 +325,8 @@ public class DirectMappingPainter implements IDirectPainter {
 								final int leftSliderValuesIndex,
 								final int rightSliderValuesIndex,
 								final boolean isShowSliderInMap,
-								final boolean isShowSliderInLegend) {
+								final boolean isShowSliderInLegend,
+								final boolean isShowSliderGap) {
 		_map = map;
 		_isTourVisible = isTourVisible;
 		_tourData = tourData;
@@ -233,6 +334,7 @@ public class DirectMappingPainter implements IDirectPainter {
 		_rightSliderValueIndex = rightSliderValuesIndex;
 		_isShowSliderInMap = isShowSliderInMap;
 		_isShowSliderInLegend = isShowSliderInLegend;
+		_isShowSliderGap = isShowSliderGap;
 	}
 
 }

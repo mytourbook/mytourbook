@@ -365,6 +365,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	 */
 	private boolean							_isLinkPhotoDisplayed;
 
+	private boolean							_isShowSliderConnection;
 	private boolean							_isInMapSync;
 	private long							_lastFiredSyncEventTime;
 
@@ -378,7 +379,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	private ActionTourColor					_actionTourColorHrZone;
 
 	private ActionDimMap					_actionDimMap;
-	private ActionOpenPrefDialog			_actionEdit2DMapPreferences;
+	private ActionOpenPrefDialog			_actionEditMap2Preferences;
 	private ActionMap2_Options				_actionMap2Options;
 	private ActionMap2_Graphs				_actionMap2TourColors;
 	private ActionMapBookmarks				_actionMapBookmarks;
@@ -674,7 +675,8 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 				_currentLeftSliderValueIndex,
 				_currentRightSliderValueIndex,
 				_actionShowSliderInMap.isChecked(),
-				_actionShowSliderInLegend.isChecked());
+				_actionShowSliderInLegend.isChecked(),
+				_isShowSliderConnection);
 
 		_map.redraw();
 	}
@@ -991,7 +993,9 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 					_map.setTourPaintMethodEnhanced(//
 							event.getNewValue().equals(PrefPageMap2Appearance.TOUR_PAINT_METHOD_COMPLEX));
 
-				} else if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
+				} else if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)
+						|| property.equals(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY)
+						|| property.equals(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY)) {
 
 					// update tour and legend
 
@@ -1001,6 +1005,16 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 					_map.disposeOverlayImageCache();
 					_map.paint();
+
+				} else if (property.equals(ITourbookPreferences.MAP2_LAYOUT_IS_DRAW_SLIDER_CONNECTION)) {
+
+					final Object isDrawSlider = event.getNewValue();
+					if (isDrawSlider instanceof Boolean) {
+
+						_isShowSliderConnection = (boolean) isDrawSlider;
+
+						actionShowSlider();
+					}
 
 				} else if (property.equals(IPreferences.SRTM_COLORS_SELECTED_PROFILE_KEY)) {
 
@@ -1240,7 +1254,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_actionSyncMap_WithChartSlider = new ActionSyncMapWithSlider(this);
 		_actionSyncZoomLevelAdjustment = new ActionSyncZoomLevelAdjustment();
 
-		_actionEdit2DMapPreferences = new ActionOpenPrefDialog(
+		_actionEditMap2Preferences = new ActionOpenPrefDialog(
 				Messages.Map_Action_Edit2DMapPreferences,
 				PrefPageMap2Appearance.ID);
 
@@ -1730,7 +1744,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			}
 		}
 
-		menuMgr.add(_actionEdit2DMapPreferences);
+		menuMgr.add(_actionEditMap2Preferences);
 		menuMgr.add(_actionDimMap);
 		menuMgr.add(_actionSyncZoomLevelAdjustment);
 
@@ -2709,7 +2723,8 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 				_currentLeftSliderValueIndex,
 				_currentRightSliderValueIndex,
 				_actionShowSliderInMap.isChecked(),
-				_actionShowSliderInLegend.isChecked());
+				_actionShowSliderInLegend.isChecked(),
+				_isShowSliderConnection);
 
 		// set the tour bounds
 		final GeoPosition[] tourBounds = tourData.getGeoBounds();
@@ -2878,7 +2893,8 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 				leftSliderValuesIndex,
 				rightSliderValuesIndex,
 				_actionShowSliderInMap.isChecked(),
-				_actionShowSliderInLegend.isChecked());
+				_actionShowSliderInLegend.isChecked(),
+				_isShowSliderConnection);
 
 		if (_isMapSynched_WithChartSlider) {
 
@@ -3136,6 +3152,8 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_map.setDimLevel(_mapDimLevel, dimColor);
 		_mapDimLevel = _actionDimMap.setDimLevel(_mapDimLevel);
 
+		_isShowSliderConnection = _prefStore.getBoolean(ITourbookPreferences.MAP2_LAYOUT_IS_DRAW_SLIDER_CONNECTION);
+
 		// display the map with the default position
 		actionSetDefaultPosition();
 	}
@@ -3315,63 +3333,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		}
 	}
 
-	/**
-	 * Calculates a zoom level so that all points in the specified set will be visible on screen.
-	 * This is useful if you have a bunch of points in an area like a city and you want to zoom out
-	 * so that the entire city and it's points are visible without panning.
-	 * 
-	 * @param positions
-	 *            A set of GeoPositions to calculate the new zoom from
-	 * @param adjustZoomLevel
-	 *            when <code>true</code> the zoom level will be adjusted to user settings
-	 */
-	private void setBoundsZoomLevel(final Set<GeoPosition> positions, final boolean isAdjustZoomLevel) {
-
-		if ((positions == null) || (positions.size() < 2)) {
-			return;
-		}
-
-		final MP mp = _map.getMapProvider();
-
-		final int maximumZoomLevel = mp.getMaximumZoomLevel();
-		int zoom = mp.getMinimumZoomLevel();
-
-		Rectangle positionRect = _map.getWorldPixelFromGeoPositions(positions, zoom);
-		Rectangle viewport = _map.getWorldPixelViewport();
-
-		// zoom in until the tour is larger than the viewport
-		while ((positionRect.width < viewport.width) && (positionRect.height < viewport.height)) {
-
-			// center position in the map
-			final Point center = new Point(//
-					positionRect.x + positionRect.width / 2,
-					positionRect.y + positionRect.height / 2);
-
-			_map.setMapCenter(mp.pixelToGeo(center, zoom));
-
-			zoom++;
-
-			// check zoom level
-			if (zoom >= maximumZoomLevel) {
-				break;
-			}
-			_map.setZoom(zoom);
-
-			positionRect = _map.getWorldPixelFromGeoPositions(positions, zoom);
-			viewport = _map.getWorldPixelViewport();
-		}
-
-		// the algorithm generated a larger zoom level as necessary
-		zoom--;
-
-		int adjustedZoomLevel = 0;
-		if (isAdjustZoomLevel) {
-			adjustedZoomLevel = _tourPainterConfig.getSynchTourZoomLevel();
-		}
-
-		_map.setZoom(zoom + adjustedZoomLevel);
-	}
-
 	@Override
 	public void setFocus() {
 		_map.setFocus();
@@ -3397,7 +3358,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_tourPainterConfig.resetTourData();
 
 		// update direct painter to draw nothing
-		_directMappingPainter.setPaintContext(_map, false, null, 0, 0, false, false);
+		_directMappingPainter.setPaintContext(_map, false, null, 0, 0, false, false, false);
 
 		_map.setShowOverlays(isShowOverlays);
 		_map.setShowLegend(false);

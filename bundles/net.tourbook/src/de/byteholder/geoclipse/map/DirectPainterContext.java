@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,7 +27,7 @@ public class DirectPainterContext {
 	public GC			gc;
 
 	/**
-	 * viewport for the current map image
+	 * Viewport for the current map image in world pixel
 	 */
 	public Rectangle	viewport;
 

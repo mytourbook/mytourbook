@@ -345,6 +345,7 @@ public interface ITourbookPreferences {
 	public static final String	MAP_LAYOUT_SYMBOL_WIDTH							= "map.layout.symbol-width";								//$NON-NLS-1$
 	public static final String	MAP_LAYOUT_TOUR_PAINT_METHOD					= "map.layout.tour-paint-algorithm";						//$NON-NLS-1$
 	
+	public static final String	MAP2_LAYOUT_IS_DRAW_SLIDER_CONNECTION			= "MAP2_LAYOUT_IS_DRAW_SLIDER_CONNECTION";						//$NON-NLS-1$
 	public static final String	MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY				= "MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY";						//$NON-NLS-1$
 	public static final String	MAP2_LAYOUT_TOUR_TRACK_OPACITY					= "MAP2_LAYOUT_TOUR_TRACK_OPACITY";							//$NON-NLS-1$
 

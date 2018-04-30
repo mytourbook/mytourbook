@@ -314,6 +314,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD, 	PrefPageMap2Appearance.TOUR_PAINT_METHOD_SIMPLE);
 		store.setDefault(ITourbookPreferences.MAP_LAYOUT_LIVE_UPDATE, true);
 		
+		store.setDefault(ITourbookPreferences.MAP2_LAYOUT_IS_DRAW_SLIDER_CONNECTION,	true);
 		store.setDefault(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY,		true);
 		store.setDefault(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY,			70); 		// opacity in %
 
