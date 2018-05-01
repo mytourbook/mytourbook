@@ -648,7 +648,6 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColor
 		 */
 		_chkMapOption_TrackOpacity.setSelection(		_prefStore.getDefaultBoolean(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY));
 		_spinnerMapOption_TrackOpacity.setSelection(	_prefStore.getDefaultInt(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY));
-
 		_spinnerMapOption_LineWidth.setSelection(		_prefStore.getDefaultInt(ITourbookPreferences.GEO_COMPARE_REF_TOUR_LINE_WIDTH));
 
 		_colorMapOption_RefTour.setColorValue(				PreferenceConverter.getDefaultColor(_prefStore,ITourbookPreferences.GEO_COMPARE_REF_TOUR_RGB));

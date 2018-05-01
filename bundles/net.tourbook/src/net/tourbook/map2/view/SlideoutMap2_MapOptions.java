@@ -83,19 +83,19 @@ public class SlideoutMap2_MapOptions extends ToolbarSlideout implements IColorSe
 	 */
 	private Composite				_parent;
 
-	private Button					_chkSliderRelation;
+	private Button					_chkSliderPath;
 	private Button					_chkTrackOpacity;
 
-	private Label					_lblSliderRelationColor;
-	private Label					_lblSliderRelationSegments;
-	private Label					_lblSliderRelationWidth;
+	private Label					_lblSliderPath_Color;
+	private Label					_lblSliderPath_Segments;
+	private Label					_lblSliderPath_Width;
 
-	private Spinner					_spinnerSliderRelationOpacity;
-	private Spinner					_spinnerSliderRelationSegments;
-	private Spinner					_spinnerSliderRelationLineWidth;
+	private Spinner					_spinnerSliderPath_Opacity;
+	private Spinner					_spinnerSliderPath_Segments;
+	private Spinner					_spinnerSliderPath_LineWidth;
 	private Spinner					_spinnerTrackOpacity;
 
-	private ColorSelectorExtended	_colorSliderRelationColor;
+	private ColorSelectorExtended	_colorSliderPathColor;
 
 	/**
 	 * @param ownerControl
@@ -159,7 +159,7 @@ public class SlideoutMap2_MapOptions extends ToolbarSlideout implements IColorSe
 		{
 			createUI_10_Header(shellContainer);
 			createUI_20_MapOptions(shellContainer);
-			createUI_30_SliderRelation(shellContainer);
+			createUI_30_SliderPath(shellContainer);
 		}
 
 		return shellContainer;
@@ -235,17 +235,17 @@ public class SlideoutMap2_MapOptions extends ToolbarSlideout implements IColorSe
 		}
 	}
 
-	private void createUI_30_SliderRelation(final Composite parent) {
+	private void createUI_30_SliderPath(final Composite parent) {
 
 		{
 			/*
-			 * Slider relationship
+			 * Slider path
 			 */
 			// checkbox
-			_chkSliderRelation = new Button(parent, SWT.CHECK);
-			_chkSliderRelation.setText(Messages.Slideout_Map2_MapOptions_Label_SliderRelation);
-			_chkSliderRelation.setToolTipText(Messages.Slideout_Map2_MapOptions_Label_SliderRelation_Tooltip);
-			_chkSliderRelation.addSelectionListener(_defaultState_SelectionListener);
+			_chkSliderPath = new Button(parent, SWT.CHECK);
+			_chkSliderPath.setText(Messages.Slideout_Map2_MapOptions_Checkbox_SliderPath);
+			_chkSliderPath.setToolTipText(Messages.Slideout_Map2_MapOptions_Checkbox_SliderPath_Tooltip);
+			_chkSliderPath.addSelectionListener(_defaultState_SelectionListener);
 		}
 
 		final Composite container = new Composite(parent, SWT.NONE);
@@ -261,17 +261,17 @@ public class SlideoutMap2_MapOptions extends ToolbarSlideout implements IColorSe
 				 */
 
 				// label
-				_lblSliderRelationSegments = new Label(container, SWT.NONE);
-				_lblSliderRelationSegments.setText(Messages.Slideout_Map2_MapOptions_Label_RelationSegemnts);
+				_lblSliderPath_Segments = new Label(container, SWT.NONE);
+				_lblSliderPath_Segments.setText(Messages.Slideout_Map2_MapOptions_Label_SliderPath_Segements);
 
 				// spinner
-				_spinnerSliderRelationSegments = new Spinner(container, SWT.BORDER);
-				_spinnerSliderRelationSegments.setMinimum(1);
-				_spinnerSliderRelationSegments.setMaximum(100);
-				_spinnerSliderRelationSegments.setIncrement(1);
-				_spinnerSliderRelationSegments.setPageIncrement(10);
-				_spinnerSliderRelationSegments.addSelectionListener(_defaultState_SelectionListener);
-				_spinnerSliderRelationSegments.addMouseWheelListener(_defaultState_MouseWheelListener);
+				_spinnerSliderPath_Segments = new Spinner(container, SWT.BORDER);
+				_spinnerSliderPath_Segments.setMinimum(1);
+				_spinnerSliderPath_Segments.setMaximum(10000);
+				_spinnerSliderPath_Segments.setIncrement(1);
+				_spinnerSliderPath_Segments.setPageIncrement(10);
+				_spinnerSliderPath_Segments.addSelectionListener(_defaultState_SelectionListener);
+				_spinnerSliderPath_Segments.addMouseWheelListener(_defaultState_MouseWheelListener);
 			}
 			{
 				/*
@@ -279,17 +279,17 @@ public class SlideoutMap2_MapOptions extends ToolbarSlideout implements IColorSe
 				 */
 
 				// label
-				_lblSliderRelationWidth = new Label(container, SWT.NONE);
-				_lblSliderRelationWidth.setText(Messages.Slideout_Map2_MapOptions_Label_RelationWidth);
+				_lblSliderPath_Width = new Label(container, SWT.NONE);
+				_lblSliderPath_Width.setText(Messages.Slideout_Map2_MapOptions_Label_SliderPath_Width);
 
 				// spinner
-				_spinnerSliderRelationLineWidth = new Spinner(container, SWT.BORDER);
-				_spinnerSliderRelationLineWidth.setMinimum(1);
-				_spinnerSliderRelationLineWidth.setMaximum(100);
-				_spinnerSliderRelationLineWidth.setIncrement(1);
-				_spinnerSliderRelationLineWidth.setPageIncrement(10);
-				_spinnerSliderRelationLineWidth.addSelectionListener(_defaultState_SelectionListener);
-				_spinnerSliderRelationLineWidth.addMouseWheelListener(_defaultState_MouseWheelListener);
+				_spinnerSliderPath_LineWidth = new Spinner(container, SWT.BORDER);
+				_spinnerSliderPath_LineWidth.setMinimum(1);
+				_spinnerSliderPath_LineWidth.setMaximum(200);
+				_spinnerSliderPath_LineWidth.setIncrement(1);
+				_spinnerSliderPath_LineWidth.setPageIncrement(10);
+				_spinnerSliderPath_LineWidth.addSelectionListener(_defaultState_SelectionListener);
+				_spinnerSliderPath_LineWidth.addMouseWheelListener(_defaultState_MouseWheelListener);
 			}
 			{
 				/*
@@ -297,26 +297,26 @@ public class SlideoutMap2_MapOptions extends ToolbarSlideout implements IColorSe
 				 */
 
 				// label
-				_lblSliderRelationColor = new Label(container, SWT.NONE);
-				_lblSliderRelationColor.setText(Messages.Slideout_Map2_MapOptions_Label_RelationColor);
+				_lblSliderPath_Color = new Label(container, SWT.NONE);
+				_lblSliderPath_Color.setText(Messages.Slideout_Map2_MapOptions_Label_SliderPath_Color);
 
 				final Composite colorContainer = new Composite(container, SWT.NONE);
 				GridDataFactory.fillDefaults().grab(true, false).applyTo(colorContainer);
 				GridLayoutFactory.fillDefaults().numColumns(2).applyTo(colorContainer);
 				{
 					// color
-					_colorSliderRelationColor = new ColorSelectorExtended(colorContainer);
-					_colorSliderRelationColor.addListener(_defaultState_ChangePropertyListener);
-					_colorSliderRelationColor.addOpenListener(this);
+					_colorSliderPathColor = new ColorSelectorExtended(colorContainer);
+					_colorSliderPathColor.addListener(_defaultState_ChangePropertyListener);
+					_colorSliderPathColor.addOpenListener(this);
 
 					// opacity
-					_spinnerSliderRelationOpacity = new Spinner(colorContainer, SWT.BORDER);
-					_spinnerSliderRelationOpacity.setMinimum(1);
-					_spinnerSliderRelationOpacity.setMaximum(100);
-					_spinnerSliderRelationOpacity.setIncrement(1);
-					_spinnerSliderRelationOpacity.setPageIncrement(10);
-					_spinnerSliderRelationOpacity.addSelectionListener(_defaultState_SelectionListener);
-					_spinnerSliderRelationOpacity.addMouseWheelListener(_defaultState_MouseWheelListener);
+					_spinnerSliderPath_Opacity = new Spinner(colorContainer, SWT.BORDER);
+					_spinnerSliderPath_Opacity.setMinimum(1);
+					_spinnerSliderPath_Opacity.setMaximum(100);
+					_spinnerSliderPath_Opacity.setIncrement(1);
+					_spinnerSliderPath_Opacity.setPageIncrement(10);
+					_spinnerSliderPath_Opacity.addSelectionListener(_defaultState_SelectionListener);
+					_spinnerSliderPath_Opacity.addMouseWheelListener(_defaultState_MouseWheelListener);
 				}
 			}
 		}
@@ -325,17 +325,17 @@ public class SlideoutMap2_MapOptions extends ToolbarSlideout implements IColorSe
 	private void enableControls() {
 
 		final boolean isUseTrackOpacity = _chkTrackOpacity.getSelection();
-		final boolean isShowSliderRelation = _chkSliderRelation.getSelection();
+		final boolean isShowSliderPath = _chkSliderPath.getSelection();
 
 		_spinnerTrackOpacity.setEnabled(isUseTrackOpacity);
 
-		_colorSliderRelationColor.setEnabled(isShowSliderRelation);
-		_lblSliderRelationColor.setEnabled(isShowSliderRelation);
-		_lblSliderRelationWidth.setEnabled(isShowSliderRelation);
-		_lblSliderRelationSegments.setEnabled(isShowSliderRelation);
-		_spinnerSliderRelationOpacity.setEnabled(isShowSliderRelation);
-		_spinnerSliderRelationSegments.setEnabled(isShowSliderRelation);
-		_spinnerSliderRelationLineWidth.setEnabled(isShowSliderRelation);
+		_colorSliderPathColor.setEnabled(isShowSliderPath);
+		_lblSliderPath_Color.setEnabled(isShowSliderPath);
+		_lblSliderPath_Width.setEnabled(isShowSliderPath);
+		_lblSliderPath_Segments.setEnabled(isShowSliderPath);
+		_spinnerSliderPath_Opacity.setEnabled(isShowSliderPath);
+		_spinnerSliderPath_Segments.setEnabled(isShowSliderPath);
+		_spinnerSliderPath_LineWidth.setEnabled(isShowSliderPath);
 	}
 
 	private void initUI(final Composite parent) {
@@ -362,7 +362,7 @@ public class SlideoutMap2_MapOptions extends ToolbarSlideout implements IColorSe
 		_defaultState_ChangePropertyListener = new IPropertyChangeListener() {
 			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
-				onChangeUI_WithState();
+				onChangeUI_MapUpdate();
 			}
 		};
 
@@ -370,13 +370,13 @@ public class SlideoutMap2_MapOptions extends ToolbarSlideout implements IColorSe
 			@Override
 			public void mouseScrolled(final MouseEvent event) {
 				UI.adjustSpinnerValueOnMouseScroll(event);
-				onChangeUI_WithState();
+				onChangeUI_MapUpdate();
 			}
 		};
 		_defaultState_SelectionListener = new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
-				onChangeUI_WithState();
+				onChangeUI_MapUpdate();
 			}
 		};
 
@@ -406,7 +406,7 @@ public class SlideoutMap2_MapOptions extends ToolbarSlideout implements IColorSe
 		enableControls();
 	}
 
-	private void onChangeUI_WithState() {
+	private void onChangeUI_MapUpdate() {
 
 		onChangeUI();
 
@@ -417,12 +417,12 @@ public class SlideoutMap2_MapOptions extends ToolbarSlideout implements IColorSe
 
 // SET_FORMATTING_OFF
 
-		// slider relation
-		_chkSliderRelation.setSelection(				Map2View.STATE_IS_SHOW_SLIDER_RELATION_DEFAULT);
-		_spinnerSliderRelationOpacity.setSelection(		Map2View.STATE_SLIDER_RELATION_OPACITY_DEFAULT);
-		_spinnerSliderRelationSegments.setSelection(	Map2View.STATE_SLIDER_RELATION_SEGMENTS_DEFAULT);
-		_spinnerSliderRelationLineWidth.setSelection(	Map2View.STATE_SLIDER_RELATION_LINE_WIDTH_DEFAULT);
-		_colorSliderRelationColor.setColorValue(		Map2View.STATE_SLIDER_RELATION_COLOR_DEFAULT);
+		// slider path
+		_chkSliderPath.setSelection(				Map2View.STATE_IS_SHOW_SLIDER_PATH_DEFAULT);
+		_spinnerSliderPath_Opacity.setSelection(	Map2View.STATE_SLIDER_PATH_OPACITY_DEFAULT);
+		_spinnerSliderPath_Segments.setSelection(	Map2View.STATE_SLIDER_PATH_SEGMENTS_DEFAULT);
+		_spinnerSliderPath_LineWidth.setSelection(	Map2View.STATE_SLIDER_PATH_LINE_WIDTH_DEFAULT);
+		_colorSliderPathColor.setColorValue(		Map2View.STATE_SLIDER_PATH_COLOR_DEFAULT);
 		
 		// track opacity
 		_chkTrackOpacity.setSelection(		_prefStore.getDefaultBoolean(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY));
@@ -430,19 +430,19 @@ public class SlideoutMap2_MapOptions extends ToolbarSlideout implements IColorSe
 		
 // SET_FORMATTING_ON
 
-		saveState();
+		onChangeUI_MapUpdate();
 	}
 
 	private void restoreState() {
 
 // SET_FORMATTING_OFF
 
-		// slider relation
-		_chkSliderRelation.setSelection(			Util.getStateBoolean(_state, Map2View.STATE_IS_SHOW_SLIDER_RELATION, 	Map2View.STATE_IS_SHOW_SLIDER_RELATION_DEFAULT));
-		_spinnerSliderRelationOpacity.setSelection(		Util.getStateInt(_state, Map2View.STATE_SLIDER_RELATION_OPACITY,	Map2View.STATE_SLIDER_RELATION_OPACITY_DEFAULT));
-		_spinnerSliderRelationSegments.setSelection(	Util.getStateInt(_state, Map2View.STATE_SLIDER_RELATION_SEGMENTS,	Map2View.STATE_SLIDER_RELATION_SEGMENTS_DEFAULT));
-		_spinnerSliderRelationLineWidth.setSelection(	Util.getStateInt(_state, Map2View.STATE_SLIDER_RELATION_LINE_WIDTH, Map2View.STATE_SLIDER_RELATION_LINE_WIDTH_DEFAULT));
-		_colorSliderRelationColor.setColorValue(		Util.getStateRGB(_state, Map2View.STATE_SLIDER_RELATION_COLOR, 		Map2View.STATE_SLIDER_RELATION_COLOR_DEFAULT));
+		// slider path
+		_chkSliderPath.setSelection(				Util.getStateBoolean(_state, Map2View.STATE_IS_SHOW_SLIDER_PATH, 	Map2View.STATE_IS_SHOW_SLIDER_PATH_DEFAULT));
+		_spinnerSliderPath_Opacity.setSelection(	Util.getStateInt(_state, Map2View.STATE_SLIDER_PATH_OPACITY,	Map2View.STATE_SLIDER_PATH_OPACITY_DEFAULT));
+		_spinnerSliderPath_Segments.setSelection(	Util.getStateInt(_state, Map2View.STATE_SLIDER_PATH_SEGMENTS,	Map2View.STATE_SLIDER_PATH_SEGMENTS_DEFAULT));
+		_spinnerSliderPath_LineWidth.setSelection(	Util.getStateInt(_state, Map2View.STATE_SLIDER_PATH_LINE_WIDTH, Map2View.STATE_SLIDER_PATH_LINE_WIDTH_DEFAULT));
+		_colorSliderPathColor.setColorValue(		Util.getStateRGB(_state, Map2View.STATE_SLIDER_PATH_COLOR, 		Map2View.STATE_SLIDER_PATH_COLOR_DEFAULT));
 		
 		// track opacity
 		_chkTrackOpacity.setSelection(			_prefStore.getBoolean(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY));
@@ -455,12 +455,12 @@ public class SlideoutMap2_MapOptions extends ToolbarSlideout implements IColorSe
 
 // SET_FORMATTING_OFF
 		
-		// slider relation
-		_state.put(Map2View.STATE_IS_SHOW_SLIDER_RELATION, _chkSliderRelation.getSelection());
-		_state.put(Map2View.STATE_SLIDER_RELATION_OPACITY, _spinnerSliderRelationOpacity.getSelection());
-		_state.put(Map2View.STATE_SLIDER_RELATION_SEGMENTS, _spinnerSliderRelationSegments.getSelection());
-		_state.put(Map2View.STATE_SLIDER_RELATION_LINE_WIDTH, _spinnerSliderRelationLineWidth.getSelection());
-		Util.setState(_state, Map2View.STATE_SLIDER_RELATION_COLOR, _colorSliderRelationColor.getColorValue());
+		// slider path
+		_state.put(Map2View.STATE_IS_SHOW_SLIDER_PATH,			_chkSliderPath.getSelection());
+		_state.put(Map2View.STATE_SLIDER_PATH_OPACITY, 			_spinnerSliderPath_Opacity.getSelection());
+		_state.put(Map2View.STATE_SLIDER_PATH_SEGMENTS, 		_spinnerSliderPath_Segments.getSelection());
+		_state.put(Map2View.STATE_SLIDER_PATH_LINE_WIDTH, 		_spinnerSliderPath_LineWidth.getSelection());
+		Util.setState(_state, Map2View.STATE_SLIDER_PATH_COLOR, _colorSliderPathColor.getColorValue());
 
 		// track opacity
 		_prefStore.setValue(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY,		_chkTrackOpacity.getSelection());
@@ -469,5 +469,4 @@ public class SlideoutMap2_MapOptions extends ToolbarSlideout implements IColorSe
 // SET_FORMATTING_ON
 
 	}
-
 }

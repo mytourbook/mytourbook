@@ -87,93 +87,6 @@ public class DirectMappingPainter implements IDirectPainter {
 		}
 	}
 
-	private void drawSliderConnection(final DirectPainterContext painterContext) {
-
-		final MP mp = _map.getMapProvider();
-		final int zoomLevel = _map.getZoom();
-
-		final double[] latitudeSerie = _tourData.latitudeSerie;
-		final double[] longitudeSerie = _tourData.longitudeSerie;
-
-		// force array bounds
-		final int leftSliderValueIndex = Math.min(Math.max(_leftSliderValueIndex, 0), latitudeSerie.length - 1);
-		final int rightSliderValueIndex = Math.min(Math.max(_rightSliderValueIndex, 0), latitudeSerie.length - 1);
-
-		int firstValueIndex;
-		int lastValueIndex;
-		if (leftSliderValueIndex > rightSliderValueIndex) {
-			firstValueIndex = rightSliderValueIndex;
-			lastValueIndex = leftSliderValueIndex;
-		} else {
-			firstValueIndex = leftSliderValueIndex;
-			lastValueIndex = rightSliderValueIndex;
-		}
-
-		final int numMaxSegments = _sliderRelationPaintingData.segments;
-		final float numSlices = lastValueIndex - firstValueIndex;
-		final int numSegments = (int) Math.min(numMaxSegments, numSlices);
-
-		final Rectangle viewport = painterContext.viewport;
-		// get world position for the slider coordinates
-		final java.awt.Point wpLeftSliderAWT = mp.geoToPixel(new GeoPosition(
-				latitudeSerie[firstValueIndex],
-				longitudeSerie[firstValueIndex]), zoomLevel);
-
-		// convert awt to swt point
-		final Point wpLeftSlider = new Point(wpLeftSliderAWT.x, wpLeftSliderAWT.y);
-
-		// convert world position into device position
-		int devPosX1 = wpLeftSlider.x - viewport.x;
-		int devPosY1 = wpLeftSlider.y - viewport.y;
-
-		// draw marker for the slider
-		final GC gc = painterContext.gc;
-
-		// set alpha when requested
-		int alpha = 0xff;
-		final int opacity = _sliderRelationPaintingData.opacity;
-		if (opacity < 100) {
-			alpha = 0xff * opacity / 100;
-		}
-
-		gc.setAlpha(alpha);
-
-		gc.setLineWidth(_sliderRelationPaintingData.lineWidth);
-//		gc.setLineCap(SWT.CAP_ROUND);
-//		gc.setLineCap(SWT.CAP_FLAT);
-//		gc.setLineCap(SWT.CAP_SQUARE);
-
-		final Color lineColor = new Color(gc.getDevice(), _sliderRelationPaintingData.color);
-		gc.setForeground(lineColor);
-
-		for (int segmentIndex = 1; segmentIndex <= numSegments; segmentIndex++) {
-
-			int nextValueIndex = (int) (numSlices / numSegments * segmentIndex);
-			nextValueIndex += firstValueIndex;
-
-			// get world position for the slider coordinates
-			final java.awt.Point wpRightSliderAWT = mp.geoToPixel(new GeoPosition(
-					latitudeSerie[nextValueIndex],
-					longitudeSerie[nextValueIndex]), zoomLevel);
-
-			// convert awt to swt point
-			final Point wpRightSlider = new Point(wpRightSliderAWT.x, wpRightSliderAWT.y);
-
-			// convert world position into device position
-			final int devPosX2 = wpRightSlider.x - viewport.x;
-			final int devPosY2 = wpRightSlider.y - viewport.y;
-
-			gc.drawLine(devPosX1, devPosY1, devPosX2, devPosY2);
-
-			// advance to the next
-			devPosX1 = devPosX2;
-			devPosY1 = devPosY2;
-		}
-		lineColor.dispose();
-		gc.setAlpha(0xff);
-
-	}
-
 	/**
 	 * @param painterContext
 	 * @param sliderValueIndex
@@ -223,6 +136,111 @@ public class DirectMappingPainter implements IDirectPainter {
 		}
 
 		return false;
+	}
+
+	private void drawSliderRelation(final DirectPainterContext painterContext) {
+
+		final MP mp = _map.getMapProvider();
+		final int zoomLevel = _map.getZoom();
+
+		final double[] latitudeSerie = _tourData.latitudeSerie;
+		final double[] longitudeSerie = _tourData.longitudeSerie;
+
+		// force array bounds
+		final int leftSliderValueIndex = Math.min(Math.max(_leftSliderValueIndex, 0), latitudeSerie.length - 1);
+		final int rightSliderValueIndex = Math.min(Math.max(_rightSliderValueIndex, 0), latitudeSerie.length - 1);
+
+		int firstValueIndex;
+		int lastValueIndex;
+		if (leftSliderValueIndex > rightSliderValueIndex) {
+			firstValueIndex = rightSliderValueIndex;
+			lastValueIndex = leftSliderValueIndex;
+		} else {
+			firstValueIndex = leftSliderValueIndex;
+			lastValueIndex = rightSliderValueIndex;
+		}
+
+		final int numMaxSegments = _sliderRelationPaintingData.segments;
+		final float numSlices = lastValueIndex - firstValueIndex;
+		final int numSegments = (int) Math.min(numMaxSegments, numSlices);
+
+		final Rectangle viewport = painterContext.viewport;
+		// get world position for the slider coordinates
+		final java.awt.Point wpLeftSliderAWT = mp.geoToPixel(new GeoPosition(
+				latitudeSerie[firstValueIndex],
+				longitudeSerie[firstValueIndex]), zoomLevel);
+
+		// convert awt to swt point
+		final Point wpLeftSlider = new Point(wpLeftSliderAWT.x, wpLeftSliderAWT.y);
+
+		// convert world position into device position
+		int devPosX1 = wpLeftSlider.x - viewport.x;
+		int devPosY1 = wpLeftSlider.y - viewport.y;
+
+		final int[] devXY = new int[numSegments * 2 + 2];
+
+		devXY[0] = devPosX1;
+		devXY[1] = devPosY1;
+
+		for (int segmentIndex = 1; segmentIndex <= numSegments; segmentIndex++) {
+
+			int nextValueIndex = (int) (numSlices / numSegments * segmentIndex);
+			nextValueIndex += firstValueIndex;
+
+			// get world position for the slider coordinates
+			final java.awt.Point wpRightSliderAWT = mp.geoToPixel(new GeoPosition(
+					latitudeSerie[nextValueIndex],
+					longitudeSerie[nextValueIndex]), zoomLevel);
+
+			// convert awt to swt point
+			final Point wpRightSlider = new Point(wpRightSliderAWT.x, wpRightSliderAWT.y);
+
+			// convert world position into device position
+			final int devPosX2 = wpRightSlider.x - viewport.x;
+			final int devPosY2 = wpRightSlider.y - viewport.y;
+
+			final int devXYIndex = segmentIndex * 2;
+
+			devXY[devXYIndex + 0] = devPosX2;
+			devXY[devXYIndex + 1] = devPosY2;
+
+			// advance to the next segment
+			devPosX1 = devPosX2;
+			devPosY1 = devPosY2;
+		}
+
+		// draw marker for the slider
+		final GC gc = painterContext.gc;
+
+		// set alpha when requested
+		int alpha = 0xff;
+		final int opacity = _sliderRelationPaintingData.opacity;
+		if (opacity < 100) {
+			alpha = 0xff * opacity / 100;
+		}
+
+		gc.setLineWidth(_sliderRelationPaintingData.lineWidth);
+		gc.setLineCap(SWT.CAP_ROUND);
+//		gc.setLineCap(SWT.CAP_FLAT);
+//		gc.setLineCap(SWT.CAP_SQUARE);
+
+//		gc.setLineJoin(SWT.JOIN_BEVEL);
+//		gc.setLineJoin(SWT.JOIN_MITER);
+		gc.setLineJoin(SWT.JOIN_ROUND);
+
+		final Color lineColor = new Color(gc.getDevice(), _sliderRelationPaintingData.color);
+		gc.setForeground(lineColor);
+
+		gc.setAlpha(alpha);
+		gc.setAntialias(SWT.ON);
+		{
+			gc.drawPolyline(devXY);
+		}
+		gc.setAntialias(SWT.OFF);
+		gc.setAlpha(0xff);
+
+		lineColor.dispose();
+
 	}
 
 	private void drawValueMarkerInLegend(final DirectPainterContext painterContext) {
@@ -310,7 +328,7 @@ public class DirectMappingPainter implements IDirectPainter {
 
 				// draw it even when the sliders are not visible but the tour can be visible !
 
-				drawSliderConnection(painterContext);
+				drawSliderRelation(painterContext);
 			}
 		}
 

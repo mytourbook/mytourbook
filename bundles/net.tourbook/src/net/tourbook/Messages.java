@@ -1783,16 +1783,12 @@ public class Messages extends NLS {
 	public static String		Slideout_LinkWithOtherViews_Label_Title_Checkbox_IsShowTourTitle;
 	public static String		Slideout_LinkWithOtherViews_Label_Title_Checkbox_IsShowTourTitle_Tooltip;
 
-	public static String Slideout_Map2_MapOptions_Label_RelationColor;
-
-	public static String Slideout_Map2_MapOptions_Label_RelationSegemnts;
-
-	public static String Slideout_Map2_MapOptions_Label_RelationWidth;
-
-	public static String		Slideout_Map2_MapOptions_Label_SliderRelation;
-	public static String		Slideout_Map2_MapOptions_Label_SliderRelation_Tooltip;
-
-	public static String Slideout_Map2_MapOptions_Title;
+	public static String		Slideout_Map2_MapOptions_Checkbox_SliderPath;
+	public static String		Slideout_Map2_MapOptions_Checkbox_SliderPath_Tooltip;
+	public static String		Slideout_Map2_MapOptions_Label_SliderPath_Color;
+	public static String		Slideout_Map2_MapOptions_Label_SliderPath_Segements;
+	public static String		Slideout_Map2_MapOptions_Label_SliderPath_Width;
+	public static String		Slideout_Map2_MapOptions_Title;
 
 	public static String		Slideout_Map2_TourColors_Checkbox_ShowInChartToolbar_Tooltip;
 	public static String		Slideout_Map2_TourColors_Label_Title;

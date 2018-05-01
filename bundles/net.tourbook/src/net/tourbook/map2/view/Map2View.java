@@ -241,22 +241,22 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	static final boolean			STATE_IS_SHOW_IN_TOOLBAR_PULSE_DEFAULT 		= true;
 	static final boolean			STATE_IS_SHOW_IN_TOOLBAR_SPEED_DEFAULT 		= false;
 	static final boolean			STATE_IS_SHOW_IN_TOOLBAR_HR_ZONE_DEFAULT 	= false;
-	
-	static final String				STATE_IS_SHOW_SLIDER_RELATION				= "STATE_IS_SHOW_SLIDER_RELATION";			//$NON-NLS-1$
-	static final boolean			STATE_IS_SHOW_SLIDER_RELATION_DEFAULT		= true;
-	static final String				STATE_SLIDER_RELATION_OPACITY				= "STATE_SLIDER_RELATION_OPACITY";			//$NON-NLS-1$
-	static final int				STATE_SLIDER_RELATION_OPACITY_DEFAULT		= 70;
-	static final String				STATE_SLIDER_RELATION_SEGMENTS				= "STATE_SLIDER_RELATION_SEGMENTS";			//$NON-NLS-1$
-	static final int				STATE_SLIDER_RELATION_SEGMENTS_DEFAULT		= 10;
-	static final String				STATE_SLIDER_RELATION_LINE_WIDTH			= "STATE_SLIDER_RELATION_LINE_WIDTH";		//$NON-NLS-1$
-	static final int				STATE_SLIDER_RELATION_LINE_WIDTH_DEFAULT	= 20;
-	static final String				STATE_SLIDER_RELATION_COLOR					= "STATE_SLIDER_RELATION_COLOR";			//$NON-NLS-1$
-	static final RGB				STATE_SLIDER_RELATION_COLOR_DEFAULT			= new RGB(0x88,0x33,0x11);
-	
+	//
+	static final String				STATE_IS_SHOW_SLIDER_PATH					= "STATE_IS_SHOW_SLIDER_PATH";				//$NON-NLS-1$
+	static final String				STATE_SLIDER_PATH_LINE_WIDTH				= "STATE_SLIDER_PATH_LINE_WIDTH";			//$NON-NLS-1$
+	static final String				STATE_SLIDER_PATH_OPACITY					= "STATE_SLIDER_PATH_OPACITY";				//$NON-NLS-1$
+	static final String				STATE_SLIDER_PATH_SEGMENTS					= "STATE_SLIDER_PATH_SEGMENTS";				//$NON-NLS-1$
+	static final String				STATE_SLIDER_PATH_COLOR						= "STATE_SLIDER_PATH_COLOR";				//$NON-NLS-1$
+	//
+	static final boolean			STATE_IS_SHOW_SLIDER_PATH_DEFAULT			= true;
+	static final int				STATE_SLIDER_PATH_LINE_WIDTH_DEFAULT		= 30;
+	static final int				STATE_SLIDER_PATH_OPACITY_DEFAULT			= 60;
+	static final int				STATE_SLIDER_PATH_SEGMENTS_DEFAULT			= 200;
+	static final RGB				STATE_SLIDER_PATH_COLOR_DEFAULT				= new RGB(0xff,0xff,0x80);
 	//
 	private static final String		GRAPH_CONTRIBUTION_ID_SLIDEOUT				= "GRAPH_CONTRIBUTION_ID_SLIDEOUT";			//$NON-NLS-1$
 	//
-	private static final MapGraphId[]	_allGraphContribId									= {
+	private static final MapGraphId[]	_allGraphContribId						= {
 
 			MapGraphId.Altitude,
 			MapGraphId.Gradient,
@@ -266,13 +266,8 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			MapGraphId.HrZone,
 	};
 
-
-
-
-
 	private final IPreferenceStore				_prefStore							= TourbookPlugin.getPrefStore();
 	private final IDialogSettings				_state								= TourbookPlugin.getState(ID);
-
 
 	private final ImageDescriptor				_imageSyncWithSlider					= TourbookPlugin.getImageDescriptor(Messages.image_action_synch_with_slider);
 	private final ImageDescriptor				_imageSyncWithSlider_Disabled			= TourbookPlugin.getImageDescriptor(Messages.image_action_synch_with_slider_disabled);
@@ -3169,24 +3164,24 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_sliderRelationPaintingData = new SliderRelationPaintingData();
 
 		_sliderRelationPaintingData.isShowSliderRelation = Util.getStateBoolean(_state,
-				Map2View.STATE_IS_SHOW_SLIDER_RELATION,
-				Map2View.STATE_IS_SHOW_SLIDER_RELATION_DEFAULT);
+				Map2View.STATE_IS_SHOW_SLIDER_PATH,
+				Map2View.STATE_IS_SHOW_SLIDER_PATH_DEFAULT);
 
 		_sliderRelationPaintingData.opacity = (Util.getStateInt(_state,
-				Map2View.STATE_SLIDER_RELATION_OPACITY,
-				Map2View.STATE_SLIDER_RELATION_OPACITY_DEFAULT));
+				Map2View.STATE_SLIDER_PATH_OPACITY,
+				Map2View.STATE_SLIDER_PATH_OPACITY_DEFAULT));
 
 		_sliderRelationPaintingData.segments = (Util.getStateInt(_state,
-				Map2View.STATE_SLIDER_RELATION_SEGMENTS,
-				Map2View.STATE_SLIDER_RELATION_SEGMENTS_DEFAULT));
+				Map2View.STATE_SLIDER_PATH_SEGMENTS,
+				Map2View.STATE_SLIDER_PATH_SEGMENTS_DEFAULT));
 
 		_sliderRelationPaintingData.lineWidth = (Util.getStateInt(_state,
-				Map2View.STATE_SLIDER_RELATION_LINE_WIDTH,
-				Map2View.STATE_SLIDER_RELATION_LINE_WIDTH_DEFAULT));
+				Map2View.STATE_SLIDER_PATH_LINE_WIDTH,
+				Map2View.STATE_SLIDER_PATH_LINE_WIDTH_DEFAULT));
 
 		_sliderRelationPaintingData.color = (Util.getStateRGB(_state,
-				Map2View.STATE_SLIDER_RELATION_COLOR,
-				Map2View.STATE_SLIDER_RELATION_COLOR_DEFAULT));
+				Map2View.STATE_SLIDER_PATH_COLOR,
+				Map2View.STATE_SLIDER_PATH_COLOR_DEFAULT));
 
 		if (isUpdateMapUI) {
 

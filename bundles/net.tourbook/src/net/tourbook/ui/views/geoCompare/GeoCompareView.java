@@ -114,6 +114,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
 // SET_FORMATTING_OFF
 
+
 	public static final String				ID		= "net.tourbook.ui.views.geoCompare.GeoCompareView";	//$NON-NLS-1$
 
 	private static final int				DELAY_BEFORE_STARTING_COMPARE	= 500;
@@ -134,6 +135,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 	private static final String				COLUMN_AVG_PULSE				= "avgPulse";						//$NON-NLS-1$
 	private static final String				COLUMN_AVG_SPEED				= "avgSpeed";						//$NON-NLS-1$
 	private static final String				COLUMN_GEO_DIFF					= "geoDiff";						//$NON-NLS-1$
+	private static final String				COLUMN_GEO_DIFF_RELATIVE		= "geoDiffRelative";				//$NON-NLS-1$
 	private static final String				COLUMN_SEQUENCE					= "sequence";						//$NON-NLS-1$
 	private static final String				COLUMN_TOUR_START_DATE			= "tourStartDate";					//$NON-NLS-1$
 	//
@@ -304,6 +306,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 			switch (__sortColumnId) {
 
 			case COLUMN_GEO_DIFF:
+			case COLUMN_GEO_DIFF_RELATIVE:
 
 				final long minDiffValue1 = item1.minDiffValue;
 				final long minDiffValue2 = item2.minDiffValue;
@@ -1367,7 +1370,9 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 	 */
 	private void defineColumn_12_GeoDiff_Relative() {
 
-		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "geoDiffRelative", SWT.TRAIL);
+		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager,
+				COLUMN_GEO_DIFF_RELATIVE,
+				SWT.TRAIL);
 
 		colDef.setColumnLabel(Messages.GeoPart_View_Column_GeoDiff_Relative_Label);
 		colDef.setColumnHeaderText(Messages.GeoPart_View_Column_GeoDiff_Relative_Header);
@@ -1375,6 +1380,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
 		colDef.setIsDefaultColumn();
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
+		colDef.setColumnSelectionListener(_columnSortListener);
 
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
