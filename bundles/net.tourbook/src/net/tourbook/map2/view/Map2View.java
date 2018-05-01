@@ -241,6 +241,18 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	static final boolean			STATE_IS_SHOW_IN_TOOLBAR_PULSE_DEFAULT 		= true;
 	static final boolean			STATE_IS_SHOW_IN_TOOLBAR_SPEED_DEFAULT 		= false;
 	static final boolean			STATE_IS_SHOW_IN_TOOLBAR_HR_ZONE_DEFAULT 	= false;
+	
+	static final String				STATE_IS_SHOW_SLIDER_RELATION				= "STATE_IS_SHOW_SLIDER_RELATION";			//$NON-NLS-1$
+	static final boolean			STATE_IS_SHOW_SLIDER_RELATION_DEFAULT		= true;
+	static final String				STATE_SLIDER_RELATION_OPACITY				= "STATE_SLIDER_RELATION_OPACITY";			//$NON-NLS-1$
+	static final int				STATE_SLIDER_RELATION_OPACITY_DEFAULT		= 70;
+	static final String				STATE_SLIDER_RELATION_SEGMENTS				= "STATE_SLIDER_RELATION_SEGMENTS";			//$NON-NLS-1$
+	static final int				STATE_SLIDER_RELATION_SEGMENTS_DEFAULT		= 10;
+	static final String				STATE_SLIDER_RELATION_LINE_WIDTH			= "STATE_SLIDER_RELATION_LINE_WIDTH";		//$NON-NLS-1$
+	static final int				STATE_SLIDER_RELATION_LINE_WIDTH_DEFAULT	= 20;
+	static final String				STATE_SLIDER_RELATION_COLOR					= "STATE_SLIDER_RELATION_COLOR";			//$NON-NLS-1$
+	static final RGB				STATE_SLIDER_RELATION_COLOR_DEFAULT			= new RGB(0x88,0x33,0x11);
+	
 	//
 	private static final String		GRAPH_CONTRIBUTION_ID_SLIDEOUT				= "GRAPH_CONTRIBUTION_ID_SLIDEOUT";			//$NON-NLS-1$
 	//
@@ -253,6 +265,9 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			MapGraphId.Speed,
 			MapGraphId.HrZone,
 	};
+
+
+
 
 
 	private final IPreferenceStore				_prefStore							= TourbookPlugin.getPrefStore();
@@ -365,7 +380,8 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	 */
 	private boolean							_isLinkPhotoDisplayed;
 
-	private boolean							_isShowSliderConnection;
+	private SliderRelationPaintingData		_sliderRelationPaintingData;
+
 	private boolean							_isInMapSync;
 	private long							_lastFiredSyncEventTime;
 
@@ -453,7 +469,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 		@Override
 		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
-			return new SlideoutMap2_MapOptions(_parent, toolbar, Map2View.this);
+			return new SlideoutMap2_MapOptions(_parent, toolbar, Map2View.this, _state);
 		}
 
 		@Override
@@ -676,7 +692,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 				_currentRightSliderValueIndex,
 				_actionShowSliderInMap.isChecked(),
 				_actionShowSliderInLegend.isChecked(),
-				_isShowSliderConnection);
+				_sliderRelationPaintingData);
 
 		_map.redraw();
 	}
@@ -1005,16 +1021,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 					_map.disposeOverlayImageCache();
 					_map.paint();
-
-				} else if (property.equals(ITourbookPreferences.MAP2_LAYOUT_IS_DRAW_SLIDER_CONNECTION)) {
-
-					final Object isDrawSlider = event.getNewValue();
-					if (isDrawSlider instanceof Boolean) {
-
-						_isShowSliderConnection = (boolean) isDrawSlider;
-
-						actionShowSlider();
-					}
 
 				} else if (property.equals(IPreferences.SRTM_COLORS_SELECTED_PROFILE_KEY)) {
 
@@ -2724,7 +2730,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 				_currentRightSliderValueIndex,
 				_actionShowSliderInMap.isChecked(),
 				_actionShowSliderInLegend.isChecked(),
-				_isShowSliderConnection);
+				_sliderRelationPaintingData);
 
 		// set the tour bounds
 		final GeoPosition[] tourBounds = tourData.getGeoBounds();
@@ -2894,7 +2900,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 				rightSliderValuesIndex,
 				_actionShowSliderInMap.isChecked(),
 				_actionShowSliderInLegend.isChecked(),
-				_isShowSliderConnection);
+				_sliderRelationPaintingData);
 
 		if (_isMapSynched_WithChartSlider) {
 
@@ -3152,10 +3158,41 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_map.setDimLevel(_mapDimLevel, dimColor);
 		_mapDimLevel = _actionDimMap.setDimLevel(_mapDimLevel);
 
-		_isShowSliderConnection = _prefStore.getBoolean(ITourbookPreferences.MAP2_LAYOUT_IS_DRAW_SLIDER_CONNECTION);
+		restoreState_Map2Options(false);
 
 		// display the map with the default position
 		actionSetDefaultPosition();
+	}
+
+	void restoreState_Map2Options(final boolean isUpdateMapUI) {
+
+		_sliderRelationPaintingData = new SliderRelationPaintingData();
+
+		_sliderRelationPaintingData.isShowSliderRelation = Util.getStateBoolean(_state,
+				Map2View.STATE_IS_SHOW_SLIDER_RELATION,
+				Map2View.STATE_IS_SHOW_SLIDER_RELATION_DEFAULT);
+
+		_sliderRelationPaintingData.opacity = (Util.getStateInt(_state,
+				Map2View.STATE_SLIDER_RELATION_OPACITY,
+				Map2View.STATE_SLIDER_RELATION_OPACITY_DEFAULT));
+
+		_sliderRelationPaintingData.segments = (Util.getStateInt(_state,
+				Map2View.STATE_SLIDER_RELATION_SEGMENTS,
+				Map2View.STATE_SLIDER_RELATION_SEGMENTS_DEFAULT));
+
+		_sliderRelationPaintingData.lineWidth = (Util.getStateInt(_state,
+				Map2View.STATE_SLIDER_RELATION_LINE_WIDTH,
+				Map2View.STATE_SLIDER_RELATION_LINE_WIDTH_DEFAULT));
+
+		_sliderRelationPaintingData.color = (Util.getStateRGB(_state,
+				Map2View.STATE_SLIDER_RELATION_COLOR,
+				Map2View.STATE_SLIDER_RELATION_COLOR_DEFAULT));
+
+		if (isUpdateMapUI) {
+
+			// update map UI
+			actionShowSlider();
+		}
 	}
 
 	/**
@@ -3358,7 +3395,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_tourPainterConfig.resetTourData();
 
 		// update direct painter to draw nothing
-		_directMappingPainter.setPaintContext(_map, false, null, 0, 0, false, false, false);
+		_directMappingPainter.setPaintContext(_map, false, null, 0, 0, false, false, _sliderRelationPaintingData);
 
 		_map.setShowOverlays(isShowOverlays);
 		_map.setShowLegend(false);

@@ -1376,10 +1376,6 @@ public class Messages extends NLS {
 	public static String		Pref_Map2_Checkbox_TrackOpacity;
 	public static String		Pref_Map2_Checkbox_TrackOpacity_Tooltip;
 
-	public static String Pref_Map2_Label_SliderConnection;
-
-	public static String Pref_Map2_Label_SliderConnection_Tooltip;
-
 	public static String		Pref_Map25_Encoding_Mapzen;
 	public static String		Pref_Map25_Encoding_OpenScienceMap;
 	public static String		Pref_Map25_Offline_Dialog_Restart_Message;
@@ -1787,7 +1783,21 @@ public class Messages extends NLS {
 	public static String		Slideout_LinkWithOtherViews_Label_Title_Checkbox_IsShowTourTitle;
 	public static String		Slideout_LinkWithOtherViews_Label_Title_Checkbox_IsShowTourTitle_Tooltip;
 
-//	public static String		Slideout_Map25TrackOptions_Label_AnimationTime;
+	public static String Slideout_Map2_MapOptions_Label_RelationColor;
+
+	public static String Slideout_Map2_MapOptions_Label_RelationSegemnts;
+
+	public static String Slideout_Map2_MapOptions_Label_RelationWidth;
+
+	public static String		Slideout_Map2_MapOptions_Label_SliderRelation;
+	public static String		Slideout_Map2_MapOptions_Label_SliderRelation_Tooltip;
+
+	public static String Slideout_Map2_MapOptions_Title;
+
+	public static String		Slideout_Map2_TourColors_Checkbox_ShowInChartToolbar_Tooltip;
+	public static String		Slideout_Map2_TourColors_Label_Title;
+
+	//	public static String		Slideout_Map25TrackOptions_Label_AnimationTime;
 //	public static String		Slideout_Map25TrackOptions_Label_AnimationTime_Tooltip;
 	public static String		Slideout_Map25TrackOptions_Label_ConfigName_Tooltip;
 	public static String		Slideout_Map25TrackOptions_Label_Name;
@@ -1840,11 +1850,6 @@ public class Messages extends NLS {
 	public static String		Slideout_Map25MarkerOptions_Label_Name_Tooltip;
 	public static String		Slideout_Map25MarkerOptions_Label_SwapColor_Tooltip;
 	public static String		Slideout_Map25MarkerOptions_Label_Title;
-
-	public static String		Slideout_Map2MapOptions_Label_MapOptions;
-
-	public static String		Slideout_Map2TourColors_Checkbox_ShowInChartToolbar_Tooltip;
-	public static String		Slideout_Map2TourColors_Label_Title;
 
 	public static String		Slideout_MapBookmark_Label_NumBookmarkListItems;
 	public static String		Slideout_MapBookmark_Label_NumBookmarkListItems_Tooltip;

@@ -24,6 +24,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.map2.Messages;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -39,19 +40,19 @@ import de.byteholder.geoclipse.mapprovider.MP;
 
 public class DirectMappingPainter implements IDirectPainter {
 
-	private Map			_map;
-	private TourData	_tourData;
+	private Map							_map;
+	private TourData					_tourData;
 
-	private int			_leftSliderValueIndex;
-	private int			_rightSliderValueIndex;
+	private int							_leftSliderValueIndex;
+	private int							_rightSliderValueIndex;
 
-	private boolean		_isTourVisible;
-	private boolean		_isShowSliderInMap;
-	private boolean		_isShowSliderInLegend;
-	private boolean		_isShowSliderGap;
+	private boolean						_isTourVisible;
+	private boolean						_isShowSliderInMap;
+	private boolean						_isShowSliderInLegend;
+	private SliderRelationPaintingData	_sliderRelationPaintingData;
 
-	private final Image	_imageLeftSlider;
-	private final Image	_imageRightSlider;
+	private final Image					_imageLeftSlider;
+	private final Image					_imageRightSlider;
 
 	/**
 	 * 
@@ -108,8 +109,9 @@ public class DirectMappingPainter implements IDirectPainter {
 			lastValueIndex = rightSliderValueIndex;
 		}
 
-		final int numMaxSegments = 10;
-		final int numSegments = Math.min(numMaxSegments, lastValueIndex - firstValueIndex);
+		final int numMaxSegments = _sliderRelationPaintingData.segments;
+		final float numSlices = lastValueIndex - firstValueIndex;
+		final int numSegments = (int) Math.min(numMaxSegments, numSlices);
 
 		final Rectangle viewport = painterContext.viewport;
 		// get world position for the slider coordinates
@@ -127,17 +129,26 @@ public class DirectMappingPainter implements IDirectPainter {
 		// draw marker for the slider
 		final GC gc = painterContext.gc;
 
-		gc.setAlpha(0x80);
+		// set alpha when requested
+		int alpha = 0xff;
+		final int opacity = _sliderRelationPaintingData.opacity;
+		if (opacity < 100) {
+			alpha = 0xff * opacity / 100;
+		}
 
-		gc.setLineWidth(21);
+		gc.setAlpha(alpha);
+
+		gc.setLineWidth(_sliderRelationPaintingData.lineWidth);
 //		gc.setLineCap(SWT.CAP_ROUND);
 //		gc.setLineCap(SWT.CAP_FLAT);
 //		gc.setLineCap(SWT.CAP_SQUARE);
-		gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+
+		final Color lineColor = new Color(gc.getDevice(), _sliderRelationPaintingData.color);
+		gc.setForeground(lineColor);
 
 		for (int segmentIndex = 1; segmentIndex <= numSegments; segmentIndex++) {
 
-			int nextValueIndex = (lastValueIndex - firstValueIndex) / numSegments * segmentIndex;
+			int nextValueIndex = (int) (numSlices / numSegments * segmentIndex);
 			nextValueIndex += firstValueIndex;
 
 			// get world position for the slider coordinates
@@ -158,7 +169,7 @@ public class DirectMappingPainter implements IDirectPainter {
 			devPosX1 = devPosX2;
 			devPosY1 = devPosY2;
 		}
-
+		lineColor.dispose();
 		gc.setAlpha(0xff);
 
 	}
@@ -295,7 +306,7 @@ public class DirectMappingPainter implements IDirectPainter {
 			drawSliderMarker(painterContext, _rightSliderValueIndex, _imageRightSlider);
 			drawSliderMarker(painterContext, _leftSliderValueIndex, _imageLeftSlider);
 
-			if (_isShowSliderGap) {
+			if (_sliderRelationPaintingData.isShowSliderRelation) {
 
 				// draw it even when the sliders are not visible but the tour can be visible !
 
@@ -317,7 +328,7 @@ public class DirectMappingPainter implements IDirectPainter {
 	 * @param rightSliderValuesIndex
 	 * @param isShowSliderInLegend
 	 * @param isShowSliderInMap
-	 * @param isShowSliderGap
+	 * @param sliderRelationPaintingData
 	 */
 	public void setPaintContext(final Map map,
 								final boolean isTourVisible,
@@ -326,7 +337,8 @@ public class DirectMappingPainter implements IDirectPainter {
 								final int rightSliderValuesIndex,
 								final boolean isShowSliderInMap,
 								final boolean isShowSliderInLegend,
-								final boolean isShowSliderGap) {
+								final SliderRelationPaintingData sliderRelationPaintingData) {
+
 		_map = map;
 		_isTourVisible = isTourVisible;
 		_tourData = tourData;
@@ -334,7 +346,7 @@ public class DirectMappingPainter implements IDirectPainter {
 		_rightSliderValueIndex = rightSliderValuesIndex;
 		_isShowSliderInMap = isShowSliderInMap;
 		_isShowSliderInLegend = isShowSliderInLegend;
-		_isShowSliderGap = isShowSliderGap;
+		_sliderRelationPaintingData = sliderRelationPaintingData;
 	}
 
 }
