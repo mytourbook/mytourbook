@@ -1785,6 +1785,8 @@ public class Messages extends NLS {
 
 	public static String		Slideout_Map2_MapOptions_Checkbox_SliderPath;
 	public static String		Slideout_Map2_MapOptions_Checkbox_SliderPath_Tooltip;
+	public static String		Slideout_Map2_MapOptions_Checkbox_ZoomWithMousePosition;
+	public static String		Slideout_Map2_MapOptions_Checkbox_ZoomWithMousePosition_Tooltip;
 	public static String		Slideout_Map2_MapOptions_Label_SliderPath_Color;
 	public static String		Slideout_Map2_MapOptions_Label_SliderPath_Segements;
 	public static String		Slideout_Map2_MapOptions_Label_SliderPath_Width;

@@ -15,9 +15,11 @@ Improvements
  
   - Sync map with both chart sliders and center the map between the sliders
   - Show a line between both chart sliders  
-  - Set opacity for the tour track, by default tour tracks have now an opacity of 70% !!!, 
-    this can be changed in the map options slideout (this is new) or geo compare view slideout
+  - Set opacity for the tour track (1) 
+  - Zoom + center with the mouse position (1)
   - Show/hide map 2D tour color actions
+
+  (1) can be changed in the the map options slideout (this is new)
 
 * Tour Chart
   

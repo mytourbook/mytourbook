@@ -246,7 +246,8 @@ public class Map extends Canvas {
 	 * Map zoom level which is currently be used to display tiles. Normally a value between around 0
 	 * and 20.
 	 */
-	private int						_mapZoomLevel				= 0;
+	private int						_mapZoomLevel;
+	private boolean					_isZoomWithMousePosition;
 
 	/**
 	 * This image contains the map which is painted in the map viewport
@@ -261,7 +262,7 @@ public class Map extends Canvas {
 	 * looking, very much a product of testing Consider whether this should really be a property or
 	 * not.
 	 */
-	private boolean					_isShowTileInfo				= false;
+	private boolean					_isShowTileInfo;
 	private boolean					_isShowTileBorder;
 
 	/**
@@ -282,22 +283,24 @@ public class Map extends Canvas {
 	 * The overlay to delegate to for painting the "foreground" of the map component. This would
 	 * include painting waypoints, day/night, etc. Also receives mouse events.
 	 */
-	private final List<MapPainter>	_overlays					= new ArrayList<MapPainter>();
+	private final List<MapPainter>	_overlays				= new ArrayList<MapPainter>();
 
-	private final TileLoadObserver	_tileImageLoadObserver		= new TileLoadObserver();
+	private final TileLoadObserver	_tileImageLoadObserver	= new TileLoadObserver();
 
 	private final Cursor			_cursorPan;
 	private final Cursor			_cursorDefault;
 	private final Cursor			_cursorCross;
 
-	private final AtomicInteger		_redrawMapCounter			= new AtomicInteger();
-	private final AtomicInteger		_overlayRunnableCounter		= new AtomicInteger();
+	private final AtomicInteger		_redrawMapCounter		= new AtomicInteger();
+	private final AtomicInteger		_overlayRunnableCounter	= new AtomicInteger();
 
-	private boolean					_isLeftMouseButtonPressed	= false;
+	private boolean					_isLeftMouseButtonPressed;
 	private boolean					_isMapPanned;
 
-	private int						_mouseMovePositionX			= Integer.MIN_VALUE;
-	private int						_mouseMovePositionY			= Integer.MIN_VALUE;
+	private int						_mouseMovePositionX		= Integer.MIN_VALUE;
+	private int						_mouseMovePositionY		= Integer.MIN_VALUE;
+	private int						_mouseMovePositionX_Last;
+	private int						_mouseMovePositionY_Last;
 	private Point					_mouseDownPosition;
 
 	private Thread					_overlayThread;
@@ -336,7 +339,7 @@ public class Map extends Canvas {
 	 */
 	private final ConcurrentLinkedQueue<Tile>	_tileOverlayPaintQueue		= new ConcurrentLinkedQueue<Tile>();
 
-	private boolean								_isRunningDrawOverlay		= false;
+	private boolean								_isRunningDrawOverlay;
 
 	private String								_overlayKey;
 
@@ -350,7 +353,7 @@ public class Map extends Canvas {
 	/**
 	 * when <code>true</code> the overlays are painted
 	 */
-	private boolean								_isDrawOverlays				= false;
+	private boolean								_isDrawOverlays;
 
 	/**
 	 * contains a legend which is painted in the map
@@ -416,7 +419,7 @@ public class Map extends Canvas {
 	// measurement system
 	private float								_distanceUnitValue			= 1;
 	private String								_distanceUnitLabel			= UI.EMPTY_STRING;
-	private boolean								_isScaleVisible				= false;
+	private boolean								_isScaleVisible;
 
 	private final Color							_transparentColor;
 	private final Color							_defaultBackgroundColor;
@@ -424,11 +427,9 @@ public class Map extends Canvas {
 	 * POI image
 	 */
 	private boolean								_isPoiVisible;
-
 	private boolean								_isPoiPositionInViewport;
-
+	//
 	private final Image							_poiImage;
-
 	private final Rectangle						_poiImageBounds;
 	private final Point							_poiImageDevPosition		= new Point(0, 0);
 	/*
@@ -443,19 +444,16 @@ public class Map extends Canvas {
 	 * when <code>true</code> the loading... image is not displayed
 	 */
 	private boolean								_isLiveView;
-	//	private long								_requestedRedrawTime;
 	private long								_lastMapDrawTime;
 
 	/*
 	 * these 4 tile positions correspond to the tiles which are needed to draw the map
 	 */
 	private int									_tilePosMinX;
-
 	private int									_tilePosMaxX;
-
 	private int									_tilePosMinY;
 	private int									_tilePosMaxY;
-
+	//
 	private final Display						_display;
 	private final Thread						_displayThread;
 	//
@@ -467,10 +465,10 @@ public class Map extends Canvas {
 	 * when <code>true</code> the tour is painted in the map in the enhanced mode otherwise in the
 	 * simple mode
 	 */
-	private boolean								_isTourPaintMethodEnhanced	= false;
+	private boolean								_isTourPaintMethodEnhanced;
 	private boolean								_isSelectOfflineArea;
-	private boolean								_isOfflineSelectionStarted	= false;
-	private boolean								_isPaintOfflineArea			= false;
+	private boolean								_isOfflineSelectionStarted;
+	private boolean								_isPaintOfflineArea;
 
 	private Point								_offlineDevAreaStart;
 	private Point								_offlineDevAreaEnd;
@@ -681,6 +679,11 @@ public class Map extends Canvas {
 
 			@Override
 			public void mouseExit(final MouseEvent e) {
+
+				// keep position for out of the map events, e.g. recenter map
+				_mouseMovePositionX_Last = _mouseMovePositionX;
+				_mouseMovePositionY_Last = _mouseMovePositionY;
+
 				// set position out of the map that to tool tip is not activated again
 				_mouseMovePositionX = Integer.MIN_VALUE;
 				_mouseMovePositionY = Integer.MIN_VALUE;
@@ -998,23 +1001,6 @@ public class Map extends Canvas {
 		resetAll();
 	}
 
-//	private Composite createPoiToolTip(final Shell shell) {
-//
-//		final Display display = shell.getDisplay();
-//		final Color bgColor = display.getSystemColor(SWT.COLOR_INFO_BACKGROUND);
-//
-//		final Composite container = new Composite(shell, SWT.NONE);
-//		container.setForeground(display.getSystemColor(SWT.COLOR_INFO_FOREGROUND));
-//		container.setBackground(bgColor);
-//		GridLayoutFactory.swtDefaults().applyTo(container);
-//		{
-//			_poiTTLabel = new Text(container, SWT.WRAP | SWT.READ_ONLY);
-//			_poiTTLabel.setBackground(bgColor);
-//		}
-//
-//		return container;
-//	}
-
 	/**
 	 * hide offline area and all states
 	 */
@@ -1030,34 +1016,6 @@ public class Map extends Canvas {
 
 		redraw();
 	}
-
-//	/**
-//	 * Calculates (and sets) the greatest zoom level, so that all positions are visible on screen.
-//	 * This is useful if you have a bunch of points in an area like a city and you want to zoom out
-//	 * so that the entire city and it's points are visible without panning.
-//	 *
-//	 * @param positions
-//	 *            A set of GeoPositions to calculate the new zoom from
-//	 */
-//	public void calculateZoomFrom(final Set<GeoPosition> positions) {
-//		if (positions.size() < 2) {
-//			return;
-//		}
-//
-//		int zoom = _MP.getMinimumZoomLevel();
-//		Rectangle rect = getBoundingRect(positions, zoom);
-//
-//		while (getViewport().contains(rect) && zoom < _MP.getMaximumZoomLevel()) {
-//			zoom++;
-//			rect = getBoundingRect(positions, zoom);
-//		}
-//		final Point2D center = new Point2D.Double(rect.getCenterX(), rect.getCenterY());
-//
-//		setMapPixelCenter(_MP.pixelToGeo(center, zoom), center);
-//		setZoom(zoom);
-//
-//		queueMapRedraw();
-//	}
 
 	/**
 	 * Disposes all overlay image cache and the overlay painting queue
@@ -1805,6 +1763,10 @@ public class Map extends Canvas {
 
 		_mouseMovePositionX = mouseEvent.x;
 		_mouseMovePositionY = mouseEvent.y;
+
+		// keep position for out of the map events, e.g. recenter map
+		_mouseMovePositionX_Last = _mouseMovePositionX;
+		_mouseMovePositionY_Last = _mouseMovePositionY;
 
 		if (_isSelectOfflineArea) {
 
@@ -3758,6 +3720,10 @@ public class Map extends Canvas {
 		_directMapPainter = directPainter;
 	}
 
+	public void setIsZoomWithMousePosition(final boolean isZoomWithMousePosition) {
+		_isZoomWithMousePosition = isZoomWithMousePosition;
+	}
+
 	/**
 	 * Set the legend for the map, the legend image will be disposed when the map is disposed,
 	 * 
@@ -3833,56 +3799,6 @@ public class Map extends Canvas {
 
 		fireMousePosition();
 	}
-
-	/*
-	 * keep old method because it is not easy to understand
-	 */
-//	/**
-//	 * Sets the center of the map in pixel coordinates.
-//	 *
-//	 * @param worldPixelCenter
-//	 */
-//	private void setMapCenterInWorldPixelOLD(Point2D worldPixelCenter) {
-//
-//		/*
-//		 * check if the center is within the map
-//		 */
-//
-//		final int viewportPixelHeight = getWorldPixelViewport().height;
-//
-//		final Rectangle newTopLeftPixelVP = getWorldPixelTopLeftViewport(worldPixelCenter);
-//
-//		// don't let the user pan over the top edge
-//		if (newTopLeftPixelVP.y < 0) {
-//			final double centerY = viewportPixelHeight / 2d;
-//			worldPixelCenter = new Point2D.Double(worldPixelCenter.getX(), centerY);
-//		}
-//
-//		// don't let the user pan over the bottom edge
-//		final Dimension mapTileSize = _mp.getMapTileSize(_mapZoomLevel);
-//		final int mapHeight = (int) mapTileSize.getHeight() * _mp.getTileSize();
-//
-//		if (newTopLeftPixelVP.y + newTopLeftPixelVP.height > mapHeight) {
-//			final double centerY = mapHeight - viewportPixelHeight / 2;
-//			worldPixelCenter = new Point2D.Double(worldPixelCenter.getX(), centerY);
-//		}
-//
-//		// if map is too small then just center it
-//		if (mapHeight < newTopLeftPixelVP.height) {
-//			final double centerY = mapHeight / 2d;
-//			worldPixelCenter = new Point2D.Double(worldPixelCenter.getX(), centerY);
-//		}
-//
-//		_worldPixelMapCenter = worldPixelCenter;
-//
-//		fireMousePosition();
-//
-//		/*
-//		 * hide previous offline area when map position has changed because the area has no absolute
-//		 * position
-//		 */
-////		_currentOfflineArea = null;
-//	}
 
 	/**
 	 * Set map context menu provider
@@ -4186,16 +4102,6 @@ public class Map extends Canvas {
 		}
 	}
 
-//	public void setPhoto(final Photo photo) {
-//
-//		final GeoPosition geoPosition = photo.getGeoPosition();
-//		if (geoPosition == null) {
-//			return;
-//		}
-//
-//		setMapCenter(geoPosition);
-//	}
-
 	/**
 	 * Set if the tile borders should be drawn. Mainly used for debugging.
 	 * 
@@ -4305,14 +4211,14 @@ public class Map extends Canvas {
 		final Dimension oldMapTileSize = _mp.getMapTileSize(oldZoomLevel);
 
 		// check if map is initialized or zoom level has not changed
-		Point2D wpOldMapCenter = _worldPixelMapCenter;
-		if (wpOldMapCenter == null) {
+		Point2D wpCurrentMapCenter = _worldPixelMapCenter;
+		if (wpCurrentMapCenter == null) {
 
 			// setup map center
 
 			initMap();
 
-			wpOldMapCenter = _worldPixelMapCenter;
+			wpCurrentMapCenter = _worldPixelMapCenter;
 		}
 
 		_mapZoomLevel = adjustedZoomLevel;
@@ -4323,11 +4229,28 @@ public class Map extends Canvas {
 		final double relativeWidth = (double) _mapTileSize.width / oldMapTileSize.width;
 		final double relativeHeight = (double) _mapTileSize.height / oldMapTileSize.height;
 
-		final Point2D.Double newWorldPixelCenter = new Point2D.Double(//
-				wpOldMapCenter.getX() * relativeWidth,
-				wpOldMapCenter.getY() * relativeHeight);
+		Point2D.Double wpNewMapCenter;
 
-		setMapCenterInWorldPixel(newWorldPixelCenter);
+		if (_isZoomWithMousePosition) {
+
+			// set map center to the current mouse position
+
+			final Rectangle wpViewPort = _worldPixelTopLeftViewport;
+
+			wpCurrentMapCenter = new Point2D.Double(
+					wpViewPort.x + _mouseMovePositionX_Last,
+					wpViewPort.y + _mouseMovePositionY_Last);
+
+		} else {
+
+			// zoom behaviour until 18.5
+		}
+
+		wpNewMapCenter = new Point2D.Double(//
+				wpCurrentMapCenter.getX() * relativeWidth,
+				wpCurrentMapCenter.getY() * relativeHeight);
+
+		setMapCenterInWorldPixel(wpNewMapCenter);
 
 		updateViewPortData();
 

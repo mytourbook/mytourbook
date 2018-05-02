@@ -203,6 +203,8 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	private static final String		STATE_IS_SYNC_WITH_PHOTO						= "STATE_IS_SYNC_WITH_PHOTO";							//$NON-NLS-1$
 	private static final String		STATE_IS_SYNC_WITH_TOURCHART_SLIDER				= "STATE_IS_SYNC_WITH_TOURCHART_SLIDER";				//$NON-NLS-1$
 	private static final String 	STATE_IS_SYNC_WITH_TOURCHART_SLIDER_IS_CENTERED	= "STATE_IS_SYNC_WITH_TOURCHART_SLIDER_IS_CENTERED";	//$NON-NLS-1$
+	static final String				STATE_IS_ZOOM_WITH_MOUSE_POSITION 				= "STATE_IS_ZOOM_WITH_MOUSE_POSITION";					//$NON-NLS-1$
+	static final boolean 			STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT 		= true;
 	
 	private static final String		MEMENTO_SHOW_START_END_IN_MAP				= "action.show-start-end-in-map";			//$NON-NLS-1$
 	private static final String		MEMENTO_SHOW_TOUR_MARKER					= "action.show-tour-marker";				//$NON-NLS-1$
@@ -265,6 +267,8 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			MapGraphId.Speed,
 			MapGraphId.HrZone,
 	};
+
+
 
 	private final IPreferenceStore				_prefStore							= TourbookPlugin.getPrefStore();
 	private final IDialogSettings				_state								= TourbookPlugin.getState(ID);
@@ -3160,6 +3164,10 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	}
 
 	void restoreState_Map2Options(final boolean isUpdateMapUI) {
+
+		_map.setIsZoomWithMousePosition(Util.getStateBoolean(_state,
+				Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION,
+				Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT));
 
 		_sliderRelationPaintingData = new SliderRelationPaintingData();
 
