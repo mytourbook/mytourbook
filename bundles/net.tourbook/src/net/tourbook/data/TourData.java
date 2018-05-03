@@ -647,13 +647,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	private int							rearShiftCount;
 
-	// ############################################# GEO POSITIONS #############################################
+	// ############################################# GEO BOUNDS #############################################
 
-//	private double						latitudeMin							= Double.MIN_VALUE;				// db-version 34
-//	private double						latitudeMax							= Double.MIN_VALUE;				// db-version 34
-//	private double						longitudeMin						= Double.MIN_VALUE;				// db-version 34
-//	private double						longitudeMax						= Double.MIN_VALUE;				// db-version 34
+    /*
+     * The geo bound values are in microdegrees (degrees * 10^6).
+     */
 
+//	private int							latitudeE6Min;								// db-version 34
+//	private int							longitudE6eMin;								// db-version 34
+//	private int							latitudeE6Max;								// db-version 34
+//	private int							longitudE6eMax;								// db-version 34
+ 
+	
 	// ############################################# UNUSED FIELDS - START #############################################
 	/**
 	 * ssss distance msw
@@ -5879,6 +5884,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 		return UI.EMPTY_STRING;
 	}
+
+//	public int getLatitudeE6Max() {
+//		return latitudeE6Max;
+//	}
+//
+//	public int getLatitudeE6Min() {
+//		return latitudeE6Min;
+//	}
+//
+//	public int getLongitudE6eMax() {
+//		return longitudE6eMax;
+//	}
+//
+//	public int getLongitudE6eMin() {
+//		return longitudE6eMin;
+//	}
 
 	/**
 	 * @return the maxAltitude

@@ -778,28 +778,28 @@
 				commandId="net.tourbook.command.OpenHomePage"
 				label="%Command_App_OpenHomePage"
 				mnemonic="%Command_App_OpenHomePage_Mnemonic"/>
-			
+
 			<!-- Forum  -->
 			<command
 				commandId="net.tourbook.command.OpenForum"
 				label="%Command_App_OpenForum"
 				mnemonic="%Command_App_OpenForum_Mnemonic"/>
-			
+
 			<separator
 				name="g_SoftwareUpdate"
 				visible="true"/>
-				
+
 			<separator
 				name="g_Log"
 				visible="true"/>
-				
+
 			<!-- Tour Log-->
 			<command
 				commandId="command.net.tourbook.tour.TourLogView"
 				icon="icons/tour-log.png"
 				label="%Command_TourLog_View"
 				mnemonic="%Command_TourLog_View_Mnemonic"/>
-			
+
 			<!-- Error Log -->
 			<command
 				commandId="org.eclipse.ui.views.showView"
@@ -807,20 +807,27 @@
 				label="%command_error_view"
 				mnemonic="%command_error_view_mnemonic"
 				style="push">
-			
+
 				<parameter
 					name="org.eclipse.ui.views.showView.viewId"
 					value="org.eclipse.pde.runtime.LogView">
 				</parameter>
 			</command>
-			
+
 			<!-- Database Consistency Check -->
 			<command
-				commandId="net.tourbook.command.dbTool.consistencyCheck"
-				label="%command_dbtool_consistency_check"
-				mnemonic="%command_dbtool_consistency_check_mnemonic"
-				style="push"/>
-			
+				commandId	="net.tourbook.command.dbTool.consistencyCheck"
+				label		="%command_dbtool_consistency_check"
+				mnemonic	="%command_dbtool_consistency_check_mnemonic"
+				style		="push"/>
+
+			<!-- Compress Database -->
+			<command
+				commandId	="net.tourbook.command.dbTool.CompressDB"
+				label		="%Command_DbTool_Compress_Database"
+				mnemonic	="%Command_DbTool_Compress_Database_Mnemonic"
+				style		="push"/>
+
 		</menuContribution>
 
    </extension>
@@ -1276,11 +1283,19 @@
             name="%command_createNewTour"
             defaultHandler="net.tourbook.ui.action.ActionHandlerCreateNewTour"
             />
-      <command
-            id="net.tourbook.command.dbTool.consistencyCheck"
-            name="%command_dbtool_consistency_check"
-            defaultHandler="net.tourbook.ui.action.ActionHandlerDbConsistencyCheck"
-            />
+
+		<command
+			id				="net.tourbook.command.dbTool.consistencyCheck"
+			name			="%command_dbtool_consistency_check"
+			defaultHandler	="net.tourbook.ui.action.ActionHandlerDbConsistencyCheck"
+		/>
+
+		<command
+			id				="net.tourbook.command.dbTool.CompressDB"
+			name			="%Command_DbTool_Compress_Database"
+			defaultHandler	="net.tourbook.ui.action.ActionHandlerDb_CompressDB"
+		/>
+
       <command
             id="net.tourbook.command.OpenHomePage"
             name="%Command_App_OpenHomePage"

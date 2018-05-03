@@ -2045,7 +2045,7 @@ public class TourDatabase {
 
 	private static void saveTour_GeoParts(final TourData tourData) {
 
-		final long startTime = System.nanoTime();
+//		final long startTime = System.nanoTime();
 
 		Connection conn = null;
 		PreparedStatement deleteStmt = null;
@@ -2064,7 +2064,6 @@ public class TourDatabase {
 			/*
 			 * Delete old geo parts
 			 */
-
 			sql = "DELETE FROM " + TABLE_TOUR_GEO_PARTS + " WHERE tourId=?"; //$NON-NLS-1$ //$NON-NLS-2$
 
 			deleteStmt = conn.prepareStatement(sql);
@@ -2074,7 +2073,6 @@ public class TourDatabase {
 			/*
 			 * Save new geo parts
 			 */
-
 			tourData.computeGeo_Grid();
 			tourGeoParts = tourData.geoGrid;
 
@@ -2387,7 +2385,7 @@ public class TourDatabase {
 	 * 
 	 * @param stmt
 	 * @throws SQLException
-	 * @since Db version 29
+	 * @since Db version 33
 	 */
 	private void createIndex_TourData_033(final Statement stmt) throws SQLException {
 
@@ -2404,6 +2402,32 @@ public class TourDatabase {
 		 */
 		sql = "CREATE INDEX StartWeekYear ON " + TABLE_TOUR_DATA + " (StartWeekYear)"; //$NON-NLS-1$ //$NON-NLS-2$
 		exec(stmt, sql);
+	}
+
+	/**
+	 * Create index for {@link TourData}. *
+	 * <p>
+	 * 
+	 * @param stmt
+	 * @throws SQLException
+	 * @since Db version 34
+	 */
+	private void createIndex_TourData_034(final Statement stmt) throws SQLException {
+
+		String sql;
+
+		sql = "CREATE INDEX LatitudeE6Min ON " + TABLE_TOUR_DATA + " (LatitudeE6Min)"; //$NON-NLS-1$ //$NON-NLS-2$
+		exec(stmt, sql);
+
+		sql = "CREATE INDEX LatitudeE6Max ON " + TABLE_TOUR_DATA + " (LatitudeE6Max)"; //$NON-NLS-1$ //$NON-NLS-2$
+		exec(stmt, sql);
+
+		sql = "CREATE INDEX LongitudeE6Min ON " + TABLE_TOUR_DATA + " (LongitudeE6Min)"; //$NON-NLS-1$ //$NON-NLS-2$
+		exec(stmt, sql);
+
+		sql = "CREATE INDEX LongitudeE6Max ON " + TABLE_TOUR_DATA + " (LongitudeE6Max)"; //$NON-NLS-1$ //$NON-NLS-2$
+		exec(stmt, sql);
+
 	}
 
 	/**
@@ -2717,6 +2741,15 @@ public class TourDatabase {
 				//
 				// version 32 end ---------
 
+				// version 34 start  -  18.5
+				//
+				+ "	LatitudeE6Min							INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
+				+ "	LatitudeE6Max							INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
+				+ "	LongitudeE6Min							INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
+				+ "	LongitudeE6Max							INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
+				//
+				// version 34 end ---------
+
 				+ "	serieData				BLOB 															\n" //$NON-NLS-1$
 
 				+ ")"); //$NON-NLS-1$
@@ -2725,6 +2758,7 @@ public class TourDatabase {
 		createIndex_TourData_022(stmt);
 		createIndex_TourData_029(stmt);
 		createIndex_TourData_033(stmt);
+		createIndex_TourData_034(stmt);
 	}
 
 	/**
@@ -6315,8 +6349,21 @@ public class TourDatabase {
 
 		final Statement stmt = conn.createStatement();
 		{
+			// double check if db already updated
 			if (!isTableAvailable(conn, TABLE_TOUR_GEO_PARTS)) {
+
 				createTable_TourGeoParts(stmt);
+
+				/*
+				 * Create geo bound fields/index
+				 */
+				SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "LatitudeE6Min", DEFAULT_0); //$NON-NLS-1$
+				SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "LongitudeE6Min", DEFAULT_0); //$NON-NLS-1$
+
+				SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "LatitudeE6Max", DEFAULT_0); //$NON-NLS-1$
+				SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "LongitudeE6Max", DEFAULT_0); //$NON-NLS-1$
+
+				createIndex_TourData_034(stmt);
 			}
 		}
 		stmt.close();
@@ -6379,7 +6426,10 @@ public class TourDatabase {
 				final TourData tourData = em.find(TourData.class, tourId);
 
 				if (tourData != null) {
+
 					saveTour_GeoParts(tourData);
+
+//					final GeoPosition[] geoBounds = tourData.computeGeo_Bounds();
 				}
 			}
 

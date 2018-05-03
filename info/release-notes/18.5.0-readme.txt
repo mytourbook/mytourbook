@@ -24,7 +24,15 @@ Improvements
 * Tour Chart
   
   - Show/hide tour chart graph actions
- 
+
+
+System
+======
+
+* Tour Database
+  
+  - Action to compress tour database, a backup before running the tool is strongly recommended !!!
+   
  
 Bugfix
 ======
