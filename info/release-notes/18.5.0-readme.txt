@@ -1,6 +1,23 @@
 Version 18.5.0                                             ?. May 2018
 
 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+UPDATE DOCU SQL EXPLORER   
+   
+   org.apache.derby_10.11.1.1_mt_15_3_0.jar
+   
+   
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+
+
+
+
+
 New
 ===	
 
@@ -42,3 +59,4 @@ Bugfix
   - Fixed out of bounds exception when a tour calendar week year was in the previous year than the tour year.
     This was introduced with the tour tag filter
    
+
