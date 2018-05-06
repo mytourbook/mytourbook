@@ -1,7 +1,7 @@
 
-##################################
-1 Click build process (since 18.1)
-##################################
+####################################
+One Click build process (since 18.1)
+####################################
 
 * Set version number as described below (Build with POM)
 * Set version number in gradle.properties in the .git root
