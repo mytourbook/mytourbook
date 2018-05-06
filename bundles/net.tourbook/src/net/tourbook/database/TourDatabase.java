@@ -55,7 +55,6 @@ import net.tourbook.application.MyTourbookSplashHandler;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.NIO;
 import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourBike;
@@ -2405,31 +2404,30 @@ public class TourDatabase {
 		exec(stmt, sql);
 	}
 
-	/**
-	 * Create index for {@link TourData}. *
-	 * <p>
-	 * 
-	 * @param stmt
-	 * @throws SQLException
-	 * @since Db version 34
-	 */
-	private void createIndex_TourData_034(final Statement stmt) throws SQLException {
-
-		String sql;
-
-		sql = "CREATE INDEX LatitudeE6Min ON " + TABLE_TOUR_DATA + " (LatitudeE6Min)"; //$NON-NLS-1$ //$NON-NLS-2$
-		exec(stmt, sql);
-
-		sql = "CREATE INDEX LatitudeE6Max ON " + TABLE_TOUR_DATA + " (LatitudeE6Max)"; //$NON-NLS-1$ //$NON-NLS-2$
-		exec(stmt, sql);
-
-		sql = "CREATE INDEX LongitudeE6Min ON " + TABLE_TOUR_DATA + " (LongitudeE6Min)"; //$NON-NLS-1$ //$NON-NLS-2$
-		exec(stmt, sql);
-
-		sql = "CREATE INDEX LongitudeE6Max ON " + TABLE_TOUR_DATA + " (LongitudeE6Max)"; //$NON-NLS-1$ //$NON-NLS-2$
-		exec(stmt, sql);
-
-	}
+//	/**
+//	 * Create index for {@link TourData}. *
+//	 * <p>
+//	 *
+//	 * @param stmt
+//	 * @throws SQLException
+//	 * @since Db version 34
+//	 */
+//	private void createIndex_TourData_034(final Statement stmt) throws SQLException {
+//
+//		String sql;
+//
+//		sql = "CREATE INDEX LatitudeE6Min ON " + TABLE_TOUR_DATA + " (LatitudeE6Min)"; //$NON-NLS-1$ //$NON-NLS-2$
+//		exec(stmt, sql);
+//
+//		sql = "CREATE INDEX LatitudeE6Max ON " + TABLE_TOUR_DATA + " (LatitudeE6Max)"; //$NON-NLS-1$ //$NON-NLS-2$
+//		exec(stmt, sql);
+//
+//		sql = "CREATE INDEX LongitudeE6Min ON " + TABLE_TOUR_DATA + " (LongitudeE6Min)"; //$NON-NLS-1$ //$NON-NLS-2$
+//		exec(stmt, sql);
+//
+//		sql = "CREATE INDEX LongitudeE6Max ON " + TABLE_TOUR_DATA + " (LongitudeE6Max)"; //$NON-NLS-1$ //$NON-NLS-2$
+//		exec(stmt, sql);
+//	}
 
 	/**
 	 * create table {@link #TABLE_TOUR_BIKE}
@@ -2759,7 +2757,7 @@ public class TourDatabase {
 		createIndex_TourData_022(stmt);
 		createIndex_TourData_029(stmt);
 		createIndex_TourData_033(stmt);
-		createIndex_TourData_034(stmt);
+//		createIndex_TourData_034(stmt);
 	}
 
 	/**
@@ -6355,16 +6353,16 @@ public class TourDatabase {
 
 				createTable_TourGeoParts(stmt);
 
-				/*
-				 * Create geo bound fields/index
-				 */
-				SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "LatitudeE6Min", DEFAULT_0); //$NON-NLS-1$
-				SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "LongitudeE6Min", DEFAULT_0); //$NON-NLS-1$
-
-				SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "LatitudeE6Max", DEFAULT_0); //$NON-NLS-1$
-				SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "LongitudeE6Max", DEFAULT_0); //$NON-NLS-1$
-
-				createIndex_TourData_034(stmt);
+//				/*
+//				 * Create geo bound fields/index
+//				 */
+//				SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "LatitudeE6Min", DEFAULT_0); //$NON-NLS-1$
+//				SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "LongitudeE6Min", DEFAULT_0); //$NON-NLS-1$
+//
+//				SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "LatitudeE6Max", DEFAULT_0); //$NON-NLS-1$
+//				SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "LongitudeE6Max", DEFAULT_0); //$NON-NLS-1$
+//
+//				createIndex_TourData_034(stmt);
 			}
 		}
 		stmt.close();
