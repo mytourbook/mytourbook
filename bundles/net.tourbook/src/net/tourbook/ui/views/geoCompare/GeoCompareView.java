@@ -1108,8 +1108,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 				 */
 				{
 					final Label label = new Label(container, SWT.NONE);
-					label.setText("Geo grids");
-					label.setToolTipText("Number of geo squares (1.57 km / 1 mi)");
+					label.setText("Geo parts");
+					label.setToolTipText("Number of geo squares (~ 1.6 km / 1 mi)");
 
 				}
 				{

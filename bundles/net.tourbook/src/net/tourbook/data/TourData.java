@@ -654,9 +654,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
      */
 
 //	private int							latitudeE6Min;								// db-version 34
-//	private int							longitudE6eMin;								// db-version 34
+//	private int							longitudE6Min;								// db-version 34
 //	private int							latitudeE6Max;								// db-version 34
-//	private int							longitudE6eMax;								// db-version 34
+//	private int							longitudE6Max;								// db-version 34
  
 	
 	// ############################################# UNUSED FIELDS - START #############################################
@@ -5894,11 +5894,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 //	}
 //
 //	public int getLongitudE6eMax() {
-//		return longitudE6eMax;
+//		return longitudE6Max;
 //	}
 //
-//	public int getLongitudE6eMin() {
-//		return longitudE6eMin;
+//	public int getLongitudE6Min() {
+//		return longitudE6Min;
 //	}
 
 	/**

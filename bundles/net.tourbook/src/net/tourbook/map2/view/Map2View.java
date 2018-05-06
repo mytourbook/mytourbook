@@ -404,7 +404,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	private ActionPhotoProperties			_actionPhotoFilter;
 	private ActionReloadFailedMapImages		_actionReloadFailedMapImages;
 	private ActionSaveDefaultPosition		_actionSaveDefaultPosition;
-	private ActionSelectGeoCompareArea		_actionSelectGeoCompareArea;
+//	private ActionSelectGeoCompareArea		_actionSelectGeoCompareArea;
 	private ActionSelectMapProvider			_actionSelectMapProvider;
 	private ActionSetDefaultPosition		_actionSetDefaultPosition;
 	private ActionShowAllFilteredPhotos		_actionShowAllFilteredPhotos;
@@ -1308,7 +1308,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_actionManageProvider = new ActionManageMapProviders(this);
 
 		_actionMapBookmarks = new ActionMapBookmarks(this._parent, this);
-		_actionSelectGeoCompareArea = new ActionSelectGeoCompareArea();
+//		_actionSelectGeoCompareArea = new ActionSelectGeoCompareArea();
 	}
 
 	/**
@@ -1746,9 +1746,9 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		menuMgr.add(_actionShowStartEndInMap);
 		menuMgr.add(_actionShowTourInfoInMap);
 
-		menuMgr.add(new Separator());
-
-		menuMgr.add(_actionSelectGeoCompareArea);
+//		menuMgr.add(new Separator());
+//
+//		menuMgr.add(_actionSelectGeoCompareArea);
 
 		menuMgr.add(new Separator());
 

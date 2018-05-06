@@ -9,6 +9,9 @@ UPDATE DOCU SQL EXPLORER
    org.apache.derby_10.11.1.1_mt_15_3_0.jar
    
    
+   user and pw must not be empty
+   
+   
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 

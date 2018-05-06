@@ -55,6 +55,7 @@ import net.tourbook.application.MyTourbookSplashHandler;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.NIO;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourBike;
@@ -166,7 +167,7 @@ public class TourDatabase {
 	public static final String			TABLE_TOUR_TAG_CATEGORY						= "TOURTAGCATEGORY";											//$NON-NLS-1$
 	public static final String			TABLE_TOUR_TYPE								= "TOURTYPE";													//$NON-NLS-1$
 	public static final String			TABLE_TOUR_WAYPOINT							= "TOURWAYPOINT";												//$NON-NLS-1$
-	public static final String			TABLE_TOUR_GEO_PARTS						= "Tour_GeoParts";												//$NON-NLS-1$
+	public static final String			TABLE_TOUR_GEO_PARTS						= "TourGeoParts";												//$NON-NLS-1$
 	
 //	public static final String			JOINTABLE__TOURDATA__SHAREDMARKER			= TABLE_TOUR_DATA			+ "_" + TABLE_SHARED_MARKER;		//$NON-NLS-1$
 	public static final String			JOINTABLE__TOURDATA__TOURTAG				= TABLE_TOUR_DATA			+ "_" + TABLE_TOUR_TAG;				//$NON-NLS-1$
@@ -2743,10 +2744,10 @@ public class TourDatabase {
 
 				// version 34 start  -  18.5
 				//
-				+ "	LatitudeE6Min							INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
-				+ "	LatitudeE6Max							INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
-				+ "	LongitudeE6Min							INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
-				+ "	LongitudeE6Max							INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
+				//				+ "	LatitudeE6Min							INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
+				//				+ "	LatitudeE6Max							INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
+				//				+ "	LongitudeE6Min							INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
+				//				+ "	LongitudeE6Max							INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
 				//
 				// version 34 end ---------
 
