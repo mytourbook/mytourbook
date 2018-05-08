@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1073,11 +1073,11 @@ public class CalendarProfileManager {
 			@Override
 			String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
 
-				if (data.recordingTime > 0 && data.distance > 0) {
+				if (data.drivingTime > 0 && data.distance > 0) {
 
 					final float pace = data.distance == 0
 							? 0
-							: 1000 * data.recordingTime / data.distance * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+							: 1000 * data.drivingTime / data.distance * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
 					final String valueText = UI.format_mm_ss((long) pace);
 
@@ -1123,11 +1123,11 @@ public class CalendarProfileManager {
 			@Override
 			String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
 
-				if (data.distance > 0 && data.recordingTime > 0) {
+				if (data.distance > 0 && data.drivingTime > 0) {
 
 					final float speed = data.distance == 0
 							? 0
-							: data.distance / (data.recordingTime / 3.6f);
+							: data.distance / (data.drivingTime / 3.6f);
 
 					final String valueText = valueFormatter.printDouble(speed);
 
@@ -1183,7 +1183,7 @@ public class CalendarProfileManager {
 			@Override
 			String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
 
-				if (data.recordingTime > 0) {
+				if (data.drivingTime > 0) {
 
 					final String valueText = valueFormatter.printLong(data.drivingTime);
 
