@@ -11,7 +11,7 @@
 			<arguments>
 				<dictionary>
 					<key>LaunchConfigHandle</key>
-					<value>&lt;project&gt;/.externalToolBuilders/tern.eclipse.ide.core.ternBuilder.launch</value>
+					<value>&lt;project&gt;/.externalToolBuilders/tern.eclipse.ide.core.ternBuilder (1).launch</value>
 				</dictionary>
 			</arguments>
 		</buildCommand>
@@ -21,7 +21,7 @@
 			<arguments>
 				<dictionary>
 					<key>LaunchConfigHandle</key>
-					<value>&lt;project&gt;/.externalToolBuilders/org.eclipse.wst.jsdt.core.javascriptValidator.launch</value>
+					<value>&lt;project&gt;/.externalToolBuilders/org.eclipse.wst.jsdt.core.javascriptValidator (1).launch</value>
 				</dictionary>
 			</arguments>
 		</buildCommand>
@@ -46,7 +46,7 @@
 			<arguments>
 				<dictionary>
 					<key>LaunchConfigHandle</key>
-					<value>&lt;project&gt;/.externalToolBuilders/org.eclipse.babel.editor.rbeBuilder (2).launch</value>
+					<value>&lt;project&gt;/.externalToolBuilders/org.eclipse.babel.editor.rbeBuilder (3).launch</value>
 				</dictionary>
 			</arguments>
 		</buildCommand>
