@@ -104,8 +104,9 @@ public class TourDatabase {
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int			TOURBOOK_DB_VERSION							= 34;
-//	private static final int			TOURBOOK_DB_VERSION							= 34;	// 18.?
+	private static final int			TOURBOOK_DB_VERSION							= 35;
+//	private static final int			TOURBOOK_DB_VERSION							= 35;	// 18.?
+//	private static final int			TOURBOOK_DB_VERSION							= 34;	// 18.5
 //	private static final int			TOURBOOK_DB_VERSION							= 33;	// 17.12
 //	private static final int			TOURBOOK_DB_VERSION							= 32;	// 16.10
 //	private static final int			TOURBOOK_DB_VERSION							= 31;	// 16.5
@@ -2404,30 +2405,30 @@ public class TourDatabase {
 		exec(stmt, sql);
 	}
 
-//	/**
-//	 * Create index for {@link TourData}. *
-//	 * <p>
-//	 *
-//	 * @param stmt
-//	 * @throws SQLException
-//	 * @since Db version 34
-//	 */
-//	private void createIndex_TourData_034(final Statement stmt) throws SQLException {
-//
-//		String sql;
-//
-//		sql = "CREATE INDEX LatitudeE6Min ON " + TABLE_TOUR_DATA + " (LatitudeE6Min)"; //$NON-NLS-1$ //$NON-NLS-2$
-//		exec(stmt, sql);
-//
-//		sql = "CREATE INDEX LatitudeE6Max ON " + TABLE_TOUR_DATA + " (LatitudeE6Max)"; //$NON-NLS-1$ //$NON-NLS-2$
-//		exec(stmt, sql);
-//
-//		sql = "CREATE INDEX LongitudeE6Min ON " + TABLE_TOUR_DATA + " (LongitudeE6Min)"; //$NON-NLS-1$ //$NON-NLS-2$
-//		exec(stmt, sql);
-//
-//		sql = "CREATE INDEX LongitudeE6Max ON " + TABLE_TOUR_DATA + " (LongitudeE6Max)"; //$NON-NLS-1$ //$NON-NLS-2$
-//		exec(stmt, sql);
-//	}
+	/**
+	 * Create index for {@link TourData}. *
+	 * <p>
+	 *
+	 * @param stmt
+	 * @throws SQLException
+	 * @since Db version 35
+	 */
+	private void createIndex_TourData_035(final Statement stmt) throws SQLException {
+
+		String sql;
+
+		sql = "CREATE INDEX LatitudeMinE6 ON " + TABLE_TOUR_DATA + " (LatitudeMinE6)"; //$NON-NLS-1$ //$NON-NLS-2$
+		exec(stmt, sql);
+
+		sql = "CREATE INDEX LatitudeMaxE6 ON " + TABLE_TOUR_DATA + " (LatitudeMaxE6)"; //$NON-NLS-1$ //$NON-NLS-2$
+		exec(stmt, sql);
+
+		sql = "CREATE INDEX LongitudeMinE6 ON " + TABLE_TOUR_DATA + " (LongitudeMinE6)"; //$NON-NLS-1$ //$NON-NLS-2$
+		exec(stmt, sql);
+
+		sql = "CREATE INDEX LongitudeMaxE6 ON " + TABLE_TOUR_DATA + " (LongitudeMaxE6)"; //$NON-NLS-1$ //$NON-NLS-2$
+		exec(stmt, sql);
+	}
 
 	/**
 	 * create table {@link #TABLE_TOUR_BIKE}
@@ -2729,8 +2730,8 @@ public class TourDatabase {
 
 				// version 31 start  -  16.5
 				//
-				+ "	CadenceMultiplier						FLOAT DEFAULT 1.0,								\n" //$NON-NLS-1$
-				+ " IsStrideSensorPresent					INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
+				+ "	CadenceMultiplier		FLOAT DEFAULT 1.0,												\n" //$NON-NLS-1$
+				+ " IsStrideSensorPresent	INTEGER DEFAULT 0,												\n" //$NON-NLS-1$
 				//
 				// version 31 end ---------
 
@@ -2740,14 +2741,14 @@ public class TourDatabase {
 				//
 				// version 32 end ---------
 
-				// version 34 start  -  18.5
+				// version 35 start  -  18.?
 				//
-				//				+ "	LatitudeE6Min							INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
-				//				+ "	LatitudeE6Max							INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
-				//				+ "	LongitudeE6Min							INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
-				//				+ "	LongitudeE6Max							INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
+				+ "	LatitudeMinE6			INTEGER DEFAULT 0,												\n" //$NON-NLS-1$
+				+ "	LatitudeMaxE6			INTEGER DEFAULT 0,												\n" //$NON-NLS-1$
+				+ "	LongitudeMinE6			INTEGER DEFAULT 0,												\n" //$NON-NLS-1$
+				+ "	LongitudeMaxE6			INTEGER DEFAULT 0,												\n" //$NON-NLS-1$
 				//
-				// version 34 end ---------
+				// version 35 end ---------
 
 				+ "	serieData				BLOB 															\n" //$NON-NLS-1$
 
@@ -2757,7 +2758,7 @@ public class TourDatabase {
 		createIndex_TourData_022(stmt);
 		createIndex_TourData_029(stmt);
 		createIndex_TourData_033(stmt);
-//		createIndex_TourData_034(stmt);
+		createIndex_TourData_035(stmt);
 	}
 
 	/**
@@ -4314,6 +4315,15 @@ public class TourDatabase {
 			}
 
 			/*
+			 * 34 -> 35
+			 */
+			boolean isPostUpdate35 = false;
+			if (currentDbVersion == 34) {
+				isPostUpdate35 = true;
+				currentDbVersion = newVersion = updateDbDesign_034_to_035(conn, monitor);
+			}
+
+			/*
 			 * update version number
 			 */
 			updateDbDesign_VersionNumber(conn, newVersion);
@@ -4361,6 +4371,9 @@ public class TourDatabase {
 			}
 			if (isPostUpdate34) {
 				updateDbDesign_033_to_034_PostUpdate(conn, monitor);
+			}
+			if (isPostUpdate35) {
+				updateDbDesign_034_to_035_PostUpdate(conn, monitor);
 			}
 
 		} catch (final SQLException e) {
@@ -6349,20 +6362,9 @@ public class TourDatabase {
 		final Statement stmt = conn.createStatement();
 		{
 			// double check if db already updated
-			if (!isTableAvailable(conn, TABLE_TOUR_GEO_PARTS)) {
+			if (isTableAvailable(conn, TABLE_TOUR_GEO_PARTS) == false) {
 
 				createTable_TourGeoParts(stmt);
-
-//				/*
-//				 * Create geo bound fields/index
-//				 */
-//				SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "LatitudeE6Min", DEFAULT_0); //$NON-NLS-1$
-//				SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "LongitudeE6Min", DEFAULT_0); //$NON-NLS-1$
-//
-//				SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "LatitudeE6Max", DEFAULT_0); //$NON-NLS-1$
-//				SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "LongitudeE6Max", DEFAULT_0); //$NON-NLS-1$
-//
-//				createIndex_TourData_034(stmt);
 			}
 		}
 		stmt.close();
@@ -6392,9 +6394,6 @@ public class TourDatabase {
 		final long startTime = System.currentTimeMillis();
 
 		try {
-
-			System.out.println("Tour Date\tTour Time\tTime Slices\tGeo Parts\tSql Time"); //$NON-NLS-1$
-			// TODO remove SYSTEM.OUT.PRINTLN
 
 			long lastUpdateTime = startTime;
 
@@ -6449,6 +6448,114 @@ public class TourDatabase {
 		StatusUtil.logInfo(
 				String.format(
 						"Database postupdate 33->34 in %s mm:ss", //$NON-NLS-1$
+						net.tourbook.common.UI.formatHhMmSs(timeDiff / 1000)));
+	}
+
+	private int updateDbDesign_034_to_035(final Connection conn, final IProgressMonitor monitor) throws SQLException {
+
+		final int newDbVersion = 35;
+
+		logDb_UpdateStart(newDbVersion);
+		updateMonitor(monitor, newDbVersion);
+
+		final Statement stmt = conn.createStatement();
+		{
+			// double check if db is already updated
+			if (isColumnAvailable(conn, TABLE_TOUR_DATA, "LatitudeMinE6") == false) { //$NON-NLS-1$
+
+				/*
+				 * Create geo bound fields/index
+				 */
+				SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "LatitudeMinE6", DEFAULT_0); //$NON-NLS-1$
+				SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "LatitudeMaxE6", DEFAULT_0); //$NON-NLS-1$
+
+				SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "LongitudeMinE6", DEFAULT_0); //$NON-NLS-1$
+				SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "LongitudeMaxE6", DEFAULT_0); //$NON-NLS-1$
+
+				createIndex_TourData_035(stmt);
+			}
+		}
+		stmt.close();
+
+		logDb_UpdateEnd(newDbVersion);
+
+		return newDbVersion;
+	}
+
+	/**
+	 * Set lat/lon min/max values
+	 *
+	 * @param conn
+	 * @param monitor
+	 * @throws SQLException
+	 */
+	private void updateDbDesign_034_to_035_PostUpdate(final Connection conn, final IProgressMonitor monitor)
+			throws SQLException {
+
+		final ArrayList<Long> allTours = getAllTourIds();
+
+		final int numTours = allTours.size();
+		int tourIndex = 1;
+
+		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+
+		final long startTime = System.currentTimeMillis();
+
+		try {
+
+			long lastUpdateTime = startTime;
+
+			// loop: all tours
+			for (final Long tourId : allTours) {
+
+				if (monitor != null) {
+
+					final long currentTime = System.currentTimeMillis();
+					final float timeDiff = currentTime - lastUpdateTime;
+
+					// reduce logging
+					if (timeDiff > 200) {
+
+						lastUpdateTime = currentTime;
+
+						final String percent = String.format("%.1f", (float) tourIndex / numTours * 100.0);//$NON-NLS-1$
+
+						monitor.subTask(
+								NLS.bind(//
+										Messages.Tour_Database_PostUpdate_035_SetGeoMinMax,
+										new Object[] { tourIndex, numTours, percent }));
+					}
+
+					tourIndex++;
+				}
+
+				final TourData tourData = em.find(TourData.class, tourId);
+
+				if (tourData != null) {
+
+					tourData.computeGeo_Bounds();
+
+					saveTour(tourData, false);
+				}
+			}
+
+			// update UI otherwise < 100% is displayed
+			monitor.subTask(
+					NLS.bind(//
+							Messages.Tour_Database_PostUpdate_035_SetGeoMinMax,
+							new Object[] { tourIndex - 1, numTours, 100 }));
+
+		} catch (final Exception e) {
+			StatusUtil.log(e);
+		} finally {
+			em.close();
+		}
+
+		final long timeDiff = System.currentTimeMillis() - startTime;
+
+		StatusUtil.logInfo(
+				String.format(
+						"Database postupdate 34->35 in %s mm:ss", //$NON-NLS-1$
 						net.tourbook.common.UI.formatHhMmSs(timeDiff / 1000)));
 	}
 
