@@ -1,65 +1,51 @@
-Version 18.5.0                                             ?. May 2018
-
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
-UPDATE DOCU SQL EXPLORER   
-   
-   org.apache.derby_10.11.1.1_mt_15_3_0.jar
-   
-   
-   user and pw must not be empty
-   
-   
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
-
-
-
-
-
+Version 18.5.0                                             10. May  2018
 
 New
 ===	
 
-* Geo compare
+* Compare Tours by Geo Location (GPS)
 
+  Tours can now be compared by using it's geo data.
+  Comparing tours by it's altitude data still works.
+
+  Geo comparing is currently EXPERIMENTAL !
 
 
 Improvements
-============
+============	
 
 * 2D Map
- 
-  - Sync map with both chart sliders and center the map between the sliders
-  - Show a line between both chart sliders  
-  - Set opacity for the tour track (1) 
-  - Zoom + center with the mouse position (1)
-  - Show/hide map 2D tour color actions
 
-  (1) can be changed in the the map options slideout (this is new)
+  - Sync map with both chart sliders and center the map between the 
+    sliders
+  - Show/hide tour color actions
+
+
+* 2D Map Options
+
+  - Show a line between both chart sliders
+  - Zoom + center with the mouse position
+  - Set opacity for the tour track
+
+    This opacity can reduce performance significantly !
+
 
 * Tour Chart
-  
+
   - Show/hide tour chart graph actions
 
-
-System
-======
-
-* Tour Database
-  
-  - Action to compress tour database, a backup before running the tool is strongly recommended !!!
-   
  
-Bugfix
+Bugfix 	
 ======
 
 * Statistics
 
-  - Fixed out of bounds exception when a tour calendar week year was in the previous year than the tour year.
-    This was introduced with the tour tag filter
-   
+  - Fixed out of bounds exception when a tour calendar week year was in 
+    the previous year than the tour year.
+    This bug was introduced with the tour tag filter
 
+
+* Calendar
+
+  - Week summary
+    Compute speed/pace with moving time and not with recording time
