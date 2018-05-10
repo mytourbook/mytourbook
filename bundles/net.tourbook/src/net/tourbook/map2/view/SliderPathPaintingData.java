@@ -17,7 +17,7 @@ package net.tourbook.map2.view;
 
 import org.eclipse.swt.graphics.RGB;
 
-public class SliderRelationPaintingData {
+public class SliderPathPaintingData {
 
 	boolean	isShowSliderRelation;
 	int		opacity;

@@ -380,7 +380,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	 */
 	private boolean							_isLinkPhotoDisplayed;
 
-	private SliderRelationPaintingData		_sliderRelationPaintingData;
+	private SliderPathPaintingData			_sliderPathPaintingData;
 
 	private boolean							_isInMapSync;
 	private long							_lastFiredSyncEventTime;
@@ -481,7 +481,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 	private class ActionSelectGeoCompareArea extends Action {
 
-
 		public ActionSelectGeoCompareArea() {
 
 			super(Messages.Map_Action_SelectGeoCompareArea);
@@ -563,7 +562,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_defaultZoom = _map.getZoom();
 		_defaultPosition = _map.getGeoCenter();
 	}
-
 
 	public void actionSetDefaultPosition() {
 
@@ -710,7 +708,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 				_currentRightSliderValueIndex,
 				_actionShowSliderInMap.isChecked(),
 				_actionShowSliderInLegend.isChecked(),
-				_sliderRelationPaintingData);
+				_sliderPathPaintingData);
 
 		_map.redraw();
 	}
@@ -2753,7 +2751,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 				_currentRightSliderValueIndex,
 				_actionShowSliderInMap.isChecked(),
 				_actionShowSliderInLegend.isChecked(),
-				_sliderRelationPaintingData);
+				_sliderPathPaintingData);
 
 		// set the tour bounds
 		final GeoPosition[] tourBounds = tourData.getGeoBounds();
@@ -2923,7 +2921,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 				rightSliderValuesIndex,
 				_actionShowSliderInMap.isChecked(),
 				_actionShowSliderInLegend.isChecked(),
-				_sliderRelationPaintingData);
+				_sliderPathPaintingData);
 
 		if (_isMapSynched_WithChartSlider) {
 
@@ -3193,25 +3191,25 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 				Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION,
 				Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT));
 
-		_sliderRelationPaintingData = new SliderRelationPaintingData();
+		_sliderPathPaintingData = new SliderPathPaintingData();
 
-		_sliderRelationPaintingData.isShowSliderRelation = Util.getStateBoolean(_state,
+		_sliderPathPaintingData.isShowSliderRelation = Util.getStateBoolean(_state,
 				Map2View.STATE_IS_SHOW_SLIDER_PATH,
 				Map2View.STATE_IS_SHOW_SLIDER_PATH_DEFAULT);
 
-		_sliderRelationPaintingData.opacity = (Util.getStateInt(_state,
+		_sliderPathPaintingData.opacity = (Util.getStateInt(_state,
 				Map2View.STATE_SLIDER_PATH_OPACITY,
 				Map2View.STATE_SLIDER_PATH_OPACITY_DEFAULT));
 
-		_sliderRelationPaintingData.segments = (Util.getStateInt(_state,
+		_sliderPathPaintingData.segments = (Util.getStateInt(_state,
 				Map2View.STATE_SLIDER_PATH_SEGMENTS,
 				Map2View.STATE_SLIDER_PATH_SEGMENTS_DEFAULT));
 
-		_sliderRelationPaintingData.lineWidth = (Util.getStateInt(_state,
+		_sliderPathPaintingData.lineWidth = (Util.getStateInt(_state,
 				Map2View.STATE_SLIDER_PATH_LINE_WIDTH,
 				Map2View.STATE_SLIDER_PATH_LINE_WIDTH_DEFAULT));
 
-		_sliderRelationPaintingData.color = (Util.getStateRGB(_state,
+		_sliderPathPaintingData.color = (Util.getStateRGB(_state,
 				Map2View.STATE_SLIDER_PATH_COLOR,
 				Map2View.STATE_SLIDER_PATH_COLOR_DEFAULT));
 
@@ -3422,7 +3420,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_tourPainterConfig.resetTourData();
 
 		// update direct painter to draw nothing
-		_directMappingPainter.setPaintContext(_map, false, null, 0, 0, false, false, _sliderRelationPaintingData);
+		_directMappingPainter.setPaintContext(_map, false, null, 0, 0, false, false, _sliderPathPaintingData);
 
 		_map.setShowOverlays(isShowOverlays);
 		_map.setShowLegend(false);

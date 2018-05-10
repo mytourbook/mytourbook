@@ -938,8 +938,6 @@ public class TourMapPainter extends MapPainter {
 			TourData prevTourData = null;
 			final long geoCompareRefTourId = ReferenceTourManager.getGeoCompareReferenceTourId();
 
-//			show ref tour without compared tour
-
 			for (final TourData tourData : tourDataList) {
 
 				if (tourData == null) {
