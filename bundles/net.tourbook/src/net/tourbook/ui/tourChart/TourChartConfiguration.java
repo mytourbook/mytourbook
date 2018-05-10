@@ -209,6 +209,11 @@ public class TourChartConfiguration {
 	 */
 	public boolean					canUseGeoCompareTool;
 
+	/**
+	 * Is <code>true</code> to show geo diff unit in compared tour chart
+	 */
+	public boolean					isGeoCompareDiff;
+
 	@SuppressWarnings("unused")
 	private TourChartConfiguration() {}
 

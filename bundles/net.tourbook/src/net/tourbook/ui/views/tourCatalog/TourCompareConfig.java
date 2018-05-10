@@ -50,7 +50,7 @@ public class TourCompareConfig {
 		_compareTourChartConfig = compTourChartConfig;
 	}
 
-	TourChartConfiguration getCompTourChartConfig() {
+	TourChartConfiguration getCompareTourChartConfig() {
 		return _compareTourChartConfig;
 	}
 

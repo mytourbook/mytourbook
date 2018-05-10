@@ -132,6 +132,7 @@ public class Messages extends NLS {
 	public static String		Graph_Label_Tour;
 	public static String		Graph_Label_Tour_Compare;
 	public static String		Graph_Label_Tour_Compare_Unit;
+	public static String		Graph_Label_Geo_Compare_Unit;
 
 	public static String		Graph_Pref_color_gradient_bright;
 	public static String		Graph_Pref_color_gradient_dark;

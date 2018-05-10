@@ -54,6 +54,7 @@ import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
+import net.tourbook.ui.views.tourCatalog.TourCatalogView_ComparedTour;
 import net.tourbook.ui.views.tourSegmenter.TourSegmenterView;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -338,6 +339,13 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 						|| eventId == TourEventId.SLIDER_POSITION_CHANGED)
 
 						&& eventData instanceof ISelection) {
+
+					if (part instanceof TourCatalogView_ComparedTour) {
+
+						// ignore -> this would modify the geo compare tour
+
+						return;
+					}
 
 					onSelectionChanged((ISelection) eventData);
 

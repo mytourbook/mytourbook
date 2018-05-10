@@ -390,6 +390,7 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
 		final boolean isNotMoved = _defaultStartIndex == _movedStartIndex && _defaultEndIndex == _movedEndIndex;
 		final boolean isMoved = isNotMoved == false;
 
+		// geo compared with ref tour cannot be saved !
 		_actionSaveComparedTour.setEnabled(_isGeoCompareRefTour == false && (isMoved || _ctCompareId == -1));
 	}
 
@@ -797,7 +798,7 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
 	}
 
 	/**
-	 * @return Returns <code>false</code> when the compared tour was not displayed
+	 * @return Returns <code>false</code> when the compared tour is not displayed
 	 */
 	private boolean updateTourChart() {
 
@@ -805,10 +806,11 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
 
 		if (tourCompareConfig != null) {
 
-			_tourChartConfig = tourCompareConfig.getCompTourChartConfig();
+			_tourChartConfig = tourCompareConfig.getCompareTourChartConfig();
 
 			_tourChartConfig.setMinMaxKeeper(true);
 			_tourChartConfig.canShowTourCompareGraph = true;
+			_tourChartConfig.isGeoCompareDiff = tourCompareConfig.isGeoCompareRefTour;
 
 			_isGeoCompareRefTour = tourCompareConfig.isGeoCompareRefTour;
 

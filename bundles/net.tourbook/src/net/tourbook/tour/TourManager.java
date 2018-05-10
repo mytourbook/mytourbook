@@ -99,6 +99,7 @@ public class TourManager {
 	private static final String		GRAPH_LABEL_CADENCE_UNIT_SPM					= net.tourbook.common.Messages.Graph_Label_Cadence_Unit_Spm;
 	private static final String		GRAPH_LABEL_CADENCE_UNIT_RPM_SPM				= net.tourbook.common.Messages.Graph_Label_Cadence_Unit_RpmSpm;
 	private static final String		GRAPH_LABEL_GEARS								= net.tourbook.common.Messages.Graph_Label_Gears;
+	private static final String		GRAPH_LABEL_GEO_COMPARE_UNIT					= net.tourbook.common.Messages.Graph_Label_Geo_Compare_Unit;
 	private static final String		GRAPH_LABEL_GRADIENT							= net.tourbook.common.Messages.Graph_Label_Gradient;
 	private static final String		GRAPH_LABEL_GRADIENT_UNIT						= net.tourbook.common.Messages.Graph_Label_Gradient_Unit;
 	private static final String		GRAPH_LABEL_HEARTBEAT							= net.tourbook.common.Messages.Graph_Label_Heartbeat;
@@ -3186,7 +3187,9 @@ public class TourManager {
 			yDataTourCompare = createChartDataSerie(tourCompareSerie, chartType);
 
 			yDataTourCompare.setYTitle(GRAPH_LABEL_TOUR_COMPARE);
-			yDataTourCompare.setUnitLabel(GRAPH_LABEL_TOUR_COMPARE_UNIT);
+			yDataTourCompare.setUnitLabel(tcc.isGeoCompareDiff
+					? GRAPH_LABEL_GEO_COMPARE_UNIT
+					: GRAPH_LABEL_TOUR_COMPARE_UNIT);
 			yDataTourCompare.setShowYSlider(true);
 			yDataTourCompare.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
 			yDataTourCompare.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_TOUR_COMPARE);
