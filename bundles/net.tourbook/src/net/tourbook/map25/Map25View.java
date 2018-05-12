@@ -796,8 +796,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		tbm.add(new Separator());
 
 		tbm.add(_actionShowMarker_WithOptions);
-		tbm.add(_actionMapBookmarks);
 		tbm.add(_actionMapOptions);
+		tbm.add(_actionMapBookmarks);
 		tbm.add(_actionSelectMapProvider);
 
 		/*
