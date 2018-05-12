@@ -462,6 +462,11 @@ public interface ITourbookPreferences {
 	public static final String	VALUE_POINT_TOOL_TIP_IS_VISIBLE					= "VALUE_POINT_TOOL_TIP_IS_VISIBLE";						//$NON-NLS-1$
 	
 	/*
+	 * Map 2 D
+	 */
+	public static final String 	MAP2_OPTIONS_IS_MODIFIED 						= "MAP2_OPTIONS_IS_MODIFIED";								//$NON-NLS-1$
+	
+	/*
 	 * Map 2.5D
 	 */
 	public static final String	MAP25_OFFLINE_MAP_CUSTOM_LOCATION				= "MAP25_OFFLINE_MAP_CUSTOM_LOCATION";						//$NON-NLS-1$
@@ -506,6 +511,7 @@ public interface ITourbookPreferences {
 	 */
 	public static final String	DIALOG_SET_TIME_ZONE_ACTION						= "DIALOG_SET_TIME_ZONE_ACTION";							//$NON-NLS-1$
 	public static final String	DIALOG_SET_TIME_ZONE_SELECTED_ZONE_ID			= "DIALOG_SET_TIME_ZONE_SELECTED_ZONE_ID";					//$NON-NLS-1$
+
 
 
 

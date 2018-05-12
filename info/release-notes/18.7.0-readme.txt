@@ -1,0 +1,22 @@
+Version 18.7.0                                             ?. July  2018
+
+New
+===	
+
+* 
+
+
+Improvements
+============	
+
+* 2D Map
+
+  - Show some options from the preferences also in the slideout
+
+
+
+ 
+Bugfix 	
+======
+
+* 

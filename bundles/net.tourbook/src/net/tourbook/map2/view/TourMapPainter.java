@@ -877,7 +877,9 @@ public class TourMapPainter extends MapPainter {
 				final String property = event.getProperty();
 
 				// test if the color or statistic data have changed
-				if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
+				if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)
+						|| property.equals(ITourbookPreferences.MAP2_OPTIONS_IS_MODIFIED)) {
+
 					getTourPainterSettings();
 				}
 			}

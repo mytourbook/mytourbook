@@ -1026,8 +1026,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 							event.getNewValue().equals(PrefPageMap2Appearance.TOUR_PAINT_METHOD_COMPLEX));
 
 				} else if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)
-						|| property.equals(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY)
-						|| property.equals(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY)) {
+						|| property.equals(ITourbookPreferences.MAP2_OPTIONS_IS_MODIFIED)) {
 
 					// update tour and legend
 

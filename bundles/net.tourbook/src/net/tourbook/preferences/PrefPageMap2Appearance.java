@@ -65,33 +65,31 @@ public class PrefPageMap2Appearance extends FieldEditorPreferencePage implements
 
 	static {}
 
-	public static final String				PLOT_TYPE_LINE				= "line";						//$NON-NLS-1$
-
-	public static final String				PLOT_TYPE_DOT				= "dot";						//$NON-NLS-1$
-
-	public static final String				PLOT_TYPE_SQUARE			= "square";						//$NON-NLS-1$
-	public static final String				DEFAULT_PLOT_TYPE			= PLOT_TYPE_LINE;
-	public static final String				TOUR_PAINT_METHOD_SIMPLE	= "simple";						//$NON-NLS-1$
-	public static final String				TOUR_PAINT_METHOD_COMPLEX	= "complex";					//$NON-NLS-1$
-
-	public static final int					BORDER_TYPE_COLOR			= 0;
-	public static final int					BORDER_TYPE_DARKER			= 1;
-
-	public static final int					DEFAULT_BORDER_TYPE			= BORDER_TYPE_COLOR;
-
-	public static int						MAP_OPACITY_MINIMUM			= 20;							// %
-
 	private static final IPreferenceStore	_prefStore					= TourbookPlugin.getPrefStore();
 
+	public static final String				PLOT_TYPE_LINE				= "line";						//$NON-NLS-1$
+	public static final String				PLOT_TYPE_DOT				= "dot";						//$NON-NLS-1$
+	public static final String				PLOT_TYPE_SQUARE			= "square";						//$NON-NLS-1$
+	public static final String				DEFAULT_PLOT_TYPE			= PLOT_TYPE_LINE;
+	//
+	public static final String				TOUR_PAINT_METHOD_SIMPLE	= "simple";						//$NON-NLS-1$
+	public static final String				TOUR_PAINT_METHOD_COMPLEX	= "complex";					//$NON-NLS-1$
+	//
+	public static final int					BORDER_TYPE_COLOR			= 0;
+	public static final int					BORDER_TYPE_DARKER			= 1;
+	public static final int					DEFAULT_BORDER_TYPE			= BORDER_TYPE_COLOR;
+	//
+	public static int						MAP_OPACITY_MINIMUM			= 20;							// %
+	//
 	private boolean							_isModified;
-
+	//
 	private SelectionAdapter				_defaultSelectionListener;
 	private MouseWheelListener				_defaultMouseWheelListener;
 	private IPropertyChangeListener			_defaultChangePropertyListener;
-
+	//
 	private PixelConverter					_pc;
 	private int								_firstColumnIndent;
-
+	//
 	/*
 	 * UI controls
 	 */
@@ -683,6 +681,7 @@ public class PrefPageMap2Appearance extends FieldEditorPreferencePage implements
 
 	private void saveState() {
 
+		// plot type
 		_prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_PLOT_TYPE, getPlotType());
 
 		// opacity
@@ -699,7 +698,6 @@ public class PrefPageMap2Appearance extends FieldEditorPreferencePage implements
 		 */
 		_prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_PAINT_WITH_BORDER, _chkPaintWithBorder.getSelection());
 		_prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_BORDER_WIDTH, _spinnerBorderWidth.getSelection());
-
 		_prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_BORDER_TYPE, getBorderType());
 		_prefStore.setValue(
 				ITourbookPreferences.MAP_LAYOUT_BORDER_DIMM_VALUE,
