@@ -497,20 +497,6 @@ public class Map extends Canvas {
 
 	private int									_overlayAlpha				= 0xff;
 
-	/*
-	 * Geo compare area
-	 */
-	private boolean								_isSelectGeoArea;
-	private boolean								_isGeoArea_SelectionStarted;
-	private boolean								_isGeoArea_2ndMouseDown;
-
-//	private int									_geoArea_DevMouseXStart;
-//	private int									_geoArea_DevMouseYStart;
-	private GeoPosition							_geoArea_GeoStart;
-	private GeoPosition							_geoArea_GeoEnd;
-
-	private Point								_geoArea_WorldMouseMove;
-
 	/**
 	 * This observer is called in the {@link Tile} when a tile image is set into the tile
 	 */
@@ -633,18 +619,6 @@ public class Map extends Canvas {
 
 		_isPaintOfflineArea = true;
 		_isSelectOfflineArea = true;
-
-		setCursor(_cursorCross);
-
-		redraw();
-		paint();
-	}
-
-	public void actionSelectGeoCompareArea() {
-
-		if (_isSelectOfflineArea) {}
-
-		_isSelectGeoArea = true;
 
 		setCursor(_cursorCross);
 
@@ -1034,25 +1008,6 @@ public class Map extends Canvas {
 	}
 
 	/**
-	 * Hide geo compare area and all states
-	 */
-	private void disableGeoAreaSelection() {
-
-		_isSelectGeoArea = false;
-		_isGeoArea_SelectionStarted = false;
-		_isGeoArea_2ndMouseDown = false;
-
-		// reset positions for correct painting
-//		_geoArea_DevStart = null;
-		_geoArea_WorldMouseMove = null;
-
-		_isContextMenuEnabled = true;
-
-		setCursor(_cursorDefault);
-		redraw();
-	}
-
-	/**
 	 * Hide offline area and all states
 	 */
 	private void disableOfflineAreaSelection() {
@@ -1210,36 +1165,6 @@ public class Map extends Canvas {
 			rect.add(new Rectangle(point.x, point.y, 0, 0));
 		}
 		return rect;
-	}
-
-	private Point getGeoAreaGridPosition(final int worldPosX, final int worldPosY) {
-
-		int tilePosX = (int) Math.floor((double) worldPosX / (double) _tilePixelSize);
-		int tilePosY = (int) Math.floor((double) worldPosY / (double) _tilePixelSize);
-
-		final int mapTiles = _mapTileSize.width;
-
-		/*
-		 * adjust tile position to the map border
-		 */
-		tilePosX = tilePosX % mapTiles;
-		if (tilePosX < -mapTiles) {
-			tilePosX += mapTiles;
-			if (tilePosX == mapTiles) {
-				tilePosX = 0;
-			}
-		}
-
-		if (tilePosY < 0) {
-			tilePosY = 0;
-		} else if ((tilePosY >= mapTiles) && (mapTiles > 0)) {
-			tilePosY = mapTiles - 1;
-		}
-
-		// get device rectangle for this tile
-		return new Point(//
-				tilePosX * _tilePixelSize - _worldPixelTopLeftViewport.x,
-				tilePosY * _tilePixelSize - _worldPixelTopLeftViewport.y);
 	}
 
 	/**
@@ -1738,11 +1663,6 @@ public class Map extends Canvas {
 			return;
 		}
 
-		if (_isSelectGeoArea) {
-			disableGeoAreaSelection();
-			return;
-		}
-
 		// accelerate with Ctrl + Shift key
 		int offset = (event.stateMask & SWT.CTRL) != 0 ? 20 : 1;
 
@@ -1827,26 +1747,6 @@ public class Map extends Canvas {
 
 			redraw();
 
-		} else if (_isSelectGeoArea) {
-
-			if (_isGeoArea_SelectionStarted) {
-
-				_isGeoArea_2ndMouseDown = true;
-
-			} else {
-
-				_isGeoArea_SelectionStarted = true;
-
-				final int worldMouseX = _worldPixelTopLeftViewport.x + mouseEvent.x;
-				final int worldMouseY = _worldPixelTopLeftViewport.y + mouseEvent.y;
-
-				_geoArea_GeoStart = _geoArea_GeoEnd = _mp.pixelToGeo(
-						new Point2D.Double(worldMouseX, worldMouseY),
-						_mapZoomLevel);
-			}
-
-			redraw();
-
 		} else {
 
 			// if the left mb is clicked remember this point (for panning)
@@ -1885,19 +1785,6 @@ public class Map extends Canvas {
 
 			return;
 
-		} else if (_isSelectGeoArea) {
-
-			_geoArea_WorldMouseMove = new Point(worldMouseX, worldMouseY);
-
-			_geoArea_GeoEnd = _mp.pixelToGeo(
-					new Point2D.Double(worldMouseX, worldMouseY),
-					_mapZoomLevel);
-
-			paint();
-
-			fireMapInfoEvent();
-
-			return;
 		}
 
 		if (_isLeftMouseButtonPressed) {
@@ -1984,31 +1871,6 @@ public class Map extends Canvas {
 			paint();
 
 			openOfflineImageDialog();
-
-		} else if (_isSelectGeoArea) {
-
-			_isContextMenuEnabled = false;
-
-			if (_isGeoArea_SelectionStarted == false) {
-
-				/*
-				 * offline selection is not started, this can happen when the right mouse button is
-				 * clicked
-				 */
-				disableGeoAreaSelection();
-
-				return;
-			}
-
-			if (_isGeoArea_2ndMouseDown) {
-
-				// 2nd mouse down will end the selection
-
-				disableGeoAreaSelection();
-			}
-
-			redraw();
-			paint();
 
 		} else {
 
@@ -2098,12 +1960,7 @@ public class Map extends Canvas {
 			if (_isPaintOfflineArea) {
 				paintOfflineArea(gc);
 			}
-
-			if (_isSelectGeoArea) {
-				paintGeoArea(gc);
-			}
 		}
-
 	}
 
 	private void onResize() {
@@ -2403,189 +2260,6 @@ public class Map extends Canvas {
 		borderColor.dispose();
 	}
 
-	private void paintGeoArea(final GC gc) {
-
-		paintGeoArea_10_Info(gc);
-
-		// check if mouse button is hit which sets the start position
-		if (_isGeoArea_SelectionStarted == false) {
-			return;
-		}
-
-//		paintGeoArea_20_GeoGrid(gc);
-		paintGeoArea_30_SelectionBox(gc);
-	}
-
-	/**
-	 * Show info in the top/left corner that selection for the geo area is activ
-	 */
-	private void paintGeoArea_10_Info(final GC gc) {
-
-		final StringBuilder sb = new StringBuilder();
-		sb.append(UI.SPACE);
-		sb.append("Geo Area");
-		sb.append(UI.SPACE2);
-
-		if (_isGeoArea_SelectionStarted) {
-
-			// display geo position of the geo area
-
-			sb.append(createText_LatLon(_geoArea_GeoStart.latitude, _geoArea_GeoStart.longitude));
-			sb.append(UI.DASH_WITH_DOUBLE_SPACE);
-			sb.append(createText_LatLon(_geoArea_GeoEnd.latitude, _geoArea_GeoEnd.longitude));
-
-		} else {
-
-			// display mouse move geo position
-
-			if (_geoArea_WorldMouseMove != null) {
-
-				final GeoPosition mouseGeo = _mp.pixelToGeo(
-						new Point2D.Double(_geoArea_WorldMouseMove.x, _geoArea_WorldMouseMove.y),
-						_mapZoomLevel);
-
-				sb.append(createText_LatLon(mouseGeo.latitude, mouseGeo.longitude));
-			}
-		}
-
-		sb.append(UI.SPACE);
-
-		gc.setForeground(SYS_COLOR_BLACK);
-		gc.setBackground(SYS_COLOR_YELLOW);
-
-		gc.drawText(sb.toString(), 0, 0);
-	}
-
-	/**
-	 * Draw box for the geo grids which are selected within the geo area box
-	 */
-	private void paintGeoArea_20_GeoGrid(final GC gc) {
-
-		final GeoPosition geoStart = _geoArea_GeoStart;
-		final GeoPosition geoEnd = _geoArea_GeoEnd;
-
-		final double geoStartLatGrid = ((int) (geoStart.latitude * 100)) / 100.0;
-		final double geoStartLonGrid = (int) (geoStart.longitude * 100) / 100.0;
-		final double geoEndLatGrid = ((int) (geoEnd.latitude * 100)) / 100.0;
-		final double geoEndLongGrid = ((int) (geoEnd.longitude * 100)) / 100.0;
-
-		///////////////////////////////////////
-		///////////////////////////////////////
-
-		final int gridPixelSize = 130;
-
-		final Point devGridStart = paintGeoArea_20_GeoGrid_ToDev(geoStart, gridPixelSize);
-		final Point devGridEnd = paintGeoArea_20_GeoGrid_ToDev(geoEnd, gridPixelSize);
-
-		///////////////////////////////////////
-		///////////////////////////////////////
-		///////////////////////////////////////
-		///////////////////////////////////////
-
-		final int devTileStartX = devGridStart.x;
-		final int devTileStartY = devGridStart.y;
-		final int devTileEndX = devGridEnd.x;
-		final int devTileEndY = devGridEnd.y;
-
-		final int devTileStartX2 = Math.min(devTileStartX, devTileEndX);
-		final int devTileStartY2 = Math.min(devTileStartY, devTileEndY);
-		final int devTileEndX2 = Math.max(devTileStartX, devTileEndX);
-		final int devTileEndY2 = Math.max(devTileStartY, devTileEndY);
-
-		for (int devX = devTileStartX2; devX <= devTileEndX2; devX += gridPixelSize) {
-			for (int devY = devTileStartY2; devY <= devTileEndY2; devY += gridPixelSize) {
-
-				gc.setLineStyle(SWT.LINE_SOLID);
-				gc.setForeground(_display.getSystemColor(SWT.COLOR_BLUE));
-				gc.drawRectangle(devX, devY, gridPixelSize, gridPixelSize);
-			}
-		}
-	}
-
-	private Point paintGeoArea_20_GeoGrid_ToDev(final GeoPosition geoPos, final int gridPixelSize) {
-
-		final java.awt.Point wpGrid = _mp.geoToPixel(geoPos, _mapZoomLevel);
-
-		int gridPosX = (int) Math.floor((double) wpGrid.x / gridPixelSize);
-		int gridPosY = (int) Math.floor((double) wpGrid.y / gridPixelSize);
-
-
-		/*
-		 * adjust grid position to the map border
-		 */
-		gridPosX = gridPosX % gridPixelSize;
-		if (gridPosX < -gridPixelSize) {
-			gridPosX += gridPixelSize;
-			if (gridPosX == gridPixelSize) {
-				gridPosX = 0;
-			}
-		}
-
-		if (gridPosY < 0) {
-			gridPosY = 0;
-		} else if ((gridPosY >= gridPixelSize) && (gridPixelSize > 0)) {
-			gridPosY = gridPixelSize - 1;
-		}
-
-		// get device rectangle for this grid position
-		final Point devGrid = new Point(//
-				gridPosX * gridPixelSize - _worldPixelTopLeftViewport.x,
-				gridPosY * gridPixelSize - _worldPixelTopLeftViewport.y);
-
-		return devGrid;
-	}
-
-	/**
-	 * Draw selected area box
-	 */
-	private void paintGeoArea_30_SelectionBox(final GC gc) {
-
-		final java.awt.Point wpStart = _mp.geoToPixel(_geoArea_GeoStart, _mapZoomLevel);
-		final java.awt.Point wpEnd = _mp.geoToPixel(_geoArea_GeoEnd, _mapZoomLevel);
-
-		final int wpTopLeftX = _worldPixelTopLeftViewport.x;
-		final int wpTopLeftY = _worldPixelTopLeftViewport.y;
-
-		final int devAreaX1 = wpStart.x - wpTopLeftX;
-		final int devAreaY1 = wpStart.y - wpTopLeftY;
-		final int devAreaX2 = wpEnd.x - wpTopLeftX;
-		final int devAreaY2 = wpEnd.y - wpTopLeftY;
-
-		final int devX;
-		final int devY;
-		final int devWidth;
-		final int devHeight;
-
-		if (devAreaX1 < devAreaX2) {
-			devX = devAreaX1;
-			devWidth = devAreaX2 - devAreaX1;
-		} else {
-			devX = devAreaX2;
-			devWidth = devAreaX1 - devAreaX2;
-		}
-		if (devAreaY1 < devAreaY2) {
-			devY = devAreaY1;
-			devHeight = devAreaY2 - devAreaY1;
-		} else {
-			devY = devAreaY2;
-			devHeight = devAreaY1 - devAreaY2;
-		}
-
-		_currentOfflineArea = new Rectangle(devX, devY, devWidth, devHeight);
-
-		gc.setLineStyle(SWT.LINE_SOLID);
-		gc.setForeground(SYS_COLOR_BLACK);
-		gc.drawRectangle(devX, devY, devWidth, devHeight);
-
-//		gc.setLineStyle(SWT.LINE_SOLID);
-//		gc.setForeground(SYS_COLOR_WHITE);
-//		gc.drawRectangle(devX + 1, devY + 1, devWidth - 2, devHeight - 2);
-
-		gc.setBackground(_display.getSystemColor(SWT.COLOR_DARK_YELLOW));
-		gc.setAlpha(0x30);
-		gc.fillRectangle(devX + 1, devY + 1, devWidth - 2, devHeight - 2);
-		gc.setAlpha(0xff);
-	}
 
 	private void paintOfflineArea(final GC gc) {
 

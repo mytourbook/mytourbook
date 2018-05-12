@@ -181,7 +181,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	
 	public static final String		ID											= "net.tourbook.map2.view.Map2ViewId";		//$NON-NLS-1$
 
-	private static final String 	IMAGE_GEO_PARTS 							= net.tourbook.Messages.Image__GeoParts;
 	private static final String 	IMAGE_GRAPH									= net.tourbook.Messages.Image__Graph;
 	private static final String 	IMAGE_GRAPH_DISABLED						= net.tourbook.Messages.Image__Graph_Disabled;
 	private static final String		IMAGE_ACTION_TOUR_COLOR_ALTITUDE			= net.tourbook.Messages.Image__graph_altitude;
@@ -404,7 +403,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	private ActionPhotoProperties			_actionPhotoFilter;
 	private ActionReloadFailedMapImages		_actionReloadFailedMapImages;
 	private ActionSaveDefaultPosition		_actionSaveDefaultPosition;
-//	private ActionSelectGeoCompareArea		_actionSelectGeoCompareArea;
 	private ActionSelectMapProvider			_actionSelectMapProvider;
 	private ActionSetDefaultPosition		_actionSetDefaultPosition;
 	private ActionShowAllFilteredPhotos		_actionShowAllFilteredPhotos;
@@ -476,21 +474,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		@Override
 		protected void onBeforeOpenSlideout() {
 			closeOpenedDialogs(this);
-		}
-	}
-
-	private class ActionSelectGeoCompareArea extends Action {
-
-		public ActionSelectGeoCompareArea() {
-
-			super(Messages.Map_Action_SelectGeoCompareArea);
-
-			setImageDescriptor(TourbookPlugin.getImageDescriptor(IMAGE_GEO_PARTS));
-		}
-
-		@Override
-		public void run() {
-			_map.actionSelectGeoCompareArea();
 		}
 	}
 
@@ -1305,7 +1288,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_actionManageProvider = new ActionManageMapProviders(this);
 
 		_actionMapBookmarks = new ActionMapBookmarks(this._parent, this);
-//		_actionSelectGeoCompareArea = new ActionSelectGeoCompareArea();
 	}
 
 	/**
@@ -1742,10 +1724,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		menuMgr.add(_actionShowPOI);
 		menuMgr.add(_actionShowStartEndInMap);
 		menuMgr.add(_actionShowTourInfoInMap);
-
-//		menuMgr.add(new Separator());
-//
-//		menuMgr.add(_actionSelectGeoCompareArea);
 
 		menuMgr.add(new Separator());
 
