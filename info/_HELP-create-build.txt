@@ -1,11 +1,28 @@
 
-####################################
-One Click build process (since 18.1)
-####################################
+#####################################
+ One Click build process (since 18.1)
+#####################################
 
 * Set version number as described below (Build with POM)
 * Set version number in gradle.properties in the .git root
 * Run gradlew in C:\DAT\MT\mytourbook\build\build.net.tourbook this will run the default task
+
+
+#################
+ Build VTM Plugin
+#################
+
+	Setup Gradle environment
+	- Set org.gradle.java.home=C:/Program Files/Java/jdk1.8 in C:\Users\WolfgangSchramm\.gradle\gradle.properties
+
+	Update manifest.MF
+	- Select 'EGradle virtual root project' in 'Package Explorer'
+	- Select in the contextmenu 'Egradle/Refresh eclipse dependencies'  
+	
+	Build plugin
+	- Open 'Gradle Tasks' view
+	- Select 'net.tourbook.ext.vtm'
+	- Double click 'assemble'
 
 
 
@@ -122,8 +139,6 @@ http://archive.eclipse.org/eclipse/downloads/drops/R-3.8.2-201301310800/org.ecli
 http://archive.eclipse.org/eclipse/downloads/drops/R-3.8.2-201301310800/org.eclipse.jdt-3.8.2.zip
 http://archive.eclipse.org/eclipse/downloads/drops/R-3.8.2-201301310800/org.eclipse.rcp-3.8.2.zip
 http://archive.eclipse.org/eclipse/downloads/drops/R-3.8.2-201301310800/org.eclipse.platform-3.8.2.zip
-
-
 
 
 

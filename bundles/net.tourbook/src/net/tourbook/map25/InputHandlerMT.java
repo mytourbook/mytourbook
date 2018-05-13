@@ -27,7 +27,7 @@ import org.oscim.layers.Layer;
 import org.oscim.map.Map;
 import org.oscim.map.ViewController;
 import org.oscim.scalebar.MapScaleBarLayer;
-import org.oscim.utils.Easing;
+import org.oscim.utils.animation.Easing;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Buttons;

@@ -304,7 +304,10 @@ def createBundleClassPath() {
     return list.join(',')
 }
 
-def mtVersion = project(':mytourbook').ext.myTourbookVersion
+// get MT version and remove quotes
+def _mtVersionRaw	= project(':mytourbook').ext.myTourbookVersion		// '18.2.0'
+def _mtVersion		= _mtVersionRaw.replaceAll('\'', '')				// 18.2.0
+
 
 // set MANIFEST.MF properties to configure OSGi bundle
 jar.manifest.attributes(
@@ -313,7 +316,7 @@ jar.manifest.attributes(
 	'Bundle-Name': 								'Vector map from Mapsforge',
 	
 	// qualifier is an easy readable time stamp
-	'Bundle-Version':							mtVersion + '.v${tstamp;yyyyMMdd-HHmm}',
+	'Bundle-Version':							_mtVersion + '.v${tstamp;yyyyMMdd-HHmm}',
 
 	'Bundle-Vendor':							"MyTourbook",
 	'Bundle-License': 							'http://www.apache.org/licenses/LICENSE-2.0',

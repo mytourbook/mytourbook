@@ -100,7 +100,7 @@ import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
 import org.oscim.map.Animator;
 import org.oscim.map.Map;
-import org.oscim.utils.Easing;
+import org.oscim.utils.animation.Easing;
 
 import de.byteholder.gpx.PointOfInterest;
 
