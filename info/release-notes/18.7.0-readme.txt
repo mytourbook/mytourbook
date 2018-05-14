@@ -15,6 +15,14 @@ Improvements
 
 
 
+* 2.5D Map
+
+  - Set track opacity  
+  
+  
+
+
+
  
 Bugfix 	
 ======

@@ -230,8 +230,8 @@ public class SlideoutMap2_MapOptions extends ToolbarSlideout implements IColorSe
 			 */
 			// checkbox
 			_chkSliderPath = new Button(parent, SWT.CHECK);
-			_chkSliderPath.setText(Messages.Slideout_Map2_MapOptions_Checkbox_SliderPath);
-			_chkSliderPath.setToolTipText(Messages.Slideout_Map2_MapOptions_Checkbox_SliderPath_Tooltip);
+			_chkSliderPath.setText(Messages.Slideout_Map_MapOptions_Checkbox_SliderPath);
+			_chkSliderPath.setToolTipText(Messages.Slideout_Map_MapOptions_Checkbox_SliderPath_Tooltip);
 			_chkSliderPath.addSelectionListener(_defaultState_SelectionListener);
 		}
 
@@ -249,7 +249,7 @@ public class SlideoutMap2_MapOptions extends ToolbarSlideout implements IColorSe
 
 				// label
 				_lblSliderPath_Segments = new Label(container, SWT.NONE);
-				_lblSliderPath_Segments.setText(Messages.Slideout_Map2_MapOptions_Label_SliderPath_Segements);
+				_lblSliderPath_Segments.setText(Messages.Slideout_Map_MapOptions_Label_SliderPath_Segements);
 
 				// spinner
 				_spinnerSliderPath_Segments = new Spinner(container, SWT.BORDER);
@@ -267,7 +267,7 @@ public class SlideoutMap2_MapOptions extends ToolbarSlideout implements IColorSe
 
 				// label
 				_lblSliderPath_Width = new Label(container, SWT.NONE);
-				_lblSliderPath_Width.setText(Messages.Slideout_Map2_MapOptions_Label_SliderPath_Width);
+				_lblSliderPath_Width.setText(Messages.Slideout_Map_MapOptions_Label_SliderPath_Width);
 
 				// spinner
 				_spinnerSliderPath_LineWidth = new Spinner(container, SWT.BORDER);
@@ -285,7 +285,7 @@ public class SlideoutMap2_MapOptions extends ToolbarSlideout implements IColorSe
 
 				// label
 				_lblSliderPath_Color = new Label(container, SWT.NONE);
-				_lblSliderPath_Color.setText(Messages.Slideout_Map2_MapOptions_Label_SliderPath_Color);
+				_lblSliderPath_Color.setText(Messages.Slideout_Map_MapOptions_Label_SliderPath_Color);
 
 				final Composite colorContainer = new Composite(container, SWT.NONE);
 				GridDataFactory.fillDefaults().grab(true, false).applyTo(colorContainer);

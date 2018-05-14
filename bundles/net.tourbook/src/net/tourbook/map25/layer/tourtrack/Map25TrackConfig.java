@@ -26,18 +26,24 @@ public class Map25TrackConfig {
 	 * be set when an xml tag is not available.
 	 */
 
-	public String	id				= Long.toString(System.nanoTime());
-	public String	defaultId		= Map25ConfigManager.CONFIG_DEFAULT_ID_1;
-	public String	name			= Map25ConfigManager.CONFIG_DEFAULT_ID_1;
+	public String	id						= Long.toString(System.nanoTime());
+	public String	defaultId				= Map25ConfigManager.CONFIG_DEFAULT_ID_1;
+	public String	name					= Map25ConfigManager.CONFIG_DEFAULT_ID_1;
 
 	// outline
-	public float	outlineWidth	= Map25ConfigManager.DEFAULT_OUTLINE_WIDTH;
-	public RGB		outlineColor	= Map25ConfigManager.DEFAULT_OUTLINE_COLOR;
+	public float	outlineWidth			= Map25ConfigManager.DEFAULT_OUTLINE_WIDTH;
+	public RGB		outlineColor			= Map25ConfigManager.DEFAULT_OUTLINE_COLOR;
+	public int		outlineOpacity			= Map25ConfigManager.DEFAULT_OUTLINE_OPACITY;
 
 	/**
 	 * Animation time in milli seconds when a tour is synched with the map, default is
 	 */
-	public int		animationTime	= Map25ConfigManager.DEFAULT_ANIMATION_TIME;
+	public int		animationTime			= Map25ConfigManager.DEFAULT_ANIMATION_TIME;
+
+	// chart slider path
+	public boolean	isShowSliderPath		= Map25ConfigManager.DEFAULT_IS_SHOW_SLIDER_PATH;
+	public float	sliderPath_LineWidth	= Map25ConfigManager.DEFAULT_SLIDER_PATH_LINE_WIDTH;
+	public int		sliderPath_Opacity		= Map25ConfigManager.DEFAULT_SLIDER_PATH_OPACITY;
 
 	public Map25TrackConfig() {}
 

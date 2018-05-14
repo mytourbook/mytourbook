@@ -116,15 +116,32 @@ public class Map25ConfigManager {
 	 */
 	private static final String			TAG_TOUR_TRACKS						= "TourTracks";							//$NON-NLS-1$
 	private static final String			TAG_TRACK							= "Track";								//$NON-NLS-1$
+	private static final String			ATTR_IS_SHOW_SLIDER_PATH			= "";									//$NON-NLS-1$
+	private static final String			ATTR_SLIDER_PATH_LINE_WIDTH			= "sliderPath_LineWidth";				//$NON-NLS-1$
+	private static final String			ATTR_SLIDER_PATH_OPACITY			= "sliderPath_Opacity";					//$NON-NLS-1$
 	//
 	// outline
 	private static final String			TAG_OUTLINE							= "Outline";							//$NON-NLS-1$
+	private static final String			ATTR_OUTLINE_OPACITY				= "opacity";							//$NON-NLS-1$
 	private static final String			ATTR_OUTLINE_WIDTH					= "width";								//$NON-NLS-1$
 	//
+	public static final RGB				DEFAULT_OUTLINE_COLOR				= new RGB(0x80, 0x0, 0x80);
+	public static final int				DEFAULT_OUTLINE_OPACITY				= 70;
+	public static final float			DEFAULT_OUTLINE_WIDTH				= 2.5f;
+	public static final int				OUTLINE_OPACITY_MIN					= 10;
+	public static final int				OUTLINE_OPACITY_MAX					= 100;
 	public static final float			OUTLINE_WIDTH_MIN					= 0.1f;
 	public static final float			OUTLINE_WIDTH_MAX					= 10.0f;
-	public static final float			DEFAULT_OUTLINE_WIDTH				= 2.5f;
-	public static final RGB				DEFAULT_OUTLINE_COLOR				= new RGB(0x80, 0x0, 0x80);
+	//
+	// slider path
+	public static final boolean			DEFAULT_IS_SHOW_SLIDER_PATH			= true;
+	public static final RGB				DEFAULT_SLIDER_PATH_COLOR			= new RGB(0xff, 0xff, 0x0);
+	public static final float			DEFAULT_SLIDER_PATH_LINE_WIDTH		= 5.0f;
+	public static final int				DEFAULT_SLIDER_PATH_OPACITY			= 30;
+	public static float					SLIDER_PATH_LINE_WIDTH_MIN			= 1.0f;
+	public static final float			SLIDER_PATH_LINE_WIDTH_MAX			= 20.0f;
+	public static final int				SLIDER_PATH_OPACITY_MIN				= 10;
+	public static final int				SLIDER_PATH_OPACITY_MAX				= 100;
 	//
 	// other properties
 	public static final int				DEFAULT_ANIMATION_TIME				= 2000;
@@ -354,6 +371,8 @@ public class Map25ConfigManager {
 	}
 
 	/**
+	 * Overwrite default defaults.
+	 * 
 	 * @param configIndex
 	 *            Index starts with 1.
 	 * @return
@@ -471,12 +490,18 @@ public class Map25ConfigManager {
 			xmlConfig.putString(ATTR_ID, config.id);
 			xmlConfig.putString(ATTR_CONFIG_NAME, config.name);
 
+			// slider path
+			xmlConfig.putBoolean(ATTR_IS_SHOW_SLIDER_PATH, config.isShowSliderPath);
+			xmlConfig.putFloat(ATTR_SLIDER_PATH_LINE_WIDTH, config.sliderPath_LineWidth);
+			xmlConfig.putInteger(ATTR_SLIDER_PATH_OPACITY, config.sliderPath_Opacity);
+
 			xmlConfig.putInteger(ATTR_ANIMATION_TIME, config.animationTime);
 
 			// <Outline>
 			final IMemento xmlOutline = Util.setXmlRgb(xmlConfig, TAG_OUTLINE, config.outlineColor);
 			{
 				xmlOutline.putFloat(ATTR_OUTLINE_WIDTH, config.outlineWidth);
+				xmlOutline.putInteger(ATTR_OUTLINE_OPACITY, config.outlineOpacity);
 			}
 		}
 	}
@@ -634,30 +659,29 @@ public class Map25ConfigManager {
 
 	private static void parse_050_TrackConfig(final XMLMemento xmlConfig, final Map25TrackConfig config) {
 
-		config.id = Util.getXmlString(
-				xmlConfig, //
-				ATTR_ID,
-				Long.toString(System.nanoTime()));
+// SET_FORMATTING_OFF
+		
+		config.id	= Util.getXmlString(xmlConfig, ATTR_ID, 			Long.toString(System.nanoTime()));
+		config.name = Util.getXmlString(xmlConfig, ATTR_CONFIG_NAME,	UI.EMPTY_STRING);
 
-		config.name = Util.getXmlString(
-				xmlConfig, //
-				ATTR_CONFIG_NAME,
-				UI.EMPTY_STRING);
+		config.isShowSliderPath 	= Util.getXmlBoolean(xmlConfig, 	ATTR_IS_SHOW_SLIDER_PATH, 		DEFAULT_IS_SHOW_SLIDER_PATH);
+		config.sliderPath_LineWidth = Util.getXmlFloatFloat(xmlConfig,	ATTR_SLIDER_PATH_LINE_WIDTH, 	DEFAULT_SLIDER_PATH_LINE_WIDTH, SLIDER_PATH_LINE_WIDTH_MIN, SLIDER_PATH_LINE_WIDTH_MAX);
+		config.sliderPath_Opacity	= Util.getXmlInteger(xmlConfig, 	ATTR_SLIDER_PATH_OPACITY, 		DEFAULT_SLIDER_PATH_OPACITY, 	SLIDER_PATH_OPACITY_MIN, 	SLIDER_PATH_OPACITY_MAX);
 
 		for (final IMemento mementoConfigChild : xmlConfig.getChildren()) {
 
 			final XMLMemento xmlConfigChild = (XMLMemento) mementoConfigChild;
 			final String configTag = xmlConfigChild.getType();
 
-// SET_FORMATTING_OFF
 			
 			switch (configTag) {
 
 			case TAG_OUTLINE:
 
-				config.outlineWidth = Util.getXmlFloatFloat(xmlConfigChild, ATTR_OUTLINE_WIDTH, DEFAULT_OUTLINE_WIDTH, OUTLINE_WIDTH_MIN, OUTLINE_WIDTH_MAX);
-				config.outlineColor = Util.getXmlRgb(xmlConfigChild, DEFAULT_OUTLINE_COLOR);
-				config.animationTime = Util.getXmlInteger(xmlConfigChild, ATTR_ANIMATION_TIME, DEFAULT_ANIMATION_TIME);
+				config.outlineColor		= Util.getXmlRgb(xmlConfigChild, 		DEFAULT_OUTLINE_COLOR);
+				config.outlineOpacity	= Util.getXmlInteger(xmlConfigChild,	ATTR_OUTLINE_OPACITY, 	DEFAULT_OUTLINE_OPACITY, 	OUTLINE_OPACITY_MIN, 	OUTLINE_OPACITY_MAX);
+				config.outlineWidth		= Util.getXmlFloatFloat(xmlConfigChild, ATTR_OUTLINE_WIDTH, 	DEFAULT_OUTLINE_WIDTH, 		OUTLINE_WIDTH_MIN, 		OUTLINE_WIDTH_MAX);
+				config.animationTime	= Util.getXmlInteger(xmlConfigChild, 	ATTR_ANIMATION_TIME, 	DEFAULT_ANIMATION_TIME);
 
 				break;
 			}

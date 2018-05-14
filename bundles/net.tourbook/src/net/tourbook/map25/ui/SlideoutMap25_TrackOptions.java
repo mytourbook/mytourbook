@@ -30,6 +30,7 @@ import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
@@ -41,6 +42,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
@@ -62,23 +64,31 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
 	private boolean					_isUpdateUI;
 
-//	private PixelConverter			_pc;
+	private PixelConverter			_pc;
+	private int						_firstColumnIndent;
 
 	/*
 	 * UI controls
 	 */
 	private Composite				_shellContainer;
-//	private Button					_btnReset;
+
+	private Button					_chkShowSliderPath;
+
 	private Combo					_comboName;
 
 	private Label					_lblConfigName;
+	private Label					_lblSliderPath_Width;
+	private Label					_lblSliderPath_Color;
 
-//	private Spinner					_spinnerAnimationTime;
-	private Spinner					_spinnerOutlineWidth;
+	private Spinner					_spinnerOutline_Opacity;
+	private Spinner					_spinnerOutline_Width;
+	private Spinner					_spinnerSliderPath_LineWidth;
+	private Spinner					_spinnerSliderPath_Opacity;
 
 	private Text					_textConfigName;
 
-	private ColorSelectorExtended	_colorOutlineColor;
+	private ColorSelectorExtended	_colorOutline_Color;
+	private ColorSelectorExtended	_colorSliderPathColor;
 
 	public SlideoutMap25_TrackOptions(	final Composite ownerControl,
 										final ToolBar toolbar,
@@ -102,7 +112,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 	@Override
 	protected Composite createToolTipContentArea(final Composite parent) {
 
-		initUI();
+		initUI(parent);
 
 		createActions();
 
@@ -131,6 +141,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 			{
 				createUI_000_Title(container);
 				createUI_100_Line(container);
+				createUI_200_SliderPath(container);
 				createUI_999_ConfigName(container);
 			}
 		}
@@ -211,22 +222,22 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
 
 			// spinner
-			_spinnerOutlineWidth = new Spinner(parent, SWT.BORDER);
-			_spinnerOutlineWidth.setDigits(1);
-			_spinnerOutlineWidth.setMinimum((int) (Map25ConfigManager.OUTLINE_WIDTH_MIN * 10.0f));
-			_spinnerOutlineWidth.setMaximum((int) (Map25ConfigManager.OUTLINE_WIDTH_MAX * 10.0f));
-			_spinnerOutlineWidth.setIncrement(1);
-			_spinnerOutlineWidth.setPageIncrement(10);
-			_spinnerOutlineWidth.addSelectionListener(_defaultSelectionListener);
-			_spinnerOutlineWidth.addMouseWheelListener(_defaultMouseWheelListener);
+			_spinnerOutline_Width = new Spinner(parent, SWT.BORDER);
+			_spinnerOutline_Width.setDigits(1);
+			_spinnerOutline_Width.setMinimum((int) (Map25ConfigManager.OUTLINE_WIDTH_MIN * 10.0f));
+			_spinnerOutline_Width.setMaximum((int) (Map25ConfigManager.OUTLINE_WIDTH_MAX * 10.0f));
+			_spinnerOutline_Width.setIncrement(1);
+			_spinnerOutline_Width.setPageIncrement(10);
+			_spinnerOutline_Width.addSelectionListener(_defaultSelectionListener);
+			_spinnerOutline_Width.addMouseWheelListener(_defaultMouseWheelListener);
 			GridDataFactory
 					.fillDefaults() //
 					.align(SWT.BEGINNING, SWT.FILL)
-					.applyTo(_spinnerOutlineWidth);
+					.applyTo(_spinnerOutline_Width);
 		}
 		{
 			/*
-			 * Line color
+			 * Line
 			 */
 
 			// label
@@ -234,37 +245,98 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 			label.setText(Messages.Slideout_Map25TrackOptions_Label_OutlineColor);
 			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
 
-			// Color: Segment alternate color
-			_colorOutlineColor = new ColorSelectorExtended(parent);
-			_colorOutlineColor.addListener(_defaultPropertyChangeListener);
-			_colorOutlineColor.addOpenListener(this);
-
+			final Composite container = new Composite(parent, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+			{
+				{
+					// color
+					_colorOutline_Color = new ColorSelectorExtended(container);
+					_colorOutline_Color.addListener(_defaultPropertyChangeListener);
+					_colorOutline_Color.addOpenListener(this);
+				}
+				{
+					// opacity
+					_spinnerOutline_Opacity = new Spinner(container, SWT.BORDER);
+					_spinnerOutline_Opacity.setMinimum(Map25ConfigManager.OUTLINE_OPACITY_MIN);
+					_spinnerOutline_Opacity.setMaximum(Map25ConfigManager.OUTLINE_OPACITY_MAX);
+					_spinnerOutline_Opacity.setIncrement(1);
+					_spinnerOutline_Opacity.setPageIncrement(10);
+					_spinnerOutline_Opacity.addSelectionListener(_defaultSelectionListener);
+					_spinnerOutline_Opacity.addMouseWheelListener(_defaultMouseWheelListener);
+				}
+			}
 		}
-//		{
-//			/*
-//			 * Animation time
-//			 */
-//
-//			// label
-//			final Label label = new Label(parent, SWT.NONE);
-//			label.setText(Messages.Slideout_Map25TrackOptions_Label_AnimationTime);
-//			label.setToolTipText(Messages.Slideout_Map25TrackOptions_Label_AnimationTime_Tooltip);
-//			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-//
-//			// spinner
-//			_spinnerAnimationTime = new Spinner(parent, SWT.BORDER);
-//			_spinnerAnimationTime.setDigits(1);
-//			_spinnerAnimationTime.setMinimum(0);
-//			_spinnerAnimationTime.setMaximum(100);
-//			_spinnerAnimationTime.setIncrement(1);
-//			_spinnerAnimationTime.setPageIncrement(10);
-//			_spinnerAnimationTime.addSelectionListener(_defaultSelectionListener);
-//			_spinnerAnimationTime.addMouseWheelListener(_defaultMouseWheelListener);
-//			GridDataFactory
-//					.fillDefaults() //
-//					.align(SWT.BEGINNING, SWT.FILL)
-//					.applyTo(_spinnerAnimationTime);
-//		}
+	}
+
+	private void createUI_200_SliderPath(final Composite parent) {
+
+		{
+			/*
+			 * Slider path
+			 */
+			// checkbox
+			_chkShowSliderPath = new Button(parent, SWT.CHECK);
+			_chkShowSliderPath.setText(Messages.Slideout_Map_MapOptions_Checkbox_SliderPath);
+			_chkShowSliderPath.setToolTipText(Messages.Slideout_Map_MapOptions_Checkbox_SliderPath_Tooltip);
+			_chkShowSliderPath.addSelectionListener(_defaultSelectionListener);
+		}
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()
+				.grab(true, false)
+				.indent(_firstColumnIndent, 0)
+				.applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+			{
+				/*
+				 * Line width
+				 */
+
+				// label
+				_lblSliderPath_Width = new Label(container, SWT.NONE);
+				_lblSliderPath_Width.setText(Messages.Slideout_Map_MapOptions_Label_SliderPath_Width);
+
+				// spinner
+				_spinnerSliderPath_LineWidth = new Spinner(container, SWT.BORDER);
+				_spinnerSliderPath_LineWidth.setDigits(1);
+				_spinnerSliderPath_LineWidth.setMinimum((int) (Map25ConfigManager.SLIDER_PATH_LINE_WIDTH_MIN * 10.0f));
+				_spinnerSliderPath_LineWidth.setMaximum((int) (Map25ConfigManager.SLIDER_PATH_LINE_WIDTH_MAX * 10.0f));
+				_spinnerSliderPath_LineWidth.setIncrement(1);
+				_spinnerSliderPath_LineWidth.setPageIncrement(10);
+				_spinnerSliderPath_LineWidth.addSelectionListener(_defaultSelectionListener);
+				_spinnerSliderPath_LineWidth.addMouseWheelListener(_defaultMouseWheelListener);
+			}
+			{
+				/*
+				 * Color + opacity
+				 */
+
+				// label
+				_lblSliderPath_Color = new Label(container, SWT.NONE);
+				_lblSliderPath_Color.setText(Messages.Slideout_Map_MapOptions_Label_SliderPath_Color);
+
+				final Composite colorContainer = new Composite(container, SWT.NONE);
+				GridDataFactory.fillDefaults().grab(true, false).applyTo(colorContainer);
+				GridLayoutFactory.fillDefaults().numColumns(2).applyTo(colorContainer);
+				{
+					// color
+					_colorSliderPathColor = new ColorSelectorExtended(colorContainer);
+					_colorSliderPathColor.addListener(_defaultPropertyChangeListener);
+					_colorSliderPathColor.addOpenListener(this);
+
+					// opacity
+					_spinnerSliderPath_Opacity = new Spinner(colorContainer, SWT.BORDER);
+					_spinnerSliderPath_Opacity.setMinimum(Map25ConfigManager.SLIDER_PATH_OPACITY_MIN);
+					_spinnerSliderPath_Opacity.setMaximum(Map25ConfigManager.SLIDER_PATH_OPACITY_MAX);
+					_spinnerSliderPath_Opacity.setIncrement(1);
+					_spinnerSliderPath_Opacity.setPageIncrement(10);
+					_spinnerSliderPath_Opacity.addSelectionListener(_defaultSelectionListener);
+					_spinnerSliderPath_Opacity.addMouseWheelListener(_defaultMouseWheelListener);
+				}
+			}
+		}
 	}
 
 	private void createUI_999_ConfigName(final Composite parent) {
@@ -312,7 +384,10 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 		_isUpdateUI = backupIsUpdateUI;
 	}
 
-	private void initUI() {
+	private void initUI(final Composite parent) {
+
+		_pc = new PixelConverter(parent);
+		_firstColumnIndent = _pc.convertWidthInCharsToPixels(3);
 
 		_defaultSelectionListener = new SelectionAdapter() {
 			@Override
@@ -418,9 +493,10 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 		_comboName.select(activeConfigIndex);
 		_textConfigName.setText(config.name);
 
-		// line color
-		_colorOutlineColor.setColorValue(config.outlineColor);
-		_spinnerOutlineWidth.setSelection((int) (config.outlineWidth * 10));
+		// line
+		_colorOutline_Color.setColorValue(config.outlineColor);
+		_spinnerOutline_Width.setSelection((int) (config.outlineWidth * 10));
+		_spinnerOutline_Opacity.setSelection(config.outlineOpacity);
 
 //		_spinnerAnimationTime.setSelection(config.animationTime / 100);
 
@@ -436,10 +512,13 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 		config.name = _textConfigName.getText();
 
 		// line
-		config.outlineColor = _colorOutlineColor.getColorValue();
-		config.outlineWidth = _spinnerOutlineWidth.getSelection() / 10.0f;
+		config.outlineColor = _colorOutline_Color.getColorValue();
+		config.outlineWidth = _spinnerOutline_Width.getSelection() / 10.0f;
+		config.outlineOpacity = _spinnerOutline_Opacity.getSelection();
 
-//		config.animationTime = _spinnerAnimationTime.getSelection() * 100;
+		config.isShowSliderPath = _chkShowSliderPath.getSelection();
+		config.sliderPath_LineWidth = _spinnerSliderPath_LineWidth.getSelection() / 10.0f;
+		config.sliderPath_Opacity = _spinnerSliderPath_Opacity.getSelection();
 	}
 
 	private void updateUI_SetActiveConfig() {
