@@ -26,6 +26,7 @@ import net.tourbook.map25.layer.marker.MarkerConfig;
 import net.tourbook.map25.layer.marker.MarkerLayer;
 import net.tourbook.map25.layer.marker.MarkerLayer.OnItemGestureListener;
 import net.tourbook.map25.layer.marker.MarkerRenderer;
+import net.tourbook.map25.layer.tourtrack.SliderLocation_Layer;
 import net.tourbook.map25.layer.tourtrack.SliderPath_Layer;
 import net.tourbook.map25.layer.tourtrack.TourLayer;
 
@@ -93,6 +94,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 	private MapScaleBarLayer		_layer_ScaleBar;
 	private TileGridLayerMT			_layer_TileInfo;
 	private TourLayer				_layer_Tour;
+	private SliderLocation_Layer	_layer_SliderLocation;
 	private SliderPath_Layer		_layer_SliderPath;
 
 	private OkHttpFactoryMT			_httpFactory;
@@ -296,6 +298,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 
 	public MapScaleBarLayer getLayer_ScaleBar() {
 		return _layer_ScaleBar;
+	}
+
+	public SliderLocation_Layer getLayer_SliderLocation() {
+		return _layer_SliderLocation;
 	}
 
 	public SliderPath_Layer getLayer_SliderPath() {
@@ -539,6 +545,11 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		_layer_Marker = new MarkerLayer(mMap, this);
 		_layer_Marker.setEnabled(false);
 		layers.add(_layer_Marker);
+
+		// slider location
+		_layer_SliderLocation = new SliderLocation_Layer(mMap);
+		_layer_SliderLocation.setEnabled(false);
+		layers.add(_layer_SliderLocation);
 
 		// scale bar
 		_layer_ScaleBar = createLayer_ScaleBar();

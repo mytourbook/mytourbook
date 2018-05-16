@@ -10,7 +10,6 @@ import net.tourbook.map25.Map25ConfigManager;
 
 import org.oscim.backend.canvas.Paint.Cap;
 import org.oscim.core.GeoPoint;
-import org.oscim.core.GeometryBuffer;
 import org.oscim.core.MapPosition;
 import org.oscim.core.MercatorProjection;
 import org.oscim.core.Tile;
@@ -47,8 +46,6 @@ public class SliderPath_Layer extends Layer {
 	LineStyle				_lineStyle;
 
 	final Worker			_simpleWorker;
-
-	GeometryBuffer			_geoBuffer;
 
 	private boolean			_isUpdateLayer;
 	private int				_firstSliderValueIndex;
@@ -159,7 +156,11 @@ public class SliderPath_Layer extends Layer {
 				synchronized (_geoPoints) {
 
 					_isUpdatePoints = false;
-					__numPoints = numPoints = _lastSliderValueIndex - _firstSliderValueIndex;
+
+					final int firstSliderValueIndex = _firstSliderValueIndex;
+					final int lastSliderValueIndex = _lastSliderValueIndex;
+
+					__numPoints = numPoints = lastSliderValueIndex - firstSliderValueIndex;
 
 					double[] points = __preProjectedPoints;
 
@@ -170,40 +171,17 @@ public class SliderPath_Layer extends Layer {
 
 					for (int pointIndex = 0; pointIndex < numPoints; pointIndex++) {
 
-						final GeoPoint geoPoint = _geoPoints[_firstSliderValueIndex + pointIndex];
+						final GeoPoint geoPoint = _geoPoints[firstSliderValueIndex + pointIndex];
 
 						MercatorProjection.project(geoPoint, points, pointIndex);
 					}
 				}
-
-			} else if (_geoBuffer != null) {
-
-				final GeometryBuffer geoBuffer = _geoBuffer;
-				_geoBuffer = null;
-				numPoints = geoBuffer.index[0];
-
-				double[] points = __preProjectedPoints;
-
-				if (numPoints > points.length) {
-					points = __preProjectedPoints = new double[numPoints * 2];
-					__projectedPoints = new float[numPoints * 2];
-				}
-
-				for (int pointIndex = 0; pointIndex < numPoints; pointIndex += 2) {
-
-					MercatorProjection.project(
-							geoBuffer.points[pointIndex + 1],
-							geoBuffer.points[pointIndex],
-							points,
-							pointIndex >> 1);
-				}
-
-				__numPoints = numPoints = numPoints >> 1;
 			}
 
 			if (numPoints == 0) {
 
 				if (task.__renderBuckets.get() != null) {
+
 					task.__renderBuckets.clear();
 					mMap.render();
 				}
@@ -424,9 +402,9 @@ public class SliderPath_Layer extends Layer {
 
 	public void onModifyConfig() {
 
-		final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
+		final Map25TrackConfig activeTourTrackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
-		setEnabled(trackConfig.isShowSliderPath);
+		setEnabled(activeTourTrackConfig.isShowSliderPath);
 
 		_lineStyle = createLineStyle();
 
@@ -455,15 +433,15 @@ public class SliderPath_Layer extends Layer {
 			lastSliderValueIndex = rightSliderValueIndex;
 		}
 
-		_firstSliderValueIndex = firstSliderValueIndex;
-		_lastSliderValueIndex = lastSliderValueIndex;
-
 		synchronized (_geoPoints) {
 
 			_tourStarts.clear();
 			_tourStarts.addAll(tourStarts);
 
 			_geoPoints = geoPoints;
+
+			_firstSliderValueIndex = firstSliderValueIndex;
+			_lastSliderValueIndex = lastSliderValueIndex;
 		}
 
 		updatePoints();

@@ -10,7 +10,6 @@ import net.tourbook.map25.Map25ConfigManager;
 
 import org.oscim.backend.canvas.Paint.Cap;
 import org.oscim.core.GeoPoint;
-import org.oscim.core.GeometryBuffer;
 import org.oscim.core.MapPosition;
 import org.oscim.core.MercatorProjection;
 import org.oscim.core.Tile;
@@ -47,8 +46,6 @@ public class TourLayer extends Layer {
 	LineStyle				_lineStyle;
 
 	final Worker			_simpleWorker;
-
-	GeometryBuffer			_geoBuffer;
 
 	private boolean			_isUpdateLayer;
 
@@ -153,8 +150,6 @@ public class TourLayer extends Layer {
 		@Override
 		public boolean doWork(final TourRenderTask task) {
 
-			final long start = System.nanoTime();
-
 			int numPoints = __numPoints;
 
 			if (_isUpdatePoints) {
@@ -175,35 +170,12 @@ public class TourLayer extends Layer {
 						MercatorProjection.project(_geoPoints[pointIndex], points, pointIndex);
 					}
 				}
-
-			} else if (_geoBuffer != null) {
-
-				final GeometryBuffer geoBuffer = _geoBuffer;
-				_geoBuffer = null;
-				numPoints = geoBuffer.index[0];
-
-				double[] points = __preProjectedPoints;
-
-				if (numPoints > points.length) {
-					points = __preProjectedPoints = new double[numPoints * 2];
-					__projectedPoints = new float[numPoints * 2];
-				}
-
-				for (int pointIndex = 0; pointIndex < numPoints; pointIndex += 2) {
-
-					MercatorProjection.project(
-							geoBuffer.points[pointIndex + 1],
-							geoBuffer.points[pointIndex],
-							points,
-							pointIndex >> 1);
-				}
-
-				__numPoints = numPoints = numPoints >> 1;
 			}
 
 			if (numPoints == 0) {
 
 				if (task.__renderBuckets.get() != null) {
+
 					task.__renderBuckets.clear();
 					mMap.render();
 				}
@@ -215,11 +187,6 @@ public class TourLayer extends Layer {
 
 			// trigger redraw to let renderer fetch the result.
 			mMap.render();
-
-//			System.out.println(
-//					(UI.timeStampNano() + " " + this.getClass().getName() + " \t")
-//							+ (((float) (System.nanoTime() - start) / 1000000) + " ms"));
-//			// TODO remove SYSTEM.OUT.PRINTLN
 
 			return true;
 		}
@@ -318,31 +285,6 @@ public class TourLayer extends Layer {
 					continue;
 				}
 
-//				final int clip = __lineClipper.clipNext(x, y);
-//				if (clip < 1) {
-//					if (i > 2) {
-//						lineBucket.addLine(projected, i, false);
-//					}
-//
-//					if (clip < 0) {
-//						/* add line segment */
-//						segment = __lineClipper.getLine(segment, 0);
-//						lineBucket.addLine(segment, 4, false);
-//						// the prev point is the real point not the clipped point
-//						//prevX = mClipper.outX2;
-//						//prevY = mClipper.outY2;
-//						prevX = x;
-//						prevY = y;
-//					}
-//					i = 0;
-//					// if the end point is inside, add it
-//					if (__lineClipper.getPrevOutcode() == 0) {
-//						projected[i++] = prevX;
-//						projected[i++] = prevY;
-//					}
-//					continue;
-//				}
-
 				final int clip = __lineClipper.clipNext(x, y);
 				if (clip != LineClipper.INSIDE) {
 
@@ -432,27 +374,6 @@ public class TourLayer extends Layer {
 		_lineStyle = createLineStyle();
 
 		_simpleWorker.submit(0);
-
-//		mMap.render();
-
-//		if (trackConfig.isRecreateTracks()) {
-//
-//			// track data has changed
-//
-//			Map3Manager.getMap3View().showAllTours(false);
-//
-//		} else {
-//
-//			for (final Renderable renderable : getRenderables()) {
-//
-//				if (renderable instanceof ITrackPath) {
-//					setPathAttributes((ITrackPath) renderable);
-//				}
-//			}
-//
-//			// ensure path modifications are redrawn
-//			Map3Manager.getWWCanvas().redraw();
-//		}
 	}
 
 	public void setPoints(final GeoPoint[] geoPoints, final TIntArrayList tourStarts) {
@@ -465,13 +386,8 @@ public class TourLayer extends Layer {
 			_geoPoints = geoPoints;
 		}
 
-		updatePoints();
-	}
-
-	private void updatePoints() {
-
 		_simpleWorker.cancel(true);
-
+		
 		_isUpdatePoints = true;
 		_isUpdateLayer = true;
 	}

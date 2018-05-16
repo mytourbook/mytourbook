@@ -60,6 +60,8 @@ import net.tourbook.map25.action.ActionSynchMapWithChartSlider;
 import net.tourbook.map25.action.ActionSynchMapWithTour;
 import net.tourbook.map25.layer.marker.MapMarker;
 import net.tourbook.map25.layer.marker.MarkerLayer;
+import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
+import net.tourbook.map25.layer.tourtrack.SliderLocation_Layer;
 import net.tourbook.map25.layer.tourtrack.SliderPath_Layer;
 import net.tourbook.map25.layer.tourtrack.TourLayer;
 import net.tourbook.map25.ui.SlideoutMap25_MapOptions;
@@ -274,9 +276,12 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	public void actionShowTour(final boolean isTrackVisible) {
 
 		_isShowTour = isTrackVisible;
-		final boolean isShowSliderPath = Map25ConfigManager.getActiveTourTrackConfig().isShowSliderPath;
+		final Map25TrackConfig activeTourTrackConfig = Map25ConfigManager.getActiveTourTrackConfig();
+		final boolean isShowSliderLocation = activeTourTrackConfig.isShowSliderLocation;
+		final boolean isShowSliderPath = activeTourTrackConfig.isShowSliderPath;
 
 		_mapApp.getLayer_Tour().setEnabled(_isShowTour);
+		_mapApp.getLayer_SliderLocation().setEnabled(_isShowTour && isShowSliderLocation);
 		_mapApp.getLayer_SliderPath().setEnabled(_isShowTour && isShowSliderPath);
 
 		_mapApp.getMap().render();
@@ -933,9 +938,11 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 		} else if (selection instanceof SelectionChartInfo) {
 
-			final boolean isShowSliderPath = Map25ConfigManager.getActiveTourTrackConfig().isShowSliderPath;
+			final Map25TrackConfig activeTourTrackConfig = Map25ConfigManager.getActiveTourTrackConfig();
+			final boolean isShowSliderLocation = activeTourTrackConfig.isShowSliderLocation;
+			final boolean isShowSliderPath = activeTourTrackConfig.isShowSliderPath;
 
-			if (_isMapSynched_WithChartSlider == false && isShowSliderPath == false) {
+			if (_isMapSynched_WithChartSlider == false && isShowSliderLocation == false && isShowSliderPath == false) {
 
 				// nothing to display
 				return;
@@ -1248,23 +1255,37 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 		tourLayer.setPoints(_allGeoPoints, _allTourStarts);
 
+		boolean isAnimate = true;
+
 		/*
-		 * Slider path
+		 * Chart slider + path
 		 */
-		final boolean isShowSliderPath = Map25ConfigManager.getActiveTourTrackConfig().isShowSliderPath;
+		final Map25TrackConfig activeTourTrackConfig = Map25ConfigManager.getActiveTourTrackConfig();
+		final boolean isShowSliderLocation = activeTourTrackConfig.isShowSliderLocation;
+		final boolean isShowSliderPath = activeTourTrackConfig.isShowSliderPath;
 
 		// show/hide layer
-		final SliderPath_Layer sliderPathLayer = _mapApp.getLayer_SliderPath();
+		final SliderLocation_Layer sliderLocation_Layer = _mapApp.getLayer_SliderLocation();
+		final SliderPath_Layer sliderPath_Layer = _mapApp.getLayer_SliderPath();
 
-		sliderPathLayer.setEnabled(isShowSliderPath);
-
-		boolean isAnimate = true;
+		sliderPath_Layer.setEnabled(isShowSliderPath);
+		sliderLocation_Layer.setEnabled(isShowSliderLocation);
 
 		if (isShowSliderPath) {
 
-			sliderPathLayer.setPoints(_allGeoPoints, _allTourStarts, _leftSliderValueIndex, _rightSliderValueIndex);
+			sliderPath_Layer.setPoints(_allGeoPoints, _allTourStarts, _leftSliderValueIndex, _rightSliderValueIndex);
 
 			isAnimate = false;
+		}
+
+		if (isShowSliderLocation) {
+
+			final GeoPoint locationGeoPoint = _allGeoPoints[_leftSliderValueIndex];
+
+			final double latitude = locationGeoPoint.getLatitude();
+			final double longitude = locationGeoPoint.getLongitude();
+
+			sliderLocation_Layer.setPosition(latitude, longitude, 10);
 		}
 
 		/*
@@ -1304,25 +1325,6 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 			});
 
 		} else {
-
-//			if (_isMapSynched_WithChartSlider) {
-//
-//				final int numGeoSlices = geoSize;
-//
-//				// check bounds
-//				final int selectedSliderValueIndex = Math.min(
-//						Math.max(_selectedSliderValueIndex, 0),
-//						numGeoSlices - 1);
-//
-//				final Map map = _mapApp.getMap();
-//
-//				final MapPosition mapPosition = map.getMapPosition();
-//				final GeoPoint geoPoint = _allGeoPoints[selectedSliderValueIndex];
-//
-//				mapPosition.setPosition(geoPoint);
-//
-//				Map25ConfigManager.setMapLocation(map, mapPosition);
-//			}
 
 			map25.updateMap(true);
 		}

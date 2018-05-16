@@ -130,13 +130,14 @@ public class Map25ConfigManager {
 	public static final float			OUTLINE_WIDTH_MIN					= 0.1f;
 	public static final float			OUTLINE_WIDTH_MAX					= 20.0f;
 	//
-	// slider path
+	// chart slider + path
 	private static final String			TAG_SLIDER_PATH						= "SliderPath";							//$NON-NLS-1$
+	private static final String			ATTR_IS_SHOW_CHART_SLIDER			= "isShowSliderLocation";					//$NON-NLS-1$
 	private static final String			ATTR_IS_SHOW_SLIDER_PATH			= "isShowSliderPath";					//$NON-NLS-1$
-	private static final String			ATTR_SLIDER_PATH_COLOR				= "sliderPath_Color";					//$NON-NLS-1$
 	private static final String			ATTR_SLIDER_PATH_LINE_WIDTH			= "sliderPath_LineWidth";				//$NON-NLS-1$
 	private static final String			ATTR_SLIDER_PATH_OPACITY			= "sliderPath_Opacity";					//$NON-NLS-1$
 	//
+	public static final boolean			DEFAULT_IS_SHOW_CHART_SLIDER		= true;
 	public static final boolean			DEFAULT_IS_SHOW_SLIDER_PATH			= true;
 	public static final RGB				DEFAULT_SLIDER_PATH_COLOR			= new RGB(0xff, 0xff, 0x0);
 	public static final float			DEFAULT_SLIDER_PATH_LINE_WIDTH		= 20.0f;
@@ -505,6 +506,7 @@ public class Map25ConfigManager {
 			// <SliderPath>
 			final IMemento xmlSliderPath = Util.setXmlRgb(xmlConfig, TAG_SLIDER_PATH, config.sliderPath_Color);
 			{
+				xmlSliderPath.putBoolean(ATTR_IS_SHOW_CHART_SLIDER, config.isShowSliderLocation);
 				xmlSliderPath.putBoolean(ATTR_IS_SHOW_SLIDER_PATH, config.isShowSliderPath);
 				xmlSliderPath.putFloat(ATTR_SLIDER_PATH_LINE_WIDTH, config.sliderPath_LineWidth);
 				xmlSliderPath.putInteger(ATTR_SLIDER_PATH_OPACITY, config.sliderPath_Opacity);
@@ -690,6 +692,7 @@ public class Map25ConfigManager {
 				
 			case TAG_SLIDER_PATH:
 				
+				config.isShowSliderLocation	= Util.getXmlBoolean(xmlConfigChild, 	ATTR_IS_SHOW_CHART_SLIDER, 		DEFAULT_IS_SHOW_CHART_SLIDER);
 				config.isShowSliderPath 	= Util.getXmlBoolean(xmlConfigChild, 	ATTR_IS_SHOW_SLIDER_PATH, 		DEFAULT_IS_SHOW_SLIDER_PATH);
 				config.sliderPath_Color		= Util.getXmlRgb(xmlConfigChild, 		DEFAULT_SLIDER_PATH_COLOR);
 				config.sliderPath_LineWidth = Util.getXmlFloatFloat(xmlConfigChild,	ATTR_SLIDER_PATH_LINE_WIDTH, 	DEFAULT_SLIDER_PATH_LINE_WIDTH, SLIDER_PATH_LINE_WIDTH_MIN, SLIDER_PATH_LINE_WIDTH_MAX);

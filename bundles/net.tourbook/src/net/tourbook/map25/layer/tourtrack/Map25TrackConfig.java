@@ -36,6 +36,7 @@ public class Map25TrackConfig {
 	public int		outlineOpacity			= Map25ConfigManager.DEFAULT_OUTLINE_OPACITY;
 
 	// chart slider path
+	public boolean	isShowSliderLocation		= Map25ConfigManager.DEFAULT_IS_SHOW_CHART_SLIDER;
 	public boolean	isShowSliderPath		= Map25ConfigManager.DEFAULT_IS_SHOW_SLIDER_PATH;
 	public RGB		sliderPath_Color		= Map25ConfigManager.DEFAULT_SLIDER_PATH_COLOR;
 	public float	sliderPath_LineWidth	= Map25ConfigManager.DEFAULT_SLIDER_PATH_LINE_WIDTH;

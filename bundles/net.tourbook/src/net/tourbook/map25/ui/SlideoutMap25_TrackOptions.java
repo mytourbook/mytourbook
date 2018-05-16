@@ -73,6 +73,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 	 */
 	private Composite				_shellContainer;
 
+	private Button					_chkShowChartSlider;
 	private Button					_chkShowSliderPath;
 
 	private Combo					_comboName;
@@ -273,6 +274,16 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
 	private void createUI_200_SliderPath(final Composite parent) {
 
+		{
+			/*
+			 * Chart slider
+			 */
+			// checkbox
+			_chkShowChartSlider = new Button(parent, SWT.CHECK);
+			_chkShowChartSlider.setText(Messages.Slideout_Map_MapOptions_Checkbox_ChartSlider);
+			_chkShowChartSlider.addSelectionListener(_defaultSelectionListener);
+			GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkShowChartSlider);
+		}
 		{
 			/*
 			 * Slider path
@@ -506,7 +517,8 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 		_spinnerOutline_Width.setSelection((int) (config.outlineWidth * 10));
 		_spinnerOutline_Opacity.setSelection(config.outlineOpacity);
 
-		// slider path
+		// chart slider + path
+		_chkShowSliderPath.setSelection(config.isShowSliderLocation);
 		_chkShowSliderPath.setSelection(config.isShowSliderPath);
 		_colorSliderPathColor.setColorValue(config.sliderPath_Color);
 		_spinnerSliderPath_LineWidth.setSelection((int) (config.sliderPath_LineWidth * 10));
@@ -528,7 +540,8 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 		config.outlineWidth = _spinnerOutline_Width.getSelection() / 10.0f;
 		config.outlineOpacity = _spinnerOutline_Opacity.getSelection();
 
-		// slider path
+		// chart slider + path
+		config.isShowSliderLocation = _chkShowChartSlider.getSelection();
 		config.isShowSliderPath = _chkShowSliderPath.getSelection();
 		config.sliderPath_Color = _colorSliderPathColor.getColorValue();
 		config.sliderPath_LineWidth = _spinnerSliderPath_LineWidth.getSelection() / 10.0f;
