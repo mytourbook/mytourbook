@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -60,6 +60,7 @@ import net.tourbook.map25.action.ActionSynchMapWithChartSlider;
 import net.tourbook.map25.action.ActionSynchMapWithTour;
 import net.tourbook.map25.layer.marker.MapMarker;
 import net.tourbook.map25.layer.marker.MarkerLayer;
+import net.tourbook.map25.layer.tourtrack.SliderPath_Layer;
 import net.tourbook.map25.layer.tourtrack.TourLayer;
 import net.tourbook.map25.ui.SlideoutMap25_MapOptions;
 import net.tourbook.map25.ui.SlideoutMap25_TrackOptions;
@@ -160,6 +161,10 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	private TIntArrayList					_allTourStarts							= new TIntArrayList();
 	private GeoPoint[]						_allGeoPoints;
 	private BoundingBox						_allBoundingBox;
+	//
+	private int								_leftSliderValueIndex;
+	private int								_rightSliderValueIndex;
+	private int								_selectedSliderValueIndex;
 	//
 	private int								_hashTourId;
 	private int								_hashTourData;
@@ -269,8 +274,11 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	public void actionShowTour(final boolean isTrackVisible) {
 
 		_isShowTour = isTrackVisible;
+		final boolean isShowSliderPath = Map25ConfigManager.getActiveTourTrackConfig().isShowSliderPath;
 
 		_mapApp.getLayer_Tour().setEnabled(_isShowTour);
+		_mapApp.getLayer_SliderPath().setEnabled(_isShowTour && isShowSliderPath);
+
 		_mapApp.getMap().render();
 
 		enableActions();
@@ -925,7 +933,11 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 		} else if (selection instanceof SelectionChartInfo) {
 
-			if (!_isMapSynched_WithChartSlider) {
+			final boolean isShowSliderPath = Map25ConfigManager.getActiveTourTrackConfig().isShowSliderPath;
+
+			if (_isMapSynched_WithChartSlider == false && isShowSliderPath == false) {
+
+				// nothing to display
 				return;
 			}
 
@@ -966,15 +978,27 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 				}
 			}
 
+			_leftSliderValueIndex = chartInfo.leftSliderValuesIndex;
+			_rightSliderValueIndex = chartInfo.rightSliderValuesIndex;
+			_selectedSliderValueIndex = chartInfo.selectedSliderValuesIndex;
+
 			if (tourData != null) {
 
-				syncMapWith_ChartSlider(//
-						tourData,
-						chartInfo.leftSliderValuesIndex,
-						chartInfo.rightSliderValuesIndex,
-						chartInfo.selectedSliderValuesIndex);
+				if (_isMapSynched_WithChartSlider) {
 
-				enableActions();
+					syncMapWith_ChartSlider(//
+							tourData,
+							chartInfo.leftSliderValuesIndex,
+							chartInfo.rightSliderValuesIndex,
+							chartInfo.selectedSliderValuesIndex);
+
+					enableActions();
+				}
+
+				if (isShowSliderPath) {
+
+					paintTour(tourData);
+				}
 			}
 
 		} else if (selection instanceof SelectionChartXSliderPosition) {
@@ -1004,6 +1028,10 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 							rightSliderValueIndex == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION
 									? leftSliderValueIndex
 									: rightSliderValueIndex;
+
+					_leftSliderValueIndex = leftSliderValueIndex;
+					_rightSliderValueIndex = rightSliderValueIndex;
+					_selectedSliderValueIndex = leftSliderValueIndex;
 
 					syncMapWith_ChartSlider(//
 							tourData,
@@ -1221,6 +1249,25 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		tourLayer.setPoints(_allGeoPoints, _allTourStarts);
 
 		/*
+		 * Slider path
+		 */
+		final boolean isShowSliderPath = Map25ConfigManager.getActiveTourTrackConfig().isShowSliderPath;
+
+		// show/hide layer
+		final SliderPath_Layer sliderPathLayer = _mapApp.getLayer_SliderPath();
+
+		sliderPathLayer.setEnabled(isShowSliderPath);
+
+		boolean isAnimate = true;
+
+		if (isShowSliderPath) {
+
+			sliderPathLayer.setPoints(_allGeoPoints, _allTourStarts, _leftSliderValueIndex, _rightSliderValueIndex);
+
+			isAnimate = false;
+		}
+
+		/*
 		 * Markers
 		 */
 		final MarkerLayer markerLayer = _mapApp.getLayer_Marker();
@@ -1236,23 +1283,49 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		 */
 		final Map map25 = _mapApp.getMap();
 
-		map25.post(new Runnable() {
+		if (isAnimate) {
 
-			@Override
-			public void run() {
+			map25.post(new Runnable() {
 
-				// create outside isSynch that data are available when map is zoomed to show the whole tour
-				_allBoundingBox = createBoundingBox(_allGeoPoints);
+				@Override
+				public void run() {
 
-				if (_isMapSynched_WithTour) {
+					// create outside isSynch that data are available when map is zoomed to show the whole tour
+					_allBoundingBox = createBoundingBox(_allGeoPoints);
 
-					final int animationTime = Map25ConfigManager.getActiveTourTrackConfig().animationTime;
-					Map25ConfigManager.setMapLocation(map25, _allBoundingBox, animationTime);
+					if (_isMapSynched_WithTour) {
+
+						final int animationTime = Map25ConfigManager.getActiveTourTrackConfig().animationTime;
+						Map25ConfigManager.setMapLocation(map25, _allBoundingBox, animationTime);
+					}
+
+					map25.updateMap(true);
 				}
+			});
 
-				map25.updateMap(true);
-			}
-		});
+		} else {
+
+//			if (_isMapSynched_WithChartSlider) {
+//
+//				final int numGeoSlices = geoSize;
+//
+//				// check bounds
+//				final int selectedSliderValueIndex = Math.min(
+//						Math.max(_selectedSliderValueIndex, 0),
+//						numGeoSlices - 1);
+//
+//				final Map map = _mapApp.getMap();
+//
+//				final MapPosition mapPosition = map.getMapPosition();
+//				final GeoPoint geoPoint = _allGeoPoints[selectedSliderValueIndex];
+//
+//				mapPosition.setPosition(geoPoint);
+//
+//				Map25ConfigManager.setMapLocation(map, mapPosition);
+//			}
+
+			map25.updateMap(true);
+		}
 	}
 
 	void restoreState() {

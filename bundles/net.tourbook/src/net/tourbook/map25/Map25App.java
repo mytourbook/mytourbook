@@ -26,6 +26,7 @@ import net.tourbook.map25.layer.marker.MarkerConfig;
 import net.tourbook.map25.layer.marker.MarkerLayer;
 import net.tourbook.map25.layer.marker.MarkerLayer.OnItemGestureListener;
 import net.tourbook.map25.layer.marker.MarkerRenderer;
+import net.tourbook.map25.layer.tourtrack.SliderPath_Layer;
 import net.tourbook.map25.layer.tourtrack.TourLayer;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -92,6 +93,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 	private MapScaleBarLayer		_layer_ScaleBar;
 	private TileGridLayerMT			_layer_TileInfo;
 	private TourLayer				_layer_Tour;
+	private SliderPath_Layer		_layer_SliderPath;
 
 	private OkHttpFactoryMT			_httpFactory;
 
@@ -294,6 +296,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 
 	public MapScaleBarLayer getLayer_ScaleBar() {
 		return _layer_ScaleBar;
+	}
+
+	public SliderPath_Layer getLayer_SliderPath() {
+		return _layer_SliderPath;
 	}
 
 	public TileGridLayerMT getLayer_TileInfo() {
@@ -513,6 +519,11 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		_layer_Tour = new TourLayer(mMap);
 		_layer_Tour.setEnabled(false);
 		layers.add(_layer_Tour);
+
+		// slider path
+		_layer_SliderPath = new SliderPath_Layer(mMap);
+		_layer_SliderPath.setEnabled(false);
+		layers.add(_layer_SliderPath);
 
 		// building
 		_layer_Building = new BuildingLayer(mMap, _layer_BaseMap);

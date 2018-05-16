@@ -3170,7 +3170,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 		_sliderPathPaintingData = new SliderPathPaintingData();
 
-		_sliderPathPaintingData.isShowSliderRelation = Util.getStateBoolean(_state,
+		_sliderPathPaintingData.isShowSliderPath = Util.getStateBoolean(_state,
 				Map2View.STATE_IS_SHOW_SLIDER_PATH,
 				Map2View.STATE_IS_SHOW_SLIDER_PATH_DEFAULT);
 

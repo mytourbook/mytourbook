@@ -458,7 +458,7 @@ public class DirectMappingPainter implements IDirectPainter {
 			drawSliderMarker(painterContext, _rightSliderValueIndex, _imageRightSlider);
 			drawSliderMarker(painterContext, _leftSliderValueIndex, _imageLeftSlider);
 
-			if (_sliderPathPaintingData.isShowSliderRelation) {
+			if (_sliderPathPaintingData.isShowSliderPath) {
 
 				// draw it even when the sliders are not visible but the tour can be visible !
 

@@ -19,10 +19,12 @@ import org.eclipse.swt.graphics.RGB;
 
 public class SliderPathPaintingData {
 
-	boolean	isShowSliderRelation;
+	boolean	isShowSliderPath;
+
+	RGB		color;
+
+	int		lineWidth;
 	int		opacity;
 	int		segments;
-	int		lineWidth;
-	RGB		color;
 
 }

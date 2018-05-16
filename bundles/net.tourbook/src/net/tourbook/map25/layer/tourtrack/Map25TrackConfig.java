@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -35,15 +35,16 @@ public class Map25TrackConfig {
 	public RGB		outlineColor			= Map25ConfigManager.DEFAULT_OUTLINE_COLOR;
 	public int		outlineOpacity			= Map25ConfigManager.DEFAULT_OUTLINE_OPACITY;
 
-	/**
-	 * Animation time in milli seconds when a tour is synched with the map, default is
-	 */
-	public int		animationTime			= Map25ConfigManager.DEFAULT_ANIMATION_TIME;
-
 	// chart slider path
 	public boolean	isShowSliderPath		= Map25ConfigManager.DEFAULT_IS_SHOW_SLIDER_PATH;
+	public RGB		sliderPath_Color		= Map25ConfigManager.DEFAULT_SLIDER_PATH_COLOR;
 	public float	sliderPath_LineWidth	= Map25ConfigManager.DEFAULT_SLIDER_PATH_LINE_WIDTH;
 	public int		sliderPath_Opacity		= Map25ConfigManager.DEFAULT_SLIDER_PATH_OPACITY;
+
+	/**
+	 * Animation time in milli seconds when a tour is synched with the map, default is 2000 ms
+	 */
+	public int		animationTime			= Map25ConfigManager.DEFAULT_ANIMATION_TIME;
 
 	public Map25TrackConfig() {}
 
