@@ -653,10 +653,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
      * The geo bound values are in microdegrees (degrees * 10^6).
      */
 
-	private int							latitudeMinE6;								// db-version 35
-	private int							latitudeMaxE6;								// db-version 35
-	private int							longitudeMinE6;								// db-version 35
-	private int							longitudeMaxE6;								// db-version 35
+//	private int							latitudeMinE6;								// db-version 35
+//	private int							latitudeMaxE6;								// db-version 35
+//	private int							longitudeMinE6;								// db-version 35
+//	private int							longitudeMaxE6;								// db-version 35
  
 	
 	// ############################################# UNUSED FIELDS - START #############################################
@@ -1564,10 +1564,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		_gpsBounds = null;
 		_rasterizedLatLon = null;
 		geoGrid = null;
-		latitudeMinE6 = 0;
-		longitudeMinE6 = 0;
-		latitudeMaxE6 = 0;
-		longitudeMaxE6 = 0;
+//		latitudeMinE6 = 0;
+//		longitudeMinE6 = 0;
+//		latitudeMaxE6 = 0;
+//		longitudeMaxE6 = 0;
 
 		_hrZones = null;
 		_hrZoneContext = null;
@@ -2666,11 +2666,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			}
 		}
 
-		latitudeMinE6 = (int) (minLatitude * 1_000_000);
-		longitudeMinE6 = (int) (minLongitude * 1_000_000);
-
-		latitudeMaxE6 = (int) (maxLatitude * 1_000_000);
-		longitudeMaxE6 = (int) (maxLongitude * 1_000_000);
+//		latitudeMinE6 = (int) (minLatitude * 1_000_000);
+//		longitudeMinE6 = (int) (minLongitude * 1_000_000);
+//
+//		latitudeMaxE6 = (int) (maxLatitude * 1_000_000);
+//		longitudeMaxE6 = (int) (maxLongitude * 1_000_000);
 
 		_gpsBounds = new GeoPosition[] {
 				new GeoPosition(minLatitude, minLongitude),
@@ -5890,21 +5890,21 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		return UI.EMPTY_STRING;
 	}
 
-	public int getLatitudeMaxE6() {
-		return latitudeMaxE6;
-	}
-
-	public int getLatitudeMinE6() {
-		return latitudeMinE6;
-	}
-
-	public int getLongitudeMaxE6() {
-		return longitudeMaxE6;
-	}
-
-	public int getLongitudeMinE6() {
-		return longitudeMinE6;
-	}
+//	public int getLatitudeMaxE6() {
+//		return latitudeMaxE6;
+//	}
+//
+//	public int getLatitudeMinE6() {
+//		return latitudeMinE6;
+//	}
+//
+//	public int getLongitudeMaxE6() {
+//		return longitudeMaxE6;
+//	}
+//
+//	public int getLongitudeMinE6() {
+//		return longitudeMinE6;
+//	}
 
 	/**
 	 * @return the maxAltitude
