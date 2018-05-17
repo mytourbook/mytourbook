@@ -4,6 +4,7 @@
 package net.tourbook.map25.layer.tourtrack;
 
 import org.oscim.backend.CanvasAdapter;
+import org.oscim.core.GeoPoint;
 import org.oscim.core.MercatorProjection;
 import org.oscim.layers.Layer;
 import org.oscim.map.Map;
@@ -37,14 +38,20 @@ public class SliderLocation_Layer extends Layer {
 		}
 	}
 
-	public void setPosition(final double latitude, final double longitude, final double accuracy) {
 
-		final double x = MercatorProjection.longitudeToX(longitude);
-		final double y = MercatorProjection.latitudeToY(latitude);
+	public void setPosition(final GeoPoint leftGeoPoint, final GeoPoint rightGeoPoint) {
 
-		final double radius = accuracy / MercatorProjection.groundResolutionWithScale(latitude, 1);
+		final double radius = 10 / MercatorProjection.groundResolutionWithScale(leftGeoPoint.getLatitude(), 1);
 
-		locationRenderer.setLocation(x, y, radius);
-		locationRenderer.animate(true);
+		locationRenderer.setLocation(
+
+				MercatorProjection.longitudeToX(leftGeoPoint.getLongitude()),
+				MercatorProjection.latitudeToY(leftGeoPoint.getLatitude()),
+
+				MercatorProjection.longitudeToX(rightGeoPoint.getLongitude()),
+				MercatorProjection.latitudeToY(rightGeoPoint.getLatitude()),
+
+				radius);
+
 	}
 }

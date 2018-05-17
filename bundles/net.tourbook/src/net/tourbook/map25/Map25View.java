@@ -1280,12 +1280,10 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 		if (isShowSliderLocation) {
 
-			final GeoPoint locationGeoPoint = _allGeoPoints[_leftSliderValueIndex];
+			final GeoPoint leftGeoPoint = _allGeoPoints[_leftSliderValueIndex];
+			final GeoPoint rightGeoPoint = _allGeoPoints[_rightSliderValueIndex];
 
-			final double latitude = locationGeoPoint.getLatitude();
-			final double longitude = locationGeoPoint.getLongitude();
-
-			sliderLocation_Layer.setPosition(latitude, longitude, 10);
+			sliderLocation_Layer.setPosition(leftGeoPoint, rightGeoPoint);
 		}
 
 		/*

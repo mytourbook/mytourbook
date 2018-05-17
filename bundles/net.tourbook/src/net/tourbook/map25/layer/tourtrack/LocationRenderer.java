@@ -24,12 +24,13 @@ import org.oscim.utils.math.Interpolation;
 
 public class LocationRenderer extends LayerRenderer {
 
-	private static final long	ANIM_RATE			= 50;
-	private static final long	INTERVAL			= 2000;
+	private static final long	ANIM_RATE				= 50;
+	private static final long	INTERVAL				= 2000;
 
-	private static final float	CIRCLE_SIZE			= 30;
-	private static final int	COLOR				= 0xff3333cc;
-	private static final int	SHOW_ACCURACY_ZOOM	= 16;
+	private static final float	CIRCLE_SIZE				= 30;
+	private static final int	COLOR1					= 0xff00ffcc;
+	private static final int	COLOR2					= 0xff3333cc;
+	private static final int	SHOW_ACCURACY_ZOOM		= 16;
 
 	private final Map			mMap;
 	private final Layer			mLayer;
@@ -45,25 +46,29 @@ public class LocationRenderer extends LayerRenderer {
 	private int					uColor;
 	private int					uMode;
 
-	private final Point			mIndicatorPosition	= new Point();
-
-	private final Point			mScreenPoint		= new Point();
-	private final Box			mBBox				= new Box();
+	private final Point			mScreenPoint			= new Point();
+	private final Box			mBBox					= new Box();
 
 	private boolean				mInitialized;
 
-	private boolean				mLocationIsVisible;
+	private final float[]		mColors[]				= new float[2][4];
+	private final Point			mIndicatorPosition[]	= { new Point(), new Point() };
+	private final boolean		mLocationIsVisible[]	= new boolean[2];
+	private final Point			mLocation[]				= {
+			new Point(Double.NaN, Double.NaN),
+			new Point(Double.NaN, Double.NaN)
+	};
 
 	private boolean				mRunAnim;
 	private long				mAnimStart;
 
 	private Callback			mCallback;
-	private final float[]		mColors				= new float[4];
-	private final Point			mLocation			= new Point(Double.NaN, Double.NaN);
+
 	private double				mRadius;
-	private int					mShowAccuracyZoom	= SHOW_ACCURACY_ZOOM;
+	private int					mShowAccuracyZoom		= SHOW_ACCURACY_ZOOM;
 
 	public interface Callback {
+
 		float getRotation();
 
 		/**
@@ -77,15 +82,22 @@ public class LocationRenderer extends LayerRenderer {
 	}
 
 	public LocationRenderer(final Map map, final Layer layer, final float scale) {
+
 		mMap = map;
 		mLayer = layer;
 		mScale = scale;
 
-		final float a = Color.aToFloat(COLOR);
-		mColors[0] = a * Color.rToFloat(COLOR);
-		mColors[1] = a * Color.gToFloat(COLOR);
-		mColors[2] = a * Color.bToFloat(COLOR);
-		mColors[3] = a;
+		final float color1 = Color.aToFloat(COLOR1);
+		mColors[0][0] = color1 * Color.rToFloat(COLOR1);
+		mColors[0][1] = color1 * Color.gToFloat(COLOR1);
+		mColors[0][2] = color1 * Color.bToFloat(COLOR1);
+		mColors[0][3] = color1;
+
+		final float color2 = Color.aToFloat(COLOR2);
+		mColors[1][0] = color2 * Color.rToFloat(COLOR2);
+		mColors[1][1] = color2 * Color.gToFloat(COLOR2);
+		mColors[1][2] = color2 * Color.bToFloat(COLOR2);
+		mColors[1][3] = color2;
 	}
 
 	public void animate(final boolean enable) {
@@ -109,9 +121,11 @@ public class LocationRenderer extends LayerRenderer {
 
 				final long diff = System.currentTimeMillis() - lastRun;
 				mMap.postDelayed(this, Math.min(ANIM_RATE, diff));
-				if (!mLocationIsVisible) {
+
+				if (mLocationIsVisible[0] == false || mLocationIsVisible[1] == false) {
 					mMap.render();
 				}
+
 				lastRun = System.currentTimeMillis();
 			}
 		};
@@ -156,9 +170,13 @@ public class LocationRenderer extends LayerRenderer {
 
 		animate(true);
 		boolean viewShed = false;
-		if (!mLocationIsVisible /* || pos.zoomLevel < SHOW_ACCURACY_ZOOM */) {
+		if (mLocationIsVisible[0] == false || mLocationIsVisible[1] == false
+		/* || pos.zoomLevel < SHOW_ACCURACY_ZOOM */) {
+
 			//animate(true);
+
 		} else {
+
 			if (v.pos.zoomLevel >= mShowAccuracyZoom) {
 				radius = (float) (mRadius * v.pos.scale);
 			}
@@ -169,43 +187,50 @@ public class LocationRenderer extends LayerRenderer {
 		}
 		gl.uniform1f(hScale, radius);
 
-		final double x = mIndicatorPosition.x - v.pos.x;
-		final double y = mIndicatorPosition.y - v.pos.y;
-		final double tileScale = Tile.SIZE * v.pos.scale;
+		for (int locationIndex = 0; locationIndex < 2; locationIndex++) {
 
-		v.mvp.setTransScale((float) (x * tileScale), (float) (y * tileScale), 1);
-		v.mvp.multiplyMM(v.viewproj, v.mvp);
-		v.mvp.setAsUniform(hMatrixPosition);
+			final double x = mIndicatorPosition[locationIndex].x - v.pos.x;
+			final double y = mIndicatorPosition[locationIndex].y - v.pos.y;
+			final double tileScale = Tile.SIZE * v.pos.scale;
 
-		if (!viewShed) {
-			float phase = Math.abs(animPhase() - 0.5f) * 2;
-			//phase = Interpolation.fade.apply(phase);
-			phase = Interpolation.swing.apply(phase);
+			v.mvp.setTransScale((float) (x * tileScale), (float) (y * tileScale), 1);
+			v.mvp.multiplyMM(v.viewproj, v.mvp);
+			v.mvp.setAsUniform(hMatrixPosition);
 
-			gl.uniform1f(hPhase, 0.8f + phase * 0.2f);
-		} else {
-			gl.uniform1f(hPhase, 1);
-		}
+			if (!viewShed) {
 
-		if (viewShed && mLocationIsVisible) {
-			if (mCallback != null && mCallback.hasRotation()) {
-				float rotation = mCallback.getRotation();
-				rotation -= 90;
-				gl.uniform2f(hDirection,
-						(float) Math.cos(Math.toRadians(rotation)),
-						(float) Math.sin(Math.toRadians(rotation)));
-				gl.uniform1i(uMode, 1); // With bearing
+				float phase = Math.abs(animPhase() - 0.5f) * 2;
+				//phase = Interpolation.fade.apply(phase);
+				phase = Interpolation.swing.apply(phase);
+
+				gl.uniform1f(hPhase, 0.8f + phase * 0.2f);
+
 			} else {
-				gl.uniform2f(hDirection, 0, 0);
-				gl.uniform1i(uMode, 0); // Without bearing
+				gl.uniform1f(hPhase, 1);
 			}
-		} else {
-			gl.uniform1i(uMode, -1); // Outside screen
+
+			if (viewShed && mLocationIsVisible[locationIndex]) {
+
+				if (mCallback != null && mCallback.hasRotation()) {
+					float rotation = mCallback.getRotation();
+					rotation -= 90;
+					gl.uniform2f(hDirection,
+							(float) Math.cos(Math.toRadians(rotation)),
+							(float) Math.sin(Math.toRadians(rotation)));
+					gl.uniform1i(uMode, 1); // With bearing
+				} else {
+					gl.uniform2f(hDirection, 0, 0);
+					gl.uniform1i(uMode, 0); // Without bearing
+				}
+
+			} else {
+				gl.uniform1i(uMode, -1); // Outside screen
+			}
+
+			GLUtils.glUniform4fv(uColor, 1, mColors[locationIndex]);
+
+			gl.drawArrays(GL.TRIANGLE_STRIP, 0, 4);
 		}
-
-		GLUtils.glUniform4fv(uColor, 1, mColors);
-
-		gl.drawArrays(GL.TRIANGLE_STRIP, 0, 4);
 	}
 
 	public void setCallback(final Callback callback) {
@@ -213,16 +238,32 @@ public class LocationRenderer extends LayerRenderer {
 	}
 
 	public void setColor(final int color) {
-		final float a = Color.aToFloat(color);
-		mColors[0] = a * Color.rToFloat(color);
-		mColors[1] = a * Color.gToFloat(color);
-		mColors[2] = a * Color.bToFloat(color);
-		mColors[3] = a;
+
+		final float color1 = Color.aToFloat(COLOR1);
+		mColors[0][0] = color1 * Color.rToFloat(COLOR1);
+		mColors[0][1] = color1 * Color.gToFloat(COLOR1);
+		mColors[0][2] = color1 * Color.bToFloat(COLOR1);
+		mColors[0][3] = color1;
+
+		final float color2 = Color.aToFloat(COLOR2);
+		mColors[1][0] = color2 * Color.rToFloat(COLOR2);
+		mColors[1][1] = color2 * Color.gToFloat(COLOR2);
+		mColors[1][2] = color2 * Color.bToFloat(COLOR2);
+		mColors[1][3] = color2;
 	}
 
-	public void setLocation(final double x, final double y, final double radius) {
-		mLocation.x = x;
-		mLocation.y = y;
+	public void setLocation(final double longitudeX,
+							final double latitudeY,
+							final double longitudeX2,
+							final double latitudeY2,
+							final double radius) {
+
+		mLocation[0].x = longitudeX;
+		mLocation[0].y = latitudeY;
+
+		mLocation[1].x = longitudeX2;
+		mLocation[1].y = latitudeY2;
+
 		mRadius = radius;
 	}
 
@@ -261,43 +302,46 @@ public class LocationRenderer extends LayerRenderer {
 		// savely translated to screen coordinates
 		v.getBBox(mBBox, 0);
 
-		double x = mLocation.x;
-		double y = mLocation.y;
+		for (int locationIndex = 0; locationIndex < 2; locationIndex++) {
 
-		if (!mBBox.contains(mLocation)) {
-			x = FastMath.clamp(x, mBBox.xmin, mBBox.xmax);
-			y = FastMath.clamp(y, mBBox.ymin, mBBox.ymax);
+			double x = mLocation[locationIndex].x;
+			double y = mLocation[locationIndex].y;
+
+			if (!mBBox.contains(mLocation[locationIndex])) {
+				x = FastMath.clamp(x, mBBox.xmin, mBBox.xmax);
+				y = FastMath.clamp(y, mBBox.ymin, mBBox.ymax);
+			}
+
+			// get position of Location in pixel relative to
+			// screen center
+			v.toScreenPoint(x, y, mScreenPoint);
+
+			x = mScreenPoint.x + width / 2;
+			y = mScreenPoint.y + height / 2;
+
+			// clip position to screen boundaries
+			int visible = 0;
+
+			if (x > width - 5) {
+				x = width;
+			} else if (x < 5) {
+				x = 0;
+			} else {
+				visible++;
+			}
+
+			if (y > height - 5) {
+				y = height;
+			} else if (y < 5) {
+				y = 0;
+			} else {
+				visible++;
+			}
+
+			mLocationIsVisible[locationIndex] = (visible == 2);
+
+			// set location indicator position
+			v.fromScreenPoint(x, y, mIndicatorPosition[locationIndex]);
 		}
-
-		// get position of Location in pixel relative to
-		// screen center
-		v.toScreenPoint(x, y, mScreenPoint);
-
-		x = mScreenPoint.x + width / 2;
-		y = mScreenPoint.y + height / 2;
-
-		// clip position to screen boundaries
-		int visible = 0;
-
-		if (x > width - 5) {
-			x = width;
-		} else if (x < 5) {
-			x = 0;
-		} else {
-			visible++;
-		}
-
-		if (y > height - 5) {
-			y = height;
-		} else if (y < 5) {
-			y = 0;
-		} else {
-			visible++;
-		}
-
-		mLocationIsVisible = (visible == 2);
-
-		// set location indicator position
-		v.fromScreenPoint(x, y, mIndicatorPosition);
 	}
 }
