@@ -73,7 +73,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 	 */
 	private Composite				_shellContainer;
 
-	private Button					_chkShowChartSlider;
+	private Button					_chkShowSliderLocation;
 	private Button					_chkShowSliderPath;
 
 	private Combo					_comboName;
@@ -279,10 +279,10 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 			 * Chart slider
 			 */
 			// checkbox
-			_chkShowChartSlider = new Button(parent, SWT.CHECK);
-			_chkShowChartSlider.setText(Messages.Slideout_Map_MapOptions_Checkbox_ChartSlider);
-			_chkShowChartSlider.addSelectionListener(_defaultSelectionListener);
-			GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkShowChartSlider);
+			_chkShowSliderLocation = new Button(parent, SWT.CHECK);
+			_chkShowSliderLocation.setText(Messages.Slideout_Map_MapOptions_Checkbox_ChartSlider);
+			_chkShowSliderLocation.addSelectionListener(_defaultSelectionListener);
+			GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkShowSliderLocation);
 		}
 		{
 			/*
@@ -457,6 +457,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
 		mapApp.getLayer_Tour().onModifyConfig();
 		mapApp.getLayer_SliderPath().onModifyConfig();
+		mapApp.getLayer_SliderLocation().onModifyConfig();
 	}
 
 	private void onModifyName() {
@@ -518,7 +519,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 		_spinnerOutline_Opacity.setSelection(config.outlineOpacity);
 
 		// chart slider + path
-		_chkShowSliderPath.setSelection(config.isShowSliderLocation);
+		_chkShowSliderLocation.setSelection(config.isShowSliderLocation);
 		_chkShowSliderPath.setSelection(config.isShowSliderPath);
 		_colorSliderPathColor.setColorValue(config.sliderPath_Color);
 		_spinnerSliderPath_LineWidth.setSelection((int) (config.sliderPath_LineWidth * 10));
@@ -541,7 +542,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 		config.outlineOpacity = _spinnerOutline_Opacity.getSelection();
 
 		// chart slider + path
-		config.isShowSliderLocation = _chkShowChartSlider.getSelection();
+		config.isShowSliderLocation = _chkShowSliderLocation.getSelection();
 		config.isShowSliderPath = _chkShowSliderPath.getSelection();
 		config.sliderPath_Color = _colorSliderPathColor.getColorValue();
 		config.sliderPath_LineWidth = _spinnerSliderPath_LineWidth.getSelection() / 10.0f;
@@ -558,5 +559,6 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
 		mapApp.getLayer_Tour().onModifyConfig();
 		mapApp.getLayer_SliderPath().onModifyConfig();
+		mapApp.getLayer_SliderLocation().onModifyConfig();
 	}
 }

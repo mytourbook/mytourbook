@@ -3,6 +3,8 @@
  */
 package net.tourbook.map25.layer.tourtrack;
 
+import net.tourbook.map25.Map25ConfigManager;
+
 import org.oscim.backend.CanvasAdapter;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MercatorProjection;
@@ -25,6 +27,13 @@ public class SliderLocation_Layer extends Layer {
 		mRenderer = locationRenderer = new LocationRenderer(mMap, this, scale);
 	}
 
+	public void onModifyConfig() {
+
+		final Map25TrackConfig activeTourTrackConfig = Map25ConfigManager.getActiveTourTrackConfig();
+
+		setEnabled(activeTourTrackConfig.isShowSliderLocation);
+	}
+
 	@Override
 	public void setEnabled(final boolean enabled) {
 		if (enabled == isEnabled()) {
@@ -37,7 +46,6 @@ public class SliderLocation_Layer extends Layer {
 			locationRenderer.animate(false);
 		}
 	}
-
 
 	public void setPosition(final GeoPoint leftGeoPoint, final GeoPoint rightGeoPoint) {
 
