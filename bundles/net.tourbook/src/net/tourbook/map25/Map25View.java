@@ -82,6 +82,7 @@ import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
@@ -110,33 +111,48 @@ import de.byteholder.gpx.PointOfInterest;
 public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDialogs, IMapBookmarkListener,
 		IMapSyncListener {
 
-// SET_FORMATTING_OFF
+	// SET_FORMATTING_OFF
 	//
-	private static final String		IMAGE_ACTION_SHOW_TOUR_IN_MAP			= net.tourbook.map2.Messages.Image__Tour;
-	private static final String		IMAGE_ACTION_SHOW_TOUR_IN_MAP_DISABLED	= net.tourbook.map2.Messages.Image__Tour_Disabled;
-	private static final String		MAP_ACTION_SHOW_TOUR_IN_MAP 			= net.tourbook.map2.Messages.map_action_show_tour_in_map;
+	private static final String	IMAGE_ACTION_SHOW_TOUR_IN_MAP						= net.tourbook.map2.Messages.Image__Tour;
+	private static final String	IMAGE_ACTION_SHOW_TOUR_IN_MAP_DISABLED				= net.tourbook.map2.Messages.Image__Tour_Disabled;
+	private static final String IMAGE_ACTION_SYNCH_WITH_SLIDER_CENTERED_DISABLED 	= net.tourbook.map2.Messages.Image_Action_SynchWithSlider_Centered_Disabled;
+	private static final String IMAGE_ACTION_SYNCH_WITH_SLIDER_CENTERED 			= net.tourbook.map2.Messages.Image_Action_SynchWithSlider_Centered;
+	private static final String IMAGE_ACTION_SYNCH_WITH_SLIDER_DISABLED 			= net.tourbook.map2.Messages.image_action_synch_with_slider_disabled;
+	private static final String IMAGE_ACTION_SYNCH_WITH_SLIDER 						= net.tourbook.map2.Messages.image_action_synch_with_slider;
+	private static final String	MAP_ACTION_SHOW_TOUR_IN_MAP 						= net.tourbook.map2.Messages.map_action_show_tour_in_map;
+	private static final String MAP_ACTION_SYNCH_WITH_SLIDER 						= net.tourbook.map2.Messages.map_action_synch_with_slider;
+	private static final String MAP_ACTION_SYNCH_WITH_SLIDER_CENTERED 				= net.tourbook.map2.Messages.Map_Action_SynchWithSlider_Centered;
 	//
-	public static final String		ID										= "net.tourbook.map25.Map25View";				//$NON-NLS-1$
 	//
-	private static final String		STATE_IS_LAYER_BASE_MAP_VISIBLE			= "STATE_IS_LAYER_BASE_MAP_VISIBLE";			//$NON-NLS-1$
-	private static final String		STATE_IS_LAYER_BUILDING_VISIBLE			= "STATE_IS_LAYER_BUILDING_VISIBLE";			//$NON-NLS-1$
-	private static final String		STATE_IS_LAYER_LABEL_VISIBLE			= "STATE_IS_LAYER_LABEL_VISIBLE";				//$NON-NLS-1$
-	private static final String		STATE_IS_LAYER_MARKER_VISIBLE			= "STATE_IS_LAYER_MARKER_VISIBLE";				//$NON-NLS-1$
-	private static final String		STATE_IS_LAYER_SCALE_BAR_VISIBLE		= "STATE_IS_LAYER_SCALE_BAR_VISIBLE";			//$NON-NLS-1$
-	private static final String		STATE_IS_LAYER_TILE_INFO_VISIBLE		= "STATE_IS_LAYER_TILE_INFO_VISIBLE";			//$NON-NLS-1$
-	private static final String		STATE_IS_LAYER_TOUR_VISIBLE				= "STATE_IS_LAYER_TOUR_VISIBLE";				//$NON-NLS-1$
-	private static final String 	STATE_IS_SYNC_MAP25_WITH_OTHER_MAP		= "STATE_IS_SYNC_MAP25_WITH_OTHER_MAP";			//$NON-NLS-1$
-	private static final String		STATE_IS_SYNCH_MAP_WITH_CHART_SLIDER	= "STATE_SYNCH_MAP_WITH_CHART_SLIDER";			//$NON-NLS-1$
-	private static final String		STATE_IS_SYNCH_MAP_WITH_TOUR			= "STATE_SYNCH_MAP_WITH_TOUR";					//$NON-NLS-1$
+	private static final String	STATE_IS_LAYER_BASE_MAP_VISIBLE						= "STATE_IS_LAYER_BASE_MAP_VISIBLE";					//$NON-NLS-1$
+	private static final String	STATE_IS_LAYER_BUILDING_VISIBLE						= "STATE_IS_LAYER_BUILDING_VISIBLE";					//$NON-NLS-1$
+	private static final String	STATE_IS_LAYER_LABEL_VISIBLE						= "STATE_IS_LAYER_LABEL_VISIBLE";						//$NON-NLS-1$
+	private static final String	STATE_IS_LAYER_MARKER_VISIBLE						= "STATE_IS_LAYER_MARKER_VISIBLE";						//$NON-NLS-1$
+	private static final String	STATE_IS_LAYER_SCALE_BAR_VISIBLE					= "STATE_IS_LAYER_SCALE_BAR_VISIBLE";					//$NON-NLS-1$
+	private static final String	STATE_IS_LAYER_TILE_INFO_VISIBLE					= "STATE_IS_LAYER_TILE_INFO_VISIBLE";					//$NON-NLS-1$
+	private static final String	STATE_IS_LAYER_TOUR_VISIBLE							= "STATE_IS_LAYER_TOUR_VISIBLE";						//$NON-NLS-1$
+	private static final String STATE_IS_SYNC_MAP25_WITH_OTHER_MAP					= "STATE_IS_SYNC_MAP25_WITH_OTHER_MAP";					//$NON-NLS-1$
+	private static final String	STATE_IS_SYNCH_MAP_WITH_CHART_SLIDER				= "STATE_SYNCH_MAP_WITH_CHART_SLIDER";					//$NON-NLS-1$
+	private static final String STATE_IS_SYNCH_MAP_WITH_CHART_SLIDER_IS_CENTERED	= "STATE_IS_SYNCH_MAP_WITH_CHART_SLIDER_IS_CENTERED";	//$NON-NLS-1$
+	private static final String	STATE_IS_SYNCH_MAP_WITH_TOUR						= "STATE_SYNCH_MAP_WITH_TOUR";							//$NON-NLS-1$
+	//
+	private static final ImageDescriptor	_imageSyncWithSlider						= TourbookPlugin.getImageDescriptor(IMAGE_ACTION_SYNCH_WITH_SLIDER);
+	private static final ImageDescriptor	_imageSyncWithSlider_Disabled				= TourbookPlugin.getImageDescriptor(IMAGE_ACTION_SYNCH_WITH_SLIDER_DISABLED);
+	private static final ImageDescriptor	_imageSyncWithSlider_Centered				= TourbookPlugin.getImageDescriptor(IMAGE_ACTION_SYNCH_WITH_SLIDER_CENTERED);
+	private static final ImageDescriptor	_imageSyncWithSlider_Centered_Disabled		= TourbookPlugin.getImageDescriptor(IMAGE_ACTION_SYNCH_WITH_SLIDER_CENTERED_DISABLED);
+	//
+	public static final String				ID					= "net.tourbook.map25.Map25View";				//$NON-NLS-1$
+	//
+	private static final IDialogSettings	_state				= TourbookPlugin.getState(ID);
 	//
 // SET_FORMATTING_ON
 	//
-	private static final IDialogSettings	_state									= TourbookPlugin.getState(ID);
+	{}
 	//
 	private Map25App						_mapApp;
 	//
-	private OpenDialogManager				_openDlgMgr								= new OpenDialogManager();
-	private final MapInfoManager			_mapInfoManager							= MapInfoManager.getInstance();
+	private OpenDialogManager				_openDlgMgr		= new OpenDialogManager();
+	private final MapInfoManager			_mapInfoManager	= MapInfoManager.getInstance();
 	//
 	private boolean							_isPartVisible;
 	private boolean							_isShowTour;
@@ -159,8 +175,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	private ActionShowEntireTour			_actionShowEntireTour;
 	private ActionShowTour_WithConfig		_actionShowTour_WithOptions;
 	//
-	private ArrayList<TourData>				_allTourData							= new ArrayList<>();
-	private TIntArrayList					_allTourStarts							= new TIntArrayList();
+	private ArrayList<TourData>				_allTourData	= new ArrayList<>();
+	private TIntArrayList					_allTourStarts	= new TIntArrayList();
 	private GeoPoint[]						_allGeoPoints;
 	private BoundingBox						_allBoundingBox;
 	//
@@ -173,9 +189,14 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	//
 	private boolean							_isMapSynched_WithOtherMap;
 	private boolean							_isMapSynched_WithChartSlider;
+	private boolean							_isMapSynched_WithChartSlider_IsCentered;
 	private boolean							_isMapSynched_WithTour;
 	private long							_lastFiredSyncEventTime;
 	//
+// SET_FORMATTING_OFF
+	//
+	//
+// SET_FORMATTING_ON
 	//
 	// context menu
 	private boolean							_isContextMenuVisible;
@@ -299,6 +320,59 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 	public void actionSync_WithChartSlider() {
 
+		if (_allTourData.size() == 0) {
+			return;
+		}
+
+		/*
+		 * Change state
+		 */
+		boolean isSync = _isMapSynched_WithChartSlider;
+		boolean isCentered = _isMapSynched_WithChartSlider_IsCentered;
+
+		if (isSync && isCentered) {
+
+			isSync = true;
+			isCentered = false;
+
+		} else if (isSync) {
+
+			isSync = false;
+			isCentered = false;
+
+		} else {
+
+			isSync = true;
+			isCentered = true;
+		}
+
+		_isMapSynched_WithChartSlider = isSync;
+		_isMapSynched_WithChartSlider_IsCentered = isCentered;
+
+		updateChartSliderAction();
+
+		if (_isMapSynched_WithChartSlider) {
+
+			deactivateMapSync();
+
+			_actionShowTour_WithOptions.setSelection(true);
+
+			// map must be synched with selected tour
+			_isMapSynched_WithTour = true;
+			_actionSyncMap_WithTour.setChecked(true);
+
+			final TourData firstTourData = _allTourData.get(0);
+
+			syncMapWith_ChartSlider(//
+					firstTourData,
+					_leftSliderValueIndex,
+					_rightSliderValueIndex,
+					_selectedSliderValueIndex);
+		}
+	}
+
+	public void actionSync_WithChartSlider_OLD() {
+
 		_isMapSynched_WithChartSlider = _actionSyncMap_WithChartSlider.isChecked();
 
 		if (_isMapSynched_WithChartSlider) {
@@ -315,7 +389,6 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 			paintTours_AndUpdateMap();
 		}
-
 	}
 
 	public void actionSync_WithOtherMap(final boolean isSelected) {
@@ -1364,6 +1437,13 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		_actionSyncMap_WithChartSlider.setChecked(isSynchWithSlider);
 		_isMapSynched_WithChartSlider = isSynchWithSlider;
 
+		// synch map with chart slider
+		_isMapSynched_WithChartSlider = Util.getStateBoolean(_state, STATE_IS_SYNCH_MAP_WITH_CHART_SLIDER, true);
+		_isMapSynched_WithChartSlider_IsCentered = Util.getStateBoolean(_state,
+				STATE_IS_SYNCH_MAP_WITH_CHART_SLIDER_IS_CENTERED,
+				true);
+		updateChartSliderAction();
+
 		// synch map with another map
 		_isMapSynched_WithOtherMap = Util.getStateBoolean(_state, STATE_IS_SYNC_MAP25_WITH_OTHER_MAP, false);
 		_actionSyncMap_WithOtherMap.setChecked(_isMapSynched_WithOtherMap);
@@ -1524,6 +1604,36 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		}
 
 		Map25ConfigManager.setMapLocation(map, mapPosition);
+	}
+
+	private void updateChartSliderAction() {
+
+		String toolTip;
+		ImageDescriptor imageDescriptor;
+		ImageDescriptor imageDescriptorDisabled;
+
+		final boolean isSync = _isMapSynched_WithChartSlider;
+		final boolean isCenter = _isMapSynched_WithChartSlider_IsCentered;
+
+		if (isSync && isCenter) {
+
+			toolTip = MAP_ACTION_SYNCH_WITH_SLIDER_CENTERED;
+
+			imageDescriptor = _imageSyncWithSlider_Centered;
+			imageDescriptorDisabled = _imageSyncWithSlider_Centered_Disabled;
+
+		} else {
+
+			toolTip = MAP_ACTION_SYNCH_WITH_SLIDER;
+
+			imageDescriptor = _imageSyncWithSlider;
+			imageDescriptorDisabled = _imageSyncWithSlider_Disabled;
+		}
+
+		_actionSyncMap_WithChartSlider.setToolTipText(toolTip);
+		_actionSyncMap_WithChartSlider.setImageDescriptor(imageDescriptor);
+		_actionSyncMap_WithChartSlider.setDisabledImageDescriptor(imageDescriptorDisabled);
+		_actionSyncMap_WithChartSlider.setChecked(isSync);
 	}
 
 	private void updateUI_MapPosition(final double latitude, final double longitude, final int zoomLevel) {
