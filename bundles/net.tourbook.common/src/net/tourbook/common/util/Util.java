@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -111,7 +111,6 @@ public class Util {
 	public static final String	ATTR_COLOR_RED							= "red";				//$NON-NLS-1$
 	public static final String	ATTR_COLOR_GREEN						= "green";				//$NON-NLS-1$
 	public static final String	ATTR_COLOR_BLUE							= "blue";				//$NON-NLS-1$
-
 
 	public static final String	CSV_FILE_EXTENSION						= "csv";				//$NON-NLS-1$
 
@@ -2266,6 +2265,17 @@ public class Util {
 		stateValues[2] = Integer.toString(rgb.blue);
 
 		state.put(stateKey, stateValues);
+	}
+
+	public static <E extends Enum<E>> void setStateEnum(final IDialogSettings state,
+														final String key,
+														final Enum<E> value) {
+
+		if (value == null) {
+			return;
+		}
+
+		state.put(key, value.name());
 	}
 
 	public static void setXmlDefaultHeader(final XMLMemento xmlHeader, final Bundle bundle) {

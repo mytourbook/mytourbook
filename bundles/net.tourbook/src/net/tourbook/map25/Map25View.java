@@ -23,7 +23,6 @@ import java.awt.Frame;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -42,7 +41,6 @@ import net.tourbook.common.util.SWTPopupOverAWT;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
-import net.tourbook.importdata.RawDataManager;
 import net.tourbook.map.IMapSyncListener;
 import net.tourbook.map.MapInfoManager;
 import net.tourbook.map.MapManager;
@@ -66,25 +64,21 @@ import net.tourbook.map25.layer.tourtrack.SliderPath_Layer;
 import net.tourbook.map25.layer.tourtrack.TourLayer;
 import net.tourbook.map25.ui.SlideoutMap25_MapOptions;
 import net.tourbook.map25.ui.SlideoutMap25_TrackOptions;
-import net.tourbook.photo.PhotoSelection;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
-import net.tourbook.tour.SelectionTourMarker;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.tourChart.TourChart;
-import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.events.MenuAdapter;
@@ -106,8 +100,6 @@ import org.oscim.map.Animator;
 import org.oscim.map.Map;
 import org.oscim.utils.animation.Easing;
 
-import de.byteholder.gpx.PointOfInterest;
-
 public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDialogs, IMapBookmarkListener,
 		IMapSyncListener {
 
@@ -123,7 +115,6 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	private static final String MAP_ACTION_SYNCH_WITH_SLIDER 						= net.tourbook.map2.Messages.map_action_synch_with_slider;
 	private static final String MAP_ACTION_SYNCH_WITH_SLIDER_CENTERED 				= net.tourbook.map2.Messages.Map_Action_SynchWithSlider_Centered;
 	//
-	//
 	private static final String	STATE_IS_LAYER_BASE_MAP_VISIBLE						= "STATE_IS_LAYER_BASE_MAP_VISIBLE";					//$NON-NLS-1$
 	private static final String	STATE_IS_LAYER_BUILDING_VISIBLE						= "STATE_IS_LAYER_BUILDING_VISIBLE";					//$NON-NLS-1$
 	private static final String	STATE_IS_LAYER_LABEL_VISIBLE						= "STATE_IS_LAYER_LABEL_VISIBLE";						//$NON-NLS-1$
@@ -131,19 +122,16 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	private static final String	STATE_IS_LAYER_SCALE_BAR_VISIBLE					= "STATE_IS_LAYER_SCALE_BAR_VISIBLE";					//$NON-NLS-1$
 	private static final String	STATE_IS_LAYER_TILE_INFO_VISIBLE					= "STATE_IS_LAYER_TILE_INFO_VISIBLE";					//$NON-NLS-1$
 	private static final String	STATE_IS_LAYER_TOUR_VISIBLE							= "STATE_IS_LAYER_TOUR_VISIBLE";						//$NON-NLS-1$
-	private static final String STATE_IS_SYNC_MAP25_WITH_OTHER_MAP					= "STATE_IS_SYNC_MAP25_WITH_OTHER_MAP";					//$NON-NLS-1$
-	private static final String	STATE_IS_SYNCH_MAP_WITH_CHART_SLIDER				= "STATE_SYNCH_MAP_WITH_CHART_SLIDER";					//$NON-NLS-1$
-	private static final String STATE_IS_SYNCH_MAP_WITH_CHART_SLIDER_IS_CENTERED	= "STATE_IS_SYNCH_MAP_WITH_CHART_SLIDER_IS_CENTERED";	//$NON-NLS-1$
-	private static final String	STATE_IS_SYNCH_MAP_WITH_TOUR						= "STATE_SYNCH_MAP_WITH_TOUR";							//$NON-NLS-1$
+	private static final String	STATE_MAP_SYNCHED_WITH								= "STATE_MAP_SYNCHED_WITH";	//$NON-NLS-1$
 	//
 	private static final ImageDescriptor	_imageSyncWithSlider						= TourbookPlugin.getImageDescriptor(IMAGE_ACTION_SYNCH_WITH_SLIDER);
 	private static final ImageDescriptor	_imageSyncWithSlider_Disabled				= TourbookPlugin.getImageDescriptor(IMAGE_ACTION_SYNCH_WITH_SLIDER_DISABLED);
 	private static final ImageDescriptor	_imageSyncWithSlider_Centered				= TourbookPlugin.getImageDescriptor(IMAGE_ACTION_SYNCH_WITH_SLIDER_CENTERED);
 	private static final ImageDescriptor	_imageSyncWithSlider_Centered_Disabled		= TourbookPlugin.getImageDescriptor(IMAGE_ACTION_SYNCH_WITH_SLIDER_CENTERED_DISABLED);
 	//
-	public static final String				ID					= "net.tourbook.map25.Map25View";				//$NON-NLS-1$
+	public static final String				ID				= "net.tourbook.map25.Map25View";				//$NON-NLS-1$
 	//
-	private static final IDialogSettings	_state				= TourbookPlugin.getState(ID);
+	private static final IDialogSettings	_state			= TourbookPlugin.getState(ID);
 	//
 // SET_FORMATTING_ON
 	//
@@ -170,11 +158,12 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	private ActionMap25_ShowMarker			_actionShowMarker_WithOptions;
 	private ActionSelectMap25Provider		_actionSelectMapProvider;
 	private ActionSynchMapWithChartSlider	_actionSyncMap_WithChartSlider;
-	private ActionSynchMapWithTour			_actionSyncMap_WithTour;
 	private ActionSyncMap2WithOtherMap		_actionSyncMap_WithOtherMap;
+	private ActionSynchMapWithTour			_actionSyncMap_WithTour;
 	private ActionShowEntireTour			_actionShowEntireTour;
 	private ActionShowTour_WithConfig		_actionShowTour_WithOptions;
 	//
+	/** Contains only geo tours */
 	private ArrayList<TourData>				_allTourData	= new ArrayList<>();
 	private TIntArrayList					_allTourStarts	= new TIntArrayList();
 	private GeoPoint[]						_allGeoPoints;
@@ -187,16 +176,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	private int								_hashTourId;
 	private int								_hashTourData;
 	//
-	private boolean							_isMapSynched_WithOtherMap;
-	private boolean							_isMapSynched_WithChartSlider;
-	private boolean							_isMapSynched_WithChartSlider_IsCentered;
-	private boolean							_isMapSynched_WithTour;
+	private MapSync							_mapSynchedWith	= MapSync.NONE;
 	private long							_lastFiredSyncEventTime;
-	//
-// SET_FORMATTING_OFF
-	//
-	//
-// SET_FORMATTING_ON
 	//
 	// context menu
 	private boolean							_isContextMenuVisible;
@@ -269,6 +250,16 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 	}
 
+	private enum MapSync {
+
+		/** Map is not synced */
+		NONE, //
+		WITH_OTHER_MAP, //
+		WITH_SLIDER, //
+		WITH_SLIDER_CENTERED, //
+		WITH_TOUR, //
+	}
+
 	void actionContextMenu(final int relativeX, final int relativeY) {
 
 		// open context menu
@@ -324,99 +315,73 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 			return;
 		}
 
-		/*
-		 * Change state
-		 */
-		boolean isSync = _isMapSynched_WithChartSlider;
-		boolean isCentered = _isMapSynched_WithChartSlider_IsCentered;
+		// change state
+		switch (_mapSynchedWith) {
 
-		if (isSync && isCentered) {
+		case WITH_SLIDER_CENTERED:
+			_mapSynchedWith = MapSync.WITH_SLIDER;
+			break;
 
-			isSync = true;
-			isCentered = false;
+		case WITH_SLIDER:
+			_mapSynchedWith = MapSync.NONE;
+			break;
 
-		} else if (isSync) {
-
-			isSync = false;
-			isCentered = false;
-
-		} else {
-
-			isSync = true;
-			isCentered = true;
+		default:
+			_mapSynchedWith = MapSync.WITH_SLIDER_CENTERED;
+			break;
 		}
 
-		_isMapSynched_WithChartSlider = isSync;
-		_isMapSynched_WithChartSlider_IsCentered = isCentered;
+		updateUI_SyncSliderAction();
 
-		updateChartSliderAction();
+		deactivateOtherMapSync();
 
-		if (_isMapSynched_WithChartSlider) {
-
-			deactivateMapSync();
+		if (_mapSynchedWith != MapSync.NONE) {
 
 			_actionShowTour_WithOptions.setSelection(true);
 
-			// map must be synched with selected tour
-			_isMapSynched_WithTour = true;
-			_actionSyncMap_WithTour.setChecked(true);
-
 			final TourData firstTourData = _allTourData.get(0);
 
-			syncMapWith_ChartSlider(//
-					firstTourData,
-					_leftSliderValueIndex,
-					_rightSliderValueIndex,
-					_selectedSliderValueIndex);
+			syncMapWith_ChartSlider(firstTourData);
 		}
 	}
 
 	public void actionSync_WithChartSlider_OLD() {
 
-		_isMapSynched_WithChartSlider = _actionSyncMap_WithChartSlider.isChecked();
-
-		if (_isMapSynched_WithChartSlider) {
-
-			// ensure that the track sliders are displayed
-
-			deactivateMapSync();
-
-			_actionShowTour_WithOptions.setSelection(true);
-
-			// map must be synched with selected tour
-			_actionSyncMap_WithTour.setChecked(true);
-			_isMapSynched_WithTour = true;
-
-			paintTours_AndUpdateMap();
-		}
+//		_isMapSynched_WithChartSlider = _actionSyncMap_WithChartSlider.isChecked();
+//
+//		if (_isMapSynched_WithChartSlider) {
+//
+//			// ensure that the track sliders are displayed
+//
+//			deactivateSync_WithMap();
+//
+//			_actionShowTour_WithOptions.setSelection(true);
+//
+//			// map must be synched with selected tour
+//			_actionSyncMap_WithTour.setChecked(true);
+//			_isMapSynched_WithTour = true;
+//
+//			paintTours_AndUpdateMap();
+//		}
 	}
 
 	public void actionSync_WithOtherMap(final boolean isSelected) {
 
-		_isMapSynched_WithOtherMap = isSelected;
+		_mapSynchedWith = isSelected ? MapSync.WITH_OTHER_MAP : MapSync.NONE;
 
-		if (_isMapSynched_WithOtherMap) {
-
-			deactivateTourSync();
-			deactivateSliderSync();
-		}
+		deactivateOtherMapSync();
 	}
 
-	public void actionSync_WithTour() {
+	public void actionSync_WithTour(final boolean isSelected) {
 
-		_isMapSynched_WithTour = _actionSyncMap_WithTour.isChecked();
+		_mapSynchedWith = isSelected ? MapSync.WITH_TOUR : MapSync.NONE;
 
-		if (_isMapSynched_WithTour) {
+		deactivateOtherMapSync();
 
-			deactivateMapSync();
+		if (_mapSynchedWith == MapSync.WITH_TOUR) {
 
 			paintTours_AndUpdateMap();
-
-		} else {
-
-			deactivateSliderSync();
 		}
-
 	}
 
 	public void actionZoomShowEntireTour() {
@@ -566,6 +531,30 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		};
 
 		TourManager.getInstance().addTourEventListener(_tourEventListener);
+	}
+
+	private void checkSliderIndices() {
+
+		if (_allTourData.size() == 0) {
+			return;
+		}
+
+		final TourData tourData = _allTourData.get(0);
+
+		final TourChart tourChart = TourManager.getActiveTourChart(tourData);
+		if (tourChart != null) {
+			final SelectionChartInfo chartInfo = tourChart.getChartInfo();
+
+			_leftSliderValueIndex = chartInfo.leftSliderValuesIndex;
+			_rightSliderValueIndex = chartInfo.rightSliderValuesIndex;
+			_selectedSliderValueIndex = chartInfo.selectedSliderValuesIndex;
+		}
+
+		final int maxSlices = tourData.altitudeSerie.length - 1;
+
+		_leftSliderValueIndex = Math.max(0, Math.min(maxSlices, _leftSliderValueIndex));
+		_rightSliderValueIndex = Math.max(0, Math.min(maxSlices, _rightSliderValueIndex));
+		_selectedSliderValueIndex = Math.max(0, Math.min(maxSlices, _selectedSliderValueIndex));
 	}
 
 	private void clearView() {
@@ -790,28 +779,34 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		_mapApp = Map25App.createMap(this, _state, awtCanvas);
 	}
 
-	private void deactivateMapSync() {
+	private void deactivateOtherMapSync() {
 
-		// disable map sync
+		switch (_mapSynchedWith) {
 
-		_isMapSynched_WithOtherMap = false;
-		_actionSyncMap_WithOtherMap.setChecked(false);
-	}
+		case WITH_SLIDER:
+		case WITH_SLIDER_CENTERED:
 
-	private void deactivateSliderSync() {
+			_actionSyncMap_WithOtherMap.setChecked(false);
+			_actionSyncMap_WithTour.setChecked(false);
+			break;
 
-		// disable slider sync
+		case WITH_OTHER_MAP:
+			_actionSyncMap_WithChartSlider.setChecked(false);
+			_actionSyncMap_WithTour.setChecked(false);
+			break;
 
-		_isMapSynched_WithChartSlider = false;
-		_actionSyncMap_WithChartSlider.setChecked(false);
-	}
+		case WITH_TOUR:
+			_actionSyncMap_WithChartSlider.setChecked(false);
+			_actionSyncMap_WithOtherMap.setChecked(false);
+			break;
 
-	private void deactivateTourSync() {
-
-		// disable tour sync
-
-		_isMapSynched_WithTour = false;
-		_actionSyncMap_WithTour.setChecked(false);
+		case NONE:
+		default:
+			_actionSyncMap_WithChartSlider.setChecked(false);
+			_actionSyncMap_WithOtherMap.setChecked(false);
+			_actionSyncMap_WithTour.setChecked(false);
+			break;
+		}
 	}
 
 	@Override
@@ -822,6 +817,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 			getViewSite().getPage().removePartListener(_partListener);
 
 			_mapApp.stop();
+			_mapApp.getMap().destroy();
 		}
 
 		MapBookmarkManager.removeBookmarkListener(this);
@@ -970,6 +966,9 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 			return;
 		}
 
+		final boolean isSyncWithSlider = _mapSynchedWith == MapSync.WITH_SLIDER
+				|| _mapSynchedWith == MapSync.WITH_SLIDER_CENTERED;
+
 		if (selection instanceof SelectionTourData) {
 
 			final SelectionTourData selectionTourData = (SelectionTourData) selection;
@@ -1015,7 +1014,9 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 			final boolean isShowSliderLocation = activeTourTrackConfig.isShowSliderLocation;
 			final boolean isShowSliderPath = activeTourTrackConfig.isShowSliderPath;
 
-			if (_isMapSynched_WithChartSlider == false && isShowSliderLocation == false && isShowSliderPath == false) {
+			if (isSyncWithSlider == false
+					&& isShowSliderLocation == false
+					&& isShowSliderPath == false) {
 
 				// nothing to display
 				return;
@@ -1032,31 +1033,31 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 				tourData = tourChart.getTourData();
 			}
 
-			if (tourData != null && tourData.isMultipleTours()) {
-
-				// multiple tours are selected
-
-			} else {
-
-				// use old behaviour
-
-				final ChartDataModel chartDataModel = chartInfo.chartDataModel;
-				if (chartDataModel != null) {
-
-					final Object tourId = chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
-					if (tourId instanceof Long) {
-
-						tourData = TourManager.getInstance().getTourData((Long) tourId);
-						if (tourData == null) {
-
-							// tour is not in the database, try to get it from the raw data manager
-
-							final HashMap<Long, TourData> rawData = RawDataManager.getInstance().getImportedTours();
-							tourData = rawData.get(tourId);
-						}
-					}
-				}
-			}
+//			if (tourData != null && tourData.isMultipleTours()) {
+//
+//				// multiple tours are selected
+//
+//			} else {
+//
+//				// use old behaviour
+//
+//				final ChartDataModel chartDataModel = chartInfo.chartDataModel;
+//				if (chartDataModel != null) {
+//
+//					final Object tourId = chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
+//					if (tourId instanceof Long) {
+//
+//						tourData = TourManager.getInstance().getTourData((Long) tourId);
+//						if (tourData == null) {
+//
+//							// tour is not in the database, try to get it from the raw data manager
+//
+//							final HashMap<Long, TourData> rawData = RawDataManager.getInstance().getImportedTours();
+//							tourData = rawData.get(tourId);
+//						}
+//					}
+//				}
+//			}
 
 			_leftSliderValueIndex = chartInfo.leftSliderValuesIndex;
 			_rightSliderValueIndex = chartInfo.rightSliderValuesIndex;
@@ -1064,18 +1065,14 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 			if (tourData != null) {
 
-				if (_isMapSynched_WithChartSlider) {
+				if (isSyncWithSlider) {
 
-					syncMapWith_ChartSlider(//
-							tourData,
-							chartInfo.leftSliderValuesIndex,
-							chartInfo.rightSliderValuesIndex,
-							chartInfo.selectedSliderValuesIndex);
+					syncMapWith_ChartSlider(tourData);
 
 					enableActions();
 				}
 
-				if (isShowSliderPath) {
+				if (isShowSliderPath || isShowSliderLocation) {
 
 					paintTour(tourData);
 				}
@@ -1083,7 +1080,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 		} else if (selection instanceof SelectionChartXSliderPosition) {
 
-			if (!_isMapSynched_WithChartSlider) {
+			if (isSyncWithSlider == false) {
 				return;
 			}
 
@@ -1113,126 +1110,11 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 					_rightSliderValueIndex = rightSliderValueIndex;
 					_selectedSliderValueIndex = leftSliderValueIndex;
 
-					syncMapWith_ChartSlider(//
-							tourData,
-							leftSliderValueIndex,
-							rightSliderValueIndex,
-							leftSliderValueIndex);
+					syncMapWith_ChartSlider(tourData);
 
 					enableActions();
 				}
 			}
-
-		} else if (selection instanceof SelectionTourMarker) {
-
-//			final SelectionTourMarker markerSelection = (SelectionTourMarker) selection;
-//
-//			onSelectionChanged_TourMarker(markerSelection, true);
-
-//		} else if (selection instanceof SelectionMapPosition) {
-//
-//			final SelectionMapPosition mapPositionSelection = (SelectionMapPosition) selection;
-//
-//			final int valueIndex1 = mapPositionSelection.getSlider1ValueIndex();
-//			int valueIndex2 = mapPositionSelection.getSlider2ValueIndex();
-//
-//			valueIndex2 = valueIndex2 == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION
-//					? valueIndex1
-//					: valueIndex2;
-//
-//			positionMapTo_TourSliders(//
-//					mapPositionSelection.getTourData(),
-//					valueIndex1,
-//					valueIndex2,
-//					valueIndex1,
-//					null);
-//
-//			enableActions();
-
-		} else if (selection instanceof PointOfInterest) {
-
-//			_isTourOrWayPoint = false;
-//
-//			clearView();
-//
-//			final PointOfInterest poi = (PointOfInterest) selection;
-//
-//			_poiPosition = poi.getPosition();
-//			_poiName = poi.getName();
-//
-//			final String boundingBox = poi.getBoundingBox();
-//			if (boundingBox == null) {
-//				_poiZoomLevel = _map.getZoom();
-//			} else {
-//				_poiZoomLevel = _map.getZoom(boundingBox);
-//			}
-//
-//			if (_poiZoomLevel == -1) {
-//				_poiZoomLevel = _map.getZoom();
-//			}
-//
-//			_map.setPoi(_poiPosition, _poiZoomLevel, _poiName);
-//
-//			_actionShowPOI.setChecked(true);
-//
-//			enableActions();
-
-		} else if (selection instanceof StructuredSelection) {
-
-//			final StructuredSelection structuredSelection = (StructuredSelection) selection;
-//			final Object firstElement = structuredSelection.getFirstElement();
-//
-//			if (firstElement instanceof TVICatalogComparedTour) {
-//
-//				final TVICatalogComparedTour comparedTour = (TVICatalogComparedTour) firstElement;
-//				final long tourId = comparedTour.getTourId();
-//
-//				final TourData tourData = TourManager.getInstance().getTourData(tourId);
-//				paintTours_20_One(tourData, false);
-//
-//			} else if (firstElement instanceof TVICompareResultComparedTour) {
-//
-//				final TVICompareResultComparedTour compareResultItem = (TVICompareResultComparedTour) firstElement;
-//				final TourData tourData = TourManager.getInstance().getTourData(
-//						compareResultItem.getComparedTourData().getTourId());
-//				paintTours_20_One(tourData, false);
-//
-//			} else if (firstElement instanceof TourWayPoint) {
-//
-//				final TourWayPoint wp = (TourWayPoint) firstElement;
-//
-//				final TourData tourData = wp.getTourData();
-//
-//				paintTours_20_One(tourData, false);
-//
-//				_map.setPOI(_wayPointToolTipProvider, wp);
-//
-//				enableActions();
-//			}
-//
-//			enableActions();
-
-		} else if (selection instanceof PhotoSelection) {
-
-//			paintPhotos(((PhotoSelection) selection).galleryPhotos);
-//
-//			enableActions();
-
-		} else if (selection instanceof SelectionTourCatalogView) {
-
-//			// show reference tour
-//
-//			final SelectionTourCatalogView tourCatalogSelection = (SelectionTourCatalogView) selection;
-//
-//			final TVICatalogRefTourItem refItem = tourCatalogSelection.getRefItem();
-//			if (refItem != null) {
-//
-//				final TourData tourData = TourManager.getInstance().getTourData(refItem.getTourId());
-//
-//				paintTours_20_One(tourData, false);
-//
-//				enableActions();
-//			}
 
 		} else if (selection instanceof SelectionDeletedTours) {
 
@@ -1243,7 +1125,10 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	private void paintTour(final TourData tourData) {
 
 		_allTourData.clear();
-		_allTourData.add(tourData);
+
+		if (tourData.altitudeSerie != null || tourData.altitudeSerie.length > 0) {
+			_allTourData.add(tourData);
+		}
 
 		paintTours_AndUpdateMap();
 	}
@@ -1292,13 +1177,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		}
 
 		int geoSize = 0;
-
 		for (final TourData tourData : _allTourData) {
-
-			// check if GPS data are available
-			if (tourData.latitudeSerie != null) {
-				geoSize += tourData.latitudeSerie.length;
-			}
+			geoSize += tourData.latitudeSerie.length;
 		}
 
 		// use array to optimize performance when millions of points are created
@@ -1309,11 +1189,6 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		int geoIndex = 0;
 
 		for (final TourData tourData : _allTourData) {
-
-			// check if GPS data are available
-			if (tourData.latitudeSerie == null) {
-				continue;
-			}
 
 			_allTourStarts.add(tourIndex);
 
@@ -1328,7 +1203,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 		tourLayer.setPoints(_allGeoPoints, _allTourStarts);
 
-		boolean isAnimate = true;
+		checkSliderIndices();
 
 		/*
 		 * Chart slider + path
@@ -1347,8 +1222,6 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		if (isShowSliderPath) {
 
 			sliderPath_Layer.setPoints(_allGeoPoints, _allTourStarts, _leftSliderValueIndex, _rightSliderValueIndex);
-
-			isAnimate = false;
 		}
 
 		if (isShowSliderLocation) {
@@ -1363,7 +1236,6 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		 * Markers
 		 */
 		final MarkerLayer markerLayer = _mapApp.getLayer_Marker();
-
 		if (markerLayer.isEnabled()) {
 
 			final List<MapMarker> allMarkers = createMapMarkers(_allTourData);
@@ -1375,7 +1247,10 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		 */
 		final Map map25 = _mapApp.getMap();
 
-		if (isAnimate) {
+		final boolean isSyncWithSlider = _mapSynchedWith == MapSync.WITH_SLIDER
+				|| _mapSynchedWith == MapSync.WITH_SLIDER_CENTERED;
+
+		if (isSyncWithSlider == false) {
 
 			map25.post(new Runnable() {
 
@@ -1385,7 +1260,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 					// create outside isSynch that data are available when map is zoomed to show the whole tour
 					_allBoundingBox = createBoundingBox(_allGeoPoints);
 
-					if (_isMapSynched_WithTour) {
+					if (_mapSynchedWith == MapSync.WITH_TOUR) {
 
 						final int animationTime = Map25ConfigManager.getActiveTourTrackConfig().animationTime;
 						Map25ConfigManager.setMapLocation(map25, _allBoundingBox, animationTime);
@@ -1424,29 +1299,11 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		_mapApp.getLayer_ScaleBar().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_SCALE_BAR_VISIBLE, true));
 		_mapApp.getLayer_TileInfo().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_TILE_INFO_VISIBLE, false));
 
-		/*
-		 * Other actions
-		 */
-		// checkbox: synch map with tour
-		final boolean isSynchTour = Util.getStateBoolean(_state, STATE_IS_SYNCH_MAP_WITH_TOUR, true);
-		_actionSyncMap_WithTour.setChecked(isSynchTour);
-		_isMapSynched_WithTour = isSynchTour;
-
-		// checkbox: synch map with chart slider
-		final boolean isSynchWithSlider = Util.getStateBoolean(_state, STATE_IS_SYNCH_MAP_WITH_CHART_SLIDER, false);
-		_actionSyncMap_WithChartSlider.setChecked(isSynchWithSlider);
-		_isMapSynched_WithChartSlider = isSynchWithSlider;
-
-		// synch map with chart slider
-		_isMapSynched_WithChartSlider = Util.getStateBoolean(_state, STATE_IS_SYNCH_MAP_WITH_CHART_SLIDER, true);
-		_isMapSynched_WithChartSlider_IsCentered = Util.getStateBoolean(_state,
-				STATE_IS_SYNCH_MAP_WITH_CHART_SLIDER_IS_CENTERED,
-				true);
-		updateChartSliderAction();
-
-		// synch map with another map
-		_isMapSynched_WithOtherMap = Util.getStateBoolean(_state, STATE_IS_SYNC_MAP25_WITH_OTHER_MAP, false);
-		_actionSyncMap_WithOtherMap.setChecked(_isMapSynched_WithOtherMap);
+		// map is synced with
+		_mapSynchedWith = (MapSync) Util.getStateEnum(_state, STATE_MAP_SYNCHED_WITH, MapSync.NONE);
+		_actionSyncMap_WithOtherMap.setChecked(_mapSynchedWith == MapSync.WITH_OTHER_MAP);
+		_actionSyncMap_WithTour.setChecked(_mapSynchedWith == MapSync.WITH_TOUR);
+		updateUI_SyncSliderAction();
 
 		enableActions();
 
@@ -1455,9 +1312,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 	private void saveState() {
 
-		_state.put(STATE_IS_SYNCH_MAP_WITH_CHART_SLIDER, _actionSyncMap_WithChartSlider.isChecked());
-		_state.put(STATE_IS_SYNCH_MAP_WITH_TOUR, _actionSyncMap_WithTour.isChecked());
-		_state.put(STATE_IS_SYNC_MAP25_WITH_OTHER_MAP, _isMapSynched_WithOtherMap);
+		Util.setStateEnum(_state, STATE_MAP_SYNCHED_WITH, _mapSynchedWith);
 
 		_state.put(STATE_IS_LAYER_BASE_MAP_VISIBLE, _mapApp.getLayer_BaseMap().isEnabled());
 		_state.put(STATE_IS_LAYER_BUILDING_VISIBLE, _mapApp.getLayer_Building().isEnabled());
@@ -1491,7 +1346,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 					return;
 				}
 
-				final ArrayList<TourData> tourDataList = TourManager.getSelectedTours();
+				final ArrayList<TourData> tourDataList = TourManager.getSelectedTours(true);
 				if (tourDataList != null) {
 
 					_allTourData.clear();
@@ -1505,39 +1360,21 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		});
 	}
 
-	private void syncMapWith_ChartSlider(	final TourData tourData,
-											final int leftSliderValuesIndex,
-											final int rightSliderValuesIndex,
-											final int selectedSliderIndex) {
-
-//		final TrackSliderLayer chartSliderLayer = getLayerTrackSlider();
-//		if (chartSliderLayer == null) {
-//			return;
-//		}
+	private void syncMapWith_ChartSlider(final TourData tourData) {
 
 		if (tourData == null || tourData.latitudeSerie == null) {
 
-//			chartSliderLayer.setSliderVisible(false);
-
-		} else {
-
-			// sync map with chart slider
-
-			syncMapWith_SliderPosition(tourData, /* chartSliderLayer, */ selectedSliderIndex);
-
-//			// update slider UI
-//			updateTrackSlider_10_Position(//
-//					tourData,
-//					leftSliderValuesIndex,
-//					rightSliderValuesIndex);
-
-			enableActions();
+			return;
 		}
+
+		// sync map with chart slider
+
+		syncMapWith_SliderPosition(tourData, _selectedSliderValueIndex);
+
+		enableActions();
 	}
 
-	private void syncMapWith_SliderPosition(final TourData tourData,
-//											final TrackSliderLayer chartSliderLayer,
-											int valuesIndex) {
+	private void syncMapWith_SliderPosition(final TourData tourData, int valuesIndex) {
 
 		final double[] latitudeSerie = tourData.latitudeSerie;
 
@@ -1545,6 +1382,44 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		if (valuesIndex >= latitudeSerie.length) {
 			valuesIndex = latitudeSerie.length;
 		}
+
+//
+//
+//
+//
+//
+//
+//		final Map25TrackConfig activeTourTrackConfig = Map25ConfigManager.getActiveTourTrackConfig();
+//		final boolean isShowSliderLocation = activeTourTrackConfig.isShowSliderLocation;
+//		final boolean isShowSliderPath = activeTourTrackConfig.isShowSliderPath;
+//
+//		// show/hide layer
+//		final SliderLocation_Layer sliderLocation_Layer = _mapApp.getLayer_SliderLocation();
+//		final SliderPath_Layer sliderPath_Layer = _mapApp.getLayer_SliderPath();
+//
+//		sliderPath_Layer.setEnabled(isShowSliderPath);
+//		sliderLocation_Layer.setEnabled(isShowSliderLocation);
+//
+//		if (isShowSliderPath) {
+//
+//			sliderPath_Layer.setPoints(_allGeoPoints, _allTourStarts, _leftSliderValueIndex, _rightSliderValueIndex);
+//		}
+//
+//		if (isShowSliderLocation) {
+//
+//			final GeoPoint leftGeoPoint = _allGeoPoints[_leftSliderValueIndex];
+//			final GeoPoint rightGeoPoint = _allGeoPoints[_rightSliderValueIndex];
+//
+//			sliderLocation_Layer.setPosition(leftGeoPoint, rightGeoPoint);
+//		}
+//
+//
+//
+//
+//
+//
+//
+//
 
 		final double latitude = latitudeSerie[valuesIndex];
 		final double longitude = tourData.longitudeSerie[valuesIndex];
@@ -1568,7 +1443,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 									final ViewPart viewPart,
 									final int positionFlags) {
 
-		if (!_isMapSynched_WithOtherMap) {
+		if (_mapSynchedWith != MapSync.WITH_OTHER_MAP) {
 
 			// sync feature is disabled
 
@@ -1606,36 +1481,6 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		Map25ConfigManager.setMapLocation(map, mapPosition);
 	}
 
-	private void updateChartSliderAction() {
-
-		String toolTip;
-		ImageDescriptor imageDescriptor;
-		ImageDescriptor imageDescriptorDisabled;
-
-		final boolean isSync = _isMapSynched_WithChartSlider;
-		final boolean isCenter = _isMapSynched_WithChartSlider_IsCentered;
-
-		if (isSync && isCenter) {
-
-			toolTip = MAP_ACTION_SYNCH_WITH_SLIDER_CENTERED;
-
-			imageDescriptor = _imageSyncWithSlider_Centered;
-			imageDescriptorDisabled = _imageSyncWithSlider_Centered_Disabled;
-
-		} else {
-
-			toolTip = MAP_ACTION_SYNCH_WITH_SLIDER;
-
-			imageDescriptor = _imageSyncWithSlider;
-			imageDescriptorDisabled = _imageSyncWithSlider_Disabled;
-		}
-
-		_actionSyncMap_WithChartSlider.setToolTipText(toolTip);
-		_actionSyncMap_WithChartSlider.setImageDescriptor(imageDescriptor);
-		_actionSyncMap_WithChartSlider.setDisabledImageDescriptor(imageDescriptorDisabled);
-		_actionSyncMap_WithChartSlider.setChecked(isSync);
-	}
-
 	private void updateUI_MapPosition(final double latitude, final double longitude, final int zoomLevel) {
 
 		// validate widget
@@ -1660,6 +1505,36 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	void updateUI_SelectedMapProvider(final Map25Provider selectedMapProvider) {
 
 		_actionSelectMapProvider.updateUI_SelectedMapProvider(selectedMapProvider);
+	}
+
+	private void updateUI_SyncSliderAction() {
+
+		String toolTip;
+		ImageDescriptor imageDescriptor;
+		ImageDescriptor imageDescriptorDisabled;
+
+		final boolean isSync = _mapSynchedWith == MapSync.WITH_SLIDER;
+		final boolean isCenter = _mapSynchedWith == MapSync.WITH_SLIDER_CENTERED;
+
+		if (isCenter) {
+
+			toolTip = MAP_ACTION_SYNCH_WITH_SLIDER_CENTERED;
+
+			imageDescriptor = _imageSyncWithSlider_Centered;
+			imageDescriptorDisabled = _imageSyncWithSlider_Centered_Disabled;
+
+		} else {
+
+			toolTip = MAP_ACTION_SYNCH_WITH_SLIDER;
+
+			imageDescriptor = _imageSyncWithSlider;
+			imageDescriptorDisabled = _imageSyncWithSlider_Disabled;
+		}
+
+		_actionSyncMap_WithChartSlider.setToolTipText(toolTip);
+		_actionSyncMap_WithChartSlider.setImageDescriptor(imageDescriptor);
+		_actionSyncMap_WithChartSlider.setDisabledImageDescriptor(imageDescriptorDisabled);
+		_actionSyncMap_WithChartSlider.setChecked(isSync || isCenter);
 	}
 
 }

@@ -82,7 +82,7 @@ public class SliderPath_Layer extends Layer {
 
 				_isUpdateLayer = false;
 
-				_simpleWorker.submit(0);
+				_simpleWorker.submit(10);
 
 				__curX = tx;
 				__curY = ty;
@@ -170,10 +170,7 @@ public class SliderPath_Layer extends Layer {
 					}
 
 					for (int pointIndex = 0; pointIndex < numPoints; pointIndex++) {
-
-						final GeoPoint geoPoint = _geoPoints[firstSliderValueIndex + pointIndex];
-
-						MercatorProjection.project(geoPoint, points, pointIndex);
+						MercatorProjection.project(_geoPoints[firstSliderValueIndex + pointIndex], points, pointIndex);
 					}
 				}
 			}
@@ -443,11 +440,6 @@ public class SliderPath_Layer extends Layer {
 			_firstSliderValueIndex = firstSliderValueIndex;
 			_lastSliderValueIndex = lastSliderValueIndex;
 		}
-
-		updatePoints();
-	}
-
-	private void updatePoints() {
 
 		_simpleWorker.cancel(true);
 

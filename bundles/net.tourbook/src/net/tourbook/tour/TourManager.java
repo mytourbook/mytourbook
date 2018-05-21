@@ -1135,6 +1135,17 @@ public class TourManager {
 	 */
 	public static ArrayList<TourData> getSelectedTours() {
 
+		return getSelectedTours(false);
+	}
+
+	/**
+	 * @param isOnlyGeoTour
+	 *            When <code>true</code> then only tours with latitude/longitude will be returned,
+	 *            otherwise all tours will be returned.
+	 * @return
+	 */
+	public static ArrayList<TourData> getSelectedTours(final boolean isOnlyGeoTour) {
+
 		final IWorkbenchWindow[] wbWindows = PlatformUI.getWorkbench().getWorkbenchWindows();
 
 		// get all tourProviders
@@ -1152,12 +1163,39 @@ public class TourManager {
 						final ITourProvider tourProvider = (ITourProvider) view;
 						final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
 
-						if (selectedTours != null && selectedTours.size() > 0) {
+						if (selectedTours != null) {
 
-							/*
-							 * a tour provider is found which also provides tours
-							 */
-							return selectedTours;
+							if (isOnlyGeoTour) {
+
+								// return only geo tours
+
+								final ArrayList<TourData> geoTours = new ArrayList<>();
+
+								for (final TourData tourData : selectedTours) {
+
+									final float[] altitudeSerie = tourData.altitudeSerie;
+
+									if (altitudeSerie != null && altitudeSerie.length > 0) {
+										geoTours.add(tourData);
+									}
+								}
+
+								if (geoTours.size() > 0) {
+									return geoTours;
+								}
+
+							} else {
+
+								// return all tours
+
+								if (selectedTours.size() > 0) {
+
+									/*
+									 * a tour provider is found which also provides tours
+									 */
+									return selectedTours;
+								}
+							}
 						}
 					}
 				}
