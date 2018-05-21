@@ -82,7 +82,7 @@ public class SliderPath_Layer extends Layer {
 
 				_isUpdateLayer = false;
 
-				_simpleWorker.submit(10);
+				_simpleWorker.submit(0);
 
 				__curX = tx;
 				__curY = ty;
@@ -287,31 +287,6 @@ public class SliderPath_Layer extends Layer {
 					i = addPoint(projected, 0, x, y);
 					continue;
 				}
-
-//				final int clip = __lineClipper.clipNext(x, y);
-//				if (clip < 1) {
-//					if (i > 2) {
-//						lineBucket.addLine(projected, i, false);
-//					}
-//
-//					if (clip < 0) {
-//						/* add line segment */
-//						segment = __lineClipper.getLine(segment, 0);
-//						lineBucket.addLine(segment, 4, false);
-//						// the prev point is the real point not the clipped point
-//						//prevX = mClipper.outX2;
-//						//prevY = mClipper.outY2;
-//						prevX = x;
-//						prevY = y;
-//					}
-//					i = 0;
-//					// if the end point is inside, add it
-//					if (__lineClipper.getPrevOutcode() == 0) {
-//						projected[i++] = prevX;
-//						projected[i++] = prevY;
-//					}
-//					continue;
-//				}
 
 				final int clip = __lineClipper.clipNext(x, y);
 				if (clip != LineClipper.INSIDE) {

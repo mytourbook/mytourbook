@@ -26,26 +26,34 @@ public class Map25TrackConfig {
 	 * be set when an xml tag is not available.
 	 */
 
-	public String	id						= Long.toString(System.nanoTime());
-	public String	defaultId				= Map25ConfigManager.CONFIG_DEFAULT_ID_1;
-	public String	name					= Map25ConfigManager.CONFIG_DEFAULT_ID_1;
+	public String	id								= Long.toString(System.nanoTime());
+	public String	defaultId						= Map25ConfigManager.CONFIG_DEFAULT_ID_1;
+	public String	name							= Map25ConfigManager.CONFIG_DEFAULT_ID_1;
 
 	// outline
-	public float	outlineWidth			= Map25ConfigManager.DEFAULT_OUTLINE_WIDTH;
-	public RGB		outlineColor			= Map25ConfigManager.DEFAULT_OUTLINE_COLOR;
-	public int		outlineOpacity			= Map25ConfigManager.DEFAULT_OUTLINE_OPACITY;
+	public float	outlineWidth					= Map25ConfigManager.DEFAULT_OUTLINE_WIDTH;
+	public RGB		outlineColor					= Map25ConfigManager.DEFAULT_OUTLINE_COLOR;
+	public int		outlineOpacity					= Map25ConfigManager.DEFAULT_OUTLINE_OPACITY;
 
-	// chart slider path
-	public boolean	isShowSliderLocation		= Map25ConfigManager.DEFAULT_IS_SHOW_CHART_SLIDER;
-	public boolean	isShowSliderPath		= Map25ConfigManager.DEFAULT_IS_SHOW_SLIDER_PATH;
-	public RGB		sliderPath_Color		= Map25ConfigManager.DEFAULT_SLIDER_PATH_COLOR;
-	public float	sliderPath_LineWidth	= Map25ConfigManager.DEFAULT_SLIDER_PATH_LINE_WIDTH;
-	public int		sliderPath_Opacity		= Map25ConfigManager.DEFAULT_SLIDER_PATH_OPACITY;
+	// slider location
+	public boolean	isShowSliderLocation			= Map25ConfigManager.DEFAULT_IS_SHOW_CHART_SLIDER;
+	public RGB		sliderLocation_Left_Color		= Map25ConfigManager.DEFAULT_SLIDER_LOCATION_LEFT_COLOR;
+	public RGB		sliderLocation_Right_Color		= Map25ConfigManager.DEFAULT_SLIDER_LOCATION_RIGHT_COLOR;
+	public int		sliderLocation_Left_Opacity		= Map25ConfigManager.DEFAULT_SLIDER_LOCATION_OPACITY;
+	public int		sliderLocation_Left_Size		= Map25ConfigManager.DEFAULT_SLIDER_LOCATION_SIZE;
+	public int		sliderLocation_Right_Opacity	= Map25ConfigManager.DEFAULT_SLIDER_LOCATION_OPACITY;
+	public int		sliderLocation_Right_Size		= Map25ConfigManager.DEFAULT_SLIDER_LOCATION_SIZE;
+
+	// slider path
+	public boolean	isShowSliderPath				= Map25ConfigManager.DEFAULT_IS_SHOW_SLIDER_PATH;
+	public RGB		sliderPath_Color				= Map25ConfigManager.DEFAULT_SLIDER_PATH_COLOR;
+	public float	sliderPath_LineWidth			= Map25ConfigManager.DEFAULT_SLIDER_PATH_LINE_WIDTH;
+	public int		sliderPath_Opacity				= Map25ConfigManager.DEFAULT_SLIDER_PATH_OPACITY;
 
 	/**
 	 * Animation time in milli seconds when a tour is synched with the map, default is 2000 ms
 	 */
-	public int		animationTime			= Map25ConfigManager.DEFAULT_ANIMATION_TIME;
+	public int		animationTime					= Map25ConfigManager.DEFAULT_ANIMATION_TIME;
 
 	public Map25TrackConfig() {}
 
