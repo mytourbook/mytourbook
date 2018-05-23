@@ -1262,7 +1262,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 					if (_mapSynchedWith == MapSync.WITH_TOUR) {
 
-						final int animationTime = Map25ConfigManager.getActiveTourTrackConfig().animationTime;
+//						final int animationTime = Map25ConfigManager.getActiveTourTrackConfig().animationTime;
+						final int animationTime = Map25ConfigManager.DEFAULT_ANIMATION_TIME;
 						Map25ConfigManager.setMapLocation(map25, _allBoundingBox, animationTime);
 					}
 

@@ -1845,19 +1845,13 @@ public class Messages extends NLS {
 	public static String		Slideout_MapBookmark_Label_Title;
 
 	public static String		Slideout_MapOptions_Checkbox_ChartSlider;
-
 	public static String		Slideout_MapOptions_Checkbox_SliderPath;
-
 	public static String		Slideout_MapOptions_Checkbox_SliderPath_Tooltip;
-
-	public static String		Slideout_MapOptions_Label_SliderLocation_Left;
-
-	public static String		Slideout_MapOptions_Label_SliderLocation_Right;
-
-	public static String		Slideout_MapOptions_Label_SliderLocation_Tooltip;
-
+	public static String		Slideout_MapOptions_Label_SliderLocation_Color;
+	public static String		Slideout_MapOptions_Label_SliderLocation_Color_Tooltip;
+	public static String		Slideout_MapOptions_Label_SliderLocation_Size;
+	public static String		Slideout_MapOptions_Label_SliderLocation_Size_Tooltip;
 	public static String		Slideout_MapOptions_Label_SliderPath_Color;
-
 	public static String		Slideout_MapOptions_Label_SliderPath_Width;
 
 	public static String		Slideout_RefTour_YearStatisticOptions_Label_Title;

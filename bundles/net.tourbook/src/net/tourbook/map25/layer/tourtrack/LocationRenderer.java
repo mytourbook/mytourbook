@@ -5,9 +5,11 @@ package net.tourbook.map25.layer.tourtrack;
 
 import static org.oscim.backend.GLAdapter.*;
 
+import net.tourbook.map25.Map25ConfigManager;
+
+import org.eclipse.swt.graphics.RGB;
 import org.oscim.backend.CanvasAdapter;
 import org.oscim.backend.GL;
-import org.oscim.backend.canvas.Color;
 import org.oscim.core.Box;
 import org.oscim.core.MapPosition;
 import org.oscim.core.Point;
@@ -25,17 +27,13 @@ import org.oscim.utils.math.Interpolation;
 
 public class LocationRenderer extends LayerRenderer {
 
-	private static final long	ANIM_RATE				= 50;
-	private static final long	INTERVAL				= 2000;
+	private static final long	ANIM_RATE						= 50;
+	private static final long	INTERVAL						= 2000;
 
-	private static final float	CIRCLE_SIZE				= 50;
-	private static final int	COLOR1					= 0xff00ffcc;
-	private static final int	COLOR2					= 0xff3333cc;
-	private static final int	SHOW_ACCURACY_ZOOM		= 16;
+	private static final int	SHOW_ACCURACY_ZOOM				= 16;
 
-	private final Map			mMap;
-	private final Layer			mLayer;
-	private final float			mScale;
+	private final Map			_map;
+	private final Layer			_layer;
 
 	private String				_shaderFile;
 	private int					_shaderProgram;
@@ -47,32 +45,35 @@ public class LocationRenderer extends LayerRenderer {
 	private int					_shader_Color;
 	private int					_shader_Mode;
 
-	private final Point			mScreenPoint			= new Point();
-	private final Box			mBBox					= new Box();
+	private Callback			_render_Callback;
+	private final float			_render_Scale;
+	private double				_render_Radius;
+	private float				_render_CircleSize				= 50;
+	private int					_render_ShowAccuracyZoom		= SHOW_ACCURACY_ZOOM;
 
-	private boolean				_isInitialized;
+	private final float[]		_render_Colors[]				= new float[2][4];
+	private final Point			_render_IndicatorPositions[]	= { new Point(), new Point() };
 
-	private final float[]		mColors[]				= new float[2][4];
-	private final Point			mIndicatorPosition[]	= { new Point(), new Point() };
+	private final Point			_screenPoint					= new Point();
+	private final Box			_viewportBBox					= new Box();
+
+	private boolean				_isShaderInitialized;
 
 	/**
 	 * When <code>true</code> the location is visible in the viewport otherwise it is outside of the
 	 * viewport
 	 */
-	private final boolean		_isLocationVisible[]	= new boolean[2];
+	private final boolean		_isLocationVisible[]			= new boolean[2];
 
-	private final Point			_locationLatLon[]		= {
+	private final Point			_locationLatLon[]				= {
 			new Point(Double.NaN, Double.NaN),
 			new Point(Double.NaN, Double.NaN)
 	};
 
 	private boolean				_isAnimationEnabled;
-	private long				mAnimStart;
+	private long				_animStart;
 
-	private Callback			mCallback;
-
-	private double				mRadius;
-	private int					mShowAccuracyZoom		= SHOW_ACCURACY_ZOOM;
+	private boolean				_isLocationModified;
 
 	public interface Callback {
 
@@ -90,21 +91,12 @@ public class LocationRenderer extends LayerRenderer {
 
 	public LocationRenderer(final Map map, final Layer layer, final float scale) {
 
-		mMap = map;
-		mLayer = layer;
-		mScale = scale;
+		_map = map;
+		_layer = layer;
 
-		final float color1 = Color.aToFloat(COLOR1);
-		mColors[0][0] = color1 * Color.rToFloat(COLOR1);
-		mColors[0][1] = color1 * Color.gToFloat(COLOR1);
-		mColors[0][2] = color1 * Color.bToFloat(COLOR1);
-		mColors[0][3] = color1;
+		_render_Scale = scale;
 
-		final float color2 = Color.aToFloat(COLOR2);
-		mColors[1][0] = color2 * Color.rToFloat(COLOR2);
-		mColors[1][1] = color2 * Color.gToFloat(COLOR2);
-		mColors[1][2] = color2 * Color.bToFloat(COLOR2);
-		mColors[1][3] = color2;
+		updateConfig();
 	}
 
 	public void animate(final boolean isEnabled) {
@@ -129,25 +121,25 @@ public class LocationRenderer extends LayerRenderer {
 				}
 
 				final long diff = System.currentTimeMillis() - lastRun;
-				mMap.postDelayed(this, Math.min(ANIM_RATE, diff));
+				_map.postDelayed(this, Math.min(ANIM_RATE, diff));
 
 				if (_isLocationVisible[0] == false || _isLocationVisible[1] == false) {
-					mMap.render();
+					_map.render();
 				}
 
 				lastRun = System.currentTimeMillis();
 			}
 		};
 
-		mAnimStart = System.currentTimeMillis();
-		mMap.postDelayed(action, ANIM_RATE);
+		_animStart = System.currentTimeMillis();
+		_map.postDelayed(action, ANIM_RATE);
 	}
 
 	private float animPhase() {
-		return (float) ((MapRenderer.frametime - mAnimStart) % INTERVAL) / INTERVAL;
+		return (float) ((MapRenderer.frametime - _animStart) % INTERVAL) / INTERVAL;
 	}
 
-	private boolean init() {
+	private boolean initShader() {
 
 		final int program = GLShader.loadShader(_shaderFile != null ? _shaderFile : "location_1");
 		if (program == 0) {
@@ -177,7 +169,7 @@ public class LocationRenderer extends LayerRenderer {
 		MapRenderer.bindQuadVertexVBO(_shader_VertexPosition/* , true */);
 
 		final MapPosition viewPortPosition = viewPort.pos;
-		float radius = CIRCLE_SIZE * mScale;
+		float radius = _render_CircleSize * _render_Scale;
 
 		for (int locationIndex = 0; locationIndex < 2; locationIndex++) {
 
@@ -186,25 +178,18 @@ public class LocationRenderer extends LayerRenderer {
 			animate(true);
 
 			final boolean isLocationVisible = _isLocationVisible[locationIndex];
-			if (isLocationVisible == false
+			if (isLocationVisible) {
 
-			/* || pos.zoomLevel < SHOW_ACCURACY_ZOOM */) {
-
-				//animate(true);
-
-			} else {
-
-				if (viewPortPosition.zoomLevel >= mShowAccuracyZoom) {
-					radius = (float) (mRadius * viewPortPosition.scale);
+				if (viewPortPosition.zoomLevel >= _render_ShowAccuracyZoom) {
+					radius = (float) (_render_Radius * viewPortPosition.scale);
 				}
-				radius = Math.max(CIRCLE_SIZE * mScale, radius);
+				radius = Math.max(_render_CircleSize * _render_Scale, radius);
 
 				isViewShed = true;
-				//animate(false);
 			}
 			gl.uniform1f(_shader_Scale, radius);
 
-			final Point locationPosition = mIndicatorPosition[locationIndex];
+			final Point locationPosition = _render_IndicatorPositions[locationIndex];
 			final double x = locationPosition.x - viewPortPosition.x;
 			final double y = locationPosition.y - viewPortPosition.y;
 			final double tileScale = Tile.SIZE * viewPortPosition.scale;
@@ -213,23 +198,26 @@ public class LocationRenderer extends LayerRenderer {
 			viewPort.mvp.multiplyMM(viewPort.viewproj, viewPort.mvp);
 			viewPort.mvp.setAsUniform(_shader_MatrixPosition);
 
-			if (isViewShed == false) {
+			if (isViewShed) {
+
+				gl.uniform1f(_shader_Phase, 1);
+
+			} else {
 
 				float phase = Math.abs(animPhase() - 0.5f) * 2;
+
 				//phase = Interpolation.fade.apply(phase);
 				phase = Interpolation.swing.apply(phase);
 
 				gl.uniform1f(_shader_Phase, 0.8f + phase * 0.2f);
 
-			} else {
-				gl.uniform1f(_shader_Phase, 1);
 			}
 
 			if (isViewShed && isLocationVisible) {
 
-				if (mCallback != null && mCallback.hasRotation()) {
+				if (_render_Callback != null && _render_Callback.hasRotation()) {
 
-					float rotation = mCallback.getRotation();
+					float rotation = _render_Callback.getRotation();
 					rotation -= 90;
 					gl.uniform2f(_shader_Direction,
 							(float) Math.cos(Math.toRadians(rotation)),
@@ -249,29 +237,14 @@ public class LocationRenderer extends LayerRenderer {
 				gl.uniform1i(_shader_Mode, -1);
 			}
 
-			GLUtils.glUniform4fv(_shader_Color, 1, mColors[locationIndex]);
+			GLUtils.glUniform4fv(_shader_Color, 1, _render_Colors[locationIndex]);
 
 			gl.drawArrays(GL.TRIANGLE_STRIP, 0, 4);
 		}
 	}
 
 	public void setCallback(final Callback callback) {
-		mCallback = callback;
-	}
-
-	public void setColor(final int color) {
-
-		final float color1 = Color.aToFloat(COLOR1);
-		mColors[0][0] = color1 * Color.rToFloat(COLOR1);
-		mColors[0][1] = color1 * Color.gToFloat(COLOR1);
-		mColors[0][2] = color1 * Color.bToFloat(COLOR1);
-		mColors[0][3] = color1;
-
-		final float color2 = Color.aToFloat(COLOR2);
-		mColors[1][0] = color2 * Color.rToFloat(COLOR2);
-		mColors[1][1] = color2 * Color.gToFloat(COLOR2);
-		mColors[1][2] = color2 * Color.bToFloat(COLOR2);
-		mColors[1][3] = color2;
+		_render_Callback = callback;
 	}
 
 	public void setLocation(final double longitudeX,
@@ -286,60 +259,67 @@ public class LocationRenderer extends LayerRenderer {
 		_locationLatLon[1].x = longitudeX2;
 		_locationLatLon[1].y = latitudeY2;
 
-		mRadius = radius;
+		_render_Radius = radius;
+
+		_isLocationModified = true;
 	}
 
 	public void setShader(final String shaderFile) {
 
 		_shaderFile = shaderFile;
-		_isInitialized = false;
+		_isShaderInitialized = false;
 	}
 
 	public void setShowAccuracyZoom(final int showAccuracyZoom) {
-		mShowAccuracyZoom = showAccuracyZoom;
+		_render_ShowAccuracyZoom = showAccuracyZoom;
 	}
 
 	@Override
-	public void update(final GLViewport v) {
+	public void update(final GLViewport viewport) {
 
-		if (!_isInitialized) {
-			init();
-			_isInitialized = true;
+		if (_isShaderInitialized == false) {
+			initShader();
+			_isShaderInitialized = true;
 		}
 
-		if (mLayer.isEnabled() == false) {
+		if (_layer.isEnabled() == false) {
+
+			// layer is hidden
+
 			setReady(false);
 			return;
 		}
 
-		/*
-		 * if (!v.changed() && isReady()) return;
-		 */
+		// optimize performance
+		if (viewport.changed() == false && _isLocationModified == false) {
+			return;
+		}
+
+		_isLocationModified = false;
 
 		setReady(true);
 
-		final int width = mMap.getWidth();
-		final int height = mMap.getHeight();
+		final int width = _map.getWidth();
+		final int height = _map.getHeight();
 
-		// clamp location to a position that can be
-		// savely translated to screen coordinates
-		v.getBBox(mBBox, 0);
+		// clamp location to a position that can be savely translated to screen coordinates
+		viewport.getBBox(_viewportBBox, 0);
 
 		for (int locationIndex = 0; locationIndex < 2; locationIndex++) {
 
 			double x = _locationLatLon[locationIndex].x;
 			double y = _locationLatLon[locationIndex].y;
 
-			if (!mBBox.contains(_locationLatLon[locationIndex])) {
-				x = FastMath.clamp(x, mBBox.xmin, mBBox.xmax);
-				y = FastMath.clamp(y, mBBox.ymin, mBBox.ymax);
+			if (!_viewportBBox.contains(_locationLatLon[locationIndex])) {
+				x = FastMath.clamp(x, _viewportBBox.xmin, _viewportBBox.xmax);
+				y = FastMath.clamp(y, _viewportBBox.ymin, _viewportBBox.ymax);
 			}
 
-			// get position of Location in pixel relative to screen center
-			v.toScreenPoint(x, y, mScreenPoint);
+			// get position of location in pixel relative to screen center
+			viewport.toScreenPoint(x, y, _screenPoint);
 
-			x = mScreenPoint.x + width / 2;
-			y = mScreenPoint.y + height / 2;
+			x = _screenPoint.x + width / 2;
+			y = _screenPoint.y + height / 2;
 
 			// clip position to screen boundaries
 			int visible = 0;
@@ -363,7 +343,28 @@ public class LocationRenderer extends LayerRenderer {
 			_isLocationVisible[locationIndex] = (visible == 2);
 
 			// set location indicator position
-			v.fromScreenPoint(x, y, mIndicatorPosition[locationIndex]);
+			viewport.fromScreenPoint(x, y, _render_IndicatorPositions[locationIndex]);
 		}
+	}
+
+	void updateConfig() {
+
+		final Map25TrackConfig config = Map25ConfigManager.getActiveTourTrackConfig();
+
+		_render_CircleSize = config.sliderLocation_Size;
+
+		final RGB leftColor = config.sliderLocation_Left_Color;
+		final RGB rightColor = config.sliderLocation_Right_Color;
+		final float opacity = config.sliderLocation_Opacity;
+
+		_render_Colors[0][0] = leftColor.red / 255f;
+		_render_Colors[0][1] = leftColor.green / 255f;
+		_render_Colors[0][2] = leftColor.blue / 255f;
+		_render_Colors[0][3] = opacity / 100f;
+
+		_render_Colors[1][0] = rightColor.red / 255f;
+		_render_Colors[1][1] = rightColor.green / 255f;
+		_render_Colors[1][2] = rightColor.blue / 255f;
+		_render_Colors[1][3] = opacity / 100f;
 	}
 }

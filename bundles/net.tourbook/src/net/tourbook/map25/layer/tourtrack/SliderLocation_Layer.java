@@ -32,6 +32,8 @@ public class SliderLocation_Layer extends Layer {
 		final Map25TrackConfig activeTourTrackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
 		setEnabled(activeTourTrackConfig.isShowSliderLocation);
+
+		locationRenderer.updateConfig();
 	}
 
 	@Override
