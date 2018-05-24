@@ -133,6 +133,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	//
 	private static final IDialogSettings	_state			= TourbookPlugin.getState(ID);
 	//
+	private static int[]					_eventCounter	= new int[1];
+	//
 // SET_FORMATTING_ON
 	//
 	{}
@@ -343,26 +345,6 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 			syncMapWith_ChartSlider(firstTourData);
 		}
-	}
-
-	public void actionSync_WithChartSlider_OLD() {
-
-//		_isMapSynched_WithChartSlider = _actionSyncMap_WithChartSlider.isChecked();
-//
-//		if (_isMapSynched_WithChartSlider) {
-//
-//			// ensure that the track sliders are displayed
-//
-//			deactivateSync_WithMap();
-//
-//			_actionShowTour_WithOptions.setSelection(true);
-//
-//			// map must be synched with selected tour
-//			_actionSyncMap_WithTour.setChecked(true);
-//			_isMapSynched_WithTour = true;
-//
-//			paintTours_AndUpdateMap();
-//		}
 	}
 
 	public void actionSync_WithOtherMap(final boolean isSelected) {
@@ -1384,59 +1366,60 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 			valuesIndex = latitudeSerie.length;
 		}
 
-//
-//
-//
-//
-//
-//
-//		final Map25TrackConfig activeTourTrackConfig = Map25ConfigManager.getActiveTourTrackConfig();
-//		final boolean isShowSliderLocation = activeTourTrackConfig.isShowSliderLocation;
-//		final boolean isShowSliderPath = activeTourTrackConfig.isShowSliderPath;
-//
-//		// show/hide layer
-//		final SliderLocation_Layer sliderLocation_Layer = _mapApp.getLayer_SliderLocation();
-//		final SliderPath_Layer sliderPath_Layer = _mapApp.getLayer_SliderPath();
-//
-//		sliderPath_Layer.setEnabled(isShowSliderPath);
-//		sliderLocation_Layer.setEnabled(isShowSliderLocation);
-//
-//		if (isShowSliderPath) {
-//
-//			sliderPath_Layer.setPoints(_allGeoPoints, _allTourStarts, _leftSliderValueIndex, _rightSliderValueIndex);
-//		}
-//
-//		if (isShowSliderLocation) {
-//
-//			final GeoPoint leftGeoPoint = _allGeoPoints[_leftSliderValueIndex];
-//			final GeoPoint rightGeoPoint = _allGeoPoints[_rightSliderValueIndex];
-//
-//			sliderLocation_Layer.setPosition(leftGeoPoint, rightGeoPoint);
-//		}
-//
-//
-//
-//
-//
-//
-//
-//
-
 		final double latitude = latitudeSerie[valuesIndex];
 		final double longitude = tourData.longitudeSerie[valuesIndex];
 
 		final Map map25 = _mapApp.getMap();
 		final MapPosition currentMapPos = new MapPosition();
 
-		// get current position
-		map25.viewport().getMapPosition(currentMapPos);
+		if (_mapSynchedWith == MapSync.WITH_SLIDER) {
 
-		// set new position
-		currentMapPos.setPosition(latitude, longitude);
+			// sync map with selected
 
-		// update map
-		map25.setMapPosition(currentMapPos);
-		map25.render();
+			// get current position
+			map25.viewport().getMapPosition(currentMapPos);
+
+			// set new position
+			currentMapPos.setPosition(latitude, longitude);
+
+			// update map
+			map25.setMapPosition(currentMapPos);
+			map25.render();
+
+		} else {
+
+			// center sliders
+
+			// create bounding box for the sliders
+			final GeoPoint leftGeoPoint = _allGeoPoints[_leftSliderValueIndex];
+			final GeoPoint rightGeoPoint = _allGeoPoints[_rightSliderValueIndex];
+
+			final List<GeoPoint> sliderPoints = new ArrayList<>();
+			sliderPoints.add(leftGeoPoint);
+			sliderPoints.add(rightGeoPoint);
+
+			final BoundingBox sliderBBox = new BoundingBox(sliderPoints);
+
+			_eventCounter[0]++;
+
+			map25.post(new Runnable() {
+
+				final int __runnableCounter = _eventCounter[0];
+
+				@Override
+				public void run() {
+
+					// skip all events which has not yet been executed
+					if (__runnableCounter != _eventCounter[0]) {
+
+						// a new event occured
+						return;
+					}
+
+					Map25ConfigManager.setMapLocation(map25, sliderBBox, 500);
+				}
+			});
+		}
 	}
 
 	@Override

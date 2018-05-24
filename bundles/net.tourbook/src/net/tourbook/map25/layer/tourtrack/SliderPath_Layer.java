@@ -5,6 +5,8 @@ package net.tourbook.map25.layer.tourtrack;
 
 import gnu.trove.list.array.TIntArrayList;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.map25.Map25ConfigManager;
 
@@ -31,6 +33,9 @@ import org.oscim.utils.geom.LineClipper;
  * org.oscim.layers.marker.ItemizedLayer.activateSelectedItems(MotionEvent, ActiveItem)
  */
 public class SliderPath_Layer extends Layer {
+
+	private AtomicInteger	_eventCounter	= new AtomicInteger();
+	private AtomicInteger	_workerCounter	= new AtomicInteger();
 
 	/**
 	 * Stores points, converted to the map projection.
@@ -148,6 +153,9 @@ public class SliderPath_Layer extends Layer {
 
 		@Override
 		public boolean doWork(final TourRenderTask task) {
+
+			final int eventCounter = _eventCounter.get();
+			final int workerCounter = _workerCounter.get();
 
 			int numPoints = __numPoints;
 
@@ -420,5 +428,7 @@ public class SliderPath_Layer extends Layer {
 
 		_isUpdatePoints = true;
 		_isUpdateLayer = true;
+
+		_eventCounter.incrementAndGet();
 	}
 }
