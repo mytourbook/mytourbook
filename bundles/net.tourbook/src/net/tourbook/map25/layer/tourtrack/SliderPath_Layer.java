@@ -35,7 +35,7 @@ import org.oscim.utils.geom.LineClipper;
 public class SliderPath_Layer extends Layer {
 
 	private AtomicInteger	_eventCounter	= new AtomicInteger();
-	private AtomicInteger	_workerCounter	= new AtomicInteger();
+	private int				_geoPointCounter;
 
 	/**
 	 * Stores points, converted to the map projection.
@@ -154,14 +154,23 @@ public class SliderPath_Layer extends Layer {
 		@Override
 		public boolean doWork(final TourRenderTask task) {
 
-			final int eventCounter = _eventCounter.get();
-			final int workerCounter = _workerCounter.get();
-
 			int numPoints = __numPoints;
 
 			if (_isUpdatePoints) {
 
 				synchronized (_geoPoints) {
+
+					final int eventCounter = _eventCounter.get();
+
+//					System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] doWork()")
+//							+ ("\tcounter diff: " + (eventCounter - _geoPointCounter))
+////							+ ("\t_geoPointCounter: " + _geoPointCounter)
+//					);
+//// TODO remove SYSTEM.OUT.PRINTLN
+
+					if (eventCounter > _geoPointCounter) {
+						return false;
+					}
 
 					_isUpdatePoints = false;
 
@@ -415,6 +424,8 @@ public class SliderPath_Layer extends Layer {
 
 		synchronized (_geoPoints) {
 
+			_geoPointCounter = _eventCounter.incrementAndGet();
+
 			_tourStarts.clear();
 			_tourStarts.addAll(tourStarts);
 
@@ -424,11 +435,16 @@ public class SliderPath_Layer extends Layer {
 			_lastSliderValueIndex = lastSliderValueIndex;
 		}
 
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] setPoints()")
+//				+ ("\tsimpleWorker.isRunning: " + _simpleWorker.isRunning())
+////				+ ("\t: " + )
+//		);
+//// TODO remove SYSTEM.OUT.PRINTLN
+
 		_simpleWorker.cancel(true);
 
 		_isUpdatePoints = true;
 		_isUpdateLayer = true;
 
-		_eventCounter.incrementAndGet();
 	}
 }

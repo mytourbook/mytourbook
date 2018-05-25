@@ -193,7 +193,10 @@ public class TourManager {
 	private static LabelProviderInt			_labelProviderInt	= new LabelProviderInt();
 	//
 	private static TourData					_multipleTourData;
+	private static ArrayList<TourData>		_multipleTourData_List;
 	private static int						_multipleTourDataHash;
+	private static int						_multipleTourData_List_Hash;
+	private static long						_multipleTourData_List_Key;
 	//
 	private static final ListenerList		_tourEventListeners	= new ListenerList(ListenerList.IDENTITY);
 	private static final ListenerList		_tourSaveListeners	= new ListenerList(ListenerList.IDENTITY);
@@ -293,6 +296,7 @@ public class TourManager {
 					 */
 
 					_multipleTourData = null;
+					_multipleTourData_List = null;
 				}
 			}
 		});
@@ -446,6 +450,7 @@ public class TourManager {
 	public static void clearMultipleTourData() {
 
 		_multipleTourData = null;
+		_multipleTourData_List = null;
 	}
 
 	/**
@@ -1441,6 +1446,15 @@ public class TourManager {
 									final ArrayList<TourData> allTourData,
 									final boolean isCheckLatLon) {
 
+		// check if the requested data are already available
+		if (_multipleTourData_List != null && allTourIds.hashCode() == _multipleTourData_List_Hash) {
+
+			allTourData.clear();
+			allTourData.addAll(_multipleTourData_List);
+
+			return _multipleTourData_List_Key;
+		}
+
 		allTourData.clear();
 
 		// create a unique key for all tours
@@ -1508,6 +1522,10 @@ public class TourManager {
 				}
 			}
 		}
+
+		_multipleTourData_List = allTourData;
+		_multipleTourData_List_Hash = allTourIds.hashCode();
+		_multipleTourData_List_Key = newOverlayKey[0];
 
 		return newOverlayKey[0];
 	}
