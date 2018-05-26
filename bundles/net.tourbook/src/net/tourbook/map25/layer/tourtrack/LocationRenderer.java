@@ -366,5 +366,7 @@ public class LocationRenderer extends LayerRenderer {
 		_render_Colors[1][1] = rightColor.green / 255f;
 		_render_Colors[1][2] = rightColor.blue / 255f;
 		_render_Colors[1][3] = opacity / 100f;
+
+		_map.render();
 	}
 }

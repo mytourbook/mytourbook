@@ -34,27 +34,29 @@ import org.oscim.utils.geom.LineClipper;
  */
 public class SliderPath_Layer extends Layer {
 
-	private AtomicInteger	_eventCounter	= new AtomicInteger();
-	private int				_geoPointCounter;
+	private static final long	RENDERING_DELAY	= 0;
+
+	private AtomicInteger		_eventCounter	= new AtomicInteger();
+	private int					_geoPointCounter;
 
 	/**
 	 * Stores points, converted to the map projection.
 	 */
-	protected GeoPoint[]	_geoPoints;
-	protected TIntArrayList	_tourStarts;
+	protected GeoPoint[]		_geoPoints;
+	protected TIntArrayList		_tourStarts;
 
-	protected boolean		_isUpdatePoints;
+	protected boolean			_isUpdatePoints;
 
 	/**
 	 * Line style
 	 */
-	LineStyle				_lineStyle;
+	LineStyle					_lineStyle;
 
-	final Worker			_simpleWorker;
+	final Worker				_simpleWorker;
 
-	private boolean			_isUpdateLayer;
-	private int				_firstSliderValueIndex;
-	private int				_lastSliderValueIndex;
+	private boolean				_isUpdateLayer;
+	private int					_firstSliderValueIndex;
+	private int					_lastSliderValueIndex;
 
 	private final class TourRenderer extends BucketRenderer {
 
@@ -87,7 +89,7 @@ public class SliderPath_Layer extends Layer {
 
 				_isUpdateLayer = false;
 
-				_simpleWorker.submit(0);
+				_simpleWorker.submit(RENDERING_DELAY);
 
 				__curX = tx;
 				__curY = ty;
@@ -392,11 +394,18 @@ public class SliderPath_Layer extends Layer {
 
 		final Map25TrackConfig activeTourTrackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
-		setEnabled(activeTourTrackConfig.isShowSliderPath);
-
 		_lineStyle = createLineStyle();
 
-		_simpleWorker.submit(0);
+		final boolean isEnabled = activeTourTrackConfig.isShowSliderPath;
+
+		setEnabled(isEnabled);
+
+		if (isEnabled) {
+			_simpleWorker.submit(RENDERING_DELAY);
+		} else {
+			_simpleWorker.cancel(true);
+		}
+
 	}
 
 	public void setPoints(	final GeoPoint[] geoPoints,

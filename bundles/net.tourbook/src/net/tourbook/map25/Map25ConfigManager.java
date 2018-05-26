@@ -125,7 +125,7 @@ public class Map25ConfigManager {
 	public static final RGB				DEFAULT_OUTLINE_COLOR				= new RGB(0x80, 0x0, 0x80);
 	public static final int				DEFAULT_OUTLINE_OPACITY				= 70;
 	public static final float			DEFAULT_OUTLINE_WIDTH				= 2.5f;
-	public static final int				OUTLINE_OPACITY_MIN					= 10;
+	public static final int				OUTLINE_OPACITY_MIN					= 1;
 	public static final int				OUTLINE_OPACITY_MAX					= 100;
 	public static final float			OUTLINE_WIDTH_MIN					= 0.1f;
 	public static final float			OUTLINE_WIDTH_MAX					= 20.0f;
@@ -146,7 +146,7 @@ public class Map25ConfigManager {
 	public static final int				DEFAULT_SLIDER_LOCATION_SIZE		= 30;
 	public static final RGB				DEFAULT_SLIDER_LOCATION_LEFT_COLOR	= new RGB(0xff, 0x0, 0x0);
 	public static final RGB				DEFAULT_SLIDER_LOCATION_RIGHT_COLOR	= new RGB(0x0, 0xff, 0x0);
-	public static final int				SLIDER_LOCATION_OPACITY_MIN			= 10;
+	public static final int				SLIDER_LOCATION_OPACITY_MIN			= 1;
 	public static final int				SLIDER_LOCATION_OPACITY_MAX			= 100;
 	public static final int				SLIDER_LOCATION_SIZE_MIN			= 10;
 	public static final int				SLIDER_LOCATION_SIZE_MAX			= 100;
@@ -157,7 +157,7 @@ public class Map25ConfigManager {
 	public static final int				DEFAULT_SLIDER_PATH_OPACITY			= 30;
 	public static float					SLIDER_PATH_LINE_WIDTH_MIN			= 1.0f;
 	public static final float			SLIDER_PATH_LINE_WIDTH_MAX			= 50.0f;
-	public static final int				SLIDER_PATH_OPACITY_MIN				= 10;
+	public static final int				SLIDER_PATH_OPACITY_MIN				= 1;
 	public static final int				SLIDER_PATH_OPACITY_MAX				= 100;
 	//
 	// other properties

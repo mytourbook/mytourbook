@@ -532,7 +532,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 			_selectedSliderValueIndex = chartInfo.selectedSliderValuesIndex;
 		}
 
-		final int maxSlices = tourData.altitudeSerie.length - 1;
+		final int maxSlices = tourData.latitudeSerie.length - 1;
 
 		_leftSliderValueIndex = Math.max(0, Math.min(maxSlices, _leftSliderValueIndex));
 		_rightSliderValueIndex = Math.max(0, Math.min(maxSlices, _rightSliderValueIndex));
@@ -1108,7 +1108,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 		_allTourData.clear();
 
-		if (tourData.altitudeSerie != null || tourData.altitudeSerie.length > 0) {
+		if (tourData.latitudeSerie != null && tourData.latitudeSerie.length > 0) {
 			_allTourData.add(tourData);
 		}
 
@@ -1335,8 +1335,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 					_allTourData.clear();
 					_allTourData.addAll(tourDataList);
 
-					paintTours_AndUpdateMap();
-				}
+						paintTours_AndUpdateMap();
+					}
 
 				enableActions();
 			}

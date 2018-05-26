@@ -32,22 +32,23 @@ import org.oscim.utils.geom.LineClipper;
  */
 public class TourLayer extends Layer {
 
+	private static final int	RENDERING_DELAY	= 0;
 	/**
 	 * Stores points, converted to the map projection.
 	 */
-	protected GeoPoint[]	_geoPoints;
-	protected TIntArrayList	_tourStarts;
+	protected GeoPoint[]		_geoPoints;
+	protected TIntArrayList		_tourStarts;
 
-	protected boolean		_isUpdatePoints;
+	protected boolean			_isUpdatePoints;
 
 	/**
 	 * Line style
 	 */
-	LineStyle				_lineStyle;
+	LineStyle					_lineStyle;
 
-	final Worker			_simpleWorker;
+	final Worker				_simpleWorker;
 
-	private boolean			_isUpdateLayer;
+	private boolean				_isUpdateLayer;
 
 	private final class TourRenderer extends BucketRenderer {
 
@@ -83,7 +84,7 @@ public class TourLayer extends Layer {
 
 				_isUpdateLayer = false;
 
-				_simpleWorker.submit(0);
+				_simpleWorker.submit(RENDERING_DELAY);
 
 				__curX = tx;
 				__curY = ty;
@@ -128,7 +129,7 @@ public class TourLayer extends Layer {
 
 		public Worker(final Map map) {
 
-			super(map, 55, new TourRenderTask(), new TourRenderTask());
+			super(map, 50, new TourRenderTask(), new TourRenderTask());
 
 			__lineClipper = new LineClipper(-__max, -__max, __max, __max);
 			__projectedPoints = new float[0];
@@ -373,7 +374,7 @@ public class TourLayer extends Layer {
 
 		_lineStyle = createLineStyle();
 
-		_simpleWorker.submit(0);
+		_simpleWorker.submit(RENDERING_DELAY);
 	}
 
 	public void setPoints(final GeoPoint[] geoPoints, final TIntArrayList tourStarts) {
@@ -387,7 +388,7 @@ public class TourLayer extends Layer {
 		}
 
 		_simpleWorker.cancel(true);
-		
+
 		_isUpdatePoints = true;
 		_isUpdateLayer = true;
 	}

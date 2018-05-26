@@ -1178,9 +1178,9 @@ public class TourManager {
 
 								for (final TourData tourData : selectedTours) {
 
-									final float[] altitudeSerie = tourData.altitudeSerie;
+									final double[] latitudeSerie = tourData.latitudeSerie;
 
-									if (altitudeSerie != null && altitudeSerie.length > 0) {
+									if (latitudeSerie != null && latitudeSerie.length > 0) {
 										geoTours.add(tourData);
 									}
 								}
