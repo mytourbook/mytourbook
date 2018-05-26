@@ -9,18 +9,19 @@ New
 Improvements
 ============	
 
+
+* 2.5D Map
+
+  - Show chart slider + path
+  - Sync map with both sliders and center it
+  - Set track opacity  
+  
+  
 * 2D Map
 
   - Show some options from the preferences also in the slideout
 
 
-
-* 2.5D Map
-
-  - Set track opacity  
-  - Show chart slider path
-  
-  
 
 
 

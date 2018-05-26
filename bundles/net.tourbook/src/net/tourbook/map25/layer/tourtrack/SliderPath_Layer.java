@@ -164,8 +164,7 @@ public class SliderPath_Layer extends Layer {
 
 //					System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] doWork()")
 //							+ ("\tcounter diff: " + (eventCounter - _geoPointCounter))
-////							+ ("\t_geoPointCounter: " + _geoPointCounter)
-//					);
+//							+ ("\t_geoPointCounter: " + _geoPointCounter));
 //// TODO remove SYSTEM.OUT.PRINTLN
 
 					if (eventCounter > _geoPointCounter) {
@@ -420,6 +419,23 @@ public class SliderPath_Layer extends Layer {
 		} else {
 			firstSliderValueIndex = leftSliderValueIndex;
 			lastSliderValueIndex = rightSliderValueIndex;
+		}
+
+		/**
+		 * There is somewhere a bug that when both sliders have the same position then the map is
+		 * rendered at 0/0 which makes it almost impossible to get back to a normal view. A
+		 * workaround is to select a bookmark -> Solution: make position different
+		 */
+		if (firstSliderValueIndex == lastSliderValueIndex) {
+
+			if (lastSliderValueIndex < numPoints - 2) {
+
+				lastSliderValueIndex++;
+
+			} else {
+
+				firstSliderValueIndex--;
+			}
 		}
 
 		synchronized (_geoPoints) {

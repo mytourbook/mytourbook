@@ -1392,7 +1392,18 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 			// create bounding box for the sliders
 			final GeoPoint leftGeoPoint = _allGeoPoints[_leftSliderValueIndex];
-			final GeoPoint rightGeoPoint = _allGeoPoints[_rightSliderValueIndex];
+			GeoPoint rightGeoPoint = _allGeoPoints[_rightSliderValueIndex];
+
+			final int MIN_CENTER_SLIDER_DIFF_E6 = 100;
+
+			// ensure that both locations are different otherwise it is like div by 0
+			if (Math.abs(leftGeoPoint.latitudeE6 - rightGeoPoint.latitudeE6) < MIN_CENTER_SLIDER_DIFF_E6
+					&& Math.abs(leftGeoPoint.longitudeE6 - rightGeoPoint.longitudeE6) < MIN_CENTER_SLIDER_DIFF_E6) {
+
+				rightGeoPoint = new GeoPoint(
+						rightGeoPoint.latitudeE6 + MIN_CENTER_SLIDER_DIFF_E6,
+						rightGeoPoint.longitudeE6 + MIN_CENTER_SLIDER_DIFF_E6);
+			}
 
 			final List<GeoPoint> sliderPoints = new ArrayList<>();
 			sliderPoints.add(leftGeoPoint);
