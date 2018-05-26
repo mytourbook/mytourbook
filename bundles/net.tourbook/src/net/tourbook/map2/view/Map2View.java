@@ -36,6 +36,7 @@ import net.tourbook.common.color.MapGraphId;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.IOpeningDialog;
+import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.ITourToolTipProvider;
 import net.tourbook.common.util.TourToolTip;
@@ -380,6 +381,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	private boolean							_isLinkPhotoDisplayed;
 
 	private SliderPathPaintingData			_sliderPathPaintingData;
+	private OpenDialogManager				_openDlgMgr				= new OpenDialogManager();
 
 	private boolean							_isInMapSync;
 	private long							_lastFiredSyncEventTime;
@@ -1187,8 +1189,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 	@Override
 	public void closeOpenedDialogs(final IOpeningDialog openingDialog) {
-
-//		_openDlgMgr.closeOpenedDialogs(openingDialog);
+		_openDlgMgr.closeOpenedDialogs(openingDialog);
 	}
 
 	private void createActions(final Composite parent) {
@@ -1414,7 +1415,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_map.setMeasurementSystem(net.tourbook.ui.UI.UNIT_VALUE_DISTANCE, UI.UNIT_LABEL_DISTANCE);
 
 		final String tourPaintMethod = _prefStore.getString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD);
-		_map.setTourPaintMethodEnhanced(tourPaintMethod.equals(PrefPageMap2Appearance.TOUR_PAINT_METHOD_COMPLEX));
+		_map.setTourPaintMethodEnhanced(PrefPageMap2Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(tourPaintMethod));
 
 		// setup tool tip's
 		_map.setTourToolTip(_tourToolTip = new TourToolTip(_map));

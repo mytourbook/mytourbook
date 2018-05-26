@@ -93,6 +93,8 @@ public class SlideoutMap2_MapOptions extends ToolbarSlideout implements IColorSe
 	private Button					_chkZoomWithMousePosition;
 	private Button					_rdoBorderColorDarker;
 	private Button					_rdoBorderColorColor;
+	private Button					_rdoPainting_Simple;
+	private Button					_rdoPainting_Complex;
 	private Button					_rdoSymbolLine;
 	private Button					_rdoSymbolDot;
 	private Button					_rdoSymbolSquare;
@@ -342,10 +344,10 @@ public class SlideoutMap2_MapOptions extends ToolbarSlideout implements IColorSe
 		groupContainer.setText(Messages.Pref_MapLayout_Group_TourInMapProperties);
 		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(groupContainer);
 		{
-			/*
-			 * radio: plot symbol
-			 */
 			{
+				/*
+				 * radio: plot symbol
+				 */
 				// label
 				final Label label = new Label(groupContainer, SWT.NONE);
 				label.setText(Messages.pref_map_layout_symbol);
@@ -370,11 +372,10 @@ public class SlideoutMap2_MapOptions extends ToolbarSlideout implements IColorSe
 					_rdoSymbolSquare.addSelectionListener(_defaultSelectionListener);
 				}
 			}
-
-			/*
-			 * Line width
-			 */
 			{
+				/*
+				 * Line width
+				 */
 				// label: line width
 				final Label label = new Label(groupContainer, SWT.NONE);
 				label.setText(Messages.pref_map_layout_symbol_width);
@@ -412,6 +413,31 @@ public class SlideoutMap2_MapOptions extends ToolbarSlideout implements IColorSe
 			}
 
 			createUI_50_Border(groupContainer);
+
+			{
+				/*
+				 * Radio: Tour painting method
+				 */
+				// label
+				final Label label = new Label(groupContainer, SWT.NONE);
+				label.setText(Messages.Pref_MapLayout_Label_TourPaintMethod);
+				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
+
+				final Composite paintingContainer = new Composite(groupContainer, SWT.NONE);
+				GridDataFactory.fillDefaults().grab(true, false).applyTo(paintingContainer);
+				GridLayoutFactory.fillDefaults().numColumns(1).applyTo(paintingContainer);
+				{
+					// Radio: Simple
+					_rdoPainting_Simple = new Button(paintingContainer, SWT.RADIO);
+					_rdoPainting_Simple.setText(Messages.Pref_MapLayout_Label_TourPaintMethod_Simple);
+					_rdoPainting_Simple.addSelectionListener(_defaultSelectionListener);
+
+					// Radio: Enhanced
+					_rdoPainting_Complex = new Button(paintingContainer, SWT.RADIO);
+					_rdoPainting_Complex.setText(Messages.Pref_MapLayout_Label_TourPaintMethod_Complex);
+					_rdoPainting_Complex.addSelectionListener(_defaultSelectionListener);
+				}
+			}
 		}
 	}
 
@@ -657,6 +683,11 @@ public class SlideoutMap2_MapOptions extends ToolbarSlideout implements IColorSe
 		
 		_colorBorderColor.setColorValue(PreferenceConverter.getDefaultColor( _prefStore, ITourbookPreferences.MAP_LAYOUT_BORDER_COLOR));
 
+		// painting method
+		final String paintingMethod = _prefStore.getDefaultString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD);
+		_rdoPainting_Simple.setSelection(			PrefPageMap2Appearance.TOUR_PAINT_METHOD_SIMPLE.equals(paintingMethod));
+		_rdoPainting_Complex.setSelection(			PrefPageMap2Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(paintingMethod));
+		
 // SET_FORMATTING_ON
 
 		onChangeUI_MapUpdate();
@@ -693,6 +724,11 @@ public class SlideoutMap2_MapOptions extends ToolbarSlideout implements IColorSe
 
 		_colorBorderColor.setColorValue(PreferenceConverter.getColor( _prefStore, ITourbookPreferences.MAP_LAYOUT_BORDER_COLOR));
 		
+		// painting method
+		final boolean isComplex = PrefPageMap2Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(_prefStore.getString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD));
+		_rdoPainting_Simple.setSelection(			isComplex==false);
+		_rdoPainting_Complex.setSelection(			isComplex);
+		
 // SET_FORMATTING_ON
 	}
 
@@ -727,8 +763,13 @@ public class SlideoutMap2_MapOptions extends ToolbarSlideout implements IColorSe
 
 		PreferenceConverter.setValue(_prefStore, ITourbookPreferences.MAP_LAYOUT_BORDER_COLOR, _colorBorderColor.getColorValue());
 		
+		// painting method
+		_prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD,
+				_rdoPainting_Complex.getSelection()
+					? PrefPageMap2Appearance.TOUR_PAINT_METHOD_COMPLEX
+					: PrefPageMap2Appearance.TOUR_PAINT_METHOD_SIMPLE);
+		
 // SET_FORMATTING_ON
-
 	}
 
 	private void updateUI_SetBorderType(int borderType) {
