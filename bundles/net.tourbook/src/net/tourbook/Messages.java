@@ -1783,8 +1783,6 @@ public class Messages extends NLS {
 	public static String		Slideout_LinkWithOtherViews_Label_Title_Checkbox_IsShowTourTitle;
 	public static String		Slideout_LinkWithOtherViews_Label_Title_Checkbox_IsShowTourTitle_Tooltip;
 
-	public static String		Slideout_MapOptions_Checkbox_ChartSlider_Tooltip;
-
 	public static String		Slideout_Map2_MapOptions_Checkbox_ZoomWithMousePosition;
 	public static String		Slideout_Map2_MapOptions_Checkbox_ZoomWithMousePosition_Tooltip;
 	public static String		Slideout_Map2_MapOptions_Label_SliderPath_Segements;
@@ -1798,8 +1796,6 @@ public class Messages extends NLS {
 	public static String		Slideout_Map25TrackOptions_Label_OutlineColor;
 	public static String		Slideout_Map25TrackOptions_Label_OutlineWidth;
 	public static String		Slideout_Map25TrackOptions_Label_OutlineWidth_Tooltip;
-	public static String		Slideout_Map25TrackOptions_Label_Title;
-	public static String		Slideout_Map25TrackOptions_Label_Title_Tooltip;
 
 	public static String		Slideout_Map25MapOptions_Checkbox_Layer_3DBuilding;
 	public static String		Slideout_Map25MapOptions_Checkbox_Layer_Cartography;
@@ -1807,9 +1803,7 @@ public class Messages extends NLS {
 	public static String		Slideout_Map25MapOptions_Checkbox_Layer_LabelSymbol;
 	public static String		Slideout_Map25MapOptions_Checkbox_Layer_ScaleBar;
 	public static String		Slideout_Map25MapOptions_Checkbox_Layer_TileInfo;
-
 	public static String		Slideout_Map25MapOptions_Checkbox_UseDraggedKeyNavigation;
-
 	public static String		Slideout_Map25MapOptions_Checkbox_UseDraggedKeyNavigation_Tooltip;
 	public static String		Slideout_Map25MapOptions_Group_MapLayer;
 	public static String		Slideout_Map25MapOptions_Label_MapOptions;
@@ -1838,21 +1832,23 @@ public class Messages extends NLS {
 	public static String		Slideout_Map25MarkerOptions_Label_SwapColor_Tooltip;
 	public static String		Slideout_Map25MarkerOptions_Label_Title;
 
-	public static String		Slideout_MapBookmark_Label_NumBookmarkListItems;
-	public static String		Slideout_MapBookmark_Label_NumBookmarkListItems_Tooltip;
-	public static String		Slideout_MapBookmark_Label_NumContextMenuItems;
-	public static String		Slideout_MapBookmark_Label_NumContextMenuItems_Tooltip;
-	public static String		Slideout_MapBookmark_Label_Title;
-
-	public static String		Slideout_MapOptions_Checkbox_ChartSlider;
-	public static String		Slideout_MapOptions_Checkbox_SliderPath;
-	public static String		Slideout_MapOptions_Checkbox_SliderPath_Tooltip;
-	public static String		Slideout_MapOptions_Label_SliderLocation_Color;
-	public static String		Slideout_MapOptions_Label_SliderLocation_Color_Tooltip;
-	public static String		Slideout_MapOptions_Label_SliderLocation_Size;
-	public static String		Slideout_MapOptions_Label_SliderLocation_Size_Tooltip;
-	public static String		Slideout_MapOptions_Label_SliderPath_Color;
-	public static String		Slideout_MapOptions_Label_SliderPath_Width;
+	public static String		Slideout_Map_Bookmark_Label_NumBookmarkListItems;
+	public static String		Slideout_Map_Bookmark_Label_NumBookmarkListItems_Tooltip;
+	public static String		Slideout_Map_Bookmark_Label_NumContextMenuItems;
+	public static String		Slideout_Map_Bookmark_Label_NumContextMenuItems_Tooltip;
+	public static String		Slideout_Map_Bookmark_Label_Title;
+	public static String		Slideout_Map_Options_Checkbox_ChartSlider;
+	public static String		Slideout_Map_Options_Checkbox_ChartSlider_Tooltip;
+	public static String		Slideout_Map_Options_Checkbox_SliderPath;
+	public static String		Slideout_Map_Options_Checkbox_SliderPath_Tooltip;
+	public static String		Slideout_Map_Options_Label_SliderLocation_Color;
+	public static String		Slideout_Map_Options_Label_SliderLocation_Color_Tooltip;
+	public static String		Slideout_Map_Options_Label_SliderLocation_Size;
+	public static String		Slideout_Map_Options_Label_SliderLocation_Size_Tooltip;
+	public static String		Slideout_Map_Options_Label_SliderPath_Color;
+	public static String		Slideout_Map_Options_Label_SliderPath_Width;
+	public static String		Slideout_Map_TrackOptions_Label_Title;
+	public static String		Slideout_Map_TrackOptions_Label_Title_Tooltip;
 
 	public static String		Slideout_RefTour_YearStatisticOptions_Label_Title;
 

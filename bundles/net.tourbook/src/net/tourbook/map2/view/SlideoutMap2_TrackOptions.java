@@ -55,7 +55,7 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Map 2D properties slideout
  */
-public class SlideoutMap2_MapOptions extends ToolbarSlideout implements IColorSelectorListener {
+public class SlideoutMap2_TrackOptions extends ToolbarSlideout implements IColorSelectorListener {
 
 // SET_FORMATTING_OFF
 	
@@ -122,10 +122,10 @@ public class SlideoutMap2_MapOptions extends ToolbarSlideout implements IColorSe
 	 * @param map2View
 	 * @param state
 	 */
-	public SlideoutMap2_MapOptions(	final Control ownerControl,
-									final ToolBar toolBar,
-									final Map2View map2View,
-									final IDialogSettings state) {
+	public SlideoutMap2_TrackOptions(	final Control ownerControl,
+										final ToolBar toolBar,
+										final Map2View map2View,
+										final IDialogSettings state) {
 
 		super(ownerControl, toolBar);
 
@@ -197,7 +197,7 @@ public class SlideoutMap2_MapOptions extends ToolbarSlideout implements IColorSe
 				 * Slideout title
 				 */
 				final Label label = new Label(container, SWT.NONE);
-				label.setText(Messages.Slideout_Map2_MapOptions_Title);
+				label.setText(Messages.Slideout_Map_TrackOptions_Label_Title);
 				MTFont.setBannerFont(label);
 				GridDataFactory
 						.fillDefaults()//
@@ -232,8 +232,8 @@ public class SlideoutMap2_MapOptions extends ToolbarSlideout implements IColorSe
 			 */
 			// checkbox
 			_chkSliderPath = new Button(parent, SWT.CHECK);
-			_chkSliderPath.setText(Messages.Slideout_MapOptions_Checkbox_SliderPath);
-			_chkSliderPath.setToolTipText(Messages.Slideout_MapOptions_Checkbox_SliderPath_Tooltip);
+			_chkSliderPath.setText(Messages.Slideout_Map_Options_Checkbox_SliderPath);
+			_chkSliderPath.setToolTipText(Messages.Slideout_Map_Options_Checkbox_SliderPath_Tooltip);
 			_chkSliderPath.addSelectionListener(_defaultState_SelectionListener);
 		}
 
@@ -269,7 +269,7 @@ public class SlideoutMap2_MapOptions extends ToolbarSlideout implements IColorSe
 
 				// label
 				_lblSliderPath_Width = new Label(container, SWT.NONE);
-				_lblSliderPath_Width.setText(Messages.Slideout_MapOptions_Label_SliderPath_Width);
+				_lblSliderPath_Width.setText(Messages.Slideout_Map_Options_Label_SliderPath_Width);
 
 				// spinner
 				_spinnerSliderPath_LineWidth = new Spinner(container, SWT.BORDER);
@@ -287,7 +287,7 @@ public class SlideoutMap2_MapOptions extends ToolbarSlideout implements IColorSe
 
 				// label
 				_lblSliderPath_Color = new Label(container, SWT.NONE);
-				_lblSliderPath_Color.setText(Messages.Slideout_MapOptions_Label_SliderPath_Color);
+				_lblSliderPath_Color.setText(Messages.Slideout_Map_Options_Label_SliderPath_Color);
 
 				final Composite colorContainer = new Composite(container, SWT.NONE);
 				GridDataFactory.fillDefaults().grab(true, false).applyTo(colorContainer);

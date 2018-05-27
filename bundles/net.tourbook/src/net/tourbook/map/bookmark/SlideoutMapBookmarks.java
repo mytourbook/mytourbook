@@ -200,7 +200,7 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 		 * Label: Slideout title
 		 */
 		final Label label = new Label(parent, SWT.NONE);
-		label.setText(Messages.Slideout_MapBookmark_Label_Title);
+		label.setText(Messages.Slideout_Map_Bookmark_Label_Title);
 		MTFont.setBannerFont(label);
 //		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
 	}
@@ -425,8 +425,8 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 
 			// Label
 			final Label label = new Label(parent, SWT.NONE);
-			label.setText(Messages.Slideout_MapBookmark_Label_NumBookmarkListItems);
-			label.setToolTipText(Messages.Slideout_MapBookmark_Label_NumBookmarkListItems_Tooltip);
+			label.setText(Messages.Slideout_Map_Bookmark_Label_NumBookmarkListItems);
+			label.setToolTipText(Messages.Slideout_Map_Bookmark_Label_NumBookmarkListItems_Tooltip);
 
 			// Spinner
 			_spinnerNumBookmarkItems = new Spinner(parent, SWT.BORDER);
@@ -443,8 +443,8 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 
 			// Label
 			final Label label = new Label(parent, SWT.NONE);
-			label.setText(Messages.Slideout_MapBookmark_Label_NumContextMenuItems);
-			label.setToolTipText(Messages.Slideout_MapBookmark_Label_NumContextMenuItems_Tooltip);
+			label.setText(Messages.Slideout_Map_Bookmark_Label_NumContextMenuItems);
+			label.setToolTipText(Messages.Slideout_Map_Bookmark_Label_NumContextMenuItems_Tooltip);
 
 			// Spinner
 			_spinnerNumRecentBookmarks = new Spinner(parent, SWT.BORDER);

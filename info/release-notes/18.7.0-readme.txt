@@ -20,6 +20,7 @@ Improvements
 * 2D Map
 
   - Show some options from the preferences also in the slideout
+  - Moved 'Map 2D Options' into 'Track Options'
 
 
 

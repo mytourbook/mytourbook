@@ -167,7 +167,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 		 * Label: Title
 		 */
 		final Label title = new Label(parent, SWT.LEAD);
-		title.setText(Messages.Slideout_Map25TrackOptions_Label_Title);
+		title.setText(Messages.Slideout_Map_TrackOptions_Label_Title);
 		title.setToolTipText(Messages.Slideout_Map25TrackOptions_Label_ConfigName_Tooltip);
 		MTFont.setBannerFont(title);
 		GridDataFactory
@@ -289,7 +289,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 			 */
 			// checkbox
 			_chkShowSliderLocation = new Button(parent, SWT.CHECK);
-			_chkShowSliderLocation.setText(Messages.Slideout_MapOptions_Checkbox_ChartSlider);
+			_chkShowSliderLocation.setText(Messages.Slideout_Map_Options_Checkbox_ChartSlider);
 			_chkShowSliderLocation.addSelectionListener(_defaultSelectionListener);
 			GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkShowSliderLocation);
 		}
@@ -300,7 +300,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
 			// label
 			_lblSliderLocation_Size = new Label(parent, SWT.NONE);
-			_lblSliderLocation_Size.setText(Messages.Slideout_MapOptions_Label_SliderLocation_Size);
+			_lblSliderLocation_Size.setText(Messages.Slideout_Map_Options_Label_SliderLocation_Size);
 			GridDataFactory.fillDefaults()
 					.indent(_firstColumnIndent, SWT.DEFAULT)
 					.applyTo(_lblSliderLocation_Size);
@@ -321,8 +321,8 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
 			// label
 			_lblSliderLocation_Color = new Label(parent, SWT.NONE);
-			_lblSliderLocation_Color.setText(Messages.Slideout_MapOptions_Label_SliderLocation_Color);
-			_lblSliderLocation_Color.setToolTipText(Messages.Slideout_MapOptions_Label_SliderLocation_Color_Tooltip);
+			_lblSliderLocation_Color.setText(Messages.Slideout_Map_Options_Label_SliderLocation_Color);
+			_lblSliderLocation_Color.setToolTipText(Messages.Slideout_Map_Options_Label_SliderLocation_Color_Tooltip);
 			GridDataFactory.fillDefaults()
 					.indent(_firstColumnIndent, SWT.DEFAULT)
 					.applyTo(_lblSliderLocation_Color);
@@ -361,8 +361,8 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 			 */
 			// checkbox
 			_chkShowSliderPath = new Button(parent, SWT.CHECK);
-			_chkShowSliderPath.setText(Messages.Slideout_MapOptions_Checkbox_SliderPath);
-			_chkShowSliderPath.setToolTipText(Messages.Slideout_MapOptions_Checkbox_SliderPath_Tooltip);
+			_chkShowSliderPath.setText(Messages.Slideout_Map_Options_Checkbox_SliderPath);
+			_chkShowSliderPath.setToolTipText(Messages.Slideout_Map_Options_Checkbox_SliderPath_Tooltip);
 			_chkShowSliderPath.addSelectionListener(_defaultSelectionListener);
 			GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkShowSliderPath);
 		}
@@ -373,7 +373,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
 			// label
 			_lblSliderPath_Width = new Label(parent, SWT.NONE);
-			_lblSliderPath_Width.setText(Messages.Slideout_MapOptions_Label_SliderPath_Width);
+			_lblSliderPath_Width.setText(Messages.Slideout_Map_Options_Label_SliderPath_Width);
 			GridDataFactory.fillDefaults().indent(_firstColumnIndent, SWT.DEFAULT).applyTo(_lblSliderPath_Width);
 
 			// spinner
@@ -393,7 +393,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
 			// label
 			_lblSliderPath_Color = new Label(parent, SWT.NONE);
-			_lblSliderPath_Color.setText(Messages.Slideout_MapOptions_Label_SliderPath_Color);
+			_lblSliderPath_Color.setText(Messages.Slideout_Map_Options_Label_SliderPath_Color);
 			GridDataFactory.fillDefaults().indent(_firstColumnIndent, SWT.DEFAULT).applyTo(_lblSliderPath_Color);
 
 			final Composite colorContainer = new Composite(parent, SWT.NONE);
@@ -428,7 +428,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 			 */
 			_lblConfigName = new Label(parent, SWT.NONE);
 			_lblConfigName.setText(Messages.Slideout_Map25TrackOptions_Label_Name);
-			_lblConfigName.setToolTipText(Messages.Slideout_Map25TrackOptions_Label_Title_Tooltip);
+			_lblConfigName.setToolTipText(Messages.Slideout_Map_TrackOptions_Label_Title_Tooltip);
 			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblConfigName);
 
 			/*

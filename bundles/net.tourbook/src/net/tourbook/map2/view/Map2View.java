@@ -73,7 +73,6 @@ import net.tourbook.map2.action.ActionShowScaleInMap;
 import net.tourbook.map2.action.ActionShowSliderInLegend;
 import net.tourbook.map2.action.ActionShowSliderInMap;
 import net.tourbook.map2.action.ActionShowStartEndInMap;
-import net.tourbook.map2.action.ActionShowTourInMap;
 import net.tourbook.map2.action.ActionShowTourInfoInMap;
 import net.tourbook.map2.action.ActionShowTourMarker;
 import net.tourbook.map2.action.ActionShowWayPoints;
@@ -397,7 +396,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 	private ActionDimMap					_actionDimMap;
 	private ActionOpenPrefDialog			_actionEditMap2Preferences;
-	private ActionMap2_Options				_actionMap2Options;
+//	private ActionMap2_Options				_actionMap2Options;
 	private ActionMap2_Graphs				_actionMap2TourColors;
 	private ActionMapBookmarks				_actionMapBookmarks;
 	private ActionMap2Color					_actionMap2Color;
@@ -415,7 +414,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	private ActionShowSliderInMap			_actionShowSliderInMap;
 	private ActionShowSliderInLegend		_actionShowSliderInLegend;
 	private ActionShowStartEndInMap			_actionShowStartEndInMap;
-	private ActionShowTourInMap				_actionShowTourInMap;
+	private ActionShowTour					_actionShowTour;
 	private ActionShowTourInfoInMap			_actionShowTourInfoInMap;
 	private ActionShowTourMarker			_actionShowTourMarker;
 	private ActionShowWayPoints				_actionShowWayPoints;
@@ -463,19 +462,50 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 		public ActionMap2_Options() {
 
-			super(
-					TourbookPlugin.getImageDescriptor(IMAGE_MAP_OPTIONS),
+			super(TourbookPlugin.getImageDescriptor(IMAGE_MAP_OPTIONS),
 					TourbookPlugin.getImageDescriptor(IMAGE_MAP_OPTIONS_DISABLED));
 		}
 
 		@Override
 		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
-			return new SlideoutMap2_MapOptions(_parent, toolbar, Map2View.this, _state);
+			return new SlideoutMap2_TrackOptions(_parent, toolbar, Map2View.this, _state);
 		}
 
 		@Override
 		protected void onBeforeOpenSlideout() {
 			closeOpenedDialogs(this);
+		}
+	}
+
+	private class ActionShowTour extends ActionToolbarSlideout {
+
+		public ActionShowTour() {
+
+			super(TourbookPlugin.getImageDescriptor(Messages.Image__Tour),
+					TourbookPlugin.getImageDescriptor(Messages.Image__Tour_Disabled));
+
+			isToggleAction = true;
+			notSelectedTooltip = Messages.map_action_show_tour_in_map;
+		}
+
+		@Override
+		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+			return new SlideoutMap2_TrackOptions(_parent, toolbar, Map2View.this, _state);
+		}
+
+		@Override
+		protected void onBeforeOpenSlideout() {
+			closeOpenedDialogs(this);
+		}
+
+		@Override
+		protected void onSelect() {
+
+			super.onSelect();
+
+			_isShowTour = getSelection();
+
+			paintTours_10_All();
 		}
 	}
 
@@ -698,13 +728,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_map.redraw();
 	}
 
-	public void actionShowTour() {
-
-		_isShowTour = _actionShowTourInMap.isChecked();
-
-		paintTours_10_All();
-	}
-
 	public void actionSync_WithChartSlider() {
 
 		if (_allTourData.size() == 0) {
@@ -743,7 +766,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			deactivateMapSync();
 			deactivatePhotoSync();
 
-			_actionShowTourInMap.setChecked(true);
+			_actionShowTour.setSelection(true);
 
 			// map must be synched with selected tour
 			_isMapSynched_WithTour = true;
@@ -811,7 +834,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			// force tour to be repainted, that it is synched immediately
 			_previousTourData = null;
 
-			_actionShowTourInMap.setChecked(true);
+			_actionShowTour.setSelection(true);
 			_map.setShowOverlays(true);
 
 			paintTours_20_One(_allTourData.get(0), true);
@@ -869,7 +892,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		 */
 		TourManager.getInstance().resetMapPositions();
 
-		_actionShowTourInMap.setChecked(true);
+		_actionShowTour.setSelection(true);
 		_map.setShowOverlays(true);
 
 		paintEntireTour();
@@ -1264,7 +1287,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 				PrefPageMap2Appearance.ID);
 
 		_actionMap2Color = new ActionMap2Color();
-		_actionMap2Options = new ActionMap2_Options();
+//		_actionMap2Options = new ActionMap2_Options();
 		_actionSelectMapProvider = new ActionSelectMapProvider(this);
 		_actionSetDefaultPosition = new ActionSetDefaultPosition(this);
 		_actionSaveDefaultPosition = new ActionSaveDefaultPosition(this);
@@ -1279,7 +1302,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_actionShowStartEndInMap = new ActionShowStartEndInMap(this);
 
 		_actionShowPOI = new ActionShowPOI(this);
-		_actionShowTourInMap = new ActionShowTourInMap(this);
+		_actionShowTour = new ActionShowTour();
 		_actionShowTourInfoInMap = new ActionShowTourInfoInMap(this);
 		_actionShowTourMarker = new ActionShowTourMarker(this);
 		_actionShowWayPoints = new ActionShowWayPoints(this);
@@ -1610,7 +1633,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_actionShowSliderInMap.setEnabled(_isTourOrWayPoint);
 		_actionShowStartEndInMap.setEnabled(isOneTour);
 		_actionShowTourInfoInMap.setEnabled(isOneTour);
-		_actionShowTourInMap.setEnabled(_isTourOrWayPoint);
+		_actionShowTour.setEnabled(_isTourOrWayPoint);
 		_actionShowTourMarker.setEnabled(_isTourOrWayPoint);
 		_actionShowWayPoints.setEnabled(_isTourOrWayPoint);
 		_actionZoom_Centered.setEnabled(isTourAvailable);
@@ -1682,7 +1705,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		tbm.add(_actionSyncMap_WithPhoto);
 		tbm.add(new Separator());
 
-		tbm.add(_actionShowTourInMap);
+		tbm.add(_actionShowTour);
 		tbm.add(_actionZoom_ShowEntireTour);
 		tbm.add(_actionSyncMap_WithTour);
 		tbm.add(_actionSyncMap_WithChartSlider);
@@ -1696,7 +1719,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		tbm.add(new Separator());
 
 		tbm.add(_actionMapBookmarks);
-		tbm.add(_actionMap2Options);
+//		tbm.add(_actionMap2Options);
 		tbm.add(_actionSelectMapProvider);
 
 		/*
@@ -2994,7 +3017,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 		// is show tour
 		_isShowTour = Util.getStateBoolean(_state, STATE_IS_SHOW_TOUR_IN_MAP, true);
-		_actionShowTourInMap.setChecked(_isShowTour);
+		_actionShowTour.setSelection(_isShowTour);
 
 		// is show photo
 		_isShowPhoto = Util.getStateBoolean(_state, STATE_IS_SHOW_PHOTO_IN_MAP, true);
