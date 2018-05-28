@@ -3861,7 +3861,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 							 */
 
 							// this occures sometimes but it seems that it's an eclipse internal problem
-							StatusUtil.log("This is a known issue when a treeviewer do a collapseAll()", e);
+							StatusUtil.log("This is a known issue when a treeviewer do a collapseAll()", e); //$NON-NLS-1$
 						}
 					}
 

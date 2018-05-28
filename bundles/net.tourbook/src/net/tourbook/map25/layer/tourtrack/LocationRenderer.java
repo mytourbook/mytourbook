@@ -141,19 +141,19 @@ public class LocationRenderer extends LayerRenderer {
 
 	private boolean initShader() {
 
-		final int program = GLShader.loadShader(_shaderFile != null ? _shaderFile : "location_1");
+		final int program = GLShader.loadShader(_shaderFile != null ? _shaderFile : "location_1"); //$NON-NLS-1$
 		if (program == 0) {
 			return false;
 		}
 
 		_shaderProgram = program;
-		_shader_VertexPosition = gl.getAttribLocation(program, "a_pos");
-		_shader_MatrixPosition = gl.getUniformLocation(program, "u_mvp");
-		_shader_Phase = gl.getUniformLocation(program, "u_phase");
-		_shader_Scale = gl.getUniformLocation(program, "u_scale");
-		_shader_Direction = gl.getUniformLocation(program, "u_dir");
-		_shader_Color = gl.getUniformLocation(program, "u_color");
-		_shader_Mode = gl.getUniformLocation(program, "u_mode");
+		_shader_VertexPosition = gl.getAttribLocation(program, "a_pos"); //$NON-NLS-1$
+		_shader_MatrixPosition = gl.getUniformLocation(program, "u_mvp"); //$NON-NLS-1$
+		_shader_Phase = gl.getUniformLocation(program, "u_phase"); //$NON-NLS-1$
+		_shader_Scale = gl.getUniformLocation(program, "u_scale"); //$NON-NLS-1$
+		_shader_Direction = gl.getUniformLocation(program, "u_dir"); //$NON-NLS-1$
+		_shader_Color = gl.getUniformLocation(program, "u_color"); //$NON-NLS-1$
+		_shader_Mode = gl.getUniformLocation(program, "u_mode"); //$NON-NLS-1$
 
 		return true;
 	}

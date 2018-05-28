@@ -109,7 +109,7 @@ public class GeoPartTourLoader {
 					+ " DISTINCT TourId " + NL //									//$NON-NLS-1$
 
 					+ (" FROM " + TourDatabase.TABLE_TOUR_GEO_PARTS + NL) //		//$NON-NLS-1$
-					+ (" WHERE GeoPart IN (" + sqlInParameters + ")") + NL //		//$NON-NLS-1$
+					+ (" WHERE GeoPart IN (" + sqlInParameters + ")") + NL //		//$NON-NLS-1$ //$NON-NLS-2$
 			;
 
 			if (isAppFilter) {
@@ -129,7 +129,7 @@ public class GeoPartTourLoader {
 
 				select = selectGeoPart
 
-						+ " AND TourId IN (" + selectAppFilter + ")";
+						+ " AND TourId IN (" + selectAppFilter + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 			} else {
 
 				select = selectGeoPart;

@@ -727,7 +727,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
 				+ fromTourData
 
-				+ " GROUP BY STARTYEAR		" + NL
+				+ " GROUP BY STARTYEAR		" + NL //$NON-NLS-1$
 				+ " ORDER BY STARTYEAR		" + NL//			//$NON-NLS-1$
 		;
 		_availableYears = new TIntArrayList();

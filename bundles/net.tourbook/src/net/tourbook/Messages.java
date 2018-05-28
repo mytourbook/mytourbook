@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -464,6 +464,7 @@ public class Messages extends NLS {
 	public static String		App_Label_H_MM;
 	public static String		App_Label_ISO8601;
 	public static String		App_Label_max;
+	public static String		App_Label_NotAvailable_Shortcut;
 
 	public static String		App_Link_RestoreDefaultValues;
 
@@ -726,17 +727,27 @@ public class Messages extends NLS {
 	public static String		Format_rawdata_file_yyyy_mm_dd;
 	public static String		Format_yyyymmdd_hhmmss;
 
-	public static String		GeoPart_View_Action_AppFilter_Tooltip;
-	public static String		GeoPart_View_Action_OnOff_Tooltip;
-	public static String		GeoPart_View_Column_GeoDiff_Header;
-	public static String		GeoPart_View_Column_GeoDiff_Label;
-	public static String		GeoPart_View_Column_GeoDiff_Relative_Header;
-	public static String		GeoPart_View_Column_GeoDiff_Relative_Label;
-	public static String		GeoPart_View_Column_GeoDiff_Relative_Tooltip;
-	public static String		GeoPart_View_Column_SequenceNumber_Header;
-	public static String		GeoPart_View_Column_SequenceNumber_Label;
-	public static String		GeoPart_View_PageText_MultipleToursNotSupported;
-	public static String		GeoPart_View_PageText_NoTourWithGeoData;
+	public static String		Geo_Compare_Label_ReferenceTour;
+
+	public static String		GeoCompare_View_Action_AppFilter_Tooltip;
+	public static String		GeoCompare_View_Action_OnOff_Tooltip;
+	public static String		GeoCompare_View_Column_GeoDiff_Header;
+	public static String		GeoCompare_View_Column_GeoDiff_Label;
+	public static String		GeoCompare_View_Column_GeoDiff_Relative_Header;
+	public static String		GeoCompare_View_Column_GeoDiff_Relative_Label;
+	public static String		GeoCompare_View_Column_GeoDiff_Relative_Tooltip;
+	public static String		GeoCompare_View_Column_IndexDiff;
+	public static String		GeoCompare_View_Column_SequenceNumber_Header;
+	public static String		GeoCompare_View_Column_SequenceNumber_Label;
+	public static String		GeoCompare_View_Label_GeoParts;
+	public static String		GeoCompare_View_Label_GeoParts_Tooltip;
+	public static String		GeoCompare_View_Label_PossibleTours;
+	public static String		GeoCompare_View_Label_TimeSlices;
+	public static String		GeoCompare_View_PageText_MultipleToursNotSupported;
+	public static String		GeoCompare_View_PageText_NoTourWithGeoData;
+	public static String		GeoCompare_View_Status_CompareResult;
+	public static String		GeoCompare_View_Status_ComparingIsCanceled;
+	public static String		GeoCompare_View_Status_StartComparing;
 
 	public static String		HR_Zone_01_060_Moderate;
 	public static String		HR_Zone_01_060_Moderate_Shortcut;

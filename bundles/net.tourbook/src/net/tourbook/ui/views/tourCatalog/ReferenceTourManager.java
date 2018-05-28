@@ -22,6 +22,7 @@ import java.util.HashMap;
 
 import javax.persistence.EntityManager;
 
+import net.tourbook.Messages;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
@@ -52,7 +53,7 @@ public class ReferenceTourManager {
 	 */
 	public static long createGeoCompareRefTour(final TourData tourData, final int startIndex, final int endIndex) {
 
-		final String refTourLabel = "Geo Compare Ref Tour";
+		final String refTourLabel = Messages.Geo_Compare_Label_ReferenceTour;
 
 		_geoCompare_RefId = System.nanoTime();
 

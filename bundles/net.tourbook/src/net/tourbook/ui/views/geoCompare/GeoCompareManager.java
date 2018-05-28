@@ -72,7 +72,7 @@ public class GeoCompareManager {
 
 		System.out.println(
 				(String.format(
-						"[%s] Comparing tours with %d threads",
+						"[%s] Comparing tours with %d threads", //$NON-NLS-1$
 						GeoCompareManager.class.getSimpleName(),
 						COMPARATOR_THREADS)));
 // TODO remove SYSTEM.OUT.PRINTLN
@@ -283,21 +283,21 @@ public class GeoCompareManager {
 
 			System.out.println(
 					String.format(
-							""
-									+ "[%3d]" // thread
-									+ " tour %-20s"
+							"" //$NON-NLS-1$
+									+ "[%3d]" // thread //$NON-NLS-1$
+									+ " tour %-20s" //$NON-NLS-1$
 									// + "   exec %5d"
 
-									+ "   diff %12d"
-									+ "   # %5d / %5d"
+									+ "   diff %12d" //$NON-NLS-1$
+									+ "   # %5d / %5d" //$NON-NLS-1$
 
-									+ "   cmp %7.0f"
-									+ "   #cmp %10d"
-									+ "   #cmpAvg %8.0f"
+									+ "   cmp %7.0f" //$NON-NLS-1$
+									+ "   #cmp %10d" //$NON-NLS-1$
+									+ "   #cmpAvg %8.0f" //$NON-NLS-1$
 
-									+ "   all %7.0f ms"
-									+ "   ld %10.4f"
-									+ "   cnvrt %10.4f",
+									+ "   all %7.0f ms" //$NON-NLS-1$
+									+ "   ld %10.4f" //$NON-NLS-1$
+									+ "   cnvrt %10.4f", //$NON-NLS-1$
 
 							Thread.currentThread().getId(),
 							comparerItem.tourId,

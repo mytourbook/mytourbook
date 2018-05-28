@@ -39,7 +39,7 @@ public class Util {
 	private final static NumberFormat	_nf1			= NumberFormat.getNumberInstance();
 	private final static NumberFormat	_nf2			= NumberFormat.getNumberInstance();
 	private final static NumberFormat	_nf3			= NumberFormat.getNumberInstance();
-	private final static DecimalFormat	_nfE			= new DecimalFormat("0.###E0");
+	private final static DecimalFormat	_nfE			= new DecimalFormat("0.###E0"); //$NON-NLS-1$
 	private final static NumberFormat	_df				= DecimalFormat.getNumberInstance();
 
 	static {

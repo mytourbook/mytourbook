@@ -92,7 +92,7 @@ public class TVITourBookRoot extends TVITourBookItem {
 
 				+ fromTourData
 
-				+ " GROUP BY StartYear		" + NL
+				+ " GROUP BY StartYear		" + NL //$NON-NLS-1$
 				+ " ORDER BY StartYear		" + NL//			//$NON-NLS-1$
 		;
 

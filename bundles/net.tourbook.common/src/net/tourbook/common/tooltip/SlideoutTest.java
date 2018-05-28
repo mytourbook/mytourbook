@@ -65,11 +65,11 @@ public class SlideoutTest extends AdvancedSlideout {
 	protected void createSlideoutContent(final Composite parent) {
 
 		final double uniqueId = Math.random();
-		final String stateSectionName = "TourTagFilterSlideout" + uniqueId;
+		final String stateSectionName = "TourTagFilterSlideout" + uniqueId; //$NON-NLS-1$
 
 		System.out.println(
-				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] createSlideoutContent()")
-						+ ("\t: " + stateSectionName));
+				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] createSlideoutContent()") //$NON-NLS-1$ //$NON-NLS-2$
+						+ ("\t: " + stateSectionName)); //$NON-NLS-1$
 // TODO remove SYSTEM.OUT.PRINTLN
 
 //		_state = TourbookPlugin.getState(stateSectionName);

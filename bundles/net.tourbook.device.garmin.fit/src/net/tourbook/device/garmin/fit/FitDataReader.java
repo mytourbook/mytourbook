@@ -318,17 +318,17 @@ public class FitDataReader extends TourbookDevice {
 				System.out.println();
 				System.out.println();
 				System.out.println(
-						(System.currentTimeMillis() + " [" + getClass().getSimpleName() + "]")
-								+ (" \t" + importFilePath));
+						(System.currentTimeMillis() + " [" + getClass().getSimpleName() + "]") //$NON-NLS-1$ //$NON-NLS-2$
+								+ (" \t" + importFilePath)); //$NON-NLS-1$
 				System.out.println();
 				System.out.println(
 						String.format(//
 								"%s %-5s %-30s %20s %s", //$NON-NLS-1$
-								"Timestamp",
-								"Num",
-								"Name",
-								"Value",
-								"Units"));
+								"Timestamp", //$NON-NLS-1$
+								"Num", //$NON-NLS-1$
+								"Name", //$NON-NLS-1$
+								"Value", //$NON-NLS-1$
+								"Units")); //$NON-NLS-1$
 				System.out.println();
 
 				addAllLogListener(broadcaster);

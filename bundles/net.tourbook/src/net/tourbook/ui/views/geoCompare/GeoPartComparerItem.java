@@ -57,9 +57,9 @@ public class GeoPartComparerItem {
 
 	@Override
 	public String toString() {
-		return "GeoPartComparerItem ["
-				+ "tourId=" + tourId + ", "
-				+ "geoPartItem=" + geoPartItem + "]";
+		return "GeoPartComparerItem [" //$NON-NLS-1$
+				+ "tourId=" + tourId + ", " //$NON-NLS-1$ //$NON-NLS-2$
+				+ "geoPartItem=" + geoPartItem + "]"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 }

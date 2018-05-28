@@ -230,7 +230,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
 			super(null, AS_CHECK_BOX);
 
-			setToolTipText(Messages.GeoPart_View_Action_AppFilter_Tooltip);
+			setToolTipText(Messages.GeoCompare_View_Action_AppFilter_Tooltip);
 			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Filter));
 			setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Filter_Disabled));
 		}
@@ -265,7 +265,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
 			super(null, AS_CHECK_BOX);
 
-			setToolTipText(Messages.GeoPart_View_Action_OnOff_Tooltip);
+			setToolTipText(Messages.GeoCompare_View_Action_OnOff_Tooltip);
 			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Turn_On));
 		}
 
@@ -1018,10 +1018,10 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 		_pageBook = new PageBook(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBook);
 
-		_pageNoData = UI.createUI_PageNoData(_pageBook, Messages.GeoPart_View_PageText_NoTourWithGeoData);
+		_pageNoData = UI.createUI_PageNoData(_pageBook, Messages.GeoCompare_View_PageText_NoTourWithGeoData);
 		_pageMultipleTours = UI.createUI_PageNoData(
 				_pageBook,
-				Messages.GeoPart_View_PageText_MultipleToursNotSupported);
+				Messages.GeoCompare_View_PageText_MultipleToursNotSupported);
 
 		_pageContent = new Composite(_pageBook, SWT.NONE);
 		GridLayoutFactory.fillDefaults().applyTo(_pageContent);
@@ -1089,7 +1089,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 				 */
 				{
 					final Label label = new Label(container, SWT.NONE);
-					label.setText("Possible tours");
+					label.setText(Messages.GeoCompare_View_Label_PossibleTours);
 
 				}
 				{
@@ -1108,8 +1108,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 				 */
 				{
 					final Label label = new Label(container, SWT.NONE);
-					label.setText("Geo parts");
-					label.setToolTipText("Number of geo squares (~ 1.6 km / 1 mi)");
+					label.setText(Messages.GeoCompare_View_Label_GeoParts);
+					label.setToolTipText(Messages.GeoCompare_View_Label_GeoParts_Tooltip);
 
 				}
 				{
@@ -1124,7 +1124,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 				 */
 				{
 					final Label label = new Label(container, SWT.NONE);
-					label.setText("Time slices");
+					label.setText(Messages.GeoCompare_View_Label_TimeSlices);
 
 				}
 				{
@@ -1136,8 +1136,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 		}
 	}
 
-	private void createUI_50_HideFalsePositive(final Composite parent) {
-
+//	private void createUI_50_HideFalsePositive(final Composite parent) {
+//
 //		final SelectionAdapter falsePositiveListener = new SelectionAdapter() {
 //			@Override
 //			public void widgetSelected(final SelectionEvent e) {
@@ -1191,7 +1191,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 //						.applyTo(_lblHideFalsePositiveValue);
 //			}
 //		}
-	}
+//	}
 
 	private void createUI_80_TableViewer(final Composite parent) {
 
@@ -1304,18 +1304,18 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 		defineColumn_30_Motion_AvgSpeed();
 		defineColumn_40_Body_AvgPulse();
 
-		defineColumn_80_StartIndex();
-		defineColumn_82_EndIndex();
-		defineColumn_84_IndexDiff();
+//		defineColumn_80_StartIndex();
+//		defineColumn_82_EndIndex();
+//		defineColumn_84_IndexDiff();
 	}
 
 	private void defineColumn_00_SequenceNumber() {
 
 		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_SEQUENCE, SWT.TRAIL);
 
-		colDef.setColumnLabel(Messages.GeoPart_View_Column_SequenceNumber_Label);
-		colDef.setColumnHeaderText(Messages.GeoPart_View_Column_SequenceNumber_Header);
-		colDef.setColumnHeaderToolTipText(Messages.GeoPart_View_Column_SequenceNumber_Label);
+		colDef.setColumnLabel(Messages.GeoCompare_View_Column_SequenceNumber_Label);
+		colDef.setColumnHeaderText(Messages.GeoCompare_View_Column_SequenceNumber_Header);
+		colDef.setColumnHeaderToolTipText(Messages.GeoCompare_View_Column_SequenceNumber_Label);
 
 		colDef.setIsDefaultColumn();
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(6));
@@ -1339,9 +1339,9 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
 		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_GEO_DIFF, SWT.TRAIL);
 
-		colDef.setColumnLabel(Messages.GeoPart_View_Column_GeoDiff_Label);
-		colDef.setColumnHeaderText(Messages.GeoPart_View_Column_GeoDiff_Header);
-		colDef.setColumnHeaderToolTipText(Messages.GeoPart_View_Column_GeoDiff_Label);
+		colDef.setColumnLabel(Messages.GeoCompare_View_Column_GeoDiff_Label);
+		colDef.setColumnHeaderText(Messages.GeoCompare_View_Column_GeoDiff_Header);
+		colDef.setColumnHeaderToolTipText(Messages.GeoCompare_View_Column_GeoDiff_Label);
 
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
 
@@ -1357,9 +1357,9 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 				final long minDiffValue = item.minDiffValue;
 
 				final String minDiffText = minDiffValue == -2
-						? "..."
+						? UI.ELLIPSIS
 						: minDiffValue == -1
-								? "n/a"
+								? Messages.App_Label_NotAvailable_Shortcut
 								: Long.toString(minDiffValue);
 
 				cell.setText(minDiffText);
@@ -1376,9 +1376,9 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 				COLUMN_GEO_DIFF_RELATIVE,
 				SWT.TRAIL);
 
-		colDef.setColumnLabel(Messages.GeoPart_View_Column_GeoDiff_Relative_Label);
-		colDef.setColumnHeaderText(Messages.GeoPart_View_Column_GeoDiff_Relative_Header);
-		colDef.setColumnHeaderToolTipText(Messages.GeoPart_View_Column_GeoDiff_Relative_Tooltip);
+		colDef.setColumnLabel(Messages.GeoCompare_View_Column_GeoDiff_Relative_Label);
+		colDef.setColumnHeaderText(Messages.GeoCompare_View_Column_GeoDiff_Relative_Header);
+		colDef.setColumnHeaderToolTipText(Messages.GeoCompare_View_Column_GeoDiff_Relative_Tooltip);
 
 		colDef.setIsDefaultColumn();
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
@@ -1392,9 +1392,9 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 				final long minDiffValue = item.minDiffValue;
 
 				final String minDiffText = minDiffValue == -2 || _maxMinDiff == -1
-						? "..."
+						? UI.ELLIPSIS
 						: minDiffValue == -1
-								? "n/a"
+								? Messages.App_Label_NotAvailable_Shortcut
 								: _nf1.format((float) minDiffValue / _maxMinDiff * 100);
 
 				cell.setText(minDiffText);
@@ -1479,74 +1479,74 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 		});
 	}
 
-	/**
-	 * Column: Start index
-	 */
-	private void defineColumn_80_StartIndex() {
-
-		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "startIndex", SWT.TRAIL);
-
-		colDef.setColumnLabel("Start Idx");
-		colDef.setColumnHeaderText("Start Idx");
-
-		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
-
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
-
-				cell.setText(Integer.toString(item.tourFirstIndex));
-			}
-		});
-	}
-
-	/**
-	 * Column: End index
-	 */
-	private void defineColumn_82_EndIndex() {
-
-		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "endIndex", SWT.TRAIL);
-
-		colDef.setColumnLabel("End Idx");
-		colDef.setColumnHeaderText("End Idx");
-
-		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
-
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
-
-				cell.setText(Integer.toString(item.tourLastIndex));
-			}
-		});
-	}
-
-	/**
-	 * Column: End index
-	 */
-	private void defineColumn_84_IndexDiff() {
-
-		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "indexDiff", SWT.TRAIL);
-
-		colDef.setColumnLabel("Idx ∆");
-		colDef.setColumnHeaderText("Idx ∆");
-
-		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
-
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
-
-				cell.setText(Integer.toString(item.tourLastIndex - item.tourFirstIndex));
-			}
-		});
-	}
+//	/**
+//	 * Column: Start index
+//	 */
+//	private void defineColumn_80_StartIndex() {
+//
+//		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "startIndex", SWT.TRAIL);
+//
+//		colDef.setColumnLabel("Start Idx");
+//		colDef.setColumnHeaderText("Start Idx");
+//
+//		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
+//
+//		colDef.setLabelProvider(new CellLabelProvider() {
+//			@Override
+//			public void update(final ViewerCell cell) {
+//
+//				final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
+//
+//				cell.setText(Integer.toString(item.tourFirstIndex));
+//			}
+//		});
+//	}
+//
+//	/**
+//	 * Column: End index
+//	 */
+//	private void defineColumn_82_EndIndex() {
+//
+//		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "endIndex", SWT.TRAIL);
+//
+//		colDef.setColumnLabel("End Idx");
+//		colDef.setColumnHeaderText("End Idx");
+//
+//		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
+//
+//		colDef.setLabelProvider(new CellLabelProvider() {
+//			@Override
+//			public void update(final ViewerCell cell) {
+//
+//				final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
+//
+//				cell.setText(Integer.toString(item.tourLastIndex));
+//			}
+//		});
+//	}
+//
+//	/**
+//	 * Column: End index
+//	 */
+//	private void defineColumn_84_IndexDiff() {
+//
+//		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "indexDiff", SWT.TRAIL); //$NON-NLS-1$
+//
+//		colDef.setColumnLabel(Messages.GeoCompare_View_Column_IndexDiff);
+//		colDef.setColumnHeaderText(Messages.GeoCompare_View_Column_IndexDiff);
+//
+//		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
+//
+//		colDef.setLabelProvider(new CellLabelProvider() {
+//			@Override
+//			public void update(final ViewerCell cell) {
+//
+//				final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
+//
+//				cell.setText(Integer.toString(item.tourLastIndex - item.tourFirstIndex));
+//			}
+//		});
+//	}
 
 	@Override
 	public void dispose() {
@@ -1571,8 +1571,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 //		_geoPartViewer.getTable().setEnabled(_isCompareEnabled);
 	}
 
-	private void enableControls_HideFalsePositive() {
-
+//	private void enableControls_HideFalsePositive() {
+//
 //		final boolean isHideFalsePositive = _chkHideFalsePositive.getSelection();
 //		final boolean isShowHideFalsePositive = isHideFalsePositive && _isComparingDone;
 //
@@ -1580,7 +1580,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 //
 //		_lblHideFalsePositiveValue.setEnabled(isShowHideFalsePositive);
 //		_scaleHideFalsePositive.setEnabled(isShowHideFalsePositive);
-	}
+//	}
 
 	private void fillToolbar() {
 
@@ -1741,11 +1741,11 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 		}
 	}
 
-	private void onChange_HideFalsePositive() {
-
-		enableControls_HideFalsePositive();
-		updateUI_HideFalsePositive();
-	}
+//	private void onChange_HideFalsePositive() {
+//
+//		enableControls_HideFalsePositive();
+//		updateUI_HideFalsePositive();
+//	}
 
 	private void onGeoPart_Select(final Event event) {
 
@@ -2194,18 +2194,18 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
 	private void updateUI_State_CancelComparing() {
 
-		_lblCompareStatus.setText("Comparing is canceled");
+		_lblCompareStatus.setText(Messages.GeoCompare_View_Status_ComparingIsCanceled);
 	}
 
 	private void updateUI_State_Progress(final int workedTours, final int numTours) {
 
 		if (workedTours == -1 && numTours == -1) {
 
-			_lblCompareStatus.setText("Start comparing...");
+			_lblCompareStatus.setText(Messages.GeoCompare_View_Status_StartComparing);
 
 		} else if (workedTours == numTours) {
 
-			_lblCompareStatus.setText(String.format("%d tours compared", numTours));
+			_lblCompareStatus.setText(String.format(Messages.GeoCompare_View_Status_CompareResult, numTours));
 
 		} else {
 

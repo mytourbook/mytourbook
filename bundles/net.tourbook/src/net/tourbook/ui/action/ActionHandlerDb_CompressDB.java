@@ -43,69 +43,69 @@ public class ActionHandlerDb_CompressDB extends AbstractHandler {
 
 			private void logTableSize(final Connection conn) throws SQLException {
 
-				String sqlSize = ""
-						+ "SELECT "
+				String sqlSize = "" //$NON-NLS-1$
+						+ "SELECT " //$NON-NLS-1$
 
-						+ " TableName,"
+						+ " TableName," //$NON-NLS-1$
 
-						+ " (SELECT"
-						+ "    SUM(NumAllocatedPages * PageSize)"
-						+ "    FROM new org.apache.derby.diag.SpaceTable('APP', t.TableName) x) AS Size"
+						+ " (SELECT" //$NON-NLS-1$
+						+ "    SUM(NumAllocatedPages * PageSize)" //$NON-NLS-1$
+						+ "    FROM new org.apache.derby.diag.SpaceTable('APP', t.TableName) x) AS Size" //$NON-NLS-1$
 
-						+ " FROM SYS.SYSTABLES t"
+						+ " FROM SYS.SYSTABLES t" //$NON-NLS-1$
 
 				//	+ " ORDER BY Size DESC"
 				;
 
-				sqlSize = "select"
+				sqlSize = "select" //$NON-NLS-1$
 
-						+ " tablename,"
+						+ " tablename," //$NON-NLS-1$
 
-						+ " (select sum(numallocatedpages*pagesize)"
-						+ "   from new org.apache.derby.diag.SpaceTable('APP',t.tablename) x),"
+						+ " (select sum(numallocatedpages*pagesize)" //$NON-NLS-1$
+						+ "   from new org.apache.derby.diag.SpaceTable('APP',t.tablename) x)," //$NON-NLS-1$
 
-						+ " (select sum(estimspacesaving) "
-						+ "   from new org.apache.derby.diag.SpaceTable('APP',t.tablename) x)"
+						+ " (select sum(estimspacesaving) " //$NON-NLS-1$
+						+ "   from new org.apache.derby.diag.SpaceTable('APP',t.tablename) x)" //$NON-NLS-1$
 
-						+ " from SYS.SYSTABLES t";
+						+ " from SYS.SYSTABLES t"; //$NON-NLS-1$
 
-				sqlSize = ""
-						+ "select"
-						+ " v.* from SYS.SYSSCHEMAS s,"
-						+ " SYS.SYSTABLES t,"
-						+ " new org.apache.derby.diag.SpaceTable(SCHEMANAME,TABLENAME) v"
-						+ " where s.SCHEMAID = t.SCHEMAID";
+				sqlSize = "" //$NON-NLS-1$
+						+ "select" //$NON-NLS-1$
+						+ " v.* from SYS.SYSSCHEMAS s," //$NON-NLS-1$
+						+ " SYS.SYSTABLES t," //$NON-NLS-1$
+						+ " new org.apache.derby.diag.SpaceTable(SCHEMANAME,TABLENAME) v" //$NON-NLS-1$
+						+ " where s.SCHEMAID = t.SCHEMAID"; //$NON-NLS-1$
 
-				sqlSize = ""
+				sqlSize = "" //$NON-NLS-1$
 
-						+ "    select v.*"
+						+ "    select v.*" //$NON-NLS-1$
 
-						+ "    from SYS.SYSSCHEMAS s,"
-						+ "         SYS.SYSTABLES t,"
-						+ "         TABLE(SYSCS_DIAG.SPACE_TABLE(SCHEMANAME, TABLENAME)) v"
+						+ "    from SYS.SYSSCHEMAS s," //$NON-NLS-1$
+						+ "         SYS.SYSTABLES t," //$NON-NLS-1$
+						+ "         TABLE(SYSCS_DIAG.SPACE_TABLE(SCHEMANAME, TABLENAME)) v" //$NON-NLS-1$
 
-						+ "    where s.SCHEMAID = t.SCHEMAID"
+						+ "    where s.SCHEMAID = t.SCHEMAID" //$NON-NLS-1$
 
 //						+ " ORDER BY v"
 
 				;
 
-				sqlSize = ""
-						+ "SELECT"
-						+ " v.*,"
-						+ " ((NUMALLOCATEDPAGES + NUMFREEPAGES) * PAGESIZE) as USEDSPACE,"
-						+ " s.*"
-						+ "   from SYS.SYSSCHEMAS s, SYS.SYSTABLES t, new org.apache.derby.diag.SpaceTable(SCHEMANAME,TABLENAME) v"
+				sqlSize = "" //$NON-NLS-1$
+						+ "SELECT" //$NON-NLS-1$
+						+ " v.*," //$NON-NLS-1$
+						+ " ((NUMALLOCATEDPAGES + NUMFREEPAGES) * PAGESIZE) as USEDSPACE," //$NON-NLS-1$
+						+ " s.*" //$NON-NLS-1$
+						+ "   from SYS.SYSSCHEMAS s, SYS.SYSTABLES t, new org.apache.derby.diag.SpaceTable(SCHEMANAME,TABLENAME) v" //$NON-NLS-1$
 
-						+ " where s.SCHEMAID = t.SCHEMAID"
-						+ " order by USEDSPACE desc";
+						+ " where s.SCHEMAID = t.SCHEMAID" //$NON-NLS-1$
+						+ " order by USEDSPACE desc"; //$NON-NLS-1$
 
 				final Statement stmtSize = conn.createStatement();
 				final ResultSet resultSetSize = stmtSize.executeQuery(sqlSize);
 
 				while (resultSetSize.next()) {
 
-					System.out.println(String.format("%-35s %10d %10d",
+					System.out.println(String.format("%-35s %10d %10d", //$NON-NLS-1$
 
 							resultSetSize.getString(1),
 							resultSetSize.getInt(2),

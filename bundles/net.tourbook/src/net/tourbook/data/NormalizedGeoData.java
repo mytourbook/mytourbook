@@ -84,21 +84,21 @@ public class NormalizedGeoData {
 	@Override
 	public String toString() {
 
-		return "NormalizedGeoData ["
+		return "NormalizedGeoData [" //$NON-NLS-1$
 
-				+ "tourId=" + tourId + ", "
+				+ "tourId=" + tourId + ", " //$NON-NLS-1$ //$NON-NLS-2$
 
-				+ "geoAccuracy=" + geoAccuracy + ", "
-				+ "distanceAccuracy=" + distanceAccuracy + ", "
+				+ "geoAccuracy=" + geoAccuracy + ", " //$NON-NLS-1$ //$NON-NLS-2$
+				+ "distanceAccuracy=" + distanceAccuracy + ", " //$NON-NLS-1$ //$NON-NLS-2$
 
-				+ "normalizedLat=" + Arrays.toString(normalizedLat) + ", "
-				+ "normalizedLon=" + Arrays.toString(normalizedLon) + ", "
-				+ "normalized2OriginalIndices=" + Arrays.toString(normalized2OriginalIndices) + ", "
+				+ "normalizedLat=" + Arrays.toString(normalizedLat) + ", " //$NON-NLS-1$ //$NON-NLS-2$
+				+ "normalizedLon=" + Arrays.toString(normalizedLon) + ", " //$NON-NLS-1$ //$NON-NLS-2$
+				+ "normalized2OriginalIndices=" + Arrays.toString(normalized2OriginalIndices) + ", " //$NON-NLS-1$ //$NON-NLS-2$
 
-				+ "originalFirstIndex=" + originalFirstIndex + ", "
-				+ "originalLastIndex=" + originalLastIndex
+				+ "originalFirstIndex=" + originalFirstIndex + ", " //$NON-NLS-1$ //$NON-NLS-2$
+				+ "originalLastIndex=" + originalLastIndex //$NON-NLS-1$
 
-				+ "]";
+				+ "]"; //$NON-NLS-1$
 	}
 
 }

@@ -68,8 +68,8 @@ public class TVIPrefTagRoot extends TVIPrefTagItem {
 		 * read tour tags from db
 		 */
 		final Query query = em.createQuery(
-				""
-						+ "SELECT"
+				"" //$NON-NLS-1$
+						+ "SELECT" //$NON-NLS-1$
 
 						+ " Tag" //$NON-NLS-1$
 
