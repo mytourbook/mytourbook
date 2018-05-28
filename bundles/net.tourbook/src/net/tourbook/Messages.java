@@ -1786,7 +1786,6 @@ public class Messages extends NLS {
 	public static String		Slideout_Map2_MapOptions_Checkbox_ZoomWithMousePosition;
 	public static String		Slideout_Map2_MapOptions_Checkbox_ZoomWithMousePosition_Tooltip;
 	public static String		Slideout_Map2_MapOptions_Label_SliderPath_Segements;
-	public static String		Slideout_Map2_MapOptions_Title;
 
 	public static String		Slideout_Map2_TourColors_Checkbox_ShowInChartToolbar_Tooltip;
 	public static String		Slideout_Map2_TourColors_Label_Title;
@@ -1838,13 +1837,11 @@ public class Messages extends NLS {
 	public static String		Slideout_Map_Bookmark_Label_NumContextMenuItems_Tooltip;
 	public static String		Slideout_Map_Bookmark_Label_Title;
 	public static String		Slideout_Map_Options_Checkbox_ChartSlider;
-	public static String		Slideout_Map_Options_Checkbox_ChartSlider_Tooltip;
 	public static String		Slideout_Map_Options_Checkbox_SliderPath;
 	public static String		Slideout_Map_Options_Checkbox_SliderPath_Tooltip;
 	public static String		Slideout_Map_Options_Label_SliderLocation_Color;
 	public static String		Slideout_Map_Options_Label_SliderLocation_Color_Tooltip;
 	public static String		Slideout_Map_Options_Label_SliderLocation_Size;
-	public static String		Slideout_Map_Options_Label_SliderLocation_Size_Tooltip;
 	public static String		Slideout_Map_Options_Label_SliderPath_Color;
 	public static String		Slideout_Map_Options_Label_SliderPath_Width;
 	public static String		Slideout_Map_TrackOptions_Label_Title;
@@ -2070,7 +2067,6 @@ public class Messages extends NLS {
 	public static String		Tour_Database_PostUpdate_029_SetImportFileName;
 	public static String		Tour_Database_PostUpdate_032_SetTourTimeZone;
 	public static String		Tour_Database_PostUpdate_034_SetTourGeoParts;
-	public static String		Tour_Database_PostUpdate_035_SetGeoMinMax;
 	public static String		Tour_Database_PostUpdate011_SetTourCreateTime;
 	public static String		Tour_Database_PostUpdate020_ConvertIntToFloat;
 	public static String		Tour_Database_PostUpdate021_SetTourStartEndTime;
@@ -2277,7 +2273,6 @@ public class Messages extends NLS {
 	public static String		tour_editor_label_time;
 	public static String		tour_editor_label_time_unit;
 	public static String		tour_editor_label_tour_calories;
-	public static String		tour_editor_label_tour_calories_unit;
 	public static String		tour_editor_label_tour_date;
 	public static String		tour_editor_label_tour_distance;
 	public static String		tour_editor_label_tour_id;

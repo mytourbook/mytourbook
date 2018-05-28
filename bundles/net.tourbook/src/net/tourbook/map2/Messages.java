@@ -100,7 +100,6 @@ public class Messages extends NLS {
 	public static String		Map_Action_PhotoFilter_Tooltip;
 	public static String		Map_Action_POI;
 	public static String		Map_Action_POI_Tooltip;
-	public static String		Map_Action_SelectGeoCompareArea;
 	public static String		Map_Action_SetDefaultMapProviders;
 	public static String		Map_Action_ShowAllFilteredPhotos_Tooltip;
 	public static String		Map_Action_ShowPhotos_Tooltip;
