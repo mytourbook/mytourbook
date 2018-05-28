@@ -437,6 +437,7 @@ public class DirectMappingPainter implements IDirectPainter {
 
 		final GC gc = painterContext.gc;
 
+		gc.setLineWidth(2);
 		gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
 
 		int linePositionY = positionY - leftValueInlegendPosition;
@@ -453,17 +454,17 @@ public class DirectMappingPainter implements IDirectPainter {
 			return;
 		}
 
+		if (_sliderPathPaintingData.isShowSliderPath) {
+
+			// draw it even when the sliders are not visible but the tour can be visible !
+
+			drawSliderPath(painterContext);
+		}
+
 		if (_isShowSliderInMap) {
 
 			drawSliderMarker(painterContext, _rightSliderValueIndex, _imageRightSlider);
 			drawSliderMarker(painterContext, _leftSliderValueIndex, _imageLeftSlider);
-
-			if (_sliderPathPaintingData.isShowSliderPath) {
-
-				// draw it even when the sliders are not visible but the tour can be visible !
-
-				drawSliderPath(painterContext);
-			}
 		}
 
 		if (_isShowSliderInLegend) {

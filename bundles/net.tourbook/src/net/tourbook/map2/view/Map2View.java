@@ -193,8 +193,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	private static final String		IMAGE_ACTION_TOUR_COLOR_PULSE_DISABLED		= net.tourbook.Messages.Image__graph_heartbeat_disabled;
 	private static final String		IMAGE_ACTION_TOUR_COLOR_SPEED				= net.tourbook.Messages.Image__graph_speed;
 	private static final String		IMAGE_ACTION_TOUR_COLOR_SPEED_DISABLED		= net.tourbook.Messages.Image__graph_speed_disabled;
-	private static final String 	IMAGE_MAP_OPTIONS 							= net.tourbook.Messages.Image__MapOptions;
-	private static final String 	IMAGE_MAP_OPTIONS_DISABLED 					= net.tourbook.Messages.Image__MapOptions_Disabled;
 
 	private static final String		STATE_IS_SHOW_TOUR_IN_MAP						= "STATE_IS_SHOW_TOUR_IN_MAP";							//$NON-NLS-1$
 	private static final String		STATE_IS_SHOW_PHOTO_IN_MAP						= "STATE_IS_SHOW_PHOTO_IN_MAP";							//$NON-NLS-1$
@@ -208,7 +206,8 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	
 	private static final String		MEMENTO_SHOW_START_END_IN_MAP				= "action.show-start-end-in-map";			//$NON-NLS-1$
 	private static final String		MEMENTO_SHOW_TOUR_MARKER					= "action.show-tour-marker";				//$NON-NLS-1$
-	private static final String		MEMENTO_SHOW_SLIDER_IN_MAP					= "action.show-slider-in-map";				//$NON-NLS-1$
+	static final String				MEMENTO_SHOW_SLIDER_IN_MAP					= "action.show-slider-in-map";				//$NON-NLS-1$
+	static final boolean			MEMENTO_SHOW_SLIDER_IN_MAP_DEFAULT			= true;
 	private static final String		MEMENTO_SHOW_SLIDER_IN_LEGEND				= "action.show-slider-in-legend";			//$NON-NLS-1$
 	private static final String		MEMENTO_SHOW_SCALE_IN_MAP					= "action.show-scale-in-map";				//$NON-NLS-1$
 	private static final String		MEMENTO_SHOW_TOUR_INFO_IN_MAP				= "action.show-tour-info-in-map";			//$NON-NLS-1$
@@ -396,7 +395,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 	private ActionDimMap					_actionDimMap;
 	private ActionOpenPrefDialog			_actionEditMap2Preferences;
-//	private ActionMap2_Options				_actionMap2Options;
 	private ActionMap2_Graphs				_actionMap2TourColors;
 	private ActionMapBookmarks				_actionMapBookmarks;
 	private ActionMap2Color					_actionMap2Color;
@@ -450,25 +448,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
 			return new SlideoutMap2TourColors(_parent, toolbar, Map2View.this, _state);
-		}
-
-		@Override
-		protected void onBeforeOpenSlideout() {
-			closeOpenedDialogs(this);
-		}
-	}
-
-	private class ActionMap2_Options extends ActionToolbarSlideout {
-
-		public ActionMap2_Options() {
-
-			super(TourbookPlugin.getImageDescriptor(IMAGE_MAP_OPTIONS),
-					TourbookPlugin.getImageDescriptor(IMAGE_MAP_OPTIONS_DISABLED));
-		}
-
-		@Override
-		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
-			return new SlideoutMap2_TrackOptions(_parent, toolbar, Map2View.this, _state);
 		}
 
 		@Override
@@ -714,6 +693,11 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			return;
 		}
 
+		final boolean isShowSliderInMap = _actionShowSliderInMap.isChecked();
+
+		// keep state for the slideout
+		_state.put(Map2View.MEMENTO_SHOW_SLIDER_IN_MAP, isShowSliderInMap);
+
 		// repaint map
 		_directMappingPainter.setPaintContext(
 				_map,
@@ -721,7 +705,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 				_allTourData.get(0),
 				_currentLeftSliderValueIndex,
 				_currentRightSliderValueIndex,
-				_actionShowSliderInMap.isChecked(),
+				isShowSliderInMap,
 				_actionShowSliderInLegend.isChecked(),
 				_sliderPathPaintingData);
 
@@ -1287,7 +1271,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 				PrefPageMap2Appearance.ID);
 
 		_actionMap2Color = new ActionMap2Color();
-//		_actionMap2Options = new ActionMap2_Options();
 		_actionSelectMapProvider = new ActionSelectMapProvider(this);
 		_actionSetDefaultPosition = new ActionSetDefaultPosition(this);
 		_actionSaveDefaultPosition = new ActionSaveDefaultPosition(this);
@@ -1719,7 +1702,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		tbm.add(new Separator());
 
 		tbm.add(_actionMapBookmarks);
-//		tbm.add(_actionMap2Options);
 		tbm.add(_actionSelectMapProvider);
 
 		/*
@@ -3087,7 +3069,9 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_map.setShowScale(isScaleVisible);
 
 		// show slider
-		_actionShowSliderInMap.setChecked(Util.getStateBoolean(_state, MEMENTO_SHOW_SLIDER_IN_MAP, true));
+		_actionShowSliderInMap.setChecked(Util.getStateBoolean(_state,
+				MEMENTO_SHOW_SLIDER_IN_MAP,
+				MEMENTO_SHOW_SLIDER_IN_MAP_DEFAULT));
 
 		_actionShowSliderInLegend.setChecked(_state.getBoolean(MEMENTO_SHOW_SLIDER_IN_LEGEND));
 
@@ -3187,6 +3171,10 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	}
 
 	void restoreState_Map2Options(final boolean isUpdateMapUI) {
+
+		_actionShowSliderInMap.setChecked(Util.getStateBoolean(_state,
+				MEMENTO_SHOW_SLIDER_IN_MAP,
+				Map2View.MEMENTO_SHOW_SLIDER_IN_MAP_DEFAULT));
 
 		_map.setIsZoomWithMousePosition(Util.getStateBoolean(_state,
 				Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION,
