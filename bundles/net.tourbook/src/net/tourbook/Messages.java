@@ -1780,6 +1780,15 @@ public class Messages extends NLS {
 
 	public static String		Slideout_ConconiOptions_Label_Title;
 
+	public static String		Slideout_GeoCompareOptions_Group_MapOptions;
+	public static String		Slideout_GeoCompareOptions_Label_ComparedTourPart;
+	public static String		Slideout_GeoCompareOptions_Label_DistanceInterval;
+	public static String		Slideout_GeoCompareOptions_Label_GeoAccuracy;
+	public static String		Slideout_GeoCompareOptions_Label_LineWidth;
+	public static String		Slideout_GeoCompareOptions_Label_NormalizedDistance;
+	public static String		Slideout_GeoCompareOptions_Label_ReferenceTour;
+	public static String		Slideout_GeoCompareOptions_Label_Title;
+
 	public static String		Slideout_GraphMinMax_Label_Title;
 
 	public static String		Slideout_HVROptions_Checkbox_2xValues;

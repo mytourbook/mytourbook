@@ -82,16 +82,16 @@ public class TourCompareConfig {
 
 	@Override
 	public String toString() {
-		return "TourCompareConfig ["
+		return "TourCompareConfig [" //$NON-NLS-1$
 
-				+ "_refTour=" + _refTour + ", "
-				+ "_refTourTourId=" + _refTourTourId + ", "
-				+ "_refTourChartConfig=" + _refTourChartConfig + ", "
-				+ "_compareTourChartConfig=" + _compareTourChartConfig + ", "
-				+ "_xSliderPosition=" + _xSliderPosition + ", "
-				+ "isGeoCompareRefTour=" + isGeoCompareRefTour
+				+ "_refTour=" + _refTour + ", " //$NON-NLS-1$ //$NON-NLS-2$
+				+ "_refTourTourId=" + _refTourTourId + ", " //$NON-NLS-1$ //$NON-NLS-2$
+				+ "_refTourChartConfig=" + _refTourChartConfig + ", " //$NON-NLS-1$ //$NON-NLS-2$
+				+ "_compareTourChartConfig=" + _compareTourChartConfig + ", " //$NON-NLS-1$ //$NON-NLS-2$
+				+ "_xSliderPosition=" + _xSliderPosition + ", " //$NON-NLS-1$ //$NON-NLS-2$
+				+ "isGeoCompareRefTour=" + isGeoCompareRefTour //$NON-NLS-1$
 
-				+ "]";
+				+ "]"; //$NON-NLS-1$
 	}
 
 }
