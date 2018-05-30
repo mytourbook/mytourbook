@@ -1,0 +1,25 @@
+Version 18.6.0                                             ?. June  2018
+
+
+Improvements
+============	
+
+* 2D Map
+
+  - Show some options from the preferences also in the slideout
+  - Moved 'Map 2D Options' into 'Track Options'
+
+
+* 2.5D Map
+
+  - Show chart slider + path
+  - Sync map with both sliders and center it
+  - Set track opacity  
+  
+
+Translation
+===========
+
+* Translated text since 17.12
+
+  - de
