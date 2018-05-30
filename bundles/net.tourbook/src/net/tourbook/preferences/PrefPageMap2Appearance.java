@@ -207,8 +207,8 @@ public class PrefPageMap2Appearance extends FieldEditorPreferencePage implements
 				{
 					// checkbox
 					_chkTrackOpacity = new Button(groupContainer, SWT.CHECK);
-					_chkTrackOpacity.setText(Messages.Pref_Map2_Checkbox_TrackOpacity);
-					_chkTrackOpacity.setToolTipText(Messages.Pref_Map2_Checkbox_TrackOpacity_Tooltip);
+					_chkTrackOpacity.setText(Messages.Slideout_Map_Options_Checkbox_TrackOpacity);
+					_chkTrackOpacity.setToolTipText(Messages.Slideout_Map_Options_Checkbox_TrackOpacity_Tooltip);
 					_chkTrackOpacity.addSelectionListener(_defaultSelectionListener);
 				}
 				{

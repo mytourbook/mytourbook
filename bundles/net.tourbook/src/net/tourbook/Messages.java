@@ -736,7 +736,6 @@ public class Messages extends NLS {
 	public static String		GeoCompare_View_Column_GeoDiff_Relative_Header;
 	public static String		GeoCompare_View_Column_GeoDiff_Relative_Label;
 	public static String		GeoCompare_View_Column_GeoDiff_Relative_Tooltip;
-	public static String		GeoCompare_View_Column_IndexDiff;
 	public static String		GeoCompare_View_Column_SequenceNumber_Header;
 	public static String		GeoCompare_View_Column_SequenceNumber_Label;
 	public static String		GeoCompare_View_Label_GeoParts;
@@ -745,9 +744,9 @@ public class Messages extends NLS {
 	public static String		GeoCompare_View_Label_TimeSlices;
 	public static String		GeoCompare_View_PageText_MultipleToursNotSupported;
 	public static String		GeoCompare_View_PageText_NoTourWithGeoData;
-	public static String		GeoCompare_View_Status_CompareResult;
-	public static String		GeoCompare_View_Status_ComparingIsCanceled;
-	public static String		GeoCompare_View_Status_StartComparing;
+	public static String		GeoCompare_View_State_CompareResult;
+	public static String		GeoCompare_View_State_ComparingIsCanceled;
+	public static String		GeoCompare_View_State_StartComparing;
 
 	public static String		HR_Zone_01_060_Moderate;
 	public static String		HR_Zone_01_060_Moderate_Shortcut;
@@ -1384,9 +1383,6 @@ public class Messages extends NLS {
 	public static String		Pref_LiveUpdate_Checkbox;
 	public static String		Pref_LiveUpdate_Checkbox_Tooltip;
 
-	public static String		Pref_Map2_Checkbox_TrackOpacity;
-	public static String		Pref_Map2_Checkbox_TrackOpacity_Tooltip;
-
 	public static String		Pref_Map25_Encoding_Mapzen;
 	public static String		Pref_Map25_Encoding_OpenScienceMap;
 	public static String		Pref_Map25_Offline_Dialog_Restart_Message;
@@ -1803,13 +1799,6 @@ public class Messages extends NLS {
 	public static String		Slideout_LinkWithOtherViews_Label_Title_Checkbox_IsShowTourTitle;
 	public static String		Slideout_LinkWithOtherViews_Label_Title_Checkbox_IsShowTourTitle_Tooltip;
 
-	public static String		Slideout_Map2_MapOptions_Checkbox_ZoomWithMousePosition;
-	public static String		Slideout_Map2_MapOptions_Checkbox_ZoomWithMousePosition_Tooltip;
-	public static String		Slideout_Map2_MapOptions_Label_SliderPath_Segements;
-
-	public static String		Slideout_Map2_TourColors_Checkbox_ShowInChartToolbar_Tooltip;
-	public static String		Slideout_Map2_TourColors_Label_Title;
-
 	public static String		Slideout_Map25TrackOptions_Label_ConfigName_Tooltip;
 	public static String		Slideout_Map25TrackOptions_Label_Name;
 	public static String		Slideout_Map25TrackOptions_Label_OutlineColor;
@@ -1856,14 +1845,25 @@ public class Messages extends NLS {
 	public static String		Slideout_Map_Bookmark_Label_NumContextMenuItems;
 	public static String		Slideout_Map_Bookmark_Label_NumContextMenuItems_Tooltip;
 	public static String		Slideout_Map_Bookmark_Label_Title;
+
+	public static String		Slideout_Map_Options_Checkbox_ZoomWithMousePosition;
+	public static String		Slideout_Map_Options_Checkbox_ZoomWithMousePosition_Tooltip;
+	public static String		Slideout_Map_Options_Label_SliderPath_Segements;
 	public static String		Slideout_Map_Options_Checkbox_ChartSlider;
 	public static String		Slideout_Map_Options_Checkbox_SliderPath;
 	public static String		Slideout_Map_Options_Checkbox_SliderPath_Tooltip;
+	public static String		Slideout_Map_Options_Checkbox_TrackOpacity;
+	public static String		Slideout_Map_Options_Checkbox_TrackOpacity_Tooltip;
+	public static String		Slideout_Map_Options_Group_TourTrack;
 	public static String		Slideout_Map_Options_Label_SliderLocation_Color;
 	public static String		Slideout_Map_Options_Label_SliderLocation_Color_Tooltip;
 	public static String		Slideout_Map_Options_Label_SliderLocation_Size;
 	public static String		Slideout_Map_Options_Label_SliderPath_Color;
 	public static String		Slideout_Map_Options_Label_SliderPath_Width;
+
+	public static String		Slideout_Map_TourColors_Checkbox_ShowInChartToolbar_Tooltip;
+	public static String		Slideout_Map_TourColors_Label_Title;
+
 	public static String		Slideout_Map_TrackOptions_Label_Title;
 	public static String		Slideout_Map_TrackOptions_Label_Title_Tooltip;
 

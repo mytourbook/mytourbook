@@ -445,8 +445,8 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColor
 				{
 					// checkbox
 					_chkMapOption_TrackOpacity = new Button(group, SWT.CHECK);
-					_chkMapOption_TrackOpacity.setText(Messages.Pref_Map2_Checkbox_TrackOpacity);
-					_chkMapOption_TrackOpacity.setToolTipText(Messages.Pref_Map2_Checkbox_TrackOpacity_Tooltip);
+					_chkMapOption_TrackOpacity.setText(Messages.Slideout_Map_Options_Checkbox_TrackOpacity);
+					_chkMapOption_TrackOpacity.setToolTipText(Messages.Slideout_Map_Options_Checkbox_TrackOpacity_Tooltip);
 					_chkMapOption_TrackOpacity.addSelectionListener(_mapOptions_SelectionListener);
 
 					_firstColumnControls.add(_chkMapOption_TrackOpacity);

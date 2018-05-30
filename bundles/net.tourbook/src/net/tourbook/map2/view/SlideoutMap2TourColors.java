@@ -130,7 +130,7 @@ public class SlideoutMap2TourColors extends ToolbarSlideout {
 		 */
 		final Label label = new Label(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().applyTo(label);
-		label.setText(Messages.Slideout_Map2_TourColors_Label_Title);
+		label.setText(Messages.Slideout_Map_TourColors_Label_Title);
 		MTFont.setBannerFont(label);
 	}
 
@@ -199,7 +199,7 @@ public class SlideoutMap2TourColors extends ToolbarSlideout {
 
 		final Button checkbox = new Button(parent, SWT.CHECK);
 
-		checkbox.setToolTipText(Messages.Slideout_Map2_TourColors_Checkbox_ShowInChartToolbar_Tooltip);
+		checkbox.setToolTipText(Messages.Slideout_Map_TourColors_Checkbox_ShowInChartToolbar_Tooltip);
 		checkbox.addSelectionListener(_defaultSelectionListener);
 
 		GridDataFactory

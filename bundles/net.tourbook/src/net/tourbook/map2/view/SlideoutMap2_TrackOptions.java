@@ -45,6 +45,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
@@ -175,9 +176,9 @@ public class SlideoutMap2_TrackOptions extends ToolbarSlideout implements IColor
 		{
 			createUI_10_Header(shellContainer);
 
-			createUI_40_TourProperties(shellContainer);
-			createUI_20_ChartSlider(shellContainer);
-			createUI_30_MapOptions(shellContainer);
+			createUI_20_TourTrack(shellContainer);
+			createUI_50_ChartSlider(shellContainer);
+			createUI_60_MapOptions(shellContainer);
 		}
 
 		return shellContainer;
@@ -222,145 +223,22 @@ public class SlideoutMap2_TrackOptions extends ToolbarSlideout implements IColor
 		}
 	}
 
-	private void createUI_20_ChartSlider(final Composite parent) {
+	private void createUI_20_TourTrack(final Composite parent) {
 
-		{
-			/*
-			 * Chart slider
-			 */
-			// checkbox
-			_chkShowSlider_Location = new Button(parent, SWT.CHECK);
-			_chkShowSlider_Location.setText(Messages.Slideout_Map_Options_Checkbox_ChartSlider);
-			_chkShowSlider_Location.addSelectionListener(_defaultState_SelectionListener);
-		}
-		{
-			/*
-			 * Slider path
-			 */
-			// checkbox
-			_chkShowSlider_Path = new Button(parent, SWT.CHECK);
-			_chkShowSlider_Path.setText(Messages.Slideout_Map_Options_Checkbox_SliderPath);
-			_chkShowSlider_Path.setToolTipText(Messages.Slideout_Map_Options_Checkbox_SliderPath_Tooltip);
-			_chkShowSlider_Path.addSelectionListener(_defaultState_SelectionListener);
-		}
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()
-				.grab(true, false)
-				.indent(_firstColumnIndent, 0)
-				.applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-		{
-			{
-				/*
-				 * Segments
-				 */
-
-				// label
-				_lblSliderPath_Segments = new Label(container, SWT.NONE);
-				_lblSliderPath_Segments.setText(Messages.Slideout_Map2_MapOptions_Label_SliderPath_Segements);
-
-				// spinner
-				_spinnerSliderPath_Segments = new Spinner(container, SWT.BORDER);
-				_spinnerSliderPath_Segments.setMinimum(1);
-				_spinnerSliderPath_Segments.setMaximum(10000);
-				_spinnerSliderPath_Segments.setIncrement(1);
-				_spinnerSliderPath_Segments.setPageIncrement(10);
-				_spinnerSliderPath_Segments.addSelectionListener(_defaultState_SelectionListener);
-				_spinnerSliderPath_Segments.addMouseWheelListener(_defaultState_MouseWheelListener);
-			}
-			{
-				/*
-				 * Line width
-				 */
-
-				// label
-				_lblSliderPath_Width = new Label(container, SWT.NONE);
-				_lblSliderPath_Width.setText(Messages.Slideout_Map_Options_Label_SliderPath_Width);
-
-				// spinner
-				_spinnerSliderPath_LineWidth = new Spinner(container, SWT.BORDER);
-				_spinnerSliderPath_LineWidth.setMinimum(1);
-				_spinnerSliderPath_LineWidth.setMaximum(200);
-				_spinnerSliderPath_LineWidth.setIncrement(1);
-				_spinnerSliderPath_LineWidth.setPageIncrement(10);
-				_spinnerSliderPath_LineWidth.addSelectionListener(_defaultState_SelectionListener);
-				_spinnerSliderPath_LineWidth.addMouseWheelListener(_defaultState_MouseWheelListener);
-			}
-			{
-				/*
-				 * Color + opacity
-				 */
-
-				// label
-				_lblSliderPath_Color = new Label(container, SWT.NONE);
-				_lblSliderPath_Color.setText(Messages.Slideout_Map_Options_Label_SliderPath_Color);
-
-				final Composite colorContainer = new Composite(container, SWT.NONE);
-				GridDataFactory.fillDefaults().grab(true, false).applyTo(colorContainer);
-				GridLayoutFactory.fillDefaults().numColumns(2).applyTo(colorContainer);
-				{
-					// color
-					_colorSliderPathColor = new ColorSelectorExtended(colorContainer);
-					_colorSliderPathColor.addListener(_defaultState_ChangePropertyListener);
-					_colorSliderPathColor.addOpenListener(this);
-
-					// opacity
-					_spinnerSliderPath_Opacity = new Spinner(colorContainer, SWT.BORDER);
-					_spinnerSliderPath_Opacity.setMinimum(1);
-					_spinnerSliderPath_Opacity.setMaximum(100);
-					_spinnerSliderPath_Opacity.setIncrement(1);
-					_spinnerSliderPath_Opacity.setPageIncrement(10);
-					_spinnerSliderPath_Opacity.addSelectionListener(_defaultState_SelectionListener);
-					_spinnerSliderPath_Opacity.addMouseWheelListener(_defaultState_MouseWheelListener);
-				}
-			}
-		}
-	}
-
-	private void createUI_30_MapOptions(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-		{
-			{
-				/*
-				 * Zoom to mouse position
-				 */
-				{
-					// checkbox
-					_chkZoomWithMousePosition = new Button(container, SWT.CHECK);
-					_chkZoomWithMousePosition.setText(
-							Messages.Slideout_Map2_MapOptions_Checkbox_ZoomWithMousePosition);
-					_chkZoomWithMousePosition.setToolTipText(
-							Messages.Slideout_Map2_MapOptions_Checkbox_ZoomWithMousePosition_Tooltip);
-					_chkZoomWithMousePosition.addSelectionListener(_defaultState_SelectionListener);
-					GridDataFactory.fillDefaults()
-							.span(2, 1)
-							.applyTo(_chkZoomWithMousePosition);
-				}
-			}
-		}
-	}
-
-	private void createUI_40_TourProperties(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults()
-				.numColumns(2)
-				.applyTo(container);
+		final Group group = new Group(parent, SWT.NONE);
+		group.setText(Messages.Slideout_Map_Options_Group_TourTrack);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
 		{
 			{
 				/*
 				 * radio: plot symbol
 				 */
 				// label
-				final Label label = new Label(container, SWT.NONE);
+				final Label label = new Label(group, SWT.NONE);
 				label.setText(Messages.pref_map_layout_symbol);
 
-				final Composite radioContainer = new Composite(container, SWT.NONE);
+				final Composite radioContainer = new Composite(group, SWT.NONE);
 				GridDataFactory.fillDefaults().grab(true, false).applyTo(radioContainer);
 				GridLayoutFactory.fillDefaults().numColumns(3).applyTo(radioContainer);
 				{
@@ -385,11 +263,11 @@ public class SlideoutMap2_TrackOptions extends ToolbarSlideout implements IColor
 				 * Line width
 				 */
 				// label: line width
-				final Label label = new Label(container, SWT.NONE);
+				final Label label = new Label(group, SWT.NONE);
 				label.setText(Messages.pref_map_layout_symbol_width);
 
 				// spinner: line width
-				_spinnerLineWidth = new Spinner(container, SWT.BORDER);
+				_spinnerLineWidth = new Spinner(group, SWT.BORDER);
 				_spinnerLineWidth.setMinimum(1);
 				_spinnerLineWidth.setMaximum(50);
 				_spinnerLineWidth.setPageIncrement(5);
@@ -403,14 +281,14 @@ public class SlideoutMap2_TrackOptions extends ToolbarSlideout implements IColor
 				 */
 				{
 					// checkbox
-					_chkTrackOpacity = new Button(container, SWT.CHECK);
-					_chkTrackOpacity.setText(Messages.Pref_Map2_Checkbox_TrackOpacity);
-					_chkTrackOpacity.setToolTipText(Messages.Pref_Map2_Checkbox_TrackOpacity_Tooltip);
+					_chkTrackOpacity = new Button(group, SWT.CHECK);
+					_chkTrackOpacity.setText(Messages.Slideout_Map_Options_Checkbox_TrackOpacity);
+					_chkTrackOpacity.setToolTipText(Messages.Slideout_Map_Options_Checkbox_TrackOpacity_Tooltip);
 					_chkTrackOpacity.addSelectionListener(_defaultSelectionListener);
 				}
 				{
 					// spinner
-					_spinnerTrackOpacity = new Spinner(container, SWT.BORDER);
+					_spinnerTrackOpacity = new Spinner(group, SWT.BORDER);
 					_spinnerTrackOpacity.setMinimum(PrefPageMap2Appearance.MAP_OPACITY_MINIMUM);
 					_spinnerTrackOpacity.setMaximum(100);
 					_spinnerTrackOpacity.setIncrement(1);
@@ -420,18 +298,18 @@ public class SlideoutMap2_TrackOptions extends ToolbarSlideout implements IColor
 				}
 			}
 
-			createUI_50_Border(container);
+			createUI_30_Border(group);
 
 			{
 				/*
 				 * Radio: Tour painting method
 				 */
 				// label
-				final Label label = new Label(container, SWT.NONE);
+				final Label label = new Label(group, SWT.NONE);
 				label.setText(Messages.Pref_MapLayout_Label_TourPaintMethod);
 				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
 
-				final Composite paintingContainer = new Composite(container, SWT.NONE);
+				final Composite paintingContainer = new Composite(group, SWT.NONE);
 				GridDataFactory.fillDefaults().grab(true, false).applyTo(paintingContainer);
 				GridLayoutFactory.fillDefaults().numColumns(1).applyTo(paintingContainer);
 				{
@@ -449,7 +327,7 @@ public class SlideoutMap2_TrackOptions extends ToolbarSlideout implements IColor
 		}
 	}
 
-	private void createUI_50_Border(final Composite parent) {
+	private void createUI_30_Border(final Composite parent) {
 
 		{
 			/*
@@ -527,6 +405,128 @@ public class SlideoutMap2_TrackOptions extends ToolbarSlideout implements IColor
 				// border color
 				_colorBorderColor = new ColorSelectorExtended(containerBorderColor);
 				_colorBorderColor.addListener(_defaultChangePropertyListener);
+			}
+		}
+	}
+
+	private void createUI_50_ChartSlider(final Composite parent) {
+
+		{
+			/*
+			 * Chart slider
+			 */
+			// checkbox
+			_chkShowSlider_Location = new Button(parent, SWT.CHECK);
+			_chkShowSlider_Location.setText(Messages.Slideout_Map_Options_Checkbox_ChartSlider);
+			_chkShowSlider_Location.addSelectionListener(_defaultState_SelectionListener);
+		}
+		{
+			/*
+			 * Slider path
+			 */
+			// checkbox
+			_chkShowSlider_Path = new Button(parent, SWT.CHECK);
+			_chkShowSlider_Path.setText(Messages.Slideout_Map_Options_Checkbox_SliderPath);
+			_chkShowSlider_Path.setToolTipText(Messages.Slideout_Map_Options_Checkbox_SliderPath_Tooltip);
+			_chkShowSlider_Path.addSelectionListener(_defaultState_SelectionListener);
+		}
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()
+				.grab(true, false)
+				.indent(_firstColumnIndent, 0)
+				.applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+			{
+				/*
+				 * Segments
+				 */
+
+				// label
+				_lblSliderPath_Segments = new Label(container, SWT.NONE);
+				_lblSliderPath_Segments.setText(Messages.Slideout_Map_Options_Label_SliderPath_Segements);
+
+				// spinner
+				_spinnerSliderPath_Segments = new Spinner(container, SWT.BORDER);
+				_spinnerSliderPath_Segments.setMinimum(1);
+				_spinnerSliderPath_Segments.setMaximum(10000);
+				_spinnerSliderPath_Segments.setIncrement(1);
+				_spinnerSliderPath_Segments.setPageIncrement(10);
+				_spinnerSliderPath_Segments.addSelectionListener(_defaultState_SelectionListener);
+				_spinnerSliderPath_Segments.addMouseWheelListener(_defaultState_MouseWheelListener);
+			}
+			{
+				/*
+				 * Line width
+				 */
+
+				// label
+				_lblSliderPath_Width = new Label(container, SWT.NONE);
+				_lblSliderPath_Width.setText(Messages.Slideout_Map_Options_Label_SliderPath_Width);
+
+				// spinner
+				_spinnerSliderPath_LineWidth = new Spinner(container, SWT.BORDER);
+				_spinnerSliderPath_LineWidth.setMinimum(1);
+				_spinnerSliderPath_LineWidth.setMaximum(200);
+				_spinnerSliderPath_LineWidth.setIncrement(1);
+				_spinnerSliderPath_LineWidth.setPageIncrement(10);
+				_spinnerSliderPath_LineWidth.addSelectionListener(_defaultState_SelectionListener);
+				_spinnerSliderPath_LineWidth.addMouseWheelListener(_defaultState_MouseWheelListener);
+			}
+			{
+				/*
+				 * Color + opacity
+				 */
+
+				// label
+				_lblSliderPath_Color = new Label(container, SWT.NONE);
+				_lblSliderPath_Color.setText(Messages.Slideout_Map_Options_Label_SliderPath_Color);
+
+				final Composite colorContainer = new Composite(container, SWT.NONE);
+				GridDataFactory.fillDefaults().grab(true, false).applyTo(colorContainer);
+				GridLayoutFactory.fillDefaults().numColumns(2).applyTo(colorContainer);
+				{
+					// color
+					_colorSliderPathColor = new ColorSelectorExtended(colorContainer);
+					_colorSliderPathColor.addListener(_defaultState_ChangePropertyListener);
+					_colorSliderPathColor.addOpenListener(this);
+
+					// opacity
+					_spinnerSliderPath_Opacity = new Spinner(colorContainer, SWT.BORDER);
+					_spinnerSliderPath_Opacity.setMinimum(1);
+					_spinnerSliderPath_Opacity.setMaximum(100);
+					_spinnerSliderPath_Opacity.setIncrement(1);
+					_spinnerSliderPath_Opacity.setPageIncrement(10);
+					_spinnerSliderPath_Opacity.addSelectionListener(_defaultState_SelectionListener);
+					_spinnerSliderPath_Opacity.addMouseWheelListener(_defaultState_MouseWheelListener);
+				}
+			}
+		}
+	}
+
+	private void createUI_60_MapOptions(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+			{
+				/*
+				 * Zoom to mouse position
+				 */
+				{
+					// checkbox
+					_chkZoomWithMousePosition = new Button(container, SWT.CHECK);
+					_chkZoomWithMousePosition.setText(
+							Messages.Slideout_Map_Options_Checkbox_ZoomWithMousePosition);
+					_chkZoomWithMousePosition.setToolTipText(
+							Messages.Slideout_Map_Options_Checkbox_ZoomWithMousePosition_Tooltip);
+					_chkZoomWithMousePosition.addSelectionListener(_defaultState_SelectionListener);
+					GridDataFactory.fillDefaults()
+							.span(2, 1)
+							.applyTo(_chkZoomWithMousePosition);
+				}
 			}
 		}
 	}

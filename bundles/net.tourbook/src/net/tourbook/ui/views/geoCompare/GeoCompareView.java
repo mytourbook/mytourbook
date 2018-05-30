@@ -2194,18 +2194,18 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
 	private void updateUI_State_CancelComparing() {
 
-		_lblCompareStatus.setText(Messages.GeoCompare_View_Status_ComparingIsCanceled);
+		_lblCompareStatus.setText(Messages.GeoCompare_View_State_ComparingIsCanceled);
 	}
 
 	private void updateUI_State_Progress(final int workedTours, final int numTours) {
 
 		if (workedTours == -1 && numTours == -1) {
 
-			_lblCompareStatus.setText(Messages.GeoCompare_View_Status_StartComparing);
+			_lblCompareStatus.setText(Messages.GeoCompare_View_State_StartComparing);
 
 		} else if (workedTours == numTours) {
 
-			_lblCompareStatus.setText(String.format(Messages.GeoCompare_View_Status_CompareResult, numTours));
+			_lblCompareStatus.setText(String.format(Messages.GeoCompare_View_State_CompareResult, numTours));
 
 		} else {
 
