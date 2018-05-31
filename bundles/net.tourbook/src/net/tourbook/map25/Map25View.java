@@ -1170,9 +1170,13 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		int tourIndex = 0;
 		int geoIndex = 0;
 
-		for (final TourData tourData : _allTourData) {
+		if (_allTourData.size() == 1 && _allTourData.get(0).isMultipleTours()) {
 
-			_allTourStarts.add(tourIndex);
+			// tourdata contains multiple tours
+
+			final TourData tourData = _allTourData.get(0);
+
+			_allTourStarts.add(tourData.multipleTourStartIndex);
 
 			final double[] latitudeSerie = tourData.latitudeSerie;
 			final double[] longitudeSerie = tourData.longitudeSerie;
@@ -1180,6 +1184,21 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 			// create vtm geo points
 			for (int serieIndex = 0; serieIndex < latitudeSerie.length; serieIndex++, tourIndex++) {
 				_allGeoPoints[geoIndex++] = (new GeoPoint(latitudeSerie[serieIndex], longitudeSerie[serieIndex]));
+			}
+
+		} else {
+
+			for (final TourData tourData : _allTourData) {
+
+				_allTourStarts.add(tourIndex);
+
+				final double[] latitudeSerie = tourData.latitudeSerie;
+				final double[] longitudeSerie = tourData.longitudeSerie;
+
+				// create vtm geo points
+				for (int serieIndex = 0; serieIndex < latitudeSerie.length; serieIndex++, tourIndex++) {
+					_allGeoPoints[geoIndex++] = (new GeoPoint(latitudeSerie[serieIndex], longitudeSerie[serieIndex]));
+				}
 			}
 		}
 
@@ -1201,17 +1220,25 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		sliderPath_Layer.setEnabled(isShowSliderPath);
 		sliderLocation_Layer.setEnabled(isShowSliderLocation);
 
-		if (isShowSliderPath) {
+		final int numPoints = _allGeoPoints.length;
 
-			sliderPath_Layer.setPoints(_allGeoPoints, _allTourStarts, _leftSliderValueIndex, _rightSliderValueIndex);
-		}
+		if (numPoints > 0) {
 
-		if (isShowSliderLocation) {
+			if (isShowSliderPath) {
 
-			final GeoPoint leftGeoPoint = _allGeoPoints[_leftSliderValueIndex];
-			final GeoPoint rightGeoPoint = _allGeoPoints[_rightSliderValueIndex];
+				sliderPath_Layer.setPoints(_allGeoPoints,
+						_allTourStarts,
+						_leftSliderValueIndex,
+						_rightSliderValueIndex);
+			}
 
-			sliderLocation_Layer.setPosition(leftGeoPoint, rightGeoPoint);
+			if (isShowSliderLocation) {
+
+				final GeoPoint leftGeoPoint = _allGeoPoints[_leftSliderValueIndex];
+				final GeoPoint rightGeoPoint = _allGeoPoints[_rightSliderValueIndex];
+
+				sliderLocation_Layer.setPosition(leftGeoPoint, rightGeoPoint);
+			}
 		}
 
 		/*
@@ -1335,8 +1362,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 					_allTourData.clear();
 					_allTourData.addAll(tourDataList);
 
-						paintTours_AndUpdateMap();
-					}
+					paintTours_AndUpdateMap();
+				}
 
 				enableActions();
 			}

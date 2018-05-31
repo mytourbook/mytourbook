@@ -131,6 +131,7 @@ public class SliderPath_Layer extends Layer {
 
 		private final LineClipper	__lineClipper;
 		private int					__numPoints;
+		private int					__sliderValueIndexOffset;
 
 		public Worker(final Map map) {
 
@@ -164,11 +165,6 @@ public class SliderPath_Layer extends Layer {
 
 					final int eventCounter = _eventCounter.get();
 
-//					System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] doWork()")
-//							+ ("\tcounter diff: " + (eventCounter - _geoPointCounter))
-//							+ ("\t_geoPointCounter: " + _geoPointCounter));
-//// TODO remove SYSTEM.OUT.PRINTLN
-
 					if (eventCounter > _geoPointCounter) {
 						return false;
 					}
@@ -179,6 +175,7 @@ public class SliderPath_Layer extends Layer {
 					final int lastSliderValueIndex = _lastSliderValueIndex;
 
 					__numPoints = numPoints = lastSliderValueIndex - firstSliderValueIndex;
+					__sliderValueIndexOffset = firstSliderValueIndex * 2;
 
 					double[] points = __preProjectedPoints;
 
@@ -254,7 +251,7 @@ public class SliderPath_Layer extends Layer {
 			 * Setup tour clipper
 			 */
 			int tourIndex = 0;
-			int nextTourStartIndex = getNextTourStartIndex(tourIndex);
+			int nextTourStartIndex = getNextTourStartIndex(tourIndex) - __sliderValueIndexOffset;
 
 			__lineClipper.clipStart(x, y);
 
@@ -294,7 +291,7 @@ public class SliderPath_Layer extends Layer {
 				if (pointIndex >= nextTourStartIndex) {
 
 					// setup next tour
-					nextTourStartIndex = getNextTourStartIndex(++tourIndex);
+					nextTourStartIndex = getNextTourStartIndex(++tourIndex) - __sliderValueIndexOffset;
 
 					// start a new line (copied from flip code)
 					if (i > 2) {

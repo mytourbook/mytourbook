@@ -20,6 +20,6 @@ Improvements
 Translation
 ===========
 
-* Translated text since 17.12
+* Translated UI since 17.12
 
   - de
