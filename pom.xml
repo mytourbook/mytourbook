@@ -140,8 +140,13 @@
 						</manifestEntries>
 					</archive>
 					
-					<!-- set qualifier date format, 'v' is a prefix -->
+					<!-- set qualifier date format, 'v' is a prefix 
 					<format>'v'yyyyMMdd-HHmm</format>
+					
+					the 'v' do NOT work with the update site (testing translated texts)
+					
+					-->
+					<format>yyyyMMdd-HHmm</format>
 					
 				</configuration>
 			</plugin>			
