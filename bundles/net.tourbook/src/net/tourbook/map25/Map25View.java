@@ -1384,17 +1384,15 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		enableActions();
 	}
 
-	private void syncMapWith_SliderPosition(final TourData tourData, int valuesIndex) {
+	private void syncMapWith_SliderPosition(final TourData tourData, final int valueIndex) {
 
 		final double[] latitudeSerie = tourData.latitudeSerie;
 
-		// check bounds
-		if (valuesIndex >= latitudeSerie.length) {
-			valuesIndex = latitudeSerie.length;
-		}
+		// force bounds
+		final int checkedValueIndex = Math.max(0, Math.min(valueIndex, latitudeSerie.length - 1));
 
-		final double latitude = latitudeSerie[valuesIndex];
-		final double longitude = tourData.longitudeSerie[valuesIndex];
+		final double latitude = latitudeSerie[checkedValueIndex];
+		final double longitude = tourData.longitudeSerie[checkedValueIndex];
 
 		final Map map25 = _mapApp.getMap();
 		final MapPosition currentMapPos = new MapPosition();
