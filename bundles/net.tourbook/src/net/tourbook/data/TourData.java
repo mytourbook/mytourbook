@@ -1349,6 +1349,32 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 */
 	@Transient
 	public boolean					isBackupImportFile;
+	
+	/*
+	 * Running dynamics data
+	 * 
+	//	|| fieldName.equals("stance_time") //				  253.0  ms
+	//	|| fieldName.equals("stance_time_balance") //		   51.31 percent
+	//	|| fieldName.equals("step_length") //				 1526.0  mm
+	//	|| fieldName.equals("vertical_oscillation") //		    7.03 percent
+	//	|| fieldName.equals("vertical_ratio") //			  114.2  mm
+	 * 
+	 * @since Version 18.7
+	 */
+	@Transient
+	private short[]					runDyn_StanceTime;
+	
+	@Transient
+	private short[]					runDyn_StanceTime_Balance;
+	
+	@Transient
+	private short[]					runDyn_StepLength;
+	
+	@Transient
+	private short[]					runDyn_Vertical_Ratio;
+	
+	@Transient
+	private short[]					runDyn_Vertical_Oscillation;
 
 // SET_FORMATTING_ON
 
@@ -7087,6 +7113,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 		pulseTimeSerie = serieData.pulseTimes;
 
+		runDyn_StanceTime = serieData.runDyn_StanceTime;
+		runDyn_StanceTime_Balance = serieData.runDyn_StanceTime_Balance;
+		runDyn_StepLength = serieData.runDyn_StepLength;
+		runDyn_Vertical_Ratio = serieData.runDyn_Vertical_Ratio;
+		runDyn_Vertical_Oscillation = serieData.runDyn_Vertical_Oscillation;
+
 		if (powerSerie != null) {
 			isPowerSerieFromDevice = true;
 		}
@@ -7132,6 +7164,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		serieData.gears = gearSerie;
 
 		serieData.pulseTimes = pulseTimeSerie;
+
+		serieData.runDyn_StanceTime = runDyn_StanceTime;
+		serieData.runDyn_StanceTime_Balance = runDyn_StanceTime_Balance;
+		serieData.runDyn_StepLength = runDyn_StepLength;
+		serieData.runDyn_Vertical_Ratio = runDyn_Vertical_Ratio;
+		serieData.runDyn_Vertical_Oscillation = runDyn_Vertical_Oscillation;
 
 		/*
 		 * time serie size

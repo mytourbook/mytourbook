@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -32,9 +32,9 @@ import net.tourbook.common.time.TimeTools;
  */
 public class TimeData implements Serializable {
 
-	public long					id;
+	private static final long	serialVersionUID			= -3435859239371853427L;
 
-	private static final long	serialVersionUID	= -3435859239371853427L;
+	public long					id;
 
 	/**
 	 * contains the difference to the previous time in seconds
@@ -46,7 +46,7 @@ public class TimeData implements Serializable {
 	 * {@link Long#MIN_VALUE} when the time is not set. This time value is set when the tour is
 	 * created by GPS devices
 	 */
-	public long					absoluteTime		= Long.MIN_VALUE;
+	public long					absoluteTime				= Long.MIN_VALUE;
 
 	/**
 	 * Contains time in seconds relative to the tour start
@@ -57,12 +57,12 @@ public class TimeData implements Serializable {
 	 * Absolute value for temperature in metric measurement system or {@link Float#MIN_VALUE} when
 	 * value is not set
 	 */
-	public float				temperature			= Float.MIN_VALUE;
+	public float				temperature					= Float.MIN_VALUE;
 
 	/**
 	 * absolute value for cadence or {@link Float#MIN_VALUE} when cadence is not set
 	 */
-	public float				cadence				= Float.MIN_VALUE;
+	public float				cadence						= Float.MIN_VALUE;
 
 	/**
 	 * 
@@ -72,62 +72,62 @@ public class TimeData implements Serializable {
 	/**
 	 * absolute value for pulse or {@link Float#MIN_VALUE} when value is not set
 	 */
-	public float				pulse				= Float.MIN_VALUE;
+	public float				pulse						= Float.MIN_VALUE;
 
 	/**
 	 * relative value for altitude, this is the difference for the altitude with the previous time
 	 * slice. Contains {@link Float#MIN_VALUE} when value is not set.
 	 */
-	public float				altitude			= Float.MIN_VALUE;
+	public float				altitude					= Float.MIN_VALUE;
 
 	/**
 	 * Contains the absolute altitude in meters or {@link Float#MIN_VALUE} when altitude is not set.
 	 */
-	public float				absoluteAltitude	= Float.MIN_VALUE;
+	public float				absoluteAltitude			= Float.MIN_VALUE;
 
 	/**
 	 * relative value for distance in meters, this is the difference for the distance with the
 	 * previous time slice. Contains {@link Float#MIN_VALUE} when value is not set.
 	 */
-	public float				distance			= Float.MIN_VALUE;
+	public float				distance					= Float.MIN_VALUE;
 
 	/**
 	 * Relative value for distance in meters, this is the difference for the distance with the
 	 * previous time slice. Contains {@link Float#MIN_VALUE} when value is not set.
 	 */
-	public float				gpxDistance			= Float.MIN_VALUE;
+	public float				gpxDistance					= Float.MIN_VALUE;
 
 	/**
 	 * contains the absolute distance in meters or {@link Float#MIN_VALUE} when distance is not set
 	 */
-	public float				absoluteDistance	= Float.MIN_VALUE;
+	public float				absoluteDistance			= Float.MIN_VALUE;
 
 	/**
 	 * absolute value for power, power is typically provided by an ergo trainer. Contains
 	 * {@link Float#MIN_VALUE} when value is not set.
 	 */
-	public float				power				= Float.MIN_VALUE;
+	public float				power						= Float.MIN_VALUE;
 
 	/**
 	 * Speed in km/h, speed is typically provided by an ergo trainer not from a bike computer, Polar
 	 * provides speed but is ignored. Contains {@link Float#MIN_VALUE} when value is not set.
 	 */
-	public float				speed				= Float.MIN_VALUE;
+	public float				speed						= Float.MIN_VALUE;
 
 	/**
 	 * Absolute value for latitude. Contains {@link Double#MIN_VALUE} when value is not set.
 	 */
-	public double				latitude			= Double.MIN_VALUE;
+	public double				latitude					= Double.MIN_VALUE;
 
 	/**
 	 * Absolute value for longitude. Contains {@link Double#MIN_VALUE} when value is not set.
 	 */
-	public double				longitude			= Double.MIN_VALUE;
+	public double				longitude					= Double.MIN_VALUE;
 
 	/**
 	 * A marker is set when {@link TimeData#marker} is NOT 0
 	 */
-	public int					marker				= 0;
+	public int					marker						= 0;
 
 	public String				markerLabel;
 
@@ -136,27 +136,55 @@ public class TimeData implements Serializable {
 	 */
 	public int[]				pulseTime;
 
+	/**
+	 * Running dynamics data: Stance time. Contains {@link Short#MIN_VALUE} when value is not set.
+	 */
+	public short				runDyn_StanceTime			= Short.MIN_VALUE;
+
+	/**
+	 * Running dynamics data: Stance time balance. Contains {@link Short#MIN_VALUE} when value is
+	 * not set.
+	 */
+	public short				runDyn_StanceTime_Balance	= Short.MIN_VALUE;
+
+	/**
+	 * Running dynamics data: Step length. Contains {@link Short#MIN_VALUE} when value is not set.
+	 */
+	public short				runDyn_StepLength			= Short.MIN_VALUE;
+
+	/**
+	 * Running dynamics data: Vertical ratio. Contains {@link Short#MIN_VALUE} when value is not
+	 * set.
+	 */
+	public short				runDyn_Vertical_Ratio		= Short.MIN_VALUE;
+
+	/**
+	 * Running dynamics data: Vertical oscillation. Contains {@link Short#MIN_VALUE} when value is
+	 * not set.
+	 */
+	public short				runDyn_Vertical_Oscillation	= Short.MIN_VALUE;
+
 	@Override
 	public String toString() {
 		return "TimeData [" //$NON-NLS-1$
 //				+ ("id=" + id) //$NON-NLS-1$
 //				+ (", time=" + time) //$NON-NLS-1$
 				+ (", absoluteTime=" + TimeTools.getZonedDateTime(absoluteTime)) //$NON-NLS-1$
-//				+ (", relativeTime=" + relativeTime) //$NON-NLS-1$
-//				+ (", pulse=" + pulse) //$NON-NLS-1$
-//				+ (", temperature=" + temperature)
+				//				+ (", relativeTime=" + relativeTime) //$NON-NLS-1$
+				//				+ (", pulse=" + pulse) //$NON-NLS-1$
+				//				+ (", temperature=" + temperature)
 				+ (", cadence=" + cadence) //$NON-NLS-1$
-//				+ (", altitude=" + altitude) //$NON-NLS-1$
-//				+ (", absoluteAltitude=" + absoluteAltitude) //$NON-NLS-1$
-//				+ (", distance=" + distance) //$NON-NLS-1$
-//				+ (", gpxDistance=" + gpxDistance)
-//				+ (", absoluteDistance=" + absoluteDistance)
-//				+ (", power=" + power)
-//				+ (", speed=" + speed)
-//				+ (", latitude=" + latitude)
-//				+ (", longitude=" + longitude)
-//				+ (", marker=" + marker)
-//				+ (", markerLabel=" + markerLabel)
+				//				+ (", altitude=" + altitude) //$NON-NLS-1$
+				//				+ (", absoluteAltitude=" + absoluteAltitude) //$NON-NLS-1$
+				//				+ (", distance=" + distance) //$NON-NLS-1$
+				//				+ (", gpxDistance=" + gpxDistance)
+				//				+ (", absoluteDistance=" + absoluteDistance)
+				//				+ (", power=" + power)
+				//				+ (", speed=" + speed)
+				//				+ (", latitude=" + latitude)
+				//				+ (", longitude=" + longitude)
+				//				+ (", marker=" + marker)
+				//				+ (", markerLabel=" + markerLabel)
 				+ "]\n"; //$NON-NLS-1$
 	}
 }

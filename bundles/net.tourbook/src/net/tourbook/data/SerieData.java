@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -80,6 +80,16 @@ public class SerieData implements Serializable {
 	 * can have multiple values, depending on the heartrate.</b>
 	 */
 	public int[]				pulseTimes;
+
+	/*
+	 * Running dynamics data
+	 * @since Version 18.7
+	 */
+	public short[]				runDyn_StanceTime;
+	public short[]				runDyn_StanceTime_Balance;
+	public short[]				runDyn_StepLength;
+	public short[]				runDyn_Vertical_Oscillation;
+	public short[]				runDyn_Vertical_Ratio;
 
 	/*
 	 * these data series cannot be removed because they are needed to convert from int to float in

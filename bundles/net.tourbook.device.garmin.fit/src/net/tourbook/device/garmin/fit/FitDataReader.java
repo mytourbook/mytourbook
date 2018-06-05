@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -88,9 +88,7 @@ public class FitDataReader extends TourbookDevice {
 //							|| fieldName.equals("time") //$NON-NLS-1$
 //							|| fieldName.equals("timestamp") //$NON-NLS-1$
 //
-//					//
 //					// record data
-//					//
 //
 //							|| fieldName.equals("activity_type") //$NON-NLS-1$
 //							|| fieldName.equals("event") //$NON-NLS-1$
@@ -121,13 +119,19 @@ public class FitDataReader extends TourbookDevice {
 //							|| fieldName.equals("enhanced_avg_speed") //$NON-NLS-1$
 //							|| fieldName.equals("enhanced_max_speed") //$NON-NLS-1$
 //
-//							|| fieldName.equals("stance_time") //$NON-NLS-1$
-//							|| fieldName.equals("stance_time_percent") //$NON-NLS-1$
-//							|| fieldName.equals("vertical_oscillation") //$NON-NLS-1$
+//							|| fieldName.equals("total_training_effect") //			3.8 			//$NON-NLS-1$
 //
-//					//
+//					// running dynamics
+//
+//							|| fieldName.equals("stance_time") //				  253.0  ms			//$NON-NLS-1$
+//							|| fieldName.equals("stance_time_percent") //		   34.75 percent	//$NON-NLS-1$
+//							|| fieldName.equals("stance_time_balance") //		   51.31 percent	//$NON-NLS-1$
+//							|| fieldName.equals("step_length") //				 1526.0  mm			//$NON-NLS-1$
+//							|| fieldName.equals("vertical_oscillation") //		    7.03 percent	//$NON-NLS-1$
+//							|| fieldName.equals("vertical_ratio") //			  114.2  mm			//$NON-NLS-1$
+//
 //					// lap data
-//					//
+//
 //							|| fieldName.equals("avg_cadence") //$NON-NLS-1$
 //							|| fieldName.equals("avg_fractional_cadence") //$NON-NLS-1$
 //							|| fieldName.equals("avg_heart_rate") //$NON-NLS-1$
@@ -156,10 +160,13 @@ public class FitDataReader extends TourbookDevice {
 //							|| fieldName.equals("total_timer_time") //$NON-NLS-1$
 //
 //							|| fieldName.equals("avg_stance_time") //$NON-NLS-1$
+//							|| fieldName.equals("avg_stance_time_balance") //$NON-NLS-1$
 //							|| fieldName.equals("avg_stance_time_percent") //$NON-NLS-1$
+//							|| fieldName.equals("avg_step_length") //$NON-NLS-1$
 //							|| fieldName.equals("avg_vertical_oscillation") //$NON-NLS-1$
-//
+//							|| fieldName.equals("avg_vertical_ratio") //$NON-NLS-1$
 //					// power
+//
 //							|| fieldName.equals("power") //$NON-NLS-1$
 //							|| fieldName.equals("accumulated_power") //$NON-NLS-1$
 //							|| fieldName.equals("left_right_balance") //$NON-NLS-1$
@@ -173,7 +180,10 @@ public class FitDataReader extends TourbookDevice {
 //							|| fieldName.equals("pwr_calc_type") //$NON-NLS-1$
 //
 //					// device
+//
 //							|| fieldName.equals("ant_network") //$NON-NLS-1$
+//							|| fieldName.equals("ant_device_number") //$NON-NLS-1$
+//							|| fieldName.equals("ant_transmission_type") //$NON-NLS-1$
 //							|| fieldName.equals("battery_status") //$NON-NLS-1$
 //							|| fieldName.equals("battery_voltage") //$NON-NLS-1$
 //							|| fieldName.equals("cum_operating_time") //$NON-NLS-1$
@@ -226,7 +236,6 @@ public class FitDataReader extends TourbookDevice {
 //							|| fieldName.equals("temperature_setting") //$NON-NLS-1$
 //							|| fieldName.equals("weight_setting") //$NON-NLS-1$
 //
-//					//
 //							|| fieldName.equals("unknown") //$NON-NLS-1$
 					//
 					) {

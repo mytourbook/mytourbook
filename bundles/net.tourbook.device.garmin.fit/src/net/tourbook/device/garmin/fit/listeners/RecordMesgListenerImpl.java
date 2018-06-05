@@ -134,26 +134,22 @@ public class RecordMesgListenerImpl extends AbstractMesgListener implements Reco
 			timeData.longitude = DataConverters.convertSemicirclesToDegrees(positionLong);
 		}
 
-		/*
-		 * Altitude
-		 */
+		// altitude
 		final Float altitude = mesg.getAltitude();
 		final Float altitudeEnhanced = mesg.getEnhancedAltitude();
-
 		if (altitudeEnhanced != null) {
 			timeData.absoluteAltitude = altitudeEnhanced;
 		} else if (altitude != null) {
 			timeData.absoluteAltitude = altitude;
 		}
 
+		// heart rate
 		final Short heartRate = mesg.getHeartRate();
 		if (heartRate != null) {
 			timeData.pulse = heartRate;
 		}
 
-		/*
-		 * Cadence
-		 */
+		// cadence
 		final Short cadence = mesg.getCadence();
 		if (cadence != null) {
 
@@ -166,9 +162,7 @@ public class RecordMesgListenerImpl extends AbstractMesgListener implements Reco
 			}
 		}
 
-		/*
-		 * Speed
-		 */
+		// speed
 		if (_isIgnoreSpeedValues == false) {
 
 			// use speed values
@@ -183,14 +177,13 @@ public class RecordMesgListenerImpl extends AbstractMesgListener implements Reco
 			}
 		}
 
-		/*
-		 * Power
-		 */
+		// power
 		final Integer power = mesg.getPower();
 		if (power != null) {
 			timeData.power = power;
 		}
 
+		// temperature
 		final Byte mesgTemperature = mesg.getTemperature();
 		if (mesgTemperature != null) {
 
@@ -203,6 +196,41 @@ public class RecordMesgListenerImpl extends AbstractMesgListener implements Reco
 
 				timeData.temperature = mesgTemperature;
 			}
+		}
+
+		/**
+		 * Running dynamics data <code>
+		 * 
+		//	|| fieldName.equals("stance_time") //				  253.0  ms
+		//	|| fieldName.equals("stance_time_balance") //		   51.31 percent
+		//	|| fieldName.equals("step_length") //				 1526.0  mm
+		//	|| fieldName.equals("vertical_oscillation") //		    7.03 percent
+		//	|| fieldName.equals("vertical_ratio") //			  114.2  mm
+		 * </code>
+		 */
+		final Float stanceTime = mesg.getStanceTime();
+		if (stanceTime != null) {
+			timeData.runDyn_StanceTime = stanceTime.shortValue();
+		}
+
+		final Float stanceTimeBalance = mesg.getStanceTimeBalance();
+		if (stanceTimeBalance != null) {
+			timeData.runDyn_StanceTime_Balance = (short) (stanceTimeBalance * 100);
+		}
+
+		final Float stepLength = mesg.getStepLength();
+		if (stepLength != null) {
+			timeData.runDyn_StepLength = stepLength.shortValue();
+		}
+
+		final Float verticalRatio = mesg.getVerticalRatio();
+		if (verticalRatio != null) {
+			timeData.runDyn_Vertical_Ratio = (short) (verticalRatio * 100);
+		}
+
+		final Float verticalOscillation = mesg.getVerticalOscillation();
+		if (verticalOscillation != null) {
+			timeData.runDyn_Vertical_Oscillation = (short) (verticalOscillation * 100);
 		}
 
 		context.onMesgRecord_20_After();

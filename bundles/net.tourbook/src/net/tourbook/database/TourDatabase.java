@@ -5238,7 +5238,7 @@ public class TourDatabase {
 
 				/*
 				 * database is from a derby version before 10.5 which creates BLOB's with a default
-				 * size of 1M, increase size to 2G because a tour with 53000 can not be saves and
+				 * size of 1M, increase size to 2G because a tour with 53000 can not be saved and
 				 * causes an exception
 				 */
 
