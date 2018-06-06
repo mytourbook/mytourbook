@@ -3208,8 +3208,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			return;
 		}
 
+		final boolean isAltitudeAvailable = altitudeSerie != null;
+
 		// check if smoothed data are already computed
-		if (speedSerie != null) {
+		if (speedSerie != null && (isAltitudeAvailable && altitudeSerieSmoothed != null)) {
 			return;
 		}
 
@@ -3227,7 +3229,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		/*
 		 * smooth altitude
 		 */
-		final boolean isAltitudeAvailable = altitudeSerie != null;
 
 		if (isAltitudeAvailable) {
 
@@ -3244,8 +3245,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 			altitudeSerieSmoothed = new float[size];
 			altitudeSerieImperialSmoothed = new float[size];
-
-			gradientSerie = new float[size];
 
 			altimeterSerie = new float[size];
 			altimeterSerieImperial = new float[size];
@@ -3398,6 +3397,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		 * Compute the terrain slope
 		 */
 		if (isAltitudeAvailable) {
+
+			gradientSerie = new float[size];
 
 			for (int serieIndex = 0; serieIndex < size; serieIndex++) {
 

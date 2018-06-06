@@ -2254,6 +2254,9 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		// adjust altitude up/down values
 		_tourData.computeAltitudeUpDown();
+
+		// compute max altitude which requires other computed data series, e.g. speed (highly complex)
+		_tourData.computeComputedValues();
 	}
 
 	private void saveTour10AdjustSRTM() {

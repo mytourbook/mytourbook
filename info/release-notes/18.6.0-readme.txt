@@ -15,7 +15,7 @@ Improvements
   - Show chart slider + path
   - Sync map with both sliders and center it
   - Set track opacity  
-  
+
 
 Translation
 ===========
@@ -23,3 +23,9 @@ Translation
 * Translated UI since 17.12
 
   - de
+  
+
+Bugfix
+======
+
+* Compute max altitude when tour altitude is adjusted, this also fixed other max altitude issues  
