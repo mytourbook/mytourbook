@@ -138,17 +138,22 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	//
 	private static final int	PAGE_NAVIGATION_SEGMENTS				= 10;
 	//
-	private static final String	GRAPH_LABEL_ALTIMETER					= net.tourbook.common.Messages.Graph_Label_Altimeter;
-	private static final String	GRAPH_LABEL_ALTITUDE					= net.tourbook.common.Messages.Graph_Label_Altitude;
-	private static final String	GRAPH_LABEL_CADENCE						= net.tourbook.common.Messages.Graph_Label_Cadence;
-	private static final String	GRAPH_LABEL_GEARS						= net.tourbook.common.Messages.Graph_Label_Gears;
-	private static final String	GRAPH_LABEL_GRADIENT					= net.tourbook.common.Messages.Graph_Label_Gradient;
-	private static final String	GRAPH_LABEL_HEARTBEAT					= net.tourbook.common.Messages.Graph_Label_Heartbeat;
-	private static final String	GRAPH_LABEL_PACE						= net.tourbook.common.Messages.Graph_Label_Pace;
-	private static final String	GRAPH_LABEL_POWER						= net.tourbook.common.Messages.Graph_Label_Power;
-	private static final String	GRAPH_LABEL_SPEED						= net.tourbook.common.Messages.Graph_Label_Speed;
-	private static final String	GRAPH_LABEL_TEMPERATURE					= net.tourbook.common.Messages.Graph_Label_Temperature;
-	private static final String	GRAPH_LABEL_TOUR_COMPARE				= net.tourbook.common.Messages.Graph_Label_Tour_Compare;
+	private static final String	GRAPH_LABEL_ALTIMETER						= net.tourbook.common.Messages.Graph_Label_Altimeter;
+	private static final String	GRAPH_LABEL_ALTITUDE						= net.tourbook.common.Messages.Graph_Label_Altitude;
+	private static final String	GRAPH_LABEL_CADENCE							= net.tourbook.common.Messages.Graph_Label_Cadence;
+	private static final String	GRAPH_LABEL_GEARS							= net.tourbook.common.Messages.Graph_Label_Gears;
+	private static final String	GRAPH_LABEL_GRADIENT						= net.tourbook.common.Messages.Graph_Label_Gradient;
+	private static final String	GRAPH_LABEL_HEARTBEAT						= net.tourbook.common.Messages.Graph_Label_Heartbeat;
+	private static final String	GRAPH_LABEL_PACE							= net.tourbook.common.Messages.Graph_Label_Pace;
+	private static final String	GRAPH_LABEL_POWER							= net.tourbook.common.Messages.Graph_Label_Power;
+	private static final String	GRAPH_LABEL_SPEED							= net.tourbook.common.Messages.Graph_Label_Speed;
+	private static final String	GRAPH_LABEL_TEMPERATURE						= net.tourbook.common.Messages.Graph_Label_Temperature;
+	private static final String	GRAPH_LABEL_TOUR_COMPARE					= net.tourbook.common.Messages.Graph_Label_Tour_Compare;
+	private static final String	GRAPH_LABEL_RUN_DYN_STANCE_TIME				= net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTime;
+	private static final String	GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCED	= net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTime_Balanced;
+	private static final String	GRAPH_LABEL_RUN_DYN_STEP_LENGTH				= net.tourbook.common.Messages.Graph_Label_RunDyn_StepLength;
+	private static final String	GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION	= net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalOscillation;
+	private static final String	GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO			= net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalRatio;
 	//
 	public static final String	ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER		= "ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER";			//$NON-NLS-1$
 	public static final String	ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED	= "ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED";		//$NON-NLS-1$
@@ -169,41 +174,57 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private static final String	GRID_VERTICAL_DISTANCE					= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
 	private static final String	GRID_HORIZONTAL_DISTANCE				= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
 	//
-	static final String		STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE				= "STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE";		//$NON-NLS-1$
-	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER			= "STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER"; 		//$NON-NLS-1$
-	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_CADENCE				= "STATE_IS_SHOW_IN_CHART_TOOLBAR_CADENCE"; 		//$NON-NLS-1$
-	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS				= "STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS"; 			//$NON-NLS-1$
-	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT				= "STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT"; 		//$NON-NLS-1$
-	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE 				= "STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE"; 			//$NON-NLS-1$
-	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER 				= "STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER"; 			//$NON-NLS-1$
-	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE 				= "STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE"; 			//$NON-NLS-1$
-	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED 				= "STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED"; 			//$NON-NLS-1$
-	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE			= "STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE";		//$NON-NLS-1$
+	static final String		STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE							= "STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE";							//$NON-NLS-1$
+	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER						= "STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER"; 							//$NON-NLS-1$
+	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_CADENCE							= "STATE_IS_SHOW_IN_CHART_TOOLBAR_CADENCE"; 							//$NON-NLS-1$
+	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS							= "STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS"; 								//$NON-NLS-1$
+	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT							= "STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT"; 							//$NON-NLS-1$
+	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE 							= "STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE"; 								//$NON-NLS-1$
+	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER 							= "STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER"; 								//$NON-NLS-1$
+	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE 							= "STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE"; 								//$NON-NLS-1$
+	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED 							= "STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED"; 								//$NON-NLS-1$
+	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE						= "STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE";							//$NON-NLS-1$
+	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME				= "STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME";					//$NON-NLS-1$
+	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_BALANCED		= "STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_BALANCED";		//$NON-NLS-1$
+	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STEP_LENGTH				= "STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STEP_LENGTH";					//$NON-NLS-1$
+	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_OSCILLATION		= "STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_OSCILLATION";		//$NON-NLS-1$
+	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_RATIO			= "STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_RATIO";				//$NON-NLS-1$
 	//
-	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE_DEFAULT		= true;
-	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER_DEFAULT	= false;
-	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_CADENCE_DEFAULT 		= false;
-	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS_DEFAULT 		= false;
-	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT_DEFAULT 	= false;
-	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_DEFAULT 		= false;
-	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER_DEFAULT 		= false;
-	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE_DEFAULT 		= true;
-	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_DEFAULT 		= false;
-	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE_DEFAULT 	= false;
+	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE_DEFAULT							= true;
+	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER_DEFAULT						= false;
+	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_CADENCE_DEFAULT 							= false;
+	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS_DEFAULT 							= false;
+	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT_DEFAULT 						= false;
+	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_DEFAULT 							= false;
+	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER_DEFAULT 							= false;
+	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE_DEFAULT 							= true;
+	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_DEFAULT 							= false;
+	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE_DEFAULT 						= false;
+	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_DEFAULT				= false;
+	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_BALANCED_DEFAULT		= false;
+	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STEP_LENGTH_DEFAULT				= true;
+	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_OSCILLATION_DEFAULT		= false;
+	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_RATIO_DEFAULT			= false;
 	//
-	private static final String	GRAPH_CONTRIBUTION_ID_SLIDEOUT			= "GRAPH_CONTRIBUTION_ID_SLIDEOUT";			//$NON-NLS-1$
+	private static final String	GRAPH_CONTRIBUTION_ID_SLIDEOUT						= "GRAPH_CONTRIBUTION_ID_SLIDEOUT";			//$NON-NLS-1$
 	//
-	private static final String GRAPH_CONTRIBUTION_ID_ALTIMETER 		= "GRAPH_CONTRIBUTION_ID_ALTIMETER";		//$NON-NLS-1$
-	private static final String GRAPH_CONTRIBUTION_ID_ALTITUDE			= "GRAPH_CONTRIBUTION_ID_ALTITUDE";			//$NON-NLS-1$
-	private static final String GRAPH_CONTRIBUTION_ID_CADENCE 			= "GRAPH_CONTRIBUTION_ID_CADENCE";			//$NON-NLS-1$
-	private static final String GRAPH_CONTRIBUTION_ID_GEARS 			= "GRAPH_CONTRIBUTION_ID_GEARS";			//$NON-NLS-1$
-	private static final String GRAPH_CONTRIBUTION_ID_GRADIENT 			= "GRAPH_CONTRIBUTION_ID_GRADIENT";			//$NON-NLS-1$
-	private static final String GRAPH_CONTRIBUTION_ID_PACE 				= "GRAPH_CONTRIBUTION_ID_PACE";				//$NON-NLS-1$
-	private static final String GRAPH_CONTRIBUTION_ID_POWER 			= "GRAPH_CONTRIBUTION_ID_POWER";			//$NON-NLS-1$
-	private static final String GRAPH_CONTRIBUTION_ID_PULSE 			= "GRAPH_CONTRIBUTION_ID_PULSE";			//$NON-NLS-1$
-	private static final String GRAPH_CONTRIBUTION_ID_SPEED				= "GRAPH_CONTRIBUTION_ID_SPEED";			//$NON-NLS-1$
-	private static final String GRAPH_CONTRIBUTION_ID_TEMPERATURE 		= "GRAPH_CONTRIBUTION_ID_TEMPERATURE";		//$NON-NLS-1$
-	private static final String GRAPH_CONTRIBUTION_ID_TOUR_COMPARE 		= "GRAPH_CONTRIBUTION_ID_TOUR_COMPARE";		//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_ALTIMETER 					= "GRAPH_CONTRIBUTION_ID_ALTIMETER";		//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_ALTITUDE						= "GRAPH_CONTRIBUTION_ID_ALTITUDE";			//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_CADENCE 						= "GRAPH_CONTRIBUTION_ID_CADENCE";			//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_GEARS 						= "GRAPH_CONTRIBUTION_ID_GEARS";			//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_GRADIENT 						= "GRAPH_CONTRIBUTION_ID_GRADIENT";			//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_PACE 							= "GRAPH_CONTRIBUTION_ID_PACE";				//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_POWER 						= "GRAPH_CONTRIBUTION_ID_POWER";			//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_PULSE 						= "GRAPH_CONTRIBUTION_ID_PULSE";			//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_SPEED							= "GRAPH_CONTRIBUTION_ID_SPEED";			//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_TEMPERATURE 					= "GRAPH_CONTRIBUTION_ID_TEMPERATURE";		//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_TOUR_COMPARE 					= "GRAPH_CONTRIBUTION_ID_TOUR_COMPARE";		//$NON-NLS-1$
+	
+	private static final String GRAPH_CONTRIBUTION_ID_RUN_DYN_STANCE_TIME			= "GRAPH_CONTRIBUTION_ID_RUN_DYN_STANCE_TIME";		//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_RUN_DYN_STANCE_TIME_BALANCED	= "GRAPH_CONTRIBUTION_ID_RUN_DYN_STANCE_TIME_BALANCED";		//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_RUN_DYN_STEP_LENGTH			= "GRAPH_CONTRIBUTION_ID_RUN_DYN_STEP_LENGTH";		//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_RUN_DYN_VERTICAL_OSCILLATION	= "GRAPH_CONTRIBUTION_ID_RUN_DYN_VERTICAL_OSCILLATION";		//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_RUN_DYN_VERTICAL_RATIO		= "GRAPH_CONTRIBUTION_ID_RUN_DYN_VERTICAL_RATIO";		//$NON-NLS-1$
 	
 	private static final String[]	_allGraphContribId									= {
 
@@ -217,6 +238,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			GRAPH_CONTRIBUTION_ID_PULSE,
 			GRAPH_CONTRIBUTION_ID_SPEED,
 			GRAPH_CONTRIBUTION_ID_TEMPERATURE,
+			                                                    
+			GRAPH_CONTRIBUTION_ID_RUN_DYN_STANCE_TIME,
+			GRAPH_CONTRIBUTION_ID_RUN_DYN_STANCE_TIME_BALANCED,
+			GRAPH_CONTRIBUTION_ID_RUN_DYN_STEP_LENGTH,
+			GRAPH_CONTRIBUTION_ID_RUN_DYN_VERTICAL_OSCILLATION,
+			GRAPH_CONTRIBUTION_ID_RUN_DYN_VERTICAL_RATIO,
 	};
 	
 //SET_FORMATTING_ON
@@ -224,9 +251,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	/**
 	 * 1e-5 is too small for the min value, it do not correct the graph.
 	 */
-	public static final double		MIN_ADJUSTMENT										= 1e-3;
+	public static final double		MIN_ADJUSTMENT														= 1e-3;
 
-	public static final double		MAX_ADJUSTMENT										= 1e-5;
+	public static final double		MAX_ADJUSTMENT														= 1e-5;
 	//
 	{}
 	//
@@ -1579,6 +1606,49 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				Messages.Image__graph_tour_compare,
 				Messages.Image__graph_tour_compare_disabled,
 				GRAPH_CONTRIBUTION_ID_TOUR_COMPARE);
+
+		/*
+		 * Running dynamics
+		 */
+		createActions_12_GraphAction(
+				TourManager.GRAPH_RUN_DYN_STANCE_TIME,
+				GRAPH_LABEL_RUN_DYN_STANCE_TIME,
+				Messages.Tour_Action_RunDyn_StanceTime_Tooltip,
+				Messages.Image__Graph_RunDyn_StanceTime,
+				Messages.Image__Graph_RunDyn_StanceTime_Disabled,
+				GRAPH_CONTRIBUTION_ID_RUN_DYN_STANCE_TIME);
+
+		createActions_12_GraphAction(
+				TourManager.GRAPH_RUN_DYN_STANCE_TIME_BALANCED,
+				GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCED,
+				Messages.Tour_Action_RunDyn_StanceTimeBalanced_Tooltip,
+				Messages.Image__Graph_RunDyn_StanceTimeBalanced,
+				Messages.Image__Graph_RunDyn_StanceTimeBalanced_Disabled,
+				GRAPH_CONTRIBUTION_ID_RUN_DYN_STANCE_TIME_BALANCED);
+
+		createActions_12_GraphAction(
+				TourManager.GRAPH_RUN_DYN_STEP_LENGTH,
+				GRAPH_LABEL_RUN_DYN_STEP_LENGTH,
+				Messages.Tour_Action_RunDyn_StepLength_Tooltip,
+				Messages.Image__Graph_RunDyn_StepLength,
+				Messages.Image__Graph_RunDyn_StepLength_Disabled,
+				GRAPH_CONTRIBUTION_ID_RUN_DYN_STEP_LENGTH);
+
+		createActions_12_GraphAction(
+				TourManager.GRAPH_RUN_DYN_VERTICAL_OSCILLATION,
+				GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION,
+				Messages.Tour_Action_RunDyn_VerticalOscillation_Tooltip,
+				Messages.Image__Graph_RunDyn_VerticalOscillation,
+				Messages.Image__Graph_RunDyn_VerticalOscillation_Disabled,
+				GRAPH_CONTRIBUTION_ID_RUN_DYN_VERTICAL_OSCILLATION);
+
+		createActions_12_GraphAction(
+				TourManager.GRAPH_RUN_DYN_VERTICAL_RATIO,
+				GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO,
+				Messages.Tour_Action_RunDyn_VerticalRatio_Tooltip,
+				Messages.Image__Graph_RunDyn_VerticalRatio,
+				Messages.Image__Graph_RunDyn_VerticalRatio_Disabled,
+				GRAPH_CONTRIBUTION_ID_RUN_DYN_VERTICAL_RATIO);
 	}
 
 	/**
@@ -2729,6 +2799,40 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				TourManager.GRAPH_GEARS,
 				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS,
 				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS_DEFAULT);
+
+		/*
+		 * Running dynamics
+		 */
+
+		fillToolbar_Graphs_Graph(
+				tbm,
+				TourManager.GRAPH_RUN_DYN_STANCE_TIME,
+				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME,
+				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_DEFAULT);
+
+		fillToolbar_Graphs_Graph(
+				tbm,
+				TourManager.GRAPH_RUN_DYN_STANCE_TIME_BALANCED,
+				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_BALANCED,
+				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_BALANCED_DEFAULT);
+
+		fillToolbar_Graphs_Graph(
+				tbm,
+				TourManager.GRAPH_RUN_DYN_STEP_LENGTH,
+				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STEP_LENGTH,
+				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STEP_LENGTH_DEFAULT);
+
+		fillToolbar_Graphs_Graph(
+				tbm,
+				TourManager.GRAPH_RUN_DYN_VERTICAL_OSCILLATION,
+				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_OSCILLATION,
+				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_OSCILLATION_DEFAULT);
+
+		fillToolbar_Graphs_Graph(
+				tbm,
+				TourManager.GRAPH_RUN_DYN_VERTICAL_RATIO,
+				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_RATIO,
+				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_RATIO_DEFAULT);
 	}
 
 	private void fillToolbar_Graphs_Graph(	final IToolBarManager tbm,

@@ -853,6 +853,16 @@ public class Messages extends NLS {
 	public static String		Image__Graph_Gears;
 	public static String		Image__Graph_Gears_disabled;
 	public static String		Image__Graph_Overlapped;
+	public static String		Image__Graph_RunDyn_StanceTime;
+	public static String		Image__Graph_RunDyn_StanceTime_Disabled;
+	public static String		Image__Graph_RunDyn_StanceTimeBalanced;
+	public static String		Image__Graph_RunDyn_StanceTimeBalanced_Disabled;
+	public static String		Image__Graph_RunDyn_StepLength;
+	public static String		Image__Graph_RunDyn_StepLength_Disabled;
+	public static String		Image__Graph_RunDyn_VerticalOscillation;
+	public static String		Image__Graph_RunDyn_VerticalOscillation_Disabled;
+	public static String		Image__Graph_RunDyn_VerticalRatio;
+	public static String		Image__Graph_RunDyn_VerticalRatio_Disabled;
 	public static String		Image__GraphMinMax;
 	public static String		Image__GraphMinMax_Disabled;
 	public static String		Image__graph_pace_disabled;
@@ -2034,6 +2044,11 @@ public class Messages extends NLS {
 	public static String		Tour_Action_MultiplyCaloriesBy1000_Apply;
 	public static String		Tour_Action_MultiplyCaloriesBy1000_Message;
 	public static String		Tour_Action_MultiplyCaloriesBy1000_Title;
+	public static String		Tour_Action_RunDyn_StanceTime_Tooltip;
+	public static String		Tour_Action_RunDyn_StanceTimeBalanced_Tooltip;
+	public static String		Tour_Action_RunDyn_StepLength_Tooltip;
+	public static String		Tour_Action_RunDyn_VerticalOscillation_Tooltip;
+	public static String		Tour_Action_RunDyn_VerticalRatio_Tooltip;
 	public static String		Tour_Action_scroll_zoomed_chart;
 	public static String		Tour_Action_show_distance_on_x_axis;
 	public static String		Tour_Action_show_distance_on_x_axis_tooltip;
