@@ -1397,6 +1397,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		int sumPower = 0;
 		int sumSpeed = 0;
 
+		int sumRunDyn_StanceTime = 0;
+		int sumRunDyn_StanceTime_Balance = 0;
+		int sumRunDyn_StepLength = 0;
+		int sumRunDyn_Vertical_Oscillation = 0;
+		int sumRunDyn_Vertical_Ratio = 0;
+
 		double mapMinLatitude = 0;
 		double mapMaxLatitude = 0;
 		double mapMinLongitude = 0;
@@ -1453,6 +1459,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			}
 			if (speedSerie != null) {
 				sumSpeed += speedSerie[serieIndex];
+			}
+
+			if (runDyn_StanceTime != null && sumRunDyn_StanceTime == 0) {
+				sumRunDyn_StanceTime += runDyn_StanceTime[serieIndex];
+			}
+			if (runDyn_StanceTime_Balance != null && sumRunDyn_StanceTime_Balance == 0) {
+				sumRunDyn_StanceTime_Balance += runDyn_StanceTime_Balance[serieIndex];
+			}
+			if (runDyn_StepLength != null && sumRunDyn_StepLength == 0) {
+				sumRunDyn_StepLength += runDyn_StepLength[serieIndex];
+			}
+			if (runDyn_Vertical_Oscillation != null && sumRunDyn_Vertical_Oscillation == 0) {
+				sumRunDyn_Vertical_Oscillation += runDyn_Vertical_Oscillation[serieIndex];
+			}
+			if (runDyn_Vertical_Ratio != null && sumRunDyn_Vertical_Ratio == 0) {
+				sumRunDyn_Vertical_Ratio += runDyn_Vertical_Ratio[serieIndex];
 			}
 
 			if (isGPS) {
@@ -1532,6 +1554,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			longitudeSerie = null;
 			_rasterizedLatLon = null;
 			geoGrid = null;
+		}
+
+		if (sumRunDyn_StanceTime == 0) {
+			runDyn_StanceTime = null;
+		}
+		if (sumRunDyn_StanceTime_Balance == 0) {
+			runDyn_StanceTime_Balance = null;
+		}
+		if (sumRunDyn_StepLength == 0) {
+			runDyn_StepLength = null;
+		}
+		if (sumRunDyn_Vertical_Oscillation == 0) {
+			runDyn_Vertical_Oscillation = null;
+		}
+		if (sumRunDyn_Vertical_Ratio == 0) {
+			runDyn_Vertical_Ratio = null;
 		}
 	}
 
@@ -4489,6 +4527,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		final boolean isPower = setupStartingValues_Power(timeDataSerie);
 		final boolean isPulse = setupStartingValues_Pulse(timeDataSerie);
 		final boolean isTemperature = setupStartingValues_Temperature(timeDataSerie);
+		final boolean isRunDyn_StanceTime = setupStartingValues_RunDyn_StanceTime(timeDataSerie);
+		final boolean isRunDyn_StanceTime_Balance = setupStartingValues_RunDyn_StanceTime_Balance(timeDataSerie);
+		final boolean isRunDyn_StepLength = setupStartingValues_RunDyn_StepLength(timeDataSerie);
+		final boolean isRunDyn_Vertical_Oscillation = setupStartingValues_RunDyn_Vertical_Oscillation(timeDataSerie);
+		final boolean isRunDyn_Vertical_Ratio = setupStartingValues_RunDyn_Vertical_Ratio(timeDataSerie);
 
 		/*
 		 * Speed
@@ -4662,6 +4705,30 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 					// speed is not interpolated, ensure to set valid values
 					final float tdSpeed = timeData.speed;
 					speedSerie[serieIndex] = tdSpeed == Float.MIN_VALUE ? 0 : tdSpeed;
+				}
+
+				/*
+				 * Running Dynamics
+				 */
+				if (isRunDyn_StanceTime) {
+					final short tdValue = timeData.runDyn_StanceTime;
+					runDyn_StanceTime[serieIndex] = tdValue == Short.MIN_VALUE ? 0 : tdValue;
+				}
+				if (isRunDyn_StanceTime_Balance) {
+					final short tdValue = timeData.runDyn_StanceTime_Balance;
+					runDyn_StanceTime_Balance[serieIndex] = tdValue == Short.MIN_VALUE ? 0 : tdValue;
+				}
+				if (isRunDyn_StepLength) {
+					final short tdValue = timeData.runDyn_StepLength;
+					runDyn_StepLength[serieIndex] = tdValue == Short.MIN_VALUE ? 0 : tdValue;
+				}
+				if (isRunDyn_Vertical_Oscillation) {
+					final short tdValue = timeData.runDyn_Vertical_Oscillation;
+					runDyn_Vertical_Oscillation[serieIndex] = tdValue == Short.MIN_VALUE ? 0 : tdValue;
+				}
+				if (isRunDyn_Vertical_Ratio) {
+					final short tdValue = timeData.runDyn_Vertical_Ratio;
+					runDyn_Vertical_Ratio[serieIndex] = tdValue == Short.MIN_VALUE ? 0 : tdValue;
 				}
 			}
 
@@ -8186,6 +8253,206 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			// pulse values are available
 
 			pulseSerie = new float[serieSize];
+			isAvailable = true;
+		}
+
+		return isAvailable;
+	}
+
+	private boolean setupStartingValues_RunDyn_StanceTime(final TimeData[] timeDataSerie) {
+
+		final TimeData firstTimeData = timeDataSerie[0];
+		final int serieSize = timeDataSerie.length;
+
+		boolean isAvailable = false;
+
+		if (firstTimeData.runDyn_StanceTime == Short.MIN_VALUE) {
+
+			// search for first valid value
+
+			for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
+
+				final short value = timeDataSerie[timeDataIndex].runDyn_StanceTime;
+
+				if (value != Short.MIN_VALUE) {
+
+					// data are available, starting values are set to first valid value
+
+					runDyn_StanceTime = new short[serieSize];
+					isAvailable = true;
+
+					for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
+						timeDataSerie[invalidIndex].runDyn_StanceTime = value;
+					}
+					break;
+				}
+			}
+
+		} else {
+
+			// data are available
+
+			runDyn_StanceTime = new short[serieSize];
+			isAvailable = true;
+		}
+
+		return isAvailable;
+	}
+
+	private boolean setupStartingValues_RunDyn_StanceTime_Balance(final TimeData[] timeDataSerie) {
+
+		final TimeData firstTimeData = timeDataSerie[0];
+		final int serieSize = timeDataSerie.length;
+
+		boolean isAvailable = false;
+
+		if (firstTimeData.runDyn_StanceTime_Balance == Short.MIN_VALUE) {
+
+			// search for first valid value
+
+			for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
+
+				final short value = timeDataSerie[timeDataIndex].runDyn_StanceTime_Balance;
+
+				if (value != Short.MIN_VALUE) {
+
+					// data are available, starting values are set to first valid value
+
+					runDyn_StanceTime_Balance = new short[serieSize];
+					isAvailable = true;
+
+					for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
+						timeDataSerie[invalidIndex].runDyn_StanceTime_Balance = value;
+					}
+					break;
+				}
+			}
+
+		} else {
+
+			// data are available
+
+			runDyn_StanceTime_Balance = new short[serieSize];
+			isAvailable = true;
+		}
+
+		return isAvailable;
+	}
+
+	private boolean setupStartingValues_RunDyn_StepLength(final TimeData[] timeDataSerie) {
+
+		final TimeData firstTimeData = timeDataSerie[0];
+		final int serieSize = timeDataSerie.length;
+
+		boolean isAvailable = false;
+
+		if (firstTimeData.runDyn_StepLength == Short.MIN_VALUE) {
+
+			// search for first valid value
+
+			for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
+
+				final short value = timeDataSerie[timeDataIndex].runDyn_StepLength;
+
+				if (value != Short.MIN_VALUE) {
+
+					// data are available, starting values are set to first valid value
+
+					runDyn_StepLength = new short[serieSize];
+					isAvailable = true;
+
+					for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
+						timeDataSerie[invalidIndex].runDyn_StepLength = value;
+					}
+					break;
+				}
+			}
+
+		} else {
+
+			// data are available
+
+			runDyn_StepLength = new short[serieSize];
+			isAvailable = true;
+		}
+
+		return isAvailable;
+	}
+
+	private boolean setupStartingValues_RunDyn_Vertical_Oscillation(final TimeData[] timeDataSerie) {
+
+		final TimeData firstTimeData = timeDataSerie[0];
+		final int serieSize = timeDataSerie.length;
+
+		boolean isAvailable = false;
+
+		if (firstTimeData.runDyn_Vertical_Oscillation == Short.MIN_VALUE) {
+
+			// search for first valid value
+
+			for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
+
+				final short value = timeDataSerie[timeDataIndex].runDyn_Vertical_Oscillation;
+
+				if (value != Short.MIN_VALUE) {
+
+					// data are available, starting values are set to first valid value
+
+					runDyn_Vertical_Oscillation = new short[serieSize];
+					isAvailable = true;
+
+					for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
+						timeDataSerie[invalidIndex].runDyn_Vertical_Oscillation = value;
+					}
+					break;
+				}
+			}
+
+		} else {
+
+			// data are available
+
+			runDyn_Vertical_Oscillation = new short[serieSize];
+			isAvailable = true;
+		}
+
+		return isAvailable;
+	}
+
+	private boolean setupStartingValues_RunDyn_Vertical_Ratio(final TimeData[] timeDataSerie) {
+
+		final TimeData firstTimeData = timeDataSerie[0];
+		final int serieSize = timeDataSerie.length;
+
+		boolean isAvailable = false;
+
+		if (firstTimeData.runDyn_Vertical_Ratio == Short.MIN_VALUE) {
+
+			// search for first valid value
+
+			for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
+
+				final short value = timeDataSerie[timeDataIndex].runDyn_Vertical_Ratio;
+
+				if (value != Short.MIN_VALUE) {
+
+					// data are available, starting values are set to first valid value
+
+					runDyn_Vertical_Ratio = new short[serieSize];
+					isAvailable = true;
+
+					for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
+						timeDataSerie[invalidIndex].runDyn_Vertical_Ratio = value;
+					}
+					break;
+				}
+			}
+
+		} else {
+
+			// data are available
+
+			runDyn_Vertical_Ratio = new short[serieSize];
 			isAvailable = true;
 		}
 
