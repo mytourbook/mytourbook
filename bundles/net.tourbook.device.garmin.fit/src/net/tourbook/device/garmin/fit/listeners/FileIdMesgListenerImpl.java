@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,13 +17,13 @@ package net.tourbook.device.garmin.fit.listeners;
 
 import net.tourbook.device.garmin.fit.FitContext;
 import net.tourbook.device.garmin.fit.FitDataReaderException;
-import net.tourbook.device.garmin.fit.types.GarminProduct;
-import net.tourbook.device.garmin.fit.types.Manufacturer;
 import net.tourbook.tour.TourLogManager;
 
 import com.garmin.fit.File;
 import com.garmin.fit.FileIdMesg;
 import com.garmin.fit.FileIdMesgListener;
+import com.garmin.fit.GarminProduct;
+import com.garmin.fit.Manufacturer;
 
 public class FileIdMesgListenerImpl extends AbstractMesgListener implements FileIdMesgListener {
 
@@ -59,26 +59,30 @@ public class FileIdMesgListenerImpl extends AbstractMesgListener implements File
 		/*
 		 * Manufacturer
 		 */
-		final Integer manufacturer = mesg.getManufacturer();
-		if (manufacturer != null) {
-			final Manufacturer manufacturerEnum = Manufacturer.valueOf(manufacturer);
-			if (manufacturerEnum != null) {
-				context.setManufacturer(manufacturerEnum.name());
+		final Integer manufacturerId = mesg.getManufacturer();
+		if (manufacturerId != null) {
+
+			final String manufacturerText = Manufacturer.getStringFromValue(manufacturerId);
+
+			if (manufacturerText.length() > 0) {
+				context.setManufacturer(manufacturerText);
 			} else {
-				context.setManufacturer(manufacturer.toString());
+				context.setManufacturer(manufacturerId.toString());
 			}
 		}
 
 		/*
 		 * Product
 		 */
-		final Integer garminProduct = mesg.getGarminProduct();
-		if (garminProduct != null) {
-			final GarminProduct garminProductEnum = GarminProduct.valueOf(garminProduct);
-			if (garminProductEnum != null) {
-				context.setGarminProduct(garminProductEnum.name());
+		final Integer garminProductId = mesg.getGarminProduct();
+		if (garminProductId != null) {
+
+			final String garminProductName = GarminProduct.getStringFromValue(garminProductId);
+
+			if (garminProductName.length() > 0) {
+				context.setGarminProduct(garminProductName);
 			} else {
-				context.setGarminProduct(garminProduct.toString());
+				context.setGarminProduct(garminProductId.toString());
 			}
 		}
 	}
