@@ -66,6 +66,12 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
 	private Button					_chkShowInChartToolbar_Tempterature;
 	private Button					_chkShowInChartToolbar_Speed;
 
+	private Button					_chkShowInChartToolbar_RunDyn_StanceTime;
+	private Button					_chkShowInChartToolbar_RunDyn_StanceTime_Balanced;
+	private Button					_chkShowInChartToolbar_RunDyn_StepLength;
+	private Button					_chkShowInChartToolbar_RunDyn_VerticalOscillation;
+	private Button					_chkShowInChartToolbar_RunDyn_VerticalRatio;
+
 	public SlideoutTourChartGraphs(	final Control ownerControl,
 									final ToolBar toolBar,
 									final TourChart tourChart,
@@ -169,7 +175,7 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(10).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(15).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
 
@@ -188,6 +194,12 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
 					createUI_GraphAction(container, TourManager.GRAPH_ALTIMETER);
 					createUI_GraphAction(container, TourManager.GRAPH_CADENCE);
 					createUI_GraphAction(container, TourManager.GRAPH_GEARS);
+
+					createUI_GraphAction(container, TourManager.GRAPH_RUN_DYN_STANCE_TIME);
+					createUI_GraphAction(container, TourManager.GRAPH_RUN_DYN_STANCE_TIME_BALANCED);
+					createUI_GraphAction(container, TourManager.GRAPH_RUN_DYN_STEP_LENGTH);
+					createUI_GraphAction(container, TourManager.GRAPH_RUN_DYN_VERTICAL_OSCILLATION);
+					createUI_GraphAction(container, TourManager.GRAPH_RUN_DYN_VERTICAL_RATIO);
 				}
 				{
 					/*
@@ -203,6 +215,12 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
 					_chkShowInChartToolbar_Altimeter = createUI_GraphCheckbox(container);
 					_chkShowInChartToolbar_Cadence = createUI_GraphCheckbox(container);
 					_chkShowInChartToolbar_Gears = createUI_GraphCheckbox(container);
+
+					_chkShowInChartToolbar_RunDyn_StanceTime = createUI_GraphCheckbox(container);
+					_chkShowInChartToolbar_RunDyn_StanceTime_Balanced = createUI_GraphCheckbox(container);
+					_chkShowInChartToolbar_RunDyn_StepLength = createUI_GraphCheckbox(container);
+					_chkShowInChartToolbar_RunDyn_VerticalOscillation = createUI_GraphCheckbox(container);
+					_chkShowInChartToolbar_RunDyn_VerticalRatio = createUI_GraphCheckbox(container);
 				}
 			}
 		}
@@ -266,16 +284,22 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
 
 // SET_FORMATTING_OFF
 		
-		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE, 		TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE_DEFAULT);
-		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER, 		TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER_DEFAULT);
-		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_CADENCE, 		TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_CADENCE_DEFAULT);
-		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS, 			TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS_DEFAULT);
-		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT, 		TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT_DEFAULT);
-		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE, 			TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_DEFAULT);
-		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER, 			TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER_DEFAULT);
-		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE, 			TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE_DEFAULT);
-		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED, 			TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_DEFAULT);
-		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE,	TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE_DEFAULT);
+		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE, 						TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE_DEFAULT);
+		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER, 						TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER_DEFAULT);
+		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_CADENCE, 						TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_CADENCE_DEFAULT);
+		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS, 							TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS_DEFAULT);
+		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT, 						TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT_DEFAULT);
+		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE, 							TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_DEFAULT);
+		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER, 							TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER_DEFAULT);
+		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE, 							TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE_DEFAULT);
+		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED, 							TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_DEFAULT);
+		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE,					TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE_DEFAULT);
+		
+		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME, 			TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_DEFAULT);
+		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_BALANCED, 	TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_BALANCED_DEFAULT);
+		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STEP_LENGTH, 			TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STEP_LENGTH_DEFAULT);
+		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_OSCILLATION, 	TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_OSCILLATION_DEFAULT);
+		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_RATIO, 		TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_RATIO_DEFAULT);
 		
 // SET_FORMATTING_ON
 
@@ -290,16 +314,22 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
 
 // SET_FORMATTING_OFF
 		
-		_chkShowInChartToolbar_Altitude.setSelection(		Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE,		TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE_DEFAULT));
-		_chkShowInChartToolbar_Altimeter.setSelection(		Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER,	TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER_DEFAULT));
-		_chkShowInChartToolbar_Cadence.setSelection(		Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_CADENCE,		TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_CADENCE_DEFAULT));
-		_chkShowInChartToolbar_Gears.setSelection(			Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS,		TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS_DEFAULT));
-		_chkShowInChartToolbar_Gradient.setSelection(		Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT,		TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT_DEFAULT));
-		_chkShowInChartToolbar_Pace.setSelection(			Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE,			TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_DEFAULT));
-		_chkShowInChartToolbar_Power.setSelection(			Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER,		TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER_DEFAULT));
-		_chkShowInChartToolbar_Pulse.setSelection(			Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE,		TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE_DEFAULT));
-		_chkShowInChartToolbar_Speed.setSelection(			Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED,		TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_DEFAULT));
-		_chkShowInChartToolbar_Tempterature.setSelection(	Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE,	TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE_DEFAULT));
+		_chkShowInChartToolbar_Altitude.setSelection(					Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE,		TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE_DEFAULT));
+		_chkShowInChartToolbar_Altimeter.setSelection(					Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER,	TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER_DEFAULT));
+		_chkShowInChartToolbar_Cadence.setSelection(					Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_CADENCE,		TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_CADENCE_DEFAULT));
+		_chkShowInChartToolbar_Gears.setSelection(						Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS,		TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS_DEFAULT));
+		_chkShowInChartToolbar_Gradient.setSelection(					Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT,		TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT_DEFAULT));
+		_chkShowInChartToolbar_Pace.setSelection(						Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE,			TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_DEFAULT));
+		_chkShowInChartToolbar_Power.setSelection(						Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER,		TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER_DEFAULT));
+		_chkShowInChartToolbar_Pulse.setSelection(						Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE,		TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE_DEFAULT));
+		_chkShowInChartToolbar_Speed.setSelection(						Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED,		TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_DEFAULT));
+		_chkShowInChartToolbar_Tempterature.setSelection(				Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE,	TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE_DEFAULT));
+		
+		_chkShowInChartToolbar_RunDyn_StanceTime.setSelection(			Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME,				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_DEFAULT));
+		_chkShowInChartToolbar_RunDyn_StanceTime_Balanced.setSelection(	Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_BALANCED, 	TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_BALANCED_DEFAULT));
+		_chkShowInChartToolbar_RunDyn_StepLength.setSelection(			Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STEP_LENGTH, 				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STEP_LENGTH_DEFAULT));
+		_chkShowInChartToolbar_RunDyn_VerticalOscillation.setSelection(	Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_OSCILLATION, 	TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_OSCILLATION_DEFAULT));
+		_chkShowInChartToolbar_RunDyn_VerticalRatio.setSelection(		Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_RATIO, 			TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_RATIO_DEFAULT));
 		
 // SET_FORMATTING_ON
 	}
@@ -308,16 +338,22 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
 
 // SET_FORMATTING_OFF
 		
-		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE, 		_chkShowInChartToolbar_Altitude.getSelection());
-		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER, 		_chkShowInChartToolbar_Altimeter.getSelection());
-		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_CADENCE, 		_chkShowInChartToolbar_Cadence.getSelection());
-		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS, 			_chkShowInChartToolbar_Gears.getSelection());
-		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT, 		_chkShowInChartToolbar_Gradient.getSelection());
-		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE, 			_chkShowInChartToolbar_Pace.getSelection());
-		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER, 			_chkShowInChartToolbar_Power.getSelection());
-		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE, 			_chkShowInChartToolbar_Pulse.getSelection());
-		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED, 			_chkShowInChartToolbar_Speed.getSelection());
-		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE,	_chkShowInChartToolbar_Tempterature.getSelection());
+		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE, 						_chkShowInChartToolbar_Altitude.getSelection());
+		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER, 						_chkShowInChartToolbar_Altimeter.getSelection());
+		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_CADENCE, 						_chkShowInChartToolbar_Cadence.getSelection());
+		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS, 							_chkShowInChartToolbar_Gears.getSelection());
+		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT, 						_chkShowInChartToolbar_Gradient.getSelection());
+		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE, 							_chkShowInChartToolbar_Pace.getSelection());
+		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER, 							_chkShowInChartToolbar_Power.getSelection());
+		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE, 							_chkShowInChartToolbar_Pulse.getSelection());
+		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED, 							_chkShowInChartToolbar_Speed.getSelection());
+		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE,					_chkShowInChartToolbar_Tempterature.getSelection());
+		
+		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME, 			_chkShowInChartToolbar_RunDyn_StanceTime.getSelection());
+		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_BALANCED, 	_chkShowInChartToolbar_RunDyn_StanceTime_Balanced.getSelection());
+		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STEP_LENGTH, 			_chkShowInChartToolbar_RunDyn_StepLength.getSelection());
+		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_OSCILLATION, 	_chkShowInChartToolbar_RunDyn_VerticalOscillation.getSelection());
+		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_RATIO, 		_chkShowInChartToolbar_RunDyn_VerticalRatio.getSelection());
 		
 // SET_FORMATTING_ON
 	}

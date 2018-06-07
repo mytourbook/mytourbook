@@ -1189,6 +1189,7 @@ public class UI {
 
 			net.tourbook.common.UI.UNIT_LABEL_DISTANCE = net.tourbook.common.UI.UNIT_DISTANCE_KM;
 			net.tourbook.common.UI.UNIT_LABEL_DISTANCE_SMALL = net.tourbook.common.UI.UNIT_METER;
+			net.tourbook.common.UI.UNIT_LABEL_DISTANCE_MM = net.tourbook.common.UI.UNIT_DISTANCE_MM;
 
 			net.tourbook.common.UI.UNIT_LABEL_SPEED = net.tourbook.common.UI.UNIT_SPEED_KM_H;
 			net.tourbook.common.UI.UNIT_LABEL_PACE = net.tourbook.common.UI.UNIT_PACE_MIN_P_KM;

@@ -1362,19 +1362,21 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * @since Version 18.7
 	 */
 	@Transient
-	private short[]					runDyn_StanceTime;
+	public short[]					runDyn_StanceTime;
+
+	@Transient
+	public short[]					runDyn_StanceTime_Balance;
 	
 	@Transient
-	private short[]					runDyn_StanceTime_Balance;
+	public short[]					runDyn_StepLength;
+	@Transient
+	private float[]					_runDyn_StepLength_UI;
 	
 	@Transient
-	private short[]					runDyn_StepLength;
+	public short[]					runDyn_Vertical_Ratio;
 	
 	@Transient
-	private short[]					runDyn_Vertical_Ratio;
-	
-	@Transient
-	private short[]					runDyn_Vertical_Oscillation;
+	public short[]					runDyn_Vertical_Oscillation;
 
 // SET_FORMATTING_ON
 
@@ -1621,6 +1623,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		altitudeSerieImperialSmoothed = null;
 
 		cadenceSerieWithMultiplier = null;
+
+		_runDyn_StepLength_UI = null;
 
 		srtmSerie = null;
 		srtmSerieImperial = null;
@@ -6298,6 +6302,27 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	public int getRestPulse() {
 		return restPulse;
+	}
+
+	public float[] getRunDyn_StepLength() {
+
+		if (_runDyn_StepLength_UI == null) {
+
+			if (runDyn_StepLength != null) {
+
+				// create UI data serie
+
+				final int serieSize = runDyn_StepLength.length;
+
+				_runDyn_StepLength_UI = new float[serieSize];
+
+				for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
+					_runDyn_StepLength_UI[serieIndex] = runDyn_StepLength[serieIndex];
+				}
+			}
+		}
+
+		return _runDyn_StepLength_UI;
 	}
 
 	/**

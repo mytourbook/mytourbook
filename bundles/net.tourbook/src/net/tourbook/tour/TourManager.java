@@ -24,7 +24,6 @@ import java.util.Comparator;
 import java.util.Formatter;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -144,6 +143,7 @@ public class TourManager {
 	public static final String	CUSTOM_DATA_SEGMENT_VALUES						= "segmentValues";					//$NON-NLS-1$
 	public static final String	CUSTOM_DATA_ANALYZER_INFO						= "analyzerInfo";					//$NON-NLS-1$
 	public static final String	CUSTOM_DATA_CONCONI_TEST						= "CUSTOM_DATA_CONCONI_TEST";		//$NON-NLS-1$
+	public static final String	CUSTOM_DATA_RUN_DYN_STEP_LENGTH					= "runDyn_StepLength";				//$NON-NLS-1$
 	//
 	public static final String	X_AXIS_TIME										= "time";							//$NON-NLS-1$
 	public static final String	X_AXIS_DISTANCE									= "distance";						//$NON-NLS-1$
@@ -222,7 +222,7 @@ public class TourManager {
 	private static final ListenerList		_tourEventListeners	= new ListenerList(ListenerList.IDENTITY);
 	private static final ListenerList		_tourSaveListeners	= new ListenerList(ListenerList.IDENTITY);
 	//
-	private static AtomicInteger			_tourCopyCounter	= new AtomicInteger();
+//	private static AtomicInteger			_tourCopyCounter	= new AtomicInteger();
 	//
 	private ComputeChartValue				_computeAvg_Altimeter;
 	private ComputeChartValue				_computeAvg_Cadence;
@@ -2907,7 +2907,7 @@ public class TourManager {
 			setGraphColor(yDataPulse, GraphColorManager.PREF_GRAPH_HEARTBEAT);
 			chartDataModel.addXyData(yDataPulse);
 
-			// adjust pulse min/max values when it's defined in the pref store
+			// adjust  min/max values when it's defined in the pref store
 			setVisibleForcedValues(
 					yDataPulse,
 					1,
@@ -2945,7 +2945,7 @@ public class TourManager {
 			setGraphColor(yDataSpeed, GraphColorManager.PREF_GRAPH_SPEED);
 			chartDataModel.addXyData(yDataSpeed);
 
-			// adjust pulse min/max values when it's defined in the pref store
+			// adjust  min/max values when it's defined in the pref store
 			setVisibleForcedValues(
 					yDataSpeed,
 					1,
@@ -2984,7 +2984,7 @@ public class TourManager {
 			setGraphColor(yDataPace, GraphColorManager.PREF_GRAPH_PACE);
 			chartDataModel.addXyData(yDataPace);
 
-			// adjust pulse min/max values when it's defined in the pref store
+			// adjust min/max values when it's defined in the pref store
 			setVisibleForcedValues(
 					yDataPace,
 					60,
@@ -3021,7 +3021,7 @@ public class TourManager {
 			setGraphColor(yDataPower, GraphColorManager.PREF_GRAPH_POWER);
 			chartDataModel.addXyData(yDataPower);
 
-			// adjust pulse min/max values when it's defined in the pref store
+			// adjust min/max values when it's defined in the pref store
 			setVisibleForcedValues(
 					yDataPower,
 					1,
@@ -3080,7 +3080,7 @@ public class TourManager {
 								: maxValue + maxAdjust);
 			}
 
-			// adjust pulse min/max values when it's defined in the pref store
+			// adjust min/max values when it's defined in the pref store
 			setVisibleForcedValues(
 					yDataAltimeter,
 					1,
@@ -3092,7 +3092,7 @@ public class TourManager {
 		}
 
 		/*
-		 * gradient
+		 * Gradient
 		 */
 		final float[] gradientSerie = tourData.gradientSerie;
 		ChartDataYSerie yDataGradient = null;
@@ -3118,7 +3118,7 @@ public class TourManager {
 			setGraphColor(yDataGradient, GraphColorManager.PREF_GRAPH_GRADIENT);
 			chartDataModel.addXyData(yDataGradient);
 
-			// adjust pulse min/max values when it's defined in the pref store
+			// adjust min/max values when it's defined in the pref store
 			setVisibleForcedValues(
 					yDataGradient,
 					1,
@@ -3178,7 +3178,7 @@ public class TourManager {
 			setGraphColor(yDataCadence, GraphColorManager.PREF_GRAPH_CADENCE);
 			chartDataModel.addXyData(yDataCadence);
 
-			// adjust pulse min/max values when it's defined in the pref store
+			// adjust min/max values when it's defined in the pref store
 			setVisibleForcedValues(
 					yDataCadence,
 					1,
@@ -3219,7 +3219,7 @@ public class TourManager {
 		}
 
 		/*
-		 * temperature
+		 * Temperature
 		 */
 		final float[] temperatureSerie = tourData.getTemperatureSerie();
 		ChartDataYSerie yDataTemperature = null;
@@ -3243,7 +3243,7 @@ public class TourManager {
 			setGraphColor(yDataTemperature, GraphColorManager.PREF_GRAPH_TEMPTERATURE);
 			chartDataModel.addXyData(yDataTemperature);
 
-			// adjust pulse min/max values when it's defined in the pref store
+			// adjust min/max values when it's defined in the pref store
 			setVisibleForcedValues(
 					yDataTemperature,
 					1,
@@ -3252,6 +3252,41 @@ public class TourManager {
 					ITourbookPreferences.GRAPH_TEMPERATURE_IS_MAX_ENABLED,
 					ITourbookPreferences.GRAPH_TEMPERATURE_MIN_VALUE,
 					ITourbookPreferences.GRAPH_TEMPERATURE_MAX_VALUE);
+		}
+
+		/*
+		 * Running Dynamics: Step length
+		 */
+		final float[] runDyn_StepLength_Serie = tourData.getRunDyn_StepLength();
+		ChartDataYSerie yData_RunDyn_StepLength = null;
+		if (runDyn_StepLength_Serie != null) {
+
+			yData_RunDyn_StepLength = createChartDataSerie(runDyn_StepLength_Serie, chartType);
+
+			yData_RunDyn_StepLength.setYTitle(GRAPH_LABEL_RUN_DYN_STEP_LENGTH);
+			yData_RunDyn_StepLength.setUnitLabel(UI.UNIT_LABEL_DISTANCE_MM);
+			yData_RunDyn_StepLength.setShowYSlider(true);
+//			yData_RunDyn_StepLength.setDisplayedFractionalDigits(1);
+			yData_RunDyn_StepLength.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_RUN_DYN_STEP_LENGTH);
+
+			if (isHrZoneDisplayed) {
+				yData_RunDyn_StepLength.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
+			} else {
+				yData_RunDyn_StepLength.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_ZERO);
+			}
+
+			setGraphColor(yData_RunDyn_StepLength, GraphColorManager.PREF_GRAPH_GRADIENT);
+			chartDataModel.addXyData(yData_RunDyn_StepLength);
+
+			// adjust min/max values when it's defined in the pref store
+//			setVisibleForcedValues(
+//					yData_RunDyn_StepLength,
+//					1,
+//					TourChart.MAX_ADJUSTMENT,
+//					ITourbookPreferences.GRAPH_GRADIENT_IS_MIN_ENABLED,
+//					ITourbookPreferences.GRAPH_GRADIENT_IS_MAX_ENABLED,
+//					ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
+//					ITourbookPreferences.GRAPH_GRADIENT_MAX_VALUE);
 		}
 
 		/*
@@ -3355,6 +3390,13 @@ public class TourManager {
 			case GRAPH_TOUR_COMPARE:
 				if (yDataTourCompare != null) {
 					chartDataModel.addYData(yDataTourCompare);
+				}
+				break;
+
+			case GRAPH_RUN_DYN_STEP_LENGTH:
+				if (yData_RunDyn_StepLength != null) {
+					chartDataModel.addYData(yData_RunDyn_StepLength);
+					chartDataModel.setCustomData(CUSTOM_DATA_RUN_DYN_STEP_LENGTH, yData_RunDyn_StepLength);
 				}
 				break;
 

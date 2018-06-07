@@ -227,6 +227,7 @@ public class UI {
 	 */
 	public static String				UNIT_LABEL_DISTANCE;
 	public static String				UNIT_LABEL_DISTANCE_SMALL;
+	public static String				UNIT_LABEL_DISTANCE_MM;
 	public static String				UNIT_LABEL_ALTITUDE;
 	public static String				UNIT_LABEL_ALTIMETER;
 	public static String				UNIT_LABEL_TEMPERATURE;
@@ -252,6 +253,8 @@ public class UI {
 	public static final String			UNIT_DISTANCE_KM						= "km";												//$NON-NLS-1$
 	public static final String			UNIT_DISTANCE_MI						= "mi";												//$NON-NLS-1$
 	public static final String			UNIT_DISTANCE_YARD						= "yd";												//$NON-NLS-1$
+	public static final String			UNIT_DISTANCE_MM						= "mm";												//$NON-NLS-1$
+	public static final String			UNIT_DISTANCE_INCH						= "\"";												//$NON-NLS-1$
 	public static final String			UNIT_PACE_MIN_P_KM						= "min/km";											//$NON-NLS-1$
 	public static final String			UNIT_PACE_MIN_P_MILE					= "min/mi";											//$NON-NLS-1$
 	public static final String			UNIT_SPEED_KM_H							= "km/h";											//$NON-NLS-1$
