@@ -124,33 +124,37 @@ public class TourManager {
 	public static final String	LOG_TEMP_ADJUST_010_NO_TEMPERATURE_DATA_SERIE	= Messages.Log_TemperatureAdjustment_010_NoTemperatureDataSeries;
 	public static final String	LOG_TEMP_ADJUST_011_NO_TIME_DATA_SERIE			= Messages.Log_TemperatureAdjustment_011_NoTimeDataSeries;
 	//
-	public static final String	CUSTOM_DATA_TOUR_DATA							= "tourData";						//$NON-NLS-1$
-	public static final String	CUSTOM_DATA_TOUR_CHART_CONFIGURATION			= "tourChartConfig";				//$NON-NLS-1$
+	public static final String	CUSTOM_DATA_TOUR_DATA							= "tourData";							//$NON-NLS-1$
+	public static final String	CUSTOM_DATA_TOUR_CHART_CONFIGURATION			= "tourChartConfig";					//$NON-NLS-1$
 	//
-	public static final String	CUSTOM_DATA_ALTIMETER							= "altimeter";						//$NON-NLS-1$
-	public static final String	CUSTOM_DATA_ALTITUDE							= "altitude";						//$NON-NLS-1$
-	public static final String	CUSTOM_DATA_CADENCE								= "cadence";						//$NON-NLS-1$
-	public static final String	CUSTOM_DATA_DISTANCE							= "distance";						//$NON-NLS-1$
-	public static final String	CUSTOM_DATA_GEAR_RATIO							= "gearRatio";						//$NON-NLS-1$
-	public static final String	CUSTOM_DATA_GRADIENT							= "gradient";						//$NON-NLS-1$
-	public static final String	CUSTOM_DATA_HISTORY								= "history";						//$NON-NLS-1$
-	public static final String	CUSTOM_DATA_PACE								= "pace";							//$NON-NLS-1$
-	public static final String	CUSTOM_DATA_POWER								= "power";							//$NON-NLS-1$
-	public static final String	CUSTOM_DATA_PULSE								= "pulse";							//$NON-NLS-1$
-	public static final String	CUSTOM_DATA_SPEED								= "speed";							//$NON-NLS-1$
-	public static final String	CUSTOM_DATA_TEMPERATURE							= "temperature";					//$NON-NLS-1$
-	public static final String	CUSTOM_DATA_TIME								= "time";							//$NON-NLS-1$
-	public static final String	CUSTOM_DATA_SEGMENT_VALUES						= "segmentValues";					//$NON-NLS-1$
-	public static final String	CUSTOM_DATA_ANALYZER_INFO						= "analyzerInfo";					//$NON-NLS-1$
-	public static final String	CUSTOM_DATA_CONCONI_TEST						= "CUSTOM_DATA_CONCONI_TEST";		//$NON-NLS-1$
-	public static final String	CUSTOM_DATA_RUN_DYN_STEP_LENGTH					= "runDyn_StepLength";				//$NON-NLS-1$
+	public static final String	CUSTOM_DATA_ALTIMETER							= "altimeter";							//$NON-NLS-1$
+	public static final String	CUSTOM_DATA_ALTITUDE							= "altitude";							//$NON-NLS-1$
+	public static final String	CUSTOM_DATA_CADENCE								= "cadence";							//$NON-NLS-1$
+	public static final String	CUSTOM_DATA_DISTANCE							= "distance";							//$NON-NLS-1$
+	public static final String	CUSTOM_DATA_GEAR_RATIO							= "gearRatio";							//$NON-NLS-1$
+	public static final String	CUSTOM_DATA_GRADIENT							= "gradient";							//$NON-NLS-1$
+	public static final String	CUSTOM_DATA_HISTORY								= "history";							//$NON-NLS-1$
+	public static final String	CUSTOM_DATA_PACE								= "pace";								//$NON-NLS-1$
+	public static final String	CUSTOM_DATA_POWER								= "power";								//$NON-NLS-1$
+	public static final String	CUSTOM_DATA_PULSE								= "pulse";								//$NON-NLS-1$
+	public static final String	CUSTOM_DATA_SPEED								= "speed";								//$NON-NLS-1$
+	public static final String	CUSTOM_DATA_TEMPERATURE							= "temperature";						//$NON-NLS-1$
+	public static final String	CUSTOM_DATA_TIME								= "time";								//$NON-NLS-1$
+	public static final String	CUSTOM_DATA_SEGMENT_VALUES						= "segmentValues";						//$NON-NLS-1$
+	public static final String	CUSTOM_DATA_ANALYZER_INFO						= "analyzerInfo";						//$NON-NLS-1$
+	public static final String	CUSTOM_DATA_CONCONI_TEST						= "CUSTOM_DATA_CONCONI_TEST";			//$NON-NLS-1$
+	public static final String	CUSTOM_DATA_RUN_DYN_STANCE_TIME					= "runDyn_RunDyn_StanceTime";			//$NON-NLS-1$
+	public static final String	CUSTOM_DATA_RUN_DYN_STANCE_TIME_BALANCED		= "runDyn_RunDyn_StanceTime_Balanced;";	//$NON-NLS-1$
+	public static final String	CUSTOM_DATA_RUN_DYN_STEP_LENGTH					= "runDyn_RunDyn_StepLength";			//$NON-NLS-1$
+	public static final String	CUSTOM_DATA_RUN_DYN_VERTICAL_OSCILLATION		= "runDyn_RunDyn_VerticalOscillation;";	//$NON-NLS-1$
+	public static final String	CUSTOM_DATA_RUN_DYN_VERTICAL_RATIO				= "runDyn_RunDyn_VerticalRatio";		//$NON-NLS-1$
 	//
-	public static final String	X_AXIS_TIME										= "time";							//$NON-NLS-1$
-	public static final String	X_AXIS_DISTANCE									= "distance";						//$NON-NLS-1$
+	public static final String	X_AXIS_TIME										= "time";								//$NON-NLS-1$
+	public static final String	X_AXIS_DISTANCE									= "distance";							//$NON-NLS-1$
 	//
-	private final static String	FORMAT_MM_SS									= "%d:%02d";						//$NON-NLS-1$
-	public static final String	GEAR_TEETH_FORMAT								= "%2d:%2d";						//$NON-NLS-1$
-	public static final String	GEAR_VALUE_FORMAT								= GEAR_TEETH_FORMAT + " - %1.2f";	//$NON-NLS-1$
+	private final static String	FORMAT_MM_SS									= "%d:%02d";							//$NON-NLS-1$
+	public static final String	GEAR_TEETH_FORMAT								= "%2d:%2d";							//$NON-NLS-1$
+	public static final String	GEAR_VALUE_FORMAT								= GEAR_TEETH_FORMAT + " - %1.2f";		//$NON-NLS-1$
 	//
 	public static final int		GRAPH_ALTITUDE									= 1000;
 	public static final int		GRAPH_SPEED										= 1001;
@@ -697,6 +701,12 @@ public class TourManager {
 		final float[] toPulseSerie = multiTourData.pulseSerie = new float[numTimeSlices];
 		final float[] toTemperaturSerie = multiTourData.temperatureSerie = new float[numTimeSlices];
 
+		final short[] toRunDyn_StanceTime = multiTourData.runDyn_StanceTime = new short[numTimeSlices];
+		final short[] toRunDyn_StanceTime_Balance = multiTourData.runDyn_StanceTime_Balance = new short[numTimeSlices];
+		final short[] toRunDyn_StepLength = multiTourData.runDyn_StepLength = new short[numTimeSlices];
+		final short[] toRunDyn_VertOscillation = multiTourData.runDyn_Vertical_Oscillation = new short[numTimeSlices];
+		final short[] toRunDyn_VertRatio = multiTourData.runDyn_Vertical_Ratio = new short[numTimeSlices];
+
 		final Long[] allTourIds = multiTourData.multipleTourIds = new Long[numTours];
 		final int[] allStartIndex = multiTourData.multipleTourStartIndex = new int[numTours];
 		final long[] allStartTime = multiTourData.multipleTourStartTime = new long[numTours];
@@ -726,6 +736,12 @@ public class TourManager {
 		boolean isPulseSerie = false;
 		boolean isTempSerie = false;
 
+		boolean isRunDyn_StanceTime = false;
+		boolean isRunDyn_StanceTime_Balance = false;
+		boolean isRunDyn_StepLength = false;
+		boolean isRunDyn_VertOscillation = false;
+		boolean isRunDyn_VertRatio = false;
+
 		boolean isFirstTour = true;
 
 		boolean isCadenceRpm = false;
@@ -746,8 +762,17 @@ public class TourManager {
 			final float[] fromPulseSerie = fromTourData.pulseSerie;
 			final float[] fromTemperaturSerie = fromTourData.temperatureSerie;
 
+			final short[] fromRunDyn_StanceTime = fromTourData.runDyn_StanceTime;
+			final short[] fromRunDyn_StanceTime_Balance = fromTourData.runDyn_StanceTime_Balance;
+			final short[] fromRunDyn_StepLength = fromTourData.runDyn_StepLength;
+			final short[] fromRunDyn_VertOscillation = fromTourData.runDyn_Vertical_Oscillation;
+			final short[] fromRunDyn_VertRatio = fromTourData.runDyn_Vertical_Ratio;
+
 			final int fromSerieLength = fromTimeSerie.length;
 
+			/*
+			 * Copy time serie
+			 */
 			if (isFirstTour) {
 
 				// first time serie
@@ -783,7 +808,7 @@ public class TourManager {
 			}
 
 			/*
-			 * Copy data series
+			 * Copy other data series
 			 */
 			if (fromAltitudeSerie != null) {
 				isAltitudeSerie = true;
@@ -820,6 +845,27 @@ public class TourManager {
 				System.arraycopy(fromTourData.getPowerSerie(), 0, toPowerSerie, toStartIndex, fromSerieLength);
 			}
 
+			if (fromRunDyn_StanceTime != null) {
+				isRunDyn_StanceTime = true;
+				System.arraycopy(fromRunDyn_StanceTime, 0, toRunDyn_StanceTime, toStartIndex, fromSerieLength);
+			}
+			if (fromRunDyn_StanceTime_Balance != null) {
+				isRunDyn_StanceTime_Balance = true;
+				System.arraycopy(fromRunDyn_StanceTime_Balance, 0, toRunDyn_StanceTime_Balance, toStartIndex, fromSerieLength);
+			}
+			if (fromRunDyn_StepLength != null) {
+				isRunDyn_StepLength = true;
+				System.arraycopy(fromRunDyn_StepLength, 0, toRunDyn_StepLength, toStartIndex, fromSerieLength);
+			}
+			if (fromRunDyn_VertOscillation != null) {
+				isRunDyn_VertOscillation = true;
+				System.arraycopy(fromRunDyn_VertOscillation, 0, toRunDyn_VertOscillation, toStartIndex, fromSerieLength);
+			}
+			if (fromRunDyn_VertRatio != null) {
+				isRunDyn_VertRatio = true;
+				System.arraycopy(fromRunDyn_VertRatio, 0, toRunDyn_VertRatio, toStartIndex, fromSerieLength);
+			}
+
 			allTourIds[tourIndex] = fromTourData.getTourId();
 
 			// tour marker
@@ -849,8 +895,6 @@ public class TourManager {
 			// summarize altitude up/down
 			tourAltUp += fromTourData.getTourAltUp();
 			tourAltDown += fromTourData.getTourAltDown();
-
-//			private final static DateTimeFormatter	_dtFormatter							= DateTimeFormat.shortDate();
 
 			// tour titles
 			final long tourStartTime = fromTourData.getTourStartTimeMS();
@@ -3266,21 +3310,54 @@ public class TourManager {
 			yData_RunDyn_StepLength.setYTitle(GRAPH_LABEL_RUN_DYN_STEP_LENGTH);
 			yData_RunDyn_StepLength.setUnitLabel(UI.UNIT_LABEL_DISTANCE_MM);
 			yData_RunDyn_StepLength.setShowYSlider(true);
-//			yData_RunDyn_StepLength.setDisplayedFractionalDigits(1);
 			yData_RunDyn_StepLength.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_RUN_DYN_STEP_LENGTH);
 
 			if (isHrZoneDisplayed) {
 				yData_RunDyn_StepLength.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
 			} else {
-				yData_RunDyn_StepLength.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_ZERO);
+				yData_RunDyn_StepLength.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
 			}
 
-			setGraphColor(yData_RunDyn_StepLength, GraphColorManager.PREF_GRAPH_GRADIENT);
+			setGraphColor(yData_RunDyn_StepLength, GraphColorManager.PREF_GRAPH_POWER);
 			chartDataModel.addXyData(yData_RunDyn_StepLength);
 
 			// adjust min/max values when it's defined in the pref store
 //			setVisibleForcedValues(
 //					yData_RunDyn_StepLength,
+//					1,
+//					TourChart.MAX_ADJUSTMENT,
+//					ITourbookPreferences.GRAPH_GRADIENT_IS_MIN_ENABLED,
+//					ITourbookPreferences.GRAPH_GRADIENT_IS_MAX_ENABLED,
+//					ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
+//					ITourbookPreferences.GRAPH_GRADIENT_MAX_VALUE);
+		}
+
+		/*
+		 * Running Dynamics: Stance time
+		 */
+		ChartDataYSerie yData_RunDyn_StanceTime = null;
+		final float[] runDyn_StanceTime_Serie = tourData.getRunDyn_StanceTime();
+		if (runDyn_StanceTime_Serie != null) {
+			
+			yData_RunDyn_StanceTime = createChartDataSerie(runDyn_StanceTime_Serie, chartType);
+			
+			yData_RunDyn_StanceTime.setYTitle(GRAPH_LABEL_RUN_DYN_STANCE_TIME);
+			yData_RunDyn_StanceTime.setUnitLabel(UI.UNIT_MS);
+			yData_RunDyn_StanceTime.setShowYSlider(true);
+			yData_RunDyn_StanceTime.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_RUN_DYN_STANCE_TIME);
+			
+			if (isHrZoneDisplayed) {
+				yData_RunDyn_StanceTime.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
+			} else {
+				yData_RunDyn_StanceTime.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+			}
+			
+			setGraphColor(yData_RunDyn_StanceTime, GraphColorManager.PREF_GRAPH_POWER);
+			chartDataModel.addXyData(yData_RunDyn_StanceTime);
+			
+			// adjust min/max values when it's defined in the pref store
+//			setVisibleForcedValues(
+//					yData_RunDyn_StanceTime,
 //					1,
 //					TourChart.MAX_ADJUSTMENT,
 //					ITourbookPreferences.GRAPH_GRADIENT_IS_MIN_ENABLED,
@@ -3390,6 +3467,13 @@ public class TourManager {
 			case GRAPH_TOUR_COMPARE:
 				if (yDataTourCompare != null) {
 					chartDataModel.addYData(yDataTourCompare);
+				}
+				break;
+
+			case GRAPH_RUN_DYN_STANCE_TIME:
+				if (yData_RunDyn_StanceTime != null) {
+					chartDataModel.addYData(yData_RunDyn_StanceTime);
+					chartDataModel.setCustomData(CUSTOM_DATA_RUN_DYN_STANCE_TIME, yData_RunDyn_StanceTime);
 				}
 				break;
 

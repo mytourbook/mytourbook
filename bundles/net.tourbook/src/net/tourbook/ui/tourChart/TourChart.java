@@ -4577,6 +4577,21 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		if (yDataWithLabels == null) {
 			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_GEAR_RATIO);
 		}
+		if (yDataWithLabels == null) {
+			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_RUN_DYN_STANCE_TIME);
+		}
+		if (yDataWithLabels == null) {
+			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_RUN_DYN_STANCE_TIME_BALANCED);
+		}
+		if (yDataWithLabels == null) {
+			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_RUN_DYN_STEP_LENGTH);
+		}
+		if (yDataWithLabels == null) {
+			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_RUN_DYN_VERTICAL_OSCILLATION);
+		}
+		if (yDataWithLabels == null) {
+			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_RUN_DYN_VERTICAL_RATIO);
+		}
 
 		ConfigGraphSegment cfgAltitude = null;
 		ConfigGraphSegment cfgPulse = null;
@@ -4655,6 +4670,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_PACE, yDataWithLabels, cfgPace);
 		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_POWER, yDataWithLabels, cfgPower);
 		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_TEMPERATURE, yDataWithLabels, null);
+
+		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_RUN_DYN_STANCE_TIME, yDataWithLabels, null);
+		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_RUN_DYN_STANCE_TIME, yDataWithLabels, null);
+		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_RUN_DYN_STEP_LENGTH, yDataWithLabels, null);
+		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_RUN_DYN_VERTICAL_OSCILLATION, yDataWithLabels, null);
+		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_RUN_DYN_VERTICAL_RATIO, yDataWithLabels, null);
 	}
 
 	/**

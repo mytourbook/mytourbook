@@ -1363,6 +1363,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 */
 	@Transient
 	public short[]					runDyn_StanceTime;
+	@Transient
+	private float[] 				_runDyn_StanceTime_UI;
 
 	@Transient
 	public short[]					runDyn_StanceTime_Balance;
@@ -6302,6 +6304,27 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	public int getRestPulse() {
 		return restPulse;
+	}
+
+	public float[] getRunDyn_StanceTime() {
+
+		if (_runDyn_StanceTime_UI == null) {
+
+			if (runDyn_StanceTime != null) {
+
+				// create UI data serie
+
+				final int serieSize = runDyn_StanceTime.length;
+
+				_runDyn_StanceTime_UI = new float[serieSize];
+
+				for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
+					_runDyn_StanceTime_UI[serieIndex] = runDyn_StanceTime[serieIndex];
+				}
+			}
+		}
+
+		return _runDyn_StanceTime_UI;
 	}
 
 	public float[] getRunDyn_StepLength() {
