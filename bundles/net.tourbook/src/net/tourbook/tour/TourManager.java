@@ -704,8 +704,8 @@ public class TourManager {
 		final short[] toRunDyn_StanceTime = multiTourData.runDyn_StanceTime = new short[numTimeSlices];
 		final short[] toRunDyn_StanceTime_Balance = multiTourData.runDyn_StanceTime_Balance = new short[numTimeSlices];
 		final short[] toRunDyn_StepLength = multiTourData.runDyn_StepLength = new short[numTimeSlices];
-		final short[] toRunDyn_VertOscillation = multiTourData.runDyn_Vertical_Oscillation = new short[numTimeSlices];
-		final short[] toRunDyn_VertRatio = multiTourData.runDyn_Vertical_Ratio = new short[numTimeSlices];
+		final short[] toRunDyn_VertOscillation = multiTourData.runDyn_VerticalOscillation = new short[numTimeSlices];
+		final short[] toRunDyn_VertRatio = multiTourData.runDyn_VerticalRatio = new short[numTimeSlices];
 
 		final Long[] allTourIds = multiTourData.multipleTourIds = new Long[numTours];
 		final int[] allStartIndex = multiTourData.multipleTourStartIndex = new int[numTours];
@@ -765,8 +765,8 @@ public class TourManager {
 			final short[] fromRunDyn_StanceTime = fromTourData.runDyn_StanceTime;
 			final short[] fromRunDyn_StanceTime_Balance = fromTourData.runDyn_StanceTime_Balance;
 			final short[] fromRunDyn_StepLength = fromTourData.runDyn_StepLength;
-			final short[] fromRunDyn_VertOscillation = fromTourData.runDyn_Vertical_Oscillation;
-			final short[] fromRunDyn_VertRatio = fromTourData.runDyn_Vertical_Ratio;
+			final short[] fromRunDyn_VertOscillation = fromTourData.runDyn_VerticalOscillation;
+			final short[] fromRunDyn_VertRatio = fromTourData.runDyn_VerticalRatio;
 
 			final int fromSerieLength = fromTimeSerie.length;
 
@@ -2863,529 +2863,28 @@ public class TourManager {
 		tcc.canShowHrZones = tourData.getNumberOfHrZones() > 0;
 		final boolean isHrZoneDisplayed = tcc.canShowHrZones && tcc.isHrZoneDisplayed;
 
-		/*
-		 * altitude
-		 */
-		ChartDataYSerie yDataAltitude = null;
-
-		final float[] altitudeSerie = tourData.getAltitudeSmoothedSerie(true);
-		if (altitudeSerie != null) {
-
-			if (tourData.isSRTMAvailable()) {
-
-				tcc.canShowSRTMData = true;
-
-				if (tcc.isSRTMDataVisible) {
-
-					final float[] srtmDataSerie = tourData.getSRTMSerie();
-					if (srtmDataSerie != null) {
-
-						// create altitude dataserie and adjust min/max values with with the srtm values
-						yDataAltitude = createChartDataSerie(//
-								new float[][] { altitudeSerie, srtmDataSerie },
-								chartType);
-					}
-				}
-
-			} else {
-
-				// SRTM data are not available
-				tcc.canShowSRTMData = false;
-			}
-
-			if (yDataAltitude == null) {
-				yDataAltitude = createChartDataSerie(altitudeSerie, chartType);
-			}
-
-			yDataAltitude.setYTitle(GRAPH_LABEL_ALTITUDE);
-			yDataAltitude.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
-			yDataAltitude.setShowYSlider(true);
-			yDataAltitude.setDisplayedFractionalDigits(2);
-			yDataAltitude.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_ALTITUDE);
-			yDataAltitude.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true));
-
-			if (isHrZoneDisplayed) {
-				yDataAltitude.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
-			} else {
-				yDataAltitude.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
-			}
-
-			setGraphColor(yDataAltitude, GraphColorManager.PREF_GRAPH_ALTITUDE);
-			chartDataModel.addXyData(yDataAltitude);
-
-			// adjust pulse min/max values when it's defined in the pref store
-			setVisibleForcedValues(
-					yDataAltitude,
-					1,
-					0,
-					ITourbookPreferences.GRAPH_ALTITUDE_IS_MIN_ENABLED,
-					ITourbookPreferences.GRAPH_ALTITUDE_IS_MAX_ENABLED,
-					ITourbookPreferences.GRAPH_ALTITUDE_MIN_VALUE,
-					ITourbookPreferences.GRAPH_ALTITUDE_MAX_VALUE);
-		}
-
-		/*
-		 * heartbeat
-		 */
-		ChartDataYSerie yDataPulse = null;
-
-		final float[] pulseSerie = tourData.getPulseSmoothedSerie();
-		if (pulseSerie != null) {
-
-			yDataPulse = createChartDataSerieNoZero(pulseSerie, chartType);
-
-			yDataPulse.setYTitle(GRAPH_LABEL_HEARTBEAT);
-			yDataPulse.setUnitLabel(GRAPH_LABEL_HEARTBEAT_UNIT);
-			yDataPulse.setShowYSlider(true);
-			yDataPulse.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_PULSE);
-			yDataPulse.setCustomData(
-					CUSTOM_DATA_ANALYZER_INFO, //
-					new TourChartAnalyzerInfo(true, _computeAvg_Pulse));
-
-			if (isHrZoneDisplayed) {
-				yDataPulse.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
-			} else {
-				yDataPulse.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
-			}
-
-			setGraphColor(yDataPulse, GraphColorManager.PREF_GRAPH_HEARTBEAT);
-			chartDataModel.addXyData(yDataPulse);
-
-			// adjust  min/max values when it's defined in the pref store
-			setVisibleForcedValues(
-					yDataPulse,
-					1,
-					0,
-					ITourbookPreferences.GRAPH_PULSE_IS_MIN_ENABLED,
-					ITourbookPreferences.GRAPH_PULSE_IS_MAX_ENABLED,
-					ITourbookPreferences.GRAPH_PULSE_MIN_VALUE,
-					ITourbookPreferences.GRAPH_PULSE_MAX_VALUE);
-		}
-
-		/*
-		 * speed
-		 */
-		final float[] speedSerie = tourData.getSpeedSerie();
-		ChartDataYSerie yDataSpeed = null;
-		if (speedSerie != null) {
-
-			yDataSpeed = createChartDataSerieNoZero(speedSerie, chartType);
-
-			yDataSpeed.setYTitle(GRAPH_LABEL_SPEED);
-			yDataSpeed.setUnitLabel(UI.UNIT_LABEL_SPEED);
-			yDataSpeed.setShowYSlider(true);
-			yDataSpeed.setDisplayedFractionalDigits(1);
-			yDataSpeed.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_SPEED);
-			yDataSpeed.setCustomData(
-					CUSTOM_DATA_ANALYZER_INFO, //
-					new TourChartAnalyzerInfo(true, true, _computeAvg_Speed, 1));
-
-			if (isHrZoneDisplayed) {
-				yDataSpeed.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
-			} else {
-				yDataSpeed.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
-			}
-
-			setGraphColor(yDataSpeed, GraphColorManager.PREF_GRAPH_SPEED);
-			chartDataModel.addXyData(yDataSpeed);
-
-			// adjust  min/max values when it's defined in the pref store
-			setVisibleForcedValues(
-					yDataSpeed,
-					1,
-					0,
-					ITourbookPreferences.GRAPH_SPEED_IS_MIN_ENABLED,
-					ITourbookPreferences.GRAPH_SPEED_IS_MAX_ENABLED,
-					ITourbookPreferences.GRAPH_SPEED_MIN_VALUE,
-					ITourbookPreferences.GRAPH_SPEED_MAX_VALUE);
-		}
-
-		/*
-		 * pace
-		 */
-		final float[] paceSerie = tourData.getPaceSerieSeconds();
-		ChartDataYSerie yDataPace = null;
-		if (paceSerie != null) {
-
-			yDataPace = createChartDataSerieNoZero(paceSerie, chartType);
-
-			yDataPace.setYTitle(GRAPH_LABEL_PACE);
-			yDataPace.setUnitLabel(UI.UNIT_LABEL_PACE);
-			yDataPace.setShowYSlider(true);
-			yDataPace.setAxisUnit(ChartDataSerie.AXIS_UNIT_MINUTE_SECOND);
-			yDataPace.setSliderLabelFormat(ChartDataYSerie.SLIDER_LABEL_FORMAT_MM_SS);
-			yDataPace.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_PACE);
-			yDataPace.setCustomData(
-					CUSTOM_DATA_ANALYZER_INFO, //
-					new TourChartAnalyzerInfo(true, false, _computeAvg_Pace, 1));
-
-			if (isHrZoneDisplayed) {
-				yDataPace.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
-			} else {
-				yDataPace.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
-			}
-
-			setGraphColor(yDataPace, GraphColorManager.PREF_GRAPH_PACE);
-			chartDataModel.addXyData(yDataPace);
-
-			// adjust min/max values when it's defined in the pref store
-			setVisibleForcedValues(
-					yDataPace,
-					60,
-					0,
-					ITourbookPreferences.GRAPH_PACE_IS_MIN_ENABLED,
-					ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED,
-					ITourbookPreferences.GRAPH_PACE_MIN_VALUE,
-					ITourbookPreferences.GRAPH_PACE_MAX_VALUE);
-		}
-
-		/*
-		 * power
-		 */
-		final float[] powerSerie = tourData.getPowerSerie();
-		ChartDataYSerie yDataPower = null;
-		if (powerSerie != null) {
-
-			yDataPower = createChartDataSerieNoZero(powerSerie, chartType);
-
-			yDataPower.setYTitle(GRAPH_LABEL_POWER);
-			yDataPower.setUnitLabel(GRAPH_LABEL_POWER_UNIT);
-			yDataPower.setShowYSlider(true);
-			yDataPower.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_POWER);
-			yDataPower.setCustomData(
-					CUSTOM_DATA_ANALYZER_INFO, //
-					new TourChartAnalyzerInfo(true, false, _computeAvg_Power, 0));
-
-			if (isHrZoneDisplayed) {
-				yDataPower.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
-			} else {
-				yDataPower.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
-			}
-
-			setGraphColor(yDataPower, GraphColorManager.PREF_GRAPH_POWER);
-			chartDataModel.addXyData(yDataPower);
-
-			// adjust min/max values when it's defined in the pref store
-			setVisibleForcedValues(
-					yDataPower,
-					1,
-					0,
-					ITourbookPreferences.GRAPH_POWER_IS_MIN_ENABLED,
-					ITourbookPreferences.GRAPH_POWER_IS_MAX_ENABLED,
-					ITourbookPreferences.GRAPH_POWER_MIN_VALUE,
-					ITourbookPreferences.GRAPH_POWER_MAX_VALUE);
-		}
-
-		/*
-		 * altimeter
-		 */
-		final float[] altimeterSerie = tourData.getAltimeterSerie();
-		ChartDataYSerie yDataAltimeter = null;
-		if (altimeterSerie != null) {
-
-			yDataAltimeter = createChartDataSerieNoZero(altimeterSerie, chartType);
-
-			yDataAltimeter.setYTitle(GRAPH_LABEL_ALTIMETER);
-			yDataAltimeter.setUnitLabel(UI.UNIT_LABEL_ALTIMETER);
-			yDataAltimeter.setShowYSlider(true);
-			yDataAltimeter.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_ALTIMETER);
-			yDataAltimeter.setCustomData(
-					CUSTOM_DATA_ANALYZER_INFO, //
-					new TourChartAnalyzerInfo(true, false, _computeAvg_Altimeter, 0));
-
-			if (isHrZoneDisplayed) {
-				yDataAltimeter.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
-			} else {
-				yDataAltimeter.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_ZERO);
-			}
-
-			setGraphColor(yDataAltimeter, GraphColorManager.PREF_GRAPH_ALTIMETER);
-			chartDataModel.addXyData(yDataAltimeter);
-
-			/*
-			 * adjust min/max altitude when it's defined in the pref store
-			 */
-			if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_ALTIMETER_IS_MIN_ENABLED)) {
-
-				final int minValue = _prefStore.getInt(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE);
-
-				yDataAltimeter.forceYAxisMinValue(minValue + TourChart.MIN_ADJUSTMENT);
-			}
-
-			if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_ALTIMETER_IS_MAX_ENABLED)) {
-
-				final double maxValue = _prefStore.getInt(ITourbookPreferences.GRAPH_ALTIMETER_MAX_VALUE);
-
-				final double maxAdjust = 1e-2;
-				// set max value after min value, adjust max otherwise values above the max are painted
-				yDataAltimeter.forceYAxisMaxValue(
-						maxValue > 0 //
-								? maxValue - maxAdjust
-								: maxValue + maxAdjust);
-			}
-
-			// adjust min/max values when it's defined in the pref store
-			setVisibleForcedValues(
-					yDataAltimeter,
-					1,
-					1e-2,
-					ITourbookPreferences.GRAPH_ALTIMETER_IS_MIN_ENABLED,
-					ITourbookPreferences.GRAPH_ALTIMETER_IS_MAX_ENABLED,
-					ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE,
-					ITourbookPreferences.GRAPH_ALTIMETER_MAX_VALUE);
-		}
-
-		/*
-		 * Gradient
-		 */
-		final float[] gradientSerie = tourData.gradientSerie;
-		ChartDataYSerie yDataGradient = null;
-		if (gradientSerie != null) {
-
-			yDataGradient = createChartDataSerie(gradientSerie, chartType);
-
-			yDataGradient.setYTitle(GRAPH_LABEL_GRADIENT);
-			yDataGradient.setUnitLabel(GRAPH_LABEL_GRADIENT_UNIT);
-			yDataGradient.setShowYSlider(true);
-			yDataGradient.setDisplayedFractionalDigits(1);
-			yDataGradient.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_GRADIENT);
-			yDataGradient.setCustomData(
-					CUSTOM_DATA_ANALYZER_INFO, //
-					new TourChartAnalyzerInfo(true, true, _computeAvg_Gradient, 1));
-
-			if (isHrZoneDisplayed) {
-				yDataGradient.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
-			} else {
-				yDataGradient.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_ZERO);
-			}
-
-			setGraphColor(yDataGradient, GraphColorManager.PREF_GRAPH_GRADIENT);
-			chartDataModel.addXyData(yDataGradient);
-
-			// adjust min/max values when it's defined in the pref store
-			setVisibleForcedValues(
-					yDataGradient,
-					1,
-					TourChart.MAX_ADJUSTMENT,
-					ITourbookPreferences.GRAPH_GRADIENT_IS_MIN_ENABLED,
-					ITourbookPreferences.GRAPH_GRADIENT_IS_MAX_ENABLED,
-					ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
-					ITourbookPreferences.GRAPH_GRADIENT_MAX_VALUE);
-		}
-
-		/*
-		 * Cadence
-		 */
-		final float[] cadenceSerie = tourData.getCadenceSerie();
-		ChartDataYSerie yDataCadence = null;
-		if (cadenceSerie != null) {
-
-			final String cadenceUnit;
-
-			if (tourData.isMultipleTours()) {
-
-				final boolean isRpm = tourData.multipleTour_IsCadenceRpm;
-				final boolean isSpm = tourData.multipleTour_IsCadenceSpm;
-
-				cadenceUnit = isRpm && isSpm
-						? GRAPH_LABEL_CADENCE_UNIT_RPM_SPM //
-						: isSpm //
-								? GRAPH_LABEL_CADENCE_UNIT_SPM
-								: GRAPH_LABEL_CADENCE_UNIT;
-
-			} else {
-
-				cadenceUnit = tourData.isCadenceSpm() //
-						? GRAPH_LABEL_CADENCE_UNIT_SPM
-						: GRAPH_LABEL_CADENCE_UNIT;
-			}
-
-			yDataCadence = createChartDataSerieNoZero(cadenceSerie, chartType);
-
-			yDataCadence.setYTitle(GRAPH_LABEL_CADENCE);
-			yDataCadence.setUnitLabel(cadenceUnit);
-			yDataCadence.setShowYSlider(true);
-			yDataCadence.setDisplayedFractionalDigits(1);
-			yDataCadence.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_CADENCE);
-			yDataCadence.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, _computeAvg_Cadence));
-			yDataCadence.setSliderLabelProvider(new SliderLabelProvider_Cadence(cadenceSerie));
-
-			if (isHrZoneDisplayed) {
-				yDataCadence.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
-			} else {
-				yDataCadence.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
-			}
-//			yDataCadence.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM_NO_BORDER);
-//			yDataCadence.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_NO);
-//			yDataCadence.setLineGaps(tourData.getCadenceGaps());
-
-			setGraphColor(yDataCadence, GraphColorManager.PREF_GRAPH_CADENCE);
-			chartDataModel.addXyData(yDataCadence);
-
-			// adjust min/max values when it's defined in the pref store
-			setVisibleForcedValues(
-					yDataCadence,
-					1,
-					0,
-					ITourbookPreferences.GRAPH_CADENCE_IS_MIN_ENABLED,
-					ITourbookPreferences.GRAPH_CADENCE_IS_MAX_ENABLED,
-					ITourbookPreferences.GRAPH_CADENCE_MIN_VALUE,
-					ITourbookPreferences.GRAPH_CADENCE_MAX_VALUE);
-		}
-
-		/*
-		 * Gears
-		 */
-		final float[][] gearSerie = tourData.getGears();
-		ChartDataYSerie yDataGears = null;
-		if (gearSerie != null) {
-
-			final float[][] chartGearSerie = new float[][] //
-			{
-					// gear ratio
-					gearSerie[0],
-
-					// front gear number, starting with 1 for the large chainwheel (Kettenblatt)
-					gearSerie[3] //
-			};
-
-			yDataGears = createChartDataSerieNoZero(chartGearSerie, ChartType.HORIZONTAL_BAR);
-
-			yDataGears.setYTitle(GRAPH_LABEL_GEARS);
-			yDataGears.setShowYSlider(true);
-			yDataGears.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_GEARS);
-			yDataGears.setSliderLabelProvider(new SliderLabelProvider_Gear(gearSerie));
-
-//			yDataGears.setLineGaps(tourData.getCadenceGaps());
-
-			setGraphColor(yDataGears, GraphColorManager.PREF_GRAPH_GEAR);
-			chartDataModel.addXyData(yDataGears);
-		}
-
-		/*
-		 * Temperature
-		 */
-		final float[] temperatureSerie = tourData.getTemperatureSerie();
-		ChartDataYSerie yDataTemperature = null;
-		if (temperatureSerie != null) {
-
-			yDataTemperature = createChartDataSerie(temperatureSerie, chartType);
-
-			yDataTemperature.setYTitle(GRAPH_LABEL_TEMPERATURE);
-			yDataTemperature.setUnitLabel(UI.UNIT_LABEL_TEMPERATURE);
-			yDataTemperature.setShowYSlider(true);
-			yDataTemperature.setDisplayedFractionalDigits(1);
-			yDataTemperature.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_TEMPERATURE);
-			yDataTemperature.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, true));
-
-			if (isHrZoneDisplayed) {
-				yDataTemperature.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
-			} else {
-				yDataTemperature.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
-			}
-
-			setGraphColor(yDataTemperature, GraphColorManager.PREF_GRAPH_TEMPTERATURE);
-			chartDataModel.addXyData(yDataTemperature);
-
-			// adjust min/max values when it's defined in the pref store
-			setVisibleForcedValues(
-					yDataTemperature,
-					1,
-					0,
-					ITourbookPreferences.GRAPH_TEMPERATURE_IS_MIN_ENABLED,
-					ITourbookPreferences.GRAPH_TEMPERATURE_IS_MAX_ENABLED,
-					ITourbookPreferences.GRAPH_TEMPERATURE_MIN_VALUE,
-					ITourbookPreferences.GRAPH_TEMPERATURE_MAX_VALUE);
-		}
-
-		/*
-		 * Running Dynamics: Step length
-		 */
-		final float[] runDyn_StepLength_Serie = tourData.getRunDyn_StepLength();
-		ChartDataYSerie yData_RunDyn_StepLength = null;
-		if (runDyn_StepLength_Serie != null) {
-
-			yData_RunDyn_StepLength = createChartDataSerie(runDyn_StepLength_Serie, chartType);
-
-			yData_RunDyn_StepLength.setYTitle(GRAPH_LABEL_RUN_DYN_STEP_LENGTH);
-			yData_RunDyn_StepLength.setUnitLabel(UI.UNIT_LABEL_DISTANCE_MM);
-			yData_RunDyn_StepLength.setShowYSlider(true);
-			yData_RunDyn_StepLength.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_RUN_DYN_STEP_LENGTH);
-
-			if (isHrZoneDisplayed) {
-				yData_RunDyn_StepLength.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
-			} else {
-				yData_RunDyn_StepLength.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
-			}
-
-			setGraphColor(yData_RunDyn_StepLength, GraphColorManager.PREF_GRAPH_POWER);
-			chartDataModel.addXyData(yData_RunDyn_StepLength);
-
-			// adjust min/max values when it's defined in the pref store
-//			setVisibleForcedValues(
-//					yData_RunDyn_StepLength,
-//					1,
-//					TourChart.MAX_ADJUSTMENT,
-//					ITourbookPreferences.GRAPH_GRADIENT_IS_MIN_ENABLED,
-//					ITourbookPreferences.GRAPH_GRADIENT_IS_MAX_ENABLED,
-//					ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
-//					ITourbookPreferences.GRAPH_GRADIENT_MAX_VALUE);
-		}
-
-		/*
-		 * Running Dynamics: Stance time
-		 */
-		ChartDataYSerie yData_RunDyn_StanceTime = null;
-		final float[] runDyn_StanceTime_Serie = tourData.getRunDyn_StanceTime();
-		if (runDyn_StanceTime_Serie != null) {
-			
-			yData_RunDyn_StanceTime = createChartDataSerie(runDyn_StanceTime_Serie, chartType);
-			
-			yData_RunDyn_StanceTime.setYTitle(GRAPH_LABEL_RUN_DYN_STANCE_TIME);
-			yData_RunDyn_StanceTime.setUnitLabel(UI.UNIT_MS);
-			yData_RunDyn_StanceTime.setShowYSlider(true);
-			yData_RunDyn_StanceTime.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_RUN_DYN_STANCE_TIME);
-			
-			if (isHrZoneDisplayed) {
-				yData_RunDyn_StanceTime.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
-			} else {
-				yData_RunDyn_StanceTime.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
-			}
-			
-			setGraphColor(yData_RunDyn_StanceTime, GraphColorManager.PREF_GRAPH_POWER);
-			chartDataModel.addXyData(yData_RunDyn_StanceTime);
-			
-			// adjust min/max values when it's defined in the pref store
-//			setVisibleForcedValues(
-//					yData_RunDyn_StanceTime,
-//					1,
-//					TourChart.MAX_ADJUSTMENT,
-//					ITourbookPreferences.GRAPH_GRADIENT_IS_MIN_ENABLED,
-//					ITourbookPreferences.GRAPH_GRADIENT_IS_MAX_ENABLED,
-//					ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
-//					ITourbookPreferences.GRAPH_GRADIENT_MAX_VALUE);
-		}
-
-		/*
-		 * Tour compare altitude or lat/lon difference
-		 */
-		final float[] tourCompareSerie = tourData.tourCompareSerie;
-		ChartDataYSerie yDataTourCompare = null;
-		if (tourCompareSerie != null && tourCompareSerie.length > 0 && tcc.canShowTourCompareGraph) {
-
-			yDataTourCompare = createChartDataSerie(tourCompareSerie, chartType);
-
-			yDataTourCompare.setYTitle(GRAPH_LABEL_TOUR_COMPARE);
-			yDataTourCompare.setUnitLabel(tcc.isGeoCompareDiff
-					? GRAPH_LABEL_GEO_COMPARE_UNIT
-					: GRAPH_LABEL_TOUR_COMPARE_UNIT);
-			yDataTourCompare.setShowYSlider(true);
-			yDataTourCompare.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
-			yDataTourCompare.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_TOUR_COMPARE);
-
-			setGraphColor(yDataTourCompare, GraphColorManager.PREF_GRAPH_TOUR_COMPARE);
-			chartDataModel.addXyData(yDataTourCompare);
-		}
+// SET_FORMATTING_OFF
+		
+		final ChartDataYSerie yDataAltitude		= createModelData_Altitude(		tourData, chartDataModel, chartType, isHrZoneDisplayed, tcc);
+		final ChartDataYSerie yDataPulse 		= createModelData_Heartbeat(	tourData, chartDataModel, chartType, isHrZoneDisplayed);
+		final ChartDataYSerie yDataSpeed 		= createModelData_Speed(		tourData, chartDataModel, chartType, isHrZoneDisplayed);
+		final ChartDataYSerie yDataPace 		= createModelData_Pace(			tourData, chartDataModel, chartType, isHrZoneDisplayed);
+		final ChartDataYSerie yDataPower 		= createModelData_Power(		tourData, chartDataModel, chartType, isHrZoneDisplayed);
+		final ChartDataYSerie yDataAltimeter 	= createModelData_Altimeter(	tourData, chartDataModel, chartType, isHrZoneDisplayed);
+		final ChartDataYSerie yDataGradient 	= createModelData_Gradient(		tourData, chartDataModel, chartType, isHrZoneDisplayed);
+		final ChartDataYSerie yDataCadence 		= createModelData_Cadence(		tourData, chartDataModel, chartType, isHrZoneDisplayed);
+		final ChartDataYSerie yDataGears 		= createModelData_Gears(		tourData, chartDataModel);
+		final ChartDataYSerie yDataTemperature 	= createModelData_Temperature(	tourData, chartDataModel, chartType, isHrZoneDisplayed);
+
+		final ChartDataYSerie yDataTourCompare 	= createModelData_TourCompare(	tourData, chartDataModel, chartType, tcc);
+		
+		final ChartDataYSerie yData_RunDyn_StanceTime			= createModelData_RunDyn_StanceTime(			tourData, chartDataModel, chartType, isHrZoneDisplayed);
+		final ChartDataYSerie yData_RunDyn_StanceTime_Balance	= createModelData_RunDyn_StanceTime_Balance(	tourData, chartDataModel, chartType, isHrZoneDisplayed);
+		final ChartDataYSerie yData_RunDyn_StepLength			= createModelData_RunDyn_StepLength(			tourData, chartDataModel, chartType, isHrZoneDisplayed);
+		final ChartDataYSerie yData_RunDyn_VerticalOscillation	= createModelData_RunDyn_VerticalOscillation(	tourData, chartDataModel, chartType, isHrZoneDisplayed);
+		final ChartDataYSerie yData_RunDyn_VerticalRatio		= createModelData_RunDyn_VerticalRatio(			tourData, chartDataModel, chartType, isHrZoneDisplayed);
+
+// SET_FORMATTING_ON
 
 		/*
 		 * all visible graphs are added as y-data to the chart data model in the sequence as they
@@ -3477,10 +2976,31 @@ public class TourManager {
 				}
 				break;
 
+			case GRAPH_RUN_DYN_STANCE_TIME_BALANCED:
+				if (yData_RunDyn_StanceTime_Balance != null) {
+					chartDataModel.addYData(yData_RunDyn_StanceTime_Balance);
+					chartDataModel.setCustomData(CUSTOM_DATA_RUN_DYN_STANCE_TIME_BALANCED, yData_RunDyn_StanceTime_Balance);
+				}
+				break;
+
 			case GRAPH_RUN_DYN_STEP_LENGTH:
 				if (yData_RunDyn_StepLength != null) {
 					chartDataModel.addYData(yData_RunDyn_StepLength);
 					chartDataModel.setCustomData(CUSTOM_DATA_RUN_DYN_STEP_LENGTH, yData_RunDyn_StepLength);
+				}
+				break;
+
+			case GRAPH_RUN_DYN_VERTICAL_OSCILLATION:
+				if (yData_RunDyn_VerticalOscillation != null) {
+					chartDataModel.addYData(yData_RunDyn_VerticalOscillation);
+					chartDataModel.setCustomData(CUSTOM_DATA_RUN_DYN_VERTICAL_OSCILLATION, yData_RunDyn_VerticalOscillation);
+				}
+				break;
+
+			case GRAPH_RUN_DYN_VERTICAL_RATIO:
+				if (yData_RunDyn_VerticalRatio != null) {
+					chartDataModel.addYData(yData_RunDyn_VerticalRatio);
+					chartDataModel.setCustomData(CUSTOM_DATA_RUN_DYN_VERTICAL_RATIO, yData_RunDyn_VerticalRatio);
 				}
 				break;
 
@@ -3543,6 +3063,755 @@ public class TourManager {
 
 	private ChartDataYSerie createChartDataSerieNoZero(final float[][] dataSerie, final ChartType chartType) {
 		return new ChartDataYSerie(chartType, dataSerie, true);
+	}
+
+	/**
+	 * Altimeter
+	 */
+	private ChartDataYSerie createModelData_Altimeter(	final TourData tourData,
+														final ChartDataModel chartDataModel,
+														final ChartType chartType,
+														final boolean isHrZoneDisplayed) {
+
+		final float[] altimeterSerie = tourData.getAltimeterSerie();
+		ChartDataYSerie yDataAltimeter = null;
+		if (altimeterSerie != null) {
+
+			yDataAltimeter = createChartDataSerieNoZero(altimeterSerie, chartType);
+
+			yDataAltimeter.setYTitle(GRAPH_LABEL_ALTIMETER);
+			yDataAltimeter.setUnitLabel(UI.UNIT_LABEL_ALTIMETER);
+			yDataAltimeter.setShowYSlider(true);
+			yDataAltimeter.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_ALTIMETER);
+			yDataAltimeter.setCustomData(
+					CUSTOM_DATA_ANALYZER_INFO, //
+					new TourChartAnalyzerInfo(true, false, _computeAvg_Altimeter, 0));
+
+			if (isHrZoneDisplayed) {
+				yDataAltimeter.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
+			} else {
+				yDataAltimeter.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_ZERO);
+			}
+
+			setGraphColor(yDataAltimeter, GraphColorManager.PREF_GRAPH_ALTIMETER);
+			chartDataModel.addXyData(yDataAltimeter);
+
+			/*
+			 * adjust min/max altitude when it's defined in the pref store
+			 */
+			if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_ALTIMETER_IS_MIN_ENABLED)) {
+
+				final int minValue = _prefStore.getInt(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE);
+
+				yDataAltimeter.forceYAxisMinValue(minValue + TourChart.MIN_ADJUSTMENT);
+			}
+
+			if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_ALTIMETER_IS_MAX_ENABLED)) {
+
+				final double maxValue = _prefStore.getInt(ITourbookPreferences.GRAPH_ALTIMETER_MAX_VALUE);
+
+				final double maxAdjust = 1e-2;
+				// set max value after min value, adjust max otherwise values above the max are painted
+				yDataAltimeter.forceYAxisMaxValue(
+						maxValue > 0 //
+								? maxValue - maxAdjust
+								: maxValue + maxAdjust);
+			}
+
+			// adjust min/max values when it's defined in the pref store
+			setVisibleForcedValues(
+					yDataAltimeter,
+					1,
+					1e-2,
+					ITourbookPreferences.GRAPH_ALTIMETER_IS_MIN_ENABLED,
+					ITourbookPreferences.GRAPH_ALTIMETER_IS_MAX_ENABLED,
+					ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE,
+					ITourbookPreferences.GRAPH_ALTIMETER_MAX_VALUE);
+		}
+		return yDataAltimeter;
+	}
+
+	/**
+	 * Altitude
+	 */
+	private ChartDataYSerie createModelData_Altitude(	final TourData tourData,
+														final ChartDataModel chartDataModel,
+														final ChartType chartType,
+														final boolean isHrZoneDisplayed,
+														final TourChartConfiguration tcc) {
+		ChartDataYSerie yDataAltitude = null;
+
+		final float[] altitudeSerie = tourData.getAltitudeSmoothedSerie(true);
+		if (altitudeSerie != null) {
+
+			if (tourData.isSRTMAvailable()) {
+
+				tcc.canShowSRTMData = true;
+
+				if (tcc.isSRTMDataVisible) {
+
+					final float[] srtmDataSerie = tourData.getSRTMSerie();
+					if (srtmDataSerie != null) {
+
+						// create altitude dataserie and adjust min/max values with with the srtm values
+						yDataAltitude = createChartDataSerie(//
+								new float[][] { altitudeSerie, srtmDataSerie },
+								chartType);
+					}
+				}
+
+			} else {
+
+				// SRTM data are not available
+				tcc.canShowSRTMData = false;
+			}
+
+			if (yDataAltitude == null) {
+				yDataAltitude = createChartDataSerie(altitudeSerie, chartType);
+			}
+
+			yDataAltitude.setYTitle(GRAPH_LABEL_ALTITUDE);
+			yDataAltitude.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
+			yDataAltitude.setShowYSlider(true);
+			yDataAltitude.setDisplayedFractionalDigits(2);
+			yDataAltitude.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_ALTITUDE);
+			yDataAltitude.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true));
+
+			if (isHrZoneDisplayed) {
+				yDataAltitude.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
+			} else {
+				yDataAltitude.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+			}
+
+			setGraphColor(yDataAltitude, GraphColorManager.PREF_GRAPH_ALTITUDE);
+			chartDataModel.addXyData(yDataAltitude);
+
+			// adjust pulse min/max values when it's defined in the pref store
+			setVisibleForcedValues(
+					yDataAltitude,
+					1,
+					0,
+					ITourbookPreferences.GRAPH_ALTITUDE_IS_MIN_ENABLED,
+					ITourbookPreferences.GRAPH_ALTITUDE_IS_MAX_ENABLED,
+					ITourbookPreferences.GRAPH_ALTITUDE_MIN_VALUE,
+					ITourbookPreferences.GRAPH_ALTITUDE_MAX_VALUE);
+		}
+		return yDataAltitude;
+	}
+
+	/**
+	 * Cadence
+	 */
+	private ChartDataYSerie createModelData_Cadence(final TourData tourData,
+													final ChartDataModel chartDataModel,
+													final ChartType chartType,
+													final boolean isHrZoneDisplayed) {
+
+		final float[] cadenceSerie = tourData.getCadenceSerie();
+		ChartDataYSerie yDataCadence = null;
+		if (cadenceSerie != null) {
+
+			final String cadenceUnit;
+
+			if (tourData.isMultipleTours()) {
+
+				final boolean isRpm = tourData.multipleTour_IsCadenceRpm;
+				final boolean isSpm = tourData.multipleTour_IsCadenceSpm;
+
+				cadenceUnit = isRpm && isSpm
+						? GRAPH_LABEL_CADENCE_UNIT_RPM_SPM //
+						: isSpm //
+								? GRAPH_LABEL_CADENCE_UNIT_SPM
+								: GRAPH_LABEL_CADENCE_UNIT;
+
+			} else {
+
+				cadenceUnit = tourData.isCadenceSpm() //
+						? GRAPH_LABEL_CADENCE_UNIT_SPM
+						: GRAPH_LABEL_CADENCE_UNIT;
+			}
+
+			yDataCadence = createChartDataSerieNoZero(cadenceSerie, chartType);
+
+			yDataCadence.setYTitle(GRAPH_LABEL_CADENCE);
+			yDataCadence.setUnitLabel(cadenceUnit);
+			yDataCadence.setShowYSlider(true);
+			yDataCadence.setDisplayedFractionalDigits(1);
+			yDataCadence.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_CADENCE);
+			yDataCadence.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, _computeAvg_Cadence));
+			yDataCadence.setSliderLabelProvider(new SliderLabelProvider_Cadence(cadenceSerie));
+
+			if (isHrZoneDisplayed) {
+				yDataCadence.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
+			} else {
+				yDataCadence.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+			}
+//			yDataCadence.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM_NO_BORDER);
+//			yDataCadence.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_NO);
+//			yDataCadence.setLineGaps(tourData.getCadenceGaps());
+
+			setGraphColor(yDataCadence, GraphColorManager.PREF_GRAPH_CADENCE);
+			chartDataModel.addXyData(yDataCadence);
+
+			// adjust min/max values when it's defined in the pref store
+			setVisibleForcedValues(
+					yDataCadence,
+					1,
+					0,
+					ITourbookPreferences.GRAPH_CADENCE_IS_MIN_ENABLED,
+					ITourbookPreferences.GRAPH_CADENCE_IS_MAX_ENABLED,
+					ITourbookPreferences.GRAPH_CADENCE_MIN_VALUE,
+					ITourbookPreferences.GRAPH_CADENCE_MAX_VALUE);
+		}
+		return yDataCadence;
+	}
+
+	/**
+	 * Gears
+	 */
+	private ChartDataYSerie createModelData_Gears(final TourData tourData, final ChartDataModel chartDataModel) {
+
+		final float[][] gearSerie = tourData.getGears();
+		ChartDataYSerie yDataGears = null;
+		if (gearSerie != null) {
+
+			final float[][] chartGearSerie = new float[][] //
+			{
+					// gear ratio
+					gearSerie[0],
+
+					// front gear number, starting with 1 for the large chainwheel (Kettenblatt)
+					gearSerie[3] //
+			};
+
+			yDataGears = createChartDataSerieNoZero(chartGearSerie, ChartType.HORIZONTAL_BAR);
+
+			yDataGears.setYTitle(GRAPH_LABEL_GEARS);
+			yDataGears.setShowYSlider(true);
+			yDataGears.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_GEARS);
+			yDataGears.setSliderLabelProvider(new SliderLabelProvider_Gear(gearSerie));
+
+//			yDataGears.setLineGaps(tourData.getCadenceGaps());
+
+			setGraphColor(yDataGears, GraphColorManager.PREF_GRAPH_GEAR);
+			chartDataModel.addXyData(yDataGears);
+		}
+		return yDataGears;
+	}
+
+	/**
+	 * Gradient
+	 */
+	private ChartDataYSerie createModelData_Gradient(	final TourData tourData,
+														final ChartDataModel chartDataModel,
+														final ChartType chartType,
+														final boolean isHrZoneDisplayed) {
+
+		final float[] gradientSerie = tourData.gradientSerie;
+		ChartDataYSerie yDataGradient = null;
+		if (gradientSerie != null) {
+
+			yDataGradient = createChartDataSerie(gradientSerie, chartType);
+
+			yDataGradient.setYTitle(GRAPH_LABEL_GRADIENT);
+			yDataGradient.setUnitLabel(GRAPH_LABEL_GRADIENT_UNIT);
+			yDataGradient.setShowYSlider(true);
+			yDataGradient.setDisplayedFractionalDigits(1);
+			yDataGradient.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_GRADIENT);
+			yDataGradient.setCustomData(
+					CUSTOM_DATA_ANALYZER_INFO, //
+					new TourChartAnalyzerInfo(true, true, _computeAvg_Gradient, 1));
+
+			if (isHrZoneDisplayed) {
+				yDataGradient.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
+			} else {
+				yDataGradient.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_ZERO);
+			}
+
+			setGraphColor(yDataGradient, GraphColorManager.PREF_GRAPH_GRADIENT);
+			chartDataModel.addXyData(yDataGradient);
+
+			// adjust min/max values when it's defined in the pref store
+			setVisibleForcedValues(
+					yDataGradient,
+					1,
+					TourChart.MAX_ADJUSTMENT,
+					ITourbookPreferences.GRAPH_GRADIENT_IS_MIN_ENABLED,
+					ITourbookPreferences.GRAPH_GRADIENT_IS_MAX_ENABLED,
+					ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
+					ITourbookPreferences.GRAPH_GRADIENT_MAX_VALUE);
+		}
+		return yDataGradient;
+	}
+
+	private ChartDataYSerie createModelData_Heartbeat(	final TourData tourData,
+														final ChartDataModel chartDataModel,
+														final ChartType chartType,
+														final boolean isHrZoneDisplayed) {
+		/**
+		 * Heartbeat
+		 */
+		ChartDataYSerie yDataPulse = null;
+
+		final float[] pulseSerie = tourData.getPulseSmoothedSerie();
+		if (pulseSerie != null) {
+
+			yDataPulse = createChartDataSerieNoZero(pulseSerie, chartType);
+
+			yDataPulse.setYTitle(GRAPH_LABEL_HEARTBEAT);
+			yDataPulse.setUnitLabel(GRAPH_LABEL_HEARTBEAT_UNIT);
+			yDataPulse.setShowYSlider(true);
+			yDataPulse.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_PULSE);
+			yDataPulse.setCustomData(
+					CUSTOM_DATA_ANALYZER_INFO, //
+					new TourChartAnalyzerInfo(true, _computeAvg_Pulse));
+
+			if (isHrZoneDisplayed) {
+				yDataPulse.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
+			} else {
+				yDataPulse.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+			}
+
+			setGraphColor(yDataPulse, GraphColorManager.PREF_GRAPH_HEARTBEAT);
+			chartDataModel.addXyData(yDataPulse);
+
+			// adjust  min/max values when it's defined in the pref store
+			setVisibleForcedValues(
+					yDataPulse,
+					1,
+					0,
+					ITourbookPreferences.GRAPH_PULSE_IS_MIN_ENABLED,
+					ITourbookPreferences.GRAPH_PULSE_IS_MAX_ENABLED,
+					ITourbookPreferences.GRAPH_PULSE_MIN_VALUE,
+					ITourbookPreferences.GRAPH_PULSE_MAX_VALUE);
+		}
+
+		return yDataPulse;
+	}
+
+	private ChartDataYSerie createModelData_Pace(	final TourData tourData,
+													final ChartDataModel chartDataModel,
+													final ChartType chartType,
+													final boolean isHrZoneDisplayed) {
+		/*
+		 * pace
+		 */
+		final float[] paceSerie = tourData.getPaceSerieSeconds();
+		ChartDataYSerie yDataPace = null;
+		if (paceSerie != null) {
+
+			yDataPace = createChartDataSerieNoZero(paceSerie, chartType);
+
+			yDataPace.setYTitle(GRAPH_LABEL_PACE);
+			yDataPace.setUnitLabel(UI.UNIT_LABEL_PACE);
+			yDataPace.setShowYSlider(true);
+			yDataPace.setAxisUnit(ChartDataSerie.AXIS_UNIT_MINUTE_SECOND);
+			yDataPace.setSliderLabelFormat(ChartDataYSerie.SLIDER_LABEL_FORMAT_MM_SS);
+			yDataPace.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_PACE);
+			yDataPace.setCustomData(
+					CUSTOM_DATA_ANALYZER_INFO, //
+					new TourChartAnalyzerInfo(true, false, _computeAvg_Pace, 1));
+
+			if (isHrZoneDisplayed) {
+				yDataPace.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
+			} else {
+				yDataPace.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+			}
+
+			setGraphColor(yDataPace, GraphColorManager.PREF_GRAPH_PACE);
+			chartDataModel.addXyData(yDataPace);
+
+			// adjust min/max values when it's defined in the pref store
+			setVisibleForcedValues(
+					yDataPace,
+					60,
+					0,
+					ITourbookPreferences.GRAPH_PACE_IS_MIN_ENABLED,
+					ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED,
+					ITourbookPreferences.GRAPH_PACE_MIN_VALUE,
+					ITourbookPreferences.GRAPH_PACE_MAX_VALUE);
+		}
+
+		return yDataPace;
+	}
+
+	/**
+	 * Power
+	 */
+	private ChartDataYSerie createModelData_Power(	final TourData tourData,
+													final ChartDataModel chartDataModel,
+													final ChartType chartType,
+													final boolean isHrZoneDisplayed) {
+
+		final float[] powerSerie = tourData.getPowerSerie();
+		ChartDataYSerie yDataPower = null;
+		if (powerSerie != null) {
+
+			yDataPower = createChartDataSerieNoZero(powerSerie, chartType);
+
+			yDataPower.setYTitle(GRAPH_LABEL_POWER);
+			yDataPower.setUnitLabel(GRAPH_LABEL_POWER_UNIT);
+			yDataPower.setShowYSlider(true);
+			yDataPower.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_POWER);
+			yDataPower.setCustomData(
+					CUSTOM_DATA_ANALYZER_INFO, //
+					new TourChartAnalyzerInfo(true, false, _computeAvg_Power, 0));
+
+			if (isHrZoneDisplayed) {
+				yDataPower.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
+			} else {
+				yDataPower.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+			}
+
+			setGraphColor(yDataPower, GraphColorManager.PREF_GRAPH_POWER);
+			chartDataModel.addXyData(yDataPower);
+
+			// adjust min/max values when it's defined in the pref store
+			setVisibleForcedValues(
+					yDataPower,
+					1,
+					0,
+					ITourbookPreferences.GRAPH_POWER_IS_MIN_ENABLED,
+					ITourbookPreferences.GRAPH_POWER_IS_MAX_ENABLED,
+					ITourbookPreferences.GRAPH_POWER_MIN_VALUE,
+					ITourbookPreferences.GRAPH_POWER_MAX_VALUE);
+		}
+
+		return yDataPower;
+	}
+
+	/**
+	 * Running Dynamics: Stance time
+	 */
+	private ChartDataYSerie createModelData_RunDyn_StanceTime(	final TourData tourData,
+																final ChartDataModel chartDataModel,
+																final ChartType chartType,
+																final boolean isHrZoneDisplayed) {
+
+		ChartDataYSerie yDataSerie = null;
+
+		final float[] dataSerie = tourData.getRunDyn_StanceTime();
+		if (dataSerie != null) {
+
+			yDataSerie = createChartDataSerie(dataSerie, chartType);
+
+			yDataSerie.setYTitle(GRAPH_LABEL_RUN_DYN_STANCE_TIME);
+			yDataSerie.setUnitLabel(UI.UNIT_MS);
+			yDataSerie.setShowYSlider(true);
+			yDataSerie.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_RUN_DYN_STANCE_TIME);
+
+			if (isHrZoneDisplayed) {
+				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
+			} else {
+				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+			}
+
+			setGraphColor(yDataSerie, GraphColorManager.PREF_GRAPH_POWER);
+			chartDataModel.addXyData(yDataSerie);
+
+			// adjust min/max values when it's defined in the pref store
+//			setVisibleForcedValues(
+//					yData_RunDyn_StanceTime,
+//					1,
+//					TourChart.MAX_ADJUSTMENT,
+//					ITourbookPreferences.GRAPH_GRADIENT_IS_MIN_ENABLED,
+//					ITourbookPreferences.GRAPH_GRADIENT_IS_MAX_ENABLED,
+//					ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
+//					ITourbookPreferences.GRAPH_GRADIENT_MAX_VALUE);
+		}
+
+		return yDataSerie;
+	}
+
+	/**
+	 * Running Dynamics: Stance time
+	 */
+	private ChartDataYSerie createModelData_RunDyn_StanceTime_Balance(	final TourData tourData,
+																		final ChartDataModel chartDataModel,
+																		final ChartType chartType,
+																		final boolean isHrZoneDisplayed) {
+
+		ChartDataYSerie yDataSerie = null;
+
+		final float[] dataSerie = tourData.getRunDyn_StanceTime_Balance();
+		if (dataSerie != null) {
+
+			yDataSerie = createChartDataSerie(dataSerie, chartType);
+
+			yDataSerie.setYTitle(GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCED);
+			yDataSerie.setUnitLabel(UI.UNIT_PERCENT);
+			yDataSerie.setShowYSlider(true);
+			yDataSerie.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_RUN_DYN_STANCE_TIME_BALANCED);
+
+			if (isHrZoneDisplayed) {
+				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
+			} else {
+				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+			}
+
+			setGraphColor(yDataSerie, GraphColorManager.PREF_GRAPH_POWER);
+			chartDataModel.addXyData(yDataSerie);
+
+			// adjust min/max values when it's defined in the pref store
+//			setVisibleForcedValues(
+//					yData_RunDyn_StanceTime_Balance,
+//					1,
+//					TourChart.MAX_ADJUSTMENT,
+//					ITourbookPreferences.GRAPH_GRADIENT_IS_MIN_ENABLED,
+//					ITourbookPreferences.GRAPH_GRADIENT_IS_MAX_ENABLED,
+//					ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
+//					ITourbookPreferences.GRAPH_GRADIENT_MAX_VALUE);
+		}
+
+		return yDataSerie;
+	}
+
+	/**
+	 * Running Dynamics: Step length
+	 */
+	private ChartDataYSerie createModelData_RunDyn_StepLength(	final TourData tourData,
+																final ChartDataModel chartDataModel,
+																final ChartType chartType,
+																final boolean isHrZoneDisplayed) {
+
+		ChartDataYSerie yDataSerie = null;
+
+		final float[] dataSerie = tourData.getRunDyn_StepLength();
+		if (dataSerie != null) {
+
+			yDataSerie = createChartDataSerie(dataSerie, chartType);
+
+			yDataSerie.setYTitle(GRAPH_LABEL_RUN_DYN_STEP_LENGTH);
+			yDataSerie.setUnitLabel(UI.UNIT_LABEL_MM);
+			yDataSerie.setShowYSlider(true);
+			yDataSerie.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_RUN_DYN_STEP_LENGTH);
+
+			if (isHrZoneDisplayed) {
+				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
+			} else {
+				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+			}
+
+			setGraphColor(yDataSerie, GraphColorManager.PREF_GRAPH_POWER);
+			chartDataModel.addXyData(yDataSerie);
+
+			// adjust min/max values when it's defined in the pref store
+//			setVisibleForcedValues(
+//					yData_RunDyn_StepLength,
+//					1,
+//					TourChart.MAX_ADJUSTMENT,
+//					ITourbookPreferences.GRAPH_GRADIENT_IS_MIN_ENABLED,
+//					ITourbookPreferences.GRAPH_GRADIENT_IS_MAX_ENABLED,
+//					ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
+//					ITourbookPreferences.GRAPH_GRADIENT_MAX_VALUE);
+		}
+
+		return yDataSerie;
+	}
+
+	/**
+	 * Running Dynamics: Vertical oscillation
+	 */
+	private ChartDataYSerie createModelData_RunDyn_VerticalOscillation(	final TourData tourData,
+	                                                             	final ChartDataModel chartDataModel,
+	                                                             	final ChartType chartType,
+	                                                             	final boolean isHrZoneDisplayed) {
+		
+		ChartDataYSerie yDataSerie = null;
+		
+		final float[] dataSerie = tourData.getRunDyn_VerticalOscillation();
+		if (dataSerie != null) {
+			
+			yDataSerie = createChartDataSerie(dataSerie, chartType);
+			
+			yDataSerie.setYTitle(GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION);
+			yDataSerie.setUnitLabel(UI.UNIT_LABEL_MM);
+			yDataSerie.setShowYSlider(true);
+			yDataSerie.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_RUN_DYN_VERTICAL_OSCILLATION);
+			
+			if (isHrZoneDisplayed) {
+				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
+			} else {
+				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+			}
+			
+			setGraphColor(yDataSerie, GraphColorManager.PREF_GRAPH_POWER);
+			chartDataModel.addXyData(yDataSerie);
+			
+			// adjust min/max values when it's defined in the pref store
+//			setVisibleForcedValues(
+//					yData_RunDyn_VerticalOscillation,
+//					1,
+//					TourChart.MAX_ADJUSTMENT,
+//					ITourbookPreferences.GRAPH_GRADIENT_IS_MIN_ENABLED,
+//					ITourbookPreferences.GRAPH_GRADIENT_IS_MAX_ENABLED,
+//					ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
+//					ITourbookPreferences.GRAPH_GRADIENT_MAX_VALUE);
+		}
+		
+		return yDataSerie;
+	}
+
+	/**
+	 * Running Dynamics: Vertical ratio
+	 */
+	private ChartDataYSerie createModelData_RunDyn_VerticalRatio(	final TourData tourData,
+																	final ChartDataModel chartDataModel,
+																	final ChartType chartType,
+																	final boolean isHrZoneDisplayed) {
+
+		ChartDataYSerie yDataSerie = null;
+
+		final float[] dataSerie = tourData.getRunDyn_VerticalRatio();
+		if (dataSerie != null) {
+
+			yDataSerie = createChartDataSerie(dataSerie, chartType);
+
+			yDataSerie.setYTitle(GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO);
+			yDataSerie.setUnitLabel(UI.UNIT_PERCENT);
+			yDataSerie.setShowYSlider(true);
+			yDataSerie.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_RUN_DYN_VERTICAL_RATIO);
+
+			if (isHrZoneDisplayed) {
+				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
+			} else {
+				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+			}
+
+			setGraphColor(yDataSerie, GraphColorManager.PREF_GRAPH_POWER);
+			chartDataModel.addXyData(yDataSerie);
+
+			// adjust min/max values when it's defined in the pref store
+//			setVisibleForcedValues(
+//					yData_RunDyn_VerticalRatio,
+//					1,
+//					TourChart.MAX_ADJUSTMENT,
+//					ITourbookPreferences.GRAPH_GRADIENT_IS_MIN_ENABLED,
+//					ITourbookPreferences.GRAPH_GRADIENT_IS_MAX_ENABLED,
+//					ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
+//					ITourbookPreferences.GRAPH_GRADIENT_MAX_VALUE);
+		}
+
+		return yDataSerie;
+	}
+
+	/**
+	 * Speed
+	 */
+	private ChartDataYSerie createModelData_Speed(	final TourData tourData,
+													final ChartDataModel chartDataModel,
+													final ChartType chartType,
+													final boolean isHrZoneDisplayed) {
+
+		final float[] speedSerie = tourData.getSpeedSerie();
+		ChartDataYSerie yDataSpeed = null;
+		if (speedSerie != null) {
+
+			yDataSpeed = createChartDataSerieNoZero(speedSerie, chartType);
+
+			yDataSpeed.setYTitle(GRAPH_LABEL_SPEED);
+			yDataSpeed.setUnitLabel(UI.UNIT_LABEL_SPEED);
+			yDataSpeed.setShowYSlider(true);
+			yDataSpeed.setDisplayedFractionalDigits(1);
+			yDataSpeed.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_SPEED);
+			yDataSpeed.setCustomData(
+					CUSTOM_DATA_ANALYZER_INFO, //
+					new TourChartAnalyzerInfo(true, true, _computeAvg_Speed, 1));
+
+			if (isHrZoneDisplayed) {
+				yDataSpeed.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
+			} else {
+				yDataSpeed.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+			}
+
+			setGraphColor(yDataSpeed, GraphColorManager.PREF_GRAPH_SPEED);
+			chartDataModel.addXyData(yDataSpeed);
+
+			// adjust  min/max values when it's defined in the pref store
+			setVisibleForcedValues(
+					yDataSpeed,
+					1,
+					0,
+					ITourbookPreferences.GRAPH_SPEED_IS_MIN_ENABLED,
+					ITourbookPreferences.GRAPH_SPEED_IS_MAX_ENABLED,
+					ITourbookPreferences.GRAPH_SPEED_MIN_VALUE,
+					ITourbookPreferences.GRAPH_SPEED_MAX_VALUE);
+		}
+
+		return yDataSpeed;
+	}
+
+	/**
+	 * Temperature
+	 */
+	private ChartDataYSerie createModelData_Temperature(final TourData tourData,
+														final ChartDataModel chartDataModel,
+														final ChartType chartType,
+														final boolean isHrZoneDisplayed) {
+
+		final float[] temperatureSerie = tourData.getTemperatureSerie();
+		ChartDataYSerie yDataTemperature = null;
+		if (temperatureSerie != null) {
+
+			yDataTemperature = createChartDataSerie(temperatureSerie, chartType);
+
+			yDataTemperature.setYTitle(GRAPH_LABEL_TEMPERATURE);
+			yDataTemperature.setUnitLabel(UI.UNIT_LABEL_TEMPERATURE);
+			yDataTemperature.setShowYSlider(true);
+			yDataTemperature.setDisplayedFractionalDigits(1);
+			yDataTemperature.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_TEMPERATURE);
+			yDataTemperature.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, true));
+
+			if (isHrZoneDisplayed) {
+				yDataTemperature.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
+			} else {
+				yDataTemperature.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+			}
+
+			setGraphColor(yDataTemperature, GraphColorManager.PREF_GRAPH_TEMPTERATURE);
+			chartDataModel.addXyData(yDataTemperature);
+
+			// adjust min/max values when it's defined in the pref store
+			setVisibleForcedValues(
+					yDataTemperature,
+					1,
+					0,
+					ITourbookPreferences.GRAPH_TEMPERATURE_IS_MIN_ENABLED,
+					ITourbookPreferences.GRAPH_TEMPERATURE_IS_MAX_ENABLED,
+					ITourbookPreferences.GRAPH_TEMPERATURE_MIN_VALUE,
+					ITourbookPreferences.GRAPH_TEMPERATURE_MAX_VALUE);
+		}
+
+		return yDataTemperature;
+	}
+
+	/**
+	 * Tour compare altitude or lat/lon difference
+	 */
+	private ChartDataYSerie createModelData_TourCompare(final TourData tourData,
+														final ChartDataModel chartDataModel,
+														final ChartType chartType,
+														final TourChartConfiguration tcc) {
+
+		final float[] tourCompareSerie = tourData.tourCompareSerie;
+		ChartDataYSerie yDataTourCompare = null;
+		if (tourCompareSerie != null && tourCompareSerie.length > 0 && tcc.canShowTourCompareGraph) {
+
+			yDataTourCompare = createChartDataSerie(tourCompareSerie, chartType);
+
+			yDataTourCompare.setYTitle(GRAPH_LABEL_TOUR_COMPARE);
+			yDataTourCompare.setUnitLabel(tcc.isGeoCompareDiff
+					? GRAPH_LABEL_GEO_COMPARE_UNIT
+					: GRAPH_LABEL_TOUR_COMPARE_UNIT);
+			yDataTourCompare.setShowYSlider(true);
+			yDataTourCompare.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+			yDataTourCompare.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_TOUR_COMPARE);
+
+			setGraphColor(yDataTourCompare, GraphColorManager.PREF_GRAPH_TOUR_COMPARE);
+			chartDataModel.addXyData(yDataTourCompare);
+		}
+
+		return yDataTourCompare;
 	}
 
 	public TourChart getActiveTourChart() {
