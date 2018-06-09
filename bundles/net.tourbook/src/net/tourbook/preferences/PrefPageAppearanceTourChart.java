@@ -64,26 +64,32 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageAppearanceTourChart extends PreferencePage implements IWorkbenchPreferencePage {
 
-	public static final String		ID											= "net.tourbook.preferences.PrefPageChartGraphs";							//$NON-NLS-1$
+	public static final String		ID											= "net.tourbook.preferences.PrefPageChartGraphs";						//$NON-NLS-1$
 
-	private static final String		STATE_PREF_PAGE_CHART_GRAPHS_SELECTED_TAB	= "PrefPage.ChartGraphs.SelectedTab";										//$NON-NLS-1$
-	
+	private static final String		STATE_PREF_PAGE_CHART_GRAPHS_SELECTED_TAB	= "PrefPage.ChartGraphs.SelectedTab";									//$NON-NLS-1$
+
 // SET_FORMATTING_OFF
 	
-	private static final String		GRAPH_LABEL_ALTIMETER						= net.tourbook.common.Messages.Graph_Label_Altimeter;
-	private static final String		GRAPH_LABEL_ALTITUDE						= net.tourbook.common.Messages.Graph_Label_Altitude;
-	private static final String		GRAPH_LABEL_CADENCE							= net.tourbook.common.Messages.Graph_Label_Cadence;
-	private static final String		GRAPH_LABEL_GEARS							= net.tourbook.common.Messages.Graph_Label_Gears;
-	private static final String		GRAPH_LABEL_GRADIENT						= net.tourbook.common.Messages.Graph_Label_Gradient;
-	private static final String		GRAPH_LABEL_HEARTBEAT						= net.tourbook.common.Messages.Graph_Label_Heartbeat;
-	private static final String		GRAPH_LABEL_PACE							= net.tourbook.common.Messages.Graph_Label_Pace;
-	private static final String		GRAPH_LABEL_POWER							= net.tourbook.common.Messages.Graph_Label_Power;
-	private static final String		GRAPH_LABEL_SHOW_HR_ZONE_BACKGROUND_TOOLTIP	= net.tourbook.common.Messages.Graph_Label_ShowHrZoneBackground_Tooltip;
-	private static final String		GRAPH_LABEL_SHOW_HR_ZONE_BACKGROUND			= net.tourbook.common.Messages.Graph_Label_ShowHrZoneBackground;
-	private static final String		GRAPH_LABEL_SPEED							= net.tourbook.common.Messages.Graph_Label_Speed;
-	private static final String		GRAPH_LABEL_TEMPERATURE						= net.tourbook.common.Messages.Graph_Label_Temperature;
-	private static final String		GRAPH_LABEL_TOUR_COMPARE_RESULT				= net.tourbook.common.Messages.Graph_Label_Tour_Compare;
+	private static final String	GRAPH_LABEL_ALTIMETER						= net.tourbook.common.Messages.Graph_Label_Altimeter;
+	private static final String	GRAPH_LABEL_ALTITUDE						= net.tourbook.common.Messages.Graph_Label_Altitude;
+	private static final String	GRAPH_LABEL_CADENCE							= net.tourbook.common.Messages.Graph_Label_Cadence;
+	private static final String	GRAPH_LABEL_GEARS							= net.tourbook.common.Messages.Graph_Label_Gears;
+	private static final String	GRAPH_LABEL_GRADIENT						= net.tourbook.common.Messages.Graph_Label_Gradient;
+	private static final String	GRAPH_LABEL_HEARTBEAT						= net.tourbook.common.Messages.Graph_Label_Heartbeat;
+	private static final String	GRAPH_LABEL_PACE							= net.tourbook.common.Messages.Graph_Label_Pace;
+	private static final String	GRAPH_LABEL_POWER							= net.tourbook.common.Messages.Graph_Label_Power;
+	private static final String	GRAPH_LABEL_SHOW_HR_ZONE_BACKGROUND_TOOLTIP	= net.tourbook.common.Messages.Graph_Label_ShowHrZoneBackground_Tooltip;
+	private static final String	GRAPH_LABEL_SHOW_HR_ZONE_BACKGROUND			= net.tourbook.common.Messages.Graph_Label_ShowHrZoneBackground;
+	private static final String	GRAPH_LABEL_SPEED							= net.tourbook.common.Messages.Graph_Label_Speed;
+	private static final String	GRAPH_LABEL_TEMPERATURE						= net.tourbook.common.Messages.Graph_Label_Temperature;
+	private static final String	GRAPH_LABEL_TOUR_COMPARE_RESULT				= net.tourbook.common.Messages.Graph_Label_Tour_Compare;
 	
+	private static final String	GRAPH_LABEL_RUN_DYN_STANCE_TIME				= net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTime;
+	private static final String	GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCED	= net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTime_Balanced;
+	private static final String	GRAPH_LABEL_RUN_DYN_STEP_LENGTH				= net.tourbook.common.Messages.Graph_Label_RunDyn_StepLength;
+	private static final String	GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION	= net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalOscillation;
+	private static final String	GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO			= net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalRatio;
+
 // SET_FORMATTING_ON
 
 	private final IPreferenceStore	_prefStore									= TourbookPlugin.getPrefStore();
@@ -732,35 +738,50 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 // SET_FORMATTING_OFF
 		
 		// create a map and list with all available graphs
-		final Graph graph_Altitude 				= new Graph(TourManager.GRAPH_ALTITUDE, 		GRAPH_LABEL_ALTITUDE);
-		final Graph graph_Speed 				= new Graph(TourManager.GRAPH_SPEED, 			GRAPH_LABEL_SPEED);
-		final Graph graph_Pace 					= new Graph(TourManager.GRAPH_PACE, 			GRAPH_LABEL_PACE);
-		final Graph graph_Power 				= new Graph(TourManager.GRAPH_POWER, 			GRAPH_LABEL_POWER);
-		final Graph graph_Pulse 				= new Graph(TourManager.GRAPH_PULSE, 			GRAPH_LABEL_HEARTBEAT);
-		final Graph graph_Temperature 			= new Graph(TourManager.GRAPH_TEMPERATURE, 		GRAPH_LABEL_TEMPERATURE);
-		final Graph graph_Cadence 				= new Graph(TourManager.GRAPH_CADENCE, 			GRAPH_LABEL_CADENCE);
-		final Graph graph_Gears 				= new Graph(TourManager.GRAPH_GEARS, 			GRAPH_LABEL_GEARS);
-		final Graph graph_Altimeter 			= new Graph(TourManager.GRAPH_ALTIMETER, 		GRAPH_LABEL_ALTIMETER);
-		final Graph graph_Gradient 				= new Graph(TourManager.GRAPH_GRADIENT, 		GRAPH_LABEL_GRADIENT);
-		final Graph graph_TourCompareResult 	= new Graph(TourManager.GRAPH_TOUR_COMPARE, 	GRAPH_LABEL_TOUR_COMPARE_RESULT);
+		final Graph graph_Altitude 						= new Graph(TourManager.GRAPH_ALTITUDE, 		GRAPH_LABEL_ALTITUDE);
+		final Graph graph_Speed 						= new Graph(TourManager.GRAPH_SPEED, 			GRAPH_LABEL_SPEED);
+		final Graph graph_Pace 							= new Graph(TourManager.GRAPH_PACE, 			GRAPH_LABEL_PACE);
+		final Graph graph_Power 						= new Graph(TourManager.GRAPH_POWER, 			GRAPH_LABEL_POWER);
+		final Graph graph_Pulse 						= new Graph(TourManager.GRAPH_PULSE, 			GRAPH_LABEL_HEARTBEAT);
+		final Graph graph_Temperature 					= new Graph(TourManager.GRAPH_TEMPERATURE, 		GRAPH_LABEL_TEMPERATURE);
+		final Graph graph_Cadence 						= new Graph(TourManager.GRAPH_CADENCE, 			GRAPH_LABEL_CADENCE);
+		final Graph graph_Gears 						= new Graph(TourManager.GRAPH_GEARS, 			GRAPH_LABEL_GEARS);
+		final Graph graph_Altimeter 					= new Graph(TourManager.GRAPH_ALTIMETER, 		GRAPH_LABEL_ALTIMETER);
+		final Graph graph_Gradient 						= new Graph(TourManager.GRAPH_GRADIENT, 		GRAPH_LABEL_GRADIENT);
+		
+		final Graph graph_RunDyn_StanceTime				= new Graph(TourManager.GRAPH_RUN_DYN_STANCE_TIME, 			GRAPH_LABEL_RUN_DYN_STANCE_TIME);
+		final Graph graph_RunDyn_StanceTime_Balance 	= new Graph(TourManager.GRAPH_RUN_DYN_STANCE_TIME_BALANCED, GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCED);
+		final Graph graph_RunDyn_StepLength			 	= new Graph(TourManager.GRAPH_RUN_DYN_STEP_LENGTH, 			GRAPH_LABEL_RUN_DYN_STEP_LENGTH);
+		final Graph graph_RunDyn_VerticalOscillation 	= new Graph(TourManager.GRAPH_RUN_DYN_VERTICAL_OSCILLATION, GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION);
+		final Graph graph_RunDyn_VerticalRatio		 	= new Graph(TourManager.GRAPH_RUN_DYN_VERTICAL_RATIO, 		GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO);
+
+		final Graph graph_TourCompareResult 			= new Graph(TourManager.GRAPH_TOUR_COMPARE, 	GRAPH_LABEL_TOUR_COMPARE_RESULT);
 
 		_graphMap = new HashMap<Integer, Graph>();
 		
-		_graphMap.put(TourManager.GRAPH_ALTITUDE,		graph_Altitude);
-		_graphMap.put(TourManager.GRAPH_SPEED, 			graph_Speed);
-		_graphMap.put(TourManager.GRAPH_PACE, 			graph_Pace);
-		_graphMap.put(TourManager.GRAPH_POWER, 			graph_Power);
-		_graphMap.put(TourManager.GRAPH_PULSE, 			graph_Pulse);
-		_graphMap.put(TourManager.GRAPH_TEMPERATURE, 	graph_Temperature);
-		_graphMap.put(TourManager.GRAPH_CADENCE, 		graph_Cadence);
-		_graphMap.put(TourManager.GRAPH_GEARS, 			graph_Gears);
-		_graphMap.put(TourManager.GRAPH_ALTIMETER, 		graph_Altimeter);
+		_graphMap.put(TourManager.GRAPH_ALTITUDE,						graph_Altitude);
+		_graphMap.put(TourManager.GRAPH_SPEED, 							graph_Speed);
+		_graphMap.put(TourManager.GRAPH_PACE, 							graph_Pace);
+		_graphMap.put(TourManager.GRAPH_POWER, 							graph_Power);
+		_graphMap.put(TourManager.GRAPH_PULSE, 							graph_Pulse);
+		_graphMap.put(TourManager.GRAPH_TEMPERATURE, 	 	 	 	 	graph_Temperature);
+		_graphMap.put(TourManager.GRAPH_CADENCE, 						graph_Cadence);
+		_graphMap.put(TourManager.GRAPH_GEARS, 							graph_Gears);
+		_graphMap.put(TourManager.GRAPH_ALTIMETER, 						graph_Altimeter);
 		_graphMap.put(TourManager.GRAPH_GRADIENT, 		graph_Gradient);
-		_graphMap.put(TourManager.GRAPH_TOUR_COMPARE,	graph_TourCompareResult);
+		
+		_graphMap.put(TourManager.GRAPH_RUN_DYN_STANCE_TIME, 			graph_RunDyn_StanceTime);
+		_graphMap.put(TourManager.GRAPH_RUN_DYN_STANCE_TIME_BALANCED,	graph_RunDyn_StanceTime_Balance);
+		_graphMap.put(TourManager.GRAPH_RUN_DYN_STEP_LENGTH, 			graph_RunDyn_StepLength);
+		_graphMap.put(TourManager.GRAPH_RUN_DYN_VERTICAL_OSCILLATION, 	graph_RunDyn_VerticalOscillation);
+		_graphMap.put(TourManager.GRAPH_RUN_DYN_VERTICAL_RATIO, 		graph_RunDyn_VerticalRatio);
+		
+		_graphMap.put(TourManager.GRAPH_TOUR_COMPARE,					graph_TourCompareResult);
 		
 // SET_FORMATTING_ON
 
 		_graphList = new ArrayList<Graph>();
+
 		_graphList.add(graph_Altitude);
 		_graphList.add(graph_Speed);
 		_graphList.add(graph_Pace);
@@ -771,6 +792,13 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		_graphList.add(graph_Gears);
 		_graphList.add(graph_Altimeter);
 		_graphList.add(graph_Gradient);
+
+		_graphList.add(graph_RunDyn_StanceTime);
+		_graphList.add(graph_RunDyn_StanceTime_Balance);
+		_graphList.add(graph_RunDyn_StepLength);
+		_graphList.add(graph_RunDyn_VerticalOscillation);
+		_graphList.add(graph_RunDyn_VerticalRatio);
+
 		_graphList.add(graph_TourCompareResult);
 	}
 
@@ -877,40 +905,28 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 		if (selectedTab == _tab1_Graphs) {
 
-			_chkGraphAntialiasing.setSelection(//
-					_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_ANTIALIASING));
+			_chkGraphAntialiasing.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_ANTIALIASING));
+			_chkShowHrZoneBackground.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_IS_HR_ZONE_BACKGROUND_VISIBLE));
 
-			_chkShowHrZoneBackground.setSelection(//
-					_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_IS_HR_ZONE_BACKGROUND_VISIBLE));
-
-			_spinnerGraphTransparencyFilling.setSelection(//
-					_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING));
-
-			_spinnerGraphTransparencyLine.setSelection(//
-					_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE));
+			_spinnerGraphTransparencyFilling.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING));
+			_spinnerGraphTransparencyLine.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE));
 
 			// segment alternate color
-			_chkSegmentAlternateColor.setSelection(//
-					_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR));
+			_chkSegmentAlternateColor.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR));
 			_colorSegmentAlternateColor.setColorValue(//
 					PreferenceConverter.getDefaultColor(_prefStore, ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR));
 
 		} else if (selectedTab == _tab2_Grid) {
 
-			_spinnerGridHorizontalDistance.setSelection(//
-					_prefStore.getDefaultInt(ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE));
-			_spinnerGridVerticalDistance.setSelection(//
-					_prefStore.getDefaultInt(ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE));
+			_spinnerGridHorizontalDistance.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE));
+			_spinnerGridVerticalDistance.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE));
 
-			_chkShowGrid_HorizontalLines.setSelection(//
-					_prefStore.getDefaultBoolean(ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES));
-			_chkShowGrid_VerticalLines.setSelection(//
-					_prefStore.getDefaultBoolean(ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES));
+			_chkShowGrid_HorizontalLines.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES));
+			_chkShowGrid_VerticalLines.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES));
 		}
 
 		// live update
-		_chkLiveUpdate.setSelection(//
-				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_PREF_PAGE_IS_TOUR_CHART_LIVE_UPDATE));
+		_chkLiveUpdate.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_PREF_PAGE_IS_TOUR_CHART_LIVE_UPDATE));
 
 		super.performDefaults();
 
@@ -935,29 +951,21 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		_tabFolder.setSelection(_prefStore.getInt(STATE_PREF_PAGE_CHART_GRAPHS_SELECTED_TAB));
 
 		// live update
-		_chkLiveUpdate.setSelection(//
-				_prefStore.getBoolean(ITourbookPreferences.GRAPH_PREF_PAGE_IS_TOUR_CHART_LIVE_UPDATE));
+		_chkLiveUpdate.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_PREF_PAGE_IS_TOUR_CHART_LIVE_UPDATE));
 
 		enableControls();
 	}
 
 	private void restoreState_Tab_1_Graphs() {
 
-		_chkGraphAntialiasing.setSelection(//
-				_prefStore.getBoolean(ITourbookPreferences.GRAPH_ANTIALIASING));
+		_chkGraphAntialiasing.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_ANTIALIASING));
+		_chkShowHrZoneBackground.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_HR_ZONE_BACKGROUND_VISIBLE));
 
-		_chkShowHrZoneBackground.setSelection(//
-				_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_HR_ZONE_BACKGROUND_VISIBLE));
-
-		_spinnerGraphTransparencyFilling.setSelection(//
-				_prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING));
-
-		_spinnerGraphTransparencyLine.setSelection(//
-				_prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE));
+		_spinnerGraphTransparencyFilling.setSelection(_prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING));
+		_spinnerGraphTransparencyLine.setSelection(_prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE));
 
 		// segment alternate color
-		_chkSegmentAlternateColor.setSelection(//
-				_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR));
+		_chkSegmentAlternateColor.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR));
 		_colorSegmentAlternateColor.setColorValue(//
 				PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR));
 
@@ -1016,15 +1024,11 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		/*
 		 * Grid
 		 */
-		_spinnerGridHorizontalDistance.setSelection(//
-				_prefStore.getInt(ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE));
-		_spinnerGridVerticalDistance.setSelection(//
-				_prefStore.getInt(ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE));
+		_spinnerGridHorizontalDistance.setSelection(_prefStore.getInt(ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE));
+		_spinnerGridVerticalDistance.setSelection(_prefStore.getInt(ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE));
 
-		_chkShowGrid_HorizontalLines.setSelection(//
-				_prefStore.getBoolean(ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES));
-		_chkShowGrid_VerticalLines.setSelection(//
-				_prefStore.getBoolean(ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES));
+		_chkShowGrid_HorizontalLines.setSelection(_prefStore.getBoolean(ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES));
+		_chkShowGrid_VerticalLines.setSelection(_prefStore.getBoolean(ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES));
 
 		/*
 		 * Units
@@ -1041,10 +1045,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	private void restoreState_Tab_3_Options() {
 
 		// mouse wheel mode
-		_chkZoomToSlider.setSelection(//
-				_prefStore.getBoolean(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER));
-		_chkMoveSlidersWhenZoomed.setSelection(//
-				_prefStore.getBoolean(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED));
+		_chkZoomToSlider.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER));
+		_chkMoveSlidersWhenZoomed.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED));
 
 		// zoom options
 		if (_prefStore.getString(ITourbookPreferences.GRAPH_MOUSE_MODE).equals(Chart.MOUSE_MODE_SLIDER)) {
@@ -1061,29 +1063,21 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		saveState_Tab_3_Options();
 
 		// live update
-		_prefStore.setValue(
-				ITourbookPreferences.GRAPH_PREF_PAGE_IS_TOUR_CHART_LIVE_UPDATE,
-				_chkLiveUpdate.getSelection());
+		_prefStore.setValue(ITourbookPreferences.GRAPH_PREF_PAGE_IS_TOUR_CHART_LIVE_UPDATE, _chkLiveUpdate.getSelection());
 	}
 
 	private void saveState_Tab_1_Graphs() {
 
-		_prefStore.setValue(ITourbookPreferences.GRAPH_ANTIALIASING,//
-				_chkGraphAntialiasing.getSelection());
+		_prefStore.setValue(ITourbookPreferences.GRAPH_ANTIALIASING, _chkGraphAntialiasing.getSelection());
+		_prefStore.setValue(ITourbookPreferences.GRAPH_IS_HR_ZONE_BACKGROUND_VISIBLE, _chkShowHrZoneBackground.getSelection());
 
-		_prefStore.setValue(ITourbookPreferences.GRAPH_IS_HR_ZONE_BACKGROUND_VISIBLE,//
-				_chkShowHrZoneBackground.getSelection());
-
-		_prefStore.setValue(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING, //
-				_spinnerGraphTransparencyFilling.getSelection());
-
-		_prefStore.setValue(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE, //
-				_spinnerGraphTransparencyLine.getSelection());
+		_prefStore.setValue(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING, _spinnerGraphTransparencyFilling.getSelection());
+		_prefStore.setValue(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE, _spinnerGraphTransparencyLine.getSelection());
 
 		// segment alternate color
-		_prefStore.setValue(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR,//
-				_chkSegmentAlternateColor.getSelection());
-		PreferenceConverter.setValue(_prefStore, ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR,//
+		_prefStore.setValue(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR, _chkSegmentAlternateColor.getSelection());
+		PreferenceConverter.setValue(_prefStore,
+				ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR,
 				_colorSegmentAlternateColor.getColorValue());
 
 		saveState_Tab_1_Graphs_Graphs();
@@ -1119,15 +1113,11 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 	private void saveState_Tab_2_Grid() {
 
-		_prefStore.setValue(ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE, //
-				_spinnerGridHorizontalDistance.getSelection());
-		_prefStore.setValue(ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE, //
-				_spinnerGridVerticalDistance.getSelection());
+		_prefStore.setValue(ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE, _spinnerGridHorizontalDistance.getSelection());
+		_prefStore.setValue(ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE, _spinnerGridVerticalDistance.getSelection());
 
-		_prefStore.setValue(ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES, //
-				_chkShowGrid_HorizontalLines.getSelection());
-		_prefStore.setValue(ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES, //
-				_chkShowGrid_VerticalLines.getSelection());
+		_prefStore.setValue(ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES, _chkShowGrid_HorizontalLines.getSelection());
+		_prefStore.setValue(ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES, _chkShowGrid_VerticalLines.getSelection());
 
 		if (_rdoShowTime.getSelection()) {
 			_prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS, TourManager.X_AXIS_TIME);
@@ -1135,8 +1125,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 			_prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS, TourManager.X_AXIS_DISTANCE);
 		}
 
-		_prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME, //
-				_chkShowStartTime.getSelection());
+		_prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME, _chkShowStartTime.getSelection());
 	}
 
 	private void saveState_Tab_3_Options() {
@@ -1149,11 +1138,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		}
 
 		// zoom options
-		_prefStore.setValue(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER, //
-				_chkZoomToSlider.getSelection());
-
-		_prefStore.setValue(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED, //
-				_chkMoveSlidersWhenZoomed.getSelection());
+		_prefStore.setValue(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER, _chkZoomToSlider.getSelection());
+		_prefStore.setValue(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED, _chkMoveSlidersWhenZoomed.getSelection());
 	}
 
 	private void saveState_UI() {

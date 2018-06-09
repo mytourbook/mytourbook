@@ -2,6 +2,7 @@ package net.tourbook.device.garmin.fit.listeners;
 
 import net.tourbook.common.UI;
 import net.tourbook.data.TimeData;
+import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.device.garmin.fit.Activator;
 import net.tourbook.device.garmin.fit.DataConverters;
@@ -215,7 +216,7 @@ public class RecordMesgListenerImpl extends AbstractMesgListener implements Reco
 
 		final Float stanceTimeBalance = mesg.getStanceTimeBalance();
 		if (stanceTimeBalance != null) {
-			timeData.runDyn_StanceTime_Balance = (short) (stanceTimeBalance * 100);
+			timeData.runDyn_StanceTime_Balance = (short) (stanceTimeBalance * TourData.RUN_DYN_DATA_MULTIPLIER);
 		}
 
 		final Float stepLength = mesg.getStepLength();
@@ -223,14 +224,14 @@ public class RecordMesgListenerImpl extends AbstractMesgListener implements Reco
 			timeData.runDyn_StepLength = stepLength.shortValue();
 		}
 
-		final Float verticalRatio = mesg.getVerticalRatio();
-		if (verticalRatio != null) {
-			timeData.runDyn_Vertical_Ratio = (short) (verticalRatio * 100);
-		}
-
 		final Float verticalOscillation = mesg.getVerticalOscillation();
 		if (verticalOscillation != null) {
-			timeData.runDyn_Vertical_Oscillation = (short) (verticalOscillation * 100);
+			timeData.runDyn_Vertical_Oscillation = (short) (verticalOscillation * TourData.RUN_DYN_DATA_MULTIPLIER);
+		}
+		
+		final Float verticalRatio = mesg.getVerticalRatio();
+		if (verticalRatio != null) {
+			timeData.runDyn_Vertical_Ratio = (short) (verticalRatio * TourData.RUN_DYN_DATA_MULTIPLIER);
 		}
 
 		context.onMesgRecord_20_After();

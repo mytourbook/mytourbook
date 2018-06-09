@@ -184,6 +184,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 */
 	public static final int				MAX_HR_ZONES						= 10;
 
+	public static final Float 			RUN_DYN_DATA_MULTIPLIER				= 100f;
+
 	/**
 	 * Device Id for manually created tours
 	 */
@@ -6354,7 +6356,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 				_runDyn_StanceTime_Balance_UI = new float[serieSize];
 
 				for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
-					_runDyn_StanceTime_Balance_UI[serieIndex] = runDyn_StanceTime_Balance[serieIndex];
+					_runDyn_StanceTime_Balance_UI[serieIndex] = runDyn_StanceTime_Balance[serieIndex] / RUN_DYN_DATA_MULTIPLIER;
 				}
 			}
 		}
@@ -6396,7 +6398,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 				_runDyn_VerticalOscillation_UI = new float[serieSize];
 
 				for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
-					_runDyn_VerticalOscillation_UI[serieIndex] = runDyn_VerticalOscillation[serieIndex];
+					_runDyn_VerticalOscillation_UI[serieIndex] = runDyn_VerticalOscillation[serieIndex] / RUN_DYN_DATA_MULTIPLIER;
 				}
 			}
 		}
@@ -6417,7 +6419,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 				_runDyn_VerticalRatio_UI = new float[serieSize];
 
 				for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
-					_runDyn_VerticalRatio_UI[serieIndex] = runDyn_VerticalRatio[serieIndex];
+					_runDyn_VerticalRatio_UI[serieIndex] = runDyn_VerticalRatio[serieIndex] / RUN_DYN_DATA_MULTIPLIER;
 				}
 			}
 		}
