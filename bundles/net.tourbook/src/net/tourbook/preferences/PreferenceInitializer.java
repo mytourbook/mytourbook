@@ -122,6 +122,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		/*
 		 * Graph preferences
 		 */
+		store.setDefault(ITourbookPreferences.GRAPH_PREF_PAGE_IS_COLOR_LIVE_UPDATE, true);
 		store.setDefault(ITourbookPreferences.GRAPH_PREF_PAGE_IS_TOUR_CHART_LIVE_UPDATE, true);
 		store.setDefault(ITourbookPreferences.GRAPH_VISIBLE, Integer.toString(TourManager.GRAPH_ALTITUDE));
 		store.setDefault(ITourbookPreferences.GRAPH_IS_GRAPH_OVERLAPPED, false);

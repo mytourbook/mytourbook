@@ -116,6 +116,7 @@ public interface ITourbookPreferences {
 	public static final String	GRAPH_IS_TOUR_PHOTO_VISIBLE						= "GRAPH_IS_TOUR_PHOTO_VISIBLE";							//$NON-NLS-1$
 	public static final String	GRAPH_SEGMENT_ALTERNATE_COLOR					= "GRAPH_SEGMENT_ALTERNATE_COLOR";							//$NON-NLS-1$
 
+	public static final String	GRAPH_PREF_PAGE_IS_COLOR_LIVE_UPDATE			= "GRAPH_PREF_PAGE_IS_COLOR_LIVE_UPDATE";				//$NON-NLS-1$
 	public static final String	GRAPH_PREF_PAGE_IS_TOUR_CHART_LIVE_UPDATE		= "GRAPH_PREF_PAGE_IS_TOUR_CHART_LIVE_UPDATE";				//$NON-NLS-1$
 
 	public static final String	GRAPH_MARKER_COLOR_DEFAULT						= "GRAPH_MARKER_COLOR_DEFAULT";								//$NON-NLS-1$

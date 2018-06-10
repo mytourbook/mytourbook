@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -88,29 +88,26 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 			new ColorValue(50, 100, 100, 0),
 			new ColorValue(100, 0, 255, 0),
 			new ColorValue(150, 0, 100, 100),
-			new ColorValue(190, 0, 0, 255)						};
+			new ColorValue(190, 0, 0, 255) };
 
-	private static final List<Float>	_legendImageUnitValues	= Arrays.asList(//
-																		10f,
-																		50f,
-																		100f,
-																		150f,
-																		190f);
+	private static final List<Float>	_legendImageUnitValues	= Arrays.asList(									//
+			10f,
+			50f,
+			100f,
+			150f,
+			190f);
 
 	private static final List<String>	_legendImageUnitLabels	= Arrays.asList(
-																		Messages.Pref_ChartColors_unit_min,
-																		Messages.Pref_ChartColors_unit_low,
-																		Messages.Pref_ChartColors_unit_mid,
-																		Messages.Pref_ChartColors_unit_high,
-																		Messages.Pref_ChartColors_unit_max);
+			Messages.Pref_ChartColors_unit_min,
+			Messages.Pref_ChartColors_unit_low,
+			Messages.Pref_ChartColors_unit_mid,
+			Messages.Pref_ChartColors_unit_high,
+			Messages.Pref_ChartColors_unit_max);
 
 	private final IPreferenceStore		_prefStore				= TourbookPlugin.getDefault().getPreferenceStore();
 	private final IPreferenceStore		_commonPrefStore		= CommonActivator.getPrefStore();
 
 	TreeViewer							_colorViewer;
-
-	private ColorSelector				_colorSelector;
-	private Button						_btnLegend;
 
 	private GraphColorItem				_selectedColor;
 	private boolean						_isColorChanged;
@@ -120,6 +117,14 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 	private IGradientColorProvider		_legendImageColorProvider;
 	private DialogMap2ColorEditor		_dialogMappingColor;
 	private GraphColorPainter			_graphColorPainter;
+
+	/*
+	 * UI controls
+	 */
+	private Button						_btnLegend;
+	private Button						_chkLiveUpdate;
+
+	private ColorSelector				_colorSelector;
 
 	/**
 	 * the color content provider has the following structure<br>
@@ -247,6 +252,8 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 
 		initializeLegend();
 
+		restoreState();
+
 		_colorViewer.setInput(this);
 
 		return ui;
@@ -260,6 +267,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 		{
 			createUI_10_ColorViewer(container);
 			createUI_20_ColorControl(container);
+			createUI_99_LiveUpdate(container);
 		}
 
 		return container;
@@ -282,11 +290,12 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 		/*
 		 * create viewer
 		 */
-		final Tree tree = new Tree(layoutContainer, SWT.H_SCROLL
-				| SWT.V_SCROLL
-				| SWT.BORDER
-				| SWT.MULTI
-				| SWT.FULL_SELECTION);
+		final Tree tree = new Tree(layoutContainer,
+				SWT.H_SCROLL
+						| SWT.V_SCROLL
+						| SWT.BORDER
+						| SWT.MULTI
+						| SWT.FULL_SELECTION);
 
 		tree.setHeaderVisible(false);
 		tree.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
@@ -403,6 +412,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 				@Override
 				public void propertyChange(final PropertyChangeEvent event) {
 					onSelectColorInColorSelector(event);
+					doLiveUpdate();
 				}
 			});
 
@@ -417,9 +427,33 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					onSelectMappingColor();
+					doLiveUpdate();
 				}
 			});
 			_btnLegend.setEnabled(false);
+		}
+	}
+
+	private void createUI_99_LiveUpdate(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().span(2, 1).grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+		{
+			/*
+			 * Checkbox: live update
+			 */
+			_chkLiveUpdate = new Button(container, SWT.CHECK);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_chkLiveUpdate);
+			_chkLiveUpdate.setText(Messages.Pref_LiveUpdate_Checkbox);
+			_chkLiveUpdate.setToolTipText(Messages.Pref_LiveUpdate_Checkbox_Tooltip);
+			_chkLiveUpdate.addSelectionListener(new SelectionAdapter() {
+
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					doLiveUpdate();
+				}
+			});
 		}
 	}
 
@@ -472,15 +506,15 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 
 					cell.setImage(_graphColorPainter.drawColorDefinitionImage(
 							(ColorDefinition) element,
-									numberOfHorizontalImages,
-									false));
+							numberOfHorizontalImages,
+							false));
 
 				} else if (element instanceof GraphColorItem) {
 
 					cell.setImage(_graphColorPainter.drawGraphColorImage(//
 							(GraphColorItem) element,
-									numberOfHorizontalImages,
-									false));
+							numberOfHorizontalImages,
+							false));
 
 				} else {
 
@@ -489,6 +523,13 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 			}
 		});
 		treeLayout.setColumnData(tc, new ColumnPixelData(colorWidth, true));
+	}
+
+	private void doLiveUpdate() {
+
+		if (_chkLiveUpdate.getSelection()) {
+			performApply();
+		}
 	}
 
 	@Override
@@ -536,20 +577,26 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 			// update the data model
 			_selectedColor.setRGB(newValue);
 
+			final ColorDefinition colorDefinition = _selectedColor.getColorDefinition();
+
 			/*
 			 * dispose the old color/image from the graph
 			 */
 			_graphColorPainter.invalidateResources(//
 					_selectedColor.getColorId(),
-					_selectedColor.getColorDefinition().getColorDefinitionId());
+					colorDefinition.getColorDefinitionId());
 
 			/*
 			 * update the tree viewer, the color images will then be recreated
 			 */
 			_colorViewer.update(_selectedColor, null);
-			_colorViewer.update(_selectedColor.getColorDefinition(), null);
+			_colorViewer.update(colorDefinition, null);
 
 			_isColorChanged = true;
+
+			// log changes that it is easier to adjust the defaults, this case will propaly happen not very often
+			System.out.println((net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ()")
+					+ ("\t: " + colorDefinition));
 		}
 	}
 
@@ -649,6 +696,9 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 
 		_isColorChanged = true;
 
+		// live update
+		_chkLiveUpdate.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_PREF_PAGE_IS_COLOR_LIVE_UPDATE));
+
 		super.performDefaults();
 	}
 
@@ -660,6 +710,9 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 		}
 
 		_graphColorPainter.disposeAllResources();
+
+		// live update
+		_prefStore.setValue(ITourbookPreferences.GRAPH_PREF_PAGE_IS_COLOR_LIVE_UPDATE, _chkLiveUpdate.getSelection());
 
 		return super.performOk();
 	}
@@ -677,6 +730,12 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 		}
 	}
 
+	private void restoreState() {
+
+		// live update
+		_chkLiveUpdate.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_PREF_PAGE_IS_COLOR_LIVE_UPDATE));
+	}
+
 	private void updateAndSaveColors() {
 
 		GraphColorManager.saveColors();
@@ -684,7 +743,8 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 		MapColorProvider.updateMap2Colors();
 
 		// force to change the status
-		TourbookPlugin.getDefault().getPreferenceStore()//
+		TourbookPlugin.getDefault()
+				.getPreferenceStore()//
 				.setValue(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED, Math.random());
 	}
 

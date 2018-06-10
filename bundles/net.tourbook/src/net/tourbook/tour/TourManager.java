@@ -3503,10 +3503,10 @@ public class TourManager {
 			if (isHrZoneDisplayed) {
 				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
 			} else {
-				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_NO);
 			}
 
-			setGraphColor(yDataSerie, GraphColorManager.PREF_GRAPH_POWER);
+			setGraphColor(yDataSerie, GraphColorManager.PREF_GRAPH_RUN_DYN_STANCE_TIME);
 			chartDataModel.addXyData(yDataSerie);
 
 			// adjust min/max values when it's defined in the pref store
@@ -3546,10 +3546,10 @@ public class TourManager {
 			if (isHrZoneDisplayed) {
 				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
 			} else {
-				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_NO);
 			}
 
-			setGraphColor(yDataSerie, GraphColorManager.PREF_GRAPH_POWER);
+			setGraphColor(yDataSerie, GraphColorManager.PREF_GRAPH_RUN_DYN_STANCE_TIME_BALANCED);
 			chartDataModel.addXyData(yDataSerie);
 
 			// adjust min/max values when it's defined in the pref store
@@ -3589,10 +3589,10 @@ public class TourManager {
 			if (isHrZoneDisplayed) {
 				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
 			} else {
-				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_NO);
 			}
 
-			setGraphColor(yDataSerie, GraphColorManager.PREF_GRAPH_POWER);
+			setGraphColor(yDataSerie, GraphColorManager.PREF_GRAPH_RUN_DYN_STEP_LENGTH);
 			chartDataModel.addXyData(yDataSerie);
 
 			// adjust min/max values when it's defined in the pref store
@@ -3632,10 +3632,10 @@ public class TourManager {
 			if (isHrZoneDisplayed) {
 				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
 			} else {
-				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_NO);
 			}
 			
-			setGraphColor(yDataSerie, GraphColorManager.PREF_GRAPH_POWER);
+			setGraphColor(yDataSerie, GraphColorManager.PREF_GRAPH_RUN_DYN_VERTICAL_OSCILLATION);
 			chartDataModel.addXyData(yDataSerie);
 			
 			// adjust min/max values when it's defined in the pref store
@@ -3675,10 +3675,10 @@ public class TourManager {
 			if (isHrZoneDisplayed) {
 				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
 			} else {
-				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_NO);
 			}
 
-			setGraphColor(yDataSerie, GraphColorManager.PREF_GRAPH_POWER);
+			setGraphColor(yDataSerie, GraphColorManager.PREF_GRAPH_RUN_DYN_VERTICAL_RATIO);
 			chartDataModel.addXyData(yDataSerie);
 
 			// adjust min/max values when it's defined in the pref store

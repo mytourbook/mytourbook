@@ -262,6 +262,21 @@ public class ColorDefinition {
 		return result;
 	}
 
+	private String logRGB(final RGB rgb) {
+
+//		new RGB(0x5B, 0x5B, 0x5B),
+
+		if (rgb == null) {
+			return "null"; //$NON-NLS-1$
+		}
+
+		return "new RGB(" //$NON-NLS-1$
+				+ "0x" + Integer.toHexString(rgb.red) + ", " //$NON-NLS-1$ //$NON-NLS-2$
+				+ "0x" + Integer.toHexString(rgb.green) + ", " //$NON-NLS-1$ //$NON-NLS-2$
+				+ "0x" + Integer.toHexString(rgb.blue) //$NON-NLS-1$
+				+ "),"; //$NON-NLS-1$
+	}
+
 	/**
 	 * Set color names for this color definition, the color names are children in the tree.
 	 * 
@@ -317,13 +332,41 @@ public class ColorDefinition {
 
 	@Override
 	public String toString() {
-		return "ColorDefinition [" //$NON-NLS-1$
 
-				+ ("_colorDefinitionId=" + _colorDefinitionId + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("_graphPrefNamePrefix=" + _graphPrefNamePrefix + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-//				+ ("_graphColorItems=" + Arrays.toString(_graphColorItems))
+// SET_FORMATTING_OFF
+		
+		return "ColorDefinition	\n" //$NON-NLS-1$
 
-				+ "]"; //$NON-NLS-1$
+				+ "_colorDefinitionId			=" + _colorDefinitionId 		+ "\n" //$NON-NLS-1$ //$NON-NLS-2$
+//				+ "_visibleName					=" + _visibleName 				+ "\n" //$NON-NLS-1$ //$NON-NLS-2$
+//				+ "_graphPrefNamePrefix			=" + _graphPrefNamePrefix 		+ "\n" //$NON-NLS-1$ //$NON-NLS-2$
+//				+ "_graphColorItems				=" + Arrays.toString(_graphColorItems) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+//
+//				+ "_lineColor_Active			=" + _lineColor_Active 			+ "\n" //$NON-NLS-1$ //$NON-NLS-2$
+//				+ "_lineColor_New				=" + _lineColor_New 			+ "\n" //$NON-NLS-1$ //$NON-NLS-2$
+//
+//				+ "_gradientBright_Active		=" + _gradientBright_Active 	+ "\n" //$NON-NLS-1$ //$NON-NLS-2$
+//				+ "_gradientBright_New			=" + _gradientBright_New 		+ "\n" //$NON-NLS-1$ //$NON-NLS-2$
+//
+//				+ "_gradientDark_Active			=" + _gradientDark_Active 		+ "\n" //$NON-NLS-1$ //$NON-NLS-2$
+//				+ "_gradientDark_New			=" + _gradientDark_New 			+ "\n" //$NON-NLS-1$ //$NON-NLS-2$
+//
+//				+ "_textColor_Active			=" + _textColor_Active 			+ "\n" //$NON-NLS-1$ //$NON-NLS-2$
+//				+ "_textColor_New				=" + _textColor_New 			+ "\n" //$NON-NLS-1$ //$NON-NLS-2$
+//
+//				+ "_map2ColorProfile_Active		=" + _map2ColorProfile_Active 	+ "\n" //$NON-NLS-1$ //$NON-NLS-2$
+//				+ "_map2ColorProfile_New		=" + _map2ColorProfile_New 		+ "\n" //$NON-NLS-1$
+
+				// Java code
+
+				+ logRGB(_gradientBright_New)	+ "\n"	// _gradientBright_Default		= "  //$NON-NLS-1$
+				+ logRGB(_gradientDark_New)		+ "\n"	// _gradientDark_Default		= "  //$NON-NLS-1$
+				+ logRGB(_lineColor_New) 		+ "\n"	// _lineColor_Default			= "  //$NON-NLS-1$
+				+ logRGB(_textColor_New) 		+ "\n"	// _textColor_Default			= "  //$NON-NLS-1$
+				
+//				+ "_map2ColorProfile_Default	= " + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+//				+ "]"; //$NON-NLS-1$
+		;
+// SET_FORMATTING_ON
 	}
-
 }

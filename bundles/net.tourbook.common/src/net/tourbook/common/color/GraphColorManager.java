@@ -1,5 +1,5 @@
-/*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+/******************************************************************************
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -49,58 +49,63 @@ import org.w3c.dom.Element;
  */
 public class GraphColorManager {
 
-	public static final String				PREF_GRAPH_ALTIMETER		= "altimeter";			//$NON-NLS-1$
-	public static final String				PREF_GRAPH_ALTITUDE			= "altitude";			//$NON-NLS-1$
-	public static final String				PREF_GRAPH_CADENCE			= "cadence";			//$NON-NLS-1$
-	public static final String				PREF_GRAPH_GEAR				= "gear";				//$NON-NLS-1$
-	public static final String				PREF_GRAPH_DISTANCE			= "distance";			//$NON-NLS-1$
-	public static final String				PREF_GRAPH_HEARTBEAT		= "heartbeat";			//$NON-NLS-1$
-	public static final String				PREF_GRAPH_HISTORY			= "History";			//$NON-NLS-1$
-	public static final String				PREF_GRAPH_GRADIENT			= "gradient";			//$NON-NLS-1$
-	public static final String				PREF_GRAPH_PACE				= "pace";				//$NON-NLS-1$
-	public static final String				PREF_GRAPH_POWER			= "power";				//$NON-NLS-1$
-	public static final String				PREF_GRAPH_SPEED			= "speed";				//$NON-NLS-1$
-	public static final String				PREF_GRAPH_TEMPTERATURE		= "tempterature";		//$NON-NLS-1$
-	public static final String				PREF_GRAPH_TIME				= "duration";			//$NON-NLS-1$
-	public static final String				PREF_GRAPH_TOUR				= "tour";				//$NON-NLS-1$
-	public static final String				PREF_GRAPH_TOUR_COMPARE		= "tourCompare";		//$NON-NLS-1$
+	public static final String				PREF_GRAPH_ALTIMETER					= "altimeter";					//$NON-NLS-1$
+	public static final String				PREF_GRAPH_ALTITUDE						= "altitude";					//$NON-NLS-1$
+	public static final String				PREF_GRAPH_CADENCE						= "cadence";					//$NON-NLS-1$
+	public static final String				PREF_GRAPH_GEAR							= "gear";						//$NON-NLS-1$
+	public static final String				PREF_GRAPH_DISTANCE						= "distance";					//$NON-NLS-1$
+	public static final String				PREF_GRAPH_HEARTBEAT					= "heartbeat";					//$NON-NLS-1$
+	public static final String				PREF_GRAPH_HISTORY						= "History";					//$NON-NLS-1$
+	public static final String				PREF_GRAPH_GRADIENT						= "gradient";					//$NON-NLS-1$
+	public static final String				PREF_GRAPH_PACE							= "pace";						//$NON-NLS-1$
+	public static final String				PREF_GRAPH_POWER						= "power";						//$NON-NLS-1$
+	public static final String				PREF_GRAPH_SPEED						= "speed";						//$NON-NLS-1$
+	public static final String				PREF_GRAPH_TEMPTERATURE					= "tempterature";				//$NON-NLS-1$
+	public static final String				PREF_GRAPH_TIME							= "duration";					//$NON-NLS-1$
+	public static final String				PREF_GRAPH_TOUR							= "tour";						//$NON-NLS-1$
+	public static final String				PREF_GRAPH_TOUR_COMPARE					= "tourCompare";				//$NON-NLS-1$
+	public static final String				PREF_GRAPH_RUN_DYN_STANCE_TIME			= "RunDyn_StanceTime";			//$NON-NLS-1$
+	public static final String				PREF_GRAPH_RUN_DYN_STANCE_TIME_BALANCED	= "RunDyn_StanceTime_Balanced";	//$NON-NLS-1$
+	public static final String				PREF_GRAPH_RUN_DYN_STEP_LENGTH			= "RunDyn_StepLength";			//$NON-NLS-1$
+	public static final String				PREF_GRAPH_RUN_DYN_VERTICAL_OSCILLATION	= "RunDyn_VerticalOscillation";	//$NON-NLS-1$
+	public static final String				PREF_GRAPH_RUN_DYN_VERTICAL_RATIO		= "RunDyn_VerticalRatio";		//$NON-NLS-1$
 
-	public static final String				PREF_COLOR_BRIGHT			= "bright";			//$NON-NLS-1$
-	public static final String				PREF_COLOR_DARK				= "dark";				//$NON-NLS-1$
-	public static final String				PREF_COLOR_LINE				= "line";				//$NON-NLS-1$
-	public static final String				PREF_COLOR_TEXT				= "text";				//$NON-NLS-1$
-	public static final String				PREF_COLOR_MAPPING			= "mapping";			//$NON-NLS-1$
+	public static final String				PREF_COLOR_BRIGHT						= "bright";						//$NON-NLS-1$
+	public static final String				PREF_COLOR_DARK							= "dark";						//$NON-NLS-1$
+	public static final String				PREF_COLOR_LINE							= "line";						//$NON-NLS-1$
+	public static final String				PREF_COLOR_TEXT							= "text";						//$NON-NLS-1$
+	public static final String				PREF_COLOR_MAPPING						= "mapping";					//$NON-NLS-1$
 
-	private static final String				MEMENTO_LEGEND_COLOR_FILE	= "legendcolor.xml";	//$NON-NLS-1$
-	private static final String				MEMENTO_ROOT				= "legendcolorlist";	//$NON-NLS-1$
+	private static final String				MEMENTO_LEGEND_COLOR_FILE				= "legendcolor.xml";			//$NON-NLS-1$
+	private static final String				MEMENTO_ROOT							= "legendcolorlist";			//$NON-NLS-1$
 
-	private static final String				MEMENTO_CHILD_LEGEND_COLOR	= "legendcolor";		//$NON-NLS-1$
-	private static final String				TAG_LEGEND_COLOR_PREF_NAME	= "prefname";			//$NON-NLS-1$
+	private static final String				MEMENTO_CHILD_LEGEND_COLOR				= "legendcolor";				//$NON-NLS-1$
+	private static final String				TAG_LEGEND_COLOR_PREF_NAME				= "prefname";					//$NON-NLS-1$
 
-	private static final String				MEMENTO_CHILD_VALUE_COLOR	= "valuecolor";		//$NON-NLS-1$
-	private static final String				TAG_VALUE_COLOR_VALUE		= "value";				//$NON-NLS-1$
-	private static final String				TAG_VALUE_COLOR_RED			= "red";				//$NON-NLS-1$
-	private static final String				TAG_VALUE_COLOR_GREEN		= "green";				//$NON-NLS-1$
-	private static final String				TAG_VALUE_COLOR_BLUE		= "blue";				//$NON-NLS-1$
+	private static final String				MEMENTO_CHILD_VALUE_COLOR				= "valuecolor";					//$NON-NLS-1$
+	private static final String				TAG_VALUE_COLOR_VALUE					= "value";						//$NON-NLS-1$
+	private static final String				TAG_VALUE_COLOR_RED						= "red";						//$NON-NLS-1$
+	private static final String				TAG_VALUE_COLOR_GREEN					= "green";						//$NON-NLS-1$
+	private static final String				TAG_VALUE_COLOR_BLUE					= "blue";						//$NON-NLS-1$
 
-	static final String						MEMENTO_CHILD_BRIGHTNESS	= "brightness";		//$NON-NLS-1$
-	static final String						TAG_BRIGHTNESS_MIN			= "min";				//$NON-NLS-1$
-	static final String						TAG_BRIGHTNESS_MIN_FACTOR	= "minFactor";			//$NON-NLS-1$
-	static final String						TAG_BRIGHTNESS_MAX			= "max";				//$NON-NLS-1$
-	static final String						TAG_BRIGHTNESS_MAX_FACTOR	= "maxFactor";			//$NON-NLS-1$
+	static final String						MEMENTO_CHILD_BRIGHTNESS				= "brightness";					//$NON-NLS-1$
+	static final String						TAG_BRIGHTNESS_MIN						= "min";						//$NON-NLS-1$
+	static final String						TAG_BRIGHTNESS_MIN_FACTOR				= "minFactor";					//$NON-NLS-1$
+	static final String						TAG_BRIGHTNESS_MAX						= "max";						//$NON-NLS-1$
+	static final String						TAG_BRIGHTNESS_MAX_FACTOR				= "maxFactor";					//$NON-NLS-1$
 
-	static final String						MEMENTO_CHILD_MIN_MAX_VALUE	= "minmaxValue";		//$NON-NLS-1$
-	static final String						TAG_IS_MIN_VALUE_OVERWRITE	= "isMinOverwrite";	//$NON-NLS-1$
-	static final String						TAG_MIN_VALUE_OVERWRITE		= "minValueOverwrite";	//$NON-NLS-1$
-	static final String						TAG_IS_MAX_VALUE_OVERWRITE	= "isMaxOverwrite";	//$NON-NLS-1$
-	static final String						TAG_MAX_VALUE_OVERWRITE		= "maxValueOverwrite";	//$NON-NLS-1$
+	static final String						MEMENTO_CHILD_MIN_MAX_VALUE				= "minmaxValue";				//$NON-NLS-1$
+	static final String						TAG_IS_MIN_VALUE_OVERWRITE				= "isMinOverwrite";				//$NON-NLS-1$
+	static final String						TAG_MIN_VALUE_OVERWRITE					= "minValueOverwrite";			//$NON-NLS-1$
+	static final String						TAG_IS_MAX_VALUE_OVERWRITE				= "isMaxOverwrite";				//$NON-NLS-1$
+	static final String						TAG_MAX_VALUE_OVERWRITE					= "maxValueOverwrite";			//$NON-NLS-1$
 
-	public static String[][]				colorNames					= new String[][] {
+	public static String[][]				colorNames								= new String[][] {
 			{ PREF_COLOR_BRIGHT, Messages.Graph_Pref_color_gradient_bright },
 			{ PREF_COLOR_DARK, Messages.Graph_Pref_color_gradient_dark },
 			{ PREF_COLOR_LINE, Messages.Graph_Pref_color_line },
 			{ PREF_COLOR_TEXT, Messages.Graph_Pref_ColorText },
-			{ PREF_COLOR_MAPPING, Messages.Graph_Pref_color_mapping }	};
+			{ PREF_COLOR_MAPPING, Messages.Graph_Pref_color_mapping } };
 
 	private static final Map2ColorProfile	MAP_COLOR_ALTITUDE;
 	private static final Map2ColorProfile	MAP_COLOR_GRADIENT;
@@ -116,11 +121,11 @@ public class GraphColorManager {
 		MAP_COLOR_ALTITUDE = new Map2ColorProfile(//
 				//
 				new ColorValue[] {
-			new ColorValue(10, 0xEC, 0x20, 0x20),
-			new ColorValue(50, 255, 85, 13),
-			new ColorValue(100, 255, 255, 0),
-			new ColorValue(150, 0, 170, 9),
-			new ColorValue(190, 23, 163, 255) },
+						new ColorValue(10, 0xEC, 0x20, 0x20),
+						new ColorValue(50, 255, 85, 13),
+						new ColorValue(100, 255, 255, 0),
+						new ColorValue(150, 0, 170, 9),
+						new ColorValue(190, 23, 163, 255) },
 				//
 				MapColorProfile.BRIGHTNESS_DIMMING,
 				38,
@@ -130,11 +135,11 @@ public class GraphColorManager {
 		MAP_COLOR_GRADIENT = new Map2ColorProfile(//
 				//
 				new ColorValue[] {
-			new ColorValue(10, 0, 0, 255),
-			new ColorValue(50, 0, 255, 255),
-			new ColorValue(100, 0, 237, 0),
-			new ColorValue(150, 255, 255, 0),
-			new ColorValue(190, 255, 0, 0) },
+						new ColorValue(10, 0, 0, 255),
+						new ColorValue(50, 0, 255, 255),
+						new ColorValue(100, 0, 237, 0),
+						new ColorValue(150, 255, 255, 0),
+						new ColorValue(190, 255, 0, 0) },
 				//
 				MapColorProfile.BRIGHTNESS_DIMMING,
 				23,
@@ -150,11 +155,11 @@ public class GraphColorManager {
 		MAP_COLOR_PACE = new Map2ColorProfile(//
 				//
 				new ColorValue[] {
-			new ColorValue(10, 255, 0, 0),
-			new ColorValue(50, 255, 255, 0),
-			new ColorValue(100, 0, 169, 0),
-			new ColorValue(150, 0, 255, 255),
-			new ColorValue(190, 0, 0, 255) },
+						new ColorValue(10, 255, 0, 0),
+						new ColorValue(50, 255, 255, 0),
+						new ColorValue(100, 0, 169, 0),
+						new ColorValue(150, 0, 255, 255),
+						new ColorValue(190, 0, 0, 255) },
 				//
 				MapColorProfile.BRIGHTNESS_DIMMING,
 				17,
@@ -164,11 +169,11 @@ public class GraphColorManager {
 		MAP_COLOR_PULSE = new Map2ColorProfile(//
 				//
 				new ColorValue[] {
-			new ColorValue(10, 0, 203, 0),
-			new ColorValue(50, 57, 255, 0),
-			new ColorValue(100, 255, 255, 0),
-			new ColorValue(150, 255, 0, 0),
-			new ColorValue(190, 255, 0, 247) },
+						new ColorValue(10, 0, 203, 0),
+						new ColorValue(50, 57, 255, 0),
+						new ColorValue(100, 255, 255, 0),
+						new ColorValue(150, 255, 0, 0),
+						new ColorValue(190, 255, 0, 247) },
 				//
 				MapColorProfile.BRIGHTNESS_DIMMING,
 				11,
@@ -178,11 +183,11 @@ public class GraphColorManager {
 		MAP_COLOR_SPEED = new Map2ColorProfile(//
 				//
 				new ColorValue[] {
-			new ColorValue(10, 0, 0, 255),
-			new ColorValue(50, 0, 255, 255),
-			new ColorValue(100, 0, 169, 0),
-			new ColorValue(150, 255, 255, 0),
-			new ColorValue(190, 255, 0, 0) },
+						new ColorValue(10, 0, 0, 255),
+						new ColorValue(50, 0, 255, 255),
+						new ColorValue(100, 0, 169, 0),
+						new ColorValue(150, 255, 255, 0),
+						new ColorValue(190, 255, 0, 0) },
 				//
 				MapColorProfile.BRIGHTNESS_DIMMING,
 				17,
@@ -190,9 +195,9 @@ public class GraphColorManager {
 				8);
 	}
 
-	private static GraphColorManager		_instance;
+	private static GraphColorManager	_instance;
 
-	private ColorDefinition[]				_graphColorDefinitions;
+	private ColorDefinition[]			_graphColorDefinitions;
 
 	public GraphColorManager() {}
 
@@ -339,7 +344,7 @@ public class GraphColorManager {
 
 		final List<ColorDefinition> allColorDef = new ArrayList<ColorDefinition>();
 
-		allColorDef.add(new ColorDefinition(PREF_GRAPH_ALTITUDE,//
+		allColorDef.add(new ColorDefinition(PREF_GRAPH_ALTITUDE, //
 				Messages.Graph_Label_Altitude,
 				new RGB(255, 255, 255),
 				new RGB(0, 255, 0),
@@ -355,7 +360,7 @@ public class GraphColorManager {
 				new RGB(183, 0, 0),
 				MAP_COLOR_PULSE));
 
-		allColorDef.add(new ColorDefinition(PREF_GRAPH_SPEED,//
+		allColorDef.add(new ColorDefinition(PREF_GRAPH_SPEED, //
 				Messages.Graph_Label_Speed,
 				new RGB(255, 255, 255),
 				new RGB(0, 135, 211),
@@ -363,7 +368,7 @@ public class GraphColorManager {
 				new RGB(0, 106, 167),
 				MAP_COLOR_SPEED));
 
-		allColorDef.add(new ColorDefinition(PREF_GRAPH_PACE,//
+		allColorDef.add(new ColorDefinition(PREF_GRAPH_PACE, //
 				Messages.Graph_Label_Pace,
 				new RGB(255, 255, 255),
 				new RGB(0x9C, 0x2F, 0xFF),
@@ -371,7 +376,7 @@ public class GraphColorManager {
 				new RGB(88, 26, 142),
 				MAP_COLOR_PACE));
 
-		allColorDef.add(new ColorDefinition(PREF_GRAPH_POWER,//
+		allColorDef.add(new ColorDefinition(PREF_GRAPH_POWER, //
 				Messages.Graph_Label_Power,
 				new RGB(255, 255, 255),
 				new RGB(240, 0, 150),
@@ -403,7 +408,7 @@ public class GraphColorManager {
 				new RGB(144, 103, 0),
 				null));
 
-		allColorDef.add(new ColorDefinition(PREF_GRAPH_CADENCE,//
+		allColorDef.add(new ColorDefinition(PREF_GRAPH_CADENCE, //
 				Messages.Graph_Label_Cadence,
 				new RGB(255, 255, 255),
 				new RGB(228, 106, 16),
@@ -411,12 +416,52 @@ public class GraphColorManager {
 				new RGB(139, 64, 10),
 				null));
 
-		allColorDef.add(new ColorDefinition(PREF_GRAPH_GEAR,//
+		allColorDef.add(new ColorDefinition(PREF_GRAPH_GEAR, //
 				Messages.Graph_Label_Gears,
 				new RGB(0x5B, 0x5B, 0x5B),
 				new RGB(0xFF, 0x00, 0x00),
 				new RGB(0x31, 0x31, 0x31),
 				new RGB(0xff, 0xff, 0xff),
+				null));
+
+		allColorDef.add(new ColorDefinition(PREF_GRAPH_RUN_DYN_STANCE_TIME,
+				Messages.Graph_Label_RunDyn_StanceTime,
+				new RGB(0xff, 0xff, 0xff),
+				new RGB(0x5a, 0x7a, 0xcd),
+				new RGB(0x22, 0x37, 0x71),
+				new RGB(0x25, 0x3d, 0x7a),
+				null));
+
+		allColorDef.add(new ColorDefinition(PREF_GRAPH_RUN_DYN_STANCE_TIME_BALANCED,
+				Messages.Graph_Label_RunDyn_StanceTime_Balanced,
+				new RGB(0xff, 0xff, 0xff),
+				new RGB(0x34, 0xa8, 0xb1),
+				new RGB(0x26, 0x7c, 0x84),
+				new RGB(0x1c, 0x58, 0x5e),
+				null));
+
+		allColorDef.add(new ColorDefinition(PREF_GRAPH_RUN_DYN_STEP_LENGTH,
+				Messages.Graph_Label_RunDyn_StepLength,
+				new RGB(0xff, 0xff, 0xff),
+				new RGB(0xff, 0x4d, 0x0),
+				new RGB(0xe6, 0x45, 0x0),
+				new RGB(0xa4, 0x31, 0x0),
+				null));
+
+		allColorDef.add(new ColorDefinition(PREF_GRAPH_RUN_DYN_VERTICAL_OSCILLATION,
+				Messages.Graph_Label_RunDyn_VerticalOscillation,
+				new RGB(0xff, 0xff, 0xff),
+				new RGB(0xa7, 0xce, 0x31),
+				new RGB(0x91, 0xb3, 0x2b),
+				new RGB(0x50, 0x62, 0x17),
+				null));
+
+		allColorDef.add(new ColorDefinition(PREF_GRAPH_RUN_DYN_VERTICAL_RATIO,
+				Messages.Graph_Label_RunDyn_VerticalRatio,
+				new RGB(0xff, 0xff, 0xff),
+				new RGB(0xcb, 0xb5, 0x34),
+				new RGB(0xac, 0x99, 0x2d),
+				new RGB(0x7e, 0x71, 0x21),
 				null));
 
 		allColorDef.add(new ColorDefinition(PREF_GRAPH_TOUR_COMPARE, //
@@ -427,7 +472,7 @@ public class GraphColorManager {
 				new RGB(139, 77, 15),
 				null));
 
-		allColorDef.add(new ColorDefinition(PREF_GRAPH_HISTORY,//
+		allColorDef.add(new ColorDefinition(PREF_GRAPH_HISTORY, //
 				Messages.Graph_Label_History,
 				new RGB(255, 255, 255),
 				new RGB(0xFF, 0x80, 0x33),
@@ -435,7 +480,7 @@ public class GraphColorManager {
 				new RGB(0xFF, 0x80, 0x33),
 				null));
 
-		allColorDef.add(new ColorDefinition(PREF_GRAPH_TOUR,//
+		allColorDef.add(new ColorDefinition(PREF_GRAPH_TOUR, //
 				Messages.Graph_Label_Tour,
 				new RGB(255, 255, 255),
 				new RGB(0x0d, 0xaa, 0xff),
@@ -443,7 +488,7 @@ public class GraphColorManager {
 				new RGB(0x0d, 0xaa, 0xff),
 				null));
 
-		allColorDef.add(new ColorDefinition(PREF_GRAPH_DISTANCE,//
+		allColorDef.add(new ColorDefinition(PREF_GRAPH_DISTANCE, //
 				Messages.Graph_Pref_color_statistic_distance,
 				new RGB(255, 255, 255),
 				new RGB(239, 167, 16),
@@ -451,13 +496,14 @@ public class GraphColorManager {
 				new RGB(139, 98, 10),
 				null));
 
-		allColorDef.add(new ColorDefinition(PREF_GRAPH_TIME,//
+		allColorDef.add(new ColorDefinition(PREF_GRAPH_TIME, //
 				Messages.Graph_Pref_color_statistic_time,
 				new RGB(255, 255, 255),
 				new RGB(187, 187, 140),
 				new RGB(170, 170, 127),
 				new RGB(88, 88, 67),
 				null));
+
 		return allColorDef;
 	}
 
