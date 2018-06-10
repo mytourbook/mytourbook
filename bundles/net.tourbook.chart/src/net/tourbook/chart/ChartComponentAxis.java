@@ -396,23 +396,24 @@ public class ChartComponentAxis extends Canvas {
 			if (_isLeft && title != null) {
 
 				// create title with unit label
-				final StringBuilder sbTitle = new StringBuilder(title);
-				if (unitLabel.length() > 0) {
-					sbTitle.append(Util.DASH_WITH_SPACE);
-					sbTitle.append(unitLabel);
-				}
-
-				String yTitle = sbTitle.toString();
-				Point labelExtend = gc.textExtent(yTitle);
+//				final StringBuilder sbTitle = new StringBuilder(title);
+//				if (unitLabel.length() > 0) {
+//					sbTitle.append(Util.DASH_WITH_SPACE);
+//					sbTitle.append(unitLabel);
+//				}
+//
+//				String yTitle = sbTitle.toString();
+				final String yTitle = unitLabel;
+				final Point labelExtend = gc.textExtent(yTitle);
 
 				final int devChartHeight = devYBottom - devYTop;
 
 				// draw only the unit text and not the title when there is not
 				// enough space
-				if (labelExtend.x > devChartHeight) {
-					yTitle = unitLabel;
-					labelExtend = gc.textExtent(yTitle);
-				}
+//				if (labelExtend.x > devChartHeight) {
+//					yTitle = unitLabel;
+//					labelExtend = gc.textExtent(yTitle);
+//				}
 
 				final int xPos = labelExtend.y / 2;
 				final int yPos = devYTop + (devChartHeight / 2) + (labelExtend.x / 2);

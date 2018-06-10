@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1178,7 +1178,7 @@ public class ChartComponentGraph extends Canvas {
 			label.width = labelWidth;
 
 			label.x = labelXPos;
-			label.y = drawingData.getDevYBottom() - drawingData.devGraphHeight - label.height;
+			label.y = drawingData.getDevYBottom() - drawingData.devGraphHeight + 4;
 
 			/*
 			 * get the y position of the marker which marks the y value in the graph
@@ -1658,11 +1658,13 @@ public class ChartComponentGraph extends Canvas {
 			final boolean isDrawGrid = !_canChartBeOverlapped
 					|| (_canChartBeOverlapped && (isStackedChart || isFirstOverlappedGraph));
 
-			boolean isDrawTitle;
+			boolean isDrawXTitle;
+			boolean isDrawGraphTitle = true;
 			if (_canChartBeOverlapped && _isChartOverlapped) {
-				isDrawTitle = isLastGraph;
+				isDrawXTitle = isLastGraph;
+				isDrawGraphTitle = isFirstGraph;
 			} else {
-				isDrawTitle = isFirstGraph;
+				isDrawXTitle = isFirstGraph;
 			}
 
 			// fill background
@@ -1676,7 +1678,7 @@ public class ChartComponentGraph extends Canvas {
 				}
 			}
 
-			if (isDrawTitle) {
+			if (isDrawXTitle) {
 				drawAsync_200_XTitle(gcChart, graphDrawingData);
 			}
 
@@ -1698,6 +1700,12 @@ public class ChartComponentGraph extends Canvas {
 
 			if (chartTitleSegmentConfig.isShowSegmentSeparator) {
 				drawAsync_240_TourSements(gcGraph, graphDrawingData);
+			}
+
+			if (isDrawGraphTitle) {
+
+				// the graph title is above the graph
+				drawAsync_250_GraphTitle(gcChart, graphDrawingData);
 			}
 
 			// draw units and grid on the x and y axis
@@ -2482,6 +2490,26 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		gcChart.setLineStyle(SWT.LINE_SOLID);
+	}
+
+	private void drawAsync_250_GraphTitle(final GC gcGraph, final GraphDrawingData drawingData) {
+
+		final ChartDataYSerie yData = drawingData.getYData();
+		final String graphTitle = yData.getYTitle();
+
+		final Point labelExtend = gcGraph.stringExtent(graphTitle);
+		final int labelHeight = labelExtend.y + 1;
+
+		final int devYTop = drawingData.getDevYTop() - labelHeight;
+
+		final RGB[] rgbText = yData.getRgbLine();
+
+		final Color colorText = new Color(gcGraph.getDevice(), rgbText[0]);
+		{
+			gcGraph.setForeground(colorText);
+			gcGraph.drawString(graphTitle, 0, devYTop);
+		}
+		colorText.dispose();
 	}
 
 	private void drawAsync_500_LineGraph(	final GC gcGraph,
@@ -4715,6 +4743,12 @@ public class ChartComponentGraph extends Canvas {
 			gcGraph.setLineDash(new int[] { 4, 1, 4, 1 });
 			gcGraph.drawLine(devSliderLinePos, devYLabel + labelHeight, devSliderLinePos, devYBottom);
 
+			gcGraph.setAlpha(0xff);
+
+			// draw label background
+			gcGraph.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+			gcGraph.fillRoundRectangle(devXLabel, devYLabel - 4, labelWidth, labelHeight + 3, 4, 4);
+
 			gcGraph.setBackground(colorDark);
 			gcGraph.setForeground(colorBright);
 
@@ -4724,7 +4758,6 @@ public class ChartComponentGraph extends Canvas {
 			gcGraph.drawRoundRectangle(devXLabel, devYLabel - 4, labelWidth, labelHeight + 3, 4, 4);
 
 			// draw slider label
-			gcGraph.setAlpha(0xff);
 			gcGraph.setForeground(colorTxt);
 			gcGraph.drawText(label.text, devXLabel + 2, devYLabel - 5, true);
 
@@ -4907,7 +4940,7 @@ public class ChartComponentGraph extends Canvas {
 
 				// draw label text
 				gcGraph.setForeground(colorText);
-				gcGraph.drawText(label, labelX + 3, labelY - 0, true);
+				gcGraph.drawString(label, labelX + 3, labelY - 0, true);
 
 				// draw slider line
 				gcGraph.setForeground(colorLine);
@@ -8632,8 +8665,10 @@ public class ChartComponentGraph extends Canvas {
 
 			if (onTopDevX + onTopWidth2 > onBotDevX - onBotWidth2
 					&& onTopDevX - onTopWidth2 < onBotDevX + onBotWidth2) {
+
 				onBotLabel.y = onBotLabel.y + onBotLabel.height + 5;
 			}
+
 			labelIndex++;
 		}
 	}
