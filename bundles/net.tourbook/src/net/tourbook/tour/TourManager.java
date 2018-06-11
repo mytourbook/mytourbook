@@ -3510,21 +3510,21 @@ public class TourManager {
 			chartDataModel.addXyData(yDataSerie);
 
 			// adjust min/max values when it's defined in the pref store
-//			setVisibleForcedValues(
-//					yData_RunDyn_StanceTime,
-//					1,
-//					TourChart.MAX_ADJUSTMENT,
-//					ITourbookPreferences.GRAPH_GRADIENT_IS_MIN_ENABLED,
-//					ITourbookPreferences.GRAPH_GRADIENT_IS_MAX_ENABLED,
-//					ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
-//					ITourbookPreferences.GRAPH_GRADIENT_MAX_VALUE);
+			setVisibleForcedValues(
+					yDataSerie,
+					1,
+					0,
+					ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MIN_ENABLED,
+					ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MAX_ENABLED,
+					ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_MIN_VALUE,
+					ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_MAX_VALUE);
 		}
 
 		return yDataSerie;
 	}
 
 	/**
-	 * Running Dynamics: Stance time
+	 * Running Dynamics: Stance time balance
 	 */
 	private ChartDataYSerie createModelData_RunDyn_StanceTime_Balance(	final TourData tourData,
 																		final ChartDataModel chartDataModel,
@@ -3553,14 +3553,14 @@ public class TourManager {
 			chartDataModel.addXyData(yDataSerie);
 
 			// adjust min/max values when it's defined in the pref store
-//			setVisibleForcedValues(
-//					yData_RunDyn_StanceTime_Balance,
-//					1,
-//					TourChart.MAX_ADJUSTMENT,
-//					ITourbookPreferences.GRAPH_GRADIENT_IS_MIN_ENABLED,
-//					ITourbookPreferences.GRAPH_GRADIENT_IS_MAX_ENABLED,
-//					ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
-//					ITourbookPreferences.GRAPH_GRADIENT_MAX_VALUE);
+			setVisibleForcedValues(
+					yDataSerie,
+					1,
+					0,
+					ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCED_IS_MIN_ENABLED,
+					ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCED_IS_MAX_ENABLED,
+					ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCED_MIN_VALUE,
+					ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCED_MAX_VALUE);
 		}
 
 		return yDataSerie;
@@ -3596,14 +3596,14 @@ public class TourManager {
 			chartDataModel.addXyData(yDataSerie);
 
 			// adjust min/max values when it's defined in the pref store
-//			setVisibleForcedValues(
-//					yData_RunDyn_StepLength,
-//					1,
-//					TourChart.MAX_ADJUSTMENT,
-//					ITourbookPreferences.GRAPH_GRADIENT_IS_MIN_ENABLED,
-//					ITourbookPreferences.GRAPH_GRADIENT_IS_MAX_ENABLED,
-//					ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
-//					ITourbookPreferences.GRAPH_GRADIENT_MAX_VALUE);
+			setVisibleForcedValues(
+					yDataSerie,
+					1,
+					0,
+					ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MIN_ENABLED,
+					ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MAX_ENABLED,
+					ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_MIN_VALUE,
+					ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_MAX_VALUE);
 		}
 
 		return yDataSerie;
@@ -3613,42 +3613,42 @@ public class TourManager {
 	 * Running Dynamics: Vertical oscillation
 	 */
 	private ChartDataYSerie createModelData_RunDyn_VerticalOscillation(	final TourData tourData,
-	                                                             	final ChartDataModel chartDataModel,
-	                                                             	final ChartType chartType,
-	                                                             	final boolean isHrZoneDisplayed) {
-		
+																		final ChartDataModel chartDataModel,
+																		final ChartType chartType,
+																		final boolean isHrZoneDisplayed) {
+
 		ChartDataYSerie yDataSerie = null;
-		
+
 		final float[] dataSerie = tourData.getRunDyn_VerticalOscillation();
 		if (dataSerie != null) {
-			
+
 			yDataSerie = createChartDataSerie(dataSerie, chartType);
-			
+
 			yDataSerie.setYTitle(GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION);
 			yDataSerie.setUnitLabel(UI.UNIT_LABEL_MM);
 			yDataSerie.setShowYSlider(true);
 			yDataSerie.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_RUN_DYN_VERTICAL_OSCILLATION);
-			
+
 			if (isHrZoneDisplayed) {
 				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
 			} else {
 				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_NO);
 			}
-			
+
 			setGraphColor(yDataSerie, GraphColorManager.PREF_GRAPH_RUN_DYN_VERTICAL_OSCILLATION);
 			chartDataModel.addXyData(yDataSerie);
-			
+
 			// adjust min/max values when it's defined in the pref store
-//			setVisibleForcedValues(
-//					yData_RunDyn_VerticalOscillation,
-//					1,
-//					TourChart.MAX_ADJUSTMENT,
-//					ITourbookPreferences.GRAPH_GRADIENT_IS_MIN_ENABLED,
-//					ITourbookPreferences.GRAPH_GRADIENT_IS_MAX_ENABLED,
-//					ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
-//					ITourbookPreferences.GRAPH_GRADIENT_MAX_VALUE);
+			setVisibleForcedValues(
+					yDataSerie,
+					1,
+					0,
+					ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MIN_ENABLED,
+					ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MAX_ENABLED,
+					ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MIN_VALUE,
+					ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MAX_VALUE);
 		}
-		
+
 		return yDataSerie;
 	}
 
@@ -3682,14 +3682,14 @@ public class TourManager {
 			chartDataModel.addXyData(yDataSerie);
 
 			// adjust min/max values when it's defined in the pref store
-//			setVisibleForcedValues(
-//					yData_RunDyn_VerticalRatio,
-//					1,
-//					TourChart.MAX_ADJUSTMENT,
-//					ITourbookPreferences.GRAPH_GRADIENT_IS_MIN_ENABLED,
-//					ITourbookPreferences.GRAPH_GRADIENT_IS_MAX_ENABLED,
-//					ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
-//					ITourbookPreferences.GRAPH_GRADIENT_MAX_VALUE);
+			setVisibleForcedValues(
+					yDataSerie,
+					1,
+					0,
+					ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_IS_MIN_ENABLED,
+					ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_IS_MAX_ENABLED,
+					ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_MIN_VALUE,
+					ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_MAX_VALUE);
 		}
 
 		return yDataSerie;

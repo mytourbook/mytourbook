@@ -1386,6 +1386,121 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 							1e-3,
 							isMinMaxEnabled);
 
+					/*
+					 * Runing dynamics: Stance time
+					 */
+					isChartModified |= setMinDefaultValue(
+							property,
+							isChartModified,
+							ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MIN_ENABLED,
+							ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_MIN_VALUE,
+							TourManager.GRAPH_RUN_DYN_STANCE_TIME,
+							0,
+							MIN_ADJUSTMENT,
+							isMinMaxEnabled);
+
+					isChartModified |= setMaxDefaultValue(
+							property,
+							isChartModified,
+							ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MAX_ENABLED,
+							ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_MAX_VALUE,
+							TourManager.GRAPH_RUN_DYN_STANCE_TIME,
+							0,
+							1e-3,
+							isMinMaxEnabled);
+
+					/*
+					 * Runing dynamics: Stance time balance
+					 */
+					isChartModified |= setMinDefaultValue(
+							property,
+							isChartModified,
+							ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCED_IS_MIN_ENABLED,
+							ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCED_MIN_VALUE,
+							TourManager.GRAPH_RUN_DYN_STANCE_TIME_BALANCED,
+							0,
+							MIN_ADJUSTMENT,
+							isMinMaxEnabled);
+
+					isChartModified |= setMaxDefaultValue(
+							property,
+							isChartModified,
+							ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCED_IS_MAX_ENABLED,
+							ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCED_MAX_VALUE,
+							TourManager.GRAPH_RUN_DYN_STANCE_TIME_BALANCED,
+							0,
+							1e-3,
+							isMinMaxEnabled);
+
+					/*
+					 * Runing dynamics: Step length
+					 */
+					isChartModified |= setMinDefaultValue(
+							property,
+							isChartModified,
+							ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MIN_ENABLED,
+							ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_MIN_VALUE,
+							TourManager.GRAPH_RUN_DYN_STEP_LENGTH,
+							0,
+							MIN_ADJUSTMENT,
+							isMinMaxEnabled);
+
+					isChartModified |= setMaxDefaultValue(
+							property,
+							isChartModified,
+							ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MAX_ENABLED,
+							ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_MAX_VALUE,
+							TourManager.GRAPH_RUN_DYN_STEP_LENGTH,
+							0,
+							1e-3,
+							isMinMaxEnabled);
+
+					/*
+					 * Runing dynamics: Vertical oscillation
+					 */
+					isChartModified |= setMinDefaultValue(
+							property,
+							isChartModified,
+							ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MIN_ENABLED,
+							ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MIN_VALUE,
+							TourManager.GRAPH_RUN_DYN_VERTICAL_OSCILLATION,
+							0,
+							MIN_ADJUSTMENT,
+							isMinMaxEnabled);
+
+					isChartModified |= setMaxDefaultValue(
+							property,
+							isChartModified,
+							ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MAX_ENABLED,
+							ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MAX_VALUE,
+							TourManager.GRAPH_RUN_DYN_VERTICAL_OSCILLATION,
+							0,
+							1e-3,
+							isMinMaxEnabled);
+
+					/*
+					 * Runing dynamics: Vertical ratio
+					 */
+					isChartModified |= setMinDefaultValue(
+							property,
+							isChartModified,
+							ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_IS_MIN_ENABLED,
+							ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_MIN_VALUE,
+							TourManager.GRAPH_RUN_DYN_VERTICAL_RATIO,
+							0,
+							MIN_ADJUSTMENT,
+							isMinMaxEnabled);
+
+					isChartModified |= setMaxDefaultValue(
+							property,
+							isChartModified,
+							ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_IS_MAX_ENABLED,
+							ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_MAX_VALUE,
+							TourManager.GRAPH_RUN_DYN_VERTICAL_RATIO,
+							0,
+							1e-3,
+							isMinMaxEnabled);
+
 					if (isChartModified) {
 						updateTourChart(keepMinMax);
 					}

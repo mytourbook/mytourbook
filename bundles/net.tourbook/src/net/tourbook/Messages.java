@@ -1356,6 +1356,11 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Checkbox_ForceValue_Altitude;
 	public static String		Pref_Graphs_Checkbox_ForceValue_Cadence;
 	public static String		Pref_Graphs_Checkbox_ForceValue_Power;
+	public static String		Pref_Graphs_Checkbox_ForceValue_RunDyn_StanceTime;
+	public static String		Pref_Graphs_Checkbox_ForceValue_RunDyn_StanceTimeBalanced;
+	public static String		Pref_Graphs_Checkbox_ForceValue_RunDyn_StepLength;
+	public static String		Pref_Graphs_Checkbox_ForceValue_RunDyn_VerticalOscillation;
+	public static String		Pref_Graphs_Checkbox_ForceValue_RunDyn_VerticalRatio;
 	public static String		Pref_Graphs_Checkbox_ForceValue_Speed;
 	public static String		Pref_Graphs_Checkbox_ForceValue_Temperature;
 	public static String		Pref_Graphs_Checkbox_GraphAntialiasing;
