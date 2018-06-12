@@ -601,32 +601,36 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
 	private void createUI_82_MinMax_RunDyn_StepLength(final Composite parent) {
 
+		final int maxStepLength = (int) (RUN_DYN_STEP_LENGTH_MAX * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_XS);
+
 		_iconRunDyn_StepLength = createUI_Icon(parent, _imageRunDyn_StepLength);
 
 		_lblMinMax_RunDyn_StepLength = createUI_Label(parent, Messages.Pref_Graphs_Checkbox_ForceValue_RunDyn_StepLength);
 
 		_chkMin_RunDyn_StepLength = createUI_Checkbox(parent);
-		_spinnerMin_RunDyn_StepLength = createUI_Spinner(parent, 0, RUN_DYN_STEP_LENGTH_MAX);
+		_spinnerMin_RunDyn_StepLength = createUI_Spinner(parent, 0, maxStepLength);
 
 		_chkMax_RunDyn_StepLength = createUI_Checkbox(parent);
-		_spinnerMax_RunDyn_StepLength = createUI_Spinner(parent, 0, RUN_DYN_STEP_LENGTH_MAX);
+		_spinnerMax_RunDyn_StepLength = createUI_Spinner(parent, 0, maxStepLength);
 
-		_lblMinMax_RunDyn_StepLength_Unit = createUI_Label(parent, UI.UNIT_MS);
+		_lblMinMax_RunDyn_StepLength_Unit = createUI_Label(parent, UI.UNIT_LABEL_DISTANCE_XS);
 	}
 
 	private void createUI_83_MinMax_RunDyn_VerticalOscillation(final Composite parent) {
+
+		final int maxVertOscillation = (int) (RUN_DYN_VERTICAL_OSCILLATION_MAX * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_XS);
 
 		_iconRunDyn_VerticalOscillation = createUI_Icon(parent, _imageRunDyn_VerticalOscillation);
 
 		_lblMinMax_RunDyn_VerticalOscillation = createUI_Label(parent, Messages.Pref_Graphs_Checkbox_ForceValue_RunDyn_VerticalOscillation);
 
 		_chkMin_RunDyn_VerticalOscillation = createUI_Checkbox(parent);
-		_spinnerMin_RunDyn_VerticalOscillation = createUI_Spinner(parent, 0, RUN_DYN_VERTICAL_OSCILLATION_MAX);
+		_spinnerMin_RunDyn_VerticalOscillation = createUI_Spinner(parent, 0, maxVertOscillation);
 
 		_chkMax_RunDyn_VerticalOscillation = createUI_Checkbox(parent);
-		_spinnerMax_RunDyn_VerticalOscillation = createUI_Spinner(parent, 0, RUN_DYN_VERTICAL_OSCILLATION_MAX);
+		_spinnerMax_RunDyn_VerticalOscillation = createUI_Spinner(parent, 0, maxVertOscillation);
 
-		_lblMinMax_RunDyn_VerticalOscillation_Unit = createUI_Label(parent, UI.UNIT_MS);
+		_lblMinMax_RunDyn_VerticalOscillation_Unit = createUI_Label(parent, UI.UNIT_LABEL_DISTANCE_XS);
 	}
 
 	private void createUI_84_MinMax_RunDyn_VerticalRatio(final Composite parent) {
@@ -903,6 +907,15 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 		spinner.setSelection(_prefStore.getDefaultInt(prefName));
 	}
 
+	private void prefRestoreDefault(final Spinner spinner, final String prefName, final float measurementFactor) {
+
+		final float prefValue = _prefStore.getDefaultInt(prefName);
+		final double prefValueAdjusted = (prefValue * measurementFactor) + 0.5;
+		final int uiValue = (int) prefValueAdjusted;
+
+		spinner.setSelection(uiValue);
+	}
+
 	private void prefRestoreValue(final Button button, final String prefName) {
 		button.setSelection(_prefStore.getBoolean(prefName));
 	}
@@ -911,12 +924,65 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 		spinner.setSelection(_prefStore.getInt(prefName));
 	}
 
+	private void prefRestoreValue(final Spinner spinner, final String prefName, final float measurementFactor) {
+
+		final float prefValue = _prefStore.getInt(prefName);
+		final double prefValueAdjusted = (prefValue * measurementFactor) + 0.5;
+		final int uiValue = (int) prefValueAdjusted;
+
+		spinner.setSelection(uiValue);
+	}
+
 	private void prefSaveValue(final Button button, final String prefName) {
 		_prefStore.setValue(prefName, button.getSelection());
 	}
 
 	private void prefSaveValue(final Spinner spinner, final String prefName) {
 		_prefStore.setValue(prefName, spinner.getSelection());
+	}
+
+	private void prefSaveValue(final Spinner spinner, final String prefName, final float measurementFactor) {
+
+		{
+			final float uiValue = spinner.getSelection();
+			final float uiValueAdjusted = uiValue / measurementFactor;
+			final int prefValue = (int) (uiValueAdjusted + 0.5f);
+
+			_prefStore.setValue(prefName, prefValue);
+
+//			if (prefName.contains("VERTICAL_OSCILLATION")) {
+//
+//				System.out.println(String.format(
+//
+//						"%s  prefValue: %3d  prefValueAdjusted: %3.5f  uiValue: %3.1f",
+//						prefName,
+//						prefValue,
+//						uiValueAdjusted,
+//						uiValue
+//				//
+//				));
+//			}
+// TODO remove SYSTEM.OUT.PRINTLN
+		}
+//		{
+//			final float prefValue = _prefStore.getInt(prefName);
+//			final double prefValueAdjusted = (prefValue * measurementFactor) + 0.5;
+//			final int uiValue = (int) prefValueAdjusted;
+//
+//			if (prefName.contains("VERTICAL_OSCILLATION")) {
+//
+//				System.out.println(String.format(
+//
+//						"%s  prefValue: %3.0f  prefValueAdjusted: %-3.5f  uiValue: %3d\n\n",
+//						prefName,
+//						prefValue,
+//						prefValueAdjusted,
+//						uiValue
+//				//
+//				));
+//			}
+//// TODO remove SYSTEM.OUT.PRINTLN
+//		}
 	}
 
 	private void resetToDefaults() {
@@ -982,6 +1048,8 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 		/*
 		 * Running dynamics
 		 */
+		final float measurementDistanceXS = net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_XS;
+		
 		prefRestoreDefault(_chkMin_RunDyn_StanceTime, 				ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MIN_ENABLED);
 		prefRestoreDefault(_chkMax_RunDyn_StanceTime, 				ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MAX_ENABLED);
 		prefRestoreDefault(_spinnerMin_RunDyn_StanceTime, 	 	 	ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_MIN_VALUE);
@@ -994,13 +1062,13 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
 		prefRestoreDefault(_chkMin_RunDyn_StepLength, 				ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MIN_ENABLED);
 		prefRestoreDefault(_chkMax_RunDyn_StepLength, 				ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MAX_ENABLED);
-		prefRestoreDefault(_spinnerMin_RunDyn_StepLength, 	 	 	ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_MIN_VALUE);
-		prefRestoreDefault(_spinnerMax_RunDyn_StepLength, 	 	 	ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_MAX_VALUE);
+		prefRestoreDefault(_spinnerMin_RunDyn_StepLength, 	 	 	ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_MIN_VALUE, 			measurementDistanceXS);
+		prefRestoreDefault(_spinnerMax_RunDyn_StepLength, 	 	 	ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_MAX_VALUE,			measurementDistanceXS);
 
 		prefRestoreDefault(_chkMin_RunDyn_VerticalOscillation, 		ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MIN_ENABLED);
 		prefRestoreDefault(_chkMax_RunDyn_VerticalOscillation, 		ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MAX_ENABLED);
-		prefRestoreDefault(_spinnerMin_RunDyn_VerticalOscillation, 	ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MIN_VALUE);
-		prefRestoreDefault(_spinnerMax_RunDyn_VerticalOscillation, 	ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MAX_VALUE);
+		prefRestoreDefault(_spinnerMin_RunDyn_VerticalOscillation, 	ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MIN_VALUE, 	measurementDistanceXS);
+		prefRestoreDefault(_spinnerMax_RunDyn_VerticalOscillation, 	ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MAX_VALUE, 	measurementDistanceXS);
 
 		prefRestoreDefault(_chkMin_RunDyn_VerticalRatio, 			ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_IS_MIN_ENABLED);
 		prefRestoreDefault(_chkMax_RunDyn_VerticalRatio, 			ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_IS_MAX_ENABLED);
@@ -1075,6 +1143,8 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 		/*
 		 * Running dynamics
 		 */
+		final float measurementDistanceXS = net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_XS;
+		
 		prefRestoreValue(_chkMin_RunDyn_StanceTime, 				ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MIN_ENABLED);
 		prefRestoreValue(_chkMax_RunDyn_StanceTime, 				ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MAX_ENABLED);
 		prefRestoreValue(_spinnerMin_RunDyn_StanceTime, 	 	 	ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_MIN_VALUE);
@@ -1087,13 +1157,13 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
 		prefRestoreValue(_chkMin_RunDyn_StepLength, 				ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MIN_ENABLED);
 		prefRestoreValue(_chkMax_RunDyn_StepLength, 				ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MAX_ENABLED);
-		prefRestoreValue(_spinnerMin_RunDyn_StepLength, 	 	 	ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_MIN_VALUE);
-		prefRestoreValue(_spinnerMax_RunDyn_StepLength, 	 	 	ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_MAX_VALUE);
+		prefRestoreValue(_spinnerMin_RunDyn_StepLength, 	 	 	ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_MIN_VALUE,			measurementDistanceXS);
+		prefRestoreValue(_spinnerMax_RunDyn_StepLength, 	 	 	ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_MAX_VALUE,			measurementDistanceXS);
 
 		prefRestoreValue(_chkMin_RunDyn_VerticalOscillation, 		ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MIN_ENABLED);
 		prefRestoreValue(_chkMax_RunDyn_VerticalOscillation, 		ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MAX_ENABLED);
-		prefRestoreValue(_spinnerMin_RunDyn_VerticalOscillation, 	ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MIN_VALUE);
-		prefRestoreValue(_spinnerMax_RunDyn_VerticalOscillation, 	ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MAX_VALUE);
+		prefRestoreValue(_spinnerMin_RunDyn_VerticalOscillation, 	ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MIN_VALUE,	measurementDistanceXS);
+		prefRestoreValue(_spinnerMax_RunDyn_VerticalOscillation, 	ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MAX_VALUE,	measurementDistanceXS);
 
 		prefRestoreValue(_chkMin_RunDyn_VerticalRatio, 				ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_IS_MIN_ENABLED);
 		prefRestoreValue(_chkMax_RunDyn_VerticalRatio, 				ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_IS_MAX_ENABLED);
@@ -1166,6 +1236,8 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 		/*
 		 * Running dynamics
 		 */
+		final float measurementDistanceXS = net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_XS;
+
 		prefSaveValue(_chkMin_RunDyn_StanceTime, 				ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MIN_ENABLED);
 		prefSaveValue(_chkMax_RunDyn_StanceTime, 				ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MAX_ENABLED);
 		prefSaveValue(_spinnerMin_RunDyn_StanceTime, 	 	 	ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_MIN_VALUE);
@@ -1178,13 +1250,13 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
 		prefSaveValue(_chkMin_RunDyn_StepLength, 				ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MIN_ENABLED);
 		prefSaveValue(_chkMax_RunDyn_StepLength, 				ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MAX_ENABLED);
-		prefSaveValue(_spinnerMin_RunDyn_StepLength, 	 	 	ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_MIN_VALUE);
-		prefSaveValue(_spinnerMax_RunDyn_StepLength, 	 	 	ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_MAX_VALUE);
+		prefSaveValue(_spinnerMin_RunDyn_StepLength, 	 	 	ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_MIN_VALUE,			measurementDistanceXS);
+		prefSaveValue(_spinnerMax_RunDyn_StepLength, 	 	 	ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_MAX_VALUE,			measurementDistanceXS);
 
 		prefSaveValue(_chkMin_RunDyn_VerticalOscillation, 		ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MIN_ENABLED);
 		prefSaveValue(_chkMax_RunDyn_VerticalOscillation, 		ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MAX_ENABLED);
-		prefSaveValue(_spinnerMin_RunDyn_VerticalOscillation, 	ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MIN_VALUE);
-		prefSaveValue(_spinnerMax_RunDyn_VerticalOscillation, 	ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MAX_VALUE);
+		prefSaveValue(_spinnerMin_RunDyn_VerticalOscillation, 	ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MIN_VALUE,	measurementDistanceXS);
+		prefSaveValue(_spinnerMax_RunDyn_VerticalOscillation, 	ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MAX_VALUE,	measurementDistanceXS);
 
 		prefSaveValue(_chkMin_RunDyn_VerticalRatio, 			ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_IS_MIN_ENABLED);
 		prefSaveValue(_chkMax_RunDyn_VerticalRatio, 			ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_IS_MAX_ENABLED);

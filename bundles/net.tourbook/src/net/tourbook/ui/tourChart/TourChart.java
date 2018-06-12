@@ -1174,10 +1174,13 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 						keepMinMax = false;
 
 						_valuePointTooltip.reopen();
+
 					}
 
-					final boolean isMinMaxEnabled = _prefStore.getBoolean(
-							ITourbookPreferences.GRAPH_IS_MIN_MAX_ENABLED);
+					/**
+					 * Accept all possible min/max modify events
+					 */
+					final boolean isMinMaxEnabled = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_MIN_MAX_ENABLED);
 
 					/*
 					 * Altitude
@@ -1441,7 +1444,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 							ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MIN_ENABLED,
 							ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_MIN_VALUE,
 							TourManager.GRAPH_RUN_DYN_STEP_LENGTH,
-							0,
+							net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_XS,
 							MIN_ADJUSTMENT,
 							isMinMaxEnabled);
 
@@ -1451,7 +1454,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 							ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MAX_ENABLED,
 							ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_MAX_VALUE,
 							TourManager.GRAPH_RUN_DYN_STEP_LENGTH,
-							0,
+							net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_XS,
 							1e-3,
 							isMinMaxEnabled);
 
@@ -1464,7 +1467,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 							ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MIN_ENABLED,
 							ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MIN_VALUE,
 							TourManager.GRAPH_RUN_DYN_VERTICAL_OSCILLATION,
-							0,
+							net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_XS,
 							MIN_ADJUSTMENT,
 							isMinMaxEnabled);
 
@@ -1474,7 +1477,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 							ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MAX_ENABLED,
 							ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MAX_VALUE,
 							TourManager.GRAPH_RUN_DYN_VERTICAL_OSCILLATION,
-							0,
+							net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_XS,
 							1e-3,
 							isMinMaxEnabled);
 
@@ -4413,7 +4416,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 										final String prefName_IsMaxEnabled,
 										final String prefName_MaxValue,
 										final int yDataInfoId,
-										final int valueDivisor,
+										final float valueDivisor,
 										final double maxAdjustment,
 										final boolean isMinMaxEnabled) {
 
@@ -4494,7 +4497,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 										final String prefName_IsMinEnabled,
 										final String prefName_MinValue,
 										final int yDataInfoId,
-										final int valueDivisor,
+										final float valueDivisor,
 										final double minAdjustment,
 										final boolean isMinMaxEnabled) {
 

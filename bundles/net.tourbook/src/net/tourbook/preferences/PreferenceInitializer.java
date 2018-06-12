@@ -258,6 +258,31 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.GRAPH_TEMPERATURE_IS_MAX_ENABLED, false);
 		store.setDefault(ITourbookPreferences.GRAPH_TEMPERATURE_MIN_VALUE, -50);
 		store.setDefault(ITourbookPreferences.GRAPH_TEMPERATURE_MAX_VALUE, 50);
+		
+		store.setDefault(ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MIN_ENABLED, true);
+		store.setDefault(ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MAX_ENABLED, true);
+		store.setDefault(ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_MIN_VALUE, 220);
+		store.setDefault(ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_MAX_VALUE, 300);
+
+		store.setDefault(ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCED_IS_MIN_ENABLED, true);
+		store.setDefault(ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCED_IS_MAX_ENABLED, true);
+		store.setDefault(ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCED_MIN_VALUE, 47);
+		store.setDefault(ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCED_MAX_VALUE, 53);
+
+		store.setDefault(ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MIN_ENABLED, true);
+		store.setDefault(ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MAX_ENABLED, true);
+		store.setDefault(ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_MIN_VALUE, 800);
+		store.setDefault(ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_MAX_VALUE, 1800);
+
+		store.setDefault(ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MIN_ENABLED, true);
+		store.setDefault(ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MAX_ENABLED, true);
+		store.setDefault(ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MIN_VALUE, 80);
+		store.setDefault(ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MAX_VALUE, 140);
+
+		store.setDefault(ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_IS_MIN_ENABLED, true);
+		store.setDefault(ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_IS_MAX_ENABLED, true);
+		store.setDefault(ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_MIN_VALUE, 5);
+		store.setDefault(ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_MAX_VALUE, 15);
 
 		// value point tool tip
 		store.setDefault(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE, true);

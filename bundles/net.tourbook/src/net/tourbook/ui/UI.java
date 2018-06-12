@@ -193,6 +193,11 @@ public class UI {
 	public static final float			UNIT_YARD						= 0.9144f;
 
 	/**
+	 * Imperial system for very small distance, 1 mm = 0.03937008 inches, 1 inch = 25.4 mm
+	 */
+	public static final float			UNIT_INCH						= 0.03937008f;
+
+	/**
 	 * Imperial system for height
 	 */
 	public static final float			UNIT_FOOT						= 0.3048f;
@@ -208,6 +213,12 @@ public class UI {
 	 * the metric system is <code>1</code>
 	 */
 	public static float					UNIT_VALUE_DISTANCE_SMALL		= 1;
+
+	/**
+	 * Contains the system of measurement value for very small distances relative to the metric
+	 * system, the metric system is 1 mm, imperial is 0.03937008 inch.
+	 */
+	public static float					UNIT_VALUE_DISTANCE_XS			= 1;
 
 	/**
 	 * contains the system of measurement value for altitudes relative to the metric system, the
@@ -1173,9 +1184,11 @@ public class UI {
 
 			UNIT_VALUE_DISTANCE = UNIT_MILE;
 			UNIT_VALUE_DISTANCE_SMALL = UNIT_YARD;
+			UNIT_VALUE_DISTANCE_XS = UNIT_INCH;
 
 			net.tourbook.common.UI.UNIT_LABEL_DISTANCE = net.tourbook.common.UI.UNIT_DISTANCE_MI;
 			net.tourbook.common.UI.UNIT_LABEL_DISTANCE_SMALL = net.tourbook.common.UI.UNIT_DISTANCE_YARD;
+			net.tourbook.common.UI.UNIT_LABEL_DISTANCE_XS = net.tourbook.common.UI.UNIT_DISTANCE_INCH;
 
 			net.tourbook.common.UI.UNIT_LABEL_SPEED = net.tourbook.common.UI.UNIT_SPEED_MPH;
 			net.tourbook.common.UI.UNIT_LABEL_PACE = net.tourbook.common.UI.UNIT_PACE_MIN_P_MILE;
@@ -1186,10 +1199,11 @@ public class UI {
 
 			UNIT_VALUE_DISTANCE = 1;
 			UNIT_VALUE_DISTANCE_SMALL = 1;
+			UNIT_VALUE_DISTANCE_XS = 1;
 
 			net.tourbook.common.UI.UNIT_LABEL_DISTANCE = net.tourbook.common.UI.UNIT_DISTANCE_KM;
 			net.tourbook.common.UI.UNIT_LABEL_DISTANCE_SMALL = net.tourbook.common.UI.UNIT_METER;
-			net.tourbook.common.UI.UNIT_LABEL_MM = net.tourbook.common.UI.UNIT_MM;
+			net.tourbook.common.UI.UNIT_LABEL_DISTANCE_XS = net.tourbook.common.UI.UNIT_MM;
 
 			net.tourbook.common.UI.UNIT_LABEL_SPEED = net.tourbook.common.UI.UNIT_SPEED_KM_H;
 			net.tourbook.common.UI.UNIT_LABEL_PACE = net.tourbook.common.UI.UNIT_PACE_MIN_P_KM;

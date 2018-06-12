@@ -1355,11 +1355,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	/*
 	 * Running dynamics data
 	 * 
-	//	|| fieldName.equals("stance_time") //				  253.0  ms
-	//	|| fieldName.equals("stance_time_balance") //		   51.31 percent
-	//	|| fieldName.equals("step_length") //				 1526.0  mm
-	//	|| fieldName.equals("vertical_oscillation") //		    7.03 percent
-	//	|| fieldName.equals("vertical_ratio") //			  114.2  mm
+	 *	stance_time                  267.0  ms
+	 *	stance_time_balance           50.56 percent
+	 *	step_length                 1147.0  mm
+	 *	vertical_oscillation         107.2  mm
+	 *	vertical_ratio                 9.15 percent
+	 *	
+	 *	stance_time                  272.0  ms
+	 *	stance_time_balance           50.46 percent
+	 *	step_length                 1169.0  mm
+	 *	vertical_oscillation         119.0  mm
+	 *	vertical_ratio                 9.84 percent
 	 * 
 	 * @since Version 18.7
 	 */
@@ -1377,16 +1383,20 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	public short[]					runDyn_StepLength;
 	@Transient
 	private float[]					_runDyn_StepLength_UI;
-	
 	@Transient
-	public short[]					runDyn_VerticalRatio;
-	@Transient
-	private float[]					_runDyn_VerticalRatio_UI;
+	private float[]					_runDyn_StepLength_UI_Imperial;
 	
 	@Transient
 	public short[]					runDyn_VerticalOscillation;
 	@Transient
 	private float[]					_runDyn_VerticalOscillation_UI;
+	@Transient
+	private float[]					_runDyn_VerticalOscillation_UI_Imperial;
+	
+	@Transient
+	public short[]					runDyn_VerticalRatio;
+	@Transient
+	private float[]					_runDyn_VerticalRatio_UI;
 
 // SET_FORMATTING_ON
 
@@ -1637,6 +1647,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		_runDyn_StanceTime_UI = null;
 		_runDyn_StanceTime_Balance_UI = null;
 		_runDyn_StepLength_UI = null;
+		_runDyn_StepLength_UI_Imperial = null;
 		_runDyn_VerticalOscillation_UI = null;
 		_runDyn_VerticalRatio_UI = null;
 
@@ -6366,44 +6377,99 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	public float[] getRunDyn_StepLength() {
 
-		if (_runDyn_StepLength_UI == null) {
+		if (UI.UNIT_VALUE_DISTANCE == 1) {
 
-			if (runDyn_StepLength != null) {
+			// use metric system
 
-				// create UI data serie
+			if (_runDyn_StepLength_UI == null) {
 
-				final int serieSize = runDyn_StepLength.length;
+				if (runDyn_StepLength != null) {
 
-				_runDyn_StepLength_UI = new float[serieSize];
+					// create UI data serie
 
-				for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
-					_runDyn_StepLength_UI[serieIndex] = runDyn_StepLength[serieIndex];
+					final int serieSize = runDyn_StepLength.length;
+
+					_runDyn_StepLength_UI = new float[serieSize];
+
+					for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
+						_runDyn_StepLength_UI[serieIndex] = runDyn_StepLength[serieIndex];
+					}
 				}
 			}
-		}
 
-		return _runDyn_StepLength_UI;
+			return _runDyn_StepLength_UI;
+
+		} else {
+
+			// use imperial system
+
+			if (_runDyn_StepLength_UI_Imperial == null) {
+
+				if (runDyn_StepLength != null) {
+
+					// create UI data serie
+
+					final int serieSize = runDyn_StepLength.length;
+
+					_runDyn_StepLength_UI_Imperial = new float[serieSize];
+
+					for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
+						_runDyn_StepLength_UI_Imperial[serieIndex] = runDyn_StepLength[serieIndex] * UI.UNIT_VALUE_DISTANCE_XS;
+					}
+				}
+			}
+
+			return _runDyn_StepLength_UI_Imperial;
+		}
 	}
 
 	public float[] getRunDyn_VerticalOscillation() {
 
-		if (_runDyn_VerticalOscillation_UI == null) {
+		if (UI.UNIT_VALUE_DISTANCE == 1) {
 
-			if (runDyn_VerticalOscillation != null) {
+			// use metric system
 
-				// create UI data serie
+			if (_runDyn_VerticalOscillation_UI == null) {
 
-				final int serieSize = runDyn_VerticalOscillation.length;
+				if (runDyn_VerticalOscillation != null) {
 
-				_runDyn_VerticalOscillation_UI = new float[serieSize];
+					// create UI data serie
 
-				for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
-					_runDyn_VerticalOscillation_UI[serieIndex] = runDyn_VerticalOscillation[serieIndex] / RUN_DYN_DATA_MULTIPLIER;
+					final int serieSize = runDyn_VerticalOscillation.length;
+
+					_runDyn_VerticalOscillation_UI = new float[serieSize];
+
+					for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
+						_runDyn_VerticalOscillation_UI[serieIndex] = runDyn_VerticalOscillation[serieIndex] / RUN_DYN_DATA_MULTIPLIER;
+					}
 				}
 			}
-		}
 
-		return _runDyn_VerticalOscillation_UI;
+			return _runDyn_VerticalOscillation_UI;
+
+		} else {
+
+			// use imperial system
+
+			if (_runDyn_VerticalOscillation_UI_Imperial == null) {
+
+				if (runDyn_VerticalOscillation != null) {
+
+					// create UI data serie
+
+					final int serieSize = runDyn_VerticalOscillation.length;
+
+					_runDyn_VerticalOscillation_UI_Imperial = new float[serieSize];
+
+					for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
+						_runDyn_VerticalOscillation_UI_Imperial[serieIndex] = runDyn_VerticalOscillation[serieIndex] / RUN_DYN_DATA_MULTIPLIER
+								* UI.UNIT_VALUE_DISTANCE_XS;
+					}
+				}
+			}
+
+			return _runDyn_VerticalOscillation_UI_Imperial;
+		}
 	}
 
 	public float[] getRunDyn_VerticalRatio() {

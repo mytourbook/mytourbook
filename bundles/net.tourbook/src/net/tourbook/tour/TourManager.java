@@ -3582,7 +3582,7 @@ public class TourManager {
 			yDataSerie = createChartDataSerie(dataSerie, chartType);
 
 			yDataSerie.setYTitle(GRAPH_LABEL_RUN_DYN_STEP_LENGTH);
-			yDataSerie.setUnitLabel(UI.UNIT_LABEL_MM);
+			yDataSerie.setUnitLabel(UI.UNIT_LABEL_DISTANCE_XS);
 			yDataSerie.setShowYSlider(true);
 			yDataSerie.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_RUN_DYN_STEP_LENGTH);
 
@@ -3598,7 +3598,7 @@ public class TourManager {
 			// adjust min/max values when it's defined in the pref store
 			setVisibleForcedValues(
 					yDataSerie,
-					1,
+					net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_XS,
 					0,
 					ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MIN_ENABLED,
 					ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MAX_ENABLED,
@@ -3625,7 +3625,7 @@ public class TourManager {
 			yDataSerie = createChartDataSerie(dataSerie, chartType);
 
 			yDataSerie.setYTitle(GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION);
-			yDataSerie.setUnitLabel(UI.UNIT_LABEL_MM);
+			yDataSerie.setUnitLabel(UI.UNIT_LABEL_DISTANCE_XS);
 			yDataSerie.setShowYSlider(true);
 			yDataSerie.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_RUN_DYN_VERTICAL_OSCILLATION);
 
@@ -4097,6 +4097,57 @@ public class TourManager {
 	 * @param prefName_MaxValue
 	 */
 	private void setVisibleForcedValues(final ChartDataYSerie yData,
+										final float valueMultiplier,
+										final double maxValueAdjustment,
+										final String prefName_IsMinEnabled,
+										final String prefName_IsMaxEnabled,
+										final String prefName_MinValue,
+										final String prefName_MaxValue) {
+		final boolean isMinMaxEnabled = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_MIN_MAX_ENABLED);
+		if (!isMinMaxEnabled) {
+			return;
+		}
+
+		if (_prefStore.getBoolean(prefName_IsMinEnabled)) {
+
+			final int prefMinValue = _prefStore.getInt(prefName_MinValue);
+
+			yData.forceYAxisMinValue(prefMinValue * valueMultiplier);
+		}
+
+		// set max value after min value, adjust max otherwise values above the max are painted
+		if (_prefStore.getBoolean(prefName_IsMaxEnabled)) {
+
+			final int prefMaxValue = _prefStore.getInt(prefName_MaxValue);
+
+			final float maxValue = prefMaxValue * valueMultiplier;
+
+			if (maxValueAdjustment == 0) {
+
+				yData.forceYAxisMaxValue(maxValue);
+
+			} else {
+
+				yData.forceYAxisMaxValue(
+						maxValue > 0 //
+								? maxValue - maxValueAdjustment
+								: maxValue + maxValueAdjustment);
+			}
+		}
+	}
+
+	/**
+	 * @param yData
+	 * @param valueMultiplier
+	 *            Will be multiplied with the pref store value.
+	 * @param maxValueAdjustment
+	 *            Will be added/subtracted from the pref max value.
+	 * @param prefName_IsMinEnabled
+	 * @param prefName_IsMaxEnabled
+	 * @param prefName_MinValue
+	 * @param prefName_MaxValue
+	 */
+	private void setVisibleForcedValues(final ChartDataYSerie yData,
 										final int valueMultiplier,
 										final double maxValueAdjustment,
 										final String prefName_IsMinEnabled,
@@ -4111,13 +4162,17 @@ public class TourManager {
 
 		if (_prefStore.getBoolean(prefName_IsMinEnabled)) {
 
-			yData.forceYAxisMinValue(_prefStore.getInt(prefName_MinValue) * valueMultiplier);
+			final int prefMinValue = _prefStore.getInt(prefName_MinValue);
+
+			yData.forceYAxisMinValue(prefMinValue * valueMultiplier);
 		}
 
 		// set max value after min value, adjust max otherwise values above the max are painted
 		if (_prefStore.getBoolean(prefName_IsMaxEnabled)) {
 
-			final int maxValue = _prefStore.getInt(prefName_MaxValue) * valueMultiplier;
+			final int prefMaxValue = _prefStore.getInt(prefName_MaxValue);
+
+			final int maxValue = prefMaxValue * valueMultiplier;
 
 			if (maxValueAdjustment == 0) {
 
