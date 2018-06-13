@@ -601,7 +601,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
 	private void createUI_82_MinMax_RunDyn_StepLength(final Composite parent) {
 
-		final int maxStepLength = (int) (RUN_DYN_STEP_LENGTH_MAX * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_XS);
+		final int maxStepLength = (int) (RUN_DYN_STEP_LENGTH_MAX * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH);
 
 		_iconRunDyn_StepLength = createUI_Icon(parent, _imageRunDyn_StepLength);
 
@@ -618,7 +618,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
 	private void createUI_83_MinMax_RunDyn_VerticalOscillation(final Composite parent) {
 
-		final int maxVertOscillation = (int) (RUN_DYN_VERTICAL_OSCILLATION_MAX * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_XS);
+		final int maxVertOscillation = (int) (RUN_DYN_VERTICAL_OSCILLATION_MAX * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH);
 
 		_iconRunDyn_VerticalOscillation = createUI_Icon(parent, _imageRunDyn_VerticalOscillation);
 
@@ -943,46 +943,11 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
 	private void prefSaveValue(final Spinner spinner, final String prefName, final float measurementFactor) {
 
-		{
-			final float uiValue = spinner.getSelection();
-			final float uiValueAdjusted = uiValue / measurementFactor;
-			final int prefValue = (int) (uiValueAdjusted + 0.5f);
+		final float uiValue = spinner.getSelection();
+		final float uiValueAdjusted = uiValue / measurementFactor;
+		final int prefValue = (int) (uiValueAdjusted + 0.5f);
 
-			_prefStore.setValue(prefName, prefValue);
-
-//			if (prefName.contains("VERTICAL_OSCILLATION")) {
-//
-//				System.out.println(String.format(
-//
-//						"%s  prefValue: %3d  prefValueAdjusted: %3.5f  uiValue: %3.1f",
-//						prefName,
-//						prefValue,
-//						uiValueAdjusted,
-//						uiValue
-//				//
-//				));
-//			}
-// TODO remove SYSTEM.OUT.PRINTLN
-		}
-//		{
-//			final float prefValue = _prefStore.getInt(prefName);
-//			final double prefValueAdjusted = (prefValue * measurementFactor) + 0.5;
-//			final int uiValue = (int) prefValueAdjusted;
-//
-//			if (prefName.contains("VERTICAL_OSCILLATION")) {
-//
-//				System.out.println(String.format(
-//
-//						"%s  prefValue: %3.0f  prefValueAdjusted: %-3.5f  uiValue: %3d\n\n",
-//						prefName,
-//						prefValue,
-//						prefValueAdjusted,
-//						uiValue
-//				//
-//				));
-//			}
-//// TODO remove SYSTEM.OUT.PRINTLN
-//		}
+		_prefStore.setValue(prefName, prefValue);
 	}
 
 	private void resetToDefaults() {
@@ -1048,7 +1013,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 		/*
 		 * Running dynamics
 		 */
-		final float measurementDistanceXS = net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_XS;
+		final float measurementDistanceXS = net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
 		
 		prefRestoreDefault(_chkMin_RunDyn_StanceTime, 				ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MIN_ENABLED);
 		prefRestoreDefault(_chkMax_RunDyn_StanceTime, 				ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MAX_ENABLED);
@@ -1143,7 +1108,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 		/*
 		 * Running dynamics
 		 */
-		final float measurementDistanceXS = net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_XS;
+		final float measurementDistanceXS = net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
 		
 		prefRestoreValue(_chkMin_RunDyn_StanceTime, 				ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MIN_ENABLED);
 		prefRestoreValue(_chkMax_RunDyn_StanceTime, 				ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MAX_ENABLED);
@@ -1236,7 +1201,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 		/*
 		 * Running dynamics
 		 */
-		final float measurementDistanceXS = net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_XS;
+		final float measurementDistanceXS = net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
 
 		prefSaveValue(_chkMin_RunDyn_StanceTime, 				ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MIN_ENABLED);
 		prefSaveValue(_chkMax_RunDyn_StanceTime, 				ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MAX_ENABLED);

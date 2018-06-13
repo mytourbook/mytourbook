@@ -218,7 +218,7 @@ public class UI {
 	 * Contains the system of measurement value for very small distances relative to the metric
 	 * system, the metric system is 1 mm, imperial is 0.03937008 inch.
 	 */
-	public static float					UNIT_VALUE_DISTANCE_XS			= 1;
+	public static float					UNIT_VALUE_DISTANCE_MM_OR_INCH	= 1;
 
 	/**
 	 * contains the system of measurement value for altitudes relative to the metric system, the
@@ -1184,7 +1184,7 @@ public class UI {
 
 			UNIT_VALUE_DISTANCE = UNIT_MILE;
 			UNIT_VALUE_DISTANCE_SMALL = UNIT_YARD;
-			UNIT_VALUE_DISTANCE_XS = UNIT_INCH;
+			UNIT_VALUE_DISTANCE_MM_OR_INCH = UNIT_INCH;
 
 			net.tourbook.common.UI.UNIT_LABEL_DISTANCE = net.tourbook.common.UI.UNIT_DISTANCE_MI;
 			net.tourbook.common.UI.UNIT_LABEL_DISTANCE_SMALL = net.tourbook.common.UI.UNIT_DISTANCE_YARD;
@@ -1199,7 +1199,7 @@ public class UI {
 
 			UNIT_VALUE_DISTANCE = 1;
 			UNIT_VALUE_DISTANCE_SMALL = 1;
-			UNIT_VALUE_DISTANCE_XS = 1;
+			UNIT_VALUE_DISTANCE_MM_OR_INCH = 1;
 
 			net.tourbook.common.UI.UNIT_LABEL_DISTANCE = net.tourbook.common.UI.UNIT_DISTANCE_KM;
 			net.tourbook.common.UI.UNIT_LABEL_DISTANCE_SMALL = net.tourbook.common.UI.UNIT_METER;

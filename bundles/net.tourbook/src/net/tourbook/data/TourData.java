@@ -6414,7 +6414,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 					_runDyn_StepLength_UI_Imperial = new float[serieSize];
 
 					for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
-						_runDyn_StepLength_UI_Imperial[serieIndex] = runDyn_StepLength[serieIndex] * UI.UNIT_VALUE_DISTANCE_XS;
+						_runDyn_StepLength_UI_Imperial[serieIndex] = runDyn_StepLength[serieIndex] * UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
 					}
 				}
 			}
@@ -6463,7 +6463,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 					for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
 						_runDyn_VerticalOscillation_UI_Imperial[serieIndex] = runDyn_VerticalOscillation[serieIndex] / RUN_DYN_DATA_MULTIPLIER
-								* UI.UNIT_VALUE_DISTANCE_XS;
+								* UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
 					}
 				}
 			}

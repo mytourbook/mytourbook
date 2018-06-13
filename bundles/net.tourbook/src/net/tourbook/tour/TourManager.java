@@ -3598,7 +3598,7 @@ public class TourManager {
 			// adjust min/max values when it's defined in the pref store
 			setVisibleForcedValues(
 					yDataSerie,
-					net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_XS,
+					net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH,
 					0,
 					ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MIN_ENABLED,
 					ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MAX_ENABLED,

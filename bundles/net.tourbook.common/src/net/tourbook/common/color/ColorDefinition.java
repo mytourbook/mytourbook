@@ -335,7 +335,7 @@ public class ColorDefinition {
 
 // SET_FORMATTING_OFF
 		
-		return "ColorDefinition	\n" //$NON-NLS-1$
+		return "\nColorDefinition	\n" //$NON-NLS-1$
 
 				+ "_colorDefinitionId			=" + _colorDefinitionId 		+ "\n" //$NON-NLS-1$ //$NON-NLS-2$
 //				+ "_visibleName					=" + _visibleName 				+ "\n" //$NON-NLS-1$ //$NON-NLS-2$

@@ -1444,7 +1444,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 							ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MIN_ENABLED,
 							ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_MIN_VALUE,
 							TourManager.GRAPH_RUN_DYN_STEP_LENGTH,
-							net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_XS,
+							net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH,
 							MIN_ADJUSTMENT,
 							isMinMaxEnabled);
 
@@ -1454,7 +1454,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 							ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MAX_ENABLED,
 							ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_MAX_VALUE,
 							TourManager.GRAPH_RUN_DYN_STEP_LENGTH,
-							net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_XS,
+							net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH,
 							1e-3,
 							isMinMaxEnabled);
 
@@ -1467,7 +1467,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 							ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MIN_ENABLED,
 							ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MIN_VALUE,
 							TourManager.GRAPH_RUN_DYN_VERTICAL_OSCILLATION,
-							net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_XS,
+							net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH,
 							MIN_ADJUSTMENT,
 							isMinMaxEnabled);
 
@@ -1477,7 +1477,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 							ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MAX_ENABLED,
 							ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MAX_VALUE,
 							TourManager.GRAPH_RUN_DYN_VERTICAL_OSCILLATION,
-							net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_XS,
+							net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH,
 							1e-3,
 							isMinMaxEnabled);
 
