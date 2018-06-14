@@ -613,7 +613,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 		_chkMax_RunDyn_StepLength = createUI_Checkbox(parent);
 		_spinnerMax_RunDyn_StepLength = createUI_Spinner(parent, 0, maxStepLength);
 
-		_lblMinMax_RunDyn_StepLength_Unit = createUI_Label(parent, UI.UNIT_LABEL_DISTANCE_XS);
+		_lblMinMax_RunDyn_StepLength_Unit = createUI_Label(parent, UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
 	}
 
 	private void createUI_83_MinMax_RunDyn_VerticalOscillation(final Composite parent) {
@@ -630,7 +630,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 		_chkMax_RunDyn_VerticalOscillation = createUI_Checkbox(parent);
 		_spinnerMax_RunDyn_VerticalOscillation = createUI_Spinner(parent, 0, maxVertOscillation);
 
-		_lblMinMax_RunDyn_VerticalOscillation_Unit = createUI_Label(parent, UI.UNIT_LABEL_DISTANCE_XS);
+		_lblMinMax_RunDyn_VerticalOscillation_Unit = createUI_Label(parent, UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
 	}
 
 	private void createUI_84_MinMax_RunDyn_VerticalRatio(final Composite parent) {

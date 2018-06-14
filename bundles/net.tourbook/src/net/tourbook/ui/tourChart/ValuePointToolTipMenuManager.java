@@ -60,8 +60,13 @@ public class ValuePointToolTipMenuManager {
 	static final long					VALUE_ID_CHART_ZOOM_FACTOR					= 1 << 14;
 	static final long					VALUE_ID_GEARS								= 1 << 15;
 	static final long					VALUE_ID_TOUR_COMPARE_RESULT				= 1 << 16;
+	static final long					VALUE_ID_RUN_DYN_STANCE_TIME				= 1 << 17;
+	static final long					VALUE_ID_RUN_DYN_STANCE_TIME_BALANCED		= 1 << 18;
+	static final long					VALUE_ID_RUN_DYN_STEP_LENGTH				= 1 << 19;
+	static final long					VALUE_ID_RUN_DYN_VERTICAL_OSCILLATION		= 1 << 20;
+	static final long					VALUE_ID_RUN_DYN_VERTICAL_RATIO				= 1 << 21;
 
-	static final long					DEFAULT_GRAPHS								=									//
+	static final long					DEFAULT_GRAPHS								=
 
 			VALUE_ID_TIME_SLICES
 					| VALUE_ID_TIME_DURATION
@@ -109,6 +114,12 @@ public class ValuePointToolTipMenuManager {
 	private ActionValueItem				_actionValue_TimeOfDay;
 	private ActionValueItem				_actionValue_TimeSlices;
 	private ActionValueItem				_actionValue_TourCompareResult;
+
+	private ActionValueItem				_actionValue_RunDyn_StanceTime;
+	private ActionValueItem				_actionValue_RunDyn_StanceTimeBalanced;
+	private ActionValueItem				_actionValue_RunDyn_StepLength;
+	private ActionValueItem				_actionValue_RunDyn_VerticalOscillation;
+	private ActionValueItem				_actionValue_RunDyn_VerticalRatio;
 
 	private Action						_actionPinLocation_Header;
 	private ActionPinLocation			_actionPinLocation_Screen;
@@ -431,6 +442,36 @@ public class ValuePointToolTipMenuManager {
 				Messages.Tooltip_ValuePoint_Action_Value_TourCompareResult,
 				Messages.Image__graph_tour_compare,
 				Messages.Image__graph_tour_compare_disabled);
+
+		_actionValue_RunDyn_StanceTime = new ActionValueItem(
+				VALUE_ID_RUN_DYN_STANCE_TIME,
+				Messages.Tooltip_ValuePoint_Action_Value_RunDyn_StanceTime,
+				Messages.Image__Graph_RunDyn_StanceTime,
+				Messages.Image__Graph_RunDyn_StanceTime_Disabled);
+
+		_actionValue_RunDyn_StanceTimeBalanced = new ActionValueItem(
+				VALUE_ID_RUN_DYN_STANCE_TIME_BALANCED,
+				Messages.Tooltip_ValuePoint_Action_Value_RunDyn_StanceTimeBalanced,
+				Messages.Image__Graph_RunDyn_StanceTimeBalanced,
+				Messages.Image__Graph_RunDyn_StanceTimeBalanced_Disabled);
+
+		_actionValue_RunDyn_StepLength = new ActionValueItem(
+				VALUE_ID_RUN_DYN_STEP_LENGTH,
+				Messages.Tooltip_ValuePoint_Action_Value_RunDyn_StepLength,
+				Messages.Image__Graph_RunDyn_StepLength,
+				Messages.Image__Graph_RunDyn_StepLength_Disabled);
+
+		_actionValue_RunDyn_VerticalOscillation = new ActionValueItem(
+				VALUE_ID_RUN_DYN_VERTICAL_OSCILLATION,
+				Messages.Tooltip_ValuePoint_Action_Value_RunDyn_VerticalOscillation,
+				Messages.Image__Graph_RunDyn_VerticalOscillation,
+				Messages.Image__Graph_RunDyn_VerticalOscillation_Disabled);
+
+		_actionValue_RunDyn_VerticalRatio = new ActionValueItem(
+				VALUE_ID_RUN_DYN_VERTICAL_RATIO,
+				Messages.Tooltip_ValuePoint_Action_Value_RunDyn_VerticalRatio,
+				Messages.Image__Graph_RunDyn_VerticalRatio,
+				Messages.Image__Graph_RunDyn_VerticalRatio_Disabled);
 	}
 
 	private void createPinActions() {
@@ -547,6 +588,26 @@ public class ValuePointToolTipMenuManager {
 		_actionValue_TourCompareResult.setState( //
 				(_allVisibleValueIds & VALUE_ID_TOUR_COMPARE_RESULT) > 0,
 				_tourData.tourCompareSerie != null && _tourData.tourCompareSerie.length > 0);
+
+		_actionValue_RunDyn_StanceTime.setState( //
+				(_allVisibleValueIds & VALUE_ID_RUN_DYN_STANCE_TIME) > 0,
+				_tourData.getRunDyn_StanceTime() != null);
+
+		_actionValue_RunDyn_StanceTimeBalanced.setState( //
+				(_allVisibleValueIds & VALUE_ID_RUN_DYN_STANCE_TIME_BALANCED) > 0,
+				_tourData.getRunDyn_StanceTime_Balance() != null);
+
+		_actionValue_RunDyn_StepLength.setState( //
+				(_allVisibleValueIds & VALUE_ID_RUN_DYN_STEP_LENGTH) > 0,
+				_tourData.getRunDyn_StepLength() != null);
+
+		_actionValue_RunDyn_VerticalOscillation.setState( //
+				(_allVisibleValueIds & VALUE_ID_RUN_DYN_VERTICAL_OSCILLATION) > 0,
+				_tourData.getRunDyn_VerticalOscillation() != null);
+
+		_actionValue_RunDyn_VerticalRatio.setState( //
+				(_allVisibleValueIds & VALUE_ID_RUN_DYN_VERTICAL_RATIO) > 0,
+				_tourData.getRunDyn_VerticalRatio() != null);
 	}
 
 	private Menu getMenu(final Control parent) {
@@ -578,6 +639,11 @@ public class ValuePointToolTipMenuManager {
 		addItem(_actionValue_Altimeter);
 		addItem(_actionValue_Cadence);
 		addItem(_actionValue_Gears);
+		addItem(_actionValue_RunDyn_StanceTime);
+		addItem(_actionValue_RunDyn_StanceTimeBalanced);
+		addItem(_actionValue_RunDyn_StepLength);
+		addItem(_actionValue_RunDyn_VerticalOscillation);
+		addItem(_actionValue_RunDyn_VerticalRatio);
 		addItem(_actionValue_TourCompareResult);
 		addItem(_actionValue_ChartZoomFactor);
 		addItem(_actionCloseTTContextMenu);

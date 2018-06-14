@@ -3540,6 +3540,7 @@ public class TourManager {
 
 			yDataSerie.setYTitle(GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCED);
 			yDataSerie.setUnitLabel(UI.UNIT_PERCENT);
+			yDataSerie.setDisplayedFractionalDigits(1);
 			yDataSerie.setShowYSlider(true);
 			yDataSerie.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_RUN_DYN_STANCE_TIME_BALANCED);
 
@@ -3582,7 +3583,7 @@ public class TourManager {
 			yDataSerie = createChartDataSerie(dataSerie, chartType);
 
 			yDataSerie.setYTitle(GRAPH_LABEL_RUN_DYN_STEP_LENGTH);
-			yDataSerie.setUnitLabel(UI.UNIT_LABEL_DISTANCE_XS);
+			yDataSerie.setUnitLabel(UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
 			yDataSerie.setShowYSlider(true);
 			yDataSerie.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_RUN_DYN_STEP_LENGTH);
 
@@ -3625,7 +3626,8 @@ public class TourManager {
 			yDataSerie = createChartDataSerie(dataSerie, chartType);
 
 			yDataSerie.setYTitle(GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION);
-			yDataSerie.setUnitLabel(UI.UNIT_LABEL_DISTANCE_XS);
+			yDataSerie.setUnitLabel(UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
+			yDataSerie.setDisplayedFractionalDigits(1);
 			yDataSerie.setShowYSlider(true);
 			yDataSerie.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_RUN_DYN_VERTICAL_OSCILLATION);
 
@@ -3669,6 +3671,7 @@ public class TourManager {
 
 			yDataSerie.setYTitle(GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO);
 			yDataSerie.setUnitLabel(UI.UNIT_PERCENT);
+			yDataSerie.setDisplayedFractionalDigits(1);
 			yDataSerie.setShowYSlider(true);
 			yDataSerie.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_RUN_DYN_VERTICAL_RATIO);
 

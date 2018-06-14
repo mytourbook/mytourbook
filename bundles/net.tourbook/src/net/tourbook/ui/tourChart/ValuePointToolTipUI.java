@@ -81,10 +81,16 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 	private static final String		GRAPH_LABEL_TIME_DURATION		= net.tourbook.common.Messages.Graph_Label_TimeDuration;
 	private static final String		GRAPH_LABEL_TIME_OF_DAY			= net.tourbook.common.Messages.Graph_Label_TimeOfDay;
 	private static final String		GRAPH_LABEL_TOUR_COMPARE		= net.tourbook.common.Messages.Graph_Label_Tour_Compare;
+
+	private static final String		GRAPH_LABEL_RUN_DYN_STANCE_TIME				= net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTime;
+	private static final String		GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCED	= net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTime_Balanced;
+	private static final String		GRAPH_LABEL_RUN_DYN_STEP_LENGTH				= net.tourbook.common.Messages.Graph_Label_RunDyn_StepLength;
+	private static final String		GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION	= net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalOscillation;
+	private static final String		GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO			= net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalRatio;
 	
 // SET_FORMATTING_ON
 
-	private final IPreferenceStore			_prefStore					= TourbookPlugin.getPrefStore();
+	private final IPreferenceStore			_prefStore									= TourbookPlugin.getPrefStore();
 
 	private IPropertyChangeListener			_prefChangeListener;
 
@@ -104,16 +110,17 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 	private int								_valueUnitDistance;
 	private double							_chartZoomFactor;
 
-	private int[]							_updateCounter				= new int[] { 0 };
+	private int[]							_updateCounter								= new int[] { 0 };
 	private long							_lastUpdateUITime;
 	private boolean							_isHorizontal;
 
-	private final NumberFormat				_nf0						= NumberFormat.getNumberInstance();
-	private final NumberFormat				_nf1						= NumberFormat.getNumberInstance();
-	private final NumberFormat				_nf1min						= NumberFormat.getNumberInstance();
-	private final NumberFormat				_nf1NoGroup					= NumberFormat.getNumberInstance();
-	private final NumberFormat				_nf3						= NumberFormat.getNumberInstance();
-	private final NumberFormat				_nf3NoGroup					= NumberFormat.getNumberInstance();
+	private final NumberFormat				_nf0										= NumberFormat.getNumberInstance();
+	private final NumberFormat				_nf1										= NumberFormat.getNumberInstance();
+	private final NumberFormat				_nf1min										= NumberFormat.getNumberInstance();
+	private final NumberFormat				_nf1NoGroup									= NumberFormat.getNumberInstance();
+	private final NumberFormat				_nf2										= NumberFormat.getNumberInstance();
+	private final NumberFormat				_nf3										= NumberFormat.getNumberInstance();
+	private final NumberFormat				_nf3NoGroup									= NumberFormat.getNumberInstance();
 	{
 		_nf0.setMinimumFractionDigits(0);
 		_nf0.setMaximumFractionDigits(0);
@@ -121,6 +128,8 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
 		_nf1min.setMinimumFractionDigits(1);
+		_nf2.setMinimumFractionDigits(2);
+		_nf2.setMaximumFractionDigits(2);
 		_nf3.setMinimumFractionDigits(3);
 		_nf3.setMaximumFractionDigits(3);
 
@@ -157,6 +166,12 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 	private boolean						_isVisible_And_Available_TimeSlice;
 	private boolean						_isVisible_And_Available_TourCompareResult;
 
+	private boolean						_isVisible_And_Available_RunDyn_StanceTime;
+	private boolean						_isVisible_And_Available_RunDyn_StanceTime_Balanced;
+	private boolean						_isVisible_And_Available_RunDyn_StepLength;
+	private boolean						_isVisible_And_Available_RunDyn_VerticalOscillation;
+	private boolean						_isVisible_And_Available_RunDyn_VerticalRatio;
+
 	/*
 	 * UI resources
 	 */
@@ -192,6 +207,11 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 	private Label						_lblTimeDuration;
 	private Label						_lblTimeOfDay;
 	private Label						_lblTourCompareResult;
+	private Label						_lblRunDyn_StanceTime;
+	private Label						_lblRunDyn_StanceTime_Balanced;
+	private Label						_lblRunDyn_StepLength;
+	private Label						_lblRunDyn_VerticalOscillation;
+	private Label						_lblRunDyn_VerticalRatio;
 
 	private Label						_lblAltitudeUnit;
 	private Label						_lblAltimeterUnit;
@@ -452,6 +472,11 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 			createUI_290_Cadence(container);
 			createUI_300_Gears(container);
 			createUI_310_TourCompareResult(container);
+			createUI_400_RunDyn_StanceTime(container);
+			createUI_410_RunDyn_StanceTime_Balanced(container);
+			createUI_420_RunDyn_StepLength(container);
+			createUI_430_RunDyn_VerticalOscillation(container);
+			createUI_440_RunDyn_VerticalRatio(container);
 			createUI_500_ChartZoomFactor(container);
 		}
 	}
@@ -873,6 +898,126 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 		}
 	}
 
+	private void createUI_400_RunDyn_StanceTime(final Composite parent) {
+
+		if (_isVisible_And_Available_RunDyn_StanceTime) {
+
+			final Composite container = createUIValueContainer(parent);
+			{
+				_lblRunDyn_StanceTime = createUILabelValue(
+						container,
+						SWT.TRAIL,
+						3,
+						GRAPH_LABEL_RUN_DYN_STANCE_TIME,
+						GraphColorManager.PREF_GRAPH_RUN_DYN_STANCE_TIME);
+
+				createUILabel(
+						container,
+						UI.UNIT_MS,
+						GRAPH_LABEL_RUN_DYN_STANCE_TIME,
+						GraphColorManager.PREF_GRAPH_RUN_DYN_STANCE_TIME);
+			}
+			_firstColumnControls.add(_lblRunDyn_StanceTime);
+			_firstColumnContainerControls.add(container);
+		}
+	}
+
+	private void createUI_410_RunDyn_StanceTime_Balanced(final Composite parent) {
+
+		if (_isVisible_And_Available_RunDyn_StanceTime_Balanced) {
+
+			final Composite container = createUIValueContainer(parent);
+			{
+				_lblRunDyn_StanceTime_Balanced = createUILabelValue(
+						container,
+						SWT.TRAIL,
+						3,
+						GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCED,
+						GraphColorManager.PREF_GRAPH_RUN_DYN_STANCE_TIME_BALANCED);
+
+				createUILabel(
+						container,
+						UI.UNIT_PERCENT,
+						GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCED,
+						GraphColorManager.PREF_GRAPH_RUN_DYN_STANCE_TIME_BALANCED);
+			}
+			_firstColumnControls.add(_lblRunDyn_StanceTime_Balanced);
+			_firstColumnContainerControls.add(container);
+		}
+	}
+
+	private void createUI_420_RunDyn_StepLength(final Composite parent) {
+
+		if (_isVisible_And_Available_RunDyn_StepLength) {
+
+			final Composite container = createUIValueContainer(parent);
+			{
+				_lblRunDyn_StepLength = createUILabelValue(
+						container,
+						SWT.TRAIL,
+						3,
+						GRAPH_LABEL_RUN_DYN_STEP_LENGTH,
+						GraphColorManager.PREF_GRAPH_RUN_DYN_STEP_LENGTH);
+
+				createUILabel(
+						container,
+						UI.UNIT_LABEL_DISTANCE_MM_OR_INCH,
+						GRAPH_LABEL_RUN_DYN_STEP_LENGTH,
+						GraphColorManager.PREF_GRAPH_RUN_DYN_STEP_LENGTH);
+			}
+			_firstColumnControls.add(_lblRunDyn_StepLength);
+			_firstColumnContainerControls.add(container);
+		}
+	}
+
+	private void createUI_430_RunDyn_VerticalOscillation(final Composite parent) {
+
+		if (_isVisible_And_Available_RunDyn_VerticalOscillation) {
+
+			final Composite container = createUIValueContainer(parent);
+			{
+				_lblRunDyn_VerticalOscillation = createUILabelValue(
+						container,
+						SWT.TRAIL,
+						3,
+						GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION,
+						GraphColorManager.PREF_GRAPH_RUN_DYN_VERTICAL_OSCILLATION);
+
+				createUILabel(
+						container,
+						UI.UNIT_LABEL_DISTANCE_MM_OR_INCH,
+						GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION,
+						GraphColorManager.PREF_GRAPH_RUN_DYN_VERTICAL_OSCILLATION);
+			}
+			_firstColumnControls.add(_lblRunDyn_VerticalOscillation);
+			_firstColumnContainerControls.add(container);
+		}
+	}
+
+	private void createUI_440_RunDyn_VerticalRatio(final Composite parent) {
+
+		if (_isVisible_And_Available_RunDyn_VerticalRatio) {
+
+			final Composite container = createUIValueContainer(parent);
+			{
+				_lblRunDyn_VerticalRatio = createUILabelValue(
+						container,
+						SWT.TRAIL,
+						3,
+						GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO,
+						GraphColorManager.PREF_GRAPH_RUN_DYN_VERTICAL_RATIO);
+
+				createUILabel(
+						container,
+						UI.UNIT_PERCENT,
+						GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO,
+						GraphColorManager.PREF_GRAPH_RUN_DYN_VERTICAL_RATIO);
+			}
+			_firstColumnControls.add(_lblRunDyn_VerticalRatio);
+			_firstColumnContainerControls.add(container);
+		}
+	}
+
 	private void createUI_500_ChartZoomFactor(final Composite parent) {
 
 		if (_isVisible_And_Available_ChartZoomFactor) {
@@ -1028,6 +1173,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 										final int style,
 										final String tooltip,
 										final String colorId) {
+
 		return createUILabelValue(parent, style, SWT.DEFAULT, tooltip, colorId);
 	}
 
@@ -1211,39 +1357,50 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 
 // SET_FORMATTING_OFF
 		
-		final long visibleId_Altimeter 			= getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_ALTIMETER);
-		final long visibleId_Altitude 			= getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_ALTITUDE);
-		final long visibleId_Cadence 			= getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_CADENCE);
-		final long visibleId_ChartZoomFactor 	= getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_CHART_ZOOM_FACTOR);
-		final long visibleId_Distance 			= getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_DISTANCE);
-		final long visibleId_Gears 				= getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_GEARS);
-		final long visibleId_Gradient 			= getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_GRADIENT);
-		final long visibleId_Pace 				= getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_PACE);
-		final long visibleId_Power 				= getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_POWER);
-		final long visibleId_Pulse 				= getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_PULSE);
-		final long visibleId_Speed 				= getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_SPEED);
-		final long visibleId_Temperature 		= getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_TEMPERATURE);
-		final long visibleId_TimeDuration 		= getState(ttVisibleValues,	ValuePointToolTipMenuManager.VALUE_ID_TIME_DURATION);
-		final long visibleId_TimeOfDay 			= getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_TIME_OF_DAY);
-		final long visibleId_TimeSlice 			= getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_TIME_SLICES);
-		final long visibleId_TourCompareResult	= getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_TOUR_COMPARE_RESULT);
+		final long visibleId_Altimeter 					= getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_ALTIMETER);
+		final long visibleId_Altitude 					= getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_ALTITUDE);
+		final long visibleId_Cadence 					= getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_CADENCE);
+		final long visibleId_ChartZoomFactor 	 	 	= getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_CHART_ZOOM_FACTOR);
+		final long visibleId_Distance 					= getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_DISTANCE);
+		final long visibleId_Gears 						= getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_GEARS);
+		final long visibleId_Gradient 					= getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_GRADIENT);
+		final long visibleId_Pace 						= getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_PACE);
+		final long visibleId_Power 						= getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_POWER);
+		final long visibleId_Pulse 						= getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_PULSE);
+		final long visibleId_RunDyn_StanceTime         	= getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_RUN_DYN_STANCE_TIME);
+		final long visibleId_RunDyn_StanceTime_Balanced	= getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_RUN_DYN_STANCE_TIME_BALANCED);
+		final long visibleId_RunDyn_StepLength         	= getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_RUN_DYN_STEP_LENGTH);
+		final long visibleId_RunDyn_VerticalOscillation	= getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_RUN_DYN_VERTICAL_OSCILLATION);
+		final long visibleId_RunDyn_VerticalRatio      	= getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_RUN_DYN_VERTICAL_RATIO);
+		final long visibleId_Speed 						= getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_SPEED);
+		final long visibleId_Temperature 				= getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_TEMPERATURE);
+		final long visibleId_TimeDuration 				= getState(ttVisibleValues,	ValuePointToolTipMenuManager.VALUE_ID_TIME_DURATION);
+		final long visibleId_TimeOfDay 					= getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_TIME_OF_DAY);
+		final long visibleId_TimeSlice 					= getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_TIME_SLICES);
+		final long visibleId_TourCompareResult			= getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_TOUR_COMPARE_RESULT);
 
-		final boolean isAvailable_Altimeter 		= _tourData.getAltimeterSerie() != null;
-		final boolean isAvailable_Altitude 			= _tourData.getAltitudeSerie() != null;
-		final boolean isAvailable_Cadence 			= _tourData.cadenceSerie != null;
-		final boolean isAvailable_ChartZoomFactor 	= true;
-		final boolean isAvailable_Distance 			= _tourData.distanceSerie != null;
-		final boolean isAvailable_Gears 			= _tourData.getGears() != null;
-		final boolean isAvailable_Gradient 			= _tourData.getGradientSerie() != null;
-		final boolean isAvailable_Pace 				= _tourData.getPaceSerie() != null;
-		final boolean isAvailable_Power 			= _tourData.getPowerSerie() != null;
-		final boolean isAvailable_Pulse 			= _tourData.pulseSerie != null;
-		final boolean isAvailable_Speed 			= _tourData.getSpeedSerie() != null;
-		final boolean isAvailable_Temperature 		= _tourData.temperatureSerie != null;
-		final boolean isAvailable_TimeDuration 		= _tourData.timeSerie != null;
-		final boolean isAvailable_TimeOfDay 		= _tourData.timeSerie != null;
-		final boolean isAvailable_TimeSlice 		= true;
-		final boolean isAvailable_TourCompareResult	= _tourData.tourCompareSerie != null && _tourData.tourCompareSerie.length > 0;
+		final boolean isAvailable_Altimeter 			= _tourData.getAltimeterSerie() != null;
+		final boolean isAvailable_Altitude 				= _tourData.getAltitudeSerie() != null;
+		final boolean isAvailable_Cadence 				= _tourData.cadenceSerie != null;
+		final boolean isAvailable_ChartZoomFactor 		= true;
+		final boolean isAvailable_Distance 				= _tourData.distanceSerie != null;
+		final boolean isAvailable_Gears 				= _tourData.getGears() != null;
+		final boolean isAvailable_Gradient 				= _tourData.getGradientSerie() != null;
+		final boolean isAvailable_Pace 					= _tourData.getPaceSerie() != null;
+		final boolean isAvailable_Power 				= _tourData.getPowerSerie() != null;
+		final boolean isAvailable_Pulse 				= _tourData.pulseSerie != null;
+		final boolean isAvailable_Speed 				= _tourData.getSpeedSerie() != null;
+		final boolean isAvailable_Temperature 			= _tourData.temperatureSerie != null;
+		final boolean isAvailable_TimeDuration 			= _tourData.timeSerie != null;
+		final boolean isAvailable_TimeOfDay 			= _tourData.timeSerie != null;
+		final boolean isAvailable_TimeSlice 			= true;
+		final boolean isAvailable_TourCompareResult		= _tourData.tourCompareSerie != null && _tourData.tourCompareSerie.length > 0;
+
+		final boolean isAvailable_RunDyn_StanceTime         	= _tourData.getRunDyn_StanceTime() != null;
+		final boolean isAvailable_RunDyn_StanceTime_Balanced	= _tourData.getRunDyn_StanceTime_Balance() != null;
+		final boolean isAvailable_RunDyn_StepLength         	= _tourData.getRunDyn_StepLength() != null;
+		final boolean isAvailable_RunDyn_VerticalOscillation	= _tourData.getRunDyn_VerticalOscillation() != null;
+		final boolean isAvailable_RunDyn_VerticalRatio      	= _tourData.getRunDyn_VerticalRatio() != null;
 		
 		_allVisibleValueIds =
 				
@@ -1263,6 +1420,11 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 				+ visibleId_TimeOfDay
 				+ visibleId_TimeSlice
 				+ visibleId_TourCompareResult
+				+ visibleId_RunDyn_StanceTime
+				+ visibleId_RunDyn_StanceTime_Balanced
+				+ visibleId_RunDyn_StepLength
+				+ visibleId_RunDyn_VerticalOscillation
+				+ visibleId_RunDyn_VerticalRatio
 				
 				;
 		
@@ -1283,7 +1445,13 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 				+ (isAvailable_TimeDuration 		? visibleId_TimeDuration : 0)
 				+ (isAvailable_TimeOfDay 			? visibleId_TimeOfDay : 0)
 				+ (isAvailable_TimeSlice 			? visibleId_TimeSlice : 0)
-				+ (isAvailable_TourCompareResult	? visibleId_TourCompareResult: 0)
+				+ (isAvailable_TourCompareResult	? visibleId_TourCompareResult : 0)
+				
+				+ (isAvailable_RunDyn_StanceTime         	? visibleId_RunDyn_StanceTime          : 0)
+				+ (isAvailable_RunDyn_StanceTime_Balanced	? visibleId_RunDyn_StanceTime_Balanced : 0)
+				+ (isAvailable_RunDyn_StepLength         	? visibleId_RunDyn_StepLength          : 0)
+				+ (isAvailable_RunDyn_VerticalOscillation	? visibleId_RunDyn_VerticalOscillation : 0)
+				+ (isAvailable_RunDyn_VerticalRatio      	? visibleId_RunDyn_VerticalRatio       : 0)
 				
 				;
 
@@ -1304,23 +1472,36 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 		_isVisible_And_Available_TimeSlice 			= isAvailable_TimeSlice 		&& visibleId_TimeSlice > 0;
 		_isVisible_And_Available_TourCompareResult	= isAvailable_TourCompareResult	&& visibleId_TourCompareResult > 0;
 
+		_isVisible_And_Available_RunDyn_StanceTime         	= isAvailable_RunDyn_StanceTime          && visibleId_RunDyn_StanceTime          > 0;
+		_isVisible_And_Available_RunDyn_StanceTime_Balanced	= isAvailable_RunDyn_StanceTime_Balanced && visibleId_RunDyn_StanceTime_Balanced > 0;
+		_isVisible_And_Available_RunDyn_StepLength         	= isAvailable_RunDyn_StepLength          && visibleId_RunDyn_StepLength          > 0;
+		_isVisible_And_Available_RunDyn_VerticalOscillation	= isAvailable_RunDyn_VerticalOscillation && visibleId_RunDyn_VerticalOscillation > 0;
+		_isVisible_And_Available_RunDyn_VerticalRatio      	= isAvailable_RunDyn_VerticalRatio       && visibleId_RunDyn_VerticalRatio       > 0;
+
 		_allVisibleAndAvailable_ValueCounter =
-				  (_isVisible_And_Available_Altimeter ? 1 : 0)
-				+ (_isVisible_And_Available_Altitude ? 1 : 0)
-				+ (_isVisible_And_Available_Cadence ? 1 : 0)
-				+ (_isVisible_And_Available_ChartZoomFactor ? 1 : 0)
-				+ (_isVisible_And_Available_Distance ? 1 : 0)
-				+ (_isVisible_And_Available_Gears ? 1 : 0)
-				+ (_isVisible_And_Available_Gradient ? 1 : 0)
-				+ (_isVisible_And_Available_Pace ? 1 : 0)
-				+ (_isVisible_And_Available_Power ? 1 : 0)
-				+ (_isVisible_And_Available_Pulse ? 1 : 0)
-				+ (_isVisible_And_Available_Speed ? 1 : 0)
-				+ (_isVisible_And_Available_Temperature ? 1 : 0)
-				+ (_isVisible_And_Available_TimeDuration ? 1 : 0)
-				+ (_isVisible_And_Available_TimeOfDay ? 1 : 0)
-				+ (_isVisible_And_Available_TimeSlice ? 1 : 0)
-				+ (_isVisible_And_Available_TourCompareResult ? 1 : 0)
+				
+				  (_isVisible_And_Available_Altimeter						? 1 : 0)
+				+ (_isVisible_And_Available_Altitude 						? 1 : 0)
+				+ (_isVisible_And_Available_Cadence 						? 1 : 0)
+				+ (_isVisible_And_Available_ChartZoomFactor 				? 1 : 0)
+				+ (_isVisible_And_Available_Distance 						? 1 : 0)
+				+ (_isVisible_And_Available_Gears 							? 1 : 0)
+				+ (_isVisible_And_Available_Gradient 						? 1 : 0)
+				+ (_isVisible_And_Available_Pace 							? 1 : 0)
+				+ (_isVisible_And_Available_Power 							? 1 : 0)
+				+ (_isVisible_And_Available_Pulse 							? 1 : 0)
+				+ (_isVisible_And_Available_Speed 							? 1 : 0)
+				+ (_isVisible_And_Available_Temperature 					? 1 : 0)
+				+ (_isVisible_And_Available_TimeDuration 					? 1 : 0)
+				+ (_isVisible_And_Available_TimeOfDay 						? 1 : 0)
+				+ (_isVisible_And_Available_TimeSlice 						? 1 : 0)
+				+ (_isVisible_And_Available_TourCompareResult 				? 1 : 0)
+
+				+ (_isVisible_And_Available_RunDyn_StanceTime         	 	? 1 : 0)
+				+ (_isVisible_And_Available_RunDyn_StanceTime_Balanced	 	? 1 : 0)
+				+ (_isVisible_And_Available_RunDyn_StepLength         	 	? 1 : 0)
+				+ (_isVisible_And_Available_RunDyn_VerticalOscillation	 	? 1 : 0)
+				+ (_isVisible_And_Available_RunDyn_VerticalRatio      	 	? 1 : 0)
 		;
 		
 // SET_FORMATTING_ON
@@ -1386,9 +1567,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 		}
 
 		if (_isVisible_And_Available_Altitude) {
-			_lblAltitude.setText(
-					_nf1NoGroup.format(//
-							_tourData.getAltitudeSmoothedSerie(false)[valueIndex]));
+			_lblAltitude.setText(_nf1NoGroup.format(_tourData.getAltitudeSmoothedSerie(false)[valueIndex]));
 		}
 
 		if (_isVisible_And_Available_Cadence) {
@@ -1416,14 +1595,13 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 //			_gears[3] = front gear number, starting with 1
 //			_gears[4] = rear gear number, starting with 1
 
-			_lblGears.setText(
-					String.format(
-							TourManager.GEAR_VALUE_FORMAT,
-							(int) gears[1][valueIndex],
-							(int) gears[2][valueIndex],
-							gears[0][valueIndex]
-					//
-					));
+			_lblGears.setText(String.format(
+					TourManager.GEAR_VALUE_FORMAT,
+					(int) gears[1][valueIndex],
+					(int) gears[2][valueIndex],
+					gears[0][valueIndex]
+			//
+			));
 		}
 
 		if (_isVisible_And_Available_Gradient) {
@@ -1434,13 +1612,11 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 
 			final long pace = (long) _tourData.getPaceSerieSeconds()[valueIndex];
 
-			_lblPace.setText(
-					String
-							.format(//
-									Messages.Tooltip_ValuePoint_Format_Pace,
-									pace / 60,
-									pace % 60)//
-							.toString());
+			_lblPace.setText(String.format(
+					Messages.Tooltip_ValuePoint_Format_Pace,
+					pace / 60,
+					pace % 60)//
+					.toString());
 		}
 
 		if (_isVisible_And_Available_Power) {
@@ -1476,10 +1652,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 		}
 
 		if (_isVisible_And_Available_TimeOfDay) {
-			_lblTimeOfDay.setText(
-					UI.format_hhh_mm_ss(
-							_tourData.getStartTimeOfDay()
-									+ timeSerie[valueIndex]));
+			_lblTimeOfDay.setText(UI.format_hhh_mm_ss(_tourData.getStartTimeOfDay() + timeSerie[valueIndex]));
 		}
 
 		if (_isVisible_And_Available_TimeSlice) {
@@ -1489,6 +1662,22 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 
 		if (_isVisible_And_Available_TourCompareResult) {
 			_lblTourCompareResult.setText(_nf0.format(_tourData.tourCompareSerie[valueIndex]));
+		}
+
+		if (_isVisible_And_Available_RunDyn_StanceTime) {
+			_lblRunDyn_StanceTime.setText(_nf0.format(_tourData.getRunDyn_StanceTime()[valueIndex]));
+		}
+		if (_isVisible_And_Available_RunDyn_StanceTime_Balanced) {
+			_lblRunDyn_StanceTime_Balanced.setText(_nf2.format(_tourData.getRunDyn_StanceTime_Balance()[valueIndex]));
+		}
+		if (_isVisible_And_Available_RunDyn_StepLength) {
+			_lblRunDyn_StepLength.setText(_nf0.format(_tourData.getRunDyn_StepLength()[valueIndex]));
+		}
+		if (_isVisible_And_Available_RunDyn_VerticalOscillation) {
+			_lblRunDyn_VerticalOscillation.setText(_nf1.format(_tourData.getRunDyn_VerticalOscillation()[valueIndex]));
+		}
+		if (_isVisible_And_Available_RunDyn_VerticalRatio) {
+			_lblRunDyn_VerticalRatio.setText(_nf2.format(_tourData.getRunDyn_VerticalRatio()[valueIndex]));
 		}
 
 		_lastUpdateUITime = System.currentTimeMillis();

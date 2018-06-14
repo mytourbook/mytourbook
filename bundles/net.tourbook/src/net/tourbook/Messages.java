@@ -1998,6 +1998,11 @@ public class Messages extends NLS {
 	public static String		Tooltip_ValuePoint_Action_Value_Pace;
 	public static String		Tooltip_ValuePoint_Action_Value_Power;
 	public static String		Tooltip_ValuePoint_Action_Value_Pulse;
+	public static String		Tooltip_ValuePoint_Action_Value_RunDyn_StanceTime;
+	public static String		Tooltip_ValuePoint_Action_Value_RunDyn_StanceTimeBalanced;
+	public static String		Tooltip_ValuePoint_Action_Value_RunDyn_StepLength;
+	public static String		Tooltip_ValuePoint_Action_Value_RunDyn_VerticalOscillation;
+	public static String		Tooltip_ValuePoint_Action_Value_RunDyn_VerticalRatio;
 	public static String		Tooltip_ValuePoint_Action_Value_Speed;
 	public static String		Tooltip_ValuePoint_Action_Value_Temperature;
 	public static String		Tooltip_ValuePoint_Action_Value_TimeDuration;

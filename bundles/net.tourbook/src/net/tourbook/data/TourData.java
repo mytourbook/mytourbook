@@ -6333,6 +6333,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		return restPulse;
 	}
 
+	/**
+	 * @return Returns the UI values for stance time.
+	 */
 	public float[] getRunDyn_StanceTime() {
 
 		if (_runDyn_StanceTime_UI == null) {
@@ -6354,6 +6357,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		return _runDyn_StanceTime_UI;
 	}
 
+	/**
+	 * @return Returns the UI values for stance time balance
+	 */
 	public float[] getRunDyn_StanceTime_Balance() {
 
 		if (_runDyn_StanceTime_Balance_UI == null) {
@@ -6375,6 +6381,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		return _runDyn_StanceTime_Balance_UI;
 	}
 
+	/**
+	 * @return Returns the metric/imperial UI values for step length
+	 */
 	public float[] getRunDyn_StepLength() {
 
 		if (UI.UNIT_VALUE_DISTANCE == 1) {
@@ -6423,6 +6432,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		}
 	}
 
+	/**
+	 * @return Returns the metric/imperial UI values for vertical oscillation
+	 */
 	public float[] getRunDyn_VerticalOscillation() {
 
 		if (UI.UNIT_VALUE_DISTANCE == 1) {
@@ -6472,6 +6484,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		}
 	}
 
+	/**
+	 * @return Returns the UI values for vertical ratio
+	 */
 	public float[] getRunDyn_VerticalRatio() {
 
 		if (_runDyn_VerticalRatio_UI == null) {
