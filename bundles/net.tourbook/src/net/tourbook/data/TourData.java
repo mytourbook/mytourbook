@@ -1586,9 +1586,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		}
 		if (sumRunDyn_StepLength == 0) {
 			runDyn_StepLength = null;
+			_runDyn_StepLength_UI = null;
+			_runDyn_StepLength_UI_Imperial = null;
 		}
 		if (sumRunDyn_Vertical_Oscillation == 0) {
 			runDyn_VerticalOscillation = null;
+			_runDyn_VerticalOscillation_UI = null;
+			_runDyn_VerticalOscillation_UI_Imperial = null;
 		}
 		if (sumRunDyn_Vertical_Ratio == 0) {
 			runDyn_VerticalRatio = null;
@@ -1649,6 +1653,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		_runDyn_StepLength_UI = null;
 		_runDyn_StepLength_UI_Imperial = null;
 		_runDyn_VerticalOscillation_UI = null;
+		_runDyn_VerticalOscillation_UI_Imperial = null;
 		_runDyn_VerticalRatio_UI = null;
 
 		srtmSerie = null;
@@ -7392,8 +7397,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		runDyn_StanceTime = serieData.runDyn_StanceTime;
 		runDyn_StanceTime_Balance = serieData.runDyn_StanceTime_Balance;
 		runDyn_StepLength = serieData.runDyn_StepLength;
-		runDyn_VerticalRatio = serieData.runDyn_Vertical_Ratio;
 		runDyn_VerticalOscillation = serieData.runDyn_Vertical_Oscillation;
+		runDyn_VerticalRatio = serieData.runDyn_Vertical_Ratio;
 
 		if (powerSerie != null) {
 			isPowerSerieFromDevice = true;
