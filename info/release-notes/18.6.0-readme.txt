@@ -1,31 +1,37 @@
-Version 18.6.0                                             ?. June  2018
-
+Version 18.6.0                                            15. June  2018
 
 Improvements
 ============	
 
 * 2D Map
 
+  - Moved Map 2D Options into Track Options
   - Show some options from the preferences also in the slideout
-  - Moved 'Map 2D Options' into 'Track Options'
 
 
 * 2.5D Map
 
   - Show chart slider + path
+  - Set track opacity
   - Sync map with both sliders and center it
-  - Set track opacity  
 
-
-Translation
+ 
+Translation 	
 ===========
 
 * Translated UI since 17.12
 
-  - de
-  
+  - Czech (Lukas Novotny)
+  - Italian (Doriano Cometto)
+  - German
 
-Bugfix
+ 
+Bugfix  	
 ======
 
-* Compute max altitude when tour altitude is adjusted, this also fixed other max altitude issues  
+* Altitude
+
+  - Compute max altitude when tour altitude is adjusted, this also fixed
+    other max altitude issues
+
+  
