@@ -141,8 +141,8 @@ public class Map extends Canvas {
 
 	public static final int			UI_MAX_ZOOM_LEVEL							= MAP_MAX_ZOOM_LEVEL + 1;
 
-	private static final String		DIRECTION_E									= "E";									//$NON-NLS-1$
-	private static final String		DIRECTION_N									= "N";									//$NON-NLS-1$
+	private static final String		DIRECTION_E									= "E";															//$NON-NLS-1$
+	private static final String		DIRECTION_N									= "N";															//$NON-NLS-1$
 
 // SET_FORMATTING_OFF
 	/*
@@ -2260,7 +2260,6 @@ public class Map extends Canvas {
 		borderColor.dispose();
 	}
 
-
 	private void paintOfflineArea(final GC gc) {
 
 		gc.setLineWidth(1);
@@ -3898,9 +3897,10 @@ public class Map extends Canvas {
 			// set new zoomlevel ONLY when it was modified -> this will dispose old overlay images !!!
 
 			setZoom(zoom);
+		}
 
-		} else {
-
+		// update map with with new map center position
+		{
 			// zoom position is the same as previous !!!
 			// _mapZoomLevel == _mapZoomLevel
 
@@ -3911,7 +3911,6 @@ public class Map extends Canvas {
 		}
 
 		fireMapInfoEvent();
-//		fireMapPositionEvent(false);
 	}
 
 	/**
