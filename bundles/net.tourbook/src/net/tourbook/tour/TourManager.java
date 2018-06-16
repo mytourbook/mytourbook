@@ -739,8 +739,8 @@ public class TourManager {
 		boolean isRunDyn_StanceTime = false;
 		boolean isRunDyn_StanceTime_Balance = false;
 		boolean isRunDyn_StepLength = false;
-		boolean isRunDyn_VertOscillation = false;
-		boolean isRunDyn_VertRatio = false;
+		boolean isRunDyn_VerticalOscillation = false;
+		boolean isRunDyn_VerticalRatio = false;
 
 		boolean isFirstTour = true;
 
@@ -858,11 +858,11 @@ public class TourManager {
 				System.arraycopy(fromRunDyn_StepLength, 0, toRunDyn_StepLength, toStartIndex, fromSerieLength);
 			}
 			if (fromRunDyn_VertOscillation != null) {
-				isRunDyn_VertOscillation = true;
+				isRunDyn_VerticalOscillation = true;
 				System.arraycopy(fromRunDyn_VertOscillation, 0, toRunDyn_VertOscillation, toStartIndex, fromSerieLength);
 			}
 			if (fromRunDyn_VertRatio != null) {
-				isRunDyn_VertRatio = true;
+				isRunDyn_VerticalRatio = true;
 				System.arraycopy(fromRunDyn_VertRatio, 0, toRunDyn_VertRatio, toStartIndex, fromSerieLength);
 			}
 
@@ -935,6 +935,22 @@ public class TourManager {
 		}
 		if (!isTempSerie) {
 			multiTourData.temperatureSerie = null;
+		}
+
+		if (isRunDyn_StanceTime == false) {
+			multiTourData.clear_RunDyn_StanceTime();
+		}
+		if (isRunDyn_StanceTime_Balance == false) {
+			multiTourData.clear_RunDyn_StanceTime_Balance();
+		}
+		if (isRunDyn_StepLength == false) {
+			multiTourData.clear_RunDyn_StepLength();
+		}
+		if (isRunDyn_VerticalOscillation == false) {
+			multiTourData.clear_RunDyn_VerticalOscillation();
+		}
+		if (isRunDyn_VerticalRatio == false) {
+			multiTourData.clear_RunDyn_VerticalRatio();
 		}
 
 		setupMultiTourMarker(multiTourData);
@@ -3600,7 +3616,8 @@ public class TourManager {
 			setVisibleForcedValues(
 					yDataSerie,
 					net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH,
-					TourChart.MAX_ADJUSTMENT,
+					0.1,
+					0.1,
 					ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MIN_ENABLED,
 					ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MAX_ENABLED,
 					ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_MIN_VALUE,
@@ -3644,7 +3661,8 @@ public class TourManager {
 			setVisibleForcedValues(
 					yDataSerie,
 					net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH,
-					TourChart.MAX_ADJUSTMENT,
+					0.1,
+					0.1,
 					ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MIN_ENABLED,
 					ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MAX_ENABLED,
 					ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MIN_VALUE,
@@ -4101,13 +4119,16 @@ public class TourManager {
 	 */
 	private void setVisibleForcedValues(final ChartDataYSerie yData,
 										final float valueMultiplier,
+										final double minValueAdjustment,
 										final double maxValueAdjustment,
 										final String prefName_IsMinEnabled,
 										final String prefName_IsMaxEnabled,
 										final String prefName_MinValue,
 										final String prefName_MaxValue) {
-		final boolean isMinMaxEnabled = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_MIN_MAX_ENABLED);
-		if (!isMinMaxEnabled) {
+
+		if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_MIN_MAX_ENABLED) == false) {
+
+			// min/max is not enabled
 			return;
 		}
 
@@ -4115,7 +4136,12 @@ public class TourManager {
 
 			final int prefMinValue = _prefStore.getInt(prefName_MinValue);
 
-			yData.forceYAxisMinValue(prefMinValue * valueMultiplier);
+			final float minValue = prefMinValue * valueMultiplier;
+			final double forcedMinValue = minValue > 0 //
+					? minValue + maxValueAdjustment
+					: minValue - maxValueAdjustment;
+
+			yData.forceYAxisMinValue(forcedMinValue);
 		}
 
 		// set max value after min value, adjust max otherwise values above the max are painted
@@ -4124,18 +4150,11 @@ public class TourManager {
 			final int prefMaxValue = _prefStore.getInt(prefName_MaxValue);
 
 			final float maxValue = prefMaxValue * valueMultiplier;
+			final double forcedMaxValue = maxValue > 0 //
+					? maxValue - maxValueAdjustment
+					: maxValue + maxValueAdjustment;
 
-			if (maxValueAdjustment == 0) {
-
-				yData.forceYAxisMaxValue(maxValue);
-
-			} else {
-
-				yData.forceYAxisMaxValue(
-						maxValue > 0 //
-								? maxValue - maxValueAdjustment
-								: maxValue + maxValueAdjustment);
-			}
+			yData.forceYAxisMaxValue(forcedMaxValue);
 		}
 	}
 
@@ -4158,8 +4177,9 @@ public class TourManager {
 										final String prefName_MinValue,
 										final String prefName_MaxValue) {
 
-		final boolean isMinMaxEnabled = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_MIN_MAX_ENABLED);
-		if (!isMinMaxEnabled) {
+		if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_MIN_MAX_ENABLED) == false) {
+
+			// min/max is not enabled
 			return;
 		}
 

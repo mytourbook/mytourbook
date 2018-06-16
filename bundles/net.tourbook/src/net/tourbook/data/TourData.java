@@ -1599,6 +1599,38 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		}
 	}
 
+	public void clear_RunDyn_StanceTime() {
+
+		runDyn_StanceTime = null;
+		_runDyn_StanceTime_UI = null;
+	}
+
+	public void clear_RunDyn_StanceTime_Balance() {
+
+		runDyn_StanceTime_Balance = null;
+		_runDyn_StanceTime_Balance_UI = null;
+	}
+
+	public void clear_RunDyn_StepLength() {
+
+		runDyn_StepLength = null;
+		_runDyn_StepLength_UI = null;
+		_runDyn_StepLength_UI_Imperial = null;
+	}
+
+	public void clear_RunDyn_VerticalOscillation() {
+
+		runDyn_VerticalOscillation = null;
+		_runDyn_VerticalOscillation_UI = null;
+		_runDyn_VerticalOscillation_UI_Imperial = null;
+	}
+
+	public void clear_RunDyn_VerticalRatio() {
+
+		runDyn_VerticalRatio = null;
+		_runDyn_VerticalRatio_UI = null;
+	}
+
 	/**
 	 * clear imperial altitude series so the next time when it's needed it will be recomputed
 	 */
@@ -6021,22 +6053,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 		return UI.EMPTY_STRING;
 	}
-
-//	public int getLatitudeMaxE6() {
-//		return latitudeMaxE6;
-//	}
-//
-//	public int getLatitudeMinE6() {
-//		return latitudeMinE6;
-//	}
-//
-//	public int getLongitudeMaxE6() {
-//		return longitudeMaxE6;
-//	}
-//
-//	public int getLongitudeMinE6() {
-//		return longitudeMinE6;
-//	}
 
 	/**
 	 * @return the maxAltitude
