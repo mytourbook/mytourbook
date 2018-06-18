@@ -25,6 +25,7 @@ import java.util.HashSet;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.TreeViewerItem;
+import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.UI;
@@ -140,7 +141,30 @@ public class TVITourBookYearSub extends TVITourBookItem {
 				+ "devicePluginName, " //							52	//$NON-NLS-1$
 				+ "deviceFirmwareVersion, " //						53	//$NON-NLS-1$
 
-				+ "cadenceMultiplier " //							54	//$NON-NLS-1$
+				+ "cadenceMultiplier, " //							54	//$NON-NLS-1$
+
+				//
+				// ---------- RUNNING DYNAMICS -------------
+				//
+				+ "runDyn_StanceTime_Min, " //						55	//$NON-NLS-1$
+				+ "runDyn_StanceTime_Max, " //						56	//$NON-NLS-1$
+				+ "runDyn_StanceTime_Avg, " //						57	//$NON-NLS-1$
+
+				+ "runDyn_StanceTimeBalance_Min, " //				58	//$NON-NLS-1$
+				+ "runDyn_StanceTimeBalance_Max, " //				59	//$NON-NLS-1$
+				+ "runDyn_StanceTimeBalance_Avg, " //				60	//$NON-NLS-1$
+
+				+ "runDyn_StepLength_Min, " //						61	//$NON-NLS-1$
+				+ "runDyn_StepLength_Max, " //						62	//$NON-NLS-1$
+				+ "runDyn_StepLength_Avg, " //						63	//$NON-NLS-1$
+
+				+ "runDyn_VerticalOscillation_Min, " //				64	//$NON-NLS-1$
+				+ "runDyn_VerticalOscillation_Max, " //				65	//$NON-NLS-1$
+				+ "runDyn_VerticalOscillation_Avg, " //				66	//$NON-NLS-1$
+
+				+ "runDyn_VerticalRatio_Min, " //					67	//$NON-NLS-1$
+				+ "runDyn_VerticalRatio_Max, " //					68	//$NON-NLS-1$
+				+ "runDyn_VerticalRatio_Avg " //					69	//$NON-NLS-1$
 
 				+ UI.NEW_LINE
 
@@ -289,6 +313,28 @@ public class TVITourBookYearSub extends TVITourBookItem {
 					// -----------------------------------------------
 
 					final float dbCadenceMultiplier = result.getFloat(54);
+
+					// ---------- RUNNING DYNAMICS -------------
+
+					tourItem.colRunDyn_StanceTime = result.getInt(55);
+					tourItem.colRunDyn_StanceTime_Max = result.getInt(56);
+					tourItem.colRunDyn_StanceTime_Avg = result.getFloat(57);
+
+					tourItem.colRunDyn_StanceTimeBalance_Min = result.getInt(58) / TourData.RUN_DYN_DATA_MULTIPLIER;
+					tourItem.colRunDyn_StanceTimeBalance_Max = result.getInt(59) / TourData.RUN_DYN_DATA_MULTIPLIER;
+					tourItem.colRunDyn_StanceTimeBalance_Avg = result.getFloat(60) / TourData.RUN_DYN_DATA_MULTIPLIER;
+
+					tourItem.colRunDyn_StepLength_Min = result.getInt(61);
+					tourItem.colRunDyn_StepLength_Max = result.getInt(62);
+					tourItem.colRunDyn_StepLength_Avg = result.getFloat(63);
+
+					tourItem.colRunDyn_VerticalOscillation_Min = result.getInt(64) / TourData.RUN_DYN_DATA_MULTIPLIER;
+					tourItem.colRunDyn_VerticalOscillation_Max = result.getInt(65) / TourData.RUN_DYN_DATA_MULTIPLIER;
+					tourItem.colRunDyn_VerticalOscillation_Avg = result.getFloat(66) / TourData.RUN_DYN_DATA_MULTIPLIER;
+
+					tourItem.colRunDyn_VerticalRatio_Min = result.getInt(67) / TourData.RUN_DYN_DATA_MULTIPLIER;
+					tourItem.colRunDyn_VerticalRatio_Max = result.getInt(68) / TourData.RUN_DYN_DATA_MULTIPLIER;
+					tourItem.colRunDyn_VerticalRatio_Avg = result.getFloat(69) / TourData.RUN_DYN_DATA_MULTIPLIER;
 
 					// -----------------------------------------------
 

@@ -63,6 +63,7 @@ public class Messages extends NLS {
 	public static String		ColumnModifyDialog_Column_Category;
 	public static String		ColumnModifyDialog_Column_FormatCategory;
 	public static String		ColumnModifyDialog_Column_FormatTour;
+	public static String		ColumnModifyDialog_Column_HeaderText;
 	public static String		ColumnModifyDialog_column_column;
 	public static String		ColumnModifyDialog_column_unit;
 	public static String		ColumnModifyDialog_column_width;

@@ -904,6 +904,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 		defineColumn_Tour_Photos();
 		defineColumn_Tour_Tags();
 
+		// Running dynamics
+		defineColumn_RunDyn_StanceTime();
+
 		// Motion / Bewegung
 		defineColumn_Motion_Distance();
 		defineColumn_Motion_MaxSpeed();
@@ -1789,6 +1792,25 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 		});
 	}
 
+	/**
+	 * Column: avg cadence
+	 */
+	private void defineColumn_RunDyn_StanceTime() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.RUN_DYN_STANCE_TIME.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final double value = ((TVITourBookItem) element).colRunDyn_StanceTime;
+
+				colDef.printValue_0(cell, value);
+
+				setCellColor(cell, element);
+			}
+		});
+	}
 	/**
 	 * column: driving time (h)
 	 */

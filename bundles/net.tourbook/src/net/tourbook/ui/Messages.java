@@ -189,6 +189,7 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_Category_Photo;
 	public static String		ColumnFactory_Category_Power;
 	public static String		ColumnFactory_Category_Powertrain;
+	public static String		ColumnFactory_Category_RunDyn;
 	public static String		ColumnFactory_Category_State;
 	public static String		ColumnFactory_Category_Time;
 	public static String		ColumnFactory_Category_Tour;
@@ -284,6 +285,7 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_restpulse_label;
 	public static String		ColumnFactory_restpulse;
 	public static String		ColumnFactory_restpulse_tooltip;
+	public static String		ColumnFactory_RunDyn_StanceTime;
 	public static String		ColumnFactory_Segment_Ascent_Label;
 	public static String		ColumnFactory_Segment_Ascent_Tooltip;
 	public static String		ColumnFactory_Segment_Descent_Label;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -86,7 +86,7 @@ import org.eclipse.swt.widgets.Widget;
 
 public class DialogModifyColumns extends TrayDialog {
 
-	private static final String[]		IS_SORTER_PROPERTY	= new String[] { "DummyProperty" }; //$NON-NLS-1$
+	private static final String[]		IS_SORTER_PROPERTY	= new String[] { "DummyProperty" };	//$NON-NLS-1$
 
 	private Action						_actionShowHideCategory;
 
@@ -397,8 +397,8 @@ public class DialogModifyColumns extends TrayDialog {
 
 		final Table table = new Table(layoutContainer, //
 				SWT.SINGLE
-//						| SWT.H_SCROLL
-//						| SWT.V_SCROLL
+						//						| SWT.H_SCROLL
+						//						| SWT.V_SCROLL
 						| SWT.BORDER
 						| SWT.FULL_SELECTION);
 
@@ -683,7 +683,7 @@ public class DialogModifyColumns extends TrayDialog {
 		 */
 		final ViewerDropAdapter viewerDropAdapter = new ViewerDropAdapter(_columnViewer) {
 
-			private Widget	_dragOverItem;
+			private Widget _dragOverItem;
 
 			@Override
 			public void dragOver(final DropTargetEvent dropEvent) {
@@ -972,17 +972,184 @@ public class DialogModifyColumns extends TrayDialog {
 
 	private void defineAllColumns(final TableColumnLayout tableLayout) {
 
-		defineColumn_ColumnName(tableLayout);
-		defineColumn_Unit(tableLayout);
-		defineColumn_Format(tableLayout);
-		defineColumn_Format_Detail(tableLayout);
-		defineColumn_Width(tableLayout);
+		defineColumn_10_ColumnName(tableLayout);
+		defineColumn_20_ColumnHeaderText(tableLayout);
+		defineColumn_30_Unit(tableLayout);
+		defineColumn_40_Format_Category(tableLayout);
+		defineColumn_50_Format_Tour(tableLayout);
+		defineColumn_60_Width(tableLayout);
 
 		/**
 		 * This column CANNOT be the first column because it would contain the checkbox, but with
 		 * the reorder feature this column is set as first column :-)
 		 */
 		defineColumn_Category(tableLayout);
+	}
+
+	/**
+	 * Column: Label
+	 */
+	private void defineColumn_10_ColumnName(final TableColumnLayout tableLayout) {
+
+		final TableViewerColumn tvc = new TableViewerColumn(_columnViewer, SWT.LEAD);
+
+		final TableColumn tc = tvc.getColumn();
+		tc.setMoveable(true);
+		tc.setText(Messages.ColumnModifyDialog_column_column);
+
+		tvc.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
+				cell.setText(colDef.getColumnLabel());
+
+				setColor(cell, colDef);
+			}
+		});
+		tableLayout.setColumnData(tc, new ColumnWeightData(30, true));
+	}
+
+	/**
+	 * Column: Column header text
+	 */
+	private void defineColumn_20_ColumnHeaderText(final TableColumnLayout tableLayout) {
+
+		final TableViewerColumn tvc = new TableViewerColumn(_columnViewer, SWT.LEAD);
+
+		final TableColumn tc = tvc.getColumn();
+		tc.setMoveable(true);
+		tc.setText(Messages.ColumnModifyDialog_Column_HeaderText);
+
+		tvc.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
+				cell.setText(colDef.getColumnHeaderText(_columnManager));
+
+				setColor(cell, colDef);
+			}
+		});
+		tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(20), true));
+	}
+
+	/**
+	 * Column: Unit
+	 */
+	private void defineColumn_30_Unit(final TableColumnLayout tableLayout) {
+
+		final TableViewerColumn tvc = new TableViewerColumn(_columnViewer, SWT.LEAD);
+
+		final TableColumn tc = tvc.getColumn();
+		tc.setText(Messages.ColumnModifyDialog_column_unit);
+		tc.setMoveable(true);
+
+		tvc.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
+				cell.setText(colDef.getColumnUnit());
+
+				setColor(cell, colDef);
+			}
+		});
+		tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(14), true));
+	}
+
+	/**
+	 * Column: Format
+	 */
+	private void defineColumn_40_Format_Category(final TableColumnLayout tableLayout) {
+
+		final TableViewerColumn tvc = new TableViewerColumn(_columnViewer, SWT.LEAD);
+
+		final TableColumn tc = tvc.getColumn();
+		tc.setMoveable(true);
+		tc.setText(Messages.ColumnModifyDialog_Column_FormatCategory);
+
+		tvc.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
+
+				ValueFormat valueFormat = colDef.getValueFormat_Category();
+
+				if (valueFormat == null) {
+					valueFormat = colDef.getDefaultValueFormat_Category();
+				}
+
+				if (valueFormat == null) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(FormatManager.getValueFormatterName(valueFormat));
+				}
+
+				setColor(cell, colDef);
+			}
+		});
+		tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(13), true));
+	}
+
+	/**
+	 * Column: Detail format
+	 */
+	private void defineColumn_50_Format_Tour(final TableColumnLayout tableLayout) {
+
+		final TableViewerColumn tvc = new TableViewerColumn(_columnViewer, SWT.LEAD);
+
+		final TableColumn tc = tvc.getColumn();
+		tc.setMoveable(true);
+		tc.setText(Messages.ColumnModifyDialog_Column_FormatTour);
+
+		tvc.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
+
+				ValueFormat valueFormat = colDef.getValueFormat_Detail();
+
+				if (valueFormat == null) {
+					valueFormat = colDef.getDefaultValueFormat_Detail();
+				}
+
+				if (valueFormat == null) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(FormatManager.getValueFormatterName(valueFormat));
+				}
+
+				setColor(cell, colDef);
+			}
+		});
+		tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(13), true));
+	}
+
+	/**
+	 * Column: Width
+	 */
+	private void defineColumn_60_Width(final TableColumnLayout tableLayout) {
+
+		final TableViewerColumn tvc = new TableViewerColumn(_columnViewer, SWT.TRAIL);
+
+		final TableColumn tc = tvc.getColumn();
+		tc.setMoveable(true);
+		tc.setText(Messages.ColumnModifyDialog_column_width);
+
+		tvc.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
+				cell.setText(Integer.toString(colDef.getColumnWidth()));
+
+				setColor(cell, colDef);
+			}
+		});
+		tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(10), true));
 	}
 
 	/**
@@ -1021,148 +1188,6 @@ public class DialogModifyColumns extends TrayDialog {
 
 			tableLayout.setColumnData(tc, new ColumnPixelData(categoryColumnWidth, true));
 		}
-	}
-
-	/**
-	 * Column: Label
-	 */
-	private void defineColumn_ColumnName(final TableColumnLayout tableLayout) {
-
-		final TableViewerColumn tvc = new TableViewerColumn(_columnViewer, SWT.LEAD);
-
-		final TableColumn tc = tvc.getColumn();
-		tc.setMoveable(true);
-		tc.setText(Messages.ColumnModifyDialog_column_column);
-
-		tvc.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
-				cell.setText(colDef.getColumnLabel());
-
-				setColor(cell, colDef);
-			}
-		});
-		tableLayout.setColumnData(tc, new ColumnWeightData(30, true));
-	}
-
-	/**
-	 * Column: Format
-	 */
-	private void defineColumn_Format(final TableColumnLayout tableLayout) {
-
-		final TableViewerColumn tvc = new TableViewerColumn(_columnViewer, SWT.LEAD);
-
-		final TableColumn tc = tvc.getColumn();
-		tc.setMoveable(true);
-		tc.setText(Messages.ColumnModifyDialog_Column_FormatCategory);
-
-		tvc.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
-
-				ValueFormat valueFormat = colDef.getValueFormat_Category();
-
-				if (valueFormat == null) {
-					valueFormat = colDef.getDefaultValueFormat_Category();
-				}
-
-				if (valueFormat == null) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(FormatManager.getValueFormatterName(valueFormat));
-				}
-
-				setColor(cell, colDef);
-			}
-		});
-		tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(14), true));
-	}
-
-	/**
-	 * Column: Detail format
-	 */
-	private void defineColumn_Format_Detail(final TableColumnLayout tableLayout) {
-
-		final TableViewerColumn tvc = new TableViewerColumn(_columnViewer, SWT.LEAD);
-
-		final TableColumn tc = tvc.getColumn();
-		tc.setMoveable(true);
-		tc.setText(Messages.ColumnModifyDialog_Column_FormatTour);
-
-		tvc.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
-
-				ValueFormat valueFormat = colDef.getValueFormat_Detail();
-
-				if (valueFormat == null) {
-					valueFormat = colDef.getDefaultValueFormat_Detail();
-				}
-
-				if (valueFormat == null) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(FormatManager.getValueFormatterName(valueFormat));
-				}
-
-				setColor(cell, colDef);
-			}
-		});
-		tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(18), true));
-	}
-
-	/**
-	 * Column: Unit
-	 */
-	private void defineColumn_Unit(final TableColumnLayout tableLayout) {
-
-		final TableViewerColumn tvc = new TableViewerColumn(_columnViewer, SWT.LEAD);
-
-		final TableColumn tc = tvc.getColumn();
-		tc.setText(Messages.ColumnModifyDialog_column_unit);
-		tc.setMoveable(true);
-
-		tvc.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
-				cell.setText(colDef.getColumnUnit());
-
-				setColor(cell, colDef);
-			}
-		});
-		tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(14), true));
-	}
-
-	/**
-	 * Column: Width
-	 */
-	private void defineColumn_Width(final TableColumnLayout tableLayout) {
-
-		final TableViewerColumn tvc = new TableViewerColumn(_columnViewer, SWT.TRAIL);
-
-		final TableColumn tc = tvc.getColumn();
-		tc.setMoveable(true);
-		tc.setText(Messages.ColumnModifyDialog_column_width);
-
-		tvc.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
-				cell.setText(Integer.toString(colDef.getColumnWidth()));
-
-				setColor(cell, colDef);
-			}
-		});
-		tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(10), true));
 	}
 
 	private void enableProfileActions() {

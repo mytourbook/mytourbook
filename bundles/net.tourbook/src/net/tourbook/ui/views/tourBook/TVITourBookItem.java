@@ -169,6 +169,28 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
 	float			colCadenceMultiplier;
 
+	// ----------- Running Dynamics ---------
+
+	int				colRunDyn_StanceTime;
+	int				colRunDyn_StanceTime_Max;
+	float			colRunDyn_StanceTime_Avg;
+
+	float			colRunDyn_StanceTimeBalance_Min;
+	float			colRunDyn_StanceTimeBalance_Max;
+	float			colRunDyn_StanceTimeBalance_Avg;
+
+	int				colRunDyn_StepLength_Min;
+	int				colRunDyn_StepLength_Max;
+	float			colRunDyn_StepLength_Avg;
+
+	float			colRunDyn_VerticalOscillation_Min;
+	float			colRunDyn_VerticalOscillation_Max;
+	float			colRunDyn_VerticalOscillation_Avg;
+
+	float			colRunDyn_VerticalRatio_Min;
+	float			colRunDyn_VerticalRatio_Max;
+	float			colRunDyn_VerticalRatio_Avg;
+
 	// ----------- POWER ---------
 
 	float			colPower_AvgLeftTorqueEffectiveness;
