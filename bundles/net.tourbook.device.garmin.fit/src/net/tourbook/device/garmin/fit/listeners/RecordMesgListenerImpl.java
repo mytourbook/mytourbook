@@ -216,7 +216,7 @@ public class RecordMesgListenerImpl extends AbstractMesgListener implements Reco
 
 		final Float stanceTimeBalance = mesg.getStanceTimeBalance();
 		if (stanceTimeBalance != null) {
-			timeData.runDyn_StanceTime_Balance = (short) (stanceTimeBalance * TourData.RUN_DYN_DATA_MULTIPLIER);
+			timeData.runDyn_StanceTimeBalance = (short) (stanceTimeBalance * TourData.RUN_DYN_DATA_MULTIPLIER);
 		}
 
 		final Float stepLength = mesg.getStepLength();
@@ -226,12 +226,12 @@ public class RecordMesgListenerImpl extends AbstractMesgListener implements Reco
 
 		final Float verticalOscillation = mesg.getVerticalOscillation();
 		if (verticalOscillation != null) {
-			timeData.runDyn_Vertical_Oscillation = (short) (verticalOscillation * TourData.RUN_DYN_DATA_MULTIPLIER);
+			timeData.runDyn_VerticalOscillation = (short) (verticalOscillation * TourData.RUN_DYN_DATA_MULTIPLIER);
 		}
 		
 		final Float verticalRatio = mesg.getVerticalRatio();
 		if (verticalRatio != null) {
-			timeData.runDyn_Vertical_Ratio = (short) (verticalRatio * TourData.RUN_DYN_DATA_MULTIPLIER);
+			timeData.runDyn_VerticalRatio = (short) (verticalRatio * TourData.RUN_DYN_DATA_MULTIPLIER);
 		}
 
 		context.onMesgRecord_20_After();

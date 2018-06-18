@@ -85,7 +85,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	private static final String	GRAPH_LABEL_TOUR_COMPARE_RESULT				= net.tourbook.common.Messages.Graph_Label_Tour_Compare;
 	
 	private static final String	GRAPH_LABEL_RUN_DYN_STANCE_TIME				= net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTime;
-	private static final String	GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCED	= net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTime_Balanced;
+	private static final String	GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCED	= net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTimeBalanced;
 	private static final String	GRAPH_LABEL_RUN_DYN_STEP_LENGTH				= net.tourbook.common.Messages.Graph_Label_RunDyn_StepLength;
 	private static final String	GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION	= net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalOscillation;
 	private static final String	GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO			= net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalRatio;
@@ -750,7 +750,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		final Graph graph_Gradient 						= new Graph(TourManager.GRAPH_GRADIENT, 		GRAPH_LABEL_GRADIENT);
 		
 		final Graph graph_RunDyn_StanceTime				= new Graph(TourManager.GRAPH_RUN_DYN_STANCE_TIME, 			GRAPH_LABEL_RUN_DYN_STANCE_TIME);
-		final Graph graph_RunDyn_StanceTime_Balance 	= new Graph(TourManager.GRAPH_RUN_DYN_STANCE_TIME_BALANCED, GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCED);
+		final Graph graph_RunDyn_StanceTimeBalance 		= new Graph(TourManager.GRAPH_RUN_DYN_STANCE_TIME_BALANCED, GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCED);
 		final Graph graph_RunDyn_StepLength			 	= new Graph(TourManager.GRAPH_RUN_DYN_STEP_LENGTH, 			GRAPH_LABEL_RUN_DYN_STEP_LENGTH);
 		final Graph graph_RunDyn_VerticalOscillation 	= new Graph(TourManager.GRAPH_RUN_DYN_VERTICAL_OSCILLATION, GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION);
 		final Graph graph_RunDyn_VerticalRatio		 	= new Graph(TourManager.GRAPH_RUN_DYN_VERTICAL_RATIO, 		GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO);
@@ -771,7 +771,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		_graphMap.put(TourManager.GRAPH_GRADIENT, 		graph_Gradient);
 		
 		_graphMap.put(TourManager.GRAPH_RUN_DYN_STANCE_TIME, 			graph_RunDyn_StanceTime);
-		_graphMap.put(TourManager.GRAPH_RUN_DYN_STANCE_TIME_BALANCED,	graph_RunDyn_StanceTime_Balance);
+		_graphMap.put(TourManager.GRAPH_RUN_DYN_STANCE_TIME_BALANCED,	graph_RunDyn_StanceTimeBalance);
 		_graphMap.put(TourManager.GRAPH_RUN_DYN_STEP_LENGTH, 			graph_RunDyn_StepLength);
 		_graphMap.put(TourManager.GRAPH_RUN_DYN_VERTICAL_OSCILLATION, 	graph_RunDyn_VerticalOscillation);
 		_graphMap.put(TourManager.GRAPH_RUN_DYN_VERTICAL_RATIO, 		graph_RunDyn_VerticalRatio);
@@ -794,7 +794,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		_graphList.add(graph_Gradient);
 
 		_graphList.add(graph_RunDyn_StanceTime);
-		_graphList.add(graph_RunDyn_StanceTime_Balance);
+		_graphList.add(graph_RunDyn_StanceTimeBalance);
 		_graphList.add(graph_RunDyn_StepLength);
 		_graphList.add(graph_RunDyn_VerticalOscillation);
 		_graphList.add(graph_RunDyn_VerticalRatio);

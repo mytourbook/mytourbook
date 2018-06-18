@@ -111,7 +111,7 @@ public class TourManager {
 	private static final String	GRAPH_LABEL_TOUR_COMPARE						= net.tourbook.common.Messages.Graph_Label_Tour_Compare;
 	private static final String	GRAPH_LABEL_TOUR_COMPARE_UNIT					= net.tourbook.common.Messages.Graph_Label_Tour_Compare_Unit;
 	private static final String	GRAPH_LABEL_RUN_DYN_STANCE_TIME					= net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTime;
-	private static final String	GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCED		= net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTime_Balanced;
+	private static final String	GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCED		= net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTimeBalanced;
 	private static final String	GRAPH_LABEL_RUN_DYN_STEP_LENGTH					= net.tourbook.common.Messages.Graph_Label_RunDyn_StepLength;
 	private static final String	GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION		= net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalOscillation;
 	private static final String	GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO				= net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalRatio;
@@ -144,7 +144,7 @@ public class TourManager {
 	public static final String	CUSTOM_DATA_ANALYZER_INFO						= "analyzerInfo";						//$NON-NLS-1$
 	public static final String	CUSTOM_DATA_CONCONI_TEST						= "CUSTOM_DATA_CONCONI_TEST";			//$NON-NLS-1$
 	public static final String	CUSTOM_DATA_RUN_DYN_STANCE_TIME					= "runDyn_RunDyn_StanceTime";			//$NON-NLS-1$
-	public static final String	CUSTOM_DATA_RUN_DYN_STANCE_TIME_BALANCED		= "runDyn_RunDyn_StanceTime_Balanced;";	//$NON-NLS-1$
+	public static final String	CUSTOM_DATA_RUN_DYN_STANCE_TIME_BALANCED		= "runDyn_RunDyn_StanceTimeBalanced;";	//$NON-NLS-1$
 	public static final String	CUSTOM_DATA_RUN_DYN_STEP_LENGTH					= "runDyn_RunDyn_StepLength";			//$NON-NLS-1$
 	public static final String	CUSTOM_DATA_RUN_DYN_VERTICAL_OSCILLATION		= "runDyn_RunDyn_VerticalOscillation;";	//$NON-NLS-1$
 	public static final String	CUSTOM_DATA_RUN_DYN_VERTICAL_RATIO				= "runDyn_RunDyn_VerticalRatio";		//$NON-NLS-1$
@@ -702,7 +702,7 @@ public class TourManager {
 		final float[] toTemperaturSerie = multiTourData.temperatureSerie = new float[numTimeSlices];
 
 		final short[] toRunDyn_StanceTime = multiTourData.runDyn_StanceTime = new short[numTimeSlices];
-		final short[] toRunDyn_StanceTime_Balance = multiTourData.runDyn_StanceTime_Balance = new short[numTimeSlices];
+		final short[] toRunDyn_StanceTimeBalance = multiTourData.runDyn_StanceTimeBalance = new short[numTimeSlices];
 		final short[] toRunDyn_StepLength = multiTourData.runDyn_StepLength = new short[numTimeSlices];
 		final short[] toRunDyn_VertOscillation = multiTourData.runDyn_VerticalOscillation = new short[numTimeSlices];
 		final short[] toRunDyn_VertRatio = multiTourData.runDyn_VerticalRatio = new short[numTimeSlices];
@@ -737,7 +737,7 @@ public class TourManager {
 		boolean isTempSerie = false;
 
 		boolean isRunDyn_StanceTime = false;
-		boolean isRunDyn_StanceTime_Balance = false;
+		boolean isRunDyn_StanceTimeBalance = false;
 		boolean isRunDyn_StepLength = false;
 		boolean isRunDyn_VerticalOscillation = false;
 		boolean isRunDyn_VerticalRatio = false;
@@ -763,7 +763,7 @@ public class TourManager {
 			final float[] fromTemperaturSerie = fromTourData.temperatureSerie;
 
 			final short[] fromRunDyn_StanceTime = fromTourData.runDyn_StanceTime;
-			final short[] fromRunDyn_StanceTime_Balance = fromTourData.runDyn_StanceTime_Balance;
+			final short[] fromRunDyn_StanceTimeBalance = fromTourData.runDyn_StanceTimeBalance;
 			final short[] fromRunDyn_StepLength = fromTourData.runDyn_StepLength;
 			final short[] fromRunDyn_VertOscillation = fromTourData.runDyn_VerticalOscillation;
 			final short[] fromRunDyn_VertRatio = fromTourData.runDyn_VerticalRatio;
@@ -849,9 +849,9 @@ public class TourManager {
 				isRunDyn_StanceTime = true;
 				System.arraycopy(fromRunDyn_StanceTime, 0, toRunDyn_StanceTime, toStartIndex, fromSerieLength);
 			}
-			if (fromRunDyn_StanceTime_Balance != null) {
-				isRunDyn_StanceTime_Balance = true;
-				System.arraycopy(fromRunDyn_StanceTime_Balance, 0, toRunDyn_StanceTime_Balance, toStartIndex, fromSerieLength);
+			if (fromRunDyn_StanceTimeBalance != null) {
+				isRunDyn_StanceTimeBalance = true;
+				System.arraycopy(fromRunDyn_StanceTimeBalance, 0, toRunDyn_StanceTimeBalance, toStartIndex, fromSerieLength);
 			}
 			if (fromRunDyn_StepLength != null) {
 				isRunDyn_StepLength = true;
@@ -940,8 +940,8 @@ public class TourManager {
 		if (isRunDyn_StanceTime == false) {
 			multiTourData.clear_RunDyn_StanceTime();
 		}
-		if (isRunDyn_StanceTime_Balance == false) {
-			multiTourData.clear_RunDyn_StanceTime_Balance();
+		if (isRunDyn_StanceTimeBalance == false) {
+			multiTourData.clear_RunDyn_StanceTimeBalance();
 		}
 		if (isRunDyn_StepLength == false) {
 			multiTourData.clear_RunDyn_StepLength();
@@ -2895,7 +2895,7 @@ public class TourManager {
 		final ChartDataYSerie yDataTourCompare 	= createModelData_TourCompare(	tourData, chartDataModel, chartType, tcc);
 		
 		final ChartDataYSerie yData_RunDyn_StanceTime			= createModelData_RunDyn_StanceTime(			tourData, chartDataModel, chartType, isHrZoneDisplayed);
-		final ChartDataYSerie yData_RunDyn_StanceTime_Balance	= createModelData_RunDyn_StanceTime_Balance(	tourData, chartDataModel, chartType, isHrZoneDisplayed);
+		final ChartDataYSerie yData_RunDyn_StanceTimeBalance	= createModelData_RunDyn_StanceTimeBalance(		tourData, chartDataModel, chartType, isHrZoneDisplayed);
 		final ChartDataYSerie yData_RunDyn_StepLength			= createModelData_RunDyn_StepLength(			tourData, chartDataModel, chartType, isHrZoneDisplayed);
 		final ChartDataYSerie yData_RunDyn_VerticalOscillation	= createModelData_RunDyn_VerticalOscillation(	tourData, chartDataModel, chartType, isHrZoneDisplayed);
 		final ChartDataYSerie yData_RunDyn_VerticalRatio		= createModelData_RunDyn_VerticalRatio(			tourData, chartDataModel, chartType, isHrZoneDisplayed);
@@ -2993,9 +2993,9 @@ public class TourManager {
 				break;
 
 			case GRAPH_RUN_DYN_STANCE_TIME_BALANCED:
-				if (yData_RunDyn_StanceTime_Balance != null) {
-					chartDataModel.addYData(yData_RunDyn_StanceTime_Balance);
-					chartDataModel.setCustomData(CUSTOM_DATA_RUN_DYN_STANCE_TIME_BALANCED, yData_RunDyn_StanceTime_Balance);
+				if (yData_RunDyn_StanceTimeBalance != null) {
+					chartDataModel.addYData(yData_RunDyn_StanceTimeBalance);
+					chartDataModel.setCustomData(CUSTOM_DATA_RUN_DYN_STANCE_TIME_BALANCED, yData_RunDyn_StanceTimeBalance);
 				}
 				break;
 
@@ -3542,14 +3542,14 @@ public class TourManager {
 	/**
 	 * Running Dynamics: Stance time balance
 	 */
-	private ChartDataYSerie createModelData_RunDyn_StanceTime_Balance(	final TourData tourData,
+	private ChartDataYSerie createModelData_RunDyn_StanceTimeBalance(	final TourData tourData,
 																		final ChartDataModel chartDataModel,
 																		final ChartType chartType,
 																		final boolean isHrZoneDisplayed) {
 
 		ChartDataYSerie yDataSerie = null;
 
-		final float[] dataSerie = tourData.getRunDyn_StanceTime_Balance();
+		final float[] dataSerie = tourData.getRunDyn_StanceTimeBalance();
 		if (dataSerie != null) {
 
 			yDataSerie = createChartDataSerie(dataSerie, chartType);

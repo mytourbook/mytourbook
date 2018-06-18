@@ -86,10 +86,10 @@ public class SerieData implements Serializable {
 	 * @since Version 18.7
 	 */
 	public short[]				runDyn_StanceTime;
-	public short[]				runDyn_StanceTime_Balance;
+	public short[]				runDyn_StanceTimeBalance;
 	public short[]				runDyn_StepLength;
-	public short[]				runDyn_Vertical_Oscillation;
-	public short[]				runDyn_Vertical_Ratio;
+	public short[]				runDyn_VerticalOscillation;
+	public short[]				runDyn_VerticalRatio;
 
 	/*
 	 * these data series cannot be removed because they are needed to convert from int to float in

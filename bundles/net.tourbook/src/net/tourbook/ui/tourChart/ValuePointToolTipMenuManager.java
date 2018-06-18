@@ -595,7 +595,7 @@ public class ValuePointToolTipMenuManager {
 
 		_actionValue_RunDyn_StanceTimeBalanced.setState( //
 				(_allVisibleValueIds & VALUE_ID_RUN_DYN_STANCE_TIME_BALANCED) > 0,
-				_tourData.getRunDyn_StanceTime_Balance() != null);
+				_tourData.getRunDyn_StanceTimeBalance() != null);
 
 		_actionValue_RunDyn_StepLength.setState( //
 				(_allVisibleValueIds & VALUE_ID_RUN_DYN_STEP_LENGTH) > 0,

@@ -157,8 +157,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 	static public final String		ID										= "net.tourbook.views.tourListView";	//$NON-NLS-1$
 	
-	static final String		STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS			= "STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS";																	//$NON-NLS-1$
-	static final boolean	STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS_DEFAULT	= true;
+	static final String				STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS			= "STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS";																	//$NON-NLS-1$
+	static final boolean			STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS_DEFAULT	= true;
 
 	private final static IPreferenceStore	_prefStore					= TourbookPlugin.getPrefStore();
 	private final static IPreferenceStore	_prefStoreCommon			= CommonActivator.getPrefStore();
@@ -218,12 +218,11 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 	private static final String		CSV_HEADER_WEEKDAY					= "Weekday";						//$NON-NLS-1$
 	private static final String		CSV_HEADER_WEEK_YEAR				= "WeekYear";						//$NON-NLS-1$
 	private static final String		CSV_HEADER_YEAR						= "Year";							//$NON-NLS-1$
-
+	//
 	private static final String		CSV_EXPORT_DEFAULT_FILE_NAME		= "TourBook_";						//$NON-NLS-1$
 	private static final String		CSV_EXPORT_DURATION_HHH_MM_SS		= "hhh:mm:ss";						//$NON-NLS-1$
-
+	//
 	private static YearSubCategory	_yearSubCategory					= YearSubCategory.MONTH;
-
 	//
 	private ColumnManager			_columnManager;
 	private OpenDialogManager		_openDlgMgr							= new OpenDialogManager();

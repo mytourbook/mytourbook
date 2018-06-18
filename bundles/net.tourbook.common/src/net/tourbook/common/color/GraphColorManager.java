@@ -433,7 +433,7 @@ public class GraphColorManager {
 				null));
 
 		allColorDef.add(new ColorDefinition(PREF_GRAPH_RUN_DYN_STANCE_TIME_BALANCED,
-				Messages.Graph_Label_RunDyn_StanceTime_Balanced,
+				Messages.Graph_Label_RunDyn_StanceTimeBalanced,
 				new RGB(0xff, 0xff, 0xff),
 				new RGB(0x86, 0x57, 0xe7),
 				new RGB(0x4a, 0x1a, 0xb0),

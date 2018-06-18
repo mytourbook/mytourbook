@@ -104,9 +104,9 @@ public class TourDatabase {
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-//	private static final int			TOURBOOK_DB_VERSION							= 35;
-//	private static final int			TOURBOOK_DB_VERSION							= 35;	// 18.?
-	private static final int			TOURBOOK_DB_VERSION							= 34;	// 18.5
+	private static final int			TOURBOOK_DB_VERSION							= 35;
+//	private static final int			TOURBOOK_DB_VERSION							= 35;	// 18.7?
+//	private static final int			TOURBOOK_DB_VERSION							= 34;	// 18.5
 //	private static final int			TOURBOOK_DB_VERSION							= 33;	// 17.12
 //	private static final int			TOURBOOK_DB_VERSION							= 32;	// 16.10
 //	private static final int			TOURBOOK_DB_VERSION							= 31;	// 16.5
@@ -407,6 +407,28 @@ public class TourDatabase {
 			final String sql = ""// 															//$NON-NLS-1$
 					+ "ALTER TABLE " + table //													//$NON-NLS-1$
 					+ "	ADD COLUMN	" + columnName + " INTEGER DEFAULT " + defaultValue; //		//$NON-NLS-1$ //$NON-NLS-2$
+
+			exec(stmt, sql);
+
+			return;
+		}
+
+		/**
+		 * @param stmt
+		 * @param table
+		 * @param columnName
+		 * @param defaultValue
+		 *            Default value.
+		 * @throws SQLException
+		 */
+		private static void AddCol_SmallInt(final Statement stmt,
+											final String table,
+											final String columnName,
+											final String defaultValue) throws SQLException {
+
+			final String sql = ""// 															//$NON-NLS-1$
+					+ "ALTER TABLE " + table //													//$NON-NLS-1$
+					+ "	ADD COLUMN	" + columnName + " SMALLINT DEFAULT " + defaultValue; //		//$NON-NLS-1$ //$NON-NLS-2$
 
 			exec(stmt, sql);
 
@@ -2741,6 +2763,30 @@ public class TourDatabase {
 				//
 				// version 32 end ---------
 
+				// version 35 start  -  18.7
+				//
+				+ "	runDyn_StanceTime_Min          			SMALLINT DEFAULT 0,								\n" //$NON-NLS-1$
+				+ "	runDyn_StanceTime_Max          			SMALLINT DEFAULT 0,								\n" //$NON-NLS-1$
+				+ "	runDyn_StanceTime_Avg          			FLOAT    DEFAULT 0,								\n" //$NON-NLS-1$
+
+				+ "	runDyn_StanceTimeBalance_Min   			SMALLINT DEFAULT 0,								\n" //$NON-NLS-1$
+				+ "	runDyn_StanceTimeBalance_Max   			SMALLINT DEFAULT 0,								\n" //$NON-NLS-1$
+				+ "	runDyn_StanceTimeBalance_Avg   			FLOAT    DEFAULT 0,								\n" //$NON-NLS-1$
+
+				+ "	runDyn_StepLength_Min          			SMALLINT DEFAULT 0,								\n" //$NON-NLS-1$
+				+ "	runDyn_StepLength_Max          			SMALLINT DEFAULT 0,								\n" //$NON-NLS-1$
+				+ "	runDyn_StepLength_Avg          			FLOAT    DEFAULT 0,								\n" //$NON-NLS-1$
+
+				+ "	runDyn_VerticalOscillation_Min 			SMALLINT DEFAULT 0,								\n" //$NON-NLS-1$
+				+ "	runDyn_VerticalOscillation_Max 			SMALLINT DEFAULT 0,								\n" //$NON-NLS-1$
+				+ "	runDyn_VerticalOscillation_Avg 			FLOAT    DEFAULT 0,								\n" //$NON-NLS-1$
+
+				+ "	runDyn_VerticalRatio_Min       			SMALLINT DEFAULT 0,								\n" //$NON-NLS-1$
+				+ "	runDyn_VerticalRatio_Max       			SMALLINT DEFAULT 0,								\n" //$NON-NLS-1$
+				+ "	runDyn_VerticalRatio_Avg       			FLOAT    DEFAULT 0,								\n" //$NON-NLS-1$
+				//
+				// version 35 end ---------
+
 				//				// version 35 start  -  18.?
 				//				//
 				//				+ "	LatitudeMinE6			INTEGER DEFAULT 0,												\n" //$NON-NLS-1$
@@ -4317,11 +4363,9 @@ public class TourDatabase {
 			/*
 			 * 34 -> 35
 			 */
-//			boolean isPostUpdate35 = false;
-//			if (currentDbVersion == 34) {
-//				isPostUpdate35 = true;
-//				currentDbVersion = newVersion = updateDbDesign_034_to_035(conn, monitor);
-//			}
+			if (currentDbVersion == 34) {
+				currentDbVersion = newVersion = updateDbDesign_034_to_035(conn, monitor);
+			}
 
 			/*
 			 * update version number
@@ -4372,9 +4416,6 @@ public class TourDatabase {
 			if (isPostUpdate34) {
 				updateDbDesign_033_to_034_PostUpdate(conn, monitor);
 			}
-//			if (isPostUpdate35) {
-//				updateDbDesign_034_to_035_PostUpdate(conn, monitor);
-//			}
 
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
@@ -6449,6 +6490,52 @@ public class TourDatabase {
 				String.format(
 						"Database postupdate 33->34 in %s mm:ss", //$NON-NLS-1$
 						net.tourbook.common.UI.formatHhMmSs(timeDiff / 1000)));
+	}
+
+	private int updateDbDesign_034_to_035(final Connection conn, final IProgressMonitor monitor) throws SQLException {
+
+		final int newDbVersion = 35;
+
+		logDb_UpdateStart(newDbVersion);
+		updateMonitor(monitor, newDbVersion);
+
+		final Statement stmt = conn.createStatement();
+		{
+			// check if db is updated to version 35
+			if (isColumnAvailable(conn, TABLE_TOUR_DATA, "runDyn_StanceTime_Min") == false) { //$NON-NLS-1$
+
+// SET_FORMATTING_OFF
+				
+				// Add new columns
+				SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_StanceTime_Min", 			DEFAULT_0); //$NON-NLS-1$
+				SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_StanceTime_Max", 			DEFAULT_0); //$NON-NLS-1$
+				SQL.AddCol_Float(	stmt, TABLE_TOUR_DATA, "runDyn_StanceTime_Avg", 			DEFAULT_0); //$NON-NLS-1$
+				                                                                          
+				SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_StanceTimeBalance_Min", 		DEFAULT_0); //$NON-NLS-1$
+				SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_StanceTimeBalance_Max", 		DEFAULT_0); //$NON-NLS-1$
+				SQL.AddCol_Float(	stmt, TABLE_TOUR_DATA, "runDyn_StanceTimeBalance_Avg", 		DEFAULT_0); //$NON-NLS-1$
+				                                                                          
+				SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_StepLength_Min", 			DEFAULT_0); //$NON-NLS-1$
+				SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_StepLength_Max", 			DEFAULT_0); //$NON-NLS-1$
+				SQL.AddCol_Float(	stmt, TABLE_TOUR_DATA, "runDyn_StepLength_Avg", 			DEFAULT_0); //$NON-NLS-1$
+
+				SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_VerticalOscillation_Min", 	DEFAULT_0); //$NON-NLS-1$
+				SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_VerticalOscillation_Max", 	DEFAULT_0); //$NON-NLS-1$
+				SQL.AddCol_Float(	stmt, TABLE_TOUR_DATA, "runDyn_VerticalOscillation_Avg", 	DEFAULT_0); //$NON-NLS-1$
+				                                                                          
+				SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_VerticalRatio_Min", 			DEFAULT_0); //$NON-NLS-1$
+				SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_VerticalRatio_Max", 			DEFAULT_0); //$NON-NLS-1$
+				SQL.AddCol_Float(	stmt, TABLE_TOUR_DATA, "runDyn_VerticalRatio_Avg", 			DEFAULT_0); //$NON-NLS-1$
+				
+// SET_FORMATTING_ON
+
+			}
+		}
+		stmt.close();
+
+		logDb_UpdateEnd(newDbVersion);
+
+		return newDbVersion;
 	}
 
 //	private int updateDbDesign_034_to_035(final Connection conn, final IProgressMonitor monitor) throws SQLException {

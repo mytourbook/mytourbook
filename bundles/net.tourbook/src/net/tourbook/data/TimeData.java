@@ -145,7 +145,7 @@ public class TimeData implements Serializable {
 	 * Running dynamics data: Stance time balance. Contains {@link Short#MIN_VALUE} when value is
 	 * not set.
 	 */
-	public short				runDyn_StanceTime_Balance	= Short.MIN_VALUE;
+	public short				runDyn_StanceTimeBalance	= Short.MIN_VALUE;
 
 	/**
 	 * Running dynamics data: Step length. Contains {@link Short#MIN_VALUE} when value is not set.
@@ -153,16 +153,16 @@ public class TimeData implements Serializable {
 	public short				runDyn_StepLength			= Short.MIN_VALUE;
 
 	/**
-	 * Running dynamics data: Vertical ratio. Contains {@link Short#MIN_VALUE} when value is not
-	 * set.
-	 */
-	public short				runDyn_Vertical_Ratio		= Short.MIN_VALUE;
-
-	/**
 	 * Running dynamics data: Vertical oscillation. Contains {@link Short#MIN_VALUE} when value is
 	 * not set.
 	 */
-	public short				runDyn_Vertical_Oscillation	= Short.MIN_VALUE;
+	public short				runDyn_VerticalOscillation	= Short.MIN_VALUE;
+
+	/**
+	 * Running dynamics data: Vertical ratio. Contains {@link Short#MIN_VALUE} when value is not
+	 * set.
+	 */
+	public short				runDyn_VerticalRatio		= Short.MIN_VALUE;
 
 	@Override
 	public String toString() {
