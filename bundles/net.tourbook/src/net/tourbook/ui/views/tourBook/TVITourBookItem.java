@@ -171,7 +171,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
 	// ----------- Running Dynamics ---------
 
-	int				colRunDyn_StanceTime;
+	int				colRunDyn_StanceTime_Min;
 	int				colRunDyn_StanceTime_Max;
 	float			colRunDyn_StanceTime_Avg;
 

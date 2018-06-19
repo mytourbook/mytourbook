@@ -150,7 +150,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private static final String	GRAPH_LABEL_TEMPERATURE						= net.tourbook.common.Messages.Graph_Label_Temperature;
 	private static final String	GRAPH_LABEL_TOUR_COMPARE					= net.tourbook.common.Messages.Graph_Label_Tour_Compare;
 	private static final String	GRAPH_LABEL_RUN_DYN_STANCE_TIME				= net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTime;
-	private static final String	GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCED	= net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTimeBalanced;
+	private static final String	GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCED	= net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTimeBalance;
 	private static final String	GRAPH_LABEL_RUN_DYN_STEP_LENGTH				= net.tourbook.common.Messages.Graph_Label_RunDyn_StepLength;
 	private static final String	GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION	= net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalOscillation;
 	private static final String	GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO			= net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalRatio;
@@ -1418,8 +1418,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 					isChartModified |= setMinDefaultValue(
 							property,
 							isChartModified,
-							ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCED_IS_MIN_ENABLED,
-							ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCED_MIN_VALUE,
+							ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_IS_MIN_ENABLED,
+							ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_MIN_VALUE,
 							TourManager.GRAPH_RUN_DYN_STANCE_TIME_BALANCED,
 							0,
 							MIN_ADJUSTMENT,
@@ -1428,8 +1428,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 					isChartModified |= setMaxDefaultValue(
 							property,
 							isChartModified,
-							ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCED_IS_MAX_ENABLED,
-							ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCED_MAX_VALUE,
+							ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_IS_MAX_ENABLED,
+							ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_MAX_VALUE,
 							TourManager.GRAPH_RUN_DYN_STANCE_TIME_BALANCED,
 							0,
 							1e-3,
@@ -1739,9 +1739,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		createActions_12_GraphAction(
 				TourManager.GRAPH_RUN_DYN_STANCE_TIME_BALANCED,
 				GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCED,
-				Messages.Tour_Action_RunDyn_StanceTimeBalanced_Tooltip,
-				Messages.Image__Graph_RunDyn_StanceTimeBalanced,
-				Messages.Image__Graph_RunDyn_StanceTimeBalanced_Disabled,
+				Messages.Tour_Action_RunDyn_StanceTimeBalance_Tooltip,
+				Messages.Image__Graph_RunDyn_StanceTimeBalance,
+				Messages.Image__Graph_RunDyn_StanceTimeBalance_Disabled,
 				GRAPH_CONTRIBUTION_ID_RUN_DYN_STANCE_TIME_BALANCED);
 
 		createActions_12_GraphAction(
@@ -4699,7 +4699,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_RUN_DYN_STANCE_TIME);
 		}
 		if (yDataWithLabels == null) {
-			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_RUN_DYN_STANCE_TIME_BALANCED);
+			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_RUN_DYN_STANCE_TIME_BALANCE);
 		}
 		if (yDataWithLabels == null) {
 			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_RUN_DYN_STEP_LENGTH);
@@ -4790,7 +4790,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_TEMPERATURE, yDataWithLabels, null);
 
 		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_RUN_DYN_STANCE_TIME, yDataWithLabels, null);
-		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_RUN_DYN_STANCE_TIME_BALANCED, yDataWithLabels, null);
+		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_RUN_DYN_STANCE_TIME_BALANCE, yDataWithLabels, null);
 		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_RUN_DYN_STEP_LENGTH, yDataWithLabels, null);
 		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_RUN_DYN_VERTICAL_OSCILLATION, yDataWithLabels, null);
 		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_RUN_DYN_VERTICAL_RATIO, yDataWithLabels, null);

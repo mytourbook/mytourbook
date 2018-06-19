@@ -111,7 +111,7 @@ public class TourManager {
 	private static final String	GRAPH_LABEL_TOUR_COMPARE						= net.tourbook.common.Messages.Graph_Label_Tour_Compare;
 	private static final String	GRAPH_LABEL_TOUR_COMPARE_UNIT					= net.tourbook.common.Messages.Graph_Label_Tour_Compare_Unit;
 	private static final String	GRAPH_LABEL_RUN_DYN_STANCE_TIME					= net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTime;
-	private static final String	GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCED		= net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTimeBalanced;
+	private static final String	GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCE			= net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTimeBalance;
 	private static final String	GRAPH_LABEL_RUN_DYN_STEP_LENGTH					= net.tourbook.common.Messages.Graph_Label_RunDyn_StepLength;
 	private static final String	GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION		= net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalOscillation;
 	private static final String	GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO				= net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalRatio;
@@ -144,9 +144,9 @@ public class TourManager {
 	public static final String	CUSTOM_DATA_ANALYZER_INFO						= "analyzerInfo";						//$NON-NLS-1$
 	public static final String	CUSTOM_DATA_CONCONI_TEST						= "CUSTOM_DATA_CONCONI_TEST";			//$NON-NLS-1$
 	public static final String	CUSTOM_DATA_RUN_DYN_STANCE_TIME					= "runDyn_RunDyn_StanceTime";			//$NON-NLS-1$
-	public static final String	CUSTOM_DATA_RUN_DYN_STANCE_TIME_BALANCED		= "runDyn_RunDyn_StanceTimeBalanced;";	//$NON-NLS-1$
+	public static final String	CUSTOM_DATA_RUN_DYN_STANCE_TIME_BALANCE			= "runDyn_RunDyn_StanceTimeBalance";	//$NON-NLS-1$
 	public static final String	CUSTOM_DATA_RUN_DYN_STEP_LENGTH					= "runDyn_RunDyn_StepLength";			//$NON-NLS-1$
-	public static final String	CUSTOM_DATA_RUN_DYN_VERTICAL_OSCILLATION		= "runDyn_RunDyn_VerticalOscillation;";	//$NON-NLS-1$
+	public static final String	CUSTOM_DATA_RUN_DYN_VERTICAL_OSCILLATION		= "runDyn_RunDyn_VerticalOscillation";	//$NON-NLS-1$
 	public static final String	CUSTOM_DATA_RUN_DYN_VERTICAL_RATIO				= "runDyn_RunDyn_VerticalRatio";		//$NON-NLS-1$
 	//
 	public static final String	X_AXIS_TIME										= "time";								//$NON-NLS-1$
@@ -2995,7 +2995,7 @@ public class TourManager {
 			case GRAPH_RUN_DYN_STANCE_TIME_BALANCED:
 				if (yData_RunDyn_StanceTimeBalance != null) {
 					chartDataModel.addYData(yData_RunDyn_StanceTimeBalance);
-					chartDataModel.setCustomData(CUSTOM_DATA_RUN_DYN_STANCE_TIME_BALANCED, yData_RunDyn_StanceTimeBalance);
+					chartDataModel.setCustomData(CUSTOM_DATA_RUN_DYN_STANCE_TIME_BALANCE, yData_RunDyn_StanceTimeBalance);
 				}
 				break;
 
@@ -3554,7 +3554,7 @@ public class TourManager {
 
 			yDataSerie = createChartDataSerie(dataSerie, chartType);
 
-			yDataSerie.setYTitle(GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCED);
+			yDataSerie.setYTitle(GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCE);
 			yDataSerie.setUnitLabel(UI.UNIT_PERCENT);
 			yDataSerie.setDisplayedFractionalDigits(1);
 			yDataSerie.setShowYSlider(true);
@@ -3574,10 +3574,10 @@ public class TourManager {
 					yDataSerie,
 					1,
 					0,
-					ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCED_IS_MIN_ENABLED,
-					ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCED_IS_MAX_ENABLED,
-					ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCED_MIN_VALUE,
-					ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCED_MAX_VALUE);
+					ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_IS_MIN_ENABLED,
+					ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_IS_MAX_ENABLED,
+					ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_MIN_VALUE,
+					ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_MAX_VALUE);
 		}
 
 		return yDataSerie;

@@ -116,7 +116,7 @@ public class ValuePointToolTipMenuManager {
 	private ActionValueItem				_actionValue_TourCompareResult;
 
 	private ActionValueItem				_actionValue_RunDyn_StanceTime;
-	private ActionValueItem				_actionValue_RunDyn_StanceTimeBalanced;
+	private ActionValueItem				_actionValue_RunDyn_StanceTimeBalance;
 	private ActionValueItem				_actionValue_RunDyn_StepLength;
 	private ActionValueItem				_actionValue_RunDyn_VerticalOscillation;
 	private ActionValueItem				_actionValue_RunDyn_VerticalRatio;
@@ -449,11 +449,11 @@ public class ValuePointToolTipMenuManager {
 				Messages.Image__Graph_RunDyn_StanceTime,
 				Messages.Image__Graph_RunDyn_StanceTime_Disabled);
 
-		_actionValue_RunDyn_StanceTimeBalanced = new ActionValueItem(
+		_actionValue_RunDyn_StanceTimeBalance = new ActionValueItem(
 				VALUE_ID_RUN_DYN_STANCE_TIME_BALANCED,
-				Messages.Tooltip_ValuePoint_Action_Value_RunDyn_StanceTimeBalanced,
-				Messages.Image__Graph_RunDyn_StanceTimeBalanced,
-				Messages.Image__Graph_RunDyn_StanceTimeBalanced_Disabled);
+				Messages.Tooltip_ValuePoint_Action_Value_RunDyn_StanceTimeBalance,
+				Messages.Image__Graph_RunDyn_StanceTimeBalance,
+				Messages.Image__Graph_RunDyn_StanceTimeBalance_Disabled);
 
 		_actionValue_RunDyn_StepLength = new ActionValueItem(
 				VALUE_ID_RUN_DYN_STEP_LENGTH,
@@ -593,7 +593,7 @@ public class ValuePointToolTipMenuManager {
 				(_allVisibleValueIds & VALUE_ID_RUN_DYN_STANCE_TIME) > 0,
 				_tourData.getRunDyn_StanceTime() != null);
 
-		_actionValue_RunDyn_StanceTimeBalanced.setState( //
+		_actionValue_RunDyn_StanceTimeBalance.setState( //
 				(_allVisibleValueIds & VALUE_ID_RUN_DYN_STANCE_TIME_BALANCED) > 0,
 				_tourData.getRunDyn_StanceTimeBalance() != null);
 
@@ -640,7 +640,7 @@ public class ValuePointToolTipMenuManager {
 		addItem(_actionValue_Cadence);
 		addItem(_actionValue_Gears);
 		addItem(_actionValue_RunDyn_StanceTime);
-		addItem(_actionValue_RunDyn_StanceTimeBalanced);
+		addItem(_actionValue_RunDyn_StanceTimeBalance);
 		addItem(_actionValue_RunDyn_StepLength);
 		addItem(_actionValue_RunDyn_VerticalOscillation);
 		addItem(_actionValue_RunDyn_VerticalRatio);

@@ -67,7 +67,7 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
 	private Button					_chkShowInChartToolbar_Speed;
 
 	private Button					_chkShowInChartToolbar_RunDyn_StanceTime;
-	private Button					_chkShowInChartToolbar_RunDyn_StanceTimeBalanced;
+	private Button					_chkShowInChartToolbar_RunDyn_StanceTimeBalance;
 	private Button					_chkShowInChartToolbar_RunDyn_StepLength;
 	private Button					_chkShowInChartToolbar_RunDyn_VerticalOscillation;
 	private Button					_chkShowInChartToolbar_RunDyn_VerticalRatio;
@@ -217,7 +217,7 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
 					_chkShowInChartToolbar_Gears = createUI_GraphCheckbox(container);
 
 					_chkShowInChartToolbar_RunDyn_StanceTime = createUI_GraphCheckbox(container);
-					_chkShowInChartToolbar_RunDyn_StanceTimeBalanced = createUI_GraphCheckbox(container);
+					_chkShowInChartToolbar_RunDyn_StanceTimeBalance = createUI_GraphCheckbox(container);
 					_chkShowInChartToolbar_RunDyn_StepLength = createUI_GraphCheckbox(container);
 					_chkShowInChartToolbar_RunDyn_VerticalOscillation = createUI_GraphCheckbox(container);
 					_chkShowInChartToolbar_RunDyn_VerticalRatio = createUI_GraphCheckbox(container);
@@ -326,7 +326,7 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
 		_chkShowInChartToolbar_Tempterature.setSelection(				Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE,	TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE_DEFAULT));
 		
 		_chkShowInChartToolbar_RunDyn_StanceTime.setSelection(			Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME,				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_DEFAULT));
-		_chkShowInChartToolbar_RunDyn_StanceTimeBalanced.setSelection(	Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_BALANCED, 	TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_BALANCED_DEFAULT));
+		_chkShowInChartToolbar_RunDyn_StanceTimeBalance.setSelection(	Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_BALANCED, 	TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_BALANCED_DEFAULT));
 		_chkShowInChartToolbar_RunDyn_StepLength.setSelection(			Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STEP_LENGTH, 				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STEP_LENGTH_DEFAULT));
 		_chkShowInChartToolbar_RunDyn_VerticalOscillation.setSelection(	Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_OSCILLATION, 	TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_OSCILLATION_DEFAULT));
 		_chkShowInChartToolbar_RunDyn_VerticalRatio.setSelection(		Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_RATIO, 			TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_RATIO_DEFAULT));
@@ -350,7 +350,7 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
 		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE,					_chkShowInChartToolbar_Tempterature.getSelection());
 		
 		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME, 			_chkShowInChartToolbar_RunDyn_StanceTime.getSelection());
-		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_BALANCED, 	_chkShowInChartToolbar_RunDyn_StanceTimeBalanced.getSelection());
+		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_BALANCED, 	_chkShowInChartToolbar_RunDyn_StanceTimeBalance.getSelection());
 		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STEP_LENGTH, 			_chkShowInChartToolbar_RunDyn_StepLength.getSelection());
 		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_OSCILLATION, 	_chkShowInChartToolbar_RunDyn_VerticalOscillation.getSelection());
 		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_RATIO, 		_chkShowInChartToolbar_RunDyn_VerticalRatio.getSelection());

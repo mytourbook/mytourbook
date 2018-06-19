@@ -855,8 +855,8 @@ public class Messages extends NLS {
 	public static String		Image__Graph_Overlapped;
 	public static String		Image__Graph_RunDyn_StanceTime;
 	public static String		Image__Graph_RunDyn_StanceTime_Disabled;
-	public static String		Image__Graph_RunDyn_StanceTimeBalanced;
-	public static String		Image__Graph_RunDyn_StanceTimeBalanced_Disabled;
+	public static String		Image__Graph_RunDyn_StanceTimeBalance;
+	public static String		Image__Graph_RunDyn_StanceTimeBalance_Disabled;
 	public static String		Image__Graph_RunDyn_StepLength;
 	public static String		Image__Graph_RunDyn_StepLength_Disabled;
 	public static String		Image__Graph_RunDyn_VerticalOscillation;
@@ -1357,7 +1357,7 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Checkbox_ForceValue_Cadence;
 	public static String		Pref_Graphs_Checkbox_ForceValue_Power;
 	public static String		Pref_Graphs_Checkbox_ForceValue_RunDyn_StanceTime;
-	public static String		Pref_Graphs_Checkbox_ForceValue_RunDyn_StanceTimeBalanced;
+	public static String		Pref_Graphs_Checkbox_ForceValue_RunDyn_StanceTimeBalance;
 	public static String		Pref_Graphs_Checkbox_ForceValue_RunDyn_StepLength;
 	public static String		Pref_Graphs_Checkbox_ForceValue_RunDyn_VerticalOscillation;
 	public static String		Pref_Graphs_Checkbox_ForceValue_RunDyn_VerticalRatio;
@@ -1999,7 +1999,7 @@ public class Messages extends NLS {
 	public static String		Tooltip_ValuePoint_Action_Value_Power;
 	public static String		Tooltip_ValuePoint_Action_Value_Pulse;
 	public static String		Tooltip_ValuePoint_Action_Value_RunDyn_StanceTime;
-	public static String		Tooltip_ValuePoint_Action_Value_RunDyn_StanceTimeBalanced;
+	public static String		Tooltip_ValuePoint_Action_Value_RunDyn_StanceTimeBalance;
 	public static String		Tooltip_ValuePoint_Action_Value_RunDyn_StepLength;
 	public static String		Tooltip_ValuePoint_Action_Value_RunDyn_VerticalOscillation;
 	public static String		Tooltip_ValuePoint_Action_Value_RunDyn_VerticalRatio;
@@ -2055,7 +2055,7 @@ public class Messages extends NLS {
 	public static String		Tour_Action_MultiplyCaloriesBy1000_Message;
 	public static String		Tour_Action_MultiplyCaloriesBy1000_Title;
 	public static String		Tour_Action_RunDyn_StanceTime_Tooltip;
-	public static String		Tour_Action_RunDyn_StanceTimeBalanced_Tooltip;
+	public static String		Tour_Action_RunDyn_StanceTimeBalance_Tooltip;
 	public static String		Tour_Action_RunDyn_StepLength_Tooltip;
 	public static String		Tour_Action_RunDyn_VerticalOscillation_Tooltip;
 	public static String		Tour_Action_RunDyn_VerticalRatio_Tooltip;

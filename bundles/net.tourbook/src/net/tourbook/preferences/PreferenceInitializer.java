@@ -264,10 +264,10 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_MIN_VALUE, 220);
 		store.setDefault(ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_MAX_VALUE, 300);
 
-		store.setDefault(ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCED_IS_MIN_ENABLED, true);
-		store.setDefault(ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCED_IS_MAX_ENABLED, true);
-		store.setDefault(ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCED_MIN_VALUE, 47);
-		store.setDefault(ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCED_MAX_VALUE, 53);
+		store.setDefault(ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_IS_MIN_ENABLED, true);
+		store.setDefault(ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_IS_MAX_ENABLED, true);
+		store.setDefault(ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_MIN_VALUE, 47);
+		store.setDefault(ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_MAX_VALUE, 53);
 
 		store.setDefault(ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MIN_ENABLED, true);
 		store.setDefault(ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MAX_ENABLED, true);

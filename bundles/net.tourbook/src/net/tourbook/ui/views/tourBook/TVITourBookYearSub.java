@@ -316,7 +316,7 @@ public class TVITourBookYearSub extends TVITourBookItem {
 
 					// ---------- RUNNING DYNAMICS -------------
 
-					tourItem.colRunDyn_StanceTime = result.getInt(55);
+					tourItem.colRunDyn_StanceTime_Min = result.getInt(55);
 					tourItem.colRunDyn_StanceTime_Max = result.getInt(56);
 					tourItem.colRunDyn_StanceTime_Avg = result.getFloat(57);
 

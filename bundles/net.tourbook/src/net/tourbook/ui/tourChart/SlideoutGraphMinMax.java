@@ -125,8 +125,8 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 	private Button			_chkMax_Temperature;
 	private Button			_chkMin_RunDyn_StanceTime;
 	private Button			_chkMax_RunDyn_StanceTime;
-	private Button			_chkMin_RunDyn_StanceTimeBalanced;
-	private Button			_chkMax_RunDyn_StanceTimeBalanced;
+	private Button			_chkMin_RunDyn_StanceTimeBalance;
+	private Button			_chkMax_RunDyn_StanceTimeBalance;
 	private Button			_chkMin_RunDyn_StepLength;
 	private Button			_chkMax_RunDyn_StepLength;
 	private Button			_chkMin_RunDyn_VerticalOscillation;
@@ -156,8 +156,8 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 	private Label			_lblMinMax_Temperature_Unit;
 	private Label			_lblMinMax_RunDyn_StanceTime;
 	private Label			_lblMinMax_RunDyn_StanceTime_Unit;
-	private Label			_lblMinMax_RunDyn_StanceTimeBalanced;
-	private Label			_lblMinMax_RunDyn_StanceTimeBalanced_Unit;
+	private Label			_lblMinMax_RunDyn_StanceTimeBalance;
+	private Label			_lblMinMax_RunDyn_StanceTimeBalance_Unit;
 	private Label			_lblMinMax_RunDyn_StepLength;
 	private Label			_lblMinMax_RunDyn_StepLength_Unit;
 	private Label			_lblMinMax_RunDyn_VerticalOscillation;
@@ -185,8 +185,8 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 	private Spinner			_spinnerMax_Temperature;
 	private Spinner			_spinnerMin_RunDyn_StanceTime;
 	private Spinner			_spinnerMax_RunDyn_StanceTime;
-	private Spinner			_spinnerMin_RunDyn_StanceTimeBalanced;
-	private Spinner			_spinnerMax_RunDyn_StanceTimeBalanced;
+	private Spinner			_spinnerMin_RunDyn_StanceTimeBalance;
+	private Spinner			_spinnerMax_RunDyn_StanceTimeBalance;
 	private Spinner			_spinnerMin_RunDyn_StepLength;
 	private Spinner			_spinnerMax_RunDyn_StepLength;
 	private Spinner			_spinnerMin_RunDyn_VerticalOscillation;
@@ -215,13 +215,13 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 	private Image			_imageTemperatureDisabled;
 
 	private Image			_imageRunDyn_StanceTime;
-	private Image			_imageRunDyn_StanceTimeBalanced;
+	private Image			_imageRunDyn_StanceTimeBalance;
 	private Image			_imageRunDyn_StepLength;
 	private Image			_imageRunDyn_VerticalOscillation;
 	private Image			_imageRunDyn_VerticalRatio;
 
 	private Image			_imageRunDyn_StanceTime_Disabled;
-	private Image			_imageRunDyn_StanceTimeBalanced_Disabled;
+	private Image			_imageRunDyn_StanceTimeBalance_Disabled;
 	private Image			_imageRunDyn_StepLength_Disabled;
 	private Image			_imageRunDyn_VerticalOscillation_Disabled;
 	private Image			_imageRunDyn_VerticalRatio_Disabled;
@@ -237,7 +237,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 	private CLabel			_iconTemperature;
 
 	private CLabel			_iconRunDyn_StanceTime;
-	private CLabel			_iconRunDyn_StanceTimeBalanced;
+	private CLabel			_iconRunDyn_StanceTimeBalance;
 	private CLabel			_iconRunDyn_StepLength;
 	private CLabel			_iconRunDyn_VerticalOscillation;
 	private CLabel			_iconRunDyn_VerticalRatio;
@@ -372,7 +372,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 			createUI_67_MinMax_Cadence(container);
 
 			createUI_80_MinMax_RunDyn_StanceTime(container);
-			createUI_81_MinMax_RunDyn_StanceTimeBalanced(container);
+			createUI_81_MinMax_RunDyn_StanceTimeBalance(container);
 			createUI_82_MinMax_RunDyn_StepLength(container);
 			createUI_83_MinMax_RunDyn_VerticalOscillation(container);
 			createUI_84_MinMax_RunDyn_VerticalRatio(container);
@@ -584,19 +584,19 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 		_lblMinMax_RunDyn_StanceTime_Unit = createUI_Label(parent, UI.UNIT_MS);
 	}
 
-	private void createUI_81_MinMax_RunDyn_StanceTimeBalanced(final Composite parent) {
+	private void createUI_81_MinMax_RunDyn_StanceTimeBalance(final Composite parent) {
 
-		_iconRunDyn_StanceTimeBalanced = createUI_Icon(parent, _imageRunDyn_StanceTimeBalanced);
+		_iconRunDyn_StanceTimeBalance = createUI_Icon(parent, _imageRunDyn_StanceTimeBalance);
 
-		_lblMinMax_RunDyn_StanceTimeBalanced = createUI_Label(parent, Messages.Pref_Graphs_Checkbox_ForceValue_RunDyn_StanceTimeBalanced);
+		_lblMinMax_RunDyn_StanceTimeBalance = createUI_Label(parent, Messages.Pref_Graphs_Checkbox_ForceValue_RunDyn_StanceTimeBalance);
 
-		_chkMin_RunDyn_StanceTimeBalanced = createUI_Checkbox(parent);
-		_spinnerMin_RunDyn_StanceTimeBalanced = createUI_Spinner(parent, 0, RUN_DYN_STANCE_TIME_BALANCED_MAX);
+		_chkMin_RunDyn_StanceTimeBalance = createUI_Checkbox(parent);
+		_spinnerMin_RunDyn_StanceTimeBalance = createUI_Spinner(parent, 0, RUN_DYN_STANCE_TIME_BALANCED_MAX);
 
-		_chkMax_RunDyn_StanceTimeBalanced = createUI_Checkbox(parent);
-		_spinnerMax_RunDyn_StanceTimeBalanced = createUI_Spinner(parent, 0, RUN_DYN_STANCE_TIME_BALANCED_MAX);
+		_chkMax_RunDyn_StanceTimeBalance = createUI_Checkbox(parent);
+		_spinnerMax_RunDyn_StanceTimeBalance = createUI_Spinner(parent, 0, RUN_DYN_STANCE_TIME_BALANCED_MAX);
 
-		_lblMinMax_RunDyn_StanceTimeBalanced_Unit = createUI_Label(parent, UI.UNIT_PERCENT);
+		_lblMinMax_RunDyn_StanceTimeBalance_Unit = createUI_Label(parent, UI.UNIT_PERCENT);
 	}
 
 	private void createUI_82_MinMax_RunDyn_StepLength(final Composite parent) {
@@ -724,8 +724,8 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
 		_lblMinMax_RunDyn_StanceTime.setEnabled(isMinMaxEnabled);
 		_lblMinMax_RunDyn_StanceTime_Unit.setEnabled(isMinMaxEnabled);
-		_lblMinMax_RunDyn_StanceTimeBalanced.setEnabled(isMinMaxEnabled);
-		_lblMinMax_RunDyn_StanceTimeBalanced_Unit.setEnabled(isMinMaxEnabled);
+		_lblMinMax_RunDyn_StanceTimeBalance.setEnabled(isMinMaxEnabled);
+		_lblMinMax_RunDyn_StanceTimeBalance_Unit.setEnabled(isMinMaxEnabled);
 		_lblMinMax_RunDyn_StepLength.setEnabled(isMinMaxEnabled);
 		_lblMinMax_RunDyn_StepLength_Unit.setEnabled(isMinMaxEnabled);
 		_lblMinMax_RunDyn_VerticalOscillation.setEnabled(isMinMaxEnabled);
@@ -754,8 +754,8 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
 		_chkMin_RunDyn_StanceTime.setEnabled(isMinMaxEnabled);
 		_chkMax_RunDyn_StanceTime.setEnabled(isMinMaxEnabled);
-		_chkMin_RunDyn_StanceTimeBalanced.setEnabled(isMinMaxEnabled);
-		_chkMax_RunDyn_StanceTimeBalanced.setEnabled(isMinMaxEnabled);
+		_chkMin_RunDyn_StanceTimeBalance.setEnabled(isMinMaxEnabled);
+		_chkMax_RunDyn_StanceTimeBalance.setEnabled(isMinMaxEnabled);
 		_chkMin_RunDyn_StepLength.setEnabled(isMinMaxEnabled);
 		_chkMax_RunDyn_StepLength.setEnabled(isMinMaxEnabled);
 		_chkMin_RunDyn_VerticalOscillation.setEnabled(isMinMaxEnabled);
@@ -775,7 +775,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 		_iconSpeed.setImage(						isMinMaxEnabled ? _imageSpeed 		: _imageSpeedDisabled);
 		_iconTemperature.setImage(					isMinMaxEnabled ? _imageTemperature 				: _imageTemperatureDisabled);
 		_iconRunDyn_StanceTime.setImage(			isMinMaxEnabled ? _imageRunDyn_StanceTime 			: _imageRunDyn_StanceTime_Disabled);
-		_iconRunDyn_StanceTimeBalanced.setImage(	isMinMaxEnabled ? _imageRunDyn_StanceTimeBalanced 	: _imageRunDyn_StanceTimeBalanced_Disabled);
+		_iconRunDyn_StanceTimeBalance.setImage(	isMinMaxEnabled ? _imageRunDyn_StanceTimeBalance 	: _imageRunDyn_StanceTimeBalance_Disabled);
 		_iconRunDyn_StepLength.setImage(			isMinMaxEnabled ? _imageRunDyn_StepLength 			: _imageRunDyn_StepLength_Disabled);
 		_iconRunDyn_VerticalOscillation.setImage(	isMinMaxEnabled ? _imageRunDyn_VerticalOscillation 	: _imageRunDyn_VerticalOscillation_Disabled);
 		_iconRunDyn_VerticalRatio.setImage(			isMinMaxEnabled ? _imageRunDyn_VerticalRatio 		: _imageRunDyn_VerticalRatio_Disabled);
@@ -801,8 +801,8 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
 		_spinnerMin_RunDyn_StanceTime.setEnabled(			isMinMaxEnabled && _chkMin_RunDyn_StanceTime.getSelection());
 		_spinnerMax_RunDyn_StanceTime.setEnabled(			isMinMaxEnabled && _chkMax_RunDyn_StanceTime.getSelection());
-		_spinnerMin_RunDyn_StanceTimeBalanced.setEnabled(	isMinMaxEnabled && _chkMin_RunDyn_StanceTimeBalanced.getSelection());
-		_spinnerMax_RunDyn_StanceTimeBalanced.setEnabled(	isMinMaxEnabled && _chkMax_RunDyn_StanceTimeBalanced.getSelection());
+		_spinnerMin_RunDyn_StanceTimeBalance.setEnabled(	isMinMaxEnabled && _chkMin_RunDyn_StanceTimeBalance.getSelection());
+		_spinnerMax_RunDyn_StanceTimeBalance.setEnabled(	isMinMaxEnabled && _chkMax_RunDyn_StanceTimeBalance.getSelection());
 		_spinnerMin_RunDyn_StepLength.setEnabled(			isMinMaxEnabled && _chkMin_RunDyn_StepLength.getSelection());
 		_spinnerMax_RunDyn_StepLength.setEnabled(			isMinMaxEnabled && _chkMax_RunDyn_StepLength.getSelection());
 		_spinnerMin_RunDyn_VerticalOscillation.setEnabled(	isMinMaxEnabled && _chkMin_RunDyn_VerticalOscillation.getSelection());
@@ -840,13 +840,13 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 		_imageTemperatureDisabled 			= TourbookPlugin.getImageDescriptor(Messages.Image__graph_temperature_disabled).createImage();
 		
 		_imageRunDyn_StanceTime						= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_StanceTime).createImage();
-		_imageRunDyn_StanceTimeBalanced				= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_StanceTimeBalanced).createImage();
+		_imageRunDyn_StanceTimeBalance				= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_StanceTimeBalance).createImage();
 		_imageRunDyn_StepLength						= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_StepLength).createImage();
 		_imageRunDyn_VerticalOscillation			= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_VerticalOscillation).createImage();
 		_imageRunDyn_VerticalRatio					= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_VerticalRatio).createImage();
 
 		_imageRunDyn_StanceTime_Disabled			= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_StanceTime_Disabled).createImage();
-		_imageRunDyn_StanceTimeBalanced_Disabled	= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_StanceTimeBalanced_Disabled).createImage();
+		_imageRunDyn_StanceTimeBalance_Disabled	= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_StanceTimeBalance_Disabled).createImage();
 		_imageRunDyn_StepLength_Disabled			= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_StepLength_Disabled).createImage();
 		_imageRunDyn_VerticalOscillation_Disabled	= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_VerticalOscillation_Disabled).createImage();
 		_imageRunDyn_VerticalRatio_Disabled			= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_VerticalRatio_Disabled).createImage();
@@ -887,13 +887,13 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 		Util.disposeResource(_imageTemperatureDisabled);
 
 		Util.disposeResource(_imageRunDyn_StanceTime);
-		Util.disposeResource(_imageRunDyn_StanceTimeBalanced);
+		Util.disposeResource(_imageRunDyn_StanceTimeBalance);
 		Util.disposeResource(_imageRunDyn_StepLength);
 		Util.disposeResource(_imageRunDyn_VerticalOscillation);
 		Util.disposeResource(_imageRunDyn_VerticalRatio);
 
 		Util.disposeResource(_imageRunDyn_StanceTime_Disabled);
-		Util.disposeResource(_imageRunDyn_StanceTimeBalanced_Disabled);
+		Util.disposeResource(_imageRunDyn_StanceTimeBalance_Disabled);
 		Util.disposeResource(_imageRunDyn_StepLength_Disabled);
 		Util.disposeResource(_imageRunDyn_VerticalOscillation_Disabled);
 		Util.disposeResource(_imageRunDyn_VerticalRatio_Disabled);
@@ -1020,10 +1020,10 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 		prefRestoreDefault(_spinnerMin_RunDyn_StanceTime, 	 	 	ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_MIN_VALUE);
 		prefRestoreDefault(_spinnerMax_RunDyn_StanceTime, 	 	 	ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_MAX_VALUE);
 
-		prefRestoreDefault(_chkMin_RunDyn_StanceTimeBalanced, 		ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCED_IS_MIN_ENABLED);
-		prefRestoreDefault(_chkMax_RunDyn_StanceTimeBalanced, 		ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCED_IS_MAX_ENABLED);
-		prefRestoreDefault(_spinnerMin_RunDyn_StanceTimeBalanced, 	ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCED_MIN_VALUE);
-		prefRestoreDefault(_spinnerMax_RunDyn_StanceTimeBalanced, 	ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCED_MAX_VALUE);
+		prefRestoreDefault(_chkMin_RunDyn_StanceTimeBalance, 		ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_IS_MIN_ENABLED);
+		prefRestoreDefault(_chkMax_RunDyn_StanceTimeBalance, 		ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_IS_MAX_ENABLED);
+		prefRestoreDefault(_spinnerMin_RunDyn_StanceTimeBalance, 	ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_MIN_VALUE);
+		prefRestoreDefault(_spinnerMax_RunDyn_StanceTimeBalance, 	ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_MAX_VALUE);
 
 		prefRestoreDefault(_chkMin_RunDyn_StepLength, 				ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MIN_ENABLED);
 		prefRestoreDefault(_chkMax_RunDyn_StepLength, 				ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MAX_ENABLED);
@@ -1115,10 +1115,10 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 		prefRestoreValue(_spinnerMin_RunDyn_StanceTime, 	 	 	ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_MIN_VALUE);
 		prefRestoreValue(_spinnerMax_RunDyn_StanceTime, 	 	 	ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_MAX_VALUE);
 
-		prefRestoreValue(_chkMin_RunDyn_StanceTimeBalanced, 		ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCED_IS_MIN_ENABLED);
-		prefRestoreValue(_chkMax_RunDyn_StanceTimeBalanced, 		ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCED_IS_MAX_ENABLED);
-		prefRestoreValue(_spinnerMin_RunDyn_StanceTimeBalanced, 	ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCED_MIN_VALUE);
-		prefRestoreValue(_spinnerMax_RunDyn_StanceTimeBalanced, 	ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCED_MAX_VALUE);
+		prefRestoreValue(_chkMin_RunDyn_StanceTimeBalance, 		ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_IS_MIN_ENABLED);
+		prefRestoreValue(_chkMax_RunDyn_StanceTimeBalance, 		ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_IS_MAX_ENABLED);
+		prefRestoreValue(_spinnerMin_RunDyn_StanceTimeBalance, 	ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_MIN_VALUE);
+		prefRestoreValue(_spinnerMax_RunDyn_StanceTimeBalance, 	ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_MAX_VALUE);
 
 		prefRestoreValue(_chkMin_RunDyn_StepLength, 				ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MIN_ENABLED);
 		prefRestoreValue(_chkMax_RunDyn_StepLength, 				ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MAX_ENABLED);
@@ -1208,10 +1208,10 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 		prefSaveValue(_spinnerMin_RunDyn_StanceTime, 	 	 	ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_MIN_VALUE);
 		prefSaveValue(_spinnerMax_RunDyn_StanceTime, 	 	 	ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_MAX_VALUE);
 
-		prefSaveValue(_chkMin_RunDyn_StanceTimeBalanced, 		ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCED_IS_MIN_ENABLED);
-		prefSaveValue(_chkMax_RunDyn_StanceTimeBalanced, 		ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCED_IS_MAX_ENABLED);
-		prefSaveValue(_spinnerMin_RunDyn_StanceTimeBalanced, 	ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCED_MIN_VALUE);
-		prefSaveValue(_spinnerMax_RunDyn_StanceTimeBalanced, 	ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCED_MAX_VALUE);
+		prefSaveValue(_chkMin_RunDyn_StanceTimeBalance, 		ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_IS_MIN_ENABLED);
+		prefSaveValue(_chkMax_RunDyn_StanceTimeBalance, 		ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_IS_MAX_ENABLED);
+		prefSaveValue(_spinnerMin_RunDyn_StanceTimeBalance, 	ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_MIN_VALUE);
+		prefSaveValue(_spinnerMax_RunDyn_StanceTimeBalance, 	ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_MAX_VALUE);
 
 		prefSaveValue(_chkMin_RunDyn_StepLength, 				ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MIN_ENABLED);
 		prefSaveValue(_chkMax_RunDyn_StepLength, 				ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MAX_ENABLED);

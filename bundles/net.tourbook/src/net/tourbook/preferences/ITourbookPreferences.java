@@ -207,31 +207,31 @@ public interface ITourbookPreferences {
 	public static final String	GRAPH_TEMPERATURE_MIN_VALUE						= "GRAPH_TEMPERATURE_MIN_VALUE";							//$NON-NLS-1$
 	public static final String	GRAPH_TEMPERATURE_MAX_VALUE						= "GRAPH_TEMPERATURE_MAX_VALUE";							//$NON-NLS-1$
 
-	public static final String	GRAPH_RUN_DYN_STANCE_TIME_IS_MIN_ENABLED			= "GRAPH_RUN_DYN_STANCE_TIME_IS_MIN_ENABLED";
-	public static final String	GRAPH_RUN_DYN_STANCE_TIME_IS_MAX_ENABLED			= "GRAPH_RUN_DYN_STANCE_TIME_IS_MAX_ENABLED";
-	public static final String	GRAPH_RUN_DYN_STANCE_TIME_MIN_VALUE					= "GRAPH_RUN_DYN_STANCE_TIME_MIN_VALUE";
-	public static final String	GRAPH_RUN_DYN_STANCE_TIME_MAX_VALUE					= "GRAPH_RUN_DYN_STANCE_TIME_MAX_VALUE";
+	public static final String	GRAPH_RUN_DYN_STANCE_TIME_IS_MIN_ENABLED			= "GRAPH_RUN_DYN_STANCE_TIME_IS_MIN_ENABLED";			//$NON-NLS-1$
+	public static final String	GRAPH_RUN_DYN_STANCE_TIME_IS_MAX_ENABLED			= "GRAPH_RUN_DYN_STANCE_TIME_IS_MAX_ENABLED";			//$NON-NLS-1$
+	public static final String	GRAPH_RUN_DYN_STANCE_TIME_MIN_VALUE					= "GRAPH_RUN_DYN_STANCE_TIME_MIN_VALUE";				//$NON-NLS-1$
+	public static final String	GRAPH_RUN_DYN_STANCE_TIME_MAX_VALUE					= "GRAPH_RUN_DYN_STANCE_TIME_MAX_VALUE";				//$NON-NLS-1$
 	                            
-	public static final String	GRAPH_RUN_DYN_STANCE_TIME_BALANCED_IS_MIN_ENABLED	= "GRAPH_RUN_DYN_STANCE_TIME_BALANCED_IS_MIN_ENABLED";
-	public static final String	GRAPH_RUN_DYN_STANCE_TIME_BALANCED_IS_MAX_ENABLED	= "GRAPH_RUN_DYN_STANCE_TIME_BALANCED_IS_MAX_ENABLED";
-	public static final String	GRAPH_RUN_DYN_STANCE_TIME_BALANCED_MIN_VALUE		= "GRAPH_RUN_DYN_STANCE_TIME_BALANCED_MIN_VALUE";
-	public static final String	GRAPH_RUN_DYN_STANCE_TIME_BALANCED_MAX_VALUE		= "GRAPH_RUN_DYN_STANCE_TIME_BALANCED_MAX_VALUE";
-	                            
-	public static final String	GRAPH_RUN_DYN_STEP_LENGTH_IS_MIN_ENABLED			= "GRAPH_RUN_DYN_STEP_LENGTH_IS_MIN_ENABLED";
-	public static final String	GRAPH_RUN_DYN_STEP_LENGTH_IS_MAX_ENABLED			= "GRAPH_RUN_DYN_STEP_LENGTH_IS_MAX_ENABLED";
-	public static final String	GRAPH_RUN_DYN_STEP_LENGTH_MIN_VALUE					= "GRAPH_RUN_DYN_STEP_LENGTH_MIN_VALUE";
-	public static final String	GRAPH_RUN_DYN_STEP_LENGTH_MAX_VALUE			        = "GRAPH_RUN_DYN_STEP_LENGTH_MAX_VALUE";
-	                            
-	public static final String	GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MIN_ENABLED	= "GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MIN_ENABLED";
-	public static final String	GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MAX_ENABLED	= "GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MAX_ENABLED";
-	public static final String	GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MIN_VALUE		= "GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MIN_VALUE";
-	public static final String	GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MAX_VALUE		= "GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MAX_VALUE";
-	                            
-	public static final String	GRAPH_RUN_DYN_VERTICAL_RATIO_IS_MIN_ENABLED			= "GRAPH_RUN_DYN_VERTICAL_RATIO_IS_MIN_ENABLED";
-	public static final String	GRAPH_RUN_DYN_VERTICAL_RATIO_IS_MAX_ENABLED			= "GRAPH_RUN_DYN_VERTICAL_RATIO_IS_MAX_ENABLED";
-	public static final String	GRAPH_RUN_DYN_VERTICAL_RATIO_MIN_VALUE				= "GRAPH_RUN_DYN_VERTICAL_RATIO_MIN_VALUE";
-	public static final String	GRAPH_RUN_DYN_VERTICAL_RATIO_MAX_VALUE				= "GRAPH_RUN_DYN_VERTICAL_RATIO_MAX_VALUE";
-	                            
+	public static final String	GRAPH_RUN_DYN_STANCE_TIME_BALANCE_IS_MIN_ENABLED	= "GRAPH_RUN_DYN_STANCE_TIME_BALANCE_IS_MIN_ENABLED";	//$NON-NLS-1$
+	public static final String	GRAPH_RUN_DYN_STANCE_TIME_BALANCE_IS_MAX_ENABLED	= "GRAPH_RUN_DYN_STANCE_TIME_BALANCE_IS_MAX_ENABLED";   //$NON-NLS-1$
+	public static final String	GRAPH_RUN_DYN_STANCE_TIME_BALANCE_MIN_VALUE			= "GRAPH_RUN_DYN_STANCE_TIME_BALANCE_MIN_VALUE";        //$NON-NLS-1$
+	public static final String	GRAPH_RUN_DYN_STANCE_TIME_BALANCE_MAX_VALUE			= "GRAPH_RUN_DYN_STANCE_TIME_BALANCE_MAX_VALUE";        //$NON-NLS-1$
+	                                                                                                                                                     
+	public static final String	GRAPH_RUN_DYN_STEP_LENGTH_IS_MIN_ENABLED			= "GRAPH_RUN_DYN_STEP_LENGTH_IS_MIN_ENABLED";			//$NON-NLS-1$
+	public static final String	GRAPH_RUN_DYN_STEP_LENGTH_IS_MAX_ENABLED			= "GRAPH_RUN_DYN_STEP_LENGTH_IS_MAX_ENABLED";           //$NON-NLS-1$
+	public static final String	GRAPH_RUN_DYN_STEP_LENGTH_MIN_VALUE					= "GRAPH_RUN_DYN_STEP_LENGTH_MIN_VALUE";                //$NON-NLS-1$
+	public static final String	GRAPH_RUN_DYN_STEP_LENGTH_MAX_VALUE			        = "GRAPH_RUN_DYN_STEP_LENGTH_MAX_VALUE";                //$NON-NLS-1$
+	                                                                                                                                                     
+	public static final String	GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MIN_ENABLED	= "GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MIN_ENABLED";	//$NON-NLS-1$
+	public static final String	GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MAX_ENABLED	= "GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MAX_ENABLED";  //$NON-NLS-1$
+	public static final String	GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MIN_VALUE		= "GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MIN_VALUE";       //$NON-NLS-1$
+	public static final String	GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MAX_VALUE		= "GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MAX_VALUE";       //$NON-NLS-1$
+	                                                                                                                                                     
+	public static final String	GRAPH_RUN_DYN_VERTICAL_RATIO_IS_MIN_ENABLED			= "GRAPH_RUN_DYN_VERTICAL_RATIO_IS_MIN_ENABLED";		//$NON-NLS-1$
+	public static final String	GRAPH_RUN_DYN_VERTICAL_RATIO_IS_MAX_ENABLED			= "GRAPH_RUN_DYN_VERTICAL_RATIO_IS_MAX_ENABLED";        //$NON-NLS-1$
+	public static final String	GRAPH_RUN_DYN_VERTICAL_RATIO_MIN_VALUE				= "GRAPH_RUN_DYN_VERTICAL_RATIO_MIN_VALUE";             //$NON-NLS-1$
+	public static final String	GRAPH_RUN_DYN_VERTICAL_RATIO_MAX_VALUE				= "GRAPH_RUN_DYN_VERTICAL_RATIO_MAX_VALUE";             //$NON-NLS-1$
+	                                                                                                                                                     
 	
 	public static final String	GRAPH_SMOOTHING_SMOOTHING_ALGORITHM				= "GraphSmoothing_SmoothingAlgorithm";						//$NON-NLS-1$
 	public static final String	GRAPH_JAMET_SMOOTHING_IS_SYNCH_SMOOTHING		= "GraphJametSmoothing_IsSynchSmoothing";					//$NON-NLS-1$
