@@ -124,11 +124,14 @@ public class UI {
 	public static final String			SYMBOL_ARROW_UP							= "\u2191";													//$NON-NLS-1$
 	public static final String			SYMBOL_ARROW_DOWN						= "\u2193";													//$NON-NLS-1$
 	public static final String			SYMBOL_ARROW_LEFT_RIGHT					= "\u2194";													//$NON-NLS-1$
+	public static final String			SYMBOL_ARROW_UP_DOWN					= "\u2195";													//$NON-NLS-1$
 	public static final String			SYMBOL_AVERAGE							= "\u00f8";													//$NON-NLS-1$
 	public static final String			SYMBOL_AVERAGE_WITH_SPACE				= "\u00f8 ";												//$NON-NLS-1$
 	public static final String			SYMBOL_BOX								= "\u25a0";													//$NON-NLS-1$
 	public static final String			SYMBOL_DASH								= "\u2212";													//$NON-NLS-1$
 	public static final String			SYMBOL_DEGREE							= "\u00B0";													//$NON-NLS-1$
+	public static final String			SYMBOL_DBL_ANGLE_QMARK_LEFT				= "\u00AB";													//$NON-NLS-1$
+	public static final String			SYMBOL_DBL_ANGLE_QMARK_RIGHT			= "\u00BB";													//$NON-NLS-1$
 	public static final String			SYMBOL_DIFFERENCE						= "\u0394";													//$NON-NLS-1$
 	public static final String			SYMBOL_DIFFERENCE_WITH_SPACE			= "\u0394 ";												//$NON-NLS-1$
 	public static final String			SYMBOL_DOUBLE_HORIZONTAL				= "\u2550";													//$NON-NLS-1$
@@ -139,8 +142,8 @@ public class UI {
 	public static final String			SYMBOL_IDENTICAL_TO						= "\u2261";													//$NON-NLS-1$
 	public static final String			SYMBOL_INFINITY_MAX						= "\u221E";													//$NON-NLS-1$
 	public static final String			SYMBOL_INFINITY_MIN						= "-\u221E";												//$NON-NLS-1$
-	public static final String			SYMBOL_DBL_ANGLE_QMARK_LEFT				= "\u00AB";													//$NON-NLS-1$
-	public static final String			SYMBOL_DBL_ANGLE_QMARK_RIGHT			= "\u00BB";													//$NON-NLS-1$
+	public static final String			SYMBOL_MIN								= "\u1D5B";													//$NON-NLS-1$
+	public static final String			SYMBOL_MAX								= "^";														//$NON-NLS-1$
 	public static final String			SYMBOL_PLUS_MINUS						= "\u00B1";													//$NON-NLS-1$
 	public static final String			SYMBOL_SUM_WITH_SPACE					= "\u2211 ";												//$NON-NLS-1$
 	public static final String			SYMBOL_SUN								= "\u263C";													//$NON-NLS-1$
@@ -222,11 +225,16 @@ public class UI {
 	public static final int				DEFAULT_DESCRIPTION_WIDTH				= 350;
 	public static final int				DEFAULT_FIELD_WIDTH						= 40;
 
+	/**
+	 * Is <code>true</code> when the measurement system is metric, otherwise it is imperial.
+	 */
+	public static boolean				UNIT_IS_METRIC;
+
 	/*
 	 * Contains the unit label in the currenty measurement system for the distance values
 	 */
 	public static String				UNIT_LABEL_DISTANCE;
-	public static String				UNIT_LABEL_DISTANCE_SMALL;
+	public static String				UNIT_LABEL_DISTANCE_M_OR_YD;
 	public static String				UNIT_LABEL_DISTANCE_MM_OR_INCH;
 	public static String				UNIT_LABEL_MS;
 	public static String				UNIT_LABEL_ALTITUDE;

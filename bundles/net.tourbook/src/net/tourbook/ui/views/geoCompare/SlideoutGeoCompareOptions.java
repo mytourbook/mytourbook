@@ -322,7 +322,7 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColor
 				{
 					// Label: Distance unit
 					_lblGeo_DistanceInterval_Unit = new Label(container, SWT.NONE);
-					_lblGeo_DistanceInterval_Unit.setText(UI.UNIT_LABEL_DISTANCE_SMALL);
+					_lblGeo_DistanceInterval_Unit.setText(UI.UNIT_LABEL_DISTANCE_M_OR_YD);
 					GridDataFactory
 							.fillDefaults()
 							.grab(true, false)
@@ -655,7 +655,7 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColor
 						? VALUE_FORMAT_1_1
 						: VALUE_FORMAT_1_2;
 
-		final String geoDistance = String.format(valueFormatting, distValue, UI.UNIT_LABEL_DISTANCE_SMALL);
+		final String geoDistance = String.format(valueFormatting, distValue, UI.UNIT_LABEL_DISTANCE_M_OR_YD);
 
 		_lblGeo_GeoAccuracy_Value.setText(geoDistance);
 	}

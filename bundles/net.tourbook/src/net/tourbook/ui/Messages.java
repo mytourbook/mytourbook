@@ -297,6 +297,15 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_RunDyn_StanceTimeBalance_Max_Header;
 	public static String		ColumnFactory_RunDyn_StanceTimeBalance_Min;
 	public static String		ColumnFactory_RunDyn_StanceTimeBalance_Min_Header;
+	public static String		ColumnFactory_RunDyn_StepLength_Avg;
+	public static String		ColumnFactory_RunDyn_StepLength_Max;
+	public static String		ColumnFactory_RunDyn_StepLength_Min;
+	public static String		ColumnFactory_RunDyn_VerticalOscillation_Avg;
+	public static String		ColumnFactory_RunDyn_VerticalOscillation_Max;
+	public static String		ColumnFactory_RunDyn_VerticalOscillation_Min;
+	public static String		ColumnFactory_RunDyn_VerticalRatio_Avg;
+	public static String		ColumnFactory_RunDyn_VerticalRatio_Max;
+	public static String		ColumnFactory_RunDyn_VerticalRatio_Min;
 	public static String		ColumnFactory_Segment_Ascent_Label;
 	public static String		ColumnFactory_Segment_Ascent_Tooltip;
 	public static String		ColumnFactory_Segment_Descent_Label;

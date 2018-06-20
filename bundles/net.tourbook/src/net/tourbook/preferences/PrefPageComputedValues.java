@@ -711,7 +711,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 				// label: unit
 				_lblBreakDistanceUnit = new Label(container, SWT.NONE);
-				_lblBreakDistanceUnit.setText(net.tourbook.common.UI.UNIT_LABEL_DISTANCE_SMALL);
+				_lblBreakDistanceUnit.setText(net.tourbook.common.UI.UNIT_LABEL_DISTANCE_M_OR_YD);
 				GridDataFactory
 						.fillDefaults()//
 //						.span(2, 1)

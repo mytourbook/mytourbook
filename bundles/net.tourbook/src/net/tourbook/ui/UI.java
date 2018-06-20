@@ -1182,12 +1182,14 @@ public class UI {
 
 			// set imperial measure system
 
+			net.tourbook.common.UI.UNIT_IS_METRIC = false;
+
 			UNIT_VALUE_DISTANCE = UNIT_MILE;
 			UNIT_VALUE_DISTANCE_SMALL = UNIT_YARD;
 			UNIT_VALUE_DISTANCE_MM_OR_INCH = UNIT_INCH;
 
 			net.tourbook.common.UI.UNIT_LABEL_DISTANCE = net.tourbook.common.UI.UNIT_DISTANCE_MI;
-			net.tourbook.common.UI.UNIT_LABEL_DISTANCE_SMALL = net.tourbook.common.UI.UNIT_DISTANCE_YARD;
+			net.tourbook.common.UI.UNIT_LABEL_DISTANCE_M_OR_YD = net.tourbook.common.UI.UNIT_DISTANCE_YARD;
 			net.tourbook.common.UI.UNIT_LABEL_DISTANCE_MM_OR_INCH = net.tourbook.common.UI.UNIT_DISTANCE_INCH;
 
 			net.tourbook.common.UI.UNIT_LABEL_SPEED = net.tourbook.common.UI.UNIT_SPEED_MPH;
@@ -1197,12 +1199,14 @@ public class UI {
 
 			// default is the metric measure system
 
+			net.tourbook.common.UI.UNIT_IS_METRIC = true;
+
 			UNIT_VALUE_DISTANCE = 1;
 			UNIT_VALUE_DISTANCE_SMALL = 1;
 			UNIT_VALUE_DISTANCE_MM_OR_INCH = 1;
 
 			net.tourbook.common.UI.UNIT_LABEL_DISTANCE = net.tourbook.common.UI.UNIT_DISTANCE_KM;
-			net.tourbook.common.UI.UNIT_LABEL_DISTANCE_SMALL = net.tourbook.common.UI.UNIT_METER;
+			net.tourbook.common.UI.UNIT_LABEL_DISTANCE_M_OR_YD = net.tourbook.common.UI.UNIT_METER;
 			net.tourbook.common.UI.UNIT_LABEL_DISTANCE_MM_OR_INCH = net.tourbook.common.UI.UNIT_MM;
 
 			net.tourbook.common.UI.UNIT_LABEL_SPEED = net.tourbook.common.UI.UNIT_SPEED_KM_H;

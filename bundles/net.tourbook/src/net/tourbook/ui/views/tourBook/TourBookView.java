@@ -961,6 +961,18 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 		defineColumn_RunDyn_StanceTimeBalance_Max();
 		defineColumn_RunDyn_StanceTimeBalance_Avg();
 
+		defineColumn_RunDyn_StepLength_Min();
+		defineColumn_RunDyn_StepLength_Max();
+		defineColumn_RunDyn_StepLength_Avg();
+
+		defineColumn_RunDyn_VerticalOscillation_Min();
+		defineColumn_RunDyn_VerticalOscillation_Max();
+		defineColumn_RunDyn_VerticalOscillation_Avg();
+
+		defineColumn_RunDyn_VerticalRatio_Min();
+		defineColumn_RunDyn_VerticalRatio_Max();
+		defineColumn_RunDyn_VerticalRatio_Avg();
+
 		// Device
 		defineColumn_Device_Name();
 		defineColumn_Device_Distance();
@@ -1910,6 +1922,216 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 				final Object element = cell.getElement();
 				final double value = ((TVITourBookItem) element).colRunDyn_StanceTimeBalance_Min;
+
+				colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * Column: Running Dynamics: Step length avg
+	 */
+	private void defineColumn_RunDyn_StepLength_Avg() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.RUN_DYN_STEP_LENGTH_AVG.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final double value = ((TVITourBookItem) element).colRunDyn_StepLength_Avg
+						* net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
+
+				if (UI.UNIT_IS_METRIC) {
+					colDef.printValue_0(cell, value);
+				} else {
+					colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * Column: Running Dynamics: Step length max
+	 */
+	private void defineColumn_RunDyn_StepLength_Max() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.RUN_DYN_STEP_LENGTH_MAX.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final double value = ((TVITourBookItem) element).colRunDyn_StepLength_Max
+						* net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
+
+				if (UI.UNIT_IS_METRIC) {
+					colDef.printValue_0(cell, value);
+				} else {
+					colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * Column: Running Dynamics: Step length min
+	 */
+	private void defineColumn_RunDyn_StepLength_Min() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.RUN_DYN_STEP_LENGTH_MIN.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final double value = ((TVITourBookItem) element).colRunDyn_StepLength_Min
+						* net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
+
+				if (UI.UNIT_IS_METRIC) {
+					colDef.printValue_0(cell, value);
+				} else {
+					colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * Column: Running Dynamics: Vertical oscillation avg
+	 */
+	private void defineColumn_RunDyn_VerticalOscillation_Avg() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.RUN_DYN_VERTICAL_OSCILLATION_AVG.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final double value = ((TVITourBookItem) element).colRunDyn_VerticalOscillation_Avg
+						* net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
+
+				if (UI.UNIT_IS_METRIC) {
+					colDef.printValue_0(cell, value);
+				} else {
+					colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * Column: Running Dynamics: Vertical oscillation max
+	 */
+	private void defineColumn_RunDyn_VerticalOscillation_Max() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.RUN_DYN_VERTICAL_OSCILLATION_MAX.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final double value = ((TVITourBookItem) element).colRunDyn_VerticalOscillation_Max
+						* net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
+
+				if (UI.UNIT_IS_METRIC) {
+					colDef.printValue_0(cell, value);
+				} else {
+					colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * Column: Running Dynamics: Vertical oscillation min
+	 */
+	private void defineColumn_RunDyn_VerticalOscillation_Min() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.RUN_DYN_VERTICAL_OSCILLATION_MIN.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final double value = ((TVITourBookItem) element).colRunDyn_VerticalOscillation_Min
+						* net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
+
+				if (UI.UNIT_IS_METRIC) {
+					colDef.printValue_0(cell, value);
+				} else {
+					colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * Column: Running Dynamics: Vertical ratio avg
+	 */
+	private void defineColumn_RunDyn_VerticalRatio_Avg() {
+		
+		final TreeColumnDefinition colDef = TreeColumnFactory.RUN_DYN_VERTICAL_RATIO_AVG.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				
+				final Object element = cell.getElement();
+				final double value = ((TVITourBookItem) element).colRunDyn_VerticalRatio_Avg;
+				
+				colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
+				
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * Column: Running Dynamics: Vertical ratio max
+	 */
+	private void defineColumn_RunDyn_VerticalRatio_Max() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.RUN_DYN_VERTICAL_RATIO_MAX.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final double value = ((TVITourBookItem) element).colRunDyn_VerticalRatio_Max;
+
+				colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * Column: Running Dynamics: Vertical ratio min
+	 */
+	private void defineColumn_RunDyn_VerticalRatio_Min() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.RUN_DYN_VERTICAL_RATIO_MIN.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final double value = ((TVITourBookItem) element).colRunDyn_VerticalRatio_Min;
 
 				colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 

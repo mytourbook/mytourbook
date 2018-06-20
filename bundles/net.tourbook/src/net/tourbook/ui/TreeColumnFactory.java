@@ -84,9 +84,15 @@ public abstract class TreeColumnFactory {
 	public static final TreeColumnFactory	RUN_DYN_STANCE_TIME_BALANCE_MIN;
 	public static final TreeColumnFactory	RUN_DYN_STANCE_TIME_BALANCE_MAX;
 	public static final TreeColumnFactory	RUN_DYN_STANCE_TIME_BALANCE_AVG;
-//	public static final TreeColumnFactory	RUN_DYN_STEP_LENGTH;
-//	public static final TreeColumnFactory	RUN_DYN_VERTICAL_OSCILLATION;
-//	public static final TreeColumnFactory	RUN_DYN_VERTICAL_RATIO;
+	public static final TreeColumnFactory	RUN_DYN_STEP_LENGTH_MIN;
+	public static final TreeColumnFactory	RUN_DYN_STEP_LENGTH_MAX;
+	public static final TreeColumnFactory	RUN_DYN_STEP_LENGTH_AVG;
+	public static final TreeColumnFactory	RUN_DYN_VERTICAL_OSCILLATION_MIN;
+	public static final TreeColumnFactory	RUN_DYN_VERTICAL_OSCILLATION_MAX;
+	public static final TreeColumnFactory	RUN_DYN_VERTICAL_OSCILLATION_AVG;
+	public static final TreeColumnFactory	RUN_DYN_VERTICAL_RATIO_MIN;
+	public static final TreeColumnFactory	RUN_DYN_VERTICAL_RATIO_MAX;
+	public static final TreeColumnFactory	RUN_DYN_VERTICAL_RATIO_AVG;
 
 	public static final TreeColumnFactory	TIME_DATE;
 	public static final TreeColumnFactory	TIME_DRIVING_TIME;
@@ -940,9 +946,10 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnCategory(Messages.ColumnFactory_Category_RunDyn);
 
 				colDef.setColumnLabel(Messages.ColumnFactory_RunDyn_StanceTime_Min);
-				colDef.setColumnHeaderText(Messages.ColumnFactory_RunDyn_StanceTime_Min_Header);
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_RunDyn_StanceTime_Min);
-				colDef.setColumnUnit(Messages.ColumnFactory_RunDyn_StanceTime_Min_Header);
+				colDef.setColumnHeaderText(Messages.ColumnFactory_RunDyn_StanceTime_Min_Header);
+
+				colDef.setColumnUnit(UI.UNIT_MS);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
@@ -962,9 +969,10 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnCategory(Messages.ColumnFactory_Category_RunDyn);
 
 				colDef.setColumnLabel(Messages.ColumnFactory_RunDyn_StanceTime_Max);
-				colDef.setColumnHeaderText(Messages.ColumnFactory_RunDyn_StanceTime_Max_Header);
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_RunDyn_StanceTime_Max);
-				colDef.setColumnUnit(Messages.ColumnFactory_RunDyn_StanceTime_Max_Header);
+				colDef.setColumnHeaderText(Messages.ColumnFactory_RunDyn_StanceTime_Max_Header);
+
+				colDef.setColumnUnit(UI.UNIT_MS);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
@@ -984,9 +992,10 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnCategory(Messages.ColumnFactory_Category_RunDyn);
 
 				colDef.setColumnLabel(Messages.ColumnFactory_RunDyn_StanceTime_Avg);
-				colDef.setColumnHeaderText(Messages.ColumnFactory_RunDyn_StanceTime_Avg_Header);
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_RunDyn_StanceTime_Avg);
-				colDef.setColumnUnit(UI.SYMBOL_AVERAGE_WITH_SPACE + UI.UNIT_MS);
+				colDef.setColumnHeaderText(Messages.ColumnFactory_RunDyn_StanceTime_Avg_Header);
+
+				colDef.setColumnUnit(UI.UNIT_MS);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
@@ -1006,14 +1015,15 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnCategory(Messages.ColumnFactory_Category_RunDyn);
 
 				colDef.setColumnLabel(Messages.ColumnFactory_RunDyn_StanceTimeBalance_Min);
-				colDef.setColumnHeaderText(Messages.ColumnFactory_RunDyn_StanceTimeBalance_Min_Header);
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_RunDyn_StanceTimeBalance_Min);
-				colDef.setColumnUnit(Messages.ColumnFactory_RunDyn_StanceTimeBalance_Min_Header);
+				colDef.setColumnHeaderText(Messages.ColumnFactory_RunDyn_StanceTimeBalance_Min_Header);
+
+				colDef.setColumnUnit(UI.SYMBOL_PERCENTAGE);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 				colDef.setValueFormats(
 						ValueFormatSet.Number,
-						ValueFormat.NUMBER_1_1,
+						null,
 						ValueFormat.NUMBER_1_1,
 						columnManager);
 
@@ -1033,14 +1043,15 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnCategory(Messages.ColumnFactory_Category_RunDyn);
 
 				colDef.setColumnLabel(Messages.ColumnFactory_RunDyn_StanceTimeBalance_Max);
-				colDef.setColumnHeaderText(Messages.ColumnFactory_RunDyn_StanceTimeBalance_Max_Header);
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_RunDyn_StanceTimeBalance_Max);
-				colDef.setColumnUnit(Messages.ColumnFactory_RunDyn_StanceTimeBalance_Max_Header);
+				colDef.setColumnHeaderText(Messages.ColumnFactory_RunDyn_StanceTimeBalance_Max_Header);
+
+				colDef.setColumnUnit(UI.SYMBOL_PERCENTAGE);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 				colDef.setValueFormats(
 						ValueFormatSet.Number,
-						ValueFormat.NUMBER_1_1,
+						null,
 						ValueFormat.NUMBER_1_1,
 						columnManager);
 
@@ -1060,14 +1071,366 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnCategory(Messages.ColumnFactory_Category_RunDyn);
 
 				colDef.setColumnLabel(Messages.ColumnFactory_RunDyn_StanceTimeBalance_Avg);
-				colDef.setColumnHeaderText(Messages.ColumnFactory_RunDyn_StanceTimeBalance_Avg_Header);
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_RunDyn_StanceTimeBalance_Avg);
-				colDef.setColumnUnit(Messages.ColumnFactory_RunDyn_StanceTimeBalance_Avg_Header);
+				colDef.setColumnHeaderText(Messages.ColumnFactory_RunDyn_StanceTimeBalance_Avg_Header);
+
+				colDef.setColumnUnit(UI.SYMBOL_PERCENTAGE);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 				colDef.setValueFormats(
 						ValueFormatSet.Number,
+						null,
 						ValueFormat.NUMBER_1_1,
+						columnManager);
+
+				return colDef;
+			};
+		};
+
+		RUN_DYN_STEP_LENGTH_MIN = new TreeColumnFactory() {
+			@Override
+			public TreeColumnDefinition createColumn(	final ColumnManager columnManager,
+														final PixelConverter pixelConverter) {
+
+				final String headerLabel = UI.EMPTY_STRING
+						+ UI.SYMBOL_MIN
+						+ UI.SPACE
+						+ UI.SYMBOL_ARROW_LEFT_RIGHT
+						+ UI.SPACE
+						+ UI.UNIT_LABEL_DISTANCE_MM_OR_INCH;
+
+				final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager,
+						"RUN_DYN_STEP_LENGTH_MIN", //$NON-NLS-1$
+						SWT.TRAIL);
+
+				colDef.setColumnCategory(Messages.ColumnFactory_Category_RunDyn);
+
+				colDef.setColumnLabel(Messages.ColumnFactory_RunDyn_StepLength_Min);
+				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_RunDyn_StepLength_Min);
+				colDef.setColumnHeaderText(headerLabel);
+
+				colDef.setColumnUnit(UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
+
+				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(11));
+
+				if (UI.UNIT_IS_METRIC == false) {
+
+					// imperial has 1 more digit
+
+					colDef.setValueFormats(
+							ValueFormatSet.Number,
+							null,
+							ValueFormat.NUMBER_1_1,
+							columnManager);
+				}
+
+				return colDef;
+			};
+		};
+
+		RUN_DYN_STEP_LENGTH_MAX = new TreeColumnFactory() {
+			@Override
+			public TreeColumnDefinition createColumn(	final ColumnManager columnManager,
+														final PixelConverter pixelConverter) {
+
+				final String headerLabel = UI.EMPTY_STRING
+						+ UI.SYMBOL_MAX
+						+ UI.SPACE
+						+ UI.SYMBOL_ARROW_LEFT_RIGHT
+						+ UI.SPACE
+						+ UI.UNIT_LABEL_DISTANCE_MM_OR_INCH;
+
+				final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager,
+						"RUN_DYN_STEP_LENGTH_MAX", //$NON-NLS-1$
+						SWT.TRAIL);
+
+				colDef.setColumnCategory(Messages.ColumnFactory_Category_RunDyn);
+
+				colDef.setColumnLabel(Messages.ColumnFactory_RunDyn_StepLength_Max);
+				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_RunDyn_StepLength_Max);
+				colDef.setColumnHeaderText(headerLabel);
+
+				colDef.setColumnUnit(UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
+
+				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(11));
+
+				if (UI.UNIT_IS_METRIC == false) {
+
+					// imperial has 1 more digit
+
+					colDef.setValueFormats(
+							ValueFormatSet.Number,
+							null,
+							ValueFormat.NUMBER_1_1,
+							columnManager);
+				}
+
+				return colDef;
+			};
+		};
+
+		RUN_DYN_STEP_LENGTH_AVG = new TreeColumnFactory() {
+			@Override
+			public TreeColumnDefinition createColumn(	final ColumnManager columnManager,
+														final PixelConverter pixelConverter) {
+
+				final String headerLabel = UI.EMPTY_STRING
+						+ UI.SYMBOL_AVERAGE
+						+ UI.SPACE
+						+ UI.SYMBOL_ARROW_LEFT_RIGHT
+						+ UI.SPACE
+						+ UI.UNIT_LABEL_DISTANCE_MM_OR_INCH;
+
+				final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager,
+						"RUN_DYN_STEP_LENGTH_AVG", //$NON-NLS-1$
+						SWT.TRAIL);
+
+				colDef.setColumnCategory(Messages.ColumnFactory_Category_RunDyn);
+
+				colDef.setColumnLabel(Messages.ColumnFactory_RunDyn_StepLength_Avg);
+				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_RunDyn_StepLength_Avg);
+				colDef.setColumnHeaderText(headerLabel);
+
+				colDef.setColumnUnit(UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
+
+				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(11));
+
+				if (UI.UNIT_IS_METRIC == false) {
+
+					// imperial has 1 more digit
+
+					colDef.setValueFormats(
+							ValueFormatSet.Number,
+							null,
+							ValueFormat.NUMBER_1_1,
+							columnManager);
+				}
+
+				return colDef;
+			};
+		};
+
+		RUN_DYN_VERTICAL_OSCILLATION_MIN = new TreeColumnFactory() {
+			@Override
+			public TreeColumnDefinition createColumn(	final ColumnManager columnManager,
+														final PixelConverter pixelConverter) {
+
+				final String headerLabel = UI.EMPTY_STRING
+						+ UI.SYMBOL_MIN
+						+ UI.SPACE
+						+ UI.SYMBOL_ARROW_UP_DOWN
+						+ UI.SPACE
+						+ UI.UNIT_LABEL_DISTANCE_MM_OR_INCH;
+
+				final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager,
+						"RUN_DYN_VERTICAL_OSCILLATION_MIN", //$NON-NLS-1$
+						SWT.TRAIL);
+
+				colDef.setColumnCategory(Messages.ColumnFactory_Category_RunDyn);
+
+				colDef.setColumnLabel(Messages.ColumnFactory_RunDyn_VerticalOscillation_Min);
+				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_RunDyn_VerticalOscillation_Min);
+				colDef.setColumnHeaderText(headerLabel);
+
+				colDef.setColumnUnit(UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
+
+				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(11));
+
+				if (UI.UNIT_IS_METRIC == false) {
+
+					// imperial has 1 more digit
+
+					colDef.setValueFormats(
+							ValueFormatSet.Number,
+							null,
+							ValueFormat.NUMBER_1_1,
+							columnManager);
+				}
+
+				return colDef;
+			};
+		};
+
+		RUN_DYN_VERTICAL_OSCILLATION_MAX = new TreeColumnFactory() {
+			@Override
+			public TreeColumnDefinition createColumn(	final ColumnManager columnManager,
+														final PixelConverter pixelConverter) {
+
+				final String headerLabel = UI.EMPTY_STRING
+						+ UI.SYMBOL_MAX
+						+ UI.SPACE
+						+ UI.SYMBOL_ARROW_UP_DOWN
+						+ UI.SPACE
+						+ UI.UNIT_LABEL_DISTANCE_MM_OR_INCH;
+
+				final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager,
+						"RUN_DYN_VERTICAL_OSCILLATION_MAX", //$NON-NLS-1$
+						SWT.TRAIL);
+
+				colDef.setColumnCategory(Messages.ColumnFactory_Category_RunDyn);
+
+				colDef.setColumnLabel(Messages.ColumnFactory_RunDyn_VerticalOscillation_Max);
+				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_RunDyn_VerticalOscillation_Max);
+				colDef.setColumnHeaderText(headerLabel);
+
+				colDef.setColumnUnit(UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
+
+				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(11));
+
+				if (UI.UNIT_IS_METRIC == false) {
+
+					// imperial has 1 more digit
+
+					colDef.setValueFormats(
+							ValueFormatSet.Number,
+							null,
+							ValueFormat.NUMBER_1_1,
+							columnManager);
+				}
+
+				return colDef;
+			};
+		};
+
+		RUN_DYN_VERTICAL_OSCILLATION_AVG = new TreeColumnFactory() {
+			@Override
+			public TreeColumnDefinition createColumn(	final ColumnManager columnManager,
+														final PixelConverter pixelConverter) {
+
+				final String headerLabel = UI.EMPTY_STRING
+						+ UI.SYMBOL_AVERAGE
+						+ UI.SPACE
+						+ UI.SYMBOL_ARROW_UP_DOWN
+						+ UI.SPACE
+						+ UI.UNIT_LABEL_DISTANCE_MM_OR_INCH;
+
+				final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager,
+						"RUN_DYN_VERTICAL_OSCILLATION_AVG", //$NON-NLS-1$
+						SWT.TRAIL);
+
+				colDef.setColumnCategory(Messages.ColumnFactory_Category_RunDyn);
+
+				colDef.setColumnLabel(Messages.ColumnFactory_RunDyn_VerticalOscillation_Avg);
+				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_RunDyn_VerticalOscillation_Avg);
+				colDef.setColumnHeaderText(headerLabel);
+
+				colDef.setColumnUnit(UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
+
+				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(11));
+
+				if (UI.UNIT_IS_METRIC == false) {
+
+					// imperial has 1 more digit
+
+					colDef.setValueFormats(
+							ValueFormatSet.Number,
+							null,
+							ValueFormat.NUMBER_1_1,
+							columnManager);
+				}
+
+				return colDef;
+			};
+		};
+
+		RUN_DYN_VERTICAL_RATIO_MIN = new TreeColumnFactory() {
+			@Override
+			public TreeColumnDefinition createColumn(	final ColumnManager columnManager,
+														final PixelConverter pixelConverter) {
+
+				final String headerLabel = UI.EMPTY_STRING
+						+ UI.SYMBOL_MIN
+						+ UI.SPACE
+						+ UI.SYMBOL_ARROW_UP_DOWN
+						+ UI.SPACE
+						+ UI.SYMBOL_PERCENTAGE;
+
+				final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager,
+						"RUN_DYN_VERTICAL_RATIO_MIN", //$NON-NLS-1$
+						SWT.TRAIL);
+
+				colDef.setColumnCategory(Messages.ColumnFactory_Category_RunDyn);
+
+				colDef.setColumnLabel(Messages.ColumnFactory_RunDyn_VerticalRatio_Min);
+				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_RunDyn_VerticalRatio_Min);
+				colDef.setColumnHeaderText(headerLabel);
+
+				colDef.setColumnUnit(UI.SYMBOL_PERCENTAGE);
+
+				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+				colDef.setValueFormats(
+						ValueFormatSet.Number,
+						null,
+						ValueFormat.NUMBER_1_1,
+						columnManager);
+
+				return colDef;
+			};
+		};
+
+		RUN_DYN_VERTICAL_RATIO_MAX = new TreeColumnFactory() {
+			@Override
+			public TreeColumnDefinition createColumn(	final ColumnManager columnManager,
+														final PixelConverter pixelConverter) {
+
+				final String headerLabel = UI.EMPTY_STRING
+						+ UI.SYMBOL_MAX
+						+ UI.SPACE
+						+ UI.SYMBOL_ARROW_UP_DOWN
+						+ UI.SPACE
+						+ UI.SYMBOL_PERCENTAGE;
+
+				final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager,
+						"RUN_DYN_VERTICAL_RATIO_MAX", //$NON-NLS-1$
+						SWT.TRAIL);
+
+				colDef.setColumnCategory(Messages.ColumnFactory_Category_RunDyn);
+
+				colDef.setColumnLabel(Messages.ColumnFactory_RunDyn_VerticalRatio_Max);
+				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_RunDyn_VerticalRatio_Max);
+				colDef.setColumnHeaderText(headerLabel);
+
+				colDef.setColumnUnit(UI.SYMBOL_PERCENTAGE);
+
+				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+				colDef.setValueFormats(
+						ValueFormatSet.Number,
+						null,
+						ValueFormat.NUMBER_1_1,
+						columnManager);
+
+				return colDef;
+			};
+		};
+
+		RUN_DYN_VERTICAL_RATIO_AVG = new TreeColumnFactory() {
+			@Override
+			public TreeColumnDefinition createColumn(	final ColumnManager columnManager,
+														final PixelConverter pixelConverter) {
+
+				final String headerLabel = UI.EMPTY_STRING
+						+ UI.SYMBOL_AVERAGE
+						+ UI.SPACE
+						+ UI.SYMBOL_ARROW_UP_DOWN
+						+ UI.SPACE
+						+ UI.SYMBOL_PERCENTAGE;
+
+				final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager,
+						"RUN_DYN_VERTICAL_RATIO_AVG", //$NON-NLS-1$
+						SWT.TRAIL);
+
+				colDef.setColumnCategory(Messages.ColumnFactory_Category_RunDyn);
+
+				colDef.setColumnLabel(Messages.ColumnFactory_RunDyn_VerticalRatio_Avg);
+				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_RunDyn_VerticalRatio_Avg);
+				colDef.setColumnHeaderText(headerLabel);
+
+				colDef.setColumnUnit(UI.SYMBOL_PERCENTAGE);
+
+				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+				colDef.setValueFormats(
+						ValueFormatSet.Number,
+						null,
 						ValueFormat.NUMBER_1_1,
 						columnManager);
 
