@@ -425,7 +425,7 @@ public class GraphColorManager {
 				null));
 
 		allColorDef.add(new ColorDefinition(PREF_GRAPH_RUN_DYN_STANCE_TIME,
-				Messages.Graph_Label_RunDyn_StanceTime,
+				Messages.Graph_Pref_Color_RunDyn_StanceTime,
 				new RGB(0xff, 0xff, 0xff),
 				new RGB(0x0, 0x8b, 0xe9),
 				new RGB(0x0, 0x65, 0xa8),
@@ -433,7 +433,7 @@ public class GraphColorManager {
 				null));
 
 		allColorDef.add(new ColorDefinition(PREF_GRAPH_RUN_DYN_STANCE_TIME_BALANCED,
-				Messages.Graph_Label_RunDyn_StanceTimeBalance,
+				Messages.Graph_Pref_Color_RunDyn_StanceTimeBalance,
 				new RGB(0xff, 0xff, 0xff),
 				new RGB(0x86, 0x57, 0xe7),
 				new RGB(0x4a, 0x1a, 0xb0),
@@ -441,7 +441,7 @@ public class GraphColorManager {
 				null));
 
 		allColorDef.add(new ColorDefinition(PREF_GRAPH_RUN_DYN_STEP_LENGTH,
-				Messages.Graph_Label_RunDyn_StepLength,
+				Messages.Graph_Pref_Color_RunDyn_StepLength,
 				new RGB(0xff, 0xff, 0xff),
 				new RGB(0xff, 0x4d, 0x0),
 				new RGB(0xe6, 0x45, 0x0),
@@ -449,7 +449,7 @@ public class GraphColorManager {
 				null));
 
 		allColorDef.add(new ColorDefinition(PREF_GRAPH_RUN_DYN_VERTICAL_OSCILLATION,
-				Messages.Graph_Label_RunDyn_VerticalOscillation,
+				Messages.Graph_Pref_Color_RunDyn_VerticalOscillation,
 				new RGB(0xff, 0xff, 0xff),
 				new RGB(0xa3, 0xd4, 0xe),
 				new RGB(0x74, 0x8e, 0x22),
@@ -457,7 +457,7 @@ public class GraphColorManager {
 				null));
 
 		allColorDef.add(new ColorDefinition(PREF_GRAPH_RUN_DYN_VERTICAL_RATIO,
-				Messages.Graph_Label_RunDyn_VerticalRatio,
+				Messages.Graph_Pref_Color_RunDyn_VerticalRatio,
 				new RGB(0xff, 0xff, 0xff),
 				new RGB(0xff, 0xce, 0x17),
 				new RGB(0xc6, 0x9e, 0x0),

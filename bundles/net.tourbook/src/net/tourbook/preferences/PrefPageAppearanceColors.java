@@ -281,7 +281,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 		final Composite layoutContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
 				.grab(true, true)
-				.hint(200, 100)
+				.hint(400, 100)
 				.applyTo(layoutContainer);
 
 		final TreeColumnLayout treeLayout = new TreeColumnLayout();
