@@ -1,15 +1,10 @@
-Version 18.7.0                                             ?. June  2018
+Version 18.7.0                                             ?. July 2018
 
 New
 ===
 
 * Running Dynamics
 
-
-Improvements
-============	
-
-* 
 
 
 Bugfix
