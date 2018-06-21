@@ -595,8 +595,8 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 			_isColorChanged = true;
 
 			// log changes that it is easier to adjust the defaults, this case will propaly happen not very often
-			System.out.println((net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ()")
-					+ ("\t: " + colorDefinition));
+			System.out.println((net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ()") //$NON-NLS-1$ //$NON-NLS-2$
+					+ ("\t: " + colorDefinition)); //$NON-NLS-1$
 		}
 	}
 
