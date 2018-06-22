@@ -1018,6 +1018,7 @@ public class Messages extends NLS {
 	public static String		Import_Data_Action_Reimport_OnlyGearValues;
 	public static String		Import_Data_Action_Reimport_OnlyPowerAndPulseValues;
 	public static String		Import_Data_Action_Reimport_OnlyPowerAndSpeedValues;
+	public static String		Import_Data_Action_Reimport_OnlyRunningDynamicsValues;
 	public static String		Import_Data_Action_Reimport_OnlyTemperatureValues;
 	public static String		Import_Data_Action_Reimport_OnlyTimeSlices;
 	public static String		Import_Data_Action_Reimport_OnlyTourMarker;
@@ -1029,6 +1030,7 @@ public class Messages extends NLS {
 	public static String		Import_Data_Default_FirstEasyImportLauncher_Name;
 	public static String		Import_Data_Default_ImportConfig_Name;
 	public static String		Import_Data_Dialog_ConfirmReimport_Message;
+	public static String		Import_Data_Dialog_ConfirmReimport_RunningDynamicsValues_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportAltitudeValues_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportCadenceValues_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportGearValues_Message;
@@ -1153,6 +1155,7 @@ public class Messages extends NLS {
 	public static String		Log_Reimport_Only_Gear;
 	public static String		Log_Reimport_Only_PowerPulse;
 	public static String		Log_Reimport_Only_PowerSpeed;
+	public static String		Log_Reimport_Only_RunningDynamics;
 	public static String		Log_Reimport_Only_Temperature;
 	public static String		Log_Reimport_Only_TourMarker;
 	public static String		Log_Reimport_PreviousFiles;

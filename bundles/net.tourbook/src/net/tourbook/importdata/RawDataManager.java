@@ -97,6 +97,7 @@ public class RawDataManager {
 	private static final String			LOG_REIMPORT_ONLY_MARKER			= Messages.Log_Reimport_Only_TourMarker;
 	private static final String			LOG_REIMPORT_ONLY_POWER_SPEED		= Messages.Log_Reimport_Only_PowerSpeed;
 	private static final String			LOG_REIMPORT_ONLY_POWER_PULSE		= Messages.Log_Reimport_Only_PowerPulse;
+	private static final String			LOG_REIMPORT_ONLY_RUNNING_DYNAMICS	= Messages.Log_Reimport_Only_RunningDynamics;
 	private static final String			LOG_REIMPORT_ONLY_TEMPERATURE		= Messages.Log_Reimport_Only_Temperature;
 	private static final String			LOG_REIMPORT_TOUR					= Messages.Log_Reimport_Tour;
 	//
@@ -200,8 +201,9 @@ public class RawDataManager {
 		OnlyGearValues, //
 		OnlyPowerAndSpeedValues, //
 		OnlyPowerAndPulseValues, //
-		OnlyTourMarker, //
+		OnlyRunningDynamics, //
 		OnlyTemperatureValues, //
+		OnlyTourMarker, //
 	}
 
 	private RawDataManager() {}
@@ -540,6 +542,21 @@ public class RawDataManager {
 				TourLogManager.addLog(
 						TourLogState.DEFAULT, //
 						LOG_REIMPORT_ONLY_POWER_SPEED,
+						TourLogView.CSS_LOG_TITLE);
+
+				return true;
+			}
+			break;
+
+		case OnlyRunningDynamics:
+
+			if (actionReimportTour_12_ConfirmDialog(
+					ITourbookPreferences.TOGGLE_STATE_REIMPORT_RUNNING_DYNAMICS_VALUES,
+					Messages.Import_Data_Dialog_ConfirmReimport_RunningDynamicsValues_Message)) {
+
+				TourLogManager.addLog(
+						TourLogState.DEFAULT, //
+						LOG_REIMPORT_ONLY_RUNNING_DYNAMICS,
 						TourLogView.CSS_LOG_TITLE);
 
 				return true;
@@ -903,6 +920,7 @@ public class RawDataManager {
 					|| reimportId == ReImport.OnlyGearValues
 					|| reimportId == ReImport.OnlyPowerAndPulseValues
 					|| reimportId == ReImport.OnlyPowerAndSpeedValues
+					|| reimportId == ReImport.OnlyRunningDynamics
 					|| reimportId == ReImport.OnlyTemperatureValues) {
 
 				// replace part of the tour
@@ -1000,7 +1018,8 @@ public class RawDataManager {
 					oldTourData.setPowerSerie(powerSerie);
 				}
 
-				//SET_FORMATTING_OFF
+//SET_FORMATTING_OFF
+				
 				oldTourData.setPower_Avg(							reimportedTourData.getPower_Avg());
 				oldTourData.setPower_Max(							reimportedTourData.getPower_Max());
 				oldTourData.setPower_Normalized(					reimportedTourData.getPower_Normalized());
@@ -1015,7 +1034,8 @@ public class RawDataManager {
 				oldTourData.setPower_AvgLeftTorqueEffectiveness(	reimportedTourData.getPower_AvgLeftTorqueEffectiveness());
 				oldTourData.setPower_AvgRightPedalSmoothness(		reimportedTourData.getPower_AvgRightPedalSmoothness());
 				oldTourData.setPower_AvgRightTorqueEffectiveness(	reimportedTourData.getPower_AvgRightTorqueEffectiveness());
-				//SET_FORMATTING_ON
+				
+//SET_FORMATTING_ON
 			}
 		}
 
@@ -1040,6 +1060,18 @@ public class RawDataManager {
 					oldTourData.setSpeedSerie(speedSerie);
 				}
 			}
+		}
+
+		// RUNNING DYNAMICS
+		if (reimportId == ReImport.AllTimeSlices || reimportId == ReImport.OnlyRunningDynamics) {
+
+			// reimport only running dynamics
+
+			oldTourData.runDyn_StanceTime = reimportedTourData.runDyn_StanceTime;
+			oldTourData.runDyn_StanceTimeBalance = reimportedTourData.runDyn_StanceTimeBalance;
+			oldTourData.runDyn_StepLength = reimportedTourData.runDyn_StepLength;
+			oldTourData.runDyn_VerticalOscillation = reimportedTourData.runDyn_VerticalOscillation;
+			oldTourData.runDyn_VerticalRatio = reimportedTourData.runDyn_VerticalRatio;
 		}
 
 		// TEMPERATURE
