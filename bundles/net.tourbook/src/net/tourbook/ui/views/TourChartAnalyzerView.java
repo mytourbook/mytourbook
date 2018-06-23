@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -115,10 +115,11 @@ public class TourChartAnalyzerView extends ViewPart {
 
 	private PixelConverter				_pc;
 
-//	private int							_debugCounter;
-
 	private int							_valueIndexRightLast;
 	private int							_valueIndexLeftLast;
+
+	private long						_lastUpdateUITime;
+	private int[]						_updateCounter		= new int[] { 0 };
 
 	/*
 	 * UI controls
@@ -314,13 +315,13 @@ public class TourChartAnalyzerView extends ViewPart {
 		// get layout format (number of columns)
 		final int clientWidth = _partContainer.getClientArea().width;
 		final int layoutFormat = clientWidth < _pc.convertHorizontalDLUsToPixels(100)
-		//
+				//
 				? LAYOUT_1_COLUMNS
 				: clientWidth < _pc.convertHorizontalDLUsToPixels(150)
-				//
+						//
 						? LAYOUT_2_COLUMNS
 						: clientWidth < _pc.convertHorizontalDLUsToPixels(300)
-						//
+								//
 								? LAYOUT_3_COLUMNS
 								: LAYOUT_6_COLUMNS;
 
@@ -864,61 +865,43 @@ public class TourChartAnalyzerView extends ViewPart {
 
 	private void updateInfo(final SelectionChartInfo chartInfo, final boolean isForceRecreate) {
 
-//		final long startTime = System.currentTimeMillis();
+		if (chartInfo == null || _pageBook.isDisposed()) {
 
-		if (chartInfo == null) {
 			clearView();
+
 			return;
 		}
 
-		if (_pageBook.isDisposed()) {
-			clearView();
-			return;
+		// get time when the redraw is requested
+		final long requestedRedrawTime = System.currentTimeMillis();
+
+		if (requestedRedrawTime > _lastUpdateUITime + 100) {
+
+			// force a redraw
+
+			updateUI_Runnable(chartInfo, isForceRecreate);
+
+		} else {
+
+			_updateCounter[0]++;
+
+			_partContainer.getDisplay().asyncExec(new Runnable() {
+
+				final int __runnableCounter = _updateCounter[0];
+
+				@Override
+				public void run() {
+
+					// update UI delayed
+					if (__runnableCounter != _updateCounter[0]) {
+						// a new update UI occured
+						return;
+					}
+
+					updateUI_Runnable(chartInfo, isForceRecreate);
+				}
+			});
 		}
-
-		_chartInfo = chartInfo;
-
-		// check if the layout needs to be recreated
-		boolean isLayoutDirty = false;
-		if (_chartDataModel != chartInfo.chartDataModel) {
-
-			// data model changed, another data model can have other visible data
-			isLayoutDirty = true;
-		}
-
-		// init vars which are used in createLayout()
-		_chartDataModel = chartInfo.chartDataModel;
-		_chartDrawingData = chartInfo.chartDrawingData;
-
-		if (_chartDrawingData == null) {
-			// this happened
-			clearView();
-			return;
-		}
-
-		_graphDrawingData = _chartDrawingData.graphDrawingData;
-
-		if ((_graphDrawingData == null) || (_graphDrawingData.size() == 0) || (_graphDrawingData.get(0) == null)) {
-			// this happened
-			clearView();
-			return;
-		}
-
-		final boolean isForceUpdate = isForceRecreate || isLayoutDirty;
-
-		createUI_10_Analyzer(isForceUpdate);
-
-		updateInfo_Values(chartInfo, isForceUpdate);
-
-		// optimize layout
-		if (isForceUpdate) {
-
-			// refresh the layout after the data has changed
-			_pageAnalyzer.layout();
-		}
-
-//		final long endTime = System.currentTimeMillis();
-//		System.out.println(++_debugCounter + "  " + (endTime - startTime) + " ms");
 	}
 
 	/**
@@ -953,7 +936,53 @@ public class TourChartAnalyzerView extends ViewPart {
 		updateInfo(chartInfo, false);
 	}
 
-	private void updateInfo_Values(final SelectionChartInfo chartInfo, final boolean isForceUpdate) {
+	private void updateUI_Runnable(final SelectionChartInfo chartInfo, final boolean isForceRecreate) {
+
+		_chartInfo = chartInfo;
+
+		// check if the layout needs to be recreated
+		boolean isLayoutDirty = false;
+		if (_chartDataModel != chartInfo.chartDataModel) {
+
+			// data model changed, another data model can have other visible data
+			isLayoutDirty = true;
+		}
+
+		// init vars which are used in createLayout()
+		_chartDataModel = chartInfo.chartDataModel;
+		_chartDrawingData = chartInfo.chartDrawingData;
+
+		if (_chartDrawingData == null) {
+			// this happened
+			clearView();
+			return;
+		}
+
+		_graphDrawingData = _chartDrawingData.graphDrawingData;
+
+		if ((_graphDrawingData == null) || (_graphDrawingData.size() == 0) || (_graphDrawingData.get(0) == null)) {
+			// this happened
+			clearView();
+			return;
+		}
+
+		final boolean isForceUpdate = isForceRecreate || isLayoutDirty;
+
+		createUI_10_Analyzer(isForceUpdate);
+
+		updateUI_Values(chartInfo, isForceUpdate);
+
+		// optimize layout
+		if (isForceUpdate) {
+
+			// refresh the layout after the data has changed
+			_pageAnalyzer.layout();
+		}
+
+		_lastUpdateUITime = System.currentTimeMillis();
+	}
+
+	private void updateUI_Values(final SelectionChartInfo chartInfo, final boolean isForceUpdate) {
 
 		final ChartDataXSerie xData = _graphDrawingData.get(0).getXData();
 
