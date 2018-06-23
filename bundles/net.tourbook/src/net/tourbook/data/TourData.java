@@ -6632,15 +6632,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	}
 
 	public float getRunDyn_StanceTimeBalance_Avg() {
-		return runDyn_StanceTimeBalance_Avg;
+		return runDyn_StanceTimeBalance_Avg / TourData.RUN_DYN_DATA_MULTIPLIER;
 	}
 
-	public short getRunDyn_StanceTimeBalance_Max() {
-		return runDyn_StanceTimeBalance_Max;
+	public float getRunDyn_StanceTimeBalance_Max() {
+		return runDyn_StanceTimeBalance_Max / TourData.RUN_DYN_DATA_MULTIPLIER;
 	}
 
-	public short getRunDyn_StanceTimeBalance_Min() {
-		return runDyn_StanceTimeBalance_Min;
+	public float getRunDyn_StanceTimeBalance_Min() {
+		return runDyn_StanceTimeBalance_Min / TourData.RUN_DYN_DATA_MULTIPLIER;
 	}
 
 	/**
@@ -6759,15 +6759,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	}
 
 	public float getRunDyn_VerticalOscillation_Avg() {
-		return runDyn_VerticalOscillation_Avg;
+		return runDyn_VerticalOscillation_Avg / TourData.RUN_DYN_DATA_MULTIPLIER;
 	}
 
-	public short getRunDyn_VerticalOscillation_Max() {
-		return runDyn_VerticalOscillation_Max;
+	public float getRunDyn_VerticalOscillation_Max() {
+		return runDyn_VerticalOscillation_Max / TourData.RUN_DYN_DATA_MULTIPLIER;
 	}
 
-	public short getRunDyn_VerticalOscillation_Min() {
-		return runDyn_VerticalOscillation_Min;
+	public float getRunDyn_VerticalOscillation_Min() {
+		return runDyn_VerticalOscillation_Min / TourData.RUN_DYN_DATA_MULTIPLIER;
 	}
 
 	/**
@@ -6795,15 +6795,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	}
 
 	public float getRunDyn_VerticalRatio_Avg() {
-		return runDyn_VerticalRatio_Avg;
+		return runDyn_VerticalRatio_Avg / TourData.RUN_DYN_DATA_MULTIPLIER;
 	}
 
-	public short getRunDyn_VerticalRatio_Max() {
-		return runDyn_VerticalRatio_Max;
+	public float getRunDyn_VerticalRatio_Max() {
+		return runDyn_VerticalRatio_Max / TourData.RUN_DYN_DATA_MULTIPLIER;
 	}
 
-	public short getRunDyn_VerticalRatio_Min() {
-		return runDyn_VerticalRatio_Min;
+	public float getRunDyn_VerticalRatio_Min() {
+		return runDyn_VerticalRatio_Min / TourData.RUN_DYN_DATA_MULTIPLIER;
 	}
 
 	/**
@@ -7475,6 +7475,34 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 */
 	public boolean isPulseSensorPresent() {
 		return isPulseSensorPresent == 1;
+	}
+
+	/**
+	 * @return Returns <code>true</code> when running dynamics data are available
+	 */
+	public boolean isRunDynAvailable() {
+
+		if (runDyn_StanceTime != null && runDyn_StanceTime.length > 0) {
+			return true;
+		}
+
+		if (runDyn_StanceTimeBalance != null && runDyn_StanceTimeBalance.length > 0) {
+			return true;
+		}
+
+		if (runDyn_StepLength != null && runDyn_StepLength.length > 0) {
+			return true;
+		}
+
+		if (runDyn_VerticalOscillation != null && runDyn_VerticalOscillation.length > 0) {
+			return true;
+		}
+
+		if (runDyn_VerticalRatio != null && runDyn_VerticalRatio.length > 0) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**

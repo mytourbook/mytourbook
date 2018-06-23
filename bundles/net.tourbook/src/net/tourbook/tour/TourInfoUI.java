@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -82,7 +82,9 @@ public class TourInfoUI {
 	// hide these components
 //																		.withMinutesRemoved()
 			.withSecondsRemoved()
-			.withMillisRemoved();
+			.withMillisRemoved()
+//
+	;
 	private final NumberFormat				_nf0				= NumberFormat.getNumberInstance();
 	private final NumberFormat				_nf1				= NumberFormat.getInstance();
 	private final NumberFormat				_nf2				= NumberFormat.getInstance();
@@ -104,6 +106,7 @@ public class TourInfoUI {
 
 	private boolean								_hasDescription;
 	private boolean								_hasGears;
+	private boolean								_hasRunDyn;
 	private boolean								_hasTags;
 	private boolean								_hasTourType;
 	private boolean								_hasWeather;
@@ -210,6 +213,12 @@ public class TourInfoUI {
 	private Label								_lblWindSpeedUnit;
 	private Label								_lblWindDirection;
 	private Label								_lblWindDirectionUnit;
+	private Label								_lblRunDyn_StanceTime_Min;
+	private Label								_lblRunDyn_StanceTime_Min_Unit;
+	private Label								_lblRunDyn_StanceTime_Max;
+	private Label								_lblRunDyn_StanceTime_Max_Unit;
+	private Label								_lblRunDyn_StanceTime_Avg;
+	private Label								_lblRunDyn_StanceTime_Avg_Unit;
 
 	/**
 	 * Run tour action quick edit.
@@ -250,6 +259,8 @@ public class TourInfoUI {
 		_hasDescription = tourDescription != null && tourDescription.length() > 0;
 		_hasWeather = _tourData.getWeather().length() > 0;
 		_hasGears = _tourData.getFrontShiftCount() > 0 || _tourData.getRearShiftCount() > 0;
+
+		_hasRunDyn = _tourData.isRunDynAvailable();
 
 		final Composite container = createUI(parent);
 
@@ -292,8 +303,8 @@ public class TourInfoUI {
 
 				createUI_30_LeftColumn(_ttContainer);
 				createUI_40_RightColumn(_ttContainer);
-				createUI_50_LowerPart(_ttContainer);
-				createUI_60_CreateModifyTime(_ttContainer);
+				createUI_90_LowerPart(_ttContainer);
+				createUI_92_CreateModifyTime(_ttContainer);
 			}
 		}
 
@@ -594,6 +605,12 @@ public class TourInfoUI {
 			createUI_Spacer(container);
 			createUI_43_Max(container);
 
+			if (_hasRunDyn) {
+
+				createUI_Spacer(container);
+				createUI_50_RunDyn(container);
+			}
+
 			createUI_Spacer(container);
 			createUI_44_Weather(container);
 		}
@@ -765,7 +782,71 @@ public class TourInfoUI {
 		_lblGearRearShifts = createUI_LabelValue(parent, SWT.LEAD);
 	}
 
-	private void createUI_50_LowerPart(final Composite parent) {
+	private void createUI_50_RunDyn(final Composite parent) {
+
+//		ColumnFactory_RunDyn_StanceTime_Avg               = Average Stance Time
+//		ColumnFactory_RunDyn_StanceTime_Avg_Header        = \u00F8 ms
+//		ColumnFactory_RunDyn_StanceTime_Max               = Maximum Stance Time
+//		ColumnFactory_RunDyn_StanceTime_Max_Header        = ^ ms
+//		ColumnFactory_RunDyn_StanceTime_Min               = Minimum Stance Time
+//		ColumnFactory_RunDyn_StanceTime_Min_Header        = \u1D5B ms
+//		ColumnFactory_RunDyn_StanceTimeBalance_Avg        = Average Stance Time Balance
+//		ColumnFactory_RunDyn_StanceTimeBalance_Avg_Header = \u00F8 %
+//		ColumnFactory_RunDyn_StanceTimeBalance_Max        = Maximum Stance Time Balance
+//		ColumnFactory_RunDyn_StanceTimeBalance_Max_Header = ^ %
+//		ColumnFactory_RunDyn_StanceTimeBalance_Min        = Minimum Stance Time Balance
+//		ColumnFactory_RunDyn_StanceTimeBalance_Min_Header = \u1D5B %
+//		ColumnFactory_RunDyn_StepLength_Avg               = Average Step Length
+//		ColumnFactory_RunDyn_StepLength_Max               = Maximum Step Length
+//		ColumnFactory_RunDyn_StepLength_Min               = Minimum Step Length
+//		ColumnFactory_RunDyn_VerticalOscillation_Avg      = Average Vertical Oscillation
+//		ColumnFactory_RunDyn_VerticalOscillation_Max      = Maximum Vertical Oscillation
+//		ColumnFactory_RunDyn_VerticalOscillation_Min      = Minimum Vertical Oscillation
+//		ColumnFactory_RunDyn_VerticalRatio_Avg            = Average Vertical Ratio
+//		ColumnFactory_RunDyn_VerticalRatio_Max            = Maximum Vertical Ratio
+//		ColumnFactory_RunDyn_VerticalRatio_Min            = Minimum Vertical Ratio
+//		ᵛ ms
+//		ø ms
+
+		{
+			/*
+			 * Stance time min
+			 */
+			final Label label = createUI_Label(parent, Messages.Tour_Tooltip_Label_RunDyn_StanceTime_Min);
+			_firstColumnControls.add(label);
+
+			_lblRunDyn_StanceTime_Min = createUI_LabelValue(parent, SWT.TRAIL);
+			_secondColumnControls.add(_lblRunDyn_StanceTime_Min);
+
+			_lblRunDyn_StanceTime_Min_Unit = createUI_LabelValue(parent, SWT.LEAD);
+		}
+		{
+			/*
+			 * Stance time max
+			 */
+			final Label label = createUI_Label(parent, Messages.Tour_Tooltip_Label_RunDyn_StanceTime_Max);
+			_firstColumnControls.add(label);
+
+			_lblRunDyn_StanceTime_Max = createUI_LabelValue(parent, SWT.TRAIL);
+			_secondColumnControls.add(_lblRunDyn_StanceTime_Max);
+
+			_lblRunDyn_StanceTime_Max_Unit = createUI_LabelValue(parent, SWT.LEAD);
+		}
+		{
+			/*
+			 * Stance time avg
+			 */
+			final Label label = createUI_Label(parent, Messages.Tour_Tooltip_Label_RunDyn_StanceTime_Avg);
+			_firstColumnControls.add(label);
+
+			_lblRunDyn_StanceTime_Avg = createUI_LabelValue(parent, SWT.TRAIL);
+			_secondColumnControls.add(_lblRunDyn_StanceTime_Avg);
+
+			_lblRunDyn_StanceTime_Avg_Unit = createUI_LabelValue(parent, SWT.LEAD);
+		}
+	}
+
+	private void createUI_90_LowerPart(final Composite parent) {
 
 		if (_hasTags == false && _hasDescription == false && _hasWeather == false && _hasTourType == false) {
 			return;
@@ -879,7 +960,7 @@ public class TourInfoUI {
 		}
 	}
 
-	private void createUI_60_CreateModifyTime(final Composite parent) {
+	private void createUI_92_CreateModifyTime(final Composite parent) {
 
 		if (_uiDtCreated == null && _uiDtModified == null) {
 			return;
@@ -1322,6 +1403,20 @@ public class TourInfoUI {
 					UI.EMPTY_STRING
 					: _uiDtModified.format(TimeTools.Formatter_DateTime_M));
 		}
+
+		/*
+		 * Running Dynamics
+		 */
+		if (_hasRunDyn) {
+
+			_lblRunDyn_StanceTime_Min.setText(Integer.toString(_tourData.getRunDyn_StanceTime_Min()));
+			_lblRunDyn_StanceTime_Min_Unit.setText(UI.UNIT_MS);
+			_lblRunDyn_StanceTime_Max.setText(Integer.toString(_tourData.getRunDyn_StanceTime_Max()));
+			_lblRunDyn_StanceTime_Max_Unit.setText(UI.UNIT_MS);
+			_lblRunDyn_StanceTime_Avg.setText(_nf0.format(_tourData.getRunDyn_StanceTime_Avg()));
+			_lblRunDyn_StanceTime_Avg_Unit.setText(UI.UNIT_MS);
+		}
+
 	}
 
 	public void updateUI_Layout() {

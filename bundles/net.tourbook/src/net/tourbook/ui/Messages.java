@@ -440,6 +440,9 @@ public class Messages extends NLS {
 	public static String		Tour_Tooltip_Label_NoTour;
 	public static String		Tour_Tooltip_Label_RecordingTime;
 	public static String		Tour_Tooltip_Label_RestPulse;
+	public static String		Tour_Tooltip_Label_RunDyn_StanceTime_Avg;
+	public static String		Tour_Tooltip_Label_RunDyn_StanceTime_Max;
+	public static String		Tour_Tooltip_Label_RunDyn_StanceTime_Min;
 	public static String		Tour_Tooltip_Label_Tags;
 	public static String		Tour_Tooltip_Label_Temperature;
 	public static String		Tour_Tooltip_Label_TimeZone;
