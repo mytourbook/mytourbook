@@ -12,6 +12,11 @@ Improvements
 * Tour Book View
 
   - Summary/total row 
+  
+  
+* Tour Analyzer View
+
+  - Optimized performance by reducing paint events -> Moving chart slider is more smoothly
 
 
 Bugfix
