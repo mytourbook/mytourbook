@@ -6,6 +6,13 @@ New
 * Running Dynamics
 
 
+Improvements
+============
+
+* Tour Book View
+
+  - Summary/total row 
+
 
 Bugfix
 ======

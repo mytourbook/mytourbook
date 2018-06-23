@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -36,6 +36,8 @@ public class TVITourBookYear extends TVITourBookItem {
 	private static final String	YEAR_WEEK_FORMAT	= "[%02d] %s";	//$NON-NLS-1$
 
 	private YearSubCategory		_subCategory;
+
+	boolean						isRowSummary;
 
 	public TVITourBookYear(final TourBookView view, final TVITourBookItem parentItem) {
 
@@ -203,6 +205,19 @@ public class TVITourBookYear extends TVITourBookItem {
 		} catch (final SQLException e) {
 			net.tourbook.ui.UI.showSQLException(e);
 		}
+	}
+
+	@Override
+	public boolean hasChildren() {
+
+		if (isRowSummary) {
+
+			// row summary has no children
+
+			return false;
+		}
+
+		return super.hasChildren();
 	}
 
 }

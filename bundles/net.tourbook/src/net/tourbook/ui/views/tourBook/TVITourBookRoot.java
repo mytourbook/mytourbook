@@ -83,6 +83,17 @@ public class TVITourBookRoot extends TVITourBookItem {
 					+ sqlFilter.getWhereClause() + NL;
 		}
 
+		final boolean isShowSummaryRow = tourBookView.isShowSummaryRow();
+
+		final String groupBy = isShowSummaryRow
+
+				// show a summary row
+				? " GROUP BY ROLLUP(StartYear) "
+
+				: " GROUP BY StartYear "
+
+						+ NL;
+
 		final String sql = NL +
 
 				"SELECT						" + NL //$NON-NLS-1$
@@ -91,9 +102,9 @@ public class TVITourBookRoot extends TVITourBookItem {
 				+ SQL_SUM_COLUMNS
 
 				+ fromTourData
+				+ groupBy
 
-				+ " GROUP BY StartYear		" + NL //$NON-NLS-1$
-				+ " ORDER BY StartYear		" + NL//			//$NON-NLS-1$
+				+ " ORDER BY StartYear		" + NL //$NON-NLS-1$
 		;
 
 		Connection conn = null;
@@ -105,20 +116,26 @@ public class TVITourBookRoot extends TVITourBookItem {
 			final PreparedStatement statement = conn.prepareStatement(sql);
 			sqlFilter.setParameters(statement, 1);
 
+			TVITourBookYear yearItem = null;
+
 			final ResultSet result = statement.executeQuery();
 			while (result.next()) {
 
 				final int dbYear = result.getInt(1);
 
-				final TVITourBookYear yearItem = new TVITourBookYear(tourBookView, this);
+				yearItem = new TVITourBookYear(tourBookView, this);
 				children.add(yearItem);
 
 				yearItem.treeColumn = Integer.toString(dbYear);
 				yearItem.tourYear = dbYear;
 
 				yearItem.colTourDateTime = new TourDateTime(calendar8.withYear(dbYear));
-
 				yearItem.addSumColumns(result, 2);
+			}
+
+			// add summary flag to the last row
+			if (yearItem != null && isShowSummaryRow) {
+				yearItem.isRowSummary = true;
 			}
 
 		} catch (final SQLException e) {
