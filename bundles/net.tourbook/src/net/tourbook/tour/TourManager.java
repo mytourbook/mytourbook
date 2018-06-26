@@ -229,14 +229,20 @@ public class TourManager {
 //	private static AtomicInteger			_tourCopyCounter	= new AtomicInteger();
 	//
 	private ComputeChartValue				_computeAvg_Altimeter;
+//	private ComputeChartValue				_computeAvg_Altitude;
 	private ComputeChartValue				_computeAvg_Cadence;
 	private ComputeChartValue				_computeAvg_Gradient;
 	private ComputeChartValue				_computeAvg_Pace;
 	private ComputeChartValue				_computeAvg_Power;
 	private ComputeChartValue				_computeAvg_Pulse;
-
 	private ComputeChartValue				_computeAvg_Speed;
-
+	//
+	private ComputeChartValue				_computeAvg_RunDyn_StanceTime;
+	private ComputeChartValue				_computeAvg_RunDyn_StanceTimeBalance;
+	private ComputeChartValue				_computeAvg_RunDyn_StepLength;
+	private ComputeChartValue				_computeAvg_RunDyn_VerticalOscillation;
+	private ComputeChartValue				_computeAvg_RunDyn_VerticalRatio;
+	//
 	private final TourDataCache				_tourDataCache;
 
 	/**
@@ -635,8 +641,7 @@ public class TourManager {
 		tcc.isShowTourPhotos = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_TOUR_PHOTO_VISIBLE);
 		tcc.isShowTourPhotoTooltip = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_TOUR_PHOTO_TOOLTIP_VISIBLE);
 
-		tcc.isShowBreaktimeValues = _prefStore.getBoolean(//
-				ITourbookPreferences.GRAPH_IS_BREAKTIME_VALUES_VISIBLE);
+		tcc.isShowBreaktimeValues = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_BREAKTIME_VALUES_VISIBLE);
 
 		tcc.updateZoomOptions();
 
@@ -2525,14 +2530,11 @@ public class TourManager {
 					return 0;
 				}
 
-				final double[] timeValues = ((ChartDataXSerie) (chartModel.getCustomData(CUSTOM_DATA_TIME)))
-						.getHighValuesDouble()[0];
+				final double[] timeValues = ((ChartDataXSerie) (chartModel.getCustomData(CUSTOM_DATA_TIME))).getHighValuesDouble()[0];
 				final double[] distanceValues = ((ChartDataXSerie) (customDataDistance)).getHighValuesDouble()[0];
 				if (timeValues == null) {
 					return 0;
 				}
-
-				final TourData tourData = (TourData) chartModel.getCustomData(CUSTOM_DATA_TOUR_DATA);
 
 				final double leftDistance = distanceValues[valueIndexLeft];
 				final double rightDistance = distanceValues[valueIndexRight];
@@ -2546,10 +2548,7 @@ public class TourManager {
 
 				} else {
 
-					final double time = Math.max(//
-							0,
-							rightTime - leftTime - tourData.getBreakTime(valueIndexLeft, valueIndexRight));
-
+					final double time = Math.max(0, rightTime - leftTime - breakTime);
 					if (time == 0) {
 						return 0;
 					}
@@ -2575,14 +2574,11 @@ public class TourManager {
 					return 0;
 				}
 
-				final double[] timeValues = ((ChartDataXSerie) (chartModel.getCustomData(CUSTOM_DATA_TIME)))
-						.getHighValuesDouble()[0];
+				final double[] timeValues = ((ChartDataXSerie) (chartModel.getCustomData(CUSTOM_DATA_TIME))).getHighValuesDouble()[0];
 				final double[] distanceValues = ((ChartDataXSerie) (customDataDistance)).getHighValuesDouble()[0];
 				if (timeValues == null) {
 					return 0;
 				}
-
-				final TourData tourData = (TourData) chartModel.getCustomData(CUSTOM_DATA_TOUR_DATA);
 
 				final double leftDistance = distanceValues[valueIndexLeft];
 				final double rightDistance = distanceValues[valueIndexRight];
@@ -2596,16 +2592,13 @@ public class TourManager {
 
 				} else {
 
-					final double time = Math.max(//
-							0,
-							rightTime - leftTime - tourData.getBreakTime(valueIndexLeft, valueIndexRight));
 					final double distance = rightDistance - leftDistance;
-
 					if (distance == 0) {
 						return 0;
-					} else {
-						return (float) (time * 1000 / distance);
 					}
+
+					final double time = Math.max(0, rightTime - leftTime - breakTime);
+					return (float) (time * 1000 / distance);
 				}
 			}
 		};
@@ -2623,15 +2616,12 @@ public class TourManager {
 					return 0;
 				}
 
-				final double[] timeValues = ((ChartDataXSerie) (chartModel.getCustomData(CUSTOM_DATA_TIME)))
-						.getHighValuesDouble()[0];
+				final double[] timeValues = ((ChartDataXSerie) (chartModel.getCustomData(CUSTOM_DATA_TIME))).getHighValuesDouble()[0];
 				if (timeValues == null) {
 					return 0;
 				}
 
 				final float[] altitudeValues = ((ChartDataYSerie) (customDataAltitude)).getHighValuesFloat()[0];
-
-				final TourData tourData = (TourData) chartModel.getCustomData(CUSTOM_DATA_TOUR_DATA);
 
 				final float leftAltitude = altitudeValues[valueIndexLeft];
 				final float rightAltitude = altitudeValues[valueIndexRight];
@@ -2645,10 +2635,7 @@ public class TourManager {
 
 				} else {
 
-					final double time = Math.max(//
-							0,
-							rightTime - leftTime - tourData.getBreakTime(valueIndexLeft, valueIndexRight));
-
+					final double time = Math.max(0, rightTime - leftTime - breakTime);
 					if (time == 0) {
 						return 0;
 					}
@@ -2657,6 +2644,19 @@ public class TourManager {
 				}
 			}
 		};
+
+//		_computeAvg_Altitude = new ComputeChartValue() {
+//
+//			@Override
+//			public float compute() {
+//
+//				final Object customDataAltitude = chartModel.getCustomData(CUSTOM_DATA_ALTITUDE);
+//				if (customDataAltitude == null) {
+//					return 0;
+//				}
+//
+//			}
+//		};
 
 		/*
 		 * Compute the average altimeter speed between the two sliders
@@ -2724,6 +2724,81 @@ public class TourManager {
 				final TourData tourData = (TourData) chartModel.getCustomData(CUSTOM_DATA_TOUR_DATA);
 
 				return tourData.computeAvg_PulseSegment(valueIndexLeft, valueIndexRight);
+			}
+		};
+
+		_computeAvg_RunDyn_StanceTime = new ComputeChartValue() {
+
+			@Override
+			public float compute() {
+
+				final TourData tourData = (TourData) chartModel.getCustomData(CUSTOM_DATA_TOUR_DATA);
+
+				final float metricValue = tourData.computeAvg_FromValues(tourData.runDyn_StanceTime,
+						valueIndexLeft,
+						valueIndexRight);
+
+				return metricValue;
+			}
+		};
+
+		_computeAvg_RunDyn_StanceTimeBalance = new ComputeChartValue() {
+
+			@Override
+			public float compute() {
+
+				final TourData tourData = (TourData) chartModel.getCustomData(CUSTOM_DATA_TOUR_DATA);
+
+				final float metricValue = tourData.computeAvg_FromValues(tourData.runDyn_StanceTimeBalance,
+						valueIndexLeft,
+						valueIndexRight);
+
+				return metricValue / TourData.RUN_DYN_DATA_MULTIPLIER;
+			}
+		};
+
+		_computeAvg_RunDyn_StepLength = new ComputeChartValue() {
+
+			@Override
+			public float compute() {
+
+				final TourData tourData = (TourData) chartModel.getCustomData(CUSTOM_DATA_TOUR_DATA);
+
+				final float metricValue = tourData.computeAvg_FromValues(tourData.runDyn_StepLength,
+						valueIndexLeft,
+						valueIndexRight);
+
+				return metricValue * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
+			}
+		};
+
+		_computeAvg_RunDyn_VerticalOscillation = new ComputeChartValue() {
+
+			@Override
+			public float compute() {
+
+				final TourData tourData = (TourData) chartModel.getCustomData(CUSTOM_DATA_TOUR_DATA);
+
+				final float metricValue = tourData.computeAvg_FromValues(tourData.runDyn_VerticalOscillation,
+						valueIndexLeft,
+						valueIndexRight);
+
+				return metricValue * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH / TourData.RUN_DYN_DATA_MULTIPLIER;
+			}
+		};
+
+		_computeAvg_RunDyn_VerticalRatio = new ComputeChartValue() {
+
+			@Override
+			public float compute() {
+
+				final TourData tourData = (TourData) chartModel.getCustomData(CUSTOM_DATA_TOUR_DATA);
+
+				final float metricValue = tourData.computeAvg_FromValues(tourData.runDyn_VerticalRatio,
+						valueIndexLeft,
+						valueIndexRight);
+
+				return metricValue / TourData.RUN_DYN_DATA_MULTIPLIER;
 			}
 		};
 	}
@@ -3099,9 +3174,7 @@ public class TourManager {
 			yDataAltimeter.setUnitLabel(UI.UNIT_LABEL_ALTIMETER);
 			yDataAltimeter.setShowYSlider(true);
 			yDataAltimeter.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_ALTIMETER);
-			yDataAltimeter.setCustomData(
-					CUSTOM_DATA_ANALYZER_INFO, //
-					new TourChartAnalyzerInfo(true, false, _computeAvg_Altimeter, 0));
+			yDataAltimeter.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, false, _computeAvg_Altimeter, 0));
 
 			if (isHrZoneDisplayed) {
 				yDataAltimeter.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
@@ -3192,6 +3265,7 @@ public class TourManager {
 			yDataAltitude.setDisplayedFractionalDigits(2);
 			yDataAltitude.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_ALTITUDE);
 			yDataAltitude.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true));
+//			yDataAltitude.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, false, _computeAvg_Altitude, 0));
 
 			if (isHrZoneDisplayed) {
 				yDataAltitude.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
@@ -3334,9 +3408,7 @@ public class TourManager {
 			yDataGradient.setShowYSlider(true);
 			yDataGradient.setDisplayedFractionalDigits(1);
 			yDataGradient.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_GRADIENT);
-			yDataGradient.setCustomData(
-					CUSTOM_DATA_ANALYZER_INFO, //
-					new TourChartAnalyzerInfo(true, true, _computeAvg_Gradient, 1));
+			yDataGradient.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, true, _computeAvg_Gradient, 1));
 
 			if (isHrZoneDisplayed) {
 				yDataGradient.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
@@ -3378,9 +3450,7 @@ public class TourManager {
 			yDataPulse.setUnitLabel(GRAPH_LABEL_HEARTBEAT_UNIT);
 			yDataPulse.setShowYSlider(true);
 			yDataPulse.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_PULSE);
-			yDataPulse.setCustomData(
-					CUSTOM_DATA_ANALYZER_INFO, //
-					new TourChartAnalyzerInfo(true, _computeAvg_Pulse));
+			yDataPulse.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, _computeAvg_Pulse));
 
 			if (isHrZoneDisplayed) {
 				yDataPulse.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
@@ -3424,9 +3494,7 @@ public class TourManager {
 			yDataPace.setAxisUnit(ChartDataSerie.AXIS_UNIT_MINUTE_SECOND);
 			yDataPace.setSliderLabelFormat(ChartDataYSerie.SLIDER_LABEL_FORMAT_MM_SS);
 			yDataPace.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_PACE);
-			yDataPace.setCustomData(
-					CUSTOM_DATA_ANALYZER_INFO, //
-					new TourChartAnalyzerInfo(true, false, _computeAvg_Pace, 1));
+			yDataPace.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, false, _computeAvg_Pace, 1));
 
 			if (isHrZoneDisplayed) {
 				yDataPace.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
@@ -3469,9 +3537,7 @@ public class TourManager {
 			yDataPower.setUnitLabel(GRAPH_LABEL_POWER_UNIT);
 			yDataPower.setShowYSlider(true);
 			yDataPower.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_POWER);
-			yDataPower.setCustomData(
-					CUSTOM_DATA_ANALYZER_INFO, //
-					new TourChartAnalyzerInfo(true, false, _computeAvg_Power, 0));
+			yDataPower.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, false, _computeAvg_Power, 0));
 
 			if (isHrZoneDisplayed) {
 				yDataPower.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
@@ -3515,6 +3581,7 @@ public class TourManager {
 			yDataSerie.setUnitLabel(UI.UNIT_MS);
 			yDataSerie.setShowYSlider(true);
 			yDataSerie.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_RUN_DYN_STANCE_TIME);
+			yDataSerie.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, _computeAvg_RunDyn_StanceTime));
 
 			if (isHrZoneDisplayed) {
 				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
@@ -3559,6 +3626,8 @@ public class TourManager {
 			yDataSerie.setDisplayedFractionalDigits(1);
 			yDataSerie.setShowYSlider(true);
 			yDataSerie.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_RUN_DYN_STANCE_TIME_BALANCED);
+			yDataSerie.setCustomData(CUSTOM_DATA_ANALYZER_INFO,
+					new TourChartAnalyzerInfo(true, true, _computeAvg_RunDyn_StanceTimeBalance, 1));
 
 			if (isHrZoneDisplayed) {
 				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
@@ -3602,6 +3671,7 @@ public class TourManager {
 			yDataSerie.setUnitLabel(UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
 			yDataSerie.setShowYSlider(true);
 			yDataSerie.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_RUN_DYN_STEP_LENGTH);
+			yDataSerie.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, _computeAvg_RunDyn_StepLength));
 
 			if (isHrZoneDisplayed) {
 				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
@@ -3647,6 +3717,7 @@ public class TourManager {
 			yDataSerie.setDisplayedFractionalDigits(1);
 			yDataSerie.setShowYSlider(true);
 			yDataSerie.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_RUN_DYN_VERTICAL_OSCILLATION);
+			yDataSerie.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, true, _computeAvg_RunDyn_VerticalOscillation, 1));
 
 			if (isHrZoneDisplayed) {
 				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
@@ -3692,6 +3763,7 @@ public class TourManager {
 			yDataSerie.setDisplayedFractionalDigits(1);
 			yDataSerie.setShowYSlider(true);
 			yDataSerie.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_RUN_DYN_VERTICAL_RATIO);
+			yDataSerie.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, true, _computeAvg_RunDyn_VerticalRatio, 1));
 
 			if (isHrZoneDisplayed) {
 				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
@@ -3735,9 +3807,7 @@ public class TourManager {
 			yDataSpeed.setShowYSlider(true);
 			yDataSpeed.setDisplayedFractionalDigits(1);
 			yDataSpeed.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_SPEED);
-			yDataSpeed.setCustomData(
-					CUSTOM_DATA_ANALYZER_INFO, //
-					new TourChartAnalyzerInfo(true, true, _computeAvg_Speed, 1));
+			yDataSpeed.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, true, _computeAvg_Speed, 1));
 
 			if (isHrZoneDisplayed) {
 				yDataSpeed.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);

@@ -1013,12 +1013,15 @@ public class TourChartAnalyzerView extends ViewPart {
 		_valueIndexLeftLast = valuesIndexLeft;
 		_valueIndexRightLast = valuesIndexRight;
 
+		// get break time
+		final TourData tourData = (TourData) _chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
+		final int breakTime = tourData.getBreakTime(valuesIndexLeft, valuesIndexRight);
+
 		for (final GraphInfo graphInfo : _graphInfos) {
 
 			final ChartDataSerie serieData = graphInfo.chartData;
 
-			TourChartAnalyzerInfo analyzerInfo = (TourChartAnalyzerInfo) serieData
-					.getCustomData(TourManager.CUSTOM_DATA_ANALYZER_INFO);
+			TourChartAnalyzerInfo analyzerInfo = (TourChartAnalyzerInfo) serieData.getCustomData(TourManager.CUSTOM_DATA_ANALYZER_INFO);
 
 			if (analyzerInfo == null) {
 				// create default average object
@@ -1086,7 +1089,7 @@ public class TourChartAnalyzerView extends ViewPart {
 
 				} else {
 
-					// optimized for speed
+					// optimized for performance
 
 					min = (value <= min) ? value : min; //Math.min(value, min);
 					max = (value >= max) ? value : max; //Math.max(value, max);
@@ -1108,6 +1111,7 @@ public class TourChartAnalyzerView extends ViewPart {
 				computeAvg.xData = xData;
 				computeAvg.yData = (ChartDataYSerie) serieData;
 				computeAvg.chartModel = _chartDataModel;
+				computeAvg.breakTime = breakTime;
 
 				avg = computeAvg.compute();
 
@@ -1123,14 +1127,12 @@ public class TourChartAnalyzerView extends ViewPart {
 			 */
 			if (graphInfo.leftValue != leftValue) {
 				graphInfo.leftValue = leftValue;
-				graphInfo.lblLeft.setText(Util.formatNumber(leftValue, unitType, valueDivisor, valueDecimals)
-						+ UI.SPACE);
+				graphInfo.lblLeft.setText(Util.formatNumber(leftValue, unitType, valueDivisor, valueDecimals) + UI.SPACE);
 			}
 
 			if (graphInfo.rightValue != rightValue) {
 				graphInfo.rightValue = rightValue;
-				graphInfo.lblRight.setText(Util.formatNumber(rightValue, unitType, valueDivisor, valueDecimals)
-						+ UI.SPACE);
+				graphInfo.lblRight.setText(Util.formatNumber(rightValue, unitType, valueDivisor, valueDecimals) + UI.SPACE);
 			}
 
 			if (graphInfo.minValue != min) {
@@ -1155,8 +1157,7 @@ public class TourChartAnalyzerView extends ViewPart {
 					if (graphInfo.avgValue != (int) avgValue) {
 
 						graphInfo.avgValue = (int) avgValue;
-						graphInfo.lblAvg.setText(Util.formatNumber(avgValue, unitType, valueDivisor2, valueDecimals)
-								+ UI.SPACE);
+						graphInfo.lblAvg.setText(Util.formatNumber(avgValue, unitType, valueDivisor2, valueDecimals) + UI.SPACE);
 					}
 
 				} else {
@@ -1164,8 +1165,7 @@ public class TourChartAnalyzerView extends ViewPart {
 					if (graphInfo.avgValue != (int) avgValue) {
 
 						graphInfo.avgValue = (int) avgValue;
-						graphInfo.lblAvg.setText(Util.formatValue((int) avgValue, unitType, valueDivisor, true)
-								+ UI.SPACE);
+						graphInfo.lblAvg.setText(Util.formatValue((int) avgValue, unitType, valueDivisor, true) + UI.SPACE);
 					}
 				}
 
@@ -1176,8 +1176,7 @@ public class TourChartAnalyzerView extends ViewPart {
 			final double diffValue = rightValue - leftValue;
 			if (graphInfo.diffValue != diffValue) {
 				graphInfo.diffValue = diffValue;
-				graphInfo.lblDiff.setText(Util.formatNumber(diffValue, unitType, valueDivisor, valueDecimals)
-						+ UI.SPACE);
+				graphInfo.lblDiff.setText(Util.formatNumber(diffValue, unitType, valueDivisor, valueDecimals) + UI.SPACE);
 			}
 		}
 	}

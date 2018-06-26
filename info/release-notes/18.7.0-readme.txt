@@ -16,7 +16,7 @@ Improvements
   
 * Tour Analyzer View
 
-  - Optimized performance by reducing paint events -> Moving chart slider is more smoothly
+  - Optimized performance by reducing paint events -> Moving the chart slider is now more smoothly
 
 
 Bugfix

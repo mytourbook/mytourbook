@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,6 +24,11 @@ public abstract class ComputeChartValue {
 	public ChartDataYSerie	yData;
 
 	public ChartDataModel	chartModel;
+
+	/**
+	 * Breaktime in seconds between the left and right value index
+	 */
+	public int				breakTime;
 
 	public abstract float compute();
 }

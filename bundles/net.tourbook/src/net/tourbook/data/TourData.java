@@ -2195,8 +2195,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			forcedIndices = multipleTourStartIndex;
 		}
 
-		final DPPoint[] simplifiedPoints = new DouglasPeuckerSimplifier(dpTolerance, dpPoints, forcedIndices)
-				.simplify();
+		final DPPoint[] simplifiedPoints = new DouglasPeuckerSimplifier(dpTolerance, dpPoints, forcedIndices).simplify();
 
 		float altitudeUpTotal = 0;
 		float altitudeDownTotal = 0;
@@ -2534,6 +2533,107 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		}
 
 		return (float) (timeSquare == 0 ? 0 : cadenceSquare / timeSquare);
+	}
+
+	public float computeAvg_FromValues(final short[] valueSerie, final int firstIndex, final int lastIndex) {
+
+		// check if data are available
+		if (valueSerie == null || valueSerie.length == 0 || timeSerie == null || timeSerie.length == 0) {
+			return 0;
+		}
+
+		// check for 1 point
+		if (firstIndex == lastIndex) {
+			return valueSerie[firstIndex];
+		}
+
+		// check for 2 points
+		if (lastIndex - firstIndex == 1) {
+			return (valueSerie[firstIndex] + valueSerie[lastIndex]) / 2;
+		}
+
+		// get break time when not yet set
+		if (breakTimeSerie == null) {
+			getBreakTime();
+		}
+
+		// at least 3 points are available
+		int prevTime = timeSerie[firstIndex];
+		int currentTime = timeSerie[firstIndex];
+		int nextTime = timeSerie[firstIndex + 1];
+
+		/**
+		 * a break is set from the previous to the current time slice
+		 */
+		final boolean hasBreakTime = breakTimeSerie != null;
+		boolean isPrevBreak = hasBreakTime ? breakTimeSerie[firstIndex] : false;
+		boolean isNextBreak = hasBreakTime ? breakTimeSerie[firstIndex + 1] : false;
+
+		double valueSquare = 0;
+		double timeSquare = 0;
+
+		for (int serieIndex = firstIndex; serieIndex <= lastIndex; serieIndex++) {
+
+			if (hasBreakTime) {
+
+				/*
+				 * break time requires distance data, so it's possible that break time data are not
+				 * available
+				 */
+
+				if (breakTimeSerie[serieIndex] == true) {
+
+					// break has occured in this time slice
+
+					if (serieIndex < lastIndex) {
+
+						isPrevBreak = isNextBreak;
+						isNextBreak = breakTimeSerie[serieIndex + 1];
+
+						prevTime = currentTime;
+						currentTime = nextTime;
+						nextTime = timeSerie[serieIndex + 1];
+					}
+
+					continue;
+				}
+			}
+
+			final float value = valueSerie[serieIndex];
+
+			float timeDiffPrev = 0;
+			float timeDiffNext = 0;
+
+			if (serieIndex > firstIndex && isPrevBreak == false) {
+				// prev is available
+				timeDiffPrev = ((float) currentTime - prevTime) / 2;
+			}
+
+			if (serieIndex < lastIndex && isNextBreak == false) {
+				// next is available
+				timeDiffNext = ((float) nextTime - currentTime) / 2;
+			}
+
+			// ignore 0 values
+			if (value > 0) {
+
+				valueSquare += value * timeDiffPrev + value * timeDiffNext;
+				timeSquare += timeDiffPrev + timeDiffNext;
+			}
+
+			if (serieIndex < lastIndex) {
+
+				isPrevBreak = isNextBreak;
+				isNextBreak = hasBreakTime ? breakTimeSerie[serieIndex + 1] : false;
+
+				prevTime = currentTime;
+				currentTime = nextTime;
+				nextTime = timeSerie[serieIndex + 1];
+			}
+
+		}
+
+		return (float) (timeSquare == 0 ? 0 : valueSquare / timeSquare);
 	}
 
 	public void computeAvg_Pulse() {

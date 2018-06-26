@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,11 +22,12 @@ import net.tourbook.chart.ComputeChartValue;
  */
 public class TourChartAnalyzerInfo {
 
-	private ComputeChartValue	_computeValues		= null;
+	private ComputeChartValue	_computeValues	= null;
 
-	private boolean				_showAvg			= false;
-	private boolean				_showAvgDecimals	= false;
-	private int					_avgDecimals		= 1;
+	private boolean				_isShowAvg;
+	private boolean				_isShowAvgDecimals;
+
+	private int					_avgDecimals	= 1;
 
 	/**
 	 * default constructor
@@ -34,44 +35,47 @@ public class TourChartAnalyzerInfo {
 	public TourChartAnalyzerInfo() {}
 
 	/**
-	 * @param showAvg
+	 * @param isShowAvg
 	 */
-	public TourChartAnalyzerInfo(final boolean showAvg) {
-		this._showAvg = showAvg;
+	public TourChartAnalyzerInfo(final boolean isShowAvg) {
+
+		_isShowAvg = isShowAvg;
 	}
 
 	/**
-	 * @param showAvg
-	 * @param showAvgDecimals
+	 * @param isShowAvg
+	 * @param isShowAvgDecimals
 	 */
-	public TourChartAnalyzerInfo(final boolean showAvg, final boolean showAvgDecimals) {
-		this._showAvg = showAvg;
-		this._showAvgDecimals = showAvgDecimals;
+	public TourChartAnalyzerInfo(final boolean isShowAvg, final boolean isShowAvgDecimals) {
+
+		_isShowAvg = isShowAvg;
+		_isShowAvgDecimals = isShowAvgDecimals;
 	}
 
 	/**
-	 * @param showAvg
-	 * @param showAvgDecimals
+	 * @param isShowAvg
+	 * @param isShowAvgDecimals
 	 * @param computeValues
 	 * @param avgDecimals
 	 */
-	public TourChartAnalyzerInfo(	final boolean showAvg,
-									final boolean showAvgDecimals,
+	public TourChartAnalyzerInfo(	final boolean isShowAvg,
+									final boolean isShowAvgDecimals,
 									final ComputeChartValue computeValues,
 									final int avgDecimals) {
 
-		_showAvg = showAvg;
-		_showAvgDecimals = showAvgDecimals;
+		_isShowAvg = isShowAvg;
+		_isShowAvgDecimals = isShowAvgDecimals;
 		_computeValues = computeValues;
 		_avgDecimals = avgDecimals;
 	}
 
 	/**
-	 * @param showAvg
+	 * @param isShowAvg
 	 * @param computeValues
 	 */
-	public TourChartAnalyzerInfo(final boolean showAvg, final ComputeChartValue computeValues) {
-		_showAvg = showAvg;
+	public TourChartAnalyzerInfo(final boolean isShowAvg, final ComputeChartValue computeValues) {
+
+		_isShowAvg = isShowAvg;
 		_computeValues = computeValues;
 	}
 
@@ -93,14 +97,14 @@ public class TourChartAnalyzerInfo {
 	 * @return Returns the showAvg.
 	 */
 	public boolean isShowAvg() {
-		return _showAvg;
+		return _isShowAvg;
 	}
 
 	/**
 	 * @return Returns the showAvgDecimals.
 	 */
 	public boolean isShowAvgDecimals() {
-		return _showAvgDecimals;
+		return _isShowAvgDecimals;
 	}
 
 }
