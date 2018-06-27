@@ -16,6 +16,9 @@ Improvements
   
 * Tour Analyzer View
 
+  - Avg altitude shows these values:
+  	Summarized up values, when 0 then the summarized down values are displayed
+  
   - Optimized performance by reducing paint events -> Moving the chart slider is now more smoothly
 
 

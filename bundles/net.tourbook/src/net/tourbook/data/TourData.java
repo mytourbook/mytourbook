@@ -2413,6 +2413,67 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		return new AltitudeUpDown(altitudeUpTotal, -altitudeDownTotal);
 	}
 
+	public float computeAvg_Altitude(final int valueIndexLeft, final int valueIndexRight) {
+
+		// check if all necessary data are available
+		if (altitudeSerie == null || altitudeSerie.length < 2
+				|| distanceSerie == null || distanceSerie.length < 2
+				|| valueIndexLeft == valueIndexRight) {
+
+			return 0;
+		}
+
+		final int serieLength = Math.abs(valueIndexRight - valueIndexLeft);
+
+		// convert data series into DP points
+		final DPPoint dpPoints[] = new DPPoint[serieLength];
+		for (int serieIndex = 0; serieIndex < dpPoints.length; serieIndex++) {
+
+			dpPoints[serieIndex] = new DPPoint(
+					distanceSerie[serieIndex + valueIndexLeft],
+					altitudeSerie[serieIndex + valueIndexLeft],
+					serieIndex);
+		}
+
+		int[] forcedIndices = null;
+		if (isMultipleTours) {
+			forcedIndices = multipleTourStartIndex;
+		}
+
+		final DPPoint[] simplifiedPoints = new DouglasPeuckerSimplifier(dpTolerance / 10.0f, dpPoints, forcedIndices).simplify();
+
+		float altitudeUpTotal = 0;
+		float altitudeDownTotal = 0;
+
+		float prevAltitude = altitudeSerie[valueIndexLeft];
+
+		/*
+		 * Get altitude up/down from the tour altitude values which are found by DP
+		 */
+		for (int dbIndex = 1; dbIndex < simplifiedPoints.length; dbIndex++) {
+
+			final DPPoint point = simplifiedPoints[dbIndex];
+			final float currentAltitude = altitudeSerie[point.serieIndex + valueIndexLeft];
+			final float altiDiff = currentAltitude - prevAltitude;
+
+			if (altiDiff > 0) {
+				altitudeUpTotal += altiDiff;
+			} else {
+				altitudeDownTotal += altiDiff;
+			}
+
+			prevAltitude = currentAltitude;
+		}
+
+		/**
+		 * Very special behaviour until the tour chart analyzer can show both values:
+		 * <p>
+		 * Returns the up values, when 0 then the down values
+		 */
+
+		return altitudeUpTotal > 0 ? altitudeUpTotal : altitudeDownTotal;
+	}
+
 	private void computeAvg_Cadence() {
 
 		if (cadenceSerie == null) {

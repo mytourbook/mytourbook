@@ -229,7 +229,7 @@ public class TourManager {
 //	private static AtomicInteger			_tourCopyCounter	= new AtomicInteger();
 	//
 	private ComputeChartValue				_computeAvg_Altimeter;
-//	private ComputeChartValue				_computeAvg_Altitude;
+	private ComputeChartValue				_computeAvg_Altitude;
 	private ComputeChartValue				_computeAvg_Cadence;
 	private ComputeChartValue				_computeAvg_Gradient;
 	private ComputeChartValue				_computeAvg_Pace;
@@ -2645,18 +2645,16 @@ public class TourManager {
 			}
 		};
 
-//		_computeAvg_Altitude = new ComputeChartValue() {
-//
-//			@Override
-//			public float compute() {
-//
-//				final Object customDataAltitude = chartModel.getCustomData(CUSTOM_DATA_ALTITUDE);
-//				if (customDataAltitude == null) {
-//					return 0;
-//				}
-//
-//			}
-//		};
+		_computeAvg_Altitude = new ComputeChartValue() {
+
+			@Override
+			public float compute() {
+
+				final TourData tourData = (TourData) chartModel.getCustomData(CUSTOM_DATA_TOUR_DATA);
+
+				return tourData.computeAvg_Altitude(valueIndexLeft, valueIndexRight);
+			}
+		};
 
 		/*
 		 * Compute the average altimeter speed between the two sliders
@@ -3265,7 +3263,7 @@ public class TourManager {
 			yDataAltitude.setDisplayedFractionalDigits(2);
 			yDataAltitude.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_ALTITUDE);
 			yDataAltitude.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true));
-//			yDataAltitude.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, false, _computeAvg_Altitude, 0));
+			yDataAltitude.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, false, _computeAvg_Altitude, 0));
 
 			if (isHrZoneDisplayed) {
 				yDataAltitude.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
