@@ -16,7 +16,6 @@
 package net.tourbook.ui.views.tourBook;
 
 import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
@@ -24,7 +23,6 @@ import net.tourbook.common.util.Util;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -36,22 +34,20 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 
 /**
- * Tour chart properties slideout.
+ * Tourbook properties slideout.
  */
 public class SlideoutTourBookOptions extends ToolbarSlideout {
 
-	private final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
-
-	private SelectionAdapter		_defaultSelectionListener;
+	private SelectionAdapter	_defaultSelectionListener;
 
 	/*
 	 * UI controls
 	 */
-	private Button					_chkShowSummaryRow;
+	private Button				_chkShowSummaryRow;
 
-	private TourBookView			_tourBookView;
+	private TourBookView		_tourBookView;
 
-	private IDialogSettings			_state;
+	private IDialogSettings		_state;
 
 	/**
 	 * @param ownerControl

@@ -936,6 +936,19 @@ public class TourChartAnalyzerView extends ViewPart {
 		updateInfo(chartInfo, false);
 	}
 
+	private void updateUI_EmptyValues(final GraphInfo graphInfo) {
+
+		graphInfo.lblDiff.setText(UI.EMPTY_STRING);
+		graphInfo.lblAvg.setText(UI.EMPTY_STRING);
+
+		graphInfo.lblLeft.setText(UI.EMPTY_STRING);
+		graphInfo.lblRight.setText(UI.EMPTY_STRING);
+
+		graphInfo.lblMin.setText(UI.EMPTY_STRING);
+		graphInfo.lblMax.setText(UI.EMPTY_STRING);
+
+	}
+
 	private void updateUI_Runnable(final SelectionChartInfo chartInfo, final boolean isForceRecreate) {
 
 		_chartInfo = chartInfo;
@@ -1047,6 +1060,8 @@ public class TourChartAnalyzerView extends ViewPart {
 			}
 
 			if (values == null) {
+
+				updateUI_EmptyValues(graphInfo);
 				continue;
 			}
 
@@ -1064,6 +1079,13 @@ public class TourChartAnalyzerView extends ViewPart {
 			// values at the left/right slider
 			final double leftValue = values[valuesIndexLeft];
 			final double rightValue = values[valuesIndexRight];
+
+			if (Double.isNaN(leftValue) || Double.isNaN(rightValue)) {
+
+				// this can happen when a data serie contains multiple tours and not all tours have all data
+				updateUI_EmptyValues(graphInfo);
+				continue;
+			}
 
 			int dataIndex = valuesIndexLeft;
 			float avg = 0;
@@ -1125,27 +1147,53 @@ public class TourChartAnalyzerView extends ViewPart {
 			/*
 			 * Set values into the labels, optimize performance by displaying only changed values
 			 */
-			if (graphInfo.leftValue != leftValue) {
-				graphInfo.leftValue = leftValue;
-				graphInfo.lblLeft.setText(Util.formatNumber(leftValue, unitType, valueDivisor, valueDecimals) + UI.SPACE);
+			if (leftValue == 0) {
+				graphInfo.prevLeftValue = 0;
+				graphInfo.lblLeft.setText(UI.EMPTY_STRING);
+			} else {
+
+				if (graphInfo.prevLeftValue != leftValue) {
+					graphInfo.prevLeftValue = leftValue;
+					graphInfo.lblLeft.setText(Util.formatNumber(leftValue, unitType, valueDivisor, valueDecimals) + UI.SPACE);
+				}
 			}
 
-			if (graphInfo.rightValue != rightValue) {
-				graphInfo.rightValue = rightValue;
-				graphInfo.lblRight.setText(Util.formatNumber(rightValue, unitType, valueDivisor, valueDecimals) + UI.SPACE);
+			if (rightValue == 0) {
+				graphInfo.prevRightValue = 0;
+				graphInfo.lblRight.setText(UI.EMPTY_STRING);
+			} else {
+
+				if (graphInfo.prevRightValue != rightValue) {
+					graphInfo.prevRightValue = rightValue;
+					graphInfo.lblRight.setText(Util.formatNumber(rightValue, unitType, valueDivisor, valueDecimals) + UI.SPACE);
+				}
 			}
 
-			if (graphInfo.minValue != min) {
-				graphInfo.minValue = min;
-				graphInfo.lblMin.setText(Util.formatNumber(min, unitType, valueDivisor, valueDecimals) + UI.SPACE);
+			if (min == 0) {
+				graphInfo.prevMinValue = 0;
+				graphInfo.lblMin.setText(UI.EMPTY_STRING);
+			} else {
+
+				if (graphInfo.prevMinValue != min) {
+					graphInfo.prevMinValue = min;
+					graphInfo.lblMin.setText(Util.formatNumber(min, unitType, valueDivisor, valueDecimals) + UI.SPACE);
+				}
 			}
 
-			if (graphInfo.maxValue != max) {
-				graphInfo.maxValue = max;
-				graphInfo.lblMax.setText(Util.formatNumber(max, unitType, valueDivisor, valueDecimals) + UI.SPACE);
+			if (max == 0) {
+				graphInfo.prevMaxValue = 0;
+				graphInfo.lblMax.setText(UI.EMPTY_STRING);
+			} else {
+
+				if (graphInfo.prevMaxValue != max) {
+					graphInfo.prevMaxValue = max;
+					graphInfo.lblMax.setText(Util.formatNumber(max, unitType, valueDivisor, valueDecimals) + UI.SPACE);
+				}
 			}
 
-			// set average value
+			/*
+			 * Avg
+			 */
 			if (analyzerInfo.isShowAvg()) {
 
 				float avgValue = avg;
@@ -1154,29 +1202,40 @@ public class TourChartAnalyzerView extends ViewPart {
 
 					avgValue *= valueDivisor2;
 
-					if (graphInfo.avgValue != (int) avgValue) {
+					if (graphInfo.prevAvgValue != (int) avgValue) {
 
-						graphInfo.avgValue = (int) avgValue;
+						graphInfo.prevAvgValue = (int) avgValue;
 						graphInfo.lblAvg.setText(Util.formatNumber(avgValue, unitType, valueDivisor2, valueDecimals) + UI.SPACE);
 					}
 
 				} else {
 
-					if (graphInfo.avgValue != (int) avgValue) {
+					if (graphInfo.prevAvgValue != (int) avgValue) {
 
-						graphInfo.avgValue = (int) avgValue;
+						graphInfo.prevAvgValue = (int) avgValue;
 						graphInfo.lblAvg.setText(Util.formatValue((int) avgValue, unitType, valueDivisor, true) + UI.SPACE);
 					}
 				}
 
 			} else {
+				graphInfo.prevAvgValue = Double.MIN_VALUE;
 				graphInfo.lblAvg.setText(UI.EMPTY_STRING);
 			}
 
+			/*
+			 * Diff
+			 */
 			final double diffValue = rightValue - leftValue;
-			if (graphInfo.diffValue != diffValue) {
-				graphInfo.diffValue = diffValue;
-				graphInfo.lblDiff.setText(Util.formatNumber(diffValue, unitType, valueDivisor, valueDecimals) + UI.SPACE);
+
+			if (diffValue == 0) {
+				graphInfo.prevDiffValue = 0;
+				graphInfo.lblDiff.setText(UI.EMPTY_STRING);
+			} else {
+
+				if (graphInfo.prevDiffValue != diffValue) {
+					graphInfo.prevDiffValue = diffValue;
+					graphInfo.lblDiff.setText(Util.formatNumber(diffValue, unitType, valueDivisor, valueDecimals) + UI.SPACE);
+				}
 			}
 		}
 	}

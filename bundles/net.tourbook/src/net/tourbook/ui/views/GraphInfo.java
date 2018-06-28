@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -33,14 +33,14 @@ class GraphInfo {
 
 	private final TourChartAnalyzerView	_tourChartAnalyzerView;
 
-	double								leftValue	= Double.MIN_VALUE;
-	double								rightValue	= Double.MIN_VALUE;
+	double								prevLeftValue	= Double.MIN_VALUE;
+	double								prevRightValue	= Double.MIN_VALUE;
 
-	double								minValue	= Double.MIN_VALUE;
-	double								maxValue	= Double.MIN_VALUE;
+	double								prevMinValue	= Double.MIN_VALUE;
+	double								prevMaxValue	= Double.MIN_VALUE;
 
-	double								avgValue	= Double.MIN_VALUE;
-	double								diffValue	= Double.MIN_VALUE;
+	double								prevAvgValue	= Double.MIN_VALUE;
+	double								prevDiffValue	= Double.MIN_VALUE;
 
 	ChartDataSerie						chartData;
 	private int							_columnSpacing;

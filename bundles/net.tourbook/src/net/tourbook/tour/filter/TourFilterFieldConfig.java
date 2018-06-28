@@ -207,7 +207,7 @@ public class TourFilterFieldConfig {
 	/**
 	 * Set maximum integer value, default is {@link Integer#MAX_VALUE}.
 	 * 
-	 * @param maxValue
+	 * @param prevMaxValue
 	 * @return
 	 */
 	TourFilterFieldConfig maxValue(final int maxValue) {
@@ -218,7 +218,7 @@ public class TourFilterFieldConfig {
 	/**
 	 * Set minimum integer value, default is 0.
 	 * 
-	 * @param minValue
+	 * @param prevMinValue
 	 * @return
 	 */
 	TourFilterFieldConfig minValue(final int minValue) {

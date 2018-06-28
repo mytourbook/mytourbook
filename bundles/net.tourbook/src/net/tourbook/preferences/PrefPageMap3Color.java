@@ -892,7 +892,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 	 */
 	private void defineColumn_32_MinValue() {
 
-		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "minValue", SWT.TRAIL); //$NON-NLS-1$
+		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "prevMinValue", SWT.TRAIL); //$NON-NLS-1$
 
 		colDef.setColumnLabel(Messages.Pref_Map3Color_Column_MinValue_Label);
 		colDef.setColumnHeaderText(Messages.Pref_Map3Color_Column_MinValue_Header);
@@ -928,7 +928,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 	 */
 	private void defineColumn_35_MaxValue() {
 
-		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "maxValue", SWT.LEAD); //$NON-NLS-1$
+		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "prevMaxValue", SWT.LEAD); //$NON-NLS-1$
 
 		colDef.setColumnLabel(Messages.Pref_Map3Color_Column_MaxValue_Label);
 		colDef.setColumnHeaderText(Messages.Pref_Map3Color_Column_MaxValue_Header);

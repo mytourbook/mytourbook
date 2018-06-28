@@ -320,8 +320,8 @@ public class YearStatisticView extends ViewPart {
 		final float minValue = (float) yData.getVisibleMinValue();
 		final float maxValue = (float) yData.getVisibleMaxValue();
 
-		final float dataMinValue = minValue;// - (minValue / 100);
-		final float dataMaxValue = maxValue;// + (maxValue / 100);
+		final float dataMinValue = minValue;// - (prevMinValue / 100);
+		final float dataMaxValue = maxValue;// + (prevMaxValue / 100);
 
 		if (_isSynchMaxValue) {
 
