@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,11 +16,11 @@
 package net.tourbook.tour;
 
 import net.tourbook.chart.ISliderLabelProvider;
+import net.tourbook.common.UI;
 
 public class SliderLabelProvider_Gear implements ISliderLabelProvider {
 
-
-	private float[][]			_gearSerie;
+	private float[][] _gearSerie;
 
 	public SliderLabelProvider_Gear(final float[][] gearSerie) {
 		_gearSerie = gearSerie;
@@ -29,13 +29,22 @@ public class SliderLabelProvider_Gear implements ISliderLabelProvider {
 	@Override
 	public String getLabel(final int sliderValueIndex) {
 
+		final float value0 = _gearSerie[0][sliderValueIndex];
+		final float value1 = _gearSerie[1][sliderValueIndex];
+		final float value2 = _gearSerie[2][sliderValueIndex];
+
+		if (Float.isNaN(value0)) {
+			return UI.DASH_WITH_SPACE;
+		}
+
 		return String.format(
+
 				TourManager.GEAR_VALUE_FORMAT,
-				(int) _gearSerie[1][sliderValueIndex],
-				(int) _gearSerie[2][sliderValueIndex],
-				_gearSerie[0][sliderValueIndex]
-		//
-				);
+				(int) value1,
+				(int) value2,
+				value0
+
+		);
 	}
 
 }
