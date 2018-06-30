@@ -951,6 +951,10 @@ public class TourChartAnalyzerView extends ViewPart {
 
 	private void updateUI_Runnable(final SelectionChartInfo chartInfo, final boolean isForceRecreate) {
 
+		if (_partContainer.isDisposed()) {
+			return;
+		}
+
 		_chartInfo = chartInfo;
 
 		// check if the layout needs to be recreated

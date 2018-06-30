@@ -11,7 +11,7 @@ Improvements
 
 * Tour Book View
 
-  - Summary/total row 
+  - Summary (totals) row 
   
   
 * Tour Analyzer View
