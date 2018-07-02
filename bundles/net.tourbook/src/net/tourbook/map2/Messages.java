@@ -154,6 +154,7 @@ public class Messages extends NLS {
 	public static String		statusLine_mapInfo_pattern;
 	public static String		statusLine_mapInfo_tooltip;
 
+	public static String		Tour_Action_RunDyn_StepLength_Tooltip;
 	public static String		Tour_Action_ShowHrZones_Tooltip;
 
 	static {

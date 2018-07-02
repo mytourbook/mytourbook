@@ -112,6 +112,7 @@ public class GraphColorManager {
 	private static final Map2ColorProfile	MAP_COLOR_PACE;
 	private static final Map2ColorProfile	MAP_COLOR_PULSE;
 	private static final Map2ColorProfile	MAP_COLOR_SPEED;
+	private static final Map2ColorProfile	MAP_COLOR_RUN_DYN_STEP_LENGTH;
 
 	/**
 	 * Set map default colors.
@@ -193,6 +194,27 @@ public class GraphColorManager {
 				17,
 				MapColorProfile.BRIGHTNESS_DIMMING,
 				8);
+
+		MAP_COLOR_RUN_DYN_STEP_LENGTH = new Map2ColorProfile(//
+				//
+				new ColorValue[] {
+						new ColorValue(10, 0xEC, 0x20, 0x20),
+						new ColorValue(50, 255, 85, 13),
+						new ColorValue(100, 255, 255, 0),
+						new ColorValue(150, 0, 170, 9),
+						new ColorValue(190, 23, 163, 255) },
+				//
+				MapColorProfile.BRIGHTNESS_DIMMING,
+				20,
+				MapColorProfile.BRIGHTNESS_LIGHTNING,
+				40,
+
+				// overwrite min/max values
+				true,
+				800,
+				true,
+				1600);
+
 	}
 
 	private static GraphColorManager	_instance;
@@ -446,7 +468,7 @@ public class GraphColorManager {
 				new RGB(0xff, 0x4d, 0x0),
 				new RGB(0xe6, 0x45, 0x0),
 				new RGB(0xa4, 0x31, 0x0),
-				null));
+				MAP_COLOR_RUN_DYN_STEP_LENGTH));
 
 		allColorDef.add(new ColorDefinition(PREF_GRAPH_RUN_DYN_VERTICAL_OSCILLATION,
 				Messages.Graph_Pref_Color_RunDyn_VerticalOscillation,
@@ -510,6 +532,7 @@ public class GraphColorManager {
 	public ColorDefinition getColorDefinition(final MapGraphId graphId) {
 
 		switch (graphId) {
+
 		case Altitude:
 			return getGraphColorDefinition(GraphColorManager.PREF_GRAPH_ALTITUDE);
 		case Gradient:
@@ -520,6 +543,10 @@ public class GraphColorManager {
 			return getGraphColorDefinition(GraphColorManager.PREF_GRAPH_HEARTBEAT);
 		case Speed:
 			return getGraphColorDefinition(GraphColorManager.PREF_GRAPH_SPEED);
+
+		case RunDyn_StepLength:
+			return getGraphColorDefinition(GraphColorManager.PREF_GRAPH_RUN_DYN_STEP_LENGTH);
+
 		default:
 			break;
 		}

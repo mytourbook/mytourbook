@@ -44,5 +44,5 @@ public enum MapGraphId {
 	Temperature,
 
 	/** Running dynamics */
-//	StepLength,
+	RunDyn_StepLength,
 }
