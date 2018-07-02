@@ -129,9 +129,13 @@ public class ChartComponents extends Composite {
 	private int					_devMarginTop				= MARGIN_TOP_WITHOUT_TITLE;
 
 	/**
-	 * height of the slider bar, 0 indicates that the slider is not visible
+	 * Height of the slider bar, 0 indicates that the slider is not visible.
+	 * <p>
+	 * Use a default height that the graph title do not cover the upper graph. After the slider
+	 * label is painted in the graph, this field is propably not needed any more but now it is used
+	 * for additional space for the graph title.
 	 */
-	int							_devSliderBarHeight			= 0;
+	int							_devSliderBarHeight			= SLIDER_BAR_HEIGHT;
 
 	/**
 	 * height of the title bar, 0 indicates that the title is not visible
@@ -708,9 +712,9 @@ public class ChartComponents extends Composite {
 				}
 
 				if (graphValue < graphLeftBorder
-				- graphUnit //
-				//
-				// ensure it's 366 days
+						- graphUnit //
+						//
+						// ensure it's 366 days
 						- DAY_IN_SECONDS) {
 
 					// advance to the next unit
@@ -771,9 +775,9 @@ public class ChartComponents extends Composite {
 				final long graphUnit = _historyDOY[historyYearIndex] * DAY_IN_SECONDS;
 
 				if (graphValue < graphLeftBorder
-				- graphUnit //
-				//
-				// ensure it's 366 days
+						- graphUnit //
+						//
+						// ensure it's 366 days
 						- DAY_IN_SECONDS) {
 
 					// advance to the next unit

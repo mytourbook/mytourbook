@@ -2495,6 +2495,7 @@ public class ChartComponentGraph extends Canvas {
 	private void drawAsync_250_GraphTitle(final GC gcGraph, final GraphDrawingData drawingData) {
 
 		final ChartDataYSerie yData = drawingData.getYData();
+
 		final String graphTitle = yData.getYTitle();
 
 		final Point labelExtend = gcGraph.stringExtent(graphTitle);
@@ -2502,12 +2503,10 @@ public class ChartComponentGraph extends Canvas {
 
 		final int devYTop = drawingData.getDevYTop() - labelHeight;
 
-		final RGB[] rgbText = yData.getRgbLine();
-
-		final Color colorText = new Color(gcGraph.getDevice(), rgbText[0]);
+		final Color colorText = new Color(gcGraph.getDevice(), yData.getDefaultRGB());
 		{
 			gcGraph.setForeground(colorText);
-			gcGraph.drawString(graphTitle, 0, devYTop);
+			gcGraph.drawString(graphTitle, 0, devYTop, true);
 		}
 		colorText.dispose();
 	}
