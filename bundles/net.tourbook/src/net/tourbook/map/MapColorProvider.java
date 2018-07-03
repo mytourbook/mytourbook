@@ -57,6 +57,8 @@ public class MapColorProvider {
 		_map2ColorProvider.put(MapGraphId.Pulse, new Map2GradientColorProvider(MapGraphId.Pulse));
 		_map2ColorProvider.put(MapGraphId.Speed, new Map2GradientColorProvider(MapGraphId.Speed));
 
+		_map2ColorProvider.put(MapGraphId.RunDyn_StepLength, new Map2GradientColorProvider(MapGraphId.RunDyn_StepLength));
+
 		_map2ColorProvider.put(MapGraphId.HrZone, new HrZonesColorProvider(MapGraphId.HrZone));
 
 		/*

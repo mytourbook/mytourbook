@@ -2414,6 +2414,10 @@ public class TourMapPainter extends MapPainter {
 			_dataSerie = tourData.getPaceSerieSeconds();
 			break;
 
+		case RunDyn_StepLength:
+			_dataSerie = tourData.getRunDyn_StepLength();
+			break;
+
 		case HrZone:
 			_dataSerie = tourData.pulseSerie;
 			break;

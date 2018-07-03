@@ -454,7 +454,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		@Override
 		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-			return new SlideoutMap2TourColors(_parent, toolbar, Map2View.this, _state);
+			return new SlideoutMap2_TourColors(_parent, toolbar, Map2View.this, _state);
 		}
 
 		@Override
@@ -1649,6 +1649,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			_actionTourColorSpeed.setEnabled(false);
 			_actionTourColorPace.setEnabled(false);
 			_actionTourColorHrZone.setEnabled(false);
+			_actionTourColor_RunDyn_StepLength.setEnabled(false);
 
 		} else if (isForceTourColor) {
 
@@ -1658,6 +1659,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			_actionTourColorSpeed.setEnabled(true);
 			_actionTourColorPace.setEnabled(true);
 			_actionTourColorHrZone.setEnabled(true);
+			_actionTourColor_RunDyn_StepLength.setEnabled(true);
 
 		} else if (isOneTour) {
 
@@ -1671,6 +1673,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			_actionTourColorSpeed.setEnabled(oneTourData.getSpeedSerie() != null);
 			_actionTourColorPace.setEnabled(oneTourData.getPaceSerie() != null);
 			_actionTourColorHrZone.setEnabled(canShowHrZones);
+			_actionTourColor_RunDyn_StepLength.setEnabled(oneTourData.runDyn_StepLength != null);
 
 		} else {
 
@@ -1680,6 +1683,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			_actionTourColorSpeed.setEnabled(false);
 			_actionTourColorPace.setEnabled(false);
 			_actionTourColorHrZone.setEnabled(false);
+			_actionTourColor_RunDyn_StepLength.setEnabled(false);
 		}
 	}
 
@@ -1819,7 +1823,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 				MapGraphId.Gradient,
 				STATE_IS_SHOW_IN_TOOLBAR_GRADIENT,
 				STATE_IS_SHOW_IN_TOOLBAR_GRADIENT_DEFAULT);
-		
+
 		fillToolbar_TourColors_Color(
 				tbm,
 				MapGraphId.RunDyn_StepLength,
@@ -3146,6 +3150,10 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 				_actionTourColorHrZone.setChecked(true);
 				break;
 
+			case RunDyn_StepLength:
+				_actionTourColor_RunDyn_StepLength.setChecked(true);
+				break;
+
 			default:
 				_actionTourColorAltitude.setChecked(true);
 				break;
@@ -3350,6 +3358,10 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 		} else if (_actionTourColorHrZone.isChecked()) {
 			colorId = MapGraphId.HrZone;
+
+		} else if (_actionTourColor_RunDyn_StepLength.isChecked()) {
+			colorId = MapGraphId.RunDyn_StepLength;
+
 		} else {
 			// use altitude as default
 			colorId = MapGraphId.Altitude;

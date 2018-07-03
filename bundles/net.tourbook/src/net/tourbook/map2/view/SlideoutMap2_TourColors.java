@@ -39,7 +39,7 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Slideout for the map2 tour colors
  */
-public class SlideoutMap2TourColors extends ToolbarSlideout {
+public class SlideoutMap2_TourColors extends ToolbarSlideout {
 
 	private IDialogSettings		_state;
 
@@ -57,9 +57,10 @@ public class SlideoutMap2TourColors extends ToolbarSlideout {
 	private Button				_chkShowInChartToolbar_Pace;
 	private Button				_chkShowInChartToolbar_Pulse;
 	private Button				_chkShowInChartToolbar_Speed;
+	private Button				_chkShowInChartToolbar_RunDyn_StepLength;
 	private Button				_chkShowInChartToolbar_HrZone;
 
-	public SlideoutMap2TourColors(	final Control ownerControl,
+	public SlideoutMap2_TourColors(	final Control ownerControl,
 									final ToolBar toolBar,
 									final Map2View map2View,
 									final IDialogSettings state) {
@@ -154,7 +155,7 @@ public class SlideoutMap2TourColors extends ToolbarSlideout {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(6).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(7).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
 
@@ -168,6 +169,7 @@ public class SlideoutMap2TourColors extends ToolbarSlideout {
 					createUI_GraphAction(container, MapGraphId.Speed);
 					createUI_GraphAction(container, MapGraphId.Pace);
 					createUI_GraphAction(container, MapGraphId.Gradient);
+					createUI_GraphAction(container, MapGraphId.RunDyn_StepLength);
 					createUI_GraphAction(container, MapGraphId.HrZone);
 				}
 				{
@@ -179,6 +181,7 @@ public class SlideoutMap2TourColors extends ToolbarSlideout {
 					_chkShowInChartToolbar_Speed = createUI_GraphCheckbox(container);
 					_chkShowInChartToolbar_Pace = createUI_GraphCheckbox(container);
 					_chkShowInChartToolbar_Gradient = createUI_GraphCheckbox(container);
+					_chkShowInChartToolbar_RunDyn_StepLength = createUI_GraphCheckbox(container);
 					_chkShowInChartToolbar_HrZone = createUI_GraphCheckbox(container);
 				}
 			}
@@ -263,12 +266,13 @@ public class SlideoutMap2TourColors extends ToolbarSlideout {
 
 // SET_FORMATTING_OFF
 		
-		_chkShowInChartToolbar_Altitude.setSelection(		Util.getStateBoolean(_state, Map2View.STATE_IS_SHOW_IN_TOOLBAR_ALTITUDE,		Map2View.STATE_IS_SHOW_IN_TOOLBAR_ALTITUDE_DEFAULT));
-		_chkShowInChartToolbar_Gradient.setSelection(		Util.getStateBoolean(_state, Map2View.STATE_IS_SHOW_IN_TOOLBAR_GRADIENT,		Map2View.STATE_IS_SHOW_IN_TOOLBAR_GRADIENT_DEFAULT));
-		_chkShowInChartToolbar_HrZone.setSelection(			Util.getStateBoolean(_state, Map2View.STATE_IS_SHOW_IN_TOOLBAR_HR_ZONE,	Map2View.STATE_IS_SHOW_IN_TOOLBAR_HR_ZONE_DEFAULT));
-		_chkShowInChartToolbar_Pace.setSelection(			Util.getStateBoolean(_state, Map2View.STATE_IS_SHOW_IN_TOOLBAR_PACE,			Map2View.STATE_IS_SHOW_IN_TOOLBAR_PACE_DEFAULT));
-		_chkShowInChartToolbar_Pulse.setSelection(			Util.getStateBoolean(_state, Map2View.STATE_IS_SHOW_IN_TOOLBAR_PULSE,		Map2View.STATE_IS_SHOW_IN_TOOLBAR_PULSE_DEFAULT));
-		_chkShowInChartToolbar_Speed.setSelection(			Util.getStateBoolean(_state, Map2View.STATE_IS_SHOW_IN_TOOLBAR_SPEED,		Map2View.STATE_IS_SHOW_IN_TOOLBAR_SPEED_DEFAULT));
+		_chkShowInChartToolbar_Altitude.setSelection(			Util.getStateBoolean(_state, Map2View.STATE_IS_SHOW_IN_TOOLBAR_ALTITUDE,			Map2View.STATE_IS_SHOW_IN_TOOLBAR_ALTITUDE_DEFAULT));
+		_chkShowInChartToolbar_Gradient.setSelection(			Util.getStateBoolean(_state, Map2View.STATE_IS_SHOW_IN_TOOLBAR_GRADIENT,			Map2View.STATE_IS_SHOW_IN_TOOLBAR_GRADIENT_DEFAULT));
+		_chkShowInChartToolbar_HrZone.setSelection(				Util.getStateBoolean(_state, Map2View.STATE_IS_SHOW_IN_TOOLBAR_HR_ZONE,				Map2View.STATE_IS_SHOW_IN_TOOLBAR_HR_ZONE_DEFAULT));
+		_chkShowInChartToolbar_Pace.setSelection(				Util.getStateBoolean(_state, Map2View.STATE_IS_SHOW_IN_TOOLBAR_PACE,				Map2View.STATE_IS_SHOW_IN_TOOLBAR_PACE_DEFAULT));
+		_chkShowInChartToolbar_Pulse.setSelection(				Util.getStateBoolean(_state, Map2View.STATE_IS_SHOW_IN_TOOLBAR_PULSE,				Map2View.STATE_IS_SHOW_IN_TOOLBAR_PULSE_DEFAULT));
+		_chkShowInChartToolbar_RunDyn_StepLength.setSelection(	Util.getStateBoolean(_state, Map2View.STATE_IS_SHOW_IN_TOOLBAR_RUN_DYN_STEP_LENGTH,	Map2View.STATE_IS_SHOW_IN_TOOLBAR_RUN_DYN_STEP_LENGTH_DEFAULT));
+		_chkShowInChartToolbar_Speed.setSelection(				Util.getStateBoolean(_state, Map2View.STATE_IS_SHOW_IN_TOOLBAR_SPEED,				Map2View.STATE_IS_SHOW_IN_TOOLBAR_SPEED_DEFAULT));
 		
 // SET_FORMATTING_ON
 	}
@@ -277,12 +281,13 @@ public class SlideoutMap2TourColors extends ToolbarSlideout {
 
 // SET_FORMATTING_OFF
 		
-		_state.put(Map2View.STATE_IS_SHOW_IN_TOOLBAR_ALTITUDE, 		_chkShowInChartToolbar_Altitude.getSelection());
-		_state.put(Map2View.STATE_IS_SHOW_IN_TOOLBAR_GRADIENT, 		_chkShowInChartToolbar_Gradient.getSelection());
-		_state.put(Map2View.STATE_IS_SHOW_IN_TOOLBAR_HR_ZONE,		_chkShowInChartToolbar_HrZone.getSelection());
-		_state.put(Map2View.STATE_IS_SHOW_IN_TOOLBAR_PACE, 			_chkShowInChartToolbar_Pace.getSelection());
-		_state.put(Map2View.STATE_IS_SHOW_IN_TOOLBAR_PULSE, 		_chkShowInChartToolbar_Pulse.getSelection());
-		_state.put(Map2View.STATE_IS_SHOW_IN_TOOLBAR_SPEED, 		_chkShowInChartToolbar_Speed.getSelection());
+		_state.put(Map2View.STATE_IS_SHOW_IN_TOOLBAR_ALTITUDE, 				_chkShowInChartToolbar_Altitude.getSelection());
+		_state.put(Map2View.STATE_IS_SHOW_IN_TOOLBAR_GRADIENT, 				_chkShowInChartToolbar_Gradient.getSelection());
+		_state.put(Map2View.STATE_IS_SHOW_IN_TOOLBAR_HR_ZONE,				_chkShowInChartToolbar_HrZone.getSelection());
+		_state.put(Map2View.STATE_IS_SHOW_IN_TOOLBAR_PACE, 					_chkShowInChartToolbar_Pace.getSelection());
+		_state.put(Map2View.STATE_IS_SHOW_IN_TOOLBAR_PULSE, 				_chkShowInChartToolbar_Pulse.getSelection());
+		_state.put(Map2View.STATE_IS_SHOW_IN_TOOLBAR_RUN_DYN_STEP_LENGTH,	_chkShowInChartToolbar_RunDyn_StepLength.getSelection());
+		_state.put(Map2View.STATE_IS_SHOW_IN_TOOLBAR_SPEED, 				_chkShowInChartToolbar_Speed.getSelection());
 		
 // SET_FORMATTING_ON
 	}

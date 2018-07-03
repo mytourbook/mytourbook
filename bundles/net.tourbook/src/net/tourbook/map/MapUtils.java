@@ -364,6 +364,67 @@ public class MapUtils {
 
 			break;
 
+		case RunDyn_StepLength:
+
+			minValue = Float.MIN_VALUE;
+			maxValue = Float.MAX_VALUE;
+
+			setInitialValue = true;
+
+			for (final TourData tourData : allTourData) {
+
+				final float[] dataSerie = tourData.getRunDyn_StepLength();
+				if ((dataSerie == null) || (dataSerie.length == 0)) {
+					continue;
+				}
+
+				/*
+				 * get min/max values
+				 */
+				for (final float dataValue : dataSerie) {
+
+					if (dataValue == Float.MIN_VALUE) {
+						// skip invalid values
+						continue;
+					}
+
+					if (setInitialValue) {
+
+						setInitialValue = false;
+						minValue = maxValue = dataValue;
+					}
+
+					minValue = (minValue <= dataValue) ? minValue : dataValue;
+					maxValue = (maxValue >= dataValue) ? maxValue : dataValue;
+				}
+			}
+
+			if ((minValue == Float.MIN_VALUE) || (maxValue == Float.MAX_VALUE)) {
+				return false;
+			}
+
+			if (colorProvider instanceof Map3GradientColorProvider) {
+
+				// the colorProvider already contains the active color profile
+
+			} else {
+
+				setMap2ColorProfile(colorProvider, GraphColorManager.PREF_GRAPH_RUN_DYN_STEP_LENGTH);
+			}
+
+			mapUnits.numberFormatDigits = 0;
+			mapUnits.unitFormat = LegendUnitFormat.Number;
+
+			colorProvider.configureColorProvider(
+					config,
+					legendHeight,
+					minValue,
+					maxValue,
+					UI.UNIT_LABEL_DISTANCE_MM_OR_INCH,
+					LegendUnitFormat.Number);
+
+			break;
+
 		default:
 			break;
 		}

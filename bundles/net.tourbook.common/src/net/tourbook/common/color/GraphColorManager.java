@@ -198,11 +198,11 @@ public class GraphColorManager {
 		MAP_COLOR_RUN_DYN_STEP_LENGTH = new Map2ColorProfile(//
 				//
 				new ColorValue[] {
-						new ColorValue(10, 0xEC, 0x20, 0x20),
-						new ColorValue(50, 255, 85, 13),
-						new ColorValue(100, 255, 255, 0),
-						new ColorValue(150, 0, 170, 9),
-						new ColorValue(190, 23, 163, 255) },
+						new ColorValue(10, 255, 77, 0),
+						new ColorValue(50, 255, 77, 0),
+						new ColorValue(100, 255, 77, 0),
+						new ColorValue(150, 255, 77, 0),
+						new ColorValue(190, 255, 77, 0) },
 				//
 				MapColorProfile.BRIGHTNESS_DIMMING,
 				20,
@@ -535,12 +535,16 @@ public class GraphColorManager {
 
 		case Altitude:
 			return getGraphColorDefinition(GraphColorManager.PREF_GRAPH_ALTITUDE);
+
 		case Gradient:
 			return getGraphColorDefinition(GraphColorManager.PREF_GRAPH_GRADIENT);
+
 		case Pace:
 			return getGraphColorDefinition(GraphColorManager.PREF_GRAPH_PACE);
+
 		case Pulse:
 			return getGraphColorDefinition(GraphColorManager.PREF_GRAPH_HEARTBEAT);
+
 		case Speed:
 			return getGraphColorDefinition(GraphColorManager.PREF_GRAPH_SPEED);
 
