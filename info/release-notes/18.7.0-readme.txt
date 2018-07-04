@@ -3,21 +3,42 @@ Version 18.7.0                                             ?. July 2018
 New
 ===
 
-* Running Dynamics
+* Running Dynamics with these features:
+
+ - Tour Import 
+   - Import from .fit files
+ 
+ - Tour Book view
+   - 15 new columns
+   - Reimport "Only Running Dynamics Values..."
+   
+ - Tour Chart 
+   - 5 new graphs
+   - Set graph min/max values
+   - Set as default graph
+   - Show in value point tooltip
+   
+ - Tour Analyzer 
+   - Show data for all 5 graphs
+   
+ - 2D Map
+   -  Show tour with "Step Length" colors
+ 
+ - Support metric/imperial measurement
 
 
 Improvements
 ============
 
-* Tour Book View
+* Tour Book 
 
   - Summary (totals) row 
   
   
-* Tour Analyzer View
+* Tour Analyzer 
 
-  - Avg altitude shows these values:
-  	Summarized up values, when 0 then the summarized down values are displayed
+  - Altitude avg will show now these values:
+  	Summarized up values, when it's 0 then the summarized down values are displayed
   
   - Optimized performance by reducing paint events -> Moving the chart slider is now more smoothly
 
@@ -27,4 +48,4 @@ Bugfix
 
 * Map 2D
 
-  - Map was not centered with the tour the first time only at the second time
+  - Map was not centered with the tour the first time, only at the second time
