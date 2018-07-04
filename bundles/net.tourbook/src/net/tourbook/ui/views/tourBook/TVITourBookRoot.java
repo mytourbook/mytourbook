@@ -88,9 +88,9 @@ public class TVITourBookRoot extends TVITourBookItem {
 		final String groupBy = isShowSummaryRow
 
 				// show a summary row
-				? " GROUP BY ROLLUP(StartYear) "
+				? " GROUP BY ROLLUP(StartYear) " //$NON-NLS-1$
 
-				: " GROUP BY StartYear "
+				: " GROUP BY StartYear " //$NON-NLS-1$
 
 						+ NL;
 
