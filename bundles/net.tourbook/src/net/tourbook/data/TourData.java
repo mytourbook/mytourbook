@@ -3539,12 +3539,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			short minValue;
 			short maxValue;
 
-			minValue = maxValue = runDyn_StanceTime[0];
+			minValue = maxValue = getFirstNot0Value(runDyn_StanceTime);
 
 			int numValues = 0;
 			float sumValue = 0;
 
 			for (final short value : runDyn_StanceTime) {
+
+				// ignore 0 values
+				if (value == 0) {
+					continue;
+				}
 
 				if (value > maxValue) {
 					maxValue = value;
@@ -3554,15 +3559,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 					minValue = value;
 				}
 
-				if (value != 0) {
-					numValues++;
-					sumValue += value;
-				}
+				numValues++;
+				sumValue += value;
 			}
 
 			runDyn_StanceTime_Min = minValue;
 			runDyn_StanceTime_Max = maxValue;
-			runDyn_StanceTime_Avg = sumValue / numValues;
+			runDyn_StanceTime_Avg = numValues == 0 ? 0 : sumValue / numValues;
 		}
 
 		/*
@@ -3573,12 +3576,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			short minValue;
 			short maxValue;
 
-			minValue = maxValue = runDyn_StanceTimeBalance[0];
+			minValue = maxValue = getFirstNot0Value(runDyn_StanceTimeBalance);
 
 			int numValues = 0;
 			float sumValue = 0;
 
 			for (final short value : runDyn_StanceTimeBalance) {
+
+				// ignore 0 values
+				if (value == 0) {
+					continue;
+				}
 
 				if (value > maxValue) {
 					maxValue = value;
@@ -3588,15 +3596,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 					minValue = value;
 				}
 
-				if (value != 0) {
-					numValues++;
-					sumValue += value;
-				}
+				numValues++;
+				sumValue += value;
 			}
 
 			runDyn_StanceTimeBalance_Min = minValue;
 			runDyn_StanceTimeBalance_Max = maxValue;
-			runDyn_StanceTimeBalance_Avg = sumValue / numValues;
+			runDyn_StanceTimeBalance_Avg = numValues == 0 ? 0 : sumValue / numValues;
 		}
 
 		/*
@@ -3607,12 +3613,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			short minValue;
 			short maxValue;
 
-			minValue = maxValue = runDyn_StepLength[0];
+			minValue = maxValue = getFirstNot0Value(runDyn_StepLength);
 
 			int numValues = 0;
 			float sumValue = 0;
 
 			for (final short value : runDyn_StepLength) {
+
+				// ignore 0 values
+				if (value == 0) {
+					continue;
+				}
 
 				if (value > maxValue) {
 					maxValue = value;
@@ -3622,15 +3633,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 					minValue = value;
 				}
 
-				if (value != 0) {
-					numValues++;
-					sumValue += value;
-				}
+				numValues++;
+				sumValue += value;
 			}
 
 			runDyn_StepLength_Min = minValue;
 			runDyn_StepLength_Max = maxValue;
-			runDyn_StepLength_Avg = sumValue / numValues;
+			runDyn_StepLength_Avg = numValues == 0 ? 0 : sumValue / numValues;
 		}
 
 		/*
@@ -3641,12 +3650,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			short minValue;
 			short maxValue;
 
-			minValue = maxValue = runDyn_VerticalOscillation[0];
+			minValue = maxValue = getFirstNot0Value(runDyn_VerticalOscillation);
 
 			int numValues = 0;
 			float sumValue = 0;
 
 			for (final short value : runDyn_VerticalOscillation) {
+
+				// ignore 0 values
+				if (value == 0) {
+					continue;
+				}
 
 				if (value > maxValue) {
 					maxValue = value;
@@ -3656,15 +3670,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 					minValue = value;
 				}
 
-				if (value != 0) {
-					numValues++;
-					sumValue += value;
-				}
+				numValues++;
+				sumValue += value;
 			}
 
 			runDyn_VerticalOscillation_Min = minValue;
 			runDyn_VerticalOscillation_Max = maxValue;
-			runDyn_VerticalOscillation_Avg = sumValue / numValues;
+			runDyn_VerticalOscillation_Avg = numValues == 0 ? 0 : sumValue / numValues;
 		}
 
 		/*
@@ -3675,12 +3687,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			short minValue;
 			short maxValue;
 
-			minValue = maxValue = runDyn_VerticalRatio[0];
+			minValue = maxValue = getFirstNot0Value(runDyn_VerticalRatio);
 
 			int numValues = 0;
 			float sumValue = 0;
 
 			for (final short value : runDyn_VerticalRatio) {
+
+				// ignore 0 values
+				if (value == 0) {
+					continue;
+				}
 
 				if (value > maxValue) {
 					maxValue = value;
@@ -3690,15 +3707,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 					minValue = value;
 				}
 
-				if (value != 0) {
-					numValues++;
-					sumValue += value;
-				}
+				numValues++;
+				sumValue += value;
 			}
 
 			runDyn_VerticalRatio_Min = minValue;
 			runDyn_VerticalRatio_Max = maxValue;
-			runDyn_VerticalRatio_Avg = sumValue / numValues;
+			runDyn_VerticalRatio_Avg = numValues == 0 ? 0 : sumValue / numValues;
 		}
 	}
 
@@ -6222,6 +6237,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	public short getDpTolerance() {
 		return dpTolerance;
+	}
+
+	/**
+	 * @param values
+	 * @return Returns first value which is not 0
+	 */
+	private short getFirstNot0Value(final short[] values) {
+
+		for (final short value : values) {
+
+			if (value > 0 || value < 0) {
+				return value;
+			}
+		}
+
+		return 0;
 	}
 
 	public int getFrontShiftCount() {

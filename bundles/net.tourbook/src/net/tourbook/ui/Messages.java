@@ -443,6 +443,18 @@ public class Messages extends NLS {
 	public static String		Tour_Tooltip_Label_RunDyn_StanceTime_Avg;
 	public static String		Tour_Tooltip_Label_RunDyn_StanceTime_Max;
 	public static String		Tour_Tooltip_Label_RunDyn_StanceTime_Min;
+	public static String		Tour_Tooltip_Label_RunDyn_StanceTimeBalance_Avg;
+	public static String		Tour_Tooltip_Label_RunDyn_StanceTimeBalance_Max;
+	public static String		Tour_Tooltip_Label_RunDyn_StanceTimeBalance_Min;
+	public static String		Tour_Tooltip_Label_RunDyn_StepLength_Avg;
+	public static String		Tour_Tooltip_Label_RunDyn_StepLength_Max;
+	public static String		Tour_Tooltip_Label_RunDyn_StepLength_Min;
+	public static String		Tour_Tooltip_Label_RunDyn_VerticalOscillation_Avg;
+	public static String		Tour_Tooltip_Label_RunDyn_VerticalOscillation_Max;
+	public static String		Tour_Tooltip_Label_RunDyn_VerticalOscillation_Min;
+	public static String		Tour_Tooltip_Label_RunDyn_VerticalRatio_Avg;
+	public static String		Tour_Tooltip_Label_RunDyn_VerticalRatio_Max;
+	public static String		Tour_Tooltip_Label_RunDyn_VerticalRatio_Min;
 	public static String		Tour_Tooltip_Label_Tags;
 	public static String		Tour_Tooltip_Label_Temperature;
 	public static String		Tour_Tooltip_Label_TimeZone;

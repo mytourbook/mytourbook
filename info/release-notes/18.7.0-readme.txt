@@ -18,7 +18,7 @@ New
    - Set as default graph
    - Show in value point tooltip
    
- - Tour Analyzer 
+ - Tour Analyzer + Tour Info Tooltip
    - Show data for all 5 graphs
    
  - 2D Map

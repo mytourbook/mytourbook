@@ -19,7 +19,6 @@ import java.text.NumberFormat;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
-import java.util.ArrayList;
 import java.util.Set;
 
 import net.tourbook.common.CommonActivator;
@@ -48,6 +47,7 @@ import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.LayoutConstants;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
@@ -55,9 +55,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
@@ -118,21 +118,14 @@ public class TourInfoUI {
 	private ActionTourToolTip_EditQuick			_actionEditQuick;
 	private ActionTourToolTip_EditPreferences	_actionPrefDialog;
 
-	private boolean								_isActionsVisible		= false;
+	private boolean								_isActionsVisible	= false;
 
 	/**
 	 * Tour which is displayed in the tool tip
 	 */
 	private TourData							_tourData;
 
-	private String								_noTourTooltip			= Messages.Tour_Tooltip_Label_NoTour;
-
-	/**
-	 * contains the controls which are displayed in the first column, these controls are used to get
-	 * the maximum width and set the first column within the differenct section to the same width
-	 */
-	private final ArrayList<Control>			_firstColumnControls	= new ArrayList<Control>();
-	private final ArrayList<Control>			_secondColumnControls	= new ArrayList<Control>();
+	private String								_noTourTooltip		= Messages.Tour_Tooltip_Label_NoTour;
 
 	/*
 	 * fields which are optionally displayed when they are not null
@@ -202,7 +195,6 @@ public class TourInfoUI {
 	private Label								_lblRecordingTimeHour;
 	private Label								_lblRestPulse;
 	private Label								_lblTemperature;
-	private Label								_lblTimeZone;
 	private Label								_lblTimeZone_Value;
 	private Label								_lblTimeZoneDifference;
 	private Label								_lblTimeZoneDifference_Value;
@@ -219,6 +211,30 @@ public class TourInfoUI {
 	private Label								_lblRunDyn_StanceTime_Max_Unit;
 	private Label								_lblRunDyn_StanceTime_Avg;
 	private Label								_lblRunDyn_StanceTime_Avg_Unit;
+	private Label								_lblRunDyn_StanceTimeBalance_Min;
+	private Label								_lblRunDyn_StanceTimeBalance_Min_Unit;
+	private Label								_lblRunDyn_StanceTimeBalance_Max;
+	private Label								_lblRunDyn_StanceTimeBalance_Max_Unit;
+	private Label								_lblRunDyn_StanceTimeBalance_Avg;
+	private Label								_lblRunDyn_StanceTimeBalance_Avg_Unit;
+	private Label								_lblRunDyn_StepLength_Min;
+	private Label								_lblRunDyn_StepLength_Min_Unit;
+	private Label								_lblRunDyn_StepLength_Max;
+	private Label								_lblRunDyn_StepLength_Max_Unit;
+	private Label								_lblRunDyn_StepLength_Avg;
+	private Label								_lblRunDyn_StepLength_Avg_Unit;
+	private Label								_lblRunDyn_VerticalOscillation_Min;
+	private Label								_lblRunDyn_VerticalOscillation_Min_Unit;
+	private Label								_lblRunDyn_VerticalOscillation_Max;
+	private Label								_lblRunDyn_VerticalOscillation_Max_Unit;
+	private Label								_lblRunDyn_VerticalOscillation_Avg;
+	private Label								_lblRunDyn_VerticalOscillation_Avg_Unit;
+	private Label								_lblRunDyn_VerticalRatio_Min;
+	private Label								_lblRunDyn_VerticalRatio_Min_Unit;
+	private Label								_lblRunDyn_VerticalRatio_Max;
+	private Label								_lblRunDyn_VerticalRatio_Max_Unit;
+	private Label								_lblRunDyn_VerticalRatio_Avg;
+	private Label								_lblRunDyn_VerticalRatio_Avg_Unit;
 
 	/**
 	 * Run tour action quick edit.
@@ -278,6 +294,9 @@ public class TourInfoUI {
 
 	private Composite createUI(final Composite parent) {
 
+		final Point defaultSpacing = LayoutConstants.getSpacing();
+		final int columnSpacing = defaultSpacing.x + 30;
+
 		/*
 		 * shell container is necessary because the margins of the inner container will hide the
 		 * tooltip when the mouse is hovered, which is not as it should be.
@@ -293,16 +312,42 @@ public class TourInfoUI {
 			_ttContainer.setBackground(_bgColor);
 			GridLayoutFactory
 					.fillDefaults() //
-					.numColumns(2)
-					.equalWidth(true)
 					.margins(SHELL_MARGIN, SHELL_MARGIN)
 					.applyTo(_ttContainer);
 //			_ttContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 			{
 				createUI_10_UpperPart(_ttContainer);
 
-				createUI_30_LeftColumn(_ttContainer);
-				createUI_40_RightColumn(_ttContainer);
+				final Composite container = new Composite(_ttContainer, SWT.NONE);
+				container.setBackground(_bgColor);
+				GridDataFactory.fillDefaults()
+//						.grab(true, false)
+						.applyTo(container);
+
+				if (_hasRunDyn) {
+
+					GridLayoutFactory.fillDefaults()
+							.numColumns(3)
+							.spacing(columnSpacing, defaultSpacing.y)
+							.applyTo(container);
+					{
+						createUI_30_Column_1(container);
+						createUI_40_Column_2(container);
+						createUI_50_Column_3(container);
+					}
+
+				} else {
+
+					GridLayoutFactory.fillDefaults()
+							.numColumns(2)
+							.spacing(columnSpacing, defaultSpacing.y)
+							.applyTo(container);
+					{
+						createUI_30_Column_1(container);
+						createUI_40_Column_2(container);
+					}
+				}
+
 				createUI_90_LowerPart(_ttContainer);
 				createUI_92_CreateModifyTime(_ttContainer);
 			}
@@ -314,9 +359,9 @@ public class TourInfoUI {
 	private void createUI_10_UpperPart(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);
 		container.setForeground(_fgColor);
 		container.setBackground(_bgColor);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory
 				.fillDefaults()//
 				.numColumns(3)
@@ -398,7 +443,7 @@ public class TourInfoUI {
 		tbm.update(true);
 	}
 
-	private void createUI_30_LeftColumn(final Composite parent) {
+	private void createUI_30_Column_1(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(container);
@@ -424,12 +469,9 @@ public class TourInfoUI {
 			/*
 			 * recording time
 			 */
-			final Label label = createUI_Label(container, Messages.Tour_Tooltip_Label_RecordingTime);
-			_firstColumnControls.add(label);
+			createUI_Label(container, Messages.Tour_Tooltip_Label_RecordingTime);
 
 			_lblRecordingTime = createUI_LabelValue(container, SWT.TRAIL);
-			_secondColumnControls.add(_lblRecordingTime);
-
 			_lblRecordingTimeHour = createUI_Label(container, Messages.Tour_Tooltip_Label_Hour);
 
 			// force this column to take the rest of the space
@@ -440,12 +482,9 @@ public class TourInfoUI {
 			/*
 			 * moving time
 			 */
-			final Label label = createUI_Label(container, Messages.Tour_Tooltip_Label_MovingTime);
-			_firstColumnControls.add(label);
+			createUI_Label(container, Messages.Tour_Tooltip_Label_MovingTime);
 
 			_lblMovingTime = createUI_LabelValue(container, SWT.TRAIL);
-			_secondColumnControls.add(_lblMovingTime);
-
 			_lblMovingTimeHour = createUI_Label(container, Messages.Tour_Tooltip_Label_Hour);
 		}
 
@@ -453,12 +492,9 @@ public class TourInfoUI {
 			/*
 			 * break time
 			 */
-			final Label label = createUI_Label(container, Messages.Tour_Tooltip_Label_BreakTime);
-			_firstColumnControls.add(label);
+			createUI_Label(container, Messages.Tour_Tooltip_Label_BreakTime);
 
 			_lblBreakTime = createUI_LabelValue(container, SWT.TRAIL);
-			_secondColumnControls.add(_lblBreakTime);
-
 			_lblBreakTimeHour = createUI_Label(container, Messages.Tour_Tooltip_Label_Hour);
 		}
 
@@ -472,7 +508,6 @@ public class TourInfoUI {
 				 */
 
 				_lblTimeZoneDifference = createUI_Label(container, Messages.Tour_Tooltip_Label_TimeZoneDifference);
-				_firstColumnControls.add(_lblTimeZoneDifference);
 
 				/*
 				 * Add decoration
@@ -486,7 +521,6 @@ public class TourInfoUI {
 				_decoTimeZone.setImage(infoImage);
 
 				_lblTimeZoneDifference_Value = createUI_LabelValue(container, SWT.TRAIL);
-				_secondColumnControls.add(_lblTimeZoneDifference_Value);
 
 				// hour
 				createUI_Label(container, Messages.Tour_Tooltip_Label_Hour);
@@ -495,14 +529,9 @@ public class TourInfoUI {
 				/*
 				 * Timezone
 				 */
-				_lblTimeZone = createUI_Label(container, Messages.Tour_Tooltip_Label_TimeZone);
-				_firstColumnControls.add(_lblTimeZone);
+				createUI_Label(container, Messages.Tour_Tooltip_Label_TimeZone);
 
 				_lblTimeZone_Value = createUI_LabelValue(container, SWT.TRAIL);
-//				final GridData gd = (GridData) _lblTimeZone_Value.getLayoutData();
-//				gd.horizontalSpan = 2;
-//				gd.horizontalAlignment = SWT.CENTER;
-//				_secondColumnControls.add(_lblTimeZone_Value);
 
 				// spacer
 				createUI_LabelValue(container, SWT.TRAIL);
@@ -517,34 +546,25 @@ public class TourInfoUI {
 		/*
 		 * distance
 		 */
-		Label label = createUI_Label(container, Messages.Tour_Tooltip_Label_Distance);
-		_firstColumnControls.add(label);
+		createUI_Label(container, Messages.Tour_Tooltip_Label_Distance);
 
 		_lblDistance = createUI_LabelValue(container, SWT.TRAIL);
-		_secondColumnControls.add(_lblDistance);
-
 		_lblDistanceUnit = createUI_LabelValue(container, SWT.LEAD);
 
 		/*
 		 * altitude up
 		 */
-		label = createUI_Label(container, Messages.Tour_Tooltip_Label_AltitudeUp);
-		_firstColumnControls.add(label);
+		createUI_Label(container, Messages.Tour_Tooltip_Label_AltitudeUp);
 
 		_lblAltitudeUp = createUI_LabelValue(container, SWT.TRAIL);
-		_secondColumnControls.add(_lblAltitudeUp);
-
 		_lblAltitudeUpUnit = createUI_LabelValue(container, SWT.LEAD);
 
 		/*
 		 * altitude up
 		 */
-		label = createUI_Label(container, Messages.Tour_Tooltip_Label_AltitudeDown);
-		_firstColumnControls.add(label);
+		createUI_Label(container, Messages.Tour_Tooltip_Label_AltitudeDown);
 
 		_lblAltitudeDown = createUI_LabelValue(container, SWT.TRAIL);
-		_secondColumnControls.add(_lblAltitudeDown);
-
 		_lblAltitudeDownUnit = createUI_LabelValue(container, SWT.LEAD);
 
 		createUI_Spacer(container);
@@ -556,11 +576,9 @@ public class TourInfoUI {
 			/*
 			 * calories
 			 */
-			final Label label = createUI_Label(container, Messages.Tour_Tooltip_Label_Calories);
-			_firstColumnControls.add(label);
+			createUI_Label(container, Messages.Tour_Tooltip_Label_Calories);
 
 			_lblCalories = createUI_LabelValue(container, SWT.TRAIL);
-			_secondColumnControls.add(_lblCalories);
 
 			createUI_Label(container, Messages.Value_Unit_KCalories);
 		}
@@ -569,11 +587,9 @@ public class TourInfoUI {
 			/*
 			 * rest pulse
 			 */
-			final Label label = createUI_Label(container, Messages.Tour_Tooltip_Label_RestPulse);
-			_firstColumnControls.add(label);
+			createUI_Label(container, Messages.Tour_Tooltip_Label_RestPulse);
 
 			_lblRestPulse = createUI_LabelValue(container, SWT.TRAIL);
-			_secondColumnControls.add(_lblRestPulse);
 
 			createUI_Label(container, Messages.Value_Unit_Pulse);
 		}
@@ -581,17 +597,15 @@ public class TourInfoUI {
 			/*
 			 * Body weight
 			 */
-			final Label label = createUI_Label(container, Messages.Tour_Tooltip_Label_BodyWeight);
-			_firstColumnControls.add(label);
+			createUI_Label(container, Messages.Tour_Tooltip_Label_BodyWeight);
 
 			_lblBodyWeight = createUI_LabelValue(container, SWT.TRAIL);
-			_secondColumnControls.add(_lblBodyWeight);
 
 			createUI_Label(container, UI.UNIT_WEIGHT_KG);
 		}
 	}
 
-	private void createUI_40_RightColumn(final Composite parent) {
+	private void createUI_40_Column_2(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(container);
@@ -605,12 +619,6 @@ public class TourInfoUI {
 			createUI_Spacer(container);
 			createUI_43_Max(container);
 
-			if (_hasRunDyn) {
-
-				createUI_Spacer(container);
-				createUI_50_RunDyn(container);
-			}
-
 			createUI_Spacer(container);
 			createUI_44_Weather(container);
 		}
@@ -618,111 +626,80 @@ public class TourInfoUI {
 
 	private void createUI_42_Avg(final Composite parent) {
 
-		Label label;
-
 		/*
 		 * avg pulse
 		 */
-		label = createUI_Label(parent, Messages.Tour_Tooltip_Label_AvgPulse);
-		_firstColumnControls.add(label);
+		createUI_Label(parent, Messages.Tour_Tooltip_Label_AvgPulse);
 
 		_lblAvgPulse = createUI_LabelValue(parent, SWT.TRAIL);
-		_secondColumnControls.add(_lblAvgPulse);
-
 		_lblAvgPulseUnit = createUI_LabelValue(parent, SWT.LEAD);
 
 		/*
 		 * avg speed
 		 */
-		label = createUI_Label(parent, Messages.Tour_Tooltip_Label_AvgSpeed);
-		_firstColumnControls.add(label);
+		createUI_Label(parent, Messages.Tour_Tooltip_Label_AvgSpeed);
 
 		_lblAvgSpeed = createUI_LabelValue(parent, SWT.TRAIL);
-		_secondColumnControls.add(_lblAvgSpeed);
-
 		_lblAvgSpeedUnit = createUI_LabelValue(parent, SWT.LEAD);
 
 		/*
 		 * avg pace
 		 */
-		label = createUI_Label(parent, Messages.Tour_Tooltip_Label_AvgPace);
-		_firstColumnControls.add(label);
+		createUI_Label(parent, Messages.Tour_Tooltip_Label_AvgPace);
 
 		_lblAvgPace = createUI_LabelValue(parent, SWT.TRAIL);
-		_secondColumnControls.add(_lblAvgPace);
-
 		_lblAvgPaceUnit = createUI_LabelValue(parent, SWT.LEAD);
 
 		/*
 		 * avg cadence
 		 */
-		label = createUI_Label(parent, Messages.Tour_Tooltip_Label_AvgCadence);
-		_firstColumnControls.add(label);
+		createUI_Label(parent, Messages.Tour_Tooltip_Label_AvgCadence);
 
 		_lblAvgCadence = createUI_LabelValue(parent, SWT.TRAIL);
-		_secondColumnControls.add(_lblAvgCadence);
-
 		_lblAvgCadenceUnit = createUI_LabelValue(parent, SWT.LEAD);
 
 		/*
 		 * avg power
 		 */
-		label = createUI_Label(parent, Messages.Tour_Tooltip_Label_AvgPower);
-		_firstColumnControls.add(label);
+		createUI_Label(parent, Messages.Tour_Tooltip_Label_AvgPower);
 
 		_lblAvg_Power = createUI_LabelValue(parent, SWT.TRAIL);
-		_secondColumnControls.add(_lblAvg_Power);
-
 		_lblAvg_PowerUnit = createUI_LabelValue(parent, SWT.LEAD);
 	}
 
 	private void createUI_43_Max(final Composite container) {
 
-		Label label;
-
 		/*
 		 * max pulse
 		 */
-		label = createUI_Label(container, Messages.Tour_Tooltip_Label_MaxPulse);
-		_firstColumnControls.add(label);
+		createUI_Label(container, Messages.Tour_Tooltip_Label_MaxPulse);
 
 		_lblMaxPulse = createUI_LabelValue(container, SWT.TRAIL);
-		_secondColumnControls.add(_lblMaxPulse);
-
 		_lblMaxPulseUnit = createUI_LabelValue(container, SWT.LEAD);
 
 		/*
 		 * max speed
 		 */
-		label = createUI_Label(container, Messages.Tour_Tooltip_Label_MaxSpeed);
-		_firstColumnControls.add(label);
+		createUI_Label(container, Messages.Tour_Tooltip_Label_MaxSpeed);
 
 		_lblMaxSpeed = createUI_LabelValue(container, SWT.TRAIL);
-		_secondColumnControls.add(_lblMaxSpeed);
-
 		_lblMaxSpeedUnit = createUI_LabelValue(container, SWT.LEAD);
 
 		/*
 		 * max altitude
 		 */
-		label = createUI_Label(container, Messages.Tour_Tooltip_Label_MaxAltitude);
-		_firstColumnControls.add(label);
+		createUI_Label(container, Messages.Tour_Tooltip_Label_MaxAltitude);
 
 		_lblMaxAltitude = createUI_LabelValue(container, SWT.TRAIL);
-		_secondColumnControls.add(_lblMaxAltitude);
-
 		_lblMaxAltitudeUnit = createUI_LabelValue(container, SWT.LEAD);
 	}
 
 	private void createUI_44_Weather(final Composite parent) {
 
-		Label label;
-
 		/*
 		 * clouds
 		 */
-		label = createUI_Label(parent, Messages.Tour_Tooltip_Label_Clouds);
-		_firstColumnControls.add(label);
+		createUI_Label(parent, Messages.Tour_Tooltip_Label_Clouds);
 
 		// icon: clouds
 		_lblClouds = new CLabel(parent, SWT.TRAIL);
@@ -737,34 +714,26 @@ public class TourInfoUI {
 		/*
 		 * temperature
 		 */
-		label = createUI_Label(parent, Messages.Tour_Tooltip_Label_Temperature);
-		_firstColumnControls.add(label);
+		createUI_Label(parent, Messages.Tour_Tooltip_Label_Temperature);
 
 		_lblTemperature = createUI_LabelValue(parent, SWT.TRAIL);
-		_secondColumnControls.add(_lblTemperature);
 
 		createUI_Label(parent, UI.UNIT_LABEL_TEMPERATURE);
 
 		/*
 		 * wind speed
 		 */
-		label = createUI_Label(parent, Messages.Tour_Tooltip_Label_WindSpeed);
-		_firstColumnControls.add(label);
+		createUI_Label(parent, Messages.Tour_Tooltip_Label_WindSpeed);
 
 		_lblWindSpeed = createUI_LabelValue(parent, SWT.TRAIL);
-		_secondColumnControls.add(_lblWindSpeed);
-
 		_lblWindSpeedUnit = createUI_LabelValue(parent, SWT.LEAD);
 
 		/*
 		 * wind direction
 		 */
-		label = createUI_Label(parent, Messages.Tour_Tooltip_Label_WindDirection);
-		_firstColumnControls.add(label);
+		createUI_Label(parent, Messages.Tour_Tooltip_Label_WindDirection);
 
 		_lblWindDirection = createUI_LabelValue(parent, SWT.TRAIL);
-		_secondColumnControls.add(_lblWindDirection);
-
 		_lblWindDirectionUnit = createUI_LabelValue(parent, SWT.LEAD);
 	}
 
@@ -773,16 +742,27 @@ public class TourInfoUI {
 		/*
 		 * Front/rear gear shifts
 		 */
-		final Label label = createUI_Label(parent, Messages.Tour_Tooltip_Label_GearShifts);
-		_firstColumnControls.add(label);
+		createUI_Label(parent, Messages.Tour_Tooltip_Label_GearShifts);
 
 		_lblGearFrontShifts = createUI_LabelValue(parent, SWT.TRAIL);
-		_secondColumnControls.add(_lblGearFrontShifts);
-
 		_lblGearRearShifts = createUI_LabelValue(parent, SWT.LEAD);
 	}
 
-	private void createUI_50_RunDyn(final Composite parent) {
+	private void createUI_50_Column_3(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(container);
+		container.setForeground(_fgColor);
+		container.setBackground(_bgColor);
+		GridLayoutFactory.fillDefaults().numColumns(3).spacing(5, 0).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+		{
+			createUI_52_RunDyn(container);
+			createUI_Spacer(container);
+		}
+	}
+
+	private void createUI_52_RunDyn(final Composite parent) {
 
 //		ColumnFactory_RunDyn_StanceTime_Avg               = Average Stance Time
 //		ColumnFactory_RunDyn_StanceTime_Avg_Header        = \u00F8 ms
@@ -810,39 +790,180 @@ public class TourInfoUI {
 
 		{
 			/*
-			 * Stance time min
+			 * Stance time
 			 */
-			final Label label = createUI_Label(parent, Messages.Tour_Tooltip_Label_RunDyn_StanceTime_Min);
-			_firstColumnControls.add(label);
 
-			_lblRunDyn_StanceTime_Min = createUI_LabelValue(parent, SWT.TRAIL);
-			_secondColumnControls.add(_lblRunDyn_StanceTime_Min);
+			{
+				/*
+				 * Min
+				 */
+				createUI_Label(parent, Messages.Tour_Tooltip_Label_RunDyn_StanceTime_Min);
 
-			_lblRunDyn_StanceTime_Min_Unit = createUI_LabelValue(parent, SWT.LEAD);
+				_lblRunDyn_StanceTime_Min = createUI_LabelValue(parent, SWT.TRAIL);
+				_lblRunDyn_StanceTime_Min_Unit = createUI_LabelValue(parent, SWT.LEAD);
+			}
+			{
+				/*
+				 * Max
+				 */
+				createUI_Label(parent, Messages.Tour_Tooltip_Label_RunDyn_StanceTime_Max);
+
+				_lblRunDyn_StanceTime_Max = createUI_LabelValue(parent, SWT.TRAIL);
+				_lblRunDyn_StanceTime_Max_Unit = createUI_LabelValue(parent, SWT.LEAD);
+			}
+			{
+				/*
+				 * Avg
+				 */
+				createUI_Label(parent, Messages.Tour_Tooltip_Label_RunDyn_StanceTime_Avg);
+
+				_lblRunDyn_StanceTime_Avg = createUI_LabelValue(parent, SWT.TRAIL);
+				_lblRunDyn_StanceTime_Avg_Unit = createUI_LabelValue(parent, SWT.LEAD);
+			}
 		}
+
+		createUI_Spacer(parent);
+
 		{
 			/*
-			 * Stance time max
+			 * Stance Time Balance
 			 */
-			final Label label = createUI_Label(parent, Messages.Tour_Tooltip_Label_RunDyn_StanceTime_Max);
-			_firstColumnControls.add(label);
 
-			_lblRunDyn_StanceTime_Max = createUI_LabelValue(parent, SWT.TRAIL);
-			_secondColumnControls.add(_lblRunDyn_StanceTime_Max);
+			{
+				/*
+				 * Min
+				 */
+				createUI_Label(parent, Messages.Tour_Tooltip_Label_RunDyn_StanceTimeBalance_Min);
 
-			_lblRunDyn_StanceTime_Max_Unit = createUI_LabelValue(parent, SWT.LEAD);
+				_lblRunDyn_StanceTimeBalance_Min = createUI_LabelValue(parent, SWT.TRAIL);
+				_lblRunDyn_StanceTimeBalance_Min_Unit = createUI_LabelValue(parent, SWT.LEAD);
+			}
+			{
+				/*
+				 * Max
+				 */
+				createUI_Label(parent, Messages.Tour_Tooltip_Label_RunDyn_StanceTimeBalance_Max);
+
+				_lblRunDyn_StanceTimeBalance_Max = createUI_LabelValue(parent, SWT.TRAIL);
+				_lblRunDyn_StanceTimeBalance_Max_Unit = createUI_LabelValue(parent, SWT.LEAD);
+			}
+			{
+				/*
+				 * Avg
+				 */
+				createUI_Label(parent, Messages.Tour_Tooltip_Label_RunDyn_StanceTimeBalance_Avg);
+
+				_lblRunDyn_StanceTimeBalance_Avg = createUI_LabelValue(parent, SWT.TRAIL);
+				_lblRunDyn_StanceTimeBalance_Avg_Unit = createUI_LabelValue(parent, SWT.LEAD);
+			}
 		}
+
+		createUI_Spacer(parent);
+
 		{
 			/*
-			 * Stance time avg
+			 * Step Length
 			 */
-			final Label label = createUI_Label(parent, Messages.Tour_Tooltip_Label_RunDyn_StanceTime_Avg);
-			_firstColumnControls.add(label);
 
-			_lblRunDyn_StanceTime_Avg = createUI_LabelValue(parent, SWT.TRAIL);
-			_secondColumnControls.add(_lblRunDyn_StanceTime_Avg);
+			{
+				/*
+				 * Min
+				 */
+				createUI_Label(parent, Messages.Tour_Tooltip_Label_RunDyn_StepLength_Min);
 
-			_lblRunDyn_StanceTime_Avg_Unit = createUI_LabelValue(parent, SWT.LEAD);
+				_lblRunDyn_StepLength_Min = createUI_LabelValue(parent, SWT.TRAIL);
+				_lblRunDyn_StepLength_Min_Unit = createUI_LabelValue(parent, SWT.LEAD);
+			}
+			{
+				/*
+				 * Max
+				 */
+				createUI_Label(parent, Messages.Tour_Tooltip_Label_RunDyn_StepLength_Max);
+
+				_lblRunDyn_StepLength_Max = createUI_LabelValue(parent, SWT.TRAIL);
+				_lblRunDyn_StepLength_Max_Unit = createUI_LabelValue(parent, SWT.LEAD);
+			}
+			{
+				/*
+				 * Avg
+				 */
+				createUI_Label(parent, Messages.Tour_Tooltip_Label_RunDyn_StepLength_Avg);
+
+				_lblRunDyn_StepLength_Avg = createUI_LabelValue(parent, SWT.TRAIL);
+				_lblRunDyn_StepLength_Avg_Unit = createUI_LabelValue(parent, SWT.LEAD);
+			}
+		}
+
+		createUI_Spacer(parent);
+
+		{
+			/*
+			 * Vertical Oscillation
+			 */
+
+			{
+				/*
+				 * Min
+				 */
+				createUI_Label(parent, Messages.Tour_Tooltip_Label_RunDyn_VerticalOscillation_Min);
+
+				_lblRunDyn_VerticalOscillation_Min = createUI_LabelValue(parent, SWT.TRAIL);
+				_lblRunDyn_VerticalOscillation_Min_Unit = createUI_LabelValue(parent, SWT.LEAD);
+			}
+			{
+				/*
+				 * Max
+				 */
+				createUI_Label(parent, Messages.Tour_Tooltip_Label_RunDyn_VerticalOscillation_Max);
+
+				_lblRunDyn_VerticalOscillation_Max = createUI_LabelValue(parent, SWT.TRAIL);
+				_lblRunDyn_VerticalOscillation_Max_Unit = createUI_LabelValue(parent, SWT.LEAD);
+			}
+			{
+				/*
+				 * Avg
+				 */
+				createUI_Label(parent, Messages.Tour_Tooltip_Label_RunDyn_VerticalOscillation_Avg);
+
+				_lblRunDyn_VerticalOscillation_Avg = createUI_LabelValue(parent, SWT.TRAIL);
+				_lblRunDyn_VerticalOscillation_Avg_Unit = createUI_LabelValue(parent, SWT.LEAD);
+			}
+		}
+
+		createUI_Spacer(parent);
+
+		{
+			/*
+			 * Vertical Ratio
+			 */
+
+			{
+				/*
+				 * Min
+				 */
+				createUI_Label(parent, Messages.Tour_Tooltip_Label_RunDyn_VerticalRatio_Min);
+
+				_lblRunDyn_VerticalRatio_Min = createUI_LabelValue(parent, SWT.TRAIL);
+				_lblRunDyn_VerticalRatio_Min_Unit = createUI_LabelValue(parent, SWT.LEAD);
+			}
+			{
+				/*
+				 * Max
+				 */
+				createUI_Label(parent, Messages.Tour_Tooltip_Label_RunDyn_VerticalRatio_Max);
+
+				_lblRunDyn_VerticalRatio_Max = createUI_LabelValue(parent, SWT.TRAIL);
+				_lblRunDyn_VerticalRatio_Max_Unit = createUI_LabelValue(parent, SWT.LEAD);
+			}
+			{
+				/*
+				 * Avg
+				 */
+				createUI_Label(parent, Messages.Tour_Tooltip_Label_RunDyn_VerticalRatio_Avg);
+
+				_lblRunDyn_VerticalRatio_Avg = createUI_LabelValue(parent, SWT.TRAIL);
+				_lblRunDyn_VerticalRatio_Avg_Unit = createUI_LabelValue(parent, SWT.LEAD);
+			}
 		}
 	}
 
@@ -856,7 +977,7 @@ public class TourInfoUI {
 		final PixelConverter pc = new PixelConverter(parent);
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		container.setForeground(_fgColor);
 		container.setBackground(_bgColor);
 		GridLayoutFactory.fillDefaults().numColumns(2).spacing(5, 0).applyTo(container);
@@ -869,7 +990,6 @@ public class TourInfoUI {
 
 				label = createUI_Label(container, Messages.Tour_Tooltip_Label_TourType);
 				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
-				_firstColumnControls.add(label);
 
 				_lblTourTypeText = createUI_LabelValue(container, SWT.LEAD | SWT.WRAP);
 				GridDataFactory
@@ -886,7 +1006,6 @@ public class TourInfoUI {
 
 				label = createUI_Label(container, Messages.Tour_Tooltip_Label_Tags);
 				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
-				_firstColumnControls.add(label);
 
 				_lblTourTags = createUI_LabelValue(container, SWT.LEAD | SWT.WRAP);
 				GridDataFactory
@@ -967,7 +1086,7 @@ public class TourInfoUI {
 		}
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		container.setForeground(_fgColor);
 		container.setBackground(_bgColor);
 		GridLayoutFactory
@@ -1085,8 +1204,6 @@ public class TourInfoUI {
 
 	public void dispose() {
 
-		_firstColumnControls.clear();
-		_secondColumnControls.clear();
 	}
 
 	private void enableControls() {
@@ -1315,14 +1432,10 @@ public class TourInfoUI {
 		_lblDistance.setText(FormatManager.formatDistance(distance / 1000.0));
 		_lblDistanceUnit.setText(UI.UNIT_LABEL_DISTANCE);
 
-		_lblAltitudeUp.setText(
-				Integer.toString(//
-						(int) (_tourData.getTourAltUp() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
+		_lblAltitudeUp.setText(Integer.toString((int) (_tourData.getTourAltUp() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
 		_lblAltitudeUpUnit.setText(UI.UNIT_LABEL_ALTITUDE);
 
-		_lblAltitudeDown.setText(
-				Integer.toString(//
-						(int) (_tourData.getTourAltDown() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
+		_lblAltitudeDown.setText(Integer.toString((int) (_tourData.getTourAltDown() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
 		_lblAltitudeDownUnit.setText(UI.UNIT_LABEL_ALTITUDE);
 
 		final float avgSpeed = movingTime == 0 ? 0 : distance / (movingTime / 3.6f);
@@ -1367,9 +1480,7 @@ public class TourInfoUI {
 		/*
 		 * Max values
 		 */
-		_lblMaxAltitude.setText(
-				Integer.toString(//
-						(int) (_tourData.getMaxAltitude() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
+		_lblMaxAltitude.setText(Integer.toString((int) (_tourData.getMaxAltitude() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
 		_lblMaxAltitudeUnit.setText(UI.UNIT_LABEL_ALTITUDE);
 
 		_lblMaxPulse.setText(FormatManager.formatPulse(_tourData.getMaxPulse()));
@@ -1409,12 +1520,59 @@ public class TourInfoUI {
 		 */
 		if (_hasRunDyn) {
 
+			final float mmOrInch = net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
+
 			_lblRunDyn_StanceTime_Min.setText(Integer.toString(_tourData.getRunDyn_StanceTime_Min()));
 			_lblRunDyn_StanceTime_Min_Unit.setText(UI.UNIT_MS);
 			_lblRunDyn_StanceTime_Max.setText(Integer.toString(_tourData.getRunDyn_StanceTime_Max()));
 			_lblRunDyn_StanceTime_Max_Unit.setText(UI.UNIT_MS);
 			_lblRunDyn_StanceTime_Avg.setText(_nf0.format(_tourData.getRunDyn_StanceTime_Avg()));
 			_lblRunDyn_StanceTime_Avg_Unit.setText(UI.UNIT_MS);
+
+			_lblRunDyn_StanceTimeBalance_Min.setText(_nf1.format(_tourData.getRunDyn_StanceTimeBalance_Min()));
+			_lblRunDyn_StanceTimeBalance_Min_Unit.setText(UI.SYMBOL_PERCENTAGE);
+			_lblRunDyn_StanceTimeBalance_Max.setText(_nf1.format(_tourData.getRunDyn_StanceTimeBalance_Max()));
+			_lblRunDyn_StanceTimeBalance_Max_Unit.setText(UI.SYMBOL_PERCENTAGE);
+			_lblRunDyn_StanceTimeBalance_Avg.setText(_nf1.format(_tourData.getRunDyn_StanceTimeBalance_Avg()));
+			_lblRunDyn_StanceTimeBalance_Avg_Unit.setText(UI.SYMBOL_PERCENTAGE);
+
+			if (UI.UNIT_IS_METRIC) {
+
+				_lblRunDyn_StepLength_Min.setText(_nf0.format(_tourData.getRunDyn_StepLength_Min() * mmOrInch));
+				_lblRunDyn_StepLength_Max.setText(_nf0.format(_tourData.getRunDyn_StepLength_Max() * mmOrInch));
+				_lblRunDyn_StepLength_Avg.setText(_nf0.format(_tourData.getRunDyn_StepLength_Avg() * mmOrInch));
+
+				_lblRunDyn_VerticalOscillation_Min.setText(_nf0.format(_tourData.getRunDyn_VerticalOscillation_Min() * mmOrInch));
+				_lblRunDyn_VerticalOscillation_Max.setText(_nf0.format(_tourData.getRunDyn_VerticalOscillation_Max() * mmOrInch));
+				_lblRunDyn_VerticalOscillation_Avg.setText(_nf0.format(_tourData.getRunDyn_VerticalOscillation_Avg() * mmOrInch));
+
+			} else {
+
+				// imperial has 1 more digit
+
+				_lblRunDyn_StepLength_Min.setText(_nf1.format(_tourData.getRunDyn_StepLength_Min() * mmOrInch));
+				_lblRunDyn_StepLength_Max.setText(_nf1.format(_tourData.getRunDyn_StepLength_Max() * mmOrInch));
+				_lblRunDyn_StepLength_Avg.setText(_nf1.format(_tourData.getRunDyn_StepLength_Avg() * mmOrInch));
+
+				_lblRunDyn_VerticalOscillation_Min.setText(_nf1.format(_tourData.getRunDyn_VerticalOscillation_Min() * mmOrInch));
+				_lblRunDyn_VerticalOscillation_Max.setText(_nf1.format(_tourData.getRunDyn_VerticalOscillation_Max() * mmOrInch));
+				_lblRunDyn_VerticalOscillation_Avg.setText(_nf1.format(_tourData.getRunDyn_VerticalOscillation_Avg() * mmOrInch));
+			}
+
+			_lblRunDyn_StepLength_Min_Unit.setText(UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
+			_lblRunDyn_StepLength_Max_Unit.setText(UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
+			_lblRunDyn_StepLength_Avg_Unit.setText(UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
+
+			_lblRunDyn_VerticalOscillation_Min_Unit.setText(UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
+			_lblRunDyn_VerticalOscillation_Max_Unit.setText(UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
+			_lblRunDyn_VerticalOscillation_Avg_Unit.setText(UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
+
+			_lblRunDyn_VerticalRatio_Min.setText(_nf1.format(_tourData.getRunDyn_VerticalRatio_Min()));
+			_lblRunDyn_VerticalRatio_Min_Unit.setText(UI.SYMBOL_PERCENTAGE);
+			_lblRunDyn_VerticalRatio_Max.setText(_nf1.format(_tourData.getRunDyn_VerticalRatio_Max()));
+			_lblRunDyn_VerticalRatio_Max_Unit.setText(UI.SYMBOL_PERCENTAGE);
+			_lblRunDyn_VerticalRatio_Avg.setText(_nf1.format(_tourData.getRunDyn_VerticalRatio_Avg()));
+			_lblRunDyn_VerticalRatio_Avg_Unit.setText(UI.SYMBOL_PERCENTAGE);
 		}
 
 	}
@@ -1422,9 +1580,8 @@ public class TourInfoUI {
 	public void updateUI_Layout() {
 
 		// compute width for all controls and equalize column width for the different sections
+
 		_ttContainer.layout(true, true);
-		UI.setEqualizeColumWidths(_firstColumnControls, 5);
-		UI.setEqualizeColumWidths(_secondColumnControls);
 
 		if (isSimpleTour()) {
 
