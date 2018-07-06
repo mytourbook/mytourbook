@@ -31,21 +31,32 @@ Improvements
 ============
 
 * Tour Book 
-
+  
   - Summary (totals) row 
   
   
 * Tour Analyzer 
-
-  - Altitude avg will show now these values:
-  	Summarized up values, when it's 0 then the summarized down values are displayed
   
   - Optimized performance by reducing paint events -> Moving the chart slider is now more smoothly
 
+
+Modifications
+=============
+
+* Tour Chart
+
+  - The graph title is now displayed above the graph and not vertically at the y-axis, is better readable and will not disappear when there is no space
+  
+  
+* Tour Analyzer 
+
+  - The altitude average value will show now these values:
+  	Summarized up values, when it is 0, then the summarized down values are displayed
+  	
 
 Bugfix
 ======
 
 * Map 2D
 
-  - Map was not centered with the tour the first time, only at the second time
+  - Map was not centered with the tour the first time, only by the second time
