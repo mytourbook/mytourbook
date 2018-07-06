@@ -198,22 +198,22 @@ public class GraphColorManager {
 		MAP_COLOR_RUN_DYN_STEP_LENGTH = new Map2ColorProfile(//
 				//
 				new ColorValue[] {
-						new ColorValue(10, 255, 77, 0),
-						new ColorValue(50, 255, 77, 0),
+						new ColorValue(10, 140, 0, 255),
+						new ColorValue(50, 215, 65, 0),
 						new ColorValue(100, 255, 77, 0),
-						new ColorValue(150, 255, 77, 0),
-						new ColorValue(190, 255, 77, 0) },
+						new ColorValue(150, 255, 115, 55),
+						new ColorValue(190, 255, 236, 0) },
 				//
 				MapColorProfile.BRIGHTNESS_DIMMING,
 				20,
 				MapColorProfile.BRIGHTNESS_LIGHTNING,
-				40,
+				20,
 
 				// overwrite min/max values
 				true,
-				800,
+				1000,
 				true,
-				1600);
+				1400);
 
 	}
 
