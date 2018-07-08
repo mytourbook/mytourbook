@@ -60,3 +60,10 @@ Bugfix
 * Map 2D
 
   - Map was not centered with the tour the first time, only by the second time
+  
+ 
+Translation 	
+===========
+
+- German
+  
