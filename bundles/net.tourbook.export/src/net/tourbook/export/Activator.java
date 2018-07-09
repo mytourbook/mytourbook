@@ -1,6 +1,6 @@
 package net.tourbook.export;
 
-import org.eclipse.osgi.framework.internal.core.AbstractBundle;
+import org.eclipse.osgi.internal.framework.EquinoxBundle;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -46,8 +46,8 @@ public class Activator extends AbstractUIPlugin {
 		plugin = this;
 
 		final Bundle bundle = context.getBundle();
-		if (bundle instanceof AbstractBundle) {
-			final AbstractBundle abstractBundle = (AbstractBundle) bundle;
+		if (bundle instanceof EquinoxBundle) {
+			final EquinoxBundle abstractBundle = (EquinoxBundle) bundle;
 			version = abstractBundle.getVersion();
 		}
 	}

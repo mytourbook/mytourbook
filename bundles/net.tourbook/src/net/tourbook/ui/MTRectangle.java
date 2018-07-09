@@ -1,5 +1,7 @@
 package net.tourbook.ui;
 
+import java.io.Serializable;
+
 /*******************************************************************************
  * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
@@ -13,13 +15,11 @@ package net.tourbook.ui;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.internal.SerializableCompatibility;
 
 /**
- * Instances of this class represent rectangular areas in an
- * (x, y) coordinate system. The top left corner of the rectangle
- * is specified by its x and y values, and the extent of the
- * rectangle is specified by its width and height.
+ * Instances of this class represent rectangular areas in an (x, y) coordinate system. The top left
+ * corner of the rectangle is specified by its x and y values, and the extent of the rectangle is
+ * specified by its width and height.
  * <p>
  * The coordinate space for rectangles and points is considered to have increasing values downward
  * and to the right from its origin making this the normal, computer graphics oriented notion of (x,
@@ -40,8 +40,9 @@ import org.eclipse.swt.internal.SerializableCompatibility;
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
  */
 
-@SuppressWarnings("restriction")
-public final class MTRectangle implements SerializableCompatibility {
+public final class MTRectangle implements Serializable {
+
+	static final long	serialVersionUID	= 3256439218279428914L;
 
 	/**
 	 * the x coordinate of the rectangle
@@ -63,11 +64,8 @@ public final class MTRectangle implements SerializableCompatibility {
 	 */
 	public int			height;
 
-	static final long	serialVersionUID	= 3256439218279428914L;
-
 	/**
-	 * Construct a new instance of this class given the
-	 * x, y, width and height values.
+	 * Construct a new instance of this class given the x, y, width and height values.
 	 * 
 	 * @param x
 	 *            the x coordinate of the origin of the rectangle
@@ -126,9 +124,8 @@ public final class MTRectangle implements SerializableCompatibility {
 	}
 
 	/**
-	 * Destructively replaces the x, y, width and height values
-	 * in the receiver with ones which represent the union of the
-	 * rectangles specified by the receiver and the given rectangle.
+	 * Destructively replaces the x, y, width and height values in the receiver with ones which
+	 * represent the union of the rectangles specified by the receiver and the given rectangle.
 	 * <p>
 	 * The union of two rectangles is the smallest single rectangle that completely covers both of
 	 * the areas covered by the two given rectangles.
@@ -165,9 +162,8 @@ public final class MTRectangle implements SerializableCompatibility {
 	}
 
 	/**
-	 * Returns <code>true</code> if the point specified by the
-	 * arguments is inside the area specified by the receiver,
-	 * and <code>false</code> otherwise.
+	 * Returns <code>true</code> if the point specified by the arguments is inside the area
+	 * specified by the receiver, and <code>false</code> otherwise.
 	 * 
 	 * @param x
 	 *            the x coordinate of the point to test for containment
@@ -181,8 +177,8 @@ public final class MTRectangle implements SerializableCompatibility {
 	}
 
 	/**
-	 * Returns <code>true</code> if the given point is inside the
-	 * area specified by the receiver, and <code>false</code> otherwise.
+	 * Returns <code>true</code> if the given point is inside the area specified by the receiver,
+	 * and <code>false</code> otherwise.
 	 * 
 	 * @param pt
 	 *            the point to test for containment
@@ -194,15 +190,15 @@ public final class MTRectangle implements SerializableCompatibility {
 	 *                </ul>
 	 */
 	public boolean contains(final Point pt) {
-		if (pt == null)
+		if (pt == null) {
 			SWT.error(SWT.ERROR_NULL_ARGUMENT);
+		}
 		return contains(pt.x, pt.y);
 	}
 
 	/**
-	 * Compares the argument to the receiver, and returns true
-	 * if they represent the <em>same</em> object using a class
-	 * specific comparison.
+	 * Compares the argument to the receiver, and returns true if they represent the <em>same</em>
+	 * object using a class specific comparison.
 	 * 
 	 * @param object
 	 *            the object to compare with this object
@@ -212,19 +208,19 @@ public final class MTRectangle implements SerializableCompatibility {
 	 */
 	@Override
 	public boolean equals(final Object object) {
-		if (object == this)
+		if (object == this) {
 			return true;
-		if (!(object instanceof MTRectangle))
+		}
+		if (!(object instanceof MTRectangle)) {
 			return false;
+		}
 		final MTRectangle r = (MTRectangle) object;
 		return (r.x == this.x) && (r.y == this.y) && (r.width == this.width) && (r.height == this.height);
 	}
 
 	/**
-	 * Returns an integer hash code for the receiver. Any two
-	 * objects that return <code>true</code> when passed to <code>equals</code> must return the same
-	 * value for this
-	 * method.
+	 * Returns an integer hash code for the receiver. Any two objects that return <code>true</code>
+	 * when passed to <code>equals</code> must return the same value for this method.
 	 * 
 	 * @return the receiver's hash
 	 * @see #equals(Object)
@@ -235,9 +231,9 @@ public final class MTRectangle implements SerializableCompatibility {
 	}
 
 	/**
-	 * Destructively replaces the x, y, width and height values
-	 * in the receiver with ones which represent the intersection of the
-	 * rectangles specified by the receiver and the given rectangle.
+	 * Destructively replaces the x, y, width and height values in the receiver with ones which
+	 * represent the intersection of the rectangles specified by the receiver and the given
+	 * rectangle.
 	 * 
 	 * @param rect
 	 *            the rectangle to intersect with the receiver
@@ -248,10 +244,12 @@ public final class MTRectangle implements SerializableCompatibility {
 	 *                since 3.0
 	 */
 	public void intersect(final MTRectangle rect) {
-		if (rect == null)
+		if (rect == null) {
 			SWT.error(SWT.ERROR_NULL_ARGUMENT);
-		if (this == rect)
+		}
+		if (this == rect) {
 			return;
+		}
 		final int left = x > rect.x ? x : rect.x;
 		final int top = y > rect.y ? y : rect.y;
 		int lhs = x + width;
@@ -267,8 +265,8 @@ public final class MTRectangle implements SerializableCompatibility {
 	}
 
 	/**
-	 * Returns a new rectangle which represents the intersection
-	 * of the receiver and the given rectangle.
+	 * Returns a new rectangle which represents the intersection of the receiver and the given
+	 * rectangle.
 	 * <p>
 	 * The intersection of two rectangles is the rectangle that covers the area which is contained
 	 * within both rectangles.
@@ -283,10 +281,12 @@ public final class MTRectangle implements SerializableCompatibility {
 	 *                </ul>
 	 */
 	public MTRectangle intersection(final MTRectangle rect) {
-		if (rect == null)
+		if (rect == null) {
 			SWT.error(SWT.ERROR_NULL_ARGUMENT);
-		if (this == rect)
+		}
+		if (this == rect) {
 			return new MTRectangle(x, y, width, height);
+		}
 		final int left = x > rect.x ? x : rect.x;
 		final int top = y > rect.y ? y : rect.y;
 		int lhs = x + width;
@@ -303,8 +303,8 @@ public final class MTRectangle implements SerializableCompatibility {
 	}
 
 	/**
-	 * Returns <code>true</code> if the rectangle described by the
-	 * arguments intersects with the receiver and <code>false</code> otherwise.
+	 * Returns <code>true</code> if the rectangle described by the arguments intersects with the
+	 * receiver and <code>false</code> otherwise.
 	 * <p>
 	 * Two rectangles intersect if the area of the rectangle representing their intersection is not
 	 * empty.
@@ -333,8 +333,8 @@ public final class MTRectangle implements SerializableCompatibility {
 	}
 
 	/**
-	 * Returns <code>true</code> if the given rectangle intersects
-	 * with the receiver and <code>false</code> otherwise.
+	 * Returns <code>true</code> if the given rectangle intersects with the receiver and
+	 * <code>false</code> otherwise.
 	 * <p>
 	 * Two rectangles intersect if the area of the rectangle representing their intersection is not
 	 * empty.
@@ -352,15 +352,15 @@ public final class MTRectangle implements SerializableCompatibility {
 	 * @see #isEmpty()
 	 */
 	public boolean intersects(final MTRectangle rect) {
-		if (rect == null)
+		if (rect == null) {
 			SWT.error(SWT.ERROR_NULL_ARGUMENT);
+		}
 		return rect == this || intersects(rect.x, rect.y, rect.width, rect.height);
 	}
 
 	/**
-	 * Returns <code>true</code> if the receiver does not cover any
-	 * area in the (x, y) coordinate plane, and <code>false</code> if
-	 * the receiver does cover some area in the plane.
+	 * Returns <code>true</code> if the receiver does not cover any area in the (x, y) coordinate
+	 * plane, and <code>false</code> if the receiver does cover some area in the plane.
 	 * <p>
 	 * A rectangle is considered to <em>cover area</em> in the (x, y) coordinate plane if both its
 	 * width and height are non-zero.
@@ -373,8 +373,7 @@ public final class MTRectangle implements SerializableCompatibility {
 	}
 
 	/**
-	 * Returns a string containing a concise, human-readable
-	 * description of the receiver.
+	 * Returns a string containing a concise, human-readable description of the receiver.
 	 * 
 	 * @return a string representation of the rectangle
 	 */
@@ -384,8 +383,7 @@ public final class MTRectangle implements SerializableCompatibility {
 	}
 
 	/**
-	 * Returns a new rectangle which represents the union of
-	 * the receiver and the given rectangle.
+	 * Returns a new rectangle which represents the union of the receiver and the given rectangle.
 	 * <p>
 	 * The union of two rectangles is the smallest single rectangle that completely covers both of
 	 * the areas covered by the two given rectangles.
@@ -401,8 +399,9 @@ public final class MTRectangle implements SerializableCompatibility {
 	 * @see #add(Rectangle)
 	 */
 	public MTRectangle union(final MTRectangle rect) {
-		if (rect == null)
+		if (rect == null) {
 			SWT.error(SWT.ERROR_NULL_ARGUMENT);
+		}
 		final int left = x < rect.x ? x : rect.x;
 		final int top = y < rect.y ? y : rect.y;
 		int lhs = x + width;

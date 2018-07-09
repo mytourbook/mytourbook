@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,7 +28,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.osgi.framework.internal.core.AbstractBundle;
+import org.eclipse.osgi.internal.framework.EquinoxBundle;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.Bundle;
@@ -226,8 +226,8 @@ public class TourbookPlugin extends AbstractUIPlugin {
 		_bundleContext = context;
 
 		final Bundle bundle = context.getBundle();
-		if (bundle instanceof AbstractBundle) {
-			final AbstractBundle abstractBundle = (AbstractBundle) bundle;
+		if (bundle instanceof EquinoxBundle) {
+			final EquinoxBundle abstractBundle = (EquinoxBundle) bundle;
 			_version = abstractBundle.getVersion();
 		}
 
