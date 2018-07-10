@@ -27,6 +27,9 @@ public class MapInfoContribution extends WorkbenchWindowControlContribution {
 	@Override
 	protected Control createControl(final Composite parent) {
 
+		// see https://bugs.eclipse.org/bugs/show_bug.cgi?id=471313
+		parent.getParent().setRedraw(true);
+
 		if (_mapInfoManager == null) {
 			_mapInfoManager = MapInfoManager.getInstance();
 		}
@@ -38,8 +41,16 @@ public class MapInfoContribution extends WorkbenchWindowControlContribution {
 		return _infoWidget;
 	}
 
+	@Override
+	public boolean isDynamic() {
+
+		// see https://bugs.eclipse.org/bugs/show_bug.cgi?id=471313
+		return true;
+	}
+
 	private void updateUI() {
 		_mapInfoManager.setInfoWidget(_infoWidget);
 	}
 
 }
+
