@@ -1447,7 +1447,7 @@ public abstract class TreeColumnFactory {
 			public TreeColumnDefinition createColumn(	final ColumnManager columnManager,
 														final PixelConverter pixelConverter) {
 
-				final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TIME_DATE", SWT.TRAIL); //$NON-NLS-1$
+				final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TIME_DATE", SWT.LEAD); //$NON-NLS-1$
 
 				colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
 				colDef.setColumnLabel(Messages.ColumnFactory_date_label);
