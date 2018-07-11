@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -84,20 +84,20 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class ConconiView extends ViewPart {
 
-	public static final String		ID									= "net.tourbook.conconi.ConconiView";													//$NON-NLS-1$
+	public static final String		ID									= "net.tourbook.conconi.ConconiView";										//$NON-NLS-1$
 
 	private static final int		ADJUST_MAX_PULSE_VALUE				= 5;
 	private static final int		ADJUST_MAX_POWER_VALUE				= 10;
 
-	private static final String		STATE_CONCONI_IS_LOG_SCALING		= "STATE_CONCONI_LOG_SCALING";															//$NON-NLS-1$
-	private static final String		STATE_CONCONI_SCALING_FACTOR		= "STATE_CONCONI_SCALING_FACTOR";														//$NON-NLS-1$
+	private static final String		STATE_CONCONI_IS_LOG_SCALING		= "STATE_CONCONI_LOG_SCALING";												//$NON-NLS-1$
+	private static final String		STATE_CONCONI_SCALING_FACTOR		= "STATE_CONCONI_SCALING_FACTOR";											//$NON-NLS-1$
 
 	private static final RGB		DEFAULT_RGB							= new RGB(0xd0, 0xd0, 0xd0);
 
-	private static final String		GRID_PREF_PREFIX					= "GRID_CONCONI__";																	//$NON-NLS-1$
+	private static final String		GRID_PREF_PREFIX					= "GRID_CONCONI__";															//$NON-NLS-1$
 
-	private static final String		GRID_IS_SHOW_VERTICAL_GRIDLINES		= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
-	private static final String		GRID_IS_SHOW_HORIZONTAL_GRIDLINES	= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
+	private static final String		GRID_IS_SHOW_VERTICAL_GRIDLINES		= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
+	private static final String		GRID_IS_SHOW_HORIZONTAL_GRIDLINES	= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
 	private static final String		GRID_VERTICAL_DISTANCE				= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
 	private static final String		GRID_HORIZONTAL_DISTANCE			= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
 
@@ -116,6 +116,11 @@ public class ConconiView extends ViewPart {
 	protected boolean				_isUpdateUI							= false;
 	private boolean					_isSelectionDisabled				= true;
 	private boolean					_isSaving;
+
+	/**
+	 * E4 calls partClosed() even when not created
+	 */
+	private boolean					_isCreated;
 
 	private TourData				_selectedTour;
 
@@ -170,7 +175,7 @@ public class ConconiView extends ViewPart {
 
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == ConconiView.this) {
+				if (partRef.getPart(false) == ConconiView.this && _isCreated) {
 					saveTour();
 					saveState();
 				}
@@ -596,6 +601,8 @@ public class ConconiView extends ViewPart {
 		if (_conconiTours == null) {
 			showTourFromTourProvider();
 		}
+
+		_isCreated = true;
 	}
 
 	private void createUI(final Composite parent) {

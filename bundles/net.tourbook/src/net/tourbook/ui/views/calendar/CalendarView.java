@@ -115,6 +115,11 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 	private CalendarTourInfoToolTip	_tourInfoToolTip;
 	private OpenDialogManager		_openDlgMgr						= new OpenDialogManager();
 
+	/**
+	 * E4 calls partClosed() even when not created
+	 */
+	private boolean					_isCreated;
+
 	/*
 	 * UI controls
 	 */
@@ -141,7 +146,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 
-				if (partRef.getPart(false) == CalendarView.this) {
+				if (partRef.getPart(false) == CalendarView.this && _isCreated) {
 					saveState();
 					CalendarProfileManager.removeProfileListener(CalendarView.this);
 				}
@@ -369,6 +374,8 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 
 		// restore selection
 		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
+
+		_isCreated = true;
 	}
 
 	private void createUI(final Composite parent) {

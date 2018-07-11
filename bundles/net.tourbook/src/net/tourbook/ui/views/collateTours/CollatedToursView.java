@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -174,6 +174,11 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	private boolean										_isInStartup;
 	private boolean										_isInReload;
 	private boolean										_isInUIUpdate;
+
+	/**
+	 * E4 calls partClosed() even when not created
+	 */
+	private boolean										_isCreated;
 	//
 	private boolean										_isToolTipInCollation;
 	private boolean										_isToolTipInTags;
@@ -296,7 +301,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == CollatedToursView.this) {
+				if (partRef.getPart(false) == CollatedToursView.this && _isCreated) {
 					saveState();
 				}
 			}
@@ -363,7 +368,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 //					updateDisplayFormats();
 
 					_tourViewer.getTree().setLinesVisible(
-							_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+									_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 					_tourViewer.refresh();
 
@@ -502,6 +507,8 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				reselectTourViewer();
 			}
 		});
+
+		_isCreated = true;
 	}
 
 	private void createUI(final Composite parent) {

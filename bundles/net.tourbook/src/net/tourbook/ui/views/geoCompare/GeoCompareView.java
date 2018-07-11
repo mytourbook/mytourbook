@@ -160,6 +160,11 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 	private long							_lastUIUpdate;
 
 	/**
+	 * E4 calls partClosed() even when not created
+	 */
+	private boolean							_isCreated;
+
+	/**
 	 * Comparer items from the last comparison
 	 */
 	private ArrayList<GeoPartComparerItem>	_comparedTours					= new ArrayList<>();
@@ -433,7 +438,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 
-				if (partRef.getPart(false) == GeoCompareView.this) {
+				if (partRef.getPart(false) == GeoCompareView.this && _isCreated) {
 
 					saveState();
 
@@ -1011,6 +1016,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 		restoreSelection();
 
 		_pageBook.showPage(_pageNoData);
+
+		_isCreated = true;
 	}
 
 	private void createUI(final Composite parent) {

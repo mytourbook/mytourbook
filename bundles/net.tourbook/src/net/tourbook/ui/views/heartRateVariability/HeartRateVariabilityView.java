@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -82,27 +82,27 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class HeartRateVariabilityView extends ViewPart {
 
-	public static final String			ID										= "net.tourbook.ui.views.heartRateVariability.HeartRateVariabilityView";				//$NON-NLS-1$
+	public static final String			ID										= "net.tourbook.ui.views.heartRateVariability.HeartRateVariabilityView";																		//$NON-NLS-1$
 
 	private static final String			GRAPH_LABEL_HEART_RATE_VARIABILITY		= net.tourbook.common.Messages.Graph_Label_HeartRateVariability;
 	private static final String			GRAPH_LABEL_HEART_RATE_VARIABILITY_UNIT	= net.tourbook.common.Messages.Graph_Label_HeartRateVariability_Unit;
 
-	private static final String			STATE_HRV_MIN_TIME						= "STATE_HRV_MIN_TIME";																//$NON-NLS-1$
-	private static final String			STATE_HRV_MAX_TIME						= "STATE_HRV_MAX_TIME";																//$NON-NLS-1$
-	private static final String			STATE_IS_SHOW_ALL_VALUES				= "STATE_IS_SHOW_ALL_VALUES";															//$NON-NLS-1$
-	private static final String			STATE_IS_SYNC_CHART_SCALING				= "STATE_IS_SYNC_CHART_SCALING";														//$NON-NLS-1$
+	private static final String			STATE_HRV_MIN_TIME						= "STATE_HRV_MIN_TIME";													//$NON-NLS-1$
+	private static final String			STATE_HRV_MAX_TIME						= "STATE_HRV_MAX_TIME";													//$NON-NLS-1$
+	private static final String			STATE_IS_SHOW_ALL_VALUES				= "STATE_IS_SHOW_ALL_VALUES";											//$NON-NLS-1$
+	private static final String			STATE_IS_SYNC_CHART_SCALING				= "STATE_IS_SYNC_CHART_SCALING";										//$NON-NLS-1$
 
-	private static final String			GRID_PREF_PREFIX						= "GRID_HEART_RATE_VARIABILITY__";														//$NON-NLS-1$
+	private static final String			GRID_PREF_PREFIX						= "GRID_HEART_RATE_VARIABILITY__";										//$NON-NLS-1$
 
-	private static final String			GRID_IS_SHOW_VERTICAL_GRIDLINES			= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
-	private static final String			GRID_IS_SHOW_HORIZONTAL_GRIDLINES		= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
-	private static final String			GRID_VERTICAL_DISTANCE					= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
-	private static final String			GRID_HORIZONTAL_DISTANCE				= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
+	private static final String			GRID_IS_SHOW_VERTICAL_GRIDLINES			= (GRID_PREF_PREFIX			+ ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
+	private static final String			GRID_IS_SHOW_HORIZONTAL_GRIDLINES		= (GRID_PREF_PREFIX			+ ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
+	private static final String			GRID_VERTICAL_DISTANCE					= (GRID_PREF_PREFIX			+ ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
+	private static final String			GRID_HORIZONTAL_DISTANCE				= (GRID_PREF_PREFIX			+ ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
 
 	private static final int			ADJUST_PULSE_VALUE						= 50;
 
-	private static final int			HRV_TIME_MIN_BORDER						= 0;																					// ms
-	private static final int			HRV_TIME_MAX_BORDER						= 9999;																				//ms
+	private static final int			HRV_TIME_MIN_BORDER						= 0;																	// ms
+	private static final int			HRV_TIME_MAX_BORDER						= 9999;																	//ms
 
 	private final IPreferenceStore		_prefStore								= TourbookPlugin.getPrefStore();
 	private final IPreferenceStore		_commonPrefStore						= CommonActivator.getPrefStore();
@@ -126,10 +126,13 @@ public class HeartRateVariabilityView extends ViewPart {
 	private boolean						_isSynchChartScaling;
 	private boolean						_isShowAllValues;
 
-	private final MinMaxKeeper_XData	_xMinMaxKeeper							= new MinMaxKeeper_XData(
-																						ADJUST_PULSE_VALUE);
-	private final MinMaxKeeper_YData	_yMinMaxKeeper							= new MinMaxKeeper_YData(
-																						ADJUST_PULSE_VALUE);
+	/**
+	 * E4 calls partClosed() even when not created
+	 */
+	private boolean						_isCreated;
+
+	private final MinMaxKeeper_XData	_xMinMaxKeeper							= new MinMaxKeeper_XData(ADJUST_PULSE_VALUE);
+	private final MinMaxKeeper_YData	_yMinMaxKeeper							= new MinMaxKeeper_YData(ADJUST_PULSE_VALUE);
 
 	private int							_fixed2xErrors_0;
 	private int							_fixed2xErrors_1;
@@ -247,7 +250,7 @@ public class HeartRateVariabilityView extends ViewPart {
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 
-				if (partRef.getPart(false) == HeartRateVariabilityView.this) {
+				if (partRef.getPart(false) == HeartRateVariabilityView.this && _isCreated) {
 					saveState();
 				}
 			}
@@ -560,6 +563,8 @@ public class HeartRateVariabilityView extends ViewPart {
 		showPage(_page_NoTour);
 
 		showTour();
+
+		_isCreated = true;
 	}
 
 	private void createUI(final Composite parent) {
