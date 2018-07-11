@@ -2498,6 +2498,10 @@ public class ChartComponentGraph extends Canvas {
 
 		final String graphTitle = yData.getYTitle();
 
+		if (graphTitle == null) {
+			return;
+		}
+
 		final Point labelExtend = gcGraph.stringExtent(graphTitle);
 		final int labelHeight = labelExtend.y + 1;
 
