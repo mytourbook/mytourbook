@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -35,69 +35,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
-
-import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.chart.Chart;
-import net.tourbook.chart.ChartDataModel;
-import net.tourbook.chart.SelectionChartInfo;
-import net.tourbook.chart.SelectionChartXSliderPosition;
-import net.tourbook.common.CommonActivator;
-import net.tourbook.common.UI;
-import net.tourbook.common.action.ActionOpenPrefDialog;
-import net.tourbook.common.font.MTFont;
-import net.tourbook.common.preferences.ICommonPreferences;
-import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.time.TimeZoneData;
-import net.tourbook.common.tooltip.ActionToolbarSlideout;
-import net.tourbook.common.tooltip.ToolbarSlideout;
-import net.tourbook.common.util.ColumnDefinition;
-import net.tourbook.common.util.ColumnManager;
-import net.tourbook.common.util.ITourViewer2;
-import net.tourbook.common.util.PostSelectionProvider;
-import net.tourbook.common.util.StatusUtil;
-import net.tourbook.common.util.Util;
-import net.tourbook.common.weather.IWeather;
-import net.tourbook.data.TourData;
-import net.tourbook.data.TourMarker;
-import net.tourbook.data.TourPerson;
-import net.tourbook.data.TourReference;
-import net.tourbook.data.TourTag;
-import net.tourbook.data.TourType;
-import net.tourbook.database.MyTourbookException;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.extension.export.ActionExport;
-import net.tourbook.importdata.RawDataManager;
-import net.tourbook.map2.view.SelectionMapPosition;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tag.TagMenuManager;
-import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
-import net.tourbook.tour.ActionOpenMarkerDialog;
-import net.tourbook.tour.ITourEventListener;
-import net.tourbook.tour.ITourSaveListener;
-import net.tourbook.tour.SelectionDeletedTours;
-import net.tourbook.tour.SelectionTourData;
-import net.tourbook.tour.SelectionTourId;
-import net.tourbook.tour.SelectionTourIds;
-import net.tourbook.tour.SelectionTourMarker;
-import net.tourbook.tour.TourEvent;
-import net.tourbook.tour.TourEventId;
-import net.tourbook.tour.TourManager;
-import net.tourbook.tourType.TourTypeImage;
-import net.tourbook.ui.ITourProvider2;
-import net.tourbook.ui.MessageManager;
-import net.tourbook.ui.TableColumnFactory;
-import net.tourbook.ui.action.ActionExtractTour;
-import net.tourbook.ui.action.ActionModifyColumns;
-import net.tourbook.ui.action.ActionSetTourTypeMenu;
-import net.tourbook.ui.action.ActionSplitTour;
-import net.tourbook.ui.tourChart.ChartLabel;
-import net.tourbook.ui.tourChart.TourChart;
-import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
-import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
-import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
-import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 
 import org.eclipse.core.databinding.conversion.StringToNumberConverter;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -192,6 +129,69 @@ import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.progress.UIJob;
 
+import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.chart.Chart;
+import net.tourbook.chart.ChartDataModel;
+import net.tourbook.chart.SelectionChartInfo;
+import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.UI;
+import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.font.MTFont;
+import net.tourbook.common.preferences.ICommonPreferences;
+import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.time.TimeZoneData;
+import net.tourbook.common.tooltip.ActionToolbarSlideout;
+import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.common.util.ColumnDefinition;
+import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.ITourViewer2;
+import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.Util;
+import net.tourbook.common.weather.IWeather;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourPerson;
+import net.tourbook.data.TourReference;
+import net.tourbook.data.TourTag;
+import net.tourbook.data.TourType;
+import net.tourbook.database.MyTourbookException;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.extension.export.ActionExport;
+import net.tourbook.importdata.RawDataManager;
+import net.tourbook.map2.view.SelectionMapPosition;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tag.TagMenuManager;
+import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
+import net.tourbook.tour.ActionOpenMarkerDialog;
+import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.ITourSaveListener;
+import net.tourbook.tour.SelectionDeletedTours;
+import net.tourbook.tour.SelectionTourData;
+import net.tourbook.tour.SelectionTourId;
+import net.tourbook.tour.SelectionTourIds;
+import net.tourbook.tour.SelectionTourMarker;
+import net.tourbook.tour.TourEvent;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
+import net.tourbook.tourType.TourTypeImage;
+import net.tourbook.ui.ITourProvider2;
+import net.tourbook.ui.MessageManager;
+import net.tourbook.ui.TableColumnFactory;
+import net.tourbook.ui.action.ActionExtractTour;
+import net.tourbook.ui.action.ActionModifyColumns;
+import net.tourbook.ui.action.ActionSetTourTypeMenu;
+import net.tourbook.ui.action.ActionSplitTour;
+import net.tourbook.ui.tourChart.ChartLabel;
+import net.tourbook.ui.tourChart.TourChart;
+import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
+import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
+import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
+import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
+
 // author: Wolfgang Schramm
 // create: 24.08.2007
 
@@ -246,6 +246,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private final boolean			_isOSX							= net.tourbook.common.UI.IS_OSX;
 	private final boolean			_isLinux						= net.tourbook.common.UI.IS_LINUX;
 	//
+	/**
+	 * E4 calls partClosed() even when not created
+	 */
+	private boolean					_isPartCreated;
 	//
 	/**
 	 * Tour start daytime in seconds
@@ -411,7 +415,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * contains all markers with the data serie index as key
 	 */
-	private final HashMap<Integer, TourMarker>	_markerMap						= new HashMap<Integer, TourMarker>();
+	private final HashMap<Integer, TourMarker>	_markerMap						= new HashMap<>();
 
 	/**
 	 * When <code>true</code> the tour is created with the tour editor
@@ -487,9 +491,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 * contains the controls which are displayed in the first column, these controls are used to get
 	 * the maximum width and set the first column within the differenct section to the same width
 	 */
-	private final ArrayList<Control>			_firstColumnControls			= new ArrayList<Control>();
-	private final ArrayList<Control>			_firstColumnContainerControls	= new ArrayList<Control>();
-	private final ArrayList<Control>			_secondColumnControls			= new ArrayList<Control>();
+	private final ArrayList<Control>			_firstColumnControls			= new ArrayList<>();
+	private final ArrayList<Control>			_firstColumnContainerControls	= new ArrayList<>();
+	private final ArrayList<Control>			_secondColumnControls			= new ArrayList<>();
 
 	private TourChart							_tourChart;
 
@@ -1518,7 +1522,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == TourDataEditorView.this) {
+
+				if (partRef.getPart(false) == TourDataEditorView.this && _isPartCreated) {
 
 					saveState();
 					TourManager.setTourDataEditor(null);
@@ -2229,6 +2234,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_pageBook.showPage(_pageNoData);
 
 		displaySelectedTour();
+
+		_isPartCreated = true;
 	}
 
 	private Section createSection(	final Composite parent,
@@ -4851,7 +4858,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 */
 	private void fireModifyNotification() {
 
-		final ArrayList<TourData> modifiedTour = new ArrayList<TourData>();
+		final ArrayList<TourData> modifiedTour = new ArrayList<>();
 		modifiedTour.add(_tourData);
 
 		final TourEvent tourEvent = new TourEvent(modifiedTour);
@@ -5129,7 +5136,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			return null;
 		}
 
-		final ArrayList<TourData> tourDataList = new ArrayList<TourData>();
+		final ArrayList<TourData> tourDataList = new ArrayList<>();
 		tourDataList.add(_tourData);
 
 		return tourDataList;
@@ -6857,7 +6864,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private void updateUI_RefTourInfo(final Collection<TourReference> refTours) {
 
-		final ArrayList<TourReference> refTourList = new ArrayList<TourReference>(refTours);
+		final ArrayList<TourReference> refTourList = new ArrayList<>(refTours);
 
 		// sort reference tours by start index
 		Collections.sort(refTourList, new Comparator<TourReference>() {

@@ -22,45 +22,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.util.ColumnDefinition;
-import net.tourbook.common.util.ColumnManager;
-import net.tourbook.common.util.ITourViewer;
-import net.tourbook.common.util.ITreeViewer;
-import net.tourbook.common.util.PostSelectionProvider;
-import net.tourbook.common.util.TreeColumnDefinition;
-import net.tourbook.common.util.TreeViewerItem;
-import net.tourbook.data.TourData;
-import net.tourbook.data.TourTag;
-import net.tourbook.data.TourType;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tag.TagMenuManager;
-import net.tourbook.tour.ITourEventListener;
-import net.tourbook.tour.TourDoubleClickState;
-import net.tourbook.tour.TourEvent;
-import net.tourbook.tour.TourEventId;
-import net.tourbook.tour.TourManager;
-import net.tourbook.tour.TourTypeMenuManager;
-import net.tourbook.tourType.TourTypeImage;
-import net.tourbook.ui.IReferenceTourProvider;
-import net.tourbook.ui.ITourProvider;
-import net.tourbook.ui.TreeColumnFactory;
-import net.tourbook.ui.UI;
-import net.tourbook.ui.action.ActionCollapseAll;
-import net.tourbook.ui.action.ActionCollapseOthers;
-import net.tourbook.ui.action.ActionEditQuick;
-import net.tourbook.ui.action.ActionEditTour;
-import net.tourbook.ui.action.ActionExpandSelection;
-import net.tourbook.ui.action.ActionModifyColumns;
-import net.tourbook.ui.action.ActionOpenTour;
-import net.tourbook.ui.action.ActionRefreshView;
-import net.tourbook.ui.action.ActionSetTourTypeMenu;
-import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
-import net.tourbook.ui.views.TourInfoToolTipStyledCellLabelProvider;
-import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
-
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -101,6 +62,45 @@ import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
+
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.ColumnDefinition;
+import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.ITourViewer;
+import net.tourbook.common.util.ITreeViewer;
+import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.TreeColumnDefinition;
+import net.tourbook.common.util.TreeViewerItem;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourTag;
+import net.tourbook.data.TourType;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tag.TagMenuManager;
+import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.TourDoubleClickState;
+import net.tourbook.tour.TourEvent;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
+import net.tourbook.tour.TourTypeMenuManager;
+import net.tourbook.tourType.TourTypeImage;
+import net.tourbook.ui.IReferenceTourProvider;
+import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.TreeColumnFactory;
+import net.tourbook.ui.UI;
+import net.tourbook.ui.action.ActionCollapseAll;
+import net.tourbook.ui.action.ActionCollapseOthers;
+import net.tourbook.ui.action.ActionEditQuick;
+import net.tourbook.ui.action.ActionEditTour;
+import net.tourbook.ui.action.ActionExpandSelection;
+import net.tourbook.ui.action.ActionModifyColumns;
+import net.tourbook.ui.action.ActionOpenTour;
+import net.tourbook.ui.action.ActionRefreshView;
+import net.tourbook.ui.action.ActionSetTourTypeMenu;
+import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
+import net.tourbook.ui.views.TourInfoToolTipStyledCellLabelProvider;
+import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
 
 public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvider, IReferenceTourProvider,
 		ITreeViewer {
@@ -146,6 +146,11 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	 * flag if actions are added to the toolbar
 	 */
 	private boolean						_isToolbarCreated		= false;
+
+	/**
+	 * E4 calls partClosed() even when not created
+	 */
+	private boolean						_isPartCreated;
 
 	private ColumnManager				_columnManager;
 
@@ -265,7 +270,8 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == TourCatalogView.this) {
+
+				if (partRef.getPart(false) == TourCatalogView.this && _isPartCreated) {
 
 					saveState();
 
@@ -331,7 +337,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 					 * find/remove the removed compared tours in the viewer
 					 */
 
-					final ArrayList<TVICatalogComparedTour> comparedTours = new ArrayList<TVICatalogComparedTour>();
+					final ArrayList<TVICatalogComparedTour> comparedTours = new ArrayList<>();
 
 					getComparedTours(comparedTours, _rootItem, removedCompTours.removedComparedTours);
 
@@ -436,11 +442,11 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 					// check if the compared tour was saved in the database
 					if (compareTourProperty.isDataSaved) {
 
-						final ArrayList<Long> compareIds = new ArrayList<Long>();
+						final ArrayList<Long> compareIds = new ArrayList<>();
 						compareIds.add(compareTourProperty.compareId);
 
 						// find the compared tour in the viewer
-						final ArrayList<TVICatalogComparedTour> comparedTours = new ArrayList<TVICatalogComparedTour>();
+						final ArrayList<TVICatalogComparedTour> comparedTours = new ArrayList<>();
 
 						getComparedTours(comparedTours, _rootItem, compareIds);
 
@@ -545,6 +551,8 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 				}
 			}
 		});
+
+		_isPartCreated = true;
 	}
 
 	private void createUI(final Composite parent) {
@@ -1108,7 +1116,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	public ArrayList<Long> getSelectedReferenceTours() {
 
 		final IStructuredSelection selectedItems = ((IStructuredSelection) _tourViewer.getSelection());
-		final ArrayList<Long> selectedReferenceTour = new ArrayList<Long>();
+		final ArrayList<Long> selectedReferenceTour = new ArrayList<>();
 
 		// loop: all selected items
 		for (final Iterator<?> iter = selectedItems.iterator(); iter.hasNext();) {
@@ -1128,7 +1136,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		// get selected tours
 
 		final IStructuredSelection selectedTours = ((IStructuredSelection) _tourViewer.getSelection());
-		final ArrayList<TourData> selectedTourData = new ArrayList<TourData>();
+		final ArrayList<TourData> selectedTourData = new ArrayList<>();
 
 		// loop: all selected items
 		for (final Iterator<?> iter = selectedTours.iterator(); iter.hasNext();) {
@@ -1350,7 +1358,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	private void updateTourViewer(final ArrayList<TVICompareResultComparedTour> persistedCompareResults) {
 
 		// ref id's which hast new children
-		final HashMap<Long, Long> viewRefIds = new HashMap<Long, Long>();
+		final HashMap<Long, Long> viewRefIds = new HashMap<>();
 
 		// get all ref tours which needs to be updated
 		for (final TVICompareResultComparedTour compareResult : persistedCompareResults) {
@@ -1435,7 +1443,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 								tourItem.tagIds.clear();
 							}
 
-							tourItem.tagIds = tagIds = new ArrayList<Long>();
+							tourItem.tagIds = tagIds = new ArrayList<>();
 							for (final TourTag tourTag : tourTags) {
 								tagIds.add(tourTag.getTagId());
 							}

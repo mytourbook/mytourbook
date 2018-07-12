@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -42,6 +42,34 @@ import java.awt.event.MouseWheelEvent;
 import java.util.ArrayList;
 
 import javax.swing.SwingUtilities;
+
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ActionContributionItem;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.awt.SWT_AWT;
+import org.eclipse.swt.events.MenuAdapter;
+import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.part.ViewPart;
+import org.oscim.core.MapPosition;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
@@ -120,34 +148,6 @@ import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.tourChart.TourChart;
 
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.ActionContributionItem;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.awt.SWT_AWT;
-import org.eclipse.swt.events.MenuAdapter;
-import org.eclipse.swt.events.MenuEvent;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.ToolItem;
-import org.eclipse.ui.IActionBars;
-import org.eclipse.ui.IPartListener2;
-import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchPartReference;
-import org.eclipse.ui.part.ViewPart;
-import org.oscim.core.MapPosition;
-
 /**
  * Display 3-D map with tour tracks.
  */
@@ -177,9 +177,8 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 	private static final String		STATE_TOUR_COLOR_ID						= "STATE_TOUR_COLOR_ID";						//$NON-NLS-1$
 
 	private static final WorldWindowGLCanvas	_wwCanvas					= Map3Manager.getWWCanvas();
-	private final IPreferenceStore				_prefStore					= TourbookPlugin.getPrefStore();
-	
 
+	private final IPreferenceStore				_prefStore					= TourbookPlugin.getPrefStore();
 	private final IDialogSettings				_state						= TourbookPlugin.getState(getClass().getCanonicalName());
 	
 // SET_FORMATTING_ON
@@ -222,14 +221,19 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 	private ISelectionListener					_postSelectionListener;
 	private IPropertyChangeListener				_prefChangeListener;
 	private ITourEventListener					_tourEventListener;
-
+	//
 	private MouseAdapter						_wwMouseListener;
 	private MouseAdapter						_wwMouseMotionListener;
 	private MouseAdapter						_wwMouseWheelListener;
-
+	//
 	private boolean								_isPartVisible;
 	private boolean								_isRestored;
 	private boolean								_isContextMenuVisible;
+	//
+	/**
+	 * E4 calls partClosed() even when not created
+	 */
+	private boolean								_isPartCreated;
 	//
 	private ISelection							_lastHiddenSelection;
 	//
@@ -241,7 +245,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 	/**
 	 * Contains all tours which are displayed in the map.
 	 */
-	private ArrayList<TourData>					_allTours								= new ArrayList<TourData>();
+	private ArrayList<TourData>					_allTours								= new ArrayList<>();
 	//
 	private int									_allTourIdHash;
 	private int									_allTourDataHash;
@@ -578,7 +582,8 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == Map3View.this) {
+
+				if (partRef.getPart(false) == Map3View.this && _isPartCreated) {
 					saveState();
 				}
 			}
@@ -864,7 +869,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 		_actionTourColorSpeed = ActionTourColor.createAction(MapGraphId.Speed, this, parent);
 		_actionTourColorHrZone = ActionTourColor.createAction(MapGraphId.HrZone, this, parent);
 
-		_allColorActions = new ArrayList<ActionTourColor>();
+		_allColorActions = new ArrayList<>();
 		_allColorActions.add(_actionTourColorAltitude);
 		_allColorActions.add(_actionTourColorGradient);
 		_allColorActions.add(_actionTourColorPace);
@@ -1000,6 +1005,8 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 				}
 			}
 		});
+
+		_isPartCreated = true;
 	}
 
 	private String createSliderText(final int positionIndex, final TourData tourData) {
@@ -1422,7 +1429,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 	 */
 	private ArrayList<TourData> getMapTours(final ArrayList<TourData> allTours) {
 
-		final ArrayList<TourData> mapTours = new ArrayList<TourData>(allTours.size());
+		final ArrayList<TourData> mapTours = new ArrayList<>(allTours.size());
 
 		for (final TourData tourData : allTours) {
 
@@ -1482,7 +1489,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
 		if (selectedTrack != null) {
 
-			final ArrayList<TourData> selectedTours = new ArrayList<TourData>();
+			final ArrayList<TourData> selectedTours = new ArrayList<>();
 
 			selectedTours.add(selectedTrack.getTourTrack().getTourData());
 
@@ -2261,7 +2268,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 			}
 		}
 
-		final ArrayList<TourData> allTours = new ArrayList<TourData>();
+		final ArrayList<TourData> allTours = new ArrayList<>();
 		allTours.add(newTourData);
 
 		showAllTours_NewTours(allTours);
@@ -2273,7 +2280,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
 			// tour data needs to be loaded
 
-			final ArrayList<TourData> allTourData = new ArrayList<TourData>();
+			final ArrayList<TourData> allTourData = new ArrayList<>();
 
 			TourManager.loadTourData(allTourIds, allTourData, true);
 

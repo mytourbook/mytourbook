@@ -22,6 +22,50 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.ColumnViewer;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.IElementComparer;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.ITreeSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.jface.viewers.StyledString.Styler;
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.events.MenuAdapter;
+import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.part.ViewPart;
+
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -81,50 +125,6 @@ import net.tourbook.ui.views.rawData.ActionMergeTour;
 import net.tourbook.ui.views.rawData.ActionReimportSubMenu;
 import net.tourbook.ui.views.tourBook.TVITourBookTour;
 
-import org.eclipse.jface.action.IMenuListener;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.PixelConverter;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.CellLabelProvider;
-import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.IElementComparer;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.ITreeSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.jface.viewers.StyledString.Styler;
-import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerCell;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.events.MenuAdapter;
-import org.eclipse.swt.events.MenuEvent;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Tree;
-import org.eclipse.ui.IPartListener2;
-import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchPartReference;
-import org.eclipse.ui.part.ViewPart;
-
 public class CollatedToursView extends ViewPart implements ITourProvider, ITourViewer3, ITourProviderByID, ITreeViewer {
 
 	static public final String	ID	= "net.tourbook.ui.views.collateTours.CollatedToursView";	//$NON-NLS-1$
@@ -169,7 +169,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 		_nf1_NoGroup.setGroupingUsed(false);
 	}
 
-	private final ArrayList<Long>						_selectedTourIds		= new ArrayList<Long>();
+	private final ArrayList<Long>						_selectedTourIds		= new ArrayList<>();
 
 	private boolean										_isInStartup;
 	private boolean										_isInReload;
@@ -178,7 +178,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	/**
 	 * E4 calls partClosed() even when not created
 	 */
-	private boolean										_isCreated;
+	private boolean										_isPartCreated;
 	//
 	private boolean										_isToolTipInCollation;
 	private boolean										_isToolTipInTags;
@@ -301,7 +301,8 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == CollatedToursView.this && _isCreated) {
+
+				if (partRef.getPart(false) == CollatedToursView.this && _isPartCreated) {
 					saveState();
 				}
 			}
@@ -508,7 +509,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 			}
 		});
 
-		_isCreated = true;
+		_isPartCreated = true;
 	}
 
 	private void createUI(final Composite parent) {
@@ -1913,7 +1914,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	@Override
 	public Set<Long> getSelectedTourIDs() {
 
-		final Set<Long> tourIds = new HashSet<Long>();
+		final Set<Long> tourIds = new HashSet<>();
 
 		final IStructuredSelection selectedTours = ((IStructuredSelection) _tourViewer.getSelection());
 
@@ -1939,7 +1940,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 		/*
 		 * show busyindicator when multiple tours needs to be retrieved from the database
 		 */
-		final ArrayList<TourData> selectedTourData = new ArrayList<TourData>();
+		final ArrayList<TourData> selectedTourData = new ArrayList<>();
 
 		if (tourIds.size() > 1) {
 			BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
@@ -1993,7 +1994,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 			return;
 		}
 
-		final HashSet<Long> tourIds = new HashSet<Long>();
+		final HashSet<Long> tourIds = new HashSet<>();
 
 		final IStructuredSelection selectedTours = (IStructuredSelection) (event.getSelection());
 		// loop: all selected items

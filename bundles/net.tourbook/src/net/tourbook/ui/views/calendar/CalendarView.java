@@ -18,27 +18,6 @@ package net.tourbook.ui.views.calendar;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
-import net.tourbook.common.color.ColorDefinition;
-import net.tourbook.common.color.GraphColorManager;
-import net.tourbook.common.font.MTFont;
-import net.tourbook.common.preferences.ICommonPreferences;
-import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.tooltip.IOpeningDialog;
-import net.tourbook.common.tooltip.OpenDialogManager;
-import net.tourbook.common.util.Util;
-import net.tourbook.data.TourData;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.ITourEventListener;
-import net.tourbook.tour.SelectionDeletedTours;
-import net.tourbook.tour.SelectionTourId;
-import net.tourbook.tour.TourEventId;
-import net.tourbook.tour.TourManager;
-import net.tourbook.ui.ITourProvider;
-import net.tourbook.ui.views.calendar.CalendarProfileManager.ICalendarProfileListener;
-
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -67,6 +46,27 @@ import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
+
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
+import net.tourbook.common.color.ColorDefinition;
+import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.font.MTFont;
+import net.tourbook.common.preferences.ICommonPreferences;
+import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.tooltip.IOpeningDialog;
+import net.tourbook.common.tooltip.OpenDialogManager;
+import net.tourbook.common.util.Util;
+import net.tourbook.data.TourData;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.SelectionDeletedTours;
+import net.tourbook.tour.SelectionTourId;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
+import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.views.calendar.CalendarProfileManager.ICalendarProfileListener;
 
 public class CalendarView extends ViewPart implements ITourProvider, ICalendarProfileListener {
 
@@ -118,7 +118,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 	/**
 	 * E4 calls partClosed() even when not created
 	 */
-	private boolean					_isCreated;
+	private boolean					_isPartCreated;
 
 	/*
 	 * UI controls
@@ -146,7 +146,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 
-				if (partRef.getPart(false) == CalendarView.this && _isCreated) {
+				if (partRef.getPart(false) == CalendarView.this && _isPartCreated) {
 					saveState();
 					CalendarProfileManager.removeProfileListener(CalendarView.this);
 				}
@@ -375,7 +375,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 		// restore selection
 		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
 
-		_isCreated = true;
+		_isPartCreated = true;
 	}
 
 	private void createUI(final Composite parent) {
@@ -521,7 +521,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 
 	private ArrayList<Action> getLocalActions() {
 
-		final ArrayList<Action> localActions = new ArrayList<Action>();
+		final ArrayList<Action> localActions = new ArrayList<>();
 
 		localActions.add(_actionBack);
 		localActions.add(_actionGotoToday);
@@ -534,8 +534,8 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 	@Override
 	public ArrayList<TourData> getSelectedTours() {
 
-		final ArrayList<TourData> selectedTourData = new ArrayList<TourData>();
-		final ArrayList<Long> tourIdSet = new ArrayList<Long>();
+		final ArrayList<TourData> selectedTourData = new ArrayList<>();
+		final ArrayList<Long> tourIdSet = new ArrayList<>();
 		tourIdSet.add(_calendarGraph.getSelectedTourId());
 		for (final Long tourId : tourIdSet) {
 			if (tourId > 0) { // < 0 means not selected

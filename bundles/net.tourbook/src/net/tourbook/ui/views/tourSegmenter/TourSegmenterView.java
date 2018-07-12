@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,41 +23,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-
-import net.tourbook.Messages;
-import net.tourbook.algorithm.DPPoint;
-import net.tourbook.algorithm.DouglasPeuckerSimplifier;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.chart.ColorCache;
-import net.tourbook.chart.SelectionChartXSliderPosition;
-import net.tourbook.common.UI;
-import net.tourbook.common.util.ColumnDefinition;
-import net.tourbook.common.util.ColumnManager;
-import net.tourbook.common.util.ITourViewer;
-import net.tourbook.common.util.PostSelectionProvider;
-import net.tourbook.common.util.Util;
-import net.tourbook.data.AltitudeUpDownSegment;
-import net.tourbook.data.TourData;
-import net.tourbook.data.TourMarker;
-import net.tourbook.data.TourSegment;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.PrefPageComputedValues;
-import net.tourbook.tour.BreakTimeMethod;
-import net.tourbook.tour.BreakTimeResult;
-import net.tourbook.tour.BreakTimeTool;
-import net.tourbook.tour.ITourEventListener;
-import net.tourbook.tour.SelectionDeletedTours;
-import net.tourbook.tour.SelectionTourData;
-import net.tourbook.tour.SelectionTourId;
-import net.tourbook.tour.SelectionTourIds;
-import net.tourbook.tour.TourEvent;
-import net.tourbook.tour.TourEventId;
-import net.tourbook.tour.TourManager;
-import net.tourbook.ui.ImageComboLabel;
-import net.tourbook.ui.TableColumnFactory;
-import net.tourbook.ui.action.ActionModifyColumns;
-import net.tourbook.ui.tourChart.TourChart;
-import net.tourbook.web.WEB;
 
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -105,6 +70,41 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
+
+import net.tourbook.Messages;
+import net.tourbook.algorithm.DPPoint;
+import net.tourbook.algorithm.DouglasPeuckerSimplifier;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.chart.ColorCache;
+import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.common.UI;
+import net.tourbook.common.util.ColumnDefinition;
+import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.ITourViewer;
+import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.Util;
+import net.tourbook.data.AltitudeUpDownSegment;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourSegment;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageComputedValues;
+import net.tourbook.tour.BreakTimeMethod;
+import net.tourbook.tour.BreakTimeResult;
+import net.tourbook.tour.BreakTimeTool;
+import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.SelectionDeletedTours;
+import net.tourbook.tour.SelectionTourData;
+import net.tourbook.tour.SelectionTourId;
+import net.tourbook.tour.SelectionTourIds;
+import net.tourbook.tour.TourEvent;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
+import net.tourbook.ui.ImageComboLabel;
+import net.tourbook.ui.TableColumnFactory;
+import net.tourbook.ui.action.ActionModifyColumns;
+import net.tourbook.ui.tourChart.TourChart;
+import net.tourbook.web.WEB;
 
 /**
  *
@@ -188,21 +188,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	 * Colors
 	 */
 	static final String								STATE_COLOR_ALTITUDE_DOWN							= "STATE_COLOR_ALTITUDE_DOWN";					//$NON-NLS-1$
-	static final RGB								STATE_COLOR_ALTITUDE_DOWN_DEFAULT					= new RGB(
-																												0,
-																												240,
-																												0);
-
 	static final String								STATE_COLOR_ALTITUDE_UP								= "STATE_COLOR_ALTITUDE_UP";					//$NON-NLS-1$
-	static final RGB								STATE_COLOR_ALTITUDE_UP_DEFAULT						= new RGB(
-																												255,
-																												66,
-																												22);
 	static final String								STATE_COLOR_TOTALS									= "STATE_COLOR_TOTALS";						//$NON-NLS-1$
-	static final RGB								STATE_COLOR_TOTALS_DEFAULT							= new RGB(
-																												253,
-																												236,
-																												115);
+	
+	static final RGB								STATE_COLOR_ALTITUDE_DOWN_DEFAULT					= new RGB(0, 240, 0);
+	static final RGB								STATE_COLOR_ALTITUDE_UP_DEFAULT						= new RGB(255, 66, 22);
+	static final RGB								STATE_COLOR_TOTALS_DEFAULT							= new RGB(253, 236, 115);
 
 	private static final int						COLUMN_DEFAULT										= 0;											// sort by time
 	private static final int						COLUMN_SPEED										= 10;
@@ -213,17 +204,15 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	private static final float						SPEED_DIGIT_VALUE									= 10.0f;
 
-	private static final IPreferenceStore			_prefStore											= TourbookPlugin
-																												.getPrefStore();
-	private static final IDialogSettings			_state												= TourbookPlugin
-																												.getState(ID);
+	private static final IPreferenceStore			_prefStore											= TourbookPlugin.getPrefStore();
+	private static final IDialogSettings			_state												= TourbookPlugin.getState(ID);
 
 	/**
 	 * Contains all available segmenters.
 	 * <p>
 	 * The sequence defines how they are displayed in the combobox.
 	 */
-	private static final ArrayList<TourSegmenter>	_allTourSegmenter									= new ArrayList<TourSegmenter>();
+	private static final ArrayList<TourSegmenter>	_allTourSegmenter									= new ArrayList<>();
 
 	static {
 
@@ -316,19 +305,24 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private int										_spinnerDistancePage;
 
 	private boolean									_isTourDirty										= false;
-
 	private boolean									_isSaving;
+
 	/**
 	 * when <code>true</code>, the tour dirty flag is disabled to load data into the fields
 	 */
 	private boolean									_isDirtyDisabled									= false;
 	private boolean									_isClearView;
 
+	/**
+	 * E4 calls partClosed() even when not created
+	 */
+	private boolean									_isPartCreated;
+
 	private float									_altitudeUp;
 
 	private float									_altitudeDown;
 
-	private ArrayList<TourSegmenter>				_availableSegmenter									= new ArrayList<TourSegmenter>();
+	private ArrayList<TourSegmenter>				_availableSegmenter									= new ArrayList<>();
 
 	/**
 	 * segmenter type which the user has selected
@@ -352,7 +346,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	 * contains the controls which are displayed in the first column, these controls are used to get
 	 * the maximum width and set the first column within the differenct section to the same width
 	 */
-	private final ArrayList<Control>				_firstColBreakTime									= new ArrayList<Control>();
+	private final ArrayList<Control>				_firstColBreakTime									= new ArrayList<>();
 
 	private ActionModifyColumns						_actionModifyColumns;
 	private ActionTourChartSegmenterConfig			_actionTCSegmenterConfig;
@@ -578,7 +572,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == TourSegmenterView.this) {
+
+				if (partRef.getPart(false) == TourSegmenterView.this && _isPartCreated) {
 					onPartClosed();
 				}
 			}
@@ -928,6 +923,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		enableActions();
 
 		showTour();
+
+		_isPartCreated = true;
 	}
 
 	private Object[] createSegmenterContent() {
@@ -1215,7 +1212,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		final float selectedMinAltiDiff = (float) (_spinnerMinAltitude.getSelection() / 10.0);
 
-		final ArrayList<AltitudeUpDownSegment> tourSegements = new ArrayList<AltitudeUpDownSegment>();
+		final ArrayList<AltitudeUpDownSegment> tourSegements = new ArrayList<>();
 
 		// create segment when the altitude up/down is changing
 		_tourData.computeAltitudeUpDown(tourSegements, selectedMinAltiDiff);
@@ -1383,7 +1380,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				: _tourData.getTourMarkers();
 
 		// sort markers by time - they can be unsorted
-		final ArrayList<TourMarker> sortedMarkers = new ArrayList<TourMarker>(tourMarkers);
+		final ArrayList<TourMarker> sortedMarkers = new ArrayList<>(tourMarkers);
 		Collections.sort(sortedMarkers, new Comparator<TourMarker>() {
 			@Override
 			public int compare(final TourMarker tm1, final TourMarker tm2) {
@@ -3283,7 +3280,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				: _tourData.getTourMarkers();
 
 		// sort markers by time - they can be unsorted
-		final ArrayList<TourMarker> sortedMarkers = new ArrayList<TourMarker>(tourMarkers);
+		final ArrayList<TourMarker> sortedMarkers = new ArrayList<>(tourMarkers);
 		Collections.sort(sortedMarkers, new Comparator<TourMarker>() {
 			@Override
 			public int compare(final TourMarker tm1, final TourMarker tm2) {

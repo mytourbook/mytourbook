@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,33 +17,6 @@ package net.tourbook.ui.views;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
-
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.util.ColumnDefinition;
-import net.tourbook.common.util.ColumnManager;
-import net.tourbook.common.util.ITourViewer;
-import net.tourbook.common.util.PostSelectionProvider;
-import net.tourbook.data.TourData;
-import net.tourbook.data.TourWayPoint;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.ITourEventListener;
-import net.tourbook.tour.SelectionDeletedTours;
-import net.tourbook.tour.SelectionTourData;
-import net.tourbook.tour.SelectionTourId;
-import net.tourbook.tour.SelectionTourIds;
-import net.tourbook.tour.TourEventId;
-import net.tourbook.tour.TourManager;
-import net.tourbook.ui.ITourProvider;
-import net.tourbook.ui.TableColumnFactory;
-import net.tourbook.ui.UI;
-import net.tourbook.ui.action.ActionModifyColumns;
-import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
-import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
-import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
-import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -86,6 +59,33 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.ColumnDefinition;
+import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.ITourViewer;
+import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourWayPoint;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.SelectionDeletedTours;
+import net.tourbook.tour.SelectionTourData;
+import net.tourbook.tour.SelectionTourId;
+import net.tourbook.tour.SelectionTourIds;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
+import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.TableColumnFactory;
+import net.tourbook.ui.UI;
+import net.tourbook.ui.action.ActionModifyColumns;
+import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
+import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
+import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
+import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
+
 public class TourWaypointView extends ViewPart implements ITourProvider, ITourViewer {
 
 	public static final String		ID						= "net.tourbook.views.TourWaypointView";					//$NON-NLS-1$
@@ -98,8 +98,8 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 	public static final int			COLUMN_X_OFFSET			= 4;
 	public static final int			COLUMN_Y_OFFSET			= 5;
 
-	private final IPreferenceStore	_prefStore				= TourbookPlugin.getDefault().getPreferenceStore();
-	private final IDialogSettings	_state					= TourbookPlugin.getDefault().getDialogSettingsSection(ID);
+	private final IPreferenceStore	_prefStore				= TourbookPlugin.getPrefStore();
+	private final IDialogSettings	_state					= TourbookPlugin.getState(ID);
 
 	private TourData				_tourData;
 
@@ -110,6 +110,11 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 	private IPartListener2			_partListener;
 
 	private PixelConverter			_pc;
+
+	/**
+	 * E4 calls partClosed() even when not created
+	 */
+	private boolean					_isPartCreated;
 
 	/*
 	 * UI controls
@@ -214,6 +219,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 	}
 
 	private void addPartListener() {
+
 		_partListener = new IPartListener2() {
 
 			@Override
@@ -224,7 +230,8 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == TourWaypointView.this) {
+
+				if (partRef.getPart(false) == TourWaypointView.this && _isPartCreated) {
 					saveState();
 				}
 			}
@@ -417,6 +424,8 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 		if (_tourData == null) {
 			showTourFromTourProvider();
 		}
+
+		_isPartCreated = true;
 	}
 
 	private void createUI(final Composite parent) {
@@ -842,7 +851,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 	@Override
 	public ArrayList<TourData> getSelectedTours() {
 
-		final ArrayList<TourData> selectedTours = new ArrayList<TourData>();
+		final ArrayList<TourData> selectedTours = new ArrayList<>();
 		selectedTours.add(_tourData);
 
 		return selectedTours;

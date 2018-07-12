@@ -15,6 +15,17 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.part.ViewPart;
+
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.data.NormalizedGeoData;
@@ -30,17 +41,6 @@ import net.tourbook.ui.views.geoCompare.GeoCompareManager;
 import net.tourbook.ui.views.geoCompare.GeoPartItem;
 import net.tourbook.ui.views.geoCompare.IGeoCompareListener;
 import net.tourbook.ui.views.tourSegmenter.TourSegmenterView;
-
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.IPartListener2;
-import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchPartReference;
-import org.eclipse.ui.part.ViewPart;
 
 /**
  * Provides a skeleton for a view which displays a tour chart
@@ -78,9 +78,7 @@ public abstract class TourChartViewPart extends ViewPart implements IGeoCompareL
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
 			@Override
-			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == TourChartViewPart.this) {}
-			}
+			public void partClosed(final IWorkbenchPartReference partRef) {}
 
 			@Override
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}

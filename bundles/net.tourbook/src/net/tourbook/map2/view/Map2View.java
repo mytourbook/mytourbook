@@ -22,6 +22,42 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceConverter;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.window.Window;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.PaletteData;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.part.ViewPart;
+import org.oscim.core.MapPosition;
+
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
@@ -119,42 +155,6 @@ import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 import net.tourbook.ui.views.tourSegmenter.SelectedTourSegmenterSegments;
-
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.dialogs.MessageDialogWithToggle;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.PreferenceConverter;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.window.Window;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.PaletteData;
-import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.ui.IPartListener2;
-import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchPartReference;
-import org.eclipse.ui.part.ViewPart;
-import org.oscim.core.MapPosition;
 
 import de.byteholder.geoclipse.GeoclipseExtensions;
 import de.byteholder.geoclipse.map.IMapContextProvider;
@@ -335,6 +335,11 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 	private boolean							_isInSelectBookmark;
 	private boolean							_isInZoom;
+
+	/**
+	 * E4 calls partClosed() even when not created
+	 */
+	private boolean							_isPartCreated;
 
 	private int								_defaultZoom;
 	private GeoPosition						_defaultPosition;
@@ -933,7 +938,8 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == Map2View.this) {
+
+				if (partRef.getPart(false) == Map2View.this && _isPartCreated) {
 					saveState();
 					_mapInfoManager.resetInfo();
 				}
@@ -1169,7 +1175,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 				if (_poiPosition == null) {
 					return;
 				}
-				positionBounds = new HashSet<GeoPosition>();
+				positionBounds = new HashSet<>();
 				positionBounds.add(_poiPosition);
 			}
 
@@ -1517,6 +1523,8 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 				}
 			}
 		});
+
+		_isPartCreated = true;
 	}
 
 	private void deactivateMapSync() {
@@ -1945,7 +1953,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			return null;
 		}
 
-		final Set<GeoPosition> mapPositions = new HashSet<GeoPosition>();
+		final Set<GeoPosition> mapPositions = new HashSet<>();
 		mapPositions.add(new GeoPosition(minLatitude, minLongitude));
 		mapPositions.add(new GeoPosition(maxLatitude, maxLongitude));
 
@@ -2010,7 +2018,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 		} else {
 
-			final Set<GeoPosition> mapPositions = new HashSet<GeoPosition>();
+			final Set<GeoPosition> mapPositions = new HashSet<>();
 
 			mapPositions.add(new GeoPosition(allMinLatitude, allMinLongitude));
 			mapPositions.add(new GeoPosition(allMaxLatitude, allMaxLongitude));
@@ -2044,7 +2052,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		final GeoPosition leftPosition = new GeoPosition(latitudeSerie[valueIndex1], longitudeSerie[valueIndex1]);
 		final GeoPosition rightPosition = new GeoPosition(latitudeSerie[valueIndex2], longitudeSerie[valueIndex2]);
 
-		final Set<GeoPosition> mapPositions = new HashSet<GeoPosition>();
+		final Set<GeoPosition> mapPositions = new HashSet<>();
 
 		mapPositions.add(leftPosition);
 		mapPositions.add(rightPosition);
@@ -2585,7 +2593,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 		_isLinkPhotoDisplayed = false;
 
-		final ArrayList<Photo> allPhotos = new ArrayList<Photo>();
+		final ArrayList<Photo> allPhotos = new ArrayList<>();
 
 		if (selection instanceof TourPhotoLinkSelection) {
 
@@ -2765,7 +2773,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		// set the tour bounds
 		final GeoPosition[] tourBounds = tourData.getGeoBounds();
 
-		final HashSet<GeoPosition> tourBoundsSet = new HashSet<GeoPosition>();
+		final HashSet<GeoPosition> tourBoundsSet = new HashSet<>();
 		tourBoundsSet.add(tourBounds[0]);
 		tourBoundsSet.add(tourBounds[1]);
 
@@ -3381,7 +3389,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		final int rightSliderValueIndex = selectedSegmenterConfig.xSliderSerieIndexRight;
 
 		final TourData segmenterTourData = selectedSegmenterConfig.tourData;
-		final Set<GeoPosition> mapPositions = new HashSet<GeoPosition>();
+		final Set<GeoPosition> mapPositions = new HashSet<>();
 
 		if (_allTourData.size() == 1) {
 

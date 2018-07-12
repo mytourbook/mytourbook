@@ -17,20 +17,6 @@ package net.tourbook.search;
 
 import java.util.ArrayList;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
-import net.tourbook.common.util.PostSelectionProvider;
-import net.tourbook.common.util.StatusUtil;
-import net.tourbook.common.util.Util;
-import net.tourbook.data.TourData;
-import net.tourbook.tour.ITourEventListener;
-import net.tourbook.tour.TourEvent;
-import net.tourbook.tour.TourEventId;
-import net.tourbook.tour.TourManager;
-import net.tourbook.web.WEB;
-import net.tourbook.web.preferences.PrefPageWebBrowser;
-
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -52,6 +38,20 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
+import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.Util;
+import net.tourbook.data.TourData;
+import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.TourEvent;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
+import net.tourbook.web.WEB;
+import net.tourbook.web.preferences.PrefPageWebBrowser;
+
 public class SearchView extends ViewPart implements ISearchView {
 
 	public static final String		ID								= "net.tourbook.search.SearchView"; //$NON-NLS-1$
@@ -65,6 +65,11 @@ public class SearchView extends ViewPart implements ISearchView {
 	private ITourEventListener		_tourEventListener;
 
 	private boolean					_isWinInternalLoaded			= false;
+
+	/**
+	 * E4 calls partClosed() even when not created
+	 */
+	private boolean					_isPartCreated;
 
 	private ActionExternalSearchUI	_actionExternalSearchUI;
 
@@ -96,7 +101,7 @@ public class SearchView extends ViewPart implements ISearchView {
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 
-				if (partRef.getPart(false) == SearchView.this) {
+				if (partRef.getPart(false) == SearchView.this && _isPartCreated) {
 					saveState();
 					SearchMgr.setSearchView(null);
 				}
@@ -190,6 +195,8 @@ public class SearchView extends ViewPart implements ISearchView {
 		restoreState();
 
 		showUIPage();
+
+		_isPartCreated = true;
 	}
 
 	private void createUI(final Composite parent) {

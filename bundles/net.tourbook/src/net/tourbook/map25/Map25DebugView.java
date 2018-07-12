@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,10 +18,6 @@ package net.tourbook.map25;
 import java.io.IOException;
 import java.text.NumberFormat;
 
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
-import net.tourbook.common.util.StatusUtil;
-
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -33,6 +29,10 @@ import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 import org.oscim.map.Map;
+
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
+import net.tourbook.common.util.StatusUtil;
 
 import de.byteholder.geoclipse.preferences.Messages;
 import okhttp3.Cache;
@@ -50,6 +50,11 @@ public class Map25DebugView extends ViewPart {
 	}
 
 	private IPartListener2	_partListener;
+
+	/**
+	 * E4 calls partClosed() even when not created
+	 */
+	private boolean			_isPartCreated;
 
 	/*
 	 * UI controls
@@ -71,7 +76,8 @@ public class Map25DebugView extends ViewPart {
 
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == Map25DebugView.this) {
+
+				if (partRef.getPart(false) == Map25DebugView.this && _isPartCreated) {
 					Map25ProviderManager.setDebugView(null);
 				}
 			}
@@ -81,6 +87,7 @@ public class Map25DebugView extends ViewPart {
 
 			@Override
 			public void partHidden(final IWorkbenchPartReference partRef) {
+
 				if (partRef.getPart(false) == Map25DebugView.this) {
 					Map25ProviderManager.setDebugViewVisible(false);
 				}
@@ -96,6 +103,7 @@ public class Map25DebugView extends ViewPart {
 
 			@Override
 			public void partVisible(final IWorkbenchPartReference partRef) {
+
 				if (partRef.getPart(false) == Map25DebugView.this) {
 					Map25ProviderManager.setDebugViewVisible(true);
 				}
@@ -110,6 +118,8 @@ public class Map25DebugView extends ViewPart {
 		createUI(parent);
 
 		addPartListener();
+
+		_isPartCreated = true;
 	}
 
 	private void createUI(final Composite parent) {

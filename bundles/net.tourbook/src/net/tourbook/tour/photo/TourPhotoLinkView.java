@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,30 +24,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
-import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.util.ColumnDefinition;
-import net.tourbook.common.util.ColumnManager;
-import net.tourbook.common.util.ITourViewer;
-import net.tourbook.common.util.Util;
-import net.tourbook.data.TourData;
-import net.tourbook.data.TourPhoto;
-import net.tourbook.photo.Camera;
-import net.tourbook.photo.Photo;
-import net.tourbook.photo.PhotoEventId;
-import net.tourbook.photo.PhotoManager;
-import net.tourbook.photo.PhotoSelection;
-import net.tourbook.photo.PicDirView;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.SelectionDeletedTours;
-import net.tourbook.tour.TourManager;
-import net.tourbook.tourType.TourTypeImage;
-import net.tourbook.ui.ITourProvider;
-import net.tourbook.ui.TableColumnFactory;
-import net.tourbook.ui.action.ActionModifyColumns;
 
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.State;
@@ -110,6 +86,30 @@ import org.joda.time.Period;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.ColumnDefinition;
+import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.ITourViewer;
+import net.tourbook.common.util.Util;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourPhoto;
+import net.tourbook.photo.Camera;
+import net.tourbook.photo.Photo;
+import net.tourbook.photo.PhotoEventId;
+import net.tourbook.photo.PhotoManager;
+import net.tourbook.photo.PhotoSelection;
+import net.tourbook.photo.PicDirView;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.SelectionDeletedTours;
+import net.tourbook.tour.TourManager;
+import net.tourbook.tourType.TourTypeImage;
+import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.TableColumnFactory;
+import net.tourbook.ui.action.ActionModifyColumns;
+
 public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourViewer {
 
 	public static final String					ID									= "net.tourbook.photo.PhotosAndToursView.ID";	//$NON-NLS-1$
@@ -123,23 +123,17 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 	private static final TourPhotoManager		_photoMgr							= TourPhotoManager.getInstance();
 
-	private final IPreferenceStore				_prefStore							= TourbookPlugin
-																							.getDefault()
-																							.getPreferenceStore();
+	private final IPreferenceStore				_prefStore							= TourbookPlugin.getPrefStore();
+	private final IDialogSettings				_state								= TourbookPlugin.getState(ID);
 
-	private final IDialogSettings				_state								= TourbookPlugin
-																							.getDefault()
-																							.getDialogSettingsSection(
-																									ID);
+	private ArrayList<TourPhotoLink>			_visibleTourPhotoLinks				= new ArrayList<>();
 
-	private ArrayList<TourPhotoLink>			_visibleTourPhotoLinks				= new ArrayList<TourPhotoLink>();
-
-	private ArrayList<Photo>					_allPhotos							= new ArrayList<Photo>();
+	private ArrayList<Photo>					_allPhotos							= new ArrayList<>();
 
 	/**
 	 * Contains all cameras which are used in all displayed tours.
 	 */
-	private HashMap<String, Camera>				_allTourCameras						= new HashMap<String, Camera>();
+	private HashMap<String, Camera>				_allTourCameras						= new HashMap<>();
 
 	/**
 	 * All cameras sorted by camera name
@@ -149,12 +143,12 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 	/**
 	 * Tour photo link which is currently selected in the tour viewer.
 	 */
-	private ArrayList<TourPhotoLink>			_selectedLinks						= new ArrayList<TourPhotoLink>();
+	private ArrayList<TourPhotoLink>			_selectedLinks						= new ArrayList<>();
 
 	/**
 	 * Contains only tour photo links with real tours and which contain geo positions.
 	 */
-	private List<TourPhotoLink>					_selectedTourPhotoLinksWithGps		= new ArrayList<TourPhotoLink>();
+	private List<TourPhotoLink>					_selectedTourPhotoLinksWithGps		= new ArrayList<>();
 
 	private TourPhotoLinkSelection				_tourPhotoLinkSelection;
 
@@ -206,9 +200,14 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private boolean								_isFilterOneHistoryTour				= false;
 
-	private ArrayList<TourPhotoLink>			_selectionBackupBeforeOneHistory	= new ArrayList<TourPhotoLink>();
+	private ArrayList<TourPhotoLink>			_selectionBackupBeforeOneHistory	= new ArrayList<>();
 
 	private ICommandService						_commandService;
+
+	/**
+	 * E4 calls partClosed() even when not created
+	 */
+	private boolean								_isPartCreated;
 
 	/*
 	 * UI controls
@@ -328,10 +327,10 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 		final TourManager tourManager = TourManager.getInstance();
 
 		// contains all photos which are modified (it also contains not modified photos)
-		final HashSet<Photo> modifiedPhotos = new HashSet<Photo>();
+		final HashSet<Photo> modifiedPhotos = new HashSet<>();
 
-		final ArrayList<TourData> modifiedTours = new ArrayList<TourData>();
-		final ArrayList<TourPhotoLink> modifiedLinks = new ArrayList<TourPhotoLink>();
+		final ArrayList<TourData> modifiedTours = new ArrayList<>();
+		final ArrayList<TourPhotoLink> modifiedLinks = new ArrayList<>();
 
 		final Object[] allSelectedPhotoLinks = ((IStructuredSelection) _tourViewer.getSelection()).toArray();
 
@@ -354,7 +353,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 						if (tourData != null) {
 
-							final HashMap<String, TourPhoto> oldTourPhotos = new HashMap<String, TourPhoto>();
+							final HashMap<String, TourPhoto> oldTourPhotos = new HashMap<>();
 							final Set<TourPhoto> tourPhotosSet = tourData.getTourPhotos();
 							for (final TourPhoto tourPhoto : tourPhotosSet) {
 								oldTourPhotos.put(tourPhoto.getImageFilePathName(), tourPhoto);
@@ -366,7 +365,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 								modifiedPhotos.addAll(oldGalleryPhotos);
 							}
 
-							final HashSet<TourPhoto> tourPhotos = new HashSet<TourPhoto>();
+							final HashSet<TourPhoto> tourPhotos = new HashSet<>();
 
 							for (final Photo galleryPhoto : linkPhotos) {
 
@@ -450,10 +449,11 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 		PhotoManager.firePhotoEvent(this, //
 				PhotoEventId.PHOTO_ATTRIBUTES_ARE_MODIFIED,
-				new ArrayList<Photo>(modifiedPhotos));
+				new ArrayList<>(modifiedPhotos));
 	}
 
 	private void addPartListener() {
+
 		_partListener = new IPartListener2() {
 
 			@Override
@@ -468,7 +468,8 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == TourPhotoLinkView.this) {
+
+				if (partRef.getPart(false) == TourPhotoLinkView.this && _isPartCreated) {
 					onPartClosed();
 				}
 			}
@@ -625,13 +626,12 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 		enableControls();
 
-		_commandService = ((ICommandService) PlatformUI
-				.getWorkbench()
-				.getActiveWorkbenchWindow()
-				.getService(ICommandService.class));
+		_commandService = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(ICommandService.class);
 
 		// show default page
 		_pageBook.showPage(_pageNoImage);
+
+		_isPartCreated = true;
 	}
 
 	private void createUI(final Composite parent) {
@@ -1307,7 +1307,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 	@Override
 	public ArrayList<TourData> getSelectedTours() {
-		return new ArrayList<TourData>();
+		return new ArrayList<>();
 	}
 
 	@Override
@@ -1421,9 +1421,9 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 		_selectedTourPhotoLinksWithGps.clear();
 
 		// contains tour id's for all real tours
-		final ArrayList<Long> selectedTourIds = new ArrayList<Long>();
+		final ArrayList<Long> selectedTourIds = new ArrayList<>();
 
-		final ArrayList<TourPhotoLink> selectedLinks = new ArrayList<TourPhotoLink>();
+		final ArrayList<TourPhotoLink> selectedLinks = new ArrayList<>();
 
 		for (final Object linkElement : allSelectedLinks) {
 

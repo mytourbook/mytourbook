@@ -21,46 +21,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.chart.Chart;
-import net.tourbook.chart.ChartDataModel;
-import net.tourbook.chart.SelectionChartInfo;
-import net.tourbook.chart.SelectionChartXSliderPosition;
-import net.tourbook.common.UI;
-import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.tooltip.ActionToolbarSlideout;
-import net.tourbook.common.tooltip.IOpeningDialog;
-import net.tourbook.common.tooltip.OpenDialogManager;
-import net.tourbook.common.tooltip.ToolbarSlideout;
-import net.tourbook.common.util.ColumnDefinition;
-import net.tourbook.common.util.ColumnManager;
-import net.tourbook.common.util.ITourViewer;
-import net.tourbook.common.util.PostSelectionProvider;
-import net.tourbook.common.util.TableColumnDefinition;
-import net.tourbook.common.util.Util;
-import net.tourbook.data.NormalizedGeoData;
-import net.tourbook.data.TourData;
-import net.tourbook.data.TourReference;
-import net.tourbook.importdata.RawDataManager;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.ITourEventListener;
-import net.tourbook.tour.SelectionDeletedTours;
-import net.tourbook.tour.SelectionTourData;
-import net.tourbook.tour.SelectionTourId;
-import net.tourbook.tour.SelectionTourIds;
-import net.tourbook.tour.TourEventId;
-import net.tourbook.tour.TourManager;
-import net.tourbook.ui.TableColumnFactory;
-import net.tourbook.ui.tourChart.TourChart;
-import net.tourbook.ui.views.tourCatalog.ReferenceTourManager;
-import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
-import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
-import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
-import net.tourbook.ui.views.tourCatalog.TourCatalogView_ComparedTour;
-import net.tourbook.ui.views.tourCatalog.TourCatalogView_ReferenceTour;
-import net.tourbook.ui.views.tourCatalog.TourCompareConfig;
-
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -109,6 +69,46 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
+
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.chart.Chart;
+import net.tourbook.chart.ChartDataModel;
+import net.tourbook.chart.SelectionChartInfo;
+import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.tooltip.ActionToolbarSlideout;
+import net.tourbook.common.tooltip.IOpeningDialog;
+import net.tourbook.common.tooltip.OpenDialogManager;
+import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.common.util.ColumnDefinition;
+import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.ITourViewer;
+import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.TableColumnDefinition;
+import net.tourbook.common.util.Util;
+import net.tourbook.data.NormalizedGeoData;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourReference;
+import net.tourbook.importdata.RawDataManager;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.SelectionDeletedTours;
+import net.tourbook.tour.SelectionTourData;
+import net.tourbook.tour.SelectionTourId;
+import net.tourbook.tour.SelectionTourIds;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
+import net.tourbook.ui.TableColumnFactory;
+import net.tourbook.ui.tourChart.TourChart;
+import net.tourbook.ui.views.tourCatalog.ReferenceTourManager;
+import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
+import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
+import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
+import net.tourbook.ui.views.tourCatalog.TourCatalogView_ComparedTour;
+import net.tourbook.ui.views.tourCatalog.TourCatalogView_ReferenceTour;
+import net.tourbook.ui.views.tourCatalog.TourCompareConfig;
 
 public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompareListener {
 
@@ -162,7 +162,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 	/**
 	 * E4 calls partClosed() even when not created
 	 */
-	private boolean							_isCreated;
+	private boolean							_isPartCreated;
 
 	/**
 	 * Comparer items from the last comparison
@@ -438,7 +438,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 
-				if (partRef.getPart(false) == GeoCompareView.this && _isCreated) {
+				if (partRef.getPart(false) == GeoCompareView.this && _isPartCreated) {
 
 					saveState();
 
@@ -1017,7 +1017,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
 		_pageBook.showPage(_pageNoData);
 
-		_isCreated = true;
+		_isPartCreated = true;
 	}
 
 	private void createUI(final Composite parent) {

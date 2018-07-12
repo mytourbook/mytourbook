@@ -17,33 +17,6 @@ package net.tourbook.ui.views;
 
 import java.util.ArrayList;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.chart.Chart;
-import net.tourbook.chart.ChartDataModel;
-import net.tourbook.chart.ChartDataSerie;
-import net.tourbook.chart.ChartDataXSerie;
-import net.tourbook.chart.ChartDataYSerie;
-import net.tourbook.chart.ChartDrawingData;
-import net.tourbook.chart.ColorCache;
-import net.tourbook.chart.ComputeChartValue;
-import net.tourbook.chart.GraphDrawingData;
-import net.tourbook.chart.SelectionChartInfo;
-import net.tourbook.chart.SelectionChartXSliderPosition;
-import net.tourbook.chart.Util;
-import net.tourbook.common.UI;
-import net.tourbook.data.TourData;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.ITourEventListener;
-import net.tourbook.tour.SelectionDeletedTours;
-import net.tourbook.tour.SelectionTourChart;
-import net.tourbook.tour.SelectionTourData;
-import net.tourbook.tour.SelectionTourId;
-import net.tourbook.tour.TourEventId;
-import net.tourbook.tour.TourManager;
-import net.tourbook.ui.tourChart.TourChart;
-import net.tourbook.ui.tourChart.TourChartView;
-
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
@@ -71,6 +44,33 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.chart.Chart;
+import net.tourbook.chart.ChartDataModel;
+import net.tourbook.chart.ChartDataSerie;
+import net.tourbook.chart.ChartDataXSerie;
+import net.tourbook.chart.ChartDataYSerie;
+import net.tourbook.chart.ChartDrawingData;
+import net.tourbook.chart.ColorCache;
+import net.tourbook.chart.ComputeChartValue;
+import net.tourbook.chart.GraphDrawingData;
+import net.tourbook.chart.SelectionChartInfo;
+import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.chart.Util;
+import net.tourbook.common.UI;
+import net.tourbook.data.TourData;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.SelectionDeletedTours;
+import net.tourbook.tour.SelectionTourChart;
+import net.tourbook.tour.SelectionTourData;
+import net.tourbook.tour.SelectionTourId;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
+import net.tourbook.ui.tourChart.TourChart;
+import net.tourbook.ui.tourChart.TourChartView;
+
 public class TourChartAnalyzerView extends ViewPart {
 
 	public static final String			ID					= "net.tourbook.views.TourChartAnalyzer";	//$NON-NLS-1$
@@ -92,7 +92,7 @@ public class TourChartAnalyzerView extends ViewPart {
 	private ChartDrawingData			_chartDrawingData;
 	private ArrayList<GraphDrawingData>	_graphDrawingData;
 
-	private final ArrayList<GraphInfo>	_graphInfos			= new ArrayList<GraphInfo>();
+	private final ArrayList<GraphInfo>	_graphInfos			= new ArrayList<>();
 
 	private final ColorCache			_colorCache			= new ColorCache();
 
@@ -112,6 +112,11 @@ public class TourChartAnalyzerView extends ViewPart {
 	int									_columnSpacing		= 1;
 
 	private boolean						_isPartVisible		= false;
+
+	/**
+	 * E4 calls partClosed() even when not created
+	 */
+	private boolean						_isPartCreated;
 
 	private PixelConverter				_pc;
 
@@ -170,8 +175,7 @@ public class TourChartAnalyzerView extends ViewPart {
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 
-				final IWorkbenchPart closedPart = partRef.getPart(false);
-				if (closedPart instanceof TourChartView) {
+				if (partRef.getPart(false) instanceof TourChartView && _isPartCreated) {
 
 					// chart is closed, hide tour chart analyzer data
 					clearView();
@@ -283,6 +287,8 @@ public class TourChartAnalyzerView extends ViewPart {
 		_pageBook.showPage(_pageNoData);
 
 		showTour();
+
+		_isPartCreated = true;
 	}
 
 	/**

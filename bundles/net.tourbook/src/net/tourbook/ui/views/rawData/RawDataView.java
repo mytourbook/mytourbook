@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,8 +15,9 @@
  *******************************************************************************/
 package net.tourbook.ui.views.rawData;
 
-import static java.nio.file.StandardWatchEventKinds.*;
-import static net.tourbook.ui.UI.*;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
+import static net.tourbook.ui.UI.getIconUrl;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,73 +43,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
-
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.CommonActivator;
-import net.tourbook.common.UI;
-import net.tourbook.common.action.ActionOpenPrefDialog;
-import net.tourbook.common.formatter.FormatManager;
-import net.tourbook.common.preferences.ICommonPreferences;
-import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.time.TourDateTime;
-import net.tourbook.common.util.ColumnDefinition;
-import net.tourbook.common.util.ColumnManager;
-import net.tourbook.common.util.ITourViewer3;
-import net.tourbook.common.util.PostSelectionProvider;
-import net.tourbook.common.util.StatusUtil;
-import net.tourbook.common.util.TableColumnDefinition;
-import net.tourbook.common.util.Util;
-import net.tourbook.data.TourData;
-import net.tourbook.data.TourMarker;
-import net.tourbook.data.TourPerson;
-import net.tourbook.data.TourTag;
-import net.tourbook.data.TourType;
-import net.tourbook.data.TourWayPoint;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.extension.export.ActionExport;
-import net.tourbook.importdata.DeviceImportState;
-import net.tourbook.importdata.DialogEasyImportConfig;
-import net.tourbook.importdata.EasyConfig;
-import net.tourbook.importdata.EasyImportManager;
-import net.tourbook.importdata.ImportConfig;
-import net.tourbook.importdata.ImportDeviceState;
-import net.tourbook.importdata.ImportLauncher;
-import net.tourbook.importdata.OSFile;
-import net.tourbook.importdata.RawDataManager;
-import net.tourbook.importdata.SpeedTourType;
-import net.tourbook.importdata.TourTypeConfig;
-import net.tourbook.photo.ImageUtils;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.PrefPageImport;
-import net.tourbook.tag.TagMenuManager;
-import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
-import net.tourbook.tour.ActionOpenMarkerDialog;
-import net.tourbook.tour.ITourEventListener;
-import net.tourbook.tour.ITourItem;
-import net.tourbook.tour.SelectionDeletedTours;
-import net.tourbook.tour.SelectionTourData;
-import net.tourbook.tour.SelectionTourIds;
-import net.tourbook.tour.TourDoubleClickState;
-import net.tourbook.tour.TourEvent;
-import net.tourbook.tour.TourEventId;
-import net.tourbook.tour.TourLogManager;
-import net.tourbook.tour.TourLogState;
-import net.tourbook.tour.TourLogView;
-import net.tourbook.tour.TourManager;
-import net.tourbook.tour.TourTypeMenuManager;
-import net.tourbook.tourType.TourTypeImage;
-import net.tourbook.ui.ITourProviderAll;
-import net.tourbook.ui.TableColumnFactory;
-import net.tourbook.ui.action.ActionEditQuick;
-import net.tourbook.ui.action.ActionEditTour;
-import net.tourbook.ui.action.ActionJoinTours;
-import net.tourbook.ui.action.ActionModifyColumns;
-import net.tourbook.ui.action.ActionOpenTour;
-import net.tourbook.ui.action.ActionSetTourTypeMenu;
-import net.tourbook.ui.views.TableViewerTourInfoToolTip;
-import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
-import net.tourbook.web.WEB;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.GroupMarker;
@@ -181,6 +115,73 @@ import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 import org.joda.time.Period;
 import org.joda.time.PeriodType;
+
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.UI;
+import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.formatter.FormatManager;
+import net.tourbook.common.preferences.ICommonPreferences;
+import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.time.TourDateTime;
+import net.tourbook.common.util.ColumnDefinition;
+import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.ITourViewer3;
+import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.TableColumnDefinition;
+import net.tourbook.common.util.Util;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourPerson;
+import net.tourbook.data.TourTag;
+import net.tourbook.data.TourType;
+import net.tourbook.data.TourWayPoint;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.extension.export.ActionExport;
+import net.tourbook.importdata.DeviceImportState;
+import net.tourbook.importdata.DialogEasyImportConfig;
+import net.tourbook.importdata.EasyConfig;
+import net.tourbook.importdata.EasyImportManager;
+import net.tourbook.importdata.ImportConfig;
+import net.tourbook.importdata.ImportDeviceState;
+import net.tourbook.importdata.ImportLauncher;
+import net.tourbook.importdata.OSFile;
+import net.tourbook.importdata.RawDataManager;
+import net.tourbook.importdata.SpeedTourType;
+import net.tourbook.importdata.TourTypeConfig;
+import net.tourbook.photo.ImageUtils;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageImport;
+import net.tourbook.tag.TagMenuManager;
+import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
+import net.tourbook.tour.ActionOpenMarkerDialog;
+import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.ITourItem;
+import net.tourbook.tour.SelectionDeletedTours;
+import net.tourbook.tour.SelectionTourData;
+import net.tourbook.tour.SelectionTourIds;
+import net.tourbook.tour.TourDoubleClickState;
+import net.tourbook.tour.TourEvent;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourLogManager;
+import net.tourbook.tour.TourLogState;
+import net.tourbook.tour.TourLogView;
+import net.tourbook.tour.TourManager;
+import net.tourbook.tour.TourTypeMenuManager;
+import net.tourbook.tourType.TourTypeImage;
+import net.tourbook.ui.ITourProviderAll;
+import net.tourbook.ui.TableColumnFactory;
+import net.tourbook.ui.action.ActionEditQuick;
+import net.tourbook.ui.action.ActionEditTour;
+import net.tourbook.ui.action.ActionJoinTours;
+import net.tourbook.ui.action.ActionModifyColumns;
+import net.tourbook.ui.action.ActionOpenTour;
+import net.tourbook.ui.action.ActionSetTourTypeMenu;
+import net.tourbook.ui.views.TableViewerTourInfoToolTip;
+import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
+import net.tourbook.web.WEB;
 
 /**
  *
@@ -345,6 +346,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	protected boolean						_isPartVisible								= false;
 	protected boolean						_isViewerPersonDataDirty					= false;
 	//
+	/**
+	 * E4 calls partClosed() even when not created
+	 */
+	private boolean							_isPartCreated;
 	//
 	private final NumberFormat				_nf1;
 	private final NumberFormat				_nf3;
@@ -765,6 +770,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	}
 
 	private void addPartListener() {
+
 		_partListener = new IPartListener2() {
 
 			@Override
@@ -775,7 +781,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == RawDataView.this) {
+
+				if (partRef.getPart(false) == RawDataView.this && _isPartCreated) {
 
 					saveState();
 
@@ -2093,6 +2100,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		// the part visible listener shows the top page also
 		updateUI_1_TopPage(true);
+
+		_isPartCreated = true;
 	}
 
 	private void createResources_Image() {
@@ -3425,7 +3434,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			return;
 		}
 
-		final ArrayList<Long> savedToursIds = new ArrayList<Long>();
+		final ArrayList<Long> savedToursIds = new ArrayList<>();
 
 		// update raw data map with the saved tour data
 		final HashMap<Long, TourData> rawDataMap = _rawDataMgr.getImportedTours();
@@ -3572,7 +3581,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
 		_actionSetTourType.setEnabled(isSavedTourSelected && (tourTypes.size() > 0));
 
-		final ArrayList<Long> existingTagIds = new ArrayList<Long>();
+		final ArrayList<Long> existingTagIds = new ArrayList<>();
 		long existingTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
 		boolean isOneTour;
 
@@ -3703,7 +3712,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		// get selected tours
 		final IStructuredSelection selectedTours = ((IStructuredSelection) _tourViewer.getSelection());
 
-		final ArrayList<TourData> selectedTourData = new ArrayList<TourData>();
+		final ArrayList<TourData> selectedTourData = new ArrayList<>();
 
 		// loop: all selected tours
 		for (final Iterator<?> iter = selectedTours.iterator(); iter.hasNext();) {
@@ -3745,7 +3754,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private ArrayList<TourData> getAnySelectedTours() {
 
-		final ArrayList<TourData> selectedTours = new ArrayList<TourData>();
+		final ArrayList<TourData> selectedTours = new ArrayList<>();
 
 		// get selected tours, this must be outside of the runnable !!!
 		final IStructuredSelection selection = ((IStructuredSelection) _tourViewer.getSelection());
@@ -3903,7 +3912,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		// get selected tours
 		final IStructuredSelection selectedTours = ((IStructuredSelection) _tourViewer.getSelection());
 
-		final ArrayList<TourData> selectedTourData = new ArrayList<TourData>();
+		final ArrayList<TourData> selectedTourData = new ArrayList<>();
 
 		// loop: all selected tours
 		for (final Iterator<?> iter = selectedTours.iterator(); iter.hasNext();) {
@@ -4349,7 +4358,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			monitor.beginTask(Messages.import_data_importTours_task, workedAll);
 		}
 
-		final ArrayList<String> notImportedFiles = new ArrayList<String>();
+		final ArrayList<String> notImportedFiles = new ArrayList<>();
 
 		_rawDataMgr.getImportedTours().clear();
 		_rawDataMgr.setImportId();
@@ -4402,7 +4411,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 					if (viewerIndices != null) {
 
-						final ArrayList<Object> viewerTourData = new ArrayList<Object>();
+						final ArrayList<Object> viewerTourData = new ArrayList<>();
 
 						for (final String viewerIndex : viewerIndices) {
 
@@ -4800,7 +4809,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		TourLogManager.addLog(TourLogState.DEFAULT, message, css);
 
-		final ArrayList<TourData> savedTours = new ArrayList<TourData>();
+		final ArrayList<TourData> savedTours = new ArrayList<>();
 
 		final IRunnableWithProgress saveRunnable = new IRunnableWithProgress() {
 			@Override

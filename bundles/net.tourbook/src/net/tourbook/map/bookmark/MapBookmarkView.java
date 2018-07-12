@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,17 +16,6 @@
 package net.tourbook.map.bookmark;
 
 import java.text.NumberFormat;
-
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
-import net.tourbook.common.util.ColumnDefinition;
-import net.tourbook.common.util.ColumnManager;
-import net.tourbook.common.util.ITourViewer;
-import net.tourbook.common.util.TableColumnDefinition;
-import net.tourbook.tour.ITourEventListener;
-import net.tourbook.tour.TourManager;
-import net.tourbook.ui.action.ActionModifyColumns;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
@@ -64,6 +53,17 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 import org.oscim.core.MapPosition;
 
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
+import net.tourbook.common.util.ColumnDefinition;
+import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.ITourViewer;
+import net.tourbook.common.util.TableColumnDefinition;
+import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.TourManager;
+import net.tourbook.ui.action.ActionModifyColumns;
+
 public class MapBookmarkView extends ViewPart implements ITourViewer {
 
 	public static final String		ID			= "net.tourbook.map.bookmark.MapBookmarkView";	//$NON-NLS-1$
@@ -90,6 +90,11 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 		_nfLatLon.setMinimumFractionDigits(4);
 		_nfLatLon.setMaximumFractionDigits(4);
 	}
+
+	/**
+	 * E4 calls partClosed() even when not created
+	 */
+	private boolean		_isPartCreated;
 
 	/*
 	 * UI controls
@@ -174,9 +179,7 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 		_partListener = new IPartListener2() {
 
 			@Override
-			public void partActivated(final IWorkbenchPartReference partRef) {
-
-			}
+			public void partActivated(final IWorkbenchPartReference partRef) {}
 
 			@Override
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
@@ -184,7 +187,7 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 
-				if (partRef.getPart(false) == MapBookmarkView.this) {
+				if (partRef.getPart(false) == MapBookmarkView.this && _isPartCreated) {
 					saveState();
 					MapBookmarkManager.setMapBookmarkView(null);
 				}
@@ -239,6 +242,8 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 		fillToolbar();
 
 		updateUI_Viewer();
+
+		_isPartCreated = true;
 	}
 
 	private void createUI(final Composite parent) {

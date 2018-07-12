@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,14 +16,6 @@
 package net.tourbook.photo;
 
 import java.io.File;
-
-import net.tourbook.common.form.SashLeftFixedForm;
-import net.tourbook.common.util.PostSelectionProvider;
-import net.tourbook.common.util.Util;
-import net.tourbook.photo.internal.Activator;
-import net.tourbook.photo.internal.PicDirFolder;
-import net.tourbook.photo.internal.PicDirImages;
-import net.tourbook.photo.internal.manager.ThumbnailStore;
 
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -44,6 +36,14 @@ import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
+
+import net.tourbook.common.form.SashLeftFixedForm;
+import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.Util;
+import net.tourbook.photo.internal.Activator;
+import net.tourbook.photo.internal.PicDirFolder;
+import net.tourbook.photo.internal.PicDirImages;
+import net.tourbook.photo.internal.manager.ThumbnailStore;
 
 public class PicDirView extends ViewPart implements IPhotoEventListener {
 
@@ -67,6 +67,11 @@ public class PicDirView extends ViewPart implements IPhotoEventListener {
 	private PicDirImages					_picDirImages;
 
 	private ISelectionConverter				_selectionConverter;
+
+	/**
+	 * E4 calls partClosed() even when not created
+	 */
+	private boolean							_isPartCreated;
 
 	/*
 	 * UI controls
@@ -180,7 +185,8 @@ public class PicDirView extends ViewPart implements IPhotoEventListener {
 
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == PicDirView.this) {
+
+				if (partRef.getPart(false) == PicDirView.this && _isPartCreated) {
 					onPartClose();
 				}
 			}
@@ -239,10 +245,13 @@ public class PicDirView extends ViewPart implements IPhotoEventListener {
 		 * during application startup
 		 */
 		parent.getDisplay().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				restoreState();
 			}
 		});
+		
+		_isPartCreated = true;
 	}
 
 	private void createUI(final Composite parent) {

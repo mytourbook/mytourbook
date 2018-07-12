@@ -26,6 +26,32 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.awt.SWT_AWT;
+import org.eclipse.swt.events.MenuAdapter;
+import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.part.ViewPart;
+import org.oscim.core.BoundingBox;
+import org.oscim.core.GeoPoint;
+import org.oscim.core.MapPosition;
+import org.oscim.map.Animator;
+import org.oscim.map.Map;
+import org.oscim.utils.animation.Easing;
+
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
@@ -74,32 +100,6 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.tourChart.TourChart;
 
-import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.awt.SWT_AWT;
-import org.eclipse.swt.events.MenuAdapter;
-import org.eclipse.swt.events.MenuEvent;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.ui.IPartListener2;
-import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchPartReference;
-import org.eclipse.ui.part.ViewPart;
-import org.oscim.core.BoundingBox;
-import org.oscim.core.GeoPoint;
-import org.oscim.core.MapPosition;
-import org.oscim.map.Animator;
-import org.oscim.map.Map;
-import org.oscim.utils.animation.Easing;
-
 public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDialogs, IMapBookmarkListener,
 		IMapSyncListener {
 
@@ -146,6 +146,11 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	//
 	private boolean							_isPartVisible;
 	private boolean							_isShowTour;
+	//
+	/**
+	 * E4 calls partClosed() even when not created
+	 */
+	private boolean							_isPartCreated;
 	//
 	private IPartListener2					_partListener;
 	private ISelectionListener				_postSelectionListener;
@@ -411,7 +416,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == Map25View.this) {
+
+				if (partRef.getPart(false) == Map25View.this && _isPartCreated) {
 					saveState();
 				}
 			}
@@ -724,6 +730,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		addSelectionListener();
 		MapBookmarkManager.addBookmarkListener(this);
 		MapManager.addMapSyncListener(this);
+
+		_isPartCreated = true;
 	}
 
 	private void createUI(final Composite parent) {

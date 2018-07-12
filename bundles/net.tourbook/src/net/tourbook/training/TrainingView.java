@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,40 +18,6 @@ package net.tourbook.training;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.chart.Chart;
-import net.tourbook.chart.ChartDataModel;
-import net.tourbook.chart.ChartDataSerie;
-import net.tourbook.chart.ChartDataXSerie;
-import net.tourbook.chart.ChartDataYSerie;
-import net.tourbook.chart.ChartType;
-import net.tourbook.chart.IBarSelectionListener;
-import net.tourbook.chart.MinMaxKeeper_YData;
-import net.tourbook.common.tooltip.ActionToolbarSlideout;
-import net.tourbook.common.tooltip.ToolbarSlideout;
-import net.tourbook.common.util.Util;
-import net.tourbook.data.HrZoneContext;
-import net.tourbook.data.TourData;
-import net.tourbook.data.TourPerson;
-import net.tourbook.data.TourPersonHRZone;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.PrefPagePeople;
-import net.tourbook.preferences.PrefPagePeopleData;
-import net.tourbook.tour.ITourEventListener;
-import net.tourbook.tour.SelectionDeletedTours;
-import net.tourbook.tour.SelectionTourData;
-import net.tourbook.tour.SelectionTourId;
-import net.tourbook.tour.SelectionTourIds;
-import net.tourbook.tour.TourEvent;
-import net.tourbook.tour.TourEventId;
-import net.tourbook.tour.TourManager;
-import net.tourbook.ui.UI;
-import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
-import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
-import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
-import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.ToolBarManager;
@@ -101,6 +67,40 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.chart.Chart;
+import net.tourbook.chart.ChartDataModel;
+import net.tourbook.chart.ChartDataSerie;
+import net.tourbook.chart.ChartDataXSerie;
+import net.tourbook.chart.ChartDataYSerie;
+import net.tourbook.chart.ChartType;
+import net.tourbook.chart.IBarSelectionListener;
+import net.tourbook.chart.MinMaxKeeper_YData;
+import net.tourbook.common.tooltip.ActionToolbarSlideout;
+import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.common.util.Util;
+import net.tourbook.data.HrZoneContext;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourPerson;
+import net.tourbook.data.TourPersonHRZone;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPagePeople;
+import net.tourbook.preferences.PrefPagePeopleData;
+import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.SelectionDeletedTours;
+import net.tourbook.tour.SelectionTourData;
+import net.tourbook.tour.SelectionTourId;
+import net.tourbook.tour.SelectionTourIds;
+import net.tourbook.tour.TourEvent;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
+import net.tourbook.ui.UI;
+import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
+import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
+import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
+import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
+
 public class TrainingView extends ViewPart {
 
 	public static final String			ID										= "net.tourbook.training.TrainingView";												//$NON-NLS-1$
@@ -139,6 +139,11 @@ public class TrainingView extends ViewPart {
 	private boolean						_isShowAllValues;
 	private boolean						_isSynchChartVerticalValues;
 
+	/**
+	 * E4 calls partClosed() even when not created
+	 */
+	private boolean						_isPartCreated;
+
 	private ToolBarManager				_headerToolbarManager;
 
 	private ActionShowAllPulseValues	_actionShowAllPulseValues;
@@ -147,7 +152,7 @@ public class TrainingView extends ViewPart {
 
 	private double[]					_xSeriePulse;
 
-	private ArrayList<TourPersonHRZone>	_personHrZones							= new ArrayList<TourPersonHRZone>();
+	private ArrayList<TourPersonHRZone>	_personHrZones							= new ArrayList<>();
 	private final MinMaxKeeper_YData	_minMaxKeeper							= new MinMaxKeeper_YData();
 
 	private final NumberFormat			_nf1									= NumberFormat.getNumberInstance();
@@ -262,7 +267,8 @@ public class TrainingView extends ViewPart {
 
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == TrainingView.this) {
+
+				if (partRef.getPart(false) == TrainingView.this && _isPartCreated) {
 					saveState();
 				}
 			}
@@ -415,6 +421,8 @@ public class TrainingView extends ViewPart {
 		restoreState();
 
 		showTour();
+
+		_isPartCreated = true;
 	}
 
 	private void createUI(final Composite parent) {

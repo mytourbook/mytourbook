@@ -20,31 +20,6 @@ import gnu.trove.list.array.TDoubleArrayList;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.chart.Chart;
-import net.tourbook.chart.ChartDataModel;
-import net.tourbook.chart.ChartDataXSerie;
-import net.tourbook.chart.ChartDataYSerie;
-import net.tourbook.chart.ChartType;
-import net.tourbook.chart.IChartLayer;
-import net.tourbook.common.CommonActivator;
-import net.tourbook.common.UI;
-import net.tourbook.common.color.GraphColorManager;
-import net.tourbook.common.preferences.ICommonPreferences;
-import net.tourbook.common.tooltip.ActionToolbarSlideout;
-import net.tourbook.common.tooltip.ToolbarSlideout;
-import net.tourbook.common.util.Util;
-import net.tourbook.data.TourData;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.ITourEventListener;
-import net.tourbook.tour.SelectionDeletedTours;
-import net.tourbook.tour.SelectionTourData;
-import net.tourbook.tour.SelectionTourId;
-import net.tourbook.tour.SelectionTourIds;
-import net.tourbook.tour.TourEventId;
-import net.tourbook.tour.TourManager;
-
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -78,6 +53,31 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
+
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.chart.Chart;
+import net.tourbook.chart.ChartDataModel;
+import net.tourbook.chart.ChartDataXSerie;
+import net.tourbook.chart.ChartDataYSerie;
+import net.tourbook.chart.ChartType;
+import net.tourbook.chart.IChartLayer;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.UI;
+import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.preferences.ICommonPreferences;
+import net.tourbook.common.tooltip.ActionToolbarSlideout;
+import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.common.util.Util;
+import net.tourbook.data.TourData;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.SelectionDeletedTours;
+import net.tourbook.tour.SelectionTourData;
+import net.tourbook.tour.SelectionTourId;
+import net.tourbook.tour.SelectionTourIds;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
 
 /**
  * Show selected tours in a conconi test chart
@@ -120,7 +120,7 @@ public class ConconiView extends ViewPart {
 	/**
 	 * E4 calls partClosed() even when not created
 	 */
-	private boolean					_isCreated;
+	private boolean					_isPartCreated;
 
 	private TourData				_selectedTour;
 
@@ -165,6 +165,7 @@ public class ConconiView extends ViewPart {
 	}
 
 	private void addPartListener() {
+
 		_partListener = new IPartListener2() {
 
 			@Override
@@ -175,7 +176,8 @@ public class ConconiView extends ViewPart {
 
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == ConconiView.this && _isCreated) {
+
+				if (partRef.getPart(false) == ConconiView.this && _isPartCreated) {
 					saveTour();
 					saveState();
 				}
@@ -303,7 +305,7 @@ public class ConconiView extends ViewPart {
 		final int serieLengthRaw = conconiTours.size();
 
 		final TourData[] toursArray = conconiTours.toArray(new TourData[serieLengthRaw]);
-		final ArrayList<TourData> validTourList = new ArrayList<TourData>();
+		final ArrayList<TourData> validTourList = new ArrayList<>();
 
 		/*
 		 * get all tours which has valid data
@@ -519,7 +521,7 @@ public class ConconiView extends ViewPart {
 		/*
 		 * updata layer for regression lines
 		 */
-		final ArrayList<IChartLayer> chartCustomLayers = new ArrayList<IChartLayer>();
+		final ArrayList<IChartLayer> chartCustomLayers = new ArrayList<>();
 		chartCustomLayers.add(_conconiLayer);
 
 		_yDataPulse.setCustomForegroundLayers(chartCustomLayers);
@@ -602,7 +604,7 @@ public class ConconiView extends ViewPart {
 			showTourFromTourProvider();
 		}
 
-		_isCreated = true;
+		_isPartCreated = true;
 	}
 
 	private void createUI(final Composite parent) {
@@ -1021,7 +1023,7 @@ public class ConconiView extends ViewPart {
 
 	private void updateChart_10(final Long tourId) {
 
-		final ArrayList<Long> tourIds = new ArrayList<Long>();
+		final ArrayList<Long> tourIds = new ArrayList<>();
 		tourIds.add(tourId);
 
 		updateChart_12(tourIds);
@@ -1037,7 +1039,7 @@ public class ConconiView extends ViewPart {
 			return;
 		}
 
-		final ArrayList<TourData> tourDataList = new ArrayList<TourData>();
+		final ArrayList<TourData> tourDataList = new ArrayList<>();
 		tourDataList.add(tourData);
 
 		updateChart_22(tourDataList);

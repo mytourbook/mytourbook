@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,36 +18,6 @@ package net.tourbook.ui.views.tourMarker;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
-
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
-import net.tourbook.common.util.ColumnDefinition;
-import net.tourbook.common.util.ColumnManager;
-import net.tourbook.common.util.ITourViewer;
-import net.tourbook.common.util.PostSelectionProvider;
-import net.tourbook.data.TourData;
-import net.tourbook.data.TourMarker;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.ActionOpenMarkerDialog;
-import net.tourbook.tour.ITourEventListener;
-import net.tourbook.tour.SelectionDeletedTours;
-import net.tourbook.tour.SelectionTourData;
-import net.tourbook.tour.SelectionTourId;
-import net.tourbook.tour.SelectionTourIds;
-import net.tourbook.tour.SelectionTourMarker;
-import net.tourbook.tour.TourEvent;
-import net.tourbook.tour.TourEventId;
-import net.tourbook.tour.TourManager;
-import net.tourbook.ui.ITourProvider;
-import net.tourbook.ui.TableColumnFactory;
-import net.tourbook.ui.action.ActionModifyColumns;
-import net.tourbook.ui.tourChart.ChartLabel;
-import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
-import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
-import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
-import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -91,6 +61,36 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
+import net.tourbook.common.util.ColumnDefinition;
+import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.ITourViewer;
+import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.ActionOpenMarkerDialog;
+import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.SelectionDeletedTours;
+import net.tourbook.tour.SelectionTourData;
+import net.tourbook.tour.SelectionTourId;
+import net.tourbook.tour.SelectionTourIds;
+import net.tourbook.tour.SelectionTourMarker;
+import net.tourbook.tour.TourEvent;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
+import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.TableColumnFactory;
+import net.tourbook.ui.action.ActionModifyColumns;
+import net.tourbook.ui.tourChart.ChartLabel;
+import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
+import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
+import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
+import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
+
 public class TourMarkerView extends ViewPart implements ITourProvider, ITourViewer {
 
 	public static final String		ID			= "net.tourbook.views.TourMarkerView";			//$NON-NLS-1$
@@ -116,6 +116,11 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
 	private boolean					_isInUpdate;
 	private boolean					_isMultipleTours;
+
+	/**
+	 * E4 calls partClosed() even when not created
+	 */
+	private boolean					_isPartCreated;
 
 	private ColumnDefinition		_colDefName;
 	private ColumnDefinition		_colDefVisibility;
@@ -208,7 +213,8 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == TourMarkerView.this) {
+
+				if (partRef.getPart(false) == TourMarkerView.this && _isPartCreated) {
 
 //					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourMarkerView.this);
 					saveState();
@@ -401,6 +407,8 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 		if (_tourData == null) {
 			showTourFromTourProvider();
 		}
+
+		_isPartCreated = true;
 	}
 
 	private void createUI(final Composite parent) {
@@ -838,7 +846,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 	@Override
 	public ArrayList<TourData> getSelectedTours() {
 
-		final ArrayList<TourData> selectedTours = new ArrayList<TourData>();
+		final ArrayList<TourData> selectedTours = new ArrayList<>();
 
 		if (_tourData != null) {
 			selectedTours.add(_tourData);
@@ -870,7 +878,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 			return;
 		}
 
-		final ArrayList<TourMarker> selectedTourMarker = new ArrayList<TourMarker>();
+		final ArrayList<TourMarker> selectedTourMarker = new ArrayList<>();
 
 		for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
 			selectedTourMarker.add((TourMarker) iterator.next());

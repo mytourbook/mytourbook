@@ -20,32 +20,6 @@ import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.chart.Chart;
-import net.tourbook.chart.ChartDataModel;
-import net.tourbook.chart.ChartDataXSerie;
-import net.tourbook.chart.ChartDataYSerie;
-import net.tourbook.chart.ChartStatisticSegments;
-import net.tourbook.chart.ChartToolTipInfo;
-import net.tourbook.chart.ChartType;
-import net.tourbook.chart.IBarSelectionListener;
-import net.tourbook.chart.IChartInfoProvider;
-import net.tourbook.common.UI;
-import net.tourbook.common.color.GraphColorManager;
-import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.tooltip.ActionToolbarSlideout;
-import net.tourbook.common.tooltip.ToolbarSlideout;
-import net.tourbook.common.util.ArrayListToArray;
-import net.tourbook.common.util.IToolTipHideListener;
-import net.tourbook.common.util.PostSelectionProvider;
-import net.tourbook.common.util.Util;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.ITourEventListener;
-import net.tourbook.tour.TourEventId;
-import net.tourbook.tour.TourInfoIconToolTipProvider;
-import net.tourbook.tour.TourManager;
-
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -71,6 +45,32 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
+
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.chart.Chart;
+import net.tourbook.chart.ChartDataModel;
+import net.tourbook.chart.ChartDataXSerie;
+import net.tourbook.chart.ChartDataYSerie;
+import net.tourbook.chart.ChartStatisticSegments;
+import net.tourbook.chart.ChartToolTipInfo;
+import net.tourbook.chart.ChartType;
+import net.tourbook.chart.IBarSelectionListener;
+import net.tourbook.chart.IChartInfoProvider;
+import net.tourbook.common.UI;
+import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.tooltip.ActionToolbarSlideout;
+import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.common.util.ArrayListToArray;
+import net.tourbook.common.util.IToolTipHideListener;
+import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.Util;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourInfoIconToolTipProvider;
+import net.tourbook.tour.TourManager;
 
 public class YearStatisticView extends ViewPart {
 
@@ -115,28 +115,28 @@ public class YearStatisticView extends ViewPart {
 	/**
 	 * contains all {@link TVICatalogComparedTour} tour objects for all years
 	 */
-	private ArrayList<TVICatalogComparedTour>	_allTours					= new ArrayList<TVICatalogComparedTour>();
+	private ArrayList<TVICatalogComparedTour>	_allTours					= new ArrayList<>();
 
 	/**
 	 * Years which the user can select as start year in the combo box
 	 */
-	private ArrayList<Integer>					_comboYears					= new ArrayList<Integer>();
+	private ArrayList<Integer>					_comboYears					= new ArrayList<>();
 
 	/**
 	 * Day of year values for all displayed years<br>
 	 * DOY...Day Of Year
 	 */
-	private ArrayList<Integer>					_DOYValues					= new ArrayList<Integer>();
+	private ArrayList<Integer>					_DOYValues					= new ArrayList<>();
 
 	/**
 	 * Tour speed for all years
 	 */
-	private ArrayList<Float>					_tourSpeed					= new ArrayList<Float>();
+	private ArrayList<Float>					_tourSpeed					= new ArrayList<>();
 
 	/**
 	 * Average pulse for all years.
 	 */
-	private ArrayList<Float>					_avgPulse					= new ArrayList<Float>();
+	private ArrayList<Float>					_avgPulse					= new ArrayList<>();
 
 	/**
 	 * this is the last year (on the right side) which is displayed in the statistics
@@ -169,6 +169,11 @@ public class YearStatisticView extends ViewPart {
 
 	private YearStatisticTourToolTip			_tourToolTip;
 	private TourInfoIconToolTipProvider			_tourInfoToolTipProvider	= new TourInfoIconToolTipProvider();
+
+	/**
+	 * E4 calls partClosed() even when not created
+	 */
+	private boolean								_isPartCreated;
 
 	/*
 	 * UI controls
@@ -211,7 +216,8 @@ public class YearStatisticView extends ViewPart {
 
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == YearStatisticView.this) {
+
+				if (partRef.getPart(false) == YearStatisticView.this && _isPartCreated) {
 					saveState();
 				}
 			}
@@ -429,6 +435,7 @@ public class YearStatisticView extends ViewPart {
 		// restore selection
 		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
 
+		_isPartCreated = true;
 	}
 
 	private ChartToolTipInfo createToolTipInfo(int valueIndex) {

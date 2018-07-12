@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,6 +22,50 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
+
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.ColumnViewer;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.IElementComparer;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.jface.viewers.TreePath;
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MenuAdapter;
+import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.part.ViewPart;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -72,50 +116,6 @@ import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
 import net.tourbook.ui.views.TourInfoToolTipStyledCellLabelProvider;
 import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
 
-import org.eclipse.jface.action.IMenuListener;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.PixelConverter;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.CellLabelProvider;
-import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.IElementComparer;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.jface.viewers.TreePath;
-import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerCell;
-import org.eclipse.jface.viewers.ViewerComparator;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MenuAdapter;
-import org.eclipse.swt.events.MenuEvent;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.Tree;
-import org.eclipse.ui.IPartListener2;
-import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchPartReference;
-import org.eclipse.ui.part.ViewPart;
-
 public class TaggingView extends ViewPart implements ITourProvider, ITourViewer, ITreeViewer {
 
 	static public final String				ID								= "net.tourbook.views.tagViewID";					//$NON-NLS-1$
@@ -158,8 +158,13 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 	private final IPreferenceStore			_prefStore						= TourbookPlugin.getPrefStore();
 
 	private final IDialogSettings			_state							= TourbookPlugin.getState(ID);
-	private int								_tagViewLayout					= TAG_VIEW_LAYOUT_HIERARCHICAL;
 
+	/**
+	 * E4 calls partClosed() even when not created
+	 */
+	private boolean							_isPartCreated;
+
+	private int								_tagViewLayout					= TAG_VIEW_LAYOUT_HIERARCHICAL;
 	private TreeViewerTourInfoToolTip		_tourInfoToolTip;
 
 	private boolean							_isToolTipInTag;
@@ -172,13 +177,12 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 	/*
 	 * resources
 	 */
-	private final Image						_imgTagCategory					= TourbookPlugin
-																					.getImage(Messages.Image__tag_category);
-	private final Image						_imgTag							= TourbookPlugin
-																					.getImage(Messages.Image__tag);
-	private final Image						_imgTagRoot						= TourbookPlugin
-																					.getImage(Messages.Image__tag_root);
+	private final Image						_imgTagCategory			= TourbookPlugin.getImage(Messages.Image__tag_category);
+	private final Image						_imgTag					= TourbookPlugin.getImage(Messages.Image__tag);
+	private final Image						_imgTagRoot				= TourbookPlugin.getImage(Messages.Image__tag_root);
+
 	private PixelConverter					_pc;
+
 	/*
 	 * UI controls
 	 */
@@ -366,7 +370,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == TaggingView.this) {
+
+				if (partRef.getPart(false) == TaggingView.this && _isPartCreated) {
 
 					saveState();
 
@@ -566,6 +571,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 		reloadViewer();
 
 		restoreState_Viewer();
+
+		_isPartCreated = true;
 	}
 
 	private void createUI(final Composite parent) {
@@ -618,7 +625,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
 					// multiple tours are selected
 
-					final ArrayList<Long> tourIds = new ArrayList<Long>();
+					final ArrayList<Long> tourIds = new ArrayList<>();
 
 					for (final Iterator<?> tourIterator = selectedTours.iterator(); tourIterator.hasNext();) {
 						final Object viewItem = tourIterator.next();
@@ -1408,7 +1415,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 		final IStructuredSelection selectedTours = ((IStructuredSelection) _tagViewer.getSelection());
 
 		final TourManager tourManager = TourManager.getInstance();
-		final ArrayList<TourData> selectedTourData = new ArrayList<TourData>();
+		final ArrayList<TourData> selectedTourData = new ArrayList<>();
 
 		// loop: all selected tours
 		for (final Iterator<?> iter = selectedTours.iterator(); iter.hasNext();) {
@@ -1535,7 +1542,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 		final long[] allStateItems = Util.getStateLongArray(_state, STATE_EXPANDED_ITEMS, null);
 		if (allStateItems != null) {
 
-			final ArrayList<TreePath> viewerTreePaths = new ArrayList<TreePath>();
+			final ArrayList<TreePath> viewerTreePaths = new ArrayList<>();
 
 			final ArrayList<StateSegment[]> allStateSegments = restoreState_Viewer_GetSegments(allStateItems);
 			for (final StateSegment[] stateSegments : allStateSegments) {
@@ -1662,8 +1669,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 	 */
 	private ArrayList<StateSegment[]> restoreState_Viewer_GetSegments(final long[] expandedItems) {
 
-		final ArrayList<StateSegment[]> allTreePathSegments = new ArrayList<StateSegment[]>();
-		final ArrayList<StateSegment> currentSegments = new ArrayList<StateSegment>();
+		final ArrayList<StateSegment[]> allTreePathSegments = new ArrayList<>();
+		final ArrayList<StateSegment> currentSegments = new ArrayList<>();
 
 		for (int itemIndex = 0; itemIndex < expandedItems.length;) {
 
@@ -1853,7 +1860,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 				final long viewerTagId = tagItem.getTagId();
 
 				final HashMap<Long, TourTag> modifiedTags = changedTags.getModifiedTags();
-				final ArrayList<Long> removedIds = new ArrayList<Long>();
+				final ArrayList<Long> removedIds = new ArrayList<>();
 
 				for (final Long modifiedTagId : modifiedTags.keySet()) {
 					if (viewerTagId == modifiedTagId.longValue()) {
@@ -1911,7 +1918,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 			return;
 		}
 
-		final ArrayList<TVITagViewTour> deletedTourItems = new ArrayList<TVITagViewTour>();
+		final ArrayList<TVITagViewTour> deletedTourItems = new ArrayList<>();
 
 		// loop: all tree children items
 		for (final Object object : parentChildren) {
@@ -1993,7 +2000,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 							final Set<TourTag> tourTags = modifiedTourData.getTourTags();
 							final ArrayList<Long> tagIds;
 
-							tourItem.tagIds = tagIds = new ArrayList<Long>();
+							tourItem.tagIds = tagIds = new ArrayList<>();
 							for (final TourTag tourTag : tourTags) {
 								tagIds.add(tourTag.getTagId());
 							}

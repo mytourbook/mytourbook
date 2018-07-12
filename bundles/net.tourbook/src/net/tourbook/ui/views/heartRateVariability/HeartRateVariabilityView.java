@@ -18,32 +18,6 @@ package net.tourbook.ui.views.heartRateVariability;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.chart.Chart;
-import net.tourbook.chart.ChartDataModel;
-import net.tourbook.chart.ChartDataXSerie;
-import net.tourbook.chart.ChartDataYSerie;
-import net.tourbook.chart.ChartType;
-import net.tourbook.chart.MinMaxKeeper_XData;
-import net.tourbook.chart.MinMaxKeeper_YData;
-import net.tourbook.common.CommonActivator;
-import net.tourbook.common.color.GraphColorManager;
-import net.tourbook.common.preferences.ICommonPreferences;
-import net.tourbook.common.tooltip.ActionToolbarSlideout;
-import net.tourbook.common.tooltip.ToolbarSlideout;
-import net.tourbook.common.util.Util;
-import net.tourbook.data.TourData;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.ITourEventListener;
-import net.tourbook.tour.SelectionDeletedTours;
-import net.tourbook.tour.SelectionTourData;
-import net.tourbook.tour.SelectionTourId;
-import net.tourbook.tour.SelectionTourIds;
-import net.tourbook.tour.TourEventId;
-import net.tourbook.tour.TourManager;
-import net.tourbook.ui.UI;
-
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.ToolBarManager;
@@ -76,6 +50,32 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
+
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.chart.Chart;
+import net.tourbook.chart.ChartDataModel;
+import net.tourbook.chart.ChartDataXSerie;
+import net.tourbook.chart.ChartDataYSerie;
+import net.tourbook.chart.ChartType;
+import net.tourbook.chart.MinMaxKeeper_XData;
+import net.tourbook.chart.MinMaxKeeper_YData;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.preferences.ICommonPreferences;
+import net.tourbook.common.tooltip.ActionToolbarSlideout;
+import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.common.util.Util;
+import net.tourbook.data.TourData;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.SelectionDeletedTours;
+import net.tourbook.tour.SelectionTourData;
+import net.tourbook.tour.SelectionTourId;
+import net.tourbook.tour.SelectionTourIds;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
+import net.tourbook.ui.UI;
 
 /**
  * Show selected tours in a Heart rate variability (HRV) chart
@@ -129,7 +129,7 @@ public class HeartRateVariabilityView extends ViewPart {
 	/**
 	 * E4 calls partClosed() even when not created
 	 */
-	private boolean						_isCreated;
+	private boolean						_isPartCreated;
 
 	private final MinMaxKeeper_XData	_xMinMaxKeeper							= new MinMaxKeeper_XData(ADJUST_PULSE_VALUE);
 	private final MinMaxKeeper_YData	_yMinMaxKeeper							= new MinMaxKeeper_YData(ADJUST_PULSE_VALUE);
@@ -250,7 +250,7 @@ public class HeartRateVariabilityView extends ViewPart {
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 
-				if (partRef.getPart(false) == HeartRateVariabilityView.this && _isCreated) {
+				if (partRef.getPart(false) == HeartRateVariabilityView.this && _isPartCreated) {
 					saveState();
 				}
 			}
@@ -380,7 +380,7 @@ public class HeartRateVariabilityView extends ViewPart {
 		final int serieLengthRaw = hrvTours.size();
 
 		final TourData[] toursArray = hrvTours.toArray(new TourData[serieLengthRaw]);
-		final ArrayList<TourData> validTourList = new ArrayList<TourData>();
+		final ArrayList<TourData> validTourList = new ArrayList<>();
 
 		/*
 		 * get all tours which has valid data
@@ -564,7 +564,7 @@ public class HeartRateVariabilityView extends ViewPart {
 
 		showTour();
 
-		_isCreated = true;
+		_isPartCreated = true;
 	}
 
 	private void createUI(final Composite parent) {
@@ -918,7 +918,7 @@ public class HeartRateVariabilityView extends ViewPart {
 
 	private void updateChart_10(final Long tourId) {
 
-		final ArrayList<Long> tourIds = new ArrayList<Long>();
+		final ArrayList<Long> tourIds = new ArrayList<>();
 		tourIds.add(tourId);
 
 		updateChart_12(tourIds);
@@ -935,7 +935,7 @@ public class HeartRateVariabilityView extends ViewPart {
 			return;
 		}
 
-		final ArrayList<TourData> tourDataList = new ArrayList<TourData>();
+		final ArrayList<TourData> tourDataList = new ArrayList<>();
 		tourDataList.add(tourData);
 
 		updateChart_22(tourDataList);

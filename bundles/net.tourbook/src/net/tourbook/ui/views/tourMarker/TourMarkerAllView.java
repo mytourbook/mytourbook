@@ -25,34 +25,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
-import net.tourbook.common.util.ColumnDefinition;
-import net.tourbook.common.util.ColumnManager;
-import net.tourbook.common.util.ITourViewer;
-import net.tourbook.common.util.PostSelectionProvider;
-import net.tourbook.common.util.SQL;
-import net.tourbook.common.util.TableColumnDefinition;
-import net.tourbook.common.util.Util;
-import net.tourbook.data.TourData;
-import net.tourbook.data.TourMarker;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.ActionOpenMarkerDialog;
-import net.tourbook.tour.ITourEventListener;
-import net.tourbook.tour.SelectionTourIds;
-import net.tourbook.tour.SelectionTourMarker;
-import net.tourbook.tour.TourEvent;
-import net.tourbook.tour.TourEventId;
-import net.tourbook.tour.TourManager;
-import net.tourbook.ui.ITourProvider;
-import net.tourbook.ui.Messages;
-import net.tourbook.ui.TableColumnFactory;
-import net.tourbook.ui.action.ActionEditQuick;
-import net.tourbook.ui.action.ActionEditTour;
-import net.tourbook.ui.action.ActionModifyColumns;
-import net.tourbook.ui.action.ActionOpenTour;
-
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -97,6 +69,34 @@ import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
+
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
+import net.tourbook.common.util.ColumnDefinition;
+import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.ITourViewer;
+import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.SQL;
+import net.tourbook.common.util.TableColumnDefinition;
+import net.tourbook.common.util.Util;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.ActionOpenMarkerDialog;
+import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.SelectionTourIds;
+import net.tourbook.tour.SelectionTourMarker;
+import net.tourbook.tour.TourEvent;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
+import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.Messages;
+import net.tourbook.ui.TableColumnFactory;
+import net.tourbook.ui.action.ActionEditQuick;
+import net.tourbook.ui.action.ActionEditTour;
+import net.tourbook.ui.action.ActionModifyColumns;
+import net.tourbook.ui.action.ActionOpenTour;
 
 /**
  * This view displays all available {@link TourMarker}.
@@ -156,7 +156,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 	private ColumnManager				_columnManager;
 	private SelectionAdapter			_columnSortListener;
 
-	private ArrayList<TourMarkerItem>	_allMarkerItems						= new ArrayList<TourMarkerItem>();
+	private ArrayList<TourMarkerItem>	_allMarkerItems						= new ArrayList<>();
 
 	private int							_gpsMarkerFilter					= GPS_MARKER_FILTER_IS_DISABLED;
 
@@ -176,10 +176,13 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 	private boolean						_isInUpdate;
 
-	private final DateFormat			_dateFormatter						= DateFormat
-																					.getDateInstance(DateFormat.SHORT);
-	private final DateFormat			_timeFormatter						= DateFormat
-																					.getTimeInstance(DateFormat.SHORT);
+	/**
+	 * E4 calls partClosed() even when not created
+	 */
+	private boolean						_isPartCreated;
+
+	private final DateFormat			_dateFormatter						= DateFormat.getDateInstance(DateFormat.SHORT);
+	private final DateFormat			_timeFormatter						= DateFormat.getTimeInstance(DateFormat.SHORT);
 	//
 	private final NumberFormat			_nf1								= NumberFormat.getNumberInstance();
 	private final NumberFormat			_nf3								= NumberFormat.getNumberInstance();
@@ -509,7 +512,8 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == TourMarkerAllView.this) {
+
+				if (partRef.getPart(false) == TourMarkerAllView.this && _isPartCreated) {
 					saveState();
 				}
 			}
@@ -663,6 +667,8 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 				restoreState_WithUI();
 			}
 		});
+
+		_isPartCreated = true;
 	}
 
 	private void createUI(final Composite parent) {
@@ -1125,7 +1131,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 	private void fireSelection(final StructuredSelection selection) {
 
 		// get unique tour id's
-		final HashSet<Long> tourIds = new HashSet<Long>();
+		final HashSet<Long> tourIds = new HashSet<>();
 		for (final Iterator<?> selectedItem = selection.iterator(); selectedItem.hasNext();) {
 			tourIds.add(((TourMarkerItem) selectedItem.next()).tourId);
 		}
@@ -1146,7 +1152,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 				return;
 			}
 
-			final ArrayList<TourMarker> selectedTourMarkers = new ArrayList<TourMarker>();
+			final ArrayList<TourMarker> selectedTourMarkers = new ArrayList<>();
 
 			for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
 
@@ -1245,7 +1251,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 	@Override
 	public ArrayList<TourData> getSelectedTours() {
 
-		final ArrayList<TourData> selectedTours = new ArrayList<TourData>();
+		final ArrayList<TourData> selectedTours = new ArrayList<>();
 
 		final StructuredSelection selection = getViewerSelection();
 

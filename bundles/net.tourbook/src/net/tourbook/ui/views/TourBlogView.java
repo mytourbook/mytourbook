@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,6 +22,35 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Set;
+
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceConverter;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.window.Window;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.SWTError;
+import org.eclipse.swt.browser.Browser;
+import org.eclipse.swt.browser.LocationAdapter;
+import org.eclipse.swt.browser.LocationEvent;
+import org.eclipse.swt.browser.ProgressAdapter;
+import org.eclipse.swt.browser.ProgressEvent;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.part.PageBook;
+import org.eclipse.ui.part.ViewPart;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -54,35 +83,6 @@ import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 import net.tourbook.web.WEB;
-
-import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.PreferenceConverter;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.window.Window;
-import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.SWTError;
-import org.eclipse.swt.browser.Browser;
-import org.eclipse.swt.browser.LocationAdapter;
-import org.eclipse.swt.browser.LocationEvent;
-import org.eclipse.swt.browser.ProgressAdapter;
-import org.eclipse.swt.browser.ProgressEvent;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IPartListener2;
-import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchPartReference;
-import org.eclipse.ui.part.PageBook;
-import org.eclipse.ui.part.ViewPart;
 
 public class TourBlogView extends ViewPart {
 
@@ -130,7 +130,6 @@ public class TourBlogView extends ViewPart {
 	private final IDialogSettings	_state									= TourbookPlugin.getState(ID);
 
 	private PostSelectionProvider	_postSelectionProvider;
-
 	private ISelectionListener		_postSelectionListener;
 	private IPropertyChangeListener	_prefChangeListener;
 	private ITourEventListener		_tourEventListener;
@@ -150,6 +149,11 @@ public class TourBlogView extends ViewPart {
 
 	private boolean					_isDrawWithDefaultColor;
 	private boolean					_isShowHiddenMarker;
+
+	/**
+	 * E4 calls partClosed() even when not created
+	 */
+	private boolean					_isPartCreated;
 
 	private Long					_reloadedTourMarkerId;
 
@@ -181,7 +185,8 @@ public class TourBlogView extends ViewPart {
 
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == TourBlogView.this) {
+
+				if (partRef.getPart(false) == TourBlogView.this && _isPartCreated) {
 					saveState();
 				}
 			}
@@ -332,7 +337,7 @@ public class TourBlogView extends ViewPart {
 		final StringBuilder sb = new StringBuilder();
 
 		final Set<TourMarker> tourMarkers = _tourData.getTourMarkers();
-		final ArrayList<TourMarker> allMarker = new ArrayList<TourMarker>(tourMarkers);
+		final ArrayList<TourMarker> allMarker = new ArrayList<>(tourMarkers);
 		Collections.sort(allMarker);
 
 		create_22_BlogHeader(sb);
@@ -614,6 +619,8 @@ public class TourBlogView extends ViewPart {
 		if (_tourData == null) {
 			showTourFromTourProvider();
 		}
+
+		_isPartCreated = true;
 	}
 
 	private void createUI(final Composite parent) {
@@ -712,7 +719,7 @@ public class TourBlogView extends ViewPart {
 
 		if (selectedMarker.length > 0) {
 
-			final ArrayList<TourMarker> allTourMarker = new ArrayList<TourMarker>();
+			final ArrayList<TourMarker> allTourMarker = new ArrayList<>();
 
 			for (final Object object : selectedMarker) {
 				allTourMarker.add((TourMarker) object);

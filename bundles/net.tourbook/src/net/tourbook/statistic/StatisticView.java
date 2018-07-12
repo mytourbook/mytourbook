@@ -24,27 +24,6 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.CommonActivator;
-import net.tourbook.common.preferences.ICommonPreferences;
-import net.tourbook.common.tooltip.ActionToolbarSlideout;
-import net.tourbook.common.tooltip.ToolbarSlideout;
-import net.tourbook.common.util.Util;
-import net.tourbook.data.TourData;
-import net.tourbook.data.TourPerson;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.ITourEventListener;
-import net.tourbook.tour.SelectionDeletedTours;
-import net.tourbook.tour.TourEvent;
-import net.tourbook.tour.TourEventId;
-import net.tourbook.tour.TourManager;
-import net.tourbook.ui.ITourProvider;
-import net.tourbook.ui.SQLFilter;
-import net.tourbook.ui.TourTypeFilter;
-import net.tourbook.ui.UI;
-
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -68,6 +47,27 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
+
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.preferences.ICommonPreferences;
+import net.tourbook.common.tooltip.ActionToolbarSlideout;
+import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.common.util.Util;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourPerson;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.SelectionDeletedTours;
+import net.tourbook.tour.TourEvent;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
+import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.SQLFilter;
+import net.tourbook.ui.TourTypeFilter;
+import net.tourbook.ui.UI;
 
 public class StatisticView extends ViewPart implements ITourProvider {
 
@@ -118,6 +118,11 @@ public class StatisticView extends ViewPart implements ITourProvider {
 	private boolean							_isInUpdateUI;
 	private boolean							_isSynchScaleEnabled;
 	private boolean							_isVerticalOrderDisabled;
+
+	/**
+	 * E4 calls partClosed() even when not created
+	 */
+	private boolean							_isPartCreated;
 
 	private int								_minimumComboWidth;
 	private int								_maximumComboWidth;
@@ -184,7 +189,8 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == StatisticView.this) {
+
+				if (partRef.getPart(false) == StatisticView.this && _isPartCreated) {
 					saveState();
 				}
 			}
@@ -366,6 +372,8 @@ public class StatisticView extends ViewPart implements ITourProvider {
 				restoreState();
 			}
 		});
+
+		_isPartCreated = true;
 	}
 
 	private void createUI(final Composite parent) {
@@ -597,7 +605,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
 		if (selectedTourData == null) {
 			return null;
 		} else {
-			final ArrayList<TourData> selectedTours = new ArrayList<TourData>();
+			final ArrayList<TourData> selectedTours = new ArrayList<>();
 			selectedTours.add(selectedTourData);
 			return selectedTours;
 		}

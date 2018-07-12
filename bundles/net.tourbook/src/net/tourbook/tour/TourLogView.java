@@ -22,13 +22,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
-import net.tourbook.common.util.Util;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.web.WEB;
-
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -47,6 +40,13 @@ import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
+
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
+import net.tourbook.common.util.Util;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.web.WEB;
 
 /**
  * Tour log view.
@@ -77,6 +77,12 @@ public class TourLogView extends ViewPart {
 	//
 	private boolean				_isNewUI;
 	private boolean				_isBrowserCompleted;
+
+	/**
+	 * E4 calls partClosed() even when not created
+	 */
+	private boolean				_isPartCreated;
+
 	private String				_cssFromFile;
 	private String				_noBrowserLog						= UI.EMPTY_STRING;
 	//
@@ -242,7 +248,7 @@ public class TourLogView extends ViewPart {
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 
-				if (partRef.getPart(false) == TourLogView.this) {
+				if (partRef.getPart(false) == TourLogView.this && _isPartCreated) {
 					TourLogManager.setLogView(null);
 				}
 			}
@@ -341,6 +347,8 @@ public class TourLogView extends ViewPart {
 		addPartListener();
 
 		updateUI();
+
+		_isPartCreated = true;
 	}
 
 	private void createUI(final Composite parent) {

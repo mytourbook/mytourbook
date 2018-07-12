@@ -29,6 +29,57 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.ColumnViewer;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.IElementComparer;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.ITreeSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.jface.viewers.TreePath;
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.events.MenuAdapter;
+import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.ScrollBar;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.part.ViewPart;
+
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
@@ -96,57 +147,6 @@ import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
 import net.tourbook.ui.views.geoCompare.GeoPartComparerItem;
 import net.tourbook.ui.views.rawData.ActionMergeTour;
 import net.tourbook.ui.views.rawData.ActionReimportSubMenu;
-
-import org.eclipse.core.runtime.Path;
-import org.eclipse.jface.action.IMenuListener;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.PixelConverter;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.CellLabelProvider;
-import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.IElementComparer;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.ITreeSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.jface.viewers.TreePath;
-import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerCell;
-import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.events.MenuAdapter;
-import org.eclipse.swt.events.MenuEvent;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.ScrollBar;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.swt.widgets.Tree;
-import org.eclipse.ui.IPartListener2;
-import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchPartReference;
-import org.eclipse.ui.part.ViewPart;
 
 public class TourBookView extends ViewPart implements ITourProvider2, ITourViewer3, ITourProviderByID, ITreeViewer {
 
@@ -264,7 +264,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 	private int											_selectedYear			= -1;
 	private int											_selectedYearSub		= -1;
-	private final ArrayList<Long>						_selectedTourIds		= new ArrayList<Long>();
+	private final ArrayList<Long>						_selectedTourIds		= new ArrayList<>();
 
 	private boolean										_isCollapseOthers;
 	private boolean										_isInFireSelection;
@@ -277,6 +277,11 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 	private boolean										_isToolTipInTime;
 	private boolean										_isToolTipInTitle;
 	private boolean										_isToolTipInWeekDay;
+
+	/**
+	 * E4 calls partClosed() even when not created
+	 */
+	private boolean										_isPartCreated;
 
 	private final TourDoubleClickState					_tourDoubleClickState	= new TourDoubleClickState();
 	private TagMenuManager								_tagMenuMgr;
@@ -531,7 +536,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == TourBookView.this) {
+
+				if (partRef.getPart(false) == TourBookView.this && _isPartCreated) {
 					saveState();
 				}
 			}
@@ -774,6 +780,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				reselectTourViewer();
 			}
 		});
+
+		_isPartCreated = true;
 	}
 
 	private void createUI(final Composite parent) {
@@ -3600,7 +3608,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 	@Override
 	public Set<Long> getSelectedTourIDs() {
 
-		final Set<Long> tourIds = new HashSet<Long>();
+		final Set<Long> tourIds = new HashSet<>();
 
 		final IStructuredSelection selectedTours = ((IStructuredSelection) _tourViewer.getSelection());
 		if (selectedTours.size() < 2) {
@@ -3664,7 +3672,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 		/*
 		 * show busyindicator when multiple tours needs to be retrieved from the database
 		 */
-		final ArrayList<TourData> selectedTourData = new ArrayList<TourData>();
+		final ArrayList<TourData> selectedTourData = new ArrayList<>();
 
 		if (tourIds.size() > 1) {
 			BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
@@ -3780,7 +3788,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 		final boolean isSelectAllChildren = _actionSelectAllTours.isChecked();
 
-		final HashSet<Long> tourIds = new HashSet<Long>();
+		final HashSet<Long> tourIds = new HashSet<>();
 
 		boolean isFirstYear = true;
 		boolean isFirstYearSub = true;
@@ -3997,7 +4005,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 		// find the old selected year/[month/week] in the new tour items
 		TreeViewerItem reselectYearItem = null;
 		TreeViewerItem reselectYearSubItem = null;
-		final ArrayList<TreeViewerItem> reselectTourItems = new ArrayList<TreeViewerItem>();
+		final ArrayList<TreeViewerItem> reselectTourItems = new ArrayList<>();
 
 		/*
 		 * get the year/month/tour item in the data model
@@ -4134,7 +4142,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 		_state.put(STATE_SELECTED_MONTH, _selectedYearSub);
 
 		// convert tour id's into string
-		final ArrayList<String> selectedTourIds = new ArrayList<String>();
+		final ArrayList<String> selectedTourIds = new ArrayList<>();
 		for (final Long tourId : _selectedTourIds) {
 			selectedTourIds.add(tourId.toString());
 		}
