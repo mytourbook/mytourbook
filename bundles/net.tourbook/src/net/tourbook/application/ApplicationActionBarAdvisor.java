@@ -15,14 +15,6 @@
  *******************************************************************************/
 package net.tourbook.application;
 
-import net.tourbook.Messages;
-import net.tourbook.map.bookmark.MapBookmarkManager;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tag.tour.filter.TourTagFilterManager;
-import net.tourbook.tour.TourTypeFilterManager;
-import net.tourbook.tour.filter.TourFilterManager;
-
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IContributionItem;
@@ -34,7 +26,6 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarContributionItem;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.swt.SWT;
-import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.actions.ActionFactory;
@@ -42,6 +33,12 @@ import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 import org.eclipse.ui.actions.ContributionItemFactory;
 import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
+
+import net.tourbook.Messages;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tag.tour.filter.TourTagFilterManager;
+import net.tourbook.tour.TourTypeFilterManager;
+import net.tourbook.tour.filter.TourFilterManager;
 
 /**
  * An action bar advisor is responsible for creating, adding, and disposing of the fGraphActions
@@ -173,6 +170,17 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		helpMenu.add(getAction(ActionFactory.ABOUT.getId()));
 
 		return helpMenu;
+	}
+
+	/*
+	 * In E4 saveState() do NOT work
+	 */
+	@Override
+	public void dispose() {
+
+		_personContribItem.saveState();
+
+		super.dispose();
 	}
 
 	@Override
@@ -323,18 +331,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 		_prefItem = new ActionContributionItem(_actionPreferences);
 		_prefItem.setVisible(!isOSX);
-	}
-
-	@Override
-	public IStatus saveState(final IMemento state) {
-
-		_personContribItem.saveState(state);
-		TourTypeFilterManager.saveState(state);
-		TourFilterManager.saveState();
-		TourTagFilterManager.saveState();
-		MapBookmarkManager.saveState();
-
-		return super.saveState(state);
 	}
 
 }
