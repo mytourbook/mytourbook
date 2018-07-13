@@ -15,10 +15,6 @@
  *******************************************************************************/
 package net.tourbook.common.tooltip;
 
-import net.tourbook.common.CommonActivator;
-import net.tourbook.common.Messages;
-import net.tourbook.common.UI;
-
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
@@ -33,6 +29,10 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
+
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.Messages;
+import net.tourbook.common.UI;
 
 /**
  * Action to open a slideout in a toolbar.
@@ -61,6 +61,8 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
 	 * This tooltip will be displayed when the action is not selected.
 	 */
 	protected String		notSelectedTooltip	= UI.EMPTY_STRING;
+
+	private boolean			_stateActionSelection;
 
 	public ActionToolbarSlideout() {
 
@@ -142,6 +144,14 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
 	 * @return Returns <code>true</code> when the action is selected, otherwise <code>false</code>.
 	 */
 	public boolean getSelection() {
+
+		if (_actionToolItem == null || _actionToolItem.isDisposed()) {
+
+			// this case occured in E4
+
+			return _stateActionSelection;
+		}
+
 		return _actionToolItem.getSelection();
 	}
 
@@ -160,6 +170,8 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
 	private void onDispose() {
 
 		if (_actionToolItem != null) {
+
+			_stateActionSelection = _actionToolItem.getSelection();
 
 			_actionToolItem.dispose();
 			_actionToolItem = null;
@@ -263,6 +275,7 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
 	public void setSelection(final boolean isSelected) {
 
 		if (_actionToolItem == null) {
+
 			// this happened
 			return;
 		}
