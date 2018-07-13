@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,14 +17,6 @@ package net.tourbook.application;
 
 import java.util.ArrayList;
 
-import net.tourbook.Messages;
-import net.tourbook.common.UI;
-import net.tourbook.common.util.StatusUtil;
-import net.tourbook.data.TourPerson;
-import net.tourbook.database.PersonManager;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.ui.CustomControlContribution;
-
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -39,7 +31,14 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.ui.IMemento;
+
+import net.tourbook.Messages;
+import net.tourbook.common.UI;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.data.TourPerson;
+import net.tourbook.database.PersonManager;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.ui.CustomControlContribution;
 
 public class PersonContributionItem extends CustomControlContribution {
 
@@ -133,6 +132,7 @@ public class PersonContributionItem extends CustomControlContribution {
 		_cboPeople.setToolTipText(Messages.App_People_tooltip);
 
 		_cboPeople.addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(final DisposeEvent e) {
 				if (_prefChangeListener != null) {
 					_prefStore.removePropertyChangeListener(_prefChangeListener);
@@ -248,10 +248,8 @@ public class PersonContributionItem extends CustomControlContribution {
 
 	/**
 	 * save current person id in the dialog settings
-	 * 
-	 * @param memento
 	 */
-	public void saveState(final IMemento memento) {
+	public void saveState() {
 
 		if (_cboPeople == null || _cboPeople.isDisposed()) {
 			StatusUtil.log("cannot save selected person, _cboPeople.isDisposed()");//$NON-NLS-1$

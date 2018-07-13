@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,16 +29,6 @@ import java.util.ArrayList;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourTypeContributionItem;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.action.ActionOpenPrefDialog;
-import net.tourbook.data.TourType;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.ui.TourTypeFilter;
-import net.tourbook.ui.TourTypeFilterSet;
-
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
@@ -57,6 +47,16 @@ import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.XMLMemento;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import net.tourbook.Messages;
+import net.tourbook.application.TourTypeContributionItem;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.data.TourType;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.ui.TourTypeFilter;
+import net.tourbook.ui.TourTypeFilterSet;
 
 public class TourTypeFilterManager {
 
@@ -82,7 +82,7 @@ public class TourTypeFilterManager {
 	 */
 	private static ArrayList<TourTypeFilter>	_tourTypeFilters;
 
-	private static ArrayList<ActionTTFilter>	_ttFilterActions			= new ArrayList<ActionTTFilter>();
+	private static ArrayList<ActionTTFilter>	_ttFilterActions			= new ArrayList<>();
 
 	private static double						_propertyValue;
 
@@ -331,7 +331,7 @@ public class TourTypeFilterManager {
 	private static ArrayList<TourTypeFilter> readXMLFilterFile() {
 
 		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
-		final ArrayList<TourTypeFilter> filterList = new ArrayList<TourTypeFilter>();
+		final ArrayList<TourTypeFilter> filterList = new ArrayList<>();
 
 		final IPath stateLocation = Platform.getStateLocation(TourbookPlugin.getDefault().getBundle());
 		final String filename = stateLocation.append(MEMENTO_FILTER_LIST_FILE).toFile().getAbsolutePath();
@@ -393,7 +393,7 @@ public class TourTypeFilterManager {
 
 				case TourTypeFilter.FILTER_TYPE_TOURTYPE_SET:
 
-					final ArrayList<TourType> tourTypesInFilter = new ArrayList<TourType>();
+					final ArrayList<TourType> tourTypesInFilter = new ArrayList<>();
 					final IMemento[] mementoTourTypes = mementoFilter.getChildren(MEMENTO_CHILD_TOURTYPE);
 
 					// get all tour types
@@ -486,7 +486,7 @@ public class TourTypeFilterManager {
 		selectTourTypeFilter(selectTourTypeFilter, false);
 	}
 
-	public static void saveState(final IMemento memento) {
+	public static void saveState() {
 
 		final TourTypeFilter activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
 
