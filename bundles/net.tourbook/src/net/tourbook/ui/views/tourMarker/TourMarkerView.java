@@ -19,6 +19,10 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
+import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -52,14 +56,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
-import org.eclipse.ui.part.ViewPart;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -91,41 +93,41 @@ import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 
-public class TourMarkerView extends ViewPart implements ITourProvider, ITourViewer {
+public class TourMarkerView implements ITourProvider, ITourViewer {
 
-	public static final String		ID			= "net.tourbook.views.TourMarkerView";			//$NON-NLS-1$
+	public static final String			ID				= "net.tourbook.views.TourMarkerView";			//$NON-NLS-1$
 
 	private final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
-	private final IDialogSettings	_state		= TourbookPlugin.getState("TourMarkerView");	//$NON-NLS-1$
+	private final IDialogSettings		_state		= TourbookPlugin.getState("TourMarkerView");	//$NON-NLS-1$
 
-	private TourData				_tourData;
+	private TourData						_tourData;
 
-	private PostSelectionProvider	_postSelectionProvider;
-	private ISelectionListener		_postSelectionListener;
+	private PostSelectionProvider		_postSelectionProvider;
+	private ISelectionListener			_postSelectionListener;
 	private IPropertyChangeListener	_prefChangeListener;
-	private ITourEventListener		_tourEventListener;
-	private IPartListener2			_partListener;
+	private ITourEventListener			_tourEventListener;
+	private IPartListener2				_partListener;
 
 	private ActionOpenMarkerDialog	_actionEditTourMarkers;
 	private ActionModifyColumns		_actionModifyColumns;
 
-	private PixelConverter			_pc;
+	private PixelConverter				_pc;
 
-	private TableViewer				_markerViewer;
-	private ColumnManager			_columnManager;
+	private TableViewer					_markerViewer;
+	private ColumnManager				_columnManager;
 
-	private boolean					_isInUpdate;
-	private boolean					_isMultipleTours;
+	private boolean						_isInUpdate;
+	private boolean						_isMultipleTours;
 
 	/**
 	 * E4 calls partClosed() even when not created
 	 */
-	private boolean					_isPartCreated;
+	private boolean						_isPartCreated;
 
-	private ColumnDefinition		_colDefName;
-	private ColumnDefinition		_colDefVisibility;
+	private ColumnDefinition			_colDefName;
+	private ColumnDefinition			_colDefVisibility;
 
-	private final NumberFormat		_nf3		= NumberFormat.getNumberInstance();
+	private final NumberFormat			_nf3			= NumberFormat.getNumberInstance();
 	{
 		_nf3.setMinimumFractionDigits(3);
 		_nf3.setMaximumFractionDigits(3);
@@ -134,11 +136,11 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 	/*
 	 * UI controls
 	 */
-	private PageBook				_pageBook;
-	private Composite				_pageNoData;
-	private Composite				_viewerContainer;
+	private PageBook	_pageBook;
+	private Composite	_pageNoData;
+	private Composite	_viewerContainer;
 
-	private Font					_boldFont;
+	private Font		_boldFont;
 
 	class MarkerViewerContentProvicer implements IStructuredContentProvider {
 
@@ -236,7 +238,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 			@Override
 			public void partVisible(final IWorkbenchPartReference partRef) {}
 		};
-		getViewSite().getPage().addPartListener(_partListener);
+//		getViewSite().getPage().addPartListener(_partListener);
 	}
 
 	private void addPrefListener() {
@@ -260,14 +262,14 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
 				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
-					_markerViewer.getTable().setLinesVisible(
-							_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+					_markerViewer.getTable()
+							.setLinesVisible(
+									_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 					_markerViewer.refresh();
 
 					/*
-					 * the tree must be redrawn because the styled text does not show with the new
-					 * color
+					 * the tree must be redrawn because the styled text does not show with the new color
 					 */
 					_markerViewer.getTable().redraw();
 
@@ -294,7 +296,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 				onSelectionChanged(selection);
 			}
 		};
-		getSite().getPage().addPostSelectionListener(_postSelectionListener);
+//		getSite().getPage().addPostSelectionListener(_postSelectionListener);
 	}
 
 	private void addTourEventListener() {
@@ -374,7 +376,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 		_actionModifyColumns = new ActionModifyColumns(this);
 	}
 
-	@Override
+	@PostConstruct
 	public void createPartControl(final Composite parent) {
 
 		_pc = new PixelConverter(parent);
@@ -396,13 +398,13 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 		fillToolbar();
 
 		// this part is a selection provider
-		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
+//		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
 		// show default page
 		_pageBook.showPage(_pageNoData);
 
 		// show marker from last selection
-		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
+//		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
 
 		if (_tourData == null) {
 			showTourFromTourProvider();
@@ -720,8 +722,8 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 				final String text = ((TourMarker) cell.getElement()).getLabel();
 
 				/*
-				 * Show text in red/bold when the text ends with a !, this hidden feature was
-				 * introduced by helmling
+				 * Show text in red/bold when the text ends with a !, this hidden feature was introduced
+				 * by helmling
 				 */
 				if (text.endsWith(UI.SYMBOL_EXCLAMATION_POINT)) {
 
@@ -776,17 +778,17 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 		});
 	}
 
-	@Override
+	@PreDestroy
 	public void dispose() {
 
 		TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
-		getSite().getPage().removePostSelectionListener(_postSelectionListener);
-		getViewSite().getPage().removePartListener(_partListener);
+//		getSite().getPage().removePostSelectionListener(_postSelectionListener);
+//		getViewSite().getPage().removePartListener(_partListener);
 
 		_prefStore.removePropertyChangeListener(_prefChangeListener);
 
-		super.dispose();
+//		super.dispose();
 	}
 
 	/**
@@ -816,15 +818,15 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
 	private void fillToolbar() {
 
-		final IActionBars actionBars = getViewSite().getActionBars();
+//		final IActionBars actionBars = getViewSite().getActionBars();
 
 		/*
 		 * Fill view menu
 		 */
-		final IMenuManager menuMgr = actionBars.getMenuManager();
-
-		menuMgr.add(new Separator());
-		menuMgr.add(_actionModifyColumns);
+//		final IMenuManager menuMgr = actionBars.getMenuManager();
+//
+//		menuMgr.add(new Separator());
+//		menuMgr.add(_actionModifyColumns);
 
 		/*
 		 * Fill view toolbar
@@ -884,10 +886,10 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 			selectedTourMarker.add((TourMarker) iterator.next());
 		}
 
-		TourManager.fireEventWithCustomData(//
-				TourEventId.MARKER_SELECTION,
-				new SelectionTourMarker(_tourData, selectedTourMarker),
-				getSite().getPart());
+//		TourManager.fireEventWithCustomData(//
+//				TourEventId.MARKER_SELECTION,
+//				new SelectionTourMarker(_tourData, selectedTourMarker),
+//				getSite().getPart());
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
@@ -1026,7 +1028,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 		_columnManager.saveState(_state);
 	}
 
-	@Override
+	@Focus
 	public void setFocus() {
 
 		_markerViewer.getTable().setFocus();
@@ -1061,7 +1063,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 	@Override
 	public void updateColumnHeader(final ColumnDefinition colDef) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	private void updateUI_MarkerViewer() {

@@ -1522,13 +1522,15 @@ THIS IS NOT YET FULLY IMPLEMENTED
 	            id="net.tourbook.views.TourDataEditorView"
 	            name="%command_view_tourEditor">
 	      </view>
-	      <view
-	            category="net.tourbook.category.tour"
-	            class="net.tourbook.ui.views.tourMarker.TourMarkerView"
-	            icon="icons/tour-marker.png"
-	            id="net.tourbook.views.TourMarkerView"
-	            name="%view_name_Marker">
-	      </view>
+
+	      <e4view
+             category="net.tourbook.category.tour"
+             class="net.tourbook.ui.views.tourMarker.TourMarkerView"
+             icon="icons/tour-marker.png"
+             id="net.tourbook.views.TourMarkerView"
+             name="%view_name_Marker"
+             restorable="true"
+			/>
 	 
 	      <view
 	            category="net.tourbook.category.tour"
