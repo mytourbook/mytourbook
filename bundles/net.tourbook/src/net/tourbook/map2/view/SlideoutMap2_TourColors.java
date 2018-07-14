@@ -15,13 +15,6 @@
  *******************************************************************************/
 package net.tourbook.map2.view;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.color.MapGraphId;
-import net.tourbook.common.font.MTFont;
-import net.tourbook.common.tooltip.ToolbarSlideout;
-import net.tourbook.common.util.Util;
-
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -35,6 +28,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
+
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.color.MapGraphId;
+import net.tourbook.common.font.MTFont;
+import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.common.util.Util;
 
 /**
  * Slideout for the map2 tour colors
@@ -246,12 +246,13 @@ public class SlideoutMap2_TourColors extends ToolbarSlideout {
 
 // SET_FORMATTING_OFF
 		
-		_state.put(Map2View.STATE_IS_SHOW_IN_TOOLBAR_ALTITUDE, 		Map2View.STATE_IS_SHOW_IN_TOOLBAR_ALTITUDE_DEFAULT);
-		_state.put(Map2View.STATE_IS_SHOW_IN_TOOLBAR_GRADIENT, 		Map2View.STATE_IS_SHOW_IN_TOOLBAR_GRADIENT_DEFAULT);
-		_state.put(Map2View.STATE_IS_SHOW_IN_TOOLBAR_HR_ZONE,		Map2View.STATE_IS_SHOW_IN_TOOLBAR_HR_ZONE_DEFAULT);
-		_state.put(Map2View.STATE_IS_SHOW_IN_TOOLBAR_PACE, 			Map2View.STATE_IS_SHOW_IN_TOOLBAR_PACE_DEFAULT);
-		_state.put(Map2View.STATE_IS_SHOW_IN_TOOLBAR_PULSE, 		Map2View.STATE_IS_SHOW_IN_TOOLBAR_PULSE_DEFAULT);
-		_state.put(Map2View.STATE_IS_SHOW_IN_TOOLBAR_SPEED, 		Map2View.STATE_IS_SHOW_IN_TOOLBAR_SPEED_DEFAULT);
+		_state.put(Map2View.STATE_IS_SHOW_IN_TOOLBAR_ALTITUDE, 				Map2View.STATE_IS_SHOW_IN_TOOLBAR_ALTITUDE_DEFAULT);
+		_state.put(Map2View.STATE_IS_SHOW_IN_TOOLBAR_GRADIENT, 				Map2View.STATE_IS_SHOW_IN_TOOLBAR_GRADIENT_DEFAULT);
+		_state.put(Map2View.STATE_IS_SHOW_IN_TOOLBAR_HR_ZONE,				Map2View.STATE_IS_SHOW_IN_TOOLBAR_HR_ZONE_DEFAULT);
+		_state.put(Map2View.STATE_IS_SHOW_IN_TOOLBAR_PACE, 					Map2View.STATE_IS_SHOW_IN_TOOLBAR_PACE_DEFAULT);
+		_state.put(Map2View.STATE_IS_SHOW_IN_TOOLBAR_PULSE, 				Map2View.STATE_IS_SHOW_IN_TOOLBAR_PULSE_DEFAULT);
+		_state.put(Map2View.STATE_IS_SHOW_IN_TOOLBAR_RUN_DYN_STEP_LENGTH,	Map2View.STATE_IS_SHOW_IN_TOOLBAR_RUN_DYN_STEP_LENGTH_DEFAULT);
+		_state.put(Map2View.STATE_IS_SHOW_IN_TOOLBAR_SPEED, 				Map2View.STATE_IS_SHOW_IN_TOOLBAR_SPEED_DEFAULT);
 		
 // SET_FORMATTING_ON
 
