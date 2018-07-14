@@ -21,28 +21,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
-import net.tourbook.common.action.ActionOpenPrefDialog;
-import net.tourbook.common.form.SashLeftFixedForm;
-import net.tourbook.common.tooltip.AdvancedSlideout;
-import net.tourbook.common.util.ITreeViewer;
-import net.tourbook.common.util.TreeViewerItem;
-import net.tourbook.common.util.Util;
-import net.tourbook.data.TourTag;
-import net.tourbook.data.TourTagCategory;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.preferences.PrefPageTags;
-import net.tourbook.tag.TVIPrefTag;
-import net.tourbook.tag.TVIPrefTagCategory;
-import net.tourbook.tag.TVIPrefTagRoot;
-import net.tourbook.tour.ITourEventListener;
-import net.tourbook.tour.TourEventId;
-import net.tourbook.tour.TourManager;
-import net.tourbook.ui.action.ActionCollapseAll;
-import net.tourbook.ui.action.ActionExpandAll;
-
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -112,6 +90,28 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
+
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
+import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.form.SashLeftFixedForm;
+import net.tourbook.common.tooltip.AdvancedSlideout;
+import net.tourbook.common.util.ITreeViewer;
+import net.tourbook.common.util.TreeViewerItem;
+import net.tourbook.common.util.Util;
+import net.tourbook.data.TourTag;
+import net.tourbook.data.TourTagCategory;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.PrefPageTags;
+import net.tourbook.tag.TVIPrefTag;
+import net.tourbook.tag.TVIPrefTagCategory;
+import net.tourbook.tag.TVIPrefTagRoot;
+import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
+import net.tourbook.ui.action.ActionCollapseAll;
+import net.tourbook.ui.action.ActionExpandAll;
 
 /**
  * Slideout for the tour tag filter
@@ -1046,7 +1046,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 		TreeColumn tvcColumn;
 
 		// column: tags + tag categories
-		tvc = new TreeViewerColumn(_tagViewer, SWT.TRAIL);
+		tvc = new TreeViewerColumn(_tagViewer, SWT.LEAD);
 		tvcColumn = tvc.getColumn();
 		tvc.setLabelProvider(new StyledCellLabelProvider() {
 			@Override
