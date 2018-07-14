@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,11 +14,6 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.views.calendar;
-
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
-import net.tourbook.common.tooltip.IOpeningDialog;
 
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.swt.SWT;
@@ -35,6 +30,11 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
+import net.tourbook.common.tooltip.IOpeningDialog;
+
 public class ActionTourInfo extends ContributionItem implements IOpeningDialog {
 
 	private static final String	IMAGE_TOUR_INFO				= Messages.Image__TourInfo;
@@ -49,7 +49,7 @@ public class ActionTourInfo extends ContributionItem implements IOpeningDialog {
 
 	private SlideoutTourInfo	_slideoutTourInfo;
 
-	private Boolean				_isSelected;
+	private Boolean				_stateIsSelected;
 
 	/*
 	 * UI controls
@@ -93,8 +93,8 @@ public class ActionTourInfo extends ContributionItem implements IOpeningDialog {
 				}
 			});
 
-			if (_isSelected != null) {
-				_actionToolItem.setSelection(_isSelected);
+			if (_stateIsSelected != null) {
+				_actionToolItem.setSelection(_stateIsSelected);
 			}
 
 			toolbar.addMouseMoveListener(new MouseMoveListener() {
@@ -125,16 +125,16 @@ public class ActionTourInfo extends ContributionItem implements IOpeningDialog {
 	}
 
 	boolean isChecked() {
-		return _actionToolItem.getSelection();
+		return _stateIsSelected;
 	}
 
 	private void onAction() {
 
 		updateUI();
 
-		final boolean isTourInfoVisible = _actionToolItem.getSelection();
+		_stateIsSelected = _actionToolItem.getSelection();
 
-		if (isTourInfoVisible) {
+		if (_stateIsSelected) {
 
 			final Rectangle itemBounds = _actionToolItem.getBounds();
 
@@ -158,7 +158,7 @@ public class ActionTourInfo extends ContributionItem implements IOpeningDialog {
 			return;
 		}
 
-		if (_actionToolItem.getSelection() == false || _actionToolItem.isEnabled() == false) {
+		if (_stateIsSelected == false || _actionToolItem.isEnabled() == false) {
 
 			// marker is not displayed
 
@@ -194,7 +194,7 @@ public class ActionTourInfo extends ContributionItem implements IOpeningDialog {
 
 		_actionToolItem.setEnabled(isEnabled);
 
-		if (isEnabled && _actionToolItem.getSelection() == false) {
+		if (isEnabled && _stateIsSelected == false) {
 
 			// show default icon
 			_actionToolItem.setImage(_imageEnabled);
@@ -207,7 +207,7 @@ public class ActionTourInfo extends ContributionItem implements IOpeningDialog {
 
 			// this happened
 
-			_isSelected = isSelected;
+			_stateIsSelected = isSelected;
 
 			return;
 		}
@@ -219,7 +219,7 @@ public class ActionTourInfo extends ContributionItem implements IOpeningDialog {
 
 	private void updateUI() {
 
-		if (_actionToolItem.getSelection()) {
+		if (_stateIsSelected) {
 
 			// hide tooltip because the tour info options slideout is displayed
 

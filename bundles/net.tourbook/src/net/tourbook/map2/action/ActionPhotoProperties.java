@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,13 +14,6 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.map2.action;
-
-import net.tourbook.common.UI;
-import net.tourbook.common.util.Util;
-import net.tourbook.map2.Messages;
-import net.tourbook.map2.view.Map2View;
-import net.tourbook.map2.view.MapFilterData;
-import net.tourbook.tour.photo.DialogPhotoProperties;
 
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -38,9 +31,16 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
+import net.tourbook.common.UI;
+import net.tourbook.common.util.Util;
+import net.tourbook.map2.Messages;
+import net.tourbook.map2.view.Map2View;
+import net.tourbook.map2.view.MapFilterData;
+import net.tourbook.tour.photo.DialogPhotoProperties;
+
 public class ActionPhotoProperties extends ContributionItem {
 
-	private static final String		ID								= "ACTION_PHOTO_FILTER_ID";		//$NON-NLS-1$
+	private static final String		ID								= "ACTION_PHOTO_FILTER_ID";			//$NON-NLS-1$
 
 	private static final String		STATE_IS_PHOTO_FILTER_ACTIVE	= "STATE_IS_PHOTO_FILTER_ACTIVE";	//$NON-NLS-1$
 
@@ -51,7 +51,9 @@ public class ActionPhotoProperties extends ContributionItem {
 	private ToolBar					_toolBar;
 
 	private ToolItem				_actionToolItem;
+
 	private IDialogSettings			_state;
+	private boolean					_stateIsFilterActive;
 
 	/*
 	 * UI controls
@@ -95,6 +97,7 @@ public class ActionPhotoProperties extends ContributionItem {
 		if (_actionToolItem == null && toolbar != null) {
 
 			toolbar.addDisposeListener(new DisposeListener() {
+				@Override
 				public void widgetDisposed(final DisposeEvent e) {
 					//toolItem.getImage().dispose();
 					_actionToolItem.dispose();
@@ -118,6 +121,7 @@ public class ActionPhotoProperties extends ContributionItem {
 			});
 
 			toolbar.addMouseMoveListener(new MouseMoveListener() {
+				@Override
 				public void mouseMove(final MouseEvent e) {
 
 					final Point mousePosition = new Point(e.x, e.y);
@@ -143,9 +147,9 @@ public class ActionPhotoProperties extends ContributionItem {
 
 		updateUI();
 
-		final boolean isFilterActive = _actionToolItem.getSelection();
+		_stateIsFilterActive = _actionToolItem.getSelection();
 
-		if (isFilterActive) {
+		if (_stateIsFilterActive) {
 
 			final Rectangle itemBounds = _actionToolItem.getBounds();
 
@@ -161,12 +165,12 @@ public class ActionPhotoProperties extends ContributionItem {
 			_photoProperties.close();
 		}
 
-		_mapView.actionPhotoProperties(isFilterActive);
+		_mapView.actionPhotoProperties(_stateIsFilterActive);
 	}
 
 	private void onMouseMove(final ToolItem item, final MouseEvent mouseEvent) {
 
-		if (_actionToolItem.getSelection() == false || _actionToolItem.isEnabled() == false) {
+		if (_stateIsFilterActive == false || _actionToolItem.isEnabled() == false) {
 
 			// filter is not active
 
@@ -201,15 +205,15 @@ public class ActionPhotoProperties extends ContributionItem {
 
 	public void restoreState() {
 
-		final boolean isFilterActive = Util.getStateBoolean(_state, STATE_IS_PHOTO_FILTER_ACTIVE, false);
+		_stateIsFilterActive = Util.getStateBoolean(_state, STATE_IS_PHOTO_FILTER_ACTIVE, false);
 
-		_actionToolItem.setSelection(isFilterActive);
+		_actionToolItem.setSelection(_stateIsFilterActive);
 
 		_photoProperties.restoreState();
 
 		updateUI();
 
-		_mapView.actionPhotoProperties(isFilterActive);
+		_mapView.actionPhotoProperties(_stateIsFilterActive);
 
 		// update AFTER photo filter is activated
 //		updateUI_FotoFilterStats();
@@ -217,7 +221,7 @@ public class ActionPhotoProperties extends ContributionItem {
 
 	public void saveState() {
 
-		_state.put(STATE_IS_PHOTO_FILTER_ACTIVE, _actionToolItem.getSelection());
+		_state.put(STATE_IS_PHOTO_FILTER_ACTIVE, _stateIsFilterActive);
 
 		_photoProperties.saveState();
 	}
@@ -226,7 +230,7 @@ public class ActionPhotoProperties extends ContributionItem {
 
 		_actionToolItem.setEnabled(isEnabled);
 
-		if (isEnabled && _actionToolItem.getSelection() == false) {
+		if (isEnabled && _stateIsFilterActive == false) {
 
 			// show default icon
 			_actionToolItem.setImage(_imageEnabled);
@@ -235,7 +239,7 @@ public class ActionPhotoProperties extends ContributionItem {
 
 	private void updateUI() {
 
-		if (_actionToolItem.getSelection()) {
+		if (_stateIsFilterActive) {
 
 			// hide tooltip because the photo filter is displayed
 

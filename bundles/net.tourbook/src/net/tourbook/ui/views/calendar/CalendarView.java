@@ -88,6 +88,8 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 	
 	private final IPreferenceStore	_prefStore								= TourbookPlugin.getPrefStore();
 	private final IDialogSettings	_state									= TourbookPlugin.getState("TourCalendarView");		//$NON-NLS-1$
+	private boolean					_stateIsLinked;
+	private boolean					_stateIsShowTourInfo;
 	
 	ColorDefinition[]				_allColorDefinition						= GraphColorManager.getInstance().getGraphColorDefinitions();
 	
@@ -320,7 +322,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 			_actionSetLinked = new Action(null, Action.AS_CHECK_BOX) {
 				@Override
 				public void run() {
-					_calendarGraph.setLinked(_actionSetLinked.isChecked());
+					_calendarGraph.setLinked(_stateIsLinked);
 				}
 			};
 			_actionSetLinked.setText(Messages.Calendar_View_Action_LinkWithOtherViews);
@@ -581,7 +583,9 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 
 			if (newTourId != oldTourId) {
 
-				if (_actionSetLinked.isChecked()) {
+				_stateIsLinked = _actionSetLinked.isChecked();
+
+				if (_stateIsLinked) {
 					_calendarGraph.gotoTour_Id(newTourId);
 				} else {
 					_calendarGraph.removeSelection();
@@ -638,8 +642,11 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 
 	private void restoreState() {
 
-		_actionSetLinked.setChecked(Util.getStateBoolean(_state, STATE_IS_LINKED, false));
-		_actionTourInfo.setSelected(Util.getStateBoolean(_state, STATE_IS_SHOW_TOUR_INFO, true));
+		_stateIsLinked = Util.getStateBoolean(_state, STATE_IS_LINKED, false);
+		_stateIsShowTourInfo = Util.getStateBoolean(_state, STATE_IS_SHOW_TOUR_INFO, true);
+
+		_actionSetLinked.setChecked(_stateIsLinked);
+		_actionTourInfo.setSelected(_stateIsShowTourInfo);
 
 		final long epochDay = Util.getStateLong(_state, STATE_FIRST_DISPLAYED_EPOCH_DAY, Long.MIN_VALUE);
 		if (epochDay == Long.MIN_VALUE) {
@@ -663,7 +670,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 
 	private void saveState() {
 
-		_state.put(STATE_IS_LINKED, _actionSetLinked.isChecked());
+		_state.put(STATE_IS_LINKED, _stateIsLinked);
 		_state.put(STATE_IS_SHOW_TOUR_INFO, _actionTourInfo.isChecked());
 
 		// save current date displayed
