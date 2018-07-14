@@ -2068,9 +2068,18 @@ THIS IS NOT YET FULLY IMPLEMENTED
 			id="net.tourbook.map.bookmark.MapBookmarkView"
 			name="%View_Name_MapBookmark"
 		/>
-   
+
 	</extension>
-   
-   
+
+	<extension
+		id="net.tourbook.fragment"
+		point="org.eclipse.e4.workbench.model">
+		
+		<fragment
+			uri="fragment.e4xmi">
+		</fragment>
+	</extension>
+
+
 </plugin>
 
