@@ -3,26 +3,26 @@
 
 <product 
 
-	version				="18.7.0.qualifier" 
+	version="18.7.0.qualifier" 
 
-	name				="MyTourbook Product" 
-	id					="net.tourbook.product" 
-	uid					="net.tourbook.product" 
-	application			="net.tourbook.application" 
-	useFeatures			="true" 
-	includeLaunchers	="true"
+	name="MyTourbook Product" 
+	id="net.tourbook.product" 
+	uid="net.tourbook.product" 
+	application="net.tourbook.application" 
+	
+	useFeatures="true" 
+	includeLaunchers="true"
 >
 
-	<aboutInfo>
-		<image path="../../bundles/net.tourbook/icons/application/tourbook-about.png"/>
-		<text>%Product_about</text>
-	</aboutInfo>
+   <aboutInfo>
+      <image path="../../bundles/net.tourbook/icons/application/tourbook-about.png"/>
+      <text>%Product_about</text>
+   </aboutInfo>
 
-	<configIni use="default">
-
-		<linux>config-linux.ini</linux>
-		<macosx>config-osx.ini</macosx>
-		<solaris>config-linux.ini</solaris>
+   <configIni use="default">
+      <linux>config-linux.ini</linux>
+      <macosx>config-osx.ini</macosx>
+      <solaris>config-linux.ini</solaris>
 
 <!--	
 		PRODUCTION	
@@ -47,8 +47,7 @@
 		<win32>config-win-DEBUG.ini</win32>
 -->
 
-
-	</configIni>
+   </configIni>
 
    <launcherArgs>
       <vmArgs>-Xmx1024m</vmArgs>
@@ -56,24 +55,22 @@
    </launcherArgs>
 
    <windowImages 
-   		i16		="../../bundles/net.tourbook/icons/application/tourbook16.png" 
-   		i32		="../../bundles/net.tourbook/icons/application/tourbook32.png" 
-   		i48		="../../bundles/net.tourbook/icons/application/tourbook48.png" 
-   		i64		="../../bundles/net.tourbook/icons/application/tourbook64.png" 
-   		i128	="../../bundles/net.tourbook/icons/application/tourbook128.png"
+   		i16="../../bundles/net.tourbook/icons/application/tourbook16.png" 
+   		i32="../../bundles/net.tourbook/icons/application/tourbook32.png" 
+   		i48="../../bundles/net.tourbook/icons/application/tourbook48.png" 
+   		i64="../../bundles/net.tourbook/icons/application/tourbook64.png" 
+   		i128="../../bundles/net.tourbook/icons/application/tourbook128.png"
    	/>
 
    <splash
       location					="net.tourbook"
       startupProgressRect		="5,131,390,10"
       startupMessageRect		="5,116,390,15"
-      startupForegroundColor	="FFFFFF"
+      startupForegroundColor	="FFFFFF" 
    />
-      
    <launcher name="mytourbook">
       <linux icon			="../../bundles/net.tourbook/icons/application/linux/tourbook48-32.xpm"/>
       <macosx icon			="../../bundles/net.tourbook/icons/application/mac/tourbook128.icns"/>
-      <solaris/>
       <win useIco="false">
          <bmp
             winSmallHigh	="../../bundles/net.tourbook/icons/application/win/tourbook16-32.bmp"
@@ -90,20 +87,22 @@
    </plugins>
 
    <features>
-      <feature id="org.eclipse.rcp"							installMode="root"/>
-      <feature id="feature.net.tourbook.ext.eclipse"		installMode="root"/>
-      <feature id="feature.net.tourbook.ext.eclipse.nl"		installMode="root"/>
-      
-      <feature id="feature.net.tourbook.ext.derby"			installMode="root"/>
-      <feature id="feature.net.tourbook.ext.ejb3"			installMode="root"/>
-      <feature id="feature.net.tourbook.ext.jars"			installMode="root"/>
-      <feature id="feature.net.tourbook.ext.rxtx"			installMode="root"/>
-      <feature id="feature.net.tourbook.ext.vtm"			installMode="root"/>
-      <feature id="feature.net.tourbook.ext.worldwind"		installMode="root"/>
-      
-      <feature id="feature.net.tourbook.app"				installMode="root"/>
-      <feature id="feature.net.tourbook.app.nl"				installMode="root"/>
-      <feature id="feature.net.tourbook.app.version"/>
+      <feature id="org.eclipse.e4.rcp"/>
+      <feature id="org.eclipse.emf.ecore"/>
+      <feature id="org.eclipse.emf.common"/>
+
+      <feature id="feature.net.tourbook.ext.eclipse" 		installMode="root"/>
+      <feature id="feature.net.tourbook.ext.eclipse.nl" 	installMode="root"/>
+      <feature id="feature.net.tourbook.ext.derby" 			installMode="root"/>
+      <feature id="feature.net.tourbook.ext.ejb3" 			installMode="root"/>
+      <feature id="feature.net.tourbook.ext.jars" 			installMode="root"/>
+      <feature id="feature.net.tourbook.ext.rxtx" 			installMode="root"/>
+      <feature id="feature.net.tourbook.ext.vtm" 			installMode="root"/>
+      <feature id="feature.net.tourbook.ext.worldwind" 		installMode="root"/>
+
+      <feature id="feature.net.tourbook.app" 				installMode="root"/>
+      <feature id="feature.net.tourbook.app.nl" 			installMode="root"/>
+      <feature id="feature.net.tourbook.app.				version"/>
    </features>
 
    <configurations>
