@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -39,26 +39,27 @@ public class TileInfoContribution extends WorkbenchWindowControlContribution {
 	private Display				_display;
 	private TileInfoControl		_infoWidget;
 
-	private int					_statIsQueued;
+	private int						_statIsQueued;
 
-	private int					_statErrorLoading;
-	private int					_statStartLoading;
-	private int					_statEndLoading;
+	private int						_statErrorLoading;
+	private int						_statStartLoading;
+	private int						_statEndLoading;
 
-	private int					_statErrorPaintingSRTM;
-	private int					_statEndPaintingSRTM;
-	private int					_statStartPaintingSRTM;
+	private int						_statErrorPaintingSRTM;
+	private int						_statEndPaintingSRTM;
+	private int						_statStartPaintingSRTM;
 
-	private int					_statStartSRTM;
-	private int					_statEndSRTM;
-	private int					_statErrorSRTM;
+	private int						_statStartSRTM;
+	private int						_statEndSRTM;
+	private int						_statErrorSRTM;
 
-	private String				_srtmRemoteName;
-	private long				_srtmReceivedBytes;
+	private String					_srtmRemoteName;
+	private long					_srtmReceivedBytes;
 
 	private final Runnable		_updateRunnable;
 	{
 		_updateRunnable = new Runnable() {
+			@Override
 			public void run() {
 
 				if (_infoWidget == null || _infoWidget.isDisposed()) {
@@ -106,6 +107,7 @@ public class TileInfoContribution extends WorkbenchWindowControlContribution {
 		final MenuManager menuMgr = new MenuManager();
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
 			public void menuAboutToShow(final IMenuManager menuMgr) {
 				fillMenu(menuMgr);
 			}
@@ -118,6 +120,9 @@ public class TileInfoContribution extends WorkbenchWindowControlContribution {
 	@Override
 	protected Control createControl(final Composite parent) {
 
+		// see https://bugs.eclipse.org/bugs/show_bug.cgi?id=471313
+		parent.getParent().setRedraw(true);
+
 		if (_tileInfoManager == null) {
 			_tileInfoManager = TileInfoManager.getInstance();
 			_tileInfoManager.setTileInfoContribution(this);
@@ -125,6 +130,7 @@ public class TileInfoContribution extends WorkbenchWindowControlContribution {
 
 		_display = parent.getDisplay();
 		_display.asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				if (_infoWidget != null && _infoWidget.isDisposed() == false) {
 					_display.timerExec(UPDATE_INTERVAL, _updateRunnable);
@@ -145,6 +151,13 @@ public class TileInfoContribution extends WorkbenchWindowControlContribution {
 
 	private void fillMenu(final IMenuManager menuMgr) {
 		menuMgr.add(new ActionClearStatistics(this));
+	}
+
+	@Override
+	public boolean isDynamic() {
+
+		// see https://bugs.eclipse.org/bugs/show_bug.cgi?id=471313
+		return true;
 	}
 
 	public void updateInfo(final TileEventId tileEventId) {
@@ -265,10 +278,11 @@ public class TileInfoContribution extends WorkbenchWindowControlContribution {
 
 			} else {
 
-				_infoWidget.updateInfo(NLS.bind(Messages.TileInfo_Control_Statistics_DownloadData, new Object[] {
-						Integer.toString(_statIsQueued % 1000),
-						_srtmRemoteName,
-						Long.toString(_srtmReceivedBytes) }));
+				_infoWidget.updateInfo(NLS.bind(Messages.TileInfo_Control_Statistics_DownloadData,
+						new Object[] {
+								Integer.toString(_statIsQueued % 1000),
+								_srtmRemoteName,
+								Long.toString(_srtmReceivedBytes) }));
 			}
 
 			return;
@@ -290,7 +304,7 @@ public class TileInfoContribution extends WorkbenchWindowControlContribution {
 		} else {
 
 			// show only truncated decimals
-			_infoWidget.updateInfo(//
+			_infoWidget.updateInfo(
 					Integer.toString(_statIsQueued % 100000),
 					Integer.toString(_statErrorLoading % 10000),
 					Integer.toString(_statEndLoading % 100000),
