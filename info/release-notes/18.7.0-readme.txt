@@ -1,70 +1,123 @@
-Version 18.7.0                                             ?. July 2018
+Version 18.7.0                                                     21. July 2018
+
 
 New
-===
+===	
 
-* Running Dynamics with these features:
+* Running Dynamics
+    
+   What is Running Dynamics ? 2 months ago, I didn't know about it, 
+   this feature was requested 
+   https://sourceforge.net/p/mytourbook/discussion/622811/thread/762cef2c/
+   
+   Some links where you can find more info
+   
+   - http://fellrnr.com/wiki/Running_Dynamics
+   - https://www8.garmin.com/...
+   - https://www.dcrainmaker.com/...
+   
+   
+   If you are a runner then you may be interested in these new features but 
+   there are also some other improvements / changes in this version.
+   
+    
+   These features are implemented for running dynamics:
+   
+   Tour Import
+   -----------
+    - Import running dynamics data from .fit files
+    
+   Tour Book view
+   --------------
+    - 15 new columns, min/max/average for
+      - Stance time
+      - Stance time balance
+      - Step length
+      - Vertical oscillation
+      - Vertical ratio
+   
+    - Reimport Only Running Dynamics Values...
+      to import running dynamics values for already saved tours
+   
+   Tour Chart
+   ----------
+    - 5 new graphs
+    - Set graph min/max values
+    - Set as default graph
+    - Show in value point tooltip
+   
+   Tour Analyzer
+   -------------
+    - Show data for all 5 graphs
+   
+   2D Map
+   ------
+    - Show tour with Step Length colors
+   
+   All
+   ---
+    - Support metric/imperial measurement
 
- - Tour Import 
-   - Import from .fit files
  
- - Tour Book view
-   - 15 new columns
-   - Reimport "Only Running Dynamics Values..."
-   
- - Tour Chart 
-   - 5 new graphs
-   - Set graph min/max values
-   - Set as default graph
-   - Show in value point tooltip
-   
- - Tour Analyzer + Tour Info Tooltip
-   - Show data for all 5 graphs
-   
- - 2D Map
-   -  Show tour with "Step Length" colors
- 
- - Support metric/imperial measurement
-
-
 Improvements
-============
+============	
 
-* Tour Book 
-  
-  - Summary (totals) row 
-  
-  
-* Tour Analyzer 
-  
-  - Optimized performance by reducing paint events -> Moving the chart slider is now more smoothly
+* Tour Book
+  - Summary (totals) row, in combination with the tour app filters it is now 
+    easy to get the desired totals.
+ 
 
-
-Modifications
+Tour Analyzer
 =============
+
+* Optimized performance by reducing paint events -> Moving the chart slider is 
+  now more smoothly
+
+ 
+
+Changes
+=======	
 
 * Tour Chart
 
-  - The graph title is now displayed above the graph and not vertically at the y-axis, is better readable and will not disappear when there is no space
-  
-  
-* Tour Analyzer 
+  - The graph title is now displayed above the graph and not vertically at the 
+    y-axis, this is better readable and the title will not disappear when there 
+    is no space.
+    This was necessary to display the longer titles for running dynamics.
+
+* Tour Analyzer
 
   - The altitude average value will show now these values:
-  	Summarized up values, when it is 0, then the summarized down values are displayed
-  	
+    Summarized altitude up values, when it is 0, then the summarized down values
+    are displayed
 
-Bugfix
+ 
+Bugfix 	
 ======
 
 * Map 2D
 
-  - Map was not centered with the tour the first time, only by the second time
-  
+  - Map was not centered with the tour the first time, only the second time
+
+* Statistics
+
+  - Cleanup + disable tour type combo box when there are no tours
+
  
-Translation 	
-===========
+* Translation 	
 
   - Italian (Doriano Cometto)
-  - German
-  
+    German
+
+    
+System 	
+======
+
+This release will be the last which is using the Eclipse 3 platform. The next 
+version is based on Eclipse 4.
+
+The first tries when using E4 looked very promising, after fixing 10 internal 
+methods, it was mostly running.
+
+After digging deeper the more problems occured, so it will be not be ready in 
+the next few days.

@@ -1000,12 +1000,12 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
 		if (statContext.outIsBarReorderingSupported) {
 
+			_comboBarVerticalOrder.setVisible(true);
+
 			updateStatistic_30_BarOrdering(statContext);
 
 			// vertical order feature is used
 			_isVerticalOrderDisabled = false;
-
-			_comboBarVerticalOrder.setVisible(true);
 
 		} else {
 
@@ -1027,17 +1027,18 @@ public class StatisticView extends ViewPart implements ITourProvider {
 			return;
 		}
 
+		_comboBarVerticalOrder.removeAll();
+
 		final String[] stackedNames = statContext.outBarNames;
 
 		// hide combo when bars are not available
 		if (stackedNames == null) {
-			_comboBarVerticalOrder.setVisible(false);
+
+			_comboBarVerticalOrder.setEnabled(false);
 			_isVerticalOrderDisabled = true;
 
 			return;
 		}
-
-		_comboBarVerticalOrder.removeAll();
 
 		for (final String name : stackedNames) {
 			_comboBarVerticalOrder.add(name);
