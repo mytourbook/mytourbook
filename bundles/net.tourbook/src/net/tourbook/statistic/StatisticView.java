@@ -24,27 +24,6 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.CommonActivator;
-import net.tourbook.common.preferences.ICommonPreferences;
-import net.tourbook.common.tooltip.ActionToolbarSlideout;
-import net.tourbook.common.tooltip.ToolbarSlideout;
-import net.tourbook.common.util.Util;
-import net.tourbook.data.TourData;
-import net.tourbook.data.TourPerson;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.ITourEventListener;
-import net.tourbook.tour.SelectionDeletedTours;
-import net.tourbook.tour.TourEvent;
-import net.tourbook.tour.TourEventId;
-import net.tourbook.tour.TourManager;
-import net.tourbook.ui.ITourProvider;
-import net.tourbook.ui.SQLFilter;
-import net.tourbook.ui.TourTypeFilter;
-import net.tourbook.ui.UI;
-
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -69,43 +48,64 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.preferences.ICommonPreferences;
+import net.tourbook.common.tooltip.ActionToolbarSlideout;
+import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.common.util.Util;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourPerson;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.SelectionDeletedTours;
+import net.tourbook.tour.TourEvent;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
+import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.SQLFilter;
+import net.tourbook.ui.TourTypeFilter;
+import net.tourbook.ui.UI;
+
 public class StatisticView extends ViewPart implements ITourProvider {
 
-	public static final String				ID							= "net.tourbook.statistic.StatisticView";			//$NON-NLS-1$
+	public static final String					ID									= "net.tourbook.statistic.StatisticView";				//$NON-NLS-1$
 
-	private static final String				COMBO_MINIMUM_WIDTH			= "1234567890";										//$NON-NLS-1$
-	private static final String				COMBO_MAXIMUM_WIDTH			= "123456789012345678901234567890";					//$NON-NLS-1$
+	private static final String				COMBO_MINIMUM_WIDTH			= "1234567890";												//$NON-NLS-1$
+	private static final String				COMBO_MAXIMUM_WIDTH			= "123456789012345678901234567890";						//$NON-NLS-1$
 
 	private static final String				STATE_SELECTED_STATISTIC	= "statistic.container.selected_statistic";			//$NON-NLS-1$
-	private static final String				STATE_SELECTED_YEAR			= "statistic.container.selected-year";				//$NON-NLS-1$
-	private static final String				STATE_NUMBER_OF_YEARS		= "statistic.container.number_of_years";			//$NON-NLS-1$
+	private static final String				STATE_SELECTED_YEAR			= "statistic.container.selected-year";					//$NON-NLS-1$
+	private static final String				STATE_NUMBER_OF_YEARS		= "statistic.container.number_of_years";				//$NON-NLS-1$
 
-	private static final char				NL							= net.tourbook.common.UI.NEW_LINE;
+	private static final char					NL									= net.tourbook.common.UI.NEW_LINE;
 
-	private static final boolean			_isOSX						= net.tourbook.common.UI.IS_OSX;
-	private static final boolean			_isLinux					= net.tourbook.common.UI.IS_LINUX;
+	private static final boolean				_isOSX							= net.tourbook.common.UI.IS_OSX;
+	private static final boolean				_isLinux							= net.tourbook.common.UI.IS_LINUX;
 
-	private final IPreferenceStore			_prefStore					= TourbookPlugin.getPrefStore();
-	private final IPreferenceStore			_prefStoreCommon			= CommonActivator.getPrefStore();
-	private final IDialogSettings			_state						= TourbookPlugin.getState("TourStatisticsView");	//$NON-NLS-1$
+	private final IPreferenceStore			_prefStore						= TourbookPlugin.getPrefStore();
+	private final IPreferenceStore			_prefStoreCommon				= CommonActivator.getPrefStore();
+	private final IDialogSettings				_state							= TourbookPlugin.getState("TourStatisticsView");	//$NON-NLS-1$
 
-	private IPartListener2					_partListener;
+	private IPartListener2						_partListener;
 	private IPropertyChangeListener			_prefChangeListener;
 	private IPropertyChangeListener			_prefChangeListenerCommon;
-	private ITourEventListener				_tourEventListener;
-	private ISelectionListener				_postSelectionListener;
+	private ITourEventListener					_tourEventListener;
+	private ISelectionListener					_postSelectionListener;
 
-	private TourPerson						_activePerson;
-	private TourTypeFilter					_activeTourTypeFilter;
+	private TourPerson							_activePerson;
+	private TourTypeFilter						_activeTourTypeFilter;
 
-	private int								_selectedYear				= -1;
+	private int										_selectedYear					= -1;
 
-	private TourbookStatistic				_activeStatistic;
+	private TourbookStatistic					_activeStatistic;
 
 	/**
 	 * Contains all years which have tours for the selected tour type and person.
 	 */
-	private TIntArrayList					_availableYears;
+	private TIntArrayList						_availableYears;
 
 	/**
 	 * contains the statistics in the same sort order as the statistic combo box
@@ -113,30 +113,30 @@ public class StatisticView extends ViewPart implements ITourProvider {
 	private ArrayList<TourbookStatistic>	_allStatisticProvider;
 
 	private ActionStatisticOptions			_actionStatisticOptions;
-	private ActionSynchChartScale			_actionSynchChartScale;
+	private ActionSynchChartScale				_actionSynchChartScale;
 
-	private boolean							_isInUpdateUI;
-	private boolean							_isSynchScaleEnabled;
-	private boolean							_isVerticalOrderDisabled;
+	private boolean								_isInUpdateUI;
+	private boolean								_isSynchScaleEnabled;
+	private boolean								_isVerticalOrderDisabled;
 
-	private int								_minimumComboWidth;
-	private int								_maximumComboWidth;
+	private int										_minimumComboWidth;
+	private int										_maximumComboWidth;
 
-	private PixelConverter					_pc;
+	private PixelConverter						_pc;
 
 	/*
 	 * UI controls
 	 */
-	private Combo							_comboYear;
-	private Combo							_comboStatistics;
-	private Combo							_comboNumberOfYears;
-	private Combo							_comboBarVerticalOrder;
+	private Combo									_comboYear;
+	private Combo									_comboStatistics;
+	private Combo									_comboNumberOfYears;
+	private Combo									_comboBarVerticalOrder;
 
-	private Composite						_statContainer;
+	private Composite								_statContainer;
 
-	private PageBook						_pageBookStatistic;
+	private PageBook								_pageBookStatistic;
 
-	private SlideoutStatisticOptions		_slideoutStatisticOptions;
+	private SlideoutStatisticOptions			_slideoutStatisticOptions;
 
 	private class ActionStatisticOptions extends ActionToolbarSlideout {
 
@@ -597,7 +597,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
 		if (selectedTourData == null) {
 			return null;
 		} else {
-			final ArrayList<TourData> selectedTours = new ArrayList<TourData>();
+			final ArrayList<TourData> selectedTours = new ArrayList<>();
 			selectedTours.add(selectedTourData);
 			return selectedTours;
 		}
@@ -844,8 +844,8 @@ public class StatisticView extends ViewPart implements ITourProvider {
 		if (selectedYearIndex == -1) {
 
 			/*
-			 * the active year was not found in the combo box, it's possible that the combo box
-			 * needs to be update
+			 * the active year was not found in the combo box, it's possible that the combo box needs
+			 * to be update
 			 */
 
 			refreshYearCombobox();
@@ -914,8 +914,8 @@ public class StatisticView extends ViewPart implements ITourProvider {
 	}
 
 	/**
-	 * Update all statistics which have been created because person or tour type could be changed
-	 * and reload data.
+	 * Update all statistics which have been created because person or tour type could be changed and
+	 * reload data.
 	 * 
 	 * @param person
 	 * @param tourTypeFilter
@@ -992,12 +992,12 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
 		if (statContext.outIsBarReorderingSupported) {
 
+			_comboBarVerticalOrder.setVisible(true);
+
 			updateStatistic_30_BarOrdering(statContext);
 
 			// vertical order feature is used
 			_isVerticalOrderDisabled = false;
-
-			_comboBarVerticalOrder.setVisible(true);
 
 		} else {
 
@@ -1019,17 +1019,18 @@ public class StatisticView extends ViewPart implements ITourProvider {
 			return;
 		}
 
+		_comboBarVerticalOrder.removeAll();
+
 		final String[] stackedNames = statContext.outBarNames;
 
 		// hide combo when bars are not available
 		if (stackedNames == null) {
-			_comboBarVerticalOrder.setVisible(false);
+
+			_comboBarVerticalOrder.setEnabled(false);
 			_isVerticalOrderDisabled = true;
 
 			return;
 		}
-
-		_comboBarVerticalOrder.removeAll();
 
 		for (final String name : stackedNames) {
 			_comboBarVerticalOrder.add(name);
