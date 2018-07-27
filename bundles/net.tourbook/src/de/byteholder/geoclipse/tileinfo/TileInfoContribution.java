@@ -32,6 +32,8 @@ public class TileInfoContribution extends WorkbenchWindowControlContribution {
 
 	private static final int	UPDATE_INTERVAL	= 500;	// ms
 
+//	private static boolean		_isCreate;
+
 	private TileInfoManager		_tileInfoManager;
 
 	private boolean				_isUpdateUI;
@@ -119,6 +121,15 @@ public class TileInfoContribution extends WorkbenchWindowControlContribution {
 
 	@Override
 	protected Control createControl(final Composite parent) {
+
+//		if (_isCreate) {
+//
+//			// E4 can create this control several times :-(
+//
+//			return null;
+//		}
+//
+//		_isCreate = true;
 
 		// see https://bugs.eclipse.org/bugs/show_bug.cgi?id=471313
 		parent.getParent().setRedraw(true);

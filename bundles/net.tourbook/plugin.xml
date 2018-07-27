@@ -1523,6 +1523,7 @@ THIS IS NOT YET FULLY IMPLEMENTED
 	            name="%command_view_tourEditor">
 	      </view>
 
+			<!-- 
 	      <e4view
              category="net.tourbook.category.tour"
              class="net.tourbook.ui.views.tourMarker.TourMarkerView"
@@ -1531,6 +1532,7 @@ THIS IS NOT YET FULLY IMPLEMENTED
              name="%view_name_Marker"
              restorable="true"
 			/>
+			-->
 	 
 	      <view
 	            category="net.tourbook.category.tour"

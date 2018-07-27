@@ -27,7 +27,7 @@ import net.tourbook.ui.views.geoCompare.GeoCompareView;
 import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.ui.views.tourBook.TourBookView;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
-import net.tourbook.ui.views.tourMarker.TourMarkerView;
+import net.tourbook.ui.views.tourMarker.TourMarkerViewE4;
 
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
@@ -93,7 +93,7 @@ public class PerspectiveFactoryTourBook implements IPerspectiveFactory {
 				0.6f,
 				FOLDER_ID_LIST);
 
-		markerFolder.addView(TourMarkerView.ID);
+		markerFolder.addView(TourMarkerViewE4.ID);
 		markerFolder.addView(TourWaypointView.ID);
 		markerFolder.addPlaceholder(GeoCompareView.ID);
 	}

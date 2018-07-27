@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,21 +13,21 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views.tourMarker;
+package net.tourbook.common.e4;
 
-import net.tourbook.common.util.Util;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
-import org.eclipse.core.commands.AbstractHandler;
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
+public class E4Util {
 
-public class ActionHandlerOpenViewTourMarker extends AbstractHandler {
+	public static String getContributionURI(final Class<?> clazz) {
 
-	public Object execute(final ExecutionEvent event) throws ExecutionException {
+		final Bundle bundle = FrameworkUtil.getBundle(clazz);
 
-		Util.showView(TourMarkerViewE4.ID, true);
-
-		return null;
+		if (bundle != null) {
+			return "bundleclass://" + bundle.getSymbolicName() + "/" + clazz.getName(); //$NON-NLS-1$ //$NON-NLS-2$
+		} else {
+			return null;
+		}
 	}
-
 }

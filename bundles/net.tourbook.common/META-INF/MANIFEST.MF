@@ -2,6 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: MyTourbook Commons
 Bundle-SymbolicName: net.tourbook.common;singleton:=true
+Automatic-Module-Name: net.tourbook.common
 Bundle-Version: 18.7.0.qualifier
 Bundle-Activator: net.tourbook.common.CommonActivator
 Bundle-Vendor: MyTourbook
@@ -14,6 +15,7 @@ Export-Package: cop.swt.widgets.viewers.table.celleditors,
  net.tourbook.common,
  net.tourbook.common.action,
  net.tourbook.common.color,
+ net.tourbook.common.e4,
  net.tourbook.common.font,
  net.tourbook.common.form,
  net.tourbook.common.formatter,
