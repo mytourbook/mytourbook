@@ -1524,15 +1524,15 @@ THIS IS NOT YET FULLY IMPLEMENTED
 	      </view>
 
 			<!-- 
+			-->
 	      <e4view
              category="net.tourbook.category.tour"
-             class="net.tourbook.ui.views.tourMarker.TourMarkerView"
+             class="net.tourbook.ui.views.tourMarker.TourMarkerViewE4"
              icon="icons/tour-marker.png"
              id="net.tourbook.views.TourMarkerView"
              name="%view_name_Marker"
              restorable="true"
 			/>
-			-->
 	 
 	      <view
 	            category="net.tourbook.category.tour"

@@ -2,6 +2,9 @@
 <fragment:ModelFragments xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:advanced="http://www.eclipse.org/ui/2010/UIModel/application/ui/advanced" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:basic_1="http://www.eclipse.org/ui/2010/UIModel/application/descriptor/basic" xmlns:commands="http://www.eclipse.org/ui/2010/UIModel/application/commands" xmlns:fragment="http://www.eclipse.org/ui/2010/UIModel/fragment" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_xVj_UIeOEeidfoHLJwTP3w">
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_MurGEIf-EeifscEiKr_C-g" featurename="commands" parentElementId="org.eclipse.e4.legacy.ide.application">
     <elements xsi:type="commands:Command" xmi:id="_PEebYI2GEeiUsqQtTYPX1Q" elementId="net.tourbook.command.ActionModifyColumnsE4" commandName="Column Manager cmd"/>
+    <elements xsi:type="commands:Command" xmi:id="_teLkQJiIEeiYV6Xegvc8CA" elementId="net.tourbook.command.e4.OpenPart" commandName="Open Part (commmand)" description="open part description">
+      <parameters xmi:id="_SbMwMJi2EeiYV6Xegvc8CA" elementId="command_param.partId" name="cmd_param.partId"/>
+    </elements>
   </fragments>
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_L_HwgIeSEeidfoHLJwTP3w" featurename="snippets" parentElementId="org.eclipse.e4.legacy.ide.application">
     <elements xsi:type="advanced:Perspective" xmi:id="_RG2NYIeUEeid4qCmeJm4Ig" elementId="net.tourbook.perspective.TourBookE4" label="Tour Book E4" iconURI="platform:/plugin/net.tourbook/icons/tourbook-tours-perspective.png">
@@ -25,7 +28,7 @@
               </menus>
               <toolbar xmi:id="_4r_yEo54Eei_U4jwxVyVJg" elementId="net.tourbook.ui.views.TourBlogView.1"/>
             </children>
-            <children xsi:type="advanced:Placeholder" xmi:id="_lnVwII9OEeilm6hWlKEeKQ" elementId="net.tourbook.placeholder.0" toBeRendered="false" visible="false" ref="_P8QrII9LEeilm6hWlKEeKQ" closeable="true"/>
+            <children xsi:type="advanced:Placeholder" xmi:id="_lnVwII9OEeilm6hWlKEeKQ" elementId="net.tourbook.placeholder.0" ref="_P8QrII9LEeilm6hWlKEeKQ" closeable="true"/>
           </children>
         </children>
       </children>
@@ -33,6 +36,7 @@
   </fragments>
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_dPyJ8IpZEeivNtAIARGcHg" featurename="handlers" parentElementId="org.eclipse.e4.legacy.ide.application">
     <elements xsi:type="commands:Handler" xmi:id="_pT3gcI2GEeiUsqQtTYPX1Q" elementId="net.tourbook.handler.ActionModifyColumnsE4" contributionURI="bundleclass://net.tourbook/net.tourbook.ui.action.ActionModifyColumnsE4" command="_PEebYI2GEeiUsqQtTYPX1Q"/>
+    <elements xsi:type="commands:Handler" xmi:id="_6spwsJiIEeiYV6Xegvc8CA" elementId="net.tourbook.handler.OpenPart" contributionURI="bundleclass://net.tourbook.common/net.tourbook.common.e4.OpenPart" command="_teLkQJiIEeiYV6Xegvc8CA"/>
   </fragments>
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_8k1eQIzrEei8daiZZD94mg" featurename="descriptors" parentElementId="org.eclipse.e4.legacy.ide.application">
     <elements xsi:type="basic_1:PartDescriptor" xmi:id="_R2gFEIzsEei8daiZZD94mg" elementId="net.tourbook.partdesc.TourMarkerView.E4" label="TourMarkerView.E4" iconURI="platform:/plugin/net.tourbook/icons/tour-marker.png" category="E4 parts" closeable="true" contributionURI="bundleclass://net.tourbook/net.tourbook.ui.views.tourMarker.TourMarkerViewE4">
@@ -50,5 +54,12 @@
   </fragments>
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_E2JSUI9LEeilm6hWlKEeKQ" featurename="sharedElements" parentElementId="IDEWindow">
     <elements xsi:type="basic:Part" xmi:id="_P8QrII9LEeilm6hWlKEeKQ" elementId="net.tourbook.part.TourMarkerViewE4_shared" contributionURI="bundleclass://net.tourbook/net.tourbook.ui.views.tourMarker.TourMarkerViewE4" label="TourMarkerViewE4_shared" iconURI="platform:/plugin/net.tourbook/icons/tour-marker.png" tooltip="tooltip"/>
+  </fragments>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_K9vkIJiKEeiYV6Xegvc8CA" featurename="toolBarContributions" parentElementId="org.eclipse.e4.legacy.ide.application">
+    <elements xsi:type="menu:ToolBarContribution" xmi:id="_WuUkUJiMEeiYV6Xegvc8CA" elementId="net.tourbook.toolbarcontribution.0" parentId="mc_tb_Tour">
+      <children xsi:type="menu:HandledToolItem" xmi:id="_iF3rYJiMEeiYV6Xegvc8CA" elementId="net.tourbook.handledtoolitem.openpart" label="" tooltip="open part tooltip" command="_teLkQJiIEeiYV6Xegvc8CA">
+        <parameters xmi:id="_fRFdgJi2EeiYV6Xegvc8CA" elementId="net.tourbook.parameter.0" name="command_param.partId" value="tourBookView"/>
+      </children>
+    </elements>
   </fragments>
 </fragment:ModelFragments>
