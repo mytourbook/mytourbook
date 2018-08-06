@@ -19,14 +19,15 @@ package net.tourbook.common.e4;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 
 import net.tourbook.common.UI;
 
-public class OpenPart {
+public class OpenPartHandler {
 
 	@Execute
-	public void execute(final EPartService partService, @Named("partId") final String partId) {
+	public void execute(final EPartService partService, @Optional @Named("net.tourbook.commandparameter.partId") final String partId) {
 
 		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] execute()")
 				+ ("\tpartId: " + partId)
