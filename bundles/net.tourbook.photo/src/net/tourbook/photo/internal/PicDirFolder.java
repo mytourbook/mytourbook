@@ -23,21 +23,6 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import net.tourbook.common.UI;
-import net.tourbook.common.util.StatusUtil;
-import net.tourbook.common.util.TreeViewerItem;
-import net.tourbook.common.util.Util;
-import net.tourbook.photo.IPhotoPreferences;
-import net.tourbook.photo.ImageUtils;
-import net.tourbook.photo.PhotoCache;
-import net.tourbook.photo.PhotoImageCache;
-import net.tourbook.photo.PhotoLoadManager;
-import net.tourbook.photo.PhotoUI;
-import net.tourbook.photo.PicDirView;
-import net.tourbook.photo.internal.manager.ExifCache;
-import net.tourbook.photo.internal.manager.ThumbnailStore;
-import net.tourbook.photo.internal.preferences.PrefPagePhotoExternalApp;
-
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -89,6 +74,21 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.progress.UIJob;
 
+import net.tourbook.common.UI;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.TreeViewerItem;
+import net.tourbook.common.util.Util;
+import net.tourbook.photo.IPhotoPreferences;
+import net.tourbook.photo.ImageUtils;
+import net.tourbook.photo.PhotoCache;
+import net.tourbook.photo.PhotoImageCache;
+import net.tourbook.photo.PhotoLoadManager;
+import net.tourbook.photo.PhotoUI;
+import net.tourbook.photo.PicDirView;
+import net.tourbook.photo.internal.manager.ExifCache;
+import net.tourbook.photo.internal.manager.ThumbnailStore;
+import net.tourbook.photo.internal.preferences.PrefPagePhotoExternalApp;
+
 /**
  * This folder viewer is from org.eclipse.swt.examples.fileviewer but with many modifications.
  */
@@ -96,23 +96,24 @@ public class PicDirFolder {
 
 // SET_FORMATTING_OFF
 	
-	private static final String				MENU_ID_PIC_DIR_VIEW_IN_FOLDER			= "menu.net.tourbook.photo.PicDirView.InFolder";	//$NON-NLS-1$
+	private static final String	MENU_ID_PIC_DIR_VIEW_IN_FOLDER			= "menu.net.tourbook.photo.PicDirView.InFolder";	//$NON-NLS-1$
 
-	static String							WIN_PROGRAMFILES						= System.getenv("programfiles");					//$NON-NLS-1$
-	static String							FILE_SEPARATOR							= System.getProperty("file.separator");			//$NON-NLS-1$
+	static String						WIN_PROGRAMFILES								= System.getenv("programfiles");							//$NON-NLS-1$
+	static String						FILE_SEPARATOR									= System.getProperty("file.separator");				//$NON-NLS-1$
 
-	private static final String				STATE_SELECTED_FOLDER					= "STATE_SELECTED_FOLDER";							//$NON-NLS-1$
-	private static final String				STATE_IS_SINGLE_CLICK_EXPAND			= "STATE_IS_SINGLE_CLICK_EXPAND";					//$NON-NLS-1$
-	private static final String				STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS	= "STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS";		//$NON-NLS-1$
+	private static final String	STATE_SELECTED_FOLDER						= "STATE_SELECTED_FOLDER";									//$NON-NLS-1$
+	private static final String	STATE_IS_SINGLE_CLICK_EXPAND				= "STATE_IS_SINGLE_CLICK_EXPAND";						//$NON-NLS-1$
+	private static final String	STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS	= "STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS";			//$NON-NLS-1$
+	
+// SET_FORMATTING_ON
 
-	private static final LinkedBlockingDeque<FolderLoader>	_folderWaitingQueue		= new LinkedBlockingDeque<FolderLoader>();
+	private static final LinkedBlockingDeque<FolderLoader>	_folderWaitingQueue							= new LinkedBlockingDeque<FolderLoader>();
+
 	/**
 	 * This executer is running only in one thread because accessing the file system with multiple
 	 * thread is slowing it down.
 	 */
-	private static ThreadPoolExecutor						_folderExecutor;
-	
-// SET_FORMATTING_ON
+	private static ThreadPoolExecutor								_folderExecutor;
 
 	static {
 
@@ -135,48 +136,48 @@ public class PicDirFolder {
 		_folderExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(1, threadFactoryFolder);
 	}
 
-	private IDialogSettings						_state;
+	private IDialogSettings							_state;
 	private final IPreferenceStore				_prefStore			= Activator.getDefault().getPreferenceStore();
 
-	private PicDirView							_picDirView;
-	private PicDirImages						_picDirImages;
+	private PicDirView								_picDirView;
+	private PicDirImages								_picDirImages;
 
-	private long								_expandRunnableCounter;
+	private long										_expandRunnableCounter;
 
-	private boolean								_isExpandingSelection;
-	private boolean								_isBehaviourAutoExpandCollapse;
-	private boolean								_isBehaviourSingleExpandedOthersCollapse;
-	private boolean								_isStateShowFileFolderInFolderItem;
+	private boolean									_isExpandingSelection;
+	private boolean									_isBehaviourAutoExpandCollapse;
+	private boolean									_isBehaviourSingleExpandedOthersCollapse;
+	private boolean									_isStateShowFileFolderInFolderItem;
 
 	/**
 	 * Is true when the mouse click is for the context menu
 	 */
-	private boolean								_isMouseContextMenu;
-	private boolean								_isFromNavigationHistory;
-	private boolean								_doAutoCollapseExpand;
+	private boolean									_isMouseContextMenu;
+	private boolean									_isFromNavigationHistory;
+	private boolean									_doAutoCollapseExpand;
 
-	private TVIFolderRoot						_rootItem;
-	private TVIFolderFolder						_selectedTVIFolder;
+	private TVIFolderRoot							_rootItem;
+	private TVIFolderFolder							_selectedTVIFolder;
 
-	private FileFilter							_imageFileFilter	= ImageUtils.createImageFileFilter();
-	private File								_selectedFolder;
+	private FileFilter								_imageFileFilter	= ImageUtils.createImageFileFilter();
+	private File										_selectedFolder;
 
 	private ActionRefreshFolder					_actionRefreshFolder;
 	private ActionRunExternalAppTitle			_actionRunExternalAppTitle;
-	private ActionRunExternalApp				_actionRunExternalAppDefault;
-	private ActionRunExternalApp				_actionRunExternalApp1;
-	private ActionRunExternalApp				_actionRunExternalApp2;
-	private ActionRunExternalApp				_actionRunExternalApp3;
-	private ActionPreferences					_actionPreferences;
+	private ActionRunExternalApp					_actionRunExternalAppDefault;
+	private ActionRunExternalApp					_actionRunExternalApp1;
+	private ActionRunExternalApp					_actionRunExternalApp2;
+	private ActionRunExternalApp					_actionRunExternalApp3;
+	private ActionPreferences						_actionPreferences;
 	private ActionSingleClickExpand				_actionAutoExpandCollapse;
 	private ActionSingleExpandCollapseOthers	_actionSingleExpandCollapseOthers;
 
 	/*
 	 * UI controls
 	 */
-	private Display								_display;
+	private Display									_display;
 
-	private TreeViewer							_folderViewer;
+	private TreeViewer								_folderViewer;
 
 	private class ActionRunExternalAppTitle extends Action {
 
@@ -552,7 +553,7 @@ public class PicDirFolder {
 		TreeColumn tvcColumn;
 
 		// column: os folder
-		tvc = new TreeViewerColumn(_folderViewer, SWT.TRAIL);
+		tvc = new TreeViewerColumn(_folderViewer, SWT.LEAD);
 		tvcColumn = tvc.getColumn();
 		tvc.setLabelProvider(new StyledCellLabelProvider() {
 
@@ -609,9 +610,9 @@ public class PicDirFolder {
 	 * @param isFromNavigationHistory
 	 * @param isReloadFolder
 	 */
-	private void displayFolderImages(	final TVIFolderFolder tviFolder,
-										final boolean isFromNavigationHistory,
-										final boolean isReloadFolder) {
+	private void displayFolderImages(final TVIFolderFolder tviFolder,
+												final boolean isFromNavigationHistory,
+												final boolean isReloadFolder) {
 
 		final File selectedFolder = tviFolder._treeItemFolder;
 
@@ -901,8 +902,8 @@ public class PicDirFolder {
 	 * @param tviFolder
 	 */
 	private void onSelectFolder_10_AutoExpandCollapse(	final ITreeSelection treeSelection,
-														final TreePath selectedTreePath,
-														final TVIFolderFolder tviFolder) {
+																		final TreePath selectedTreePath,
+																		final TVIFolderFolder tviFolder) {
 
 		if (_isBehaviourSingleExpandedOthersCollapse) {
 
@@ -912,11 +913,11 @@ public class PicDirFolder {
 			 */
 			Display.getCurrent().asyncExec(new Runnable() {
 
-				private long			__expandRunnableCounter		= ++_expandRunnableCounter;
+				private long				__expandRunnableCounter		= ++_expandRunnableCounter;
 
-				private TVIFolderFolder	__selectedFolderItem		= tviFolder;
+				private TVIFolderFolder	__selectedFolderItem			= tviFolder;
 				private ITreeSelection	__treeSelection				= treeSelection;
-				private TreePath		__selectedTreePath			= selectedTreePath;
+				private TreePath			__selectedTreePath			= selectedTreePath;
 				private boolean			__isFromNavigationHistory	= _isFromNavigationHistory;
 
 				@Override
@@ -956,9 +957,9 @@ public class PicDirFolder {
 	 * @param isFromNavigationHistory
 	 */
 	private void onSelectFolder_20_AutoExpandCollapse_Runnable(	final TVIFolderFolder selectedFolderItem,
-																final ITreeSelection treeSelection,
-																final TreePath selectedTreePath,
-																final boolean isFromNavigationHistory) {
+																					final ITreeSelection treeSelection,
+																					final TreePath selectedTreePath,
+																					final boolean isFromNavigationHistory) {
 		_isExpandingSelection = true;
 		{
 			final Tree tree = _folderViewer.getTree();
@@ -1051,9 +1052,9 @@ public class PicDirFolder {
 							} else {
 
 								/*
-								 * update structural changes, also the triangle to expand/collapse,
-								 * an update(...) is not sufficient because this will not remove the
-								 * triangle when not necessary
+								 * update structural changes, also the triangle to expand/collapse, an
+								 * update(...) is not sufficient because this will not remove the triangle
+								 * when not necessary
 								 */
 								_folderViewer.refresh(loaderFolderItem);
 							}
@@ -1079,8 +1080,7 @@ public class PicDirFolder {
 	}
 
 	/**
-	 * this feature is not very simple to be implemented, stopped for implementing now
-	 * 2012-07-18<br>
+	 * this feature is not very simple to be implemented, stopped for implementing now 2012-07-18<br>
 	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
 	 * recursive <br>
 	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
@@ -1192,15 +1192,15 @@ public class PicDirFolder {
 	 * @param requestedFolderName
 	 * @param isMoveUpHierarchyWhenFolderIsInvalid
 	 * @param isFromNavigationHistory
-	 *            Set <code>true</code> when the folder was selected from the navigations history
-	 *            which prevents that the naviation history is updated.
+	 *           Set <code>true</code> when the folder was selected from the navigations history
+	 *           which prevents that the naviation history is updated.
 	 * @param isRootItem
 	 * @return Return <code>false</code> when the folder which should be selected is not available
 	 */
-	boolean selectFolder(	final String requestedFolderName,
-							final boolean isMoveUpHierarchyWhenFolderIsInvalid,
-							final boolean isFromNavigationHistory,
-							final boolean isRootItem) {
+	boolean selectFolder(final String requestedFolderName,
+								final boolean isMoveUpHierarchyWhenFolderIsInvalid,
+								final boolean isFromNavigationHistory,
+								final boolean isRootItem) {
 
 		_isFromNavigationHistory = isFromNavigationHistory;
 
