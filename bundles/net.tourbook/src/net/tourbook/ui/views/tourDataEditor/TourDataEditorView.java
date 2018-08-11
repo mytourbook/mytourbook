@@ -1515,13 +1515,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
 			@Override
-			public void partClosed(final IWorkbenchPartReference partRef) {}
+			public void partClosed(final IWorkbenchPartReference partRef) {
+
+				if (partRef.getPart(false) == TourDataEditorView.this) {
+					TourManager.setTourDataEditor(null);
+				}
+			}
 
 			@Override
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
 			@Override
 			public void partHidden(final IWorkbenchPartReference partRef) {
+
 				if (partRef.getPart(false) == TourDataEditorView.this) {
 					_isPartVisible = false;
 				}
@@ -1532,9 +1538,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			@Override
 			public void partOpened(final IWorkbenchPartReference partRef) {
+
 				if (partRef.getPart(false) == TourDataEditorView.this) {
+
 					// when part is opened it also should be visible
 					_isPartVisible = true;
+
 					TourManager.setTourDataEditor(TourDataEditorView.this);
 				}
 			}
@@ -3691,7 +3700,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			}
 		}
 
-		// with e4 the layouts are not set -> NPE's
+		// with e4 the layouts are not yet set -> NPE's -> run async which worked
 		parent.getShell().getDisplay().asyncExec(new Runnable() {
 			@Override
 			public void run() {
@@ -6129,8 +6138,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_state.put(STATE_SECTION_PERSONAL, _sectionPersonal.isExpanded());
 		_state.put(STATE_SECTION_TITLE, _sectionTitle.isExpanded());
 		_state.put(STATE_SECTION_WEATHER, _sectionWeather.isExpanded());
-
-		TourManager.setTourDataEditor(null);
 	}
 
 	/**
