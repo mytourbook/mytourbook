@@ -20,6 +20,7 @@ import gnu.trove.list.array.TDoubleArrayList;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -84,76 +85,75 @@ import net.tourbook.tour.TourManager;
  */
 public class ConconiView extends ViewPart {
 
-	public static final String		ID									= "net.tourbook.conconi.ConconiView";										//$NON-NLS-1$
+	public static final String			ID												= "net.tourbook.conconi.ConconiView";													//$NON-NLS-1$
 
-	private static final int		ADJUST_MAX_PULSE_VALUE				= 5;
-	private static final int		ADJUST_MAX_POWER_VALUE				= 10;
+	private static final int			ADJUST_MAX_PULSE_VALUE					= 5;
+	private static final int			ADJUST_MAX_POWER_VALUE					= 10;
 
-	private static final String		STATE_CONCONI_IS_LOG_SCALING		= "STATE_CONCONI_LOG_SCALING";												//$NON-NLS-1$
-	private static final String		STATE_CONCONI_SCALING_FACTOR		= "STATE_CONCONI_SCALING_FACTOR";											//$NON-NLS-1$
+	private static final String		STATE_CONCONI_IS_LOG_SCALING			= "STATE_CONCONI_LOG_SCALING";															//$NON-NLS-1$
+	private static final String		STATE_CONCONI_SCALING_FACTOR			= "STATE_CONCONI_SCALING_FACTOR";														//$NON-NLS-1$
 
-	private static final RGB		DEFAULT_RGB							= new RGB(0xd0, 0xd0, 0xd0);
+	private static final RGB			DEFAULT_RGB									= new RGB(0xd0, 0xd0, 0xd0);
 
-	private static final String		GRID_PREF_PREFIX					= "GRID_CONCONI__";															//$NON-NLS-1$
+// SET_FORMATTING_OFF
+	
+	private static final String		GRID_PREF_PREFIX							= "GRID_CONCONI__";															//$NON-NLS-1$
 
 	private static final String		GRID_IS_SHOW_VERTICAL_GRIDLINES		= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
 	private static final String		GRID_IS_SHOW_HORIZONTAL_GRIDLINES	= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
-	private static final String		GRID_VERTICAL_DISTANCE				= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
-	private static final String		GRID_HORIZONTAL_DISTANCE			= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
+	private static final String		GRID_VERTICAL_DISTANCE					= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
+	private static final String		GRID_HORIZONTAL_DISTANCE				= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
+	
+// SET_FORMATTING_ON
 
-	private final IPreferenceStore	_prefStore							= TourbookPlugin.getPrefStore();
-	private final IPreferenceStore	_commonPrefStore					= CommonActivator.getPrefStore();
-	private final IDialogSettings	_state								= TourbookPlugin.getState(ID);
+	private final IPreferenceStore	_prefStore									= TourbookPlugin.getPrefStore();
+	private final IPreferenceStore	_commonPrefStore							= CommonActivator.getPrefStore();
+	private final IDialogSettings		_state										= TourbookPlugin.getState(ID);
 
-	private IPartListener2			_partListener;
-	private ISelectionListener		_postSelectionListener;
+	private IPartListener2				_partListener;
+	private ISelectionListener			_postSelectionListener;
 	private IPropertyChangeListener	_prefChangeListener;
-	private ITourEventListener		_tourEventListener;
+	private ITourEventListener			_tourEventListener;
 
-	private ChartDataYSerie			_yDataPulse;
-	private ConconiData				_conconiDataForSelectedTour;
+	private ChartDataYSerie				_yDataPulse;
+	private ConconiData					_conconiDataForSelectedTour;
 
-	protected boolean				_isUpdateUI							= false;
-	private boolean					_isSelectionDisabled				= true;
-	private boolean					_isSaving;
+	protected boolean						_isUpdateUI									= false;
+	private boolean						_isSelectionDisabled						= true;
+	private boolean						_isSaving;
 
-	/**
-	 * E4 calls partClosed() even when not created
-	 */
-	private boolean					_isPartCreated;
+	private TourData						_selectedTour;
 
-	private TourData				_selectedTour;
+	private int								_originalTourDeflection					= -1;
+	private int								_modifiedTourDeflection					= -1;
 
-	private int						_originalTourDeflection				= -1;
-	private int						_modifiedTourDeflection				= -1;
+	private PixelConverter				_pc;
+	private FormToolkit					_tk;
 
-	private PixelConverter			_pc;
-	private FormToolkit				_tk;
+	private ActionConconiOptions		_actionConconiOptions;
 
-	private ActionConconiOptions	_actionConconiOptions;
-
-	private int						_hintDefaultSpinnerWidth;
+	private int								_hintDefaultSpinnerWidth;
 
 	/*
 	 * UI controls
 	 */
-	private PageBook				_pageBook;
-	private Composite				_page_NoTour;
-	private Composite				_page_ConconiTest;
+	private PageBook						_pageBook;
+	private Composite						_page_NoTour;
+	private Composite						_page_ConconiTest;
 
 	private ArrayList<TourData>		_conconiTours;
 
-	private Chart					_chartConconiTest;
-	private ChartLayerConconiTest	_conconiLayer;
+	private Chart							_chartConconiTest;
+	private ChartLayerConconiTest		_conconiLayer;
 
-	private Combo					_comboTests;
-	private Scale					_scaleDeflection;
-	private Label					_lblDeflactionPulse;
-	private Label					_lblDeflactionPower;
+	private Combo							_comboTests;
+	private Scale							_scaleDeflection;
+	private Label							_lblDeflactionPulse;
+	private Label							_lblDeflactionPower;
 
-	private Button					_chkExtendedScaling;
-	private Label					_lblFactor;
-	private Spinner					_spinFactor;
+	private Button							_chkExtendedScaling;
+	private Label							_lblFactor;
+	private Spinner						_spinFactor;
 
 	private class ActionConconiOptions extends ActionToolbarSlideout {
 
@@ -175,13 +175,7 @@ public class ConconiView extends ViewPart {
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
 			@Override
-			public void partClosed(final IWorkbenchPartReference partRef) {
-
-				if (partRef.getPart(false) == ConconiView.this && _isPartCreated) {
-					saveTour();
-					saveState();
-				}
-			}
+			public void partClosed(final IWorkbenchPartReference partRef) {}
 
 			@Override
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
@@ -288,11 +282,11 @@ public class ConconiView extends ViewPart {
 
 	/**
 	 * @param conconiTours
-	 *            contains all tours which are displayed in the conconi chart, they can be valid or
-	 *            invalid
+	 *           contains all tours which are displayed in the conconi chart, they can be valid or
+	 *           invalid
 	 * @param markedTour
-	 *            contains tour which should be marked in the chart, when <code>null</code> the
-	 *            first tour will be marked
+	 *           contains tour which should be marked in the chart, when <code>null</code> the first
+	 *           tour will be marked
 	 * @return
 	 */
 	private ChartDataModel createChartDataModelConconiTest(final ArrayList<TourData> conconiTours, TourData markedTour) {
@@ -603,8 +597,6 @@ public class ConconiView extends ViewPart {
 		if (_conconiTours == null) {
 			showTourFromTourProvider();
 		}
-
-		_isPartCreated = true;
 	}
 
 	private void createUI(final Composite parent) {
@@ -941,12 +933,15 @@ public class ConconiView extends ViewPart {
 		_isUpdateUI = false;
 	}
 
+	@PersistState
 	private void saveState() {
 
 		// check if UI is disposed
 		if (_pageBook.isDisposed()) {
 			return;
 		}
+
+		saveTour();
 
 		_state.put(STATE_CONCONI_IS_LOG_SCALING, _chkExtendedScaling.getSelection());
 		_state.put(STATE_CONCONI_SCALING_FACTOR, _spinFactor.getSelection());
@@ -1048,8 +1043,8 @@ public class ConconiView extends ViewPart {
 	private void updateChart_22(final ArrayList<TourData> tourDataList) {
 
 		/*
-		 * tour editor is not opened because it can cause a recursive attempt to active a part in
-		 * the middle of activating a part
+		 * tour editor is not opened because it can cause a recursive attempt to active a part in the
+		 * middle of activating a part
 		 */
 		if (tourDataList == null || tourDataList.size() == 0 || TourManager.isTourEditorModified(false)) {
 			// nothing to do
@@ -1072,7 +1067,7 @@ public class ConconiView extends ViewPart {
 
 	/**
 	 * @param markedTour
-	 *            contains a tour which is marked in the conconi chart
+	 *           contains a tour which is marked in the conconi chart
 	 */
 	private void updateChart_30_NewTour(final TourData markedTour) {
 
@@ -1092,8 +1087,8 @@ public class ConconiView extends ViewPart {
 		_chartConconiTest.updateChart(conconiChartDataModel, true, true);
 
 		/*
-		 * force the chart to be repainted because updating the conconi layer requires that the
-		 * chart is already painted (it requires drawing data)
+		 * force the chart to be repainted because updating the conconi layer requires that the chart
+		 * is already painted (it requires drawing data)
 		 */
 		_chartConconiTest.resizeChart();
 		updateUI_20_ConconiValues();

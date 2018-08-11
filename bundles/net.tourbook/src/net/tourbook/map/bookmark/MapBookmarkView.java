@@ -17,6 +17,7 @@ package net.tourbook.map.bookmark;
 
 import java.text.NumberFormat;
 
+import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -66,7 +67,7 @@ import net.tourbook.ui.action.ActionModifyColumns;
 
 public class MapBookmarkView extends ViewPart implements ITourViewer {
 
-	public static final String		ID			= "net.tourbook.map.bookmark.MapBookmarkView";	//$NON-NLS-1$
+	public static final String		ID				= "net.tourbook.map.bookmark.MapBookmarkView";	//$NON-NLS-1$
 
 	private final IDialogSettings	_state		= TourbookPlugin.getState(ID);
 
@@ -74,7 +75,7 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 	private IPartListener2			_partListener;
 
 	private ActionDeleteBookmark	_actionDeleteBookmark;
-	private ActionModifyColumns		_actionModifyColumns;
+	private ActionModifyColumns	_actionModifyColumns;
 	private ActionRenameBookmark	_actionRenameBookmark;
 
 	private PixelConverter			_pc;
@@ -82,7 +83,7 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 	private TableViewer				_bookmarkViewer;
 	private ColumnManager			_columnManager;
 
-	private final NumberFormat		_nf0		= NumberFormat.getNumberInstance();
+	private final NumberFormat		_nf0			= NumberFormat.getNumberInstance();
 	private final NumberFormat		_nfLatLon	= NumberFormat.getNumberInstance();
 	{
 		_nf0.setMinimumFractionDigits(0);
@@ -90,11 +91,6 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 		_nfLatLon.setMinimumFractionDigits(4);
 		_nfLatLon.setMaximumFractionDigits(4);
 	}
-
-	/**
-	 * E4 calls partClosed() even when not created
-	 */
-	private boolean		_isPartCreated;
 
 	/*
 	 * UI controls
@@ -187,8 +183,7 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 
-				if (partRef.getPart(false) == MapBookmarkView.this && _isPartCreated) {
-					saveState();
+				if (partRef.getPart(false) == MapBookmarkView.this) {
 					MapBookmarkManager.setMapBookmarkView(null);
 				}
 			}
@@ -206,7 +201,6 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 			public void partOpened(final IWorkbenchPartReference partRef) {
 
 				if (partRef.getPart(false) == MapBookmarkView.this) {
-					saveState();
 					MapBookmarkManager.setMapBookmarkView(MapBookmarkView.this);
 				}
 			}
@@ -242,8 +236,6 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 		fillToolbar();
 
 		updateUI_Viewer();
-
-		_isPartCreated = true;
 	}
 
 	private void createUI(final Composite parent) {
@@ -673,8 +665,8 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 
 	/**
 	 * @param isOpenedWithMouse
-	 *            Is <code>true</code> when the action is opened with the mouse, otherwise with the
-	 *            keyboard
+	 *           Is <code>true</code> when the action is opened with the mouse, otherwise with the
+	 *           keyboard
 	 */
 	private void onBookmark_Rename(final boolean isOpenedWithMouse) {
 
@@ -764,6 +756,7 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 		updateUI_Viewer();
 	}
 
+	@PersistState
 	private void saveState() {
 
 		_columnManager.saveState(_state);
