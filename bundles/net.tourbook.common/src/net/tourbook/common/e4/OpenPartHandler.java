@@ -20,21 +20,29 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
+import org.eclipse.e4.ui.workbench.modeling.EPartService.PartState;
 
-import net.tourbook.common.UI;
+import net.tourbook.common.util.StatusUtil;
 
 public class OpenPartHandler {
 
 	@Execute
 	public void execute(final EPartService partService, @Optional @Named("net.tourbook.commandparameter.partId") final String partId) {
 
-		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] execute()")
-				+ ("\tpartId: " + partId)
-//				+ ("\t: " + )
-		);
-// TODO remove SYSTEM.OUT.PRINTLN
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] execute()")
+//				+ ("\tpartId: " + partId)
+////				+ ("\t: " + )
+//		);
+//// TODO remove SYSTEM.OUT.PRINTLN
 
+		final MPart part = partService.showPart(partId, PartState.ACTIVATE);
+
+		if (part == null) {
+			StatusUtil.showStatus(new IllegalArgumentException(String.format("Part is not available with id '%s'", partId)));
+//			throw new IllegalArgumentException(String.format("Part is not available with id '%s'", partId));
+		}
 	}
 
 }

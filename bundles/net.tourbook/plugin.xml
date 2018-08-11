@@ -2073,6 +2073,9 @@ THIS IS NOT YET FULLY IMPLEMENTED
 
 	</extension>
 
+
+	<!-- E4 MODEL FRAGMENT -->
+
 	<extension
 		id="net.tourbook.fragment"
 		point="org.eclipse.e4.workbench.model">

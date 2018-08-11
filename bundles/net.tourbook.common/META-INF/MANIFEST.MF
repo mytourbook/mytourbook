@@ -36,8 +36,9 @@ Require-Bundle: org.eclipse.ui,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Import-Package: com.skedgo.converter,
-  gnu.trove.map.hash,
-  javax.inject;version="1.0.0",
-  org.joda.time,
-  org.joda.time.format
+ gnu.trove.map.hash,
+ javax.inject;version="1.0.0",
+ org.eclipse.e4.core.services.log,
+ org.joda.time,
+ org.joda.time.format
 Automatic-Module-Name: net.tourbook.common
