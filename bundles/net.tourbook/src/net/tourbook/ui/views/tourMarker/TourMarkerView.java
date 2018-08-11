@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -19,6 +19,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -93,39 +94,34 @@ import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 
 public class TourMarkerView extends ViewPart implements ITourProvider, ITourViewer {
 
-	public static final String		ID			= "net.tourbook.views.TourMarkerView";			//$NON-NLS-1$
+	public static final String			ID				= "net.tourbook.views.TourMarkerView";			//$NON-NLS-1$
 
 	private final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
-	private final IDialogSettings	_state		= TourbookPlugin.getState("TourMarkerView");	//$NON-NLS-1$
+	private final IDialogSettings		_state		= TourbookPlugin.getState("TourMarkerView");	//$NON-NLS-1$
 
-	private TourData				_tourData;
+	private TourData						_tourData;
 
-	private PostSelectionProvider	_postSelectionProvider;
-	private ISelectionListener		_postSelectionListener;
+	private PostSelectionProvider		_postSelectionProvider;
+	private ISelectionListener			_postSelectionListener;
 	private IPropertyChangeListener	_prefChangeListener;
-	private ITourEventListener		_tourEventListener;
-	private IPartListener2			_partListener;
+	private ITourEventListener			_tourEventListener;
+	private IPartListener2				_partListener;
 
 	private ActionOpenMarkerDialog	_actionEditTourMarkers;
 	private ActionModifyColumns		_actionModifyColumns;
 
-	private PixelConverter			_pc;
+	private PixelConverter				_pc;
 
-	private TableViewer				_markerViewer;
-	private ColumnManager			_columnManager;
+	private TableViewer					_markerViewer;
+	private ColumnManager				_columnManager;
 
-	private boolean					_isInUpdate;
-	private boolean					_isMultipleTours;
+	private boolean						_isInUpdate;
+	private boolean						_isMultipleTours;
 
-	/**
-	 * E4 calls partClosed() even when not created
-	 */
-	private boolean					_isPartCreated;
+	private ColumnDefinition			_colDefName;
+	private ColumnDefinition			_colDefVisibility;
 
-	private ColumnDefinition		_colDefName;
-	private ColumnDefinition		_colDefVisibility;
-
-	private final NumberFormat		_nf3		= NumberFormat.getNumberInstance();
+	private final NumberFormat			_nf3			= NumberFormat.getNumberInstance();
 	{
 		_nf3.setMinimumFractionDigits(3);
 		_nf3.setMaximumFractionDigits(3);
@@ -134,11 +130,11 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 	/*
 	 * UI controls
 	 */
-	private PageBook				_pageBook;
-	private Composite				_pageNoData;
-	private Composite				_viewerContainer;
+	private PageBook	_pageBook;
+	private Composite	_pageNoData;
+	private Composite	_viewerContainer;
 
-	private Font					_boldFont;
+	private Font		_boldFont;
 
 	class MarkerViewerContentProvicer implements IStructuredContentProvider {
 
@@ -212,14 +208,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
 			@Override
-			public void partClosed(final IWorkbenchPartReference partRef) {
-
-				if (partRef.getPart(false) == TourMarkerView.this && _isPartCreated) {
-
-//					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourMarkerView.this);
-					saveState();
-				}
-			}
+			public void partClosed(final IWorkbenchPartReference partRef) {}
 
 			@Override
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
@@ -260,14 +249,11 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
 				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
-					_markerViewer.getTable().setLinesVisible(
-							_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
-
+					_markerViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 					_markerViewer.refresh();
 
 					/*
-					 * the tree must be redrawn because the styled text does not show with the new
-					 * color
+					 * the tree must be redrawn because the styled text does not show with the new color
 					 */
 					_markerViewer.getTable().redraw();
 
@@ -407,8 +393,6 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 		if (_tourData == null) {
 			showTourFromTourProvider();
 		}
-
-		_isPartCreated = true;
 	}
 
 	private void createUI(final Composite parent) {
@@ -720,8 +704,8 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 				final String text = ((TourMarker) cell.getElement()).getLabel();
 
 				/*
-				 * Show text in red/bold when the text ends with a !, this hidden feature was
-				 * introduced by helmling
+				 * Show text in red/bold when the text ends with a !, this hidden feature was introduced
+				 * by helmling
 				 */
 				if (text.endsWith(UI.SYMBOL_EXCLAMATION_POINT)) {
 
@@ -1021,6 +1005,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 		updateUI_MarkerViewer();
 	}
 
+	@PersistState
 	private void saveState() {
 
 		_columnManager.saveState(_state);
@@ -1061,7 +1046,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 	@Override
 	public void updateColumnHeader(final ColumnDefinition colDef) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	private void updateUI_MarkerViewer() {

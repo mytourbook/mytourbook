@@ -1525,9 +1525,9 @@ THIS IS NOT YET FULLY IMPLEMENTED
 
 			<!-- 
 			-->
-	      <e4view
+	      <view
              category="net.tourbook.category.tour"
-             class="net.tourbook.ui.views.tourMarker.TourMarkerViewE4"
+             class="net.tourbook.ui.views.tourMarker.TourMarkerView"
              icon="icons/tour-marker.png"
              id="net.tourbook.views.TourMarkerView"
              name="%view_name_Marker"
