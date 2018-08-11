@@ -95,18 +95,18 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	private ApplicationActionBarAdvisor			_applicationActionBarAdvisor;
 	private IPerspectiveDescriptor				_lastPerspective;
 
-	private IWorkbenchPage						_lastActivePage;
-	private IWorkbenchPart						_lastActivePart;
-	private String								_lastPartTitle	= UI.EMPTY_STRING;
+	private IWorkbenchPage							_lastActivePage;
+	private IWorkbenchPart							_lastActivePart;
+	private String										_lastPartTitle	= UI.EMPTY_STRING;
 
-	private String								_appTitle;
+	private String										_appTitle;
 
 	private final ApplicationWorkbenchAdvisor	_wbAdvisor;
 
-	private IPropertyListener					_partPropertyListener;
+	private IPropertyListener						_partPropertyListener;
 
 	public ApplicationWorkbenchWindowAdvisor(	final ApplicationWorkbenchAdvisor wbAdvisor,
-												final IWorkbenchWindowConfigurer configurer) {
+															final IWorkbenchWindowConfigurer configurer) {
 		super(configurer);
 
 		_wbAdvisor = wbAdvisor;
@@ -196,14 +196,10 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 	@Override
 	public ActionBarAdvisor createActionBarAdvisor(final IActionBarConfigurer configurer) {
+
 		_applicationActionBarAdvisor = new ApplicationActionBarAdvisor(configurer);
+
 		return _applicationActionBarAdvisor;
-	}
-
-	@Override
-	public void dispose() {
-
-		TourTypeImage.dispose();
 	}
 
 	private void firstApplicationStart() {
@@ -295,8 +291,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 			@Override
 			public void perspectiveSavedAs(	final IWorkbenchPage page,
-											final IPerspectiveDescriptor oldPerspective,
-											final IPerspectiveDescriptor newPerspective) {
+														final IPerspectiveDescriptor oldPerspective,
+														final IPerspectiveDescriptor newPerspective) {
 				updateTitle();
 			}
 		});
@@ -425,6 +421,14 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 ////				_isViewOpening = false;
 ////			}
 //		}
+	}
+
+	@Override
+	public void postWindowClose() {
+
+		// do last cleanup, this dispose causes NPE in e4 when run in dispose() method
+
+		TourTypeImage.dispose();
 	}
 
 	@Override
