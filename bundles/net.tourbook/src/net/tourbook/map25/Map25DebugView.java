@@ -39,11 +39,11 @@ import okhttp3.Cache;
 
 public class Map25DebugView extends ViewPart {
 
-	public static final String				ID		= "net.tourbook.map25.Map25DebugView";	//$NON-NLS-1$
+	public static final String					ID			= "net.tourbook.map25.Map25DebugView";	//$NON-NLS-1$
 
 	private static final IDialogSettings	_state	= TourbookPlugin.getState(ID);
 
-	private final static NumberFormat		_nf2	= NumberFormat.getNumberInstance();
+	private final static NumberFormat		_nf2		= NumberFormat.getNumberInstance();
 	{
 		_nf2.setMinimumIntegerDigits(2);
 		_nf2.setMaximumFractionDigits(2);
@@ -51,18 +51,13 @@ public class Map25DebugView extends ViewPart {
 
 	private IPartListener2	_partListener;
 
-	/**
-	 * E4 calls partClosed() even when not created
-	 */
-	private boolean			_isPartCreated;
-
 	/*
 	 * UI controls
 	 */
-	private Label			_lblCacheHits;
-	private Label			_lblRequestedTiles;
-	private Label			_lblNetworkRequests;
-	private Label			_lblCacheSize;
+	private Label				_lblCacheHits;
+	private Label				_lblRequestedTiles;
+	private Label				_lblNetworkRequests;
+	private Label				_lblCacheSize;
 
 	private void addPartListener() {
 
@@ -77,7 +72,7 @@ public class Map25DebugView extends ViewPart {
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 
-				if (partRef.getPart(false) == Map25DebugView.this && _isPartCreated) {
+				if (partRef.getPart(false) == Map25DebugView.this) {
 					Map25ProviderManager.setDebugView(null);
 				}
 			}
@@ -118,8 +113,6 @@ public class Map25DebugView extends ViewPart {
 		createUI(parent);
 
 		addPartListener();
-
-		_isPartCreated = true;
 	}
 
 	private void createUI(final Composite parent) {

@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -105,98 +106,93 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 	// SET_FORMATTING_OFF
 	//
-	private static final String	IMAGE_ACTION_SHOW_TOUR_IN_MAP						= net.tourbook.map2.Messages.Image__Tour;
-	private static final String	IMAGE_ACTION_SHOW_TOUR_IN_MAP_DISABLED				= net.tourbook.map2.Messages.Image__Tour_Disabled;
-	private static final String IMAGE_ACTION_SYNCH_WITH_SLIDER_CENTERED_DISABLED 	= net.tourbook.map2.Messages.Image_Action_SynchWithSlider_Centered_Disabled;
-	private static final String IMAGE_ACTION_SYNCH_WITH_SLIDER_CENTERED 			= net.tourbook.map2.Messages.Image_Action_SynchWithSlider_Centered;
-	private static final String IMAGE_ACTION_SYNCH_WITH_SLIDER_DISABLED 			= net.tourbook.map2.Messages.image_action_synch_with_slider_disabled;
-	private static final String IMAGE_ACTION_SYNCH_WITH_SLIDER 						= net.tourbook.map2.Messages.image_action_synch_with_slider;
-	private static final String	MAP_ACTION_SHOW_TOUR_IN_MAP 						= net.tourbook.map2.Messages.map_action_show_tour_in_map;
-	private static final String MAP_ACTION_SYNCH_WITH_SLIDER 						= net.tourbook.map2.Messages.map_action_synch_with_slider;
-	private static final String MAP_ACTION_SYNCH_WITH_SLIDER_CENTERED 				= net.tourbook.map2.Messages.Map_Action_SynchWithSlider_Centered;
+	private static final String	IMAGE_ACTION_SHOW_TOUR_IN_MAP								= net.tourbook.map2.Messages.Image__Tour;
+	private static final String	IMAGE_ACTION_SHOW_TOUR_IN_MAP_DISABLED					= net.tourbook.map2.Messages.Image__Tour_Disabled;
+	private static final String	IMAGE_ACTION_SYNCH_WITH_SLIDER_CENTERED_DISABLED	= net.tourbook.map2.Messages.Image_Action_SynchWithSlider_Centered_Disabled;
+	private static final String	IMAGE_ACTION_SYNCH_WITH_SLIDER_CENTERED 				= net.tourbook.map2.Messages.Image_Action_SynchWithSlider_Centered;
+	private static final String	IMAGE_ACTION_SYNCH_WITH_SLIDER_DISABLED 				= net.tourbook.map2.Messages.image_action_synch_with_slider_disabled;
+	private static final String	IMAGE_ACTION_SYNCH_WITH_SLIDER 							= net.tourbook.map2.Messages.image_action_synch_with_slider;
+	private static final String	MAP_ACTION_SHOW_TOUR_IN_MAP 								= net.tourbook.map2.Messages.map_action_show_tour_in_map;
+	private static final String	MAP_ACTION_SYNCH_WITH_SLIDER 								= net.tourbook.map2.Messages.map_action_synch_with_slider;
+	private static final String	MAP_ACTION_SYNCH_WITH_SLIDER_CENTERED 					= net.tourbook.map2.Messages.Map_Action_SynchWithSlider_Centered;
 	//
-	private static final String	STATE_IS_LAYER_BASE_MAP_VISIBLE						= "STATE_IS_LAYER_BASE_MAP_VISIBLE";					//$NON-NLS-1$
-	private static final String	STATE_IS_LAYER_BUILDING_VISIBLE						= "STATE_IS_LAYER_BUILDING_VISIBLE";					//$NON-NLS-1$
-	private static final String	STATE_IS_LAYER_LABEL_VISIBLE						= "STATE_IS_LAYER_LABEL_VISIBLE";						//$NON-NLS-1$
-	private static final String	STATE_IS_LAYER_MARKER_VISIBLE						= "STATE_IS_LAYER_MARKER_VISIBLE";						//$NON-NLS-1$
-	private static final String	STATE_IS_LAYER_SCALE_BAR_VISIBLE					= "STATE_IS_LAYER_SCALE_BAR_VISIBLE";					//$NON-NLS-1$
-	private static final String	STATE_IS_LAYER_TILE_INFO_VISIBLE					= "STATE_IS_LAYER_TILE_INFO_VISIBLE";					//$NON-NLS-1$
-	private static final String	STATE_IS_LAYER_TOUR_VISIBLE							= "STATE_IS_LAYER_TOUR_VISIBLE";						//$NON-NLS-1$
-	private static final String	STATE_MAP_SYNCHED_WITH								= "STATE_MAP_SYNCHED_WITH";	//$NON-NLS-1$
+	private static final String	STATE_IS_LAYER_BASE_MAP_VISIBLE							= "STATE_IS_LAYER_BASE_MAP_VISIBLE";					//$NON-NLS-1$
+	private static final String	STATE_IS_LAYER_BUILDING_VISIBLE							= "STATE_IS_LAYER_BUILDING_VISIBLE";					//$NON-NLS-1$
+	private static final String	STATE_IS_LAYER_LABEL_VISIBLE								= "STATE_IS_LAYER_LABEL_VISIBLE";						//$NON-NLS-1$
+	private static final String	STATE_IS_LAYER_MARKER_VISIBLE								= "STATE_IS_LAYER_MARKER_VISIBLE";						//$NON-NLS-1$
+	private static final String	STATE_IS_LAYER_SCALE_BAR_VISIBLE							= "STATE_IS_LAYER_SCALE_BAR_VISIBLE";					//$NON-NLS-1$
+	private static final String	STATE_IS_LAYER_TILE_INFO_VISIBLE							= "STATE_IS_LAYER_TILE_INFO_VISIBLE";					//$NON-NLS-1$
+	private static final String	STATE_IS_LAYER_TOUR_VISIBLE								= "STATE_IS_LAYER_TOUR_VISIBLE";							//$NON-NLS-1$
+	private static final String	STATE_MAP_SYNCHED_WITH										= "STATE_MAP_SYNCHED_WITH";								//$NON-NLS-1$
 	//
-	private static final ImageDescriptor	_imageSyncWithSlider						= TourbookPlugin.getImageDescriptor(IMAGE_ACTION_SYNCH_WITH_SLIDER);
-	private static final ImageDescriptor	_imageSyncWithSlider_Disabled				= TourbookPlugin.getImageDescriptor(IMAGE_ACTION_SYNCH_WITH_SLIDER_DISABLED);
-	private static final ImageDescriptor	_imageSyncWithSlider_Centered				= TourbookPlugin.getImageDescriptor(IMAGE_ACTION_SYNCH_WITH_SLIDER_CENTERED);
+	private static final ImageDescriptor	_imageSyncWithSlider								= TourbookPlugin.getImageDescriptor(IMAGE_ACTION_SYNCH_WITH_SLIDER);
+	private static final ImageDescriptor	_imageSyncWithSlider_Disabled					= TourbookPlugin.getImageDescriptor(IMAGE_ACTION_SYNCH_WITH_SLIDER_DISABLED);
+	private static final ImageDescriptor	_imageSyncWithSlider_Centered					= TourbookPlugin.getImageDescriptor(IMAGE_ACTION_SYNCH_WITH_SLIDER_CENTERED);
 	private static final ImageDescriptor	_imageSyncWithSlider_Centered_Disabled		= TourbookPlugin.getImageDescriptor(IMAGE_ACTION_SYNCH_WITH_SLIDER_CENTERED_DISABLED);
 	//
-	public static final String				ID				= "net.tourbook.map25.Map25View";				//$NON-NLS-1$
+	public static final String					ID					= "net.tourbook.map25.Map25View";															//$NON-NLS-1$
 	//
 	private static final IDialogSettings	_state			= TourbookPlugin.getState(ID);
 	//
-	private static int[]					_eventCounter	= new int[1];
+	private static int[]							_eventCounter	= new int[1];
 	//
 // SET_FORMATTING_ON
 	//
 	{}
 	//
-	private Map25App						_mapApp;
+	private Map25App								_mapApp;
 	//
-	private OpenDialogManager				_openDlgMgr		= new OpenDialogManager();
-	private final MapInfoManager			_mapInfoManager	= MapInfoManager.getInstance();
+	private OpenDialogManager					_openDlgMgr			= new OpenDialogManager();
+	private final MapInfoManager				_mapInfoManager	= MapInfoManager.getInstance();
 	//
-	private boolean							_isPartVisible;
-	private boolean							_isShowTour;
+	private boolean								_isPartVisible;
+	private boolean								_isShowTour;
 	//
-	/**
-	 * E4 calls partClosed() even when not created
-	 */
-	private boolean							_isPartCreated;
+	private IPartListener2						_partListener;
+	private ISelectionListener					_postSelectionListener;
+	private ITourEventListener					_tourEventListener;
 	//
-	private IPartListener2					_partListener;
-	private ISelectionListener				_postSelectionListener;
-	private ITourEventListener				_tourEventListener;
+	private ISelection							_lastHiddenSelection;
+	private ISelection							_selectionWhenHidden;
+	private int										_lastSelectionHash;
 	//
-	private ISelection						_lastHiddenSelection;
-	private ISelection						_selectionWhenHidden;
-	private int								_lastSelectionHash;
-	//
-	private ActionMapBookmarks				_actionMapBookmarks;
+	private ActionMapBookmarks					_actionMapBookmarks;
 	private ActionMap25_Options				_actionMapOptions;
 	private ActionMap25_ShowMarker			_actionShowMarker_WithOptions;
 	private ActionSelectMap25Provider		_actionSelectMapProvider;
 	private ActionSynchMapWithChartSlider	_actionSyncMap_WithChartSlider;
 	private ActionSyncMap2WithOtherMap		_actionSyncMap_WithOtherMap;
 	private ActionSynchMapWithTour			_actionSyncMap_WithTour;
-	private ActionShowEntireTour			_actionShowEntireTour;
+	private ActionShowEntireTour				_actionShowEntireTour;
 	private ActionShowTour_WithConfig		_actionShowTour_WithOptions;
 	//
 	/** Contains only geo tours */
-	private ArrayList<TourData>				_allTourData	= new ArrayList<>();
-	private TIntArrayList					_allTourStarts	= new TIntArrayList();
-	private GeoPoint[]						_allGeoPoints;
-	private BoundingBox						_allBoundingBox;
+	private ArrayList<TourData>				_allTourData		= new ArrayList<>();
+	private TIntArrayList						_allTourStarts		= new TIntArrayList();
+	private GeoPoint[]							_allGeoPoints;
+	private BoundingBox							_allBoundingBox;
 	//
-	private int								_leftSliderValueIndex;
-	private int								_rightSliderValueIndex;
-	private int								_selectedSliderValueIndex;
+	private int										_leftSliderValueIndex;
+	private int										_rightSliderValueIndex;
+	private int										_selectedSliderValueIndex;
 	//
-	private int								_hashTourId;
-	private int								_hashTourData;
+	private int										_hashTourId;
+	private int										_hashTourData;
 	//
-	private MapSync							_mapSynchedWith	= MapSync.NONE;
-	private long							_lastFiredSyncEventTime;
+	private MapSync								_mapSynchedWith	= MapSync.NONE;
+	private long									_lastFiredSyncEventTime;
 	//
 	// context menu
-	private boolean							_isContextMenuVisible;
-//	private MouseAdapter					_wwMouseListener;
-	private Menu							_swtContextMenu;
+	private boolean								_isContextMenuVisible;
+//	private MouseAdapter							_wwMouseListener;
+	private Menu									_swtContextMenu;
 	//
 	/*
 	 * UI controls
 	 */
-	private Composite						_swtContainer;
+	private Composite								_swtContainer;
 
-	Composite								_parent;
+	Composite										_parent;
 
 	private class ActionMap25_Options extends ActionToolbarSlideout {
 
@@ -415,18 +411,14 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
 			@Override
-			public void partClosed(final IWorkbenchPartReference partRef) {
-
-				if (partRef.getPart(false) == Map25View.this && _isPartCreated) {
-					saveState();
-				}
-			}
+			public void partClosed(final IWorkbenchPartReference partRef) {}
 
 			@Override
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
 			@Override
 			public void partHidden(final IWorkbenchPartReference partRef) {
+
 				if (partRef.getPart(false) == Map25View.this) {
 					_isPartVisible = false;
 				}
@@ -440,6 +432,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 			@Override
 			public void partVisible(final IWorkbenchPartReference partRef) {
+
 				if (partRef.getPart(false) == Map25View.this) {
 
 					_isPartVisible = true;
@@ -619,8 +612,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 				_isContextMenuVisible = false;
 
 				/*
-				 * run async that the context state and tour info reset is done after the context
-				 * menu actions has done they tasks
+				 * run async that the context state and tour info reset is done after the context menu
+				 * actions has done they tasks
 				 */
 				Display.getCurrent().asyncExec(new Runnable() {
 					@Override
@@ -689,8 +682,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 				final int serieIndex = tourMarker.getSerieIndex();
 
 				/*
-				 * check bounds because when a tour is split, it can happen that the marker serie
-				 * index is out of scope
+				 * check bounds because when a tour is split, it can happen that the marker serie index
+				 * is out of scope
 				 */
 				if (serieIndex >= latitudeSerie.length) {
 					continue;
@@ -730,8 +723,6 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		addSelectionListener();
 		MapBookmarkManager.addBookmarkListener(this);
 		MapManager.addMapSyncListener(this);
-
-		_isPartCreated = true;
 	}
 
 	private void createUI(final Composite parent) {
@@ -936,8 +927,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		if (_lastSelectionHash == selectionHash) {
 
 			/*
-			 * Last selection has not changed, this can occure when the app lost the focus and got
-			 * the focus again.
+			 * Last selection has not changed, this can occure when the app lost the focus and got the
+			 * focus again.
 			 */
 			return;
 		}
@@ -1328,6 +1319,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		showToursFromTourProvider();
 	}
 
+	@PersistState
 	private void saveState() {
 
 		Util.setStateEnum(_state, STATE_MAP_SYNCHED_WITH, _mapSynchedWith);
@@ -1467,9 +1459,9 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	}
 
 	@Override
-	public void syncMapWithOtherMap(final MapPosition mapPosition,
-									final ViewPart viewPart,
-									final int positionFlags) {
+	public void syncMapWithOtherMap(	final MapPosition mapPosition,
+												final ViewPart viewPart,
+												final int positionFlags) {
 
 		if (_mapSynchedWith != MapSync.WITH_OTHER_MAP) {
 

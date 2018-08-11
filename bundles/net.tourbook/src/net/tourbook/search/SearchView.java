@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -17,6 +17,7 @@ package net.tourbook.search;
 
 import java.util.ArrayList;
 
+import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -54,35 +55,30 @@ import net.tourbook.web.preferences.PrefPageWebBrowser;
 
 public class SearchView extends ViewPart implements ISearchView {
 
-	public static final String		ID								= "net.tourbook.search.SearchView"; //$NON-NLS-1$
+	public static final String			ID											= "net.tourbook.search.SearchView";	//$NON-NLS-1$
 
-	private static final String		STATE_USE_EXTERNAL_WEB_BROWSER	= "STATE_USE_EXTERNAL_WEB_BROWSER"; //$NON-NLS-1$
+	private static final String		STATE_USE_EXTERNAL_WEB_BROWSER	= "STATE_USE_EXTERNAL_WEB_BROWSER";	//$NON-NLS-1$
 
-	private final IDialogSettings	_state							= TourbookPlugin.getState(ID);
+	private final IDialogSettings		_state									= TourbookPlugin.getState(ID);
 
-	private PostSelectionProvider	_postSelectionProvider;
-	private IPartListener2			_partListener;
-	private ITourEventListener		_tourEventListener;
+	private PostSelectionProvider		_postSelectionProvider;
+	private IPartListener2				_partListener;
+	private ITourEventListener			_tourEventListener;
 
-	private boolean					_isWinInternalLoaded			= false;
-
-	/**
-	 * E4 calls partClosed() even when not created
-	 */
-	private boolean					_isPartCreated;
+	private boolean						_isWinInternalLoaded					= false;
 
 	private ActionExternalSearchUI	_actionExternalSearchUI;
 
 	/*
 	 * UI controls
 	 */
-	private Browser					_browser;
+	private Browser						_browser;
 
-	private PageBook				_pageBook;
+	private PageBook						_pageBook;
 
-	private Composite				_pageLinux;
-	private Composite				_pageWinExternalBrowser;
-	private Composite				_pageWinInternalBrowser;
+	private Composite						_pageLinux;
+	private Composite						_pageWinExternalBrowser;
+	private Composite						_pageWinInternalBrowser;
 
 	void actionSearchUI() {
 		showUIPage();
@@ -101,8 +97,7 @@ public class SearchView extends ViewPart implements ISearchView {
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 
-				if (partRef.getPart(false) == SearchView.this && _isPartCreated) {
-					saveState();
+				if (partRef.getPart(false) == SearchView.this) {
 					SearchMgr.setSearchView(null);
 				}
 			}
@@ -195,8 +190,6 @@ public class SearchView extends ViewPart implements ISearchView {
 		restoreState();
 
 		showUIPage();
-
-		_isPartCreated = true;
 	}
 
 	private void createUI(final Composite parent) {
@@ -377,6 +370,7 @@ public class SearchView extends ViewPart implements ISearchView {
 		enableActions();
 	}
 
+	@PersistState
 	private void saveState() {
 
 		_state.put(STATE_USE_EXTERNAL_WEB_BROWSER, _actionExternalSearchUI.isChecked());
