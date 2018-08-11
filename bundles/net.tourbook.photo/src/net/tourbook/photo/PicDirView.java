@@ -17,6 +17,7 @@ package net.tourbook.photo;
 
 import java.io.File;
 
+import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
@@ -47,38 +48,31 @@ import net.tourbook.photo.internal.manager.ThumbnailStore;
 
 public class PicDirView extends ViewPart implements IPhotoEventListener {
 
-	static public final String				ID									= "net.tourbook.photo.PicDirView";		//$NON-NLS-1$
+	static public final String					ID												= "net.tourbook.photo.PicDirView";														//$NON-NLS-1$
 
-	private static final String				SEPARATOR_ID_PIC_DIR_VIEW_TOOL_BAR	= "PicDirViewToolBar";					//$NON-NLS-1$
+	private static final String				SEPARATOR_ID_PIC_DIR_VIEW_TOOL_BAR	= "PicDirViewToolBar";																		//$NON-NLS-1$
 
-	private static final String				STATE_TREE_WIDTH					= "STATE_TREE_WIDTH";					//$NON-NLS-1$
+	private static final String				STATE_TREE_WIDTH							= "STATE_TREE_WIDTH";																		//$NON-NLS-1$
 
-	private static final IDialogSettings	_state								= Activator.getDefault()//
-																						.getDialogSettingsSection(
-																								"PhotoDirectoryView");	//$NON-NLS-1$
-	private static final IPreferenceStore	_prefStore							= Activator.getDefault()//
-																						.getPreferenceStore();
-	private IPartListener2					_partListener;
+	private static final IDialogSettings	_state										= Activator.getDefault().getDialogSettingsSection("PhotoDirectoryView");	//$NON-NLS-1$
+	private static final IPreferenceStore	_prefStore									= Activator.getDefault().getPreferenceStore();
+
+	private IPartListener2						_partListener;
 	private IPropertyChangeListener			_prefChangeListener;
 
-	private PostSelectionProvider			_postSelectionProvider;
+	private PostSelectionProvider				_postSelectionProvider;
 
-	private PicDirFolder					_picDirFolder;
-	private PicDirImages					_picDirImages;
+	private PicDirFolder							_picDirFolder;
+	private PicDirImages							_picDirImages;
 
 	private ISelectionConverter				_selectionConverter;
-
-	/**
-	 * E4 calls partClosed() even when not created
-	 */
-	private boolean							_isPartCreated;
 
 	/*
 	 * UI controls
 	 */
-	private SashLeftFixedForm				_containerMasterDetail;
-	private Composite						_containerFolder;
-	private Composite						_containerImages;
+	private SashLeftFixedForm					_containerMasterDetail;
+	private Composite								_containerFolder;
+	private Composite								_containerImages;
 
 	static int compareFiles(final File file1, final File file2) {
 
@@ -113,9 +107,9 @@ public class PicDirView extends ViewPart implements IPhotoEventListener {
 
 	/**
 	 * Gets a directory listing
-	 * 
+	 *
 	 * @param file
-	 *            the directory to be listed
+	 *           the directory to be listed
 	 * @return an array of files this directory contains, may be empty but not null
 	 */
 	static File[] getDirectoryList(final File file) {
@@ -160,9 +154,9 @@ public class PicDirView extends ViewPart implements IPhotoEventListener {
 
 	/**
 	 * Sorts files lexicographically by name.
-	 * 
+	 *
 	 * @param files
-	 *            the array of Files to be sorted
+	 *           the array of Files to be sorted
 	 */
 	public static void sortFiles(final File[] files) {
 
@@ -186,8 +180,11 @@ public class PicDirView extends ViewPart implements IPhotoEventListener {
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 
-				if (partRef.getPart(false) == PicDirView.this && _isPartCreated) {
-					onPartClose();
+				if (partRef.getPart(false) == PicDirView.this) {
+
+					_picDirImages.stopLoadingImages();
+
+					ThumbnailStore.cleanupStoreFiles(false, false);
 				}
 			}
 
@@ -240,9 +237,9 @@ public class PicDirView extends ViewPart implements IPhotoEventListener {
 		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
 		/*
-		 * restore async because a previous folder can contain many files and it can take a long
-		 * time to show the UI, this can be worrisome for the user when the UI is not displayed
-		 * during application startup
+		 * restore async because a previous folder can contain many files and it can take a long time
+		 * to show the UI, this can be worrisome for the user when the UI is not displayed during
+		 * application startup
 		 */
 		parent.getDisplay().asyncExec(new Runnable() {
 			@Override
@@ -250,8 +247,6 @@ public class PicDirView extends ViewPart implements IPhotoEventListener {
 				restoreState();
 			}
 		});
-		
-		_isPartCreated = true;
 	}
 
 	private void createUI(final Composite parent) {
@@ -364,25 +359,15 @@ public class PicDirView extends ViewPart implements IPhotoEventListener {
 
 	/**
 	 * Creates a {@link PhotosWithExifSelection}
-	 * 
+	 *
 	 * @param isAllImages
-	 *            When <code>true</code>, all images which are displayed in the gallery are
-	 *            returned, otherwise the selected images.
+	 *           When <code>true</code>, all images which are displayed in the gallery are returned,
+	 *           otherwise the selected images.
 	 * @return Returns a {@link ISelection} for selected or all images or <code>null</code> when
 	 *         loading EXIF data was canceled by the user.
 	 */
 	public PhotosWithExifSelection getSelectedPhotosWithExif(final boolean isAllImages) {
 		return _picDirImages.getSelectedPhotosWithExif(isAllImages);
-	}
-
-	private void onPartClose() {
-
-		// also stop loading images
-		_picDirImages.stopLoadingImages();
-
-		ThumbnailStore.cleanupStoreFiles(false, false);
-
-		saveState();
 	}
 
 	@Override
@@ -406,8 +391,8 @@ public class PicDirView extends ViewPart implements IPhotoEventListener {
 		_containerMasterDetail.setViewerWidth(Util.getStateInt(_state, STATE_TREE_WIDTH, 200));
 
 		/*
-		 * image restore must be done BEFORE folder restore because folder restore is also loading
-		 * the folder and updates folder history
+		 * image restore must be done BEFORE folder restore because folder restore is also loading the
+		 * folder and updates folder history
 		 */
 		// 1.
 		_picDirImages.restoreState();
@@ -421,6 +406,7 @@ public class PicDirView extends ViewPart implements IPhotoEventListener {
 //		getViewSite().getPage().activate(this);
 	}
 
+	@PersistState
 	private void saveState() {
 
 		if (_containerFolder.isDisposed()) {
@@ -457,8 +443,8 @@ public class PicDirView extends ViewPart implements IPhotoEventListener {
 		if (_selectionConverter != null) {
 
 			/*
-			 * convert default selection into a selection from the selection type provider, it
-			 * mainly converts into another type, that the new type is fired instead of the old
+			 * convert default selection into a selection from the selection type provider, it mainly
+			 * converts into another type, that the new type is fired instead of the old
 			 */
 			selection = _selectionConverter.convertSelection(selection);
 		}
