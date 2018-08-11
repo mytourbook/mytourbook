@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -18,6 +18,7 @@ package net.tourbook.ui.views;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
+import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -88,57 +89,52 @@ import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 
 public class TourWaypointView extends ViewPart implements ITourProvider, ITourViewer {
 
-	public static final String		ID						= "net.tourbook.views.TourWaypointView";					//$NON-NLS-1$
+	public static final String			ID								= "net.tourbook.views.TourWaypointView";	//$NON-NLS-1$
 
-	public static final int			COLUMN_TIME				= 0;
+	public static final int				COLUMN_TIME					= 0;
 
-	public static final int			COLUMN_DISTANCE			= 1;
-	public static final int			COLUMN_REMARK			= 2;
-	public static final int			COLUMN_VISUAL_POSITION	= 3;
-	public static final int			COLUMN_X_OFFSET			= 4;
-	public static final int			COLUMN_Y_OFFSET			= 5;
+	public static final int				COLUMN_DISTANCE			= 1;
+	public static final int				COLUMN_REMARK				= 2;
+	public static final int				COLUMN_VISUAL_POSITION	= 3;
+	public static final int				COLUMN_X_OFFSET			= 4;
+	public static final int				COLUMN_Y_OFFSET			= 5;
 
-	private final IPreferenceStore	_prefStore				= TourbookPlugin.getPrefStore();
-	private final IDialogSettings	_state					= TourbookPlugin.getState(ID);
+	private final IPreferenceStore	_prefStore					= TourbookPlugin.getPrefStore();
+	private final IDialogSettings		_state						= TourbookPlugin.getState(ID);
 
-	private TourData				_tourData;
+	private TourData						_tourData;
 
-	private PostSelectionProvider	_postSelectionProvider;
-	private ISelectionListener		_postSelectionListener;
+	private PostSelectionProvider		_postSelectionProvider;
+	private ISelectionListener			_postSelectionListener;
 	private IPropertyChangeListener	_prefChangeListener;
-	private ITourEventListener		_tourPropertyListener;
-	private IPartListener2			_partListener;
+	private ITourEventListener			_tourPropertyListener;
+	private IPartListener2				_partListener;
 
-	private PixelConverter			_pc;
-
-	/**
-	 * E4 calls partClosed() even when not created
-	 */
-	private boolean					_isPartCreated;
+	private PixelConverter				_pc;
 
 	/*
 	 * UI controls
 	 */
-	private PageBook				_pageBook;
+	private PageBook						_pageBook;
 
-	private TableViewer				_wpViewer;
+	private TableViewer					_wpViewer;
 
-	private Composite				_pageNoData;
-	private Composite				_viewerContainer;
+	private Composite						_pageNoData;
+	private Composite						_viewerContainer;
 
 	private ActionModifyColumns		_actionModifyColumns;
 
 	/*
 	 * none UI
 	 */
-	private ColumnManager			_columnManager;
+	private ColumnManager				_columnManager;
 
 	/*
 	 * measurement unit values
 	 */
-	private float					_unitValueAltitude;
+	private float							_unitValueAltitude;
 
-	private final NumberFormat		_nf_1_1					= NumberFormat.getNumberInstance();
+	private final NumberFormat			_nf_1_1						= NumberFormat.getNumberInstance();
 
 	{
 		_nf_1_1.setMinimumFractionDigits(1);
@@ -229,12 +225,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
 			@Override
-			public void partClosed(final IWorkbenchPartReference partRef) {
-
-				if (partRef.getPart(false) == TourWaypointView.this && _isPartCreated) {
-					saveState();
-				}
-			}
+			public void partClosed(final IWorkbenchPartReference partRef) {}
 
 			@Override
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
@@ -277,14 +268,11 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 
 				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
-					_wpViewer.getTable().setLinesVisible(
-							_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
-
+					_wpViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 					_wpViewer.refresh();
 
 					/*
-					 * the tree must be redrawn because the styled text does not show with the new
-					 * color
+					 * the tree must be redrawn because the styled text does not show with the new color
 					 */
 					_wpViewer.getTable().redraw();
 				}
@@ -424,8 +412,6 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 		if (_tourData == null) {
 			showTourFromTourProvider();
 		}
-
-		_isPartCreated = true;
 	}
 
 	private void createUI(final Composite parent) {
@@ -964,6 +950,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 		_wpViewer.setInput(new Object[0]);
 	}
 
+	@PersistState
 	private void saveState() {
 
 		// check if UI is disposed

@@ -45,6 +45,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -188,99 +189,100 @@ import net.tourbook.web.WEB;
  */
 public class RawDataView extends ViewPart implements ITourProviderAll, ITourViewer3 {
 
-	public static final String				ID											= "net.tourbook.views.rawData.RawDataView";							//$NON-NLS-1$
+	public static final String		ID															= "net.tourbook.views.rawData.RawDataView";									//$NON-NLS-1$
 
-	private static final String				COLUMN_FACTORY_TIME_ZONE_DIFF_TOOLTIP		= net.tourbook.ui.Messages.ColumnFactory_TimeZoneDifference_Tooltip;
+	private static final String	COLUMN_FACTORY_TIME_ZONE_DIFF_TOOLTIP			= net.tourbook.ui.Messages.ColumnFactory_TimeZoneDifference_Tooltip;
 	// db state
-	private static final String				IMAGE_ASSIGN_MERGED_TOUR					= "IMAGE_ASSIGN_MERGED_TOUR";											//$NON-NLS-1$
-	private static final String				IMAGE_DATABASE								= "IMAGE_DATABASE";													//$NON-NLS-1$
-	private static final String				IMAGE_DATABASE_OTHER_PERSON					= "IMAGE_DATABASE_OTHER_PERSON";										//$NON-NLS-1$
-	private static final String				IMAGE_DELETE								= "IMAGE_DELETE";														//$NON-NLS-1$
-	private static final String				IMAGE_ICON_PLACEHOLDER						= "IMAGE_ICON_PLACEHOLDER";											//$NON-NLS-1$
+	private static final String	IMAGE_ASSIGN_MERGED_TOUR							= "IMAGE_ASSIGN_MERGED_TOUR";														//$NON-NLS-1$
+	private static final String	IMAGE_DATABASE											= "IMAGE_DATABASE";																	//$NON-NLS-1$
+	private static final String	IMAGE_DATABASE_OTHER_PERSON						= "IMAGE_DATABASE_OTHER_PERSON";													//$NON-NLS-1$
+	private static final String	IMAGE_DELETE											= "IMAGE_DELETE";																		//$NON-NLS-1$
+	private static final String	IMAGE_ICON_PLACEHOLDER								= "IMAGE_ICON_PLACEHOLDER";														//$NON-NLS-1$
 	// import state
-	private static final String				IMAGE_STATE_DELETE							= "IMAGE_STATE_DELETE";												//$NON-NLS-1$
-	private static final String				IMAGE_STATE_MOVED							= "IMAGE_STATE_MOVED";													//$NON-NLS-1$
+	private static final String	IMAGE_STATE_DELETE									= "IMAGE_STATE_DELETE";																//$NON-NLS-1$
+	private static final String	IMAGE_STATE_MOVED										= "IMAGE_STATE_MOVED";																//$NON-NLS-1$
 	// OLD UI
-	private static final String				IMAGE_DATA_TRANSFER							= "IMAGE_DATA_TRANSFER";												//$NON-NLS-1$
-	private static final String				IMAGE_DATA_TRANSFER_DIRECT					= "IMAGE_DATA_TRANSFER_DIRECT";										//$NON-NLS-1$
-	private static final String				IMAGE_IMPORT_FROM_FILES						= "IMAGE_IMPORT_FROM_FILES";											//$NON-NLS-1$
-	private static final String				IMAGE_NEW_UI								= "IMAGE_NEW_UI";														//$NON-NLS-1$
+	private static final String	IMAGE_DATA_TRANSFER									= "IMAGE_DATA_TRANSFER";															//$NON-NLS-1$
+	private static final String	IMAGE_DATA_TRANSFER_DIRECT							= "IMAGE_DATA_TRANSFER_DIRECT";													//$NON-NLS-1$
+	private static final String	IMAGE_IMPORT_FROM_FILES								= "IMAGE_IMPORT_FROM_FILES";														//$NON-NLS-1$
+	private static final String	IMAGE_NEW_UI											= "IMAGE_NEW_UI";																		//$NON-NLS-1$
 	//
-	private static final String				HTML_TD										= "<td>";																//$NON-NLS-1$
-	private static final String				HTML_TD_SPACE								= "<td ";																//$NON-NLS-1$
-	private static final String				HTML_TD_END									= "</td>";																//$NON-NLS-1$
-	private static final String				HTML_TR										= "<tr>";																//$NON-NLS-1$
-	private static final String				HTML_TR_END									= "</tr>";																//$NON-NLS-1$
+	private static final String	HTML_TD													= "<td>";																				//$NON-NLS-1$
+	private static final String	HTML_TD_SPACE											= "<td ";																				//$NON-NLS-1$
+	private static final String	HTML_TD_END												= "</td>";																				//$NON-NLS-1$
+	private static final String	HTML_TR													= "<tr>";																				//$NON-NLS-1$
+	private static final String	HTML_TR_END												= "</tr>";																				//$NON-NLS-1$
 	//
-	private static final String				JS_FUNCTION_ON_SELECT_IMPORT_CONFIG			= "onSelectImportConfig";												//$NON-NLS-1$
+	private static final String	JS_FUNCTION_ON_SELECT_IMPORT_CONFIG				= "onSelectImportConfig";															//$NON-NLS-1$
 	//
-	private static final String				WEB_RESOURCE_TITLE_FONT						= "Nunito-Bold.ttf";													//$NON-NLS-1$
-//	private static final String				WEB_RESOURCE_TITLE_FONT						= "NothingYouCouldDo.ttf";					//$NON-NLS-1$
-	private static final String				WEB_RESOURCE_TOUR_IMPORT_BG_IMAGE			= "mytourbook-icon.svg";												//$NON-NLS-1$
-	private static final String				WEB_RESOURCE_TOUR_IMPORT_CSS				= "tour-import.css";													//$NON-NLS-1$
-	private static final String				WEB_RESOURCE_TOUR_IMPORT_CSS3				= "tour-import-css3.css";												//$NON-NLS-1$
+	private static final String	WEB_RESOURCE_TITLE_FONT								= "Nunito-Bold.ttf";																	//$NON-NLS-1$
+//	private static final String	WEB_RESOURCE_TITLE_FONT								= "NothingYouCouldDo.ttf";					//$NON-NLS-1$
+	private static final String	WEB_RESOURCE_TOUR_IMPORT_BG_IMAGE				= "mytourbook-icon.svg";															//$NON-NLS-1$
+	private static final String	WEB_RESOURCE_TOUR_IMPORT_CSS						= "tour-import.css";																	//$NON-NLS-1$
+	private static final String	WEB_RESOURCE_TOUR_IMPORT_CSS3						= "tour-import-css3.css";															//$NON-NLS-1$
 	//
-	private static final String				CSS_IMPORT_BACKGROUND						= "div.import-background";												//$NON-NLS-1$
-	private static final String				CSS_IMPORT_TILE								= "a.import-tile";														//$NON-NLS-1$
+	private static final String	CSS_IMPORT_BACKGROUND								= "div.import-background";															//$NON-NLS-1$
+	private static final String	CSS_IMPORT_TILE										= "a.import-tile";																	//$NON-NLS-1$
 	//
-	static final int						COLUMN_DATE									= 0;
-	static final int						COLUMN_TITLE								= 1;
-	static final int						COLUMN_DATA_FORMAT							= 2;
-	static final int						COLUMN_FILE_NAME							= 3;
-	static final int						COLUMN_TIME_ZONE							= 4;
+	static final int					COLUMN_DATE												= 0;
+	static final int					COLUMN_TITLE											= 1;
+	static final int					COLUMN_DATA_FORMAT									= 2;
+	static final int					COLUMN_FILE_NAME										= 3;
+	static final int					COLUMN_TIME_ZONE										= 4;
 	//
-	private static final String				STATE_IMPORTED_FILENAMES					= "importedFilenames";													//$NON-NLS-1$
-	private static final String				STATE_SELECTED_TOUR_INDICES					= "SelectedTourIndices";												//$NON-NLS-1$
+	private static final String	STATE_IMPORTED_FILENAMES							= "importedFilenames";																//$NON-NLS-1$
+	private static final String	STATE_SELECTED_TOUR_INDICES						= "SelectedTourIndices";															//$NON-NLS-1$
 	//
-	public static final String				STATE_IS_CHECKSUM_VALIDATION				= "isChecksumValidation";												//$NON-NLS-1$
-	public static final boolean				STATE_IS_CHECKSUM_VALIDATION_DEFAULT		= true;
-	public static final String				STATE_IS_CONVERT_WAYPOINTS					= "STATE_IS_CONVERT_WAYPOINTS";										//$NON-NLS-1$
-	public static final boolean				STATE_IS_CONVERT_WAYPOINTS_DEFAULT			= true;
-	public static final String				STATE_IS_CREATE_TOUR_ID_WITH_TIME			= "isCreateTourIdWithTime";											//$NON-NLS-1$
-	public static final boolean				STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT	= false;
-	public static final String				STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW			= "STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW";								//$NON-NLS-1$
-	public static final boolean				STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT	= true;
-	private static final String				STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED		= "STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED";							//$NON-NLS-1$
-	public static final String				STATE_IS_MERGE_TRACKS						= "isMergeTracks";														//$NON-NLS-1$
-	public static final boolean				STATE_IS_MERGE_TRACKS_DEFAULT				= false;
+	public static final String		STATE_IS_CHECKSUM_VALIDATION						= "isChecksumValidation";															//$NON-NLS-1$
+	public static final boolean	STATE_IS_CHECKSUM_VALIDATION_DEFAULT			= true;
+	public static final String		STATE_IS_CONVERT_WAYPOINTS							= "STATE_IS_CONVERT_WAYPOINTS";													//$NON-NLS-1$
+	public static final boolean	STATE_IS_CONVERT_WAYPOINTS_DEFAULT				= true;
+	public static final String		STATE_IS_CREATE_TOUR_ID_WITH_TIME				= "isCreateTourIdWithTime";														//$NON-NLS-1$
+	public static final boolean	STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT		= false;
+	public static final String		STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW				= "STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW";										//$NON-NLS-1$
+	public static final boolean	STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT	= true;
+	private static final String	STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED			= "STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED";									//$NON-NLS-1$
+	public static final String		STATE_IS_MERGE_TRACKS								= "isMergeTracks";																	//$NON-NLS-1$
+	public static final boolean	STATE_IS_MERGE_TRACKS_DEFAULT						= false;
 	//
-	private static final String				HREF_TOKEN									= "#";																	//$NON-NLS-1$
-	private static final String				PAGE_ABOUT_BLANK							= "about:blank";														//$NON-NLS-1$
+	private static final String	HREF_TOKEN												= "#";																					//$NON-NLS-1$
+	private static final String	PAGE_ABOUT_BLANK										= "about:blank";																		//$NON-NLS-1$
 
 	/**
 	 * This is necessary otherwise XULrunner in Linux do not fire a location change event.
 	 */
-	private static final String				HTTP_DUMMY									= "http://dummy";														//$NON-NLS-1$
+	private static final String	HTTP_DUMMY												= "http://dummy";																		//$NON-NLS-1$
 
-	private static final String				HTML_STYLE_TITLE_VERTICAL_PADDING			= "style='padding-top:10px;'";											//$NON-NLS-1$
+	private static final String	HTML_STYLE_TITLE_VERTICAL_PADDING				= "style='padding-top:10px;'";													//$NON-NLS-1$
 
-	private static String					ACTION_DEVICE_IMPORT						= "DeviceImport";														//$NON-NLS-1$
-	private static String					ACTION_DEVICE_WATCHING_ON_OFF				= "DeviceOnOff";														//$NON-NLS-1$
-	private static final String				ACTION_IMPORT_FROM_FILES					= "ImportFromFiles";													//$NON-NLS-1$
-	private static final String				ACTION_OLD_UI								= "OldUI";																//$NON-NLS-1$
-	private static final String				ACTION_SERIAL_PORT_CONFIGURED				= "SerialPortConfigured";												//$NON-NLS-1$
-	private static final String				ACTION_SERIAL_PORT_DIRECTLY					= "SerialPortDirectly";												//$NON-NLS-1$
-	private static final String				ACTION_SETUP_EASY_IMPORT					= "SetupEasyImport";													//$NON-NLS-1$
+	private static String			ACTION_DEVICE_IMPORT									= "DeviceImport";																		//$NON-NLS-1$
+	private static String			ACTION_DEVICE_WATCHING_ON_OFF						= "DeviceOnOff";																		//$NON-NLS-1$
+	private static final String	ACTION_IMPORT_FROM_FILES							= "ImportFromFiles";																	//$NON-NLS-1$
+	private static final String	ACTION_OLD_UI											= "OldUI";																				//$NON-NLS-1$
+	private static final String	ACTION_SERIAL_PORT_CONFIGURED						= "SerialPortConfigured";															//$NON-NLS-1$
+	private static final String	ACTION_SERIAL_PORT_DIRECTLY						= "SerialPortDirectly";																//$NON-NLS-1$
+	private static final String	ACTION_SETUP_EASY_IMPORT							= "SetupEasyImport";																	//$NON-NLS-1$
 	//
-	private static final String				DOM_CLASS_DEVICE_ON							= "deviceOn";															//$NON-NLS-1$
-	private static final String				DOM_CLASS_DEVICE_OFF						= "deviceOff";															//$NON-NLS-1$
-	private static final String				DOM_CLASS_DEVICE_ON_ANIMATED				= "deviceOnAnimated";													//$NON-NLS-1$
-	private static final String				DOM_CLASS_DEVICE_OFF_ANIMATED				= "deviceOffAnimated";													//$NON-NLS-1$
+	private static final String	DOM_CLASS_DEVICE_ON									= "deviceOn";																			//$NON-NLS-1$
+	private static final String	DOM_CLASS_DEVICE_OFF									= "deviceOff";																			//$NON-NLS-1$
+	private static final String	DOM_CLASS_DEVICE_ON_ANIMATED						= "deviceOnAnimated";																//$NON-NLS-1$
+	private static final String	DOM_CLASS_DEVICE_OFF_ANIMATED						= "deviceOffAnimated";																//$NON-NLS-1$
 	//
-	private static final String				DOM_ID_DEVICE_ON_OFF						= "deviceOnOff";														//$NON-NLS-1$
-	private static final String				DOM_ID_DEVICE_STATE							= "deviceState";														//$NON-NLS-1$
-	private static final String				DOM_ID_IMPORT_CONFIG						= "importConfig";														//$NON-NLS-1$
-	private static final String				DOM_ID_IMPORT_TILES							= "importTiles";														//$NON-NLS-1$
+	private static final String	DOM_ID_DEVICE_ON_OFF									= "deviceOnOff";																		//$NON-NLS-1$
+	private static final String	DOM_ID_DEVICE_STATE									= "deviceState";																		//$NON-NLS-1$
+	private static final String	DOM_ID_IMPORT_CONFIG									= "importConfig";																		//$NON-NLS-1$
+	private static final String	DOM_ID_IMPORT_TILES									= "importTiles";																		//$NON-NLS-1$
 	//
-	private static String					HREF_ACTION_DEVICE_IMPORT;
-	private static String					HREF_ACTION_DEVICE_WATCHING_ON_OFF;
-	private static String					HREF_ACTION_IMPORT_FROM_FILES;
-	private static String					HREF_ACTION_OLD_UI;
-	private static String					HREF_ACTION_SERIAL_PORT_CONFIGURED;
-	private static String					HREF_ACTION_SERIAL_PORT_DIRECTLY;
-	private static String					HREF_ACTION_SETUP_EASY_IMPORT;
+	private static String			HREF_ACTION_DEVICE_IMPORT;
+	private static String			HREF_ACTION_DEVICE_WATCHING_ON_OFF;
+	private static String			HREF_ACTION_IMPORT_FROM_FILES;
+	private static String			HREF_ACTION_OLD_UI;
+	private static String			HREF_ACTION_SERIAL_PORT_CONFIGURED;
+	private static String			HREF_ACTION_SERIAL_PORT_DIRECTLY;
+	private static String			HREF_ACTION_SETUP_EASY_IMPORT;
 
 	static {
+
 		HREF_ACTION_DEVICE_IMPORT = HREF_TOKEN + ACTION_DEVICE_IMPORT;
 		HREF_ACTION_DEVICE_WATCHING_ON_OFF = HREF_TOKEN + ACTION_DEVICE_WATCHING_ON_OFF;
 		HREF_ACTION_IMPORT_FROM_FILES = HREF_TOKEN + ACTION_IMPORT_FROM_FILES;
@@ -291,70 +293,65 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	}
 
 	//
-	private final IPreferenceStore			_prefStore									= TourbookPlugin.getPrefStore();
-	private final IPreferenceStore			_prefStoreCommon							= CommonActivator
-																								.getPrefStore();
-	private final IDialogSettings			_state										= TourbookPlugin.getState(ID);
+	private final IPreferenceStore			_prefStore						= TourbookPlugin.getPrefStore();
+	private final IPreferenceStore			_prefStoreCommon				= CommonActivator
+			.getPrefStore();
+	private final IDialogSettings				_state							= TourbookPlugin.getState(ID);
 	//
-	private RawDataManager					_rawDataMgr									= RawDataManager.getInstance();
-	private TableViewer						_tourViewer;
+	private RawDataManager						_rawDataMgr						= RawDataManager.getInstance();
+	private TableViewer							_tourViewer;
 	private TableViewerTourInfoToolTip		_tourInfoToolTip;
-	private ColumnManager					_columnManager;
-	private SelectionAdapter				_columnSortListener;
-	private TableColumnDefinition			_timeZoneOffsetColDef;
-	private ImportComparator				_importComparator;
+	private ColumnManager						_columnManager;
+	private SelectionAdapter					_columnSortListener;
+	private TableColumnDefinition				_timeZoneOffsetColDef;
+	private ImportComparator					_importComparator;
 	//
-	private String							_columnId_DeviceName;
-	private String							_columnId_ImportFileName;
-	private String							_columnId_TimeZone;
-	private String							_columnId_Title;
-	private String							_columnId_TourStartDate;
+	private String									_columnId_DeviceName;
+	private String									_columnId_ImportFileName;
+	private String									_columnId_TimeZone;
+	private String									_columnId_Title;
+	private String									_columnId_TourStartDate;
 	//
-	private PostSelectionProvider			_postSelectionProvider;
-	private IPartListener2					_partListener;
-	private ISelectionListener				_postSelectionListener;
+	private PostSelectionProvider				_postSelectionProvider;
+	private IPartListener2						_partListener;
+	private ISelectionListener					_postSelectionListener;
 	private IPropertyChangeListener			_prefChangeListener;
 	private IPropertyChangeListener			_prefChangeListenerCommon;
-	private ITourEventListener				_tourEventListener;
+	private ITourEventListener					_tourEventListener;
 	//
 	// context menu actions
-	private ActionClearView					_actionClearView;
-	private ActionOpenTourLogView			_actionOpenTourLogView;
-	private ActionDeleteTourFiles			_actionDeleteTourFile;
-	private ActionExport					_actionExportTour;
-	private ActionEditQuick					_actionEditQuick;
-	private ActionEditTour					_actionEditTour;
-	private ActionJoinTours					_actionJoinTours;
+	private ActionClearView						_actionClearView;
+	private ActionOpenTourLogView				_actionOpenTourLogView;
+	private ActionDeleteTourFiles				_actionDeleteTourFile;
+	private ActionExport							_actionExportTour;
+	private ActionEditQuick						_actionEditQuick;
+	private ActionEditTour						_actionEditTour;
+	private ActionJoinTours						_actionJoinTours;
 	private ActionMergeIntoMenu				_actionMergeIntoTour;
-	private ActionMergeTour					_actionMergeTour;
+	private ActionMergeTour						_actionMergeTour;
 	private ActionModifyColumns				_actionModifyColumns;
-	private ActionOpenTour					_actionOpenTour;
+	private ActionOpenTour						_actionOpenTour;
 	private ActionOpenMarkerDialog			_actionOpenMarkerDialog;
 	private ActionOpenAdjustAltitudeDialog	_actionOpenAdjustAltitudeDialog;
-	private ActionOpenPrefDialog			_actionEditImportPreferences;
-	private ActionReimportSubMenu			_actionReimportSubMenu;
-	private ActionRemoveTour				_actionRemoveTour;
+	private ActionOpenPrefDialog				_actionEditImportPreferences;
+	private ActionReimportSubMenu				_actionReimportSubMenu;
+	private ActionRemoveTour					_actionRemoveTour;
 	private ActionRemoveToursWhenClosed		_actionRemoveToursWhenClosed;
-	private ActionSaveTourInDatabase		_actionSaveTour;
-	private ActionSaveTourInDatabase		_actionSaveTourWithPerson;
-	private ActionSetupImport				_actionSetupImport;
-	private ActionSetTourTypeMenu			_actionSetTourType;
+	private ActionSaveTourInDatabase			_actionSaveTour;
+	private ActionSaveTourInDatabase			_actionSaveTourWithPerson;
+	private ActionSetupImport					_actionSetupImport;
+	private ActionSetTourTypeMenu				_actionSetTourType;
 	//
-	protected TourPerson					_activePerson;
-	protected TourPerson					_newActivePerson;
+	protected TourPerson							_activePerson;
+	protected TourPerson							_newActivePerson;
 	//
-	protected boolean						_isPartVisible								= false;
-	protected boolean						_isViewerPersonDataDirty					= false;
+	protected boolean								_isPartVisible					= false;
+	protected boolean								_isViewerPersonDataDirty	= false;
 	//
-	/**
-	 * E4 calls partClosed() even when not created
-	 */
-	private boolean							_isPartCreated;
+	private final NumberFormat					_nf1;
+	private final NumberFormat					_nf3;
 	//
-	private final NumberFormat				_nf1;
-	private final NumberFormat				_nf3;
-	//
-	private final PeriodType				_durationTemplate;
+	private final PeriodType					_durationTemplate;
 	{
 		_nf1 = NumberFormat.getNumberInstance();
 		_nf3 = NumberFormat.getNumberInstance();
@@ -365,43 +362,43 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_nf3.setMaximumFractionDigits(3);
 
 		_durationTemplate = PeriodType.yearMonthDayTime()
-		//		// hide these components
+
+				// hide these components
 				.withMillisRemoved();
 	}
 	//
+	private boolean						_isToolTipInDate;
+	private boolean						_isToolTipInTime;
+	private boolean						_isToolTipInTitle;
+	private boolean						_isToolTipInTags;
 	//
-	private boolean							_isToolTipInDate;
-	private boolean							_isToolTipInTime;
-	private boolean							_isToolTipInTitle;
-	private boolean							_isToolTipInTags;
-	//
-	private TagMenuManager					_tagMenuMgr;
-	private TourDoubleClickState			_tourDoubleClickState						= new TourDoubleClickState();
+	private TagMenuManager				_tagMenuMgr;
+	private TourDoubleClickState		_tourDoubleClickState			= new TourDoubleClickState();
 	//
 	private Thread							_watchingStoresThread;
 	private Thread							_watchingFolderThread;
 	private WatchService					_folderWatcher;
-	private boolean							_isStopWatchingStoresThread;
-	private AtomicBoolean					_isWatchingStores							= new AtomicBoolean();
-	private AtomicBoolean					_isDeviceStateUpdateDelayed					= new AtomicBoolean();
-	private ReentrantLock					WATCH_LOCK									= new ReentrantLock();
+	private boolean						_isStopWatchingStoresThread;
+	private AtomicBoolean				_isWatchingStores					= new AtomicBoolean();
+	private AtomicBoolean				_isDeviceStateUpdateDelayed	= new AtomicBoolean();
+	private ReentrantLock				WATCH_LOCK							= new ReentrantLock();
 	//
-	private HashMap<Long, Image>			_configImages								= new HashMap<>();
-	private HashMap<Long, Integer>			_configImageHash							= new HashMap<>();
+	private HashMap<Long, Image>		_configImages						= new HashMap<>();
+	private HashMap<Long, Integer>	_configImageHash					= new HashMap<>();
 	//
-	private boolean							_isBrowserCompleted;
-	private boolean							_isInUIStartup;
-	private boolean							_isInUpdate;
-	private boolean							_isNewUI;
+	private boolean						_isBrowserCompleted;
+	private boolean						_isInUIStartup;
+	private boolean						_isInUpdate;
+	private boolean						_isNewUI;
 
 	/**
 	 * When <code>false</code> then the background WatchStores task must set it valid. Only when it
 	 * is valid then the device state icon displays the state, otherwise it shows a waiting icon.
 	 */
-	private boolean							_isDeviceStateValid;
-	private boolean							_isRunDashboardAnimation					= true;
-	private boolean							_isShowWatcherAnimation;
-	private boolean							_isUpdateDeviceState						= true;
+	private boolean						_isDeviceStateValid;
+	private boolean						_isRunDashboardAnimation		= true;
+	private boolean						_isShowWatcherAnimation;
+	private boolean						_isUpdateDeviceState				= true;
 	//
 	private String							_cssFonts;
 	private String							_cssFromFile;
@@ -423,14 +420,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private String							_imageUrl_State_SaveTour;
 	private String							_imageUrl_State_TourMarker;
 	//
-	private PixelConverter					_pc;
+	private PixelConverter				_pc;
 
 	/*
 	 * resources
 	 */
-	private ImageRegistry					_images;
+	private ImageRegistry				_images;
 
-	private DialogEasyImportConfig			_dialogImportConfig;
+	private DialogEasyImportConfig	_dialogImportConfig;
 
 	/*
 	 * UI controls
@@ -452,15 +449,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private Link							_linkImport;
 
-	private Browser							_browser;
+	private Browser						_browser;
 
 	private class ImportComparator extends ViewerComparator {
 
-		static final int			ASCENDING		= 0;
-		private static final int	DESCENDING		= 1;
+		static final int				ASCENDING	= 0;
+		private static final int	DESCENDING	= 1;
 
-		private String				__sortColumnId;
-		private int					__sortDirection;
+		private String					__sortColumnId;
+		private int						__sortDirection;
 
 		@Override
 		public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
@@ -537,11 +534,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 
 		/**
-		 * Does the sort. If it's a different column from the previous sort, do an ascending sort.
-		 * If it's the same column as the last sort, toggle the sort direction.
-		 * 
+		 * Does the sort. If it's a different column from the previous sort, do an ascending sort. If
+		 * it's the same column as the last sort, toggle the sort direction.
+		 *
 		 * @param widget
-		 *            Column widget
+		 *           Column widget
 		 */
 		private void setSortColumn(final Widget widget) {
 
@@ -633,8 +630,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	/**
 	 * @param selectedTab
-	 *            Tab which should be selected when config dialog is opened, -1 will select the
-	 *            restored tab index.
+	 *           Tab which should be selected when config dialog is opened, -1 will select the
+	 *           restored tab index.
 	 */
 	void action_Easy_SetupImport(final int selectedTab) {
 
@@ -782,9 +779,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 
-				if (partRef.getPart(false) == RawDataView.this && _isPartCreated) {
-
-					saveState();
+				if (partRef.getPart(false) == RawDataView.this) {
 
 					// remove all tours
 					_rawDataMgr.removeAllTours();
@@ -871,14 +866,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
-					_tourViewer.getTable().setLinesVisible(
-							_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+					_tourViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 					_tourViewer.refresh();
 
 					/*
-					 * the tree must be redrawn because the styled text does not show with the new
-					 * color
+					 * the tree must be redrawn because the styled text does not show with the new color
 					 */
 					_tourViewer.getTable().redraw();
 				}
@@ -1003,7 +996,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	/**
 	 * Create css from the import configurations.
-	 * 
+	 *
 	 * @return
 	 */
 	private String createCSS_Custom() {
@@ -1087,7 +1080,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		 * Tile size
 		 */
 		final String tileSize = UI.EMPTY_STRING
-		//
+				//
 				+ (CSS_IMPORT_TILE + "\n") //$NON-NLS-1$
 				+ ("{\n") //$NON-NLS-1$
 				+ ("	min-height: " + itemSize + "px;\n") //$NON-NLS-1$ //$NON-NLS-2$
@@ -1100,7 +1093,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		 * State tooltip
 		 */
 		final String stateTooltip = UI.EMPTY_STRING
-		//
+				//
 				+ (".stateTooltip\n") //$NON-NLS-1$
 				+ ("{\n") //$NON-NLS-1$
 				+ ("	width:" + easyConfig.stateToolTipWidth + "px;\n") //$NON-NLS-1$ //$NON-NLS-2$
@@ -1163,8 +1156,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		{
 			/*
 			 * Very tricky: When a parent has an opacity, a child cannot modify it. Therefore the
-			 * different divs with position relative/absolute. It took me some time to
-			 * find/implement this tricky but simple solution.
+			 * different divs with position relative/absolute. It took me some time to find/implement
+			 * this tricky but simple solution.
 			 */
 			sb.append("<div class='import-background'></div>\n"); //$NON-NLS-1$
 
@@ -1370,8 +1363,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			String folderInfo = null;
 
 			/*
-			 * Show back folder info only when device folder is OK because they are related
-			 * together.
+			 * Show back folder info only when device folder is OK because they are related together.
 			 */
 			if (isDeviceFolderOK) {
 
@@ -1524,8 +1516,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final String stateIconValue = isDeviceFolderOK ? Integer.toString(numNotImportedFiles) : UI.EMPTY_STRING;
 
 		/*
-		 * Show overflow scrollbar ONLY when more than 10 entries are available because it looks
-		 * ugly.
+		 * Show overflow scrollbar ONLY when more than 10 entries are available because it looks ugly.
 		 */
 		final String cssOverflow = numNotImportedFiles > 10 //
 				? "style='overflow-y: scroll;'" //$NON-NLS-1$
@@ -1555,12 +1546,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 * @param folderTitle
 	 * @param folderInfo
 	 */
-	private void createHTML_56_FolderState(	final StringBuilder sb,
-											final String folderLocation,
-											final boolean isOSFolderValid,
-											final boolean isTopMargin,
-											final String folderTitle,
-											final String folderInfo) {
+	private void createHTML_56_FolderState(final StringBuilder sb,
+														final String folderLocation,
+														final boolean isOSFolderValid,
+														final boolean isTopMargin,
+														final String folderTitle,
+														final String folderInfo) {
 
 		String htmlErrorState;
 		String htmlFolderInfo;
@@ -2018,10 +2009,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	}
 
 	private void createHTML_92_TileAction(	final StringBuilder sb,
-											final String name,
-											final String tooltip,
-											final String href,
-											final String imageUrl) {
+														final String name,
+														final String tooltip,
+														final String href,
+														final String imageUrl) {
 
 		String htmlImage = UI.EMPTY_STRING;
 
@@ -2100,8 +2091,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		// the part visible listener shows the top page also
 		updateUI_1_TopPage(true);
-
-		_isPartCreated = true;
 	}
 
 	private void createResources_Image() {
@@ -2113,7 +2102,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		 */
 		_images.put(IMAGE_DATABASE, //
 				TourbookPlugin.getImageDescriptor(Messages.Image__database));
-		_images.put(IMAGE_DATABASE_OTHER_PERSON,//
+		_images.put(IMAGE_DATABASE_OTHER_PERSON, //
 				TourbookPlugin.getImageDescriptor(Messages.Image__database_other_person));
 		_images.put(IMAGE_ASSIGN_MERGED_TOUR, //
 				TourbookPlugin.getImageDescriptor(Messages.Image__assignMergedTour));
@@ -2135,7 +2124,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		 */
 		_images.put(IMAGE_DATA_TRANSFER, //
 				TourbookPlugin.getImageDescriptor(Messages.Image__RawData_Transfer));
-		_images.put(IMAGE_DATA_TRANSFER_DIRECT,//
+		_images.put(IMAGE_DATA_TRANSFER_DIRECT, //
 				TourbookPlugin.getImageDescriptor(Messages.Image__RawData_TransferDirect));
 		_images.put(IMAGE_IMPORT_FROM_FILES, //
 				TourbookPlugin.getImageDescriptor(Messages.Image__RawData_Import));
@@ -2391,7 +2380,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	/**
 	 * This page is displayed until the first page of the browser is loaded.
-	 * 
+	 *
 	 * @param parent
 	 * @return
 	 */
@@ -2621,7 +2610,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * Defines all columns for the table viewer in the column manager, the sequenze defines the
 	 * default columns
-	 * 
+	 *
 	 * @param parent
 	 */
 	private void defineAllColumns() {
@@ -2848,7 +2837,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				final long drivingTime = tourData.getTourDrivingTime();
 
 				final float pace = tourDistance == 0 ? //
-						0
+				0
 						: drivingTime * 1000 / tourDistance * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
 				if (pace == 0) {
@@ -3216,7 +3205,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			@Override
 			public void update(final ViewerCell cell) {
 
-
 				final TourType tourType = ((TourData) cell.getElement()).getTourType();
 
 				if (tourType == null) {
@@ -3227,9 +3215,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					final Image tourTypeImage = TourTypeImage.getTourTypeImage(tourTypeId);
 
 					/*
-					 * when a tour type image is modified, it will keep the same image resource only
-					 * the content is modified but in the rawDataView the modified image is not
-					 * displayed compared with the tourBookView which displays the correct image
+					 * when a tour type image is modified, it will keep the same image resource only the
+					 * content is modified but in the rawDataView the modified image is not displayed
+					 * compared with the tourBookView which displays the correct image
 					 */
 					cell.setImage(tourTypeImage);
 				}
@@ -3286,10 +3274,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	}
 
 	private void deleteFile(final ArrayList<String> deletedFiles,
-							final ArrayList<String> notDeletedFiles,
-							final String fileFolder,
-							final String fileName,
-							final TourLogState importLogState) {
+									final ArrayList<String> notDeletedFiles,
+									final String fileFolder,
+									final String fileName,
+									final TourLogState importLogState) {
 
 		if (fileFolder == null || fileFolder.trim().length() == 0) {
 			// there is no folder
@@ -3375,15 +3363,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	/**
 	 * @param tourData
-	 *            {@link TourData} which is not yet saved.
+	 *           {@link TourData} which is not yet saved.
 	 * @param person
-	 *            Person for which the tour is being saved.
+	 *           Person for which the tour is being saved.
 	 * @param savedTours
-	 *            The saved tour is added to this list.
+	 *           The saved tour is added to this list.
 	 */
-	private void doSaveTour_OneTour(final TourData tourData,
-									final TourPerson person,
-									final ArrayList<TourData> savedTours) {
+	private void doSaveTour_OneTour(	final TourData tourData,
+												final TourPerson person,
+												final ArrayList<TourData> savedTours) {
 
 		// workaround for hibernate problems
 		if (tourData.isTourDeleted) {
@@ -3393,8 +3381,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		if (tourData.getTourPerson() != null) {
 
 			/*
-			 * tour is already saved, resaving cannot be done in the import view it can be done in
-			 * the tour editor
+			 * tour is already saved, resaving cannot be done in the import view it can be done in the
+			 * tour editor
 			 */
 			return;
 		}
@@ -3423,9 +3411,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	/**
 	 * After tours are saved, the internal structures and ui viewers must be updated
-	 * 
+	 *
 	 * @param savedTours
-	 *            contains the saved {@link TourData}
+	 *           contains the saved {@link TourData}
 	 */
 	private void doSaveTour_PostActions(final ArrayList<TourData> savedTours) {
 
@@ -3447,8 +3435,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 
 		/*
-		 * the selection provider can contain old tour data which conflicts with the tour data in
-		 * the tour data editor
+		 * the selection provider can contain old tour data which conflicts with the tour data in the
+		 * tour data editor
 		 */
 		_postSelectionProvider.clearSelection();
 
@@ -3736,8 +3724,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				} else {
 
 					/*
-					 * get the data from the database because the tag names could be changed and
-					 * this is not reflected in the tours which are displayed in the raw data view
+					 * get the data from the database because the tag names could be changed and this is
+					 * not reflected in the tours which are displayed in the raw data view
 					 */
 
 					final TourData tourDataInDb = tourManager.getTourData(tourData.getTourId());
@@ -3929,8 +3917,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				if (tourData.getTourPerson() != null) {
 
 					/*
-					 * get the data from the database because the tag names could be changed and
-					 * this is not reflected in the tours which are displayed in the raw data view
+					 * get the data from the database because the tag names could be changed and this is
+					 * not reflected in the tours which are displayed in the raw data view
 					 */
 					final TourData tourDataInDb = tourManager.getTourData(tourData.getTourId());
 					if (tourDataInDb != null) {
@@ -4030,8 +4018,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * @param image
 	 * @param importConfig
-	 * @return Returns <code>true</code> when the image is valid, returns <code>false</code> when
-	 *         the profile image must be created,
+	 * @return Returns <code>true</code> when the image is valid, returns <code>false</code> when the
+	 *         profile image must be created,
 	 */
 	private boolean isConfigImageValid(final Image image, final ImportLauncher importConfig) {
 
@@ -4192,7 +4180,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	/**
 	 * Import config is selected in the dashboard.
-	 * 
+	 *
 	 * @param selectedIndex
 	 */
 	private void onSelectImportConfig(final int selectedIndex) {
@@ -4291,7 +4279,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	/**
 	 * Update {@link TourData} from the database for all imported tours, displays a progress dialog.
-	 * 
+	 *
 	 * @param canCancelable
 	 */
 	private void reimportAllImportFiles(final boolean canCancelable) {
@@ -4342,14 +4330,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	/**
 	 * reimport previous imported tours
-	 * 
+	 *
 	 * @param monitor
 	 * @param importedFiles
 	 * @param canCancelable
 	 */
-	private void reimportAllImportFiles_Runnable(	final IProgressMonitor monitor,
-													final String[] importedFiles,
-													final boolean canCancelable) {
+	private void reimportAllImportFiles_Runnable(final IProgressMonitor monitor,
+																final String[] importedFiles,
+																final boolean canCancelable) {
 
 		int workedDone = 0;
 		final int workedAll = importedFiles.length;
@@ -4445,7 +4433,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	/**
 	 * This will also aktivate/deactivate the folder/store watcher.
-	 * 
+	 *
 	 * @see net.tourbook.common.util.ITourViewer#reloadViewer()
 	 */
 	@Override
@@ -4480,8 +4468,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				/**
 				 * when a remove tour is saved again, this will cause the exception: <br>
 				 * detached entity passed to persist: net.tourbook.data.TourMarker<br>
-				 * I didn't find a workaround, so this tour cannot be saved again until it is
-				 * reloaded from the file
+				 * I didn't find a workaround, so this tour cannot be saved again until it is reloaded
+				 * from the file
 				 */
 				tourData.isTourDeleted = true;
 			}
@@ -4512,7 +4500,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_rawDataMgr.setState_CreateTourIdWithTime(isCreateTourIdWithTime);
 
 		// auto open import log view
-		final boolean isAutoOpenLogView = Util.getStateBoolean(_state,//
+		final boolean isAutoOpenLogView = Util.getStateBoolean(_state, //
 				STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW,
 				RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT);
 		_rawDataMgr.setState_IsOpenImportLogView(isAutoOpenLogView);
@@ -4707,8 +4695,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 	}
 
-	private void runEasyImport_004_SetLastMarker(	final ImportLauncher importLauncher,
-													final ArrayList<TourData> importedTours) {
+	private void runEasyImport_004_SetLastMarker(final ImportLauncher importLauncher,
+																final ArrayList<TourData> importedTours) {
 
 		final String lastMarkerText = importLauncher.lastMarkerText;
 		if (lastMarkerText == null || lastMarkerText.trim().length() == 0) {
@@ -4757,7 +4745,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	}
 
 	private void runEasyImport_005_AdjustTemperature(	final ImportLauncher importLauncher,
-														final ArrayList<TourData> importedTours) {
+																		final ArrayList<TourData> importedTours) {
 
 		final float avgMinimumTemperature = importLauncher.tourAvgTemperature;
 		final float temperature = UI.convertTemperatureFromMetric(avgMinimumTemperature);
@@ -4765,10 +4753,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		TourLogManager.addLog(
 				TourLogState.DEFAULT,
-				NLS.bind(EasyImportManager.LOG_EASY_IMPORT_005_ADJUST_TEMPERATURE, new Object[] {
-						getDurationText(importLauncher),
-						_nf1.format(temperature),
-						UI.UNIT_LABEL_TEMPERATURE }));
+				NLS.bind(EasyImportManager.LOG_EASY_IMPORT_005_ADJUST_TEMPERATURE,
+						new Object[] {
+								getDurationText(importLauncher),
+								_nf1.format(temperature),
+								UI.UNIT_LABEL_TEMPERATURE }));
 
 		for (final TourData tourData : importedTours) {
 
@@ -4797,8 +4786,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 * @return Returns list with saved tours.
 	 */
 	private ArrayList<TourData> runEasyImport_099_SaveTour(	final TourPerson person,
-															final ArrayList<TourData> selectedTours,
-															final boolean isEasyImport) {
+																				final ArrayList<TourData> selectedTours,
+																				final boolean isEasyImport) {
 
 		final String css = isEasyImport //
 				? UI.EMPTY_STRING
@@ -4854,14 +4843,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	/**
 	 * @param isDeleteAllFiles
-	 *            When <code>true</code> then all files (device and backup) will be deleted.
-	 *            Otherwise only device files will be deleted without any confirmation dialog, the
-	 *            backup files are not touched, this feature is used to move device files to the
-	 *            backup folder.
+	 *           When <code>true</code> then all files (device and backup) will be deleted. Otherwise
+	 *           only device files will be deleted without any confirmation dialog, the backup files
+	 *           are not touched, this feature is used to move device files to the backup folder.
 	 */
 	private void runEasyImport_100_DeleteTourFiles(	final boolean isDeleteAllFiles,
-													final ArrayList<TourData> allTourData,
-													final boolean isEasyImport) {
+																	final ArrayList<TourData> allTourData,
+																	final boolean isEasyImport) {
 
 		// open log view always then tour files are deleted
 		TourLogManager.showLogView();
@@ -4980,6 +4968,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		TourLogManager.addLog(TourLogState.DEFAULT, logText);
 	}
 
+	@PersistState
 	private void saveState() {
 
 		// check if UI is disposed
@@ -5155,8 +5144,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	/**
 	 * @param isStartWatching
-	 *            When <code>true</code> a new watcher ist restarted, otherwise this thread is
-	 *            canceled.
+	 *           When <code>true</code> a new watcher ist restarted, otherwise this thread is
+	 *           canceled.
 	 */
 	private void thread_WatchFolders(final boolean isStartWatching) {
 
@@ -5272,8 +5261,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 					if (isDeviceFolderValid) {
 
-						Thread.currentThread().setName(//
-								"WatchingDeviceFolder: " + deviceFolder + " - " + TimeTools.now()); //$NON-NLS-1$ //$NON-NLS-2$
+						Thread.currentThread().setName("WatchingDeviceFolder: " + deviceFolder + " - " + TimeTools.now()); //$NON-NLS-1$ //$NON-NLS-2$
 
 					} else {
 
@@ -5580,8 +5568,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		if (_dashboard_PageBook == null) {
 
 			/*
-			 * This occures when the app is started the first time and the measurement selection
-			 * dialog which fires an event
+			 * This occures when the app is started the first time and the measurement selection dialog
+			 * which fires an event
 			 */
 
 			return;
@@ -5655,7 +5643,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	/**
 	 * Set the sort column direction indicator for a column.
-	 * 
+	 *
 	 * @param sortColumnId
 	 * @param isAscendingSort
 	 */

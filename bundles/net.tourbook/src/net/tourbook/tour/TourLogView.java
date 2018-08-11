@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -49,59 +49,55 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.web.WEB;
 
 /**
- * Tour log view.
+ * Tour log view
  */
 public class TourLogView extends ViewPart {
 
-	public static final String	ID									= "net.tourbook.tour.TourLogView";					//$NON-NLS-1$
+	public static final String		ID											= "net.tourbook.tour.TourLogView";						//$NON-NLS-1$
 	//
-	private static final String	STATE_COPY							= "COPY";											//$NON-NLS-1$
-	private static final String	STATE_DELETE						= "DELETE";										//$NON-NLS-1$
-	private static final String	STATE_ERROR							= "ERROR";											//$NON-NLS-1$
-	private static final String	STATE_EXCEPTION						= "EXCEPTION";										//$NON-NLS-1$
-	private static final String	STATE_INFO							= "INFO";											//$NON-NLS-1$
-	private static final String	STATE_OK							= "OK";											//$NON-NLS-1$
-	private static final String	STATE_SAVE							= "SAVE";											//$NON-NLS-1$
+	private static final String	STATE_COPY								= "COPY";														//$NON-NLS-1$
+	private static final String	STATE_DELETE							= "DELETE";														//$NON-NLS-1$
+	private static final String	STATE_ERROR								= "ERROR";														//$NON-NLS-1$
+	private static final String	STATE_EXCEPTION						= "EXCEPTION";													//$NON-NLS-1$
+	private static final String	STATE_INFO								= "INFO";														//$NON-NLS-1$
+	private static final String	STATE_OK									= "OK";															//$NON-NLS-1$
+	private static final String	STATE_SAVE								= "SAVE";														//$NON-NLS-1$
 	//
-	public static final String	CSS_LOG_INFO						= "info";											//$NON-NLS-1$
-	private static final String	CSS_LOG_ITEM						= "logItem"; //$NON-NLS-1$
-	private static final String	CSS_LOG_SUB_ITEM					= "subItem";										//$NON-NLS-1$
-	public static final String	CSS_LOG_TITLE						= "title";											//$NON-NLS-1$
+	public static final String		CSS_LOG_INFO							= "info";														//$NON-NLS-1$
+	private static final String	CSS_LOG_ITEM							= "logItem";													//$NON-NLS-1$
+	private static final String	CSS_LOG_SUB_ITEM						= "subItem";													//$NON-NLS-1$
+	public static final String		CSS_LOG_TITLE							= "title";														//$NON-NLS-1$
 	//
-	private static final String	DOM_ID_LOG							= "logs";											//$NON-NLS-1$
-	private static final String	WEB_RESOURCE_TOUR_IMPORT_LOG_CSS	= "tour-import-log.css";							//$NON-NLS-1$
+	private static final String	DOM_ID_LOG								= "logs";														//$NON-NLS-1$
+	private static final String	WEB_RESOURCE_TOUR_IMPORT_LOG_CSS	= "tour-import-log.css";									//$NON-NLS-1$
 	//
-	private IPartListener2		_partListener;
+	private IPartListener2			_partListener;
 	//
-	private Action				_actionReset;
+	private Action						_actionReset;
 	//
-	private boolean				_isNewUI;
-	private boolean				_isBrowserCompleted;
+	private boolean					_isNewUI;
+	private boolean					_isBrowserCompleted;
 
-	/**
-	 * E4 calls partClosed() even when not created
-	 */
-	private boolean				_isPartCreated;
-
-	private String				_cssFromFile;
-	private String				_noBrowserLog						= UI.EMPTY_STRING;
+	private String						_cssFromFile;
+	private String						_noBrowserLog							= UI.EMPTY_STRING;
 	//
-	private String				_imageUrl_StateCopy					= getIconUrl(Messages.Image__State_Copy);
-	private String				_imageUrl_StateDeleteDevice			= getIconUrl(Messages.Image__State_Deleted_Device);
-	private String				_imageUrl_StateDeleteBackup			= getIconUrl(Messages.Image__State_Deleted_Backup);
-	private String				_imageUrl_StateError				= getIconUrl(Messages.Image__State_Error);
-	private String				_imageUrl_StateInfo					= getIconUrl(Messages.Image__State_Info);
-	private String				_imageUrl_StateOK					= getIconUrl(Messages.Image__State_OK);
-	private String				_imageUrl_StateSave					= getIconUrl(Messages.Image__State_Save);
+	private String						_imageUrl_StateCopy					= getIconUrl(Messages.Image__State_Copy);
+	private String						_imageUrl_StateDeleteDevice		= getIconUrl(Messages.Image__State_Deleted_Device);
+	private String						_imageUrl_StateDeleteBackup		= getIconUrl(Messages.Image__State_Deleted_Backup);
+	private String						_imageUrl_StateError					= getIconUrl(Messages.Image__State_Error);
+	private String						_imageUrl_StateInfo					= getIconUrl(Messages.Image__State_Info);
+	private String						_imageUrl_StateOK						= getIconUrl(Messages.Image__State_OK);
+	private String						_imageUrl_StateSave					= getIconUrl(Messages.Image__State_Save);
+
 	/*
 	 * UI controls
 	 */
-	private Browser				_browser;
-	private PageBook			_pageBook;
+	private Browser					_browser;
+	private PageBook					_pageBook;
 
-	private Composite			_page_NoBrowser;
-	private Composite			_page_WithBrowser;
-	private Text				_txtNoBrowser;
+	private Composite					_page_NoBrowser;
+	private Composite					_page_WithBrowser;
+	private Text						_txtNoBrowser;
 
 	public class ActionReset extends Action {
 
@@ -172,7 +168,7 @@ public class TourLogView extends ViewPart {
 					} else {
 
 						tdContent = UI.EMPTY_STRING
-						//
+								//
 								+ "var span = document.createElement('SPAN');\n" //$NON-NLS-1$
 								+ ("span.innerHTML='" + message + "';\n") //$NON-NLS-1$ //$NON-NLS-2$
 								+ "td.appendChild(span);\n"; //$NON-NLS-1$
@@ -183,18 +179,18 @@ public class TourLogView extends ViewPart {
 							+ ("var tr = document.createElement('TR');\n") //$NON-NLS-1$
 							+ ("tr.className='row';\n") //$NON-NLS-1$
 
-							// time
+					// time
 							+ ("var td = document.createElement('TD');\n") //$NON-NLS-1$
 							+ ("td.appendChild(document.createTextNode('" + tourLog.time + "'));\n") //$NON-NLS-1$ //$NON-NLS-2$
 							+ ("tr.appendChild(td);\n") //$NON-NLS-1$
 
-							// state
+					// state
 							+ ("var td = document.createElement('TD');\n") //$NON-NLS-1$
 							+ ("td.className='column icon';\n") //$NON-NLS-1$
 							+ stateWithBrowser[0]
 							+ ("tr.appendChild(td);\n") //$NON-NLS-1$
 
-							// message
+					// message
 							+ ("var td = document.createElement('TD');\n") //$NON-NLS-1$
 							+ ("td.className='column " + subItem + " " + css + "';\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 							+ tdContent
@@ -204,7 +200,7 @@ public class TourLogView extends ViewPart {
 							+ ("var logTable = document.getElementById(\"" + DOM_ID_LOG + "\");\n") //$NON-NLS-1$ //$NON-NLS-2$
 							+ ("logTable.tBodies[0].appendChild(tr);\n") //$NON-NLS-1$
 
-							// scroll to the bottom -> this do not work
+					// scroll to the bottom -> this do not work
 //							+ ("debugger;\n") //$NON-NLS-1$
 							+ ("var html = document.documentElement;\n") //$NON-NLS-1$
 							+ ("var scrollHeight = html.scrollHeight;\n") //$NON-NLS-1$
@@ -248,7 +244,7 @@ public class TourLogView extends ViewPart {
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 
-				if (partRef.getPart(false) == TourLogView.this && _isPartCreated) {
+				if (partRef.getPart(false) == TourLogView.this) {
 					TourLogManager.setLogView(null);
 				}
 			}
@@ -347,8 +343,6 @@ public class TourLogView extends ViewPart {
 		addPartListener();
 
 		updateUI();
-
-		_isPartCreated = true;
 	}
 
 	private void createUI(final Composite parent) {

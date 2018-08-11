@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -105,85 +106,79 @@ import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
 public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvider, IReferenceTourProvider,
 		ITreeViewer {
 
-	public static final String		ID									=
-			"net.tourbook.views.tourCatalog.TourCatalogView";												//$NON-NLS-1$
+	public static final String			ID												= "net.tourbook.views.tourCatalog.TourCatalogView";	//$NON-NLS-1$
 
-	public static final int			COLUMN_LABEL						= 0;
-	public static final int			COLUMN_SPEED						= 1;
+	public static final int				COLUMN_LABEL								= 0;
+	public static final int				COLUMN_SPEED								= 1;
 
-	private static final String		MEMENTO_TOUR_CATALOG_ACTIVE_REF_ID	= "tour.catalog.active.ref.id";		//$NON-NLS-1$
-	private static final String		MEMENTO_TOUR_CATALOG_LINK_TOUR		= "tour.catalog.link.tour";			//$NON-NLS-1$
+	private static final String		MEMENTO_TOUR_CATALOG_ACTIVE_REF_ID	= "tour.catalog.active.ref.id";								//$NON-NLS-1$
+	private static final String		MEMENTO_TOUR_CATALOG_LINK_TOUR		= "tour.catalog.link.tour";									//$NON-NLS-1$
 
-	private final IPreferenceStore	_prefStore							= TourbookPlugin.getPrefStore();
-	private final IDialogSettings	_state								= TourbookPlugin.getState(ID);
+	private final IPreferenceStore	_prefStore									= TourbookPlugin.getPrefStore();
+	private final IDialogSettings		_state										= TourbookPlugin.getState(ID);
 
-	private TVICatalogRootItem		_rootItem;
+	private TVICatalogRootItem			_rootItem;
 
-	private final NumberFormat		_nf1								= NumberFormat.getNumberInstance();
+	private final NumberFormat			_nf1											= NumberFormat.getNumberInstance();
 	{
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
 	}
 
-	private PostSelectionProvider		_postSelectionProvider;
+	private PostSelectionProvider			_postSelectionProvider;
 
-	private ISelectionListener			_postSelectionListener;
-	private IPartListener2				_partListener;
+	private ISelectionListener				_postSelectionListener;
+	private IPartListener2					_partListener;
 	private IPropertyChangeListener		_prefChangeListener;
-	private ITourEventListener			_tourEventListener;
+	private ITourEventListener				_tourEventListener;
 
 	/**
 	 * tour item which is selected by the link tour action
 	 */
-	protected TVICatalogComparedTour	_linkedTour;
+	protected TVICatalogComparedTour		_linkedTour;
 
 	/**
 	 * ref id which is currently selected in the tour viewer
 	 */
-	private long						_activeRefId;
+	private long								_activeRefId;
 
 	/**
 	 * flag if actions are added to the toolbar
 	 */
-	private boolean						_isToolbarCreated		= false;
+	private boolean							_isToolbarCreated			= false;
 
-	/**
-	 * E4 calls partClosed() even when not created
-	 */
-	private boolean						_isPartCreated;
+	private ColumnManager					_columnManager;
 
-	private ColumnManager				_columnManager;
+	private boolean							_isToolTipInRefTour;
+	private boolean							_isToolTipInTitle;
+	private boolean							_isToolTipInTags;
 
-	private boolean						_isToolTipInRefTour;
-	private boolean						_isToolTipInTitle;
-	private boolean						_isToolTipInTags;
-
-	private TagMenuManager				_tagMenuMgr;
+	private TagMenuManager					_tagMenuMgr;
 	private TreeViewerTourInfoToolTip	_tourInfoToolTip;
-	private TourDoubleClickState		_tourDoubleClickState	= new TourDoubleClickState();
+	private TourDoubleClickState			_tourDoubleClickState	= new TourDoubleClickState();
 
-	private PixelConverter				_pc;
+	private PixelConverter					_pc;
 
 	/*
 	 * UI controls
 	 */
-	private Composite					_viewerContainer;
-	private TreeViewer					_tourViewer;
+	private Composite							_viewerContainer;
+	private TreeViewer						_tourViewer;
 
 	private ActionRemoveComparedTours	_actionRemoveComparedTours;
 	private ActionRenameRefTour			_actionRenameRefTour;
-	private ActionLinkTour				_actionLinkTour;
-	private ActionCollapseAll			_actionCollapseAll;
-	private ActionCollapseOthers		_actionCollapseOthers;
-	private ActionExpandSelection		_actionExpandSelection;
-	private ActionRefreshView			_actionRefreshView;
+	private ActionLinkTour					_actionLinkTour;
+	private ActionCollapseAll				_actionCollapseAll;
+	private ActionCollapseOthers			_actionCollapseOthers;
+	private ActionExpandSelection			_actionExpandSelection;
+	private ActionRefreshView				_actionRefreshView;
 	private ActionModifyColumns			_actionModifyColumns;
-	private ActionEditQuick				_actionEditQuick;
-	private ActionEditTour				_actionEditTour;
-	private ActionSetTourTypeMenu		_actionSetTourType;
+	private ActionEditQuick					_actionEditQuick;
+	private ActionEditTour					_actionEditTour;
+	private ActionSetTourTypeMenu			_actionSetTourType;
 
 	private ActionTourCompareWizard		_actionTourCompareWizard;
-	private ActionOpenTour				_actionOpenTour;
+	private ActionOpenTour					_actionOpenTour;
 
 	class TourContentProvider implements ITreeContentProvider {
 
@@ -222,15 +217,15 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	 * Find the compared tours in the tour map tree viewer<br>
 	 * <br>
 	 * !!! Recursive !!!<br>
-	 * 
+	 *
 	 * @param comparedTours
 	 * @param parentItem
 	 * @param findCompIds
-	 *            comp id's which should be found
+	 *           comp id's which should be found
 	 */
 	private static void getComparedTours(	final ArrayList<TVICatalogComparedTour> comparedTours,
-											final TreeViewerItem parentItem,
-											final ArrayList<Long> findCompIds) {
+														final TreeViewerItem parentItem,
+														final ArrayList<Long> findCompIds) {
 
 		final ArrayList<TreeViewerItem> unfetchedChildren = parentItem.getUnfetchedChildren();
 
@@ -269,15 +264,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
 			@Override
-			public void partClosed(final IWorkbenchPartReference partRef) {
-
-				if (partRef.getPart(false) == TourCatalogView.this && _isPartCreated) {
-
-					saveState();
-
-//					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourCatalogView.this);
-				}
-			}
+			public void partClosed(final IWorkbenchPartReference partRef) {}
 
 			@Override
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
@@ -290,9 +277,10 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 			@Override
 			public void partOpened(final IWorkbenchPartReference partRef) {
+
 				/*
-				 * add the actions in the part open event so they are appended AFTER the actions
-				 * which are defined in the plugin.xml
+				 * add the actions in the part open event so they are appended AFTER the actions which
+				 * are defined in the plugin.xml
 				 */
 				fillToolbar();
 			}
@@ -407,14 +395,12 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
-					_tourViewer.getTree().setLinesVisible(
-							_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+					_tourViewer.getTree().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 					_tourViewer.refresh();
 
 					/*
-					 * the tree must be redrawn because the styled text does not show with the new
-					 * color
+					 * the tree must be redrawn because the styled text does not show with the new color
 					 */
 					_tourViewer.getTree().redraw();
 				}
@@ -551,8 +537,6 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 				}
 			}
 		});
-
-		_isPartCreated = true;
 	}
 
 	private void createUI(final Composite parent) {
@@ -1181,7 +1165,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 	/**
 	 * Selection changes in the tour map viewer
-	 * 
+	 *
 	 * @param selection
 	 */
 	private void onSelectionChanged(final IStructuredSelection selection) {
@@ -1293,7 +1277,8 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		updateToolTipState();
 	}
 
-	public void saveState() {
+	@PersistState
+	private void saveState() {
 
 		_state.put(MEMENTO_TOUR_CATALOG_ACTIVE_REF_ID, Long.toString(_activeRefId));
 		_state.put(MEMENTO_TOUR_CATALOG_LINK_TOUR, _actionLinkTour.isChecked());
@@ -1312,7 +1297,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 	/**
 	 * Select the reference tour in the tour viewer
-	 * 
+	 *
 	 * @param refId
 	 */
 	private void selectRefTour(final long refId) {
@@ -1352,7 +1337,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 	/**
 	 * Update viewer with new saved compared tours
-	 * 
+	 *
 	 * @param persistedCompareResults
 	 */
 	private void updateTourViewer(final ArrayList<TVICompareResultComparedTour> persistedCompareResults) {
@@ -1400,7 +1385,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 	/**
 	 * !!!Recursive !!! update all tour items with new data
-	 * 
+	 *
 	 * @param rootItem
 	 * @param modifiedTours
 	 */

@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -118,9 +119,9 @@ import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
 
 public class TaggingView extends ViewPart implements ITourProvider, ITourViewer, ITreeViewer {
 
-	static public final String				ID								= "net.tourbook.views.tagViewID";					//$NON-NLS-1$
+	static public final String				ID										= "net.tourbook.views.tagViewID";	//$NON-NLS-1$
 
-	private static final String				MEMENTO_TAG_VIEW_LAYOUT			= "tagview.layout";								//$NON-NLS-1$
+	private static final String			MEMENTO_TAG_VIEW_LAYOUT			= "tagview.layout";						//$NON-NLS-1$
 
 	/**
 	 * The expanded tag items have these structure:
@@ -132,20 +133,20 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 	 * 4. id/year/month<br>
 	 * ...
 	 */
-	private static final String				STATE_EXPANDED_ITEMS			= "STATE_EXPANDED_ITEMS";							//$NON-NLS-1$
+	private static final String			STATE_EXPANDED_ITEMS				= "STATE_EXPANDED_ITEMS";				//$NON-NLS-1$
 
 	private static final int				STATE_ITEM_TYPE_SEPARATOR		= -1;
 
 	private static final int				STATE_ITEM_TYPE_CATEGORY		= 1;
 	private static final int				STATE_ITEM_TYPE_TAG				= 2;
-	private static final int				STATE_ITEM_TYPE_YEAR			= 3;
+	private static final int				STATE_ITEM_TYPE_YEAR				= 3;
 	private static final int				STATE_ITEM_TYPE_MONTH			= 4;
 
-	static final int						TAG_VIEW_LAYOUT_FLAT			= 0;
-	static final int						TAG_VIEW_LAYOUT_HIERARCHICAL	= 10;
+	static final int							TAG_VIEW_LAYOUT_FLAT				= 0;
+	static final int							TAG_VIEW_LAYOUT_HIERARCHICAL	= 10;
 	//
-	private static final NumberFormat		_nf0							= NumberFormat.getNumberInstance();
-	private static final NumberFormat		_nf1							= NumberFormat.getNumberInstance();
+	private static final NumberFormat	_nf0									= NumberFormat.getNumberInstance();
+	private static final NumberFormat	_nf1									= NumberFormat.getNumberInstance();
 
 	{
 		_nf0.setMinimumFractionDigits(0);
@@ -155,67 +156,62 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 		_nf1.setMaximumFractionDigits(1);
 	}
 
-	private final IPreferenceStore			_prefStore						= TourbookPlugin.getPrefStore();
+	private final IPreferenceStore			_prefStore					= TourbookPlugin.getPrefStore();
 
-	private final IDialogSettings			_state							= TourbookPlugin.getState(ID);
+	private final IDialogSettings				_state						= TourbookPlugin.getState(ID);
 
-	/**
-	 * E4 calls partClosed() even when not created
-	 */
-	private boolean							_isPartCreated;
-
-	private int								_tagViewLayout					= TAG_VIEW_LAYOUT_HIERARCHICAL;
+	private int										_tagViewLayout				= TAG_VIEW_LAYOUT_HIERARCHICAL;
 	private TreeViewerTourInfoToolTip		_tourInfoToolTip;
 
-	private boolean							_isToolTipInTag;
-	private boolean							_isToolTipInTitle;
-	private boolean							_isToolTipInTags;
-	private TagMenuManager					_tagMenuMgr;
+	private boolean								_isToolTipInTag;
+	private boolean								_isToolTipInTitle;
+	private boolean								_isToolTipInTags;
+	private TagMenuManager						_tagMenuMgr;
 
-	private TourDoubleClickState			_tourDoubleClickState			= new TourDoubleClickState();
+	private TourDoubleClickState				_tourDoubleClickState	= new TourDoubleClickState();
 	//
 	/*
 	 * resources
 	 */
-	private final Image						_imgTagCategory			= TourbookPlugin.getImage(Messages.Image__tag_category);
-	private final Image						_imgTag					= TourbookPlugin.getImage(Messages.Image__tag);
-	private final Image						_imgTagRoot				= TourbookPlugin.getImage(Messages.Image__tag_root);
+	private final Image							_imgTagCategory			= TourbookPlugin.getImage(Messages.Image__tag_category);
+	private final Image							_imgTag						= TourbookPlugin.getImage(Messages.Image__tag);
+	private final Image							_imgTagRoot					= TourbookPlugin.getImage(Messages.Image__tag_root);
 
-	private PixelConverter					_pc;
+	private PixelConverter						_pc;
 
 	/*
 	 * UI controls
 	 */
-	private Composite						_viewerContainer;
+	private Composite								_viewerContainer;
 
-	private TreeViewer						_tagViewer;
+	private TreeViewer							_tagViewer;
 
-	private TVITagViewRoot					_rootItem;
-	private ColumnManager					_columnManager;
+	private TVITagViewRoot						_rootItem;
+	private ColumnManager						_columnManager;
 
-	private PostSelectionProvider			_postSelectionProvider;
+	private PostSelectionProvider				_postSelectionProvider;
 
-	private ITourEventListener				_tourEventListener;
+	private ITourEventListener					_tourEventListener;
 
-	private ISelectionListener				_postSelectionListener;
+	private ISelectionListener					_postSelectionListener;
 	private IPropertyChangeListener			_prefChangeListener;
-	private IPartListener2					_partListener;
+	private IPartListener2						_partListener;
 	//
-	private ActionCollapseAll				_actionCollapseAll;
-	private ActionCollapseOthers			_actionCollapseOthers;
-	private ActionEditQuick					_actionEditQuick;
-	private ActionEditTour					_actionEditTour;
-	private ActionExpandSelection			_actionExpandSelection;
+	private ActionCollapseAll					_actionCollapseAll;
+	private ActionCollapseOthers				_actionCollapseOthers;
+	private ActionEditQuick						_actionEditQuick;
+	private ActionEditTour						_actionEditTour;
+	private ActionExpandSelection				_actionExpandSelection;
 	private ActionMenuSetAllTagStructures	_actionSetAllTagStructures;
 	private ActionMenuSetTagStructure		_actionSetTagStructure;
 	private ActionModifyColumns				_actionModifyColumns;
-	private ActionOpenTour					_actionOpenTour;
-	private ActionOpenPrefDialog			_actionOpenTagPrefs;
-	private ActionRefreshView				_actionRefreshView;
-	private ActionRenameTag					_actionRenameTag;
+	private ActionOpenTour						_actionOpenTour;
+	private ActionOpenPrefDialog				_actionOpenTagPrefs;
+	private ActionRefreshView					_actionRefreshView;
+	private ActionRenameTag						_actionRenameTag;
 	private ActionSetLayoutHierarchical		_actionSetLayoutHierarchical;
 	private ActionSetLayoutFlat				_actionSetLayoutFlat;
-	private ActionSetTourTypeMenu			_actionSetTourType;
+	private ActionSetTourTypeMenu				_actionSetTourType;
 
 	private class StateSegment {
 
@@ -369,15 +365,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
 			@Override
-			public void partClosed(final IWorkbenchPartReference partRef) {
-
-				if (partRef.getPart(false) == TaggingView.this && _isPartCreated) {
-
-					saveState();
-
-//					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TaggingView.this);
-				}
-			}
+			public void partClosed(final IWorkbenchPartReference partRef) {}
 
 			@Override
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
@@ -433,14 +421,14 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
 				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
-					_tagViewer.getTree().setLinesVisible(
-							_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+					_tagViewer.getTree()
+							.setLinesVisible(
+									_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 					_tagViewer.refresh();
 
 					/*
-					 * the tree must be redrawn because the styled text does not show with the new
-					 * color
+					 * the tree must be redrawn because the styled text does not show with the new color
 					 */
 					_tagViewer.getTree().redraw();
 				}
@@ -571,8 +559,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 		reloadViewer();
 
 		restoreState_Viewer();
-
-		_isPartCreated = true;
 	}
 
 	private void createUI(final Composite parent) {
@@ -1324,8 +1310,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 		}
 
 		/*
-		 * tree expand type can be set if only tags are selected or when an item is selected which
-		 * is not a category
+		 * tree expand type can be set if only tags are selected or when an item is selected which is
+		 * not a category
 		 */
 		_actionSetTagStructure.setEnabled(isTagSelected || (items == 1 && categoryItems == 0));
 		_actionSetAllTagStructures.setEnabled(isItemsAvailable);
@@ -1339,9 +1325,10 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
 		_tagMenuMgr.enableTagActions(isTourSelected, isOneTour, firstTour == null ? null : firstTour.tagIds);
 
-		TourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, isOneTour
-				? firstTour.tourTypeId
-				: TourDatabase.ENTITY_IS_NOT_SAVED);
+		TourTypeMenuManager.enableRecentTourTypeActions(isTourSelected,
+				isOneTour
+						? firstTour.tourTypeId
+						: TourDatabase.ENTITY_IS_NOT_SAVED);
 	}
 
 	private void fillContextMenu(final IMenuManager menuMgr) {
@@ -1555,8 +1542,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 				for (final StateSegment stateSegment : stateSegments) {
 
 					/*
-					 * This is somehow recursive as it goes deeper into the child tree items until
-					 * there are no children
+					 * This is somehow recursive as it goes deeper into the child tree items until there
+					 * are no children
 					 */
 					treeItems = restoreState_Viewer_ExpandItem(pathSegments, treeItems, stateSegment);
 				}
@@ -1579,8 +1566,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 	 * @return Returns children when it could be expanded otherwise <code>null</code>.
 	 */
 	private ArrayList<TreeViewerItem> restoreState_Viewer_ExpandItem(	final ArrayList<Object> pathSegments,
-																		final ArrayList<TreeViewerItem> treeItems,
-																		final StateSegment stateSegment) {
+																							final ArrayList<TreeViewerItem> treeItems,
+																							final StateSegment stateSegment) {
 
 		if (treeItems == null) {
 			return null;
@@ -1718,6 +1705,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 		return allTreePathSegments;
 	}
 
+	@PersistState
 	private void saveState() {
 
 		_columnManager.saveState(_state);
@@ -1836,14 +1824,14 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 	/**
 	 * !!! Recursive !!! method to update the tags in the viewer, this method handles changes in the
 	 * tag structure
-	 * 
+	 *
 	 * @param rootItem
 	 * @param changedTags
 	 * @param isAddMode
 	 */
 	private void updateViewerAfterTagStructureIsModified(	final TreeViewerItem parentItem,
-															final ChangedTags changedTags,
-															final boolean isAddMode) {
+																			final ChangedTags changedTags,
+																			final boolean isAddMode) {
 
 		final ArrayList<TreeViewerItem> children = parentItem.getUnfetchedChildren();
 
@@ -1883,8 +1871,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 				}
 
 				/*
-				 * modified tag id exists only once in the tree viewer, remove the id's outside of
-				 * the foreach loop to avid the exception ConcurrentModificationException
+				 * modified tag id exists only once in the tree viewer, remove the id's outside of the
+				 * foreach loop to avid the exception ConcurrentModificationException
 				 */
 				for (final Long removedId : removedIds) {
 					modifiedTags.remove(removedId);
@@ -1905,12 +1893,12 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
 	/**
 	 * !!!Recursive !!! delete tour items
-	 * 
+	 *
 	 * @param rootItem
 	 * @param deletedTourIds
 	 */
-	private void updateViewerAfterTourIsDeleted(final TreeViewerItem parentItem,
-												final ArrayList<ITourItem> deletedTourIds) {
+	private void updateViewerAfterTourIsDeleted(	final TreeViewerItem parentItem,
+																final ArrayList<ITourItem> deletedTourIds) {
 
 		final ArrayList<TreeViewerItem> parentChildren = parentItem.getUnfetchedChildren();
 
@@ -1960,12 +1948,12 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
 	/**
 	 * !!!Recursive !!! update the data for all tour items
-	 * 
+	 *
 	 * @param rootItem
 	 * @param modifiedTours
 	 */
-	private void updateViewerAfterTourIsModified(	final TreeViewerItem parentItem,
-													final ArrayList<TourData> modifiedTours) {
+	private void updateViewerAfterTourIsModified(final TreeViewerItem parentItem,
+																final ArrayList<TourData> modifiedTours) {
 
 		final ArrayList<TreeViewerItem> children = parentItem.getUnfetchedChildren();
 

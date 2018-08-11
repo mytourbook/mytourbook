@@ -22,6 +22,7 @@ import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 
+import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -108,59 +109,53 @@ import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
 
 public class TourCompareResultView extends ViewPart implements ITourViewer, ITourProvider, ITreeViewer {
 
-	public static final String					ID					= "net.tourbook.views.tourCatalog.CompareResultView";	//$NON-NLS-1$
+	public static final String							ID							= "net.tourbook.views.tourCatalog.CompareResultView";										//$NON-NLS-1$
 
-	private final IPreferenceStore				_prefStore			= TourbookPlugin.getPrefStore();
-	private final IDialogSettings				_state				= TourbookPlugin.getState(ID);
+	private final IPreferenceStore					_prefStore				= TourbookPlugin.getPrefStore();
+	private final IDialogSettings						_state					= TourbookPlugin.getState(ID);
 
-	private TVICompareResultRootItem			_rootItem;
+	private TVICompareResultRootItem					_rootItem;
 
-	private PostSelectionProvider				_postSelectionProvider;
+	private PostSelectionProvider						_postSelectionProvider;
 
-	private ISelectionListener					_postSelectionListener;
-	private IPartListener2						_partListener;
-	private IPropertyChangeListener				_prefChangeListener;
-	private ITourEventListener					_tourPropertyListener;
-	private ITourEventListener					_compareTourPropertyListener;
+	private ISelectionListener							_postSelectionListener;
+	private IPartListener2								_partListener;
+	private IPropertyChangeListener					_prefChangeListener;
+	private ITourEventListener							_tourPropertyListener;
+	private ITourEventListener							_compareTourPropertyListener;
 
-	private boolean								_isToolbarCreated;
+	private boolean										_isToolbarCreated;
 
-	/**
-	 * E4 calls partClosed() even when not created
-	 */
-	private boolean								_isPartCreated;
+	private ColumnManager								_columnManager;
+	private TagMenuManager								_tagMenuMgr;
 
-	private ColumnManager						_columnManager;
-	private TagMenuManager						_tagMenuMgr;
-
-	private SelectionRemovedComparedTours		_oldRemoveSelection	= null;
+	private SelectionRemovedComparedTours			_oldRemoveSelection	= null;
 
 	/*
 	 * resources
 	 */
-	private Image								_dbImage			= TourbookPlugin.getImageDescriptor(//
-																			Messages.Image__database).createImage(true);
+	private Image											_dbImage					= TourbookPlugin.getImageDescriptor(Messages.Image__database).createImage(true);
 
-	private TreeViewerTourInfoToolTip			_tourInfoToolTip;
-	private PixelConverter						_pc;
+	private TreeViewerTourInfoToolTip				_tourInfoToolTip;
+	private PixelConverter								_pc;
 
 	/*
 	 * UI controls
 	 */
-	private Composite							_viewerContainer;
-	private CheckboxTreeViewer					_tourViewer;
+	private Composite										_viewerContainer;
+	private CheckboxTreeViewer							_tourViewer;
 
-	private ActionSaveComparedTours				_actionSaveComparedTours;
+	private ActionSaveComparedTours					_actionSaveComparedTours;
 	private ActionRemoveComparedTourSaveStatus	_actionRemoveComparedTourSaveStatus;
-	private ActionCheckTours					_actionCheckTours;
-	private ActionUncheckTours					_actionUncheckTours;
-	private ActionModifyColumns					_actionModifyColumns;
-	private ActionCollapseAll					_actionCollapseAll;
+	private ActionCheckTours							_actionCheckTours;
+	private ActionUncheckTours							_actionUncheckTours;
+	private ActionModifyColumns						_actionModifyColumns;
+	private ActionCollapseAll							_actionCollapseAll;
 
-	private ActionEditQuick						_actionEditQuick;
-	private ActionEditTour						_actionEditTour;
-	private ActionSetTourTypeMenu				_actionSetTourType;
-	private ActionOpenTour						_actionOpenTour;
+	private ActionEditQuick								_actionEditQuick;
+	private ActionEditTour								_actionEditTour;
+	private ActionSetTourTypeMenu						_actionSetTourType;
+	private ActionOpenTour								_actionOpenTour;
 
 	class ResultContentProvider implements ITreeContentProvider {
 
@@ -284,11 +279,9 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 
-				if (partRef.getPart(false) == TourCompareResultView.this && _isPartCreated) {
+				if (partRef.getPart(false) == TourCompareResultView.this) {
 
-					saveState();
-
-					clearCompareResult();
+					TourCompareManager.getInstance().clearCompareResult();
 				}
 			}
 
@@ -303,9 +296,10 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 			@Override
 			public void partOpened(final IWorkbenchPartReference partRef) {
+
 				/*
-				 * add the actions in the part open event so they are appended AFTER the actions
-				 * which are defined in the plugin.xml
+				 * add the actions in the part open event so they are appended AFTER the actions which
+				 * are defined in the plugin.xml
 				 */
 				fillToolbar();
 			}
@@ -339,14 +333,12 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
-					_tourViewer.getTree().setLinesVisible(
-							_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+					_tourViewer.getTree().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 					_tourViewer.refresh();
 
 					/*
-					 * the tree must be redrawn because the styled text does not show with the new
-					 * color
+					 * the tree must be redrawn because the styled text does not show with the new color
 					 */
 					_tourViewer.getTree().redraw();
 				}
@@ -400,11 +392,6 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		TourManager.getInstance().addTourEventListener(_tourPropertyListener);
 	}
 
-	private void clearCompareResult() {
-
-		TourCompareManager.getInstance().clearCompareResult();
-	}
-
 	private void createActions() {
 
 		_actionSaveComparedTours = new ActionSaveComparedTours(this);
@@ -449,8 +436,6 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
 		_tourViewer.setInput(_rootItem = new TVICompareResultRootItem());
-
-		_isPartCreated = true;
 	}
 
 	private void createUI(final Composite parent) {
@@ -465,12 +450,13 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	private Control createUI_10_TourViewer(final Composite parent) {
 
 		// tour tree
-		final Tree tree = new Tree(parent, SWT.H_SCROLL
-				| SWT.V_SCROLL
-				| SWT.BORDER
-				| SWT.MULTI
-				| SWT.FULL_SELECTION
-				| SWT.CHECK);
+		final Tree tree = new Tree(parent,
+				SWT.H_SCROLL
+						| SWT.V_SCROLL
+						| SWT.BORDER
+						| SWT.MULTI
+						| SWT.FULL_SELECTION
+						| SWT.CHECK);
 
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(tree);
 
@@ -526,9 +512,9 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 					if (event.getChecked() && compareResult.isSaved()) {
 						/*
-						 * uncheck elements which are already stored for the reftour, it would be
-						 * better to disable them, but this is not possible because this is a
-						 * limitation by the OS
+						 * uncheck elements which are already stored for the reftour, it would be better
+						 * to disable them, but this is not possible because this is a limitation by the
+						 * OS
 						 */
 						_tourViewer.setChecked(compareResult, false);
 					} else {
@@ -1094,13 +1080,13 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 	/**
 	 * Recursive method to walk down the tour tree items and find the compared tours
-	 * 
+	 *
 	 * @param parentItem
 	 * @param CompareIds
 	 */
-	private void getComparedTours(	final ArrayList<TVICompareResultComparedTour> comparedTours,
-									final TreeViewerItem parentItem,
-									final ArrayList<Long> CompareIds) {
+	private void getComparedTours(final ArrayList<TVICompareResultComparedTour> comparedTours,
+											final TreeViewerItem parentItem,
+											final ArrayList<Long> CompareIds) {
 
 		final ArrayList<TreeViewerItem> unfetchedChildren = parentItem.getUnfetchedChildren();
 
@@ -1172,8 +1158,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 			if (treeItem instanceof TVICompareResultComparedTour) {
 
 				final TVICompareResultComparedTour compareItem = ((TVICompareResultComparedTour) treeItem);
-				final TourData tourData = TourManager.getInstance().getTourData(
-						compareItem.comparedTourData.getTourId());
+				final TourData tourData = TourManager.getInstance().getTourData(compareItem.comparedTourData.getTourId());
 				if (tourData != null) {
 					selectedTourData.add(tourData);
 				}
@@ -1533,6 +1518,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		}
 	}
 
+	@PersistState
 	private void saveState() {
 
 		_columnManager.saveState(_state);
@@ -1569,7 +1555,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 	/**
 	 * !!!Recursive !!! update all tour items with new data
-	 * 
+	 *
 	 * @param rootItem
 	 * @param modifiedTours
 	 */

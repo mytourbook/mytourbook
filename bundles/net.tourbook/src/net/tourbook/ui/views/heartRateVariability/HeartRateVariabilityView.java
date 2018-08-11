@@ -18,6 +18,7 @@ package net.tourbook.ui.views.heartRateVariability;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.ToolBarManager;
@@ -82,60 +83,59 @@ import net.tourbook.ui.UI;
  */
 public class HeartRateVariabilityView extends ViewPart {
 
-	public static final String			ID										= "net.tourbook.ui.views.heartRateVariability.HeartRateVariabilityView";																		//$NON-NLS-1$
+	public static final String			ID														= "net.tourbook.ui.views.heartRateVariability.HeartRateVariabilityView";	//$NON-NLS-1$
 
-	private static final String			GRAPH_LABEL_HEART_RATE_VARIABILITY		= net.tourbook.common.Messages.Graph_Label_HeartRateVariability;
-	private static final String			GRAPH_LABEL_HEART_RATE_VARIABILITY_UNIT	= net.tourbook.common.Messages.Graph_Label_HeartRateVariability_Unit;
+	private static final String		GRAPH_LABEL_HEART_RATE_VARIABILITY			= net.tourbook.common.Messages.Graph_Label_HeartRateVariability;
+	private static final String		GRAPH_LABEL_HEART_RATE_VARIABILITY_UNIT	= net.tourbook.common.Messages.Graph_Label_HeartRateVariability_Unit;
 
-	private static final String			STATE_HRV_MIN_TIME						= "STATE_HRV_MIN_TIME";													//$NON-NLS-1$
-	private static final String			STATE_HRV_MAX_TIME						= "STATE_HRV_MAX_TIME";													//$NON-NLS-1$
-	private static final String			STATE_IS_SHOW_ALL_VALUES				= "STATE_IS_SHOW_ALL_VALUES";											//$NON-NLS-1$
-	private static final String			STATE_IS_SYNC_CHART_SCALING				= "STATE_IS_SYNC_CHART_SCALING";										//$NON-NLS-1$
+	private static final String		STATE_HRV_MIN_TIME								= "STATE_HRV_MIN_TIME";																		//$NON-NLS-1$
+	private static final String		STATE_HRV_MAX_TIME								= "STATE_HRV_MAX_TIME";																		//$NON-NLS-1$
+	private static final String		STATE_IS_SHOW_ALL_VALUES						= "STATE_IS_SHOW_ALL_VALUES";																//$NON-NLS-1$
+	private static final String		STATE_IS_SYNC_CHART_SCALING					= "STATE_IS_SYNC_CHART_SCALING";															//$NON-NLS-1$
 
-	private static final String			GRID_PREF_PREFIX						= "GRID_HEART_RATE_VARIABILITY__";										//$NON-NLS-1$
+	private static final String		GRID_PREF_PREFIX									= "GRID_HEART_RATE_VARIABILITY__";														//$NON-NLS-1$
 
-	private static final String			GRID_IS_SHOW_VERTICAL_GRIDLINES			= (GRID_PREF_PREFIX			+ ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
-	private static final String			GRID_IS_SHOW_HORIZONTAL_GRIDLINES		= (GRID_PREF_PREFIX			+ ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
-	private static final String			GRID_VERTICAL_DISTANCE					= (GRID_PREF_PREFIX			+ ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
-	private static final String			GRID_HORIZONTAL_DISTANCE				= (GRID_PREF_PREFIX			+ ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
+// SET_FORMATTING_OFF
 
-	private static final int			ADJUST_PULSE_VALUE						= 50;
+	private static final String		GRID_IS_SHOW_VERTICAL_GRIDLINES				= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
+	private static final String		GRID_IS_SHOW_HORIZONTAL_GRIDLINES			= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
+	private static final String		GRID_VERTICAL_DISTANCE							= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
+	private static final String		GRID_HORIZONTAL_DISTANCE						= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
 
-	private static final int			HRV_TIME_MIN_BORDER						= 0;																	// ms
-	private static final int			HRV_TIME_MAX_BORDER						= 9999;																	//ms
+// SET_FORMATTING_ON
 
-	private final IPreferenceStore		_prefStore								= TourbookPlugin.getPrefStore();
-	private final IPreferenceStore		_commonPrefStore						= CommonActivator.getPrefStore();
-	private final IDialogSettings		_state									= TourbookPlugin.getState(ID);
+	private static final int			ADJUST_PULSE_VALUE								= 50;
+
+	private static final int			HRV_TIME_MIN_BORDER								= 0;																								// ms
+	private static final int			HRV_TIME_MAX_BORDER								= 9999;																							//ms
+
+	private final IPreferenceStore	_prefStore											= TourbookPlugin.getPrefStore();
+	private final IPreferenceStore	_commonPrefStore									= CommonActivator.getPrefStore();
+	private final IDialogSettings		_state												= TourbookPlugin.getState(ID);
 
 	private ModifyListener				_defaultSpinnerModifyListener;
 	private MouseWheelListener			_defaultSpinnerMouseWheelListener;
 	private SelectionAdapter			_defaultSpinnerSelectionListener;
 	private IPartListener2				_partListener;
 	private ISelectionListener			_postSelectionListener;
-	private IPropertyChangeListener		_prefChangeListener;
+	private IPropertyChangeListener	_prefChangeListener;
 	private ITourEventListener			_tourEventListener;
 
-	private ArrayList<TourData>			_hrvTours;
+	private ArrayList<TourData>		_hrvTours;
 
 	private ActionToolbarSlideout		_actionHrvOptions;
 	private ActionSynchChartScale		_actionSynchChartScaling;
-	private ActionShowAllValues			_actionShowAllValues;
+	private ActionShowAllValues		_actionShowAllValues;
 
 	private boolean						_isUpdateUI;
 	private boolean						_isSynchChartScaling;
 	private boolean						_isShowAllValues;
 
-	/**
-	 * E4 calls partClosed() even when not created
-	 */
-	private boolean						_isPartCreated;
+	private final MinMaxKeeper_XData	_xMinMaxKeeper										= new MinMaxKeeper_XData(ADJUST_PULSE_VALUE);
+	private final MinMaxKeeper_YData	_yMinMaxKeeper										= new MinMaxKeeper_YData(ADJUST_PULSE_VALUE);
 
-	private final MinMaxKeeper_XData	_xMinMaxKeeper							= new MinMaxKeeper_XData(ADJUST_PULSE_VALUE);
-	private final MinMaxKeeper_YData	_yMinMaxKeeper							= new MinMaxKeeper_YData(ADJUST_PULSE_VALUE);
-
-	private int							_fixed2xErrors_0;
-	private int							_fixed2xErrors_1;
+	private int								_fixed2xErrors_0;
+	private int								_fixed2xErrors_1;
 
 	private ToolBarManager				_toolbarManager;
 	private FormToolkit					_tk;
@@ -143,17 +143,17 @@ public class HeartRateVariabilityView extends ViewPart {
 	/*
 	 * UI controls
 	 */
-	private PageBook					_pageBook;
+	private PageBook						_pageBook;
 
-	private Composite					_page_NoTour;
-	private Composite					_page_Chart;
-	private Composite					_page_InvalidData;
+	private Composite						_page_NoTour;
+	private Composite						_page_Chart;
+	private Composite						_page_InvalidData;
 
-	private Chart						_chartHRV;
+	private Chart							_chartHRV;
 
-	private Label						_lblInvalidData;
-	private Label						_lblMinTime;
-	private Label						_lblMaxTime;
+	private Label							_lblInvalidData;
+	private Label							_lblMinTime;
+	private Label							_lblMaxTime;
 
 	private Spinner						_spinnerMinTime;
 	private Spinner						_spinnerMaxTime;
@@ -248,12 +248,7 @@ public class HeartRateVariabilityView extends ViewPart {
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
 			@Override
-			public void partClosed(final IWorkbenchPartReference partRef) {
-
-				if (partRef.getPart(false) == HeartRateVariabilityView.this && _isPartCreated) {
-					saveState();
-				}
-			}
+			public void partClosed(final IWorkbenchPartReference partRef) {}
 
 			@Override
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
@@ -370,7 +365,7 @@ public class HeartRateVariabilityView extends ViewPart {
 
 	/**
 	 * @param hrvTours
-	 *            contains all tours which are displayed in the chart, they can be valid or invalid
+	 *           contains all tours which are displayed in the chart, they can be valid or invalid
 	 * @return
 	 */
 	private ChartDataModel createChartDataModel(final ArrayList<TourData> hrvTours) {
@@ -563,8 +558,6 @@ public class HeartRateVariabilityView extends ViewPart {
 		showPage(_page_NoTour);
 
 		showTour();
-
-		_isPartCreated = true;
 	}
 
 	private void createUI(final Composite parent) {
@@ -852,6 +845,7 @@ public class HeartRateVariabilityView extends ViewPart {
 		_isUpdateUI = false;
 	}
 
+	@PersistState
 	private void saveState() {
 
 		_state.put(STATE_HRV_MIN_TIME, _spinnerMinTime.getSelection());
@@ -944,8 +938,8 @@ public class HeartRateVariabilityView extends ViewPart {
 	private void updateChart_22(final ArrayList<TourData> tourDataList) {
 
 		/*
-		 * tour editor is not opened because it can cause a recursive attempt to active a part in
-		 * the middle of activating a part
+		 * tour editor is not opened because it can cause a recursive attempt to active a part in the
+		 * middle of activating a part
 		 */
 		if (tourDataList == null || tourDataList.size() == 0 || TourManager.isTourEditorModified(false)) {
 

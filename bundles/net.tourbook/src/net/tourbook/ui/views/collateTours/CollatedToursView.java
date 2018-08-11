@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -137,22 +138,22 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	}
 
 	private final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
-	private final IDialogSettings	_state		= TourbookPlugin.getState(ID);
+	private final IDialogSettings		_state		= TourbookPlugin.getState(ID);
 	//
-	private ColumnManager			_columnManager;
-	private OpenDialogManager		_openDlgMgr	= new OpenDialogManager();
+	private ColumnManager				_columnManager;
+	private OpenDialogManager			_openDlgMgr	= new OpenDialogManager();
 	//
-	private PostSelectionProvider	_postSelectionProvider;
-	private ISelectionListener		_postSelectionListener;
-	private IPartListener2			_partListener;
-	private ITourEventListener		_tourPropertyListener;
+	private PostSelectionProvider		_postSelectionProvider;
+	private ISelectionListener			_postSelectionListener;
+	private IPartListener2				_partListener;
+	private ITourEventListener			_tourPropertyListener;
 	private IPropertyChangeListener	_prefChangeListener;
 	//
-	private TVICollatedTour_Root	_rootItem;
+	private TVICollatedTour_Root		_rootItem;
 	//
-	private final NumberFormat		_nf0;
-	private final NumberFormat		_nf1;
-	private final NumberFormat		_nf1_NoGroup;
+	private final NumberFormat			_nf0;
+	private final NumberFormat			_nf1;
+	private final NumberFormat			_nf1_NoGroup;
 
 	{
 		_nf0 = NumberFormat.getNumberInstance();
@@ -169,58 +170,54 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 		_nf1_NoGroup.setGroupingUsed(false);
 	}
 
-	private final ArrayList<Long>						_selectedTourIds		= new ArrayList<>();
+	private final ArrayList<Long>								_selectedTourIds			= new ArrayList<>();
 
-	private boolean										_isInStartup;
-	private boolean										_isInReload;
-	private boolean										_isInUIUpdate;
+	private boolean												_isInStartup;
+	private boolean												_isInReload;
+	private boolean												_isInUIUpdate;
 
-	/**
-	 * E4 calls partClosed() even when not created
-	 */
-	private boolean										_isPartCreated;
 	//
-	private boolean										_isToolTipInCollation;
-	private boolean										_isToolTipInTags;
-	private boolean										_isToolTipInTime;
-	private boolean										_isToolTipInTitle;
-	private boolean										_isToolTipInWeekDay;
+	private boolean												_isToolTipInCollation;
+	private boolean												_isToolTipInTags;
+	private boolean												_isToolTipInTime;
+	private boolean												_isToolTipInTitle;
+	private boolean												_isToolTipInWeekDay;
 	//
-	private final TourDoubleClickState					_tourDoubleClickState	= new TourDoubleClickState();
-	private TagMenuManager								_tagMenuMgr;
-	private TreeViewerTourInfoToolTip					_tourInfoToolTip;
+	private final TourDoubleClickState						_tourDoubleClickState	= new TourDoubleClickState();
+	private TagMenuManager										_tagMenuMgr;
+	private TreeViewerTourInfoToolTip						_tourInfoToolTip;
 	//
-	private ActionCollapseAll							_actionCollapseAll;
-	private ActionCollapseOthers						_actionCollapseOthers;
+	private ActionCollapseAll									_actionCollapseAll;
+	private ActionCollapseOthers								_actionCollapseOthers;
 	private ActionComputeDistanceValuesFromGeoposition	_actionComputeDistanceValuesFromGeoposition;
-	private ActionComputeElevationGain					_actionComputeElevationGain;
-	private ActionEditQuick								_actionEditQuick;
-	private ActionExpandSelection						_actionExpandSelection;
-	private ActionExport								_actionExportTour;
-	private ActionEditTour								_actionEditTour;
-	private ActionOpenTour								_actionOpenTour;
-	private ActionOpenMarkerDialog						_actionOpenMarkerDialog;
-	private ActionOpenAdjustAltitudeDialog				_actionOpenAdjustAltitudeDialog;
-	private ActionJoinTours								_actionJoinTours;
-	private ActionMergeTour								_actionMergeTour;
-	private ActionModifyColumns							_actionModifyColumns;
-	private ActionPrint									_actionPrintTour;
-	private ActionRefreshView							_actionRefreshView;
-	private ActionReimportSubMenu						_actionReimportSubMenu;
+	private ActionComputeElevationGain						_actionComputeElevationGain;
+	private ActionEditQuick										_actionEditQuick;
+	private ActionExpandSelection								_actionExpandSelection;
+	private ActionExport											_actionExportTour;
+	private ActionEditTour										_actionEditTour;
+	private ActionOpenTour										_actionOpenTour;
+	private ActionOpenMarkerDialog							_actionOpenMarkerDialog;
+	private ActionOpenAdjustAltitudeDialog					_actionOpenAdjustAltitudeDialog;
+	private ActionJoinTours										_actionJoinTours;
+	private ActionMergeTour										_actionMergeTour;
+	private ActionModifyColumns								_actionModifyColumns;
+	private ActionPrint											_actionPrintTour;
+	private ActionRefreshView									_actionRefreshView;
+	private ActionReimportSubMenu								_actionReimportSubMenu;
 	private ActionSetAltitudeValuesFromSRTM				_actionSetAltitudeFromSRTM;
-	private ActionSetTourTypeMenu						_actionSetTourType;
-	private ActionSetPerson								_actionSetOtherPerson;
+	private ActionSetTourTypeMenu								_actionSetTourType;
+	private ActionSetPerson										_actionSetOtherPerson;
 
-	private CollateTourContributionItem					_contribItem_CollatedTours;
+	private CollateTourContributionItem						_contribItem_CollatedTours;
 
-	private TreeViewer									_tourViewer;
+	private TreeViewer											_tourViewer;
 
-	private PixelConverter								_pc;
+	private PixelConverter										_pc;
 
 	/*
 	 * UI controls
 	 */
-	private Composite									_viewerContainer;
+	private Composite												_viewerContainer;
 
 	private static class ItemComparer implements IElementComparer {
 
@@ -300,12 +297,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
 			@Override
-			public void partClosed(final IWorkbenchPartReference partRef) {
-
-				if (partRef.getPart(false) == CollatedToursView.this && _isPartCreated) {
-					saveState();
-				}
-			}
+			public void partClosed(final IWorkbenchPartReference partRef) {}
 
 			@Override
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
@@ -368,14 +360,12 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
 //					updateDisplayFormats();
 
-					_tourViewer.getTree().setLinesVisible(
-									_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+					_tourViewer.getTree().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 					_tourViewer.refresh();
 
 					/*
-					 * the tree must be redrawn because the styled text does not show with the new
-					 * color
+					 * the tree must be redrawn because the styled text does not show with the new color
 					 */
 					_tourViewer.getTree().redraw();
 				}
@@ -412,8 +402,8 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				if (eventId == TourEventId.TOUR_CHANGED || eventId == TourEventId.UPDATE_UI) {
 
 					/*
-					 * it is possible when a tour type was modified, the tour can be hidden or
-					 * visible in the viewer because of the tour type filter
+					 * it is possible when a tour type was modified, the tour can be hidden or visible in
+					 * the viewer because of the tour type filter
 					 */
 					reloadViewer();
 
@@ -429,7 +419,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
 	/**
 	 * Close all opened dialogs except the opening dialog.
-	 * 
+	 *
 	 * @param openingDialog
 	 */
 	public void closeOpenedDialogs(final IOpeningDialog openingDialog) {
@@ -508,8 +498,6 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				reselectTourViewer();
 			}
 		});
-
-		_isPartCreated = true;
 	}
 
 	private void createUI(final Composite parent) {
@@ -619,7 +607,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	/**
 	 * Defines all columns for the table viewer in the column manager, the sequence defines the
 	 * default columns
-	 * 
+	 *
 	 * @param parent
 	 */
 	private void defineAllColumns(final Composite parent) {
@@ -1567,9 +1555,9 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 					final Image tourTypeImage = TourTypeImage.getTourTypeImage(tourTypeId);
 
 					/*
-					 * when a tour type image is modified, it will keep the same image resource only
-					 * the content is modified but in the rawDataView the modified image is not
-					 * displayed compared with the tourBookView which displays the correct image
+					 * when a tour type image is modified, it will keep the same image resource only the
+					 * content is modified but in the rawDataView the modified image is not displayed
+					 * compared with the tourBookView which displays the correct image
 					 */
 					cell.setImage(tourTypeImage);
 				}
@@ -2102,6 +2090,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 		updateToolTipState();
 	}
 
+	@PersistState
 	private void saveState() {
 
 		_columnManager.saveState(_state);

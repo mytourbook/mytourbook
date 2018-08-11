@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -17,6 +17,7 @@ package net.tourbook.tour.photo;
 
 import java.util.ArrayList;
 
+import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -70,23 +71,21 @@ import net.tourbook.ui.UI;
 
 public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
-	public static final String				ID								= "net.tourbook.photo.TourPhotosView.ID";	//$NON-NLS-1$
+	public static final String					ID											= "net.tourbook.photo.TourPhotosView.ID";	//$NON-NLS-1$
 
 	private static final String				STATE_PHOTO_GALLERY_IS_VERTICAL	= "STATE_PHOTO_GALLERY_IS_VERTICAL";		//$NON-NLS-1$
 
-	private static final IDialogSettings	_state							= TourbookPlugin.getDefault()//
-																					.getDialogSettingsSection(ID);
-	private final IPreferenceStore			_prefStore						= TourbookPlugin.getDefault()//
-																					.getPreferenceStore();
+	private static final IDialogSettings	_state									= TourbookPlugin.getState(ID);
+	private final IPreferenceStore			_prefStore								= TourbookPlugin.getPrefStore();
 
-	private PostSelectionProvider			_postSelectionProvider;
+	private PostSelectionProvider				_postSelectionProvider;
 
-	private ISelectionListener				_postSelectionListener;
+	private ISelectionListener					_postSelectionListener;
 	private IPropertyChangeListener			_prefChangeListener;
-	private ITourEventListener				_tourEventListener;
-	private IPartListener2					_partListener;
+	private ITourEventListener					_tourEventListener;
+	private IPartListener2						_partListener;
 
-	private boolean							_isPartVisible;
+	private boolean								_isPartVisible;
 
 	private ActionToggleGalleryOrientation	_actionToggleGalleryOrientation;
 
@@ -95,28 +94,23 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 	 */
 	private TourPhotoLinkSelection			_selectionWhenHidden;
 
-	private PhotoGallery					_photoGallery;
+	private PhotoGallery							_photoGallery;
 
-	private boolean							_isVerticalGallery;
-	public IToolBarManager					_galleryToolbarManager;
+	private boolean								_isVerticalGallery;
+	public IToolBarManager						_galleryToolbarManager;
 
-	private int								_galleryPositionKey;
+	private int										_galleryPositionKey;
 
-	private long							_photoStartTime;
-	private long							_photoEndTime;
+	private long									_photoStartTime;
+	private long									_photoEndTime;
 
-	private boolean							_isLinkPhotoDisplayed;
-
-	/**
-	 * E4 calls partClosed() even when not created
-	 */
-	private boolean							_isPartCreated;
+	private boolean								_isLinkPhotoDisplayed;
 
 	/*
 	 * UI controls
 	 */
-	private ToolBar							_toolbarLeft;
-	private Label							_labelTitle;
+	private ToolBar								_toolbarLeft;
+	private Label									_labelTitle;
 
 	private class ActionToggleGalleryOrientation extends Action {
 
@@ -187,12 +181,7 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
 			@Override
-			public void partClosed(final IWorkbenchPartReference partRef) {
-
-				if (partRef.getPart(false) == TourPhotosView.this && _isPartCreated) {
-					saveState();
-				}
-			}
+			public void partClosed(final IWorkbenchPartReference partRef) {}
 
 			@Override
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
@@ -324,8 +313,6 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
 		showTour();
-
-		_isPartCreated = true;
 	}
 
 	private void createUI(final Composite parent) {
@@ -422,7 +409,7 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
 	/**
 	 * Get photos from a tour.
-	 * 
+	 *
 	 * @param allPhotos
 	 * @param tourData
 	 */
@@ -588,6 +575,7 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 		updateUI_ToogleAction();
 	}
 
+	@PersistState
 	private void saveState() {
 
 		_state.put(STATE_PHOTO_GALLERY_IS_VERTICAL, _isVerticalGallery);

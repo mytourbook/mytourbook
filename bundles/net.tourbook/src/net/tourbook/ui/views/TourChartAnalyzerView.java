@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -73,70 +73,64 @@ import net.tourbook.ui.tourChart.TourChartView;
 
 public class TourChartAnalyzerView extends ViewPart {
 
-	public static final String			ID					= "net.tourbook.views.TourChartAnalyzer";	//$NON-NLS-1$
+	public static final String				ID						= "net.tourbook.views.TourChartAnalyzer";	//$NON-NLS-1$
 
-	private static final int			LAYOUT_1_COLUMNS	= 0;
-	private static final int			LAYOUT_2_COLUMNS	= 1;
-	private static final int			LAYOUT_3_COLUMNS	= 2;
-	private static final int			LAYOUT_6_COLUMNS	= 3;
+	private static final int				LAYOUT_1_COLUMNS	= 0;
+	private static final int				LAYOUT_2_COLUMNS	= 1;
+	private static final int				LAYOUT_3_COLUMNS	= 2;
+	private static final int				LAYOUT_6_COLUMNS	= 3;
 
 	private final IPreferenceStore		_prefStore			= TourbookPlugin.getPrefStore();
 
-	private IPartListener2				_partListener;
-	private ISelectionListener			_postSelectionListener;
+	private IPartListener2					_partListener;
+	private ISelectionListener				_postSelectionListener;
 	private IPropertyChangeListener		_prefChangeListener;
-	private ITourEventListener			_tourEventListener;
+	private ITourEventListener				_tourEventListener;
 
-	private ChartDataModel				_chartDataModel;
-
-	private ChartDrawingData			_chartDrawingData;
+	private ChartDataModel					_chartDataModel;
+	private ChartDrawingData				_chartDrawingData;
 	private ArrayList<GraphDrawingData>	_graphDrawingData;
 
 	private final ArrayList<GraphInfo>	_graphInfos			= new ArrayList<>();
 
-	private final ColorCache			_colorCache			= new ColorCache();
+	private final ColorCache				_colorCache			= new ColorCache();
 
-	private Color						_bgColorHeader;
-	private Font						_fontBold;
+	private SelectionChartInfo				_chartInfo;
 
-	private SelectionChartInfo			_chartInfo;
+	private int									_layoutFormat;
 
-	private int							_layoutFormat;
-
-	private int							_valueIndexLeftBackup;
-	private int							_valueIndexRightBackup;
+	private int									_valueIndexLeftBackup;
+	private int									_valueIndexRightBackup;
 
 	/**
 	 * space between columns
 	 */
-	int									_columnSpacing		= 1;
+	int											_columnSpacing		= 1;
 
-	private boolean						_isPartVisible		= false;
+	private boolean							_isPartVisible		= false;
 
-	/**
-	 * E4 calls partClosed() even when not created
-	 */
-	private boolean						_isPartCreated;
+	private PixelConverter					_pc;
 
-	private PixelConverter				_pc;
+	private int									_valueIndexRightLast;
+	private int									_valueIndexLeftLast;
 
-	private int							_valueIndexRightLast;
-	private int							_valueIndexLeftLast;
-
-	private long						_lastUpdateUITime;
-	private int[]						_updateCounter		= new int[] { 0 };
+	private long								_lastUpdateUITime;
+	private int[]								_updateCounter		= new int[] { 0 };
 
 	/*
 	 * UI controls
 	 */
-	private PageBook					_pageBook;
+	private Color								_bgColorHeader;
+	private Font								_fontBold;
 
-	private Composite					_innerScContainer;
-	private Composite					_partContainer;
-	private Composite					_pageAnalyzer;
-	private Composite					_pageNoData;
+	private PageBook							_pageBook;
 
-	private ScrolledComposite			_scrolledContainer;
+	private Composite							_innerScContainer;
+	private Composite							_partContainer;
+	private Composite							_pageAnalyzer;
+	private Composite							_pageNoData;
+
+	private ScrolledComposite				_scrolledContainer;
 
 	public TourChartAnalyzerView() {
 		super();
@@ -175,9 +169,9 @@ public class TourChartAnalyzerView extends ViewPart {
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 
-				if (partRef.getPart(false) instanceof TourChartView && _isPartCreated) {
+				if (partRef.getPart(false) instanceof TourChartView) {
 
-					// chart is closed, hide tour chart analyzer data
+					// TOUR CHART is closed, hide tour chart analyzer data
 					clearView();
 				}
 			}
@@ -271,7 +265,9 @@ public class TourChartAnalyzerView extends ViewPart {
 
 		_chartInfo = null;
 
-		_pageBook.showPage(_pageNoData);
+		if (_pageBook != null && _pageBook.isDisposed() == false) {
+			_pageBook.showPage(_pageNoData);
+		}
 	}
 
 	@Override
@@ -287,8 +283,6 @@ public class TourChartAnalyzerView extends ViewPart {
 		_pageBook.showPage(_pageNoData);
 
 		showTour();
-
-		_isPartCreated = true;
 	}
 
 	/**
@@ -313,7 +307,7 @@ public class TourChartAnalyzerView extends ViewPart {
 
 	/**
 	 * This UI can only be created when {@link #_chartDataModel} is set.
-	 * 
+	 *
 	 * @param isForceRecreate
 	 */
 	private void createUI_10_Analyzer(final boolean isForceRecreate) {

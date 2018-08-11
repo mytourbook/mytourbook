@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -112,100 +113,90 @@ import net.tourbook.ui.views.tourCatalog.TourCompareConfig;
 
 public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompareListener {
 
-// SET_FORMATTING_OFF
+	public static final String					ID										= "net.tourbook.ui.views.geoCompare.GeoCompareView";	//$NON-NLS-1$
 
+	private static final int					DELAY_BEFORE_STARTING_COMPARE	= 500;
 
-	public static final String				ID		= "net.tourbook.ui.views.geoCompare.GeoCompareView";	//$NON-NLS-1$
+	private static final int					UI_UPDATE_INTERVAL				= 1000;
 
-	private static final int				DELAY_BEFORE_STARTING_COMPARE	= 500;
-                                            
-// SET_FORMATTING_ON
-
-	private static final int				UI_UPDATE_INTERVAL				= 1000;
-
-	private static final String				STATE_IS_USE_APP_FILTER			= "STATE_IS_USE_APP_FILTER";		//$NON-NLS-1$
-	static final String						STATE_DISTANCE_INTERVAL			= "STATE_DISTANCE_INTERVAL";		//$NON-NLS-1$
-	static final String						STATE_GEO_ACCURACY				= "STATE_GEO_ACCURACY";				//$NON-NLS-1$
-	private static final String				STATE_SORT_COLUMN_DIRECTION		= "STATE_SORT_COLUMN_DIRECTION";	//$NON-NLS-1$
-	private static final String				STATE_SORT_COLUMN_ID			= "STATE_SORT_COLUMN_ID";			//$NON-NLS-1$
+	private static final String				STATE_IS_USE_APP_FILTER			= "STATE_IS_USE_APP_FILTER";									//$NON-NLS-1$
+	static final String							STATE_DISTANCE_INTERVAL			= "STATE_DISTANCE_INTERVAL";									//$NON-NLS-1$
+	static final String							STATE_GEO_ACCURACY				= "STATE_GEO_ACCURACY";											//$NON-NLS-1$
+	private static final String				STATE_SORT_COLUMN_DIRECTION	= "STATE_SORT_COLUMN_DIRECTION";								//$NON-NLS-1$
+	private static final String				STATE_SORT_COLUMN_ID				= "STATE_SORT_COLUMN_ID";										//$NON-NLS-1$
 	//
-	static final int						DEFAULT_DISTANCE_INTERVAL		= 100;
-	static final int						DEFAULT_GEO_ACCURACY			= 10_000;
+	static final int								DEFAULT_DISTANCE_INTERVAL		= 100;
+	static final int								DEFAULT_GEO_ACCURACY				= 10_000;
 	//
-	private static final String				COLUMN_AVG_PULSE				= "avgPulse";						//$NON-NLS-1$
-	private static final String				COLUMN_AVG_SPEED				= "avgSpeed";						//$NON-NLS-1$
-	private static final String				COLUMN_GEO_DIFF					= "geoDiff";						//$NON-NLS-1$
-	private static final String				COLUMN_GEO_DIFF_RELATIVE		= "geoDiffRelative";				//$NON-NLS-1$
-	private static final String				COLUMN_SEQUENCE					= "sequence";						//$NON-NLS-1$
-	private static final String				COLUMN_TOUR_START_DATE			= "tourStartDate";					//$NON-NLS-1$
+	private static final String				COLUMN_AVG_PULSE					= "avgPulse";														//$NON-NLS-1$
+	private static final String				COLUMN_AVG_SPEED					= "avgSpeed";														//$NON-NLS-1$
+	private static final String				COLUMN_GEO_DIFF					= "geoDiff";														//$NON-NLS-1$
+	private static final String				COLUMN_GEO_DIFF_RELATIVE		= "geoDiffRelative";												//$NON-NLS-1$
+	private static final String				COLUMN_SEQUENCE					= "sequence";														//$NON-NLS-1$
+	private static final String				COLUMN_TOUR_START_DATE			= "tourStartDate";												//$NON-NLS-1$
 	//
-	private static final IDialogSettings	_state							= TourbookPlugin.getState(ID);
-	private static final IPreferenceStore	_prefStore						= TourbookPlugin.getPrefStore();
+	private static final IDialogSettings	_state								= TourbookPlugin.getState(ID);
+	private static final IPreferenceStore	_prefStore							= TourbookPlugin.getPrefStore();
 	//
-	private IPartListener2					_partListener;
-	private SelectionAdapter				_columnSortListener;
+	private IPartListener2						_partListener;
+	private SelectionAdapter					_columnSortListener;
 	private IPropertyChangeListener			_prefChangeListener;
-	private ISelectionListener				_postSelectionListener;
-	private ITourEventListener				_tourEventListener;
-	private PostSelectionProvider			_postSelectionProvider;
+	private ISelectionListener					_postSelectionListener;
+	private ITourEventListener					_tourEventListener;
+	private PostSelectionProvider				_postSelectionProvider;
 	//
-	private int								_lastSelectionHash;
+	private int										_lastSelectionHash;
 	//
-	private AtomicInteger					_workedTours					= new AtomicInteger();
-	private AtomicInteger					_runningId						= new AtomicInteger();
+	private AtomicInteger						_workedTours						= new AtomicInteger();
+	private AtomicInteger						_runningId							= new AtomicInteger();
 	//
-	private long							_workerExecutorId;
+	private long									_workerExecutorId;
 	//
-	private boolean							_isInUpdate;
-	private long							_lastUIUpdate;
-
-	/**
-	 * E4 calls partClosed() even when not created
-	 */
-	private boolean							_isPartCreated;
+	private boolean								_isInUpdate;
+	private long									_lastUIUpdate;
 
 	/**
 	 * Comparer items from the last comparison
 	 */
-	private ArrayList<GeoPartComparerItem>	_comparedTours					= new ArrayList<>();
+	private ArrayList<GeoPartComparerItem>	_comparedTours						= new ArrayList<>();
 	//
 	private GeoPartComparerItem				_selectedComparerItem;
 	//
-	private int								_compareData_NumGeoPartTours;
-	private TourData						_compareData_TourData;
-	private long							_compareData_TourId				= Long.MIN_VALUE;
-	private int								_compareData_FirstIndex;
-	private int								_compareData_LastIndex;
-	private int[]							_compareData_GeoGrid;
-	private GeoPartItem						_compareData_PreviousGeoPartItem;
-	private long							_compareData_RefId;
-	private String							_compareData_TourTitle;
-	private boolean							_compareData_IsUseAppFilter;
+	private int										_compareData_NumGeoPartTours;
+	private TourData								_compareData_TourData;
+	private long									_compareData_TourId				= Long.MIN_VALUE;
+	private int										_compareData_FirstIndex;
+	private int										_compareData_LastIndex;
+	private int[]									_compareData_GeoGrid;
+	private GeoPartItem							_compareData_PreviousGeoPartItem;
+	private long									_compareData_RefId;
+	private String									_compareData_TourTitle;
+	private boolean								_compareData_IsUseAppFilter;
 	//
-	private long							_lastCompare_TourId;
-	private int								_lastCompare_FirstIndex;
-	private int								_lastCompare_LastIndex;
-	private int								_lastCompare_DistanceInterval;
-	private int								_lastCompare_GeoAccuracy;
-	private boolean							_lastCompare_IsUseAppFilter;
+	private long									_lastCompare_TourId;
+	private int										_lastCompare_FirstIndex;
+	private int										_lastCompare_LastIndex;
+	private int										_lastCompare_DistanceInterval;
+	private int										_lastCompare_GeoAccuracy;
+	private boolean								_lastCompare_IsUseAppFilter;
 	//
 	private ActionAppTourFilter				_actionAppTourFilter;
-	private ActionOnOff						_actionOnOff;
+	private ActionOnOff							_actionOnOff;
 	private ActionGeoCompareOptions			_actionGeoCompareOptions;
 	//
-	private TableViewer						_geoPartViewer;
-	private ColumnManager					_columnManager;
+	private TableViewer							_geoPartViewer;
+	private ColumnManager						_columnManager;
 	private CompareResultComparator			_geoPartComparator				= new CompareResultComparator();
 	//
-	private int								_distanceInterval;
-	private int								_geoAccuracy;
-	private long							_maxMinDiff;
+	private int										_distanceInterval;
+	private int										_geoAccuracy;
+	private long									_maxMinDiff;
 	//
-	private OpenDialogManager				_openDlgMgr						= new OpenDialogManager();
+	private OpenDialogManager					_openDlgMgr							= new OpenDialogManager();
 	private SlideoutGeoCompareOptions		_slideoutGeoCompareOptions;
-	private GeoCompareState					_slideoutGeoCompareState		= new GeoCompareState();
+	private GeoCompareState						_slideoutGeoCompareState		= new GeoCompareState();
 	//
-	private final NumberFormat				_nf1							= NumberFormat.getInstance();
+	private final NumberFormat					_nf1									= NumberFormat.getInstance();
 	{
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
@@ -215,19 +206,19 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 	/*
 	 * UI controls
 	 */
-	private Composite		_parent;
-	private Composite		_viewerContainer;
+	private Composite			_parent;
+	private Composite			_viewerContainer;
 	//
-	private PageBook		_pageBook;
-	private Composite		_pageContent;
-	private Composite		_pageMultipleTours;
-	private Composite		_pageNoData;
-	private Label			_lblCompareStatus;
+	private PageBook			_pageBook;
+	private Composite			_pageContent;
+	private Composite			_pageMultipleTours;
+	private Composite			_pageNoData;
+	private Label				_lblCompareStatus;
 	//
-	private Label			_lblNumTours;
-	private Label			_lblNumGeoGrids;
-	private Label			_lblNumSlices;
-	private Label			_lblTitle;
+	private Label				_lblNumTours;
+	private Label				_lblNumGeoGrids;
+	private Label				_lblNumSlices;
+	private Label				_lblTitle;
 
 	private class ActionAppTourFilter extends Action {
 
@@ -292,11 +283,11 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
 	private class CompareResultComparator extends ViewerComparator {
 
-		private static final int	ASCENDING		= 0;
-		private static final int	DESCENDING		= 1;
+		private static final int	ASCENDING			= 0;
+		private static final int	DESCENDING			= 1;
 
-		private String				__sortColumnId	= COLUMN_GEO_DIFF;
-		private int					__sortDirection	= ASCENDING;
+		private String					__sortColumnId		= COLUMN_GEO_DIFF;
+		private int						__sortDirection	= ASCENDING;
 
 		@Override
 		public int compare(final Viewer viewer, final Object e1, final Object e2) {
@@ -425,12 +416,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 		_partListener = new IPartListener2() {
 
 			@Override
-			public void partActivated(final IWorkbenchPartReference partRef) {
-
-				if (partRef.getPart(false) == GeoCompareView.this) {
-
-				}
-			}
+			public void partActivated(final IWorkbenchPartReference partRef) {}
 
 			@Override
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
@@ -438,12 +424,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 
-				if (partRef.getPart(false) == GeoCompareView.this && _isPartCreated) {
-
-					saveState();
-
+				if (partRef.getPart(false) == GeoCompareView.this) {
 					setState_StopComparing();
-					updateUI_State_CancelComparing();
 				}
 			}
 
@@ -451,9 +433,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
 			@Override
-			public void partHidden(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == GeoCompareView.this) {}
-			}
+			public void partHidden(final IWorkbenchPartReference partRef) {}
 
 			@Override
 			public void partInputChanged(final IWorkbenchPartReference partRef) {}
@@ -462,9 +442,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 			public void partOpened(final IWorkbenchPartReference partRef) {}
 
 			@Override
-			public void partVisible(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == GeoCompareView.this) {}
-			}
+			public void partVisible(final IWorkbenchPartReference partRef) {}
 		};
 		getViewSite().getPage().addPartListener(_partListener);
 	}
@@ -559,7 +537,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
 	/**
 	 * Close all opened dialogs except the opening dialog.
-	 * 
+	 *
 	 * @param openingDialog
 	 */
 	public void closeOpenedDialogs(final IOpeningDialog openingDialog) {
@@ -571,12 +549,12 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 	 * @param leftIndex
 	 * @param rightIndex
 	 * @param refId
-	 *            Reference tour id or <code>-1</code> when not available
+	 *           Reference tour id or <code>-1</code> when not available
 	 */
-	private void compare_10_Compare(final TourData tourData,
-									final int leftIndex,
-									final int rightIndex,
-									final long refId) {
+	private void compare_10_Compare(	final TourData tourData,
+												final int leftIndex,
+												final int rightIndex,
+												final long refId) {
 
 		if (GeoCompareManager.isGeoComparing() == false) {
 
@@ -1016,8 +994,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 		restoreSelection();
 
 		_pageBook.showPage(_pageNoData);
-
-		_isPartCreated = true;
 	}
 
 	private void createUI(final Composite parent) {
@@ -1212,8 +1188,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 		table.setLinesVisible(false);
 
 		/*
-		 * It took a while that the correct listener is set and also the checked item is fired and
-		 * not the wrong selection.
+		 * It took a while that the correct listener is set and also the checked item is fired and not
+		 * the wrong selection.
 		 */
 		table.addListener(SWT.Selection, new Listener() {
 
@@ -1702,7 +1678,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
 	/**
 	 * @param isOn
-	 *            Turn comparing ON/OFF
+	 *           Turn comparing ON/OFF
 	 * @param isDoRecomparing
 	 */
 	private void onAction_OnOff(final boolean isOn) {
@@ -1797,8 +1773,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 		if (_lastSelectionHash == selectionHash) {
 
 			/*
-			 * Last selection has not changed, this can occure when the app lost the focus and got
-			 * the focus again.
+			 * Last selection has not changed, this can occure when the app lost the focus and got the
+			 * focus again.
 			 */
 			return;
 		}
@@ -2076,6 +2052,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 		_geoPartComparator.__sortDirection = sortDirection;
 	}
 
+	@PersistState
 	private void saveState() {
 
 		_state.put(STATE_IS_USE_APP_FILTER, _compareData_IsUseAppFilter);
@@ -2170,7 +2147,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
 	/**
 	 * Select and reveal a compare item item.
-	 * 
+	 *
 	 * @param selection
 	 */
 	private void updateUI_SelectCompareItem(final ISelection selection) {
@@ -2186,7 +2163,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
 	/**
 	 * Set the sort column direction indicator for a column.
-	 * 
+	 *
 	 * @param sortColumnId
 	 * @param isAscendingSort
 	 */

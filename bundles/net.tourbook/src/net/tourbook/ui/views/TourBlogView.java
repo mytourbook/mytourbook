@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -86,27 +86,27 @@ import net.tourbook.web.WEB;
 
 public class TourBlogView extends ViewPart {
 
-	public static final String		ID										= "net.tourbook.ui.views.TourBlogView";		//$NON-NLS-1$
+	public static final String		ID														= "net.tourbook.ui.views.TourBlogView";		//$NON-NLS-1$
 
-	private static final String		TOUR_BLOG_CSS							= "/tourbook/resources/tour-blog.css";			//$NON-NLS-1$
+	private static final String	TOUR_BLOG_CSS										= "/tourbook/resources/tour-blog.css";			//$NON-NLS-1$
 
 	static final String				STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR	= "STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR";	//$NON-NLS-1$
-	static final String				STATE_IS_SHOW_HIDDEN_MARKER				= "STATE_IS_SHOW_HIDDEN_MARKER";				//$NON-NLS-1$
+	static final String				STATE_IS_SHOW_HIDDEN_MARKER					= "STATE_IS_SHOW_HIDDEN_MARKER";					//$NON-NLS-1$
 
-	private static final String		EXTERNAL_LINK_URL						= "http";										//$NON-NLS-1$
-	private static final String		HREF_TOKEN								= "#";											//$NON-NLS-1$
-	private static final String		PAGE_ABOUT_BLANK						= "about:blank";								//$NON-NLS-1$
+	private static final String	EXTERNAL_LINK_URL									= "http";												//$NON-NLS-1$
+	private static final String	HREF_TOKEN											= "#";													//$NON-NLS-1$
+	private static final String	PAGE_ABOUT_BLANK									= "about:blank";										//$NON-NLS-1$
 
 	/**
 	 * This is necessary otherwise XULrunner in Linux do not fire a location change event.
 	 */
-	private static final String		HTTP_DUMMY								= "http://dummy";								//$NON-NLS-1$
+	private static final String	HTTP_DUMMY											= "http://dummy";										//$NON-NLS-1$
 
-	private static final String		ACTION_EDIT_TOUR						= "EditTour";									//$NON-NLS-1$
-	private static final String		ACTION_EDIT_MARKER						= "EditMarker";								//$NON-NLS-1$
-	private static final String		ACTION_HIDE_MARKER						= "HideMarker";								//$NON-NLS-1$
-	private static final String		ACTION_OPEN_MARKER						= "OpenMarker";								//$NON-NLS-1$
-	private static final String		ACTION_SHOW_MARKER						= "ShowMarker";								//$NON-NLS-1$
+	private static final String	ACTION_EDIT_TOUR									= "EditTour";											//$NON-NLS-1$
+	private static final String	ACTION_EDIT_MARKER								= "EditMarker";										//$NON-NLS-1$
+	private static final String	ACTION_HIDE_MARKER								= "HideMarker";										//$NON-NLS-1$
+	private static final String	ACTION_OPEN_MARKER								= "OpenMarker";										//$NON-NLS-1$
+	private static final String	ACTION_SHOW_MARKER								= "ShowMarker";										//$NON-NLS-1$
 
 	private static String			HREF_EDIT_TOUR;
 	private static String			HREF_EDIT_MARKER;
@@ -124,54 +124,49 @@ public class TourBlogView extends ViewPart {
 		HREF_SHOW_MARKER = HREF_TOKEN + ACTION_SHOW_MARKER + HREF_TOKEN;
 	}
 
-	private static final String		HREF_MARKER_ITEM						= "#MarkerItem";								//$NON-NLS-1$
+	private static final String		HREF_MARKER_ITEM	= "#MarkerItem";						//$NON-NLS-1$
 
-	private final IPreferenceStore	_prefStore								= TourbookPlugin.getPrefStore();
-	private final IDialogSettings	_state									= TourbookPlugin.getState(ID);
+	private final IPreferenceStore	_prefStore			= TourbookPlugin.getPrefStore();
+	private final IDialogSettings		_state				= TourbookPlugin.getState(ID);
 
-	private PostSelectionProvider	_postSelectionProvider;
-	private ISelectionListener		_postSelectionListener;
+	private PostSelectionProvider		_postSelectionProvider;
+	private ISelectionListener			_postSelectionListener;
 	private IPropertyChangeListener	_prefChangeListener;
-	private ITourEventListener		_tourEventListener;
-	private IPartListener2			_partListener;
+	private ITourEventListener			_tourEventListener;
+	private IPartListener2				_partListener;
 
-	private TourData				_tourData;
+	private TourData						_tourData;
 
-	private String					_htmlCss;
+	private String							_htmlCss;
 
-	private String					_actionEditImageUrl;
-	private String					_actionHideMarkerUrl;
-	private String					_actionShowMarkerUrl;
+	private String							_actionEditImageUrl;
+	private String							_actionHideMarkerUrl;
+	private String							_actionShowMarkerUrl;
 
-	private String					_cssMarkerDefaultColor;
-	private String					_cssMarkerDeviceColor;
-	private String					_cssMarkerHiddenColor;
+	private String							_cssMarkerDefaultColor;
+	private String							_cssMarkerDeviceColor;
+	private String							_cssMarkerHiddenColor;
 
-	private boolean					_isDrawWithDefaultColor;
-	private boolean					_isShowHiddenMarker;
+	private boolean						_isDrawWithDefaultColor;
+	private boolean						_isShowHiddenMarker;
 
-	/**
-	 * E4 calls partClosed() even when not created
-	 */
-	private boolean					_isPartCreated;
+	private Long							_reloadedTourMarkerId;
 
-	private Long					_reloadedTourMarkerId;
-
-	private ActionTourBlogMarker	_actionTourBlogMarker;
+	private ActionTourBlogMarker		_actionTourBlogMarker;
 
 	/*
 	 * UI controls
 	 */
-	private PageBook				_pageBook;
+	private PageBook						_pageBook;
 
-	private Composite				_pageNoBrowser;
-	private Composite				_pageNoData;
-	private Composite				_pageContent;
-	private Composite				_uiParent;
+	private Composite						_pageNoBrowser;
+	private Composite						_pageNoData;
+	private Composite						_pageContent;
+	private Composite						_uiParent;
 
-	private Browser					_browser;
-	private TourChart				_tourChart;
-	private Text					_txtNoBrowser;
+	private Browser						_browser;
+	private TourChart						_tourChart;
+	private Text							_txtNoBrowser;
 
 	private void addPartListener() {
 
@@ -184,12 +179,7 @@ public class TourBlogView extends ViewPart {
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
 			@Override
-			public void partClosed(final IWorkbenchPartReference partRef) {
-
-				if (partRef.getPart(false) == TourBlogView.this && _isPartCreated) {
-					saveState();
-				}
-			}
+			public void partClosed(final IWorkbenchPartReference partRef) {}
 
 			@Override
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
@@ -421,8 +411,8 @@ public class TourBlogView extends ViewPart {
 											+ (" href='" + hrefEditTour + "'") //$NON-NLS-1$ //$NON-NLS-2$
 											+ (" title='" + hoverEdit + "'") //$NON-NLS-1$ //$NON-NLS-2$
 											+ ">" // //$NON-NLS-1$
-									+ "</a>") // //$NON-NLS-1$
-							+ "	</div>\n") //$NON-NLS-1$
+											+ "</a>") // //$NON-NLS-1$
+									+ "	</div>\n") //$NON-NLS-1$
 							+ ("<span class='blog-title'>" + tourTitle + "</span>\n")); //$NON-NLS-1$ //$NON-NLS-2$
 
 					/*
@@ -619,8 +609,6 @@ public class TourBlogView extends ViewPart {
 		if (_tourData == null) {
 			showTourFromTourProvider();
 		}
-
-		_isPartCreated = true;
 	}
 
 	private void createUI(final Composite parent) {
@@ -662,8 +650,8 @@ public class TourBlogView extends ViewPart {
 			} catch (final Exception e) {
 
 				/*
-				 * Use mozilla browser, this is necessary for Linux when default browser fails
-				 * however the XULrunner needs to be installed.
+				 * Use mozilla browser, this is necessary for Linux when default browser fails however
+				 * the XULrunner needs to be installed.
 				 */
 				_browser = new Browser(parent, SWT.MOZILLA);
 			}
@@ -874,8 +862,8 @@ public class TourBlogView extends ViewPart {
 		if (location.contains(HREF_MARKER_ITEM)) {
 
 			/*
-			 * Page is reloaded and is scrolled to the tour marker where the last tour marker action
-			 * is done.
+			 * Page is reloaded and is scrolled to the tour marker where the last tour marker action is
+			 * done.
 			 */
 
 			_browser.setRedraw(true);
@@ -1034,7 +1022,7 @@ public class TourBlogView extends ViewPart {
 
 	/**
 	 * Keeps the current browser scroll position.
-	 * 
+	 *
 	 * @param tourMarker
 	 */
 	private void prepareBrowserReload(final TourMarker tourMarker) {
@@ -1055,10 +1043,6 @@ public class TourBlogView extends ViewPart {
 				TourManager.saveModifiedTour(_tourData);
 			}
 		});
-	}
-
-	private void saveState() {
-
 	}
 
 	@Override

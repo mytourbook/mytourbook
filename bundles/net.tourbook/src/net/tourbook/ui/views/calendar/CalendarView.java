@@ -18,6 +18,7 @@ package net.tourbook.ui.views.calendar;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
+import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -71,68 +72,63 @@ import net.tourbook.ui.views.calendar.CalendarProfileManager.ICalendarProfileLis
 public class CalendarView extends ViewPart implements ITourProvider, ICalendarProfileListener {
 
 // SET_FORMATTING_OFF
-	
+
 	/**
 	 * The ID of the view as specified by the extension.
 	 */
-	public static final String		ID										= "net.tourbook.views.calendar.CalendarView";		//$NON-NLS-1$
-	
-	private static final String		STATE_IS_LINKED							= "STATE_IS_LINKED"; 								//$NON-NLS-1$
-	private static final String		STATE_IS_SHOW_TOUR_INFO					= "STATE_IS_SHOW_TOUR_INFO";	 					//$NON-NLS-1$
-	static final String 			STATE_TOUR_TOOLTIP_DELAY	 			= "STATE_TOUR_TOOLTIP_DELAY"; 						//$NON-NLS-1$
+	public static final String		ID												= "net.tourbook.views.calendar.CalendarView";	//$NON-NLS-1$
 
-	private static final String		STATE_FIRST_DISPLAYED_EPOCH_DAY			= "STATE_FIRST_DISPLAYED_EPOCH_DAY";				//$NON-NLS-1$
-	private static final String		STATE_SELECTED_TOURS					= "STATE_SELECTED_TOURS";							//$NON-NLS-1$
-	
-	static final int				DEFAULT_TOUR_TOOLTIP_DELAY				= 100; // ms
-	
+	private static final String	STATE_IS_LINKED							= "STATE_IS_LINKED"; 									//$NON-NLS-1$
+	private static final String	STATE_IS_SHOW_TOUR_INFO					= "STATE_IS_SHOW_TOUR_INFO";	 						//$NON-NLS-1$
+	static final String 				STATE_TOUR_TOOLTIP_DELAY	 			= "STATE_TOUR_TOOLTIP_DELAY"; 						//$NON-NLS-1$
+
+	private static final String	STATE_FIRST_DISPLAYED_EPOCH_DAY		= "STATE_FIRST_DISPLAYED_EPOCH_DAY";				//$NON-NLS-1$
+	private static final String	STATE_SELECTED_TOURS						= "STATE_SELECTED_TOURS";								//$NON-NLS-1$
+
+	static final int					DEFAULT_TOUR_TOOLTIP_DELAY				= 100; // ms
+
 	private final IPreferenceStore	_prefStore								= TourbookPlugin.getPrefStore();
-	private final IDialogSettings	_state									= TourbookPlugin.getState("TourCalendarView");		//$NON-NLS-1$
-	private boolean					_stateIsLinked;
-	private boolean					_stateIsShowTourInfo;
-	
-	ColorDefinition[]				_allColorDefinition						= GraphColorManager.getInstance().getGraphColorDefinitions();
-	
+	private final IDialogSettings		_state									= TourbookPlugin.getState("TourCalendarView");	//$NON-NLS-1$
+	private boolean						_stateIsLinked;
+	private boolean						_stateIsShowTourInfo;
+
+	ColorDefinition[]						_allColorDefinition					= GraphColorManager.getInstance().getGraphColorDefinitions();
+
 // SET_FORMATTING_ON
 
 	//
-	private ISelectionListener		_selectionListener;
-	private IPartListener2			_partListener;
+	private ISelectionListener			_selectionListener;
+	private IPartListener2				_partListener;
 	private IPropertyChangeListener	_prefChangeListener;
-	private ITourEventListener		_tourEventListener;
+	private ITourEventListener			_tourEventListener;
 
-	private ActionCalendarOptions	_actionCalendarOptions;
+	private ActionCalendarOptions		_actionCalendarOptions;
 
-	private Action					_actionBack;
-	private Action					_actionForward;
-	private Action					_actionSetLinked;
-	private Action					_actionGotoToday;
-	private ActionTourInfo			_actionTourInfo;
+	private Action							_actionBack;
+	private Action							_actionForward;
+	private Action							_actionSetLinked;
+	private Action							_actionGotoToday;
+	private ActionTourInfo				_actionTourInfo;
 	//
-	private LocalDate				_titleFirstDay;
-	private LocalDate				_titleLastDay;
+	private LocalDate						_titleFirstDay;
+	private LocalDate						_titleLastDay;
 
-	private PixelConverter			_pc;
+	private PixelConverter				_pc;
 
 	private CalendarTourInfoToolTip	_tourInfoToolTip;
-	private OpenDialogManager		_openDlgMgr						= new OpenDialogManager();
-
-	/**
-	 * E4 calls partClosed() even when not created
-	 */
-	private boolean					_isPartCreated;
+	private OpenDialogManager			_openDlgMgr								= new OpenDialogManager();
 
 	/*
 	 * UI controls
 	 */
-	private CalendarGraph			_calendarGraph;
+	private CalendarGraph				_calendarGraph;
 
-	private Composite				_parent;
-	private Composite				_calendarContainer;
+	private Composite						_parent;
+	private Composite						_calendarContainer;
 
-	private Combo					_comboProfiles;
+	private Combo							_comboProfiles;
 
-	private Label					_lblTitle;
+	private Label							_lblTitle;
 
 	public CalendarView() {}
 
@@ -148,8 +144,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 
-				if (partRef.getPart(false) == CalendarView.this && _isPartCreated) {
-					saveState();
+				if (partRef.getPart(false) == CalendarView.this) {
 					CalendarProfileManager.removeProfileListener(CalendarView.this);
 				}
 			}
@@ -247,8 +242,8 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 
 				if (eventId == TourEventId.TOUR_CHANGED || eventId == TourEventId.UPDATE_UI) {
 					/*
-					 * it is possible when a tour type was modified, the tour can be hidden or
-					 * visible in the viewer because of the tour type filter
+					 * it is possible when a tour type was modified, the tour can be hidden or visible in
+					 * the viewer because of the tour type filter
 					 */
 					refreshCalendar();
 
@@ -272,7 +267,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 
 	/**
 	 * Close all opened dialogs except the opening dialog.
-	 * 
+	 *
 	 * @param openingDialog
 	 */
 	void closeOpenedDialogs(final IOpeningDialog openingDialog) {
@@ -376,8 +371,6 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 
 		// restore selection
 		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
-
-		_isPartCreated = true;
 	}
 
 	private void createUI(final Composite parent) {
@@ -668,6 +661,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 		_tourInfoToolTip.setPopupDelay(Util.getStateInt(_state, STATE_TOUR_TOOLTIP_DELAY, DEFAULT_TOUR_TOOLTIP_DELAY));
 	}
 
+	@PersistState
 	private void saveState() {
 
 		_state.put(STATE_IS_LINKED, _stateIsLinked);
@@ -776,8 +770,8 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 						if (titleWidth > availableWidth) {
 
 							/*
-							 * Force that the title is displayed the next time. There was a problem
-							 * when resizing the canvas and the title was empty.
+							 * Force that the title is displayed the next time. There was a problem when
+							 * resizing the canvas and the title was empty.
 							 */
 							_titleFirstDay = null;
 						}
