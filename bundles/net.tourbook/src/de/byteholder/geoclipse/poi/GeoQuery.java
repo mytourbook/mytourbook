@@ -16,15 +16,15 @@ import de.byteholder.gpx.PointOfInterest;
 
 public class GeoQuery extends Observable implements Runnable {
 
-//	private final static String			URL	= 			"http://www.frankieandshadow.com/osm/search.xml?find="; //$NON-NLS-1$
+//	private final static String			URL				= "http://www.frankieandshadow.com/osm/search.xml?find="; //$NON-NLS-1$
 //	private final static String			SEARCH_URL		= "http://gazetteer.openstreetmap.org/namefinder/search.xml?find="; //$NON-NLS-1$
-	private final static String			SEARCH_URL		= "http://nominatim.openstreetmap.org/search?format=xml&addressdetails=0&q=";	//$NON-NLS-1$
+	private final static String			SEARCH_URL		= "https://nominatim.openstreetmap.org/search?format=xml&addressdetails=0&q=";	//$NON-NLS-1$
 
-	private ArrayList<PointOfInterest>	_searchResult	= new ArrayList<PointOfInterest>();
+	private ArrayList<PointOfInterest>	_searchResult	= new ArrayList<>();
 
-	private Exception					_exception;
+	private Exception							_exception;
 
-	private String						_query;
+	private String								_query;
 
 	public GeoQuery(final String query) {
 		_query = query;
@@ -52,6 +52,7 @@ public class GeoQuery extends Observable implements Runnable {
 		return _searchResult;
 	}
 
+	@Override
 	public void run() {
 
 		try {

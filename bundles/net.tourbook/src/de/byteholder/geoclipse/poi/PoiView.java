@@ -1,6 +1,6 @@
 /* *****************************************************************************
  *  Copyright (C) 2008 Michael Kanis, Veit Edunjobi and others
- * 
+ *
  *  This file is part of Geoclipse.
  *
  *  Geoclipse is free software: you can redistribute it and/or modify
@@ -24,8 +24,7 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-import net.tourbook.application.TourbookPlugin;
-
+import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -57,6 +56,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.help.IWorkbenchHelpSystem;
 import org.eclipse.ui.part.ViewPart;
 
+import net.tourbook.application.TourbookPlugin;
+
 import de.byteholder.gpx.PointOfInterest;
 import de.byteholder.gpx.Waypoint;
 
@@ -66,47 +67,55 @@ import de.byteholder.gpx.Waypoint;
  */
 public class PoiView extends ViewPart implements Observer {
 
-	public final static String		ID						= "de.byteholder.geoclipse.poi.poiView";	//$NON-NLS-1$
+	public final static String		ID								= "de.byteholder.geoclipse.poi.poiView";	//$NON-NLS-1$
 
-	private static final String		STATE_SEARCHED_QUERIES	= "searched.queries";						//$NON-NLS-1$
+	private static final String	STATE_SEARCHED_QUERIES	= "searched.queries";							//$NON-NLS-1$
 
-	private static final String		IMG_KEY_ANCHOR			= "anchor";								//$NON-NLS-1$
-	private static final String		IMG_KEY_CAR				= "car";									//$NON-NLS-1$
-	private static final String		IMG_KEY_CART			= "cart";									//$NON-NLS-1$
-	private static final String		IMG_KEY_FLAG			= "flag";									//$NON-NLS-1$
-	private static final String		IMG_KEY_HOUSE			= "house";									//$NON-NLS-1$
-	private static final String		IMG_KEY_SOCCER			= "soccer";								//$NON-NLS-1$
-	private static final String		IMG_KEY_STAR			= "star";									//$NON-NLS-1$
+	private static final String	IMG_KEY_ANCHOR				= "anchor";											//$NON-NLS-1$
+	private static final String	IMG_KEY_CAR					= "car";												//$NON-NLS-1$
+	private static final String	IMG_KEY_CART				= "cart";											//$NON-NLS-1$
+	private static final String	IMG_KEY_FLAG				= "flag";											//$NON-NLS-1$
+	private static final String	IMG_KEY_HOUSE				= "house";											//$NON-NLS-1$
+	private static final String	IMG_KEY_SOCCER				= "soccer";											//$NON-NLS-1$
+	private static final String	IMG_KEY_STAR				= "star";											//$NON-NLS-1$
 
-	private IDialogSettings			_state					= TourbookPlugin.getDefault().getDialogSettingsSection(
-																	"PoiView");						//$NON-NLS-1$
+	private IDialogSettings			_state						= TourbookPlugin.getState("PoiView");		//$NON-NLS-1$
 
-	private Combo					_cboSearchQuery;
-	private ComboViewer				_queryViewer;
-	private Button					_btnSearch;
 	private TableViewer				_poiViewer;
 	private List<PointOfInterest>	_pois;
+	private ArrayList<String>		_searchHistory				= new ArrayList<>();
 
 	private PostSelectionProvider	_postSelectionProvider;
 
 	private IWorkbenchHelpSystem	_wbHelpSystem;
 
-	private ArrayList<String>		_searchedQueries		= new ArrayList<String>();
+	/*
+	 * UI controls
+	 */
+	private Button						_btnSearch;
+	
+	private Combo						_cboSearchQuery;
+	private ComboViewer				_queryViewer;
 
 	public class SearchContentProvider implements IStructuredContentProvider {
 
+		@Override
 		public void dispose() {}
 
+		@Override
 		public Object[] getElements(final Object inputElement) {
-			return _searchedQueries.toArray(new String[_searchedQueries.size()]);
+			return _searchHistory.toArray(new String[_searchHistory.size()]);
 		}
 
+		@Override
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
 	class ViewContentProvider implements IStructuredContentProvider {
+		@Override
 		public void dispose() {}
 
+		@Override
 		public Object[] getElements(final Object parent) {
 			if (_pois == null) {
 				return new String[] {};
@@ -115,11 +124,13 @@ public class PoiView extends ViewPart implements Observer {
 			}
 		}
 
+		@Override
 		public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
 	}
 
 	class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
 
+		@Override
 		public Image getColumnImage(final Object obj, final int index) {
 			switch (index) {
 			case 0:
@@ -129,6 +140,7 @@ public class PoiView extends ViewPart implements Observer {
 			}
 		}
 
+		@Override
 		public String getColumnText(final Object obj, final int index) {
 			final PointOfInterest poi = (PointOfInterest) obj;
 
@@ -216,6 +228,7 @@ public class PoiView extends ViewPart implements Observer {
 		//Clicking F1 while this view has Focus will jump to the associated
 		//helpContext, see de.byteholder.geoclipse.help
 		_wbHelpSystem = PlatformUI.getWorkbench().getHelpSystem();
+
 		//TODO this "forces" of this plug-in to de.byteholder.geoclipse.help ?!
 		final String contextId = "de.byteholder.geoclipse.help.places_view"; //$NON-NLS-1$
 		_wbHelpSystem.setHelp(parent, contextId);
@@ -318,6 +331,7 @@ public class PoiView extends ViewPart implements Observer {
 
 			_poiViewer.addPostSelectionChangedListener(new ISelectionChangedListener() {
 
+				@Override
 				public void selectionChanged(final SelectionChangedEvent e) {
 
 					final ISelection selection = e.getSelection();
@@ -328,14 +342,6 @@ public class PoiView extends ViewPart implements Observer {
 				}
 			});
 		}
-	}
-
-	@Override
-	public void dispose() {
-
-		saveState();
-
-		super.dispose();
 	}
 
 	private void initImageRegistry() {
@@ -364,19 +370,19 @@ public class PoiView extends ViewPart implements Observer {
 		final String searchText = _cboSearchQuery.getText();
 
 		// remove same search text
-		if (_searchedQueries.contains(searchText) == false) {
+		if (_searchHistory.contains(searchText) == false) {
 
 			// update model
-			_searchedQueries.add(searchText);
+			_searchHistory.add(searchText);
 
 			// update viewer
 			_queryViewer.add(searchText);
 		}
 
 		// start poi search
-		final GeoQuery finder = new GeoQuery(searchText);
-		finder.addObserver(PoiView.this);
-		finder.asyncFind();
+		final GeoQuery geoQuery = new GeoQuery(searchText);
+		geoQuery.addObserver(PoiView.this);
+		geoQuery.asyncFind();
 	}
 
 	private void restoreState() {
@@ -385,23 +391,27 @@ public class PoiView extends ViewPart implements Observer {
 		final String[] stateSearchedQueries = _state.getArray(STATE_SEARCHED_QUERIES);
 		if (stateSearchedQueries != null) {
 			for (final String query : stateSearchedQueries) {
-				_searchedQueries.add(query);
+				_searchHistory.add(query);
 			}
 		}
 
 		// update content in the comboviewer
 		_queryViewer.setInput(new Object());
-
 	}
 
+	@PersistState
 	private void saveState() {
 
-		_state.put(STATE_SEARCHED_QUERIES, _searchedQueries.toArray(new String[_searchedQueries.size()]));
+		_state.put(STATE_SEARCHED_QUERIES, _searchHistory.toArray(new String[_searchHistory.size()]));
 	}
 
 	@Override
 	public void setFocus() {
+
+		// set default button
 		_btnSearch.getShell().setDefaultButton(_btnSearch);
+
+		// set focus
 		_cboSearchQuery.setFocus();
 	}
 
@@ -419,6 +429,7 @@ public class PoiView extends ViewPart implements Observer {
 	/**
 	 * implements update from interface observer
 	 */
+	@Override
 	public void update(final Observable observable, final Object arg) {
 
 		if (observable instanceof GeoQuery) {
@@ -431,6 +442,7 @@ public class PoiView extends ViewPart implements Observer {
 			}
 
 			Display.getDefault().asyncExec(new Runnable() {
+				@Override
 				public void run() {
 
 					// check if view is closed

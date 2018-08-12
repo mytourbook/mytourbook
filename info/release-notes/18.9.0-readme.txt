@@ -5,4 +5,16 @@ E3 -> E4
 
 * Search Tours View
 
-  - A tour cannot be selected in the embedded view only in an external browser window  
+  - A tour cannot be selected in the embedded view only in an external browser window
+  
+  
+Changes
+=======
+
+
+Bugfix
+======
+
+* Search POI
+
+  - Use https instead of http which do not work anymore  
