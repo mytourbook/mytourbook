@@ -1,75 +1,11 @@
 <?xml version="1.0" encoding="ASCII"?>
-<fragment:ModelFragments xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:advanced="http://www.eclipse.org/ui/2010/UIModel/application/ui/advanced" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:basic_1="http://www.eclipse.org/ui/2010/UIModel/application/descriptor/basic" xmlns:commands="http://www.eclipse.org/ui/2010/UIModel/application/commands" xmlns:fragment="http://www.eclipse.org/ui/2010/UIModel/fragment" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_xVj_UIeOEeidfoHLJwTP3w">
-  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_MurGEIf-EeifscEiKr_C-g" featurename="commands" parentElementId="xpath:/">
-    <elements xsi:type="commands:Command" xmi:id="_PEebYI2GEeiUsqQtTYPX1Q" elementId="net.tourbook.command.ActionModifyColumnsE4" commandName="Column Manager"/>
-    <elements xsi:type="commands:Command" xmi:id="_teLkQJiIEeiYV6Xegvc8CA" elementId="net.tourbook.command.e4.OpenPart" commandName="Open Part" description="open part description">
-      <parameters xmi:id="_KdHCwJl7EeiolYQoqFODsQ" elementId="net.tourbook.commandparameter.partId" name="partId"/>
-    </elements>
-  </fragments>
-  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_L_HwgIeSEeidfoHLJwTP3w" featurename="snippets" parentElementId="xpath:/">
-    <elements xsi:type="advanced:Perspective" xmi:id="_RG2NYIeUEeid4qCmeJm4Ig" elementId="net.tourbook.perspective.TourBookE4" label="Tour Book E4" iconURI="platform:/plugin/net.tourbook/icons/tourbook-tours-perspective.png">
-      <children xsi:type="basic:PartSashContainer" xmi:id="_irC78IfsEei5M5n_EtWjBA" elementId="net.tourbook.partsashcontainer.0" horizontal="true">
-        <children xsi:type="basic:PartSashContainer" xmi:id="_sobyIIfsEei5M5n_EtWjBA" elementId="net.tourbook.partsashcontainer.2">
-          <children xsi:type="basic:PartStack" xmi:id="_z8B7kIfsEei5M5n_EtWjBA" elementId="net.tourbook.partstack.0">
-            <children xsi:type="basic:Part" xmi:id="_1zZs4IfsEei5M5n_EtWjBA" elementId="net.tourbook.part.TourMarkerViewE4" contributionURI="bundleclass://net.tourbook/net.tourbook.ui.views.tourMarker.TourMarkerViewE4" label="%view_name_Marker" iconURI="platform:/plugin/net.tourbook/icons/tour-marker.png" closeable="true"/>
-          </children>
-        </children>
-      </children>
-    </elements>
-    <elements xsi:type="advanced:Perspective" xmi:id="_59C1MI2yEeiuJ4lbXUlxjw" elementId="net.tourbook.perspective.e4" label="E4" iconURI="platform:/plugin/net.tourbook/icons/tour-map-compare-result-perspective.png">
-      <children xsi:type="basic:PartSashContainer" xmi:id="_VUtw8I2zEeiuJ4lbXUlxjw" elementId="net.tourbook.partsashcontainer.1" selectedElement="_HpDVYI23EeiuJ4lbXUlxjw" horizontal="true">
-        <children xsi:type="basic:PartSashContainer" xmi:id="_HpDVYI23EeiuJ4lbXUlxjw" elementId="net.tourbook.partsashcontainer.3" selectedElement="_JyAl8I23EeiuJ4lbXUlxjw">
-          <children xsi:type="basic:PartStack" xmi:id="_JyAl8I23EeiuJ4lbXUlxjw" elementId="net.tourbook.partstack.1">
-            <children xsi:type="basic:Part" xmi:id="_4r_yEI54Eei_U4jwxVyVJg" elementId="net.tourbook.ui.views.TourBlogView.0" contributionURI="bundleclass://net.tourbook/net.tourbook.ui.views.TourBlogView" label="%View_Name_TourBlog" iconURI="platform:/plugin/net.tourbook/icons/tour-blog.png" closeable="true">
-              <tags>View</tags>
-              <tags>categoryTag:net.tourbook.category.tour</tags>
-              <menus xmi:id="_4r_yEY54Eei_U4jwxVyVJg" elementId="net.tourbook.ui.views.TourBlogView.2">
-                <tags>ViewMenu</tags>
-              </menus>
-              <toolbar xmi:id="_4r_yEo54Eei_U4jwxVyVJg" elementId="net.tourbook.ui.views.TourBlogView.1"/>
-            </children>
-            <children xsi:type="advanced:Placeholder" xmi:id="_lnVwII9OEeilm6hWlKEeKQ" elementId="net.tourbook.placeholder.0" ref="_P8QrII9LEeilm6hWlKEeKQ" closeable="true"/>
-          </children>
-        </children>
-      </children>
-    </elements>
-  </fragments>
-  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_dPyJ8IpZEeivNtAIARGcHg" featurename="handlers" parentElementId="xpath:/">
-    <elements xsi:type="commands:Handler" xmi:id="_pT3gcI2GEeiUsqQtTYPX1Q" elementId="net.tourbook.handler.ActionModifyColumnsE4" contributionURI="bundleclass://net.tourbook/net.tourbook.ui.action.ActionModifyColumnsE4" command="_PEebYI2GEeiUsqQtTYPX1Q"/>
-    <elements xsi:type="commands:Handler" xmi:id="_6spwsJiIEeiYV6Xegvc8CA" elementId="net.tourbook.handler.OpenPart" contributionURI="bundleclass://net.tourbook.common/net.tourbook.common.e4.OpenPartHandler" command="_teLkQJiIEeiYV6Xegvc8CA"/>
-  </fragments>
-  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_8k1eQIzrEei8daiZZD94mg" featurename="descriptors" parentElementId="xpath:/">
-    <elements xsi:type="basic_1:PartDescriptor" xmi:id="_R2gFEIzsEei8daiZZD94mg" elementId="net.tourbook.partdesc.TourMarkerView.E4" label="TourMarkerView.E4" iconURI="platform:/plugin/net.tourbook/icons/tour-marker.png" category="E4 parts" closeable="true" contributionURI="bundleclass://net.tourbook/net.tourbook.ui.views.tourMarker.TourMarkerViewE4">
-      <tags>View</tags>
-      <menus xmi:id="_e2XfcI2JEeiUsqQtTYPX1Q" elementId="menu:net.tourbook.views.TourMarkerView.E4">
-        <tags>ViewMenu</tags>
-        <children xsi:type="menu:HandledMenuItem" xmi:id="_hYrEII2JEeiUsqQtTYPX1Q" elementId="net.tourbook.handledmenuitem.0" label="handled menu item 0" iconURI="platform:/plugin/net.tourbook.common/icons/customize-profiles-columns.png" tooltip="handled menu item 0" command="_PEebYI2GEeiUsqQtTYPX1Q"/>
-      </menus>
-      <toolbar xmi:id="_YNSgoIzvEei8daiZZD94mg" elementId="net.tourbook.toolbar.0">
-        <children xsi:type="menu:HandledToolItem" xmi:id="_UWuGMI2IEeiUsqQtTYPX1Q" elementId="net.tourbook.handledtoolitem.handledtoolitem" label="handled tool item" iconURI="platform:/plugin/net.tourbook.common/icons/customize-profiles-columns.png" tooltip="handled tool item" command="_PEebYI2GEeiUsqQtTYPX1Q"/>
-        <children xsi:type="menu:ToolBarSeparator" xmi:id="_5Co0gI2IEeiUsqQtTYPX1Q" elementId="net.tourbook.toolbarseparator.0"/>
-        <children xsi:type="menu:DirectToolItem" xmi:id="_58TncI2IEeiUsqQtTYPX1Q" elementId="net.tourbook.directtoolitem.directtoolitem" label="direct tool item" iconURI="platform:/plugin/net.tourbook.common/icons/customize-profiles-columns.png" tooltip="direct tool item" contributionURI="bundleclass://net.tourbook/net.tourbook.ui.action.ActionModifyColumnsE4"/>
-      </toolbar>
-    </elements>
-  </fragments>
-  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_E2JSUI9LEeilm6hWlKEeKQ" featurename="sharedElements" parentElementId="IDEWindow">
-    <elements xsi:type="basic:Part" xmi:id="_P8QrII9LEeilm6hWlKEeKQ" elementId="net.tourbook.part.TourMarkerViewE4_shared" contributionURI="bundleclass://net.tourbook/net.tourbook.ui.views.tourMarker.TourMarkerViewE4" label="TourMarkerViewE4_shared" iconURI="platform:/plugin/net.tourbook/icons/tour-marker.png" tooltip="tooltip"/>
-  </fragments>
+<fragment:ModelFragments xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:fragment="http://www.eclipse.org/ui/2010/UIModel/fragment" xmi:id="_xVj_UIeOEeidfoHLJwTP3w">
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_MurGEIf-EeifscEiKr_C-g" featurename="commands" parentElementId="xpath:/"/>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_L_HwgIeSEeidfoHLJwTP3w" featurename="snippets" parentElementId="xpath:/"/>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_dPyJ8IpZEeivNtAIARGcHg" featurename="handlers" parentElementId="xpath:/"/>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_8k1eQIzrEei8daiZZD94mg" featurename="descriptors" parentElementId="xpath:/"/>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_E2JSUI9LEeilm6hWlKEeKQ" featurename="sharedElements" parentElementId="IDEWindow"/>
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_eYXDkJsYEeihxr4J6PvPOg" featurename="menuContributions" parentElementId="xpath:/"/>
-  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_K9vkIJiKEeiYV6Xegvc8CA" featurename="toolBarContributions" parentElementId="xpath:/">
-    <elements xsi:type="menu:ToolBarContribution" xmi:id="_WuUkUJiMEeiYV6Xegvc8CA" elementId="net.tourbook.toolbarcontribution.0" parentId="mc_tb_Tour" positionInParent="">
-      <children xsi:type="menu:HandledToolItem" xmi:id="_iF3rYJiMEeiYV6Xegvc8CA" elementId="net.tourbook.handledtoolitem.openpart" label="" iconURI="platform:/plugin/net.tourbook/icons/tourbook-tours.png" tooltip="%view_name_Book" command="_teLkQJiIEeiYV6Xegvc8CA">
-        <parameters xmi:id="_PaimEJl7EeiolYQoqFODsQ" elementId="net.tourbook.parameter.partId" name="net.tourbook.commandparameter.partId" value="net.tourbook.views.tourListView"/>
-      </children>
-    </elements>
-  </fragments>
-  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_dlGvYJrQEeioQ-My4t5mvA" featurename="trimContributions" parentElementId="xpath:/">
-    <elements xsi:type="menu:TrimContribution" xmi:id="__8EGkJrSEeioQ-My4t5mvA" elementId="net.tourbook.trimcontribution.0" accessibilityPhrase="" parentId="org.eclipse.ui.main.toolbar" positionInParent="">
-      <children xsi:type="menu:ToolBar" xmi:id="__8EGkZrSEeioQ-My4t5mvA" elementId="net.tourbook.toolbar.E4-Test" accessibilityPhrase="">
-        <children xsi:type="menu:HandledToolItem" xmi:id="__8EGkprSEeioQ-My4t5mvA" elementId="net.tourbook.handledtoolitem.collatedTours" iconURI="platform:/plugin/net.tourbook/icons/collated-tours.png" tooltip="%View_Name_CollatedTours" command="_teLkQJiIEeiYV6Xegvc8CA">
-          <parameters xmi:id="__8EGk5rSEeioQ-My4t5mvA" elementId="net.tourbook.parameter.partId" name="net.tourbook.commandparameter.partId" value="net.tourbook.ui.views.collateTours.CollatedToursView"/>
-        </children>
-      </children>
-    </elements>
-  </fragments>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_K9vkIJiKEeiYV6Xegvc8CA" featurename="toolBarContributions" parentElementId="xpath:/"/>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_dlGvYJrQEeioQ-My4t5mvA" featurename="trimContributions" parentElementId="xpath:/"/>
 </fragment:ModelFragments>
