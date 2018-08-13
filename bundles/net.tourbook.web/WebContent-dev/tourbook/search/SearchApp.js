@@ -35,7 +35,7 @@ define(
 	'dojo/i18n!./nls/Messages',
 	'dojo/domReady!'
 ], /* @callback */function(
-//	
+
 // dojo/_base
 declare, //
 fx, //
@@ -61,11 +61,11 @@ Tooltip, //
 TooltipDialog, //
 
 // dgrid
-Keyboard, //
-OnDemandList, //
-Selection, //
-QueryResults, //
-RequestMemory, //
+dgridKeyboard, //
+dgridOnDemandList, //
+dgridSelection, //
+dstoreQueryResults, //
+dstoreRequestMemory, //
 
 put, //
 
@@ -76,7 +76,8 @@ SearchMgr, //
 Messages //
 ) {
 
-	var SearchApp = declare('tourbook.search.SearchApp', [], {
+	var SearchApp = declare('tourbook.search.SearchApp', [],
+	{
 
 		createUI : function() {
 
@@ -85,7 +86,7 @@ Messages //
 			/**
 			 * Dialog: Search options
 			 */
-			this._dlgSearchOptions = new DialogSearchOptions(//
+			this._dlgSearchOptions = new DialogSearchOptions(
 			{
 				searchApp : this
 			});
@@ -93,7 +94,7 @@ Messages //
 			/**
 			 * Field: Search input
 			 */
-			this._searchInput = new SearchInput(//
+			this._searchInput = new SearchInput(
 			{
 				id : 'searchInput',
 				name : 'idSearch',
@@ -120,7 +121,6 @@ Messages //
 			var appLabel = NLS.bind0(Messages.Search_App_Tooltip, SearchMgr.Search_App_Tooltip_Url);
 
 			new Tooltip(
-			//
 			{
 				connectId : 'domInfo',
 
@@ -130,7 +130,7 @@ Messages //
 
 				showDelay : 100,
 
-				label : "<div style='width:30em;'>" + appLabel + "</div>"
+				label : '<div style=\'width:30em;\'>' + appLabel + '</div>'
 			});
 
 			// set tooltips
@@ -144,7 +144,7 @@ Messages //
 			/**
 			 * Action: Show search options.
 			 */
-			this._actionSearchOptions = new Button(//
+			this._actionSearchOptions = new Button(
 			{
 				// label is displayed as tooltip
 				label : Messages.Search_App_Action_SearchOptions_Tooltip,
@@ -164,7 +164,7 @@ Messages //
 
 				_showDialog : function() {
 
-					var dialogProperties = //
+					var dialogProperties =
 					{
 						title : Messages.Search_Options_Dialog_Header,
 
@@ -181,7 +181,7 @@ Messages //
 			/**
 			 * Action: Start search.
 			 */
-			this._actionStartSearch = new Button(//
+			this._actionStartSearch = new Button(
 			{
 				// label is displayed as tooltip
 				label : Messages.Search_App_Action_StartSearch_Tooltip,
@@ -204,8 +204,7 @@ Messages //
 
 			// copied from http://dgrid.io/tutorials/0.4/grids_and_stores/demo/OnDemandGrid-comparison.html
 			// ??? WHEN fetchRange IS NOT DEFINED, DATA WILL NOT BE RETRIEVED ???
-			var collection = new (declare('tourbook.search.ResultStore', //
-			RequestMemory,//
+			var collection = new declare('tourbook.search.ResultStore', dstoreRequestMemory,
 			{
 				/**
 				 * Overwrite fetchRange in dstore.Cache
@@ -227,10 +226,10 @@ Messages //
 					/*
 					 * Create query result
 					 */
-					var queryResult = new QueryResults(//
+					var queryResult = new dstoreQueryResults(
 
 					// data
-					response.data, //
+					response.data,
 
 					// options
 					{
@@ -243,19 +242,19 @@ Messages //
 					 */
 					response.response.then(function(args) {
 
-						var //
+						var
 
 						/*
 						 * The data must be parsed a second time, have not found a solution to do it better after 2 days of
 						 * try and error.
 						 */
-						requestData = JSON.parse(args.data), //
+						requestData = JSON.parse(args.data),
 
 //						searchText = app._searchInput.getSearchText(), //
 						searchTime = requestData.searchTime, //
 						searchTotal = requestData.totalHits, //
 
-						statusText = '' + searchTotal + ' - ' + searchTime;
+						statusText = String(searchTotal) + ' - ' + searchTime;
 
 						// update status
 						dom.byId('domAppStatus').innerHTML = statusText;
@@ -263,7 +262,7 @@ Messages //
 
 					return queryResult;
 				}
-			}))(//
+			})(
 			{
 
 				// a valid url is necessary
@@ -274,7 +273,44 @@ Messages //
 				useRangeHeaders : true
 			});
 
-			var selectionCallback = function(event) {
+			var grid = new declare('tourbook.search.Grid',
+			[
+				dgridOnDemandList,
+				dgridKeyboard,
+				dgridSelection
+			],
+			{
+
+				allowSelectAll : true,
+
+				// default is empty that it is not confusing when loading the first time,
+				// this message will be set when a search is started manually
+				noDataMessage : '',
+
+				renderRow : function(value) {
+
+					var div = put('div', '');
+					div.innerHTML = value.htmlContent;
+
+					return div;
+				}
+			})(
+			{
+
+				columns :
+				{
+					id : 'id',
+					name : 'name'
+				},
+
+				collection : collection
+
+			}, 'domGrid');
+
+			/**
+			 * @callback
+			 */
+			var selectionCallback = function(evt) {
 
 				var selectedItems = [];
 
@@ -297,7 +333,8 @@ Messages //
 				xhrQuery[SearchMgr.XHR_PARAM_ACTION] = SearchMgr.XHR_ACTION_SELECT;
 				xhrQuery[SearchMgr.XHR_PARAM_SELECTED_ITEMS] = encodeURIComponent(jsonSelectedItems);
 
-				xhr(SearchMgr.XHR_SEARCH_HANDLER, {
+				xhr(SearchMgr.XHR_SEARCH_HANDLER,
+				{
 
 					handleAs : 'json',
 					preventCache : true,
@@ -306,37 +343,6 @@ Messages //
 					query : xhrQuery
 				});
 			};
-
-			var grid = new (declare('tourbook.search.Grid',
-			[
-				OnDemandList,
-				Keyboard,
-				Selection
-			], {
-
-				allowSelectAll : true,
-
-				// default is empty that it is not confusing when loading the first time, 
-				// this message will be set when a search is started manually
-				noDataMessage : '',
-
-				renderRow : function(value) {
-
-					var div = put('div', '');
-					div.innerHTML = value.htmlContent;
-
-					return div;
-				}
-			}))({
-
-				columns : {
-					id : 'id',
-					name : 'name'
-				},
-
-				collection : collection
-
-			}, 'domGrid');
 
 			// fire an event when tour, marker or waypoint is selected in the UI
 			// fire the event also when multiple items are selected and one is deselected !!!
@@ -378,7 +384,7 @@ Messages //
 			/*
 			 * Run context menu action @callback
 			 */
-			var runUrlAction = function(event) {
+			var runUrlAction = function(evt) {
 
 				var actionUrl = contextMenuItemData.actionUrl_EditItem;
 				SearchApp.action(actionUrl);
@@ -397,7 +403,8 @@ Messages //
 			var query = {};
 			query[SearchMgr.XHR_PARAM_ACTION] = SearchMgr.XHR_ACTION_GET_STATE;
 
-			xhr(SearchMgr.XHR_SEARCH_HANDLER, {
+			xhr(SearchMgr.XHR_SEARCH_HANDLER,
+			{
 
 				query : query,
 				timeout : SearchMgr.XHR_TIMEOUT,
@@ -414,7 +421,7 @@ Messages //
 		},
 
 // saveState() is disabled because an xhr request during page unload is not working !!!
-// 		
+//
 //		saveState : function saveState() {
 //
 //			var searchText = this._searchInput.getSearchText();
@@ -450,7 +457,8 @@ Messages //
 			registry.byId('domContainer').resize();
 
 			// fade out loading message
-			fx.fadeOut({
+			fx.fadeOut(
+			{
 				node : 'domLoading',
 				duration : 200,
 
@@ -473,7 +481,8 @@ Messages //
 		query[SearchMgr.XHR_PARAM_ACTION] = SearchMgr.XHR_ACTION_ITEM_ACTION;
 		query[SearchMgr.XHR_PARAM_ACTION_URL] = encodeURIComponent(actionUrl);
 
-		xhr(SearchMgr.XHR_SEARCH_HANDLER, {
+		xhr(SearchMgr.XHR_SEARCH_HANDLER,
+		{
 
 			handleAs : 'json',
 			preventCache : true,

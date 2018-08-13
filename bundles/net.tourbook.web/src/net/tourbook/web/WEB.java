@@ -1,19 +1,22 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.web;
+
+import com.sun.net.httpserver.Headers;
+import com.sun.net.httpserver.HttpExchange;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,11 +28,6 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 
-import net.tourbook.common.ReplacingOutputStream;
-import net.tourbook.common.UI;
-import net.tourbook.common.util.StatusUtil;
-import net.tourbook.common.util.Util;
-
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -40,8 +38,10 @@ import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.sun.net.httpserver.Headers;
-import com.sun.net.httpserver.HttpExchange;
+import net.tourbook.common.ReplacingOutputStream;
+import net.tourbook.common.UI;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.Util;
 
 /**
  * Web tools.
@@ -57,104 +57,105 @@ public class WEB {
 	 * {@value #WEB_CONTENT_DEVELOPMENT_FOLDER} folder otherwise it is delivered from the
 	 * {@value #WEB_CONTENT_RELEASE_FOLDER} folder.
 	 */
-	static boolean							IS_DEBUG								= false;
+	static boolean									IS_DEBUG											= true;
 
 	/*
 	 * It is very complicated to support testing for language translators, therefore it is currently
 	 * not yet implemented.
 	 */
-//	static boolean							IS_DEBUG_NLS							= true;
+//	static boolean									IS_DEBUG_NLS								= true;
 
-	static String							DEFAULT_LANGUAGE						= "en";											//$NON-NLS-1$
+	static String									DEFAULT_LANGUAGE								= "en";													//$NON-NLS-1$
 
 	/**
 	 * Supported languages.
 	 */
-	static String[]							SUPPORTED_LANGUAGES						= {
-																						"cs",										//$NON-NLS-1$
-																						"de",										//$NON-NLS-1$
-																						DEFAULT_LANGUAGE,
-																						"es",										//$NON-NLS-1$
-																						"fr",										//$NON-NLS-1$
-																						"it",										//$NON-NLS-1$
-																						"nl"										//$NON-NLS-1$
-	};
+	static String[]								SUPPORTED_LANGUAGES							=
+			{
+					"cs",																																				//$NON-NLS-1$
+					"de",																																				//$NON-NLS-1$
+					DEFAULT_LANGUAGE,
+					"es",																																				//$NON-NLS-1$
+					"fr",																																				//$NON-NLS-1$
+					"it",																																				//$NON-NLS-1$
+					"nl"																																				//$NON-NLS-1$
+			};
 
-	static final String						DEBUG_PATH_DOJO							= "C:/E/js-resources/dojo/";					//$NON-NLS-1$
-	private static final String				DEBUG_PATH_XUL_RUNNER					= "C:/E/XULRunner/";							//$NON-NLS-1$
-	private static final String				DEBUG_PATH_FIREBUG_LITE					= "/WebContent-firebug-lite";					//$NON-NLS-1$
+	static final String							DEBUG_PATH_DOJO								= "C:/E/js-resources/dojo/";						//$NON-NLS-1$
+	private static final String				DEBUG_PATH_XUL_RUNNER						= "C:/E/XULRunner/";									//$NON-NLS-1$
+	private static final String				DEBUG_PATH_FIREBUG_LITE						= "/WebContent-firebug-lite";						//$NON-NLS-1$
 
-	public static final String				PROTOCOL_HTTP							= "http://";									//$NON-NLS-1$
+	public static final String					PROTOCOL_HTTP									= "http://";											//$NON-NLS-1$
 
-	static final String						DOJO_TOOLKIT_FOLDER						= "/MyTourbook-DojoToolkit";					//$NON-NLS-1$
+	static final String							DOJO_TOOLKIT_FOLDER							= "/MyTourbook-DojoToolkit";						//$NON-NLS-1$
 
-	private static final String				WEB_CONTENT_DEVELOPMENT_FOLDER			= "/WebContent-dev";							//$NON-NLS-1$
-	private static final String				WEB_CONTENT_RELEASE_FOLDER				= "/WebContent-rel";							//$NON-NLS-1$
-	private static final String				RESOURCE_PATH							= "/tourbook/resources/";						//$NON-NLS-1$
+	private static final String				WEB_CONTENT_DEVELOPMENT_FOLDER			= "/WebContent-dev";									//$NON-NLS-1$
+	private static final String				WEB_CONTENT_RELEASE_FOLDER					= "/WebContent-rel";									//$NON-NLS-1$
+	private static final String				RESOURCE_PATH									= "/tourbook/resources/";							//$NON-NLS-1$
 
 	/**
 	 * Root folder for web content in the web plugin.
 	 */
-	private static final String				WEB_CONTENT_FOLDER						= IS_DEBUG
+	private static final String				WEB_CONTENT_FOLDER							= IS_DEBUG
 			? WEB_CONTENT_DEVELOPMENT_FOLDER
 			: WEB_CONTENT_RELEASE_FOLDER;
 
-	public static final String				UTF_8									= "UTF-8";										//$NON-NLS-1$
+	public static final String					UTF_8												= "UTF-8";												//$NON-NLS-1$
 
-	private static final String				URL_SPACE								= " ";											//$NON-NLS-1$
-	private static final String				URL_SPACE_REPLACEMENT					= "%20";										//$NON-NLS-1$
-	private static final String				URL_SQB_OPEN							= "\\[";										//$NON-NLS-1$
-	private static final String				URL_SQB_OPEN_REPLACEMENT				= "%5B";										//$NON-NLS-1$
-	private static final String				URL_SQB_CLOSE							= "\\]";										//$NON-NLS-1$
-	private static final String				URL_SQB_CLOSE_REPLACEMENT				= "%5D";										//$NON-NLS-1$
+	private static final String				URL_SPACE										= " ";													//$NON-NLS-1$
+	private static final String				URL_SPACE_REPLACEMENT						= "%20";													//$NON-NLS-1$
+	private static final String				URL_SQB_OPEN									= "\\[";													//$NON-NLS-1$
+	private static final String				URL_SQB_OPEN_REPLACEMENT					= "%5B";													//$NON-NLS-1$
+	private static final String				URL_SQB_CLOSE									= "\\]";													//$NON-NLS-1$
+	private static final String				URL_SQB_CLOSE_REPLACEMENT					= "%5D";													//$NON-NLS-1$
 
-	public static final String				HTML_ELEMENT_BR							= "<br>";										//$NON-NLS-1$
+	public static final String					HTML_ELEMENT_BR								= "<br>";												//$NON-NLS-1$
 
-	public static final String				RESPONSE_HEADER_ACCEPT_LANGUAGE			= "Accept-Language";							//$NON-NLS-1$
-	private static final String				RESPONSE_HEADER_CONTENT_ENCODING		= "Content-Encoding";							//$NON-NLS-1$
-	public static final String				RESPONSE_HEADER_CONTENT_RANGE			= "Content-Range";								//$NON-NLS-1$
-	public static final String				RESPONSE_HEADER_CONTENT_TYPE			= "Content-Type";								//$NON-NLS-1$
+	public static final String					RESPONSE_HEADER_ACCEPT_LANGUAGE			= "Accept-Language";									//$NON-NLS-1$
+	private static final String				RESPONSE_HEADER_CONTENT_ENCODING			= "Content-Encoding";								//$NON-NLS-1$
+	public static final String					RESPONSE_HEADER_CONTENT_RANGE				= "Content-Range";									//$NON-NLS-1$
+	public static final String					RESPONSE_HEADER_CONTENT_TYPE				= "Content-Type";										//$NON-NLS-1$
 
-	private static final String				CONTENT_ENCODING_GZIP					= "gzip";										//$NON-NLS-1$
+	private static final String				CONTENT_ENCODING_GZIP						= "gzip";												//$NON-NLS-1$
 
 	private static final String				CONTENT_TYPE_APPLICATION_JAVASCRIPT		= "application/javascript";						//$NON-NLS-1$
-	public static final String				CONTENT_TYPE_APPLICATION_JSON			= "application/json";							//$NON-NLS-1$
+	public static final String					CONTENT_TYPE_APPLICATION_JSON				= "application/json";								//$NON-NLS-1$
 	private static final String				CONTENT_TYPE_APPLICATION_X_JAVASCRIPT	= "application/x-javascript; charset=UTF-8";	//$NON-NLS-1$
-	private static final String				CONTENT_TYPE_IMAGE_GIF					= "image/gif";									//$NON-NLS-1$
-	private static final String				CONTENT_TYPE_IMAGE_JPG					= "image/jpeg";									//$NON-NLS-1$
-	private static final String				CONTENT_TYPE_IMAGE_PNG					= "image/png";									//$NON-NLS-1$
-	private static final String				CONTENT_TYPE_IMAGE_X_ICO				= "image/x-icon";								//$NON-NLS-1$
-	private static final String				CONTENT_TYPE_TEXT_CSS					= "text/css";									//$NON-NLS-1$
-	private static final String				CONTENT_TYPE_TEXT_HTML					= "text/html";									//$NON-NLS-1$
-	private static final String				CONTENT_TYPE_UNKNOWN					= "application/octet-stream";					//$NON-NLS-1$
+	private static final String				CONTENT_TYPE_IMAGE_GIF						= "image/gif";											//$NON-NLS-1$
+	private static final String				CONTENT_TYPE_IMAGE_JPG						= "image/jpeg";										//$NON-NLS-1$
+	private static final String				CONTENT_TYPE_IMAGE_PNG						= "image/png";											//$NON-NLS-1$
+	private static final String				CONTENT_TYPE_IMAGE_X_ICO					= "image/x-icon";										//$NON-NLS-1$
+	private static final String				CONTENT_TYPE_TEXT_CSS						= "text/css";											//$NON-NLS-1$
+	private static final String				CONTENT_TYPE_TEXT_HTML						= "text/html";											//$NON-NLS-1$
+	private static final String				CONTENT_TYPE_UNKNOWN							= "application/octet-stream";						//$NON-NLS-1$
 
-	private static final String				FILE_EXTENSION_CSS						= "css";										//$NON-NLS-1$
-	private static final String				FILE_EXTENSION_GIF						= "gif";										//$NON-NLS-1$
-	private static final String				FILE_EXTENSION_HTML						= "html";										//$NON-NLS-1$
-	private static final String				FILE_EXTENSION_ICO						= "ico";										//$NON-NLS-1$
-	private static final String				FILE_EXTENSION_JGZ						= "jgz";										//$NON-NLS-1$
-	private static final String				FILE_EXTENSION_JPG						= "jpg";										//$NON-NLS-1$
-	private static final String				FILE_EXTENSION_JS						= "js";											//$NON-NLS-1$
-	private static final String				FILE_EXTENSION_MAP						= "map";										//$NON-NLS-1$
-	private static final String				FILE_EXTENSION_PNG						= "png";										//$NON-NLS-1$
+	private static final String				FILE_EXTENSION_CSS							= "css";													//$NON-NLS-1$
+	private static final String				FILE_EXTENSION_GIF							= "gif";													//$NON-NLS-1$
+	private static final String				FILE_EXTENSION_HTML							= "html";												//$NON-NLS-1$
+	private static final String				FILE_EXTENSION_ICO							= "ico";													//$NON-NLS-1$
+	private static final String				FILE_EXTENSION_JGZ							= "jgz";													//$NON-NLS-1$
+	private static final String				FILE_EXTENSION_JPG							= "jpg";													//$NON-NLS-1$
+	private static final String				FILE_EXTENSION_JS								= "js";													//$NON-NLS-1$
+	private static final String				FILE_EXTENSION_MAP							= "map";													//$NON-NLS-1$
+	private static final String				FILE_EXTENSION_PNG							= "png";													//$NON-NLS-1$
 
 	/**
 	 * This file extension is for HTML pages which contain variable replacements, processed in
 	 * {@link ReplacingOutputStream}.
 	 */
-	public static final String				FILE_EXTENSION_MTHTML					= "mthtml";										//$NON-NLS-1$
+	public static final String					FILE_EXTENSION_MTHTML						= "mthtml";												//$NON-NLS-1$
 
-	public static final String				STATE_EXTERNAL_WEB_BROWSER				= "STATE_EXTERNAL_WEB_BROWSER";					//$NON-NLS-1$
-	public static final String				STATE_EXTERNAL_WEB_BROWSER_DEFAULT		= UI.EMPTY_STRING;
-	public static final String				STATE_USE_EXTERNAL_WEB_BROWSER			= "STATE_USE_EXTERNAL_WEB_BROWSER";				//$NON-NLS-1$
+	public static final String					STATE_EXTERNAL_WEB_BROWSER					= "STATE_EXTERNAL_WEB_BROWSER";					//$NON-NLS-1$
+	public static final String					STATE_EXTERNAL_WEB_BROWSER_DEFAULT		= UI.EMPTY_STRING;
+	public static final String					STATE_USE_EXTERNAL_WEB_BROWSER			= "STATE_USE_EXTERNAL_WEB_BROWSER";				//$NON-NLS-1$
 	public static final boolean				STATE_USE_EXTERNAL_WEB_BROWSER_DEFAULT	= false;
 
-	private static final IDialogSettings	_state									= Activator
+	private static final IDialogSettings	_state											= Activator
 			.getState(WEB.class.getCanonicalName());
 
 	/**
 	 * Converts Java newline into HTML newline.
-	 * 
+	 *
 	 * @param text
 	 * @return
 	 */
@@ -165,7 +166,7 @@ public class WEB {
 
 	/**
 	 * Convert Java newline into JS newline.
-	 * 
+	 *
 	 * @param text
 	 * @return
 	 */
@@ -192,9 +193,9 @@ public class WEB {
 	 * Hex-encodes a URL argument
 	 *
 	 * @param urlString
-	 *            The URL argument to encode
+	 *           The URL argument to encode
 	 * @param obfuscateAll
-	 *            True to force hex-encoding on all argument characters
+	 *           True to force hex-encoding on all argument characters
 	 * @return The StringBuffer where the hex-encoded String will be placed
 	 */
 	public static String encodeUrl(final String urlString, final boolean obfuscateAll) {
@@ -299,9 +300,9 @@ public class WEB {
 
 	/**
 	 * @param webContentFile
-	 *            Absolute file path name which parent is {@value #WEB_CONTENT_FOLDER}.
+	 *           Absolute file path name which parent is {@value #WEB_CONTENT_FOLDER}.
 	 * @param isConvertPaths
-	 *            Converts absolute paths to file paths.
+	 *           Converts absolute paths to file paths.
 	 * @return Returns the content of a file from the WebContent folder, this folder is the root for
 	 *         web resources located in {@value #WEB_CONTENT_FOLDER}.
 	 */
@@ -365,7 +366,7 @@ public class WEB {
 
 	/**
 	 * Open url with default or external web browser.
-	 * 
+	 *
 	 * @param url
 	 */
 	public static void openUrl(String href) {
@@ -422,7 +423,7 @@ public class WEB {
 
 		final String encodedUrl = encodeSpace(url);
 
-		final ArrayList<String> commands = new ArrayList<String>();
+		final ArrayList<String> commands = new ArrayList<>();
 
 		if (UI.IS_WIN) {
 
@@ -497,7 +498,7 @@ public class WEB {
 
 	/**
 	 * Decodes the raw json data and converts it in a {@link JSONArray}.
-	 * 
+	 *
 	 * @param jsonRawData
 	 * @return Returns a {@link JSONArray} from the parsed json data.
 	 * @throws UnsupportedEncodingException
@@ -513,7 +514,7 @@ public class WEB {
 
 	/**
 	 * Decodes the raw json data and converts it in a {@link JSONObject}.
-	 * 
+	 *
 	 * @param jsonRawData
 	 * @return Returns a {@link JSONObject} from the parsed json data.
 	 * @throws UnsupportedEncodingException
@@ -548,8 +549,8 @@ public class WEB {
 	}
 
 	private static String replacePath(	final String webContent,
-										final String htmlContentPath,
-										final String systemContentPath) {
+													final String htmlContentPath,
+													final String systemContentPath) {
 
 		String replacedContent = UI.EMPTY_STRING;
 
@@ -574,7 +575,7 @@ public class WEB {
 	/**
 	 * Set content type from the file extension into the HTTP header. This is necessary otherwise IE
 	 * 11 will ignore the files.
-	 * 
+	 *
 	 * @param httpExchange
 	 * @param file
 	 * @return Returns the file extension.
@@ -682,7 +683,7 @@ public class WEB {
 	 * Returns true if the specified character should be hex-encoded in a URL
 	 *
 	 * @param ch
-	 *            The character to test
+	 *           The character to test
 	 * @return True if the specified character should be hex-encoded in a URL
 	 */
 	private static boolean shouldEncodeArgChar(final char ch) {

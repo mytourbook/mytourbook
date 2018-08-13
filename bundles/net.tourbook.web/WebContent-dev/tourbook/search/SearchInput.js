@@ -2,19 +2,20 @@
 
 /*eslint-env browser */
 /*eslint-env amd */
+/*eslint-disable no-param-reassign */
 define(
 [
-	"dojo/_base/declare",
-	"dojo/_base/lang",
+	'dojo/_base/declare',
+	'dojo/_base/lang',
 
-	"dojo/dom",
-	"dojo/keys", // keys.DOWN_ARROW keys.ENTER keys.ESCAPE
-	"dojo/on",
-	"dojo/request/xhr",
-	"dojo/store/Memory",
-	"dojo/window",
+	'dojo/dom',
+	'dojo/keys', // keys.DOWN_ARROW keys.ENTER keys.ESCAPE
+	'dojo/on',
+	'dojo/request/xhr',
+	'dojo/store/Memory',
+	'dojo/window',
 
-	"dijit/form/FilteringSelect",
+	'dijit/form/FilteringSelect',
 
 	'./SearchMgr',
 	'dojo/i18n!./nls/Messages'
@@ -37,7 +38,7 @@ SearchMgr, //
 Messages //
 ) {
 
-	var SearchUI = declare("tourbook.search.SearchInput",
+	var SearchUI = declare('tourbook.search.SearchInput',
 	[ FilteringSelect
 	], {
 
@@ -48,7 +49,7 @@ Messages //
 			}
 
 			if (!xhrSearchText) {
-				console.info("Search text is empty.");
+				console.info('Search text is empty.');
 				return;
 			}
 
@@ -61,7 +62,7 @@ Messages //
 			xhr(SearchMgr.XHR_SEARCH_HANDLER, {
 
 				query : query,
-				handleAs : "json",
+				handleAs : 'json',
 				preventCache : true,
 				timeout : SearchMgr.XHR_TIMEOUT
 
@@ -79,7 +80,7 @@ Messages //
 			}, function(err) {
 
 				// Handle the error condition
-				console.error("error: " + err);
+				console.error('error: ' + err);
 			});
 		},
 
@@ -92,7 +93,7 @@ Messages //
 
 			var newSearchUrl = this.createSearchUrl();
 
-			console.warn("startSearch '" + newSearchUrl + "'");
+			console.warn('startSearch \'' + newSearchUrl + '\'');
 
 			// check if loading is needed
 			if (isForceRefresh || this._currentSearchUrl !== newSearchUrl) {
@@ -112,7 +113,7 @@ Messages //
 			}
 		},
 
-		_onKeyUp : function _onKeyUp(event) {
+		_onKeyUp : function _onKeyUp(evt) {
 
 //			console.info("_onKeyUp '" + this.getSearchText() + "'");
 
@@ -122,8 +123,8 @@ Messages //
 			if (searchText !== this._lastSearchText) {
 
 				// prevent that it is call TWICE
-				event.stopPropagation();
-				event.preventDefault();
+				evt.stopPropagation();
+				evt.preventDefault();
 
 				this._lastSearchText = searchText;
 
@@ -131,7 +132,7 @@ Messages //
 			}
 
 			// load results only with the <Enter> key
-			if (event.keyCode == keys.ENTER) {
+			if (evt.keyCode === keys.ENTER) {
 				this.startSearch();
 			}
 		},
@@ -157,8 +158,8 @@ Messages //
 
 			var searchText = this.getSearchText();
 
-			var actionSearch = SearchMgr.XHR_PARAM_ACTION + "=" + SearchMgr.XHR_ACTION_SEARCH;
-			var paramSearchText = "&" + SearchMgr.XHR_PARAM_SEARCH_TEXT + "=" + encodeURIComponent(searchText);
+			var actionSearch = SearchMgr.XHR_PARAM_ACTION + '=' + SearchMgr.XHR_ACTION_SEARCH;
+			var paramSearchText = '&' + SearchMgr.XHR_PARAM_SEARCH_TEXT + '=' + encodeURIComponent(searchText);
 
 			var url = SearchMgr.XHR_SEARCH_HANDLER + '?' + actionSearch + paramSearchText;
 
@@ -172,22 +173,25 @@ Messages //
 
 		log : function(logText) {
 
-			dom.byId("domLog").innerHTML = logText;
+			dom.byId('domLog').innerHTML = logText;
 		},
 
+		/**
+		 * @callback
+		 */
 		onChange : function(value) {
 			/*
 			 * THIS IS NOT WORKING PROPERLY :-(
 			 */
 //			this._onChange(value);
-			console.warn("onChange '" + this.getSearchText() + "'");
+			console.warn('onChange \'' + this.getSearchText() + '\'');
 		},
 
 		postCreate : function() {
 
 			this.inherited(arguments);
 
-			on(this.domNode, "keyup", lang.hitch(this, "_onKeyUp"));
+			on(this.domNode, 'keyup', lang.hitch(this, '_onKeyUp'));
 		},
 
 		resize : function() {
