@@ -52,10 +52,10 @@ Set version number / year
 -------------------------
 
 	- Replace year in "net.tourbook.application.ApplicationVersion"
-	- Replace text (Ctrl-H) "x.y.0-SNAPSHOT" to "a.b.0-SNAPSHOT" in all "pom*.xml"
-	- Replace text (Ctrl-H) "x.y.0.qualifier" to "a.b.0.qualifier" in all other files
-	- Replace text (Ctrl-H) "x.y.z" to "a.b.c" in "about.mappings"
-	- Replace text (Ctrl-H) "x.y.z" to "a.b.c" in these files
+	- Replace text (Ctrl-H) "x.y.0-SNAPSHOT" to "a.b.0-SNAPSHOT" 		in all "pom*.xml"
+	- Replace text (Ctrl-H) "x.y.0.qualifier" to "a.b.0.qualifier" 	in all other files
+	- Replace text (Ctrl-H) "x.y.z" to "a.b.c" 								in "about.mappings"
+	- Replace text (Ctrl-H) "x.y.z" to "a.b.c" 								in these files
 	 
 	    BUT ONLY WHEN A MAJOR RELEASE IS CREATED DON'T MODIFY match="equivalent" VERSION WHEN AN UPDATE SITE IS CREATED
 
