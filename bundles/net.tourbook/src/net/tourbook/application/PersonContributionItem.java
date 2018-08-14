@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -42,18 +42,18 @@ import net.tourbook.ui.CustomControlContribution;
 
 public class PersonContributionItem extends CustomControlContribution {
 
-	private static final String		ID			= "net.tourbook.clientselector";	//$NON-NLS-1$
+	private static final String		ID				= "net.tourbook.clientselector";		//$NON-NLS-1$
 
-	private static TourbookPlugin	_activator	= TourbookPlugin.getDefault();
+	private static TourbookPlugin		_activator	= TourbookPlugin.getDefault();
 
-	private final IDialogSettings	_state		= _activator.getDialogSettings();
+	private final IDialogSettings		_state		= _activator.getDialogSettings();
 	private final IPreferenceStore	_prefStore	= _activator.getPreferenceStore();
 
 	private IPropertyChangeListener	_prefChangeListener;
 
-	private ArrayList<TourPerson>	_allPeople;
+	private ArrayList<TourPerson>		_allPeople;
 
-	private Combo					_cboPeople;
+	private Combo							_cboPeople;
 
 	public PersonContributionItem() {
 		this(ID);
@@ -157,8 +157,8 @@ public class PersonContributionItem extends CustomControlContribution {
 		_cboPeople.removeAll();
 
 		/*
-		 * removed the dash in the "All People" string because the whole item was not displayed on
-		 * mac osx
+		 * removed the dash in the "All People" string because the whole item was not displayed on mac
+		 * osx
 		 */
 		_cboPeople.add(Messages.App_People_item_all);
 
@@ -249,7 +249,7 @@ public class PersonContributionItem extends CustomControlContribution {
 	/**
 	 * save current person id in the dialog settings
 	 */
-	public void saveState() {
+	void saveState() {
 
 		if (_cboPeople == null || _cboPeople.isDisposed()) {
 			StatusUtil.log("cannot save selected person, _cboPeople.isDisposed()");//$NON-NLS-1$
@@ -266,7 +266,7 @@ public class PersonContributionItem extends CustomControlContribution {
 		_state.put(ITourbookPreferences.APP_LAST_SELECTED_PERSON_ID, personId);
 	}
 
-	public void selectFirstPerson() {
+	void selectFirstPerson() {
 
 		final int peopleCount = _cboPeople.getItemCount();
 

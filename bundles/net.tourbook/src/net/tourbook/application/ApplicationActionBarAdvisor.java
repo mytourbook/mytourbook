@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -46,19 +46,19 @@ import net.tourbook.tour.filter.TourFilterManager;
  */
 public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
-	private static final String					MENU_CONTRIB_TOOLBAR_APP_FILTER	= "mc_tb_AppFilter";//$NON-NLS-1$
+	private static final String					MENU_CONTRIB_TOOLBAR_APP_FILTER	= "mc_tb_AppFilter";	//$NON-NLS-1$
 
-	private IWorkbenchWindow					_window;
+	private IWorkbenchWindow						_window;
 
-	private IWorkbenchAction					_actionPreferences;
+	private IWorkbenchAction						_actionPreferences;
 
-	private IWorkbenchAction					_actionAbout;
-	private IWorkbenchAction					_actionQuit;
+	private IWorkbenchAction						_actionAbout;
+	private IWorkbenchAction						_actionQuit;
 
-	private IWorkbenchAction					_actionSavePerspective;
-	private IWorkbenchAction					_actionResetPerspective;
-	private IWorkbenchAction					_actionClosePerspective;
-	private IWorkbenchAction					_actionCloseAllPerspective;
+	private IWorkbenchAction						_actionSavePerspective;
+	private IWorkbenchAction						_actionResetPerspective;
+	private IWorkbenchAction						_actionClosePerspective;
+	private IWorkbenchAction						_actionCloseAllPerspective;
 
 	private ActionContributionItem				_quitItem;
 	private ActionContributionItem				_prefItem;
@@ -72,13 +72,13 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	 */
 //	private IWorkbenchAction					_actionEditActionSets;
 
-	PersonContributionItem						_personContribItem;
-	private ActionTourDataFilter				_actionTourDataFilter;
+	PersonContributionItem							_personContribItem;
+	private ActionTourDataFilter					_actionTourDataFilter;
 	private ActionTourTagFilter					_actionTourTagFilter;
-	private TourTypeContributionItem			_tourTypeContribItem;
+	private TourTypeContributionItem				_tourTypeContribItem;
 	private MeasurementSystemContributionItem	_measurementContribItem;
 
-	private ActionOtherViews					_actionOtherViews;
+	private ActionOtherViews						_actionOtherViews;
 
 	public ApplicationActionBarAdvisor(final IActionBarConfigurer configurer) {
 		super(configurer);
@@ -170,17 +170,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		helpMenu.add(getAction(ActionFactory.ABOUT.getId()));
 
 		return helpMenu;
-	}
-
-	/*
-	 * In E4 saveState() do NOT work
-	 */
-	@Override
-	public void dispose() {
-
-		_personContribItem.saveState();
-
-		super.dispose();
 	}
 
 	@Override
@@ -321,10 +310,10 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		register(_actionCloseAllPerspective);
 
 		/*
-		 * If we're on OS X we shouldn't show this command in the File menu. It should be invisible
-		 * to the user. However, we should not remove it - the carbon UI code will do a search
-		 * through our menu structure looking for it when Cmd-Q is invoked (or Quit is chosen from
-		 * the application menu.
+		 * If we're on OS X we shouldn't show this command in the File menu. It should be invisible to
+		 * the user. However, we should not remove it - the carbon UI code will do a search through
+		 * our menu structure looking for it when Cmd-Q is invoked (or Quit is chosen from the
+		 * application menu.
 		 */
 		_quitItem = new ActionContributionItem(_actionQuit);
 		_quitItem.setVisible(!isOSX);

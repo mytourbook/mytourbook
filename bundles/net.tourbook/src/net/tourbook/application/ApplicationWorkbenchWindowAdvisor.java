@@ -252,7 +252,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 	/**
 	 * Hooks the listeners needed on the window
-	 * 
+	 *
 	 * @param configurer
 	 */
 	private void hookTitleUpdateListeners(final IWorkbenchWindowConfigurer configurer) {
@@ -533,6 +533,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 		FTSearchManager.close();
 		WebContentServer.stop();
+
+		_applicationActionBarAdvisor._personContribItem.saveState();
 
 		/**
 		 * Save map3 state only when map is initialized (displayed). When this state is not checked
