@@ -8,11 +8,18 @@
 		<echo message="tycho-version:  '${tycho-version}'"/>
 
 		<antcall target="set-755-in-zip-file">
-			<param name="zip-file" value="${tycho-path}\products\mytourbook-${tycho-version}-linux.gtk.x86.zip"/>
+			<param name="zip-file"				value="${tycho-path}\products\mytourbook-${tycho-version}-linux.gtk.x86.zip"/>
+			<param name="launcher-filepath"	value="mytourbook/mytourbook"/>
 		</antcall>
 	
 		<antcall target="set-755-in-zip-file">
-			<param name="zip-file" value="${tycho-path}\products\mytourbook-${tycho-version}-linux.gtk.x86_64.zip"/>
+			<param name="zip-file"				value="${tycho-path}\products\mytourbook-${tycho-version}-linux.gtk.x86_64.zip"/>
+			<param name="launcher-filepath"	value="mytourbook/mytourbook"/>
+		</antcall>
+	
+		<antcall target="set-755-in-zip-file">
+			<param name="zip-file"				value="${tycho-path}\products\mytourbook-${tycho-version}-macosx.cocoa.x86_64.zip"/>
+			<param name="launcher-filepath"	value="MyTourbook.app/Contents/MacOS/mytourbook"/>
 		</antcall>
 		
 	</target>
@@ -21,8 +28,7 @@
     <target name="set-755-in-zip-file">
 
     	<property name="param-zip-file"				value="${zip-file}"/>
-    	
-    	<property name="launcher-filepath"			value="mytourbook/mytourbook"/>
+    	<property name="param-launcher-filepath"	value="${launcher-filepath}"/>
 
     	<property name="temp-expanded-zip-dir"		value="./temp"/>
     	<property name="temp-new-zip-file"			value="temp-new-zip-file"/>
@@ -34,13 +40,13 @@
     	<!-- extract app launcher -->
     	<unzip src="${param-zip-file}" dest="${temp-expanded-zip-dir}" >
     		<patternset>
-    			<include name="${launcher-filepath}" />
+    			<include name="${param-launcher-filepath}" />
     		</patternset>
     	</unzip>
 
     	<!-- create temp zip without launcher-->
     	<zip destfile="${temp-new-zip-file}">
-    	    <zipfileset src="${param-zip-file}" excludes="${launcher-filepath}"/>
+    	    <zipfileset src="${param-zip-file}" excludes="${param-launcher-filepath}"/>
     	</zip>
 
     	<!-- 
@@ -57,8 +63,8 @@
     	<zip destfile="${temp-new-zip-file}"		update="true">
     		
     		<zipfileset 
-    			file		="${temp-expanded-zip-dir}/${launcher-filepath}"
-    			fullpath	="${launcher-filepath}"
+    			file		="${temp-expanded-zip-dir}/${param-launcher-filepath}"
+    			fullpath	="${param-launcher-filepath}"
     			filemode	="755"
     		/>
     		

@@ -1,24 +1,40 @@
 Version 18.9.0                                             ?. September 2018
 
-The target for this new version was to use Eclipse 4 as backend, there are no other new features, except a few bugfixes.
+This version is VERY experimental.
 
-Eclipse 3 -> Eclipse 4
-======================
+The app is working and tour data should not be lost but there is currently not much experience if all features are working as expected.
+
+The target for this new version was to use Eclipse 4 as backend. There are no other new features, except a few bugfixes. Some adjustments had to be made that the app is running again with Eclipse 4.
+
+
+Eclipse 3 -> Eclipse 4 Issues
+=============================
 
 These are the issues which are already found
 
-* Product size
+* First App Start / Switch Perspective
 
-  The size of the product is now 12 MByte larger than before because the old Eclipse 3 code is still used in the compatibility layer. The Eclipse IDE (which is the main Eclipse product) is also using the same compatibility layer as MyTourbook. 
+  There has been an issue logged when another perspective was selected but this could also occure in other case, e.g. first app start 
+  
+  "org.eclipse.core.runtime.AssertionFailedException: null argument:Placeholder net.tourbook.views.TourMarkerView does not point to a valid reference" 
+  
+  and the UI was partly corrupted. After an app restart, the app was working normally and in my case the TourMarkerView was displayed correctly.
+
 
 * Search Tours View
 
   - A tour cannot be selected with the mouse in the embedded browser (this still works with an external browser), however navigating with the keyboard works in the embedded browser.
     Workaround: Select next/previous tour with mouse (selection marker is not visible) and navigate with the keyboard up/down
 
+
 * Software Update
 
   - The features "Check for Updates" and "Install New Software..." are not working, they are already rarely used   
+
+
+* Product Size
+
+  The size of the product is now 12 MByte larger than before because the old Eclipse 3 code is still used in the compatibility layer. The Eclipse IDE (which is the main Eclipse product) is also using the same compatibility layer as MyTourbook. 
 
 
 Bugfix

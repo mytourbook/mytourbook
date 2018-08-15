@@ -74,9 +74,9 @@ task logCompileConfig {
 	}
 }
 
-def nativesDir_Linux	= project(':net.tourbook.ext.vtm.linux'		).projectDir.toString() + '/natives'
+def nativesDir_Linux		= project(':net.tourbook.ext.vtm.linux'	).projectDir.toString() + '/natives'
 def nativesDir_Windows	= project(':net.tourbook.ext.vtm.windows'	).projectDir.toString() + '/natives'
-def nativesDir_Vtm		= project(':vtm-desktop'					).projectDir.toString() + '/natives'
+def nativesDir_Vtm		= project(':vtm-desktop'						).projectDir.toString() + '/natives'
 
 // extract natives from jar files
 task extractNatives {
@@ -277,7 +277,7 @@ def createBundleClassPath() {
     
     	def name = it.name
     	
-//    	println '\t' + name
+//   	println '\t' + name
     	
     	if(name.equals('linux') || name.equals('osx') || name.equals('windows')){ 
 	    	
@@ -312,22 +312,22 @@ def _mtVersion		= _mtVersionRaw.replaceAll('\'', '')				// 18.2.0
 // set MANIFEST.MF properties to configure OSGi bundle
 jar.manifest.attributes(
 
-	'Bundle-SymbolicName': 						project.name,
-	'Bundle-Name': 								'Vector map from Mapsforge',
+	'Bundle-SymbolicName': 							project.name,
+	'Bundle-Name': 									'Vector map from Mapsforge',
 	
 	// qualifier is an easy readable time stamp
-	'Bundle-Version':							_mtVersion + '.v${tstamp;yyyyMMdd-HHmm}',
+	'Bundle-Version':									_mtVersion + '.v${tstamp;yyyyMMdd-HHmm}',
 
-	'Bundle-Vendor':							"MyTourbook",
-	'Bundle-License': 							'http://www.apache.org/licenses/LICENSE-2.0',
+	'Bundle-Vendor':									"MyTourbook",
+	'Bundle-License': 								'http://www.apache.org/licenses/LICENSE-2.0',
 	
 	// eclipse 4.6 manifest editor creates this property and not 'Require-Capability'
 	'Bundle-RequiredExecutionEnvironment':		'JavaSE-1.7',
 
 	// export all packages from all included jar's
-	'Export-Package': 							'*',
-    'Bundle-ClassPath': 						createBundleClassPath(),
+	'Export-Package': 								'*',
+    'Bundle-ClassPath': 							createBundleClassPath(),
 
-	'-removeheaders':							'Bnd-LastModified, Created-By, Tool, Private-Package, Require-Capability',
+	'-removeheaders':									'Bnd-LastModified, Created-By, Tool, Private-Package, Require-Capability',
 )
 

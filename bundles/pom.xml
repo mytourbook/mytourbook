@@ -48,6 +48,7 @@
 		<module>net.tourbook.ext.velocity</module>
 		<module>net.tourbook.ext.vtm</module>
 		<module>net.tourbook.ext.vtm.linux</module>
+		<module>net.tourbook.ext.vtm.macosx</module>
 		<module>net.tourbook.ext.vtm.windows</module>
 		<module>net.tourbook.ext.worldwind.linux32_2.0</module>
 		<module>net.tourbook.ext.worldwind.linux64_2.0</module>

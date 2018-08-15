@@ -24,7 +24,6 @@
 		<plugins>
 
 			<plugin>
-			
 				<artifactId>tycho-p2-director-plugin</artifactId>	<groupId>org.eclipse.tycho</groupId>
 																					<version>${tycho.version}</version>
 				<executions>
@@ -48,8 +47,8 @@
 							<attachId>mytourbook_attachId</attachId>
 							-->
 
-					        <!-- optional parameters -->
-					        <rootFolder>mytourbook</rootFolder>
+					      <!-- optional parameters -->
+					      <rootFolder>mytourbook</rootFolder>
 					        
 							<!-- 
 							${project.version}
@@ -57,11 +56,26 @@
 							-->
 							<archiveFileName>mytourbook-${unqualifiedVersion}</archiveFileName>
 
+							<!-- macosx adjustment -->
+							<rootFolders>
+								<macosx>MyTourbook.app</macosx>
+							</rootFolders>
 						</product>
 					</products>
 				</configuration>
-				
   			</plugin>
+
+			<!-- macosx adjustment -->
+			<plugin>
+				<artifactId>tycho-p2-repository-plugin</artifactId>		<groupId>org.eclipse.tycho</groupId>
+																							<version>${tycho.version}</version>
+				<configuration>
+					<includeAllDependencies>true</includeAllDependencies>
+					<profileProperties>
+						<macosx-bundled>true</macosx-bundled>
+					</profileProperties>
+				</configuration>
+			</plugin>
 
 			<plugin>
 				<artifactId>maven-antrun-plugin</artifactId>	<version>1.8</version>

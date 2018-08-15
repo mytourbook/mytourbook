@@ -5,7 +5,7 @@ plugins {
 
 // get MT version and remove quotes
 def _mtVersionRaw	= project(':mytourbook').ext.myTourbookVersion		// '18.2.0'
-def _mtVersion		= _mtVersionRaw.replaceAll('\'', '')				// 18.2.0
+def _mtVersion		= _mtVersionRaw.replaceAll('\'', '')					// 18.2.0
 
 def _dirProductBuilt				= file('../build.net.tourbook.product/target/products')
 def _dirProductArchive			= file('../../../../mytourbook-PRODUCT/' + _mtVersion)
@@ -38,10 +38,10 @@ mt_0_Build.dependsOn(
 	'mt_10_CreateBuildFiles',
 	'mt_20_BuildProduct',
 	'mt_30_CopyProduct',
-	'mt_40_ExtractWinFiles',
-	'mt_50_CreateExeFiles',
-	'mt_60_CleanupWinFiles',
-	'mt_70_CopyReleaseNotes',
+//	'mt_40_ExtractWinFiles',
+//	'mt_50_CreateExeFiles',
+//	'mt_60_CleanupWinFiles',
+//	'mt_70_CopyReleaseNotes',
 )
 
 
