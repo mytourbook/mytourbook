@@ -1,16 +1,24 @@
 Version 18.9.0                                             ?. September 2018
 
-E3 -> E4
-========
+The target for this new version was to use Eclipse 4 as backend, there are no other new features, except a few bugfixes.
+
+Eclipse 3 -> Eclipse 4
+======================
+
+These are the issues which are already found
+
+* Product size
+
+  The size of the product is now 12 MByte larger than before because the old Eclipse 3 code is still used in the compatibility layer. The Eclipse IDE (which is the main Eclipse product) is also using the same compatibility layer as MyTourbook. 
 
 * Search Tours View
 
-  - A tour cannot be selected with the mouse in the embedded browser (this still works with an external browser), navigating with keyboard works in the embedded browser.
-    Workaround: Select next/previous tour with mouse (selection is not visible) and navigate with the keyboard up/down
-  
-  
-Changes
-=======
+  - A tour cannot be selected with the mouse in the embedded browser (this still works with an external browser), however navigating with the keyboard works in the embedded browser.
+    Workaround: Select next/previous tour with mouse (selection marker is not visible) and navigate with the keyboard up/down
+
+* Software Update
+
+  - The features "Check for Updates" and "Install New Software..." are not working, they are already rarely used   
 
 
 Bugfix

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project 
 
-	xmlns				="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi			="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns						="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi				="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation	="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	
 	<modelVersion>4.0.0</modelVersion>
@@ -10,12 +10,12 @@
 	<name>MyTourbook App</name>
 
 	<artifactId>mytourbook-app</artifactId>		<groupId>net.tourbook</groupId>
-												<version>18.9.0-SNAPSHOT</version>
+																<version>18.9.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	
 	<properties>
 		<tycho.version>0.24.0</tycho.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  
 	</properties>
 
 	<modules>
@@ -59,40 +59,77 @@
 
 	<repositories>
 	
-		<!--  Eclipse web repository	
+
+		<!-- Eclipse E4 web repositories 
+		
+		<repository>
+			<id>eclipse-photon</id>
+			<layout>p2</layout>
+			<url>http://download.eclipse.org/releases/photon</url>
+		</repository>
+		
+		-->
+		
+		<!-- Eclipse 4.8 local repositories -->
+	
+		<repository>
+			<id>eclipse.platform.4.8</id>											<layout>p2</layout>
+			<url>jar:file:repositories/org.eclipse.platform-4.8.zip!/</url>
+		</repository>
+	
+		<repository>
+			<id>eclipse.rcp.4.8</id>													<layout>p2</layout>
+			<url>jar:file:repositories/org.eclipse.rcp-4.8.zip!/</url>
+		</repository>
+	
+		<repository>
+			<id>eclipse.jdt.4.8</id>													<layout>p2</layout>
+			<url>jar:file:repositories/org.eclipse.jdt-4.8.zip!/</url>
+		</repository>
+	
+		<repository>
+			<id>eclipse.pde.4.8</id>													<layout>p2</layout>
+			<url>jar:file:repositories/org.eclipse.pde-4.8.zip!/</url>
+		</repository>
+
+
+		<!--  Eclipse 3.8 web repository	
 
 		<repository>
-			<id>juno</id>													<layout>p2</layout>
+			<id>juno</id>																	<layout>p2</layout>
 			<url>http://download.eclipse.org/eclipse/updates/3.8</url>
 		</repository>
 		-->
-
-		<!-- Eclipse local repositories -->
+		
+		<!-- Eclipse 3.8.2 local repositories 
 	
 		<repository>
-			<id>eclipse.platform.3.8.2</id>									<layout>p2</layout>
+			<id>eclipse.platform.3.8.2</id>											<layout>p2</layout>
 			<url>jar:file:repositories/org.eclipse.platform-3.8.2.zip!/</url>
 		</repository>
 	
 		<repository>
-			<id>eclipse.rcp.3.8.2</id>										<layout>p2</layout>
+			<id>eclipse.rcp.3.8.2</id>													<layout>p2</layout>
 			<url>jar:file:repositories/org.eclipse.rcp-3.8.2.zip!/</url>
 		</repository>
 	
 		<repository>
-			<id>eclipse.jdt.3.8.2</id>										<layout>p2</layout>
+			<id>eclipse.jdt.3.8.2</id>													<layout>p2</layout>
 			<url>jar:file:repositories/org.eclipse.jdt-3.8.2.zip!/</url>
 		</repository>
 	
 		<repository>
-			<id>eclipse.pde.3.8.2</id>										<layout>p2</layout>
+			<id>eclipse.pde.3.8.2</id>													<layout>p2</layout>
 			<url>jar:file:repositories/org.eclipse.pde-3.8.2.zip!/</url>
 		</repository>
 
+		-->
+		
 		<repository>
-			<id>eclipse.3.8.2.nl</id>										<layout>p2</layout>
+			<id>eclipse.3.8.2.nl</id>													<layout>p2</layout>
 			<url>file:build/build.eclipse.3.8.2.nl.update-site</url>
 		</repository>
+		
 		
 	</repositories>
 	
@@ -106,13 +143,13 @@
         			
 			<plugin>
 				<artifactId>tycho-maven-plugin</artifactId>					<groupId>org.eclipse.tycho</groupId>
-																			<version>${tycho.version}</version>
+																							<version>${tycho.version}</version>
 				<extensions>true</extensions>
 			</plugin>
 
 			<plugin>
 				<artifactId>tycho-compiler-plugin</artifactId>				<groupId>org.eclipse.tycho</groupId>
-																			<version>${tycho.version}</version>
+																							<version>${tycho.version}</version>
 				<configuration>
 
 
@@ -129,7 +166,7 @@
 			
 			<plugin>
 				<artifactId>tycho-packaging-plugin</artifactId>				<groupId>org.eclipse.tycho</groupId>
-																			<version>${tycho.version}</version>
+																							<version>${tycho.version}</version>
 				<configuration>
 				
 					<!-- !!! Hide default user name in manifest files and set a new name !!! -->
@@ -152,14 +189,14 @@
 			</plugin>			
 			
 			<plugin>
-				<artifactId>target-platform-configuration</artifactId>		<groupId>org.eclipse.tycho</groupId>
-																			<version>${tycho.version}</version>
+				<artifactId>target-platform-configuration</artifactId>	<groupId>org.eclipse.tycho</groupId>
+																							<version>${tycho.version}</version>
 				<configuration>
 					<resolver>p2</resolver>
 					<environments>
-						<environment>	<os>win32</os>	<ws>win32</ws>	<arch>x86</arch>		</environment>
+						<environment>	<os>win32</os>	<ws>win32</ws>	<arch>x86</arch>			</environment>
 						<environment>	<os>win32</os>	<ws>win32</ws>	<arch>x86_64</arch>		</environment>
-						<environment>	<os>linux</os>	<ws>gtk</ws>	<arch>x86</arch>		</environment>
+						<environment>	<os>linux</os>	<ws>gtk</ws>	<arch>x86</arch>			</environment>
 						<environment>	<os>linux</os>	<ws>gtk</ws>	<arch>x86_64</arch>		</environment>
 					</environments>
 				</configuration>

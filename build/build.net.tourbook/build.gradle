@@ -7,12 +7,12 @@ plugins {
 def _mtVersionRaw	= project(':mytourbook').ext.myTourbookVersion		// '18.2.0'
 def _mtVersion		= _mtVersionRaw.replaceAll('\'', '')				// 18.2.0
 
-def _dirProductBuilt			= file('../build.net.tourbook.product/target/products')
+def _dirProductBuilt				= file('../build.net.tourbook.product/target/products')
 def _dirProductArchive			= file('../../../../mytourbook-PRODUCT/' + _mtVersion)
-def _dirProductReleaseNotes		= file('../../info/release-notes')
+def _dirProductReleaseNotes	= file('../../info/release-notes')
 def _pathProductArchive			= _dirProductArchive.absolutePath
 
-def _dirWinInnoSetup			= file('../../INSTALL-UPDATES/installer-net.tourbook/win-Inno.Setup')
+def _dirWinInnoSetup				= file('../../INSTALL-UPDATES/installer-net.tourbook/win-Inno.Setup')
 def _pathInnoSetupCompilerApp	= file('c:/Program Files (x86)/Inno Setup 5/iscc.exe').absolutePath
 
 
@@ -71,7 +71,7 @@ task mt_20_BuildProduct {
         mavenexec {
         
             workingDir	buildDir
-            goals		'verify'
+            goals			'verify'
             
 			options {
 				activateProfiles	= ['build-release']
