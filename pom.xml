@@ -92,38 +92,6 @@
 			<url>jar:file:repositories/org.eclipse.pde-4.8.zip!/</url>
 		</repository>
 
-
-		<!--  Eclipse 3.8 web repository	
-
-		<repository>
-			<id>juno</id>																	<layout>p2</layout>
-			<url>http://download.eclipse.org/eclipse/updates/3.8</url>
-		</repository>
-		-->
-		
-		<!-- Eclipse 3.8.2 local repositories 
-	
-		<repository>
-			<id>eclipse.platform.3.8.2</id>											<layout>p2</layout>
-			<url>jar:file:repositories/org.eclipse.platform-3.8.2.zip!/</url>
-		</repository>
-	
-		<repository>
-			<id>eclipse.rcp.3.8.2</id>													<layout>p2</layout>
-			<url>jar:file:repositories/org.eclipse.rcp-3.8.2.zip!/</url>
-		</repository>
-	
-		<repository>
-			<id>eclipse.jdt.3.8.2</id>													<layout>p2</layout>
-			<url>jar:file:repositories/org.eclipse.jdt-3.8.2.zip!/</url>
-		</repository>
-	
-		<repository>
-			<id>eclipse.pde.3.8.2</id>													<layout>p2</layout>
-			<url>jar:file:repositories/org.eclipse.pde-3.8.2.zip!/</url>
-		</repository>
-
-		-->
 		
 		<repository>
 			<id>eclipse.3.8.2.nl</id>													<layout>p2</layout>
