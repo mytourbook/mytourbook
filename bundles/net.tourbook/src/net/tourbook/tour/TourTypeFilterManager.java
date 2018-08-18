@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -60,21 +60,21 @@ import net.tourbook.ui.TourTypeFilterSet;
 
 public class TourTypeFilterManager {
 
-	private static final String					TAG_NAME					= "name";									//$NON-NLS-1$
+	private static final String					TAG_NAME							= "name";															//$NON-NLS-1$
 
-	private static final String					TAG_FILTER_TYPE				= "filterType";							//$NON-NLS-1$
-	private static final String					TAG_SYSTEM_ID				= "systemId";								//$NON-NLS-1$
-	private static final String					TAG_TOUR_TYPE_ID			= "tourTypeId";							//$NON-NLS-1$
+	private static final String					TAG_FILTER_TYPE				= "filterType";													//$NON-NLS-1$
+	private static final String					TAG_SYSTEM_ID					= "systemId";														//$NON-NLS-1$
+	private static final String					TAG_TOUR_TYPE_ID				= "tourTypeId";													//$NON-NLS-1$
 
-	private static final String					MEMENTO_ROOT_FILTER_LIST	= "filterlist";							//$NON-NLS-1$
-	private static final String					MEMENTO_CHILD_FILTER		= "filter";								//$NON-NLS-1$
-	private static final String					MEMENTO_CHILD_TOURTYPE		= "tourtype";								//$NON-NLS-1$
+	private static final String					MEMENTO_ROOT_FILTER_LIST	= "filterlist";													//$NON-NLS-1$
+	private static final String					MEMENTO_CHILD_FILTER			= "filter";															//$NON-NLS-1$
+	private static final String					MEMENTO_CHILD_TOURTYPE		= "tourtype";														//$NON-NLS-1$
 
-	private static final String					MEMENTO_FILTER_LIST_FILE	= "filterlist.xml";						//$NON-NLS-1$
+	private static final String					MEMENTO_FILTER_LIST_FILE	= "filterlist.xml";												//$NON-NLS-1$
 
-	private static IPreferenceStore				_prefStore					= TourbookPlugin.getPrefStore();
-	private static IDialogSettings				_state						= TourbookPlugin
-																					.getState("TourTypeFilterManager"); //$NON-NLS-1$
+	private static IPreferenceStore				_prefStore						= TourbookPlugin.getPrefStore();
+	private static IDialogSettings				_state							= TourbookPlugin.getState("TourTypeFilterManager");	//$NON-NLS-1$
+
 	private static IPropertyChangeListener		_prefChangeListener;
 
 	/**
@@ -82,18 +82,18 @@ public class TourTypeFilterManager {
 	 */
 	private static ArrayList<TourTypeFilter>	_tourTypeFilters;
 
-	private static ArrayList<ActionTTFilter>	_ttFilterActions			= new ArrayList<>();
+	private static ArrayList<ActionTTFilter>	_ttFilterActions				= new ArrayList<>();
 
-	private static double						_propertyValue;
+	private static double							_propertyValue;
 
 	private static ActionOpenPrefDialog			_actionOpenTourTypePrefs;
 
 	/**
 	 * contains the action for the filter which is currently selected
 	 */
-	private static ActionTTFilter				_selectedFilterAction;
+	private static ActionTTFilter					_selectedFilterAction;
 
-	private static TourTypeContributionItem		_tourTypeContribItem;
+	private static TourTypeContributionItem	_tourTypeContribItem;
 
 	static {
 
@@ -180,7 +180,7 @@ public class TourTypeFilterManager {
 
 	/**
 	 * Fills the tour type filter context menu.
-	 * 
+	 *
 	 * @param menuMgr
 	 */
 	public static void fillMenu(final IMenuManager menuMgr) {
@@ -325,7 +325,7 @@ public class TourTypeFilterManager {
 
 	/**
 	 * Read filter list from xml file
-	 * 
+	 *
 	 * @return Returns a list with all filters from the xml file
 	 */
 	private static ArrayList<TourTypeFilter> readXMLFilterFile() {
@@ -495,8 +495,8 @@ public class TourTypeFilterManager {
 
 	/**
 	 * @param isNext
-	 *            is <code>true</code> when the next filter should be selected, is
-	 *            <code>false</code> when the previous filter should be selected
+	 *           is <code>true</code> when the next filter should be selected, is <code>false</code>
+	 *           when the previous filter should be selected
 	 * @return Returns <code>true</code> when a new filter is selected
 	 */
 	public static boolean selectNextFilter(final boolean isNext) {
@@ -534,12 +534,12 @@ public class TourTypeFilterManager {
 
 	/**
 	 * reselect the tour type in the combo box and set the active tour type in the plugin activator
-	 * 
+	 *
 	 * @param isFireEvent
 	 * @param tourTypeFilter
 	 */
-	private static TourTypeFilter selectTourTypeFilter(	final TourTypeFilter requestedTourTypeFilter,
-														final boolean isFireEvent) {
+	private static TourTypeFilter selectTourTypeFilter(final TourTypeFilter requestedTourTypeFilter,
+																		final boolean isFireEvent) {
 
 		ActionTTFilter selectedTTFilterAction = null;
 
@@ -617,7 +617,7 @@ public class TourTypeFilterManager {
 
 	/**
 	 * write the filters from the viewer into an xml file
-	 * 
+	 *
 	 * @param filterViewer
 	 */
 	public static void writeXMLFilterFile(final TableViewer filterViewer) {

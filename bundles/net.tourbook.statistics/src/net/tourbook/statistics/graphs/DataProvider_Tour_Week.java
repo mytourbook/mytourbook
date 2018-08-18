@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -33,22 +33,24 @@ public class DataProvider_Tour_Week extends DataProvider {
 
 	private static DataProvider_Tour_Week	_instance;
 
-	private TourData_Week					_tourWeekData;
+	private TourData_Week						_tourWeekData;
 
 	private DataProvider_Tour_Week() {}
 
 	public static DataProvider_Tour_Week getInstance() {
+
 		if (_instance == null) {
 			_instance = new DataProvider_Tour_Week();
 		}
+
 		return _instance;
 	}
 
 	TourData_Week getWeekData(	final TourPerson person,
-								final TourTypeFilter tourTypeFilter,
-								final int lastYear,
-								final int numberOfYears,
-								final boolean refreshData) {
+										final TourTypeFilter tourTypeFilter,
+										final int lastYear,
+										final int numberOfYears,
+										final boolean refreshData) {
 
 		// when the data for the year are already loaded, all is done
 		if (_activePerson == person
@@ -56,6 +58,7 @@ public class DataProvider_Tour_Week extends DataProvider {
 				&& lastYear == _lastYear
 				&& numberOfYears == _numberOfYears
 				&& refreshData == false) {
+
 			return _tourWeekData;
 		}
 
@@ -70,8 +73,8 @@ public class DataProvider_Tour_Week extends DataProvider {
 		_tourWeekData = new TourData_Week();
 
 		// get the tour types
-		final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
-		final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
+		final ArrayList<TourType> allActiveTourTypesList = TourDatabase.getActiveTourTypes();
+		final TourType[] allActiveTourTypes = allActiveTourTypesList.toArray(new TourType[allActiveTourTypesList.size()]);
 
 		int numWeeks = 0;
 		for (final int weeks : _yearWeeks) {
@@ -83,8 +86,8 @@ public class DataProvider_Tour_Week extends DataProvider {
 			colorOffset = StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
 		}
 
-		int serieLength = colorOffset + tourTypes.length;
-		serieLength = serieLength == 0 ? 1 : serieLength;
+		int numTourTypes = colorOffset + allActiveTourTypes.length;
+		numTourTypes = numTourTypes == 0 ? 1 : numTourTypes; // ensure that at least 1 is available
 
 		String fromTourData;
 
@@ -95,9 +98,9 @@ public class DataProvider_Tour_Week extends DataProvider {
 
 			fromTourData = NL
 
-					+ "FROM (						" + NL //$NON-NLS-1$
+					+ "FROM (							" + NL //$NON-NLS-1$
 
-					+ " SELECT						" + NL //$NON-NLS-1$
+					+ " SELECT							" + NL //$NON-NLS-1$
 
 					+ "  StartWeekYear,				" + NL //$NON-NLS-1$
 					+ "  StartWeek,					" + NL //$NON-NLS-1$
@@ -139,16 +142,16 @@ public class DataProvider_Tour_Week extends DataProvider {
 				"SELECT" + NL //$NON-NLS-1$
 
 				+ " StartWeekYear,				" + NL // 1 //$NON-NLS-1$
-				+ " StartWeek,					" + NL // 2 //$NON-NLS-1$
+				+ " StartWeek,						" + NL // 2 //$NON-NLS-1$
 
 				+ " SUM(TourDistance),			" + NL // 3 //$NON-NLS-1$
 				+ " SUM(TourAltUp),				" + NL // 4 //$NON-NLS-1$
 				+ " SUM(CASE WHEN TourDrivingTime > 0 THEN TourDrivingTime ELSE TourRecordingTime END)," + NL // 5 //$NON-NLS-1$
 				+ " SUM(TourRecordingTime),		" + NL // 6 //$NON-NLS-1$
 				+ " SUM(TourDrivingTime),		" + NL // 7 //$NON-NLS-1$
-				+ " SUM(1), 					" + NL // 8 //$NON-NLS-1$
+				+ " SUM(1), 						" + NL // 8 //$NON-NLS-1$
 
-				+ " TourType_TypeId 			" + NL // 9 //$NON-NLS-1$
+				+ " TourType_TypeId 				" + NL // 9 //$NON-NLS-1$
 
 				+ fromTourData
 
@@ -158,16 +161,16 @@ public class DataProvider_Tour_Week extends DataProvider {
 
 		try {
 
-			final float[][] dbDistance = new float[serieLength][numWeeks];
-			final float[][] dbAltitude = new float[serieLength][numWeeks];
-			final float[][] dbNumTours = new float[serieLength][numWeeks];
+			final float[][] dbDistance = new float[numTourTypes][numWeeks];
+			final float[][] dbAltitude = new float[numTourTypes][numWeeks];
+			final float[][] dbNumTours = new float[numTourTypes][numWeeks];
 
-			final int[][] dbDurationTime = new int[serieLength][numWeeks];
-			final int[][] dbRecordingTime = new int[serieLength][numWeeks];
-			final int[][] dbDrivingTime = new int[serieLength][numWeeks];
-			final int[][] dbBreakTime = new int[serieLength][numWeeks];
+			final int[][] dbDurationTime = new int[numTourTypes][numWeeks];
+			final int[][] dbRecordingTime = new int[numTourTypes][numWeeks];
+			final int[][] dbDrivingTime = new int[numTourTypes][numWeeks];
+			final int[][] dbBreakTime = new int[numTourTypes][numWeeks];
 
-			final long[][] dbTypeIds = new long[serieLength][numWeeks];
+			final long[][] dbTypeIds = new long[numTourTypes][numWeeks];
 
 			final Connection conn = TourDatabase.getInstance().getConnection();
 			final PreparedStatement statement = conn.prepareStatement(sqlString);
@@ -193,8 +196,8 @@ public class DataProvider_Tour_Week extends DataProvider {
 				if (weekIndex < 0) {
 
 					/**
-					 * This can occure when dbWeek == 0, tour is in the previous year and not
-					 * displayed in the week stats
+					 * This can occure when dbWeek == 0, tour is in the previous year and not displayed
+					 * in the week stats
 					 */
 
 					continue;
@@ -222,9 +225,9 @@ public class DataProvider_Tour_Week extends DataProvider {
 				int colorIndex = 0;
 				final Long dbTypeIdObject = (Long) result.getObject(9);
 				if (dbTypeIdObject != null) {
-					final long dbTypeId = result.getLong(9);
-					for (int typeIndex = 0; typeIndex < tourTypes.length; typeIndex++) {
-						if (dbTypeId == tourTypes[typeIndex].getTypeId()) {
+					final long dbTypeId = dbTypeIdObject;
+					for (int typeIndex = 0; typeIndex < allActiveTourTypes.length; typeIndex++) {
+						if (dbTypeId == allActiveTourTypes[typeIndex].getTypeId()) {
 							colorIndex = colorOffset + typeIndex;
 							break;
 						}
@@ -258,20 +261,20 @@ public class DataProvider_Tour_Week extends DataProvider {
 			_tourWeekData.yearWeeks = _yearWeeks;
 			_tourWeekData.yearDays = _yearDays;
 
-			_tourWeekData.setDurationTimeLow(new int[serieLength][numWeeks]);
+			_tourWeekData.setDurationTimeLow(new int[numTourTypes][numWeeks]);
 			_tourWeekData.setDurationTimeHigh(dbDurationTime);
 
-			_tourWeekData.distanceLow = new float[serieLength][numWeeks];
+			_tourWeekData.distanceLow = new float[numTourTypes][numWeeks];
 			_tourWeekData.distanceHigh = dbDistance;
 
-			_tourWeekData.altitudeLow = new float[serieLength][numWeeks];
+			_tourWeekData.altitudeLow = new float[numTourTypes][numWeeks];
 			_tourWeekData.altitudeHigh = dbAltitude;
 
 			_tourWeekData.recordingTime = dbRecordingTime;
 			_tourWeekData.drivingTime = dbDrivingTime;
 			_tourWeekData.breakTime = dbBreakTime;
 
-			_tourWeekData.numToursLow = new float[serieLength][numWeeks];
+			_tourWeekData.numToursLow = new float[numTourTypes][numWeeks];
 			_tourWeekData.numToursHigh = dbNumTours;
 
 		} catch (final SQLException e) {

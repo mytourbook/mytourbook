@@ -40,6 +40,11 @@ These are the issues which are already found
 Bugfix
 ======
 
+* Statistics View
+
+  When tour types are not defined, the month/year statistics are empty
+  
+
 * Search POI
 
-  - Using https://... instead of http://..., http do not work anymore  
+  Using https://... instead of http://..., http do not work anymore  

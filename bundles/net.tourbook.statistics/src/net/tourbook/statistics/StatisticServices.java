@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -17,7 +17,12 @@ package net.tourbook.statistics;
 
 import java.util.ArrayList;
 
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceConverter;
+import org.eclipse.swt.graphics.RGB;
+
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartTitleSegmentConfig;
@@ -30,16 +35,12 @@ import net.tourbook.statistic.StatisticContext;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.PreferenceConverter;
-import org.eclipse.swt.graphics.RGB;
-
 public class StatisticServices {
 
 	/**
 	 * offset for tour types in the color index
 	 */
-	public static int	TOUR_TYPE_COLOR_INDEX_OFFSET	= 1;
+	public static int TOUR_TYPE_COLOR_INDEX_OFFSET = 1;
 
 	/**
 	 * @param serieIndex
@@ -49,9 +50,9 @@ public class StatisticServices {
 	 * @return Returns the tour type name for a data serie
 	 */
 	public static String getTourTypeName(	final int serieIndex,
-											final int valueIndex,
-											final long[][] resortedTypeIds,
-											final TourTypeFilter activeTourTypeFilter) {
+														final int valueIndex,
+														final long[][] resortedTypeIds,
+														final TourTypeFilter activeTourTypeFilter) {
 
 		int colorOffset = 0;
 		if (activeTourTypeFilter.showUndefinedTourTypes()) {
@@ -96,31 +97,51 @@ public class StatisticServices {
 	/**
 	 * Set bar names into the statistic context. The names will be displayed in a combobox in the
 	 * statistics toolbar.
-	 * 
+	 *
 	 * @param statContext
-	 * @param usedTourTypeIds
+	 * @param allUsedTourTypeIds
 	 */
+	@SuppressWarnings("unchecked")
 	public static void setBarNames(	final StatisticContext statContext,
-									final long[] usedTourTypeIds,
-									final int barOrderStart) {
+												final long[] allUsedTourTypeIds,
+												final int barOrderStart) {
 
 		int numUsedTypes = 0;
 
-		// get number of used tour types, a used tour type is != -1
-		for (final long tourTypeId : usedTourTypeIds) {
-			if (tourTypeId != -1) {
+		// get number of used tour types, a used tour type is not NO_TOUR_TYPE
+		for (final long tourTypeId : allUsedTourTypeIds) {
+			if (tourTypeId != TourType.TOUR_TYPE_IS_NOT_USED) {
 				numUsedTypes++;
 			}
 		}
 
-		final ArrayList<TourType> tourTypes = TourDatabase.getActiveTourTypes();
+		ArrayList<TourType> allTourTypes = TourDatabase.getActiveTourTypes();
 
-		if (tourTypes == null || tourTypes.size() == 0 || numUsedTypes == 0) {
+		final boolean isShowNoTourTypes = TourbookPlugin.getActiveTourTypeFilter().showUndefinedTourTypes();
+		if (isShowNoTourTypes) {
 
-			statContext.outIsUpdateBarNames = true;
-			statContext.outBarNames = null;
+			ArrayList<TourType> clonedTourTypes = new ArrayList<>();
 
-			return;
+			if (allTourTypes != null) {
+				clonedTourTypes = (ArrayList<TourType>) allTourTypes.clone();
+			}
+
+			// add dummy tour type
+			final TourType dummyTourType = new TourType(Messages.ui_tour_not_defined);
+			dummyTourType.setTourId_NotDefinedInTourData();
+			clonedTourTypes.add(0, dummyTourType);
+
+			allTourTypes = clonedTourTypes;
+
+		} else {
+
+			if (allTourTypes == null || allTourTypes.size() == 0 || numUsedTypes == 0) {
+
+				statContext.outIsUpdateBarNames = true;
+				statContext.outBarNames = null;
+
+				return;
+			}
 		}
 
 		int barIndex = 0;
@@ -130,9 +151,9 @@ public class StatisticServices {
 
 		for (int inverseIndex = 0; inverseIndex < 2; inverseIndex++) {
 
-			for (int typeIndex = 0; typeIndex < tourTypes.size(); typeIndex++) {
+			for (int typeIndex = 0; typeIndex < allTourTypes.size(); typeIndex++) {
 
-				final TourType tourType = tourTypes.get(typeIndex);
+				final TourType tourType = allTourTypes.get(typeIndex);
 
 				final long tourTypeId = tourType.getTypeId();
 
@@ -140,9 +161,13 @@ public class StatisticServices {
 				 * Check if this type is used
 				 */
 				boolean isTourTypeUsed = false;
-				for (final long usedType : usedTourTypeIds) {
+				long usedTourTypeId = 0;
 
-					if (usedType == tourTypeId) {
+				for (final long usedTourTypeIdValue : allUsedTourTypeIds) {
+
+					usedTourTypeId = usedTourTypeIdValue;
+
+					if (usedTourTypeId == tourTypeId) {
 						isTourTypeUsed = true;
 						break;
 					}
@@ -152,10 +177,14 @@ public class StatisticServices {
 
 					String barName;
 
+					final String tourTypeName = usedTourTypeId == TourType.TOUR_TYPE_IS_NOT_DEFINED_IN_TOUR_DATA
+							? Messages.ui_tour_not_defined
+							: tourType.getName();
+
 					if (inverseIndex == 0) {
-						barName = tourType.getName();
+						barName = tourTypeName;
 					} else {
-						barName = tourType.getName()
+						barName = tourTypeName
 								+ UI.SPACE
 								+ net.tourbook.statistics.Messages.Statistic_Label_Invers;
 					}
@@ -174,7 +203,7 @@ public class StatisticServices {
 	/**
 	 * Set default colors for the y-axis, the color is defined in
 	 * {@link GraphColorManager#PREF_COLOR_LINE}
-	 * 
+	 *
 	 * @param yData
 	 * @param graphName
 	 */
@@ -192,12 +221,12 @@ public class StatisticServices {
 
 	/**
 	 * create the color index for every tour type, <code>typeIds</code> contain all tour types
-	 * 
+	 *
 	 * @param tourTypeFilter
 	 */
 	public static void setTourTypeColorIndex(	final ChartDataYSerie yData,
-												final long[][] resortedTypeIds,
-												final TourTypeFilter tourTypeFilter) {
+															final long[][] resortedTypeIds,
+															final TourTypeFilter tourTypeFilter) {
 
 		final ArrayList<TourType> tourTypes = TourDatabase.getActiveTourTypes();
 
@@ -238,17 +267,17 @@ public class StatisticServices {
 	}
 
 	public static void setTourTypeColors(	final ChartDataYSerie yData,
-											final String graphName,
-											final TourTypeFilter tourTypeFilter) {
+														final String graphName,
+														final TourTypeFilter tourTypeFilter) {
 
-		final ArrayList<RGB> rgbBright = new ArrayList<RGB>();
-		final ArrayList<RGB> rgbDark = new ArrayList<RGB>();
-		final ArrayList<RGB> rgbLine = new ArrayList<RGB>();
-		final ArrayList<RGB> rgbText = new ArrayList<RGB>();
+		final ArrayList<RGB> rgbBright = new ArrayList<>();
+		final ArrayList<RGB> rgbDark = new ArrayList<>();
+		final ArrayList<RGB> rgbLine = new ArrayList<>();
+		final ArrayList<RGB> rgbText = new ArrayList<>();
 
 		/*
-		 * set default color when tours are displayed where the tour type is not set, these tour
-		 * will be painted in the default color
+		 * set default color when tours are displayed where the tour type is not set, these tour will
+		 * be painted in the default color
 		 */
 		if (tourTypeFilter.showUndefinedTourTypes()) {
 
@@ -324,10 +353,10 @@ public class StatisticServices {
 
 	/**
 	 * Set chart properties from the pref store.
-	 * 
+	 *
 	 * @param chart
 	 * @param prefGridPrefix
-	 *            Prefix for grid preferences.
+	 *           Prefix for grid preferences.
 	 */
 	public static void updateChartProperties(final Chart chart, final String prefGridPrefix) {
 
