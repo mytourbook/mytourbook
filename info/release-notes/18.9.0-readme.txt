@@ -26,6 +26,21 @@ These are the issues which are already found
   - A tour cannot be selected with the mouse in the embedded browser (this still works with an external browser), however navigating with the keyboard works in the embedded browser.
     Workaround: Select next/previous tour with mouse (selection marker is not visible) and navigate with the keyboard up/down
 
+* 2.5 D Map - Windows 10
+
+  Map is not displayed with this exception
+  
+  
+* 3D Map - Linux (Ubuntu 18.04)
+
+  Map is not displayed with this exception
+
+  Exception in thread "AWT-EventQueue-0" 
+  javax.media.opengl.GLException: 
+  AWT-EventQueue-0: X11GLXContext.createContextImpl ctx !ARB, profile > GL2 requested (OpenGL >= 3.0.1). 
+  Requested: GLProfile[GL3bc/GL3bc.hw], 
+  current: 3.0 (Compat profile, ES2 compat, FBO, hardware) - 3.0 Mesa 18.0.5
+
 
 * Software Update
 
