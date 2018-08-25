@@ -1,9 +1,9 @@
 .settings/
 
 bin
-*/build/
 target/
 repositories/
+**/build/
 **/tmp/
 
 # VTM external files
