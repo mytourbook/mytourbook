@@ -7,6 +7,7 @@ project(':mytourbook'	).projectDir	= new File('..')
 include ':net.tourbook.vtm'
 include ':net.tourbook.ext.vtm'
 include ':net.tourbook.ext.vtm.linux'
+include ':net.tourbook.ext.vtm.macosx'
 include ':net.tourbook.ext.vtm.windows'
 
 // vtm projects

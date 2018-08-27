@@ -23,6 +23,7 @@ repositories {
 dependencies {
 
 	compile project(':net.tourbook.ext.vtm.linux')
+	compile project(':net.tourbook.ext.vtm.macosx')
 	compile project(':net.tourbook.ext.vtm.windows')
 	
 	compile project(':vtm')
@@ -75,9 +76,10 @@ task logCompileConfig {
 	}
 }
 
-def nativesDir_Linux		= project(':net.tourbook.ext.vtm.linux'	).projectDir.toString() + '/natives'
+def nativesDir_Linux	= project(':net.tourbook.ext.vtm.linux'		).projectDir.toString() + '/natives'
+def nativesDir_MacOS	= project(':net.tourbook.ext.vtm.macosx'	).projectDir.toString() + '/natives'
 def nativesDir_Windows	= project(':net.tourbook.ext.vtm.windows'	).projectDir.toString() + '/natives'
-def nativesDir_Vtm		= project(':vtm-desktop'						).projectDir.toString() + '/natives'
+def nativesDir_Vtm		= project(':vtm-desktop'					).projectDir.toString() + '/natives'
 
 // extract natives from jar files
 task extractNatives {
@@ -99,6 +101,13 @@ task extractNatives {
 				   include '*.so'
 				}
 	
+				// copy gdx macos natives		    
+				copy {
+				   from zipTree("$file.path")
+				   into nativesDir_MacOS
+				   include '*.dylib'
+				}
+	
 				// copy gdx windows natives		    
 				copy {
 				   from zipTree("$file.path")
@@ -115,6 +124,17 @@ task extractNatives {
 				   from zipTree("$file.path")
 				   into nativesDir_Linux
 				   include '*.so'
+				}
+				
+			} else if (file.name.contains('natives-osx')) {
+	
+				println "\t$file.name - $file.path"
+	
+				// copy macos natives		    
+				copy {
+				   from zipTree("$file.path")
+				   into nativesDir_MacOS
+				   include '*.dylib'
 				}
 				
 			} else if (file.name.contains('natives-windows')) {
@@ -137,6 +157,12 @@ task copyVtmNatives_Linux(type: Copy) {
 
 	from nativesDir_Vtm + '/linux'
 	into nativesDir_Linux
+    include '**/*'
+}
+task copyVtmNatives_MacOS(type: Copy) {
+
+	from nativesDir_Vtm + '/osx'
+	into nativesDir_MacOS
     include '**/*'
 }
 task copyVtmNatives_Windows(type: Copy) {
@@ -165,6 +191,7 @@ tasks.classes.dependsOn(
 	// copy natives into platform plugin fragments
 	extractNatives,
 	copyVtmNatives_Linux,
+	copyVtmNatives_MacOS,
 	copyVtmNatives_Windows,
 
 	// copy jars from dependencies to 'public' project folder
