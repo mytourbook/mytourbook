@@ -15,10 +15,20 @@
  *******************************************************************************/
 package net.tourbook.device.garmin.fit;
 
+import com.garmin.fit.Decode;
+import com.garmin.fit.Field;
+import com.garmin.fit.Fit;
+import com.garmin.fit.FitRuntimeException;
+import com.garmin.fit.Mesg;
+import com.garmin.fit.MesgBroadcaster;
+import com.garmin.fit.MesgListener;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
+
+import org.apache.commons.io.IOUtils;
 
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.data.TourData;
@@ -36,19 +46,9 @@ import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.tour.TourLogManager;
 
-import org.apache.commons.io.IOUtils;
-
-import com.garmin.fit.Decode;
-import com.garmin.fit.Field;
-import com.garmin.fit.Fit;
-import com.garmin.fit.FitRuntimeException;
-import com.garmin.fit.Mesg;
-import com.garmin.fit.MesgBroadcaster;
-import com.garmin.fit.MesgListener;
-
 /**
  * Garmin FIT activity reader based on the official Garmin SDK.
- * 
+ *
  * @author Marcin Kuthan <marcin.kuthan@gmail.com>
  * @author Wolfgang Schramm
  */
@@ -88,6 +88,15 @@ public class FitDataReader extends TourbookDevice {
 //							|| fieldName.equals("time") //$NON-NLS-1$
 //							|| fieldName.equals("timestamp") //$NON-NLS-1$
 //
+//							|| fieldName.equals("event_timestamp_12") //$NON-NLS-1$
+//							|| fieldName.equals("event_timestamp") //$NON-NLS-1$
+//							|| fieldName.equals("fractional_timestamp") //		   0.730224609375 s		//$NON-NLS-1$
+//
+//							|| fieldName.equals("pool_length") //					25.0 m						//$NON-NLS-1$
+//							|| fieldName.equals("pool_length_unit") //			   0 							//$NON-NLS-1$
+//
+//							|| fieldName.equals("") //$NON-NLS-1$
+//
 //					// record data
 //
 //							|| fieldName.equals("activity_type") //$NON-NLS-1$
@@ -119,16 +128,29 @@ public class FitDataReader extends TourbookDevice {
 //							|| fieldName.equals("enhanced_avg_speed") //$NON-NLS-1$
 //							|| fieldName.equals("enhanced_max_speed") //$NON-NLS-1$
 //
-//							|| fieldName.equals("total_training_effect") //			3.8 			//$NON-NLS-1$
+//							|| fieldName.equals("total_training_effect") //				3.8 					//$NON-NLS-1$
+//
+//					// swimming
+//
+//							|| fieldName.equals("filtered_bpm") //						  118 bpm				//$NON-NLS-1$
+//
+//							|| fieldName.equals("first_length_index") //				    54 					//$NON-NLS-1$
+//							|| fieldName.equals("avg_stroke_distance") //			  2.25 m					//$NON-NLS-1$
+//							|| fieldName.equals("avg_swimming_cadence") //			   20 strokes/min		//$NON-NLS-1$
+//							|| fieldName.equals("length_type") //						    1 					//$NON-NLS-1$
+//							|| fieldName.equals("num_lengths") //						    16 lengths			//$NON-NLS-1$
+//							|| fieldName.equals("num_active_lengths") //				    16 lengths			//$NON-NLS-1$
+//							|| fieldName.equals("swim_stroke") //						    2 swim_stroke		//$NON-NLS-1$
+//							|| fieldName.equals("total_strokes") //					   12 strokes			//$NON-NLS-1$
 //
 //					// running dynamics
 //
-//							|| fieldName.equals("stance_time") //				  253.0  ms			//$NON-NLS-1$
-//							|| fieldName.equals("stance_time_percent") //		   34.75 percent	//$NON-NLS-1$
-//							|| fieldName.equals("stance_time_balance") //		   51.31 percent	//$NON-NLS-1$
-//							|| fieldName.equals("step_length") //				 1526.0  mm			//$NON-NLS-1$
-//							|| fieldName.equals("vertical_oscillation") //		    7.03 percent	//$NON-NLS-1$
-//							|| fieldName.equals("vertical_ratio") //			  114.2  mm			//$NON-NLS-1$
+//							|| fieldName.equals("stance_time") //						  253.0  ms			//$NON-NLS-1$
+//							|| fieldName.equals("stance_time_percent") //			   34.75 percent	//$NON-NLS-1$
+//							|| fieldName.equals("stance_time_balance") //			   51.31 percent	//$NON-NLS-1$
+//							|| fieldName.equals("step_length") //						 1526.0  mm			//$NON-NLS-1$
+//							|| fieldName.equals("vertical_oscillation") //			    7.03 percent	//$NON-NLS-1$
+//							|| fieldName.equals("vertical_ratio") //					  114.2  mm			//$NON-NLS-1$
 //
 //					// lap data
 //
@@ -165,6 +187,30 @@ public class FitDataReader extends TourbookDevice {
 //							|| fieldName.equals("avg_step_length") //$NON-NLS-1$
 //							|| fieldName.equals("avg_vertical_oscillation") //$NON-NLS-1$
 //							|| fieldName.equals("avg_vertical_ratio") //$NON-NLS-1$
+//
+//							|| fieldName.equals("auto_activity_detect") //                              1 			//$NON-NLS-1$
+//							|| fieldName.equals("autosync_min_steps") //                             2000 steps		//$NON-NLS-1$
+//							|| fieldName.equals("autosync_min_time") //                               240 minutes	//$NON-NLS-1$
+//							|| fieldName.equals("time_mode") //                                         1 			//$NON-NLS-1$
+//							|| fieldName.equals("backlight_mode") //                                    3 			//$NON-NLS-1$
+//							|| fieldName.equals("activity_tracker_enabled") //                          1 			//$NON-NLS-1$
+//							|| fieldName.equals("move_alert_enabled") //                                0 			//$NON-NLS-1$
+//							|| fieldName.equals("mounting_side") //                                     1 			//$NON-NLS-1$
+//							|| fieldName.equals("lactate_threshold_autodetect_enabled") //              1 			//$NON-NLS-1$
+//							|| fieldName.equals("wake_time") //                                     32400 			//$NON-NLS-1$
+//							|| fieldName.equals("sleep_time") //                                    79200 			//$NON-NLS-1$
+//							|| fieldName.equals("user_running_step_length") //                        0.0 m			//$NON-NLS-1$
+//							|| fieldName.equals("user_walking_step_length") //                        0.0 m			//$NON-NLS-1$
+//							|| fieldName.equals("resting_heart_rate") //                                0 bpm		//$NON-NLS-1$
+//							|| fieldName.equals("height_setting") //                                    0 			//$NON-NLS-1$
+//							|| fieldName.equals("avg_temperature") //                                  28 C			//$NON-NLS-1$
+//							|| fieldName.equals("max_temperature") //                                  29 C			//$NON-NLS-1$
+//							|| fieldName.equals("avg_temperature") //                                  26 C			//$NON-NLS-1$
+//							|| fieldName.equals("max_temperature") //                                  27 C			//$NON-NLS-1$
+//							|| fieldName.equals("avg_temperature") //                                  26 C			//$NON-NLS-1$
+//							|| fieldName.equals("max_temperature") //                                  29 C			//$NON-NLS-1$
+//							|| fieldName.equals("total_anaerobic_training_effect") //                  0.0 			//$NON-NLS-1$
+//
 //					// power
 //
 //							|| fieldName.equals("power") //$NON-NLS-1$
