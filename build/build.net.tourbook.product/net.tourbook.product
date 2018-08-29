@@ -52,6 +52,7 @@
    <launcherArgs>
       <vmArgs>-Xmx1024m</vmArgs>
       <vmArgsLin>-Dorg.eclipse.swt.browser.XULRunnerPath=/opt/xulrunner</vmArgsLin>
+      <vmArgsMac>-XstartOnFirstThread</vmArgsMac>
    </launcherArgs>
 
    <windowImages 
