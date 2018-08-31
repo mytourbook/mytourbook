@@ -1,43 +1,19 @@
-Version 18.9.0                                                   29. August 2018
+Version 18.9.0                                                   31. August 2018
 
 
-Version 18.9 is VERY Experimental
-=================================
-
-MyTourbook is now also running with Java 9/10+, that this was possible, the 
-background framework had to be replaced from Eclipse 3 with Eclipse 4.
-
-These Changes
-
-- Eclipse 3 -> Eclipse 4
-- Java 8    -> Java 9+
-
-needed some adjustments in the application that it was running again, there are 
-still some issues which could not yet been resolved, see below.
-
- 
-MyTourbook & macOS
-==================
-
-After the build process was automated a while ago, there was not much additional
-work, to also build the macOS version. With Eclipse 4 it is now running almost 
-as in the old days, see below.
-
-It is NOT planned to support macOS platform,
-
-after a few test, the app on this platform seems to be unstable. If you are 
-still interested in the macOS version, it will be available in the download 
-area.
-
- 
 New
 ===	
 
 * Java 9 / 10 Support
 
+* Eclipse 4
+
+  There are some minimal UI adjustments, e.g. toolbar has a few less pixels for 
+  the spacing
+
 
 Common Issues
-=============	
+==============	
 
 * First App Start / Switch Perspective
 
@@ -55,8 +31,8 @@ Common Issues
 * Search Tours View
 
   A tour cannot be selected with the mouse in the embedded browser (this still 
-  works with an external browser), however navigating with the keyboard works in
-  the embedded browser.
+  works with an external browser), however navigating with the keyboard works 
+  in the embedded browser.
 
   Workaround: Select a tour with the mouse, the selection marker is not visible 
   and navigate with the keyboard up/down
@@ -68,8 +44,8 @@ Common Issues
   they are already rarely used
 
  
-Win Issues 	
-==========
+Windows Issues 	
+==============
 
 * 2.5D Map
 
@@ -79,7 +55,7 @@ Win Issues
 Linux Issues 	
 ============
 
-* 3D Map - Linux (Ubuntu 18.04)
+* 3D Map with Ubuntu 18.04
 
   This map is not displayed with the exception
 
@@ -88,29 +64,26 @@ Linux Issues
   AWT-EventQueue-0: X11GLXContext.createContextImpl ctx !ARB, profile > GL2 
   requested (OpenGL >= 3.0.1).
   
-  Requested: GLProfile[GL3bc/GL3bc.hw], current: 3.0 (Compat profile, ES2 
-  compat, FBO, hardware) - 3.0 Mesa 18.0.5
-  
-  
+  Requested: GLProfile[GL3bc/GL3bc.hw], current: 3.0 (Compat profile, 
+  ES2 compat, FBO, hardware) - 3.0 Mesa 18.0.5
+
+ 
 * Gtk
 
   The console shows some/many Gtk issues
 
   - GLib-CRITICAL **: g_base64_encode_step: assertion 'in != NULL' failed
-  
   - Gtk-WARNING **: Negative content width -2 (allocation 0, extents 1x1) while 
     allocating gadget (node trough, owner GtkProgressBar)
-    
   - Gtk-WARNING **: gtk_widget_size_allocate(): attempt to allocate widget with 
     width 12 and height -14
-    
   - Gtk-CRITICAL **: gtk_box_gadget_distribute: assertion 'size >= 0' failed in 
     GtkScrollbar
     *** BUG ***
     In pixman_region32_init_rect: Invalid rectangle passed
     Set a breakpoint on '_pixman_log_error' to debug
 
-
+ 
 macOS Issues 	
 ============
 
@@ -123,9 +96,9 @@ Bugfix
 
 * Statistics View
 
-  When tour types are not defined, the month/year statistics are empty
-
+  When tour types are not defined, the month/year statistics was empty
  
+
 * Search POI
 
   Using https://... instead of http://..., http do not work anymore 
