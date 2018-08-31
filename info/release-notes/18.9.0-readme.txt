@@ -90,8 +90,27 @@ Linux Issues
   
   Requested: GLProfile[GL3bc/GL3bc.hw], current: 3.0 (Compat profile, ES2 
   compat, FBO, hardware) - 3.0 Mesa 18.0.5
+  
+  
+* Gtk
 
- 
+  The console shows some/many Gtk issues
+
+  - GLib-CRITICAL **: g_base64_encode_step: assertion 'in != NULL' failed
+  
+  - Gtk-WARNING **: Negative content width -2 (allocation 0, extents 1x1) while 
+    allocating gadget (node trough, owner GtkProgressBar)
+    
+  - Gtk-WARNING **: gtk_widget_size_allocate(): attempt to allocate widget with 
+    width 12 and height -14
+    
+  - Gtk-CRITICAL **: gtk_box_gadget_distribute: assertion 'size >= 0' failed in 
+    GtkScrollbar
+    *** BUG ***
+    In pixman_region32_init_rect: Invalid rectangle passed
+    Set a breakpoint on '_pixman_log_error' to debug
+
+
 macOS Issues 	
 ============
 
