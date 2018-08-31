@@ -17,7 +17,7 @@
 
 		<move 
 			file	="${tycho-path}\products\mytourbook-${tycho-version}-macosx.cocoa.x86_64.zip"
-			tofile	="${tycho-path}\products\mytourbook-${tycho-version}-macos-64.zip"/>
+			tofile	="${tycho-path}\products\mytourbook-${tycho-version}-macos-64_THIS_IS_NOT_SUPPORTED.zip"/>
 
 		<move 
 			file	="${tycho-path}\products\mytourbook-${tycho-version}-win32.win32.x86.zip"
