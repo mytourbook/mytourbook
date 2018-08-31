@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -16,9 +16,6 @@
 package net.tourbook.chart;
 
 import java.util.HashMap;
-
-import net.tourbook.common.form.ViewForm;
-import net.tourbook.common.util.ITourToolTipProvider;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.action.Action;
@@ -39,101 +36,103 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.ToolBar;
 
+import net.tourbook.common.form.ViewForm;
+import net.tourbook.common.util.ITourToolTipProvider;
+
 /**
  * Chart widget
  */
 public class Chart extends ViewForm {
 
-	private static final String		ACTION_ID_MOUSE_MODE				= "ACTION_ID_MOUSE_MODE";				//$NON-NLS-1$
-	private static final String		ACTION_ID_MOVE_LEFT_SLIDER_HERE		= "ACTION_ID_MOVE_LEFT_SLIDER_HERE";	//$NON-NLS-1$
-	private static final String		ACTION_ID_MOVE_RIGHT_SLIDER_HERE	= "ACTION_ID_MOVE_RIGHT_SLIDER_HERE";	//$NON-NLS-1$
-	private static final String		ACTION_ID_MOVE_SLIDERS_TO_BORDER	= "ACTION_ID_MOVE_SLIDERS_TO_BORDER";	//$NON-NLS-1$
-	private static final String		ACTION_ID_ZOOM_FIT_GRAPH			= "ACTION_ID_ZOOM_FIT_GRAPH";			//$NON-NLS-1$
-	private static final String		ACTION_ID_ZOOM_IN					= "ACTION_ID_ZOOM_IN";					//$NON-NLS-1$
-	private static final String		ACTION_ID_ZOOM_IN_TO_SLIDER			= "ACTION_ID_ZOOM_IN_TO_SLIDER";		//$NON-NLS-1$
-	private static final String		ACTION_ID_ZOOM_OUT					= "ACTION_ID_ZOOM_OUT";					//$NON-NLS-1$
+	private static final String								ACTION_ID_MOUSE_MODE					= "ACTION_ID_MOUSE_MODE";							//$NON-NLS-1$
+	private static final String								ACTION_ID_MOVE_LEFT_SLIDER_HERE	= "ACTION_ID_MOVE_LEFT_SLIDER_HERE";			//$NON-NLS-1$
+	private static final String								ACTION_ID_MOVE_RIGHT_SLIDER_HERE	= "ACTION_ID_MOVE_RIGHT_SLIDER_HERE";			//$NON-NLS-1$
+	private static final String								ACTION_ID_MOVE_SLIDERS_TO_BORDER	= "ACTION_ID_MOVE_SLIDERS_TO_BORDER";			//$NON-NLS-1$
+	private static final String								ACTION_ID_ZOOM_FIT_GRAPH			= "ACTION_ID_ZOOM_FIT_GRAPH";						//$NON-NLS-1$
+	private static final String								ACTION_ID_ZOOM_IN						= "ACTION_ID_ZOOM_IN";								//$NON-NLS-1$
+	private static final String								ACTION_ID_ZOOM_IN_TO_SLIDER		= "ACTION_ID_ZOOM_IN_TO_SLIDER";					//$NON-NLS-1$
+	private static final String								ACTION_ID_ZOOM_OUT					= "ACTION_ID_ZOOM_OUT";								//$NON-NLS-1$
 
-	static final int				NO_BAR_SELECTION					= -1;
+	static final int												NO_BAR_SELECTION						= -1;
 
-	public static final String		CUSTOM_DATA_TOUR_ID					= "tourId";								//$NON-NLS-1$
+	public static final String									CUSTOM_DATA_TOUR_ID					= "tourId";												//$NON-NLS-1$
 
-	public static final int			SYNCH_MODE_NO						= 0;
-	public static final int			SYNCH_MODE_BY_SCALE					= 1;
-	public static final int			SYNCH_MODE_BY_SIZE					= 2;
+	public static final int										SYNCH_MODE_NO							= 0;
+	public static final int										SYNCH_MODE_BY_SCALE					= 1;
+	public static final int										SYNCH_MODE_BY_SIZE					= 2;
 
-	public static final String		MOUSE_MODE_SLIDER					= "slider";								//$NON-NLS-1$
-	public static final String		MOUSE_MODE_ZOOM						= "zoom";								//$NON-NLS-1$
+	public static final String									MOUSE_MODE_SLIDER						= "slider";												//$NON-NLS-1$
+	public static final String									MOUSE_MODE_ZOOM						= "zoom";												//$NON-NLS-1$
 
-	private static final int		MouseMove							= 10;
-	private static final int		MouseDown							= 20;
-	private static final int		MouseUp								= 30;
-	private static final int		MouseDoubleClick					= 40;
-	private static final int		MouseExit							= 50;
-	private static final int		KeyDown								= 110;
-	private static final int		ChartResized						= 999;
+	private static final int									MouseMove								= 10;
+	private static final int									MouseDown								= 20;
+	private static final int									MouseUp									= 30;
+	private static final int									MouseDoubleClick						= 40;
+	private static final int									MouseExit								= 50;
+	private static final int									KeyDown									= 110;
+	private static final int									ChartResized							= 999;
 
-//	private final ListenerList		_focusListeners						= new ListenerList();
-	private final ListenerList		_barSelectionListeners				= new ListenerList();
-	private final ListenerList		_barDoubleClickListeners			= new ListenerList();
-	private final ListenerList		_sliderMoveListeners				= new ListenerList();
-	private final ListenerList		_chartKeyListener					= new ListenerList();
-	private final ListenerList		_chartMouseListener					= new ListenerList();
-	private final ListenerList		_chartMouseMoveListener				= new ListenerList();
-	private final ListenerList		_chartOverlayListener				= new ListenerList();
+	private final ListenerList<IBarSelectionListener>	_barSelectionListeners				= new ListenerList<>();
+	private final ListenerList<IBarSelectionListener>	_barDoubleClickListeners			= new ListenerList<>();
+	private final ListenerList<ISliderMoveListener>		_sliderMoveListeners					= new ListenerList<>();
+	private final ListenerList<IKeyListener>				_chartKeyListener						= new ListenerList<>();
+	private final ListenerList<IMouseListener>			_chartMouseListener					= new ListenerList<>();
+	private final ListenerList<IMouseListener>			_chartMouseMoveListener				= new ListenerList<>();
+	private final ListenerList<IChartOverlay>				_chartOverlayListener				= new ListenerList<>();
 
-	private ChartComponents			_chartComponents;
+	private ChartComponents										_chartComponents;
 
-	private Chart					_synchedChart;
+	private Chart													_synchedChart;
 
-	private ChartDataModel			_chartDataModel;
+	private ChartDataModel										_chartDataModel;
 
-	private IToolBarManager			_toolbarMgr;
-	private IChartContextProvider	_chartContextProvider;
-	private boolean					_isShowZoomActions					= false;
+	private IToolBarManager										_toolbarMgr;
+	private IChartContextProvider								_chartContextProvider;
+	private boolean												_isShowZoomActions					= false;
 
-	private boolean					_isShowMouseMode					= false;
-	private Color					_backgroundColor;
+	private boolean												_isShowMouseMode						= false;
+	private Color													_backgroundColor;
 
 	/**
 	 * listener which is called when the x-marker was dragged
 	 */
-	IChartListener					_draggingListenerXMarker;
+	IChartListener													_draggingListenerXMarker;
 
-	IHoveredValueListener			_hoveredListener;
+	IHoveredValueListener										_hoveredListener;
 
-	private HashMap<String, Action>	_allChartActions;
-	private boolean					_isFillToolbar						= true;
-	private boolean					_isToolbarCreated;
+	private HashMap<String, Action>							_allChartActions;
+	private boolean												_isFillToolbar							= true;
+	private boolean												_isToolbarCreated;
 
-	private int						_barSelectionSerieIndex;
-	private int						_barSelectionValueIndex;
+	private int														_barSelectionSerieIndex;
+	private int														_barSelectionValueIndex;
 
-	int								_synchMode;
+	int																_synchMode;
 
 	/**
 	 * <code>true</code> to start the bar chart at the bottom of the chart
 	 */
-	private boolean					_isDrawBarChartAtBottom				= true;
+	private boolean												_isDrawBarChartAtBottom				= true;
 
 	/**
 	 * minimum width in pixel for one unit, this is only an approximate value because the pixel is
 	 * rounded up or down to fit a rounded unit
 	 */
-	protected int					gridVerticalDistance				= 30;
-	protected int					gridHorizontalDistance				= 70;
+	protected int													gridVerticalDistance					= 30;
+	protected int													gridHorizontalDistance				= 70;
 
-	protected boolean				isShowHorizontalGridLines			= false;
-	protected boolean				isShowVerticalGridLines				= false;
+	protected boolean												isShowHorizontalGridLines			= false;
+	protected boolean												isShowVerticalGridLines				= false;
 
 	/**
 	 * Transparency of the graph lines
 	 */
-	protected int					graphTransparencyLine				= 0xFF;
+	protected int													graphTransparencyLine				= 0xFF;
 
 	/**
 	 * Transparency of the graph fillings
 	 */
-	protected int					graphTransparencyFilling			= 0xE0;
+	protected int													graphTransparencyFilling			= 0xE0;
 
 	/**
 	 * The graph transparency can be adjusted with this value. This value is multiplied with the
@@ -141,32 +140,32 @@ public class Chart extends ViewForm {
 	 * <p>
 	 * Opacity: 0.0 = transparent, 1.0 = opaque.
 	 */
-	double							graphTransparencyAdjustment			= 1.0;
+	double															graphTransparencyAdjustment		= 1.0;
 
 	/**
 	 * Antialiasing for the graph, can be {@link SWT#ON} or {@link SWT#OFF}.
 	 */
-	public int						graphAntialiasing					= SWT.OFF;
+	public int														graphAntialiasing						= SWT.OFF;
 
 	/*
 	 * Segment alternate color
 	 */
-	protected boolean				isShowSegmentAlternateColor			= true;
-	protected RGB					segmentAlternateColor				= new RGB(0xf5, 0xf5, 0xf5);
+	protected boolean												isShowSegmentAlternateColor		= true;
+	protected RGB													segmentAlternateColor				= new RGB(0xf5, 0xf5, 0xf5);
 
 	/**
 	 * mouse behaviour:<br>
 	 * <br>
 	 * {@link #MOUSE_MODE_SLIDER} or {@link #MOUSE_MODE_ZOOM}
 	 */
-	private String					_mouseMode							= MOUSE_MODE_SLIDER;
+	private String													_mouseMode								= MOUSE_MODE_SLIDER;
 
-	private boolean					_isTopMenuPosition;
+	private boolean												_isTopMenuPosition;
 
 	/**
 	 * Is <code>true</code> when running in UI update, then events are not fired.
 	 */
-	private boolean					_isInUpdateUI;
+	private boolean												_isInUpdateUI;
 
 	/**
 	 * Chart widget
@@ -239,7 +238,7 @@ public class Chart extends ViewForm {
 
 	/**
 	 * Adds a listener when the vertical slider is moved
-	 * 
+	 *
 	 * @param listener
 	 */
 	public void addSliderMoveListener(final ISliderMoveListener listener) {
@@ -273,7 +272,7 @@ public class Chart extends ViewForm {
 			return;
 		}
 
-		_allChartActions = new HashMap<String, Action>();
+		_allChartActions = new HashMap<>();
 
 		_allChartActions.put(ACTION_ID_MOUSE_MODE, new ActionMouseMode(this));
 		_allChartActions.put(ACTION_ID_MOVE_LEFT_SLIDER_HERE, new ActionMoveLeftSliderHere(this));
@@ -382,13 +381,13 @@ public class Chart extends ViewForm {
 		_allChartActions.get(ACTION_ID_MOVE_SLIDERS_TO_BORDER).setEnabled(true);
 	}
 
-	void fillContextMenu(	final IMenuManager menuMgr,
-							final ChartXSlider leftSlider,
-							final ChartXSlider rightSlider,
-							final int hoveredBarSerieIndex,
-							final int hoveredBarValueIndex,
-							final int mouseDownDevPositionX,
-							final int mouseDownDevPositionY) {
+	void fillContextMenu(final IMenuManager menuMgr,
+								final ChartXSlider leftSlider,
+								final ChartXSlider rightSlider,
+								final int hoveredBarSerieIndex,
+								final int hoveredBarValueIndex,
+								final int mouseDownDevPositionX,
+								final int mouseDownDevPositionY) {
 
 		if (_allChartActions == null) {
 			return;
@@ -410,11 +409,11 @@ public class Chart extends ViewForm {
 		}
 	}
 
-	private void fillContextMenu_ChartDefault(	final IMenuManager menuMgr,
-												final ChartXSlider leftSlider,
-												final ChartXSlider rightSlider,
-												final int hoveredBarSerieIndex,
-												final int hoveredBarValueIndex) {
+	private void fillContextMenu_ChartDefault(final IMenuManager menuMgr,
+															final ChartXSlider leftSlider,
+															final ChartXSlider rightSlider,
+															final int hoveredBarSerieIndex,
+															final int hoveredBarValueIndex) {
 
 		if (_chartDataModel.getChartType() == ChartType.BAR) {
 
@@ -471,7 +470,7 @@ public class Chart extends ViewForm {
 
 	/**
 	 * put the actions into the internal toolbar
-	 * 
+	 *
 	 * @param refreshToolbar
 	 */
 	public void fillToolbar(final boolean refreshToolbar) {
@@ -640,7 +639,7 @@ public class Chart extends ViewForm {
 
 	/**
 	 * Return information about the chart
-	 * 
+	 *
 	 * @return
 	 */
 	public SelectionChartInfo getChartInfo() {
@@ -723,7 +722,7 @@ public class Chart extends ViewForm {
 	 * <p>
 	 * A border is painted between the chart and toolbar because {@link ViewForm} draws this line in
 	 * the onPaint() method.
-	 * 
+	 *
 	 * @return
 	 */
 	public IToolBarManager getToolBarManager() {
@@ -880,9 +879,9 @@ public class Chart extends ViewForm {
 	}
 
 	ChartMouseEvent onExternalMouseDown(final long eventTime,
-										final int devXMouse,
-										final int devYMouse,
-										final int stateMask) {
+													final int devXMouse,
+													final int devYMouse,
+													final int stateMask) {
 
 		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseDown, eventTime, devXMouse, devYMouse, stateMask);
 
@@ -963,10 +962,6 @@ public class Chart extends ViewForm {
 		_chartComponents.getChartComponentGraph().redrawLayer();
 	}
 
-//	public void removeFocusListener(final Listener listener) {
-//		_focusListeners.remove(listener);
-//	}
-
 	public void removeChartKeyListener(final IKeyListener keyListener) {
 		_chartKeyListener.remove(keyListener);
 	}
@@ -1004,9 +999,9 @@ public class Chart extends ViewForm {
 
 	/**
 	 * Set the background color for the chart, the default is SWT.COLOR_WHITE
-	 * 
+	 *
 	 * @param backgroundColor
-	 *            The backgroundColor to set.
+	 *           The backgroundColor to set.
 	 */
 	public void setBackgroundColor(final Color backgroundColor) {
 
@@ -1015,7 +1010,7 @@ public class Chart extends ViewForm {
 
 	/**
 	 * Set the option to move the sliders to the border when the chart is zoomed
-	 * 
+	 *
 	 * @param canMoveSlidersWhenZoomed
 	 */
 	public void setCanAutoMoveSliders(final boolean canMoveSlidersWhenZoomed) {
@@ -1024,7 +1019,7 @@ public class Chart extends ViewForm {
 
 	/**
 	 * set the option to auto zoom the chart
-	 * 
+	 *
 	 * @param canZoomToSliderOnMouseUp
 	 */
 	public void setCanAutoZoomToSlider(final boolean canZoomToSliderOnMouseUp) {
@@ -1042,8 +1037,8 @@ public class Chart extends ViewForm {
 	/**
 	 * @param chartContextProvider
 	 * @param isTopMenuPosition
-	 *            When <code>true</code> the context menu will be positioned before the chart menu
-	 *            actions.
+	 *           When <code>true</code> the context menu will be positioned before the chart menu
+	 *           actions.
 	 */
 	public void setContextProvider(final IChartContextProvider chartContextProvider, final boolean isTopMenuPosition) {
 
@@ -1057,7 +1052,7 @@ public class Chart extends ViewForm {
 
 	/**
 	 * Set <code>false</code> to not draw the bars at the bottom of the chart
-	 * 
+	 *
 	 * @param fDrawBarCharttAtBottom
 	 */
 	public void setDrawBarChartAtBottom(final boolean fDrawBarCharttAtBottom) {
@@ -1066,7 +1061,7 @@ public class Chart extends ViewForm {
 
 	/**
 	 * Display an error message instead of the chart.
-	 * 
+	 *
 	 * @param errorMessage
 	 */
 	public void setErrorMessage(final String errorMessage) {
@@ -1096,7 +1091,7 @@ public class Chart extends ViewForm {
 	 * chart preference page.
 	 * <p>
 	 * Opacity: 0.0 = transparent, 1.0 = opaque.
-	 * 
+	 *
 	 * @param adjustment
 	 */
 	public void setGraphAlpha(final double adjustment) {
@@ -1109,7 +1104,7 @@ public class Chart extends ViewForm {
 
 	/**
 	 * Set hovered tour in the {@link ChartComponentGraph}.
-	 * 
+	 *
 	 * @param chartTitleSegment
 	 */
 	public void setHoveredTitleSegment(final ChartTitleSegment chartTitleSegment) {
@@ -1127,7 +1122,7 @@ public class Chart extends ViewForm {
 	/**
 	 * Sets the mouse mode, when <code>true</code> the mode {@link #MOUSE_MODE_SLIDER} is active,
 	 * this is the default
-	 * 
+	 *
 	 * @param isChecked
 	 */
 	public void setMouseMode(final boolean isChecked) {
@@ -1153,10 +1148,10 @@ public class Chart extends ViewForm {
 
 	/**
 	 * Select (highlight) the bar in the bar chart
-	 * 
+	 *
 	 * @param selectedItems
-	 *            items in the x-data serie which should be selected, can be <code>null</code> to
-	 *            deselect the bar
+	 *           items in the x-data serie which should be selected, can be <code>null</code> to
+	 *           deselect the bar
 	 */
 	public void setSelectedBars(final boolean[] selectedItems) {
 
@@ -1193,7 +1188,7 @@ public class Chart extends ViewForm {
 
 	/**
 	 * @param isSliderVisible
-	 *            <code>true</code> shows the sliders
+	 *           <code>true</code> shows the sliders
 	 */
 	public void setShowSlider(final boolean isSliderVisible) {
 		_chartComponents.setSliderVisible(isSliderVisible);
@@ -1201,8 +1196,8 @@ public class Chart extends ViewForm {
 
 	/**
 	 * @param isVisible
-	 *            When <code>true</code> then the area between the vertical x-sliders are filled
-	 *            with a translucent background color.
+	 *           When <code>true</code> then the area between the vertical x-sliders are filled with
+	 *           a translucent background color.
 	 */
 	public void setShowXSliderArea(final boolean isVisible) {
 		_chartComponents.componentGraph.setXSliderAreaVisible(isVisible);
@@ -1214,9 +1209,9 @@ public class Chart extends ViewForm {
 
 	/**
 	 * set the synch configuration which is used when the chart is drawn/resized
-	 * 
+	 *
 	 * @param synchConfigIn
-	 *            set <code>null</code> to disable the synchronization
+	 *           set <code>null</code> to disable the synchronization
 	 */
 	public void setSynchConfig(final SynchConfiguration synchConfigIn) {
 		_chartComponents.setSynchConfig(synchConfigIn);
@@ -1225,7 +1220,7 @@ public class Chart extends ViewForm {
 	/**
 	 * Set's the {@link SynchConfiguration} listener, this is a {@link Chart} which will be notified
 	 * when this chart is resized, <code>null</code> will disable the synchronisation
-	 * 
+	 *
 	 * @param chartWidget
 	 */
 	public void setSynchedChart(final Chart chartWidget) {
@@ -1239,9 +1234,9 @@ public class Chart extends ViewForm {
 	/**
 	 * @param toolbarMgr
 	 * @param isFillToolbar
-	 *            set <code>false</code> when the toolbar will be filled with
-	 *            {@link Chart#fillToolbar(boolean)} from externally, when <code>true</code> the
-	 *            toolbar will be filled when the chart is updated
+	 *           set <code>false</code> when the toolbar will be filled with
+	 *           {@link Chart#fillToolbar(boolean)} from externally, when <code>true</code> the
+	 *           toolbar will be filled when the chart is updated
 	 */
 	public void setToolBarManager(final IToolBarManager toolbarMgr, final boolean isFillToolbar) {
 		_toolbarMgr = toolbarMgr;
@@ -1260,7 +1255,7 @@ public class Chart extends ViewForm {
 
 	/**
 	 * sets the position of the x-sliders
-	 * 
+	 *
 	 * @param sliderPosition
 	 */
 	public void setXSliderPosition(final SelectionChartXSliderPosition sliderPosition) {
@@ -1269,7 +1264,7 @@ public class Chart extends ViewForm {
 
 	/**
 	 * sets the position of the x-sliders
-	 * 
+	 *
 	 * @param sliderPosition
 	 */
 	public void setXSliderPosition(final SelectionChartXSliderPosition sliderPosition, final boolean isFireEvent) {
@@ -1282,7 +1277,7 @@ public class Chart extends ViewForm {
 
 	/**
 	 * Enable/disable the zoom in/out action
-	 * 
+	 *
 	 * @param isEnabled
 	 */
 	public void setZoomActionsEnabled(final boolean isEnabled) {
@@ -1315,11 +1310,11 @@ public class Chart extends ViewForm {
 
 	/**
 	 * Sets a new data model for the chart and redraws it, NULL will hide the chart
-	 * 
+	 *
 	 * @param chartDataModel
 	 * @param isShowAllData
-	 *            set <code>true</code> to show the entire data in the chart, otherwise the min max
-	 *            values will be kept
+	 *           set <code>true</code> to show the entire data in the chart, otherwise the min max
+	 *           values will be kept
 	 */
 	public void updateChart(final ChartDataModel chartDataModel, final boolean isShowAllData) {
 
@@ -1330,17 +1325,17 @@ public class Chart extends ViewForm {
 	 * Set a new data model for the chart and redraws it, NULL will hide the chart.
 	 * <p>
 	 * This method sets the data for the chart and creates it.
-	 * 
+	 *
 	 * @param chartDataModel
 	 * @param isResetSelection
-	 *            <code>true</code> will reset the last selection in the chart.
+	 *           <code>true</code> will reset the last selection in the chart.
 	 * @param isShowAllData
-	 *            When <code>true</code> then the entire data in the chart is displayed, otherwise
-	 *            the min max values will be kept.
+	 *           When <code>true</code> then the entire data in the chart is displayed, otherwise the
+	 *           min max values will be kept.
 	 */
 	public void updateChart(final ChartDataModel chartDataModel,
-							final boolean isResetSelection,
-							final boolean isShowAllData) {
+									final boolean isResetSelection,
+									final boolean isShowAllData) {
 
 		if (chartDataModel == null || //
 				(chartDataModel != null //
@@ -1357,8 +1352,7 @@ public class Chart extends ViewForm {
 				if (errorMessage == null) {
 
 					/*
-					 * display error message that the user is not confuses when a graph is not
-					 * displayed
+					 * display error message that the user is not confuses when a graph is not displayed
 					 */
 					errorMessage = Messages.Error_Message_001_Default;
 				}
@@ -1409,7 +1403,7 @@ public class Chart extends ViewForm {
 
 	/**
 	 * Update different properties and refresh the chart.
-	 * 
+	 *
 	 * @param horizontalGrid
 	 * @param verticalGrid
 	 * @param isHGridVisible
@@ -1417,11 +1411,11 @@ public class Chart extends ViewForm {
 	 * @param isAlternateColor
 	 */
 	public void updateProperties(	final int horizontalGrid,
-									final int verticalGrid,
-									final boolean isHGridVisible,
-									final boolean isVGridVisible,
-									final boolean isAlternateColor,
-									final RGB rgbAlternateColor) {
+											final int verticalGrid,
+											final boolean isHGridVisible,
+											final boolean isVGridVisible,
+											final boolean isAlternateColor,
+											final RGB rgbAlternateColor) {
 
 		gridHorizontalDistance = horizontalGrid;
 		gridVerticalDistance = verticalGrid;

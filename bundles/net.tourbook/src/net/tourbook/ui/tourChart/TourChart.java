@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -20,6 +20,43 @@ import gnu.trove.list.array.TIntArrayList;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceConverter;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Path;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbenchPart;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -91,141 +128,105 @@ import net.tourbook.ui.views.geoCompare.GeoCompareView;
 import net.tourbook.ui.views.tourSegmenter.SelectedTourSegmenterSegments;
 import net.tourbook.ui.views.tourSegmenter.TourSegmenterView;
 
-import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.PreferenceConverter;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.FontData;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Path;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IWorkbenchPart;
-
 /**
  * The tour chart extends the chart with all the functionality for a tour chart
  */
 public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdater, ILineSelectionPainter {
 
 // SET_FORMATTING_OFF
-	
-//	private static final String	ID										= "net.tourbook.ui.tourChart";			//$NON-NLS-1$
 
+//	private static final String	ID														= "net.tourbook.ui.tourChart";			//$NON-NLS-1$
 	//
-	private static final int	PAGE_NAVIGATION_SEGMENTS				= 10;
+	private static final int		PAGE_NAVIGATION_SEGMENTS						= 10;
 	//
-	private static final String	GRAPH_LABEL_ALTIMETER						= net.tourbook.common.Messages.Graph_Label_Altimeter;
-	private static final String	GRAPH_LABEL_ALTITUDE						= net.tourbook.common.Messages.Graph_Label_Altitude;
-	private static final String	GRAPH_LABEL_CADENCE							= net.tourbook.common.Messages.Graph_Label_Cadence;
-	private static final String	GRAPH_LABEL_GEARS							= net.tourbook.common.Messages.Graph_Label_Gears;
-	private static final String	GRAPH_LABEL_GRADIENT						= net.tourbook.common.Messages.Graph_Label_Gradient;
-	private static final String	GRAPH_LABEL_HEARTBEAT						= net.tourbook.common.Messages.Graph_Label_Heartbeat;
-	private static final String	GRAPH_LABEL_PACE							= net.tourbook.common.Messages.Graph_Label_Pace;
-	private static final String	GRAPH_LABEL_POWER							= net.tourbook.common.Messages.Graph_Label_Power;
-	private static final String	GRAPH_LABEL_SPEED							= net.tourbook.common.Messages.Graph_Label_Speed;
-	private static final String	GRAPH_LABEL_TEMPERATURE						= net.tourbook.common.Messages.Graph_Label_Temperature;
-	private static final String	GRAPH_LABEL_TOUR_COMPARE					= net.tourbook.common.Messages.Graph_Label_Tour_Compare;
+	private static final String	GRAPH_LABEL_ALTIMETER							= net.tourbook.common.Messages.Graph_Label_Altimeter;
+	private static final String	GRAPH_LABEL_ALTITUDE								= net.tourbook.common.Messages.Graph_Label_Altitude;
+	private static final String	GRAPH_LABEL_CADENCE								= net.tourbook.common.Messages.Graph_Label_Cadence;
+	private static final String	GRAPH_LABEL_GEARS									= net.tourbook.common.Messages.Graph_Label_Gears;
+	private static final String	GRAPH_LABEL_GRADIENT								= net.tourbook.common.Messages.Graph_Label_Gradient;
+	private static final String	GRAPH_LABEL_HEARTBEAT							= net.tourbook.common.Messages.Graph_Label_Heartbeat;
+	private static final String	GRAPH_LABEL_PACE									= net.tourbook.common.Messages.Graph_Label_Pace;
+	private static final String	GRAPH_LABEL_POWER									= net.tourbook.common.Messages.Graph_Label_Power;
+	private static final String	GRAPH_LABEL_SPEED									= net.tourbook.common.Messages.Graph_Label_Speed;
+	private static final String	GRAPH_LABEL_TEMPERATURE							= net.tourbook.common.Messages.Graph_Label_Temperature;
+	private static final String	GRAPH_LABEL_TOUR_COMPARE						= net.tourbook.common.Messages.Graph_Label_Tour_Compare;
 	private static final String	GRAPH_LABEL_RUN_DYN_STANCE_TIME				= net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTime;
 	private static final String	GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCED	= net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTimeBalance;
 	private static final String	GRAPH_LABEL_RUN_DYN_STEP_LENGTH				= net.tourbook.common.Messages.Graph_Label_RunDyn_StepLength;
 	private static final String	GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION	= net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalOscillation;
 	private static final String	GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO			= net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalRatio;
 	//
-	public static final String	ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER		= "ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER";			//$NON-NLS-1$
-	public static final String	ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED	= "ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED";		//$NON-NLS-1$
-	public static final String	ACTION_ID_EDIT_CHART_PREFERENCES		= "ACTION_ID_EDIT_CHART_PREFERENCES";			//$NON-NLS-1$
-	private static final String	ACTION_ID_IS_GRAPH_OVERLAPPED			= "ACTION_ID_IS_GRAPH_OVERLAPPED";				//$NON-NLS-1$
-	public static final String	ACTION_ID_IS_SHOW_TOUR_PHOTOS			= "ACTION_ID_IS_SHOW_TOUR_PHOTOS";				//$NON-NLS-1$
-	public static final String	ACTION_ID_HR_ZONE_DROPDOWN_MENU			= "ACTION_ID_HR_ZONE_DROPDOWN_MENU";			//$NON-NLS-1$
-	public static final String	ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP		= "ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP";			//$NON-NLS-1$
-	public static final String	ACTION_ID_HR_ZONE_STYLE_NO_GRADIENT		= "ACTION_ID_HR_ZONE_STYLE_NO_GRADIENT";		//$NON-NLS-1$
-	public static final String	ACTION_ID_HR_ZONE_STYLE_WHITE_BOTTOM	= "ACTION_ID_HR_ZONE_STYLE_WHITE_BOTTOM";		//$NON-NLS-1$
-	public static final String	ACTION_ID_HR_ZONE_STYLE_WHITE_TOP		= "ACTION_ID_HR_ZONE_STYLE_WHITE_TOP";			//$NON-NLS-1$
-	public static final String	ACTION_ID_X_AXIS_DISTANCE				= "ACTION_ID_X_AXIS_DISTANCE";					//$NON-NLS-1$
-	public static final String	ACTION_ID_X_AXIS_TIME					= "ACTION_ID_X_AXIS_TIME";						//$NON-NLS-1$
+	public static final String		ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER			= "ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER";			//$NON-NLS-1$
+	public static final String		ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED		= "ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED";		//$NON-NLS-1$
+	public static final String		ACTION_ID_EDIT_CHART_PREFERENCES				= "ACTION_ID_EDIT_CHART_PREFERENCES";			//$NON-NLS-1$
+	private static final String	ACTION_ID_IS_GRAPH_OVERLAPPED					= "ACTION_ID_IS_GRAPH_OVERLAPPED";				//$NON-NLS-1$
+	public static final String		ACTION_ID_IS_SHOW_TOUR_PHOTOS					= "ACTION_ID_IS_SHOW_TOUR_PHOTOS";				//$NON-NLS-1$
+	public static final String		ACTION_ID_HR_ZONE_DROPDOWN_MENU				= "ACTION_ID_HR_ZONE_DROPDOWN_MENU";			//$NON-NLS-1$
+	public static final String		ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP			= "ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP";			//$NON-NLS-1$
+	public static final String		ACTION_ID_HR_ZONE_STYLE_NO_GRADIENT			= "ACTION_ID_HR_ZONE_STYLE_NO_GRADIENT";		//$NON-NLS-1$
+	public static final String		ACTION_ID_HR_ZONE_STYLE_WHITE_BOTTOM		= "ACTION_ID_HR_ZONE_STYLE_WHITE_BOTTOM";		//$NON-NLS-1$
+	public static final String		ACTION_ID_HR_ZONE_STYLE_WHITE_TOP			= "ACTION_ID_HR_ZONE_STYLE_WHITE_TOP";			//$NON-NLS-1$
+	public static final String		ACTION_ID_X_AXIS_DISTANCE						= "ACTION_ID_X_AXIS_DISTANCE";					//$NON-NLS-1$
+	public static final String		ACTION_ID_X_AXIS_TIME							= "ACTION_ID_X_AXIS_TIME";						//$NON-NLS-1$
 	//
-	private static final String	GRID_PREF_PREFIX						= "GRID_TOUR_CHART__";							//$NON-NLS-1$
-	private static final String	GRID_IS_SHOW_VERTICAL_GRIDLINES			= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
-	private static final String	GRID_IS_SHOW_HORIZONTAL_GRIDLINES		= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
-	private static final String	GRID_VERTICAL_DISTANCE					= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
-	private static final String	GRID_HORIZONTAL_DISTANCE				= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
+	private static final String	GRID_PREF_PREFIX									= "GRID_TOUR_CHART__";							//$NON-NLS-1$
+	private static final String	GRID_IS_SHOW_VERTICAL_GRIDLINES				= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
+	private static final String	GRID_IS_SHOW_HORIZONTAL_GRIDLINES			= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
+	private static final String	GRID_VERTICAL_DISTANCE							= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
+	private static final String	GRID_HORIZONTAL_DISTANCE						= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
 	//
-	static final String		STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE							= "STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE";							//$NON-NLS-1$
-	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER						= "STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER"; 							//$NON-NLS-1$
-	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_CADENCE							= "STATE_IS_SHOW_IN_CHART_TOOLBAR_CADENCE"; 							//$NON-NLS-1$
-	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS							= "STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS"; 								//$NON-NLS-1$
-	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT							= "STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT"; 							//$NON-NLS-1$
-	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE 							= "STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE"; 								//$NON-NLS-1$
-	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER 							= "STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER"; 								//$NON-NLS-1$
-	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE 							= "STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE"; 								//$NON-NLS-1$
-	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED 							= "STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED"; 								//$NON-NLS-1$
-	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE						= "STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE";							//$NON-NLS-1$
-	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME				= "STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME";					//$NON-NLS-1$
-	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_BALANCED		= "STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_BALANCED";		//$NON-NLS-1$
-	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STEP_LENGTH				= "STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STEP_LENGTH";					//$NON-NLS-1$
-	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_OSCILLATION		= "STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_OSCILLATION";		//$NON-NLS-1$
-	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_RATIO			= "STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_RATIO";				//$NON-NLS-1$
+	static final String	STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE										= "STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE";							//$NON-NLS-1$
+	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER										= "STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER"; 							//$NON-NLS-1$
+	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_CADENCE											= "STATE_IS_SHOW_IN_CHART_TOOLBAR_CADENCE"; 							//$NON-NLS-1$
+	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS											= "STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS"; 								//$NON-NLS-1$
+	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT										= "STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT"; 							//$NON-NLS-1$
+	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE 											= "STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE"; 								//$NON-NLS-1$
+	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER 											= "STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER"; 								//$NON-NLS-1$
+	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE 											= "STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE"; 								//$NON-NLS-1$
+	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED 											= "STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED"; 								//$NON-NLS-1$
+	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE									= "STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE";							//$NON-NLS-1$
+	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME							= "STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME";					//$NON-NLS-1$
+	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_BALANCED				= "STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_BALANCED";		//$NON-NLS-1$
+	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STEP_LENGTH							= "STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STEP_LENGTH";					//$NON-NLS-1$
+	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_OSCILLATION				= "STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_OSCILLATION";		//$NON-NLS-1$
+	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_RATIO						= "STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_RATIO";				//$NON-NLS-1$
 	//
-	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE_DEFAULT							= true;
-	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER_DEFAULT						= false;
-	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_CADENCE_DEFAULT 							= false;
-	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS_DEFAULT 							= false;
-	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT_DEFAULT 						= false;
-	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_DEFAULT 							= false;
-	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER_DEFAULT 							= false;
-	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE_DEFAULT 							= true;
-	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_DEFAULT 							= false;
+	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE_DEFAULT								= true;
+	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER_DEFAULT							= false;
+	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_CADENCE_DEFAULT 								= false;
+	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS_DEFAULT 								= false;
+	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT_DEFAULT 							= false;
+	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_DEFAULT 									= false;
+	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER_DEFAULT 								= false;
+	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE_DEFAULT 								= true;
+	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_DEFAULT 								= false;
 	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE_DEFAULT 						= false;
 	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_DEFAULT				= false;
-	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_BALANCED_DEFAULT		= false;
+	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_BALANCED_DEFAULT	= false;
 	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STEP_LENGTH_DEFAULT				= true;
-	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_OSCILLATION_DEFAULT		= false;
+	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_OSCILLATION_DEFAULT	= false;
 	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_RATIO_DEFAULT			= false;
 	//
-	private static final String	GRAPH_CONTRIBUTION_ID_SLIDEOUT						= "GRAPH_CONTRIBUTION_ID_SLIDEOUT";			//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_SLIDEOUT								= "GRAPH_CONTRIBUTION_ID_SLIDEOUT";			//$NON-NLS-1$
 	//
-	private static final String GRAPH_CONTRIBUTION_ID_ALTIMETER 					= "GRAPH_CONTRIBUTION_ID_ALTIMETER";		//$NON-NLS-1$
-	private static final String GRAPH_CONTRIBUTION_ID_ALTITUDE						= "GRAPH_CONTRIBUTION_ID_ALTITUDE";			//$NON-NLS-1$
-	private static final String GRAPH_CONTRIBUTION_ID_CADENCE 						= "GRAPH_CONTRIBUTION_ID_CADENCE";			//$NON-NLS-1$
-	private static final String GRAPH_CONTRIBUTION_ID_GEARS 						= "GRAPH_CONTRIBUTION_ID_GEARS";			//$NON-NLS-1$
-	private static final String GRAPH_CONTRIBUTION_ID_GRADIENT 						= "GRAPH_CONTRIBUTION_ID_GRADIENT";			//$NON-NLS-1$
-	private static final String GRAPH_CONTRIBUTION_ID_PACE 							= "GRAPH_CONTRIBUTION_ID_PACE";				//$NON-NLS-1$
-	private static final String GRAPH_CONTRIBUTION_ID_POWER 						= "GRAPH_CONTRIBUTION_ID_POWER";			//$NON-NLS-1$
-	private static final String GRAPH_CONTRIBUTION_ID_PULSE 						= "GRAPH_CONTRIBUTION_ID_PULSE";			//$NON-NLS-1$
-	private static final String GRAPH_CONTRIBUTION_ID_SPEED							= "GRAPH_CONTRIBUTION_ID_SPEED";			//$NON-NLS-1$
-	private static final String GRAPH_CONTRIBUTION_ID_TEMPERATURE 					= "GRAPH_CONTRIBUTION_ID_TEMPERATURE";		//$NON-NLS-1$
-	private static final String GRAPH_CONTRIBUTION_ID_TOUR_COMPARE 					= "GRAPH_CONTRIBUTION_ID_TOUR_COMPARE";		//$NON-NLS-1$
-	
-	private static final String GRAPH_CONTRIBUTION_ID_RUN_DYN_STANCE_TIME			= "GRAPH_CONTRIBUTION_ID_RUN_DYN_STANCE_TIME";		//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_ALTIMETER 							= "GRAPH_CONTRIBUTION_ID_ALTIMETER";		//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_ALTITUDE								= "GRAPH_CONTRIBUTION_ID_ALTITUDE";			//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_CADENCE 								= "GRAPH_CONTRIBUTION_ID_CADENCE";			//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_GEARS 									= "GRAPH_CONTRIBUTION_ID_GEARS";			//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_GRADIENT 								= "GRAPH_CONTRIBUTION_ID_GRADIENT";			//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_PACE 									= "GRAPH_CONTRIBUTION_ID_PACE";				//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_POWER 									= "GRAPH_CONTRIBUTION_ID_POWER";			//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_PULSE 									= "GRAPH_CONTRIBUTION_ID_PULSE";			//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_SPEED									= "GRAPH_CONTRIBUTION_ID_SPEED";			//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_TEMPERATURE 							= "GRAPH_CONTRIBUTION_ID_TEMPERATURE";		//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_TOUR_COMPARE 						= "GRAPH_CONTRIBUTION_ID_TOUR_COMPARE";		//$NON-NLS-1$
+
+	private static final String GRAPH_CONTRIBUTION_ID_RUN_DYN_STANCE_TIME				= "GRAPH_CONTRIBUTION_ID_RUN_DYN_STANCE_TIME";		//$NON-NLS-1$
 	private static final String GRAPH_CONTRIBUTION_ID_RUN_DYN_STANCE_TIME_BALANCED	= "GRAPH_CONTRIBUTION_ID_RUN_DYN_STANCE_TIME_BALANCED";		//$NON-NLS-1$
-	private static final String GRAPH_CONTRIBUTION_ID_RUN_DYN_STEP_LENGTH			= "GRAPH_CONTRIBUTION_ID_RUN_DYN_STEP_LENGTH";		//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_RUN_DYN_STEP_LENGTH				= "GRAPH_CONTRIBUTION_ID_RUN_DYN_STEP_LENGTH";		//$NON-NLS-1$
 	private static final String GRAPH_CONTRIBUTION_ID_RUN_DYN_VERTICAL_OSCILLATION	= "GRAPH_CONTRIBUTION_ID_RUN_DYN_VERTICAL_OSCILLATION";		//$NON-NLS-1$
-	private static final String GRAPH_CONTRIBUTION_ID_RUN_DYN_VERTICAL_RATIO		= "GRAPH_CONTRIBUTION_ID_RUN_DYN_VERTICAL_RATIO";		//$NON-NLS-1$
-	
+	private static final String GRAPH_CONTRIBUTION_ID_RUN_DYN_VERTICAL_RATIO			= "GRAPH_CONTRIBUTION_ID_RUN_DYN_VERTICAL_RATIO";		//$NON-NLS-1$
+
 	private static final String[]	_allGraphContribId									= {
 
 			GRAPH_CONTRIBUTION_ID_ALTIMETER,
@@ -238,140 +239,142 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			GRAPH_CONTRIBUTION_ID_PULSE,
 			GRAPH_CONTRIBUTION_ID_SPEED,
 			GRAPH_CONTRIBUTION_ID_TEMPERATURE,
-			                                                    
+
 			GRAPH_CONTRIBUTION_ID_RUN_DYN_STANCE_TIME,
 			GRAPH_CONTRIBUTION_ID_RUN_DYN_STANCE_TIME_BALANCED,
 			GRAPH_CONTRIBUTION_ID_RUN_DYN_STEP_LENGTH,
 			GRAPH_CONTRIBUTION_ID_RUN_DYN_VERTICAL_OSCILLATION,
 			GRAPH_CONTRIBUTION_ID_RUN_DYN_VERTICAL_RATIO,
 	};
-	
+
 //SET_FORMATTING_ON
+
+	static {}
 
 	/**
 	 * 1e-5 is too small for the min value, it do not correct the graph.
 	 */
-	public static final double		MIN_ADJUSTMENT														= 1e-3;
+	public static final double											MIN_ADJUSTMENT							= 1e-3;
 
-	public static final double		MAX_ADJUSTMENT														= 1e-5;
+	public static final double											MAX_ADJUSTMENT							= 1e-5;
+
 	//
-	{}
 	//
-	private final IDialogSettings			_state;
-	private final IPreferenceStore			_prefStore						= TourbookPlugin.getPrefStore();
-	private final IDialogSettings			_tourSegmenterState				= TourSegmenterView.getState();
+	private final IDialogSettings										_state;
+	private final IPreferenceStore									_prefStore								= TourbookPlugin.getPrefStore();
+	private final IDialogSettings										_tourSegmenterState					= TourSegmenterView.getState();
 	//
 	/**
 	 * Part in which the tour chart is created, can be <code>null</code> when created in a dialog.
 	 */
-	private IWorkbenchPart					_part;
+	private IWorkbenchPart												_part;
 	//
-	private TourData						_tourData;;
-	private TourChartConfiguration			_tcc;
+	private TourData														_tourData;;
+	private TourChartConfiguration									_tcc;
 	//
-	private Map<String, Action>				_allTourChartActions;
+	private Map<String, Action>										_allTourChartActions;
 	//
-	private ActionEditQuick					_actionEditQuick;
-	private ActionGeoCompare				_actionGeoCompare;
-	private ActionGraphMinMax				_actionGraphMinMax;
-	private ActionOpenMarkerDialog			_actionOpenMarkerDialog;
-	private ActionTourChartGraphs			_actionTourChartGraphs;
-	private ActionTourChartInfo				_actionTourInfo;
-	private ActionTourChartMarker			_actionTourMarker;
-	private ActionTourChartOptions			_actionTourChartOptions;
-	private ActionTourChartSmoothing		_actionTourChartSmoothing;
+	private ActionEditQuick												_actionEditQuick;
+	private ActionGeoCompare											_actionGeoCompare;
+	private ActionGraphMinMax											_actionGraphMinMax;
+	private ActionOpenMarkerDialog									_actionOpenMarkerDialog;
+	private ActionTourChartGraphs										_actionTourChartGraphs;
+	private ActionTourChartInfo										_actionTourInfo;
+	private ActionTourChartMarker										_actionTourMarker;
+	private ActionTourChartOptions									_actionTourChartOptions;
+	private ActionTourChartSmoothing									_actionTourChartSmoothing;
 	//
 	/**
 	 * datamodel listener is called when the chart data is created
 	 */
-	private IDataModelListener				_chartDataModelListener;
-	private IPropertyChangeListener			_prefChangeListener;
+	private IDataModelListener											_chartDataModelListener;
+	private IPropertyChangeListener									_prefChangeListener;
 
-	private final ListenerList				_tourMarkerModifyListener		= new ListenerList();
-	private final ListenerList				_tourMarkerSelectionListener	= new ListenerList();
-	private final ListenerList				_tourModifyListener				= new ListenerList();
-	private final ListenerList				_xAxisSelectionListener			= new ListenerList();
+	private final ListenerList<ITourMarkerModifyListener>		_tourMarkerModifyListener			= new ListenerList<>();
+	private final ListenerList<ITourMarkerSelectionListener>	_tourMarkerSelectionListener		= new ListenerList<>();
+	private final ListenerList<ITourModifyListener>				_tourModifyListener					= new ListenerList<>();
+	private final ListenerList<IXAxisSelectionListener>		_xAxisSelectionListener				= new ListenerList<>();
 	//
-	private boolean							_is2ndAltiLayerVisible;
-	private boolean							_isDisplayedInDialog;
-	private boolean							_isMouseModeSet;
-	private boolean							_isTourChartToolbarCreated;
-	private TourMarker						_firedTourMarker;
+	private boolean														_is2ndAltiLayerVisible;
+	private boolean														_isDisplayedInDialog;
+	private boolean														_isMouseModeSet;
+	private boolean														_isTourChartToolbarCreated;
+	private TourMarker													_firedTourMarker;
 	//
 	/**
 	 * The {@link TourMarker} selection state is <b>only</b> be displayed when the mouse is hovering
 	 * it.
 	 */
-	private TourMarker						_selectedTourMarker;
+	private TourMarker													_selectedTourMarker;
 	//
 //SET_FORMATTING_OFF
-	//
-	private ImageDescriptor					_imagePhoto								= TourbookPlugin.getImageDescriptor(Messages.Image__PhotoPhotos);
-	private ImageDescriptor					_imagePhotoTooltip						= TourbookPlugin.getImageDescriptor(Messages.Image__PhotoImage);
-	private IFillPainter					_hrZonePainter;
-
-	private OpenDialogManager				_openDlgMgr								= new OpenDialogManager();
-
-	private ChartPhotoToolTip				_photoTooltip;
-	private TourToolTip						_tourInfoIconTooltip;
-	private TourInfoIconToolTipProvider		_tourInfoIconTooltipProvider;
-	private ChartMarkerToolTip				_tourMarkerTooltip;
-	private TourSegmenterTooltip			_tourSegmenterTooltip;
-	private ChartTitleToolTip				_tourTitleTooltip;
-	private ValuePointToolTipUI				_valuePointTooltip;
-	//
-	private ControlListener					_ttControlListener						= new ControlListener();
-	private IKeyListener					_chartKeyListener						= new ChartKeyListener();
-	private IMouseListener					_mouseMarkerListener					= new MouseMarkerListener();
-	private IMouseListener					_mousePhotoListener						= new MousePhotoListener();
-	private IMouseListener					_mouseSegmentLabel_Listener				= new MouseListener_SegmenterSegment();
-	private IMouseListener					_mouseSegmentLabel_MoveListener			= new MouseListener_SegmenterSegment_Move();
-	private IMouseListener					_mouseSegmentTitle_Listener				= new MouseListener_SegmentTitle();
-	private IMouseListener					_mouseSegmentTitle_MoveListener			= new MouseListener_SegmentTitle_Move();
-	//
+	private ImageDescriptor												_imagePhoto								= TourbookPlugin.getImageDescriptor(Messages.Image__PhotoPhotos);
+	private ImageDescriptor												_imagePhotoTooltip					= TourbookPlugin.getImageDescriptor(Messages.Image__PhotoImage);
 //SET_FORMATTING_ON
 	//
-	private long							_hoveredSegmentTitleEventTime;
+	private IFillPainter													_hrZonePainter;
+
+	private OpenDialogManager											_openDlgMgr								= new OpenDialogManager();
+
+	private ChartPhotoToolTip											_photoTooltip;
+	private TourToolTip													_tourInfoIconTooltip;
+	private TourInfoIconToolTipProvider								_tourInfoIconTooltipProvider;
+	private ChartMarkerToolTip											_tourMarkerTooltip;
+	private TourSegmenterTooltip										_tourSegmenterTooltip;
+	private ChartTitleToolTip											_tourTitleTooltip;
+	private ValuePointToolTipUI										_valuePointTooltip;
 	//
-	private boolean							_isSegmenterSegmentHovered;
-	private long							_hoveredSegmenterSegmentEventTime;
-	private SegmenterSegment				_hoveredSegmenterSegment;
-	private SegmenterSegment				_selectedSegmenterSegment_1;
-	private SegmenterSegment				_selectedSegmenterSegment_2;
-	private boolean							_isRecomputeLineSelection;
-	private TIntArrayList					_selectedAltitudePoints;
-	private ArrayList<RGB>					_selectedAltitudeRGB;
-	private ArrayList<TIntArrayList>		_selectedOtherPoints;
-	private ArrayList<RGB>					_selectedPathsRGB;
+	private ControlListener												_ttControlListener					= new ControlListener();
+	private IKeyListener													_chartKeyListener						= new ChartKeyListener();
+	private IMouseListener												_mouseMarkerListener					= new MouseMarkerListener();
+	private IMouseListener												_mousePhotoListener					= new MousePhotoListener();
+	private IMouseListener												_mouseSegmentLabel_Listener		= new MouseListener_SegmenterSegment();
+	private IMouseListener												_mouseSegmentLabel_MoveListener	= new MouseListener_SegmenterSegment_Move();
+	private IMouseListener												_mouseSegmentTitle_Listener		= new MouseListener_SegmentTitle();
+	private IMouseListener												_mouseSegmentTitle_MoveListener	= new MouseListener_SegmentTitle_Move();
 	//
-	private boolean							_isSegmentTitleHovered;
-	private ChartTitleSegment				_chartTitleSegment;
-	private TourMarker						_lastHoveredTourMarker;
+	//
+	private long															_hoveredSegmentTitleEventTime;
+	//
+	private boolean														_isSegmenterSegmentHovered;
+	private long															_hoveredSegmenterSegmentEventTime;
+	private SegmenterSegment											_hoveredSegmenterSegment;
+	private SegmenterSegment											_selectedSegmenterSegment_1;
+	private SegmenterSegment											_selectedSegmenterSegment_2;
+	private boolean														_isRecomputeLineSelection;
+	private TIntArrayList												_selectedAltitudePoints;
+	private ArrayList<RGB>												_selectedAltitudeRGB;
+	private ArrayList<TIntArrayList>									_selectedOtherPoints;
+	private ArrayList<RGB>												_selectedPathsRGB;
+	//
+	private boolean														_isSegmentTitleHovered;
+	private ChartTitleSegment											_chartTitleSegment;
+	private TourMarker													_lastHoveredTourMarker;
 	//
 	/**
 	 * Hide tour segments when tour chart is displayed in dialogs.
 	 */
-	private boolean							_canShowTourSegments;
-	private boolean							_isTourSegmenterVisible;
-	private boolean							_isShowSegmenterTooltip;
-	private SelectedTourSegmenterSegments	_segmenterSelection;
-	private Font							_segmenterValueFont;
-	private int								_oldTourSegmentsHash;
+	private boolean														_canShowTourSegments;
+	private boolean														_isTourSegmenterVisible;
+	private boolean														_isShowSegmenterTooltip;
+	private SelectedTourSegmenterSegments							_segmenterSelection;
+	private Font															_segmenterValueFont;
+	private int																_oldTourSegmentsHash;
 	//
 	/*
 	 * UI controls
 	 */
-	private Composite						_parent;
+	private Composite														_parent;
 	//
-	private I2ndAltiLayer					_layer2ndAlti;
-	private ChartLayerMarker				_layerMarker;
-	private ChartLayer2ndAltiSerie			_layer2ndAltiSerie;
-	private ChartLayerPhoto					_layerPhoto;
-	private ChartLayerSegmentAltitude		_layerTourSegmenterAltitude;
-	private ChartLayerSegmentValue			_layerTourSegmenterOther;
+	private I2ndAltiLayer												_layer2ndAlti;
+	private ChartLayerMarker											_layerMarker;
+	private ChartLayer2ndAltiSerie									_layer2ndAltiSerie;
+	private ChartLayerPhoto												_layerPhoto;
+	private ChartLayerSegmentAltitude								_layerTourSegmenterAltitude;
+	private ChartLayerSegmentValue									_layerTourSegmenterOther;
 	//
-	private Color							_photoOverlayBGColorLink;
-	private Color							_photoOverlayBGColorTour;
+	private Color															_photoOverlayBGColorLink;
+	private Color															_photoOverlayBGColorTour;
 
 	public class ActionGeoCompare extends Action {
 
@@ -426,7 +429,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private class ActionTourChartGraphs extends ActionToolbarSlideout {
 
 		public ActionTourChartGraphs(	final ImageDescriptor imageDescriptor,
-										final ImageDescriptor imageDescriptorDisabled) {
+												final ImageDescriptor imageDescriptorDisabled) {
 
 			super(imageDescriptor, imageDescriptorDisabled);
 
@@ -461,8 +464,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	private class ActionTourChartSmoothing extends ActionToolbarSlideout {
 
-		public ActionTourChartSmoothing(final ImageDescriptor imageDescriptor,
-										final ImageDescriptor imageDescriptorDisabled) {
+		public ActionTourChartSmoothing(	final ImageDescriptor imageDescriptor,
+													final ImageDescriptor imageDescriptorDisabled) {
 
 			super(imageDescriptor, imageDescriptorDisabled);
 		}
@@ -528,8 +531,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 					} else {
 
 						/*
-						 * check if the hovered control is the owner control, if not, hide the
-						 * tooltip
+						 * check if the hovered control is the owner control, if not, hide the tooltip
 						 */
 
 						final ChartComponents chartComponents = getChartComponents();
@@ -583,10 +585,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 		@Override
 		public void hoveredValue(	final long eventTime,
-									final int devXMouseMove,
-									final int devYMouseMove,
-									final int hoveredValueIndex,
-									final PointLong devHoveredValue) {
+											final int devXMouseMove,
+											final int devYMouseMove,
+											final int hoveredValueIndex,
+											final PointLong devHoveredValue) {
 
 			if (_tourData == null) {
 				return;
@@ -743,8 +745,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	 * @param parent
 	 * @param style
 	 * @param part
-	 *            Part in which the tour chart is created, can be <code>null</code> when created in
-	 *            a dialog.
+	 *           Part in which the tour chart is created, can be <code>null</code> when created in a
+	 *           dialog.
 	 * @param state
 	 */
 	public TourChart(final Composite parent, final int style, final IWorkbenchPart part, final IDialogSettings state) {
@@ -986,7 +988,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	/**
 	 * Set the X-axis to distance
-	 * 
+	 *
 	 * @param isChecked
 	 */
 	public void actionXAxisDistance(final boolean isChecked) {
@@ -1050,8 +1052,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			}
 
 			/**
-			 * keepMinMaxValues must be set to false, that a deeply zoomed in chart can display
-			 * x-axis units
+			 * keepMinMaxValues must be set to false, that a deeply zoomed in chart can display x-axis
+			 * units
 			 */
 			updateTourChart(false);
 
@@ -1082,7 +1084,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	 * Add listener to all controls within the tour chart
 	 * <p>
 	 * ########################### Recursive #########################################<br>
-	 * 
+	 *
 	 * @param control
 	 */
 	private void addControlListener(final Control control) {
@@ -1100,7 +1102,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	/**
 	 * add a data model listener which is fired when the data model has changed
-	 * 
+	 *
 	 * @param dataModelListener
 	 */
 	public void addDataModelListener(final IDataModelListener dataModelListener) {
@@ -1137,8 +1139,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 					} else if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
 
 						/*
-						 * when the chart is computed, the modified colors are read from the
-						 * preferences
+						 * when the chart is computed, the modified colors are read from the preferences
 						 */
 						isChartModified = true;
 
@@ -1535,7 +1536,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	/**
 	 * Close all opened dialogs except the opening dialog.
-	 * 
+	 *
 	 * @param openingDialog
 	 */
 	public void closeOpenedDialogs(final IOpeningDialog openingDialog) {
@@ -1552,7 +1553,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			return;
 		}
 
-		_allTourChartActions = new HashMap<String, Action>();
+		_allTourChartActions = new HashMap<>();
 
 		/*
 		 * graph actions
@@ -1771,7 +1772,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	/**
 	 * Create a graph action
-	 * 
+	 *
 	 * @param graphId
 	 * @param label
 	 * @param toolTip
@@ -1779,12 +1780,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	 * @param imageDisabled
 	 * @param contributionId
 	 */
-	private void createActions_12_GraphAction(	final int graphId,
-												final String label,
-												final String toolTip,
-												final String imageEnabled,
-												final String imageDisabled,
-												final String contributionId) {
+	private void createActions_12_GraphAction(final int graphId,
+															final String label,
+															final String toolTip,
+															final String imageEnabled,
+															final String imageDisabled,
+															final String contributionId) {
 
 		final ActionGraph graphAction = new ActionGraph(this, graphId, label, toolTip, imageEnabled, imageDisabled);
 
@@ -1795,7 +1796,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	/**
 	 * Creates the handlers for the tour chart actions
-	 * 
+	 *
 	 * @param workbenchWindow
 	 * @param tourChartConfig
 	 */
@@ -1809,14 +1810,14 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	/**
 	 * Create chart photos, these are photos which contain the time slice position.
-	 * 
+	 *
 	 * @param srcPhotos
 	 * @param chartPhotos
 	 * @param isPhotoSavedInTour
 	 */
 	private void createChartPhotos(	final ArrayList<Photo> srcPhotos,
-									final ArrayList<ChartPhoto> chartPhotos,
-									final boolean isPhotoSavedInTour) {
+												final ArrayList<ChartPhoto> chartPhotos,
+												final boolean isPhotoSavedInTour) {
 
 		final int[] timeSerie = _tourData.timeSerie;
 		final long[] historySerie = _tourData.timeSerieHistory;
@@ -1975,8 +1976,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			if (serieIndex >= numberOfTimeSlices - 1) {
 
 				/*
-				 * end of tour is reached but there are still photos available, set remaining photos
-				 * at the end of the tour
+				 * end of tour is reached but there are still photos available, set remaining photos at
+				 * the end of the tour
 				 */
 
 				while (true) {
@@ -2025,13 +2026,13 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	/**
 	 * create the layer which displays the tour marker
-	 * 
+	 *
 	 * @param isForcedMarker
-	 *            When <code>true</code> the marker must be drawn, otherwise
-	 *            {@link TourChartConfiguration#isShowTourMarker} determines if the markers are
-	 *            drawn or not.
-	 *            <p>
-	 *            Marker must be drawn in the marker dialog.
+	 *           When <code>true</code> the marker must be drawn, otherwise
+	 *           {@link TourChartConfiguration#isShowTourMarker} determines if the markers are drawn
+	 *           or not.
+	 *           <p>
+	 *           Marker must be drawn in the marker dialog.
 	 */
 	private void createLayer_Marker(final boolean isForcedMarker) {
 
@@ -2162,9 +2163,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	 * @return
 	 */
 	private ChartLabel createLayer_Marker_ChartLabel(	final TourMarker tourMarker,
-														final double[] xAxisSerie,
-														final int xAxisSerieIndex,
-														final int labelPosition) {
+																		final double[] xAxisSerie,
+																		final int xAxisSerieIndex,
+																		final int labelPosition) {
 
 		final ChartLabel chartLabel = new ChartLabel();
 
@@ -2220,7 +2221,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				break;
 			}
 
-			final ArrayList<PhotoCategory> chartPhotoGroups = new ArrayList<PhotoCategory>();
+			final ArrayList<PhotoCategory> chartPhotoGroups = new ArrayList<>();
 
 			/*
 			 * get saved photos
@@ -2228,7 +2229,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			final ArrayList<Photo> srcTourPhotos = _tourData.getGalleryPhotos();
 			if (srcTourPhotos != null && srcTourPhotos.size() > 0) {
 
-				final ArrayList<ChartPhoto> chartPhotos = new ArrayList<ChartPhoto>();
+				final ArrayList<ChartPhoto> chartPhotos = new ArrayList<>();
 				createChartPhotos(srcTourPhotos, chartPhotos, true);
 
 				final PhotoCategory chartPhotoGroup = new PhotoCategory(chartPhotos, ChartPhotoType.TOUR);
@@ -2236,8 +2237,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			}
 
 			/*
-			 * get link photos, they are painted below saved photos that the mouse hit area is
-			 * larger
+			 * get link photos, they are painted below saved photos that the mouse hit area is larger
 			 */
 			final TourPhotoLink tourPhotoLink = _tourData.tourPhotoLink;
 			if (tourPhotoLink != null) {
@@ -2246,7 +2246,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 				if (srcLinkPhotos.size() > 0) {
 
-					final ArrayList<ChartPhoto> chartPhotos = new ArrayList<ChartPhoto>();
+					final ArrayList<ChartPhoto> chartPhotos = new ArrayList<>();
 					createChartPhotos(srcLinkPhotos, chartPhotos, false);
 
 					final PhotoCategory chartPhotoGroup = new PhotoCategory(chartPhotos, ChartPhotoType.LINK);
@@ -2264,8 +2264,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			 */
 
 			/*
-			 * The old photo layer can still be available. This happens because the action button is
-			 * a three state button.
+			 * The old photo layer can still be available. This happens because the action button is a
+			 * three state button.
 			 */
 			if (_layerPhoto == null) {
 
@@ -2464,7 +2464,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		_selectedAltitudeRGB = selectedAltitudeRGB;
 
 		/*
-		 * 
+		 *
 		 */
 		final ArrayList<TIntArrayList> selectedOtherPaths = new ArrayList<>();
 		final ArrayList<RGB> selectedPathsRGB = new ArrayList<>();
@@ -2486,9 +2486,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	}
 
 	private TIntArrayList createSelectedLines_Values(	final ArrayList<SegmenterSegment> paintedSegments,
-														final int selectedSegmentIndexStart,
-														final int selectedSegmentIndexEnd,
-														final ArrayList<RGB> allValueRGBs) {
+																		final int selectedSegmentIndexStart,
+																		final int selectedSegmentIndexEnd,
+																		final ArrayList<RGB> allValueRGBs) {
 
 		final TIntArrayList lineSegments = new TIntArrayList();
 
@@ -2546,8 +2546,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		if (_isDisplayedInDialog) {
 
 			/*
-			 * Do not confirm deletion when tour chart is displayed in a dialog, because the dialog
-			 * and the removal can be canceled.
+			 * Do not confirm deletion when tour chart is displayed in a dialog, because the dialog and
+			 * the removal can be canceled.
 			 */
 
 			// this will update the chart
@@ -2572,9 +2572,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	}
 
 	@Override
-	public void drawSelectedLines(	final GC gc,
-									final ArrayList<GraphDrawingData> allGraphDrawingData,
-									final boolean isFocusActive) {
+	public void drawSelectedLines(final GC gc,
+											final ArrayList<GraphDrawingData> allGraphDrawingData,
+											final boolean isFocusActive) {
 
 		if (_isRecomputeLineSelection) {
 
@@ -2843,7 +2843,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		tbm.add(_actionGraphMinMax);
 		tbm.add(_actionTourChartOptions);
 
-		tbm.update(true);
+		/*
+		 * With E4 the toolbar is not displayed correctly as in E3
+		 */
+		updateToolbarBar((ToolBarManager) tbm);
 	}
 
 	private void fillToolbar_Graphs(final IToolBarManager tbm) {
@@ -2954,9 +2957,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	}
 
 	private void fillToolbar_Graphs_Graph(	final IToolBarManager tbm,
-											final int graphId,
-											final String stateKey,
-											final boolean stateDefaultValue) {
+														final int graphId,
+														final String stateKey,
+														final boolean stateDefaultValue) {
 
 		if (Util.getStateBoolean(_state, stateKey, stateDefaultValue)) {
 
@@ -2968,7 +2971,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	/**
 	 * Fires an event when the a tour marker is modified.
-	 * 
+	 *
 	 * @param tourMarker
 	 * @param isTourMarkerDeleted
 	 */
@@ -2986,7 +2989,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 		// update selection locally (e.g. in a dialog)
 
-		final ArrayList<TourMarker> allTourMarker = new ArrayList<TourMarker>();
+		final ArrayList<TourMarker> allTourMarker = new ArrayList<>();
 		allTourMarker.add(tourMarker);
 
 		final SelectionTourMarker tourMarkerSelection = new SelectionTourMarker(_tourData, allTourMarker);
@@ -3022,7 +3025,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	/**
 	 * Fires an event when the x-axis values were changed by the user
-	 * 
+	 *
 	 * @param isShowTimeOnXAxis
 	 */
 	private void fireXAxisSelection(final boolean showTimeOnXAxis) {
@@ -3041,7 +3044,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	/**
 	 * Converts the graph Id into an action Id
-	 * 
+	 *
 	 * @param graphId
 	 * @return
 	 */
@@ -3142,6 +3145,29 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		return _layerMarker;
 	}
 
+	/**
+	 * Copied from {@link org.eclipse.ui.internal.e4.compatibility.ActionBars}
+	 * @param control
+	 * @return
+	 */
+	@SuppressWarnings("restriction")
+	private Control getPackParent(final Control control) {
+
+		Composite parent = control.getParent();
+
+		while (parent != null) {
+			if (parent instanceof CTabFolder) {
+				final Control topRight = ((CTabFolder) parent).getTopRight();
+				if (topRight != null) {
+					return topRight;
+				}
+				break;
+			}
+			parent = parent.getParent();
+		}
+		return control.getParent();
+	}
+
 	TourMarker getSelectedTourMarker() {
 		return _selectedTourMarker;
 	}
@@ -3149,7 +3175,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	@Override
 	public ArrayList<TourData> getSelectedTours() {
 
-		final ArrayList<TourData> tourChartTours = new ArrayList<TourData>();
+		final ArrayList<TourData> tourChartTours = new ArrayList<>();
 
 		if (_tourData != null) {
 
@@ -3464,7 +3490,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	/**
 	 * Fire selection for the selected segment label.
-	 * 
+	 *
 	 * @param mouseEvent
 	 */
 	private void onSegmenterSegment_MouseDown(final ChartMouseEvent mouseEvent) {
@@ -3630,7 +3656,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	/**
 	 * Open tour quick editor.
-	 * 
+	 *
 	 * @param mouseEvent
 	 */
 	private void onSegmentTitle_MouseDoubleClick(final ChartMouseEvent mouseEvent) {
@@ -3791,8 +3817,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			// reset selection when tour or segments have changed
 
 			/*
-			 * I'm not shure if this condition is sufficient to disable the segmenter selection but
-			 * the selection should be kept as long as possible.
+			 * I'm not shure if this condition is sufficient to disable the segmenter selection but the
+			 * selection should be kept as long as possible.
 			 */
 
 			_selectedSegmenterSegment_1 = null;
@@ -4106,23 +4132,23 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		keyEvent.isWorked = true;
 
 		/*
-		 * Hide segmenter tooltip, I tried to open the tooltip but this needs some more work to get
-		 * it running, THIS IS NOT A SIMPLE TASK.
+		 * Hide segmenter tooltip, I tried to open the tooltip but this needs some more work to get it
+		 * running, THIS IS NOT A SIMPLE TASK.
 		 */
 		_tourSegmenterTooltip.hide();
 	}
 
 	/**
 	 * Set sliders to the selected segments and fire these positions.
-	 * 
+	 *
 	 * @param selectedSegment_1
 	 * @param selectedSegment_2
-	 *            Can be <code>null</code> when only 1 segment is selected.
+	 *           Can be <code>null</code> when only 1 segment is selected.
 	 * @param isMoveChartToShowSlider
 	 */
 	private void selectSegmenterSegments(	final SegmenterSegment selectedSegment_1,
-											final SegmenterSegment selectedSegment_2,
-											final boolean isMoveChartToShowSlider) {
+														final SegmenterSegment selectedSegment_2,
+														final boolean isMoveChartToShowSlider) {
 
 		// prevent selection from previous selection event
 		_segmenterSelection = null;
@@ -4325,8 +4351,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			if (_selectedSegmenterSegment_1 != null && _selectedSegmenterSegment_2 != null) {
 
 				/*
-				 * Prevent that both segments have the same index, the 2nd segment is used for
-				 * multiple selection, otherwise the selection with the mouse is a bit strange.
+				 * Prevent that both segments have the same index, the 2nd segment is used for multiple
+				 * selection, otherwise the selection with the mouse is a bit strange.
 				 */
 				if (_selectedSegmenterSegment_1.serieIndex == _selectedSegmenterSegment_2.serieIndex) {
 					_selectedSegmenterSegment_2 = null;
@@ -4344,7 +4370,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	/**
 	 * Set the check state for a command and update the UI
-	 * 
+	 *
 	 * @param commandId
 	 * @param isChecked
 	 */
@@ -4384,7 +4410,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	/**
 	 * When a tour chart is opened in a dialog, some actions should not be done.
-	 * 
+	 *
 	 * @param isDisplayedInDialog
 	 */
 	public void setIsDisplayedInDialog(final boolean isDisplayedInDialog) {
@@ -4407,18 +4433,18 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	 * @param yDataInfoId
 	 * @param valueDivisor
 	 * @param maxAdjustment
-	 *            Is disabled when set to {@link Double#MIN_VALUE}.
+	 *           Is disabled when set to {@link Double#MIN_VALUE}.
 	 * @param isMinMaxEnabled
 	 * @return
 	 */
 	private boolean setMaxDefaultValue(	final String property,
-										boolean isChartModified,
-										final String prefName_IsMaxEnabled,
-										final String prefName_MaxValue,
-										final int yDataInfoId,
-										final float valueDivisor,
-										final double maxAdjustment,
-										final boolean isMinMaxEnabled) {
+													boolean isChartModified,
+													final String prefName_IsMaxEnabled,
+													final String prefName_MaxValue,
+													final int yDataInfoId,
+													final float valueDivisor,
+													final double maxAdjustment,
+													final boolean isMinMaxEnabled) {
 
 		boolean isAllMinMaxModified = false;
 
@@ -4488,18 +4514,18 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	 * @param yDataInfoId
 	 * @param valueDivisor
 	 * @param minAdjustment
-	 *            Is disabled when set to {@link Double#MIN_VALUE}.
+	 *           Is disabled when set to {@link Double#MIN_VALUE}.
 	 * @param isMinMaxEnabled
 	 * @return
 	 */
 	private boolean setMinDefaultValue(	final String property,
-										boolean isChartModified,
-										final String prefName_IsMinEnabled,
-										final String prefName_MinValue,
-										final int yDataInfoId,
-										final float valueDivisor,
-										final double minAdjustment,
-										final boolean isMinMaxEnabled) {
+													boolean isChartModified,
+													final String prefName_IsMinEnabled,
+													final String prefName_MinValue,
+													final int yDataInfoId,
+													final float valueDivisor,
+													final double minAdjustment,
+													final boolean isMinMaxEnabled) {
 
 		boolean isAllMinMaxModified = false;
 
@@ -4574,7 +4600,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	/**
 	 * Enable or disable the edit actions in the tour info tooltip, by default the edit actions are
 	 * disabled.
-	 * 
+	 *
 	 * @param isEnabled
 	 */
 	public void setTourInfoActionsEnabled(final boolean isEnabled) {
@@ -4663,8 +4689,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		}
 
 		/*
-		 * the tour markers are displayed in the altitude graph, when this graph is not available,
-		 * the markers are painted in one of the other graphs
+		 * the tour markers are displayed in the altitude graph, when this graph is not available, the
+		 * markers are painted in one of the other graphs
 		 */
 		ChartDataYSerie yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_ALTITUDE);
 
@@ -4798,14 +4824,14 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	/**
 	 * Set data for each graph
-	 * 
+	 *
 	 * @param customDataKey
 	 * @param segmentDataSerie
 	 * @param yDataWithLabels
 	 */
 	private void setupGraphLayer_Layer(	final String customDataKey,
-										final ChartDataYSerie yDataWithLabels,
-										final ConfigGraphSegment segmentConfig) {
+													final ChartDataYSerie yDataWithLabels,
+													final ConfigGraphSegment segmentConfig) {
 
 		final ChartDataModel dataModel = getChartDataModel();
 		final ChartDataYSerie yData = (ChartDataYSerie) dataModel.getCustomData(customDataKey);
@@ -4814,7 +4840,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			return;
 		}
 
-		final ArrayList<IChartLayer> customFgLayers = new ArrayList<IChartLayer>();
+		final ArrayList<IChartLayer> customFgLayers = new ArrayList<>();
 
 		/**
 		 * Sequence of the graph layer is the z-order, last added layer is on the top
@@ -4938,11 +4964,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	/**
 	 * set's the chart which is synched with this chart
-	 * 
+	 *
 	 * @param isSynchEnabled
-	 *            <code>true</code> to enable synch, <code>false</code> to disable synch
+	 *           <code>true</code> to enable synch, <code>false</code> to disable synch
 	 * @param synchedChart
-	 *            contains the {@link Chart} which is synched with this chart
+	 *           contains the {@link Chart} which is synched with this chart
 	 * @param synchMode
 	 */
 	public void synchChart(final boolean isSynchEnabled, final TourChart synchedChart, final int synchMode) {
@@ -5116,6 +5142,33 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	}
 
 	/**
+	 * Copied from {@link org.eclipse.ui.internal.e4.compatibility.ActionBars.updateActionBars}
+	 *
+	 * @param tbm
+	 */
+	@SuppressWarnings("restriction")
+	private void updateToolbarBar(final ToolBarManager tbm) {
+
+		final Control tbCtrl = tbm.getControl();
+
+		if (tbCtrl == null || tbCtrl.isDisposed()) {} else {
+
+			tbm.update(true);
+
+			if (!tbCtrl.isDisposed()) {
+
+				final Control packParent = getPackParent(tbCtrl);
+				packParent.pack();
+
+				// Specifically lay out the CTabFolder
+				if (packParent.getParent() instanceof CTabFolder) {
+					packParent.getParent().layout(true);
+				}
+			}
+		}
+	}
+
+	/**
 	 * Check and enable the graph actions, the visible state of a graph is defined in the tour chart
 	 * config.
 	 */
@@ -5126,7 +5179,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		 */
 		final int[] allGraphIds = TourManager.getAllGraphIDs();
 		final ArrayList<Integer> visibleGraphIds = _tcc.getVisibleGraphs();
-		final ArrayList<Integer> enabledGraphIds = new ArrayList<Integer>();
+		final ArrayList<Integer> enabledGraphIds = new ArrayList<>();
 
 		// get all graph ids which can be displayed
 		for (final ChartDataSerie xyDataIterator : getChartDataModel().getXyData()) {
@@ -5248,9 +5301,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	/**
 	 * Update the tour chart with the previous data and configuration.
-	 * 
+	 *
 	 * @param keepMinMaxValues
-	 *            <code>true</code> keeps the min/max values from the previous chart
+	 *           <code>true</code> keeps the min/max values from the previous chart
 	 */
 	public void updateTourChart(final boolean keepMinMaxValues) {
 		updateTourChartInternal(_tourData, _tcc, keepMinMaxValues, false);
@@ -5258,11 +5311,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	/**
 	 * Update the tour chart with the previous data and configuration
-	 * 
+	 *
 	 * @param keepMinMaxValues
-	 *            <code>true</code> keeps the min/max values from the previous chart
+	 *           <code>true</code> keeps the min/max values from the previous chart
 	 * @param isPropertyChanged
-	 *            when <code>true</code> the properties for the tour chart have changed
+	 *           when <code>true</code> the properties for the tour chart have changed
 	 */
 	public void updateTourChart(final boolean keepMinMaxValues, final boolean isPropertyChanged) {
 		updateTourChartInternal(_tourData, _tcc, keepMinMaxValues, isPropertyChanged);
@@ -5275,15 +5328,15 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	/**
 	 * Set {@link TourData} and {@link TourChartConfiguration} to create a new chart data model
-	 * 
+	 *
 	 * @param tourData
 	 * @param tourChartConfig
 	 * @param keepMinMaxValues
-	 *            <code>true</code> keeps the min/max values from the previous chart
+	 *           <code>true</code> keeps the min/max values from the previous chart
 	 */
-	public void updateTourChart(final TourData tourData,
-								final TourChartConfiguration tourChartConfig,
-								final boolean keepMinMaxValues) {
+	public void updateTourChart(	final TourData tourData,
+											final TourChartConfiguration tourChartConfig,
+											final boolean keepMinMaxValues) {
 
 		updateTourChartInternal(tourData, tourChartConfig, keepMinMaxValues, false);
 	}
@@ -5293,16 +5346,16 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	 * <p>
 	 * This method is synchronized because when SRTM data are retrieved and the import view is
 	 * openened, the error occured that the chart config was deleted with {@link #updateChart(null)}
-	 * 
+	 *
 	 * @param newTourData
 	 * @param newTCC
 	 * @param keepMinMaxValues
 	 * @param isPropertyChanged
 	 */
 	private synchronized void updateTourChartInternal(	final TourData newTourData,
-														final TourChartConfiguration newTCC,
-														final boolean keepMinMaxValues,
-														final boolean isPropertyChanged) {
+																		final TourChartConfiguration newTCC,
+																		final boolean keepMinMaxValues,
+																		final boolean isPropertyChanged) {
 
 		if (newTourData == null || newTCC == null) {
 
@@ -5333,10 +5386,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		hidePhotoLayer();
 		resetSegmenterSelection();
 
-		final ChartDataModel newChartDataModel = TourManager.getInstance().createChartDataModel(//
-				_tourData,
-				_tcc,
-				isPropertyChanged);
+		final ChartDataModel newChartDataModel = TourManager.getInstance()
+				.createChartDataModel(
+						_tourData,
+						_tcc,
+						isPropertyChanged);
 
 		// set the model BEFORE actions are created/enabled/checked
 		setDataModel(newChartDataModel);
@@ -5385,7 +5439,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	/**
 	 * Toursegmenter is modified, update its layers.
-	 * 
+	 *
 	 * @param tourSegmenterView
 	 */
 	public void updateTourSegmenter() {
@@ -5438,7 +5492,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	/**
 	 * Updates the marker layer in the chart
-	 * 
+	 *
 	 * @param isMarkerVisible
 	 */
 	public void updateUI_MarkerLayer(final boolean isMarkerVisible) {
@@ -5474,7 +5528,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	/**
 	 * Enable/disable the zoom options in the tour chart
-	 * 
+	 *
 	 * @param isEnabled
 	 */
 	private void updateZoomOptions(final boolean isEnabled) {
