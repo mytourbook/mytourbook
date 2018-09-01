@@ -1,0 +1,15 @@
+Version 18.9.1                                                   ?. September 2018
+
+
+New
+===	
+
+* 
+
+ 
+Bugfix 	
+======
+
+* Dialog adjust altitude
+  Tourchart in this dialog was too small, this was introduced when the display issue of the tour chart toolbar was fixed
+

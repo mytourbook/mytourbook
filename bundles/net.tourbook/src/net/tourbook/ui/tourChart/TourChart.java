@@ -347,6 +347,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private ArrayList<TIntArrayList>									_selectedOtherPoints;
 	private ArrayList<RGB>												_selectedPathsRGB;
 	//
+	private boolean														_isToolbarPack							= true;
 	private boolean														_isSegmentTitleHovered;
 	private ChartTitleSegment											_chartTitleSegment;
 	private TourMarker													_lastHoveredTourMarker;
@@ -2843,10 +2844,17 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		tbm.add(_actionGraphMinMax);
 		tbm.add(_actionTourChartOptions);
 
-		/*
-		 * With E4 the toolbar is not displayed correctly as in E3
-		 */
-		updateToolbarBar((ToolBarManager) tbm);
+		if (_isToolbarPack) {
+
+			// with E4 the toolbar is not displayed correctly as in E3
+			updateToolbarBar((ToolBarManager) tbm);
+
+		} else {
+
+			// do not do a toolbar pack this would resize the tour chart to the default size, occures in dialogAdjustAltitude
+
+			tbm.update(true);
+		}
 	}
 
 	private void fillToolbar_Graphs(final IToolBarManager tbm) {
@@ -3147,6 +3155,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	/**
 	 * Copied from {@link org.eclipse.ui.internal.e4.compatibility.ActionBars}
+	 *
 	 * @param control
 	 * @return
 	 */
@@ -4595,6 +4604,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	public void setMouseMode(final Object newMouseMode) {
 		super.setMouseMode(newMouseMode);
 		enableZoomOptions();
+	}
+
+	public void setNoToolbarPack() {
+		_isToolbarPack = false;
 	}
 
 	/**

@@ -1056,6 +1056,15 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 			createUI_20_TourChart(_dlgContainer);
 			createUI_30_Options(_dlgContainer);
 		}
+
+		parent.getDisplay().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+
+				// with the new e4 toolbar update the chart has it's default size (pack() is used) -> resize to window size
+//				parent.layout(true, true);
+			}
+		});
 	}
 
 	private void createUI_10_AdjustmentType(final Composite parent) {
@@ -1102,10 +1111,15 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		_tourChart = new TourChart(parent, SWT.BORDER, null, _state);
 
-		GridDataFactory.fillDefaults().grab(true, true).indent(0, 0).minSize(300, 200).applyTo(_tourChart);
+		GridDataFactory.fillDefaults()
+				.grab(true, true)
+				.indent(0, 0)
+				.minSize(600, 400)
+				.applyTo(_tourChart);
 
 		_tourChart.setShowZoomActions(true);
 		_tourChart.setShowSlider(true);
+		_tourChart.setNoToolbarPack();
 
 		_tourChart.setContextProvider(new DialogAdjustAltitudeChartContextProvicer(this), true);
 
