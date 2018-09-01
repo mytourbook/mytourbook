@@ -53,6 +53,14 @@
 				<module>build/build.update-site-no-NL</module>
 			</modules>
 		</profile>
+
+		<profile>
+			<id>build-flatpak</id>
+			<modules>
+				<module>features</module>
+				<module>build/build.flatpak</module>
+			</modules>
+		</profile>
 	
 	</profiles>
 

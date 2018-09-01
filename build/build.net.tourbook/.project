@@ -41,6 +41,11 @@
 			<locationURI>PARENT-2-PROJECT_LOC/build/build.net.tourbook.product/pom.xml</locationURI>
 		</link>
 		<link>
+			<name>pom-flatpak.xml</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PARENT_LOC/build/build.flatpak/pom.xml</locationURI>
+		</link>
+		<link>
 			<name>pom-update-site.xml</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/build/build.update-site/pom.xml</locationURI>
