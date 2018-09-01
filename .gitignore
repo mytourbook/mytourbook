@@ -3,7 +3,7 @@
 bin
 target/
 repositories/
-**/build/
+*/build/
 **/tmp/
 
 # VTM external files
