@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -23,9 +23,6 @@ import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.Random;
 
-import net.tourbook.common.weather.IWeather;
-
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -86,6 +83,8 @@ import org.epics.css.dal.Timestamp;
 import org.epics.css.dal.Timestamp.Format;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
+
+import net.tourbook.common.weather.IWeather;
 
 public class UI {
 
@@ -179,7 +178,7 @@ public class UI {
 
 	/**
 	 * The ellipsis is the string that is used to represent shortened text.
-	 * 
+	 *
 	 * @since 3.0
 	 */
 	public static final String			ELLIPSIS								= "...";													//$NON-NLS-1$
@@ -306,35 +305,35 @@ public class UI {
 
 	/**
 	 * The dialog settings key name for stored dialog x location.
-	 * 
+	 *
 	 * @since 3.2
 	 */
 	private static final String			DIALOG_ORIGIN_X							= "DIALOG_X_ORIGIN";										//$NON-NLS-1$
 
 	/**
 	 * The dialog settings key name for stored dialog y location.
-	 * 
+	 *
 	 * @since 3.2
 	 */
 	private static final String			DIALOG_ORIGIN_Y							= "DIALOG_Y_ORIGIN";										//$NON-NLS-1$
 
 	/**
 	 * The dialog settings key name for stored dialog width.
-	 * 
+	 *
 	 * @since 3.2
 	 */
 	private static final String			DIALOG_WIDTH							= "DIALOG_WIDTH";											//$NON-NLS-1$
 
 	/**
 	 * The dialog settings key name for stored dialog height.
-	 * 
+	 *
 	 * @since 3.2
 	 */
 	private static final String			DIALOG_HEIGHT							= "DIALOG_HEIGHT";											//$NON-NLS-1$
 
 	/**
 	 * The dialog settings key name for the font used when the dialog height and width was stored.
-	 * 
+	 *
 	 * @since 3.2
 	 */
 	private static final String			DIALOG_FONT_DATA						= "DIALOG_FONT_NAME";										//$NON-NLS-1$
@@ -352,7 +351,7 @@ public class UI {
 	public static final Font			AWT_FONT_ARIAL_BOLD_24					= Font.decode("Arial-bold-24");								//$NON-NLS-1$
 
 // SET_FORMATTING_OFF
-	
+
 	private static final Random 		RANDOM_GENERATOR						= new Random();
 	private static final String			ALL_SCRAMBLED_CHARS_LOWER				= "abcdefghklmnoprsu";						//$NON-NLS-1$
 	private static final String			ALL_SCRAMBLED_CHARS_UPPER				= "ABCDEFGHKLMNOPRSU";						//$NON-NLS-1$
@@ -610,7 +609,7 @@ public class UI {
 	 *	gc.dispose();
 	 * </code>
 	 * </p>
-	 * 
+	 *
 	 * @param fontMetrics
 	 *            used in performing the conversion
 	 * @param dlus
@@ -632,7 +631,7 @@ public class UI {
 	 * <p>
 	 * Clients may call this framework method, but should not override it.
 	 * </p>
-	 * 
+	 *
 	 * @param dlus
 	 *            the number of horizontal dialog units
 	 * @return the number of pixels
@@ -697,7 +696,7 @@ public class UI {
 
 	/**
 	 * Creates one action in a toolbar.
-	 * 
+	 *
 	 * @param parent
 	 * @param action
 	 */
@@ -794,7 +793,7 @@ public class UI {
 
 	/**
 	 * disposes a resource
-	 * 
+	 *
 	 * @param image
 	 * @return
 	 */
@@ -846,7 +845,7 @@ public class UI {
 
 	/**
 	 * Hours are ignored when they are 0. An empty string is returned when time = <code>-1</code>
-	 * 
+	 *
 	 * @param time
 	 * @return
 	 */
@@ -885,7 +884,7 @@ public class UI {
 
 	/**
 	 * force hours to be displayed
-	 * 
+	 *
 	 * @param time
 	 * @return
 	 */
@@ -960,7 +959,7 @@ public class UI {
 
 	/**
 	 * Hours are ignored when they are 0. An empty string is returned when time = <code>0</code>.
-	 * 
+	 *
 	 * @param time
 	 *            Time in seconds.
 	 * @return
@@ -1011,7 +1010,7 @@ public class UI {
 
 	/**
 	 * Get best-fit size for an image drawn in an area of maxX, maxY
-	 * 
+	 *
 	 * @param imageWidth
 	 * @param imageHeight
 	 * @param canvasWidth
@@ -1090,7 +1089,7 @@ public class UI {
 	 */
 	public static TreePath[] getExpandedOpenedItems(final Object[] allVisibleItems, final TreePath[] allExpandedItems) {
 
-		final ArrayList<TreePath> expandedOpened = new ArrayList<TreePath>();
+		final ArrayList<TreePath> expandedOpened = new ArrayList<>();
 
 		for (final TreePath expandedPath : allExpandedItems) {
 
@@ -1114,7 +1113,7 @@ public class UI {
 
 	/**
 	 * This is a copy with modifications from {@link org.eclipse.jface.dialogs.Dialog}
-	 * 
+	 *
 	 * @param statePrefix
 	 */
 	public static Point getInitialLocation(	final IDialogSettings state,
@@ -1194,7 +1193,7 @@ public class UI {
 
 	/**
 	 * Opens the control context menu, the menue is aligned below the control to the right side
-	 * 
+	 *
 	 * @param control
 	 *            Controls which menu is opened
 	 */
@@ -1263,7 +1262,7 @@ public class UI {
 
 	/**
 	 * Restore the sash weight from a memento
-	 * 
+	 *
 	 * @param sashForm
 	 * @param state
 	 * @param weightKey
@@ -1302,7 +1301,7 @@ public class UI {
 
 	/**
 	 * Restore the sash weight from a memento
-	 * 
+	 *
 	 * @param sash
 	 * @param fMemento
 	 * @param weightKey
@@ -1337,7 +1336,7 @@ public class UI {
 
 	/**
 	 * This is a copy with modifications from {@link org.eclipse.jface.dialogs.Dialog}
-	 * 
+	 *
 	 * @param statePrefix
 	 */
 	public static void saveDialogBounds(final IDialogSettings state,
@@ -1371,7 +1370,7 @@ public class UI {
 
 	/**
 	 * Store the weights for the sash in a memento
-	 * 
+	 *
 	 * @param sashForm
 	 * @param state
 	 * @param weightKey
@@ -1387,7 +1386,7 @@ public class UI {
 
 	/**
 	 * Store the weights for the sash in a memento
-	 * 
+	 *
 	 * @param sash
 	 * @param memento
 	 * @param weightKey
@@ -1469,7 +1468,7 @@ public class UI {
 
 	/**
 	 * Set the layout data of the button to a GridData with appropriate heights and widths.
-	 * 
+	 *
 	 * @param button
 	 */
 	public static void setButtonLayoutData(final Button button) {
@@ -1488,7 +1487,7 @@ public class UI {
 
 	/**
 	 * Initialize cell editing.
-	 * 
+	 *
 	 * @param viewer
 	 */
 	public static void setCellEditSupport(final TableViewer viewer) {
@@ -1521,7 +1520,7 @@ public class UI {
 
 	/**
 	 * Update colors for all decendants.
-	 * 
+	 *
 	 * @param child
 	 * @param bgColor
 	 * @param fgColor
@@ -1659,10 +1658,9 @@ public class UI {
 			}
 
 			final Object layoutData = control.getLayoutData();
-
-			Assert.isNotNull(layoutData);
-
-			((GridData) layoutData).widthHint = maxWidth;
+			if (layoutData != null) {
+				((GridData) layoutData).widthHint = maxWidth;
+			}
 		}
 	}
 
@@ -1748,7 +1746,7 @@ public class UI {
 
 	/**
 	 * copy from {@link CTabItem}
-	 * 
+	 *
 	 * @param gc
 	 * @param text
 	 * @param width
@@ -1791,7 +1789,7 @@ public class UI {
 	 * the width of the given control. Overrides characters in the center of the original string
 	 * with an ellipsis ("...") if necessary. If a <code>null</code> value is given,
 	 * <code>null</code> is returned.
-	 * 
+	 *
 	 * @param textValue
 	 *            the original string or <code>null</code>
 	 * @param control
