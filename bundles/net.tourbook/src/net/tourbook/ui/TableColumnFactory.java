@@ -1,30 +1,30 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui;
 
+import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.jface.viewers.ColumnPixelData;
+import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.swt.SWT;
+
 import net.tourbook.common.UI;
 import net.tourbook.common.formatter.ValueFormat;
 import net.tourbook.common.formatter.ValueFormatSet;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.TableColumnDefinition;
-
-import org.eclipse.jface.layout.PixelConverter;
-import org.eclipse.jface.viewers.ColumnPixelData;
-import org.eclipse.jface.viewers.ColumnWeightData;
-import org.eclipse.swt.SWT;
 
 public abstract class TableColumnFactory {
 
@@ -86,6 +86,7 @@ public abstract class TableColumnFactory {
 	public static final TableColumnFactory	POWERTRAIN_CADENCE;
 	public static final TableColumnFactory	POWERTRAIN_GEAR_RATIO;
 	public static final TableColumnFactory	POWERTRAIN_GEAR_TEETH;
+	public static final TableColumnFactory	POWERTRAIN_STRIDE_LENGTH;
 
 	public static final TableColumnFactory	STATE_DB_STATUS;
 	public static final TableColumnFactory	STATE_IMPORT_STATE;
@@ -1307,6 +1308,35 @@ public abstract class TableColumnFactory {
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_GearTeeth_Tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+				return colDef;
+			};
+		};
+
+		POWERTRAIN_STRIDE_LENGTH = new TableColumnFactory() {
+
+			@Override
+			public TableColumnDefinition createColumn(final ColumnManager columnManager,
+																	final PixelConverter pixelConverter) {
+
+				final String header = "mts";
+
+				final TableColumnDefinition colDef = new TableColumnDefinition(
+						columnManager,
+						"POWERTRAIN_STRIDE_LENGTH", //$NON-NLS-1$
+						SWT.TRAIL);
+
+				colDef.setColumnCategory(Messages.ColumnFactory_Category_Powertrain);
+				colDef.setColumnLabel(Messages.ColumnFactory_StrideLength_Label);
+				colDef.setColumnHeaderText(header);
+				colDef.setColumnUnit(header);
+				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_StrideLength_Tooltip);
+
+				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+				colDef.setValueFormats(//
+						ValueFormatSet.Number,
+						ValueFormat.NUMBER_1_1,
+						columnManager);
 
 				return colDef;
 			};
