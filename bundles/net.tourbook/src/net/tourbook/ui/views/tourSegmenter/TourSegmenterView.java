@@ -3002,7 +3002,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		final ColumnDefinition colDef;
 
-		colDef = TableColumnFactory.POWERTRAIN_STRIDE_LENGTH.createColumn(_columnManager, _pc);
+		colDef = TableColumnFactory.RUN_DYN_STEP_LENGTH_AVG.createColumn(_columnManager, _pc);
 
 		colDef.setIsDefaultColumn();
 		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
@@ -3012,9 +3012,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			public void update(final ViewerCell cell) {
 
 				final TourSegment segment = (TourSegment) cell.getElement();
-				final double value = segment.strideLength;
+				final double value = segment.strideLength * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH * 1000;
 
-				colDef.printDetailValue(cell, value);
+				if (UI.UNIT_IS_METRIC) {
+					colDef.printValue_0(cell, value);
+				} else {
+					colDef.printDetailValue(cell, value);
+				}
 			}
 		});
 	}
