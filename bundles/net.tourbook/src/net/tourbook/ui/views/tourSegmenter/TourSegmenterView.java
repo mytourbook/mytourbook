@@ -2390,6 +2390,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		defineColumn_Body_AvgPulse_Difference();
 
 		defineColumn_Powertrain_AvgCadence();
+		defineColumn_Powertrain_StrideLength(defaultListener);
 
 		defineColumn_Data_SerieStartEndIndex();
 	}
@@ -2989,6 +2990,34 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 				if (segment.isTotal) {
 					setTotalStyle(cell);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: Stride length (meters/stride)
+	 */
+	private void defineColumn_Powertrain_StrideLength(final SelectionAdapter defaultColumnSelectionListener) {
+
+		final ColumnDefinition colDef;
+
+		colDef = TableColumnFactory.RUN_DYN_STEP_LENGTH_AVG.createColumn(_columnManager, _pc);
+
+		colDef.setIsDefaultColumn();
+		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourSegment segment = (TourSegment) cell.getElement();
+				final double value = segment.strideLength * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH * 1000;
+
+				if (UI.UNIT_IS_METRIC) {
+					colDef.printValue_0(cell, value);
+				} else {
+					colDef.printDetailValue(cell, value);
 				}
 			}
 		});

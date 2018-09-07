@@ -44,7 +44,7 @@ Switch to workspace "C:\DAT\ws_mt-NL-projects"
 	      translation test update site can be build OTHERWISE it is NOT working 
 
 	
-Switch to workspace "C:\DAT\ws_MT-e38"
+Switch to workspace "C:\DAT\ws_MT-e48"
 --------------------------------------
 
 
@@ -62,8 +62,8 @@ Set version number / year
 		"feature.xml" in "feature.net.tourbook.app"
 		"feature.xml" in "feature.net.tourbook.app.nl" 
 
-		This version ensures that a software update is done ONLY for the current version, VERY TRICKY
-		<import feature="feature.net.tourbook.app.version" version="16.2.0" match="equivalent"/>
+			This version ensures that a software update is done ONLY for the current version, VERY TRICKY
+			<import feature="feature.net.tourbook.app.version" version="16.2.0" match="equivalent"/>
 	
 	
 	Win-Installer

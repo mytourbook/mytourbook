@@ -4,12 +4,13 @@ Version 18.9.1                                                   ?. September 20
 New
 ===	
 
-* 
+* Tour Segmenter
+  - Stride length computed from cadence/time/distance
 
  
 Bugfix 	
 ======
 
 * Dialog adjust altitude
-  Tourchart in this dialog was too small, this was introduced when the display issue of the tour chart toolbar was fixed
+  Tourchart is too small in this dialog, this was introduced when the display issue of the tour chart toolbar was fixed
 

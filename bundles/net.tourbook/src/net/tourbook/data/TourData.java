@@ -15,8 +15,10 @@
  *******************************************************************************/
 package net.tourbook.data;
 
-import static javax.persistence.CascadeType.*;
-import static javax.persistence.FetchType.*;
+import static javax.persistence.CascadeType.ALL;
+import static javax.persistence.FetchType.EAGER;
+
+import com.skedgo.converter.TimezoneMapper;
 
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TIntObjectHashMap;
@@ -65,6 +67,11 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.widgets.Display;
+import org.hibernate.annotations.Cascade;
+
 import net.tourbook.Messages;
 import net.tourbook.algorithm.DPPoint;
 import net.tourbook.algorithm.DouglasPeuckerSimplifier;
@@ -100,13 +107,6 @@ import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.ISmoothingAlgorithm;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.widgets.Display;
-import org.hibernate.annotations.Cascade;
-
-import com.skedgo.converter.TimezoneMapper;
-
 /**
  * Tour data contains all data for a tour (except markers), an entity will be saved in the database
  */
@@ -117,48 +117,48 @@ import com.skedgo.converter.TimezoneMapper;
 public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable {
 
 // SET_FORMATTING_OFF
-	
-	public static final int		DB_LENGTH_DEVICE_TOUR_TYPE			= 2;
-	public static final int		DB_LENGTH_DEVICE_PLUGIN_ID			= 255;
-	public static final int		DB_LENGTH_DEVICE_PLUGIN_NAME		= 255;
-	public static final int		DB_LENGTH_DEVICE_MODE_NAME			= 255;
+
+	public static final int		DB_LENGTH_DEVICE_TOUR_TYPE				= 2;
+	public static final int		DB_LENGTH_DEVICE_PLUGIN_ID				= 255;
+	public static final int		DB_LENGTH_DEVICE_PLUGIN_NAME			= 255;
+	public static final int		DB_LENGTH_DEVICE_MODE_NAME				= 255;
 	public static final int		DB_LENGTH_DEVICE_FIRMWARE_VERSION	= 255;
 
-	public static final int		DB_LENGTH_TOUR_TITLE				= 255;
-	public static final int		DB_LENGTH_TOUR_DESCRIPTION			= 4096;
+	public static final int		DB_LENGTH_TOUR_TITLE						= 255;
+	public static final int		DB_LENGTH_TOUR_DESCRIPTION				= 4096;
 	public static final int		DB_LENGTH_TOUR_DESCRIPTION_V10		= 32000;
-	public static final int		DB_LENGTH_TOUR_START_PLACE			= 255;
-	public static final int		DB_LENGTH_TOUR_END_PLACE			= 255;
+	public static final int		DB_LENGTH_TOUR_START_PLACE				= 255;
+	public static final int		DB_LENGTH_TOUR_END_PLACE				= 255;
 	public static final int		DB_LENGTH_TOUR_IMPORT_FILE_PATH		= 255;
 	public static final int		DB_LENGTH_TOUR_IMPORT_FILE_NAME		= 255;
-	public static final int		DB_LENGTH_TIME_ZONE_ID				= 255;
+	public static final int		DB_LENGTH_TIME_ZONE_ID					= 255;
 
-	public static final int		DB_LENGTH_WEATHER					= 1000;
-	public static final int		DB_LENGTH_WEATHER_CLOUDS			= 255;
+	public static final int		DB_LENGTH_WEATHER							= 1000;
+	public static final int		DB_LENGTH_WEATHER_CLOUDS				= 255;
 
 
 	/**
 	 * <pre>
-	 * 
+	 *
 	 *	decimal	decimal
-	 *	places	degrees 	DMS 			qualitative scale that          N/S or E/W		E/W at		E/W at		E/W at
-	 *										can be identified 				at equator		23N/S 		45N/S 		67N/S
-	 * 
-	 * 	0 		1.0 		1° 00′ 0″ 		country or large region 		111.32 km 		102.47 km 	78.71 km 	43.496 km
-	 * 	1 		0.1 		0° 06′ 0″ 		large city or district 			11.132 km 		10.247 km 	7.871 km 	4.3496 km
-	 * 	2 		0.01 		0° 00′ 36″ 		town or village 				1.1132 km 		1.0247 km 	787.1 m 	434.96 m
-	 * 	3 		0.001 		0° 00′ 3.6″ 	neighborhood, street 			111.32 m 		102.47 m 	78.71 m 	43.496 m
-	 * 	4 		0.0001 		0° 00′ 0.36″ 	individual street, land parcel 	11.132 m 		10.247 m 	7.871 m 	4.3496 m
-	 * 	5 		0.00001 	0° 00′ 0.036″ 	individual trees 				1.1132 m 		1.0247 m 	787.1 mm 	434.96 mm
-	 * 	6 		0.000001 	0° 00′ 0.0036″ 	individual humans 				111.32 mm 		102.47 mm 	78.71 mm 	43.496 mm
+	 *	places	degrees 		DMS 						qualitative scale that          N/S or E/W		E/W at		E/W at		E/W at
+	 *																can be identified 				at equator		23N/S 		45N/S 		67N/S
+	 *
+	 * 	0 		1.0 			1° 00′ 0″ 		country or large region 			111.32 km 		102.47 km 	78.71 km 	43.496 km
+	 * 	1 		0.1 			0° 06′ 0″ 		large city or district 				11.132 km 		10.247 km 	7.871 km 	4.3496 km
+	 * 	2 		0.01 			0° 00′ 36″ 		town or village 						1.1132 km 		1.0247 km 	787.1 m 		434.96 m
+	 * 	3 		0.001 		0° 00′ 3.6″ 		neighborhood, street 				111.32 m 		102.47 m 	78.71 m 		43.496 m
+	 * 	4 		0.0001 		0° 00′ 0.36″ 	individual street, land parcel 	11.132 m 		10.247 m 	7.871 m 		4.3496 m
+	 * 	5 		0.00001 		0° 00′ 0.036″ 	individual trees 						1.1132 m 		1.0247 m 	787.1 mm 	434.96 mm
+	 * 	6 		0.000001 	0° 00′ 0.0036″ 	individual humans 					111.32 mm 		102.47 mm 	78.71 mm 	43.496 mm
 	 * </pre>
-	 * 
+	 *
 	 * https://en.wikipedia.org/wiki/Decimal_degrees
 	 *
 	 * Factor to normalize lat/lon
-	 * 
+	 *
 	 * <pre>
-	 * 
+	 *
 	 * Degree * INT    resolution
 	   ---------------------------------------
 	   Deg * 100	   1570 m
@@ -172,7 +172,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	public static final double			NORMALIZED_LATITUDE_OFFSET			= 90.0;
 	public static final double			NORMALIZED_LONGITUDE_OFFSET			= 180.0;
 
-	private static final String			TIME_ZONE_ID_EUROPE_BERLIN			= "Europe/Berlin";				//$NON-NLS-1$
+	private static final String		TIME_ZONE_ID_EUROPE_BERLIN			= "Europe/Berlin";				//$NON-NLS-1$
 
 	public static final int				MIN_TIMEINTERVAL_FOR_MAX_SPEED		= 20;
 
@@ -222,14 +222,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * Tour start time in milliseconds since 1970-01-01T00:00:00Z
-	 * 
+	 *
 	 * @since DB version 22
 	 */
 	private long						tourStartTime;
 
 	/**
 	 * Tour end time in milliseconds since 1970-01-01T00:00:00Z
-	 * 
+	 *
 	 * @since DB version 22
 	 */
 	private long						tourEndTime;
@@ -260,7 +260,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	private short						startMinute;
 
 	/**
-	 * 
+	 *
 	 */
 	private int							startSecond;														// db-version 7
 
@@ -283,7 +283,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * Total recording time in seconds
-	 * 
+	 *
 	 * @since Is long since db version 22, before it was int
 	 */
 	@XmlElement
@@ -291,7 +291,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * Total driving/moving time in seconds
-	 * 
+	 *
 	 * @since Is long since db version 22, before it was int
 	 */
 	@XmlElement
@@ -355,7 +355,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	private int							restPulse;															// db-version 8
 
 	@XmlElement
-	private Integer						calories;															// db-version 4
+	private Integer					calories;															// db-version 4
 
 	private float						bikerWeight;														// db-version 4
 
@@ -372,7 +372,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * Average pulse, this data can also be set from device data and pulse data are not available
-	 * 
+	 *
 	 * @since is float since db version 21, before it was int
 	 */
 	@XmlElement
@@ -380,7 +380,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * Maximum pulse for the current tour.
-	 * 
+	 *
 	 * @since is float since db version 21, before it was int
 	 */
 	@XmlElement
@@ -439,7 +439,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * maximum altitude in metric system
-	 * 
+	 *
 	 * @since is float since db version 21, before it was int
 	 */
 	@XmlElement
@@ -463,7 +463,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * Average temperature with metric system
-	 * 
+	 *
 	 * @since Is float since db version 21, before it was int. In db version 20 this field was
 	 *        already float but not the database field.
 	 */
@@ -650,28 +650,28 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	private int							rearShiftCount;
 
 	// ############################################# RUNNING DYNAMICS #######################################
-	
+
 	private short						runDyn_StanceTime_Min;
 	private short						runDyn_StanceTime_Max;
 	private float						runDyn_StanceTime_Avg;
-                                
+
 	private short						runDyn_StanceTimeBalance_Min;
 	private short						runDyn_StanceTimeBalance_Max;
 	private float						runDyn_StanceTimeBalance_Avg;
-	                            
+
 	private short						runDyn_StepLength_Min;
 	private short						runDyn_StepLength_Max;
 	private float						runDyn_StepLength_Avg;
-	                            
+
 	private short						runDyn_VerticalOscillation_Min;
 	private short						runDyn_VerticalOscillation_Max;
 	private float						runDyn_VerticalOscillation_Avg;
-	                            
+
 	private short						runDyn_VerticalRatio_Min;
 	private short						runDyn_VerticalRatio_Max;
 	private float						runDyn_VerticalRatio_Avg;
-	
-	
+
+
 	// ############################################# GEO BOUNDS #############################################
 
     /*
@@ -682,8 +682,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 //	private int							latitudeMaxE6;								// db-version 35
 //	private int							longitudeMinE6;								// db-version 35
 //	private int							longitudeMaxE6;								// db-version 35
- 
-	
+
+
 	// ############################################# UNUSED FIELDS - START #############################################
 	/**
 	 * ssss distance msw
@@ -766,7 +766,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	@ManyToMany(fetch = EAGER)
 	@JoinTable(inverseJoinColumns = @JoinColumn(name = "TOURTAG_TagID", referencedColumnName = "TagID"))
 	private Set<TourTag>				tourTags							= new HashSet<>();
-	
+
 //	/**
 //	 * SharedMarker
 //	 */
@@ -785,7 +785,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * database
 	 */
 	@ManyToOne
-	private TourPerson					tourPerson;
+	private TourPerson				tourPerson;
 
 	/**
 	 * plugin id for the device which was used for this tour Bike used for this tour
@@ -847,29 +847,29 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * smoothed altitude serie is used to display the tour chart when not <code>null</code>
 	 */
 	@Transient
-	private float[]						altitudeSerieSmoothed;
+	private float[]					altitudeSerieSmoothed;
 
 	/**
 	 * contains the absolute altitude in feet (imperial system)
 	 */
 	@Transient
-	private float[]						altitudeSerieImperial;
+	private float[]					altitudeSerieImperial;
 
 	/**
 	 * smoothed altitude serie is used to display the tour chart when not <code>null</code>
 	 */
 	@Transient
-	private float[]						altitudeSerieImperialSmoothed;
+	private float[]					altitudeSerieImperialSmoothed;
 
 	/**
 	 * SRTM altitude values, when <code>null</code> srtm data have not yet been attached, when
 	 * <code>length()==0</code> data are invalid.
 	 */
 	@Transient
-	private float[]						srtmSerie;
+	private float[]					srtmSerie;
 
 	@Transient
-	private float[]						srtmSerieImperial;
+	private float[]					srtmSerieImperial;
 
 	@Transient
 	public float[]						cadenceSerie;
@@ -878,7 +878,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	public float[]						pulseSerie;
 
 	@Transient
-	private float[]						pulseSerieSmoothed;
+	private float[]					pulseSerieSmoothed;
 
 	@Transient
 	public int[]						pulseTimeSerie;
@@ -900,7 +900,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * contains the temperature in the imperial measurement system
 	 */
 	@Transient
-	private float[]						temperatureSerieImperial;
+	private float[]					temperatureSerieImperial;
 
 	/**
 	 * Contains speed in km/h
@@ -909,57 +909,57 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * system is imperial
 	 */
 	@Transient
-	private float[]						speedSerie;
+	private float[]					speedSerie;
 
 	@Transient
-	private float[]						speedSerieImperial;
+	private float[]					speedSerieImperial;
 
 	/**
 	 * Is <code>true</code> when the data in {@link #speedSerie} are from the device and not
 	 * computed. Speed data are normally available from an ergometer and not from a bike computer
 	 */
 	@Transient
-	private boolean						isSpeedSerieFromDevice				= false;
+	private boolean					isSpeedSerieFromDevice				= false;
 
 	/**
 	 * pace in sec/km
 	 */
 	@Transient
-	private float[]						paceSerieSeconds;
+	private float[]					paceSerieSeconds;
 
 	/**
 	 * pace in sec/mile
 	 */
 	@Transient
-	private float[]						paceSerieSecondsImperial;
+	private float[]					paceSerieSecondsImperial;
 
 	/**
 	 * pace in min/km
 	 */
 	@Transient
-	private float[]						paceSerieMinute;
+	private float[]					paceSerieMinute;
 
 	/**
 	 * pace in min/mile
 	 */
 	@Transient
-	private float[]						paceSerieMinuteImperial;
+	private float[]					paceSerieMinuteImperial;
 
 	@Transient
-	private float[]						powerSerie;
+	private float[]					powerSerie;
 
 	/**
 	 * Is <code>true</code> when the data in {@link #powerSerie} are from the device and not
 	 * computed. Power data source can be an ergometer or a power sensor
 	 */
 	@Transient
-	private boolean						isPowerSerieFromDevice				= false;
+	private boolean					isPowerSerieFromDevice				= false;
 
 	@Transient
-	private float[]						altimeterSerie;
+	private float[]					altimeterSerie;
 
 	@Transient
-	private float[]						altimeterSerieImperial;
+	private float[]					altimeterSerieImperial;
 
 	@Transient
 	public float[]						gradientSerie;
@@ -974,10 +974,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * Contains tour latitude data or <code>null</code> when GPS data are not available.
 	 */
 	@Transient
-	public double[]						latitudeSerie;
+	public double[]					latitudeSerie;
 
 	@Transient
-	public double[]						longitudeSerie;
+	public double[]					longitudeSerie;
 
 	/**
 	 * Gears which are saved in a tour are in this HEX format (left to right)
@@ -1017,33 +1017,33 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * 2nd item contains lat/lon maximum values<br>
 	 */
 	@Transient
-	private GeoPosition[]				_gpsBounds;
+	private GeoPosition[]			_gpsBounds;
 
 	/**
 	 * Contains the rough geo parts of the tour or <code>null</code> when geo data are not available. A
 	 * grid square is an integer of lat and lon * 100 (1570 m)
-	 * 
+	 *
 	 * <pre>
-	
+
 		int latPart = (int) (latitude * 100);
 		int lonPart = (int) (longitude * 100);
-		
+
 		lat		( -90 ... + 90) * 100 =  -9_000 +  9_000 = 18_000
 		lon		(-180 ... +180) * 100 = -18_000 + 18_000 = 36_000
-	
+
 		max		(9_000 + 9_000) * 100_000 = 18_000 * 100_000  = 1_800_000_000
-	
+
 											Integer.MAX_VALUE = 2_147_483_647
-		
+
 		Factor to normalize lat/lon
-		
+
 		Degree * Integer = Resolution
 		---------------------------------------
 		Deg *     100      1570 m
 		Deg *   1_000       157 m
 		Deg *  10_000        16 m
 		Deg * 100_000         1.6 m
-											
+
 	 * </pre>
 	 */
 	@Transient
@@ -1053,8 +1053,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * Latitude/longitude multiplied with {@link #_normalizedGeoAccuracy}
 	 */
 	@Transient
-	private NormalizedGeoData			_rasterizedLatLon;
-	
+	private NormalizedGeoData		_rasterizedLatLon;
+
 	@Transient
 	private int							_normalizedGeoAccuracy;
 
@@ -1094,9 +1094,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	private int[]						segmentSerie_Time_Break;
 
 	@Transient
-	private float[]						segmentSerie_Distance_Diff;
+	private float[]					segmentSerie_Distance_Diff;
 	@Transient
-	private float[]						segmentSerie_Distance_Total;
+	private float[]					segmentSerie_Distance_Total;
 
 	@Transient
 	public float[]						segmentSerie_Altitude_Diff;
@@ -1154,13 +1154,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * caches the world positions for the tour lat/long values for each zoom level
 	 */
 	@Transient
-	private final TIntObjectHashMap<Point[]>					_tourWorldPosition	= new TIntObjectHashMap<Point[]>();
+	private final TIntObjectHashMap<Point[]>						_tourWorldPosition	= new TIntObjectHashMap<>();
 
 	/**
 	 * caches the world positions for the way point lat/long values for each zoom level
 	 */
 	@Transient
-	private final TIntObjectHashMap<TIntObjectHashMap<Point>>	_twpWorldPosition	= new TIntObjectHashMap<TIntObjectHashMap<Point>>();
+	private final TIntObjectHashMap<TIntObjectHashMap<Point>>	_twpWorldPosition	= new TIntObjectHashMap<>();
 
 	/**
 	 * when a tour was deleted and is still visible in the raw data view, resaving the tour or
@@ -1209,16 +1209,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	private TourData				_mergeSourceTourData;
 
 	@Transient
-	private ZonedDateTime			_dateTimeCreated;
+	private ZonedDateTime		_dateTimeCreated;
 
 	@Transient
-	private ZonedDateTime			_dateTimeModified;
+	private ZonedDateTime		_dateTimeModified;
 
 	/**
 	 * Tour start time with a time zone.
 	 */
 	@Transient
-	private ZonedDateTime			_zonedStartTime;
+	private ZonedDateTime		_zonedStartTime;
 
 	/**
 	 * Tour markers which are sorted by serie index
@@ -1233,7 +1233,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	private int[]					_hrZones;
 
 	@Transient
-	private HrZoneContext			_hrZoneContext;
+	private HrZoneContext		_hrZoneContext;
 
 	/**
 	 * Copy of {@link #timeSerie} with floating type, this is used for the chart x-axis.
@@ -1254,10 +1254,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * Contains photos which are displayed in photo galleries.
 	 */
 	@Transient
-	private ArrayList<Photo>		_galleryPhotos	= new ArrayList<Photo>();
+	private ArrayList<Photo>	_galleryPhotos	= new ArrayList<>();
 
 	/**
-	 * 
+	 *
 	 */
 	@Transient
 	public boolean					isHistoryTour;
@@ -1288,7 +1288,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * are selected to be displayed in the {@link TourChart}.
 	 */
 	@Transient
-	private boolean					isMultipleTours;
+	private boolean				isMultipleTours;
 
 	/**
 	 * Contains the tour id's
@@ -1312,7 +1312,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * Contains tour titles for each tour.
 	 */
 	@Transient
-	public String[]					multipleTourTitles;
+	public String[]				multipleTourTitles;
 
 	/**
 	 * Contains the number of tour markers for each tour.
@@ -1344,14 +1344,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * Contains the cadence data serie when the {@link #cadenceMultiplier} != 1.0;
 	 */
 	@Transient
-	private float[]					cadenceSerieWithMultiplier;
+	private float[]				cadenceSerieWithMultiplier;
 
 	/**
 	 * Is <code>true</code> when the tour is imported and contained MT specific fields, e.g. tour
 	 * recording time, average temperature, ...
 	 */
 	@Transient
-	private boolean					_isImportedMTTour;
+	private boolean				_isImportedMTTour;
 
 	/**
 	 * Is <code>true</code> when tour file is deleted in the device and in the backup folder.
@@ -1374,16 +1374,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 */
 	@Transient
 	public boolean					isBackupImportFile;
-	
+
 	/*
 	 * Running dynamics data
-	 * 
+	 *
 	 *	stance_time                  267.0  ms
 	 *	stance_time_balance           50.56 percent			* TourData.RUN_DYN_DATA_MULTIPLIER
 	 *	step_length                 1147.0  mm
 	 *	vertical_oscillation         107.2  mm				* TourData.RUN_DYN_DATA_MULTIPLIER
 	 *	vertical_ratio                 9.15 percent			* TourData.RUN_DYN_DATA_MULTIPLIER
-	 *	
+	 *
 	 *	stance_time                  272.0  ms
 	 *	stance_time_balance           50.46 percent			* TourData.RUN_DYN_DATA_MULTIPLIER
 	 *	step_length                 1169.0  mm
@@ -1392,6 +1392,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 *
 	 * @since Version 18.7
 	 */
+// SET_FORMATTING_ON
 	@Transient
 	public short[]					runDyn_StanceTime;
 	@Transient
@@ -1401,27 +1402,26 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	public short[]					runDyn_StanceTimeBalance;
 	@Transient
 	private float[] 				_runDyn_StanceTimeBalance_UI;
-	
+
 	@Transient
 	public short[]					runDyn_StepLength;
 	@Transient
-	private float[]					_runDyn_StepLength_UI;
+	private float[]															_runDyn_StepLength_UI;
 	@Transient
-	private float[]					_runDyn_StepLength_UI_Imperial;
-	
+	private float[]															_runDyn_StepLength_UI_Imperial;
+
 	@Transient
 	public short[]					runDyn_VerticalOscillation;
 	@Transient
-	private float[]					_runDyn_VerticalOscillation_UI;
+	private float[]															_runDyn_VerticalOscillation_UI;
 	@Transient
-	private float[]					_runDyn_VerticalOscillation_UI_Imperial;
-	
+	private float[]															_runDyn_VerticalOscillation_UI_Imperial;
+
 	@Transient
 	public short[]					runDyn_VerticalRatio;
 	@Transient
-	private float[]					_runDyn_VerticalRatio_UI;
+	private float[]															_runDyn_VerticalRatio_UI;
 
-// SET_FORMATTING_ON
 
 	public TourData() {}
 
@@ -1545,8 +1545,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 				mapMaxLongitude = mapMaxLongitude > lastValidLonAdjusted ? mapMaxLongitude : lastValidLonAdjusted;
 
 				/*
-				 * check if latitude is not 0, there was a bug until version 1.3.0 where latitude
-				 * and longitude has been saved with 0 values
+				 * check if latitude is not 0, there was a bug until version 1.3.0 where latitude and
+				 * longitude has been saved with 0 values
 				 */
 				if ((isLatitudeValid == false) && (lastValidLatitude != 0)) {
 					isLatitudeValid = true;
@@ -1794,7 +1794,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * Complete tour marker with altitude/lat/lon.
-	 * 
+	 *
 	 * @param tourMarker
 	 * @param serieIndex
 	 */
@@ -2048,8 +2048,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			lowIndex = (lowIndex >= 0) ? lowIndex : 0;
 
 			/*
-			 * check if a time difference is available between 2 time data, this can happen in gps
-			 * data that lat+long is available but no time
+			 * check if a time difference is available between 2 time data, this can happen in gps data
+			 * that lat+long is available but no time
 			 */
 			boolean isTimeValid = true;
 			int prevTime = timeSerie[lowIndex];
@@ -2126,7 +2126,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * Computes and sets the altitude up/down values into {@link TourData}
-	 * 
+	 *
 	 * @return Returns <code>true</code> when altitude was computed otherwise <code>false</code>
 	 */
 	public boolean computeAltitudeUpDown() {
@@ -2165,15 +2165,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		return true;
 	}
 
-	public AltitudeUpDown computeAltitudeUpDown(final ArrayList<AltitudeUpDownSegment> segmentSerieIndexParameter,
-												final float selectedMinAltiDiff) {
+	public AltitudeUpDown computeAltitudeUpDown(	final ArrayList<AltitudeUpDownSegment> segmentSerieIndexParameter,
+																final float selectedMinAltiDiff) {
 
 		return computeAltitudeUpDown_30_Algorithm_9_08(segmentSerieIndexParameter, selectedMinAltiDiff);
 	}
 
 	/**
 	 * Compute altitude up/down with Douglas Peuker algorithm.
-	 * 
+	 *
 	 * @param dpTolerance
 	 * @return Returns <code>null</code> when altitude up/down cannot be computed
 	 */
@@ -2226,17 +2226,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	/**
 	 * Compute altitude up/down since version 9.08
 	 * <p>
-	 * This algorithm is abandond because it can cause very wrong values dependend on the terrain.
-	 * DP is the preferred algorithm since 14.7.
-	 * 
+	 * This algorithm is abandond because it can cause very wrong values dependend on the terrain. DP
+	 * is the preferred algorithm since 14.7.
+	 *
 	 * @param segmentSerie
-	 *            segments are created for each gradient alternation when segmentSerie is not
-	 *            <code>null</code>
+	 *           segments are created for each gradient alternation when segmentSerie is not
+	 *           <code>null</code>
 	 * @param minAltiDiff
 	 * @return Returns <code>null</code> when altitude up/down cannot be computed
 	 */
-	private AltitudeUpDown computeAltitudeUpDown_30_Algorithm_9_08(	final ArrayList<AltitudeUpDownSegment> segmentSerie,
-																	final float minAltiDiff) {
+	private AltitudeUpDown computeAltitudeUpDown_30_Algorithm_9_08(final ArrayList<AltitudeUpDownSegment> segmentSerie,
+																						final float minAltiDiff) {
 
 		// check if all necessary data are available
 		if ((altitudeSerie == null) || (timeSerie == null) || (timeSerie.length < 2)) {
@@ -2314,8 +2314,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 					// altitude is ascending
 
 					/*
-					 * compares with equal 0 (== 0) to prevent initialization error, otherwise the
-					 * value is >0 or <0
+					 * compares with equal 0 (== 0) to prevent initialization error, otherwise the value
+					 * is >0 or <0
 					 */
 					if (prevAltiDiff >= 0) {
 
@@ -2361,8 +2361,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 					// altitude is descending
 
 					/*
-					 * compares to == 0 to prevent initialization error, otherwise the value is >0
-					 * or <0
+					 * compares to == 0 to prevent initialization error, otherwise the value is >0 or <0
 					 */
 					if (prevAltiDiff <= 0) {
 
@@ -2532,6 +2531,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		double cadenceSquare = 0;
 		double timeSquare = 0;
 
+		final float[] cadenceWithMuliplier = getCadenceSerie();
+
 		for (int serieIndex = firstIndex; serieIndex <= lastIndex; serieIndex++) {
 
 			if (hasBreakTime) {
@@ -2559,7 +2560,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 				}
 			}
 
-			final float cadence = cadenceSerie[serieIndex];
+			final float cadence = cadenceWithMuliplier[serieIndex];
 
 			float timeDiffPrev = 0;
 			float timeDiffNext = 0;
@@ -2862,10 +2863,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	/**
 	 * calculate the driving time, ignore the time when the distance is 0 within a time period which
 	 * is defined by <code>sliceMin</code>
-	 * 
+	 *
 	 * @param minSlices
-	 *            A break will occure when the distance will not change within the minimum number of
-	 *            time slices.
+	 *           A break will occure when the distance will not change within the minimum number of
+	 *           time slices.
 	 * @return Returns the number of slices which can be ignored
 	 */
 	private void computeBreakTimeFixed(int minSlices) {
@@ -2893,7 +2894,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * Computes tour break time
-	 * 
+	 *
 	 * @param startIndex
 	 * @param endIndex
 	 * @param btConfig
@@ -2967,7 +2968,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * Computes geo bounds when data are available.
-	 * 
+	 *
 	 * @return Returns geo min/max positions when data are available, otherwise <code>null</code>.
 	 */
 	public void computeGeo_Bounds() {
@@ -3014,8 +3015,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * Computes geo partitions from {@link #latitudeSerie} and {@link #latitudeSerie} into
-	 * {@link #geoGrid} when geo data are available, otherwise {@link #geoGrid} is
-	 * <code>null</code>.
+	 * {@link #geoGrid} when geo data are available, otherwise {@link #geoGrid} is <code>null</code>.
 	 */
 	public void computeGeo_Grid() {
 
@@ -3029,18 +3029,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	/**
 	 * Computes geo partitions when geo data are available, a geo partition is a square which was
 	 * touched by the tour
-	 * 
+	 *
 	 * @param partLatitude
 	 * @param partLongitude
 	 * @param indexStart
 	 * @param indexEnd
-	 *            Last index + 1
+	 *           Last index + 1
 	 * @return Returns all geo partitions or <code>null</code> when geo data are not available.
 	 */
 	private TIntHashSet computeGeo_Grid(final double[] partLatitude,
-										final double[] partLongitude,
-										final int indexStart,
-										final int indexEnd) {
+													final double[] partLongitude,
+													final int indexStart,
+													final int indexEnd) {
 
 		if (partLatitude == null || partLongitude == null) {
 			return null;
@@ -3126,10 +3126,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		return computedGeoParts.toArray();
 	}
 
-	public NormalizedGeoData computeGeo_NormalizeLatLon(final int measureStartIndex,
-														final int measureEndIndex,
-														final int geoAccuracy,
-														final int distanceInterval) {
+	public NormalizedGeoData computeGeo_NormalizeLatLon(	final int measureStartIndex,
+																			final int measureEndIndex,
+																			final int geoAccuracy,
+																			final int distanceInterval) {
 
 		final float[] measureAllDistance = distanceSerie;
 		final double[] measureAllLat = latitudeSerie;
@@ -3214,17 +3214,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * <li>multiplied with geo accuracy</li>
 	 * <li>removed subsequent duplicates</li>
 	 * </ul>
-	 * 
+	 *
 	 * @param indexStart
 	 * @param indexEnd
 	 * @param geoAccuracy
 	 * @param normalizedDistance
 	 * @return Returns rasterized lat/lon data of the tour or <code>null</code> when not available
 	 */
-	public NormalizedGeoData computeGeo_NormalizeLatLon_OLD(final int indexStart,
-															final int indexEnd,
-															final int geoAccuracy,
-															final int normalizedDistance) {
+	public NormalizedGeoData computeGeo_NormalizeLatLon_OLD(	final int indexStart,
+																				final int indexEnd,
+																				final int geoAccuracy,
+																				final int normalizedDistance) {
 
 		if (latitudeSerie == null || distanceSerie == null) {
 			return null;
@@ -4011,7 +4011,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * Computes the imperial speed data serie and max speed
-	 * 
+	 *
 	 * @return
 	 */
 	private void computeSpeedSerieFromDevice() {
@@ -4041,7 +4041,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * Computes the speed data serie with the internal algorithm for a fix time interval
-	 * 
+	 *
 	 * @return
 	 */
 	private void computeSpeedSerieInternalWithFixedInterval() {
@@ -4213,8 +4213,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 				} else if (isLatLongEqual) {
 
 					/*
-					 * lat/long equality ended, compute distance for all datapoints which has the
-					 * same lat/long because this was not correctly computed from the device
+					 * lat/long equality ended, compute distance for all datapoints which has the same
+					 * lat/long because this was not correctly computed from the device
 					 */
 
 					isLatLongEqual = false;
@@ -4290,8 +4290,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			float speedImperial = 0;
 
 			/*
-			 * check if a time difference is available between 2 time data, this can happen in gps
-			 * data that lat+long is available but no time
+			 * check if a time difference is available between 2 time data, this can happen in gps data
+			 * that lat+long is available but no time
 			 */
 			highIndex = (highIndex <= lastSerieIndex) ? highIndex : lastSerieIndex;
 			lowIndex = (lowIndex >= 0) ? lowIndex : 0;
@@ -4400,7 +4400,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 		final int timeDiffRange = 10_000;
 
-		final ArrayList<TourWayPoint> removedWayPoints = new ArrayList<TourWayPoint>();
+		final ArrayList<TourWayPoint> removedWayPoints = new ArrayList<>();
 
 		for (final TourWayPoint wp : tourWayPoints) {
 
@@ -4494,8 +4494,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			}
 
 			/*
-			 * when a photo is in the photo cache it is possible that the tour is from the file
-			 * system, update tour relevant fields
+			 * when a photo is in the photo cache it is possible that the tour is from the file system,
+			 * update tour relevant fields
 			 */
 			galleryPhoto.isSavedInTour = true;
 
@@ -4575,13 +4575,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * Create the tour segment list from the segment index array
-	 * 
+	 *
 	 * @param breakMinSpeedDiff
 	 * @param breakMaxDistance
 	 * @param breakMinTime
 	 * @param segmenterBreakDistance
 	 * @param breakMinSpeedDiff
-	 *            in km/h
+	 *           in km/h
 	 * @param breakMinSpeed2
 	 * @param breakDistance
 	 * @return
@@ -4606,7 +4606,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 		final int segmentSerieLength = segmentSerieIndex.length;
 
-		final ArrayList<TourSegment> tourSegments = new ArrayList<TourSegment>(segmentSerieLength);
+		final ArrayList<TourSegment> tourSegments = new ArrayList<>(segmentSerieLength);
 		final int firstSerieIndex = segmentSerieIndex[0];
 
 		/*
@@ -4843,6 +4843,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 				final float segmentAvgCadence = computeAvg_CadenceSegment(segmentStartIndex, segmentEndIndex);
 				segmentSerie_Cadence[segmentIndex] = segment.cadence = segmentAvgCadence;
+
+				// stride length with rule of 3
+				final float revolutionTotal = segmentAvgCadence / 60 * segment.time_Driving;
+				segment.strideLength = segment.distance_Diff / revolutionTotal;
 			}
 
 			// end point of current segment is the start of the next segment
@@ -4954,9 +4958,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * transfered.
 	 * <p>
 	 * The array {@link #timeSerie} is always created even when the time is not available.
-	 * 
+	 *
 	 * @param isCreateMarker
-	 *            creates markers when <code>true</code>
+	 *           creates markers when <code>true</code>
 	 */
 	public void createTimeSeries(final List<TimeData> timeDataList, final boolean isCreateMarker) {
 
@@ -4980,21 +4984,21 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		timeSerie = new int[serieSize];
 
 // SET_FORMATTING_OFF
-		
-		final boolean isAltitude 					= setupStartingValues_Altitude(timeDataSerie, isAbsoluteData);
-		final boolean isCadence 					= setupStartingValues_Cadence(timeDataSerie);
-		final boolean isDistance	 	 	 	 	= setupStartingValues_Distance(timeDataSerie, isAbsoluteData);
-		final boolean isGear 						= setupStartingValues_Gear(timeDataSerie);
-		final boolean isGPS 						= setupStartingValues_LatLon(timeDataSerie);
-		final boolean isPower 						= setupStartingValues_Power(timeDataSerie);
-		final boolean isPulse 						= setupStartingValues_Pulse(timeDataSerie);
-		final boolean isTemperature 				= setupStartingValues_Temperature(timeDataSerie);
-		final boolean isRunDyn_StanceTime 			= setupStartingValues_RunDyn_StanceTime(timeDataSerie);
-		final boolean isRunDyn_StanceTimeBalance 	= setupStartingValues_RunDyn_StanceTimeBalance(timeDataSerie);
-		final boolean isRunDyn_StepLength 			= setupStartingValues_RunDyn_StepLength(timeDataSerie);
-		final boolean isRunDyn_VerticalOscillation 	= setupStartingValues_RunDyn_VerticalOscillation(timeDataSerie);
-		final boolean isRunDyn_VerticalRatio 		= setupStartingValues_RunDyn_VerticalRatio(timeDataSerie);
-		
+
+		final boolean isAltitude 							= setupStartingValues_Altitude(timeDataSerie, isAbsoluteData);
+		final boolean isCadence 							= setupStartingValues_Cadence(timeDataSerie);
+		final boolean isDistance	 	 	 			 	= setupStartingValues_Distance(timeDataSerie, isAbsoluteData);
+		final boolean isGear 								= setupStartingValues_Gear(timeDataSerie);
+		final boolean isGPS 									= setupStartingValues_LatLon(timeDataSerie);
+		final boolean isPower 								= setupStartingValues_Power(timeDataSerie);
+		final boolean isPulse 								= setupStartingValues_Pulse(timeDataSerie);
+		final boolean isTemperature 						= setupStartingValues_Temperature(timeDataSerie);
+		final boolean isRunDyn_StanceTime 				= setupStartingValues_RunDyn_StanceTime(timeDataSerie);
+		final boolean isRunDyn_StanceTimeBalance 		= setupStartingValues_RunDyn_StanceTimeBalance(timeDataSerie);
+		final boolean isRunDyn_StepLength 				= setupStartingValues_RunDyn_StepLength(timeDataSerie);
+		final boolean isRunDyn_VerticalOscillation	= setupStartingValues_RunDyn_VerticalOscillation(timeDataSerie);
+		final boolean isRunDyn_VerticalRatio			= setupStartingValues_RunDyn_VerticalRatio(timeDataSerie);
+
 // SET_FORMATTING_ON
 
 		/*
@@ -5058,8 +5062,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 							/**
 							 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 							 * <p>
-							 * rounding cannot be used because the tour id contains the last value
-							 * from the distance serie so rounding creates another tour id
+							 * rounding cannot be used because the tour id contains the last value from the
+							 * distance serie so rounding creates another tour id
 							 * <p>
 							 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 							 */
@@ -5072,8 +5076,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 					// 1..n trackpoint
 
 					/*
-					 * time: absolute time is checked against last valid time because this case
-					 * happened but time can NOT be in the past.
+					 * time: absolute time is checked against last valid time because this case happened
+					 * but time can NOT be in the past.
 					 */
 					if (absoluteTime == Long.MIN_VALUE || absoluteTime < lastValidAbsoluteTime) {
 						recordingTime = lastValidTime;
@@ -5095,8 +5099,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 							/**
 							 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 							 * <p>
-							 * rounding cannot be used because the tour id contains the last value
-							 * from the distance serie so rounding creates another tour id
+							 * rounding cannot be used because the tour id contains the last value from the
+							 * distance serie so rounding creates another tour id
 							 * <p>
 							 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 							 */
@@ -5273,8 +5277,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		cleanupDataSeries();
 
 		/*
-		 * Try to get distance values from lat/long values, this must be done after the cleanup
-		 * which can set distanceSerie = null.
+		 * Try to get distance values from lat/long values, this must be done after the cleanup which
+		 * can set distanceSerie = null.
 		 */
 		if (distanceSerie == null) {
 			TourManager.computeDistanceValuesFromGeoPosition(this);
@@ -5349,9 +5353,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		}
 
 		/*
-		 * Distance is measured with the gps device and not with a sensor. Remove all distance
-		 * values which are set but lat/lon is not available, this case can happen when a device is
-		 * in a tunnel. Distance values will be interpolited later.
+		 * Distance is measured with the gps device and not with a sensor. Remove all distance values
+		 * which are set but lat/lon is not available, this case can happen when a device is in a
+		 * tunnel. Distance values will be interpolited later.
 		 */
 
 		final int size = timeSerie.length;
@@ -5364,8 +5368,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	}
 
 	/**
-	 * Because of the current algorithm, the first distance value can be <code>0</code> and the
-	 * other values can be {@link Float#MIN_VALUE}.
+	 * Because of the current algorithm, the first distance value can be <code>0</code> and the other
+	 * values can be {@link Float#MIN_VALUE}.
 	 * <p>
 	 * When this occures, set all distance values to {@link Float#MIN_VALUE}, that distance values
 	 * are not recognized.
@@ -5523,11 +5527,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		}
 	}
 
-	private double createTimeSeries_40_linear_interpolation(final double time1,
-															final double time2,
-															final double val1,
-															final double val2,
-															final double time) {
+	private double createTimeSeries_40_linear_interpolation(	final double time1,
+																				final double time2,
+																				final double val1,
+																				final double val2,
+																				final double time) {
 		if (time2 == time1) {
 			return ((val1 + val2) / 2.);
 		} else {
@@ -5644,9 +5648,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * Creates the unique tour id from the tour date/time and the unique key.
-	 * 
+	 *
 	 * @param uniqueKeySuffix
-	 *            Unique key to identify a tour, this <b>MUST</b> be an {@link Integer} value.
+	 *           Unique key to identify a tour, this <b>MUST</b> be an {@link Integer} value.
 	 * @return
 	 */
 	public Long createTourId(final String uniqueKeySuffix) {
@@ -5708,23 +5712,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * Create a device marker at the current position
-	 * 
+	 *
 	 * @param timeData
 	 * @param serieIndex
 	 * @param relativeTime
 	 * @param distanceAbsolute
 	 */
-	private void createTourMarker(	final TimeData timeData,
-									final int serieIndex,
-									final int relativeTime,
-									final float distanceAbsolute) {
+	private void createTourMarker(final TimeData timeData,
+											final int serieIndex,
+											final int relativeTime,
+											final float distanceAbsolute) {
 
 		// create a new marker
 		final TourMarker tourMarker = new TourMarker(this, ChartLabel.MARKER_TYPE_DEVICE);
 
 		/*
-		 * ??? timeData.marker was added until version 14.9 but I have no idea why this was added
-		 * ???
+		 * ??? timeData.marker was added until version 14.9 but I have no idea why this was added ???
 		 */
 //		tourMarker.setTime((int) (relativeTime + timeData.marker));
 
@@ -5971,7 +5974,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * Computes break time between start and end index when and when a break occures
-	 * 
+	 *
 	 * @param startIndex
 	 * @param endIndex
 	 * @param breakTimeTool
@@ -6149,7 +6152,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * This info is only displayed in viewer columns
-	 * 
+	 *
 	 * @return
 	 */
 	public String getDeviceModeName() {
@@ -6186,8 +6189,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	}
 
 	/**
-	 * @return Returns the distance data serie for the current measurement system, this can be
-	 *         metric or imperial
+	 * @return Returns the distance data serie for the current measurement system, this can be metric
+	 *         or imperial
 	 */
 	public double[] getDistanceSerieDouble() {
 
@@ -6285,8 +6288,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	}
 
 	/**
-	 * @return Returns <code>null</code> when gears are not available otherwise it returns gears
-	 *         with this format
+	 * @return Returns <code>null</code> when gears are not available otherwise it returns gears with
+	 *         this format
 	 *         <p>
 	 *         _gears[0] = gear ratio<br>
 	 *         _gears[1] = front gear teeth<br>
@@ -6512,8 +6515,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	}
 
 	/**
-	 * @return Returns the distance serie from the metric system, the distance serie is
-	 *         <b>always</b> saved in the database with the metric system
+	 * @return Returns the distance serie from the metric system, the distance serie is <b>always</b>
+	 *         saved in the database with the metric system
 	 */
 	public float[] getMetricDistanceSerie() {
 		return distanceSerie;
@@ -7286,8 +7289,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	}
 
 	/**
-	 * @return Returns Tour time zone ID or <code>null</code> when the time zone ID is not
-	 *         available.
+	 * @return Returns Tour time zone ID or <code>null</code> when the time zone ID is not available.
 	 */
 	public String getTimeZoneId() {
 		return timeZoneId;
@@ -7322,8 +7324,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	}
 
 	/**
-	 * !!! THIS VALUE IS NOT CACHED BECAUSE WHEN THE DEFAULT TIME ZONE IS CHANGING THEN THIS VALUE
-	 * IS WRONG !!!
+	 * !!! THIS VALUE IS NOT CACHED BECAUSE WHEN THE DEFAULT TIME ZONE IS CHANGING THEN THIS VALUE IS
+	 * WRONG !!!
 	 */
 	public TourDateTime getTourDateTime() {
 
@@ -7391,7 +7393,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		}
 
 		// sort markers by serie index
-		_sortedMarkers = new ArrayList<TourMarker>(tourMarkers);
+		_sortedMarkers = new ArrayList<>(tourMarkers);
 
 		Collections.sort(_sortedMarkers, new Comparator<TourMarker>() {
 			@Override
@@ -7452,8 +7454,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			if (timeZoneId == null) {
 
 				/*
-				 * Tour has no time zone but this can be changed in the preferences, so this value
-				 * is not cached
+				 * Tour has no time zone but this can be changed in the preferences, so this value is
+				 * not cached
 				 */
 
 				setCalendarWeek(zonedStartTime);
@@ -7643,7 +7645,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	/**
 	 * This is the state of the device which is not related to the availability of power data. Power
 	 * data should be available but is not checked.
-	 * 
+	 *
 	 * @return Returns <code>true</code> when the device has a power sensor
 	 */
 	public boolean isPowerSensorPresent() {
@@ -7662,7 +7664,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	/**
 	 * This is the state of the device which is not related to the availability of pulse data. Pulse
 	 * data should be available but is not checked.
-	 * 
+	 *
 	 * @return Returns <code>true</code> when the device has a pulse sensor
 	 */
 	public boolean isPulseSensorPresent() {
@@ -7698,9 +7700,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	}
 
 	/**
-	 * @return Returns <code>true</code> when the data in {@link #speedSerie} are from the device
-	 *         and not computed. Speed data are normally available from an ergometer and not from a
-	 *         bike computer
+	 * @return Returns <code>true</code> when the data in {@link #speedSerie} are from the device and
+	 *         not computed. Speed data are normally available from an ergometer and not from a bike
+	 *         computer
 	 */
 	public boolean isSpeedSerieFromDevice() {
 		return isSpeedSerieFromDevice;
@@ -7752,7 +7754,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * Checks if VARCHAR fields have the correct length
-	 * 
+	 *
 	 * @return Returns <code>true</code> when the data are valid and can be saved
 	 */
 	public boolean isValidForSave() {
@@ -8003,7 +8005,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * @param avgCadence
-	 *            the avgCadence to set
+	 *           the avgCadence to set
 	 */
 	public void setAvgCadence(final float avgCadence) {
 		this.avgCadence = avgCadence;
@@ -8011,7 +8013,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * @param avgPulse
-	 *            the avgPulse to set
+	 *           the avgPulse to set
 	 */
 	public void setAvgPulse(final float avgPulse) {
 		this.avgPulse = avgPulse;
@@ -8019,7 +8021,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * @param avgTemperature
-	 *            the avgTemperature to set
+	 *           the avgTemperature to set
 	 */
 	public void setAvgTemperature(final float avgTemperature) {
 		this.avgTemperature = avgTemperature;
@@ -8027,7 +8029,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * @param bikerWeight
-	 *            Sets the body weight.
+	 *           Sets the body weight.
 	 */
 	public void setBodyWeight(final float bikerWeight) {
 		this.bikerWeight = bikerWeight;
@@ -8043,7 +8045,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * Set the calendar week in the tour.
-	 * 
+	 *
 	 * @param dateTime
 	 */
 	private void setCalendarWeek(final ZonedDateTime dateTime) {
@@ -8056,7 +8058,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * @param calories
-	 *            the calories to set
+	 *           the calories to set
 	 */
 	public void setCalories(final int calories) {
 		this.calories = calories;
@@ -8098,7 +8100,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * Time difference in seconds between 2 time slices when the interval is constant for the whole
 	 * tour or <code>-1</code> for GPS devices or ergometer when the time slice duration are not
 	 * equally
-	 * 
+	 *
 	 * @param deviceTimeInterval
 	 */
 	public void setDeviceTimeInterval(final short deviceTimeInterval) {
@@ -8239,7 +8241,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * Set only the import folder.
-	 * 
+	 *
 	 * @param backupOSFolder
 	 */
 	public void setImportBackupFileFolder(final String backupOSFolder) {
@@ -8254,7 +8256,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	/**
 	 * Sets the file path (folder + file name) for the imported file, this is displayed in the
 	 * {@link TourDataEditorView}
-	 * 
+	 *
 	 * @param tourImportFilePath
 	 */
 	public void setImportFilePath(final String tourImportFilePath) {
@@ -8277,7 +8279,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * Set state if the distance is from a sensor or not, default is <code>false</code>
-	 * 
+	 *
 	 * @param isFromSensor
 	 */
 	public void setIsDistanceFromSensor(final boolean isFromSensor) {
@@ -8351,7 +8353,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * Sets Functional Threshold Power (FTP)
-	 * 
+	 *
 	 * @param ftp
 	 */
 	public void setPower_FTP(final int ftp) {
@@ -8384,7 +8386,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * Sets the power data serie and set's a flag that the data serie is from a device
-	 * 
+	 *
 	 * @param powerSerie
 	 */
 	public void setPowerSerie(final float[] powerSerie) {
@@ -8401,10 +8403,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	}
 
 	private void setSpeed(	final int serieIndex,
-							final float speedMetric,
-							final float speedImperial,
-							final int timeDiff,
-							final float distDiff) {
+									final float speedMetric,
+									final float speedImperial,
+									final int timeDiff,
+									final float distDiff) {
 
 		speedSerie[serieIndex] = speedMetric;
 		speedSerieImperial[serieIndex] = speedImperial;
@@ -8423,7 +8425,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * Sets the speed data serie and set's a flag that the data serie is from a device
-	 * 
+	 *
 	 * @param speedSerie
 	 */
 	public void setSpeedSerie(final float[] speedSerie) {
@@ -8442,7 +8444,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * Odometer value, this is the distance which the device is accumulating
-	 * 
+	 *
 	 * @param startDistance
 	 */
 	public void setStartDistance(final float startDistance) {
@@ -8479,7 +8481,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * @param tourDescription
-	 *            the tourDescription to set
+	 *           the tourDescription to set
 	 */
 	public void setTourDescription(final String tourDescription) {
 		this.tourDescription = tourDescription;
@@ -8491,7 +8493,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * Set total driving/moving time in seconds.
-	 * 
+	 *
 	 * @param tourDrivingTime
 	 */
 	public void setTourDrivingTime(final int tourDrivingTime) {
@@ -8500,7 +8502,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * @param tourEndPlace
-	 *            the tourEndPlace to set
+	 *           the tourEndPlace to set
 	 */
 	public void setTourEndPlace(final String tourEndPlace) {
 		this.tourEndPlace = tourEndPlace;
@@ -8525,7 +8527,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	/**
 	 * Sets the {@link TourPerson} for the tour or <code>null</code> when the tour is not saved in
 	 * the database
-	 * 
+	 *
 	 * @param tourPerson
 	 */
 	public void setTourPerson(final TourPerson tourPerson) {
@@ -8534,7 +8536,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * Set new photos into the tour, existing photos will be replaced.
-	 * 
+	 *
 	 * @param newTourPhotos
 	 * @param linkPhotos
 	 */
@@ -8594,7 +8596,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * Set total recording time in seconds
-	 * 
+	 *
 	 * @param tourRecordingTime
 	 */
 	public void setTourRecordingTime(final long tourRecordingTime) {
@@ -8606,7 +8608,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * @param tourStartPlace
-	 *            the tourStartPlace to set
+	 *           the tourStartPlace to set
 	 */
 	public void setTourStartPlace(final String tourStartPlace) {
 		this.tourStartPlace = tourStartPlace;
@@ -8614,21 +8616,21 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * Set tour start date/time and week.
-	 * 
+	 *
 	 * @param tourStartYear
 	 * @param tourStartMonth
-	 *            1...12
+	 *           1...12
 	 * @param tourStartDay
 	 * @param tourStartHour
 	 * @param tourStartMinute
 	 * @param tourStartSecond
 	 */
 	public void setTourStartTime(	final int tourStartYear,
-									final int tourStartMonth,
-									final int tourStartDay,
-									final int tourStartHour,
-									final int tourStartMinute,
-									final int tourStartSecond) {
+											final int tourStartMonth,
+											final int tourStartDay,
+											final int tourStartHour,
+											final int tourStartMinute,
+											final int tourStartSecond) {
 
 		final ZonedDateTime zonedStartTime = ZonedDateTime.of(
 				tourStartYear,
@@ -8687,7 +8689,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * @param tourTitle
-	 *            the tourTitle to set
+	 *           the tourTitle to set
 	 */
 	public void setTourTitle(final String tourTitle) {
 		this.tourTitle = tourTitle;
@@ -8717,7 +8719,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * Search for first valid value and fill up the data serie until the first valid value is
 	 * reached.
 	 * <p>
-	 * 
+	 *
 	 * @param timeDataSerie
 	 * @param isAbsoluteData
 	 * @return Returns <code>true</code> when values are available in the data serie and
@@ -9258,7 +9260,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	/**
 	 * Sets the weather id which is defined in {@link IWeather#WEATHER_ID_}... or <code>null</code>
 	 * when weather id is not defined
-	 * 
+	 *
 	 * @param weatherClouds
 	 */
 	public void setWeatherClouds(final String weatherClouds) {
@@ -9275,7 +9277,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * Set world positions which are cached
-	 * 
+	 *
 	 * @param worldPositions
 	 * @param zoomLevel
 	 * @param projectionId
@@ -9286,14 +9288,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/**
 	 * Set world positions which are cached
-	 * 
+	 *
 	 * @param worldPositions
 	 * @param zoomLevel
 	 * @param projectionId
 	 */
 	public void setWorldPixelForWayPoints(	final TIntObjectHashMap<Point> worldPositions,
-											final int zoomLevel,
-											final String projectionId) {
+														final int zoomLevel,
+														final String projectionId) {
 
 		_twpWorldPosition.put(projectionId.hashCode() + zoomLevel, worldPositions);
 	}
@@ -9353,8 +9355,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	private void updateDatabase_019_to_020_10DataSeries() {
 
 		/*
-		 * cleanup dataseries because dataseries has been saved before version 1.3.0 even when no
-		 * data are available
+		 * cleanup dataseries because dataseries has been saved before version 1.3.0 even when no data
+		 * are available
 		 */
 // this DO NOT WORK because time serie is not set !!!!
 //		cleanupDataSeries();
