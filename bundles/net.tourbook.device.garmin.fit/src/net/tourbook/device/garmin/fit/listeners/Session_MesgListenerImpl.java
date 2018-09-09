@@ -12,16 +12,16 @@ import com.garmin.fit.SessionMesg;
 import com.garmin.fit.SessionMesgListener;
 import com.garmin.fit.Sport;
 
-public class SessionMesgListenerImpl extends AbstractMesgListener implements SessionMesgListener {
+public class Session_MesgListenerImpl extends AbstractMesgListener implements SessionMesgListener {
 
-	public SessionMesgListenerImpl(final FitContext context) {
+	public Session_MesgListenerImpl(final FitContext context) {
 		super(context);
 	}
 
 	@Override
 	public void onMesg(final SessionMesg mesg) {
 
-		context.onMesgSession_10_Before();
+		context.onMesg_Session_10_Before();
 
 		final Integer messageIndex = getMessageIndex(mesg);
 		context.setSessionIndex(messageIndex.toString());
@@ -153,6 +153,6 @@ public class SessionMesgListenerImpl extends AbstractMesgListener implements Ses
 			tourData.setPower_FTP(ftp);
 		}
 
-		context.onMesgSession_20_After();
+		context.onMesg_Session_20_After();
 	}
 }

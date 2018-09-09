@@ -38,15 +38,15 @@ public abstract class AbstractMesgListener {
 	}
 
 	protected TimeData getTimeData() {
-		return getContextData().getCurrentTimeData();
+		return getContextData().getCurrent_TimeData();
 	}
 
 	protected TourData getTourData() {
-		return getContextData().getCurrentTourData();
+		return getContextData().getCurrent_TourData();
 	}
 
 	protected TourMarker getTourMarker() {
-		return getContextData().getCurrentTourMarker();
+		return getContextData().getCurrent_TourMarker();
 	}
 
 }

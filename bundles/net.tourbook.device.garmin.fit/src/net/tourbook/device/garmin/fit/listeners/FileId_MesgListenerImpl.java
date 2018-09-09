@@ -25,9 +25,9 @@ import com.garmin.fit.FileIdMesgListener;
 import com.garmin.fit.GarminProduct;
 import com.garmin.fit.Manufacturer;
 
-public class FileIdMesgListenerImpl extends AbstractMesgListener implements FileIdMesgListener {
+public class FileId_MesgListenerImpl extends AbstractMesgListener implements FileIdMesgListener {
 
-	public FileIdMesgListenerImpl(final FitContext context) {
+	public FileId_MesgListenerImpl(final FitContext context) {
 		super(context);
 	}
 
