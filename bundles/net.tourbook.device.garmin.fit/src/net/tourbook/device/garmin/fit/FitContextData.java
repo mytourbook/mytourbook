@@ -1,5 +1,8 @@
 package net.tourbook.device.garmin.fit;
 
+import com.garmin.fit.EventMesg;
+import com.garmin.fit.HrMesg;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,31 +12,30 @@ import net.tourbook.data.GearData;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
+import net.tourbook.tour.TourLogManager;
 import net.tourbook.ui.tourChart.ChartLabel;
 
-import com.garmin.fit.EventMesg;
-
 /**
- * Wrapper for tour data used by {@link FitContext}.
- * 
+ * Wrapper for {@link TourData} used by {@link FitContext}.
+ *
  * @author Marcin Kuthan <marcin.kuthan@gmail.com>
  */
 public class FitContextData {
 
-	private final List<TourContext>						_allTourContext	= new ArrayList<TourContext>();
+	private final List<TourContext>							_allTourContext	= new ArrayList<>();
 
-	private final Map<TourContext, List<GearData>>		_allGearData	= new HashMap<TourContext, List<GearData>>();
-	private final Map<TourContext, List<TimeData>>		_allTimeData	= new HashMap<TourContext, List<TimeData>>();
-	private final Map<TourContext, List<TourMarker>>	_allTourMarker	= new HashMap<TourContext, List<TourMarker>>();
+	private final Map<TourContext, List<GearData>>		_allGearData		= new HashMap<>();
+	private final Map<TourContext, List<TimeData>>		_allTimeData		= new HashMap<>();
+	private final Map<TourContext, List<TourMarker>>	_allTourMarker		= new HashMap<>();
 
-	private TourContext									_currentTourContext;
+	private TimeData												_current_TimeData;
+	private TimeData												_previous_TimeData;
 
-	private TimeData									_currentTimeData;
-	private List<TimeData>								_currentTimeDataList;
+	private List<TimeData>										_current_AllTimeData;
+	private List<TimeData>										_previous_AllTimeData;
 
-	private TourMarker									_currentTourMarker;
-
-	private TimeData									_previousTimeData;
+	private TourContext											_current_TourContext;
+	private TourMarker											_current_TourMarker;
 
 	/**
 	 * Tour context is a little bit tricky and cannot be replaced with just a {@link TourData}
@@ -41,7 +43,7 @@ public class FitContextData {
 	 */
 	private class TourContext {
 
-		private TourData	__tourData;
+		private TourData __tourData;
 
 		public TourContext(final TourData tourData) {
 			__tourData = tourData;
@@ -55,13 +57,13 @@ public class FitContextData {
 
 	/**
 	 * Gear data are available in the common {@link EventMesg}.
-	 * 
+	 *
 	 * @param mesg
 	 */
-	public void ctxEventMesg(final EventMesg mesg) {
+	void context_EventMesg(final EventMesg mesg) {
 
 		// ensure a tour is setup
-		onMesgSession_Tour_10_Initialize();
+		onMesg_Session_Tour_10_Initialize();
 
 		final Long gearChangeData = mesg.getGearChangeData();
 
@@ -69,11 +71,11 @@ public class FitContextData {
 		if (gearChangeData != null) {
 
 			// get gear list for current tour
-			List<GearData> tourGears = _allGearData.get(_currentTourContext);
+			List<GearData> tourGears = _allGearData.get(_current_TourContext);
 
 			if (tourGears == null) {
-				tourGears = new ArrayList<GearData>();
-				_allGearData.put(_currentTourContext, tourGears);
+				tourGears = new ArrayList<>();
+				_allGearData.put(_current_TourContext, tourGears);
 			}
 
 			// create gear data for the current time
@@ -93,158 +95,283 @@ public class FitContextData {
 		}
 	}
 
-	public TimeData getCurrentTimeData() {
+	void context_HrMesg(final HrMesg mesg) {
 
-		if (_currentTimeData == null) {
+		// ensure tour is setup
+		onMesg_Session_Tour_10_Initialize();
+
+//		System.out.println(String.format(""
+//
+//				+ "[%s]"
+//
+//				+ " NumEventTimestamp %-3d"
+//				+ " NumFilteredBpm %-3d"
+//
+//				+ " Timestamp %-29s"
+//				+ " timestamp %-15s"
+//				+ " FractionalTimestamp: %-7.5f"
+////				+ (" Time256: " + mesg.getTime256())
+//
+//				+ " EventTimestamp %-90s "
+//				+ " FilteredBpm %-45s "
+//
+//				+ (" NumEventTimestamp12 %-5d")
+//				+ (" EventTimestamp12 " + Arrays.toString(mesg.getEventTimestamp12())),
+//
+//				getClass().getSimpleName(),
+//
+//				mesg.getNumEventTimestamp(),
+//				mesg.getNumFilteredBpm(),
+//
+//				mesg.getTimestamp(),
+//				mesg.getTimestamp() == null ? "" : mesg.getTimestamp().getTimestamp(),
+//				mesg.getFractionalTimestamp() == null ? null : mesg.getFractionalTimestamp(),
+//
+//				Arrays.toString(mesg.getEventTimestamp()),
+//				Arrays.toString(mesg.getFilteredBpm()),
+//
+//				mesg.getNumEventTimestamp12()
+//		));
+//TODO remove SYSTEM.OUT.PRINTLN
+
+		boolean isTimeAvailable = false;
+
+		final int numEventTimestamp = mesg.getNumEventTimestamp();
+		if (numEventTimestamp < 1) {
+			return;
+		}
+
+		final Float[] allEventTimestamps = mesg.getEventTimestamp();
+		final Short[] allFilteredBpm = mesg.getFilteredBpm();
+
+		if (allFilteredBpm.length != allEventTimestamps.length) {
+
+			TourLogManager.logError(String.format("Fit file has different filtered data: EventTimestamp: %d - FilteredBpm: %d",
+					allEventTimestamps.length,
+					allFilteredBpm.length));
+
+			return;
+		}
+
+		for (int timeStampIndex = 0; timeStampIndex < allEventTimestamps.length; timeStampIndex++) {
+
+			final Float eventTimeStamp = allEventTimestamps[timeStampIndex];
+			final Short filteredBpm = allFilteredBpm[timeStampIndex];
+
+			final double sliceGarminTimeS = eventTimeStamp + 901846752.0;
+			final long sliceGarminTimeMS = (long) (sliceGarminTimeS * 1000);
+			final long sliceJavaTime = sliceGarminTimeMS + com.garmin.fit.DateTime.OFFSET;
+
+			for (final TimeData timeData : _previous_AllTimeData) {
+
+				if (timeData.absoluteTime == sliceJavaTime) {
+
+					timeData.pulse = filteredBpm;
+					isTimeAvailable = true;
+
+//					System.out.println(String.format(""
+//
+//							+ "[%s]"
+//
+//							+ (" eventTimeStamp %-8.2f   ")
+//							+ (" sliceJavaTime %d   ")
+//							+ (" localDT %s   ")
+//							+ (" bpm %d"),
+//
+//							getClass().getSimpleName(),
+//
+//							eventTimeStamp,
+//							sliceJavaTime,
+//							new LocalDateTime(sliceJavaTime),
+//							filteredBpm
+//
+//// TODO remove SYSTEM.OUT.PRINTLN
+//					));
+
+					break;
+				}
+			}
+
+			if (isTimeAvailable == false) {
+
+				// timeslice is not yet created for this heartrate
+
+//				System.out.println(String.format(""
+//
+//						+ "[%s]"
+//
+//						+ (" eventTimeStamp %-8.2f   ")
+//						+ (" sliceJavaTime %d   ")
+//						+ (" localDT %s   ")
+//						+ (" bpm %d - no timeslice"),
+//
+//						getClass().getSimpleName(),
+//
+//						eventTimeStamp,
+//						sliceJavaTime,
+//						new LocalDateTime(sliceJavaTime),
+//						filteredBpm
+//
+//// TODO remove SYSTEM.OUT.PRINTLN
+//				));
+			}
+		}
+	}
+
+	public TimeData getCurrent_TimeData() {
+
+		if (_current_TimeData == null) {
 			throw new IllegalArgumentException("Time data is not initialized"); //$NON-NLS-1$
 		}
 
-		return _currentTimeData;
+		return _current_TimeData;
 
 	}
 
-	public TourData getCurrentTourData() {
+	public TourData getCurrent_TourData() {
 
-		if (_currentTourContext == null) {
+		if (_current_TourContext == null) {
 			throw new IllegalArgumentException("Tour data is not initialized"); //$NON-NLS-1$
 		}
 
-		return _currentTourContext.__tourData;
+		return _current_TourContext.__tourData;
 	}
 
-	public TourMarker getCurrentTourMarker() {
+	public TourMarker getCurrent_TourMarker() {
 
-		if (_currentTourMarker == null) {
+		if (_current_TourMarker == null) {
 			throw new IllegalArgumentException("Tour marker is not initialized"); //$NON-NLS-1$
 		}
 
-		return _currentTourMarker;
+		return _current_TourMarker;
 	}
 
-	public void onMesgLap_Marker_10_Initialize() {
+	public void onMesg_Lap_Marker_10_Initialize() {
 
-		onMesgSession_Tour_10_Initialize();
+		onMesg_Session_Tour_10_Initialize();
 
-		List<TourMarker> tourMarkers = _allTourMarker.get(_currentTourContext);
+		List<TourMarker> tourMarkers = _allTourMarker.get(_current_TourContext);
 
 		if (tourMarkers == null) {
 
-			tourMarkers = new ArrayList<TourMarker>();
+			tourMarkers = new ArrayList<>();
 
-			_allTourMarker.put(_currentTourContext, tourMarkers);
+			_allTourMarker.put(_current_TourContext, tourMarkers);
 		}
 
-		_currentTourMarker = new TourMarker(getCurrentTourData(), ChartLabel.MARKER_TYPE_DEVICE);
-		tourMarkers.add(_currentTourMarker);
+		_current_TourMarker = new TourMarker(getCurrent_TourData(), ChartLabel.MARKER_TYPE_DEVICE);
+		tourMarkers.add(_current_TourMarker);
 	}
 
-	public void onMesgLap_Marker_20_Finalize() {
+	public void onMesg_Lap_Marker_20_Finalize() {
 
-		_currentTourMarker = null;
+		_current_TourMarker = null;
 	}
 
-	public void onMesgRecord_Time_10_Initialize() {
+	public void onMesg_Record_Time_10_Initialize() {
 
 		// ensure tour is setup
-		onMesgSession_Tour_10_Initialize();
+		onMesg_Session_Tour_10_Initialize();
 
-		if (_currentTimeDataList == null) {
+		if (_current_AllTimeData == null) {
 
-			_currentTimeDataList = new ArrayList<TimeData>();
+			_current_AllTimeData = new ArrayList<>();
 
-			_allTimeData.put(_currentTourContext, _currentTimeDataList);
+			_allTimeData.put(_current_TourContext, _current_AllTimeData);
 		}
 
-		_currentTimeData = new TimeData();
+		_current_TimeData = new TimeData();
 	}
 
-	public void onMesgRecord_Time_20_Finalize() {
+	public void onMesg_Record_Time_20_Finalize() {
 
-		if (_currentTimeData == null) {
+		if (_current_TimeData == null) {
 			// this occured
 			return;
 		}
 
 		boolean useThisTimeSlice = true;
 
-		if (_previousTimeData != null) {
+		if (_previous_TimeData != null) {
 
-			final long prevTime = _previousTimeData.absoluteTime;
-			final long currentTime = _currentTimeData.absoluteTime;
+			final long prevTime = _previous_TimeData.absoluteTime;
+			final long currentTime = _current_TimeData.absoluteTime;
 
 			if (prevTime == currentTime) {
 
 				/*
-				 * Ignore and merge duplicated records. The device Bryton 210 creates duplicated
-				 * enries, to have valid data for this device, they must be merged.
+				 * Ignore and merge duplicated records. The device Bryton 210 creates duplicated enries,
+				 * to have valid data for this device, they must be merged.
 				 */
 
 				useThisTimeSlice = false;
 
-				if (_previousTimeData.absoluteAltitude == Float.MIN_VALUE) {
-					_previousTimeData.absoluteAltitude = _currentTimeData.absoluteAltitude;
+				if (_previous_TimeData.absoluteAltitude == Float.MIN_VALUE) {
+					_previous_TimeData.absoluteAltitude = _current_TimeData.absoluteAltitude;
 				}
 
-				if (_previousTimeData.absoluteDistance == Float.MIN_VALUE) {
-					_previousTimeData.absoluteDistance = _currentTimeData.absoluteDistance;
+				if (_previous_TimeData.absoluteDistance == Float.MIN_VALUE) {
+					_previous_TimeData.absoluteDistance = _current_TimeData.absoluteDistance;
 				}
 
-				if (_previousTimeData.cadence == Float.MIN_VALUE) {
-					_previousTimeData.cadence = _currentTimeData.cadence;
+				if (_previous_TimeData.cadence == Float.MIN_VALUE) {
+					_previous_TimeData.cadence = _current_TimeData.cadence;
 				}
 
-				if (_previousTimeData.latitude == Double.MIN_VALUE) {
-					_previousTimeData.latitude = _currentTimeData.latitude;
+				if (_previous_TimeData.latitude == Double.MIN_VALUE) {
+					_previous_TimeData.latitude = _current_TimeData.latitude;
 				}
 
-				if (_previousTimeData.longitude == Double.MIN_VALUE) {
-					_previousTimeData.longitude = _currentTimeData.longitude;
+				if (_previous_TimeData.longitude == Double.MIN_VALUE) {
+					_previous_TimeData.longitude = _current_TimeData.longitude;
 				}
 
-				if (_previousTimeData.power == Float.MIN_VALUE) {
-					_previousTimeData.power = _currentTimeData.power;
+				if (_previous_TimeData.power == Float.MIN_VALUE) {
+					_previous_TimeData.power = _current_TimeData.power;
 				}
 
-				if (_previousTimeData.pulse == Float.MIN_VALUE) {
-					_previousTimeData.pulse = _currentTimeData.pulse;
+				if (_previous_TimeData.pulse == Float.MIN_VALUE) {
+					_previous_TimeData.pulse = _current_TimeData.pulse;
 				}
 
-				if (_previousTimeData.speed == Float.MIN_VALUE) {
-					_previousTimeData.speed = _currentTimeData.speed;
+				if (_previous_TimeData.speed == Float.MIN_VALUE) {
+					_previous_TimeData.speed = _current_TimeData.speed;
 				}
 
-				if (_previousTimeData.temperature == Float.MIN_VALUE) {
-					_previousTimeData.temperature = _currentTimeData.temperature;
+				if (_previous_TimeData.temperature == Float.MIN_VALUE) {
+					_previous_TimeData.temperature = _current_TimeData.temperature;
 				}
 			}
 		}
 
 		if (useThisTimeSlice) {
-			_currentTimeDataList.add(_currentTimeData);
+			_current_AllTimeData.add(_current_TimeData);
 		}
 
-		_previousTimeData = _currentTimeData;
-		_currentTimeData = null;
+		_previous_TimeData = _current_TimeData;
+		_current_TimeData = null;
 	}
 
-	public void onMesgSession_Tour_10_Initialize() {
+	public void onMesg_Session_Tour_10_Initialize() {
 
-		if (_currentTourContext == null) {
+		if (_current_TourContext == null) {
 
 			final TourData currentTourData = new TourData();
 
-			_currentTourContext = new TourContext(currentTourData);
+			_current_TourContext = new TourContext(currentTourData);
 
-			_allTourContext.add(_currentTourContext);
+			_allTourContext.add(_current_TourContext);
 		}
 	}
 
-	public void onMesgSession_Tour_20_Finalize() {
+	public void onMesg_Session_Tour_20_Finalize() {
 
-		onMesgRecord_Time_20_Finalize();
+		onMesg_Record_Time_20_Finalize();
 
-		_currentTourContext = null;
-		_currentTimeDataList = null;
+		_previous_AllTimeData = _current_AllTimeData;
+
+		_current_TourContext = null;
+		_current_AllTimeData = null;
 	}
 
 	public void processAllTours(final FitContextDataHandler handler) {

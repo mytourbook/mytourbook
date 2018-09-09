@@ -1,5 +1,8 @@
 package net.tourbook.device.garmin.fit;
 
+import com.garmin.fit.EventMesg;
+import com.garmin.fit.HrMesg;
+
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,6 +10,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.eclipse.jface.preference.IPreferenceStore;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -18,53 +23,49 @@ import net.tourbook.data.TourMarker;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.tour.TourLogManager;
 
-import org.eclipse.jface.preference.IPreferenceStore;
-
-import com.garmin.fit.EventMesg;
-
 /**
  * Garmin FIT activity context used by message listeners to store activity data loaded from FIT
  * file. The loaded data is converted into {@link TourData} records (one record for each session).
- * 
+ *
  * @author Marcin Kuthan <marcin.kuthan@gmail.com>
  */
 public class FitContext {
 
-	private IPreferenceStore		_prefStore	= Activator.getDefault().getPreferenceStore();
+	private IPreferenceStore			_prefStore	= Activator.getDefault().getPreferenceStore();
 
-	private TourbookDevice			_device;
-	private final String			_importFilePathName;
+	private TourbookDevice				_device;
+	private final String					_importFilePathName;
 
-	private FitContextData			_contextData;
+	private FitContextData				_contextData;
 
-	private boolean					_isHeartRateSensorPresent;
-	private boolean					_isPowerSensorPresent;
-	private boolean					_isSpeedSensorPresent;
-	private boolean					_isStrideSensorPresent;
+	private boolean						_isHeartRateSensorPresent;
+	private boolean						_isPowerSensorPresent;
+	private boolean						_isSpeedSensorPresent;
+	private boolean						_isStrideSensorPresent;
 
-	private String					_deviceId;
-	private String					_manufacturer;
-	private String					_garminProduct;
-	private String					_softwareVersion;
+	private String							_deviceId;
+	private String							_manufacturer;
+	private String							_garminProduct;
+	private String							_softwareVersion;
 
-	private String					_sessionIndex;
+	private String							_sessionIndex;
 
-	private ZonedDateTime			_sessionTime;
+	private ZonedDateTime				_sessionTime;
 
-	private float					_lapDistance;
-	private int						_lapTime;
+	private float							_lapDistance;
+	private int								_lapTime;
 
 	private Map<Long, TourData>		_alreadyImportedTours;
 	private HashMap<Long, TourData>	_newlyImportedTours;
 
-	private boolean					_isIgnoreLastMarker;
-	private boolean					_isSetLastMarker;
-	private int						_lastMarkerTimeSlices;
+	private boolean						_isIgnoreLastMarker;
+	private boolean						_isSetLastMarker;
+	private int								_lastMarkerTimeSlices;
 
-	public FitContext(	final TourbookDevice device,
-						final String importFilePath,
-						final Map<Long, TourData> alreadyImportedTours,
-						final HashMap<Long, TourData> newlyImportedTours) {
+	public FitContext(final TourbookDevice device,
+							final String importFilePath,
+							final Map<Long, TourData> alreadyImportedTours,
+							final HashMap<Long, TourData> newlyImportedTours) {
 
 		_device = device;
 		_importFilePathName = importFilePath;
@@ -84,9 +85,9 @@ public class FitContext {
 
 			@Override
 			public void finalizeTour(	final TourData tourData,
-										final List<TimeData> timeDataList,
-										final List<TourMarker> tourMarkers,
-										final List<GearData> gears) {
+												final List<TimeData> timeDataList,
+												final List<TourMarker> tourMarkers,
+												final List<GearData> gears) {
 
 				resetSpeedAtFirstPosition(timeDataList);
 
@@ -121,10 +122,12 @@ public class FitContext {
 								String.format(
 										message,
 										_importFilePathName,
-										TimeTools.getZonedDateTime(sessionStartTime).format(
-												TimeTools.Formatter_DateTime_M),
-										TimeTools.getZonedDateTime(recordStartTime).format(
-												TimeTools.Formatter_DateTime_M),
+										TimeTools.getZonedDateTime(sessionStartTime)
+												.format(
+														TimeTools.Formatter_DateTime_M),
+										TimeTools.getZonedDateTime(recordStartTime)
+												.format(
+														TimeTools.Formatter_DateTime_M),
 										(recordStartTime - sessionStartTime) / 1000));
 					}
 				}
@@ -168,7 +171,7 @@ public class FitContext {
 				final long tourStartTime = tourData.getTourStartTimeMS();
 				final long tourEndTime = tourStartTime + (timeSerie[timeSerie.length - 1] * 1000);
 
-				final List<GearData> validatedGearList = new ArrayList<GearData>();
+				final List<GearData> validatedGearList = new ArrayList<>();
 				GearData startGear = null;
 
 				for (final GearData gearData : gearList) {
@@ -189,9 +192,9 @@ public class FitContext {
 						 * contained the wrong values.
 						 * <p>
 						 * <code>
-						 * 
+						 *
 						 *  2015-08-30 08:12:50.092'345 [FitContextData]
-						 * 
+						 *
 						 * 	Gears: GearData [absoluteTime=2015-08-27T17:39:08.000+02:00,
 						 * 			FrontGearNum	= 2,
 						 * 			FrontGearTeeth	= 50,
@@ -202,8 +205,8 @@ public class FitContext {
 						 */
 
 						/*
-						 * Set valid value but make it visible that the values are wrong, visible
-						 * value is 0x10 / 0x30 = 0.33
+						 * Set valid value but make it visible that the values are wrong, visible value is
+						 * 0x10 / 0x30 = 0.33
 						 */
 
 						gearData.gears = 0x10013001;
@@ -306,8 +309,8 @@ public class FitContext {
 						if (isSetMarker) {
 
 							/*
-							 * a last marker can be set when it's far enough away from the end, this
-							 * will disable the last tour marker
+							 * a last marker can be set when it's far enough away from the end, this will
+							 * disable the last tour marker
 							 */
 							final boolean canSetLastMarker = _isIgnoreLastMarker
 									&& serieIndex < serieSize - _lastMarkerTimeSlices;
@@ -332,7 +335,7 @@ public class FitContext {
 					}
 				}
 
-				final Set<TourMarker> tourTourMarkers = new HashSet<TourMarker>(validatedTourMarkers);
+				final Set<TourMarker> tourTourMarkers = new HashSet<>(validatedTourMarkers);
 
 				tourData.setTourMarkers(tourTourMarkers);
 			}
@@ -378,31 +381,35 @@ public class FitContext {
 	}
 
 	public void onMesg(final EventMesg mesg) {
-		_contextData.ctxEventMesg(mesg);
+		_contextData.context_EventMesg(mesg);
 	}
 
-	public void onMesgLap_10_Before() {
-		_contextData.onMesgLap_Marker_10_Initialize();
+	public void onMesg(final HrMesg mesg) {
+		_contextData.context_HrMesg(mesg);
 	}
 
-	public void onMesgLap_20_After() {
-		_contextData.onMesgLap_Marker_20_Finalize();
+	public void onMesg_Lap_10_Before() {
+		_contextData.onMesg_Lap_Marker_10_Initialize();
 	}
 
-	public void onMesgRecord_10_Before() {
-		_contextData.onMesgRecord_Time_10_Initialize();
+	public void onMesg_Lap_20_After() {
+		_contextData.onMesg_Lap_Marker_20_Finalize();
 	}
 
-	public void onMesgRecord_20_After() {
-		_contextData.onMesgRecord_Time_20_Finalize();
+	public void onMesg_Record_10_Before() {
+		_contextData.onMesg_Record_Time_10_Initialize();
 	}
 
-	public void onMesgSession_10_Before() {
-		_contextData.onMesgSession_Tour_10_Initialize();
+	public void onMesg_Record_20_After() {
+		_contextData.onMesg_Record_Time_20_Finalize();
 	}
 
-	public void onMesgSession_20_After() {
-		_contextData.onMesgSession_Tour_20_Finalize();
+	public void onMesg_Session_10_Before() {
+		_contextData.onMesg_Session_Tour_10_Initialize();
+	}
+
+	public void onMesg_Session_20_After() {
+		_contextData.onMesg_Session_Tour_20_Finalize();
 	}
 
 	private void resetSpeedAtFirstPosition(final List<TimeData> timeDataList) {

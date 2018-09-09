@@ -32,15 +32,16 @@ import org.apache.commons.io.IOUtils;
 
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.data.TourData;
-import net.tourbook.device.garmin.fit.listeners.ActivityMesgListenerImpl;
-import net.tourbook.device.garmin.fit.listeners.BikeProfileMesgListenerImpl;
-import net.tourbook.device.garmin.fit.listeners.DeviceInfoMesgListenerImpl;
-import net.tourbook.device.garmin.fit.listeners.EventMesgListenerImpl;
-import net.tourbook.device.garmin.fit.listeners.FileCreatorMesgListenerImpl;
-import net.tourbook.device.garmin.fit.listeners.FileIdMesgListenerImpl;
-import net.tourbook.device.garmin.fit.listeners.LapMesgListenerImpl;
-import net.tourbook.device.garmin.fit.listeners.RecordMesgListenerImpl;
-import net.tourbook.device.garmin.fit.listeners.SessionMesgListenerImpl;
+import net.tourbook.device.garmin.fit.listeners.Activity_MesgListenerImpl;
+import net.tourbook.device.garmin.fit.listeners.BikeProfile_MesgListenerImpl;
+import net.tourbook.device.garmin.fit.listeners.DeviceInfo_MesgListenerImpl;
+import net.tourbook.device.garmin.fit.listeners.Event_MesgListenerImpl;
+import net.tourbook.device.garmin.fit.listeners.FileCreator_MesgListenerImpl;
+import net.tourbook.device.garmin.fit.listeners.FileId_MesgListenerImpl;
+import net.tourbook.device.garmin.fit.listeners.Hr_MesgListenerImpl;
+import net.tourbook.device.garmin.fit.listeners.Lap_MesgListenerImpl;
+import net.tourbook.device.garmin.fit.listeners.Record_MesgListenerImpl;
+import net.tourbook.device.garmin.fit.listeners.Session_MesgListenerImpl;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
@@ -84,12 +85,12 @@ public class FitDataReader extends TourbookDevice {
 					 */
 					if (fieldName.equals("") // //$NON-NLS-1$
 
-//							|| fieldName.equals("name") //$NON-NLS-1$
-//							|| fieldName.equals("time") //$NON-NLS-1$
-//							|| fieldName.equals("timestamp") //$NON-NLS-1$
+//							|| fieldName.equals("name") //															//$NON-NLS-1$
+//							|| fieldName.equals("time") //															//$NON-NLS-1$
+//							|| fieldName.equals("timestamp") //														//$NON-NLS-1$
 //
-//							|| fieldName.equals("event_timestamp_12") //$NON-NLS-1$
-//							|| fieldName.equals("event_timestamp") //$NON-NLS-1$
+//							|| fieldName.equals("event_timestamp_12") //											//$NON-NLS-1$
+//							|| fieldName.equals("event_timestamp") //												//$NON-NLS-1$
 //							|| fieldName.equals("fractional_timestamp") //		   0.730224609375 s		//$NON-NLS-1$
 //
 //							|| fieldName.equals("pool_length") //					25.0 m						//$NON-NLS-1$
@@ -106,8 +107,8 @@ public class FitDataReader extends TourbookDevice {
 //
 //							|| fieldName.equals("altitude") //$NON-NLS-1$
 //							|| fieldName.equals("cadence") //$NON-NLS-1$
-//							|| fieldName.equals("distance") //$NON-NLS-1$
 //							|| fieldName.equals("fractional_cadence") //$NON-NLS-1$
+//							|| fieldName.equals("distance") //$NON-NLS-1$
 //							|| fieldName.equals("grade") //$NON-NLS-1$
 //							|| fieldName.equals("heart_rate") //$NON-NLS-1$
 //							|| fieldName.equals("position_lat") //$NON-NLS-1$
@@ -145,12 +146,12 @@ public class FitDataReader extends TourbookDevice {
 //
 //					// running dynamics
 //
-//							|| fieldName.equals("stance_time") //						  253.0  ms			//$NON-NLS-1$
-//							|| fieldName.equals("stance_time_percent") //			   34.75 percent	//$NON-NLS-1$
-//							|| fieldName.equals("stance_time_balance") //			   51.31 percent	//$NON-NLS-1$
-//							|| fieldName.equals("step_length") //						 1526.0  mm			//$NON-NLS-1$
-//							|| fieldName.equals("vertical_oscillation") //			    7.03 percent	//$NON-NLS-1$
-//							|| fieldName.equals("vertical_ratio") //					  114.2  mm			//$NON-NLS-1$
+//							|| fieldName.equals("stance_time") //						  253.0  ms				//$NON-NLS-1$
+//							|| fieldName.equals("stance_time_percent") //			   34.75 percent		//$NON-NLS-1$
+//							|| fieldName.equals("stance_time_balance") //			   51.31 percent		//$NON-NLS-1$
+//							|| fieldName.equals("step_length") //						 1526.0  mm				//$NON-NLS-1$
+//							|| fieldName.equals("vertical_oscillation") //			    7.03 percent		//$NON-NLS-1$
+//							|| fieldName.equals("vertical_ratio") //					  114.2  mm				//$NON-NLS-1$
 //
 //					// lap data
 //
@@ -291,11 +292,23 @@ public class FitDataReader extends TourbookDevice {
 					final long javaTime = (garminTimestamp * 1000) + com.garmin.fit.DateTime.OFFSET;
 
 					System.out.println(
-							String.format(
-									"%s %d %s %-5d %-30s %20s %s", //$NON-NLS-1$
-									TimeTools.getZonedDateTime(javaTime), // show readable date/time
-									javaTime / 1000,
-									Long.toString(garminTimestamp),
+
+							String.format(""
+
+									+ "[%s]"
+
+					// time
+									+ " %-42s %d  %s  "
+
+					// field
+									+ " %-5d %-30s %20s %s", //$NON-NLS-1$
+
+									FitDataReader.class.getSimpleName(),
+
+									TimeTools.getZonedDateTime(javaTime), // 		show readable date/time
+									javaTime / 1000, //									java time in s
+									Long.toString(garminTimestamp), //				garmin timestamp
+
 									field.getNum(),
 									fieldName,
 									field.getValue(),
@@ -336,10 +349,10 @@ public class FitDataReader extends TourbookDevice {
 	}
 
 	@Override
-	public boolean processDeviceData(	final String importFilePath,
-										final DeviceData deviceData,
-										final HashMap<Long, TourData> alreadyImportedTours,
-										final HashMap<Long, TourData> newlyImportedTours) {
+	public boolean processDeviceData(final String importFilePath,
+												final DeviceData deviceData,
+												final HashMap<Long, TourData> alreadyImportedTours,
+												final HashMap<Long, TourData> newlyImportedTours) {
 
 		boolean returnValue = false;
 
@@ -354,15 +367,16 @@ public class FitDataReader extends TourbookDevice {
 					newlyImportedTours);
 
 			// setup all fit listeners
-			broadcaster.addListener(new ActivityMesgListenerImpl(context));
-			broadcaster.addListener(new BikeProfileMesgListenerImpl(context));
-			broadcaster.addListener(new DeviceInfoMesgListenerImpl(context));
-			broadcaster.addListener(new EventMesgListenerImpl(context));
-			broadcaster.addListener(new FileCreatorMesgListenerImpl(context));
-			broadcaster.addListener(new FileIdMesgListenerImpl(context));
-			broadcaster.addListener(new LapMesgListenerImpl(context));
-			broadcaster.addListener(new RecordMesgListenerImpl(context));
-			broadcaster.addListener(new SessionMesgListenerImpl(context));
+			broadcaster.addListener(new Activity_MesgListenerImpl(context));
+			broadcaster.addListener(new BikeProfile_MesgListenerImpl(context));
+			broadcaster.addListener(new DeviceInfo_MesgListenerImpl(context));
+			broadcaster.addListener(new Event_MesgListenerImpl(context));
+			broadcaster.addListener(new FileCreator_MesgListenerImpl(context));
+			broadcaster.addListener(new FileId_MesgListenerImpl(context));
+			broadcaster.addListener(new Lap_MesgListenerImpl(context));
+			broadcaster.addListener(new Record_MesgListenerImpl(context));
+			broadcaster.addListener(new Session_MesgListenerImpl(context));
+			broadcaster.addListener(new Hr_MesgListenerImpl(context));
 
 			if (_isLogFitData) {
 
@@ -376,14 +390,19 @@ public class FitDataReader extends TourbookDevice {
 						(System.currentTimeMillis() + " [" + getClass().getSimpleName() + "]") //$NON-NLS-1$ //$NON-NLS-2$
 								+ (" \t" + importFilePath)); //$NON-NLS-1$
 				System.out.println();
-				System.out.println(
-						String.format(//
-								"%s %-5s %-30s %20s %s", //$NON-NLS-1$
-								"Timestamp", //$NON-NLS-1$
-								"Num", //$NON-NLS-1$
-								"Name", //$NON-NLS-1$
-								"Value", //$NON-NLS-1$
-								"Units")); //$NON-NLS-1$
+				System.out.println(String.format(//
+
+						"%-15s %-66s %-5s %-30s %20s %s", //$NON-NLS-1$
+
+						"Java",
+						"Timestamp", //$NON-NLS-1$
+						"Num", //$NON-NLS-1$
+						"Name", //$NON-NLS-1$
+						"Value", //$NON-NLS-1$
+						"Units" //$NON-NLS-1$
+
+				));
+
 				System.out.println();
 
 				addAllLogListener(broadcaster);
