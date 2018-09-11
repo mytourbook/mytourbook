@@ -18,6 +18,16 @@ package net.tourbook.statistics.graphs;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
+import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.IWorkbenchPart;
+
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
@@ -38,6 +48,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.statistic.StatisticContext;
+import net.tourbook.statistic.StatisticView;
 import net.tourbook.statistic.TourbookStatistic;
 import net.tourbook.statistics.IBarSelectionProvider;
 import net.tourbook.statistics.Messages;
@@ -55,53 +66,42 @@ import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.action.ActionEditQuick;
 
-import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.TraverseEvent;
-import org.eclipse.swt.events.TraverseListener;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.ui.IViewSite;
-import org.eclipse.ui.IWorkbenchPart;
-
 public abstract class StatisticDay extends TourbookStatistic implements IBarSelectionProvider, ITourProvider {
 
 // SET_FORMATTING_OFF
-	
+
 	private static final String			TOUR_TOOLTIP_FORMAT_DATE_WEEK_TIME	= net.tourbook.ui.Messages.Tour_Tooltip_Format_DateWeekTime;
-	
+
 // SET_FORMATTING_ON
 
-	private TourTypeFilter				_activeTourTypeFilter;
-	private TourPerson					_activePerson;
+	private TourTypeFilter					_activeTourTypeFilter;
+	private TourPerson						_activePerson;
 
-	private long						_selectedTourId						= -1;
+	private long								_selectedTourId							= -1;
 
-	private int							_currentYear;
-	private int							_numberOfYears;
+	private int									_currentYear;
+	private int									_numberOfYears;
 
-	private Chart						_chart;
-	private StatisticContext			_statContext;
+	private Chart								_chart;
+	private StatisticContext				_statContext;
 
-	private final MinMaxKeeper_YData	_minMaxKeeper						= new MinMaxKeeper_YData();
-	private TourData_Day				_tourDayData;
+	private final MinMaxKeeper_YData		_minMaxKeeper								= new MinMaxKeeper_YData();
+	private TourData_Day						_tourDayData;
 
-	private boolean						_isInUpdateUI;
-	private boolean						_isSynchScaleEnabled;
+	private boolean							_isSynchScaleEnabled;
 
-	private ITourEventListener			_tourPropertyListener;
-	private StatisticTourToolTip		_tourToolTip;
+	private ITourEventListener				_tourPropertyListener;
+	private StatisticTourToolTip			_tourToolTip;
 
-	private TourInfoIconToolTipProvider	_tourInfoToolTipProvider			= new TourInfoIconToolTipProvider();
+	private TourInfoIconToolTipProvider	_tourInfoToolTipProvider				= new TourInfoIconToolTipProvider();
 
 	private void addTourPropertyListener() {
 
 		_tourPropertyListener = new ITourEventListener() {
 			@Override
 			public void tourChanged(final IWorkbenchPart part,
-									final TourEventId propertyId,
-									final Object propertyData) {
+											final TourEventId propertyId,
+											final Object propertyData) {
 
 				if (propertyId == TourEventId.TOUR_CHANGED && propertyData instanceof TourEvent) {
 
@@ -202,12 +202,12 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 					_selectedTourId = _tourDayData.tourIds[valueIndex];
 					_tourInfoToolTipProvider.setTourId(_selectedTourId);
 
-					if (_isInUpdateUI) {
+					if (StatisticView.isInUpdateUI()) {
 
 						/*
-						 * Do not fire an event when this is running already in an update event.
-						 * This occures when a tour is modified (marker) in the toubook view and the
-						 * stat view is opened !!!
+						 * Do not fire an event when this is running already in an update event. This
+						 * occures when a tour is modified (marker) in the toubook view and the stat view
+						 * is opened !!!
 						 */
 
 						return;
@@ -284,9 +284,10 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 
 		final String tourTypeName = TourDatabase.getTourTypeName(_tourDayData.typeIds[valueIndex]);
 		final String tourTags = TourDatabase.getTagNames(_tourDayData.tagIds.get(tooltipTourId));
-		final String tourDescription = _tourDayData.tourDescription.get(valueIndex).replace(
-				net.tourbook.ui.UI.SYSTEM_NEW_LINE,
-				UI.NEW_LINE1);
+		final String tourDescription = _tourDayData.tourDescription.get(valueIndex)
+				.replace(
+						net.tourbook.ui.UI.SYSTEM_NEW_LINE,
+						UI.NEW_LINE1);
 
 		final int[] startValue = _tourDayData.tourStartValues;
 		final int[] endValue = _tourDayData.tourEndValues;
@@ -571,7 +572,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 			return null;
 		}
 
-		final ArrayList<TourData> selectedTours = new ArrayList<TourData>();
+		final ArrayList<TourData> selectedTours = new ArrayList<>();
 
 		selectedTours.add(TourManager.getInstance().getTourData(_selectedTourId));
 
@@ -684,7 +685,6 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 		_activeTourTypeFilter = statContext.appTourTypeFilter;
 		_currentYear = statContext.statFirstYear;
 		_numberOfYears = statContext.statNumberOfYears;
-		_isInUpdateUI = statContext.isInUpdateUI;
 
 		/*
 		 * get currently selected tour id
@@ -710,12 +710,13 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 			}
 		}
 
-		_tourDayData = DataProvider_Tour_Day.getInstance().getDayData(
-				statContext.appPerson,
-				statContext.appTourTypeFilter,
-				statContext.statFirstYear,
-				statContext.statNumberOfYears,
-				isDataDirtyWithReset() || statContext.isRefreshData);
+		_tourDayData = DataProvider_Tour_Day.getInstance()
+				.getDayData(
+						statContext.appPerson,
+						statContext.appTourTypeFilter,
+						statContext.statFirstYear,
+						statContext.statNumberOfYears,
+						isDataDirtyWithReset() || statContext.isRefreshData);
 
 		// reset min/max values
 		if (_isSynchScaleEnabled == false && statContext.isRefreshData) {

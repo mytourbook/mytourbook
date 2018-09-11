@@ -86,6 +86,8 @@ public class StatisticView extends ViewPart implements ITourProvider {
 	private static final boolean				_isOSX							= net.tourbook.common.UI.IS_OSX;
 	private static final boolean				_isLinux							= net.tourbook.common.UI.IS_LINUX;
 
+	private static boolean						_isInUpdateUI;
+
 	private final IPreferenceStore			_prefStore						= TourbookPlugin.getPrefStore();
 	private final IPreferenceStore			_prefStoreCommon				= CommonActivator.getPrefStore();
 	private final IDialogSettings				_state							= TourbookPlugin.getState("TourStatisticsView");	//$NON-NLS-1$
@@ -97,6 +99,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
 	private ISelectionListener					_postSelectionListener;
 
 	private TourPerson							_activePerson;
+
 	private TourTypeFilter						_activeTourTypeFilter;
 
 	private int										_selectedYear					= -1;
@@ -112,11 +115,9 @@ public class StatisticView extends ViewPart implements ITourProvider {
 	 * contains the statistics in the same sort order as the statistic combo box
 	 */
 	private ArrayList<TourbookStatistic>	_allStatisticProvider;
-
 	private ActionStatisticOptions			_actionStatisticOptions;
 	private ActionSynchChartScale				_actionSynchChartScale;
 
-	private boolean								_isInUpdateUI;
 	private boolean								_isSynchScaleEnabled;
 	private boolean								_isVerticalOrderDisabled;
 
@@ -149,6 +150,10 @@ public class StatisticView extends ViewPart implements ITourProvider {
 			return _slideoutStatisticOptions;
 		}
 
+	}
+
+	public static boolean isInUpdateUI() {
+		return _isInUpdateUI;
 	}
 
 	void actionSynchScale(final boolean isEnabled) {
@@ -946,7 +951,6 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
 		statContext.isRefreshData = true;
 		statContext.eventManager = this;
-		statContext.isInUpdateUI = _isInUpdateUI;
 
 		_activeStatistic.updateStatistic(statContext);
 
