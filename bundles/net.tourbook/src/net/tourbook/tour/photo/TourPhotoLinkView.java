@@ -635,7 +635,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 			_pageViewer = new Composite(_pageBook, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageViewer);
 			GridLayoutFactory.fillDefaults().applyTo(_pageViewer);
-			_pageViewer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+//			_pageViewer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 			{
 				createUI_20_Tours(_pageViewer);
 			}
