@@ -17,6 +17,24 @@ package net.tourbook.ui.tourChart;
 
 import java.util.ArrayList;
 
+import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.part.PageBook;
+import org.eclipse.ui.part.ViewPart;
+
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
@@ -57,24 +75,6 @@ import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 import net.tourbook.ui.views.tourCatalog.TourCatalogView_ComparedTour;
 import net.tourbook.ui.views.tourSegmenter.TourSegmenterView;
 
-import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IPartListener2;
-import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchPartReference;
-import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eclipse.ui.part.PageBook;
-import org.eclipse.ui.part.ViewPart;
-
 // author: Wolfgang Schramm
 // create: 09.07.2007
 
@@ -84,40 +84,40 @@ import org.eclipse.ui.part.ViewPart;
 public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoEventListener, ITourModifyListener,
 		IGeoCompareListener {
 
-	public static final String		ID			= "net.tourbook.views.TourChartView";	//$NON-NLS-1$
+	public static final String			ID				= "net.tourbook.views.TourChartView";	//$NON-NLS-1$
 
-	private final IDialogSettings	_state		= TourbookPlugin.getState(ID);
+	private final IDialogSettings		_state		= TourbookPlugin.getState(ID);
 	private final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
 
 	private TourChartConfiguration	_tourChartConfig;
-	private TourData				_tourData;
-	private TourPhotoLink			_tourPhotoLink;
+	private TourData						_tourData;
+	private TourPhotoLink				_tourPhotoLink;
 
 	/**
 	 * Chart update is forced, when previous selection was a photo link or current selection is a
 	 * photo link.
 	 */
-	private boolean					_isForceUpdate;
+	private boolean						_isForceUpdate;
 
-	private PostSelectionProvider	_postSelectionProvider;
-	private ISelectionListener		_postSelectionListener;
+	private IPartListener2				_partListener;
+	private PostSelectionProvider		_postSelectionProvider;
+	private ISelectionListener			_postSelectionListener;
 	private IPropertyChangeListener	_prefChangeListener;
-	private ITourEventListener		_tourEventListener;
-	private IPartListener2			_partListener;
+	private ITourEventListener			_tourEventListener;
 
-	private boolean					_isInSaving;
-	private boolean					_isInSelectionChanged;
-	private boolean					_isInSliderPositionFired;
+	private boolean						_isInSaving;
+	private boolean						_isInSelectionChanged;
+	private boolean						_isInSliderPositionFired;
 
-	private FormToolkit				_tk;
+	private FormToolkit					_tk;
 
 	/*
 	 * UI controls
 	 */
-	private PageBook				_pageBook;
-	private Composite				_pageNoData;
+	private PageBook						_pageBook;
+	private Composite						_pageNoData;
 
-	private TourChart				_tourChart;
+	private TourChart						_tourChart;
 
 	private void addPartListener() {
 
@@ -199,8 +199,8 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 				//
 
 				/*
-				 * HR zone colors can be modified and person hash code has changed by saving the
-				 * person entity -> tour chart must be recreated
+				 * HR zone colors can be modified and person hash code has changed by saving the person
+				 * entity -> tour chart must be recreated
 				 */
 				property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)
 
@@ -268,8 +268,8 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 						} else {
 
 							/*
-							 * This case happened that this event contains not the same tourdata as
-							 * the tourchart, it occured for multiple tours in tourdata.
+							 * This case happened that this event contains not the same tourdata as the
+							 * tourchart, it occured for multiple tours in tourdata.
 							 */
 
 							onSelectionChanged(new SelectionTourData(eventTourData));
@@ -300,8 +300,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 							if (tourData == null) {
 
 								/*
-								 * tour is not set, this can be the case when a manual tour is
-								 * discarded
+								 * tour is not set, this can be the case when a manual tour is discarded
 								 */
 
 								clearView();
@@ -532,7 +531,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 			return null;
 		}
 
-		final ArrayList<TourData> tourList = new ArrayList<TourData>();
+		final ArrayList<TourData> tourList = new ArrayList<>();
 		tourList.add(_tourData);
 
 		return tourList;
@@ -712,8 +711,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 				} else if (firstElement instanceof TVICompareResultComparedTour) {
 
 					final TVICompareResultComparedTour compareResultItem = (TVICompareResultComparedTour) firstElement;
-					final TourData tourData = TourManager.getInstance().getTourData(
-							compareResultItem.getComparedTourData().getTourId());
+					final TourData tourData = TourManager.getInstance().getTourData(compareResultItem.getComparedTourData().getTourId());
 					updateChart(tourData);
 
 				} else if (firstElement instanceof GeoPartComparerItem) {
@@ -893,7 +891,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 	/**
 	 * Create virtual tour which contains multiple tours.
-	 * 
+	 *
 	 * @param tourIds
 	 */
 	private void updateChart(final ArrayList<Long> tourIds) {

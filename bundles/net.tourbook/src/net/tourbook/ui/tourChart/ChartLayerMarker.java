@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -17,14 +17,6 @@
  * @author Wolfgang Schramm Created: 06.07.2005
  */
 package net.tourbook.ui.tourChart;
-
-import net.tourbook.chart.Chart;
-import net.tourbook.chart.ChartMouseEvent;
-import net.tourbook.chart.GraphDrawingData;
-import net.tourbook.chart.IChartLayer;
-import net.tourbook.chart.IChartOverlay;
-import net.tourbook.data.TourMarker;
-import net.tourbook.photo.ILoadCallBack;
 
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
@@ -37,21 +29,29 @@ import org.eclipse.swt.graphics.Region;
 import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.widgets.Display;
 
+import net.tourbook.chart.Chart;
+import net.tourbook.chart.ChartMouseEvent;
+import net.tourbook.chart.GraphDrawingData;
+import net.tourbook.chart.IChartLayer;
+import net.tourbook.chart.IChartOverlay;
+import net.tourbook.data.TourMarker;
+import net.tourbook.photo.ILoadCallBack;
+
 public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 
-	private int					LABEL_OFFSET;
-	private int					MARKER_HOVER_SIZE;
-	private int					MARKER_POINT_SIZE;
-//	private int					SIGN_IMAGE_MAX_SIZE;
+	private int						LABEL_OFFSET;
+	private int						MARKER_HOVER_SIZE;
+	private int						MARKER_POINT_SIZE;
+//	private int						SIGN_IMAGE_MAX_SIZE;
 
-	private TourChart			_tourChart;
+	private TourChart				_tourChart;
 	private ChartMarkerConfig	_cmc;
 
 	private boolean				_isVertical;
 
-	private int					_devXMarker;
-	private int					_devYMarker;
-	private long				_hoveredEventTime;
+	private int						_devXMarker;
+	private int						_devYMarker;
+	private long					_hoveredEventTime;
 
 	private ChartLabel			_hoveredLabel;
 	private ChartLabel			_tooltipLabel;
@@ -88,11 +88,20 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 		_tourChart = tourChart;
 	}
 
-	private void adjustLabelPosition(	final ChartLabel chartLabel,
-										final int devYTop,
-										final int devYBottom,
-										final int labelWidth,
-										final int labelHeight) {
+	/**
+	 * Adjust label to the requested position
+	 *
+	 * @param chartLabel
+	 * @param devYTop
+	 * @param devYBottom
+	 * @param labelWidth
+	 * @param labelHeight
+	 */
+	private void adjustLabelPosition(final ChartLabel chartLabel,
+												final int devYTop,
+												final int devYBottom,
+												final int labelWidth,
+												final int labelHeight) {
 
 		final int labelHeight2 = labelHeight / 2;
 		final int markerPointSize2 = MARKER_POINT_SIZE / 2 + 0;
@@ -211,8 +220,8 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 		final long devVirtualGraphImageOffset = chart.getXXDevViewPortLeftBorder();
 		final int devGraphHeight = drawingData.devGraphHeight;
 		final long devVirtualGraphWidth = drawingData.devVirtualGraphWidth;
-//		final int devVisibleChartWidth = drawingData.getChartDrawingData().devVisibleChartWidth;
-//		final boolean isZoomed = devVirtualGraphWidth != devVisibleChartWidth;
+		final int devVisibleChartWidth = drawingData.getChartDrawingData().devVisibleChartWidth;
+		final boolean isGraphZoomed = devVirtualGraphWidth != devVisibleChartWidth;
 
 		final float graphYBottom = drawingData.getGraphYBottom();
 		final float[] yValues = drawingData.getYData().getHighValuesFloat()[0];
@@ -343,7 +352,7 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 						labelWidth,
 						labelHeight);
 
-				// add additional offset
+				// add an additional offset which is defined for all markers in the marker properties slideout
 				_devXMarker += chartLabel.labelXOffset;
 				_devYMarker -= chartLabel.labelYOffset;
 
@@ -365,8 +374,8 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 					}
 
 					// don't draw the marker to the right of the chart
-					final double devVirtualMarkerRightPos = virtualXPos + vLabelWidth;
-					if (devVirtualMarkerRightPos > devVirtualGraphWidth) {
+					final double devMarkerRightPos = _devXMarker + vLabelWidth;
+					if (devMarkerRightPos > devVirtualGraphWidth) {
 						_devXMarker = (int) (devVirtualGraphWidth - vLabelWidth - devVirtualGraphImageOffset);
 					}
 
@@ -443,8 +452,10 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 					}
 
 					// don't draw the marker to the right of the chart
-					final double devVirtualMarkerRightPos = virtualXPos + labelWidth;
-					if (devVirtualMarkerRightPos > devVirtualGraphWidth) {
+					final double devMarkerRightPos = isGraphZoomed
+							? virtualXPos + labelWidth
+							: _devXMarker + labelWidth;
+					if (devMarkerRightPos > devVirtualGraphWidth) {
 						_devXMarker = (int) (devVirtualGraphWidth - labelWidth - devVirtualGraphImageOffset - 2);
 					}
 
@@ -477,7 +488,7 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 			chartLabel.devHoverSize = MARKER_HOVER_SIZE;
 			chartLabel.devYBottom = devYBottom;
 			chartLabel.devYTop = devYTop;
-			chartLabel.devGraphWidth = drawingData.getChartDrawingData().devVisibleChartWidth;
+			chartLabel.devGraphWidth = devVisibleChartWidth;
 		}
 
 		/*
@@ -620,11 +631,11 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 	}
 
 	private void drawOverlay_Label(	final ChartLabel chartLabel,
-									final GC gc,
-									final Color colorDefault,
-									final Color colorDevice,
-									final Color colorHidden,
-									final boolean isSelected) {
+												final GC gc,
+												final Color colorDefault,
+												final Color colorDevice,
+												final Color colorHidden,
+												final boolean isSelected) {
 
 		if (chartLabel == null) {
 			return;
@@ -650,8 +661,8 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 		}
 
 		/*
-		 * Rectangles can be merged into a union with regions, took me some time to find this
-		 * solution :-)
+		 * Rectangles can be merged into a union with regions, took me some time to find this solution
+		 * :-)
 		 */
 		final Region region = new Region(gc.getDevice());
 
