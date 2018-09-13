@@ -5,7 +5,10 @@ New
 ===	
 
 * Tour Segmenter
-  - Stride length computed from cadence/time/distance
+  Stride length computed from cadence/time/distance
+  
+* Tour Info
+  The tour info tab within the tour editor is moved into a separete tour info view
 
  
 Bugfix 	

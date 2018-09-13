@@ -644,6 +644,13 @@
 				label="%View_Name_TourBlog"
 				mnemonic="%View_Name_TourBlog_Mnemonic"/>
 
+			<!-- Tour Info -->
+			<command
+				commandId="command.net.tourbook.views.TourInfoView"
+				icon="icons/tour-info.png"
+				label="%View_Name_TourInfo"
+				mnemonic="%View_Name_TourInfo_Mnemonic"/>
+
 			<!-- Tour Photos -->
 			<command
 				commandId="command.net.tourbook.photo.TourPhotosView"
@@ -1178,6 +1185,12 @@ THIS IS NOT YET FULLY IMPLEMENTED
 			/>
 
 		<command
+			id="command.net.tourbook.views.TourInfoView"
+			name="%View_Name_TourBlog"
+			defaultHandler="net.tourbook.ui.views.ActionHandler_OpenView_TourInfo"
+			/>
+
+		<command
 			id="command.net.tourbook.views.TourWaypointView"
 			name="%View_Name_Waypoint"
 			defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourWaypoint"
@@ -1536,6 +1549,12 @@ THIS IS NOT YET FULLY IMPLEMENTED
 	            icon="icons/tour-blog.png"
 	            id="net.tourbook.ui.views.TourBlogView"
 	            name="%View_Name_TourBlog"/>
+	      <view
+	            category="net.tourbook.category.tour"
+	            class="net.tourbook.ui.views.TourInfoView"
+	            icon="icons/tour-info.png"
+	            id="net.tourbook.ui.views.TourInfoView"
+	            name="%View_Name_TourInfo"/>
 	      <view
 	            category="net.tourbook.category.tour"
 	            class="net.tourbook.ui.views.TourWaypointView"
