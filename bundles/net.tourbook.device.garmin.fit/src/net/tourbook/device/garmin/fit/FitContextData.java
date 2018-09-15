@@ -2,12 +2,16 @@ package net.tourbook.device.garmin.fit;
 
 import com.garmin.fit.EventMesg;
 import com.garmin.fit.HrMesg;
+import com.garmin.fit.LengthMesg;
+import com.garmin.fit.LengthType;
+import com.garmin.fit.SwimStroke;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.data.GearData;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
@@ -55,15 +59,43 @@ public class FitContextData {
 		}
 	}
 
+	public TimeData getCurrent_TimeData() {
+
+		if (_current_TimeData == null) {
+			throw new IllegalArgumentException("Time data is not initialized"); //$NON-NLS-1$
+		}
+
+		return _current_TimeData;
+
+	}
+
+	public TourData getCurrent_TourData() {
+
+		if (_current_TourContext == null) {
+			throw new IllegalArgumentException("Tour data is not initialized"); //$NON-NLS-1$
+		}
+
+		return _current_TourContext.__tourData;
+	}
+
+	public TourMarker getCurrent_TourMarker() {
+
+		if (_current_TourMarker == null) {
+			throw new IllegalArgumentException("Tour marker is not initialized"); //$NON-NLS-1$
+		}
+
+		return _current_TourMarker;
+	}
+
 	/**
 	 * Gear data are available in the common {@link EventMesg}.
 	 *
 	 * @param mesg
 	 */
-	void context_EventMesg(final EventMesg mesg) {
+	public void onMesg_Event(final EventMesg mesg) {
 
 		// ensure a tour is setup
-		onMesg_Session_Tour_10_Initialize();
+		setupSession_Tour_10_Initialize();
 
 		final Long gearChangeData = mesg.getGearChangeData();
 
@@ -95,10 +127,16 @@ public class FitContextData {
 		}
 	}
 
-	void context_HrMesg(final HrMesg mesg) {
+	/**
+	 * This is called AFTER the session is closed. Swimming is producing the hr event separately in
+	 * it's own device.
+	 *
+	 * @param mesg
+	 */
+	public void onMesg_Hr(final HrMesg mesg) {
 
 		// ensure tour is setup
-		onMesg_Session_Tour_10_Initialize();
+		setupSession_Tour_10_Initialize();
 
 //		System.out.println(String.format(""
 //
@@ -130,9 +168,8 @@ public class FitContextData {
 //				Arrays.toString(mesg.getEventTimestamp()),
 //				Arrays.toString(mesg.getFilteredBpm()),
 //
-//				mesg.getNumEventTimestamp12()
-//		));
-//TODO remove SYSTEM.OUT.PRINTLN
+//				mesg.getNumEventTimestamp12()));
+////TODO remove SYSTEM.OUT.PRINTLN
 
 		boolean isTimeAvailable = false;
 
@@ -162,6 +199,7 @@ public class FitContextData {
 			final long sliceGarminTimeMS = (long) (sliceGarminTimeS * 1000);
 			final long sliceJavaTime = sliceGarminTimeMS + com.garmin.fit.DateTime.OFFSET;
 
+			// merge HR data into an already existing time data
 			for (final TimeData timeData : _previous_AllTimeData) {
 
 				if (timeData.absoluteTime == sliceJavaTime) {
@@ -218,37 +256,128 @@ public class FitContextData {
 		}
 	}
 
-	public TimeData getCurrent_TimeData() {
+	public void onMesg_Length(final LengthMesg mesg) {
 
-		if (_current_TimeData == null) {
-			throw new IllegalArgumentException("Time data is not initialized"); //$NON-NLS-1$
+		// ensure tour is setup
+		setupSession_Tour_10_Initialize();
+
+		final long timestamp = mesg.getTimestamp().getDate().getTime();
+
+		final Short avgSwimmingCadence = mesg.getAvgSwimmingCadence();
+		final LengthType lengthType = mesg.getLengthType();
+		final SwimStroke swimStroke = mesg.getSwimStroke();
+		final Integer totalStrokes = mesg.getTotalStrokes();
+
+		if (_previous_TimeData != null) {
+
+			if (_previous_TimeData.absoluteTime != timestamp) {
+
+				TourLogManager.logError(String.format("Swimming event time %s is different from the record event %s",
+						TimeTools.toLocalDateTime(timestamp),
+						TimeTools.toLocalDateTime(_previous_TimeData.absoluteTime)));
+
+				return;
+			}
+
+			final long tourStartTime = _current_AllTimeData.get(0).absoluteTime;
+
+			_previous_TimeData.swim_Time = (short) ((timestamp - tourStartTime) / 1000);
+
+			if (lengthType != null) {
+				_previous_TimeData.swim_ActivityType = lengthType.getValue();
+			}
+
+			if (swimStroke != null) {
+				_previous_TimeData.swim_StrokeStyle = swimStroke.getValue();
+			}
+
+			if (avgSwimmingCadence != null) {
+				_previous_TimeData.swim_Cadence = avgSwimmingCadence;
+			}
+
+			if (totalStrokes != null) {
+				_previous_TimeData.swim_Strokes = totalStrokes.shortValue();
+			}
+
 		}
 
-		return _current_TimeData;
+		System.out.println(String.format(""
+
+				+ "[%s]"
+
+				+ " Timestamp %-23s"
+//				+ " StartTime %-23s"
+//				+ " Time Diff %-6d"
+
+				+ " LengthType %-10s"
+
+				+ " SwimStroke %-15s"
+				+ " AvgSwimmingCadence %-6s"
+				+ " TotalStrokes %-5s"
+
+//				+ " NumStrokeCount %-3d"
+//				+ " StrokeCount %-30s"
+
+				,
+
+				getClass().getSimpleName(),
+
+				TimeTools.toLocalDateTime(timestamp),
+//				TimeTools.toLocalDateTime(mesg.getStartTime().getDate().getTime()),
+//				mesg.getTimestamp().getTimestamp() - mesg.getStartTime().getTimestamp(),
+
+				lengthType,
+
+				swimStroke == null ? "" : swimStroke.toString(),
+				avgSwimmingCadence == null ? "" : avgSwimmingCadence.toString(),
+				totalStrokes == null ? "" : totalStrokes.toString()
+
+		));
+//TODO remove SYSTEM.OUT.PRINTLN
+
+//		[FitContextData] Timestamp 2018-09-01T14:51:01     LengthType ACTIVE     SwimStroke FREESTYLE       AvgSwimmingCadence 24     TotalStrokes 12
+//		[FitContextData] Timestamp 2018-09-01T14:51:26     LengthType ACTIVE     SwimStroke FREESTYLE       AvgSwimmingCadence 23     TotalStrokes 11
+//		[FitContextData] Timestamp 2018-09-01T14:52        LengthType ACTIVE     SwimStroke FREESTYLE       AvgSwimmingCadence 25     TotalStrokes 13
+//		[FitContextData] Timestamp 2018-09-01T14:52:30     LengthType ACTIVE     SwimStroke FREESTYLE       AvgSwimmingCadence 24     TotalStrokes 12
+//		[FitContextData] Timestamp 2018-09-01T14:53        LengthType ACTIVE     SwimStroke FREESTYLE       AvgSwimmingCadence 24     TotalStrokes 12
+//		[FitContextData] Timestamp 2018-09-01T14:53:19     LengthType ACTIVE     SwimStroke FREESTYLE       AvgSwimmingCadence 24     TotalStrokes 11
+//		[FitContextData] Timestamp 2018-09-01T14:54:34     LengthType IDLE       SwimStroke                 AvgSwimmingCadence        TotalStrokes
+//		[FitContextData] Timestamp 2018-09-01T14:55:25     LengthType ACTIVE     SwimStroke BREASTSTROKE    AvgSwimmingCadence 17     TotalStrokes 12
+//		[FitContextData] Timestamp 2018-09-01T14:56:09     LengthType ACTIVE     SwimStroke BREASTSTROKE    AvgSwimmingCadence 19     TotalStrokes 13
+//		[FitContextData] Timestamp 2018-09-01T14:56:50     LengthType ACTIVE     SwimStroke BREASTSTROKE    AvgSwimmingCadence 19     TotalStrokes 13
+//		[FitContextData] Timestamp 2018-09-01T14:57:19     LengthType ACTIVE     SwimStroke BREASTSTROKE    AvgSwimmingCadence 16     TotalStrokes 11
+//		[FitContextData] Timestamp 2018-09-01T14:59:05     LengthType IDLE       SwimStroke                 AvgSwimmingCadence        TotalStrokes
+//		[FitContextData] Timestamp 2018-09-01T14:59:42     LengthType ACTIVE     SwimStroke FREESTYLE       AvgSwimmingCadence 23     TotalStrokes 12
+//		[FitContextData] Timestamp 2018-09-01T15:00:10     LengthType ACTIVE     SwimStroke FREESTYLE       AvgSwimmingCadence 26     TotalStrokes 12
+//		[FitContextData] Timestamp 2018-09-01T15:00:38     LengthType ACTIVE     SwimStroke FREESTYLE       AvgSwimmingCadence 25     TotalStrokes 12
+//		[FitContextData] Timestamp 2018-09-01T15:01:09     LengthType ACTIVE     SwimStroke FREESTYLE       AvgSwimmingCadence 26     TotalStrokes 12
 
 	}
 
-	public TourData getCurrent_TourData() {
+	public void processAllTours(final FitContextDataHandler handler) {
 
-		if (_current_TourContext == null) {
-			throw new IllegalArgumentException("Tour data is not initialized"); //$NON-NLS-1$
+		for (final TourContext tourContext : _allTourContext) {
+
+			final List<TimeData> timeDataList = _allTimeData.get(tourContext);
+
+			// ensure data are avaialble
+			if (timeDataList == null) {
+				// nothing is imported
+				continue;
+			}
+
+			final TourData tourData = tourContext.__tourData;
+
+			final List<TourMarker> tourMarkers = _allTourMarker.get(tourContext);
+			final List<GearData> tourGears = _allGearData.get(tourContext);
+
+			handler.finalizeTour(tourData, timeDataList, tourMarkers, tourGears);
 		}
-
-		return _current_TourContext.__tourData;
 	}
 
-	public TourMarker getCurrent_TourMarker() {
+	public void setupLap_Marker_10_Initialize() {
 
-		if (_current_TourMarker == null) {
-			throw new IllegalArgumentException("Tour marker is not initialized"); //$NON-NLS-1$
-		}
-
-		return _current_TourMarker;
-	}
-
-	public void onMesg_Lap_Marker_10_Initialize() {
-
-		onMesg_Session_Tour_10_Initialize();
+		setupSession_Tour_10_Initialize();
 
 		List<TourMarker> tourMarkers = _allTourMarker.get(_current_TourContext);
 
@@ -263,15 +392,15 @@ public class FitContextData {
 		tourMarkers.add(_current_TourMarker);
 	}
 
-	public void onMesg_Lap_Marker_20_Finalize() {
+	public void setupLap_Marker_20_Finalize() {
 
 		_current_TourMarker = null;
 	}
 
-	public void onMesg_Record_Time_10_Initialize() {
+	public void setupRecord_10_Initialize() {
 
 		// ensure tour is setup
-		onMesg_Session_Tour_10_Initialize();
+		setupSession_Tour_10_Initialize();
 
 		if (_current_AllTimeData == null) {
 
@@ -283,7 +412,7 @@ public class FitContextData {
 		_current_TimeData = new TimeData();
 	}
 
-	public void onMesg_Record_Time_20_Finalize() {
+	public void setupRecord_20_Finalize() {
 
 		if (_current_TimeData == null) {
 			// this occured
@@ -352,7 +481,7 @@ public class FitContextData {
 		_current_TimeData = null;
 	}
 
-	public void onMesg_Session_Tour_10_Initialize() {
+	public void setupSession_Tour_10_Initialize() {
 
 		if (_current_TourContext == null) {
 
@@ -364,35 +493,14 @@ public class FitContextData {
 		}
 	}
 
-	public void onMesg_Session_Tour_20_Finalize() {
+	public void setupSession_Tour_20_Finalize() {
 
-		onMesg_Record_Time_20_Finalize();
+		setupRecord_20_Finalize();
 
 		_previous_AllTimeData = _current_AllTimeData;
 
 		_current_TourContext = null;
 		_current_AllTimeData = null;
-	}
-
-	public void processAllTours(final FitContextDataHandler handler) {
-
-		for (final TourContext tourContext : _allTourContext) {
-
-			final List<TimeData> timeDataList = _allTimeData.get(tourContext);
-
-			// ensure data are avaialble
-			if (timeDataList == null) {
-				// nothing is imported
-				continue;
-			}
-
-			final TourData tourData = tourContext.__tourData;
-
-			final List<TourMarker> tourMarkers = _allTourMarker.get(tourContext);
-			final List<GearData> tourGears = _allGearData.get(tourContext);
-
-			handler.finalizeTour(tourData, timeDataList, tourMarkers, tourGears);
-		}
 	}
 
 }

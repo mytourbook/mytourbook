@@ -1,13 +1,13 @@
 package net.tourbook.device.garmin.fit.listeners;
 
+import com.garmin.fit.DateTime;
+import com.garmin.fit.LapMesg;
+import com.garmin.fit.LapMesgListener;
+
 import java.util.Date;
 
 import net.tourbook.data.TourMarker;
 import net.tourbook.device.garmin.fit.FitContext;
-
-import com.garmin.fit.DateTime;
-import com.garmin.fit.LapMesg;
-import com.garmin.fit.LapMesgListener;
 
 /**
  * A {@link TourMarker} is set for each lap.
@@ -23,11 +23,11 @@ public class Lap_MesgListenerImpl extends AbstractMesgListener implements LapMes
 	@Override
 	public void onMesg(final LapMesg lapMesg) {
 
-		context.onMesg_Lap_10_Before();
+		context.getContextData().setupLap_Marker_10_Initialize();
 
 		setMarker(lapMesg);
 
-		context.onMesg_Lap_20_After();
+		context.getContextData().setupLap_Marker_20_Finalize();
 	}
 
 	private void setMarker(final LapMesg lapMesg) {

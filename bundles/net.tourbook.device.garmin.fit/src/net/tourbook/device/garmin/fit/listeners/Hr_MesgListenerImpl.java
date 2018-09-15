@@ -16,7 +16,7 @@ public class Hr_MesgListenerImpl extends AbstractMesgListener implements HrMesgL
 
 	@Override
 	public void onMesg(final HrMesg mesg) {
-		context.onMesg(mesg);
+		context.getContextData().onMesg_Hr(mesg);
 	}
 
 }

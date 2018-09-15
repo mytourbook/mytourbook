@@ -1,8 +1,5 @@
 package net.tourbook.device.garmin.fit;
 
-import com.garmin.fit.EventMesg;
-import com.garmin.fit.HrMesg;
-
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -380,38 +377,6 @@ public class FitContext {
 		return String.format("%s (%s)", _importFilePathName, _sessionIndex); //$NON-NLS-1$
 	}
 
-	public void onMesg(final EventMesg mesg) {
-		_contextData.context_EventMesg(mesg);
-	}
-
-	public void onMesg(final HrMesg mesg) {
-		_contextData.context_HrMesg(mesg);
-	}
-
-	public void onMesg_Lap_10_Before() {
-		_contextData.onMesg_Lap_Marker_10_Initialize();
-	}
-
-	public void onMesg_Lap_20_After() {
-		_contextData.onMesg_Lap_Marker_20_Finalize();
-	}
-
-	public void onMesg_Record_10_Before() {
-		_contextData.onMesg_Record_Time_10_Initialize();
-	}
-
-	public void onMesg_Record_20_After() {
-		_contextData.onMesg_Record_Time_20_Finalize();
-	}
-
-	public void onMesg_Session_10_Before() {
-		_contextData.onMesg_Session_Tour_10_Initialize();
-	}
-
-	public void onMesg_Session_20_After() {
-		_contextData.onMesg_Session_Tour_20_Finalize();
-	}
-
 	private void resetSpeedAtFirstPosition(final List<TimeData> timeDataList) {
 		if (!timeDataList.isEmpty()) {
 			timeDataList.get(0).speed = Float.MIN_VALUE;
@@ -430,8 +395,8 @@ public class FitContext {
 		_isHeartRateSensorPresent = heartRateSensorPresent;
 	}
 
-	public void setLapDistance(final float lapDistance2) {
-		_lapDistance = lapDistance2;
+	public void setLapDistance(final float lapDistance) {
+		_lapDistance = lapDistance;
 	}
 
 	public void setLapTime(final int lapTime) {

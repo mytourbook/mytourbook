@@ -104,40 +104,40 @@ public class TourDatabase {
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int	TOURBOOK_DB_VERSION							= 35;
-//	private static final int	TOURBOOK_DB_VERSION							= 35;	// 18.7?
-//	private static final int	TOURBOOK_DB_VERSION							= 34;	// 18.5
-//	private static final int	TOURBOOK_DB_VERSION							= 33;	// 17.12
-//	private static final int	TOURBOOK_DB_VERSION							= 32;	// 16.10
-//	private static final int	TOURBOOK_DB_VERSION							= 31;	// 16.5
-//	private static final int	TOURBOOK_DB_VERSION							= 30;	// 16.1
-//	private static final int	TOURBOOK_DB_VERSION							= 29;	// 15.12
-//	private static final int	TOURBOOK_DB_VERSION							= 28;	// 15.6
-//	private static final int	TOURBOOK_DB_VERSION							= 27;	// 15.3.1
-//	private static final int	TOURBOOK_DB_VERSION							= 26;	// 14.14 / 15.3
-//	private static final int	TOURBOOK_DB_VERSION							= 25;	// 14.10
-//	private static final int	TOURBOOK_DB_VERSION							= 24;	// 14.7
-//	private static final int	TOURBOOK_DB_VERSION							= 23;	// 13.2.0
-//	private static final int	TOURBOOK_DB_VERSION							= 22;	// 12.12.0
-//	private static final int	TOURBOOK_DB_VERSION							= 21;	// 12.1.1
-//	private static final int	TOURBOOK_DB_VERSION							= 20;	// 12.1
-//	private static final int	TOURBOOK_DB_VERSION							= 19;	// 11.8
-//	private static final int	TOURBOOK_DB_VERSION							= 18;	// 11.8
-//	private static final int	TOURBOOK_DB_VERSION							= 17;	// 11.8
-//	private static final int	TOURBOOK_DB_VERSION							= 16;	// 11.8
-//	private static final int	TOURBOOK_DB_VERSION							= 15;	// 11.8
-//	private static final int	TOURBOOK_DB_VERSION							= 14;	// 11.3
-//	private static final int	TOURBOOK_DB_VERSION							= 13;	// 10.11
-//	private static final int	TOURBOOK_DB_VERSION							= 12;	// 10.9.1
-//	private static final int	TOURBOOK_DB_VERSION							= 11;	// 10.7.0 - 11-07-2010
-//	private static final int	TOURBOOK_DB_VERSION							= 10;	// 10.5.0 not released
-//	private static final int	TOURBOOK_DB_VERSION							= 9;	// 10.3.0
-//	private static final int	TOURBOOK_DB_VERSION							= 8;	// 10.2.1 Mod by Kenny
-//	private static final int	TOURBOOK_DB_VERSION							= 7;	// 9.01
-//	private static final int	TOURBOOK_DB_VERSION							= 6;	// 8.12
-//	private static final int	TOURBOOK_DB_VERSION							= 5;	// 8.11
+	private static final int	TOURBOOK_DB_VERSION								= 35;
+//	private static final int	TOURBOOK_DB_VERSION								= 35;	// 18.7
+//	private static final int	TOURBOOK_DB_VERSION								= 34;	// 18.5
+//	private static final int	TOURBOOK_DB_VERSION								= 33;	// 17.12
+//	private static final int	TOURBOOK_DB_VERSION								= 32;	// 16.10
+//	private static final int	TOURBOOK_DB_VERSION								= 31;	// 16.5
+//	private static final int	TOURBOOK_DB_VERSION								= 30;	// 16.1
+//	private static final int	TOURBOOK_DB_VERSION								= 29;	// 15.12
+//	private static final int	TOURBOOK_DB_VERSION								= 28;	// 15.6
+//	private static final int	TOURBOOK_DB_VERSION								= 27;	// 15.3.1
+//	private static final int	TOURBOOK_DB_VERSION								= 26;	// 14.14 / 15.3
+//	private static final int	TOURBOOK_DB_VERSION								= 25;	// 14.10
+//	private static final int	TOURBOOK_DB_VERSION								= 24;	// 14.7
+//	private static final int	TOURBOOK_DB_VERSION								= 23;	// 13.2.0
+//	private static final int	TOURBOOK_DB_VERSION								= 22;	// 12.12.0
+//	private static final int	TOURBOOK_DB_VERSION								= 21;	// 12.1.1
+//	private static final int	TOURBOOK_DB_VERSION								= 20;	// 12.1
+//	private static final int	TOURBOOK_DB_VERSION								= 19;	// 11.8
+//	private static final int	TOURBOOK_DB_VERSION								= 18;	// 11.8
+//	private static final int	TOURBOOK_DB_VERSION								= 17;	// 11.8
+//	private static final int	TOURBOOK_DB_VERSION								= 16;	// 11.8
+//	private static final int	TOURBOOK_DB_VERSION								= 15;	// 11.8
+//	private static final int	TOURBOOK_DB_VERSION								= 14;	// 11.3
+//	private static final int	TOURBOOK_DB_VERSION								= 13;	// 10.11
+//	private static final int	TOURBOOK_DB_VERSION								= 12;	// 10.9.1
+//	private static final int	TOURBOOK_DB_VERSION								= 11;	// 10.7.0 - 11-07-2010
+//	private static final int	TOURBOOK_DB_VERSION								= 10;	// 10.5.0 not released
+//	private static final int	TOURBOOK_DB_VERSION								= 9;	// 10.3.0
+//	private static final int	TOURBOOK_DB_VERSION								= 8;	// 10.2.1 Mod by Kenny
+//	private static final int	TOURBOOK_DB_VERSION								= 7;	// 9.01
+//	private static final int	TOURBOOK_DB_VERSION								= 6;	// 8.12
+//	private static final int	TOURBOOK_DB_VERSION								= 5;	// 8.11
 
-//	private static final String	SQL_STATE_XJ004_DATABASE_NOT_FOUND			= "XJ004";									//$NON-NLS-1$
+//	private static final String	SQL_STATE_XJ004_DATABASE_NOT_FOUND		= "XJ004";														//$NON-NLS-1$
 
 	public static boolean			IS_POST_UPDATE_019_to_020					= false;
 
@@ -169,51 +169,51 @@ public class TourDatabase {
 	public static final String		TABLE_TOUR_WAYPOINT							= "TOURWAYPOINT";												//$NON-NLS-1$
 	public static final String		TABLE_TOUR_GEO_PARTS							= "TourGeoParts";												//$NON-NLS-1$
 
-//	public static final String		JOINTABLE__TOURDATA__SHAREDMARKER				= TABLE_TOUR_DATA			+ "_" + TABLE_SHARED_MARKER;		//$NON-NLS-1$
-	public static final String		JOINTABLE__TOURDATA__TOURTAG						= TABLE_TOUR_DATA			+ "_" + TABLE_TOUR_TAG;				//$NON-NLS-1$
+//	public static final String		JOINTABLE__TOURDATA__SHAREDMARKER				= TABLE_TOUR_DATA			+ "_" + TABLE_SHARED_MARKER;			//$NON-NLS-1$
+	public static final String		JOINTABLE__TOURDATA__TOURTAG						= TABLE_TOUR_DATA			+ "_" + TABLE_TOUR_TAG;					//$NON-NLS-1$
 	public static final String		JOINTABLE__TOURTAGCATEGORY_TOURTAG				= TABLE_TOUR_TAG_CATEGORY	+ "_" + TABLE_TOUR_TAG;				//$NON-NLS-1$
 	public static final String		JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY	= TABLE_TOUR_TAG_CATEGORY	+ "_" + TABLE_TOUR_TAG_CATEGORY;	//$NON-NLS-1$
 
 	/*
 	 * Tables which never have been used, they are dropped in db version 24
 	 */
-	private static final String	JOINTABLE__TOURDATA__TOURMARKER				= TABLE_TOUR_DATA			+ "_" + TABLE_TOUR_MARKER;			//$NON-NLS-1$
-	private static final String	JOINTABLE__TOURDATA__TOURPHOTO				= TABLE_TOUR_DATA			+ "_" + TABLE_TOUR_PHOTO;			//$NON-NLS-1$
-	private static final String	JOINTABLE__TOURDATA__TOURREFERENCE			= TABLE_TOUR_DATA			+ "_" + TABLE_TOUR_REFERENCE;		//$NON-NLS-1$
-	private static final String	JOINTABLE__TOURDATA__TOURWAYPOINT			= TABLE_TOUR_DATA			+ "_" + TABLE_TOUR_WAYPOINT;		//$NON-NLS-1$
-	private static final String	JOINTABLE__TOURPERSON__TOURPERSON_HRZONE	= TABLE_TOUR_PERSON			+ "_" + TABLE_TOUR_PERSON_HRZONE;	//$NON-NLS-1$
+	private static final String	JOINTABLE__TOURDATA__TOURMARKER				= TABLE_TOUR_DATA			+ "_" + TABLE_TOUR_MARKER;				//$NON-NLS-1$
+	private static final String	JOINTABLE__TOURDATA__TOURPHOTO				= TABLE_TOUR_DATA			+ "_" + TABLE_TOUR_PHOTO;				//$NON-NLS-1$
+	private static final String	JOINTABLE__TOURDATA__TOURREFERENCE			= TABLE_TOUR_DATA			+ "_" + TABLE_TOUR_REFERENCE;			//$NON-NLS-1$
+	private static final String	JOINTABLE__TOURDATA__TOURWAYPOINT			= TABLE_TOUR_DATA			+ "_" + TABLE_TOUR_WAYPOINT;			//$NON-NLS-1$
+	private static final String	JOINTABLE__TOURPERSON__TOURPERSON_HRZONE	= TABLE_TOUR_PERSON		+ "_" + TABLE_TOUR_PERSON_HRZONE;	//$NON-NLS-1$
 
 	// never used tables, is needed to drop them
-	private final static String	TABLE_TOUR_CATEGORY							= "TourCategory";															//$NON-NLS-1$
-	private final static String	TABLE_TOURCATEGORY__TOURDATA				= TABLE_TOUR_CATEGORY		+ "_" + TABLE_TOUR_DATA;			//$NON-NLS-1$
+	private final static String	TABLE_TOUR_CATEGORY							= "TourCategory";																//$NON-NLS-1$
+	private final static String	TABLE_TOURCATEGORY__TOURDATA				= TABLE_TOUR_CATEGORY		+ "_" + TABLE_TOUR_DATA;				//$NON-NLS-1$
 	/**
 	 * Is <code>-1</code>, this is the id for a not saved entity
 	 */
 	public static final int			ENTITY_IS_NOT_SAVED							= -1;
 	//
-	private static final String	ENTITY_ID_BIKE									= "BikeID";														//$NON-NLS-1$
-	private static final String	ENTITY_ID_COMPARED							= "ComparedID";												//$NON-NLS-1$
-	private static final String	ENTITY_ID_HR_ZONE								= "HrZoneID";													//$NON-NLS-1$
-	private static final String	ENTITY_ID_MARKER								= "MarkerID";													//$NON-NLS-1$
-	private static final String	ENTITY_ID_PERSON								= "PersonID";													//$NON-NLS-1$
-	private static final String	ENTITY_ID_PHOTO								= "PhotoID";													//$NON-NLS-1$
-	private static final String	ENTITY_ID_REF									= "RefID";														//$NON-NLS-1$
-//	private static final String	ENTITY_ID_SIGN									= "SignID";														//$NON-NLS-1$
-//	private static final String	ENTITY_ID_SHARED_MARKER						= "SharedMarkerID";											//$NON-NLS-1$
-	private static final String	ENTITY_ID_TAG									= "TagID";														//$NON-NLS-1$
-	private static final String	ENTITY_ID_TAG_CATEGORY						= "TagCategoryID";											//$NON-NLS-1$
-	public static final String		ENTITY_ID_TOUR									= "TourID";														//$NON-NLS-1$
-	private static final String	ENTITY_ID_TYPE									= "TypeID";														//$NON-NLS-1$
-	public static final String		ENTITY_ID_WAY_POINT							= "WayPointID";												//$NON-NLS-1$
+	private static final String	ENTITY_ID_BIKE									= "BikeID";																		//$NON-NLS-1$
+	private static final String	ENTITY_ID_COMPARED							= "ComparedID";																//$NON-NLS-1$
+	private static final String	ENTITY_ID_HR_ZONE								= "HrZoneID";																	//$NON-NLS-1$
+	private static final String	ENTITY_ID_MARKER								= "MarkerID";																	//$NON-NLS-1$
+	private static final String	ENTITY_ID_PERSON								= "PersonID";																	//$NON-NLS-1$
+	private static final String	ENTITY_ID_PHOTO								= "PhotoID";																	//$NON-NLS-1$
+	private static final String	ENTITY_ID_REF									= "RefID";																		//$NON-NLS-1$
+//	private static final String	ENTITY_ID_SIGN									= "SignID";																		//$NON-NLS-1$
+//	private static final String	ENTITY_ID_SHARED_MARKER						= "SharedMarkerID";															//$NON-NLS-1$
+	private static final String	ENTITY_ID_TAG									= "TagID";																		//$NON-NLS-1$
+	private static final String	ENTITY_ID_TAG_CATEGORY						= "TagCategoryID";															//$NON-NLS-1$
+	public static final String		ENTITY_ID_TOUR									= "TourID";																		//$NON-NLS-1$
+	private static final String	ENTITY_ID_TYPE									= "TypeID";																		//$NON-NLS-1$
+	public static final String		ENTITY_ID_WAY_POINT							= "WayPointID";																//$NON-NLS-1$
 	//
-	private static final String	KEY_BIKE											= TABLE_TOUR_BIKE 			+ "_" + ENTITY_ID_BIKE;				//$NON-NLS-1$
-	private static final String	KEY_PERSON										= TABLE_TOUR_PERSON			+ "_" + ENTITY_ID_PERSON;			//$NON-NLS-1$
-//	private static final String	KEY_SIGN											= TABLE_TOUR_SIGN			+ "_" + ENTITY_ID_SIGN;					//$NON-NLS-1$
-//	private static final String	KEY_SHARED_MARKER								= TABLE_SHARED_MARKER		+ "_" + ENTITY_ID_SHARED_MARKER;	//$NON-NLS-1$
-	private static final String	KEY_TAG											= TABLE_TOUR_TAG			+ "_" + ENTITY_ID_TAG;					//$NON-NLS-1$
-	private static final String	KEY_TAG_CATEGORY								= TABLE_TOUR_TAG_CATEGORY	+ "_" + ENTITY_ID_TAG_CATEGORY;	//$NON-NLS-1$
-	public static final String		KEY_TOUR											= TABLE_TOUR_DATA			+ "_" + ENTITY_ID_TOUR;					//$NON-NLS-1$
-	private static final String	KEY_TYPE											= TABLE_TOUR_TYPE			+ "_" + ENTITY_ID_TYPE;					//$NON-NLS-1$
+	private static final String	KEY_BIKE											= TABLE_TOUR_BIKE 			+ "_" + ENTITY_ID_BIKE;					//$NON-NLS-1$
+	private static final String	KEY_PERSON										= TABLE_TOUR_PERSON			+ "_" + ENTITY_ID_PERSON;				//$NON-NLS-1$
+//	private static final String	KEY_SIGN											= TABLE_TOUR_SIGN				+ "_" + ENTITY_ID_SIGN;					//$NON-NLS-1$
+//	private static final String	KEY_SHARED_MARKER								= TABLE_SHARED_MARKER		+ "_" + ENTITY_ID_SHARED_MARKER;		//$NON-NLS-1$
+	private static final String	KEY_TAG											= TABLE_TOUR_TAG				+ "_" + ENTITY_ID_TAG;					//$NON-NLS-1$
+	private static final String	KEY_TAG_CATEGORY								= TABLE_TOUR_TAG_CATEGORY	+ "_" + ENTITY_ID_TAG_CATEGORY;		//$NON-NLS-1$
+	public static final String		KEY_TOUR											= TABLE_TOUR_DATA				+ "_" + ENTITY_ID_TOUR;					//$NON-NLS-1$
+	private static final String	KEY_TYPE											= TABLE_TOUR_TYPE				+ "_" + ENTITY_ID_TYPE;					//$NON-NLS-1$
 
 	private static final String	DEFAULT_0										= "0";															//$NON-NLS-1$
 	private static final String	DEFAULT_1_0										= "1.0";															//$NON-NLS-1$
@@ -285,8 +285,8 @@ public class TourDatabase {
 //	Derby Limitations
 //
 //	Smallest 			DOUBLE 	-1.79769E+308
-//	Largest 			DOUBLE 	 1.79769E+308
-//	Smallest positive 	DOUBLE 	   2.225E-307
+//	Largest 				DOUBLE 	 1.79769E+308
+//	Smallest positive DOUBLE 	   2.225E-307
 //	Largest negative 	DOUBLE    -2.225E-307
 //
 //	Smallest 			REAL 	   -3.402E+38
@@ -320,27 +320,27 @@ public class TourDatabase {
 //		SQL_INT_MIN_VALUE = Integer.toString(Integer.MIN_VALUE);
 		SQL_LONG_MIN_VALUE = Long.toString(Long.MIN_VALUE);
 
-		SQL_FLOAT_MIN_VALUE = (new Float(DEFAULT_FLOAT)).toString();
-		SQL_DOUBLE_MIN_VALUE = (new Double(DEFAULT_DOUBLE)).toString();
+		SQL_FLOAT_MIN_VALUE = Float.toString(DEFAULT_FLOAT);
+		SQL_DOUBLE_MIN_VALUE = Double.toString(DEFAULT_DOUBLE);
 	}
 
-	private boolean				_isDbInitialized;
-	private boolean				_isTableChecked;
-	private boolean				_isVersionChecked;
+	private boolean											_isDbInitialized;
+	private boolean											_isTableChecked;
+	private boolean											_isVersionChecked;
 
-	private final ListenerList	_propertyListeners	= new ListenerList(ListenerList.IDENTITY);
+	private final ListenerList<IPropertyListener>	_propertyListeners	= new ListenerList<>(ListenerList.IDENTITY);
 
-	private boolean				_isSQLUpdateError		= false;
+	private boolean											_isSQLUpdateError		= false;
 
 	/**
 	 * Database version before a db update is performed
 	 */
-	private int						_dbVersionBeforeUpdate;
-	private int						_dbVersionAfterUpdate;
+	private int													_dbVersionBeforeUpdate;
+	private int													_dbVersionAfterUpdate;
 
-	private boolean				_isDerbyEmbedded;
-	private boolean				_isChecked_DbUpgraded;
-	private boolean				_isChecked_DbCreated;
+	private boolean											_isDerbyEmbedded;
+	private boolean											_isChecked_DbUpgraded;
+	private boolean											_isChecked_DbCreated;
 
 	/**
 	 * SQL utilities.
@@ -366,13 +366,11 @@ public class TourDatabase {
 														final String columnName,
 														final String defaultValue) throws SQLException {
 
-			final String sql = ""// 															//$NON-NLS-1$
-					+ "ALTER TABLE " + table //													//$NON-NLS-1$
-					+ "	ADD COLUMN	" + columnName + " DOUBLE DEFAULT " + defaultValue; //		//$NON-NLS-1$ //$NON-NLS-2$
+			final String sql = ""// 																			//$NON-NLS-1$
+					+ "ALTER TABLE " + table //																//$NON-NLS-1$
+					+ "	ADD COLUMN	" + columnName + " DOUBLE DEFAULT " + defaultValue; //	//$NON-NLS-1$ //$NON-NLS-2$
 
 			exec(stmt, sql);
-
-			return;
 		}
 
 		private static void AddCol_Float(final Statement stmt,
@@ -407,8 +405,6 @@ public class TourDatabase {
 					+ "	ADD COLUMN	" + columnName + " INTEGER DEFAULT " + defaultValue; //		//$NON-NLS-1$ //$NON-NLS-2$
 
 			exec(stmt, sql);
-
-			return;
 		}
 
 		/**
@@ -429,8 +425,6 @@ public class TourDatabase {
 					+ "	ADD COLUMN	" + columnName + " SMALLINT DEFAULT " + defaultValue; //		//$NON-NLS-1$ //$NON-NLS-2$
 
 			exec(stmt, sql);
-
-			return;
 		}
 
 		/**
@@ -457,8 +451,6 @@ public class TourDatabase {
 					+ ("	ADD COLUMN	" + columnName + "	VARCHAR(" + columnWidth + ")\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 			exec(stmt, sql);
-
-			return;
 		}
 
 		private static void AlterCol_VarChar_Width(	final Statement stmt,
@@ -472,8 +464,6 @@ public class TourDatabase {
 					+ ("	SET DATA TYPE	VARCHAR(" + newWidth + ")\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
 			exec(stmt, sql);
-
-			return;
 		}
 
 		private static void Cleanup_DropConstraint(	final Statement stmt,
@@ -2518,26 +2508,26 @@ public class TourDatabase {
 		/*
 		 * CREATE TABLE TourData
 		 */
-		exec(stmt, "CREATE TABLE " + TABLE_TOUR_DATA + "	(												\n" //$NON-NLS-1$ //$NON-NLS-2$
+		exec(stmt, "CREATE TABLE " + TABLE_TOUR_DATA + "	(											\n" //$NON-NLS-1$ //$NON-NLS-2$
 		//
 				+ SQL.CreateField_EntityId(ENTITY_ID_TOUR, false)
 				//
-				+ "	StartYear 				SMALLINT NOT NULL,												\n" //$NON-NLS-1$
-				+ "	StartMonth 				SMALLINT NOT NULL,												\n" //$NON-NLS-1$
-				+ "	StartDay 				SMALLINT NOT NULL,												\n" //$NON-NLS-1$
-				+ "	StartHour 				SMALLINT NOT NULL,												\n" //$NON-NLS-1$
-				+ "	StartMinute 			SMALLINT NOT NULL,												\n" //$NON-NLS-1$
-				+ "	StartWeek 				SMALLINT NOT NULL,												\n" //$NON-NLS-1$
+				+ "	StartYear 				SMALLINT NOT NULL,											\n" //$NON-NLS-1$
+				+ "	StartMonth 				SMALLINT NOT NULL,											\n" //$NON-NLS-1$
+				+ "	StartDay 				SMALLINT NOT NULL,											\n" //$NON-NLS-1$
+				+ "	StartHour 				SMALLINT NOT NULL,											\n" //$NON-NLS-1$
+				+ "	StartMinute 			SMALLINT NOT NULL,											\n" //$NON-NLS-1$
+				+ "	StartWeek 				SMALLINT NOT NULL,											\n" //$NON-NLS-1$
 				+ "	StartDistance 			INTEGER NOT NULL,												\n" //$NON-NLS-1$
 				+ "	Distance 				INTEGER NOT NULL,												\n" //$NON-NLS-1$
-				+ "	StartAltitude 			SMALLINT NOT NULL,												\n" //$NON-NLS-1$
-				+ "	StartPulse 				SMALLINT NOT NULL,												\n" //$NON-NLS-1$
-				+ "	DpTolerance 			SMALLINT NOT NULL,												\n" //$NON-NLS-1$
+				+ "	StartAltitude 			SMALLINT NOT NULL,											\n" //$NON-NLS-1$
+				+ "	StartPulse 				SMALLINT NOT NULL,											\n" //$NON-NLS-1$
+				+ "	DpTolerance 			SMALLINT NOT NULL,											\n" //$NON-NLS-1$
 				+ "	TourDistance 			INTEGER NOT NULL,												\n" //$NON-NLS-1$
 
 				// replaced with BIGINT values in version 22
-				//				+ "	tourRecordingTime 		INTEGER NOT NULL,												\n" //$NON-NLS-1$
-				//				+ "	tourDrivingTime 		INTEGER NOT NULL,												\n" //$NON-NLS-1$
+				//				+ "	tourRecordingTime 	INTEGER NOT NULL,								\n" //$NON-NLS-1$
+				//				+ "	tourDrivingTime 		INTEGER NOT NULL,								\n" //$NON-NLS-1$
 
 				+ "	tourAltUp 				INTEGER NOT NULL,												\n" //$NON-NLS-1$
 				+ "	tourAltDown 			INTEGER NOT NULL,												\n" //$NON-NLS-1$
@@ -2546,7 +2536,7 @@ public class TourDatabase {
 				+ "	devicePluginId			VARCHAR(" + TourData.DB_LENGTH_DEVICE_PLUGIN_ID + "),			\n" //$NON-NLS-1$ //$NON-NLS-2$
 
 				+ "	deviceTravelTime 		BIGINT NOT NULL,												\n" //$NON-NLS-1$
-				+ "	deviceDistance 			INTEGER NOT NULL,												\n" //$NON-NLS-1$
+				+ "	deviceDistance 		INTEGER NOT NULL,												\n" //$NON-NLS-1$
 				+ "	deviceWheel 			INTEGER NOT NULL,												\n" //$NON-NLS-1$
 				+ "	deviceWeight 			INTEGER NOT NULL,												\n" //$NON-NLS-1$
 				+ "	deviceTotalUp 			INTEGER NOT NULL,												\n" //$NON-NLS-1$
@@ -2554,62 +2544,50 @@ public class TourDatabase {
 
 				// version 3 start
 				+ "	deviceMode 				SMALLINT,														\n" //$NON-NLS-1$
-				+ "	deviceTimeInterval		SMALLINT,														\n" //$NON-NLS-1$
+				+ "	deviceTimeInterval	SMALLINT,														\n" //$NON-NLS-1$
 				// version 3 end
 
 				// version 4 start
 
 				// from markus
 				// replaced with FLOAT values in version 21
-				//				+ "	maxAltitude				INTEGER,														\n" //$NON-NLS-1$
-				//				+ "	maxPulse				INTEGER,														\n" //$NON-NLS-1$
-				//				+ "	avgPulse				INTEGER,														\n" //$NON-NLS-1$
-				//				+ "	avgCadence				INTEGER,														\n" //$NON-NLS-1$
-				//				+ "	avgTemperature			INTEGER,														\n" //$NON-NLS-1$
+				//				+ "	maxAltitude				INTEGER,											\n" //$NON-NLS-1$
+				//				+ "	maxPulse					INTEGER,											\n" //$NON-NLS-1$
+				//				+ "	avgPulse					INTEGER,											\n" //$NON-NLS-1$
+				//				+ "	avgCadence				INTEGER,											\n" //$NON-NLS-1$
+				//				+ "	avgTemperature			INTEGER,											\n" //$NON-NLS-1$
 
-				+ "	maxSpeed				FLOAT,															\n" //$NON-NLS-1$
-				+ "	tourTitle				VARCHAR(" + TourData.DB_LENGTH_TOUR_TITLE + "),					\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	maxSpeed					FLOAT,															\n" //$NON-NLS-1$
+				+ "	tourTitle				VARCHAR(" + TourData.DB_LENGTH_TOUR_TITLE + "),		\n" //$NON-NLS-1$ //$NON-NLS-2$
 
-				// OLD			+ "	tourDescription			VARCHAR(4096),													\n"	// version <= 9
-				+ "	tourDescription			VARCHAR(" + TourData.DB_LENGTH_TOUR_DESCRIPTION_V10 + "),		\n" // modified in version 10 //$NON-NLS-1$ //$NON-NLS-2$
+				// OLD			+ "	tourDescription			VARCHAR(4096),											\n"	// version <= 9
+				+ "	tourDescription			VARCHAR(" + TourData.DB_LENGTH_TOUR_DESCRIPTION_V10 + "),	\n" // modified in version 10 //$NON-NLS-1$ //$NON-NLS-2$
 
-				+ "	tourStartPlace			VARCHAR(" + TourData.DB_LENGTH_TOUR_START_PLACE + "),			\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	tourStartPlace			VARCHAR(" + TourData.DB_LENGTH_TOUR_START_PLACE + "),				\n" //$NON-NLS-1$ //$NON-NLS-2$
 				+ "	tourEndPlace			VARCHAR(" + TourData.DB_LENGTH_TOUR_END_PLACE + "),				\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "	calories				INTEGER,														\n" //$NON-NLS-1$
-				+ "	bikerWeight				FLOAT,															\n" //$NON-NLS-1$
-				+ "	" + KEY_BIKE + "		BIGINT,															\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	calories					INTEGER,																			\n" //$NON-NLS-1$
+				+ "	bikerWeight				FLOAT,																			\n" //$NON-NLS-1$
+				+ "	" + KEY_BIKE + "		BIGINT,																			\n" //$NON-NLS-1$ //$NON-NLS-2$
 
 				// from wolfgang
 				+ "	devicePluginName		VARCHAR(" + TourData.DB_LENGTH_DEVICE_PLUGIN_NAME + "),			\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "	deviceModeName			VARCHAR(" + TourData.DB_LENGTH_DEVICE_MODE_NAME + "),			\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	deviceModeName			VARCHAR(" + TourData.DB_LENGTH_DEVICE_MODE_NAME + "),				\n" //$NON-NLS-1$ //$NON-NLS-2$
 
 				// version 4 end
 
-				// version 5 start
-				/**
-				 * disabled because when two blob object's are deserialized then the error occures:
-				 * <p>
-				 * java.io.StreamCorruptedException: invalid stream header: 00ACED00
-				 * <p>
-				 * therefor the gpsData are put into the serieData object
-				 */
-				//	+ "gpsData 				BLOB,															\n" //$NON-NLS-1$
-				//
-				// version 5 end
-				//
-				+ "	" + KEY_TYPE + " 		BIGINT,															\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "	" + KEY_PERSON + " 		BIGINT,															\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	" + KEY_TYPE + " 		BIGINT,																\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	" + KEY_PERSON + " 	BIGINT,																\n" //$NON-NLS-1$ //$NON-NLS-2$
 
 				// version 6 start
 				//
-				+ "	tourImportFilePath		VARCHAR(" + TourData.DB_LENGTH_TOUR_IMPORT_FILE_PATH + "),		\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	tourImportFilePath	VARCHAR(" + TourData.DB_LENGTH_TOUR_IMPORT_FILE_PATH + "),		\n" //$NON-NLS-1$ //$NON-NLS-2$
 				//
 				// version 6 end
 
 				// version 7 start
 				//
-				+ "	mergeSourceTourId		BIGINT,															\n" //$NON-NLS-1$
-				+ "	mergeTargetTourId		BIGINT,															\n" //$NON-NLS-1$
+				+ "	mergeSourceTourId		BIGINT,																\n" //$NON-NLS-1$
+				+ "	mergeTargetTourId		BIGINT,																\n" //$NON-NLS-1$
 				+ "	mergedTourTimeOffset	INTEGER DEFAULT 0,												\n" //$NON-NLS-1$
 				+ "	mergedAltitudeOffset	INTEGER DEFAULT 0,												\n" //$NON-NLS-1$
 				+ "	startSecond	 			SMALLINT DEFAULT 0,												\n" //$NON-NLS-1$
@@ -2621,8 +2599,8 @@ public class TourDatabase {
 				+ "	weatherWindDir			INTEGER DEFAULT 0,												\n" //$NON-NLS-1$
 				+ "	weatherWindSpd			INTEGER DEFAULT 0,												\n" //$NON-NLS-1$
 				+ "	weatherClouds			VARCHAR(" + TourData.DB_LENGTH_WEATHER_CLOUDS + "),				\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "	restPulse        	    INTEGER DEFAULT 0,												\n" //$NON-NLS-1$
-				+ "	isDistanceFromSensor 	SMALLINT DEFAULT 0, 											\n" //$NON-NLS-1$
+				+ "	restPulse        	   INTEGER DEFAULT 0,												\n" //$NON-NLS-1$
+				+ "	isDistanceFromSensor SMALLINT DEFAULT 0, 												\n" //$NON-NLS-1$
 				//
 				// version 8 end ----------
 
@@ -2641,85 +2619,85 @@ public class TourDatabase {
 				// version 11 start
 				//
 				+ "	DateTimeCreated			BIGINT DEFAULT 0,												\n" //$NON-NLS-1$
-				+ "	DateTimeModified		BIGINT DEFAULT 0,												\n" //$NON-NLS-1$
+				+ "	DateTimeModified			BIGINT DEFAULT 0,												\n" //$NON-NLS-1$
 				//
 				// version 11 end ---------
 
 				// version 12 start
 				//
-				+ "	IsPulseSensorPresent	INTEGER DEFAULT 0, 												\n" //$NON-NLS-1$
-				+ "	IsPowerSensorPresent	INTEGER DEFAULT 0, 												\n" //$NON-NLS-1$
-				+ "	DeviceAvgSpeed			FLOAT DEFAULT 0,												\n" //$NON-NLS-1$
+				+ "	IsPulseSensorPresent		INTEGER DEFAULT 0, 											\n" //$NON-NLS-1$
+				+ "	IsPowerSensorPresent		INTEGER DEFAULT 0, 											\n" //$NON-NLS-1$
+				+ "	DeviceAvgSpeed				FLOAT DEFAULT 0,												\n" //$NON-NLS-1$
 				+ "	DeviceFirmwareVersion	VARCHAR(" + TourData.DB_LENGTH_DEVICE_FIRMWARE_VERSION + "),	\n" //$NON-NLS-1$ //$NON-NLS-2$
 				//
 				// version 12 end ---------
 
 				// version 13 start
 				//
-				+ "	TemperatureScale		INTEGER DEFAULT 1, 												\n" //$NON-NLS-1$
-				+ "	Weather					VARCHAR(" + TourData.DB_LENGTH_WEATHER + "),					\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	TemperatureScale			INTEGER DEFAULT 1, 											\n" //$NON-NLS-1$
+				+ "	Weather						VARCHAR(" + TourData.DB_LENGTH_WEATHER + "),			\n" //$NON-NLS-1$ //$NON-NLS-2$
 				//
 				// version 13 end ---------
 
 				// version 14 start
 				//
-				+ "	ConconiDeflection		INTEGER DEFAULT 0, 				\n" //$NON-NLS-1$
+				+ "	ConconiDeflection			INTEGER DEFAULT 0, 											\n" //$NON-NLS-1$
 				//
 				// version 14 end ---------
 
 				// version 17 start
 				//
-				+ "	hrZone0					INTEGER DEFAULT -1,												\n" //$NON-NLS-1$
-				+ "	hrZone1					INTEGER DEFAULT -1, 											\n" //$NON-NLS-1$
-				+ "	hrZone2					INTEGER DEFAULT -1, 											\n" //$NON-NLS-1$
-				+ "	hrZone3					INTEGER DEFAULT -1, 											\n" //$NON-NLS-1$
-				+ "	hrZone4					INTEGER DEFAULT -1, 											\n" //$NON-NLS-1$
-				+ "	hrZone5					INTEGER DEFAULT -1, 											\n" //$NON-NLS-1$
-				+ "	hrZone6					INTEGER DEFAULT -1, 											\n" //$NON-NLS-1$
-				+ "	hrZone7					INTEGER DEFAULT -1, 											\n" //$NON-NLS-1$
-				+ "	hrZone8					INTEGER DEFAULT -1, 											\n" //$NON-NLS-1$
-				+ "	hrZone9					INTEGER DEFAULT -1, 											\n" //$NON-NLS-1$
+				+ "	hrZone0						INTEGER DEFAULT -1,											\n" //$NON-NLS-1$
+				+ "	hrZone1						INTEGER DEFAULT -1, 											\n" //$NON-NLS-1$
+				+ "	hrZone2						INTEGER DEFAULT -1, 											\n" //$NON-NLS-1$
+				+ "	hrZone3						INTEGER DEFAULT -1, 											\n" //$NON-NLS-1$
+				+ "	hrZone4						INTEGER DEFAULT -1, 											\n" //$NON-NLS-1$
+				+ "	hrZone5						INTEGER DEFAULT -1, 											\n" //$NON-NLS-1$
+				+ "	hrZone6						INTEGER DEFAULT -1, 											\n" //$NON-NLS-1$
+				+ "	hrZone7						INTEGER DEFAULT -1, 											\n" //$NON-NLS-1$
+				+ "	hrZone8						INTEGER DEFAULT -1, 											\n" //$NON-NLS-1$
+				+ "	hrZone9						INTEGER DEFAULT -1, 											\n" //$NON-NLS-1$
 				//
 				// version 17 end ---------
 
 				// version 18 start
 				//
-				+ "	NumberOfHrZones			INTEGER DEFAULT 0, 												\n" //$NON-NLS-1$
+				+ "	NumberOfHrZones			INTEGER DEFAULT 0, 											\n" //$NON-NLS-1$
 				//
 				// version 18 end ---------
 
 				// version 21 start
 				//
-				+ "	maxAltitude				FLOAT DEFAULT 0,												\n" //$NON-NLS-1$
-				+ "	maxPulse				FLOAT DEFAULT 0,												\n" //$NON-NLS-1$
-				+ "	avgPulse				FLOAT DEFAULT 0,												\n" //$NON-NLS-1$
-				+ "	avgCadence				FLOAT DEFAULT 0,												\n" //$NON-NLS-1$
-				+ "	avgTemperature			FLOAT DEFAULT 0,												\n" //$NON-NLS-1$
+				+ "	maxAltitude					FLOAT DEFAULT 0,												\n" //$NON-NLS-1$
+				+ "	maxPulse						FLOAT DEFAULT 0,												\n" //$NON-NLS-1$
+				+ "	avgPulse						FLOAT DEFAULT 0,												\n" //$NON-NLS-1$
+				+ "	avgCadence					FLOAT DEFAULT 0,												\n" //$NON-NLS-1$
+				+ "	avgTemperature				FLOAT DEFAULT 0,												\n" //$NON-NLS-1$
 				//
 				// version 21 end ---------
 
 				// version 22 start  -  12.12
 				//
-				+ "	TourStartTime			BIGINT DEFAULT 0,												\n" //$NON-NLS-1$
-				+ "	TourEndTime				BIGINT DEFAULT 0,												\n" //$NON-NLS-1$
+				+ "	TourStartTime				BIGINT DEFAULT 0,												\n" //$NON-NLS-1$
+				+ "	TourEndTime					BIGINT DEFAULT 0,												\n" //$NON-NLS-1$
 
 				+ "	TourRecordingTime 		BIGINT DEFAULT 0,												\n" //$NON-NLS-1$
-				+ "	TourDrivingTime 		BIGINT DEFAULT 0,												\n" //$NON-NLS-1$
+				+ "	TourDrivingTime 			BIGINT DEFAULT 0,												\n" //$NON-NLS-1$
 				//
 				// version 22 end ---------
 
 				// version 23 start  -  13.2
 				//
-				+ "	numberOfTimeSlices		INTEGER DEFAULT 0,												\n" //$NON-NLS-1$
-				+ "	numberOfPhotos			INTEGER DEFAULT 0,												\n" //$NON-NLS-1$
-				+ "	photoTimeAdjustment		INTEGER DEFAULT 0,												\n" //$NON-NLS-1$
+				+ "	numberOfTimeSlices		INTEGER DEFAULT 0,											\n" //$NON-NLS-1$
+				+ "	numberOfPhotos				INTEGER DEFAULT 0,											\n" //$NON-NLS-1$
+				+ "	photoTimeAdjustment		INTEGER DEFAULT 0,											\n" //$NON-NLS-1$
 				//
 				// version 23 end ---------
 
 				// version 27 start  -  15.5
 				//
-				+ "	frontShiftCount			INTEGER DEFAULT 0,												\n" //$NON-NLS-1$
-				+ "	rearShiftCount			INTEGER DEFAULT 0,												\n" //$NON-NLS-1$
+				+ "	frontShiftCount			INTEGER DEFAULT 0,											\n" //$NON-NLS-1$
+				+ "	rearShiftCount				INTEGER DEFAULT 0,											\n" //$NON-NLS-1$
 				//
 				// version 27 end ---------
 
@@ -2731,27 +2709,27 @@ public class TourDatabase {
 
 				// version 30 start  -  16.1
 				//
-				+ "	power_Avg								FLOAT DEFAULT 0,								\n" //$NON-NLS-1$
-				+ "	power_Max								INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
-				+ "	power_Normalized						INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
-				+ "	power_FTP								INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
+				+ "	power_Avg										FLOAT DEFAULT 0,									\n" //$NON-NLS-1$
+				+ "	power_Max										INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
+				+ "	power_Normalized								INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
+				+ "	power_FTP										INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
 
-				+ " power_TotalWork							BIGINT DEFAULT 0,								\n" //$NON-NLS-1$
-				+ " power_TrainingStressScore				FLOAT DEFAULT 0,								\n" //$NON-NLS-1$
-				+ " power_IntensityFactor					FLOAT DEFAULT 0,								\n" //$NON-NLS-1$
+				+ "	power_TotalWork								BIGINT DEFAULT 0,									\n" //$NON-NLS-1$
+				+ "	power_TrainingStressScore					FLOAT DEFAULT 0,									\n" //$NON-NLS-1$
+				+ "	power_IntensityFactor						FLOAT DEFAULT 0,									\n" //$NON-NLS-1$
 
-				+ " power_PedalLeftRightBalance				INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
-				+ " power_AvgLeftTorqueEffectiveness		FLOAT DEFAULT 0,								\n" //$NON-NLS-1$
-				+ " power_AvgRightTorqueEffectiveness		FLOAT DEFAULT 0,								\n" //$NON-NLS-1$
-				+ " power_AvgLeftPedalSmoothness			FLOAT DEFAULT 0,								\n" //$NON-NLS-1$
-				+ " power_AvgRightPedalSmoothness			FLOAT DEFAULT 0,								\n" //$NON-NLS-1$
+				+ "	power_PedalLeftRightBalance				INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
+				+ "	power_AvgLeftTorqueEffectiveness			FLOAT DEFAULT 0,									\n" //$NON-NLS-1$
+				+ "	power_AvgRightTorqueEffectiveness		FLOAT DEFAULT 0,									\n" //$NON-NLS-1$
+				+ "	power_AvgLeftPedalSmoothness				FLOAT DEFAULT 0,									\n" //$NON-NLS-1$
+				+ "	power_AvgRightPedalSmoothness				FLOAT DEFAULT 0,									\n" //$NON-NLS-1$
 				//
 				// version 30 end ---------
 
 				// version 31 start  -  16.5
 				//
-				+ "	CadenceMultiplier		FLOAT DEFAULT 1.0,												\n" //$NON-NLS-1$
-				+ " IsStrideSensorPresent	INTEGER DEFAULT 0,												\n" //$NON-NLS-1$
+				+ "	CadenceMultiplier								FLOAT DEFAULT 1.0,								\n" //$NON-NLS-1$
+				+ " IsStrideSensorPresent							INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
 				//
 				// version 31 end ---------
 
@@ -2787,14 +2765,26 @@ public class TourDatabase {
 
 				//				// version 35 start  -  18.?
 				//				//
-				//				+ "	LatitudeMinE6			INTEGER DEFAULT 0,												\n" //$NON-NLS-1$
-				//				+ "	LatitudeMaxE6			INTEGER DEFAULT 0,												\n" //$NON-NLS-1$
-				//				+ "	LongitudeMinE6			INTEGER DEFAULT 0,												\n" //$NON-NLS-1$
-				//				+ "	LongitudeMaxE6			INTEGER DEFAULT 0,												\n" //$NON-NLS-1$
+				//				+ "	LatitudeMinE6			INTEGER DEFAULT 0,										\n" //$NON-NLS-1$
+				//				+ "	LatitudeMaxE6			INTEGER DEFAULT 0,										\n" //$NON-NLS-1$
+				//				+ "	LongitudeMinE6			INTEGER DEFAULT 0,										\n" //$NON-NLS-1$
+				//				+ "	LongitudeMaxE6			INTEGER DEFAULT 0,										\n" //$NON-NLS-1$
 				//				//
 				//				// version 35 end ---------
 
-				+ "	serieData				BLOB 															\n" //$NON-NLS-1$
+				// version 5 start
+				/**
+				 * disabled because when two blob object's are deserialized then the error occures:
+				 * <p>
+				 * java.io.StreamCorruptedException: invalid stream header: 00ACED00
+				 * <p>
+				 * therefor the gpsData are put into the serieData object
+				 */
+				//	+ "gpsData 											BLOB,													\n" //$NON-NLS-1$
+
+				// version 5 end
+
+				+ "	serieData										BLOB 													\n" //$NON-NLS-1$
 
 				+ ")"); //$NON-NLS-1$
 
@@ -6505,28 +6495,27 @@ public class TourDatabase {
 // SET_FORMATTING_OFF
 
 				// Add new columns
-				SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_StanceTime_Min", 			DEFAULT_0); //$NON-NLS-1$
-				SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_StanceTime_Max", 			DEFAULT_0); //$NON-NLS-1$
-				SQL.AddCol_Float(	stmt, TABLE_TOUR_DATA, "runDyn_StanceTime_Avg", 			DEFAULT_0); //$NON-NLS-1$
+				SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_StanceTime_Min", 				DEFAULT_0); //$NON-NLS-1$
+				SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_StanceTime_Max", 				DEFAULT_0); //$NON-NLS-1$
+				SQL.AddCol_Float(	  stmt, TABLE_TOUR_DATA, "runDyn_StanceTime_Avg", 				DEFAULT_0); //$NON-NLS-1$
 
-				SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_StanceTimeBalance_Min", 		DEFAULT_0); //$NON-NLS-1$
-				SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_StanceTimeBalance_Max", 		DEFAULT_0); //$NON-NLS-1$
-				SQL.AddCol_Float(	stmt, TABLE_TOUR_DATA, "runDyn_StanceTimeBalance_Avg", 		DEFAULT_0); //$NON-NLS-1$
+				SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_StanceTimeBalance_Min", 	DEFAULT_0); //$NON-NLS-1$
+				SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_StanceTimeBalance_Max", 	DEFAULT_0); //$NON-NLS-1$
+				SQL.AddCol_Float(	  stmt, TABLE_TOUR_DATA, "runDyn_StanceTimeBalance_Avg", 	DEFAULT_0); //$NON-NLS-1$
 
-				SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_StepLength_Min", 			DEFAULT_0); //$NON-NLS-1$
-				SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_StepLength_Max", 			DEFAULT_0); //$NON-NLS-1$
-				SQL.AddCol_Float(	stmt, TABLE_TOUR_DATA, "runDyn_StepLength_Avg", 			DEFAULT_0); //$NON-NLS-1$
+				SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_StepLength_Min", 				DEFAULT_0); //$NON-NLS-1$
+				SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_StepLength_Max", 				DEFAULT_0); //$NON-NLS-1$
+				SQL.AddCol_Float(	  stmt, TABLE_TOUR_DATA, "runDyn_StepLength_Avg", 				DEFAULT_0); //$NON-NLS-1$
 
 				SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_VerticalOscillation_Min", 	DEFAULT_0); //$NON-NLS-1$
 				SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_VerticalOscillation_Max", 	DEFAULT_0); //$NON-NLS-1$
-				SQL.AddCol_Float(	stmt, TABLE_TOUR_DATA, "runDyn_VerticalOscillation_Avg", 	DEFAULT_0); //$NON-NLS-1$
+				SQL.AddCol_Float(	  stmt, TABLE_TOUR_DATA, "runDyn_VerticalOscillation_Avg", 	DEFAULT_0); //$NON-NLS-1$
 
 				SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_VerticalRatio_Min", 			DEFAULT_0); //$NON-NLS-1$
 				SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_VerticalRatio_Max", 			DEFAULT_0); //$NON-NLS-1$
-				SQL.AddCol_Float(	stmt, TABLE_TOUR_DATA, "runDyn_VerticalRatio_Avg", 			DEFAULT_0); //$NON-NLS-1$
+				SQL.AddCol_Float(	  stmt, TABLE_TOUR_DATA, "runDyn_VerticalRatio_Avg", 			DEFAULT_0); //$NON-NLS-1$
 
 // SET_FORMATTING_ON
-
 			}
 		}
 		stmt.close();

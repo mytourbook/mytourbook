@@ -15,10 +15,6 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
-
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -40,6 +36,10 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.PlatformUI;
+
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 
 public class PrefPageAppearance extends PreferencePage implements IWorkbenchPreferencePage {
 
@@ -296,6 +296,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 		_prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_POWER_AND_SPEED_VALUES, false);
 		_prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_POWER_AND_PULSE_VALUES, false);
 		_prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_RUNNING_DYNAMICS_VALUES, false);
+		_prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_SWIMMING_VALUES, false);
 		_prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_TEMPERATURE_VALUES, false);
 		_prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR, false);
 		_prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR_MARKER, false);

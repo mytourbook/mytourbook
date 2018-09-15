@@ -28,7 +28,7 @@ public class Event_MesgListenerImpl extends AbstractMesgListener implements Even
 
 	@Override
 	public void onMesg(final EventMesg mesg) {
-		context.onMesg(mesg);
+		context.getContextData().onMesg_Event(mesg);
 	}
 
 }

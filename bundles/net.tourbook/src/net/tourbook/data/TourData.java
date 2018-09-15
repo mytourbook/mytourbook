@@ -167,22 +167,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	   Deg * 100000		  1.6 m
 	 * </pre>
 	 */
-	public static final double			MAX_GEO_DIFF						= 0.0001;
+	public static final double			MAX_GEO_DIFF							= 0.0001;
 
 	public static final double			NORMALIZED_LATITUDE_OFFSET			= 90.0;
-	public static final double			NORMALIZED_LONGITUDE_OFFSET			= 180.0;
+	public static final double			NORMALIZED_LONGITUDE_OFFSET		= 180.0;
 
 	private static final String		TIME_ZONE_ID_EUROPE_BERLIN			= "Europe/Berlin";				//$NON-NLS-1$
 
-	public static final int				MIN_TIMEINTERVAL_FOR_MAX_SPEED		= 20;
+	public static final int				MIN_TIMEINTERVAL_FOR_MAX_SPEED	= 20;
 
-	public static final float			MAX_BIKE_SPEED						= 120f;
+	public static final float			MAX_BIKE_SPEED							= 120f;
 
 	/**
 	 * Number of defined hr zone fields which is currently {@link #hrZone0} ... {@link #hrZone9} =
 	 * 10
 	 */
-	public static final int				MAX_HR_ZONES						= 10;
+	public static final int				MAX_HR_ZONES							= 10;
 
 	public static final Float 			RUN_DYN_DATA_MULTIPLIER				= 100f;
 
@@ -389,7 +389,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	/**
 	 * Number of HR zones which are available for this tour, is 0 when HR zones are not defined.
 	 */
-	private int							numberOfHrZones						= 0;							// db-version 18
+	private int							numberOfHrZones					= 0;							// db-version 18
 
 	/**
 	 * Time for all HR zones are contained in {@link #hrZone0} ... {@link #hrZone9}. Each tour can
@@ -435,7 +435,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * Visible name for the used profile which is defined in {@link #deviceMode}, e.g. Jogging,
 	 * Running, Bike1, Bike2...
 	 */
-	private String						deviceModeName;														// db-version 4
+	private String						deviceModeName;													// db-version 4
 
 	/**
 	 * maximum altitude in metric system
@@ -471,10 +471,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	// ############################################# WEATHER #############################################
 
-	private int							weatherWindDir;														// db-version 8
-	private int							weatherWindSpd;														// db-version 8
+	private int							weatherWindDir;													// db-version 8
+	private int							weatherWindSpd;													// db-version 8
 	private String						weatherClouds;														// db-version 8
-	private String						weather;															// db-version 13
+	private String						weather;																// db-version 13
 
 	// ############################################# POWER #############################################
 
@@ -510,7 +510,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	private String						tourDescription;													// db-version 4
 
 	@XmlElement
-	private String						tourStartPlace;														// db-version 4
+	private String						tourStartPlace;													// db-version 4
 
 	@XmlElement
 	private String						tourEndPlace;														// db-version 4
@@ -531,10 +531,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	private long						dateTimeModified;													// db-version 11
 
 	/** Folder path from the import file. */
-	private String						tourImportFilePath;													// db-version 6
+	private String						tourImportFilePath;												// db-version 6
 
 	/** File name from the import file. */
-	private String						tourImportFileName;													// db-version 29
+	private String						tourImportFileName;												// db-version 29
 
 	/**
 	 * Tolerance for the Douglas Peucker algorithm.
@@ -545,7 +545,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * Time difference in seconds between 2 time slices or <code>-1</code> for GPS devices when the
 	 * time slices has variable time duration
 	 */
-	private short						deviceTimeInterval					= -1;							// db-version 3
+	private short						deviceTimeInterval					= -1;						// db-version 3
 
 	/**
 	 * Scaling factor for the temperature data serie, e.g. when set to 10 the temperature data serie
@@ -560,7 +560,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	/**
 	 * Firmware version of the device
 	 */
-	private String						deviceFirmwareVersion;												// db-version 12
+	private String						deviceFirmwareVersion;											// db-version 12
 
 	/**
 	 * This value is multiplied with the cadence data serie when displayed, cadence data serie is
@@ -584,23 +584,23 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * when a tour is merged with another tour, {@link #mergeSourceTourId} contains the tour id of
 	 * the tour which is merged into this tour
 	 */
-	private Long						mergeSourceTourId;													// db-version 7
+	private Long						mergeSourceTourId;												// db-version 7
 
 	/**
 	 * when a tour is merged into another tour, {@link #mergeTargetTourId} contains the tour id of
 	 * the tour into which this tour is merged
 	 */
-	private Long						mergeTargetTourId;													// db-version 7
+	private Long						mergeTargetTourId;												// db-version 7
 
 	/**
 	 * positive or negative time offset in seconds for the merged tour
 	 */
-	private int							mergedTourTimeOffset;												// db-version 7
+	private int							mergedTourTimeOffset;											// db-version 7
 
 	/**
 	 * altitude difference for the merged tour
 	 */
-	private int							mergedAltitudeOffset;												// db-version 7
+	private int							mergedAltitudeOffset;											// db-version 7
 
 	/**
 	 * Unique plugin id for the device data reader which created this tour, this id is defined in
@@ -680,8 +680,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 //	private int							latitudeMinE6;								// db-version 35
 //	private int							latitudeMaxE6;								// db-version 35
-//	private int							longitudeMinE6;								// db-version 35
-//	private int							longitudeMaxE6;								// db-version 35
+//	private int							longitudeMinE6;							// db-version 35
+//	private int							longitudeMaxE6;							// db-version 35
 
 
 	// ############################################# UNUSED FIELDS - START #############################################
@@ -694,7 +694,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	private int							distance;
 
 	@SuppressWarnings("unused")
-	private float						deviceAvgSpeed;								// db-version 12
+	private float						deviceAvgSpeed;							// db-version 12
 
 	@SuppressWarnings("unused")
 	private int							deviceDistance;
@@ -723,7 +723,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	// ############################################# UNUSED FIELDS - END #############################################
 
 	/**
-	 * data series for time, altitude,...
+	 * All data series for time, altitude,... A BLOB CANNOT BE MULTIPLE !
 	 */
 	@Basic(optional = false)
 	private SerieData					serieData;
@@ -733,7 +733,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 */
 	@OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-	private Set<TourPhoto>				tourPhotos							= new HashSet<>();
+	private Set<TourPhoto>				tourPhotos								= new HashSet<>();
 
 	// ############################################# ASSOCIATED ENTITIES #############################################
 
@@ -744,28 +744,28 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	@XmlElementWrapper(name = "TourMarkers")
 	@XmlElement(name = "TourMarker")
-	private Set<TourMarker>				tourMarkers							= new HashSet<>();
+	private Set<TourMarker>				tourMarkers								= new HashSet<>();
 
 	/**
 	 * Contains the tour way points
 	 */
 	@OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-	private final Set<TourWayPoint>		tourWayPoints						= new HashSet<>();
+	private final Set<TourWayPoint>	tourWayPoints							= new HashSet<>();
 
 	/**
 	 * Reference tours
 	 */
 	@OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-	private final Set<TourReference>	tourReferences						= new HashSet<>();
+	private final Set<TourReference>	tourReferences							= new HashSet<>();
 
 	/**
 	 * Tags
 	 */
 	@ManyToMany(fetch = EAGER)
 	@JoinTable(inverseJoinColumns = @JoinColumn(name = "TOURTAG_TagID", referencedColumnName = "TagID"))
-	private Set<TourTag>				tourTags							= new HashSet<>();
+	private Set<TourTag>					tourTags									= new HashSet<>();
 
 //	/**
 //	 * SharedMarker
@@ -919,7 +919,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * computed. Speed data are normally available from an ergometer and not from a bike computer
 	 */
 	@Transient
-	private boolean					isSpeedSerieFromDevice				= false;
+	private boolean					isSpeedSerieFromDevice					= false;
 
 	/**
 	 * pace in sec/km
@@ -953,7 +953,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * computed. Power data source can be an ergometer or a power sensor
 	 */
 	@Transient
-	private boolean					isPowerSerieFromDevice				= false;
+	private boolean					isPowerSerieFromDevice					= false;
 
 	@Transient
 	private float[]					altimeterSerie;
@@ -1135,14 +1135,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * not set
 	 */
 	@Transient
-	public double						mapCenterPositionLatitude			= Double.MIN_VALUE;
+	public double						mapCenterPositionLatitude				= Double.MIN_VALUE;
 
 	/**
 	 * Longitude for the center position in the map or {@link Double#MIN_VALUE} when the position is
 	 * not set
 	 */
 	@Transient
-	public double						mapCenterPositionLongitude			= Double.MIN_VALUE;
+	public double						mapCenterPositionLongitude				= Double.MIN_VALUE;
 
 	/**
 	 * Zoomlevel in the map
@@ -1254,7 +1254,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * Contains photos which are displayed in photo galleries.
 	 */
 	@Transient
-	private ArrayList<Photo>	_galleryPhotos	= new ArrayList<>();
+	private ArrayList<Photo>	_galleryPhotos									= new ArrayList<>();
 
 	/**
 	 *
@@ -1392,7 +1392,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 *
 	 * @since Version 18.7
 	 */
-// SET_FORMATTING_ON
 	@Transient
 	public short[]					runDyn_StanceTime;
 	@Transient
@@ -1406,22 +1405,66 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	@Transient
 	public short[]					runDyn_StepLength;
 	@Transient
-	private float[]															_runDyn_StepLength_UI;
+	private float[]				_runDyn_StepLength_UI;
 	@Transient
-	private float[]															_runDyn_StepLength_UI_Imperial;
+	private float[]				_runDyn_StepLength_UI_Imperial;
 
 	@Transient
 	public short[]					runDyn_VerticalOscillation;
 	@Transient
-	private float[]															_runDyn_VerticalOscillation_UI;
+	private float[]				_runDyn_VerticalOscillation_UI;
 	@Transient
-	private float[]															_runDyn_VerticalOscillation_UI_Imperial;
+	private float[]				_runDyn_VerticalOscillation_UI_Imperial;
 
 	@Transient
 	public short[]					runDyn_VerticalRatio;
 	@Transient
-	private float[]															_runDyn_VerticalRatio_UI;
+	private float[]				_runDyn_VerticalRatio_UI;
 
+	/*
+	 * Swimming data
+	 * @since Version 18.10
+	 */
+
+	/**
+	 * Swimming data: Relative time in seconds to the tour start time. Contains
+	 * {@link Short#MIN_VALUE} when value is not set.
+	 */
+	@Transient
+	public short[]					swim_Time;
+
+	/**
+	 * Swimming data: Activity e.g. active, idle. Contains {@link Short#MIN_VALUE} when value is not
+	 * set.
+	 */
+	@Transient
+	public short[]					swim_ActivityType;
+	private float[]				_swim_ActivityType_UI;
+
+	/**
+	 * Swimming data: Number of strokes. Contains {@link Short#MIN_VALUE} when value is not set.
+	 */
+	@Transient
+	public short[]					swim_Strokes;
+	private float[]				_swim_Strokes_UI;
+
+	/**
+	 * Swimming data: Stroke style e.g. freestyle, breaststroke. Contains {@link Short#MIN_VALUE}
+	 * when value is not set.
+	 */
+	@Transient
+	public short[]					swim_StrokeStyle;
+	private float[]				_swim_StrokeStyle_UI;
+
+	/**
+	 * Swimming data: Swimming cadence in strokes/min. Contains {@link Short#MIN_VALUE} when value is
+	 * not set.
+	 */
+	@Transient
+	public short[]					swim_Cadence;
+	private float[]				_swim_Cadence_UI;
+
+// SET_FORMATTING_ON
 
 	public TourData() {}
 
@@ -1672,6 +1715,35 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		runDyn_VerticalRatio_Avg = 0;
 
 		_runDyn_VerticalRatio_UI = null;
+	}
+
+	public void clear_Swim_ActivityType() {
+
+		swim_ActivityType = null;
+		_swim_ActivityType_UI = null;
+	}
+
+	public void clear_Swim_Cadence() {
+
+		swim_Cadence = null;
+		_swim_Cadence_UI = null;
+	}
+
+	public void clear_Swim_Strokes() {
+
+		swim_Strokes = null;
+		_swim_Strokes_UI = null;
+	}
+
+	public void clear_Swim_StrokeStyle() {
+
+		swim_StrokeStyle = null;
+		_swim_StrokeStyle_UI = null;
+	}
+
+	public void clear_Swim_Time() {
+
+		swim_Time = null;
 	}
 
 	/**
@@ -4993,11 +5065,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		final boolean isPower 								= setupStartingValues_Power(timeDataSerie);
 		final boolean isPulse 								= setupStartingValues_Pulse(timeDataSerie);
 		final boolean isTemperature 						= setupStartingValues_Temperature(timeDataSerie);
+
 		final boolean isRunDyn_StanceTime 				= setupStartingValues_RunDyn_StanceTime(timeDataSerie);
 		final boolean isRunDyn_StanceTimeBalance 		= setupStartingValues_RunDyn_StanceTimeBalance(timeDataSerie);
 		final boolean isRunDyn_StepLength 				= setupStartingValues_RunDyn_StepLength(timeDataSerie);
 		final boolean isRunDyn_VerticalOscillation	= setupStartingValues_RunDyn_VerticalOscillation(timeDataSerie);
 		final boolean isRunDyn_VerticalRatio			= setupStartingValues_RunDyn_VerticalRatio(timeDataSerie);
+
+		final boolean isSwim_ActivityType 				= setupStartingValues_Swim_ActivityType(timeDataSerie);
+		final boolean isSwim_Cadence		 				= setupStartingValues_Swim_Cadence(timeDataSerie);
+		final boolean isSwim_Strokes		 				= setupStartingValues_Swim_Strokes(timeDataSerie);
+		final boolean isSwim_StrokeStyle 				= setupStartingValues_Swim_StrokeStyle(timeDataSerie);
+		final boolean isSwim_Time 							= setupStartingValues_Swim_Time(timeDataSerie);
 
 // SET_FORMATTING_ON
 
@@ -5197,6 +5276,25 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 				if (isRunDyn_VerticalRatio) {
 					final short tdValue = timeData.runDyn_VerticalRatio;
 					runDyn_VerticalRatio[serieIndex] = tdValue == Short.MIN_VALUE ? 0 : tdValue;
+				}
+
+				/*
+				 * Swimming
+				 */
+				if (isSwim_ActivityType) {
+					swim_ActivityType[serieIndex] = timeData.swim_Time;
+				}
+				if (isSwim_Cadence) {
+					swim_Cadence[serieIndex] = timeData.swim_Time;
+				}
+				if (isSwim_Strokes) {
+					swim_Strokes[serieIndex] = timeData.swim_Time;
+				}
+				if (isSwim_StrokeStyle) {
+					swim_StrokeStyle[serieIndex] = timeData.swim_Time;
+				}
+				if (isSwim_Time) {
+					swim_Time[serieIndex] = timeData.swim_Time;
 				}
 			}
 
@@ -7909,11 +8007,19 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 		pulseTimeSerie = serieData.pulseTimes;
 
+		// running dynamics
 		runDyn_StanceTime = serieData.runDyn_StanceTime;
 		runDyn_StanceTimeBalance = serieData.runDyn_StanceTimeBalance;
 		runDyn_StepLength = serieData.runDyn_StepLength;
 		runDyn_VerticalOscillation = serieData.runDyn_VerticalOscillation;
 		runDyn_VerticalRatio = serieData.runDyn_VerticalRatio;
+
+		// swimming
+		swim_ActivityType = serieData.swim_ActivityType;
+		swim_Cadence = serieData.swim_Cadence;
+		swim_Strokes = serieData.swim_Strokes;
+		swim_StrokeStyle = serieData.swim_StrokeStyle;
+		swim_Time = serieData.swim_Time;
 
 		if (powerSerie != null) {
 			isPowerSerieFromDevice = true;
@@ -7961,15 +8067,21 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 		serieData.pulseTimes = pulseTimeSerie;
 
+		// running dynamics
 		serieData.runDyn_StanceTime = runDyn_StanceTime;
 		serieData.runDyn_StanceTimeBalance = runDyn_StanceTimeBalance;
 		serieData.runDyn_StepLength = runDyn_StepLength;
 		serieData.runDyn_VerticalRatio = runDyn_VerticalRatio;
 		serieData.runDyn_VerticalOscillation = runDyn_VerticalOscillation;
 
-		/*
-		 * time serie size
-		 */
+		// swimming
+		serieData.swim_ActivityType = swim_ActivityType;
+		serieData.swim_Cadence = swim_Cadence;
+		serieData.swim_Strokes = swim_Strokes;
+		serieData.swim_StrokeStyle = swim_StrokeStyle;
+		serieData.swim_Time = swim_Time;
+
+		// time serie size
 		numberOfTimeSlices = timeSerie == null ? 0 : timeSerie.length;
 	}
 
@@ -9182,6 +9294,206 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			// data are available
 
 			runDyn_VerticalRatio = new short[serieSize];
+			isAvailable = true;
+		}
+
+		return isAvailable;
+	}
+
+	private boolean setupStartingValues_Swim_ActivityType(final TimeData[] timeDataSerie) {
+
+		final TimeData firstTimeData = timeDataSerie[0];
+		final int serieSize = timeDataSerie.length;
+
+		boolean isAvailable = false;
+
+		if (firstTimeData.swim_ActivityType == Short.MIN_VALUE) {
+
+			// search for first valid value
+
+			for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
+
+				final short value = timeDataSerie[timeDataIndex].swim_ActivityType;
+
+				if (value != Short.MIN_VALUE) {
+
+					// data are available, starting values are set to first valid value
+
+					swim_ActivityType = new short[serieSize];
+					isAvailable = true;
+
+//					for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
+//						timeDataSerie[invalidIndex].swim_ActivityType = value;
+//					}
+					break;
+				}
+			}
+
+		} else {
+
+			// data are available
+
+			swim_ActivityType = new short[serieSize];
+			isAvailable = true;
+		}
+
+		return isAvailable;
+	}
+
+	private boolean setupStartingValues_Swim_Cadence(final TimeData[] timeDataSerie) {
+
+		final TimeData firstTimeData = timeDataSerie[0];
+		final int serieSize = timeDataSerie.length;
+
+		boolean isAvailable = false;
+
+		if (firstTimeData.swim_Cadence == Short.MIN_VALUE) {
+
+			// search for first valid value
+
+			for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
+
+				final short value = timeDataSerie[timeDataIndex].swim_Cadence;
+
+				if (value != Short.MIN_VALUE) {
+
+					// data are available, starting values are set to first valid value
+
+					swim_Cadence = new short[serieSize];
+					isAvailable = true;
+
+//					for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
+//						timeDataSerie[invalidIndex].swim_Cadence = value;
+//					}
+					break;
+				}
+			}
+
+		} else {
+
+			// data are available
+
+			swim_Cadence = new short[serieSize];
+			isAvailable = true;
+		}
+
+		return isAvailable;
+	}
+
+	private boolean setupStartingValues_Swim_Strokes(final TimeData[] timeDataSerie) {
+
+		final TimeData firstTimeData = timeDataSerie[0];
+		final int serieSize = timeDataSerie.length;
+
+		boolean isAvailable = false;
+
+		if (firstTimeData.swim_Strokes == Short.MIN_VALUE) {
+
+			// search for first valid value
+
+			for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
+
+				final short value = timeDataSerie[timeDataIndex].swim_Strokes;
+
+				if (value != Short.MIN_VALUE) {
+
+					// data are available, starting values are set to first valid value
+
+					swim_Strokes = new short[serieSize];
+					isAvailable = true;
+
+//					for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
+//						timeDataSerie[invalidIndex].swim_Strokes = value;
+//					}
+					break;
+				}
+			}
+
+		} else {
+
+			// data are available
+
+			swim_Strokes = new short[serieSize];
+			isAvailable = true;
+		}
+
+		return isAvailable;
+	}
+
+	private boolean setupStartingValues_Swim_StrokeStyle(final TimeData[] timeDataSerie) {
+
+		final TimeData firstTimeData = timeDataSerie[0];
+		final int serieSize = timeDataSerie.length;
+
+		boolean isAvailable = false;
+
+		if (firstTimeData.swim_StrokeStyle == Short.MIN_VALUE) {
+
+			// search for first valid value
+
+			for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
+
+				final short value = timeDataSerie[timeDataIndex].swim_StrokeStyle;
+
+				if (value != Short.MIN_VALUE) {
+
+					// data are available, starting values are set to first valid value
+
+					swim_StrokeStyle = new short[serieSize];
+					isAvailable = true;
+
+//					for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
+//						timeDataSerie[invalidIndex].swim_StrokeStyle = value;
+//					}
+					break;
+				}
+			}
+
+		} else {
+
+			// data are available
+
+			swim_StrokeStyle = new short[serieSize];
+			isAvailable = true;
+		}
+
+		return isAvailable;
+	}
+
+	private boolean setupStartingValues_Swim_Time(final TimeData[] timeDataSerie) {
+
+		final TimeData firstTimeData = timeDataSerie[0];
+		final int serieSize = timeDataSerie.length;
+
+		boolean isAvailable = false;
+
+		if (firstTimeData.swim_Time == Short.MIN_VALUE) {
+
+			// search for first valid value
+
+			for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
+
+				final short value = timeDataSerie[timeDataIndex].swim_Time;
+
+				if (value != Short.MIN_VALUE) {
+
+					// data are available, starting values are set to first valid value
+
+					swim_Time = new short[serieSize];
+					isAvailable = true;
+
+//					for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
+//						timeDataSerie[invalidIndex].swim_Time = value;
+//					}
+					break;
+				}
+			}
+
+		} else {
+
+			// data are available
+
+			swim_Time = new short[serieSize];
 			isAvailable = true;
 		}
 

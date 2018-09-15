@@ -1,20 +1,20 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 /**
- * 
+ *
  */
 package net.tourbook.data;
 
@@ -28,15 +28,15 @@ public class SerieData implements Serializable {
 
 	private static final long	serialVersionUID	= 1L;
 
-	public int[]				timeSerie;
+	public int[]					timeSerie;
 
-	public float[]				distanceSerie20;
-	public float[]				altitudeSerie20;
-	public float[]				cadenceSerie20;
-	public float[]				pulseSerie20;
-	public float[]				temperatureSerie20;
-	public float[]				speedSerie20;
-	public float[]				powerSerie20;
+	public float[]					distanceSerie20;
+	public float[]					altitudeSerie20;
+	public float[]					cadenceSerie20;
+	public float[]					pulseSerie20;
+	public float[]					temperatureSerie20;
+	public float[]					speedSerie20;
+	public float[]					powerSerie20;
 
 	/**
 	 * Gears are in this format (left to right)
@@ -45,30 +45,30 @@ public class SerieData implements Serializable {
 	 * Front gear number<br>
 	 * Back teeth<br>
 	 * Back gear number<br>
-	 * 
+	 *
 	 * <pre>
-	 * 
+	 *
 	 * public int getFrontGearNum() {
 	 * 	return (int) (gears &gt;&gt; 16 &amp; 0xff);
 	 * }
-	 * 
+	 *
 	 * public int getFrontGearTeeth() {
 	 * 	return (int) (gears &gt;&gt; 24 &amp; 0xff);
 	 * }
-	 * 
+	 *
 	 * public int getRearGearNum() {
 	 * 	return (int) (gears &amp; 0xff);
 	 * }
-	 * 
+	 *
 	 * public int getRearGearTeeth() {
 	 * 	return (int) (gears &gt;&gt; 8 &amp; 0xff);
 	 * }
-	 * 
+	 *
 	 * </pre>
-	 * 
+	 *
 	 * @since Db-version 27
 	 */
-	public long[]				gears;
+	public long[]					gears;
 
 	public double[]				longitude;
 	public double[]				latitude;
@@ -76,33 +76,43 @@ public class SerieData implements Serializable {
 	/**
 	 * Pulse times in milliseconds.
 	 * <p>
-	 * <b>This data serie has not the same serie length as the other data series because 1 second
-	 * can have multiple values, depending on the heartrate.</b>
+	 * <b>This data serie has not the same serie length as the other data series because 1 second can
+	 * have multiple values, depending on the heartrate.</b>
 	 */
-	public int[]				pulseTimes;
+	public int[]					pulseTimes;
 
 	/*
 	 * Running dynamics data
 	 * @since Version 18.7
 	 */
-	public short[]				runDyn_StanceTime;
-	public short[]				runDyn_StanceTimeBalance;
-	public short[]				runDyn_StepLength;
-	public short[]				runDyn_VerticalOscillation;
-	public short[]				runDyn_VerticalRatio;
+	public short[]					runDyn_StanceTime;
+	public short[]					runDyn_StanceTimeBalance;
+	public short[]					runDyn_StepLength;
+	public short[]					runDyn_VerticalOscillation;
+	public short[]					runDyn_VerticalRatio;
 
 	/*
-	 * these data series cannot be removed because they are needed to convert from int to float in
-	 * db version 20
+	 * Swim data
+	 * @since Version 18.10
 	 */
-	public int[]				distanceSerie;
-	public int[]				altitudeSerie;
-	public int[]				cadenceSerie;
-	public int[]				pulseSerie;
-	public int[]				temperatureSerie;
-	public int[]				speedSerie;
-	public int[]				powerSerie;
+	public short[]					swim_ActivityType;			// e.g. active, idle
+	public short[]					swim_Cadence;					// strokes/min
+	public short[]					swim_Strokes;					// number of strokes
+	public short[]					swim_StrokeStyle;				// e.g. freestyle, breaststroke
+	public short[]					swim_Time;						// relative time to the start time
 
-	public int[]				deviceMarker;
+	/*
+	 * These data series cannot be removed because they are needed to convert from int to float in db
+	 * version 20
+	 */
+	public int[]					distanceSerie;
+	public int[]					altitudeSerie;
+	public int[]					cadenceSerie;
+	public int[]					pulseSerie;
+	public int[]					temperatureSerie;
+	public int[]					speedSerie;
+	public int[]					powerSerie;
+
+	public int[]					deviceMarker;
 
 }

@@ -1,16 +1,16 @@
 package net.tourbook.device.garmin.fit.listeners;
 
+import com.garmin.fit.DateTime;
+import com.garmin.fit.SessionMesg;
+import com.garmin.fit.SessionMesgListener;
+import com.garmin.fit.Sport;
+
 import java.time.ZonedDateTime;
 
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.data.TourData;
 import net.tourbook.device.garmin.fit.FitContext;
 import net.tourbook.device.garmin.fit.FitDataReaderException;
-
-import com.garmin.fit.DateTime;
-import com.garmin.fit.SessionMesg;
-import com.garmin.fit.SessionMesgListener;
-import com.garmin.fit.Sport;
 
 public class Session_MesgListenerImpl extends AbstractMesgListener implements SessionMesgListener {
 
@@ -21,7 +21,7 @@ public class Session_MesgListenerImpl extends AbstractMesgListener implements Se
 	@Override
 	public void onMesg(final SessionMesg mesg) {
 
-		context.onMesg_Session_10_Before();
+		context.getContextData().setupSession_Tour_10_Initialize();
 
 		final Integer messageIndex = getMessageIndex(mesg);
 		context.setSessionIndex(messageIndex.toString());
@@ -153,6 +153,6 @@ public class Session_MesgListenerImpl extends AbstractMesgListener implements Se
 			tourData.setPower_FTP(ftp);
 		}
 
-		context.onMesg_Session_20_After();
+		context.getContextData().setupSession_Tour_20_Finalize();
 	}
 }

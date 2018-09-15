@@ -49,7 +49,7 @@ public class Record_MesgListenerImpl extends AbstractMesgListener implements Rec
 	@Override
 	public void onMesg(final RecordMesg mesg) {
 
-		context.onMesg_Record_10_Before();
+		context.getContextData().setupRecord_10_Initialize();
 
 		final TimeData timeData = getTimeData();
 
@@ -117,7 +117,7 @@ public class Record_MesgListenerImpl extends AbstractMesgListener implements Rec
 				 * Create a marker for the exceeded time slice
 				 */
 
-				context.onMesg_Lap_10_Before();
+				context.getContextData().setupLap_Marker_10_Initialize();
 				{
 					final TourMarker tourMarker = getTourMarker();
 
@@ -135,7 +135,7 @@ public class Record_MesgListenerImpl extends AbstractMesgListener implements Rec
 
 					tourMarker.setDeviceLapTime(absoluteTime);
 				}
-				context.onMesg_Lap_20_After();
+				context.getContextData().setupLap_Marker_20_Finalize();
 			}
 		}
 
@@ -268,7 +268,7 @@ public class Record_MesgListenerImpl extends AbstractMesgListener implements Rec
 			timeData.runDyn_VerticalRatio = (short) (verticalRatio * TourData.RUN_DYN_DATA_MULTIPLIER);
 		}
 
-		context.onMesg_Record_20_After();
+		context.getContextData().setupRecord_20_Finalize();
 	}
 
 }

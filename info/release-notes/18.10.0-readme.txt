@@ -1,8 +1,14 @@
-Version 18.9.1                                                   ?. September 2018
+Version 18.10.0                                                   ?. October 2018
 
 
 New
 ===	
+
+* Swimming
+  - Import
+  - Reimport
+  - Tour chart
+
 
 * Tour Segmenter
   Stride length computed from cadence/time/distance
