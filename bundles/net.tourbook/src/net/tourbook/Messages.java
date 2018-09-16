@@ -863,6 +863,8 @@ public class Messages extends NLS {
 	public static String				Image__Graph_RunDyn_VerticalOscillation_Disabled;
 	public static String				Image__Graph_RunDyn_VerticalRatio;
 	public static String				Image__Graph_RunDyn_VerticalRatio_Disabled;
+	public static String				Image__Graph_Swim_Strokes;
+	public static String				Image__Graph_Swim_Strokes_Disabled;
 	public static String				Image__GraphMinMax;
 	public static String				Image__GraphMinMax_Disabled;
 	public static String				Image__graph_pace_disabled;

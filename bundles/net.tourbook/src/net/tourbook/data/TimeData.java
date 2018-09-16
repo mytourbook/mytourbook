@@ -163,34 +163,9 @@ public class TimeData implements Serializable {
 	 */
 	public short					runDyn_VerticalRatio			= Short.MIN_VALUE;
 
-	/**
-	 * Swimming data: Relative time in seconds to the tour start time. Contains
-	 * {@link Short#MIN_VALUE} when value is not set.
-	 */
-	public short					swim_Time						= Short.MIN_VALUE;
-
-	/**
-	 * Swimming data: Activity e.g. active, idle. Contains {@link Short#MIN_VALUE} when value is not
-	 * set.
-	 */
-	public short					swim_ActivityType				= Short.MIN_VALUE;
-
-	/**
-	 * Swimming data: Stroke style e.g. freestyle, breaststroke. Contains {@link Short#MIN_VALUE}
-	 * when value is not set.
-	 */
-	public short					swim_StrokeStyle				= Short.MIN_VALUE;
-
-	/**
-	 * Swimming data: Number of strokes. Contains {@link Short#MIN_VALUE} when value is not set.
-	 */
-	public short					swim_Strokes					= Short.MIN_VALUE;
-
-	/**
-	 * Swimming data: Swimming cadence in strokes/min. Contains {@link Short#MIN_VALUE} when value is
-	 * not set.
-	 */
-	public short					swim_Cadence					= Short.MIN_VALUE;
+	public TimeData() {
+		super();
+	}
 
 	@Override
 	public String toString() {

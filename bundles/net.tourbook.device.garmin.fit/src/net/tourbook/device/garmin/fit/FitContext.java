@@ -14,6 +14,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.GearData;
+import net.tourbook.data.SwimData;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -46,7 +47,6 @@ public class FitContext {
 	private String							_softwareVersion;
 
 	private String							_sessionIndex;
-
 	private ZonedDateTime				_sessionTime;
 
 	private float							_lapDistance;
@@ -82,11 +82,12 @@ public class FitContext {
 
 			@Override
 			public void finalizeTour(	final TourData tourData,
-												final List<TimeData> timeDataList,
-												final List<TourMarker> tourMarkers,
-												final List<GearData> gears) {
+												final List<TimeData> allTimeData,
+												final List<TourMarker> allTourMarkers,
+												final List<GearData> allTourGears,
+												final List<SwimData> allTourSwimData) {
 
-				resetSpeedAtFirstPosition(timeDataList);
+				resetSpeedAtFirstPosition(allTimeData);
 
 // disabled, this is annoing
 //				tourData.setTourTitle(getTourTitle());
@@ -104,7 +105,7 @@ public class FitContext {
 				tourData.setIsDistanceFromSensor(_isSpeedSensorPresent);
 				tourData.setIsStrideSensorPresent(_isStrideSensorPresent);
 
-				final long recordStartTime = timeDataList.get(0).absoluteTime;
+				final long recordStartTime = allTimeData.get(0).absoluteTime;
 
 				if (_sessionTime != null) {
 
@@ -119,12 +120,8 @@ public class FitContext {
 								String.format(
 										message,
 										_importFilePathName,
-										TimeTools.getZonedDateTime(sessionStartTime)
-												.format(
-														TimeTools.Formatter_DateTime_M),
-										TimeTools.getZonedDateTime(recordStartTime)
-												.format(
-														TimeTools.Formatter_DateTime_M),
+										TimeTools.getZonedDateTime(sessionStartTime).format(TimeTools.Formatter_DateTime_M),
+										TimeTools.getZonedDateTime(recordStartTime).format(TimeTools.Formatter_DateTime_M),
 										(recordStartTime - sessionStartTime) / 1000));
 					}
 				}
@@ -133,7 +130,7 @@ public class FitContext {
 
 				tourData.setTourStartTime(zonedStartTime);
 
-				tourData.createTimeSeries(timeDataList, false);
+				tourData.createTimeSeries(allTimeData, false);
 
 				// after all data are added, the tour id can be created
 				final String uniqueId = _device.createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_GARMIN_FIT);
@@ -149,9 +146,10 @@ public class FitContext {
 					tourData.computeAltimeterGradientSerie();
 
 					// must be called after time series are created
-					setupTour_Gears(tourData, gears);
+					setupTour_Gears(tourData, allTourGears);
 
-					setupTour_Marker(tourData, tourMarkers);
+					setupTour_Marker(tourData, allTourMarkers);
+					setupTour_SwimData(tourData, allTourSwimData);
 				}
 			}
 
@@ -242,9 +240,9 @@ public class FitContext {
 				}
 			}
 
-			private void setupTour_Marker(final TourData tourData, final List<TourMarker> tourMarkers) {
+			private void setupTour_Marker(final TourData tourData, final List<TourMarker> allTourMarkers) {
 
-				if (tourMarkers == null || tourMarkers.size() == 0) {
+				if (allTourMarkers == null || allTourMarkers.size() == 0) {
 					return;
 				}
 
@@ -255,7 +253,7 @@ public class FitContext {
 				final long absoluteTourEndTime = tourData.getTourEndTimeMS();
 
 				final ArrayList<TourMarker> validatedTourMarkers = new ArrayList<>();
-				final int tourMarkerSize = tourMarkers.size();
+				final int tourMarkerSize = allTourMarkers.size();
 
 				int markerIndex = 0;
 				int serieIndex = 0;
@@ -266,7 +264,7 @@ public class FitContext {
 
 				for (; markerIndex < tourMarkerSize; markerIndex++) {
 
-					final TourMarker tourMarker = tourMarkers.get(markerIndex);
+					final TourMarker tourMarker = allTourMarkers.get(markerIndex);
 					final long absoluteMarkerTime = tourMarker.getDeviceLapTime();
 
 					boolean isSetMarker = false;
@@ -335,6 +333,45 @@ public class FitContext {
 				final Set<TourMarker> tourTourMarkers = new HashSet<>(validatedTourMarkers);
 
 				tourData.setTourMarkers(tourTourMarkers);
+			}
+
+			/**
+			 * Fill swim data into tourdata.
+			 *
+			 * @param tourData
+			 * @param allTourSwimData
+			 */
+			private void setupTour_SwimData(final TourData tourData, final List<SwimData> allTourSwimData) {
+
+				final long tourStartTime = tourData.getTourStartTimeMS();
+
+				final int swimDataSize = allTourSwimData.size();
+
+				final short[] activityType = new short[swimDataSize];
+				final short[] cadence = new short[swimDataSize];
+				final short[] strokes = new short[swimDataSize];
+				final short[] strokeStyle = new short[swimDataSize];
+				final int[] swimTime = new int[swimDataSize];
+
+				tourData.swim_ActivityType = activityType;
+				tourData.swim_Cadence = cadence;
+				tourData.swim_Strokes = strokes;
+				tourData.swim_StrokeStyle = strokeStyle;
+				tourData.swim_Time = swimTime;
+
+				for (int swimSerieIndex = 0; swimSerieIndex < allTourSwimData.size(); swimSerieIndex++) {
+
+					final SwimData swimData = allTourSwimData.get(swimSerieIndex);
+
+					final long absoluteSwimTime = swimData.absoluteTime;
+					final short relativeSwimTime = (short) ((absoluteSwimTime - tourStartTime) / 1000);
+
+					activityType[swimSerieIndex] = swimData.swim_ActivityType;
+					cadence[swimSerieIndex] = swimData.swim_Cadence;
+					strokes[swimSerieIndex] = swimData.swim_Strokes;
+					strokeStyle[swimSerieIndex] = swimData.swim_StrokeStyle;
+					swimTime[swimSerieIndex] = relativeSwimTime;
+				}
 			}
 		};
 

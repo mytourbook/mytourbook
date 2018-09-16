@@ -99,7 +99,7 @@ public class SerieData implements Serializable {
 	public short[]					swim_Cadence;					// strokes/min
 	public short[]					swim_Strokes;					// number of strokes
 	public short[]					swim_StrokeStyle;				// e.g. freestyle, breaststroke
-	public short[]					swim_Time;						// relative time to the start time
+	public int[]					swim_Time;						// relative time to the start time
 
 	/*
 	 * These data series cannot be removed because they are needed to convert from int to float in db

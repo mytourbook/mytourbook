@@ -1431,7 +1431,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * {@link Short#MIN_VALUE} when value is not set.
 	 */
 	@Transient
-	public short[]					swim_Time;
+	public int[]					swim_Time;
 
 	/**
 	 * Swimming data: Activity e.g. active, idle. Contains {@link Short#MIN_VALUE} when value is not
@@ -1439,6 +1439,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 */
 	@Transient
 	public short[]					swim_ActivityType;
+	@Transient
 	private float[]				_swim_ActivityType_UI;
 
 	/**
@@ -1446,6 +1447,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 */
 	@Transient
 	public short[]					swim_Strokes;
+	@Transient
 	private float[]				_swim_Strokes_UI;
 
 	/**
@@ -1454,6 +1456,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 */
 	@Transient
 	public short[]					swim_StrokeStyle;
+	@Transient
 	private float[]				_swim_StrokeStyle_UI;
 
 	/**
@@ -1462,6 +1465,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 */
 	@Transient
 	public short[]					swim_Cadence;
+	@Transient
 	private float[]				_swim_Cadence_UI;
 
 // SET_FORMATTING_ON
@@ -1802,6 +1806,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		_runDyn_VerticalOscillation_UI = null;
 		_runDyn_VerticalOscillation_UI_Imperial = null;
 		_runDyn_VerticalRatio_UI = null;
+
+		_swim_ActivityType_UI = null;
+		_swim_Cadence_UI = null;
+		_swim_Strokes_UI = null;
+		_swim_StrokeStyle_UI = null;
 
 		srtmSerie = null;
 		srtmSerieImperial = null;
@@ -5025,6 +5034,54 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		});
 	}
 
+	private float[] createSwimDataSerie(final short[] swimDataSerie) {
+
+		float[] swimStrokesUI = null;
+
+		if (timeSerie != null && swim_Time != null && swim_Time.length > 0 && swimDataSerie != null) {
+
+			// create UI data serie
+
+			final int timeSerieSize = timeSerie.length;
+			final int swimSerieSize = swimDataSerie.length;
+
+			swimStrokesUI = new float[timeSerieSize];
+
+			long swimTime = tourStartTime + (swim_Time[0] * 1000);
+			short swimStrokes = 0;
+
+			int swimSerieIndex = 0;
+
+			for (int timeSerieIndex = 0; timeSerieIndex < timeSerieSize; timeSerieIndex++) {
+
+				final long tourTime = tourStartTime + (timeSerie[timeSerieIndex] * 1000);
+
+				if (tourTime >= swimTime) {
+
+					// advance to the next swim slice, swim slices are less frequent than tour slices
+
+					swimSerieIndex++;
+
+					// check bounds
+					if (swimSerieIndex < swimSerieSize) {
+
+						swimStrokes = swimDataSerie[swimSerieIndex];
+
+						if (swimStrokes == Short.MIN_VALUE) {
+							swimStrokes = 0;
+						}
+
+						swimTime = tourStartTime + (swim_Time[swimSerieIndex] * 1000);
+					}
+				}
+
+				swimStrokesUI[timeSerieIndex] = swimStrokes;
+			}
+		}
+
+		return swimStrokesUI;
+	}
+
 	/**
 	 * Convert {@link TimeData} into {@link TourData} this will be done after data are imported or
 	 * transfered.
@@ -5071,12 +5128,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		final boolean isRunDyn_StepLength 				= setupStartingValues_RunDyn_StepLength(timeDataSerie);
 		final boolean isRunDyn_VerticalOscillation	= setupStartingValues_RunDyn_VerticalOscillation(timeDataSerie);
 		final boolean isRunDyn_VerticalRatio			= setupStartingValues_RunDyn_VerticalRatio(timeDataSerie);
-
-		final boolean isSwim_ActivityType 				= setupStartingValues_Swim_ActivityType(timeDataSerie);
-		final boolean isSwim_Cadence		 				= setupStartingValues_Swim_Cadence(timeDataSerie);
-		final boolean isSwim_Strokes		 				= setupStartingValues_Swim_Strokes(timeDataSerie);
-		final boolean isSwim_StrokeStyle 				= setupStartingValues_Swim_StrokeStyle(timeDataSerie);
-		final boolean isSwim_Time 							= setupStartingValues_Swim_Time(timeDataSerie);
 
 // SET_FORMATTING_ON
 
@@ -5276,25 +5327,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 				if (isRunDyn_VerticalRatio) {
 					final short tdValue = timeData.runDyn_VerticalRatio;
 					runDyn_VerticalRatio[serieIndex] = tdValue == Short.MIN_VALUE ? 0 : tdValue;
-				}
-
-				/*
-				 * Swimming
-				 */
-				if (isSwim_ActivityType) {
-					swim_ActivityType[serieIndex] = timeData.swim_Time;
-				}
-				if (isSwim_Cadence) {
-					swim_Cadence[serieIndex] = timeData.swim_Time;
-				}
-				if (isSwim_Strokes) {
-					swim_Strokes[serieIndex] = timeData.swim_Time;
-				}
-				if (isSwim_StrokeStyle) {
-					swim_StrokeStyle[serieIndex] = timeData.swim_Time;
-				}
-				if (isSwim_Time) {
-					swim_Time[serieIndex] = timeData.swim_Time;
 				}
 			}
 
@@ -7239,6 +7271,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	public short getStartWeekYear() {
 		return startWeekYear;
+	}
+
+	/**
+	 * @return Returns the UI values for number of strokes.
+	 */
+	public float[] getSwim_Strokes() {
+
+		if (_swim_Strokes_UI == null) {
+			_swim_Strokes_UI = createSwimDataSerie(swim_Strokes);
+		}
+
+		return _swim_Strokes_UI;
 	}
 
 	/**
@@ -9294,206 +9338,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			// data are available
 
 			runDyn_VerticalRatio = new short[serieSize];
-			isAvailable = true;
-		}
-
-		return isAvailable;
-	}
-
-	private boolean setupStartingValues_Swim_ActivityType(final TimeData[] timeDataSerie) {
-
-		final TimeData firstTimeData = timeDataSerie[0];
-		final int serieSize = timeDataSerie.length;
-
-		boolean isAvailable = false;
-
-		if (firstTimeData.swim_ActivityType == Short.MIN_VALUE) {
-
-			// search for first valid value
-
-			for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
-
-				final short value = timeDataSerie[timeDataIndex].swim_ActivityType;
-
-				if (value != Short.MIN_VALUE) {
-
-					// data are available, starting values are set to first valid value
-
-					swim_ActivityType = new short[serieSize];
-					isAvailable = true;
-
-//					for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
-//						timeDataSerie[invalidIndex].swim_ActivityType = value;
-//					}
-					break;
-				}
-			}
-
-		} else {
-
-			// data are available
-
-			swim_ActivityType = new short[serieSize];
-			isAvailable = true;
-		}
-
-		return isAvailable;
-	}
-
-	private boolean setupStartingValues_Swim_Cadence(final TimeData[] timeDataSerie) {
-
-		final TimeData firstTimeData = timeDataSerie[0];
-		final int serieSize = timeDataSerie.length;
-
-		boolean isAvailable = false;
-
-		if (firstTimeData.swim_Cadence == Short.MIN_VALUE) {
-
-			// search for first valid value
-
-			for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
-
-				final short value = timeDataSerie[timeDataIndex].swim_Cadence;
-
-				if (value != Short.MIN_VALUE) {
-
-					// data are available, starting values are set to first valid value
-
-					swim_Cadence = new short[serieSize];
-					isAvailable = true;
-
-//					for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
-//						timeDataSerie[invalidIndex].swim_Cadence = value;
-//					}
-					break;
-				}
-			}
-
-		} else {
-
-			// data are available
-
-			swim_Cadence = new short[serieSize];
-			isAvailable = true;
-		}
-
-		return isAvailable;
-	}
-
-	private boolean setupStartingValues_Swim_Strokes(final TimeData[] timeDataSerie) {
-
-		final TimeData firstTimeData = timeDataSerie[0];
-		final int serieSize = timeDataSerie.length;
-
-		boolean isAvailable = false;
-
-		if (firstTimeData.swim_Strokes == Short.MIN_VALUE) {
-
-			// search for first valid value
-
-			for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
-
-				final short value = timeDataSerie[timeDataIndex].swim_Strokes;
-
-				if (value != Short.MIN_VALUE) {
-
-					// data are available, starting values are set to first valid value
-
-					swim_Strokes = new short[serieSize];
-					isAvailable = true;
-
-//					for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
-//						timeDataSerie[invalidIndex].swim_Strokes = value;
-//					}
-					break;
-				}
-			}
-
-		} else {
-
-			// data are available
-
-			swim_Strokes = new short[serieSize];
-			isAvailable = true;
-		}
-
-		return isAvailable;
-	}
-
-	private boolean setupStartingValues_Swim_StrokeStyle(final TimeData[] timeDataSerie) {
-
-		final TimeData firstTimeData = timeDataSerie[0];
-		final int serieSize = timeDataSerie.length;
-
-		boolean isAvailable = false;
-
-		if (firstTimeData.swim_StrokeStyle == Short.MIN_VALUE) {
-
-			// search for first valid value
-
-			for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
-
-				final short value = timeDataSerie[timeDataIndex].swim_StrokeStyle;
-
-				if (value != Short.MIN_VALUE) {
-
-					// data are available, starting values are set to first valid value
-
-					swim_StrokeStyle = new short[serieSize];
-					isAvailable = true;
-
-//					for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
-//						timeDataSerie[invalidIndex].swim_StrokeStyle = value;
-//					}
-					break;
-				}
-			}
-
-		} else {
-
-			// data are available
-
-			swim_StrokeStyle = new short[serieSize];
-			isAvailable = true;
-		}
-
-		return isAvailable;
-	}
-
-	private boolean setupStartingValues_Swim_Time(final TimeData[] timeDataSerie) {
-
-		final TimeData firstTimeData = timeDataSerie[0];
-		final int serieSize = timeDataSerie.length;
-
-		boolean isAvailable = false;
-
-		if (firstTimeData.swim_Time == Short.MIN_VALUE) {
-
-			// search for first valid value
-
-			for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
-
-				final short value = timeDataSerie[timeDataIndex].swim_Time;
-
-				if (value != Short.MIN_VALUE) {
-
-					// data are available, starting values are set to first valid value
-
-					swim_Time = new short[serieSize];
-					isAvailable = true;
-
-//					for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
-//						timeDataSerie[invalidIndex].swim_Time = value;
-//					}
-					break;
-				}
-			}
-
-		} else {
-
-			// data are available
-
-			swim_Time = new short[serieSize];
 			isAvailable = true;
 		}
 

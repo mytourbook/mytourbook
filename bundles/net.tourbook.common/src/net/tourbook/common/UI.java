@@ -88,103 +88,103 @@ import net.tourbook.common.weather.IWeather;
 
 public class UI {
 
-	public static final int				SHELL_MARGIN							= 5;
+	public static final int					SHELL_MARGIN									= 5;
 
-	public static final char			SPACE									= ' ';
-	public static final char			NEW_LINE								= '\n';
-	public static final char			TAB										= '\t';
+	public static final char				SPACE												= ' ';
+	public static final char				NEW_LINE											= '\n';
+	public static final char				TAB												= '\t';
 
-	public static final char			SYMBOL_BRACKET_LEFT						= '(';
-	public static final char			SYMBOL_BRACKET_RIGHT					= ')';
+	public static final char				SYMBOL_BRACKET_LEFT							= '(';
+	public static final char				SYMBOL_BRACKET_RIGHT							= ')';
 
-	public static final String			COMMA_SPACE								= ", ";														//$NON-NLS-1$
-	public static final String			DASH									= "-";														//$NON-NLS-1$
-	public static final String			DASH_WITH_SPACE							= " - ";													//$NON-NLS-1$
-	public static final String			DASH_WITH_DOUBLE_SPACE					= "   -   ";												//$NON-NLS-1$
-	public static final String			DIMENSION								= " x ";													//$NON-NLS-1$
-	public static final String			EMPTY_STRING							= "";														//$NON-NLS-1$
-	public static final String			NEW_LINE1								= "\n";														//$NON-NLS-1$
-	public static final String			NEW_LINE2								= "\n\n";													//$NON-NLS-1$
-	public static final String			NEW_LINE3								= "\n\n\n";													//$NON-NLS-1$
-	public static final String			SLASH_WITH_SPACE						= " / ";													//$NON-NLS-1$
-	public static final String			SPACE1									= " ";														//$NON-NLS-1$
-	public static final String			SPACE2									= "  ";														//$NON-NLS-1$
-	public static final String			SPACE3									= "   ";													//$NON-NLS-1$
-	public static final String			SPACE4									= "    ";													//$NON-NLS-1$
-	public static final String			ZERO									= "0";														//$NON-NLS-1$
+	public static final String				COMMA_SPACE										= ", ";																						//$NON-NLS-1$
+	public static final String				DASH												= "-";																						//$NON-NLS-1$
+	public static final String				DASH_WITH_SPACE								= " - ";																						//$NON-NLS-1$
+	public static final String				DASH_WITH_DOUBLE_SPACE						= "   -   ";																				//$NON-NLS-1$
+	public static final String				DIMENSION										= " x ";																						//$NON-NLS-1$
+	public static final String				EMPTY_STRING									= "";																							//$NON-NLS-1$
+	public static final String				NEW_LINE1										= "\n";																						//$NON-NLS-1$
+	public static final String				NEW_LINE2										= "\n\n";																					//$NON-NLS-1$
+	public static final String				NEW_LINE3										= "\n\n\n";																					//$NON-NLS-1$
+	public static final String				SLASH_WITH_SPACE								= " / ";																						//$NON-NLS-1$
+	public static final String				SPACE1											= " ";																						//$NON-NLS-1$
+	public static final String				SPACE2											= "  ";																						//$NON-NLS-1$
+	public static final String				SPACE3											= "   ";																						//$NON-NLS-1$
+	public static final String				SPACE4											= "    ";																					//$NON-NLS-1$
+	public static final String				ZERO												= "0";																						//$NON-NLS-1$
 
-	private static final String			JS_APOSTROPHE							= "'";														//$NON-NLS-1$
-	private static final String			JS_APOSTROPHE_REPLACEMENT				= "\\'";													//$NON-NLS-1$
-	private static final String			JS_QUOTA_MARK							= "\"";														//$NON-NLS-1$
-	private static final String			JS_QUOTA_MARK_REPLACEMENT				= "\\\"";													//$NON-NLS-1$
-	private static final String			JS_BACKSLASH_REPLACEMENT				= "\\\\";													//$NON-NLS-1$
-	private static final String			HTML_NEW_LINE							= "\\n";													//$NON-NLS-1$
+	private static final String			JS_APOSTROPHE									= "'";																						//$NON-NLS-1$
+	private static final String			JS_APOSTROPHE_REPLACEMENT					= "\\'";																						//$NON-NLS-1$
+	private static final String			JS_QUOTA_MARK									= "\"";																						//$NON-NLS-1$
+	private static final String			JS_QUOTA_MARK_REPLACEMENT					= "\\\"";																					//$NON-NLS-1$
+	private static final String			JS_BACKSLASH_REPLACEMENT					= "\\\\";																					//$NON-NLS-1$
+	private static final String			HTML_NEW_LINE									= "\\n";																						//$NON-NLS-1$
 
-	public static final String			SYMBOL_ARROW_UP							= "\u2191";													//$NON-NLS-1$
-	public static final String			SYMBOL_ARROW_DOWN						= "\u2193";													//$NON-NLS-1$
-	public static final String			SYMBOL_ARROW_LEFT_RIGHT					= "\u2194";													//$NON-NLS-1$
-	public static final String			SYMBOL_ARROW_UP_DOWN					= "\u2195";													//$NON-NLS-1$
-	public static final String			SYMBOL_AVERAGE							= "\u00f8";													//$NON-NLS-1$
-	public static final String			SYMBOL_AVERAGE_WITH_SPACE				= "\u00f8 ";												//$NON-NLS-1$
-	public static final String			SYMBOL_BOX								= "\u25a0";													//$NON-NLS-1$
-	public static final String			SYMBOL_DASH								= "\u2212";													//$NON-NLS-1$
-	public static final String			SYMBOL_DEGREE							= "\u00B0";													//$NON-NLS-1$
-	public static final String			SYMBOL_DBL_ANGLE_QMARK_LEFT				= "\u00AB";													//$NON-NLS-1$
-	public static final String			SYMBOL_DBL_ANGLE_QMARK_RIGHT			= "\u00BB";													//$NON-NLS-1$
-	public static final String			SYMBOL_DIFFERENCE						= "\u0394";													//$NON-NLS-1$
-	public static final String			SYMBOL_DIFFERENCE_WITH_SPACE			= "\u0394 ";												//$NON-NLS-1$
-	public static final String			SYMBOL_DOUBLE_HORIZONTAL				= "\u2550";													//$NON-NLS-1$
-	public static final String			SYMBOL_ELLIPSIS							= "\u2026";													//$NON-NLS-1$
-	public static final String			SYMBOL_FIGURE_DASH						= "\u2012";													//$NON-NLS-1$
-	public static final String			SYMBOL_FOOT_NOTE						= "\u20F0";													//$NON-NLS-1$
-	public static final String			SYMBOL_FULL_BLOCK						= "\u2588";													//$NON-NLS-1$
-	public static final String			SYMBOL_IDENTICAL_TO						= "\u2261";													//$NON-NLS-1$
-	public static final String			SYMBOL_INFINITY_MAX						= "\u221E";													//$NON-NLS-1$
-	public static final String			SYMBOL_INFINITY_MIN						= "-\u221E";												//$NON-NLS-1$
-	public static final String			SYMBOL_MIN								= "\u1D5B";													//$NON-NLS-1$
-	public static final String			SYMBOL_MAX								= "^";														//$NON-NLS-1$
-	public static final String			SYMBOL_PLUS_MINUS						= "\u00B1";													//$NON-NLS-1$
-	public static final String			SYMBOL_SUM_WITH_SPACE					= "\u2211 ";												//$NON-NLS-1$
-	public static final String			SYMBOL_SUN								= "\u263C";													//$NON-NLS-1$
-	public static final String			SYMBOL_TAU								= "\u03c4";													//$NON-NLS-1$
+	public static final String				SYMBOL_ARROW_UP								= "\u2191";																					//$NON-NLS-1$
+	public static final String				SYMBOL_ARROW_DOWN								= "\u2193";																					//$NON-NLS-1$
+	public static final String				SYMBOL_ARROW_LEFT_RIGHT						= "\u2194";																					//$NON-NLS-1$
+	public static final String				SYMBOL_ARROW_UP_DOWN							= "\u2195";																					//$NON-NLS-1$
+	public static final String				SYMBOL_AVERAGE									= "\u00f8";																					//$NON-NLS-1$
+	public static final String				SYMBOL_AVERAGE_WITH_SPACE					= "\u00f8 ";																				//$NON-NLS-1$
+	public static final String				SYMBOL_BOX										= "\u25a0";																					//$NON-NLS-1$
+	public static final String				SYMBOL_DASH										= "\u2212";																					//$NON-NLS-1$
+	public static final String				SYMBOL_DEGREE									= "\u00B0";																					//$NON-NLS-1$
+	public static final String				SYMBOL_DBL_ANGLE_QMARK_LEFT				= "\u00AB";																					//$NON-NLS-1$
+	public static final String				SYMBOL_DBL_ANGLE_QMARK_RIGHT				= "\u00BB";																					//$NON-NLS-1$
+	public static final String				SYMBOL_DIFFERENCE								= "\u0394";																					//$NON-NLS-1$
+	public static final String				SYMBOL_DIFFERENCE_WITH_SPACE				= "\u0394 ";																				//$NON-NLS-1$
+	public static final String				SYMBOL_DOUBLE_HORIZONTAL					= "\u2550";																					//$NON-NLS-1$
+	public static final String				SYMBOL_ELLIPSIS								= "\u2026";																					//$NON-NLS-1$
+	public static final String				SYMBOL_FIGURE_DASH							= "\u2012";																					//$NON-NLS-1$
+	public static final String				SYMBOL_FOOT_NOTE								= "\u20F0";																					//$NON-NLS-1$
+	public static final String				SYMBOL_FULL_BLOCK								= "\u2588";																					//$NON-NLS-1$
+	public static final String				SYMBOL_IDENTICAL_TO							= "\u2261";																					//$NON-NLS-1$
+	public static final String				SYMBOL_INFINITY_MAX							= "\u221E";																					//$NON-NLS-1$
+	public static final String				SYMBOL_INFINITY_MIN							= "-\u221E";																				//$NON-NLS-1$
+	public static final String				SYMBOL_MIN										= "\u1D5B";																					//$NON-NLS-1$
+	public static final String				SYMBOL_MAX										= "^";																						//$NON-NLS-1$
+	public static final String				SYMBOL_PLUS_MINUS								= "\u00B1";																					//$NON-NLS-1$
+	public static final String				SYMBOL_SUM_WITH_SPACE						= "\u2211 ";																				//$NON-NLS-1$
+	public static final String				SYMBOL_SUN										= "\u263C";																					//$NON-NLS-1$
+	public static final String				SYMBOL_TAU										= "\u03c4";																					//$NON-NLS-1$
 
-	public static final CharSequence	SYMBOL_BACKSLASH						= "\\";														//$NON-NLS-1$
-	public static final String			SYMBOL_COLON							= ":";														//$NON-NLS-1$
-	public static final String			SYMBOL_DOT								= ".";														//$NON-NLS-1$
-	public static final String			SYMBOL_MIDDLE_DOT						= "·";														//$NON-NLS-1$
+	public static final CharSequence		SYMBOL_BACKSLASH								= "\\";																						//$NON-NLS-1$
+	public static final String				SYMBOL_COLON									= ":";																						//$NON-NLS-1$
+	public static final String				SYMBOL_DOT										= ".";																						//$NON-NLS-1$
+	public static final String				SYMBOL_MIDDLE_DOT								= "·";																						//$NON-NLS-1$
 	// this looks ugly "\u2551";
-	public static final String			SYMBOL_DOUBLE_VERTICAL					= "||";														//$NON-NLS-1$
-	public static final String			SYMBOL_EQUAL							= "=";														//$NON-NLS-1$
-	public static final String			SYMBOL_EXCLAMATION_POINT				= "!";														//$NON-NLS-1$
-	public static final String			SYMBOL_GREATER_THAN						= ">";														//$NON-NLS-1$
-	public static final String			SYMBOL_LESS_THAN						= "<";														//$NON-NLS-1$
-	public static final String			SYMBOL_MNEMONIC							= "&";														//$NON-NLS-1$
-	public static final char			SYMBOL_NUMBER_SIGN						= '#';
-	public static final String			SYMBOL_PERCENTAGE						= "%";														//$NON-NLS-1$
-	public static final String			SYMBOL_QUESTION_MARK					= "?";														//$NON-NLS-1$
-	public static final char			SYMBOL_SEMICOLON						= ';';
-	public static final String			SYMBOL_STAR								= "*";														//$NON-NLS-1$
-	public static final String			SYMBOL_TEMPERATURE_CELCIUS				= "\u00b0C";												//$NON-NLS-1$
-	public static final String			SYMBOL_TEMPERATURE_FAHRENHEIT			= "\u00b0F";												//$NON-NLS-1$
-	public static final String			SYMBOL_UNDERSCORE						= "_";														//$NON-NLS-1$
-	public static final String			SYMBOL_WIND_WITH_SPACE					= "W ";														//$NON-NLS-1$
+	public static final String				SYMBOL_DOUBLE_VERTICAL						= "||";																						//$NON-NLS-1$
+	public static final String				SYMBOL_EQUAL									= "=";																						//$NON-NLS-1$
+	public static final String				SYMBOL_EXCLAMATION_POINT					= "!";																						//$NON-NLS-1$
+	public static final String				SYMBOL_GREATER_THAN							= ">";																						//$NON-NLS-1$
+	public static final String				SYMBOL_LESS_THAN								= "<";																						//$NON-NLS-1$
+	public static final String				SYMBOL_MNEMONIC								= "&";																						//$NON-NLS-1$
+	public static final char				SYMBOL_NUMBER_SIGN							= '#';
+	public static final String				SYMBOL_PERCENTAGE								= "%";																						//$NON-NLS-1$
+	public static final String				SYMBOL_QUESTION_MARK							= "?";																						//$NON-NLS-1$
+	public static final char				SYMBOL_SEMICOLON								= ';';
+	public static final String				SYMBOL_STAR										= "*";																						//$NON-NLS-1$
+	public static final String				SYMBOL_TEMPERATURE_CELCIUS					= "\u00b0C";																				//$NON-NLS-1$
+	public static final String				SYMBOL_TEMPERATURE_FAHRENHEIT				= "\u00b0F";																				//$NON-NLS-1$
+	public static final String				SYMBOL_UNDERSCORE								= "_";																						//$NON-NLS-1$
+	public static final String				SYMBOL_WIND_WITH_SPACE						= "W ";																						//$NON-NLS-1$
 
-	public static final CharSequence	SYMBOL_HTML_BACKSLASH					= "&#92;";													//$NON-NLS-1$
+	public static final CharSequence		SYMBOL_HTML_BACKSLASH						= "&#92;";																					//$NON-NLS-1$
 
-	public static final String			LINK_TAG_END							= "</a>";													//$NON-NLS-1$
-	public static final String			LINK_TAG_START							= "<a>";													//$NON-NLS-1$
+	public static final String				LINK_TAG_END									= "</a>";																					//$NON-NLS-1$
+	public static final String				LINK_TAG_START									= "<a>";																						//$NON-NLS-1$
 
-	public static final int				FORM_FIRST_COLUMN_INDENT				= 16;
+	public static final int					FORM_FIRST_COLUMN_INDENT					= 16;
 
 	/**
 	 * The ellipsis is the string that is used to represent shortened text.
 	 *
 	 * @since 3.0
 	 */
-	public static final String			ELLIPSIS								= "...";													//$NON-NLS-1$
-	public static final String			ELLIPSIS_WITH_SPACE						= " ... ";													//$NON-NLS-1$
+	public static final String				ELLIPSIS											= "...";																						//$NON-NLS-1$
+	public static final String				ELLIPSIS_WITH_SPACE							= " ... ";																					//$NON-NLS-1$
 
-	private static final char[]			INVALID_FILENAME_CHARS					= new char[] {
+	private static final char[]			INVALID_FILENAME_CHARS						= new char[] {
 			'\\',
 			'/',
 			':',
@@ -194,7 +194,7 @@ public class UI {
 			'<',
 			'>',
 			'|', };
-	private static final char[]			INVALID_FILEPATH_CHARS					= new char[] {
+	private static final char[]			INVALID_FILEPATH_CHARS						= new char[] {
 			'*',
 			'?',
 			'"',
@@ -202,93 +202,93 @@ public class UI {
 			'>',
 			'|', };
 
-	public static final boolean			IS_LINUX								= "gtk".equals(SWT.getPlatform());							//$NON-NLS-1$
-	public static final boolean			IS_OSX									= "carbon".equals(SWT.getPlatform())						//$NON-NLS-1$
-			|| "cocoa".equals(SWT.getPlatform());																							//$NON-NLS-1$
-	public static final boolean			IS_WIN									= "win32".equals(SWT.getPlatform())							//$NON-NLS-1$
-			|| "wpf".equals(SWT.getPlatform());																								//$NON-NLS-1$
+// SET_FORMATTING_OFF
+	public static final boolean			IS_LINUX		= "gtk".equals(SWT.getPlatform());																						//$NON-NLS-1$
+	public static final boolean			IS_OSX		= "carbon".equals(SWT.getPlatform())	|| "cocoa".equals(SWT.getPlatform());								//$NON-NLS-1$ //$NON-NLS-2$
+	public static final boolean			IS_WIN		= "win32".equals(SWT.getPlatform())		|| "wpf".equals(SWT.getPlatform());									//$NON-NLS-1$ //$NON-NLS-2$
+// SET_FORMATTING_ON
 
-	public static final String			BROWSER_TYPE_MOZILLA					= "mozilla";												//$NON-NLS-1$
+	public static final String				BROWSER_TYPE_MOZILLA							= "mozilla";																				//$NON-NLS-1$
 
-	public static final String			UTF_8									= "UTF-8";													//$NON-NLS-1$
-	public static final String			UTF_16									= "UTF-16";													//$NON-NLS-1$
-	public static final String			ISO_8859_1								= "ISO-8859-1";												//$NON-NLS-1$
+	public static final String				UTF_8												= "UTF-8";																					//$NON-NLS-1$
+	public static final String				UTF_16											= "UTF-16";																					//$NON-NLS-1$
+	public static final String				ISO_8859_1										= "ISO-8859-1";																			//$NON-NLS-1$
 
-	public static final Charset			UTF8_CHARSET							= Charset.forName("UTF-8");									//$NON-NLS-1$
+	public static final Charset			UTF8_CHARSET									= Charset.forName("UTF-8");															//$NON-NLS-1$
 
-	public static final String			MENU_SEPARATOR_ADDITIONS				= "additions";												//$NON-NLS-1$
+	public static final String				MENU_SEPARATOR_ADDITIONS					= "additions";																				//$NON-NLS-1$
 
 	/**
 	 * Layout hint for a description field
 	 */
-	public static final int				DEFAULT_DESCRIPTION_WIDTH				= 350;
-	public static final int				DEFAULT_FIELD_WIDTH						= 40;
+	public static final int					DEFAULT_DESCRIPTION_WIDTH					= 350;
+	public static final int					DEFAULT_FIELD_WIDTH							= 40;
 
 	/**
 	 * Is <code>true</code> when the measurement system is metric, otherwise it is imperial.
 	 */
-	public static boolean				UNIT_IS_METRIC;
+	public static boolean					UNIT_IS_METRIC;
 
 	/*
 	 * Contains the unit label in the currenty measurement system for the distance values
 	 */
-	public static String				UNIT_LABEL_DISTANCE;
-	public static String				UNIT_LABEL_DISTANCE_M_OR_YD;
-	public static String				UNIT_LABEL_DISTANCE_MM_OR_INCH;
-	public static String				UNIT_LABEL_MS;
-	public static String				UNIT_LABEL_ALTITUDE;
-	public static String				UNIT_LABEL_ALTIMETER;
-	public static String				UNIT_LABEL_TEMPERATURE;
-	public static String				UNIT_LABEL_SPEED;
-	public static String				UNIT_LABEL_PACE;
+	public static String						UNIT_LABEL_DISTANCE;
+	public static String						UNIT_LABEL_DISTANCE_M_OR_YD;
+	public static String						UNIT_LABEL_DISTANCE_MM_OR_INCH;
+	public static String						UNIT_LABEL_MS;
+	public static String						UNIT_LABEL_ALTITUDE;
+	public static String						UNIT_LABEL_ALTIMETER;
+	public static String						UNIT_LABEL_TEMPERATURE;
+	public static String						UNIT_LABEL_SPEED;
+	public static String						UNIT_LABEL_PACE;
 
-	public static final String			UNIT_LABEL_TIME							= "h";														//$NON-NLS-1$
-	public static final String			UNIT_LABEL_DIRECTION					= "\u00B0";													//$NON-NLS-1$
+	public static final String				UNIT_LABEL_TIME								= "h";																						//$NON-NLS-1$
+	public static final String				UNIT_LABEL_DIRECTION							= "\u00B0";																					//$NON-NLS-1$
 
-	public static float					UNIT_VALUE_TEMPERATURE;
+	public static float						UNIT_VALUE_TEMPERATURE;
 
 	// (Celcius * 9/5) + 32 = Fahrenheit
-	public static final float			UNIT_FAHRENHEIT_MULTI					= 1.8f;
-	public static final float			UNIT_FAHRENHEIT_ADD						= 32;
+	public static final float				UNIT_FAHRENHEIT_MULTI						= 1.8f;
+	public static final float				UNIT_FAHRENHEIT_ADD							= 32;
 
 	/*
 	 * Labels for the different measurement systems
 	 */
-	public static final String			UNIT_ALTIMETER_M_H						= "m/h";													//$NON-NLS-1$
-	public static final String			UNIT_ALTIMETER_FT_H						= "ft/h";													//$NON-NLS-1$
-	public static final String			UNIT_ALTITUDE_M							= "m";														//$NON-NLS-1$
-	public static final String			UNIT_ALTITUDE_FT						= "ft";														//$NON-NLS-1$
-	public static final String			UNIT_DISTANCE_KM						= "km";														//$NON-NLS-1$
-	public static final String			UNIT_DISTANCE_MI						= "mi";														//$NON-NLS-1$
-	public static final String			UNIT_DISTANCE_YARD						= "yd";														//$NON-NLS-1$
-	public static final String			UNIT_DISTANCE_INCH						= "inch";													//$NON-NLS-1$
-	public static final String			UNIT_PACE_MIN_P_KM						= "min/km";													//$NON-NLS-1$
-	public static final String			UNIT_PACE_MIN_P_MILE					= "min/mi";													//$NON-NLS-1$
-	public static final String			UNIT_SPEED_KM_H							= "km/h";													//$NON-NLS-1$
-	public static final String			UNIT_SPEED_MPH							= "mph";													//$NON-NLS-1$
-	public static final String			UNIT_TEMPERATURE_C						= "\u00B0C";												//$NON-NLS-1$
-	public static final String			UNIT_TEMPERATURE_F						= "\u00B0F";												//$NON-NLS-1$
+	public static final String				UNIT_ALTIMETER_M_H							= "m/h";																						//$NON-NLS-1$
+	public static final String				UNIT_ALTIMETER_FT_H							= "ft/h";																					//$NON-NLS-1$
+	public static final String				UNIT_ALTITUDE_M								= "m";																						//$NON-NLS-1$
+	public static final String				UNIT_ALTITUDE_FT								= "ft";																						//$NON-NLS-1$
+	public static final String				UNIT_DISTANCE_KM								= "km";																						//$NON-NLS-1$
+	public static final String				UNIT_DISTANCE_MI								= "mi";																						//$NON-NLS-1$
+	public static final String				UNIT_DISTANCE_YARD							= "yd";																						//$NON-NLS-1$
+	public static final String				UNIT_DISTANCE_INCH							= "inch";																					//$NON-NLS-1$
+	public static final String				UNIT_PACE_MIN_P_KM							= "min/km";																					//$NON-NLS-1$
+	public static final String				UNIT_PACE_MIN_P_MILE							= "min/mi";																					//$NON-NLS-1$
+	public static final String				UNIT_SPEED_KM_H								= "km/h";																					//$NON-NLS-1$
+	public static final String				UNIT_SPEED_MPH									= "mph";																						//$NON-NLS-1$
+	public static final String				UNIT_TEMPERATURE_C							= "\u00B0C";																				//$NON-NLS-1$
+	public static final String				UNIT_TEMPERATURE_F							= "\u00B0F";																				//$NON-NLS-1$
 
-	public static final String			UNIT_JOULE								= "J";														//$NON-NLS-1$
-	public static final String			UNIT_JOULE_KILO							= "kJ";														//$NON-NLS-1$
-	public static final String			UNIT_JOULE_MEGA							= "MJ";														//$NON-NLS-1$
-	public static final String			UNIT_MBYTES								= "MByte";													//$NON-NLS-1$
-	public static final String			UNIT_METER								= "m";														//$NON-NLS-1$
-	public static final String			UNIT_MM									= "mm";														//$NON-NLS-1$
-	public static final String			UNIT_MS									= "ms";														//$NON-NLS-1$
-	public static final String			UNIT_PERCENT							= "%";														//$NON-NLS-1$
-	public static final String			UNIT_POWER_TO_WEIGHT_RATIO				= "W/Kg";													//$NON-NLS-1$
-	public static final String			UNIT_POWER								= "Watt";													//$NON-NLS-1$
-	public static final String			UNIT_POWER_SHORT						= "W";														//$NON-NLS-1$
-	public static final String			UNIT_WEIGHT_KG							= "kg";														//$NON-NLS-1$
+	public static final String				UNIT_JOULE										= "J";																						//$NON-NLS-1$
+	public static final String				UNIT_JOULE_KILO								= "kJ";																						//$NON-NLS-1$
+	public static final String				UNIT_JOULE_MEGA								= "MJ";																						//$NON-NLS-1$
+	public static final String				UNIT_MBYTES										= "MByte";																					//$NON-NLS-1$
+	public static final String				UNIT_METER										= "m";																						//$NON-NLS-1$
+	public static final String				UNIT_MM											= "mm";																						//$NON-NLS-1$
+	public static final String				UNIT_MS											= "ms";																						//$NON-NLS-1$
+	public static final String				UNIT_PERCENT									= "%";																						//$NON-NLS-1$
+	public static final String				UNIT_POWER_TO_WEIGHT_RATIO					= "W/Kg";																					//$NON-NLS-1$
+	public static final String				UNIT_POWER										= "Watt";																					//$NON-NLS-1$
+	public static final String				UNIT_POWER_SHORT								= "W";																						//$NON-NLS-1$
+	public static final String				UNIT_WEIGHT_KG									= "kg";																						//$NON-NLS-1$
 
 	public static final PeriodFormatter	DEFAULT_DURATION_FORMATTER;
 	public static final PeriodFormatter	DEFAULT_DURATION_FORMATTER_SHORT;
 
-	private static StringBuilder		_formatterSB							= new StringBuilder();
-	private static Formatter			_formatter								= new Formatter(_formatterSB);
+	private static StringBuilder			_formatterSB									= new StringBuilder();
+	private static Formatter				_formatter										= new Formatter(_formatterSB);
 
-	private static FontMetrics			_fontMetrics;
+	private static FontMetrics				_fontMetrics;
 
 	/*
 	 * SET_FORMATTING_OFF
@@ -299,56 +299,56 @@ public class UI {
 	 * SET_FORMATTING_ON
 	 */
 
-	public static final int				BERLIN_HISTORY_ADJUSTMENT				= 6 * 60 + 32;
+	public static final int					BERLIN_HISTORY_ADJUSTMENT					= 6 * 60 + 32;
 
-	public static final int				DAY_IN_SECONDS							= 24 * 60 * 60;
+	public static final int					DAY_IN_SECONDS									= 24 * 60 * 60;
 
 	/**
 	 * The dialog settings key name for stored dialog x location.
 	 *
 	 * @since 3.2
 	 */
-	private static final String			DIALOG_ORIGIN_X							= "DIALOG_X_ORIGIN";										//$NON-NLS-1$
+	private static final String			DIALOG_ORIGIN_X								= "DIALOG_X_ORIGIN";																		//$NON-NLS-1$
 
 	/**
 	 * The dialog settings key name for stored dialog y location.
 	 *
 	 * @since 3.2
 	 */
-	private static final String			DIALOG_ORIGIN_Y							= "DIALOG_Y_ORIGIN";										//$NON-NLS-1$
+	private static final String			DIALOG_ORIGIN_Y								= "DIALOG_Y_ORIGIN";																		//$NON-NLS-1$
 
 	/**
 	 * The dialog settings key name for stored dialog width.
 	 *
 	 * @since 3.2
 	 */
-	private static final String			DIALOG_WIDTH							= "DIALOG_WIDTH";											//$NON-NLS-1$
+	private static final String			DIALOG_WIDTH									= "DIALOG_WIDTH";																			//$NON-NLS-1$
 
 	/**
 	 * The dialog settings key name for stored dialog height.
 	 *
 	 * @since 3.2
 	 */
-	private static final String			DIALOG_HEIGHT							= "DIALOG_HEIGHT";											//$NON-NLS-1$
+	private static final String			DIALOG_HEIGHT									= "DIALOG_HEIGHT";																		//$NON-NLS-1$
 
 	/**
 	 * The dialog settings key name for the font used when the dialog height and width was stored.
 	 *
 	 * @since 3.2
 	 */
-	private static final String			DIALOG_FONT_DATA						= "DIALOG_FONT_NAME";										//$NON-NLS-1$
+	private static final String			DIALOG_FONT_DATA								= "DIALOG_FONT_NAME";																	//$NON-NLS-1$
 
-	public static final Font			AWT_FONT_ARIAL_8						= Font.decode("Arial-plain-8");								//$NON-NLS-1$
-	public static final Font			AWT_FONT_ARIAL_10						= Font.decode("Arial-plain-10");							//$NON-NLS-1$
-	public static final Font			AWT_FONT_ARIAL_12						= Font.decode("Arial-plain-12");							//$NON-NLS-1$
-	public static final Font			AWT_FONT_ARIAL_14						= Font.decode("Arial-plain-14");							//$NON-NLS-1$
-	public static final Font			AWT_FONT_ARIAL_16						= Font.decode("Arial-plain-16");							//$NON-NLS-1$
-	public static final Font			AWT_FONT_ARIAL_18						= Font.decode("Arial-plain-18");							//$NON-NLS-1$
-	public static final Font			AWT_FONT_ARIAL_20						= Font.decode("Arial-plain-20");							//$NON-NLS-1$
-	public static final Font			AWT_FONT_ARIAL_24						= Font.decode("Arial-plain-24");							//$NON-NLS-1$
-	public static final Font			AWT_FONT_ARIAL_48						= Font.decode("Arial-plain-48");							//$NON-NLS-1$
-	public static final Font			AWT_FONT_ARIAL_BOLD_12					= Font.decode("Arial-bold-12");								//$NON-NLS-1$
-	public static final Font			AWT_FONT_ARIAL_BOLD_24					= Font.decode("Arial-bold-24");								//$NON-NLS-1$
+	public static final Font				AWT_FONT_ARIAL_8								= Font.decode("Arial-plain-8");														//$NON-NLS-1$
+	public static final Font				AWT_FONT_ARIAL_10								= Font.decode("Arial-plain-10");														//$NON-NLS-1$
+	public static final Font				AWT_FONT_ARIAL_12								= Font.decode("Arial-plain-12");														//$NON-NLS-1$
+	public static final Font				AWT_FONT_ARIAL_14								= Font.decode("Arial-plain-14");														//$NON-NLS-1$
+	public static final Font				AWT_FONT_ARIAL_16								= Font.decode("Arial-plain-16");														//$NON-NLS-1$
+	public static final Font				AWT_FONT_ARIAL_18								= Font.decode("Arial-plain-18");														//$NON-NLS-1$
+	public static final Font				AWT_FONT_ARIAL_20								= Font.decode("Arial-plain-20");														//$NON-NLS-1$
+	public static final Font				AWT_FONT_ARIAL_24								= Font.decode("Arial-plain-24");														//$NON-NLS-1$
+	public static final Font				AWT_FONT_ARIAL_48								= Font.decode("Arial-plain-48");														//$NON-NLS-1$
+	public static final Font				AWT_FONT_ARIAL_BOLD_12						= Font.decode("Arial-bold-12");														//$NON-NLS-1$
+	public static final Font				AWT_FONT_ARIAL_BOLD_24						= Font.decode("Arial-bold-24");														//$NON-NLS-1$
 
 // SET_FORMATTING_OFF
 
@@ -370,7 +370,7 @@ public class UI {
 
 	public final static ImageRegistry	IMAGE_REGISTRY;
 
-	public static final int				DECORATOR_HORIZONTAL_INDENT				= 2;
+	public static final int					DECORATOR_HORIZONTAL_INDENT				= 2;
 
 	static {
 
@@ -506,12 +506,12 @@ public class UI {
 	/**
 	 * Number of horizontal dialog units per character, value <code>4</code>.
 	 */
-	private static final int	HORIZONTAL_DIALOG_UNIT_PER_CHAR	= 4;
+	private static final int HORIZONTAL_DIALOG_UNIT_PER_CHAR = 4;
 
 	/**
 	 * Number of vertical dialog units per character, value <code>8</code>.
 	 */
-	private static final int	VERTICAL_DIALOG_UNITS_PER_CHAR	= 8;
+//	private static final int	VERTICAL_DIALOG_UNITS_PER_CHAR	= 8;
 
 	public static void addSashColorHandler(final Sash sash) {
 
@@ -611,16 +611,17 @@ public class UI {
 	 * </p>
 	 *
 	 * @param fontMetrics
-	 *            used in performing the conversion
+	 *           used in performing the conversion
 	 * @param dlus
-	 *            the number of horizontal dialog units
+	 *           the number of horizontal dialog units
 	 * @return the number of pixels
 	 * @since 2.0
 	 */
-	public static int convertHorizontalDLUsToPixels(final FontMetrics fontMetrics, final int dlus) {
+	private static int convertHorizontalDLUsToPixels(final FontMetrics fontMetrics, final int dlus) {
+
 		// round to the nearest pixel
-		return (fontMetrics.getAverageCharWidth() * dlus + HORIZONTAL_DIALOG_UNIT_PER_CHAR / 2)
-				/ HORIZONTAL_DIALOG_UNIT_PER_CHAR;
+		return (int) ((fontMetrics.getAverageCharacterWidth() * dlus + HORIZONTAL_DIALOG_UNIT_PER_CHAR / 2)
+				/ HORIZONTAL_DIALOG_UNIT_PER_CHAR);
 	}
 
 	/**
@@ -633,7 +634,7 @@ public class UI {
 	 * </p>
 	 *
 	 * @param dlus
-	 *            the number of horizontal dialog units
+	 *           the number of horizontal dialog units
 	 * @return the number of pixels
 	 */
 	private static int convertHorizontalDLUsToPixels(final int dlus) {
@@ -717,9 +718,9 @@ public class UI {
 	 * @return Returns create image or reused image
 	 */
 	public static Image createTransparentImage(	final int imageWidth,
-												final int imageHeight,
-												final Image existingImage,
-												final ImagePainter gcPainter) {
+																final int imageHeight,
+																final Image existingImage,
+																final ImagePainter gcPainter) {
 
 		final Device display = Display.getDefault();
 		final RGB rgbTransparent = new RGB(0xfa, 0xfb, 0xfc);
@@ -729,8 +730,8 @@ public class UI {
 		if (existingImage == null) {
 
 			/*
-			 * Use a color which is likely not used, the previous color 0xfefefe was used and had
-			 * bad effects.
+			 * Use a color which is likely not used, the previous color 0xfefefe was used and had bad
+			 * effects.
 			 */
 
 			final ImageData imageData = new ImageData(//
@@ -914,12 +915,12 @@ public class UI {
 		return _formatter.format(Messages.Format_hhmm, (timeAbs / 60), (timeAbs % 60)).toString();
 	}
 
-	public static String format_yyyymmdd_hhmmss(final int year,
-												final int month,
-												final int day,
-												final int hour,
-												final int minute,
-												final int second) {
+	public static String format_yyyymmdd_hhmmss(	final int year,
+																final int month,
+																final int day,
+																final int hour,
+																final int minute,
+																final int second) {
 
 		_formatterSB.setLength(0);
 
@@ -961,7 +962,7 @@ public class UI {
 	 * Hours are ignored when they are 0. An empty string is returned when time = <code>0</code>.
 	 *
 	 * @param time
-	 *            Time in seconds.
+	 *           Time in seconds.
 	 * @return
 	 */
 	public static String formatHhMmSs(long time) {
@@ -1018,9 +1019,9 @@ public class UI {
 	 * @return
 	 */
 	public static Point getBestFitCanvasSize(	final int imageWidth,
-												final int imageHeight,
-												final int canvasWidth,
-												final int canvasHeight) {
+															final int imageHeight,
+															final int canvasWidth,
+															final int canvasHeight) {
 
 		final double widthRatio = (double) imageWidth / (double) canvasWidth;
 		final double heightRatio = (double) imageHeight / (double) canvasHeight;
@@ -1116,10 +1117,10 @@ public class UI {
 	 *
 	 * @param statePrefix
 	 */
-	public static Point getInitialLocation(	final IDialogSettings state,
-											final String statePrefix,
-											final Shell shell,
-											final Shell parentShell) {
+	public static Point getInitialLocation(final IDialogSettings state,
+														final String statePrefix,
+														final Shell shell,
+														final Shell parentShell) {
 
 		Point result = shell.getLocation();
 
@@ -1195,7 +1196,7 @@ public class UI {
 	 * Opens the control context menu, the menue is aligned below the control to the right side
 	 *
 	 * @param control
-	 *            Controls which menu is opened
+	 *           Controls which menu is opened
 	 */
 	public static void openControlMenu(final Control control) {
 
@@ -1269,9 +1270,9 @@ public class UI {
 	 * @param sashDefaultWeight
 	 */
 	public static void restoreSashWeight(	final SashForm sashForm,
-											final IDialogSettings state,
-											final String weightKey,
-											final int[] sashDefaultWeight) {
+														final IDialogSettings state,
+														final String weightKey,
+														final int[] sashDefaultWeight) {
 
 		final int[] sashWeights = sashForm.getWeights();
 		final int[] newWeights = new int[sashWeights.length];
@@ -1308,9 +1309,9 @@ public class UI {
 	 * @param sashDefaultWeight
 	 */
 	public static void restoreSashWeight(	final SashForm sash,
-											final IMemento fMemento,
-											final String weightKey,
-											final int[] sashDefaultWeight) {
+														final IMemento fMemento,
+														final String weightKey,
+														final int[] sashDefaultWeight) {
 
 		final int[] sashWeights = sash.getWeights();
 		final int[] newWeights = new int[sashWeights.length];
@@ -1340,9 +1341,9 @@ public class UI {
 	 * @param statePrefix
 	 */
 	public static void saveDialogBounds(final IDialogSettings state,
-										final String statePrefix,
-										final Shell shell,
-										final Shell parentShell) {
+													final String statePrefix,
+													final Shell shell,
+													final Shell parentShell) {
 
 		if (state != null) {
 
@@ -1664,8 +1665,8 @@ public class UI {
 		}
 	}
 
-	public static void setEqualizeColumWidthsWithReset(	final ArrayList<Control> columnControls,
-														final int additionalSpace) {
+	public static void setEqualizeColumWidthsWithReset(final ArrayList<Control> columnControls,
+																		final int additionalSpace) {
 
 		// reset existing widthHint
 		for (final Control control : columnControls) {
@@ -1785,15 +1786,15 @@ public class UI {
 	/**
 	 * copied from {@link Dialog} <br>
 	 * <br>
-	 * Shortens the given text <code>textValue</code> so that its width in pixels does not exceed
-	 * the width of the given control. Overrides characters in the center of the original string
-	 * with an ellipsis ("...") if necessary. If a <code>null</code> value is given,
-	 * <code>null</code> is returned.
+	 * Shortens the given text <code>textValue</code> so that its width in pixels does not exceed the
+	 * width of the given control. Overrides characters in the center of the original string with an
+	 * ellipsis ("...") if necessary. If a <code>null</code> value is given, <code>null</code> is
+	 * returned.
 	 *
 	 * @param textValue
-	 *            the original string or <code>null</code>
+	 *           the original string or <code>null</code>
 	 * @param control
-	 *            the control the string will be displayed on
+	 *           the control the string will be displayed on
 	 * @return the string to display, or <code>null</code> if null was passed in
 	 * @since 3.0
 	 */
@@ -1829,10 +1830,10 @@ public class UI {
 		return textValue;
 	}
 
-	public static String shortenText(	final String text,
-										final Control control,
-										final int width,
-										final boolean isUseEllipses) {
+	public static String shortenText(final String text,
+												final Control control,
+												final int width,
+												final boolean isUseEllipses) {
 
 		String shortText;
 		final GC gc = new GC(control);

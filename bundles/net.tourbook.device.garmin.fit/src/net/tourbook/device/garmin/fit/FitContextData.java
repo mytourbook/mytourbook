@@ -11,8 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.tourbook.common.time.TimeTools;
 import net.tourbook.data.GearData;
+import net.tourbook.data.SwimData;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -29,6 +29,7 @@ public class FitContextData {
 	private final List<TourContext>							_allTourContext	= new ArrayList<>();
 
 	private final Map<TourContext, List<GearData>>		_allGearData		= new HashMap<>();
+	private final Map<TourContext, List<SwimData>>		_allSwimData		= new HashMap<>();
 	private final Map<TourContext, List<TimeData>>		_allTimeData		= new HashMap<>();
 	private final Map<TourContext, List<TourMarker>>	_allTourMarker		= new HashMap<>();
 
@@ -259,81 +260,86 @@ public class FitContextData {
 	public void onMesg_Length(final LengthMesg mesg) {
 
 		// ensure tour is setup
-		setupSession_Tour_10_Initialize();
+//		setupSession_Tour_10_Initialize();
 
-		final long timestamp = mesg.getTimestamp().getDate().getTime();
+		// get gear list for current tour
+		List<SwimData> tourSwimData = _allSwimData.get(_current_TourContext);
+
+		if (tourSwimData == null) {
+			tourSwimData = new ArrayList<>();
+			_allSwimData.put(_current_TourContext, tourSwimData);
+		}
+
+		// create gear data for the current time
+		final SwimData swimData = new SwimData();
+
+		tourSwimData.add(swimData);
+
+		final com.garmin.fit.DateTime garminTime = mesg.getTimestamp();
+
+		// convert garmin time into java time
+		final long garminTimeS = garminTime.getTimestamp();
+		final long garminTimeMS = garminTimeS * 1000;
+		final long javaTime = garminTimeMS + com.garmin.fit.DateTime.OFFSET;
 
 		final Short avgSwimmingCadence = mesg.getAvgSwimmingCadence();
 		final LengthType lengthType = mesg.getLengthType();
-		final SwimStroke swimStroke = mesg.getSwimStroke();
-		final Integer totalStrokes = mesg.getTotalStrokes();
+		final SwimStroke swimStrokeStyle = mesg.getSwimStroke();
+		final Integer numStrokes = mesg.getTotalStrokes();
 
-		if (_previous_TimeData != null) {
+		swimData.absoluteTime = javaTime;
 
-			if (_previous_TimeData.absoluteTime != timestamp) {
-
-				TourLogManager.logError(String.format("Swimming event time %s is different from the record event %s",
-						TimeTools.toLocalDateTime(timestamp),
-						TimeTools.toLocalDateTime(_previous_TimeData.absoluteTime)));
-
-				return;
-			}
-
-			final long tourStartTime = _current_AllTimeData.get(0).absoluteTime;
-
-			_previous_TimeData.swim_Time = (short) ((timestamp - tourStartTime) / 1000);
-
-			if (lengthType != null) {
-				_previous_TimeData.swim_ActivityType = lengthType.getValue();
-			}
-
-			if (swimStroke != null) {
-				_previous_TimeData.swim_StrokeStyle = swimStroke.getValue();
-			}
-
-			if (avgSwimmingCadence != null) {
-				_previous_TimeData.swim_Cadence = avgSwimmingCadence;
-			}
-
-			if (totalStrokes != null) {
-				_previous_TimeData.swim_Strokes = totalStrokes.shortValue();
-			}
-
+		if (lengthType != null) {
+			swimData.swim_ActivityType = lengthType.getValue();
 		}
 
-		System.out.println(String.format(""
+		if (avgSwimmingCadence != null) {
+			swimData.swim_Cadence = avgSwimmingCadence;
+		}
 
-				+ "[%s]"
+		if (numStrokes != null) {
+			swimData.swim_Strokes = numStrokes.shortValue();
+		}
 
-				+ " Timestamp %-23s"
-//				+ " StartTime %-23s"
-//				+ " Time Diff %-6d"
+		if (swimStrokeStyle != null) {
+			swimData.swim_StrokeStyle = swimStrokeStyle.getValue();
+		}
 
-				+ " LengthType %-10s"
-
-				+ " SwimStroke %-15s"
-				+ " AvgSwimmingCadence %-6s"
-				+ " TotalStrokes %-5s"
-
-//				+ " NumStrokeCount %-3d"
-//				+ " StrokeCount %-30s"
-
-				,
-
-				getClass().getSimpleName(),
-
-				TimeTools.toLocalDateTime(timestamp),
-//				TimeTools.toLocalDateTime(mesg.getStartTime().getDate().getTime()),
-//				mesg.getTimestamp().getTimestamp() - mesg.getStartTime().getTimestamp(),
-
-				lengthType,
-
-				swimStroke == null ? "" : swimStroke.toString(),
-				avgSwimmingCadence == null ? "" : avgSwimmingCadence.toString(),
-				totalStrokes == null ? "" : totalStrokes.toString()
-
-		));
-//TODO remove SYSTEM.OUT.PRINTLN
+//		final long timestamp = mesg.getTimestamp().getDate().getTime();
+//
+//		System.out.println(String.format(""
+//
+//				+ "[%s]"
+//
+//				+ " Timestamp %-23s"
+////				+ " StartTime %-23s"
+////				+ " Time Diff %-6d"
+//
+//				+ " LengthType %-10s"
+//
+//				+ " SwimStroke %-15s"
+//				+ " AvgSwimmingCadence %-6s"
+//				+ " TotalStrokes %-5s"
+//
+////				+ " NumStrokeCount %-3d"
+////				+ " StrokeCount %-30s"
+//
+//				,
+//
+//				getClass().getSimpleName(),
+//
+//				TimeTools.toLocalDateTime(timestamp),
+////				TimeTools.toLocalDateTime(mesg.getStartTime().getDate().getTime()),
+////				mesg.getTimestamp().getTimestamp() - mesg.getStartTime().getTimestamp(),
+//
+//				lengthType,
+//
+//				swimStrokeStyle == null ? "" : swimStrokeStyle.toString(),
+//				avgSwimmingCadence == null ? "" : avgSwimmingCadence.toString(),
+//				numStrokes == null ? "" : numStrokes.toString()
+//
+//		));
+////TODO remove SYSTEM.OUT.PRINTLN
 
 //		[FitContextData] Timestamp 2018-09-01T14:51:01     LengthType ACTIVE     SwimStroke FREESTYLE       AvgSwimmingCadence 24     TotalStrokes 12
 //		[FitContextData] Timestamp 2018-09-01T14:51:26     LengthType ACTIVE     SwimStroke FREESTYLE       AvgSwimmingCadence 23     TotalStrokes 11
@@ -370,8 +376,9 @@ public class FitContextData {
 
 			final List<TourMarker> tourMarkers = _allTourMarker.get(tourContext);
 			final List<GearData> tourGears = _allGearData.get(tourContext);
+			final List<SwimData> tourSwimData = _allSwimData.get(tourContext);
 
-			handler.finalizeTour(tourData, timeDataList, tourMarkers, tourGears);
+			handler.finalizeTour(tourData, timeDataList, tourMarkers, tourGears, tourSwimData);
 		}
 	}
 
