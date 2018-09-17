@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -17,31 +17,6 @@ package net.tourbook.preferences;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.color.ColorProviderConfig;
-import net.tourbook.common.color.Map3ColorDefinition;
-import net.tourbook.common.color.Map3ColorProfile;
-import net.tourbook.common.color.Map3GradientColorManager;
-import net.tourbook.common.color.Map3GradientColorProvider;
-import net.tourbook.common.color.Map3ProfileComparator;
-import net.tourbook.common.color.MapGraphId;
-import net.tourbook.common.color.ProfileImage;
-import net.tourbook.common.color.RGBVertex;
-import net.tourbook.common.util.ColumnDefinition;
-import net.tourbook.common.util.ColumnManager;
-import net.tourbook.common.util.ITourViewer;
-import net.tourbook.common.util.ITreeViewer;
-import net.tourbook.common.util.TreeColumnDefinition;
-import net.tourbook.common.util.Util;
-import net.tourbook.map2.view.TourMapPainter;
-import net.tourbook.map3.Messages;
-import net.tourbook.map3.ui.DialogMap3ColorEditor;
-import net.tourbook.map3.ui.IMap3ColorUpdater;
-import net.tourbook.photo.IPhotoPreferences;
-import net.tourbook.ui.UI;
-import net.tourbook.ui.action.ActionCollapseAll;
-import net.tourbook.ui.action.ActionExpandAll;
 
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -102,80 +77,99 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPreferencePage, IMap3ColorUpdater,
-		ITourViewer, ITreeViewer {
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.color.ColorProviderConfig;
+import net.tourbook.common.color.Map3ColorDefinition;
+import net.tourbook.common.color.Map3ColorProfile;
+import net.tourbook.common.color.Map3GradientColorManager;
+import net.tourbook.common.color.Map3GradientColorProvider;
+import net.tourbook.common.color.Map3ProfileComparator;
+import net.tourbook.common.color.MapGraphId;
+import net.tourbook.common.color.ProfileImage;
+import net.tourbook.common.color.RGBVertex;
+import net.tourbook.common.util.ColumnDefinition;
+import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.ITourViewer;
+import net.tourbook.common.util.ITreeViewer;
+import net.tourbook.common.util.TreeColumnDefinition;
+import net.tourbook.common.util.Util;
+import net.tourbook.map2.view.TourMapPainter;
+import net.tourbook.map3.Messages;
+import net.tourbook.map3.ui.DialogMap3ColorEditor;
+import net.tourbook.map3.ui.IMap3ColorUpdater;
+import net.tourbook.photo.IPhotoPreferences;
+import net.tourbook.ui.UI;
+import net.tourbook.ui.action.ActionCollapseAll;
+import net.tourbook.ui.action.ActionExpandAll;
 
-	public static final String							ID									= "net.tourbook.preferences.PrefPageMap3Color";	//$NON-NLS-1$
+public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPreferencePage, IMap3ColorUpdater, ITourViewer, ITreeViewer {
 
-	private static final String							APP_ACTION_COLUMNS					= net.tourbook.Messages.App_Action_Columns;
-	private static final String							APP_ACTION_DUPLICATE				= net.tourbook.Messages.App_Action_Duplicate;
-	private static final String							APP_ACTION_EDIT						= net.tourbook.Messages.App_Action_Edit;
-	private static final String							APP_ACTION_NEW						= net.tourbook.Messages.App_Action_New;
-	private static final String							APP_ACTION_REMOVE					= net.tourbook.Messages.App_Action_Remove;
+	public static final String									ID											= "net.tourbook.preferences.PrefPageMap3Color";			//$NON-NLS-1$
 
-	private static int									PROFILE_IMAGE_HEIGHT;
-	private static final int							PROFILE_IMAGE_MIN_SIZE				= 30;
+	private static final String								APP_ACTION_COLUMNS					= net.tourbook.Messages.App_Action_Columns;
+	private static final String								APP_ACTION_DUPLICATE					= net.tourbook.Messages.App_Action_Duplicate;
+	private static final String								APP_ACTION_EDIT						= net.tourbook.Messages.App_Action_Edit;
+	private static final String								APP_ACTION_NEW							= net.tourbook.Messages.App_Action_New;
+	private static final String								APP_ACTION_REMOVE						= net.tourbook.Messages.App_Action_Remove;
 
-	private static final String							STATE_EXPANDED_COLOR_DEFINITIONS	= "STATE_EXPANDED_COLOR_DEFINITIONS";				//$NON-NLS-1$
+	private static int											PROFILE_IMAGE_HEIGHT;
+	private static final int									PROFILE_IMAGE_MIN_SIZE				= 30;
 
-	private final IPreferenceStore						_prefStore							= TourbookPlugin
-																									.getPrefStore();
+	private static final String								STATE_EXPANDED_COLOR_DEFINITIONS	= "STATE_EXPANDED_COLOR_DEFINITIONS";						//$NON-NLS-1$
 
-	private final IDialogSettings						_state								= TourbookPlugin
-																									.getState(this
-																											.getClass()
-																											.getName());
+	private final IPreferenceStore							_prefStore								= TourbookPlugin.getPrefStore();
+	private final IDialogSettings								_state									= TourbookPlugin.getState(this.getClass().getName());
 
 	/**
-	 * Displays all {@link Map3ColorDefinition}s and all {@link Map3GradientColorProvider}s which
-	 * are managed by the {@link Map3GradientColorManager}.
+	 * Displays all {@link Map3ColorDefinition}s and all {@link Map3GradientColorProvider}s which are
+	 * managed by the {@link Map3GradientColorManager}.
 	 */
-	private CheckboxTreeViewer							_colorProfileViewer;
-	private ColumnManager								_columnManager;
+	private CheckboxTreeViewer									_colorProfileViewer;
+	private ColumnManager										_columnManager;
 
-	private PixelConverter								_pc;
+	private PixelConverter										_pc;
 
-	private boolean										_isInUIUpdate;
+	private boolean												_isInUIUpdate;
 
-	private int											_defaultImageWidth					= 300;
-	private int											_oldImageWidth						= -1;
+	private int														_defaultImageWidth					= 300;
+	private int														_oldImageWidth							= -1;
 
 	/**
 	 * Contains the table column widget for the profile image.
 	 */
-	private TreeColumn									_tcProfileImage;
+	private TreeColumn											_tcProfileImage;
 
-	private TreeColumnDefinition						_colDefGraphImage;
-	private TreeColumnDefinition						_colDefProfileImage;
+	private TreeColumnDefinition								_colDefGraphImage;
+	private TreeColumnDefinition								_colDefProfileImage;
 
 	/**
 	 * index of the profile image, this can be changed when the columns are reordered with the mouse
 	 * or the column manager
 	 */
-	private int											_columnIndexGraphImage				= 0;
-	private int											_columnIndexProfileImage			= 0;
+	private int														_columnIndexGraphImage				= 0;
+	private int														_columnIndexProfileImage			= 0;
 
-	private HashMap<Map3GradientColorProvider, Image>	_profileImages						= new HashMap<Map3GradientColorProvider, Image>();
+	private HashMap<Map3GradientColorProvider, Image>	_profileImages							= new HashMap<>();
 
-	private MouseWheelListener							_defaultMouseWheelListener;
+	private MouseWheelListener									_defaultMouseWheelListener;
 
 	/*
 	 * UI controls
 	 */
-	private Composite									_viewerContainer;
+	private Composite												_viewerContainer;
 
-	private Button										_btnDuplicateProfile;
-	private Button										_btnEditProfile;
-	private Button										_btnNewProfile;
-	private Button										_btnRemoveProfile;
+	private Button													_btnDuplicateProfile;
+	private Button													_btnEditProfile;
+	private Button													_btnNewProfile;
+	private Button													_btnRemoveProfile;
 
-	private Button										_chkShowColorSelector;
+	private Button													_chkShowColorSelector;
 
-	private Label										_lblNumberOfColors;
+	private Label													_lblNumberOfColors;
 
-	private Spinner										_spinNumberOfColors;
+	private Spinner												_spinNumberOfColors;
 
-	private ToolBar										_toolBar;
+	private ToolBar												_toolBar;
 
 	{
 		_defaultMouseWheelListener = new MouseWheelListener() {
@@ -188,16 +182,16 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 
 	/**
 	 * the color content provider has the following structure<br>
-	 * 
+	 *
 	 * <pre>
 	 * {@link Map3ColorDefinition}
 	 *    {@link Map3GradientColorProvider}
 	 *    {@link Map3GradientColorProvider}
 	 *    ...
 	 *    {@link Map3GradientColorProvider}
-	 * 
+	 *
 	 *    ...
-	 * 
+	 *
 	 * {@link Map3ColorDefinition}
 	 *    {@link Map3GradientColorProvider}
 	 *    {@link Map3GradientColorProvider}
@@ -399,9 +393,9 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 	}
 
 	@Override
-	public void applyMapColors(	final Map3GradientColorProvider originalCP,
-								final Map3GradientColorProvider modifiedCP,
-								final boolean isNewColorProvider) {
+	public void applyMapColors(final Map3GradientColorProvider originalCP,
+										final Map3GradientColorProvider modifiedCP,
+										final boolean isNewColorProvider) {
 
 		/*
 		 * Update model
@@ -545,6 +539,10 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 
 	private void createUI_22_ColorViewer_Table(final Composite parent) {
 
+		final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
+		final Color fgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND);
+		final Color bgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
+
 		/*
 		 * Create tree
 		 */
@@ -557,12 +555,12 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(tree);
 
 		tree.setHeaderVisible(true);
-//		tree.setLinesVisible(false);
-//		tree.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+		tree.setHeaderBackground(bgColor);
+		tree.setHeaderForeground(fgColor);
 
 		/*
-		 * NOTE: MeasureItem, PaintItem and EraseItem are called repeatedly. Therefore, it is
-		 * critical for performance that these methods be as efficient as possible.
+		 * NOTE: MeasureItem, PaintItem and EraseItem are called repeatedly. Therefore, it is critical
+		 * for performance that these methods be as efficient as possible.
 		 */
 		final Listener paintListener = new Listener() {
 			@Override
@@ -631,11 +629,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 
 		createContextMenu();
 
-		// set color for all controls
-		final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
-		final Color fgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND);
-		final Color bgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
-
+		// set colors for all controls
 		net.tourbook.common.UI.setChildColors(tree, fgColor, bgColor);
 	}
 
@@ -999,9 +993,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 	 */
 	private void defineColumn_42_LegendMarker() {
 
-		final TreeColumnDefinition colDef = new TreeColumnDefinition(
-				_columnManager,
-				"legendMinMaxOverwrite", SWT.CENTER); //$NON-NLS-1$
+		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "legendMinMaxOverwrite", SWT.CENTER); //$NON-NLS-1$
 
 		colDef.setColumnLabel(Messages.Pref_Map3Color_Column_OverwriteLegendMinMax_Label);
 		colDef.setColumnHeaderToolTipText(Messages.Pref_Map3Color_Column_OverwriteLegendMinMax_Label_Tooltip);
@@ -1223,8 +1215,8 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 
 	/**
 	 * @param image
-	 * @return Returns <code>true</code> when the image is valid, returns <code>false</code> when
-	 *         the profile image must be created,
+	 * @return Returns <code>true</code> when the image is valid, returns <code>false</code> when the
+	 *         profile image must be created,
 	 */
 	private boolean isProfileImageValid(final Image image) {
 
@@ -1543,7 +1535,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 		final String[] expandedColorDefIds = Util.getStateArray(_state, STATE_EXPANDED_COLOR_DEFINITIONS, null);
 		if (expandedColorDefIds != null) {
 
-			final ArrayList<Map3ColorDefinition> expandedColorDefs = new ArrayList<Map3ColorDefinition>();
+			final ArrayList<Map3ColorDefinition> expandedColorDefs = new ArrayList<>();
 
 			for (final String graphIdValue : expandedColorDefIds) {
 
@@ -1576,7 +1568,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 		/*
 		 * save state for expanded color defs
 		 */
-		final ArrayList<String> expandedColorDefIds = new ArrayList<String>();
+		final ArrayList<String> expandedColorDefIds = new ArrayList<>();
 
 		for (final Object expandedElement : _colorProfileViewer.getExpandedElements()) {
 			if (expandedElement instanceof Map3ColorDefinition) {
@@ -1638,7 +1630,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 	@Override
 	public void updateColumnHeader(final ColumnDefinition colDef) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	private void updateUI_SelectColorProvider(final Map3GradientColorProvider selectedColorProvider) {
