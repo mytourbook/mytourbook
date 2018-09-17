@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -20,26 +20,6 @@ import java.sql.SQLException;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
-
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.util.ColumnDefinition;
-import net.tourbook.common.util.ColumnManager;
-import net.tourbook.common.util.ITourViewer;
-import net.tourbook.common.util.ITreeViewer;
-import net.tourbook.common.util.TreeViewerItem;
-import net.tourbook.data.TourTag;
-import net.tourbook.data.TourTagCategory;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.tag.TVIPrefTag;
-import net.tourbook.tag.TVIPrefTagCategory;
-import net.tourbook.tag.TVIPrefTagRoot;
-import net.tourbook.tag.TagMenuManager;
-import net.tourbook.tour.TourEventId;
-import net.tourbook.tour.TourManager;
-import net.tourbook.ui.UI;
-import net.tourbook.ui.action.ActionCollapseAll;
-import net.tourbook.ui.action.ActionExpandSelection;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -94,45 +74,59 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.util.ColumnDefinition;
+import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.ITourViewer;
+import net.tourbook.common.util.ITreeViewer;
+import net.tourbook.common.util.TreeViewerItem;
+import net.tourbook.data.TourTag;
+import net.tourbook.data.TourTagCategory;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.tag.TVIPrefTag;
+import net.tourbook.tag.TVIPrefTagCategory;
+import net.tourbook.tag.TVIPrefTagRoot;
+import net.tourbook.tag.TagMenuManager;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
+import net.tourbook.ui.UI;
+import net.tourbook.ui.action.ActionCollapseAll;
+import net.tourbook.ui.action.ActionExpandSelection;
+
 public class PrefPageTags extends PreferencePage implements IWorkbenchPreferencePage, ITourViewer, ITreeViewer {
 
-	public static final String		ID				= "net.tourbook.preferences.PrefPageTags";			//$NON-NLS-1$
+	public static final String			ID						= "net.tourbook.preferences.PrefPageTags";													//$NON-NLS-1$
 
-	private static final String		SORT_PROPERTY	= "sort";											//$NON-NLS-1$
+	private static final String		SORT_PROPERTY		= "sort";																								//$NON-NLS-1$
 
-	private final IPreferenceStore	_prefStore		= TourbookPlugin.getDefault().getPreferenceStore();
+	private final IPreferenceStore	_prefStore			= TourbookPlugin.getPrefStore();
 
 	private IPropertyChangeListener	_prefChangeListener;
 
-	private TVIPrefTagRoot			_rootItem;
+	private TVIPrefTagRoot				_rootItem;
 
-	private boolean					_isModified		= false;
+	private boolean						_isModified			= false;
 
-	private long					_dragStartTime;
+	private long							_dragStartTime;
 
 	/*
 	 * image resources
 	 */
-	private Image					_imgTag			= TourbookPlugin
-			.getImageDescriptor(Messages.Image__tag)
-			.createImage();
-	private Image					_imgTagRoot		= TourbookPlugin
-			.getImageDescriptor(Messages.Image__tag_root)
-			.createImage();
-	private Image					_imgTagCategory	= TourbookPlugin
-			.getImageDescriptor(Messages.Image__tag_category)
-			.createImage();
+	private Image							_imgTag				= TourbookPlugin.getImageDescriptor(Messages.Image__tag).createImage();
+	private Image							_imgTagRoot			= TourbookPlugin.getImageDescriptor(Messages.Image__tag_root).createImage();
+	private Image							_imgTagCategory	= TourbookPlugin.getImageDescriptor(Messages.Image__tag_category).createImage();
 
 	/*
 	 * UI constrols
 	 */
-	private TreeViewer				_tagViewer;
-	private ToolBar					_toolBar;
+	private TreeViewer					_tagViewer;
+	private ToolBar						_toolBar;
 
-	private Button					_btnNewTag;
-	private Button					_btnNewTagCategory;
-	private Button					_btnRename;
-	private Button					_btnReset;
+	private Button							_btnNewTag;
+	private Button							_btnNewTagCategory;
+	private Button							_btnRename;
+	private Button							_btnReset;
 
 	/*
 	 * None UI controls
@@ -234,14 +228,14 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 				if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
-					_tagViewer.getTree().setLinesVisible(
-							getPreferenceStore().getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+					_tagViewer.getTree()
+							.setLinesVisible(
+									getPreferenceStore().getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 					_tagViewer.refresh();
 
 					/*
-					 * the tree must be redrawn because the styled text does not display the new
-					 * color
+					 * the tree must be redrawn because the styled text does not display the new color
 					 */
 					_tagViewer.getTree().redraw();
 				}
@@ -431,7 +425,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		TreeColumn tvcColumn;
 
 		// column: tags + tag categories
-		tvc = new TreeViewerColumn(_tagViewer, SWT.TRAIL);
+		tvc = new TreeViewerColumn(_tagViewer, SWT.LEAD);
 		tvcColumn = tvc.getColumn();
 		tvc.setLabelProvider(new StyledCellLabelProvider() {
 			@Override
@@ -792,7 +786,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 	/**
 	 * <pre>
-	 * 
+	 *
 	 * category	--- category
 	 * category	--- tag
 	 * 			+-- tag

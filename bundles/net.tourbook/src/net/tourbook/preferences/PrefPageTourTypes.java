@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -22,28 +22,6 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
-
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
-import net.tourbook.common.color.ColorDefinition;
-import net.tourbook.common.color.GraphColorItem;
-import net.tourbook.common.color.GraphColorManager;
-import net.tourbook.common.color.IGradientColorProvider;
-import net.tourbook.common.util.StatusUtil;
-import net.tourbook.data.TourData;
-import net.tourbook.data.TourType;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.tour.TourManager;
-import net.tourbook.tourType.TourTypeBorder;
-import net.tourbook.tourType.TourTypeColor;
-import net.tourbook.tourType.TourTypeImage;
-import net.tourbook.tourType.TourTypeImageConfig;
-import net.tourbook.tourType.TourTypeLayout;
-import net.tourbook.tourType.TourTypeManager;
-import net.tourbook.tourType.TourTypeManager.TourTypeBorderData;
-import net.tourbook.tourType.TourTypeManager.TourTypeColorData;
-import net.tourbook.tourType.TourTypeManager.TourTypeLayoutData;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.InputDialog;
@@ -97,50 +75,71 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.PlatformUI;
 
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
+import net.tourbook.common.color.ColorDefinition;
+import net.tourbook.common.color.GraphColorItem;
+import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.color.IGradientColorProvider;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourType;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.tour.TourManager;
+import net.tourbook.tourType.TourTypeBorder;
+import net.tourbook.tourType.TourTypeColor;
+import net.tourbook.tourType.TourTypeImage;
+import net.tourbook.tourType.TourTypeImageConfig;
+import net.tourbook.tourType.TourTypeLayout;
+import net.tourbook.tourType.TourTypeManager;
+import net.tourbook.tourType.TourTypeManager.TourTypeBorderData;
+import net.tourbook.tourType.TourTypeManager.TourTypeColorData;
+import net.tourbook.tourType.TourTypeManager.TourTypeLayoutData;
+
 public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPreferencePage, IColorTreeViewer {
 
-	private static final String					COLOR_UNIQUE_ID_PREFIX	= "crId";						//$NON-NLS-1$
+	private static final String						COLOR_UNIQUE_ID_PREFIX	= "crId";																		//$NON-NLS-1$
 
-	private static final String[]				SORT_PROPERTY			= new String[] {
-			"this property is needed for sorting !!!" };												//$NON-NLS-1$
+	private static final String[]						SORT_PROPERTY				= new String[] { "this property is needed for sorting !!!" };	//$NON-NLS-1$
 
-	private final IPreferenceStore				_prefStore				= TourbookPlugin.getPrefStore();
+	private final IPreferenceStore					_prefStore					= TourbookPlugin.getPrefStore();
 
-	private GraphColorPainter					_graphColorPainter;
+	private GraphColorPainter							_graphColorPainter;
 
-	private ColorDefinition						_expandedItem;
+	private ColorDefinition								_expandedItem;
 
-	private GraphColorItem						_selectedGraphColor;
-	private ArrayList<TourType>					_dbTourTypes;
+	private GraphColorItem								_selectedGraphColor;
+	private ArrayList<TourType>						_dbTourTypes;
 
 	/**
 	 * This is the model of the tour type viewer.
 	 */
 	private ArrayList<TourTypeColorDefinition>	_colorDefinitions;
 
-	private boolean								_isModified				= false;
-	private boolean								_isRecreateTourTypeImages;
+	private boolean										_isModified					= false;
+	private boolean										_isRecreateTourTypeImages;
 
-	private boolean								_isUIEmpty;
+	private boolean										_isUIEmpty;
 
 	/*
 	 * UI controls
 	 */
-	private TreeViewer							_tourTypeViewer;
+	private TreeViewer									_tourTypeViewer;
 
-	private Button								_btnAdd;
-	private Button								_btnDelete;
-	private Button								_btnRename;
+	private Button											_btnAdd;
+	private Button											_btnDelete;
+	private Button											_btnRename;
 
-	private ColorSelector						_colorSelector;
+	private ColorSelector								_colorSelector;
 
-	private Combo								_comboFillColor1;
-	private Combo								_comboFillColor2;
-	private Combo								_comboFillLayout;
-	private Combo								_comboBorderColor;
-	private Combo								_comboBorderLayout;
+	private Combo											_comboFillColor1;
+	private Combo											_comboFillColor2;
+	private Combo											_comboFillLayout;
+	private Combo											_comboBorderColor;
+	private Combo											_comboBorderLayout;
 
-	private Spinner								_spinnerBorder;
+	private Spinner										_spinnerBorder;
 
 	private class ColorDefinitionContentProvider implements ITreeContentProvider {
 
@@ -249,7 +248,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		/*
 		 * create color definitions for all tour types
 		 */
-		_colorDefinitions = new ArrayList<TourTypeColorDefinition>();
+		_colorDefinitions = new ArrayList<>();
 
 		if (_dbTourTypes != null) {
 
@@ -434,8 +433,8 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 					final ColorDefinition treeItem = (ColorDefinition) element;
 
 					/*
-					 * run not in the treeExpand method, this is blocked by the viewer with the
-					 * message: Ignored reentrant call while viewer is busy
+					 * run not in the treeExpand method, this is blocked by the viewer with the message:
+					 * Ignored reentrant call while viewer is busy
 					 */
 					Display.getCurrent().asyncExec(new Runnable() {
 						@Override
@@ -655,7 +654,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 			 * 1. column: color item/color definition
 			 */
 
-			tvc = new TreeViewerColumn(_tourTypeViewer, SWT.TRAIL);
+			tvc = new TreeViewerColumn(_tourTypeViewer, SWT.LEAD);
 			tc = tvc.getColumn();
 			tvc.setLabelProvider(new StyledCellLabelProvider() {
 				@Override
@@ -1113,7 +1112,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 	/**
 	 * Is called when the color in the color selector has changed
-	 * 
+	 *
 	 * @param event
 	 */
 	private void onChangeGraphColor(final PropertyChangeEvent event) {
