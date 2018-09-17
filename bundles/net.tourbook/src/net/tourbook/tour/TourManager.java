@@ -704,35 +704,39 @@ public class TourManager {
 
 		final int numTours = validatedMultipleTours.size();
 
-		final int[] toTimeSerie = multiTourData.timeSerie = new int[numTimeSlices];
-		final float[] toAltitudeSerie = multiTourData.altitudeSerie = new float[numTimeSlices];
-		final float[] toCadenceSerie = multiTourData.cadenceSerie = new float[numTimeSlices];
-		final float[] toDistanceSerie = multiTourData.distanceSerie = new float[numTimeSlices];
-		final long[] toGearSerie = multiTourData.gearSerie = new long[numTimeSlices];
-		final double[] toLatitudeSerie = multiTourData.latitudeSerie = new double[numTimeSlices];
-		final double[] toLongitudeSerie = multiTourData.longitudeSerie = new double[numTimeSlices];
-		final float[] toPowerSerie = new float[numTimeSlices];
-		final float[] toPulseSerie = multiTourData.pulseSerie = new float[numTimeSlices];
-		final float[] toTemperaturSerie = multiTourData.temperatureSerie = new float[numTimeSlices];
+// SET_FORMATTING_OFF
 
-		final short[] toRunDyn_StanceTime = multiTourData.runDyn_StanceTime = new short[numTimeSlices];
-		final short[] toRunDyn_StanceTimeBalance = multiTourData.runDyn_StanceTimeBalance = new short[numTimeSlices];
-		final short[] toRunDyn_StepLength = multiTourData.runDyn_StepLength = new short[numTimeSlices];
-		final short[] toRunDyn_VertOscillation = multiTourData.runDyn_VerticalOscillation = new short[numTimeSlices];
-		final short[] toRunDyn_VertRatio = multiTourData.runDyn_VerticalRatio = new short[numTimeSlices];
+		final int[] toTimeSerie 						= multiTourData.timeSerie = new int[numTimeSlices];
+		final float[] toAltitudeSerie 				= multiTourData.altitudeSerie = new float[numTimeSlices];
+		final float[] toCadenceSerie 					= multiTourData.cadenceSerie = new float[numTimeSlices];
+		final float[] toDistanceSerie 				= multiTourData.distanceSerie = new float[numTimeSlices];
+		final long[] toGearSerie 						= multiTourData.gearSerie = new long[numTimeSlices];
+		final double[] toLatitudeSerie 				= multiTourData.latitudeSerie = new double[numTimeSlices];
+		final double[] toLongitudeSerie 				= multiTourData.longitudeSerie = new double[numTimeSlices];
+		final float[] toPowerSerie 					= new float[numTimeSlices];
+		final float[] toPulseSerie 					= multiTourData.pulseSerie = new float[numTimeSlices];
+		final float[] toTemperaturSerie 				= multiTourData.temperatureSerie = new float[numTimeSlices];
 
-		final short[] toSwim_ActivityType = multiTourData.swim_ActivityType = new short[numSwimTimeSlices];
-		final short[] toSwim_Cadence = multiTourData.swim_Cadence = new short[numSwimTimeSlices];
-		final short[] toSwim_Strokes = multiTourData.swim_Strokes = new short[numSwimTimeSlices];
-		final short[] toSwim_StrokeStyle = multiTourData.swim_StrokeStyle = new short[numSwimTimeSlices];
-		final int[] toSwim_Time = multiTourData.swim_Time = new int[numSwimTimeSlices];
+		final short[] toRunDyn_StanceTime 			= multiTourData.runDyn_StanceTime = new short[numTimeSlices];
+		final short[] toRunDyn_StanceTimeBalance 	= multiTourData.runDyn_StanceTimeBalance = new short[numTimeSlices];
+		final short[] toRunDyn_StepLength 			= multiTourData.runDyn_StepLength = new short[numTimeSlices];
+		final short[] toRunDyn_VertOscillation 	= multiTourData.runDyn_VerticalOscillation = new short[numTimeSlices];
+		final short[] toRunDyn_VertRatio 			= multiTourData.runDyn_VerticalRatio = new short[numTimeSlices];
 
-		final Long[] allTourIds = multiTourData.multipleTourIds = new Long[numTours];
-		final int[] allStartIndex = multiTourData.multipleTourStartIndex = new int[numTours];
-		final long[] allStartTime = multiTourData.multipleTourStartTime = new long[numTours];
-		final String[] allTourTitle = multiTourData.multipleTourTitles = new String[numTours];
+		final short[] toSwim_ActivityType 			= multiTourData.swim_ActivityType = new short[numSwimTimeSlices];
+		final short[] toSwim_Cadence 					= multiTourData.swim_Cadence = new short[numSwimTimeSlices];
+		final short[] toSwim_Strokes 					= multiTourData.swim_Strokes = new short[numSwimTimeSlices];
+		final short[] toSwim_StrokeStyle 			= multiTourData.swim_StrokeStyle = new short[numSwimTimeSlices];
+		final int[] toSwim_Time 						= multiTourData.swim_Time = new int[numSwimTimeSlices];
+
+		final Long[] allTourIds 						= multiTourData.multipleTourIds = new Long[numTours];
+		final int[] allStartIndex 						= multiTourData.multipleTourStartIndex = new int[numTours];
+		final long[] allStartTime 						= multiTourData.multipleTourStartTime = new long[numTours];
+		final String[] allTourTitle 					= multiTourData.multipleTourTitles = new String[numTours];
 		final ArrayList<TourMarker> allTourMarker = multiTourData.multiTourMarkers = new ArrayList<>();
-		final int[] allTourMarkerNumbers = multiTourData.multipleNumberOfMarkers = new int[numTours];
+		final int[] allTourMarkerNumbers 			= multiTourData.multipleNumberOfMarkers = new int[numTours];
+
+// SET_FORMATTING_ON
 
 		final HashSet<TourPhoto> allTourPhoto = new HashSet<>();
 
@@ -816,7 +820,9 @@ public class TourManager {
 
 				// copy data series from the first tour
 				System.arraycopy(fromTimeSerie, 0, toTimeSerie, toStartIndex, fromSerieLength);
-				System.arraycopy(fromSwim_Time, 0, toSwim_Time, toSwimStartIndex, fromSwimSerieLength);
+				if (fromSwim_Time != null) {
+					System.arraycopy(fromSwim_Time, 0, toSwim_Time, toSwimStartIndex, fromSwimSerieLength);
+				}
 
 				if (fromDistanceSerie != null) {
 					isDistanceSerie = true;
@@ -831,8 +837,10 @@ public class TourManager {
 				for (int serieIndex = 0; serieIndex < fromSerieLength; serieIndex++) {
 					toTimeSerie[toStartIndex + serieIndex] = tourRecordingTime + fromTimeSerie[serieIndex];
 				}
-				for (int swimSerieIndex = 0; swimSerieIndex < fromSwimSerieLength; swimSerieIndex++) {
-					toSwim_Time[toSwimStartIndex + swimSerieIndex] = tourRecordingTime + fromSwim_Time[swimSerieIndex];
+				if (fromSwim_Time != null) {
+					for (int swimSerieIndex = 0; swimSerieIndex < fromSwimSerieLength; swimSerieIndex++) {
+						toSwim_Time[toSwimStartIndex + swimSerieIndex] = tourRecordingTime + fromSwim_Time[swimSerieIndex];
+					}
 				}
 
 				// adjust relative distance
@@ -3937,7 +3945,7 @@ public class TourManager {
 			yDataSerie = createChartDataSerie(dataSerie, chartType);
 
 			yDataSerie.setYTitle(GRAPH_LABEL_SWIM_STROKES);
-			yDataSerie.setUnitLabel(UI.UNIT_MS);
+			yDataSerie.setUnitLabel(UI.SYMBOL_NUMBER_SIGN);
 			yDataSerie.setShowYSlider(true);
 			yDataSerie.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_SWIM_STROKES);
 //			yDataSerie.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, _computeAvg_RunDyn_StanceTime));
@@ -3948,7 +3956,7 @@ public class TourManager {
 				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_NO);
 			}
 
-			setGraphColor(yDataSerie, GraphColorManager.PREF_GRAPH_RUN_DYN_STANCE_TIME);
+			setGraphColor(yDataSerie, GraphColorManager.PREF_GRAPH_SWIM_STROKES);
 			chartDataModel.addXyData(yDataSerie);
 
 			// adjust min/max values when it's defined in the pref store

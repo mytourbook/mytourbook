@@ -159,7 +159,7 @@ public class UI {
 	public static final String				SYMBOL_GREATER_THAN							= ">";																						//$NON-NLS-1$
 	public static final String				SYMBOL_LESS_THAN								= "<";																						//$NON-NLS-1$
 	public static final String				SYMBOL_MNEMONIC								= "&";																						//$NON-NLS-1$
-	public static final char				SYMBOL_NUMBER_SIGN							= '#';
+	public static final String				SYMBOL_NUMBER_SIGN							= "#";
 	public static final String				SYMBOL_PERCENTAGE								= "%";																						//$NON-NLS-1$
 	public static final String				SYMBOL_QUESTION_MARK							= "?";																						//$NON-NLS-1$
 	public static final char				SYMBOL_SEMICOLON								= ';';

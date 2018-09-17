@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -18,24 +18,6 @@ package net.tourbook.preferences;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.CommonActivator;
-import net.tourbook.common.color.ColorDefinition;
-import net.tourbook.common.color.ColorProviderConfig;
-import net.tourbook.common.color.ColorValue;
-import net.tourbook.common.color.GraphColorItem;
-import net.tourbook.common.color.GraphColorManager;
-import net.tourbook.common.color.IGradientColorProvider;
-import net.tourbook.common.color.Map2ColorProfile;
-import net.tourbook.common.color.Map2GradientColorProvider;
-import net.tourbook.common.color.MapGraphId;
-import net.tourbook.common.color.MapUnits;
-import net.tourbook.map.MapColorProvider;
-import net.tourbook.map2.view.DialogMap2ColorEditor;
-import net.tourbook.map2.view.IMap2ColorUpdater;
-import net.tourbook.ui.UI;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -74,14 +56,32 @@ import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.color.ColorDefinition;
+import net.tourbook.common.color.ColorProviderConfig;
+import net.tourbook.common.color.ColorValue;
+import net.tourbook.common.color.GraphColorItem;
+import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.color.IGradientColorProvider;
+import net.tourbook.common.color.Map2ColorProfile;
+import net.tourbook.common.color.Map2GradientColorProvider;
+import net.tourbook.common.color.MapGraphId;
+import net.tourbook.common.color.MapUnits;
+import net.tourbook.map.MapColorProvider;
+import net.tourbook.map2.view.DialogMap2ColorEditor;
+import net.tourbook.map2.view.IMap2ColorUpdater;
+import net.tourbook.ui.UI;
+
 public class PrefPageAppearanceColors extends PreferencePage implements IWorkbenchPreferencePage, IColorTreeViewer,
 		IMap2ColorUpdater {
 
 	/*
 	 * Legend is created with dummy values 0...200.
 	 */
-	private static final int			LEGEND_MIN_VALUE		= 0;
-	private static final int			LEGEND_MAX_VALUE		= 200;
+	private static final int				LEGEND_MIN_VALUE			= 0;
+	private static final int				LEGEND_MAX_VALUE			= 200;
 
 	private static ColorValue[]			_legendImageColors		= new ColorValue[] {
 			new ColorValue(10, 255, 0, 0),
@@ -90,7 +90,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 			new ColorValue(150, 0, 100, 100),
 			new ColorValue(190, 0, 0, 255) };
 
-	private static final List<Float>	_legendImageUnitValues	= Arrays.asList(									//
+	private static final List<Float>		_legendImageUnitValues	= Arrays.asList(
 			10f,
 			50f,
 			100f,
@@ -104,40 +104,40 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 			Messages.Pref_ChartColors_unit_high,
 			Messages.Pref_ChartColors_unit_max);
 
-	private final IPreferenceStore		_prefStore				= TourbookPlugin.getDefault().getPreferenceStore();
-	private final IPreferenceStore		_commonPrefStore		= CommonActivator.getPrefStore();
+	private final IPreferenceStore		_prefStore					= TourbookPlugin.getDefault().getPreferenceStore();
+	private final IPreferenceStore		_commonPrefStore			= CommonActivator.getPrefStore();
 
-	TreeViewer							_colorViewer;
+	TreeViewer									_colorViewer;
 
-	private GraphColorItem				_selectedColor;
-	private boolean						_isColorChanged;
+	private GraphColorItem					_selectedColor;
+	private boolean							_isColorChanged;
 
-	private ColorDefinition				_expandedItem;
+	private ColorDefinition					_expandedItem;
 
 	private IGradientColorProvider		_legendImageColorProvider;
-	private DialogMap2ColorEditor		_dialogMappingColor;
-	private GraphColorPainter			_graphColorPainter;
+	private DialogMap2ColorEditor			_dialogMappingColor;
+	private GraphColorPainter				_graphColorPainter;
 
 	/*
 	 * UI controls
 	 */
-	private Button						_btnLegend;
-	private Button						_chkLiveUpdate;
+	private Button								_btnLegend;
+	private Button								_chkLiveUpdate;
 
-	private ColorSelector				_colorSelector;
+	private ColorSelector					_colorSelector;
 
 	/**
 	 * the color content provider has the following structure<br>
-	 * 
+	 *
 	 * <pre>
 	 * {@link ColorDefinition}
 	 *    {@link GraphColorItem}
 	 *    {@link GraphColorItem}
 	 *    ...
 	 *    {@link GraphColorItem}
-	 * 
+	 *
 	 *    ...
-	 * 
+	 *
 	 * {@link ColorDefinition}
 	 *    {@link GraphColorItem}
 	 *    {@link GraphColorItem}
@@ -223,7 +223,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 
 		for (final ColorDefinition colorDefinition : graphColorDefinitions) {
 
-			final ArrayList<GraphColorItem> graphColors = new ArrayList<GraphColorItem>();
+			final ArrayList<GraphColorItem> graphColors = new ArrayList<>();
 
 			final boolean isMapColorAvailable = colorDefinition.getMap2Color_Active() != null;
 
@@ -391,7 +391,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 
 	/**
 	 * Create the color selection control.
-	 * 
+	 *
 	 * @param parent
 	 */
 	private void createUI_20_ColorControl(final Composite parent) {
@@ -474,7 +474,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 		TreeViewerColumn tvc;
 
 		// 1. column: color item/color definition
-		tvc = new TreeViewerColumn(_colorViewer, SWT.TRAIL);
+		tvc = new TreeViewerColumn(_colorViewer, SWT.LEAD);
 		tc = tvc.getColumn();
 		tvc.setLabelProvider(new StyledCellLabelProvider() {
 			@Override
@@ -562,7 +562,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 
 	/**
 	 * is called when the color in the color selector has changed
-	 * 
+	 *
 	 * @param event
 	 */
 	private void onSelectColorInColorSelector(final PropertyChangeEvent event) {
@@ -749,7 +749,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 	}
 
 	private void updateColorsFromDialog(final ColorDefinition selectedColorDefinition,
-										final Map2ColorProfile newMapColor) {
+													final Map2ColorProfile newMapColor) {
 
 		// set new legend color
 		selectedColorDefinition.setMap2Color_New(newMapColor);

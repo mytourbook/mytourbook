@@ -1,14 +1,14 @@
 /******************************************************************************
  * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -30,9 +30,6 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.tourbook.common.CommonActivator;
-import net.tourbook.common.Messages;
-
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -44,68 +41,76 @@ import org.eclipse.ui.XMLMemento;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.Messages;
+import net.tourbook.common.UI;
+
 /**
  * Manage colors which are displayed in a chart, map or other locations.
  */
 public class GraphColorManager {
 
-	public static final String				PREF_GRAPH_ALTIMETER					= "altimeter";					//$NON-NLS-1$
-	public static final String				PREF_GRAPH_ALTITUDE						= "altitude";					//$NON-NLS-1$
-	public static final String				PREF_GRAPH_CADENCE						= "cadence";					//$NON-NLS-1$
-	public static final String				PREF_GRAPH_GEAR							= "gear";						//$NON-NLS-1$
-	public static final String				PREF_GRAPH_DISTANCE						= "distance";					//$NON-NLS-1$
-	public static final String				PREF_GRAPH_HEARTBEAT					= "heartbeat";					//$NON-NLS-1$
-	public static final String				PREF_GRAPH_HISTORY						= "History";					//$NON-NLS-1$
-	public static final String				PREF_GRAPH_GRADIENT						= "gradient";					//$NON-NLS-1$
-	public static final String				PREF_GRAPH_PACE							= "pace";						//$NON-NLS-1$
-	public static final String				PREF_GRAPH_POWER						= "power";						//$NON-NLS-1$
-	public static final String				PREF_GRAPH_SPEED						= "speed";						//$NON-NLS-1$
-	public static final String				PREF_GRAPH_TEMPTERATURE					= "tempterature";				//$NON-NLS-1$
-	public static final String				PREF_GRAPH_TIME							= "duration";					//$NON-NLS-1$
-	public static final String				PREF_GRAPH_TOUR							= "tour";						//$NON-NLS-1$
-	public static final String				PREF_GRAPH_TOUR_COMPARE					= "tourCompare";				//$NON-NLS-1$
-	public static final String				PREF_GRAPH_RUN_DYN_STANCE_TIME			= "RunDyn_StanceTime";			//$NON-NLS-1$
-	public static final String				PREF_GRAPH_RUN_DYN_STANCE_TIME_BALANCED	= "RunDyn_StanceTime_Balanced";	//$NON-NLS-1$
-	public static final String				PREF_GRAPH_RUN_DYN_STEP_LENGTH			= "RunDyn_StepLength";			//$NON-NLS-1$
-	public static final String				PREF_GRAPH_RUN_DYN_VERTICAL_OSCILLATION	= "RunDyn_VerticalOscillation";	//$NON-NLS-1$
-	public static final String				PREF_GRAPH_RUN_DYN_VERTICAL_RATIO		= "RunDyn_VerticalRatio";		//$NON-NLS-1$
+	public static final String					PREF_GRAPH_ALTIMETER								= "altimeter";							//$NON-NLS-1$
+	public static final String					PREF_GRAPH_ALTITUDE								= "altitude";							//$NON-NLS-1$
+	public static final String					PREF_GRAPH_CADENCE								= "cadence";							//$NON-NLS-1$
+	public static final String					PREF_GRAPH_GEAR									= "gear";								//$NON-NLS-1$
+	public static final String					PREF_GRAPH_DISTANCE								= "distance";							//$NON-NLS-1$
+	public static final String					PREF_GRAPH_HEARTBEAT								= "heartbeat";							//$NON-NLS-1$
+	public static final String					PREF_GRAPH_HISTORY								= "History";							//$NON-NLS-1$
+	public static final String					PREF_GRAPH_GRADIENT								= "gradient";							//$NON-NLS-1$
+	public static final String					PREF_GRAPH_PACE									= "pace";								//$NON-NLS-1$
+	public static final String					PREF_GRAPH_POWER									= "power";								//$NON-NLS-1$
+	public static final String					PREF_GRAPH_SPEED									= "speed";								//$NON-NLS-1$
+	public static final String					PREF_GRAPH_TEMPTERATURE							= "tempterature";						//$NON-NLS-1$
+	public static final String					PREF_GRAPH_TIME									= "duration";							//$NON-NLS-1$
+	public static final String					PREF_GRAPH_TOUR									= "tour";								//$NON-NLS-1$
+	public static final String					PREF_GRAPH_TOUR_COMPARE							= "tourCompare";						//$NON-NLS-1$
+	public static final String					PREF_GRAPH_RUN_DYN_STANCE_TIME				= "RunDyn_StanceTime";				//$NON-NLS-1$
+	public static final String					PREF_GRAPH_RUN_DYN_STANCE_TIME_BALANCED	= "RunDyn_StanceTime_Balanced";	//$NON-NLS-1$
+	public static final String					PREF_GRAPH_RUN_DYN_STEP_LENGTH				= "RunDyn_StepLength";				//$NON-NLS-1$
+	public static final String					PREF_GRAPH_RUN_DYN_VERTICAL_OSCILLATION	= "RunDyn_VerticalOscillation";	//$NON-NLS-1$
+	public static final String					PREF_GRAPH_RUN_DYN_VERTICAL_RATIO			= "RunDyn_VerticalRatio";			//$NON-NLS-1$
+	public static final String					PREF_GRAPH_SWIM_STROKES							= "Swim_Strokes";						//$NON-NLS-1$
 
-	public static final String				PREF_COLOR_BRIGHT						= "bright";						//$NON-NLS-1$
-	public static final String				PREF_COLOR_DARK							= "dark";						//$NON-NLS-1$
-	public static final String				PREF_COLOR_LINE							= "line";						//$NON-NLS-1$
-	public static final String				PREF_COLOR_TEXT							= "text";						//$NON-NLS-1$
-	public static final String				PREF_COLOR_MAPPING						= "mapping";					//$NON-NLS-1$
+	public static final String					PREF_COLOR_BRIGHT									= "bright";								//$NON-NLS-1$
+	public static final String					PREF_COLOR_DARK									= "dark";								//$NON-NLS-1$
+	public static final String					PREF_COLOR_LINE									= "line";								//$NON-NLS-1$
+	public static final String					PREF_COLOR_TEXT									= "text";								//$NON-NLS-1$
+	public static final String					PREF_COLOR_MAPPING								= "mapping";							//$NON-NLS-1$
 
-	private static final String				MEMENTO_LEGEND_COLOR_FILE				= "legendcolor.xml";			//$NON-NLS-1$
-	private static final String				MEMENTO_ROOT							= "legendcolorlist";			//$NON-NLS-1$
+	private static final String				MEMENTO_LEGEND_COLOR_FILE						= "legendcolor.xml";					//$NON-NLS-1$
+	private static final String				MEMENTO_ROOT										= "legendcolorlist";					//$NON-NLS-1$
 
-	private static final String				MEMENTO_CHILD_LEGEND_COLOR				= "legendcolor";				//$NON-NLS-1$
-	private static final String				TAG_LEGEND_COLOR_PREF_NAME				= "prefname";					//$NON-NLS-1$
+	private static final String				MEMENTO_CHILD_LEGEND_COLOR						= "legendcolor";						//$NON-NLS-1$
+	private static final String				TAG_LEGEND_COLOR_PREF_NAME						= "prefname";							//$NON-NLS-1$
 
-	private static final String				MEMENTO_CHILD_VALUE_COLOR				= "valuecolor";					//$NON-NLS-1$
-	private static final String				TAG_VALUE_COLOR_VALUE					= "value";						//$NON-NLS-1$
-	private static final String				TAG_VALUE_COLOR_RED						= "red";						//$NON-NLS-1$
-	private static final String				TAG_VALUE_COLOR_GREEN					= "green";						//$NON-NLS-1$
-	private static final String				TAG_VALUE_COLOR_BLUE					= "blue";						//$NON-NLS-1$
+	private static final String				MEMENTO_CHILD_VALUE_COLOR						= "valuecolor";						//$NON-NLS-1$
+	private static final String				TAG_VALUE_COLOR_VALUE							= "value";								//$NON-NLS-1$
+	private static final String				TAG_VALUE_COLOR_RED								= "red";									//$NON-NLS-1$
+	private static final String				TAG_VALUE_COLOR_GREEN							= "green";								//$NON-NLS-1$
+	private static final String				TAG_VALUE_COLOR_BLUE								= "blue";								//$NON-NLS-1$
 
-	static final String						MEMENTO_CHILD_BRIGHTNESS				= "brightness";					//$NON-NLS-1$
-	static final String						TAG_BRIGHTNESS_MIN						= "min";						//$NON-NLS-1$
-	static final String						TAG_BRIGHTNESS_MIN_FACTOR				= "minFactor";					//$NON-NLS-1$
-	static final String						TAG_BRIGHTNESS_MAX						= "max";						//$NON-NLS-1$
-	static final String						TAG_BRIGHTNESS_MAX_FACTOR				= "maxFactor";					//$NON-NLS-1$
+	static final String							MEMENTO_CHILD_BRIGHTNESS						= "brightness";						//$NON-NLS-1$
+	static final String							TAG_BRIGHTNESS_MIN								= "min";									//$NON-NLS-1$
+	static final String							TAG_BRIGHTNESS_MIN_FACTOR						= "minFactor";							//$NON-NLS-1$
+	static final String							TAG_BRIGHTNESS_MAX								= "max";									//$NON-NLS-1$
+	static final String							TAG_BRIGHTNESS_MAX_FACTOR						= "maxFactor";							//$NON-NLS-1$
 
-	static final String						MEMENTO_CHILD_MIN_MAX_VALUE				= "minmaxValue";				//$NON-NLS-1$
-	static final String						TAG_IS_MIN_VALUE_OVERWRITE				= "isMinOverwrite";				//$NON-NLS-1$
-	static final String						TAG_MIN_VALUE_OVERWRITE					= "minValueOverwrite";			//$NON-NLS-1$
-	static final String						TAG_IS_MAX_VALUE_OVERWRITE				= "isMaxOverwrite";				//$NON-NLS-1$
-	static final String						TAG_MAX_VALUE_OVERWRITE					= "maxValueOverwrite";			//$NON-NLS-1$
+	static final String							MEMENTO_CHILD_MIN_MAX_VALUE					= "minmaxValue";						//$NON-NLS-1$
+	static final String							TAG_IS_MIN_VALUE_OVERWRITE						= "isMinOverwrite";					//$NON-NLS-1$
+	static final String							TAG_MIN_VALUE_OVERWRITE							= "minValueOverwrite";				//$NON-NLS-1$
+	static final String							TAG_IS_MAX_VALUE_OVERWRITE						= "isMaxOverwrite";					//$NON-NLS-1$
+	static final String							TAG_MAX_VALUE_OVERWRITE							= "maxValueOverwrite";				//$NON-NLS-1$
 
-	public static String[][]				colorNames								= new String[][] {
+	public static String[][]					colorNames											= new String[][]
+
+	{
 			{ PREF_COLOR_BRIGHT, Messages.Graph_Pref_color_gradient_bright },
 			{ PREF_COLOR_DARK, Messages.Graph_Pref_color_gradient_dark },
 			{ PREF_COLOR_LINE, Messages.Graph_Pref_color_line },
 			{ PREF_COLOR_TEXT, Messages.Graph_Pref_ColorText },
-			{ PREF_COLOR_MAPPING, Messages.Graph_Pref_color_mapping } };
+			{ PREF_COLOR_MAPPING, Messages.Graph_Pref_color_mapping }
+	};
 
 	private static final Map2ColorProfile	MAP_COLOR_ALTITUDE;
 	private static final Map2ColorProfile	MAP_COLOR_GRADIENT;
@@ -364,7 +369,7 @@ public class GraphColorManager {
 
 	private List<ColorDefinition> createDefaultColors() {
 
-		final List<ColorDefinition> allColorDef = new ArrayList<ColorDefinition>();
+		final List<ColorDefinition> allColorDef = new ArrayList<>();
 
 		allColorDef.add(new ColorDefinition(PREF_GRAPH_ALTITUDE, //
 				Messages.Graph_Label_Altitude,
@@ -446,8 +451,14 @@ public class GraphColorManager {
 				new RGB(0xff, 0xff, 0xff),
 				null));
 
+		final String uiSpacing = UI.SPACE3 + UI.SYMBOL_GREATER_THAN + UI.SPACE3;
+
+		/*
+		 * Running Dynamics
+		 */
+
 		allColorDef.add(new ColorDefinition(PREF_GRAPH_RUN_DYN_STANCE_TIME,
-				Messages.Graph_Pref_Color_RunDyn_StanceTime,
+				Messages.Graph_Label_Prefix_RunningDynamics + uiSpacing + Messages.Graph_Label_RunDyn_StanceTime,
 				new RGB(0xff, 0xff, 0xff),
 				new RGB(0x0, 0x8b, 0xe9),
 				new RGB(0x0, 0x65, 0xa8),
@@ -455,7 +466,7 @@ public class GraphColorManager {
 				null));
 
 		allColorDef.add(new ColorDefinition(PREF_GRAPH_RUN_DYN_STANCE_TIME_BALANCED,
-				Messages.Graph_Pref_Color_RunDyn_StanceTimeBalance,
+				Messages.Graph_Label_Prefix_RunningDynamics + uiSpacing + Messages.Graph_Label_RunDyn_StanceTimeBalance,
 				new RGB(0xff, 0xff, 0xff),
 				new RGB(0x86, 0x57, 0xe7),
 				new RGB(0x4a, 0x1a, 0xb0),
@@ -463,7 +474,7 @@ public class GraphColorManager {
 				null));
 
 		allColorDef.add(new ColorDefinition(PREF_GRAPH_RUN_DYN_STEP_LENGTH,
-				Messages.Graph_Pref_Color_RunDyn_StepLength,
+				Messages.Graph_Label_Prefix_RunningDynamics + uiSpacing + Messages.Graph_Label_RunDyn_StepLength,
 				new RGB(0xff, 0xff, 0xff),
 				new RGB(0xff, 0x4d, 0x0),
 				new RGB(0xe6, 0x45, 0x0),
@@ -471,7 +482,7 @@ public class GraphColorManager {
 				MAP_COLOR_RUN_DYN_STEP_LENGTH));
 
 		allColorDef.add(new ColorDefinition(PREF_GRAPH_RUN_DYN_VERTICAL_OSCILLATION,
-				Messages.Graph_Pref_Color_RunDyn_VerticalOscillation,
+				Messages.Graph_Label_Prefix_RunningDynamics + uiSpacing + Messages.Graph_Label_RunDyn_VerticalOscillation,
 				new RGB(0xff, 0xff, 0xff),
 				new RGB(0xa3, 0xd4, 0xe),
 				new RGB(0x74, 0x8e, 0x22),
@@ -479,12 +490,28 @@ public class GraphColorManager {
 				null));
 
 		allColorDef.add(new ColorDefinition(PREF_GRAPH_RUN_DYN_VERTICAL_RATIO,
-				Messages.Graph_Pref_Color_RunDyn_VerticalRatio,
+				Messages.Graph_Label_Prefix_RunningDynamics + uiSpacing + Messages.Graph_Label_RunDyn_VerticalRatio,
 				new RGB(0xff, 0xff, 0xff),
 				new RGB(0xff, 0xce, 0x17),
 				new RGB(0xc6, 0x9e, 0x0),
 				new RGB(0x84, 0x69, 0x0),
 				null));
+
+		/*
+		 * Swimming
+		 */
+
+		allColorDef.add(new ColorDefinition(PREF_GRAPH_SWIM_STROKES,
+				Messages.Graph_Label_Prefix_Swimming + uiSpacing + Messages.Graph_Label_Swim_Strokes,
+				new RGB(0xff, 0xff, 0xff),
+				new RGB(0xff, 0xce, 0x17),
+				new RGB(0xc6, 0x9e, 0x0),
+				new RGB(0x84, 0x69, 0x0),
+				null));
+
+		/*
+		 * Other
+		 */
 
 		allColorDef.add(new ColorDefinition(PREF_GRAPH_TOUR_COMPARE, //
 				Messages.Graph_Label_Tour_Compare,
@@ -560,7 +587,7 @@ public class GraphColorManager {
 
 	/**
 	 * @param preferenceName
-	 *            preference name PREF_GRAPH_...
+	 *           preference name PREF_GRAPH_...
 	 * @return Returns the {@link ColorDefinition} for the preference name
 	 */
 	public ColorDefinition getGraphColorDefinition(final String preferenceName) {
@@ -640,7 +667,7 @@ public class GraphColorManager {
 				/*
 				 * value colors
 				 */
-				final ArrayList<ColorValue> valueColors = new ArrayList<ColorValue>();
+				final ArrayList<ColorValue> valueColors = new ArrayList<>();
 
 				// loop: all value colors
 				for (final IMemento mementoValueColor : mementoValueColors) {

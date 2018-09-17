@@ -134,6 +134,8 @@ public class Messages extends NLS {
 	public static String				Graph_Label_Tour_Compare;
 	public static String				Graph_Label_Tour_Compare_Unit;
 	public static String				Graph_Label_Geo_Compare_Unit;
+	public static String				Graph_Label_Prefix_RunningDynamics;
+	public static String				Graph_Label_Prefix_Swimming;
 	public static String				Graph_Label_RunDyn_StanceTime;
 	public static String				Graph_Label_RunDyn_StanceTimeBalance;
 	public static String				Graph_Label_RunDyn_StepLength;
@@ -147,11 +149,6 @@ public class Messages extends NLS {
 	public static String				Graph_Pref_color_mapping;
 	public static String				Graph_Pref_color_statistic_distance;
 	public static String				Graph_Pref_color_statistic_time;
-	public static String				Graph_Pref_Color_RunDyn_StanceTime;
-	public static String				Graph_Pref_Color_RunDyn_StanceTimeBalance;
-	public static String				Graph_Pref_Color_RunDyn_StepLength;
-	public static String				Graph_Pref_Color_RunDyn_VerticalOscillation;
-	public static String				Graph_Pref_Color_RunDyn_VerticalRatio;
 	public static String				Graph_Pref_ColorText;
 
 	public static String				Image___Empty16;

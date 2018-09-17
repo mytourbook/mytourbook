@@ -5042,6 +5042,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 			// create UI data serie
 
+			if (isMultipleTours) {
+				multipleTourStartIndex
+			}
+
 			final int timeSerieSize = timeSerie.length;
 			final int swimSerieSize = swimDataSerie.length;
 
