@@ -1335,6 +1335,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	public boolean					multipleTour_IsCadenceSpm;
 
 	/**
+	 * Contains the swim start index in the swim data series for each tour.
+	 */
+	@Transient
+	public int[]					multipleSwimStartIndex;
+
+	/**
 	 * A value is <code>true</code> when cadence is 0.
 	 */
 	@Transient
@@ -5036,20 +5042,75 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	private float[] createSwimDataSerie(final short[] swimDataSerie) {
 
+		if (timeSerie == null || swim_Time == null || swim_Time.length == 0 || swimDataSerie == null) {
+			return null;
+		}
+
+		// create UI data serie
+
 		float[] swimStrokesUI = null;
 
-		if (timeSerie != null && swim_Time != null && swim_Time.length > 0 && swimDataSerie != null) {
+		final int timeSerieSize = timeSerie.length;
+		final int swimSerieSize = swimDataSerie.length;
 
-			// create UI data serie
+		swimStrokesUI = new float[timeSerieSize];
 
-			if (isMultipleTours) {
-				multipleTourStartIndex
+		if (isMultipleTours) {
+
+			// tour data contains multiple tours
+
+			final int numTours = multipleSwimStartIndex.length;
+
+			for (int tourIndex = 0; tourIndex < numTours; tourIndex++) {
+
+				final int timeSerieStartIndex = multipleTourStartIndex[tourIndex];
+				final int swimSerieStartIndex = multipleSwimStartIndex[tourIndex];
+
+				if (swimSerieStartIndex >= swimSerieSize) {
+
+					// there are no further swim data, this can occure when the last tour(s) have no swim data
+					break;
+				}
+
+				final int timeSerieEndIndex = tourIndex < numTours - 1 ? multipleTourStartIndex[tourIndex + 1] : timeSerieSize;
+				final int swimSerieEndIndex = tourIndex < numTours - 1 ? multipleSwimStartIndex[tourIndex + 1] : swimSerieSize;
+
+				final long swimTourStartTime = tourStartTime + (timeSerie[timeSerieStartIndex] * 1000);
+				long swimTime = tourStartTime + (swim_Time[swimSerieStartIndex] * 1000);
+
+				short swimStrokes = 0;
+				int swimSerieIndex = swimSerieStartIndex;
+
+				for (int timeSerieIndex = timeSerieStartIndex; timeSerieIndex < timeSerieEndIndex; timeSerieIndex++) {
+
+					final long tourTime = swimTourStartTime + (timeSerie[timeSerieIndex] * 1000);
+
+					if (tourTime >= swimTime) {
+
+						// advance to the next swim slice, swim slices are less frequent than tour slices
+
+						swimSerieIndex++;
+
+						// check bounds
+						if (swimSerieIndex < swimSerieEndIndex) {
+
+							swimStrokes = swimDataSerie[swimSerieIndex];
+
+							if (swimStrokes == Short.MIN_VALUE) {
+								swimStrokes = 0;
+							}
+
+							swimTime = swimTourStartTime + (swim_Time[swimSerieIndex] * 1000);
+						}
+					}
+
+					swimStrokesUI[timeSerieIndex] = swimStrokes;
+				}
 			}
 
-			final int timeSerieSize = timeSerie.length;
-			final int swimSerieSize = swimDataSerie.length;
+		} else {
 
-			swimStrokesUI = new float[timeSerieSize];
+			// tour data contains 1 tour
 
 			long swimTime = tourStartTime + (swim_Time[0] * 1000);
 			short swimStrokes = 0;
@@ -5081,6 +5142,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 				swimStrokesUI[timeSerieIndex] = swimStrokes;
 			}
+
 		}
 
 		return swimStrokesUI;

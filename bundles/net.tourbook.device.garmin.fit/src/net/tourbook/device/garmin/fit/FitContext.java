@@ -359,6 +359,8 @@ public class FitContext {
 				tourData.swim_StrokeStyle = strokeStyle;
 				tourData.swim_Time = swimTime;
 
+				boolean isSwimCadence = false;
+
 				for (int swimSerieIndex = 0; swimSerieIndex < allTourSwimData.size(); swimSerieIndex++) {
 
 					final SwimData swimData = allTourSwimData.get(swimSerieIndex);
@@ -366,11 +368,21 @@ public class FitContext {
 					final long absoluteSwimTime = swimData.absoluteTime;
 					final short relativeSwimTime = (short) ((absoluteSwimTime - tourStartTime) / 1000);
 
+					final short swimCadence = swimData.swim_Cadence;
+					if (swimCadence != Short.MIN_VALUE) {
+						isSwimCadence = true;
+					}
+
 					activityType[swimSerieIndex] = swimData.swim_ActivityType;
-					cadence[swimSerieIndex] = swimData.swim_Cadence;
+					cadence[swimSerieIndex] = swimCadence;
 					strokes[swimSerieIndex] = swimData.swim_Strokes;
 					strokeStyle[swimSerieIndex] = swimData.swim_StrokeStyle;
 					swimTime[swimSerieIndex] = relativeSwimTime;
+				}
+
+				// removed cadence data serie when swim cadence is available
+				if (isSwimCadence) {
+					tourData.cadenceSerie = null;
 				}
 			}
 		};

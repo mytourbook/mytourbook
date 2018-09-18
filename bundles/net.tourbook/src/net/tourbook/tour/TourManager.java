@@ -735,6 +735,7 @@ public class TourManager {
 		final String[] allTourTitle 					= multiTourData.multipleTourTitles = new String[numTours];
 		final ArrayList<TourMarker> allTourMarker = multiTourData.multiTourMarkers = new ArrayList<>();
 		final int[] allTourMarkerNumbers 			= multiTourData.multipleNumberOfMarkers = new int[numTours];
+		final int[] allSwimStartIndex 				= multiTourData.multipleSwimStartIndex = new int[numTours];
 
 // SET_FORMATTING_ON
 
@@ -821,6 +822,7 @@ public class TourManager {
 				// copy data series from the first tour
 				System.arraycopy(fromTimeSerie, 0, toTimeSerie, toStartIndex, fromSerieLength);
 				if (fromSwim_Time != null) {
+					isSwim_Time = true;
 					System.arraycopy(fromSwim_Time, 0, toSwim_Time, toSwimStartIndex, fromSwimSerieLength);
 				}
 
@@ -838,6 +840,7 @@ public class TourManager {
 					toTimeSerie[toStartIndex + serieIndex] = tourRecordingTime + fromTimeSerie[serieIndex];
 				}
 				if (fromSwim_Time != null) {
+					isSwim_Time = true;
 					for (int swimSerieIndex = 0; swimSerieIndex < fromSwimSerieLength; swimSerieIndex++) {
 						toSwim_Time[toSwimStartIndex + swimSerieIndex] = tourRecordingTime + fromSwim_Time[swimSerieIndex];
 					}
@@ -935,10 +938,6 @@ public class TourManager {
 				isSwim_StrokeStyle = true;
 				System.arraycopy(fromSwim_StrokeStyle, 0, toSwim_StrokeStyle, toSwimStartIndex, fromSwimSerieLength);
 			}
-			if (fromSwim_Time != null) {
-				isSwim_Time = true;
-				System.arraycopy(fromSwim_Time, 0, toSwim_Time, toSwimStartIndex, fromSwimSerieLength);
-			}
 
 			allTourIds[tourIndex] = fromTourData.getTourId();
 
@@ -956,6 +955,8 @@ public class TourManager {
 			 */
 			allStartIndex[tourIndex] = toStartIndex;
 			toStartIndex += fromSerieLength;
+
+			allSwimStartIndex[tourIndex] = toSwimStartIndex;
 			toSwimStartIndex += fromSwimSerieLength;
 
 			// summarize tour distance
