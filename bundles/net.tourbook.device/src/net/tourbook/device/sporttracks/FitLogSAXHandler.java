@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -21,6 +21,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Set;
+
+import org.eclipse.osgi.util.NLS;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.Util;
@@ -35,11 +40,6 @@ import net.tourbook.device.InvalidDeviceSAXException;
 import net.tourbook.device.Messages;
 import net.tourbook.preferences.TourTypeColorDefinition;
 import net.tourbook.ui.tourChart.ChartLabel;
-
-import org.eclipse.osgi.util.NLS;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
 
 public class FitLogSAXHandler extends DefaultHandler {
 
@@ -83,33 +83,33 @@ public class FitLogSAXHandler extends DefaultHandler {
 	//
 	private static final String						TAG_LAPS					= "Laps";							//$NON-NLS-1$
 	private static final String						TAG_LAP						= "Lap";							//$NON-NLS-1$
+	private static final HashMap<String, String>	_weatherId					= new HashMap<>();
 	//
 	private String									_importFilePath;
 	private FitLogDeviceDataReader					_device;
 	private HashMap<Long, TourData>					_alreadyImportedTours;
 	private HashMap<Long, TourData>					_newlyImportedTours;
-	private Activity								_currentActivity;
 
+	private Activity								_currentActivity;
 	private double									_prevLatitude;
 	private double									_prevLongitude;
-	private double									_distanceAbsolute;
 
+	private double									_distanceAbsolute;
 	private boolean									_isImported					= false;
 	private boolean									_isNewTag					= false;
-	private boolean									_isNewTourType				= false;
 
+	private boolean									_isNewTourType				= false;
 	private boolean									_isInActivity;
 	private boolean									_isInTrack;
-	private boolean									_isInName;
 
+	private boolean									_isInName;
 	private boolean									_isInNotes;
 	private boolean									_isInWeather;
+
 	private StringBuilder							_characters					= new StringBuilder(100);
-
 	private boolean									_isInLaps;
-	private ArrayList<TourType>						_allTourTypes;
 
-	private static final HashMap<String, String>	_weatherId					= new HashMap<String, String>();
+	private ArrayList<TourType>						_allTourTypes;
 	{
 		/*
 		 * entries which are marked with *) have not a corresponding id/image within MyTourbook
@@ -133,9 +133,9 @@ public class FitLogSAXHandler extends DefaultHandler {
 
 	private class Activity {
 
-		private ArrayList<TimeData>	timeSlices			= new ArrayList<TimeData>();
-		private ArrayList<Lap>		laps				= new ArrayList<Lap>();
-		private ArrayList<String>	equipmentName		= new ArrayList<String>();
+		private ArrayList<TimeData>	timeSlices			= new ArrayList<>();
+		private ArrayList<Lap>		laps				= new ArrayList<>();
+		private ArrayList<String>	equipmentName		= new ArrayList<>();
 
 		private ZonedDateTime		tourStartTime;
 		private long				tourStartTimeMills	= Long.MIN_VALUE;
@@ -291,7 +291,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 			tourData.setMaxPulse(_currentActivity.maxPulse);
 		}
 
-		if (tourData.cadenceSerie == null) {
+		if (tourData.getCadenceSerie() == null) {
 			tourData.setAvgCadence(_currentActivity.avgCadence);
 		}
 
@@ -331,7 +331,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 
 	/**
 	 * Set tour type from category field
-	 * 
+	 *
 	 * @param tourData
 	 */
 	private void finalizeTour_10_SetTourType(final TourData tourData) {
@@ -392,7 +392,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 
 		boolean isNewTag = false;
 
-		final Set<TourTag> tourTags = new HashSet<TourTag>();
+		final Set<TourTag> tourTags = new HashSet<>();
 
 		HashMap<Long, TourTag> tourTagMap = TourDatabase.getAllTourTags();
 		TourTag[] allTourTags = tourTagMap.values().toArray(new TourTag[tourTagMap.size()]);

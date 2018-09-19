@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -17,19 +17,6 @@ package net.tourbook.ui.tourChart;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
-
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.chart.ColorCache;
-import net.tourbook.chart.ITooltipOwner;
-import net.tourbook.chart.IValuePointToolTip;
-import net.tourbook.common.PointLong;
-import net.tourbook.common.UI;
-import net.tourbook.common.color.GraphColorManager;
-import net.tourbook.common.util.Util;
-import net.tourbook.data.TourData;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
@@ -55,6 +42,19 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.chart.ColorCache;
+import net.tourbook.chart.ITooltipOwner;
+import net.tourbook.chart.IValuePointToolTip;
+import net.tourbook.common.PointLong;
+import net.tourbook.common.UI;
+import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.util.Util;
+import net.tourbook.data.TourData;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.TourManager;
+
 /**
  * This tooltip is displayed when the mouse is hovered over a value point in a line graph and
  * displays value point information.
@@ -62,65 +62,65 @@ import org.eclipse.swt.widgets.ToolItem;
 public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValuePointToolTip {
 
 // SET_FORMATTING_OFF
-	
-	private static final String		GRAPH_LABEL_ALTIMETER			= net.tourbook.common.Messages.Graph_Label_Altimeter;
-	private static final String		GRAPH_LABEL_ALTITUDE			= net.tourbook.common.Messages.Graph_Label_Altitude;
-	private static final String		GRAPH_LABEL_CADENCE				= net.tourbook.common.Messages.Graph_Label_Cadence;
-	private static final String		GRAPH_LABEL_CADENCE_UNIT		= net.tourbook.common.Messages.Graph_Label_Cadence_Unit;
-	private static final String		GRAPH_LABEL_DISTANCE			= net.tourbook.common.Messages.Graph_Label_Distance;
-	private static final String		GRAPH_LABEL_GEARS				= net.tourbook.common.Messages.Graph_Label_Gears;
-	private static final String		GRAPH_LABEL_GRADIENT			= net.tourbook.common.Messages.Graph_Label_Gradient;
-	private static final String		GRAPH_LABEL_GRADIENT_UNIT		= net.tourbook.common.Messages.Graph_Label_Gradient_Unit;
-	private static final String		GRAPH_LABEL_HEARTBEAT			= net.tourbook.common.Messages.Graph_Label_Heartbeat;
-	private static final String		GRAPH_LABEL_HEARTBEAT_UNIT		= net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
-	private static final String		GRAPH_LABEL_PACE				= net.tourbook.common.Messages.Graph_Label_Pace;
-	private static final String		GRAPH_LABEL_POWER				= net.tourbook.common.Messages.Graph_Label_Power;
-	private static final String		GRAPH_LABEL_POWER_UNIT			= net.tourbook.common.Messages.Graph_Label_Power_Unit;
-	private static final String		GRAPH_LABEL_SPEED				= net.tourbook.common.Messages.Graph_Label_Speed;
-	private static final String		GRAPH_LABEL_TEMPERATURE			= net.tourbook.common.Messages.Graph_Label_Temperature;
-	private static final String		GRAPH_LABEL_TIME_DURATION		= net.tourbook.common.Messages.Graph_Label_TimeDuration;
-	private static final String		GRAPH_LABEL_TIME_OF_DAY			= net.tourbook.common.Messages.Graph_Label_TimeOfDay;
-	private static final String		GRAPH_LABEL_TOUR_COMPARE		= net.tourbook.common.Messages.Graph_Label_Tour_Compare;
+
+	private static final String		GRAPH_LABEL_ALTIMETER							= net.tourbook.common.Messages.Graph_Label_Altimeter;
+	private static final String		GRAPH_LABEL_ALTITUDE								= net.tourbook.common.Messages.Graph_Label_Altitude;
+	private static final String		GRAPH_LABEL_CADENCE								= net.tourbook.common.Messages.Graph_Label_Cadence;
+	private static final String		GRAPH_LABEL_CADENCE_UNIT						= net.tourbook.common.Messages.Graph_Label_Cadence_Unit;
+	private static final String		GRAPH_LABEL_DISTANCE								= net.tourbook.common.Messages.Graph_Label_Distance;
+	private static final String		GRAPH_LABEL_GEARS									= net.tourbook.common.Messages.Graph_Label_Gears;
+	private static final String		GRAPH_LABEL_GRADIENT								= net.tourbook.common.Messages.Graph_Label_Gradient;
+	private static final String		GRAPH_LABEL_GRADIENT_UNIT						= net.tourbook.common.Messages.Graph_Label_Gradient_Unit;
+	private static final String		GRAPH_LABEL_HEARTBEAT							= net.tourbook.common.Messages.Graph_Label_Heartbeat;
+	private static final String		GRAPH_LABEL_HEARTBEAT_UNIT						= net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
+	private static final String		GRAPH_LABEL_PACE									= net.tourbook.common.Messages.Graph_Label_Pace;
+	private static final String		GRAPH_LABEL_POWER									= net.tourbook.common.Messages.Graph_Label_Power;
+	private static final String		GRAPH_LABEL_POWER_UNIT							= net.tourbook.common.Messages.Graph_Label_Power_Unit;
+	private static final String		GRAPH_LABEL_SPEED									= net.tourbook.common.Messages.Graph_Label_Speed;
+	private static final String		GRAPH_LABEL_TEMPERATURE							= net.tourbook.common.Messages.Graph_Label_Temperature;
+	private static final String		GRAPH_LABEL_TIME_DURATION						= net.tourbook.common.Messages.Graph_Label_TimeDuration;
+	private static final String		GRAPH_LABEL_TIME_OF_DAY							= net.tourbook.common.Messages.Graph_Label_TimeOfDay;
+	private static final String		GRAPH_LABEL_TOUR_COMPARE						= net.tourbook.common.Messages.Graph_Label_Tour_Compare;
 
 	private static final String		GRAPH_LABEL_RUN_DYN_STANCE_TIME				= net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTime;
 	private static final String		GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCED	= net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTimeBalance;
 	private static final String		GRAPH_LABEL_RUN_DYN_STEP_LENGTH				= net.tourbook.common.Messages.Graph_Label_RunDyn_StepLength;
 	private static final String		GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION	= net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalOscillation;
 	private static final String		GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO			= net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalRatio;
-	
+
 // SET_FORMATTING_ON
 
-	private final IPreferenceStore			_prefStore									= TourbookPlugin.getPrefStore();
+	private final IPreferenceStore			_prefStore											= TourbookPlugin.getPrefStore();
 
 	private IPropertyChangeListener			_prefChangeListener;
 
-	private TourData						_tourData;
+	private TourData								_tourData;
 
 	private ValuePointToolTipMenuManager	_ttMenuMgr;
-	private ActionOpenTooltipMenu			_actionOpenTooltipMenu;
+	private ActionOpenTooltipMenu				_actionOpenTooltipMenu;
 
-	private int								_devXMouse;
-	private int								_devYMouse;
+	private int										_devXMouse;
+	private int										_devYMouse;
 
 	/**
 	 * Global state if the tooltip is visible.
 	 */
-	private boolean							_isToolTipVisible;
-	private int								_currentValueIndex;
-	private int								_valueUnitDistance;
-	private double							_chartZoomFactor;
+	private boolean								_isToolTipVisible;
+	private int										_currentValueIndex;
+	private int										_valueUnitDistance;
+	private double									_chartZoomFactor;
 
-	private int[]							_updateCounter								= new int[] { 0 };
-	private long							_lastUpdateUITime;
-	private boolean							_isHorizontal;
+	private int[]									_updateCounter										= new int[] { 0 };
+	private long									_lastUpdateUITime;
+	private boolean								_isHorizontal;
 
-	private final NumberFormat				_nf0										= NumberFormat.getNumberInstance();
-	private final NumberFormat				_nf1										= NumberFormat.getNumberInstance();
-	private final NumberFormat				_nf1min										= NumberFormat.getNumberInstance();
-	private final NumberFormat				_nf1NoGroup									= NumberFormat.getNumberInstance();
-	private final NumberFormat				_nf2										= NumberFormat.getNumberInstance();
-	private final NumberFormat				_nf3										= NumberFormat.getNumberInstance();
-	private final NumberFormat				_nf3NoGroup									= NumberFormat.getNumberInstance();
+	private final NumberFormat					_nf0													= NumberFormat.getNumberInstance();
+	private final NumberFormat					_nf1													= NumberFormat.getNumberInstance();
+	private final NumberFormat					_nf1min												= NumberFormat.getNumberInstance();
+	private final NumberFormat					_nf1NoGroup											= NumberFormat.getNumberInstance();
+	private final NumberFormat					_nf2													= NumberFormat.getNumberInstance();
+	private final NumberFormat					_nf3													= NumberFormat.getNumberInstance();
+	private final NumberFormat					_nf3NoGroup											= NumberFormat.getNumberInstance();
 	{
 		_nf0.setMinimumFractionDigits(0);
 		_nf0.setMaximumFractionDigits(0);
@@ -145,9 +145,9 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 	/**
 	 * Contains all graph id's which are set to be visible but can be unavailable
 	 */
-	private long						_allVisibleValueIds;
-	private long						_allVisibleAndAvailable_ValueIds;
-	private int							_allVisibleAndAvailable_ValueCounter;
+	private long							_allVisibleValueIds;
+	private long							_allVisibleAndAvailable_ValueIds;
+	private int								_allVisibleAndAvailable_ValueCounter;
 
 	private boolean						_isVisible_And_Available_Altimeter;
 	private boolean						_isVisible_And_Available_Altitude;
@@ -175,50 +175,50 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 	/*
 	 * UI resources
 	 */
-	private Color						_fgColor;
-	private Color						_fgBorder;
-	private Color						_bgColor;
-	private final ColorCache			_colorCache						= new ColorCache();
-	private final GraphColorManager		_colorManager					= GraphColorManager.getInstance();
+	private Color							_fgColor;
+	private Color							_fgBorder;
+	private Color							_bgColor;
+	private final ColorCache			_colorCache							= new ColorCache();
+	private final GraphColorManager	_colorManager						= GraphColorManager.getInstance();
 
-	private final ArrayList<Control>	_firstColumnControls			= new ArrayList<Control>();
-	private final ArrayList<Control>	_firstColumnContainerControls	= new ArrayList<Control>();
+	private final ArrayList<Control>	_firstColumnControls				= new ArrayList<>();
+	private final ArrayList<Control>	_firstColumnContainerControls	= new ArrayList<>();
 
 	/*
 	 * UI controls
 	 */
-	private Composite					_shellContainer;
+	private Composite						_shellContainer;
 	private ToolBar						_toolbarControl;
 
-	private Label						_lblAltimeter;
-	private Label						_lblAltitude;
-	private Label						_lblCadence;
-	private Label						_lblChartZoomFactor;
-	private Label						_lblDataSerieCurrent;
-	private Label						_lblDataSerieMax;
-	private Label						_lblDistance;
-	private Label						_lblGears;
-	private Label						_lblGradient;
-	private Label						_lblPace;
-	private Label						_lblPower;
-	private Label						_lblPulse;
-	private Label						_lblSpeed;
-	private Label						_lblTemperature;
-	private Label						_lblTimeDuration;
-	private Label						_lblTimeOfDay;
-	private Label						_lblTourCompareResult;
-	private Label						_lblRunDyn_StanceTime;
-	private Label						_lblRunDyn_StanceTimeBalance;
-	private Label						_lblRunDyn_StepLength;
-	private Label						_lblRunDyn_VerticalOscillation;
-	private Label						_lblRunDyn_VerticalRatio;
+	private Label							_lblAltimeter;
+	private Label							_lblAltitude;
+	private Label							_lblCadence;
+	private Label							_lblChartZoomFactor;
+	private Label							_lblDataSerieCurrent;
+	private Label							_lblDataSerieMax;
+	private Label							_lblDistance;
+	private Label							_lblGears;
+	private Label							_lblGradient;
+	private Label							_lblPace;
+	private Label							_lblPower;
+	private Label							_lblPulse;
+	private Label							_lblSpeed;
+	private Label							_lblTemperature;
+	private Label							_lblTimeDuration;
+	private Label							_lblTimeOfDay;
+	private Label							_lblTourCompareResult;
+	private Label							_lblRunDyn_StanceTime;
+	private Label							_lblRunDyn_StanceTimeBalance;
+	private Label							_lblRunDyn_StepLength;
+	private Label							_lblRunDyn_VerticalOscillation;
+	private Label							_lblRunDyn_VerticalRatio;
 
-	private Label						_lblAltitudeUnit;
-	private Label						_lblAltimeterUnit;
-	private Label						_lblDistanceUnit;
-	private Label						_lblPaceUnit;
-	private Label						_lblSpeedUnit;
-	private Label						_lblTemperatureUnit;
+	private Label							_lblAltitudeUnit;
+	private Label							_lblAltimeterUnit;
+	private Label							_lblDistanceUnit;
+	private Label							_lblPaceUnit;
+	private Label							_lblSpeedUnit;
+	private Label							_lblTemperatureUnit;
 
 	private class ActionOpenTooltipMenu extends Action {
 
@@ -300,8 +300,8 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 		 * Get item which is opening the value point tooltip
 		 * <p>
 		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
-		 * This is a hack because the toolbar contains only one item, hopefully this will not
-		 * change. <br>
+		 * This is a hack because the toolbar contains only one item, hopefully this will not change.
+		 * <br>
 		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		 */
 		final ToolItem toolItem = _toolbarControl.getItem(0);
@@ -1078,10 +1078,10 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 	 * @param colorId
 	 * @return Returns created label.
 	 */
-	private Label createUILabel(final Composite parent,
-								final String labelText,
-								final String tooltip,
-								final String colorId) {
+	private Label createUILabel(	final Composite parent,
+											final String labelText,
+											final String tooltip,
+											final String colorId) {
 
 		final Label label = new Label(parent, SWT.NONE);
 		label.setForeground(_fgColor);
@@ -1111,17 +1111,17 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 	 * @param parent
 	 * @param style
 	 * @param chars
-	 *            Hint for the width in characters.
+	 *           Hint for the width in characters.
 	 * @param tooltip
 	 * @param colorId
-	 *            Can be <code>null</code>.
+	 *           Can be <code>null</code>.
 	 * @return
 	 */
-	private Label createUILabelValue(	final Composite parent,
-										final int style,
-										final int chars,
-										final String tooltip,
-										final String colorId) {
+	private Label createUILabelValue(final Composite parent,
+												final int style,
+												final int chars,
+												final String tooltip,
+												final String colorId) {
 
 		final int charsWidth;
 		if (chars == SWT.DEFAULT) {
@@ -1169,10 +1169,10 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 		return label;
 	}
 
-	private Label createUILabelValue(	final Composite parent,
-										final int style,
-										final String tooltip,
-										final String colorId) {
+	private Label createUILabelValue(final Composite parent,
+												final int style,
+												final String tooltip,
+												final String colorId) {
 
 		return createUILabelValue(parent, style, SWT.DEFAULT, tooltip, colorId);
 	}
@@ -1266,7 +1266,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 
 	/**
 	 * @param tourData
-	 *            When <code>null</code> the tooltip will be hidden.
+	 *           When <code>null</code> the tooltip will be hidden.
 	 */
 	void setTourData(final TourData tourData) {
 
@@ -1279,8 +1279,8 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 		}
 
 		/*
-		 * hide tool tip context menu because new tour data can change the available graphs which
-		 * can be selected in the context menu
+		 * hide tool tip context menu because new tour data can change the available graphs which can
+		 * be selected in the context menu
 		 */
 		if (_ttMenuMgr != null) {
 			_ttMenuMgr.hideContextMenu();
@@ -1300,10 +1300,10 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 
 	@Override
 	public void setValueIndex(	final int valueIndex,
-								final int devXMouseMove,
-								final int devYMouseMove,
-								final PointLong valueDevPosition,
-								final double chartZoomFactor) {
+										final int devXMouseMove,
+										final int devYMouseMove,
+										final PointLong valueDevPosition,
+										final double chartZoomFactor) {
 
 		if (_tourData == null || _isToolTipVisible == false) {
 			return;
@@ -1350,13 +1350,13 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 
 	/**
 	 * Sets state which graphs can be displayed.
-	 * 
+	 *
 	 * @param ttVisibleValues
 	 */
 	private void updateStateVisibleValues(final long ttVisibleValues) {
 
 // SET_FORMATTING_OFF
-		
+
 		final long visibleId_Altimeter 					= getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_ALTIMETER);
 		final long visibleId_Altitude 					= getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_ALTITUDE);
 		final long visibleId_Cadence 					= getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_CADENCE);
@@ -1381,7 +1381,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 
 		final boolean isAvailable_Altimeter 			= _tourData.getAltimeterSerie() != null;
 		final boolean isAvailable_Altitude 				= _tourData.getAltitudeSerie() != null;
-		final boolean isAvailable_Cadence 				= _tourData.cadenceSerie != null;
+		final boolean isAvailable_Cadence 				= _tourData.getCadenceSerie() != null;
 		final boolean isAvailable_ChartZoomFactor 		= true;
 		final boolean isAvailable_Distance 				= _tourData.distanceSerie != null;
 		final boolean isAvailable_Gears 				= _tourData.getGears() != null;
@@ -1401,9 +1401,9 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 		final boolean isAvailable_RunDyn_StepLength         	= _tourData.getRunDyn_StepLength() != null;
 		final boolean isAvailable_RunDyn_VerticalOscillation	= _tourData.getRunDyn_VerticalOscillation() != null;
 		final boolean isAvailable_RunDyn_VerticalRatio      	= _tourData.getRunDyn_VerticalRatio() != null;
-		
+
 		_allVisibleValueIds =
-				
+
 				  visibleId_Altimeter
 				+ visibleId_Altitude
 				+ visibleId_Cadence
@@ -1425,11 +1425,11 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 				+ visibleId_RunDyn_StepLength
 				+ visibleId_RunDyn_VerticalOscillation
 				+ visibleId_RunDyn_VerticalRatio
-				
+
 				;
-		
+
 		_allVisibleAndAvailable_ValueIds =
-				
+
 				  (isAvailable_Altimeter 			? visibleId_Altimeter : 0)
 				+ (isAvailable_Altitude 			? visibleId_Altitude : 0)
 				+ (isAvailable_Cadence 				? visibleId_Cadence : 0)
@@ -1446,13 +1446,13 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 				+ (isAvailable_TimeOfDay 			? visibleId_TimeOfDay : 0)
 				+ (isAvailable_TimeSlice 			? visibleId_TimeSlice : 0)
 				+ (isAvailable_TourCompareResult	? visibleId_TourCompareResult : 0)
-				
+
 				+ (isAvailable_RunDyn_StanceTime         	? visibleId_RunDyn_StanceTime          : 0)
 				+ (isAvailable_RunDyn_StanceTimeBalance	? visibleId_RunDyn_StanceTimeBalance : 0)
 				+ (isAvailable_RunDyn_StepLength         	? visibleId_RunDyn_StepLength          : 0)
 				+ (isAvailable_RunDyn_VerticalOscillation	? visibleId_RunDyn_VerticalOscillation : 0)
 				+ (isAvailable_RunDyn_VerticalRatio      	? visibleId_RunDyn_VerticalRatio       : 0)
-				
+
 				;
 
 		_isVisible_And_Available_Altimeter 			= isAvailable_Altimeter			&& visibleId_Altimeter > 0;
@@ -1479,7 +1479,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 		_isVisible_And_Available_RunDyn_VerticalRatio      	= isAvailable_RunDyn_VerticalRatio       && visibleId_RunDyn_VerticalRatio       > 0;
 
 		_allVisibleAndAvailable_ValueCounter =
-				
+
 				  (_isVisible_And_Available_Altimeter						? 1 : 0)
 				+ (_isVisible_And_Available_Altitude 						? 1 : 0)
 				+ (_isVisible_And_Available_Cadence 						? 1 : 0)
@@ -1503,7 +1503,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 				+ (_isVisible_And_Available_RunDyn_VerticalOscillation	 	? 1 : 0)
 				+ (_isVisible_And_Available_RunDyn_VerticalRatio      	 	? 1 : 0)
 		;
-		
+
 // SET_FORMATTING_ON
 	}
 
@@ -1571,7 +1571,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 		}
 
 		if (_isVisible_And_Available_Cadence) {
-			_lblCadence.setText(Integer.toString((int) _tourData.cadenceSerie[valueIndex]));
+			_lblCadence.setText(Integer.toString((int) _tourData.getCadenceSerie()[valueIndex]));
 		}
 
 		if (_isVisible_And_Available_ChartZoomFactor) {

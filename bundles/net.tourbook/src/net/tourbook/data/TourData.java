@@ -872,7 +872,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	private float[]					srtmSerieImperial;
 
 	@Transient
-	public float[]						cadenceSerie;
+	private float[]					cadenceSerie;
 
 	@Transient
 	public float[]						pulseSerie;
@@ -1399,33 +1399,33 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * @since Version 18.7
 	 */
 	@Transient
-	public short[]					runDyn_StanceTime;
+	public short[]		runDyn_StanceTime;
 	@Transient
-	private float[] 				_runDyn_StanceTime_UI;
+	private float[] 	_runDyn_StanceTime_UI;
 
 	@Transient
-	public short[]					runDyn_StanceTimeBalance;
+	public short[]		runDyn_StanceTimeBalance;
 	@Transient
-	private float[] 				_runDyn_StanceTimeBalance_UI;
+	private float[] 	_runDyn_StanceTimeBalance_UI;
 
 	@Transient
-	public short[]					runDyn_StepLength;
+	public short[]		runDyn_StepLength;
 	@Transient
-	private float[]				_runDyn_StepLength_UI;
+	private float[]	_runDyn_StepLength_UI;
 	@Transient
-	private float[]				_runDyn_StepLength_UI_Imperial;
+	private float[]	_runDyn_StepLength_UI_Imperial;
 
 	@Transient
-	public short[]					runDyn_VerticalOscillation;
+	public short[]		runDyn_VerticalOscillation;
 	@Transient
-	private float[]				_runDyn_VerticalOscillation_UI;
+	private float[]	_runDyn_VerticalOscillation_UI;
 	@Transient
-	private float[]				_runDyn_VerticalOscillation_UI_Imperial;
+	private float[]	_runDyn_VerticalOscillation_UI_Imperial;
 
 	@Transient
-	public short[]					runDyn_VerticalRatio;
+	public short[]		runDyn_VerticalRatio;
 	@Transient
-	private float[]				_runDyn_VerticalRatio_UI;
+	private float[]	_runDyn_VerticalRatio_UI;
 
 	/*
 	 * Swimming data
@@ -1437,42 +1437,48 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * {@link Short#MIN_VALUE} when value is not set.
 	 */
 	@Transient
-	public int[]					swim_Time;
+	public int[]		swim_Time;
 
 	/**
 	 * Swimming data: Activity e.g. active, idle. Contains {@link Short#MIN_VALUE} when value is not
 	 * set.
 	 */
 	@Transient
-	public short[]					swim_ActivityType;
+	public short[]		swim_ActivityType;
 	@Transient
-	private float[]				_swim_ActivityType_UI;
+	private float[]	_swim_ActivityType_UI;
 
 	/**
 	 * Swimming data: Number of strokes. Contains {@link Short#MIN_VALUE} when value is not set.
 	 */
 	@Transient
-	public short[]					swim_Strokes;
+	public short[]		swim_Strokes;
 	@Transient
-	private float[]				_swim_Strokes_UI;
+	private float[]	_swim_Strokes_UI;
 
 	/**
 	 * Swimming data: Stroke style e.g. freestyle, breaststroke. Contains {@link Short#MIN_VALUE}
 	 * when value is not set.
 	 */
 	@Transient
-	public short[]					swim_StrokeStyle;
+	public short[]		swim_StrokeStyle;
 	@Transient
-	private float[]				_swim_StrokeStyle_UI;
+	private float[]	_swim_StrokeStyle_UI;
 
 	/**
 	 * Swimming data: Swimming cadence in strokes/min. Contains {@link Short#MIN_VALUE} when value is
 	 * not set.
 	 */
 	@Transient
-	public short[]					swim_Cadence;
+	public short[]		swim_Cadence;
 	@Transient
-	private float[]				_swim_Cadence_UI;
+	private float[]	_swim_Cadence_UI;
+
+	/**
+	 * Is <code>true</code> when {@link #cadenceSerie} is computed from swimming cadence {@link #swim_Cadence} values.
+	 */
+	@Transient
+	public boolean 	isSwimCadence;
 
 // SET_FORMATTING_ON
 
@@ -2618,7 +2624,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		double cadenceSquare = 0;
 		double timeSquare = 0;
 
-		final float[] cadenceWithMuliplier = getCadenceSerie();
+		final float[] cadenceWithMuliplier = getCadenceSerieWithMuliplier();
 
 		for (int serieIndex = firstIndex; serieIndex <= lastIndex; serieIndex++) {
 
@@ -5048,12 +5054,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 		// create UI data serie
 
-		float[] swimStrokesUI = null;
+		float[] swimUIValues = null;
 
 		final int timeSerieSize = timeSerie.length;
 		final int swimSerieSize = swimDataSerie.length;
 
-		swimStrokesUI = new float[timeSerieSize];
+		swimUIValues = new float[timeSerieSize];
 
 		if (isMultipleTours) {
 
@@ -5078,7 +5084,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 				final long swimTourStartTime = tourStartTime + (timeSerie[timeSerieStartIndex] * 1000);
 				long swimTime = tourStartTime + (swim_Time[swimSerieStartIndex] * 1000);
 
-				short swimStrokes = 0;
+				short swimValue = 0;
 				int swimSerieIndex = swimSerieStartIndex;
 
 				for (int timeSerieIndex = timeSerieStartIndex; timeSerieIndex < timeSerieEndIndex; timeSerieIndex++) {
@@ -5094,17 +5100,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 						// check bounds
 						if (swimSerieIndex < swimSerieEndIndex) {
 
-							swimStrokes = swimDataSerie[swimSerieIndex];
+							swimValue = swimDataSerie[swimSerieIndex];
 
-							if (swimStrokes == Short.MIN_VALUE) {
-								swimStrokes = 0;
+							if (swimValue == Short.MIN_VALUE) {
+								swimValue = 0;
 							}
 
 							swimTime = swimTourStartTime + (swim_Time[swimSerieIndex] * 1000);
 						}
 					}
 
-					swimStrokesUI[timeSerieIndex] = swimStrokes;
+					swimUIValues[timeSerieIndex] = swimValue;
 				}
 			}
 
@@ -5113,7 +5119,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			// tour data contains 1 tour
 
 			long swimTime = tourStartTime + (swim_Time[0] * 1000);
-			short swimStrokes = 0;
+			short swimValue = 0;
 
 			int swimSerieIndex = 0;
 
@@ -5130,22 +5136,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 					// check bounds
 					if (swimSerieIndex < swimSerieSize) {
 
-						swimStrokes = swimDataSerie[swimSerieIndex];
+						swimValue = swimDataSerie[swimSerieIndex];
 
-						if (swimStrokes == Short.MIN_VALUE) {
-							swimStrokes = 0;
+						if (swimValue == Short.MIN_VALUE) {
+							swimValue = 0;
 						}
 
 						swimTime = tourStartTime + (swim_Time[swimSerieIndex] * 1000);
 					}
 				}
 
-				swimStrokesUI[timeSerieIndex] = swimStrokes;
+				swimUIValues[timeSerieIndex] = swimValue;
 			}
 
 		}
 
-		return swimStrokesUI;
+		return swimUIValues;
 	}
 
 	/**
@@ -6245,28 +6251,49 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		return cadenceMultiplier;
 	}
 
+	public float[] getCadenceSerie() {
+
+		if (isSwimCadence) {
+
+			// cadence is computed from swim cadence, these cadence values are not saaved
+
+			return getSwim_Cadence();
+
+		} else {
+
+			return cadenceSerie;
+		}
+	}
+
 	/**
 	 * @return Returns cadence data serie which is multiplied with the {@link #cadenceMultiplier}
 	 */
-	public float[] getCadenceSerie() {
+	public float[] getCadenceSerieWithMuliplier() {
 
-		if (cadenceMultiplier != 1.0 && cadenceSerie != null) {
+		if (isSwimCadence) {
 
-			if (cadenceSerieWithMultiplier == null) {
+			return getSwim_Cadence();
 
-				// create cadence with multiplier
+		} else {
 
-				cadenceSerieWithMultiplier = new float[cadenceSerie.length];
+			if (cadenceMultiplier != 1.0 && cadenceSerie != null) {
 
-				for (int serieIndex = 0; serieIndex < cadenceSerie.length; serieIndex++) {
-					cadenceSerieWithMultiplier[serieIndex] = cadenceSerie[serieIndex] * cadenceMultiplier;
+				if (cadenceSerieWithMultiplier == null) {
+
+					// create cadence with multiplier
+
+					cadenceSerieWithMultiplier = new float[cadenceSerie.length];
+
+					for (int serieIndex = 0; serieIndex < cadenceSerie.length; serieIndex++) {
+						cadenceSerieWithMultiplier[serieIndex] = cadenceSerie[serieIndex] * cadenceMultiplier;
+					}
 				}
+
+				return cadenceSerieWithMultiplier;
 			}
 
-			return cadenceSerieWithMultiplier;
+			return cadenceSerie;
 		}
-
-		return cadenceSerie;
 	}
 
 	/**
@@ -7340,6 +7367,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	}
 
 	/**
+	 * @return Returns the UI values for cadence.
+	 */
+	public float[] getSwim_Cadence() {
+
+		if (_swim_Cadence_UI == null) {
+			_swim_Cadence_UI = createSwimDataSerie(swim_Cadence);
+		}
+
+		return _swim_Cadence_UI;
+	}
+
+	/**
 	 * @return Returns the UI values for number of strokes.
 	 */
 	public float[] getSwim_Strokes() {
@@ -8117,6 +8156,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 		pulseTimeSerie = serieData.pulseTimes;
 
+		if (powerSerie != null) {
+			isPowerSerieFromDevice = true;
+		}
+
+		if (speedSerie != null) {
+			isSpeedSerieFromDevice = true;
+		}
+
 		// running dynamics
 		runDyn_StanceTime = serieData.runDyn_StanceTime;
 		runDyn_StanceTimeBalance = serieData.runDyn_StanceTimeBalance;
@@ -8130,14 +8177,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		swim_Strokes = serieData.swim_Strokes;
 		swim_StrokeStyle = serieData.swim_StrokeStyle;
 		swim_Time = serieData.swim_Time;
-
-		if (powerSerie != null) {
-			isPowerSerieFromDevice = true;
-		}
-
-		if (speedSerie != null) {
-			isSpeedSerieFromDevice = true;
-		}
+		isSwimCadence = swim_Cadence != null;
 	}
 
 	/**
@@ -8190,6 +8230,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		serieData.swim_Strokes = swim_Strokes;
 		serieData.swim_StrokeStyle = swim_StrokeStyle;
 		serieData.swim_Time = swim_Time;
+
+		if (isSwimCadence) {
+			// cadence is computed from cadence swim data
+			serieData.cadenceSerie20 = null;
+		}
 
 		// time serie size
 		numberOfTimeSlices = timeSerie == null ? 0 : timeSerie.length;
@@ -8263,6 +8308,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	public void setCadenceMultiplier(final float cadenceMultiplier) {
 		this.cadenceMultiplier = cadenceMultiplier;
+	}
+
+	public void setCadenceSerie(final float[] cadenceSerieData) {
+		cadenceSerie = cadenceSerieData;
 	}
 
 	/**

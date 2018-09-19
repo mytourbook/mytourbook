@@ -4801,7 +4801,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_serieDistance = _tourData.distanceSerie;
 		_serieAltitude = _tourData.altitudeSerie;
 
-		_serieCadence = _tourData.cadenceSerie;
+		_serieCadence = _tourData.getCadenceSerie();
 		_serieGears = _tourData.getGears();
 		_seriePulse = _tourData.pulseSerie;
 
@@ -4826,7 +4826,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		final ZonedDateTime tourStartTime = _tourData.getTourStartTime();
 
-//		_tourStartDayTime = _tourData.getStartTimeOfDay();
 		_tourStartDayTime = tourStartTime.get(ChronoField.SECOND_OF_DAY);
 
 		if (_isManualTour == false) {

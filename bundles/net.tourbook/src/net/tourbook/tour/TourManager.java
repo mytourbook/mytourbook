@@ -706,9 +706,12 @@ public class TourManager {
 
 // SET_FORMATTING_OFF
 
+		final float[] cadenceSerieData = new float[numTimeSlices];
+		multiTourData.setCadenceSerie(cadenceSerieData);
+
 		final int[] toTimeSerie 						= multiTourData.timeSerie = new int[numTimeSlices];
 		final float[] toAltitudeSerie 				= multiTourData.altitudeSerie = new float[numTimeSlices];
-		final float[] toCadenceSerie 					= multiTourData.cadenceSerie = new float[numTimeSlices];
+		final float[] toCadenceSerie 					= cadenceSerieData;
 		final float[] toDistanceSerie 				= multiTourData.distanceSerie = new float[numTimeSlices];
 		final long[] toGearSerie 						= multiTourData.gearSerie = new long[numTimeSlices];
 		final double[] toLatitudeSerie 				= multiTourData.latitudeSerie = new double[numTimeSlices];
@@ -787,7 +790,7 @@ public class TourManager {
 			final int[] fromTimeSerie = fromTourData.timeSerie;
 
 			final float[] fromAltitudeSerie = fromTourData.altitudeSerie;
-			final float[] fromCadenceSerie = fromTourData.getCadenceSerie();
+			final float[] fromCadenceSerie = fromTourData.getCadenceSerieWithMuliplier();
 			final float[] fromDistanceSerie = fromTourData.distanceSerie;
 			final long[] fromGearSerie = fromTourData.gearSerie;
 			final double[] fromLatitudeSerie = fromTourData.latitudeSerie;
@@ -991,7 +994,7 @@ public class TourManager {
 			multiTourData.altitudeSerie = null;
 		}
 		if (!isCadenceSerie) {
-			multiTourData.cadenceSerie = null;
+			multiTourData.setCadenceSerie(null);
 		}
 		if (!isDistanceSerie) {
 			multiTourData.distanceSerie = null;
@@ -1792,9 +1795,9 @@ public class TourManager {
 			tourData.altitudeSerie = removeTimeSlices_Float(floatSerie, firstIndex, lastIndex);
 		}
 
-		floatSerie = tourData.cadenceSerie;
+		floatSerie = tourData.getCadenceSerie();
 		if (floatSerie != null) {
-			tourData.cadenceSerie = removeTimeSlices_Float(floatSerie, firstIndex, lastIndex);
+			tourData.setCadenceSerie(removeTimeSlices_Float(floatSerie, firstIndex, lastIndex));
 		}
 
 		floatSerie = tourData.distanceSerie;
@@ -3395,7 +3398,7 @@ public class TourManager {
 																	final ChartType chartType,
 																	final boolean isHrZoneDisplayed) {
 
-		final float[] cadenceSerie = tourData.getCadenceSerie();
+		final float[] cadenceSerie = tourData.getCadenceSerieWithMuliplier();
 		ChartDataYSerie yDataCadence = null;
 		if (cadenceSerie != null) {
 

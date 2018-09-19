@@ -21,27 +21,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.action.ActionOpenPrefDialog;
-import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.util.StatusUtil;
-import net.tourbook.common.util.Util;
-import net.tourbook.data.TourData;
-import net.tourbook.data.TourMarker;
-import net.tourbook.data.TourPerson;
-import net.tourbook.data.TourTag;
-import net.tourbook.data.TourType;
-import net.tourbook.data.TourWayPoint;
-import net.tourbook.database.PersonManager;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tag.TagMenuManager;
-import net.tourbook.ui.ITourProvider2;
-import net.tourbook.ui.UI;
-import net.tourbook.ui.action.ActionSetTourTypeMenu;
-import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
-
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -71,6 +50,27 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.Util;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourPerson;
+import net.tourbook.data.TourTag;
+import net.tourbook.data.TourType;
+import net.tourbook.data.TourWayPoint;
+import net.tourbook.database.PersonManager;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tag.TagMenuManager;
+import net.tourbook.ui.ITourProvider2;
+import net.tourbook.ui.UI;
+import net.tourbook.ui.action.ActionSetTourTypeMenu;
+import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 /**
  * Split tour at a time slice position and save extracted time slices as a new tour
@@ -218,7 +218,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
 	/**
 	 * Split or extract a tour
-	 * 
+	 *
 	 * @param parentShell
 	 * @param tourData
 	 * @param extractStartIndex
@@ -559,7 +559,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
 	/**
 	 * tour type & tags
-	 * 
+	 *
 	 * @param defaultSelectionAdapter
 	 */
 	private void createUI_30_TypeTags(final Composite parent) {
@@ -731,7 +731,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		 * get data series
 		 */
 		final float[] tourAltitudeSerie = _tourDataSource.altitudeSerie;
-		final float[] tourCadenceSerie = _tourDataSource.cadenceSerie;
+		final float[] tourCadenceSerie = _tourDataSource.getCadenceSerie();
 		final float[] tourDistanceSerie = _tourDataSource.distanceSerie;
 		final long[] tourGearSerie = _tourDataSource.gearSerie;
 		final double[] tourLatitudeSerie = _tourDataSource.latitudeSerie;
@@ -814,8 +814,8 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		final float[] extractTemperatureSerie = new float[extractSerieLength];
 		final int[] extractTimeSerie = new int[extractSerieLength];
 
-		final HashSet<TourMarker> extractedTourMarker = new HashSet<TourMarker>();
-		final ArrayList<TourWayPoint> extractedWayPoints = new ArrayList<TourWayPoint>();
+		final HashSet<TourMarker> extractedTourMarker = new HashSet<>();
+		final ArrayList<TourWayPoint> extractedWayPoints = new ArrayList<>();
 
 		/*
 		 * get start date/time
@@ -1021,7 +1021,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 			_tourDataTarget.distanceSerie = extractDistanceSerie;
 		}
 		if (isTourCadence) {
-			_tourDataTarget.cadenceSerie = extractCadenceSerie;
+			_tourDataTarget.setCadenceSerie(extractCadenceSerie);
 		}
 		if (isTourGear) {
 			_tourDataTarget.setGears(extractGearSerie);
@@ -1129,7 +1129,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		 */
 		_tourDataTarget.createTourIdDummy();
 
-		_tourDataTargetList = new ArrayList<TourData>();
+		_tourDataTargetList = new ArrayList<>();
 		_tourDataTargetList.add(_tourDataTarget);
 
 		/*
@@ -1139,7 +1139,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		_tourTitleFromMarker = UI.EMPTY_STRING;
 
 		// get title from first marker which is within the splitted tour
-		final ArrayList<TourMarker> sortedMarker = new ArrayList<TourMarker>(_tourDataSource.getTourMarkers());
+		final ArrayList<TourMarker> sortedMarker = new ArrayList<>(_tourDataSource.getTourMarkers());
 		Collections.sort(sortedMarker);
 
 		for (final TourMarker tourMarker : sortedMarker) {
@@ -1154,7 +1154,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		/*
 		 * get all tags
 		 */
-		final Set<TourTag> extractedTourTags = new HashSet<TourTag>();
+		final Set<TourTag> extractedTourTags = new HashSet<>();
 		final Set<TourTag> tourTags = _tourDataSource.getTourTags();
 		extractedTourTags.addAll(tourTags);
 		_tourDataTarget.setTourTags(extractedTourTags);

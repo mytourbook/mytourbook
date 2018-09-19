@@ -1,23 +1,19 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
-
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.data.TourData;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -33,15 +29,19 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Widget;
 
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.data.TourData;
+
 public class ValuePointToolTipMenuManager {
 
 // SET_FORMATTING_OFF
 
 	static final String					STATE_VALUE_POINT_TOOLTIP_VISIBLE_GRAPHS	= "ValuePoint_ToolTip_VisibleGraphs";		//$NON-NLS-1$
 	static final String					STATE_VALUE_POINT_TOOLTIP_ORIENTATION		= "ValuePoint_ToolTip_Orientation";		//$NON-NLS-1$
-	
+
 	static ValuePointToolTipOrientation	DEFAULT_ORIENTATION							= ValuePointToolTipOrientation.Horizontal;
-	
+
 // SET_FORMATTING_ON
 
 	static final long					VALUE_ID_ALTIMETER							= 1 << 1;
@@ -280,7 +280,7 @@ public class ValuePointToolTipMenuManager {
 
 	/**
 	 * Show/hide value and reopen the tool tip with the new or hidden value.
-	 * 
+	 *
 	 * @param graphId
 	 *            Graph id which should be displayed/hidden.
 	 * @param isChecked
@@ -535,7 +535,7 @@ public class ValuePointToolTipMenuManager {
 
 		_actionValue_Cadence.setState( //
 				(_allVisibleValueIds & VALUE_ID_CADENCE) > 0,
-				_tourData.cadenceSerie != null);
+				_tourData.getCadenceSerie() != null);
 
 		_actionValue_ChartZoomFactor.setState( //
 				(_allVisibleValueIds & VALUE_ID_CHART_ZOOM_FACTOR) > 0,
@@ -680,7 +680,7 @@ public class ValuePointToolTipMenuManager {
 
 	/**
 	 * Open tooltip context menu.
-	 * 
+	 *
 	 * @param event
 	 * @param tourData
 	 * @param allVisibleValueIds

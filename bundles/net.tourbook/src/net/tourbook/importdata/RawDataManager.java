@@ -1005,7 +1005,7 @@ public class RawDataManager {
 		if (reimportId == ReImport.AllTimeSlices || reimportId == ReImport.OnlyCadenceValues) {
 
 			// reimport cadence/stride only
-			oldTourData.cadenceSerie = reimportedTourData.cadenceSerie;
+			oldTourData.setCadenceSerie(reimportedTourData.getCadenceSerie());
 			oldTourData.setCadenceMultiplier(reimportedTourData.getCadenceMultiplier());
 			oldTourData.setIsStrideSensorPresent(reimportedTourData.isStrideSensorPresent());
 		}

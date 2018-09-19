@@ -343,6 +343,11 @@ public class FitContext {
 			 */
 			private void setupTour_SwimData(final TourData tourData, final List<SwimData> allTourSwimData) {
 
+				// check if swim data are available
+				if (allTourSwimData == null) {
+					return;
+				}
+
 				final long tourStartTime = tourData.getTourStartTimeMS();
 
 				final int swimDataSize = allTourSwimData.size();
@@ -359,7 +364,11 @@ public class FitContext {
 				tourData.swim_StrokeStyle = strokeStyle;
 				tourData.swim_Time = swimTime;
 
+				boolean isSwimActivityType = false;
 				boolean isSwimCadence = false;
+				boolean isSwimStrokes = false;
+				boolean isSwimStrokeStyle = false;
+				boolean isSwimTime = false;
 
 				for (int swimSerieIndex = 0; swimSerieIndex < allTourSwimData.size(); swimSerieIndex++) {
 
@@ -368,21 +377,56 @@ public class FitContext {
 					final long absoluteSwimTime = swimData.absoluteTime;
 					final short relativeSwimTime = (short) ((absoluteSwimTime - tourStartTime) / 1000);
 
+					final short swimActivityType = swimData.swim_ActivityType;
 					final short swimCadence = swimData.swim_Cadence;
-					if (swimCadence != Short.MIN_VALUE) {
+					final short swimStrokes = swimData.swim_Strokes;
+					final short swimStrokeStyle = swimData.swim_StrokeStyle;
+
+					if (swimActivityType != Short.MIN_VALUE && swimActivityType > 0) {
+						isSwimActivityType = true;
+					}
+					if (swimCadence != Short.MIN_VALUE && swimCadence > 0) {
 						isSwimCadence = true;
 					}
+					if (swimStrokes != Short.MIN_VALUE && swimStrokes > 0) {
+						isSwimStrokes = true;
+					}
+					if (swimStrokeStyle != Short.MIN_VALUE && swimStrokeStyle > 0) {
+						isSwimStrokeStyle = true;
+					}
+					if (relativeSwimTime > 0) {
+						isSwimTime = true;
+					}
 
-					activityType[swimSerieIndex] = swimData.swim_ActivityType;
+					activityType[swimSerieIndex] = swimActivityType;
 					cadence[swimSerieIndex] = swimCadence;
-					strokes[swimSerieIndex] = swimData.swim_Strokes;
-					strokeStyle[swimSerieIndex] = swimData.swim_StrokeStyle;
+					strokes[swimSerieIndex] = swimStrokes;
+					strokeStyle[swimSerieIndex] = swimStrokeStyle;
 					swimTime[swimSerieIndex] = relativeSwimTime;
 				}
 
-				// removed cadence data serie when swim cadence is available
+				/*
+				 * Cleanup data series
+				 */
+				if (isSwimActivityType == false) {
+					tourData.swim_ActivityType = null;
+				}
+				if (isSwimStrokes == false) {
+					tourData.swim_Strokes = null;
+				}
+				if (isSwimStrokeStyle == false) {
+					tourData.swim_StrokeStyle = null;
+				}
+				if (isSwimTime == false) {
+					tourData.swim_Time = null;
+				}
+
+				// cadence is very special
 				if (isSwimCadence) {
-					tourData.cadenceSerie = null;
+					// removed 'normal' cadence data serie when swim cadence is available
+					tourData.setCadenceSerie(null);
+				} else {
+					tourData.swim_Cadence = null;
 				}
 			}
 		};

@@ -37,21 +37,6 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
-import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.util.StatusUtil;
-import net.tourbook.common.util.Util;
-import net.tourbook.data.TourData;
-import net.tourbook.data.TourMarker;
-import net.tourbook.data.TourWayPoint;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.ext.velocity.VelocityService;
-import net.tourbook.extension.export.ExportTourExtension;
-import net.tourbook.tour.TourManager;
-import net.tourbook.ui.FileCollisionBehavior;
-
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.tools.generic.MathTool;
@@ -102,6 +87,21 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.osgi.framework.Version;
 
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.Util;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourWayPoint;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.ext.velocity.VelocityService;
+import net.tourbook.extension.export.ExportTourExtension;
+import net.tourbook.tour.TourManager;
+import net.tourbook.ui.FileCollisionBehavior;
+
 public class DialogExportTour extends TitleAreaDialog {
 
 	private static final String				EXPORT_ID_GPX					= "net.tourbook.export.gpx";			//$NON-NLS-1$
@@ -130,7 +130,7 @@ public class DialogExportTour extends TitleAreaDialog {
 	 * This is a special parameter to force elevation values from the device and not from the
 	 * lat/lon + srtm data <a
 	 * href="http://strava.github.io/api/v3/uploads/">http://strava.github.io/api/v3/uploads/</a>.
-	 * 
+	 *
 	 * @since 15.6
 	 */
 	private static final String				STRAVA_WITH_BAROMETER			= " with barometer";					//$NON-NLS-1$
@@ -1013,9 +1013,9 @@ public class DialogExportTour extends TitleAreaDialog {
 
 			// export one tour
 
-			final ArrayList<GarminTrack> tracks = new ArrayList<GarminTrack>();
-			final ArrayList<TourWayPoint> wayPoints = new ArrayList<TourWayPoint>();
-			final ArrayList<TourMarker> tourMarkers = new ArrayList<TourMarker>();
+			final ArrayList<GarminTrack> tracks = new ArrayList<>();
+			final ArrayList<TourWayPoint> wayPoints = new ArrayList<>();
+			final ArrayList<TourMarker> tourMarkers = new ArrayList<>();
 
 			final TourData tourData = _tourDataList.get(0);
 			final ZonedDateTime trackStartTime = tourData.getTourStartTime();
@@ -1089,9 +1089,9 @@ public class DialogExportTour extends TitleAreaDialog {
 			_mergedTime = _tourDataList.get(0).getTourStartTime();
 			_mergedDistance = 0;
 
-			final ArrayList<GarminTrack> tracks = new ArrayList<GarminTrack>();
-			final ArrayList<TourWayPoint> wayPoints = new ArrayList<TourWayPoint>();
-			final ArrayList<TourMarker> tourMarkers = new ArrayList<TourMarker>();
+			final ArrayList<GarminTrack> tracks = new ArrayList<>();
+			final ArrayList<TourWayPoint> wayPoints = new ArrayList<>();
+			final ArrayList<TourMarker> tourMarkers = new ArrayList<>();
 
 			final GarminLap tourLap = new GarminLap();
 
@@ -1161,9 +1161,9 @@ public class DialogExportTour extends TitleAreaDialog {
 						tourSize,
 						exportFilePathName }));
 
-				final ArrayList<GarminTrack> tracks = new ArrayList<GarminTrack>();
-				final ArrayList<TourWayPoint> wayPoints = new ArrayList<TourWayPoint>();
-				final ArrayList<TourMarker> tourMarkers = new ArrayList<TourMarker>();
+				final ArrayList<GarminTrack> tracks = new ArrayList<>();
+				final ArrayList<TourWayPoint> wayPoints = new ArrayList<>();
+				final ArrayList<TourMarker> tourMarkers = new ArrayList<>();
 
 				final ZonedDateTime trackStartTime = tourData.getTourStartTime();
 
@@ -1261,7 +1261,7 @@ public class DialogExportTour extends TitleAreaDialog {
 
 	/**
 	 * Adds some values to the velocity context (e.g. date, ...).
-	 * 
+	 *
 	 * @param vcContext
 	 *            the velocity context holding all the data
 	 */
@@ -1548,7 +1548,7 @@ public class DialogExportTour extends TitleAreaDialog {
 		}
 
 		final float[] altitudeSerie = tourData.altitudeSerie;
-		final float[] cadenceSerie = tourData.cadenceSerie;
+		final float[] cadenceSerie = tourData.getCadenceSerie();
 		final float[] distanceSerie = tourData.distanceSerie;
 		final long[] gearSerie = tourData.gearSerie;
 		final double[] latitudeSerie = tourData.latitudeSerie;
