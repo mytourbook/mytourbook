@@ -142,6 +142,7 @@ public class Messages extends NLS {
 	public static String				Graph_Label_RunDyn_VerticalRatio;
 	public static String				Graph_Label_RunDyn_VerticalOscillation;
 	public static String				Graph_Label_Swim_Strokes;
+	public static String				Graph_Label_Swim_Swolf;
 
 	public static String				Graph_Pref_color_gradient_bright;
 	public static String				Graph_Pref_color_gradient_dark;

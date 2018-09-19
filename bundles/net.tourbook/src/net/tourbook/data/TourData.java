@@ -1480,6 +1480,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	@Transient
 	public boolean 	isSwimCadence;
 
+	/**
+	 *Computed swim data serie
+	 */
+	@Transient
+	private float[]	_swim_Swolf;
+
 // SET_FORMATTING_ON
 
 	public TourData() {}
@@ -5046,7 +5052,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		});
 	}
 
-	private float[] createSwimDataSerie(final short[] swimDataSerie) {
+	private float[] createSwim_DataSerie(final short[] swimDataSerie) {
 
 		if (timeSerie == null || swim_Time == null || swim_Time.length == 0 || swimDataSerie == null) {
 			return null;
@@ -5152,6 +5158,43 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		}
 
 		return swimUIValues;
+	}
+
+	/**
+	 * Compute swim Swolf data and convert it into a 'normal' data serie
+	 *
+	 * @return
+	 */
+	private float[] createSwim_SwolfDataSerie() {
+
+		if (timeSerie == null
+				|| swim_Time == null || swim_Time.length == 0
+				|| swim_Strokes == null || swim_Strokes.length == 0) {
+
+			return null;
+		}
+
+		final int swimSerieSize = swim_Time.length;
+
+		final short[] swolfData = new short[swimSerieSize];
+
+		int prevSwimTime = swim_Time[0];
+
+		for (int swimIndex = 0; swimIndex < swim_Time.length; swimIndex++) {
+
+			final int currentSwimTime = swim_Time[swimIndex];
+			final short strokes = swim_Strokes[swimIndex];
+
+			final int timeDiff = currentSwimTime - prevSwimTime;
+
+			swolfData[swimIndex] = (short) (strokes == Short.MIN_VALUE || strokes == 0
+					? 0
+					: strokes + timeDiff);
+
+			prevSwimTime = currentSwimTime;
+		}
+
+		return createSwim_DataSerie(swolfData);
 	}
 
 	/**
@@ -7372,7 +7415,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	public float[] getSwim_Cadence() {
 
 		if (_swim_Cadence_UI == null) {
-			_swim_Cadence_UI = createSwimDataSerie(swim_Cadence);
+			_swim_Cadence_UI = createSwim_DataSerie(swim_Cadence);
 		}
 
 		return _swim_Cadence_UI;
@@ -7384,10 +7427,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	public float[] getSwim_Strokes() {
 
 		if (_swim_Strokes_UI == null) {
-			_swim_Strokes_UI = createSwimDataSerie(swim_Strokes);
+			_swim_Strokes_UI = createSwim_DataSerie(swim_Strokes);
 		}
 
 		return _swim_Strokes_UI;
+	}
+
+	/**
+	 * @return Returns the UI values for number of strokes.
+	 */
+	public float[] getSwim_Swolf() {
+
+		if (_swim_Swolf == null) {
+			_swim_Swolf = createSwim_SwolfDataSerie();
+		}
+
+		return _swim_Swolf;
 	}
 
 	/**

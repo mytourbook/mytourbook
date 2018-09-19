@@ -94,6 +94,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	private static final String	GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO				= net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalRatio;
 
 	private static final String	GRAPH_LABEL_SWIM_STROKES							= net.tourbook.common.Messages.Graph_Label_Swim_Strokes;
+	private static final String	GRAPH_LABEL_SWIM_SWOLF								= net.tourbook.common.Messages.Graph_Label_Swim_Swolf;
 
 // SET_FORMATTING_ON
 
@@ -777,6 +778,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		final Graph graph_RunDyn_VerticalRatio		 		= new Graph(TourManager.GRAPH_RUN_DYN_VERTICAL_RATIO, 		GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO,				GRAPH_LABEL_PREFIX_RUNNING_DYNAMICS);
 
 		final Graph graph_Swim_Strokes				 		= new Graph(TourManager.GRAPH_SWIM_STROKES, 						GRAPH_LABEL_SWIM_STROKES,							GRAPH_LABEL_PREFIX_SWIMMING);
+		final Graph graph_Swim_Swolf					 		= new Graph(TourManager.GRAPH_SWIM_SWOLF, 						GRAPH_LABEL_SWIM_SWOLF,								GRAPH_LABEL_PREFIX_SWIMMING);
 
 		final Graph graph_TourCompareResult 				= new Graph(TourManager.GRAPH_TOUR_COMPARE, 						GRAPH_LABEL_TOUR_COMPARE_RESULT);
 

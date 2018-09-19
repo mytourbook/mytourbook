@@ -116,6 +116,7 @@ public class TourManager {
 	private static final String	GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION		= net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalOscillation;
 	private static final String	GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO				= net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalRatio;
 	private static final String	GRAPH_LABEL_SWIM_STROKES							= net.tourbook.common.Messages.Graph_Label_Swim_Strokes;
+	private static final String	GRAPH_LABEL_SWIM_SWOLF								= net.tourbook.common.Messages.Graph_Label_Swim_Swolf;
 	//
 	public static final String	LOG_TEMP_ADJUST_001_START								= Messages.Log_TemperatureAdjustment_001_Start;
 	public static final String	LOG_TEMP_ADJUST_002_END									= Messages.Log_TemperatureAdjustment_002_End;
@@ -176,6 +177,7 @@ public class TourManager {
 	public static final int		GRAPH_RUN_DYN_VERTICAL_RATIO						= 1104;
 
 	public static final int		GRAPH_SWIM_STROKES									= 1200;
+	public static final int		GRAPH_SWIM_SWOLF										= 1201;
 
 	public static final int		GRAPH_TOUR_COMPARE									= 2000;
 
@@ -203,6 +205,7 @@ public class TourManager {
 			GRAPH_RUN_DYN_VERTICAL_RATIO,
 
 			GRAPH_SWIM_STROKES,
+			GRAPH_SWIM_SWOLF,
 
 			GRAPH_TOUR_COMPARE
 	};
@@ -3068,6 +3071,7 @@ public class TourManager {
 		final ChartDataYSerie yData_RunDyn_VerticalRatio			= createModelData_RunDyn_VerticalRatio(		tourData, chartDataModel, chartType, isHrZoneDisplayed);
 
 		final ChartDataYSerie yData_Swim_Strokes						= createModelData_Swim_Strokes(					tourData, chartDataModel, chartType, isHrZoneDisplayed);
+		final ChartDataYSerie yData_Swim_Swolf							= createModelData_Swim_Swolf(						tourData, chartDataModel, chartType, isHrZoneDisplayed);
 
 // SET_FORMATTING_ON
 
@@ -3193,6 +3197,13 @@ public class TourManager {
 				if (yData_Swim_Strokes != null) {
 					chartDataModel.addYData(yData_Swim_Strokes);
 					chartDataModel.setCustomData(CUSTOM_DATA_SWIM_STROKES, yData_Swim_Strokes);
+				}
+				break;
+
+			case GRAPH_SWIM_SWOLF:
+				if (yData_Swim_Swolf != null) {
+					chartDataModel.addYData(yData_Swim_Swolf);
+					chartDataModel.setCustomData(CUSTOM_DATA_SWIM_STROKES, yData_Swim_Swolf);
 				}
 				break;
 
@@ -3949,7 +3960,7 @@ public class TourManager {
 			yDataSerie = createChartDataSerie(dataSerie, chartType);
 
 			yDataSerie.setYTitle(GRAPH_LABEL_SWIM_STROKES);
-			yDataSerie.setUnitLabel(UI.SYMBOL_NUMBER_SIGN);
+			yDataSerie.setUnitLabel(GRAPH_LABEL_SWIM_STROKES);
 			yDataSerie.setShowYSlider(true);
 			yDataSerie.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_SWIM_STROKES);
 //			yDataSerie.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, _computeAvg_RunDyn_StanceTime));
@@ -3961,6 +3972,50 @@ public class TourManager {
 			}
 
 			setGraphColor(yDataSerie, GraphColorManager.PREF_GRAPH_SWIM_STROKES);
+			chartDataModel.addXyData(yDataSerie);
+
+			// adjust min/max values when it's defined in the pref store
+//			setVisibleForcedValues(
+//					yDataSerie,
+//					1,
+//					0,
+//					ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MIN_ENABLED,
+//					ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MAX_ENABLED,
+//					ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_MIN_VALUE,
+//					ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_MAX_VALUE);
+		}
+
+		return yDataSerie;
+	}
+
+	/**
+	 * Swimming: Swolf
+	 */
+	private ChartDataYSerie createModelData_Swim_Swolf(final TourData tourData,
+																		final ChartDataModel chartDataModel,
+																		final ChartType chartType,
+																		final boolean isHrZoneDisplayed) {
+
+		ChartDataYSerie yDataSerie = null;
+
+		final float[] dataSerie = tourData.getSwim_Swolf();
+		if (dataSerie != null) {
+
+			yDataSerie = createChartDataSerie(dataSerie, chartType);
+
+			yDataSerie.setYTitle(GRAPH_LABEL_SWIM_SWOLF);
+			yDataSerie.setUnitLabel(GRAPH_LABEL_SWIM_SWOLF);
+			yDataSerie.setShowYSlider(true);
+			yDataSerie.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_SWIM_SWOLF);
+//			yDataSerie.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, _computeAvg_RunDyn_StanceTime));
+
+			if (isHrZoneDisplayed) {
+				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
+			} else {
+				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_NO);
+			}
+
+			setGraphColor(yDataSerie, GraphColorManager.PREF_GRAPH_SWIM_SWOLF);
 			chartDataModel.addXyData(yDataSerie);
 
 			// adjust min/max values when it's defined in the pref store

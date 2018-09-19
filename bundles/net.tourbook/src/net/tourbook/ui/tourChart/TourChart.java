@@ -156,6 +156,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private static final String	GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION	= net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalOscillation;
 	private static final String	GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO			= net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalRatio;
 	private static final String	GRAPH_LABEL_SWIM_STROKES						= net.tourbook.common.Messages.Graph_Label_Swim_Strokes;
+	private static final String	GRAPH_LABEL_SWIM_SWOLF							= net.tourbook.common.Messages.Graph_Label_Swim_Swolf;
 	//
 	public static final String		ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER			= "ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER";			//$NON-NLS-1$
 	public static final String		ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED		= "ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED";		//$NON-NLS-1$
@@ -192,6 +193,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_OSCILLATION				= "STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_OSCILLATION";	//$NON-NLS-1$
 	static final String 	STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_RATIO						= "STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_RATIO";			//$NON-NLS-1$
 	static final String	STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_STROKES									= "STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_STROKES";						//$NON-NLS-1$
+	static final String	STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_SWOLF										= "STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_SWOLF";							//$NON-NLS-1$
 	//
 	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE_DEFAULT								= true;
 	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER_DEFAULT							= false;
@@ -209,6 +211,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_OSCILLATION_DEFAULT	= false;
 	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_RATIO_DEFAULT			= false;
 	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_STROKES_DEFAULT						= true;
+	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_SWOLF_DEFAULT							= false;
 	//
 	private static final String GRAPH_CONTRIBUTION_ID_SLIDEOUT								= "GRAPH_CONTRIBUTION_ID_SLIDEOUT";			//$NON-NLS-1$
 	//
@@ -229,7 +232,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private static final String GRAPH_CONTRIBUTION_ID_RUN_DYN_STEP_LENGTH				= "GRAPH_CONTRIBUTION_ID_RUN_DYN_STEP_LENGTH";				//$NON-NLS-1$
 	private static final String GRAPH_CONTRIBUTION_ID_RUN_DYN_VERTICAL_OSCILLATION	= "GRAPH_CONTRIBUTION_ID_RUN_DYN_VERTICAL_OSCILLATION";	//$NON-NLS-1$
 	private static final String GRAPH_CONTRIBUTION_ID_RUN_DYN_VERTICAL_RATIO			= "GRAPH_CONTRIBUTION_ID_RUN_DYN_VERTICAL_RATIO";			//$NON-NLS-1$
+
 	private static final String GRAPH_CONTRIBUTION_ID_SWIM_STROKES							= "GRAPH_CONTRIBUTION_ID_SWIM_STROKES";						//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_SWIM_SWOLF							= "GRAPH_CONTRIBUTION_ID_SWIM_SWOLF";							//$NON-NLS-1$
 
 	private static final String[]	_allGraphContribId = {
 
@@ -250,7 +255,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		GRAPH_CONTRIBUTION_ID_RUN_DYN_VERTICAL_OSCILLATION,
 		GRAPH_CONTRIBUTION_ID_RUN_DYN_VERTICAL_RATIO,
 
-		GRAPH_CONTRIBUTION_ID_SWIM_STROKES
+		GRAPH_CONTRIBUTION_ID_SWIM_STROKES,
+		GRAPH_CONTRIBUTION_ID_SWIM_SWOLF
 	};
 
 //SET_FORMATTING_ON
@@ -1785,10 +1791,18 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		createActions_12_GraphAction(
 				TourManager.GRAPH_SWIM_STROKES,
 				GRAPH_LABEL_SWIM_STROKES,
-				Messages.Tour_Action_RunDyn_StanceTime_Tooltip,
+				Messages.Tour_Action_Swim_Strokes_Tooltip,
 				Messages.Image__Graph_Swim_Strokes,
 				Messages.Image__Graph_Swim_Strokes_Disabled,
 				GRAPH_CONTRIBUTION_ID_SWIM_STROKES);
+
+		createActions_12_GraphAction(
+				TourManager.GRAPH_SWIM_SWOLF,
+				GRAPH_LABEL_SWIM_SWOLF,
+				Messages.Tour_Action_Swim_Swolf_Tooltip,
+				Messages.Image__Graph_Swim_Swolf,
+				Messages.Image__Graph_Swim_Swolf_Disabled,
+				GRAPH_CONTRIBUTION_ID_SWIM_SWOLF);
 	}
 
 	/**
@@ -2992,6 +3006,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				TourManager.GRAPH_SWIM_STROKES,
 				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_STROKES,
 				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_STROKES_DEFAULT);
+
+		fillToolbar_Graphs_Graph(
+				tbm,
+				TourManager.GRAPH_SWIM_SWOLF,
+				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_SWOLF,
+				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_SWOLF_DEFAULT);
 	}
 
 	private void fillToolbar_Graphs_Graph(	final IToolBarManager tbm,

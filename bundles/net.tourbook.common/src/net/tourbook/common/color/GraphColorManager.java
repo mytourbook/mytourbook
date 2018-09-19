@@ -71,6 +71,7 @@ public class GraphColorManager {
 	public static final String					PREF_GRAPH_RUN_DYN_VERTICAL_OSCILLATION	= "RunDyn_VerticalOscillation";	//$NON-NLS-1$
 	public static final String					PREF_GRAPH_RUN_DYN_VERTICAL_RATIO			= "RunDyn_VerticalRatio";			//$NON-NLS-1$
 	public static final String					PREF_GRAPH_SWIM_STROKES							= "Swim_Strokes";						//$NON-NLS-1$
+	public static final String					PREF_GRAPH_SWIM_SWOLF							= "Swim_Swolf";						//$NON-NLS-1$
 
 	public static final String					PREF_COLOR_BRIGHT									= "bright";								//$NON-NLS-1$
 	public static final String					PREF_COLOR_DARK									= "dark";								//$NON-NLS-1$
@@ -503,6 +504,14 @@ public class GraphColorManager {
 
 		allColorDef.add(new ColorDefinition(PREF_GRAPH_SWIM_STROKES,
 				Messages.Graph_Label_Prefix_Swimming + uiSpacing + Messages.Graph_Label_Swim_Strokes,
+				new RGB(0xff, 0xff, 0xff),
+				new RGB(0xff, 0xce, 0x17),
+				new RGB(0xc6, 0x9e, 0x0),
+				new RGB(0x84, 0x69, 0x0),
+				null));
+
+		allColorDef.add(new ColorDefinition(PREF_GRAPH_SWIM_SWOLF,
+				Messages.Graph_Label_Prefix_Swimming + uiSpacing + Messages.Graph_Label_Swim_Swolf,
 				new RGB(0xff, 0xff, 0xff),
 				new RGB(0xff, 0xce, 0x17),
 				new RGB(0xc6, 0x9e, 0x0),

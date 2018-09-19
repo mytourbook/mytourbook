@@ -865,6 +865,10 @@ public class Messages extends NLS {
 	public static String				Image__Graph_RunDyn_VerticalRatio_Disabled;
 	public static String				Image__Graph_Swim_Strokes;
 	public static String				Image__Graph_Swim_Strokes_Disabled;
+
+	public static String Image__Graph_Swim_Swolf;
+
+	public static String Image__Graph_Swim_Swolf_Disabled;
 	public static String				Image__GraphMinMax;
 	public static String				Image__GraphMinMax_Disabled;
 	public static String				Image__graph_pace_disabled;
@@ -2081,6 +2085,10 @@ public class Messages extends NLS {
 	public static String				Tour_Action_ShowBreaktimeValues;
 	public static String				Tour_Action_ShowHrZones_Tooltip;
 	public static String				Tour_Action_ShowTourMarker;
+
+	public static String Tour_Action_Swim_Strokes_Tooltip;
+
+	public static String Tour_Action_Swim_Swolf_Tooltip;
 	public static String				Tour_Action_TourInfo_Tooltip;
 	public static String				Tour_Action_TourPhotos;
 	public static String				Tour_Action_TourPhotosWithoutTooltip_Tooltip;

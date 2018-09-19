@@ -4263,9 +4263,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="22.627417"
-     inkscape:cx="528.16337"
-     inkscape:cy="975.38739"
+     inkscape:zoom="11.313709"
+     inkscape:cx="540.85451"
+     inkscape:cy="966.1417"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -9527,54 +9527,17 @@
        inkscape:export-ydpi="96" />
     <rect
        style="opacity:0.98999999;fill:none;stroke:none;stroke-linecap:round;stroke-linejoin:round"
-       id="rect6561-8-1-8-0-2-2"
-       width="16"
-       height="16"
-       x="500"
-       y="66.362183"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\graph-swim.png"
-       inkscape:export-xdpi="96"
-       inkscape:export-ydpi="96" />
-    <path
-       style="fill:#ff4d00;fill-opacity:1;stroke:#792500;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 500.258,78.112183 h 10.63755 l -3,-7.554 h 6.50045 v -1.5 h -9.10048 l 1.71296,4.724814 z"
-       id="path5941"
-       inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cccccccc"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\graph-swim.png"
-       inkscape:export-xdpi="96"
-       inkscape:export-ydpi="96" />
-    <circle
-       style="opacity:1;fill:#ff4d00;fill-opacity:1;stroke:#792500;stroke-width:0.49999991;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
-       id="path5945"
-       cx="513.49988"
-       cy="74.862167"
-       r="2.2499998"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\graph-swim.png"
-       inkscape:export-xdpi="96"
-       inkscape:export-ydpi="96" />
-    <path
-       style="fill:#008be9;fill-opacity:1;stroke:none;stroke-width:0.49999997;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M 515.99998,82.362184 500.0002,82.317464 500,79.362183 h 15.99998 z"
-       id="path5939-8"
-       inkscape:connector-curvature="0"
-       sodipodi:nodetypes="ccccc"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\graph-swim.png"
-       inkscape:export-xdpi="96"
-       inkscape:export-ydpi="96" />
-    <rect
-       style="opacity:0.98999999;fill:none;stroke:none;stroke-linecap:round;stroke-linejoin:round"
        id="rect6561-8-1-8-0-2-2-6"
        width="16"
        height="16"
-       x="520"
+       x="500"
        y="66.362183"
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\graph-swim-strokes.png"
        inkscape:export-xdpi="96"
        inkscape:export-ydpi="96" />
     <path
-       style="fill:#ff4d00;fill-opacity:1;stroke:#792500;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 520.18769,79.615528 c 0,0 7.25425,0.03522 11.25861,0.03522 l -3.55075,-8.983745 h 6.50045 v -1.5 h -9.10048 l 1.71296,4.724814 z"
+       style="fill:#ffce17;fill-opacity:1;stroke:#9d7c00;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 500.18769,79.615528 c 0,0 7.25425,0.03522 11.25861,0.03522 l -3.55075,-8.983745 h 6.50045 v -1.5 h -9.10048 l 1.71296,4.724814 z"
        id="path5941-9"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cccccccc"
@@ -9582,12 +9545,40 @@
        inkscape:export-xdpi="96"
        inkscape:export-ydpi="96" />
     <circle
-       style="opacity:1;fill:#ff4d00;fill-opacity:1;stroke:#792500;stroke-width:0.49999991;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       style="opacity:1;fill:#ffce17;fill-opacity:1;stroke:#9d7c00;stroke-width:0.49999991;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
        id="path5945-0"
-       cx="533.49988"
+       cx="513.49988"
        cy="74.970978"
        r="2.2499998"
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\graph-swim-strokes.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="opacity:0.98999999;fill:none;stroke:none;stroke-linecap:round;stroke-linejoin:round"
+       id="rect6561-8-1-8-0-2-2-6-1"
+       width="16"
+       height="16"
+       x="520"
+       y="66.362183"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\graph-swim-swolf.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <path
+       style="fill:#915be4;fill-opacity:1;stroke:#3b1477;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 520.18769,79.615528 c 0,0 7.25425,0.03522 11.25861,0.03522 l -3.55075,-8.983745 h 6.50045 v -1.5 h -9.10048 l 1.71296,4.724814 z"
+       id="path5941-9-6"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccccccc"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\graph-swim-swolf.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <circle
+       style="opacity:1;fill:#915be4;fill-opacity:1;stroke:#3b1477;stroke-width:0.49999991;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       id="path5945-0-7"
+       cx="533.49988"
+       cy="74.970978"
+       r="2.2499998"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\graph-swim-swolf.png"
        inkscape:export-xdpi="96"
        inkscape:export-ydpi="96" />
   </g>
