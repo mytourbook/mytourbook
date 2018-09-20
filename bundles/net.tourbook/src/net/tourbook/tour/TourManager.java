@@ -151,6 +151,7 @@ public class TourManager {
 	public static final String	CUSTOM_DATA_RUN_DYN_VERTICAL_OSCILLATION		= "runDyn_RunDyn_VerticalOscillation";	//$NON-NLS-1$
 	public static final String	CUSTOM_DATA_RUN_DYN_VERTICAL_RATIO				= "runDyn_RunDyn_VerticalRatio";			//$NON-NLS-1$
 	public static final String	CUSTOM_DATA_SWIM_STROKES							= "swim_Strokes";								//$NON-NLS-1$
+	public static final String	CUSTOM_DATA_SWIM_SWOLF								= "swim_Swolf";								//$NON-NLS-1$
 	//
 	public static final String	X_AXIS_TIME												= "time";										//$NON-NLS-1$
 	public static final String	X_AXIS_DISTANCE										= "distance";									//$NON-NLS-1$
@@ -3203,7 +3204,7 @@ public class TourManager {
 			case GRAPH_SWIM_SWOLF:
 				if (yData_Swim_Swolf != null) {
 					chartDataModel.addYData(yData_Swim_Swolf);
-					chartDataModel.setCustomData(CUSTOM_DATA_SWIM_STROKES, yData_Swim_Swolf);
+					chartDataModel.setCustomData(CUSTOM_DATA_SWIM_SWOLF, yData_Swim_Swolf);
 				}
 				break;
 

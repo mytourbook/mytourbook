@@ -1,29 +1,19 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
-
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
-import net.tourbook.common.color.IColorSelectorListener;
-import net.tourbook.common.font.MTFont;
-import net.tourbook.common.tooltip.ToolbarSlideout;
-import net.tourbook.common.util.Util;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.PrefPagePeople;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
@@ -45,6 +35,16 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
+import net.tourbook.common.color.IColorSelectorListener;
+import net.tourbook.common.font.MTFont;
+import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.common.util.Util;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPagePeople;
+
 /**
  * Tour chart marker properties slideout.
  */
@@ -54,29 +54,29 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 	private static final String		GRAPH_LABEL_HEARTBEAT_UNIT			= net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
 	private static final String		GRAPH_LABEL_POWER_UNIT				= net.tourbook.common.Messages.Graph_Label_Power_Unit;
 
-	private static final int		ALTIMETER_MIN						= -10000;
-	private static final int		ALTIMETER_MAX						= 10000;
-	private static final int		ALTITUDE_MIN						= -1000;
-	private static final int		ALTITUDE_MAX						= 10000;
-	private static final int		CADENCE_MAX							= 300;
-	private static final int		GRADIENT_MIN						= -100;
-	private static final int		GRADIENT_MAX						= 100;
-	private static final int		PACE_MAX							= 100;
-	private static final int		POWER_MAX							= 1000000;
-	private static final int		SPEED_MAX							= 1000;
-	private static final int		TEMPERATURE_MIN						= -100;
-	private static final int		TEMPERATURE_MAX						= 100;
+	private static final int			ALTIMETER_MIN							= -10000;
+	private static final int			ALTIMETER_MAX							= 10000;
+	private static final int			ALTITUDE_MIN							= -1000;
+	private static final int			ALTITUDE_MAX							= 10000;
+	private static final int			CADENCE_MAX								= 300;
+	private static final int			GRADIENT_MIN							= -100;
+	private static final int			GRADIENT_MAX							= 100;
+	private static final int			PACE_MAX									= 100;
+	private static final int			POWER_MAX								= 1000000;
+	private static final int			SPEED_MAX								= 1000;
+	private static final int			TEMPERATURE_MIN						= -100;
+	private static final int			TEMPERATURE_MAX						= 100;
 
-	private static final int		RUN_DYN_STANCE_TIME_MAX				= 10000;													// ms
-	private static final int		RUN_DYN_STANCE_TIME_BALANCED_MAX	= 100;														// %
-	private static final int		RUN_DYN_STEP_LENGTH_MAX				= 10000;													// mm
-	private static final int		RUN_DYN_VERTICAL_OSCILLATION_MAX	= 1000;														// mm
-	private static final int		RUN_DYN_VERTICAL_RATIO_MAX			= 100;														// %
+	private static final int			RUN_DYN_STANCE_TIME_MAX				= 10000;																		// ms
+	private static final int			RUN_DYN_STANCE_TIME_BALANCED_MAX	= 100;																		// %
+	private static final int			RUN_DYN_STEP_LENGTH_MAX				= 10000;																		// mm
+	private static final int			RUN_DYN_VERTICAL_OSCILLATION_MAX	= 1000;																		// mm
+	private static final int			RUN_DYN_VERTICAL_RATIO_MAX			= 100;																		// %
 
-	private final IPreferenceStore	_prefStore							= TourbookPlugin.getPrefStore();
+	private final IPreferenceStore	_prefStore								= TourbookPlugin.getPrefStore();
 
-	private SelectionAdapter		_defaultSelectionListener;
-	private MouseWheelListener		_defaultMouseWheelListener;
+	private SelectionAdapter			_defaultSelectionListener;
+	private MouseWheelListener			_defaultMouseWheelListener;
 
 	{
 		_defaultSelectionListener = new SelectionAdapter() {
@@ -97,73 +97,73 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
 	private PixelConverter	_pc;
 
-	private Action			_actionRestoreDefaults;
+	private Action				_actionRestoreDefaults;
 
-	private int				_columnSpacing;
+	private int					_columnSpacing;
 
 	/*
 	 * UI controls
 	 */
-	private Button			_chkEnableMinMax;
-	private Button			_chkMin_Altimeter;
-	private Button			_chkMax_Altimeter;
-	private Button			_chkMin_Altitude;
-	private Button			_chkMax_Altitude;
-	private Button			_chkMin_Cadence;
-	private Button			_chkMax_Cadence;
-	private Button			_chkMin_Gradient;
-	private Button			_chkMax_Gradient;
-	private Button			_chkMin_Pace;
-	private Button			_chkMax_Pace;
-	private Button			_chkMin_Power;
-	private Button			_chkMax_Power;
-	private Button			_chkMin_Pulse;
-	private Button			_chkMax_Pulse;
-	private Button			_chkMax_Speed;
-	private Button			_chkMin_Speed;
-	private Button			_chkMin_Temperature;
-	private Button			_chkMax_Temperature;
-	private Button			_chkMin_RunDyn_StanceTime;
-	private Button			_chkMax_RunDyn_StanceTime;
-	private Button			_chkMin_RunDyn_StanceTimeBalance;
-	private Button			_chkMax_RunDyn_StanceTimeBalance;
-	private Button			_chkMin_RunDyn_StepLength;
-	private Button			_chkMax_RunDyn_StepLength;
-	private Button			_chkMin_RunDyn_VerticalOscillation;
-	private Button			_chkMax_RunDyn_VerticalOscillation;
-	private Button			_chkMin_RunDyn_VerticalRatio;
-	private Button			_chkMax_RunDyn_VerticalRatio;
+	private Button				_chkEnableMinMax;
+	private Button				_chkMin_Altimeter;
+	private Button				_chkMax_Altimeter;
+	private Button				_chkMin_Altitude;
+	private Button				_chkMax_Altitude;
+	private Button				_chkMin_Cadence;
+	private Button				_chkMax_Cadence;
+	private Button				_chkMin_Gradient;
+	private Button				_chkMax_Gradient;
+	private Button				_chkMin_Pace;
+	private Button				_chkMax_Pace;
+	private Button				_chkMin_Power;
+	private Button				_chkMax_Power;
+	private Button				_chkMin_Pulse;
+	private Button				_chkMax_Pulse;
+	private Button				_chkMax_Speed;
+	private Button				_chkMin_Speed;
+	private Button				_chkMin_Temperature;
+	private Button				_chkMax_Temperature;
+	private Button				_chkMin_RunDyn_StanceTime;
+	private Button				_chkMax_RunDyn_StanceTime;
+	private Button				_chkMin_RunDyn_StanceTimeBalance;
+	private Button				_chkMax_RunDyn_StanceTimeBalance;
+	private Button				_chkMin_RunDyn_StepLength;
+	private Button				_chkMax_RunDyn_StepLength;
+	private Button				_chkMin_RunDyn_VerticalOscillation;
+	private Button				_chkMax_RunDyn_VerticalOscillation;
+	private Button				_chkMin_RunDyn_VerticalRatio;
+	private Button				_chkMax_RunDyn_VerticalRatio;
 
-	private Label			_lblMaxValue;
-	private Label			_lblMinValue;
-	private Label			_lblMinMax_Altimeter;
-	private Label			_lblMinMax_Altimeter_Unit;
-	private Label			_lblMinMax_Altitude;
-	private Label			_lblMinMax_Altitude_Unit;
-	private Label			_lblMinMax_Cadence;
-	private Label			_lblMinMax_Cadence_Unit;
-	private Label			_lblMinMax_Gradient;
-	private Label			_lblMinMax_Gradient_Unit;
-	private Label			_lblMinMax_Pulse;
-	private Label			_lblMinMax_Pulse_Unit;
-	private Label			_lblMinMax_Pace;
-	private Label			_lblMinMax_Pace_Unit;
-	private Label			_lblMinMax_Power;
-	private Label			_lblMinMax_Power_Unit;
-	private Label			_lblMinMax_Speed;
-	private Label			_lblMinMax_Speed_Unit;
-	private Label			_lblMinMax_Temperature;
-	private Label			_lblMinMax_Temperature_Unit;
-	private Label			_lblMinMax_RunDyn_StanceTime;
-	private Label			_lblMinMax_RunDyn_StanceTime_Unit;
-	private Label			_lblMinMax_RunDyn_StanceTimeBalance;
-	private Label			_lblMinMax_RunDyn_StanceTimeBalance_Unit;
-	private Label			_lblMinMax_RunDyn_StepLength;
-	private Label			_lblMinMax_RunDyn_StepLength_Unit;
-	private Label			_lblMinMax_RunDyn_VerticalOscillation;
-	private Label			_lblMinMax_RunDyn_VerticalOscillation_Unit;
-	private Label			_lblMinMax_RunDyn_VerticalRatio;
-	private Label			_lblMinMax_RunDyn_VerticalRatio_Unit;
+	private Label				_lblMaxValue;
+	private Label				_lblMinValue;
+	private Label				_lblMinMax_Altimeter;
+	private Label				_lblMinMax_Altimeter_Unit;
+	private Label				_lblMinMax_Altitude;
+	private Label				_lblMinMax_Altitude_Unit;
+	private Label				_lblMinMax_Cadence;
+	private Label				_lblMinMax_Cadence_Unit;
+	private Label				_lblMinMax_Gradient;
+	private Label				_lblMinMax_Gradient_Unit;
+	private Label				_lblMinMax_Pulse;
+	private Label				_lblMinMax_Pulse_Unit;
+	private Label				_lblMinMax_Pace;
+	private Label				_lblMinMax_Pace_Unit;
+	private Label				_lblMinMax_Power;
+	private Label				_lblMinMax_Power_Unit;
+	private Label				_lblMinMax_Speed;
+	private Label				_lblMinMax_Speed_Unit;
+	private Label				_lblMinMax_Temperature;
+	private Label				_lblMinMax_Temperature_Unit;
+	private Label				_lblMinMax_RunDyn_StanceTime;
+	private Label				_lblMinMax_RunDyn_StanceTime_Unit;
+	private Label				_lblMinMax_RunDyn_StanceTimeBalance;
+	private Label				_lblMinMax_RunDyn_StanceTimeBalance_Unit;
+	private Label				_lblMinMax_RunDyn_StepLength;
+	private Label				_lblMinMax_RunDyn_StepLength_Unit;
+	private Label				_lblMinMax_RunDyn_VerticalOscillation;
+	private Label				_lblMinMax_RunDyn_VerticalOscillation_Unit;
+	private Label				_lblMinMax_RunDyn_VerticalRatio;
+	private Label				_lblMinMax_RunDyn_VerticalRatio_Unit;
 
 	private Spinner			_spinnerMin_Altimeter;
 	private Spinner			_spinnerMax_Altimeter;
@@ -194,53 +194,53 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 	private Spinner			_spinnerMin_RunDyn_VerticalRatio;
 	private Spinner			_spinnerMax_RunDyn_VerticalRatio;
 
-	private Image			_imageAltimeter;
-	private Image			_imageAltitude;
-	private Image			_imageCadence;
-	private Image			_imageGradient;
-	private Image			_imagePace;
-	private Image			_imagePower;
-	private Image			_imagePulse;
-	private Image			_imageSpeed;
-	private Image			_imageTemperature;
+	private Image				_imageAltimeter;
+	private Image				_imageAltitude;
+	private Image				_imageCadence;
+	private Image				_imageGradient;
+	private Image				_imagePace;
+	private Image				_imagePower;
+	private Image				_imagePulse;
+	private Image				_imageSpeed;
+	private Image				_imageTemperature;
 
-	private Image			_imageAltimeterDisabled;
-	private Image			_imageAltitudeDisabled;
-	private Image			_imageCadenceDisabled;
-	private Image			_imageGradientDisabled;
-	private Image			_imagePaceDisabled;
-	private Image			_imagePowerDisabled;
-	private Image			_imagePulseDisabled;
-	private Image			_imageSpeedDisabled;
-	private Image			_imageTemperatureDisabled;
+	private Image				_imageAltimeterDisabled;
+	private Image				_imageAltitudeDisabled;
+	private Image				_imageCadenceDisabled;
+	private Image				_imageGradientDisabled;
+	private Image				_imagePaceDisabled;
+	private Image				_imagePowerDisabled;
+	private Image				_imagePulseDisabled;
+	private Image				_imageSpeedDisabled;
+	private Image				_imageTemperatureDisabled;
 
-	private Image			_imageRunDyn_StanceTime;
-	private Image			_imageRunDyn_StanceTimeBalance;
-	private Image			_imageRunDyn_StepLength;
-	private Image			_imageRunDyn_VerticalOscillation;
-	private Image			_imageRunDyn_VerticalRatio;
+	private Image				_imageRunDyn_StanceTime;
+	private Image				_imageRunDyn_StanceTimeBalance;
+	private Image				_imageRunDyn_StepLength;
+	private Image				_imageRunDyn_VerticalOscillation;
+	private Image				_imageRunDyn_VerticalRatio;
 
-	private Image			_imageRunDyn_StanceTime_Disabled;
-	private Image			_imageRunDyn_StanceTimeBalance_Disabled;
-	private Image			_imageRunDyn_StepLength_Disabled;
-	private Image			_imageRunDyn_VerticalOscillation_Disabled;
-	private Image			_imageRunDyn_VerticalRatio_Disabled;
+	private Image				_imageRunDyn_StanceTime_Disabled;
+	private Image				_imageRunDyn_StanceTimeBalance_Disabled;
+	private Image				_imageRunDyn_StepLength_Disabled;
+	private Image				_imageRunDyn_VerticalOscillation_Disabled;
+	private Image				_imageRunDyn_VerticalRatio_Disabled;
 
-	private CLabel			_iconAltitude;
-	private CLabel			_iconAltimeter;
-	private CLabel			_iconGradient;
-	private CLabel			_iconPulse;
-	private CLabel			_iconSpeed;
-	private CLabel			_iconPace;
-	private CLabel			_iconCadence;
-	private CLabel			_iconPower;
-	private CLabel			_iconTemperature;
+	private CLabel				_iconAltitude;
+	private CLabel				_iconAltimeter;
+	private CLabel				_iconGradient;
+	private CLabel				_iconPulse;
+	private CLabel				_iconSpeed;
+	private CLabel				_iconPace;
+	private CLabel				_iconCadence;
+	private CLabel				_iconPower;
+	private CLabel				_iconTemperature;
 
-	private CLabel			_iconRunDyn_StanceTime;
-	private CLabel			_iconRunDyn_StanceTimeBalance;
-	private CLabel			_iconRunDyn_StepLength;
-	private CLabel			_iconRunDyn_VerticalOscillation;
-	private CLabel			_iconRunDyn_VerticalRatio;
+	private CLabel				_iconRunDyn_StanceTime;
+	private CLabel				_iconRunDyn_StanceTimeBalance;
+	private CLabel				_iconRunDyn_StepLength;
+	private CLabel				_iconRunDyn_VerticalOscillation;
+	private CLabel				_iconRunDyn_VerticalRatio;
 
 	public SlideoutGraphMinMax(final Control ownerControl, final ToolBar toolBar) {
 
@@ -764,7 +764,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 		_chkMax_RunDyn_VerticalRatio.setEnabled(isMinMaxEnabled);
 
 // SET_FORMATTING_OFF
-		
+
 		_iconAltimeter.setImage(					isMinMaxEnabled ? _imageAltimeter 	: _imageAltimeterDisabled);
 		_iconAltitude.setImage(						isMinMaxEnabled ? _imageAltitude 	: _imageAltitudeDisabled);
 		_iconCadence.setImage(						isMinMaxEnabled ? _imageCadence 	: _imageCadenceDisabled);
@@ -809,7 +809,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 		_spinnerMax_RunDyn_VerticalOscillation.setEnabled(	isMinMaxEnabled && _chkMax_RunDyn_VerticalOscillation.getSelection());
 		_spinnerMin_RunDyn_VerticalRatio.setEnabled(		isMinMaxEnabled && _chkMin_RunDyn_VerticalRatio.getSelection());
 		_spinnerMax_RunDyn_VerticalRatio.setEnabled(		isMinMaxEnabled && _chkMax_RunDyn_VerticalRatio.getSelection());
-		
+
 // SET_FORMATTING_ON
 	}
 
@@ -818,7 +818,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 		_pc = new PixelConverter(parent);
 
 // SET_FORMATTING_OFF
-		
+
 		_imageAltimeter 					= TourbookPlugin.getImageDescriptor(Messages.Image__graph_altimeter).createImage();
 		_imageAltitude 						= TourbookPlugin.getImageDescriptor(Messages.Image__graph_altitude).createImage();
 		_imageCadence 						= TourbookPlugin.getImageDescriptor(Messages.Image__graph_cadence).createImage();
@@ -828,7 +828,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 		_imagePulse 						= TourbookPlugin.getImageDescriptor(Messages.Image__graph_heartbeat).createImage();
 		_imageSpeed 						= TourbookPlugin.getImageDescriptor(Messages.Image__graph_speed).createImage();
 		_imageTemperature 					= TourbookPlugin.getImageDescriptor(Messages.Image__graph_temperature).createImage();
-		
+
 		_imageAltimeterDisabled 			= TourbookPlugin.getImageDescriptor(Messages.Image__graph_altimeter_disabled).createImage();
 		_imageAltitudeDisabled 				= TourbookPlugin.getImageDescriptor(Messages.Image__graph_altitude_disabled).createImage();
 		_imageCadenceDisabled 				= TourbookPlugin.getImageDescriptor(Messages.Image__graph_cadence_disabled).createImage();
@@ -838,7 +838,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 		_imagePulseDisabled 				= TourbookPlugin.getImageDescriptor(Messages.Image__graph_heartbeat_disabled).createImage();
 		_imageSpeedDisabled 				= TourbookPlugin.getImageDescriptor(Messages.Image__graph_speed_disabled).createImage();
 		_imageTemperatureDisabled 			= TourbookPlugin.getImageDescriptor(Messages.Image__graph_temperature_disabled).createImage();
-		
+
 		_imageRunDyn_StanceTime						= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_StanceTime).createImage();
 		_imageRunDyn_StanceTimeBalance				= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_StanceTimeBalance).createImage();
 		_imageRunDyn_StepLength						= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_StepLength).createImage();
@@ -850,7 +850,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 		_imageRunDyn_StepLength_Disabled			= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_StepLength_Disabled).createImage();
 		_imageRunDyn_VerticalOscillation_Disabled	= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_VerticalOscillation_Disabled).createImage();
 		_imageRunDyn_VerticalRatio_Disabled			= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_VerticalRatio_Disabled).createImage();
-		
+
 // SET_FORMATTING_ON
 	}
 
@@ -1014,7 +1014,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 		 * Running dynamics
 		 */
 		final float measurementDistanceXS = net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
-		
+
 		prefRestoreDefault(_chkMin_RunDyn_StanceTime, 				ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MIN_ENABLED);
 		prefRestoreDefault(_chkMax_RunDyn_StanceTime, 				ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MAX_ENABLED);
 		prefRestoreDefault(_spinnerMin_RunDyn_StanceTime, 	 	 	ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_MIN_VALUE);
@@ -1104,12 +1104,12 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 		prefRestoreValue(_spinnerMax_Temperature, ITourbookPreferences.GRAPH_TEMPERATURE_MAX_VALUE);
 
 // SET_FORMATTING_OFF
-		
+
 		/*
 		 * Running dynamics
 		 */
 		final float measurementDistanceXS = net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
-		
+
 		prefRestoreValue(_chkMin_RunDyn_StanceTime, 				ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MIN_ENABLED);
 		prefRestoreValue(_chkMax_RunDyn_StanceTime, 				ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MAX_ENABLED);
 		prefRestoreValue(_spinnerMin_RunDyn_StanceTime, 	 	 	ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_MIN_VALUE);
@@ -1197,7 +1197,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 		prefSaveValue(_spinnerMax_Temperature, ITourbookPreferences.GRAPH_TEMPERATURE_MAX_VALUE);
 
 // SET_FORMATTING_OFF
-		
+
 		/*
 		 * Running dynamics
 		 */

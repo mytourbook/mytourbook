@@ -802,6 +802,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		_graphMap.put(TourManager.GRAPH_RUN_DYN_VERTICAL_RATIO,	 		graph_RunDyn_VerticalRatio);
 
 		_graphMap.put(TourManager.GRAPH_SWIM_STROKES,			 			graph_Swim_Strokes);
+		_graphMap.put(TourManager.GRAPH_SWIM_SWOLF,			 				graph_Swim_Swolf);
 
 		_graphMap.put(TourManager.GRAPH_TOUR_COMPARE,						graph_TourCompareResult);
 
@@ -827,6 +828,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		_graphList.add(graph_RunDyn_VerticalRatio);
 
 		_graphList.add(graph_Swim_Strokes);
+		_graphList.add(graph_Swim_Swolf);
 
 		_graphList.add(graph_TourCompareResult);
 	}

@@ -73,6 +73,7 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
 	private Button						_chkShowInChartToolbar_RunDyn_VerticalRatio;
 
 	private Button						_chkShowInChartToolbar_Swim_Strokes;
+	private Button						_chkShowInChartToolbar_Swim_Swolf;
 
 	public SlideoutTourChartGraphs(	final Control ownerControl,
 												final ToolBar toolBar,
@@ -177,7 +178,7 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(16).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(17).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
 
@@ -204,6 +205,7 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
 					createUI_GraphAction(container, TourManager.GRAPH_RUN_DYN_VERTICAL_RATIO);
 
 					createUI_GraphAction(container, TourManager.GRAPH_SWIM_STROKES);
+					createUI_GraphAction(container, TourManager.GRAPH_SWIM_SWOLF);
 				}
 				{
 					/*
@@ -227,6 +229,7 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
 					_chkShowInChartToolbar_RunDyn_VerticalRatio = createUI_GraphCheckbox(container);
 
 					_chkShowInChartToolbar_Swim_Strokes = createUI_GraphCheckbox(container);
+					_chkShowInChartToolbar_Swim_Swolf = createUI_GraphCheckbox(container);
 				}
 			}
 		}
@@ -308,6 +311,7 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
 		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_RATIO, 			TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_RATIO_DEFAULT);
 
 		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_STROKES,				 			TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_STROKES_DEFAULT);
+		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_SWOLF,				 			TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_SWOLF_DEFAULT);
 
 // SET_FORMATTING_ON
 
@@ -339,7 +343,8 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
 		_chkShowInChartToolbar_RunDyn_VerticalOscillation.setSelection(	Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_OSCILLATION, 	TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_OSCILLATION_DEFAULT));
 		_chkShowInChartToolbar_RunDyn_VerticalRatio.setSelection(			Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_RATIO, 			TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_RATIO_DEFAULT));
 
-		_chkShowInChartToolbar_Swim_Strokes.setSelection(						Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_RATIO, 			TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_STROKES_DEFAULT));
+		_chkShowInChartToolbar_Swim_Strokes.setSelection(						Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_STROKES, 						TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_STROKES_DEFAULT));
+		_chkShowInChartToolbar_Swim_Swolf.setSelection(							Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_SWOLF, 							TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_SWOLF_DEFAULT));
 
 // SET_FORMATTING_ON
 	}
@@ -366,6 +371,7 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
 		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_RATIO, 			_chkShowInChartToolbar_RunDyn_VerticalRatio.getSelection());
 
 		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_STROKES,				 			_chkShowInChartToolbar_Swim_Strokes.getSelection());
+		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_SWOLF,				 			_chkShowInChartToolbar_Swim_Swolf.getSelection());
 
 // SET_FORMATTING_ON
 	}

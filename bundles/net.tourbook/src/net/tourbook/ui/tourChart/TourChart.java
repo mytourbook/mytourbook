@@ -4784,6 +4784,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		if (yDataWithLabels == null) {
 			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_GEAR_RATIO);
 		}
+
 		if (yDataWithLabels == null) {
 			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_RUN_DYN_STANCE_TIME);
 		}
@@ -4798,6 +4799,13 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		}
 		if (yDataWithLabels == null) {
 			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_RUN_DYN_VERTICAL_RATIO);
+		}
+
+		if (yDataWithLabels == null) {
+			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_SWIM_STROKES);
+		}
+		if (yDataWithLabels == null) {
+			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_SWIM_SWOLF);
 		}
 
 		ConfigGraphSegment cfgAltitude = null;
@@ -4883,6 +4891,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_RUN_DYN_STEP_LENGTH, yDataWithLabels, null);
 		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_RUN_DYN_VERTICAL_OSCILLATION, yDataWithLabels, null);
 		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_RUN_DYN_VERTICAL_RATIO, yDataWithLabels, null);
+
+		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_SWIM_STROKES, yDataWithLabels, null);
+		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_SWIM_SWOLF, yDataWithLabels, null);
 	}
 
 	/**
