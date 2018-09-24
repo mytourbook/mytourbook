@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -20,27 +20,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Set;
-
-import net.tourbook.common.CommonActivator;
-import net.tourbook.common.UI;
-import net.tourbook.common.font.MTFont;
-import net.tourbook.common.formatter.FormatManager;
-import net.tourbook.common.preferences.ICommonPreferences;
-import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.time.TourDateTime;
-import net.tourbook.common.util.IToolTipProvider;
-import net.tourbook.common.util.Util;
-import net.tourbook.common.weather.IWeather;
-import net.tourbook.data.TourData;
-import net.tourbook.data.TourTag;
-import net.tourbook.data.TourType;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.preferences.PrefPageAppearanceDisplayFormat;
-import net.tourbook.ui.ITourProvider;
-import net.tourbook.ui.Messages;
-import net.tourbook.ui.action.ActionTourToolTip_EditPreferences;
-import net.tourbook.ui.action.ActionTourToolTip_EditQuick;
-import net.tourbook.ui.action.ActionTourToolTip_EditTour;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.fieldassist.ControlDecoration;
@@ -64,6 +43,27 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.joda.time.Period;
 import org.joda.time.PeriodType;
+
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.UI;
+import net.tourbook.common.font.MTFont;
+import net.tourbook.common.formatter.FormatManager;
+import net.tourbook.common.preferences.ICommonPreferences;
+import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.time.TourDateTime;
+import net.tourbook.common.util.IToolTipProvider;
+import net.tourbook.common.util.Util;
+import net.tourbook.common.weather.IWeather;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourTag;
+import net.tourbook.data.TourType;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.PrefPageAppearanceDisplayFormat;
+import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.Messages;
+import net.tourbook.ui.action.ActionTourToolTip_EditPreferences;
+import net.tourbook.ui.action.ActionTourToolTip_EditQuick;
+import net.tourbook.ui.action.ActionTourToolTip_EditTour;
 
 public class TourInfoUI {
 
@@ -507,7 +507,8 @@ public class TourInfoUI {
 				 * Timezone difference
 				 */
 
-				_lblTimeZoneDifference = createUI_Label(container, Messages.Tour_Tooltip_Label_TimeZoneDifference);
+				final Label label = _lblTimeZoneDifference = createUI_Label(container, Messages.Tour_Tooltip_Label_TimeZoneDifference);
+				GridDataFactory.fillDefaults().applyTo(label);
 
 				/*
 				 * Add decoration
@@ -1236,7 +1237,7 @@ public class TourInfoUI {
 
 	/**
 	 * Enable/disable tour edit actions, actions are disabled by default
-	 * 
+	 *
 	 * @param isEnabled
 	 */
 	public void setActionsEnabled(final boolean isEnabled) {
@@ -1245,7 +1246,7 @@ public class TourInfoUI {
 
 	/**
 	 * Set text for the tooltip which is displayed when a tour is not hovered.
-	 * 
+	 *
 	 * @param noTourTooltip
 	 */
 	public void setNoTourTooltip(final String noTourTooltip) {
