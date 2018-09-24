@@ -3976,14 +3976,14 @@ public class TourManager {
 			chartDataModel.addXyData(yDataSerie);
 
 			// adjust min/max values when it's defined in the pref store
-//			setVisibleForcedValues(
-//					yDataSerie,
-//					1,
-//					0,
-//					ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MIN_ENABLED,
-//					ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MAX_ENABLED,
-//					ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_MIN_VALUE,
-//					ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_MAX_VALUE);
+			setVisibleForcedValues(
+					yDataSerie,
+					1,
+					0,
+					ITourbookPreferences.GRAPH_SWIM_STROKES_IS_MIN_ENABLED,
+					ITourbookPreferences.GRAPH_SWIM_STROKES_IS_MAX_ENABLED,
+					ITourbookPreferences.GRAPH_SWIM_STROKES_MIN_VALUE,
+					ITourbookPreferences.GRAPH_SWIM_STROKES_MAX_VALUE);
 		}
 
 		return yDataSerie;
@@ -4020,14 +4020,14 @@ public class TourManager {
 			chartDataModel.addXyData(yDataSerie);
 
 			// adjust min/max values when it's defined in the pref store
-//			setVisibleForcedValues(
-//					yDataSerie,
-//					1,
-//					0,
-//					ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MIN_ENABLED,
-//					ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MAX_ENABLED,
-//					ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_MIN_VALUE,
-//					ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_MAX_VALUE);
+			setVisibleForcedValues(
+					yDataSerie,
+					1,
+					0,
+					ITourbookPreferences.GRAPH_SWIM_SWOLF_IS_MIN_ENABLED,
+					ITourbookPreferences.GRAPH_SWIM_SWOLF_IS_MAX_ENABLED,
+					ITourbookPreferences.GRAPH_SWIM_SWOLF_MIN_VALUE,
+					ITourbookPreferences.GRAPH_SWIM_SWOLF_MAX_VALUE);
 		}
 
 		return yDataSerie;

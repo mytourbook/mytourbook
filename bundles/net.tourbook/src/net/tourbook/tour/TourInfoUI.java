@@ -1550,7 +1550,6 @@ public class TourInfoUI {
 			_lblRunDyn_VerticalRatio_Avg.setText(_nf1.format(_tourData.getRunDyn_VerticalRatio_Avg()));
 			_lblRunDyn_VerticalRatio_Avg_Unit.setText(UI.SYMBOL_PERCENTAGE);
 		}
-
 	}
 
 	public void updateUI_Layout() {

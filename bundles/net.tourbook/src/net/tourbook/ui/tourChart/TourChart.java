@@ -133,7 +133,7 @@ import net.tourbook.ui.views.tourSegmenter.TourSegmenterView;
  */
 public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdater, ILineSelectionPainter {
 
-// SET_FORMATTING_OFF
+//SET_FORMATTING_OFF
 
 //	private static final String	ID														= "net.tourbook.ui.tourChart";			//$NON-NLS-1$
 	//
@@ -159,7 +159,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private static final String	GRAPH_LABEL_SWIM_SWOLF							= net.tourbook.common.Messages.Graph_Label_Swim_Swolf;
 	//
 	public static final String		ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER			= "ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER";			//$NON-NLS-1$
-	public static final String		ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED		= "ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED";		//$NON-NLS-1$
+	public static final String		ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED		= "ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED";	//$NON-NLS-1$
 	public static final String		ACTION_ID_EDIT_CHART_PREFERENCES				= "ACTION_ID_EDIT_CHART_PREFERENCES";			//$NON-NLS-1$
 	private static final String	ACTION_ID_IS_GRAPH_OVERLAPPED					= "ACTION_ID_IS_GRAPH_OVERLAPPED";				//$NON-NLS-1$
 	public static final String		ACTION_ID_IS_SHOW_TOUR_PHOTOS					= "ACTION_ID_IS_SHOW_TOUR_PHOTOS";				//$NON-NLS-1$
@@ -169,9 +169,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	public static final String		ACTION_ID_HR_ZONE_STYLE_WHITE_BOTTOM		= "ACTION_ID_HR_ZONE_STYLE_WHITE_BOTTOM";		//$NON-NLS-1$
 	public static final String		ACTION_ID_HR_ZONE_STYLE_WHITE_TOP			= "ACTION_ID_HR_ZONE_STYLE_WHITE_TOP";			//$NON-NLS-1$
 	public static final String		ACTION_ID_X_AXIS_DISTANCE						= "ACTION_ID_X_AXIS_DISTANCE";					//$NON-NLS-1$
-	public static final String		ACTION_ID_X_AXIS_TIME							= "ACTION_ID_X_AXIS_TIME";						//$NON-NLS-1$
+	public static final String		ACTION_ID_X_AXIS_TIME							= "ACTION_ID_X_AXIS_TIME";							//$NON-NLS-1$
 	//
-	private static final String	GRID_PREF_PREFIX									= "GRID_TOUR_CHART__";							//$NON-NLS-1$
+	private static final String	GRID_PREF_PREFIX									= "GRID_TOUR_CHART__";								//$NON-NLS-1$
 	private static final String	GRID_IS_SHOW_VERTICAL_GRIDLINES				= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
 	private static final String	GRID_IS_SHOW_HORIZONTAL_GRIDLINES			= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
 	private static final String	GRID_VERTICAL_DISTANCE							= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
@@ -213,19 +213,19 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_STROKES_DEFAULT						= true;
 	static final boolean	STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_SWOLF_DEFAULT							= false;
 	//
-	private static final String GRAPH_CONTRIBUTION_ID_SLIDEOUT								= "GRAPH_CONTRIBUTION_ID_SLIDEOUT";			//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_SLIDEOUT								= "GRAPH_CONTRIBUTION_ID_SLIDEOUT";								//$NON-NLS-1$
 	//
-	private static final String GRAPH_CONTRIBUTION_ID_ALTIMETER 							= "GRAPH_CONTRIBUTION_ID_ALTIMETER";		//$NON-NLS-1$
-	private static final String GRAPH_CONTRIBUTION_ID_ALTITUDE								= "GRAPH_CONTRIBUTION_ID_ALTITUDE";			//$NON-NLS-1$
-	private static final String GRAPH_CONTRIBUTION_ID_CADENCE 								= "GRAPH_CONTRIBUTION_ID_CADENCE";			//$NON-NLS-1$
-	private static final String GRAPH_CONTRIBUTION_ID_GEARS 									= "GRAPH_CONTRIBUTION_ID_GEARS";				//$NON-NLS-1$
-	private static final String GRAPH_CONTRIBUTION_ID_GRADIENT 								= "GRAPH_CONTRIBUTION_ID_GRADIENT";			//$NON-NLS-1$
-	private static final String GRAPH_CONTRIBUTION_ID_PACE 									= "GRAPH_CONTRIBUTION_ID_PACE";				//$NON-NLS-1$
-	private static final String GRAPH_CONTRIBUTION_ID_POWER 									= "GRAPH_CONTRIBUTION_ID_POWER";				//$NON-NLS-1$
-	private static final String GRAPH_CONTRIBUTION_ID_PULSE 									= "GRAPH_CONTRIBUTION_ID_PULSE";				//$NON-NLS-1$
-	private static final String GRAPH_CONTRIBUTION_ID_SPEED									= "GRAPH_CONTRIBUTION_ID_SPEED";				//$NON-NLS-1$
-	private static final String GRAPH_CONTRIBUTION_ID_TEMPERATURE 							= "GRAPH_CONTRIBUTION_ID_TEMPERATURE";		//$NON-NLS-1$
-	private static final String GRAPH_CONTRIBUTION_ID_TOUR_COMPARE 						= "GRAPH_CONTRIBUTION_ID_TOUR_COMPARE";	//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_ALTIMETER 							= "GRAPH_CONTRIBUTION_ID_ALTIMETER";							//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_ALTITUDE								= "GRAPH_CONTRIBUTION_ID_ALTITUDE";								//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_CADENCE 								= "GRAPH_CONTRIBUTION_ID_CADENCE";								//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_GEARS 									= "GRAPH_CONTRIBUTION_ID_GEARS";									//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_GRADIENT 								= "GRAPH_CONTRIBUTION_ID_GRADIENT";								//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_PACE 									= "GRAPH_CONTRIBUTION_ID_PACE";									//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_POWER 									= "GRAPH_CONTRIBUTION_ID_POWER";									//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_PULSE 									= "GRAPH_CONTRIBUTION_ID_PULSE";									//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_SPEED									= "GRAPH_CONTRIBUTION_ID_SPEED";									//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_TEMPERATURE 							= "GRAPH_CONTRIBUTION_ID_TEMPERATURE";							//$NON-NLS-1$
+	private static final String GRAPH_CONTRIBUTION_ID_TOUR_COMPARE 						= "GRAPH_CONTRIBUTION_ID_TOUR_COMPARE";						//$NON-NLS-1$
 
 	private static final String GRAPH_CONTRIBUTION_ID_RUN_DYN_STANCE_TIME				= "GRAPH_CONTRIBUTION_ID_RUN_DYN_STANCE_TIME";				//$NON-NLS-1$
 	private static final String GRAPH_CONTRIBUTION_ID_RUN_DYN_STANCE_TIME_BALANCED	= "GRAPH_CONTRIBUTION_ID_RUN_DYN_STANCE_TIME_BALANCED";	//$NON-NLS-1$
@@ -1519,6 +1519,52 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 							TourManager.GRAPH_RUN_DYN_VERTICAL_RATIO,
 							0,
 							1e-3,
+							isMinMaxEnabled);
+
+					/*
+					 * Swimming: Strokes
+					 */
+					isChartModified |= setMinDefaultValue(
+							property,
+							isChartModified,
+							ITourbookPreferences.GRAPH_SWIM_STROKES_IS_MIN_ENABLED,
+							ITourbookPreferences.GRAPH_SWIM_STROKES_MIN_VALUE,
+							TourManager.GRAPH_SWIM_STROKES,
+							0,
+							0.1,
+							isMinMaxEnabled);
+
+					isChartModified |= setMaxDefaultValue(
+							property,
+							isChartModified,
+							ITourbookPreferences.GRAPH_SWIM_STROKES_IS_MAX_ENABLED,
+							ITourbookPreferences.GRAPH_SWIM_STROKES_MAX_VALUE,
+							TourManager.GRAPH_SWIM_STROKES,
+							0,
+							0.1,
+							isMinMaxEnabled);
+
+					/*
+					 * Swimming: Swolf
+					 */
+					isChartModified |= setMinDefaultValue(
+							property,
+							isChartModified,
+							ITourbookPreferences.GRAPH_SWIM_SWOLF_IS_MIN_ENABLED,
+							ITourbookPreferences.GRAPH_SWIM_SWOLF_MIN_VALUE,
+							TourManager.GRAPH_SWIM_SWOLF,
+							0,
+							0.1,
+							isMinMaxEnabled);
+
+					isChartModified |= setMaxDefaultValue(
+							property,
+							isChartModified,
+							ITourbookPreferences.GRAPH_SWIM_SWOLF_IS_MAX_ENABLED,
+							ITourbookPreferences.GRAPH_SWIM_SWOLF_MAX_VALUE,
+							TourManager.GRAPH_SWIM_SWOLF,
+							0,
+							0.1,
 							isMinMaxEnabled);
 
 					if (isChartModified) {
