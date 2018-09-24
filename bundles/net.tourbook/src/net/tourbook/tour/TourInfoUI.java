@@ -507,8 +507,10 @@ public class TourInfoUI {
 				 * Timezone difference
 				 */
 
-				final Label label = _lblTimeZoneDifference = createUI_Label(container, Messages.Tour_Tooltip_Label_TimeZoneDifference);
-				GridDataFactory.fillDefaults().applyTo(label);
+				_lblTimeZoneDifference = createUI_Label(container, Messages.Tour_Tooltip_Label_TimeZoneDifference);
+
+				// set layout that the decoration is correctly layouted
+				GridDataFactory.fillDefaults().applyTo(_lblTimeZoneDifference);
 
 				/*
 				 * Add decoration
@@ -1552,7 +1554,7 @@ public class TourInfoUI {
 		}
 	}
 
-	public void updateUI_Layout() {
+	private void updateUI_Layout() {
 
 		// compute width for all controls and equalize column width for the different sections
 

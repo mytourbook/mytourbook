@@ -200,92 +200,92 @@ import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
  */
 public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITourViewer2, ITourProvider2 {
 
-	public static final String			ID										= "net.tourbook.views.TourDataEditorView";						//$NON-NLS-1$
+	public static final String     ID                            = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
 	//
-	private static final String		GRAPH_LABEL_HEARTBEAT_UNIT		= net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
-	private static final String		VALUE_UNIT_K_CALORIES			= net.tourbook.ui.Messages.Value_Unit_KCalories;
+	private static final String    GRAPH_LABEL_HEARTBEAT_UNIT    = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
+	private static final String    VALUE_UNIT_K_CALORIES         = net.tourbook.ui.Messages.Value_Unit_KCalories;
 	//
-	private static final int			COLUMN_SPACING						= 20;
+	private static final int       COLUMN_SPACING                = 20;
 	//
-	private static final String		WIDGET_KEY							= "widgetKey";																//$NON-NLS-1$
-	private static final String		WIDGET_KEY_TOURDISTANCE			= "tourDistance";															//$NON-NLS-1$
-	private static final String		WIDGET_KEY_ALTITUDE_UP			= "altitudeUp";															//$NON-NLS-1$
-	private static final String		WIDGET_KEY_ALTITUDE_DOWN		= "altitudeDown";															//$NON-NLS-1$
-	private static final String		WIDGET_KEY_PERSON					= "tourPerson";															//$NON-NLS-1$
+	private static final String    WIDGET_KEY                    = "widgetKey";                                            //$NON-NLS-1$
+	private static final String    WIDGET_KEY_TOURDISTANCE       = "tourDistance";                                         //$NON-NLS-1$
+	private static final String    WIDGET_KEY_ALTITUDE_UP        = "altitudeUp";                                           //$NON-NLS-1$
+	private static final String    WIDGET_KEY_ALTITUDE_DOWN      = "altitudeDown";                                         //$NON-NLS-1$
+	private static final String    WIDGET_KEY_PERSON             = "tourPerson";                                           //$NON-NLS-1$
 	//
-	private static final String		MESSAGE_KEY_ANOTHER_SELECTION	= "anotherSelection";													//$NON-NLS-1$
+	private static final String    MESSAGE_KEY_ANOTHER_SELECTION = "anotherSelection";                                     //$NON-NLS-1$
 	/**
 	 * shows the busy indicator to load the slice viewer when there are more items as this value
 	 */
-	private static final int			BUSY_INDICATOR_ITEMS				= 5000;
+	private static final int       BUSY_INDICATOR_ITEMS          = 5000;
 	//
-	private static final String		STATE_SELECTED_TAB				= "tourDataEditor.selectedTab";										//$NON-NLS-1$
-	private static final String		STATE_ROW_EDIT_MODE				= "tourDataEditor.rowEditMode";										//$NON-NLS-1$
-	private static final String		STATE_IS_EDIT_MODE				= "tourDataEditor.isEditMode";										//$NON-NLS-1$
-	private static final String		STATE_CSV_EXPORT_PATH			= "tourDataEditor.csvExportPath";									//$NON-NLS-1$
+	private static final String    STATE_SELECTED_TAB            = "tourDataEditor.selectedTab";                           //$NON-NLS-1$
+	private static final String    STATE_ROW_EDIT_MODE           = "tourDataEditor.rowEditMode";                           //$NON-NLS-1$
+	private static final String    STATE_IS_EDIT_MODE            = "tourDataEditor.isEditMode";                            //$NON-NLS-1$
+	private static final String    STATE_CSV_EXPORT_PATH         = "tourDataEditor.csvExportPath";                         //$NON-NLS-1$
 	//
-	private static final String		STATE_SECTION_CHARACTERISTICS	= "STATE_SECTION_CHARACTERISTICS";									//$NON-NLS-1$
-	private static final String		STATE_SECTION_DATE_TIME			= "STATE_SECTION_DATE_TIME";											//$NON-NLS-1$
-	private static final String		STATE_SECTION_PERSONAL			= "STATE_SECTION_PERSONAL";											//$NON-NLS-1$
-	private static final String		STATE_SECTION_TITLE				= "STATE_SECTION_TITLE";												//$NON-NLS-1$
-	private static final String		STATE_SECTION_WEATHER			= "STATE_SECTION_WEATHER";												//$NON-NLS-1$
+	private static final String    STATE_SECTION_CHARACTERISTICS = "STATE_SECTION_CHARACTERISTICS";                        //$NON-NLS-1$
+	private static final String    STATE_SECTION_DATE_TIME       = "STATE_SECTION_DATE_TIME";                              //$NON-NLS-1$
+	private static final String    STATE_SECTION_PERSONAL        = "STATE_SECTION_PERSONAL";                               //$NON-NLS-1$
+	private static final String    STATE_SECTION_TITLE           = "STATE_SECTION_TITLE";                                  //$NON-NLS-1$
+	private static final String    STATE_SECTION_WEATHER         = "STATE_SECTION_WEATHER";                                //$NON-NLS-1$
 	//
-	static final String					STATE_LAT_LON_DIGITS				= "STATE_LAT_LON_DIGITS";												//$NON-NLS-1$
-	static final int						DEFAULT_LAT_LON_DIGITS			= 5;
+	static final String            STATE_LAT_LON_DIGITS          = "STATE_LAT_LON_DIGITS";                                 //$NON-NLS-1$
+	static final int               DEFAULT_LAT_LON_DIGITS        = 5;
 	//
-	private final IPreferenceStore	_prefStore							= TourbookPlugin.getPrefStore();
-	private final IPreferenceStore	_prefStoreCommon					= CommonActivator.getPrefStore();
-	private final IDialogSettings		_state								= TourbookPlugin.getState(ID);
-	private final IDialogSettings		_stateSlice							= TourbookPlugin.getState(ID + ".slice");							//$NON-NLS-1$
+	private final IPreferenceStore _prefStore                    = TourbookPlugin.getPrefStore();
+	private final IPreferenceStore _prefStoreCommon              = CommonActivator.getPrefStore();
+	private final IDialogSettings  _state                        = TourbookPlugin.getState(ID);
+	private final IDialogSettings  _stateSlice                   = TourbookPlugin.getState(ID + ".slice");                 //$NON-NLS-1$
 	//
-	private final boolean				_isOSX								= net.tourbook.common.UI.IS_OSX;
-	private final boolean				_isLinux								= net.tourbook.common.UI.IS_LINUX;
+	private final boolean          _isOSX                        = net.tourbook.common.UI.IS_OSX;
+	private final boolean          _isLinux                      = net.tourbook.common.UI.IS_LINUX;
 	//
 	/**
 	 * Tour start daytime in seconds
 	 */
-	private int								_tourStartDayTime;
+	private int                    _tourStartDayTime;
 	//
 	/*
 	 * Data series which are displayed in the viewer, all are metric system
 	 */
-	private int[]							_serieTime;
-	private float[]						_serieDistance;
-	private float[]						_serieAltitude;
-	private float[]						_serieTemperature;
-	private float[]						_serieCadence;
-	private float[]						_serieGradient;
-	private float[]						_serieSpeed;
-	private float[]						_seriePace;
-	private float[]						_seriePower;
-	private float[]						_seriePulse;
-	private double[]						_serieLatitude;
-	private double[]						_serieLongitude;
-	private float[][]						_serieGears;
-	private boolean[]						_serieBreakTime;
+	private int[]                   _serieTime;
+	private float[]                 _serieDistance;
+	private float[]                 _serieAltitude;
+	private float[]                 _serieTemperature;
+	private float[]                 _serieCadence;
+	private float[]                 _serieGradient;
+	private float[]                 _serieSpeed;
+	private float[]                 _seriePace;
+	private float[]                 _seriePower;
+	private float[]                 _seriePulse;
+	private double[]                _serieLatitude;
+	private double[]                _serieLongitude;
+	private float[][]               _serieGears;
+	private boolean[]               _serieBreakTime;
 	//
-	private ColumnDefinition			_colDefAltitude;
-	private ColumnDefinition			_colDefCadence;
-	private ColumnDefinition			_colDefPulse;
-	private ColumnDefinition			_colDefTemperature;
-	private ColumnDefinition			_colDefLatitude;
-	private ColumnDefinition			_colDefLongitude;
+	private ColumnDefinition        _colDefAltitude;
+	private ColumnDefinition        _colDefCadence;
+	private ColumnDefinition        _colDefPulse;
+	private ColumnDefinition        _colDefTemperature;
+	private ColumnDefinition        _colDefLatitude;
+	private ColumnDefinition        _colDefLongitude;
 	//
-	private MessageManager				_messageManager;
-	private PostSelectionProvider		_postSelectionProvider;
-	private ISelectionListener			_postSelectionListener;
-	private IPartListener2				_partListener;
-	private IPropertyChangeListener	_prefChangeListener;
-	private IPropertyChangeListener	_prefChangeListenerCommon;
-	private ITourEventListener			_tourEventListener;
-	private ITourSaveListener			_tourSaveListener;
+	private MessageManager          _messageManager;
+	private PostSelectionProvider   _postSelectionProvider;
+	private ISelectionListener      _postSelectionListener;
+	private IPartListener2          _partListener;
+	private IPropertyChangeListener _prefChangeListener;
+	private IPropertyChangeListener _prefChangeListenerCommon;
+	private ITourEventListener      _tourEventListener;
+	private ITourSaveListener       _tourSaveListener;
 	//
-	private final NumberFormat			_nf1									= NumberFormat.getNumberInstance();
-	private final NumberFormat			_nf1NoGroup							= NumberFormat.getNumberInstance();
-	private final NumberFormat			_nf2									= NumberFormat.getNumberInstance();
-	private final NumberFormat			_nf3									= NumberFormat.getNumberInstance();
-	private final NumberFormat			_nf6									= NumberFormat.getNumberInstance();
-	private final NumberFormat			_nf3NoGroup							= NumberFormat.getNumberInstance();
+	private final NumberFormat      _nf1        = NumberFormat.getNumberInstance();
+	private final NumberFormat      _nf1NoGroup = NumberFormat.getNumberInstance();
+	private final NumberFormat      _nf2        = NumberFormat.getNumberInstance();
+	private final NumberFormat      _nf3        = NumberFormat.getNumberInstance();
+	private final NumberFormat      _nf6        = NumberFormat.getNumberInstance();
+	private final NumberFormat      _nf3NoGroup = NumberFormat.getNumberInstance();
 	{
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
@@ -304,267 +304,266 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_nf3NoGroup.setMaximumFractionDigits(3);
 		_nf3NoGroup.setGroupingUsed(false);
 	}
-	//
+
 	/**
 	 * <code>true</code>: rows can be selected in the viewer<br>
 	 * <code>false</code>: cell can be selected in the viewer
 	 */
-	private boolean										_isRowEditMode						= true;
-	private boolean										_isEditMode;
-	private long											_sliceViewerTourId				= -1;
-	private SelectionChartXSliderPosition			_sliceViewerXSliderPosition;
-	private boolean										_isTourDirty						= false;
+	private boolean                            _isRowEditMode        = true;
+	private boolean                            _isEditMode;
+	private long                               _sliceViewerTourId    = -1;
+	private SelectionChartXSliderPosition      _sliceViewerXSliderPosition;
+	private boolean                            _isTourDirty          = false;
 
-	//
 	/**
 	 * is <code>true</code> when the tour is currently being saved to prevent a modify event or the
 	 * onSelectionChanged event
 	 */
-	private boolean										_isSavingInProgress				= false;
+	private boolean                            _isSavingInProgress   = false;
 
 	/**
 	 * when <code>true</code> data are loaded into fields
 	 */
-	private boolean										_isSetField							= false;
+	private boolean                            _isSetField           = false;
+
 	/**
 	 * contains the tour id from the last selection event
 	 */
-	private Long											_selectionTourId;
+	private Long                               _selectionTourId;
 	//
-	private KeyAdapter									_keyListener;
-	private ModifyListener								_modifyListener;
-	private ModifyListener								_verifyFloatValue;
-	private ModifyListener								_verifyIntValue;
-	private MouseWheelListener							_mouseWheelListener;
-	private SelectionAdapter							_selectionListener;
-	private SelectionAdapter							_tourTimeListener;
-	private SelectionAdapter							_dateTimeListener;
-	private PixelConverter								_pc;
+	private KeyAdapter                         _keyListener;
+	private ModifyListener                     _modifyListener;
+	private ModifyListener                     _verifyFloatValue;
+	private ModifyListener                     _verifyIntValue;
+	private MouseWheelListener                 _mouseWheelListener;
+	private SelectionAdapter                   _selectionListener;
+	private SelectionAdapter                   _tourTimeListener;
+	private SelectionAdapter                   _dateTimeListener;
+	private PixelConverter                     _pc;
 
-	//
 	/**
 	 * this width is used as a hint for the width of the description field, this value also
 	 * influences the width of the columns in this editor
 	 */
-	private final int										_hintTextColumnWidth				= _isOSX ? 200 : 150;
+	private final int                          _hintTextColumnWidth  = _isOSX ? 200 : 150;
 
-	private int												_hintValueFieldWidth;
-	private int												_hintDefaultSpinnerWidth;
+	private int                                _hintValueFieldWidth;
+	private int                                _hintDefaultSpinnerWidth;
 
 	/**
 	 * is <code>true</code> when {@link #_tourChart} contains reference tours
 	 */
-	private boolean										_isReferenceTourAvailable;
+	private boolean                            _isReferenceTourAvailable;
 
 	/**
 	 * range for the reference tours, is <code>null</code> when reference tours are not available<br>
 	 * 1st index = ref tour<br>
 	 * 2nd index: 0:start, 1:end
 	 */
-	private int[][]										_refTourRange;
+	private int[][]                            _refTourRange;
 
-	private boolean										_isPartVisible						= false;
+	private boolean                            _isPartVisible        = false;
 
 	/**
 	 * when <code>true</code> additional info is displayed in the title area
 	 */
-	private boolean										_isInfoInTitle;
+	private boolean                            _isInfoInTitle;
 
 	/**
 	 * is <code>true</code> when a cell editor is activ, otherwise <code>false</code>
 	 */
-	private boolean										_isCellEditorActive				= false;
+	private boolean                            _isCellEditorActive   = false;
 
 	/**
 	 * every requested UI update increased this counter
 	 */
-	private int												_uiUpdateCounter;
+	private int                                _uiUpdateCounter;
 
 	/**
 	 * counter when the UI update runnable is run, this will optimize performance to not update the
 	 * UI when the part is hidden
 	 */
-	private int												_uiRunnableCounter				= 0;
+	private int                                _uiRunnableCounter    = 0;
 
-	private int												_uiUpdateTitleCounter			= 0;
+	private int                                _uiUpdateTitleCounter = 0;
 
-	private TourData										_uiRunnableTourData;
-	private boolean										_uiRunnableForceTimeSliceReload;
-	private boolean										_uiRunnableIsDirtyDisabled;
+	private TourData                           _uiRunnableTourData;
+	private boolean                            _uiRunnableForceTimeSliceReload;
+	private boolean                            _uiRunnableIsDirtyDisabled;
 
-	private SliceFloatEditingSupport					_altitudeEditingSupport;
-	private SliceFloatEditingSupport					_pulseEditingSupport;
-	private SliceFloatEditingSupport					_temperatureEditingSupport;
-	private SliceFloatEditingSupport					_cadenceEditingSupport;
-	private SliceDoubleEditingSupport				_latitudeEditingSupport;
-	private SliceDoubleEditingSupport				_longitudeEditingSupport;
+	private SliceFloatEditingSupport           _altitudeEditingSupport;
+	private SliceFloatEditingSupport           _pulseEditingSupport;
+	private SliceFloatEditingSupport           _temperatureEditingSupport;
+	private SliceFloatEditingSupport           _cadenceEditingSupport;
+	private SliceDoubleEditingSupport          _latitudeEditingSupport;
+	private SliceDoubleEditingSupport          _longitudeEditingSupport;
 
-	private int												_enableActionCounter				= 0;
+	private int                                _enableActionCounter  = 0;
 
 	/**
 	 * contains all markers with the data serie index as key
 	 */
-	private final HashMap<Integer, TourMarker>	_markerMap							= new HashMap<>();
+	private final HashMap<Integer, TourMarker> _markerMap            = new HashMap<>();
 
 	/**
 	 * When <code>true</code> the tour is created with the tour editor
 	 */
-	private boolean										_isManualTour;
+	private boolean                            _isManualTour;
 
-	private boolean										_isTitleModified;
-	private boolean										_isAltitudeManuallyModified;
-	private boolean										_isDistManuallyModified;
-	private boolean										_isLocationStartModified;
-	private boolean										_isLocationEndModified;
-	private boolean										_isTimeZoneManuallyModified;
-	private boolean										_isTemperatureManuallyModified;
-	private boolean										_isWindSpeedManuallyModified;
+	private boolean                            _isTitleModified;
+	private boolean                            _isAltitudeManuallyModified;
+	private boolean                            _isDistManuallyModified;
+	private boolean                            _isLocationStartModified;
+	private boolean                            _isLocationEndModified;
+	private boolean                            _isTimeZoneManuallyModified;
+	private boolean                            _isTemperatureManuallyModified;
+	private boolean                            _isWindSpeedManuallyModified;
 
-	private boolean										_isSetDigits						= false;
+	private boolean                            _isSetDigits          = false;
 
 	/*
 	 * measurement unit values
 	 */
-	private float											_unitValueAltitude;
-	private float											_unitValueDistance;
-	private int[]											_unitValueWindSpeed;
+	private float _unitValueAltitude;
+	private float _unitValueDistance;
+	private int[] _unitValueWindSpeed;
 
 	// pages
-	private PageBook										_pageBook;
+	private PageBook _pageBook;
 
 	/*
 	 * actions
 	 */
-	private ActionComputeDistanceValues				_actionComputeDistanceValues;
-	private ActionCreateTour							_actionCreateTour;
-	private ActionCreateTourMarker					_actionCreateTourMarker;
-	private ActionCSVTimeSliceExport					_actionCsvTimeSliceExport;
-	private ActionDeleteDistanceValues				_actionDeleteDistanceValues;
-	private ActionDeleteTimeSlicesKeepTime			_actionDeleteTimeSlicesKeepTime;
-	private ActionDeleteTimeSlicesRemoveTime		_actionDeleteTimeSlicesRemoveTime;
-	private ActionExport									_actionExportTour;
-	private ActionExtractTour							_actionExtractTour;
-	private ActionModifyColumns						_actionModifyColumns;
-	private ActionOpenAdjustAltitudeDialog			_actionOpenAdjustAltitudeDialog;
-	private ActionOpenMarkerDialog					_actionOpenMarkerDialog;
-	private ActionOpenPrefDialog						_actionOpenTourTypePrefs;
-	private ActionSaveTour								_actionSaveTour;
-	private ActionSetStartDistanceTo0				_actionSetStartDistanceTo_0;
-	private ActionSplitTour								_actionSplitTour;
-	private ActionToggleReadEditMode					_actionToggleReadEditMode;
-	private ActionToggleRowSelectMode				_actionToggleRowSelectMode;
-	private ActionUndoChanges							_actionUndoChanges;
-	private ActionViewSettings							_actionViewSettings;
+	private ActionComputeDistanceValues      _actionComputeDistanceValues;
+	private ActionCreateTour                 _actionCreateTour;
+	private ActionCreateTourMarker           _actionCreateTourMarker;
+	private ActionCSVTimeSliceExport         _actionCsvTimeSliceExport;
+	private ActionDeleteDistanceValues       _actionDeleteDistanceValues;
+	private ActionDeleteTimeSlicesKeepTime   _actionDeleteTimeSlicesKeepTime;
+	private ActionDeleteTimeSlicesRemoveTime _actionDeleteTimeSlicesRemoveTime;
+	private ActionExport                     _actionExportTour;
+	private ActionExtractTour                _actionExtractTour;
+	private ActionModifyColumns              _actionModifyColumns;
+	private ActionOpenAdjustAltitudeDialog   _actionOpenAdjustAltitudeDialog;
+	private ActionOpenMarkerDialog           _actionOpenMarkerDialog;
+	private ActionOpenPrefDialog             _actionOpenTourTypePrefs;
+	private ActionSaveTour                   _actionSaveTour;
+	private ActionSetStartDistanceTo0        _actionSetStartDistanceTo_0;
+	private ActionSplitTour                  _actionSplitTour;
+	private ActionToggleReadEditMode         _actionToggleReadEditMode;
+	private ActionToggleRowSelectMode        _actionToggleRowSelectMode;
+	private ActionUndoChanges                _actionUndoChanges;
+	private ActionViewSettings               _actionViewSettings;
 
-	private TagMenuManager								_tagMenuMgr;
+	private TagMenuManager                   _tagMenuMgr;
 
 	/**
 	 * Number of digits for the lat/lon columns.
 	 */
-	private int												_latLonDigits;
+	private int                              _latLonDigits;
 
 	//
 	// ################################################## UI controls ##################################################
 	//
 
-	private final NumberFormat							_nfLatLon							= NumberFormat.getNumberInstance();
-	private Composite										_pageNoData;
-	private Form											_pageEditorForm;
+	private final NumberFormat       _nfLatLon                     = NumberFormat.getNumberInstance();
+	private Composite                _pageNoData;
+	private Form                     _pageEditorForm;
 
-	private CTabFolder									_tabFolder;
-	private CTabItem										_tabTour;
-	private CTabItem										_tabSlices;
+	private CTabFolder               _tabFolder;
+	private CTabItem                 _tabTour;
+	private CTabItem                 _tabSlices;
 
 	/**
 	 * contains the controls which are displayed in the first column, these controls are used to get
 	 * the maximum width and set the first column within the differenct section to the same width
 	 */
-	private final ArrayList<Control>					_firstColumnControls				= new ArrayList<>();
-	private final ArrayList<Control>					_firstColumnContainerControls	= new ArrayList<>();
-	private final ArrayList<Control>					_secondColumnControls			= new ArrayList<>();
+	private final ArrayList<Control> _firstColumnControls          = new ArrayList<>();
+	private final ArrayList<Control> _firstColumnContainerControls = new ArrayList<>();
+	private final ArrayList<Control> _secondColumnControls         = new ArrayList<>();
 
-	private TourChart										_tourChart;
+	private TourChart                _tourChart;
 
-	private TourData										_tourData;
+	private TourData                 _tourData;
 
 	/*
 	 * UI controls
 	 */
-	private Composite										_tourContainer;
+	private Composite         _tourContainer;
 
-	private ScrolledComposite							_tab1Container;
-	private Composite										_tab3Container;
+	private ScrolledComposite _tab1Container;
+	private Composite         _tab3Container;
 
-	private Composite										_sliceViewerContainer;
-	private Section										_sectionTitle;
+	private Composite         _sliceViewerContainer;
+	private Section           _sectionTitle;
 
-	private Section										_sectionDateTime;
-	private Section										_sectionPersonal;
-	private Section										_sectionWeather;
-	private Section										_sectionCharacteristics;
-	private Label											_timeSliceLabel;
+	private Section           _sectionDateTime;
+	private Section           _sectionPersonal;
+	private Section           _sectionWeather;
+	private Section           _sectionCharacteristics;
+	private Label             _timeSliceLabel;
 
-	private TableViewer									_sliceViewer;
-	private Object[]										_sliceViewerItems;
-	private ColumnManager								_sliceColumnManager;
+	private TableViewer       _sliceViewer;
+	private Object[]          _sliceViewerItems;
+	private ColumnManager     _sliceColumnManager;
 
-	private FormToolkit									_tk;
+	private FormToolkit       _tk;
 
 	/*
 	 * tab: tour
 	 */
-	private Combo											_comboTitle;
+	private Combo             _comboTitle;
 	//
-	private Button											_rdoCadence_Rpm;
-	private Button											_rdoCadence_Spm;
+	private Button            _rdoCadence_Rpm;
+	private Button            _rdoCadence_Spm;
 	//
-	private CLabel											_lblCloudIcon;
-	private CLabel											_lblTourType;
+	private CLabel            _lblCloudIcon;
+	private CLabel            _lblTourType;
 	//
-	private ControlDecoration							_decoTimeZone;
+	private ControlDecoration _decoTimeZone;
 	//
-	private Combo											_comboClouds;
-	private Combo											_comboLocation_Start;
-	private Combo											_comboLocation_End;
-	private Combo											_comboTimeZone;
-	private Combo											_comboWindDirectionText;
-	private Combo											_comboWindSpeedText;
+	private Combo             _comboClouds;
+	private Combo             _comboLocation_Start;
+	private Combo             _comboLocation_End;
+	private Combo             _comboTimeZone;
+	private Combo             _comboWindDirectionText;
+	private Combo             _comboWindSpeedText;
 	//
-	private DateTime										_dtStartTime;
-	private DateTime										_dtTourDate;
+	private DateTime          _dtStartTime;
+	private DateTime          _dtTourDate;
 	//
-	private Label											_lblAltitudeUpUnit;
-	private Label											_lblAltitudeDownUnit;
-	private Label											_lblDistanceUnit;
-	private Label											_lblSpeedUnit;
-	private Label											_lblStartTime;
-	private Label											_lblTags;
-	private Label											_lblTemperatureUnit;
-	private Label											_lblTimeZone;
+	private Label             _lblAltitudeUpUnit;
+	private Label             _lblAltitudeDownUnit;
+	private Label             _lblDistanceUnit;
+	private Label             _lblSpeedUnit;
+	private Label             _lblStartTime;
+	private Label             _lblTags;
+	private Label             _lblTemperatureUnit;
+	private Label             _lblTimeZone;
 	//
-	private Link											_linkDefaultTimeZone;
-	private Link											_linkGeoTimeZone;
-	private Link											_linkRemoveTimeZone;
-	private Link											_linkTag;
-	private Link											_linkTourType;
+	private Link              _linkDefaultTimeZone;
+	private Link              _linkGeoTimeZone;
+	private Link              _linkRemoveTimeZone;
+	private Link              _linkTag;
+	private Link              _linkTourType;
 	//
-	private Spinner										_spinBodyWeight;
-	private Spinner										_spinCalories;
-	private Spinner										_spinFTP;
-	private Spinner										_spinRestPuls;
-	private Spinner										_spinTemperature;
-	private Spinner										_spinWindDirectionValue;
-	private Spinner										_spinWindSpeedValue;
+	private Spinner           _spinBodyWeight;
+	private Spinner           _spinCalories;
+	private Spinner           _spinFTP;
+	private Spinner           _spinRestPuls;
+	private Spinner           _spinTemperature;
+	private Spinner           _spinWindDirectionValue;
+	private Spinner           _spinWindSpeedValue;
 	//
-	private Text											_txtAltitudeDown;
-	private Text											_txtAltitudeUp;
-	private Text											_txtDescription;
-	private Text											_txtDistance;
-	private Text											_txtWeather;
+	private Text              _txtAltitudeDown;
+	private Text              _txtAltitudeUp;
+	private Text              _txtDescription;
+	private Text              _txtDistance;
+	private Text              _txtWeather;
 	//
-	private TimeDuration									_timeDriving;
-	private TimeDuration									_timePaused;
-	private TimeDuration									_timeRecording;
+	private TimeDuration      _timeDriving;
+	private TimeDuration      _timePaused;
+	private TimeDuration      _timeRecording;
 
 	private class ActionViewSettings extends ActionToolbarSlideout {
 
@@ -577,8 +576,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private final class SliceDoubleEditingSupport extends EditingSupport {
 
-		private final TextCellEditor	__cellEditor;
-		private double[]					__dataSerie;
+		private final TextCellEditor __cellEditor;
+		private double[]             __dataSerie;
 
 		private SliceDoubleEditingSupport(final TextCellEditor cellEditor, final double[] dataSerie) {
 			super(_sliceViewer);
@@ -618,7 +617,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				try {
 
 					final double enteredValue = Double.parseDouble((String) value);
-					final int serieIndex = ((TimeSlice) element).serieIndex;
+					final int    serieIndex   = ((TimeSlice) element).serieIndex;
 
 					if (enteredValue != __dataSerie[serieIndex]) {
 
@@ -645,8 +644,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private final class SliceFloatEditingSupport extends EditingSupport {
 
-		private final TextCellEditor	__cellEditor;
-		private float[]					__dataSerie;
+		private final TextCellEditor __cellEditor;
+		private float[]              __dataSerie;
 
 		private SliceFloatEditingSupport(final TextCellEditor cellEditor, final float[] dataSerie) {
 			super(_sliceViewer);
@@ -672,8 +671,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		@Override
 		protected Object getValue(final Object element) {
 
-			final float metricValue = __dataSerie[((TimeSlice) element).serieIndex];
-			float displayedValue = metricValue;
+			final float metricValue    = __dataSerie[((TimeSlice) element).serieIndex];
+			float       displayedValue = metricValue;
 
 			/*
 			 * convert current measurement system into metric
@@ -710,7 +709,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					 * convert entered value into metric value
 					 */
 					final float enteredValue = Float.parseFloat((String) value);
-					float metricValue = enteredValue;
+					float       metricValue  = enteredValue;
 
 					if (__dataSerie == _serieAltitude) {
 
@@ -795,18 +794,18 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private class TimeDuration {
 
-		private static final String	timeFormat			= "%5d:%02d:%02d";	//$NON-NLS-1$
+		private static final String timeFormat      = "%5d:%02d:%02d"; //$NON-NLS-1$
 
-		private PageBook					_pageBook;
-		private Composite					_pageReadMode;
-		private Composite					_pageEditMode;
+		private PageBook            _pageBook;
+		private Composite           _pageReadMode;
+		private Composite           _pageEditMode;
 
-		private Text						_txtTime;
-		private Spinner					_spinHours;
-		private Spinner					_spinMinutes;
-		private Spinner					_spinSeconds;
+		private Text                _txtTime;
+		private Spinner             _spinHours;
+		private Spinner             _spinMinutes;
+		private Spinner             _spinSeconds;
 
-		private boolean					_isTimeEditMode	= false;
+		private boolean             _isTimeEditMode = false;
 
 		public TimeDuration(final Composite parent) {
 
@@ -929,7 +928,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		public void setTime(final int recordingTime) {
 
-			final int hours = recordingTime / 3600;
+			final int hours   = recordingTime / 3600;
 			final int minutes = (recordingTime % 3600) / 60;
 			final int seconds = (recordingTime % 3600) % 60;
 
@@ -1255,10 +1254,22 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		// a tour with reference tours is currently not supported
 		if (_isReferenceTourAvailable) {
+
 			MessageDialog.openInformation(
 					Display.getCurrent().getActiveShell(),
 					Messages.tour_editor_dlg_delete_rows_title,
 					Messages.tour_editor_dlg_delete_rows_message);
+
+			return;
+		}
+
+		// swimming data series have a different number of time slices
+		if (_tourData.swim_Time != null) {
+
+			MessageDialog.openInformation(
+					Display.getCurrent().getActiveShell(),
+					Messages.Tour_Editor_Dialog_DeleteSwimTimeSlices_Title,
+					Messages.Tour_Editor_Dialog_DeleteSwimTimeSlices_Message);
 			return;
 		}
 
@@ -1277,7 +1288,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		/*
 		 * check if time slices have a successive selection
 		 */
-		int lastIndex = -1;
+		int lastIndex  = -1;
 		int firstIndex = -1;
 
 		for (final Object selectedItem : selectedTimeSlices) {
@@ -1319,7 +1330,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		/*
 		 * get first selection index to select a time slice after removal
 		 */
-		final Table table = (Table) _sliceViewer.getControl();
+		final Table table   = (Table) _sliceViewer.getControl();
 		final int[] indices = table.getSelectionIndices();
 		Arrays.sort(indices);
 		int lastSelectionIndex = indices[0];
@@ -1378,8 +1389,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		// it is already checked if a valid data serie is available and first distance is > 0
 
-		final float[] distanceSerie = _tourData.distanceSerie;
-		final float distanceOffset = distanceSerie[0];
+		final float[] distanceSerie  = _tourData.distanceSerie;
+		final float   distanceOffset = distanceSerie[0];
 
 		// adjust distance data serie
 		for (int serieIndex = 0; serieIndex < distanceSerie.length; serieIndex++) {
@@ -1435,10 +1446,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 
 		// select time zone from geo position
-		final double lat0 = _tourData.latitudeSerie[0];
-		final double lat1 = _tourData.longitudeSerie[0];
+		final double lat0          = _tourData.latitudeSerie[0];
+		final double lat1          = _tourData.longitudeSerie[0];
 
-		final int timeZoneIndex = TimeTools.getTimeZoneIndex(lat0, lat1);
+		final int    timeZoneIndex = TimeTools.getTimeZoneIndex(lat0, lat1);
 
 		_comboTimeZone.select(timeZoneIndex);
 		_isTimeZoneManuallyModified = true;
@@ -1670,7 +1681,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 					if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
-						final TourEvent tourEvent = (TourEvent) eventData;
+						final TourEvent           tourEvent     = (TourEvent) eventData;
 						final ArrayList<TourData> modifiedTours = tourEvent.getModifiedTours();
 
 						if (modifiedTours == null) {
@@ -1991,7 +2002,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					return;
 				}
 
-				final Text widget = (Text) event.widget;
+				final Text   widget    = (Text) event.widget;
 				final String valueText = widget.getText().trim();
 
 				if (valueText.length() > 0) {
@@ -2046,7 +2057,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					return;
 				}
 
-				final Text widget = (Text) event.widget;
+				final Text   widget    = (Text) event.widget;
 				final String valueText = widget.getText().trim();
 
 				if (valueText.length() > 0) {
@@ -2132,8 +2143,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			@Override
 			public void menuAboutToShow(final IMenuManager menuMgr) {
 
-				final Set<TourTag> tourTags = _tourData.getTourTags();
-				final boolean isTagInTour = tourTags.size() > 0;
+				final Set<TourTag> tourTags    = _tourData.getTourTags();
+				final boolean      isTagInTour = tourTags.size() > 0;
 
 				_tagMenuMgr.fillTagMenu(menuMgr);
 				_tagMenuMgr.enableTagActions(true, isTagInTour, tourTags);
@@ -2153,7 +2164,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			public void menuShown(final MenuEvent menuEvent) {
 
 				final Rectangle rect = _linkTag.getBounds();
-				Point pt = new Point(rect.x, rect.y + rect.height);
+				Point           pt   = new Point(rect.x, rect.y + rect.height);
 				pt = _linkTag.getParent().toDisplay(pt);
 
 				_tagMenuMgr.onShowMenu(menuEvent, _linkTag, pt, null);
@@ -2208,8 +2219,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 											final boolean isGrabVertical,
 											final boolean isExpandable) {
 
-		final int style = isExpandable ? //
-				Section.TWISTIE //
+		final int     style   = isExpandable ?                  //
+				Section.TWISTIE                                   //
 						| Section.TITLE_BAR
 				: Section.TITLE_BAR;
 
@@ -3642,7 +3653,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				if (_serieGradient != null) {
 
 					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-					final float value = _serieGradient[timeSlice.serieIndex];
+					final float     value     = _serieGradient[timeSlice.serieIndex];
 
 					colDef.printDetailValue(cell, value);
 
@@ -3709,7 +3720,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			public void update(final ViewerCell cell) {
 
 				final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
-				final int logIndex = ((TimeSlice) cell.getElement()).uniqueCreateIndex;
+				final int logIndex   = ((TimeSlice) cell.getElement()).uniqueCreateIndex;
 
 				// the UI shows the time slice number starting with 1 and not with 0
 				cell.setText(Integer.toString(logIndex + 0));
@@ -3750,10 +3761,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 				if (_serieDistance != null) {
 
-					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-					final int serieIndex = timeSlice.serieIndex;
+					final TimeSlice timeSlice  = (TimeSlice) cell.getElement();
+					final int       serieIndex = timeSlice.serieIndex;
 
-					final float distance = _serieDistance[serieIndex] / 1000 / _unitValueDistance;
+					final float     distance   = _serieDistance[serieIndex] / 1000 / _unitValueDistance;
 
 					cell.setText(_nf3.format(distance));
 
@@ -3777,10 +3788,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 				if (_serieDistance != null) {
 
-					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-					final int serieIndex = timeSlice.serieIndex;
+					final TimeSlice timeSlice  = (TimeSlice) cell.getElement();
+					final int       serieIndex = timeSlice.serieIndex;
 
-					float distanceDiff;
+					float           distanceDiff;
 
 					if (serieIndex == 0) {
 						// first time slice can contain a distance, occured in .fit files
@@ -3788,7 +3799,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					} else {
 
 						final float distancePrevious = _serieDistance[serieIndex - 1] / 1000 / _unitValueDistance;
-						final float distance = _serieDistance[serieIndex] / 1000 / _unitValueDistance;
+						final float distance         = _serieDistance[serieIndex] / 1000 / _unitValueDistance;
 
 						distanceDiff = distance - distancePrevious;
 					}
@@ -3821,8 +3832,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
 
-					final double latitude = _serieLatitude[timeSlice.serieIndex];
-					final String valueText = _nfLatLon.format(latitude);
+					final double    latitude  = _serieLatitude[timeSlice.serieIndex];
+					final String    valueText = _nfLatLon.format(latitude);
 
 					cell.setText(valueText);
 
@@ -3849,8 +3860,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
 
-					final double longitude = _serieLongitude[timeSlice.serieIndex];
-					final String valueText = _nfLatLon.format(longitude);
+					final double    longitude = _serieLongitude[timeSlice.serieIndex];
+					final String    valueText = _nfLatLon.format(longitude);
 
 					cell.setText(valueText);
 
@@ -3875,7 +3886,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					cell.setText(UI.EMPTY_STRING);
 				} else {
 					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-					final long pace = (long) _seriePace[timeSlice.serieIndex];
+					final long      pace      = (long) _seriePace[timeSlice.serieIndex];
 
 					cell.setText(net.tourbook.common.UI.format_mm_ss(pace));
 				}
@@ -3896,7 +3907,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				if (_serieSpeed != null) {
 
 					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-					final float speed = _serieSpeed[timeSlice.serieIndex];
+					final float     speed     = _serieSpeed[timeSlice.serieIndex];
 
 					cell.setText(_nf1.format(speed));
 
@@ -3920,20 +3931,20 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 				if (_serieTime != null && _serieDistance != null) {
 
-					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-					final int serieIndex = timeSlice.serieIndex;
+					final TimeSlice timeSlice  = (TimeSlice) cell.getElement();
+					final int       serieIndex = timeSlice.serieIndex;
 
 					if (serieIndex == 0) {
 						cell.setText(Integer.toString(0));
 					} else {
 
-						final float timeDiff = (_serieTime[serieIndex] - _serieTime[serieIndex - 1]);
+						final float timeDiff         = (_serieTime[serieIndex] - _serieTime[serieIndex - 1]);
 
 						final float distancePrevious = _serieDistance[serieIndex - 1] / 1000 / _unitValueDistance;
-						final float distance = _serieDistance[serieIndex] / 1000 / _unitValueDistance;
+						final float distance         = _serieDistance[serieIndex] / 1000 / _unitValueDistance;
 
-						final float distDiff = distance - distancePrevious;
-						final float speed = timeDiff == 0 ? 0 : distDiff * 3600f / timeDiff;
+						final float distDiff         = distance - distancePrevious;
+						final float speed            = timeDiff == 0 ? 0 : distDiff * 3600f / timeDiff;
 
 						cell.setText(_nf1.format(speed));
 					}
@@ -4005,8 +4016,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 				} else {
 
-					final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
-					final float gearRatio = _serieGears[0][serieIndex];
+					final int   serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
+					final float gearRatio  = _serieGears[0][serieIndex];
 
 					cell.setText(_nf2.format(gearRatio));
 				}
@@ -4031,10 +4042,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 				} else {
 
-					final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
+					final int  serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
 
 					final long frontTeeth = (long) _serieGears[1][serieIndex];
-					final long rearTeeth = (long) _serieGears[2][serieIndex];
+					final long rearTeeth  = (long) _serieGears[2][serieIndex];
 
 					cell.setText(String.format(TourManager.GEAR_TEETH_FORMAT, frontTeeth, rearTeeth));
 				}
@@ -4079,8 +4090,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			public void update(final ViewerCell cell) {
 
 				if (_serieTime != null) {
-					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-					final int serieIndex = timeSlice.serieIndex;
+					final TimeSlice timeSlice  = (TimeSlice) cell.getElement();
+					final int       serieIndex = timeSlice.serieIndex;
 					if (serieIndex == 0) {
 						cell.setText(Integer.toString(0));
 					} else {
@@ -4128,8 +4139,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			public void update(final ViewerCell cell) {
 
 				if (_serieTime != null) {
-					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-					final int serieIndex = timeSlice.serieIndex;
+					final TimeSlice timeSlice  = (TimeSlice) cell.getElement();
+					final int       serieIndex = timeSlice.serieIndex;
 					cell.setText(Integer.toString(_serieTime[serieIndex]));
 				} else {
 					cell.setText(UI.EMPTY_STRING);
@@ -4176,7 +4187,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			@Override
 			public void update(final ViewerCell cell) {
 
-				final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+				final TimeSlice  timeSlice  = (TimeSlice) cell.getElement();
 
 				final TourMarker tourMarker = _markerMap.get(timeSlice.serieIndex);
 				if (tourMarker != null) {
@@ -4209,7 +4220,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
 
-					final float value = UI.convertTemperatureFromMetric(_serieTemperature[timeSlice.serieIndex]);
+					final float     value     = UI.convertTemperatureFromMetric(_serieTemperature[timeSlice.serieIndex]);
 
 					colDef.printDetailValue(cell, value);
 
@@ -4244,10 +4255,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private void displayCloudIcon() {
 
-		final int selectionIndex = _comboClouds.getSelectionIndex();
+		final int    selectionIndex = _comboClouds.getSelectionIndex();
 
-		final String cloudKey = IWeather.cloudIcon[selectionIndex];
-		final Image cloundIcon = UI.IMAGE_REGISTRY.get(cloudKey);
+		final String cloudKey       = IWeather.cloudIcon[selectionIndex];
+		final Image  cloundIcon     = UI.IMAGE_REGISTRY.get(cloudKey);
 
 		_lblCloudIcon.setImage(cloundIcon);
 	}
@@ -4361,30 +4372,30 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private void enableActions() {
 
-		final boolean isTourInDb = isTourInDb();
-		final boolean isTourValid = isTourValid() && isTourInDb;
+		final boolean isTourInDb      = isTourInDb();
+		final boolean isTourValid     = isTourValid() && isTourInDb;
 		final boolean isNotManualTour = _isManualTour == false;
-		final boolean canEdit = _isEditMode && isTourInDb;
+		final boolean canEdit         = _isEditMode && isTourInDb;
 
 		// all actions are disabled when a cell editor is activated
-		final boolean isCellEditorInactive = _isCellEditorActive == false;
+		final boolean  isCellEditorInactive = _isCellEditorActive == false;
 
-		final CTabItem selectedTab = _tabFolder.getSelection();
-		final boolean isTableViewerTab = selectedTab == _tabSlices;
-		final boolean isTourData = _tourData != null;
+		final CTabItem selectedTab          = _tabFolder.getSelection();
+		final boolean  isTableViewerTab     = selectedTab == _tabSlices;
+		final boolean  isTourData           = _tourData != null;
 
-		final boolean canUseTool = _isEditMode && isTourValid && (_isManualTour == false);
+		final boolean  canUseTool           = _isEditMode && isTourValid && (_isManualTour == false);
 
 		// at least 2 positions are necessary to compute the distance
-		final boolean isGeoAvailable = isTourData
+		final boolean isGeoAvailable        = isTourData
 				&& _tourData.latitudeSerie != null
 				&& _tourData.latitudeSerie.length >= 2;
 
-		final boolean isDistanceAvailable = isTourData //
+		final boolean isDistanceAvailable   = isTourData   //
 				&& _tourData.distanceSerie != null
 				&& _tourData.distanceSerie.length > 0;
 
-		final boolean isDistanceLargerThan0 = isTourData //
+		final boolean isDistanceLargerThan0 = isTourData   //
 				&& isDistanceAvailable
 				&& _tourData.distanceSerie[0] > 0;
 		/*
@@ -4456,13 +4467,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private void enableControls() {
 
-		final boolean canEdit = _isEditMode && isTourInDb();
+		final boolean canEdit         = _isEditMode && isTourInDb();
 		final boolean isManualAndEdit = _isManualTour && canEdit;
-		final boolean isDeviceTour = _isManualTour == false;
+		final boolean isDeviceTour    = _isManualTour == false;
 
-		final float[] serieDistance = _tourData == null ? null : _tourData.distanceSerie;
+		final float[] serieDistance   = _tourData == null ? null : _tourData.distanceSerie;
 		final boolean isDistanceSerie = serieDistance != null && serieDistance.length > 0;
-		final boolean isGeoAvailable = _tourData != null
+		final boolean isGeoAvailable  = _tourData != null
 				&& _tourData.latitudeSerie != null
 				&& _tourData.latitudeSerie.length > 0;
 
@@ -4517,13 +4528,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 */
 	private void enableSliceActions() {
 
-		final StructuredSelection sliceSelection = (StructuredSelection) _sliceViewer.getSelection();
+		final StructuredSelection sliceSelection         = (StructuredSelection) _sliceViewer.getSelection();
 
-		final int numberOfSelectedSlices = sliceSelection.size();
+		final int                 numberOfSelectedSlices = sliceSelection.size();
 
-		final boolean isSliceSelected = numberOfSelectedSlices > 0;
-		final boolean isOneSliceSelected = numberOfSelectedSlices == 1;
-		final boolean isTourInDb = isTourInDb();
+		final boolean             isSliceSelected        = numberOfSelectedSlices > 0;
+		final boolean             isOneSliceSelected     = numberOfSelectedSlices == 1;
+		final boolean             isTourInDb             = isTourInDb();
 
 		// check if a marker can be created
 		boolean canCreateMarker = false;
@@ -4559,14 +4570,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		// set start/end position into the actions
 		if (isSliceSelected) {
 
-			final Object[] selectedSliceArray = sliceSelection.toArray();
-			final int lastSliceIndex = selectedSliceArray.length - 1;
+			final Object[]  selectedSliceArray      = sliceSelection.toArray();
+			final int       lastSliceIndex          = selectedSliceArray.length - 1;
 
-			final TimeSlice firstSelectedTimeSlice = (TimeSlice) selectedSliceArray[0];
-			final TimeSlice lastSelectedTimeSlice = (TimeSlice) selectedSliceArray[lastSliceIndex];
+			final TimeSlice firstSelectedTimeSlice  = (TimeSlice) selectedSliceArray[0];
+			final TimeSlice lastSelectedTimeSlice   = (TimeSlice) selectedSliceArray[lastSliceIndex];
 
-			final int firstSelectedSerieIndex = firstSelectedTimeSlice.serieIndex;
-			final int lastSelectedSerieIndex = lastSelectedTimeSlice.serieIndex;
+			final int       firstSelectedSerieIndex = firstSelectedTimeSlice.serieIndex;
+			final int       lastSelectedSerieIndex  = lastSelectedTimeSlice.serieIndex;
 
 			_actionExportTour.setTourRange(firstSelectedSerieIndex, lastSelectedSerieIndex);
 
@@ -4576,9 +4587,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			/*
 			 * prevent that the first and last slice is selected for the split which causes errors
 			 */
-			final int numberOfAllSlices = _sliceViewerItems.length;
+			final int     numberOfAllSlices = _sliceViewerItems.length;
 
-			final boolean isSplitValid = firstSelectedSerieIndex > 0 && firstSelectedSerieIndex < numberOfAllSlices - 1;
+			final boolean isSplitValid      = firstSelectedSerieIndex > 0 && firstSelectedSerieIndex < numberOfAllSlices - 1;
 
 			_actionSplitTour.setEnabled(isOneSliceSelected && isSplitValid);
 		}
@@ -4687,11 +4698,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			}
 		}
 
-		final Object firstItem = selectedData[0];
+		final Object firstItem   = selectedData[0];
 
-		int serieIndex0 = -1;
-		int serieIndex1 = -1;
-		int serieIndex2 = -1;
+		int          serieIndex0 = -1;
+		int          serieIndex1 = -1;
+		int          serieIndex2 = -1;
 
 		if (selectedData.length > 1) {
 
@@ -4876,12 +4887,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		return 0;
 	}
 
-	private TimeSlice[] getRemainingSliceItems(	final Object[] dataViewerItems,
+	private TimeSlice[] getRemainingSliceItems(  final Object[] dataViewerItems,
 																final int firstIndex,
 																final int lastIndex) {
 
-		final int oldSerieLength = dataViewerItems.length;
-		final int newSerieLength = oldSerieLength - (lastIndex - firstIndex + 1);
+		final int         oldSerieLength = dataViewerItems.length;
+		final int         newSerieLength = oldSerieLength - (lastIndex - firstIndex + 1);
 
 		final TimeSlice[] newViewerItems = new TimeSlice[newSerieLength];
 
@@ -5031,9 +5042,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private int getWindDirectionTextIndex(final int degreeDirection) {
 
-		final float degree = (degreeDirection + 22.5f) / 45.0f;
+		final float degree         = (degreeDirection + 22.5f) / 45.0f;
 
-		final int directionIndex = ((int) degree) % 8;
+		final int   directionIndex = ((int) degree) % 8;
 
 		return directionIndex;
 	}
@@ -5107,7 +5118,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				new String[] { IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL },
 				1);
 
-		final int result = dialog.open();
+		final int           result = dialog.open();
 		if (result == 0) {
 
 			// discard modifications
@@ -5315,7 +5326,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		if (selection instanceof SelectionTourData) {
 
 			final SelectionTourData selectionTourData = (SelectionTourData) selection;
-			final TourData tourData = selectionTourData.getTourData();
+			final TourData          tourData          = selectionTourData.getTourData();
 			if (tourData == null) {
 				_tourChart = null;
 			} else {
@@ -5345,7 +5356,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			final SelectionTourCatalogView tourCatalogSelection = (SelectionTourCatalogView) selection;
 
-			final TVICatalogRefTourItem refItem = tourCatalogSelection.getRefItem();
+			final TVICatalogRefTourItem    refItem              = tourCatalogSelection.getRefItem();
 			if (refItem != null) {
 				displayTour(refItem.getTourId());
 			}
@@ -5410,8 +5421,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			return false;
 		}
 
-		TourData selectedTourData = null;
-		final long currentTourId = _tourData.getTourId();
+		TourData   selectedTourData = null;
+		final long currentTourId    = _tourData.getTourId();
 
 		if (selection instanceof SelectionTourData) {
 
@@ -5463,8 +5474,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		} else if (selection instanceof SelectionChartInfo) {
 
-			final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
-			final ChartDataModel chartDataModel = chartInfo.chartDataModel;
+			final SelectionChartInfo chartInfo      = (SelectionChartInfo) selection;
+			final ChartDataModel     chartDataModel = chartInfo.chartDataModel;
 			if (chartDataModel != null) {
 
 				final Object tourId = chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
@@ -5490,7 +5501,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			final SelectionChartXSliderPosition xSliderPosition = (SelectionChartXSliderPosition) selection;
 
-			final Chart chart = xSliderPosition.getChart();
+			final Chart                         chart           = xSliderPosition.getChart();
 			if (chart != null) {
 
 				final ChartDataModel chartDataModel = chart.getChartDataModel();
@@ -5518,13 +5529,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		} else if (selection instanceof SelectionTourMarker) {
 
-			final SelectionTourMarker markerSelection = (SelectionTourMarker) selection;
+			final SelectionTourMarker   markerSelection       = (SelectionTourMarker) selection;
 
-			final ArrayList<TourMarker> tourMarker = markerSelection.getSelectedTourMarker();
-			final int numberOfTourMarkers = tourMarker.size();
+			final ArrayList<TourMarker> tourMarker            = markerSelection.getSelectedTourMarker();
+			final int                   numberOfTourMarkers   = tourMarker.size();
 
-			int leftSliderValueIndex = 0;
-			int rightSliderValueIndex = 0;
+			int                         leftSliderValueIndex  = 0;
+			int                         rightSliderValueIndex = 0;
 
 			if (numberOfTourMarkers == 1) {
 
@@ -5575,11 +5586,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private void onSelectionChanged_TourMarker(final SelectionTourMarker markerSelection) {
 
-		final ArrayList<TourMarker> tourMarker = markerSelection.getSelectedTourMarker();
-		final int numberOfTourMarkers = tourMarker.size();
+		final ArrayList<TourMarker> tourMarker            = markerSelection.getSelectedTourMarker();
+		final int                   numberOfTourMarkers   = tourMarker.size();
 
-		int leftSliderValueIndex = 0;
-		int rightSliderValueIndex = 0;
+		int                         leftSliderValueIndex  = 0;
+		int                         rightSliderValueIndex = 0;
 
 		if (numberOfTourMarkers == 1) {
 
@@ -5661,10 +5672,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		_isWindSpeedManuallyModified = true;
 
-		final int selectedIndex = _comboWindSpeedText.getSelectionIndex();
-		final int speed = _unitValueWindSpeed[selectedIndex];
+		final int     selectedIndex = _comboWindSpeedText.getSelectionIndex();
+		final int     speed         = _unitValueWindSpeed[selectedIndex];
 
-		final boolean isBackup = _isSetField;
+		final boolean isBackup      = _isSetField;
 		_isSetField = true;
 		{
 			_spinWindSpeedValue.setSelection(speed);
@@ -5676,9 +5687,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		_isWindSpeedManuallyModified = true;
 
-		final int windSpeed = _spinWindSpeedValue.getSelection();
+		final int     windSpeed = _spinWindSpeedValue.getSelection();
 
-		final boolean isBackup = _isSetField;
+		final boolean isBackup  = _isSetField;
 		_isSetField = true;
 		{
 			_comboWindSpeedText.select(getWindSpeedTextIndex(windSpeed));
@@ -5735,8 +5746,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				// preserve column width, selection and focus
 				final ISelection selection = _sliceViewer.getSelection();
 
-				final Table table = _sliceViewer.getTable();
-				final boolean isFocus = table.isFocusControl();
+				final Table      table     = _sliceViewer.getTable();
+				final boolean    isFocus   = table.isFocusControl();
 
 				_sliceViewerContainer.setRedraw(false);
 				{
@@ -5787,7 +5798,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			return _tourData;
 		}
 
-		final Long tourId = _tourData.getTourId();
+		final Long        tourId      = _tourData.getTourId();
 		final TourManager tourManager = TourManager.getInstance();
 
 		tourManager.removeTourFromCache(tourId);
@@ -5807,7 +5818,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 				final ISelection previousSelection = _sliceViewer.getSelection();
 
-				final Table table = _sliceViewer.getTable();
+				final Table      table             = _sliceViewer.getTable();
 				if (table.isDisposed()) {
 					return;
 				}
@@ -6088,8 +6099,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private void selectTimeSlice(final SelectionChartInfo chartInfo) {
 
-		final Table table = (Table) _sliceViewer.getControl();
-		final int itemCount = table.getItemCount();
+		final Table table     = (Table) _sliceViewer.getControl();
+		final int   itemCount = table.getItemCount();
 
 		// adjust to array bounds
 		int valueIndex = chartInfo.selectedSliderValuesIndex;
@@ -6108,8 +6119,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			return;
 		}
 
-		int valueIndexStart = sliderPosition.getLeftSliderValueIndex();
-		final int valueIndexEnd = sliderPosition.getRightSliderValueIndex();
+		int           valueIndexStart    = sliderPosition.getLeftSliderValueIndex();
+		final int     valueIndexEnd      = sliderPosition.getRightSliderValueIndex();
 
 		final boolean isAdjustStartIndex = sliderPosition.isAdjustStartIndex();
 
@@ -6130,8 +6141,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 */
 	private void selectTimeSlice_InViewer(final int valueIndexStart, final int valueIndexEnd) {
 
-		final Table table = (Table) _sliceViewer.getControl();
-		final int itemCount = table.getItemCount();
+		final Table table     = (Table) _sliceViewer.getControl();
+		final int   itemCount = table.getItemCount();
 
 		// adjust to array bounds
 		final int checkedValueIndex1 = Math.max(0, Math.min(valueIndexStart, itemCount - 1));
@@ -6328,7 +6339,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			}
 
 			final int cloudIndex = _comboClouds.getSelectionIndex();
-			String cloudValue = IWeather.cloudIcon[cloudIndex];
+			String    cloudValue = IWeather.cloudIcon[cloudIndex];
 			if (cloudValue.equals(UI.IMAGE_EMPTY_16)) {
 				// replace invalid cloud key
 				cloudValue = UI.EMPTY_STRING;
@@ -6347,9 +6358,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 				// set time zone ONLY when manually modified
 
-				final int selectedTimeZoneIndex = _comboTimeZone.getSelectionIndex();
-				final TimeZoneData timeZoneData = TimeTools.getTimeZone_ByIndex(selectedTimeZoneIndex);
-				final String timeZoneId = timeZoneData.zoneId;
+				final int          selectedTimeZoneIndex = _comboTimeZone.getSelectionIndex();
+				final TimeZoneData timeZoneData          = TimeTools.getTimeZone_ByIndex(selectedTimeZoneIndex);
+				final String       timeZoneId            = timeZoneData.zoneId;
 
 				_tourData.setTimeZoneId(timeZoneId);
 			}
@@ -6386,7 +6397,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				 * errors
 				 */
 
-				float altitudeUpValue = getFloatValue(_txtAltitudeUp.getText());
+				float altitudeUpValue   = getFloatValue(_txtAltitudeUp.getText());
 				float altitudeDownValue = getFloatValue(_txtAltitudeDown.getText());
 
 				if (_unitValueAltitude != 1) {
@@ -6426,8 +6437,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private void updateStatusLine() {
 
-		final boolean isVisible = _timeSliceLabel.isVisible();
-		boolean setVisible = false;
+		final boolean isVisible  = _timeSliceLabel.isVisible();
+		boolean       setVisible = false;
 
 		if (_isReferenceTourAvailable) {
 
@@ -6516,7 +6527,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 *           <code>true</code> will reload time slices
 	 * @param isDirtyDisabled
 	 */
-	private void updateUI_FromModel(	final TourData tourData,
+	private void updateUI_FromModel( final TourData tourData,
 												final boolean forceTimeSliceReload,
 												final boolean isDirtyDisabled) {
 
@@ -6657,8 +6668,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				}
 			});
 
-			final StringBuilder sb = new StringBuilder();
-			int refCounter = 0;
+			final StringBuilder sb         = new StringBuilder();
+			int                 refCounter = 0;
 
 			_refTourRange = new int[refTourList.size()][2];
 
@@ -6722,7 +6733,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		// wind speed
 		final int windSpeed = _tourData.getWeatherWindSpeed();
-		final int speed = (int) (windSpeed / _unitValueDistance);
+		final int speed     = (int) (windSpeed / _unitValueDistance);
 		_spinWindSpeedValue.setSelection(speed);
 		_comboWindSpeedText.select(getWindSpeedTextIndex(speed));
 
@@ -6761,15 +6772,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 
 		// altitude up/down
-		final int altitudeUp = _tourData.getTourAltUp();
+		final int altitudeUp   = _tourData.getTourAltUp();
 		final int altitudeDown = _tourData.getTourAltDown();
 		_txtAltitudeUp.setText(Integer.toString((int) (altitudeUp / _unitValueAltitude)));
 		_txtAltitudeDown.setText(Integer.toString((int) (altitudeDown / _unitValueAltitude)));
 
 		// tour time's
 		final int recordingTime = (int) _tourData.getTourRecordingTime();
-		final int drivingTime = (int) _tourData.getTourDrivingTime();
-		final int pausedTime = recordingTime - drivingTime;
+		final int drivingTime   = (int) _tourData.getTourDrivingTime();
+		final int pausedTime    = recordingTime - drivingTime;
 
 		_timeRecording.setTime(recordingTime);
 		_timeDriving.setTime(drivingTime);
@@ -6778,7 +6789,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		/*
 		 * Time zone
 		 */
-		int timeZoneIndex;
+		int          timeZoneIndex;
 		final String timeZoneId = _tourData.getTimeZoneId();
 		if (timeZoneId == null) {
 
@@ -6818,8 +6829,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_lblSpeedUnit.setText(UI.UNIT_LABEL_SPEED);
 
 		// cadence rpm/spm
-		final float cadence = _tourData.getCadenceMultiplier();
-		final boolean isSpm = cadence == 2.0f;
+		final float   cadence = _tourData.getCadenceMultiplier();
+		final boolean isSpm   = cadence == 2.0f;
 		_rdoCadence_Rpm.setSelection(!isSpm);
 		_rdoCadence_Spm.setSelection(isSpm);
 
@@ -6876,9 +6887,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			return;
 		}
 
-		int recTime = _timeRecording.getTime();
+		int recTime    = _timeRecording.getTime();
 		int pausedTime = _timePaused.getTime();
-		int driveTime = _timeDriving.getTime();
+		int driveTime  = _timeDriving.getTime();
 
 		if (recTime < 0) {
 			recTime = -recTime - 1;
@@ -6934,10 +6945,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		/*
 		 * Update tooltip
 		 */
-		final ZonedDateTime tourStartTime = _tourData.getTourStartTime();
+		final ZonedDateTime tourStartTime    = _tourData.getTourStartTime();
 		final ZonedDateTime tourStartTimeUTC = tourStartTime.withZoneSameInstant(ZoneOffset.UTC);
 
-		final String tourStartTooltip = NLS.bind(//
+		final String        tourStartTooltip = NLS.bind(                                         //
 				Messages.Tour_Editor_Label_TourStartTime_Tooltip,
 				tourStartTimeUTC.format(TimeTools.Formatter_DateTime_SM));
 
@@ -6965,7 +6976,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 */
 	private void updateUI_Title() {
 
-		final ZoneId zoneId = _tourData == null //
+		final ZoneId        zoneId        = _tourData == null                       //
 				? TimeTools.getDefaultTimeZone()
 				: _tourData.getTimeZoneIdWithDefault();
 
@@ -6979,7 +6990,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				0,
 				zoneId);
 
-		final String tourTitle = TourManager.getTourTitle(tourStartTime);
+		final String        tourTitle     = TourManager.getTourTitle(tourStartTime);
 
 		updateUI_TitleAsynch(tourTitle);
 	}
