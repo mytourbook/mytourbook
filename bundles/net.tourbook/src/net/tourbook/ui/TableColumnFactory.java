@@ -92,6 +92,8 @@ public abstract class TableColumnFactory {
 	public static final TableColumnFactory	STATE_DB_STATUS;
 	public static final TableColumnFactory	STATE_IMPORT_STATE;
 
+	public static final TableColumnFactory	SWIM_CADENCE;
+
 	public static final TableColumnFactory	TIME_BREAK_TIME;
 	public static final TableColumnFactory	TIME_DRIVING_TIME;
 	public static final TableColumnFactory	TIME_PAUSED_TIME;
@@ -1427,6 +1429,31 @@ public abstract class TableColumnFactory {
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_ImportStatus_Tooltip);
 
 				colDef.setDefaultColumnWidth(20);
+
+				return colDef;
+			};
+		};
+
+		/*
+		 * Swimming
+		 */
+		SWIM_CADENCE = new TableColumnFactory() {
+
+			@Override
+			public TableColumnDefinition createColumn(final ColumnManager columnManager,
+																	final PixelConverter pixelConverter) {
+
+				final TableColumnDefinition colDef = new TableColumnDefinition(columnManager,
+						"SWIM_CADENCE", //$NON-NLS-1$
+						SWT.TRAIL);
+
+				colDef.setColumnCategory(Messages.ColumnFactory_Category_Swimming);
+				colDef.setColumnLabel(Messages.ColumnFactory_cadence_label);
+				colDef.setColumnHeaderText(Messages.ColumnFactory_cadence);
+				colDef.setColumnUnit(Messages.ColumnFactory_cadence);
+				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_cadence_tooltip);
+
+				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
 
 				return colDef;
 			};
