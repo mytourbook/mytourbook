@@ -198,7 +198,7 @@ import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 /**
  * This editor can edit (when all is implemented) all data for a tour
  */
-public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITourViewer2, ITourProvider2 {
+public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITourProvider2 {
 
 	public static final String ID = "net.tourbook.views.TourDataEditorView"; //$NON-NLS-1$
 
@@ -313,8 +313,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_nf3NoGroup.setGroupingUsed(false);
 	}
 	//
-	private long											_timeSliceViewerTourId	= -1;
-	private SelectionChartXSliderPosition			_sliceViewerXSliderPosition;
+	private long											_timeSlice_ViewerTourId	= -1;
+	private long											_swimSlice_ViewerTourId	= -1;
 	//
 	/**
 	 * <code>true</code>: rows can be selected in the viewer<br>
@@ -395,7 +395,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private int												_uiRunnableCounter		= 0;
 	private int												_uiUpdateTitleCounter	= 0;
 	private TourData										_uiRunnableTourData;
-	private boolean										_uiRunnableForceTimeSliceReload;
+	private boolean										_uiRunnableForce_TimeSliceReload;
+	private boolean										_uiRunnableForce_SwimSliceReload;
 	private boolean										_uiRunnableIsDirtyDisabled;
 	//
 	private SliceFloatEditingSupport					_altitudeEditingSupport;
@@ -447,7 +448,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private ActionDeleteTimeSlicesRemoveTime	_actionDeleteTimeSlicesRemoveTime;
 	private ActionExport								_actionExportTour;
 	private ActionExtractTour						_actionExtractTour;
-	private ActionModifyColumns					_actionModifyColumns;
+	private ActionModifyColumns					_actionModify_TimeSliceColumns;
+	private ActionModifyColumns					_actionModify_SwimSliceColumns;
 	private ActionOpenAdjustAltitudeDialog		_actionOpenAdjustAltitudeDialog;
 	private ActionOpenMarkerDialog				_actionOpenMarkerDialog;
 	private ActionOpenPrefDialog					_actionOpenTourTypePrefs;
@@ -511,10 +513,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private TableViewer					_timeSlice_Viewer;
 	private Object[]						_timeSlice_ViewerItems;
 	private ColumnManager				_timeSlice_ColumnManager;
+	private TimeSlice_TourViewer		_timeSlice_TourViewer			= new TimeSlice_TourViewer();
 	//
 	private TableViewer					_swimSlice_Viewer;
 	private Object[]						_swimSlice_ViewerItems;
 	private ColumnManager				_swimSlice_ColumnManager;
+	private SwimSlice_TourViewer		_swimSlice_TourViewer			= new SwimSlice_TourViewer();
 
 	private FormToolkit					_tk;
 
@@ -774,6 +778,169 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 	}
 
+	private class SwimSlice_TourViewer implements ITourViewer2 {
+
+		@Override
+		public ColumnManager getColumnManager() {
+
+			final CTabItem selectedTab = _tabFolder.getSelection();
+
+			if (selectedTab == _tab_30_SwimSlices) {
+				return _swimSlice_ColumnManager;
+			}
+
+			return null;
+		}
+
+		@Override
+		public ColumnViewer getViewer() {
+
+			final CTabItem selectedTab = _tabFolder.getSelection();
+
+			if (selectedTab == _tab_30_SwimSlices) {
+				return _swimSlice_Viewer;
+			}
+
+			return null;
+		}
+
+		@Override
+		public boolean isColumn0Visible(final ColumnViewer columnViewer) {
+
+			if (columnViewer == _swimSlice_Viewer) {
+				// first column is hidden, this is a super hack that the second column can be right aligned
+				return false;
+			}
+
+			return true;
+		}
+
+		@Override
+		public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
+
+			final ColumnViewer[] newColumnViewer = new ColumnViewer[1];
+
+			BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+
+				private void recreateSwimSliceViewer() {
+
+					// preserve column width, selection and focus
+					final ISelection selection = _swimSlice_Viewer.getSelection();
+
+					final Table table = _swimSlice_Viewer.getTable();
+					final boolean isFocus = table.isFocusControl();
+
+					_swimSliceViewerContainer.setRedraw(false);
+					{
+						table.dispose();
+
+						createUI_Tab_32_SwimSliceViewer(_swimSliceViewerContainer);
+
+						_swimSliceViewerContainer.layout();
+
+						// update the viewer
+						_swimSlice_ViewerItems = getSliceViewerItems().__swimSlice_ViewerItems;
+						_swimSlice_Viewer.setInput(_swimSlice_ViewerItems);
+					}
+					_swimSliceViewerContainer.setRedraw(true);
+
+					_swimSlice_Viewer.setSelection(selection, true);
+
+					if (isFocus) {
+						_swimSlice_Viewer.getTable().setFocus();
+					}
+
+					newColumnViewer[0] = _swimSlice_Viewer;
+				}
+
+				@Override
+				public void run() {
+
+					if (columnViewer == _swimSlice_Viewer) {
+						recreateSwimSliceViewer();
+					}
+				}
+			});
+
+			return newColumnViewer[0];
+		}
+
+		/**
+		 * reload the content of the viewer
+		 */
+		@Override
+		public void reloadViewer() {
+
+			Display.getCurrent().asyncExec(new Runnable() {
+
+				private void reloadSwimSliceViewer() {
+
+					final ISelection previousSelection = _swimSlice_Viewer.getSelection();
+
+					final Table table = _swimSlice_Viewer.getTable();
+					if (table.isDisposed()) {
+						return;
+					}
+
+					table.setRedraw(false);
+					{
+						/*
+						 * update the viewer, show busy indicator when it's a large tour or the previous
+						 * tour was large because it takes time to remove the old items
+						 */
+						if (((_tourData != null) && (_tourData.timeSerie != null)
+								&& (_tourData.timeSerie.length > BUSY_INDICATOR_ITEMS))
+								|| (table.getItemCount() > BUSY_INDICATOR_ITEMS)) {
+
+							BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+								@Override
+								public void run() {
+									_swimSlice_ViewerItems = getSliceViewerItems().__swimSlice_ViewerItems;
+									_swimSlice_Viewer.setInput(_swimSlice_ViewerItems);
+								}
+							});
+						} else {
+							_swimSlice_ViewerItems = getSliceViewerItems().__swimSlice_ViewerItems;
+							_swimSlice_Viewer.setInput(_swimSlice_ViewerItems);
+						}
+
+						_swimSlice_Viewer.setSelection(previousSelection, true);
+					}
+					table.setRedraw(true);
+				}
+
+				@Override
+				public void run() {
+
+					final CTabItem selectedTab = _tabFolder.getSelection();
+
+					if (selectedTab == _tab_30_SwimSlices) {
+						reloadSwimSliceViewer();
+					}
+				}
+			});
+		}
+
+		@Override
+		public void updateColumnHeader(final ColumnDefinition colDef) {}
+	}
+
+	private class SwimSliceViewerContentProvider implements IStructuredContentProvider {
+
+		public SwimSliceViewerContentProvider() {}
+
+		@Override
+		public void dispose() {}
+
+		@Override
+		public Object[] getElements(final Object parent) {
+			return _swimSlice_ViewerItems;
+		}
+
+		@Override
+		public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
+	}
+
 	/**
 	 * It took me hours to find this location where the editor is activated/deactivated without using
 	 * TableViewerEditor which is activated in setCellEditingSupport but not in the row edit mode.
@@ -968,6 +1135,153 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			}
 			_isSetField = isBackup;
 		}
+	}
+
+	private class TimeSlice_TourViewer implements ITourViewer2 {
+
+		@Override
+		public ColumnManager getColumnManager() {
+
+			final CTabItem selectedTab = _tabFolder.getSelection();
+
+			if (selectedTab == _tab_20_TimeSlices) {
+				return _timeSlice_ColumnManager;
+			}
+
+			return null;
+		}
+
+		@Override
+		public ColumnViewer getViewer() {
+
+			final CTabItem selectedTab = _tabFolder.getSelection();
+
+			if (selectedTab == _tab_20_TimeSlices) {
+				return _timeSlice_Viewer;
+			}
+
+			return null;
+		}
+
+		@Override
+		public boolean isColumn0Visible(final ColumnViewer columnViewer) {
+
+			if (columnViewer == _timeSlice_Viewer) {
+				// first column is hidden, this is a super hack that the second column can be right aligned
+				return false;
+			}
+
+			return true;
+		}
+
+		@Override
+		public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
+
+			final ColumnViewer[] newColumnViewer = new ColumnViewer[1];
+
+			BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+
+				private void recreateTimeSliceViewer() {
+
+					// preserve column width, selection and focus
+					final ISelection selection = _timeSlice_Viewer.getSelection();
+
+					final Table table = _timeSlice_Viewer.getTable();
+					final boolean isFocus = table.isFocusControl();
+
+					_timeSliceViewerContainer.setRedraw(false);
+					{
+						table.dispose();
+
+						createUI_Tab_22_TimeSliceViewer(_timeSliceViewerContainer);
+
+						_timeSliceViewerContainer.layout();
+
+						// update the viewer
+						_timeSlice_ViewerItems = getSliceViewerItems().__timeSlice_ViewerItems;
+						_timeSlice_Viewer.setInput(_timeSlice_ViewerItems);
+					}
+					_timeSliceViewerContainer.setRedraw(true);
+
+					_timeSlice_Viewer.setSelection(selection, true);
+
+					if (isFocus) {
+						_timeSlice_Viewer.getTable().setFocus();
+					}
+
+					newColumnViewer[0] = _timeSlice_Viewer;
+				}
+
+				@Override
+				public void run() {
+
+					if (columnViewer == _timeSlice_Viewer) {
+						recreateTimeSliceViewer();
+					}
+				}
+			});
+
+			return newColumnViewer[0];
+		}
+
+		/**
+		 * reload the content of the viewer
+		 */
+		@Override
+		public void reloadViewer() {
+
+			Display.getCurrent().asyncExec(new Runnable() {
+
+				private void reloadTimeSliceViewer() {
+
+					final ISelection previousSelection = _timeSlice_Viewer.getSelection();
+
+					final Table table = _timeSlice_Viewer.getTable();
+					if (table.isDisposed()) {
+						return;
+					}
+
+					table.setRedraw(false);
+					{
+						/*
+						 * update the viewer, show busy indicator when it's a large tour or the previous
+						 * tour was large because it takes time to remove the old items
+						 */
+						if (((_tourData != null) && (_tourData.timeSerie != null)
+								&& (_tourData.timeSerie.length > BUSY_INDICATOR_ITEMS))
+								|| (table.getItemCount() > BUSY_INDICATOR_ITEMS)) {
+
+							BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+								@Override
+								public void run() {
+									_timeSlice_ViewerItems = getSliceViewerItems().__timeSlice_ViewerItems;
+									_timeSlice_Viewer.setInput(_timeSlice_ViewerItems);
+								}
+							});
+						} else {
+							_timeSlice_ViewerItems = getSliceViewerItems().__timeSlice_ViewerItems;
+							_timeSlice_Viewer.setInput(_timeSlice_ViewerItems);
+						}
+
+						_timeSlice_Viewer.setSelection(previousSelection, true);
+					}
+					table.setRedraw(true);
+				}
+
+				@Override
+				public void run() {
+
+					final CTabItem selectedTab = _tabFolder.getSelection();
+
+					if (selectedTab == _tab_20_TimeSlices) {
+						reloadTimeSliceViewer();
+					}
+				}
+			});
+		}
+
+		@Override
+		public void updateColumnHeader(final ColumnDefinition colDef) {}
 	}
 
 	private class TimeSliceViewerContentProvider implements IStructuredContentProvider {
@@ -1863,7 +2177,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_tourData = null;
 
 			// set slice viewer dirty
-			_timeSliceViewerTourId = -1;
+			_timeSlice_ViewerTourId = -1;
+			_swimSlice_ViewerTourId = -1;
 
 			_postSelectionProvider.clearSelection();
 
@@ -1926,7 +2241,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				Messages.action_tourType_modify_tourTypes,
 				ITourbookPreferences.PREF_PAGE_TOUR_TYPE);
 
-		_actionModifyColumns = new ActionModifyColumns(this);
+		_actionModify_TimeSliceColumns = new ActionModifyColumns(_timeSlice_TourViewer);
+		_actionModify_SwimSliceColumns = new ActionModifyColumns(_swimSlice_TourViewer);
 
 		_tagMenuMgr = new TagMenuManager(this, false);
 	}
@@ -2208,14 +2524,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		updateInternalUnitValues();
 
-		// define columns for the viewers
-		_timeSlice_ColumnManager = new ColumnManager(this, _stateTimeSlice);
+		// define columns for the time slice viewer
+		_timeSlice_ColumnManager = new ColumnManager(_timeSlice_TourViewer, _stateTimeSlice);
 		_timeSlice_ColumnManager.setIsCategoryAvailable(true);
 		defineAllColumns_TimeSlices();
 
-		// define columns for the viewers
-		_swimSlice_ColumnManager = new ColumnManager(this, _stateSwimSlice);
-		_swimSlice_ColumnManager.setIsCategoryAvailable(true);
+		// define columns for the swim slice viewer
+		_swimSlice_ColumnManager = new ColumnManager(_swimSlice_TourViewer, _stateSwimSlice);
+//		_swimSlice_ColumnManager.setIsCategoryAvailable(true);
 		defineAllColumns_SwimSlices();
 
 		restoreState_BeforeUI();
@@ -3663,37 +3979,37 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 //			UI.setCellEditSupport(_timeSliceViewer);
 //		}
 
-		/*
-		 * create editing support after the viewer is created but before the columns are created.
-		 */
-		final TextCellEditor cellEditor = new TextCellEditorCustomized(_timeSlice_Viewer.getTable());
+//		/*
+//		 * create editing support after the viewer is created but before the columns are created.
+//		 */
+//		final TextCellEditor cellEditor = new TextCellEditorCustomized(_timeSlice_Viewer.getTable());
+//
+//		_altitudeEditingSupport = new SliceFloatEditingSupport(cellEditor, _serieAltitude);
+//		_pulseEditingSupport = new SliceFloatEditingSupport(cellEditor, _seriePulse);
+//		_temperatureEditingSupport = new SliceFloatEditingSupport(cellEditor, _serieTemperature);
+//		_cadenceEditingSupport = new SliceFloatEditingSupport(cellEditor, _serieCadence);
+//		_latitudeEditingSupport = new SliceDoubleEditingSupport(cellEditor, _serieLatitude);
+//		_longitudeEditingSupport = new SliceDoubleEditingSupport(cellEditor, _serieLongitude);
+//
+//		_colDefAltitude.setEditingSupport(_altitudeEditingSupport);
+//		_colDefPulse.setEditingSupport(_pulseEditingSupport);
+//		_colDefTemperature.setEditingSupport(_temperatureEditingSupport);
+//		_colDefCadence.setEditingSupport(_cadenceEditingSupport);
+//		_colDefLatitude.setEditingSupport(_latitudeEditingSupport);
+//		_colDefLongitude.setEditingSupport(_longitudeEditingSupport);
 
-		_altitudeEditingSupport = new SliceFloatEditingSupport(cellEditor, _serieAltitude);
-		_pulseEditingSupport = new SliceFloatEditingSupport(cellEditor, _seriePulse);
-		_temperatureEditingSupport = new SliceFloatEditingSupport(cellEditor, _serieTemperature);
-		_cadenceEditingSupport = new SliceFloatEditingSupport(cellEditor, _serieCadence);
-		_latitudeEditingSupport = new SliceDoubleEditingSupport(cellEditor, _serieLatitude);
-		_longitudeEditingSupport = new SliceDoubleEditingSupport(cellEditor, _serieLongitude);
+		_swimSlice_ColumnManager.createColumns(_swimSlice_Viewer);
 
-		_colDefAltitude.setEditingSupport(_altitudeEditingSupport);
-		_colDefPulse.setEditingSupport(_pulseEditingSupport);
-		_colDefTemperature.setEditingSupport(_temperatureEditingSupport);
-		_colDefCadence.setEditingSupport(_cadenceEditingSupport);
-		_colDefLatitude.setEditingSupport(_latitudeEditingSupport);
-		_colDefLongitude.setEditingSupport(_longitudeEditingSupport);
+		_swimSlice_Viewer.setContentProvider(new SwimSliceViewerContentProvider());
+		_swimSlice_Viewer.setUseHashlookup(true);
 
-		_timeSlice_ColumnManager.createColumns(_timeSlice_Viewer);
-
-		_timeSlice_Viewer.setContentProvider(new TimeSliceViewerContentProvider());
-		_timeSlice_Viewer.setUseHashlookup(true);
-
-		_timeSlice_Viewer.addSelectionChangedListener(new ISelectionChangedListener() {
+		_swimSlice_Viewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
-				final StructuredSelection selection = (StructuredSelection) event.getSelection();
-				if (selection != null) {
-					fireSliderPosition(selection);
-				}
+//				final StructuredSelection selection = (StructuredSelection) event.getSelection();
+//				if (selection != null) {
+//					fireSliderPosition(selection);
+//				}
 			}
 		});
 
@@ -3710,7 +4026,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 //		public short[]		swim_Cadence;
 //		private float[]	_swim_Swolf;
 
-		defineColumn_SwimSlice_Time();
+//		defineColumn_SwimSlice_Data_1_First();
+		defineColumn_SwimSlice_Data_Sequence();
+//		defineColumn_SwimSlice_Time();
 		defineColumn_SwimSlice_Cadence();
 	}
 
@@ -3753,15 +4071,65 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		final ColumnDefinition colDef = TableColumnFactory.SWIM_CADENCE.createColumn(_swimSlice_ColumnManager, _pc);
 
+		colDef.setIsDefaultColumn();
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 				if (_swimSerie_Cadence != null) {
+
 					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-					cell.setText(_nf1.format(_swimSerie_Cadence[timeSlice.serieIndex]));
+					final short value = _swimSerie_Cadence[timeSlice.serieIndex];
+
+					if (value == Short.MIN_VALUE) {
+						cell.setText(UI.EMPTY_STRING);
+					} else {
+						cell.setText(_nf1.format(value));
+					}
+
 				} else {
 					cell.setText(UI.EMPTY_STRING);
 				}
+			}
+		});
+	}
+
+	/**
+	 * 1. column will be hidden because the alignment for the first column is always to the left
+	 */
+	private void defineColumn_SwimSlice_Data_1_First() {
+
+		final ColumnDefinition colDef = TableColumnFactory.DATA_FIRST_COLUMN.createColumn(_swimSlice_ColumnManager, _pc);
+
+		colDef.setIsDefaultColumn();
+		colDef.setCanModifyVisibility(false);
+		colDef.setIsColumnMoveable(false);
+		colDef.setHideColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {}
+		});
+	}
+
+	/**
+	 * column: #
+	 */
+	private void defineColumn_SwimSlice_Data_Sequence() {
+
+		final ColumnDefinition colDef = TableColumnFactory.DATA_SEQUENCE.createColumn(_swimSlice_ColumnManager, _pc);
+
+		colDef.setIsDefaultColumn();
+		colDef.setCanModifyVisibility(false);
+		colDef.setIsColumnMoveable(false);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final int logIndex = ((TimeSlice) cell.getElement()).uniqueCreateIndex;
+
+				// the UI shows the time slice number starting with 1 and not with 0
+				cell.setText(Integer.toString(logIndex + 0));
+				cell.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 			}
 		});
 	}
@@ -3781,6 +4149,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_colDefAltitude = colDef = TableColumnFactory.ALTITUDE_ALTITUDE.createColumn(_timeSlice_ColumnManager, _pc);
 
 		colDef.setIsDefaultColumn();
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -4538,7 +4907,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		final boolean isCellEditorInactive = _isCellEditorActive == false;
 
 		final CTabItem selectedTab = _tabFolder.getSelection();
-		final boolean isTableViewerTab = selectedTab == _tab_20_TimeSlices;
+		final boolean isTimeSlice_ViewerTab = selectedTab == _tab_20_TimeSlices;
+		final boolean isSwimSlice_ViewerTab = selectedTab == _tab_30_SwimSlices;
 		final boolean isTourData = _tourData != null;
 
 		final boolean canUseTool = _isEditMode && isTourValid && (_isManualTour == false);
@@ -4568,12 +4938,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		_actionToggleRowSelectMode.setEnabled(
 				isCellEditorInactive
-						&& isTableViewerTab
+						&& isTimeSlice_ViewerTab
 						&& isTourValid
 						&& (_isManualTour == false));
 		_actionToggleReadEditMode.setEnabled(isCellEditorInactive && isTourInDb);
 
-		_actionModifyColumns.setEnabled(isCellEditorInactive && isTableViewerTab);// && isTourValid);
+		_actionModify_TimeSliceColumns.setEnabled(isCellEditorInactive && isTimeSlice_ViewerTab);
+		_actionModify_SwimSliceColumns.setEnabled(isCellEditorInactive && isSwimSlice_ViewerTab);
 
 		_actionSetStartDistanceTo_0.setEnabled(//
 				isCellEditorInactive && isNotManualTour && canEdit && isDistanceLargerThan0);
@@ -4806,7 +5177,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		menuMgr.add(_actionUndoChanges);
 		menuMgr.add(new Separator());
 
-		menuMgr.add(_actionModifyColumns);
+		menuMgr.add(_actionModify_TimeSliceColumns);
+		menuMgr.add(_actionModify_SwimSliceColumns);
 	}
 
 	/**
@@ -4938,18 +5310,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 
 		return sliderSelection;
-	}
-
-	@Override
-	public ColumnManager getColumnManager() {
-
-		final CTabItem selectedTab = _tabFolder.getSelection();
-
-		if (selectedTab == _tab_20_TimeSlices) {
-			return _timeSlice_ColumnManager;
-		}
-
-		return null;
 	}
 
 //	@Override
@@ -5200,18 +5560,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 	}
 
-	@Override
-	public ColumnViewer getViewer() {
-
-		final CTabItem selectedTab = _tabFolder.getSelection();
-
-		if (selectedTab == _tab_20_TimeSlices) {
-			return _timeSlice_Viewer;
-		}
-
-		return null;
-	}
-
 	private int getWindDirectionTextIndex(final int degreeDirection) {
 
 		final float degree = (degreeDirection + 22.5f) / 45.0f;
@@ -5248,17 +5596,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				: _pc.convertWidthInCharsToPixels(_isOSX ? 14 : 7);
 
 		_hintValueFieldWidth = _pc.convertWidthInCharsToPixels(10);
-	}
-
-	@Override
-	public boolean isColumn0Visible(final ColumnViewer columnViewer) {
-
-		if (columnViewer == _timeSlice_Viewer) {
-			// first column is hidden, this is a super hack that the second column can be right aligned
-			return false;
-		}
-
-		return true;
 	}
 
 	/**
@@ -5780,14 +6117,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private void onSelectTab() {
 
-		if (_tabFolder.getSelection() == _tab_20_TimeSlices) {
+		final CTabItem selectedTab = _tabFolder.getSelection();
 
-			if (_timeSliceViewerTourId == -1L) {
+		if (selectedTab == _tab_20_TimeSlices) {
+
+			if (_timeSlice_ViewerTourId == -1L) {
 
 				// load viewer when this is was not yet done
-				_timeSliceViewerTourId = _tourData.getTourId();
+				_timeSlice_ViewerTourId = _tourData.getTourId();
 
-				reloadViewer();
+				_timeSlice_TourViewer.reloadViewer();
 				updateStatusLine();
 
 				// run asynch because relaodViewer is also running asynch
@@ -5799,8 +6138,31 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 							return;
 						}
 
-						selectTimeSlice(_sliceViewerXSliderPosition);
 						_timeSlice_Viewer.getTable().setFocus();
+					}
+				});
+			}
+
+		} else if (selectedTab == _tab_30_SwimSlices) {
+
+			if (_swimSlice_ViewerTourId == -1L) {
+
+				// load viewer when this is was not yet done
+				_swimSlice_ViewerTourId = _tourData.getTourId();
+
+				_swimSlice_TourViewer.reloadViewer();
+//				updateStatusLine();
+
+				// run asynch because relaodViewer is also running asynch
+				Display.getCurrent().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+
+						if (_swimSlice_Viewer.getTable().isDisposed()) {
+							return;
+						}
+
+						_swimSlice_Viewer.getTable().setFocus();
 					}
 				});
 			}
@@ -5898,62 +6260,23 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private void recreateViewer() {
 
-		// recreate slice viewer
+		/*
+		 * Recreate time slice viewer
+		 */
 		_timeSlice_ColumnManager.saveState(_stateTimeSlice);
 		_timeSlice_ColumnManager.clearColumns();
 
 		defineAllColumns_TimeSlices();
-		_timeSlice_Viewer = (TableViewer) recreateViewer(_timeSlice_Viewer);
-	}
+		_timeSlice_Viewer = (TableViewer) _timeSlice_TourViewer.recreateViewer(_timeSlice_Viewer);
 
-	@Override
-	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
+		/*
+		 * Recreate swim slice viewer
+		 */
+		_swimSlice_ColumnManager.saveState(_stateSwimSlice);
+		_swimSlice_ColumnManager.clearColumns();
 
-		final ColumnViewer[] newColumnViewer = new ColumnViewer[1];
-
-		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-
-			private void recreateTimeSliceViewer() {
-
-				// preserve column width, selection and focus
-				final ISelection selection = _timeSlice_Viewer.getSelection();
-
-				final Table table = _timeSlice_Viewer.getTable();
-				final boolean isFocus = table.isFocusControl();
-
-				_timeSliceViewerContainer.setRedraw(false);
-				{
-					table.dispose();
-
-					createUI_Tab_22_TimeSliceViewer(_timeSliceViewerContainer);
-
-					_timeSliceViewerContainer.layout();
-
-					// update the viewer
-					_timeSlice_ViewerItems = getSliceViewerItems().__timeSlice_ViewerItems;
-					_timeSlice_Viewer.setInput(_timeSlice_ViewerItems);
-				}
-				_timeSliceViewerContainer.setRedraw(true);
-
-				_timeSlice_Viewer.setSelection(selection, true);
-
-				if (isFocus) {
-					_timeSlice_Viewer.getTable().setFocus();
-				}
-
-				newColumnViewer[0] = _timeSlice_Viewer;
-			}
-
-			@Override
-			public void run() {
-
-				if (columnViewer == _timeSlice_Viewer) {
-					recreateTimeSliceViewer();
-				}
-			}
-		});
-
-		return newColumnViewer[0];
+		defineAllColumns_SwimSlices();
+		_swimSlice_Viewer = (TableViewer) _swimSlice_TourViewer.recreateViewer(_swimSlice_Viewer);
 	}
 
 	private TourData reloadTourData() {
@@ -5976,62 +6299,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		tourManager.removeTourFromCache(tourId);
 
 		return tourManager.getTourDataFromDb(tourId);
-	}
-
-	/**
-	 * reload the content of the viewer
-	 */
-	@Override
-	public void reloadViewer() {
-
-		Display.getCurrent().asyncExec(new Runnable() {
-
-			private void reloadTimeSliceViewer() {
-
-				final ISelection previousSelection = _timeSlice_Viewer.getSelection();
-
-				final Table table = _timeSlice_Viewer.getTable();
-				if (table.isDisposed()) {
-					return;
-				}
-
-				table.setRedraw(false);
-				{
-					/*
-					 * update the viewer, show busy indicator when it's a large tour or the previous tour
-					 * was large because it takes time to remove the old items
-					 */
-					if (((_tourData != null) && (_tourData.timeSerie != null)
-							&& (_tourData.timeSerie.length > BUSY_INDICATOR_ITEMS))
-							|| (table.getItemCount() > BUSY_INDICATOR_ITEMS)) {
-
-						BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-							@Override
-							public void run() {
-								_timeSlice_ViewerItems = getSliceViewerItems().__timeSlice_ViewerItems;
-								_timeSlice_Viewer.setInput(_timeSlice_ViewerItems);
-							}
-						});
-					} else {
-						_timeSlice_ViewerItems = getSliceViewerItems().__timeSlice_ViewerItems;
-						_timeSlice_Viewer.setInput(_timeSlice_ViewerItems);
-					}
-
-					_timeSlice_Viewer.setSelection(previousSelection, true);
-				}
-				table.setRedraw(true);
-			}
-
-			@Override
-			public void run() {
-
-				final CTabItem selectedTab = _tabFolder.getSelection();
-
-				if (selectedTab == _tab_20_TimeSlices) {
-					reloadTimeSliceViewer();
-				}
-			}
-		});
 	}
 
 	private void restoreState_BeforeUI() {
@@ -6092,6 +6359,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		// viewer state
 		_timeSlice_ColumnManager.saveState(_stateTimeSlice);
+		_swimSlice_ColumnManager.saveState(_stateSwimSlice);
 
 		// editor state
 		_state.put(STATE_SECTION_CHARACTERISTICS, _sectionCharacteristics.isExpanded());
@@ -6448,9 +6716,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 	}
 
-	@Override
-	public void updateColumnHeader(final ColumnDefinition colDef) {}
-
 	private void updateInternalUnitValues() {
 
 		_unitValueDistance = net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
@@ -6669,8 +6934,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		 * set slice viewer dirty when the time slice tab is not selected -> slice viewer was not
 		 * updated in updateUIAfterSliceEdit()
 		 */
-		if (_tabFolder.getSelection() != _tab_20_TimeSlices) {
-			_timeSliceViewerTourId = -1;
+		final CTabItem selectedTab = _tabFolder.getSelection();
+		if (selectedTab != _tab_20_TimeSlices) {
+
+			_timeSlice_ViewerTourId = -1;
+
+		} else if (selectedTab != _tab_30_SwimSlices) {
+
+			_swimSlice_ViewerTourId = -1;
 		}
 	}
 
@@ -6682,7 +6953,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		getDataSeriesFromTourData();
 
 		// refresh the whole viewer because the computed data series could have been changed
-		final ColumnViewer viewer = getViewer();
+		final ColumnViewer viewer = _timeSlice_TourViewer.getViewer();
 		if (viewer != null) {
 			viewer.refresh();
 		}
@@ -6695,12 +6966,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 * updates the fields in the tour data editor and enables actions and controls
 	 *
 	 * @param tourData
-	 * @param forceTimeSliceReload
+	 * @param forceSliceReload
 	 *           <code>true</code> will reload time slices
 	 * @param isDirtyDisabled
 	 */
 	private void updateUI_FromModel(	final TourData tourData,
-												final boolean forceTimeSliceReload,
+												final boolean forceSliceReload,
 												final boolean isDirtyDisabled) {
 
 		if (tourData == null) {
@@ -6739,7 +7010,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				}
 
 				_uiRunnableTourData = tourData;
-				_uiRunnableForceTimeSliceReload = forceTimeSliceReload;
+				_uiRunnableForce_TimeSliceReload = forceSliceReload;
+				_uiRunnableForce_SwimSliceReload = forceSliceReload;
 				_uiRunnableIsDirtyDisabled = isDirtyDisabled;
 
 				// force reload
@@ -6788,6 +7060,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		updateUI_Tab_1_Tour();
 		updateUI_Tab_2_TimeSlices();
+		updateUI_Tab_3_SwimSlices();
 		updateUI_ReferenceTourRanges();
 
 		enableActions();
@@ -7013,26 +7286,52 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private void updateUI_Tab_2_TimeSlices() {
 
-		if (_uiRunnableForceTimeSliceReload) {
-			_timeSliceViewerTourId = -1L;
+		if (_uiRunnableForce_TimeSliceReload) {
+			_timeSlice_ViewerTourId = -1L;
 		}
 
-		if ((_tabFolder.getSelection() == _tab_20_TimeSlices) && (_timeSliceViewerTourId != _tourData.getTourId())) {
+		if ((_tabFolder.getSelection() == _tab_20_TimeSlices) && (_timeSlice_ViewerTourId != _tourData.getTourId())) {
 
 			/*
-			 * time slice tab is selected and the viewer is not yeat loaded
+			 * Time slice tab is selected and the viewer is not yeat loaded
 			 */
 
-			reloadViewer();
-			_timeSliceViewerTourId = _tourData.getTourId();
+			_timeSlice_TourViewer.reloadViewer();
+			_timeSlice_ViewerTourId = _tourData.getTourId();
 
 			updateStatusLine();
 
 		} else {
 
-			if (_timeSliceViewerTourId != _tourData.getTourId()) {
+			if (_timeSlice_ViewerTourId != _tourData.getTourId()) {
 				// force reload when it's not yet loaded
-				_timeSliceViewerTourId = -1L;
+				_timeSlice_ViewerTourId = -1L;
+			}
+		}
+	}
+
+	private void updateUI_Tab_3_SwimSlices() {
+
+		if (_uiRunnableForce_SwimSliceReload) {
+			_swimSlice_ViewerTourId = -1L;
+		}
+
+		if ((_tabFolder.getSelection() == _tab_30_SwimSlices) && (_swimSlice_ViewerTourId != _tourData.getTourId())) {
+
+			/*
+			 * Swim slice tab is selected and the viewer is not yeat loaded
+			 */
+
+			_swimSlice_TourViewer.reloadViewer();
+			_swimSlice_ViewerTourId = _tourData.getTourId();
+
+			updateStatusLine();
+
+		} else {
+
+			if (_swimSlice_ViewerTourId != _tourData.getTourId()) {
+				// force reload when it's not yet loaded
+				_swimSlice_ViewerTourId = -1L;
 			}
 		}
 	}
