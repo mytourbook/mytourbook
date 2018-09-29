@@ -240,8 +240,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private final IDialogSettings		_stateTimeSlice					= TourbookPlugin.getState(ID + ".slice");							//$NON-NLS-1$
 	private final IDialogSettings		_stateSwimSlice					= TourbookPlugin.getState(ID + ".swimSlice");					//$NON-NLS-1$
 	//
-	private final boolean				_isOSX								= net.tourbook.common.UI.IS_OSX;
-	private final boolean				_isLinux								= net.tourbook.common.UI.IS_LINUX;
+	private final boolean				_isOSX								= UI.IS_OSX;
+	private final boolean				_isLinux								= UI.IS_LINUX;
 	//
 	/**
 	 * Tour start daytime in seconds
@@ -323,6 +323,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private boolean										_isRowEditMode				= true;
 	private boolean										_isEditMode;
 	private boolean										_isTourDirty				= false;
+	private boolean										_isTourWithSwimData;
 	//
 	/**
 	 * is <code>true</code> when the tour is currently being saved to prevent a modify event or the
@@ -429,13 +430,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/*
 	 * measurement unit values
 	 */
-	private float		_unitValueAltitude;
-
-	private float		_unitValueDistance;
-	private int[]		_unitValueWindSpeed;
-	// pages
-	private PageBook	_pageBook;
-
+	private float	_unitValueAltitude;
+	private float	_unitValueDistance;
+	private int[]	_unitValueWindSpeed;
+	//
 	/*
 	 * actions
 	 */
@@ -476,8 +474,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	// ################################################## UI controls ##################################################
 	//
 
-	private Composite						_pageNoData;
-	private Form							_pageEditorForm;
+	private PageBook						_pageBook;
+	private Composite						_page_NoTourData;
+	private Form							_page_EditorForm;
+
+	private PageBook						_pageBook_Swim;
+	private Composite						_pageSwim_NoData;
+	private Composite						_pageSwim_Data;
 	//
 	private CTabFolder					_tabFolder;
 	private CTabItem						_tab_10_Tour;
@@ -498,7 +501,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	//
 	private ScrolledComposite			_tab1Container;
 	private Composite						_tab2_TimeSlice_Container;
-	private Composite						_tab3_SwimSlice_Container;
 	//
 	private Composite						_swimSliceViewerContainer;
 	private Composite						_timeSliceViewerContainer;
@@ -1452,7 +1454,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 				// time hh:mm:ss
 				if (_serieTime != null) {
-					sb.append(net.tourbook.common.UI.format_hh_mm_ss(_serieTime[serieIndex]));
+					sb.append(UI.format_hh_mm_ss(_serieTime[serieIndex]));
 				}
 				sb.append(UI.TAB);
 
@@ -1516,7 +1518,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 				// pace
 				if (_seriePace != null) {
-					sb.append(net.tourbook.common.UI.format_hhh_mm_ss((long) _seriePace[serieIndex]));
+					sb.append(UI.format_hhh_mm_ss((long) _seriePace[serieIndex]));
 				}
 				sb.append(UI.TAB);
 
@@ -2184,7 +2186,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			setTourClean();
 
-			_pageBook.showPage(_pageNoData);
+			_pageBook.showPage(_page_NoTourData);
 		}
 	}
 
@@ -2556,7 +2558,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		restoreState_WithUI();
 
-		_pageBook.showPage(_pageNoData);
+		_pageBook.showPage(_page_NoTourData);
 
 		displaySelectedTour();
 	}
@@ -2594,17 +2596,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		_pageBook = new PageBook(parent, SWT.NONE);
 
-		_pageNoData = UI.createUI_PageNoData(_pageBook, Messages.UI_Label_no_chart_is_selected);
+		_page_NoTourData = UI.createUI_PageNoData(_pageBook, Messages.UI_Label_no_chart_is_selected);
 
 		_tk = new FormToolkit(parent.getDisplay());
 
-		_pageEditorForm = _tk.createForm(_pageBook);
-		MTFont.setHeaderFont(_pageEditorForm);
-		_tk.decorateFormHeading(_pageEditorForm);
+		_page_EditorForm = _tk.createForm(_pageBook);
+		MTFont.setHeaderFont(_page_EditorForm);
+		_tk.decorateFormHeading(_page_EditorForm);
 
-		_messageManager = new MessageManager(_pageEditorForm);
+		_messageManager = new MessageManager(_page_EditorForm);
 
-		final Composite formBody = _pageEditorForm.getBody();
+		final Composite formBody = _page_EditorForm.getBody();
 		GridLayoutFactory.fillDefaults().applyTo(formBody);
 		formBody.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 
@@ -3667,7 +3669,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				_linkTag.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
-						net.tourbook.common.UI.openControlMenu(_linkTag);
+						UI.openControlMenu(_linkTag);
 					}
 				});
 				_tk.adapt(_linkTag, true, true);
@@ -3694,7 +3696,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				_linkTourType.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
-						net.tourbook.common.UI.openControlMenu(_linkTourType);
+						UI.openControlMenu(_linkTourType);
 					}
 				});
 				_tk.adapt(_linkTourType, true, true);
@@ -3845,6 +3847,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		table.setHeaderVisible(true);
+		table.setHeaderBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 		table.setLinesVisible(true);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
 
@@ -3922,7 +3925,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		menuMgr.addMenuListener(new IMenuListener() {
 			@Override
 			public void menuAboutToShow(final IMenuManager manager) {
-				fillSliceContextMenu(manager);
+				fillTimeSlice_ContextMenu(manager);
 			}
 		});
 
@@ -3933,18 +3936,22 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private Control createUI_Tab_30_SwimSlices(final Composite parent) {
 
-		_tab3_SwimSlice_Container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(_tab3_SwimSlice_Container);
-		GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(_tab3_SwimSlice_Container);
+		_pageBook_Swim = new PageBook(parent, SWT.NONE);
+
+		_pageSwim_NoData = UI.createUI_PageNoData(_pageBook_Swim, Messages.Tour_Editor_NoSwimData);
+
+		_pageSwim_Data = new Composite(_pageBook_Swim, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageSwim_Data);
+		GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(_pageSwim_Data);
 		{
-			_swimSliceViewerContainer = new Composite(_tab3_SwimSlice_Container, SWT.NONE);
+			_swimSliceViewerContainer = new Composite(_pageSwim_Data, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, true).applyTo(_swimSliceViewerContainer);
 			GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(_swimSliceViewerContainer);
 
 			createUI_Tab_32_SwimSliceViewer(_swimSliceViewerContainer);
 		}
 
-		return _tab3_SwimSlice_Container;
+		return _pageBook_Swim;
 	}
 
 	private void createUI_Tab_32_SwimSliceViewer(final Composite parent) {
@@ -3954,11 +3961,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		table.setHeaderVisible(true);
+		table.setHeaderBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 		table.setLinesVisible(true);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
 
-//		createUI_Tab_24_SliceViewerContextMenu(table);
-//
+		createUI_Tab_34_SwimSliceViewerContextMenu(table);
+
 //		table.addKeyListener(new KeyAdapter() {
 //			@Override
 //			public void keyPressed(final KeyEvent e) {
@@ -4017,6 +4025,23 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		table.getColumn(0).setWidth(0);
 	}
 
+	private void createUI_Tab_34_SwimSliceViewerContextMenu(final Table table) {
+
+		final MenuManager menuMgr = new MenuManager();
+
+		menuMgr.setRemoveAllWhenShown(true);
+		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
+			public void menuAboutToShow(final IMenuManager manager) {
+//				fillSliceContextMenu(manager);
+			}
+		});
+
+		final Menu tableContextMenu = menuMgr.createContextMenu(table);
+
+		_swimSlice_ColumnManager.createHeaderContextMenu(table, tableContextMenu);
+	}
+
 	private void defineAllColumns_SwimSlices() {
 
 //		public int[]		swim_Time;
@@ -4026,10 +4051,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 //		public short[]		swim_Cadence;
 //		private float[]	_swim_Swolf;
 
-//		defineColumn_SwimSlice_Data_1_First();
+		defineColumn_SwimSlice_Data_1_First();
 		defineColumn_SwimSlice_Data_Sequence();
-//		defineColumn_SwimSlice_Time();
-		defineColumn_SwimSlice_Cadence();
+
+		defineColumn_SwimSlice_Time_TimeInHHMMSSRelative();
+		defineColumn_SwimSlice_Time_TimeOfDay();
+		defineColumn_SwimSlice_Time_TimeInSeconds();
+		defineColumn_SwimSlice_Time_TimeDiff();
+
+		defineColumn_SwimSlice_Swim_Strokes();
+		defineColumn_SwimSlice_Swim_Cadence();
 	}
 
 	private void defineAllColumns_TimeSlices() {
@@ -4067,33 +4098,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		defineColumn_TimeSlice_Power();
 	}
 
-	private void defineColumn_SwimSlice_Cadence() {
-
-		final ColumnDefinition colDef = TableColumnFactory.SWIM_CADENCE.createColumn(_swimSlice_ColumnManager, _pc);
-
-		colDef.setIsDefaultColumn();
-
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				if (_swimSerie_Cadence != null) {
-
-					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-					final short value = _swimSerie_Cadence[timeSlice.serieIndex];
-
-					if (value == Short.MIN_VALUE) {
-						cell.setText(UI.EMPTY_STRING);
-					} else {
-						cell.setText(_nf1.format(value));
-					}
-
-				} else {
-					cell.setText(UI.EMPTY_STRING);
-				}
-			}
-		});
-	}
-
 	/**
 	 * 1. column will be hidden because the alignment for the first column is always to the left
 	 */
@@ -4128,15 +4132,156 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				final int logIndex = ((TimeSlice) cell.getElement()).uniqueCreateIndex;
 
 				// the UI shows the time slice number starting with 1 and not with 0
-				cell.setText(Integer.toString(logIndex + 0));
+				cell.setText(Integer.toString(logIndex + 1));
 				cell.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 			}
 		});
 	}
 
-	private void defineColumn_SwimSlice_Time() {
-		// TODO Auto-generated method stub
+	private void defineColumn_SwimSlice_Swim_Cadence() {
 
+		final ColumnDefinition colDef = TableColumnFactory.SWIM_CADENCE.createColumn(_swimSlice_ColumnManager, _pc);
+
+		colDef.setIsDefaultColumn();
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				if (_swimSerie_Cadence != null) {
+
+					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+					final short value = _swimSerie_Cadence[timeSlice.serieIndex];
+
+					if (value == Short.MIN_VALUE) {
+						cell.setText(UI.EMPTY_STRING);
+					} else {
+						cell.setText(Integer.toString(value));
+					}
+
+				} else {
+					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
+	}
+
+	private void defineColumn_SwimSlice_Swim_Strokes() {
+
+		final ColumnDefinition colDef = TableColumnFactory.SWIM_STROKES.createColumn(_swimSlice_ColumnManager, _pc);
+
+		colDef.setIsDefaultColumn();
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				if (_swimSerie_Strokes != null) {
+
+					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+					final short value = _swimSerie_Strokes[timeSlice.serieIndex];
+
+					if (value == Short.MIN_VALUE) {
+						cell.setText(UI.EMPTY_STRING);
+					} else {
+						cell.setText(Integer.toString(value));
+					}
+
+				} else {
+					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: time difference in seconds to previous slice
+	 */
+	private void defineColumn_SwimSlice_Time_TimeDiff() {
+
+		final ColumnDefinition colDef = TableColumnFactory.SWIM_TIME_TOUR_TIME_DIFF.createColumn(_swimSlice_ColumnManager, _pc);
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				if (_swimSerie_Time != null) {
+					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+					final int serieIndex = timeSlice.serieIndex;
+					if (serieIndex == 0) {
+						cell.setText(Integer.toString(0));
+					} else {
+						cell.setText(Integer.toString(_swimSerie_Time[serieIndex] - _swimSerie_Time[serieIndex - 1]));
+					}
+				} else {
+					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: time hh:mm:ss relative to tour start
+	 */
+	private void defineColumn_SwimSlice_Time_TimeInHHMMSSRelative() {
+
+		final ColumnDefinition colDef = TableColumnFactory.SWIM_TIME_TOUR_TIME_HH_MM_SS.createColumn(_swimSlice_ColumnManager, _pc);
+
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
+				if (_swimSerie_Time != null) {
+					cell.setText(UI.format_hh_mm_ss(_swimSerie_Time[serieIndex]));
+				} else {
+					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: time in seconds
+	 */
+	private void defineColumn_SwimSlice_Time_TimeInSeconds() {
+
+		final ColumnDefinition colDef = TableColumnFactory.SWIM_TIME_TOUR_TIME.createColumn(_swimSlice_ColumnManager, _pc);
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				if (_swimSerie_Time != null) {
+					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+					final int serieIndex = timeSlice.serieIndex;
+					cell.setText(Integer.toString(_swimSerie_Time[serieIndex]));
+				} else {
+					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: time of day in hh:mm:ss
+	 */
+	private void defineColumn_SwimSlice_Time_TimeOfDay() {
+
+		final ColumnDefinition colDef = TableColumnFactory.SWIM_TIME_TOUR_TIME_OF_DAY_HH_MM_SS.createColumn(_swimSlice_ColumnManager, _pc);
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				if (_swimSerie_Time == null) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+
+					final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
+
+					cell.setText(UI.format_hh_mm_ss(_tourStartDayTime + _swimSerie_Time[serieIndex]));
+				}
+			}
+		});
 	}
 
 	/**
@@ -4249,7 +4394,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				final int logIndex = ((TimeSlice) cell.getElement()).uniqueCreateIndex;
 
 				// the UI shows the time slice number starting with 1 and not with 0
-				cell.setText(Integer.toString(logIndex + 0));
+				cell.setText(Integer.toString(logIndex + 1));
 
 				// mark reference tour with a different background color
 				boolean isBgSet = false;
@@ -4414,7 +4559,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
 					final long pace = (long) _seriePace[timeSlice.serieIndex];
 
-					cell.setText(net.tourbook.common.UI.format_mm_ss(pace));
+					cell.setText(UI.format_mm_ss(pace));
 				}
 			}
 		});
@@ -4635,9 +4780,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 */
 	private void defineColumn_TimeSlice_Time_TimeInHHMMSSRelative() {
 
-		final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_TIME_HH_MM_SS.createColumn(
-				_timeSlice_ColumnManager,
-				_pc);
+		final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_TIME_HH_MM_SS.createColumn(_timeSlice_ColumnManager, _pc);
 
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -4645,7 +4788,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			public void update(final ViewerCell cell) {
 				final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
 				if (_serieTime != null) {
-					cell.setText(net.tourbook.common.UI.format_hh_mm_ss(_serieTime[serieIndex]));
+					cell.setText(UI.format_hh_mm_ss(_serieTime[serieIndex]));
 				} else {
 					cell.setText(UI.EMPTY_STRING);
 				}
@@ -4680,9 +4823,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 */
 	private void defineColumn_TimeSlice_Time_TimeOfDay() {
 
-		final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_TIME_OF_DAY_HH_MM_SS.createColumn(
-				_timeSlice_ColumnManager,
-				_pc);
+		final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_TIME_OF_DAY_HH_MM_SS.createColumn(_timeSlice_ColumnManager, _pc);
 
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -4694,7 +4835,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 					final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
 
-					cell.setText(net.tourbook.common.UI.format_hh_mm_ss(_tourStartDayTime + _serieTime[serieIndex]));
+					cell.setText(UI.format_hh_mm_ss(_tourStartDayTime + _serieTime[serieIndex]));
 				}
 			}
 		});
@@ -5123,7 +5264,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 	}
 
-	private void fillSliceContextMenu(final IMenuManager menuMgr) {
+	private void fillTimeSlice_ContextMenu(final IMenuManager menuMgr) {
 
 		menuMgr.add(_actionCreateTourMarker);
 		menuMgr.add(_actionOpenMarkerDialog);
@@ -5812,7 +5953,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					 */
 
 					// hide title
-					_pageEditorForm.setText(UI.EMPTY_STRING);
+					_page_EditorForm.setText(UI.EMPTY_STRING);
 
 					// show info
 					_messageManager.addMessage(
@@ -6610,7 +6751,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 // !!! disabled because the first field gets the focus !!!
 //		fTabFolder.setFocus();
 
-		_pageEditorForm.setFocus();
+		_page_EditorForm.setFocus();
 	}
 
 	/**
@@ -6975,7 +7116,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 												final boolean isDirtyDisabled) {
 
 		if (tourData == null) {
-			_pageBook.showPage(_pageNoData);
+			_pageBook.showPage(_page_NoTourData);
 			return;
 		}
 
@@ -7033,7 +7174,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		_uiRunnableCounter = _uiUpdateCounter;
 
-		if (_pageEditorForm.isDisposed() || (_uiRunnableTourData == null)) {
+		if (_page_EditorForm.isDisposed() || (_uiRunnableTourData == null)) {
 			// widget is disposed or data is not set
 			return;
 		}
@@ -7042,6 +7183,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		// keep tour data
 		_tourData = _uiRunnableTourData;
+		_isTourWithSwimData = _tourData.swim_Time != null;
 
 		updateMarkerMap();
 
@@ -7051,9 +7193,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		// show tour type image when tour type is set
 		final TourType tourType = _uiRunnableTourData.getTourType();
 		if (tourType == null) {
-			_pageEditorForm.setImage(null);
+			_page_EditorForm.setImage(null);
 		} else {
-			_pageEditorForm.setImage(TourTypeImage.getTourTypeImage(tourType.getTypeId()));
+			_page_EditorForm.setImage(TourTypeImage.getTourTypeImage(tourType.getTypeId()));
 		}
 
 		updateUI_TitleAsynch(getTourTitle());
@@ -7071,7 +7213,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				NLS.bind(Messages.TourEditor_Action_SetStartDistanceTo0, UI.UNIT_LABEL_DISTANCE));
 
 		// show editor page
-		_pageBook.showPage(_pageEditorForm);
+		_pageBook.showPage(_page_EditorForm);
+		_pageBook_Swim.showPage(_isTourWithSwimData ? _pageSwim_Data : _pageSwim_NoData);
 
 		_isSetField = false;
 	}
@@ -7479,7 +7622,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			@Override
 			public void run() {
 
-				if (_pageEditorForm.isDisposed()) {
+				if (_page_EditorForm.isDisposed()) {
 					return;
 				}
 
@@ -7489,7 +7632,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					return;
 				}
 
-				_pageEditorForm.setText(title);
+				_page_EditorForm.setText(title);
 			}
 		});
 	}

@@ -2183,6 +2183,7 @@ public class Messages extends NLS {
 	public static String	Tour_Editor_Link_SetDefautTimeZone_Tooltip;
 	public static String	Tour_Editor_Link_SetGeoTimeZone;
 	public static String	Tour_Editor_Link_SetGeoTimeZone_Tooltip;
+	public static String Tour_Editor_NoSwimData;
 	public static String	Tour_Editor_Radio_Cadence_Rpm;
 	public static String	Tour_Editor_Radio_Cadence_Spm;
 	public static String	Tour_Editor_TabLabel_SwimSlices;
