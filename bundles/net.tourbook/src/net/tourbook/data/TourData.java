@@ -1444,9 +1444,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * set.
 	 */
 	@Transient
-	public short[]		swim_ActivityType;
+	public short[]		swim_LengthType;
 	@Transient
-	private float[]	_swim_ActivityType_UI;
+	private float[]	_swim_LengthType_UI;
 
 	/**
 	 * Swimming data: Number of strokes. Contains {@link Short#MIN_VALUE} when value is not set.
@@ -1739,10 +1739,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		_runDyn_VerticalRatio_UI = null;
 	}
 
-	public void clear_Swim_ActivityType() {
+	public void clear_swim_LengthType() {
 
-		swim_ActivityType = null;
-		_swim_ActivityType_UI = null;
+		swim_LengthType = null;
+		_swim_LengthType_UI = null;
 	}
 
 	public void clear_Swim_Cadence() {
@@ -1825,7 +1825,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		_runDyn_VerticalOscillation_UI_Imperial = null;
 		_runDyn_VerticalRatio_UI = null;
 
-		_swim_ActivityType_UI = null;
+		_swim_LengthType_UI = null;
 		_swim_Cadence_UI = null;
 		_swim_Strokes_UI = null;
 		_swim_StrokeStyle_UI = null;
@@ -8231,7 +8231,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		runDyn_VerticalRatio = serieData.runDyn_VerticalRatio;
 
 		// swimming
-		swim_ActivityType = serieData.swim_ActivityType;
+		swim_LengthType = serieData.swim_LengthType;
 		swim_Cadence = serieData.swim_Cadence;
 		swim_Strokes = serieData.swim_Strokes;
 		swim_StrokeStyle = serieData.swim_StrokeStyle;
@@ -8284,7 +8284,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		serieData.runDyn_VerticalOscillation = runDyn_VerticalOscillation;
 
 		// swimming
-		serieData.swim_ActivityType = swim_ActivityType;
+		serieData.swim_LengthType = swim_LengthType;
 		serieData.swim_Cadence = swim_Cadence;
 		serieData.swim_Strokes = swim_Strokes;
 		serieData.swim_StrokeStyle = swim_StrokeStyle;

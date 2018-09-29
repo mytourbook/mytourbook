@@ -352,19 +352,19 @@ public class FitContext {
 
 				final int swimDataSize = allTourSwimData.size();
 
-				final short[] activityType = new short[swimDataSize];
+				final short[] lengthType = new short[swimDataSize];
 				final short[] cadence = new short[swimDataSize];
 				final short[] strokes = new short[swimDataSize];
 				final short[] strokeStyle = new short[swimDataSize];
 				final int[] swimTime = new int[swimDataSize];
 
-				tourData.swim_ActivityType = activityType;
+				tourData.swim_LengthType = lengthType;
 				tourData.swim_Cadence = cadence;
 				tourData.swim_Strokes = strokes;
 				tourData.swim_StrokeStyle = strokeStyle;
 				tourData.swim_Time = swimTime;
 
-				boolean isSwimActivityType = false;
+				boolean isSwimLengthType = false;
 				boolean isSwimCadence = false;
 				boolean isSwimStrokes = false;
 				boolean isSwimStrokeStyle = false;
@@ -377,13 +377,13 @@ public class FitContext {
 					final long absoluteSwimTime = swimData.absoluteTime;
 					final short relativeSwimTime = (short) ((absoluteSwimTime - tourStartTime) / 1000);
 
-					final short swimActivityType = swimData.swim_ActivityType;
+					final short swimLengthType = swimData.swim_LengthType;
 					final short swimCadence = swimData.swim_Cadence;
 					final short swimStrokes = swimData.swim_Strokes;
 					final short swimStrokeStyle = swimData.swim_StrokeStyle;
 
-					if (swimActivityType != Short.MIN_VALUE && swimActivityType > 0) {
-						isSwimActivityType = true;
+					if (swimLengthType != Short.MIN_VALUE && swimLengthType > 0) {
+						isSwimLengthType = true;
 					}
 					if (swimCadence != Short.MIN_VALUE && swimCadence > 0) {
 						isSwimCadence = true;
@@ -398,7 +398,7 @@ public class FitContext {
 						isSwimTime = true;
 					}
 
-					activityType[swimSerieIndex] = swimActivityType;
+					lengthType[swimSerieIndex] = swimLengthType;
 					cadence[swimSerieIndex] = swimCadence;
 					strokes[swimSerieIndex] = swimStrokes;
 					strokeStyle[swimSerieIndex] = swimStrokeStyle;
@@ -408,8 +408,8 @@ public class FitContext {
 				/*
 				 * Cleanup data series
 				 */
-				if (isSwimActivityType == false) {
-					tourData.swim_ActivityType = null;
+				if (isSwimLengthType == false) {
+					tourData.swim_LengthType = null;
 				}
 				if (isSwimStrokes == false) {
 					tourData.swim_Strokes = null;

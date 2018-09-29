@@ -290,7 +290,7 @@ public class FitContextData {
 		swimData.absoluteTime = javaTime;
 
 		if (lengthType != null) {
-			swimData.swim_ActivityType = lengthType.getValue();
+			swimData.swim_LengthType = lengthType.getValue();
 		}
 
 		if (avgSwimmingCadence != null) {

@@ -726,7 +726,7 @@ public class TourManager {
 		final short[]               toRunDyn_VertOscillation   = multiTourData.runDyn_VerticalOscillation = new short[numTimeSlices];
 		final short[]               toRunDyn_VertRatio         = multiTourData.runDyn_VerticalRatio = new short[numTimeSlices];
 
-		final short[]               toSwim_ActivityType        = multiTourData.swim_ActivityType = new short[numSwimTimeSlices];
+		final short[]               toswim_LengthType        = multiTourData.swim_LengthType = new short[numSwimTimeSlices];
 		final short[]               toSwim_Cadence             = multiTourData.swim_Cadence = new short[numSwimTimeSlices];
 		final short[]               toSwim_Strokes             = multiTourData.swim_Strokes = new short[numSwimTimeSlices];
 		final short[]               toSwim_StrokeStyle         = multiTourData.swim_StrokeStyle = new short[numSwimTimeSlices];
@@ -769,7 +769,7 @@ public class TourManager {
 		boolean isRunDyn_VerticalOscillation = false;
 		boolean isRunDyn_VerticalRatio       = false;
 
-		boolean isSwim_ActivityType          = false;
+		boolean isswim_LengthType          = false;
 		boolean isSwim_Cadence               = false;
 		boolean isSwim_Strokes               = false;
 		boolean isSwim_StrokeStyle           = false;
@@ -802,7 +802,7 @@ public class TourManager {
 			final short[]  fromRunDyn_VertOscillation   = fromTourData.runDyn_VerticalOscillation;
 			final short[]  fromRunDyn_VertRatio         = fromTourData.runDyn_VerticalRatio;
 
-			final short[]  fromSwim_ActivityType        = fromTourData.swim_ActivityType;
+			final short[]  fromswim_LengthType        = fromTourData.swim_LengthType;
 			final short[]  fromSwim_Cadence             = fromTourData.swim_Cadence;
 			final short[]  fromSwim_Strokes             = fromTourData.swim_Strokes;
 			final short[]  fromSwim_StrokeStyle         = fromTourData.swim_StrokeStyle;
@@ -923,9 +923,9 @@ public class TourManager {
 			/*
 			 * Swimming
 			 */
-			if (fromSwim_ActivityType != null) {
-				isSwim_ActivityType = true;
-				System.arraycopy(fromSwim_ActivityType, 0, toSwim_ActivityType, toSwimStartIndex, fromSwimSerieLength);
+			if (fromswim_LengthType != null) {
+				isswim_LengthType = true;
+				System.arraycopy(fromswim_LengthType, 0, toswim_LengthType, toSwimStartIndex, fromSwimSerieLength);
 			}
 			if (fromSwim_Cadence != null) {
 				isSwim_Cadence = true;
@@ -1036,8 +1036,8 @@ public class TourManager {
 		/*
 		 * Swimming
 		 */
-		if (isSwim_ActivityType == false) {
-			multiTourData.clear_Swim_ActivityType();
+		if (isswim_LengthType == false) {
+			multiTourData.clear_swim_LengthType();
 		}
 		if (isSwim_Cadence == false) {
 			multiTourData.clear_Swim_Cadence();

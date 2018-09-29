@@ -267,7 +267,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private boolean[]						_serieBreakTime;
 	//
 	private short[]						_swimSerie_Cadence;
-	private short[]						_swimSerie_ActivityType;
+	private short[]						_swimSerie_LengthType;
 	private short[]						_swimSerie_Strokes;
 	private short[]						_swimSerie_StrokeStyle;
 	private int[]							_swimSerie_Time;
@@ -4045,7 +4045,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private void defineAllColumns_SwimSlices() {
 
 //		public int[]		swim_Time;
-//		public short[]		swim_ActivityType;
+//		public short[]		swim_LengthType;
 //		public short[]		swim_Strokes;
 //		public short[]		swim_StrokeStyle;
 //		public short[]		swim_Cadence;
@@ -5487,7 +5487,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_serieTemperature = _tourData.temperatureSerie;
 
 		_swimSerie_Cadence = _tourData.swim_Cadence;
-		_swimSerie_ActivityType = _tourData.swim_ActivityType;
+		_swimSerie_LengthType = _tourData.swim_LengthType;
 		_swimSerie_Strokes = _tourData.swim_Strokes;
 		_swimSerie_StrokeStyle = _tourData.swim_StrokeStyle;
 		_swimSerie_Time = _tourData.swim_Time;

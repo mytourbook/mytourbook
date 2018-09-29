@@ -1096,7 +1096,7 @@ public class RawDataManager {
 
 			// reimport only swimming
 
-			oldTourData.swim_ActivityType = reimportedTourData.swim_ActivityType;
+			oldTourData.swim_LengthType = reimportedTourData.swim_LengthType;
 			oldTourData.swim_Cadence = reimportedTourData.swim_Cadence;
 			oldTourData.swim_Strokes = reimportedTourData.swim_Strokes;
 			oldTourData.swim_StrokeStyle = reimportedTourData.swim_StrokeStyle;
