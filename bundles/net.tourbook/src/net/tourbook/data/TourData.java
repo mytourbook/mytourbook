@@ -1440,7 +1440,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	public int[]		swim_Time;
 
 	/**
-	 * Swimming data: Activity is defined in {@link com.garmin.fit.LengthType} e.g. active, idle. Contains {@link Short#MIN_VALUE} when value is not
+	 * Swimming data: Activity is defined in {@link LengthType} e.g. active, idle. Contains {@link Short#MIN_VALUE} when value is not
 	 * set.
 	 */
 	@Transient
@@ -1457,7 +1457,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	private float[]	_swim_Strokes_UI;
 
 	/**
-	 * Swimming data: Stroke style is defined in {@link com.garmin.fit.SwimStroke} e.g. freestyle, breaststroke... Contains {@link Short#MIN_VALUE}
+	 * Swimming data: Stroke style is defined in {@link SwimStroke}  e.g. freestyle, breaststroke... Contains {@link Short#MIN_VALUE}
 	 * when value is not set.
 	 */
 	@Transient
@@ -1739,16 +1739,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		_runDyn_VerticalRatio_UI = null;
 	}
 
-	public void clear_swim_LengthType() {
-
-		swim_LengthType = null;
-		_swim_LengthType_UI = null;
-	}
-
 	public void clear_Swim_Cadence() {
 
 		swim_Cadence = null;
 		_swim_Cadence_UI = null;
+	}
+
+	public void clear_swim_LengthType() {
+
+		swim_LengthType = null;
+		_swim_LengthType_UI = null;
 	}
 
 	public void clear_Swim_Strokes() {

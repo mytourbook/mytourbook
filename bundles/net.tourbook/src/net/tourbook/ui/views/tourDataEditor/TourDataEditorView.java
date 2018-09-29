@@ -152,6 +152,7 @@ import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
+import net.tourbook.data.SwimStroke;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourPerson;
@@ -2533,7 +2534,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		// define columns for the swim slice viewer
 		_swimSlice_ColumnManager = new ColumnManager(_swimSlice_TourViewer, _stateSwimSlice);
-//		_swimSlice_ColumnManager.setIsCategoryAvailable(true);
+		_swimSlice_ColumnManager.setIsCategoryAvailable(true);
 		defineAllColumns_SwimSlices();
 
 		restoreState_BeforeUI();
@@ -3847,7 +3848,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		table.setHeaderVisible(true);
-		table.setHeaderBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+
+		// header is disabled because of https://bugs.eclipse.org/bugs/show_bug.cgi?id=536021
+		// Table: right-aligned column header with own background color lacks margin
+//		table.setHeaderBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 		table.setLinesVisible(true);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
 
@@ -3961,7 +3965,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		table.setHeaderVisible(true);
-		table.setHeaderBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+
+		// header is disabled because of https://bugs.eclipse.org/bugs/show_bug.cgi?id=536021
+		// Table: right-aligned column header with own background color lacks margin
+//		table.setHeaderBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 		table.setLinesVisible(true);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
 
@@ -4014,10 +4021,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_swimSlice_Viewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
-//				final StructuredSelection selection = (StructuredSelection) event.getSelection();
-//				if (selection != null) {
-//					fireSliderPosition(selection);
-//				}
+				final StructuredSelection selection = (StructuredSelection) event.getSelection();
+				if (selection != null) {
+					fireSliderPosition(selection);
+				}
 			}
 		});
 
@@ -4060,6 +4067,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		defineColumn_SwimSlice_Time_TimeDiff();
 
 		defineColumn_SwimSlice_Swim_Strokes();
+		defineColumn_SwimSlice_Swim_StrokeStyle();
 		defineColumn_SwimSlice_Swim_Cadence();
 	}
 
@@ -4129,7 +4137,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			@Override
 			public void update(final ViewerCell cell) {
 
-				final int logIndex = ((TimeSlice) cell.getElement()).uniqueCreateIndex;
+				final int logIndex = ((SwimSlice) cell.getElement()).uniqueCreateIndex;
 
 				// the UI shows the time slice number starting with 1 and not with 0
 				cell.setText(Integer.toString(logIndex + 1));
@@ -4140,7 +4148,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private void defineColumn_SwimSlice_Swim_Cadence() {
 
-		final ColumnDefinition colDef = TableColumnFactory.SWIM_CADENCE.createColumn(_swimSlice_ColumnManager, _pc);
+		final ColumnDefinition colDef = TableColumnFactory.SWIM__SWIM_CADENCE.createColumn(_swimSlice_ColumnManager, _pc);
 
 		colDef.setIsDefaultColumn();
 
@@ -4149,7 +4157,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			public void update(final ViewerCell cell) {
 				if (_swimSerie_Cadence != null) {
 
-					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+					final SwimSlice timeSlice = (SwimSlice) cell.getElement();
 					final short value = _swimSerie_Cadence[timeSlice.serieIndex];
 
 					if (value == Short.MIN_VALUE) {
@@ -4167,7 +4175,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private void defineColumn_SwimSlice_Swim_Strokes() {
 
-		final ColumnDefinition colDef = TableColumnFactory.SWIM_STROKES.createColumn(_swimSlice_ColumnManager, _pc);
+		final ColumnDefinition colDef = TableColumnFactory.SWIM__SWIM_STROKES.createColumn(_swimSlice_ColumnManager, _pc);
 
 		colDef.setIsDefaultColumn();
 
@@ -4176,7 +4184,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			public void update(final ViewerCell cell) {
 				if (_swimSerie_Strokes != null) {
 
-					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+					final SwimSlice timeSlice = (SwimSlice) cell.getElement();
 					final short value = _swimSerie_Strokes[timeSlice.serieIndex];
 
 					if (value == Short.MIN_VALUE) {
@@ -4192,19 +4200,46 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		});
 	}
 
+	private void defineColumn_SwimSlice_Swim_StrokeStyle() {
+
+		final ColumnDefinition colDef = TableColumnFactory.SWIM__SWIM_STROKE_STYLE.createColumn(_swimSlice_ColumnManager, _pc);
+
+		colDef.setIsDefaultColumn();
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				if (_swimSerie_StrokeStyle != null) {
+
+					final SwimSlice timeSlice = (SwimSlice) cell.getElement();
+					final short value = _swimSerie_StrokeStyle[timeSlice.serieIndex];
+
+					if (value == Short.MIN_VALUE) {
+						cell.setText(UI.EMPTY_STRING);
+					} else {
+						cell.setText(SwimStroke.getStringFromValue(SwimStroke.getByValue(value)));
+					}
+
+				} else {
+					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
+	}
+
 	/**
 	 * column: time difference in seconds to previous slice
 	 */
 	private void defineColumn_SwimSlice_Time_TimeDiff() {
 
-		final ColumnDefinition colDef = TableColumnFactory.SWIM_TIME_TOUR_TIME_DIFF.createColumn(_swimSlice_ColumnManager, _pc);
+		final ColumnDefinition colDef = TableColumnFactory.SWIM__TIME_TOUR_TIME_DIFF.createColumn(_swimSlice_ColumnManager, _pc);
 
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 
 				if (_swimSerie_Time != null) {
-					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+					final SwimSlice timeSlice = (SwimSlice) cell.getElement();
 					final int serieIndex = timeSlice.serieIndex;
 					if (serieIndex == 0) {
 						cell.setText(Integer.toString(0));
@@ -4223,13 +4258,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 */
 	private void defineColumn_SwimSlice_Time_TimeInHHMMSSRelative() {
 
-		final ColumnDefinition colDef = TableColumnFactory.SWIM_TIME_TOUR_TIME_HH_MM_SS.createColumn(_swimSlice_ColumnManager, _pc);
+		final ColumnDefinition colDef = TableColumnFactory.SWIM__TIME_TOUR_TIME_HH_MM_SS.createColumn(_swimSlice_ColumnManager, _pc);
 
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
-				final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
+				final int serieIndex = ((SwimSlice) cell.getElement()).serieIndex;
 				if (_swimSerie_Time != null) {
 					cell.setText(UI.format_hh_mm_ss(_swimSerie_Time[serieIndex]));
 				} else {
@@ -4244,14 +4279,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 */
 	private void defineColumn_SwimSlice_Time_TimeInSeconds() {
 
-		final ColumnDefinition colDef = TableColumnFactory.SWIM_TIME_TOUR_TIME.createColumn(_swimSlice_ColumnManager, _pc);
+		final ColumnDefinition colDef = TableColumnFactory.SWIM__TIME_TOUR_TIME.createColumn(_swimSlice_ColumnManager, _pc);
 
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 
 				if (_swimSerie_Time != null) {
-					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+					final SwimSlice timeSlice = (SwimSlice) cell.getElement();
 					final int serieIndex = timeSlice.serieIndex;
 					cell.setText(Integer.toString(_swimSerie_Time[serieIndex]));
 				} else {
@@ -4266,7 +4301,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 */
 	private void defineColumn_SwimSlice_Time_TimeOfDay() {
 
-		final ColumnDefinition colDef = TableColumnFactory.SWIM_TIME_TOUR_TIME_OF_DAY_HH_MM_SS.createColumn(_swimSlice_ColumnManager, _pc);
+		final ColumnDefinition colDef = TableColumnFactory.SWIM__TIME_TOUR_TIME_OF_DAY_HH_MM_SS.createColumn(_swimSlice_ColumnManager, _pc);
 
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -4276,7 +4311,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					cell.setText(UI.EMPTY_STRING);
 				} else {
 
-					final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
+					final int serieIndex = ((SwimSlice) cell.getElement()).serieIndex;
 
 					cell.setText(UI.format_hh_mm_ss(_tourStartDayTime + _swimSerie_Time[serieIndex]));
 				}
@@ -5348,15 +5383,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	}
 
 	/**
-	 * select the chart slider(s) according to the selected marker(s)
+	 * Select the chart/map slider(s) according to the selected slices
 	 *
 	 * @return
 	 */
-	private ISelection fireSliderPosition(final StructuredSelection selection) {
+	private void fireSliderPosition(final StructuredSelection selection) {
 
-		final Object[] selectedData = selection.toArray();
-		if ((selectedData == null) || (selectedData.length == 0)) {
-			return null;
+		final Object[] selectedSlices = selection.toArray();
+		if ((selectedSlices == null) || (selectedSlices.length == 0)) {
+			return;
 		}
 
 		if (_tourChart == null) {
@@ -5368,39 +5403,49 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			}
 		}
 
-		final Object firstItem = selectedData[0];
+		final int timeSerieSize = _tourData.timeSerie.length;
 
-		int serieIndex0 = -1;
-		int serieIndex1 = -1;
-		int serieIndex2 = -1;
+		final int numSelectedSlices = selectedSlices.length;
+		final Object slice1 = selectedSlices[0];
 
-		if (selectedData.length > 1) {
+		int serieIndex0 = SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION;
+		int serieIndex1 = SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION;
+		int serieIndex2 = SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION;
 
-			// two or more data are selected, set the 2 sliders to the first and last selected data
+		if (numSelectedSlices == 1) {
 
-			if (firstItem instanceof TimeSlice) {
+			// One slice is selected
 
-				final int serieIndexFirst = ((TimeSlice) firstItem).serieIndex;
+			if (slice1 instanceof SwimSlice) {
 
 				/*
-				 * position slider at the beginning of the first slice
+				 * position slider at the beginning of the slice so that each slice borders has an
+				 * slider
 				 */
-				serieIndex1 = serieIndexFirst > 0 ? serieIndexFirst - 1 : 0;
-				serieIndex2 = ((TimeSlice) selectedData[selectedData.length - 1]).serieIndex;
+				final int swimSerieIndex1 = ((SwimSlice) slice1).serieIndex;
+				final int timeSerieIndex1 = getSerieIndexFromSwimTime(swimSerieIndex1);
 
-			} else if (firstItem instanceof TourMarker) {
+				if (timeSerieIndex1 > 1) {
 
-				serieIndex1 = ((TourMarker) firstItem).getSerieIndex();
-				serieIndex2 = ((TourMarker) selectedData[selectedData.length - 1]).getSerieIndex();
-			}
+					final int swimSerieIndex0 = swimSerieIndex1 - 1;
+					final int timeSerieIndex0 = getSerieIndexFromSwimTime(swimSerieIndex0);
 
-		} else if (selectedData.length > 0) {
+					serieIndex0 = timeSerieIndex0;
+				}
 
-			// one data is selected
+				serieIndex1 = timeSerieIndex1 == timeSerieSize - 1
 
-			if (firstItem instanceof TimeSlice) {
+						// keep slider at the end of the chart
+						? timeSerieSize - 1
 
-				final int serieIndexFirst = ((TimeSlice) firstItem).serieIndex;
+						// adjust slider to the same stroke/swolf value as the left slider
+						: timeSerieIndex1 - 1;
+
+				serieIndex2 = SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION;
+
+			} else if (slice1 instanceof TimeSlice) {
+
+				final int serieIndexFirst = ((TimeSlice) slice1).serieIndex;
 
 				/*
 				 * position slider at the beginning of the slice so that each slice borders has an
@@ -5412,11 +5457,49 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 				serieIndex1 = serieIndexFirst;
 				serieIndex2 = SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION;
+			}
 
-			} else if (firstItem instanceof TourMarker) {
+		} else if (numSelectedSlices > 1) {
 
-				serieIndex1 = ((TourMarker) firstItem).getSerieIndex();
-				serieIndex2 = SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION;
+			// Two or more slices are selected, set the 2 sliders to the first and last selected slices
+
+			if (slice1 instanceof SwimSlice) {
+
+				final int swimSerieIndex1 = ((SwimSlice) slice1).serieIndex;
+				final int swimSerieIndex2 = ((SwimSlice) selectedSlices[numSelectedSlices - 1]).serieIndex;
+
+				final int timeSerieIndex2 = getSerieIndexFromSwimTime(swimSerieIndex2);
+
+				/*
+				 * Position slider at the beginning of the first slice
+				 */
+//				serieIndex1 = timeSerieIndex1 > 0 ? timeSerieIndex1 - 1 : 0;
+
+				serieIndex1 = 0;
+
+				if (swimSerieIndex1 > 0) {
+					final int timeSerieIndex1 = getSerieIndexFromSwimTime(swimSerieIndex1 - 1);
+					serieIndex1 = timeSerieIndex1;
+				}
+
+				serieIndex2 = timeSerieIndex2 == timeSerieSize - 1
+
+						// keep slider at the end of the chart
+						? timeSerieSize - 1
+
+						// adjust slider to the same stroke/swolf value as the left slider
+						: timeSerieIndex2 - 1;
+
+			} else if (slice1 instanceof TimeSlice) {
+
+				final int serieIndexFirst = ((TimeSlice) slice1).serieIndex;
+
+				/*
+				 * Position slider at the beginning of the first slice
+				 */
+				serieIndex1 = serieIndexFirst > 0 ? serieIndexFirst - 1 : 0;
+				serieIndex2 = ((TimeSlice) selectedSlices[numSelectedSlices - 1]).serieIndex;
+
 			}
 		}
 
@@ -5447,21 +5530,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				sliderSelection = xSliderSelection;
 			}
 
-			_postSelectionProvider.setSelection(sliderSelection);
+			if (sliderSelection != null) {
+				_postSelectionProvider.setSelection(sliderSelection);
+			}
 		}
-
-		return sliderSelection;
 	}
-
-//	@Override
-//	public Object getAdapter(final Class adapter) {
-//
-//		if (adapter == ColumnViewer.class) {
-//			return _sliceViewer;
-//		}
-//
-//		return Platform.getAdapterManager().getAdapter(this, adapter);
-//	}
 
 	private void getDataSeriesFromTourData() {
 
@@ -5604,6 +5677,30 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		return tourDataList;
 	}
 
+	/**
+	 * Get time serie index from swim time
+	 */
+	private int getSerieIndexFromSwimTime(final int swimSerieIndex) {
+
+		// check bounds
+		if (swimSerieIndex < 0 || swimSerieIndex >= _swimSerie_Time.length) {
+			return 0;
+		}
+
+		final int swimTime = _swimSerie_Time[swimSerieIndex];
+
+		for (int serieIndex = 0; serieIndex < _serieTime.length; serieIndex++) {
+
+			final int serieTime = _serieTime[serieIndex];
+
+			if (serieTime >= swimTime) {
+				return serieIndex;
+			}
+		}
+
+		return 0;
+	}
+
 //	/**
 //	 * Converts a string into a int value
 //	 *
@@ -5653,9 +5750,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		Object[] swimSlice_ViewerItems = new Object[0];
 		if (_swimSerie_Time != null) {
 
-			swimSlice_ViewerItems = new TimeSlice[_swimSerie_Time.length];
+			swimSlice_ViewerItems = new SwimSlice[_swimSerie_Time.length];
 			for (int serieIndex = 0; serieIndex < swimSlice_ViewerItems.length; serieIndex++) {
-				swimSlice_ViewerItems[serieIndex] = new TimeSlice(serieIndex);
+				swimSlice_ViewerItems[serieIndex] = new SwimSlice(serieIndex);
 			}
 		}
 

@@ -321,9 +321,10 @@ public class Messages extends NLS {
 	public static String				ColumnFactory_SpeedDiff_Tooltip;
 	public static String				ColumnFactory_StrideLength_Label;
 	public static String				ColumnFactory_StrideLength_Tooltip;
-	
+
 	public static String				ColumnFactory_Swim_Strokes_Label;
 	public static String				ColumnFactory_Swim_Strokes_Tooltip;
+	public static String				ColumnFactory_Swim_StrokeStyle_Label;
 	public static String				ColumnFactory_SwimTime_Header;
 	public static String				ColumnFactory_SwimTime_Label;
 	public static String				ColumnFactory_SwimTime_Tooltip;
