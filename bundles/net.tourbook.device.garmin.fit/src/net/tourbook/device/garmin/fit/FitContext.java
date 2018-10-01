@@ -378,22 +378,47 @@ public class FitContext {
 					final short relativeSwimTime = (short) ((absoluteSwimTime - tourStartTime) / 1000);
 
 					final short swimLengthType = swimData.swim_LengthType;
-					final short swimCadence = swimData.swim_Cadence;
-					final short swimStrokes = swimData.swim_Strokes;
+					short swimCadence = swimData.swim_Cadence;
+					short swimStrokes = swimData.swim_Strokes;
 					final short swimStrokeStyle = swimData.swim_StrokeStyle;
 
+					/*
+					 * Length type
+					 */
 					if (swimLengthType != Short.MIN_VALUE && swimLengthType > 0) {
 						isSwimLengthType = true;
 					}
-					if (swimCadence != Short.MIN_VALUE && swimCadence > 0) {
+
+					/*
+					 * Cadence
+					 */
+					if (swimCadence == Short.MIN_VALUE) {
+						swimCadence = 0;
+					}
+					if (swimCadence > 0) {
 						isSwimCadence = true;
 					}
-					if (swimStrokes != Short.MIN_VALUE && swimStrokes > 0) {
+
+					/*
+					 * Strokes
+					 */
+					if (swimStrokes == Short.MIN_VALUE) {
+						swimStrokes = 0;
+					}
+					if (swimStrokes > 0) {
 						isSwimStrokes = true;
 					}
+
+					/*
+					 * Stroke style
+					 */
 					if (swimStrokeStyle != Short.MIN_VALUE && swimStrokeStyle > 0) {
 						isSwimStrokeStyle = true;
 					}
+
+					/*
+					 * Swim time
+					 */
 					if (relativeSwimTime > 0) {
 						isSwimTime = true;
 					}

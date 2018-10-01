@@ -150,6 +150,7 @@ import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer2;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.SwimStroke;
@@ -216,6 +217,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private static final String		WIDGET_KEY_PERSON					= "tourPerson";															//$NON-NLS-1$
 	//
 	private static final String		MESSAGE_KEY_ANOTHER_SELECTION	= "anotherSelection";													//$NON-NLS-1$
+	//
 	/**
 	 * shows the busy indicator to load the slice viewer when there are more items as this value
 	 */
@@ -273,12 +275,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private short[]						_swimSerie_StrokeStyle;
 	private int[]							_swimSerie_Time;
 	//
-	private ColumnDefinition			_colDefAltitude;
-	private ColumnDefinition			_colDefCadence;
-	private ColumnDefinition			_colDefPulse;
-	private ColumnDefinition			_colDefTemperature;
-	private ColumnDefinition			_colDefLatitude;
-	private ColumnDefinition			_colDefLongitude;
+	private ColumnDefinition			_timeSlice_ColDef_Altitude;
+	private ColumnDefinition			_timeSlice_ColDef_Cadence;
+	private ColumnDefinition			_timeSlice_ColDef_Pulse;
+	private ColumnDefinition			_timeSlice_ColDef_Temperature;
+	private ColumnDefinition			_timeSlice_ColDef_Latitude;
+	private ColumnDefinition			_timeSlice_ColDef_Longitude;
+	//
+	private ColumnDefinition			_swimSlice_ColDef_Cadence;
+	private ColumnDefinition			_swimSlice_ColDef_Strokes;
 	//
 	private MessageManager				_messageManager;
 	private PostSelectionProvider		_postSelectionProvider;
@@ -401,12 +406,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private boolean										_uiRunnableForce_SwimSliceReload;
 	private boolean										_uiRunnableIsDirtyDisabled;
 	//
-	private SliceFloatEditingSupport					_altitudeEditingSupport;
-	private SliceFloatEditingSupport					_pulseEditingSupport;
-	private SliceFloatEditingSupport					_temperatureEditingSupport;
-	private SliceFloatEditingSupport					_cadenceEditingSupport;
-	private SliceDoubleEditingSupport				_latitudeEditingSupport;
-	private SliceDoubleEditingSupport				_longitudeEditingSupport;
+	private SliceFloatEditingSupport					_timeSlice_AltitudeEditingSupport;
+	private SliceFloatEditingSupport					_timeSlice_PulseEditingSupport;
+	private SliceFloatEditingSupport					_timeSlice_TemperatureEditingSupport;
+	private SliceFloatEditingSupport					_timeSlice_CadenceEditingSupport;
+	private SliceDoubleEditingSupport				_timeSlice_LatitudeEditingSupport;
+	private SliceDoubleEditingSupport				_timeSlice_LongitudeEditingSupport;
+	//
+	private SliceShortEditingSupport					_swimSlice_CadenceEditingSupport;
+	private SliceShortEditingSupport					_swimSlice_StrokesEditingSupport;
+	//
 	private int												_enableActionCounter		= 0;
 
 	/**
@@ -663,20 +672,35 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		private final TextCellEditor	__cellEditor;
 		private float[]					__dataSerie;
 
+		private boolean					__canEditSlice	= true;
+
 		private SliceFloatEditingSupport(final TextCellEditor cellEditor, final float[] dataSerie) {
+
 			super(_timeSlice_Viewer);
+
 			__cellEditor = cellEditor;
 			__dataSerie = dataSerie;
+
 		}
 
 		@Override
 		protected boolean canEdit(final Object element) {
 
-			if ((__dataSerie == null) || (isTourInDb() == false) || (_isEditMode == false)) {
+			if ((__dataSerie == null)
+					|| (isTourInDb() == false)
+					|| (_isEditMode == false)
+					|| (__canEditSlice == false)
+
+			) {
 				return false;
 			}
 
 			return true;
+		}
+
+		void canEditSlices(final boolean canEditSlices) {
+
+			__canEditSlice = canEditSlices;
 		}
 
 		@Override
@@ -744,6 +768,87 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					if (isTemperatureSerie) {
 						metricValue = UI.convertTemperatureToMetric(enteredValue);
 					}
+
+					final int serieIndex = ((TimeSlice) element).serieIndex;
+					if (metricValue != __dataSerie[serieIndex]) {
+
+						// value has changed
+
+						// update dataserie
+						__dataSerie[serieIndex] = metricValue;
+
+						updateUI_AfterSliceEdit();
+					}
+
+				} catch (final Exception e) {
+					// ignore invalid characters
+				} finally {}
+			}
+		}
+	}
+
+	private final class SliceShortEditingSupport extends EditingSupport {
+
+		private final TextCellEditor	__cellEditor;
+		private short[]					__dataSerie;
+
+		private boolean					__canEditSlice	= true;
+
+		/**
+		 * Flag which indicates for which slice type (time/swim) this editor is used.
+		 */
+//		private int							__sliceType;
+
+		private SliceShortEditingSupport(final TextCellEditor cellEditor, final short[] dataSerie) {
+
+			super(_timeSlice_Viewer);
+
+			__cellEditor = cellEditor;
+			__dataSerie = dataSerie;
+		}
+
+		@Override
+		protected boolean canEdit(final Object element) {
+
+			if ((__dataSerie == null)
+					|| (isTourInDb() == false)
+					|| (_isEditMode == false)
+					|| (__canEditSlice == false)
+
+			) {
+				return false;
+			}
+
+			return true;
+		}
+
+		@Override
+		protected CellEditor getCellEditor(final Object element) {
+			return __cellEditor;
+		}
+
+		@Override
+		protected Object getValue(final Object element) {
+
+			final short metricValue = __dataSerie[((TimeSlice) element).serieIndex];
+			final short displayedValue = metricValue;
+
+			return Short.toString(displayedValue);
+		}
+
+		public void setDataSerie(final short[] dataSerie) {
+			__dataSerie = dataSerie;
+		}
+
+		@Override
+		protected void setValue(final Object element, final Object value) {
+
+			if (value instanceof String) {
+
+				try {
+
+					final short enteredValue = Short.parseShort((String) value);
+					final short metricValue = enteredValue;
 
 					final int serieIndex = ((TimeSlice) element).serieIndex;
 					if (metricValue != __dataSerie[serieIndex]) {
@@ -2908,6 +3013,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				_txtAltitudeUp.addModifyListener(_verifyIntValue);
 				_txtAltitudeUp.setData(WIDGET_KEY, WIDGET_KEY_ALTITUDE_UP);
 				_txtAltitudeUp.addKeyListener(new KeyListener() {
+
 					@Override
 					public void keyPressed(final KeyEvent e) {
 						_isAltitudeManuallyModified = true;
@@ -3073,6 +3179,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 						_linkDefaultTimeZone = new Link(actionContainer, SWT.NONE);
 						_linkDefaultTimeZone.setText(Messages.Tour_Editor_Link_SetDefautTimeZone);
 						_linkDefaultTimeZone.addSelectionListener(new SelectionAdapter() {
+
 							@Override
 							public void widgetSelected(final SelectionEvent e) {
 								actionTimeZone_SetDefault();
@@ -3101,10 +3208,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 						_linkRemoveTimeZone.setText(Messages.Tour_Editor_Link_RemoveTimeZone);
 						_linkRemoveTimeZone.setToolTipText(Messages.Tour_Editor_Link_RemoveTimeZone_Tooltip);
 						_linkRemoveTimeZone.addSelectionListener(new SelectionAdapter() {
+
 							@Override
 							public void widgetSelected(final SelectionEvent e) {
 								actionTimeZone_Remove();
 							}
+
 						});
 						_tk.adapt(_linkRemoveTimeZone, true, true);
 					}
@@ -3695,6 +3804,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				_linkTourType = new Link(container, SWT.NONE);
 				_linkTourType.setText(Messages.tour_editor_label_tour_type);
 				_linkTourType.addSelectionListener(new SelectionAdapter() {
+
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
 						UI.openControlMenu(_linkTourType);
@@ -3704,8 +3814,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				_firstColumnControls.add(_linkTourType);
 
 				_lblTourType = new CLabel(container, SWT.NONE);
-				GridDataFactory
-						.swtDefaults()//
+				GridDataFactory.swtDefaults()//
 						.grab(true, false)
 						.span(3, 1)
 						.applyTo(_lblTourType);
@@ -3717,7 +3826,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				 */
 
 				// label
-				final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_Cadence);
+				final Label label = _tk.createLabel(container,
+						Messages.Tour_Editor_Label_Cadence);
 				label.setToolTipText(Messages.Tour_Editor_Label_Cadence_Tooltip);
 				_firstColumnControls.add(label);
 
@@ -3725,17 +3835,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				GridLayoutFactory.fillDefaults().numColumns(2).applyTo(radioContainer);
 				{
 					// ratio: rpm
-					_rdoCadence_Rpm = _tk.createButton(
-							radioContainer,
-							Messages.Tour_Editor_Radio_Cadence_Rpm,
-							SWT.RADIO);
+					_rdoCadence_Rpm = _tk.createButton(radioContainer, Messages.Tour_Editor_Radio_Cadence_Rpm, SWT.RADIO);
 					_rdoCadence_Rpm.addSelectionListener(_selectionListener);
 
 					// radio: spm
-					_rdoCadence_Spm = _tk.createButton(
-							radioContainer,
-							Messages.Tour_Editor_Radio_Cadence_Spm,
-							SWT.RADIO);
+					_rdoCadence_Spm = _tk.createButton(radioContainer, Messages.Tour_Editor_Radio_Cadence_Spm, SWT.RADIO);
 					_rdoCadence_Spm.addSelectionListener(_selectionListener);
 				}
 			}
@@ -3888,19 +3992,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		 */
 		final TextCellEditor cellEditor = new TextCellEditorCustomized(_timeSlice_Viewer.getTable());
 
-		_altitudeEditingSupport = new SliceFloatEditingSupport(cellEditor, _serieAltitude);
-		_pulseEditingSupport = new SliceFloatEditingSupport(cellEditor, _seriePulse);
-		_temperatureEditingSupport = new SliceFloatEditingSupport(cellEditor, _serieTemperature);
-		_cadenceEditingSupport = new SliceFloatEditingSupport(cellEditor, _serieCadence);
-		_latitudeEditingSupport = new SliceDoubleEditingSupport(cellEditor, _serieLatitude);
-		_longitudeEditingSupport = new SliceDoubleEditingSupport(cellEditor, _serieLongitude);
+		_timeSlice_AltitudeEditingSupport = new SliceFloatEditingSupport(cellEditor, _serieAltitude);
+		_timeSlice_PulseEditingSupport = new SliceFloatEditingSupport(cellEditor, _seriePulse);
+		_timeSlice_TemperatureEditingSupport = new SliceFloatEditingSupport(cellEditor, _serieTemperature);
+		_timeSlice_CadenceEditingSupport = new SliceFloatEditingSupport(cellEditor, _serieCadence);
+		_timeSlice_LatitudeEditingSupport = new SliceDoubleEditingSupport(cellEditor, _serieLatitude);
+		_timeSlice_LongitudeEditingSupport = new SliceDoubleEditingSupport(cellEditor, _serieLongitude);
 
-		_colDefAltitude.setEditingSupport(_altitudeEditingSupport);
-		_colDefPulse.setEditingSupport(_pulseEditingSupport);
-		_colDefTemperature.setEditingSupport(_temperatureEditingSupport);
-		_colDefCadence.setEditingSupport(_cadenceEditingSupport);
-		_colDefLatitude.setEditingSupport(_latitudeEditingSupport);
-		_colDefLongitude.setEditingSupport(_longitudeEditingSupport);
+		_timeSlice_ColDef_Altitude.setEditingSupport(_timeSlice_AltitudeEditingSupport);
+		_timeSlice_ColDef_Pulse.setEditingSupport(_timeSlice_PulseEditingSupport);
+		_timeSlice_ColDef_Temperature.setEditingSupport(_timeSlice_TemperatureEditingSupport);
+		_timeSlice_ColDef_Cadence.setEditingSupport(_timeSlice_CadenceEditingSupport);
+		_timeSlice_ColDef_Latitude.setEditingSupport(_timeSlice_LatitudeEditingSupport);
+		_timeSlice_ColDef_Longitude.setEditingSupport(_timeSlice_LongitudeEditingSupport);
 
 		_timeSlice_ColumnManager.createColumns(_timeSlice_Viewer);
 
@@ -3990,28 +4094,20 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		_swimSlice_Viewer = new TableViewer(table);
 
-//		if (_isRowEditMode == false) {
-//			UI.setCellEditSupport(_timeSliceViewer);
-//		}
+		if (_isRowEditMode == false) {
+			UI.setCellEditSupport(_swimSlice_Viewer);
+		}
 
-//		/*
-//		 * create editing support after the viewer is created but before the columns are created.
-//		 */
-//		final TextCellEditor cellEditor = new TextCellEditorCustomized(_timeSlice_Viewer.getTable());
-//
-//		_altitudeEditingSupport = new SliceFloatEditingSupport(cellEditor, _serieAltitude);
-//		_pulseEditingSupport = new SliceFloatEditingSupport(cellEditor, _seriePulse);
-//		_temperatureEditingSupport = new SliceFloatEditingSupport(cellEditor, _serieTemperature);
-//		_cadenceEditingSupport = new SliceFloatEditingSupport(cellEditor, _serieCadence);
-//		_latitudeEditingSupport = new SliceDoubleEditingSupport(cellEditor, _serieLatitude);
-//		_longitudeEditingSupport = new SliceDoubleEditingSupport(cellEditor, _serieLongitude);
-//
-//		_colDefAltitude.setEditingSupport(_altitudeEditingSupport);
-//		_colDefPulse.setEditingSupport(_pulseEditingSupport);
-//		_colDefTemperature.setEditingSupport(_temperatureEditingSupport);
-//		_colDefCadence.setEditingSupport(_cadenceEditingSupport);
-//		_colDefLatitude.setEditingSupport(_latitudeEditingSupport);
-//		_colDefLongitude.setEditingSupport(_longitudeEditingSupport);
+		/*
+		 * create editing support after the viewer is created but before the columns are created.
+		 */
+		final TextCellEditor cellEditor = new TextCellEditorCustomized(_swimSlice_Viewer.getTable());
+
+		_swimSlice_CadenceEditingSupport = new SliceShortEditingSupport(cellEditor, _swimSerie_Cadence);
+		_swimSlice_StrokesEditingSupport = new SliceShortEditingSupport(cellEditor, _swimSerie_Strokes);
+
+		_swimSlice_ColDef_Cadence.setEditingSupport(_swimSlice_CadenceEditingSupport);
+		_swimSlice_ColDef_Strokes.setEditingSupport(_swimSlice_StrokesEditingSupport);
 
 		_swimSlice_ColumnManager.createColumns(_swimSlice_Viewer);
 
@@ -4051,13 +4147,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private void defineAllColumns_SwimSlices() {
 
-//		public int[]		swim_Time;
-//		public short[]		swim_LengthType;
-//		public short[]		swim_Strokes;
-//		public short[]		swim_StrokeStyle;
-//		public short[]		swim_Cadence;
-//		private float[]	_swim_Swolf;
-
 		defineColumn_SwimSlice_Data_1_First();
 		defineColumn_SwimSlice_Data_Sequence();
 
@@ -4067,8 +4156,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		defineColumn_SwimSlice_Time_TimeDiff();
 
 		defineColumn_SwimSlice_Swim_Strokes();
-		defineColumn_SwimSlice_Swim_StrokeStyle();
 		defineColumn_SwimSlice_Swim_Cadence();
+		defineColumn_SwimSlice_Swim_StrokeStyle();
 	}
 
 	private void defineAllColumns_TimeSlices() {
@@ -4148,7 +4237,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private void defineColumn_SwimSlice_Swim_Cadence() {
 
-		final ColumnDefinition colDef = TableColumnFactory.SWIM__SWIM_CADENCE.createColumn(_swimSlice_ColumnManager, _pc);
+		TableColumnDefinition colDef;
+
+		_swimSlice_ColDef_Cadence = colDef = TableColumnFactory.SWIM__SWIM_CADENCE.createColumn(_swimSlice_ColumnManager, _pc);
 
 		colDef.setIsDefaultColumn();
 
@@ -4160,10 +4251,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					final SwimSlice timeSlice = (SwimSlice) cell.getElement();
 					final short value = _swimSerie_Cadence[timeSlice.serieIndex];
 
-					if (value == Short.MIN_VALUE) {
+					if (value == 0) {
 						cell.setText(UI.EMPTY_STRING);
 					} else {
-						cell.setText(Integer.toString(value));
+						cell.setText(Short.toString(value));
 					}
 
 				} else {
@@ -4175,7 +4266,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private void defineColumn_SwimSlice_Swim_Strokes() {
 
-		final ColumnDefinition colDef = TableColumnFactory.SWIM__SWIM_STROKES.createColumn(_swimSlice_ColumnManager, _pc);
+		final ColumnDefinition colDef;
+
+		_swimSlice_ColDef_Strokes = colDef = TableColumnFactory.SWIM__SWIM_STROKES.createColumn(_swimSlice_ColumnManager, _pc);
 
 		colDef.setIsDefaultColumn();
 
@@ -4187,10 +4280,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					final SwimSlice timeSlice = (SwimSlice) cell.getElement();
 					final short value = _swimSerie_Strokes[timeSlice.serieIndex];
 
-					if (value == Short.MIN_VALUE) {
+					if (value == 0) {
 						cell.setText(UI.EMPTY_STRING);
 					} else {
-						cell.setText(Integer.toString(value));
+						cell.setText(Short.toString(value));
 					}
 
 				} else {
@@ -4326,7 +4419,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		ColumnDefinition colDef;
 
-		_colDefAltitude = colDef = TableColumnFactory.ALTITUDE_ALTITUDE.createColumn(_timeSlice_ColumnManager, _pc);
+		_timeSlice_ColDef_Altitude = colDef = TableColumnFactory.ALTITUDE_ALTITUDE.createColumn(_timeSlice_ColumnManager, _pc);
 
 		colDef.setIsDefaultColumn();
 
@@ -4377,7 +4470,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		ColumnDefinition colDef;
 
-		_colDefPulse = colDef = TableColumnFactory.BODY_PULSE.createColumn(_timeSlice_ColumnManager, _pc);
+		_timeSlice_ColDef_Pulse = colDef = TableColumnFactory.BODY_PULSE.createColumn(_timeSlice_ColumnManager, _pc);
 
 		colDef.disableValueFormatter();
 
@@ -4529,7 +4622,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		ColumnDefinition colDef;
 
-		_colDefLatitude = colDef = TableColumnFactory.MOTION_LATITUDE.createColumn(_timeSlice_ColumnManager, _pc);
+		_timeSlice_ColDef_Latitude = colDef = TableColumnFactory.MOTION_LATITUDE.createColumn(_timeSlice_ColumnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -4556,7 +4649,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private void defineColumn_TimeSlice_Motion_Longitude() {
 
 		ColumnDefinition colDef;
-		_colDefLongitude = colDef = TableColumnFactory.MOTION_LONGITUDE.createColumn(_timeSlice_ColumnManager, _pc);
+		_timeSlice_ColDef_Longitude = colDef = TableColumnFactory.MOTION_LONGITUDE.createColumn(_timeSlice_ColumnManager, _pc);
 
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -4690,7 +4783,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		ColumnDefinition colDef;
 
-		_colDefCadence = colDef = TableColumnFactory.POWERTRAIN_CADENCE.createColumn(_timeSlice_ColumnManager, _pc);
+		_timeSlice_ColDef_Cadence = colDef = TableColumnFactory.POWERTRAIN_CADENCE.createColumn(_timeSlice_ColumnManager, _pc);
 
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -4764,9 +4857,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 */
 	private void defineColumn_TimeSlice_Time_BreakTime() {
 
-		ColumnDefinition colDef;
-
-		_colDefCadence = colDef = TableColumnFactory.TIME_BREAK_TIME.createColumn(_timeSlice_ColumnManager, _pc);
+		final ColumnDefinition colDef = TableColumnFactory.TIME_BREAK_TIME.createColumn(_timeSlice_ColumnManager, _pc);
 
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -4913,7 +5004,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private void defineColumn_TimeSlice_Weather_Temperature() {
 
 		final ColumnDefinition colDef;
-		_colDefTemperature = colDef = TableColumnFactory.WEATHER_TEMPERATURE.createColumn(_timeSlice_ColumnManager, _pc);
+		_timeSlice_ColDef_Temperature = colDef = TableColumnFactory.WEATHER_TEMPERATURE.createColumn(_timeSlice_ColumnManager, _pc);
 
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -5114,7 +5205,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		_actionToggleRowSelectMode.setEnabled(
 				isCellEditorInactive
-						&& isTimeSlice_ViewerTab
+						&& (isTimeSlice_ViewerTab || isSwimSlice_ViewerTab)
 						&& isTourValid
 						&& (_isManualTour == false));
 		_actionToggleReadEditMode.setEnabled(isCellEditorInactive && isTourInDb);
@@ -5565,12 +5656,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_swimSerie_StrokeStyle = _tourData.swim_StrokeStyle;
 		_swimSerie_Time = _tourData.swim_Time;
 
-		_altitudeEditingSupport.setDataSerie(_serieAltitude);
-		_temperatureEditingSupport.setDataSerie(_serieTemperature);
-		_pulseEditingSupport.setDataSerie(_seriePulse);
-		_cadenceEditingSupport.setDataSerie(_serieCadence);
-		_latitudeEditingSupport.setDataSerie(_serieLatitude);
-		_longitudeEditingSupport.setDataSerie(_serieLongitude);
+		_swimSlice_CadenceEditingSupport.setDataSerie(_swimSerie_Cadence);
+		_swimSlice_StrokesEditingSupport.setDataSerie(_swimSerie_Strokes);
+
+		_timeSlice_AltitudeEditingSupport.setDataSerie(_serieAltitude);
+		_timeSlice_TemperatureEditingSupport.setDataSerie(_serieTemperature);
+		_timeSlice_PulseEditingSupport.setDataSerie(_seriePulse);
+		_timeSlice_CadenceEditingSupport.setDataSerie(_serieCadence);
+		_timeSlice_LatitudeEditingSupport.setDataSerie(_serieLatitude);
+		_timeSlice_LongitudeEditingSupport.setDataSerie(_serieLongitude);
 
 		final ZonedDateTime tourStartTime = _tourData.getTourStartTime();
 
@@ -6393,6 +6487,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 				// run asynch because relaodViewer is also running asynch
 				Display.getCurrent().asyncExec(new Runnable() {
+
 					@Override
 					public void run() {
 
@@ -6402,6 +6497,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 						_swimSlice_Viewer.getTable().setFocus();
 					}
+
 				});
 			}
 
@@ -7190,8 +7286,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_tourData.clearComputedSeries();
 		getDataSeriesFromTourData();
 
-		// refresh the whole viewer because the computed data series could have been changed
-		final ColumnViewer viewer = _timeSlice_TourViewer.getViewer();
+		// refresh the whole viewer because the computed data series could have been changed and the edited cell needs to be updated
+		ColumnViewer viewer = _timeSlice_TourViewer.getViewer();
+		if (viewer != null) {
+			viewer.refresh();
+		}
+		viewer = _swimSlice_TourViewer.getViewer();
 		if (viewer != null) {
 			viewer.refresh();
 		}
@@ -7304,6 +7404,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		enableActions();
 		enableControls();
+
+		/*
+		 * Cadence is edited in swim slices, cadence in time slices cannot be edited
+		 */
+		_timeSlice_CadenceEditingSupport.canEditSlices(_isTourWithSwimData == false);
 
 		// this action displays selected unit label
 		_actionSetStartDistanceTo_0.setText(

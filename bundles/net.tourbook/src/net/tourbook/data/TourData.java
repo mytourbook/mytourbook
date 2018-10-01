@@ -5128,8 +5128,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 			// tour data contains 1 tour
 
+			// set values for 1st swim slice
 			long swimTime = tourStartTime + (swim_Time[0] * 1000);
-			short swimValue = 0;
+			short swimValue = swimDataSerie[0];
 
 			int swimSerieIndex = 0;
 
