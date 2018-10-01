@@ -141,9 +141,11 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 				+ (Integer.toString(TourManager.GRAPH_GRADIENT) + separator)
 				+ Integer.toString(TourManager.GRAPH_POWER));
 
-		// HR zone backbround
-		store.setDefault(ITourbookPreferences.GRAPH_IS_HR_ZONE_BACKGROUND_VISIBLE, false);
-		store.setDefault(ITourbookPreferences.GRAPH_HR_ZONE_STYLE, TourChart.ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP);
+		// graph background
+		store.setDefault(ITourbookPreferences.GRAPH_IS_GRAPH_BG_STYLE_VISIBLE, false);
+		store.setDefault(ITourbookPreferences.GRAPH_USE_GRAPH_BG_STYLE_HR_ZONE, true);
+		store.setDefault(ITourbookPreferences.GRAPH_USE_GRAPH_BG_STYLE_SWIM_STYLE, false);
+		store.setDefault(ITourbookPreferences.GRAPH_BACKGROUND_STYLE, TourChart.ACTION_ID_GRAPH_BG_STYLE_GRAPH_TOP);
 
 		store.setDefault(ITourbookPreferences.GRAPH_ANTIALIASING, true);
 		store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE, 0xFF);

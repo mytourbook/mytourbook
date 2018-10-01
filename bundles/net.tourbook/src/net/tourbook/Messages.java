@@ -2053,6 +2053,8 @@ public class Messages extends NLS {
 	public static String	Tour_Action_graph_temperature_tooltip;
 	public static String	Tour_Action_graph_tour_compare_tooltip;
 	public static String	Tour_Action_GeoCompare_Tooltip;
+	public static String	Tour_Action_GraphBgFrom_HrZone;
+	public static String	Tour_Action_GraphBgFrom_SwimStyle;
 	public static String	Tour_Action_GraphGears;
 	public static String	Tour_Action_GraphOverlapped;
 	public static String	Tour_Action_HrZone_Title;
@@ -2085,12 +2087,13 @@ public class Messages extends NLS {
 	public static String	Tour_Action_show_time_on_x_axis_tooltip;
 	public static String	Tour_Action_SetTimeZone;
 	public static String	Tour_Action_ShowBreaktimeValues;
+	public static String	Tour_Action_ShowGraphBackground_Tooltip;
 	public static String	Tour_Action_ShowHrZones_Tooltip;
 	public static String	Tour_Action_ShowTourMarker;
-
 	public static String	Tour_Action_Swim_Strokes_Tooltip;
-
 	public static String	Tour_Action_Swim_Swolf_Tooltip;
+	public static String Tour_Action_Title_GraphBackground_Source;
+	public static String	Tour_Action_Title_GraphBackground_Style;
 	public static String	Tour_Action_TourInfo_Tooltip;
 	public static String	Tour_Action_TourPhotos;
 	public static String	Tour_Action_TourPhotosWithoutTooltip_Tooltip;
@@ -2183,7 +2186,7 @@ public class Messages extends NLS {
 	public static String	Tour_Editor_Link_SetDefautTimeZone_Tooltip;
 	public static String	Tour_Editor_Link_SetGeoTimeZone;
 	public static String	Tour_Editor_Link_SetGeoTimeZone_Tooltip;
-	public static String Tour_Editor_NoSwimData;
+	public static String	Tour_Editor_NoSwimData;
 	public static String	Tour_Editor_Radio_Cadence_Rpm;
 	public static String	Tour_Editor_Radio_Cadence_Spm;
 	public static String	Tour_Editor_TabLabel_SwimSlices;
