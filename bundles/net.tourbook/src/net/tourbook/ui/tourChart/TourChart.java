@@ -860,7 +860,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	 * @param selectedAction
 	 * @param isSource
 	 */
-	public void action_GraphBackground(final Boolean isActionChecked, final String selectedAction, final boolean isSource) {
+	public void action_GraphBackground(final boolean isActionChecked, final String selectedAction, final boolean isSource) {
+
+		// ignore uncheck event and wait for the check event
+		if (isActionChecked == false) {
+			return;
+		}
 
 		if (isSource) {
 
@@ -873,11 +878,17 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				return;
 			}
 
-			_prefStore.setValue(ITourbookPreferences.GRAPH_BACKGROUND_SOURCE, selectedAction);
-			_tcc.graphBackgroundSource = selectedAction;
+			final boolean useGraphBgStyle_HrZone = ACTION_ID_GRAPH_BG_SOURCE_HR_ZONE.equals(selectedAction);
+			final boolean useGraphBgStyle_SwimStyle = ACTION_ID_GRAPH_BG_SOURCE_SWIM_STYLE.equals(selectedAction);
 
-			setActionChecked(ACTION_ID_GRAPH_BG_SOURCE_HR_ZONE, ACTION_ID_GRAPH_BG_SOURCE_HR_ZONE.equals(selectedAction));
-			setActionChecked(ACTION_ID_GRAPH_BG_SOURCE_SWIM_STYLE, ACTION_ID_GRAPH_BG_SOURCE_SWIM_STYLE.equals(selectedAction));
+			_prefStore.setValue(ITourbookPreferences.GRAPH_BACKGROUND_SOURCE, selectedAction);
+
+			_tcc.graphBackgroundSource = selectedAction;
+			_tcc.useGraphBgStyle_HrZone = useGraphBgStyle_HrZone;
+			_tcc.useGraphBgStyle_SwimStyle = useGraphBgStyle_SwimStyle;
+
+			setActionChecked(ACTION_ID_GRAPH_BG_SOURCE_HR_ZONE, useGraphBgStyle_HrZone);
+			setActionChecked(ACTION_ID_GRAPH_BG_SOURCE_SWIM_STYLE, useGraphBgStyle_SwimStyle);
 
 		} else {
 
@@ -909,6 +920,19 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		}
 	}
 
+	/**
+	 * Toggle Graph background style
+	 */
+	public void action_ShowGraphBgStyle() {
+
+		final boolean isGraphBgStylevisible = !_tcc.isGraphBgStyleVisible;
+
+		_prefStore.setValue(ITourbookPreferences.GRAPH_IS_GRAPH_BG_STYLE_VISIBLE, isGraphBgStylevisible);
+		_tcc.isGraphBgStyleVisible = isGraphBgStylevisible;
+
+		updateTourChart();
+	}
+
 	public void actionCanAutoMoveSliders(final boolean isItemChecked) {
 
 		setCanAutoMoveSliders(isItemChecked);
@@ -922,7 +946,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		updateZoomOptionActionHandlers();
 	}
 
-	public void actionCanAutoZoomToSlider(final Boolean isItemChecked) {
+	public void actionCanAutoZoomToSlider(final boolean isItemChecked) {
 
 		setCanAutoZoomToSlider(isItemChecked);
 
@@ -936,7 +960,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		updateZoomOptionActionHandlers();
 	}
 
-	public void actionCanScrollChart(final Boolean isItemChecked) {
+	public void actionCanScrollChart(final boolean isItemChecked) {
 
 		// apply setting to the chart
 		if (isItemChecked) {
@@ -958,19 +982,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		setActionChecked(ACTION_ID_IS_GRAPH_OVERLAPPED, isItemChecked);
 	}
 
-	/**
-	 * Toggle Graph background style
-	 */
-	public void action_ShowGraphBgStyle() {
-
-		final boolean isGraphBgStylevisible = !_tcc.isGraphBgStyleVisible;
-
-		_prefStore.setValue(ITourbookPreferences.GRAPH_IS_GRAPH_BG_STYLE_VISIBLE, isGraphBgStylevisible);
-		_tcc.isGraphBgStyleVisible = isGraphBgStylevisible;
-
-		updateTourChart();
-	}
-
 	public void actionShowTourInfo(final boolean isTourInfoVisible) {
 
 		_prefStore.setValue(ITourbookPreferences.GRAPH_TOUR_INFO_IS_VISIBLE, isTourInfoVisible);
@@ -980,7 +991,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		updateUI_TourTitleInfo();
 	}
 
-	public void actionShowTourMarker(final Boolean isMarkerVisible) {
+	public void actionShowTourMarker(final boolean isMarkerVisible) {
 
 		_prefStore.setValue(ITourbookPreferences.GRAPH_IS_MARKER_VISIBLE, isMarkerVisible);
 

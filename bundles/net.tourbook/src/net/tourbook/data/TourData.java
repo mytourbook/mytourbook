@@ -7444,6 +7444,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	/**
 	 * @return Returns the UI values for number of strokes.
 	 */
+	public float[] getSwim_StrokeStyle() {
+
+		if (_swim_StrokeStyle_UI == null) {
+			_swim_StrokeStyle_UI = createSwim_DataSerie(swim_StrokeStyle);
+		}
+
+		return _swim_StrokeStyle_UI;
+	}
+
+	/**
+	 * @return Returns the UI values for number of strokes.
+	 */
 	public float[] getSwim_Swolf() {
 
 		if (_swim_Swolf == null) {
