@@ -1,0 +1,22 @@
+Version 18.11                                                   ? 2018
+
+
+New
+===	
+
+* Support Swimming Data
+
+  - Import swimming data from .fit files
+
+  - Tour chart
+    - Show swim graphs
+
+  - Tour Editor 
+    - Edit swim slices
+
+ 
+Bugfix 	
+======
+
+* 
+ 

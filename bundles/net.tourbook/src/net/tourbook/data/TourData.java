@@ -77,6 +77,7 @@ import net.tourbook.algorithm.DPPoint;
 import net.tourbook.algorithm.DouglasPeuckerSimplifier;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.map.GeoPosition;
+import net.tourbook.common.swimming.SwimStroke;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.MtMath;
@@ -1481,7 +1482,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	public boolean 	isSwimCadence;
 
 	/**
-	 *Computed swim data serie
+	 * Computed swim data serie
 	 */
 	@Transient
 	private float[]	_swim_Swolf;
@@ -1829,6 +1830,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		_swim_Cadence_UI = null;
 		_swim_Strokes_UI = null;
 		_swim_StrokeStyle_UI = null;
+		_swim_Swolf = null;
+
 		if (isSwimCadence) {
 			// cadence is from swim cadence
 			cadenceSerie = null;

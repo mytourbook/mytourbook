@@ -1492,7 +1492,7 @@ public abstract class TableColumnFactory {
 			public TableColumnDefinition createColumn(final ColumnManager columnManager,
 																	final PixelConverter pixelConverter) {
 
-				final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "SWIM__SWIM_STROKE_STYLE", SWT.TRAIL); //$NON-NLS-1$
+				final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "SWIM__SWIM_STROKE_STYLE", SWT.LEAD); //$NON-NLS-1$
 
 				colDef.setColumnCategory(Messages.ColumnFactory_Category_Swimming);
 

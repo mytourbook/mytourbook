@@ -4366,6 +4366,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	void selectXSliders(final SelectionChartXSliderPosition xSliderPosition) {
 
+		if (_tourData == null) {
+			// this occured
+			return;
+		}
+
 		// set position for the x-sliders
 		setXSliderPosition(xSliderPosition);
 

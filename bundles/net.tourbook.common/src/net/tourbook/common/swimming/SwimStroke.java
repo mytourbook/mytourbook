@@ -14,7 +14,7 @@
 // Tag = production/akw/20.66.00-0-gc7b345b
 ////////////////////////////////////////////////////////////////////////////////
 
-package net.tourbook.data;
+package net.tourbook.common.swimming;
 
 /*
  * Copied from com.garmin.fit.SwimStroke
@@ -38,6 +38,7 @@ public enum SwimStroke {
 	}
 
 	public static SwimStroke getByValue(final Short value) {
+
 		for (final SwimStroke type : SwimStroke.values()) {
 			if (value == type.value) {
 				return type;
