@@ -22,6 +22,16 @@
    inkscape:export-ydpi="96.000458">
   <defs
      id="defs2987">
+    <inkscape:path-effect
+       effect="bspline"
+       id="path-effect5939"
+       is_visible="true"
+       weight="33.333333"
+       steps="2"
+       helper_size="0"
+       apply_no_weight="true"
+       apply_with_weight="true"
+       only_selected="false" />
     <linearGradient
        id="gear">
       <stop
@@ -4263,13 +4273,13 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="11.313709"
-     inkscape:cx="525.38655"
-     inkscape:cy="966.1417"
+     inkscape:zoom="22.627417"
+     inkscape:cx="403.98822"
+     inkscape:cy="1003.4723"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
-     inkscape:window-width="1583"
+     inkscape:window-width="1754"
      inkscape:window-height="1376"
      inkscape:window-x="384"
      inkscape:window-y="26"
@@ -9581,5 +9591,39 @@
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\graph-swim-swolf.png"
        inkscape:export-xdpi="96"
        inkscape:export-ydpi="96" />
+    <path
+       style="fill:#d0ec86;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 405,52.362183 5,-10 v 10 z"
+       id="path5947"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\graph-background.png"
+       inkscape:export-xdpi="96.000732"
+       inkscape:export-ydpi="96.000732" />
+    <path
+       style="display:inline;fill:#93bf1f;fill-opacity:1;stroke:none;stroke-width:0.99999988;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 410,52.362183 h 6 v -10 L 412.99998,36.705933 410,42.362183 Z"
+       id="path3778-4-75-0-7"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccccc"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\graph-background.png"
+       inkscape:export-xdpi="96.000732"
+       inkscape:export-ydpi="96.000732" />
+    <path
+       style="fill:#4a6d11;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 421,52.362183 -5,-10 v 10 z"
+       id="path5947-5"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\graph-background.png"
+       inkscape:export-xdpi="96.000732"
+       inkscape:export-ydpi="96.000732" />
+    <path
+       style="fill:none;fill-opacity:1;stroke:#4a6d11;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 420.77646,52.250315 -7.77642,-15.638163 -7.77645,15.638163"
+       id="path4660-1-0-0-2-2-9-9-3-7-7-2-1-5"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\graph-background.png"
+       inkscape:export-xdpi="96.000732"
+       inkscape:export-ydpi="96.000732"
+       sodipodi:nodetypes="ccc" />
   </g>
 </svg>

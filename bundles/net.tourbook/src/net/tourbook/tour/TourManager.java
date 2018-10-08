@@ -66,6 +66,7 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringToArrayConverter;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourPhoto;
@@ -79,6 +80,8 @@ import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourProviderAll;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
+import net.tourbook.ui.tourChart.GraphBackgroundStyle;
+import net.tourbook.ui.tourChart.GraphBgSource;
 import net.tourbook.ui.tourChart.IValueLabelProvider;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
@@ -625,11 +628,18 @@ public class TourManager {
 			tcc.addVisibleGraph(Integer.parseInt(prefGraphId));
 		}
 
+		/*
+		 * Graph background
+		 */
 		tcc.isGraphBgStyleVisible = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_GRAPH_BG_STYLE_VISIBLE);
-		tcc.useGraphBgStyle_HrZone = _prefStore.getBoolean(ITourbookPreferences.GRAPH_USE_GRAPH_BG_STYLE_HR_ZONE);
-		tcc.useGraphBgStyle_SwimStyle = _prefStore.getBoolean(ITourbookPreferences.GRAPH_USE_GRAPH_BG_STYLE_SWIM_STYLE);
 
-		tcc.graphBackgroundStyle = _prefStore.getString(ITourbookPreferences.GRAPH_BACKGROUND_STYLE);
+		final String prefGraphBgSource = _prefStore.getString(ITourbookPreferences.GRAPH_BACKGROUND_SOURCE);
+		final String prefGraphBgStyle = _prefStore.getString(ITourbookPreferences.GRAPH_BACKGROUND_STYLE);
+
+		tcc.graphBackground_Source = (GraphBgSource) Util.getEnumValue(prefGraphBgSource,
+				TourChartConfiguration.GRAPH_BACKGROUND_SOURCE_DEFAULT);
+		tcc.graphBackground_Style = (GraphBackgroundStyle) Util.getEnumValue(prefGraphBgStyle,
+				TourChartConfiguration.GRAPH_BACKGROUND_STYLE_DEFAULT);
 
 		// set the unit which is shown on the x-axis
 		final boolean isShowTime = _prefStore.getString(ITourbookPreferences.GRAPH_X_AXIS).equals(X_AXIS_TIME);
@@ -3100,11 +3110,12 @@ public class TourManager {
 
 		// HR zones can be displayed when they are available
 		tcc.canShowHrZones = tourData.getNumberOfHrZones() > 0;
-		final boolean isHrZoneDisplayed = tcc.canShowHrZones && tcc.isGraphBgStyleVisible && tcc.useGraphBgStyle_HrZone;
+//		final boolean isHrZoneDisplayed = tcc.canShowHrZones && tcc.isGraphBgStyleVisible && tcc.useGraphBgStyle_HrZone;
+		final boolean isHrZoneDisplayed = tcc.canShowHrZones && tcc.isGraphBgStyleVisible;
 
 		// swim style can be displayed when they are availabel
 		tcc.canShowSwimStyle = tourData.swim_Time != null;
-		final boolean isSwimStyleDisplayed = tcc.canShowSwimStyle && tcc.isGraphBgStyleVisible && tcc.useGraphBgStyle_SwimStyle;
+		final boolean isSwimStyleDisplayed = tcc.canShowSwimStyle && tcc.isGraphBgStyleVisible;
 
 		final boolean useGraphBgStyle = isHrZoneDisplayed || isSwimStyleDisplayed;
 

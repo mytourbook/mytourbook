@@ -13,31 +13,13 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.tourChart.action;
+package net.tourbook.ui.tourChart;
 
-import org.eclipse.jface.action.Action;
+public enum GraphBackgroundStyle {
 
-import net.tourbook.ui.tourChart.TourChart;
-
-public class Action_GraphBackground extends Action {
-
-	private TourChart	_tourChart;
-
-	private String		_commandId;
-	private boolean	_isSource;
-
-	public Action_GraphBackground(final TourChart tourChart, final String commandId, final String label, final boolean isSource) {
-
-		super(label, AS_RADIO_BUTTON);
-
-		_tourChart = tourChart;
-		_commandId = commandId;
-		_isSource = isSource;
-	}
-
-	@Override
-	public void run() {
-		_tourChart.action_GraphBackground(isChecked(), _commandId, _isSource);
-	}
+	GRAPH_COLOR_TOP, //
+	NO_GRADIENT, //
+	WHITE_BOTTOM, //
+	WHITE_TOP, //
 
 }

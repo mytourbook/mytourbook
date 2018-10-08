@@ -34,7 +34,6 @@ import net.tourbook.tour.BreakTimeTool;
 import net.tourbook.tour.DialogSetTimeZone;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.tourChart.ChartMarkerToolTip;
-import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.ISmoothingAlgorithm;
 
 /**
@@ -142,10 +141,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 				+ Integer.toString(TourManager.GRAPH_POWER));
 
 		// graph background
-		store.setDefault(ITourbookPreferences.GRAPH_IS_GRAPH_BG_STYLE_VISIBLE, false);
-		store.setDefault(ITourbookPreferences.GRAPH_USE_GRAPH_BG_STYLE_HR_ZONE, true);
-		store.setDefault(ITourbookPreferences.GRAPH_USE_GRAPH_BG_STYLE_SWIM_STYLE, false);
-		store.setDefault(ITourbookPreferences.GRAPH_BACKGROUND_STYLE, TourChart.ACTION_ID_GRAPH_BG_STYLE_GRAPH_TOP);
+		store.setDefault(ITourbookPreferences.GRAPH_IS_GRAPH_BG_STYLE_VISIBLE, 		false);
 
 		store.setDefault(ITourbookPreferences.GRAPH_ANTIALIASING, true);
 		store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE, 0xFF);

@@ -26,6 +26,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.swt.graphics.RGB;
 
+import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ChartYDataMinMaxKeeper;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -34,6 +35,41 @@ import net.tourbook.preferences.ITourbookPreferences;
  * Contains the configuration how a tour chart is displayed.
  */
 public class TourChartConfiguration {
+
+	/**
+	 * Graph background source, they must correspond to the position id GRAPH_BACKGROUND_SOURCE_*.
+	 */
+	public static final GraphBgSourceType[]	GRAPH_BACKGROUND_SOURCE_TYPE;
+
+	public final static GraphBgSource			GRAPH_BACKGROUND_SOURCE_DEFAULT	= GraphBgSource.HR_ZONE;
+
+	/**
+	 * Graph background style, they must correspond to the position id GRAPH_BACKGROUND_SOURCE_*.
+	 */
+	public static final GraphBgStyleType[]		GRAPH_BACKGROUND_STYLE_TYPE;
+
+	public final static GraphBackgroundStyle	GRAPH_BACKGROUND_STYLE_DEFAULT	= GraphBackgroundStyle.NO_GRADIENT;
+
+// SET_FORMATTING_OFF
+
+	static {
+
+		GRAPH_BACKGROUND_SOURCE_TYPE = new GraphBgSourceType[] { //
+				//
+				new GraphBgSourceType(GraphBgSource.HR_ZONE, 			Messages.TourChart_GraphBackgroundSource_HrZone),
+				new GraphBgSourceType(GraphBgSource.SWIMMING_STYLE, Messages.TourChart_GraphBackgroundSource_SwimmingStyle),
+		};
+
+		GRAPH_BACKGROUND_STYLE_TYPE = new GraphBgStyleType[] { //
+				//
+				new GraphBgStyleType(GraphBackgroundStyle.NO_GRADIENT, 		Messages.TourChart_GraphBackgroundStyle_NoGradient),
+				new GraphBgStyleType(GraphBackgroundStyle.GRAPH_COLOR_TOP, 	Messages.TourChart_GraphBackgroundStyle_GraphColor_Top),
+				new GraphBgStyleType(GraphBackgroundStyle.WHITE_BOTTOM, 		Messages.TourChart_GraphBackgroundStyle_White_Bottom),
+				new GraphBgStyleType(GraphBackgroundStyle.WHITE_TOP, 			Messages.TourChart_GraphBackgroundStyle_White_Top),
+		};
+	}
+
+// SET_FORMATTING_ON
 
 	private final IPreferenceStore	_prefStore					= TourbookPlugin.getPrefStore();
 
@@ -129,16 +165,17 @@ public class TourChartConfiguration {
 	public boolean							isShowMarkerLabel;
 
 	public boolean							isShowMarkerTooltip;
+
 	public boolean							isShowAbsoluteValues;
 
 	public int								markerTooltipPosition	= ChartMarkerToolTip.DEFAULT_TOOLTIP_POSITION;
-
 	public boolean							isShowMarkerPoint;
+
 	public boolean							isShowSignImage;
 
 	public boolean							isGraphOverlapped;
-
 	public int								markerHoverSize;
+
 	public int								markerLabelOffset;
 
 	public boolean							isShowLabelTempPos;
@@ -148,7 +185,6 @@ public class TourChartConfiguration {
 	 * Size of the marker point in DLU (Dialog Units).
 	 */
 	public int								markerPointSize;
-
 	/**
 	 * Size of the sign image in DLU (Dialog Units).
 	 */
@@ -175,52 +211,43 @@ public class TourChartConfiguration {
 	 */
 	public boolean							isShowBreaktimeValues	= true;
 
-	/*
-	 * Graph background
-	 */
-
 	/**
 	 * Is <code>true</code> when HR zones can be displayed, which requires that pulse values are
 	 * available and the person has defined HR zones.
 	 */
-	public boolean	canShowHrZones					= false;
+	public boolean							canShowHrZones				= false;
 
 	/**
 	 * Is <code>true</code> when swim style can be displayed, this requires that swim data are
 	 * available .
 	 */
-	public boolean	canShowSwimStyle				= false;
+	public boolean							canShowSwimStyle			= false;
+
+	/*
+	 * Graph background
+	 */
 
 	/**
 	 * Is <code>true</code> when the graph background color is filled with hr zone or swim style
 	 * color
 	 */
-	public boolean	isGraphBgStyleVisible		= false;
+	public boolean						isGraphBgStyleVisible	= false;
 
 	/**
-	 * Is <code>true</code> when the graph background color is filled with hr zone color
+	 * Source which is used to draw the graph background
 	 */
-	public boolean	useGraphBgStyle_HrZone		= true;
+	public GraphBgSource				graphBackground_Source	= GRAPH_BACKGROUND_SOURCE_DEFAULT;
 
 	/**
-	 * Is <code>true</code> when the graph background color is filled with swim style color
+	 * Graph style which is used to draw the graph background
 	 */
-	public boolean	useGraphBgStyle_SwimStyle	= false;
-
-	/**
-	 * Source which is used to draw the graph background.
-	 */
-	public String	graphBackgroundSource		= TourChart.ACTION_ID_GRAPH_BG_SOURCE_HR_ZONE;
-
-	/**
-	 * Graph style which is used to draw the graph background.
-	 */
-	public String	graphBackgroundStyle			= TourChart.ACTION_ID_GRAPH_BG_STYLE_GRAPH_TOP;
+	public GraphBackgroundStyle	graphBackground_Style	= GRAPH_BACKGROUND_STYLE_DEFAULT;
 
 	/*
 	 * Tour photos
 	 */
 	public boolean	isShowTourPhotos			= true;
+
 	public boolean	isShowTourPhotoTooltip	= true;
 
 	/*
@@ -228,15 +255,14 @@ public class TourChartConfiguration {
 	 */
 	public boolean	isTourInfoVisible;
 	public boolean	isShowInfoTitle;
+
 	public boolean	isShowInfoTooltip;
 	public boolean	isShowInfoTourSeparator;
 	public int		tourInfoTooltipDelay;
-
 	/**
 	 * Is <code>true</code> when the geo compare action is visible and can be used
 	 */
 	public boolean	canUseGeoCompareTool;
-
 	/**
 	 * Is <code>true</code> to show geo diff unit in compared tour chart
 	 */

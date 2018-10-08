@@ -116,13 +116,11 @@ import net.tourbook.ui.tourChart.action.ActionCanAutoZoomToSlider;
 import net.tourbook.ui.tourChart.action.ActionCanMoveSlidersWhenZoomed;
 import net.tourbook.ui.tourChart.action.ActionGraph;
 import net.tourbook.ui.tourChart.action.ActionGraphOverlapped;
-import net.tourbook.ui.tourChart.action.ActionTourChartInfo;
 import net.tourbook.ui.tourChart.action.ActionTourChartMarker;
 import net.tourbook.ui.tourChart.action.ActionTourPhotos;
 import net.tourbook.ui.tourChart.action.ActionXAxisDistance;
 import net.tourbook.ui.tourChart.action.ActionXAxisTime;
-import net.tourbook.ui.tourChart.action.Action_GraphBackground;
-import net.tourbook.ui.tourChart.action.Action_GraphBackground_Menu;
+import net.tourbook.ui.tourChart.action.Action_TourChart_Info;
 import net.tourbook.ui.views.geoCompare.GeoCompareManager;
 import net.tourbook.ui.views.geoCompare.GeoCompareView;
 import net.tourbook.ui.views.tourSegmenter.SelectedTourSegmenterSegments;
@@ -163,13 +161,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	public static final String		ACTION_ID_EDIT_CHART_PREFERENCES				= "ACTION_ID_EDIT_CHART_PREFERENCES";			//$NON-NLS-1$
 	private static final String	ACTION_ID_IS_GRAPH_OVERLAPPED					= "ACTION_ID_IS_GRAPH_OVERLAPPED";				//$NON-NLS-1$
 	public static final String		ACTION_ID_IS_SHOW_TOUR_PHOTOS					= "ACTION_ID_IS_SHOW_TOUR_PHOTOS";				//$NON-NLS-1$
-	public static final String		ACTION_ID_GRAPH_BG_DROPDOWN_MENU				= "ACTION_ID_GRAPH_BG_DROPDOWN_MENU";			//$NON-NLS-1$
-	public static final String		ACTION_ID_GRAPH_BG_SOURCE_HR_ZONE			= "ACTION_ID_GRAPH_BG_SOURCE_HR_ZONE";			//$NON-NLS-1$
-	public static final String		ACTION_ID_GRAPH_BG_SOURCE_SWIM_STYLE		= "ACTION_ID_GRAPH_BG_SOURCE_SWIM_STYLE";		//$NON-NLS-1$
-	public static final String		ACTION_ID_GRAPH_BG_STYLE_GRAPH_TOP			= "ACTION_ID_GRAPH_BG_STYLE_GRAPH_TOP";		//$NON-NLS-1$
-	public static final String		ACTION_ID_GRAPH_BG_STYLE_NO_GRADIENT		= "ACTION_ID_GRAPH_BG_STYLE_NO_GRADIENT";		//$NON-NLS-1$
-	public static final String		ACTION_ID_GRAPH_BG_STYLE_WHITE_BOTTOM		= "ACTION_ID_GRAPH_BG_STYLE_WHITE_BOTTOM";	//$NON-NLS-1$
-	public static final String		ACTION_ID_GRAPH_BG_STYLE_WHITE_TOP			= "ACTION_ID_GRAPH_BG_STYLE_WHITE_TOP";		//$NON-NLS-1$
 	public static final String		ACTION_ID_X_AXIS_DISTANCE						= "ACTION_ID_X_AXIS_DISTANCE";					//$NON-NLS-1$
 	public static final String		ACTION_ID_X_AXIS_TIME							= "ACTION_ID_X_AXIS_TIME";							//$NON-NLS-1$
 	//
@@ -286,15 +277,16 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	//
 	private Map<String, Action>										_allTourChartActions;
 	//
+	private Action_GraphBackground_Slideout						_action_GraphBackground_Slideout;
 	private ActionEditQuick												_actionEditQuick;
 	private ActionGeoCompare											_actionGeoCompare;
 	private ActionGraphMinMax											_actionGraphMinMax;
 	private ActionOpenMarkerDialog									_actionOpenMarkerDialog;
-	private ActionTourChartGraphs										_actionTourChartGraphs;
-	private ActionTourChartInfo										_actionTourInfo;
+	private Action_AllGraphs											_actionTourChartGraphs;
+	private Action_TourChart_Info										_actionTourInfo;
 	private ActionTourChartMarker										_actionTourMarker;
-	private ActionTourChartOptions									_actionTourChartOptions;
-	private ActionTourChartSmoothing									_actionTourChartSmoothing;
+	private Action_TourChart_Options									_actionTourChartOptions;
+	private Action_TourChart_Smoothing								_actionTourChartSmoothing;
 	//
 	/**
 	 * datamodel listener is called when the chart data is created
@@ -392,6 +384,82 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private Color								_photoOverlayBGColorLink;
 	private Color								_photoOverlayBGColorTour;
 
+	private class Action_AllGraphs extends ActionToolbarSlideout {
+
+		public Action_AllGraphs() {
+
+			super(TourbookPlugin.getImageDescriptor(Messages.Image__Graph),
+					TourbookPlugin.getImageDescriptor(Messages.Image__Graph_Disabled));
+
+			setId(GRAPH_CONTRIBUTION_ID_SLIDEOUT);
+		}
+
+		@Override
+		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+
+			return new SlideoutTourChartGraphs(_parent, toolbar, TourChart.this, _state);
+		}
+
+		@Override
+		protected void onBeforeOpenSlideout() {
+			closeOpenedDialogs(this);
+		}
+	}
+
+	private class Action_GraphBackground_Slideout extends ActionToolbarSlideout {
+
+		public Action_GraphBackground_Slideout() {
+
+			super(TourbookPlugin.getImageDescriptor(Messages.Image__Graph_Background),
+					TourbookPlugin.getImageDescriptor(Messages.Image__Graph_Background_Disabled));
+		}
+
+		@Override
+		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+
+			return new Slideout_GraphBackground(_parent, toolbar, TourChart.this, _state);
+		}
+
+		@Override
+		protected void onBeforeOpenSlideout() {
+			closeOpenedDialogs(this);
+		}
+	}
+
+	private class Action_TourChart_Options extends ActionToolbarSlideout {
+
+		@Override
+		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+
+			return new SlideoutTourChartOptions(_parent, toolbar, TourChart.this, GRID_PREF_PREFIX);
+		}
+
+		@Override
+		protected void onBeforeOpenSlideout() {
+			closeOpenedDialogs(this);
+		}
+	}
+
+	private class Action_TourChart_Smoothing extends ActionToolbarSlideout {
+
+		public Action_TourChart_Smoothing() {
+
+			super(TourbookPlugin.getImageDescriptor(Messages.Image__Smoothing),
+					TourbookPlugin.getImageDescriptor(Messages.Image__Smoothing_Disabled));
+		}
+
+		@Override
+		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+
+			return new SlideoutTourChartSmoothing(_parent, toolbar, TourChart.this);
+		}
+
+		@Override
+		protected void onBeforeOpenSlideout() {
+			closeOpenedDialogs(this);
+		}
+	}
+
 	public class ActionGeoCompare extends Action {
 
 		public ActionGeoCompare() {
@@ -425,71 +493,16 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	private class ActionGraphMinMax extends ActionToolbarSlideout {
 
-		public ActionGraphMinMax(final ImageDescriptor imageDescriptor, final ImageDescriptor imageDescriptorDisabled) {
+		public ActionGraphMinMax() {
 
-			super(imageDescriptor, imageDescriptorDisabled);
+			super(TourbookPlugin.getImageDescriptor(Messages.Image__GraphMinMax),
+					TourbookPlugin.getImageDescriptor(Messages.Image__GraphMinMax_Disabled));
 		}
 
 		@Override
 		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
 			return new SlideoutGraphMinMax(_parent, toolbar);
-		}
-
-		@Override
-		protected void onBeforeOpenSlideout() {
-			closeOpenedDialogs(this);
-		}
-	}
-
-	private class ActionTourChartGraphs extends ActionToolbarSlideout {
-
-		public ActionTourChartGraphs(	final ImageDescriptor imageDescriptor,
-												final ImageDescriptor imageDescriptorDisabled) {
-
-			super(imageDescriptor, imageDescriptorDisabled);
-
-			setId(GRAPH_CONTRIBUTION_ID_SLIDEOUT);
-		}
-
-		@Override
-		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
-
-			return new SlideoutTourChartGraphs(_parent, toolbar, TourChart.this, _state);
-		}
-
-		@Override
-		protected void onBeforeOpenSlideout() {
-			closeOpenedDialogs(this);
-		}
-	}
-
-	private class ActionTourChartOptions extends ActionToolbarSlideout {
-
-		@Override
-		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
-
-			return new SlideoutTourChartOptions(_parent, toolbar, TourChart.this, GRID_PREF_PREFIX);
-		}
-
-		@Override
-		protected void onBeforeOpenSlideout() {
-			closeOpenedDialogs(this);
-		}
-	}
-
-	private class ActionTourChartSmoothing extends ActionToolbarSlideout {
-
-		public ActionTourChartSmoothing(	final ImageDescriptor imageDescriptor,
-													final ImageDescriptor imageDescriptorDisabled) {
-
-			super(imageDescriptor, imageDescriptorDisabled);
-		}
-
-		@Override
-		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
-
-			return new SlideoutTourChartSmoothing(_parent, toolbar, TourChart.this);
 		}
 
 		@Override
@@ -853,71 +866,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 		setHoveredListener(new HoveredValueListener());
 		setLineSelectionPainter(this);
-	}
-
-	/**
-	 * @param isActionChecked
-	 * @param selectedAction
-	 * @param isSource
-	 */
-	public void action_GraphBackground(final boolean isActionChecked, final String selectedAction, final boolean isSource) {
-
-		// ignore uncheck event and wait for the check event
-		if (isActionChecked == false) {
-			return;
-		}
-
-		if (isSource) {
-
-			// a source action is selected
-
-			final String previousGraphBgSource = _tcc.graphBackgroundSource;
-
-			// check if the same action was selected
-			if (isActionChecked && selectedAction.equals(previousGraphBgSource)) {
-				return;
-			}
-
-			final boolean useGraphBgStyle_HrZone = ACTION_ID_GRAPH_BG_SOURCE_HR_ZONE.equals(selectedAction);
-			final boolean useGraphBgStyle_SwimStyle = ACTION_ID_GRAPH_BG_SOURCE_SWIM_STYLE.equals(selectedAction);
-
-			_prefStore.setValue(ITourbookPreferences.GRAPH_BACKGROUND_SOURCE, selectedAction);
-
-			_tcc.graphBackgroundSource = selectedAction;
-			_tcc.useGraphBgStyle_HrZone = useGraphBgStyle_HrZone;
-			_tcc.useGraphBgStyle_SwimStyle = useGraphBgStyle_SwimStyle;
-
-			setActionChecked(ACTION_ID_GRAPH_BG_SOURCE_HR_ZONE, useGraphBgStyle_HrZone);
-			setActionChecked(ACTION_ID_GRAPH_BG_SOURCE_SWIM_STYLE, useGraphBgStyle_SwimStyle);
-
-		} else {
-
-			// a style action is selected
-
-			final String previousGraphType = _tcc.graphBackgroundStyle;
-
-			// check if the same action was selected
-			if (isActionChecked && selectedAction.equals(previousGraphType)) {
-				return;
-			}
-
-			_prefStore.setValue(ITourbookPreferences.GRAPH_BACKGROUND_STYLE, selectedAction);
-			_tcc.graphBackgroundStyle = selectedAction;
-
-			setActionChecked(ACTION_ID_GRAPH_BG_STYLE_GRAPH_TOP, ACTION_ID_GRAPH_BG_STYLE_GRAPH_TOP.equals(selectedAction));
-			setActionChecked(ACTION_ID_GRAPH_BG_STYLE_NO_GRADIENT, ACTION_ID_GRAPH_BG_STYLE_NO_GRADIENT.equals(selectedAction));
-			setActionChecked(ACTION_ID_GRAPH_BG_STYLE_WHITE_TOP, ACTION_ID_GRAPH_BG_STYLE_WHITE_TOP.equals(selectedAction));
-			setActionChecked(ACTION_ID_GRAPH_BG_STYLE_WHITE_BOTTOM, ACTION_ID_GRAPH_BG_STYLE_WHITE_BOTTOM.equals(selectedAction));
-		}
-
-		if (_tcc.isGraphBgStyleVisible == false) {
-
-			// graph background style is not yet displayed
-			action_ShowGraphBgStyle();
-
-		} else {
-			updateTourChart();
-		}
 	}
 
 	/**
@@ -1650,23 +1598,18 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		 */
 		createActions_10_GraphActions();
 
-		_actionTourChartGraphs = new ActionTourChartGraphs(
-				TourbookPlugin.getImageDescriptor(Messages.Image__Graph),
-				TourbookPlugin.getImageDescriptor(Messages.Image__Graph_Disabled));
+		_actionTourChartGraphs = new Action_AllGraphs();
+		_action_GraphBackground_Slideout = new Action_GraphBackground_Slideout();
 
 		/*
 		 * other actions
 		 */
 		_actionGeoCompare = new ActionGeoCompare();
 		_actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
-		_actionTourChartOptions = new ActionTourChartOptions();
-		_actionTourChartSmoothing = new ActionTourChartSmoothing(
-				TourbookPlugin.getImageDescriptor(Messages.Image__Smoothing),
-				TourbookPlugin.getImageDescriptor(Messages.Image__Smoothing_Disabled));
-		_actionGraphMinMax = new ActionGraphMinMax(
-				TourbookPlugin.getImageDescriptor(Messages.Image__GraphMinMax),
-				TourbookPlugin.getImageDescriptor(Messages.Image__GraphMinMax_Disabled));
-		_actionTourInfo = new ActionTourChartInfo(this, _parent);
+		_actionTourChartOptions = new Action_TourChart_Options();
+		_actionTourChartSmoothing = new Action_TourChart_Smoothing();
+		_actionGraphMinMax = new ActionGraphMinMax();
+		_actionTourInfo = new Action_TourChart_Info(this, _parent);
 		_actionTourMarker = new ActionTourChartMarker(this, _parent);
 
 		_allTourChartActions.put(ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER, new ActionCanAutoZoomToSlider(this));
@@ -1676,56 +1619,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		_allTourChartActions.put(ACTION_ID_X_AXIS_DISTANCE, new ActionXAxisDistance(this));
 		_allTourChartActions.put(ACTION_ID_X_AXIS_TIME, new ActionXAxisTime(this));
 
-		_allTourChartActions.put(
-				ACTION_ID_EDIT_CHART_PREFERENCES,
+		_allTourChartActions.put(ACTION_ID_EDIT_CHART_PREFERENCES,
 				new ActionOpenPrefDialog(//
 						Messages.Tour_Action_EditChartPreferences,
 						PrefPageAppearanceTourChart.ID));
-
-		/*
-		 * Graph background actions
-		 */
-		final Action_GraphBackground actionBgSource_HrZone = new Action_GraphBackground(
-				this,
-				ACTION_ID_GRAPH_BG_SOURCE_HR_ZONE,
-				Messages.Tour_Action_GraphBgFrom_HrZone,
-				true);
-		final Action_GraphBackground actionBgSource_SwimStyle = new Action_GraphBackground(
-				this,
-				ACTION_ID_GRAPH_BG_SOURCE_SWIM_STYLE,
-				Messages.Tour_Action_GraphBgFrom_SwimStyle,
-				true);
-
-		final Action_GraphBackground actionBgStyle_GraphTop = new Action_GraphBackground(
-				this,
-				ACTION_ID_GRAPH_BG_STYLE_GRAPH_TOP,
-				Messages.Tour_Action_HrZoneGraphType_Default,
-				false);
-		final Action_GraphBackground actionBgStyle_NoGradient = new Action_GraphBackground(
-				this,
-				ACTION_ID_GRAPH_BG_STYLE_NO_GRADIENT,
-				Messages.Tour_Action_HrZoneGraphType_NoGradient,
-				false);
-		final Action_GraphBackground actionBgStyle_WhiteTop = new Action_GraphBackground(
-				this,
-				ACTION_ID_GRAPH_BG_STYLE_WHITE_TOP,
-				Messages.Tour_Action_HrZoneGraphType_WhiteTop,
-				false);
-		final Action_GraphBackground actionBgStyle_WhiteBottom = new Action_GraphBackground(
-				this,
-				ACTION_ID_GRAPH_BG_STYLE_WHITE_BOTTOM,
-				Messages.Tour_Action_HrZoneGraphType_WhiteBottom,
-				false);
-
-		_allTourChartActions.put(ACTION_ID_GRAPH_BG_DROPDOWN_MENU, new Action_GraphBackground_Menu(this));
-
-		_allTourChartActions.put(ACTION_ID_GRAPH_BG_SOURCE_HR_ZONE, actionBgSource_HrZone);
-		_allTourChartActions.put(ACTION_ID_GRAPH_BG_SOURCE_SWIM_STYLE, actionBgSource_SwimStyle);
-
-		_allTourChartActions.put(ACTION_ID_GRAPH_BG_STYLE_GRAPH_TOP, actionBgStyle_GraphTop);
-		_allTourChartActions.put(ACTION_ID_GRAPH_BG_STYLE_NO_GRADIENT, actionBgStyle_NoGradient);
-		_allTourChartActions.put(ACTION_ID_GRAPH_BG_STYLE_WHITE_TOP, actionBgStyle_WhiteTop);
-		_allTourChartActions.put(ACTION_ID_GRAPH_BG_STYLE_WHITE_BOTTOM, actionBgStyle_WhiteBottom);
 
 		/*
 		 * This is a special case because the quick edit action in the tour info tooltip can not yet
@@ -2947,8 +2844,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		fillToolbar_Graphs(tbm);
 
 		tbm.add(new Separator());
+		tbm.add(_action_GraphBackground_Slideout);
 		tbm.add(_allTourChartActions.get(ACTION_ID_IS_GRAPH_OVERLAPPED));
-		tbm.add(_allTourChartActions.get(ACTION_ID_GRAPH_BG_DROPDOWN_MENU));
 		tbm.add(_allTourChartActions.get(ACTION_ID_X_AXIS_TIME));
 		tbm.add(_allTourChartActions.get(ACTION_ID_X_AXIS_DISTANCE));
 
@@ -5369,50 +5266,13 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		}
 
 		/*
-		 * Graph background style
+		 * Graph background
 		 */
 		final boolean canShowHrZones = _tcc.canShowHrZones;
 		final boolean canShowSwimStyle = _tcc.canShowSwimStyle;
 
-		final String currentGraphBgSource = _tcc.graphBackgroundSource;
-		final String currentGraphBgStyle = _tcc.graphBackgroundStyle;
-
-		/*
-		 * Graph dropdown menu
-		 */
-		// enable dropdown when hr or swim data are available
-		tourAction = _allTourChartActions.get(ACTION_ID_GRAPH_BG_DROPDOWN_MENU);
-		tourAction.setEnabled(canShowHrZones || canShowSwimStyle);
-
-		/*
-		 * Graph source
-		 */
-		tourAction = _allTourChartActions.get(ACTION_ID_GRAPH_BG_SOURCE_HR_ZONE);
-		tourAction.setEnabled(true);
-		tourAction.setChecked(currentGraphBgSource.equals(ACTION_ID_GRAPH_BG_SOURCE_HR_ZONE));
-
-		tourAction = _allTourChartActions.get(ACTION_ID_GRAPH_BG_SOURCE_SWIM_STYLE);
-		tourAction.setEnabled(true);
-		tourAction.setChecked(currentGraphBgSource.equals(ACTION_ID_GRAPH_BG_SOURCE_SWIM_STYLE));
-
-		/*
-		 * Graph background style
-		 */
-		tourAction = _allTourChartActions.get(ACTION_ID_GRAPH_BG_STYLE_GRAPH_TOP);
-		tourAction.setEnabled(true);
-		tourAction.setChecked(currentGraphBgStyle.equals(ACTION_ID_GRAPH_BG_STYLE_GRAPH_TOP));
-
-		tourAction = _allTourChartActions.get(ACTION_ID_GRAPH_BG_STYLE_NO_GRADIENT);
-		tourAction.setEnabled(true);
-		tourAction.setChecked(currentGraphBgStyle.equals(ACTION_ID_GRAPH_BG_STYLE_NO_GRADIENT));
-
-		tourAction = _allTourChartActions.get(ACTION_ID_GRAPH_BG_STYLE_WHITE_TOP);
-		tourAction.setEnabled(true);
-		tourAction.setChecked(currentGraphBgStyle.equals(ACTION_ID_GRAPH_BG_STYLE_WHITE_TOP));
-
-		tourAction = _allTourChartActions.get(ACTION_ID_GRAPH_BG_STYLE_WHITE_BOTTOM);
-		tourAction.setEnabled(true);
-		tourAction.setChecked(currentGraphBgStyle.equals(ACTION_ID_GRAPH_BG_STYLE_WHITE_BOTTOM));
+		// enable graph background slideout when HR or swim data are available
+		_action_GraphBackground_Slideout.setEnabled(canShowHrZones || canShowSwimStyle);
 
 		/*
 		 * Tour infos

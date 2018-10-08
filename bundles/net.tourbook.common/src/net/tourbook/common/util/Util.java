@@ -43,9 +43,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
-import net.tourbook.common.UI;
-import net.tourbook.common.time.TimeTools;
-
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -76,43 +73,46 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 import org.xml.sax.Attributes;
 
+import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
+
 public class Util {
 
 //	public static final String	UNIQUE_ID_SUFFIX_CICLO_TOUR				= "83582";				//$NON-NLS-1$
-	public static final String	UNIQUE_ID_SUFFIX_GARMIN_FIT				= "12653";				//$NON-NLS-1$
-	public static final String	UNIQUE_ID_SUFFIX_GARMIN_TCX				= "42984";				//$NON-NLS-1$
-	public static final String	UNIQUE_ID_SUFFIX_GPX					= "31683";				//$NON-NLS-1$
-	public static final String	UNIQUE_ID_SUFFIX_NMEA					= "32481";				//$NON-NLS-1$
-	public static final String	UNIQUE_ID_SUFFIX_POLAR_HRM				= "63193";				//$NON-NLS-1$
-	public static final String	UNIQUE_ID_SUFFIX_POLAR_PDD				= "76913";				//$NON-NLS-1$
-	public static final String	UNIQUE_ID_SUFFIX_POLAR_TRAINER			= "13457";				//$NON-NLS-1$
-	public static final String	UNIQUE_ID_SUFFIX_SPORT_TRACKS_FITLOG	= "24168";				//$NON-NLS-1$
-	public static final String	UNIQUE_ID_SUFFIX_SUUNTO2				= "92145";				//$NON-NLS-1$
-	public static final String	UNIQUE_ID_SUFFIX_SUUNTO3				= "73198";				//$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_GARMIN_FIT				= "12653";	//$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_GARMIN_TCX				= "42984";	//$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_GPX							= "31683";	//$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_NMEA						= "32481";	//$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_POLAR_HRM					= "63193";	//$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_POLAR_PDD					= "76913";	//$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_POLAR_TRAINER			= "13457";	//$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_SPORT_TRACKS_FITLOG	= "24168";	//$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_SUUNTO2					= "92145";	//$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_SUUNTO3					= "73198";	//$NON-NLS-1$
 
 	/*
 	 * Default xml tags
 	 */
-	private static final String	TAG_ITEM								= "item";				//$NON-NLS-1$
-	private static final String	TAG_LIST								= "list";				//$NON-NLS-1$
+	private static final String	TAG_ITEM		= "item";	//$NON-NLS-1$
+	private static final String	TAG_LIST		= "list";	//$NON-NLS-1$
 
-	private static final String	ATTR_KEY								= "key";				//$NON-NLS-1$
-	private static final String	ATTR_VALUE								= "value";				//$NON-NLS-1$
+	private static final String	ATTR_KEY		= "key";		//$NON-NLS-1$
+	private static final String	ATTR_VALUE	= "value";	//$NON-NLS-1$
 
 	/*
 	 * default xml attributes
 	 */
-	public static final String	ATTR_ROOT_DATETIME						= "Created";			//$NON-NLS-1$
-	public static final String	ATTR_ROOT_VERSION_MAJOR					= "VersionMajor";		//$NON-NLS-1$
-	public static final String	ATTR_ROOT_VERSION_MINOR					= "VersionMinor";		//$NON-NLS-1$
-	public static final String	ATTR_ROOT_VERSION_MICRO					= "VersionMicro";		//$NON-NLS-1$
-	public static final String	ATTR_ROOT_VERSION_QUALIFIER				= "VersionQualifier";	//$NON-NLS-1$
+	public static final String	ATTR_ROOT_DATETIME				= "Created";				//$NON-NLS-1$
+	public static final String	ATTR_ROOT_VERSION_MAJOR			= "VersionMajor";			//$NON-NLS-1$
+	public static final String	ATTR_ROOT_VERSION_MINOR			= "VersionMinor";			//$NON-NLS-1$
+	public static final String	ATTR_ROOT_VERSION_MICRO			= "VersionMicro";			//$NON-NLS-1$
+	public static final String	ATTR_ROOT_VERSION_QUALIFIER	= "VersionQualifier";	//$NON-NLS-1$
 
-	public static final String	ATTR_COLOR_RED							= "red";				//$NON-NLS-1$
-	public static final String	ATTR_COLOR_GREEN						= "green";				//$NON-NLS-1$
-	public static final String	ATTR_COLOR_BLUE							= "blue";				//$NON-NLS-1$
+	public static final String	ATTR_COLOR_RED						= "red";						//$NON-NLS-1$
+	public static final String	ATTR_COLOR_GREEN					= "green";					//$NON-NLS-1$
+	public static final String	ATTR_COLOR_BLUE					= "blue";					//$NON-NLS-1$
 
-	public static final String	CSV_FILE_EXTENSION						= "csv";				//$NON-NLS-1$
+	public static final String	CSV_FILE_EXTENSION				= "csv";						//$NON-NLS-1$
 
 	public static int adjustScaleValueOnMouseScroll(final MouseEvent event) {
 
@@ -137,7 +137,7 @@ public class Util {
 
 	/**
 	 * Revers an array sort order.
-	 * 
+	 *
 	 * @param arr
 	 * @return
 	 */
@@ -411,7 +411,7 @@ public class Util {
 
 	/**
 	 * Creates a {@link ZonedDateTime} from the number: YYYYMMDDhhmmss
-	 * 
+	 *
 	 * @param yyyymmddhhmmss
 	 * @return
 	 */
@@ -429,7 +429,7 @@ public class Util {
 
 	/**
 	 * creates a double array backup
-	 * 
+	 *
 	 * @param original
 	 * @return Returns a copy of a <code>double[]</code> or <code>null</code> when the original data
 	 *         is <code>null</code>.
@@ -449,7 +449,7 @@ public class Util {
 
 	/**
 	 * creates a float array backup
-	 * 
+	 *
 	 * @param original
 	 * @return Returns a copy of a <code>float[]</code> or <code>null</code> when the original data
 	 *         is <code>null</code>.
@@ -469,7 +469,7 @@ public class Util {
 
 	/**
 	 * creates a int array backup
-	 * 
+	 *
 	 * @param original
 	 * @return the backup array or <code>null</code> when the original data is <code>null</code>
 	 */
@@ -835,8 +835,8 @@ public class Util {
 	}
 
 	public static boolean getPrefixPrefBoolean(	final IPreferenceStore prefStore,
-												final String prefPrefix,
-												final String prefKey) {
+																final String prefPrefix,
+																final String prefKey) {
 
 		boolean prefValue;
 
@@ -850,8 +850,8 @@ public class Util {
 	}
 
 	public static int getPrefixPrefInt(	final IPreferenceStore prefStore,
-										final String prefPrefix,
-										final String prefKey) {
+													final String prefPrefix,
+													final String prefKey) {
 
 		int prefValue;
 
@@ -929,14 +929,14 @@ public class Util {
 	 * @param defaultValue
 	 * @param combo
 	 * @param defaultComboIndex
-	 *            Combo default index when retrieved state index is too large.
+	 *           Combo default index when retrieved state index is too large.
 	 * @return
 	 */
-	public static int getStateCombo(final IDialogSettings state,
-									final String stateKey,
-									final int defaultValue,
-									final Combo combo,
-									final int defaultComboIndex) {
+	public static int getStateCombo(	final IDialogSettings state,
+												final String stateKey,
+												final int defaultValue,
+												final Combo combo,
+												final int defaultComboIndex) {
 
 		int comboIndex = getStateInt(state, stateKey, defaultValue);
 
@@ -984,8 +984,8 @@ public class Util {
 	 *         default value is returned.
 	 */
 	public static <E extends Enum<E>> Enum<E> getStateEnum(	final IDialogSettings state,
-															final String key,
-															final Enum<E> defaultValue) {
+																				final String key,
+																				final Enum<E> defaultValue) {
 
 		if (state == null) {
 			return defaultValue;
@@ -1029,12 +1029,12 @@ public class Util {
 
 	/**
 	 * @param combo
-	 *            combo box, the items in the combo box must correspond to the items in the states
-	 *            array
+	 *           combo box, the items in the combo box must correspond to the items in the states
+	 *           array
 	 * @param states
-	 *            array which contains all states
+	 *           array which contains all states
 	 * @param defaultState
-	 *            state when an item is not selected in the combo box
+	 *           state when an item is not selected in the combo box
 	 * @return Returns the state which is selected in the combo box
 	 */
 	public static String getStateFromCombo(final Combo combo, final String[] states, final String defaultState) {
@@ -1084,7 +1084,7 @@ public class Util {
 			return defaultValue;
 		}
 
-		final ArrayList<Integer> intValues = new ArrayList<Integer>();
+		final ArrayList<Integer> intValues = new ArrayList<>();
 
 		for (final String stringValue : stringValues) {
 
@@ -1140,7 +1140,7 @@ public class Util {
 			return defaultValue;
 		}
 
-		final ArrayList<Long> longValues = new ArrayList<Long>();
+		final ArrayList<Long> longValues = new ArrayList<>();
 
 		for (final String stringValue : stringValues) {
 
@@ -1197,7 +1197,7 @@ public class Util {
 
 	/**
 	 * Remove duplicate items from a list and add a new item.
-	 * 
+	 *
 	 * @param allItems
 	 * @param newItem
 	 * @param maxItems
@@ -1211,7 +1211,7 @@ public class Util {
 			return allItems;
 		}
 
-		final ArrayList<String> newItems = new ArrayList<String>();
+		final ArrayList<String> newItems = new ArrayList<>();
 
 		newItems.add(newItem);
 
@@ -1343,8 +1343,8 @@ public class Util {
 	}
 
 	public static <E extends Enum<E>> Enum<E> getXmlEnum(	final IMemento xml,
-															final String attrName,
-															final Enum<E> defaultValue) {
+																			final String attrName,
+																			final Enum<E> defaultValue) {
 
 		final String xmlValue = xml.getString(attrName);
 
@@ -1378,16 +1378,16 @@ public class Util {
 	 * @param key
 	 * @param defaultValue
 	 * @param minValue
-	 *            Float min value.
+	 *           Float min value.
 	 * @param maxValue
-	 *            Float max value.
+	 *           Float max value.
 	 * @return
 	 */
 	public static float getXmlFloatFloat(	final XMLMemento xmlMemento,
-											final String key,
-											final float defaultValue,
-											final float minValue,
-											final float maxValue) {
+														final String key,
+														final float defaultValue,
+														final float minValue,
+														final float maxValue) {
 
 		final Float value = getXmlFloat(xmlMemento, key, defaultValue);
 
@@ -1407,16 +1407,16 @@ public class Util {
 	 * @param key
 	 * @param defaultValue
 	 * @param minValue
-	 *            Integer min value.
+	 *           Integer min value.
 	 * @param maxValue
-	 *            Integer max value.
+	 *           Integer max value.
 	 * @return
 	 */
 	public static float getXmlFloatInt(	final IMemento xmlMemento,
-										final String key,
-										final float defaultValue,
-										final int minValue,
-										final int maxValue) {
+													final String key,
+													final float defaultValue,
+													final int minValue,
+													final int maxValue) {
 
 		final Float value = getXmlFloat(xmlMemento, key, defaultValue);
 
@@ -1457,11 +1457,11 @@ public class Util {
 	 * @param maxValue
 	 * @return
 	 */
-	public static int getXmlInteger(final IMemento xmlMemento,
-									final String key,
-									final int defaultValue,
-									final int minValue,
-									final int maxValue) {
+	public static int getXmlInteger(	final IMemento xmlMemento,
+												final String key,
+												final int defaultValue,
+												final int minValue,
+												final int maxValue) {
 
 		final int value = getXmlInteger(xmlMemento, key, defaultValue);
 
@@ -1503,7 +1503,7 @@ public class Util {
 
 	/**
 	 * Get long array from xml list/item tags.
-	 * 
+	 *
 	 * @param memento
 	 * @param listKeyName
 	 * @return
@@ -1558,7 +1558,7 @@ public class Util {
 
 	/**
 	 * RBG values are in child tag as attributes
-	 * 
+	 *
 	 * @param xmlConfig
 	 * @param childTag
 	 * @param defaultRgb
@@ -1593,7 +1593,7 @@ public class Util {
 
 	/**
 	 * found here: http://www.odi.ch/prog/design/datetime.php
-	 * 
+	 *
 	 * @param cal
 	 * @return
 	 */
@@ -1645,7 +1645,7 @@ public class Util {
 
 	/**
 	 * Parses SAX attribute
-	 * 
+	 *
 	 * @param attributes
 	 * @param attributeName
 	 * @return Returns double value or {@link Double#MIN_VALUE} when attribute is not available or
@@ -1680,7 +1680,7 @@ public class Util {
 
 	/**
 	 * Parses SAX attribute
-	 * 
+	 *
 	 * @param attributes
 	 * @param attributeName
 	 * @return Returns float value or {@link Float#MIN_VALUE} when attribute is not available or
@@ -1715,7 +1715,7 @@ public class Util {
 
 	/**
 	 * Parses SAX attribute
-	 * 
+	 *
 	 * @param attributes
 	 * @param attributeName
 	 * @return Returns integer value or {@link Integer#MIN_VALUE} when attribute is not available or
@@ -1736,7 +1736,7 @@ public class Util {
 
 	/**
 	 * Parses SAX attribute
-	 * 
+	 *
 	 * @param attributes
 	 * @param attributeName
 	 * @return Returns integer value or 0 when attribute is not available or cannot be parsed.
@@ -1756,11 +1756,11 @@ public class Util {
 
 	/**
 	 * Parses SAX attribute
-	 * 
+	 *
 	 * @param attributes
 	 * @param attributeName
-	 * @return Returns long value or {@link Long#MIN_VALUE} when attribute is not available or
-	 *         cannot be parsed.
+	 * @return Returns long value or {@link Long#MIN_VALUE} when attribute is not available or cannot
+	 *         be parsed.
 	 */
 	public static long parseLong(final Attributes attributes, final String attributeName) {
 
@@ -1777,7 +1777,7 @@ public class Util {
 
 	/**
 	 * Load a text file.
-	 * 
+	 *
 	 * @param fileName
 	 * @return Returns the content from a text file
 	 */
@@ -1869,7 +1869,7 @@ public class Util {
 
 	/**
 	 * Round floating value to an inverse long value.
-	 * 
+	 *
 	 * @param graphValue
 	 * @param graphUnit
 	 * @return
@@ -1905,7 +1905,7 @@ public class Util {
 
 	/**
 	 * Round number of units to a 'month suitable' format.
-	 * 
+	 *
 	 * @param defaultUnitValue
 	 * @return
 	 */
@@ -2122,7 +2122,7 @@ public class Util {
 	/**
 	 * Round floating value by removing the trailing part, which causes problem when creating units.
 	 * For the value 200.00004 the .00004 part will be removed
-	 * 
+	 *
 	 * @param graphValue
 	 * @param graphUnit
 	 * @return
@@ -2175,19 +2175,19 @@ public class Util {
 
 	/**
 	 * Selects an item in the combo box which is retrieved from a state.
-	 * 
+	 *
 	 * @param state
 	 * @param stateKey
 	 * @param comboStates
-	 *            this array must must have the same number of entries as the combo box has items
+	 *           this array must must have the same number of entries as the combo box has items
 	 * @param defaultState
 	 * @param combo
 	 */
 	public static void selectStateInCombo(	final IDialogSettings state,
-											final String stateKey,
-											final String[] comboStates,
-											final String defaultState,
-											final Combo combo) {
+														final String stateKey,
+														final String[] comboStates,
+														final String defaultState,
+														final Combo combo) {
 
 		final String stateValue = Util.getStateString(state, stateKey, defaultState);
 
@@ -2206,11 +2206,11 @@ public class Util {
 	/**
 	 * Selects a text item in the combo box. When text item is not available, the first item is
 	 * selected
-	 * 
+	 *
 	 * @param combo
 	 * @param comboItems
 	 * @param selectedItem
-	 *            Text which should be selected in the combo box
+	 *           Text which should be selected in the combo box
 	 */
 	public static void selectTextInCombo(final Combo combo, final String[] comboItems, final String selectedItem) {
 
@@ -2229,7 +2229,7 @@ public class Util {
 
 	/**
 	 * Set the state for an integer array, integer values are converted into string value.
-	 * 
+	 *
 	 * @param state
 	 * @param stateKey
 	 * @param intValues
@@ -2267,9 +2267,9 @@ public class Util {
 		state.put(stateKey, stateValues);
 	}
 
-	public static <E extends Enum<E>> void setStateEnum(final IDialogSettings state,
-														final String key,
-														final Enum<E> value) {
+	public static <E extends Enum<E>> void setStateEnum(	final IDialogSettings state,
+																			final String key,
+																			final Enum<E> value) {
 
 		if (value == null) {
 			return;
@@ -2317,7 +2317,7 @@ public class Util {
 
 	/**
 	 * Set values into xml list/item tags.
-	 * 
+	 *
 	 * @param memento
 	 * @param listKeyName
 	 * @param values
@@ -2336,7 +2336,7 @@ public class Util {
 
 	/**
 	 * Creates a child for the color.
-	 * 
+	 *
 	 * @param xmlColor
 	 * @param tagName
 	 * @param rgb
@@ -2356,10 +2356,10 @@ public class Util {
 
 	/**
 	 * Open view
-	 * 
+	 *
 	 * @param viewId
 	 * @param isActivateView
-	 *            View is activated when <code>true</code>, otherwise it is only visible.
+	 *           View is activated when <code>true</code>, otherwise it is only visible.
 	 * @return Returns the opened/activated view.
 	 */
 	public static IViewPart showView(final String viewId, final boolean isActivateView) {
@@ -2426,7 +2426,7 @@ public class Util {
 
 	/**
 	 * Writes a XML memento into a XML file.
-	 * 
+	 *
 	 * @param xmlMemento
 	 * @param xmlFile
 	 */

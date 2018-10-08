@@ -849,6 +849,8 @@ public class Messages extends NLS {
 	public static String				Image__GeoParts;
 	public static String				Image__GeoParts_Disabled;
 	public static String				Image__Graph;
+	public static String				Image__Graph_Background;
+	public static String				Image__Graph_Background_Disabled;
 	public static String				Image__Graph_Disabled;
 	public static String				Image__Graph_Gears;
 	public static String				Image__Graph_Gears_disabled;
@@ -865,9 +867,7 @@ public class Messages extends NLS {
 	public static String				Image__Graph_RunDyn_VerticalRatio_Disabled;
 	public static String				Image__Graph_Swim_Strokes;
 	public static String				Image__Graph_Swim_Strokes_Disabled;
-
 	public static String				Image__Graph_Swim_Swolf;
-
 	public static String				Image__Graph_Swim_Swolf_Disabled;
 	public static String				Image__GraphMinMax;
 	public static String				Image__GraphMinMax_Disabled;
@@ -1928,6 +1928,11 @@ public class Messages extends NLS {
 	public static String	Slideout_TourChartGraph_Checkbox_ShowInChartToolbar_Tooltip;
 	public static String	Slideout_TourChartGraph_Label_Title;
 
+	public static String	Slideout_TourChartGraphBackground_Combo_BackgroundSource_Tooltip;
+	public static String	Slideout_TourChartGraphBackground_Combo_BackgroundStyle_Tooltip;
+	public static String	Slideout_TourChartGraphBackground_Label_BackgroundSource;
+	public static String	Slideout_TourChartGraphBackground_Label_BackgroundStyle;
+	public static String	Slideout_TourChartGraphBackground_Label_Title;
 	public static String	Slideout_TourChartOptions_Label_Title;
 
 	public static String	Slideout_TourChartSmoothing_Label_Title;
@@ -2092,7 +2097,7 @@ public class Messages extends NLS {
 	public static String	Tour_Action_ShowTourMarker;
 	public static String	Tour_Action_Swim_Strokes_Tooltip;
 	public static String	Tour_Action_Swim_Swolf_Tooltip;
-	public static String Tour_Action_Title_GraphBackground_Source;
+	public static String	Tour_Action_Title_GraphBackground_Source;
 	public static String	Tour_Action_Title_GraphBackground_Style;
 	public static String	Tour_Action_TourInfo_Tooltip;
 	public static String	Tour_Action_TourPhotos;
@@ -2484,6 +2489,18 @@ public class Messages extends NLS {
 
 	public static String	TourCatalog_View_Action_NavigateNextTour;
 	public static String	TourCatalog_View_Action_NavigatePrevTour;
+
+	public static String	TourChart_GraphBackgroundSource_HrZone;
+
+	public static String	TourChart_GraphBackgroundSource_SwimmingStyle;
+
+	public static String	TourChart_GraphBackgroundStyle_GraphColor_Top;
+
+	public static String	TourChart_GraphBackgroundStyle_NoGradient;
+
+	public static String	TourChart_GraphBackgroundStyle_White_Bottom;
+
+	public static String	TourChart_GraphBackgroundStyle_White_Top;
 
 	public static String	TourChart_Property_chart_type_bar;
 	public static String	TourChart_Property_chart_type_line;

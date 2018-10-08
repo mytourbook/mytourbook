@@ -127,7 +127,6 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	private Button						_chkMoveSlidersWhenZoomed;
 	private Button						_chkSegmentAlternateColor;
 	private Button						_chkShowGrid_HorizontalLines;
-	private Button						_chkShowHrZoneBackground;
 	private Button						_chkShowStartTime;
 	private Button						_chkShowGrid_VerticalLines;
 	private Button						_chkZoomToSlider;
@@ -437,15 +436,6 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 			// Color: Segment alternate color
 			_colorSegmentAlternateColor = new ColorSelector(container);
 			_colorSegmentAlternateColor.addListener(_defaultChangePropertyListener);
-
-			/*
-			 * checkbox: HR zones
-			 */
-			_chkShowHrZoneBackground = new Button(container, SWT.CHECK);
-			GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkShowHrZoneBackground);
-			_chkShowHrZoneBackground.setText(GRAPH_LABEL_SHOW_HR_ZONE_BACKGROUND);
-			_chkShowHrZoneBackground.setToolTipText(GRAPH_LABEL_SHOW_HR_ZONE_BACKGROUND_TOOLTIP);
-			_chkShowHrZoneBackground.addSelectionListener(_defaultSelectionListener);
 		}
 	}
 
@@ -936,10 +926,6 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 		if (selectedTab == _tab1_Graphs) {
 
-			final boolean isShowGraphBgStyle = _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_IS_GRAPH_BG_STYLE_VISIBLE);
-			final boolean useGraphBgStyle_HrZone = _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_USE_GRAPH_BG_STYLE_HR_ZONE);
-			_chkShowHrZoneBackground.setSelection(isShowGraphBgStyle && useGraphBgStyle_HrZone);
-
 			_chkGraphAntialiasing.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_ANTIALIASING));
 
 			_spinnerGraphTransparencyFilling.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING));
@@ -991,10 +977,6 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	}
 
 	private void restoreState_Tab_1_Graphs() {
-
-		final boolean isShowGraphBgStyle = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_GRAPH_BG_STYLE_VISIBLE);
-		final boolean useGraphBgStyle_HrZone = _prefStore.getBoolean(ITourbookPreferences.GRAPH_USE_GRAPH_BG_STYLE_HR_ZONE);
-		_chkShowHrZoneBackground.setSelection(isShowGraphBgStyle && useGraphBgStyle_HrZone);
 
 		_chkGraphAntialiasing.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_ANTIALIASING));
 
@@ -1103,11 +1085,6 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	}
 
 	private void saveState_Tab_1_Graphs() {
-
-		final boolean isShowHrZoneBackground = _chkShowHrZoneBackground.getSelection();
-		_prefStore.setValue(ITourbookPreferences.GRAPH_IS_GRAPH_BG_STYLE_VISIBLE, isShowHrZoneBackground);
-		_prefStore.setValue(ITourbookPreferences.GRAPH_USE_GRAPH_BG_STYLE_HR_ZONE, isShowHrZoneBackground);
-		_prefStore.setValue(ITourbookPreferences.GRAPH_USE_GRAPH_BG_STYLE_SWIM_STYLE, !isShowHrZoneBackground);
 
 		_prefStore.setValue(ITourbookPreferences.GRAPH_ANTIALIASING, _chkGraphAntialiasing.getSelection());
 

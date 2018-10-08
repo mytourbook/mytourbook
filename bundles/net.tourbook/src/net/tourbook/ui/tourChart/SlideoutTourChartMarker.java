@@ -1,29 +1,19 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
-
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
-import net.tourbook.common.color.ColorSelectorExtended;
-import net.tourbook.common.color.IColorSelectorListener;
-import net.tourbook.common.font.MTFont;
-import net.tourbook.common.tooltip.ToolbarSlideout;
-import net.tourbook.data.TourMarker;
-import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
@@ -51,6 +41,16 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
+import net.tourbook.common.color.ColorSelectorExtended;
+import net.tourbook.common.color.IColorSelectorListener;
+import net.tourbook.common.font.MTFont;
+import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.data.TourMarker;
+import net.tourbook.preferences.ITourbookPreferences;
+
 /**
  * Tour chart marker properties slideout.
  */
@@ -58,10 +58,10 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 
 	private final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
 
-	private SelectionAdapter		_defaultSelectionAdapter;
-	private MouseWheelListener		_defaultMouseWheelListener;
+	private SelectionAdapter			_defaultSelectionAdapter;
+	private MouseWheelListener			_defaultMouseWheelListener;
 	private IPropertyChangeListener	_defaultPropertyChangeListener;
-	private FocusListener			_keepOpenListener;
+	private FocusListener				_keepOpenListener;
 
 	{
 		_defaultSelectionAdapter = new SelectionAdapter() {
@@ -105,45 +105,45 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 		};
 	}
 
-	private PixelConverter			_pc;
+	private PixelConverter	_pc;
 
-	private Action					_actionRestoreDefaults;
+	private Action				_actionRestoreDefaults;
 
 	/*
 	 * UI controls
 	 */
-	private TourChart				_tourChart;
+	private TourChart					_tourChart;
 
-	private Button					_chkDrawMarkerWithDefaultColor;
-	private Button					_chkShowAbsoluteValues;
-	private Button					_chkShowHiddenMarker;
-	private Button					_chkShowLabelTempPosition;
-	private Button					_chkShowMarkerLabel;
-	private Button					_chkShowMarkerPoint;
-	private Button					_chkShowMarkerTooltip;
-	private Button					_chkShowOnlyWithDescription;
+	private Button						_chkDrawMarkerWithDefaultColor;
+	private Button						_chkShowAbsoluteValues;
+	private Button						_chkShowHiddenMarker;
+	private Button						_chkShowLabelTempPosition;
+	private Button						_chkShowMarkerLabel;
+	private Button						_chkShowMarkerPoint;
+	private Button						_chkShowMarkerTooltip;
+	private Button						_chkShowOnlyWithDescription;
 
 	/**
 	 * Label temporary position, this position is not saved in the marker.
 	 */
-	private Combo					_comboLabelTempPosition;
-	private Combo					_comboTooltipPosition;
+	private Combo						_comboLabelTempPosition;
+	private Combo						_comboTooltipPosition;
 
 	private ColorSelectorExtended	_colorDefaultMarker;
 	private ColorSelectorExtended	_colorDeviceMarker;
 	private ColorSelectorExtended	_colorHiddenMarker;
 
-	private Label					_lblLabelOffset;
-	private Label					_lblMarkerPointSize;
+	private Label						_lblLabelOffset;
+	private Label						_lblMarkerPointSize;
 
 	private Spinner					_spinHoverSize;
 	private Spinner					_spinLabelOffset;
 	private Spinner					_spinMarkerPointSize;
 
 	public SlideoutTourChartMarker(	final Control ownerControl,
-									final ToolBar toolBar,
-									final IDialogSettings state,
-									final TourChart tourChart) {
+												final ToolBar toolBar,
+												final IDialogSettings state,
+												final TourChart tourChart) {
 
 		super(ownerControl, toolBar);
 
@@ -555,8 +555,7 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 			{
 				// Label
 				final Label label = new Label(container, SWT.NONE);
-				GridDataFactory
-						.fillDefaults()//
+				GridDataFactory.fillDefaults()
 						.align(SWT.FILL, SWT.CENTER)
 						.applyTo(label);
 				label.setText(Messages.Slideout_ChartMarkerOptions_Label_DeviceMarkerColor);
@@ -564,8 +563,7 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 
 				// Color selector
 				_colorDeviceMarker = new ColorSelectorExtended(container);
-				GridDataFactory
-						.swtDefaults()//
+				GridDataFactory.swtDefaults()
 						.grab(false, true)
 						.align(SWT.BEGINNING, SWT.BEGINNING)
 						.applyTo(_colorDeviceMarker.getButton());
@@ -720,45 +718,32 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 
 	private void resetToDefaults() {
 
+// SET_FORMATTING_OFF
 		/*
 		 * Update UI with defaults from pref store
 		 */
 
-		_chkDrawMarkerWithDefaultColor.setSelection(//
-				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_DRAW_WITH_DEFAULT_COLOR));
-		_chkShowAbsoluteValues.setSelection(//
-				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_ABSOLUTE_VALUES));
-		_chkShowHiddenMarker.setSelection(//
-				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_HIDDEN_MARKER));
-		_chkShowLabelTempPosition.setSelection(//
-				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_LABEL_TEMP_POSITION));
-		_chkShowMarkerLabel.setSelection(//
-				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_LABEL));
-		_chkShowMarkerPoint.setSelection(//
-				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_POINT));
-		_chkShowMarkerTooltip.setSelection(//
-				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP));
-		_chkShowOnlyWithDescription.setSelection(//
-				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_ONLY_WITH_DESCRIPTION));
+		_chkDrawMarkerWithDefaultColor.setSelection(	_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_DRAW_WITH_DEFAULT_COLOR));
+		_chkShowAbsoluteValues.setSelection(			_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_ABSOLUTE_VALUES));
+		_chkShowHiddenMarker.setSelection(				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_HIDDEN_MARKER));
+		_chkShowLabelTempPosition.setSelection(		_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_LABEL_TEMP_POSITION));
+		_chkShowMarkerLabel.setSelection(				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_LABEL));
+		_chkShowMarkerPoint.setSelection(				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_POINT));
+		_chkShowMarkerTooltip.setSelection(				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP));
+		_chkShowOnlyWithDescription.setSelection(		_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_ONLY_WITH_DESCRIPTION));
 
-		_comboLabelTempPosition.select(//
-				_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_MARKER_LABEL_TEMP_POSITION));
-		_comboTooltipPosition.select(//
-				_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_MARKER_TOOLTIP_POSITION));
+		_comboLabelTempPosition.select(					_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_MARKER_LABEL_TEMP_POSITION));
+		_comboTooltipPosition.select(						_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_MARKER_TOOLTIP_POSITION));
 
-		_spinHoverSize.setSelection(//
-				_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_MARKER_HOVER_SIZE));
-		_spinMarkerPointSize.setSelection(//
-				_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_MARKER_POINT_SIZE));
-		_spinLabelOffset.setSelection(//
-				_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_MARKER_LABEL_OFFSET));
+		_spinHoverSize.setSelection(						_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_MARKER_HOVER_SIZE));
+		_spinMarkerPointSize.setSelection(				_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_MARKER_POINT_SIZE));
+		_spinLabelOffset.setSelection(					_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_MARKER_LABEL_OFFSET));
 
-		_colorDefaultMarker.setColorValue(//
-				PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT));
-		_colorDeviceMarker.setColorValue(//
-				PreferenceConverter.getDefaultColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE));
-		_colorHiddenMarker.setColorValue(//
-				PreferenceConverter.getDefaultColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN));
+		_colorDefaultMarker.setColorValue(	PreferenceConverter.getColor(_prefStore, 			ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT));
+		_colorDeviceMarker.setColorValue(	PreferenceConverter.getDefaultColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE));
+		_colorHiddenMarker.setColorValue(	PreferenceConverter.getDefaultColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN));
+
+// SET_FORMATTING_ON
 
 		onChangeUI();
 	}

@@ -102,8 +102,8 @@ public class GraphBackgroundPainter implements IFillPainter {
 		final TourData tourData = (TourData) dataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
 		final TourChartConfiguration tcc = (TourChartConfiguration) dataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_CHART_CONFIGURATION);
 
-		final boolean useGraphBgStyle_HrZone = tcc.useGraphBgStyle_HrZone;
-		final boolean useGraphBgStyle_SwimStyle = tcc.useGraphBgStyle_SwimStyle;
+		final boolean useGraphBgStyle_HrZone = GraphBgSource.HR_ZONE.name().equals(tcc.graphBackground_Source.name());
+		final boolean useGraphBgStyle_SwimStyle = GraphBgSource.SWIMMING_STYLE.name().equals(tcc.graphBackground_Source.name());
 
 		if (useGraphBgStyle_HrZone) {
 
@@ -131,31 +131,36 @@ public class GraphBackgroundPainter implements IFillPainter {
 		boolean isGradient = false;
 		boolean isWhite = false;
 		boolean isBgColor = false;
-		final String graphBgStyle = tcc.graphBackgroundStyle;
 
-		if (graphBgStyle.equals(TourChart.ACTION_ID_GRAPH_BG_STYLE_GRAPH_TOP)) {
+		switch (tcc.graphBackground_Style) {
+
+		case GRAPH_COLOR_TOP:
 
 			isGradient = true;
 			isWhite = false;
 			isBgColor = true;
+			break;
 
-		} else if (graphBgStyle.equals(TourChart.ACTION_ID_GRAPH_BG_STYLE_NO_GRADIENT)) {
+		case NO_GRADIENT:
 
 			isGradient = false;
 			isWhite = false;
 			isBgColor = true;
+			break;
 
-		} else if (graphBgStyle.equals(TourChart.ACTION_ID_GRAPH_BG_STYLE_WHITE_TOP)) {
-
-			isGradient = true;
-			isWhite = true;
-			isBgColor = true;
-
-		} else if (graphBgStyle.equals(TourChart.ACTION_ID_GRAPH_BG_STYLE_WHITE_BOTTOM)) {
+		case WHITE_BOTTOM:
 
 			isGradient = true;
 			isWhite = true;
 			isBgColor = false;
+			break;
+
+		case WHITE_TOP:
+
+			isGradient = true;
+			isWhite = true;
+			isBgColor = true;
+			break;
 		}
 
 		if (isWhite) {

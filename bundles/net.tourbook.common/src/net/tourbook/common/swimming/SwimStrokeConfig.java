@@ -32,7 +32,7 @@ public class SwimStrokeConfig {
 
 	// SET_FORMATTING_OFF
 
-	private static StrokeStyle[]								_allStrokeStyles	= {
+	private static StrokeStyle[]	_allStrokeStyles	= {
 
 			new StrokeStyle(SwimStroke.FREESTYLE, 		Messages.Swim_Stroke_Freestyle, 				new RGB(0x80, 0x0, 0xff)),
 			new StrokeStyle(SwimStroke.BACKSTROKE, 	Messages.Swim_Stroke_Backstroke, 			new RGB(0x80, 0x80, 0xff)),
