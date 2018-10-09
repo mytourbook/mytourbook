@@ -19,9 +19,10 @@ import org.eclipse.swt.graphics.RGB;
 
 public class StrokeStyle {
 
-	SwimStroke	swimStroke;
-	String		swimStrokeText;
-	public RGB	graphBgColor;
+	SwimStroke		swimStroke;
+	public String	swimStrokeText;
+
+	public RGB		graphBgColor;
 
 	public StrokeStyle(final SwimStroke swimStroke, final String swimStrokeText, final RGB graphBgColor) {
 

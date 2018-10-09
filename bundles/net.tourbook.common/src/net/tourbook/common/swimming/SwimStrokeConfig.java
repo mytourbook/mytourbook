@@ -69,7 +69,11 @@ public class SwimStrokeConfig {
 		_swimStrokeMap.put(SwimStroke.INVALID, _strokeStyle_Invalid);
 	}
 
-	public static HashMap<SwimStroke, StrokeStyle> getAllStrokeStyles() {
+	public static StrokeStyle[] getAllStrokeStyleList() {
+		return _allStrokeStyles;
+	}
+
+	public static HashMap<SwimStroke, StrokeStyle> getAllStrokeStyleMap() {
 		return _swimStrokeMap;
 	}
 

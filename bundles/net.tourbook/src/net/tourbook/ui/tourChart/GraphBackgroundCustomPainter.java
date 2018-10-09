@@ -70,7 +70,7 @@ public class GraphBackgroundCustomPainter implements IFillPainter {
 
 		_strokeStyle_Colors = new HashMap<>();
 
-		for (final Entry<SwimStroke, StrokeStyle> swimStrokeConfig : SwimStrokeConfig.getAllStrokeStyles().entrySet()) {
+		for (final Entry<SwimStroke, StrokeStyle> swimStrokeConfig : SwimStrokeConfig.getAllStrokeStyleMap().entrySet()) {
 
 			final StrokeStyle strokeStyle = swimStrokeConfig.getValue();
 

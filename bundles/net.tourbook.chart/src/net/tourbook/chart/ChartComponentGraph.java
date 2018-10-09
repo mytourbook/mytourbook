@@ -21,10 +21,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
-import net.tourbook.common.PointLong;
-import net.tourbook.common.RectangleLong;
-import net.tourbook.common.UI;
-
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -68,9 +64,13 @@ import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 
+import net.tourbook.common.PointLong;
+import net.tourbook.common.RectangleLong;
+import net.tourbook.common.UI;
+
 /**
  * Draws the graph and axis into the canvas
- * 
+ *
  * @author Wolfgang Schramm
  */
 public class ChartComponentGraph extends Canvas {
@@ -141,14 +141,14 @@ public class ChartComponentGraph extends Canvas {
 	private Image						_chartImage_40_Overlay;
 
 	/**
-	 * 
+	 *
 	 */
 	private ChartDrawingData			_chartDrawingData;
 
 	/**
 	 * drawing data which is used to draw the chart, when this list is empty, an error is displayed
 	 */
-	private ArrayList<GraphDrawingData>	_allGraphDrawingData			= new ArrayList<GraphDrawingData>();
+	private ArrayList<GraphDrawingData>	_allGraphDrawingData			= new ArrayList<>();
 	private ArrayList<GraphDrawingData>	_revertedGraphDrawingData;
 
 	/**
@@ -337,8 +337,8 @@ public class ChartComponentGraph extends Canvas {
 	private boolean						_isHoveredLineVisible			= false;
 	private int							_hoveredValuePointIndex			= -1;
 
-	private ArrayList<RectangleLong[]>	_lineFocusRectangles			= new ArrayList<RectangleLong[]>();
-	private ArrayList<PointLong[]>		_lineDevPositions				= new ArrayList<PointLong[]>();
+	private ArrayList<RectangleLong[]>	_lineFocusRectangles			= new ArrayList<>();
+	private ArrayList<PointLong[]>		_lineDevPositions				= new ArrayList<>();
 
 	/**
 	 * Tooltip for value points, can be <code>null</code> when not set.
@@ -457,7 +457,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param parent
 	 *            the parent of this control.
 	 * @param style
@@ -1006,7 +1006,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Create a cursor resource from an image file
-	 * 
+	 *
 	 * @param imageName
 	 * @return
 	 */
@@ -1045,7 +1045,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Creates the label(s) and the position for each graph
-	 * 
+	 *
 	 * @param gc
 	 * @param xSlider
 	 */
@@ -1056,7 +1056,7 @@ public class ChartComponentGraph extends Canvas {
 		int sliderValueIndex = xSlider.getValuesIndex();
 		// final int valueX = slider.getValueX();
 
-		final ArrayList<ChartXSliderLabel> labelList = new ArrayList<ChartXSliderLabel>();
+		final ArrayList<ChartXSliderLabel> labelList = new ArrayList<>();
 		xSlider.setLabelList(labelList);
 
 		final ScrollBar hBar = getHorizontalBar();
@@ -1448,7 +1448,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Draw the graphs into the chart+graph image
-	 * 
+	 *
 	 * @return Return <code>true</code> when the graph was painted directly and not in async mode
 	 */
 	private boolean drawAsync_100_StartPainting() {
@@ -1613,7 +1613,7 @@ public class ChartComponentGraph extends Canvas {
 	/**
 	 * Draw all graphs, each graph is painted in the same canvas (gcGraph) which is painted in the
 	 * the chart image (gcChart).
-	 * 
+	 *
 	 * @param gcChart
 	 * @param gcGraph
 	 */
@@ -1770,7 +1770,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Draw segment background
-	 * 
+	 *
 	 * @param gc
 	 * @param drawingData
 	 */
@@ -2062,7 +2062,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Draw the unit label, tick and the vertical grid line for the x axis
-	 * 
+	 *
 	 * @param gcChart
 	 * @param gcGraph
 	 * @param graphDrawingData
@@ -2334,7 +2334,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * draw the horizontal gridlines or the x-axis
-	 * 
+	 *
 	 * @param gcGraph
 	 * @param drawingData
 	 * @param isDrawOnlyXAsis
@@ -2399,7 +2399,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * draw the horizontal gridlines or the x-axis
-	 * 
+	 *
 	 * @param gcGraph
 	 * @param drawingData
 	 * @param isDrawOnlyXAsis
@@ -2605,7 +2605,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * First draw the graph into a path, the path is then drawn on the device with a transformation.
-	 * 
+	 *
 	 * @param gc
 	 * @param graphDrawingData
 	 * @param startIndex
@@ -2688,7 +2688,7 @@ public class ChartComponentGraph extends Canvas {
 		final Path path2 = isPath2 ? new Path(display) : null;
 
 		final boolean isShowSkippedValues = _chartDrawingData.chartDataModel.isNoLinesValuesDisplayed();
-		final ArrayList<Point> skippedValues = new ArrayList<Point>();
+		final ArrayList<Point> skippedValues = new ArrayList<>();
 
 		final int devGraphHeight = graphDrawingData.devGraphHeight;
 		final float devYGraphTop = (float) (scaleY * graphYBorderTop);
@@ -2699,7 +2699,7 @@ public class ChartComponentGraph extends Canvas {
 		RectangleLong prevLineRect = null;
 
 		/*
-		 * 
+		 *
 		 */
 		final float devY0Inverse = devGraphHeight + devYGraphBottom;
 
@@ -3269,7 +3269,7 @@ public class ChartComponentGraph extends Canvas {
 	/**
 	 * Draws a bar graph, this requires that drawingData.getChartData2ndValues does not return null,
 	 * if null is returned, a line graph will be drawn instead
-	 * 
+	 *
 	 * @param gcGraph
 	 * @param drawingData
 	 */
@@ -3526,7 +3526,7 @@ public class ChartComponentGraph extends Canvas {
 	/**
 	 * Draws a bar graph, this requires that drawingData.getChartData2ndValues does not return
 	 * <code>null</code>, if <code>null</code> is returned, a line graph will be drawn instead.
-	 * 
+	 *
 	 * @param gc
 	 * @param drawingData
 	 */
@@ -3672,7 +3672,7 @@ public class ChartComponentGraph extends Canvas {
 	 * <p>
 	 * <b> Zooming the chart is not yet supported for this charttype because logarithmic scaling is
 	 * very complex for a zoomed chart </b>
-	 * 
+	 *
 	 * @param gc
 	 * @param drawingData
 	 */
@@ -3749,7 +3749,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Is used for drawing gear values.
-	 * 
+	 *
 	 * @param gc
 	 * @param graphDrawingData
 	 * @param isTopGraph
@@ -4308,16 +4308,16 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Paint event handler
-	 * 
+	 *
 	 * <pre>
 	 * Top-down sequence how the images are painted
-	 * 
+	 *
 	 * {@link #_chartImage_40_Overlay}
 	 * {@link #_chartImage_30_Custom}
 	 * {@link #_chartImage_20_Chart}
 	 * {@link #_chartImage_10_Graphs}
 	 * </pre>
-	 * 
+	 *
 	 * @param gc
 	 * @param eventTime
 	 */
@@ -4456,7 +4456,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * This is painted when the chart is scrolled horizontally or when its dragged with the mouse.
-	 * 
+	 *
 	 * @param gc
 	 */
 	private void drawSync_020_MoveCanvas(final GC gc) {
@@ -4564,7 +4564,7 @@ public class ChartComponentGraph extends Canvas {
 	/**
 	 * Draws the overlays into the graph (fg layer image) slider image which contains the custom
 	 * layer image
-	 * 
+	 *
 	 * @param eventTime
 	 */
 	private void drawSync_400_OverlayImage(final long eventTime) {
@@ -4861,7 +4861,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Draw the y-slider which it hit.
-	 * 
+	 *
 	 * @param gcGraph
 	 */
 	private void drawSync_420_YSliders(final GC gcGraph) {
@@ -5817,7 +5817,7 @@ public class ChartComponentGraph extends Canvas {
 	/**
 	 * Mouse event occured in the value point tooltip, move the slider and/or hovered line (value
 	 * point) accordingly.
-	 * 
+	 *
 	 * @param event
 	 * @param mouseDisplayPosition
 	 */
@@ -5873,7 +5873,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * check if mouse has moved over a bar
-	 * 
+	 *
 	 * @param devX
 	 * @param devY
 	 */
@@ -6032,7 +6032,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * check if the mouse hit an y-slider and returns the hit slider
-	 * 
+	 *
 	 * @param graphX
 	 * @param devY
 	 * @return
@@ -6155,7 +6155,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Move slider to the valueIndex position.
-	 * 
+	 *
 	 * @param xSlider
 	 * @param valueIndex
 	 * @param isCenterSliderPosition
@@ -6202,7 +6202,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Move the slider to a new position
-	 * 
+	 *
 	 * @param xSlider
 	 *            Current slider
 	 * @param xxDevSliderLinePos
@@ -6316,7 +6316,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * move the x-slider with the keyboard
-	 * 
+	 *
 	 * @param event
 	 */
 	private void onKeyDown_MoveXSlider(final Event event) {
@@ -6490,7 +6490,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Mouse down event handler
-	 * 
+	 *
 	 * @param event
 	 */
 	private void onMouseDown(final MouseEvent event) {
@@ -6702,7 +6702,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Mouse down event in the x-axis area
-	 * 
+	 *
 	 * @param event
 	 */
 	void onMouseDownAxis(final MouseEvent event) {
@@ -6738,7 +6738,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Mouse exit event handler
-	 * 
+	 *
 	 * @param event
 	 */
 	private void onMouseExit(final MouseEvent event) {
@@ -6808,7 +6808,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Mouse move event handler
-	 * 
+	 *
 	 * @param eventTime
 	 * @param eventTime
 	 */
@@ -7246,7 +7246,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Mouse up event handler
-	 * 
+	 *
 	 * @param event
 	 */
 	private void onMouseUp(final MouseEvent event) {
@@ -7434,7 +7434,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Scroll event handler
-	 * 
+	 *
 	 * @param event
 	 */
 	private void onScroll(final SelectionEvent event) {
@@ -7631,7 +7631,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Move a zoomed chart so that the slider is visible.
-	 * 
+	 *
 	 * @param slider
 	 * @param isCenterSliderPosition
 	 * @param isSetSliderVisible
@@ -7714,7 +7714,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Move a zoomed chart to a new position
-	 * 
+	 *
 	 * @param xxDevNewPosition
 	 */
 	private void setChartPosition(final long xxDevNewPosition) {
@@ -7837,7 +7837,7 @@ public class ChartComponentGraph extends Canvas {
 			 * will overlap the other graphs.
 			 */
 
-			_revertedGraphDrawingData = new ArrayList<GraphDrawingData>();
+			_revertedGraphDrawingData = new ArrayList<>();
 
 			for (final GraphDrawingData graphDrawingData : _allGraphDrawingData) {
 				_revertedGraphDrawingData.add(graphDrawingData);
@@ -7898,7 +7898,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Set the focus to a control depending on the chart type
-	 * 
+	 *
 	 * @return Returns <code>true</code> when the focus was set
 	 */
 	private boolean setFocusToControl() {
@@ -8079,7 +8079,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Set the value index in the X-slider for the hovered position.
-	 * 
+	 *
 	 * @param xSlider
 	 */
 	void setXSliderValue_FromHoveredValuePoint(final ChartXSlider xSlider) {
@@ -8116,7 +8116,7 @@ public class ChartComponentGraph extends Canvas {
 	 * steadily but with different distance on the x axis. So first we have to find the nearest
 	 * position in the values array and then interpolite from the found position to the slider
 	 * position.
-	 * 
+	 *
 	 * @param xSlider
 	 */
 	void setXSliderValue_FromRatio(final ChartXSlider xSlider) {
@@ -8220,7 +8220,7 @@ public class ChartComponentGraph extends Canvas {
 	/**
 	 * makes the slider visible, a slider is only drawn into the chart if a slider was created with
 	 * createSlider
-	 * 
+	 *
 	 * @param isXSliderVisible
 	 */
 	void setXSliderVisible(final boolean isSliderVisible) {
@@ -8277,7 +8277,7 @@ public class ChartComponentGraph extends Canvas {
 	 * set the slider to the 2nd x-data and keep the slider on the same xValue position as before,
 	 * this can cause to the situation, that the right slider gets unvisible/unhitable or the
 	 * painted graph can have a white space on the right side
-	 * 
+	 *
 	 * @param slider
 	 *            the slider which gets changed
 	 */
@@ -8416,7 +8416,7 @@ public class ChartComponentGraph extends Canvas {
 		/*
 		 * update all y-sliders
 		 */
-		_ySliders = new ArrayList<ChartYSlider>();
+		_ySliders = new ArrayList<>();
 
 		// loop: get all y-sliders from all graphs
 		for (final GraphDrawingData drawingData : _allGraphDrawingData) {
@@ -8863,7 +8863,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Zooms out of the graph
-	 * 
+	 *
 	 * @param isUpdateChart
 	 * @param devXMousePosition
 	 *            This relative mouse position is used to keep the position when zoomed in, when set

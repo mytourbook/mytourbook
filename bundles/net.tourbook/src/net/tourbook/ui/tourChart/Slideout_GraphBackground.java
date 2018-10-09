@@ -50,6 +50,7 @@ import net.tourbook.preferences.PrefPageAppearanceColors;
 import net.tourbook.preferences.PrefPageAppearanceTourChart;
 import net.tourbook.preferences.PrefPagePeople;
 import net.tourbook.preferences.PrefPagePeopleData;
+import net.tourbook.preferences.PrefPage_Appearance_Swimming;
 
 /**
  * Tour chart properties slideout.
@@ -467,6 +468,7 @@ public class Slideout_GraphBackground extends ToolbarSlideout {
 			break;
 
 		case SWIMMING_STYLE:
+			pageId = PrefPage_Appearance_Swimming.ID;
 			break;
 
 		case DEFAULT:
