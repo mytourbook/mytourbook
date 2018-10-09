@@ -43,7 +43,7 @@ import net.tourbook.training.TrainingManager;
 /**
  * Draws background color into the graph, e.g. HR zone, swim style
  */
-public class GraphBackgroundPainter implements IFillPainter {
+public class GraphBackgroundCustomPainter implements IFillPainter {
 
 	private Color[]					_hrZone_Colors;
 	private HashMap<Short, Color>	_strokeStyle_Colors;
@@ -86,24 +86,13 @@ public class GraphBackgroundPainter implements IFillPainter {
 							final int valueIndexFirstPoint,
 							final int valueIndexLastPoint) {
 
-//		drawVertical(gcGraph, graphDrawingData, chart);
-		drawHorizontal(gcGraph, graphDrawingData, chart, devXPositions, valueIndexFirstPoint, valueIndexLastPoint);
-	}
-
-	private void drawHorizontal(	final GC gcGraph,
-											final GraphDrawingData graphDrawingData,
-											final Chart chart,
-											final long[] devXPositions,
-											final int valueIndexFirstPoint,
-											final int valueIndexLastPoint) {
-
 		final ChartDataModel dataModel = chart.getChartDataModel();
 
 		final TourData tourData = (TourData) dataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
 		final TourChartConfiguration tcc = (TourChartConfiguration) dataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_CHART_CONFIGURATION);
 
-		final boolean useGraphBgStyle_HrZone = GraphBgSource.HR_ZONE.name().equals(tcc.graphBackground_Source.name());
-		final boolean useGraphBgStyle_SwimStyle = GraphBgSource.SWIMMING_STYLE.name().equals(tcc.graphBackground_Source.name());
+		final boolean useGraphBgStyle_HrZone = tcc.isBackgroundStyle_HrZone();
+		final boolean useGraphBgStyle_SwimStyle = tcc.isBackgroundStyle_SwimmingStyle();
 
 		if (useGraphBgStyle_HrZone) {
 
@@ -267,4 +256,5 @@ public class GraphBackgroundPainter implements IFillPainter {
 			}
 		}
 	}
+
 }

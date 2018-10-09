@@ -105,7 +105,6 @@ public interface ITourbookPreferences {
 	public static final String	GRAPH_BACKGROUND_SOURCE								= "GRAPH_BACKGROUND_SOURCE";							//$NON-NLS-1$
 	public static final String	GRAPH_BACKGROUND_STYLE								= "GRAPH_BACKGROUND_STYLE";							//$NON-NLS-1$
 	public static final String	GRAPH_IS_BREAKTIME_VALUES_VISIBLE				= "Graph_IsBreaktimeVisible";							//$NON-NLS-1$
-	public static final String	GRAPH_IS_GRAPH_BG_STYLE_VISIBLE					= "GRAPH_IS_GRAPH_BG_STYLE_VISIBLE";				//$NON-NLS-1$
 	public static final String	GRAPH_IS_GRAPH_OVERLAPPED							= "GRAPH_IS_GRAPH_OVERLAPPED";						//$NON-NLS-1$
 	public static final String	GRAPH_IS_MARKER_VISIBLE								= "Graph_IsMarkerVisible";								//$NON-NLS-1$
 	public static final String	GRAPH_IS_SEGMENT_ALTERNATE_COLOR					= "GRAPH_IS_SEGMENT_ALTERNATE_COLOR";				//$NON-NLS-1$

@@ -41,7 +41,7 @@ public class TourChartConfiguration {
 	 */
 	public static final GraphBgSourceType[]	GRAPH_BACKGROUND_SOURCE_TYPE;
 
-	public final static GraphBgSource			GRAPH_BACKGROUND_SOURCE_DEFAULT	= GraphBgSource.HR_ZONE;
+	public final static GraphBackgroundSource	GRAPH_BACKGROUND_SOURCE_DEFAULT	= GraphBackgroundSource.DEFAULT;
 
 	/**
 	 * Graph background style, they must correspond to the position id GRAPH_BACKGROUND_SOURCE_*.
@@ -56,8 +56,9 @@ public class TourChartConfiguration {
 
 		GRAPH_BACKGROUND_SOURCE_TYPE = new GraphBgSourceType[] { //
 				//
-				new GraphBgSourceType(GraphBgSource.HR_ZONE, 			Messages.TourChart_GraphBackgroundSource_HrZone),
-				new GraphBgSourceType(GraphBgSource.SWIMMING_STYLE, Messages.TourChart_GraphBackgroundSource_SwimmingStyle),
+				new GraphBgSourceType(GraphBackgroundSource.DEFAULT, 					Messages.TourChart_GraphBackgroundSource_Default),
+				new GraphBgSourceType(GraphBackgroundSource.HR_ZONE, 					Messages.TourChart_GraphBackgroundSource_HrZone),
+				new GraphBgSourceType(GraphBackgroundSource.SWIMMING_STYLE,			Messages.TourChart_GraphBackgroundSource_SwimmingStyle),
 		};
 
 		GRAPH_BACKGROUND_STYLE_TYPE = new GraphBgStyleType[] { //
@@ -211,37 +212,31 @@ public class TourChartConfiguration {
 	 */
 	public boolean							isShowBreaktimeValues	= true;
 
-	/**
-	 * Is <code>true</code> when HR zones can be displayed, which requires that pulse values are
-	 * available and the person has defined HR zones.
-	 */
-	public boolean							canShowHrZones				= false;
-
-	/**
-	 * Is <code>true</code> when swim style can be displayed, this requires that swim data are
-	 * available .
-	 */
-	public boolean							canShowSwimStyle			= false;
-
 	/*
 	 * Graph background
 	 */
 
 	/**
-	 * Is <code>true</code> when the graph background color is filled with hr zone or swim style
-	 * color
-	 */
-	public boolean						isGraphBgStyleVisible	= false;
-
-	/**
 	 * Source which is used to draw the graph background
 	 */
-	public GraphBgSource				graphBackground_Source	= GRAPH_BACKGROUND_SOURCE_DEFAULT;
+	public GraphBackgroundSource	graphBackground_Source			= GRAPH_BACKGROUND_SOURCE_DEFAULT;
 
 	/**
 	 * Graph style which is used to draw the graph background
 	 */
-	public GraphBackgroundStyle	graphBackground_Style	= GRAPH_BACKGROUND_STYLE_DEFAULT;
+	public GraphBackgroundStyle	graphBackground_Style			= GRAPH_BACKGROUND_STYLE_DEFAULT;
+
+	/**
+	 * Is <code>true</code> when HR zones can be displayed, which requires that pulse values are
+	 * available and the person has defined HR zones.
+	 */
+	public boolean						canShowBackground_HrZones		= false;
+
+	/**
+	 * Is <code>true</code> when swim style can be displayed, this requires that swim data are
+	 * available .
+	 */
+	public boolean						canShowBackground_SwimStyle	= false;
 
 	/*
 	 * Tour photos
@@ -341,6 +336,18 @@ public class TourChartConfiguration {
 		return _visibleGraphSequence;
 	}
 
+	public boolean isBackgroundStyle_Default() {
+		return GraphBackgroundSource.DEFAULT.name().equals(graphBackground_Source.name());
+	}
+
+	public boolean isBackgroundStyle_HrZone() {
+		return GraphBackgroundSource.HR_ZONE.name().equals(graphBackground_Source.name());
+	}
+
+	public boolean isBackgroundStyle_SwimmingStyle() {
+		return GraphBackgroundSource.SWIMMING_STYLE.name().equals(graphBackground_Source.name());
+	}
+
 	public void removeVisibleGraph(final int selectedGraphId) {
 
 		int graphIndex = 0;
@@ -386,5 +393,4 @@ public class TourChartConfiguration {
 		autoZoomToSlider = _prefStore.getBoolean(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER);
 		moveSlidersWhenZoomed = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED);
 	}
-
 }

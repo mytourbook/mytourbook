@@ -17,10 +17,10 @@ package net.tourbook.ui.tourChart;
 
 public class GraphBgSourceType {
 
-	GraphBgSource	graphBgSource;
+	GraphBackgroundSource	graphBgSource;
 	String			label;
 
-	public GraphBgSourceType(final GraphBgSource graphBgSource, final String label) {
+	public GraphBgSourceType(final GraphBackgroundSource graphBgSource, final String label) {
 
 		this.graphBgSource = graphBgSource;
 		this.label = label;

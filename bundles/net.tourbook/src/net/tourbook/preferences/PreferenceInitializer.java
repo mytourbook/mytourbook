@@ -140,9 +140,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 				+ (Integer.toString(TourManager.GRAPH_GRADIENT) + separator)
 				+ Integer.toString(TourManager.GRAPH_POWER));
 
-		// graph background
-		store.setDefault(ITourbookPreferences.GRAPH_IS_GRAPH_BG_STYLE_VISIBLE, 		false);
-
 		store.setDefault(ITourbookPreferences.GRAPH_ANTIALIASING, true);
 		store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE, 0xFF);
 		store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING, 0x80);

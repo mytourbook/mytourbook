@@ -18,7 +18,9 @@ package net.tourbook.ui.tourChart;
 /**
  * Fill graph background with color from this source.
  */
-public enum GraphBgSource {
+public enum GraphBackgroundSource {
+
+	DEFAULT, // defined in the preferences Appearance/Colors
 
 	HR_ZONE, //
 	SWIMMING_STYLE, //

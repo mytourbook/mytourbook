@@ -80,8 +80,8 @@ import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourProviderAll;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
+import net.tourbook.ui.tourChart.GraphBackgroundSource;
 import net.tourbook.ui.tourChart.GraphBackgroundStyle;
-import net.tourbook.ui.tourChart.GraphBgSource;
 import net.tourbook.ui.tourChart.IValueLabelProvider;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
@@ -627,19 +627,6 @@ public class TourManager {
 		for (final String prefGraphId : prefGraphIds) {
 			tcc.addVisibleGraph(Integer.parseInt(prefGraphId));
 		}
-
-		/*
-		 * Graph background
-		 */
-		tcc.isGraphBgStyleVisible = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_GRAPH_BG_STYLE_VISIBLE);
-
-		final String prefGraphBgSource = _prefStore.getString(ITourbookPreferences.GRAPH_BACKGROUND_SOURCE);
-		final String prefGraphBgStyle = _prefStore.getString(ITourbookPreferences.GRAPH_BACKGROUND_STYLE);
-
-		tcc.graphBackground_Source = (GraphBgSource) Util.getEnumValue(prefGraphBgSource,
-				TourChartConfiguration.GRAPH_BACKGROUND_SOURCE_DEFAULT);
-		tcc.graphBackground_Style = (GraphBackgroundStyle) Util.getEnumValue(prefGraphBgStyle,
-				TourChartConfiguration.GRAPH_BACKGROUND_STYLE_DEFAULT);
 
 		// set the unit which is shown on the x-axis
 		final boolean isShowTime = _prefStore.getString(ITourbookPreferences.GRAPH_X_AXIS).equals(X_AXIS_TIME);
@@ -3108,40 +3095,75 @@ public class TourManager {
 			chartType = ChartType.LINE;
 		}
 
+		/*
+		 * Graph background
+		 */
+
 		// HR zones can be displayed when they are available
-		tcc.canShowHrZones = tourData.getNumberOfHrZones() > 0;
-//		final boolean isHrZoneDisplayed = tcc.canShowHrZones && tcc.isGraphBgStyleVisible && tcc.useGraphBgStyle_HrZone;
-		final boolean isHrZoneDisplayed = tcc.canShowHrZones && tcc.isGraphBgStyleVisible;
+		final boolean canShowBackground_HrZones = tcc.canShowBackground_HrZones = tourData.getNumberOfHrZones() > 0;
 
 		// swim style can be displayed when they are availabel
-		tcc.canShowSwimStyle = tourData.swim_Time != null;
-		final boolean isSwimStyleDisplayed = tcc.canShowSwimStyle && tcc.isGraphBgStyleVisible;
+		final boolean canShowBackground_SwimStyle = tcc.canShowBackground_SwimStyle = tourData.swim_Time != null;
 
-		final boolean useGraphBgStyle = isHrZoneDisplayed || isSwimStyleDisplayed;
+		final String prefGraphBgSource = _prefStore.getString(ITourbookPreferences.GRAPH_BACKGROUND_SOURCE);
+		final String prefGraphBgStyle = _prefStore.getString(ITourbookPreferences.GRAPH_BACKGROUND_STYLE);
+
+		GraphBackgroundSource graphBgSource = (GraphBackgroundSource) Util.getEnumValue(prefGraphBgSource,
+				TourChartConfiguration.GRAPH_BACKGROUND_SOURCE_DEFAULT);
+		final GraphBackgroundStyle graphBgStyle = (GraphBackgroundStyle) Util.getEnumValue(prefGraphBgStyle,
+				TourChartConfiguration.GRAPH_BACKGROUND_STYLE_DEFAULT);
+
+		final boolean prefShow_HrZone = GraphBackgroundSource.HR_ZONE.name().equals(prefGraphBgSource);
+		final boolean prefShow_SwimStyle = GraphBackgroundSource.SWIMMING_STYLE.name().equals(prefGraphBgSource);
+
+		// check if data are available for the requested background source
+		if (prefShow_HrZone) {
+
+			if (canShowBackground_HrZones == false) {
+
+				// hr zones cannot be displayed -> show default
+				graphBgSource = GraphBackgroundSource.DEFAULT;
+			}
+
+		} else if (prefShow_SwimStyle) {
+
+			if (canShowBackground_SwimStyle == false) {
+
+				// swimming style cannot be displayed -> show default
+				graphBgSource = GraphBackgroundSource.DEFAULT;
+			}
+		}
+
+		tcc.graphBackground_Source = graphBgSource;
+		tcc.graphBackground_Style = graphBgStyle;
+
+		final boolean isHrZoneDisplayed = canShowBackground_HrZones && tcc.isBackgroundStyle_HrZone();
+		final boolean isSwimStyleDisplayed = canShowBackground_SwimStyle && tcc.isBackgroundStyle_SwimmingStyle();
+		final boolean useCustomBackground = isHrZoneDisplayed || isSwimStyleDisplayed;
 
 // SET_FORMATTING_OFF
 
-		final ChartDataYSerie yDataAltitude			= createModelData_Altitude(	tourData, chartDataModel, chartType, useGraphBgStyle, tcc);
-		final ChartDataYSerie yDataPulse 			= createModelData_Heartbeat(	tourData, chartDataModel, chartType, useGraphBgStyle);
-		final ChartDataYSerie yDataSpeed 			= createModelData_Speed(		tourData, chartDataModel, chartType, useGraphBgStyle);
-		final ChartDataYSerie yDataPace 				= createModelData_Pace(			tourData, chartDataModel, chartType, useGraphBgStyle);
-		final ChartDataYSerie yDataPower 			= createModelData_Power(		tourData, chartDataModel, chartType, useGraphBgStyle);
-		final ChartDataYSerie yDataAltimeter 	 	= createModelData_Altimeter(	tourData, chartDataModel, chartType, useGraphBgStyle);
-		final ChartDataYSerie yDataGradient 		= createModelData_Gradient(	tourData, chartDataModel, chartType, useGraphBgStyle);
-		final ChartDataYSerie yDataCadence 			= createModelData_Cadence(		tourData, chartDataModel, chartType, useGraphBgStyle);
+		final ChartDataYSerie yDataAltitude			= createModelData_Altitude(	tourData, chartDataModel, chartType, useCustomBackground, tcc);
+		final ChartDataYSerie yDataPulse 			= createModelData_Heartbeat(	tourData, chartDataModel, chartType, useCustomBackground);
+		final ChartDataYSerie yDataSpeed 			= createModelData_Speed(		tourData, chartDataModel, chartType, useCustomBackground);
+		final ChartDataYSerie yDataPace 				= createModelData_Pace(			tourData, chartDataModel, chartType, useCustomBackground);
+		final ChartDataYSerie yDataPower 			= createModelData_Power(		tourData, chartDataModel, chartType, useCustomBackground);
+		final ChartDataYSerie yDataAltimeter 	 	= createModelData_Altimeter(	tourData, chartDataModel, chartType, useCustomBackground);
+		final ChartDataYSerie yDataGradient 		= createModelData_Gradient(	tourData, chartDataModel, chartType, useCustomBackground);
+		final ChartDataYSerie yDataCadence 			= createModelData_Cadence(		tourData, chartDataModel, chartType, useCustomBackground);
 		final ChartDataYSerie yDataGears 			= createModelData_Gears(		tourData, chartDataModel);
-		final ChartDataYSerie yDataTemperature 	= createModelData_Temperature(tourData, chartDataModel, chartType, useGraphBgStyle);
+		final ChartDataYSerie yDataTemperature 	= createModelData_Temperature(tourData, chartDataModel, chartType, useCustomBackground);
 
 		final ChartDataYSerie yDataTourCompare 	= createModelData_TourCompare(tourData, chartDataModel, chartType, tcc);
 
-		final ChartDataYSerie yData_RunDyn_StanceTime				= createModelData_RunDyn_StanceTime(			tourData, chartDataModel, chartType, useGraphBgStyle);
-		final ChartDataYSerie yData_RunDyn_StanceTimeBalance		= createModelData_RunDyn_StanceTimeBalance(	tourData, chartDataModel, chartType, useGraphBgStyle);
-		final ChartDataYSerie yData_RunDyn_StepLength				= createModelData_RunDyn_StepLength(			tourData, chartDataModel, chartType, useGraphBgStyle);
-		final ChartDataYSerie yData_RunDyn_VerticalOscillation	= createModelData_RunDyn_VerticalOscillation(tourData, chartDataModel, chartType, useGraphBgStyle);
-		final ChartDataYSerie yData_RunDyn_VerticalRatio			= createModelData_RunDyn_VerticalRatio(		tourData, chartDataModel, chartType, useGraphBgStyle);
+		final ChartDataYSerie yData_RunDyn_StanceTime				= createModelData_RunDyn_StanceTime(			tourData, chartDataModel, chartType, useCustomBackground);
+		final ChartDataYSerie yData_RunDyn_StanceTimeBalance		= createModelData_RunDyn_StanceTimeBalance(	tourData, chartDataModel, chartType, useCustomBackground);
+		final ChartDataYSerie yData_RunDyn_StepLength				= createModelData_RunDyn_StepLength(			tourData, chartDataModel, chartType, useCustomBackground);
+		final ChartDataYSerie yData_RunDyn_VerticalOscillation	= createModelData_RunDyn_VerticalOscillation(tourData, chartDataModel, chartType, useCustomBackground);
+		final ChartDataYSerie yData_RunDyn_VerticalRatio			= createModelData_RunDyn_VerticalRatio(		tourData, chartDataModel, chartType, useCustomBackground);
 
-		final ChartDataYSerie yData_Swim_Strokes						= createModelData_Swim_Strokes(					tourData, chartDataModel, chartType, useGraphBgStyle);
-		final ChartDataYSerie yData_Swim_Swolf							= createModelData_Swim_Swolf(						tourData, chartDataModel, chartType, useGraphBgStyle);
+		final ChartDataYSerie yData_Swim_Strokes						= createModelData_Swim_Strokes(					tourData, chartDataModel, chartType, useCustomBackground);
+		final ChartDataYSerie yData_Swim_Swolf							= createModelData_Swim_Swolf(						tourData, chartDataModel, chartType, useCustomBackground);
 
 // SET_FORMATTING_ON
 
@@ -3518,9 +3540,6 @@ public class TourManager {
 			} else {
 				yDataCadence.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
 			}
-//			yDataCadence.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM_NO_BORDER);
-//			yDataCadence.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_NO);
-//			yDataCadence.setLineGaps(tourData.getCadenceGaps());
 
 			setGraphColor(yDataCadence, GraphColorManager.PREF_GRAPH_CADENCE);
 			chartDataModel.addXyData(yDataCadence);

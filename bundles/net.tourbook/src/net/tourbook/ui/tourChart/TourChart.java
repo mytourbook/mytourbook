@@ -316,30 +316,26 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private ImageDescriptor												_imagePhotoTooltip					= TourbookPlugin.getImageDescriptor(Messages.Image__PhotoImage);
 //SET_FORMATTING_ON
 	//
-	private IFillPainter						_hrZonePainter;
+	private IFillPainter							_customBackgroundPainter;
 
-	private OpenDialogManager				_openDlgMgr								= new OpenDialogManager();
+	private OpenDialogManager					_openDlgMgr								= new OpenDialogManager();
 
-	private ChartPhotoToolTip				_photoTooltip;
-	private TourToolTip						_tourInfoIconTooltip;
-	private TourInfoIconToolTipProvider	_tourInfoIconTooltipProvider;
-	private ChartMarkerToolTip				_tourMarkerTooltip;
-	private TourSegmenterTooltip			_tourSegmenterTooltip;
-	private ChartTitleToolTip				_tourTitleTooltip;
-	private ValuePointToolTipUI			_valuePointTooltip;
+	private ChartPhotoToolTip					_photoTooltip;
+	private TourToolTip							_tourInfoIconTooltip;
+	private TourInfoIconToolTipProvider		_tourInfoIconTooltipProvider;
+	private ChartMarkerToolTip					_tourMarkerTooltip;
+	private TourSegmenterTooltip				_tourSegmenterTooltip;
+	private ChartTitleToolTip					_tourTitleTooltip;
+	private ValuePointToolTipUI				_valuePointTooltip;
 	//
-	private ControlListener					_ttControlListener					= new ControlListener();
-	private IKeyListener						_chartKeyListener						= new ChartKeyListener();
-	private IMouseListener					_mouseMarkerListener					= new MouseMarkerListener();
-	private IMouseListener					_mousePhotoListener					= new MousePhotoListener();
-	private IMouseListener					_mouseSegmentLabel_Listener		=
-			new MouseListener_SegmenterSegment();
-	private IMouseListener					_mouseSegmentLabel_MoveListener	=
-			new MouseListener_SegmenterSegment_Move();
-	private IMouseListener					_mouseSegmentTitle_Listener		= new MouseListener_SegmentTitle();
-	private IMouseListener					_mouseSegmentTitle_MoveListener	=
-			new MouseListener_SegmentTitle_Move();
-	//
+	private ControlListener						_ttControlListener					= new ControlListener();
+	private IKeyListener							_chartKeyListener						= new ChartKeyListener();
+	private IMouseListener						_mouseMarkerListener					= new MouseMarkerListener();
+	private IMouseListener						_mousePhotoListener					= new MousePhotoListener();
+	private IMouseListener						_mouseSegmentLabel_Listener		= new MouseListener_SegmenterSegment();
+	private IMouseListener						_mouseSegmentLabel_MoveListener	= new MouseListener_SegmenterSegment_Move();
+	private IMouseListener						_mouseSegmentTitle_Listener		= new MouseListener_SegmentTitle();
+	private IMouseListener						_mouseSegmentTitle_MoveListener	= new MouseListener_SegmentTitle_Move();
 	//
 	private long									_hoveredSegmentTitleEventTime;
 	//
@@ -354,7 +350,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private ArrayList<TIntArrayList>			_selectedOtherPoints;
 	private ArrayList<RGB>						_selectedPathsRGB;
 	//
-	private boolean								_isToolbarPack	= true;
+	private boolean								_isToolbarPack							= true;
 	private boolean								_isSegmentTitleHovered;
 	private ChartTitleSegment					_chartTitleSegment;
 	private TourMarker							_lastHoveredTourMarker;
@@ -866,19 +862,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 		setHoveredListener(new HoveredValueListener());
 		setLineSelectionPainter(this);
-	}
-
-	/**
-	 * Toggle Graph background style
-	 */
-	public void action_ShowGraphBgStyle() {
-
-		final boolean isGraphBgStylevisible = !_tcc.isGraphBgStyleVisible;
-
-		_prefStore.setValue(ITourbookPreferences.GRAPH_IS_GRAPH_BG_STYLE_VISIBLE, isGraphBgStylevisible);
-		_tcc.isGraphBgStyleVisible = isGraphBgStylevisible;
-
-		updateTourChart();
 	}
 
 	public void actionCanAutoMoveSliders(final boolean isItemChecked) {
@@ -2418,15 +2401,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 		// draw the graph lighter that the segments are more visible
 		setGraphAlpha(graphOpacity / 100.0);
-	}
-
-	private void createPainter_HrZone() {
-
-		if (_tcc.isGraphBgStyleVisible) {
-			_hrZonePainter = new GraphBackgroundPainter();
-		} else {
-			_hrZonePainter = null;
-		}
 	}
 
 	private void createSelectedLines() {
@@ -4455,6 +4429,15 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		_canShowTourSegments = canShowTourSegments;
 	}
 
+	private void setCustomBackgroundPainter() {
+
+		if (_tcc.isBackgroundStyle_HrZone() || _tcc.isBackgroundStyle_SwimmingStyle()) {
+			_customBackgroundPainter = new GraphBackgroundCustomPainter();
+		} else {
+			_customBackgroundPainter = null;
+		}
+	}
+
 	/**
 	 * When a tour chart is opened in a dialog, some actions should not be done.
 	 *
@@ -4950,10 +4933,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		}
 
 		/*
-		 * HR zone painter
+		 * HR zone / swimming style painter
 		 */
-		if (_hrZonePainter != null) {
-			yData.setCustomFillPainter(_hrZonePainter);
+		if (_customBackgroundPainter != null) {
+			yData.setCustomFillPainter(_customBackgroundPainter);
 		}
 
 		// set custom layers, no layers are set when layer list is empty
@@ -5266,15 +5249,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		}
 
 		/*
-		 * Graph background
-		 */
-		final boolean canShowHrZones = _tcc.canShowHrZones;
-		final boolean canShowSwimStyle = _tcc.canShowSwimStyle;
-
-		// enable graph background slideout when HR or swim data are available
-		_action_GraphBackground_Slideout.setEnabled(canShowHrZones || canShowSwimStyle);
-
-		/*
 		 * Tour infos
 		 */
 		_actionTourInfo.setSelected(_tcc.isTourInfoVisible);
@@ -5465,7 +5439,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		createLayer_2ndAlti();
 		createLayer_Photo();
 
-		createPainter_HrZone();
+		setCustomBackgroundPainter();
 
 		setupGraphLayer();
 		setupChartSegmentTitle();

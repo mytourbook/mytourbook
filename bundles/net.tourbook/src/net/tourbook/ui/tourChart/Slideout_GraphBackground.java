@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
+import java.util.ArrayList;
+
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -42,22 +44,30 @@ import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.data.TourPerson;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageAppearanceColors;
 import net.tourbook.preferences.PrefPageAppearanceTourChart;
+import net.tourbook.preferences.PrefPagePeople;
+import net.tourbook.preferences.PrefPagePeopleData;
 
 /**
  * Tour chart properties slideout.
  */
 public class Slideout_GraphBackground extends ToolbarSlideout {
 
-	private static final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
+	private static final IPreferenceStore	_prefStore							= TourbookPlugin.getPrefStore();
 	private IDialogSettings						_state;
+
+	/**
+	 * Contains all {@link GraphBgSourceType}s which can be displayed for the current tour
+	 */
+	private ArrayList<GraphBgSourceType>	_availableGraphBgSourceTypes	= new ArrayList<>();
 
 	private Action									_actionRestoreDefaults;
 	private ActionOpenPrefDialog				_actionPrefDialog;
 
 	private SelectionAdapter					_defaultSelectionListener;
-
 	private SelectionAdapter					_defaultSelectionAdapter;
 	private MouseWheelListener					_defaultMouseWheelListener;
 	private IPropertyChangeListener			_defaultPropertyChangeListener;
@@ -113,6 +123,8 @@ public class Slideout_GraphBackground extends ToolbarSlideout {
 	private Combo		_comboGraphBgStyle;
 	private Combo		_comboGraphBgSource;
 
+	private Label		_lblGraphBgStyle;
+
 	public Slideout_GraphBackground(	final Control ownerControl,
 												final ToolBar toolBar,
 												final TourChart tourChart,
@@ -140,7 +152,7 @@ public class Slideout_GraphBackground extends ToolbarSlideout {
 		_actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
 
 		_actionPrefDialog = new ActionOpenPrefDialog(
-				Messages.Tour_Action_EditChartPreferences,
+				Messages.Slideout_TourChartGraphBackground_Action_Colors_Tooltip,
 				PrefPageAppearanceTourChart.ID);
 
 		_actionPrefDialog.closeThisTooltip(this);
@@ -205,10 +217,7 @@ public class Slideout_GraphBackground extends ToolbarSlideout {
 				.applyTo(toolbar);
 
 		final ToolBarManager tbm = new ToolBarManager(toolbar);
-
 		tbm.add(_actionRestoreDefaults);
-		tbm.add(_actionPrefDialog);
-
 		tbm.update(true);
 	}
 
@@ -225,50 +234,97 @@ public class Slideout_GraphBackground extends ToolbarSlideout {
 				 */
 				final Label label = new Label(container, SWT.NONE);
 				label.setText(Messages.Slideout_TourChartGraphBackground_Label_BackgroundSource);
-				GridDataFactory.fillDefaults()
-						.align(SWT.FILL, SWT.CENTER)
-						.applyTo(label);
+				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
 
-				_comboGraphBgSource = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-				_comboGraphBgSource.setVisibleItemCount(20);
-				_comboGraphBgSource.setToolTipText(Messages.Slideout_TourChartGraphBackground_Combo_BackgroundSource_Tooltip);
-				_comboGraphBgSource.addSelectionListener(_defaultSelectionAdapter);
-				_comboGraphBgSource.addFocusListener(_keepOpenListener);
-//				GridDataFactory.fillDefaults()
-//						.grab(true, false)
-//						.align(SWT.END, SWT.FILL)
-//						.applyTo(_comboBackgroundSource);
+				final Composite bgSourcecontainer = new Composite(container, SWT.NONE);
+				GridDataFactory.fillDefaults().grab(true, false).applyTo(bgSourcecontainer);
+				GridLayoutFactory.fillDefaults().numColumns(2).applyTo(bgSourcecontainer);
+				{
+					{
+						_comboGraphBgSource = new Combo(bgSourcecontainer, SWT.DROP_DOWN | SWT.READ_ONLY);
+						_comboGraphBgSource.setVisibleItemCount(20);
+						_comboGraphBgSource.setToolTipText(Messages.Slideout_TourChartGraphBackground_Combo_BackgroundSource_Tooltip);
+						_comboGraphBgSource.addSelectionListener(_defaultSelectionAdapter);
+						_comboGraphBgSource.addFocusListener(_keepOpenListener);
+					}
+					{
+						final ToolBar toolbar = new ToolBar(bgSourcecontainer, SWT.FLAT);
+						GridDataFactory.fillDefaults()//
+								.grab(true, false)
+								.align(SWT.BEGINNING, SWT.CENTER)
+								.applyTo(toolbar);
+
+						final ToolBarManager tbm = new ToolBarManager(toolbar);
+						tbm.add(_actionPrefDialog);
+						tbm.update(true);
+					}
+				}
 			}
 			{
 				/*
 				 * Combo: Background style
 				 */
-				final Label label = new Label(container, SWT.NONE);
-				label.setText(Messages.Slideout_TourChartGraphBackground_Label_BackgroundStyle);
-				GridDataFactory.fillDefaults()
-						.align(SWT.FILL, SWT.CENTER)
-						.applyTo(label);
+				_lblGraphBgStyle = new Label(container, SWT.NONE);
+				_lblGraphBgStyle.setText(Messages.Slideout_TourChartGraphBackground_Label_BackgroundStyle);
+				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblGraphBgStyle);
 
 				_comboGraphBgStyle = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
 				_comboGraphBgStyle.setVisibleItemCount(20);
 				_comboGraphBgStyle.addSelectionListener(_defaultSelectionAdapter);
 				_comboGraphBgStyle.addFocusListener(_keepOpenListener);
-//				GridDataFactory.fillDefaults()
-//						.grab(true, false)
-//						.align(SWT.END, SWT.FILL)
-//						.applyTo(_comboBackgroundStyle);
 			}
 		}
 	}
 
+	private void enableControls() {
+
+		final TourChartConfiguration tcc = _tourChart.getTourChartConfig();
+
+		final boolean canUseBgStyle = tcc.isBackgroundStyle_HrZone() || tcc.isBackgroundStyle_SwimmingStyle();
+
+		_lblGraphBgStyle.setEnabled(canUseBgStyle);
+		_comboGraphBgStyle.setEnabled(canUseBgStyle);
+	}
+
 	private void fillUI() {
 
-		for (final GraphBgSourceType bgSource : TourChartConfiguration.GRAPH_BACKGROUND_SOURCE_TYPE) {
-			_comboGraphBgSource.add(bgSource.label);
+		_availableGraphBgSourceTypes.clear();
+
+		final TourChartConfiguration tcc = _tourChart.getTourChartConfig();
+
+		for (final GraphBgSourceType bgSourceType : TourChartConfiguration.GRAPH_BACKGROUND_SOURCE_TYPE) {
+
+			switch (bgSourceType.graphBgSource) {
+
+			case DEFAULT:
+
+				// default is always added
+				_availableGraphBgSourceTypes.add(bgSourceType);
+				_comboGraphBgSource.add(bgSourceType.label);
+				break;
+
+			case HR_ZONE:
+
+				if (tcc.canShowBackground_HrZones) {
+					_availableGraphBgSourceTypes.add(bgSourceType);
+					_comboGraphBgSource.add(bgSourceType.label);
+				}
+
+				break;
+
+			case SWIMMING_STYLE:
+
+				if (tcc.canShowBackground_SwimStyle) {
+					_availableGraphBgSourceTypes.add(bgSourceType);
+					_comboGraphBgSource.add(bgSourceType.label);
+				}
+				break;
+			}
+
 		}
 
-		for (final GraphBgStyleType bgStyle : TourChartConfiguration.GRAPH_BACKGROUND_STYLE_TYPE) {
-			_comboGraphBgStyle.add(bgStyle.label);
+		for (final GraphBgStyleType bgStyleType : TourChartConfiguration.GRAPH_BACKGROUND_STYLE_TYPE) {
+			_comboGraphBgStyle.add(bgStyleType.label);
 		}
 
 	}
@@ -286,7 +342,9 @@ public class Slideout_GraphBackground extends ToolbarSlideout {
 	private void onChangeUI() {
 
 		saveState();
+		enableControls();
 
+		updateUI();
 		updateGraphUI();
 	}
 
@@ -301,7 +359,9 @@ public class Slideout_GraphBackground extends ToolbarSlideout {
 		select_GraphBgStyle(TourChartConfiguration.GRAPH_BACKGROUND_STYLE_DEFAULT);
 
 		saveState();
+		enableControls();
 
+		updateUI();
 		updateGraphUI();
 	}
 
@@ -312,6 +372,9 @@ public class Slideout_GraphBackground extends ToolbarSlideout {
 		// graph background
 		select_GraphBgSource(tcc.graphBackground_Source);
 		select_GraphBgStyle(tcc.graphBackground_Style);
+
+		updateUI();
+		enableControls();
 	}
 
 	private void saveState() {
@@ -320,10 +383,10 @@ public class Slideout_GraphBackground extends ToolbarSlideout {
 
 // SET_FORMATTING_OFF
 
-		final GraphBgSourceType graphBgSourceType 	= TourChartConfiguration.GRAPH_BACKGROUND_SOURCE_TYPE[_comboGraphBgSource.getSelectionIndex()];
+		final GraphBgSourceType graphBgSourceType 	= _availableGraphBgSourceTypes.get(_comboGraphBgSource.getSelectionIndex());
 		final GraphBgStyleType graphBgStyleType 		= TourChartConfiguration.GRAPH_BACKGROUND_STYLE_TYPE[_comboGraphBgStyle.getSelectionIndex()];
 
-		final GraphBgSource graphBgSource 				= graphBgSourceType.graphBgSource;
+		final GraphBackgroundSource graphBgSource 	= graphBgSourceType.graphBgSource;
 		final GraphBackgroundStyle graphBgStyle 		= graphBgStyleType.graphBgStyle;
 
 		/*
@@ -341,17 +404,18 @@ public class Slideout_GraphBackground extends ToolbarSlideout {
 // SET_FORMATTING_ON
 	}
 
-	private void select_GraphBgSource(final GraphBgSource graphBgSource) {
+	private void select_GraphBgSource(final GraphBackgroundSource graphBgSource) {
 
-		final GraphBgSourceType[] graphBgSourceType = TourChartConfiguration.GRAPH_BACKGROUND_SOURCE_TYPE;
-		for (int itemIndex = 0; itemIndex < graphBgSourceType.length; itemIndex++) {
+		int itemIndex = 0;
 
-			final GraphBgSourceType bgSource = graphBgSourceType[itemIndex];
+		for (final GraphBgSourceType graphBgSourceType : _availableGraphBgSourceTypes) {
 
-			if (bgSource.graphBgSource.equals(graphBgSource)) {
+			if (graphBgSourceType.graphBgSource.equals(graphBgSource)) {
 				_comboGraphBgSource.select(itemIndex);
 				return;
 			}
+
+			itemIndex++;
 		}
 
 		// set default
@@ -377,16 +441,40 @@ public class Slideout_GraphBackground extends ToolbarSlideout {
 
 	private void updateGraphUI() {
 
-		final TourChartConfiguration tcc = _tourChart.getTourChartConfig();
+		_tourChart.updateTourChart();
+	}
 
-		if (tcc.isGraphBgStyleVisible == false) {
+	private void updateUI() {
 
-			// graph background style is not yet displayed
-			_tourChart.action_ShowGraphBgStyle();
+		/*
+		 * Setup pref page which should be opened with the action
+		 */
 
-		} else {
+		String pageId = null;
+		Object data = null;
 
-			_tourChart.updateTourChart();
+		final GraphBgSourceType graphBgSourceType = _availableGraphBgSourceTypes.get(_comboGraphBgSource.getSelectionIndex());
+
+		switch (graphBgSourceType.graphBgSource) {
+
+		case HR_ZONE:
+
+			final TourPerson person = _tourChart.getTourData().getDataPerson();
+
+			pageId = PrefPagePeople.ID;
+			data = new PrefPagePeopleData(PrefPagePeople.PREF_DATA_SELECT_HR_ZONES, person);
+
+			break;
+
+		case SWIMMING_STYLE:
+			break;
+
+		case DEFAULT:
+		default:
+			pageId = PrefPageAppearanceColors.ID;
+			break;
 		}
+
+		_actionPrefDialog.setPrefData(pageId, data);
 	}
 }

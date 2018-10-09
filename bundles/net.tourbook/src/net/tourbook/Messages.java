@@ -1928,6 +1928,7 @@ public class Messages extends NLS {
 	public static String	Slideout_TourChartGraph_Checkbox_ShowInChartToolbar_Tooltip;
 	public static String	Slideout_TourChartGraph_Label_Title;
 
+	public static String	Slideout_TourChartGraphBackground_Action_Colors_Tooltip;
 	public static String	Slideout_TourChartGraphBackground_Combo_BackgroundSource_Tooltip;
 	public static String	Slideout_TourChartGraphBackground_Combo_BackgroundStyle_Tooltip;
 	public static String	Slideout_TourChartGraphBackground_Label_BackgroundSource;
@@ -2490,16 +2491,12 @@ public class Messages extends NLS {
 	public static String	TourCatalog_View_Action_NavigateNextTour;
 	public static String	TourCatalog_View_Action_NavigatePrevTour;
 
+	public static String	TourChart_GraphBackgroundSource_Default;
 	public static String	TourChart_GraphBackgroundSource_HrZone;
-
 	public static String	TourChart_GraphBackgroundSource_SwimmingStyle;
-
 	public static String	TourChart_GraphBackgroundStyle_GraphColor_Top;
-
 	public static String	TourChart_GraphBackgroundStyle_NoGradient;
-
 	public static String	TourChart_GraphBackgroundStyle_White_Bottom;
-
 	public static String	TourChart_GraphBackgroundStyle_White_Top;
 
 	public static String	TourChart_Property_chart_type_bar;
