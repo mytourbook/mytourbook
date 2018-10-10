@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.zip.GZIPInputStream;
 
@@ -13,9 +14,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import net.tourbook.common.UI;
-import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
+import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
@@ -74,6 +75,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 			return false;
 		}
 		_importFilePath = importFilePath;
+
 		createTourData(alreadyImportedTours, newlyImportedTours);
 		return true;
 	}
@@ -115,8 +117,8 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 				return false;
 			}
 
-		} catch (final Exception e1) {
-			StatusUtil.log(e1);
+		} catch (final Exception e) {
+			StatusUtil.log(e);
 		} finally {
 			Util.closeReader(fileReader);
 		}
@@ -128,15 +130,10 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 	private void createTourData(final HashMap<Long, TourData> alreadyImportedTours,
 			final HashMap<Long, TourData> newlyImportedTours) {
 
+		String jsonFileContent = GetJsonContentFromGZipFile(_importFilePath);
+
 		// create data object for each tour
-		final TourData tourData = new TourData();
-
-		/*
-		 * set tour start date/time
-		 */
-		final ZonedDateTime dtTourStart = ZonedDateTime.of(2018, 10, 10, 8, 0, 0, 0, TimeTools.getDefaultTimeZone());
-
-		tourData.setTourStartTime(dtTourStart);
+		final TourData tourData = ImportTour(jsonFileContent);
 
 		tourData.setImportFilePath(_importFilePath);
 
@@ -146,8 +143,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
 		tourData.setDeviceId(deviceId);
 		// after all data are added, the tour id can be created
-		final String uniqueId = createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_POLAR_HRM);
-		final Long tourId = tourData.createTourId(uniqueId);
+		final Long tourId = tourData.createTourId("49837533398");
 
 		// check if the tour is already imported
 		if (alreadyImportedTours.containsKey(tourId) == false) {
@@ -179,5 +175,71 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		}
 
 		return jsonFileContent;
+	}
+
+
+	private TourData ImportTour(String jsonFileContent) {
+		final TourData tourData = new TourData();
+		JSONArray samples = null;
+		try {
+			JSONObject jsonContent = new JSONObject(jsonFileContent);
+			samples = (JSONArray) jsonContent.get("Samples");
+		} catch (JSONException ex) {
+			return null;
+		}
+
+		JSONObject firstSample = (JSONObject) samples.get(0);
+
+		/*
+		 * set tour start date/time
+		 */
+		ZonedDateTime previousLapStartTime = ZonedDateTime.parse(firstSample.get("TimeISO8601").toString());
+		tourData.setTourStartTime(previousLapStartTime);
+
+		ArrayList<TimeData> _sampleList = new ArrayList<>();
+		for (int i = 0; i < samples.length(); i++) {
+			JSONObject sample = samples.getJSONObject(i);
+			JSONObject currentSampleAttributes = new JSONObject(sample.get("Attributes").toString());
+			JSONObject currentSampleSml = new JSONObject(currentSampleAttributes.get("suunto/sml").toString());
+			String currentSampleData = currentSampleSml.get("Sample").toString();
+
+			// GPS point
+			if (currentSampleData.contains("GPSAltitude") && currentSampleData.contains("Latitude")
+					&& currentSampleData.contains("Longitude")) {
+				TryAddGpsData(new JSONObject(currentSampleData), _sampleList);
+			}
+
+		}
+		tourData.createTimeSeries(_sampleList, true);
+
+		return tourData;
+	}
+
+
+	private void TryAddGpsData(JSONObject currentSample, ArrayList<TimeData> sampleList) {
+		ZonedDateTime time = ZonedDateTime.parse(currentSample.get("UTC").toString());
+		float latitude = Float.parseFloat(currentSample.get("Latitude").toString());
+		float longitude = Float.parseFloat(currentSample.get("Longitude").toString());
+		float altitude = Float.parseFloat(currentSample.get("GPSAltitude").toString());
+		TimeData dejfn = new TimeData();
+		dejfn.latitude = (latitude * 180) / Math.PI;
+		dejfn.longitude = (longitude * 180) / Math.PI;
+		// dejfn.time = time;
+		dejfn.altitude = altitude;
+
+		sampleList.add(dejfn);
+		/*
+		 * if (TryRetrieveFloatElementValue( currentSample, SuuntoDataNames.GpsAltitude,
+		 * out float altitude) && TryRetrieveFloatElementValue( currentSample,
+		 * SuuntoDataNames.Latitude, out float latitude) &&
+		 * TryRetrieveFloatElementValue( currentSample, SuuntoDataNames.Longitude, out
+		 * float longitude) && TryRetrieveDateTimeElementValue( currentSample,
+		 * SuuntoDataNames.Utc, out DateTime time)) { if (activity.GPSRoute == null) {
+		 * activity.GPSRoute = new GPSRoute(); }
+		 * 
+		 * GPSPoint gpsPoint = new GPSPoint( (float)(latitude * 180.0 / Math.PI),
+		 * (float)(longitude * 180.0 / Math.PI), altitude); activity.GPSRoute.Add(time,
+		 * gpsPoint); } }
+		 */
 	}
 }
