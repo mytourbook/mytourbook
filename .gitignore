@@ -6,10 +6,6 @@ repositories/
 **/build/
 **/tmp/
 
-# VTM external files
-libs/
-**/natives/
-
 .apt_generated
 
 .gradle
