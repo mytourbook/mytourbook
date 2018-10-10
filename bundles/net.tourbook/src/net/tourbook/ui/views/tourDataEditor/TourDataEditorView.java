@@ -143,7 +143,7 @@ import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.swimming.SwimStroke;
-import net.tourbook.common.swimming.SwimStrokeConfig;
+import net.tourbook.common.swimming.SwimStrokeManager;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TimeZoneData;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
@@ -4208,7 +4208,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		 */
 		final TextCellEditor textCellEditor = new CellEditor_Text_Customized(_swimSlice_Viewer.getTable());
 		final ComboBoxCellEditor strokeStyleCellEditor = new CellEditor_ComboBox_Customized(_swimSlice_Viewer.getTable(),
-				SwimStrokeConfig.getAllStrokeText());
+				SwimStrokeManager.getAllStrokeText());
 
 		_swimSlice_CadenceEditingSupport = new SliceEditingSupport_Short(textCellEditor, _swimSerie_Cadence);
 		_swimSlice_StrokesEditingSupport = new SliceEditingSupport_Short(textCellEditor, _swimSerie_Strokes);
@@ -4421,7 +4421,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					if (value == Short.MIN_VALUE) {
 						cell.setText(UI.EMPTY_STRING);
 					} else {
-						cell.setText(SwimStrokeConfig.getLabel(SwimStroke.getByValue(value)));
+						cell.setText(SwimStrokeManager.getLabel(SwimStroke.getByValue(value)));
 					}
 
 				} else {

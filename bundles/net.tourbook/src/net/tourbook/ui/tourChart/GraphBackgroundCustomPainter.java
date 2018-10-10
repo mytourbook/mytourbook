@@ -30,9 +30,8 @@ import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IFillPainter;
-import net.tourbook.common.swimming.StrokeStyle;
 import net.tourbook.common.swimming.SwimStroke;
-import net.tourbook.common.swimming.SwimStrokeConfig;
+import net.tourbook.common.swimming.SwimStrokeManager;
 import net.tourbook.data.HrZoneContext;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
@@ -70,11 +69,8 @@ public class GraphBackgroundCustomPainter implements IFillPainter {
 
 		_strokeStyle_Colors = new HashMap<>();
 
-		for (final Entry<SwimStroke, StrokeStyle> swimStrokeConfig : SwimStrokeConfig.getAllStrokeStyleMap().entrySet()) {
-
-			final StrokeStyle strokeStyle = swimStrokeConfig.getValue();
-
-			_strokeStyle_Colors.put(swimStrokeConfig.getKey().getValue(), new Color(display, strokeStyle.graphBgColor));
+		for (final Entry<SwimStroke, RGB> swimStrokeItem : SwimStrokeManager.getSwimStroke_RGB().entrySet()) {
+			_strokeStyle_Colors.put(swimStrokeItem.getKey().getValue(), new Color(display, swimStrokeItem.getValue()));
 		}
 	}
 

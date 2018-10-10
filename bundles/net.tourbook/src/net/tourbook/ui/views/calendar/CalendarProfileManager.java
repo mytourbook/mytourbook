@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -20,6 +20,19 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.util.ArrayList;
+
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.ui.IMemento;
+import org.eclipse.ui.XMLMemento;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.Version;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -38,265 +51,250 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.RGB;
-import org.eclipse.ui.IMemento;
-import org.eclipse.ui.XMLMemento;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.Version;
-
 public class CalendarProfileManager {
 
-// SET_FORMATTING_OFF
 	//
-	private static final String				VALUE_UNIT_K_CALORIES	= net.tourbook.ui.Messages.Value_Unit_KCalories;
+	private static final String	VALUE_UNIT_K_CALORIES	= net.tourbook.ui.Messages.Value_Unit_KCalories;
 	//
-	private static final String				DEFAULT_PREFIX			= " : ";					//$NON-NLS-1$
+	private static final String	DEFAULT_PREFIX				= " : ";														//$NON-NLS-1$
 	//
-	private static final String				PROFILE_FILE_NAME		= "calendar-profiles.xml";			//$NON-NLS-1$
+	private static final String	PROFILE_FILE_NAME			= "calendar-profiles.xml";								//$NON-NLS-1$
 	//
 	/**
 	 * Version number is not yet used.
 	 */
-	private static final int				PROFILE_VERSION			= 1;
+	private static final int		PROFILE_VERSION			= 1;
 	//
-	private static final Bundle				_bundle					= TourbookPlugin.getDefault().getBundle();
-	private static final IPath				_stateLocation			= Platform.getStateLocation(_bundle);
+	private static final Bundle	_bundle						= TourbookPlugin.getDefault().getBundle();
+	private static final IPath		_stateLocation				= Platform.getStateLocation(_bundle);
 	//
-// SET_FORMATTING_ON
 	//
 	// common attributes
-	private static final String				ATTR_ID									= "id";								//$NON-NLS-1$
-	private static final String				ATTR_ACTIVE_PROFILE_ID					= "activeProfileId";				//$NON-NLS-1$
-	private static final String				ATTR_PROFILE_NAME						= "profileName";					//$NON-NLS-1$
+	private static final String	ATTR_ID										= "id";									//$NON-NLS-1$
+	private static final String	ATTR_ACTIVE_PROFILE_ID					= "activeProfileId";					//$NON-NLS-1$
+	private static final String	ATTR_PROFILE_NAME							= "profileName";						//$NON-NLS-1$
 	//
-	private static final String				ATTR_IS_DEFAULT_DEFAULT_ID				= "isDefaultDefaultId";				//$NON-NLS-1$
-	private static final String				ATTR_IS_USER_PARENT_DEFAULT_ID			= "isUserParentDefaultId";			//$NON-NLS-1$
-	private static final String				ATTR_PROFILE_DEFAULT_DEFAULT_ID			= "profileDefaultDefaultId";		//$NON-NLS-1$
-	private static final String				ATTR_PROFILE_USER_DEFAULT_ID			= "profileUserDefaultId";			//$NON-NLS-1$
-	private static final String				ATTR_PROFILE_USER_PARENT_DEFAULT_ID		= "profileUserParentDefaultId";		//$NON-NLS-1$
+	private static final String	ATTR_IS_DEFAULT_DEFAULT_ID				= "isDefaultDefaultId";				//$NON-NLS-1$
+	private static final String	ATTR_IS_USER_PARENT_DEFAULT_ID		= "isUserParentDefaultId";			//$NON-NLS-1$
+	private static final String	ATTR_PROFILE_DEFAULT_DEFAULT_ID		= "profileDefaultDefaultId";		//$NON-NLS-1$
+	private static final String	ATTR_PROFILE_USER_DEFAULT_ID			= "profileUserDefaultId";			//$NON-NLS-1$
+	private static final String	ATTR_PROFILE_USER_PARENT_DEFAULT_ID	= "profileUserParentDefaultId";	//$NON-NLS-1$
 	//
 	/*
 	 * Root
 	 */
-	private static final String				TAG_ROOT								= "CalendarProfiles";				//$NON-NLS-1$
-	private static final String				ATTR_PROFILE_VERSION					= "profileVersion";					//$NON-NLS-1$
+	private static final String	TAG_ROOT					= "CalendarProfiles";	//$NON-NLS-1$
+	private static final String	ATTR_PROFILE_VERSION	= "profileVersion";		//$NON-NLS-1$
 	//
 	/*
 	 * Calendars
 	 */
-	private static final String				TAG_CALENDAR_PROFILE					= "CalendarProfile";				//$NON-NLS-1$
-	private static final String				TAG_CALENDAR							= "Calendar";						//$NON-NLS-1$
+	private static final String		TAG_CALENDAR_PROFILE							= "CalendarProfile";					//$NON-NLS-1$
+	private static final String		TAG_CALENDAR									= "Calendar";							//$NON-NLS-1$
 	//
-	private static final String				TAG_ALL_TOUR_FORMATTER					= "AllTourFormatter";				//$NON-NLS-1$
-	private static final String				TAG_ALL_WEEK_FORMATTER					= "AllWeekFormatter";				//$NON-NLS-1$
-	private static final String				TAG_ALTERNATE_MONTH_RGB					= "AlternateMonthRGB";				//$NON-NLS-1$
-	private static final String				TAG_ALTERNATE_MONTH2_RGB				= "AlternateMonth2RGB";				//$NON-NLS-1$
-	private static final String				TAG_CALENDAR_BACKGROUND_RGB				= "CalendarBackgroundRGB";			//$NON-NLS-1$
-	private static final String				TAG_CALENDAR_FOREGROUND_RGB				= "CalendarForegroundRGB";			//$NON-NLS-1$
-	private static final String				TAG_DAY_HOVERED_RGB						= "DayHoveredRGB";					//$NON-NLS-1$;
-	private static final String				TAG_DAY_SELECTED_RGB					= "DaySelectedRGB";					//$NON-NLS-1$;
-	private static final String				TAG_DAY_TODAY_RGB						= "DayTodayRGB";					//$NON-NLS-1$
-	private static final String				TAG_FORMATTER							= "Formatter";						//$NON-NLS-1$
-	private static final String				TAG_TOUR_BACKGROUND_1_RGB				= "TourBackground1RGB";				//$NON-NLS-1$;
-	private static final String				TAG_TOUR_BACKGROUND_2_RGB				= "TourBackground2RGB";				//$NON-NLS-1$;
-	private static final String				TAG_TOUR_BORDER_RGB						= "TourBorderRGB";					//$NON-NLS-1$;
-	private static final String				TAG_TOUR_DRAGGED_RGB					= "TourDraggedRGB";					//$NON-NLS-1$
-	private static final String				TAG_TOUR_HOVERED_RGB					= "TourHoveredRGB";					//$NON-NLS-1$;
-	private static final String				TAG_TOUR_SELECTED_RGB					= "TourSelectedRGB";				//$NON-NLS-1$;
-	private static final String				TAG_TOUR_CONTENT_RGB					= "TourContentRGB";					//$NON-NLS-1$;
-	private static final String				TAG_TOUR_TITLE_RGB						= "TourTitleRGB";					//$NON-NLS-1$;
-	private static final String				TAG_TOUR_VALUE_RGB						= "TourValueRGB";					//$NON-NLS-1$;
-	private static final String				TAG_WEEK_VALUE_RGB						= "weekValueRGB";					//$NON-NLS-1$
+	private static final String		TAG_ALL_TOUR_FORMATTER						= "AllTourFormatter";				//$NON-NLS-1$
+	private static final String		TAG_ALL_WEEK_FORMATTER						= "AllWeekFormatter";				//$NON-NLS-1$
+	private static final String		TAG_ALTERNATE_MONTH_RGB						= "AlternateMonthRGB";				//$NON-NLS-1$
+	private static final String		TAG_ALTERNATE_MONTH2_RGB					= "AlternateMonth2RGB";				//$NON-NLS-1$
+	private static final String		TAG_CALENDAR_BACKGROUND_RGB				= "CalendarBackgroundRGB";			//$NON-NLS-1$
+	private static final String		TAG_CALENDAR_FOREGROUND_RGB				= "CalendarForegroundRGB";			//$NON-NLS-1$
+	private static final String		TAG_DAY_HOVERED_RGB							= "DayHoveredRGB";					//$NON-NLS-1$;
+	private static final String		TAG_DAY_SELECTED_RGB							= "DaySelectedRGB";					//$NON-NLS-1$;
+	private static final String		TAG_DAY_TODAY_RGB								= "DayTodayRGB";						//$NON-NLS-1$
+	private static final String		TAG_FORMATTER									= "Formatter";							//$NON-NLS-1$
+	private static final String		TAG_TOUR_BACKGROUND_1_RGB					= "TourBackground1RGB";				//$NON-NLS-1$;
+	private static final String		TAG_TOUR_BACKGROUND_2_RGB					= "TourBackground2RGB";				//$NON-NLS-1$;
+	private static final String		TAG_TOUR_BORDER_RGB							= "TourBorderRGB";					//$NON-NLS-1$;
+	private static final String		TAG_TOUR_DRAGGED_RGB							= "TourDraggedRGB";					//$NON-NLS-1$
+	private static final String		TAG_TOUR_HOVERED_RGB							= "TourHoveredRGB";					//$NON-NLS-1$;
+	private static final String		TAG_TOUR_SELECTED_RGB						= "TourSelectedRGB";					//$NON-NLS-1$;
+	private static final String		TAG_TOUR_CONTENT_RGB							= "TourContentRGB";					//$NON-NLS-1$;
+	private static final String		TAG_TOUR_TITLE_RGB							= "TourTitleRGB";						//$NON-NLS-1$;
+	private static final String		TAG_TOUR_VALUE_RGB							= "TourValueRGB";						//$NON-NLS-1$;
+	private static final String		TAG_WEEK_VALUE_RGB							= "weekValueRGB";						//$NON-NLS-1$
 	//
-	private static final String				ATTR_IS_DAY_CONTENT_VERTICAL			= "isDayContentVertical";			//$NON-NLS-1$
-	private static final String				ATTR_IS_HIDE_DAY_DATE_WHEN_NO_TOUR		= "isHideDayDateWhenNoTour";		//$NON-NLS-1$
-	private static final String				ATTR_IS_SHOW_DATE_COLUMN				= "isShowDateColumn";				//$NON-NLS-1$
-	private static final String				ATTR_IS_SHOW_DAY_DATE					= "isShowDayDate";					//$NON-NLS-1$
-	private static final String				ATTR_IS_SHOW_DAY_DATE_WEEKEND_COLOR		= "isShowDayDateWeekendColor";		//$NON-NLS-1$
-	private static final String				ATTR_IS_SHOW_SUMMARY_COLUMN				= "isShowSummaryColumn";			//$NON-NLS-1$
-	private static final String				ATTR_IS_SHOW_TOUR_CONTENT				= "isShowTourContent";				//$NON-NLS-1$
-	private static final String				ATTR_IS_SHOW_TOUR_VALUE_UNIT			= "isShowTourValueUnit";			//$NON-NLS-1$
-	private static final String				ATTR_IS_SHOW_YEAR_COLUMNS				= "isShowYearColumns";				//$NON-NLS-1$
-	private static final String				ATTR_IS_SHOW_VALUE						= "isShowValue";					//$NON-NLS-1$
-	private static final String				ATTR_IS_SHOW_WEEK_VALUE_UNIT			= "isShowWeekValueUnit";			//$NON-NLS-1$
-	private static final String				ATTR_IS_TOGGLE_MONTH_COLOR				= "isToggleMonthColor";				//$NON-NLS-1$
-	private static final String				ATTR_IS_TRUNCATE_TOUR_TEXT				= "isTruncateTourText";				//$NON-NLS-1$
-	private static final String				ATTR_IS_WEEK_ROW_HEIGHT					= "isWeekRowHeight";				//$NON-NLS-1$
-	private static final String				ATTR_IS_YEAR_COLUMN_DAY_WIDTH			= "isYearColumnDayWidth";			//$NON-NLS-1$
-	private static final String				ATTR_DATE_COLUMN_CONTENT				= "dateColumnContent";				//$NON-NLS-1$
-	private static final String				ATTR_DATE_COLUMN_FONT					= "dateColumnFont";					//$NON-NLS-1$
-	private static final String				ATTR_DATE_COLUMN_WIDTH					= "dateColumnWidth";				//$NON-NLS-1$
-	private static final String				ATTR_DAY_DATE_FONT						= "dayDateFont";					//$NON-NLS-1$
-	private static final String				ATTR_DAY_DATE_FORMAT					= "dayDateFormat";					//$NON-NLS-1$
-	private static final String				ATTR_DAY_DATE_MARGIN_TOP				= "dayDateMarginTop";				//$NON-NLS-1$
-	private static final String				ATTR_DAY_DATE_MARGIN_LEFT				= "dayDateMarginLeft";				//$NON-NLS-1$
-	private static final String				ATTR_FORMATTER_ID						= "formatterId";					//$NON-NLS-1$
-	private static final String				ATTR_FORMATTER_VALUE_FORMAT				= "formatterValueFormat";			//$NON-NLS-1$
-	private static final String				ATTR_TOUR_BACKGROUND					= "tourBackground";					//$NON-NLS-1$
-	private static final String				ATTR_TOUR_BACKGROUND_COLOR1				= "tourBackgroundColor1";			//$NON-NLS-1$
-	private static final String				ATTR_TOUR_BACKGROUND_COLOR2				= "tourBackgroundColor2";			//$NON-NLS-1$
-	private static final String				ATTR_TOUR_BORDER_WIDTH					= "tourBackgroundWidth";			//$NON-NLS-1$
-	private static final String				ATTR_TOUR_BORDER						= "tourBorder";						//$NON-NLS-1$
-	private static final String				ATTR_TOUR_BORDER_COLOR					= "tourBorderColor";				//$NON-NLS-1$
-	private static final String				ATTR_TOUR_BACKGROUND_WIDTH				= "tourBorderWidth";				//$NON-NLS-1$
-	private static final String				ATTR_TOUR_CONTENT_FONT					= "tourContentFont";				//$NON-NLS-1$
-	private static final String				ATTR_TOUR_CONTENT_COLOR					= "tourContentColor";				//$NON-NLS-1$
-	private static final String				ATTR_TOUR_DRAGGED_COLOR					= "tourDraggedColor";				//$NON-NLS-1$
-	private static final String				ATTR_TOUR_HOVERED_COLOR					= "tourHoveredColor";				//$NON-NLS-1$;
-	private static final String				ATTR_TOUR_MARGIN_TOP					= "tourMarginTop";					//$NON-NLS-1$
-	private static final String				ATTR_TOUR_MARGIN_LEFT					= "tourMarginLeft";					//$NON-NLS-1$
-	private static final String				ATTR_TOUR_MARGIN_BOTTOM					= "tourMarginBottom";				//$NON-NLS-1$
-	private static final String				ATTR_TOUR_MARGIN_RIGHT					= "tourMarginRight";				//$NON-NLS-1$
-	private static final String				ATTR_TOUR_SELECTED_COLOR				= "tourSelectedColor";				//$NON-NLS-1$;
-	private static final String				ATTR_TOUR_TITLE_COLOR					= "tourTitleColor";					//$NON-NLS-1$
-	private static final String				ATTR_TOUR_TITLE_FONT					= "tourTitleFont";					//$NON-NLS-1$
-	private static final String				ATTR_TOUR_TRUNCATED_LINES				= "tourTruncatedLines";				//$NON-NLS-1$
-	private static final String				ATTR_TOUR_VALUE_COLOR					= "tourValueColor";					//$NON-NLS-1$
-	private static final String				ATTR_TOUR_VALUE_COLUMNS					= "tourValueColumns";				//$NON-NLS-1$
-	private static final String				ATTR_TOUR_VALUE_FONT					= "tourValueFont";					//$NON-NLS-1$
-	private static final String				ATTR_USE_DRAGGED_SCROLLING				= "useDraggedScrolling";			//$NON-NLS-1$
-	private static final String				ATTR_WEEK_COLUMN_WIDTH					= "weekColumnWidth";				//$NON-NLS-1$
-	private static final String				ATTR_WEEK_HEIGHT						= "weekHeight";						//$NON-NLS-1$
-	private static final String				ATTR_WEEK_MARGIN_TOP					= "weekMarginTop";					//$NON-NLS-1$
-	private static final String				ATTR_WEEK_MARGIN_LEFT					= "weekMarginLeft";					//$NON-NLS-1$
-	private static final String				ATTR_WEEK_MARGIN_BOTTOM					= "weekMarginBottom";				//$NON-NLS-1$
-	private static final String				ATTR_WEEK_MARGIN_RIGHT					= "weekMarginRight";				//$NON-NLS-1$
-	private static final String				ATTR_WEEK_ROWS							= "weekRows";						//$NON-NLS-1$
-	private static final String				ATTR_WEEK_VALUE_COLOR					= "weekValueColor";					//$NON-NLS-1$
-	private static final String				ATTR_WEEK_VALUE_FONT					= "weekValueFont";					//$NON-NLS-1$
-	private static final String				ATTR_YEAR_COLUMNS						= "yearColumns";					//$NON-NLS-1$
-	private static final String				ATTR_YEAR_COLUMNS_SPACING				= "yearColumnsSpacing";				//$NON-NLS-1$
-	private static final String				ATTR_YEAR_COLUMNS_START					= "yearColumnsStart";				//$NON-NLS-1$
-	private static final String				ATTR_YEAR_COLUMN_DAY_WIDTH				= "yearColumnDayWidth";				//$NON-NLS-1$
-	private static final String				ATTR_YEAR_HEADER_FONT					= "yearHeaderFont";					//$NON-NLS-1$
+	private static final String		ATTR_IS_DAY_CONTENT_VERTICAL				= "isDayContentVertical";			//$NON-NLS-1$
+	private static final String		ATTR_IS_HIDE_DAY_DATE_WHEN_NO_TOUR		= "isHideDayDateWhenNoTour";		//$NON-NLS-1$
+	private static final String		ATTR_IS_SHOW_DATE_COLUMN					= "isShowDateColumn";				//$NON-NLS-1$
+	private static final String		ATTR_IS_SHOW_DAY_DATE						= "isShowDayDate";					//$NON-NLS-1$
+	private static final String		ATTR_IS_SHOW_DAY_DATE_WEEKEND_COLOR		= "isShowDayDateWeekendColor";	//$NON-NLS-1$
+	private static final String		ATTR_IS_SHOW_SUMMARY_COLUMN				= "isShowSummaryColumn";			//$NON-NLS-1$
+	private static final String		ATTR_IS_SHOW_TOUR_CONTENT					= "isShowTourContent";				//$NON-NLS-1$
+	private static final String		ATTR_IS_SHOW_TOUR_VALUE_UNIT				= "isShowTourValueUnit";			//$NON-NLS-1$
+	private static final String		ATTR_IS_SHOW_YEAR_COLUMNS					= "isShowYearColumns";				//$NON-NLS-1$
+	private static final String		ATTR_IS_SHOW_VALUE							= "isShowValue";						//$NON-NLS-1$
+	private static final String		ATTR_IS_SHOW_WEEK_VALUE_UNIT				= "isShowWeekValueUnit";			//$NON-NLS-1$
+	private static final String		ATTR_IS_TOGGLE_MONTH_COLOR					= "isToggleMonthColor";				//$NON-NLS-1$
+	private static final String		ATTR_IS_TRUNCATE_TOUR_TEXT					= "isTruncateTourText";				//$NON-NLS-1$
+	private static final String		ATTR_IS_WEEK_ROW_HEIGHT						= "isWeekRowHeight";					//$NON-NLS-1$
+	private static final String		ATTR_IS_YEAR_COLUMN_DAY_WIDTH				= "isYearColumnDayWidth";			//$NON-NLS-1$
+	private static final String		ATTR_DATE_COLUMN_CONTENT					= "dateColumnContent";				//$NON-NLS-1$
+	private static final String		ATTR_DATE_COLUMN_FONT						= "dateColumnFont";					//$NON-NLS-1$
+	private static final String		ATTR_DATE_COLUMN_WIDTH						= "dateColumnWidth";					//$NON-NLS-1$
+	private static final String		ATTR_DAY_DATE_FONT							= "dayDateFont";						//$NON-NLS-1$
+	private static final String		ATTR_DAY_DATE_FORMAT							= "dayDateFormat";					//$NON-NLS-1$
+	private static final String		ATTR_DAY_DATE_MARGIN_TOP					= "dayDateMarginTop";				//$NON-NLS-1$
+	private static final String		ATTR_DAY_DATE_MARGIN_LEFT					= "dayDateMarginLeft";				//$NON-NLS-1$
+	private static final String		ATTR_FORMATTER_ID								= "formatterId";						//$NON-NLS-1$
+	private static final String		ATTR_FORMATTER_VALUE_FORMAT				= "formatterValueFormat";			//$NON-NLS-1$
+	private static final String		ATTR_TOUR_BACKGROUND							= "tourBackground";					//$NON-NLS-1$
+	private static final String		ATTR_TOUR_BACKGROUND_COLOR1				= "tourBackgroundColor1";			//$NON-NLS-1$
+	private static final String		ATTR_TOUR_BACKGROUND_COLOR2				= "tourBackgroundColor2";			//$NON-NLS-1$
+	private static final String		ATTR_TOUR_BORDER_WIDTH						= "tourBackgroundWidth";			//$NON-NLS-1$
+	private static final String		ATTR_TOUR_BORDER								= "tourBorder";						//$NON-NLS-1$
+	private static final String		ATTR_TOUR_BORDER_COLOR						= "tourBorderColor";					//$NON-NLS-1$
+	private static final String		ATTR_TOUR_BACKGROUND_WIDTH					= "tourBorderWidth";					//$NON-NLS-1$
+	private static final String		ATTR_TOUR_CONTENT_FONT						= "tourContentFont";					//$NON-NLS-1$
+	private static final String		ATTR_TOUR_CONTENT_COLOR						= "tourContentColor";				//$NON-NLS-1$
+	private static final String		ATTR_TOUR_DRAGGED_COLOR						= "tourDraggedColor";				//$NON-NLS-1$
+	private static final String		ATTR_TOUR_HOVERED_COLOR						= "tourHoveredColor";				//$NON-NLS-1$;
+	private static final String		ATTR_TOUR_MARGIN_TOP							= "tourMarginTop";					//$NON-NLS-1$
+	private static final String		ATTR_TOUR_MARGIN_LEFT						= "tourMarginLeft";					//$NON-NLS-1$
+	private static final String		ATTR_TOUR_MARGIN_BOTTOM						= "tourMarginBottom";				//$NON-NLS-1$
+	private static final String		ATTR_TOUR_MARGIN_RIGHT						= "tourMarginRight";					//$NON-NLS-1$
+	private static final String		ATTR_TOUR_SELECTED_COLOR					= "tourSelectedColor";				//$NON-NLS-1$;
+	private static final String		ATTR_TOUR_TITLE_COLOR						= "tourTitleColor";					//$NON-NLS-1$
+	private static final String		ATTR_TOUR_TITLE_FONT							= "tourTitleFont";					//$NON-NLS-1$
+	private static final String		ATTR_TOUR_TRUNCATED_LINES					= "tourTruncatedLines";				//$NON-NLS-1$
+	private static final String		ATTR_TOUR_VALUE_COLOR						= "tourValueColor";					//$NON-NLS-1$
+	private static final String		ATTR_TOUR_VALUE_COLUMNS						= "tourValueColumns";				//$NON-NLS-1$
+	private static final String		ATTR_TOUR_VALUE_FONT							= "tourValueFont";					//$NON-NLS-1$
+	private static final String		ATTR_USE_DRAGGED_SCROLLING					= "useDraggedScrolling";			//$NON-NLS-1$
+	private static final String		ATTR_WEEK_COLUMN_WIDTH						= "weekColumnWidth";					//$NON-NLS-1$
+	private static final String		ATTR_WEEK_HEIGHT								= "weekHeight";						//$NON-NLS-1$
+	private static final String		ATTR_WEEK_MARGIN_TOP							= "weekMarginTop";					//$NON-NLS-1$
+	private static final String		ATTR_WEEK_MARGIN_LEFT						= "weekMarginLeft";					//$NON-NLS-1$
+	private static final String		ATTR_WEEK_MARGIN_BOTTOM						= "weekMarginBottom";				//$NON-NLS-1$
+	private static final String		ATTR_WEEK_MARGIN_RIGHT						= "weekMarginRight";					//$NON-NLS-1$
+	private static final String		ATTR_WEEK_ROWS									= "weekRows";							//$NON-NLS-1$
+	private static final String		ATTR_WEEK_VALUE_COLOR						= "weekValueColor";					//$NON-NLS-1$
+	private static final String		ATTR_WEEK_VALUE_FONT							= "weekValueFont";					//$NON-NLS-1$
+	private static final String		ATTR_YEAR_COLUMNS								= "yearColumns";						//$NON-NLS-1$
+	private static final String		ATTR_YEAR_COLUMNS_SPACING					= "yearColumnsSpacing";				//$NON-NLS-1$
+	private static final String		ATTR_YEAR_COLUMNS_START						= "yearColumnsStart";				//$NON-NLS-1$
+	private static final String		ATTR_YEAR_COLUMN_DAY_WIDTH					= "yearColumnDayWidth";				//$NON-NLS-1$
+	private static final String		ATTR_YEAR_HEADER_FONT						= "yearHeaderFont";					//$NON-NLS-1$
 	//
-	static final DataFormatter				DEFAULT_EMPTY_FORMATTER;
+	static final DataFormatter			DEFAULT_EMPTY_FORMATTER;
 	//
-	static final DefaultId					DEFAULT_PROFILE_DEFAULT_ID				= DefaultId.DEFAULT;
-	static final int						DEFAULT_DATE_COLUMN_WIDTH				= 50;
-	static final DateColumnContent			DEFAULT_DATE_COLUMN_CONTENT				= DateColumnContent.MONTH;
-	static final DayDateFormat				DEFAULT_DAY_DATE_FORMAT					= DayDateFormat.DAY;
+	static final DefaultId				DEFAULT_PROFILE_DEFAULT_ID					= DefaultId.DEFAULT;
+	static final int						DEFAULT_DATE_COLUMN_WIDTH					= 50;
+	static final DateColumnContent	DEFAULT_DATE_COLUMN_CONTENT				= DateColumnContent.MONTH;
+	static final DayDateFormat			DEFAULT_DAY_DATE_FORMAT						= DayDateFormat.DAY;
 	static final int						DEFAULT_DAY_DATE_MARGIN_TOP				= 0;
-	static final int						DEFAULT_DAY_DATE_MARGIN_LEFT			= 0;
+	static final int						DEFAULT_DAY_DATE_MARGIN_LEFT				= 0;
 	static final boolean					DEFAULT_IS_SHOW_DAY_DATE_WEEKEND_COLOR	= false;
-	static final boolean					DEFAULT_IS_TRUNCATE_TOUR_TEXT			= true;
-	static final boolean					DEFAULT_IS_WEEK_ROW_HEIGHT				= false;
-	static final boolean					DEFAULT_IS_YEAR_COLUMN_DAY_WIDTH		= false;
-	static final int						DEFAULT_MARGIN_MIN						= -30;
-	static final int						DEFAULT_MARGIN_MAX						= 30;
-	static final int						DEFAULT_WEEK_COLUMN_WIDTH				= 100;
+	static final boolean					DEFAULT_IS_TRUNCATE_TOUR_TEXT				= true;
+	static final boolean					DEFAULT_IS_WEEK_ROW_HEIGHT					= false;
+	static final boolean					DEFAULT_IS_YEAR_COLUMN_DAY_WIDTH			= false;
+	static final int						DEFAULT_MARGIN_MIN							= -30;
+	static final int						DEFAULT_MARGIN_MAX							= 30;
+	static final int						DEFAULT_WEEK_COLUMN_WIDTH					= 100;
 	static final RGB						DEFAULT_ALTERNATE_MONTH_RGB				= new RGB(60, 60, 60);
-	static final RGB						DEFAULT_ALTERNATE_MONTH2_RGB			= new RGB(80, 80, 80);
+	static final RGB						DEFAULT_ALTERNATE_MONTH2_RGB				= new RGB(80, 80, 80);
 	static final RGB						DEFAULT_CALENDAR_BACKGROUND_RGB			= new RGB(40, 40, 40);
 	static final RGB						DEFAULT_CALENDAR_FOREBACKGROUND_RGB		= new RGB(200, 200, 200);
-	static final RGB						DEFAULT_DAY_HOVERED_RGB					= new RGB(255, 255, 255);
-	static final RGB						DEFAULT_DAY_SELECTED_RGB				= new RGB(128, 128, 128);
-	static final RGB						DEFAULT_DAY_TODAY_RGB					= new RGB(255, 255, 0);
+	static final RGB						DEFAULT_DAY_HOVERED_RGB						= new RGB(255, 255, 255);
+	static final RGB						DEFAULT_DAY_SELECTED_RGB					= new RGB(128, 128, 128);
+	static final RGB						DEFAULT_DAY_TODAY_RGB						= new RGB(255, 255, 0);
 	//
 	// tour background
-	static final TourBackground				DEFAULT_TOUR_BACKGROUND					= TourBackground.FILL;
-	static final int						DEFAULT_TOUR_BACKGROUND_WIDTH			= 3;
-	static final TourBorder					DEFAULT_TOUR_BORDER						= TourBorder.NO_BORDER;
-	static final int						DEFAULT_TOUR_BORDER_WIDTH				= 1;
-	static final CalendarColor				DEFAULT_TOUR_BACKGROUND_COLOR1			= CalendarColor.DARK;
-	static final CalendarColor				DEFAULT_TOUR_BACKGROUND_COLOR2			= CalendarColor.BRIGHT;
-	static final CalendarColor				DEFAULT_TOUR_BORDER_COLOR				= CalendarColor.LINE;
-	static final CalendarColor				DEFAULT_TOUR_COLOR						= CalendarColor.CONTRAST;
-	static final CalendarColor				DEFAULT_TOUR_DRAGGED_COLOR				= CalendarColor.CUSTOM;
-	static final CalendarColor				DEFAULT_TOUR_HOVERED_COLOR				= CalendarColor.CUSTOM;
-	static final CalendarColor				DEFAULT_TOUR_SELECTED_COLOR				= CalendarColor.CUSTOM;
-	static final RGB						DEFAULT_TOUR_BACKGROUND_1_RGB			= new RGB(64, 0, 255);
-	static final RGB						DEFAULT_TOUR_BACKGROUND_2_RGB			= new RGB(128, 64, 0);
-	static final RGB						DEFAULT_TOUR_BORDER_RGB					= new RGB(192, 128, 0);
-	static final RGB						DEFAULT_TOUR_DRAGGED_RGB				= new RGB(255, 255, 0);
-	static final RGB						DEFAULT_TOUR_HOVERED_RGB				= new RGB(255, 255, 255);
-	static final RGB						DEFAULT_TOUR_SELECTED_RGB				= new RGB(192, 192, 192);
+	static final TourBackground	DEFAULT_TOUR_BACKGROUND				= TourBackground.FILL;
+	static final int					DEFAULT_TOUR_BACKGROUND_WIDTH		= 3;
+	static final TourBorder			DEFAULT_TOUR_BORDER					= TourBorder.NO_BORDER;
+	static final int					DEFAULT_TOUR_BORDER_WIDTH			= 1;
+	static final CalendarColor		DEFAULT_TOUR_BACKGROUND_COLOR1	= CalendarColor.DARK;
+	static final CalendarColor		DEFAULT_TOUR_BACKGROUND_COLOR2	= CalendarColor.BRIGHT;
+	static final CalendarColor		DEFAULT_TOUR_BORDER_COLOR			= CalendarColor.LINE;
+	static final CalendarColor		DEFAULT_TOUR_COLOR					= CalendarColor.CONTRAST;
+	static final CalendarColor		DEFAULT_TOUR_DRAGGED_COLOR			= CalendarColor.CUSTOM;
+	static final CalendarColor		DEFAULT_TOUR_HOVERED_COLOR			= CalendarColor.CUSTOM;
+	static final CalendarColor		DEFAULT_TOUR_SELECTED_COLOR		= CalendarColor.CUSTOM;
+	static final RGB					DEFAULT_TOUR_BACKGROUND_1_RGB		= new RGB(64, 0, 255);
+	static final RGB					DEFAULT_TOUR_BACKGROUND_2_RGB		= new RGB(128, 64, 0);
+	static final RGB					DEFAULT_TOUR_BORDER_RGB				= new RGB(192, 128, 0);
+	static final RGB					DEFAULT_TOUR_DRAGGED_RGB			= new RGB(255, 255, 0);
+	static final RGB					DEFAULT_TOUR_HOVERED_RGB			= new RGB(255, 255, 255);
+	static final RGB					DEFAULT_TOUR_SELECTED_RGB			= new RGB(192, 192, 192);
 	//
 	// tour content
-	static final int						DEFAULT_TOUR_MARGIN_TOP					= -3;
-	static final int						DEFAULT_TOUR_MARGIN_LEFT				= 1;
-	static final int						DEFAULT_TOUR_MARGIN_BOTTOM				= 1;
-	static final int						DEFAULT_TOUR_MARGIN_RIGHT				= -3;
-	static final int						DEFAULT_TOUR_TRUNCATED_LINES			= 3;
-	static final int						DEFAULT_TOUR_VALUE_COLUMNS				= 3;
-	static final RGB						DEFAULT_TOUR_CONTENT_RGB				= new RGB(255, 192, 255);
-	static final RGB						DEFAULT_TOUR_TITLE_RGB					= new RGB(191, 255, 203);
-	static final RGB						DEFAULT_TOUR_VALUE_RGB					= new RGB(191, 193, 255);
+	static final int				DEFAULT_TOUR_MARGIN_TOP			= -3;
+	static final int				DEFAULT_TOUR_MARGIN_LEFT		= 1;
+	static final int				DEFAULT_TOUR_MARGIN_BOTTOM		= 1;
+	static final int				DEFAULT_TOUR_MARGIN_RIGHT		= -3;
+	static final int				DEFAULT_TOUR_TRUNCATED_LINES	= 3;
+	static final int				DEFAULT_TOUR_VALUE_COLUMNS		= 3;
+	static final RGB				DEFAULT_TOUR_CONTENT_RGB		= new RGB(255, 192, 255);
+	static final RGB				DEFAULT_TOUR_TITLE_RGB			= new RGB(191, 255, 203);
+	static final RGB				DEFAULT_TOUR_VALUE_RGB			= new RGB(191, 193, 255);
 	//
-	static final int						DEFAULT_WEEK_HEIGHT						= 120;
-	static final int						DEFAULT_WEEK_MARGIN_TOP					= -3;
-	static final int						DEFAULT_WEEK_MARGIN_LEFT				= 1;
-	static final int						DEFAULT_WEEK_MARGIN_BOTTOM				= 1;
-	static final int						DEFAULT_WEEK_MARGIN_RIGHT				= -3;
-	static final int						DEFAULT_WEEK_ROWS						= 10;
-	static final CalendarColor				DEFAULT_WEEK_VALUE_COLOR				= CalendarColor.BRIGHT;
-	static final RGB						DEFAULT_WEEK_VALUE_RGB					= new RGB(255, 0, 128);
+	static final int				DEFAULT_WEEK_HEIGHT				= 120;
+	static final int				DEFAULT_WEEK_MARGIN_TOP			= -3;
+	static final int				DEFAULT_WEEK_MARGIN_LEFT		= 1;
+	static final int				DEFAULT_WEEK_MARGIN_BOTTOM		= 1;
+	static final int				DEFAULT_WEEK_MARGIN_RIGHT		= -3;
+	static final int				DEFAULT_WEEK_ROWS					= 10;
+	static final CalendarColor	DEFAULT_WEEK_VALUE_COLOR		= CalendarColor.BRIGHT;
+	static final RGB				DEFAULT_WEEK_VALUE_RGB			= new RGB(255, 0, 128);
 	//
-	static final int						DEFAULT_YEAR_COLUMN_DAY_WIDTH			= 50;
-	static final int						DEFAULT_YEAR_COLUMNS					= 1;
-	static final ColumnStart				DEFAULT_YEAR_COLUMNS_LAYOUT				= ColumnStart.CONTINUOUSLY;
-	static final int						DEFAULT_YEAR_COLUMNS_SPACING			= 30;
+	static final int				DEFAULT_YEAR_COLUMN_DAY_WIDTH	= 50;
+	static final int				DEFAULT_YEAR_COLUMNS				= 1;
+	static final ColumnStart	DEFAULT_YEAR_COLUMNS_LAYOUT	= ColumnStart.CONTINUOUSLY;
+	static final int				DEFAULT_YEAR_COLUMNS_SPACING	= 30;
 	//
 	//
-	static final FormatterData[]			DEFAULT_TOUR_FORMATTER_DATA;
-	static final FormatterData[]			DEFAULT_WEEK_FORMATTER_DATA;
-	static final int						NUM_DEFAULT_TOUR_FORMATTER;
-	static final int						NUM_DEFAULT_WEEK_FORMATTER;
+	static final FormatterData[]	DEFAULT_TOUR_FORMATTER_DATA;
+	static final FormatterData[]	DEFAULT_WEEK_FORMATTER_DATA;
+	static final int					NUM_DEFAULT_TOUR_FORMATTER;
+	static final int					NUM_DEFAULT_WEEK_FORMATTER;
 	//
 	/*
 	 * min / MAX values
 	 */
-	static final int						CALENDAR_COLUMNS_SPACE_MIN				= 0;
-	static final int						CALENDAR_COLUMNS_SPACE_MAX				= 300;
-	static final int						DATE_COLUMN_WIDTH_MIN					= 1;
-	static final int						DATE_COLUMN_WIDTH_MAX					= 200;
-	static final int						TOUR_BACKGROUND_WIDTH_MIN				= 0;
-	static final int						TOUR_BACKGROUND_WIDTH_MAX				= 100;
-	static final int						TOUR_BORDER_WIDTH_MIN					= 0;
-	static final int						TOUR_BORDER_WIDTH_MAX					= 100;
-	static final int						TOUR_TRUNCATED_LINES_MIN				= 1;
-	static final int						TOUR_TRUNCATED_LINES_MAX				= 10;
-	static final int						TOUR_VALUE_COLUMNS_MIN					= 1;
-	static final int						TOUR_VALUE_COLUMNS_MAX					= 5;
-	static final int						WEEK_COLUMN_WIDTH_MIN					= 1;
-	static final int						WEEK_COLUMN_WIDTH_MAX					= 200;
-	static final int						WEEK_HEIGHT_MIN							= 2;
-	static final int						WEEK_HEIGHT_MAX							= 1000;
-	static final int						WEEK_ROWS_MIN							= 1;
-	static final int						WEEK_ROWS_MAX							= 1000;
-	static final int						YEAR_COLUMNS_MIN						= 1;
-	static final int						YEAR_COLUMNS_MAX						= 100;
-	static final int						YEAR_COLUMN_DAY_WIDTH_MIN				= 1;
-	static final int						YEAR_COLUMN_DAY_WIDTH_MAX				= 500;
+	static final int							CALENDAR_COLUMNS_SPACE_MIN	= 0;
+	static final int							CALENDAR_COLUMNS_SPACE_MAX	= 300;
+	static final int							DATE_COLUMN_WIDTH_MIN		= 1;
+	static final int							DATE_COLUMN_WIDTH_MAX		= 200;
+	static final int							TOUR_BACKGROUND_WIDTH_MIN	= 0;
+	static final int							TOUR_BACKGROUND_WIDTH_MAX	= 100;
+	static final int							TOUR_BORDER_WIDTH_MIN		= 0;
+	static final int							TOUR_BORDER_WIDTH_MAX		= 100;
+	static final int							TOUR_TRUNCATED_LINES_MIN	= 1;
+	static final int							TOUR_TRUNCATED_LINES_MAX	= 10;
+	static final int							TOUR_VALUE_COLUMNS_MIN		= 1;
+	static final int							TOUR_VALUE_COLUMNS_MAX		= 5;
+	static final int							WEEK_COLUMN_WIDTH_MIN		= 1;
+	static final int							WEEK_COLUMN_WIDTH_MAX		= 200;
+	static final int							WEEK_HEIGHT_MIN				= 2;
+	static final int							WEEK_HEIGHT_MAX				= 1000;
+	static final int							WEEK_ROWS_MIN					= 1;
+	static final int							WEEK_ROWS_MAX					= 1000;
+	static final int							YEAR_COLUMNS_MIN				= 1;
+	static final int							YEAR_COLUMNS_MAX				= 100;
+	static final int							YEAR_COLUMN_DAY_WIDTH_MIN	= 1;
+	static final int							YEAR_COLUMN_DAY_WIDTH_MAX	= 500;
 
-	private static final DataFormatter		_tourFormatter_Altitude;
-	private static final DataFormatter		_tourFormatter_Distance;
-	private static final DataFormatter		_tourFormatter_Energy_kcal;
-	private static final DataFormatter		_tourFormatter_Energy_MJ;
-	private static final DataFormatter		_tourFormatter_Pace;
-	private static final DataFormatter		_tourFormatter_Speed;
-	private static final DataFormatter		_tourFormatter_Time_Moving;
-	private static final DataFormatter		_tourFormatter_Time_Paused;
-	private static final DataFormatter		_tourFormatter_Time_Recording;
-	private static final DataFormatter		_tourFormatter_TourDescription;
-	private static final DataFormatter		_tourFormatter_TourTitle;
+	private static final DataFormatter	_tourFormatter_Altitude;
+	private static final DataFormatter	_tourFormatter_Distance;
+	private static final DataFormatter	_tourFormatter_Energy_kcal;
+	private static final DataFormatter	_tourFormatter_Energy_MJ;
+	private static final DataFormatter	_tourFormatter_Pace;
+	private static final DataFormatter	_tourFormatter_Speed;
+	private static final DataFormatter	_tourFormatter_Time_Moving;
+	private static final DataFormatter	_tourFormatter_Time_Paused;
+	private static final DataFormatter	_tourFormatter_Time_Recording;
+	private static final DataFormatter	_tourFormatter_TourDescription;
+	private static final DataFormatter	_tourFormatter_TourTitle;
 
-	private static final DataFormatter		_weekFormatter_Altitude;
-	private static final DataFormatter		_weekFormatter_Distance;
-	private static final DataFormatter		_weekFormatter_Energy_kcal;
-	private static final DataFormatter		_weekFormatter_Energy_MJ;
-	private static final DataFormatter		_weekFormatter_Pace;
-	private static final DataFormatter		_weekFormatter_Speed;
-	private static final DataFormatter		_weekFormatter_Time_Moving;
-	private static final DataFormatter		_weekFormatter_Time_Paused;
-	private static final DataFormatter		_weekFormatter_Time_Recording;
+	private static final DataFormatter	_weekFormatter_Altitude;
+	private static final DataFormatter	_weekFormatter_Distance;
+	private static final DataFormatter	_weekFormatter_Energy_kcal;
+	private static final DataFormatter	_weekFormatter_Energy_MJ;
+	private static final DataFormatter	_weekFormatter_Pace;
+	private static final DataFormatter	_weekFormatter_Speed;
+	private static final DataFormatter	_weekFormatter_Time_Moving;
+	private static final DataFormatter	_weekFormatter_Time_Paused;
+	private static final DataFormatter	_weekFormatter_Time_Recording;
 
 	static final DataFormatter[]			allTourContentFormatter;
 	static final DataFormatter[]			allWeekFormatter;
@@ -309,7 +307,7 @@ public class CalendarProfileManager {
 	private static final IValueFormatter	_valueFormatter_Number_1_3				= new ValueFormatter_Number_1_3(false);
 	private static final IValueFormatter	_valueFormatter_Time_HH					= new ValueFormatter_Time_HH();
 	private static final IValueFormatter	_valueFormatter_Time_HHMM				= new ValueFormatter_Time_HHMM();
-	private static final IValueFormatter	_valueFormatter_Time_HHMMSS				= new ValueFormatter_Time_HHMMSS();
+	private static final IValueFormatter	_valueFormatter_Time_HHMMSS			= new ValueFormatter_Time_HHMMSS();
 	//
 	static {
 
@@ -322,13 +320,13 @@ public class CalendarProfileManager {
 		// Tour
 		_tourFormatter_TourDescription	= createFormatter_Tour_Description();
 		_tourFormatter_TourTitle	 	= createFormatter_Tour_Title();
-		
+
 		_tourFormatter_Altitude 		= createFormatter_Altitude();
 		_tourFormatter_Distance 		= createFormatter_Distance();
 
 		_tourFormatter_Pace 			= createFormatter_Pace();
 		_tourFormatter_Speed 			= createFormatter_Speed();
-		
+
 		_tourFormatter_Energy_kcal 		= createFormatter_Energy_kcal();
 		_tourFormatter_Energy_MJ 		= createFormatter_Energy_MJ();
 
@@ -337,53 +335,53 @@ public class CalendarProfileManager {
 		_tourFormatter_Time_Recording 	= createFormatter_Time_Recording();
 
 		allTourContentFormatter = new DataFormatter[] {
-				
+
 				DEFAULT_EMPTY_FORMATTER,
-				
+
 				_tourFormatter_TourTitle,
 				_tourFormatter_TourDescription,
-				
+
 				_tourFormatter_Distance,
 				_tourFormatter_Altitude,
-				
+
 				_tourFormatter_Speed,
 				_tourFormatter_Pace,
-				
+
 				_tourFormatter_Energy_kcal,
 				_tourFormatter_Energy_MJ,
-				
+
 				_tourFormatter_Time_Recording,
 				_tourFormatter_Time_Moving,
 				_tourFormatter_Time_Paused,
 		};
-		
+
 		// Week
 		_weekFormatter_Altitude 		= createFormatter_Altitude();
 		_weekFormatter_Distance 		= createFormatter_Distance();
-		
+
 		_weekFormatter_Pace 			= createFormatter_Pace();
 		_weekFormatter_Speed 			= createFormatter_Speed();
-		
+
 		_weekFormatter_Energy_kcal 		= createFormatter_Energy_kcal();
 		_weekFormatter_Energy_MJ 		= createFormatter_Energy_MJ();
-		
+
 		_weekFormatter_Time_Moving 		= createFormatter_Time_Moving();
 		_weekFormatter_Time_Paused 		= createFormatter_Time_Paused();
 		_weekFormatter_Time_Recording 	= createFormatter_Time_Recording();
 
 		allWeekFormatter = new DataFormatter[] {
-				
+
 				DEFAULT_EMPTY_FORMATTER,
-				
+
 				_weekFormatter_Distance,
 				_weekFormatter_Altitude,
-				
+
 				_weekFormatter_Speed,
 				_weekFormatter_Pace,
-				
+
 				_weekFormatter_Energy_kcal,
 				_weekFormatter_Energy_MJ,
-				
+
 				_weekFormatter_Time_Recording,
 				_weekFormatter_Time_Moving,
 				_weekFormatter_Time_Paused,
@@ -400,19 +398,19 @@ public class CalendarProfileManager {
 			new FormatterData(false,	FormatterID.EMPTY,				ValueFormat.DUMMY_VALUE),
 			new FormatterData(false,	FormatterID.EMPTY,				ValueFormat.DUMMY_VALUE),
 		};
-		
+
 		NUM_DEFAULT_TOUR_FORMATTER = DEFAULT_TOUR_FORMATTER_DATA.length;
 
 		DEFAULT_WEEK_FORMATTER_DATA = new FormatterData[] {
-				
+
 			new FormatterData(true,		FormatterID.DISTANCE,			_weekFormatter_Distance.getDefaultFormat()),
 			new FormatterData(true,		FormatterID.ALTITUDE,			_weekFormatter_Altitude.getDefaultFormat()),
 			new FormatterData(true,		FormatterID.SPEED,				_weekFormatter_Speed.getDefaultFormat()),
-			new FormatterData(true,		FormatterID.PACE,				_weekFormatter_Pace.getDefaultFormat()),
+			new FormatterData(true,		FormatterID.PACE,					_weekFormatter_Pace.getDefaultFormat()),
 			new FormatterData(true,		FormatterID.TIME_MOVING,		_weekFormatter_Time_Moving.getDefaultFormat()),
 			new FormatterData(false,	FormatterID.EMPTY,				ValueFormat.DUMMY_VALUE),
 		};
-		
+
 		NUM_DEFAULT_WEEK_FORMATTER = DEFAULT_WEEK_FORMATTER_DATA.length;
 	}
 	//
@@ -422,8 +420,8 @@ public class CalendarProfileManager {
 		new DateColumn_ComboData[] {
 
 			new DateColumn_ComboData(DateColumnContent.WEEK_NUMBER,	Messages.Calendar_Profile_DateColumn_WeekNumber),
-			new DateColumn_ComboData(DateColumnContent.MONTH, 		Messages.Calendar_Profile_DateColumn_Month),
-			new DateColumn_ComboData(DateColumnContent.YEAR, 		Messages.Calendar_Profile_DateColumn_Year),
+			new DateColumn_ComboData(DateColumnContent.MONTH, 			Messages.Calendar_Profile_DateColumn_Month),
+			new DateColumn_ComboData(DateColumnContent.YEAR, 			Messages.Calendar_Profile_DateColumn_Year),
 		};
 
 	private static final ColumnLayout_ComboData[] _allColumnLayout_ComboData =
@@ -491,12 +489,12 @@ public class CalendarProfileManager {
 					true,
 					true,
 					false),
-			
+
 			new TourBackground_ComboData(TourBackground.FILL_LEFT,				Messages.Calendar_Profile_TourBackground_Fill_Left,
 					true,
 					false,
 					true),
-			
+
 			new TourBackground_ComboData(TourBackground.FILL_RIGHT,				Messages.Calendar_Profile_TourBackground_Fill_Right,
 					true,
 					false,
@@ -523,7 +521,7 @@ public class CalendarProfileManager {
 					true,
 					true),
 
-			new TourBorder_ComboData(TourBorder.BORDER_TOP_BOTTOM,		Messages.Calendar_Profile_TourBorder_TopBottom,
+			new TourBorder_ComboData(TourBorder.BORDER_TOP_BOTTOM,	Messages.Calendar_Profile_TourBorder_TopBottom,
 					true,
 					true),
 
@@ -535,7 +533,7 @@ public class CalendarProfileManager {
 					true,
 					true),
 
-			new TourBorder_ComboData(TourBorder.BORDER_LEFT_RIGHT,		Messages.Calendar_Profile_TourBorder_LeftRight,
+			new TourBorder_ComboData(TourBorder.BORDER_LEFT_RIGHT,	Messages.Calendar_Profile_TourBorder_LeftRight,
 					true,
 					true),
 		};
@@ -543,7 +541,7 @@ public class CalendarProfileManager {
 	private static final CalendarColor_ComboData[] _allGraphColor_ComboData =
 
 		new CalendarColor_ComboData[] {
-	
+
 			new CalendarColor_ComboData(CalendarColor.BRIGHT,			Messages.Calendar_Profile_Color_Bright),
 			new CalendarColor_ComboData(CalendarColor.DARK,				Messages.Calendar_Profile_Color_Dark),
 			new CalendarColor_ComboData(CalendarColor.LINE,				Messages.Calendar_Profile_Color_Line),
@@ -552,11 +550,11 @@ public class CalendarProfileManager {
 			new CalendarColor_ComboData(CalendarColor.WHITE,			Messages.Calendar_Profile_Color_White),
 			new CalendarColor_ComboData(CalendarColor.CUSTOM,			Messages.Calendar_Profile_Color_Custom),
 		};
-	
+
 	private static final ProfileDefaultId_ComboData[] _allAppDefault_ComboData =
-			
+
 		new ProfileDefaultId_ComboData[] {
-				
+
 			new ProfileDefaultId_ComboData(DefaultId.DEFAULT,			Messages.Calendar_Profile_AppDefault_Default),
 			new ProfileDefaultId_ComboData(DefaultId.COMPACT,			Messages.Calendar_Profile_AppDefault_Compact),
 			new ProfileDefaultId_ComboData(DefaultId.COMPACT_II,		Messages.Calendar_Profile_AppDefault_Compact_II),
@@ -577,8 +575,8 @@ public class CalendarProfileManager {
 			new DayContentColor_ComboData(CalendarColor.DARK, 			Messages.Calendar_Profile_Color_Dark),
 			new DayContentColor_ComboData(CalendarColor.LINE, 			Messages.Calendar_Profile_Color_Line),
 			new DayContentColor_ComboData(CalendarColor.TEXT, 			Messages.Calendar_Profile_Color_Text),
-			new DayContentColor_ComboData(CalendarColor.BLACK, 			Messages.Calendar_Profile_Color_Black),
-			new DayContentColor_ComboData(CalendarColor.WHITE, 			Messages.Calendar_Profile_Color_White),
+			new DayContentColor_ComboData(CalendarColor.BLACK, 		Messages.Calendar_Profile_Color_Black),
+			new DayContentColor_ComboData(CalendarColor.WHITE, 		Messages.Calendar_Profile_Color_White),
 			new DayContentColor_ComboData(CalendarColor.CUSTOM, 		Messages.Calendar_Profile_Color_Custom),
 		};
 	//
@@ -587,15 +585,15 @@ public class CalendarProfileManager {
 	/**
 	 * Contains all calendar profiles which are loaded from a xml file.
 	 */
-	private static final ArrayList<CalendarProfile>			_allCalendarProfiles				= new ArrayList<>();
-	private static final ArrayList<CalendarProfile>			_allDefaultDefaultProfiles			= new ArrayList<>();
+	private static final ArrayList<CalendarProfile>	_allCalendarProfiles			= new ArrayList<>();
+	private static final ArrayList<CalendarProfile>	_allDefaultDefaultProfiles	= new ArrayList<>();
 	static {
 		createProfile_0_AllDefaultDefaultProfiles(_allDefaultDefaultProfiles);
 	}
 	//
 	private static CalendarProfile		_activeCalendarProfile;
 	//
-	private static String				_fromXml_ActiveCalendarProfileId;
+	private static String					_fromXml_ActiveCalendarProfileId;
 	//
 	private final static ListenerList	_profileListener	= new ListenerList();
 
@@ -677,7 +675,7 @@ public class CalendarProfileManager {
 
 		/**
 		 * This constructor creates combo data for default default id's.
-		 * 
+		 *
 		 * @param defaultId
 		 * @param label
 		 */
@@ -691,7 +689,7 @@ public class CalendarProfileManager {
 
 		/**
 		 * This constructor creates combo data which has a user default id.
-		 * 
+		 *
 		 * @param userDefaultId
 		 * @param defaultId
 		 */
@@ -724,11 +722,11 @@ public class CalendarProfileManager {
 		boolean			isColor1;
 		boolean			isColor2;
 
-		public TourBackground_ComboData(final TourBackground tourBackground,
-										final String label,
-										final boolean isColor1,
-										final boolean isColor2,
-										final boolean isWidth) {
+		public TourBackground_ComboData(	final TourBackground tourBackground,
+													final String label,
+													final boolean isColor1,
+													final boolean isColor2,
+													final boolean isWidth) {
 
 			this.tourBackground = tourBackground;
 			this.label = label;
@@ -747,10 +745,10 @@ public class CalendarProfileManager {
 		boolean		isColor;
 		boolean		isWidth;
 
-		public TourBorder_ComboData(final TourBorder tourBorder,
-									final String label,
-									final boolean isColor,
-									final boolean isWidth) {
+		public TourBorder_ComboData(	final TourBorder tourBorder,
+												final String label,
+												final boolean isColor,
+												final boolean isWidth) {
 
 			this.tourBorder = tourBorder;
 			this.label = label;
@@ -785,7 +783,7 @@ public class CalendarProfileManager {
 
 	/**
 	 * Altitude
-	 * 
+	 *
 	 * @return
 	 */
 	private static DataFormatter createFormatter_Altitude() {
@@ -842,7 +840,7 @@ public class CalendarProfileManager {
 
 	/**
 	 * Distance
-	 * 
+	 *
 	 * @return
 	 */
 	private static DataFormatter createFormatter_Distance() {
@@ -901,7 +899,7 @@ public class CalendarProfileManager {
 
 	/**
 	 * Empty
-	 * 
+	 *
 	 * @return
 	 */
 	private static DataFormatter createFormatter_Empty() {
@@ -937,7 +935,7 @@ public class CalendarProfileManager {
 
 	/**
 	 * Energy kcal
-	 * 
+	 *
 	 * @return
 	 */
 	private static DataFormatter createFormatter_Energy_kcal() {
@@ -998,7 +996,7 @@ public class CalendarProfileManager {
 
 	/**
 	 * Energy MJ
-	 * 
+	 *
 	 * @return
 	 */
 	private static DataFormatter createFormatter_Energy_MJ() {
@@ -1060,7 +1058,7 @@ public class CalendarProfileManager {
 
 	/**
 	 * Pace
-	 * 
+	 *
 	 * @return
 	 */
 	private static DataFormatter createFormatter_Pace() {
@@ -1110,7 +1108,7 @@ public class CalendarProfileManager {
 
 	/**
 	 * Speed
-	 * 
+	 *
 	 * @return
 	 */
 	private static DataFormatter createFormatter_Speed() {
@@ -1170,7 +1168,7 @@ public class CalendarProfileManager {
 
 	/**
 	 * Moving time
-	 * 
+	 *
 	 * @return
 	 */
 	private static DataFormatter createFormatter_Time_Moving() {
@@ -1226,7 +1224,7 @@ public class CalendarProfileManager {
 
 	/**
 	 * Paused time
-	 * 
+	 *
 	 * @return
 	 */
 	private static DataFormatter createFormatter_Time_Paused() {
@@ -1282,7 +1280,7 @@ public class CalendarProfileManager {
 
 	/**
 	 * Recording time
-	 * 
+	 *
 	 * @return
 	 */
 	private static DataFormatter createFormatter_Time_Recording() {
@@ -1339,7 +1337,7 @@ public class CalendarProfileManager {
 
 	/**
 	 * Description
-	 * 
+	 *
 	 * @return
 	 */
 	private static DataFormatter createFormatter_Tour_Description() {
@@ -1378,7 +1376,7 @@ public class CalendarProfileManager {
 
 	/**
 	 * Title
-	 * 
+	 *
 	 * @return
 	 */
 	private static DataFormatter createFormatter_Tour_Title() {
@@ -1459,13 +1457,13 @@ public class CalendarProfileManager {
 		profile.calendarForegroundRGB         = new RGB (200, 200, 200);
 		profile.dayHoveredRGB                 = new RGB (192, 192, 192);
 		profile.daySelectedRGB                = new RGB (255, 255, 255);
-		                                                                                           
+
 		// 1. Date column
 		profile.isShowDateColumn              = true;
 		profile.dateColumnContent             = DateColumnContent.MONTH;
 		profile.dateColumnFont                = CalendarProfile.createFont(1.7f, SWT.BOLD);
 		profile.dateColumnWidth               = 50;
-		                                                                                           
+
 		// 2. Year columns
 		profile.isShowYearColumns             = true;
 		profile.isYearColumnDayWidth          = false;
@@ -1474,7 +1472,7 @@ public class CalendarProfileManager {
 		profile.yearColumnsStart              = ColumnStart.CONTINUOUSLY;
 		profile.yearColumnDayWidth            = 50;
 		profile.yearHeaderFont                = CalendarProfile.createFont(2.8f, SWT.BOLD);
-		                                                                                           
+
 		// 3. Week summary column
 		profile.isShowSummaryColumn           = true;
 		profile.isShowWeekValueUnit           = true;
@@ -1486,7 +1484,7 @@ public class CalendarProfileManager {
 		profile.weekValueFont                 = CalendarProfile.createFont(1.2f, SWT.NORMAL);
 		profile.weekValueColor                = CalendarColor.BRIGHT;
 		profile.weekValueRGB                  = new RGB (255, 0, 128);
-		                                                                                           
+
 		// day date
 		profile.isHideDayDateWhenNoTour       = true;
 		profile.isShowDayDate                 = true;
@@ -1495,10 +1493,10 @@ public class CalendarProfileManager {
 		profile.dayDateMarginLeft             = 3;
 		profile.dayDateFont                   = CalendarProfile.createFont(1.6f, SWT.BOLD);
 		profile.dayDateFormat                 = DayDateFormat.DAY;
-		                                                                                           
+
 		// day
 		profile.isDayContentVertical          = true;
-		                                                                                           
+
 		// tour background
 		profile.tourBackground                = TourBackground.FILL;
 		profile.tourBackgroundWidth           = 3;
@@ -1516,7 +1514,7 @@ public class CalendarProfileManager {
 		profile.tourDraggedRGB                = new RGB (255, 255, 0);
 		profile.tourHoveredRGB                = new RGB (192, 192, 192);
 		profile.tourSelectedRGB               = new RGB (255, 255, 255);
-		                                                                                           
+
 		// tour content
 		profile.isShowTourContent             = true;
 		profile.isShowTourValueUnit           = true;
@@ -1591,13 +1589,13 @@ public class CalendarProfileManager {
 		profile.calendarForegroundRGB         = new RGB (200, 200, 200);
 		profile.dayHoveredRGB                 = new RGB (192, 192, 192);
 		profile.daySelectedRGB                = new RGB (255, 255, 255);
-		                                                                                           
+
 		// 1. Date column
 		profile.isShowDateColumn              = true;
 		profile.dateColumnContent             = DateColumnContent.MONTH;
 		profile.dateColumnFont                = CalendarProfile.createFont(1.4f, SWT.BOLD);
 		profile.dateColumnWidth               = 50;
-		                                                                                           
+
 		// 2. Year columns
 		profile.isShowYearColumns             = true;
 		profile.isYearColumnDayWidth          = false;
@@ -1606,7 +1604,7 @@ public class CalendarProfileManager {
 		profile.yearColumnsStart              = ColumnStart.CONTINUOUSLY;
 		profile.yearColumnDayWidth            = 50;
 		profile.yearHeaderFont                = CalendarProfile.createFont(1.9f, SWT.BOLD);
-		                                                                                           
+
 		// 3. Week summary column
 		profile.isShowSummaryColumn           = true;
 		profile.isShowWeekValueUnit           = false;
@@ -1618,7 +1616,7 @@ public class CalendarProfileManager {
 		profile.weekValueFont                 = CalendarProfile.createFont(0.9f, SWT.NORMAL);
 		profile.weekValueColor                = CalendarColor.BRIGHT;
 		profile.weekValueRGB                  = new RGB (255, 0, 128);
-		                                                                                           
+
 		// day date
 		profile.isHideDayDateWhenNoTour       = true;
 		profile.isShowDayDate                 = false;
@@ -1627,10 +1625,10 @@ public class CalendarProfileManager {
 		profile.dayDateMarginLeft             = 2;
 		profile.dayDateFont                   = CalendarProfile.createFont(1.2f, SWT.BOLD);
 		profile.dayDateFormat                 = DayDateFormat.DAY;
-		                                                                                           
+
 		// day
 		profile.isDayContentVertical          = false;
-		                                                                                           
+
 		// tour background
 		profile.tourBackground                = TourBackground.FILL;
 		profile.tourBackgroundWidth           = 3;
@@ -1648,7 +1646,7 @@ public class CalendarProfileManager {
 		profile.tourDraggedRGB                = new RGB (255, 255, 0);
 		profile.tourHoveredRGB                = new RGB (192, 192, 192);
 		profile.tourSelectedRGB               = new RGB (255, 255, 255);
-		                                                                                           
+
 		// tour content
 		profile.isShowTourContent             = true;
 		profile.isShowTourValueUnit           = false;
@@ -1723,13 +1721,13 @@ public class CalendarProfileManager {
 		profile.calendarForegroundRGB         = new RGB (200, 200, 200);
 		profile.dayHoveredRGB                 = new RGB (192, 192, 192);
 		profile.daySelectedRGB                = new RGB (255, 255, 255);
-		                                                                                           
+
 		// 1. Date column
 		profile.isShowDateColumn              = true;
 		profile.dateColumnContent             = DateColumnContent.MONTH;
 		profile.dateColumnFont                = CalendarProfile.createFont(1.2f, SWT.BOLD);
 		profile.dateColumnWidth               = 50;
-		                                                                                           
+
 		// 2. Year columns
 		profile.isShowYearColumns             = true;
 		profile.isYearColumnDayWidth          = false;
@@ -1738,7 +1736,7 @@ public class CalendarProfileManager {
 		profile.yearColumnsStart              = ColumnStart.CONTINUOUSLY;
 		profile.yearColumnDayWidth            = 50;
 		profile.yearHeaderFont                = CalendarProfile.createFont(1.7f, SWT.BOLD);
-		                                                                                           
+
 		// 3. Week summary column
 		profile.isShowSummaryColumn           = true;
 		profile.isShowWeekValueUnit           = false;
@@ -1750,7 +1748,7 @@ public class CalendarProfileManager {
 		profile.weekValueFont                 = CalendarProfile.createFont(1.0f, SWT.NORMAL);
 		profile.weekValueColor                = CalendarColor.BRIGHT;
 		profile.weekValueRGB                  = new RGB (255, 0, 128);
-		                                                                                           
+
 		// day date
 		profile.isHideDayDateWhenNoTour       = true;
 		profile.isShowDayDate                 = false;
@@ -1759,10 +1757,10 @@ public class CalendarProfileManager {
 		profile.dayDateMarginLeft             = 2;
 		profile.dayDateFont                   = CalendarProfile.createFont(1.0f, SWT.BOLD);
 		profile.dayDateFormat                 = DayDateFormat.DAY;
-		                                                                                           
+
 		// day
 		profile.isDayContentVertical          = false;
-		                                                                                           
+
 		// tour background
 		profile.tourBackground                = TourBackground.FILL;
 		profile.tourBackgroundWidth           = 3;
@@ -1780,7 +1778,7 @@ public class CalendarProfileManager {
 		profile.tourDraggedRGB                = new RGB (255, 255, 0);
 		profile.tourHoveredRGB                = new RGB (192, 192, 192);
 		profile.tourSelectedRGB               = new RGB (255, 255, 255);
-		                                                                                           
+
 		// tour content
 		profile.isShowTourContent             = true;
 		profile.isShowTourValueUnit           = false;
@@ -1855,13 +1853,13 @@ public class CalendarProfileManager {
 		profile.calendarForegroundRGB         = new RGB (200, 200, 200);
 		profile.dayHoveredRGB                 = new RGB (192, 192, 192);
 		profile.daySelectedRGB                = new RGB (255, 255, 255);
-		                                                                                           
+
 		// 1. Date column
 		profile.isShowDateColumn              = true;
 		profile.dateColumnContent             = DateColumnContent.MONTH;
 		profile.dateColumnFont                = CalendarProfile.createFont(1.0f, SWT.NORMAL);
 		profile.dateColumnWidth               = 50;
-		                                                                                           
+
 		// 2. Year columns
 		profile.isShowYearColumns             = true;
 		profile.isYearColumnDayWidth          = false;
@@ -1870,7 +1868,7 @@ public class CalendarProfileManager {
 		profile.yearColumnsStart              = ColumnStart.CONTINUOUSLY;
 		profile.yearColumnDayWidth            = 50;
 		profile.yearHeaderFont                = CalendarProfile.createFont(1.7f, SWT.BOLD);
-		                                                                                           
+
 		// 3. Week summary column
 		profile.isShowSummaryColumn           = true;
 		profile.isShowWeekValueUnit           = false;
@@ -1882,7 +1880,7 @@ public class CalendarProfileManager {
 		profile.weekValueFont                 = CalendarProfile.createFont(0.8f, SWT.NORMAL);
 		profile.weekValueColor                = CalendarColor.BRIGHT;
 		profile.weekValueRGB                  = new RGB (255, 0, 128);
-		                                                                                           
+
 		// day date
 		profile.isHideDayDateWhenNoTour       = true;
 		profile.isShowDayDate                 = false;
@@ -1891,10 +1889,10 @@ public class CalendarProfileManager {
 		profile.dayDateMarginLeft             = 1;
 		profile.dayDateFont                   = CalendarProfile.createFont(0.8f, SWT.BOLD);
 		profile.dayDateFormat                 = DayDateFormat.DAY;
-		                                                                                           
+
 		// day
 		profile.isDayContentVertical          = false;
-		                                                                                           
+
 		// tour background
 		profile.tourBackground                = TourBackground.FILL;
 		profile.tourBackgroundWidth           = 3;
@@ -1912,7 +1910,7 @@ public class CalendarProfileManager {
 		profile.tourDraggedRGB                = new RGB (255, 255, 0);
 		profile.tourHoveredRGB                = new RGB (192, 192, 192);
 		profile.tourSelectedRGB               = new RGB (255, 255, 255);
-		                                                                                           
+
 		// tour content
 		profile.isShowTourContent             = false;
 		profile.isShowTourValueUnit           = false;
@@ -1987,13 +1985,13 @@ public class CalendarProfileManager {
 		profile.calendarForegroundRGB         = new RGB (200, 200, 200);
 		profile.dayHoveredRGB                 = new RGB (192, 192, 192);
 		profile.daySelectedRGB                = new RGB (255, 255, 255);
-		                                                                                           
+
 		// 1. Date column
 		profile.isShowDateColumn              = false;
 		profile.dateColumnContent             = DateColumnContent.MONTH;
 		profile.dateColumnFont                = CalendarProfile.createFont(1.0f, SWT.BOLD);
 		profile.dateColumnWidth               = 15;
-		                                                                                           
+
 		// 2. Year columns
 		profile.isShowYearColumns             = true;
 		profile.isYearColumnDayWidth          = true;
@@ -2002,7 +2000,7 @@ public class CalendarProfileManager {
 		profile.yearColumnsStart              = ColumnStart.JAN;
 		profile.yearColumnDayWidth            = 14;
 		profile.yearHeaderFont                = CalendarProfile.createFont(1.7f, SWT.BOLD);
-		                                                                                           
+
 		// 3. Week summary column
 		profile.isShowSummaryColumn           = true;
 		profile.isShowWeekValueUnit           = false;
@@ -2014,7 +2012,7 @@ public class CalendarProfileManager {
 		profile.weekValueFont                 = CalendarProfile.createFont(1.0f, SWT.NORMAL);
 		profile.weekValueColor                = CalendarColor.BRIGHT;
 		profile.weekValueRGB                  = new RGB (255, 0, 128);
-		                                                                                           
+
 		// day date
 		profile.isHideDayDateWhenNoTour       = true;
 		profile.isShowDayDate                 = false;
@@ -2023,10 +2021,10 @@ public class CalendarProfileManager {
 		profile.dayDateMarginLeft             = 4;
 		profile.dayDateFont                   = CalendarProfile.createFont(1.0f, SWT.NORMAL);
 		profile.dayDateFormat                 = DayDateFormat.DAY;
-		                                                                                           
+
 		// day
 		profile.isDayContentVertical          = true;
-		                                                                                           
+
 		// tour background
 		profile.tourBackground                = TourBackground.CIRCLE;
 		profile.tourBackgroundWidth           = 3;
@@ -2044,7 +2042,7 @@ public class CalendarProfileManager {
 		profile.tourDraggedRGB                = new RGB (255, 255, 0);
 		profile.tourHoveredRGB                = new RGB (192, 192, 192);
 		profile.tourSelectedRGB               = new RGB (255, 255, 255);
-		                                                                                           
+
 		// tour content
 		profile.isShowTourContent             = false;
 		profile.isShowTourValueUnit           = false;
@@ -2118,13 +2116,13 @@ public class CalendarProfileManager {
 		profile.calendarForegroundRGB         = new RGB (200, 200, 200);
 		profile.dayHoveredRGB                 = new RGB (192, 192, 192);
 		profile.daySelectedRGB                = new RGB (255, 255, 255);
-		                                                                                           
+
 		// 1. Date column
 		profile.isShowDateColumn              = false;
 		profile.dateColumnContent             = DateColumnContent.MONTH;
 		profile.dateColumnFont                = CalendarProfile.createFont(1.5f, SWT.BOLD);
 		profile.dateColumnWidth               = 50;
-		                                                                                           
+
 		// 2. Year columns
 		profile.isShowYearColumns             = true;
 		profile.isYearColumnDayWidth          = true;
@@ -2133,7 +2131,7 @@ public class CalendarProfileManager {
 		profile.yearColumnsStart              = ColumnStart.JAN;
 		profile.yearColumnDayWidth            = 10;
 		profile.yearHeaderFont                = CalendarProfile.createFont(1.4f, SWT.BOLD);
-		                                                                                           
+
 		// 3. Week summary column
 		profile.isShowSummaryColumn           = false;
 		profile.isShowWeekValueUnit           = true;
@@ -2145,7 +2143,7 @@ public class CalendarProfileManager {
 		profile.weekValueFont                 = CalendarProfile.createFont(1.2f, SWT.BOLD);
 		profile.weekValueColor                = CalendarColor.TEXT;
 		profile.weekValueRGB                  = new RGB (255, 0, 128);
-		                                                                                           
+
 		// day date
 		profile.isHideDayDateWhenNoTour       = true;
 		profile.isShowDayDate                 = false;
@@ -2154,7 +2152,7 @@ public class CalendarProfileManager {
 		profile.dayDateMarginLeft             = 0;
 		profile.dayDateFont                   = CalendarProfile.createFont(1.2f, SWT.BOLD);
 		profile.dayDateFormat                 = DayDateFormat.DAY;
-		                                                                                           
+
 		// tour background
 		profile.tourBackground                = TourBackground.CIRCLE;
 		profile.tourBackgroundWidth           = 3;
@@ -2172,7 +2170,7 @@ public class CalendarProfileManager {
 		profile.tourDraggedRGB                = new RGB (255, 255, 0);
 		profile.tourHoveredRGB                = new RGB (192, 192, 192);
 		profile.tourSelectedRGB               = new RGB (255, 255, 255);
-		                                                                                           
+
 		// tour content
 		profile.isShowTourContent             = false;
 		profile.isShowTourValueUnit           = true;
@@ -2245,13 +2243,13 @@ public class CalendarProfileManager {
 		profile.calendarForegroundRGB         = new RGB (200, 200, 200);
 		profile.dayHoveredRGB                 = new RGB (192, 192, 192);
 		profile.daySelectedRGB                = new RGB (255, 255, 255);
-		                                                                                           
+
 		// 1. Date column
 		profile.isShowDateColumn              = false;
 		profile.dateColumnContent             = DateColumnContent.MONTH;
 		profile.dateColumnFont                = CalendarProfile.createFont(1.5f, SWT.BOLD);
 		profile.dateColumnWidth               = 50;
-		                                                                                           
+
 		// 2. Year columns
 		profile.isShowYearColumns             = true;
 		profile.isYearColumnDayWidth          = true;
@@ -2260,7 +2258,7 @@ public class CalendarProfileManager {
 		profile.yearColumnsStart              = ColumnStart.JAN;
 		profile.yearColumnDayWidth            = 5;
 		profile.yearHeaderFont                = CalendarProfile.createFont(0.9f, SWT.NORMAL);
-		                                                                                           
+
 		// 3. Week summary column
 		profile.isShowSummaryColumn           = false;
 		profile.isShowWeekValueUnit           = true;
@@ -2271,14 +2269,14 @@ public class CalendarProfileManager {
 		profile.weekMarginRight               = -3;
 		profile.weekValueColor                = CalendarColor.TEXT;
 		profile.weekValueFont                 = CalendarProfile.createFont(1.2f, SWT.BOLD);
-		                                                                                           
+
 		// day date
 		profile.isHideDayDateWhenNoTour       = true;
 		profile.isShowDayDate                 = false;
 		profile.isShowDayDateWeekendColor     = false;
 		profile.dayDateFont                   = CalendarProfile.createFont(1.2f, SWT.BOLD);
 		profile.dayDateFormat                 = DayDateFormat.DAY;
-		                                                                                           
+
 		// tour background
 		profile.tourBackground                = TourBackground.FILL;
 		profile.tourBackgroundWidth           = 3;
@@ -2296,7 +2294,7 @@ public class CalendarProfileManager {
 		profile.tourDraggedRGB                = new RGB (255, 255, 0);
 		profile.tourHoveredRGB                = new RGB (192, 192, 192);
 		profile.tourSelectedRGB               = new RGB (255, 255, 255);
-		                                                                                           
+
 		// tour content
 		profile.isShowTourContent             = false;
 		profile.isShowTourValueUnit           = true;
@@ -2372,13 +2370,13 @@ public class CalendarProfileManager {
 		profile.dayHoveredRGB                 = new RGB (153, 153, 153);
 		profile.daySelectedRGB                = new RGB (77, 77, 77);
 		profile.dayTodayRGB                   = new RGB (0, 0, 255);
-		                                                                                           
+
 		// 1. Date column
 		profile.isShowDateColumn              = true;
 		profile.dateColumnContent             = DateColumnContent.WEEK_NUMBER;
 		profile.dateColumnFont                = CalendarProfile.createFont(1.5f, SWT.BOLD);
 		profile.dateColumnWidth               = 50;
-		                                                                                           
+
 		// 2. Year columns
 		profile.isShowYearColumns             = false;
 		profile.isYearColumnDayWidth          = false;
@@ -2387,7 +2385,7 @@ public class CalendarProfileManager {
 		profile.yearColumnsStart              = ColumnStart.CONTINUOUSLY;
 		profile.yearColumnDayWidth            = 50;
 		profile.yearHeaderFont                = CalendarProfile.createFont(2.2f, SWT.BOLD);
-		                                                                                           
+
 		// 3. Week summary column
 		profile.isShowSummaryColumn           = true;
 		profile.isShowWeekValueUnit           = true;
@@ -2399,7 +2397,7 @@ public class CalendarProfileManager {
 		profile.weekValueFont                 = CalendarProfile.createFont(1.2f, SWT.BOLD);
 		profile.weekValueColor                = CalendarColor.TEXT;
 		profile.weekValueRGB                  = new RGB (255, 0, 128);
-		                                                                                           
+
 		// day date
 		profile.isHideDayDateWhenNoTour       = false;
 		profile.isShowDayDate                 = true;
@@ -2408,10 +2406,10 @@ public class CalendarProfileManager {
 		profile.dayDateMarginLeft             = 2;
 		profile.dayDateFont                   = CalendarProfile.createFont(1.2f, SWT.NORMAL);
 		profile.dayDateFormat                 = DayDateFormat.AUTOMATIC;
-		                                                                                           
+
 		// day
 		profile.isDayContentVertical          = true;
-		                                                                                           
+
 		// tour background
 		profile.tourBackground                = TourBackground.FILL;
 		profile.tourBackgroundWidth           = 3;
@@ -2429,7 +2427,7 @@ public class CalendarProfileManager {
 		profile.tourDraggedRGB                = new RGB (0, 0, 255);
 		profile.tourHoveredRGB                = new RGB (162, 162, 162);
 		profile.tourSelectedRGB               = new RGB (53, 53, 53);
-		                                                                                           
+
 		// tour content
 		profile.isShowTourContent             = true;
 		profile.isShowTourValueUnit           = true;
@@ -2502,25 +2500,25 @@ public class CalendarProfileManager {
 		} else {
 
 // SET_FORMATTING_OFF
-		
+
 			switch (profile.defaultId) {
-			
+
 			case CLASSIC:				return createProfile_99_Classic();
-	
+
 			case COMPACT:				return createProfile_20_Compact();
 			case COMPACT_II:			return createProfile_22_Compact_II();
 			case COMPACT_III:			return createProfile_23_Compact_III();
-			
+
 			case YEAR:					return createProfile_50_Year();
 			case YEAR_II:				return createProfile_52_Year_II();
 			case YEAR_III:				return createProfile_54_Year_III();
-			
+
 			case DEFAULT:
 			default:
 				// create default default
 				return createProfile_10_Default();
 		}
-		
+
 // SET_FORMATTING_ON
 		}
 	}
@@ -2727,8 +2725,8 @@ public class CalendarProfileManager {
 		return layerFile;
 	}
 
-	private static void parse_200_Calendars(final XMLMemento xmlRoot,
-											final ArrayList<CalendarProfile> allCalendarProfiles) {
+	private static void parse_200_Calendars(	final XMLMemento xmlRoot,
+															final ArrayList<CalendarProfile> allCalendarProfiles) {
 
 		if (xmlRoot == null) {
 			return;
@@ -2759,8 +2757,8 @@ public class CalendarProfileManager {
 					if (profile.defaultId == DefaultId.XML_DEFAULT) {
 
 						/*
-						 * The default id is unknown, this occured when switching vom 17.12.0 ->
-						 * 17.12.1 but it can occure when data are corrup, setup as default
+						 * The default id is unknown, this occured when switching vom 17.12.0 -> 17.12.1
+						 * but it can occure when data are corrup, setup as default
 						 */
 						profile.defaultId = DefaultId.DEFAULT;
 
@@ -2796,7 +2794,7 @@ public class CalendarProfileManager {
 
 	/**
 	 * Read or create profile
-	 * 
+	 *
 	 * @return
 	 */
 	private static void readProfileFromXml() {
@@ -2911,7 +2909,7 @@ public class CalendarProfileManager {
 		final CalendarProfile profile = createProfile_10_Default();
 
 // SET_FORMATTING_OFF
-		
+
 		// profile
 		profile.id							= Util.getXmlString(xmlProfile,						ATTR_ID,								Long.toString(System.nanoTime()));
 		profile.profileName					= Util.getXmlString(xmlProfile,						ATTR_PROFILE_NAME,						UI.EMPTY_STRING);
@@ -2921,7 +2919,7 @@ public class CalendarProfileManager {
 		profile.userDefaultId				= Util.getXmlString(xmlProfile,						ATTR_PROFILE_USER_DEFAULT_ID,			UI.EMPTY_STRING);
 		profile.userParentDefaultId			= Util.getXmlString(xmlProfile,						ATTR_PROFILE_USER_PARENT_DEFAULT_ID,	UI.EMPTY_STRING);
 		profile.defaultId					= (DefaultId) Util.getXmlEnum(xmlProfile,			ATTR_PROFILE_DEFAULT_DEFAULT_ID,		DefaultId.XML_DEFAULT);
-		
+
 		// layout
 		profile.isToggleMonthColor			= Util.getXmlBoolean(xmlProfile, 					ATTR_IS_TOGGLE_MONTH_COLOR,		true);
 		profile.isWeekRowHeight				= Util.getXmlBoolean(xmlProfile, 					ATTR_IS_WEEK_ROW_HEIGHT,		DEFAULT_IS_WEEK_ROW_HEIGHT);
@@ -2935,13 +2933,13 @@ public class CalendarProfileManager {
 		profile.dayHoveredRGB				= Util.getXmlRgb(xmlProfile,						TAG_DAY_HOVERED_RGB, 			DEFAULT_DAY_HOVERED_RGB);
 		profile.daySelectedRGB				= Util.getXmlRgb(xmlProfile,						TAG_DAY_SELECTED_RGB,			DEFAULT_DAY_SELECTED_RGB);
 		profile.dayTodayRGB					= Util.getXmlRgb(xmlProfile,						TAG_DAY_TODAY_RGB,				DEFAULT_DAY_TODAY_RGB);
-		
+
 		// 1. Date column
 		profile.isShowDateColumn			= Util.getXmlBoolean(xmlProfile, 					ATTR_IS_SHOW_DATE_COLUMN,		true);
 		profile.dateColumnFont 				= Util.getXmlFont(xmlProfile, 						ATTR_DATE_COLUMN_FONT, 			defaultFont.getFontData()[0]);
 		profile.dateColumnWidth				= Util.getXmlInteger(xmlProfile, 					ATTR_DATE_COLUMN_WIDTH,			DEFAULT_DATE_COLUMN_WIDTH);
 		profile.dateColumnContent			= (DateColumnContent) Util.getXmlEnum(xmlProfile,	ATTR_DATE_COLUMN_CONTENT,		DateColumnContent.WEEK_NUMBER);
-		
+
 		// 2. Year columns
 		profile.isShowYearColumns			= Util.getXmlBoolean(xmlProfile, 					ATTR_IS_SHOW_YEAR_COLUMNS,		true);
 		profile.isYearColumnDayWidth		= Util.getXmlBoolean(xmlProfile, 					ATTR_IS_YEAR_COLUMN_DAY_WIDTH,		DEFAULT_IS_YEAR_COLUMN_DAY_WIDTH);
@@ -2950,7 +2948,7 @@ public class CalendarProfileManager {
 		profile.yearColumnsStart			= (ColumnStart) Util.getXmlEnum(xmlProfile,			ATTR_YEAR_COLUMNS_START,		DEFAULT_YEAR_COLUMNS_LAYOUT);
 		profile.yearColumnDayWidth			= Util.getXmlInteger(xmlProfile, 					ATTR_YEAR_COLUMN_DAY_WIDTH,		DEFAULT_YEAR_COLUMN_DAY_WIDTH);
 		profile.yearHeaderFont				= Util.getXmlFont(xmlProfile, 						ATTR_YEAR_HEADER_FONT,			defaultFont.getFontData()[0]);
-		
+
 		// 3. Week summary column
 		profile.isShowSummaryColumn			= Util.getXmlBoolean(xmlProfile, 					ATTR_IS_SHOW_SUMMARY_COLUMN,	true);
 		profile.isShowWeekValueUnit			= Util.getXmlBoolean(xmlProfile, 					ATTR_IS_SHOW_WEEK_VALUE_UNIT,	true);
@@ -2971,11 +2969,11 @@ public class CalendarProfileManager {
 		profile.dayDateMarginLeft			= Util.getXmlInteger(xmlProfile, 					ATTR_DAY_DATE_MARGIN_LEFT,				DEFAULT_DAY_DATE_MARGIN_LEFT,		DEFAULT_MARGIN_MIN, DEFAULT_MARGIN_MAX);
 		profile.dayDateFont 				= Util.getXmlFont(xmlProfile, 						ATTR_DAY_DATE_FONT, 					defaultFont.getFontData()[0]);
 		profile.dayDateFormat				= (DayDateFormat) Util.getXmlEnum(xmlProfile,		ATTR_DAY_DATE_FORMAT,					DEFAULT_DAY_DATE_FORMAT);
-		
+
 		// day layout
 		profile.isDayContentVertical		= Util.getXmlBoolean(xmlProfile, 					ATTR_IS_DAY_CONTENT_VERTICAL,	true);
-		
-		                                    
+
+
 		// tour fill
 		profile.tourBackgroundWidth			= Util.getXmlInteger(xmlProfile, 					ATTR_TOUR_BACKGROUND_WIDTH, 	DEFAULT_TOUR_BACKGROUND_WIDTH,	TOUR_BACKGROUND_WIDTH_MIN,	TOUR_BACKGROUND_WIDTH_MAX);
 		profile.tourBorderWidth				= Util.getXmlInteger(xmlProfile, 					ATTR_TOUR_BORDER_WIDTH,		 	DEFAULT_TOUR_BORDER_WIDTH,		TOUR_BORDER_WIDTH_MIN,		TOUR_BORDER_WIDTH_MAX);
@@ -2993,7 +2991,7 @@ public class CalendarProfileManager {
 		profile.tourDraggedRGB				= Util.getXmlRgb(xmlProfile,						TAG_TOUR_DRAGGED_RGB, 			DEFAULT_TOUR_DRAGGED_RGB);
 		profile.tourHoveredRGB				= Util.getXmlRgb(xmlProfile,						TAG_TOUR_HOVERED_RGB, 			DEFAULT_TOUR_HOVERED_RGB);
 		profile.tourSelectedRGB				= Util.getXmlRgb(xmlProfile,						TAG_TOUR_SELECTED_RGB, 			DEFAULT_TOUR_SELECTED_RGB);
-		
+
 		// tour content
 		profile.isShowTourContent			= Util.getXmlBoolean(xmlProfile, 					ATTR_IS_SHOW_TOUR_CONTENT,		true);
 		profile.isShowTourValueUnit			= Util.getXmlBoolean(xmlProfile, 					ATTR_IS_SHOW_TOUR_VALUE_UNIT,	true);
@@ -3038,8 +3036,8 @@ public class CalendarProfileManager {
 	}
 
 	private static FormatterData[] restoreProfile_FormatterData(final XMLMemento xmlProfile,
-																final String tagAllFormatter,
-																final CalendarProfile profile) {
+																					final String tagAllFormatter,
+																					final CalendarProfile profile) {
 
 		final XMLMemento xmlAllFormatter = (XMLMemento) xmlProfile.getChild(tagAllFormatter);
 		if (xmlAllFormatter != null) {
@@ -3072,7 +3070,7 @@ public class CalendarProfileManager {
 	private static void saveProfile(final CalendarProfile profile, final IMemento xmlProfile) {
 
 // SET_FORMATTING_OFF
-					
+
 		// profile
 		xmlProfile.putString(		ATTR_ID, 								profile.id);
 		xmlProfile.putString(		ATTR_PROFILE_NAME, 						profile.profileName);
@@ -3082,7 +3080,7 @@ public class CalendarProfileManager {
 		xmlProfile.putString(		ATTR_PROFILE_USER_DEFAULT_ID,			profile.userDefaultId);
 		xmlProfile.putString(		ATTR_PROFILE_USER_PARENT_DEFAULT_ID,	profile.userParentDefaultId);
 		Util.setXmlEnum(xmlProfile,	ATTR_PROFILE_DEFAULT_DEFAULT_ID,		profile.defaultId);
-		
+
 		// layout
 		xmlProfile.putBoolean(		ATTR_IS_TOGGLE_MONTH_COLOR, 			profile.isToggleMonthColor);
 		xmlProfile.putBoolean(		ATTR_IS_WEEK_ROW_HEIGHT,	 			profile.isWeekRowHeight);
@@ -3096,7 +3094,7 @@ public class CalendarProfileManager {
 		Util.setXmlRgb(xmlProfile,	TAG_DAY_HOVERED_RGB, 					profile.dayHoveredRGB);
 		Util.setXmlRgb(xmlProfile,	TAG_DAY_SELECTED_RGB, 					profile.daySelectedRGB);
 		Util.setXmlRgb(xmlProfile,	TAG_DAY_TODAY_RGB,	 					profile.dayTodayRGB);
-		
+
 		// 1. Date column
 		xmlProfile.putBoolean(		ATTR_IS_SHOW_DATE_COLUMN, 				profile.isShowDateColumn);
 		xmlProfile.putInteger(		ATTR_DATE_COLUMN_WIDTH, 				profile.dateColumnWidth);
@@ -3111,7 +3109,7 @@ public class CalendarProfileManager {
 		xmlProfile.putInteger(		ATTR_YEAR_COLUMN_DAY_WIDTH, 			profile.yearColumnDayWidth);
 		Util.setXmlEnum(xmlProfile,	ATTR_YEAR_COLUMNS_START, 				profile.yearColumnsStart);
 		Util.setXmlFont(xmlProfile,	ATTR_YEAR_HEADER_FONT, 					profile.yearHeaderFont);
-		
+
 		// 3. Week summary column
 		xmlProfile.putBoolean(		ATTR_IS_SHOW_SUMMARY_COLUMN, 			profile.isShowSummaryColumn);
 		xmlProfile.putBoolean(		ATTR_IS_SHOW_WEEK_VALUE_UNIT, 			profile.isShowWeekValueUnit);
@@ -3123,7 +3121,7 @@ public class CalendarProfileManager {
 		Util.setXmlEnum(xmlProfile,	ATTR_WEEK_VALUE_COLOR, 					profile.weekValueColor);
 		Util.setXmlFont(xmlProfile,	ATTR_WEEK_VALUE_FONT, 					profile.weekValueFont);
 		Util.setXmlRgb(xmlProfile,	TAG_WEEK_VALUE_RGB, 					profile.weekValueRGB);
-		
+
 		// day date
 		xmlProfile.putBoolean(		ATTR_IS_HIDE_DAY_DATE_WHEN_NO_TOUR, 	profile.isHideDayDateWhenNoTour);
 		xmlProfile.putBoolean(		ATTR_IS_SHOW_DAY_DATE, 					profile.isShowDayDate);
@@ -3132,7 +3130,7 @@ public class CalendarProfileManager {
 		xmlProfile.putInteger(		ATTR_DAY_DATE_MARGIN_LEFT, 				profile.dayDateMarginLeft);
 		Util.setXmlEnum(xmlProfile,	ATTR_DAY_DATE_FORMAT, 					profile.dayDateFormat);
 		Util.setXmlFont(xmlProfile,	ATTR_DAY_DATE_FONT, 					profile.dayDateFont);
-		
+
 		// day layout
 		xmlProfile.putBoolean(		ATTR_IS_DAY_CONTENT_VERTICAL, 			profile.isDayContentVertical);
 
@@ -3173,7 +3171,7 @@ public class CalendarProfileManager {
 		Util.setXmlRgb(xmlProfile,	TAG_TOUR_CONTENT_RGB, 					profile.tourContentRGB);
 		Util.setXmlRgb(xmlProfile,	TAG_TOUR_TITLE_RGB, 					profile.tourTitleRGB);
 		Util.setXmlRgb(xmlProfile,	TAG_TOUR_VALUE_RGB, 					profile.tourValueRGB);
-		
+
 // SET_FORMATTING_ON
 
 		// formatter
@@ -3182,7 +3180,7 @@ public class CalendarProfileManager {
 	}
 
 	private static void saveProfile_FormatterData(	final IMemento xmlAllTourFormatter,
-													final FormatterData[] allFormatterData) {
+																	final FormatterData[] allFormatterData) {
 
 		for (final FormatterData formatterData : allFormatterData) {
 
@@ -3236,11 +3234,11 @@ public class CalendarProfileManager {
 
 	/**
 	 * Set a new/modified profile
-	 * 
+	 *
 	 * @param modifiedProfile
-	 *            Modified or selected profile
+	 *           Modified or selected profile
 	 * @param isFireModifyEvent
-	 *            Fire modify event when <code>true</code>
+	 *           Fire modify event when <code>true</code>
 	 */
 	static void setActiveCalendarProfile(final CalendarProfile modifiedProfile, final boolean isFireModifyEvent) {
 

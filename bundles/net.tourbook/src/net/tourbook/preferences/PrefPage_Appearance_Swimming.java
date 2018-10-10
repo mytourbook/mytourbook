@@ -28,6 +28,7 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -39,7 +40,8 @@ import net.tourbook.Messages;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.swimming.StrokeStyle;
-import net.tourbook.common.swimming.SwimStrokeConfig;
+import net.tourbook.common.swimming.SwimStroke;
+import net.tourbook.common.swimming.SwimStrokeManager;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 
@@ -49,22 +51,18 @@ public class PrefPage_Appearance_Swimming extends PreferencePage implements IWor
 
 	private final IPreferenceStore	_prefStore	= CommonActivator.getPrefStore();
 
+	private SelectionAdapter			_defaultSelectionListener;
+	private IPropertyChangeListener	_defaultChangePropertyListener;
+
 	private PixelConverter				_pc;
 
 	/*
 	 * UI controls
 	 */
-	private SelectionAdapter			_defaultSelectionListener;
 
 	private Button							_chkLiveUpdate;
 
-	private IPropertyChangeListener	_defaultChangePropertyListener;
-
 	private ArrayList<ColorSelector>	_allSwimColors	= new ArrayList<>();
-
-	public PrefPage_Appearance_Swimming() {
-//		noDefaultAndApplyButton();
-	}
 
 	@Override
 	protected Control createContents(final Composite parent) {
@@ -84,16 +82,8 @@ public class PrefPage_Appearance_Swimming extends PreferencePage implements IWor
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.fillDefaults().spacing(5, 15).applyTo(container);
 		{
-//			{
-//				/*
-//				 * Label: Info
-//				 */
-//				final Label label = new Label(container, SWT.NONE);
-//				label.setText(Messages.Pref_DisplayFormat_Label_Info);
-//				GridDataFactory.fillDefaults()//
-//						.span(2, 1)
-//						.applyTo(label);
-//			}
+			// label: Info
+			new Label(container, SWT.NONE).setText(Messages.Pref_Swimming_Label_Info);
 
 			createUI_20_SwimColors(container);
 			createUI_99_LiveUpdate(container);
@@ -105,31 +95,27 @@ public class PrefPage_Appearance_Swimming extends PreferencePage implements IWor
 	private void createUI_20_SwimColors(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-//		GridDataFactory.fillDefaults()//
-//				.grab(true, false)
-//				.applyTo(container);
 		GridLayoutFactory.fillDefaults()
 				.numColumns(2)
-//				.spacing(20, 5)
+				.spacing(20, 5)
 				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 		{
-			for (final StrokeStyle strokeStyle : SwimStrokeConfig.getAllStrokeStyleList()) {
+			for (final StrokeStyle strokeStyle : SwimStrokeManager.DEFAULT_STROKE_STYLES) {
 
 				{
 					final Label label = new Label(container, SWT.NONE);
-					label.setText(strokeStyle.swimStrokeText);
+					label.setText(strokeStyle.swimStrokeLabel);
 				}
 
 				{
 					final ColorSelector swimColor = new ColorSelector(container);
-					swimColor.setColorValue(strokeStyle.graphBgColor);
+					swimColor.setColorValue(strokeStyle.getGraphBgColor());
 					swimColor.addListener(_defaultChangePropertyListener);
 
 					_allSwimColors.add(swimColor);
 				}
 			}
-
 		}
 	}
 
@@ -183,7 +169,7 @@ public class PrefPage_Appearance_Swimming extends PreferencePage implements IWor
 	}
 
 	/**
-	 * Property was changed.
+	 * Property is modified
 	 *
 	 * @param source
 	 */
@@ -191,14 +177,14 @@ public class PrefPage_Appearance_Swimming extends PreferencePage implements IWor
 
 		ColorSelector modifiedColorSelector = null;
 
-		StrokeStyle strokeStyle = null;
+		StrokeStyle defaultStrokeStyle = null;
 		for (int selectorIndex = 0; selectorIndex < _allSwimColors.size(); selectorIndex++) {
 
 			final ColorSelector colorSelector = _allSwimColors.get(selectorIndex);
 
 			if (source == colorSelector) {
 				modifiedColorSelector = colorSelector;
-				strokeStyle = SwimStrokeConfig.getAllStrokeStyleList()[selectorIndex];
+				defaultStrokeStyle = SwimStrokeManager.DEFAULT_STROKE_STYLES[selectorIndex];
 				break;
 			}
 		}
@@ -207,7 +193,8 @@ public class PrefPage_Appearance_Swimming extends PreferencePage implements IWor
 			return;
 		}
 
-		strokeStyle.graphBgColor = modifiedColorSelector.getColorValue();
+		// update model
+		SwimStrokeManager.setRgb(defaultStrokeStyle.swimStroke, modifiedColorSelector.getColorValue());
 
 		doLiveUpdate();
 	}
@@ -224,8 +211,23 @@ public class PrefPage_Appearance_Swimming extends PreferencePage implements IWor
 	protected void performDefaults() {
 
 		final boolean isLiveUpdate = _prefStore.getDefaultBoolean(ICommonPreferences.DISPLAY_FORMAT_IS_LIVE_UPDATE);
-
 		_chkLiveUpdate.setSelection(isLiveUpdate);
+
+		/*
+		 * Update model
+		 */
+		SwimStrokeManager.restoreDefaults();
+
+		/*
+		 * Update UI
+		 */
+		for (int styleIndex = 0; styleIndex < _allSwimColors.size(); styleIndex++) {
+
+			final RGB strokeRgb = SwimStrokeManager.DEFAULT_STROKE_STYLES[styleIndex].getGraphBgColor();
+			final ColorSelector colorSelector = _allSwimColors.get(styleIndex);
+
+			colorSelector.setColorValue(strokeRgb);
+		}
 
 		super.performDefaults();
 
@@ -243,8 +245,17 @@ public class PrefPage_Appearance_Swimming extends PreferencePage implements IWor
 	private void restoreState() {
 
 		final boolean isLiveUpdate = _prefStore.getBoolean(ICommonPreferences.DISPLAY_FORMAT_IS_LIVE_UPDATE);
-
 		_chkLiveUpdate.setSelection(isLiveUpdate);
+
+		for (int styleIndex = 0; styleIndex < _allSwimColors.size(); styleIndex++) {
+
+			final SwimStroke swimStroke = SwimStrokeManager.DEFAULT_STROKE_STYLES[styleIndex].swimStroke;
+			final RGB strokeRgb = SwimStrokeManager.getColor(swimStroke);
+
+			final ColorSelector colorSelector = _allSwimColors.get(styleIndex);
+
+			colorSelector.setColorValue(strokeRgb);
+		}
 	}
 
 	private void saveState() {

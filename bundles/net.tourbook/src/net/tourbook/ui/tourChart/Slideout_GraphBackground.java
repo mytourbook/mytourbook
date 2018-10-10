@@ -23,8 +23,6 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -36,6 +34,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 
 import net.tourbook.Messages;
@@ -58,7 +57,6 @@ import net.tourbook.preferences.PrefPage_Appearance_Swimming;
 public class Slideout_GraphBackground extends ToolbarSlideout {
 
 	private static final IPreferenceStore	_prefStore							= TourbookPlugin.getPrefStore();
-	private IDialogSettings						_state;
 
 	/**
 	 * Contains all {@link GraphBgSourceType}s which can be displayed for the current tour
@@ -69,13 +67,11 @@ public class Slideout_GraphBackground extends ToolbarSlideout {
 	private ActionOpenPrefDialog				_actionPrefDialog;
 
 	private SelectionAdapter					_defaultSelectionListener;
-	private SelectionAdapter					_defaultSelectionAdapter;
 	private MouseWheelListener					_defaultMouseWheelListener;
-	private IPropertyChangeListener			_defaultPropertyChangeListener;
 	private FocusListener						_keepOpenListener;
 
 	{
-		_defaultSelectionAdapter = new SelectionAdapter() {
+		_defaultSelectionListener = new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				onChangeUI();
@@ -86,13 +82,6 @@ public class Slideout_GraphBackground extends ToolbarSlideout {
 			@Override
 			public void mouseScrolled(final MouseEvent event) {
 				UI.adjustSpinnerValueOnMouseScroll(event);
-				onChangeUI();
-			}
-		};
-
-		_defaultPropertyChangeListener = new IPropertyChangeListener() {
-			@Override
-			public void propertyChange(final PropertyChangeEvent event) {
 				onChangeUI();
 			}
 		};
@@ -126,6 +115,8 @@ public class Slideout_GraphBackground extends ToolbarSlideout {
 
 	private Label		_lblGraphBgStyle;
 
+	private Spinner	_spinnerGraphTransparencyFilling;
+
 	public Slideout_GraphBackground(	final Control ownerControl,
 												final ToolBar toolBar,
 												final TourChart tourChart,
@@ -134,7 +125,6 @@ public class Slideout_GraphBackground extends ToolbarSlideout {
 		super(ownerControl, toolBar);
 
 		_tourChart = tourChart;
-		_state = state;
 	}
 
 	private void createActions() {
@@ -163,8 +153,6 @@ public class Slideout_GraphBackground extends ToolbarSlideout {
 	@Override
 	protected Composite createToolTipContentArea(final Composite parent) {
 
-		initUI(parent);
-
 		createActions();
 
 		final Composite ui = createUI(parent);
@@ -191,7 +179,14 @@ public class Slideout_GraphBackground extends ToolbarSlideout {
 				createUI_10_Title(container);
 				createUI_12_Actions(container);
 			}
-			createUI_20_Graphs(shellContainer);
+
+			final Composite containerGraph = new Composite(shellContainer, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(containerGraph);
+			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerGraph);
+			{
+				createUI_20_Graphs(containerGraph);
+				createUI_30_Filling(containerGraph);
+			}
 		}
 
 		return shellContainer;
@@ -224,56 +219,77 @@ public class Slideout_GraphBackground extends ToolbarSlideout {
 
 	private void createUI_20_Graphs(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
+			/*
+			 * Combo: Graph source
+			 */
+			final Label label = new Label(parent, SWT.NONE);
+			label.setText(Messages.Slideout_TourChartGraphBackground_Label_BackgroundSource);
+			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+
+			final Composite bgSourcecontainer = new Composite(parent, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(bgSourcecontainer);
+			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(bgSourcecontainer);
 			{
-				/*
-				 * Combo: Graph source
-				 */
-				final Label label = new Label(container, SWT.NONE);
-				label.setText(Messages.Slideout_TourChartGraphBackground_Label_BackgroundSource);
-				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-
-				final Composite bgSourcecontainer = new Composite(container, SWT.NONE);
-				GridDataFactory.fillDefaults().grab(true, false).applyTo(bgSourcecontainer);
-				GridLayoutFactory.fillDefaults().numColumns(2).applyTo(bgSourcecontainer);
 				{
-					{
-						_comboGraphBgSource = new Combo(bgSourcecontainer, SWT.DROP_DOWN | SWT.READ_ONLY);
-						_comboGraphBgSource.setVisibleItemCount(20);
-						_comboGraphBgSource.setToolTipText(Messages.Slideout_TourChartGraphBackground_Combo_BackgroundSource_Tooltip);
-						_comboGraphBgSource.addSelectionListener(_defaultSelectionAdapter);
-						_comboGraphBgSource.addFocusListener(_keepOpenListener);
-					}
-					{
-						final ToolBar toolbar = new ToolBar(bgSourcecontainer, SWT.FLAT);
-						GridDataFactory.fillDefaults()//
-								.grab(true, false)
-								.align(SWT.BEGINNING, SWT.CENTER)
-								.applyTo(toolbar);
+					_comboGraphBgSource = new Combo(bgSourcecontainer, SWT.DROP_DOWN | SWT.READ_ONLY);
+					_comboGraphBgSource.setVisibleItemCount(20);
+					_comboGraphBgSource.setToolTipText(Messages.Slideout_TourChartGraphBackground_Combo_BackgroundSource_Tooltip);
+					_comboGraphBgSource.addSelectionListener(_defaultSelectionListener);
+					_comboGraphBgSource.addFocusListener(_keepOpenListener);
+				}
+				{
+					final ToolBar toolbar = new ToolBar(bgSourcecontainer, SWT.FLAT);
+					GridDataFactory.fillDefaults()//
+							.grab(true, false)
+							.align(SWT.BEGINNING, SWT.CENTER)
+							.applyTo(toolbar);
 
-						final ToolBarManager tbm = new ToolBarManager(toolbar);
-						tbm.add(_actionPrefDialog);
-						tbm.update(true);
-					}
+					final ToolBarManager tbm = new ToolBarManager(toolbar);
+					tbm.add(_actionPrefDialog);
+					tbm.update(true);
 				}
 			}
-			{
-				/*
-				 * Combo: Background style
-				 */
-				_lblGraphBgStyle = new Label(container, SWT.NONE);
-				_lblGraphBgStyle.setText(Messages.Slideout_TourChartGraphBackground_Label_BackgroundStyle);
-				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblGraphBgStyle);
+		}
+		{
+			/*
+			 * Combo: Background style
+			 */
+			_lblGraphBgStyle = new Label(parent, SWT.NONE);
+			_lblGraphBgStyle.setText(Messages.Slideout_TourChartGraphBackground_Label_BackgroundStyle);
+			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblGraphBgStyle);
 
-				_comboGraphBgStyle = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-				_comboGraphBgStyle.setVisibleItemCount(20);
-				_comboGraphBgStyle.addSelectionListener(_defaultSelectionAdapter);
-				_comboGraphBgStyle.addFocusListener(_keepOpenListener);
-			}
+			_comboGraphBgStyle = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
+			_comboGraphBgStyle.setVisibleItemCount(20);
+			_comboGraphBgStyle.addSelectionListener(_defaultSelectionListener);
+			_comboGraphBgStyle.addFocusListener(_keepOpenListener);
+		}
+	}
+
+	private void createUI_30_Filling(final Composite parent) {
+
+		{
+			/*
+			 * label: graph filling transparency
+			 */
+			final Label label = new Label(parent, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.FILL, SWT.CENTER)
+					.applyTo(label);
+			label.setText(Messages.Pref_Graphs_Label_GraphTransparency);
+			label.setToolTipText(Messages.Pref_Graphs_Label_GraphTransparency_Tooltip);
+
+			/*
+			 * spinner: graph filling transparence
+			 */
+			_spinnerGraphTransparencyFilling = new Spinner(parent, SWT.BORDER);
+			GridDataFactory.fillDefaults() //
+					.align(SWT.BEGINNING, SWT.FILL)
+					.applyTo(_spinnerGraphTransparencyFilling);
+			_spinnerGraphTransparencyFilling.setMinimum(0x00);
+			_spinnerGraphTransparencyFilling.setMaximum(0xff);
+			_spinnerGraphTransparencyFilling.addMouseWheelListener(_defaultMouseWheelListener);
+			_spinnerGraphTransparencyFilling.addSelectionListener(_defaultSelectionListener);
 		}
 	}
 
@@ -330,16 +346,6 @@ public class Slideout_GraphBackground extends ToolbarSlideout {
 
 	}
 
-	private void initUI(final Composite parent) {
-
-		_defaultSelectionListener = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onChangeUI();
-			}
-		};
-	}
-
 	private void onChangeUI() {
 
 		saveState();
@@ -356,6 +362,8 @@ public class Slideout_GraphBackground extends ToolbarSlideout {
 
 	private void resetToDefaults() {
 
+		_spinnerGraphTransparencyFilling.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING));
+
 		select_GraphBgSource(TourChartConfiguration.GRAPH_BACKGROUND_SOURCE_DEFAULT);
 		select_GraphBgStyle(TourChartConfiguration.GRAPH_BACKGROUND_STYLE_DEFAULT);
 
@@ -368,6 +376,8 @@ public class Slideout_GraphBackground extends ToolbarSlideout {
 
 	private void restoreState() {
 
+		_spinnerGraphTransparencyFilling.setSelection(_prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING));
+
 		final TourChartConfiguration tcc = _tourChart.getTourChartConfig();
 
 		// graph background
@@ -379,6 +389,8 @@ public class Slideout_GraphBackground extends ToolbarSlideout {
 	}
 
 	private void saveState() {
+
+		_prefStore.setValue(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING, _spinnerGraphTransparencyFilling.getSelection());
 
 		final TourChartConfiguration tcc = _tourChart.getTourChartConfig();
 

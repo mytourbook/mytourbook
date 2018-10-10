@@ -19,15 +19,25 @@ import org.eclipse.swt.graphics.RGB;
 
 public class StrokeStyle {
 
-	SwimStroke		swimStroke;
-	public String	swimStrokeText;
+	public SwimStroke	swimStroke;
 
-	public RGB		graphBgColor;
+	public String		swimStrokeLabel;
+	private RGB			graphBgColor;
+
+	public StrokeStyle() {}
 
 	public StrokeStyle(final SwimStroke swimStroke, final String swimStrokeText, final RGB graphBgColor) {
 
 		this.swimStroke = swimStroke;
-		this.swimStrokeText = swimStrokeText;
+		this.swimStrokeLabel = swimStrokeText;
+		this.graphBgColor = graphBgColor;
+	}
+
+	public RGB getGraphBgColor() {
+		return graphBgColor;
+	}
+
+	public void setGraphBgColor(final RGB graphBgColor) {
 		this.graphBgColor = graphBgColor;
 	}
 }

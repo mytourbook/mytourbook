@@ -1580,6 +1580,8 @@ public class Messages extends NLS {
 	public static String	Pref_Statistic_Radio_BarAdjacent;
 	public static String	Pref_Statistic_Radio_BarStacked;
 
+	public static String	Pref_Swimming_Label_Info;
+
 	public static String	Pref_Tour_Button_FailedUpdate;
 	public static String	Pref_Tour_Dialog_ConfirmDatabaseUpdate_Message;
 	public static String	Pref_Tour_Dialog_ConfirmDatabaseUpdate_Title;
