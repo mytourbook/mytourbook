@@ -255,6 +255,14 @@
 			id="net.tourbook.device.Suunto3"
 			name="Suunto 3">
 		</device>
+		
+		<!-- Suunto Spartan/9 -->
+		<device
+			class="net.tourbook.device.suunto.Suunto9DeviceDataReader"
+			fileextension="json.gz"
+			id="net.tourbook.device.Suunto9"
+			name="Suunto 9">
+		</device>
 
 		<!-- TUR -->
 		<device
