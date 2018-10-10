@@ -4,17 +4,16 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.zip.GZIPInputStream;
-
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -23,6 +22,9 @@ import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 
 public class Suunto9DeviceDataReader extends TourbookDevice {
+
+	private String _importFilePath;
+
 
 	// plugin constructor
 	public Suunto9DeviceDataReader() {
@@ -71,28 +73,9 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		if (isValidJSONFile(importFilePath) == false) {
 			return false;
 		}
-
-		Suunto3SAXHandler saxHandler = null;
-
-		try {
-
-			saxHandler = new Suunto3SAXHandler(//
-					this, importFilePath, alreadyImportedTours, newlyImportedTours);
-
-			final SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
-
-			parser.parse("file:" + importFilePath, saxHandler);//$NON-NLS-1$
-
-		} catch (final Exception e) {
-
-			StatusUtil.log("Error parsing file: " + importFilePath, e); //$NON-NLS-1$
-			return false;
-
-		} finally {
-			saxHandler.dispose();
-		}
-
-		return saxHandler.isImported();
+		_importFilePath = importFilePath;
+		createTourData(alreadyImportedTours, newlyImportedTours);
+		return true;
 	}
 
 
@@ -103,13 +86,9 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
 
 	/**
-	 * Check if the file is a valid device xml file.
+	 * Check if the file is a valid device JSON file.
 	 * 
 	 * @param importFilePath
-	 * @param deviceTag
-	 * @param isRemoveBOM
-	 *            When <code>true</code> the BOM (Byte Order Mark) is removed from
-	 *            the file.
 	 * @return Returns <code>true</code> when the file contains content with the
 	 *         requested tag.
 	 */
@@ -143,6 +122,44 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		}
 
 		return true;
+	}
+
+
+	private void createTourData(final HashMap<Long, TourData> alreadyImportedTours,
+			final HashMap<Long, TourData> newlyImportedTours) {
+
+		// create data object for each tour
+		final TourData tourData = new TourData();
+
+		/*
+		 * set tour start date/time
+		 */
+		final ZonedDateTime dtTourStart = ZonedDateTime.of(2018, 10, 10, 8, 0, 0, 0, TimeTools.getDefaultTimeZone());
+
+		tourData.setTourStartTime(dtTourStart);
+
+		tourData.setImportFilePath(_importFilePath);
+
+		// tourData.setCalories(_calories);
+		// tourData.setRestPulse(_sectionParams.restHR == Integer.MIN_VALUE ? 0 :
+		// _sectionParams.restHR);
+
+		tourData.setDeviceId(deviceId);
+		// after all data are added, the tour id can be created
+		final String uniqueId = createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_POLAR_HRM);
+		final Long tourId = tourData.createTourId(uniqueId);
+
+		// check if the tour is already imported
+		if (alreadyImportedTours.containsKey(tourId) == false) {
+
+			// add new tour to other tours
+			newlyImportedTours.put(tourId, tourData);
+
+			// create additional data
+			tourData.computeTourDrivingTime();
+			tourData.computeComputedValues();
+			tourData.computeAltitudeUpDown();
+		}
 	}
 
 
