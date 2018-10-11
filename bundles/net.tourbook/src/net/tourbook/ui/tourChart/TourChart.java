@@ -4432,7 +4432,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private void setCustomBackgroundPainter() {
 
 		if (_tcc.isBackgroundStyle_HrZone() || _tcc.isBackgroundStyle_SwimmingStyle()) {
-			_customBackgroundPainter = new GraphBackgroundCustomPainter();
+			_customBackgroundPainter = new GraphBackgroundPainter();
 		} else {
 			_customBackgroundPainter = null;
 		}

@@ -78,18 +78,18 @@ public class ChartComponentGraph extends Canvas {
 	private static final double			FLOAT_ZERO			= ChartDataYSerie.FLOAT_ZERO;
 
 	private static final double			ZOOM_RATIO			= 1.3;
-	private static double				ZOOM_RATIO_FACTOR	= ZOOM_RATIO;
+	private static double					ZOOM_RATIO_FACTOR	= ZOOM_RATIO;
 
-	private static final int			BAR_MARKER_WIDTH	= 16;
+	private static final int				BAR_MARKER_WIDTH	= 16;
 
-	private static final int[]			DOT_DASHES			= new int[] { 1, 1 };
+	private static final int[]				DOT_DASHES			= new int[] { 1, 1 };
 
 	private static final NumberFormat	_nf					= NumberFormat.getNumberInstance();
 
-	private static final RGB			_gridRGB			= new RGB(230, 230, 230);
-	private static final RGB			_gridRGBMajor		= new RGB(220, 220, 220);
+	private static final RGB				_gridRGB				= new RGB(230, 230, 230);
+	private static final RGB				_gridRGBMajor		= new RGB(220, 220, 220);
 
-	private static final int[][]		_leftAccelerator	= new int[][] {
+	private static final int[][]			_leftAccelerator	= new int[][] {
 			{ -40, -200 },
 			{ -30, -50 },
 			{ -20, -10 },
@@ -99,23 +99,23 @@ public class ChartComponentGraph extends Canvas {
 			// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 			{ 0, -2 } };
 
-	private static final int[][]		_rightAccelerator	= new int[][] {
+	private static final int[][]			_rightAccelerator	= new int[][] {
 			{ 10, 2 },
 			{ 20, 5 },
 			{ 30, 10 },
 			{ 40, 50 },
 			{ Integer.MAX_VALUE, 200 } };
 
-	private final LineAttributes		LINE_DASHED			= new LineAttributes(5);
+	private final LineAttributes			LINE_DASHED			= new LineAttributes(5);
 	{
 		LINE_DASHED.dashOffset = 3;
 		LINE_DASHED.style = SWT.LINE_CUSTOM;
 		LINE_DASHED.dash = new float[] { 1f, 2f };
 		LINE_DASHED.width = 1f;
 	}
-	Chart								_chart;
+	Chart											_chart;
 
-	private final ChartComponents		_chartComponents;
+	private final ChartComponents			_chartComponents;
 
 	/**
 	 * This image contains one single graph without title and x-axis with units.
@@ -123,159 +123,159 @@ public class ChartComponentGraph extends Canvas {
 	 * This image was created to fix clipping bugs which occured when gradient filling was painted
 	 * with a path.
 	 */
-	private Image						_chartImage_10_Graphs;
+	private Image								_chartImage_10_Graphs;
 
 	/**
 	 * This image contains the chart without additional layers.
 	 */
-	private Image						_chartImage_20_Chart;
+	private Image								_chartImage_20_Chart;
 
 	/**
 	 * Contains custom layers like the markers or tour segments which are painted in the foreground.
 	 */
-	private Image						_chartImage_30_Custom;
+	private Image								_chartImage_30_Custom;
 
 	/**
 	 * Contains layers like the x/y sliders, x-marker, selection or hovered line/bar.
 	 */
-	private Image						_chartImage_40_Overlay;
+	private Image								_chartImage_40_Overlay;
 
 	/**
 	 *
 	 */
-	private ChartDrawingData			_chartDrawingData;
+	private ChartDrawingData				_chartDrawingData;
 
 	/**
 	 * drawing data which is used to draw the chart, when this list is empty, an error is displayed
 	 */
-	private ArrayList<GraphDrawingData>	_allGraphDrawingData			= new ArrayList<>();
+	private ArrayList<GraphDrawingData>	_allGraphDrawingData	= new ArrayList<>();
 	private ArrayList<GraphDrawingData>	_revertedGraphDrawingData;
 
 	/**
 	 * Zoom ratio between the visible and the virtual chart width, is 1.0 when not zoomed, is > 1
 	 * when zoomed.
 	 */
-	private double						_graphZoomRatio					= 1;
+	private double								_graphZoomRatio		= 1;
 
 	/**
 	 * Contains the width for a zoomed graph this includes also the invisible parts.
 	 */
-	private long						_xxDevGraphWidth;
+	private long								_xxDevGraphWidth;
 
 	/**
-	 * When the graph is zoomed, the chart shows only a part of the whole graph in the viewport.
-	 * This value contains the left border of the viewport.
+	 * When the graph is zoomed, the chart shows only a part of the whole graph in the viewport. This
+	 * value contains the left border of the viewport.
 	 */
-	long								_xxDevViewPortLeftBorder;
+	long											_xxDevViewPortLeftBorder;
 
 	/**
 	 * ratio for the position where the chart starts on the left side within the virtual graph width
 	 */
-	private double						_zoomRatioLeftBorder;
+	private double								_zoomRatioLeftBorder;
 
 	/**
 	 * ratio where the mouse was double clicked, this position is used to zoom the chart with the
 	 * mouse
 	 */
-	private double						_zoomRatioCenter;
+	private double								_zoomRatioCenter;
 
 	/**
 	 * This zoom ratio is used when zooming the next time with the keyboard, when 0 this is ignored.
 	 */
-	private double						_zoomRatioCenterKey;
+	private double								_zoomRatioCenterKey;
 
 	/**
 	 * when the slider is dragged and the mouse up event occures, the graph is zoomed to the sliders
 	 * when set to <code>true</code>
 	 */
-	boolean								_canAutoZoomToSlider;
+	boolean										_canAutoZoomToSlider;
 
 	/**
 	 * when <code>true</code> the vertical sliders will be moved to the border when the chart is
 	 * zoomed
 	 */
-	boolean								_canAutoMoveSliders;
+	boolean										_canAutoMoveSliders;
 
 	/**
 	 * true indicates the graph needs to be redrawn in the paint event
 	 */
-	private boolean						_isChartDirty;
+	private boolean							_isChartDirty;
 
 	/**
 	 * true indicates the slider needs to be redrawn in the paint event
 	 */
-	private boolean						_isSliderDirty;
+	private boolean							_isSliderDirty;
 
 	/**
-	 * when <code>true</code> the custom layers above the graph image needs to be redrawn in the
-	 * next paint event
+	 * when <code>true</code> the custom layers above the graph image needs to be redrawn in the next
+	 * paint event
 	 */
-	private boolean						_isCustomLayerImageDirty;
+	private boolean							_isCustomLayerImageDirty;
 
 	/**
 	 * set to <code>true</code> when the selection needs to be redrawn
 	 */
-	private boolean						_isSelectionDirty;
+	private boolean							_isSelectionDirty;
 
 	/**
 	 * status for the x-slider, <code>true</code> indicates, the slider is visible
 	 */
-	private boolean						_isXSliderVisible;
+	private boolean							_isXSliderVisible;
 
 	/**
 	 * true indicates that the y-sliders is visible
 	 */
-	private boolean						_isYSliderVisible;
+	private boolean							_isYSliderVisible;
 
 	/**
-	 * Is <code>true</code> when the area between the vertical x-sliders is filled with a
-	 * translucent background color, this is used for the geo compare area.
+	 * Is <code>true</code> when the area between the vertical x-sliders is filled with a translucent
+	 * background color, this is used for the geo compare area.
 	 */
-	private boolean						_isXSliderAreaVisible;
+	private boolean							_isXSliderAreaVisible;
 
 	/*
 	 * chart slider
 	 */
-	private final ChartXSlider			_xSliderA;
-	private final ChartXSlider			_xSliderB;
+	private final ChartXSlider				_xSliderA;
+	private final ChartXSlider				_xSliderB;
 
 	/**
 	 * This is set when the x-slider is being dragged, otherwise it is <code>null</code>
 	 */
-	private ChartXSlider				_xSliderDragged;
+	private ChartXSlider						_xSliderDragged;
 
 	/**
 	 * This is the slider which is drawn on top of the other, this is normally the last dragged
 	 * slider
 	 */
-	private ChartXSlider				_xSliderOnTop;
+	private ChartXSlider						_xSliderOnTop;
 
 	/**
 	 * this is the slider which is below the top slider
 	 */
-	private ChartXSlider				_xSliderOnBottom;
+	private ChartXSlider						_xSliderOnBottom;
 
 	/**
 	 * contains the x-slider when the mouse is over it, or <code>null</code> when the mouse is not
 	 * over it
 	 */
-	private ChartXSlider				_mouseOverXSlider;
+	private ChartXSlider						_mouseOverXSlider;
 
 	/**
 	 * Contains the slider which has the focus.
 	 */
-	private ChartXSlider				_selectedXSlider;
+	private ChartXSlider						_selectedXSlider;
 
 	/**
 	 * Device position of the x-slider line when the slider is dragged. The position can be outside
 	 * of the viewport which causes autoscrolling.
 	 */
-	private int							_devXDraggedXSliderLine;
+	private int									_devXDraggedXSliderLine;
 
 	/**
 	 * Mouse device position when autoscrolling is done with the mouse but without a x-slider
 	 */
-	private int							_devXAutoScrollMousePosition	= Integer.MIN_VALUE;
+	private int									_devXAutoScrollMousePosition	= Integer.MIN_VALUE;
 
 	/**
 	 * list for all y-sliders
@@ -285,183 +285,182 @@ public class ChartComponentGraph extends Canvas {
 	/**
 	 * contextLeftSlider is set when the right mouse button was clicked and the left slider was hit
 	 */
-	private ChartXSlider				_contextLeftSlider;
+	private ChartXSlider						_contextLeftSlider;
 
 	/**
-	 * contextRightSlider is set when the right mouse button was clicked and the right slider was
-	 * hit
+	 * contextRightSlider is set when the right mouse button was clicked and the right slider was hit
 	 */
-	private ChartXSlider				_contextRightSlider;
+	private ChartXSlider						_contextRightSlider;
 
 	/**
 	 * cursor when the graph can be resizes
 	 */
-	private Cursor						_cursorResizeLeftRight;
+	private Cursor								_cursorResizeLeftRight;
 
-	private Cursor						_cursorArrow;
-	private Cursor						_cursorDragged;
-	private Cursor						_cursorDragXSlider_ModeZoom;
-	private Cursor						_cursorDragXSlider_ModeSlider;
-	private Cursor						_cursorHoverXSlider;
-	private Cursor						_cursorModeZoom;
-	private Cursor						_cursorModeZoomMove;
-	private Cursor						_cursorModeSlider;
-	private Cursor						_cursorMove1x;
-	private Cursor						_cursorMove2x;
-	private Cursor						_cursorMove3x;
-	private Cursor						_cursorMove4x;
-	private Cursor						_cursorMove5x;
-	private Cursor						_cursorResizeTopDown;
-	private Cursor						_cursorXSliderLeft;
-	private Cursor						_cursorXSliderRight;
+	private Cursor								_cursorArrow;
+	private Cursor								_cursorDragged;
+	private Cursor								_cursorDragXSlider_ModeZoom;
+	private Cursor								_cursorDragXSlider_ModeSlider;
+	private Cursor								_cursorHoverXSlider;
+	private Cursor								_cursorModeZoom;
+	private Cursor								_cursorModeZoomMove;
+	private Cursor								_cursorModeSlider;
+	private Cursor								_cursorMove1x;
+	private Cursor								_cursorMove2x;
+	private Cursor								_cursorMove3x;
+	private Cursor								_cursorMove4x;
+	private Cursor								_cursorMove5x;
+	private Cursor								_cursorResizeTopDown;
+	private Cursor								_cursorXSliderLeft;
+	private Cursor								_cursorXSliderRight;
 
-	private Color						_gridColor;
-	private Color						_gridColorMajor;
+	private Color								_gridColor;
+	private Color								_gridColorMajor;
 
 	/**
 	 * Contains a {@link ChartTitleSegment} when a tour title area is hovered, otherwise
 	 * <code>null</code> .
 	 */
-	private ChartTitleSegment			_hoveredTitleSegment;
+	private ChartTitleSegment				_hoveredTitleSegment;
 
 	/**
 	 * serie index for the hovered bar, the bar is hidden when -1;
 	 */
-	private int							_hoveredBarSerieIndex			= -1;
+	private int									_hoveredBarSerieIndex			= -1;
 
-	private int							_hoveredBarValueIndex;
-	private boolean						_isHoveredBarDirty;
+	private int									_hoveredBarValueIndex;
+	private boolean							_isHoveredBarDirty;
 
-	private ToolTipV1					_hoveredBarToolTip;
+	private ToolTipV1							_hoveredBarToolTip;
 
-	private boolean						_isHoveredLineVisible			= false;
-	private int							_hoveredValuePointIndex			= -1;
+	private boolean							_isHoveredLineVisible			= false;
+	private int									_hoveredValuePointIndex			= -1;
 
-	private ArrayList<RectangleLong[]>	_lineFocusRectangles			= new ArrayList<>();
-	private ArrayList<PointLong[]>		_lineDevPositions				= new ArrayList<>();
+	private ArrayList<RectangleLong[]>	_lineFocusRectangles				= new ArrayList<>();
+	private ArrayList<PointLong[]>		_lineDevPositions					= new ArrayList<>();
 
 	/**
 	 * Tooltip for value points, can be <code>null</code> when not set.
 	 */
-	IValuePointToolTip					valuePointToolTip;
+	IValuePointToolTip						valuePointToolTip;
 
-	private ChartYSlider				_hitYSlider;
-	private ChartYSlider				_ySliderDragged;
-	private int							_ySliderGraphX;
+	private ChartYSlider						_hitYSlider;
+	private ChartYSlider						_ySliderDragged;
+	private int									_ySliderGraphX;
 
-	private boolean						_isSetXSliderPositionLeft;
-	private boolean						_isSetXSliderPositionRight;
+	private boolean							_isSetXSliderPositionLeft;
+	private boolean							_isSetXSliderPositionRight;
 
 	/**
 	 * <code>true</code> when the x-marker is moved with the mouse
 	 */
-	private boolean						_isXMarkerMoved;
+	private boolean							_isXMarkerMoved;
 
 	/**
 	 * x-position when the x-marker was started to drag
 	 */
-	private int							_devXMarkerDraggedStartPos;
+	private int									_devXMarkerDraggedStartPos;
 
 	/**
 	 * x-position when the x-marker is moved
 	 */
-	private int							_devXMarkerDraggedPos;
+	private int									_devXMarkerDraggedPos;
 
-	private int							_movedXMarkerStartValueIndex;
-	private int							_movedXMarkerEndValueIndex;
+	private int									_movedXMarkerStartValueIndex;
+	private int									_movedXMarkerEndValueIndex;
 
-	private double						_xMarkerValueDiff;
+	private double								_xMarkerValueDiff;
 
 	/**
 	 * <code>true</code> when the chart is dragged with the mouse
 	 */
-	private boolean						_isChartDragged					= false;
+	private boolean							_isChartDragged					= false;
 
 	/**
 	 * <code>true</code> when the mouse button in down but not moved
 	 */
-	private boolean						_isChartDraggedStarted			= false;
+	private boolean							_isChartDraggedStarted			= false;
 
-	private Point						_draggedChartStartPos;
-	private Point						_draggedChartDraggedPos;
+	private Point								_draggedChartStartPos;
+	private Point								_draggedChartDraggedPos;
 
-	private boolean[]					_selectedBarItems;
+	private boolean[]							_selectedBarItems;
 
-	private final int[]					_drawAsyncCounter				= new int[1];
+	private final int[]						_drawAsyncCounter					= new int[1];
 
-	private boolean						_isAutoScroll;
-	private boolean						_isDisableHoveredLineValueIndex;
-	private int[]						_autoScrollCounter				= new int[1];
+	private boolean							_isAutoScroll;
+	private boolean							_isDisableHoveredLineValueIndex;
+	private int[]								_autoScrollCounter				= new int[1];
 
-	private final ColorCache			_colorCache						= new ColorCache();
+	private final ColorCache				_colorCache							= new ColorCache();
 
-	private boolean						_isSelectionVisible;
+	private boolean							_isSelectionVisible;
 
 	/**
 	 * Is <code>true</code> when this chart gained the focus, <code>false</code> when the focus is
 	 * lost.
 	 */
-	private boolean						_isFocusActive;
+	private boolean							_isFocusActive;
 
-	private boolean						_isOverlayDirty;
+	private boolean							_isOverlayDirty;
 
 	/**
 	 * widget relative position of the mouse in the mouse down event
 	 */
-	private int							_devXMouseDown;
-	private int							_devYMouseDown;
-	private int							_devXMouseMove;
-	private int							_devYMouseMove;
+	private int									_devXMouseDown;
+	private int									_devYMouseDown;
+	private int									_devXMouseMove;
+	private int									_devYMouseMove;
 
-	private boolean						_isPaintDraggedImage			= false;
+	private boolean							_isPaintDraggedImage				= false;
 
 	/**
 	 * is <code>true</code> when data for a graph is available
 	 */
-	private boolean						_isGraphVisible					= false;
+	private boolean							_isGraphVisible					= false;
 
 	/**
 	 * Client area for this canvas
 	 */
-	Rectangle							_clientArea;
+	Rectangle									_clientArea;
 
 	/**
 	 * After a resize the custom overlay must be recomputed
 	 */
-	private int							_isCustomOverlayInvalid;
+	private int									_isCustomOverlayInvalid;
 
-	private PixelConverter				_pc;
+	private PixelConverter					_pc;
 
 	/**
 	 * Is <code>true</code> when a chart can be overlapped. The overlap feature is currently
 	 * supported for graphs which all have the chart type ChartType.LINE.
 	 */
-	boolean								_canChartBeOverlapped;
+	boolean										_canChartBeOverlapped;
 
 	/**
 	 * Is <code>true</code> when overlapped graphs are enabled.
 	 */
-	boolean								_isChartOverlapped;
+	boolean										_isChartOverlapped;
 
 	/**
 	 * Cache font to improve performance.
 	 */
-	private Font						_uiFont;
+	private Font								_uiFont;
 
 	/**
 	 * Configuration how the chart title segment is displayed.
 	 */
-	ChartTitleSegmentConfig				chartTitleSegmentConfig			= new ChartTitleSegmentConfig();
+	ChartTitleSegmentConfig					chartTitleSegmentConfig			= new ChartTitleSegmentConfig();
 
-	private ILineSelectionPainter		_lineSelectionPainter;
+	private ILineSelectionPainter			_lineSelectionPainter;
 
 	/**
 	 * Constructor
 	 *
 	 * @param parent
-	 *            the parent of this control.
+	 *           the parent of this control.
 	 * @param style
-	 *            the style of this control.
+	 *           the style of this control.
 	 */
 	ChartComponentGraph(final Chart chartWidget, final Composite parent, final int style) {
 
@@ -909,10 +908,10 @@ public class ChartComponentGraph extends Canvas {
 		}
 	}
 
-	private int computeXMarkerValue(final double[] xValues,
-									final int xmStartIndex,
-									final double valueDraggingDiff,
-									final double valueXStartWithOffset) {
+	private int computeXMarkerValue(	final double[] xValues,
+												final int xmStartIndex,
+												final double valueDraggingDiff,
+												final double valueXStartWithOffset) {
 
 		int valueIndex;
 		double valueX = xValues[xmStartIndex];
@@ -1142,8 +1141,7 @@ public class ChartComponentGraph extends Canvas {
 
 			if (xSlider == _xSliderDragged) {
 				/*
-				 * current slider is the dragged slider, clip the slider label position at the
-				 * viewport
+				 * current slider is the dragged slider, clip the slider label position at the viewport
 				 */
 				if (labelXPos < leftPos) {
 					labelXPos += (leftPos - labelXPos);
@@ -1331,10 +1329,10 @@ public class ChartComponentGraph extends Canvas {
 	}
 
 	private void doAutoScroll_10_RunnableScrollGraph(	final Runnable runnable,
-														final int autoScrollInterval,
-														final int devMouseOffset,
-														final boolean isLeft,
-														final long eventTime) {
+																		final int autoScrollInterval,
+																		final int devMouseOffset,
+																		final boolean isLeft,
+																		final long eventTime) {
 
 		final long xxDevNewPosition = _xxDevViewPortLeftBorder + devMouseOffset;
 
@@ -1362,8 +1360,8 @@ public class ChartComponentGraph extends Canvas {
 	}
 
 	private void doAutoScroll_20_RunnableMoveSlider(final Runnable runnable,
-													final int autoScrollInterval,
-													final int devMouseOffset) {
+																	final int autoScrollInterval,
+																	final int devMouseOffset) {
 
 		// get new slider position
 		final long xxDevOldSliderLinePos = _xSliderDragged.getXXDevSliderLinePos();
@@ -1541,8 +1539,8 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		/*
-		 * The graph image is only a part where ONE single graph is painted without any title or
-		 * unit tick/values
+		 * The graph image is only a part where ONE single graph is painted without any title or unit
+		 * tick/values
 		 */
 		final GraphDrawingData graphDrawingData = _allGraphDrawingData.get(0);
 		final int devGraphHeight = graphDrawingData.devGraphHeight;
@@ -1924,8 +1922,8 @@ public class ChartComponentGraph extends Canvas {
 					if (segmentTitle == null || segmentTitle.length() == 0) {
 
 						/*
-						 * Create a dummy title, that the title segment is created. This segment is
-						 * used to get the hovered tour when multiple tours are displayed.
+						 * Create a dummy title, that the title segment is created. This segment is used
+						 * to get the hovered tour when multiple tours are displayed.
 						 */
 						segmentTitle = UI.EMPTY_STRING;
 					}
@@ -2067,13 +2065,13 @@ public class ChartComponentGraph extends Canvas {
 	 * @param gcGraph
 	 * @param graphDrawingData
 	 * @param isDrawUnit
-	 *            <code>true</code> indicate to draws the unit tick and unit label additional to the
-	 *            unit grid line
+	 *           <code>true</code> indicate to draws the unit tick and unit label additional to the
+	 *           unit grid line
 	 */
-	private void drawAsync_210_XUnits_VGrid(final GC gcChart,
-											final GC gcGraph,
-											final GraphDrawingData graphDrawingData,
-											final boolean isDrawUnit) {
+	private void drawAsync_210_XUnits_VGrid(	final GC gcChart,
+															final GC gcGraph,
+															final GraphDrawingData graphDrawingData,
+															final boolean isDrawUnit) {
 
 		final Display display = getDisplay();
 
@@ -2253,8 +2251,8 @@ public class ChartComponentGraph extends Canvas {
 						isFirstUnit = false;
 
 						/*
-						 * this is the first unit, do not center it on the unit tick, because it
-						 * would be clipped on the left border
+						 * this is the first unit, do not center it on the unit tick, because it would be
+						 * clipped on the left border
 						 */
 						int devXUnit = devXUnitValueDefaultPosition;
 
@@ -2284,8 +2282,8 @@ public class ChartComponentGraph extends Canvas {
 						if (devXUnitValueDefaultPosition >= 0) {
 
 							/*
-							 * check if the unit value would be clipped at the right border, move it
-							 * to the left to make it fully visible
+							 * check if the unit value would be clipped at the right border, move it to the
+							 * left to make it fully visible
 							 */
 							if ((devXUnitTick + devUnitValueWidth2) > devVisibleChartWidth) {
 
@@ -2316,9 +2314,9 @@ public class ChartComponentGraph extends Canvas {
 					gcGraph.setForeground(_gridColorMajor);
 				} else {
 					/*
-					 * line width is a complicated topic, when it's not set the gridlines of the
-					 * first graph is different than the subsequent graphs, but setting it globally
-					 * degrades performance dramatically
+					 * line width is a complicated topic, when it's not set the gridlines of the first
+					 * graph is different than the subsequent graphs, but setting it globally degrades
+					 * performance dramatically
 					 */
 //					gcGraph.setLineWidth(0);
 					gcGraph.setLineDash(DOT_DASHES);
@@ -2516,8 +2514,8 @@ public class ChartComponentGraph extends Canvas {
 	}
 
 	private void drawAsync_500_LineGraph(	final GC gcGraph,
-											final GraphDrawingData graphDrawingData,
-											final boolean isTopGraph) {
+														final GraphDrawingData graphDrawingData,
+														final boolean isTopGraph) {
 
 		final ChartDataXSerie xData = graphDrawingData.getXData();
 		final ChartDataYSerie yData = graphDrawingData.getYData();
@@ -2618,19 +2616,19 @@ public class ChartComponentGraph extends Canvas {
 	 * @param graphValueOffset
 	 * @param isFillGraph
 	 * @param isSegmented
-	 *            When <code>true</code> the whole graph is painted with several segments, otherwise
-	 *            the whole graph is painted once.
+	 *           When <code>true</code> the whole graph is painted with several segments, otherwise
+	 *           the whole graph is painted once.
 	 */
-	private void drawAsync_510_LineGraphSegment(final GC gc,
-												final GraphDrawingData graphDrawingData,
-												final int startIndex,
-												final int endIndex,
-												final RGB rgbFg,
-												final RGB rgbBgDark,
-												final RGB rgbBgBright,
-												final int graphLineAlpha,
-												final int graphFillingAlpha,
-												final double graphValueOffset) {
+	private void drawAsync_510_LineGraphSegment(	final GC gc,
+																final GraphDrawingData graphDrawingData,
+																final int startIndex,
+																final int endIndex,
+																final RGB rgbFg,
+																final RGB rgbBgDark,
+																final RGB rgbBgBright,
+																final int graphLineAlpha,
+																final int graphFillingAlpha,
+																final double graphValueOffset) {
 
 		final ChartDataXSerie xData = graphDrawingData.getXData();
 		final ChartDataYSerie yData = graphDrawingData.getYData();
@@ -2754,8 +2752,8 @@ public class ChartComponentGraph extends Canvas {
 
 		/*
 		 * set the hovered index only ONCE because when autoscrolling is done to the right side this
-		 * can cause that the last value is used for the hovered index instead of the previous
-		 * before the last
+		 * can cause that the last value is used for the hovered index instead of the previous before
+		 * the last
 		 */
 		boolean isSetHoveredIndex = false;
 
@@ -2917,8 +2915,8 @@ public class ChartComponentGraph extends Canvas {
 					}
 
 					/*
-					 * keep positions, because skipped values will be painted as a dot outside of
-					 * the path, but don't draw on the graph bottom or x-axis
+					 * keep positions, because skipped values will be painted as a dot outside of the
+					 * path, but don't draw on the graph bottom or x-axis
 					 */
 					if (isShowSkippedValues) {
 
@@ -3101,8 +3099,7 @@ public class ChartComponentGraph extends Canvas {
 		if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_BOTTOM) {
 
 			/*
-			 * adjust the fill gradient in the height, otherwise the fill is not in the whole
-			 * rectangle
+			 * adjust the fill gradient in the height, otherwise the fill is not in the whole rectangle
 			 */
 
 			gc.setForeground(colorBgDark);
@@ -3150,8 +3147,8 @@ public class ChartComponentGraph extends Canvas {
 
 			if (customFillPainter != null) {
 
-				gc.setForeground(colorBgDark);
-				gc.setBackground(colorBgBright);
+//				gc.setForeground(colorBgDark);
+//				gc.setBackground(colorBgBright);
 
 				customFillPainter.draw(//
 						gc,
@@ -3755,8 +3752,8 @@ public class ChartComponentGraph extends Canvas {
 	 * @param isTopGraph
 	 */
 	private void drawAsync_560_HorizontalBar(	final GC gc,
-												final GraphDrawingData graphDrawingData,
-												final boolean isTopGraph) {
+															final GraphDrawingData graphDrawingData,
+															final boolean isTopGraph) {
 
 		final ChartDataXSerie xData = graphDrawingData.getXData();
 		final ChartDataYSerie yData = graphDrawingData.getYData();
@@ -3831,8 +3828,8 @@ public class ChartComponentGraph extends Canvas {
 
 		/*
 		 * set the hovered index only ONCE because when autoscrolling is done to the right side this
-		 * can cause that the last value is used for the hovered index instead of the previous
-		 * before the last
+		 * can cause that the last value is used for the hovered index instead of the previous before
+		 * the last
 		 */
 		boolean isSetHoveredIndex = false;
 
@@ -4179,8 +4176,8 @@ public class ChartComponentGraph extends Canvas {
 
 		/*
 		 * set the hovered index only ONCE because when autoscrolling is done to the right side this
-		 * can cause that the last value is used for the hovered index instead of the previous
-		 * before the last
+		 * can cause that the last value is used for the hovered index instead of the previous before
+		 * the last
 		 */
 		boolean isSetHoveredIndex = false;
 
@@ -4389,8 +4386,8 @@ public class ChartComponentGraph extends Canvas {
 		if (_isChartDirty == false || isPaintedDirectly) {
 
 			/*
-			 * if the graph is not yet drawn (because this is done in another thread) there is
-			 * nothing to do
+			 * if the graph is not yet drawn (because this is done in another thread) there is nothing
+			 * to do
 			 */
 			if (_chartImage_20_Chart == null) {
 				// fill the image area when there is no graphic
@@ -4534,8 +4531,8 @@ public class ChartComponentGraph extends Canvas {
 			gcCustom.fillRectangle(chartRect);
 
 			/*
-			 * draw the chart image with the graphs into the custom layer image, the custom
-			 * foreground layers are drawn on top of the graphs
+			 * draw the chart image with the graphs into the custom layer image, the custom foreground
+			 * layers are drawn on top of the graphs
 			 */
 			gcCustom.drawImage(_chartImage_20_Chart, 0, 0);
 
@@ -4616,8 +4613,7 @@ public class ChartComponentGraph extends Canvas {
 		final GC gcOverlay = new GC(_chartImage_40_Overlay);
 		{
 			/*
-			 * copy the graph image into the slider image, the slider will be drawn on top of the
-			 * graph
+			 * copy the graph image into the slider image, the slider will be drawn on top of the graph
 			 */
 			gcOverlay.fillRectangle(graphImageRect);
 			gcOverlay.drawImage(_chartImage_30_Custom, 0, 0);
@@ -5009,8 +5005,8 @@ public class ChartComponentGraph extends Canvas {
 			devMovedXEnd = (int) (scaleX * xValues[_movedXMarkerEndValueIndex] - _xxDevViewPortLeftBorder);
 
 			/*
-			 * when the moved x-marker is on the right or the left border, make sure that the
-			 * x-markers don't get too small
+			 * when the moved x-marker is on the right or the left border, make sure that the x-markers
+			 * don't get too small
 			 */
 			final double valueMovedDiff = xValues[_movedXMarkerEndValueIndex] - xValues[_movedXMarkerStartValueIndex];
 
@@ -5020,8 +5016,7 @@ public class ChartComponentGraph extends Canvas {
 			if (_movedXMarkerStartValueIndex == 0 && valueMovedDiff < _xMarkerValueDiff) {
 
 				/*
-				 * the x-marker is moved to the left, the most left x-marker is on the first
-				 * position
+				 * the x-marker is moved to the left, the most left x-marker is on the first position
 				 */
 
 				int valueIndex;
@@ -5037,8 +5032,7 @@ public class ChartComponentGraph extends Canvas {
 			} else if (_movedXMarkerEndValueIndex == xValues.length - 1 && valueMovedDiff < _xMarkerValueDiff) {
 
 				/*
-				 * the x-marker is moved to the right, the most right x-marker is on the last
-				 * position
+				 * the x-marker is moved to the right, the most right x-marker is on the last position
 				 */
 
 				int valueIndex;
@@ -5056,8 +5050,8 @@ public class ChartComponentGraph extends Canvas {
 			if (valueMovedDiff > _xMarkerValueDiff) {
 
 				/*
-				 * force the value diff for the x-marker, the moved value diff can't be wider then
-				 * one value index
+				 * force the value diff for the x-marker, the moved value diff can't be wider then one
+				 * value index
 				 */
 
 				final double valueStart = xValues[_movedXMarkerStartValueIndex];
@@ -5579,8 +5573,8 @@ public class ChartComponentGraph extends Canvas {
 				final ArrayList<IChartLayer> customFgLayers = graphDrawingData.getYData().getCustomForegroundLayers();
 
 				/**
-				 * Draw overlay only when a graph contains overlay layers to ensure that a overlay
-				 * is painted not for the "wrong" graphs.
+				 * Draw overlay only when a graph contains overlay layers to ensure that a overlay is
+				 * painted not for the "wrong" graphs.
 				 * <p>
 				 * This feature is used to optimize painting is currently used for tour markers and
 				 * photos.
@@ -6164,11 +6158,11 @@ public class ChartComponentGraph extends Canvas {
 	 * @param isSetKeyCenterZoomPosition
 	 */
 	void moveXSlider(	final ChartXSlider xSlider,
-						int valueIndex,
-						final boolean isCenterSliderPosition,
-						final boolean isMoveChartToShowSlider,
-						final boolean isFireEvent,
-						final boolean isSetKeyCenterZoomPosition) {
+							int valueIndex,
+							final boolean isCenterSliderPosition,
+							final boolean isMoveChartToShowSlider,
+							final boolean isFireEvent,
+							final boolean isSetKeyCenterZoomPosition) {
 
 		final ChartDataXSerie xData = getXData();
 
@@ -6204,10 +6198,10 @@ public class ChartComponentGraph extends Canvas {
 	 * Move the slider to a new position
 	 *
 	 * @param xSlider
-	 *            Current slider
+	 *           Current slider
 	 * @param xxDevSliderLinePos
-	 *            x coordinate for the slider line within the graph, this can be outside of the
-	 *            visible graph
+	 *           x coordinate for the slider line within the graph, this can be outside of the
+	 *           visible graph
 	 */
 	private void moveXSlider(final ChartXSlider xSlider, final long devXSliderLinePos) {
 
@@ -6849,8 +6843,8 @@ public class ChartComponentGraph extends Canvas {
 			_devXDraggedXSliderLine = devXMouse;
 
 			/*
-			 * when the x-slider is outside of the visual graph in horizontal direction, the graph
-			 * can be scrolled with the mouse
+			 * when the x-slider is outside of the visual graph in horizontal direction, the graph can
+			 * be scrolled with the mouse
 			 */
 			final int devVisibleChartWidth = getDevVisibleChartWidth();
 			if (_devXDraggedXSliderLine > -1 && _devXDraggedXSliderLine < devVisibleChartWidth) {
@@ -6868,8 +6862,8 @@ public class ChartComponentGraph extends Canvas {
 			} else {
 
 				/*
-				 * slider is outside the visible area, auto scroll the slider and graph when this is
-				 * not yet done
+				 * slider is outside the visible area, auto scroll the slider and graph when this is not
+				 * yet done
 				 */
 				if (_isAutoScroll == false) {
 					doAutoScroll(eventTime);
@@ -7022,8 +7016,8 @@ public class ChartComponentGraph extends Canvas {
 					}
 
 					/*
-					 * this redraw is necessary otherwise a hovered photo displayed as none hovered
-					 * when mouse is not hovering a photo
+					 * this redraw is necessary otherwise a hovered photo displayed as none hovered when
+					 * mouse is not hovering a photo
 					 */
 					isRedraw = true;
 				}
@@ -7147,8 +7141,8 @@ public class ChartComponentGraph extends Canvas {
 				|| _graphZoomRatio == 1
 
 						/*
-						 * ensure the mouse is moved from the graph from the tooltip or is moved
-						 * over the tooltip when it's above the y-axis
+						 * ensure the mouse is moved from the graph from the tooltip or is moved over the
+						 * tooltip when it's above the y-axis
 						 */
 						&& isMouseFromLeftToolTip == false && isMouseFromRightToolTip == false
 
@@ -7327,8 +7321,8 @@ public class ChartComponentGraph extends Canvas {
 			// mouse mode: move slider
 
 			/**
-			 * when a slider in a graph is moved with the mouse wheel the direction is the same as
-			 * when the mouse wheel is scrolling in the tour editor:
+			 * when a slider in a graph is moved with the mouse wheel the direction is the same as when
+			 * the mouse wheel is scrolling in the tour editor:
 			 * <p>
 			 * wheel up -> tour editor up
 			 */
@@ -7594,7 +7588,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * @param canAutoZoomToSlider
-	 *            the canAutoZoomToSlider to set
+	 *           the canAutoZoomToSlider to set
 	 */
 	void setCanAutoZoomToSlider(final boolean canAutoZoomToSlider) {
 
@@ -7636,13 +7630,13 @@ public class ChartComponentGraph extends Canvas {
 	 * @param isCenterSliderPosition
 	 * @param isSetSliderVisible
 	 * @param borderOffset
-	 *            Set chart with an offset to the chart border, this is helpful when tour segments
-	 *            are selected that the surrounding area is also visible.
+	 *           Set chart with an offset to the chart border, this is helpful when tour segments are
+	 *           selected that the surrounding area is also visible.
 	 */
-	private void setChartPosition(	final ChartXSlider slider,
-									final boolean isCenterSliderPosition,
-									final boolean isSetSliderVisible,
-									final int borderOffset) {
+	private void setChartPosition(final ChartXSlider slider,
+											final boolean isCenterSliderPosition,
+											final boolean isSetSliderVisible,
+											final int borderOffset) {
 
 		if (_graphZoomRatio == 1) {
 			// chart is not zoomed, nothing to do
@@ -7833,8 +7827,8 @@ public class ChartComponentGraph extends Canvas {
 		if (_canChartBeOverlapped && _isChartOverlapped) {
 
 			/*
-			 * Revert sequence that the top graph is painted as last and not as the first that it
-			 * will overlap the other graphs.
+			 * Revert sequence that the top graph is painted as last and not as the first that it will
+			 * overlap the other graphs.
 			 */
 
 			_revertedGraphDrawingData = new ArrayList<>();
@@ -7856,8 +7850,8 @@ public class ChartComponentGraph extends Canvas {
 			/*
 			 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 			 * prevent setting new positions until the chart is redrawn otherwise the slider has the
-			 * value index -1, the chart is flickering when autoscrolling and the map is WRONGLY /
-			 * UGLY positioned
+			 * value index -1, the chart is flickering when autoscrolling and the map is WRONGLY / UGLY
+			 * positioned
 			 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 			 */
 			_isDisableHoveredLineValueIndex = false;
@@ -8275,11 +8269,11 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * set the slider to the 2nd x-data and keep the slider on the same xValue position as before,
-	 * this can cause to the situation, that the right slider gets unvisible/unhitable or the
-	 * painted graph can have a white space on the right side
+	 * this can cause to the situation, that the right slider gets unvisible/unhitable or the painted
+	 * graph can have a white space on the right side
 	 *
 	 * @param slider
-	 *            the slider which gets changed
+	 *           the slider which gets changed
 	 */
 	private void switchSliderTo2ndXData(final ChartXSlider slider) {
 
@@ -8589,9 +8583,8 @@ public class ChartComponentGraph extends Canvas {
 			if (yData.isForceMinValue()) {
 
 				/*
-				 * Prevent that data values which are small than forced min are not painted but
-				 * increase the visible min values when the data values are larger than the forced
-				 * min value.
+				 * Prevent that data values which are small than forced min are not painted but increase
+				 * the visible min values when the data values are larger than the forced min value.
 				 */
 
 				final double forcedMinValue = yData.getVisibleMinValueForced();
@@ -8619,9 +8612,8 @@ public class ChartComponentGraph extends Canvas {
 			if (yData.isForceMaxValue()) {
 
 				/*
-				 * Prevent that data values which are larger than forced max are not painted but
-				 * reduce the visible max values when the data values are below the forced max
-				 * value.
+				 * Prevent that data values which are larger than forced max are not painted but reduce
+				 * the visible max values when the data values are below the forced max value.
 				 */
 
 				final double forcedMaxValue = yData.getVisibleMaxValueForced();
@@ -8678,11 +8670,11 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * @param devXMousePosition
-	 *            This relative mouse position is used to keep the position when zoomed in, when set
-	 *            to {@link Integer#MIN_VALUE} this value is ignored.
+	 *           This relative mouse position is used to keep the position when zoomed in, when set
+	 *           to {@link Integer#MIN_VALUE} this value is ignored.
 	 * @param accelerator
-	 *            The default zoom ratio will be multiplied with this value when this value is not
-	 *            1.0.
+	 *           The default zoom ratio will be multiplied with this value when this value is not
+	 *           1.0.
 	 */
 	void zoomInWithMouse(final int devXMousePosition, final double accelerator) {
 
@@ -8767,8 +8759,7 @@ public class ChartComponentGraph extends Canvas {
 			if (graphImageWidth * ZOOM_RATIO_FACTOR > maxChartWidth) {
 
 				/*
-				 * the double zoomed graph would be wider than the max width, reduce it to the max
-				 * width
+				 * the double zoomed graph would be wider than the max width, reduce it to the max width
 				 */
 				_graphZoomRatio = (double) maxChartWidth / visibleGraphWidth;
 				_xxDevGraphWidth = maxChartWidth;
@@ -8866,11 +8857,11 @@ public class ChartComponentGraph extends Canvas {
 	 *
 	 * @param isUpdateChart
 	 * @param devXMousePosition
-	 *            This relative mouse position is used to keep the position when zoomed in, when set
-	 *            to {@link Integer#MIN_VALUE} this value is ignored.
+	 *           This relative mouse position is used to keep the position when zoomed in, when set
+	 *           to {@link Integer#MIN_VALUE} this value is ignored.
 	 * @param accelerator
-	 *            The default zoom ratio will be multiplied with this value when this value is not
-	 *            1.0.
+	 *           The default zoom ratio will be multiplied with this value when this value is not
+	 *           1.0.
 	 */
 	void zoomOutWithMouse(final boolean isUpdateChart, final int devXMousePosition, final double accelerator) {
 
@@ -8891,8 +8882,8 @@ public class ChartComponentGraph extends Canvas {
 				/**
 				 * Set zoom center so that the dragged x-slider keeps position when zoomed out.
 				 * <p>
-				 * This formula preserves the slider ratio for a resized graph but is using the
-				 * zoomed center to preserve the x-slider position
+				 * This formula preserves the slider ratio for a resized graph but is using the zoomed
+				 * center to preserve the x-slider position
 				 * <p>
 				 * very complicated and it took me some time to get this formula
 				 */

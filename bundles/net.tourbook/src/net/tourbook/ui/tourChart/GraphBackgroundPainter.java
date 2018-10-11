@@ -42,7 +42,7 @@ import net.tourbook.training.TrainingManager;
 /**
  * Draws background color into the graph, e.g. HR zone, swim style
  */
-public class GraphBackgroundCustomPainter implements IFillPainter {
+public class GraphBackgroundPainter implements IFillPainter {
 
 	private Color[]					_hrZone_Colors;
 	private HashMap<Short, Color>	_strokeStyle_Colors;
@@ -215,7 +215,7 @@ public class GraphBackgroundCustomPainter implements IFillPainter {
 				final long devXCurrent = devXPositions[valueIndex];
 				final boolean isLastIndex = valueIndex == valueIndexLastPoint;
 
-				// ignore same position even when the HR zone has changed
+				// ignore same position
 				if (devXCurrent == devXPrev && isLastIndex == false) {
 					continue;
 				}
@@ -227,18 +227,27 @@ public class GraphBackgroundCustomPainter implements IFillPainter {
 				}
 
 				final int devWidth = (int) (devXCurrent - devXStart);
-				final Color color = _strokeStyle_Colors.getOrDefault(prevStrokeStyle, Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+				final Color color = _strokeStyle_Colors.get(prevStrokeStyle);
 
-				if (isBgColor) {
-					gcGraph.setBackground(color);
-				} else {
-					gcGraph.setForeground(color);
-				}
 
-				if (isGradient) {
-					gcGraph.fillGradientRectangle((int) devXStart, 0, devWidth, devCanvasHeight, true);
-				} else {
-					gcGraph.fillRectangle((int) devXStart, 0, devWidth, devCanvasHeight);
+				if (color != null) {
+
+					/*
+					 * Color could be null when there is no stroke during the rest time -> nothing will
+					 * be painted to make the heartrate more visible
+					 */
+
+					if (isBgColor) {
+						gcGraph.setBackground(color);
+					} else {
+						gcGraph.setForeground(color);
+					}
+
+					if (isGradient) {
+						gcGraph.fillGradientRectangle((int) devXStart, 0, devWidth, devCanvasHeight, true);
+					} else {
+						gcGraph.fillRectangle((int) devXStart, 0, devWidth, devCanvasHeight);
+					}
 				}
 
 				// set start for the next HR zone

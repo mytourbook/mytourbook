@@ -64,8 +64,8 @@ public class SwimStrokeManager {
 	public static StrokeStyle[]	DEFAULT_STROKE_STYLES = {
 
 			new StrokeStyle(SwimStroke.FREESTYLE, 		Messages.Swim_Stroke_Freestyle, 			new RGB(0x0,  0xff, 0xff)),
-			new StrokeStyle(SwimStroke.BREASTSTROKE, 	Messages.Swim_Stroke_Breaststroke, 		new RGB(0xff, 0xff, 0x0)),
-			new StrokeStyle(SwimStroke.BACKSTROKE, 	Messages.Swim_Stroke_Backstroke, 		new RGB(0x0,  0xff, 0x0)),
+			new StrokeStyle(SwimStroke.BREASTSTROKE, 	Messages.Swim_Stroke_Breaststroke, 		new RGB(0x0,  0xff, 0x0)),
+			new StrokeStyle(SwimStroke.BACKSTROKE, 	Messages.Swim_Stroke_Backstroke, 		new RGB(0xff, 0xff, 0x0)),
 			new StrokeStyle(SwimStroke.BUTTERFLY, 		Messages.Swim_Stroke_Butterfly, 			new RGB(0xff, 0x0,  0x0)),
 
 			// This race is either swum by one swimmer as individual medley (IM) or by four swimmers as a medley relay.

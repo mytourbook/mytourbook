@@ -5059,7 +5059,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		});
 	}
 
-	private float[] createSwim_DataSerie(final short[] swimDataSerie) {
+	private float[] createSwimUI_DataSerie(final short[] swimDataSerie) {
 
 		if (timeSerie == null || swim_Time == null || swim_Time.length == 0 || swimDataSerie == null) {
 			return null;
@@ -5116,7 +5116,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 							swimValue = swimDataSerie[swimSerieIndex];
 
 							if (swimValue == Short.MIN_VALUE) {
-								swimValue = 0;
+
+								// use MIN_VALUE that the original color is displayed which makes a rest time more visible
+								//	swimValue = 0;
 							}
 
 							swimTime = swimTourStartTime + (swim_Time[swimSerieIndex] * 1000);
@@ -5153,7 +5155,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 						swimValue = swimDataSerie[swimSerieIndex];
 
 						if (swimValue == Short.MIN_VALUE) {
-							swimValue = 0;
+
+							// use MIN_VALUE that the original color is displayed which makes a rest time more visible
+							//	swimValue = 0;
 						}
 
 						swimTime = tourStartTime + (swim_Time[swimSerieIndex] * 1000);
@@ -5173,7 +5177,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 *
 	 * @return
 	 */
-	private float[] createSwim_SwolfDataSerie() {
+	private float[] createSwimUI_SwolfDataSerie() {
 
 		if (timeSerie == null
 				|| swim_Time == null || swim_Time.length == 0
@@ -5202,7 +5206,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			prevSwimTime = currentSwimTime;
 		}
 
-		return createSwim_DataSerie(swolfData);
+		return createSwimUI_DataSerie(swolfData);
 	}
 
 	/**
@@ -7423,7 +7427,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	public float[] getSwim_Cadence() {
 
 		if (_swim_Cadence_UI == null) {
-			_swim_Cadence_UI = createSwim_DataSerie(swim_Cadence);
+			_swim_Cadence_UI = createSwimUI_DataSerie(swim_Cadence);
 		}
 
 		return _swim_Cadence_UI;
@@ -7435,7 +7439,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	public float[] getSwim_Strokes() {
 
 		if (_swim_Strokes_UI == null) {
-			_swim_Strokes_UI = createSwim_DataSerie(swim_Strokes);
+			_swim_Strokes_UI = createSwimUI_DataSerie(swim_Strokes);
 		}
 
 		return _swim_Strokes_UI;
@@ -7447,7 +7451,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	public float[] getSwim_StrokeStyle() {
 
 		if (_swim_StrokeStyle_UI == null) {
-			_swim_StrokeStyle_UI = createSwim_DataSerie(swim_StrokeStyle);
+			_swim_StrokeStyle_UI = createSwimUI_DataSerie(swim_StrokeStyle);
 		}
 
 		return _swim_StrokeStyle_UI;
@@ -7459,7 +7463,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	public float[] getSwim_Swolf() {
 
 		if (_swim_Swolf == null) {
-			_swim_Swolf = createSwim_SwolfDataSerie();
+			_swim_Swolf = createSwimUI_SwolfDataSerie();
 		}
 
 		return _swim_Swolf;
