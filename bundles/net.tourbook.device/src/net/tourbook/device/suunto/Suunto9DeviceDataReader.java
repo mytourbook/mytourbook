@@ -26,6 +26,8 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
 	private String _importFilePath;
 
+	private final float Kelvin = 273.1499938964845f;
+
 
 	// plugin constructor
 	public Suunto9DeviceDataReader() {
@@ -137,12 +139,8 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
 		tourData.setImportFilePath(_importFilePath);
 
-		// tourData.setCalories(_calories);
-		// tourData.setRestPulse(_sectionParams.restHR == Integer.MIN_VALUE ? 0 :
-		// _sectionParams.restHR);
-
 		tourData.setDeviceId(deviceId);
-		// after all data are added, the tour id can be created
+		// TODO after all data are added, the tour id can be created
 		final Long tourId = tourData.createTourId("49837533398");
 
 		// check if the tour is already imported
@@ -155,6 +153,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 			tourData.computeTourDrivingTime();
 			tourData.computeComputedValues();
 			tourData.computeAltitudeUpDown();
+			tourData.computeSpeedSerie();
 		}
 	}
 
@@ -202,13 +201,42 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 			JSONObject currentSampleAttributes = new JSONObject(sample.get("Attributes").toString());
 			JSONObject currentSampleSml = new JSONObject(currentSampleAttributes.get("suunto/sml").toString());
 			String currentSampleData = currentSampleSml.get("Sample").toString();
+			long currentSampleDate = ZonedDateTime.parse(sample.get("TimeISO8601").toString()).toInstant()
+					.toEpochMilli();
+
+			TimeData timeData = new TimeData();
+
+			timeData.absoluteTime = currentSampleDate;
 
 			// GPS point
 			if (currentSampleData.contains("GPSAltitude") && currentSampleData.contains("Latitude")
 					&& currentSampleData.contains("Longitude")) {
-				TryAddGpsData(new JSONObject(currentSampleData), _sampleList);
+				TryAddGpsData(new JSONObject(currentSampleData), timeData);
 			}
 
+			// Heart Rate
+			TryAddHeartRateData(new JSONObject(currentSampleData), timeData);
+
+			// Speed
+			TryAddSpeedData(new JSONObject(currentSampleData), timeData);
+
+			// Cadence
+			TryAddCadenceData(new JSONObject(currentSampleData), timeData);
+
+			// Barometric Altitude
+			// TryAddAltitudeData(new JSONObject(currentSampleData), currentSampleDate,
+			// timeData);
+
+			// Power
+			TryAddPowerData(new JSONObject(currentSampleData), timeData);
+
+			// Distance
+			TryAddDistanceData(new JSONObject(currentSampleData), timeData);
+
+			// Temperature
+			TryAddTemperatureData(new JSONObject(currentSampleData), timeData);
+
+			_sampleList.add(timeData);
 		}
 		tourData.createTimeSeries(_sampleList, true);
 
@@ -216,30 +244,162 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 	}
 
 
-	private void TryAddGpsData(JSONObject currentSample, ArrayList<TimeData> sampleList) {
-		ZonedDateTime time = ZonedDateTime.parse(currentSample.get("UTC").toString());
+	/**
+	 * Attempts to retrieve and add GPS data to the current tour.
+	 * 
+	 * @param currentSample
+	 *            The current sample data in JSON format.
+	 * @param sampleList
+	 *            The tour's time serie.
+	 */
+	private void TryAddGpsData(JSONObject currentSample, TimeData timeData) {
+		String dateString = currentSample.get("UTC").toString();
+		long unixTime = ZonedDateTime.parse(dateString).toInstant().toEpochMilli();
 		float latitude = Float.parseFloat(currentSample.get("Latitude").toString());
 		float longitude = Float.parseFloat(currentSample.get("Longitude").toString());
 		float altitude = Float.parseFloat(currentSample.get("GPSAltitude").toString());
-		TimeData dejfn = new TimeData();
-		dejfn.latitude = (latitude * 180) / Math.PI;
-		dejfn.longitude = (longitude * 180) / Math.PI;
-		// dejfn.time = time;
-		dejfn.altitude = altitude;
 
-		sampleList.add(dejfn);
-		/*
-		 * if (TryRetrieveFloatElementValue( currentSample, SuuntoDataNames.GpsAltitude,
-		 * out float altitude) && TryRetrieveFloatElementValue( currentSample,
-		 * SuuntoDataNames.Latitude, out float latitude) &&
-		 * TryRetrieveFloatElementValue( currentSample, SuuntoDataNames.Longitude, out
-		 * float longitude) && TryRetrieveDateTimeElementValue( currentSample,
-		 * SuuntoDataNames.Utc, out DateTime time)) { if (activity.GPSRoute == null) {
-		 * activity.GPSRoute = new GPSRoute(); }
-		 * 
-		 * GPSPoint gpsPoint = new GPSPoint( (float)(latitude * 180.0 / Math.PI),
-		 * (float)(longitude * 180.0 / Math.PI), altitude); activity.GPSRoute.Add(time,
-		 * gpsPoint); } }
-		 */
+		timeData.latitude = (latitude * 180) / Math.PI;
+		timeData.longitude = (longitude * 180) / Math.PI;
+		timeData.absoluteTime = unixTime;
+		timeData.absoluteAltitude = altitude;
+	}
+
+
+	/**
+	 * Attempts to retrieve and add HR data to the current tour.
+	 * 
+	 * @param currentSample
+	 *            The current sample data in JSON format.
+	 * @param sampleList
+	 *            The tour's time serie.
+	 */
+	private void TryAddHeartRateData(JSONObject currentSample, TimeData timeData) {
+		String value = null;
+		if ((value = TryRetrieveStringElementValue(currentSample, "HR")) != null) {
+			timeData.pulse = Float.parseFloat(value) * 60;
+		}
+	}
+
+
+	/**
+	 * Attempts to retrieve and add speed data to the current tour.
+	 * 
+	 * @param currentSample
+	 *            The current sample data in JSON format.
+	 * @param sampleList
+	 *            The tour's time serie.
+	 */
+	private void TryAddSpeedData(JSONObject currentSample, TimeData timeData) {
+		String value = null;
+		if ((value = TryRetrieveStringElementValue(currentSample, "Speed")) != null) {
+			timeData.speed = Float.parseFloat(value);
+		}
+	}
+
+
+	/**
+	 * Attempts to retrieve and add cadence data to the current tour.
+	 * 
+	 * @param currentSample
+	 *            The current sample data in JSON format.
+	 * @param sampleList
+	 *            The tour's time serie.
+	 */
+	private void TryAddCadenceData(JSONObject currentSample, TimeData timeData) {
+		String value = null;
+		if ((value = TryRetrieveStringElementValue(currentSample, "Cadence")) != null) {
+			timeData.cadence = Float.parseFloat(value) * 60;
+		}
+	}
+
+
+	/**
+	 * Attempts to retrieve and add barometric altitude data to the current tour.
+	 * 
+	 * @param currentSample
+	 *            The current sample data in JSON format.
+	 * @param sampleList
+	 *            The tour's time serie.
+	 */
+	private void TryAddAltitudeData(JSONObject currentSample, TimeData timeData) {
+		String value = null;
+		if ((value = TryRetrieveStringElementValue(currentSample, "Altitude")) != null) {
+			timeData.absoluteAltitude = Float.parseFloat(value);
+		}
+	}
+
+
+	/**
+	 * Attempts to retrieve and add power data to the current tour.
+	 * 
+	 * @param currentSample
+	 *            The current sample data in JSON format.
+	 * @param sampleList
+	 *            The tour's time serie.
+	 */
+	private void TryAddPowerData(JSONObject currentSample, TimeData timeData) {
+		String value = null;
+		if ((value = TryRetrieveStringElementValue(currentSample, "Power")) != null) {
+			timeData.power = Float.parseFloat(value);
+		}
+	}
+
+
+	/**
+	 * Attempts to retrieve and add power data to the current tour.
+	 * 
+	 * @param currentSample
+	 *            The current sample data in JSON format.
+	 * @param sampleList
+	 *            The tour's time serie.
+	 */
+	private void TryAddDistanceData(JSONObject currentSample, TimeData timeData) {
+		String value = null;
+		if ((value = TryRetrieveStringElementValue(currentSample, "Distance")) != null) {
+			timeData.absoluteDistance = Float.parseFloat(value);
+		}
+	}
+
+
+	/**
+	 * Attempts to retrieve and add power data to the current tour.
+	 * 
+	 * @param currentSample
+	 *            The current sample data in JSON format.
+	 * @param sampleList
+	 *            The tour's time serie.
+	 */
+	private void TryAddTemperatureData(JSONObject currentSample, TimeData timeData) {
+		String value = null;
+		if ((value = TryRetrieveStringElementValue(currentSample, "Temperature")) != null) {
+			timeData.temperature = Float.parseFloat(value) - Kelvin;
+		}
+	}
+
+
+	/**
+	 * Searches for an element and returns its value as a string.
+	 * 
+	 * @param token
+	 *            The JSON token in which to look for a given element.
+	 * @param elementName
+	 *            The element name to look for in a JSON content.
+	 * @return The element value, if found.
+	 */
+	private String TryRetrieveStringElementValue(JSONObject token, String elementName) {
+		if (!token.toString().contains(elementName))
+			return null;
+
+		String result = null;
+		try {
+			result = token.get(elementName).toString();
+		} catch (Exception e) {
+
+		}
+		if (result == "null")
+			return null;
+
+		return result;
 	}
 }
