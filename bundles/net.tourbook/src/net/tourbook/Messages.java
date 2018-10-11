@@ -923,6 +923,7 @@ public class Messages extends NLS {
 	public static String				Image__RawData_Transfer;
 	public static String				Image__RawData_TransferDirect;
 	public static String				Image__Remove;
+	public static String				Image__Remove_Disabled;
 	public static String				Image__refresh;
 	public static String				Image__remove_all;
 	public static String				Image__remove_all_disabled;
@@ -2538,8 +2539,10 @@ public class Messages extends NLS {
 
 	public static String	TourEditor_Action_ComputeDistanceValuesFromGeoPosition;
 	public static String	TourEditor_Action_DeleteDistanceValues;
+	public static String	TourEditor_Action_RemoveSwimStyle;
 	public static String	TourEditor_Action_SetAltitudeValuesFromSRTM;
 	public static String	TourEditor_Action_SetStartDistanceTo0;
+	public static String	TourEditor_Action_SetSwimStyle;
 
 	public static String	TourEditor_Dialog_ComputeDistanceValues_Message;
 	public static String	TourEditor_Dialog_ComputeDistanceValues_Title;

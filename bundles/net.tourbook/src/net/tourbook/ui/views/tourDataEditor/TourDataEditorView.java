@@ -33,6 +33,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -42,6 +43,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.e4.ui.di.PersistState;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -142,6 +144,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.preferences.ICommonPreferences;
+import net.tourbook.common.swimming.StrokeStyle;
 import net.tourbook.common.swimming.SwimStroke;
 import net.tourbook.common.swimming.SwimStrokeManager;
 import net.tourbook.common.time.TimeTools;
@@ -272,7 +275,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private boolean[]						_serieBreakTime;
 	//
 	private short[]						_swimSerie_Cadence;
-	private short[]						_swimSerie_LengthType;
+//	private short[]						_swimSerie_LengthType;
 	private short[]						_swimSerie_Strokes;
 	private short[]						_swimSerie_StrokeStyle;
 	private int[]							_swimSerie_Time;
@@ -418,7 +421,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	//
 	private SliceEditingSupport_Short				_swimSlice_CadenceEditingSupport;
 	private SliceEditingSupport_Short				_swimSlice_StrokesEditingSupport;
-	private SliceEditingSupport_ComboBox			_swimSlice_StrokeStyleEditingSupport;
+	private SliceEditor_ComboBox_StrokeStyle		_swimSlice_StrokeStyleEditingSupport;
 	//
 	private int												_enableActionCounter		= 0;
 
@@ -451,6 +454,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/*
 	 * actions
 	 */
+	private Action_RemoveSwimStyle				_action_RemoveSwimStyle;
+	private Action_SetSwimStyle_Header			_action_SetSwimStyle_Header;
 	private ActionComputeDistanceValues			_actionComputeDistanceValues;
 	private ActionCreateTour						_actionCreateTour;
 	private ActionCreateTourMarker				_actionCreateTourMarker;
@@ -472,6 +477,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private ActionToggleRowSelectMode			_actionToggleRowSelectMode;
 	private ActionUndoChanges						_actionUndoChanges;
 	private ActionViewSettings						_actionViewSettings;
+	//
+	private ArrayList<Action_SetSwimStyle>		_allSwimStyleActions;
 	//
 	private TagMenuManager							_tagMenuMgr;
 
@@ -594,6 +601,34 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private TimeDuration			_timePaused;
 	private TimeDuration			_timeRecording;
 
+	private class Action_RemoveSwimStyle extends Action {
+
+		public Action_RemoveSwimStyle() {
+
+			super(Messages.TourEditor_Action_RemoveSwimStyle);
+
+			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Remove));
+			setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Remove_Disabled));
+		}
+
+		@Override
+		public void run() {
+			setSwimStyle(null);
+		}
+	}
+
+	/**
+	 * Swim style menu header item without action
+	 */
+	public class Action_SetSwimStyle_Header extends Action {
+
+		public Action_SetSwimStyle_Header() {
+
+			super(Messages.TourEditor_Action_SetSwimStyle, AS_PUSH_BUTTON);
+			setEnabled(false);
+		}
+	}
+
 	private class ActionViewSettings extends ActionToolbarSlideout {
 
 		@Override
@@ -654,86 +689,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			_isCellEditorActive = false;
 			enableActionsDelayed();
-		}
-	}
-
-	private final class SliceEditingSupport_ComboBox extends EditingSupport {
-
-		private final ComboBoxCellEditor	__cellEditor;
-		private short[]						__dataSerie;
-
-		private boolean						__canEditSlice	= true;
-
-		private SliceEditingSupport_ComboBox(final ComboBoxCellEditor comboBoxCellEditor, final short[] dataSerie) {
-
-			super(_timeSlice_Viewer);
-
-			__cellEditor = comboBoxCellEditor;
-			__dataSerie = dataSerie;
-		}
-
-		@Override
-		protected boolean canEdit(final Object element) {
-
-			if ((__dataSerie == null)
-					|| (isTourInDb() == false)
-					|| (_isEditMode == false)
-					|| (__canEditSlice == false)
-
-			) {
-				return false;
-			}
-
-			return true;
-		}
-
-		@Override
-		protected CellEditor getCellEditor(final Object element) {
-			return __cellEditor;
-		}
-
-		@Override
-		protected Object getValue(final Object element) {
-
-			final int intValue = __dataSerie[((TimeSlice) element).serieIndex];
-
-			// combobox needs an integer value
-			return intValue;
-		}
-
-		public void setDataSerie(final short[] dataSerie) {
-			__dataSerie = dataSerie;
-		}
-
-		@Override
-		protected void setValue(final Object element, final Object value) {
-
-			if (value instanceof Integer) {
-
-				try {
-
-					// convert int -> short
-					final short enteredValue = ((Integer) value).shortValue();
-
-					final int serieIndex = ((TimeSlice) element).serieIndex;
-					if (enteredValue != __dataSerie[serieIndex]) {
-
-						// value has changed
-
-						// update dataserie
-						__dataSerie[serieIndex] = enteredValue < 0
-
-								// an invalid item is selected -> hide item
-								? Short.MIN_VALUE
-								: enteredValue;
-
-						updateUI_AfterSliceEdit();
-					}
-
-				} catch (final Exception e) {
-					StatusUtil.log(e);
-				}
-			}
 		}
 	}
 
@@ -960,8 +915,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		@Override
 		protected Object getValue(final Object element) {
 
-			final short metricValue = __dataSerie[((TimeSlice) element).serieIndex];
-			final short displayedValue = metricValue;
+			final short displayedValue = __dataSerie[((TimeSlice) element).serieIndex];
 
 			return Short.toString(displayedValue);
 		}
@@ -978,15 +932,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				try {
 
 					final short enteredValue = Short.parseShort((String) value);
-					final short metricValue = enteredValue;
 
 					final int serieIndex = ((TimeSlice) element).serieIndex;
-					if (metricValue != __dataSerie[serieIndex]) {
+					if (enteredValue != __dataSerie[serieIndex]) {
 
 						// value has changed
 
 						// update dataserie
-						__dataSerie[serieIndex] = metricValue;
+						__dataSerie[serieIndex] = enteredValue;
 
 						updateUI_AfterSliceEdit();
 
@@ -998,6 +951,97 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				} catch (final Exception e) {
 					// ignore invalid characters
 				} finally {}
+			}
+		}
+	}
+
+	private final class SliceEditor_ComboBox_StrokeStyle extends EditingSupport {
+
+		private final ComboBoxCellEditor	__cellEditor;
+		private short[]						__dataSerie;
+
+		private boolean						__canEditSlice	= true;
+
+		private SliceEditor_ComboBox_StrokeStyle(final ComboBoxCellEditor comboBoxCellEditor, final short[] dataSerie) {
+
+			super(_timeSlice_Viewer);
+
+			__cellEditor = comboBoxCellEditor;
+			__dataSerie = dataSerie;
+		}
+
+		@Override
+		protected boolean canEdit(final Object element) {
+
+			if ((__dataSerie == null)
+					|| (isTourInDb() == false)
+					|| (_isEditMode == false)
+					|| (__canEditSlice == false)
+
+			) {
+				return false;
+			}
+
+			return true;
+		}
+
+		@Override
+		protected CellEditor getCellEditor(final Object element) {
+			return __cellEditor;
+		}
+
+		@Override
+		protected Object getValue(final Object element) {
+
+			final short strokeValue = __dataSerie[((TimeSlice) element).serieIndex];
+
+			final int labelIndex = SwimStrokeManager.getDefaultIndex(strokeValue);
+
+			// combobox needs an integer value
+			return labelIndex;
+		}
+
+		public void setDataSerie(final short[] dataSerie) {
+			__dataSerie = dataSerie;
+		}
+
+		@Override
+		protected void setValue(final Object element, final Object value) {
+
+			if (value instanceof Integer) {
+
+				try {
+
+					// convert int -> short
+					final short enteredValue = ((Integer) value).shortValue();
+
+					final int serieIndex = ((TimeSlice) element).serieIndex;
+					if (enteredValue != __dataSerie[serieIndex]) {
+
+						// value has changed
+
+						short strokeValue;
+
+						if (enteredValue == -1) {
+
+							// nothing is selected
+
+							strokeValue = Short.MIN_VALUE;
+
+						} else {
+
+							strokeValue = SwimStrokeManager.getStrokeValue(enteredValue);
+						}
+
+						// update dataserie
+						__dataSerie[serieIndex] = strokeValue;
+
+						updateUI_AfterSliceEdit();
+					}
+
+				} catch (final Exception e) {
+					StatusUtil.log(e);
+				}
 			}
 		}
 	}
@@ -2458,6 +2502,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_actionModify_SwimSliceColumns = new ActionModifyColumns(_swimSlice_TourViewer);
 
 		_tagMenuMgr = new TagMenuManager(this, false);
+
+		// swim style actions
+		_action_SetSwimStyle_Header = new Action_SetSwimStyle_Header();
+		_allSwimStyleActions = new ArrayList<>();
+		for (final StrokeStyle strokeStyle : SwimStrokeManager.DEFAULT_STROKE_STYLES) {
+			_allSwimStyleActions.add(new Action_SetSwimStyle(this, strokeStyle));
+		}
+		_action_RemoveSwimStyle = new Action_RemoveSwimStyle();
+
 	}
 
 	private void createFieldListener() {
@@ -4175,8 +4228,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		table.setHeaderVisible(true);
 
-		// header is disabled because of https://bugs.eclipse.org/bugs/show_bug.cgi?id=536021
-		// Table: right-aligned column header with own background color lacks margin
+// table header is disabled because of https://bugs.eclipse.org/bugs/show_bug.cgi?id=536021
+// Table: right-aligned column header with own background color lacks margin
 //		table.setHeaderBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 		table.setLinesVisible(true);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
@@ -4207,12 +4260,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		 * create editing support after the viewer is created but before the columns are created.
 		 */
 		final TextCellEditor textCellEditor = new CellEditor_Text_Customized(_swimSlice_Viewer.getTable());
-		final ComboBoxCellEditor strokeStyleCellEditor = new CellEditor_ComboBox_Customized(_swimSlice_Viewer.getTable(),
-				SwimStrokeManager.getAllStrokeText());
+		final ComboBoxCellEditor strokeStyleCellEditor = new CellEditor_ComboBox_Customized(
+				_swimSlice_Viewer.getTable(),
+				SwimStrokeManager.getAllSortedSwimStrokeLabel());
 
 		_swimSlice_CadenceEditingSupport = new SliceEditingSupport_Short(textCellEditor, _swimSerie_Cadence);
 		_swimSlice_StrokesEditingSupport = new SliceEditingSupport_Short(textCellEditor, _swimSerie_Strokes);
-		_swimSlice_StrokeStyleEditingSupport = new SliceEditingSupport_ComboBox(strokeStyleCellEditor, _swimSerie_StrokeStyle);
+		_swimSlice_StrokeStyleEditingSupport = new SliceEditor_ComboBox_StrokeStyle(strokeStyleCellEditor, _swimSerie_StrokeStyle);
 
 		_swimSlice_ColDef_Cadence.setEditingSupport(_swimSlice_CadenceEditingSupport);
 		_swimSlice_ColDef_Strokes.setEditingSupport(_swimSlice_StrokesEditingSupport);
@@ -4245,7 +4299,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		menuMgr.addMenuListener(new IMenuListener() {
 			@Override
 			public void menuAboutToShow(final IMenuManager manager) {
-//				fillSliceContextMenu(manager);
+				fillSwimSlice_ContextMenu(manager);
 			}
 		});
 
@@ -4415,13 +4469,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			public void update(final ViewerCell cell) {
 				if (_swimSerie_StrokeStyle != null) {
 
-					final SwimSlice timeSlice = (SwimSlice) cell.getElement();
-					final short value = _swimSerie_StrokeStyle[timeSlice.serieIndex];
+					final SwimSlice swimSlice = (SwimSlice) cell.getElement();
+					final short value = _swimSerie_StrokeStyle[swimSlice.serieIndex];
 
 					if (value == Short.MIN_VALUE) {
+
 						cell.setText(UI.EMPTY_STRING);
+
 					} else {
-						cell.setText(SwimStrokeManager.getLabel(SwimStroke.getByValue(value)));
+
+						final SwimStroke swimStroke = SwimStroke.getByValue(value);
+						cell.setText(SwimStrokeManager.getLabel(swimStroke));
 					}
 
 				} else {
@@ -5258,6 +5316,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_tk.dispose();
 		}
 
+		for (final Action_SetSwimStyle swimStyleAction : _allSwimStyleActions) {
+			swimStyleAction.dispose();
+		}
+
 		_firstColumnControls.clear();
 		_secondColumnControls.clear();
 		_firstColumnContainerControls.clear();
@@ -5327,6 +5389,24 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_actionSetStartDistanceTo_0.setEnabled(isCellEditorInactive && isNotManualTour && canEdit && isDistanceLargerThan0);
 		_actionDeleteDistanceValues.setEnabled(isCellEditorInactive && isNotManualTour && canEdit && isDistanceAvailable);
 		_actionComputeDistanceValues.setEnabled(isCellEditorInactive && isNotManualTour && canEdit && isGeoAvailable);
+	}
+
+	private void enableActions_SwimSlices() {
+
+		final StructuredSelection sliceSelection = (StructuredSelection) _swimSlice_Viewer.getSelection();
+
+		final int numSelectedSlices = sliceSelection.size();
+
+		final boolean isSliceSelected = numSelectedSlices > 0;
+		final boolean isTourInDb = isTourInDb();
+
+		final boolean canEditSwimSlices = _isEditMode && isTourInDb && isSliceSelected;
+
+		for (final Action_SetSwimStyle swimStyleAction : _allSwimStyleActions) {
+			swimStyleAction.setEnabled(canEditSwimSlices);
+		}
+
+		_action_RemoveSwimStyle.setEnabled(canEditSwimSlices);
 	}
 
 	/**
@@ -5497,6 +5577,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_linkTourType.setEnabled(canEdit);
 
 		_timeSlice_Viewer.getTable().setEnabled(isDeviceTour);
+	}
+
+	private void fillSwimSlice_ContextMenu(final IMenuManager menuMgr) {
+
+		menuMgr.add(_action_SetSwimStyle_Header);
+
+		for (final Action_SetSwimStyle swimStyleAction : _allSwimStyleActions) {
+			menuMgr.add(swimStyleAction);
+		}
+
+		menuMgr.add(_action_RemoveSwimStyle);
+
+		enableActions_SwimSlices();
 	}
 
 	private void fillTimeSlice_ContextMenu(final IMenuManager menuMgr) {
@@ -5760,7 +5853,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_serieTemperature = _tourData.temperatureSerie;
 
 		_swimSerie_Cadence = _tourData.swim_Cadence;
-		_swimSerie_LengthType = _tourData.swim_LengthType;
+//		_swimSerie_LengthType = _tourData.swim_LengthType;
 		_swimSerie_Strokes = _tourData.swim_Strokes;
 		_swimSerie_StrokeStyle = _tourData.swim_StrokeStyle;
 		_swimSerie_Time = _tourData.swim_Time;
@@ -7068,6 +7161,43 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 //		fTabFolder.setFocus();
 
 		_page_EditorForm.setFocus();
+	}
+
+	/**
+	 * Set stroke style for the selected swim slices
+	 *
+	 * @param strokeStyle
+	 *           Stroke style, can be <code>null</code> to remove the stroke styke
+	 */
+	void setSwimStyle(final StrokeStyle strokeStyle) {
+
+		final StructuredSelection selection = (StructuredSelection) _swimSlice_Viewer.getSelection();
+
+		final List<?> selectionList = selection.toList();
+
+		for (final Object listItem : selectionList) {
+
+			if (listItem instanceof SwimSlice) {
+
+				final SwimSlice swimSlice = (SwimSlice) listItem;
+
+				_swimSerie_StrokeStyle[swimSlice.serieIndex] = strokeStyle == null
+						? Short.MIN_VALUE
+						: strokeStyle.swimStroke.getValue();
+
+//				if (value == Short.MIN_VALUE) {
+//
+//					cell.setText(UI.EMPTY_STRING);
+//
+//				} else {
+//
+//					final SwimStroke swimStroke = SwimStroke.getByValue(value);
+//					cell.setText(SwimStrokeManager.getLabel(swimStroke));
+//				}
+			}
+		}
+
+		updateUI_AfterSliceEdit();
 	}
 
 	/**

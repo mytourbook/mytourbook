@@ -55,12 +55,18 @@ public class SwimStrokeManager {
 	private static final HashMap<SwimStroke, String>	_swimStroke_Label	= new HashMap<>();
 	private static final HashMap<SwimStroke, RGB>		_swimStroke_Rgb	= new HashMap<>();
 
-	private static final String[]								_allSwimStrokeText;
+	/**
+	 * Swim stroke labels which are sorted in the sequence of the {@link #DEFAULT_STROKE_STYLES}
+	 */
+	private static final String[]								_allSortedSwimStrokeLabel;
 	private static final StrokeStyle							_strokeStyle_Invalid;
 
 // SET_FORMATTING_OFF
 
 
+	/**
+	 * Contains all stroke styles sorted in the sequence as it is displayed in the UI
+	 */
 	public static StrokeStyle[]	DEFAULT_STROKE_STYLES = {
 
 			new StrokeStyle(SwimStroke.FREESTYLE, 		Messages.Swim_Stroke_Freestyle, 			new RGB(0x0,  0xff, 0xff)),
@@ -79,7 +85,7 @@ public class SwimStrokeManager {
 
 	static {
 
-		_allSwimStrokeText = new String[DEFAULT_STROKE_STYLES.length];
+		_allSortedSwimStrokeLabel = new String[DEFAULT_STROKE_STYLES.length];
 
 		_strokeStyle_Invalid = new StrokeStyle(SwimStroke.IM, Messages.Swim_Stroke_Invalid, new RGB(0x0, 0x0, 0x0));
 
@@ -89,8 +95,8 @@ public class SwimStrokeManager {
 		readSwimStyles();
 	}
 
-	public static String[] getAllStrokeText() {
-		return _allSwimStrokeText;
+	public static String[] getAllSortedSwimStrokeLabel() {
+		return _allSortedSwimStrokeLabel;
 	}
 
 	/**
@@ -102,6 +108,27 @@ public class SwimStrokeManager {
 	}
 
 	/**
+	 * @param strokeValue
+	 * @return Returns the index of the stroke value in {@link #DEFAULT_STROKE_STYLES}
+	 */
+	public static int getDefaultIndex(final short strokeValue) {
+
+		final SwimStroke swimStroke = SwimStroke.getByValue(strokeValue);
+
+		for (int defaultIndex = 0; defaultIndex < DEFAULT_STROKE_STYLES.length; defaultIndex++) {
+
+			final StrokeStyle strokeStyle = DEFAULT_STROKE_STYLES[defaultIndex];
+
+			if (strokeStyle.swimStroke.equals(swimStroke)) {
+				return defaultIndex;
+			}
+		}
+
+		// return valid value
+		return 0;
+	}
+
+	/**
 	 * Retrieves the String Representation of the Value
 	 *
 	 * @return The string representation of the value
@@ -109,6 +136,17 @@ public class SwimStrokeManager {
 	public static String getLabel(final SwimStroke stroke) {
 
 		return _swimStroke_Label.getOrDefault(stroke, _strokeStyle_Invalid.swimStrokeLabel);
+	}
+
+	/**
+	 * @param defaultIndex
+	 * @return Returns the stroke value for the default index.
+	 */
+	public static short getStrokeValue(final short defaultIndex) {
+
+		final StrokeStyle strokeStyle = DEFAULT_STROKE_STYLES[defaultIndex];
+
+		return strokeStyle.swimStroke.value;
 	}
 
 	public static HashMap<SwimStroke, String> getSwimStroke_Label() {
@@ -217,6 +255,7 @@ public class SwimStrokeManager {
 		for (final StrokeStyle strokeStyle : DEFAULT_STROKE_STYLES) {
 			_swimStroke_Rgb.put(strokeStyle.swimStroke, strokeStyle.getGraphBgColor());
 		}
+
 		_swimStroke_Label.clear();
 		for (final StrokeStyle strokeStyle : DEFAULT_STROKE_STYLES) {
 			_swimStroke_Label.put(strokeStyle.swimStroke, strokeStyle.swimStrokeLabel);
@@ -224,7 +263,7 @@ public class SwimStrokeManager {
 
 		// create texts (for user selection) without the invalid item
 		for (int itemIndex = 0; itemIndex < DEFAULT_STROKE_STYLES.length; itemIndex++) {
-			_allSwimStrokeText[itemIndex] = DEFAULT_STROKE_STYLES[itemIndex].swimStrokeLabel;
+			_allSortedSwimStrokeLabel[itemIndex] = DEFAULT_STROKE_STYLES[itemIndex].swimStrokeLabel;
 		}
 
 		// add the invalid item which is not displayed in the combobox

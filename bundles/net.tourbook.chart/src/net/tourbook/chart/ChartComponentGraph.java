@@ -3147,8 +3147,8 @@ public class ChartComponentGraph extends Canvas {
 
 			if (customFillPainter != null) {
 
-//				gc.setForeground(colorBgDark);
-//				gc.setBackground(colorBgBright);
+				gc.setForeground(colorBgDark);
+				gc.setBackground(colorBgBright);
 
 				customFillPainter.draw(//
 						gc,
