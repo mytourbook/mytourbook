@@ -154,6 +154,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 			// create additional data
 			tourData.computeAltitudeUpDown();
 			tourData.computeTourDrivingTime();
+			tourData.computeSpeedSerie();
 			tourData.computeComputedValues();
 		}
 	}
@@ -258,9 +259,9 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		try {
 			String dateString = currentSample.get("UTC").toString();
 			long unixTime = ZonedDateTime.parse(dateString).toInstant().toEpochMilli();
-			float latitude = Float.parseFloat(currentSample.get("Latitude").toString());
-			float longitude = Float.parseFloat(currentSample.get("Longitude").toString());
-			float altitude = Float.parseFloat(currentSample.get("GPSAltitude").toString());
+			float latitude = Util.parseFloat(currentSample.get("Latitude").toString());
+			float longitude = Util.parseFloat(currentSample.get("Longitude").toString());
+			float altitude = Util.parseFloat(currentSample.get("GPSAltitude").toString());
 
 			timeData.latitude = (latitude * 180) / Math.PI;
 			timeData.longitude = (longitude * 180) / Math.PI;
@@ -285,7 +286,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 	private boolean TryAddHeartRateData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
 		if ((value = TryRetrieveStringElementValue(currentSample, "HR")) != null) {
-			timeData.pulse = Float.parseFloat(value) * 60;
+			timeData.pulse = Util.parseFloat(value) * 60.0f;
 			return true;
 		}
 
@@ -304,7 +305,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 	private boolean TryAddSpeedData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
 		if ((value = TryRetrieveStringElementValue(currentSample, "Speed")) != null) {
-			timeData.speed = Float.parseFloat(value) * 3600;
+			timeData.speed = Util.parseFloat(value) * 3600.0f;
 			return true;
 		}
 		return false;
@@ -322,7 +323,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 	private boolean TryAddCadenceData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
 		if ((value = TryRetrieveStringElementValue(currentSample, "Cadence")) != null) {
-			timeData.cadence = Float.parseFloat(value) * 60;
+			timeData.cadence = Util.parseFloat(value) * 60.0f;
 			return true;
 		}
 		return false;
@@ -341,7 +342,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 	private boolean TryAddAltitudeData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
 		if ((value = TryRetrieveStringElementValue(currentSample, "Altitude")) != null) {
-			timeData.absoluteAltitude = Float.parseFloat(value);
+			timeData.absoluteAltitude = Util.parseFloat(value);
 			return true;
 		}
 		return false;
@@ -359,7 +360,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 	private boolean TryAddPowerData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
 		if ((value = TryRetrieveStringElementValue(currentSample, "Power")) != null) {
-			timeData.power = Float.parseFloat(value);
+			timeData.power = Util.parseFloat(value) * 60.0f;
 			return true;
 		}
 		return false;
@@ -377,7 +378,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 	private boolean TryAddDistanceData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
 		if ((value = TryRetrieveStringElementValue(currentSample, "Distance")) != null) {
-			timeData.absoluteDistance = Float.parseFloat(value);
+			timeData.absoluteDistance = Util.parseFloat(value);
 			return true;
 		}
 		return false;
@@ -395,7 +396,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 	private boolean TryAddTemperatureData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
 		if ((value = TryRetrieveStringElementValue(currentSample, "Temperature")) != null) {
-			timeData.temperature = Float.parseFloat(value) - Kelvin;
+			timeData.temperature = Util.parseFloat(value) - Kelvin;
 			return true;
 		}
 		return false;
