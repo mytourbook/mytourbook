@@ -212,8 +212,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 			// GPS point
 			if (currentSampleData.contains("GPSAltitude") && currentSampleData.contains("Latitude")
 					&& currentSampleData.contains("Longitude")) {
-				TryAddGpsData(new JSONObject(currentSampleData), timeData);
-				wasDataPopulated = true;
+				wasDataPopulated |= TryAddGpsData(new JSONObject(currentSampleData), timeData);
 			}
 
 			// Heart Rate
@@ -255,17 +254,23 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 	 * @param sampleList
 	 *            The tour's time serie.
 	 */
-	private void TryAddGpsData(JSONObject currentSample, TimeData timeData) {
-		String dateString = currentSample.get("UTC").toString();
-		long unixTime = ZonedDateTime.parse(dateString).toInstant().toEpochMilli();
-		float latitude = Float.parseFloat(currentSample.get("Latitude").toString());
-		float longitude = Float.parseFloat(currentSample.get("Longitude").toString());
-		float altitude = Float.parseFloat(currentSample.get("GPSAltitude").toString());
+	private boolean TryAddGpsData(JSONObject currentSample, TimeData timeData) {
+		try {
+			String dateString = currentSample.get("UTC").toString();
+			long unixTime = ZonedDateTime.parse(dateString).toInstant().toEpochMilli();
+			float latitude = Float.parseFloat(currentSample.get("Latitude").toString());
+			float longitude = Float.parseFloat(currentSample.get("Longitude").toString());
+			float altitude = Float.parseFloat(currentSample.get("GPSAltitude").toString());
 
-		timeData.latitude = (latitude * 180) / Math.PI;
-		timeData.longitude = (longitude * 180) / Math.PI;
-		timeData.absoluteTime = unixTime;
-		timeData.absoluteAltitude = altitude;
+			timeData.latitude = (latitude * 180) / Math.PI;
+			timeData.longitude = (longitude * 180) / Math.PI;
+			timeData.absoluteTime = unixTime;
+			timeData.absoluteAltitude = altitude;
+
+			return true;
+		} catch (Exception e) {
+		}
+		return false;
 	}
 
 
@@ -332,6 +337,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 	 * @param sampleList
 	 *            The tour's time serie.
 	 */
+	@SuppressWarnings("unused")
 	private boolean TryAddAltitudeData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
 		if ((value = TryRetrieveStringElementValue(currentSample, "Altitude")) != null) {
