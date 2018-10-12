@@ -259,7 +259,7 @@
 		<!-- Suunto Spartan/9 -->
 		<device
 			class="net.tourbook.device.suunto.Suunto9DeviceDataReader"
-			fileextension="json.gz"
+			fileextension="gz"
 			id="net.tourbook.device.Suunto9"
 			name="Suunto 9">
 		</device>
