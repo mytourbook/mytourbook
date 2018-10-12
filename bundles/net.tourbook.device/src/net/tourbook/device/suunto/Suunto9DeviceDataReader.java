@@ -293,7 +293,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 	private void TryAddSpeedData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
 		if ((value = TryRetrieveStringElementValue(currentSample, "Speed")) != null) {
-			timeData.speed = Float.parseFloat(value);
+			timeData.speed = Float.parseFloat(value) * 3600;
 		}
 	}
 
