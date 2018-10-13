@@ -28,12 +28,12 @@ public class GraphBgStyleType {
 
 	@Override
 	public String toString() {
-		return "GraphBgStyleType ["
+		return "GraphBgStyleType [" //$NON-NLS-1$
 
-				+ "graphBgStyle=" + graphBgStyle + ", "
-				+ "label=" + label
+				+ "graphBgStyle=" + graphBgStyle + ", " //$NON-NLS-1$ //$NON-NLS-2$
+				+ "label=" + label //$NON-NLS-1$
 
-				+ "]";
+				+ "]"; //$NON-NLS-1$
 	}
 
 }

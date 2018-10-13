@@ -184,7 +184,7 @@ public class FitContextData {
 
 		if (allFilteredBpm.length != allEventTimestamps.length) {
 
-			TourLogManager.logError(String.format("Fit file has different filtered data: EventTimestamp: %d - FilteredBpm: %d",
+			TourLogManager.logError(String.format("Fit file has different filtered data: EventTimestamp: %d - FilteredBpm: %d", //$NON-NLS-1$
 					allEventTimestamps.length,
 					allFilteredBpm.length));
 

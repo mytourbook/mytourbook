@@ -40,7 +40,7 @@ public class OpenPartHandler {
 		final MPart part = partService.showPart(partId, PartState.ACTIVATE);
 
 		if (part == null) {
-			StatusUtil.showStatus(new IllegalArgumentException(String.format("Part is not available with id '%s'", partId)));
+			StatusUtil.showStatus(new IllegalArgumentException(String.format("Part is not available with id '%s'", partId))); //$NON-NLS-1$
 //			throw new IllegalArgumentException(String.format("Part is not available with id '%s'", partId));
 		}
 	}

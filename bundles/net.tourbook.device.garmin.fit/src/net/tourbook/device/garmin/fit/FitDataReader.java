@@ -297,12 +297,12 @@ public class FitDataReader extends TourbookDevice {
 
 					System.out.println(
 
-							String.format(""
+							String.format("" //$NON-NLS-1$
 
-									+ "[%s]"
+									+ "[%s]" //$NON-NLS-1$
 
 					// time
-									+ " %-42s %d  %s  "
+									+ " %-42s %d  %s  " //$NON-NLS-1$
 
 					// field
 									+ " %-5d %-30s %20s %s", //$NON-NLS-1$
@@ -399,7 +399,7 @@ public class FitDataReader extends TourbookDevice {
 
 						"%-15s %-66s %-5s %-30s %20s %s", //$NON-NLS-1$
 
-						"Java",
+						"Java", //$NON-NLS-1$
 						"Timestamp", //$NON-NLS-1$
 						"Num", //$NON-NLS-1$
 						"Name", //$NON-NLS-1$

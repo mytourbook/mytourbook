@@ -28,11 +28,11 @@ public class GraphBgSourceType {
 
 	@Override
 	public String toString() {
-		return "GraphBgSourceType ["
+		return "GraphBgSourceType [" //$NON-NLS-1$
 
-				+ "graphBgSource=" + graphBgSource + ", "
-				+ "label=" + label
+				+ "graphBgSource=" + graphBgSource + ", " //$NON-NLS-1$ //$NON-NLS-2$
+				+ "label=" + label //$NON-NLS-1$
 
-				+ "]";
+				+ "]"; //$NON-NLS-1$
 	}
 }
