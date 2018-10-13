@@ -1933,7 +1933,6 @@ public class Messages extends NLS {
 
 	public static String	Slideout_TourChartGraphBackground_Action_Colors_Tooltip;
 	public static String	Slideout_TourChartGraphBackground_Combo_BackgroundSource_Tooltip;
-	public static String	Slideout_TourChartGraphBackground_Combo_BackgroundStyle_Tooltip;
 	public static String	Slideout_TourChartGraphBackground_Label_BackgroundSource;
 	public static String	Slideout_TourChartGraphBackground_Label_BackgroundStyle;
 	public static String	Slideout_TourChartGraphBackground_Label_Title;
@@ -2062,15 +2061,8 @@ public class Messages extends NLS {
 	public static String	Tour_Action_graph_temperature_tooltip;
 	public static String	Tour_Action_graph_tour_compare_tooltip;
 	public static String	Tour_Action_GeoCompare_Tooltip;
-	public static String	Tour_Action_GraphBgFrom_HrZone;
-	public static String	Tour_Action_GraphBgFrom_SwimStyle;
 	public static String	Tour_Action_GraphGears;
 	public static String	Tour_Action_GraphOverlapped;
-	public static String	Tour_Action_HrZone_Title;
-	public static String	Tour_Action_HrZoneGraphType_Default;
-	public static String	Tour_Action_HrZoneGraphType_NoGradient;
-	public static String	Tour_Action_HrZoneGraphType_WhiteBottom;
-	public static String	Tour_Action_HrZoneGraphType_WhiteTop;
 	public static String	Tour_Action_Marker_Delete;
 	public static String	Tour_Action_Marker_Delete_WithConfirm;
 	public static String	Tour_Action_Marker_PositionHorizontal;
@@ -2096,13 +2088,9 @@ public class Messages extends NLS {
 	public static String	Tour_Action_show_time_on_x_axis_tooltip;
 	public static String	Tour_Action_SetTimeZone;
 	public static String	Tour_Action_ShowBreaktimeValues;
-	public static String	Tour_Action_ShowGraphBackground_Tooltip;
-	public static String	Tour_Action_ShowHrZones_Tooltip;
 	public static String	Tour_Action_ShowTourMarker;
 	public static String	Tour_Action_Swim_Strokes_Tooltip;
 	public static String	Tour_Action_Swim_Swolf_Tooltip;
-	public static String	Tour_Action_Title_GraphBackground_Source;
-	public static String	Tour_Action_Title_GraphBackground_Style;
 	public static String	Tour_Action_TourInfo_Tooltip;
 	public static String	Tour_Action_TourPhotos;
 	public static String	Tour_Action_TourPhotosWithoutTooltip_Tooltip;
@@ -2377,14 +2365,11 @@ public class Messages extends NLS {
 	public static String	tour_editor_message_show_another_tour;
 	public static String	tour_editor_section_characteristics;
 	public static String	tour_editor_section_date_time;
-	public static String	tour_editor_section_info;
 	public static String	tour_editor_section_tour;
 	public static String	tour_editor_section_personal;
 	public static String	tour_editor_section_weather;
-	public static String	tour_editor_tabLabel_info;
 	public static String	tour_editor_tabLabel_tour;
 	public static String	tour_editor_tabLabel_tour_data;
-//	public static String		tour_editor_tabLabel_tour_marker;
 	public static String	tour_editor_tour_new_tooltip;
 
 	public static String	tour_merger_btn_reset_adjustment;

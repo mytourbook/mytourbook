@@ -319,17 +319,8 @@ public class Messages extends NLS {
 	public static String				ColumnFactory_SerieStartEndIndex_Tooltip;
 	public static String				ColumnFactory_SpeedDiff_Label;
 	public static String				ColumnFactory_SpeedDiff_Tooltip;
-	public static String				ColumnFactory_StrideLength_Label;
-	public static String				ColumnFactory_StrideLength_Tooltip;
-
 	public static String				ColumnFactory_Swim_Strokes_Label;
-	public static String				ColumnFactory_Swim_Strokes_Tooltip;
 	public static String				ColumnFactory_Swim_StrokeStyle_Label;
-	public static String				ColumnFactory_SwimTime_Header;
-	public static String				ColumnFactory_SwimTime_Label;
-	public static String				ColumnFactory_SwimTime_Tooltip;
-	public static String				ColumnFactory_SwimTime_Unit;
-
 	public static String				ColumnFactory_tour_week_header;
 	public static String				ColumnFactory_tour_week_label;
 	public static String				ColumnFactory_tour_week_tooltip;
