@@ -1454,10 +1454,10 @@ public abstract class TableColumnFactory {
 
 				colDef.setColumnCategory(Messages.ColumnFactory_Category_Swimming);
 
-				colDef.setColumnLabel(Messages.ColumnFactory_cadence_label);
-				colDef.setColumnHeaderText(Messages.ColumnFactory_cadence);
-				colDef.setColumnUnit(Messages.ColumnFactory_cadence);
-				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_cadence_tooltip);
+				colDef.setColumnLabel(Messages.ColumnFactory_Swim_Cadence_Label);
+				colDef.setColumnHeaderText(Messages.ColumnFactory_Swim_Cadence_Label);
+//				colDef.setColumnUnit(Messages.ColumnFactory_Swim_Cadence_Label);
+				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Swim_Cadence_Tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
 
@@ -1477,8 +1477,8 @@ public abstract class TableColumnFactory {
 
 				colDef.setColumnLabel(Messages.ColumnFactory_Swim_Strokes_Label);
 				colDef.setColumnHeaderText(Messages.ColumnFactory_Swim_Strokes_Label);
-				colDef.setColumnUnit(Messages.ColumnFactory_Swim_Strokes_Label);
-				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Swim_Strokes_Label);
+//				colDef.setColumnUnit(Messages.ColumnFactory_Swim_Strokes_Label);
+				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Swim_Strokes_Tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
 
@@ -1498,8 +1498,8 @@ public abstract class TableColumnFactory {
 
 				colDef.setColumnLabel(Messages.ColumnFactory_Swim_StrokeStyle_Label);
 				colDef.setColumnHeaderText(Messages.ColumnFactory_Swim_StrokeStyle_Label);
-				colDef.setColumnUnit(Messages.ColumnFactory_Swim_StrokeStyle_Label);
-				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Swim_StrokeStyle_Label);
+//				colDef.setColumnUnit(Messages.ColumnFactory_Swim_StrokeStyle_Label);
+				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Swim_StrokeStyle_Tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
 
