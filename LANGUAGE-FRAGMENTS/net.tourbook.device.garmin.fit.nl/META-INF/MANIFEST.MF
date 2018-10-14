@@ -5,4 +5,3 @@ Bundle-SymbolicName: net.tourbook.device.garmin.fit.nl;singleton:=true
 Bundle-Version: 18.11.0.qualifier
 Bundle-Vendor: MyTourbook
 Fragment-Host: net.tourbook.device.garmin.fit
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7

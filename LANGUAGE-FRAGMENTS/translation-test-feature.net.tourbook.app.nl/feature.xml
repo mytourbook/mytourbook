@@ -12,7 +12,6 @@
    </license>
 
    <requires>
-      <import feature="feature.net.tourbook.app.version" version="18.11.0" match="equivalent"/>
       <import plugin="net.tourbook"/>
       <import plugin="net.tourbook.chart"/>
       <import plugin="net.tourbook.common"/>
