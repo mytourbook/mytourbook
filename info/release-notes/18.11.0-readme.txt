@@ -1,22 +1,44 @@
-Version 18.11                                                   ? 2018
+Version 18.11.0                                                   ?. October 2018
+
+
+Translation: Check pref page for Message Editor / Formatting, there are 2 modified preferences !!!
+
+http://mytourbook.sourceforge.net/mytourbook/index.php/development/translation/install-resource-editor
 
 
 New
 ===	
 
-* Support Swimming Data
-
-  - Import swimming data from .fit files
-
-  - Tour chart
+* Swimming
+  - Import swim data from .fit files
+  - Tour Book
+    - Reimport only swimming data
+  - Tour Chart
     - Show swim graphs
-
+    - Force swim min/max values
   - Tour Editor 
     - Edit swim slices
+
+* Tour Segmenter
+  Stride length computed from cadence/time/distance
+  
+* Tour Info
+  The tour info tab within the tour editor is moved into a separete tour info view
 
  
 Bugfix 	
 ======
 
-* 
+* Adjust Altitude Dialog
+  Tourchart is too small in this dialog, this was introduced when the display issue of the tour chart toolbar was fixed
+
+
+* Statistic View & Tour Chart
+  A selected tour in the statistics was not visible in the tour chart after a tour marker was modified
+  
+* Tour Chart
+  Right aligned tour marker label was not correctly displayed when there was not enough space to the right side
+
+
+
  
