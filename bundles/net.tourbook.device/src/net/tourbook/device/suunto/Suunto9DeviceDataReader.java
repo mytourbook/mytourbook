@@ -24,17 +24,14 @@ import net.tourbook.importdata.TourbookDevice;
 
 public class Suunto9DeviceDataReader extends TourbookDevice {
 
-	private String _importFilePath;
+	private String						_importFilePath;
 
-	private final float Kelvin = 273.1499938964845f;
+	private final float				Kelvin		= 273.1499938964845f;
 
-	private ArrayList<TimeData> _sampleList = new ArrayList<TimeData>();
-
+	private ArrayList<TimeData>	_sampleList	= new ArrayList<TimeData>();
 
 	// plugin constructor
-	public Suunto9DeviceDataReader() {
-	}
-
+	public Suunto9DeviceDataReader() {}
 
 	@Override
 	public String buildFileNameFromRawData(final String rawDataFileName) {
@@ -42,38 +39,34 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		return null;
 	}
 
-
 	@Override
 	public boolean checkStartSequence(final int byteIndex, final int newByte) {
 		return true;
 	}
 
-
 	public String getDeviceModeName(final int profileId) {
 		return UI.EMPTY_STRING;
 	}
-
 
 	@Override
 	public SerialParameters getPortParameters(final String portName) {
 		return null;
 	}
 
-
 	@Override
 	public int getStartSequenceSize() {
 		return 0;
 	}
 
-
 	public int getTransferDataSize() {
 		return -1;
 	}
 
-
 	@Override
-	public boolean processDeviceData(final String importFilePath, final DeviceData deviceData,
-			final HashMap<Long, TourData> alreadyImportedTours, final HashMap<Long, TourData> newlyImportedTours) {
+	public boolean processDeviceData(final String importFilePath,
+												final DeviceData deviceData,
+												final HashMap<Long, TourData> alreadyImportedTours,
+												final HashMap<Long, TourData> newlyImportedTours) {
 
 		if (isValidJSONFile(importFilePath) == false) {
 			return false;
@@ -84,19 +77,16 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		return true;
 	}
 
-
 	@Override
 	public boolean validateRawData(final String fileName) {
 		return isValidJSONFile(fileName);
 	}
 
-
 	/**
 	 * Check if the file is a valid device JSON file.
 	 * 
 	 * @param importFilePath
-	 * @return Returns <code>true</code> when the file contains content with the
-	 *         requested tag.
+	 * @return Returns <code>true</code> when the file contains content with the requested tag.
 	 */
 	protected boolean isValidJSONFile(final String importFilePath) {
 
@@ -130,9 +120,8 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		return true;
 	}
 
-
-	private void createTourData(final HashMap<Long, TourData> alreadyImportedTours,
-			final HashMap<Long, TourData> newlyImportedTours) {
+	private void createTourData(	final HashMap<Long, TourData> alreadyImportedTours,
+											final HashMap<Long, TourData> newlyImportedTours) {
 
 		String jsonFileContent = GetJsonContentFromGZipFile(_importFilePath);
 
@@ -142,8 +131,9 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		tourData.setImportFilePath(_importFilePath);
 
 		tourData.setDeviceId(deviceId);
-		// TODO after all data are added, the tour id can be created
-		final Long tourId = tourData.createTourId("49837533398");
+		// after all data are added, the tour id can be created
+		final String uniqueId = this.createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_SUUNTO9);
+		final Long tourId = tourData.createTourId(uniqueId);
 
 		// check if the tour is already imported
 		if (alreadyImportedTours.containsKey(tourId) == false) {
@@ -158,7 +148,6 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 			tourData.computeComputedValues();
 		}
 	}
-
 
 	private String GetJsonContentFromGZipFile(String gzipFilePath) {
 		String jsonFileContent = null;
@@ -177,7 +166,6 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
 		return jsonFileContent;
 	}
-
 
 	private TourData ImportTour(String jsonFileContent) {
 		final TourData tourData = new TourData();
@@ -202,7 +190,8 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 			JSONObject currentSampleAttributes = new JSONObject(sample.get("Attributes").toString());
 			JSONObject currentSampleSml = new JSONObject(currentSampleAttributes.get("suunto/sml").toString());
 			String currentSampleData = currentSampleSml.get("Sample").toString();
-			long currentSampleDate = ZonedDateTime.parse(sample.get("TimeISO8601").toString()).toInstant()
+			long currentSampleDate = ZonedDateTime.parse(sample.get("TimeISO8601").toString())
+					.toInstant()
 					.toEpochMilli();
 
 			boolean wasDataPopulated = false;
@@ -246,14 +235,13 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		return tourData;
 	}
 
-
 	/**
 	 * Attempts to retrieve and add GPS data to the current tour.
 	 * 
 	 * @param currentSample
-	 *            The current sample data in JSON format.
+	 *           The current sample data in JSON format.
 	 * @param sampleList
-	 *            The tour's time serie.
+	 *           The tour's time serie.
 	 */
 	private boolean TryAddGpsData(JSONObject currentSample, TimeData timeData) {
 		try {
@@ -269,19 +257,17 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 			timeData.absoluteAltitude = altitude;
 
 			return true;
-		} catch (Exception e) {
-		}
+		} catch (Exception e) {}
 		return false;
 	}
-
 
 	/**
 	 * Attempts to retrieve and add HR data to the current tour.
 	 * 
 	 * @param currentSample
-	 *            The current sample data in JSON format.
+	 *           The current sample data in JSON format.
 	 * @param sampleList
-	 *            The tour's time serie.
+	 *           The tour's time serie.
 	 */
 	private boolean TryAddHeartRateData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
@@ -293,14 +279,13 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		return false;
 	}
 
-
 	/**
 	 * Attempts to retrieve and add speed data to the current tour.
 	 * 
 	 * @param currentSample
-	 *            The current sample data in JSON format.
+	 *           The current sample data in JSON format.
 	 * @param sampleList
-	 *            The tour's time serie.
+	 *           The tour's time serie.
 	 */
 	private boolean TryAddSpeedData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
@@ -311,14 +296,13 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		return false;
 	}
 
-
 	/**
 	 * Attempts to retrieve and add cadence data to the current tour.
 	 * 
 	 * @param currentSample
-	 *            The current sample data in JSON format.
+	 *           The current sample data in JSON format.
 	 * @param sampleList
-	 *            The tour's time serie.
+	 *           The tour's time serie.
 	 */
 	private boolean TryAddCadenceData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
@@ -329,14 +313,13 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		return false;
 	}
 
-
 	/**
 	 * Attempts to retrieve and add barometric altitude data to the current tour.
 	 * 
 	 * @param currentSample
-	 *            The current sample data in JSON format.
+	 *           The current sample data in JSON format.
 	 * @param sampleList
-	 *            The tour's time serie.
+	 *           The tour's time serie.
 	 */
 	@SuppressWarnings("unused")
 	private boolean TryAddAltitudeData(JSONObject currentSample, TimeData timeData) {
@@ -348,14 +331,13 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		return false;
 	}
 
-
 	/**
 	 * Attempts to retrieve and add power data to the current tour.
 	 * 
 	 * @param currentSample
-	 *            The current sample data in JSON format.
+	 *           The current sample data in JSON format.
 	 * @param sampleList
-	 *            The tour's time serie.
+	 *           The tour's time serie.
 	 */
 	private boolean TryAddPowerData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
@@ -366,14 +348,13 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		return false;
 	}
 
-
 	/**
 	 * Attempts to retrieve and add power data to the current tour.
 	 * 
 	 * @param currentSample
-	 *            The current sample data in JSON format.
+	 *           The current sample data in JSON format.
 	 * @param sampleList
-	 *            The tour's time serie.
+	 *           The tour's time serie.
 	 */
 	private boolean TryAddDistanceData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
@@ -384,14 +365,13 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		return false;
 	}
 
-
 	/**
 	 * Attempts to retrieve and add power data to the current tour.
 	 * 
 	 * @param currentSample
-	 *            The current sample data in JSON format.
+	 *           The current sample data in JSON format.
 	 * @param sampleList
-	 *            The tour's time serie.
+	 *           The tour's time serie.
 	 */
 	private boolean TryAddTemperatureData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
@@ -402,14 +382,13 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		return false;
 	}
 
-
 	/**
 	 * Searches for an element and returns its value as a string.
 	 * 
 	 * @param token
-	 *            The JSON token in which to look for a given element.
+	 *           The JSON token in which to look for a given element.
 	 * @param elementName
-	 *            The element name to look for in a JSON content.
+	 *           The element name to look for in a JSON content.
 	 * @return The element value, if found.
 	 */
 	private String TryRetrieveStringElementValue(JSONObject token, String elementName) {

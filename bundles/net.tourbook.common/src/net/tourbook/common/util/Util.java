@@ -43,9 +43,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
-import net.tourbook.common.UI;
-import net.tourbook.common.time.TimeTools;
-
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -76,43 +73,47 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 import org.xml.sax.Attributes;
 
+import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
+
 public class Util {
 
 //	public static final String	UNIQUE_ID_SUFFIX_CICLO_TOUR				= "83582";				//$NON-NLS-1$
-	public static final String	UNIQUE_ID_SUFFIX_GARMIN_FIT				= "12653";				//$NON-NLS-1$
-	public static final String	UNIQUE_ID_SUFFIX_GARMIN_TCX				= "42984";				//$NON-NLS-1$
-	public static final String	UNIQUE_ID_SUFFIX_GPX					= "31683";				//$NON-NLS-1$
-	public static final String	UNIQUE_ID_SUFFIX_NMEA					= "32481";				//$NON-NLS-1$
-	public static final String	UNIQUE_ID_SUFFIX_POLAR_HRM				= "63193";				//$NON-NLS-1$
-	public static final String	UNIQUE_ID_SUFFIX_POLAR_PDD				= "76913";				//$NON-NLS-1$
-	public static final String	UNIQUE_ID_SUFFIX_POLAR_TRAINER			= "13457";				//$NON-NLS-1$
-	public static final String	UNIQUE_ID_SUFFIX_SPORT_TRACKS_FITLOG	= "24168";				//$NON-NLS-1$
-	public static final String	UNIQUE_ID_SUFFIX_SUUNTO2				= "92145";				//$NON-NLS-1$
-	public static final String	UNIQUE_ID_SUFFIX_SUUNTO3				= "73198";				//$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_GARMIN_FIT				= "12653";	//$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_GARMIN_TCX				= "42984";	//$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_GPX							= "31683";	//$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_NMEA						= "32481";	//$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_POLAR_HRM					= "63193";	//$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_POLAR_PDD					= "76913";	//$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_POLAR_TRAINER			= "13457";	//$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_SPORT_TRACKS_FITLOG	= "24168";	//$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_SUUNTO2					= "92145";	//$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_SUUNTO3					= "73198";	//$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_SUUNTO9					= "93281";	//$NON-NLS-1$
 
 	/*
 	 * Default xml tags
 	 */
-	private static final String	TAG_ITEM								= "item";				//$NON-NLS-1$
-	private static final String	TAG_LIST								= "list";				//$NON-NLS-1$
+	private static final String	TAG_ITEM		= "item";	//$NON-NLS-1$
+	private static final String	TAG_LIST		= "list";	//$NON-NLS-1$
 
-	private static final String	ATTR_KEY								= "key";				//$NON-NLS-1$
-	private static final String	ATTR_VALUE								= "value";				//$NON-NLS-1$
+	private static final String	ATTR_KEY		= "key";		//$NON-NLS-1$
+	private static final String	ATTR_VALUE	= "value";	//$NON-NLS-1$
 
 	/*
 	 * default xml attributes
 	 */
-	public static final String	ATTR_ROOT_DATETIME						= "Created";			//$NON-NLS-1$
-	public static final String	ATTR_ROOT_VERSION_MAJOR					= "VersionMajor";		//$NON-NLS-1$
-	public static final String	ATTR_ROOT_VERSION_MINOR					= "VersionMinor";		//$NON-NLS-1$
-	public static final String	ATTR_ROOT_VERSION_MICRO					= "VersionMicro";		//$NON-NLS-1$
-	public static final String	ATTR_ROOT_VERSION_QUALIFIER				= "VersionQualifier";	//$NON-NLS-1$
+	public static final String	ATTR_ROOT_DATETIME				= "Created";				//$NON-NLS-1$
+	public static final String	ATTR_ROOT_VERSION_MAJOR			= "VersionMajor";			//$NON-NLS-1$
+	public static final String	ATTR_ROOT_VERSION_MINOR			= "VersionMinor";			//$NON-NLS-1$
+	public static final String	ATTR_ROOT_VERSION_MICRO			= "VersionMicro";			//$NON-NLS-1$
+	public static final String	ATTR_ROOT_VERSION_QUALIFIER	= "VersionQualifier";	//$NON-NLS-1$
 
-	public static final String	ATTR_COLOR_RED							= "red";				//$NON-NLS-1$
-	public static final String	ATTR_COLOR_GREEN						= "green";				//$NON-NLS-1$
-	public static final String	ATTR_COLOR_BLUE							= "blue";				//$NON-NLS-1$
+	public static final String	ATTR_COLOR_RED						= "red";						//$NON-NLS-1$
+	public static final String	ATTR_COLOR_GREEN					= "green";					//$NON-NLS-1$
+	public static final String	ATTR_COLOR_BLUE					= "blue";					//$NON-NLS-1$
 
-	public static final String	CSV_FILE_EXTENSION						= "csv";				//$NON-NLS-1$
+	public static final String	CSV_FILE_EXTENSION				= "csv";						//$NON-NLS-1$
 
 	public static int adjustScaleValueOnMouseScroll(final MouseEvent event) {
 
@@ -835,8 +836,8 @@ public class Util {
 	}
 
 	public static boolean getPrefixPrefBoolean(	final IPreferenceStore prefStore,
-												final String prefPrefix,
-												final String prefKey) {
+																final String prefPrefix,
+																final String prefKey) {
 
 		boolean prefValue;
 
@@ -850,8 +851,8 @@ public class Util {
 	}
 
 	public static int getPrefixPrefInt(	final IPreferenceStore prefStore,
-										final String prefPrefix,
-										final String prefKey) {
+													final String prefPrefix,
+													final String prefKey) {
 
 		int prefValue;
 
@@ -929,14 +930,14 @@ public class Util {
 	 * @param defaultValue
 	 * @param combo
 	 * @param defaultComboIndex
-	 *            Combo default index when retrieved state index is too large.
+	 *           Combo default index when retrieved state index is too large.
 	 * @return
 	 */
-	public static int getStateCombo(final IDialogSettings state,
-									final String stateKey,
-									final int defaultValue,
-									final Combo combo,
-									final int defaultComboIndex) {
+	public static int getStateCombo(	final IDialogSettings state,
+												final String stateKey,
+												final int defaultValue,
+												final Combo combo,
+												final int defaultComboIndex) {
 
 		int comboIndex = getStateInt(state, stateKey, defaultValue);
 
@@ -984,8 +985,8 @@ public class Util {
 	 *         default value is returned.
 	 */
 	public static <E extends Enum<E>> Enum<E> getStateEnum(	final IDialogSettings state,
-															final String key,
-															final Enum<E> defaultValue) {
+																				final String key,
+																				final Enum<E> defaultValue) {
 
 		if (state == null) {
 			return defaultValue;
@@ -1029,12 +1030,12 @@ public class Util {
 
 	/**
 	 * @param combo
-	 *            combo box, the items in the combo box must correspond to the items in the states
-	 *            array
+	 *           combo box, the items in the combo box must correspond to the items in the states
+	 *           array
 	 * @param states
-	 *            array which contains all states
+	 *           array which contains all states
 	 * @param defaultState
-	 *            state when an item is not selected in the combo box
+	 *           state when an item is not selected in the combo box
 	 * @return Returns the state which is selected in the combo box
 	 */
 	public static String getStateFromCombo(final Combo combo, final String[] states, final String defaultState) {
@@ -1343,8 +1344,8 @@ public class Util {
 	}
 
 	public static <E extends Enum<E>> Enum<E> getXmlEnum(	final IMemento xml,
-															final String attrName,
-															final Enum<E> defaultValue) {
+																			final String attrName,
+																			final Enum<E> defaultValue) {
 
 		final String xmlValue = xml.getString(attrName);
 
@@ -1378,16 +1379,16 @@ public class Util {
 	 * @param key
 	 * @param defaultValue
 	 * @param minValue
-	 *            Float min value.
+	 *           Float min value.
 	 * @param maxValue
-	 *            Float max value.
+	 *           Float max value.
 	 * @return
 	 */
 	public static float getXmlFloatFloat(	final XMLMemento xmlMemento,
-											final String key,
-											final float defaultValue,
-											final float minValue,
-											final float maxValue) {
+														final String key,
+														final float defaultValue,
+														final float minValue,
+														final float maxValue) {
 
 		final Float value = getXmlFloat(xmlMemento, key, defaultValue);
 
@@ -1407,16 +1408,16 @@ public class Util {
 	 * @param key
 	 * @param defaultValue
 	 * @param minValue
-	 *            Integer min value.
+	 *           Integer min value.
 	 * @param maxValue
-	 *            Integer max value.
+	 *           Integer max value.
 	 * @return
 	 */
 	public static float getXmlFloatInt(	final IMemento xmlMemento,
-										final String key,
-										final float defaultValue,
-										final int minValue,
-										final int maxValue) {
+													final String key,
+													final float defaultValue,
+													final int minValue,
+													final int maxValue) {
 
 		final Float value = getXmlFloat(xmlMemento, key, defaultValue);
 
@@ -1457,11 +1458,11 @@ public class Util {
 	 * @param maxValue
 	 * @return
 	 */
-	public static int getXmlInteger(final IMemento xmlMemento,
-									final String key,
-									final int defaultValue,
-									final int minValue,
-									final int maxValue) {
+	public static int getXmlInteger(	final IMemento xmlMemento,
+												final String key,
+												final int defaultValue,
+												final int minValue,
+												final int maxValue) {
 
 		final int value = getXmlInteger(xmlMemento, key, defaultValue);
 
@@ -1759,8 +1760,8 @@ public class Util {
 	 * 
 	 * @param attributes
 	 * @param attributeName
-	 * @return Returns long value or {@link Long#MIN_VALUE} when attribute is not available or
-	 *         cannot be parsed.
+	 * @return Returns long value or {@link Long#MIN_VALUE} when attribute is not available or cannot
+	 *         be parsed.
 	 */
 	public static long parseLong(final Attributes attributes, final String attributeName) {
 
@@ -2179,15 +2180,15 @@ public class Util {
 	 * @param state
 	 * @param stateKey
 	 * @param comboStates
-	 *            this array must must have the same number of entries as the combo box has items
+	 *           this array must must have the same number of entries as the combo box has items
 	 * @param defaultState
 	 * @param combo
 	 */
 	public static void selectStateInCombo(	final IDialogSettings state,
-											final String stateKey,
-											final String[] comboStates,
-											final String defaultState,
-											final Combo combo) {
+														final String stateKey,
+														final String[] comboStates,
+														final String defaultState,
+														final Combo combo) {
 
 		final String stateValue = Util.getStateString(state, stateKey, defaultState);
 
@@ -2210,7 +2211,7 @@ public class Util {
 	 * @param combo
 	 * @param comboItems
 	 * @param selectedItem
-	 *            Text which should be selected in the combo box
+	 *           Text which should be selected in the combo box
 	 */
 	public static void selectTextInCombo(final Combo combo, final String[] comboItems, final String selectedItem) {
 
@@ -2267,9 +2268,9 @@ public class Util {
 		state.put(stateKey, stateValues);
 	}
 
-	public static <E extends Enum<E>> void setStateEnum(final IDialogSettings state,
-														final String key,
-														final Enum<E> value) {
+	public static <E extends Enum<E>> void setStateEnum(	final IDialogSettings state,
+																			final String key,
+																			final Enum<E> value) {
 
 		if (value == null) {
 			return;
@@ -2359,7 +2360,7 @@ public class Util {
 	 * 
 	 * @param viewId
 	 * @param isActivateView
-	 *            View is activated when <code>true</code>, otherwise it is only visible.
+	 *           View is activated when <code>true</code>, otherwise it is only visible.
 	 * @return Returns the opened/activated view.
 	 */
 	public static IViewPart showView(final String viewId, final boolean isActivateView) {
