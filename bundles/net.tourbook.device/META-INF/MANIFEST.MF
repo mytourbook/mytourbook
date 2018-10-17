@@ -29,4 +29,5 @@ Import-Package: de.byteholder.geoclipse.map,
  net.tourbook.ui,
  net.tourbook.ui.tourChart,
  net.tourbook.ui.views.rawData,
- org.json
+ org.json,
+ org.xmlunit.diff

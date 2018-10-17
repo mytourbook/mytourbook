@@ -24,8 +24,6 @@ import net.tourbook.importdata.TourbookDevice;
 
 public class Suunto9DeviceDataReader extends TourbookDevice {
 
-	private String						_importFilePath;
-
 	private final float				Kelvin		= 273.1499938964845f;
 
 	private ArrayList<TimeData>	_sampleList	= new ArrayList<TimeData>();
@@ -71,9 +69,26 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		if (isValidJSONFile(importFilePath) == false) {
 			return false;
 		}
-		_importFilePath = importFilePath;
 
-		createTourData(alreadyImportedTours, newlyImportedTours);
+		TourData tourData = createTourData(importFilePath);
+
+		// after all data are added, the tour id can be created
+		final String uniqueId = this.createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_SUUNTO9);
+		final Long tourId = tourData.createTourId(uniqueId);
+
+		// check if the tour is already imported
+		if (alreadyImportedTours.containsKey(tourId) == false) {
+
+			// add new tour to other tours
+			newlyImportedTours.put(tourId, tourData);
+
+			// create additional data
+			tourData.computeAltitudeUpDown();
+			tourData.computeTourDrivingTime();
+			tourData.computeSpeedSerie();
+			tourData.computeComputedValues();
+		}
+
 		return true;
 	}
 
@@ -120,33 +135,18 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		return true;
 	}
 
-	private void createTourData(	final HashMap<Long, TourData> alreadyImportedTours,
-											final HashMap<Long, TourData> newlyImportedTours) {
+	public TourData createTourData(String importFilePath) {
 
-		String jsonFileContent = GetJsonContentFromGZipFile(_importFilePath);
+		String jsonFileContent = GetJsonContentFromGZipFile(importFilePath);
 
 		// create data object for each tour
 		final TourData tourData = ImportTour(jsonFileContent);
 
-		tourData.setImportFilePath(_importFilePath);
+		tourData.setImportFilePath(importFilePath);
 
 		tourData.setDeviceId(deviceId);
-		// after all data are added, the tour id can be created
-		final String uniqueId = this.createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_SUUNTO9);
-		final Long tourId = tourData.createTourId(uniqueId);
 
-		// check if the tour is already imported
-		if (alreadyImportedTours.containsKey(tourId) == false) {
-
-			// add new tour to other tours
-			newlyImportedTours.put(tourId, tourData);
-
-			// create additional data
-			tourData.computeAltitudeUpDown();
-			tourData.computeTourDrivingTime();
-			tourData.computeSpeedSerie();
-			tourData.computeComputedValues();
-		}
+		return tourData;
 	}
 
 	private String GetJsonContentFromGZipFile(String gzipFilePath) {
