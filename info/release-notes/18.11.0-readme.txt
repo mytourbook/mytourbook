@@ -1,9 +1,4 @@
-Version 18.11.0                                                   ?. October 2018
-
-
-Translation: Check pref page for Message Editor / Formatting, there are 2 modified preferences !!!
-
-http://mytourbook.sourceforge.net/mytourbook/index.php/development/translation/install-resource-editor
+Version 18.11.0                                                   ?. November 2018
 
 
 New
