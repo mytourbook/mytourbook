@@ -7,8 +7,10 @@ import java.io.InputStreamReader;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
+import org.apache.commons.io.FilenameUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,9 +26,12 @@ import net.tourbook.importdata.TourbookDevice;
 
 public class Suunto9DeviceDataReader extends TourbookDevice {
 
-	private final float				Kelvin	= 273.1499938964845f;
+	private final float						Kelvin								= 273.1499938964845f;
 
-	private ArrayList<TimeData>	_sampleList;
+	private ArrayList<TimeData>			_sampleList;
+
+	private HashMap<String, TourData>	processedActivities				= new HashMap<String, TourData>();
+	private HashMap<String, String>		childrenActivitiesToProcess	= new HashMap<String, String>();
 
 	// plugin constructor
 	public Suunto9DeviceDataReader() {}
@@ -71,8 +76,8 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		if (isValidJSONFile(jsonFileContent) == false) {
 			return false;
 		}
-		SuuntoFileImporter s = new SuuntoFileImporter();
-		s.ProcessFile(importFilePath, jsonFileContent);
+		SuuntoJsonProcessor s = new SuuntoJsonProcessor();
+		ProcessFile(importFilePath, jsonFileContent);
 
 		final TourData tourData = ImportTour(jsonFileContent);
 
@@ -92,6 +97,11 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 			tourData.computeAltitudeUpDown();
 			tourData.computeTourDrivingTime();
 			tourData.computeComputedValues();
+		}
+		//An updated version of the tour is available
+		// DON'T DO if it works by reference, which I assume so
+		else {
+
 		}
 
 		return true;
@@ -153,6 +163,67 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		}
 
 		return jsonFileContent;
+	}
+
+	private boolean ProcessFile(String filePath, String jsonFileContent) {
+		SuuntoJsonProcessor suuntoJsonProcessor = new SuuntoJsonProcessor();
+
+		String fileName =
+				FilenameUtils.removeExtension(filePath);
+		if (fileName.substring(fileName.length() - 5, 5) == ".json") {
+			fileName = FilenameUtils.removeExtension(fileName);
+		}
+
+		String fileNumberString =
+				fileName.substring(fileName.lastIndexOf('-') + 1);
+
+		int fileNumber;
+		try {
+			fileNumber = Integer.parseInt(fileNumberString);
+		} catch (NumberFormatException e) {
+			return false;
+		}
+
+		TourData activity = new TourData();
+
+		if (fileNumber == 1) {
+			activity = suuntoJsonProcessor.ImportActivity(
+					jsonFileContent,
+					null);
+
+			if (!processedActivities.containsKey(filePath))
+				processedActivities.put(filePath, activity);
+		} else if (fileNumber > 1) {
+			// if we find the parent (e.g: The activity just before the
+			// current one. Example : If the current is xxx-3, we find xxx-2)
+			// then we import it reusing the parent activity AND we check that there is no children waiting to be imported
+			// If nothing is found, we store it for (hopefully) future use.
+			Map.Entry<String, TourData> parentEntry = null;
+			for (Map.Entry<String, TourData> entry : processedActivities.entrySet()) {
+				String key = entry.getKey();
+				int ff = fileNumber - 1;
+				if (key.contains(FilenameUtils.removeExtension(filePath) + "-" + ff + ".json")) {
+					parentEntry = entry;
+				}
+			}
+
+			if (parentEntry == null) {
+				if (!childrenActivitiesToProcess.containsKey(filePath))
+					childrenActivitiesToProcess.put(filePath, jsonFileContent);
+			} else {
+				activity = suuntoJsonProcessor.ImportActivity(
+						jsonFileContent,
+						parentEntry.getValue());
+
+				//We remove the parent activity to replace it with the
+				//updated one (parent activity concatenated with the current
+				//one).
+				processedActivities.remove(parentEntry.getKey());
+				if (!processedActivities.containsKey(filePath))
+					processedActivities.put(filePath, activity);
+			}
+		}
+		return true;
 	}
 
 	private TourData ImportTour(String jsonFileContent) {
