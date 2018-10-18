@@ -65,12 +65,19 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 												final DeviceData deviceData,
 												final HashMap<Long, TourData> alreadyImportedTours,
 												final HashMap<Long, TourData> newlyImportedTours) {
+		String jsonFileContent =
+				GetJsonContentFromGZipFile(importFilePath);
 
-		if (isValidJSONFile(importFilePath) == false) {
+		if (isValidJSONFile(jsonFileContent) == false) {
 			return false;
 		}
+		SuuntoFileImporter s = new SuuntoFileImporter();
+		s.ProcessFile(importFilePath, jsonFileContent);
 
-		TourData tourData = createTourData(importFilePath);
+		final TourData tourData = ImportTour(jsonFileContent);
+
+		tourData.setDeviceId(deviceId);
+		tourData.setImportFilePath(importFilePath);
 
 		// after all data are added, the tour id can be created
 		final String uniqueId = this.createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_SUUNTO9);
@@ -78,7 +85,6 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
 		// check if the tour is already imported
 		if (alreadyImportedTours.containsKey(tourId) == false) {
-
 			// add new tour to other tours
 			newlyImportedTours.put(tourId, tourData);
 
@@ -102,12 +108,9 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 	 * @param importFilePath
 	 * @return Returns <code>true</code> when the file contains content with the requested tag.
 	 */
-	protected boolean isValidJSONFile(final String importFilePath) {
-
+	protected boolean isValidJSONFile(String jsonFileContent) {
 		BufferedReader fileReader = null;
 		try {
-
-			String jsonFileContent = GetJsonContentFromGZipFile(importFilePath);
 
 			if (jsonFileContent == null) {
 				return false;
@@ -134,20 +137,6 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		return true;
 	}
 
-	public TourData createTourData(String importFilePath) {
-
-		String jsonFileContent = GetJsonContentFromGZipFile(importFilePath);
-
-		// create data object for each tour
-		final TourData tourData = ImportTour(jsonFileContent);
-
-		tourData.setImportFilePath(importFilePath);
-
-		tourData.setDeviceId(deviceId);
-
-		return tourData;
-	}
-
 	private String GetJsonContentFromGZipFile(String gzipFilePath) {
 		String jsonFileContent = null;
 		try {
@@ -160,7 +149,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 			br.close();
 			gzip.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			return "";
 		}
 
 		return jsonFileContent;
@@ -292,6 +281,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 	 * @param sampleList
 	 *           The tour's time serie.
 	 */
+	@SuppressWarnings("unused")
 	private boolean TryAddSpeedData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
 		if ((value = TryRetrieveStringElementValue(currentSample, "Speed")) != null) {
