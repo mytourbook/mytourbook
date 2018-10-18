@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,18 +16,6 @@
 package net.tourbook.ui.tourChart;
 
 import java.util.ArrayList;
-
-import net.tourbook.Messages;
-import net.tourbook.chart.ChartComponentGraph;
-import net.tourbook.chart.ColorCache;
-import net.tourbook.common.UI;
-import net.tourbook.common.formatter.FormatManager;
-import net.tourbook.common.tooltip.AnimatedToolTipShell;
-import net.tourbook.data.TourData;
-import net.tourbook.data.TourMarker;
-import net.tourbook.tour.ActionOpenMarkerDialog;
-import net.tourbook.ui.ITourProvider;
-import net.tourbook.web.WEB;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -55,69 +43,81 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 
+import net.tourbook.Messages;
+import net.tourbook.chart.ChartComponentGraph;
+import net.tourbook.chart.ColorCache;
+import net.tourbook.common.UI;
+import net.tourbook.common.formatter.FormatManager;
+import net.tourbook.common.tooltip.AnimatedToolTipShell;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
+import net.tourbook.tour.ActionOpenMarkerDialog;
+import net.tourbook.ui.ITourProvider;
+import net.tourbook.web.WEB;
+
 /**
  * created: 30.5.2014
  */
 public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourProvider {
 
-	private static final String				GRAPH_LABEL_ALTITUDE			= net.tourbook.common.Messages.Graph_Label_Altitude;
-	private static final String				GRAPH_LABEL_TIME				= net.tourbook.common.Messages.Graph_Label_Time;
-	private static final String				GRAPH_LABEL_DISTANCE			= net.tourbook.common.Messages.Graph_Label_Distance;
+	private static final String	GRAPH_LABEL_ALTITUDE	= net.tourbook.common.Messages.Graph_Label_Altitude;
+	private static final String	GRAPH_LABEL_TIME		= net.tourbook.common.Messages.Graph_Label_Time;
+	private static final String	GRAPH_LABEL_DISTANCE	= net.tourbook.common.Messages.Graph_Label_Distance;
 
-	private static final int				DEFAULT_TEXT_WIDTH				= 50;
-	private static final int				DEFAULT_TEXT_HEIGHT				= 20;
+	private static final int		DEFAULT_TEXT_WIDTH	= 50;
+	private static final int		DEFAULT_TEXT_HEIGHT	= 20;
 
 	/**
 	 * Visual position for marker tooltip, they must correspond to the position id
 	 * TOOLTIP_POSITION_*.
 	 */
-	public static final String[]			TOOLTIP_POSITIONS;
+	public static final String[]	TOOLTIP_POSITIONS;
 
 	static {
 
 		TOOLTIP_POSITIONS = new String[] { //
-		//
-			Messages.Tour_Marker_TooltipPosition_Left, // 				0
-			Messages.Tour_Marker_TooltipPosition_Right, // 				1
-			Messages.Tour_Marker_TooltipPosition_Top, // 				2
-			Messages.Tour_Marker_TooltipPosition_Bottom, // 			3
-			Messages.Tour_Marker_TooltipPosition_ChartTop, // 			4
-			Messages.Tour_Marker_TooltipPosition_ChartBottom, // 		5
+				//
+				Messages.Tour_Marker_TooltipPosition_Left, // 				0
+				Messages.Tour_Marker_TooltipPosition_Right, // 				1
+				Messages.Tour_Marker_TooltipPosition_Top, // 				2
+				Messages.Tour_Marker_TooltipPosition_Bottom, // 			3
+				Messages.Tour_Marker_TooltipPosition_ChartTop, // 			4
+				Messages.Tour_Marker_TooltipPosition_ChartBottom, // 		5
 		};
 	}
 
-	private static final int				TOOLTIP_POSITION_LEFT			= 0;
-	private static final int				TOOLTIP_POSITION_RIGHT			= 1;
-	private static final int				TOOLTIP_POSITION_ABOVE			= 2;
-	private static final int				TOOLTIP_POSITION_BELOW			= 3;
-	private static final int				TOOLTIP_POSITION_CHART_TOP		= 4;
-	private static final int				TOOLTIP_POSITION_CHART_BOTTOM	= 5;
+	private static final int						TOOLTIP_POSITION_LEFT			= 0;
+	private static final int						TOOLTIP_POSITION_RIGHT			= 1;
+	private static final int						TOOLTIP_POSITION_ABOVE			= 2;
+	private static final int						TOOLTIP_POSITION_BELOW			= 3;
+	private static final int						TOOLTIP_POSITION_CHART_TOP		= 4;
+	private static final int						TOOLTIP_POSITION_CHART_BOTTOM	= 5;
 
-	public static final int					DEFAULT_TOOLTIP_POSITION		= TOOLTIP_POSITION_BELOW;
+	public static final int							DEFAULT_TOOLTIP_POSITION		= TOOLTIP_POSITION_BELOW;
 
-	private static final int				_textStyle						= SWT.WRAP //
-																					| SWT.MULTI
-																					| SWT.READ_ONLY
+	private static final int						_textStyle							= SWT.WRAP						//
+			| SWT.MULTI
+			| SWT.READ_ONLY
 //																					| SWT.BORDER
-																			;
+	;
 
-	private PixelConverter					_pc;
+	private PixelConverter							_pc;
 
-	private int								_defaultTextWidth;
-	private int								_defaultTextHeight;
+	private int											_defaultTextWidth;
+	private int											_defaultTextHeight;
 
-	private TourChart						_tourChart;
-	private TourData						_tourData;
+	private TourChart									_tourChart;
+	private TourData									_tourData;
 
-	private ChartLabel						_hoveredLabel;
-	private TourMarker						_hoveredTourMarker;
+	private ChartLabel								_hoveredLabel;
+	private TourMarker								_hoveredTourMarker;
 
 	/**
 	 * When <code>true</code> the actions are displayed, e.g. to open the marker dialog.
 	 */
-	private boolean							_isShowActions;
+	private boolean									_isShowActions;
 
-	private ChartMarkerConfig				_cmc;
+	private ChartMarkerConfig						_cmc;
 
 	private ActionOpenMarkerDialogInTooltip	_actionOpenMarkerDialog;
 
@@ -136,10 +136,10 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 	/*
 	 * UI resources
 	 */
-	private Font							_boldFont;
-	private Color							_fgBorder;
-	private Color							_titleColor;
-	private ColorCache						_colorCache;
+	private Font			_boldFont;
+	private Color			_fgBorder;
+	private Color			_titleColor;
+	private ColorCache	_colorCache;
 
 	/*
 	 * UI controls
@@ -151,7 +151,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 	 * Contains the controls which are displayed in the first column, these controls are used to get
 	 * the maximum width and set the first column within the differenct section to the same width.
 	 */
-	private final ArrayList<Control>		_firstColumnControls			= new ArrayList<Control>();
+	private final ArrayList<Control>	_firstColumnControls	= new ArrayList<>();
 
 	private class ActionOpenMarkerDialogInTooltip extends ActionOpenMarkerDialog {
 
@@ -221,7 +221,6 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 		}
 
 		_tourData = _tourChart.getTourData();
-
 
 		createActions();
 
@@ -343,7 +342,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 
 	/**
 	 * Description
-	 * 
+	 *
 	 * @param parent
 	 */
 	private void createUI_40_Description(final Composite parent) {
@@ -471,9 +470,9 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 	}
 
 	private void createUI_72_ValueField(final Composite parent,
-										final String fieldName,
-										final String unit,
-										final String valueText) {
+													final String fieldName,
+													final String unit,
+													final String valueText) {
 
 		Label label = new Label(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().applyTo(label);
@@ -612,7 +611,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 	@Override
 	public ArrayList<TourData> getSelectedTours() {
 
-		final ArrayList<TourData> tours = new ArrayList<TourData>();
+		final ArrayList<TourData> tours = new ArrayList<>();
 		tours.add(_tourChart.getTourData());
 
 		return tours;
@@ -702,8 +701,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 			if (_hoveredLabel.visualPosition == TourMarker.LABEL_POS_VERTICAL_TOP_CHART) {
 
 				/*
-				 * y position is wrong, adjust it but this do NOT cover all possible positions, but
-				 * some
+				 * y position is wrong, adjust it but this do NOT cover all possible positions, but some
 				 */
 				ttPosY -= devHoverSize;
 			}
@@ -889,8 +887,8 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 		if (hoveredLabel != null && isTooltipClosing()) {
 
 			/**
-			 * This case occures when the tooltip is opened but is currently closing and the mouse
-			 * is moved from the tooltip back to the hovered label.
+			 * This case occures when the tooltip is opened but is currently closing and the mouse is
+			 * moved from the tooltip back to the hovered label.
 			 * <p>
 			 * This prevents that when the mouse is over the hovered label but not moved, that the
 			 * tooltip keeps opened.
@@ -964,16 +962,16 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 
 	/**
 	 * Recreate text control with vertical scrollbar and limited height.
-	 * 
+	 *
 	 * @param parent
 	 * @param txtControl
 	 * @param text
 	 * @param widthHint
 	 */
-	private void setTextControlSize_RecreateWithVScroll(final Composite parent,
-														Text txtControl,
-														final String text,
-														final int widthHint) {
+	private void setTextControlSize_RecreateWithVScroll(	final Composite parent,
+																			Text txtControl,
+																			final String text,
+																			final int widthHint) {
 
 		txtControl.dispose();
 

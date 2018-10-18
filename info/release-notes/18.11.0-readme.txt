@@ -1,14 +1,18 @@
-Version 18.10.0                                                   ?. October 2018
+Version 18.11.0                                                   ?. November 2018
 
 
 New
 ===	
 
 * Swimming
-  - Import
-  - Reimport
-  - Tour chart
-
+  - Import swim data from .fit files
+  - Tour Book
+    - Reimport only swimming data
+  - Tour Chart
+    - Show swim graphs
+    - Force swim min/max values
+  - Tour Editor 
+    - Edit swim slices
 
 * Tour Segmenter
   Stride length computed from cadence/time/distance
@@ -31,3 +35,5 @@ Bugfix
   Right aligned tour marker label was not correctly displayed when there was not enough space to the right side
 
 
+
+ 

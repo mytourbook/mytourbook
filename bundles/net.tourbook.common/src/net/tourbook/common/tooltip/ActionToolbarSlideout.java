@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -39,30 +39,30 @@ import net.tourbook.common.UI;
  */
 public abstract class ActionToolbarSlideout extends ContributionItem implements IOpeningDialog {
 
-	private String			_dialogId			= getClass().getCanonicalName();
+	private String				_dialogId	= getClass().getCanonicalName();
 
 	private ToolBar			_toolBar;
-	private ToolItem		_actionToolItem;
+	private ToolItem			_actionToolItem;
 
 	private ToolbarSlideout	_toolbarSlideout;
 
 	/*
 	 * UI controls
 	 */
-	private Image			_imageEnabled;
-	private Image			_imageDisabled;
+	private Image		_imageEnabled;
+	private Image		_imageDisabled;
 
 	/**
 	 * When <code>true</code> then the action can be toggeled, default is <code>false</code>.
 	 */
-	protected boolean		isToggleAction;
+	protected boolean	isToggleAction;
 
 	/**
 	 * This tooltip will be displayed when the action is not selected.
 	 */
-	protected String		notSelectedTooltip	= UI.EMPTY_STRING;
+	protected String	notSelectedTooltip	= UI.EMPTY_STRING;
 
-	private boolean			_stateActionSelection;
+	private boolean	_stateActionSelection;
 
 	public ActionToolbarSlideout() {
 

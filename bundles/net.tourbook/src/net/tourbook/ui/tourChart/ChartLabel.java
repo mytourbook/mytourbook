@@ -126,7 +126,7 @@ public class ChartLabel {
 //				+ ("graphX=" + graphX + ", ")
 //				+ ("devXMarker=" + devXMarker + ", ")
 //				+ ("devYMarker=" + devYMarker + ", ")
-				+ ("markerLabel=" + markerLabel)
+				+ ("markerLabel=" + markerLabel) //$NON-NLS-1$
 				+ "]"; //$NON-NLS-1$
 	}
 

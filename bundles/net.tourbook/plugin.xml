@@ -315,6 +315,13 @@
 				class="net.tourbook.preferences.PrefPageAppearanceTourChart"
 				category="net.tourbook.preferences.PrefPageAppearance"
 			/>
+
+			<page
+				name="%Pref_Page_SwimmingColors"
+				id="net.tourbook.preferences.PrefPage_Appearance_Swimming"
+				class="net.tourbook.preferences.PrefPage_Appearance_Swimming"
+				category="net.tourbook.preferences.PrefPageAppearance"
+			/>
         
 			<page
 				name="%preference_page_tourEditor"

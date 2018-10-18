@@ -66,6 +66,7 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringToArrayConverter;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourPhoto;
@@ -79,6 +80,8 @@ import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourProviderAll;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
+import net.tourbook.ui.tourChart.GraphBackgroundSource;
+import net.tourbook.ui.tourChart.GraphBackgroundStyle;
 import net.tourbook.ui.tourChart.IValueLabelProvider;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
@@ -184,7 +187,7 @@ public class TourManager {
 
 // SET_FORMATTING_ON
 
-	private static final int[]                            _allGraphIDs        = new int[] {
+	private static final int[]										_allGraphIDs			= new int[] {
 
 			GRAPH_ALTITUDE,
 			GRAPH_SPEED,
@@ -209,52 +212,52 @@ public class TourManager {
 			GRAPH_TOUR_COMPARE
 	};
 
-	private final static IPreferenceStore                 _prefStore          = TourbookPlugin.getPrefStore();
+	private final static IPreferenceStore						_prefStore				= TourbookPlugin.getPrefStore();
 
-	private static TourManager                            _instance;
+	private static TourManager										_instance;
 
-	private final static StringBuilder                    _sbFormatter        = new StringBuilder();
-	private final static Formatter                        _formatter          = new Formatter(_sbFormatter);
+	private final static StringBuilder							_sbFormatter			= new StringBuilder();
+	private final static Formatter								_formatter				= new Formatter(_sbFormatter);
 
 	/**
 	 * contains the instance of the {@link TourDataEditorView} or <code>null</code> when this part is
 	 * not opened
 	 */
-	private static TourDataEditorView                     _tourDataEditorInstance;
+	private static TourDataEditorView							_tourDataEditorInstance;
 	//
-	private static LabelProviderMMSS                      _labelProviderMMSS  = new LabelProviderMMSS();
-	private static LabelProviderInt                       _labelProviderInt   = new LabelProviderInt();
+	private static LabelProviderMMSS								_labelProviderMMSS	= new LabelProviderMMSS();
+	private static LabelProviderInt								_labelProviderInt		= new LabelProviderInt();
 	//
-	private static TourData                               _multipleTourData;
-	private static ArrayList<TourData>                    _multipleTourData_List;
-	private static int                                    _multipleTourDataHash;
-	private static int                                    _multipleTourData_List_Hash;
-	private static long                                   _multipleTourData_List_Key;
+	private static TourData											_multipleTourData;
+	private static ArrayList<TourData>							_multipleTourData_List;
+	private static int												_multipleTourDataHash;
+	private static int												_multipleTourData_List_Hash;
+	private static long												_multipleTourData_List_Key;
 	//
-	private static final ListenerList<ITourEventListener> _tourEventListeners = new ListenerList<>(ListenerList.IDENTITY);
-	private static final ListenerList<ITourSaveListener>  _tourSaveListeners  = new ListenerList<>(ListenerList.IDENTITY);
+	private static final ListenerList<ITourEventListener>	_tourEventListeners	= new ListenerList<>(ListenerList.IDENTITY);
+	private static final ListenerList<ITourSaveListener>	_tourSaveListeners	= new ListenerList<>(ListenerList.IDENTITY);
 	//
-	private ComputeChartValue                             _computeAvg_Altimeter;
-	private ComputeChartValue                             _computeAvg_Altitude;
-	private ComputeChartValue                             _computeAvg_Cadence;
-	private ComputeChartValue                             _computeAvg_Gradient;
-	private ComputeChartValue                             _computeAvg_Pace;
-	private ComputeChartValue                             _computeAvg_Power;
-	private ComputeChartValue                             _computeAvg_Pulse;
-	private ComputeChartValue                             _computeAvg_Speed;
+	private ComputeChartValue										_computeAvg_Altimeter;
+	private ComputeChartValue										_computeAvg_Altitude;
+	private ComputeChartValue										_computeAvg_Cadence;
+	private ComputeChartValue										_computeAvg_Gradient;
+	private ComputeChartValue										_computeAvg_Pace;
+	private ComputeChartValue										_computeAvg_Power;
+	private ComputeChartValue										_computeAvg_Pulse;
+	private ComputeChartValue										_computeAvg_Speed;
 	//
-	private ComputeChartValue                             _computeAvg_RunDyn_StanceTime;
-	private ComputeChartValue                             _computeAvg_RunDyn_StanceTimeBalance;
-	private ComputeChartValue                             _computeAvg_RunDyn_StepLength;
-	private ComputeChartValue                             _computeAvg_RunDyn_VerticalOscillation;
-	private ComputeChartValue                             _computeAvg_RunDyn_VerticalRatio;
+	private ComputeChartValue										_computeAvg_RunDyn_StanceTime;
+	private ComputeChartValue										_computeAvg_RunDyn_StanceTimeBalance;
+	private ComputeChartValue										_computeAvg_RunDyn_StepLength;
+	private ComputeChartValue										_computeAvg_RunDyn_VerticalOscillation;
+	private ComputeChartValue										_computeAvg_RunDyn_VerticalRatio;
 	//
-	private final TourDataCache                           _tourDataCache;
+	private final TourDataCache									_tourDataCache;
 
 	/**
 	 * tour chart which shows the selected tour
 	 */
-	private TourChart                                     _activeTourChart;
+	private TourChart													_activeTourChart;
 
 	public static class LabelProviderInt implements IValueLabelProvider {
 
@@ -346,7 +349,7 @@ public class TourManager {
 	 */
 	public static boolean adjustTemperature(final TourData tourData, final int durationTime) {
 
-		final int[]   timeSerie        = tourData.timeSerie;
+		final int[] timeSerie = tourData.timeSerie;
 		final float[] temperatureSerie = tourData.temperatureSerie;
 
 		// ensure data are available
@@ -540,9 +543,9 @@ public class TourManager {
 
 		final float[] distanceSerie = new float[latSerie.length];
 
-		double        distance      = 0;
-		double        latStart      = latSerie[0];
-		double        lonStart      = lonSerie[0];
+		double distance = 0;
+		double latStart = latSerie[0];
+		double lonStart = lonSerie[0];
 
 		// compute distance for every time slice
 		for (int serieIndex = 1; serieIndex < latSerie.length; serieIndex++) {
@@ -590,7 +593,7 @@ public class TourManager {
 	public static float computeTourSpeed(final TourData tourData, final int startIndex, final int endIndex) {
 
 		final float[] distanceSerie = tourData.getMetricDistanceSerie();
-		final int[]   timeSerie     = tourData.timeSerie;
+		final int[] timeSerie = tourData.timeSerie;
 
 		if (timeSerie == null
 				|| timeSerie.length == 0
@@ -600,7 +603,7 @@ public class TourManager {
 		}
 
 		final float distance = distanceSerie[endIndex] - distanceSerie[startIndex];
-		final int   time     = Math.max(                                                                 //
+		final int time = Math.max( //
 				0,
 				timeSerie[endIndex] - timeSerie[startIndex] - tourData.getBreakTime(startIndex, endIndex));
 
@@ -619,17 +622,11 @@ public class TourManager {
 		/*
 		 * convert graph ids from the preferences into visible graphs in the chart panel configuration
 		 */
-		final String[] prefGraphIds = StringToArrayConverter.convertStringToArray(//
-				_prefStore.getString(ITourbookPreferences.GRAPH_VISIBLE));
+		final String[] prefGraphIds = StringToArrayConverter.convertStringToArray(_prefStore.getString(ITourbookPreferences.GRAPH_VISIBLE));
 
 		for (final String prefGraphId : prefGraphIds) {
 			tcc.addVisibleGraph(Integer.parseInt(prefGraphId));
 		}
-
-		tcc.isHrZoneDisplayed = _prefStore.getBoolean(//
-				ITourbookPreferences.GRAPH_IS_HR_ZONE_BACKGROUND_VISIBLE);
-
-		tcc.hrZoneStyle = _prefStore.getString(ITourbookPreferences.GRAPH_HR_ZONE_STYLE);
 
 		// set the unit which is shown on the x-axis
 		final boolean isShowTime = _prefStore.getString(ITourbookPreferences.GRAPH_X_AXIS).equals(X_AXIS_TIME);
@@ -665,7 +662,7 @@ public class TourManager {
 			return _multipleTourData;
 		}
 
-		final ArrayList<TourData> allMultipleTours       = new ArrayList<>();
+		final ArrayList<TourData> allMultipleTours = new ArrayList<>();
 		final ArrayList<TourData> validatedMultipleTours = new ArrayList<>();
 
 		loadTourData(tourIds, allMultipleTours, false);
@@ -678,7 +675,7 @@ public class TourManager {
 			}
 		});
 
-		int numTimeSlices     = 0;
+		int numTimeSlices = 0;
 		int numSwimTimeSlices = 0;
 
 		// get tours which have data series
@@ -704,112 +701,112 @@ public class TourManager {
 
 		multiTourData.setupMultipleTour();
 
-		final int     numTours         = validatedMultipleTours.size();
+		final int numTours = validatedMultipleTours.size();
 
 		final float[] cadenceSerieData = new float[numTimeSlices];
 		multiTourData.setCadenceSerie(cadenceSerieData);
 
-		final int[]                 toTimeSerie                = multiTourData.timeSerie = new int[numTimeSlices];
-		final float[]               toAltitudeSerie            = multiTourData.altitudeSerie = new float[numTimeSlices];
-		final float[]               toCadenceSerie             = cadenceSerieData;
-		final float[]               toDistanceSerie            = multiTourData.distanceSerie = new float[numTimeSlices];
-		final long[]                toGearSerie                = multiTourData.gearSerie = new long[numTimeSlices];
-		final double[]              toLatitudeSerie            = multiTourData.latitudeSerie = new double[numTimeSlices];
-		final double[]              toLongitudeSerie           = multiTourData.longitudeSerie = new double[numTimeSlices];
-		final float[]               toPowerSerie               = new float[numTimeSlices];
-		final float[]               toPulseSerie               = multiTourData.pulseSerie = new float[numTimeSlices];
-		final float[]               toTemperaturSerie          = multiTourData.temperatureSerie = new float[numTimeSlices];
+		final int[] toTimeSerie = multiTourData.timeSerie = new int[numTimeSlices];
+		final float[] toAltitudeSerie = multiTourData.altitudeSerie = new float[numTimeSlices];
+		final float[] toCadenceSerie = cadenceSerieData;
+		final float[] toDistanceSerie = multiTourData.distanceSerie = new float[numTimeSlices];
+		final long[] toGearSerie = multiTourData.gearSerie = new long[numTimeSlices];
+		final double[] toLatitudeSerie = multiTourData.latitudeSerie = new double[numTimeSlices];
+		final double[] toLongitudeSerie = multiTourData.longitudeSerie = new double[numTimeSlices];
+		final float[] toPowerSerie = new float[numTimeSlices];
+		final float[] toPulseSerie = multiTourData.pulseSerie = new float[numTimeSlices];
+		final float[] toTemperaturSerie = multiTourData.temperatureSerie = new float[numTimeSlices];
 
-		final short[]               toRunDyn_StanceTime        = multiTourData.runDyn_StanceTime = new short[numTimeSlices];
-		final short[]               toRunDyn_StanceTimeBalance = multiTourData.runDyn_StanceTimeBalance = new short[numTimeSlices];
-		final short[]               toRunDyn_StepLength        = multiTourData.runDyn_StepLength = new short[numTimeSlices];
-		final short[]               toRunDyn_VertOscillation   = multiTourData.runDyn_VerticalOscillation = new short[numTimeSlices];
-		final short[]               toRunDyn_VertRatio         = multiTourData.runDyn_VerticalRatio = new short[numTimeSlices];
+		final short[] toRunDyn_StanceTime = multiTourData.runDyn_StanceTime = new short[numTimeSlices];
+		final short[] toRunDyn_StanceTimeBalance = multiTourData.runDyn_StanceTimeBalance = new short[numTimeSlices];
+		final short[] toRunDyn_StepLength = multiTourData.runDyn_StepLength = new short[numTimeSlices];
+		final short[] toRunDyn_VertOscillation = multiTourData.runDyn_VerticalOscillation = new short[numTimeSlices];
+		final short[] toRunDyn_VertRatio = multiTourData.runDyn_VerticalRatio = new short[numTimeSlices];
 
-		final short[]               toSwim_ActivityType        = multiTourData.swim_ActivityType = new short[numSwimTimeSlices];
-		final short[]               toSwim_Cadence             = multiTourData.swim_Cadence = new short[numSwimTimeSlices];
-		final short[]               toSwim_Strokes             = multiTourData.swim_Strokes = new short[numSwimTimeSlices];
-		final short[]               toSwim_StrokeStyle         = multiTourData.swim_StrokeStyle = new short[numSwimTimeSlices];
-		final int[]                 toSwim_Time                = multiTourData.swim_Time = new int[numSwimTimeSlices];
+		final short[] toswim_LengthType = multiTourData.swim_LengthType = new short[numSwimTimeSlices];
+		final short[] toSwim_Cadence = multiTourData.swim_Cadence = new short[numSwimTimeSlices];
+		final short[] toSwim_Strokes = multiTourData.swim_Strokes = new short[numSwimTimeSlices];
+		final short[] toSwim_StrokeStyle = multiTourData.swim_StrokeStyle = new short[numSwimTimeSlices];
+		final int[] toSwim_Time = multiTourData.swim_Time = new int[numSwimTimeSlices];
 
-		final Long[]                allTourIds                 = multiTourData.multipleTourIds = new Long[numTours];
-		final int[]                 allStartIndex              = multiTourData.multipleTourStartIndex = new int[numTours];
-		final long[]                allStartTime               = multiTourData.multipleTourStartTime = new long[numTours];
-		final String[]              allTourTitle               = multiTourData.multipleTourTitles = new String[numTours];
-		final ArrayList<TourMarker> allTourMarker              = multiTourData.multiTourMarkers = new ArrayList<>();
-		final int[]                 allTourMarkerNumbers       = multiTourData.multipleNumberOfMarkers = new int[numTours];
-		final int[]                 allSwimStartIndex          = multiTourData.multipleSwimStartIndex = new int[numTours];
+		final Long[] allTourIds = multiTourData.multipleTourIds = new Long[numTours];
+		final int[] allStartIndex = multiTourData.multipleTourStartIndex = new int[numTours];
+		final long[] allStartTime = multiTourData.multipleTourStartTime = new long[numTours];
+		final String[] allTourTitle = multiTourData.multipleTourTitles = new String[numTours];
+		final ArrayList<TourMarker> allTourMarker = multiTourData.multiTourMarkers = new ArrayList<>();
+		final int[] allTourMarkerNumbers = multiTourData.multipleNumberOfMarkers = new int[numTours];
+		final int[] allSwimStartIndex = multiTourData.multipleSwimStartIndex = new int[numTours];
 
-		final HashSet<TourPhoto>    allTourPhoto               = new HashSet<>();
+		final HashSet<TourPhoto> allTourPhoto = new HashSet<>();
 
 		// fixing IndexOutOfBoundsException: Index: 0, Size: 0
 		if (numTours == 0) {
 			return multiTourData;
 		}
 
-		int     toStartIndex                 = 0;
-		int     toSwimStartIndex             = 0;
-		int     tourRecordingTime            = 0;
-		float   tourDistance                 = 0;
-		float   tourAltUp                    = 0;
-		float   tourAltDown                  = 0;
+		int toStartIndex = 0;
+		int toSwimStartIndex = 0;
+		int tourRecordingTime = 0;
+		float tourDistance = 0;
+		float tourAltUp = 0;
+		float tourAltDown = 0;
 
-		boolean isAltitudeSerie              = false;
-		boolean isCadenceSerie               = false;
-		boolean isDistanceSerie              = false;
-		boolean isGearSerie                  = false;
-		boolean isLatLonSerie                = false;
-		boolean isPowerSerie                 = false;
-		boolean isPulseSerie                 = false;
-		boolean isTempSerie                  = false;
+		boolean isAltitudeSerie = false;
+		boolean isCadenceSerie = false;
+		boolean isDistanceSerie = false;
+		boolean isGearSerie = false;
+		boolean isLatLonSerie = false;
+		boolean isPowerSerie = false;
+		boolean isPulseSerie = false;
+		boolean isTempSerie = false;
 
-		boolean isRunDyn_StanceTime          = false;
-		boolean isRunDyn_StanceTimeBalance   = false;
-		boolean isRunDyn_StepLength          = false;
+		boolean isRunDyn_StanceTime = false;
+		boolean isRunDyn_StanceTimeBalance = false;
+		boolean isRunDyn_StepLength = false;
 		boolean isRunDyn_VerticalOscillation = false;
-		boolean isRunDyn_VerticalRatio       = false;
+		boolean isRunDyn_VerticalRatio = false;
 
-		boolean isSwim_ActivityType          = false;
-		boolean isSwim_Cadence               = false;
-		boolean isSwim_Strokes               = false;
-		boolean isSwim_StrokeStyle           = false;
-		boolean isSwim_Time                  = false;
+		boolean isswim_LengthType = false;
+		boolean isSwim_Cadence = false;
+		boolean isSwim_Strokes = false;
+		boolean isSwim_StrokeStyle = false;
+		boolean isSwim_Time = false;
 
-		boolean isFirstTour                  = true;
+		boolean isFirstTour = true;
 
-		boolean isCadenceRpm                 = false;
-		boolean isCadenceSpm                 = false;
+		boolean isCadenceRpm = false;
+		boolean isCadenceSpm = false;
 
 		// loop: all tours
 		for (int tourIndex = 0; tourIndex < numTours; tourIndex++) {
 
-			final TourData fromTourData                 = validatedMultipleTours.get(tourIndex);
+			final TourData fromTourData = validatedMultipleTours.get(tourIndex);
 
-			final int[]    fromTimeSerie                = fromTourData.timeSerie;
+			final int[] fromTimeSerie = fromTourData.timeSerie;
 
-			final float[]  fromAltitudeSerie            = fromTourData.altitudeSerie;
-			final float[]  fromCadenceSerie             = fromTourData.getCadenceSerieWithMuliplier();
-			final float[]  fromDistanceSerie            = fromTourData.distanceSerie;
-			final long[]   fromGearSerie                = fromTourData.gearSerie;
-			final double[] fromLatitudeSerie            = fromTourData.latitudeSerie;
-			final double[] fromLongitudeSerie           = fromTourData.longitudeSerie;
-			final float[]  fromPulseSerie               = fromTourData.pulseSerie;
-			final float[]  fromTemperaturSerie          = fromTourData.temperatureSerie;
+			final float[] fromAltitudeSerie = fromTourData.altitudeSerie;
+			final float[] fromCadenceSerie = fromTourData.getCadenceSerieWithMuliplier();
+			final float[] fromDistanceSerie = fromTourData.distanceSerie;
+			final long[] fromGearSerie = fromTourData.gearSerie;
+			final double[] fromLatitudeSerie = fromTourData.latitudeSerie;
+			final double[] fromLongitudeSerie = fromTourData.longitudeSerie;
+			final float[] fromPulseSerie = fromTourData.pulseSerie;
+			final float[] fromTemperaturSerie = fromTourData.temperatureSerie;
 
-			final short[]  fromRunDyn_StanceTime        = fromTourData.runDyn_StanceTime;
-			final short[]  fromRunDyn_StanceTimeBalance = fromTourData.runDyn_StanceTimeBalance;
-			final short[]  fromRunDyn_StepLength        = fromTourData.runDyn_StepLength;
-			final short[]  fromRunDyn_VertOscillation   = fromTourData.runDyn_VerticalOscillation;
-			final short[]  fromRunDyn_VertRatio         = fromTourData.runDyn_VerticalRatio;
+			final short[] fromRunDyn_StanceTime = fromTourData.runDyn_StanceTime;
+			final short[] fromRunDyn_StanceTimeBalance = fromTourData.runDyn_StanceTimeBalance;
+			final short[] fromRunDyn_StepLength = fromTourData.runDyn_StepLength;
+			final short[] fromRunDyn_VertOscillation = fromTourData.runDyn_VerticalOscillation;
+			final short[] fromRunDyn_VertRatio = fromTourData.runDyn_VerticalRatio;
 
-			final short[]  fromSwim_ActivityType        = fromTourData.swim_ActivityType;
-			final short[]  fromSwim_Cadence             = fromTourData.swim_Cadence;
-			final short[]  fromSwim_Strokes             = fromTourData.swim_Strokes;
-			final short[]  fromSwim_StrokeStyle         = fromTourData.swim_StrokeStyle;
-			final int[]    fromSwim_Time                = fromTourData.swim_Time;
+			final short[] fromswim_LengthType = fromTourData.swim_LengthType;
+			final short[] fromSwim_Cadence = fromTourData.swim_Cadence;
+			final short[] fromSwim_Strokes = fromTourData.swim_Strokes;
+			final short[] fromSwim_StrokeStyle = fromTourData.swim_StrokeStyle;
+			final int[] fromSwim_Time = fromTourData.swim_Time;
 
-			final int      fromSerieLength              = fromTimeSerie.length;
-			final int      fromSwimSerieLength          = fromSwim_Time == null ? 0 : fromSwim_Time.length;
+			final int fromSerieLength = fromTimeSerie.length;
+			final int fromSwimSerieLength = fromSwim_Time == null ? 0 : fromSwim_Time.length;
 
 			/*
 			 * Copy time serie
@@ -923,9 +920,9 @@ public class TourManager {
 			/*
 			 * Swimming
 			 */
-			if (fromSwim_ActivityType != null) {
-				isSwim_ActivityType = true;
-				System.arraycopy(fromSwim_ActivityType, 0, toSwim_ActivityType, toSwimStartIndex, fromSwimSerieLength);
+			if (fromswim_LengthType != null) {
+				isswim_LengthType = true;
+				System.arraycopy(fromswim_LengthType, 0, toswim_LengthType, toSwimStartIndex, fromSwimSerieLength);
 			}
 			if (fromSwim_Cadence != null) {
 				isSwim_Cadence = true;
@@ -1036,8 +1033,8 @@ public class TourManager {
 		/*
 		 * Swimming
 		 */
-		if (isSwim_ActivityType == false) {
-			multiTourData.clear_Swim_ActivityType();
+		if (isswim_LengthType == false) {
+			multiTourData.clear_swim_LengthType();
 		}
 		if (isSwim_Cadence == false) {
 			multiTourData.clear_Swim_Cadence();
@@ -1055,7 +1052,7 @@ public class TourManager {
 		setupMultiTourMarker(multiTourData);
 		multiTourData.setTourPhotos(allTourPhoto, null);
 
-		final TourData      firstTour     = validatedMultipleTours.get(0);
+		final TourData firstTour = validatedMultipleTours.get(0);
 		final ZonedDateTime tourStartTime = TimeTools.getZonedDateTime(firstTour.getTourStartTimeMS());
 
 		multiTourData.setTourStartTime(tourStartTime);
@@ -1087,26 +1084,26 @@ public class TourManager {
 	 */
 	private static void createStatisticSegments(final TourData tourData, final ChartDataModel chartDataModel) {
 
-		final ChartDataXSerie xData   = chartDataModel.getXData();
-		final double[]        xValues = xData.getHighValuesDouble()[0];
+		final ChartDataXSerie xData = chartDataModel.getXData();
+		final double[] xValues = xData.getHighValuesDouble()[0];
 
 		if (xValues == null) {
 			return;
 		}
 
-		final int[]    multipleTourStartIndex = tourData.multipleTourStartIndex;
-		final int[]    timeSerie              = tourData.timeSerie;
+		final int[] multipleTourStartIndex = tourData.multipleTourStartIndex;
+		final int[] timeSerie = tourData.timeSerie;
 
-		final int      numberOfTours          = multipleTourStartIndex.length;
+		final int numberOfTours = multipleTourStartIndex.length;
 
-		final double[] segmentStartValue      = new double[numberOfTours];
-		final double[] segmentEndValue        = new double[numberOfTours];
+		final double[] segmentStartValue = new double[numberOfTours];
+		final double[] segmentEndValue = new double[numberOfTours];
 
 		for (int tourIndex = 0; tourIndex < numberOfTours; tourIndex++) {
 
 			final int tourStartIndex = multipleTourStartIndex[tourIndex];
 
-			int       tourEndIndex;
+			int tourEndIndex;
 
 			if (tourIndex == numberOfTours - 1) {
 
@@ -1182,7 +1179,7 @@ public class TourManager {
 		listener.tourChanged(part, tourEventId, customData);
 	}
 
-	public static void fireEventWithCustomData(  final TourEventId tourEventId,
+	public static void fireEventWithCustomData(	final TourEventId tourEventId,
 																final Object customData,
 																final IWorkbenchPart part) {
 
@@ -1219,8 +1216,8 @@ public class TourManager {
 					/*
 					 * check if the tour data in the editor is the same
 					 */
-					final TourChart tourChart         = ((TourEditor) activeEditor).getTourChart();
-					final TourData  tourChartTourData = tourChart.getTourData();
+					final TourChart tourChart = ((TourEditor) activeEditor).getTourChart();
+					final TourData tourChartTourData = tourChart.getTourData();
 					if (tourChartTourData == tourData) {
 
 						try {
@@ -1248,8 +1245,8 @@ public class TourManager {
 						/*
 						 * check if the tour data in the tour chart is the same
 						 */
-						final TourChart tourChart         = tourChartView.getTourChart();
-						final TourData  tourChartTourData = tourChart.getTourData();
+						final TourChart tourChart = tourChartView.getTourChart();
+						final TourData tourChartTourData = tourChart.getTourData();
 						if (tourChartTourData == tourData) {
 							try {
 								checkTourData(tourData, tourChartTourData);
@@ -1291,7 +1288,7 @@ public class TourManager {
 		// get COLOR from common pref store
 		final IPreferenceStore commonPrefStore = CommonActivator.getPrefStore();
 
-		final RGB              color           = PreferenceConverter.getColor(commonPrefStore, prefGraphName + colorProfileName);
+		final RGB color = PreferenceConverter.getColor(commonPrefStore, prefGraphName + colorProfileName);
 
 		return color;
 	}
@@ -1345,7 +1342,7 @@ public class TourManager {
 					final IViewPart view = viewRef.getView(false);
 					if (view instanceof ITourProvider) {
 
-						final ITourProvider       tourProvider  = (ITourProvider) view;
+						final ITourProvider tourProvider = (ITourProvider) view;
 						final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
 
 						if (selectedTours != null) {
@@ -1392,7 +1389,7 @@ public class TourManager {
 
 	public static ISelection getSelectedToursSelection() {
 
-		ISelection                selection     = null;
+		ISelection selection = null;
 
 		final ArrayList<TourData> selectedTours = getSelectedTours();
 
@@ -1539,7 +1536,7 @@ public class TourManager {
 		}
 
 		final String firstTour = multipleTourTitles[0];
-		final String lastTour  = multipleTourTitles[multipleTourTitles.length - 1];
+		final String lastTour = multipleTourTitles[multipleTourTitles.length - 1];
 
 		return firstTour + UI.DASH_WITH_SPACE + lastTour;
 	}
@@ -1560,7 +1557,7 @@ public class TourManager {
 		// check if coordinates are available
 
 		final double[] longitudeSerie = tourData.longitudeSerie;
-		final double[] latitudeSerie  = tourData.latitudeSerie;
+		final double[] latitudeSerie = tourData.latitudeSerie;
 
 		if ((longitudeSerie == null)
 				|| (longitudeSerie.length == 0)
@@ -1622,7 +1619,7 @@ public class TourManager {
 	 *           will be returned.
 	 * @return Returns a unique key for all {@link TourData}.
 	 */
-	public static long loadTourData( final ArrayList<Long> allTourIds,
+	public static long loadTourData(	final ArrayList<Long> allTourIds,
 												final ArrayList<TourData> allTourData,
 												final boolean isCheckLatLon) {
 
@@ -1649,8 +1646,8 @@ public class TourManager {
 					public void run(final IProgressMonitor monitor)
 							throws InvocationTargetException, InterruptedException {
 
-						int       loadCounter = 0;
-						final int idSize      = allTourIds.size();
+						int loadCounter = 0;
+						final int idSize = allTourIds.size();
 
 						monitor.beginTask(Messages.Tour_Data_LoadTourData_Monitor, idSize);
 
@@ -1731,9 +1728,9 @@ public class TourManager {
 
 					final IWorkbenchWindow activeWorkbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 
-					final IWorkbenchPage   page                  = activeWorkbenchWindow.getActivePage();
+					final IWorkbenchPage page = activeWorkbenchWindow.getActivePage();
 
-					final IViewPart        viewPart              = page.showView(TourDataEditorView.ID, null, IWorkbenchPage.VIEW_VISIBLE);
+					final IViewPart viewPart = page.showView(TourDataEditorView.ID, null, IWorkbenchPage.VIEW_VISIBLE);
 
 					if (viewPart instanceof TourDataEditorView) {
 
@@ -1784,10 +1781,10 @@ public class TourManager {
 			removeTimeSlices_TimeAndDistance(tourData, firstIndex, lastIndex);
 		}
 
-		short[]  shortSerie;
-		int[]    intSerie;
-		long[]   longSerie;
-		float[]  floatSerie;
+		short[] shortSerie;
+		int[] intSerie;
+		long[] longSerie;
+		float[] floatSerie;
 		double[] doubleSerie;
 
 		floatSerie = tourData.altitudeSerie;
@@ -1897,10 +1894,10 @@ public class TourManager {
 																	final int firstIndex,
 																	final int lastIndex) {
 
-		final int      oldSerieLength = dataSerie.length;
-		final int      newSerieLength = oldSerieLength - (lastIndex - firstIndex + 1);
+		final int oldSerieLength = dataSerie.length;
+		final int newSerieLength = oldSerieLength - (lastIndex - firstIndex + 1);
 
-		final double[] newDataSerie   = new double[newSerieLength];
+		final double[] newDataSerie = new double[newSerieLength];
 
 		if (firstIndex == 0) {
 
@@ -1929,10 +1926,10 @@ public class TourManager {
 
 	private static float[] removeTimeSlices_Float(final float[] dataSerie, final int firstIndex, final int lastIndex) {
 
-		final int     oldSerieLength = dataSerie.length;
-		final int     newSerieLength = oldSerieLength - (lastIndex - firstIndex + 1);
+		final int oldSerieLength = dataSerie.length;
+		final int newSerieLength = oldSerieLength - (lastIndex - firstIndex + 1);
 
-		final float[] newDataSerie   = new float[newSerieLength];
+		final float[] newDataSerie = new float[newSerieLength];
 
 		if (firstIndex == 0) {
 
@@ -1961,10 +1958,10 @@ public class TourManager {
 
 	private static int[] removeTimeSlices_Integer(final int[] oldDataSerie, final int firstIndex, final int lastIndex) {
 
-		final int   oldSerieLength = oldDataSerie.length;
-		final int   newSerieLength = oldSerieLength - (lastIndex - firstIndex + 1);
+		final int oldSerieLength = oldDataSerie.length;
+		final int newSerieLength = oldSerieLength - (lastIndex - firstIndex + 1);
 
-		final int[] newDataSerie   = new int[newSerieLength];
+		final int[] newDataSerie = new int[newSerieLength];
 
 		if (firstIndex == 0) {
 
@@ -1993,10 +1990,10 @@ public class TourManager {
 
 	private static long[] removeTimeSlices_Long(final long[] dataSerie, final int firstIndex, final int lastIndex) {
 
-		final int    oldSerieLength = dataSerie.length;
-		final int    newSerieLength = oldSerieLength - (lastIndex - firstIndex + 1);
+		final int oldSerieLength = dataSerie.length;
+		final int newSerieLength = oldSerieLength - (lastIndex - firstIndex + 1);
 
-		final long[] newDataSerie   = new long[newSerieLength];
+		final long[] newDataSerie = new long[newSerieLength];
 
 		if (firstIndex == 0) {
 
@@ -2025,10 +2022,10 @@ public class TourManager {
 
 	private static short[] removeTimeSlices_Short(final short[] oldDataSerie, final int firstIndex, final int lastIndex) {
 
-		final int     oldSerieLength = oldDataSerie.length;
-		final int     newSerieLength = oldSerieLength - (lastIndex - firstIndex + 1);
+		final int oldSerieLength = oldDataSerie.length;
+		final int newSerieLength = oldSerieLength - (lastIndex - firstIndex + 1);
 
-		final short[] newDataSerie   = new short[newSerieLength];
+		final short[] newDataSerie = new short[newSerieLength];
 
 		if (firstIndex == 0) {
 
@@ -2055,11 +2052,11 @@ public class TourManager {
 		return newDataSerie;
 	}
 
-	private static void removeTimeSlices_TimeAndDistance( final TourData _tourData,
+	private static void removeTimeSlices_TimeAndDistance(	final TourData _tourData,
 																			final int firstIndex,
 																			final int lastIndex) {
 
-		final int[]   timeSerie = _tourData.timeSerie;
+		final int[] timeSerie = _tourData.timeSerie;
 		final float[] distSerie = _tourData.distanceSerie;
 
 		if ((timeSerie == null) || (timeSerie.length == 0)) {
@@ -2074,7 +2071,7 @@ public class TourManager {
 		}
 
 		final int timeDiff = timeSerie[lastIndex + 1] - timeSerie[firstIndex];
-		float     distDiff = -1;
+		float distDiff = -1;
 
 		if (distSerie != null) {
 			distDiff = distSerie[lastIndex + 1] - distSerie[firstIndex];
@@ -2100,7 +2097,7 @@ public class TourManager {
 	 * @param lastSerieIndex
 	 * @param isRemoveTime
 	 */
-	private static void removeTourMarkers( final TourData tourData,
+	private static void removeTourMarkers(	final TourData tourData,
 														final int firstSerieIndex,
 														final int lastSerieIndex,
 														final boolean isRemoveTime) {
@@ -2127,11 +2124,11 @@ public class TourManager {
 		/*
 		 * update marker index in the remaining markers
 		 */
-		final int     diffSerieIndex  = lastSerieIndex - firstSerieIndex + 1;
-		final long    tourStartTimeMS = tourData.getTourStartTimeMS();
+		final int diffSerieIndex = lastSerieIndex - firstSerieIndex + 1;
+		final long tourStartTimeMS = tourData.getTourStartTimeMS();
 
-		final int[]   timeSerie       = tourData.timeSerie;
-		final float[] distSerie       = tourData.distanceSerie;
+		final int[] timeSerie = tourData.timeSerie;
+		final float[] distSerie = tourData.distanceSerie;
 
 		for (final TourMarker tourMarker : allTourMarkers) {
 
@@ -2223,7 +2220,7 @@ public class TourManager {
 	 *           when <code>true</code>, a notification is fired when the data are saved
 	 * @return a list with all persisted {@link TourData}
 	 */
-	private static ArrayList<TourData> saveModifiedTours( final ArrayList<TourData> modifiedTours,
+	private static ArrayList<TourData> saveModifiedTours(	final ArrayList<TourData> modifiedTours,
 																			final boolean canFireNotification) {
 
 		// reset multiple tour data cache
@@ -2237,7 +2234,7 @@ public class TourManager {
 		}
 
 		final TourData[] tourDataEditorSavedTour = { null };
-		final boolean[]  doFireChangeEvent       = { false };
+		final boolean[] doFireChangeEvent = { false };
 
 		if (modifiedTours.size() == 1) {
 
@@ -2254,8 +2251,8 @@ public class TourManager {
 					public void run(final IProgressMonitor monitor)
 							throws InvocationTargetException, InterruptedException {
 
-						int       saveCounter = 0;
-						final int tourSize    = modifiedTours.size();
+						int saveCounter = 0;
+						final int tourSize = modifiedTours.size();
 
 						monitor.beginTask(Messages.Tour_Data_SaveTour_Monitor, tourSize);
 
@@ -2296,12 +2293,12 @@ public class TourManager {
 		return savedTours;
 	}
 
-	private static void saveModifiedTours_OneTour(  final ArrayList<TourData> savedTours,
+	private static void saveModifiedTours_OneTour(	final ArrayList<TourData> savedTours,
 																	final TourData[] tourDataEditorSavedTour,
 																	final boolean[] doFireChangeEvent,
 																	final TourData tourData) {
-		boolean                  doSaveTour     = false;
-		TourData                 savedTour      = null;
+		boolean doSaveTour = false;
+		TourData savedTour = null;
 
 		final TourDataEditorView tourDataEditor = getTourDataEditor();
 		if (tourDataEditor != null) {
@@ -2429,19 +2426,19 @@ public class TourManager {
 		// get COLOR from common pref store
 		final IPreferenceStore commonPrefStore = CommonActivator.getPrefStore();
 
-		final RGB              prefLineColor   = PreferenceConverter.getColor(   //
+		final RGB prefLineColor = PreferenceConverter.getColor( //
 				commonPrefStore,
 				prefGraphName + GraphColorManager.PREF_COLOR_LINE);
 
-		final RGB              prefTextColor   = PreferenceConverter.getColor(   //
+		final RGB prefTextColor = PreferenceConverter.getColor( //
 				commonPrefStore,
 				prefGraphName + GraphColorManager.PREF_COLOR_TEXT);
 
-		final RGB              prefDarkColor   = PreferenceConverter.getColor(   //
+		final RGB prefDarkColor = PreferenceConverter.getColor( //
 				commonPrefStore,
 				prefGraphName + GraphColorManager.PREF_COLOR_DARK);
 
-		final RGB              prefBrightColor = PreferenceConverter.getColor(   //
+		final RGB prefBrightColor = PreferenceConverter.getColor( //
 				commonPrefStore,
 				prefGraphName + GraphColorManager.PREF_COLOR_BRIGHT);
 
@@ -2467,7 +2464,7 @@ public class TourManager {
 
 	private static void setupMultiTourMarker(final TourData tourData) {
 
-		final int[] multipleStartTimeIndex  = tourData.multipleTourStartIndex;
+		final int[] multipleStartTimeIndex = tourData.multipleTourStartIndex;
 		final int[] multipleNumberOfMarkers = tourData.multipleNumberOfMarkers;
 
 		// fixing ArrayIndexOutOfBoundsException: 0
@@ -2475,9 +2472,9 @@ public class TourManager {
 			return;
 		}
 
-		int tourIndex            = 0;
+		int tourIndex = 0;
 		int numberOfMultiMarkers = 0;
-		int tourSerieIndex       = 0;
+		int tourSerieIndex = 0;
 
 		// setup first multiple tour
 		tourSerieIndex = multipleStartTimeIndex[tourIndex];
@@ -2500,8 +2497,8 @@ public class TourManager {
 				}
 			}
 
-			final TourMarker tourMarker      = allTourMarkers.get(markerIndex);
-			final int        xAxisSerieIndex = tourSerieIndex + tourMarker.getSerieIndex();
+			final TourMarker tourMarker = allTourMarkers.get(markerIndex);
+			final int xAxisSerieIndex = tourSerieIndex + tourMarker.getSerieIndex();
 
 			tourMarker.setMultiTourSerieIndex(xAxisSerieIndex);
 		}
@@ -2549,13 +2546,13 @@ public class TourManager {
 	 */
 	private void computeValueClipping(final TourData tourData) {
 
-		final int[]    timeSerie      = tourData.timeSerie;
+		final int[] timeSerie = tourData.timeSerie;
 
-		final float[]  gradientSerie  = tourData.gradientSerie;
-		final float[]  speedSerie     = tourData.getSpeedSerie();
-		final float[]  paceSerie      = tourData.getPaceSerie();
-		final float[]  altimeterSerie = tourData.getAltimeterSerie();
-		final double[] distanceSerie  = tourData.getDistanceSerieDouble();
+		final float[] gradientSerie = tourData.gradientSerie;
+		final float[] speedSerie = tourData.getSpeedSerie();
+		final float[] paceSerie = tourData.getPaceSerie();
+		final float[] altimeterSerie = tourData.getAltimeterSerie();
+		final double[] distanceSerie = tourData.getDistanceSerieDouble();
 
 		if ((timeSerie == null || timeSerie.length == 0)
 				|| speedSerie == null
@@ -2586,8 +2583,8 @@ public class TourManager {
 
 		paceClipping /= 10;
 
-		final int serieLength        = timeSerie.length;
-		final int serieLengthLast    = serieLength - 1;
+		final int serieLength = timeSerie.length;
+		final int serieLengthLast = serieLength - 1;
 
 		final int deviceTimeInterval = tourData.getDeviceTimeInterval();
 		if (deviceTimeInterval > 0) {
@@ -2601,7 +2598,7 @@ public class TourManager {
 			for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 
 				// adjust index to the array size
-				int       sliceIndex    = serieIndex + slices;
+				int sliceIndex = serieIndex + slices;
 				final int sliceIndexMax = ((0 >= sliceIndex) ? 0 : sliceIndex);
 				sliceIndex = (sliceIndexMax <= serieLengthLast) ? sliceIndexMax : serieLengthLast;
 
@@ -2629,10 +2626,10 @@ public class TourManager {
 
 				// adjust index to the array size
 				final int serieIndexPrev = serieIndex - 1;
-				int       lowIndex       = ((0 >= serieIndexPrev) ? 0 : serieIndexPrev);
+				int lowIndex = ((0 >= serieIndexPrev) ? 0 : serieIndexPrev);
 
-				int       timeDiff       = timeSerie[serieIndex] - timeSerie[lowIndex];
-				double    distDiff       = 0;
+				int timeDiff = timeSerie[serieIndex] - timeSerie[lowIndex];
+				double distDiff = 0;
 
 				while (timeDiff < clippingTime) {
 
@@ -2680,16 +2677,16 @@ public class TourManager {
 					return 0;
 				}
 
-				final double[] timeValues     = ((ChartDataXSerie) (chartModel.getCustomData(CUSTOM_DATA_TIME))).getHighValuesDouble()[0];
+				final double[] timeValues = ((ChartDataXSerie) (chartModel.getCustomData(CUSTOM_DATA_TIME))).getHighValuesDouble()[0];
 				final double[] distanceValues = ((ChartDataXSerie) (customDataDistance)).getHighValuesDouble()[0];
 				if (timeValues == null) {
 					return 0;
 				}
 
-				final double leftDistance  = distanceValues[valueIndexLeft];
+				final double leftDistance = distanceValues[valueIndexLeft];
 				final double rightDistance = distanceValues[valueIndexRight];
-				final double leftTime      = timeValues[valueIndexLeft];
-				final double rightTime     = timeValues[valueIndexRight];
+				final double leftTime = timeValues[valueIndexLeft];
+				final double rightTime = timeValues[valueIndexRight];
 
 				if (leftTime == rightTime) {
 
@@ -2704,7 +2701,7 @@ public class TourManager {
 					}
 
 					final double distance = rightDistance - leftDistance;
-					final double speed    = distance / time * 3.6;
+					final double speed = distance / time * 3.6;
 
 					return (float) speed;
 				}
@@ -2724,16 +2721,16 @@ public class TourManager {
 					return 0;
 				}
 
-				final double[] timeValues     = ((ChartDataXSerie) (chartModel.getCustomData(CUSTOM_DATA_TIME))).getHighValuesDouble()[0];
+				final double[] timeValues = ((ChartDataXSerie) (chartModel.getCustomData(CUSTOM_DATA_TIME))).getHighValuesDouble()[0];
 				final double[] distanceValues = ((ChartDataXSerie) (customDataDistance)).getHighValuesDouble()[0];
 				if (timeValues == null) {
 					return 0;
 				}
 
-				final double leftDistance  = distanceValues[valueIndexLeft];
+				final double leftDistance = distanceValues[valueIndexLeft];
 				final double rightDistance = distanceValues[valueIndexRight];
-				final double leftTime      = timeValues[valueIndexLeft];
-				final double rightTime     = timeValues[valueIndexRight];
+				final double leftTime = timeValues[valueIndexLeft];
+				final double rightTime = timeValues[valueIndexRight];
 
 				if (leftTime == rightTime) {
 
@@ -2773,10 +2770,10 @@ public class TourManager {
 
 				final float[] altitudeValues = ((ChartDataYSerie) (customDataAltitude)).getHighValuesFloat()[0];
 
-				final float   leftAltitude   = altitudeValues[valueIndexLeft];
-				final float   rightAltitude  = altitudeValues[valueIndexRight];
-				final double  leftTime       = timeValues[valueIndexLeft];
-				final double  rightTime      = timeValues[valueIndexRight];
+				final float leftAltitude = altitudeValues[valueIndexLeft];
+				final float rightAltitude = altitudeValues[valueIndexRight];
+				final double leftTime = timeValues[valueIndexLeft];
+				final double rightTime = timeValues[valueIndexRight];
 
 				if (leftTime == rightTime) {
 
@@ -2820,13 +2817,13 @@ public class TourManager {
 					return 0;
 				}
 
-				final float[]  altitudeValues = ((ChartDataYSerie) (customDataAltitude)).getHighValuesFloat()[0];
+				final float[] altitudeValues = ((ChartDataYSerie) (customDataAltitude)).getHighValuesFloat()[0];
 				final double[] distanceValues = ((ChartDataXSerie) (customDataDistance)).getHighValuesDouble()[0];
 
-				final float    leftAltitude   = altitudeValues[valueIndexLeft];
-				final float    rightAltitude  = altitudeValues[valueIndexRight];
-				final double   leftDistance   = distanceValues[valueIndexLeft];
-				final double   rightDistance  = distanceValues[valueIndexRight];
+				final float leftAltitude = altitudeValues[valueIndexLeft];
+				final float rightAltitude = altitudeValues[valueIndexRight];
+				final double leftDistance = distanceValues[valueIndexLeft];
+				final double rightDistance = distanceValues[valueIndexRight];
 
 				if (leftDistance == rightDistance) {
 					// left and right slider are at the same position
@@ -2880,9 +2877,9 @@ public class TourManager {
 			@Override
 			public float compute() {
 
-				final TourData tourData    = (TourData) chartModel.getCustomData(CUSTOM_DATA_TOUR_DATA);
+				final TourData tourData = (TourData) chartModel.getCustomData(CUSTOM_DATA_TOUR_DATA);
 
-				final float    metricValue = tourData.computeAvg_FromValues(tourData.runDyn_StanceTime,
+				final float metricValue = tourData.computeAvg_FromValues(tourData.runDyn_StanceTime,
 						valueIndexLeft,
 						valueIndexRight);
 
@@ -2895,9 +2892,9 @@ public class TourManager {
 			@Override
 			public float compute() {
 
-				final TourData tourData    = (TourData) chartModel.getCustomData(CUSTOM_DATA_TOUR_DATA);
+				final TourData tourData = (TourData) chartModel.getCustomData(CUSTOM_DATA_TOUR_DATA);
 
-				final float    metricValue = tourData.computeAvg_FromValues(tourData.runDyn_StanceTimeBalance,
+				final float metricValue = tourData.computeAvg_FromValues(tourData.runDyn_StanceTimeBalance,
 						valueIndexLeft,
 						valueIndexRight);
 
@@ -2910,9 +2907,9 @@ public class TourManager {
 			@Override
 			public float compute() {
 
-				final TourData tourData    = (TourData) chartModel.getCustomData(CUSTOM_DATA_TOUR_DATA);
+				final TourData tourData = (TourData) chartModel.getCustomData(CUSTOM_DATA_TOUR_DATA);
 
-				final float    metricValue = tourData.computeAvg_FromValues(tourData.runDyn_StepLength,
+				final float metricValue = tourData.computeAvg_FromValues(tourData.runDyn_StepLength,
 						valueIndexLeft,
 						valueIndexRight);
 
@@ -2925,9 +2922,9 @@ public class TourManager {
 			@Override
 			public float compute() {
 
-				final TourData tourData    = (TourData) chartModel.getCustomData(CUSTOM_DATA_TOUR_DATA);
+				final TourData tourData = (TourData) chartModel.getCustomData(CUSTOM_DATA_TOUR_DATA);
 
-				final float    metricValue = tourData.computeAvg_FromValues(tourData.runDyn_VerticalOscillation,
+				final float metricValue = tourData.computeAvg_FromValues(tourData.runDyn_VerticalOscillation,
 						valueIndexLeft,
 						valueIndexRight);
 
@@ -2940,9 +2937,9 @@ public class TourManager {
 			@Override
 			public float compute() {
 
-				final TourData tourData    = (TourData) chartModel.getCustomData(CUSTOM_DATA_TOUR_DATA);
+				final TourData tourData = (TourData) chartModel.getCustomData(CUSTOM_DATA_TOUR_DATA);
 
-				final float    metricValue = tourData.computeAvg_FromValues(tourData.runDyn_VerticalRatio,
+				final float metricValue = tourData.computeAvg_FromValues(tourData.runDyn_VerticalRatio,
 						valueIndexLeft,
 						valueIndexRight);
 
@@ -2964,14 +2961,14 @@ public class TourManager {
 		return createChartDataModel_10(tourData, tcc, false);
 	}
 
-	public ChartDataModel createChartDataModel(  final TourData tourData,
+	public ChartDataModel createChartDataModel(	final TourData tourData,
 																final TourChartConfiguration tcc,
 																final boolean hasPropertyChanged) {
 
 		return createChartDataModel_10(tourData, tcc, hasPropertyChanged);
 	}
 
-	private ChartDataModel createChartDataModel_10( final TourData tourData,
+	private ChartDataModel createChartDataModel_10(	final TourData tourData,
 																	final TourChartConfiguration tcc,
 																	final boolean hasPropertyChanged) {
 
@@ -2982,7 +2979,7 @@ public class TourManager {
 		/*
 		 * TIME SERIE is a MUST data serie
 		 */
-		final boolean isTimeSerie    = tourData.timeSerie != null && tourData.timeSerie.length > 0;
+		final boolean isTimeSerie = tourData.timeSerie != null && tourData.timeSerie.length > 0;
 		final boolean isHistorySerie = tourData.timeSerieHistory != null && tourData.timeSerieHistory.length > 0;
 
 		if (isTimeSerie == false && isHistorySerie == false) {
@@ -3001,8 +2998,8 @@ public class TourManager {
 		/*
 		 * distance
 		 */
-		final double[]  distanceSerie = tourData.getDistanceSerieDouble();
-		ChartDataXSerie xDataDist     = null;
+		final double[] distanceSerie = tourData.getDistanceSerieDouble();
+		ChartDataXSerie xDataDist = null;
 		if (distanceSerie != null) {
 			xDataDist = new ChartDataXSerie(distanceSerie);
 			xDataDist.setLabel(Messages.tour_editor_label_distance);
@@ -3058,13 +3055,13 @@ public class TourManager {
 			 * when time is displayed, the x-axis can show the start time starting from 0 or from the
 			 * current time of the day
 			 */
-			final int               tourTimeOfDay   = tourStartTime.get(ChronoField.SECOND_OF_DAY);
+			final int tourTimeOfDay = tourStartTime.get(ChronoField.SECOND_OF_DAY);
 
-			final int               photoTimeOfDay  = tourTimeOfDay - tourData.getPhotoTimeAdjustment();
+			final int photoTimeOfDay = tourTimeOfDay - tourData.getPhotoTimeAdjustment();
 
 			final X_AXIS_START_TIME configXAxisTime = tcc.xAxisTime;
 
-			final double            xAxisStartValue = configXAxisTime == X_AXIS_START_TIME.START_WITH_0
+			final double xAxisStartValue = configXAxisTime == X_AXIS_START_TIME.START_WITH_0
 					? 0
 					: configXAxisTime == X_AXIS_START_TIME.TOUR_START_TIME ? tourTimeOfDay : photoTimeOfDay;
 
@@ -3089,7 +3086,7 @@ public class TourManager {
 		 */
 		xDataTime.setNoLine(tourData.getBreakTimeSerie());
 
-		ChartType    chartType;
+		ChartType chartType;
 		final String chartTypeName = _prefStore.getString(ITourbookPreferences.GRAPH_PROPERTY_CHARTTYPE);
 		try {
 			chartType = ChartType.valueOf(ChartType.class, chartTypeName);
@@ -3098,33 +3095,75 @@ public class TourManager {
 			chartType = ChartType.LINE;
 		}
 
+		/*
+		 * Graph background
+		 */
+
 		// HR zones can be displayed when they are available
-		tcc.canShowHrZones = tourData.getNumberOfHrZones() > 0;
-		final boolean isHrZoneDisplayed = tcc.canShowHrZones && tcc.isHrZoneDisplayed;
+		final boolean canShowBackground_HrZones = tcc.canShowBackground_HrZones = tourData.getNumberOfHrZones() > 0;
+
+		// swim style can be displayed when they are availabel
+		final boolean canShowBackground_SwimStyle = tcc.canShowBackground_SwimStyle = tourData.swim_Time != null;
+
+		final String prefGraphBgSource = _prefStore.getString(ITourbookPreferences.GRAPH_BACKGROUND_SOURCE);
+		final String prefGraphBgStyle = _prefStore.getString(ITourbookPreferences.GRAPH_BACKGROUND_STYLE);
+
+		GraphBackgroundSource graphBgSource = (GraphBackgroundSource) Util.getEnumValue(prefGraphBgSource,
+				TourChartConfiguration.GRAPH_BACKGROUND_SOURCE_DEFAULT);
+		final GraphBackgroundStyle graphBgStyle = (GraphBackgroundStyle) Util.getEnumValue(prefGraphBgStyle,
+				TourChartConfiguration.GRAPH_BACKGROUND_STYLE_DEFAULT);
+
+		final boolean prefShow_HrZone = GraphBackgroundSource.HR_ZONE.name().equals(prefGraphBgSource);
+		final boolean prefShow_SwimStyle = GraphBackgroundSource.SWIMMING_STYLE.name().equals(prefGraphBgSource);
+
+		// check if data are available for the requested background source
+		if (prefShow_HrZone) {
+
+			if (canShowBackground_HrZones == false) {
+
+				// hr zones cannot be displayed -> show default
+				graphBgSource = GraphBackgroundSource.DEFAULT;
+			}
+
+		} else if (prefShow_SwimStyle) {
+
+			if (canShowBackground_SwimStyle == false) {
+
+				// swimming style cannot be displayed -> show default
+				graphBgSource = GraphBackgroundSource.DEFAULT;
+			}
+		}
+
+		tcc.graphBackground_Source = graphBgSource;
+		tcc.graphBackground_Style = graphBgStyle;
+
+		final boolean isHrZoneDisplayed = canShowBackground_HrZones && tcc.isBackgroundStyle_HrZone();
+		final boolean isSwimStyleDisplayed = canShowBackground_SwimStyle && tcc.isBackgroundStyle_SwimmingStyle();
+		final boolean useCustomBackground = isHrZoneDisplayed || isSwimStyleDisplayed;
 
 // SET_FORMATTING_OFF
 
-		final ChartDataYSerie yDataAltitude			= createModelData_Altitude(	tourData, chartDataModel, chartType, isHrZoneDisplayed, tcc);
-		final ChartDataYSerie yDataPulse 			= createModelData_Heartbeat(	tourData, chartDataModel, chartType, isHrZoneDisplayed);
-		final ChartDataYSerie yDataSpeed 			= createModelData_Speed(		tourData, chartDataModel, chartType, isHrZoneDisplayed);
-		final ChartDataYSerie yDataPace 				= createModelData_Pace(			tourData, chartDataModel, chartType, isHrZoneDisplayed);
-		final ChartDataYSerie yDataPower 			= createModelData_Power(		tourData, chartDataModel, chartType, isHrZoneDisplayed);
-		final ChartDataYSerie yDataAltimeter 	 	= createModelData_Altimeter(	tourData, chartDataModel, chartType, isHrZoneDisplayed);
-		final ChartDataYSerie yDataGradient 		= createModelData_Gradient(	tourData, chartDataModel, chartType, isHrZoneDisplayed);
-		final ChartDataYSerie yDataCadence 			= createModelData_Cadence(		tourData, chartDataModel, chartType, isHrZoneDisplayed);
+		final ChartDataYSerie yDataAltitude			= createModelData_Altitude(	tourData, chartDataModel, chartType, useCustomBackground, tcc);
+		final ChartDataYSerie yDataPulse 			= createModelData_Heartbeat(	tourData, chartDataModel, chartType, useCustomBackground);
+		final ChartDataYSerie yDataSpeed 			= createModelData_Speed(		tourData, chartDataModel, chartType, useCustomBackground);
+		final ChartDataYSerie yDataPace 				= createModelData_Pace(			tourData, chartDataModel, chartType, useCustomBackground);
+		final ChartDataYSerie yDataPower 			= createModelData_Power(		tourData, chartDataModel, chartType, useCustomBackground);
+		final ChartDataYSerie yDataAltimeter 	 	= createModelData_Altimeter(	tourData, chartDataModel, chartType, useCustomBackground);
+		final ChartDataYSerie yDataGradient 		= createModelData_Gradient(	tourData, chartDataModel, chartType, useCustomBackground);
+		final ChartDataYSerie yDataCadence 			= createModelData_Cadence(		tourData, chartDataModel, chartType, useCustomBackground);
 		final ChartDataYSerie yDataGears 			= createModelData_Gears(		tourData, chartDataModel);
-		final ChartDataYSerie yDataTemperature 	= createModelData_Temperature(tourData, chartDataModel, chartType, isHrZoneDisplayed);
+		final ChartDataYSerie yDataTemperature 	= createModelData_Temperature(tourData, chartDataModel, chartType, useCustomBackground);
 
 		final ChartDataYSerie yDataTourCompare 	= createModelData_TourCompare(tourData, chartDataModel, chartType, tcc);
 
-		final ChartDataYSerie yData_RunDyn_StanceTime				= createModelData_RunDyn_StanceTime(			tourData, chartDataModel, chartType, isHrZoneDisplayed);
-		final ChartDataYSerie yData_RunDyn_StanceTimeBalance		= createModelData_RunDyn_StanceTimeBalance(	tourData, chartDataModel, chartType, isHrZoneDisplayed);
-		final ChartDataYSerie yData_RunDyn_StepLength				= createModelData_RunDyn_StepLength(			tourData, chartDataModel, chartType, isHrZoneDisplayed);
-		final ChartDataYSerie yData_RunDyn_VerticalOscillation	= createModelData_RunDyn_VerticalOscillation(tourData, chartDataModel, chartType, isHrZoneDisplayed);
-		final ChartDataYSerie yData_RunDyn_VerticalRatio			= createModelData_RunDyn_VerticalRatio(		tourData, chartDataModel, chartType, isHrZoneDisplayed);
+		final ChartDataYSerie yData_RunDyn_StanceTime				= createModelData_RunDyn_StanceTime(			tourData, chartDataModel, chartType, useCustomBackground);
+		final ChartDataYSerie yData_RunDyn_StanceTimeBalance		= createModelData_RunDyn_StanceTimeBalance(	tourData, chartDataModel, chartType, useCustomBackground);
+		final ChartDataYSerie yData_RunDyn_StepLength				= createModelData_RunDyn_StepLength(			tourData, chartDataModel, chartType, useCustomBackground);
+		final ChartDataYSerie yData_RunDyn_VerticalOscillation	= createModelData_RunDyn_VerticalOscillation(tourData, chartDataModel, chartType, useCustomBackground);
+		final ChartDataYSerie yData_RunDyn_VerticalRatio			= createModelData_RunDyn_VerticalRatio(		tourData, chartDataModel, chartType, useCustomBackground);
 
-		final ChartDataYSerie yData_Swim_Strokes						= createModelData_Swim_Strokes(					tourData, chartDataModel, chartType, isHrZoneDisplayed);
-		final ChartDataYSerie yData_Swim_Swolf							= createModelData_Swim_Swolf(						tourData, chartDataModel, chartType, isHrZoneDisplayed);
+		final ChartDataYSerie yData_Swim_Strokes						= createModelData_Swim_Strokes(					tourData, chartDataModel, chartType, useCustomBackground);
+		final ChartDataYSerie yData_Swim_Swolf							= createModelData_Swim_Swolf(						tourData, chartDataModel, chartType, useCustomBackground);
 
 // SET_FORMATTING_ON
 
@@ -3275,8 +3314,8 @@ public class TourManager {
 			xDataTime.setStartDateTime(tourData.getTourStartTime());
 
 			// history do not have any y-data, create dummy values
-			final float[]         yHistorySerie = new float[tourData.timeSerieHistory.length];
-			final ChartDataYSerie yDataHistory  = createChartDataSerie(yHistorySerie, ChartType.HISTORY);
+			final float[] yHistorySerie = new float[tourData.timeSerieHistory.length];
+			final ChartDataYSerie yDataHistory = createChartDataSerie(yHistorySerie, ChartType.HISTORY);
 
 			yDataHistory.setAxisUnit(ChartDataSerie.AXIS_UNIT_HISTORY);
 
@@ -3324,12 +3363,12 @@ public class TourManager {
 	/**
 	 * Altimeter
 	 */
-	private ChartDataYSerie createModelData_Altimeter( final TourData tourData,
+	private ChartDataYSerie createModelData_Altimeter(	final TourData tourData,
 																		final ChartDataModel chartDataModel,
 																		final ChartType chartType,
-																		final boolean isHrZoneDisplayed) {
+																		final boolean useGraphBgStyle) {
 
-		final float[]   altimeterSerie = tourData.getAltimeterSerie();
+		final float[] altimeterSerie = tourData.getAltimeterSerie();
 		ChartDataYSerie yDataAltimeter = null;
 		if (altimeterSerie != null) {
 
@@ -3341,7 +3380,7 @@ public class TourManager {
 			yDataAltimeter.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_ALTIMETER);
 			yDataAltimeter.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, false, _computeAvg_Altimeter, 0));
 
-			if (isHrZoneDisplayed) {
+			if (useGraphBgStyle) {
 				yDataAltimeter.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
 			} else {
 				yDataAltimeter.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_ZERO);
@@ -3362,7 +3401,7 @@ public class TourManager {
 
 			if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_ALTIMETER_IS_MAX_ENABLED)) {
 
-				final double maxValue  = _prefStore.getInt(ITourbookPreferences.GRAPH_ALTIMETER_MAX_VALUE);
+				final double maxValue = _prefStore.getInt(ITourbookPreferences.GRAPH_ALTIMETER_MAX_VALUE);
 
 				final double maxAdjust = 1e-2;
 				// set max value after min value, adjust max otherwise values above the max are painted
@@ -3388,14 +3427,14 @@ public class TourManager {
 	/**
 	 * Altitude
 	 */
-	private ChartDataYSerie createModelData_Altitude(  final TourData tourData,
+	private ChartDataYSerie createModelData_Altitude(	final TourData tourData,
 																		final ChartDataModel chartDataModel,
 																		final ChartType chartType,
-																		final boolean isHrZoneDisplayed,
+																		final boolean useGraphBgStyle,
 																		final TourChartConfiguration tcc) {
 		ChartDataYSerie yDataAltitude = null;
 
-		final float[]   altitudeSerie = tourData.getAltitudeSmoothedSerie(true);
+		final float[] altitudeSerie = tourData.getAltitudeSmoothedSerie(true);
 		if (altitudeSerie != null) {
 
 			if (tourData.isSRTMAvailable()) {
@@ -3432,7 +3471,7 @@ public class TourManager {
 			yDataAltitude.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true));
 			yDataAltitude.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, false, _computeAvg_Altitude, 0));
 
-			if (isHrZoneDisplayed) {
+			if (useGraphBgStyle) {
 				yDataAltitude.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
 			} else {
 				yDataAltitude.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
@@ -3460,9 +3499,9 @@ public class TourManager {
 	private ChartDataYSerie createModelData_Cadence(final TourData tourData,
 																	final ChartDataModel chartDataModel,
 																	final ChartType chartType,
-																	final boolean isHrZoneDisplayed) {
+																	final boolean useGraphBgStyle) {
 
-		final float[]   cadenceSerie = tourData.getCadenceSerieWithMuliplier();
+		final float[] cadenceSerie = tourData.getCadenceSerieWithMuliplier();
 		ChartDataYSerie yDataCadence = null;
 		if (cadenceSerie != null) {
 
@@ -3496,14 +3535,11 @@ public class TourManager {
 			yDataCadence.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, _computeAvg_Cadence));
 			yDataCadence.setSliderLabelProvider(new SliderLabelProvider_Cadence(cadenceSerie));
 
-			if (isHrZoneDisplayed) {
+			if (useGraphBgStyle) {
 				yDataCadence.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
 			} else {
 				yDataCadence.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
 			}
-//			yDataCadence.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM_NO_BORDER);
-//			yDataCadence.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_NO);
-//			yDataCadence.setLineGaps(tourData.getCadenceGaps());
 
 			setGraphColor(yDataCadence, GraphColorManager.PREF_GRAPH_CADENCE);
 			chartDataModel.addXyData(yDataCadence);
@@ -3526,7 +3562,7 @@ public class TourManager {
 	 */
 	private ChartDataYSerie createModelData_Gears(final TourData tourData, final ChartDataModel chartDataModel) {
 
-		final float[][] gearSerie  = tourData.getGears();
+		final float[][] gearSerie = tourData.getGears();
 		ChartDataYSerie yDataGears = null;
 		if (gearSerie != null) {
 
@@ -3557,12 +3593,12 @@ public class TourManager {
 	/**
 	 * Gradient
 	 */
-	private ChartDataYSerie createModelData_Gradient(  final TourData tourData,
+	private ChartDataYSerie createModelData_Gradient(	final TourData tourData,
 																		final ChartDataModel chartDataModel,
 																		final ChartType chartType,
-																		final boolean isHrZoneDisplayed) {
+																		final boolean useGraphBgStyle) {
 
-		final float[]   gradientSerie = tourData.gradientSerie;
+		final float[] gradientSerie = tourData.gradientSerie;
 		ChartDataYSerie yDataGradient = null;
 		if (gradientSerie != null) {
 
@@ -3575,7 +3611,7 @@ public class TourManager {
 			yDataGradient.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_GRADIENT);
 			yDataGradient.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, true, _computeAvg_Gradient, 1));
 
-			if (isHrZoneDisplayed) {
+			if (useGraphBgStyle) {
 				yDataGradient.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
 			} else {
 				yDataGradient.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_ZERO);
@@ -3597,16 +3633,16 @@ public class TourManager {
 		return yDataGradient;
 	}
 
-	private ChartDataYSerie createModelData_Heartbeat( final TourData tourData,
+	private ChartDataYSerie createModelData_Heartbeat(	final TourData tourData,
 																		final ChartDataModel chartDataModel,
 																		final ChartType chartType,
-																		final boolean isHrZoneDisplayed) {
+																		final boolean useGraphBgStyle) {
 		/**
 		 * Heartbeat
 		 */
 		ChartDataYSerie yDataPulse = null;
 
-		final float[]   pulseSerie = tourData.getPulseSmoothedSerie();
+		final float[] pulseSerie = tourData.getPulseSmoothedSerie();
 		if (pulseSerie != null) {
 
 			yDataPulse = createChartDataSerieNoZero(pulseSerie, chartType);
@@ -3617,7 +3653,7 @@ public class TourManager {
 			yDataPulse.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_PULSE);
 			yDataPulse.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, _computeAvg_Pulse));
 
-			if (isHrZoneDisplayed) {
+			if (useGraphBgStyle) {
 				yDataPulse.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
 			} else {
 				yDataPulse.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
@@ -3643,11 +3679,11 @@ public class TourManager {
 	private ChartDataYSerie createModelData_Pace(final TourData tourData,
 																final ChartDataModel chartDataModel,
 																final ChartType chartType,
-																final boolean isHrZoneDisplayed) {
+																final boolean useGraphBgStyle) {
 		/*
 		 * pace
 		 */
-		final float[]   paceSerie = tourData.getPaceSerieSeconds();
+		final float[] paceSerie = tourData.getPaceSerieSeconds();
 		ChartDataYSerie yDataPace = null;
 		if (paceSerie != null) {
 
@@ -3661,7 +3697,7 @@ public class TourManager {
 			yDataPace.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_PACE);
 			yDataPace.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, false, _computeAvg_Pace, 1));
 
-			if (isHrZoneDisplayed) {
+			if (useGraphBgStyle) {
 				yDataPace.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
 			} else {
 				yDataPace.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
@@ -3687,12 +3723,12 @@ public class TourManager {
 	/**
 	 * Power
 	 */
-	private ChartDataYSerie createModelData_Power(  final TourData tourData,
+	private ChartDataYSerie createModelData_Power(	final TourData tourData,
 																	final ChartDataModel chartDataModel,
 																	final ChartType chartType,
-																	final boolean isHrZoneDisplayed) {
+																	final boolean useGraphBgStyle) {
 
-		final float[]   powerSerie = tourData.getPowerSerie();
+		final float[] powerSerie = tourData.getPowerSerie();
 		ChartDataYSerie yDataPower = null;
 		if (powerSerie != null) {
 
@@ -3704,7 +3740,7 @@ public class TourManager {
 			yDataPower.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_POWER);
 			yDataPower.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, false, _computeAvg_Power, 0));
 
-			if (isHrZoneDisplayed) {
+			if (useGraphBgStyle) {
 				yDataPower.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
 			} else {
 				yDataPower.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
@@ -3730,14 +3766,14 @@ public class TourManager {
 	/**
 	 * Running Dynamics: Stance time
 	 */
-	private ChartDataYSerie createModelData_RunDyn_StanceTime(  final TourData tourData,
+	private ChartDataYSerie createModelData_RunDyn_StanceTime(	final TourData tourData,
 																					final ChartDataModel chartDataModel,
 																					final ChartType chartType,
-																					final boolean isHrZoneDisplayed) {
+																					final boolean useGraphBgStyle) {
 
 		ChartDataYSerie yDataSerie = null;
 
-		final float[]   dataSerie  = tourData.getRunDyn_StanceTime();
+		final float[] dataSerie = tourData.getRunDyn_StanceTime();
 		if (dataSerie != null) {
 
 			yDataSerie = createChartDataSerie(dataSerie, chartType);
@@ -3748,7 +3784,7 @@ public class TourManager {
 			yDataSerie.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_RUN_DYN_STANCE_TIME);
 			yDataSerie.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, _computeAvg_RunDyn_StanceTime));
 
-			if (isHrZoneDisplayed) {
+			if (useGraphBgStyle) {
 				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
 			} else {
 				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_NO);
@@ -3774,14 +3810,14 @@ public class TourManager {
 	/**
 	 * Running Dynamics: Stance time balance
 	 */
-	private ChartDataYSerie createModelData_RunDyn_StanceTimeBalance( final TourData tourData,
+	private ChartDataYSerie createModelData_RunDyn_StanceTimeBalance(	final TourData tourData,
 																							final ChartDataModel chartDataModel,
 																							final ChartType chartType,
-																							final boolean isHrZoneDisplayed) {
+																							final boolean useGraphBgStyle) {
 
 		ChartDataYSerie yDataSerie = null;
 
-		final float[]   dataSerie  = tourData.getRunDyn_StanceTimeBalance();
+		final float[] dataSerie = tourData.getRunDyn_StanceTimeBalance();
 		if (dataSerie != null) {
 
 			yDataSerie = createChartDataSerie(dataSerie, chartType);
@@ -3794,7 +3830,7 @@ public class TourManager {
 			yDataSerie.setCustomData(CUSTOM_DATA_ANALYZER_INFO,
 					new TourChartAnalyzerInfo(true, true, _computeAvg_RunDyn_StanceTimeBalance, 1));
 
-			if (isHrZoneDisplayed) {
+			if (useGraphBgStyle) {
 				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
 			} else {
 				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_NO);
@@ -3820,14 +3856,14 @@ public class TourManager {
 	/**
 	 * Running Dynamics: Step length
 	 */
-	private ChartDataYSerie createModelData_RunDyn_StepLength(  final TourData tourData,
+	private ChartDataYSerie createModelData_RunDyn_StepLength(	final TourData tourData,
 																					final ChartDataModel chartDataModel,
 																					final ChartType chartType,
-																					final boolean isHrZoneDisplayed) {
+																					final boolean useGraphBgStyle) {
 
 		ChartDataYSerie yDataSerie = null;
 
-		final float[]   dataSerie  = tourData.getRunDyn_StepLength();
+		final float[] dataSerie = tourData.getRunDyn_StepLength();
 		if (dataSerie != null) {
 
 			yDataSerie = createChartDataSerie(dataSerie, chartType);
@@ -3838,7 +3874,7 @@ public class TourManager {
 			yDataSerie.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_RUN_DYN_STEP_LENGTH);
 			yDataSerie.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, _computeAvg_RunDyn_StepLength));
 
-			if (isHrZoneDisplayed) {
+			if (useGraphBgStyle) {
 				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
 			} else {
 				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_NO);
@@ -3865,14 +3901,14 @@ public class TourManager {
 	/**
 	 * Running Dynamics: Vertical oscillation
 	 */
-	private ChartDataYSerie createModelData_RunDyn_VerticalOscillation(  final TourData tourData,
+	private ChartDataYSerie createModelData_RunDyn_VerticalOscillation(	final TourData tourData,
 																								final ChartDataModel chartDataModel,
 																								final ChartType chartType,
-																								final boolean isHrZoneDisplayed) {
+																								final boolean useGraphBgStyle) {
 
 		ChartDataYSerie yDataSerie = null;
 
-		final float[]   dataSerie  = tourData.getRunDyn_VerticalOscillation();
+		final float[] dataSerie = tourData.getRunDyn_VerticalOscillation();
 		if (dataSerie != null) {
 
 			yDataSerie = createChartDataSerie(dataSerie, chartType);
@@ -3884,7 +3920,7 @@ public class TourManager {
 			yDataSerie.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_RUN_DYN_VERTICAL_OSCILLATION);
 			yDataSerie.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, true, _computeAvg_RunDyn_VerticalOscillation, 1));
 
-			if (isHrZoneDisplayed) {
+			if (useGraphBgStyle) {
 				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
 			} else {
 				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_NO);
@@ -3911,14 +3947,14 @@ public class TourManager {
 	/**
 	 * Running Dynamics: Vertical ratio
 	 */
-	private ChartDataYSerie createModelData_RunDyn_VerticalRatio(  final TourData tourData,
+	private ChartDataYSerie createModelData_RunDyn_VerticalRatio(	final TourData tourData,
 																						final ChartDataModel chartDataModel,
 																						final ChartType chartType,
-																						final boolean isHrZoneDisplayed) {
+																						final boolean useGraphBgStyle) {
 
 		ChartDataYSerie yDataSerie = null;
 
-		final float[]   dataSerie  = tourData.getRunDyn_VerticalRatio();
+		final float[] dataSerie = tourData.getRunDyn_VerticalRatio();
 		if (dataSerie != null) {
 
 			yDataSerie = createChartDataSerie(dataSerie, chartType);
@@ -3930,7 +3966,7 @@ public class TourManager {
 			yDataSerie.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_RUN_DYN_VERTICAL_RATIO);
 			yDataSerie.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, true, _computeAvg_RunDyn_VerticalRatio, 1));
 
-			if (isHrZoneDisplayed) {
+			if (useGraphBgStyle) {
 				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
 			} else {
 				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_NO);
@@ -3956,12 +3992,12 @@ public class TourManager {
 	/**
 	 * Speed
 	 */
-	private ChartDataYSerie createModelData_Speed(  final TourData tourData,
+	private ChartDataYSerie createModelData_Speed(	final TourData tourData,
 																	final ChartDataModel chartDataModel,
 																	final ChartType chartType,
-																	final boolean isHrZoneDisplayed) {
+																	final boolean useGraphBgStyle) {
 
-		final float[]   speedSerie = tourData.getSpeedSerie();
+		final float[] speedSerie = tourData.getSpeedSerie();
 		ChartDataYSerie yDataSpeed = null;
 		if (speedSerie != null) {
 
@@ -3974,7 +4010,7 @@ public class TourManager {
 			yDataSpeed.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_SPEED);
 			yDataSpeed.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, true, _computeAvg_Speed, 1));
 
-			if (isHrZoneDisplayed) {
+			if (useGraphBgStyle) {
 				yDataSpeed.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
 			} else {
 				yDataSpeed.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
@@ -4000,14 +4036,14 @@ public class TourManager {
 	/**
 	 * Swimming: Strokes
 	 */
-	private ChartDataYSerie createModelData_Swim_Strokes( final TourData tourData,
+	private ChartDataYSerie createModelData_Swim_Strokes(	final TourData tourData,
 																			final ChartDataModel chartDataModel,
 																			final ChartType chartType,
-																			final boolean isHrZoneDisplayed) {
+																			final boolean useGraphBgStyle) {
 
 		ChartDataYSerie yDataSerie = null;
 
-		final float[]   dataSerie  = tourData.getSwim_Strokes();
+		final float[] dataSerie = tourData.getSwim_Strokes();
 		if (dataSerie != null) {
 
 			yDataSerie = createChartDataSerie(dataSerie, chartType);
@@ -4018,7 +4054,7 @@ public class TourManager {
 			yDataSerie.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_SWIM_STROKES);
 //			yDataSerie.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, _computeAvg_RunDyn_StanceTime));
 
-			if (isHrZoneDisplayed) {
+			if (useGraphBgStyle) {
 				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
 			} else {
 				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_NO);
@@ -4047,11 +4083,11 @@ public class TourManager {
 	private ChartDataYSerie createModelData_Swim_Swolf(final TourData tourData,
 																		final ChartDataModel chartDataModel,
 																		final ChartType chartType,
-																		final boolean isHrZoneDisplayed) {
+																		final boolean useGraphBgStyle) {
 
 		ChartDataYSerie yDataSerie = null;
 
-		final float[]   dataSerie  = tourData.getSwim_Swolf();
+		final float[] dataSerie = tourData.getSwim_Swolf();
 		if (dataSerie != null) {
 
 			yDataSerie = createChartDataSerie(dataSerie, chartType);
@@ -4062,7 +4098,7 @@ public class TourManager {
 			yDataSerie.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_SWIM_SWOLF);
 //			yDataSerie.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, _computeAvg_RunDyn_StanceTime));
 
-			if (isHrZoneDisplayed) {
+			if (useGraphBgStyle) {
 				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
 			} else {
 				yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_NO);
@@ -4088,12 +4124,12 @@ public class TourManager {
 	/**
 	 * Temperature
 	 */
-	private ChartDataYSerie createModelData_Temperature(  final TourData tourData,
+	private ChartDataYSerie createModelData_Temperature(	final TourData tourData,
 																			final ChartDataModel chartDataModel,
 																			final ChartType chartType,
-																			final boolean isHrZoneDisplayed) {
+																			final boolean useGraphBgStyle) {
 
-		final float[]   temperatureSerie = tourData.getTemperatureSerie();
+		final float[] temperatureSerie = tourData.getTemperatureSerie();
 		ChartDataYSerie yDataTemperature = null;
 		if (temperatureSerie != null) {
 
@@ -4106,7 +4142,7 @@ public class TourManager {
 			yDataTemperature.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_TEMPERATURE);
 			yDataTemperature.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, true));
 
-			if (isHrZoneDisplayed) {
+			if (useGraphBgStyle) {
 				yDataTemperature.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
 			} else {
 				yDataTemperature.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
@@ -4132,12 +4168,12 @@ public class TourManager {
 	/**
 	 * Tour compare altitude or lat/lon difference
 	 */
-	private ChartDataYSerie createModelData_TourCompare(  final TourData tourData,
+	private ChartDataYSerie createModelData_TourCompare(	final TourData tourData,
 																			final ChartDataModel chartDataModel,
 																			final ChartType chartType,
 																			final TourChartConfiguration tcc) {
 
-		final float[]   tourCompareSerie = tourData.tourCompareSerie;
+		final float[] tourCompareSerie = tourData.tourCompareSerie;
 		ChartDataYSerie yDataTourCompare = null;
 		if (tourCompareSerie != null && tourCompareSerie.length > 0 && tcc.canShowTourCompareGraph) {
 
@@ -4214,7 +4250,7 @@ public class TourManager {
 		 * get tour from cache or database
 		 */
 		TourData existingTourData = null;
-		TourData tourDataInCache  = null;
+		TourData tourDataInCache = null;
 
 		tourDataInCache = _tourDataCache.get(requestedTourId);
 
@@ -4350,7 +4386,7 @@ public class TourManager {
 			return;
 		}
 
-		final long tourIdInEditor  = tourDataInEditor.getTourId().longValue();
+		final long tourIdInEditor = tourDataInEditor.getTourId().longValue();
 		final long tourIdForEditor = tourDataForEditor.getTourId().longValue();
 		if (tourIdInEditor != tourIdForEditor) {
 			// tour editor contains another tour
@@ -4457,10 +4493,10 @@ public class TourManager {
 
 		if (_prefStore.getBoolean(prefName_IsMinEnabled)) {
 
-			final int    prefMinValue   = _prefStore.getInt(prefName_MinValue);
+			final int prefMinValue = _prefStore.getInt(prefName_MinValue);
 
-			final float  minValue       = prefMinValue * valueMultiplier;
-			final double forcedMinValue = minValue > 0                         //
+			final float minValue = prefMinValue * valueMultiplier;
+			final double forcedMinValue = minValue > 0 //
 					? minValue + maxValueAdjustment
 					: minValue - maxValueAdjustment;
 
@@ -4470,10 +4506,10 @@ public class TourManager {
 		// set max value after min value, adjust max otherwise values above the max are painted
 		if (_prefStore.getBoolean(prefName_IsMaxEnabled)) {
 
-			final int    prefMaxValue   = _prefStore.getInt(prefName_MaxValue);
+			final int prefMaxValue = _prefStore.getInt(prefName_MaxValue);
 
-			final float  maxValue       = prefMaxValue * valueMultiplier;
-			final double forcedMaxValue = maxValue > 0                         //
+			final float maxValue = prefMaxValue * valueMultiplier;
+			final double forcedMaxValue = maxValue > 0 //
 					? maxValue - maxValueAdjustment
 					: maxValue + maxValueAdjustment;
 
@@ -4518,7 +4554,7 @@ public class TourManager {
 
 			final int prefMaxValue = _prefStore.getInt(prefName_MaxValue);
 
-			final int maxValue     = prefMaxValue * valueMultiplier;
+			final int maxValue = prefMaxValue * valueMultiplier;
 
 			if (maxValueAdjustment == 0) {
 
@@ -4540,7 +4576,7 @@ public class TourManager {
 	 * @param tourProvider
 	 * @param tourDoubleClickState
 	 */
-	public void tourDoubleClickAction(  final ITourProvider tourProvider,
+	public void tourDoubleClickAction(	final ITourProvider tourProvider,
 													final TourDoubleClickState tourDoubleClickState) {
 
 		ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
@@ -4558,10 +4594,10 @@ public class TourManager {
 			}
 		}
 
-		final String   action     = _prefStore.getString(ITourbookPreferences.VIEW_DOUBLE_CLICK_ACTIONS);
-		final TourData firstTour  = selectedTours.get(0);
+		final String action = _prefStore.getString(ITourbookPreferences.VIEW_DOUBLE_CLICK_ACTIONS);
+		final TourData firstTour = selectedTours.get(0);
 
-		String         actionInfo = null;
+		String actionInfo = null;
 
 		if (action.equals(PrefPageViews.VIEW_DOUBLE_CLICK_ACTION_ADJUST_ALTITUDE)) {
 

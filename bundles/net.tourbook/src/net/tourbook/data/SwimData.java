@@ -27,7 +27,7 @@ public class SwimData implements Serializable {
 	 * Swimming data: Activity e.g. active, idle. Contains {@link Short#MIN_VALUE} when value is not
 	 * set.
 	 */
-	public short					swim_ActivityType	= Short.MIN_VALUE;
+	public short					swim_LengthType	= Short.MIN_VALUE;
 
 	/**
 	 * Swimming data: Swimming cadence in strokes/min. Contains {@link Short#MIN_VALUE} when value is

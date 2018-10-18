@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -22,25 +22,25 @@ import org.eclipse.jface.viewers.ISelection;
  */
 public class SelectionChartXSliderPosition implements ISelection {
 
-	public static final int	IGNORE_SLIDER_POSITION			= -1;
+	public static final int	IGNORE_SLIDER_POSITION				= -1;
 	public static final int	SLIDER_POSITION_AT_CHART_BORDER	= -2;
 
-	private int				_beforeLeftSliderIndex			= IGNORE_SLIDER_POSITION;
-	private int				_leftSliderValueIndex			= IGNORE_SLIDER_POSITION;
-	private int				_rightSliderValueIndex			= IGNORE_SLIDER_POSITION;
+	private int					_beforeLeftSliderIndex				= IGNORE_SLIDER_POSITION;
+	private int					_leftSliderValueIndex				= IGNORE_SLIDER_POSITION;
+	private int					_rightSliderValueIndex				= IGNORE_SLIDER_POSITION;
 
 	/**
 	 * When <code>true</code> the slider will be positioned in the center of the chart.
 	 */
-	private boolean			_isCenterSliderPosition			= false;
+	private boolean			_isCenterSliderPosition				= false;
 
 	/**
 	 * When <code>true</code> then the slider will be set visible in the chart by repositioning the
 	 * graph (this is the old default behaviour), otherwise <code>false</code>.
 	 */
-	private boolean			_isMoveChartToShowSlider		= true;
+	private boolean			_isMoveChartToShowSlider			= true;
 
-	private Chart			_chart;
+	private Chart				_chart;
 
 	/**
 	 * When <code>true</code> the start index must be adjusted to the next time slice, this bug
@@ -54,7 +54,7 @@ public class SelectionChartXSliderPosition implements ISelection {
 	 */
 	private boolean			_isCenterZoomPositionWithKey;
 
-	private Object			_customData;
+	private Object				_customData;
 
 	public SelectionChartXSliderPosition(final Chart chart, final int leftValueIndex, final int rightValueIndex) {
 
@@ -65,9 +65,9 @@ public class SelectionChartXSliderPosition implements ISelection {
 	}
 
 	public SelectionChartXSliderPosition(	final Chart chart,
-											final int startIndex,
-											final int endIndex,
-											final boolean isAdjustStartIndex) {
+														final int startIndex,
+														final int endIndex,
+														final boolean isAdjustStartIndex) {
 
 		this(chart, startIndex, endIndex);
 
@@ -76,9 +76,9 @@ public class SelectionChartXSliderPosition implements ISelection {
 	}
 
 	public SelectionChartXSliderPosition(	final Chart chart,
-											final int serieIndex0,
-											final int serieIndex1,
-											final int serieIndex2) {
+														final int serieIndex0,
+														final int serieIndex1,
+														final int serieIndex2) {
 
 		this(chart, serieIndex1, serieIndex2);
 

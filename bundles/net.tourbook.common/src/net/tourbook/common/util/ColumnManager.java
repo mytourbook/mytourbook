@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -24,19 +24,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
-
-import net.tourbook.common.Messages;
-import net.tourbook.common.UI;
-import net.tourbook.common.formatter.IValueFormatter;
-import net.tourbook.common.formatter.ValueFormat;
-import net.tourbook.common.formatter.ValueFormatter_Default;
-import net.tourbook.common.formatter.ValueFormatter_Number_1_0;
-import net.tourbook.common.formatter.ValueFormatter_Number_1_1;
-import net.tourbook.common.formatter.ValueFormatter_Number_1_2;
-import net.tourbook.common.formatter.ValueFormatter_Number_1_3;
-import net.tourbook.common.formatter.ValueFormatter_Time_HH;
-import net.tourbook.common.formatter.ValueFormatter_Time_HHMM;
-import net.tourbook.common.formatter.ValueFormatter_Time_HHMMSS;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -74,6 +61,19 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.XMLMemento;
 
+import net.tourbook.common.Messages;
+import net.tourbook.common.UI;
+import net.tourbook.common.formatter.IValueFormatter;
+import net.tourbook.common.formatter.ValueFormat;
+import net.tourbook.common.formatter.ValueFormatter_Default;
+import net.tourbook.common.formatter.ValueFormatter_Number_1_0;
+import net.tourbook.common.formatter.ValueFormatter_Number_1_1;
+import net.tourbook.common.formatter.ValueFormatter_Number_1_2;
+import net.tourbook.common.formatter.ValueFormatter_Number_1_3;
+import net.tourbook.common.formatter.ValueFormatter_Time_HH;
+import net.tourbook.common.formatter.ValueFormatter_Time_HHMM;
+import net.tourbook.common.formatter.ValueFormatter_Time_HHMMSS;
+
 /**
  * Manages the columns for a tree/table-viewer
  * <p>
@@ -81,46 +81,51 @@ import org.eclipse.ui.XMLMemento;
  */
 public class ColumnManager {
 
-	private static final String					XML_STATE_COLUMN_MANAGER			= "XML_STATE_COLUMN_MANAGER";			//$NON-NLS-1$
+	private static final String XML_STATE_COLUMN_MANAGER = "XML_STATE_COLUMN_MANAGER"; //$NON-NLS-1$
 
 	//
-	private static final String					TAG_ROOT							= "ColumnProfiles";					//$NON-NLS-1$
+	private static final String	TAG_ROOT										= "ColumnProfiles";				//$NON-NLS-1$
 	//
-	private static final String					TAG_COLUMN							= "Column";							//$NON-NLS-1$
-	private static final String					TAG_PROFILE							= "Profile";							//$NON-NLS-1$
+	private static final String	TAG_COLUMN									= "Column";							//$NON-NLS-1$
+	private static final String	TAG_PROFILE									= "Profile";						//$NON-NLS-1$
 	//
-	private static final String					ATTR_IS_ACTIVE_PROFILE				= "isActiveProfile";					//$NON-NLS-1$
-	private static final String					ATTR_IS_SHOW_CATEGORY				= "isShowCategory";					//$NON-NLS-1$
+	private static final String	ATTR_IS_ACTIVE_PROFILE					= "isActiveProfile";				//$NON-NLS-1$
+	private static final String	ATTR_IS_SHOW_CATEGORY					= "isShowCategory";				//$NON-NLS-1$
 	private static final String					ATTR_IS_SHOW_COLUMN_ANNOTATIONS		= "isShowColumnAnnotations";			//$NON-NLS-1$
 	//
-	private static final String					ATTR_COLUMN_ID						= "columnId";							//$NON-NLS-1$
-	private static final String					ATTR_COLUMN_FORMAT_CATEGORY			= "categoryFormat";					//$NON-NLS-1$
-	private static final String					ATTR_COLUMN_FORMAT_DETAIL			= "detailFormat";						//$NON-NLS-1$
-	private static final String					ATTR_NAME							= "name";								//$NON-NLS-1$
+	private static final String	ATTR_COLUMN_ID								= "columnId";						//$NON-NLS-1$
+	private static final String	ATTR_COLUMN_FORMAT_CATEGORY			= "categoryFormat";				//$NON-NLS-1$
+	private static final String	ATTR_COLUMN_FORMAT_DETAIL				= "detailFormat";					//$NON-NLS-1$
+	private static final String	ATTR_NAME									= "name";							//$NON-NLS-1$
 
-	private static final String					ATTR_VISIBLE_COLUMN_IDS				= "visibleColumnIds";					//$NON-NLS-1$
+	private static final String	ATTR_VISIBLE_COLUMN_IDS					= "visibleColumnIds";			//$NON-NLS-1$
 	private static final String					ATTR_VISIBLE_COLUMN_IDS_AND_WIDTH	= "visibleColumnIdsAndWidth";			//$NON-NLS-1$
 	//
-	static final String							COLUMN_CATEGORY_SEPARATOR			= "   \u00bb   ";						//$NON-NLS-1$
-	static final String							COLUMN_TEXT_SEPARATOR				= "   \u00B7   ";						//$NON-NLS-1$
+	static final String				COLUMN_CATEGORY_SEPARATOR				= "   \u00bb   ";					//$NON-NLS-1$
+	static final String				COLUMN_TEXT_SEPARATOR					= "   \u00B7   ";					//$NON-NLS-1$
 
 	/**
 	 * Minimum column width, when the column width is 0, there was a bug that this happened.
 	 */
-	private static final int					MINIMUM_COLUMN_WIDTH				= 7;
+	private static final int		MINIMUM_COLUMN_WIDTH						= 7;
+
+	/*
+	 * Value formatter
+	 */
+	private static IValueFormatter	_defaultDefaultValueFormatter	= new ValueFormatter_Default();
 
 	/**
 	 * Contains all column definitions which are defined for the table/tree viewer.
 	 * <p>
 	 * The sequence how they are added is the default.
 	 */
-	private final ArrayList<ColumnDefinition>	_allDefinedColumnDefinitions		= new ArrayList<ColumnDefinition>();
+	private final ArrayList<ColumnDefinition>	_allDefinedColumnDefinitions			= new ArrayList<>();
 
 	/** All column profiles */
-	private ArrayList<ColumnProfile>			_allProfiles						= new ArrayList<>();
+	private ArrayList<ColumnProfile>				_allProfiles								= new ArrayList<>();
 
 	/** Active column profile */
-	private ColumnProfile						_activeProfile;
+	private ColumnProfile							_activeProfile;
 
 	/**
 	 * When <code>true</code>, columns can be categorized which is displayed in the UI but it has no
@@ -129,48 +134,43 @@ public class ColumnManager {
 	 * When only a view columns are contained in a view then it does not make sense to categorize
 	 * these columns.
 	 */
-	private boolean								_isCategoryAvailable				= false;
+	private boolean									_isCategoryAvailable						= false;
 
 	/**
 	 * Flag which the user can set to show/hide column category in the column viewer and table/tree
 	 * header context menu.
 	 */
-	private boolean								_isShowCategory						= true;
+	private boolean									_isShowCategory							= true;
 
-	private boolean								_isShowColumnAnnotations;
+	private boolean									_isShowColumnAnnotations;
 
 	private Comparator<ColumnProfile>			_profileSorter;
 
-	private final ITourViewer					_tourViewer;
+	private final ITourViewer						_tourViewer;
 
-	private AbstractColumnLayout				_columnLayout;
-
+	private AbstractColumnLayout					_columnLayout;
 	/**
 	 * Viewer which is managed by this {@link ColumnManager}.
 	 */
-	private ColumnViewer						_columnViewer;
-	private ColumnWrapper						_headerColumn;
+	private ColumnViewer								_columnViewer;
+
+	private ColumnWrapper							_headerColumn;
 
 	/**
 	 * Context menu listener.
 	 */
-	private Listener							_tableMenuDetectListener;
+	private Listener									_tableMenuDetectListener;
+	private Listener									_treeMenuDetectListener;
 
-	private Listener							_treeMenuDetectListener;
-	private final Listener						_colItemListener;
+	private final Listener							_colItemListener;
 
-	/*
-	 * Value formatter
-	 */
-	private static IValueFormatter				_defaultDefaultValueFormatter		= new ValueFormatter_Default();
-
-	private IValueFormatter						_valueFormatter_Number_1_0			= new ValueFormatter_Number_1_0();
-	private IValueFormatter						_valueFormatter_Number_1_1			= new ValueFormatter_Number_1_1();
-	private IValueFormatter						_valueFormatter_Number_1_2			= new ValueFormatter_Number_1_2();
-	private IValueFormatter						_valueFormatter_Number_1_3			= new ValueFormatter_Number_1_3();
-	private IValueFormatter						_valueFormatter_Time_HH				= new ValueFormatter_Time_HH();
-	private IValueFormatter						_valueFormatter_Time_HHMM			= new ValueFormatter_Time_HHMM();
-	private IValueFormatter						_valueFormatter_Time_HHMMSS			= new ValueFormatter_Time_HHMMSS();
+	private IValueFormatter							_valueFormatter_Number_1_0		= new ValueFormatter_Number_1_0();
+	private IValueFormatter							_valueFormatter_Number_1_1		= new ValueFormatter_Number_1_1();
+	private IValueFormatter							_valueFormatter_Number_1_2		= new ValueFormatter_Number_1_2();
+	private IValueFormatter							_valueFormatter_Number_1_3		= new ValueFormatter_Number_1_3();
+	private IValueFormatter							_valueFormatter_Time_HH			= new ValueFormatter_Time_HH();
+	private IValueFormatter							_valueFormatter_Time_HHMM		= new ValueFormatter_Time_HHMM();
+	private IValueFormatter							_valueFormatter_Time_HHMMSS	= new ValueFormatter_Time_HHMMSS();
 
 	{
 		_colItemListener = new Listener() {
@@ -284,9 +284,9 @@ public class ColumnManager {
 		});
 	}
 
-	void action_SetValueFormatter(	final ColumnDefinition colDef,
-									final ValueFormat valueFormat,
-									final boolean isDetailFormat) {
+	void action_SetValueFormatter(final ColumnDefinition colDef,
+											final ValueFormat valueFormat,
+											final boolean isDetailFormat) {
 
 		/*
 		 * Update model
@@ -415,7 +415,7 @@ public class ColumnManager {
 
 	/**
 	 * Creates the columns in the tree/table for all visible columns.
-	 * 
+	 *
 	 * @param columnViewer
 	 */
 	public void createColumns(final ColumnViewer columnViewer) {
@@ -446,7 +446,7 @@ public class ColumnManager {
 
 	/**
 	 * Creates a column in a table viewer
-	 * 
+	 *
 	 * @param colDef
 	 * @param tableViewer
 	 */
@@ -535,7 +535,7 @@ public class ColumnManager {
 
 	/**
 	 * Creates a column in a tree viewer
-	 * 
+	 *
 	 * @param colDef
 	 * @param treeViewer
 	 */
@@ -598,7 +598,7 @@ public class ColumnManager {
 
 	/**
 	 * Create header context menu which has the action to modify columns
-	 * 
+	 *
 	 * @param composite
 	 * @param defaultContextMenu
 	 * @return
@@ -826,7 +826,7 @@ public class ColumnManager {
 
 		final ArrayList<ColumnDefinition> displayedColumns = new ArrayList<>();
 		final ArrayList<ColumnDefinition> notDisplyedColumns = new ArrayList<>();
-		final HashSet<String> categorizedNames = new HashSet<String>();
+		final HashSet<String> categorizedNames = new HashSet<>();
 
 		for (final ColumnDefinition colDef : allColumns) {
 
@@ -868,10 +868,10 @@ public class ColumnManager {
 
 	/**
 	 * set context menu depending on the position of the mouse
-	 * 
+	 *
 	 * @param table
 	 * @param defaultContextMenu
-	 *            can be <code>null</code>
+	 *           can be <code>null</code>
 	 */
 	public void createHeaderContextMenu(final Table table, final Menu defaultContextMenu) {
 
@@ -919,8 +919,8 @@ public class ColumnManager {
 					}
 
 					/*
-					 * It is possible that the context menu is outside of the tree, this occures
-					 * when the column is very wide and horizonal scrolled.
+					 * It is possible that the context menu is outside of the tree, this occures when the
+					 * column is very wide and horizonal scrolled.
 					 */
 					if (posX - xOffset > clientArea.width) {
 						posX = xOffset + clientArea.width;
@@ -939,10 +939,10 @@ public class ColumnManager {
 
 	/**
 	 * set context menu depending on the position of the mouse
-	 * 
+	 *
 	 * @param tree
 	 * @param defaultContextMenu
-	 *            can be <code>null</code>
+	 *           can be <code>null</code>
 	 */
 	public void createHeaderContextMenu(final Tree tree, final Menu defaultContextMenu) {
 
@@ -991,8 +991,8 @@ public class ColumnManager {
 					}
 
 					/*
-					 * It is possible that the context menu is outside of the tree, this occures
-					 * when the column is very wide and horizonal scrolled.
+					 * It is possible that the context menu is outside of the tree, this occures when the
+					 * column is very wide and horizonal scrolled.
 					 */
 					if (posX - xOffset > clientArea.width) {
 						posX = xOffset + clientArea.width;
@@ -1020,7 +1020,7 @@ public class ColumnManager {
 
 	/**
 	 * @param columnId
-	 *            column id
+	 *           column id
 	 * @return Returns the column definition for the column id, or <code>null</code> when the column
 	 *         for the column id is not available
 	 */
@@ -1038,7 +1038,7 @@ public class ColumnManager {
 
 	/**
 	 * @param orderIndex
-	 *            column create id
+	 *           column create id
 	 * @return Returns the column definition for the column create index, or <code>null</code> when
 	 *         the column is not available
 	 */
@@ -1080,7 +1080,7 @@ public class ColumnManager {
 	 */
 	private String[] getColumns_FromViewer_IdAndWidth() {
 
-		final ArrayList<String> columnIdsAndWidth = new ArrayList<String>();
+		final ArrayList<String> columnIdsAndWidth = new ArrayList<>();
 
 		if (_columnViewer instanceof TableViewer) {
 
@@ -1118,12 +1118,12 @@ public class ColumnManager {
 
 	/**
 	 * Read the column order from a table/tree.
-	 * 
+	 *
 	 * @return Returns <code>null</code> when table/tree cannot be accessed.
 	 */
 	private String[] getColumns_FromViewer_Ids() {
 
-		final ArrayList<String> orderedColumnIds = new ArrayList<String>();
+		final ArrayList<String> orderedColumnIds = new ArrayList<>();
 
 		int[] columnOrder = null;
 
@@ -1293,13 +1293,13 @@ public class ColumnManager {
 	/**
 	 * Read the order/width for the columns, this is necessary because the user can have rearranged
 	 * the columns and/or resized the columns with the mouse.
-	 * 
+	 *
 	 * @return Returns ALL columns, first the visible then the hidden columns.
 	 */
 	private ArrayList<ColumnDefinition> getRearrangedColumns() {
 
-		final ArrayList<ColumnDefinition> allRearrangedColumns = new ArrayList<ColumnDefinition>();
-		final ArrayList<ColumnDefinition> allColDefClone = new ArrayList<ColumnDefinition>();
+		final ArrayList<ColumnDefinition> allRearrangedColumns = new ArrayList<>();
+		final ArrayList<ColumnDefinition> allColDefClone = new ArrayList<>();
 
 		try {
 			for (final ColumnDefinition definedColDef : _allDefinedColumnDefinitions) {
@@ -1372,7 +1372,7 @@ public class ColumnManager {
 
 	/**
 	 * Get a value formatter for a {@link ValueFormat}.
-	 * 
+	 *
 	 * @param valueFormat_Category
 	 * @return Returns the {@link IValueFormatter} or <code>null</code> when not available.
 	 */
@@ -1460,7 +1460,7 @@ public class ColumnManager {
 
 	/**
 	 * Restore the column order and width from a memento
-	 * 
+	 *
 	 * @param state
 	 */
 	private void restoreState(final IDialogSettings state) {
@@ -1550,7 +1550,7 @@ public class ColumnManager {
 
 								if (columnId != null //
 										&& (valueFormat_Category != ValueFormat.DUMMY_VALUE //
-										|| valueFormat_Detail != ValueFormat.DUMMY_VALUE)) {
+												|| valueFormat_Detail != ValueFormat.DUMMY_VALUE)) {
 
 									final ColumnProperties columnProperties = new ColumnProperties();
 
@@ -1600,7 +1600,7 @@ public class ColumnManager {
 
 	/**
 	 * Save the column order and width into a memento
-	 * 
+	 *
 	 * @param state
 	 */
 	public void saveState(final IDialogSettings state) {
@@ -1730,7 +1730,7 @@ public class ColumnManager {
 	 * <p>
 	 * When the columnLayout is set, all columns must have a {@link ColumnWeightData}, otherwise it
 	 * will fail
-	 * 
+	 *
 	 * @param columnLayout
 	 */
 	public void setColumnLayout(final AbstractColumnLayout columnLayout) {
@@ -1774,8 +1774,8 @@ public class ColumnManager {
 					currentColumnProperties = columnProperties;
 
 					/*
-					 * Set format ONLY when default is set, this prevents that old saved settings
-					 * are still used.
+					 * Set format ONLY when default is set, this prevents that old saved settings are
+					 * still used.
 					 */
 
 					if (defaultFormat_Category != null) {
@@ -1834,7 +1834,7 @@ public class ColumnManager {
 
 	/**
 	 * Set column definitions in the {@link ColumnProfile} from the visible id's.
-	 * 
+	 *
 	 * @param columnProfile
 	 */
 	void setVisibleColDefs(final ColumnProfile columnProfile) {
@@ -1884,7 +1884,7 @@ public class ColumnManager {
 		 */
 		if ((visibleColDefs.size() == 0) && (_allDefinedColumnDefinitions.size() > 0)) {
 
-			final ArrayList<String> columnIds = new ArrayList<String>();
+			final ArrayList<String> columnIds = new ArrayList<>();
 			int createIndex = 0;
 
 			for (final ColumnDefinition colDef : _allDefinedColumnDefinitions) {
@@ -1918,7 +1918,7 @@ public class ColumnManager {
 		 * Ensure that all columns which must be visible, are also displayed. This case can happen
 		 * when new columns are added.
 		 */
-		final ArrayList<ColumnDefinition> notAddedColumns = new ArrayList<ColumnDefinition>();
+		final ArrayList<ColumnDefinition> notAddedColumns = new ArrayList<>();
 
 		for (final ColumnDefinition colDef : _allDefinedColumnDefinitions) {
 
@@ -1945,7 +1945,7 @@ public class ColumnManager {
 			/*
 			 * Set visible id's
 			 */
-			final ArrayList<String> columnIds = new ArrayList<String>();
+			final ArrayList<String> columnIds = new ArrayList<>();
 
 			for (final ColumnDefinition colDef : visibleColDefs) {
 				columnIds.add(colDef.getColumnId());
@@ -1957,8 +1957,8 @@ public class ColumnManager {
 
 	private void setVisibleColumnIds_AddColumn(final ColumnDefinition newColDef) {
 
-		final ArrayList<String> visibleColumnIds = new ArrayList<String>();
-		final ArrayList<String> visibleIdsAndWidth = new ArrayList<String>();
+		final ArrayList<String> visibleColumnIds = new ArrayList<>();
+		final ArrayList<String> visibleIdsAndWidth = new ArrayList<>();
 
 		for (final String columnId : _activeProfile.visibleColumnIds) {
 
@@ -1997,8 +1997,8 @@ public class ColumnManager {
 
 	private void setVisibleColumnIds_All() {
 
-		final ArrayList<String> visibleColumnIds = new ArrayList<String>();
-		final ArrayList<String> visibleIdsAndWidth = new ArrayList<String>();
+		final ArrayList<String> visibleColumnIds = new ArrayList<>();
+		final ArrayList<String> visibleIdsAndWidth = new ArrayList<>();
 
 		for (final ColumnDefinition colDef : _allDefinedColumnDefinitions) {
 
@@ -2016,8 +2016,8 @@ public class ColumnManager {
 
 	private void setVisibleColumnIds_Default() {
 
-		final ArrayList<String> visibleColumnIds = new ArrayList<String>();
-		final ArrayList<String> visibleIdsAndWidth = new ArrayList<String>();
+		final ArrayList<String> visibleColumnIds = new ArrayList<>();
+		final ArrayList<String> visibleIdsAndWidth = new ArrayList<>();
 
 		for (final ColumnDefinition colDef : _allDefinedColumnDefinitions) {
 
@@ -2038,8 +2038,8 @@ public class ColumnManager {
 
 	private void setVisibleColumnIds_FromMenu(final MenuItem[] menuItems) {
 
-		final ArrayList<String> visibleColumnIds = new ArrayList<String>();
-		final ArrayList<String> columnIdsAndWidth = new ArrayList<String>();
+		final ArrayList<String> visibleColumnIds = new ArrayList<>();
+		final ArrayList<String> columnIdsAndWidth = new ArrayList<>();
 
 		// recreate columns in the correct sort order
 		for (final MenuItem menuItem : menuItems) {
@@ -2070,15 +2070,15 @@ public class ColumnManager {
 	}
 
 	/**
-	 * Set the columns in {@link #_activeProfile._visibleColumnDefinitions} to the order of the <code>tableItems</code> in the
-	 * {@link DialogModifyColumns}
-	 * 
+	 * Set the columns in {@link #_activeProfile._visibleColumnDefinitions} to the order of the
+	 * <code>tableItems</code> in the {@link DialogModifyColumns}
+	 *
 	 * @param tableItems
 	 */
 	void setVisibleColumnIds_FromModifyDialog(final ColumnProfile profile, final TableItem[] tableItems) {
 
-		final ArrayList<String> visibleColumnIds = new ArrayList<String>();
-		final ArrayList<String> columnIdsAndWidth = new ArrayList<String>();
+		final ArrayList<String> visibleColumnIds = new ArrayList<>();
+		final ArrayList<String> columnIdsAndWidth = new ArrayList<>();
 
 		// recreate columns in the correct sort order
 		for (final TableItem tableItem : tableItems) {
@@ -2117,8 +2117,8 @@ public class ColumnManager {
 		final String headerHitColId = headerHitColDef.getColumnId();
 		final String[] visibleIds = _activeProfile.visibleColumnIds;
 
-		final ArrayList<String> visibleColumnIds = new ArrayList<String>();
-		final ArrayList<String> visibleIdsAndWidth = new ArrayList<String>();
+		final ArrayList<String> visibleColumnIds = new ArrayList<>();
+		final ArrayList<String> visibleIdsAndWidth = new ArrayList<>();
 
 		for (final String columnId : visibleIds) {
 
@@ -2152,10 +2152,10 @@ public class ColumnManager {
 
 	/**
 	 * Update the viewer with the columns from the {@link DialogModifyColumns}
-	 * 
+	 *
 	 * @param dialogActiveProfile
 	 * @param tableItems
-	 *            table item in the {@link DialogModifyColumns}
+	 *           table item in the {@link DialogModifyColumns}
 	 */
 	void updateColumns(final ColumnProfile dialogActiveProfile, final TableItem[] tableItems) {
 

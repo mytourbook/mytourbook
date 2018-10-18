@@ -77,6 +77,8 @@ import net.tourbook.ui.UI;
 public class PrefPageAppearanceColors extends PreferencePage implements IWorkbenchPreferencePage, IColorTreeViewer,
 		IMap2ColorUpdater {
 
+	public static final String ID = "net.tourbook.preferences.PrefPageChartColors"; //$NON-NLS-1$
+
 	/*
 	 * Legend is created with dummy values 0...200.
 	 */
@@ -121,10 +123,10 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 	/*
 	 * UI controls
 	 */
-	private Button								_btnLegend;
-	private Button								_chkLiveUpdate;
+	private Button				_btnLegend;
+	private Button				_chkLiveUpdate;
 
-	private ColorSelector					_colorSelector;
+	private ColorSelector	_colorSelector;
 
 	/**
 	 * the color content provider has the following structure<br>

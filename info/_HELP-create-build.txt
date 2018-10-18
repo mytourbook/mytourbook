@@ -3,8 +3,8 @@
  One Click build process (since 18.1)
 #####################################
 
-* Set version number as described below (Build with POM)
 * Set version number in gradle.properties in the .git root
+* Set version number as described below (Build with POM)
 * Run gradlew in C:\DAT\MT\mytourbook\build\build.net.tourbook this will run the default task
 
 

@@ -184,7 +184,7 @@ public class FitContextData {
 
 		if (allFilteredBpm.length != allEventTimestamps.length) {
 
-			TourLogManager.logError(String.format("Fit file has different filtered data: EventTimestamp: %d - FilteredBpm: %d",
+			TourLogManager.logError(String.format("Fit file has different filtered data: EventTimestamp: %d - FilteredBpm: %d", //$NON-NLS-1$
 					allEventTimestamps.length,
 					allFilteredBpm.length));
 
@@ -290,7 +290,7 @@ public class FitContextData {
 		swimData.absoluteTime = javaTime;
 
 		if (lengthType != null) {
-			swimData.swim_ActivityType = lengthType.getValue();
+			swimData.swim_LengthType = lengthType.getValue();
 		}
 
 		if (avgSwimmingCadence != null) {
