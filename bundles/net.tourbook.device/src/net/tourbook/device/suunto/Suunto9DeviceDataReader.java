@@ -188,8 +188,12 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		for (int i = 0; i < samples.length(); i++) {
 			JSONObject sample = samples.getJSONObject(i);
 			JSONObject currentSampleAttributes = new JSONObject(sample.get("Attributes").toString());
-			JSONObject currentSampleSml = new JSONObject(currentSampleAttributes.get("suunto/sml").toString());
-			String currentSampleData = currentSampleSml.get("Sample").toString();
+			String currentSampleSml = currentSampleAttributes.get("suunto/sml").toString();
+			if (!currentSampleSml.contains("Sample"))
+				continue;
+
+			String currentSampleData = new JSONObject(currentSampleSml).get("Sample").toString();
+
 			long currentSampleDate = ZonedDateTime.parse(sample.get("TimeISO8601").toString())
 					.toInstant()
 					.toEpochMilli();
@@ -342,7 +346,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 	private boolean TryAddPowerData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
 		if ((value = TryRetrieveStringElementValue(currentSample, "Power")) != null) {
-			timeData.power = Util.parseFloat(value) * 60.0f;
+			timeData.power = Util.parseFloat(value);
 			return true;
 		}
 		return false;
