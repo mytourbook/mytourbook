@@ -24,9 +24,9 @@ import net.tourbook.importdata.TourbookDevice;
 
 public class Suunto9DeviceDataReader extends TourbookDevice {
 
-	private final float				Kelvin		= 273.1499938964845f;
+	private final float				Kelvin	= 273.1499938964845f;
 
-	private ArrayList<TimeData>	_sampleList	= new ArrayList<TimeData>();
+	private ArrayList<TimeData>	_sampleList;
 
 	// plugin constructor
 	public Suunto9DeviceDataReader() {}
@@ -168,6 +168,8 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
 	private TourData ImportTour(String jsonFileContent) {
 		final TourData tourData = new TourData();
+		_sampleList = new ArrayList<TimeData>();
+
 		JSONArray samples = null;
 		try {
 			JSONObject jsonContent = new JSONObject(jsonFileContent);
