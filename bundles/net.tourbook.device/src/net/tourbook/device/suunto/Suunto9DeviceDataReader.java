@@ -85,7 +85,6 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 			// create additional data
 			tourData.computeAltitudeUpDown();
 			tourData.computeTourDrivingTime();
-			tourData.computeSpeedSerie();
 			tourData.computeComputedValues();
 		}
 
@@ -213,7 +212,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 			wasDataPopulated |= TryAddHeartRateData(new JSONObject(currentSampleData), timeData);
 
 			// Speed
-			wasDataPopulated |= TryAddSpeedData(new JSONObject(currentSampleData), timeData);
+			//wasDataPopulated |= TryAddSpeedData(new JSONObject(currentSampleData), timeData);
 
 			// Cadence
 			wasDataPopulated |= TryAddCadenceData(new JSONObject(currentSampleData), timeData);
@@ -294,7 +293,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 	private boolean TryAddSpeedData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
 		if ((value = TryRetrieveStringElementValue(currentSample, "Speed")) != null) {
-			timeData.speed = Util.parseFloat(value) * 3600.0f;
+			timeData.speed = Util.parseFloat(value);
 			return true;
 		}
 		return false;
