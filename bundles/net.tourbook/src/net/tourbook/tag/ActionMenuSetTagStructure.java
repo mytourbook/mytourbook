@@ -20,10 +20,10 @@ import java.util.ArrayList;
 import net.tourbook.Messages;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.TreeViewerItem;
-import net.tourbook.ui.views.tagging.TVITagViewMonth;
-import net.tourbook.ui.views.tagging.TVITagViewTag;
-import net.tourbook.ui.views.tagging.TVITagViewTour;
-import net.tourbook.ui.views.tagging.TVITagViewYear;
+import net.tourbook.ui.views.tagging.TVITagView_Month;
+import net.tourbook.ui.views.tagging.TVITagView_Tag;
+import net.tourbook.ui.views.tagging.TVITagView_Tour;
+import net.tourbook.ui.views.tagging.TVITagView_Year;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -68,8 +68,8 @@ public class ActionMenuSetTagStructure extends Action implements IMenuCreator {
 
 					for (final Object element : selection.toArray()) {
 
-						if (element instanceof TVITagViewTour) {
-							setTagStructure(((TVITagViewTour) element).getParentItem());
+						if (element instanceof TVITagView_Tour) {
+							setTagStructure(((TVITagView_Tour) element).getParentItem());
 						} else {
 							setTagStructure(element);
 						}
@@ -78,21 +78,21 @@ public class ActionMenuSetTagStructure extends Action implements IMenuCreator {
 
 				private void setTagStructure(final Object element) {
 
-					if (element instanceof TVITagViewTag) {
+					if (element instanceof TVITagView_Tag) {
 
-						setTagStructure_Item((TVITagViewTag) element);
+						setTagStructure_Item((TVITagView_Tag) element);
 
-					} else if (element instanceof TVITagViewYear) {
+					} else if (element instanceof TVITagView_Year) {
 
-						setTagStructure_Item(((TVITagViewYear) element).getTagItem());
+						setTagStructure_Item(((TVITagView_Year) element).getTagItem());
 
-					} else if (element instanceof TVITagViewMonth) {
+					} else if (element instanceof TVITagView_Month) {
 
-						setTagStructure_Item(((TVITagViewMonth) element).getYearItem().getTagItem());
+						setTagStructure_Item(((TVITagView_Month) element).getYearItem().getTagItem());
 					}
 				}
 
-				private void setTagStructure_Item(final TVITagViewTag tagItem) {
+				private void setTagStructure_Item(final TVITagView_Tag tagItem) {
 
 					// check if expand type has changed
 					if (tagItem.getExpandType() == __expandType) {
@@ -215,8 +215,8 @@ public class ActionMenuSetTagStructure extends Action implements IMenuCreator {
 
 			// set the expand type when only one tag is selected
 
-			if (selection.getFirstElement() instanceof TVITagViewTag) {
-				final TVITagViewTag itemTag = (TVITagViewTag) selection.getFirstElement();
+			if (selection.getFirstElement() instanceof TVITagView_Tag) {
+				final TVITagView_Tag itemTag = (TVITagView_Tag) selection.getFirstElement();
 				selectedExpandType = itemTag.getExpandType();
 			}
 		}

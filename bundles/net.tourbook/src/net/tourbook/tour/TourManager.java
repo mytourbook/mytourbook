@@ -4218,6 +4218,19 @@ public class TourManager {
 	}
 
 	/**
+	 * Fills a list with {@link TourData} from it's id's.
+	 *
+	 * @param allTourData
+	 * @param tourIds
+	 */
+	public void getTourData(final ArrayList<TourData> allTourData, final ArrayList<Long> tourIds) {
+
+		for (final Long tourId : tourIds) {
+			allTourData.add(getTourData(tourId));
+		}
+	}
+
+	/**
 	 * Get a tour from the cache, the cache is necessary because getting a tour from the database
 	 * creates always a new instance.
 	 *
