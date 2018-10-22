@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +17,6 @@ import org.json.JSONObject;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
-import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
@@ -26,12 +24,10 @@ import net.tourbook.importdata.TourbookDevice;
 
 public class Suunto9DeviceDataReader extends TourbookDevice {
 
-	private final float						Kelvin								= 273.1499938964845f;
-
-	private ArrayList<TimeData>			_sampleList;
-
 	private HashMap<String, TourData>	processedActivities				= new HashMap<String, TourData>();
 	private HashMap<String, String>		childrenActivitiesToProcess	= new HashMap<String, String>();
+	private HashMap<Long, TourData>		_newlyImportedTours				= new HashMap<Long, TourData>();
+	private HashMap<Long, TourData>		_alreadyImportedTours			= new HashMap<Long, TourData>();
 
 	// plugin constructor
 	public Suunto9DeviceDataReader() {}
@@ -70,46 +66,24 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 												final DeviceData deviceData,
 												final HashMap<Long, TourData> alreadyImportedTours,
 												final HashMap<Long, TourData> newlyImportedTours) {
+		_newlyImportedTours = newlyImportedTours;
+		_alreadyImportedTours = alreadyImportedTours;
+
 		String jsonFileContent =
 				GetJsonContentFromGZipFile(importFilePath);
 
 		if (isValidJSONFile(jsonFileContent) == false) {
 			return false;
 		}
-		SuuntoJsonProcessor s = new SuuntoJsonProcessor();
 		ProcessFile(importFilePath, jsonFileContent);
-
-		final TourData tourData = ImportTour(jsonFileContent);
-
-		tourData.setDeviceId(deviceId);
-		tourData.setImportFilePath(importFilePath);
-
-		// after all data are added, the tour id can be created
-		final String uniqueId = this.createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_SUUNTO9);
-		final Long tourId = tourData.createTourId(uniqueId);
-
-		// check if the tour is already imported
-		if (alreadyImportedTours.containsKey(tourId) == false) {
-			// add new tour to other tours
-			newlyImportedTours.put(tourId, tourData);
-
-			// create additional data
-			tourData.computeAltitudeUpDown();
-			tourData.computeTourDrivingTime();
-			tourData.computeComputedValues();
-		}
-		//An updated version of the tour is available
-		// DON'T DO if it works by reference, which I assume so
-		else {
-
-		}
 
 		return true;
 	}
 
 	@Override
 	public boolean validateRawData(final String fileName) {
-		return isValidJSONFile(fileName);
+		String jsonFileContent = GetJsonContentFromGZipFile(fileName);
+		return isValidJSONFile(jsonFileContent);
 	}
 
 	/**
@@ -170,12 +144,13 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
 		String fileName =
 				FilenameUtils.removeExtension(filePath);
-		if (fileName.substring(fileName.length() - 5, 5) == ".json") {
+
+		if (fileName.substring(fileName.length() - 5, fileName.length()) == ".json") {
 			fileName = FilenameUtils.removeExtension(fileName);
 		}
 
 		String fileNumberString =
-				fileName.substring(fileName.lastIndexOf('-') + 1);
+				fileName.substring(fileName.lastIndexOf('-') + 1, fileName.lastIndexOf('-') + 2);
 
 		int fileNumber;
 		try {
@@ -201,6 +176,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 			Map.Entry<String, TourData> parentEntry = null;
 			for (Map.Entry<String, TourData> entry : processedActivities.entrySet()) {
 				String key = entry.getKey();
+				//TODO
 				int ff = fileNumber - 1;
 				if (key.contains(FilenameUtils.removeExtension(filePath) + "-" + ff + ".json")) {
 					parentEntry = entry;
@@ -223,253 +199,92 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 					processedActivities.put(filePath, activity);
 			}
 		}
+
+		//We check if the child(ren) has(ve) been provided earlier.
+		//In this case, we concatenate it(them) with the parent
+		//activity
+		if (activity != null) {
+			ConcatenateChildrenActivities(
+					filePath,
+					fileNumber,
+					activity);
+
+			activity.setImportFilePath(filePath);
+
+			FinalizeTour(activity);
+		}
+
 		return true;
 	}
 
-	private TourData ImportTour(String jsonFileContent) {
-		final TourData tourData = new TourData();
-		_sampleList = new ArrayList<TimeData>();
+	/**
+	 * Concatenates children activities with a given activity.
+	 * 
+	 * @param filePath
+	 *           The absolute full path of a given activity.
+	 * @param currentFileNumber
+	 *           The file number of the given activity. Example : If the current activity file is
+	 *           1536723722706_{DeviceSerialNumber}_-2.json.gz its file number will be 2
+	 * @param currentActivity
+	 *           The current activity processed and created.
+	 */
+	private void ConcatenateChildrenActivities(	String filePath,
+																int currentFileNumber,
+																TourData currentActivity) {
+		SuuntoJsonProcessor suuntoJsonProcessor = new SuuntoJsonProcessor();
 
-		JSONArray samples = null;
-		try {
-			JSONObject jsonContent = new JSONObject(jsonFileContent);
-			samples = (JSONArray) jsonContent.get("Samples");
-		} catch (JSONException ex) {
-			return null;
-		}
+		ArrayList<String> keysToRemove = new ArrayList<String>();
+		for (Map.Entry<String, String> unused : childrenActivitiesToProcess.entrySet()) {
+			String key = unused.getKey();
+			String ff = String.valueOf(++currentFileNumber);
 
-		JSONObject firstSample = (JSONObject) samples.get(0);
+			Map.Entry<String, String> childEntry = null;
 
-		/*
-		 * set tour start date/time
-		 */
-		ZonedDateTime previousLapStartTime = ZonedDateTime.parse(firstSample.get("TimeISO8601").toString());
-		tourData.setTourStartTime(previousLapStartTime);
-
-		for (int i = 0; i < samples.length(); i++) {
-			JSONObject sample = samples.getJSONObject(i);
-			JSONObject currentSampleAttributes = new JSONObject(sample.get("Attributes").toString());
-			String currentSampleSml = currentSampleAttributes.get("suunto/sml").toString();
-			if (!currentSampleSml.contains("Sample"))
-				continue;
-
-			String currentSampleData = new JSONObject(currentSampleSml).get("Sample").toString();
-
-			long currentSampleDate = ZonedDateTime.parse(sample.get("TimeISO8601").toString())
-					.toInstant()
-					.toEpochMilli();
-
-			boolean wasDataPopulated = false;
-			TimeData timeData = new TimeData();
-
-			timeData.absoluteTime = currentSampleDate;
-
-			// GPS point
-			if (currentSampleData.contains("GPSAltitude") && currentSampleData.contains("Latitude")
-					&& currentSampleData.contains("Longitude")) {
-				wasDataPopulated |= TryAddGpsData(new JSONObject(currentSampleData), timeData);
+			if (key.contains(FilenameUtils.removeExtension(filePath) + "-" + ff + ".json")) {
+				childEntry = unused;
 			}
 
-			// Heart Rate
-			wasDataPopulated |= TryAddHeartRateData(new JSONObject(currentSampleData), timeData);
+			if (childEntry == null)
+				break;
 
-			// Speed
-			//wasDataPopulated |= TryAddSpeedData(new JSONObject(currentSampleData), timeData);
+			suuntoJsonProcessor.ImportActivity(
+					childEntry.getValue(),
+					currentActivity);
 
-			// Cadence
-			wasDataPopulated |= TryAddCadenceData(new JSONObject(currentSampleData), timeData);
+			// We just concatenated a child activity so we can remove it
+			// from the list of activities to process
+			keysToRemove.add(childEntry.getKey());
 
-			// Barometric Altitude
-			// TryAddAltitudeData(new JSONObject(currentSampleData), currentSampleDate,
-			// timeData);
-
-			// Power
-			wasDataPopulated |= TryAddPowerData(new JSONObject(currentSampleData), timeData);
-
-			// Distance
-			wasDataPopulated |= TryAddDistanceData(new JSONObject(currentSampleData), timeData);
-
-			// Temperature
-			wasDataPopulated |= TryAddTemperatureData(new JSONObject(currentSampleData), timeData);
-
-			if (wasDataPopulated)
-				_sampleList.add(timeData);
-		}
-		tourData.createTimeSeries(_sampleList, true);
-
-		return tourData;
-	}
-
-	/**
-	 * Attempts to retrieve and add GPS data to the current tour.
-	 * 
-	 * @param currentSample
-	 *           The current sample data in JSON format.
-	 * @param sampleList
-	 *           The tour's time serie.
-	 */
-	private boolean TryAddGpsData(JSONObject currentSample, TimeData timeData) {
-		try {
-			String dateString = currentSample.get("UTC").toString();
-			long unixTime = ZonedDateTime.parse(dateString).toInstant().toEpochMilli();
-			float latitude = Util.parseFloat(currentSample.get("Latitude").toString());
-			float longitude = Util.parseFloat(currentSample.get("Longitude").toString());
-			float altitude = Util.parseFloat(currentSample.get("GPSAltitude").toString());
-
-			timeData.latitude = (latitude * 180) / Math.PI;
-			timeData.longitude = (longitude * 180) / Math.PI;
-			timeData.absoluteTime = unixTime;
-			timeData.absoluteAltitude = altitude;
-
-			return true;
-		} catch (Exception e) {}
-		return false;
-	}
-
-	/**
-	 * Attempts to retrieve and add HR data to the current tour.
-	 * 
-	 * @param currentSample
-	 *           The current sample data in JSON format.
-	 * @param sampleList
-	 *           The tour's time serie.
-	 */
-	private boolean TryAddHeartRateData(JSONObject currentSample, TimeData timeData) {
-		String value = null;
-		if ((value = TryRetrieveStringElementValue(currentSample, "HR")) != null) {
-			timeData.pulse = Util.parseFloat(value) * 60.0f;
-			return true;
+			// We need to update the activity we just concatenated by
+			// updating the file path and the activity object.
+			processedActivities.remove(filePath);
+			processedActivities.put(childEntry.getKey(), currentActivity);
 		}
 
-		return false;
-	}
-
-	/**
-	 * Attempts to retrieve and add speed data to the current tour.
-	 * 
-	 * @param currentSample
-	 *           The current sample data in JSON format.
-	 * @param sampleList
-	 *           The tour's time serie.
-	 */
-	@SuppressWarnings("unused")
-	private boolean TryAddSpeedData(JSONObject currentSample, TimeData timeData) {
-		String value = null;
-		if ((value = TryRetrieveStringElementValue(currentSample, "Speed")) != null) {
-			timeData.speed = Util.parseFloat(value);
-			return true;
+		for (int index = 0; index < keysToRemove.size(); ++index) {
+			childrenActivitiesToProcess.remove(keysToRemove.get(index));
 		}
-		return false;
 	}
 
-	/**
-	 * Attempts to retrieve and add cadence data to the current tour.
-	 * 
-	 * @param currentSample
-	 *           The current sample data in JSON format.
-	 * @param sampleList
-	 *           The tour's time serie.
-	 */
-	private boolean TryAddCadenceData(JSONObject currentSample, TimeData timeData) {
-		String value = null;
-		if ((value = TryRetrieveStringElementValue(currentSample, "Cadence")) != null) {
-			timeData.cadence = Util.parseFloat(value) * 60.0f;
-			return true;
+	private void FinalizeTour(TourData tourData) {
+
+		tourData.setDeviceId(deviceId);
+
+		final String uniqueId = this.createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_SUUNTO9);
+		final Long tourId = tourData.createTourId(uniqueId);
+
+		// check if the tour is already imported
+		if (_newlyImportedTours.containsKey(tourId)) {
+			_newlyImportedTours.remove(tourId);
 		}
-		return false;
+
+		// add new tour to other tours
+		_newlyImportedTours.put(tourId, tourData);
+
+		// create additional data
+		tourData.computeAltitudeUpDown();
+		tourData.computeTourDrivingTime();
+		tourData.computeComputedValues();
 	}
 
-	/**
-	 * Attempts to retrieve and add barometric altitude data to the current tour.
-	 * 
-	 * @param currentSample
-	 *           The current sample data in JSON format.
-	 * @param sampleList
-	 *           The tour's time serie.
-	 */
-	@SuppressWarnings("unused")
-	private boolean TryAddAltitudeData(JSONObject currentSample, TimeData timeData) {
-		String value = null;
-		if ((value = TryRetrieveStringElementValue(currentSample, "Altitude")) != null) {
-			timeData.absoluteAltitude = Util.parseFloat(value);
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Attempts to retrieve and add power data to the current tour.
-	 * 
-	 * @param currentSample
-	 *           The current sample data in JSON format.
-	 * @param sampleList
-	 *           The tour's time serie.
-	 */
-	private boolean TryAddPowerData(JSONObject currentSample, TimeData timeData) {
-		String value = null;
-		if ((value = TryRetrieveStringElementValue(currentSample, "Power")) != null) {
-			timeData.power = Util.parseFloat(value);
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Attempts to retrieve and add power data to the current tour.
-	 * 
-	 * @param currentSample
-	 *           The current sample data in JSON format.
-	 * @param sampleList
-	 *           The tour's time serie.
-	 */
-	private boolean TryAddDistanceData(JSONObject currentSample, TimeData timeData) {
-		String value = null;
-		if ((value = TryRetrieveStringElementValue(currentSample, "Distance")) != null) {
-			timeData.absoluteDistance = Util.parseFloat(value);
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Attempts to retrieve and add power data to the current tour.
-	 * 
-	 * @param currentSample
-	 *           The current sample data in JSON format.
-	 * @param sampleList
-	 *           The tour's time serie.
-	 */
-	private boolean TryAddTemperatureData(JSONObject currentSample, TimeData timeData) {
-		String value = null;
-		if ((value = TryRetrieveStringElementValue(currentSample, "Temperature")) != null) {
-			timeData.temperature = Util.parseFloat(value) - Kelvin;
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Searches for an element and returns its value as a string.
-	 * 
-	 * @param token
-	 *           The JSON token in which to look for a given element.
-	 * @param elementName
-	 *           The element name to look for in a JSON content.
-	 * @return The element value, if found.
-	 */
-	private String TryRetrieveStringElementValue(JSONObject token, String elementName) {
-		if (!token.toString().contains(elementName))
-			return null;
-
-		String result = null;
-		try {
-			result = token.get(elementName).toString();
-		} catch (Exception e) {
-
-		}
-		if (result == "null")
-			return null;
-
-		return result;
-	}
 }
