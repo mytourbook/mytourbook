@@ -100,6 +100,24 @@ public class Map25ProviderManager {
 	}
 
 	/**
+	 * Mapsforge 
+	 */
+	private static Map25Provider createMapProvider_Mapsforge() {
+
+		final Map25Provider mapProvider = new Map25Provider();
+
+		mapProvider.isEnabled = false;
+		mapProvider.name = "Mapsforge";
+		mapProvider.url = "http://opensciencemap.org/tiles/vtm"; //$NON-NLS-1$
+		mapProvider.tilePath = "/{Z}/{X}/{Y}.vtm"; //$NON-NLS-1$
+		mapProvider.tileEncoding = TileEncoding.VTM;
+		mapProvider.description = "Offline Mapsforgemaps eg. openandromaps.org";
+
+		return mapProvider;
+	}	
+
+	
+	/**
 	 * mapzen
 	 */
 	private static Map25Provider createMapProvider_Mapzen() {
@@ -134,6 +152,9 @@ public class Map25ProviderManager {
 		return mapProvider;
 	}
 
+
+	
+	
 	private static void fireChangeEvent() {
 
 		final Object[] allListeners = _mapProviderListeners.getListeners();
@@ -248,6 +269,7 @@ public class Map25ProviderManager {
 			 */
 			allMapProvider.add(_defaultMapProvider);
 			allMapProvider.add(createMapProvider_Mapzen());
+			allMapProvider.add(createMapProvider_Mapsforge());
 			allMapProvider.add(createMapProvider_MyTileServer());
 		}
 

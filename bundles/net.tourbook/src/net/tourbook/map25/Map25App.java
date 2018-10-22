@@ -16,6 +16,7 @@
 package net.tourbook.map25;
 
 import java.awt.Canvas;
+import java.io.File;
 
 import net.tourbook.common.util.Util;
 import net.tourbook.map25.Map25TileSource.Builder;
@@ -80,7 +81,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 	static final String				STATE_SUFFIX_MAP_DEFAULT_POSITION	= "MapDefaultPosition";					//$NON-NLS-1$
 
 	private static IDialogSettings	_state;
-
+	private static final String			MAPSFORGE_MAP_FILE_PATH				= "C:\\mf\\Germany.map";
 	private static Map25View		_map25View;
 	private static LwjglApplication	_lwjglApp;
 
@@ -125,6 +126,21 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		return mapApp;
 	}
 
+   public static File getMapFile() {
+
+      File file = new File(MAPSFORGE_MAP_FILE_PATH);
+      if (!file.exists()) {
+          throw new IllegalArgumentException("file does not exist: " + file);
+      } else if (!file.isFile()) {
+          throw new IllegalArgumentException("not a file: " + file);
+      } else if (!file.canRead()) {
+          throw new IllegalArgumentException("cannot read file: " + file);
+      }
+      return file;
+  }	
+	
+	
+	
 	protected static LwjglApplicationConfiguration getConfig(final String title) {
 
 		LwjglApplicationConfiguration.disableAudio = true;
