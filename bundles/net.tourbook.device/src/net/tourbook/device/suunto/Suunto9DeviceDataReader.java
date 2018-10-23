@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.io.FilenameUtils;
@@ -77,9 +78,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		if (isValidJSONFile(jsonFileContent) == false) {
 			return false;
 		}
-		ProcessFile(importFilePath, jsonFileContent);
-
-		return true;
+		return ProcessFile(importFilePath, jsonFileContent);
 	}
 
 	@Override
@@ -172,6 +171,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 			final String uniqueId = this.createUniqueId(activity, Util.UNIQUE_ID_SUFFIX_SUUNTO9);
 			activity.createTourId(uniqueId);
 
+			//TODO Call function AddProcessedActivity that will iterate...
 			if (!processedActivities.containsKey(filePath))
 				processedActivities.put(activity, suuntoJsonProcessor.getSampleList());
 		} else if (fileNumber > 1) {
@@ -184,7 +184,6 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 				TourData key = entry.getKey();
 				//TODO
 				int ff = fileNumber - 1;
-				String toto = key.getImportFileName();
 				String tata = GetFileNameWithoutNumber(FilenameUtils.getBaseName(filePath)) + "-" + ff + ".json.gz";
 				if (key.getImportFileName().contains(tata)) {
 					parentEntry = entry;
@@ -204,9 +203,9 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 				//We remove the parent activity to replace it with the
 				//updated one (parent activity concatenated with the current
 				//one).
-				Iterator it = processedActivities.entrySet().iterator();
+				Iterator<Entry<TourData, ArrayList<TimeData>>> it = processedActivities.entrySet().iterator();
 				while (it.hasNext()) {
-					Map.Entry<TourData, ArrayList<TimeData>> entry = (Map.Entry) it.next();
+					Map.Entry<TourData, ArrayList<TimeData>> entry = (Entry<TourData, ArrayList<TimeData>>) it.next();
 					if (entry.getKey().getTourId() == parentEntry.getKey().getTourId())
 						it.remove(); // avoids a ConcurrentModificationException
 				}

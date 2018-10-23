@@ -15,6 +15,7 @@ public class SuuntoJsonProcessor {
 
 	private final float				Kelvin	= 273.1499938964845f;
 	private ArrayList<TimeData>	_sampleList;
+	private int							_lapCounter;
 
 	public TourData ImportActivity(	String jsonFileContent,
 												TourData activityToReUse,
@@ -42,12 +43,16 @@ public class SuuntoJsonProcessor {
 				firstSampleAttributes.contains("Start")) {
 			ZonedDateTime startTime = ZonedDateTime.parse(firstSample.get("TimeISO8601").toString());
 			tourData.setTourStartTime(startTime);
+
 		} else if (activityToReUse != null) {
 			tourData = activityToReUse;
 			_sampleList = sampleListToReUse;
 			tourData.cleanupDataSeries();
 		} else
 			return null;
+
+		boolean activityContainsLaps = false;
+		boolean isPaused = false;
 
 		for (int i = 0; i < samples.length(); i++) {
 			JSONObject sample = samples.getJSONObject(i);
@@ -66,6 +71,30 @@ public class SuuntoJsonProcessor {
 			TimeData timeData = new TimeData();
 
 			timeData.absoluteTime = currentSampleDate;
+
+			if (currentSampleData.contains("Pause")) {
+				if (!isPaused) {
+					if (currentSampleData.contains("true")) {
+						isPaused = true;
+					}
+				} else {
+					if (currentSampleData.contains("false"))
+						isPaused = false;
+				}
+			}
+
+			if (isPaused)
+				continue;
+
+			if (currentSampleData.contains("Lap") &&
+					(currentSampleData.contains("Manual") ||
+							currentSampleData.contains("Distance"))) {
+				activityContainsLaps = true;
+
+				timeData.marker = 1;
+				timeData.markerLabel = Integer.toString(++_lapCounter);
+				_sampleList.add(timeData);
+			}
 
 			// GPS point
 			if (currentSampleData.contains("GPSAltitude") && currentSampleData.contains("Latitude")
