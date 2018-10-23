@@ -18,12 +18,6 @@ package net.tourbook.data;
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.EAGER;
 
-import com.skedgo.converter.TimezoneMapper;
-
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.set.hash.TIntHashSet;
-
 import java.awt.Point;
 import java.io.File;
 import java.io.PrintStream;
@@ -72,6 +66,11 @@ import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 import org.hibernate.annotations.Cascade;
 
+import com.skedgo.converter.TimezoneMapper;
+
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.set.hash.TIntHashSet;
 import net.tourbook.Messages;
 import net.tourbook.algorithm.DPPoint;
 import net.tourbook.algorithm.DouglasPeuckerSimplifier;
@@ -226,6 +225,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 *
 	 * @since DB version 22
 	 */
+	@XmlElement
 	private long						tourStartTime;
 
 	/**
@@ -233,36 +233,43 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 *
 	 * @since DB version 22
 	 */
+	@XmlElement
 	private long						tourEndTime;
 
 	/**
 	 * year of tour start
 	 */
+	@XmlElement
 	private short						startYear;
 
 	/**
 	 * mm (d) month of tour
 	 */
+	@XmlElement
 	private short						startMonth;
 
 	/**
 	 * dd (d) day of tour
 	 */
+	@XmlElement
 	private short						startDay;
 
 	/**
 	 * HH (d) hour of tour
 	 */
+	@XmlElement
 	private short						startHour;
 
 	/**
 	 * MM (d) minute of tour
 	 */
+	@XmlElement
 	private short						startMinute;
 
 	/**
 	 *
 	 */
+	@XmlElement
 	private int							startSecond;														// db-version 7
 
 	/**
@@ -270,6 +277,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * <p>
 	 * This is used in sql queries.
 	 */
+	@XmlElement
 	private short						startWeek;
 
 	/**
@@ -301,6 +309,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	/**
 	 * Time zone ID or <code>null</code> when the time zone ID is not available.
 	 */
+	@XmlElement
 	private String						timeZoneId;
 
 	// ############################################# DISTANCE #############################################
@@ -9680,7 +9689,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	public String toXml() {
 
 		try {
-			final JAXBContext context = JAXBContext.newInstance(this.getClass());
+			final JAXBContext context = JAXBContext.newInstance(TourData.class);
 			final Marshaller marshaller = context.createMarshaller();
 			final StringWriter sw = new StringWriter();
 			marshaller.marshal(this, sw);
