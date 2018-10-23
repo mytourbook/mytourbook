@@ -35,8 +35,13 @@ public class SuuntoJsonProcessor {
 		/*
 		 * set tour start date/time
 		 */
-		ZonedDateTime previousLapStartTime = ZonedDateTime.parse(firstSample.get("TimeISO8601").toString());
-		tourData.setTourStartTime(previousLapStartTime);
+		String firstSampleAttributes = firstSample.get("attributes").toString();
+		if (firstSampleAttributes.contains("Lap") &&
+				firstSampleAttributes.contains("Type") &&
+				firstSampleAttributes.contains("Start")) {
+			ZonedDateTime startTime = ZonedDateTime.parse(firstSample.get("TimeISO8601").toString());
+			tourData.setTourStartTime(startTime);
+		}
 
 		for (int i = 0; i < samples.length(); i++) {
 			JSONObject sample = samples.getJSONObject(i);
