@@ -11,6 +11,7 @@ import org.xmlunit.builder.Input;
 import org.xmlunit.diff.Diff;
 
 import net.tourbook.common.util.Util;
+import net.tourbook.data.TourData;
 
 public class Suunto9DeviceDataReaderTests {
 
@@ -35,17 +36,15 @@ public class Suunto9DeviceDataReaderTests {
 				Paths.get(filePath).toString());
 
 		// Single file tests
-		Suunto9DeviceDataReader suuntoJsonProcessor = new Suunto9DeviceDataReader();
+		SuuntoJsonProcessor suuntoJsonProcessor = new SuuntoJsonProcessor();
 		for (Map.Entry<String, String> entry : testFiles.entrySet()) {
+			TourData tour = suuntoJsonProcessor.ImportActivity(entry.getValue(), null, null);
 
-			//TourData tour = suuntoJsonProcessor.createTourData(entry.getValue());
-
-			//CompareAgainstControl(entry.getKey(), tour.toXml());
+			CompareAgainstControl(entry.getKey(), tour.toXml());
 		}
 	}
 
-	private static void CompareAgainstControl(
-															String controlDocumentFilePath,
+	private static void CompareAgainstControl(String controlDocumentFilePath,
 															String xmlTestDocument) {
 		final String control = Util.readContentFromFile(xmlTestDocument);
 
