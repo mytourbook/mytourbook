@@ -16,8 +16,9 @@ public class SuuntoJsonProcessor {
 	private final float				Kelvin	= 273.1499938964845f;
 	private ArrayList<TimeData>	_sampleList;
 
-	TourData ImportActivity(String jsonFileContent,
-									TourData activityToReUse) {
+	public TourData ImportActivity(	String jsonFileContent,
+												TourData activityToReUse,
+												ArrayList<TimeData> sampleListToReUse) {
 
 		TourData tourData = new TourData();
 		_sampleList = new ArrayList<TimeData>();
@@ -43,6 +44,8 @@ public class SuuntoJsonProcessor {
 			tourData.setTourStartTime(startTime);
 		} else if (activityToReUse != null) {
 			tourData = activityToReUse;
+			_sampleList = sampleListToReUse;
+			tourData.cleanupDataSeries();
 		} else
 			return null;
 
@@ -98,6 +101,10 @@ public class SuuntoJsonProcessor {
 		tourData.createTimeSeries(_sampleList, true);
 
 		return tourData;
+	}
+
+	public ArrayList<TimeData> getSampleList() {
+		return _sampleList;
 	}
 
 	/**
