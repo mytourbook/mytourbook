@@ -51,7 +51,6 @@ public class SuuntoJsonProcessor {
 		} else
 			return null;
 
-		boolean activityContainsLaps = false;
 		boolean isPaused = false;
 
 		for (int i = 0; i < samples.length(); i++) {
@@ -89,8 +88,6 @@ public class SuuntoJsonProcessor {
 			if (currentSampleData.contains("Lap") &&
 					(currentSampleData.contains("Manual") ||
 							currentSampleData.contains("Distance"))) {
-				activityContainsLaps = true;
-
 				timeData.marker = 1;
 				timeData.markerLabel = Integer.toString(++_lapCounter);
 				_sampleList.add(timeData);
@@ -119,7 +116,7 @@ public class SuuntoJsonProcessor {
 			wasDataPopulated |= TryAddPowerData(new JSONObject(currentSampleData), timeData);
 
 			// Distance
-			wasDataPopulated |= TryAddDistanceData(new JSONObject(currentSampleData), timeData);
+			//wasDataPopulated |= TryAddDistanceData(new JSONObject(currentSampleData), timeData);
 
 			// Temperature
 			wasDataPopulated |= TryAddTemperatureData(new JSONObject(currentSampleData), timeData);
