@@ -19,7 +19,7 @@ public class SuuntoJsonProcessor {
 	TourData ImportActivity(String jsonFileContent,
 									TourData activityToReUse) {
 
-		final TourData tourData = new TourData();
+		TourData tourData = new TourData();
 		_sampleList = new ArrayList<TimeData>();
 
 		JSONArray samples = null;
@@ -35,13 +35,16 @@ public class SuuntoJsonProcessor {
 		/*
 		 * set tour start date/time
 		 */
-		String firstSampleAttributes = firstSample.get("attributes").toString();
+		String firstSampleAttributes = firstSample.get("Attributes").toString();
 		if (firstSampleAttributes.contains("Lap") &&
 				firstSampleAttributes.contains("Type") &&
 				firstSampleAttributes.contains("Start")) {
 			ZonedDateTime startTime = ZonedDateTime.parse(firstSample.get("TimeISO8601").toString());
 			tourData.setTourStartTime(startTime);
-		}
+		} else if (activityToReUse != null) {
+			tourData = activityToReUse;
+		} else
+			return null;
 
 		for (int i = 0; i < samples.length(); i++) {
 			JSONObject sample = samples.getJSONObject(i);
