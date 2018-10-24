@@ -93,6 +93,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 	private static final String			MAPSFORGE_THEME_FILE_PATH		   = "C:\\Users\\top\\BTSync\\oruxmaps\\mapstyles\\ELV4\\Elevate.xml";
 	private static File themeFile;
 
+	
    private boolean s3db;
    
 	private static Map25View		_map25View;

@@ -37,5 +37,6 @@ public enum TileEncoding {
 	 * Mapsforge Map encoding
 	 */
 	MF,
+	
 
 }

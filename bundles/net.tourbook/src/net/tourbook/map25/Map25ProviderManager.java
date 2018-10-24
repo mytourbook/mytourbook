@@ -67,6 +67,7 @@ public class Map25ProviderManager {
 
 	private static ArrayList<Map25Provider>	_allMapProvider;
 
+	
 	/**
 	 * Contains the default default map provider
 	 */

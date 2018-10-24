@@ -81,6 +81,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 		new TileEncodingData(TileEncoding.VTM, Messages.Pref_Map25_Encoding_Mapsforge)
 	};
 
+	
 // SET_FORMATTING_ON
 
 	private final IDialogSettings			_state								= TourbookPlugin.getState(ID);
