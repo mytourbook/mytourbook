@@ -103,7 +103,7 @@ public class SuuntoJsonProcessor {
 			wasDataPopulated |= TryAddHeartRateData(new JSONObject(currentSampleData), timeData);
 
 			// Speed
-			//wasDataPopulated |= TryAddSpeedData(new JSONObject(currentSampleData), timeData);
+			wasDataPopulated |= TryAddSpeedData(new JSONObject(currentSampleData), timeData);
 
 			// Cadence
 			wasDataPopulated |= TryAddCadenceData(new JSONObject(currentSampleData), timeData);

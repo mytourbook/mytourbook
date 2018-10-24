@@ -3,7 +3,9 @@ package net.tourbook.device.suunto;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -15,6 +17,9 @@ import org.apache.commons.io.FilenameUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.builder.Input;
+import org.xmlunit.diff.Diff;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
@@ -31,6 +36,11 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 	private HashMap<String, String>						childrenActivitiesToProcess	= new HashMap<String, String>();
 	private HashMap<Long, TourData>						_newlyImportedTours				= new HashMap<Long, TourData>();
 	private HashMap<Long, TourData>						_alreadyImportedTours			= new HashMap<Long, TourData>();
+
+	// For Unit testing
+	private static final boolean			UNITTESTS			= true;
+	public static final String				IMPORT_FILE_PATH	= "/net/tourbook/device/suunto/testFiles/";
+	private static Map<String, String>	testFiles			= new HashMap<>();									// Java 7
 
 	// plugin constructor
 	public Suunto9DeviceDataReader() {}
@@ -69,6 +79,10 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 												final DeviceData deviceData,
 												final HashMap<Long, TourData> alreadyImportedTours,
 												final HashMap<Long, TourData> newlyImportedTours) {
+		if (UNITTESTS) {
+			return testSuuntoFiles(importFilePath, deviceData, alreadyImportedTours, newlyImportedTours);
+		}
+
 		_newlyImportedTours = newlyImportedTours;
 		_alreadyImportedTours = alreadyImportedTours;
 
@@ -126,6 +140,27 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		String jsonFileContent = null;
 		try {
 			GZIPInputStream gzip = new GZIPInputStream(new FileInputStream(gzipFilePath));
+			BufferedReader br = new BufferedReader(new InputStreamReader(gzip));
+
+			jsonFileContent = br.readLine();
+
+			// close resources
+			br.close();
+			gzip.close();
+		} catch (IOException e) {
+			return "";
+		}
+
+		return jsonFileContent;
+	}
+
+	private String GetJsonContentFromResource(String resourceFilePath) {
+		String jsonFileContent = null;
+		try {
+			InputStream inputStream =
+					Suunto9DeviceDataReader.class.getResourceAsStream(resourceFilePath);
+
+			GZIPInputStream gzip = new GZIPInputStream(inputStream);
 			BufferedReader br = new BufferedReader(new InputStreamReader(gzip));
 
 			jsonFileContent = br.readLine();
@@ -313,9 +348,54 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		// add new tour to other tours
 		_newlyImportedTours.put(tourId, tourData);
 
+		//TODO
 		// create additional data
 		//tourData.computeAltitudeUpDown();
 		//tourData.computeComputedValues();
+	}
+
+	/**
+	 * Unit tests for the Suunto Spartan/9 import
+	 */
+	public boolean testSuuntoFiles(	final String importFilePath,
+												final DeviceData deviceData,
+												final HashMap<Long, TourData> alreadyImportedTours,
+												final HashMap<Long, TourData> newlyImportedTours) {
+
+		boolean testResults = true;
+		// City of Rocks, ID
+		String filePath =
+				IMPORT_FILE_PATH + "1537365846902_183010004848_post_timeline-1.json.gz";
+		testFiles.put(
+				Paths.get(IMPORT_FILE_PATH, "1537365846902_183010004848_post_timeline-1.xml").toString(),
+				filePath);
+
+		// Single file tests
+		SuuntoJsonProcessor suuntoJsonProcessor = new SuuntoJsonProcessor();
+		for (Map.Entry<String, String> entry : testFiles.entrySet()) {
+			String jsonFileContent =
+					GetJsonContentFromResource(entry.getValue());
+			TourData tour = suuntoJsonProcessor.ImportActivity(
+					jsonFileContent,
+					null,
+					null);
+			String xml = tour.toXml();
+
+			testResults &= CompareAgainstControl(entry.getKey(), xml);
+		}
+
+		return testResults;
+	}
+
+	private static boolean CompareAgainstControl(String controlDocumentFilePath,
+																String xmlTestDocument) {
+		final String control = Util.readContentFromFile(xmlTestDocument);
+
+		Diff myDiff = DiffBuilder.compare(Input.fromString(control))
+				.withTest(Input.fromString(xmlTestDocument))
+				.build();
+
+		return !myDiff.hasDifferences();
 	}
 
 }
