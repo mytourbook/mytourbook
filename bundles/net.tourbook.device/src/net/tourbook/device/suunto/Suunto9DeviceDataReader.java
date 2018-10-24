@@ -5,12 +5,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.io.FilenameUtils;
@@ -154,25 +154,31 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		return jsonFileContent;
 	}
 
-	private String GetJsonContentFromResource(String resourceFilePath) {
-		String jsonFileContent = null;
+	private String GetContentFromResource(String resourceFilePath, boolean isZipFile) {
+		String fileContent = null;
 		try {
 			InputStream inputStream =
 					Suunto9DeviceDataReader.class.getResourceAsStream(resourceFilePath);
 
-			GZIPInputStream gzip = new GZIPInputStream(inputStream);
-			BufferedReader br = new BufferedReader(new InputStreamReader(gzip));
+			BufferedReader br = null;
+			GZIPInputStream gzip = null;
+			if (isZipFile) {
+				gzip = new GZIPInputStream(inputStream);
+				br = new BufferedReader(new InputStreamReader(gzip));
+			} else
+				br = new BufferedReader(new InputStreamReader(inputStream));
 
-			jsonFileContent = br.readLine();
+			fileContent = br.lines().collect(Collectors.joining());
 
 			// close resources
 			br.close();
-			gzip.close();
+			if (isZipFile)
+				gzip.close();
 		} catch (IOException e) {
 			return "";
 		}
 
-		return jsonFileContent;
+		return fileContent;
 	}
 
 	private boolean ProcessFile(String filePath, String jsonFileContent) {
@@ -366,33 +372,32 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		// City of Rocks, ID
 		String filePath =
 				IMPORT_FILE_PATH + "1537365846902_183010004848_post_timeline-1.json.gz";
-		testFiles.put(
-				Paths.get(IMPORT_FILE_PATH, "1537365846902_183010004848_post_timeline-1.xml").toString(),
-				filePath);
+		String controlFilePath = IMPORT_FILE_PATH + "1537365846902_183010004848_post_timeline-1.xml";
+		testFiles.put(controlFilePath, filePath);
 
 		// Single file tests
 		SuuntoJsonProcessor suuntoJsonProcessor = new SuuntoJsonProcessor();
 		for (Map.Entry<String, String> entry : testFiles.entrySet()) {
 			String jsonFileContent =
-					GetJsonContentFromResource(entry.getValue());
-			TourData tour = suuntoJsonProcessor.ImportActivity(
-					jsonFileContent,
-					null,
-					null);
+					GetContentFromResource(entry.getValue(), true);
+			TourData tour = suuntoJsonProcessor.ImportActivity(jsonFileContent, null, null);
 			String xml = tour.toXml();
 
-			testResults &= CompareAgainstControl(entry.getKey(), xml);
+			String controlFileContent = GetContentFromResource(entry.getKey(), false);
+
+			testResults &= CompareAgainstControl(controlFileContent, xml);
 		}
 
 		return testResults;
 	}
 
-	private static boolean CompareAgainstControl(String controlDocumentFilePath,
+	private static boolean CompareAgainstControl(String controlDocument,
 																String xmlTestDocument) {
-		final String control = Util.readContentFromFile(xmlTestDocument);
+		//final String control = Util.readContentFromFile(xmlTestDocument);
 
-		Diff myDiff = DiffBuilder.compare(Input.fromString(control))
+		Diff myDiff = DiffBuilder.compare(Input.fromString(controlDocument))
 				.withTest(Input.fromString(xmlTestDocument))
+				.ignoreWhitespace()
 				.build();
 
 		return !myDiff.hasDifferences();

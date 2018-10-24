@@ -825,7 +825,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * The array {@link #timeSerie} is <code>null</code> for a manually created tour, it is
 	 * <b>always</b> set when tour is from a device or an imported file.
 	 */
-	@XmlElement
+	@Transient
 	public int[]						timeSerie;
 
 	/**

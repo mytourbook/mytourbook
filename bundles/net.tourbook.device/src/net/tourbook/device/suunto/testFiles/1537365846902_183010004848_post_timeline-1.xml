@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<TourData>
+	<tourStartTime>1536852810738</tourStartTime>
+	<tourEndTime>1536857120738</tourEndTime>
+	<startYear>2018</startYear>
+	<startMonth>9</startMonth>
+	<startDay>13</startDay>
+	<startHour>9</startHour>
+	<startMinute>33</startMinute>
+	<startSecond>30</startSecond>
+	<startWeek>37</startWeek>
+	<tourRecordingTime>4310</tourRecordingTime>
+	<tourDrivingTime>0</tourDrivingTime>
+	<timeZoneId>America/Boise</timeZoneId>
+	<tourDistance>6614.0</tourDistance>
+	<tourAltUp>0</tourAltUp>
+	<tourAltDown>0</tourAltDown>
+	<restPulse>0</restPulse>
+	<avgPulse>0.0</avgPulse>
+	<maxPulse>0.0</maxPulse>
+	<maxAltitude>0.0</maxAltitude>
+	<maxSpeed>0.0</maxSpeed>
+	<avgCadence>0.0</avgCadence>
+	<TourMarkers/>
+	<test>jokl</test>
+</TourData>
+
