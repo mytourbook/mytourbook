@@ -63,6 +63,7 @@ import org.oscim.theme.VtmThemes;
 import org.oscim.tiling.source.UrlTileSource;
 import org.oscim.tiling.source.mapfile.MapFileTileSource;
 
+
 import org.oscim.utils.Parameters;
 
 import com.badlogic.gdx.Gdx;
@@ -88,10 +89,11 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 
 	private static IDialogSettings	_state;
 	
-	private static final String			MAPSFORGE_MAP_FILE_PATH				= "C:\\Users\\top\\BTSync\\oruxmaps\\mapfiles\\Germany_North_ML.map";
-	//private static final String			MAPSFORGE_MAP_FILE_PATH				= "C:\\Users\\top\\BTSync\\oruxmaps\\mapfiles\\niedersachsen_V5.map";
+	//private static final String			MAPSFORGE_MAP_FILE_PATH				= "C:\\Users\\top\\BTSync\\oruxmaps\\mapfiles\\Germany_North_ML.map";
+	private static final String			MAPSFORGE_MAP_FILE_PATH				= "C:\\Users\\top\\BTSync\\oruxmaps\\mapfiles\\niedersachsen_V5.map";
 	private static final String			MAPSFORGE_THEME_FILE_PATH		   = "C:\\Users\\top\\BTSync\\oruxmaps\\mapstyles\\ELV4\\Elevate.xml";
-	private static File themeFile;
+	private static String _mapFilePath;
+	private static String _themeFilePath;
 
 	
    private boolean s3db;
@@ -104,6 +106,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 
 	private OsmTileLayerMT			_layer_BaseMap;
 	private BuildingLayer			_layer_Building;
+	private S3DBLayer				_layer_S3DB;
+	private VectorTileLayer 	_vector_TileLayer_S3DB;
 	private LabelLayerMT			_layer_Label;
 	private MarkerLayer				_layer_Marker;
 	private MapScaleBarLayer		_layer_ScaleBar;
@@ -227,6 +231,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 			public void onMapEvent(final Event e, final MapPosition mapPosition) {
 
 				_map25View.fireSyncMapEvent(mapPosition, 0);
+				//System.out.println("############### Orientation: " +  _map25View.getOrientation()); //always 0
 			}
 		});
 	}
@@ -247,7 +252,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		mapScaleBar.setScaleBarPosition(MapScaleBar.ScaleBarPosition.BOTTOM_LEFT);
 
 		final MapScaleBarLayer layer = new MapScaleBarLayer(mMap, mapScaleBar);
-		layer.setEnabled(false);
+		layer.setEnabled(true);
 
 		final BitmapRenderer renderer = layer.getRenderer();
 		renderer.setPosition(GLViewport.Position.BOTTOM_RIGHT);
@@ -266,24 +271,22 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		_httpFactory = new OkHttpEngineMT.OkHttpFactoryMT();
 
 
-		File mapFile = getMapFile();
-		themeFile = getThemeFile();
+		_mapFilePath = getMapFile().getAbsolutePath();
+		_themeFilePath = getThemeFile().getAbsolutePath();
 		//final UrlTileSource tileSource = createTileSource(_selectedMapProvider, _httpFactory);
 		final MapFileTileSource tileSource = new MapFileTileSource();
-		tileSource.setMapFile(mapFile.getAbsolutePath());
+		tileSource.setMapFile(_mapFilePath);
 		tileSource.setPreferredLanguage("en");
 
+		System.out.println("########################## MapName: " + tileSource.getName());
+		
+		_vector_TileLayer_S3DB = mMap.setBaseMap(tileSource);
+		_vector_TileLayer_S3DB.setRenderTheme(ThemeLoader.load(_themeFilePath));
+		
       VectorTileLayer l = mMap.setBaseMap(tileSource);
-      //loadTheme(null);
-      mMap.setTheme(ThemeLoader.load(MAPSFORGE_THEME_FILE_PATH));
-      		//load(File));
-
-      if (s3db)
-          mMap.layers().add(new S3DBLayer(mMap, l));
-      else
-          mMap.layers().add(new BuildingLayer(mMap, l));
+      mMap.setTheme(ThemeLoader.load(_themeFilePath));
+      mMap.layers().add(new S3DBLayer(mMap, l));
       mMap.layers().add(new LabelLayer(mMap, l));
-
 
 
 		setupMap(_selectedMapProvider, tileSource);
@@ -302,7 +305,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 
    protected void loadTheme(final String styleId) {
       //mMap.setTheme(VtmThemes.DEFAULT);
-   	mMap.setTheme(ThemeLoader.load(MAPSFORGE_THEME_FILE_PATH));
+   	mMap.setTheme(ThemeLoader.load(_themeFilePath));//    load(_themeFile));
   }
 
 	
@@ -552,7 +555,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 
 		_layer_BaseMap.setTileSource(tileSource);
 		//mMap.setTheme(getTheme(mapProvider));
-		mMap.setTheme(ThemeLoader.load(MAPSFORGE_THEME_FILE_PATH));
+		mMap.setTheme(ThemeLoader.load(_themeFilePath));
 
 		_selectedMapProvider = mapProvider;
 	}
@@ -575,7 +578,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 
 		//mMap.se
 		//mMap.setTheme(getTheme(mapProvider));
-		mMap.setTheme(ThemeLoader.load(MAPSFORGE_THEME_FILE_PATH));
+		mMap.setTheme(ThemeLoader.load(_themeFilePath));
 
 		/*
 		 * Map Viewport
@@ -607,6 +610,13 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		_layer_Building = new BuildingLayer(mMap, _layer_BaseMap);
 		_layer_Building.setEnabled(false);
 		layers.add(_layer_Building);
+		
+		// S3DB
+		//_layer_S3DB = new S3DBLayer(mMap,_vector_TileLayer_S3DB);
+		//_layer_S3DB.setEnabled(false);
+		//layers.add(_layer_S3DB);
+		//layers.add(_layer_Label);
+
 
 		// label
 		_layer_Label = new LabelLayerMT(mMap, _layer_BaseMap);
