@@ -825,7 +825,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * The array {@link #timeSerie} is <code>null</code> for a manually created tour, it is
 	 * <b>always</b> set when tour is from a device or an imported file.
 	 */
-	@Transient
+	@XmlElementWrapper(name = "TimeSeries")
+	@XmlElement(name = "TimeSerie")
 	public int[]						timeSerie;
 
 	/**
@@ -850,7 +851,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * Contains the absolute altitude in meter (metric system) or <code>null</code> when not
 	 * available.
 	 */
-	@Transient
+	@XmlElementWrapper(name = "AltitudeSeries")
+	@XmlElement(name = "AltitudeSerie")
 	public float[]						altitudeSerie;
 
 	/**
@@ -881,10 +883,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	@Transient
 	private float[]					srtmSerieImperial;
 
-	@Transient
+	@XmlElementWrapper(name = "CadenceSeries")
+	@XmlElement(name = "CadenceSerie")
 	private float[]					cadenceSerie;
 
-	@Transient
+	@XmlElementWrapper(name = "PulseSeries")
+	@XmlElement(name = "PulseSerie")
 	public float[]						pulseSerie;
 
 	@Transient
@@ -903,7 +907,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	/**
 	 * Contains the temperature in the metric measurement system.
 	 */
-	@Transient
+	@XmlElementWrapper(name = "TemperatureSeries")
+	@XmlElement(name = "TemperatureSerie")
 	public float[]						temperatureSerie;
 
 	/**
@@ -955,7 +960,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	@Transient
 	private float[]					paceSerieMinuteImperial;
 
-	@Transient
+	@XmlElementWrapper(name = "PowerSeries")
+	@XmlElement(name = "PowerSerie")
 	private float[]					powerSerie;
 
 	/**
@@ -983,10 +989,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	/**
 	 * Contains tour latitude data or <code>null</code> when GPS data are not available.
 	 */
-	@Transient
+	@XmlElementWrapper(name = "LatitudeSeries")
+	@XmlElement(name = "LatitudeSerie")
 	public double[]					latitudeSerie;
 
-	@Transient
+	@XmlElementWrapper(name = "LongitudeSeries")
+	@XmlElement(name = "LongitudeSerie")
 	public double[]					longitudeSerie;
 
 	/**

@@ -103,7 +103,7 @@ public class SuuntoJsonProcessor {
 			wasDataPopulated |= TryAddHeartRateData(new JSONObject(currentSampleData), timeData);
 
 			// Speed
-			wasDataPopulated |= TryAddSpeedData(new JSONObject(currentSampleData), timeData);
+			//wasDataPopulated |= TryAddSpeedData(new JSONObject(currentSampleData), timeData);
 
 			// Cadence
 			wasDataPopulated |= TryAddCadenceData(new JSONObject(currentSampleData), timeData);
@@ -255,6 +255,7 @@ public class SuuntoJsonProcessor {
 	 * @param sampleList
 	 *           The tour's time serie.
 	 */
+	@SuppressWarnings("unused")
 	private boolean TryAddDistanceData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
 		if ((value = TryRetrieveStringElementValue(currentSample, "Distance")) != null) {
