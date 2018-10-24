@@ -110,7 +110,7 @@ public class Map25ProviderManager {
 		mapProvider.name = "Mapsforge";
 		mapProvider.url = "http://opensciencemap.org/tiles/vtm"; //$NON-NLS-1$
 		mapProvider.tilePath = "/{Z}/{X}/{Y}.vtm"; //$NON-NLS-1$
-		mapProvider.tileEncoding = TileEncoding.VTM;
+		mapProvider.tileEncoding = TileEncoding.MF;
 		mapProvider.description = "Offline Mapsforgemaps eg. openandromaps.org";
 
 		return mapProvider;

@@ -45,6 +45,9 @@ import org.oscim.gdx.LwjglGL20;
 import org.oscim.gdx.MotionHandler;
 import org.oscim.layers.tile.TileManager;
 import org.oscim.layers.tile.buildings.BuildingLayer;
+import org.oscim.layers.tile.buildings.S3DBLayer;
+import org.oscim.layers.tile.vector.VectorTileLayer;
+import org.oscim.layers.tile.vector.labeling.LabelLayer;
 import org.oscim.map.Layers;
 import org.oscim.map.Map.UpdateListener;
 import org.oscim.map.ViewController;
@@ -55,8 +58,11 @@ import org.oscim.scalebar.MapScaleBar;
 import org.oscim.scalebar.MapScaleBarLayer;
 import org.oscim.scalebar.MetricUnitAdapter;
 import org.oscim.theme.ThemeFile;
+import org.oscim.theme.ThemeLoader;
 import org.oscim.theme.VtmThemes;
 import org.oscim.tiling.source.UrlTileSource;
+import org.oscim.tiling.source.mapfile.MapFileTileSource;
+
 import org.oscim.utils.Parameters;
 
 import com.badlogic.gdx.Gdx;
@@ -81,7 +87,14 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 	static final String				STATE_SUFFIX_MAP_DEFAULT_POSITION	= "MapDefaultPosition";					//$NON-NLS-1$
 
 	private static IDialogSettings	_state;
-	private static final String			MAPSFORGE_MAP_FILE_PATH				= "C:\\mf\\Germany.map";
+	
+	private static final String			MAPSFORGE_MAP_FILE_PATH				= "C:\\Users\\top\\BTSync\\oruxmaps\\mapfiles\\Germany_North_ML.map";
+	//private static final String			MAPSFORGE_MAP_FILE_PATH				= "C:\\Users\\top\\BTSync\\oruxmaps\\mapfiles\\niedersachsen_V5.map";
+	private static final String			MAPSFORGE_THEME_FILE_PATH		   = "C:\\Users\\top\\BTSync\\oruxmaps\\mapstyles\\ELV4\\Elevate.xml";
+	private static File themeFile;
+
+   private boolean s3db;
+   
 	private static Map25View		_map25View;
 	private static LwjglApplication	_lwjglApp;
 
@@ -130,16 +143,29 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 
       File file = new File(MAPSFORGE_MAP_FILE_PATH);
       if (!file.exists()) {
-          throw new IllegalArgumentException("file does not exist: " + file);
+          throw new IllegalArgumentException("mapfile does not exist: " + file);
       } else if (!file.isFile()) {
           throw new IllegalArgumentException("not a file: " + file);
       } else if (!file.canRead()) {
           throw new IllegalArgumentException("cannot read file: " + file);
       }
+     System.out.println("########################## mf_map_path: " +  file.getAbsolutePath());
       return file;
   }	
 	
-	
+   public static File getThemeFile() {
+
+      File file = new File(MAPSFORGE_THEME_FILE_PATH);
+      if (!file.exists()) {
+          throw new IllegalArgumentException("themefile does not exist: " + file);
+      } else if (!file.isFile()) {
+          throw new IllegalArgumentException("not a file: " + file);
+      } else if (!file.canRead()) {
+          throw new IllegalArgumentException("cannot read file: " + file);
+      }
+     System.out.println("########################## mf_theme_path: " +  file.getAbsolutePath());
+      return file;
+  }	
 	
 	protected static LwjglApplicationConfiguration getConfig(final String title) {
 
@@ -238,7 +264,26 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 
 		_httpFactory = new OkHttpEngineMT.OkHttpFactoryMT();
 
-		final UrlTileSource tileSource = createTileSource(_selectedMapProvider, _httpFactory);
+
+		File mapFile = getMapFile();
+		themeFile = getThemeFile();
+		//final UrlTileSource tileSource = createTileSource(_selectedMapProvider, _httpFactory);
+		final MapFileTileSource tileSource = new MapFileTileSource();
+		tileSource.setMapFile(mapFile.getAbsolutePath());
+		tileSource.setPreferredLanguage("en");
+
+      VectorTileLayer l = mMap.setBaseMap(tileSource);
+      //loadTheme(null);
+      mMap.setTheme(ThemeLoader.load(MAPSFORGE_THEME_FILE_PATH));
+      		//load(File));
+
+      if (s3db)
+          mMap.layers().add(new S3DBLayer(mMap, l));
+      else
+          mMap.layers().add(new BuildingLayer(mMap, l));
+      mMap.layers().add(new LabelLayer(mMap, l));
+
+
 
 		setupMap(_selectedMapProvider, tileSource);
 		updateUI_MarkerLayer();
@@ -254,6 +299,12 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		});
 	}
 
+   protected void loadTheme(final String styleId) {
+      //mMap.setTheme(VtmThemes.DEFAULT);
+   	mMap.setTheme(ThemeLoader.load(MAPSFORGE_THEME_FILE_PATH));
+  }
+
+	
 	private UrlTileSource createTileSource(final Map25Provider mapProvider, final OkHttpFactoryMT httpFactory) {
 
 		final Builder<?> map25Builder = Map25TileSource
@@ -499,12 +550,14 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		final UrlTileSource tileSource = createTileSource(mapProvider, _httpFactory);
 
 		_layer_BaseMap.setTileSource(tileSource);
-		mMap.setTheme(getTheme(mapProvider));
+		//mMap.setTheme(getTheme(mapProvider));
+		mMap.setTheme(ThemeLoader.load(MAPSFORGE_THEME_FILE_PATH));
 
 		_selectedMapProvider = mapProvider;
 	}
 
-	private void setupMap(final Map25Provider mapProvider, final UrlTileSource tileSource) {
+	//private void setupMap(final Map25Provider mapProvider, final UrlTileSource tileSource) {
+	private void setupMap(final Map25Provider mapProvider, final MapFileTileSource tileSource) {
 
 		_layer_BaseMap = new OsmTileLayerMT(mMap);
 
@@ -519,7 +572,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 
 		setupMap_Layers();
 
-		mMap.setTheme(getTheme(mapProvider));
+		//mMap.se
+		//mMap.setTheme(getTheme(mapProvider));
+		mMap.setTheme(ThemeLoader.load(MAPSFORGE_THEME_FILE_PATH));
 
 		/*
 		 * Map Viewport

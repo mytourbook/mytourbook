@@ -32,5 +32,10 @@ public enum TileEncoding {
 	 * Open Science Map encoding
 	 */
 	VTM,
+	
+	/**
+	 * Mapsforge Map encoding
+	 */
+	MF,
 
 }
