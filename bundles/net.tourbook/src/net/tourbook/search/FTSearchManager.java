@@ -41,7 +41,6 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.IntPoint;
-import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.DocValuesType;
@@ -93,52 +92,52 @@ import net.tourbook.ui.UI;
 
 public class FTSearchManager {
 
-	private static final String					LUCENE_INDEX_FOLDER_NAME	= "lucene-index";							//$NON-NLS-1$
+	private static final String					LUCENE_INDEX_FOLDER_NAME				= "lucene-index";							//$NON-NLS-1$
 
-	private static final String					SEARCH_FIELD_DESCRIPTION	= "description";							//$NON-NLS-1$
+	private static final String					SEARCH_FIELD_DESCRIPTION				= "description";							//$NON-NLS-1$
+	private static final String					SEARCH_FIELD_DOC_SOURCE_NOT_SAVED	= "docSourceNotSaved";					//$NON-NLS-1$
+	private static final String					SEARCH_FIELD_DOC_SOURCE_SAVED			= "docSourceSaved";						//$NON-NLS-1$
+	private static final String					SEARCH_FIELD_MARKER_ID					= "markerID";								//$NON-NLS-1$
+	private static final String					SEARCH_FIELD_TITLE						= "title";									//$NON-NLS-1$
+	private static final String					SEARCH_FIELD_TOUR_ID						= "tourID";									//$NON-NLS-1$
+	private static final String					SEARCH_FIELD_TIME							= "time";									//$NON-NLS-1$
 
-	private static final String					SEARCH_FIELD_DOC_SOURCE		= "docSource";								//$NON-NLS-1$
-	private static final String					SEARCH_FIELD_MARKER_ID		= "markerID";								//$NON-NLS-1$
-	private static final String					SEARCH_FIELD_TITLE			= "title";									//$NON-NLS-1$
-	private static final String					SEARCH_FIELD_TOUR_ID			= "tourID";									//$NON-NLS-1$
-	private static final String					SEARCH_FIELD_TIME				= "time";									//$NON-NLS-1$
-	private static final String					LOG_CREATE_INDEX				= "Created ft index: %s\t %d ms";	//$NON-NLS-1$
+	private static final String					LOG_CREATE_INDEX							= "Created ft index: %s\t %d ms";	//$NON-NLS-1$
 
-	static final int									DOC_SOURCE_TOUR				= 1;
+	static final int									DOC_SOURCE_TOUR							= 1;
+	static final int									DOC_SOURCE_TOUR_MARKER					= 2;
+	static final int									DOC_SOURCE_WAY_POINT						= 3;
 
-	static final int									DOC_SOURCE_TOUR_MARKER		= 2;
-	static final int									DOC_SOURCE_WAY_POINT			= 3;
-	private static final List<LookupResult>	_emptyProposal					= new ArrayList<>();
+	private static final List<LookupResult>	_emptyProposal								= new ArrayList<>();
 
 	private static Lookup							_suggester;
 
 	private static IndexReader						_indexReader;
 	private static IndexSearcher					_indexSearcher;
 	private static FSDirectory						_infixStore;
+
 	private static TopDocs							_topDocs;
-
 	private static String							_topDocsSearchText;
-	private static boolean							_isShowContentAll;
 
+	private static boolean							_isShowContentAll;
 	private static boolean							_isShowContentMarker;
 	private static boolean							_isShowContentTour;
 	private static boolean							_isShowContentWaypoint;
-	private static boolean							_isSortDateAscending			= false;										// -> sort descending
+	private static boolean							_isSortDateAscending						= false;										// -> sort descending
 
-	// configure field with offsets at index time
-//	private static final FieldType			_longSearchField			= new FieldType(LongField.TYPE_STORED);
-//	private static final FieldType			_textSearchField			= new FieldType(TextField.TYPE_STORED);
-	private static FieldType fieldType_Long;
+	private static FieldType						fieldType_Int;
+	private static FieldType						fieldType_Long;
 
 	static {
-		// _longSearchField.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
-		// _textSearchField.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
+
+		fieldType_Int = new FieldType(TextField.TYPE_STORED);
+		fieldType_Int.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
+		fieldType_Int.setDocValuesType(DocValuesType.NUMERIC);
+		fieldType_Int.freeze();
 
 		fieldType_Long = new FieldType(TextField.TYPE_STORED);
-
 		fieldType_Long.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
 		fieldType_Long.setDocValuesType(DocValuesType.NUMERIC);
-
 		fieldType_Long.freeze();
 	}
 
@@ -252,15 +251,24 @@ public class FTSearchManager {
 		}
 	}
 
-	private static class LongField_WithOptions extends Field {
+	private static class FieldWithOptions_Int extends Field {
 
-		public LongField_WithOptions(final String fieldName, final FieldType fieldType, final long value) {
+		public FieldWithOptions_Int(final String fieldName, final FieldType fieldType, final int value) {
+
+			super(fieldName, fieldType);
+
+			fieldsData = Integer.valueOf(value);
+		}
+	}
+
+	private static class FieldWithOptions_Long extends Field {
+
+		public FieldWithOptions_Long(final String fieldName, final FieldType fieldType, final long value) {
 
 			super(fieldName, fieldType);
 
 			fieldsData = Long.valueOf(value);
 		}
-
 	}
 
 	public static void close() {
@@ -305,19 +313,13 @@ public class FTSearchManager {
 														final String description,
 														final long time) throws IOException {
 
-//		private static final FieldType			_longSearchField			= new FieldType(LongField.TYPE_STORED);
-//		private static final FieldType			_textSearchField			= new FieldType(TextField.TYPE_STORED);
-		// {
-		// _longSearchField.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
-		// _textSearchField.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
-		// }
-
 		final Document doc = new Document();
 
-		doc.add(new IntPoint(SEARCH_FIELD_DOC_SOURCE, DOC_SOURCE_TOUR_MARKER));
+		doc.add(new IntPoint(SEARCH_FIELD_DOC_SOURCE_NOT_SAVED, DOC_SOURCE_TOUR_MARKER));
+		doc.add(createField_WithIndexOptions_Int(SEARCH_FIELD_DOC_SOURCE_SAVED, DOC_SOURCE_TOUR_MARKER));
 
-		doc.add(new LongPoint(SEARCH_FIELD_MARKER_ID, markerId));
-		doc.add(new LongPoint(SEARCH_FIELD_TOUR_ID, tourId));
+		doc.add(createField_WithIndexOptions_Long(SEARCH_FIELD_MARKER_ID, markerId));
+		doc.add(createField_WithIndexOptions_Long(SEARCH_FIELD_TOUR_ID, tourId));
 		doc.add(createField_WithIndexOptions_Long(SEARCH_FIELD_TIME, time));
 
 		if (title != null) {
@@ -339,13 +341,13 @@ public class FTSearchManager {
 
 		final Document doc = new Document();
 
-		doc.add(new IntPoint(SEARCH_FIELD_DOC_SOURCE, DOC_SOURCE_TOUR));
+		doc.add(new IntPoint(SEARCH_FIELD_DOC_SOURCE_NOT_SAVED, DOC_SOURCE_TOUR));
+		doc.add(createField_WithIndexOptions_Int(SEARCH_FIELD_DOC_SOURCE_SAVED, DOC_SOURCE_TOUR));
 
-		doc.add(new LongPoint(SEARCH_FIELD_TOUR_ID, tourId));
+		doc.add(createField_WithIndexOptions_Long(SEARCH_FIELD_TOUR_ID, tourId));
 		doc.add(createField_WithIndexOptions_Long(SEARCH_FIELD_TIME, time));
 
 		if (title != null) {
-//			doc.add(new Field(SEARCH_FIELD_TITLE, title, createFieldType_Text()));
 			doc.add(new Field(SEARCH_FIELD_TITLE, title, createFieldType_Text()));
 		}
 
@@ -365,10 +367,11 @@ public class FTSearchManager {
 
 		final Document doc = new Document();
 
-		doc.add(new IntPoint(SEARCH_FIELD_DOC_SOURCE, DOC_SOURCE_WAY_POINT));
+		doc.add(new IntPoint(SEARCH_FIELD_DOC_SOURCE_NOT_SAVED, DOC_SOURCE_WAY_POINT));
+		doc.add(createField_WithIndexOptions_Int(SEARCH_FIELD_DOC_SOURCE_SAVED, DOC_SOURCE_WAY_POINT));
 
-		doc.add(new LongPoint(SEARCH_FIELD_MARKER_ID, markerId));
-		doc.add(new LongPoint(SEARCH_FIELD_TOUR_ID, tourId));
+		doc.add(createField_WithIndexOptions_Long(SEARCH_FIELD_MARKER_ID, markerId));
+		doc.add(createField_WithIndexOptions_Long(SEARCH_FIELD_TOUR_ID, tourId));
 
 		if (time != 0) {
 			doc.add(createField_WithIndexOptions_Long(SEARCH_FIELD_TIME, time));
@@ -385,11 +388,14 @@ public class FTSearchManager {
 		indexWriter.addDocument(doc);
 	}
 
+	private static IndexableField createField_WithIndexOptions_Int(final String fieldName, final int value) {
+
+		return new FieldWithOptions_Int(fieldName, fieldType_Int, value);
+	}
+
 	private static IndexableField createField_WithIndexOptions_Long(final String fieldName, final long value) {
 
-		final Field field = new LongField_WithOptions(fieldName, fieldType_Long, value);
-
-		return field;
+		return new FieldWithOptions_Long(fieldName, fieldType_Long, value);
 	}
 
 	/**
@@ -969,33 +975,47 @@ public class FTSearchManager {
 
 					// filter by content
 
-					final Builder queryBuilder = new BooleanQuery.Builder()
-
-							// add search text
-							.add(textQuery, Occur.FILTER);
+					/*
+					 * Query text/marker/waypoint with OR
+					 */
+					final Builder orQueryBuilder = new BooleanQuery.Builder();
 
 					if (_isShowContentTour) {
 
-						final Query query = IntPoint.newExactQuery(SEARCH_FIELD_DOC_SOURCE, DOC_SOURCE_TOUR);
+						final Query query = IntPoint.newExactQuery(SEARCH_FIELD_DOC_SOURCE_NOT_SAVED, DOC_SOURCE_TOUR);
 
-						queryBuilder.add(query, Occur.SHOULD);
+						orQueryBuilder.add(query, Occur.SHOULD);
 					}
 
 					if (_isShowContentMarker) {
 
-						final Query query = IntPoint.newExactQuery(SEARCH_FIELD_DOC_SOURCE, DOC_SOURCE_TOUR_MARKER);
+						final Query query = IntPoint.newExactQuery(SEARCH_FIELD_DOC_SOURCE_NOT_SAVED, DOC_SOURCE_TOUR_MARKER);
 
-						queryBuilder.add(query, Occur.SHOULD);
+						orQueryBuilder.add(query, Occur.SHOULD);
 					}
 
 					if (_isShowContentWaypoint) {
 
-						final Query query = IntPoint.newExactQuery(SEARCH_FIELD_DOC_SOURCE, DOC_SOURCE_WAY_POINT);
+						final Query query = IntPoint.newExactQuery(SEARCH_FIELD_DOC_SOURCE_NOT_SAVED, DOC_SOURCE_WAY_POINT);
 
-						queryBuilder.add(query, Occur.SHOULD);
+						orQueryBuilder.add(query, Occur.SHOULD);
 					}
 
-					_topDocs = _indexSearcher.search(queryBuilder.build(), maxDoc, sort);
+					final BooleanQuery orQuery = orQueryBuilder.build();
+
+					final Builder andQueryBuilder = new BooleanQuery.Builder()
+
+							// add search text
+							.add(textQuery, Occur.MUST)
+
+							// add tour text/marker/waypoint
+							.add(orQuery, Occur.MUST)
+
+					;
+
+					final BooleanQuery andQuery = andQueryBuilder.build();
+
+					_topDocs = _indexSearcher.search(andQuery, maxDoc, sort);
 				}
 
 				_topDocsSearchText = searchText;
@@ -1089,7 +1109,7 @@ public class FTSearchManager {
 
 		boolean isDocRead = false;
 		final Set<String> fieldsToLoad = new HashSet<>();
-		fieldsToLoad.add(SEARCH_FIELD_DOC_SOURCE);
+		fieldsToLoad.add(SEARCH_FIELD_DOC_SOURCE_SAVED);
 		fieldsToLoad.add(SEARCH_FIELD_TOUR_ID);
 		fieldsToLoad.add(SEARCH_FIELD_MARKER_ID);
 		fieldsToLoad.add(SEARCH_FIELD_TIME);
@@ -1128,7 +1148,7 @@ public class FTSearchManager {
 						final String docFieldName = indexField.name();
 
 						switch (docFieldName) {
-						case SEARCH_FIELD_DOC_SOURCE:
+						case SEARCH_FIELD_DOC_SOURCE_SAVED:
 							resultItem.docSource = indexField.numericValue().intValue();
 							break;
 
