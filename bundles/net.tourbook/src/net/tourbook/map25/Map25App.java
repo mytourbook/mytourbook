@@ -47,7 +47,6 @@ import org.oscim.layers.tile.TileManager;
 import org.oscim.layers.tile.buildings.BuildingLayer;
 import org.oscim.layers.tile.buildings.S3DBLayer;
 import org.oscim.layers.tile.vector.VectorTileLayer;
-import org.oscim.layers.tile.vector.labeling.LabelLayer;
 import org.oscim.map.Layers;
 import org.oscim.map.Map.UpdateListener;
 import org.oscim.map.ViewController;
@@ -90,24 +89,24 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 	private static IDialogSettings	_state;
 	
 	//private static final String			MAPSFORGE_MAP_FILE_PATH				= "C:\\Users\\top\\BTSync\\oruxmaps\\mapfiles\\Germany_North_ML.map";
-	private static final String			MAPSFORGE_MAP_FILE_PATH				= "C:\\Users\\top\\BTSync\\oruxmaps\\mapfiles\\niedersachsen_V5.map";
-	private static final String			MAPSFORGE_THEME_FILE_PATH		   = "C:\\Users\\top\\BTSync\\oruxmaps\\mapstyles\\ELV4\\Elevate.xml";
-	private static String _mapFilePath;
-	private static String _themeFilePath;
-
+	//private static final String			MAPSFORGE_MAP_FILE_PATH				= "C:\\Users\\top\\BTSync\\oruxmaps\\mapfiles\\niedersachsen_V5.map";
+	//private static final String			MAPSFORGE_THEME_FILE_PATH		   = "C:\\Users\\top\\BTSync\\oruxmaps\\mapstyles\\ELV4\\Elevate.xml";
 	
-   private boolean s3db;
-   
+	private static String _mf_mapFilePath = null;
+	private static String _mf_themeFilePath = null;
+	
 	private static Map25View		_map25View;
 	private static LwjglApplication	_lwjglApp;
 
+
+	
 	private Map25Provider			_selectedMapProvider;
 	private TileManager				_tileManager;
 
 	private OsmTileLayerMT			_layer_BaseMap;
 	private BuildingLayer			_layer_Building;
-	private S3DBLayer				_layer_S3DB;
-	private VectorTileLayer 	_vector_TileLayer_S3DB;
+	private S3DBLayer				_mf_layer_S3DB;
+	private VectorTileLayer 	_mf_VectorTileLayer_S3DB;
 	private LabelLayerMT			_layer_Label;
 	private MarkerLayer				_layer_Marker;
 	private MapScaleBarLayer		_layer_ScaleBar;
@@ -124,6 +123,11 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 	 * Is <code>true</code> when a tour marker is hit.
 	 */
 	private boolean					_isMapItemHit;
+	
+	/**
+	 * Is <code>true</code> when maps is a mapsforgemap.
+	 */	
+	private boolean					_is_mf_Map = true;
 
 	public Map25App(final IDialogSettings state) {
 
@@ -144,33 +148,20 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		return mapApp;
 	}
 
-   public static File getMapFile() {
+   public static File getFile(String FilePath) {
 
-      File file = new File(MAPSFORGE_MAP_FILE_PATH);
+      File file = new File(FilePath);
       if (!file.exists()) {
-          throw new IllegalArgumentException("mapfile does not exist: " + file);
+          throw new IllegalArgumentException("file does not exist: " + file);
       } else if (!file.isFile()) {
           throw new IllegalArgumentException("not a file: " + file);
       } else if (!file.canRead()) {
           throw new IllegalArgumentException("cannot read file: " + file);
       }
-     System.out.println("########################## mf_map_path: " +  file.getAbsolutePath());
+     System.out.println("########################## file_path: " +  file.getAbsolutePath());
       return file;
   }	
 	
-   public static File getThemeFile() {
-
-      File file = new File(MAPSFORGE_THEME_FILE_PATH);
-      if (!file.exists()) {
-          throw new IllegalArgumentException("themefile does not exist: " + file);
-      } else if (!file.isFile()) {
-          throw new IllegalArgumentException("not a file: " + file);
-      } else if (!file.canRead()) {
-          throw new IllegalArgumentException("cannot read file: " + file);
-      }
-     System.out.println("########################## mf_theme_path: " +  file.getAbsolutePath());
-      return file;
-  }	
 	
 	protected static LwjglApplicationConfiguration getConfig(final String title) {
 
@@ -268,28 +259,45 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 
 		_map25View.updateUI_SelectedMapProvider(_selectedMapProvider);
 
-		_httpFactory = new OkHttpEngineMT.OkHttpFactoryMT();
+		//_httpFactory = new OkHttpEngineMT.OkHttpFactoryMT();
 
+		System.out.println("########################## Map encoding: " +_selectedMapProvider.tileEncoding.toString());
+		System.out.println("########################## Map API KEY:  " +_selectedMapProvider.apiKey);
+		System.out.println("########################## Map description:  " +_selectedMapProvider.description);
 
-		_mapFilePath = getMapFile().getAbsolutePath();
-		_themeFilePath = getThemeFile().getAbsolutePath();
-		//final UrlTileSource tileSource = createTileSource(_selectedMapProvider, _httpFactory);
-		final MapFileTileSource tileSource = new MapFileTileSource();
-		tileSource.setMapFile(_mapFilePath);
-		tileSource.setPreferredLanguage("en");
-
-		System.out.println("########################## MapName: " + tileSource.getName());
+		System.out.println("########################## MapProviderUrl: " + _selectedMapProvider.url);
+		if (!_selectedMapProvider.tileEncoding.toString().equalsIgnoreCase("mf")){ // NOT mapsforge
+			_is_mf_Map = false;
+			_httpFactory = new OkHttpEngineMT.OkHttpFactoryMT();
+			final UrlTileSource tileSource = createTileSource(_selectedMapProvider, _httpFactory);
+			setupMap(_selectedMapProvider, tileSource);
+			System.out.println("########################## is online map: " + _selectedMapProvider.url);
+		} else {  //mapsforge
+			_is_mf_Map = true;
+			_mf_mapFilePath = getFile(_selectedMapProvider.apiKey).getAbsolutePath();
+			_mf_themeFilePath = getFile(_selectedMapProvider.description).getAbsolutePath();
+			final MapFileTileSource tileSource = new MapFileTileSource();
+			tileSource.setMapFile(_mf_mapFilePath);
+			tileSource.setPreferredLanguage("en");
+			_mf_VectorTileLayer_S3DB = mMap.setBaseMap(tileSource);
+			_mf_VectorTileLayer_S3DB.setRenderTheme(ThemeLoader.load(_mf_themeFilePath));
+			mMap.setTheme(ThemeLoader.load(_mf_themeFilePath));
+			setupMap(_selectedMapProvider, tileSource);
+			System.out.println("########################## is mapsforge map using : " + _mf_mapFilePath);
+		}
 		
-		_vector_TileLayer_S3DB = mMap.setBaseMap(tileSource);
-		_vector_TileLayer_S3DB.setRenderTheme(ThemeLoader.load(_themeFilePath));
 		
-      VectorTileLayer l = mMap.setBaseMap(tileSource);
-      mMap.setTheme(ThemeLoader.load(_themeFilePath));
-      mMap.layers().add(new S3DBLayer(mMap, l));
-      mMap.layers().add(new LabelLayer(mMap, l));
+		/** the next block should not be neccercay because its done in: setupMap_Layers()
+		the reason is that Map25TileSource.java does not know the new layer
+		hmmmm currently its working, i set the layer to enabled. in the past i got an exception than.*/
+		if(_is_mf_Map) {
+			//mMap.layers().add(new S3DBLayer(mMap, _mf_VectorTileLayer_S3DB));
+			//mMap.layers().add(new LabelLayerMT(mMap, _mf_VectorTileLayer_S3DB));
+			;
+		}
+		
 
-
-		setupMap(_selectedMapProvider, tileSource);
+		//setupMap(_selectedMapProvider, tileSource);
 		updateUI_MarkerLayer();
 
 		restoreState();
@@ -305,7 +313,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 
    protected void loadTheme(final String styleId) {
       //mMap.setTheme(VtmThemes.DEFAULT);
-   	mMap.setTheme(ThemeLoader.load(_themeFilePath));//    load(_themeFile));
+   	mMap.setTheme(ThemeLoader.load(_mf_themeFilePath));//    load(_themeFile));
   }
 
 	
@@ -456,7 +464,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 //				+ ("\tonItemSingleTapUp")//
 //				+ ("\tindex:" + index)
 //				+ ("\t_isMapItemHit:" + _isMapItemHit + " -> true")
-//				//
+//				//Pref_Map25_Encoding_Mapsforge
 //				);
 //		// TODO remove SYSTEM.OUT.PRINTLN
 //
@@ -550,18 +558,26 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 	}
 
 	public void setMapProvider(final Map25Provider mapProvider) {
-
-		final UrlTileSource tileSource = createTileSource(mapProvider, _httpFactory);
-
-		_layer_BaseMap.setTileSource(tileSource);
+		
+		//if NOT mf map!!
+		if(!_is_mf_Map) {
+			final UrlTileSource tileSource = createTileSource(mapProvider, _httpFactory);
+			_layer_BaseMap.setTileSource(tileSource);
+			mMap.setTheme(getTheme(mapProvider));
+		} else {
+		//_layer_BaseMap.setTileSource(tileSource);
 		//mMap.setTheme(getTheme(mapProvider));
-		mMap.setTheme(ThemeLoader.load(_themeFilePath));
-
+			mMap.setTheme(ThemeLoader.load(_mf_themeFilePath));
+		}
 		_selectedMapProvider = mapProvider;
 	}
 
-	//private void setupMap(final Map25Provider mapProvider, final UrlTileSource tileSource) {
-	private void setupMap(final Map25Provider mapProvider, final MapFileTileSource tileSource) {
+	/**
+	 * setupMap for online maps
+	 * @param mapProvider
+	 * @param tileSource
+	 */
+	private void setupMap(final Map25Provider mapProvider, final UrlTileSource tileSource) {
 
 		_layer_BaseMap = new OsmTileLayerMT(mMap);
 
@@ -576,11 +592,44 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 
 		setupMap_Layers();
 
-		//mMap.se
-		//mMap.setTheme(getTheme(mapProvider));
-		mMap.setTheme(ThemeLoader.load(_themeFilePath));
+		mMap.setTheme(getTheme(mapProvider));
 
-		/*
+		/**
+		 * Map Viewport
+		 */
+		final ViewController mapViewport = mMap.viewport();
+
+		// extend default tilt
+		mapViewport.setMaxTilt((float) MercatorProjection.LATITUDE_MAX);
+//		mapViewport.setMaxTilt(77.0f);
+
+		mapViewport.setMinScale(2);
+	}
+	
+	
+/**
+ * setupMap for mapsforge
+ * @param mapProvider
+ * @param tileSource
+ */
+	private void setupMap(final Map25Provider mapProvider, final MapFileTileSource tileSource) {
+
+		_layer_BaseMap = new OsmTileLayerMT(mMap);
+		
+		_tileManager = _layer_BaseMap.getManager();
+		
+		_layer_BaseMap.setTileSource(tileSource);
+		
+	// THIS IS NOT YET WORKING
+//		mapLayer.setNumLoaders(10);		
+		
+		mMap.setBaseMap(_layer_BaseMap);
+		
+		setupMap_Layers();
+
+		mMap.setTheme(ThemeLoader.load(_mf_themeFilePath));
+
+		/**
 		 * Map Viewport
 		 */
 		final ViewController mapViewport = mMap.viewport();
@@ -612,11 +661,13 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		layers.add(_layer_Building);
 		
 		// S3DB
-		//_layer_S3DB = new S3DBLayer(mMap,_vector_TileLayer_S3DB);
-		//_layer_S3DB.setEnabled(false);
-		//layers.add(_layer_S3DB);
-		//layers.add(_layer_Label);
-
+		if(_is_mf_Map) {
+			System.out.println("########################## adding S3DBlayer ");
+			_mf_layer_S3DB = new S3DBLayer(mMap,_mf_VectorTileLayer_S3DB);
+			_mf_layer_S3DB.setEnabled(true);
+			_mf_VectorTileLayer_S3DB.setRenderTheme(ThemeLoader.load(_mf_themeFilePath));
+			layers.add(_mf_layer_S3DB);
+		}
 
 		// label
 		_layer_Label = new LabelLayerMT(mMap, _layer_BaseMap);
