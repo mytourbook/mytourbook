@@ -92,23 +92,23 @@ import net.tourbook.ui.UI;
 
 public class FTSearchManager {
 
-	private static final String					LUCENE_INDEX_FOLDER_NAME				= "lucene-index";							//$NON-NLS-1$
+	private static final String					LUCENE_INDEX_FOLDER_NAME		= "lucene-index";							//$NON-NLS-1$
 
-	private static final String					SEARCH_FIELD_DESCRIPTION				= "description";							//$NON-NLS-1$
-	private static final String					SEARCH_FIELD_DOC_SOURCE_NOT_SAVED	= "docSourceNotSaved";					//$NON-NLS-1$
-	private static final String					SEARCH_FIELD_DOC_SOURCE_SAVED			= "docSourceSaved";						//$NON-NLS-1$
-	private static final String					SEARCH_FIELD_MARKER_ID					= "markerID";								//$NON-NLS-1$
-	private static final String					SEARCH_FIELD_TITLE						= "title";									//$NON-NLS-1$
-	private static final String					SEARCH_FIELD_TOUR_ID						= "tourID";									//$NON-NLS-1$
-	private static final String					SEARCH_FIELD_TIME							= "time";									//$NON-NLS-1$
+	private static final String					SEARCH_FIELD_DESCRIPTION		= "description";							//$NON-NLS-1$
+	private static final String					SEARCH_FIELD_DOC_SOURCE_INDEX	= "docSource_Index";						//$NON-NLS-1$
+	private static final String					SEARCH_FIELD_DOC_SOURCE_SAVED	= "docSource_Saved";						//$NON-NLS-1$
+	private static final String					SEARCH_FIELD_MARKER_ID			= "markerID";								//$NON-NLS-1$
+	private static final String					SEARCH_FIELD_TITLE				= "title";									//$NON-NLS-1$
+	private static final String					SEARCH_FIELD_TOUR_ID				= "tourID";									//$NON-NLS-1$
+	private static final String					SEARCH_FIELD_TIME					= "time";									//$NON-NLS-1$
 
-	private static final String					LOG_CREATE_INDEX							= "Created ft index: %s\t %d ms";	//$NON-NLS-1$
+	private static final String					LOG_CREATE_INDEX					= "Created ft index: %s\t %d ms";	//$NON-NLS-1$
 
-	static final int									DOC_SOURCE_TOUR							= 1;
-	static final int									DOC_SOURCE_TOUR_MARKER					= 2;
-	static final int									DOC_SOURCE_WAY_POINT						= 3;
+	static final int									DOC_SOURCE_TOUR					= 1;
+	static final int									DOC_SOURCE_TOUR_MARKER			= 2;
+	static final int									DOC_SOURCE_WAY_POINT				= 3;
 
-	private static final List<LookupResult>	_emptyProposal								= new ArrayList<>();
+	private static final List<LookupResult>	_emptyProposal						= new ArrayList<>();
 
 	private static Lookup							_suggester;
 
@@ -123,7 +123,7 @@ public class FTSearchManager {
 	private static boolean							_isShowContentMarker;
 	private static boolean							_isShowContentTour;
 	private static boolean							_isShowContentWaypoint;
-	private static boolean							_isSortDateAscending						= false;										// -> sort descending
+	private static boolean							_isSortDateAscending				= false;										// -> sort descending
 
 	private static FieldType						fieldType_Int;
 	private static FieldType						fieldType_Long;
@@ -315,7 +315,7 @@ public class FTSearchManager {
 
 		final Document doc = new Document();
 
-		doc.add(new IntPoint(SEARCH_FIELD_DOC_SOURCE_NOT_SAVED, DOC_SOURCE_TOUR_MARKER));
+		doc.add(new IntPoint(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_TOUR_MARKER));
 		doc.add(createField_WithIndexOptions_Int(SEARCH_FIELD_DOC_SOURCE_SAVED, DOC_SOURCE_TOUR_MARKER));
 
 		doc.add(createField_WithIndexOptions_Long(SEARCH_FIELD_MARKER_ID, markerId));
@@ -341,7 +341,7 @@ public class FTSearchManager {
 
 		final Document doc = new Document();
 
-		doc.add(new IntPoint(SEARCH_FIELD_DOC_SOURCE_NOT_SAVED, DOC_SOURCE_TOUR));
+		doc.add(new IntPoint(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_TOUR));
 		doc.add(createField_WithIndexOptions_Int(SEARCH_FIELD_DOC_SOURCE_SAVED, DOC_SOURCE_TOUR));
 
 		doc.add(createField_WithIndexOptions_Long(SEARCH_FIELD_TOUR_ID, tourId));
@@ -367,7 +367,7 @@ public class FTSearchManager {
 
 		final Document doc = new Document();
 
-		doc.add(new IntPoint(SEARCH_FIELD_DOC_SOURCE_NOT_SAVED, DOC_SOURCE_WAY_POINT));
+		doc.add(new IntPoint(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_WAY_POINT));
 		doc.add(createField_WithIndexOptions_Int(SEARCH_FIELD_DOC_SOURCE_SAVED, DOC_SOURCE_WAY_POINT));
 
 		doc.add(createField_WithIndexOptions_Long(SEARCH_FIELD_MARKER_ID, markerId));
@@ -982,21 +982,21 @@ public class FTSearchManager {
 
 					if (_isShowContentTour) {
 
-						final Query query = IntPoint.newExactQuery(SEARCH_FIELD_DOC_SOURCE_NOT_SAVED, DOC_SOURCE_TOUR);
+						final Query query = IntPoint.newExactQuery(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_TOUR);
 
 						orQueryBuilder.add(query, Occur.SHOULD);
 					}
 
 					if (_isShowContentMarker) {
 
-						final Query query = IntPoint.newExactQuery(SEARCH_FIELD_DOC_SOURCE_NOT_SAVED, DOC_SOURCE_TOUR_MARKER);
+						final Query query = IntPoint.newExactQuery(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_TOUR_MARKER);
 
 						orQueryBuilder.add(query, Occur.SHOULD);
 					}
 
 					if (_isShowContentWaypoint) {
 
-						final Query query = IntPoint.newExactQuery(SEARCH_FIELD_DOC_SOURCE_NOT_SAVED, DOC_SOURCE_WAY_POINT);
+						final Query query = IntPoint.newExactQuery(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_WAY_POINT);
 
 						orQueryBuilder.add(query, Occur.SHOULD);
 					}
