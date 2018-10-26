@@ -17,7 +17,7 @@ package net.tourbook.map25;
 
 import java.awt.Canvas;
 import java.io.File;
-import java.io.FileNotFoundException;
+//import java.io.FileNotFoundException;
 import java.util.Map;
 import java.util.Set;
 
@@ -46,6 +46,7 @@ import org.oscim.gdx.GdxMap;
 import org.oscim.gdx.GestureHandlerImpl;
 import org.oscim.gdx.LwjglGL20;
 import org.oscim.gdx.MotionHandler;
+import org.oscim.layers.tile.bitmap.BitmapTileLayer.*;
 import org.oscim.layers.tile.TileManager;
 import org.oscim.layers.tile.buildings.BuildingLayer;
 import org.oscim.layers.tile.buildings.S3DBLayer;
@@ -60,7 +61,7 @@ import org.oscim.scalebar.MapScaleBar;
 import org.oscim.scalebar.MapScaleBarLayer;
 import org.oscim.scalebar.MetricUnitAdapter;
 import org.oscim.theme.ExternalRenderTheme;
-import org.oscim.theme.StreamRenderTheme;
+//import org.oscim.theme.StreamRenderTheme;
 import org.oscim.theme.XmlRenderThemeMenuCallback;
 import org.oscim.theme.XmlRenderThemeStyleLayer;
 import org.oscim.theme.XmlRenderThemeStyleMenu;
@@ -308,6 +309,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 
 			//mMap.setTheme(ThemeLoader.load(_mf_themeFilePath));
 			setupMap(_selectedMapProvider, tileSource);
+			System.out.println("########################## is mapsforge layer : " + mMap.layers().toString());
 			System.out.println("########################## is mapsforge map using : " + _mf_mapFilePath);
 		}
 		
@@ -609,14 +611,17 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 			System.out.println("########################## setTheme to " + mapProvider.description);
 			tileSource.setMapFile(mapProvider.apiKey);
 			tileSource.setPreferredLanguage(_mf_prefered_language);
-			_mf_VectorTileLayer_S3DB = mMap.setBaseMap(tileSource);
-			_mf_VectorTileLayer_S3DB.setRenderTheme(ThemeLoader.load(mapProvider.description));
-						
+			//_mf_VectorTileLayer_S3DB = mMap.setBaseMap(tileSource);
+			//_mf_VectorTileLayer_S3DB.setRenderTheme(ThemeLoader.load(mapProvider.description));
+					
 			_layer_BaseMap.setTileSource(tileSource);
+			_layer_mf_S3DB.setEnabled(true);	
+			
 			mMap.setTheme(ThemeLoader.load(mapProvider.description));
-
+			
 		}
 		//setupMap_Layers();
+		System.out.println("########################## is mapsforge layer : " + mMap.layers().toString());
 		_selectedMapProvider = mapProvider;
 		
 	}
@@ -736,7 +741,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		// scale bar
 		_layer_ScaleBar = createLayer_ScaleBar();
 		layers.add(_layer_ScaleBar);
-
+		
+		// layercheck
+		layers.toString();
+		
 		// tile info
 		_layer_TileInfo = new TileGridLayerMT(mMap);
 		_layer_TileInfo.setEnabled(false);
