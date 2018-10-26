@@ -360,7 +360,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		// add new tour to other tours
 		_newlyImportedTours.put(tourId, tourData);
 
-		//TODO  create additional data
+		//TODO  create additional data when the tour is considered done (no parent or children are found)
 		//tourData.computeAltitudeUpDown();
 		//tourData.computeComputedValues();
 	}
