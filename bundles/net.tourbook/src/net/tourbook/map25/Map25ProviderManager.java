@@ -67,6 +67,7 @@ public class Map25ProviderManager {
 
 	private static ArrayList<Map25Provider>	_allMapProvider;
 
+	
 	/**
 	 * Contains the default default map provider
 	 */
@@ -99,6 +100,25 @@ public class Map25ProviderManager {
 		return mapProvider;
 	}
 
+	/**
+	 * Mapsforge 
+	 */
+	private static Map25Provider createMapProvider_Mapsforge() {
+
+		final Map25Provider mapProvider = new Map25Provider();
+
+		mapProvider.isEnabled = false;
+		mapProvider.name = "Mapsforge";
+		mapProvider.url = "http://opensciencemap.org/tiles/vtm";
+		mapProvider.tilePath = "/{Z}/{X}/{Y}.vtm"; //$NON-NLS-1$
+		mapProvider.tileEncoding = TileEncoding.MF;
+		mapProvider.apiKey = "C:\\Users\\top\\BTSync\\oruxmaps\\mapfiles\\niedersachsen_V5.map"; //$NON-NLS-1$
+		mapProvider.description = "C:\\Users\\top\\BTSync\\oruxmaps\\mapstyles\\ELV4\\Elevate.xml"; //$NON-NLS-1$
+
+		return mapProvider;
+	}	
+
+	
 	/**
 	 * mapzen
 	 */
@@ -134,6 +154,9 @@ public class Map25ProviderManager {
 		return mapProvider;
 	}
 
+
+	
+	
 	private static void fireChangeEvent() {
 
 		final Object[] allListeners = _mapProviderListeners.getListeners();
@@ -207,7 +230,7 @@ public class Map25ProviderManager {
 		final File xmlFile = getXmlFile();
 
 		if (xmlFile.exists()) {
-
+			System.out.println("#################### xml exists");
 			try (BufferedReader reader = Files.newBufferedReader(Paths.get(xmlFile.toURI()))) {
 
 				final XMLMemento xmlRoot = XMLMemento.createReadRoot(reader);
@@ -230,7 +253,8 @@ public class Map25ProviderManager {
 						mp.url = Util.getXmlString(xml, ATTR_URL, UI.EMPTY_STRING);
 
 						mp.tileEncoding = (TileEncoding) Util.getXmlEnum(xml, ATTR_TILE_ENCODING, TileEncoding.VTM);
-
+						System.out.println("################## tilePath and URL" + mp.tilePath + " " + mp.url);
+						
 						allMapProvider.add(mp);
 					}
 				}
@@ -248,6 +272,7 @@ public class Map25ProviderManager {
 			 */
 			allMapProvider.add(_defaultMapProvider);
 			allMapProvider.add(createMapProvider_Mapzen());
+			allMapProvider.add(createMapProvider_Mapsforge());
 			allMapProvider.add(createMapProvider_MyTileServer());
 		}
 

@@ -77,9 +77,11 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 	private static final TileEncodingData[] _allTileEncoding					= new TileEncodingData[] {
 
 		new TileEncodingData(TileEncoding.MVT, Messages.Pref_Map25_Encoding_Mapzen),
-		new TileEncodingData(TileEncoding.VTM, Messages.Pref_Map25_Encoding_OpenScienceMap)
+		new TileEncodingData(TileEncoding.VTM, Messages.Pref_Map25_Encoding_OpenScienceMap),
+		new TileEncodingData(TileEncoding.MF, "local Mapsforgefile")
 	};
 
+	
 // SET_FORMATTING_ON
 
 	private final IDialogSettings			_state								= TourbookPlugin.getState(ID);
