@@ -827,6 +827,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 */
 	@XmlElementWrapper(name = "TimeSeries")
 	@XmlElement(name = "TimeSerie")
+	@Transient
 	public int[]						timeSerie;
 
 	/**
@@ -853,6 +854,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 */
 	@XmlElementWrapper(name = "AltitudeSeries")
 	@XmlElement(name = "AltitudeSerie")
+	@Transient
 	public float[]						altitudeSerie;
 
 	/**
@@ -885,10 +887,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	@XmlElementWrapper(name = "CadenceSeries")
 	@XmlElement(name = "CadenceSerie")
+	@Transient
 	private float[]					cadenceSerie;
 
 	@XmlElementWrapper(name = "PulseSeries")
 	@XmlElement(name = "PulseSerie")
+	@Transient
 	public float[]						pulseSerie;
 
 	@Transient
@@ -909,6 +913,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 */
 	@XmlElementWrapper(name = "TemperatureSeries")
 	@XmlElement(name = "TemperatureSerie")
+	@Transient
 	public float[]						temperatureSerie;
 
 	/**
@@ -962,6 +967,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	@XmlElementWrapper(name = "PowerSeries")
 	@XmlElement(name = "PowerSerie")
+	@Transient
 	private float[]					powerSerie;
 
 	/**
@@ -991,10 +997,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 */
 	@XmlElementWrapper(name = "LatitudeSeries")
 	@XmlElement(name = "LatitudeSerie")
+	@Transient
 	public double[]					latitudeSerie;
 
 	@XmlElementWrapper(name = "LongitudeSeries")
 	@XmlElement(name = "LongitudeSerie")
+	@Transient
 	public double[]					longitudeSerie;
 
 	/**
