@@ -278,12 +278,13 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		_map25View.updateUI_SelectedMapProvider(_selectedMapProvider);
 
 		//_httpFactory = new OkHttpEngineMT.OkHttpFactoryMT();
-
+		System.out.println("########################## Map Name: " +_selectedMapProvider.name);
+		System.out.println("########################## Map URL:  " +_selectedMapProvider.url);
+		System.out.println("########################## Map tilepath:  " +_selectedMapProvider.tilePath);
 		System.out.println("########################## Map encoding: " +_selectedMapProvider.tileEncoding.toString());
 		System.out.println("########################## Map API KEY:  " +_selectedMapProvider.apiKey);
 		System.out.println("########################## Map description:  " +_selectedMapProvider.description);
 
-		System.out.println("########################## MapProviderUrl: " + _selectedMapProvider.url);
 		
 		
 		if (_selectedMapProvider.tileEncoding  != TileEncoding.MF) { // NOT mapsforge
@@ -295,19 +296,22 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		} else {  //mapsforge
 			_is_mf_Map = true;
 			_httpFactory = null;
-			_mf_mapFilePath = getFile(_selectedMapProvider.apiKey).getAbsolutePath();
-			_mf_themeFilePath = getFile(_selectedMapProvider.description).getAbsolutePath();
+			//_mf_mapFilePath = getFile(_selectedMapProvider.apiKey).getAbsolutePath();
+			_mf_mapFilePath = getFile(_selectedMapProvider.url).getAbsolutePath();
+			_mf_themeFilePath = getFile(_selectedMapProvider.tilePath).getAbsolutePath();
 			
-			loadExternalRenderTheme(_mf_themeFilePath); //just to see whats inside the xml
-			
+			//loadExternalRenderTheme(_mf_themeFilePath); //just to see whats inside the xml
+			System.out.println("########################## Map Path: " + _mf_mapFilePath);
 			final MapFileTileSource tileSource = new MapFileTileSource();	
 			tileSource.setMapFile(_mf_mapFilePath);
 			tileSource.setPreferredLanguage(_mf_prefered_language);
 			_mf_VectorTileLayer_S3DB = mMap.setBaseMap(tileSource);
 			_mf_VectorTileLayer_S3DB.setRenderTheme(ThemeLoader.load(_mf_themeFilePath));
 			mMap.setTheme(ThemeLoader.load(_mf_themeFilePath));
+			//System.out.println("########################## tileSource Name: " + tileSource.toString());
+			//_layer_BaseMap.setTileSource(tileSource);
+			//_layer_mf_S3DB.setEnabled(true);	
 
-			//mMap.setTheme(ThemeLoader.load(_mf_themeFilePath));
 			setupMap(_selectedMapProvider, tileSource);
 			System.out.println("########################## is mapsforge layer : " + mMap.layers().toString());
 			System.out.println("########################## is mapsforge map using : " + _mf_mapFilePath);
@@ -607,17 +611,16 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 			System.out.println("########################## setMapProvider its mf Map");
 			//_httpFactory = null;
 			final MapFileTileSource tileSource = new MapFileTileSource();
-			System.out.println("########################## setMap to " + mapProvider.apiKey);
-			System.out.println("########################## setTheme to " + mapProvider.description);
-			tileSource.setMapFile(mapProvider.apiKey);
+			System.out.println("########################## setMap to " + mapProvider.url);
+			System.out.println("########################## setTheme to " + mapProvider.tilePath);
+			tileSource.setMapFile(mapProvider.url);
 			tileSource.setPreferredLanguage(_mf_prefered_language);
 			//_mf_VectorTileLayer_S3DB = mMap.setBaseMap(tileSource);
-			//_mf_VectorTileLayer_S3DB.setRenderTheme(ThemeLoader.load(mapProvider.description));
+			//_mf_VectorTileLayer_S3DB.setRenderTheme(ThemeLoader.load(mapProvider.tilePath));
 					
 			_layer_BaseMap.setTileSource(tileSource);
-			_layer_mf_S3DB.setEnabled(true);	
-			
-			mMap.setTheme(ThemeLoader.load(mapProvider.description));
+
+			mMap.setTheme(ThemeLoader.load(mapProvider.tilePath));
 			
 		}
 		//setupMap_Layers();
@@ -716,9 +719,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		
 		// S3DB
 		if(_is_mf_Map) {
-			System.out.println("########################## adding S3DBlayer ");
 			_layer_mf_S3DB = new S3DBLayer(mMap,_mf_VectorTileLayer_S3DB);
 			_layer_mf_S3DB.setEnabled(true);
+			System.out.println("########################## adding S3DBlayer ");
 			//_mf_VectorTileLayer_S3DB.setRenderTheme(ThemeLoader.load(_mf_themeFilePath));
 			layers.add(_layer_mf_S3DB);
 		}
