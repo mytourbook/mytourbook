@@ -74,18 +74,12 @@ public class SuuntoJsonProcessor {
 
 			timeData.absoluteTime = currentSampleDate;
 
-			TimeData minTDobject = null;
-			long mintdvalue = Long.MAX_VALUE;
-			for (TimeData object : _sampleList) {
-				long difference = currentSampleDate - object.absoluteTime;
-				if (difference < mintdvalue) {
-					mintdvalue = difference;
-					minTDobject = object;
-				}
-			}
-			if (mintdvalue > -200 && mintdvalue < 200) {
-				timeData = minTDobject;
-			}
+			/*
+			 * TimeData minTDobject = null; long mintdvalue = Long.MAX_VALUE; for (TimeData object :
+			 * _sampleList) { long difference = currentSampleDate - object.absoluteTime; if (difference
+			 * < mintdvalue) { mintdvalue = difference; minTDobject = object; } } if (mintdvalue > -200
+			 * && mintdvalue < 200) { timeData = minTDobject; }
+			 */
 
 			if (currentSampleData.contains("Pause")) {
 				if (!isPaused) {

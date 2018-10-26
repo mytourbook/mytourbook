@@ -38,14 +38,9 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 	private HashMap<Long, TourData>						_alreadyImportedTours			= new HashMap<Long, TourData>();
 
 	// For Unit testing
-	private static final boolean			UNITTESTS			= false;
+	private static final boolean			UNITTESTS			= true;
 	public static final String				IMPORT_FILE_PATH	= "/net/tourbook/device/suunto/testFiles/";
 	private static Map<String, String>	testFiles			= new HashMap<>();									// Java 7
-
-	public Suunto9DeviceDataReader() {
-		_processedActivities.clear();
-		_childrenActivitiesToProcess.clear();
-	}
 
 	@Override
 	public String buildFileNameFromRawData(final String rawDataFileName) {
@@ -87,6 +82,11 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
 		_newlyImportedTours = newlyImportedTours;
 		_alreadyImportedTours = alreadyImportedTours;
+
+		// When a new import is started, we need to clean the previous saved activities
+		if (newlyImportedTours.size() == 0 && alreadyImportedTours.size() == 0) {
+			cleanUpActivities();
+		}
 
 		String jsonFileContent =
 				GetJsonContentFromGZipFile(importFilePath);
@@ -259,7 +259,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 						it.remove(); // avoids a ConcurrentModificationException
 				}
 				//processedActivities.remove(parentEntry.getKey());
-				//TODO not sure the line below will work (reference ??)(
+
 				if (!processedActivityExists(activity.getTourId()))
 					_processedActivities.put(activity, suuntoJsonProcessor.getSampleList());
 			}
@@ -301,7 +301,8 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		SuuntoJsonProcessor suuntoJsonProcessor = new SuuntoJsonProcessor();
 
 		ArrayList<String> keysToRemove = new ArrayList<String>();
-		for (Map.Entry<String, String> unused : _childrenActivitiesToProcess.entrySet()) {
+		for (@SuppressWarnings("unused")
+		Map.Entry<String, String> unused : _childrenActivitiesToProcess.entrySet()) {
 
 			String parentFileName = GetFileNameWithoutNumber(
 					FilenameUtils.getBaseName(filePath)) +
@@ -397,6 +398,16 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		return null;
 	}
 
+	/*
+	 * At the end of the import process, we clean the accumulated data so that the next round will
+	 * begin clean.
+	 */
+
+	private void cleanUpActivities() {
+		_childrenActivitiesToProcess.clear();
+		_processedActivities.clear();
+	}
+
 	/**
 	 * Unit tests for the Suunto Spartan/9 import
 	 */
@@ -413,6 +424,12 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		String controlFilePath = IMPORT_FILE_PATH + "1537365846902_183010004848_post_timeline-1.xml";
 		testFiles.put(controlFilePath, filePath);
 
+		//Maxwell, CO
+		filePath =
+				IMPORT_FILE_PATH + "Original-1536723722706_183010004848_post_timeline-1.json.gz";
+		controlFilePath = IMPORT_FILE_PATH + "1536723722706_183010004848_post_timeline-1.xml";
+		testFiles.put(controlFilePath, filePath);
+
 		// Single file tests
 		SuuntoJsonProcessor suuntoJsonProcessor = new SuuntoJsonProcessor();
 		for (Map.Entry<String, String> entry : testFiles.entrySet()) {
@@ -426,7 +443,42 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 			testResults &= CompareAgainstControl(controlFileContent, xml);
 		}
 
-		//TODO Add multiple files unit tests
+		cleanUpActivities();
+
+		// ------------------------------------------
+		// Split files test
+		// ------------------------------------------
+
+		// Maxwell, CO (Split manually)
+
+		// ORDER 2 - 1 - 3
+		// File #2
+		String maxWell2FilePath = IMPORT_FILE_PATH +
+				"1536723722706_183010004848_post_timeline-2.json.gz";
+		String jsonContent = GetJsonContentFromGZipFile(maxWell2FilePath);
+		ProcessFile(maxWell2FilePath, jsonContent);
+
+		// File #1
+		String maxWell1FilePath = IMPORT_FILE_PATH +
+				"1536723722706_183010004848_post_timeline-1.json.gz";
+		jsonContent = GetJsonContentFromGZipFile(maxWell1FilePath);
+		ProcessFile(maxWell1FilePath, jsonContent);
+
+		// File #3
+		String maxWell3FilePath = IMPORT_FILE_PATH +
+				"1536723722706_183010004848_post_timeline-3.json.gz";
+		jsonContent = GetJsonContentFromGZipFile(maxWell3FilePath);
+		ProcessFile(maxWell3FilePath, jsonContent);
+
+		String controlDocumentPath = IMPORT_FILE_PATH +
+				"1536723722706_183010004848_post_timeline-1.xml";
+
+		Iterator<Entry<TourData, ArrayList<TimeData>>> it = _processedActivities.entrySet().iterator();
+		Map.Entry<TourData, ArrayList<TimeData>> entry = (Entry<TourData, ArrayList<TimeData>>) it.next();
+		String xml = entry.getKey().toXml();
+		String controlFileContent = GetContentFromResource(controlDocumentPath, false);
+
+		testResults &= CompareAgainstControl(controlFileContent, xml);
 
 		return testResults;
 	}
