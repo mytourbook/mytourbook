@@ -42,8 +42,10 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 	public static final String				IMPORT_FILE_PATH	= "/net/tourbook/device/suunto/testFiles/";
 	private static Map<String, String>	testFiles			= new HashMap<>();									// Java 7
 
-	// plugin constructor
-	public Suunto9DeviceDataReader() {}
+	public Suunto9DeviceDataReader() {
+		processedActivities.clear();
+		childrenActivitiesToProcess.clear();
+	}
 
 	@Override
 	public String buildFileNameFromRawData(final String rawDataFileName) {
@@ -212,9 +214,9 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 			final String uniqueId = this.createUniqueId(activity, Util.UNIQUE_ID_SUFFIX_SUUNTO9);
 			activity.createTourId(uniqueId);
 
-			//TODO Call function AddProcessedActivity that will iterate...
-			if (!processedActivities.containsKey(filePath))
+			if (!processedActivityExists(activity.getTourId()))
 				processedActivities.put(activity, suuntoJsonProcessor.getSampleList());
+
 		} else if (fileNumber > 1) {
 			// if we find the parent (e.g: The activity just before the
 			// current one. Example : If the current is xxx-3, we find xxx-2)
@@ -223,10 +225,14 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 			Map.Entry<TourData, ArrayList<TimeData>> parentEntry = null;
 			for (Map.Entry<TourData, ArrayList<TimeData>> entry : processedActivities.entrySet()) {
 				TourData key = entry.getKey();
-				//TODO
-				int ff = fileNumber - 1;
-				String tata = GetFileNameWithoutNumber(FilenameUtils.getBaseName(filePath)) + "-" + ff + ".json.gz";
-				if (key.getImportFileName().contains(tata)) {
+
+				String parentFileName = GetFileNameWithoutNumber(
+						FilenameUtils.getBaseName(filePath)) +
+						"-" +
+						String.valueOf(fileNumber - 1) +
+						".json.gz";
+
+				if (key.getImportFileName().contains(parentFileName)) {
 					parentEntry = entry;
 					break;
 				}
@@ -252,7 +258,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 				}
 				//processedActivities.remove(parentEntry.getKey());
 				//TODO not sure the line below will work (reference ??)(
-				if (!processedActivities.containsKey(activity))
+				if (!processedActivityExists(activity.getTourId()))
 					processedActivities.put(activity, suuntoJsonProcessor.getSampleList());
 			}
 		}
@@ -354,10 +360,19 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		// add new tour to other tours
 		_newlyImportedTours.put(tourId, tourData);
 
-		//TODO
-		// create additional data
+		//TODO  create additional data
 		//tourData.computeAltitudeUpDown();
 		//tourData.computeComputedValues();
+	}
+
+	private boolean processedActivityExists(long tourId) {
+		for (Map.Entry<TourData, ArrayList<TimeData>> entry : processedActivities.entrySet()) {
+			TourData key = entry.getKey();
+			if (key.getTourId() == tourId)
+				return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -369,6 +384,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 												final HashMap<Long, TourData> newlyImportedTours) {
 
 		boolean testResults = true;
+
 		// City of Rocks, ID
 		String filePath =
 				IMPORT_FILE_PATH + "1537365846902_183010004848_post_timeline-1.json.gz";
@@ -387,6 +403,8 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
 			testResults &= CompareAgainstControl(controlFileContent, xml);
 		}
+
+		//TODO Add multiple files unit tests
 
 		return testResults;
 	}
