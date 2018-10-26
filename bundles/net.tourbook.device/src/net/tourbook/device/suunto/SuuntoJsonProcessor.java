@@ -41,13 +41,16 @@ public class SuuntoJsonProcessor {
 		if (firstSampleAttributes.contains("Lap") &&
 				firstSampleAttributes.contains("Type") &&
 				firstSampleAttributes.contains("Start")) {
+
 			ZonedDateTime startTime = ZonedDateTime.parse(firstSample.get("TimeISO8601").toString());
 			tourData.setTourStartTime(startTime);
 
 		} else if (activityToReUse != null) {
+
 			tourData = activityToReUse;
 			_sampleList = sampleListToReUse;
 			tourData.cleanupDataSeries();
+
 		} else
 			return null;
 
@@ -80,7 +83,7 @@ public class SuuntoJsonProcessor {
 					minTDobject = object;
 				}
 			}
-			if (mintdvalue > -100 && mintdvalue < 100) {
+			if (mintdvalue > -200 && mintdvalue < 200) {
 				timeData = minTDobject;
 			}
 
@@ -101,6 +104,7 @@ public class SuuntoJsonProcessor {
 			if (currentSampleData.contains("Lap") &&
 					(currentSampleData.contains("Manual") ||
 							currentSampleData.contains("Distance"))) {
+				//TODO Support the case where we are in a children activity and the lap counter may need to be adjusted
 				timeData.marker = 1;
 				timeData.markerLabel = Integer.toString(++_lapCounter);
 				_sampleList.add(timeData);
