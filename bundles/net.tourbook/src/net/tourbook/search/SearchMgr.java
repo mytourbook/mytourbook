@@ -690,7 +690,7 @@ public class SearchMgr implements XHRHandler {
 
 			// shutdown search service
 
-			FTSearchManager.close();
+			FTSearchManager.closeIndexReaderSuggester();
 
 			WebContentServer.stop();
 
@@ -867,6 +867,9 @@ public class SearchMgr implements XHRHandler {
 
 						if (_isUI_ShowItemNumber) {
 							sb.append(TAG_TD + Integer.toString(itemNumber) + TAG_TD_END);
+// for debugging
+//                     sb.append(TAG_TD + tourId + TAG_TD_END);
+//                     sb.append(TAG_TD + markerId + TAG_TD_END);
 						}
 
 						if (_isUI_ShowLuceneDocId) {
