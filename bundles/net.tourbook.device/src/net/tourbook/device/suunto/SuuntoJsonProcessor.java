@@ -2,6 +2,9 @@ package net.tourbook.device.suunto;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -10,6 +13,7 @@ import org.json.JSONObject;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
 
 public class SuuntoJsonProcessor {
 
@@ -23,6 +27,15 @@ public class SuuntoJsonProcessor {
 
 		TourData tourData = new TourData();
 		_sampleList = new ArrayList<TimeData>();
+
+		if (activityToReUse != null) {
+			Set<TourMarker> toto = activityToReUse.getTourMarkers();
+			for (Iterator<TourMarker> it = toto.iterator(); it.hasNext();) {
+				TourMarker f = it.next();
+				_lapCounter = Integer.valueOf(f.getLabel());
+			}
+			activityToReUse.setTourMarkers(new HashSet<>());
+		}
 
 		JSONArray samples = null;
 		try {
@@ -49,8 +62,7 @@ public class SuuntoJsonProcessor {
 
 			tourData = activityToReUse;
 			_sampleList = sampleListToReUse;
-			tourData.cleanupDataSeries();
-
+			tourData.timeSerie = null;
 		} else
 			return null;
 
