@@ -253,7 +253,7 @@ public class Map25ProviderManager {
 						mp.url = Util.getXmlString(xml, ATTR_URL, UI.EMPTY_STRING);
 
 						mp.tileEncoding = (TileEncoding) Util.getXmlEnum(xml, ATTR_TILE_ENCODING, TileEncoding.VTM);
-						System.out.println("################## tilePath and URL" + mp.tilePath + " " + mp.url);
+						System.out.println("################## Name, Url and tilePath: " + mp.name + " " + mp.url + mp.tilePath );
 						
 						allMapProvider.add(mp);
 					}
