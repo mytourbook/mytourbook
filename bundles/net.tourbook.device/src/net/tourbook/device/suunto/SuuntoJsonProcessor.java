@@ -24,18 +24,7 @@ public class SuuntoJsonProcessor {
 	public TourData ImportActivity(	String jsonFileContent,
 												TourData activityToReUse,
 												ArrayList<TimeData> sampleListToReUse) {
-
-		TourData tourData = new TourData();
 		_sampleList = new ArrayList<TimeData>();
-
-		if (activityToReUse != null) {
-			Set<TourMarker> toto = activityToReUse.getTourMarkers();
-			for (Iterator<TourMarker> it = toto.iterator(); it.hasNext();) {
-				TourMarker f = it.next();
-				_lapCounter = Integer.valueOf(f.getLabel());
-			}
-			activityToReUse.setTourMarkers(new HashSet<>());
-		}
 
 		JSONArray samples = null;
 		try {
@@ -47,23 +36,9 @@ public class SuuntoJsonProcessor {
 
 		JSONObject firstSample = (JSONObject) samples.get(0);
 
-		/*
-		 * set tour start date/time
-		 */
-		String firstSampleAttributes = firstSample.get("Attributes").toString();
-		if (firstSampleAttributes.contains("Lap") &&
-				firstSampleAttributes.contains("Type") &&
-				firstSampleAttributes.contains("Start")) {
+		TourData tourData = InitializeActivity(firstSample, activityToReUse, sampleListToReUse);
 
-			ZonedDateTime startTime = ZonedDateTime.parse(firstSample.get("TimeISO8601").toString());
-			tourData.setTourStartTime(startTime);
-
-		} else if (activityToReUse != null) {
-
-			tourData = activityToReUse;
-			_sampleList = sampleListToReUse;
-			tourData.timeSerie = null;
-		} else
+		if (tourData == null)
 			return null;
 
 		boolean isPaused = false;
@@ -150,6 +125,48 @@ public class SuuntoJsonProcessor {
 		tourData.createTimeSeries(_sampleList, true);
 
 		return tourData;
+	}
+
+	/**
+	 * Creates a new activity and initializes all the needed fields.
+	 * 
+	 * @param firstSample
+	 *           The activity start time as a string.
+	 * @param activityToReuse
+	 *           The activity to concatenate the current activity with.
+	 * @return If valid, the initialized tour
+	 */
+	private TourData InitializeActivity(JSONObject firstSample,
+													TourData activityToReUse,
+													ArrayList<TimeData> sampleListToReUse) {
+		TourData tourData = new TourData();
+		String firstSampleAttributes = firstSample.get("Attributes").toString();
+
+		if (firstSampleAttributes.contains("Lap") &&
+				firstSampleAttributes.contains("Type") &&
+				firstSampleAttributes.contains("Start")) {
+
+			ZonedDateTime startTime = ZonedDateTime.parse(firstSample.get("TimeISO8601").toString());
+			tourData.setTourStartTime(startTime);
+
+		} else if (activityToReUse != null) {
+
+			Set<TourMarker> tourMarkers = activityToReUse.getTourMarkers();
+			for (Iterator<TourMarker> it = tourMarkers.iterator(); it.hasNext();) {
+				TourMarker tourMarker = it.next();
+				_lapCounter = Integer.valueOf(tourMarker.getLabel());
+			}
+			activityToReUse.setTourMarkers(new HashSet<>());
+
+			tourData = activityToReUse;
+			_sampleList = sampleListToReUse;
+			tourData.timeSerie = null;
+
+		} else
+			return null;
+
+		return tourData;
+
 	}
 
 	public ArrayList<TimeData> getSampleList() {
