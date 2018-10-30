@@ -653,6 +653,62 @@ public class FTSearchManager {
       }
    }
 
+   /**
+    * Remove tour from ft index when tour is deleted.
+    *
+    * @param tourId
+    */
+   public static void deleteFromIndex(final long tourId) {
+
+      setupIndexReader();
+
+      FSDirectory indexStore_TourData = null;
+      FSDirectory indexStore_Marker = null;
+      FSDirectory indexStore_WayPoint = null;
+
+      IndexWriter indexWriter_TourData = null;
+      IndexWriter indexWriter_Marker = null;
+      IndexWriter indexWriter_WayPoint = null;
+
+      final Builder deleteDoc_TourData = new BooleanQuery.Builder();
+      final Builder deleteDoc_Marker = new BooleanQuery.Builder();
+      final Builder deleteDoc_WayPoint = new BooleanQuery.Builder();
+
+      try {
+
+         indexStore_TourData = openStore(TourDatabase.TABLE_TOUR_DATA);
+         indexStore_Marker = openStore(TourDatabase.TABLE_TOUR_MARKER);
+         indexStore_WayPoint = openStore(TourDatabase.TABLE_TOUR_WAYPOINT);
+
+         indexWriter_TourData = new IndexWriter(indexStore_TourData, getIndexWriterConfig());
+         indexWriter_Marker = new IndexWriter(indexStore_Marker, getIndexWriterConfig());
+         indexWriter_WayPoint = new IndexWriter(indexStore_WayPoint, getIndexWriterConfig());
+
+         /*
+          * Delete existing tour, marker and waypoint
+          */
+         final Query tourIdQuery = LongPoint.newExactQuery(SEARCH_FIELD_TOUR_ID, tourId);
+
+         deleteDoc_TourData.add(tourIdQuery, Occur.FILTER);
+         deleteDoc_Marker.add(tourIdQuery, Occur.FILTER);
+         deleteDoc_WayPoint.add(tourIdQuery, Occur.FILTER);
+
+         indexWriter_TourData.deleteDocuments(deleteDoc_TourData.build());
+         indexWriter_Marker.deleteDocuments(deleteDoc_Marker.build());
+         indexWriter_WayPoint.deleteDocuments(deleteDoc_WayPoint.build());
+
+      } catch (final IOException e) {
+         StatusUtil.showStatus(e);
+      } finally {
+
+         closeIndexWriterAndStore(indexStore_TourData, indexWriter_TourData);
+         closeIndexWriterAndStore(indexStore_Marker, indexWriter_Marker);
+         closeIndexWriterAndStore(indexStore_WayPoint, indexWriter_WayPoint);
+      }
+
+      closeIndexReaderSuggester();
+   }
+
    private static Analyzer getAnalyzer() {
 
       Analyzer analyzer = null;
@@ -1026,6 +1082,7 @@ public class FTSearchManager {
       fieldsToLoad.add(SEARCH_FIELD_DOC_SOURCE_SAVED);
       fieldsToLoad.add(SEARCH_FIELD_TOUR_ID);
       fieldsToLoad.add(SEARCH_FIELD_MARKER_ID);
+      fieldsToLoad.add(SEARCH_FIELD_WAYPOINT_ID);
       fieldsToLoad.add(SEARCH_FIELD_TIME);
 
       for (final Entry<String, String[]> field : fields) {
@@ -1071,6 +1128,10 @@ public class FTSearchManager {
                      break;
 
                   case SEARCH_FIELD_MARKER_ID:
+                     resultItem.markerId = indexField.stringValue();
+                     break;
+
+                  case SEARCH_FIELD_WAYPOINT_ID:
                      resultItem.markerId = indexField.stringValue();
                      break;
 

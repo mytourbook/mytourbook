@@ -26,6 +26,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.lucene.search.suggest.Lookup.LookupResult;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -561,7 +562,8 @@ public class SearchMgr implements XHRHandler {
 		TourWayPoint selectedWayPoint = null;
 
 		// get marker by id
-		for (final TourWayPoint wayPoint : tourData.getTourWayPoints()) {
+		Set<TourWayPoint> tourWayPoints = tourData.getTourWayPoints();
+      for (final TourWayPoint wayPoint : tourWayPoints) {
 			if (wayPoint.getWayPointId() == markerId) {
 				selectedWayPoint = wayPoint;
 				break;
