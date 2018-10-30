@@ -38,7 +38,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 	private HashMap<Long, TourData>						_alreadyImportedTours			= new HashMap<Long, TourData>();
 
 	// For Unit testing
-	private static final boolean			UNITTESTS			= true;
+	private static final boolean			UNITTESTS			= false;
 	public static final String				IMPORT_FILE_PATH	= "/net/tourbook/device/suunto/testFiles/";
 	private static Map<String, String>	testFiles			= new HashMap<>();									// Java 7
 
@@ -137,7 +137,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 			Util.closeReader(fileReader);
 		}
 
-		return true;
+		return false;
 	}
 
 	private String GetJsonContentFromGZipFile(String gzipFilePath) {
@@ -352,6 +352,13 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		return fileName.substring(0, fileName.lastIndexOf('-'));
 	}
 
+	/**
+	 * Attempting to finalize an activity. If it doesn't contain a tourId, it is not a final
+	 * activity.
+	 * 
+	 * @param tourData
+	 *           The tour to finalize
+	 */
 	private void TryFinalizeTour(TourData tourData) {
 
 		tourData.setDeviceId(deviceId);
@@ -377,11 +384,10 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 			}
 			_newlyImportedTours.put(tourId, tourData);
 
-			//TODO  create additional data when the tour is considered done (no parent or children are found)
 			//tourData.computeAltitudeUpDown();
+			//tourData.computeTourDrivingTime();
 			//tourData.computeComputedValues();
 		}
-
 	}
 
 	private boolean processedActivityExists(long tourId) {
