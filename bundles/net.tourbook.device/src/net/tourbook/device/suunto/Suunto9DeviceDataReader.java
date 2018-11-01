@@ -123,7 +123,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 				JSONArray samples = (JSONArray) jsonContent.get("Samples");
 
 				String firstSample = samples.get(0).toString();
-				if (firstSample.contains("Lap") && firstSample.contains("Type") && firstSample.contains("Start"))
+				if (firstSample.contains("Attributes") && firstSample.contains("Source") && firstSample.contains("TimeISO8601"))
 					return true;
 
 			} catch (JSONException ex) {
