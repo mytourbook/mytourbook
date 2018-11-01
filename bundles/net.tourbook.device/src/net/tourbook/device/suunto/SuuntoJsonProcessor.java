@@ -1,6 +1,7 @@
 package net.tourbook.device.suunto;
 
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -43,7 +44,10 @@ public class SuuntoJsonProcessor {
 
 		boolean isPaused = false;
 
+		boolean reusePreviousTimeEntry;
 		for (int i = 0; i < samples.length(); i++) {
+			reusePreviousTimeEntry = false;
+
 			JSONObject sample = samples.getJSONObject(i);
 			JSONObject currentSampleAttributes = new JSONObject(sample.get("Attributes").toString());
 			String currentSampleSml = currentSampleAttributes.get("suunto/sml").toString();
@@ -52,15 +56,27 @@ public class SuuntoJsonProcessor {
 
 			String currentSampleData = new JSONObject(currentSampleSml).get("Sample").toString();
 
-			long currentSampleDate = ZonedDateTime.parse(sample.get("TimeISO8601").toString())
-					.toInstant()
-					.toEpochMilli();
-
 			boolean wasDataPopulated = false;
 			TimeData timeData = new TimeData();
 
-			timeData.absoluteTime = currentSampleDate;
+			ZonedDateTime toto = ZonedDateTime.parse(sample.get("TimeISO8601").toString());
 
+			toto = toto.truncatedTo(ChronoUnit.SECONDS);
+			if (Character.getNumericValue(sample.get("TimeISO8601").toString().charAt(20)) >= 5)
+				toto = toto.plusSeconds(1);
+
+			long tata = toto.toInstant().toEpochMilli();
+			if (_sampleList.size() > 0) {
+				for (int j = _sampleList.size() - 1; j > _sampleList.size() - 11 && j >= 0; --j) {
+					if (_sampleList.get(j).absoluteTime == tata) {
+						timeData = _sampleList.get(j);
+						reusePreviousTimeEntry = true;
+						break;
+					}
+				}
+			}
+			if (!reusePreviousTimeEntry)
+				timeData.absoluteTime = tata;
 			/*
 			 * TimeData minTDobject = null; long mintdvalue = Long.MAX_VALUE; for (TimeData object :
 			 * _sampleList) { long difference = currentSampleDate - object.absoluteTime; if (difference
@@ -88,7 +104,8 @@ public class SuuntoJsonProcessor {
 				//TODO Support the case where we are in a children activity and the lap counter may need to be adjusted
 				timeData.marker = 1;
 				timeData.markerLabel = Integer.toString(++_lapCounter);
-				_sampleList.add(timeData);
+				if (!reusePreviousTimeEntry)
+					_sampleList.add(timeData);
 			}
 
 			// GPS point
@@ -119,9 +136,17 @@ public class SuuntoJsonProcessor {
 			// Temperature
 			wasDataPopulated |= TryAddTemperatureData(new JSONObject(currentSampleData), timeData);
 
-			if (wasDataPopulated)
+			if (wasDataPopulated && !reusePreviousTimeEntry)
 				_sampleList.add(timeData);
 		}
+		//removing the orphanes
+		Iterator<TimeData> fff = _sampleList.iterator();
+		while (fff.hasNext()) {
+			TimeData s = fff.next(); // must be called before you can call i.remove()
+			if (s.longitude == Double.MIN_VALUE && s.latitude == Double.MIN_VALUE)
+				fff.remove();
+		}
+
 		tourData.createTimeSeries(_sampleList, true);
 
 		return tourData;
@@ -183,15 +208,12 @@ public class SuuntoJsonProcessor {
 	 */
 	private boolean TryAddGpsData(JSONObject currentSample, TimeData timeData) {
 		try {
-			String dateString = currentSample.get("UTC").toString();
-			long unixTime = ZonedDateTime.parse(dateString).toInstant().toEpochMilli();
 			float latitude = Util.parseFloat(currentSample.get("Latitude").toString());
 			float longitude = Util.parseFloat(currentSample.get("Longitude").toString());
 			float altitude = Util.parseFloat(currentSample.get("GPSAltitude").toString());
 
 			timeData.latitude = (latitude * 180) / Math.PI;
 			timeData.longitude = (longitude * 180) / Math.PI;
-			timeData.absoluteTime = unixTime;
 			timeData.absoluteAltitude = altitude;
 
 			return true;
