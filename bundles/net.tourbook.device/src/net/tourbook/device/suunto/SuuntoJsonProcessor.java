@@ -45,7 +45,7 @@ public class SuuntoJsonProcessor {
 		boolean isPaused = false;
 
 		boolean reusePreviousTimeEntry;
-		for (int i = 0; i < samples.length(); i++) {
+		for (int i = 0; i < samples.length(); ++i) {
 
 			JSONObject sample = samples.getJSONObject(i);
 			JSONObject currentSampleAttributes = new JSONObject(sample.get("Attributes").toString());
@@ -68,9 +68,10 @@ public class SuuntoJsonProcessor {
 			long currentTime = currentZonedDateTime.toInstant().toEpochMilli();
 
 			if (_sampleList.size() > 0) {
-				for (int j = _sampleList.size() - 1; j > _sampleList.size() - 11 && j >= 0; --j) {
-					if (_sampleList.get(j).absoluteTime == currentTime) {
-						timeData = _sampleList.get(j);
+				//Looking in the last 10 entries to see if their time is identical to the current sample's time
+				for (int index = _sampleList.size() - 1; index > _sampleList.size() - 11 && index >= 0; --index) {
+					if (_sampleList.get(index).absoluteTime == currentTime) {
+						timeData = _sampleList.get(index);
 						reusePreviousTimeEntry = true;
 						break;
 					}
@@ -183,7 +184,7 @@ public class SuuntoJsonProcessor {
 
 			tourData = activityToReUse;
 			_sampleList = sampleListToReUse;
-			tourData.cleanupDataSeries();
+			tourData.clearComputedSeries();
 			tourData.timeSerie = null;
 
 		} else
