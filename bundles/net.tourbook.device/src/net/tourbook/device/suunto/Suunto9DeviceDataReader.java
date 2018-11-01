@@ -384,9 +384,9 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 			}
 			_newlyImportedTours.put(tourId, tourData);
 
-			//tourData.computeAltitudeUpDown();
-			//tourData.computeTourDrivingTime();
-			//tourData.computeComputedValues();
+			tourData.computeAltitudeUpDown();
+			tourData.computeTourDrivingTime();
+			tourData.computeComputedValues();
 		}
 	}
 
