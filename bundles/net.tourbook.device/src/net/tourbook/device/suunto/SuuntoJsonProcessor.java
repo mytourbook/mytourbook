@@ -46,7 +46,6 @@ public class SuuntoJsonProcessor {
 
 		boolean reusePreviousTimeEntry;
 		for (int i = 0; i < samples.length(); i++) {
-			reusePreviousTimeEntry = false;
 
 			JSONObject sample = samples.getJSONObject(i);
 			JSONObject currentSampleAttributes = new JSONObject(sample.get("Attributes").toString());
@@ -55,34 +54,33 @@ public class SuuntoJsonProcessor {
 				continue;
 
 			String currentSampleData = new JSONObject(currentSampleSml).get("Sample").toString();
-
 			boolean wasDataPopulated = false;
-			TimeData timeData = new TimeData();
+			reusePreviousTimeEntry = false;
+			TimeData timeData = null;
 
-			ZonedDateTime toto = ZonedDateTime.parse(sample.get("TimeISO8601").toString());
+			String sampleTime = sample.get("TimeISO8601").toString();
+			ZonedDateTime currentZonedDateTime = ZonedDateTime.parse(sampleTime);
+			currentZonedDateTime = currentZonedDateTime.truncatedTo(ChronoUnit.SECONDS);
+			//Rounding to the nearest second
+			if (Character.getNumericValue(sampleTime.charAt(20)) >= 5)
+				currentZonedDateTime = currentZonedDateTime.plusSeconds(1);
 
-			toto = toto.truncatedTo(ChronoUnit.SECONDS);
-			if (Character.getNumericValue(sample.get("TimeISO8601").toString().charAt(20)) >= 5)
-				toto = toto.plusSeconds(1);
+			long currentTime = currentZonedDateTime.toInstant().toEpochMilli();
 
-			long tata = toto.toInstant().toEpochMilli();
 			if (_sampleList.size() > 0) {
 				for (int j = _sampleList.size() - 1; j > _sampleList.size() - 11 && j >= 0; --j) {
-					if (_sampleList.get(j).absoluteTime == tata) {
+					if (_sampleList.get(j).absoluteTime == currentTime) {
 						timeData = _sampleList.get(j);
 						reusePreviousTimeEntry = true;
 						break;
 					}
 				}
 			}
-			if (!reusePreviousTimeEntry)
-				timeData.absoluteTime = tata;
-			/*
-			 * TimeData minTDobject = null; long mintdvalue = Long.MAX_VALUE; for (TimeData object :
-			 * _sampleList) { long difference = currentSampleDate - object.absoluteTime; if (difference
-			 * < mintdvalue) { mintdvalue = difference; minTDobject = object; } } if (mintdvalue > -200
-			 * && mintdvalue < 200) { timeData = minTDobject; }
-			 */
+
+			if (!reusePreviousTimeEntry) {
+				timeData = new TimeData();
+				timeData.absoluteTime = currentTime;
+			}
 
 			if (currentSampleData.contains("Pause")) {
 				if (!isPaused) {
@@ -101,7 +99,6 @@ public class SuuntoJsonProcessor {
 			if (currentSampleData.contains("Lap") &&
 					(currentSampleData.contains("Manual") ||
 							currentSampleData.contains("Distance"))) {
-				//TODO Support the case where we are in a children activity and the lap counter may need to be adjusted
 				timeData.marker = 1;
 				timeData.markerLabel = Integer.toString(++_lapCounter);
 				if (!reusePreviousTimeEntry)
@@ -118,20 +115,19 @@ public class SuuntoJsonProcessor {
 			wasDataPopulated |= TryAddHeartRateData(new JSONObject(currentSampleData), timeData);
 
 			// Speed
-			//wasDataPopulated |= TryAddSpeedData(new JSONObject(currentSampleData), timeData);
+			wasDataPopulated |= TryAddSpeedData(new JSONObject(currentSampleData), timeData);
 
 			// Cadence
 			wasDataPopulated |= TryAddCadenceData(new JSONObject(currentSampleData), timeData);
 
 			// Barometric Altitude
-			// TryAddAltitudeData(new JSONObject(currentSampleData), currentSampleDate,
-			// timeData);
+			//wasDataPopulated |= TryAddAltitudeData(new JSONObject(currentSampleData), timeData);
 
 			// Power
 			wasDataPopulated |= TryAddPowerData(new JSONObject(currentSampleData), timeData);
 
 			// Distance
-			//wasDataPopulated |= TryAddDistanceData(new JSONObject(currentSampleData), timeData);
+			wasDataPopulated |= TryAddDistanceData(new JSONObject(currentSampleData), timeData);
 
 			// Temperature
 			wasDataPopulated |= TryAddTemperatureData(new JSONObject(currentSampleData), timeData);
@@ -139,12 +135,14 @@ public class SuuntoJsonProcessor {
 			if (wasDataPopulated && !reusePreviousTimeEntry)
 				_sampleList.add(timeData);
 		}
-		//removing the orphanes
-		Iterator<TimeData> fff = _sampleList.iterator();
-		while (fff.hasNext()) {
-			TimeData s = fff.next(); // must be called before you can call i.remove()
-			if (s.longitude == Double.MIN_VALUE && s.latitude == Double.MIN_VALUE)
-				fff.remove();
+
+		//removing the entries that don't have GPS data
+		Iterator<TimeData> sampleListIterator = _sampleList.iterator();
+		while (sampleListIterator.hasNext()) {
+			TimeData currentTimeData = sampleListIterator.next();
+			if (currentTimeData.longitude == Double.MIN_VALUE &&
+					currentTimeData.latitude == Double.MIN_VALUE)
+				sampleListIterator.remove();
 		}
 
 		tourData.createTimeSeries(_sampleList, true);
@@ -185,6 +183,7 @@ public class SuuntoJsonProcessor {
 
 			tourData = activityToReUse;
 			_sampleList = sampleListToReUse;
+			tourData.cleanupDataSeries();
 			tourData.timeSerie = null;
 
 		} else
@@ -247,7 +246,6 @@ public class SuuntoJsonProcessor {
 	 * @param sampleList
 	 *           The tour's time serie.
 	 */
-	@SuppressWarnings("unused")
 	private boolean TryAddSpeedData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
 		if ((value = TryRetrieveStringElementValue(currentSample, "Speed")) != null) {
@@ -317,7 +315,6 @@ public class SuuntoJsonProcessor {
 	 * @param sampleList
 	 *           The tour's time serie.
 	 */
-	@SuppressWarnings("unused")
 	private boolean TryAddDistanceData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
 		if ((value = TryRetrieveStringElementValue(currentSample, "Distance")) != null) {
