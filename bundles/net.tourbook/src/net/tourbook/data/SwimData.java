@@ -46,4 +46,19 @@ public class SwimData implements Serializable {
 	 */
 	public short					swim_StrokeStyle	= Short.MIN_VALUE;
 
+	@Override
+	public String toString() {
+		return "SwimData " //$NON-NLS-1$
+
+				+ "[" //$NON-NLS-1$
+
+				+ "absoluteTime=" + absoluteTime + ", " //$NON-NLS-1$ //$NON-NLS-2$
+//				+ "swim_LengthType=" + swim_LengthType + ", " //$NON-NLS-1$ //$NON-NLS-2$
+//				+ "swim_Cadence=" + swim_Cadence + ", " //$NON-NLS-1$ //$NON-NLS-2$
+				+ "swim_Strokes=" + swim_Strokes + ", " //$NON-NLS-1$ //$NON-NLS-2$
+//				+ "swim_StrokeStyle=" + swim_StrokeStyle //$NON-NLS-1$
+
+				+ "]"; //$NON-NLS-1$
+	}
+
 }

@@ -1,5 +1,6 @@
 package net.tourbook.device.garmin.fit;
 
+import com.garmin.fit.DateTime;
 import com.garmin.fit.EventMesg;
 import com.garmin.fit.HrMesg;
 import com.garmin.fit.LengthMesg;
@@ -41,6 +42,8 @@ public class FitContextData {
 
 	private TourContext											_current_TourContext;
 	private TourMarker											_current_TourMarker;
+
+	private long													_timeDiffMS;
 
 	/**
 	 * Tour context is a little bit tricky and cannot be replaced with just a {@link TourData}
@@ -139,6 +142,8 @@ public class FitContextData {
 		// ensure tour is setup
 		setupSession_Tour_10_Initialize();
 
+		final DateTime hrTime = mesg.getTimestamp();
+
 //		System.out.println(String.format(""
 //
 //				+ "[%s]"
@@ -162,15 +167,16 @@ public class FitContextData {
 //				mesg.getNumEventTimestamp(),
 //				mesg.getNumFilteredBpm(),
 //
-//				mesg.getTimestamp(),
-//				mesg.getTimestamp() == null ? "" : mesg.getTimestamp().getTimestamp(),
+//				hrTime,
+//				hrTime == null ? "" : hrTime.getTimestamp(),
 //				mesg.getFractionalTimestamp() == null ? null : mesg.getFractionalTimestamp(),
 //
 //				Arrays.toString(mesg.getEventTimestamp()),
 //				Arrays.toString(mesg.getFilteredBpm()),
 //
-//				mesg.getNumEventTimestamp12()));
+//				mesg.getNumEventTimestamp12())
 ////TODO remove SYSTEM.OUT.PRINTLN
+//		);
 
 		boolean isTimeAvailable = false;
 
@@ -179,26 +185,44 @@ public class FitContextData {
 			return;
 		}
 
-		final Float[] allEventTimestamps = mesg.getEventTimestamp();
+		final Float[] allEventTime = mesg.getEventTimestamp();
 		final Short[] allFilteredBpm = mesg.getFilteredBpm();
 
-		if (allFilteredBpm.length != allEventTimestamps.length) {
+		if (allFilteredBpm.length != allEventTime.length) {
 
 			TourLogManager.logError(String.format("Fit file has different filtered data: EventTimestamp: %d - FilteredBpm: %d", //$NON-NLS-1$
-					allEventTimestamps.length,
+					allEventTime.length,
 					allFilteredBpm.length));
 
 			return;
 		}
 
-		for (int timeStampIndex = 0; timeStampIndex < allEventTimestamps.length; timeStampIndex++) {
+		/*
+		 * Get time diff between tour and hr recording. It is complicated because it also contains the
+		 * garmin time offset. After several time and error processes this algorithm seems to be now
+		 * correct.
+		 */
+		if (hrTime != null && _timeDiffMS == Long.MIN_VALUE && allEventTime.length > 0) {
 
-			final Float eventTimeStamp = allEventTimestamps[timeStampIndex];
+			final long firstTourTimeMS = _previous_AllTimeData.get(0).absoluteTime;
+			final long firstHrTimestampMS = hrTime.getDate().getTime();
+
+			final long hr2TourTimeDiffMS = firstTourTimeMS - firstHrTimestampMS;
+
+			final long firstHrTimeSec = Float.valueOf(allEventTime[0]).longValue();
+			final long firstHrTimeMS = firstHrTimeSec * 1000;
+
+			_timeDiffMS = firstTourTimeMS - firstHrTimeMS - hr2TourTimeDiffMS;
+		}
+
+		for (int timeStampIndex = 0; timeStampIndex < allEventTime.length; timeStampIndex++) {
+
+			final Float eventTimeStamp = allEventTime[timeStampIndex];
 			final Short filteredBpm = allFilteredBpm[timeStampIndex];
 
-			final double sliceGarminTimeS = eventTimeStamp + 901846752.0;
+			final double sliceGarminTimeS = eventTimeStamp;
 			final long sliceGarminTimeMS = (long) (sliceGarminTimeS * 1000);
-			final long sliceJavaTime = sliceGarminTimeMS + com.garmin.fit.DateTime.OFFSET;
+			final long sliceJavaTime = sliceGarminTimeMS + _timeDiffMS;
 
 			// merge HR data into an already existing time data
 			for (final TimeData timeData : _previous_AllTimeData) {
@@ -505,6 +529,7 @@ public class FitContextData {
 		setupRecord_20_Finalize();
 
 		_previous_AllTimeData = _current_AllTimeData;
+		_timeDiffMS = Long.MIN_VALUE;
 
 		_current_TourContext = null;
 		_current_AllTimeData = null;
