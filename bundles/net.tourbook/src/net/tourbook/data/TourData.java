@@ -833,6 +833,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	/**
 	 * Contains the absolute distance in m (metric system) or <code>null</code> when not available
 	 */
+	@XmlElementWrapper(name = "DistanceSeries")
+	@XmlElement(name = "DistanceSerie")
 	@Transient
 	public float[]						distanceSerie;
 
@@ -928,6 +930,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * the metric speed serie is required when computing the power even if the current measurement
 	 * system is imperial
 	 */
+	@XmlElementWrapper(name = "SpeedSeries")
+	@XmlElement(name = "SpeedSerie")
 	@Transient
 	private float[]					speedSerie;
 

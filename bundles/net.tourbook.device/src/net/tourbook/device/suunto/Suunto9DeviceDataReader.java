@@ -387,6 +387,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 			tourData.computeAltitudeUpDown();
 			tourData.computeTourDrivingTime();
 			tourData.computeComputedValues();
+
 		}
 	}
 
@@ -453,14 +454,23 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		controlFilePath =
 				IMPORT_FILE_PATH + "1536723722706_183010004848_post_timeline-1.xml";
 		testFiles.put(controlFilePath, filePath); // Single file tests SuuntoJsonProcessor
-		SuuntoJsonProcessor suuntoJsonProcessor = new SuuntoJsonProcessor();
-		for (Map.Entry<String, String> entry : testFiles.entrySet()) {
+
+		//TODO refactor : GetLastImportedTourData();
+		Iterator<Entry<TourData, ArrayList<TimeData>>> it;
+		Map.Entry<TourData, ArrayList<TimeData>> entry;
+		String xml;
+		String controlFileContent;
+
+		for (Map.Entry<String, String> testEntry : testFiles.entrySet()) {
 			String jsonFileContent =
-					GetContentFromResource(entry.getValue(), true);
-			TourData tour =
-					suuntoJsonProcessor.ImportActivity(jsonFileContent, null, null);
-			String xml = tour.toXml();
-			String controlFileContent = GetContentFromResource(entry.getKey(), false);
+					GetContentFromResource(testEntry.getValue(), true);
+			ProcessFile(testEntry.getValue(), jsonFileContent);
+
+			it = _processedActivities.entrySet().iterator();
+			entry = (Entry<TourData, ArrayList<TimeData>>) it.next();
+			xml = entry.getKey().toXml();
+			controlFileContent = GetContentFromResource(testEntry.getKey(), false);
+
 			testResults &=
 					CompareAgainstControl(controlFileContent, xml);
 		}
@@ -494,11 +504,10 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		String controlDocumentPath = IMPORT_FILE_PATH +
 				"1536723722706_183010004848_post_timeline-1.xml";
 
-		Iterator<Entry<TourData, ArrayList<TimeData>>> it = _processedActivities.entrySet().iterator();
-		Map.Entry<TourData, ArrayList<TimeData>> entry = (Entry<TourData, ArrayList<TimeData>>) it.next();
-		String xml = entry.getKey().toXml();
-		String controlFileContent = GetContentFromResource(controlDocumentPath, false);
-
+		it = _processedActivities.entrySet().iterator();
+		entry = (Entry<TourData, ArrayList<TimeData>>) it.next();
+		xml = entry.getKey().toXml();
+		controlFileContent = GetContentFromResource(controlDocumentPath, false);
 		testResults &= CompareAgainstControl(controlFileContent, xml);
 
 		// ORDER 2 - 3 - 1
@@ -518,7 +527,6 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		it = _processedActivities.entrySet().iterator();
 		entry = (Entry<TourData, ArrayList<TimeData>>) it.next();
 		xml = entry.getKey().toXml();
-
 		testResults &= CompareAgainstControl(controlFileContent, xml);
 
 		// ORDER 1 - 2 - 3
