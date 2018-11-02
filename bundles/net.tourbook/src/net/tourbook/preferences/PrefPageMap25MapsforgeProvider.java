@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -738,23 +739,42 @@ public class PrefPageMap25MapsforgeProvider extends PreferencePage implements IW
 		if (isNewProvider || _isMapProviderModified) {
 
 			if (_txtProviderName.getText().trim().equals(UI.EMPTY_STRING)) {
-
 				setErrorMessage(Messages.Pref_Map25_Provider_Error_ProviderNameIsRequired);
-
 				return false;
 
 			} else if (_txtUrl.getText().trim().equals(UI.EMPTY_STRING)) {
-
-				setErrorMessage(Messages.Pref_Map25_Provider_Error_UrlIsRequired);
-
+				setErrorMessage("Mapfile (.map) is required, cant be empty");
+				return false;
+				
+			} else if (checkFile(_txtUrl.getText().trim()).equals("1")) {  //TO DO: call checkFile only once
+				setErrorMessage("Mapfile does not exist");
+				return false;
+				
+			} else if (checkFile(_txtUrl.getText().trim()).equals("2")) {
+				setErrorMessage("Mapfile is not a file");
 				return false;
 
+			} else if (checkFile(_txtUrl.getText().trim()).equals("3")) {
+				setErrorMessage("can not read the map file");
+				return false;
+	
 			} else if (_txtTilePath.getText().trim().equals(UI.EMPTY_STRING)) {
-
-				setErrorMessage(Messages.Pref_Map25_Provider_Error_TilePathIsRequired);
-
+				setErrorMessage("Themefile (.xml) is required");
+				return false;
+				
+			} else if (checkFile(_txtTilePath.getText().trim()).equals("1")) {
+				setErrorMessage("Themefile does not exist");
+				return false;
+				
+			} else if (checkFile(_txtTilePath.getText().trim()).equals("2")) {
+				setErrorMessage("Themefile is not a file");
+				return false;
+				
+			} else if (checkFile(_txtTilePath.getText().trim()).equals("3")) {
+				setErrorMessage("can not read the theme file");
 				return false;
 			}
+
 
 			/*
 			 * Check that at least 1 map provider is enabled
@@ -1103,4 +1123,20 @@ public class PrefPageMap25MapsforgeProvider extends PreferencePage implements IW
 		_isInUpdateUI = false;
 	}
 
+	public static String checkFile(String FilePath) {  	
+		File file = new File(FilePath);
+		if (!file.exists()) {
+			System.out.println("############# file not exist: " +  file.getAbsolutePath());
+			return "1";
+		} else if (!file.isFile()) {
+			System.out.println("############# is not a file: " +  file.getAbsolutePath());
+			return "2";
+		} else if (!file.canRead()) {
+			System.out.println("############# can not read file: " +  file.getAbsolutePath());
+			return "3";
+		}
+		return file.getAbsolutePath();
+	}	
+	
+	
 }
