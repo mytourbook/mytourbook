@@ -1,0 +1,1 @@
+gradlew :vtm-playground:run -Pargs=C:\Users\top\BTSync\oruxmaps\mapfiles\Germany_North_ML.map
