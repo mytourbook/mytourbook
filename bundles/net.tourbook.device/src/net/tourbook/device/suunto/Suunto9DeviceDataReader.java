@@ -213,6 +213,9 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 					null,
 					null);
 
+			if (activity == null)
+				return false;
+
 			final String uniqueId = this.createUniqueId(activity, Util.UNIQUE_ID_SUFFIX_SUUNTO9);
 			activity.createTourId(uniqueId);
 
