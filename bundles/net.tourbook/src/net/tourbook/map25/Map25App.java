@@ -108,9 +108,12 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 	private TileManager				_tileManager;
 
 	private OsmTileLayerMT			_layer_BaseMap;   //extends extends VectorTileLayer
+	private VectorTileLayer 		_layer_mf_VectorTileLayer_S3DB;
+//	private OsmTileLayerMT			_layer_mf_VectorTileLayer_S3DB;
+	
 	private BuildingLayer			_layer_Building;
-	private S3DBLayer					_layer_mf_S3DB;
-	private VectorTileLayer 		_mf_VectorTileLayer_S3DB;
+	private S3DBLayer					_layer_mf_S3DB_Building;
+	
 	private LabelLayerMT				_layer_Label;
 	private MarkerLayer				_layer_Marker;
 	private MapScaleBarLayer		_layer_ScaleBar;
@@ -270,7 +273,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 			_is_mf_Map = false;
 			_httpFactory = new OkHttpEngineMT.OkHttpFactoryMT();
 			final UrlTileSource tileSource = createTileSource(_selectedMapProvider, _httpFactory);
-			_mf_VectorTileLayer_S3DB = mMap.setBaseMap(tileSource);
+			_layer_mf_VectorTileLayer_S3DB = mMap.setBaseMap(tileSource);
+			
 			setupMap(_selectedMapProvider, tileSource);
 			System.out.println("############# create Layers: is online map: " + _selectedMapProvider.url);
 		} else {  //mapsforge
@@ -290,7 +294,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 			final MapFileTileSource tileSource = new MapFileTileSource();	
 			tileSource.setMapFile(_mf_mapFilePath);
 			tileSource.setPreferredLanguage(_mf_prefered_language);
-			_mf_VectorTileLayer_S3DB = mMap.setBaseMap(tileSource);
+			_layer_mf_VectorTileLayer_S3DB = mMap.setBaseMap(tileSource);
 			
 			
 			
@@ -304,7 +308,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 					System.out.println("############# create Layers: themeloader started"); 			
 					this._mf_IRenderTheme = ThemeLoader.load(_mf_themeFilePath);
 
-					_mf_VectorTileLayer_S3DB.setRenderTheme(_mf_IRenderTheme);
+					_layer_mf_VectorTileLayer_S3DB.setRenderTheme(_mf_IRenderTheme);
 					mMap.setTheme(_mf_IRenderTheme);
 
 					CanvasAdapter.textScale = _mf_TextScale;
@@ -397,7 +401,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 	}
 	
 	public S3DBLayer getLayer_S3DB() {
-		return _layer_mf_S3DB;
+		return _layer_mf_S3DB_Building;
 	}
 
 	public LabelLayerMT getLayer_Label() {
@@ -635,7 +639,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 					this._mf_IRenderTheme = ThemeLoader.load(_mf_themeFilePath);
 					System.out.println("############# setMapProvider Theme loader done");
 					CanvasAdapter.textScale = _mf_TextScale;
-					_mf_VectorTileLayer_S3DB.setRenderTheme(_mf_IRenderTheme);
+					_layer_mf_VectorTileLayer_S3DB.setRenderTheme(_mf_IRenderTheme);
 					mMap.setTheme(_mf_IRenderTheme);	
 					mMap.clearMap();
 					mMap.updateMap(true);
@@ -720,7 +724,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 			//_mf_VectorTileLayer_S3DB.setRenderTheme(ThemeLoader.load(_mf_themeFilePath));
 			mMap.setTheme(VtmThemes.OSMARENDER);   // ThemeLoader.load(_mf_themeFilePath));
 		} else {
-			_mf_VectorTileLayer_S3DB.setRenderTheme(ThemeLoader.load(_mf_themeFilePath));
+			_layer_mf_VectorTileLayer_S3DB.setRenderTheme(ThemeLoader.load(_mf_themeFilePath));
 			mMap.setTheme(ThemeLoader.load(_mf_themeFilePath));
 		}
 		//mMap.setTheme(ThemeLoader.load(_mf_themeFilePath));
@@ -763,15 +767,15 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 
 		
 		// S3DB
-		_layer_mf_S3DB = new S3DBLayer(mMap,_mf_VectorTileLayer_S3DB);
+		_layer_mf_S3DB_Building = new S3DBLayer(mMap,_layer_mf_VectorTileLayer_S3DB);
 		//_layer_mf_S3DB = new S3DBLayer(mMap,_layer_BaseMap);
 		if(_is_mf_Map) {
 			//_layer_mf_S3DB = new S3DBLayer(mMap,_mf_VectorTileLayer_S3DB);
-			_layer_mf_S3DB.setEnabled(true);
+			_layer_mf_S3DB_Building.setEnabled(true);
 			System.out.println("############ setupMaplayer: adding S3DBlayer ");
 			//_mf_VectorTileLayer_S3DB.setRenderTheme(ThemeLoader.load(_mf_themeFilePath));
 			//layers.remove(_layer_Building);
-			layers.add(_layer_mf_S3DB);
+			layers.add(_layer_mf_S3DB_Building);
 		}
 
 		// label
