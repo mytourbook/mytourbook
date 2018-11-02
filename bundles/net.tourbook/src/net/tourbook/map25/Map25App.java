@@ -107,7 +107,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 	private Map25Provider			_selectedMapProvider;
 	private TileManager				_tileManager;
 
-	private OsmTileLayerMT			_layer_BaseMap;
+	private OsmTileLayerMT			_layer_BaseMap;   //extends extends VectorTileLayer
 	private BuildingLayer			_layer_Building;
 	private S3DBLayer					_layer_mf_S3DB;
 	private VectorTileLayer 		_mf_VectorTileLayer_S3DB;
@@ -296,18 +296,20 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 			
 			if (_mf_themeFilePath == null) {
 				System.out.println("############# create Layers: Theme not found: " + _mf_mapFilePath + " using default OSMARENDER");
-				//_mf_VectorTileLayer_S3DB.setRenderTheme(ThemeLoader.load(_mf_themeFilePath));
+
 				CanvasAdapter.textScale = 1.5f;
 				mMap.setTheme(VtmThemes.OSMARENDER);   // ThemeLoader.load(_mf_themeFilePath));
 			} else {
 				if (!_mf_themeFilePath.equals(_last_mf_themeFilePath)) {  //only parsing when different file
 					System.out.println("############# create Layers: themeloader started"); 			
 					this._mf_IRenderTheme = ThemeLoader.load(_mf_themeFilePath);
-					//this._mf_IRenderTheme.updateStyles();
+
 					_mf_VectorTileLayer_S3DB.setRenderTheme(_mf_IRenderTheme);
 					mMap.setTheme(_mf_IRenderTheme);
-					//this._mf_IRenderTheme.scaleTextSize(_mf_TextScale);
+
 					CanvasAdapter.textScale = _mf_TextScale;
+					mMap.clearMap();
+					mMap.updateMap(true);
 					System.out.println("############# create Layers: themeloader done");
 				}
 			}
@@ -334,9 +336,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 	protected void loadTheme(final String styleId) {
 		if(_is_mf_Map) {
 			mMap.setTheme(ThemeLoader.load(_mf_themeFilePath));//    load(_themeFile));
+			mMap.clearMap();
+			mMap.updateMap(true);
 			CanvasAdapter.textScale = _mf_TextScale;
-			//this._mf_IRenderTheme.scaleTextSize(_mf_TextScale);
-			this._mf_IRenderTheme.updateStyles();
 		} else {
 			CanvasAdapter.textScale = 1.5f;
 			mMap.setTheme(VtmThemes.OSMARENDER);
@@ -599,6 +601,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 			final UrlTileSource tileSource = createTileSource(mapProvider, _httpFactory);
 			_layer_BaseMap.setTileSource(tileSource);
 			mMap.setTheme(getTheme(mapProvider));
+			mMap.clearMap();
+			mMap.updateMap(true);
 				_mf_themeFilePath = "";
 		} else { //it mapsforge map
 			System.out.println("############# setMapProvider setMapProvider its mf Map");
@@ -608,10 +612,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 			System.out.println("############# setMapProvider setTheme to " + mapProvider.tilePath);
 			tileSource.setMapFile(mapProvider.url);
 			tileSource.setPreferredLanguage(_mf_prefered_language);
-
-			//_mf_VectorTileLayer_S3DB = mMap.setBaseMap(tileSource);
-			//_mf_VectorTileLayer_S3DB.setRenderTheme(ThemeLoader.load(mapProvider.tilePath));
-					
+				
 			_layer_BaseMap.setTileSource(tileSource);
 
 			_mf_mapFilePath = checkFile(mapProvider.url);
@@ -633,23 +634,17 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 					System.out.println("############# setMapProvider Theme loader started");
 					this._mf_IRenderTheme = ThemeLoader.load(_mf_themeFilePath);
 					System.out.println("############# setMapProvider Theme loader done");
-					//this._mf_IRenderTheme.scaleTextSize(_mf_TextScale);
-					//this._mf_IRenderTheme.updateStyles();
-					//_mf_VectorTileLayer_S3DB.setRenderTheme(ThemeLoader.load(_mf_themeFilePath));
-					//mMap.setTheme(ThemeLoader.load(_mf_themeFilePath));
 					CanvasAdapter.textScale = _mf_TextScale;
 					_mf_VectorTileLayer_S3DB.setRenderTheme(_mf_IRenderTheme);
-					mMap.setTheme(_mf_IRenderTheme);		
+					mMap.setTheme(_mf_IRenderTheme);	
+					mMap.clearMap();
+					mMap.updateMap(true);
 				} else {
 					System.out.println("############# setMapProvider mapprovider has the same theme file");
 				}
 			}
-			//mMap.setTheme(ThemeLoader.load(mapProvider.tilePath));
-
 
 		}
-		//setupMap_Layers();
-		//System.out.println("############# setMapProvider is mapsforge layer : " + mMap.layers().toString());
 		System.out.println("############# setMapProvider set language : " + _mf_prefered_language);
 		//System.out.println("############# setMapProvider getdefault : " + locale.getDisplayLanguage());
 		this._last_mf_themeFilePath = _mf_themeFilePath;
