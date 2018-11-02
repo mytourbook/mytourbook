@@ -38,7 +38,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 	private HashMap<Long, TourData>						_alreadyImportedTours			= new HashMap<Long, TourData>();
 
 	// For Unit testing
-	private static final boolean			UNITTESTS			= false;
+	private static final boolean			UNITTESTS			= true;
 	public static final String				IMPORT_FILE_PATH	= "/net/tourbook/device/suunto/testFiles/";
 	private static Map<String, String>	testFiles			= new HashMap<>();									// Java 7
 
@@ -256,9 +256,8 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 				while (it.hasNext()) {
 					Map.Entry<TourData, ArrayList<TimeData>> entry = (Entry<TourData, ArrayList<TimeData>>) it.next();
 					if (entry.getKey().getTourId() == parentEntry.getKey().getTourId())
-						it.remove(); // avoids a ConcurrentModificationException
+						it.remove();
 				}
-				//processedActivities.remove(parentEntry.getKey());
 
 				if (!processedActivityExists(activity.getTourId()))
 					_processedActivities.put(activity, suuntoJsonProcessor.getSampleList());
@@ -415,7 +414,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		while (it.hasNext()) {
 			Map.Entry<TourData, ArrayList<TimeData>> entry = (Entry<TourData, ArrayList<TimeData>>) it.next();
 			if (entry.getKey().getImportFilePath() == filePath) {
-				it.remove(); // avoids a ConcurrentModificationException
+				it.remove();
 				return;
 			}
 		}
@@ -462,13 +461,16 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		for (Map.Entry<String, String> testEntry : testFiles.entrySet()) {
 			String jsonFileContent =
 					GetContentFromResource(testEntry.getValue(), true);
-			ProcessFile(testEntry.getValue(), jsonFileContent);
-
+			ProcessFile(testEntry.getValue(),
+					jsonFileContent);
 			entry = GetLastTourDataImported();
 			xml = entry.toXml();
 			controlFileContent = GetContentFromResource(testEntry.getKey(), false);
+			testResults &= CompareAgainstControl(controlFileContent, xml);
 
-			//testResults &= CompareAgainstControl(controlFileContent, xml);
+			// We clear the history so that it doesn't
+			//create conflict in the unit tests as we reuse files
+			cleanUpActivities();
 		}
 
 		// ------------------------------------------
@@ -497,14 +499,16 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		jsonContent = GetContentFromResource(maxWell3FilePath, true);
 		ProcessFile(maxWell3FilePath, jsonContent);
 
+		//Because the files are split, it causes small discrepancies in the data whenever
+		//jump from 1 file to another
 		String controlDocumentPath = IMPORT_FILE_PATH +
-				"1536723722706_183010004848_post_timeline-1.xml";
-
+				"1536723722706_183010004848_post_timeline-1-SplitTests.xml";
+		controlFileContent = GetContentFromResource(controlDocumentPath, false);
 		entry = GetLastTourDataImported();
 		xml = entry.toXml();
-		controlFileContent = GetContentFromResource(controlDocumentPath, false);
 		testResults &= CompareAgainstControl(controlFileContent, xml);
 
+		cleanUpActivities();
 		// ORDER 2 - 3 - 1
 
 		// File #2
@@ -523,6 +527,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		xml = entry.toXml();
 		testResults &= CompareAgainstControl(controlFileContent, xml);
 
+		cleanUpActivities();
 		// ORDER 1 - 2 - 3
 
 		// File #1
@@ -541,6 +546,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		xml = entry.toXml();
 		testResults &= CompareAgainstControl(controlFileContent, xml);
 
+		cleanUpActivities();
 		// ORDER 1 - 3 - 2
 
 		// File #1
@@ -555,6 +561,53 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		jsonContent = GetContentFromResource(maxWell2FilePath, true);
 		ProcessFile(maxWell2FilePath, jsonContent);
 
+		entry = GetLastTourDataImported();
+		xml = entry.toXml();
+		testResults &= CompareAgainstControl(controlFileContent, xml);
+
+		cleanUpActivities();
+		// ORDER 3 - 2 - 1
+
+		// File #3
+		jsonContent = GetContentFromResource(maxWell3FilePath, true);
+		ProcessFile(maxWell3FilePath, jsonContent);
+
+		// File #2
+		jsonContent = GetContentFromResource(maxWell2FilePath, true);
+		ProcessFile(maxWell2FilePath, jsonContent);
+
+		// File #1
+		jsonContent = GetContentFromResource(maxWell1FilePath, true);
+		ProcessFile(maxWell1FilePath, jsonContent);
+
+		//Because we start with the 3rd file, it causes different discrepancies
+		//when we jump from 1 file to another.
+		controlDocumentPath = IMPORT_FILE_PATH +
+				"1536723722706_183010004848_post_timeline-1-SplitTests-LastFileFirst.xml";
+		controlFileContent = GetContentFromResource(controlDocumentPath, false);
+		entry = GetLastTourDataImported();
+		xml = entry.toXml();
+		testResults &= CompareAgainstControl(controlFileContent, xml);
+
+		cleanUpActivities();
+		// ORDER 3 - 1 - 2
+
+		// File #3
+		jsonContent = GetContentFromResource(maxWell3FilePath, true);
+		ProcessFile(maxWell3FilePath, jsonContent);
+
+		// File #1
+		jsonContent = GetContentFromResource(maxWell1FilePath, true);
+		ProcessFile(maxWell1FilePath, jsonContent);
+
+		// File #2
+		jsonContent = GetContentFromResource(maxWell2FilePath, true);
+		ProcessFile(maxWell2FilePath, jsonContent);
+
+		//Small discrepancies as the tour markers are out of order.
+		controlDocumentPath = IMPORT_FILE_PATH +
+				"1536723722706_183010004848_post_timeline-1-SplitTests.xml";
+		controlFileContent = GetContentFromResource(controlDocumentPath, false);
 		entry = GetLastTourDataImported();
 		xml = entry.toXml();
 		testResults &= CompareAgainstControl(controlFileContent, xml);
@@ -582,5 +635,4 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
 		return !myDiff.hasDifferences();
 	}
-
 }
