@@ -2394,7 +2394,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
             paintTours_20_One(tourData, false);
 
             // delay to show the poi otherwise the map is being painted OVER the poi !!!
-            _map.getDisplay().timerExec(100, new Runnable() {
+            _map.getDisplay().timerExec(500, new Runnable() {
                @Override
                public void run() {
 
