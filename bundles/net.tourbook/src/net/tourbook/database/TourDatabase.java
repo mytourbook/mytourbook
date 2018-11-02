@@ -2048,6 +2048,11 @@ public class TourDatabase {
          updateCachedFields(persistedEntity);
 
          saveTour_GeoParts(persistedEntity);
+
+         // update ft index
+         final ArrayList<TourData> allTours = new ArrayList<>();
+         allTours.add(persistedEntity);
+         FTSearchManager.updateIndex(allTours);
       }
 
       return persistedEntity;
