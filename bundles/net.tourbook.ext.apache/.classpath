@@ -14,11 +14,11 @@
 	<classpathentry exported="true" kind="lib" path="lucene-analyzers-common-7.5.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lucene-core-7.5.0.jar" sourcepath="jar-src/lucene-7.5.0-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lucene-highlighter-7.5.0.jar" sourcepath="jar-src/lucene-7.5.0-src.zip"/>
+	<classpathentry exported="true" kind="lib" path="lucene-join-7.5.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lucene-memory-7.5.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lucene-misc-7.5.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lucene-queries-7.5.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lucene-queryparser-7.5.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lucene-suggest-7.5.0.jar" sourcepath="jar-src/lucene-7.5.0-src.zip"/>
-	<classpathentry kind="lib" path="lucene-join-7.5.0.jar"/>
-	<classpathentry kind="lib" path="lucene-memory-7.5.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

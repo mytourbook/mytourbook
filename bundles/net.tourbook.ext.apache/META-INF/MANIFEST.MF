@@ -2,7 +2,8 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Apache Derby + Lucene Plug-in for Eclipse
 Bundle-SymbolicName: net.tourbook.ext.apache
-Bundle-Version: 18.12.0.v10_14__7_5_mt_18_12
+Automatic-Module-Name: net.tourbook.ext.apache
+Bundle-Version: 1.0.0.v10_14__7_5
 Bundle-Vendor: The Apache Software Foundation
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ClassPath: derby-10.14.2.jar,
