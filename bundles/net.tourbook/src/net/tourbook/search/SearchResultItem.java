@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,33 +17,33 @@ package net.tourbook.search;
 
 public class SearchResultItem {
 
-	int		docSource;
+   int    docSource;
 
-	String	markerId;
-	String	tourId;
+   String markerId;
+   String tourId;
 
-	String	title;
-	String	description;
-	long	tourStartTime;
+   String title;
+   String description;
+   long   tourStartTime;
 
 //	float	score;
 
-	/**
-	 * Lucene doc id.
-	 */
-	int		docId;
+   /**
+    * Lucene doc id.
+    */
+   int docId;
 
-	@Override
-	public String toString() {
-		return "SearchResultItem [" //$NON-NLS-1$
-				+ ("tourId=" + tourId + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("markerId=" + markerId + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("tourStartTime=" + tourStartTime + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+   @Override
+   public String toString() {
+      return "SearchResultItem [" //$NON-NLS-1$
+            + ("tourId=" + tourId + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+            + ("markerId=" + markerId + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+            + ("tourStartTime=" + tourStartTime + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 //				+ ("markerLabel=" + markerLabel + ", ")
-				+ ("tourTitle=" + title + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("description=" + description + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+            + ("tourTitle=" + title + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+            + ("description=" + description + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 //				+ ("score=" + score)
-				+ "]"; //$NON-NLS-1$
-	}
+            + "]"; //$NON-NLS-1$
+   }
 
 }

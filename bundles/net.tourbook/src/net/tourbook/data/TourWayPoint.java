@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -25,6 +25,9 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
+import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.swt.graphics.Image;
+
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.map.GeoPosition;
@@ -33,9 +36,6 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
 
-import org.eclipse.jface.resource.ImageRegistry;
-import org.eclipse.swt.graphics.Image;
-
 /**
  * A waypoint is associated with a tour but the way point position is independently from a tour, it
  * has it's own lat/lon position.
@@ -43,438 +43,439 @@ import org.eclipse.swt.graphics.Image;
 @Entity
 public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea {
 
-	private static final String			IMAGE_MAP_WAY_POINT_HOVERED	=
-			net.tourbook.map2.Messages.Image_Map_WayPoint_Hovered;
-
-	public static final int				DB_LENGTH_NAME				= 1024;
-	public static final int				DB_LENGTH_DESCRIPTION		= 4096;
-	public static final int				DB_LENGTH_COMMENT			= 4096;
-	public static final int				DB_LENGTH_SYMBOL			= 1024;
-	public static final int				DB_LENGTH_CATEGORY			= 1024;
+   private static final String        IMAGE_MAP_WAY_POINT_HOVERED =
+         net.tourbook.map2.Messages.Image_Map_WayPoint_Hovered;
 
-	@Transient
-	private static Image				_twpHoveredImage;
+   public static final int            DB_LENGTH_NAME              = 1024;
+   public static final int            DB_LENGTH_DESCRIPTION       = 4096;
+   public static final int            DB_LENGTH_COMMENT           = 4096;
+   public static final int            DB_LENGTH_SYMBOL            = 1024;
+   public static final int            DB_LENGTH_CATEGORY          = 1024;
 
-	/**
-	 * Manually created way points or imported way points need a unique id to identify them, saved
-	 * way points are compared with the way point id.
-	 */
-	@Transient
-	private static final AtomicInteger	_createCounter				= new AtomicInteger();
+   @Transient
+   private static Image               _twpHoveredImage;
 
-	/**
-	 * Unique id for the {@link TourWayPoint} entity
-	 */
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long						wayPointId					= TourDatabase.ENTITY_IS_NOT_SAVED;
-	@ManyToOne(optional = false)
-	private TourData					tourData;
+   /**
+    * Manually created way points or imported way points need a unique id to identify them, saved
+    * way points are compared with the way point id.
+    */
+   @Transient
+   private static final AtomicInteger _createCounter              = new AtomicInteger();
 
-	// initialize with invalid values
-	private double						longitude					= Double.MIN_VALUE;
+   /**
+    * Unique id for the {@link TourWayPoint} entity
+    */
+   @Id
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
+   private long                       wayPointId                  = TourDatabase.ENTITY_IS_NOT_SAVED;
 
-	private double						latitude					= Double.MIN_VALUE;
+   @ManyToOne(optional = false)
+   private TourData                   tourData;
 
-	/**
-	 * Absolute time in milliseconds since 1970-01-01T00:00:00Z with the default time zone.
-	 */
-	private long						time;
+   // initialize with invalid values
+   private double      longitude = Double.MIN_VALUE;
 
-	/**
-	 * Altitude in meters or {@link Float#MIN_VALUE} when not available.
-	 */
-	private float						altitude					= Float.MIN_VALUE;
-	private String						name;
-	private String						description;
-	private String						comment;
+   private double      latitude  = Double.MIN_VALUE;
 
-	private String						symbol;
+   /**
+    * Absolute time in milliseconds since 1970-01-01T00:00:00Z with the default time zone.
+    */
+   private long        time;
 
-	private String						category;
+   /**
+    * Altitude in meters or {@link Float#MIN_VALUE} when not available.
+    */
+   private float       altitude  = Float.MIN_VALUE;
+   private String      name;
+   private String      description;
+   private String      comment;
 
-	/**
-	 * Text to display on the hyperlink, can be <code>null</code>
-	 * 
-	 * @since DB version 28
-	 */
-	// <urlname> Text to display on the <url> hyperlink
-	private String						urlText;
+   private String      symbol;
 
-	/**
-	 * URL associated with the waypoint, can be <code>null</code>
-	 * 
-	 * @since DB version 28
-	 */
-	// <url> URL associated with the waypoint
-	private String						urlAddress;
+   private String      category;
 
-	@Transient
-	private GeoPosition					_geoPosition;
+   /**
+    * Text to display on the hyperlink, can be <code>null</code>
+    *
+    * @since DB version 28
+    */
+   // <urlname> Text to display on the <url> hyperlink
+   private String      urlText;
 
-	/**
-	 * Unique id for manually created waypoints because the {@link #wayPointId} is 0 when the
-	 * waypoint is not persisted.
-	 */
-	@Transient
-	private long						_createId					= _createCounter.incrementAndGet();
+   /**
+    * URL associated with the waypoint, can be <code>null</code>
+    *
+    * @since DB version 28
+    */
+   // <url> URL associated with the waypoint
+   private String      urlAddress;
 
-	public TourWayPoint() {}
+   @Transient
+   private GeoPosition _geoPosition;
 
-	public TourWayPoint clone(final TourData wpTourData) {
+   /**
+    * Unique id for manually created waypoints because the {@link #wayPointId} is 0 when the
+    * waypoint is not persisted.
+    */
+   @Transient
+   private long        _createId = _createCounter.incrementAndGet();
 
-		try {
+   public TourWayPoint() {}
 
-			// create a shallow copy
-			final TourWayPoint newWayPoint = (TourWayPoint) super.clone();
+   public TourWayPoint clone(final TourData wpTourData) {
 
-			// set create id to uniquely identify the way point
-			newWayPoint._createId = _createCounter.incrementAndGet();
+      try {
 
-			newWayPoint.wayPointId = TourDatabase.ENTITY_IS_NOT_SAVED;
+         // create a shallow copy
+         final TourWayPoint newWayPoint = (TourWayPoint) super.clone();
 
-			newWayPoint.tourData = wpTourData;
+         // set create id to uniquely identify the way point
+         newWayPoint._createId = _createCounter.incrementAndGet();
 
-			return newWayPoint;
+         newWayPoint.wayPointId = TourDatabase.ENTITY_IS_NOT_SAVED;
 
-		} catch (final CloneNotSupportedException e) {
-			StatusUtil.log(e);
-		}
+         newWayPoint.tourData = wpTourData;
 
-		return null;
-	}
+         return newWayPoint;
 
-	@Override
-	public int compareTo(final Object other) {
+      } catch (final CloneNotSupportedException e) {
+         StatusUtil.log(e);
+      }
 
-		/*
-		 * Set default sorting by time or by id (creation time)
-		 */
+      return null;
+   }
 
-		if (other instanceof TourWayPoint) {
+   @Override
+   public int compareTo(final Object other) {
 
-			final TourWayPoint otherWP = (TourWayPoint) other;
+      /*
+       * Set default sorting by time or by id (creation time)
+       */
 
-			/*
-			 * Compare by time
-			 */
-			if (time != 0 && otherWP.time != 0) {
+      if (other instanceof TourWayPoint) {
 
-				return time > otherWP.time ? 1 : -1;
-			}
+         final TourWayPoint otherWP = (TourWayPoint) other;
 
-			/*
-			 * Compare by id
-			 */
-			if (wayPointId == TourDatabase.ENTITY_IS_NOT_SAVED) {
+         /*
+          * Compare by time
+          */
+         if (time != 0 && otherWP.time != 0) {
 
-				// waypoint is not yet persisted
+            return time > otherWP.time ? 1 : -1;
+         }
 
-				if (otherWP.wayPointId == TourDatabase.ENTITY_IS_NOT_SAVED) {
+         /*
+          * Compare by id
+          */
+         if (wayPointId == TourDatabase.ENTITY_IS_NOT_SAVED) {
 
-					// both way points are created and not persisted
+            // waypoint is not yet persisted
 
-					return _createId > otherWP._createId ? 1 : -1;
-				}
+            if (otherWP.wayPointId == TourDatabase.ENTITY_IS_NOT_SAVED) {
 
-				return -1;
+               // both way points are created and not persisted
 
-			} else {
+               return _createId > otherWP._createId ? 1 : -1;
+            }
 
-				// waypoint is persisted
+            return -1;
 
-				if (otherWP.wayPointId != TourDatabase.ENTITY_IS_NOT_SAVED) {
+         } else {
 
-					// both way point is also persisted
-					return wayPointId > otherWP.wayPointId ? 1 : -1;
-				}
+            // waypoint is persisted
 
-				return 1;
-			}
-		}
+            if (otherWP.wayPointId != TourDatabase.ENTITY_IS_NOT_SAVED) {
 
-		return 0;
-	}
+               // both way point is also persisted
+               return wayPointId > otherWP.wayPointId ? 1 : -1;
+            }
 
-	@Override
-	public boolean equals(final Object obj) {
+            return 1;
+         }
+      }
 
-		if (this == obj) {
-			return true;
-		}
+      return 0;
+   }
 
-		if (obj == null) {
-			return false;
-		}
+   @Override
+   public boolean equals(final Object obj) {
 
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
+      if (this == obj) {
+         return true;
+      }
 
-		final TourWayPoint otherWP = (TourWayPoint) obj;
+      if (obj == null) {
+         return false;
+      }
 
-		if (wayPointId == TourDatabase.ENTITY_IS_NOT_SAVED) {
+      if (getClass() != obj.getClass()) {
+         return false;
+      }
 
-			// tour was create or imported
+      final TourWayPoint otherWP = (TourWayPoint) obj;
 
-			if (_createId == otherWP._createId) {
-				return true;
-			}
+      if (wayPointId == TourDatabase.ENTITY_IS_NOT_SAVED) {
 
-		} else {
+         // tour was create or imported
 
-			// tour is from the database
+         if (_createId == otherWP._createId) {
+            return true;
+         }
 
-			if (wayPointId == otherWP.wayPointId) {
-				return true;
-			}
-		}
+      } else {
 
-		return false;
-	}
+         // tour is from the database
 
-	/**
-	 * @return Returns altitude in meters or {@link Float#MIN_VALUE} when altitude is not set.
-	 */
-	public float getAltitude() {
-		return altitude;
-	}
+         if (wayPointId == otherWP.wayPointId) {
+            return true;
+         }
+      }
 
-	/**
-	 * @return Returns altitude in meters as {@link Double} or {@link Float#MIN_VALUE} when altitude
-	 *         is not set.
-	 *         <p>
-	 *         <b>Have absolute <i>NO</i> idea why velocity is not working with float values.</b>
-	 */
-	public double getAltitudeD() {
-		return altitude;
-	}
+      return false;
+   }
 
-	public String getCategory() {
-		return category;
-	}
+   /**
+    * @return Returns altitude in meters or {@link Float#MIN_VALUE} when altitude is not set.
+    */
+   public float getAltitude() {
+      return altitude;
+   }
 
-	public String getComment() {
-		return comment;
-	}
+   /**
+    * @return Returns altitude in meters as {@link Double} or {@link Float#MIN_VALUE} when altitude
+    *         is not set.
+    *         <p>
+    *         <b>Have absolute <i>NO</i> idea why velocity is not working with float values.</b>
+    */
+   public double getAltitudeD() {
+      return altitude;
+   }
 
-	/**
-	 * @return Returns a unique id for manually created way points because the {@link #wayPointId}
-	 *         is {@link TourDatabase#ENTITY_IS_NOT_SAVED} when it's not yet persisted
-	 */
-	public long getCreateId() {
-		return _createId;
-	}
+   public String getCategory() {
+      return category;
+   }
 
-	public String getDescription() {
-		return description;
-	}
+   public String getComment() {
+      return comment;
+   }
 
-	@Override
-	public Image getHoveredImage() {
+   /**
+    * @return Returns a unique id for manually created way points because the {@link #wayPointId} is
+    *         {@link TourDatabase#ENTITY_IS_NOT_SAVED} when it's not yet persisted
+    */
+   public long getCreateId() {
+      return _createId;
+   }
 
-		if (_twpHoveredImage != null) {
-			return _twpHoveredImage;
-		}
+   public String getDescription() {
+      return description;
+   }
 
-		final ImageRegistry imageRegistry = TourbookPlugin.getDefault().getImageRegistry();
+   @Override
+   public Image getHoveredImage() {
 
-		imageRegistry.put(IMAGE_MAP_WAY_POINT_HOVERED, TourbookPlugin.getImageDescriptor(IMAGE_MAP_WAY_POINT_HOVERED));
+      if (_twpHoveredImage != null) {
+         return _twpHoveredImage;
+      }
 
-		_twpHoveredImage = imageRegistry.get(IMAGE_MAP_WAY_POINT_HOVERED);
+      final ImageRegistry imageRegistry = TourbookPlugin.getDefault().getImageRegistry();
 
-		return _twpHoveredImage;
-	}
+      imageRegistry.put(IMAGE_MAP_WAY_POINT_HOVERED, TourbookPlugin.getImageDescriptor(IMAGE_MAP_WAY_POINT_HOVERED));
 
-	public double getLatitude() {
-		return latitude;
-	}
+      _twpHoveredImage = imageRegistry.get(IMAGE_MAP_WAY_POINT_HOVERED);
 
-	public double getLongitude() {
-		return longitude;
-	}
+      return _twpHoveredImage;
+   }
 
-	public String getName() {
-		return name;
-	}
+   public double getLatitude() {
+      return latitude;
+   }
 
-	public GeoPosition getPosition() {
+   public double getLongitude() {
+      return longitude;
+   }
 
-		if (_geoPosition == null) {
-			_geoPosition = new GeoPosition(latitude, longitude);
-		}
+   public String getName() {
+      return name;
+   }
 
-		return _geoPosition;
-	}
+   public GeoPosition getPosition() {
 
-	public String getSymbol() {
-		return symbol;
-	}
+      if (_geoPosition == null) {
+         _geoPosition = new GeoPosition(latitude, longitude);
+      }
 
-	/**
-	 * @return Returns the waypoint time in milliseconds since 1970-01-01T00:00:00Z with the default
-	 *         time zone.
-	 */
-	public long getTime() {
-		return time;
-	}
+      return _geoPosition;
+   }
 
-	public TourData getTourData() {
-		return tourData;
-	}
+   public String getSymbol() {
+      return symbol;
+   }
 
-	public String getUrlAddress() {
-		return urlAddress;
-	}
+   /**
+    * @return Returns the waypoint time in milliseconds since 1970-01-01T00:00:00Z with the default
+    *         time zone.
+    */
+   public long getTime() {
+      return time;
+   }
 
-	public String getUrlText() {
-		return urlText;
-	}
+   public TourData getTourData() {
+      return tourData;
+   }
 
-	/**
-	 * @return Returns the persistence id or {@link TourDatabase#ENTITY_IS_NOT_SAVED} when the
-	 *         entity is not yet saved
-	 */
-	public long getWayPointId() {
-		return wayPointId;
-	}
+   public String getUrlAddress() {
+      return urlAddress;
+   }
 
-	@Override
-	public int hashCode() {
+   public String getUrlText() {
+      return urlText;
+   }
 
-		final int prime = 31;
-		int result = 1;
+   /**
+    * @return Returns the persistence id or {@link TourDatabase#ENTITY_IS_NOT_SAVED} when the entity
+    *         is not yet saved
+    */
+   public long getWayPointId() {
+      return wayPointId;
+   }
 
-		if (wayPointId == TourDatabase.ENTITY_IS_NOT_SAVED) {
-			result = prime * result + (int) (_createId ^ (_createId >>> 32));
-		} else {
-			result = prime * result + (int) (wayPointId ^ (wayPointId >>> 32));
-		}
+   @Override
+   public int hashCode() {
 
-		return result;
-	}
+      final int prime = 31;
+      int result = 1;
 
-	/**
-	 * @return Returns <code>true</code> when altitude is available.
-	 *         <p>
-	 *         This method is used when exporting waypoints.
-	 */
-	public boolean hasValidAltitude() {
-		return altitude != Float.MIN_VALUE;
-	}
+      if (wayPointId == TourDatabase.ENTITY_IS_NOT_SAVED) {
+         result = prime * result + (int) (_createId ^ (_createId >>> 32));
+      } else {
+         result = prime * result + (int) (wayPointId ^ (wayPointId >>> 32));
+      }
 
-	/**
-	 * Checks if VARCHAR fields have the correct length
-	 * 
-	 * @return Returns <code>true</code> when the data are valid and can be saved
-	 */
-	public boolean isValidForSave() {
+      return result;
+   }
 
-		/*
-		 * Check: url text
-		 */
-		FIELD_VALIDATION fieldValidation = TourDatabase.isFieldValidForSave(
-				urlText,
-				TourMarker.DB_LENGTH_URL_TEXT,
-				Messages.Db_Field_TourMarker_UrlText);
+   /**
+    * @return Returns <code>true</code> when altitude is available.
+    *         <p>
+    *         This method is used when exporting waypoints.
+    */
+   public boolean hasValidAltitude() {
+      return altitude != Float.MIN_VALUE;
+   }
 
-		if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
-			return false;
-		} else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
-			urlText = urlText.substring(0, TourMarker.DB_LENGTH_URL_TEXT);
-		}
+   /**
+    * Checks if VARCHAR fields have the correct length
+    *
+    * @return Returns <code>true</code> when the data are valid and can be saved
+    */
+   public boolean isValidForSave() {
 
-		/*
-		 * Check: url address
-		 */
-		fieldValidation = TourDatabase.isFieldValidForSave(
-				urlAddress,
-				TourMarker.DB_LENGTH_URL_ADDRESS,
-				Messages.Db_Field_TourMarker_UrlAddress);
+      /*
+       * Check: url text
+       */
+      FIELD_VALIDATION fieldValidation = TourDatabase.isFieldValidForSave(
+            urlText,
+            TourMarker.DB_LENGTH_URL_TEXT,
+            Messages.Db_Field_TourMarker_UrlText);
 
-		if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
-			return false;
-		} else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
-			urlAddress = urlAddress.substring(0, TourMarker.DB_LENGTH_URL_ADDRESS);
-		}
+      if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
+         return false;
+      } else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
+         urlText = urlText.substring(0, TourMarker.DB_LENGTH_URL_TEXT);
+      }
 
-		return true;
-	}
+      /*
+       * Check: url address
+       */
+      fieldValidation = TourDatabase.isFieldValidForSave(
+            urlAddress,
+            TourMarker.DB_LENGTH_URL_ADDRESS,
+            Messages.Db_Field_TourMarker_UrlAddress);
 
-	public void setAltitude(final Float altitude) {
-		this.altitude = altitude;
-	}
+      if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
+         return false;
+      } else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
+         urlAddress = urlAddress.substring(0, TourMarker.DB_LENGTH_URL_ADDRESS);
+      }
 
-	public void setCategory(final String category) {
-		this.category = category;
-	}
+      return true;
+   }
 
-	public void setComment(final String comment) {
-		this.comment = comment;
-	}
+   public void setAltitude(final Float altitude) {
+      this.altitude = altitude;
+   }
 
-	public void setDescription(final String description) {
-		this.description = description;
-	}
+   public void setCategory(final String category) {
+      this.category = category;
+   }
 
-	public void setLatitude(final double latitude) {
+   public void setComment(final String comment) {
+      this.comment = comment;
+   }
 
-		this.latitude = latitude;
+   public void setDescription(final String description) {
+      this.description = description;
+   }
 
-		if (_geoPosition != null) {
-			_geoPosition.latitude = latitude;
-		}
-	}
+   public void setLatitude(final double latitude) {
 
-	public void setLongitude(final double longitude) {
+      this.latitude = latitude;
 
-		this.longitude = longitude;
+      if (_geoPosition != null) {
+         _geoPosition.latitude = latitude;
+      }
+   }
 
-		if (_geoPosition != null) {
-			_geoPosition.longitude = longitude;
-		}
-	}
+   public void setLongitude(final double longitude) {
 
-	public void setName(final String name) {
-		this.name = name;
-	}
+      this.longitude = longitude;
 
-	public void setSymbol(final String symbol) {
-		this.symbol = symbol;
-	}
+      if (_geoPosition != null) {
+         _geoPosition.longitude = longitude;
+      }
+   }
 
-	public void setTime(final long time) {
-		this.time = time;
-	}
+   public void setName(final String name) {
+      this.name = name;
+   }
 
-	public void setTourData(final TourData newTourData) {
-		tourData = newTourData;
-	}
+   public void setSymbol(final String symbol) {
+      this.symbol = symbol;
+   }
 
-	public void setUrlAddress(final String urlAddress) {
-		this.urlAddress = urlAddress;
-	}
+   public void setTime(final long time) {
+      this.time = time;
+   }
 
-	public void setUrlText(final String urlText) {
-		this.urlText = urlText;
-	}
+   public void setTourData(final TourData newTourData) {
+      tourData = newTourData;
+   }
 
-	@Override
-	public String toString() {
-		return "TourWayPoint [" //$NON-NLS-1$
+   public void setUrlAddress(final String urlAddress) {
+      this.urlAddress = urlAddress;
+   }
 
-				+ ("time=" + Instant.ofEpochMilli(time) + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("_createId=" + _createId + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("wayPointId=" + wayPointId + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("latitude=" + latitude + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("longitude=" + longitude + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-				//				+ ("altitude=" + altitude + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-				//				+ ("name=" + name + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-				//				+ ("description=" + description + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-				//				+ ("comment=" + comment + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-				//				+ ("symbol=" + symbol + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-				//				+ ("category=" + category) //$NON-NLS-1$
+   public void setUrlText(final String urlText) {
+      this.urlText = urlText;
+   }
 
-				+ "]\n"; //$NON-NLS-1$
-	}
+   @Override
+   public String toString() {
+      return "TourWayPoint [" //$NON-NLS-1$
+
+            + ("time=" + Instant.ofEpochMilli(time) + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+            + ("_createId=" + _createId + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+            + ("wayPointId=" + wayPointId + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+            + ("latitude=" + latitude + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+            + ("longitude=" + longitude + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+            //				+ ("altitude=" + altitude + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+            //				+ ("name=" + name + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+            //				+ ("description=" + description + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+            //				+ ("comment=" + comment + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+            //				+ ("symbol=" + symbol + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+            //				+ ("category=" + category) //$NON-NLS-1$
+
+            + "]\n"; //$NON-NLS-1$
+   }
 }

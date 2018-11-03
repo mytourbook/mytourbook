@@ -1,0 +1,42 @@
+Version 18.12.0                                                   ?. December 2018
+
+*************************************************** ALL *************************************************** 
+
+ !!! Tour database cannot be opened with the OLD version of MyTourbook !!! 
+
+*************************************************** ALL *************************************************** 
+
+
+
+*************************************************** DEVELOPER *************************************************** 
+
+ * Updated java formatter
+ * Renamed apache + geclipse plugins
+
+*************************************************** DEVELOPER *************************************************** 
+
+
+New
+===	
+
+
+
+Improvements
+============
+
+* Tour fulltext is updated when tour/marker/waypoint is modified/added/deleted
+  The "Search Tours" view is NOT updated automatically, this needs to be done manually either by entering a MODIFIED search text or changing the "Search Options" otherwise the view is not updated. 
+  Updating this view automatically would need some UI adjustments but this UI will be deprecated later on and is now in the maintanance mode.
+  The fulltext index can be deleted (when MyTourbook is closed), it will be recreated when the "Search Tours" view is opened. 
+
+ 
+Bugfix 	
+======
+
+* 
+
+System	
+======
+
+* Derby database 10.14.2 
+  Lucene fulltext search engine 7.5.0
