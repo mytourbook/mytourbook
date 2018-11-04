@@ -19,6 +19,7 @@ import java.awt.Canvas;
 import java.io.File;
 import java.util.Locale;
 //import java.io.FileNotFoundException;
+import java.util.Set;
 
 import net.tourbook.common.util.Util;
 import net.tourbook.map25.Map25TileSource.Builder;
@@ -62,11 +63,13 @@ import org.oscim.scalebar.MapScaleBarLayer;
 import org.oscim.scalebar.MetricUnitAdapter;
 //import org.oscim.theme.StreamRenderTheme;
 import org.oscim.theme.XmlRenderThemeStyleMenu;
+import org.oscim.theme.ExternalRenderTheme;
 import org.oscim.theme.IRenderTheme;
 import org.oscim.theme.ThemeFile;
 import org.oscim.theme.ThemeLoader;
 import org.oscim.theme.VtmThemes;
-
+import org.oscim.theme.XmlRenderThemeMenuCallback;
+import org.oscim.theme.XmlRenderThemeStyleLayer;
 import org.oscim.tiling.source.UrlTileSource;
 import org.oscim.tiling.source.mapfile.MapFileTileSource;
 
@@ -96,9 +99,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 
 	private static IDialogSettings	_state;
 	
-	private static String	 _mf_mapFilePath = null;
-	private static String	 _mf_themeFilePath = null;
-	
+	private static String	_mf_mapFilePath = null;
+	private static String	_mf_themeFilePath = null;
+	private static String	_mf_theme_styleID = null;
+
 	private static Map25View		_map25View;
 	private static LwjglApplication	_lwjglApp;
 
@@ -126,6 +130,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 
 	private long						_lastRenderTime;
 	private String						_last_mf_themeFilePath = "";
+	private String						_last_mf_theme_styleID = "";
 	
 	private IRenderTheme				_mf_IRenderTheme;
 	private float						_mf_TextScale = 1.5f;
@@ -260,7 +265,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 
 		_map25View.updateUI_SelectedMapProvider(_selectedMapProvider);
 		
-		_mf_prefered_language = Locale.getDefault().toString();
+		_mf_prefered_language = Locale.getDefault().getLanguage();
 
 		//_httpFactory = new OkHttpEngineMT.OkHttpFactoryMT();
 		System.out.println("############# create Layers: Map Name: " +_selectedMapProvider.name);
@@ -290,6 +295,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 			}
 			
 			_mf_themeFilePath = checkFile(_selectedMapProvider.tilePath);
+			_mf_theme_styleID = _selectedMapProvider.apiKey;
 
 			final MapFileTileSource tileSource = new MapFileTileSource();	
 			tileSource.setMapFile(_mf_mapFilePath);
@@ -304,20 +310,22 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 				CanvasAdapter.textScale = 1.5f;
 				mMap.setTheme(VtmThemes.OSMARENDER);   // ThemeLoader.load(_mf_themeFilePath));
 			} else {
-				if (!_mf_themeFilePath.equals(_last_mf_themeFilePath)) {  //only parsing when different file
+				//if (!_mf_themeFilePath.equals(_last_mf_themeFilePath) || !_mf_theme_styleID.equals(_last_mf_theme_styleID)) {  //only parsing when different file
 					System.out.println("############# create Layers: themeloader started"); 			
 					this._mf_IRenderTheme = ThemeLoader.load(_mf_themeFilePath);
 
 					_layer_mf_VectorTileLayer_S3DB.setRenderTheme(_mf_IRenderTheme);
 					mMap.setTheme(_mf_IRenderTheme);
+					loadTheme(_selectedMapProvider.apiKey);
 
 					CanvasAdapter.textScale = _mf_TextScale;
 					mMap.clearMap();
 					mMap.updateMap(true);
 					System.out.println("############# create Layers: themeloader done");
-				}
+				//}
 			}
 			this._last_mf_themeFilePath = _mf_themeFilePath;
+			this._last_mf_theme_styleID = _mf_theme_styleID;
 			setupMap(_selectedMapProvider, tileSource);
 			//System.out.println("############# create Layers: is mapsforge layer : " + mMap.layers().toString());
 			System.out.println("############# create Layers: is mapsforge map using : " + _mf_mapFilePath);
@@ -337,18 +345,57 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		});
 	}
 
-	protected void loadTheme(final String styleId) {
+/*	protected void loadTheme(final String styleId) {
 		if(_is_mf_Map) {
 			mMap.setTheme(ThemeLoader.load(_mf_themeFilePath));//    load(_themeFile));
 			mMap.clearMap();
 			mMap.updateMap(true);
 			CanvasAdapter.textScale = _mf_TextScale;
 		} else {
-			CanvasAdapter.textScale = 1.5f;
+			CanvasAdapter.textScale = _mf_TextScale;
 			mMap.setTheme(VtmThemes.OSMARENDER);
 		}
-	}
+	}*/
 
+	protected void loadTheme(final String styleId) {
+		if(_is_mf_Map) {
+			mMap.setTheme(new ExternalRenderTheme(_mf_themeFilePath, new XmlRenderThemeMenuCallback() {
+				// mMap.setTheme(new StreamRenderTheme("", getClass().getResourceAsStream("/assets/vtm/stylemenu.xml"), new XmlRenderThemeMenuCallback() {
+				@Override
+				public Set<String> getCategories(XmlRenderThemeStyleMenu renderThemeStyleMenu) {
+					// Use the selected style or the default
+					String style = styleId != null ? styleId : renderThemeStyleMenu.getDefaultValue();
+					//System.out.println("#### load theme  default style: " + renderThemeStyleMenu.getDefaultValue());
+					//System.out.println("#### load theme         Layers: " + renderThemeStyleMenu.getDefaultValue());
+					// Retrieve the layer from the style id
+					XmlRenderThemeStyleLayer renderThemeStyleLayer = renderThemeStyleMenu.getLayer(style);
+					if (renderThemeStyleLayer == null) {
+						System.err.println("Invalid style " + style);
+						return null;
+					}
+					System.out.println("####### loadtheme:  selected Style: " + renderThemeStyleLayer.getTitle(_mf_prefered_language));
+					// First get the selected layer's categories that are enabled together
+					Set<String> categories = renderThemeStyleLayer.getCategories();
+					// Then add the selected layer's overlays that are enabled individually
+					// Here we use the style menu, but users can use their own preferences
+					for (XmlRenderThemeStyleLayer overlay : renderThemeStyleLayer.getOverlays()) {
+						//System.out.println("overlay id, title: " + overlay.getId() + " , " + overlay.getTitle("de") + " , " + "");
+						if (overlay.isEnabled())
+							categories.addAll(overlay.getCategories());
+					}	 
+					// This is the whole categories set to be enabled
+					return categories;
+				}
+			}));
+
+		}  else {
+			CanvasAdapter.textScale = _mf_TextScale;
+			mMap.setTheme(VtmThemes.OSMARENDER);
+		}
+		mMap.clearMap();
+		mMap.updateMap(true);
+	}
+	
 	
 	private UrlTileSource createTileSource(final Map25Provider mapProvider, final OkHttpFactoryMT httpFactory) {
 
@@ -628,30 +675,33 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 
 			_mf_themeFilePath = checkFile(mapProvider.tilePath);
 
+
 			if (_mf_themeFilePath == null) {
 				System.out.println("############# setMapProvider Theme not found: " + _mf_mapFilePath + " using default OSMARENDER");
 				//_mf_VectorTileLayer_S3DB.setRenderTheme(ThemeLoader.load(_mf_themeFilePath));
 				CanvasAdapter.textScale = 1.5f;
 				mMap.setTheme(VtmThemes.OSMARENDER);   // ThemeLoader.load(_mf_themeFilePath));
 			} else {
-				if (!_mf_themeFilePath.equals(this._last_mf_themeFilePath)) {  //only parsing when different file
+				//if (!_mf_themeFilePath.equals(_last_mf_themeFilePath) || !_mf_theme_styleID.equals(_last_mf_theme_styleID)) {  //only parsing when different file
 					System.out.println("############# setMapProvider Theme loader started");
 					this._mf_IRenderTheme = ThemeLoader.load(_mf_themeFilePath);
 					System.out.println("############# setMapProvider Theme loader done");
 					CanvasAdapter.textScale = _mf_TextScale;
 					_layer_mf_VectorTileLayer_S3DB.setRenderTheme(_mf_IRenderTheme);
-					mMap.setTheme(_mf_IRenderTheme);	
+					mMap.setTheme(_mf_IRenderTheme);
+					loadTheme(mapProvider.apiKey);
 					mMap.clearMap();
 					mMap.updateMap(true);
-				} else {
-					System.out.println("############# setMapProvider mapprovider has the same theme file");
-				}
+				//} else {
+				//	System.out.println("############# setMapProvider mapprovider has the same theme file");
+				//}
 			}
 
 		}
 		System.out.println("############# setMapProvider set language : " + _mf_prefered_language);
 		//System.out.println("############# setMapProvider getdefault : " + locale.getDisplayLanguage());
 		this._last_mf_themeFilePath = _mf_themeFilePath;
+		this._last_mf_theme_styleID = _mf_theme_styleID;
 		_selectedMapProvider = mapProvider;
 			
 	}
@@ -726,6 +776,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		} else {
 			_layer_mf_VectorTileLayer_S3DB.setRenderTheme(ThemeLoader.load(_mf_themeFilePath));
 			mMap.setTheme(ThemeLoader.load(_mf_themeFilePath));
+			loadTheme(mapProvider.apiKey);
 		}
 		//mMap.setTheme(ThemeLoader.load(_mf_themeFilePath));
 

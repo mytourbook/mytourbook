@@ -746,7 +746,7 @@ public class PrefPageMap25MapsforgeProvider extends PreferencePage implements IW
 				setErrorMessage("Mapfile (.map) is required, cant be empty");
 				return false;
 				
-			} else if (checkFile(_txtUrl.getText().trim()).equals("1")) {  //TO DO: call checkFile only once
+			} else if (checkFile(_txtUrl.getText().trim()).equals("1")) {  //TO DO: call checkFile() only once per event
 				setErrorMessage("Mapfile does not exist");
 				return false;
 				
