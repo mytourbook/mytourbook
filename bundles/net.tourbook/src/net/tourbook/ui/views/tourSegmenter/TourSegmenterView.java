@@ -114,6 +114,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
    public static final String  ID                                                 = "net.tourbook.views.TourSegmenter";           //$NON-NLS-1$
 
+   private static final float  UNIT_MILE                                          = net.tourbook.ui.UI.UNIT_MILE;
+   private static final float  UNIT_YARD                                          = net.tourbook.ui.UI.UNIT_YARD;
+
    private static final String DISTANCE_MILES_1_8                                 = "1/8";                                        //$NON-NLS-1$
    private static final String DISTANCE_MILES_1_4                                 = "1/4";                                        //$NON-NLS-1$
    private static final String DISTANCE_MILES_3_8                                 = "3/8";                                        //$NON-NLS-1$
@@ -184,6 +187,21 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    public static final int     STATE_SMALL_VALUE_SIZE_DEFAULT                 = 50;
    public static final String  STATE_STACKED_VISIBLE_VALUES                   = "STATE_STACKED_VISIBLE_VALUES";           //$NON-NLS-1$
    public static final int     STATE_STACKED_VISIBLE_VALUES_DEFAULT           = 2;
+
+   /*
+    * Surfing
+    */
+
+   private static final String  STATE_SURFING_MIN_START_STOP_SPEED              = "STATE_SURFING_MIN_START_STOP_SPEED";     //$NON-NLS-1$
+   private static final int     STATE_SURFING_MIN_START_STOP_SPEED_DEFAULT      = 9;
+   private static final String  STATE_SURFING_MIN_SURFING_SPEED                 = "STATE_SURFING_MIN_SURFING_SPEED";        //$NON-NLS-1$
+   private static final int     STATE_SURFING_MIN_SURFING_SPEED_DEFAULT         = 13;
+   private static final String  STATE_SURFING_MIN_SURFING_TIME_DURATION         = "STATE_SURFING_MIN_SURFING_TIME_DURATION";//$NON-NLS-1$
+   private static final int     STATE_SURFING_MIN_SURFING_TIME_DURATION_DEFAULT = 6;
+   private static final String  STATE_SURFING_IS_MIN_SURFING_DISTANCE           = "STATE_SURFING_IS_MIN_SURFING_DISTANCE";  //$NON-NLS-1$
+   private static final boolean STATE_SURFING_IS_MIN_SURFING_DISTANCE_DEFAULT   = false;
+   private static final String  STATE_SURFING_MIN_SURFING_DISTANCE              = "STATE_SURFING_MIN_SURFING_DISTANCE";     //$NON-NLS-1$
+   private static final int     STATE_SURFING_MIN_SURFING_DISTANCE_DEFAULT      = 10;
 
    /*
     * Colors
@@ -384,6 +402,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private Composite       _pageSegType_DPPulse;
    private Composite       _pageSegType_Surfing;
 
+   private Button          _chkIsMinSurfingDistance;
+
    private Combo           _comboBreakMethod;
    private Combo           _comboSegmenterType;
 
@@ -395,6 +415,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private Label           _lblDistanceValue;
    private Label           _lblMinAltitude;
    private Label           _lblNumSegments;
+   private Label           _lblSurfing_MinStartStopSpeed_Unit;
+   private Label           _lblSurfing_MinSurfingDistance_Unit;
+   private Label           _lblSurfing_MinSurfingSpeed_Unit;
    private Label           _lblTourBreakTime;
 
    private Spinner         _spinnerBreak_MinAvgSpeedAS;
@@ -410,6 +433,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private Spinner         _spinnerDPTolerance_Power;
    private Spinner         _spinnerDPTolerance_Pulse;
    private Spinner         _spinnerMinAltitude;
+   private Spinner         _spinnerSurfing_MinSurfingDistance;
+   private Spinner         _spinnerSurfing_MinSurfingSpeed;
+   private Spinner         _spinnerSurfing_MinSurfingTimeDuration;
+   private Spinner         _spinnerSurfing_MinStartStopSpeed;
 
    private TableViewer     _segmentViewer;
 
@@ -418,10 +445,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
     * chart to a selected segment
     */
    private TourChart       _tourChart;
-
-   private Spinner         _spinnerSurfing_StartStopThresholdSpeed;
-
-   private Label           _lblSurfing_StartStopThresholdSpeed_Unit;
 
    public static enum SegmenterType {
       ByAltitudeWithDP, //
@@ -642,6 +665,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                 */
                _lblMinAltitude.setText(net.tourbook.common.UI.UNIT_LABEL_DISTANCE);
                _lblMinAltitude.pack(true);
+
+               updateUI_SurfingMeasurementValues();
 
                createSegments(true);
 
@@ -1570,27 +1595,104 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
    private void createSegmentsBy_Surfing() {
 
+      final int[] timeSerie = _tourData.timeSerie;
       final float[] distanceSerie = _tourData.getMetricDistanceSerie();
-      final int lastDistanceSerieIndex = distanceSerie.length - 1;
+      final float[] speedSerie = _tourData.getSpeedSerieMetric();
 
-      final float segmentDistance = getDistance();
+      final int lastSerieIndex = timeSerie.length - 1;
+
+      // get surfing values in metric measurement
+      float minSpeed_StartStop = _spinnerSurfing_MinStartStopSpeed.getSelection();
+      float minSpeed_Surfing = _spinnerSurfing_MinSurfingSpeed.getSelection();
+      final float minTimeDuration = _spinnerSurfing_MinSurfingTimeDuration.getSelection();
+      float minDistance = _spinnerSurfing_MinSurfingDistance.getSelection();
+      final boolean isMinDistance = _chkIsMinSurfingDistance.getSelection();
+
+      if (net.tourbook.ui.UI.UNIT_VALUE_DISTANCE == UNIT_MILE) {
+
+         // convert imperial -> metric
+
+         minSpeed_StartStop = (float) (minSpeed_StartStop / UNIT_MILE + 0.5);
+         minSpeed_Surfing = (float) (minSpeed_Surfing / UNIT_MILE + 0.5);
+
+         minDistance = (float) (minDistance / UNIT_YARD + 0.5);
+      }
+
       final TIntArrayList segmentSerieIndex = new TIntArrayList();
 
       // set first segment start
       segmentSerieIndex.add(0);
 
-      float nextSegmentDistance = segmentDistance;
+      boolean isSurfing_StartStop = false;
+      boolean isSurfing_MinSpeed = false;
+      boolean isSurfingTime = false;
+      boolean isSurfing = false;
+      int surfingTime = 0;
+      int prevTime = 0;
+      int startIndex = 0;
 
-      for (int distanceIndex = 0; distanceIndex < distanceSerie.length; distanceIndex++) {
+      for (int serieIndex = 0; serieIndex < distanceSerie.length; serieIndex++) {
 
-         final float distance = distanceSerie[distanceIndex];
-         if (distance >= nextSegmentDistance) {
+         final int currentTime = timeSerie[serieIndex];
+         final float currentDistance = distanceSerie[serieIndex];
+         final float currentSpeed = speedSerie[serieIndex];
 
-            segmentSerieIndex.add(distanceIndex);
+         final int timeDiff = currentTime - prevTime;
 
-            // set minimum distance for the next segment
-            nextSegmentDistance += segmentDistance;
+         if (currentSpeed >= minSpeed_StartStop) {
+
+            if (isSurfing_StartStop == false) {
+               startIndex = serieIndex;
+            }
+
+            isSurfing_StartStop = true;
+
+         } else {
+
+            isSurfing_StartStop = false;
          }
+
+         if (currentSpeed >= minSpeed_Surfing) {
+            isSurfing_MinSpeed = true;
+         }
+
+         if (isSurfing_StartStop && isSurfing_MinSpeed) {
+
+            surfingTime += timeDiff;
+
+            if (surfingTime >= minTimeDuration) {
+               isSurfingTime = true;
+            }
+
+         } else {
+
+            isSurfingTime = false;
+            surfingTime = 0;
+         }
+
+         final boolean prevIsSurfing = isSurfing;
+         if (isSurfing_StartStop && isSurfing_MinSpeed && isSurfingTime) {
+            isSurfing = true;
+         } else {
+            isSurfing = false;
+         }
+
+         if (prevIsSurfing && isSurfing == false) {
+
+            // surfing stopped
+
+            if (startIndex == serieIndex - 1) {
+
+               // ignore, this occures
+
+            } else {
+
+               segmentSerieIndex.add(startIndex);
+               segmentSerieIndex.add(serieIndex - 1);
+            }
+         }
+
+         prevTime = currentTime;
       }
 
       // ensure the last segment ends at the end of the tour
@@ -1598,9 +1700,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       if (serieSize == 1 || //
 
       // ensure the last index is not duplicated
-            segmentSerieIndex.get(serieSize - 1) != lastDistanceSerieIndex) {
+            segmentSerieIndex.get(serieSize - 1) != lastSerieIndex) {
 
-         segmentSerieIndex.add(lastDistanceSerieIndex);
+         segmentSerieIndex.add(lastSerieIndex);
       }
 
       _tourData.segmentSerieIndex = segmentSerieIndex.toArray();
@@ -1766,23 +1868,23 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          label.setText(Messages.tour_segmenter_segType_byDistance_label);
 
          // spinner: distance
-			_spinnerDistance = new Spinner(container, SWT.BORDER);
-			GridDataFactory.fillDefaults().applyTo(_spinnerDistance);
-			_spinnerDistance.setMinimum(1); // 0.1
-			_spinnerDistance.setMaximum(_maxDistanceSpinner);
-			_spinnerDistance.setPageIncrement(_spinnerDistancePage);
-			_spinnerDistance.setDigits(1);
-			_spinnerDistance.addSelectionListener(new SelectionAdapter() {
+         _spinnerDistance = new Spinner(container, SWT.BORDER);
+         GridDataFactory.fillDefaults().applyTo(_spinnerDistance);
+         _spinnerDistance.setMinimum(1); // 0.1
+         _spinnerDistance.setMaximum(_maxDistanceSpinner);
+         _spinnerDistance.setPageIncrement(_spinnerDistancePage);
+         _spinnerDistance.setDigits(1);
+         _spinnerDistance.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent e) {
-					onSelect_Distance();
+               onSelect_Distance();
             }
          });
-			_spinnerDistance.addMouseWheelListener(new MouseWheelListener() {
+         _spinnerDistance.addMouseWheelListener(new MouseWheelListener() {
             @Override
             public void mouseScrolled(final MouseEvent event) {
                UI.adjustSpinnerValueOnMouseScroll(event);
-					onSelect_Distance();
+               onSelect_Distance();
             }
          });
 
@@ -2290,46 +2392,119 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
    private Composite createUI_60_SegmenterBy_Surfing(final Composite parent) {
 
+      final SelectionAdapter defaultSelectionListener = new SelectionAdapter() {
+         @Override
+         public void widgetSelected(final SelectionEvent e) {
+            onSelect_Surfing();
+         }
+      };
+
+      final MouseWheelListener defaultMouseWheelListener = new MouseWheelListener() {
+         @Override
+         public void mouseScrolled(final MouseEvent event) {
+            UI.adjustSpinnerValueOnMouseScroll(event);
+            onSelect_Surfing();
+         }
+      };
+
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
       {
          {
             /*
-             * Start/stop speed threshold
+             * Min start/stop speed
              */
 
             // label
             final Label label = new Label(container, SWT.NONE);
             label.setText(Messages.Tour_Segmenter_Surfing_Label_StartStopSpeedThreshold);
+            label.setToolTipText(Messages.Tour_Segmenter_Surfing_Label_StartStopSpeedThreshold_Tooltip);
 
             // spinner: speed
-            _spinnerSurfing_StartStopThresholdSpeed = new Spinner(container, SWT.BORDER);
-            _spinnerSurfing_StartStopThresholdSpeed.setMinimum(5);
-            _spinnerSurfing_StartStopThresholdSpeed.setMaximum(100);
-            _spinnerSurfing_StartStopThresholdSpeed.setPageIncrement(_spinnerDistancePage);
-            _spinnerSurfing_StartStopThresholdSpeed.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onSelect_Surfing();
-               }
-            });
-            _spinnerSurfing_StartStopThresholdSpeed.addMouseWheelListener(new MouseWheelListener() {
-               @Override
-               public void mouseScrolled(final MouseEvent event) {
-                  UI.adjustSpinnerValueOnMouseScroll(event);
-                  onSelect_Surfing();
-               }
-            });
-            GridDataFactory.fillDefaults().applyTo(_spinnerSurfing_StartStopThresholdSpeed);
+            _spinnerSurfing_MinStartStopSpeed = new Spinner(container, SWT.BORDER);
+            _spinnerSurfing_MinStartStopSpeed.setMinimum(5);
+            _spinnerSurfing_MinStartStopSpeed.setMaximum(100);
+            _spinnerSurfing_MinStartStopSpeed.setPageIncrement(5);
+            _spinnerSurfing_MinStartStopSpeed.addSelectionListener(defaultSelectionListener);
+            _spinnerSurfing_MinStartStopSpeed.addMouseWheelListener(defaultMouseWheelListener);
 
             // label: unit
-            _lblSurfing_StartStopThresholdSpeed_Unit = new Label(container, SWT.NONE);
-            _lblSurfing_StartStopThresholdSpeed_Unit.setText(UI.UNIT_LABEL_SPEED);
-            GridDataFactory.fillDefaults()
-                  .align(SWT.FILL, SWT.CENTER)
-                  .grab(true, false)
-                  .applyTo(_lblSurfing_StartStopThresholdSpeed_Unit);
+            _lblSurfing_MinStartStopSpeed_Unit = new Label(container, SWT.NONE);
+            _lblSurfing_MinStartStopSpeed_Unit.setText(UI.UNIT_LABEL_SPEED);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).applyTo(_lblSurfing_MinStartStopSpeed_Unit);
+         }
+         {
+            /*
+             * Min surfing speed
+             */
+
+            // label
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(Messages.Tour_Segmenter_Surfing_Label_MinSurfingSpeed);
+            label.setToolTipText(Messages.Tour_Segmenter_Surfing_Label_MinSurfingSpeed_Tooltip);
+
+            // spinner: seconds
+            _spinnerSurfing_MinSurfingSpeed = new Spinner(container, SWT.BORDER);
+            _spinnerSurfing_MinSurfingSpeed.setMinimum(1);
+            _spinnerSurfing_MinSurfingSpeed.setMaximum(100);
+            _spinnerSurfing_MinSurfingSpeed.setPageIncrement(5);
+            _spinnerSurfing_MinSurfingSpeed.addSelectionListener(defaultSelectionListener);
+            _spinnerSurfing_MinSurfingSpeed.addMouseWheelListener(defaultMouseWheelListener);
+
+            // label: unit
+            _lblSurfing_MinSurfingSpeed_Unit = new Label(container, SWT.NONE);
+            _lblSurfing_MinSurfingSpeed_Unit.setText(UI.UNIT_LABEL_SPEED);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).applyTo(_lblSurfing_MinSurfingSpeed_Unit);
+         }
+         {
+            /*
+             * Min surf time duration
+             */
+
+            // label
+            Label label = new Label(container, SWT.NONE);
+            label.setText(Messages.Tour_Segmenter_Surfing_Label_MinSurfTimeDuration);
+            label.setToolTipText(Messages.Tour_Segmenter_Surfing_Label_MinSurfTimeDuration_Tooltip);
+
+            // spinner: seconds
+            _spinnerSurfing_MinSurfingTimeDuration = new Spinner(container, SWT.BORDER);
+            _spinnerSurfing_MinSurfingTimeDuration.setMinimum(1);
+            _spinnerSurfing_MinSurfingTimeDuration.setMaximum(100);
+            _spinnerSurfing_MinSurfingTimeDuration.setPageIncrement(5);
+            _spinnerSurfing_MinSurfingTimeDuration.addSelectionListener(defaultSelectionListener);
+            _spinnerSurfing_MinSurfingTimeDuration.addMouseWheelListener(defaultMouseWheelListener);
+
+            // label: unit
+            label = new Label(container, SWT.NONE);
+            label.setText(Messages.App_Unit_Seconds_Small);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).applyTo(label);
+         }
+         {
+            /*
+             * Min surfing distance
+             */
+
+            {
+               _chkIsMinSurfingDistance = new Button(container, SWT.CHECK);
+               _chkIsMinSurfingDistance.setText(Messages.Tour_Segmenter_Surfing_Checkbox_IsMinSurfingDistance);
+               _chkIsMinSurfingDistance.setToolTipText(Messages.Tour_Segmenter_Surfing_Label_MinSurfingDistance_Tooltip);
+               _chkIsMinSurfingDistance.addSelectionListener(defaultSelectionListener);
+               GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_chkIsMinSurfingDistance);
+
+               // spinner: seconds
+               _spinnerSurfing_MinSurfingDistance = new Spinner(container, SWT.BORDER);
+               _spinnerSurfing_MinSurfingDistance.setMinimum(0);
+               _spinnerSurfing_MinSurfingDistance.setMaximum(1000);
+               _spinnerSurfing_MinSurfingDistance.setPageIncrement(20);
+               _spinnerSurfing_MinSurfingDistance.addSelectionListener(defaultSelectionListener);
+               _spinnerSurfing_MinSurfingDistance.addMouseWheelListener(defaultMouseWheelListener);
+
+               // label: unit
+               _lblSurfing_MinSurfingDistance_Unit = new Label(container, SWT.NONE);
+               _lblSurfing_MinSurfingDistance_Unit.setText(UI.UNIT_LABEL_DISTANCE_M_OR_YD);
+               GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).applyTo(_lblSurfing_MinSurfingDistance_Unit);
+            }
          }
       }
 
@@ -3254,6 +3429,16 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       final boolean isTourAvailable = _tourData != null;
 
       _actionTCSegmenterConfig.setEnabled(isTourAvailable);
+
+      enableActions_Surfing();
+   }
+
+   private void enableActions_Surfing() {
+
+      final boolean isMinDistance = _chkIsMinSurfingDistance.getSelection();
+
+      _spinnerSurfing_MinSurfingDistance.setEnabled(isMinDistance);
+      _lblSurfing_MinSurfingDistance_Unit.setEnabled(isMinDistance);
    }
 
    private void fillToolbar() {
@@ -3315,7 +3500,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       final float selectedDistance = _spinnerDistance.getSelection();
       float spinnerDistance;
 
-      if (net.tourbook.ui.UI.UNIT_VALUE_DISTANCE == net.tourbook.ui.UI.UNIT_MILE) {
+      if (net.tourbook.ui.UI.UNIT_VALUE_DISTANCE == UNIT_MILE) {
 
          // miles are displayed
 
@@ -3326,7 +3511,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          }
 
          // convert mile -> meters
-         spinnerDistance *= net.tourbook.ui.UI.UNIT_MILE;
+         spinnerDistance *= UNIT_MILE;
 
       } else {
 
@@ -3778,8 +3963,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    }
 
    private void onSelect_Surfing() {
-      // TODO Auto-generated method stub
 
+      enableActions_Surfing();
+
+      createSegments(true);
    }
 
    private void onSelect_Tolerance() {
@@ -3954,7 +4141,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
    private void onSetDefaults(final Composite parent) {
 
-      saveBreakTimeValuesInPrefStore();
+      saveBreakTimeValues_InPrefStore();
 
       PreferencesUtil.createPreferenceDialogOn(
             parent.getShell(),
@@ -4046,14 +4233,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       /*
        * Actions
        */
-      _actionTCSegmenterConfig.setSelected(Util.getStateBoolean(
-            _state,
+      _actionTCSegmenterConfig.setSelected(Util.getStateBoolean(_state,
             STATE_IS_SHOW_TOUR_SEGMENTS,
             STATE_IS_SHOW_TOUR_SEGMENTS_DEFAULT));
 
       // selected segmenter
-      final String stateSegmenterName = Util.getStateString(
-            _state,
+      final String stateSegmenterName = Util.getStateString(_state,
             STATE_SELECTED_SEGMENTER_BY_USER,
             SegmenterType.ByAltitudeWithDP.name());
       try {
@@ -4082,8 +4267,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       _dpTolerancePulse = stateDPTolerancePulse / 10.0f;
       _spinnerDPTolerance_Pulse.setSelection(stateDPTolerancePulse);
 
-      final int stateDPToleranceMultipleTours = Util.getStateInt(
-            _state,
+      final int stateDPToleranceMultipleTours = Util.getStateInt(_state,
             STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS,
             STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS_DEFAULT);
       _dpToleranceAltitudeMultipleTours = (float) (stateDPToleranceMultipleTours / 10.0);
@@ -4112,41 +4296,34 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       /*
        * break by slice speed
        */
-      final float stateSliceSpeed = Util.getStateFloat(
-            _state,
+      final float stateSliceSpeed = Util.getStateFloat(_state,
             STATE_BREAK_TIME_MIN_SLICE_SPEED,
             btConfig.breakMinSliceSpeed);
 
-      _spinnerBreak_MinSliceSpeed
-            .setSelection((int) (stateSliceSpeed * SPEED_DIGIT_VALUE * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
+      _spinnerBreak_MinSliceSpeed.setSelection((int) (stateSliceSpeed * SPEED_DIGIT_VALUE * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
 
       /*
        * break by avg speed
        */
-      final float stateAvgSpeed = Util.getStateFloat(
-            _state,
+      final float stateAvgSpeed = Util.getStateFloat(_state,
             STATE_BREAK_TIME_MIN_AVG_SPEED,
             btConfig.breakMinAvgSpeed);
 
-      _spinnerBreak_MinAvgSpeed
-            .setSelection((int) (stateAvgSpeed * SPEED_DIGIT_VALUE * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
+      _spinnerBreak_MinAvgSpeed.setSelection((int) (stateAvgSpeed * SPEED_DIGIT_VALUE * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
 
       /*
        * break time by time/distance
        */
-      _spinnerBreak_ShortestTime.setSelection(Util.getStateInt(
-            _state,
+      _spinnerBreak_ShortestTime.setSelection(Util.getStateInt(_state,
             STATE_BREAK_TIME_MIN_TIME_VALUE,
             btConfig.breakShortestTime));
 
-      final float breakDistance = Util.getStateFloat(
-            _state,
+      final float breakDistance = Util.getStateFloat(_state,
             STATE_BREAK_TIME_MIN_DISTANCE_VALUE,
             btConfig.breakMaxDistance) / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_SMALL;
       _spinnerBreak_MaxDistance.setSelection((int) (breakDistance + 0.5));
 
-      _spinnerBreak_SliceDiff.setSelection(Util.getStateInt(
-            _state,
+      _spinnerBreak_SliceDiff.setSelection(Util.getStateInt(_state,
             STATE_BREAK_TIME_SLICE_DIFF,
             btConfig.breakSliceDiff));
 
@@ -4164,12 +4341,39 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       _colorCache.setColor(
             STATE_COLOR_TOTALS,
             Util.getStateRGB(_state, STATE_COLOR_TOTALS, STATE_COLOR_TOTALS_DEFAULT));
+
+      /*
+       * Surfing
+       */
+      _chkIsMinSurfingDistance.setSelection(Util.getStateBoolean(_state,
+            STATE_SURFING_IS_MIN_SURFING_DISTANCE,
+            STATE_SURFING_IS_MIN_SURFING_DISTANCE_DEFAULT));
+
+      final int stateMinDistance = Util.getStateInt(_state,
+            STATE_SURFING_MIN_SURFING_DISTANCE,
+            STATE_SURFING_MIN_SURFING_DISTANCE_DEFAULT);
+      final double minDistance_UI = stateMinDistance / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_SMALL;
+      _spinnerSurfing_MinSurfingDistance.setSelection((int) (minDistance_UI + 0.5));
+
+      _spinnerSurfing_MinSurfingTimeDuration.setSelection(Util.getStateInt(_state,
+            STATE_SURFING_MIN_SURFING_TIME_DURATION,
+            STATE_SURFING_MIN_SURFING_TIME_DURATION_DEFAULT));
+
+      final int stateMinStartStopSpeed = Util.getStateInt(_state,
+            STATE_SURFING_MIN_START_STOP_SPEED,
+            STATE_SURFING_MIN_START_STOP_SPEED_DEFAULT);
+      _spinnerSurfing_MinStartStopSpeed.setSelection((int) (stateMinStartStopSpeed * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
+
+      final int stateMinSurfingSpeed = Util.getStateInt(_state,
+            STATE_SURFING_MIN_SURFING_SPEED,
+            STATE_SURFING_MIN_SURFING_SPEED_DEFAULT);
+      _spinnerSurfing_MinSurfingSpeed.setSelection((int) (stateMinSurfingSpeed * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
    }
 
    /**
     * saves break time values in the pref store
     */
-   private void saveBreakTimeValuesInPrefStore() {
+   private void saveBreakTimeValues_InPrefStore() {
 
       // break method
       _prefStore.setValue(ITourbookPreferences.BREAK_TIME_METHOD2, getSelectedBreakMethod().methodId);
@@ -4200,7 +4404,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    /**
     * save break time values in the viewer settings
     */
-   private void saveBreakTimeValuesInState() {
+   private void saveBreakTimeValues_InState() {
 
       // break method
       _state.put(STATE_SELECTED_BREAK_METHOD2, getSelectedBreakMethod().methodId);
@@ -4242,7 +4446,33 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       _state.put(STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS, (int) (_dpToleranceAltitudeMultipleTours * 10));
 
-      saveBreakTimeValuesInState();
+      /*
+       * Surfing
+       */
+      int minStartStopSpeed = _spinnerSurfing_MinStartStopSpeed.getSelection();
+      int minSurfingSpeed = _spinnerSurfing_MinSurfingSpeed.getSelection();
+      int minSurfingDistance = _spinnerSurfing_MinSurfingDistance.getSelection();
+
+      if (net.tourbook.ui.UI.UNIT_VALUE_DISTANCE == UNIT_MILE) {
+
+         // convert imperial -> metric
+
+         minStartStopSpeed = (int) (minStartStopSpeed / UNIT_MILE + 0.5);
+         minSurfingSpeed = (int) (minSurfingSpeed / UNIT_MILE + 0.5);
+
+         minSurfingDistance = (int) (minSurfingDistance / UNIT_YARD + 0.5);
+      }
+
+      _state.put(STATE_SURFING_IS_MIN_SURFING_DISTANCE, _chkIsMinSurfingDistance.getSelection());
+      _state.put(STATE_SURFING_MIN_START_STOP_SPEED, minStartStopSpeed);
+      _state.put(STATE_SURFING_MIN_SURFING_DISTANCE, minSurfingDistance);
+      _state.put(STATE_SURFING_MIN_SURFING_SPEED, minSurfingSpeed);
+      _state.put(STATE_SURFING_MIN_SURFING_TIME_DURATION, _spinnerSurfing_MinSurfingTimeDuration.getSelection());
+
+      /*
+       * Break time
+       */
+      saveBreakTimeValues_InState();
    }
 
    private TourData saveTour() {
@@ -4361,7 +4591,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
    private void setMaxDistanceSpinner() {
 
-      if (net.tourbook.ui.UI.UNIT_VALUE_DISTANCE == net.tourbook.ui.UI.UNIT_MILE) {
+      if (net.tourbook.ui.UI.UNIT_VALUE_DISTANCE == UNIT_MILE) {
 
          // imperial
 
@@ -4577,7 +4807,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       float spinnerDistance = getDistance() / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
-      if (net.tourbook.ui.UI.UNIT_VALUE_DISTANCE == net.tourbook.ui.UI.UNIT_MILE) {
+      if (net.tourbook.ui.UI.UNIT_VALUE_DISTANCE == UNIT_MILE) {
 
          // imperial
 
@@ -4689,5 +4919,38 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             _comboSegmenterType.select(0);
          }
       }
+   }
+
+   private void updateUI_SurfingMeasurementValues() {
+
+      final int minDistance = _spinnerSurfing_MinSurfingDistance.getSelection();
+      final int minSpeed_StartStop = _spinnerSurfing_MinStartStopSpeed.getSelection();
+      final int minSpeed_Surfing = _spinnerSurfing_MinSurfingSpeed.getSelection();
+
+      // this conversion is not exactly but the measurement system is not changed very often
+
+      if (net.tourbook.ui.UI.UNIT_VALUE_DISTANCE == UNIT_MILE) {
+
+         // imperial -> metric
+
+         _spinnerSurfing_MinStartStopSpeed.setSelection((int) ((minSpeed_StartStop / UNIT_MILE) + 0.5));
+         _spinnerSurfing_MinSurfingSpeed.setSelection((int) ((minSpeed_Surfing / UNIT_MILE) + 0.5));
+
+         _spinnerSurfing_MinSurfingDistance.setSelection((int) (minDistance / UNIT_YARD + 0.5));
+
+      } else {
+
+         // metric -> imperial
+
+         _spinnerSurfing_MinStartStopSpeed.setSelection((int) (minSpeed_StartStop * UNIT_MILE));
+         _spinnerSurfing_MinSurfingSpeed.setSelection((int) (minSpeed_Surfing * UNIT_MILE));
+
+         _spinnerSurfing_MinSurfingDistance.setSelection((int) (minDistance * UNIT_YARD));
+      }
+
+      _lblSurfing_MinStartStopSpeed_Unit.setText(UI.UNIT_LABEL_SPEED);
+      _lblSurfing_MinSurfingSpeed_Unit.setText(UI.UNIT_LABEL_SPEED);
+
+      _lblSurfing_MinSurfingDistance_Unit.setText(UI.UNIT_LABEL_DISTANCE_M_OR_YD);
    }
 }

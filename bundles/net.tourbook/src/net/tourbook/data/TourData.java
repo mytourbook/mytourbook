@@ -1070,7 +1070,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * <p>
 	 * {@link #segmentSerieIndex} contains the outer index, this contains the inner index.
 	 * <p>
-	 * This is used, first to create the sements by the outer attribute, e.g. tour marker and then
+	 * This is used, first to create the segments by the outer attribute, e.g. tour marker and then
 	 * create the inner segments, e.g. altitude with DP.
 	 */
 	@Transient
