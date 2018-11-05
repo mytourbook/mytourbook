@@ -79,7 +79,7 @@ public class PrefPageMap25MapsforgeProvider extends PreferencePage implements IW
 
 		new TileEncodingData(TileEncoding.MVT, Messages.Pref_Map25_Encoding_Mapzen),
 		new TileEncodingData(TileEncoding.VTM, Messages.Pref_Map25_Encoding_OpenScienceMap),
-		new TileEncodingData(TileEncoding.MF, "local Mapsforgefile")
+		new TileEncodingData(TileEncoding.MF, "Local Mapsforgefile")
 	};
 
 	
