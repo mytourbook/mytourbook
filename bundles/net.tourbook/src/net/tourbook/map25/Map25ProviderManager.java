@@ -112,7 +112,7 @@ public class Map25ProviderManager {
 		mapProvider.url = "C:\\Users\\top\\BTSync\\oruxmaps\\mapfiles\\niedersachsen_V5.map";
 		mapProvider.tilePath = "C:\\Users\\top\\BTSync\\oruxmaps\\mapstyles\\ELV4\\Elevate.xml"; //$NON-NLS-1$
 		mapProvider.tileEncoding = TileEncoding.MF;
-		mapProvider.apiKey = ""; //$NON-NLS-1$
+		mapProvider.apiKey = "elv-mtb"; //$NON-NLS-1$
 		mapProvider.description = "Mapsforge Offlinemaps, eg. openandromaps.org\nurl set to absolut mappath eg c:\\maps\\germany.map\ntilepath set to absolut themepath eg.: c:\\themes\\Elevate.xml"; //$NON-NLS-1$
 
 		return mapProvider;
