@@ -330,8 +330,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    /**
     * when <code>true</code>, the tour dirty flag is disabled to load data into the fields
     */
-   private boolean                        _isDirtyDisabled    = false;
+   private boolean                        _isDirtyDisabled;
    private boolean                        _isClearView;
+   private boolean                        _isInSelection;
 
    private float                          _altitudeUp;
    private float                          _altitudeDown;
@@ -797,7 +798,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                       * selected
                       */
 
-                     selectTourSegments((SelectedTourSegmenterSegments) customData);
+                     _isInSelection = true;
+                     {
+                        selectTourSegments((SelectedTourSegmenterSegments) customData);
+                     }
+                     _isInSelection = false;
                   }
 
                } else if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
@@ -1623,13 +1628,26 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       // set first segment start
       segmentSerieIndex.add(0);
 
-      boolean isSurfing_StartStop = false;
-      boolean isSurfing_MinSpeed = false;
-      boolean isSurfingTime = false;
       boolean isSurfing = false;
-      int surfingTime = 0;
+      final boolean isSurfing_Distance = false;
+      boolean isSurfing_MinSpeed = false;
+      boolean isSurfing_StartStop = false;
+      boolean isSurfing_Time = false;
+
+      int surfing_TimeDuration = 0;
+      float surfing_Distance = 0;
+
       int prevTime = 0;
-      int startIndex = 0;
+      float prevDistance = 0;
+
+      int segmentStartIndex = 0;
+
+//      System.out.println();
+//      System.out.println();
+//      System.out.println();
+//      System.out.println();
+//      System.out.println();
+//      System.out.println();
 
       for (int serieIndex = 0; serieIndex < distanceSerie.length; serieIndex++) {
 
@@ -1638,11 +1656,16 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          final float currentSpeed = speedSerie[serieIndex];
 
          final int timeDiff = currentTime - prevTime;
+         final float distanceDiff = currentDistance - prevDistance;
 
          if (currentSpeed >= minSpeed_StartStop) {
 
             if (isSurfing_StartStop == false) {
-               startIndex = serieIndex;
+
+               segmentStartIndex = serieIndex;
+
+               surfing_Distance = 0;
+               surfing_TimeDuration = 0;
             }
 
             isSurfing_StartStop = true;
@@ -1658,41 +1681,84 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
          if (isSurfing_StartStop && isSurfing_MinSpeed) {
 
-            surfingTime += timeDiff;
+            surfing_TimeDuration += timeDiff;
 
-            if (surfingTime >= minTimeDuration) {
-               isSurfingTime = true;
+            if (surfing_TimeDuration >= minTimeDuration) {
+               isSurfing_Time = true;
             }
 
          } else {
 
-            isSurfingTime = false;
-            surfingTime = 0;
+            isSurfing_Time = false;
+
+//            surfing_TimeDuration = 0;
+
          }
 
+//         System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ()")
+//               + ("\t: " + serieIndex)
+//               + ("\tsurfing_TimeDuration = " + surfing_TimeDuration)
+//               + ("\tisSurfing_Time = " + isSurfing_Time)
+//         //
+//         );
+//// TODO remove SYSTEM.OUT.PRINTLN
+
+//         if (isSurfing_StartStop && isSurfing_MinSpeed && isSurfing_Time) {
+//
+//            surfing_Distance += distanceDiff;
+//
+//            if (surfing_Distance >= minDistance) {
+//               isSurfing_Distance = true;
+//            }
+//
+//         } else {
+//
+//            isSurfing_Distance = false;
+//
+////            surfing_Distance = 0;
+//         }
+
          final boolean prevIsSurfing = isSurfing;
-         if (isSurfing_StartStop && isSurfing_MinSpeed && isSurfingTime) {
+
+         if (isSurfing_StartStop && isSurfing_MinSpeed && isSurfing_Time) {
+
+            // distance is optional
+//            if (isMinDistance) {
+//
+//               //check distance
+//               if (isSurfing_Distance) {
+//                  isSurfing = true;
+//               } else {
+//                  isSurfing = false;
+//               }
+//
+//            } else {
             isSurfing = true;
+//            }
+
          } else {
             isSurfing = false;
          }
 
          if (prevIsSurfing && isSurfing == false) {
 
-            // surfing stopped
+            // surfing has stopped
 
-            if (startIndex == serieIndex - 1) {
+            final int segmentEndIndex = serieIndex - 1;
 
-               // ignore, this occures
+            if (segmentStartIndex == segmentEndIndex) {
+
+               // ignore, this occured
 
             } else {
 
-               segmentSerieIndex.add(startIndex);
-               segmentSerieIndex.add(serieIndex - 1);
+               segmentSerieIndex.add(segmentStartIndex);
+               segmentSerieIndex.add(segmentEndIndex);
             }
          }
 
          prevTime = currentTime;
+         prevDistance = currentDistance;
       }
 
       // ensure the last segment ends at the end of the tour
@@ -2496,7 +2562,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                _spinnerSurfing_MinSurfingDistance = new Spinner(container, SWT.BORDER);
                _spinnerSurfing_MinSurfingDistance.setMinimum(0);
                _spinnerSurfing_MinSurfingDistance.setMaximum(1000);
-               _spinnerSurfing_MinSurfingDistance.setPageIncrement(20);
+               _spinnerSurfing_MinSurfingDistance.setPageIncrement(10);
                _spinnerSurfing_MinSurfingDistance.addSelectionListener(defaultSelectionListener);
                _spinnerSurfing_MinSurfingDistance.addMouseWheelListener(defaultMouseWheelListener);
 
@@ -3835,6 +3901,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
    private void onSelect_Segment(final SelectionChangedEvent event) {
 
+      if (_isInSelection) {
+         return;
+      }
+
       final StructuredSelection selection = (StructuredSelection) event.getSelection();
       if (selection != null) {
 
@@ -3852,6 +3922,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
             final TourSegment firstTourSegment = (TourSegment) (segments[0]);
             final int serieStartIndex = firstTourSegment.serieIndex_Start;
+
+            if (serieStartIndex > 0) {
+               // adjust start index otherwise it is wrong displayed in the tour editor time slices
+//               serieStartIndex--;
+            }
 
             if (segments.length == 1 && firstTourSegment.isTotal) {
 
