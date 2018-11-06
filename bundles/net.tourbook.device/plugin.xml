@@ -270,7 +270,7 @@
 			class="net.tourbook.device.suunto.Suunto9DeviceDataReader"
 			fileextension="gz"
 			id="net.tourbook.device.Suunto9"
-			name="Suunto 9">
+			name="Suunto Spartan/9">
 		</device>
 
 		<!-- TUR -->
