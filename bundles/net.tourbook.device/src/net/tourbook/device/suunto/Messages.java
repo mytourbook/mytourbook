@@ -19,16 +19,20 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-	private static final String BUNDLE_NAME = "net.tourbook.device.suunto.messages"; //$NON-NLS-1$
+	private static final String	BUNDLE_NAME	= "net.tourbook.device.suunto.messages";	//$NON-NLS-1$
 
-	public static String pref_data;
+	public static String				pref_data_source;
+	public static String				pref_altitude_source;
+	public static String				pref_altitude_gps;
+	public static String				pref_altitude_barometer;
+	public static String				pref_distance_source;
+	public static String				pref_distance_gps;
+	public static String				pref_distance_providedvalues;
 
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
 
-
-	private Messages() {
-	}
+	private Messages() {}
 }

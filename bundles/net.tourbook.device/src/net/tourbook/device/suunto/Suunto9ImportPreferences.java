@@ -10,8 +10,6 @@ import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
@@ -26,16 +24,14 @@ public class Suunto9ImportPreferences extends FieldEditorPreferencePage implemen
 
 	private final static ArrayList<String>	AltitudeData	= new ArrayList<String>() {
 																				{
-																					//TODO Use Messages.
-																					add("GPS");
-																					add("Barometer");
+																					add(Messages.pref_altitude_gps);
+																					add(Messages.pref_altitude_barometer);
 																				}
 																			};
 	private final static ArrayList<String>	DistanceData	= new ArrayList<String>() {
 																				{
-																					//TODO Use Messages.
-																					add("GPS");
-																					add("Provided values");
+																					add(Messages.pref_distance_gps);
+																					add(Messages.pref_distance_providedvalues);
 																				}
 																			};
 
@@ -72,12 +68,12 @@ public class Suunto9ImportPreferences extends FieldEditorPreferencePage implemen
 		 * Data
 		 */
 		_groupData = new Group(parent, SWT.NONE);
-		_groupData.setText(Messages.pref_data);
+		_groupData.setText(Messages.pref_data_source);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(_groupData);
 		{
 			// label: Altitude data source
 			_lblAltitudeDataSource = new Label(_groupData, SWT.NONE);
-			_lblAltitudeDataSource.setText("ddd");
+			_lblAltitudeDataSource.setText(Messages.pref_altitude_source);
 			/*
 			 * combo: Altitude source
 			 */
@@ -86,22 +82,13 @@ public class Suunto9ImportPreferences extends FieldEditorPreferencePage implemen
 
 			// label: Distance data source
 			_lblDistanceDataSource = new Label(_groupData, SWT.NONE);
-			_lblDistanceDataSource.setText("Distance");
+			_lblDistanceDataSource.setText(Messages.pref_distance_source);
 
 			/*
-			 * combo: smoothing algorithm
+			 * combo: Distance source
 			 */
 			_comboDistanceDataSource = new Combo(_groupData, SWT.READ_ONLY | SWT.BORDER);
-			_comboDistanceDataSource.setVisibleItemCount(10);
-			// _comboAlgorithm.addFocusListener(_keepOpenListener);
-			_comboDistanceDataSource.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					// if (_isUpdateUI) {
-					return;
-				}
-				// onSelectSmoothingAlgo();
-			});
+			_comboDistanceDataSource.setVisibleItemCount(2);
 
 			// text: decimal separator
 			_txtDecimalSep = new StringFieldEditor(
