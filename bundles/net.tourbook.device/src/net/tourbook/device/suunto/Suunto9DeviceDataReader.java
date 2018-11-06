@@ -77,7 +77,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 												final HashMap<Long, TourData> alreadyImportedTours,
 												final HashMap<Long, TourData> newlyImportedTours) {
 		if (UNITTESTS) {
-			return testSuuntoFiles(importFilePath, deviceData, alreadyImportedTours, newlyImportedTours);
+			return testSuuntoFiles();
 		}
 
 		_newlyImportedTours = newlyImportedTours;
@@ -106,7 +106,8 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 	/**
 	 * Check if the file is a valid device JSON file.
 	 * 
-	 * @param importFilePath
+	 * @param jsonFileContent
+	 *           The content to check.
 	 * @return Returns <code>true</code> when the file contains content with the requested tag.
 	 */
 	protected boolean isValidJSONFile(String jsonFileContent) {
@@ -140,6 +141,13 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		return false;
 	}
 
+	/**
+	 * Retrieves the JSON content from a GZip Suunto file.
+	 * 
+	 * @param gzipFilePath
+	 *           The absolute file path of the Suunto file.
+	 * @return Returns the JSON content.
+	 */
 	private String GetJsonContentFromGZipFile(String gzipFilePath) {
 		String jsonFileContent = null;
 		try {
@@ -159,6 +167,15 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		return jsonFileContent;
 	}
 
+	/**
+	 * Retrieves the content from a resource.
+	 * 
+	 * @param gzipFilePath
+	 *           The absolute file path of the Suunto file.
+	 * @param isZipFile
+	 *           True if the file is a Zip archive, false otherwise.
+	 * @return Returns the JSON content of the given resource file,
+	 */
 	private String GetContentFromResource(String resourceFilePath, boolean isZipFile) {
 		String fileContent = null;
 		try {
@@ -186,6 +203,16 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		return fileContent;
 	}
 
+	/**
+	 * For a given Suunto activity file, the function processes it and imports it as a tour.
+	 * activity.
+	 * 
+	 * @param filePath
+	 *           The absolute full path of a given activity.
+	 * @param jsonFileContent
+	 *           The JSON content of the activity file.
+	 * @return The Suunto activity as a tour.
+	 */
 	private boolean ProcessFile(String filePath, String jsonFileContent) {
 		SuuntoJsonProcessor suuntoJsonProcessor = new SuuntoJsonProcessor();
 
@@ -290,10 +317,10 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 	 * Concatenates children activities with a given activity.
 	 * 
 	 * @param filePath
-	 *           The absolute full path of a given activity.
+	 *           The absolute path of a given activity.
 	 * @param currentFileNumber
 	 *           The file number of the given activity. Example : If the current activity file is
-	 *           1536723722706_{DeviceSerialNumber}_-2.json.gz its file number will be 2
+	 *           1536723722706_{DeviceSerialNumber}_-2.json.gz its file number will be 2.
 	 * @param currentActivity
 	 *           The current activity processed and created.
 	 */
@@ -359,7 +386,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 	 * activity.
 	 * 
 	 * @param tourData
-	 *           The tour to finalize
+	 *           The tour to finalize.
 	 */
 	private void TryFinalizeTour(TourData tourData) {
 
@@ -393,6 +420,13 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		}
 	}
 
+	/**
+	 * Checks if an activity has already been processed.
+	 * 
+	 * @param tourId
+	 *           The tour ID of the activity.
+	 * @return True if the activity has already been processed, false otherwise.
+	 */
 	private boolean processedActivityExists(long tourId) {
 		for (Map.Entry<TourData, ArrayList<TimeData>> entry : _processedActivities.entrySet()) {
 			TourData key = entry.getKey();
@@ -403,6 +437,13 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		return false;
 	}
 
+	/**
+	 * Retrieves an unprocessed activity that is the child of a given processed activity.
+	 * 
+	 * @param filePath
+	 *           The absolute path of a given activity.
+	 * @return If found, the child activity.
+	 */
 	private Entry<String, String> getChildActivity(String filePath) {
 		for (Entry<String, String> childEntry : _childrenActivitiesToProcess.entrySet()) {
 			if (childEntry.getKey().contains(filePath))
@@ -412,6 +453,12 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		return null;
 	}
 
+	/**
+	 * Removes an already processed activity.
+	 * 
+	 * @param filePath
+	 *           The absolute path of a given activity.
+	 */
 	private void removeProcessedActivity(String filePath) {
 		Iterator<Entry<TourData, ArrayList<TimeData>>> it = _processedActivities.entrySet().iterator();
 		while (it.hasNext()) {
@@ -423,11 +470,10 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		}
 	}
 
-	/*
+	/**
 	 * At the end of the import process, we clean the accumulated data so that the next round will
 	 * begin clean.
 	 */
-
 	private void cleanUpActivities() {
 		_childrenActivitiesToProcess.clear();
 		_processedActivities.clear();
@@ -435,11 +481,10 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
 	/**
 	 * Unit tests for the Suunto Spartan/9 import
+	 * 
+	 * @return True if all the tests were successful, false otherwise.
 	 */
-	public boolean testSuuntoFiles(	final String importFilePath,
-												final DeviceData deviceData,
-												final HashMap<Long, TourData> alreadyImportedTours,
-												final HashMap<Long, TourData> newlyImportedTours) {
+	public boolean testSuuntoFiles() {
 
 		boolean testResults = true;
 
@@ -628,6 +673,15 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		return lastTourData;
 	}
 
+	/**
+	 * Compares a test transaction against a control transaction.
+	 * 
+	 * @param controlDocument
+	 *           The control Suunto 9 XML file's content.
+	 * @param xmlTestDocument
+	 *           The test Suunto 9 GZip file's content.
+	 * @return True if no differences were found, false otherwise.
+	 */
 	private static boolean CompareAgainstControl(String controlDocument,
 																String xmlTestDocument) {
 

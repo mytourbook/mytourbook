@@ -25,6 +25,17 @@ public class SuuntoJsonProcessor {
 	private int							_lapCounter;
 	final IPreferenceStore			_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
 
+	/**
+	 * Processes and imports a Suunto activity (from a Suunto 9 or Spartan watch).
+	 * 
+	 * @param jsonFileContent
+	 *           The Suunto's file content in JSON format.
+	 * @param activityToReUse
+	 *           If provided, the activity to concatenate the provided file to.
+	 * @param sampleListToReUse
+	 *           If provided, the activity's data from the activity to reuse.
+	 * @return The created tour.
+	 */
 	public TourData ImportActivity(	String jsonFileContent,
 												TourData activityToReUse,
 												ArrayList<TimeData> sampleListToReUse) {
@@ -164,7 +175,9 @@ public class SuuntoJsonProcessor {
 	 * @param firstSample
 	 *           The activity start time as a string.
 	 * @param activityToReuse
-	 *           The activity to concatenate the current activity with.
+	 *           If provided, the activity to concatenate the current activity with.
+	 * @param sampleListToReUse
+	 *           If provided, the activity's data from the activity to reuse.
 	 * @return If valid, the initialized tour
 	 */
 	private TourData InitializeActivity(JSONObject firstSample,
@@ -201,6 +214,11 @@ public class SuuntoJsonProcessor {
 
 	}
 
+	/**
+	 * Retrieves the current activity's data.
+	 * 
+	 * @return The list of data.
+	 */
 	public ArrayList<TimeData> getSampleList() {
 		return _sampleList;
 	}
@@ -212,6 +230,7 @@ public class SuuntoJsonProcessor {
 	 *           The current sample data in JSON format.
 	 * @param sampleList
 	 *           The tour's time serie.
+	 * @return True if successful, false otherwise.
 	 */
 	private boolean TryAddGpsData(JSONObject currentSample, TimeData timeData) {
 		try {
@@ -239,6 +258,7 @@ public class SuuntoJsonProcessor {
 	 *           The current sample data in JSON format.
 	 * @param sampleList
 	 *           The tour's time serie.
+	 * @return True if successful, false otherwise.
 	 */
 	private boolean TryAddHeartRateData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
@@ -257,6 +277,7 @@ public class SuuntoJsonProcessor {
 	 *           The current sample data in JSON format.
 	 * @param sampleList
 	 *           The tour's time serie.
+	 * @return True if successful, false otherwise.
 	 */
 	private boolean TryAddSpeedData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
@@ -274,6 +295,7 @@ public class SuuntoJsonProcessor {
 	 *           The current sample data in JSON format.
 	 * @param sampleList
 	 *           The tour's time serie.
+	 * @return True if successful, false otherwise.
 	 */
 	private boolean TryAddCadenceData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
@@ -291,8 +313,8 @@ public class SuuntoJsonProcessor {
 	 *           The current sample data in JSON format.
 	 * @param sampleList
 	 *           The tour's time serie.
+	 * @return True if successful, false otherwise.
 	 */
-	@SuppressWarnings("unused")
 	private boolean TryAddAltitudeData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
 		if ((value = TryRetrieveStringElementValue(currentSample, "Altitude")) != null) {
@@ -309,6 +331,7 @@ public class SuuntoJsonProcessor {
 	 *           The current sample data in JSON format.
 	 * @param sampleList
 	 *           The tour's time serie.
+	 * @return True if successful, false otherwise.
 	 */
 	private boolean TryAddPowerData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
@@ -326,6 +349,7 @@ public class SuuntoJsonProcessor {
 	 *           The current sample data in JSON format.
 	 * @param sampleList
 	 *           The tour's time serie.
+	 * @return True if successful, false otherwise.
 	 */
 	private boolean TryAddDistanceData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
@@ -343,6 +367,7 @@ public class SuuntoJsonProcessor {
 	 *           The current sample data in JSON format.
 	 * @param sampleList
 	 *           The tour's time serie.
+	 * @return True if successful, false otherwise.
 	 */
 	private boolean TryAddTemperatureData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
