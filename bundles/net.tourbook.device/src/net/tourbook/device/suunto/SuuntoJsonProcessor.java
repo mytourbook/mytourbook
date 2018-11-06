@@ -13,6 +13,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
@@ -46,6 +47,7 @@ public class SuuntoJsonProcessor {
 			JSONObject jsonContent = new JSONObject(jsonFileContent);
 			samples = (JSONArray) jsonContent.get("Samples");
 		} catch (JSONException ex) {
+			StatusUtil.log(ex);
 			return null;
 		}
 
@@ -60,19 +62,31 @@ public class SuuntoJsonProcessor {
 
 		boolean reusePreviousTimeEntry;
 		for (int i = 0; i < samples.length(); ++i) {
+			String currentSampleData;
+			String sampleTime;
+			try {
+				JSONObject sample = samples.getJSONObject(i);
+				String attributesContent = sample.get("Attributes").toString();
+				if (attributesContent == null || attributesContent == "")
+					continue;
 
-			JSONObject sample = samples.getJSONObject(i);
-			JSONObject currentSampleAttributes = new JSONObject(sample.get("Attributes").toString());
-			String currentSampleSml = currentSampleAttributes.get("suunto/sml").toString();
-			if (!currentSampleSml.contains("Sample"))
+				JSONObject currentSampleAttributes = new JSONObject(sample.get("Attributes").toString());
+				String currentSampleSml = currentSampleAttributes.get("suunto/sml").toString();
+				if (!currentSampleSml.contains("Sample"))
+					continue;
+
+				currentSampleData = new JSONObject(currentSampleSml).get("Sample").toString();
+
+				sampleTime = sample.get("TimeISO8601").toString();
+			} catch (Exception e) {
+				StatusUtil.log(e);
 				continue;
+			}
 
-			String currentSampleData = new JSONObject(currentSampleSml).get("Sample").toString();
 			boolean wasDataPopulated = false;
 			reusePreviousTimeEntry = false;
 			TimeData timeData = null;
 
-			String sampleTime = sample.get("TimeISO8601").toString();
 			ZonedDateTime currentZonedDateTime = ZonedDateTime.parse(sampleTime);
 			currentZonedDateTime = currentZonedDateTime.truncatedTo(ChronoUnit.SECONDS);
 			//Rounding to the nearest second
@@ -247,7 +261,9 @@ public class SuuntoJsonProcessor {
 			}
 
 			return true;
-		} catch (Exception e) {}
+		} catch (Exception e) {
+			StatusUtil.log(e);
+		}
 		return false;
 	}
 
@@ -394,9 +410,7 @@ public class SuuntoJsonProcessor {
 		String result = null;
 		try {
 			result = token.get(elementName).toString();
-		} catch (Exception e) {
-
-		}
+		} catch (Exception e) {}
 		if (result == "null")
 			return null;
 

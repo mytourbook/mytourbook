@@ -128,6 +128,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 					return true;
 
 			} catch (JSONException ex) {
+				StatusUtil.log(ex);
 				return false;
 			}
 
@@ -161,6 +162,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 			gzip.close();
 
 		} catch (IOException e) {
+			StatusUtil.log(e);
 			return "";
 		}
 
@@ -197,6 +199,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 			if (isZipFile)
 				gzip.close();
 		} catch (IOException e) {
+			StatusUtil.log(e);
 			return "";
 		}
 
@@ -230,6 +233,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		try {
 			fileNumber = Integer.parseInt(fileNumberString);
 		} catch (NumberFormatException e) {
+			StatusUtil.log(e);
 			return false;
 		}
 
@@ -398,6 +402,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 			tourId = tourData.getTourId();
 
 		} catch (NullPointerException e) {
+			StatusUtil.log(e);
 			tourId = -1;
 		}
 
