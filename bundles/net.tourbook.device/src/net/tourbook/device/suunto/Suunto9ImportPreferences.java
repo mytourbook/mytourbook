@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.StringFieldEditor;
@@ -21,29 +20,27 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.device.polar.hrm.IPreferences;
 import net.tourbook.preferences.ITourbookPreferences;
 
 public class Suunto9ImportPreferences extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-	ArrayList<String>						AltitudeData	= new ArrayList<String>() {
-																		{
-																			//TODO Use Messages.
-																			add("GPS");
-																			add("Altitude");
-																		}
-																	};
-	ArrayList<String>						DistanceData	= new ArrayList<String>() {
-																		{
-																			//TODO Use Messages.
-																			add("GPS");
-																			add("Provided values");
-																		}
-																	};
-	private SelectionAdapter			_defaultSelectionListener;
+	private final static ArrayList<String>	AltitudeData	= new ArrayList<String>() {
+																				{
+																					//TODO Use Messages.
+																					add("GPS");
+																					add("Altitude");
+																				}
+																			};
+	private final static ArrayList<String>	DistanceData	= new ArrayList<String>() {
+																				{
+																					//TODO Use Messages.
+																					add("GPS");
+																					add("Provided values");
+																				}
+																			};
 
-	private final IPreferenceStore	_prefStore		= TourbookPlugin.getDefault().getPreferenceStore();
-
-	private PixelConverter				_pc;
+	private final IPreferenceStore			_prefStore		= TourbookPlugin.getDefault().getPreferenceStore();
 
 	/*
 	 * UI controls
@@ -138,8 +135,6 @@ public class Suunto9ImportPreferences extends FieldEditorPreferencePage implemen
 		//	regionalLayout.marginWidth = 5;
 		//regionalLayout.marginHeight = 5;
 
-		enableControls();
-
 	}
 
 	private void setupUI() {
@@ -153,7 +148,7 @@ public class Suunto9ImportPreferences extends FieldEditorPreferencePage implemen
 		_comboAlgorithm.select(0);
 
 		/*
-		 * fillup algorithm combo
+		 * Fill-up the distance data choices
 		 */
 		for (String distanceChoice : DistanceData) {
 			_comboDistance.add(distanceChoice);
@@ -161,29 +156,8 @@ public class Suunto9ImportPreferences extends FieldEditorPreferencePage implemen
 		_comboDistance.select(0);
 	}
 
-	private void enableControls() {
-
-		// final boolean isUseCustomFormat = _chkUseCustomFormat.getBooleanValue();
-
-		// _txtDecimalSep.setEnabled(isUseCustomFormat, _groupData);
-		// _txtGroupSep.setEnabled(isUseCustomFormat, _groupData);
-
-		// _lblExample.setEnabled(isUseCustomFormat);
-		// _lblExampleValue.setEnabled(isUseCustomFormat);
-	}
-
 	@Override
 	public void init(final IWorkbench workbench) {}
-
-	private void initUI(final Composite parent) {
-
-		_pc = new PixelConverter(parent);
-
-		_defaultSelectionListener = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {}
-		};
-	}
 
 	@Override
 	protected void performDefaults() {
@@ -195,10 +169,12 @@ public class Suunto9ImportPreferences extends FieldEditorPreferencePage implemen
 	@Override
 	public boolean performOk() {
 
-		// _prefStore.setValue(IPreferences.IS_TITLE_IMPORT_ALL,
-		// _rdoImportAll.getSelection());
+		final boolean isOK = super.performOk();
 
-		return super.performOk();
+		if (isOK) {
+			_prefStore.setValue(IPreferences.SLICE_ADJUSTMENT_VALUE, AltitudeData.get(_comboAlgorithm.getSelectionIndex()));
+		}
+		return isOK;
 	}
 
 }

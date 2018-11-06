@@ -7,20 +7,24 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
+import net.tourbook.device.polar.hrm.IPreferences;
 
 public class SuuntoJsonProcessor {
 
-	private final float				Kelvin	= 273.1499938964845f;
+	private final float				Kelvin		= 273.1499938964845f;
 	private ArrayList<TimeData>	_sampleList;
 	private int							_lapCounter;
+	final IPreferenceStore			_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
 
 	public TourData ImportActivity(	String jsonFileContent,
 												TourData activityToReUse,
@@ -122,13 +126,18 @@ public class SuuntoJsonProcessor {
 			wasDataPopulated |= TryAddCadenceData(new JSONObject(currentSampleData), timeData);
 
 			// Barometric Altitude
-			//wasDataPopulated |= TryAddAltitudeData(new JSONObject(currentSampleData), timeData);
+			if (_prefStore.getInt(IPreferences.ALTITUDE_DATA) == 1) {
+				wasDataPopulated |= TryAddAltitudeData(new JSONObject(currentSampleData), timeData);
+			}
 
 			// Power
 			wasDataPopulated |= TryAddPowerData(new JSONObject(currentSampleData), timeData);
 
 			// Distance
-			wasDataPopulated |= TryAddDistanceData(new JSONObject(currentSampleData), timeData);
+			//TODO, will that actually change the end mileage ? TO TEST
+			if (_prefStore.getInt(IPreferences.ALTITUDE_DATA) == 1) {
+				wasDataPopulated |= TryAddDistanceData(new JSONObject(currentSampleData), timeData);
+			}
 
 			// Temperature
 			wasDataPopulated |= TryAddTemperatureData(new JSONObject(currentSampleData), timeData);
@@ -214,7 +223,11 @@ public class SuuntoJsonProcessor {
 
 			timeData.latitude = (latitude * 180) / Math.PI;
 			timeData.longitude = (longitude * 180) / Math.PI;
-			timeData.absoluteAltitude = altitude;
+
+			// GPS altitude
+			if (_prefStore.getInt(IPreferences.ALTITUDE_DATA) == 0) {
+				timeData.absoluteAltitude = altitude;
+			}
 
 			return true;
 		} catch (Exception e) {}
