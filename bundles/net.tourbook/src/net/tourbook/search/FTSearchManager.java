@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,45 +15,38 @@
  *******************************************************************************/
 package net.tourbook.search;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import net.tourbook.Messages;
-import net.tourbook.common.util.StatusUtil;
-import net.tourbook.common.util.Util;
-import net.tourbook.data.TourData;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.UI;
-
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
+import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.analysis.util.CharArraySet;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.FieldType;
-import org.apache.lucene.document.IntField;
-import org.apache.lucene.document.LongField;
+import org.apache.lucene.document.IntPoint;
+import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.document.TextField;
-import org.apache.lucene.index.AtomicReader;
-import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.FieldInfo.IndexOptions;
-import org.apache.lucene.index.Fields;
+import org.apache.lucene.index.DocValuesType;
+import org.apache.lucene.index.IndexFormatTooOldException;
+import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -61,31 +54,26 @@ import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.MultiFields;
 import org.apache.lucene.index.MultiReader;
-import org.apache.lucene.index.Terms;
-import org.apache.lucene.index.TermsEnum;
-import org.apache.lucene.queries.BooleanFilter;
-import org.apache.lucene.queries.FilterClause;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.search.BooleanClause.Occur;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.BooleanQuery.Builder;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.NumericRangeFilter;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.SortField.Type;
 import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.search.postingshighlight.PostingsHighlighter;
 import org.apache.lucene.search.suggest.InputIterator;
 import org.apache.lucene.search.suggest.Lookup;
 import org.apache.lucene.search.suggest.Lookup.LookupResult;
 import org.apache.lucene.search.suggest.analyzing.AnalyzingInfixSuggester;
-import org.apache.lucene.search.suggest.analyzing.AnalyzingSuggester;
 import org.apache.lucene.search.suggest.analyzing.FreeTextSuggester;
+import org.apache.lucene.search.uhighlight.UnifiedHighlighter;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.Version;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
@@ -95,1313 +83,1360 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 
+import net.tourbook.Messages;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.Util;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourWayPoint;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.tour.TourLogManager;
+import net.tourbook.ui.UI;
+
 public class FTSearchManager {
 
-	private static final Version			LUCENE_VERSION				= Version.LUCENE_4_10_1;
-
-	private static final String				LUCENE_INDEX_FOLDER_NAME	= "lucene-index";					//$NON-NLS-1$
-
-	private static final String				SEARCH_FIELD_DESCRIPTION	= "description";					//$NON-NLS-1$
-	private static final String				SEARCH_FIELD_DOC_SOURCE		= "docSource";						//$NON-NLS-1$
-	private static final String				SEARCH_FIELD_MARKER_ID		= "markerID";						//$NON-NLS-1$
-	private static final String				SEARCH_FIELD_TITLE			= "title";							//$NON-NLS-1$
-	private static final String				SEARCH_FIELD_TOUR_ID		= "tourID";						//$NON-NLS-1$
-	private static final String				SEARCH_FIELD_TIME			= "time";							//$NON-NLS-1$
-
-	private static final String				LOG_CREATE_INDEX			= "Created ft index: %s\t %d ms";	//$NON-NLS-1$
+   private static final String             LUCENE_INDEX_FOLDER_NAME      = "lucene-index";                 //$NON-NLS-1$
+
+   private static final String             SEARCH_FIELD_DESCRIPTION      = "description";                  //$NON-NLS-1$
+   private static final String             SEARCH_FIELD_DOC_SOURCE_INDEX = "docSource_Index";              //$NON-NLS-1$
+   private static final String             SEARCH_FIELD_DOC_SOURCE_SAVED = "docSource_Saved";              //$NON-NLS-1$
+   private static final String             SEARCH_FIELD_MARKER_ID        = "markerID";                     //$NON-NLS-1$
+   private static final String             SEARCH_FIELD_TITLE            = "title";                        //$NON-NLS-1$
+   private static final String             SEARCH_FIELD_TOUR_ID          = "tourID";                       //$NON-NLS-1$
+   private static final String             SEARCH_FIELD_TIME             = "time";                         //$NON-NLS-1$
+   private static final String             SEARCH_FIELD_WAYPOINT_ID      = "wayPointID";                   //$NON-NLS-1$
+
+   private static final String             LOG_CREATE_INDEX              = "Created ft index: %s\t %d ms"; //$NON-NLS-1$
 
-	static final int						DOC_SOURCE_TOUR				= 1;
-	static final int						DOC_SOURCE_TOUR_MARKER		= 2;
-	static final int						DOC_SOURCE_WAY_POINT		= 3;
+   static final int                        DOC_SOURCE_TOUR               = 1;
+   static final int                        DOC_SOURCE_TOUR_MARKER        = 2;
+   static final int                        DOC_SOURCE_WAY_POINT          = 3;
 
-	private static final List<LookupResult>	_emptyProposal				= new ArrayList<LookupResult>();
+   private static final List<LookupResult> _emptyProposal                = new ArrayList<>();
 
-	private static Lookup					_suggester;
-	private static IndexReader				_indexReader;
-	private static IndexSearcher			_indexSearcher;
-	private static FSDirectory				_infixStore;
+   private static Lookup                   _suggester;
 
-	private static TopDocs					_topDocs;
-	private static String					_topDocsSearchText;
+   private static IndexReader              _indexReader;
+   private static IndexSearcher            _indexSearcher;
+   private static FSDirectory              _infixStore;
 
-	private static boolean					_isShowContentAll;
-	private static boolean					_isShowContentMarker;
-	private static boolean					_isShowContentTour;
-	private static boolean					_isShowContentWaypoint;
-	private static boolean					_isSortDateAscending		= false;							// -> sort descending
+   private static TopDocs                  _topDocs;
+   private static String                   _topDocsSearchText;
 
-	// configure field with offsets at index time
-//	private static final FieldType			_longSearchField			= new FieldType(LongField.TYPE_STORED);
-//	private static final FieldType			_textSearchField			= new FieldType(TextField.TYPE_STORED);
-	{
-		// _longSearchField.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
-		// _textSearchField.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
-	}
+   private static boolean                  _isShowContentAll;
+   private static boolean                  _isShowContentMarker;
+   private static boolean                  _isShowContentTour;
+   private static boolean                  _isShowContentWaypoint;
+   private static boolean                  _isSortDateAscending          = false;                          // -> sort descending
 
-	/**
-	 * Implements {@link InputIterator} from multiple stored fields.
-	 * <p>
-	 * Copied and modified from
-	 * {@link org.apache.lucene.search.suggest.DocumentDictionary.DocumentInputIterator.DocumentInputIterator}
-	 */
-	private static class DocumentInputIterator implements InputIterator {
+   private static FieldType                fieldType_Int;
+   private static FieldType                fieldType_Long;
 
-		private IndexReader			__indexReader;
-		private final Bits			__liveDocs;
+   static {
 
-		private final int			__docCount;
-		private final int			__fieldCount;
+      fieldType_Int = new FieldType(TextField.TYPE_STORED);
+      fieldType_Int.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
+      fieldType_Int.setDocValuesType(DocValuesType.NUMERIC);
+      fieldType_Int.freeze();
 
-		private final Set<String>	__fieldsToLoad;
-		private ArrayList<String>	__fieldNames;
+      fieldType_Long = new FieldType(TextField.TYPE_STORED);
+      fieldType_Long.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
+      fieldType_Long.setDocValuesType(DocValuesType.NUMERIC);
+      fieldType_Long.freeze();
+   }
 
-		private int					__currentDocId		= -1;
-		private int					__currentFieldIndex	= -1;
-		private Document			__currentDoc;
+   /**
+    * Implements {@link InputIterator} from multiple stored fields.
+    * <p>
+    * Copied and modified from
+    * {@link org.apache.lucene.search.suggest.DocumentDictionary.DocumentInputIterator.DocumentInputIterator}
+    */
+   private static class DocumentInputIterator implements InputIterator {
 
-		/**
-		 * Creates an iterator over fields from the lucene index.
-		 * 
-		 * @param indexReader
-		 */
-		public DocumentInputIterator(final IndexReader indexReader) throws IOException {
+      private IndexReader       __indexReader;
+      private final Bits        __liveDocs;
 
-			__indexReader = indexReader;
-			__docCount = __indexReader.maxDoc() - 1;
+      private final int         __docCount;
+      private final int         __fieldCount;
 
-			__liveDocs = (__indexReader.leaves().size() > 0) ? MultiFields.getLiveDocs(__indexReader) : null;
+      private final Set<String> __fieldsToLoad;
+      private ArrayList<String> __fieldNames;
 
-			__fieldsToLoad = new HashSet<>();
-			__fieldsToLoad.add(SEARCH_FIELD_TITLE);
-			__fieldsToLoad.add(SEARCH_FIELD_DESCRIPTION);
+      private int               __currentDocId      = -1;
+      private int               __currentFieldIndex = -1;
+      private Document          __currentDoc;
 
-			__fieldNames = new ArrayList<String>(__fieldsToLoad);
-			__fieldCount = __fieldNames.size();
-		}
+      /**
+       * Creates an iterator over fields from the lucene index.
+       *
+       * @param indexReader
+       */
+      public DocumentInputIterator(final IndexReader indexReader) throws IOException {
 
-		@Override
-		public Set<BytesRef> contexts() {
-			return null;
-		}
+         __indexReader = indexReader;
+         __docCount = __indexReader.maxDoc() - 1;
 
-		@Override
-		public Comparator<BytesRef> getComparator() {
-			return null;
-		}
+         __liveDocs = (__indexReader.leaves().size() > 0) ? MultiFields.getLiveDocs(__indexReader) : null;
 
-		@Override
-		public boolean hasContexts() {
-			return false;
-		}
+         __fieldsToLoad = new HashSet<>();
+         __fieldsToLoad.add(SEARCH_FIELD_TITLE);
+         __fieldsToLoad.add(SEARCH_FIELD_DESCRIPTION);
 
-		@Override
-		public boolean hasPayloads() {
-			return false;
-		}
+         __fieldNames = new ArrayList<>(__fieldsToLoad);
+         __fieldCount = __fieldNames.size();
+      }
 
-		@Override
-		public BytesRef next() throws IOException {
+      @Override
+      public Set<BytesRef> contexts() {
+         return null;
+      }
 
-			while (__currentDocId < __docCount) {
+      @Override
+      public boolean hasContexts() {
+         return false;
+      }
 
-				if (__currentFieldIndex == -1) {
+      @Override
+      public boolean hasPayloads() {
+         return false;
+      }
 
-					// get a new document
+      @Override
+      public BytesRef next() throws IOException {
 
-					__currentDocId++;
+         while (__currentDocId < __docCount) {
 
-					if (__liveDocs != null && !__liveDocs.get(__currentDocId)) {
-						continue;
-					}
+            if (__currentFieldIndex == -1) {
 
-					__currentDoc = __indexReader.document(__currentDocId, __fieldsToLoad);
-				}
+               // get a new document
 
-				while (__currentFieldIndex < __fieldCount - 1) {
+               __currentDocId++;
 
-					__currentFieldIndex++;
+               if (__liveDocs != null && !__liveDocs.get(__currentDocId)) {
+                  continue;
+               }
 
-					final String fieldName = __fieldNames.get(__currentFieldIndex);
+               __currentDoc = __indexReader.document(__currentDocId, __fieldsToLoad);
+            }
 
-					final IndexableField fieldVal = __currentDoc.getField(fieldName);
+            while (__currentFieldIndex < __fieldCount - 1) {
 
-					if (fieldVal == null || (fieldVal.binaryValue() == null && fieldVal.stringValue() == null)) {
-						continue;
-					}
+               __currentFieldIndex++;
 
-					final BytesRef tempFieldValue = fieldVal.stringValue() != null //
-							? new BytesRef(fieldVal.stringValue())
-							: fieldVal.binaryValue();
+               final String fieldName = __fieldNames.get(__currentFieldIndex);
 
-					return tempFieldValue;
-				}
+               final IndexableField fieldVal = __currentDoc.getField(fieldName);
 
-				__currentFieldIndex = -1;
-			}
+               if (fieldVal == null || (fieldVal.binaryValue() == null && fieldVal.stringValue() == null)) {
+                  continue;
+               }
 
-			return null;
-		}
+               final BytesRef tempFieldValue = fieldVal.stringValue() != null //
+                     ? new BytesRef(fieldVal.stringValue())
+                     : fieldVal.binaryValue();
 
-		@Override
-		public BytesRef payload() {
-			return null;
-		}
+               return tempFieldValue;
+            }
 
-		@Override
-		public long weight() {
-			return 1;
-		}
-	}
+            __currentFieldIndex = -1;
+         }
 
-	public static class MyPostingsHighlighter extends PostingsHighlighter {
+         return null;
+      }
 
-		private MyPostingsHighlighter() {
-			super();
-		}
+      @Override
+      public BytesRef payload() {
+         return null;
+      }
 
-		@Override
-		protected Analyzer getIndexAnalyzer(final String field) {
-			return getAnalyzer();
-		}
-	}
+      @Override
+      public long weight() {
+         return 1;
+      }
+   }
 
-	public static void close() {
+   private static class FieldWithOptions_Int extends Field {
 
-		if (_suggester instanceof AnalyzingInfixSuggester) {
-			try {
-				final AnalyzingInfixSuggester suggester = (AnalyzingInfixSuggester) _suggester;
-				suggester.close();
-			} catch (final IOException e) {
-				StatusUtil.showStatus(e);
-			}
-		}
-		_suggester = null;
+      public FieldWithOptions_Int(final String fieldName, final FieldType fieldType, final int value) {
 
-		if (_indexReader != null) {
+         super(fieldName, fieldType);
 
-			try {
+         fieldsData = Integer.valueOf(value);
+      }
+   }
 
-				_indexReader.close();
-				_indexReader = null;
+   private static class FieldWithOptions_Long extends Field {
 
-			} catch (final IOException e) {
-				StatusUtil.showStatus(e);
-			}
-		}
+      public FieldWithOptions_Long(final String fieldName, final FieldType fieldType, final long value) {
 
-		if (_infixStore != null) {
-			_infixStore.close();
-			_infixStore = null;
-		}
+         super(fieldName, fieldType);
 
-	}
+         fieldsData = Long.valueOf(value);
+      }
+   }
 
-	private static void createDoc_Marker(	final IndexWriter indexWriter,
-											final long markerId,
-											final long tourId,
-											final String title,
-											final String description,
-											final long time) throws IOException {
+   public static void closeIndexReaderSuggester() {
 
-//		private static final FieldType			_longSearchField			= new FieldType(LongField.TYPE_STORED);
-//		private static final FieldType			_textSearchField			= new FieldType(TextField.TYPE_STORED);
-		// {
-		// _longSearchField.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
-		// _textSearchField.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
-		// }
+      if (_suggester instanceof AnalyzingInfixSuggester) {
+         try {
+            final AnalyzingInfixSuggester suggester = (AnalyzingInfixSuggester) _suggester;
+            suggester.close();
+         } catch (final IOException e) {
+            StatusUtil.showStatus(e);
+         }
+      }
+      _suggester = null;
 
-		final Document doc = new Document();
+      if (_indexReader != null) {
 
-		doc.add(new IntField(SEARCH_FIELD_DOC_SOURCE, DOC_SOURCE_TOUR_MARKER, Store.YES));
+         try {
 
-		doc.add(new LongField(SEARCH_FIELD_MARKER_ID, markerId, Store.YES));
-		doc.add(new LongField(SEARCH_FIELD_TOUR_ID, tourId, Store.YES));
-		doc.add(new LongField(SEARCH_FIELD_TIME, time, createFieldType_Long()));
+            _indexReader.close();
+            _indexReader = null;
 
-		if (title != null) {
-			doc.add(new Field(SEARCH_FIELD_TITLE, title, createFieldType_Text()));
-		}
+         } catch (final IOException e) {
+            StatusUtil.showStatus(e);
+         }
+      }
 
-		if (description != null) {
-			doc.add(new Field(SEARCH_FIELD_DESCRIPTION, description, createFieldType_Text()));
-		}
+      if (_infixStore != null) {
+         try {
+            _infixStore.close();
+         } catch (final IOException e) {
+            StatusUtil.showStatus(e);
+         }
+         _infixStore = null;
+      }
+   }
 
-		indexWriter.addDocument(doc);
-	}
+   private static void closeIndexWriterAndStore(final FSDirectory indexStore, final IndexWriter indexWriter) {
 
-	private static void createDoc_Tour(	final IndexWriter indexWriter,
-										final long tourId,
-										final String title,
-										final String description,
-										final long time) throws IOException {
+      if (indexWriter != null) {
+         try {
+            indexWriter.close();
+         } catch (final IOException e) {
+            StatusUtil.showStatus(e);
+         }
+      }
 
-		final Document doc = new Document();
+      if (indexStore != null) {
+         try {
+            indexStore.close();
+         } catch (final IOException e) {
+            StatusUtil.showStatus(e);
+         }
+      }
+   }
 
-		doc.add(new IntField(SEARCH_FIELD_DOC_SOURCE, DOC_SOURCE_TOUR, Store.YES));
+   private static Document createDoc_Marker(final long markerId,
+                                            final long tourId,
+                                            final String title,
+                                            final String description,
+                                            final long time) throws IOException {
 
-		doc.add(new LongField(SEARCH_FIELD_TOUR_ID, tourId, Store.YES));
-		doc.add(new LongField(SEARCH_FIELD_TIME, time, createFieldType_Long()));
+      final Document doc = new Document();
 
-		if (title != null) {
-			doc.add(new Field(SEARCH_FIELD_TITLE, title, createFieldType_Text()));
-		}
+      doc.add(new IntPoint(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_TOUR_MARKER));
+      doc.add(new LongPoint(SEARCH_FIELD_TOUR_ID, tourId));
 
-		if (description != null) {
-			doc.add(new Field(SEARCH_FIELD_DESCRIPTION, description, createFieldType_Text()));
-		}
+      doc.add(createField_WithIndexOptions_Int(SEARCH_FIELD_DOC_SOURCE_SAVED, DOC_SOURCE_TOUR_MARKER));
+      doc.add(createField_WithIndexOptions_Long(SEARCH_FIELD_MARKER_ID, markerId));
+      doc.add(createField_WithIndexOptions_Long(SEARCH_FIELD_TOUR_ID, tourId));
+      doc.add(createField_WithIndexOptions_Long(SEARCH_FIELD_TIME, time));
 
-		indexWriter.addDocument(doc);
-	}
+      if (title != null) {
+         doc.add(new Field(SEARCH_FIELD_TITLE, title, createFieldType_Text()));
+      }
 
-	private static void createDoc_WayPoint(	final IndexWriter indexWriter,
-											final long markerId,
-											final long tourId,
-											final String title,
-											final String description,
-											final long time) throws IOException {
+      if (description != null) {
+         doc.add(new Field(SEARCH_FIELD_DESCRIPTION, description, createFieldType_Text()));
+      }
 
-		final Document doc = new Document();
+      return doc;
+   }
 
-		doc.add(new IntField(SEARCH_FIELD_DOC_SOURCE, DOC_SOURCE_WAY_POINT, Store.YES));
+   private static Document createDoc_Tour(final long tourId,
+                                          final String title,
+                                          final String description,
+                                          final long time) throws IOException {
 
-		doc.add(new LongField(SEARCH_FIELD_MARKER_ID, markerId, Store.YES));
-		doc.add(new LongField(SEARCH_FIELD_TOUR_ID, tourId, Store.YES));
+      final Document doc = new Document();
 
-		if (time != 0) {
-			doc.add(new LongField(SEARCH_FIELD_TIME, time, createFieldType_Long()));
-		}
+      doc.add(new IntPoint(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_TOUR));
+      doc.add(new LongPoint(SEARCH_FIELD_TOUR_ID, tourId));
 
-		if (title != null) {
-			doc.add(new Field(SEARCH_FIELD_TITLE, title, createFieldType_Text()));
-		}
+      doc.add(createField_WithIndexOptions_Int(SEARCH_FIELD_DOC_SOURCE_SAVED, DOC_SOURCE_TOUR));
+      doc.add(createField_WithIndexOptions_Long(SEARCH_FIELD_TOUR_ID, tourId));
+      doc.add(createField_WithIndexOptions_Long(SEARCH_FIELD_TIME, time));
 
-		if (description != null) {
-			doc.add(new Field(SEARCH_FIELD_DESCRIPTION, description, createFieldType_Text()));
-		}
+      if (title != null) {
+         doc.add(new Field(SEARCH_FIELD_TITLE, title, createFieldType_Text()));
+      }
 
-		indexWriter.addDocument(doc);
-	}
+      if (description != null) {
+         doc.add(new Field(SEARCH_FIELD_DESCRIPTION, description, createFieldType_Text()));
+      }
 
-	private static FieldType createFieldType_Long() {
+      return doc;
+   }
 
-		final FieldType _longSearchField = new FieldType(LongField.TYPE_STORED);
-		_longSearchField.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
+   private static Document createDoc_WayPoint(final long dbWayPointId,
+                                              final long tourId,
+                                              final String title,
+                                              final String description,
+                                              final long time) throws IOException {
 
-		return _longSearchField;
-	}
+      final Document doc = new Document();
 
-	/**
-	 * This field must be created for each document otherwise the highlighter will throw the
-	 * exception
-	 * <p>
-	 * <b>field 'description' was indexed without offsets, cannot highlight</b>
-	 * 
-	 * @return
-	 */
-	private static FieldType createFieldType_Text() {
+      doc.add(new IntPoint(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_WAY_POINT));
+      doc.add(new LongPoint(SEARCH_FIELD_TOUR_ID, tourId));
 
-		final FieldType _textSearchField = new FieldType(TextField.TYPE_STORED);
-		_textSearchField.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
+      doc.add(createField_WithIndexOptions_Int(SEARCH_FIELD_DOC_SOURCE_SAVED, DOC_SOURCE_WAY_POINT));
+      doc.add(createField_WithIndexOptions_Long(SEARCH_FIELD_TOUR_ID, tourId));
+      doc.add(createField_WithIndexOptions_Long(SEARCH_FIELD_WAYPOINT_ID, dbWayPointId));
 
-		return _textSearchField;
-	}
+      if (time != 0) {
+         doc.add(createField_WithIndexOptions_Long(SEARCH_FIELD_TIME, time));
+      }
 
-	private static void createStores_TourData(final Connection conn, final IProgressMonitor monitor)
-			throws SQLException {
+      if (title != null) {
+         doc.add(new Field(SEARCH_FIELD_TITLE, title, createFieldType_Text()));
+      }
 
-		final long start = System.currentTimeMillis();
+      if (description != null) {
+         doc.add(new Field(SEARCH_FIELD_DESCRIPTION, description, createFieldType_Text()));
+      }
 
-		FSDirectory indexStore = null;
-		IndexWriter indexWriter = null;
-		PreparedStatement stmt = null;
+      return doc;
+   }
 
-		final String tableName = TourDatabase.TABLE_TOUR_DATA;
+   private static IndexableField createField_WithIndexOptions_Int(final String fieldName, final int value) {
 
-		try {
+      return new FieldWithOptions_Int(fieldName, fieldType_Int, value);
+   }
 
-			indexStore = openStore(tableName);
-			indexWriter = new IndexWriter(indexStore, getIndexWriterConfig());
+   private static IndexableField createField_WithIndexOptions_Long(final String fieldName, final long value) {
 
-			/*
-			 * Get sql data
-			 */
-			final String sql = "" // //$NON-NLS-1$
-					//
-					+ "SELECT" //$NON-NLS-1$
-					//
-					+ " tourId," //				1 //$NON-NLS-1$
-					+ " tourTitle," //			2 //$NON-NLS-1$
-					+ " tourDescription," //	3 //$NON-NLS-1$
-					+ " tourStartTime" //		4 //$NON-NLS-1$
-					//
-					+ (" FROM " + tableName); //$NON-NLS-1$
+      return new FieldWithOptions_Long(fieldName, fieldType_Long, value);
+   }
 
-			stmt = conn.prepareStatement(sql);
-			final ResultSet rs = stmt.executeQuery();
+   /**
+    * This field must be created for each document otherwise the highlighter will throw the
+    * exception
+    * <p>
+    * <b>field 'description' was indexed without offsets, cannot highlight</b>
+    *
+    * @return
+    */
+   private static FieldType createFieldType_Text() {
 
-			int createdDocuments = 0;
-			long lastUpdateTime = System.currentTimeMillis();
+      final FieldType fieldType = new FieldType(TextField.TYPE_STORED);
+      fieldType.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
 
-			while (rs.next()) {
+      return fieldType;
+   }
 
-				final long dbTourId = rs.getLong(1);
-				final String dbTitle = rs.getString(2);
-				final String dbDescription = rs.getString(3);
-				final Long dbTourStartTime = rs.getLong(4);
+   private static void createStores_TourData(final Connection conn, final IProgressMonitor monitor)
+         throws SQLException {
 
-				createDoc_Tour(indexWriter, dbTourId, dbTitle, dbDescription, dbTourStartTime);
+      final long start = System.currentTimeMillis();
 
-				createdDocuments++;
+      FSDirectory indexStore = null;
+      IndexWriter indexWriter = null;
+      PreparedStatement stmt = null;
 
-				/*
-				 * Update monitor every 1/20 seconds
-				 */
-				final long now = System.currentTimeMillis();
+      final String tableName = TourDatabase.TABLE_TOUR_DATA;
 
-				if (now > lastUpdateTime + 50) {
-					lastUpdateTime = now;
-					monitor.subTask(NLS.bind(Messages.Search_Manager_CreateFTIndex, createdDocuments));
-				}
-			}
+      try {
 
-		} catch (final IOException e) {
-			StatusUtil.showStatus(e);
-		} finally {
+         indexStore = openStore(tableName);
+         indexWriter = getIndexWriter(indexStore);
 
-			if (indexWriter != null) {
-				try {
-					indexWriter.close();
-				} catch (final IOException e) {
-					StatusUtil.showStatus(e);
-				}
-			}
+         /*
+          * Get sql data
+          */
+         final String sql = "" // //$NON-NLS-1$
+               //
+               + "SELECT" //$NON-NLS-1$
+               //
+               + " tourId," //				1 //$NON-NLS-1$
+               + " tourTitle," //			2 //$NON-NLS-1$
+               + " tourDescription," //	3 //$NON-NLS-1$
+               + " tourStartTime" //		4 //$NON-NLS-1$
+               //
+               + (" FROM " + tableName); //$NON-NLS-1$
 
-			if (indexStore != null) {
-				indexStore.close();
-			}
+         stmt = conn.prepareStatement(sql);
+         final ResultSet rs = stmt.executeQuery();
 
-			Util.closeSql(stmt);
+         int createdDocuments = 0;
+         long lastUpdateTime = System.currentTimeMillis();
 
-			logCreateIndex(tableName, start);
-		}
-	}
+         while (rs.next()) {
 
-	private static void createStores_TourMarker(final Connection conn, final IProgressMonitor monitor)
-			throws SQLException {
+            final long dbTourId = rs.getLong(1);
+            final String dbTitle = rs.getString(2);
+            final String dbDescription = rs.getString(3);
+            final Long dbTourStartTime = rs.getLong(4);
 
-		final long start = System.currentTimeMillis();
+            final Document tourDoc = createDoc_Tour(dbTourId, dbTitle, dbDescription, dbTourStartTime);
+            indexWriter.addDocument(tourDoc);
 
-		FSDirectory indexStore = null;
-		IndexWriter indexWriter = null;
-		PreparedStatement stmt = null;
+            createdDocuments++;
 
-		final String tableName = TourDatabase.TABLE_TOUR_MARKER;
+            /*
+             * Update monitor every 1/20 seconds
+             */
+            final long now = System.currentTimeMillis();
 
-		try {
+            if (now > lastUpdateTime + 50) {
+               lastUpdateTime = now;
+               monitor.subTask(NLS.bind(Messages.Search_Manager_CreateFTIndex, createdDocuments));
+            }
+         }
 
-			indexStore = openStore(tableName);
-			indexWriter = new IndexWriter(indexStore, getIndexWriterConfig());
+      } catch (final IOException e) {
+         StatusUtil.showStatus(e);
+      } finally {
 
-			/*
-			 * Get sql data
-			 */
-			final String sql = "" // //$NON-NLS-1$
-					//
-					+ "SELECT" //$NON-NLS-1$
-					//
-					+ " markerId," //						1 //$NON-NLS-1$
-					+ (TourDatabase.KEY_TOUR + ",") //		2 //$NON-NLS-1$
-					+ " label," //							3 //$NON-NLS-1$
-					+ " description," //					4 //$NON-NLS-1$
-					+ " tourTime" //						5 //$NON-NLS-1$
-					//
-					+ (" FROM " + tableName); //$NON-NLS-1$
+         closeIndexWriterAndStore(indexStore, indexWriter);
 
-			stmt = conn.prepareStatement(sql);
-			final ResultSet rs = stmt.executeQuery();
+         Util.closeSql(stmt);
 
-			int createdDocuments = 0;
-			long lastUpdateTime = System.currentTimeMillis();
+         logCreateIndex(tableName, start);
+      }
+   }
 
-			while (rs.next()) {
+   private static void createStores_TourMarker(final Connection conn, final IProgressMonitor monitor)
+         throws SQLException {
 
-				final long dbMarkerId = rs.getLong(1);
-				final long dbTourId = rs.getLong(2);
-				final String dbLabel = rs.getString(3);
-				final String dbDescription = rs.getString(4);
-				final long dbTourTime = rs.getLong(5);
+      final long start = System.currentTimeMillis();
 
-				createDoc_Marker(indexWriter, dbMarkerId, dbTourId, dbLabel, dbDescription, dbTourTime);
+      FSDirectory indexStore = null;
+      IndexWriter indexWriter = null;
+      PreparedStatement stmt = null;
 
-				createdDocuments++;
+      final String tableName = TourDatabase.TABLE_TOUR_MARKER;
 
-				/*
-				 * Update monitor every 1/20 seconds
-				 */
-				final long now = System.currentTimeMillis();
+      try {
 
-				if (now > lastUpdateTime + 50) {
-					lastUpdateTime = now;
-					monitor.subTask(NLS.bind(Messages.Search_Manager_CreateFTIndex, createdDocuments));
-				}
-			}
+         indexStore = openStore(tableName);
+         indexWriter = getIndexWriter(indexStore);
 
-		} catch (final IOException e) {
-			StatusUtil.showStatus(e);
-		} finally {
+         /*
+          * Get sql data
+          */
+         final String sql = "" // //$NON-NLS-1$
+               //
+               + "SELECT" //$NON-NLS-1$
+               //
+               + " markerId," //					     	1 //$NON-NLS-1$
+               + (TourDatabase.KEY_TOUR + ",") //  2 //$NON-NLS-1$
+               + " label," //                      3 //$NON-NLS-1$
+               + " description," //                4 //$NON-NLS-1$
+               + " tourTime" //                    5 //$NON-NLS-1$
+               //
+               + (" FROM " + tableName); //$NON-NLS-1$
 
-			if (indexWriter != null) {
-				try {
-					indexWriter.close();
-				} catch (final IOException e) {
-					StatusUtil.showStatus(e);
-				}
-			}
+         stmt = conn.prepareStatement(sql);
+         final ResultSet rs = stmt.executeQuery();
 
-			if (indexStore != null) {
-				indexStore.close();
-			}
+         int createdDocuments = 0;
+         long lastUpdateTime = System.currentTimeMillis();
 
-			Util.closeSql(stmt);
+         while (rs.next()) {
 
-			logCreateIndex(tableName, start);
-		}
-	}
+            final long dbMarkerId = rs.getLong(1);
+            final long dbTourId = rs.getLong(2);
+            final String dbLabel = rs.getString(3);
+            final String dbDescription = rs.getString(4);
+            final long dbTourTime = rs.getLong(5);
 
-	private static void createStores_TourWayPoint(final Connection conn, final IProgressMonitor monitor)
-			throws SQLException {
+            final Document markerDoc = createDoc_Marker(dbMarkerId, dbTourId, dbLabel, dbDescription, dbTourTime);
+            indexWriter.addDocument(markerDoc);
 
-		final long start = System.currentTimeMillis();
+            createdDocuments++;
 
-		final String tableName = TourDatabase.TABLE_TOUR_WAYPOINT;
+            /*
+             * Update monitor every 1/20 seconds
+             */
+            final long now = System.currentTimeMillis();
 
-		FSDirectory indexStore = null;
-		IndexWriter indexWriter = null;
-		PreparedStatement stmt = null;
+            if (now > lastUpdateTime + 50) {
+               lastUpdateTime = now;
+               monitor.subTask(NLS.bind(Messages.Search_Manager_CreateFTIndex, createdDocuments));
+            }
+         }
 
-		try {
+      } catch (final IOException e) {
+         StatusUtil.showStatus(e);
+      } finally {
 
-			indexStore = openStore(tableName);
-			indexWriter = new IndexWriter(indexStore, getIndexWriterConfig());
+         closeIndexWriterAndStore(indexStore, indexWriter);
 
-			/*
-			 * Get sql data
-			 */
-			final String sql = "" // //$NON-NLS-1$
-					//
-					+ "SELECT" //$NON-NLS-1$
-					//
-					+ (" " + TourDatabase.ENTITY_ID_WAY_POINT + ",") //		1 //$NON-NLS-1$ //$NON-NLS-2$
-					+ (TourDatabase.KEY_TOUR + ",") //						2 //$NON-NLS-1$
-					+ " name," //											3 //$NON-NLS-1$
-					+ " description," //									4 //$NON-NLS-1$
-					+ " time" //											5 //$NON-NLS-1$
-					//
-					+ (" FROM " + tableName); //$NON-NLS-1$
+         Util.closeSql(stmt);
 
-			stmt = conn.prepareStatement(sql);
-			final ResultSet rs = stmt.executeQuery();
+         logCreateIndex(tableName, start);
+      }
+   }
 
-			int createdDocuments = 0;
-			long lastUpdateTime = System.currentTimeMillis();
+   private static void createStores_TourWayPoint(final Connection conn, final IProgressMonitor monitor)
+         throws SQLException {
 
-			while (rs.next()) {
+      final long start = System.currentTimeMillis();
 
-				final long dbMarkerId = rs.getLong(1);
-				final long dbTourId = rs.getLong(2);
-				final String dbLabel = rs.getString(3);
-				final String dbDescription = rs.getString(4);
-				final long dbTourTime = rs.getLong(5);
+      final String tableName = TourDatabase.TABLE_TOUR_WAYPOINT;
 
-				createDoc_WayPoint(indexWriter, dbMarkerId, dbTourId, dbLabel, dbDescription, dbTourTime);
+      FSDirectory indexStore = null;
+      IndexWriter indexWriter = null;
+      PreparedStatement stmt = null;
 
-				createdDocuments++;
+      try {
 
-				/*
-				 * Update monitor every 1/20 seconds
-				 */
-				final long now = System.currentTimeMillis();
+         indexStore = openStore(tableName);
+         indexWriter = getIndexWriter(indexStore);
 
-				if (now > lastUpdateTime + 50) {
-					lastUpdateTime = now;
-					monitor.subTask(NLS.bind(Messages.Search_Manager_CreateFTIndex, createdDocuments));
-				}
-			}
+         /*
+          * Get sql data
+          */
+         final String sql = "" // //$NON-NLS-1$
+               //
+               + "SELECT" //$NON-NLS-1$
+               //
+               + (" " + TourDatabase.ENTITY_ID_WAY_POINT + ",") //		1 //$NON-NLS-1$ //$NON-NLS-2$
+               + (TourDatabase.KEY_TOUR + ",") //						2 //$NON-NLS-1$
+               + " name," //											3 //$NON-NLS-1$
+               + " description," //									4 //$NON-NLS-1$
+               + " time" //											5 //$NON-NLS-1$
+               //
+               + (" FROM " + tableName); //$NON-NLS-1$
 
-		} catch (final IOException e) {
-			StatusUtil.showStatus(e);
-		} finally {
+         stmt = conn.prepareStatement(sql);
+         final ResultSet rs = stmt.executeQuery();
 
-			if (indexWriter != null) {
-				try {
-					indexWriter.close();
-				} catch (final IOException e) {
-					StatusUtil.showStatus(e);
-				}
-			}
+         int createdDocuments = 0;
+         long lastUpdateTime = System.currentTimeMillis();
 
-			if (indexStore != null) {
-				indexStore.close();
-			}
+         while (rs.next()) {
 
-			Util.closeSql(stmt);
+            final long dbWayPointId = rs.getLong(1);
+            final long dbTourId = rs.getLong(2);
+            final String dbLabel = rs.getString(3);
+            final String dbDescription = rs.getString(4);
+            final long dbTourTime = rs.getLong(5);
 
-			logCreateIndex(tableName, start);
-		}
-	}
+            final Document wayPointDoc = createDoc_WayPoint(dbWayPointId, dbTourId, dbLabel, dbDescription, dbTourTime);
+            indexWriter.addDocument(wayPointDoc);
 
-	private static InputIterator createTermIterator() throws IOException {
+            createdDocuments++;
 
-		final TermFreqIteratorListWrapper inputIterator = new TermFreqIteratorListWrapper();
+            /*
+             * Update monitor every 1/20 seconds
+             */
+            final long now = System.currentTimeMillis();
 
-		final List<AtomicReaderContext> leaves = _indexReader.leaves();
+            if (now > lastUpdateTime + 50) {
+               lastUpdateTime = now;
+               monitor.subTask(NLS.bind(Messages.Search_Manager_CreateFTIndex, createdDocuments));
+            }
+         }
 
-		for (final AtomicReaderContext readerContext : leaves) {
+      } catch (final IOException e) {
+         StatusUtil.showStatus(e);
+      } finally {
 
-			final AtomicReader reader = readerContext.reader();
-			final Fields fields = reader.fields();
+         closeIndexWriterAndStore(indexStore, indexWriter);
 
-			for (final String field : fields) {
+         Util.closeSql(stmt);
 
-				if (field.equals(SEARCH_FIELD_DESCRIPTION) || field.equals(SEARCH_FIELD_TITLE)) {
+         logCreateIndex(tableName, start);
+      }
+   }
 
-					final Terms terms = fields.terms(field);
-					final TermsEnum termsEnum = terms.iterator(null);
+   /**
+    * Remove tour from ft index when tour is deleted.
+    *
+    * @param tourId
+    */
+   public static void deleteFromIndex(final long tourId) {
 
-					inputIterator.add(termsEnum);
-				}
-			}
-		}
+      setupIndexReader();
 
-		return inputIterator;
-	}
+      FSDirectory indexStore_TourData = null;
+      FSDirectory indexStore_Marker = null;
+      FSDirectory indexStore_WayPoint = null;
 
-	private static Analyzer getAnalyzer() {
+      IndexWriter indexWriter_TourData = null;
+      IndexWriter indexWriter_Marker = null;
+      IndexWriter indexWriter_WayPoint = null;
 
-		Analyzer analyzer = null;
+      final Builder deleteDoc_TourData = new BooleanQuery.Builder();
+      final Builder deleteDoc_Marker = new BooleanQuery.Builder();
+      final Builder deleteDoc_WayPoint = new BooleanQuery.Builder();
 
-		// try {
-		//
-		// final Locale currentLocale = Locale.getDefault();
-		//
-		// // currentLocale = Locale.GERMAN;
-		// // currentLocale = Locale.ENGLISH;
-		// //
-		// // analyzer = SearchUtils.getAnalyzerForLocale(currentLocale);
-		// // analyzer = new GermanAnalyzer();
-		// // analyzer = new EnglishAnalyzer();
-		//
-		//
-		// } catch (final SQLException e) {
-		// StatusUtil.showStatus(e);
-		// }
+      try {
 
-		analyzer = new StandardAnalyzer(new CharArraySet(0, true));
+         indexStore_TourData = openStore(TourDatabase.TABLE_TOUR_DATA);
+         indexStore_Marker = openStore(TourDatabase.TABLE_TOUR_MARKER);
+         indexStore_WayPoint = openStore(TourDatabase.TABLE_TOUR_WAYPOINT);
 
-		return analyzer;
-	}
+         indexWriter_TourData = new IndexWriter(indexStore_TourData, getIndexWriterConfig());
+         indexWriter_Marker = new IndexWriter(indexStore_Marker, getIndexWriterConfig());
+         indexWriter_WayPoint = new IndexWriter(indexStore_WayPoint, getIndexWriterConfig());
 
-	private static IndexWriterConfig getIndexWriterConfig() {
+         /*
+          * Delete existing tour, marker and waypoint
+          */
+         final Query tourIdQuery = LongPoint.newExactQuery(SEARCH_FIELD_TOUR_ID, tourId);
 
-		final Analyzer analyzer = getAnalyzer();
+         deleteDoc_TourData.add(tourIdQuery, Occur.FILTER);
+         deleteDoc_Marker.add(tourIdQuery, Occur.FILTER);
+         deleteDoc_WayPoint.add(tourIdQuery, Occur.FILTER);
 
-		final IndexWriterConfig writerConfig = new IndexWriterConfig(LUCENE_VERSION, analyzer);
+         indexWriter_TourData.deleteDocuments(deleteDoc_TourData.build());
+         indexWriter_Marker.deleteDocuments(deleteDoc_Marker.build());
+         indexWriter_WayPoint.deleteDocuments(deleteDoc_WayPoint.build());
 
-		final boolean IS_DELETE_INDEX = true;
+      } catch (final IOException e) {
+         StatusUtil.showStatus(e);
+      } finally {
 
-		if (IS_DELETE_INDEX) {
-			// delete old index and create a new
-			writerConfig.setOpenMode(OpenMode.CREATE);
-		} else {
-			writerConfig.setOpenMode(OpenMode.CREATE_OR_APPEND);
-		}
+         closeIndexWriterAndStore(indexStore_TourData, indexWriter_TourData);
+         closeIndexWriterAndStore(indexStore_Marker, indexWriter_Marker);
+         closeIndexWriterAndStore(indexStore_WayPoint, indexWriter_WayPoint);
+      }
 
-		return writerConfig;
-	}
+      closeIndexReaderSuggester();
+   }
 
-	static List<LookupResult> getProposals(final String contents) {
+   private static Analyzer getAnalyzer() {
 
-		try {
+      Analyzer analyzer = null;
 
-			if (_suggester == null) {
-				setupSuggester();
-			}
+      // try {
+      //
+      // final Locale currentLocale = Locale.getDefault();
+      //
+      // // currentLocale = Locale.GERMAN;
+      // // currentLocale = Locale.ENGLISH;
+      // //
+      // // analyzer = SearchUtils.getAnalyzerForLocale(currentLocale);
+      // // analyzer = new GermanAnalyzer();
+      // // analyzer = new EnglishAnalyzer();
+      //
+      //
+      // } catch (final SQLException e) {
+      // StatusUtil.showStatus(e);
+      // }
 
-			if (_indexReader.numDocs() == 0) {
+      analyzer = new StandardAnalyzer(new CharArraySet(0, true));
 
-				// Suggester for 0 documents causes an exception
-				return null;
-			}
+      return analyzer;
+   }
 
-			final List<LookupResult> suggestions = _suggester.lookup(contents, false, 10000);
+   private static IndexWriter getIndexWriter(final FSDirectory indexStore) throws IOException {
 
-			return suggestions;
+      IndexWriter indexWriter = null;
 
-		} catch (final Exception e) {
-			return _emptyProposal;
-		}
-	}
+      try {
 
-	/**
-	 * @return Returns <code>true</code> when the ft index is created.
-	 */
-	private static boolean isIndexCreated() {
+         indexWriter = new IndexWriter(indexStore, getIndexWriterConfig());
 
-		FSDirectory indexStore = null;
-		IndexWriter indexWriter = null;
+      } catch (final IndexFormatTooOldException e) {
 
-		try {
+         // this occures when an old index exists -> delete index
 
-			indexStore = openStore(TourDatabase.TABLE_TOUR_DATA);
-			indexWriter = new IndexWriter(indexStore, getIndexWriterConfig());
+         TourLogManager.logError(e.getMessage());
 
-			// check if index is already created
-			if (indexWriter.numDocs() > 0) {
-				return true;
-			}
+         final java.nio.file.Path rootPath = getLuceneIndexRootPath();
 
-		} catch (final IOException e) {
-			StatusUtil.showStatus(e);
-		} finally {
+         TourLogManager.logInfo(String.format("Deleting lucene root folder \"%s\"", rootPath.toString()));
 
-			if (indexWriter != null) {
-				try {
-					indexWriter.close();
-				} catch (final IOException e) {
-					StatusUtil.showStatus(e);
-				}
-			}
+         Files.walkFileTree(rootPath, new SimpleFileVisitor<java.nio.file.Path>() {
 
-			if (indexStore != null) {
-				indexStore.close();
-			}
-		}
+            @Override
+            public FileVisitResult postVisitDirectory(final java.nio.file.Path dir, final IOException exc) throws IOException {
 
-		return false;
-	}
+               Files.delete(dir);
 
-	private static void logCreateIndex(final String indexStore, final long start) {
+               return FileVisitResult.CONTINUE;
+            }
 
-		StatusUtil.log(String.format(LOG_CREATE_INDEX, //
-				indexStore,
-				System.currentTimeMillis() - start));
-	}
+            @Override
+            public FileVisitResult visitFile(final java.nio.file.Path file, final BasicFileAttributes attrs) throws IOException {
 
-	private static FSDirectory openStore(final String tableName) throws IOException {
+               Files.delete(file);
 
-		final Path dbPath = new Path(TourDatabase.getDatabasePath());
+               return FileVisitResult.CONTINUE;
+            }
+         });
 
-		final IPath luceneIndexPath = dbPath.append(LUCENE_INDEX_FOLDER_NAME).append(tableName);
-		final String indexFolder = luceneIndexPath.toOSString();
+         TourLogManager.logInfo("Lucene root folder is deleted");
 
-		final FSDirectory indexDirectory = FSDirectory.open(new File(indexFolder));
+         indexWriter = new IndexWriter(indexStore, getIndexWriterConfig());
+      }
 
-		return indexDirectory;
-	}
+      return indexWriter;
+   }
 
-	/**
-	 * @param searchText
-	 * @param searchFrom
-	 * @param searchTo
-	 * @param searchResult
-	 * @return
-	 */
-	private static void search(	final String searchText,
-								final int searchFrom,
-								final int searchTo,
-								final SearchResult searchResult) {
+   private static IndexWriterConfig getIndexWriterConfig() {
 
-		try {
+      final Analyzer analyzer = getAnalyzer();
 
-			setupIndexReader();
+      final IndexWriterConfig writerConfig = new IndexWriterConfig(analyzer);
 
-			final int maxDoc = _indexReader.maxDoc();
+      final boolean IS_DELETE_INDEX = false;
 
-			if (maxDoc == 0) {
+      if (IS_DELETE_INDEX) {
 
-				// there are 0 documents
+         // delete old index and create a new
+         writerConfig.setOpenMode(OpenMode.CREATE);
 
-				searchResult.totalHits = 0;
+      } else {
 
-				return;
-			}
+         writerConfig.setOpenMode(OpenMode.CREATE_OR_APPEND);
+      }
 
-			final String[] queryFields = {
-					//
-					SEARCH_FIELD_TITLE,
-					SEARCH_FIELD_DESCRIPTION,
-			//
-			};
+      return writerConfig;
+   }
 
-			final int maxPassages[] = new int[queryFields.length];
-			Arrays.fill(maxPassages, 1);
+   /**
+    * @return Returns the path of the lucene index root folder.
+    */
+   private static java.nio.file.Path getLuceneIndexRootPath() {
 
-			final Analyzer analyzer = getAnalyzer();
+      final Path osgiDbPath = new Path(TourDatabase.getDatabasePath());
+      final IPath osgiIndexPath = osgiDbPath.append(LUCENE_INDEX_FOLDER_NAME);
 
-			final MultiFieldQueryParser queryParser = new MultiFieldQueryParser(queryFields, analyzer);
-			queryParser.setAllowLeadingWildcard(true);
+      // convert osgi to java path
+      final String indexFolderName = osgiIndexPath.toOSString();
+      final java.nio.file.Path javaRootPath = Paths.get(indexFolderName);
 
-			final Query query = queryParser.parse(searchText);
+      return javaRootPath;
+   }
 
-			if (_topDocsSearchText == null || _topDocsSearchText.equals(searchText) == false || true) {
+   static List<LookupResult> getProposals(final String contents) {
 
-				// this is a new search
+      try {
 
-				/*
-				 * Set sorting
-				 */
-				final SortField sortByTime = new SortField(SEARCH_FIELD_TIME, Type.LONG, _isSortDateAscending == false);
-				final Sort sort = new Sort(sortByTime);
+         if (_suggester == null) {
+            setupSuggester();
+         }
 
-				if (_isShowContentAll) {
+         if (_indexReader.numDocs() == 0) {
 
-					// no filtering
-					_topDocs = _indexSearcher.search(query, maxDoc, sort);
+            // Suggester for 0 documents causes an exception
+            return null;
+         }
 
-				} else {
+         final List<LookupResult> suggestions = _suggester.lookup(contents, false, 10000);
 
-					// filter by content
+         return suggestions;
 
-					final BooleanFilter searchFilter = new BooleanFilter();
+      } catch (final Exception e) {
+         return _emptyProposal;
+      }
+   }
 
-					if (_isShowContentMarker) {
+   /**
+    * @return Returns <code>true</code> when the ft index is created.
+    */
+   private static boolean isIndexCreated() {
 
-						final NumericRangeFilter<Integer> filter = NumericRangeFilter.newIntRange(
-								SEARCH_FIELD_DOC_SOURCE,
-								DOC_SOURCE_TOUR_MARKER,
-								DOC_SOURCE_TOUR_MARKER,
-								true,
-								true);
+      FSDirectory indexStore = null;
+      IndexWriter indexWriter = null;
 
-						searchFilter.add(new FilterClause(filter, Occur.SHOULD));
-					}
+      try {
 
-					if (_isShowContentTour) {
+         indexStore = openStore(TourDatabase.TABLE_TOUR_DATA);
+         indexWriter = getIndexWriter(indexStore);
 
-						final NumericRangeFilter<Integer> filter = NumericRangeFilter.newIntRange(
-								SEARCH_FIELD_DOC_SOURCE,
-								DOC_SOURCE_TOUR,
-								DOC_SOURCE_TOUR,
-								true,
-								true);
+         // check if index is already created
+         if (indexWriter.numDocs() > 0) {
+            return true;
+         }
 
-						searchFilter.add(new FilterClause(filter, Occur.SHOULD));
-					}
+      } catch (final IOException e) {
+         StatusUtil.showStatus(e);
+      } finally {
+         closeIndexWriterAndStore(indexStore, indexWriter);
+      }
 
-					if (_isShowContentWaypoint) {
+      return false;
+   }
 
-						final NumericRangeFilter<Integer> filter = NumericRangeFilter.newIntRange(
-								SEARCH_FIELD_DOC_SOURCE,
-								DOC_SOURCE_WAY_POINT,
-								DOC_SOURCE_WAY_POINT,
-								true,
-								true);
+   private static void logCreateIndex(final String indexStore, final long start) {
 
-						searchFilter.add(new FilterClause(filter, Occur.SHOULD));
-					}
+      StatusUtil.log(String.format(LOG_CREATE_INDEX, //
+            indexStore,
+            System.currentTimeMillis() - start));
+   }
 
-					_topDocs = _indexSearcher.search(query, searchFilter, maxDoc, sort);
-				}
+   private static FSDirectory openStore(final String tableName) throws IOException {
 
-				_topDocsSearchText = searchText;
-			}
+      // append table name to the root path
+      final java.nio.file.Path javaPath = getLuceneIndexRootPath().resolve(tableName);
 
-			searchResult.totalHits = _topDocs.totalHits;
+      final FSDirectory indexDirectory = FSDirectory.open(javaPath);
 
-			/**
-			 * Get doc id's only for the current page.
-			 * <p>
-			 * It is very cheap to query the doc id's but very expensive to retrieve the documents.
-			 */
-			final int docStartIndex = searchFrom;
-			int docEndIndex = searchTo;
+      return indexDirectory;
+   }
 
-			final ScoreDoc[] scoreDocs = _topDocs.scoreDocs;
-			final int scoreSize = scoreDocs.length;
+   /**
+    * @param searchText
+    * @param searchFrom
+    * @param searchTo
+    * @param searchResult
+    * @return
+    */
+   private static void search(final String searchText,
+                              final int searchFrom,
+                              final int searchTo,
+                              final SearchResult searchResult) {
 
-			if (docEndIndex >= scoreSize) {
-				docEndIndex = scoreSize - 1;
-			}
+      try {
 
-			final int resultSize = docEndIndex - docStartIndex + 1;
-			final int docids[] = new int[resultSize];
+         setupIndexReader();
 
-			for (int docIndex = 0; docIndex < resultSize; docIndex++) {
-				docids[docIndex] = scoreDocs[docStartIndex + docIndex].doc;
-			}
+         final int maxDoc = _indexReader.maxDoc();
 
-			// this can occure: field 'description' was indexed without offsets, cannot highlight
+         if (maxDoc == 0) {
 
-			final MyPostingsHighlighter highlighter = new MyPostingsHighlighter();
-			final Map<String, String[]> highlights = highlighter.highlightFields(
-					queryFields,
-					query,
-					_indexSearcher,
-					docids,
-					maxPassages);
+            // there are 0 documents
 
-			search_CreateResult(highlights, _indexReader, searchResult, docids, docStartIndex);
+            searchResult.totalHits = 0;
 
-		} catch (final Exception e) {
-			StatusUtil.showStatus(e);
-			searchResult.error = e.getMessage();
-		}
-	}
+            return;
+         }
 
-	/**
-	 * Creating the result is complicated because the highlights are listed by field and not by hit,
-	 * therefor the structure must be inverted.
-	 * 
-	 * @param highlights
-	 * @param indexReader
-	 * @param searchResult
-	 * @param docStartIndex
-	 * @param docids2
-	 * @throws IOException
-	 */
-	private static void search_CreateResult(final Map<String, String[]> highlights,
-											final IndexReader indexReader,
-											final SearchResult searchResult,
-											final int[] docids,
-											final int docStartIndex) throws IOException {
+         final String[] queryFields = {
+               //
+               SEARCH_FIELD_TITLE,
+               SEARCH_FIELD_DESCRIPTION,
+               //
+         };
 
-		if (highlights.size() == 0) {
-			return;
-		}
+         final int maxPassages[] = new int[queryFields.length];
+         Arrays.fill(maxPassages, 1);
 
-		final Set<Entry<String, String[]>> fields = highlights.entrySet();
-		Entry<String, String[]> firstHit;
-		try {
-			firstHit = fields.iterator().next();
-		} catch (final Exception e) {
-			return;
-		}
+         final Analyzer analyzer = getAnalyzer();
 
-		final int numberOfHits = firstHit.getValue().length;
+         final MultiFieldQueryParser queryParser = new MultiFieldQueryParser(queryFields, analyzer);
+         queryParser.setAllowLeadingWildcard(true);
 
-		// create result items
-		final SearchResultItem[] resultItems = new SearchResultItem[numberOfHits];
-		final ArrayList<SearchResultItem> searchResultItems = searchResult.items;
+         final Query textQuery = queryParser.parse(searchText);
 
-		for (int hitIndex = 0; hitIndex < numberOfHits; hitIndex++) {
+         if (_topDocsSearchText == null || _topDocsSearchText.equals(searchText) == false || true) {
 
-			final SearchResultItem resultItem = new SearchResultItem();
+            // this is a new search
 
-			resultItems[hitIndex] = resultItem;
+            /*
+             * Set sorting
+             */
+            final SortField sortByTime = new SortField(SEARCH_FIELD_TIME, Type.LONG, _isSortDateAscending == false);
+            final Sort sort = new Sort(sortByTime);
 
-			searchResultItems.add(resultItem);
-		}
+            if (_isShowContentAll) {
 
-		boolean isDocRead = false;
-		final Set<String> fieldsToLoad = new HashSet<String>();
-		fieldsToLoad.add(SEARCH_FIELD_DOC_SOURCE);
-		fieldsToLoad.add(SEARCH_FIELD_TOUR_ID);
-		fieldsToLoad.add(SEARCH_FIELD_MARKER_ID);
-		fieldsToLoad.add(SEARCH_FIELD_TIME);
+               // no filtering
+               _topDocs = _indexSearcher.search(textQuery, maxDoc, sort);
 
-		for (final Entry<String, String[]> field : fields) {
+            } else {
 
-			final String fieldName = field.getKey();
-			final String[] snippets = field.getValue();
+               // filter by content
 
-			for (int hitIndex = 0; hitIndex < snippets.length; hitIndex++) {
+               /*
+                * Query text/marker/waypoint with OR
+                */
+               final Builder orQueryBuilder = new BooleanQuery.Builder();
 
-				final SearchResultItem resultItem = resultItems[hitIndex];
-				final String snippet = snippets[hitIndex];
+               if (_isShowContentTour) {
 
-				switch (fieldName) {
+                  final Query query = IntPoint.newExactQuery(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_TOUR);
 
-				case SEARCH_FIELD_DESCRIPTION:
-					resultItem.description = snippet;
-					break;
+                  orQueryBuilder.add(query, Occur.SHOULD);
+               }
 
-				case SEARCH_FIELD_TITLE:
-					resultItem.title = snippet;
-					break;
-				}
+               if (_isShowContentMarker) {
 
-				if (isDocRead == false) {
+                  final Query query = IntPoint.newExactQuery(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_TOUR_MARKER);
 
-					final int docId = docids[hitIndex];
-					final Document doc = indexReader.document(docId, fieldsToLoad);
+                  orQueryBuilder.add(query, Occur.SHOULD);
+               }
 
-					resultItem.docId = docId;
-					// resultItem.score = scoreDocs[docStartIndex + hitIndex].score;
+               if (_isShowContentWaypoint) {
 
-					for (final IndexableField indexField : doc.getFields()) {
+                  final Query query = IntPoint.newExactQuery(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_WAY_POINT);
 
-						final String docFieldName = indexField.name();
+                  orQueryBuilder.add(query, Occur.SHOULD);
+               }
 
-						switch (docFieldName) {
-						case SEARCH_FIELD_DOC_SOURCE:
-							resultItem.docSource = indexField.numericValue().intValue();
-							break;
+               final BooleanQuery orQuery = orQueryBuilder.build();
 
-						case SEARCH_FIELD_TOUR_ID:
-							resultItem.tourId = indexField.stringValue();
-							break;
+               final Builder andQueryBuilder = new BooleanQuery.Builder()
 
-						case SEARCH_FIELD_MARKER_ID:
-							resultItem.markerId = indexField.stringValue();
-							break;
+                     // add search text
+                     .add(textQuery, Occur.MUST)
 
-						case SEARCH_FIELD_TIME:
-							resultItem.tourStartTime = indexField.numericValue().longValue();
-							break;
-						}
-					}
-				}
-			}
+                     // add tour text/marker/waypoint
+                     .add(orQuery, Occur.MUST)
 
-			// get doc fields only once
-			isDocRead = true;
-		}
-	}
+               ;
 
-	public static SearchResult searchByPosition(final String searchText, final int searchPosFrom, final int searchPosTo) {
+               final BooleanQuery andQuery = andQueryBuilder.build();
 
-		final SearchResult searchResult = new SearchResult();
+               _topDocs = _indexSearcher.search(andQuery, maxDoc, sort);
+            }
 
-		search(searchText, searchPosFrom, searchPosTo, searchResult);
+            _topDocsSearchText = searchText;
+         }
 
-		return searchResult;
-	}
+         searchResult.totalHits = _topDocs.totalHits;
 
-	static void setSearchOptions(	final boolean isShowContentAll,
-									final boolean isShowContentMarker,
-									final boolean isShowContentTour,
-									final boolean isShowContentWaypoint,
-									final boolean isSortDateAscending) {
+         /**
+          * Get doc id's only for the current page.
+          * <p>
+          * It is very cheap to query the doc id's but very expensive to retrieve the documents.
+          */
+         final int docStartIndex = searchFrom;
+         int docEndIndex = searchTo;
 
-		_isShowContentAll = isShowContentAll;
-		_isShowContentMarker = isShowContentMarker;
-		_isShowContentTour = isShowContentTour;
-		_isShowContentWaypoint = isShowContentWaypoint;
+         final ScoreDoc[] scoreDocs = _topDocs.scoreDocs;
+         final int scoreSize = scoreDocs.length;
 
-		_isSortDateAscending = isSortDateAscending;
-	}
+         if (docEndIndex >= scoreSize) {
+            docEndIndex = scoreSize - 1;
+         }
 
-	/**
-	 * Create FT index.
-	 * 
-	 * @param conn
-	 * @param monitor
-	 * @throws SQLException
-	 */
-	private static void setupIndex() {
+         final int resultSize = docEndIndex - docStartIndex + 1;
+         final int docids[] = new int[resultSize];
 
-		if (isIndexCreated()) {
-			return;
-		}
+         for (int docIndex = 0; docIndex < resultSize; docIndex++) {
+            docids[docIndex] = scoreDocs[docStartIndex + docIndex].doc;
+         }
 
-		Display.getDefault().syncExec(new Runnable() {
-			@Override
-			public void run() {
+         // this can occure: field 'description' was indexed without offsets, cannot highlight
 
-				try {
+         final UnifiedHighlighter highlighter = new UnifiedHighlighter(_indexSearcher, getAnalyzer());
 
-					final IRunnableWithProgress runnable = new IRunnableWithProgress() {
+         final Map<String, String[]> highlights = highlighter.highlightFields(
+               queryFields,
+               textQuery,
+               docids,
+               maxPassages);
 
-						@Override
-						public void run(final IProgressMonitor monitor) throws InvocationTargetException,
-								InterruptedException {
+         search_CreateResult(highlights, _indexReader, searchResult, docids, docStartIndex);
 
-							monitor.subTask(Messages.Database_Monitor_SetupLucene);
+      } catch (final Exception e) {
+         StatusUtil.showStatus(e);
+         searchResult.error = e.getMessage();
+      }
+   }
 
-							Connection conn = null;
+   /**
+    * Creating the result is complicated because the highlights are listed by field and not by hit,
+    * therefor the structure must be inverted.
+    *
+    * @param highlights
+    * @param indexReader
+    * @param searchResult
+    * @param docStartIndex
+    * @param docids2
+    * @throws IOException
+    */
+   private static void search_CreateResult(final Map<String, String[]> highlights,
+                                           final IndexReader indexReader,
+                                           final SearchResult searchResult,
+                                           final int[] docids,
+                                           final int docStartIndex) throws IOException {
 
-							try {
+      if (highlights.size() == 0) {
+         return;
+      }
 
-								conn = TourDatabase.getInstance().getConnection();
+      final Set<Entry<String, String[]>> fields = highlights.entrySet();
+      Entry<String, String[]> firstHit;
+      try {
+         firstHit = fields.iterator().next();
+      } catch (final Exception e) {
+         return;
+      }
 
-								createStores_TourData(conn, monitor);
-								createStores_TourMarker(conn, monitor);
-								createStores_TourWayPoint(conn, monitor);
+      final int numberOfHits = firstHit.getValue().length;
 
-							} catch (final SQLException e) {
-								UI.showSQLException(e);
-							} finally {
-								Util.closeSql(conn);
-							}
-						}
-					};
+      // create result items
+      final SearchResultItem[] resultItems = new SearchResultItem[numberOfHits];
+      final ArrayList<SearchResultItem> searchResultItems = searchResult.items;
 
-					new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(true, false, runnable);
+      for (int hitIndex = 0; hitIndex < numberOfHits; hitIndex++) {
 
-				} catch (final InvocationTargetException e) {
-					StatusUtil.log(e);
-				} catch (final InterruptedException e) {
-					StatusUtil.log(e);
-				}
-			}
-		});
-	}
+         final SearchResultItem resultItem = new SearchResultItem();
 
-	/**
-	 * Once you have a new IndexReader, it's relatively cheap to create a new IndexSearcher from it.
-	 */
-	private static void setupIndexReader() {
+         resultItems[hitIndex] = resultItem;
 
-		if (_indexReader != null) {
-			// index reader is initialized
-			return;
-		}
+         searchResultItems.add(resultItem);
+      }
 
-		setupIndex();
+      boolean isDocRead = false;
+      final Set<String> fieldsToLoad = new HashSet<>();
+      fieldsToLoad.add(SEARCH_FIELD_DOC_SOURCE_SAVED);
+      fieldsToLoad.add(SEARCH_FIELD_TOUR_ID);
+      fieldsToLoad.add(SEARCH_FIELD_MARKER_ID);
+      fieldsToLoad.add(SEARCH_FIELD_WAYPOINT_ID);
+      fieldsToLoad.add(SEARCH_FIELD_TIME);
 
-		IndexReader indexReader1 = null;
-		IndexReader indexReader2 = null;
-		IndexReader indexReader3 = null;
+      for (final Entry<String, String[]> field : fields) {
 
-		try {
+         final String fieldName = field.getKey();
+         final String[] snippets = field.getValue();
 
-			final FSDirectory tourDataIndex = openStore(TourDatabase.TABLE_TOUR_DATA);
-			final FSDirectory tourMarkerIndex = openStore(TourDatabase.TABLE_TOUR_MARKER);
-			final FSDirectory tourWayPoint = openStore(TourDatabase.TABLE_TOUR_WAYPOINT);
+         for (int hitIndex = 0; hitIndex < snippets.length; hitIndex++) {
 
-			indexReader1 = DirectoryReader.open(tourDataIndex);
-			indexReader2 = DirectoryReader.open(tourMarkerIndex);
-			indexReader3 = DirectoryReader.open(tourWayPoint);
+            final SearchResultItem resultItem = resultItems[hitIndex];
+            final String snippet = snippets[hitIndex];
 
-			_indexReader = new MultiReader(indexReader1, indexReader2, indexReader3);
+            switch (fieldName) {
 
-			_indexSearcher = new IndexSearcher(_indexReader);
+            case SEARCH_FIELD_DESCRIPTION:
+               resultItem.description = snippet;
+               break;
 
-		} catch (final Exception e) {
-			StatusUtil.showStatus(e);
-		}
-	}
+            case SEARCH_FIELD_TITLE:
+               resultItem.title = snippet;
+               break;
+            }
 
-	public static void setupSuggester() {
+            if (isDocRead == false) {
 
-		if (_suggester == null) {
+               final int docId = docids[hitIndex];
+               final Document doc = indexReader.document(docId, fieldsToLoad);
 
-			// _suggester = setupSuggester_Analyzing();
-			// _suggester = setupSuggester_AnalyzingInfix();
-			// _suggester = setupSuggester_NGramAnalyzing();
+               resultItem.docId = docId;
+               // resultItem.score = scoreDocs[docStartIndex + hitIndex].score;
 
-			_suggester = setupSuggester_FreeText();
-		}
-	}
+               for (final IndexableField indexField : doc.getFields()) {
 
-	private static Lookup setupSuggester_Analyzing() {
+                  final String docFieldName = indexField.name();
 
-		setupIndexReader();
+                  switch (docFieldName) {
+                  case SEARCH_FIELD_DOC_SOURCE_SAVED:
+                     resultItem.docSource = indexField.numericValue().intValue();
+                     break;
 
-		final Lookup suggester[] = new AnalyzingSuggester[1];
+                  case SEARCH_FIELD_TOUR_ID:
+                     resultItem.tourId = indexField.stringValue();
+                     break;
 
-		Display.getDefault().syncExec(new Runnable() {
-			@Override
-			public void run() {
+                  case SEARCH_FIELD_MARKER_ID:
+                     resultItem.markerId = indexField.stringValue();
+                     break;
 
-				BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-					@Override
-					public void run() {
+                  case SEARCH_FIELD_WAYPOINT_ID:
+                     resultItem.markerId = indexField.stringValue();
+                     break;
 
-						try {
+                  case SEARCH_FIELD_TIME:
+                     resultItem.tourStartTime = indexField.numericValue().longValue();
+                     break;
+                  }
+               }
+            }
+         }
 
-							final Analyzer queryAnalyzer = new StandardAnalyzer(new CharArraySet(0, true));
-							final InputIterator termIterator = createTermIterator();
+         // get doc fields only once
+         isDocRead = true;
+      }
+   }
 
-							suggester[0] = new AnalyzingSuggester(queryAnalyzer);
-							suggester[0].build(termIterator);
+   public static SearchResult searchByPosition(final String searchText, final int searchPosFrom, final int searchPosTo) {
 
-						} catch (final Exception e) {
-							StatusUtil.showStatus(e);
-						}
-					}
-				});
-			}
-		});
+      final SearchResult searchResult = new SearchResult();
 
-		return suggester[0];
-	}
+      search(searchText, searchPosFrom, searchPosTo, searchResult);
 
-	private static Lookup setupSuggester_AnalyzingInfix() {
+      return searchResult;
+   }
 
-		setupIndexReader();
+   static void setSearchOptions(final boolean isShowContentAll,
+                                final boolean isShowContentMarker,
+                                final boolean isShowContentTour,
+                                final boolean isShowContentWaypoint,
+                                final boolean isSortDateAscending) {
 
-		final Lookup suggester[] = new AnalyzingInfixSuggester[1];
+      _isShowContentAll = isShowContentAll;
+      _isShowContentMarker = isShowContentMarker;
+      _isShowContentTour = isShowContentTour;
+      _isShowContentWaypoint = isShowContentWaypoint;
 
-		Display.getDefault().syncExec(new Runnable() {
-			@Override
-			public void run() {
+      _isSortDateAscending = isSortDateAscending;
+   }
 
-				BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+   /**
+    * Create FT index.
+    *
+    * @param conn
+    * @param monitor
+    * @throws SQLException
+    */
+   private static void setupIndex() {
 
-					@Override
-					public void run() {
+      if (isIndexCreated()) {
+         return;
+      }
 
-						try {
+      Display.getDefault().syncExec(new Runnable() {
+         @Override
+         public void run() {
 
-							final DocumentInputIterator inputIterator = new DocumentInputIterator(_indexReader);
-							final Analyzer indexAnalyzer = new StandardAnalyzer(new CharArraySet(0, true));
-							final Analyzer queryAnalyzer = new WhitespaceAnalyzer();
+            try {
 
-							_infixStore = openStore("AnalyzingInfixSuggesterSTORE"); //$NON-NLS-1$
+               final IRunnableWithProgress runnable = new IRunnableWithProgress() {
 
-							suggester[0] = new AnalyzingInfixSuggester(
-									LUCENE_VERSION,
-									_infixStore,
-									indexAnalyzer,
-									queryAnalyzer,
-									2);
+                  @Override
+                  public void run(final IProgressMonitor monitor) throws InvocationTargetException,
+                        InterruptedException {
 
-							suggester[0].build(inputIterator);
+                     monitor.subTask(Messages.Database_Monitor_SetupLucene);
 
-						} catch (final Exception e) {
-							StatusUtil.showStatus(e);
-						}
-					}
-				});
-			}
-		});
+                     Connection conn = null;
 
-		return suggester[0];
-	}
+                     try {
 
-	private static Lookup setupSuggester_FreeText() {
+                        conn = TourDatabase.getInstance().getConnection();
 
-		setupIndexReader();
+                        createStores_TourData(conn, monitor);
+                        createStores_TourMarker(conn, monitor);
+                        createStores_TourWayPoint(conn, monitor);
 
-		final int numDocs = _indexReader.numDocs();
-		if (numDocs == 0) {
+                     } catch (final SQLException e) {
+                        UI.showSQLException(e);
+                     } finally {
+                        Util.closeSql(conn);
+                     }
+                  }
+               };
 
-			/*
-			 * Suggester for 0 documents causes an exception
-			 */
+               new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(true, false, runnable);
 
-			return null;
-		}
+            } catch (final InvocationTargetException e) {
+               StatusUtil.log(e);
+            } catch (final InterruptedException e) {
+               StatusUtil.log(e);
+            }
+         }
+      });
+   }
 
-		final Lookup suggester[] = new FreeTextSuggester[1];
+   /**
+    * Once you have a new IndexReader, it's relatively cheap to create a new IndexSearcher from it.
+    */
+   private static void setupIndexReader() {
 
-		Display.getDefault().syncExec(new Runnable() {
-			@Override
-			public void run() {
+      if (_indexReader != null) {
+         // index reader is initialized
+         return;
+      }
 
-				BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-					@Override
-					public void run() {
+      setupIndex();
 
-						try {
+      IndexReader indexReader1 = null;
+      IndexReader indexReader2 = null;
+      IndexReader indexReader3 = null;
 
-							final DocumentInputIterator inputIterator = new DocumentInputIterator(_indexReader);
+      try {
 
-//							final Analyzer queryAnalyzer = new WhitespaceAnalyzer();
-							final Analyzer queryAnalyzer = new StandardAnalyzer(new CharArraySet(0, true));
+         final FSDirectory tourDataIndex = openStore(TourDatabase.TABLE_TOUR_DATA);
+         final FSDirectory tourMarkerIndex = openStore(TourDatabase.TABLE_TOUR_MARKER);
+         final FSDirectory tourWayPoint = openStore(TourDatabase.TABLE_TOUR_WAYPOINT);
 
-							suggester[0] = new FreeTextSuggester(queryAnalyzer, queryAnalyzer, 4, (byte) 0x20);
+         indexReader1 = DirectoryReader.open(tourDataIndex);
+         indexReader2 = DirectoryReader.open(tourMarkerIndex);
+         indexReader3 = DirectoryReader.open(tourWayPoint);
 
-							try {
-								suggester[0].build(inputIterator);
-							} catch (final IllegalArgumentException e) {
+         _indexReader = new MultiReader(indexReader1, indexReader2, indexReader3);
 
-								// java.lang.IllegalArgumentException: need at least one suggestion
+         _indexSearcher = new IndexSearcher(_indexReader);
 
-								/*
-								 * This exception can occure when there are documents available but
-								 * do not contain any content which the suggester can use.
-								 */
-							}
+      } catch (final Exception e) {
+         StatusUtil.showStatus(e);
+      }
+   }
 
-						} catch (final Exception e) {
-							StatusUtil.showStatus(e);
-						}
-					}
-				});
-			}
-		});
+   public static void setupSuggester() {
 
-		return suggester[0];
-	}
+      if (_suggester == null) {
 
-	private static Lookup setupSuggester_NGramAnalyzing() {
+         // _suggester = setupSuggester_Analyzing();
+         // _suggester = setupSuggester_AnalyzingInfix();
+         // _suggester = setupSuggester_NGramAnalyzing();
 
-		setupIndexReader();
+         _suggester = setupSuggester_FreeText();
+      }
+   }
 
-		final Lookup suggester[] = new AnalyzingSuggester[1];
+   private static Lookup setupSuggester_FreeText() {
 
-		try {
+      setupIndexReader();
 
-			// static {
-			//
-			// analyzer = new Analyzer() {
-			//
-			// @Override
-//						public TokenStream tokenStream(final String fieldName, final Reader reader) {
-			//
-			// TokenStream result = new StandardTokenizer(reader);
-			//
-			// result = new StandardFilter(result);
-			// result = new LowerCaseFilter(result);
-			// result = new ISOLatin1AccentFilter(result);
-			// result = new StopFilter(result, ENGLISH_STOP_WORDS);
-			// result = new EdgeNGramTokenFilter(result, Side.FRONT, 1, 20);
-			//
-			// return result;
-			// }
-			// };
-			//
-//					autocompletionAnalyzer = new AnalyzerWrapper(Analyzer.PER_FIELD_REUSE_STRATEGY) {
-			//
-			// @Override
-			// protected Analyzer getWrappedAnalyzer(final String fieldName) {
-			// return analyzer;
-			// }
-			//
-			// @Override
-//						protected TokenStreamComponents wrapComponents(	final String fieldName,
-			// final TokenStreamComponents components) {
-			//
-//							final NGramTokenFilter filter = new NGramTokenFilter(components.getTokenStream(), 2, 100);
-			// final Tokenizer tokenizer = components.getTokenizer();
-			//
-			// return new TokenStreamComponents(tokenizer, filter);
-			// }
-			// };
-			//
-//					newInfixSuggester = new AnalyzingSuggester(autocompletionAnalyzer, analyzer);
-			// }
+      final int numDocs = _indexReader.numDocs();
+      if (numDocs == 0) {
 
-		} catch (final Exception e) {
-			StatusUtil.showStatus(e);
-		}
+         /*
+          * Suggester for 0 documents causes an exception
+          */
 
-		return suggester[0];
-	}
+         return null;
+      }
 
-	public static void updateIndex(final ArrayList<TourData> modifiedTours) {
+      final Lookup suggester[] = new FreeTextSuggester[1];
 
-		// setupIndexReader();
-		//
-		// FSDirectory indexStore = null;
-		// final PreparedStatement stmt = null;
-		// IndexWriter indexWriter = null;
-		//
-		// try {
-		//
-		// indexStore = openStore(TourDatabase.TABLE_TOUR_DATA);
-		// indexWriter = new IndexWriter(indexStore, getIndexWriterConfig());
-		//
-		// } catch (final IOException e) {
-		// StatusUtil.showStatus(e);
-		// } finally {
-		//
-		// if (indexWriter != null) {
-		// try {
-		// indexWriter.close();
-		// } catch (final IOException e) {
-		// StatusUtil.showStatus(e);
-		// }
-		// }
-		//
-		// if (indexStore != null) {
-		// indexStore.close();
-		// }
-		//
-		// Util.closeSql(stmt);
-		// }
+      Display.getDefault().syncExec(new Runnable() {
+         @Override
+         public void run() {
 
-	}
+            BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+               @Override
+               public void run() {
+
+                  try {
+
+                     final DocumentInputIterator inputIterator = new DocumentInputIterator(_indexReader);
+
+                     final Analyzer queryAnalyzer = new StandardAnalyzer(new CharArraySet(0, true));
+
+                     suggester[0] = new FreeTextSuggester(queryAnalyzer, queryAnalyzer, 4, (byte) 0x20);
+
+                     try {
+                        suggester[0].build(inputIterator);
+                     } catch (final IllegalArgumentException e) {
+
+                        // java.lang.IllegalArgumentException: need at least one suggestion
+
+                        /*
+                         * This exception can occure when there are documents available but do not
+                         * contain any content which the suggester can use.
+                         */
+                     }
+
+                  } catch (final Exception e) {
+                     StatusUtil.showStatus(e);
+                  }
+               }
+            });
+         }
+      });
+
+      return suggester[0];
+   }
+
+   /**
+    * Update fulltext search index when tours are saved. This is not very efficient because all
+    * tours and their markers/waypoints are deleted and recreated, however it is fast enought for a
+    * few thousand items otherwise it would be more complex.
+    *
+    * @param modifiedTours
+    */
+   public static void updateIndex(final ArrayList<TourData> modifiedTours) {
+
+      setupIndexReader();
+
+      FSDirectory indexStore_TourData = null;
+      FSDirectory indexStore_Marker = null;
+      FSDirectory indexStore_WayPoint = null;
+
+      IndexWriter indexWriter_TourData = null;
+      IndexWriter indexWriter_Marker = null;
+      IndexWriter indexWriter_WayPoint = null;
+
+      final Builder deleteDoc_TourData = new BooleanQuery.Builder();
+      final Builder deleteDoc_Marker = new BooleanQuery.Builder();
+      final Builder deleteDoc_WayPoint = new BooleanQuery.Builder();
+
+      final ArrayList<Document> newDoc_TourData = new ArrayList<>();
+      final ArrayList<Document> newDoc_Marker = new ArrayList<>();
+      final ArrayList<Document> newDoc_WayPoint = new ArrayList<>();
+
+      try {
+
+         indexStore_TourData = openStore(TourDatabase.TABLE_TOUR_DATA);
+         indexStore_Marker = openStore(TourDatabase.TABLE_TOUR_MARKER);
+         indexStore_WayPoint = openStore(TourDatabase.TABLE_TOUR_WAYPOINT);
+
+         indexWriter_TourData = new IndexWriter(indexStore_TourData, getIndexWriterConfig());
+         indexWriter_Marker = new IndexWriter(indexStore_Marker, getIndexWriterConfig());
+         indexWriter_WayPoint = new IndexWriter(indexStore_WayPoint, getIndexWriterConfig());
+
+         for (final TourData tourData : modifiedTours) {
+
+            final long tourId = tourData.getTourId();
+
+            /*
+             * Delete existing tour, marker and waypoint
+             */
+            final Query tourIdQuery = LongPoint.newExactQuery(SEARCH_FIELD_TOUR_ID, tourId);
+
+            deleteDoc_TourData.add(tourIdQuery, Occur.FILTER);
+            deleteDoc_Marker.add(tourIdQuery, Occur.FILTER);
+            deleteDoc_WayPoint.add(tourIdQuery, Occur.FILTER);
+
+            /*
+             * Recreate tour, marker and waypoint
+             */
+            final Document tourDoc = createDoc_Tour(tourId,
+                  tourData.getTourTitle(),
+                  tourData.getTourDescription(),
+                  tourData.getTourStartTimeMS());
+
+            newDoc_TourData.add(tourDoc);
+
+            for (final TourMarker tourMarker : tourData.getTourMarkers()) {
+
+               final Document markerDoc = createDoc_Marker(
+                     tourMarker.getMarkerId(),
+                     tourId,
+                     tourMarker.getLabel(),
+                     tourMarker.getDescription(),
+                     tourMarker.getTourTime());
+
+               newDoc_Marker.add(markerDoc);
+            }
+
+            for (final TourWayPoint wayPoint : tourData.getTourWayPoints()) {
+
+               final Document wayPointDoc = createDoc_WayPoint(
+                     wayPoint.getWayPointId(),
+                     tourId,
+                     wayPoint.getName(),
+                     wayPoint.getDescription(),
+                     wayPoint.getTime());
+
+               newDoc_WayPoint.add(wayPointDoc);
+            }
+         }
+
+         indexWriter_TourData.deleteDocuments(deleteDoc_TourData.build());
+         indexWriter_Marker.deleteDocuments(deleteDoc_Marker.build());
+         indexWriter_WayPoint.deleteDocuments(deleteDoc_WayPoint.build());
+
+         for (final Document document : newDoc_TourData) {
+            indexWriter_TourData.addDocument(document);
+         }
+         for (final Document document : newDoc_Marker) {
+            indexWriter_Marker.addDocument(document);
+         }
+         for (final Document document : newDoc_WayPoint) {
+            indexWriter_WayPoint.addDocument(document);
+         }
+
+      } catch (final IOException e) {
+         StatusUtil.showStatus(e);
+      } finally {
+
+         closeIndexWriterAndStore(indexStore_TourData, indexWriter_TourData);
+         closeIndexWriterAndStore(indexStore_Marker, indexWriter_Marker);
+         closeIndexWriterAndStore(indexStore_WayPoint, indexWriter_WayPoint);
+      }
+
+      closeIndexReaderSuggester();
+   }
 }
