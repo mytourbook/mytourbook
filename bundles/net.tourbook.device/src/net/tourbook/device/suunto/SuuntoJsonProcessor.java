@@ -17,7 +17,6 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
-import net.tourbook.device.polar.hrm.IPreferences;
 
 public class SuuntoJsonProcessor {
 
@@ -126,7 +125,7 @@ public class SuuntoJsonProcessor {
 			wasDataPopulated |= TryAddCadenceData(new JSONObject(currentSampleData), timeData);
 
 			// Barometric Altitude
-			if (_prefStore.getInt(IPreferences.ALTITUDE_DATA) == 1) {
+			if (_prefStore.getInt(IPreferences.ALTITUDE_DATA_SOURCE) == 1) {
 				wasDataPopulated |= TryAddAltitudeData(new JSONObject(currentSampleData), timeData);
 			}
 
@@ -134,8 +133,7 @@ public class SuuntoJsonProcessor {
 			wasDataPopulated |= TryAddPowerData(new JSONObject(currentSampleData), timeData);
 
 			// Distance
-			//TODO, will that actually change the end mileage ? TO TEST
-			if (_prefStore.getInt(IPreferences.ALTITUDE_DATA) == 1) {
+			if (_prefStore.getInt(IPreferences.DISTANCE_DATA_SOURCE) == 1) {
 				wasDataPopulated |= TryAddDistanceData(new JSONObject(currentSampleData), timeData);
 			}
 
@@ -225,7 +223,7 @@ public class SuuntoJsonProcessor {
 			timeData.longitude = (longitude * 180) / Math.PI;
 
 			// GPS altitude
-			if (_prefStore.getInt(IPreferences.ALTITUDE_DATA) == 0) {
+			if (_prefStore.getInt(IPreferences.ALTITUDE_DATA_SOURCE) == 0) {
 				timeData.absoluteAltitude = altitude;
 			}
 

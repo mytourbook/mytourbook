@@ -20,7 +20,6 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.device.polar.hrm.IPreferences;
 import net.tourbook.preferences.ITourbookPreferences;
 
 public class Suunto9ImportPreferences extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
@@ -29,7 +28,7 @@ public class Suunto9ImportPreferences extends FieldEditorPreferencePage implemen
 																				{
 																					//TODO Use Messages.
 																					add("GPS");
-																					add("Altitude");
+																					add("Barometer");
 																				}
 																			};
 	private final static ArrayList<String>	DistanceData	= new ArrayList<String>() {
@@ -47,13 +46,13 @@ public class Suunto9ImportPreferences extends FieldEditorPreferencePage implemen
 	 */
 	private Group					_groupData;
 
-	private Combo					_comboAlgorithm;
-	private Combo					_comboDistance;
+	private Combo					_comboAltitudeDataSource;
+	private Combo					_comboDistanceDataSource;
 
 	private StringFieldEditor	_txtDecimalSep;
 
-	private Label					_lblExample;
-	private Label					_lblExampleValue;
+	private Label					_lblAltitudeDataSource;
+	private Label					_lblDistanceDataSource;
 
 	@Override
 	protected void createFieldEditors() {
@@ -76,34 +75,26 @@ public class Suunto9ImportPreferences extends FieldEditorPreferencePage implemen
 		_groupData.setText(Messages.pref_data);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(_groupData);
 		{
-			// label: value example
-			_lblExample = new Label(_groupData, SWT.NONE);
-			_lblExample.setText("ddd");
+			// label: Altitude data source
+			_lblAltitudeDataSource = new Label(_groupData, SWT.NONE);
+			_lblAltitudeDataSource.setText("ddd");
 			/*
-			 * combo: smoothing algorithm
+			 * combo: Altitude source
 			 */
-			_comboAlgorithm = new Combo(_groupData, SWT.READ_ONLY | SWT.BORDER);
-			_comboAlgorithm.setVisibleItemCount(10);
-			// _comboAlgorithm.addFocusListener(_keepOpenListener);
-			_comboAlgorithm.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					// if (_isUpdateUI) {
-					return;
-				}
-				// onSelectSmoothingAlgo();
-			});
+			_comboAltitudeDataSource = new Combo(_groupData, SWT.READ_ONLY | SWT.BORDER);
+			_comboAltitudeDataSource.setVisibleItemCount(2);
 
-			_lblExampleValue = new Label(_groupData, SWT.NONE);
-			_lblExampleValue.setText("Distance");
+			// label: Distance data source
+			_lblDistanceDataSource = new Label(_groupData, SWT.NONE);
+			_lblDistanceDataSource.setText("Distance");
 
 			/*
 			 * combo: smoothing algorithm
 			 */
-			_comboDistance = new Combo(_groupData, SWT.READ_ONLY | SWT.BORDER);
-			_comboDistance.setVisibleItemCount(10);
+			_comboDistanceDataSource = new Combo(_groupData, SWT.READ_ONLY | SWT.BORDER);
+			_comboDistanceDataSource.setVisibleItemCount(10);
 			// _comboAlgorithm.addFocusListener(_keepOpenListener);
-			_comboDistance.addSelectionListener(new SelectionAdapter() {
+			_comboDistanceDataSource.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					// if (_isUpdateUI) {
@@ -140,20 +131,19 @@ public class Suunto9ImportPreferences extends FieldEditorPreferencePage implemen
 	private void setupUI() {
 
 		/*
-		 * fillup algorithm combo
+		 * Fill-up the altitude data choices
 		 */
 		for (int index = 0; index < AltitudeData.size(); ++index) {
-			_comboAlgorithm.add(AltitudeData.get(index));
+			_comboAltitudeDataSource.add(AltitudeData.get(index));
 		}
-		_comboAlgorithm.select(0);
-
+		_comboAltitudeDataSource.select(_prefStore.getInt(IPreferences.ALTITUDE_DATA_SOURCE));
 		/*
 		 * Fill-up the distance data choices
 		 */
 		for (String distanceChoice : DistanceData) {
-			_comboDistance.add(distanceChoice);
+			_comboDistanceDataSource.add(distanceChoice);
 		}
-		_comboDistance.select(0);
+		_comboDistanceDataSource.select(_prefStore.getInt(IPreferences.DISTANCE_DATA_SOURCE));
 	}
 
 	@Override
@@ -162,8 +152,8 @@ public class Suunto9ImportPreferences extends FieldEditorPreferencePage implemen
 	@Override
 	protected void performDefaults() {
 
-		_comboAlgorithm.select(0);
-		_comboDistance.select(0);
+		_comboAltitudeDataSource.select(0);
+		_comboDistanceDataSource.select(0);
 	}
 
 	@Override
@@ -172,7 +162,8 @@ public class Suunto9ImportPreferences extends FieldEditorPreferencePage implemen
 		final boolean isOK = super.performOk();
 
 		if (isOK) {
-			_prefStore.setValue(IPreferences.SLICE_ADJUSTMENT_VALUE, AltitudeData.get(_comboAlgorithm.getSelectionIndex()));
+			_prefStore.setValue(IPreferences.ALTITUDE_DATA_SOURCE, _comboAltitudeDataSource.getSelectionIndex());
+			_prefStore.setValue(IPreferences.DISTANCE_DATA_SOURCE, _comboDistanceDataSource.getSelectionIndex());
 		}
 		return isOK;
 	}
