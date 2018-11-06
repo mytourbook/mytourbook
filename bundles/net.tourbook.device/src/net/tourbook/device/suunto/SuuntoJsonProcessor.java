@@ -150,17 +150,13 @@ public class SuuntoJsonProcessor {
 			wasDataPopulated |= TryAddCadenceData(new JSONObject(currentSampleData), timeData);
 
 			// Barometric Altitude
-			if (_prefStore.getInt(IPreferences.ALTITUDE_DATA_SOURCE) == 1) {
-				wasDataPopulated |= TryAddAltitudeData(new JSONObject(currentSampleData), timeData);
-			}
+			wasDataPopulated |= TryAddAltitudeData(new JSONObject(currentSampleData), timeData);
 
 			// Power
 			wasDataPopulated |= TryAddPowerData(new JSONObject(currentSampleData), timeData);
 
 			// Distance
-			if (_prefStore.getInt(IPreferences.DISTANCE_DATA_SOURCE) == 1) {
-				wasDataPopulated |= TryAddDistanceData(new JSONObject(currentSampleData), timeData);
-			}
+			wasDataPopulated |= TryAddDistanceData(new JSONObject(currentSampleData), timeData);
 
 			// Temperature
 			wasDataPopulated |= TryAddTemperatureData(new JSONObject(currentSampleData), timeData);
@@ -256,9 +252,7 @@ public class SuuntoJsonProcessor {
 			timeData.longitude = (longitude * 180) / Math.PI;
 
 			// GPS altitude
-			if (_prefStore.getInt(IPreferences.ALTITUDE_DATA_SOURCE) == 0) {
-				timeData.absoluteAltitude = altitude;
-			}
+			timeData.absoluteAltitude = altitude;
 
 			return true;
 		} catch (Exception e) {

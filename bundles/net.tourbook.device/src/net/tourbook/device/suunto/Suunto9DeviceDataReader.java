@@ -38,7 +38,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 	private HashMap<Long, TourData>						_alreadyImportedTours			= new HashMap<Long, TourData>();
 
 	// For Unit testing
-	private static final boolean			UNITTESTS			= false;
+	private static final boolean			UNITTESTS			= true;
 	public static final String				IMPORT_FILE_PATH	= "/net/tourbook/device/suunto/testFiles/";
 	private static Map<String, String>	testFiles			= new HashMap<>();									// Java 7
 
