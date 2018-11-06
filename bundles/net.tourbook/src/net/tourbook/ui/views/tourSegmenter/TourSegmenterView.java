@@ -1629,7 +1629,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       segmentSerieIndex.add(0);
 
       boolean isSurfing = false;
-      final boolean isSurfing_Distance = false;
+      boolean isSurfing_Distance = false;
       boolean isSurfing_MinSpeed = false;
       boolean isSurfing_StartStop = false;
       boolean isSurfing_Time = false;
@@ -1641,13 +1641,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       float prevDistance = 0;
 
       int segmentStartIndex = 0;
-
-//      System.out.println();
-//      System.out.println();
-//      System.out.println();
-//      System.out.println();
-//      System.out.println();
-//      System.out.println();
 
       for (int serieIndex = 0; serieIndex < distanceSerie.length; serieIndex++) {
 
@@ -1662,7 +1655,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
             if (isSurfing_StartStop == false) {
 
+               // start new segment
+
                segmentStartIndex = serieIndex;
+
+               isSurfing_MinSpeed = false;
+               isSurfing_Time = false;
+               isSurfing_Distance = false;
 
                surfing_Distance = 0;
                surfing_TimeDuration = 0;
@@ -1690,51 +1689,38 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          } else {
 
             isSurfing_Time = false;
-
-//            surfing_TimeDuration = 0;
-
          }
 
-//         System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ()")
-//               + ("\t: " + serieIndex)
-//               + ("\tsurfing_TimeDuration = " + surfing_TimeDuration)
-//               + ("\tisSurfing_Time = " + isSurfing_Time)
-//         //
-//         );
-//// TODO remove SYSTEM.OUT.PRINTLN
+         if (isSurfing_StartStop && isSurfing_MinSpeed) {
 
-//         if (isSurfing_StartStop && isSurfing_MinSpeed && isSurfing_Time) {
-//
-//            surfing_Distance += distanceDiff;
-//
-//            if (surfing_Distance >= minDistance) {
-//               isSurfing_Distance = true;
-//            }
-//
-//         } else {
-//
-//            isSurfing_Distance = false;
-//
-////            surfing_Distance = 0;
-//         }
+            surfing_Distance += distanceDiff;
+
+            if (surfing_Distance >= minDistance) {
+               isSurfing_Distance = true;
+            }
+
+         } else {
+
+            isSurfing_Distance = false;
+         }
 
          final boolean prevIsSurfing = isSurfing;
 
          if (isSurfing_StartStop && isSurfing_MinSpeed && isSurfing_Time) {
 
             // distance is optional
-//            if (isMinDistance) {
-//
-//               //check distance
-//               if (isSurfing_Distance) {
-//                  isSurfing = true;
-//               } else {
-//                  isSurfing = false;
-//               }
-//
-//            } else {
-            isSurfing = true;
-//            }
+            if (isMinDistance) {
+
+               //check distance
+               if (isSurfing_Distance) {
+                  isSurfing = true;
+               } else {
+                  isSurfing = false;
+               }
+
+            } else {
+               isSurfing = true;
+            }
 
          } else {
             isSurfing = false;
@@ -1745,6 +1731,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             // surfing has stopped
 
             final int segmentEndIndex = serieIndex - 1;
+
+            segmentStartIndex--;
 
             if (segmentStartIndex == segmentEndIndex) {
 
@@ -2489,7 +2477,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
             // spinner: speed
             _spinnerSurfing_MinStartStopSpeed = new Spinner(container, SWT.BORDER);
-            _spinnerSurfing_MinStartStopSpeed.setMinimum(5);
+            _spinnerSurfing_MinStartStopSpeed.setMinimum(1);
             _spinnerSurfing_MinStartStopSpeed.setMaximum(100);
             _spinnerSurfing_MinStartStopSpeed.setPageIncrement(5);
             _spinnerSurfing_MinStartStopSpeed.addSelectionListener(defaultSelectionListener);
