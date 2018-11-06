@@ -7,8 +7,6 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.StringFieldEditor;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -99,12 +97,6 @@ public class Suunto9ImportPreferences extends FieldEditorPreferencePage implemen
 					.swtDefaults()
 					.hint(15, SWT.DEFAULT)
 					.applyTo(_txtDecimalSep.getTextControl(_groupData));
-			_txtDecimalSep.setTextLimit(1);
-			_txtDecimalSep.setPreferenceStore(_prefStore);
-			_txtDecimalSep.load();
-			_txtDecimalSep.setPropertyChangeListener(new IPropertyChangeListener() {
-				public void propertyChange(final PropertyChangeEvent event) {}
-			});
 
 		}
 
