@@ -6,7 +6,6 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -16,7 +15,6 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.preferences.ITourbookPreferences;
 
 public class Suunto9ImportPreferences extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
@@ -38,15 +36,13 @@ public class Suunto9ImportPreferences extends FieldEditorPreferencePage implemen
 	/*
 	 * UI controls
 	 */
-	private Group					_groupData;
+	private Group	_groupData;
 
-	private Combo					_comboAltitudeDataSource;
-	private Combo					_comboDistanceDataSource;
+	private Combo	_comboAltitudeDataSource;
+	private Combo	_comboDistanceDataSource;
 
-	private StringFieldEditor	_txtDecimalSep;
-
-	private Label					_lblAltitudeDataSource;
-	private Label					_lblDistanceDataSource;
+	private Label	_lblAltitudeDataSource;
+	private Label	_lblDistanceDataSource;
 
 	@Override
 	protected void createFieldEditors() {
@@ -67,6 +63,7 @@ public class Suunto9ImportPreferences extends FieldEditorPreferencePage implemen
 		 */
 		_groupData = new Group(parent, SWT.NONE);
 		_groupData.setText(Messages.pref_data_source);
+		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(_groupData);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(_groupData);
 		{
 			// label: Altitude data source
@@ -87,24 +84,7 @@ public class Suunto9ImportPreferences extends FieldEditorPreferencePage implemen
 			 */
 			_comboDistanceDataSource = new Combo(_groupData, SWT.READ_ONLY | SWT.BORDER);
 			_comboDistanceDataSource.setVisibleItemCount(2);
-
-			// text: decimal separator
-			_txtDecimalSep = new StringFieldEditor(
-					ITourbookPreferences.REGIONAL_DECIMAL_SEPARATOR,
-					"dewfreg",
-					_groupData);
-			GridDataFactory
-					.swtDefaults()
-					.hint(15, SWT.DEFAULT)
-					.applyTo(_txtDecimalSep.getTextControl(_groupData));
-
 		}
-
-		// add layout to the group
-		//final GridLayout regionalLayout = (GridLayout) _groupData.getLayout();
-		//	regionalLayout.marginWidth = 5;
-		//regionalLayout.marginHeight = 5;
-
 	}
 
 	private void setupUI() {
