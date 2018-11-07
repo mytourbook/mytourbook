@@ -3171,9 +3171,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                cell.setText(UI.EMPTY_STRING);
             } else {
 
-               cell.setText(startIndex == endIndex ? //
-               Integer.toString(startIndex)
-                     : startIndex + UI.DASH_WITH_SPACE + endIndex);
+               // start index by 1 instead of 0 to have the same index as in the tour data editor
+               final int uiStartIndex = startIndex + 1;
+               final int uiEndIndex = endIndex + 1;
+
+               cell.setText(startIndex == endIndex
+                     ? Integer.toString(uiStartIndex)
+                     : uiStartIndex + UI.DASH_WITH_SPACE + uiEndIndex);
             }
          }
       });

@@ -4762,8 +4762,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
                float distanceDiff;
 
                if (serieIndex == 0) {
+
                   // first time slice can contain a distance, occured in .fit files
                   distanceDiff = _serieDistance[0] / 1000 / _unitValueDistance;
+
                } else {
 
                   final float distancePrevious = _serieDistance[serieIndex - 1] / 1000 / _unitValueDistance;

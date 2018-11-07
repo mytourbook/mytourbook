@@ -17,7 +17,12 @@ Version 18.12.0                                                   ?. December 20
 
 
 New
-===	
+===
+
+* Tour segmenter for surfing	
+  The surfing speed depends on the speed smoothing algorithm, according are the surfing events recognized or not.
+  The smoothing algorithm can create speed value peeks which also can influence the surfing event recognition.
+  Peeks can occure when there are missing distance values, e.g. when there was no GPS signal in a wave or underwater.
 
 
 
