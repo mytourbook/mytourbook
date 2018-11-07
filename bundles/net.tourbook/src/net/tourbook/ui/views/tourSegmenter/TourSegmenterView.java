@@ -25,8 +25,10 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import org.eclipse.e4.ui.di.PersistState;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -63,6 +65,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPage;
@@ -368,6 +371,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
    private boolean                        _isGetInitialTours;
    private ArrayList<TourSegment>         _allTourSegments;
+
+   private Action                         _actionSurfing_RestoreDefaults;
 
    /*
     * UI resources
@@ -922,6 +927,18 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       _actionModifyColumns = new ActionModifyColumns(this);
       _actionTCSegmenterConfig = new ActionTourChartSegmenterConfig(this, _parent);
 
+      /*
+       * Action: Restore default
+       */
+      _actionSurfing_RestoreDefaults = new Action() {
+         @Override
+         public void run() {
+            onResetSurfingToDefaults();
+         }
+      };
+
+      _actionSurfing_RestoreDefaults.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_RestoreDefault));
+      _actionSurfing_RestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
    }
 
    @Override
@@ -938,8 +955,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       _columnManager.setIsCategoryAvailable(true);
       defineAllColumns(parent);
 
-      createUI(parent);
       createActions();
+      createUI(parent);
       fillToolbar();
 
       addSelectionListener();
@@ -1648,6 +1665,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          final float currentDistance = distanceSerie[serieIndex];
          final float currentSpeed = speedSerie[serieIndex];
 
+         // diffs to the previous time slice
          final int timeDiff = currentTime - prevTime;
          final float distanceDiff = currentDistance - prevDistance;
 
@@ -1732,7 +1750,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
             final int segmentEndIndex = serieIndex - 1;
 
-            segmentStartIndex--;
+            segmentStartIndex = segmentStartIndex > 0 ? segmentStartIndex - 1 : 0;
 
             if (segmentStartIndex == segmentEndIndex) {
 
@@ -2408,7 +2426,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(false, true).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
       {
          /*
           * button: restore from defaults
@@ -2446,6 +2463,34 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
    private Composite createUI_60_SegmenterBy_Surfing(final Composite parent) {
 
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      {
+         createUI_62_SurfingFields(container);
+
+         {
+            /*
+             * Toolbar: actions
+             */
+            final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
+
+            GridDataFactory.fillDefaults()
+                  .align(SWT.FILL, SWT.BEGINNING)
+                  .indent(10, 0)
+                  .applyTo(toolbar);
+
+            final ToolBarManager tbm = new ToolBarManager(toolbar);
+            tbm.add(_actionSurfing_RestoreDefaults);
+            tbm.update(true);
+         }
+      }
+
+      return container;
+   }
+
+   private Composite createUI_62_SurfingFields(final Composite parent) {
+
       final SelectionAdapter defaultSelectionListener = new SelectionAdapter() {
          @Override
          public void widgetSelected(final SelectionEvent e) {
@@ -2462,7 +2507,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       };
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
       {
          {
@@ -2561,7 +2606,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             }
          }
       }
-
       return container;
    }
 
@@ -3825,6 +3869,20 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       if (_tourData != null) {
          fireSegmentLayerChanged();
       }
+   }
+
+   private void onResetSurfingToDefaults() {
+
+      _chkIsMinSurfingDistance.setSelection(STATE_SURFING_IS_MIN_SURFING_DISTANCE_DEFAULT);
+
+      final double minDistance_UI = STATE_SURFING_MIN_SURFING_DISTANCE_DEFAULT / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_SMALL;
+      _spinnerSurfing_MinSurfingDistance.setSelection((int) (minDistance_UI + 0.5));
+
+      _spinnerSurfing_MinSurfingTimeDuration.setSelection(STATE_SURFING_MIN_SURFING_TIME_DURATION_DEFAULT);
+      _spinnerSurfing_MinStartStopSpeed.setSelection((int) (STATE_SURFING_MIN_START_STOP_SPEED_DEFAULT * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
+      _spinnerSurfing_MinSurfingSpeed.setSelection((int) (STATE_SURFING_MIN_SURFING_SPEED_DEFAULT * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
+
+      onSelect_Surfing();
    }
 
    private void onSaveTourAltitude() {
