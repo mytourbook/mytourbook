@@ -18,12 +18,6 @@ package net.tourbook.data;
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.EAGER;
 
-import com.skedgo.converter.TimezoneMapper;
-
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.set.hash.TIntHashSet;
-
 import java.awt.Point;
 import java.io.File;
 import java.io.PrintStream;
@@ -72,11 +66,17 @@ import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 import org.hibernate.annotations.Cascade;
 
+import com.skedgo.converter.TimezoneMapper;
+
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.set.hash.TIntHashSet;
 import net.tourbook.Messages;
 import net.tourbook.algorithm.DPPoint;
 import net.tourbook.algorithm.DouglasPeuckerSimplifier;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.map.GeoPosition;
+import net.tourbook.common.swimming.SwimStroke;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.MtMath;
@@ -225,6 +225,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 *
 	 * @since DB version 22
 	 */
+	@XmlElement
 	private long						tourStartTime;
 
 	/**
@@ -232,36 +233,43 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 *
 	 * @since DB version 22
 	 */
+	@XmlElement
 	private long						tourEndTime;
 
 	/**
 	 * year of tour start
 	 */
+	@XmlElement
 	private short						startYear;
 
 	/**
 	 * mm (d) month of tour
 	 */
+	@XmlElement
 	private short						startMonth;
 
 	/**
 	 * dd (d) day of tour
 	 */
+	@XmlElement
 	private short						startDay;
 
 	/**
 	 * HH (d) hour of tour
 	 */
+	@XmlElement
 	private short						startHour;
 
 	/**
 	 * MM (d) minute of tour
 	 */
+	@XmlElement
 	private short						startMinute;
 
 	/**
 	 *
 	 */
+	@XmlElement
 	private int							startSecond;														// db-version 7
 
 	/**
@@ -269,6 +277,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * <p>
 	 * This is used in sql queries.
 	 */
+	@XmlElement
 	private short						startWeek;
 
 	/**
@@ -300,6 +309,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	/**
 	 * Time zone ID or <code>null</code> when the time zone ID is not available.
 	 */
+	@XmlElement
 	private String						timeZoneId;
 
 	// ############################################# DISTANCE #############################################
@@ -815,12 +825,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * The array {@link #timeSerie} is <code>null</code> for a manually created tour, it is
 	 * <b>always</b> set when tour is from a device or an imported file.
 	 */
+	@XmlElementWrapper(name = "TimeSeries")
+	@XmlElement(name = "TimeSerie")
 	@Transient
 	public int[]						timeSerie;
 
 	/**
 	 * Contains the absolute distance in m (metric system) or <code>null</code> when not available
 	 */
+	@XmlElementWrapper(name = "DistanceSeries")
+	@XmlElement(name = "DistanceSerie")
 	@Transient
 	public float[]						distanceSerie;
 
@@ -840,6 +854,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * Contains the absolute altitude in meter (metric system) or <code>null</code> when not
 	 * available.
 	 */
+	@XmlElementWrapper(name = "AltitudeSeries")
+	@XmlElement(name = "AltitudeSerie")
 	@Transient
 	public float[]						altitudeSerie;
 
@@ -871,9 +887,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	@Transient
 	private float[]					srtmSerieImperial;
 
+	@XmlElementWrapper(name = "CadenceSeries")
+	@XmlElement(name = "CadenceSerie")
 	@Transient
 	private float[]					cadenceSerie;
 
+	@XmlElementWrapper(name = "PulseSeries")
+	@XmlElement(name = "PulseSerie")
 	@Transient
 	public float[]						pulseSerie;
 
@@ -893,6 +913,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	/**
 	 * Contains the temperature in the metric measurement system.
 	 */
+	@XmlElementWrapper(name = "TemperatureSeries")
+	@XmlElement(name = "TemperatureSerie")
 	@Transient
 	public float[]						temperatureSerie;
 
@@ -908,6 +930,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * the metric speed serie is required when computing the power even if the current measurement
 	 * system is imperial
 	 */
+	@XmlElementWrapper(name = "SpeedSeries")
+	@XmlElement(name = "SpeedSerie")
 	@Transient
 	private float[]					speedSerie;
 
@@ -945,6 +969,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	@Transient
 	private float[]					paceSerieMinuteImperial;
 
+	@XmlElementWrapper(name = "PowerSeries")
+	@XmlElement(name = "PowerSerie")
 	@Transient
 	private float[]					powerSerie;
 
@@ -973,9 +999,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	/**
 	 * Contains tour latitude data or <code>null</code> when GPS data are not available.
 	 */
+	@XmlElementWrapper(name = "LatitudeSeries")
+	@XmlElement(name = "LatitudeSerie")
 	@Transient
 	public double[]					latitudeSerie;
 
+	@XmlElementWrapper(name = "LongitudeSeries")
+	@XmlElement(name = "LongitudeSerie")
 	@Transient
 	public double[]					longitudeSerie;
 
@@ -1440,13 +1470,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	public int[]		swim_Time;
 
 	/**
-	 * Swimming data: Activity e.g. active, idle. Contains {@link Short#MIN_VALUE} when value is not
+	 * Swimming data: Activity is defined in {@link LengthType} e.g. active, idle. Contains {@link Short#MIN_VALUE} when value is not
 	 * set.
 	 */
 	@Transient
-	public short[]		swim_ActivityType;
+	public short[]		swim_LengthType;
 	@Transient
-	private float[]	_swim_ActivityType_UI;
+	private float[]	_swim_LengthType_UI;
 
 	/**
 	 * Swimming data: Number of strokes. Contains {@link Short#MIN_VALUE} when value is not set.
@@ -1457,7 +1487,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	private float[]	_swim_Strokes_UI;
 
 	/**
-	 * Swimming data: Stroke style e.g. freestyle, breaststroke. Contains {@link Short#MIN_VALUE}
+	 * Swimming data: Stroke style is defined in {@link SwimStroke}  e.g. freestyle, breaststroke... Contains {@link Short#MIN_VALUE}
 	 * when value is not set.
 	 */
 	@Transient
@@ -1481,7 +1511,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	public boolean 	isSwimCadence;
 
 	/**
-	 *Computed swim data serie
+	 * Computed swim data serie
 	 */
 	@Transient
 	private float[]	_swim_Swolf;
@@ -1499,24 +1529,24 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			return;
 		}
 
-		int    sumAltitude                   = 0;
-		int    sumCadence                    = 0;
-		int    sumDistance                   = 0;
-		int    sumPulse                      = 0;
-		int    sumTemperature                = 0;
-		int    sumPower                      = 0;
-		int    sumSpeed                      = 0;
+		int sumAltitude = 0;
+		int sumCadence = 0;
+		int sumDistance = 0;
+		int sumPulse = 0;
+		int sumTemperature = 0;
+		int sumPower = 0;
+		int sumSpeed = 0;
 
-		int    sumRunDyn_StanceTime          = 0;
-		int    sumRunDyn_StanceTimeBalance   = 0;
-		int    sumRunDyn_StepLength          = 0;
-		int    sumRunDyn_VerticalOscillation = 0;
-		int    sumRunDyn_VerticalRatio       = 0;
+		int sumRunDyn_StanceTime = 0;
+		int sumRunDyn_StanceTimeBalance = 0;
+		int sumRunDyn_StepLength = 0;
+		int sumRunDyn_VerticalOscillation = 0;
+		int sumRunDyn_VerticalRatio = 0;
 
-		double mapMinLatitude                = 0;
-		double mapMaxLatitude                = 0;
-		double mapMinLongitude               = 0;
-		double mapMaxLongitude               = 0;
+		double mapMinLatitude = 0;
+		double mapMaxLatitude = 0;
+		double mapMinLongitude = 0;
+		double mapMaxLongitude = 0;
 
 		// get FIRST VALID latitude/longitude
 		boolean isGPS = false;
@@ -1534,9 +1564,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 				}
 			}
 		}
-		double  lastValidLatitude  = mapMinLatitude - 90;
-		double  lastValidLongitude = mapMinLongitude - 180;
-		boolean isLatitudeValid    = false;
+		double lastValidLatitude = mapMinLatitude - 90;
+		double lastValidLongitude = mapMinLongitude - 180;
+		boolean isLatitudeValid = false;
 
 		for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
 
@@ -1589,7 +1619,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 			if (isGPS) {
 
-				final double latitude  = latitudeSerie[serieIndex];
+				final double latitude = latitudeSerie[serieIndex];
 				final double longitude = longitudeSerie[serieIndex];
 
 				if ((latitude == Double.MIN_VALUE) || (longitude == Double.MIN_VALUE)) {
@@ -1739,16 +1769,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		_runDyn_VerticalRatio_UI = null;
 	}
 
-	public void clear_Swim_ActivityType() {
-
-		swim_ActivityType = null;
-		_swim_ActivityType_UI = null;
-	}
-
 	public void clear_Swim_Cadence() {
 
 		swim_Cadence = null;
 		_swim_Cadence_UI = null;
+	}
+
+	public void clear_swim_LengthType() {
+
+		swim_LengthType = null;
+		_swim_LengthType_UI = null;
 	}
 
 	public void clear_Swim_Strokes() {
@@ -1825,10 +1855,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		_runDyn_VerticalOscillation_UI_Imperial = null;
 		_runDyn_VerticalRatio_UI = null;
 
-		_swim_ActivityType_UI = null;
+		_swim_LengthType_UI = null;
 		_swim_Cadence_UI = null;
 		_swim_Strokes_UI = null;
 		_swim_StrokeStyle_UI = null;
+		_swim_Swolf = null;
+
 		if (isSwimCadence) {
 			// cadence is from swim cadence
 			cadenceSerie = null;
@@ -1885,9 +1917,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 		if (obj instanceof TourData) {
 
-			final TourData otherTourData  = (TourData) obj;
+			final TourData otherTourData = (TourData) obj;
 
-			final long     tourStartTime2 = otherTourData.tourStartTime;
+			final long tourStartTime2 = otherTourData.tourStartTime;
 
 			return tourStartTime > tourStartTime2 ? 1 : tourStartTime < tourStartTime2 ? -1 : 0;
 		}
@@ -1921,7 +1953,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 		for (final TourMarker tourMarker : this.getTourMarkers()) {
 
-			final int serieIndex       = tourMarker.getSerieIndex();
+			final int serieIndex = tourMarker.getSerieIndex();
 			final int relativeTourTime = tourMarker.getTime();
 
 			tourMarker.setTime(relativeTourTime, tourStartTime + (relativeTourTime * 1000));
@@ -1962,13 +1994,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 */
 	private void computeAltimeterGradientSerieWithFixedInterval() {
 
-		final int   serieLength          = timeSerie.length;
+		final int serieLength = timeSerie.length;
 
 		final float dataSerieAltimeter[] = new float[serieLength];
-		final float dataSerieGradient[]  = new float[serieLength];
+		final float dataSerieGradient[] = new float[serieLength];
 
-		int         adjustIndexLow;
-		int         adjustmentIndexHigh;
+		int adjustIndexLow;
+		int adjustmentIndexHigh;
 
 //		if (prefStore.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_VALUE_COMPUTING)) {
 //
@@ -2016,20 +2048,20 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			/*
 			 * adjust index to the array size, this is optimized to NOT use Math.min or Math.max
 			 */
-			final int   serieLengthLow   = serieLength - 1;
+			final int serieLengthLow = serieLength - 1;
 
-			final int   indexLowTemp     = serieIndex - adjustIndexLow;
-			final int   indexLowTempMax  = ((0 >= indexLowTemp) ? 0 : indexLowTemp);
-			final int   indexLow         = ((indexLowTempMax <= serieLengthLow) ? indexLowTempMax : serieLengthLow);
+			final int indexLowTemp = serieIndex - adjustIndexLow;
+			final int indexLowTempMax = ((0 >= indexLowTemp) ? 0 : indexLowTemp);
+			final int indexLow = ((indexLowTempMax <= serieLengthLow) ? indexLowTempMax : serieLengthLow);
 
-			final int   indexHighTemp    = serieIndex + adjustmentIndexHigh;
-			final int   indexHighTempMin = ((indexHighTemp <= serieLengthLow) ? indexHighTemp : serieLengthLow);
-			final int   indexHigh        = ((0 >= indexHighTempMin) ? 0 : indexHighTempMin);
+			final int indexHighTemp = serieIndex + adjustmentIndexHigh;
+			final int indexHighTempMin = ((indexHighTemp <= serieLengthLow) ? indexHighTemp : serieLengthLow);
+			final int indexHigh = ((0 >= indexHighTempMin) ? 0 : indexHighTempMin);
 
-			final float distanceDiff     = distanceSerie[indexHigh] - distanceSerie[indexLow];
-			final float altitudeDiff     = altitudeSerie[indexHigh] - altitudeSerie[indexLow];
+			final float distanceDiff = distanceSerie[indexHigh] - distanceSerie[indexLow];
+			final float altitudeDiff = altitudeSerie[indexHigh] - altitudeSerie[indexLow];
 
-			final float timeDiff         = deviceTimeInterval * (indexHigh - indexLow);
+			final float timeDiff = deviceTimeInterval * (indexHigh - indexLow);
 
 			// keep altimeter data
 			dataSerieAltimeter[serieIndex] = 3600 * altitudeDiff / timeDiff / UI.UNIT_VALUE_ALTITUDE;
@@ -2059,13 +2091,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 */
 	private void computeAltimeterGradientSerieWithVariableInterval() {
 
-		final float[] checkSpeedSerie      = getSpeedSerie();
+		final float[] checkSpeedSerie = getSpeedSerie();
 
-		final int     serieLength          = timeSerie.length;
-		final int     serieLengthLast      = serieLength - 1;
+		final int serieLength = timeSerie.length;
+		final int serieLengthLast = serieLength - 1;
 
-		final float   dataSerieAltimeter[] = new float[serieLength];
-		final float   dataSerieGradient[]  = new float[serieLength];
+		final float dataSerieAltimeter[] = new float[serieLength];
+		final float dataSerieGradient[] = new float[serieLength];
 
 		// get minimum time/distance differences
 		final int minTimeDiff = _prefStore.getInt(ITourbookPreferences.APP_DATA_SPEED_MIN_TIMESLICE_VALUE);
@@ -2078,9 +2110,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 //			minTimeDiff = 16;
 //		}
 
-		final int     minDistanceDiff = minTimeDiff;
+		final int minDistanceDiff = minTimeDiff;
 
-		final boolean checkPosition   = (latitudeSerie != null) && (longitudeSerie != null);
+		final boolean checkPosition = (latitudeSerie != null) && (longitudeSerie != null);
 
 		for (int serieIndex = 1; serieIndex < serieLength; serieIndex++) {
 
@@ -2117,14 +2149,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			final int serieIndexPrev = serieIndex - 1;
 
 			// adjust index to the array size
-			int     lowIndex     = ((0 >= serieIndexPrev) ? 0 : serieIndexPrev);
-			int     highIndex    = ((serieIndex <= serieLengthLast) ? serieIndex : serieLengthLast);
+			int lowIndex = ((0 >= serieIndexPrev) ? 0 : serieIndexPrev);
+			int highIndex = ((serieIndex <= serieLengthLast) ? serieIndex : serieLengthLast);
 
-			int     timeDiff     = timeSerie[highIndex] - timeSerie[lowIndex];
-			float   distanceDiff = distanceSerie[highIndex] - distanceSerie[lowIndex];
-			float   altitudeDiff = altitudeSerie[highIndex] - altitudeSerie[lowIndex];
+			int timeDiff = timeSerie[highIndex] - timeSerie[lowIndex];
+			float distanceDiff = distanceSerie[highIndex] - distanceSerie[lowIndex];
+			float altitudeDiff = altitudeSerie[highIndex] - altitudeSerie[lowIndex];
 
-			boolean toggleIndex  = true;
+			boolean toggleIndex = true;
 
 			while ((timeDiff < minTimeDiff) || (distanceDiff < minDistanceDiff)) {
 
@@ -2155,7 +2187,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			 * that lat+long is available but no time
 			 */
 			boolean isTimeValid = true;
-			int     prevTime    = timeSerie[lowIndex];
+			int prevTime = timeSerie[lowIndex];
 			for (int timeIndex = lowIndex + 1; timeIndex <= highIndex; timeIndex++) {
 				final int currentTime = timeSerie[timeIndex];
 				if (prevTime == currentTime) {
@@ -2268,7 +2300,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		return true;
 	}
 
-	public AltitudeUpDown computeAltitudeUpDown( final ArrayList<AltitudeUpDownSegment> segmentSerieIndexParameter,
+	public AltitudeUpDown computeAltitudeUpDown(	final ArrayList<AltitudeUpDownSegment> segmentSerieIndexParameter,
 																final float selectedMinAltiDiff) {
 
 		return computeAltitudeUpDown_30_Algorithm_9_08(segmentSerieIndexParameter, selectedMinAltiDiff);
@@ -2298,21 +2330,21 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			forcedIndices = multipleTourStartIndex;
 		}
 
-		final DPPoint[] simplifiedPoints  = new DouglasPeuckerSimplifier(dpTolerance, dpPoints, forcedIndices).simplify();
+		final DPPoint[] simplifiedPoints = new DouglasPeuckerSimplifier(dpTolerance, dpPoints, forcedIndices).simplify();
 
-		float           altitudeUpTotal   = 0;
-		float           altitudeDownTotal = 0;
+		float altitudeUpTotal = 0;
+		float altitudeDownTotal = 0;
 
-		float           prevAltitude      = altitudeSerie[0];
+		float prevAltitude = altitudeSerie[0];
 
 		/*
 		 * Get altitude up/down from the tour altitude values which are found by DP
 		 */
 		for (int dbIndex = 1; dbIndex < simplifiedPoints.length; dbIndex++) {
 
-			final DPPoint point           = simplifiedPoints[dbIndex];
-			final float   currentAltitude = altitudeSerie[point.serieIndex];
-			final float   altiDiff        = currentAltitude - prevAltitude;
+			final DPPoint point = simplifiedPoints[dbIndex];
+			final float currentAltitude = altitudeSerie[point.serieIndex];
+			final float altiDiff = currentAltitude - prevAltitude;
 
 			if (altiDiff > 0) {
 				altitudeUpTotal += altiDiff;
@@ -2346,28 +2378,28 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			return null;
 		}
 
-		final boolean isCreateSegments         = segmentSerie != null;
+		final boolean isCreateSegments = segmentSerie != null;
 
-		float         prevAltitude             = 0;
-		float         prevSegmentAltitude      = 0;
-		float         prevAltiDiff             = 0;
+		float prevAltitude = 0;
+		float prevSegmentAltitude = 0;
+		float prevAltiDiff = 0;
 
-		float         angleAltiUp              = 0;
-		float         angleAltiDown            = 0;
+		float angleAltiUp = 0;
+		float angleAltiDown = 0;
 
-		float         segmentAltitudeMin       = 0;
-		float         segmentAltitudeMax       = 0;
+		float segmentAltitudeMin = 0;
+		float segmentAltitudeMax = 0;
 
-		float         altitudeUpTotal          = 0;
-		float         altitudeDownTotal        = 0;
+		float altitudeUpTotal = 0;
+		float altitudeDownTotal = 0;
 
-		final int     serieLength              = timeSerie.length;
-		int           currentSegmentSerieIndex = 0;
+		final int serieLength = timeSerie.length;
+		int currentSegmentSerieIndex = 0;
 
 		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 
 			final float altitude = altitudeSerie[serieIndex];
-			float       altiDiff = 0;
+			float altiDiff = 0;
 
 			if (serieIndex == 0) {
 
@@ -2542,21 +2574,21 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			forcedIndices = multipleTourStartIndex;
 		}
 
-		final DPPoint[] simplifiedPoints  = new DouglasPeuckerSimplifier(dpTolerance / 10.0f, dpPoints, forcedIndices).simplify();
+		final DPPoint[] simplifiedPoints = new DouglasPeuckerSimplifier(dpTolerance / 10.0f, dpPoints, forcedIndices).simplify();
 
-		float           altitudeUpTotal   = 0;
-		float           altitudeDownTotal = 0;
+		float altitudeUpTotal = 0;
+		float altitudeDownTotal = 0;
 
-		float           prevAltitude      = altitudeSerie[valueIndexLeft];
+		float prevAltitude = altitudeSerie[valueIndexLeft];
 
 		/*
 		 * Get altitude up/down from the tour altitude values which are found by DP
 		 */
 		for (int dbIndex = 1; dbIndex < simplifiedPoints.length; dbIndex++) {
 
-			final DPPoint point           = simplifiedPoints[dbIndex];
-			final float   currentAltitude = altitudeSerie[point.serieIndex + valueIndexLeft];
-			final float   altiDiff        = currentAltitude - prevAltitude;
+			final DPPoint point = simplifiedPoints[dbIndex];
+			final float currentAltitude = altitudeSerie[point.serieIndex + valueIndexLeft];
+			final float altiDiff = currentAltitude - prevAltitude;
 
 			if (altiDiff > 0) {
 				altitudeUpTotal += altiDiff;
@@ -2582,8 +2614,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			return;
 		}
 
-		float cadenceSum   = 0;
-		int   cadenceCount = 0;
+		float cadenceSum = 0;
+		int cadenceCount = 0;
 
 		for (final float cadence : cadenceSerie) {
 
@@ -2620,19 +2652,19 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		}
 
 		// at least 3 points are available
-		int           prevTime             = timeSerie[firstIndex];
-		int           currentTime          = timeSerie[firstIndex];
-		int           nextTime             = timeSerie[firstIndex + 1];
+		int prevTime = timeSerie[firstIndex];
+		int currentTime = timeSerie[firstIndex];
+		int nextTime = timeSerie[firstIndex + 1];
 
 		/**
 		 * a break is set from the previous to the current time slice
 		 */
-		final boolean hasBreakTime         = breakTimeSerie != null;
-		boolean       isPrevBreak          = hasBreakTime ? breakTimeSerie[firstIndex] : false;
-		boolean       isNextBreak          = hasBreakTime ? breakTimeSerie[firstIndex + 1] : false;
+		final boolean hasBreakTime = breakTimeSerie != null;
+		boolean isPrevBreak = hasBreakTime ? breakTimeSerie[firstIndex] : false;
+		boolean isNextBreak = hasBreakTime ? breakTimeSerie[firstIndex + 1] : false;
 
-		double        cadenceSquare        = 0;
-		double        timeSquare           = 0;
+		double cadenceSquare = 0;
+		double timeSquare = 0;
 
 		final float[] cadenceWithMuliplier = getCadenceSerieWithMuliplier();
 
@@ -2663,10 +2695,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 				}
 			}
 
-			final float cadence      = cadenceWithMuliplier[serieIndex];
+			final float cadence = cadenceWithMuliplier[serieIndex];
 
-			float       timeDiffPrev = 0;
-			float       timeDiffNext = 0;
+			float timeDiffPrev = 0;
+			float timeDiffNext = 0;
 
 			if (serieIndex > firstIndex && isPrevBreak == false) {
 				// prev is available
@@ -2723,19 +2755,19 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		}
 
 		// at least 3 points are available
-		int           prevTime     = timeSerie[firstIndex];
-		int           currentTime  = timeSerie[firstIndex];
-		int           nextTime     = timeSerie[firstIndex + 1];
+		int prevTime = timeSerie[firstIndex];
+		int currentTime = timeSerie[firstIndex];
+		int nextTime = timeSerie[firstIndex + 1];
 
 		/**
 		 * a break is set from the previous to the current time slice
 		 */
 		final boolean hasBreakTime = breakTimeSerie != null;
-		boolean       isPrevBreak  = hasBreakTime ? breakTimeSerie[firstIndex] : false;
-		boolean       isNextBreak  = hasBreakTime ? breakTimeSerie[firstIndex + 1] : false;
+		boolean isPrevBreak = hasBreakTime ? breakTimeSerie[firstIndex] : false;
+		boolean isNextBreak = hasBreakTime ? breakTimeSerie[firstIndex + 1] : false;
 
-		double        valueSquare  = 0;
-		double        timeSquare   = 0;
+		double valueSquare = 0;
+		double timeSquare = 0;
 
 		for (int serieIndex = firstIndex; serieIndex <= lastIndex; serieIndex++) {
 
@@ -2764,10 +2796,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 				}
 			}
 
-			final float value        = valueSerie[serieIndex];
+			final float value = valueSerie[serieIndex];
 
-			float       timeDiffPrev = 0;
-			float       timeDiffNext = 0;
+			float timeDiffPrev = 0;
+			float timeDiffNext = 0;
 
 			if (serieIndex > firstIndex && isPrevBreak == false) {
 				// prev is available
@@ -2842,9 +2874,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		}
 
 		// at least 3 points are available
-		int prevTime    = timeSerie[firstIndex];
+		int prevTime = timeSerie[firstIndex];
 		int currentTime = timeSerie[firstIndex];
-		int nextTime    = timeSerie[firstIndex + 1];
+		int nextTime = timeSerie[firstIndex + 1];
 
 		/**
 		 * a break is set from the previous to the current time slice
@@ -2852,8 +2884,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		boolean isPrevBreak = breakTimeSerie == null ? false : breakTimeSerie[firstIndex];
 		boolean isNextBreak = breakTimeSerie == null ? false : breakTimeSerie[firstIndex + 1];
 
-		double  pulseSquare = 0;
-		double  timeSquare  = 0;
+		double pulseSquare = 0;
+		double timeSquare = 0;
 
 		for (int serieIndex = firstIndex; serieIndex <= lastIndex; serieIndex++) {
 
@@ -2882,10 +2914,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 				}
 			}
 
-			final float pulse        = pulseSerieSmoothed[serieIndex];
+			final float pulse = pulseSerieSmoothed[serieIndex];
 
-			float       timeDiffPrev = 0;
-			float       timeDiffNext = 0;
+			float timeDiffPrev = 0;
+			float timeDiffNext = 0;
 
 			if (serieIndex > firstIndex && isPrevBreak == false) {
 				// prev is available
@@ -2924,7 +2956,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		}
 
 		float temperatureSum = 0;
-		int   tempLength     = temperatureSerie.length;
+		int tempLength = temperatureSerie.length;
 
 		for (final float temperature : temperatureSerie) {
 			if (temperature == Float.MIN_VALUE) {
@@ -2950,8 +2982,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 		for (int serieIndex = startIndex + 1; serieIndex <= endIndex; serieIndex++) {
 
-			final int     currentTime = timeSerie[serieIndex];
-			final boolean isBreak     = breakTimeSerie[serieIndex];
+			final int currentTime = timeSerie[serieIndex];
+			final boolean isBreak = breakTimeSerie[serieIndex];
 
 			if (isBreak) {
 				totalBreakTime += currentTime - prevTime;
@@ -3084,14 +3116,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		 * get min/max longitude/latitude
 		 */
 
-		double minLatitude  = latitudeSerie[0];
-		double maxLatitude  = latitudeSerie[0];
+		double minLatitude = latitudeSerie[0];
+		double maxLatitude = latitudeSerie[0];
 		double minLongitude = longitudeSerie[0];
 		double maxLongitude = longitudeSerie[0];
 
 		for (int serieIndex = 1; serieIndex < latitudeSerie.length; serieIndex++) {
 
-			final double latitude  = latitudeSerie[serieIndex];
+			final double latitude = latitudeSerie[serieIndex];
 			final double longitude = longitudeSerie[serieIndex];
 
 			minLatitude = latitude < minLatitude ? latitude : minLatitude;
@@ -3151,7 +3183,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 		// validate indices
 		int firstIndex = indexStart < indexEnd ? indexStart : indexEnd;
-		int lastIndex  = indexStart > indexEnd ? indexStart : indexEnd;
+		int lastIndex = indexStart > indexEnd ? indexStart : indexEnd;
 
 		if (firstIndex < 0) {
 			firstIndex = 0;
@@ -3175,13 +3207,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 //
 //												Integer.MAX_VALUE = 2_147_483_647
 
-			final double latitude   = partLatitude[serieIndex];
-			final double longitude  = partLongitude[serieIndex];
+			final double latitude = partLatitude[serieIndex];
+			final double longitude = partLongitude[serieIndex];
 
-			final int    latPart    = (int) (latitude * 100);
-			final int    lonPart    = (int) (longitude * 100);
+			final int latPart = (int) (latitude * 100);
+			final int lonPart = (int) (longitude * 100);
 
-			final int    latLonPart = (latPart + 9_000) * 100_000 + (lonPart + 18_000);
+			final int latLonPart = (latPart + 9_000) * 100_000 + (lonPart + 18_000);
 
 			allGeoParts.add(latLonPart);
 		}
@@ -3229,37 +3261,37 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		return computedGeoParts.toArray();
 	}
 
-	public NormalizedGeoData computeGeo_NormalizeLatLon(  final int measureStartIndex,
+	public NormalizedGeoData computeGeo_NormalizeLatLon(	final int measureStartIndex,
 																			final int measureEndIndex,
 																			final int geoAccuracy,
 																			final int distanceInterval) {
 
-		final float[]  measureAllDistance = distanceSerie;
-		final double[] measureAllLat      = latitudeSerie;
-		final double[] measureAllLon      = longitudeSerie;
+		final float[] measureAllDistance = distanceSerie;
+		final double[] measureAllLat = latitudeSerie;
+		final double[] measureAllLon = longitudeSerie;
 
 		if (measureAllLat == null || measureAllDistance == null) {
 			return null;
 		}
 
 		// create normalized data, the distance will be normalized to 100m
-		final float   measureStartDistance        = measureAllDistance[measureStartIndex];
-		final float   measureEndDistance          = measureAllDistance[measureEndIndex];
+		final float measureStartDistance = measureAllDistance[measureStartIndex];
+		final float measureEndDistance = measureAllDistance[measureEndIndex];
 
-		final float   normalizedStartDistance     = measureStartDistance / distanceInterval;
-		final float   normalizedEndDistance       = measureEndDistance / distanceInterval;
-		final int     normalizedSize              = (int) (normalizedEndDistance - normalizedStartDistance + 1);
+		final float normalizedStartDistance = measureStartDistance / distanceInterval;
+		final float normalizedEndDistance = measureEndDistance / distanceInterval;
+		final int normalizedSize = (int) (normalizedEndDistance - normalizedStartDistance + 1);
 
-		final float[] normalizedAllDist           = new float[normalizedSize];
-		final int[]   normalizedAllLat            = new int[normalizedSize];
-		final int[]   normalizedAllLon            = new int[normalizedSize];
-		final int[]   allNormalized2OriginalIndex = new int[normalizedSize];
+		final float[] normalizedAllDist = new float[normalizedSize];
+		final int[] normalizedAllLat = new int[normalizedSize];
+		final int[] normalizedAllLon = new int[normalizedSize];
+		final int[] allNormalized2OriginalIndex = new int[normalizedSize];
 
-		float         normalizedDistance          = normalizedStartDistance * distanceInterval;
+		float normalizedDistance = normalizedStartDistance * distanceInterval;
 
-		int           measureIndex                = measureStartIndex;
+		int measureIndex = measureStartIndex;
 
-		float         measureNextDistance         = 0;
+		float measureNextDistance = 0;
 
 		for (int normIndex = 0; normIndex < normalizedSize; normIndex++) {
 
@@ -3276,8 +3308,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			final double latValueWithOffset = measureAllLat[measureIndex] + NORMALIZED_LATITUDE_OFFSET;
 			final double lonValueWithOffset = measureAllLon[measureIndex] + NORMALIZED_LONGITUDE_OFFSET;
 
-			final int    latNormalized      = (int) (latValueWithOffset * geoAccuracy);
-			final int    lonNormalized      = (int) (lonValueWithOffset * geoAccuracy);
+			final int latNormalized = (int) (latValueWithOffset * geoAccuracy);
+			final int lonNormalized = (int) (lonValueWithOffset * geoAccuracy);
 
 			normalizedAllDist[normIndex] = normalizedDistance;
 
@@ -3324,7 +3356,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * @param normalizedDistance
 	 * @return Returns rasterized lat/lon data of the tour or <code>null</code> when not available
 	 */
-	public NormalizedGeoData computeGeo_NormalizeLatLon_OLD( final int indexStart,
+	public NormalizedGeoData computeGeo_NormalizeLatLon_OLD(	final int indexStart,
 																				final int indexEnd,
 																				final int geoAccuracy,
 																				final int normalizedDistance) {
@@ -3335,7 +3367,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 		// validate indices
 		int firstIndex = indexStart < indexEnd ? indexStart : indexEnd;
-		int lastIndex  = indexStart > indexEnd ? indexStart : indexEnd;
+		int lastIndex = indexStart > indexEnd ? indexStart : indexEnd;
 
 		if (firstIndex < 0) {
 			firstIndex = 0;
@@ -3347,14 +3379,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			lastIndex = numSlices;
 		}
 
-		final int[] allNormalizedLat             = new int[numSlices];
-		final int[] allNormalizedLon             = new int[numSlices];
+		final int[] allNormalizedLat = new int[numSlices];
+		final int[] allNormalizedLon = new int[numSlices];
 		final int[] allNormalizedOriginalIndices = new int[numSlices];
 
-		int         prevLatNormalized            = Integer.MIN_VALUE;
-		int         prevLonNormalized            = Integer.MIN_VALUE;
+		int prevLatNormalized = Integer.MIN_VALUE;
+		int prevLonNormalized = Integer.MIN_VALUE;
 
-		int         normalizedIndex              = -1;
+		int normalizedIndex = -1;
 
 		for (int serieIndex = firstIndex; serieIndex < lastIndex; serieIndex++) {
 
@@ -3362,8 +3394,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			final double latValueWithOffset = latitudeSerie[serieIndex] + NORMALIZED_LATITUDE_OFFSET;
 			final double lonValueWithOffset = longitudeSerie[serieIndex] + NORMALIZED_LONGITUDE_OFFSET;
 
-			final int    latNormalized      = (int) (latValueWithOffset * geoAccuracy);
-			final int    lonNormalized      = (int) (lonValueWithOffset * geoAccuracy);
+			final int latNormalized = (int) (latValueWithOffset * geoAccuracy);
+			final int lonNormalized = (int) (lonValueWithOffset * geoAccuracy);
 
 			if (latNormalized != prevLatNormalized || lonNormalized != prevLonNormalized) {
 
@@ -3382,7 +3414,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			prevLonNormalized = lonNormalized;
 		}
 
-		final int               normalizedLength  = normalizedIndex + 1;
+		final int normalizedLength = normalizedIndex + 1;
 
 		final NormalizedGeoData normalizedGeoData = new NormalizedGeoData();
 
@@ -3435,17 +3467,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		final float[] zoneMinBpm = _hrZoneContext.zoneMinBpm;
 		final float[] zoneMaxBpm = _hrZoneContext.zoneMaxBpm;
 
-		final int     zoneSize   = zoneMinBpm.length;
-		final int[]   hrZones    = new int[zoneSize];
-		int           prevTime   = 0;
+		final int zoneSize = zoneMinBpm.length;
+		final int[] hrZones = new int[zoneSize];
+		int prevTime = 0;
 
 		// compute zone values
 		for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
 
-			final float pulse    = pulseSerieSmoothed[serieIndex];
-			final int   time     = timeSerie[serieIndex];
+			final float pulse = pulseSerieSmoothed[serieIndex];
+			final int time = timeSerie[serieIndex];
 
-			final int   timeDiff = time - prevTime;
+			final int timeDiff = time - prevTime;
 			prevTime = time;
 
 			// check if a break occured, break time is ignored
@@ -3463,7 +3495,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			}
 
 			boolean isZoneAvailable = false;
-			int     zoneIndex       = 0;
+			int zoneIndex = 0;
 
 			for (; zoneIndex < zoneSize; zoneIndex++) {
 
@@ -3565,7 +3597,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	private void computePhotoTimeAdjustment() {
 
 		long allPhotoTimeAdjustment = 0;
-		int  photoCounter           = 0;
+		int photoCounter = 0;
 
 		for (final TourPhoto tourPhoto : tourPhotos) {
 
@@ -3609,13 +3641,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			return;
 		}
 
-		final int      repeatedSmoothing = _prefStore.getInt(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_REPEATED_SMOOTHING);
-		final double   repeatedTau       = _prefStore.getDouble(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_REPEATED_TAU);
-		final double   tauPulse          = _prefStore.getDouble(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_PULSE_TAU);
+		final int repeatedSmoothing = _prefStore.getInt(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_REPEATED_SMOOTHING);
+		final double repeatedTau = _prefStore.getDouble(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_REPEATED_TAU);
+		final double tauPulse = _prefStore.getDouble(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_PULSE_TAU);
 
-		final int      size              = timeSerie.length;
-		final double[] heart_rate        = new double[size];
-		final double[] heart_rate_sc     = new double[size];
+		final int size = timeSerie.length;
+		final double[] heart_rate = new double[size];
+		final double[] heart_rate_sc = new double[size];
 
 		// convert float into double
 		for (int serieIndex = 0; serieIndex < size; serieIndex++) {
@@ -3644,8 +3676,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 			minValue = maxValue = getFirstNot0Value(runDyn_StanceTime);
 
-			int   numValues = 0;
-			float sumValue  = 0;
+			int numValues = 0;
+			float sumValue = 0;
 
 			for (final short value : runDyn_StanceTime) {
 
@@ -3681,8 +3713,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 			minValue = maxValue = getFirstNot0Value(runDyn_StanceTimeBalance);
 
-			int   numValues = 0;
-			float sumValue  = 0;
+			int numValues = 0;
+			float sumValue = 0;
 
 			for (final short value : runDyn_StanceTimeBalance) {
 
@@ -3718,8 +3750,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 			minValue = maxValue = getFirstNot0Value(runDyn_StepLength);
 
-			int   numValues = 0;
-			float sumValue  = 0;
+			int numValues = 0;
+			float sumValue = 0;
 
 			for (final short value : runDyn_StepLength) {
 
@@ -3755,8 +3787,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 			minValue = maxValue = getFirstNot0Value(runDyn_VerticalOscillation);
 
-			int   numValues = 0;
-			float sumValue  = 0;
+			int numValues = 0;
+			float sumValue = 0;
 
 			for (final short value : runDyn_VerticalOscillation) {
 
@@ -3792,8 +3824,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 			minValue = maxValue = getFirstNot0Value(runDyn_VerticalRatio);
 
-			int   numValues = 0;
-			float sumValue  = 0;
+			int numValues = 0;
+			float sumValue = 0;
 
 			for (final short value : runDyn_VerticalRatio) {
 
@@ -3841,16 +3873,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			return;
 		}
 
-		final int    size              = timeSerie.length;
+		final int size = timeSerie.length;
 
-		final double altitude[]        = new double[size];
-		final double altitude_sc[]     = new double[size];
+		final double altitude[] = new double[size];
+		final double altitude_sc[] = new double[size];
 
-		final double tauGradient       = _prefStore.getDouble(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_GRADIENT_TAU);
-		final double tauSpeed          = _prefStore.getDouble(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_SPEED_TAU);
+		final double tauGradient = _prefStore.getDouble(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_GRADIENT_TAU);
+		final double tauSpeed = _prefStore.getDouble(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_SPEED_TAU);
 
-		final int    repeatedSmoothing = _prefStore.getInt(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_REPEATED_SMOOTHING);
-		final double repeatedTau       = _prefStore.getDouble(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_REPEATED_TAU);
+		final int repeatedSmoothing = _prefStore.getInt(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_REPEATED_SMOOTHING);
+		final double repeatedTau = _prefStore.getDouble(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_REPEATED_TAU);
 
 		/*
 		 * smooth altitude
@@ -3911,16 +3943,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			return;
 		}
 
-		final double[] distance    = new double[size];
+		final double[] distance = new double[size];
 		final double[] distance_sc = new double[size];
 
-		final double   Vh_ini[]    = new double[size];
-		final double   Vh[]        = new double[size];
-		final double   Vh_sc[]     = new double[size];
+		final double Vh_ini[] = new double[size];
+		final double Vh[] = new double[size];
+		final double Vh_sc[] = new double[size];
 
-		final double   Vv_ini[]    = new double[size];
-		final double   Vv[]        = new double[size];
-		final double   Vv_sc[]     = new double[size];
+		final double Vv_ini[] = new double[size];
+		final double Vv[] = new double[size];
+		final double Vv_sc[] = new double[size];
 
 		/*
 		 * get distance
@@ -4044,7 +4076,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		maxSpeed = 0.0f;
 		for (int serieIndex = 0; serieIndex < Vh.length; serieIndex++) {
 
-			final double speedMetric   = Vh[serieIndex] * 3.6;
+			final double speedMetric = Vh[serieIndex] * 3.6;
 			final double speedImperial = speedMetric / UI.UNIT_MILE;
 
 			if (speedMetric > maxSpeed) {
@@ -4054,7 +4086,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			speedSerie[serieIndex] = (float) speedMetric;
 			speedSerieImperial[serieIndex] = (float) speedImperial;
 
-			final float paceMetricSeconds   = speedMetric < 1.0 ? 0 : (float) (3600.0 / speedMetric);
+			final float paceMetricSeconds = speedMetric < 1.0 ? 0 : (float) (3600.0 / speedMetric);
 			final float paceImperialSeconds = speedMetric < 0.6 ? 0 : (float) (3600.0 / speedImperial);
 
 			paceSerieSeconds[serieIndex] = paceMetricSeconds;
@@ -4166,7 +4198,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		paceSerieMinute = new float[serieLength];
 		paceSerieMinuteImperial = new float[serieLength];
 
-		int lowIndexAdjustmentDefault  = 0;
+		int lowIndexAdjustmentDefault = 0;
 		int highIndexAdjustmentDefault = 0;
 
 		if (deviceTimeInterval <= 2) {
@@ -4190,18 +4222,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 
 			// adjust index to the array size
-			final int   serieIndexLow     = serieIndex - lowIndexAdjustmentDefault;
-			final int   serieIndexLowMax  = ((0 >= serieIndexLow) ? 0 : serieIndexLow);
-			int         distIndexLow      = ((serieIndexLowMax <= serieLengthLast) ? serieIndexLowMax : serieLengthLast);
+			final int serieIndexLow = serieIndex - lowIndexAdjustmentDefault;
+			final int serieIndexLowMax = ((0 >= serieIndexLow) ? 0 : serieIndexLow);
+			int distIndexLow = ((serieIndexLowMax <= serieLengthLast) ? serieIndexLowMax : serieLengthLast);
 
-			final int   serieIndexHigh    = serieIndex + highIndexAdjustmentDefault;
-			final int   serieIndexHighMax = ((serieIndexHigh <= serieLengthLast) ? serieIndexHigh : serieLengthLast);
-			int         distIndexHigh     = ((0 >= serieIndexHighMax) ? 0 : serieIndexHighMax);
+			final int serieIndexHigh = serieIndex + highIndexAdjustmentDefault;
+			final int serieIndexHighMax = ((serieIndexHigh <= serieLengthLast) ? serieIndexHigh : serieLengthLast);
+			int distIndexHigh = ((0 >= serieIndexHighMax) ? 0 : serieIndexHighMax);
 
-			final float distanceDefault   = distanceSerie[distIndexHigh] - distanceSerie[distIndexLow];
+			final float distanceDefault = distanceSerie[distIndexHigh] - distanceSerie[distIndexLow];
 
 			// adjust the accuracy for the distance
-			int lowIndexAdjustment  = lowIndexAdjustmentDefault;
+			int lowIndexAdjustment = lowIndexAdjustmentDefault;
 			int highIndexAdjustment = highIndexAdjustmentDefault;
 
 			if (distanceDefault < 30) {
@@ -4216,12 +4248,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			}
 
 			// adjust index to the array size
-			final int serieIndexLowAdjusted    = serieIndex - lowIndexAdjustment;
+			final int serieIndexLowAdjusted = serieIndex - lowIndexAdjustment;
 			final int serieIndexLowAdjustedMax = ((0 >= serieIndexLowAdjusted) ? 0 : serieIndexLowAdjusted);
 
 			distIndexLow = (serieIndexLowAdjustedMax <= serieLengthLast) ? serieIndexLowAdjustedMax : serieLengthLast;
 
-			final int serieIndexHighAdjusted    = serieIndex + highIndexAdjustment;
+			final int serieIndexHighAdjusted = serieIndex + highIndexAdjustment;
 			final int serieIndexHighAdjustedMin = ((serieIndexHighAdjusted <= serieLengthLast)
 					? serieIndexHighAdjusted
 					: serieLengthLast);
@@ -4234,7 +4266,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			/*
 			 * speed
 			 */
-			float speedMetric   = 0;
+			float speedMetric = 0;
 			float speedImperial = 0;
 			if (timeDiff != 0) {
 				final float speed = (distDiff * 3.6f) / timeDiff;
@@ -4247,7 +4279,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 			maxSpeed = Math.max(maxSpeed, speedMetric);
 
-			final float paceMetricSeconds   = speedMetric < 1.0 ? 0 : (float) (3600.0 / speedMetric);
+			final float paceMetricSeconds = speedMetric < 1.0 ? 0 : (float) (3600.0 / speedMetric);
 			final float paceImperialSeconds = speedMetric < 0.6 ? 0 : (float) (3600.0 / speedImperial);
 
 			paceSerieSeconds[serieIndex] = paceMetricSeconds;
@@ -4268,9 +4300,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			return;
 		}
 
-		final int minTimeDiff    = _prefStore.getInt(ITourbookPreferences.APP_DATA_SPEED_MIN_TIMESLICE_VALUE);
+		final int minTimeDiff = _prefStore.getInt(ITourbookPreferences.APP_DATA_SPEED_MIN_TIMESLICE_VALUE);
 
-		final int serieLength    = timeSerie.length;
+		final int serieLength = timeSerie.length;
 		final int lastSerieIndex = serieLength - 1;
 
 		maxSpeed = 0;
@@ -4283,22 +4315,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		paceSerieMinute = new float[serieLength];
 		paceSerieMinuteImperial = new float[serieLength];
 
-		final boolean isUseLatLon     = (latitudeSerie != null) &&     //
+		final boolean isUseLatLon = (latitudeSerie != null) && //
 				(longitudeSerie != null) && (isDistanceFromSensor == 0); // --> distance is measured with the gps device and not from a sensor
 
-		boolean       isLatLongEqual  = false;
-		int           equalStartIndex = 0;
+		boolean isLatLongEqual = false;
+		int equalStartIndex = 0;
 
 		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 
 			final int prevSerieIndex = serieIndex - 1;
 
 			// adjust index to the array size
-			int   lowIndex  = ((0 >= prevSerieIndex) ? 0 : prevSerieIndex);
-			int   highIndex = ((serieIndex <= lastSerieIndex) ? serieIndex : lastSerieIndex);
+			int lowIndex = ((0 >= prevSerieIndex) ? 0 : prevSerieIndex);
+			int highIndex = ((serieIndex <= lastSerieIndex) ? serieIndex : lastSerieIndex);
 
-			int   timeDiff  = timeSerie[highIndex] - timeSerie[lowIndex];
-			float distDiff  = distanceSerie[highIndex] - distanceSerie[lowIndex];
+			int timeDiff = timeSerie[highIndex] - timeSerie[lowIndex];
+			float distDiff = distanceSerie[highIndex] - distanceSerie[lowIndex];
 
 			// check if a lat and long diff is available
 			if (isUseLatLon && (serieIndex > 0) && (serieIndex < lastSerieIndex - 1)) {
@@ -4322,11 +4354,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 					isLatLongEqual = false;
 
-					final int   equalTimeDiff = timeSerie[serieIndex] - timeSerie[equalStartIndex];
+					final int equalTimeDiff = timeSerie[serieIndex] - timeSerie[equalStartIndex];
 					final float equalDistDiff = distanceSerie[serieIndex] - distanceSerie[equalStartIndex];
 
-					float       speedMetric   = 0;
-					float       speedImperial = 0;
+					float speedMetric = 0;
+					float speedImperial = 0;
 
 					if ((equalTimeDiff > 20) && (equalDistDiff < 10)) {
 						// speed must be greater than 1.8 km/h
@@ -4335,10 +4367,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 						for (int equalSerieIndex = equalStartIndex
 								+ 1; equalSerieIndex < serieIndex; equalSerieIndex++) {
 
-							final int   equalSegmentTimeDiff = timeSerie[equalSerieIndex]
+							final int equalSegmentTimeDiff = timeSerie[equalSerieIndex]
 									- timeSerie[equalSerieIndex - 1];
 
-							final float equalSegmentDistDiff = equalTimeDiff == 0 ? 0 :        //
+							final float equalSegmentDistDiff = equalTimeDiff == 0 ? 0 : //
 									(float) equalSegmentTimeDiff / equalTimeDiff * equalDistDiff;
 
 							distanceSerie[equalSerieIndex] = distanceSerie[equalSerieIndex - 1] + equalSegmentDistDiff;
@@ -4389,7 +4421,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			/*
 			 * speed
 			 */
-			float speedMetric   = 0;
+			float speedMetric = 0;
 			float speedImperial = 0;
 
 			/*
@@ -4400,7 +4432,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			lowIndex = (lowIndex >= 0) ? lowIndex : 0;
 
 			boolean isTimeValid = true;
-			int     prevTime    = timeSerie[lowIndex];
+			int prevTime = timeSerie[lowIndex];
 
 			for (int timeIndex = lowIndex + 1; timeIndex <= highIndex; timeIndex++) {
 				final int currentTime = timeSerie[timeIndex];
@@ -4501,22 +4533,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			return;
 		}
 
-		final int                     timeDiffRange    = 10_000;
+		final int timeDiffRange = 10_000;
 
 		final ArrayList<TourWayPoint> removedWayPoints = new ArrayList<>();
 
 		for (final TourWayPoint wp : tourWayPoints) {
 
-			final long   wpTime = wp.getTime();
-			final double wpLat  = wp.getLatitude();
-			final double wpLon  = wp.getLongitude();
+			final long wpTime = wp.getTime();
+			final double wpLat = wp.getLatitude();
+			final double wpLon = wp.getLongitude();
 
 			for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
 
-				final int  relativeTime = timeSerie[serieIndex];
-				final long tourTime     = tourStartTime + relativeTime * 1000;
+				final int relativeTime = timeSerie[serieIndex];
+				final long tourTime = tourStartTime + relativeTime * 1000;
 
-				long       timeDiff     = tourTime - wpTime;
+				long timeDiff = tourTime - wpTime;
 				if (timeDiff < 0) {
 					timeDiff = -timeDiff;
 				}
@@ -4526,8 +4558,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 					final double tourLat = latitudeSerie[serieIndex];
 					final double tourLon = longitudeSerie[serieIndex];
 
-					double       latDiff = tourLat - wpLat;
-					double       lonDiff = tourLon - wpLon;
+					double latDiff = tourLat - wpLat;
+					double lonDiff = tourLon - wpLon;
 
 					if (latDiff < 0) {
 						latDiff = -latDiff;
@@ -4584,7 +4616,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 			final String imageFilePathName = tourPhoto.getImageFilePathName();
 
-			Photo        galleryPhoto      = PhotoCache.getPhoto(imageFilePathName);
+			Photo galleryPhoto = PhotoCache.getPhoto(imageFilePathName);
 			if (galleryPhoto == null) {
 
 				/*
@@ -4650,9 +4682,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		// convert data from the tour format into long[] array
 		for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
 
-			final HistoryData timeData     = timeDataSerie[serieIndex];
+			final HistoryData timeData = timeDataSerie[serieIndex];
 
-			final long        absoluteTime = timeData.absoluteTime;
+			final long absoluteTime = timeData.absoluteTime;
 
 			if (serieIndex == 0) {
 
@@ -4697,25 +4729,25 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			return null;
 		}
 
-		final float[]                segmenterAltitudeSerie = getAltitudeSmoothedSerie(false);
+		final float[] segmenterAltitudeSerie = getAltitudeSmoothedSerie(false);
 
-		final boolean                isAltitudeSerie        = (segmenterAltitudeSerie != null) && (segmenterAltitudeSerie.length > 0);
-		final boolean                isCadenceSerie         = (cadenceSerie != null) && (cadenceSerie.length > 0);
-		final boolean                isDistanceSerie        = (distanceSerie != null) && (distanceSerie.length > 0);
-		final boolean                isPulseSerie           = (pulseSerie != null) && (pulseSerie.length > 0);
+		final boolean isAltitudeSerie = (segmenterAltitudeSerie != null) && (segmenterAltitudeSerie.length > 0);
+		final boolean isCadenceSerie = (cadenceSerie != null) && (cadenceSerie.length > 0);
+		final boolean isDistanceSerie = (distanceSerie != null) && (distanceSerie.length > 0);
+		final boolean isPulseSerie = (pulseSerie != null) && (pulseSerie.length > 0);
 
-		final float[]                localPowerSerie        = getPowerSerie();
-		final boolean                isPowerSerie           = (localPowerSerie != null) && (localPowerSerie.length > 0);
+		final float[] localPowerSerie = getPowerSerie();
+		final boolean isPowerSerie = (localPowerSerie != null) && (localPowerSerie.length > 0);
 
-		final int                    segmentSerieLength     = segmentSerieIndex.length;
+		final int segmentSerieLength = segmentSerieIndex.length;
 
-		final ArrayList<TourSegment> tourSegments           = new ArrayList<>(segmentSerieLength);
-		final int                    firstSerieIndex        = segmentSerieIndex[0];
+		final ArrayList<TourSegment> tourSegments = new ArrayList<>(segmentSerieLength);
+		final int firstSerieIndex = segmentSerieIndex[0];
 
 		/*
 		 * get start values
 		 */
-		int   timeStart     = timeSerie[firstSerieIndex];
+		int timeStart = timeSerie[firstSerieIndex];
 
 		float altitudeStart = 0;
 		if (isAltitudeSerie) {
@@ -4727,15 +4759,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			distanceStart = distanceSerie[firstSerieIndex];
 		}
 
-		int         timeTotal                      = 0;
-		float       distanceTotal                  = 0;
+		int timeTotal = 0;
+		float distanceTotal = 0;
 
-		float       altitudeUpSummarizedBorder     = 0;
-		float       altitudeUpSummarizedComputed   = 0;
-		float       altitudeDownSummarizedBorder   = 0;
-		float       altitudeDownSummarizedComputed = 0;
+		float altitudeUpSummarizedBorder = 0;
+		float altitudeUpSummarizedComputed = 0;
+		float altitudeDownSummarizedBorder = 0;
+		float altitudeDownSummarizedComputed = 0;
 
-		final float tourPace                       = tourDistance == 0           //
+		final float tourPace = tourDistance == 0 //
 				? 0
 				: tourDrivingTime * 1000 / (tourDistance * UI.UNIT_VALUE_DISTANCE);
 
@@ -4758,22 +4790,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		segmentSerie_Power = new float[segmentSerieLength];
 		segmentSerie_Pulse = new float[segmentSerieLength];
 
-		int   segmentIndex2nd     = 0;
+		int segmentIndex2nd = 0;
 
-		int   totalTime_Recording = 0;
-		int   totalTime_Driving   = 0;
-		int   totalTime_Break     = 0;
-		float totalDistance       = 0;
-		float totalAltitude_Up    = 0;
-		float totalAltitude_Down  = 0;
+		int totalTime_Recording = 0;
+		int totalTime_Driving = 0;
+		int totalTime_Break = 0;
+		float totalDistance = 0;
+		float totalAltitude_Up = 0;
+		float totalAltitude_Down = 0;
 
 		// compute segment values between tour start and tour end
 		for (int segmentIndex = 1; segmentIndex < segmentSerieLength; segmentIndex++) {
 
-			final int         segmentStartIndex = segmentSerieIndex[segmentIndex - 1];
-			final int         segmentEndIndex   = segmentSerieIndex[segmentIndex];
+			final int segmentStartIndex = segmentSerieIndex[segmentIndex - 1];
+			final int segmentEndIndex = segmentSerieIndex[segmentIndex];
 
-			final TourSegment segment           = new TourSegment();
+			final TourSegment segment = new TourSegment();
 			tourSegments.add(segment);
 
 			segment.serieIndex_Start = segmentStartIndex;
@@ -4782,11 +4814,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			/*
 			 * time
 			 */
-			final int   segmentEndTime       = timeSerie[segmentEndIndex];
-			final int   segmentRecordingTime = segmentEndTime - timeStart;
-			final int   segmentBreakTime     = getBreakTime(segmentStartIndex, segmentEndIndex, btConfig);
+			final int segmentEndTime = timeSerie[segmentEndIndex];
+			final int segmentRecordingTime = segmentEndTime - timeStart;
+			final int segmentBreakTime = getBreakTime(segmentStartIndex, segmentEndIndex, btConfig);
 
-			final float segmentDrivingTime   = segmentRecordingTime - segmentBreakTime;
+			final float segmentDrivingTime = segmentRecordingTime - segmentBreakTime;
 
 			segmentSerie_Time_Recording[segmentIndex] = segment.time_Recording = segmentRecordingTime;
 			segmentSerie_Time_Driving[segmentIndex] = segment.time_Driving = (int) segmentDrivingTime;
@@ -4804,7 +4836,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			 */
 			if (isDistanceSerie) {
 
-				final float distanceEnd  = distanceSerie[segmentEndIndex];
+				final float distanceEnd = distanceSerie[segmentEndIndex];
 				final float distanceDiff = distanceEnd - distanceStart;
 
 				segmentSerie_Distance_Diff[segmentIndex] = segment.distance_Diff = distanceDiff;
@@ -4836,10 +4868,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			 */
 			if (isAltitudeSerie) {
 
-				final float altitudeEnd    = segmenterAltitudeSerie[segmentEndIndex];
-				final float altitudeDiff   = altitudeEnd - altitudeStart;
+				final float altitudeEnd = segmenterAltitudeSerie[segmentEndIndex];
+				final float altitudeDiff = altitudeEnd - altitudeStart;
 
-				final float altiUpDownHour = segmentDrivingTime == 0                                        //
+				final float altiUpDownHour = segmentDrivingTime == 0 //
 						? 0
 						: (altitudeDiff / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE) / segmentDrivingTime * 3600;
 
@@ -4879,7 +4911,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 				// get computed values: altitude up/down from the 2nd index
 				if (segmentSerieIndex2nd != null) {
 
-					float sumSegmentAltitude_Up   = 0;
+					float sumSegmentAltitude_Up = 0;
 					float sumSegmentAltitude_Down = 0;
 
 					// get initial altitude
@@ -4893,7 +4925,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 							break;
 						}
 
-						final float altitude2     = segmenterAltitudeSerie[serieIndex2nd];
+						final float altitude2 = segmenterAltitudeSerie[serieIndex2nd];
 						final float altitude2Diff = altitude2 - altitude1;
 
 						altitude1 = altitude2;
@@ -4959,11 +4991,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		/*
 		 * Add total segment
 		 */
-		final float       totalSpeed   = totalTime_Driving == 0                     //
+		final float totalSpeed = totalTime_Driving == 0 //
 				? 0
 				: totalDistance / totalTime_Driving * 3.6f / UI.UNIT_VALUE_DISTANCE;
 
-		final float       totalPace    = totalDistance == 0                         //
+		final float totalPace = totalDistance == 0 //
 				? 0
 				: totalTime_Driving * 1000 / (totalDistance / UI.UNIT_VALUE_DISTANCE);
 
@@ -5000,20 +5032,20 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			@Override
 			public void run() {
 
-				int           serieIndex           = 0;
-				float         lastValidSRTM        = 0;
-				boolean       isSRTMValid          = false;
+				int serieIndex = 0;
+				float lastValidSRTM = 0;
+				boolean isSRTMValid = false;
 
-				final int     serieLength          = timeSerie.length;
+				final int serieLength = timeSerie.length;
 
-				final float[] newSRTMSerie         = new float[serieLength];
+				final float[] newSRTMSerie = new float[serieLength];
 				final float[] newSRTMSerieImperial = new float[serieLength];
 
 				for (final double latitude : latitudeSerie) {
 
 					final double longitude = longitudeSerie[serieIndex];
 
-					float        srtmValue = 0;
+					float srtmValue = 0;
 
 					// ignore lat/lon 0/0, this is in the ocean
 					if (latitude != 0 || longitude != 0) {
@@ -5056,7 +5088,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		});
 	}
 
-	private float[] createSwim_DataSerie(final short[] swimDataSerie) {
+	private float[] createSwimUI_DataSerie(final short[] swimDataSerie) {
 
 		if (timeSerie == null || swim_Time == null || swim_Time.length == 0 || swimDataSerie == null) {
 			return null;
@@ -5064,7 +5096,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 		// create UI data serie
 
-		float[]   swimUIValues  = null;
+		float[] swimUIValues = null;
 
 		final int timeSerieSize = timeSerie.length;
 		final int swimSerieSize = swimDataSerie.length;
@@ -5088,14 +5120,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 					break;
 				}
 
-				final int  timeSerieEndIndex = tourIndex < numTours - 1 ? multipleTourStartIndex[tourIndex + 1] : timeSerieSize;
-				final int  swimSerieEndIndex = tourIndex < numTours - 1 ? multipleSwimStartIndex[tourIndex + 1] : swimSerieSize;
+				final int timeSerieEndIndex = tourIndex < numTours - 1 ? multipleTourStartIndex[tourIndex + 1] : timeSerieSize;
+				final int swimSerieEndIndex = tourIndex < numTours - 1 ? multipleSwimStartIndex[tourIndex + 1] : swimSerieSize;
 
 				final long swimTourStartTime = tourStartTime + (timeSerie[timeSerieStartIndex] * 1000);
-				long       swimTime          = tourStartTime + (swim_Time[swimSerieStartIndex] * 1000);
+				long swimTime = tourStartTime + (swim_Time[swimSerieStartIndex] * 1000);
 
-				short      swimValue         = 0;
-				int        swimSerieIndex    = swimSerieStartIndex;
+				short swimValue = 0;
+				int swimSerieIndex = swimSerieStartIndex;
 
 				for (int timeSerieIndex = timeSerieStartIndex; timeSerieIndex < timeSerieEndIndex; timeSerieIndex++) {
 
@@ -5113,7 +5145,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 							swimValue = swimDataSerie[swimSerieIndex];
 
 							if (swimValue == Short.MIN_VALUE) {
-								swimValue = 0;
+
+								// use MIN_VALUE that the original color is displayed which makes a rest time more visible
+								//	swimValue = 0;
 							}
 
 							swimTime = swimTourStartTime + (swim_Time[swimSerieIndex] * 1000);
@@ -5128,10 +5162,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 			// tour data contains 1 tour
 
-			long  swimTime       = tourStartTime + (swim_Time[0] * 1000);
-			short swimValue      = 0;
+			// set values for 1st swim slice
+			long swimTime = tourStartTime + (swim_Time[0] * 1000);
+			short swimValue = swimDataSerie[0];
 
-			int   swimSerieIndex = 0;
+			int swimSerieIndex = 0;
 
 			for (int timeSerieIndex = 0; timeSerieIndex < timeSerieSize; timeSerieIndex++) {
 
@@ -5149,7 +5184,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 						swimValue = swimDataSerie[swimSerieIndex];
 
 						if (swimValue == Short.MIN_VALUE) {
-							swimValue = 0;
+
+							// use MIN_VALUE that the original color is displayed which makes a rest time more visible
+							//	swimValue = 0;
 						}
 
 						swimTime = tourStartTime + (swim_Time[swimSerieIndex] * 1000);
@@ -5169,7 +5206,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 *
 	 * @return
 	 */
-	private float[] createSwim_SwolfDataSerie() {
+	private float[] createSwimUI_SwolfDataSerie() {
 
 		if (timeSerie == null
 				|| swim_Time == null || swim_Time.length == 0
@@ -5178,18 +5215,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			return null;
 		}
 
-		final int     swimSerieSize = swim_Time.length;
+		final int swimSerieSize = swim_Time.length;
 
-		final short[] swolfData     = new short[swimSerieSize];
+		final short[] swolfData = new short[swimSerieSize];
 
-		int           prevSwimTime  = swim_Time[0];
+		int prevSwimTime = swim_Time[0];
 
 		for (int swimIndex = 0; swimIndex < swim_Time.length; swimIndex++) {
 
-			final int   currentSwimTime = swim_Time[swimIndex];
-			final short strokes         = swim_Strokes[swimIndex];
+			final int currentSwimTime = swim_Time[swimIndex];
+			final short strokes = swim_Strokes[swimIndex];
 
-			final int   timeDiff        = currentSwimTime - prevSwimTime;
+			final int timeDiff = currentSwimTime - prevSwimTime;
 
 			swolfData[swimIndex] = (short) (strokes == Short.MIN_VALUE || strokes == 0
 					? 0
@@ -5198,7 +5235,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			prevSwimTime = currentSwimTime;
 		}
 
-		return createSwim_DataSerie(swolfData);
+		return createSwimUI_DataSerie(swolfData);
 	}
 
 	/**
@@ -5217,8 +5254,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			return;
 		}
 
-		final TimeData[] timeDataSerie     = timeDataList.toArray(new TimeData[serieSize]);
-		final TimeData   firstTimeDataItem = timeDataSerie[0];
+		final TimeData[] timeDataSerie = timeDataList.toArray(new TimeData[serieSize]);
+		final TimeData firstTimeDataItem = timeDataSerie[0];
 
 		/*
 		 * absolute time is set when absolute data are available which are mostly data from GPS
@@ -5270,16 +5307,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			 * absolute data are available when data are from GPS devices
 			 */
 
-			long tourStartTime         = 0;
-			long lastValidTime         = 0;
+			long tourStartTime = 0;
+			long lastValidTime = 0;
 			long lastValidAbsoluteTime = 0;
 
 			// convert data from the tour format into interger[] arrays
 			for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
 
-				final TimeData timeData     = timeDataSerie[serieIndex];
+				final TimeData timeData = timeDataSerie[serieIndex];
 
-				final long     absoluteTime = timeData.absoluteTime;
+				final long absoluteTime = timeData.absoluteTime;
 
 				if (serieIndex == 0) {
 
@@ -5463,7 +5500,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 				final TimeData timeData = timeDataSerie[serieIndex];
 
-				final int      tdTime   = timeData.time;
+				final int tdTime = timeData.time;
 
 				// set time
 				timeSerie[serieIndex] = (int) (recordingTime += tdTime == Integer.MIN_VALUE ? 0 : tdTime);
@@ -5541,11 +5578,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			// latitude can be null AFTER cleanup data series
 
 			// get time zone from lat/lon
-			final double lat       = latitudeSerie[0];
-			final double lon       = longitudeSerie[0];
+			final double lat = latitudeSerie[0];
+			final double lon = longitudeSerie[0];
 
 			final String rawZoneId = TimezoneMapper.latLngToTimezoneString(lat, lon);
-			final ZoneId zoneId    = ZoneId.of(rawZoneId);
+			final ZoneId zoneId = ZoneId.of(rawZoneId);
 
 			setTimeZoneId(zoneId.getId());
 		}
@@ -5561,7 +5598,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 				if (timeData.marker != 0) {
 
-					int   relativeTime  = 0;
+					int relativeTime = 0;
 					float distanceValue = 0;
 
 					if (timeSerie != null) {
@@ -5697,10 +5734,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 					field[nextValidIndex] = lastValidValue;
 				}
 
-				final int    time1 = time[serieIndex - 1];
-				final int    time2 = time[nextValidIndex];
-				final double val1  = field[serieIndex - 1];
-				final double val2  = field[nextValidIndex];
+				final int time1 = time[serieIndex - 1];
+				final int time2 = time[nextValidIndex];
+				final double val1 = field[serieIndex - 1];
+				final double val2 = field[nextValidIndex];
 
 				for (int interpolationIndex = serieIndex; interpolationIndex < nextValidIndex; interpolationIndex++) {
 
@@ -5752,12 +5789,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 					field[nextValidIndex] = lastValidValue;
 				}
 
-				final int    validValueIndex = serieIndex == 0 ? 0 : serieIndex - 1;
+				final int validValueIndex = serieIndex == 0 ? 0 : serieIndex - 1;
 
-				final int    time1           = time[validValueIndex];
-				final int    time2           = time[nextValidIndex];
-				final double val1            = field[validValueIndex];
-				final double val2            = field[nextValidIndex];
+				final int time1 = time[validValueIndex];
+				final int time2 = time[nextValidIndex];
+				final double val1 = field[validValueIndex];
+				final double val2 = field[nextValidIndex];
 
 				for (int interpolationIndex = serieIndex; interpolationIndex < nextValidIndex; interpolationIndex++) {
 
@@ -5776,7 +5813,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		}
 	}
 
-	private double createTimeSeries_40_linear_interpolation( final double time1,
+	private double createTimeSeries_40_linear_interpolation(	final double time1,
 																				final double time2,
 																				final double val1,
 																				final double val2,
@@ -6468,7 +6505,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			return null;
 		}
 
-		double[]    serie;
+		double[] serie;
 
 		final float unitValueDistance = UI.UNIT_VALUE_DISTANCE;
 
@@ -6587,15 +6624,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 		for (int gearIndex = 0; gearIndex < gearSize; gearIndex++) {
 
-			final long  gearRaw     = gearSerie[gearIndex];
+			final long gearRaw = gearSerie[gearIndex];
 
-			final float frontTeeth  = (gearRaw >> 24 & 0xff);
-			final float rearTeeth   = (gearRaw >> 8 & 0xff);
+			final float frontTeeth = (gearRaw >> 24 & 0xff);
+			final float rearTeeth = (gearRaw >> 8 & 0xff);
 
 			final float frontGearNo = (gearRaw >> 16 & 0xff);
-			final float rearGearNo  = (gearRaw >> 0 & 0xff);
+			final float rearGearNo = (gearRaw >> 0 & 0xff);
 
-			final float gearRatio   = frontTeeth / rearTeeth;
+			final float gearRatio = frontTeeth / rearTeeth;
 
 			_gears[0][gearIndex] = gearRatio;
 			_gears[1][gearIndex] = frontTeeth;
@@ -6955,26 +6992,26 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		final float weightBike = 10;
 		final float bodyHeight = 188;
 
-		final float cR         = 0.008f; // Rollreibungskoeffizient Asphalt
-		final float cD         = 0.8f;   // Streomungskoeffizient
-		final float p          = 1.145f; // 20C / 400m
+		final float cR = 0.008f; // Rollreibungskoeffizient Asphalt
+		final float cD = 0.8f; // Streomungskoeffizient
+		final float p = 1.145f; // 20C / 400m
 //		float p = 0.968f; // 10C / 2000m
 
 		final float weightTotal = weightBody + weightBike;
-		final float bsa         = (float) (0.007184f * Math.pow(weightBody, 0.425) * Math.pow(bodyHeight, 0.725));
-		final float aP          = bsa * 0.185f;
+		final float bsa = (float) (0.007184f * Math.pow(weightBody, 0.425) * Math.pow(bodyHeight, 0.725));
+		final float aP = bsa * 0.185f;
 
-		final float roll        = weightTotal * 9.81f * cR;
-		final float slope       = weightTotal * 9.81f;                                                            // * gradient/100
-		final float air         = 0.5f * p * cD * aP;                                                             // * v2;
+		final float roll = weightTotal * 9.81f * cR;
+		final float slope = weightTotal * 9.81f; // * gradient/100
+		final float air = 0.5f * p * cD * aP; // * v2;
 
 //		int joule = 0;
 //		int prefTime = 0;
 
 		for (int timeIndex = 0; timeIndex < timeSerie.length; timeIndex++) {
 
-			final float speed    = speedSerie[timeIndex] / 3.6f;   // speed km/h -> m/s
-			float       gradient = gradientSerie[timeIndex] / 100; // gradient (%) /100
+			final float speed = speedSerie[timeIndex] / 3.6f; // speed km/h -> m/s
+			float gradient = gradientSerie[timeIndex] / 100; // gradient (%) /100
 
 			// adjust computed errors
 //			if (gradient < 0.04 && gradient > 0) {
@@ -6991,11 +7028,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			}
 
 			final float slopeTotal = slope * gradient;
-			final float airTotal   = air * speed * speed;
+			final float airTotal = air * speed * speed;
 
-			final float total      = roll + airTotal + slopeTotal;
+			final float total = roll + airTotal + slopeTotal;
 
-			float       pTotal     = total * speed;
+			float pTotal = total * speed;
 
 //			if (pTotal > 600) {
 //				pTotal = pTotal * 1;
@@ -7419,7 +7456,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	public float[] getSwim_Cadence() {
 
 		if (_swim_Cadence_UI == null) {
-			_swim_Cadence_UI = createSwim_DataSerie(swim_Cadence);
+			_swim_Cadence_UI = createSwimUI_DataSerie(swim_Cadence);
 		}
 
 		return _swim_Cadence_UI;
@@ -7431,7 +7468,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	public float[] getSwim_Strokes() {
 
 		if (_swim_Strokes_UI == null) {
-			_swim_Strokes_UI = createSwim_DataSerie(swim_Strokes);
+			_swim_Strokes_UI = createSwimUI_DataSerie(swim_Strokes);
 		}
 
 		return _swim_Strokes_UI;
@@ -7440,10 +7477,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	/**
 	 * @return Returns the UI values for number of strokes.
 	 */
+	public float[] getSwim_StrokeStyle() {
+
+		if (_swim_StrokeStyle_UI == null) {
+			_swim_StrokeStyle_UI = createSwimUI_DataSerie(swim_StrokeStyle);
+		}
+
+		return _swim_StrokeStyle_UI;
+	}
+
+	/**
+	 * @return Returns the UI values for number of strokes.
+	 */
 	public float[] getSwim_Swolf() {
 
 		if (_swim_Swolf == null) {
-			_swim_Swolf = createSwim_SwolfDataSerie();
+			_swim_Swolf = createSwimUI_SwolfDataSerie();
 		}
 
 		return _swim_Swolf;
@@ -7459,11 +7508,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			return null;
 		}
 
-		float[]     serie;
+		float[] serie;
 
 		final float unitValueTempterature = UI.UNIT_VALUE_TEMPERATURE;
-		final float fahrenheitMulti       = UI.UNIT_FAHRENHEIT_MULTI;
-		final float fahrenheitAdd         = UI.UNIT_FAHRENHEIT_ADD;
+		final float fahrenheitMulti = UI.UNIT_FAHRENHEIT_MULTI;
+		final float fahrenheitAdd = UI.UNIT_FAHRENHEIT_ADD;
 
 		if (unitValueTempterature != 1) {
 
@@ -7548,12 +7597,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		}
 
 		final ZonedDateTime tourStartDefaultZone = getTourStartTime();
-		final int           utcZoneOffset        = tourStartDefaultZone.getOffset().getTotalSeconds();
+		final int utcZoneOffset = tourStartDefaultZone.getOffset().getTotalSeconds();
 
-		final long          tourStartUTC         = tourStartDefaultZone.plusSeconds(utcZoneOffset).toInstant().toEpochMilli();
-		final long          tourEnd              = tourEndTime;
+		final long tourStartUTC = tourStartDefaultZone.plusSeconds(utcZoneOffset).toInstant().toEpochMilli();
+		final long tourEnd = tourEndTime;
 
-		final ZoneId        defaultZone          = TimeTools.getDefaultTimeZone();
+		final ZoneId defaultZone = TimeTools.getDefaultTimeZone();
 
 		if (defaultZone.getId().equals(TIME_ZONE_ID_EUROPE_BERLIN)) {
 
@@ -7575,9 +7624,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 					for (int serieIndex = 0; serieIndex < timeSerieHistory.length; serieIndex++) {
 
-						long       historyTimeSlice = timeSerieHistory[serieIndex];
+						long historyTimeSlice = timeSerieHistory[serieIndex];
 
-						final long absoluteUTCTime  = tourStartUTC + historyTimeSlice * 1000;
+						final long absoluteUTCTime = tourStartUTC + historyTimeSlice * 1000;
 
 						if (absoluteUTCTime > net.tourbook.common.UI.beforeCET) {
 							historyTimeSlice += net.tourbook.common.UI.BERLIN_HISTORY_ADJUSTMENT;
@@ -7607,12 +7656,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 */
 	public ZoneId getTimeZoneIdWithDefault() {
 
-		final String zoneIdRaw = timeZoneId == null   //
+		final String zoneIdRaw = timeZoneId == null //
 
 				? TimeTools.getDefaultTimeZoneId()
 				: timeZoneId;
 
-		final ZoneId tzId      = ZoneId.of(zoneIdRaw);
+		final ZoneId tzId = ZoneId.of(zoneIdRaw);
 
 		return tzId;
 	}
@@ -7752,10 +7801,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 		if (_zonedStartTime == null) {
 
-			final Instant       tourStartMills      = Instant.ofEpochMilli(tourStartTime);
-			final ZoneId        tourStartTimeZoneId = getTimeZoneIdWithDefault();
+			final Instant tourStartMills = Instant.ofEpochMilli(tourStartTime);
+			final ZoneId tourStartTimeZoneId = getTimeZoneIdWithDefault();
 
-			final ZonedDateTime zonedStartTime      = ZonedDateTime.ofInstant(tourStartMills, tourStartTimeZoneId);
+			final ZonedDateTime zonedStartTime = ZonedDateTime.ofInstant(tourStartMills, tourStartTimeZoneId);
 
 			if (timeZoneId == null) {
 
@@ -8231,7 +8280,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		runDyn_VerticalRatio = serieData.runDyn_VerticalRatio;
 
 		// swimming
-		swim_ActivityType = serieData.swim_ActivityType;
+		swim_LengthType = serieData.swim_LengthType;
 		swim_Cadence = serieData.swim_Cadence;
 		swim_Strokes = serieData.swim_Strokes;
 		swim_StrokeStyle = serieData.swim_StrokeStyle;
@@ -8284,7 +8333,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		serieData.runDyn_VerticalOscillation = runDyn_VerticalOscillation;
 
 		// swimming
-		serieData.swim_ActivityType = swim_ActivityType;
+		serieData.swim_LengthType = swim_LengthType;
 		serieData.swim_Cadence = swim_Cadence;
 		serieData.swim_Strokes = swim_Strokes;
 		serieData.swim_StrokeStyle = swim_StrokeStyle;
@@ -8459,15 +8508,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 		// convert gear data into a gearSerie
 
-		final long[] gearSerie     = new long[timeSerie.length];
+		final long[] gearSerie = new long[timeSerie.length];
 
-		int          gearIndex     = 0;
-		final int    nextGearIndex = gearSize > 0 ? 1 : 0;
+		int gearIndex = 0;
+		final int nextGearIndex = gearSize > 0 ? 1 : 0;
 
-		GearData     currentGear   = gears.get(0);
-		GearData     nextGear      = gears.get(nextGearIndex);
+		GearData currentGear = gears.get(0);
+		GearData nextGear = gears.get(nextGearIndex);
 
-		long         nextGearTime;
+		long nextGearTime;
 		if (gearIndex >= nextGearIndex) {
 			// there are no further gears
 			nextGearTime = Long.MAX_VALUE;
@@ -8475,10 +8524,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			nextGearTime = nextGear.absoluteTime;
 		}
 
-		int frontShiftCount  = 0;
-		int rearShiftCount   = 0;
+		int frontShiftCount = 0;
+		int rearShiftCount = 0;
 		int currentFrontGear = currentGear.getFrontGearTeeth();
-		int currentRearGear  = currentGear.getRearGearTeeth();
+		int currentRearGear = currentGear.getRearGearTeeth();
 
 		for (int timeIndex = 0; timeIndex < gearSerie.length; timeIndex++) {
 
@@ -8500,7 +8549,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 					nextGearTime = nextGear.absoluteTime;
 
 					final int nextFrontGear = nextGear.getFrontGearTeeth();
-					final int nextRearGear  = nextGear.getRearGearTeeth();
+					final int nextRearGear = nextGear.getRearGearTeeth();
 
 					if (currentFrontGear != nextFrontGear) {
 
@@ -8540,16 +8589,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			return;
 		}
 
-		int frontShifts      = 0;
-		int rearShifts       = 0;
+		int frontShifts = 0;
+		int rearShifts = 0;
 
 		int currentFrontGear = (int) (gearSerieData[0] >> 24 & 0xff);
-		int currentRearGear  = (int) (gearSerieData[0] >> 8 & 0xff);
+		int currentRearGear = (int) (gearSerieData[0] >> 8 & 0xff);
 
 		for (final long gear : gearSerieData) {
 
 			final int nextFrontGear = (int) (gear >> 24 & 0xff);
-			final int nextRearGear  = (int) (gear >> 8 & 0xff);
+			final int nextRearGear = (int) (gear >> 8 & 0xff);
 
 			if (currentFrontGear != nextFrontGear) {
 				frontShifts++;
@@ -8593,9 +8642,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 		try {
 
-			final Path filePath   = Paths.get(tourImportFilePath);
+			final Path filePath = Paths.get(tourImportFilePath);
 
-			final Path fileName   = filePath.getFileName();
+			final Path fileName = filePath.getFileName();
 			final Path folderPath = filePath.getParent();
 
 			// extract file name
@@ -8732,7 +8781,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		this.restPulse = restPulse;
 	}
 
-	private void setSpeed(  final int serieIndex,
+	private void setSpeed(	final int serieIndex,
 									final float speedMetric,
 									final float speedImperial,
 									final int timeDiff,
@@ -8743,7 +8792,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 		maxSpeed = Math.max(maxSpeed, speedMetric);
 
-		final float paceMetricSeconds   = speedMetric < 1.0 ? 0 : (float) (3600.0 / speedMetric);
+		final float paceMetricSeconds = speedMetric < 1.0 ? 0 : (float) (3600.0 / speedMetric);
 		final float paceImperialSeconds = speedMetric < 0.6 ? 0 : (float) (3600.0 / speedImperial);
 
 		paceSerieSeconds[serieIndex] = paceMetricSeconds;
@@ -8882,7 +8931,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 			for (final Photo oldGalleryPhoto : oldGalleryPhotos) {
 
 				final String oldImageFilePathName = oldGalleryPhoto.imageFilePathName;
-				boolean      isPhotoUsed          = false;
+				boolean isPhotoUsed = false;
 
 				for (final Photo newGalleryPhoto : newGalleryPhotos) {
 
@@ -8955,7 +9004,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * @param tourStartMinute
 	 * @param tourStartSecond
 	 */
-	public void setTourStartTime( final int tourStartYear,
+	public void setTourStartTime(	final int tourStartYear,
 											final int tourStartMonth,
 											final int tourStartDay,
 											final int tourStartHour,
@@ -9058,9 +9107,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	private boolean setupStartingValues_Altitude(final TimeData[] timeDataSerie, final boolean isAbsoluteData) {
 
 		final TimeData firstTimeData = timeDataSerie[0];
-		final int      serieSize     = timeDataSerie.length;
+		final int serieSize = timeDataSerie.length;
 
-		boolean        isAvailable   = false;
+		boolean isAvailable = false;
 
 		if (isAbsoluteData) {
 
@@ -9110,9 +9159,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	private boolean setupStartingValues_Cadence(final TimeData[] timeDataSerie) {
 
 		final TimeData firstTimeData = timeDataSerie[0];
-		final int      serieSize     = timeDataSerie.length;
+		final int serieSize = timeDataSerie.length;
 
-		boolean        isAvailable   = false;
+		boolean isAvailable = false;
 
 		if (firstTimeData.cadence == Float.MIN_VALUE) {
 
@@ -9149,9 +9198,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	private boolean setupStartingValues_Distance(final TimeData[] timeDataSerie, final boolean isAbsoluteData) {
 
 		final TimeData firstTimeData = timeDataSerie[0];
-		final int      serieSize     = timeDataSerie.length;
+		final int serieSize = timeDataSerie.length;
 
-		boolean        isAvailable   = false;
+		boolean isAvailable = false;
 
 		if ((firstTimeData.distance != Float.MIN_VALUE) || isAbsoluteData) {
 			distanceSerie = new float[serieSize];
@@ -9164,9 +9213,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	private boolean setupStartingValues_Gear(final TimeData[] timeDataSerie) {
 
 		final TimeData firstTimeData = timeDataSerie[0];
-		final int      serieSize     = timeDataSerie.length;
+		final int serieSize = timeDataSerie.length;
 
-		boolean        isAvailable   = false;
+		boolean isAvailable = false;
 
 		if (firstTimeData.gear == 0) {
 
@@ -9174,8 +9223,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 			for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
 
-				final TimeData timeData  = timeDataSerie[timeDataIndex];
-				final long     gearValue = timeData.gear;
+				final TimeData timeData = timeDataSerie[timeDataIndex];
+				final long gearValue = timeData.gear;
 
 				if (gearValue != 0) {
 
@@ -9205,7 +9254,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	private boolean setupStartingValues_LatLon(final TimeData[] timeDataSerie) {
 
 		final int serieSize = timeDataSerie.length;
-		boolean   isGPS     = false;
+		boolean isGPS = false;
 
 		for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
 
@@ -9215,7 +9264,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 				isGPS = true;
 
-				final double firstValidLatitude  = timeData.latitude;
+				final double firstValidLatitude = timeData.latitude;
 				final double firstValidLongitude = timeData.longitude;
 
 				latitudeSerie = new double[serieSize];
@@ -9238,16 +9287,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	private boolean setupStartingValues_Power(final TimeData[] timeDataSerie) {
 
 		final TimeData firstTimeData = timeDataSerie[0];
-		final int      serieSize     = timeDataSerie.length;
+		final int serieSize = timeDataSerie.length;
 
-		boolean        isAvailable   = false;
+		boolean isAvailable = false;
 
 		if (firstTimeData.power == Float.MIN_VALUE) {
 
 			for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
 
 				final TimeData timeData = timeDataSerie[timeDataIndex];
-				final float    power    = timeData.power;
+				final float power = timeData.power;
 
 				if (power != Float.MIN_VALUE) {
 
@@ -9281,16 +9330,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	private boolean setupStartingValues_Pulse(final TimeData[] timeDataSerie) {
 
 		final TimeData firstTimeData = timeDataSerie[0];
-		final int      serieSize     = timeDataSerie.length;
+		final int serieSize = timeDataSerie.length;
 
-		boolean        isAvailable   = false;
+		boolean isAvailable = false;
 
 		if (firstTimeData.pulse == Float.MIN_VALUE) {
 
 			for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
 
 				final TimeData timeData = timeDataSerie[timeDataIndex];
-				final float    pulse    = timeData.pulse;
+				final float pulse = timeData.pulse;
 
 				if (pulse > 0) {
 
@@ -9321,9 +9370,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	private boolean setupStartingValues_RunDyn_StanceTime(final TimeData[] timeDataSerie) {
 
 		final TimeData firstTimeData = timeDataSerie[0];
-		final int      serieSize     = timeDataSerie.length;
+		final int serieSize = timeDataSerie.length;
 
-		boolean        isAvailable   = false;
+		boolean isAvailable = false;
 
 		if (firstTimeData.runDyn_StanceTime == Short.MIN_VALUE) {
 
@@ -9361,9 +9410,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	private boolean setupStartingValues_RunDyn_StanceTimeBalance(final TimeData[] timeDataSerie) {
 
 		final TimeData firstTimeData = timeDataSerie[0];
-		final int      serieSize     = timeDataSerie.length;
+		final int serieSize = timeDataSerie.length;
 
-		boolean        isAvailable   = false;
+		boolean isAvailable = false;
 
 		if (firstTimeData.runDyn_StanceTimeBalance == Short.MIN_VALUE) {
 
@@ -9401,9 +9450,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	private boolean setupStartingValues_RunDyn_StepLength(final TimeData[] timeDataSerie) {
 
 		final TimeData firstTimeData = timeDataSerie[0];
-		final int      serieSize     = timeDataSerie.length;
+		final int serieSize = timeDataSerie.length;
 
-		boolean        isAvailable   = false;
+		boolean isAvailable = false;
 
 		if (firstTimeData.runDyn_StepLength == Short.MIN_VALUE) {
 
@@ -9441,9 +9490,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	private boolean setupStartingValues_RunDyn_VerticalOscillation(final TimeData[] timeDataSerie) {
 
 		final TimeData firstTimeData = timeDataSerie[0];
-		final int      serieSize     = timeDataSerie.length;
+		final int serieSize = timeDataSerie.length;
 
-		boolean        isAvailable   = false;
+		boolean isAvailable = false;
 
 		if (firstTimeData.runDyn_VerticalOscillation == Short.MIN_VALUE) {
 
@@ -9481,9 +9530,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	private boolean setupStartingValues_RunDyn_VerticalRatio(final TimeData[] timeDataSerie) {
 
 		final TimeData firstTimeData = timeDataSerie[0];
-		final int      serieSize     = timeDataSerie.length;
+		final int serieSize = timeDataSerie.length;
 
-		boolean        isAvailable   = false;
+		boolean isAvailable = false;
 
 		if (firstTimeData.runDyn_VerticalRatio == Short.MIN_VALUE) {
 
@@ -9521,16 +9570,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	private boolean setupStartingValues_Temperature(final TimeData[] timeDataSerie) {
 
 		final TimeData firstTimeData = timeDataSerie[0];
-		final int      serieSize     = timeDataSerie.length;
+		final int serieSize = timeDataSerie.length;
 
-		boolean        isAvailable   = false;
+		boolean isAvailable = false;
 
 		if (firstTimeData.temperature == Float.MIN_VALUE) {
 
 			for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
 
-				final TimeData timeData    = timeDataSerie[timeDataIndex];
-				final float    temperature = timeData.temperature;
+				final TimeData timeData = timeDataSerie[timeDataIndex];
+				final float temperature = timeData.temperature;
 
 				if (temperature != Float.MIN_VALUE) {
 
@@ -9623,7 +9672,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * @param zoomLevel
 	 * @param projectionId
 	 */
-	public void setWorldPixelForWayPoints( final TIntObjectHashMap<Point> worldPositions,
+	public void setWorldPixelForWayPoints(	final TIntObjectHashMap<Point> worldPositions,
 														final int zoomLevel,
 														final String projectionId) {
 
@@ -9660,9 +9709,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	public String toXml() {
 
 		try {
-			final JAXBContext  context    = JAXBContext.newInstance(this.getClass());
-			final Marshaller   marshaller = context.createMarshaller();
-			final StringWriter sw         = new StringWriter();
+			final JAXBContext context = JAXBContext.newInstance(TourData.class);
+			final Marshaller marshaller = context.createMarshaller();
+			final StringWriter sw = new StringWriter();
 			marshaller.marshal(this, sw);
 			return sw.toString();
 

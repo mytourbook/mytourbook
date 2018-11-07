@@ -43,8 +43,8 @@ public class ActionMenuSetSignStructure_DISABLED /* extends Action implements IM
 //
 //					for (final Object element : selection.toArray()) {
 //
-//						if (element instanceof TVITagViewTour) {
-//							setTagStructure(((TVITagViewTour) element).getParentItem());
+//						if (element instanceof TVITagView_Tour) {
+//							setTagStructure(((TVITagView_Tour) element).getParentItem());
 //						} else {
 //							setTagStructure(element);
 //						}
@@ -53,21 +53,21 @@ public class ActionMenuSetSignStructure_DISABLED /* extends Action implements IM
 //
 //				private void setTagStructure(final Object element) {
 //
-//					if (element instanceof TVITagViewTag) {
+//					if (element instanceof TVITagView_Tag) {
 //
-//						setTagStructure2((TVITagViewTag) element);
+//						setTagStructure2((TVITagView_Tag) element);
 //
-//					} else if (element instanceof TVITagViewYear) {
+//					} else if (element instanceof TVITagView_Year) {
 //
-//						setTagStructure2(((TVITagViewYear) element).getTagItem());
+//						setTagStructure2(((TVITagView_Year) element).getTagItem());
 //
-//					} else if (element instanceof TVITagViewMonth) {
+//					} else if (element instanceof TVITagView_Month) {
 //
-//						setTagStructure2(((TVITagViewMonth) element).getYearItem().getTagItem());
+//						setTagStructure2(((TVITagView_Month) element).getYearItem().getTagItem());
 //					}
 //				}
 //
-//				private void setTagStructure2(final TVITagViewTag tagItem) {
+//				private void setTagStructure2(final TVITagView_Tag tagItem) {
 //
 //					// check if expand type has changed
 //					if (tagItem.getExpandType() == fExpandType) {
@@ -189,8 +189,8 @@ public class ActionMenuSetSignStructure_DISABLED /* extends Action implements IM
 //
 //			// set the expand type when only one tag is selected
 //
-//			if (selection.getFirstElement() instanceof TVITagViewTag) {
-//				final TVITagViewTag itemTag = (TVITagViewTag) selection.getFirstElement();
+//			if (selection.getFirstElement() instanceof TVITagView_Tag) {
+//				final TVITagView_Tag itemTag = (TVITagView_Tag) selection.getFirstElement();
 //				selectedExpandType = itemTag.getExpandType();
 //			}
 //		}

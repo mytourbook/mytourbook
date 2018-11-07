@@ -78,8 +78,8 @@ import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 public class RawDataManager {
 
-	private static final String		RAW_DATA_LAST_SELECTED_PATH			= "raw-data-view.last-selected-import-path";					//$NON-NLS-1$
-	private static final String		TEMP_IMPORTED_FILE						= "received-device-data.txt";										//$NON-NLS-1$
+	private static final String		RAW_DATA_LAST_SELECTED_PATH			= "raw-data-view.last-selected-import-path";	//$NON-NLS-1$
+	private static final String		TEMP_IMPORTED_FILE						= "received-device-data.txt";						//$NON-NLS-1$
 	//
 	public static final String			LOG_IMPORT_DELETE_TOUR_FILE			= Messages.Log_Import_DeleteTourFiles;
 	public static final String			LOG_IMPORT_DELETE_TOUR_FILE_END		= Messages.Log_Import_DeleteTourFiles_End;
@@ -125,39 +125,39 @@ public class RawDataManager {
 		};
 	}
 
-	private static RawDataManager					_instance									= null;
+	private static RawDataManager				_instance						= null;
 
-	private final IPreferenceStore				_prefStore									= TourbookPlugin.getPrefStore();
+	private final IPreferenceStore			_prefStore						= TourbookPlugin.getPrefStore();
 
 	/**
 	 * contains the device data imported from the device/file
 	 */
-	private final DeviceData						_deviceData									= new DeviceData();
+	private final DeviceData					_deviceData						= new DeviceData();
 
 	/**
 	 * Contains tours which are imported or received and displayed in the import view.
 	 */
-	private final HashMap<Long, TourData>		_toursInImportView						= new HashMap<>();
+	private final HashMap<Long, TourData>	_toursInImportView			= new HashMap<>();
 
 	/**
 	 * Contains tours which are imported from the last file name.
 	 */
-	private final HashMap<Long, TourData>		_newlyImportedTours						= new HashMap<>();
+	private final HashMap<Long, TourData>	_newlyImportedTours			= new HashMap<>();
 
-	private String										_lastImportedFileName;
+	private String									_lastImportedFileName;
 
 	/**
 	 * Contains the filenames for all imported files which are displayed in the import view
 	 */
-	private final HashSet<String>					_importedFileNames						= new HashSet<>();
+	private final HashSet<String>				_importedFileNames			= new HashSet<>();
 
 	/**
 	 * Contains filenames which are not directly imported but is imported from other imported files
 	 */
-	private final HashSet<String>					_importedFileNamesChildren				= new HashSet<>();
+	private final HashSet<String>				_importedFileNamesChildren	= new HashSet<>();
 
-	private boolean									_isImported;
-	private boolean									_isImportCanceled;
+	private boolean								_isImported;
+	private boolean								_isImportCanceled;
 	//
 // SET_FORMATTING_OFF
 	private int								_importState_ImportYear				= ADJUST_IMPORT_YEAR_IS_DISABLED;
@@ -171,8 +171,8 @@ public class RawDataManager {
 
 	private HashMap<String, TourbookDevice>	_devicesByExtension;
 
-	private final ArrayList<TourType>			_tempTourTypes								= new ArrayList<>();
-	private final ArrayList<TourTag>				_tempTourTags								= new ArrayList<>();
+	private final ArrayList<TourType>			_tempTourTypes	= new ArrayList<>();
+	private final ArrayList<TourTag>				_tempTourTags	= new ArrayList<>();
 
 	/**
 	 * Filepath from the previous reimported tour
@@ -938,6 +938,7 @@ public class RawDataManager {
 					|| reimportId == ReImport.OnlyPowerAndPulseValues
 					|| reimportId == ReImport.OnlyPowerAndSpeedValues
 					|| reimportId == ReImport.OnlyRunningDynamics
+					|| reimportId == ReImport.OnlySwimming
 					|| reimportId == ReImport.OnlyTemperatureValues) {
 
 				// replace part of the tour
@@ -1037,17 +1038,17 @@ public class RawDataManager {
 
 //SET_FORMATTING_OFF
 
-				oldTourData.setPower_Avg(							reimportedTourData.getPower_Avg());
-				oldTourData.setPower_Max(							reimportedTourData.getPower_Max());
-				oldTourData.setPower_Normalized(					reimportedTourData.getPower_Normalized());
-				oldTourData.setPower_FTP(							reimportedTourData.getPower_FTP());
+				oldTourData.setPower_Avg(									reimportedTourData.getPower_Avg());
+				oldTourData.setPower_Max(									reimportedTourData.getPower_Max());
+				oldTourData.setPower_Normalized(							reimportedTourData.getPower_Normalized());
+				oldTourData.setPower_FTP(									reimportedTourData.getPower_FTP());
 
-				oldTourData.setPower_TotalWork(						reimportedTourData.getPower_TotalWork());
-				oldTourData.setPower_TrainingStressScore(			reimportedTourData.getPower_TrainingStressScore());
-				oldTourData.setPower_IntensityFactor(				reimportedTourData.getPower_IntensityFactor());
+				oldTourData.setPower_TotalWork(							reimportedTourData.getPower_TotalWork());
+				oldTourData.setPower_TrainingStressScore(				reimportedTourData.getPower_TrainingStressScore());
+				oldTourData.setPower_IntensityFactor(					reimportedTourData.getPower_IntensityFactor());
 
 				oldTourData.setPower_PedalLeftRightBalance(			reimportedTourData.getPower_PedalLeftRightBalance());
-				oldTourData.setPower_AvgLeftPedalSmoothness(		reimportedTourData.getPower_AvgLeftPedalSmoothness());
+				oldTourData.setPower_AvgLeftPedalSmoothness(			reimportedTourData.getPower_AvgLeftPedalSmoothness());
 				oldTourData.setPower_AvgLeftTorqueEffectiveness(	reimportedTourData.getPower_AvgLeftTorqueEffectiveness());
 				oldTourData.setPower_AvgRightPedalSmoothness(		reimportedTourData.getPower_AvgRightPedalSmoothness());
 				oldTourData.setPower_AvgRightTorqueEffectiveness(	reimportedTourData.getPower_AvgRightTorqueEffectiveness());
@@ -1096,7 +1097,7 @@ public class RawDataManager {
 
 			// reimport only swimming
 
-			oldTourData.swim_ActivityType = reimportedTourData.swim_ActivityType;
+			oldTourData.swim_LengthType = reimportedTourData.swim_LengthType;
 			oldTourData.swim_Cadence = reimportedTourData.swim_Cadence;
 			oldTourData.swim_Strokes = reimportedTourData.swim_Strokes;
 			oldTourData.swim_StrokeStyle = reimportedTourData.swim_StrokeStyle;

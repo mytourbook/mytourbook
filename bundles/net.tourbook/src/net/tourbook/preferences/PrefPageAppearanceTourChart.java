@@ -64,9 +64,9 @@ import net.tourbook.tour.TourManager;
 
 public class PrefPageAppearanceTourChart extends PreferencePage implements IWorkbenchPreferencePage {
 
-	public static final String			ID															= "net.tourbook.preferences.PrefPageChartGraphs";							//$NON-NLS-1$
+	public static final String		ID														= "net.tourbook.preferences.PrefPageChartGraphs";	//$NON-NLS-1$
 
-	private static final String		STATE_PREF_PAGE_CHART_GRAPHS_SELECTED_TAB		= "PrefPage.ChartGraphs.SelectedTab";											//$NON-NLS-1$
+	private static final String	STATE_PREF_PAGE_CHART_GRAPHS_SELECTED_TAB	= "PrefPage.ChartGraphs.SelectedTab";					//$NON-NLS-1$
 
 // SET_FORMATTING_OFF
 
@@ -98,7 +98,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 // SET_FORMATTING_ON
 
-	private final IPreferenceStore	_prefStore												= TourbookPlugin.getPrefStore();
+	private final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
 
 	private HashMap<Integer, Graph>	_graphMap;
 	private ArrayList<Graph>			_graphList;
@@ -111,43 +111,42 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	/*
 	 * UI controls
 	 */
-	private TabFolder						_tabFolder;
-	private TabItem						_tab1_Graphs;
-	private TabItem						_tab2_Grid;
-	private TabItem						_tab3_Options;
+	private TabFolder					_tabFolder;
+	private TabItem					_tab1_Graphs;
+	private TabItem					_tab2_Grid;
+	private TabItem					_tab3_Options;
 
-	private CheckboxTableViewer		_graphCheckboxList;
+	private CheckboxTableViewer	_graphCheckboxList;
 
-	private Button							_btnDown;
-	private Button							_btnUp;
+	private Button						_btnDown;
+	private Button						_btnUp;
 
-	private Button							_chkGraphAntialiasing;
-	private Button							_chkLiveUpdate;
+	private Button						_chkGraphAntialiasing;
+	private Button						_chkLiveUpdate;
 
-	private Button							_chkMoveSlidersWhenZoomed;
-	private Button							_chkSegmentAlternateColor;
-	private Button							_chkShowGrid_HorizontalLines;
-	private Button							_chkShowHrZoneBackground;
-	private Button							_chkShowStartTime;
-	private Button							_chkShowGrid_VerticalLines;
-	private Button							_chkZoomToSlider;
+	private Button						_chkMoveSlidersWhenZoomed;
+	private Button						_chkSegmentAlternateColor;
+	private Button						_chkShowGrid_HorizontalLines;
+	private Button						_chkShowStartTime;
+	private Button						_chkShowGrid_VerticalLines;
+	private Button						_chkZoomToSlider;
 
-	private Label							_lblGridHorizontal;
-	private Label							_lblGridHorizontal_Unit;
-	private Label							_lblGridVertical;
-	private Label							_lblGridVertical_Unit;
+	private Label						_lblGridHorizontal;
+	private Label						_lblGridHorizontal_Unit;
+	private Label						_lblGridVertical;
+	private Label						_lblGridVertical_Unit;
 
-	private Button							_rdoMouseModeSlider;
-	private Button							_rdoMouseModeZoom;
-	private Button							_rdoShowDistance;
-	private Button							_rdoShowTime;
+	private Button						_rdoMouseModeSlider;
+	private Button						_rdoMouseModeZoom;
+	private Button						_rdoShowDistance;
+	private Button						_rdoShowTime;
 
-	private Spinner						_spinnerGraphTransparencyLine;
-	private Spinner						_spinnerGraphTransparencyFilling;
-	private Spinner						_spinnerGridHorizontalDistance;
-	private Spinner						_spinnerGridVerticalDistance;
+	private Spinner					_spinnerGraphTransparencyLine;
+	private Spinner					_spinnerGraphTransparencyFilling;
+	private Spinner					_spinnerGridHorizontalDistance;
+	private Spinner					_spinnerGridVerticalDistance;
 
-	private ColorSelector				_colorSegmentAlternateColor;
+	private ColorSelector			_colorSegmentAlternateColor;
 
 	private static class Graph {
 
@@ -437,15 +436,6 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 			// Color: Segment alternate color
 			_colorSegmentAlternateColor = new ColorSelector(container);
 			_colorSegmentAlternateColor.addListener(_defaultChangePropertyListener);
-
-			/*
-			 * checkbox: HR zones
-			 */
-			_chkShowHrZoneBackground = new Button(container, SWT.CHECK);
-			GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkShowHrZoneBackground);
-			_chkShowHrZoneBackground.setText(GRAPH_LABEL_SHOW_HR_ZONE_BACKGROUND);
-			_chkShowHrZoneBackground.setToolTipText(GRAPH_LABEL_SHOW_HR_ZONE_BACKGROUND_TOOLTIP);
-			_chkShowHrZoneBackground.addSelectionListener(_defaultSelectionListener);
 		}
 	}
 
@@ -937,7 +927,6 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		if (selectedTab == _tab1_Graphs) {
 
 			_chkGraphAntialiasing.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_ANTIALIASING));
-			_chkShowHrZoneBackground.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_IS_HR_ZONE_BACKGROUND_VISIBLE));
 
 			_spinnerGraphTransparencyFilling.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING));
 			_spinnerGraphTransparencyLine.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE));
@@ -990,7 +979,6 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	private void restoreState_Tab_1_Graphs() {
 
 		_chkGraphAntialiasing.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_ANTIALIASING));
-		_chkShowHrZoneBackground.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_HR_ZONE_BACKGROUND_VISIBLE));
 
 		_spinnerGraphTransparencyFilling.setSelection(_prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING));
 		_spinnerGraphTransparencyLine.setSelection(_prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE));
@@ -1099,7 +1087,6 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	private void saveState_Tab_1_Graphs() {
 
 		_prefStore.setValue(ITourbookPreferences.GRAPH_ANTIALIASING, _chkGraphAntialiasing.getSelection());
-		_prefStore.setValue(ITourbookPreferences.GRAPH_IS_HR_ZONE_BACKGROUND_VISIBLE, _chkShowHrZoneBackground.getSelection());
 
 		_prefStore.setValue(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING, _spinnerGraphTransparencyFilling.getSelection());
 		_prefStore.setValue(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE, _spinnerGraphTransparencyLine.getSelection());

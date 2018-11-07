@@ -95,7 +95,7 @@ public class SerieData implements Serializable {
 	 * Swim data
 	 * @since Version 18.10
 	 */
-	public short[]					swim_ActivityType;			// e.g. active, idle
+	public short[]					swim_LengthType;			// e.g. active, idle
 	public short[]					swim_Cadence;					// strokes/min
 	public short[]					swim_Strokes;					// number of strokes
 	public short[]					swim_StrokeStyle;				// e.g. freestyle, breaststroke

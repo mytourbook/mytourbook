@@ -269,6 +269,15 @@ public class Messages extends NLS {
 	public static String				Slideout_Dialog_Action_KeepSlideoutOpen_Tooltip;
 	public static String				Slideout_Dialog_Action_PinSlideoutLocation_Tooltip;
 
+	public static String				Swim_Stroke_Backstroke;
+	public static String				Swim_Stroke_Breaststroke;
+	public static String				Swim_Stroke_Butterfly;
+	public static String				Swim_Stroke_Drill;
+	public static String				Swim_Stroke_Freestyle;
+	public static String				Swim_Stroke_IndividualMedley;
+	public static String				Swim_Stroke_Invalid;
+	public static String				Swim_Stroke_Mixed;
+
 	public static String				Time_Tools_DST_North;
 	public static String				Time_Tools_DST_South;
 

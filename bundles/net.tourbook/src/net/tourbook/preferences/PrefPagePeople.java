@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,25 +24,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
-import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.util.Util;
-import net.tourbook.data.HrZoneContext;
-import net.tourbook.data.TourData;
-import net.tourbook.data.TourPerson;
-import net.tourbook.data.TourPersonHRZone;
-import net.tourbook.database.IComputeTourValues;
-import net.tourbook.database.PersonManager;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.importdata.DeviceManager;
-import net.tourbook.importdata.ExternalDevice;
-import net.tourbook.tour.TourEventId;
-import net.tourbook.tour.TourManager;
-import net.tourbook.training.DialogHRZones;
-import net.tourbook.training.TrainingManager;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -108,38 +89,55 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.Util;
+import net.tourbook.data.HrZoneContext;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourPerson;
+import net.tourbook.data.TourPersonHRZone;
+import net.tourbook.database.IComputeTourValues;
+import net.tourbook.database.PersonManager;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.importdata.DeviceManager;
+import net.tourbook.importdata.ExternalDevice;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
+import net.tourbook.training.DialogHRZones;
+import net.tourbook.training.TrainingManager;
+
 public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferencePage {
 
-	public static final String			ID							= "net.tourbook.preferences.PrefPagePeopleId";	//$NON-NLS-1$
+	public static final String			ID									= "net.tourbook.preferences.PrefPagePeopleId";	//$NON-NLS-1$
 
-	private static final String			STATE_SELECTED_PERSON		= "selectedPersonId";							//$NON-NLS-1$
-	private static final String			STATE_SELECTED_TAB_FOLDER	= "selectedTabFolder";							//$NON-NLS-1$
+	private static final String		STATE_SELECTED_PERSON		= "selectedPersonId";									//$NON-NLS-1$
+	private static final String		STATE_SELECTED_TAB_FOLDER	= "selectedTabFolder";									//$NON-NLS-1$
 
-	public static final int				HEART_BEAT_MIN				= 10;
-	public static final int				HEART_BEAT_MAX				= 300;
+	public static final int				HEART_BEAT_MIN					= 10;
+	public static final int				HEART_BEAT_MAX					= 300;
 
 	/**
 	 * Id to indicate that the hr zones should be displayed for the active person when the pref
 	 * dialog is opened
 	 */
-	public static final String			PREF_DATA_SELECT_HR_ZONES	= "SelectHrZones";								//$NON-NLS-1$
+	public static final String			PREF_DATA_SELECT_HR_ZONES	= "SelectHrZones";										//$NON-NLS-1$
 
-	private final IPreferenceStore		_prefStore					= TourbookPlugin.getDefault()//
-																			.getPreferenceStore();
-	private final IDialogSettings		_state						= TourbookPlugin.getDefault()//
-																			.getDialogSettingsSection(ID);
+	private final IPreferenceStore	_prefStore						= TourbookPlugin.getPrefStore();
+	private final IDialogSettings		_state							= TourbookPlugin.getState(ID);
 
 	// REMOVED BIKES 30.4.2011
 
-	private ArrayList<TourPerson>		_people;
+	private ArrayList<TourPerson>			_people;
 
 	/**
 	 * this device list has all the devices which are visible in the device combobox
 	 */
 	private ArrayList<ExternalDevice>	_deviceList;
 
-	private final NumberFormat			_nf1						= NumberFormat.getNumberInstance();
-	private final NumberFormat			_nf2						= NumberFormat.getNumberInstance();
+	private final NumberFormat				_nf1	= NumberFormat.getNumberInstance();
+	private final NumberFormat				_nf2	= NumberFormat.getNumberInstance();
 	{
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
@@ -147,40 +145,40 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		_nf2.setMaximumFractionDigits(2);
 	}
 
-	private final boolean				_isOSX						= net.tourbook.common.UI.IS_OSX;
-	private final boolean				_isLinux					= net.tourbook.common.UI.IS_LINUX;
+	private final boolean					_isOSX							= net.tourbook.common.UI.IS_OSX;
+	private final boolean					_isLinux							= net.tourbook.common.UI.IS_LINUX;
 
-	private SelectionListener			_defaultSelectionListener;
-	private ModifyListener				_defaultModifyListener;
-	private MouseListener				_hrZoneMouseListener;
+	private SelectionListener				_defaultSelectionListener;
+	private ModifyListener					_defaultModifyListener;
+	private MouseListener					_hrZoneMouseListener;
 	private IPropertyChangeListener		_prefChangeListener;
 
-	private boolean						_isFireModifyEvent			= false;
-	private boolean						_isPersonModified			= false;
-	private boolean						_isUpdateUI					= false;
+	private boolean							_isFireModifyEvent			= false;
+	private boolean							_isPersonModified				= false;
+	private boolean							_isUpdateUI						= false;
 
-	private HashMap<Long, TourPerson>	_peopleWithModifiedHrZones	= new HashMap<Long, TourPerson>();
-	private boolean						_isHrZoneModified			= false;
+	private HashMap<Long, TourPerson>	_peopleWithModifiedHrZones	= new HashMap<>();
+	private boolean							_isHrZoneModified				= false;
 
-	private TourPerson					_selectedPerson;
-	private TourPerson					_newPerson;
-	private Set<TourPersonHRZone>		_backupSelectedPersonHrZones;
+	private TourPerson						_selectedPerson;
+	private TourPerson						_newPerson;
+	private Set<TourPersonHRZone>			_backupSelectedPersonHrZones;
 
-	private ZonedDateTime				_today						= TimeTools.now();
+	private ZonedDateTime					_today							= TimeTools.now();
 
-	private Font						_fontItalic;
-	private Color[]						_hrZoneColors;
+	private Font								_fontItalic;
+	private Color[]							_hrZoneColors;
 
 	/**
 	 * Is <code>true</code> when a tour in the tour editor is modified.
 	 */
-	private boolean						_isNoUI						= false;
+	private boolean							_isNoUI							= false;
 
 	/*
 	 * UI controls
 	 */
 	private Composite					_prefPageContainer;
-	private TableViewer					_peopleViewer;
+	private TableViewer				_peopleViewer;
 
 	private Button						_btnAddPerson;
 	private Button						_btnSavePerson;
@@ -190,14 +188,14 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	private Text						_txtFirstName;
 	private Text						_txtLastName;
 	private Combo						_cboSportComputer;
-	private Spinner						_spinnerWeight;
-	private Spinner						_spinnerHeight;
-	private Spinner						_spinnerRestingHR;
-	private Spinner						_spinnerMaxHR;
+	private Spinner					_spinnerWeight;
+	private Spinner					_spinnerHeight;
+	private Spinner					_spinnerRestingHR;
+	private Spinner					_spinnerMaxHR;
 	private Button						_rdoGenderMale;
 	private Button						_rdoGenderFemale;
 
-	private ScrolledComposite			_hrZoneScrolledContainer;
+	private ScrolledComposite		_hrZoneScrolledContainer;
 	private Button						_btnModifyHrZones;
 	private Button						_btnComputeHrZonesForAllTours;
 	private Combo						_cboTemplate;
@@ -207,7 +205,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	private Label						_lblAgeHr;
 
 	private Text						_txtRawDataPath;
-	private DirectoryFieldEditor		_rawDataPathEditor;
+	private DirectoryFieldEditor	_rawDataPathEditor;
 
 	private class ClientsContentProvider implements IStructuredContentProvider {
 
@@ -326,7 +324,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 	private Set<TourPersonHRZone> cloneHrZones(final ArrayList<TourPersonHRZone> hrZones) {
 
-		final HashSet<TourPersonHRZone> hrZonesClone = new HashSet<TourPersonHRZone>();
+		final HashSet<TourPersonHRZone> hrZonesClone = new HashSet<>();
 
 		for (final TourPersonHRZone tourPersonHRZone : hrZones) {
 			hrZonesClone.add(tourPersonHRZone.clone());
@@ -476,7 +474,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	private void createDeviceList() {
 
 		// create device list
-		_deviceList = new ArrayList<ExternalDevice>();
+		_deviceList = new ArrayList<>();
 
 		// add special device
 		_deviceList.add(null);
@@ -764,8 +762,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 				@Override
 				public void keyReleased(final KeyEvent e) {
 					/*
-					 * key listener is necessary because the selection listener is not fired when
-					 * the values are modified with mouse wheel up/down
+					 * key listener is necessary because the selection listener is not fired when the
+					 * values are modified with mouse wheel up/down
 					 */
 //					onModifyHrZones();
 				}
@@ -1173,8 +1171,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	}
 
 	private void createUI_80_HrZone_InnerContainer(	final int hrMaxFormulaKey,
-													final int hrMaxPulse,
-													final ZonedDateTime birthDay) {
+																	final int hrMaxPulse,
+																	final ZonedDateTime birthDay) {
 
 		// get current scroll position
 		final Point scrollBackup = _hrZoneScrolledContainer.getOrigin();
@@ -1264,10 +1262,10 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 //		label.addMouseListener(_hrZoneMouseListener);
 	}
 
-	private void createUI_84_HrZone_Fields(	final Composite parent,
-											final int hrMaxFormulaKey,
-											final int hrMaxPulse,
-											final ZonedDateTime birthDay) {
+	private void createUI_84_HrZone_Fields(final Composite parent,
+														final int hrMaxFormulaKey,
+														final int hrMaxPulse,
+														final ZonedDateTime birthDay) {
 
 		final TourPerson currentPerson = getCurrentPerson();
 		if (currentPerson == null) {
@@ -1275,7 +1273,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		}
 
 		// get sorted hr zones
-		final ArrayList<TourPersonHRZone> hrZones = new ArrayList<TourPersonHRZone>(currentPerson.getHrZonesSorted());
+		final ArrayList<TourPersonHRZone> hrZones = new ArrayList<>(currentPerson.getHrZonesSorted());
 		final int hrZoneSize = hrZones.size();
 		Collections.sort(hrZones);
 
@@ -1665,9 +1663,9 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	}
 
 	/**
-	 * @return Returns person which is currently displayed, one person is at least available
-	 *         therefor this should never return <code>null</code> but it can be <code>null</code>
-	 *         when the application is started the first time and people are not yet created.
+	 * @return Returns person which is currently displayed, one person is at least available therefor
+	 *         this should never return <code>null</code> but it can be <code>null</code> when the
+	 *         application is started the first time and people are not yet created.
 	 */
 	private TourPerson getCurrentPerson() {
 
@@ -2052,7 +2050,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 						Messages.Pref_People_Dialog_SaveModifiedPerson_Title,
 						NLS.bind(Messages.Pref_People_Dialog_SaveModifiedPerson_Message,
 
-						// use name from the ui because it could be modified
+								// use name from the ui because it could be modified
 								_txtFirstName.getText())) == false) {
 
 					// revert person
@@ -2233,7 +2231,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 	/**
 	 * hr max formula
-	 * 
+	 *
 	 * @param hrMaxFormulaKey
 	 * @param maxPulse
 	 */

@@ -26,8 +26,8 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
-import net.tourbook.ui.views.tagging.TVITagViewTag;
-import net.tourbook.ui.views.tagging.TVITagViewTagCategory;
+import net.tourbook.ui.views.tagging.TVITagView_Tag;
+import net.tourbook.ui.views.tagging.TVITagView_TagCategory;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.InputDialog;
@@ -139,15 +139,15 @@ public class ActionRenameSign_DISABLED extends Action {
 //		String dlgTitle = UI.EMPTY_STRING;
 //		String dlgMessage = UI.EMPTY_STRING;
 //
-//		if (firstElement instanceof TVITagViewTag) {
+//		if (firstElement instanceof TVITagView_Tag) {
 //
-//			name = ((TVITagViewTag) firstElement).getName();
+//			name = ((TVITagView_Tag) firstElement).getName();
 //			dlgTitle = Messages.action_tag_dlg_rename_title;
 //			dlgMessage = Messages.action_tag_dlg_rename_message;
 //
-//		} else if (firstElement instanceof TVITagViewTagCategory) {
+//		} else if (firstElement instanceof TVITagView_TagCategory) {
 //
-//			name = ((TVITagViewTagCategory) firstElement).getName();
+//			name = ((TVITagView_TagCategory) firstElement).getName();
 //			dlgTitle = Messages.action_tagcategory_dlg_rename_title;
 //			dlgMessage = Messages.action_tagcategory_dlg_rename_message;
 //		} else {
@@ -175,11 +175,11 @@ public class ActionRenameSign_DISABLED extends Action {
 //		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
 //			public void run() {
 //
-//				if (firstElement instanceof TVITagViewTag) {
+//				if (firstElement instanceof TVITagView_Tag) {
 //
 //					// save tag
 //
-//					final TVITagViewTag tourTagItem = ((TVITagViewTag) firstElement);
+//					final TVITagView_Tag tourTagItem = ((TVITagView_Tag) firstElement);
 //
 //					// update model
 //					updateTag(tourTagItem.getTagId(), newName);
@@ -187,11 +187,11 @@ public class ActionRenameSign_DISABLED extends Action {
 //					// update view
 //					fTourViewer.getViewer().update(tourTagItem, null);
 //
-//				} else if (firstElement instanceof TVITagViewTagCategory) {
+//				} else if (firstElement instanceof TVITagView_TagCategory) {
 //
 //					// save category
 //
-//					final TVITagViewTagCategory tourCategoryItem = ((TVITagViewTagCategory) firstElement);
+//					final TVITagView_TagCategory tourCategoryItem = ((TVITagView_TagCategory) firstElement);
 //
 //					// update model
 //					updateCategory(tourCategoryItem.getCategoryId(), newName);

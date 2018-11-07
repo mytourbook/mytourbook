@@ -92,6 +92,15 @@ public abstract class TableColumnFactory {
 	public static final TableColumnFactory	STATE_DB_STATUS;
 	public static final TableColumnFactory	STATE_IMPORT_STATE;
 
+	public static final TableColumnFactory	SWIM__SWIM_CADENCE;
+	public static final TableColumnFactory	SWIM__SWIM_STROKES;
+	public static final TableColumnFactory	SWIM__SWIM_STROKE_STYLE;
+
+	public static final TableColumnFactory	SWIM__TIME_TOUR_TIME_DIFF;
+	public static final TableColumnFactory	SWIM__TIME_TOUR_TIME_HH_MM_SS;
+	public static final TableColumnFactory	SWIM__TIME_TOUR_TIME;
+	public static final TableColumnFactory	SWIM__TIME_TOUR_TIME_OF_DAY_HH_MM_SS;
+
 	public static final TableColumnFactory	TIME_BREAK_TIME;
 	public static final TableColumnFactory	TIME_DRIVING_TIME;
 	public static final TableColumnFactory	TIME_PAUSED_TIME;
@@ -1427,6 +1436,161 @@ public abstract class TableColumnFactory {
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_ImportStatus_Tooltip);
 
 				colDef.setDefaultColumnWidth(20);
+
+				return colDef;
+			};
+		};
+
+		/*
+		 * Swimming
+		 */
+		SWIM__SWIM_CADENCE = new TableColumnFactory() {
+
+			@Override
+			public TableColumnDefinition createColumn(final ColumnManager columnManager,
+																	final PixelConverter pixelConverter) {
+
+				final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "SWIM__SWIM_CADENCE", SWT.TRAIL); //$NON-NLS-1$
+
+				colDef.setColumnCategory(Messages.ColumnFactory_Category_Swimming);
+
+				colDef.setColumnLabel(Messages.ColumnFactory_Swim_Cadence_Label);
+				colDef.setColumnHeaderText(Messages.ColumnFactory_Swim_Cadence_Label);
+//				colDef.setColumnUnit(Messages.ColumnFactory_Swim_Cadence_Label);
+				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Swim_Cadence_Tooltip);
+
+				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
+
+				return colDef;
+			};
+		};
+
+		SWIM__SWIM_STROKES = new TableColumnFactory() {
+
+			@Override
+			public TableColumnDefinition createColumn(final ColumnManager columnManager,
+																	final PixelConverter pixelConverter) {
+
+				final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "SWIM__SWIM_STROKES", SWT.TRAIL); //$NON-NLS-1$
+
+				colDef.setColumnCategory(Messages.ColumnFactory_Category_Swimming);
+
+				colDef.setColumnLabel(Messages.ColumnFactory_Swim_Strokes_Label);
+				colDef.setColumnHeaderText(Messages.ColumnFactory_Swim_Strokes_Label);
+//				colDef.setColumnUnit(Messages.ColumnFactory_Swim_Strokes_Label);
+				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Swim_Strokes_Tooltip);
+
+				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
+
+				return colDef;
+			};
+		};
+
+		SWIM__SWIM_STROKE_STYLE = new TableColumnFactory() {
+
+			@Override
+			public TableColumnDefinition createColumn(final ColumnManager columnManager,
+																	final PixelConverter pixelConverter) {
+
+				final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "SWIM__SWIM_STROKE_STYLE", SWT.LEAD); //$NON-NLS-1$
+
+				colDef.setColumnCategory(Messages.ColumnFactory_Category_Swimming);
+
+				colDef.setColumnLabel(Messages.ColumnFactory_Swim_StrokeStyle_Label);
+				colDef.setColumnHeaderText(Messages.ColumnFactory_Swim_StrokeStyle_Label);
+//				colDef.setColumnUnit(Messages.ColumnFactory_Swim_StrokeStyle_Label);
+				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Swim_StrokeStyle_Tooltip);
+
+				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
+
+				return colDef;
+			};
+		};
+
+		SWIM__TIME_TOUR_TIME_DIFF = new TableColumnFactory() {
+
+			@Override
+			public TableColumnDefinition createColumn(final ColumnManager columnManager,
+																	final PixelConverter pixelConverter) {
+
+				final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "SWIM__TIME_TOUR_TIME_DIFF", SWT.TRAIL); //$NON-NLS-1$
+
+				colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
+
+				colDef.setColumnLabel(Messages.ColumnFactory_TourTimeDiff_Label);
+				colDef.setColumnHeaderText(Messages.ColumnFactory_TourTimeDiff_Header);
+				colDef.setColumnUnit(Messages.ColumnFactory_tour_time);
+				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_TourTimeDiff_Tooltip);
+
+				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+				return colDef;
+			};
+		};
+
+		SWIM__TIME_TOUR_TIME_HH_MM_SS = new TableColumnFactory() {
+
+			@Override
+			public TableColumnDefinition createColumn(final ColumnManager columnManager,
+																	final PixelConverter pixelConverter) {
+
+				final int pixelWidth = pixelConverter.convertWidthInCharsToPixels(12);
+
+				final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "SWIM__TIME_TOUR_TIME_HH_MM_SS", SWT.TRAIL); //$NON-NLS-1$
+
+				colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
+
+				colDef.setColumnLabel(Messages.ColumnFactory_tour_time_label_hhmmss);
+				colDef.setColumnHeaderText(Messages.ColumnFactory_tour_time_label_hhmmss);
+				colDef.setColumnUnit(Messages.ColumnFactory_tour_time_hhmmss);
+				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_tour_time_tooltip_hhmmss);
+
+				colDef.setDefaultColumnWidth(pixelWidth);
+				colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
+
+				return colDef;
+			};
+		};
+
+		SWIM__TIME_TOUR_TIME = new TableColumnFactory() {
+
+			@Override
+			public TableColumnDefinition createColumn(final ColumnManager columnManager,
+																	final PixelConverter pixelConverter) {
+
+				final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "SWIM__TIME_TOUR_TIME", SWT.TRAIL); //$NON-NLS-1$
+
+				colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
+
+				colDef.setColumnLabel(Messages.ColumnFactory_tour_time_label);
+				colDef.setColumnHeaderText(Messages.ColumnFactory_tour_time);
+				colDef.setColumnUnit(Messages.ColumnFactory_tour_time);
+				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_tour_time_tooltip);
+
+				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+				return colDef;
+			};
+		};
+
+		SWIM__TIME_TOUR_TIME_OF_DAY_HH_MM_SS = new TableColumnFactory() {
+
+			@Override
+			public TableColumnDefinition createColumn(final ColumnManager columnManager,
+																	final PixelConverter pixelConverter) {
+
+				final int pixelWidth = pixelConverter.convertWidthInCharsToPixels(12);
+				final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "SWIM__TIME_TOUR_TIME_OF_DAY_HH_MM_SS", SWT.TRAIL); //$NON-NLS-1$
+
+				colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
+
+				colDef.setColumnLabel(Messages.ColumnFactory_Tour_DayTime);
+				colDef.setColumnHeaderText(Messages.ColumnFactory_Tour_DayTime);
+				colDef.setColumnUnit(Messages.ColumnFactory_tour_time_hhmmss);
+				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Tour_DayTime_Tooltip);
+
+				colDef.setDefaultColumnWidth(pixelWidth);
+				colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
 
 				return colDef;
 			};

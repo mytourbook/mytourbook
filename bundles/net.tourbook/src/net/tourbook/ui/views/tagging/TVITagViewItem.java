@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -73,38 +73,38 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 	/**
 	 * content which is displayed in the tree column
 	 */
-	String				treeColumn;
+	String	treeColumn;
 
-	long				colDistance;
+	long		colDistance;
 
-	long				colRecordingTime;
-	long				colDrivingTime;
-	long				colPausedTime;
+	long		colRecordingTime;
+	long		colDrivingTime;
+	long		colPausedTime;
 
-	long				colAltitudeUp;
-	long				colAltitudeDown;
+	long		colAltitudeUp;
+	long		colAltitudeDown;
 
-	float				colMaxSpeed;
-	long				colMaxPulse;
-	long				colMaxAltitude;
+	float		colMaxSpeed;
+	long		colMaxPulse;
+	long		colMaxAltitude;
 
-	float				colAvgSpeed;
-	float				colAvgPace;
+	float		colAvgSpeed;
+	float		colAvgPace;
 
-	float				colAvgPulse;
-	float				colAvgCadence;
-	float				colAvgTemperature;
+	float		colAvgPulse;
+	float		colAvgCadence;
+	float		colAvgTemperature;
 
-	long				colTourCounter;
+	long		colTourCounter;
 
-	int					temperatureDigits;
+	int		temperatureDigits;
 
 	/**
 	 * Read sum totals from the database for the tagItem
-	 * 
+	 *
 	 * @param tagItem
 	 */
-	public static void readTagTotals(final TVITagViewTag tagItem) {
+	public static void readTagTotals(final TVITagView_Tag tagItem) {
 
 		try {
 
@@ -114,7 +114,7 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 			 * get tags
 			 */
 			final String sql = "" //$NON-NLS-1$
-			//
+					//
 					+ ("SELECT " + SQL_SUM_COLUMNS) //$NON-NLS-1$
 					+ (" FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jtblTagData") //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -140,8 +140,8 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 			if (tagItem.colTourCounter == 0) {
 
 				/*
-				 * to hide the '+' for an item which has no children, an empty list of children will
-				 * be created
+				 * to hide the '+' for an item which has no children, an empty list of children will be
+				 * created
 				 */
 				tagItem.setChildren(new ArrayList<TreeViewerItem>());
 			}

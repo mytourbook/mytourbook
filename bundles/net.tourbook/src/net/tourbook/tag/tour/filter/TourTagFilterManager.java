@@ -20,15 +20,6 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-import net.tourbook.application.ActionTourTagFilter;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
-import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.util.StatusUtil;
-import net.tourbook.common.util.Util;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.filter.SQLFilterData;
-
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -38,48 +29,51 @@ import org.eclipse.ui.XMLMemento;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
+import net.tourbook.application.ActionTourTagFilter;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.Util;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.filter.SQLFilterData;
+
 public class TourTagFilterManager {
 
-	private static final String	TOUR_FILTER_FILE_NAME		= "tour-tag-filter.xml";	//$NON-NLS-1$
-	private static final int	TOUR_FILTER_VERSION			= 1;
+	private static final String							TOUR_FILTER_FILE_NAME		= "tour-tag-filter.xml";						//$NON-NLS-1$
+	private static final int								TOUR_FILTER_VERSION			= 1;
 
-	private static final String	TAG_PROFILE					= "Profile";				//$NON-NLS-1$
-	private static final String	TAG_ROOT					= "TourTagFilterProfiles";	//$NON-NLS-1$
+	private static final String							TAG_PROFILE						= "Profile";										//$NON-NLS-1$
+	private static final String							TAG_ROOT							= "TourTagFilterProfiles";						//$NON-NLS-1$
 
-	private static final String	ATTR_TOUR_FILTER_VERSION	= "tourTagFilterVersion";	//$NON-NLS-1$
-	private static final String	ATTR_IS_SELECTED			= "isSelected";				//$NON-NLS-1$
-	private static final String	ATTR_NAME					= "name";					//$NON-NLS-1$
-	private static final String	ATTR_TAG_ID					= "tagIds";					//$NON-NLS-1$
+	private static final String							ATTR_TOUR_FILTER_VERSION	= "tourTagFilterVersion";						//$NON-NLS-1$
+	private static final String							ATTR_IS_SELECTED				= "isSelected";									//$NON-NLS-1$
+	private static final String							ATTR_NAME						= "name";											//$NON-NLS-1$
+	private static final String							ATTR_TAG_ID						= "tagIds";											//$NON-NLS-1$
 
-	private static final String	PARAMETER_FIRST				= " ?";						//$NON-NLS-1$
-	private static final String	PARAMETER_FOLLOWING			= ", ?";					//$NON-NLS-1$
+	private static final String							PARAMETER_FIRST				= " ?";												//$NON-NLS-1$
+	private static final String							PARAMETER_FOLLOWING			= ", ?";												//$NON-NLS-1$
 
-	static {}
+	private static final Bundle							_bundle							= TourbookPlugin.getDefault().getBundle();
 
-// SET_FORMATTING_OFF
+	private static final IPath								_stateLocation					= Platform.getStateLocation(_bundle);
+	private static final IPreferenceStore				_prefStore						= TourbookPlugin.getPrefStore();
 
-	private static final Bundle				_bundle			= TourbookPlugin.getDefault().getBundle();
-	
-	private static final IPath				_stateLocation	= Platform.getStateLocation(_bundle);
-	private static final IPreferenceStore	_prefStore		= TourbookPlugin.getPrefStore();
-	
-	private static boolean					_isTourTagFilterEnabled;
-	
-// SET_FORMATTING_ON
+	private static boolean									_isTourTagFilterEnabled;
 
 	/**
 	 * Contains all available profiles.
 	 */
-	private static ArrayList<TourTagFilterProfile>	_filterProfiles		= new ArrayList<>();
+	private static ArrayList<TourTagFilterProfile>	_filterProfiles				= new ArrayList<>();
 
 	/**
 	 * Contains the selected profile or <code>null</code> when a profile is not selected.
 	 */
-	private static TourTagFilterProfile				_selectedProfile;
+	private static TourTagFilterProfile					_selectedProfile;
 
-	private static int[]							_fireEventCounter	= new int[1];
+	private static int[]										_fireEventCounter				= new int[1];
 
-	private static ActionTourTagFilter				_actionTourTagFilter;
+	private static ActionTourTagFilter					_actionTourTagFilter;
 
 	/**
 	 * Fire event that the tour filter has changed.
@@ -167,7 +161,7 @@ public class TourTagFilterManager {
 
 	/**
 	 * Read filter profile xml file.
-	 * 
+	 *
 	 * @return
 	 */
 	private static void readFilterProfile() {
@@ -228,7 +222,7 @@ public class TourTagFilterManager {
 
 	/**
 	 * Sets the state if the tour filter is active or not.
-	 * 
+	 *
 	 * @param isEnabled
 	 */
 	public static void setFilterEnabled(final boolean isEnabled) {

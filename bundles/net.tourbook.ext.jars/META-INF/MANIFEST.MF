@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: External jar's
 Bundle-SymbolicName: net.tourbook.ext.jars;singleton:=true
-Bundle-Version: 18.9.1.qualifier
+Bundle-Version: 18.11.0.qualifier
 Eclipse-BuddyPolicy: registered
 Bundle-Vendor: MyTourbook
 Bundle-ClassPath: joda-time-2.9.4.jar,
@@ -16,7 +16,8 @@ Bundle-ClassPath: joda-time-2.9.4.jar,
  imgscalr-lib-4.2.jar,
  org.apache.commons.imaging-0.97-r1401825-2012-10-24.jar,
  json-20160212.jar,
- lat-lon-timezone-converter-2016-05-04.jar
+ lat-lon-timezone-converter-2016-05-04.jar,
+ xmlunit-core-2.6.2.jar
 Export-Package: com.enterprisedt,
  com.enterprisedt.net.ftp,
  com.enterprisedt.net.ftp.internal,
@@ -186,5 +187,7 @@ Export-Package: com.enterprisedt,
  org.joda.time.tz.data.Pacific,
  org.json,
  org.xmlpull.mxp1,
- org.xmlpull.v1
+ org.xmlpull.v1,
+ org.xmlunit.builder,
+ org.xmlunit.diff
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7

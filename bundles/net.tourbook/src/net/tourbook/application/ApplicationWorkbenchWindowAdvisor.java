@@ -63,6 +63,7 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.formatter.FormatManager;
+import net.tourbook.common.swimming.SwimStrokeManager;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.PersonManager;
@@ -530,8 +531,9 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		TourFilterManager.saveState();
 		TourPhotoManager.saveState();
 		MapBookmarkManager.saveState();
+		SwimStrokeManager.saveState();
 
-		FTSearchManager.close();
+		FTSearchManager.closeIndexReaderSuggester();
 		WebContentServer.stop();
 
 		_applicationActionBarAdvisor._personContribItem.saveState();

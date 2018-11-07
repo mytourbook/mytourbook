@@ -1,0 +1,56 @@
+18.11                                                           31. October 2018
+
+New
+===	
+
+* Swimming
+  - Import swim data from .fit files
+  - Tour Chart
+    - Show swim graphs
+    - Draw graph background with the swim style color
+    - Set swim style colors
+    - Force swim min/max values
+  - Tour Editor
+    - Edit swim slices
+  - Tour Book
+    - Reimport only swim data
+
+* Tour Info View
+  - The tour info tab within the tour editor is moved into a separete tour info 
+    view
+
+ 
+Improvements
+============	
+
+* Tour Segmenter
+  - Stride length is computed from cadence/time/distance
+
+* Tagged Tours
+
+  - Export tours including all tours which are hidden in the selected items 
+    years / months / tags / tag categories
+  - The export tour context item shows the number of tours which will be 
+    exported
+
+ 
+Bugfix 	
+======
+
+* Adjust Altitude Dialog
+  - Tourchart is too small in this dialog, this was introduced when the display 
+    issue of the tour chart toolbar was fixed
+
+* Statistic View & Tour Chart
+  - A selected tour in the statistics was not visible in the tour chart after a 
+    tour marker was modified
+
+* Tour Chart
+  - Right aligned tour marker label was not correctly displayed when there was 
+    not enough space to the right side
+
+ 
+Translation 	
+===========
+
+* German

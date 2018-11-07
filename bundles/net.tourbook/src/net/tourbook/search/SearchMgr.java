@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,9 @@
  *******************************************************************************/
 package net.tourbook.search;
 
+import com.sun.net.httpserver.Headers;
+import com.sun.net.httpserver.HttpExchange;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
@@ -23,6 +26,19 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import org.apache.lucene.search.suggest.Lookup.LookupResult;
+import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.window.Window;
+import org.eclipse.swt.browser.LocationEvent;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import net.tourbook.Messages;
 import net.tourbook.application.IconRequestMgr;
@@ -46,125 +62,109 @@ import net.tourbook.web.WEB;
 import net.tourbook.web.WebContentServer;
 import net.tourbook.web.XHRHandler;
 
-import org.apache.lucene.search.suggest.Lookup.LookupResult;
-import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.window.Window;
-import org.eclipse.swt.browser.LocationEvent;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import com.sun.net.httpserver.Headers;
-import com.sun.net.httpserver.HttpExchange;
-
 /**
  *
  */
 public class SearchMgr implements XHRHandler {
 
-	private static final String		SEARCH_APP_ACTION_EDIT_MARKER			= tourbook.search.nls.Messages.Search_App_Action_EditMarker;
-	private static final String		SEARCH_APP_ACTION_EDIT_TOUR				= tourbook.search.nls.Messages.Search_App_Action_EditTour;
+	private static final String	SEARCH_APP_ACTION_EDIT_MARKER				= tourbook.search.nls.Messages.Search_App_Action_EditMarker;
+	private static final String	SEARCH_APP_ACTION_EDIT_TOUR				= tourbook.search.nls.Messages.Search_App_Action_EditTour;
 
-	private static final String		IMAGE_ACTION_TOUR_WAY_POINT				= net.tourbook.map2.Messages.Image_Action_TourWayPoint;
+	private static final String	IMAGE_ACTION_TOUR_WAY_POINT				= net.tourbook.map2.Messages.Image_Action_TourWayPoint;
 
-	final static IDialogSettings	state									= TourbookPlugin
-																					.getState("net.tourbook.search.SearchMgr");			//$NON-NLS-1$
+	final static IDialogSettings	state												= TourbookPlugin.getState("net.tourbook.search.SearchMgr");	//$NON-NLS-1$
 
-	private static final String		JSON_STATE_SEARCH_TEXT					= "searchText";												//$NON-NLS-1$
+	private static final String	JSON_STATE_SEARCH_TEXT						= "searchText";															//$NON-NLS-1$
 
-	private static final String		STATE_CURRENT_SEARCH_TEXT				= "STATE_CURRENT_SEARCH_TEXT";									//$NON-NLS-1$
+	private static final String	STATE_CURRENT_SEARCH_TEXT					= "STATE_CURRENT_SEARCH_TEXT";										//$NON-NLS-1$
 
-	static final String				STATE_IS_EASE_SEARCHING					= "STATE_IS_EASE_SEARCHING";									//$NON-NLS-1$
-	static final boolean			STATE_IS_EASE_SEARCHING_DEFAULT			= true;
+	static final String				STATE_IS_EASE_SEARCHING						= "STATE_IS_EASE_SEARCHING";											//$NON-NLS-1$
+	static final boolean				STATE_IS_EASE_SEARCHING_DEFAULT			= true;
 
-	static final String				STATE_IS_SHOW_CONTENT_ALL				= "STATE_IS_SHOW_CONTENT_ALL";									//$NON-NLS-1$
-	static final boolean			STATE_IS_SHOW_CONTENT_ALL_DEFAULT		= true;
-	static final String				STATE_IS_SHOW_CONTENT_MARKER			= "STATE_IS_SHOW_CONTENT_MARKER";								//$NON-NLS-1$
-	static final boolean			STATE_IS_SHOW_CONTENT_MARKER_DEFAULT	= true;
-	static final String				STATE_IS_SHOW_CONTENT_TOUR				= "STATE_IS_SHOW_CONTENT_TOUR";								//$NON-NLS-1$
-	static final boolean			STATE_IS_SHOW_CONTENT_TOUR_DEFAULT		= true;
-	static final String				STATE_IS_SHOW_CONTENT_WAYPOINT			= "STATE_IS_SHOW_CONTENT_WAYPOINT";							//$NON-NLS-1$
-	static final boolean			STATE_IS_SHOW_CONTENT_WAYPOINT_DEFAULT	= true;
+	static final String				STATE_IS_SHOW_CONTENT_ALL					= "STATE_IS_SHOW_CONTENT_ALL";										//$NON-NLS-1$
+	static final boolean				STATE_IS_SHOW_CONTENT_ALL_DEFAULT		= true;
+	static final String				STATE_IS_SHOW_CONTENT_MARKER				= "STATE_IS_SHOW_CONTENT_MARKER";									//$NON-NLS-1$
+	static final boolean				STATE_IS_SHOW_CONTENT_MARKER_DEFAULT	= true;
+	static final String				STATE_IS_SHOW_CONTENT_TOUR					= "STATE_IS_SHOW_CONTENT_TOUR";										//$NON-NLS-1$
+	static final boolean				STATE_IS_SHOW_CONTENT_TOUR_DEFAULT		= true;
+	static final String				STATE_IS_SHOW_CONTENT_WAYPOINT			= "STATE_IS_SHOW_CONTENT_WAYPOINT";									//$NON-NLS-1$
+	static final boolean				STATE_IS_SHOW_CONTENT_WAYPOINT_DEFAULT	= true;
 	//
-	static final String				STATE_IS_SHOW_DATE						= "STATE_IS_SHOW_DATE";										//$NON-NLS-1$
-	static final boolean			STATE_IS_SHOW_DATE_DEFAULT				= false;
-	static final String				STATE_IS_SHOW_TIME						= "STATE_IS_SHOW_TIME";										//$NON-NLS-1$
-	static final boolean			STATE_IS_SHOW_TIME_DEFAULT				= false;
-	static final String				STATE_IS_SHOW_DESCRIPTION				= "STATE_IS_SHOW_DESCRIPTION";									//$NON-NLS-1$
-	static final boolean			STATE_IS_SHOW_DESCRIPTION_DEFAULT		= true;
-	static final String				STATE_IS_SHOW_ITEM_NUMBER				= "STATE_IS_SHOW_ITEM_NUMBER";									//$NON-NLS-1$
-	static final boolean			STATE_IS_SHOW_ITEM_NUMBER_DEFAULT		= false;
-	static final String				STATE_IS_SHOW_LUCENE_DOC_ID				= "STATE_IS_SHOW_LUCENE_DOC_ID";								//$NON-NLS-1$
-	static final boolean			STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT		= false;
+	static final String				STATE_IS_SHOW_DATE							= "STATE_IS_SHOW_DATE";													//$NON-NLS-1$
+	static final boolean				STATE_IS_SHOW_DATE_DEFAULT					= false;
+	static final String				STATE_IS_SHOW_TIME							= "STATE_IS_SHOW_TIME";													//$NON-NLS-1$
+	static final boolean				STATE_IS_SHOW_TIME_DEFAULT					= false;
+	static final String				STATE_IS_SHOW_DESCRIPTION					= "STATE_IS_SHOW_DESCRIPTION";										//$NON-NLS-1$
+	static final boolean				STATE_IS_SHOW_DESCRIPTION_DEFAULT		= true;
+	static final String				STATE_IS_SHOW_ITEM_NUMBER					= "STATE_IS_SHOW_ITEM_NUMBER";										//$NON-NLS-1$
+	static final boolean				STATE_IS_SHOW_ITEM_NUMBER_DEFAULT		= false;
+	static final String				STATE_IS_SHOW_LUCENE_DOC_ID				= "STATE_IS_SHOW_LUCENE_DOC_ID";										//$NON-NLS-1$
+	static final boolean				STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT		= false;
 	//
-	static final String				STATE_IS_SORT_DATE_ASCENDING			= "STATE_IS_SORT_DATE_ASCENDING";								//$NON-NLS-1$
-	static final boolean			STATE_IS_SORT_DATE_ASCENDING_DEFAULT	= false;
+	static final String				STATE_IS_SORT_DATE_ASCENDING				= "STATE_IS_SORT_DATE_ASCENDING";									//$NON-NLS-1$
+	static final boolean				STATE_IS_SORT_DATE_ASCENDING_DEFAULT	= false;
 
-	private static final String		REQUEST_HEADER_RANGE					= "Range";														//$NON-NLS-1$
+	private static final String	REQUEST_HEADER_RANGE							= "Range";																	//$NON-NLS-1$
 
-	private static final String		CONTENT_RANGE_ITEMS						= "items %d-%d/%d";											//$NON-NLS-1$
-	private static final String		CONTENT_RANGE_ZERO						= "0-0/0";														//$NON-NLS-1$
+	private static final String	CONTENT_RANGE_ITEMS							= "items %d-%d/%d";														//$NON-NLS-1$
+	private static final String	CONTENT_RANGE_ZERO							= "0-0/0";																	//$NON-NLS-1$
 
 	/*
 	 * This will handle all xhr actions, they are also defined in SearchMgr.js
 	 */
-	private static final String		XHR_SEARCH_INPUT_HANDLER				= "/xhrSearch";												//$NON-NLS-1$
+	private static final String	XHR_SEARCH_INPUT_HANDLER		= "/xhrSearch";				//$NON-NLS-1$
 	//
-	private static final String		XHR_ACTION_ITEM_ACTION					= "itemAction";												//$NON-NLS-1$
-	private static final String		XHR_ACTION_PROPOSALS					= "proposals";													//$NON-NLS-1$
-	private static final String		XHR_ACTION_SEARCH						= "search";													//$NON-NLS-1$
-	private static final String		XHR_ACTION_SELECT						= "select";													//$NON-NLS-1$
-	private static final String		XHR_ACTION_GET_SEARCH_OPTIONS			= "getSearchOptions";											//$NON-NLS-1$
-	private static final String		XHR_ACTION_SET_SEARCH_OPTIONS			= "setSearchOptions";											//$NON-NLS-1$
-	private static final String		XHR_ACTION_GET_STATE					= "getState";													//$NON-NLS-1$
-																																			//
-	private static final String		XHR_PARAM_ACTION						= "action";													//$NON-NLS-1$
-	private static final String		XHR_PARAM_ACTION_URL					= "actionUrl";													//$NON-NLS-1$
-	private static final String		XHR_PARAM_SEARCH_OPTIONS				= "searchOptions";												//$NON-NLS-1$
-	private static final String		XHR_PARAM_SEARCH_TEXT					= JSON_STATE_SEARCH_TEXT;
-	private static final String		XHR_PARAM_SELECTED_ITEMS				= "selectedItems";												//$NON-NLS-1$
+	private static final String	XHR_ACTION_ITEM_ACTION			= "itemAction";				//$NON-NLS-1$
+	private static final String	XHR_ACTION_PROPOSALS				= "proposals";					//$NON-NLS-1$
+	private static final String	XHR_ACTION_SEARCH					= "search";						//$NON-NLS-1$
+	private static final String	XHR_ACTION_SELECT					= "select";						//$NON-NLS-1$
+	private static final String	XHR_ACTION_GET_SEARCH_OPTIONS	= "getSearchOptions";		//$NON-NLS-1$
+	private static final String	XHR_ACTION_SET_SEARCH_OPTIONS	= "setSearchOptions";		//$NON-NLS-1$
+	private static final String	XHR_ACTION_GET_STATE				= "getState";					//$NON-NLS-1$
+	//
+	private static final String	XHR_PARAM_ACTION					= "action";						//$NON-NLS-1$
+	private static final String	XHR_PARAM_ACTION_URL				= "actionUrl";					//$NON-NLS-1$
+	private static final String	XHR_PARAM_SEARCH_OPTIONS		= "searchOptions";			//$NON-NLS-1$
+	private static final String	XHR_PARAM_SEARCH_TEXT			= JSON_STATE_SEARCH_TEXT;
+	private static final String	XHR_PARAM_SELECTED_ITEMS		= "selectedItems";			//$NON-NLS-1$
 
 	/*
 	 * JSON response values
 	 */
-	private static final String		JSON_ID									= "id";														//$NON-NLS-1$
-	private static final String		JSON_NAME								= "name";														//$NON-NLS-1$
-	private static final String		JSON_HTML_CONTENT						= "htmlContent";												//$NON-NLS-1$
-	private static final String		JSON_ITEM_ACTION_URL_EDIT_ITEM			= "actionUrl_EditItem";										//$NON-NLS-1$
-	private static final String		JSON_ITEM_IS_MARKER						= "item_IsMarker";												//$NON-NLS-1$
-	private static final String		JSON_ITEM_IS_TOUR						= "item_IsTour";												//$NON-NLS-1$
-	private static final String		JSON_ITEM_IS_WAYPOINT					= "item_IsWaypoint";											//$NON-NLS-1$
-	private static final String		JSON_ITEM_ID_TOUR_ID					= "itemId_TourId";												//$NON-NLS-1$
-	private static final String		JSON_ITEM_ID_MARKER_ID					= "itemId_MarkerId";											//$NON-NLS-1$
+	private static final String	JSON_ID									= "id";						//$NON-NLS-1$
+	private static final String	JSON_NAME								= "name";					//$NON-NLS-1$
+	private static final String	JSON_HTML_CONTENT						= "htmlContent";			//$NON-NLS-1$
+	private static final String	JSON_ITEM_ACTION_URL_EDIT_ITEM	= "actionUrl_EditItem";	//$NON-NLS-1$
+	private static final String	JSON_ITEM_IS_MARKER					= "item_IsMarker";		//$NON-NLS-1$
+	private static final String	JSON_ITEM_IS_TOUR						= "item_IsTour";			//$NON-NLS-1$
+	private static final String	JSON_ITEM_IS_WAYPOINT				= "item_IsWaypoint";		//$NON-NLS-1$
+	private static final String	JSON_ITEM_ID_TOUR_ID					= "itemId_TourId";		//$NON-NLS-1$
+	private static final String	JSON_ITEM_ID_MARKER_ID				= "itemId_MarkerId";		//$NON-NLS-1$
 	//
 	//
 	// search options
-	private static final String		JSON_IS_SEARCH_OPTIONS_DEFAULT			= "isSearchOptionsDefault";									//$NON-NLS-1$
+	private static final String	JSON_IS_SEARCH_OPTIONS_DEFAULT	= "isSearchOptionsDefault";	//$NON-NLS-1$
 	//
-	private static final String		JSON_IS_EASE_SEARCHING					= "isEaseSearching";											//$NON-NLS-1$
-	private static final String		JSON_IS_SHOW_CONTENT_ALL				= "isShowContentAll";											//$NON-NLS-1$
-	private static final String		JSON_IS_SHOW_CONTENT_MARKER				= "isShowContentMarker";										//$NON-NLS-1$
-	private static final String		JSON_IS_SHOW_CONTENT_TOUR				= "isShowContentTour";											//$NON-NLS-1$
-	private static final String		JSON_IS_SHOW_CONTENT_WAYPOINT			= "isShowContentWaypoint";										//$NON-NLS-1$
-	private static final String		JSON_IS_SHOW_DATE						= "isShowDate";												//$NON-NLS-1$
-	private static final String		JSON_IS_SHOW_TIME						= "isShowTime";												//$NON-NLS-1$
-	private static final String		JSON_IS_SHOW_DESCRIPTION				= "isShowDescription";											//$NON-NLS-1$
-	private static final String		JSON_IS_SHOW_ITEM_NUMBER				= "isShowItemNumber";											//$NON-NLS-1$
-	private static final String		JSON_IS_SHOW_LUCENE_ID					= "isShowLuceneID";											//$NON-NLS-1$
-	private static final String		JSON_IS_SORT_BY_DATE_ASCENDING			= "isSortByDateAscending";										//$NON-NLS-1$
+	private static final String	JSON_IS_EASE_SEARCHING				= "isEaseSearching";				//$NON-NLS-1$
+	private static final String	JSON_IS_SHOW_CONTENT_ALL			= "isShowContentAll";			//$NON-NLS-1$
+	private static final String	JSON_IS_SHOW_CONTENT_MARKER		= "isShowContentMarker";		//$NON-NLS-1$
+	private static final String	JSON_IS_SHOW_CONTENT_TOUR			= "isShowContentTour";			//$NON-NLS-1$
+	private static final String	JSON_IS_SHOW_CONTENT_WAYPOINT		= "isShowContentWaypoint";		//$NON-NLS-1$
+	private static final String	JSON_IS_SHOW_DATE						= "isShowDate";					//$NON-NLS-1$
+	private static final String	JSON_IS_SHOW_TIME						= "isShowTime";					//$NON-NLS-1$
+	private static final String	JSON_IS_SHOW_DESCRIPTION			= "isShowDescription";			//$NON-NLS-1$
+	private static final String	JSON_IS_SHOW_ITEM_NUMBER			= "isShowItemNumber";			//$NON-NLS-1$
+	private static final String	JSON_IS_SHOW_LUCENE_ID				= "isShowLuceneID";				//$NON-NLS-1$
+	private static final String	JSON_IS_SORT_BY_DATE_ASCENDING	= "isSortByDateAscending";		//$NON-NLS-1$
 	//
-	private static final String		SEARCH_FOLDER							= "/tourbook/search/";											//$NON-NLS-1$
-	private static final String		SEARCH_PAGE								= "search.mthtml";												//$NON-NLS-1$
+	private static final String	SEARCH_FOLDER							= "/tourbook/search/";			//$NON-NLS-1$
+	private static final String	SEARCH_PAGE								= "search.mthtml";				//$NON-NLS-1$
 	//
 	/**
 	 * This is necessary otherwise XULrunner in Linux do not fire a location change event.
 	 */
-	static String					ACTION_URL;
-	static String					SEARCH_URL;
+	static String						ACTION_URL;
+	static String						SEARCH_URL;
 	//
 	private static String			_actionUrl_EditImage;
 	private static String			_iconUrl_Tour;
@@ -183,25 +183,25 @@ public class SearchMgr implements XHRHandler {
 	private static boolean			_isUI_ShowLuceneDocId;
 	private static boolean			_isUI_SortDateAscending;
 	//
-	static final String				TAG_TD									= "<td>";														//$NON-NLS-1$
-	static final String				TAG_TD_END								= "</td>";														//$NON-NLS-1$
-	static final String				CSS_ITEM_CONTAINER						= "item-container";											//$NON-NLS-1$
+	static final String				TAG_TD									= "<td>";							//$NON-NLS-1$
+	static final String				TAG_TD_END								= "</td>";							//$NON-NLS-1$
+	static final String				CSS_ITEM_CONTAINER					= "item-container";				//$NON-NLS-1$
 
-	static final String				PAGE_ABOUT_BLANK						= "about:blank";												//$NON-NLS-1$
+	static final String				PAGE_ABOUT_BLANK						= "about:blank";					//$NON-NLS-1$
 
-	static final String				HREF_TOKEN								= "&";															//$NON-NLS-1$
-	static final String				HREF_VALUE_SEP							= "=";															//$NON-NLS-1$
+	static final String				HREF_TOKEN								= "&";								//$NON-NLS-1$
+	static final String				HREF_VALUE_SEP							= "=";								//$NON-NLS-1$
 
-	static final String				PARAM_ACTION							= "action";													//$NON-NLS-1$
-	static final String				PARAM_DOC_ID							= "docId";														//$NON-NLS-1$
-	static final String				PARAM_MARKER_ID							= "markerId";													//$NON-NLS-1$
-	static final String				PARAM_TOUR_ID							= "tourId";													//$NON-NLS-1$
+	static final String				PARAM_ACTION							= "action";							//$NON-NLS-1$
+	static final String				PARAM_DOC_ID							= "docId";							//$NON-NLS-1$
+	static final String				PARAM_MARKER_ID						= "markerId";						//$NON-NLS-1$
+	static final String				PARAM_TOUR_ID							= "tourId";							//$NON-NLS-1$
 
-	static final String				ACTION_EDIT_MARKER						= "EditMarker";												//$NON-NLS-1$
-	static final String				ACTION_EDIT_TOUR						= "EditTour";													//$NON-NLS-1$
-	static final String				ACTION_SELECT_TOUR						= "SelectTour";												//$NON-NLS-1$
-	static final String				ACTION_SELECT_MARKER					= "SelectMarker";												//$NON-NLS-1$
-	static final String				ACTION_SELECT_WAY_POINT					= "SelectWayPoint";											//$NON-NLS-1$
+	static final String				ACTION_EDIT_MARKER					= "EditMarker";					//$NON-NLS-1$
+	static final String				ACTION_EDIT_TOUR						= "EditTour";						//$NON-NLS-1$
+	static final String				ACTION_SELECT_TOUR					= "SelectTour";					//$NON-NLS-1$
+	static final String				ACTION_SELECT_MARKER					= "SelectMarker";					//$NON-NLS-1$
+	static final String				ACTION_SELECT_WAY_POINT				= "SelectWayPoint";				//$NON-NLS-1$
 
 	static final String				HREF_ACTION_EDIT_MARKER;
 	static final String				HREF_ACTION_EDIT_TOUR;
@@ -245,11 +245,11 @@ public class SearchMgr implements XHRHandler {
 		setInternalSearchOptions();
 	}
 
-	private static SearchMgr		_searchMgr;
+	private static SearchMgr	_searchMgr;
 
-	private static ISearchView		_searchView;
+	private static ISearchView	_searchView;
 
-	private static boolean			_isModalDialogOpen						= false;
+	private static boolean		_isModalDialogOpen	= false;
 
 	private class ItemResponse {
 
@@ -262,12 +262,12 @@ public class SearchMgr implements XHRHandler {
 		boolean	item_IsWayPoint;
 
 		String	itemId_TourId;
-		String	itemId_MarkerId;	// is marker or waypoint
+		String	itemId_MarkerId;		// is marker or waypoint
 	}
 
 	/**
 	 * !!! With an active shell the dialog positions are maintained !!!
-	 * 
+	 *
 	 * @return
 	 */
 	private static Shell getActiveShell() {
@@ -485,7 +485,7 @@ public class SearchMgr implements XHRHandler {
 			return;
 		}
 
-		final ArrayList<TourMarker> selectedTourMarkers = new ArrayList<TourMarker>();
+		final ArrayList<TourMarker> selectedTourMarkers = new ArrayList<>();
 		selectedTourMarkers.add(selectedTourMarker);
 
 		final SelectionTourMarker markerSelection = new SelectionTourMarker(tourData, selectedTourMarkers);
@@ -562,7 +562,8 @@ public class SearchMgr implements XHRHandler {
 		TourWayPoint selectedWayPoint = null;
 
 		// get marker by id
-		for (final TourWayPoint wayPoint : tourData.getTourWayPoints()) {
+		Set<TourWayPoint> tourWayPoints = tourData.getTourWayPoints();
+      for (final TourWayPoint wayPoint : tourWayPoints) {
 			if (wayPoint.getWayPointId() == markerId) {
 				selectedWayPoint = wayPoint;
 				break;
@@ -667,7 +668,7 @@ public class SearchMgr implements XHRHandler {
 				STATE_IS_SHOW_ITEM_NUMBER,
 				STATE_IS_SHOW_ITEM_NUMBER_DEFAULT);
 
-		_isUI_SortDateAscending = Util.getStateBoolean(state,//
+		_isUI_SortDateAscending = Util.getStateBoolean(state, //
 				STATE_IS_SORT_DATE_ASCENDING,
 				STATE_IS_SORT_DATE_ASCENDING_DEFAULT);
 
@@ -682,7 +683,7 @@ public class SearchMgr implements XHRHandler {
 
 	/**
 	 * Web content server is available only when the search view is opened.
-	 * 
+	 *
 	 * @param searchView
 	 */
 	public static void setSearchView(final ISearchView searchView) {
@@ -691,7 +692,7 @@ public class SearchMgr implements XHRHandler {
 
 			// shutdown search service
 
-			FTSearchManager.close();
+			FTSearchManager.closeIndexReaderSuggester();
 
 			WebContentServer.stop();
 
@@ -713,7 +714,7 @@ public class SearchMgr implements XHRHandler {
 
 	/**
 	 * Ensure that the selection provider contains the same data.
-	 * 
+	 *
 	 * @param selection
 	 */
 	private static void updateSelectionProvider(final ISelection selection) {
@@ -868,6 +869,9 @@ public class SearchMgr implements XHRHandler {
 
 						if (_isUI_ShowItemNumber) {
 							sb.append(TAG_TD + Integer.toString(itemNumber) + TAG_TD_END);
+// for debugging
+//                     sb.append(TAG_TD + tourId + TAG_TD_END);
+//                     sb.append(TAG_TD + markerId + TAG_TD_END);
 						}
 
 						if (_isUI_ShowLuceneDocId) {
@@ -1211,7 +1215,7 @@ public class SearchMgr implements XHRHandler {
 			searchTime = String.format("%.0f ms", timeDiff); //$NON-NLS-1$
 		}
 
-		final int totalHits = searchResult == null ? 0 : searchResult.totalHits;
+		final long totalHits = searchResult == null ? 0 : searchResult.totalHits;
 
 		/*
 		 * Create JSON response
@@ -1321,7 +1325,7 @@ public class SearchMgr implements XHRHandler {
 
 	/**
 	 * Set search options from the web UI.
-	 * 
+	 *
 	 * @param params
 	 * @return
 	 * @throws UnsupportedEncodingException
