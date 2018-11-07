@@ -45,7 +45,7 @@ public class SuuntoJsonProcessor {
 		JSONArray samples = null;
 		try {
 			JSONObject jsonContent = new JSONObject(jsonFileContent);
-			samples = (JSONArray) jsonContent.get("Samples");
+			samples = (JSONArray) jsonContent.get("Samples"); //$NON-NLS-1$
 		} catch (JSONException ex) {
 			StatusUtil.log(ex);
 			return null;
@@ -66,18 +66,18 @@ public class SuuntoJsonProcessor {
 			String sampleTime;
 			try {
 				JSONObject sample = samples.getJSONObject(i);
-				String attributesContent = sample.get("Attributes").toString();
-				if (attributesContent == null || attributesContent == "")
+				String attributesContent = sample.get("Attributes").toString(); //$NON-NLS-1$
+				if (attributesContent == null || attributesContent == "") //$NON-NLS-1$
 					continue;
 
-				JSONObject currentSampleAttributes = new JSONObject(sample.get("Attributes").toString());
-				String currentSampleSml = currentSampleAttributes.get("suunto/sml").toString();
-				if (!currentSampleSml.contains("Sample"))
+				JSONObject currentSampleAttributes = new JSONObject(sample.get("Attributes").toString()); //$NON-NLS-1$
+				String currentSampleSml = currentSampleAttributes.get("suunto/sml").toString(); //$NON-NLS-1$
+				if (!currentSampleSml.contains("Sample")) //$NON-NLS-1$
 					continue;
 
-				currentSampleData = new JSONObject(currentSampleSml).get("Sample").toString();
+				currentSampleData = new JSONObject(currentSampleSml).get("Sample").toString(); //$NON-NLS-1$
 
-				sampleTime = sample.get("TimeISO8601").toString();
+				sampleTime = sample.get("TimeISO8601").toString(); //$NON-NLS-1$
 			} catch (Exception e) {
 				StatusUtil.log(e);
 				continue;
@@ -111,13 +111,13 @@ public class SuuntoJsonProcessor {
 				timeData.absoluteTime = currentTime;
 			}
 
-			if (currentSampleData.contains("Pause")) {
+			if (currentSampleData.contains("Pause")) { //$NON-NLS-1$
 				if (!isPaused) {
-					if (currentSampleData.contains("true")) {
+					if (currentSampleData.contains("true")) { //$NON-NLS-1$
 						isPaused = true;
 					}
 				} else {
-					if (currentSampleData.contains("false"))
+					if (currentSampleData.contains("false")) //$NON-NLS-1$
 						isPaused = false;
 				}
 			}
@@ -125,9 +125,9 @@ public class SuuntoJsonProcessor {
 			if (isPaused)
 				continue;
 
-			if (currentSampleData.contains("Lap") &&
-					(currentSampleData.contains("Manual") ||
-							currentSampleData.contains("Distance"))) {
+			if (currentSampleData.contains("Lap") && //$NON-NLS-1$
+					(currentSampleData.contains("Manual") || //$NON-NLS-1$
+							currentSampleData.contains("Distance"))) { //$NON-NLS-1$
 				timeData.marker = 1;
 				timeData.markerLabel = Integer.toString(++_lapCounter);
 				if (!reusePreviousTimeEntry)
@@ -135,8 +135,8 @@ public class SuuntoJsonProcessor {
 			}
 
 			// GPS point
-			if (currentSampleData.contains("GPSAltitude") && currentSampleData.contains("Latitude")
-					&& currentSampleData.contains("Longitude")) {
+			if (currentSampleData.contains("GPSAltitude") && currentSampleData.contains("Latitude") //$NON-NLS-1$ //$NON-NLS-2$
+					&& currentSampleData.contains("Longitude")) { //$NON-NLS-1$
 				wasDataPopulated |= TryAddGpsData(new JSONObject(currentSampleData), timeData);
 			}
 
@@ -198,13 +198,13 @@ public class SuuntoJsonProcessor {
 													TourData activityToReUse,
 													ArrayList<TimeData> sampleListToReUse) {
 		TourData tourData = new TourData();
-		String firstSampleAttributes = firstSample.get("Attributes").toString();
+		String firstSampleAttributes = firstSample.get("Attributes").toString(); //$NON-NLS-1$
 
-		if (firstSampleAttributes.contains("Lap") &&
-				firstSampleAttributes.contains("Type") &&
-				firstSampleAttributes.contains("Start")) {
+		if (firstSampleAttributes.contains("Lap") && //$NON-NLS-1$
+				firstSampleAttributes.contains("Type") && //$NON-NLS-1$
+				firstSampleAttributes.contains("Start")) { //$NON-NLS-1$
 
-			ZonedDateTime startTime = ZonedDateTime.parse(firstSample.get("TimeISO8601").toString());
+			ZonedDateTime startTime = ZonedDateTime.parse(firstSample.get("TimeISO8601").toString()); //$NON-NLS-1$
 			tourData.setTourStartTime(startTime);
 
 		} else if (activityToReUse != null) {
@@ -248,9 +248,9 @@ public class SuuntoJsonProcessor {
 	 */
 	private boolean TryAddGpsData(JSONObject currentSample, TimeData timeData) {
 		try {
-			float latitude = Util.parseFloat(currentSample.get("Latitude").toString());
-			float longitude = Util.parseFloat(currentSample.get("Longitude").toString());
-			float altitude = Util.parseFloat(currentSample.get("GPSAltitude").toString());
+			float latitude = Util.parseFloat(currentSample.get("Latitude").toString()); //$NON-NLS-1$
+			float longitude = Util.parseFloat(currentSample.get("Longitude").toString()); //$NON-NLS-1$
+			float altitude = Util.parseFloat(currentSample.get("GPSAltitude").toString()); //$NON-NLS-1$
 
 			timeData.latitude = (latitude * 180) / Math.PI;
 			timeData.longitude = (longitude * 180) / Math.PI;
@@ -278,7 +278,7 @@ public class SuuntoJsonProcessor {
 	 */
 	private boolean TryAddHeartRateData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
-		if ((value = TryRetrieveStringElementValue(currentSample, "HR")) != null) {
+		if ((value = TryRetrieveStringElementValue(currentSample, "HR")) != null) { //$NON-NLS-1$
 			timeData.pulse = Util.parseFloat(value) * 60.0f;
 			return true;
 		}
@@ -297,7 +297,7 @@ public class SuuntoJsonProcessor {
 	 */
 	private boolean TryAddSpeedData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
-		if ((value = TryRetrieveStringElementValue(currentSample, "Speed")) != null) {
+		if ((value = TryRetrieveStringElementValue(currentSample, "Speed")) != null) { //$NON-NLS-1$
 			timeData.speed = Util.parseFloat(value);
 			return true;
 		}
@@ -315,7 +315,7 @@ public class SuuntoJsonProcessor {
 	 */
 	private boolean TryAddCadenceData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
-		if ((value = TryRetrieveStringElementValue(currentSample, "Cadence")) != null) {
+		if ((value = TryRetrieveStringElementValue(currentSample, "Cadence")) != null) { //$NON-NLS-1$
 			timeData.cadence = Util.parseFloat(value) * 60.0f;
 			return true;
 		}
@@ -333,7 +333,7 @@ public class SuuntoJsonProcessor {
 	 */
 	private boolean TryAddAltitudeData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
-		if ((value = TryRetrieveStringElementValue(currentSample, "Altitude")) != null) {
+		if ((value = TryRetrieveStringElementValue(currentSample, "Altitude")) != null) { //$NON-NLS-1$
 			timeData.absoluteAltitude = Util.parseFloat(value);
 			return true;
 		}
@@ -351,7 +351,7 @@ public class SuuntoJsonProcessor {
 	 */
 	private boolean TryAddPowerData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
-		if ((value = TryRetrieveStringElementValue(currentSample, "Power")) != null) {
+		if ((value = TryRetrieveStringElementValue(currentSample, "Power")) != null) { //$NON-NLS-1$
 			timeData.power = Util.parseFloat(value);
 			return true;
 		}
@@ -369,7 +369,7 @@ public class SuuntoJsonProcessor {
 	 */
 	private boolean TryAddDistanceData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
-		if ((value = TryRetrieveStringElementValue(currentSample, "Distance")) != null) {
+		if ((value = TryRetrieveStringElementValue(currentSample, "Distance")) != null) { //$NON-NLS-1$
 			timeData.absoluteDistance = Util.parseFloat(value);
 			return true;
 		}
@@ -387,7 +387,7 @@ public class SuuntoJsonProcessor {
 	 */
 	private boolean TryAddTemperatureData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
-		if ((value = TryRetrieveStringElementValue(currentSample, "Temperature")) != null) {
+		if ((value = TryRetrieveStringElementValue(currentSample, "Temperature")) != null) { //$NON-NLS-1$
 			timeData.temperature = Util.parseFloat(value) - Kelvin;
 			return true;
 		}
@@ -411,7 +411,7 @@ public class SuuntoJsonProcessor {
 		try {
 			result = token.get(elementName).toString();
 		} catch (Exception e) {}
-		if (result == "null")
+		if (result == "null") //$NON-NLS-1$
 			return null;
 
 		return result;
