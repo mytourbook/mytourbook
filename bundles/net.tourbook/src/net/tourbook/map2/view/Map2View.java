@@ -305,6 +305,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
    private ISelectionListener        _postSelectionListener;
    private IPropertyChangeListener   _prefChangeListener;
    private ITourEventListener        _tourEventListener;
+
    /**
     * Contains all tours which are displayed in the map.
     */
@@ -1113,6 +1114,10 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
             } else if (eventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof ISelection) {
 
                onSelectionChanged((ISelection) eventData);
+
+            } else if (eventId == TourEventId.SEGMENT_LAYER_CHANGED) {
+
+               resetMap();
             }
          }
       };

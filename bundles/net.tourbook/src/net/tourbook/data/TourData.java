@@ -1487,6 +1487,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	@Transient
 	private float[]	_swim_Swolf;
 
+	/**
+	 * When <code>true</code> the data are visible, otherwise they are hidden.
+	 * This is used to show surfing and hide the none surfing parts.
+	 */
+	@Transient
+   public boolean[] visibleDataPointSerie;
+
 // SET_FORMATTING_ON
 
    public TourData() {}
@@ -8257,6 +8264,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       swim_StrokeStyle = serieData.swim_StrokeStyle;
       swim_Time = serieData.swim_Time;
       isSwimCadence = swim_Cadence != null;
+
+      // surfing
+      visibleDataPointSerie = serieData.visibleDataPoint;
    }
 
    /**
@@ -8314,6 +8324,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          // cadence is computed from cadence swim data
          serieData.cadenceSerie20 = null;
       }
+
+      // surfing
+      serieData.visibleDataPoint = visibleDataPointSerie;
 
       // time serie size
       numberOfTimeSlices = timeSerie == null ? 0 : timeSerie.length;

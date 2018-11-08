@@ -1416,6 +1416,7 @@ public class TourMapPainter extends MapPainter {
 
       final double[] latitudeSerie = tourData.latitudeSerie;
       final double[] longitudeSerie = tourData.longitudeSerie;
+      final boolean[] visibleDataPointSerie = tourData.visibleDataPointSerie;
 
       /*
        * world positions are cached to optimize performance when multiple tours are selected
@@ -1498,7 +1499,7 @@ public class TourMapPainter extends MapPainter {
 
             if (_prefIsDrawLine) {
 
-               // check if position is in the viewport
+               // draw as a line
 
                // get positions with the part offset
                final int devToWithOffsetX = devX + devPartOffset;
@@ -1515,9 +1516,15 @@ public class TourMapPainter extends MapPainter {
 
                Color color = null;
 
+               boolean isVisibleDataPoint = true;
+               if (visibleDataPointSerie != null) {
+                  isVisibleDataPoint = visibleDataPointSerie[serieIndex];
+               }
+
                // this condition is an inline for:
                // tileViewport.contains(tileWorldPos.x, tileWorldPos.y)
 
+               // check if position is in the viewport
                if ((tourWorldPixelX >= tileWorldPixelX)
                      && (tourWorldPixelY >= tileWorldPixelY)
                      && tourWorldPixelX < (tileWorldPixelX + tileWidth)
@@ -1588,29 +1595,38 @@ public class TourMapPainter extends MapPainter {
                   // optimize drawing: check if position has changed
                   if (devX != devFromWithOffsetX && devY != devFromWithOffsetY) {
 
-                     isTourInTile = true;
+                     boolean isVisibleDataPoint = true;
 
-                     // adjust positions with the part offset
-                     devX += devPartOffset;
-                     devY += devPartOffset;
-
-                     final Color color = getTourColor(
-                           tourData,
-                           serieIndex,
-                           isBorder,
-                           false,
-                           isGeoCompareRefTour,
-                           isInRefTourPart);
-
-                     if (_prefIsDrawSquare) {
-                        drawTour_30_Square(gcTile, devX, devY, color);
-                     } else {
-                        drawTour_40_Dot(gcTile, devX, devY, color);
+                     if (visibleDataPointSerie != null) {
+                        isVisibleDataPoint = visibleDataPointSerie[serieIndex];
                      }
 
-                     // set previous pixel
-                     devFromWithOffsetX = devX;
-                     devFromWithOffsetY = devY;
+                     if (isVisibleDataPoint) {
+
+                        isTourInTile = true;
+
+                        // adjust positions with the part offset
+                        devX += devPartOffset;
+                        devY += devPartOffset;
+
+                        final Color color = getTourColor(
+                              tourData,
+                              serieIndex,
+                              isBorder,
+                              false,
+                              isGeoCompareRefTour,
+                              isInRefTourPart);
+
+                        if (_prefIsDrawSquare) {
+                           drawTour_30_Square(gcTile, devX, devY, color);
+                        } else {
+                           drawTour_40_Dot(gcTile, devX, devY, color);
+                        }
+
+                        // set previous pixel
+                        devFromWithOffsetX = devX;
+                        devFromWithOffsetY = devY;
+                     }
                   }
                }
             }
@@ -2005,8 +2021,9 @@ public class TourMapPainter extends MapPainter {
        */
       if (isGeoCompareRefTour) {
 
-         return _colorCache.getColor(
-               isInRefTourPart ? _prefGeoCompare_CompartTourPart_RGB : _prefGeoCompare_RefTour_RGB);
+         return _colorCache.getColor(isInRefTourPart
+               ? _prefGeoCompare_CompartTourPart_RGB
+               : _prefGeoCompare_RefTour_RGB);
       }
 
       /*

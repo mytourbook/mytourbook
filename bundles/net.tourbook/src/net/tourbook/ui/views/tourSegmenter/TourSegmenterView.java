@@ -1621,6 +1621,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       final float[] distanceSerie = _tourData.getMetricDistanceSerie();
       final float[] speedSerie = _tourData.getSpeedSerieMetric();
 
+      final boolean[] visibleDataPointSerie = _tourData.visibleDataPointSerie = new boolean[timeSerie.length];
+
       final int lastSerieIndex = timeSerie.length - 1;
 
       // get surfing values in metric measurement
@@ -1744,6 +1746,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             isSurfing = false;
          }
 
+         // overwrite old values
+         visibleDataPointSerie[serieIndex] = false;
+
          if (prevIsSurfing && isSurfing == false) {
 
             // surfing has stopped
@@ -1760,6 +1765,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
                segmentSerieIndex.add(segmentStartIndex);
                segmentSerieIndex.add(segmentEndIndex);
+
+               // mark datapoints visible
+               for (int surfSerieIndex = segmentStartIndex + 1; surfSerieIndex <= segmentEndIndex; surfSerieIndex++) {
+                  visibleDataPointSerie[surfSerieIndex] = true;
+               }
             }
          }
 
