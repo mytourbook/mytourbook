@@ -39,7 +39,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
 	// For Unit testing
 	private static final boolean			UNITTESTS			= false;
-	public static final String				IMPORT_FILE_PATH	= "/net/tourbook/device/suunto/testFiles/"; //$NON-NLS-1$
+	public static final String				IMPORT_FILE_PATH	= "/net/tourbook/device/suunto/testFiles/";	//$NON-NLS-1$
 	private static Map<String, String>	testFiles			= new HashMap<>();									// Java 7
 
 	@Override
@@ -121,10 +121,12 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
 			try {
 				JSONObject jsonContent = new JSONObject(jsonFileContent);
-				JSONArray samples = (JSONArray) jsonContent.get("Samples"); //$NON-NLS-1$
+				JSONArray samples = (JSONArray) jsonContent.get(SuuntoJsonProcessor.TAG_SAMPLES);
 
 				String firstSample = samples.get(0).toString();
-				if (firstSample.contains("Attributes") && firstSample.contains("Source") && firstSample.contains("TimeISO8601")) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				if (firstSample.contains(SuuntoJsonProcessor.TAG_ATTRIBUTES) &&
+						firstSample.contains(SuuntoJsonProcessor.TAG_SOURCE) &&
+						firstSample.contains(SuuntoJsonProcessor.TAG_TIMEISO8601))
 					return true;
 
 			} catch (JSONException ex) {
