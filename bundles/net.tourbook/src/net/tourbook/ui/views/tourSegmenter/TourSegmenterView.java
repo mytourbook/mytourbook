@@ -299,9 +299,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
    private float                   _dpTolerancePulse;
    private float                   _savedDpToleranceAltitude = -1;
+
    private PostSelectionProvider   _postSelectionProvider;
    private ISelectionListener      _postSelectionListener;
    private IPartListener2          _partListener;
+
+   private MouseWheelListener      _defaultSurfing_MouseWheelListener;
+   private SelectionAdapter        _defaultSurfing_SelectionListener;
 
    private IPropertyChangeListener _prefChangeListener;
    private ITourEventListener      _tourEventListener;
@@ -409,6 +413,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private Composite       _pageSegType_Surfing;
 
    private Button          _chkIsMinSurfingDistance;
+   private Button          _chkIsSurfingEnabled;
 
    private Combo           _comboBreakMethod;
    private Combo           _comboSegmenterType;
@@ -421,9 +426,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private Label           _lblDistanceValue;
    private Label           _lblMinAltitude;
    private Label           _lblNumSegments;
+   private Label           _lblSurfing_MinStartStopSpeed;
    private Label           _lblSurfing_MinStartStopSpeed_Unit;
    private Label           _lblSurfing_MinSurfingDistance_Unit;
+   private Label           _lblSurfing_MinSurfingSpeed;
    private Label           _lblSurfing_MinSurfingSpeed_Unit;
+   private Label           _lblSurfing_MinSurfingTimeDuration;
+   private Label           _lblSurfing_MinSurfingTimeDuration_Unit;
    private Label           _lblTourBreakTime;
 
    private Spinner         _spinnerBreak_MinAvgSpeedAS;
@@ -608,6 +617,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
                _state.put(STATE_IS_SEGMENTER_ACTIVE, false);
 
+               removeVisibleDataPointsBeforeNextTourIsSet();
+
                fireSegmentLayerChanged();
             }
          }
@@ -623,6 +634,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
          @Override
          public void partOpened(final IWorkbenchPartReference partRef) {
+
             if (partRef.getPart(false) == TourSegmenterView.this) {
                onPartOpened();
             }
@@ -910,6 +922,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       _pageBookUI.showPage(_pageNoData);
 
+      removeVisibleDataPointsBeforeNextTourIsSet();
       _tourData = null;
       _tourChart = null;
 
@@ -944,9 +957,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    @Override
    public void createPartControl(final Composite parent) {
 
-      _parent = parent;
-      _pc = new PixelConverter(parent);
-      _spinnerWidth = _pc.convertWidthInCharsToPixels(_isOSX ? 10 : 5);
+      initUI(parent);
 
       setMaxDistanceSpinner();
 
@@ -2476,45 +2487,38 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
       {
-         createUI_62_SurfingFields(container);
-
          {
             /*
-             * Toolbar: actions
+             * Enable/disable segmenter
              */
-            final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
+            _chkIsSurfingEnabled = new Button(container, SWT.CHECK);
+            _chkIsSurfingEnabled.setText(Messages.Tour_Segmenter_Surfing_Checkbox_IsSurfingEnabled);
+            _chkIsSurfingEnabled.setToolTipText(Messages.Tour_Segmenter_Surfing_Label_IsSurfingEnabled_Tooltip);
+            _chkIsSurfingEnabled.addSelectionListener(new SelectionAdapter() {
+
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onSelect_SurfingEnabled();
+               }
+            });
 
             GridDataFactory.fillDefaults()
-                  .align(SWT.FILL, SWT.BEGINNING)
-                  .indent(10, 0)
-                  .applyTo(toolbar);
+                  .align(SWT.FILL, SWT.CENTER)
+                  .span(2, 1)
+                  .applyTo(_chkIsSurfingEnabled);
 
-            final ToolBarManager tbm = new ToolBarManager(toolbar);
-            tbm.add(_actionSurfing_RestoreDefaults);
-            tbm.update(true);
          }
+
+         createUI_62_SurfingFields(container);
+         createUI_64_SurfingActions(container);
       }
 
       return container;
    }
 
    private Composite createUI_62_SurfingFields(final Composite parent) {
-
-      final SelectionAdapter defaultSelectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onSelect_Surfing();
-         }
-      };
-
-      final MouseWheelListener defaultMouseWheelListener = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
-            UI.adjustSpinnerValueOnMouseScroll(event);
-            onSelect_Surfing();
-         }
-      };
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
@@ -2526,17 +2530,17 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
              */
 
             // label
-            final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Tour_Segmenter_Surfing_Label_StartStopSpeedThreshold);
-            label.setToolTipText(Messages.Tour_Segmenter_Surfing_Label_StartStopSpeedThreshold_Tooltip);
+            _lblSurfing_MinStartStopSpeed = new Label(container, SWT.NONE);
+            _lblSurfing_MinStartStopSpeed.setText(Messages.Tour_Segmenter_Surfing_Label_StartStopSpeedThreshold);
+            _lblSurfing_MinStartStopSpeed.setToolTipText(Messages.Tour_Segmenter_Surfing_Label_StartStopSpeedThreshold_Tooltip);
 
             // spinner: speed
             _spinnerSurfing_MinStartStopSpeed = new Spinner(container, SWT.BORDER);
             _spinnerSurfing_MinStartStopSpeed.setMinimum(1);
             _spinnerSurfing_MinStartStopSpeed.setMaximum(100);
             _spinnerSurfing_MinStartStopSpeed.setPageIncrement(5);
-            _spinnerSurfing_MinStartStopSpeed.addSelectionListener(defaultSelectionListener);
-            _spinnerSurfing_MinStartStopSpeed.addMouseWheelListener(defaultMouseWheelListener);
+            _spinnerSurfing_MinStartStopSpeed.addSelectionListener(_defaultSurfing_SelectionListener);
+            _spinnerSurfing_MinStartStopSpeed.addMouseWheelListener(_defaultSurfing_MouseWheelListener);
 
             // label: unit
             _lblSurfing_MinStartStopSpeed_Unit = new Label(container, SWT.NONE);
@@ -2549,17 +2553,17 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
              */
 
             // label
-            final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Tour_Segmenter_Surfing_Label_MinSurfingSpeed);
-            label.setToolTipText(Messages.Tour_Segmenter_Surfing_Label_MinSurfingSpeed_Tooltip);
+            _lblSurfing_MinSurfingSpeed = new Label(container, SWT.NONE);
+            _lblSurfing_MinSurfingSpeed.setText(Messages.Tour_Segmenter_Surfing_Label_MinSurfingSpeed);
+            _lblSurfing_MinSurfingSpeed.setToolTipText(Messages.Tour_Segmenter_Surfing_Label_MinSurfingSpeed_Tooltip);
 
             // spinner: seconds
             _spinnerSurfing_MinSurfingSpeed = new Spinner(container, SWT.BORDER);
             _spinnerSurfing_MinSurfingSpeed.setMinimum(1);
             _spinnerSurfing_MinSurfingSpeed.setMaximum(100);
             _spinnerSurfing_MinSurfingSpeed.setPageIncrement(5);
-            _spinnerSurfing_MinSurfingSpeed.addSelectionListener(defaultSelectionListener);
-            _spinnerSurfing_MinSurfingSpeed.addMouseWheelListener(defaultMouseWheelListener);
+            _spinnerSurfing_MinSurfingSpeed.addSelectionListener(_defaultSurfing_SelectionListener);
+            _spinnerSurfing_MinSurfingSpeed.addMouseWheelListener(_defaultSurfing_MouseWheelListener);
 
             // label: unit
             _lblSurfing_MinSurfingSpeed_Unit = new Label(container, SWT.NONE);
@@ -2572,22 +2576,22 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
              */
 
             // label
-            Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Tour_Segmenter_Surfing_Label_MinSurfTimeDuration);
-            label.setToolTipText(Messages.Tour_Segmenter_Surfing_Label_MinSurfTimeDuration_Tooltip);
+            _lblSurfing_MinSurfingTimeDuration = new Label(container, SWT.NONE);
+            _lblSurfing_MinSurfingTimeDuration.setText(Messages.Tour_Segmenter_Surfing_Label_MinSurfTimeDuration);
+            _lblSurfing_MinSurfingTimeDuration.setToolTipText(Messages.Tour_Segmenter_Surfing_Label_MinSurfTimeDuration_Tooltip);
 
             // spinner: seconds
             _spinnerSurfing_MinSurfingTimeDuration = new Spinner(container, SWT.BORDER);
             _spinnerSurfing_MinSurfingTimeDuration.setMinimum(1);
             _spinnerSurfing_MinSurfingTimeDuration.setMaximum(100);
             _spinnerSurfing_MinSurfingTimeDuration.setPageIncrement(5);
-            _spinnerSurfing_MinSurfingTimeDuration.addSelectionListener(defaultSelectionListener);
-            _spinnerSurfing_MinSurfingTimeDuration.addMouseWheelListener(defaultMouseWheelListener);
+            _spinnerSurfing_MinSurfingTimeDuration.addSelectionListener(_defaultSurfing_SelectionListener);
+            _spinnerSurfing_MinSurfingTimeDuration.addMouseWheelListener(_defaultSurfing_MouseWheelListener);
 
             // label: unit
-            label = new Label(container, SWT.NONE);
-            label.setText(Messages.App_Unit_Seconds_Small);
-            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).applyTo(label);
+            _lblSurfing_MinSurfingTimeDuration_Unit = new Label(container, SWT.NONE);
+            _lblSurfing_MinSurfingTimeDuration_Unit.setText(Messages.App_Unit_Seconds_Small);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).applyTo(_lblSurfing_MinSurfingTimeDuration_Unit);
          }
          {
             /*
@@ -2598,7 +2602,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                _chkIsMinSurfingDistance = new Button(container, SWT.CHECK);
                _chkIsMinSurfingDistance.setText(Messages.Tour_Segmenter_Surfing_Checkbox_IsMinSurfingDistance);
                _chkIsMinSurfingDistance.setToolTipText(Messages.Tour_Segmenter_Surfing_Label_MinSurfingDistance_Tooltip);
-               _chkIsMinSurfingDistance.addSelectionListener(defaultSelectionListener);
+               _chkIsMinSurfingDistance.addSelectionListener(_defaultSurfing_SelectionListener);
                GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_chkIsMinSurfingDistance);
 
                // spinner: seconds
@@ -2606,8 +2610,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                _spinnerSurfing_MinSurfingDistance.setMinimum(0);
                _spinnerSurfing_MinSurfingDistance.setMaximum(1000);
                _spinnerSurfing_MinSurfingDistance.setPageIncrement(10);
-               _spinnerSurfing_MinSurfingDistance.addSelectionListener(defaultSelectionListener);
-               _spinnerSurfing_MinSurfingDistance.addMouseWheelListener(defaultMouseWheelListener);
+               _spinnerSurfing_MinSurfingDistance.addSelectionListener(_defaultSurfing_SelectionListener);
+               _spinnerSurfing_MinSurfingDistance.addMouseWheelListener(_defaultSurfing_MouseWheelListener);
 
                // label: unit
                _lblSurfing_MinSurfingDistance_Unit = new Label(container, SWT.NONE);
@@ -2617,6 +2621,25 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          }
       }
       return container;
+   }
+
+   private void createUI_64_SurfingActions(final Composite parent) {
+
+      {
+         /*
+          * Toolbar: actions
+          */
+         final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
+
+         GridDataFactory.fillDefaults()
+               .align(SWT.FILL, SWT.BEGINNING)
+               .indent(10, 0)
+               .applyTo(toolbar);
+
+         final ToolBarManager tbm = new ToolBarManager(toolbar);
+         tbm.add(_actionSurfing_RestoreDefaults);
+         tbm.update(true);
+      }
    }
 
    private void createUI_70_Viewer(final Composite parent) {
@@ -3547,10 +3570,29 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
    private void enableActions_Surfing() {
 
+      final boolean isSurfingEnabled = _chkIsSurfingEnabled.getSelection();
       final boolean isMinDistance = _chkIsMinSurfingDistance.getSelection();
 
-      _spinnerSurfing_MinSurfingDistance.setEnabled(isMinDistance);
-      _lblSurfing_MinSurfingDistance_Unit.setEnabled(isMinDistance);
+      _segmentViewer.getTable().setEnabled(isSurfingEnabled);
+
+      _chkIsMinSurfingDistance.setEnabled(isSurfingEnabled);
+
+      _lblSurfing_MinStartStopSpeed.setEnabled(isSurfingEnabled);
+      _lblSurfing_MinStartStopSpeed_Unit.setEnabled(isSurfingEnabled);
+      _lblSurfing_MinSurfingDistance_Unit.setEnabled(isSurfingEnabled);
+      _lblSurfing_MinSurfingSpeed.setEnabled(isSurfingEnabled);
+      _lblSurfing_MinSurfingSpeed_Unit.setEnabled(isSurfingEnabled);
+      _lblSurfing_MinSurfingTimeDuration.setEnabled(isSurfingEnabled);
+      _lblSurfing_MinSurfingTimeDuration_Unit.setEnabled(isSurfingEnabled);
+
+      _spinnerSurfing_MinSurfingDistance.setEnabled(isSurfingEnabled);
+      _spinnerSurfing_MinSurfingSpeed.setEnabled(isSurfingEnabled);
+      _spinnerSurfing_MinSurfingTimeDuration.setEnabled(isSurfingEnabled);
+      _spinnerSurfing_MinStartStopSpeed.setEnabled(isSurfingEnabled);
+
+      _spinnerSurfing_MinSurfingDistance.setEnabled(isSurfingEnabled && isMinDistance);
+      _lblSurfing_MinSurfingDistance_Unit.setEnabled(isSurfingEnabled && isMinDistance);
+
    }
 
    private void fillToolbar() {
@@ -3850,6 +3892,29 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       return _segmentViewer;
    }
 
+   private void initUI(final Composite parent) {
+
+      _parent = parent;
+      _pc = new PixelConverter(parent);
+      _spinnerWidth = _pc.convertWidthInCharsToPixels(_isOSX ? 10 : 5);
+
+      _defaultSurfing_SelectionListener = new SelectionAdapter() {
+         @Override
+         public void widgetSelected(final SelectionEvent e) {
+            onSelect_Surfing();
+         }
+      };
+
+      _defaultSurfing_MouseWheelListener = new MouseWheelListener() {
+         @Override
+         public void mouseScrolled(final MouseEvent event) {
+            UI.adjustSpinnerValueOnMouseScroll(event);
+            onSelect_Surfing();
+         }
+      };
+
+   }
+
    private boolean isSegmentLayerVisible() {
 
       final boolean isSegmentLayerVisible = Util.getStateBoolean(
@@ -3908,6 +3973,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       _tourData.setDpTolerance((short) (_dpToleranceAltitude * 10));
 
       _isTourDirty = true;
+
+      removeVisibleDataPointsBeforeNextTourIsSet();
 
       _tourData = saveTour();
 
@@ -4044,6 +4111,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          return;
       }
 
+      // enable segmenter table by default, segmenter can disable it
+      _segmentViewer.getTable().setEnabled(true);
+
       final SegmenterType selectedSegmenterType = selectedSegmenter.segmenterType;
 
       /*
@@ -4090,6 +4160,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       } else if (selectedSegmenterType == SegmenterType.Surfing) {
 
          _pageBookSegmenter.showPage(_pageSegType_Surfing);
+         enableActions_Surfing();
       }
 
       _pageSegmenter.layout();
@@ -4102,6 +4173,29 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       enableActions_Surfing();
 
       createSegments(true);
+   }
+
+   private void onSelect_SurfingEnabled() {
+
+      final boolean isEnabled = _chkIsSurfingEnabled.getSelection();
+
+      if (isEnabled) {
+
+         onSelect_Surfing();
+
+      } else {
+
+         // hide segmenter data points
+
+         _tourData.visibleDataPointSerie = null;
+
+         enableActions_Surfing();
+
+         TourManager.fireEventWithCustomData(//
+               TourEventId.SEGMENT_LAYER_CHANGED,
+               _tourData,
+               TourSegmenterView.this);
+      }
    }
 
    private void onSelect_Tolerance() {
@@ -4308,6 +4402,17 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       // force content to be reloaded
       _segmentViewer.setInput(new Object[0]);
+   }
+
+   /**
+    * Prevent that visible points are saved accidently, visible points must be saved explicitly !!!
+    */
+   private void removeVisibleDataPointsBeforeNextTourIsSet() {
+
+      if (_tourData != null) {
+
+         _tourData.visibleDataPointSerie = null;
+      }
    }
 
    /**
@@ -4761,6 +4866,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       _isDirtyDisabled = true;
       {
+         removeVisibleDataPointsBeforeNextTourIsSet();
+
          _tourData = tourData;
 
          _pageBookUI.showPage(_pageSegmenter);
