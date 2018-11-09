@@ -34,6 +34,9 @@ Improvements
   Updating this view automatically would need some UI adjustments but this UI will be deprecated later on and is now in the maintanance mode.
   The fulltext index can be deleted (when MyTourbook is closed), it will be recreated when the "Search Tours" view is opened. 
 
+* Map 2D
+  - Increased max zoom level 18 -> 19
+ 
  
 Bugfix 	
 ======
