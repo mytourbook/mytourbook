@@ -19,7 +19,6 @@
 	</parent>
 	
 	<modules>
-		<module>de.byteholder.geoclipse.ext.geotools</module>
 
 		<module>net.tourbook</module>
 		<module>net.tourbook.branding</module>
@@ -36,7 +35,9 @@
 		<module>net.tourbook.statistics</module>
 		<module>net.tourbook.web</module>
 
+		<module>net.tourbook.ext.apache</module>
 		<module>net.tourbook.ext.ejb3_3.4.0</module>
+		<module>net.tourbook.ext.geoclipse</module>
 		<module>net.tourbook.ext.jars</module>
 		<module>net.tourbook.ext.jars.printing</module>
 		<module>net.tourbook.ext.rxtx.linux32_2.2</module>
@@ -57,7 +58,6 @@
 		<module>net.tourbook.ext.worldwind.win64_2.0</module>
 		<module>net.tourbook.ext.worldwind_2.0</module>
 
-		<module>org.apache.derby_10.11.1.1</module>
 	</modules>
 
 </project>
