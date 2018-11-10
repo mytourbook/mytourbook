@@ -39,7 +39,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
 	// For Unit testing
 	private static final boolean			UNITTESTS			= false;
-	public static final String				IMPORT_FILE_PATH	= "/net/tourbook/device/suunto/testFiles/";
+	public static final String				IMPORT_FILE_PATH	= "/net/tourbook/device/suunto/testFiles/";	//$NON-NLS-1$
 	private static Map<String, String>	testFiles			= new HashMap<>();									// Java 7
 
 	@Override
@@ -115,16 +115,18 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		try {
 
 			if (jsonFileContent == null ||
-					jsonFileContent == "") {
+					jsonFileContent == "") { //$NON-NLS-1$
 				return false;
 			}
 
 			try {
 				JSONObject jsonContent = new JSONObject(jsonFileContent);
-				JSONArray samples = (JSONArray) jsonContent.get("Samples");
+				JSONArray samples = (JSONArray) jsonContent.get(SuuntoJsonProcessor.TAG_SAMPLES);
 
 				String firstSample = samples.get(0).toString();
-				if (firstSample.contains("Attributes") && firstSample.contains("Source") && firstSample.contains("TimeISO8601"))
+				if (firstSample.contains(SuuntoJsonProcessor.TAG_ATTRIBUTES) &&
+						firstSample.contains(SuuntoJsonProcessor.TAG_SOURCE) &&
+						firstSample.contains(SuuntoJsonProcessor.TAG_TIMEISO8601))
 					return true;
 
 			} catch (JSONException ex) {
@@ -163,7 +165,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
 		} catch (IOException e) {
 			StatusUtil.log(e);
-			return "";
+			return ""; //$NON-NLS-1$
 		}
 
 		return jsonFileContent;
@@ -200,7 +202,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 				gzip.close();
 		} catch (IOException e) {
 			StatusUtil.log(e);
-			return "";
+			return ""; //$NON-NLS-1$
 		}
 
 		return fileContent;
@@ -222,7 +224,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		String fileName =
 				FilenameUtils.removeExtension(filePath);
 
-		if (fileName.substring(fileName.length() - 5, fileName.length()) == ".json") {
+		if (fileName.substring(fileName.length() - 5, fileName.length()) == ".json") { //$NON-NLS-1$
 			fileName = FilenameUtils.removeExtension(fileName);
 		}
 
@@ -264,9 +266,9 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
 				String parentFileName = GetFileNameWithoutNumber(
 						FilenameUtils.getBaseName(filePath)) +
-						"-" +
+						"-" + //$NON-NLS-1$
 						String.valueOf(fileNumber - 1) +
-						".json.gz";
+						".json.gz"; //$NON-NLS-1$
 
 				if (key.getImportFileName().contains(parentFileName)) {
 					parentEntry = entry;
@@ -340,9 +342,9 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
 			String parentFileName = GetFileNameWithoutNumber(
 					FilenameUtils.getBaseName(filePath)) +
-					"-" +
+					"-" + //$NON-NLS-1$
 					String.valueOf(++currentFileNumber) +
-					".json.gz";
+					".json.gz"; //$NON-NLS-1$
 
 			Map.Entry<String, String> childEntry = getChildActivity(parentFileName);
 
@@ -495,16 +497,16 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
 		// City of Rocks, ID
 		String filePath =
-				IMPORT_FILE_PATH + "1537365846902_183010004848_post_timeline-1.json.gz";
-		String controlFilePath = IMPORT_FILE_PATH + "1537365846902_183010004848_post_timeline-1.xml";
+				IMPORT_FILE_PATH + "1537365846902_183010004848_post_timeline-1.json.gz"; //$NON-NLS-1$
+		String controlFilePath = IMPORT_FILE_PATH + "1537365846902_183010004848_post_timeline-1.xml"; //$NON-NLS-1$
 		testFiles.put(controlFilePath, filePath);
 
 		//Maxwell, CO
 
 		filePath = IMPORT_FILE_PATH +
-				"Original-1536723722706_183010004848_post_timeline-1.json.gz";
+				"Original-1536723722706_183010004848_post_timeline-1.json.gz"; //$NON-NLS-1$
 		controlFilePath =
-				IMPORT_FILE_PATH + "1536723722706_183010004848_post_timeline-1.xml";
+				IMPORT_FILE_PATH + "1536723722706_183010004848_post_timeline-1.xml"; //$NON-NLS-1$
 		testFiles.put(controlFilePath, filePath); // Single file tests SuuntoJsonProcessor
 
 		TourData entry;
@@ -536,26 +538,26 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
 		// File #2
 		String maxWell2FilePath = IMPORT_FILE_PATH +
-				"1536723722706_183010004848_post_timeline-2.json.gz";
+				"1536723722706_183010004848_post_timeline-2.json.gz"; //$NON-NLS-1$
 		String jsonContent = GetContentFromResource(maxWell2FilePath, true);
 		ProcessFile(maxWell2FilePath, jsonContent);
 
 		// File #1
 		String maxWell1FilePath = IMPORT_FILE_PATH +
-				"1536723722706_183010004848_post_timeline-1.json.gz";
+				"1536723722706_183010004848_post_timeline-1.json.gz"; //$NON-NLS-1$
 		jsonContent = GetContentFromResource(maxWell1FilePath, true);
 		ProcessFile(maxWell1FilePath, jsonContent);
 
 		// File #3
 		String maxWell3FilePath = IMPORT_FILE_PATH +
-				"1536723722706_183010004848_post_timeline-3.json.gz";
+				"1536723722706_183010004848_post_timeline-3.json.gz"; //$NON-NLS-1$
 		jsonContent = GetContentFromResource(maxWell3FilePath, true);
 		ProcessFile(maxWell3FilePath, jsonContent);
 
 		//Because the files are split, it causes small discrepancies in the data whenever
 		//jump from 1 file to another
 		String controlDocumentPath = IMPORT_FILE_PATH +
-				"1536723722706_183010004848_post_timeline-1-SplitTests.xml";
+				"1536723722706_183010004848_post_timeline-1-SplitTests.xml"; //$NON-NLS-1$
 		controlFileContent = GetContentFromResource(controlDocumentPath, false);
 		entry = GetLastTourDataImported();
 		xml = entry.toXml();
@@ -636,7 +638,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		//Because we start with the 3rd file, it causes different discrepancies
 		//when we jump from 1 file to another.
 		controlDocumentPath = IMPORT_FILE_PATH +
-				"1536723722706_183010004848_post_timeline-1-SplitTests-LastFileFirst.xml";
+				"1536723722706_183010004848_post_timeline-1-SplitTests-LastFileFirst.xml"; //$NON-NLS-1$
 		controlFileContent = GetContentFromResource(controlDocumentPath, false);
 		entry = GetLastTourDataImported();
 		xml = entry.toXml();
@@ -659,7 +661,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
 		//Small discrepancies as the tour markers are out of order.
 		controlDocumentPath = IMPORT_FILE_PATH +
-				"1536723722706_183010004848_post_timeline-1-SplitTests.xml";
+				"1536723722706_183010004848_post_timeline-1-SplitTests.xml"; //$NON-NLS-1$
 		controlFileContent = GetContentFromResource(controlDocumentPath, false);
 		entry = GetLastTourDataImported();
 		xml = entry.toXml();

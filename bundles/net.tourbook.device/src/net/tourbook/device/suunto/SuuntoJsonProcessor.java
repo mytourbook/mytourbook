@@ -21,10 +21,32 @@ import net.tourbook.data.TourMarker;
 
 public class SuuntoJsonProcessor {
 
-	private final float				Kelvin		= 273.1499938964845f;
+	private final float				Kelvin				= 273.1499938964845f;
 	private ArrayList<TimeData>	_sampleList;
 	private int							_lapCounter;
-	final IPreferenceStore			_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
+	final IPreferenceStore			_prefStore			= TourbookPlugin.getDefault().getPreferenceStore();
+
+	public static final String		TAG_SAMPLES			= "Samples";													//$NON-NLS-1$
+	private static final String	TAG_SAMPLE			= "Sample";														//$NON-NLS-1$
+	public static final String		TAG_TIMEISO8601	= "TimeISO8601";												//$NON-NLS-1$
+	public static final String		TAG_ATTRIBUTES		= "Attributes";												//$NON-NLS-1$
+	public static final String		TAG_SOURCE			= "Source";														//$NON-NLS-1$
+	private static final String	TAG_SUUNTOSML		= "suunto/sml";												//$NON-NLS-1$
+	private static final String	TAG_LAP				= "Lap";															//$NON-NLS-1$
+	private static final String	TAG_MANUAL			= "Manual";														//$NON-NLS-1$
+	private static final String	TAG_DISTANCE		= "Distance";													//$NON-NLS-1$
+	private static final String	TAG_GPSALTITUDE	= "GPSAltitude";												//$NON-NLS-1$
+	private static final String	TAG_LATITUDE		= "Latitude";													//$NON-NLS-1$
+	private static final String	TAG_LONGITUDE		= "Longitude";													//$NON-NLS-1$
+	private static final String	TAG_TYPE				= "Start";														//$NON-NLS-1$
+	private static final String	TAG_START			= "Type";														//$NON-NLS-1$
+	private static final String	TAG_PAUSE			= "Pause";														//$NON-NLS-1$
+	private static final String	TAG_HR				= "HR";															//$NON-NLS-1$
+	private static final String	TAG_SPEED			= "Speed";														//$NON-NLS-1$
+	private static final String	TAG_CADENCE			= "Cadence";													//$NON-NLS-1$
+	private static final String	TAG_ALTITUDE		= "Altitude";													//$NON-NLS-1$
+	private static final String	TAG_POWER			= "Power";														//$NON-NLS-1$
+	private static final String	TAG_TEMPERATURE	= "Temperature";												//$NON-NLS-1$
 
 	/**
 	 * Processes and imports a Suunto activity (from a Suunto 9 or Spartan watch).
@@ -45,7 +67,7 @@ public class SuuntoJsonProcessor {
 		JSONArray samples = null;
 		try {
 			JSONObject jsonContent = new JSONObject(jsonFileContent);
-			samples = (JSONArray) jsonContent.get("Samples");
+			samples = (JSONArray) jsonContent.get(TAG_SAMPLES);
 		} catch (JSONException ex) {
 			StatusUtil.log(ex);
 			return null;
@@ -66,18 +88,18 @@ public class SuuntoJsonProcessor {
 			String sampleTime;
 			try {
 				JSONObject sample = samples.getJSONObject(i);
-				String attributesContent = sample.get("Attributes").toString();
-				if (attributesContent == null || attributesContent == "")
+				String attributesContent = sample.get(TAG_ATTRIBUTES).toString();
+				if (attributesContent == null || attributesContent == "") //$NON-NLS-1$
 					continue;
 
-				JSONObject currentSampleAttributes = new JSONObject(sample.get("Attributes").toString());
-				String currentSampleSml = currentSampleAttributes.get("suunto/sml").toString();
-				if (!currentSampleSml.contains("Sample"))
+				JSONObject currentSampleAttributes = new JSONObject(sample.get(TAG_ATTRIBUTES).toString());
+				String currentSampleSml = currentSampleAttributes.get(TAG_SUUNTOSML).toString();
+				if (!currentSampleSml.contains(TAG_SAMPLE))
 					continue;
 
-				currentSampleData = new JSONObject(currentSampleSml).get("Sample").toString();
+				currentSampleData = new JSONObject(currentSampleSml).get(TAG_SAMPLE).toString();
 
-				sampleTime = sample.get("TimeISO8601").toString();
+				sampleTime = sample.get(TAG_TIMEISO8601).toString();
 			} catch (Exception e) {
 				StatusUtil.log(e);
 				continue;
@@ -89,14 +111,15 @@ public class SuuntoJsonProcessor {
 
 			ZonedDateTime currentZonedDateTime = ZonedDateTime.parse(sampleTime);
 			currentZonedDateTime = currentZonedDateTime.truncatedTo(ChronoUnit.SECONDS);
-			//Rounding to the nearest second
+			// Rounding to the nearest second
 			if (Character.getNumericValue(sampleTime.charAt(20)) >= 5)
 				currentZonedDateTime = currentZonedDateTime.plusSeconds(1);
 
 			long currentTime = currentZonedDateTime.toInstant().toEpochMilli();
 
 			if (_sampleList.size() > 0) {
-				//Looking in the last 10 entries to see if their time is identical to the current sample's time
+				// Looking in the last 10 entries to see if their time is identical to the
+				// current sample's time
 				for (int index = _sampleList.size() - 1; index > _sampleList.size() - 11 && index >= 0; --index) {
 					if (_sampleList.get(index).absoluteTime == currentTime) {
 						timeData = _sampleList.get(index);
@@ -111,13 +134,13 @@ public class SuuntoJsonProcessor {
 				timeData.absoluteTime = currentTime;
 			}
 
-			if (currentSampleData.contains("Pause")) {
+			if (currentSampleData.contains(TAG_PAUSE)) {
 				if (!isPaused) {
-					if (currentSampleData.contains("true")) {
+					if (currentSampleData.contains(Boolean.TRUE.toString())) {
 						isPaused = true;
 					}
 				} else {
-					if (currentSampleData.contains("false"))
+					if (currentSampleData.contains(Boolean.FALSE.toString()))
 						isPaused = false;
 				}
 			}
@@ -125,9 +148,9 @@ public class SuuntoJsonProcessor {
 			if (isPaused)
 				continue;
 
-			if (currentSampleData.contains("Lap") &&
-					(currentSampleData.contains("Manual") ||
-							currentSampleData.contains("Distance"))) {
+			if (currentSampleData.contains(TAG_LAP) &&
+					(currentSampleData.contains(TAG_MANUAL) ||
+							currentSampleData.contains(TAG_DISTANCE))) {
 				timeData.marker = 1;
 				timeData.markerLabel = Integer.toString(++_lapCounter);
 				if (!reusePreviousTimeEntry)
@@ -135,8 +158,8 @@ public class SuuntoJsonProcessor {
 			}
 
 			// GPS point
-			if (currentSampleData.contains("GPSAltitude") && currentSampleData.contains("Latitude")
-					&& currentSampleData.contains("Longitude")) {
+			if (currentSampleData.contains(TAG_GPSALTITUDE) && currentSampleData.contains(TAG_LATITUDE)
+					&& currentSampleData.contains(TAG_LONGITUDE)) {
 				wasDataPopulated |= TryAddGpsData(new JSONObject(currentSampleData), timeData);
 			}
 
@@ -169,12 +192,11 @@ public class SuuntoJsonProcessor {
 				_sampleList.add(timeData);
 		}
 
-		//removing the entries that don't have GPS data
+		// removing the entries that don't have GPS data
 		Iterator<TimeData> sampleListIterator = _sampleList.iterator();
 		while (sampleListIterator.hasNext()) {
 			TimeData currentTimeData = sampleListIterator.next();
-			if (currentTimeData.longitude == Double.MIN_VALUE &&
-					currentTimeData.latitude == Double.MIN_VALUE)
+			if (currentTimeData.longitude == Double.MIN_VALUE && currentTimeData.latitude == Double.MIN_VALUE)
 				sampleListIterator.remove();
 		}
 
@@ -198,13 +220,13 @@ public class SuuntoJsonProcessor {
 													TourData activityToReUse,
 													ArrayList<TimeData> sampleListToReUse) {
 		TourData tourData = new TourData();
-		String firstSampleAttributes = firstSample.get("Attributes").toString();
+		String firstSampleAttributes = firstSample.get(TAG_ATTRIBUTES).toString();
 
-		if (firstSampleAttributes.contains("Lap") &&
-				firstSampleAttributes.contains("Type") &&
-				firstSampleAttributes.contains("Start")) {
+		if (firstSampleAttributes.contains(TAG_LAP) &&
+				firstSampleAttributes.contains(TAG_TYPE) &&
+				firstSampleAttributes.contains(TAG_START)) {
 
-			ZonedDateTime startTime = ZonedDateTime.parse(firstSample.get("TimeISO8601").toString());
+			ZonedDateTime startTime = ZonedDateTime.parse(firstSample.get(TAG_TIMEISO8601).toString());
 			tourData.setTourStartTime(startTime);
 
 		} else if (activityToReUse != null) {
@@ -248,9 +270,9 @@ public class SuuntoJsonProcessor {
 	 */
 	private boolean TryAddGpsData(JSONObject currentSample, TimeData timeData) {
 		try {
-			float latitude = Util.parseFloat(currentSample.get("Latitude").toString());
-			float longitude = Util.parseFloat(currentSample.get("Longitude").toString());
-			float altitude = Util.parseFloat(currentSample.get("GPSAltitude").toString());
+			float latitude = Util.parseFloat(currentSample.get(TAG_LATITUDE).toString());
+			float longitude = Util.parseFloat(currentSample.get(TAG_LONGITUDE).toString());
+			float altitude = Util.parseFloat(currentSample.get(TAG_GPSALTITUDE).toString());
 
 			timeData.latitude = (latitude * 180) / Math.PI;
 			timeData.longitude = (longitude * 180) / Math.PI;
@@ -278,7 +300,7 @@ public class SuuntoJsonProcessor {
 	 */
 	private boolean TryAddHeartRateData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
-		if ((value = TryRetrieveStringElementValue(currentSample, "HR")) != null) {
+		if ((value = TryRetrieveStringElementValue(currentSample, TAG_HR)) != null) {
 			timeData.pulse = Util.parseFloat(value) * 60.0f;
 			return true;
 		}
@@ -297,7 +319,7 @@ public class SuuntoJsonProcessor {
 	 */
 	private boolean TryAddSpeedData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
-		if ((value = TryRetrieveStringElementValue(currentSample, "Speed")) != null) {
+		if ((value = TryRetrieveStringElementValue(currentSample, TAG_SPEED)) != null) {
 			timeData.speed = Util.parseFloat(value);
 			return true;
 		}
@@ -315,7 +337,7 @@ public class SuuntoJsonProcessor {
 	 */
 	private boolean TryAddCadenceData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
-		if ((value = TryRetrieveStringElementValue(currentSample, "Cadence")) != null) {
+		if ((value = TryRetrieveStringElementValue(currentSample, TAG_CADENCE)) != null) {
 			timeData.cadence = Util.parseFloat(value) * 60.0f;
 			return true;
 		}
@@ -333,7 +355,7 @@ public class SuuntoJsonProcessor {
 	 */
 	private boolean TryAddAltitudeData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
-		if ((value = TryRetrieveStringElementValue(currentSample, "Altitude")) != null) {
+		if ((value = TryRetrieveStringElementValue(currentSample, TAG_ALTITUDE)) != null) {
 			timeData.absoluteAltitude = Util.parseFloat(value);
 			return true;
 		}
@@ -351,7 +373,7 @@ public class SuuntoJsonProcessor {
 	 */
 	private boolean TryAddPowerData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
-		if ((value = TryRetrieveStringElementValue(currentSample, "Power")) != null) {
+		if ((value = TryRetrieveStringElementValue(currentSample, TAG_POWER)) != null) {
 			timeData.power = Util.parseFloat(value);
 			return true;
 		}
@@ -369,7 +391,7 @@ public class SuuntoJsonProcessor {
 	 */
 	private boolean TryAddDistanceData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
-		if ((value = TryRetrieveStringElementValue(currentSample, "Distance")) != null) {
+		if ((value = TryRetrieveStringElementValue(currentSample, TAG_DISTANCE)) != null) {
 			timeData.absoluteDistance = Util.parseFloat(value);
 			return true;
 		}
@@ -387,7 +409,7 @@ public class SuuntoJsonProcessor {
 	 */
 	private boolean TryAddTemperatureData(JSONObject currentSample, TimeData timeData) {
 		String value = null;
-		if ((value = TryRetrieveStringElementValue(currentSample, "Temperature")) != null) {
+		if ((value = TryRetrieveStringElementValue(currentSample, TAG_TEMPERATURE)) != null) {
 			timeData.temperature = Util.parseFloat(value) - Kelvin;
 			return true;
 		}
@@ -411,7 +433,7 @@ public class SuuntoJsonProcessor {
 		try {
 			result = token.get(elementName).toString();
 		} catch (Exception e) {}
-		if (result == "null")
+		if (result == "null") //$NON-NLS-1$
 			return null;
 
 		return result;
