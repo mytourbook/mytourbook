@@ -2271,13 +2271,16 @@ public class Messages extends NLS {
    public static String Tour_Marker_TooltipPosition_Top;
 
    public static String Tour_Segmenter_Action_ShowHideSegmentsInTourChart_Tooltip;
+   public static String Tour_Segmenter_Button_ResetSurfingOptions;
+   public static String Tour_Segmenter_Button_SaveTour;
    public static String Tour_Segmenter_Button_SaveTour_Tooltip;
+   public static String Tour_Segmenter_Button_SurfingSaveTour_Tooltip;
    public static String Tour_Segmenter_Label_AltitudeUpDown_Tooltip;
    public static String Tour_Segmenter_Label_DPTolerance;
    public static String Tour_Segmenter_Label_DPTolerance_Tooltip;
    public static String Tour_Segmenter_Label_no_chart;
    public static String Tour_Segmenter_Label_NumberOfSegments_Tooltip;
-   
+
    public static String Tour_Segmenter_Surfing_Checkbox_IsMinSurfingDistance;
    public static String Tour_Segmenter_Surfing_Checkbox_IsSurfingEnabled;
    public static String Tour_Segmenter_Surfing_Label_IsSurfingEnabled_Tooltip;

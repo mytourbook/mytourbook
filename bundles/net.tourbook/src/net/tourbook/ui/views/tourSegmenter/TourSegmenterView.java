@@ -25,10 +25,8 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import org.eclipse.e4.ui.di.PersistState;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -46,7 +44,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
-import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
@@ -65,7 +63,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPage;
@@ -116,10 +115,10 @@ import net.tourbook.web.WEB;
 public class TourSegmenterView extends ViewPart implements ITourViewer {
 
    public static final String  ID                                                 = "net.tourbook.views.TourSegmenter";           //$NON-NLS-1$
-
+   //
    private static final float  UNIT_MILE                                          = net.tourbook.ui.UI.UNIT_MILE;
    private static final float  UNIT_YARD                                          = net.tourbook.ui.UI.UNIT_YARD;
-
+   //
    private static final String DISTANCE_MILES_1_8                                 = "1/8";                                        //$NON-NLS-1$
    private static final String DISTANCE_MILES_1_4                                 = "1/4";                                        //$NON-NLS-1$
    private static final String DISTANCE_MILES_3_8                                 = "3/8";                                        //$NON-NLS-1$
@@ -127,18 +126,18 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private static final String DISTANCE_MILES_5_8                                 = "5/8";                                        //$NON-NLS-1$
    private static final String DISTANCE_MILES_3_4                                 = "3/4";                                        //$NON-NLS-1$
    private static final String DISTANCE_MILES_7_8                                 = "7/8";                                        //$NON-NLS-1$
-
+   //
    private static final String FORMAT_ALTITUDE_DIFF                               = "%d / %d %s";                                 //$NON-NLS-1$
-
+   //
    private static final int    SEGMENTER_REQUIRES_ALTITUDE                        = 0x01;
    private static final int    SEGMENTER_REQUIRES_DISTANCE                        = 0x02;
    private static final int    SEGMENTER_REQUIRES_PULSE                           = 0x04;
    private static final int    SEGMENTER_REQUIRES_MARKER                          = 0x08;
    private static final int    SEGMENTER_REQUIRES_POWER                           = 0x10;
-
+   //
    private static final int    MAX_DISTANCE_SPINNER_MILE                          = 80;
    private static final int    MAX_DISTANCE_SPINNER_METRIC                        = 100;
-
+   //
    private static final String STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS         = "STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS"; //$NON-NLS-1$
    private static final int    STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS_DEFAULT = 100;
    private static final String STATE_DP_TOLERANCE_POWER                           = "STATE_DP_TOLERANCE_POWER";                   //$NON-NLS-1$
@@ -146,28 +145,25 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private static final String STATE_MINIMUM_ALTITUDE                             = "STATE_MINIMUM_ALTITUDE";                     //$NON-NLS-1$
    private static final String STATE_SELECTED_DISTANCE                            = "selectedDistance";                           //$NON-NLS-1$
    private static final String STATE_SELECTED_SEGMENTER_BY_USER                   = "STATE_SELECTED_SEGMENTER_BY_USER";           //$NON-NLS-1$
-
+   //
    /**
     * Initially this was an int value, with 2 it's a string.
     */
    private static final String STATE_SELECTED_BREAK_METHOD2                       = "selectedBreakMethod2";                       //$NON-NLS-1$
-
+   //
    private static final String STATE_BREAK_TIME_MIN_AVG_SPEED_AS                  = "selectedBreakTimeMinAvgSpeedAS";             //$NON-NLS-1$
    private static final String STATE_BREAK_TIME_MIN_SLICE_SPEED_AS                = "selectedBreakTimeMinSliceSpeedAS";           //$NON-NLS-1$
    private static final String STATE_BREAK_TIME_MIN_SLICE_TIME_AS                 = "selectedBreakTimeMinSliceTimeAS";            //$NON-NLS-1$
-
    private static final String STATE_BREAK_TIME_MIN_AVG_SPEED                     = "selectedBreakTimeMinAvgSpeed";               //$NON-NLS-1$
    private static final String STATE_BREAK_TIME_MIN_SLICE_SPEED                   = "selectedBreakTimeMinSliceSpeed";             //$NON-NLS-1$
-
    private static final String STATE_BREAK_TIME_MIN_DISTANCE_VALUE                = "selectedBreakTimeMinDistance";               //$NON-NLS-1$
    private static final String STATE_BREAK_TIME_MIN_TIME_VALUE                    = "selectedBreakTimeMinTime";                   //$NON-NLS-1$
    private static final String STATE_BREAK_TIME_SLICE_DIFF                        = "selectedBreakTimeSliceDiff";                 //$NON-NLS-1$
-
+   //
    /*
     * Tour segmenter
     */
    public static final String  STATE_IS_SEGMENTER_ACTIVE                      = "STATE_IS_SEGMENTER_ACTIVE";              //$NON-NLS-1$
-
    public static final String  STATE_IS_HIDE_SMALL_VALUES                     = "STATE_IS_HIDE_SMALL_VALUES";             //$NON-NLS-1$
    public static final boolean STATE_IS_HIDE_SMALL_VALUES_DEFAULT             = true;
    public static final String  STATE_IS_SHOW_SEGMENTER_DECIMAL_PLACES         = "STATE_IS_SHOW_SEGMENTER_DECIMAL_PLACES"; //$NON-NLS-1$
@@ -190,42 +186,36 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    public static final int     STATE_SMALL_VALUE_SIZE_DEFAULT                 = 50;
    public static final String  STATE_STACKED_VISIBLE_VALUES                   = "STATE_STACKED_VISIBLE_VALUES";           //$NON-NLS-1$
    public static final int     STATE_STACKED_VISIBLE_VALUES_DEFAULT           = 2;
-
+   private static final String STATE_SURFING_IS_SEGMENTER_ENABLED             = "STATE_SURFING_IS_SEGMENTER_ENABLED";     //$NON-NLS-1$
+   //
    /*
     * Surfing
     */
-
-   private static final String  STATE_SURFING_MIN_START_STOP_SPEED              = "STATE_SURFING_MIN_START_STOP_SPEED";     //$NON-NLS-1$
-   private static final int     STATE_SURFING_MIN_START_STOP_SPEED_DEFAULT      = 9;
-   private static final String  STATE_SURFING_MIN_SURFING_SPEED                 = "STATE_SURFING_MIN_SURFING_SPEED";        //$NON-NLS-1$
-   private static final int     STATE_SURFING_MIN_SURFING_SPEED_DEFAULT         = 13;
-   private static final String  STATE_SURFING_MIN_SURFING_TIME_DURATION         = "STATE_SURFING_MIN_SURFING_TIME_DURATION";//$NON-NLS-1$
-   private static final int     STATE_SURFING_MIN_SURFING_TIME_DURATION_DEFAULT = 6;
-   private static final String  STATE_SURFING_IS_MIN_SURFING_DISTANCE           = "STATE_SURFING_IS_MIN_SURFING_DISTANCE";  //$NON-NLS-1$
+   private static final boolean STATE_SURFING_IS_SEGMENTER_ENABLED_DEFAULT      = true;
+   private static final String  STATE_SURFING_IS_MIN_SURFING_DISTANCE           = "STATE_SURFING_IS_MIN_SURFING_DISTANCE";   //$NON-NLS-1$
    private static final boolean STATE_SURFING_IS_MIN_SURFING_DISTANCE_DEFAULT   = false;
-   private static final String  STATE_SURFING_MIN_SURFING_DISTANCE              = "STATE_SURFING_MIN_SURFING_DISTANCE";     //$NON-NLS-1$
+   private static final String  STATE_SURFING_MIN_START_STOP_SPEED              = "STATE_SURFING_MIN_START_STOP_SPEED";      //$NON-NLS-1$
+   private static final int     STATE_SURFING_MIN_START_STOP_SPEED_DEFAULT      = 9;
+   private static final String  STATE_SURFING_MIN_SURFING_SPEED                 = "STATE_SURFING_MIN_SURFING_SPEED";         //$NON-NLS-1$
+   private static final int     STATE_SURFING_MIN_SURFING_SPEED_DEFAULT         = 13;
+   private static final String  STATE_SURFING_MIN_SURFING_TIME_DURATION         = "STATE_SURFING_MIN_SURFING_TIME_DURATION"; //$NON-NLS-1$
+   private static final int     STATE_SURFING_MIN_SURFING_TIME_DURATION_DEFAULT = 6;
+   private static final String  STATE_SURFING_MIN_SURFING_DISTANCE              = "STATE_SURFING_MIN_SURFING_DISTANCE";      //$NON-NLS-1$
    private static final int     STATE_SURFING_MIN_SURFING_DISTANCE_DEFAULT      = 10;
-
+   //
    /*
     * Colors
     */
    static final String                           STATE_COLOR_ALTITUDE_DOWN         = "STATE_COLOR_ALTITUDE_DOWN";  //$NON-NLS-1$
    static final String                           STATE_COLOR_ALTITUDE_UP           = "STATE_COLOR_ALTITUDE_UP";    //$NON-NLS-1$
    static final String                           STATE_COLOR_TOTALS                = "STATE_COLOR_TOTALS";         //$NON-NLS-1$
-
+   //
    static final RGB                              STATE_COLOR_ALTITUDE_DOWN_DEFAULT = new RGB(0, 240, 0);
    static final RGB                              STATE_COLOR_ALTITUDE_UP_DEFAULT   = new RGB(255, 66, 22);
    static final RGB                              STATE_COLOR_TOTALS_DEFAULT        = new RGB(253, 236, 115);
-
-   private static final int                      COLUMN_DEFAULT                    = 0;                            // sort by time
-   private static final int                      COLUMN_SPEED                      = 10;
-   private static final int                      COLUMN_PACE                       = 20;
-   private static final int                      COLUMN_GRADIENT                   = 30;
-   private static final int                      COLUMN_PULSE                      = 40;
-   private static final int                      COLUMN_CADENCE                    = 50;
-
+   //
    private static final float                    SPEED_DIGIT_VALUE                 = 10.0f;
-
+   //
    private static final IPreferenceStore         _prefStore                        = TourbookPlugin.getPrefStore();
    private static final IDialogSettings          _state                            = TourbookPlugin.getState(ID);
    //
@@ -235,7 +225,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
     * The sequence defines how they are displayed in the combobox.
     */
    private static final ArrayList<TourSegmenter> _allTourSegmenter                 = new ArrayList<>();
-
    static {
 
       _allTourSegmenter.add(new TourSegmenter(
@@ -290,26 +279,29 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    }
 
    private final boolean           _isOSX                    = net.tourbook.common.UI.IS_OSX;
-
+   //
+   private TableViewer             _segmentViewer;
+   private SegmenterComparator     _segmentComparator        = new SegmenterComparator();
    private ColumnManager           _columnManager;
+
    private TourData                _tourData;
+
    private float                   _dpToleranceAltitude;
    private float                   _dpToleranceAltitudeMultipleTours;
    private float                   _dpTolerancePower;
-
    private float                   _dpTolerancePulse;
+   //
    private float                   _savedDpToleranceAltitude = -1;
-
-   private PostSelectionProvider   _postSelectionProvider;
-   private ISelectionListener      _postSelectionListener;
-   private IPartListener2          _partListener;
-
+   //
+   private SelectionAdapter        _columnSortListener;
    private MouseWheelListener      _defaultSurfing_MouseWheelListener;
    private SelectionAdapter        _defaultSurfing_SelectionListener;
-
+   private IPartListener2          _partListener;
+   private PostSelectionProvider   _postSelectionProvider;
+   private ISelectionListener      _postSelectionListener;
    private IPropertyChangeListener _prefChangeListener;
    private ITourEventListener      _tourEventListener;
-
+   //
    private final NumberFormat      _nf_0_0                   = NumberFormat.getNumberInstance();
    private final NumberFormat      _nf_1_0                   = NumberFormat.getNumberInstance();
    private final NumberFormat      _nf_1_1                   = NumberFormat.getNumberInstance();
@@ -327,23 +319,22 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       _nf_3_3.setMinimumFractionDigits(3);
       _nf_3_3.setMaximumFractionDigits(3);
    }
-
+   //
    private int                            _maxDistanceSpinner;
    private int                            _spinnerDistancePage;
-
-   private boolean                        _isTourDirty        = false;
-   private boolean                        _isSaving;
-
+   //
    /**
     * when <code>true</code>, the tour dirty flag is disabled to load data into the fields
     */
    private boolean                        _isDirtyDisabled;
    private boolean                        _isClearView;
    private boolean                        _isInSelection;
-
+   private boolean                        _isSaving;
+   private boolean                        _isTourDirty        = false;
+   //
    private float                          _altitudeUp;
    private float                          _altitudeDown;
-
+   //
    private ArrayList<TourSegmenter>       _availableSegmenter = new ArrayList<>();
 
    /**
@@ -352,6 +343,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private SegmenterType                  _userSelectedSegmenterType;
 
    private long                           _tourBreakTime;
+
    private float                          _breakUIMinAvgSpeedAS;
    private float                          _breakUIMinSliceSpeedAS;
    private int                            _breakUIMinSliceTimeAS;
@@ -360,23 +352,21 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private int                            _breakUIShortestBreakTime;
    private int                            _breakUISliceDiff;
    private float                          _breakUIMaxDistance;
-
+   //
    private PixelConverter                 _pc;
    private int                            _spinnerWidth;
-
+   //
    /**
     * contains the controls which are displayed in the first column, these controls are used to get
     * the maximum width and set the first column within the differenct section to the same width
     */
    private final ArrayList<Control>       _firstColBreakTime  = new ArrayList<>();
-
+   //
    private ActionModifyColumns            _actionModifyColumns;
    private ActionTourChartSegmenterConfig _actionTCSegmenterConfig;
-
+   //
    private boolean                        _isGetInitialTours;
    private ArrayList<TourSegment>         _allTourSegments;
-
-   private Action                         _actionSurfing_RestoreDefaults;
 
    /*
     * UI resources
@@ -387,16 +377,16 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
     * UI controls
     */
    private Composite       _parent;
-
+   //
    private PageBook        _pageBookUI;
    private PageBook        _pageBookSegmenter;
    private PageBook        _pageBookBreakTime;
-
    private Button          _btnSaveTourDP;
    private Button          _btnSaveTourMin;
-
+   //
    private Composite       _containerBreakTime;
-   private Composite       _containerViewer;
+   private Composite       _viewerContainer;
+   //
    private Composite       _pageSegmenter;
    private Composite       _pageBreakBy_AvgSliceSpeed;
    private Composite       _pageBreakBy_AvgSpeed;
@@ -411,15 +401,17 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private Composite       _pageSegType_DPPower;
    private Composite       _pageSegType_DPPulse;
    private Composite       _pageSegType_Surfing;
-
+   private Button          _btnSurfing_ResetOptions;
+   private Button          _btnSurfing_SaveTour;
+   //
    private Button          _chkIsMinSurfingDistance;
-   private Button          _chkIsSurfingEnabled;
-
+   private Button          _chkIsSurfingSegmenterEnabled;
+   //
    private Combo           _comboBreakMethod;
    private Combo           _comboSegmenterType;
-
+   //
    private ImageComboLabel _lblTitle;
-
+   //
    private Label           _lblAltitudeUpDP;
    private Label           _lblAltitudeUpMin;
    private Label           _lblBreakDistanceUnit;
@@ -434,7 +426,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private Label           _lblSurfing_MinSurfingTimeDuration;
    private Label           _lblSurfing_MinSurfingTimeDuration_Unit;
    private Label           _lblTourBreakTime;
-
+   //
    private Spinner         _spinnerBreak_MinAvgSpeedAS;
    private Spinner         _spinnerBreak_MinSliceSpeedAS;
    private Spinner         _spinnerBreak_MinSliceTimeAS;
@@ -453,13 +445,125 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private Spinner         _spinnerSurfing_MinSurfingTimeDuration;
    private Spinner         _spinnerSurfing_MinStartStopSpeed;
 
-   private TableViewer     _segmentViewer;
-
    /**
     * {@link TourChart} contains the chart for the tour, this is necessary to move the slider in the
     * chart to a selected segment
     */
    private TourChart       _tourChart;
+
+   private class SegmenterComparator extends ViewerComparator {
+
+      private static final int ASCENDING       = 0;
+      private static final int DESCENDING      = 1;
+
+      private String           __sortColumnId  = "default";
+      private int              __sortDirection = ASCENDING;
+
+      /**
+       * Compares the object for sorting
+       */
+      @Override
+      public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
+
+         final TourSegment segment1 = ((TourSegment) obj1);
+         final TourSegment segment2 = ((TourSegment) obj2);
+
+         // sort total item to the end of the view
+         if (segment1.isTotal && segment2.isTotal) {
+
+            return -2;
+
+         } else if (segment1.isTotal) {
+
+            return -1;
+
+         } else if (segment2.isTotal) {
+
+            return 1;
+         }
+
+         double rc = 0;
+
+         // Determine which column and do the appropriate sort
+         switch (__sortColumnId) {
+
+         case TableColumnFactory.MOTION_AVG_SPEED_ID:
+            rc = (segment1.speed - segment2.speed) * 100;
+            break;
+
+         case TableColumnFactory.MOTION_DISTANCE_ID:
+            rc = segment1.distance_Diff - segment2.distance_Diff;
+            break;
+
+         case TableColumnFactory.MOTION_AVG_PACE_ID:
+            rc = (segment1.pace - segment2.pace) * 100;
+            break;
+
+         case TableColumnFactory.BODY_AVG_PULSE_ID:
+            rc = segment1.pulse - segment2.pulse;
+            break;
+
+         case TableColumnFactory.ALTITUDE_GRADIENT_ID:
+            rc = (segment1.gradient - segment2.gradient) * 100;
+            break;
+
+         case TableColumnFactory.POWERTRAIN_AVG_CADENCE_ID:
+            rc = segment1.cadence - segment2.cadence;
+            break;
+
+         case TableColumnFactory.TIME_RECORDING_TIME_ID:
+            rc = segment1.time_Recording - segment2.time_Recording;
+            break;
+
+         default:
+            // sort start ... end
+            rc = segment1.serieIndex_Start - segment2.serieIndex_Start;
+         }
+
+         // flip the direction
+         if (__sortDirection == DESCENDING) {
+            rc = -rc;
+         }
+
+         /*
+          * MUST return 1 or -1 otherwise long values are not sorted correctly.
+          */
+         return rc > 0 //
+               ? 1
+               : rc < 0 //
+                     ? -1
+                     : 0;
+      }
+
+      /**
+       * Does the sort. If it's a different column from the previous sort, do an ascending sort. If
+       * it's the same column as the last sort, toggle the sort direction.
+       *
+       * @param columnId
+       */
+
+      public void setSortColumn(final Widget widget) {
+
+         final ColumnDefinition columnDefinition = (ColumnDefinition) widget.getData();
+         final String columnId = columnDefinition.getColumnId();
+
+         if (columnId.equals(__sortColumnId)) {
+
+            // Same column as last sort; toggle the direction
+
+            __sortDirection = 1 - __sortDirection;
+
+         } else {
+
+            // New column; do an ascent sorting
+
+            __sortColumnId = columnId;
+            __sortDirection = ASCENDING;
+         }
+
+         updateUI_SetSortDirection(__sortColumnId, __sortDirection);
+      }
+   }
 
    public static enum SegmenterType {
       ByAltitudeWithDP, //
@@ -506,87 +610,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       @Override
       public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
-   }
-
-   private static class ViewSorter extends ViewerSorter {
-
-//		private static final int	ASCENDING	= 0;
-      private static final int DESCENDING = 1;
-
-      private int              _column;
-      private int              _direction;
-
-      /**
-       * Compares the object for sorting
-       */
-      @Override
-      public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
-
-         final TourSegment segment1 = ((TourSegment) obj1);
-         final TourSegment segment2 = ((TourSegment) obj2);
-
-         // sort total item to the end of the view
-         if (segment1.isTotal) {
-            return 1;
-         }
-
-         int rc = 0;
-
-         // Determine which column and do the appropriate sort
-         switch (_column) {
-         case COLUMN_DEFAULT:
-            rc = segment1.serieIndex_Start - segment2.serieIndex_Start;
-            if (_direction == DESCENDING) {
-               rc = -rc;
-            }
-            break;
-
-         case COLUMN_SPEED:
-            rc = (int) ((segment1.speed - segment2.speed) * 100);
-            break;
-
-         case COLUMN_PACE:
-            rc = (int) ((segment1.pace - segment2.pace) * 100);
-            break;
-
-         case COLUMN_PULSE:
-            rc = (int) (segment1.pulse - segment2.pulse);
-            break;
-
-         case COLUMN_GRADIENT:
-            rc = (int) ((segment1.gradient - segment2.gradient) * 100);
-            break;
-
-         case COLUMN_CADENCE:
-            rc = (int) (segment1.cadence - segment2.cadence);
-            break;
-         }
-
-         // If descending order, flip the direction
-         if (_direction == DESCENDING) {
-            rc = -rc;
-         }
-
-         return rc;
-      }
-
-      /**
-       * Does the sort. If it's a different column from the previous sort, do an ascending sort. If
-       * it's the same column as the last sort, toggle the sort direction.
-       *
-       * @param column
-       */
-      public void setSortColumn(final int column) {
-
-         if (column == _column) {
-            // Same column as last sort; toggle the direction
-            _direction = 1 - _direction;
-         } else {
-            // New column; do an descending sort
-            _column = column;
-            _direction = DESCENDING;
-         }
-      }
    }
 
    /**
@@ -666,7 +689,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                 */
                _columnManager.saveState(_state);
                _columnManager.clearColumns();
-               defineAllColumns(_containerViewer);
+               defineAllColumns(_viewerContainer);
 
                recreateViewer(null);
 
@@ -939,19 +962,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       _actionModifyColumns = new ActionModifyColumns(this);
       _actionTCSegmenterConfig = new ActionTourChartSegmenterConfig(this, _parent);
-
-      /*
-       * Action: Restore default
-       */
-      _actionSurfing_RestoreDefaults = new Action() {
-         @Override
-         public void run() {
-            onResetSurfingToDefaults();
-         }
-      };
-
-      _actionSurfing_RestoreDefaults.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_RestoreDefault));
-      _actionSurfing_RestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
    }
 
    @Override
@@ -1627,6 +1637,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    }
 
    private void createSegmentsBy_Surfing() {
+
+      final boolean isSurfingEnabled = _chkIsSurfingSegmenterEnabled.getSelection();
+      if (isSurfingEnabled == false) {
+         return;
+      }
 
       final int[] timeSerie = _tourData.timeSerie;
       final float[] distanceSerie = _tourData.getMetricDistanceSerie();
@@ -2493,10 +2508,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             /*
              * Enable/disable segmenter
              */
-            _chkIsSurfingEnabled = new Button(container, SWT.CHECK);
-            _chkIsSurfingEnabled.setText(Messages.Tour_Segmenter_Surfing_Checkbox_IsSurfingEnabled);
-            _chkIsSurfingEnabled.setToolTipText(Messages.Tour_Segmenter_Surfing_Label_IsSurfingEnabled_Tooltip);
-            _chkIsSurfingEnabled.addSelectionListener(new SelectionAdapter() {
+            _chkIsSurfingSegmenterEnabled = new Button(container, SWT.CHECK);
+            _chkIsSurfingSegmenterEnabled.setText(Messages.Tour_Segmenter_Surfing_Checkbox_IsSurfingEnabled);
+            _chkIsSurfingSegmenterEnabled.setToolTipText(Messages.Tour_Segmenter_Surfing_Label_IsSurfingEnabled_Tooltip);
+            _chkIsSurfingSegmenterEnabled.addSelectionListener(new SelectionAdapter() {
 
                @Override
                public void widgetSelected(final SelectionEvent e) {
@@ -2507,7 +2522,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.CENTER)
                   .span(2, 1)
-                  .applyTo(_chkIsSurfingEnabled);
+                  .applyTo(_chkIsSurfingSegmenterEnabled);
 
          }
 
@@ -2625,30 +2640,48 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
    private void createUI_64_SurfingActions(final Composite parent) {
 
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
       {
-         /*
-          * Toolbar: actions
-          */
-         final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
-
-         GridDataFactory.fillDefaults()
-               .align(SWT.FILL, SWT.BEGINNING)
-               .indent(10, 0)
-               .applyTo(toolbar);
-
-         final ToolBarManager tbm = new ToolBarManager(toolbar);
-         tbm.add(_actionSurfing_RestoreDefaults);
-         tbm.update(true);
+         {
+            /*
+             * Button: Save tour
+             */
+            _btnSurfing_SaveTour = new Button(parent, SWT.NONE);
+            _btnSurfing_SaveTour.setText(Messages.Tour_Segmenter_Button_SaveTour);
+            _btnSurfing_SaveTour.setToolTipText(Messages.Tour_Segmenter_Button_SurfingSaveTour_Tooltip);
+            _btnSurfing_SaveTour.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onSurfing_SaveTour();
+               }
+            });
+         }
+         {
+            /*
+             * Button: Reset options
+             */
+            _btnSurfing_ResetOptions = new Button(parent, SWT.NONE);
+            _btnSurfing_ResetOptions.setText(Messages.Tour_Segmenter_Button_ResetSurfingOptions);
+            _btnSurfing_ResetOptions.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
+            _btnSurfing_ResetOptions.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onSurfing_ResetToDefaults();
+               }
+            });
+         }
       }
    }
 
    private void createUI_70_Viewer(final Composite parent) {
 
-      _containerViewer = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(_containerViewer);
-      GridLayoutFactory.fillDefaults().applyTo(_containerViewer);
+      _viewerContainer = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(_viewerContainer);
+      GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
       {
-         createUI_80_SegmentViewer(_containerViewer);
+         createUI_80_SegmentViewer(_viewerContainer);
       }
    }
 
@@ -2665,7 +2698,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       _columnManager.createColumns(_segmentViewer);
 
       _segmentViewer.setContentProvider(new ViewContentProvider());
-      _segmentViewer.setSorter(new ViewSorter());
+      _segmentViewer.setComparator(_segmentComparator);
 
       _segmentViewer.addSelectionChangedListener(new ISelectionChangedListener() {
          @Override
@@ -2673,6 +2706,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             onSelect_Segment(event);
          }
       });
+
+      updateUI_SetSortDirection(//
+            _segmentComparator.__sortColumnId,
+            _segmentComparator.__sortDirection);
 
       createUI_90_ContextMenu();
    }
@@ -2696,7 +2733,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       btn.addSelectionListener(new SelectionAdapter() {
          @Override
          public void widgetSelected(final SelectionEvent e) {
-            onSaveTourAltitude();
+            onSaveTour_Altitude();
          }
       });
 
@@ -2756,46 +2793,35 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
    private void defineAllColumns(final Composite parent) {
 
-      final SelectionAdapter defaultListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent event) {
+      defineColumn_Time_RecordingTimeTotal();
+      defineColumn_Time_Recording();
+      defineColumn_Time_Driving();
+      defineColumn_Time_Paused();
 
-            // sort columns
-            ((ViewSorter) _segmentViewer.getSorter()).setSortColumn(COLUMN_DEFAULT);
-
-            _segmentViewer.refresh();
-         }
-      };
-
-      defineColumn_Time_RecordingTimeTotal(defaultListener);
-      defineColumn_Time_Recording(defaultListener);
-      defineColumn_Time_Driving(defaultListener);
-      defineColumn_Time_Paused(defaultListener);
-
-      defineColumn_Motion_DistanceTotal(defaultListener);
-      defineColumn_Motion_Distance(defaultListener);
+      defineColumn_Motion_DistanceTotal();
+      defineColumn_Motion_Distance();
       defineColumn_Motion_AvgSpeed();
       defineColumn_Motion_AvgPace();
       defineColumn_Motion_AvgPace_Difference();
 
       defineColumn_Altitude_Gradient();
-      defineColumn_Altitude_Hour_Up(defaultListener);
-      defineColumn_Altitude_Hour_Down(defaultListener);
-      defineColumn_Altitude_Diff_SegmentBorder(defaultListener);
-      defineColumn_Altitude_Segment_Up(defaultListener);
-      defineColumn_Altitude_Segment_Down(defaultListener);
-      defineColumn_Altitude_SummarizedBorder_Up(defaultListener);
-      defineColumn_Altitude_SummarizedBorder_Down(defaultListener);
+      defineColumn_Altitude_Hour_Up();
+      defineColumn_Altitude_Hour_Down();
+      defineColumn_Altitude_Diff_SegmentBorder();
+      defineColumn_Altitude_Segment_Up();
+      defineColumn_Altitude_Segment_Down();
+      defineColumn_Altitude_SummarizedBorder_Up();
+      defineColumn_Altitude_SummarizedBorder_Down();
 
-      defineColumn_Altitude_Diff_SegmentComputed(defaultListener);
-      defineColumn_Altitude_SummarizedComputed_Up(defaultListener);
-      defineColumn_Altitude_SummarizedComputed_Down(defaultListener);
+      defineColumn_Altitude_Diff_SegmentComputed();
+      defineColumn_Altitude_SummarizedComputed_Up();
+      defineColumn_Altitude_SummarizedComputed_Down();
 
       defineColumn_Body_AvgPulse();
       defineColumn_Body_AvgPulse_Difference();
 
       defineColumn_Powertrain_AvgCadence();
-      defineColumn_Powertrain_StrideLength(defaultListener);
+      defineColumn_Powertrain_StrideLength();
 
       defineColumn_Data_SerieStartEndIndex();
    }
@@ -2803,14 +2829,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    /**
     * column: altitude diff segment border (m/ft)
     */
-   private void defineColumn_Altitude_Diff_SegmentBorder(final SelectionAdapter defaultColumnSelectionListener) {
+   private void defineColumn_Altitude_Diff_SegmentBorder() {
 
       final ColumnDefinition colDef;
 
       colDef = TableColumnFactory.ALTITUDE_DIFF_SEGMENT_BORDER.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
-      colDef.setColumnSelectionListener(defaultColumnSelectionListener);
+      colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -2831,14 +2857,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    /**
     * column: computed altitude diff (m/ft)
     */
-   private void defineColumn_Altitude_Diff_SegmentComputed(final SelectionAdapter defaultColumnSelectionListener) {
+   private void defineColumn_Altitude_Diff_SegmentComputed() {
 
       final ColumnDefinition colDef;
 
       colDef = TableColumnFactory.ALTITUDE_DIFF_SEGMENT_COMPUTED.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
-      colDef.setColumnSelectionListener(defaultColumnSelectionListener);
+      colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -2866,14 +2892,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       colDef = TableColumnFactory.ALTITUDE_GRADIENT.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
-
-      colDef.setColumnSelectionListener(new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent event) {
-            ((ViewSorter) _segmentViewer.getSorter()).setSortColumn(COLUMN_GRADIENT);
-            _segmentViewer.refresh();
-         }
-      });
+      colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -2890,14 +2909,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    /**
     * column: altitude down m/h
     */
-   private void defineColumn_Altitude_Hour_Down(final SelectionAdapter defaultColumnSelectionListener) {
+   private void defineColumn_Altitude_Hour_Down() {
 
       final ColumnDefinition colDef;
 
       colDef = TableColumnFactory.ALTITUDE_ELEVATION_DOWN.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
-      colDef.setColumnSelectionListener(defaultColumnSelectionListener);
+      colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -2925,14 +2944,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    /**
     * column: altitude up m/h
     */
-   private void defineColumn_Altitude_Hour_Up(final SelectionAdapter defaultColumnSelectionListener) {
+   private void defineColumn_Altitude_Hour_Up() {
 
       final ColumnDefinition colDef;
 
       colDef = TableColumnFactory.ALTITUDE_ELEVATION_UP.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
-      colDef.setColumnSelectionListener(defaultColumnSelectionListener);
+      colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -2960,14 +2979,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    /**
     * Column: Altitude segment down
     */
-   private void defineColumn_Altitude_Segment_Down(final SelectionAdapter defaultColumnSelectionListener) {
+   private void defineColumn_Altitude_Segment_Down() {
 
       final ColumnDefinition colDef;
 
       colDef = TableColumnFactory.ALTITUDE_ELEVATION_SEGMENT_DOWN.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
-      colDef.setColumnSelectionListener(defaultColumnSelectionListener);
+      colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -2989,14 +3008,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    /**
     * Column: Altitude segment up
     */
-   private void defineColumn_Altitude_Segment_Up(final SelectionAdapter defaultColumnSelectionListener) {
+   private void defineColumn_Altitude_Segment_Up() {
 
       final ColumnDefinition colDef;
 
       colDef = TableColumnFactory.ALTITUDE_ELEVATION_SEGMENT_UP.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
-      colDef.setColumnSelectionListener(defaultColumnSelectionListener);
+      colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3018,14 +3037,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    /**
     * column: total altitude down (m/ft)
     */
-   private void defineColumn_Altitude_SummarizedBorder_Down(final SelectionAdapter defaultColumnSelectionListener) {
+   private void defineColumn_Altitude_SummarizedBorder_Down() {
 
       final ColumnDefinition colDef;
 
       colDef = TableColumnFactory.ALTITUDE_SUMMARIZED_BORDER_DOWN.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
-      colDef.setColumnSelectionListener(defaultColumnSelectionListener);
+      colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3042,14 +3061,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    /**
     * column: total altitude up (m/ft)
     */
-   private void defineColumn_Altitude_SummarizedBorder_Up(final SelectionAdapter defaultColumnSelectionListener) {
+   private void defineColumn_Altitude_SummarizedBorder_Up() {
 
       final ColumnDefinition colDef;
 
       colDef = TableColumnFactory.ALTITUDE_SUMMARIZED_BORDER_UP.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
-      colDef.setColumnSelectionListener(defaultColumnSelectionListener);
+      colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3066,14 +3085,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    /**
     * column: total altitude down (m/ft)
     */
-   private void defineColumn_Altitude_SummarizedComputed_Down(final SelectionAdapter defaultColumnSelectionListener) {
+   private void defineColumn_Altitude_SummarizedComputed_Down() {
 
       final ColumnDefinition colDef;
 
       colDef = TableColumnFactory.ALTITUDE_SUMMARIZED_COMPUTED_DOWN.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
-      colDef.setColumnSelectionListener(defaultColumnSelectionListener);
+      colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3090,14 +3109,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    /**
     * column: total altitude up (m/ft)
     */
-   private void defineColumn_Altitude_SummarizedComputed_Up(final SelectionAdapter defaultColumnSelectionListener) {
+   private void defineColumn_Altitude_SummarizedComputed_Up() {
 
       final ColumnDefinition colDef;
 
       colDef = TableColumnFactory.ALTITUDE_SUMMARIZED_COMPUTED_UP.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
-      colDef.setColumnSelectionListener(defaultColumnSelectionListener);
+      colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3121,14 +3140,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       colDef = TableColumnFactory.BODY_AVG_PULSE.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
-
-      colDef.setColumnSelectionListener(new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent event) {
-            ((ViewSorter) _segmentViewer.getSorter()).setSortColumn(COLUMN_PULSE);
-            _segmentViewer.refresh();
-         }
-      });
+      colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3186,6 +3198,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       final ColumnDefinition colDef;
 
       colDef = TableColumnFactory.DATA_SERIE_START_END_INDEX.createColumn(_columnManager, _pc);
+      colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3226,14 +3239,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       colDef = TableColumnFactory.MOTION_AVG_PACE.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
-
-      colDef.setColumnSelectionListener(new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent event) {
-            ((ViewSorter) _segmentViewer.getSorter()).setSortColumn(COLUMN_SPEED);
-            _segmentViewer.refresh();
-         }
-      });
+      colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3292,14 +3298,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       colDef = TableColumnFactory.MOTION_AVG_SPEED.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
-
-      colDef.setColumnSelectionListener(new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent event) {
-            ((ViewSorter) _segmentViewer.getSorter()).setSortColumn(COLUMN_SPEED);
-            _segmentViewer.refresh();
-         }
-      });
+      colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3320,14 +3319,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    /**
     * column: distance (km/mile)
     */
-   private void defineColumn_Motion_Distance(final SelectionAdapter defaultColumnSelectionListener) {
+   private void defineColumn_Motion_Distance() {
 
       final ColumnDefinition colDef;
 
       colDef = TableColumnFactory.MOTION_DISTANCE.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
-      colDef.setColumnSelectionListener(defaultColumnSelectionListener);
+      colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3348,14 +3347,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    /**
     * column: TOTAL distance (km/mile)
     */
-   private void defineColumn_Motion_DistanceTotal(final SelectionAdapter defaultColumnSelectionListener) {
+   private void defineColumn_Motion_DistanceTotal() {
 
       final ColumnDefinition colDef;
 
       colDef = TableColumnFactory.MOTION_DISTANCE_TOTAL.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
-      colDef.setColumnSelectionListener(defaultColumnSelectionListener);
+      colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3379,14 +3378,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       colDef = TableColumnFactory.POWERTRAIN_AVG_CADENCE.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
-
-      colDef.setColumnSelectionListener(new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent event) {
-            ((ViewSorter) _segmentViewer.getSorter()).setSortColumn(COLUMN_CADENCE);
-            _segmentViewer.refresh();
-         }
-      });
+      colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3407,14 +3399,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    /**
     * column: Stride length (meters/stride)
     */
-   private void defineColumn_Powertrain_StrideLength(final SelectionAdapter defaultColumnSelectionListener) {
+   private void defineColumn_Powertrain_StrideLength() {
 
       final ColumnDefinition colDef;
 
       colDef = TableColumnFactory.RUN_DYN_STEP_LENGTH_AVG.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
-      colDef.setColumnSelectionListener(defaultColumnSelectionListener);
+      colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3435,14 +3427,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    /**
     * column: driving time
     */
-   private void defineColumn_Time_Driving(final SelectionAdapter defaultColumnSelectionListener) {
+   private void defineColumn_Time_Driving() {
 
       final ColumnDefinition colDef;
 
       colDef = TableColumnFactory.TIME_DRIVING_TIME.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
-      colDef.setColumnSelectionListener(defaultColumnSelectionListener);
+      colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3463,14 +3455,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    /**
     * column: break time
     */
-   private void defineColumn_Time_Paused(final SelectionAdapter defaultColumnSelectionListener) {
+   private void defineColumn_Time_Paused() {
 
       final ColumnDefinition colDef;
 
       colDef = TableColumnFactory.TIME_PAUSED_TIME.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
-      colDef.setColumnSelectionListener(defaultColumnSelectionListener);
+      colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3491,14 +3483,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    /**
     * column: recording time
     */
-   private void defineColumn_Time_Recording(final SelectionAdapter defaultColumnSelectionListener) {
+   private void defineColumn_Time_Recording() {
 
       final ColumnDefinition colDef;
 
       colDef = TableColumnFactory.TIME_RECORDING_TIME.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
-      colDef.setColumnSelectionListener(defaultColumnSelectionListener);
+      colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3519,14 +3511,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    /**
     * column: TOTAL recording time
     */
-   private void defineColumn_Time_RecordingTimeTotal(final SelectionAdapter defaultColumnSelectionListener) {
+   private void defineColumn_Time_RecordingTimeTotal() {
 
       final ColumnDefinition colDef;
 
       colDef = TableColumnFactory.TIME_RECORDING_TIME_TOTAL.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
-      colDef.setColumnSelectionListener(defaultColumnSelectionListener);
+      colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3570,7 +3562,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
    private void enableActions_Surfing() {
 
-      final boolean isSurfingEnabled = _chkIsSurfingEnabled.getSelection();
+      final boolean isSurfingEnabled = _chkIsSurfingSegmenterEnabled.getSelection();
       final boolean isMinDistance = _chkIsMinSurfingDistance.getSelection();
 
       _segmentViewer.getTable().setEnabled(isSurfingEnabled);
@@ -3727,6 +3719,27 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       // should not happen
       return null;
+   }
+
+   /**
+    * @param sortColumnId
+    * @return Returns the column widget by it's column id, when column id is not found then the
+    *         first column is returned.
+    */
+   private TableColumn getSortColumn(final String sortColumnId) {
+
+      final TableColumn[] allColumns = _segmentViewer.getTable().getColumns();
+
+      for (final TableColumn column : allColumns) {
+
+         final String columnId = ((ColumnDefinition) column.getData()).getColumnId();
+
+         if (columnId.equals(sortColumnId)) {
+            return column;
+         }
+      }
+
+      return allColumns[0];
    }
 
    private int[] getTourAndMarkerIndices() {
@@ -3913,6 +3926,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          }
       };
 
+      _columnSortListener = new SelectionAdapter() {
+         @Override
+         public void widgetSelected(final SelectionEvent e) {
+            onSelect_SortColumn(e);
+         }
+      };
    }
 
    private boolean isSegmentLayerVisible() {
@@ -3950,21 +3969,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       }
    }
 
-   private void onResetSurfingToDefaults() {
-
-      _chkIsMinSurfingDistance.setSelection(STATE_SURFING_IS_MIN_SURFING_DISTANCE_DEFAULT);
-
-      final double minDistance_UI = STATE_SURFING_MIN_SURFING_DISTANCE_DEFAULT / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_SMALL;
-      _spinnerSurfing_MinSurfingDistance.setSelection((int) (minDistance_UI + 0.5));
-
-      _spinnerSurfing_MinSurfingTimeDuration.setSelection(STATE_SURFING_MIN_SURFING_TIME_DURATION_DEFAULT);
-      _spinnerSurfing_MinStartStopSpeed.setSelection((int) (STATE_SURFING_MIN_START_STOP_SPEED_DEFAULT * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
-      _spinnerSurfing_MinSurfingSpeed.setSelection((int) (STATE_SURFING_MIN_SURFING_SPEED_DEFAULT * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
-
-      onSelect_Surfing();
-   }
-
-   private void onSaveTourAltitude() {
+   private void onSaveTour_Altitude() {
 
       _tourData.setTourAltUp(_altitudeUp);
       _tourData.setTourAltDown(_altitudeDown);
@@ -4168,6 +4173,26 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       createSegments(true);
    }
 
+   private void onSelect_SortColumn(final SelectionEvent e) {
+
+      _viewerContainer.setRedraw(false);
+      {
+         // keep selection
+         final ISelection selectionBackup = _segmentViewer.getSelection();
+         {
+            // update viewer with new sorting
+            _segmentComparator.setSortColumn(e.widget);
+            _segmentViewer.refresh();
+         }
+
+         // reselect
+         _segmentViewer.setSelection(selectionBackup, true);
+         _segmentViewer.getTable().showSelection();
+
+      }
+      _viewerContainer.setRedraw(true);
+   }
+
    private void onSelect_Surfing() {
 
       enableActions_Surfing();
@@ -4177,7 +4202,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
    private void onSelect_SurfingEnabled() {
 
-      final boolean isEnabled = _chkIsSurfingEnabled.getSelection();
+      final boolean isEnabled = _chkIsSurfingSegmenterEnabled.getSelection();
 
       if (isEnabled) {
 
@@ -4379,20 +4404,39 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             PrefPageComputedValues.TAB_FOLDER_BREAK_TIME).open();
    }
 
+   private void onSurfing_ResetToDefaults() {
+
+      _chkIsMinSurfingDistance.setSelection(STATE_SURFING_IS_MIN_SURFING_DISTANCE_DEFAULT);
+
+      final double minDistance_UI = STATE_SURFING_MIN_SURFING_DISTANCE_DEFAULT / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_SMALL;
+      _spinnerSurfing_MinSurfingDistance.setSelection((int) (minDistance_UI + 0.5));
+
+      _spinnerSurfing_MinSurfingTimeDuration.setSelection(STATE_SURFING_MIN_SURFING_TIME_DURATION_DEFAULT);
+      _spinnerSurfing_MinStartStopSpeed.setSelection((int) (STATE_SURFING_MIN_START_STOP_SPEED_DEFAULT * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
+      _spinnerSurfing_MinSurfingSpeed.setSelection((int) (STATE_SURFING_MIN_SURFING_SPEED_DEFAULT * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
+
+      onSelect_Surfing();
+   }
+
+   private void onSurfing_SaveTour() {
+      // TODO Auto-generated method stub
+
+   }
+
    @Override
    public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
-      _containerViewer.setRedraw(false);
+      _viewerContainer.setRedraw(false);
       {
          _segmentViewer.getTable().dispose();
 
-         createUI_80_SegmentViewer(_containerViewer);
-         _containerViewer.layout();
+         createUI_80_SegmentViewer(_viewerContainer);
+         _viewerContainer.layout();
 
          // update the viewer
          reloadViewer();
       }
-      _containerViewer.setRedraw(true);
+      _viewerContainer.setRedraw(true);
 
       return _segmentViewer;
    }
@@ -4585,6 +4629,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       /*
        * Surfing
        */
+      _chkIsSurfingSegmenterEnabled.setSelection(Util.getStateBoolean(_state,
+            STATE_SURFING_IS_SEGMENTER_ENABLED,
+            STATE_SURFING_IS_SEGMENTER_ENABLED_DEFAULT));
+
       _chkIsMinSurfingDistance.setSelection(Util.getStateBoolean(_state,
             STATE_SURFING_IS_MIN_SURFING_DISTANCE,
             STATE_SURFING_IS_MIN_SURFING_DISTANCE_DEFAULT));
@@ -4704,6 +4752,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       }
 
       _state.put(STATE_SURFING_IS_MIN_SURFING_DISTANCE, _chkIsMinSurfingDistance.getSelection());
+      _state.put(STATE_SURFING_IS_SEGMENTER_ENABLED, _chkIsSurfingSegmenterEnabled.getSelection());
       _state.put(STATE_SURFING_MIN_START_STOP_SPEED, minStartStopSpeed);
       _state.put(STATE_SURFING_MIN_SURFING_DISTANCE, minSurfingDistance);
       _state.put(STATE_SURFING_MIN_SURFING_SPEED, minSurfingSpeed);
@@ -5161,6 +5210,21 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             _comboSegmenterType.select(0);
          }
       }
+   }
+
+   /**
+    * Set the sort column direction indicator for a column.
+    *
+    * @param sortColumnId
+    * @param isAscendingSort
+    */
+   private void updateUI_SetSortDirection(final String sortColumnId, final int sortDirection) {
+
+      final Table table = _segmentViewer.getTable();
+      final TableColumn tc = getSortColumn(sortColumnId);
+
+      table.setSortColumn(tc);
+      table.setSortDirection(sortDirection == SegmenterComparator.ASCENDING ? SWT.UP : SWT.DOWN);
    }
 
    private void updateUI_SurfingMeasurementValues() {

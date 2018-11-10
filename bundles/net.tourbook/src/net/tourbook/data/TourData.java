@@ -8326,9 +8326,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
 
       // surfing
-      if (isSaveVisibleDataPoints) {
-         serieData.visibleDataPoint = visibleDataPointSerie;
-      }
+//      if (isSaveVisibleDataPoints) {
+//         serieData.visibleDataPoint = visibleDataPointSerie;
+//      }
 
       // time serie size
       numberOfTimeSlices = timeSerie == null ? 0 : timeSerie.length;
