@@ -788,6 +788,7 @@ public class PrefPageMap25MapsforgeProvider extends PreferencePage implements IW
 			for (Item item : mf_styles) {
 				this._styles += item.getXmlLayer();
 				this._styles += ",";
+				
 				//System.out.println(item.getXmlLayer());
 			}
 			this._styles += "all";
