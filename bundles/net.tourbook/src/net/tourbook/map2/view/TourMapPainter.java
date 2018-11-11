@@ -1581,20 +1581,23 @@ public class TourMapPainter extends MapPainter {
 
                // current position is outside the tile
 
-               if (serieIndex == lastInsideIndex + 1) {
+               if (isVisibleDataPoint) {
 
-                  /*
-                   * this position is the first which is outside of the tile, draw a line from the
-                   * last inside to the first outside position
-                   */
+                  if (serieIndex == lastInsideIndex + 1) {
 
-                  drawTour_20_Line(
-                        gcTile,
-                        devFrom_WithOffsetX,
-                        devFrom_WithOffsetY,
-                        devTo_WithOffsetX,
-                        devTo_WithOffsetY,
-                        color);
+                     /*
+                      * this position is the first which is outside of the tile, draw a line from
+                      * the last inside to the first outside position
+                      */
+
+                     drawTour_20_Line(
+                           gcTile,
+                           devFrom_WithOffsetX,
+                           devFrom_WithOffsetY,
+                           devTo_WithOffsetX,
+                           devTo_WithOffsetY,
+                           color);
+                  }
                }
 
                // keep positions
