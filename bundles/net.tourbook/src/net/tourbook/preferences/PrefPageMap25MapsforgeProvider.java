@@ -117,6 +117,7 @@ public class PrefPageMap25MapsforgeProvider extends PreferencePage implements IW
 	private Text							_txtTilePath;
 	private Text							_txtTileUrl;
 	private Text							_txtUrl;
+	private String							_styles = "";
 	//
 	private Combo							_comboTileEncoding;
 
@@ -733,9 +734,9 @@ public class PrefPageMap25MapsforgeProvider extends PreferencePage implements IW
 	 * @return Returns <code>true</code> when person is valid, otherwise <code>false</code>.
 	 */
 	private boolean isDataValid() {
-
+		//String styles ="Aviable Styles: ";
 		final boolean isNewProvider = _newProvider != null;
-
+		
 		if (isNewProvider || _isMapProviderModified) {
 
 			if (_txtProviderName.getText().trim().equals(UI.EMPTY_STRING)) {
@@ -760,22 +761,38 @@ public class PrefPageMap25MapsforgeProvider extends PreferencePage implements IW
 	
 			} else if (_txtTilePath.getText().trim().equals(UI.EMPTY_STRING)) {
 				setErrorMessage("Themefile (.xml) is required");
+				this._styles ="";
 				return false;
 				
 			} else if (checkFile(_txtTilePath.getText().trim()).equals("1")) {
 				setErrorMessage("Themefile does not exist");
+				this._styles ="";
 				return false;
 				
 			} else if (checkFile(_txtTilePath.getText().trim()).equals("2")) {
 				setErrorMessage("Themefile is not a file");
+				this._styles ="";
 				return false;
 				
 			} else if (checkFile(_txtTilePath.getText().trim()).equals("3")) {
 				setErrorMessage("can not read the theme file");
+				this._styles ="";
 				return false;
 			}
 
-
+			MapsforgeStyleParser mf_style_parser = new MapsforgeStyleParser();
+			//java.util.List<Item> mf_styles = mf_style_parser.readConfig("C:\\Users\\top\\BTSync\\oruxmaps\\mapstyles\\ELV4\\Elevate.xml");
+			java.util.List<Item> mf_styles = mf_style_parser.readConfig(_txtTilePath.getText().trim());
+			//System.out.println("####### PrefPageMap25MapsforgeProvider Stylecount: " + mf_styles.size());
+			this._styles ="Aviable Styles: ";
+			for (Item item : mf_styles) {
+				this._styles += item.getXmlLayer();
+				this._styles += ",";
+				//System.out.println(item.getXmlLayer());
+			}
+			this._styles += "all";
+			//System.out.println("####### PrefPageMap25MapsforgeProvider isDataValid: " + styles);
+			
 			/*
 			 * Check that at least 1 map provider is enabled
 			 */
@@ -792,17 +809,16 @@ public class PrefPageMap25MapsforgeProvider extends PreferencePage implements IW
 			if (isCurrentEnabled || numEnabledOtherMapProviders > 0) {
 				// at least one is enabled
 			} else {
-
 				setErrorMessage(Messages.Pref_Map25_Provider_Error_EnableMapProvider);
 
 				return false;
-			}
-		}
+			} //end if at least one is enabled
+		} // end if modified
 
 		setErrorMessage(null);
 
 		return true;
-	}
+	} //end function isDataValid
 
 	private boolean isSaveMapProvider() {
 
@@ -1084,11 +1100,9 @@ public class PrefPageMap25MapsforgeProvider extends PreferencePage implements IW
 	}
 
 	private void updateUI_Data() {
-
-		final String tileUrl = _txtUrl.getText() + _txtTilePath.getText();
-
+		//final String tileUrl = _txtUrl.getText() + _txtTilePath.getText();
 		//_txtTileUrl.setText(tileUrl);
-		_txtTileUrl.setText("");
+		_txtTileUrl.setText(_styles);
 	}
 
 	private void updateUI_FromProvider(final Map25Provider mapProvider) {

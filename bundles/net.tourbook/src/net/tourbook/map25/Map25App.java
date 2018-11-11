@@ -112,7 +112,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 	private TileManager				_tileManager;
 
 	private OsmTileLayerMT			_layer_BaseMap;   //extends extends VectorTileLayer
-	private VectorTileLayer 		l;	
+	private VectorTileLayer 		_l;	
 	
 	private BuildingLayer			_layer_Building;
 	private S3DBLayer					_layer_mf_S3DB_Building;
@@ -277,7 +277,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 			_is_mf_Map = false;
 			_httpFactory = new OkHttpEngineMT.OkHttpFactoryMT();
 			final UrlTileSource tileSource = createTileSource(_selectedMapProvider, _httpFactory);
-			l = mMap.setBaseMap(tileSource);
+			_l = mMap.setBaseMap(tileSource);
 			loadTheme(null);
 			
 			setupMap(_selectedMapProvider, tileSource);
@@ -297,7 +297,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 			final MapFileTileSource tileSource = new MapFileTileSource();	
 			tileSource.setMapFile(_mf_mapFilePath);
 			tileSource.setPreferredLanguage(_mf_prefered_language);
-			l = mMap.setBaseMap(tileSource);
+			_l = mMap.setBaseMap(tileSource);
 			loadTheme(null);
 			
 			if (_mf_themeFilePath == null) {
@@ -308,7 +308,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 					System.out.println("############# create Layers: themeloader started"); 			
 					this._mf_IRenderTheme = ThemeLoader.load(_mf_themeFilePath);
 					System.out.println("############# create Layers: themeloader done");
-					l.setRenderTheme(_mf_IRenderTheme);
+					_l.setRenderTheme(_mf_IRenderTheme);
 					mMap.setTheme(_mf_IRenderTheme);
 					loadTheme(_selectedMapProvider.apiKey);
 				} else {
@@ -356,6 +356,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		if(_is_mf_Map) {
 			System.out.println("##### loadtheme: is mf map setting textscale " +   _mf_TextScale);
 			CanvasAdapter.textScale = _mf_TextScale;
+			if(styleId != null && styleId.equals("all")) {
+				return;
+			}
 			mMap.setTheme(new ExternalRenderTheme(_mf_themeFilePath, new XmlRenderThemeMenuCallback() {
 				@Override
 				public Set<String> getCategories(XmlRenderThemeStyleMenu renderThemeStyleMenu) {
@@ -364,7 +367,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 					// Retrieve the layer from the style id
 					XmlRenderThemeStyleLayer renderThemeStyleLayer = renderThemeStyleMenu.getLayer(style);
 					if (renderThemeStyleLayer == null) {
-						System.err.println("##### loadtheme:  Invalid style \"" + style + "\" showing all styles");
+						System.err.println("##### loadtheme:  Invalid style \"" + style + "\" so i show all styles");
 						return null;
 					}
 					System.out.println("####### loadtheme:  selected Style: " + renderThemeStyleLayer.getTitle(_mf_prefered_language));
@@ -647,14 +650,16 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		if (mapProvider.tileEncoding  != TileEncoding.MF) { // NOT mapsforge
 			this._is_mf_Map = false;
 			System.out.println("############# setMapProvider setMapProvider NOT mf Map");
-			
-			mMap.layers().remove(_layer_mf_S3DB_Building);
-			mMap.layers().remove(_layer_Building); // removing both, if switching from one vtm to another vtm
-			mMap.layers().add(_layer_Building);
-			
+
 			final UrlTileSource tileSource = createTileSource(mapProvider, _httpFactory);
 			_layer_BaseMap.setTileSource(tileSource);
 			mMap.setTheme(getTheme(mapProvider));
+			
+	/*		mMap.layers().remove(_layer_mf_S3DB_Building);
+			mMap.layers().remove(_layer_Building); // removing both, if switching from one vtm to another vtm
+			_layer_Building = new BuildingLayer(mMap, _layer_BaseMap);
+			mMap.layers().add(_layer_Building);		*/	
+			
 			////mMap.clearMap();
 			////mMap.updateMap(true);
 			_mf_themeFilePath = ""; // so if mf is next themefile is parsed
@@ -672,9 +677,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 			_layer_BaseMap.setTileSource(tileSource);
 			_mf_mapFilePath = checkFile(mapProvider.url);
 
-			mMap.layers().remove(_layer_Building);
+/*			mMap.layers().remove(_layer_Building);
 			mMap.layers().remove(_layer_mf_S3DB_Building); // removing both, if switching from one mf to another mf
-			mMap.layers().add(_layer_mf_S3DB_Building);			
+			_layer_mf_S3DB_Building = new S3DBLayer(mMap,_layer_BaseMap);
+			mMap.layers().add(_layer_mf_S3DB_Building);			*/
 			
 			if (_mf_mapFilePath == null) {
 				throw new IllegalArgumentException("############# setMapProvider cannot read mapfile: " + _mf_mapFilePath);
@@ -692,7 +698,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 						System.out.println("############# setMapProvider Theme loader started");
 						this._mf_IRenderTheme = ThemeLoader.load(_mf_themeFilePath);
 						System.out.println("############# setMapProvider Theme loader done, now activating...");
-						l.setRenderTheme(_mf_IRenderTheme);
+						_l.setRenderTheme(_mf_IRenderTheme);
 						////mMap.setTheme(_mf_IRenderTheme);
 						loadTheme(mapProvider.apiKey);  //whene starting with onlinemaps and switching to mf, osmarender is used ??? when uncommented it ok
 						System.out.println("############# setMapProvider ...activaded");
@@ -781,7 +787,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 			System.out.println("############# setupMap:  Theme not found: " + _mf_mapFilePath + " using default OSMARENDER");
 			mMap.setTheme(VtmThemes.OSMARENDER);   // ThemeLoader.load(_mf_themeFilePath));
 		} else {
-			l.setRenderTheme(_mf_IRenderTheme);
+			_l.setRenderTheme(_mf_IRenderTheme);
 			mMap.setTheme(ThemeLoader.load(_mf_themeFilePath));
 			loadTheme(mapProvider.apiKey);
 		}
@@ -822,7 +828,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		 * with this code i got always good S3DB, but online buildings did not look good
 		 * i have also to check if the layers becomes more, if i switch the mapprovider
 		 */
-		// Buildings or S3DB
+/*		// Buildings or S3DB  Block I
 		_layer_mf_S3DB_Building = new S3DBLayer(mMap,_layer_BaseMap);  //this is working for mf, onlinemaps missing 2 walls and roof
 		//_layer_mf_S3DB_Building = new S3DBLayer(mMap,l);  //private S3DBLayer	_layer_mf_S3DB_Building; //is working, but S3DB only once after programm start
 		_layer_Building = new BuildingLayer(mMap, _layer_BaseMap);
@@ -839,6 +845,26 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 			System.out.println("############ setupMap layer: adding Building Layer ");
 			layers.remove(_layer_mf_S3DB_Building);
 			layers.add(_layer_Building);
+		}*/
+		
+		// building Block II
+		_layer_Building = new BuildingLayer(mMap, _layer_BaseMap);
+		//if(!_is_mf_Map) {
+			_layer_Building.setEnabled(false);
+		//	layers.remove(_layer_mf_S3DB_Building);
+			layers.add(_layer_Building);
+		//}
+		
+		// S3DB Block II
+		_layer_mf_S3DB_Building = new S3DBLayer(mMap,_l);
+		//_layer_mf_S3DB_Building = new S3DBLayer(mMap,_layer_BaseMap);
+		if(_is_mf_Map) {
+			//_layer_mf_S3DB = new S3DBLayer(mMap,_mf_VectorTileLayer_S3DB);
+			_layer_mf_S3DB_Building.setEnabled(true);
+			System.out.println("############ setupMaplayer: adding S3DBlayer ");
+			//_mf_VectorTileLayer_S3DB.setRenderTheme(_mf_IRenderTheme);
+			//layers.remove(_layer_Building);
+			layers.add(_layer_mf_S3DB_Building);
 		}
 		
 		// label
