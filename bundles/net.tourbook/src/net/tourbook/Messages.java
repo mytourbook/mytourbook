@@ -432,6 +432,7 @@ public class Messages extends NLS {
    public static String        App_Action_Remove_Immediate;
    public static String        App_Action_Rename;
    public static String        App_Action_RestartApp;
+   public static String        App_Action_RestoreDefault;
    public static String        App_Action_RestoreDefault_Tooltip;
    public static String        App_Action_set_tour_type;
    public static String        App_Action_Save;
@@ -2271,7 +2272,6 @@ public class Messages extends NLS {
    public static String Tour_Marker_TooltipPosition_Top;
 
    public static String Tour_Segmenter_Action_ShowHideSegmentsInTourChart_Tooltip;
-   public static String Tour_Segmenter_Button_ResetSurfingOptions;
    public static String Tour_Segmenter_Button_SaveTour;
    public static String Tour_Segmenter_Button_SaveTour_Tooltip;
    public static String Tour_Segmenter_Button_SurfingSaveTour_Tooltip;

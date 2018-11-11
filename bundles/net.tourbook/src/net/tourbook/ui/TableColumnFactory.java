@@ -54,6 +54,7 @@ public abstract class TableColumnFactory {
    public static final TableColumnFactory DATA_SERIE_START_END_INDEX;
    public static final String             DATA_SERIE_START_END_INDEX_ID = "DATA_SERIE_START_END_INDEX"; //$NON-NLS-1$
    public static final TableColumnFactory DATA_SEQUENCE;
+   public static final String             DATA_SEQUENCE_ID              = "DATA_SEQUENCE";              //$NON-NLS-1$
    public static final TableColumnFactory DATA_TIME_INTERVAL;
 
    public static final TableColumnFactory DEVICE_NAME;
@@ -665,7 +666,7 @@ public abstract class TableColumnFactory {
 
             final TableColumnDefinition colDef = new TableColumnDefinition(
                   columnManager,
-                  "DATA_SEQUENCE", //$NON-NLS-1$
+                  DATA_SEQUENCE_ID,
                   SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Data);

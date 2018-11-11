@@ -1066,6 +1066,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	public int[]						segmentSerieIndex;
 
 	/**
+	 *
+	 */
+	@Transient
+	public int[]						segmentSerieMarker;
+
+	/**
 	 * 2nd Index of the segmented data in the data series.
 	 * <p>
 	 * {@link #segmentSerieIndex} contains the outer index, this contains the inner index.
@@ -4786,8 +4792,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          final TourSegment segment = new TourSegment();
          tourSegments.add(segment);
 
+         segment.sequence = segmentIndex;
+
          segment.serieIndex_Start = segmentStartIndex;
          segment.serieIndex_End = segmentEndIndex;
+
+         if (segmentSerieMarker != null) {
+            segment.marker = segmentSerieMarker[segmentIndex];
+         }
 
          /*
           * time
