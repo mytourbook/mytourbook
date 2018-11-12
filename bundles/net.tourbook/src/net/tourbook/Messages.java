@@ -2282,9 +2282,11 @@ public class Messages extends NLS {
    public static String Tour_Segmenter_Label_NumberOfSegments_Tooltip;
 
    public static String Tour_Segmenter_Surfing_Checkbox_IsMinSurfingDistance;
-   public static String Tour_Segmenter_Surfing_Checkbox_IsShowOnlySurfingParts;
+   public static String Tour_Segmenter_Surfing_Checkbox_IsShowOnlySelectedSegments;
+   public static String Tour_Segmenter_Surfing_Checkbox_IsShowOnlySurfingSegments;
    public static String Tour_Segmenter_Surfing_Checkbox_IsSurfingEnabled;
-   public static String Tour_Segmenter_Surfing_Label_IsShowOnlySurfingParts_Tooltip;
+   public static String Tour_Segmenter_Surfing_Label_IsShowOnlySelectedSegments_Tooltip;
+   public static String Tour_Segmenter_Surfing_Label_IsShowOnlySurfingSegments_Tooltip;
    public static String Tour_Segmenter_Surfing_Label_IsSurfingEnabled_Tooltip;
    public static String Tour_Segmenter_Surfing_Label_MinSurfingDistance;
    public static String Tour_Segmenter_Surfing_Label_MinSurfingDistance_Tooltip;

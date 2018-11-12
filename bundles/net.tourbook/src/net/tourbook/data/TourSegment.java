@@ -51,7 +51,7 @@ public class TourSegment {
    public float   pulse;
    public float   pulse_Diff;
 
-   public int     marker;
+   public int     filter;
 
    /** Is <code>true</code> when this segment is the totals segment. */
    public boolean isTotal;

@@ -39,6 +39,7 @@ import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
@@ -193,43 +194,49 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    /*
     * Surfing
     */
-   private static final boolean STATE_SURFING_IS_SEGMENTER_ENABLED_DEFAULT        = true;
+   private static final boolean STATE_SURFING_IS_SEGMENTER_ENABLED_DEFAULT           = true;
    //
-   private static final String  STATE_SURFING_IS_SHOW_ONLY_SURFING_EVENTS         = "STATE_SURFING_IS_SHOW_ONLY_SURFING_EVENTS";//$NON-NLS-1$
-   private static final boolean STATE_SURFING_IS_SHOW_ONLY_SURFING_EVENTS_DEFAULT = false;
-   private static final String  STATE_SURFING_IS_MIN_SURFING_DISTANCE             = "STATE_SURFING_IS_MIN_SURFING_DISTANCE";    //$NON-NLS-1$
-   private static final boolean STATE_SURFING_IS_MIN_SURFING_DISTANCE_DEFAULT     = false;
-   private static final String  STATE_SURFING_MIN_START_STOP_SPEED                = "STATE_SURFING_MIN_START_STOP_SPEED";       //$NON-NLS-1$
-   private static final int     STATE_SURFING_MIN_START_STOP_SPEED_DEFAULT        = 9;
-   private static final String  STATE_SURFING_MIN_SURFING_SPEED                   = "STATE_SURFING_MIN_SURFING_SPEED";          //$NON-NLS-1$
-   private static final int     STATE_SURFING_MIN_SURFING_SPEED_DEFAULT           = 13;
-   private static final String  STATE_SURFING_MIN_SURFING_TIME_DURATION           = "STATE_SURFING_MIN_SURFING_TIME_DURATION";  //$NON-NLS-1$
-   private static final int     STATE_SURFING_MIN_SURFING_TIME_DURATION_DEFAULT   = 6;
-   private static final String  STATE_SURFING_MIN_SURFING_DISTANCE                = "STATE_SURFING_MIN_SURFING_DISTANCE";       //$NON-NLS-1$
-   private static final int     STATE_SURFING_MIN_SURFING_DISTANCE_DEFAULT        = 10;
+   private static final String  STATE_SURFING_IS_SHOW_ONLY_SELECTED_SEGMENTS         = "STATE_SURFING_IS_SHOW_ONLY_SELECTED_SEGMENTS";//$NON-NLS-1$
+   private static final boolean STATE_SURFING_IS_SHOW_ONLY_SELECTED_SEGMENTS_DEFAULT = false;
+   private static final String  STATE_SURFING_IS_SHOW_ONLY_SURFING_SEGMENTS          = "STATE_SURFING_IS_SHOW_ONLY_SURFING_SEGMENTS"; //$NON-NLS-1$
+   private static final boolean STATE_SURFING_IS_SHOW_ONLY_SURFING_SEGMENTS_DEFAULT  = false;
+   private static final String  STATE_SURFING_IS_MIN_SURFING_DISTANCE                = "STATE_SURFING_IS_MIN_SURFING_DISTANCE";       //$NON-NLS-1$
+   private static final boolean STATE_SURFING_IS_MIN_SURFING_DISTANCE_DEFAULT        = false;
+   private static final String  STATE_SURFING_MIN_START_STOP_SPEED                   = "STATE_SURFING_MIN_START_STOP_SPEED";          //$NON-NLS-1$
+   private static final int     STATE_SURFING_MIN_START_STOP_SPEED_DEFAULT           = 9;
+   private static final String  STATE_SURFING_MIN_SURFING_SPEED                      = "STATE_SURFING_MIN_SURFING_SPEED";             //$NON-NLS-1$
+   private static final int     STATE_SURFING_MIN_SURFING_SPEED_DEFAULT              = 13;
+   private static final String  STATE_SURFING_MIN_SURFING_TIME_DURATION              = "STATE_SURFING_MIN_SURFING_TIME_DURATION";     //$NON-NLS-1$
+   private static final int     STATE_SURFING_MIN_SURFING_TIME_DURATION_DEFAULT      = 6;
+   private static final String  STATE_SURFING_MIN_SURFING_DISTANCE                   = "STATE_SURFING_MIN_SURFING_DISTANCE";          //$NON-NLS-1$
+   private static final int     STATE_SURFING_MIN_SURFING_DISTANCE_DEFAULT           = 10;
    //
    /*
     * Colors
     */
-   static final String                           STATE_COLOR_ALTITUDE_DOWN         = "STATE_COLOR_ALTITUDE_DOWN";  //$NON-NLS-1$
-   static final String                           STATE_COLOR_ALTITUDE_UP           = "STATE_COLOR_ALTITUDE_UP";    //$NON-NLS-1$
-   static final String                           STATE_COLOR_TOTALS                = "STATE_COLOR_TOTALS";         //$NON-NLS-1$
+   static final String                           SEGMENTER_FILTER_BACKGROUND            = "SEGMENTER_FILTER_BACKGROUND";        //$NON-NLS-1$
+   static final String                           SEGMENTER_FILTER_BACKGROUND_HEADER     = "SEGMENTER_FILTER_BACKGROUND_HEADER"; //$NON-NLS-1$
+   static final String                           STATE_COLOR_ALTITUDE_DOWN              = "STATE_COLOR_ALTITUDE_DOWN";          //$NON-NLS-1$
+   static final String                           STATE_COLOR_ALTITUDE_UP                = "STATE_COLOR_ALTITUDE_UP";            //$NON-NLS-1$
+   static final String                           STATE_COLOR_TOTALS                     = "STATE_COLOR_TOTALS";                 //$NON-NLS-1$
    //
-   static final RGB                              STATE_COLOR_ALTITUDE_DOWN_DEFAULT = new RGB(0, 240, 0);
-   static final RGB                              STATE_COLOR_ALTITUDE_UP_DEFAULT   = new RGB(255, 66, 22);
-   static final RGB                              STATE_COLOR_TOTALS_DEFAULT        = new RGB(253, 236, 115);
+   static final RGB                              SEGMENTER_FILTER_BACKGROUND_RGB        = new RGB(0xF8, 0xFF, 0xFF);
+   static final RGB                              SEGMENTER_FILTER_BACKGROUND_RGB_HEADER = new RGB(209, 237, 255);
+   static final RGB                              STATE_COLOR_ALTITUDE_DOWN_DEFAULT      = new RGB(0, 240, 0);
+   static final RGB                              STATE_COLOR_ALTITUDE_UP_DEFAULT        = new RGB(255, 66, 22);
+   static final RGB                              STATE_COLOR_TOTALS_DEFAULT             = new RGB(253, 236, 115);
    //
-   private static final float                    SPEED_DIGIT_VALUE                 = 10.0f;
+   private static final float                    SPEED_DIGIT_VALUE                      = 10.0f;
    //
-   private static final IPreferenceStore         _prefStore                        = TourbookPlugin.getPrefStore();
-   private static final IDialogSettings          _state                            = TourbookPlugin.getState(ID);
+   private static final IPreferenceStore         _prefStore                             = TourbookPlugin.getPrefStore();
+   private static final IDialogSettings          _state                                 = TourbookPlugin.getState(ID);
    //
    /**
     * Contains all available segmenters.
     * <p>
     * The sequence defines how they are displayed in the combobox.
     */
-   private static final ArrayList<TourSegmenter> _allTourSegmenter                 = new ArrayList<>();
+   private static final ArrayList<TourSegmenter> _allTourSegmenter                      = new ArrayList<>();
    static {
 
       _allTourSegmenter.add(new TourSegmenter(
@@ -288,6 +295,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
     * This must be in sync with the columns in the {@link SegmenterComparator}
     */
    private static final ArrayList<String> _allSortableColumns = new ArrayList<>();
+
    static {
 
       _allSortableColumns.add(TableColumnFactory.DATA_SEQUENCE_ID); // this is the default sort column
@@ -431,7 +439,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private Button          _btnSurfing_SaveTour;
    //
    private Button          _chkIsMinSurfingDistance;
-   private Button          _chkIsShowOnlySurfingEvents;
+   private Button          _chkIsShowOnlySelectedSegments;
+   private Button          _chkIsShowOnlySurfingSegments;
    private Button          _chkIsSurfingSegmenterEnabled;
    //
    private Combo           _comboBreakMethod;
@@ -646,7 +655,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
          final TourSegment segment = (TourSegment) element;
 
-         if (segment.marker == 1) {
+         if (segment.filter == 1) {
             return true;
          }
 
@@ -1120,7 +1129,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       // reset other indices
       _tourData.segmentSerieIndex2nd = null;
-      _tourData.segmentSerieMarker = null;
+      _tourData.segmentSerieFilter = null;
 
       final TourSegmenter selectedSegmenter = getSelectedSegmenter();
       if (selectedSegmenter == null) {
@@ -1729,11 +1738,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       }
 
       final TIntArrayList segmentSerieIndex = new TIntArrayList();
-      final TIntArrayList segmentSerieMarker = new TIntArrayList();
+      final TIntArrayList segmentSerieFilter = new TIntArrayList();
 
       // set first segment start
       segmentSerieIndex.add(0);
-      segmentSerieMarker.add(0);
+      segmentSerieFilter.add(0);
 
       boolean isSurfing = false;
       boolean isSurfing_Distance = false;
@@ -1854,10 +1863,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                segmentSerieIndex.add(segmentStartIndex);
                segmentSerieIndex.add(segmentEndIndex);
 
-               segmentSerieMarker.add(0);
-               segmentSerieMarker.add(1);
+               segmentSerieFilter.add(0);
+               segmentSerieFilter.add(1);
 
-               // mark datapoints visible
+               // set datapoints visible, this is used in the map
                for (int surfSerieIndex = segmentStartIndex + 1; surfSerieIndex <= segmentEndIndex; surfSerieIndex++) {
                   visibleDataPointSerie[surfSerieIndex] = true;
                }
@@ -1876,11 +1885,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             segmentSerieIndex.get(serieSize - 1) != lastSerieIndex) {
 
          segmentSerieIndex.add(lastSerieIndex);
-         segmentSerieMarker.add(0);
+         segmentSerieFilter.add(0);
       }
 
       _tourData.segmentSerieIndex = segmentSerieIndex.toArray();
-      _tourData.segmentSerieMarker = segmentSerieMarker.toArray();
+      _tourData.segmentSerieFilter = segmentSerieFilter.toArray();
    }
 
    private void createUI(final Composite parent) {
@@ -2719,14 +2728,29 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             /*
              * Show only surfing events
              */
-            _chkIsShowOnlySurfingEvents = new Button(container, SWT.CHECK);
-            _chkIsShowOnlySurfingEvents.setText(Messages.Tour_Segmenter_Surfing_Checkbox_IsShowOnlySurfingParts);
-            _chkIsShowOnlySurfingEvents.setToolTipText(Messages.Tour_Segmenter_Surfing_Label_IsShowOnlySurfingParts_Tooltip);
-            _chkIsShowOnlySurfingEvents.addSelectionListener(new SelectionAdapter() {
+            _chkIsShowOnlySurfingSegments = new Button(container, SWT.CHECK);
+            _chkIsShowOnlySurfingSegments.setText(Messages.Tour_Segmenter_Surfing_Checkbox_IsShowOnlySurfingSegments);
+            _chkIsShowOnlySurfingSegments.setToolTipText(Messages.Tour_Segmenter_Surfing_Label_IsShowOnlySurfingSegments_Tooltip);
+            _chkIsShowOnlySurfingSegments.addSelectionListener(new SelectionAdapter() {
 
                @Override
                public void widgetSelected(final SelectionEvent e) {
-                  onSelect_Surfing_ShowOnlySurfingEvents();
+                  onSelect_Surfing_ShowOnlySurfingSegments();
+               }
+            });
+         }
+         {
+            /*
+             * Show only selected segment
+             */
+            _chkIsShowOnlySelectedSegments = new Button(container, SWT.CHECK);
+            _chkIsShowOnlySelectedSegments.setText(Messages.Tour_Segmenter_Surfing_Checkbox_IsShowOnlySelectedSegments);
+            _chkIsShowOnlySelectedSegments.setToolTipText(Messages.Tour_Segmenter_Surfing_Label_IsShowOnlySelectedSegments_Tooltip);
+            _chkIsShowOnlySelectedSegments.addSelectionListener(new SelectionAdapter() {
+
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onSelect_Surfing_ShowOnlySelectedSegments();
                }
             });
          }
@@ -3694,14 +3718,19 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private void enableActions_Surfing() {
 
       final boolean isSurfingEnabled = _chkIsSurfingSegmenterEnabled.getSelection();
+      final boolean isShowOnlySelectedSegments = _chkIsShowOnlySelectedSegments.getSelection();
       final boolean isMinDistance = _chkIsMinSurfingDistance.getSelection();
 
       _segmentViewer.getTable().setEnabled(isSurfingEnabled);
 
       _btnSurfing_RestoreDefaults.setEnabled(isSurfingEnabled);
 
+      // disable save that hidden segments do not get lost in the tour
+      _btnSurfing_SaveTour.setEnabled(isShowOnlySelectedSegments == false);
+
       _chkIsMinSurfingDistance.setEnabled(isSurfingEnabled);
-      _chkIsShowOnlySurfingEvents.setEnabled(isSurfingEnabled);
+      _chkIsShowOnlySelectedSegments.setEnabled(isSurfingEnabled);
+      _chkIsShowOnlySurfingSegments.setEnabled(isSurfingEnabled);
 
       _lblSurfing_MinStartStopSpeed.setEnabled(isSurfingEnabled);
       _lblSurfing_MinStartStopSpeed_Unit.setEnabled(isSurfingEnabled);
@@ -4150,7 +4179,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          return;
       }
 
-      final StructuredSelection selection = (StructuredSelection) event.getSelection();
+      final IStructuredSelection selection = event.getStructuredSelection();
       if (selection != null) {
 
          /*
@@ -4214,6 +4243,30 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                selectedSegments.xSliderSerieIndexRight = serieEndIndex;
 
                selectionSliderPosition.setCustomData(selectedSegments);
+            }
+
+            /*
+             * Do segmenter specific actions
+             */
+            final TourSegmenter selectedSegmenter = getSelectedSegmenter();
+            if (selectedSegmenter != null) {
+
+               final SegmenterType selectedSegmenterType = selectedSegmenter.segmenterType;
+
+               switch (selectedSegmenterType) {
+               case Surfing:
+
+                  final boolean isShowOnlySelectedSegments = _chkIsShowOnlySelectedSegments.getSelection();
+
+                  if (isShowOnlySelectedSegments) {
+                     onSelect_Surfing_ShowOnlySelectedSegments();
+                  }
+
+                  break;
+
+               default:
+                  break;
+               }
             }
 
             _postSelectionProvider.setSelection(selectionSliderPosition);
@@ -4283,11 +4336,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          _pageBookSegmenter.showPage(_pageSegType_Surfing);
 
          _isSegmenterEnabled = _chkIsSurfingSegmenterEnabled.getSelection();
-         _isSegmenterFiltered = _chkIsShowOnlySurfingEvents.getSelection();
+         _isSegmenterFiltered = _chkIsShowOnlySurfingSegments.getSelection();
 
          enableActions_Surfing();
 
       }
+
+      updateUI_SegmenterBackground();
 
       _pageSegmenter.layout();
 
@@ -4327,9 +4382,53 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       }
    }
 
-   private void onSelect_Surfing_ShowOnlySurfingEvents() {
+   private void onSelect_Surfing_ShowOnlySelectedSegments() {
 
-      _isSegmenterFiltered = _chkIsShowOnlySurfingEvents.getSelection();
+      final boolean isShowOnlySelectedSegments = _chkIsShowOnlySelectedSegments.getSelection();
+
+      if (isShowOnlySelectedSegments) {
+
+         // hide segments in the map which are not selected
+
+         final int[] timeSerie = _tourData.timeSerie;
+         final boolean[] visibleDataPointSerie = _tourData.visibleDataPointSerie = new boolean[timeSerie.length];
+
+         final IStructuredSelection selection = _segmentViewer.getStructuredSelection();
+         for (final Object selectedItem : selection.toList()) {
+
+            if (selectedItem instanceof TourSegment) {
+
+               final TourSegment tourSegment = (TourSegment) selectedItem;
+
+               final int segmentStartIndex = tourSegment.serieIndex_Start;
+               final int segmentEndIndex = tourSegment.serieIndex_End;
+
+               for (int surfSerieIndex = segmentStartIndex + 1; surfSerieIndex <= segmentEndIndex; surfSerieIndex++) {
+                  visibleDataPointSerie[surfSerieIndex] = true;
+               }
+            }
+         }
+
+         TourManager.fireEventWithCustomData(//
+               TourEventId.SEGMENT_LAYER_CHANGED,
+               _tourData,
+               TourSegmenterView.this);
+
+         enableActions_Surfing();
+
+      } else {
+
+         // recreate all segments
+
+         onSelect_Surfing();
+      }
+   }
+
+   private void onSelect_Surfing_ShowOnlySurfingSegments() {
+
+      _isSegmenterFiltered = _chkIsShowOnlySurfingSegments.getSelection();
+
+      updateUI_SegmenterBackground();
 
       _segmentViewer.refresh(false);
    }
@@ -4518,7 +4617,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private void onSurfing_ResetToDefaults() {
 
       _chkIsMinSurfingDistance.setSelection(STATE_SURFING_IS_MIN_SURFING_DISTANCE_DEFAULT);
-      _chkIsShowOnlySurfingEvents.setSelection(STATE_SURFING_IS_SHOW_ONLY_SURFING_EVENTS_DEFAULT);
+      _chkIsShowOnlySelectedSegments.setSelection(STATE_SURFING_IS_SHOW_ONLY_SELECTED_SEGMENTS_DEFAULT);
+      _chkIsShowOnlySurfingSegments.setSelection(STATE_SURFING_IS_SHOW_ONLY_SURFING_SEGMENTS_DEFAULT);
 
       final double minDistance_UI = STATE_SURFING_MIN_SURFING_DISTANCE_DEFAULT / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_SMALL;
       _spinnerSurfing_MinSurfingDistance.setSelection((int) (minDistance_UI + 0.5));
@@ -4726,6 +4826,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       /*
        * Setup colors
        */
+      _colorCache.setColor(SEGMENTER_FILTER_BACKGROUND, SEGMENTER_FILTER_BACKGROUND_RGB);
+      _colorCache.setColor(SEGMENTER_FILTER_BACKGROUND_HEADER, SEGMENTER_FILTER_BACKGROUND_RGB_HEADER);
+
       _colorCache.setColor(
             STATE_COLOR_ALTITUDE_UP,
             Util.getStateRGB(_state, STATE_COLOR_ALTITUDE_UP, STATE_COLOR_ALTITUDE_UP_DEFAULT));
@@ -4749,9 +4852,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             STATE_SURFING_IS_MIN_SURFING_DISTANCE,
             STATE_SURFING_IS_MIN_SURFING_DISTANCE_DEFAULT));
 
-      _chkIsShowOnlySurfingEvents.setSelection(Util.getStateBoolean(_state,
-            STATE_SURFING_IS_SHOW_ONLY_SURFING_EVENTS,
-            STATE_SURFING_IS_SHOW_ONLY_SURFING_EVENTS_DEFAULT));
+      _chkIsShowOnlySelectedSegments.setSelection(Util.getStateBoolean(_state,
+            STATE_SURFING_IS_SHOW_ONLY_SELECTED_SEGMENTS,
+            STATE_SURFING_IS_SHOW_ONLY_SELECTED_SEGMENTS_DEFAULT));
+
+      _chkIsShowOnlySurfingSegments.setSelection(Util.getStateBoolean(_state,
+            STATE_SURFING_IS_SHOW_ONLY_SURFING_SEGMENTS,
+            STATE_SURFING_IS_SHOW_ONLY_SURFING_SEGMENTS_DEFAULT));
 
       final int stateMinDistance = Util.getStateInt(_state,
             STATE_SURFING_MIN_SURFING_DISTANCE,
@@ -4867,7 +4974,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          minSurfingDistance = (int) (minSurfingDistance / UNIT_YARD + 0.5);
       }
 
-      _state.put(STATE_SURFING_IS_SHOW_ONLY_SURFING_EVENTS, _chkIsShowOnlySurfingEvents.getSelection());
+      _state.put(STATE_SURFING_IS_SHOW_ONLY_SELECTED_SEGMENTS, _chkIsShowOnlySelectedSegments.getSelection());
+      _state.put(STATE_SURFING_IS_SHOW_ONLY_SURFING_SEGMENTS, _chkIsShowOnlySurfingSegments.getSelection());
       _state.put(STATE_SURFING_IS_MIN_SURFING_DISTANCE, _chkIsMinSurfingDistance.getSelection());
       _state.put(STATE_SURFING_IS_SEGMENTER_ENABLED, _chkIsSurfingSegmenterEnabled.getSelection());
       _state.put(STATE_SURFING_MIN_START_STOP_SPEED, minStartStopSpeed);
@@ -5337,6 +5445,21 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          // update UI, the spinner already displays the correct value
          _lblDistanceValue.setText(net.tourbook.common.UI.UNIT_LABEL_DISTANCE);
       }
+   }
+
+   private void updateUI_SegmenterBackground() {
+
+      final Table segmenterTable = _segmentViewer.getTable();
+
+      if (_isSegmenterFiltered) {
+//         segmenterTable.setBackground(null);
+         segmenterTable.setBackground(_colorCache.get(SEGMENTER_FILTER_BACKGROUND));
+         segmenterTable.setHeaderBackground(_colorCache.get(SEGMENTER_FILTER_BACKGROUND_HEADER));
+      } else {
+         segmenterTable.setBackground(null);
+         segmenterTable.setHeaderBackground(null);
+      }
+
    }
 
    private void updateUI_SegmenterInfo(final Object[] tourSegments) {

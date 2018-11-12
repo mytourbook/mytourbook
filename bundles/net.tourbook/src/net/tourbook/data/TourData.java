@@ -1069,7 +1069,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 *
 	 */
 	@Transient
-	public int[]						segmentSerieMarker;
+	public int[]						segmentSerieFilter;
 
 	/**
 	 * 2nd Index of the segmented data in the data series.
@@ -4797,8 +4797,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          segment.serieIndex_Start = segmentStartIndex;
          segment.serieIndex_End = segmentEndIndex;
 
-         if (segmentSerieMarker != null) {
-            segment.marker = segmentSerieMarker[segmentIndex];
+         if (segmentSerieFilter != null) {
+            segment.filter = segmentSerieFilter[segmentIndex];
          }
 
          /*
