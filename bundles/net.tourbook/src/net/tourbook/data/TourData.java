@@ -1392,16 +1392,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * Running dynamics data
 	 *
 	 *	stance_time                  267.0  ms
-	 *	stance_time_balance           50.56 percent			* TourData.RUN_DYN_DATA_MULTIPLIER
+	 *	stance_time_balance           50.56 percent		* TourData.RUN_DYN_DATA_MULTIPLIER
 	 *	step_length                 1147.0  mm
 	 *	vertical_oscillation         107.2  mm				* TourData.RUN_DYN_DATA_MULTIPLIER
-	 *	vertical_ratio                 9.15 percent			* TourData.RUN_DYN_DATA_MULTIPLIER
+	 *	vertical_ratio                 9.15 percent		* TourData.RUN_DYN_DATA_MULTIPLIER
 	 *
 	 *	stance_time                  272.0  ms
-	 *	stance_time_balance           50.46 percent			* TourData.RUN_DYN_DATA_MULTIPLIER
+	 *	stance_time_balance           50.46 percent		* TourData.RUN_DYN_DATA_MULTIPLIER
 	 *	step_length                 1169.0  mm
 	 *	vertical_oscillation         119.0  mm				* TourData.RUN_DYN_DATA_MULTIPLIER
-	 *	vertical_ratio                 9.84 percent			* TourData.RUN_DYN_DATA_MULTIPLIER
+	 *	vertical_ratio                 9.84 percent		* TourData.RUN_DYN_DATA_MULTIPLIER
 	 *
 	 * @since Version 18.7
 	 */
@@ -1434,73 +1434,84 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	@Transient
 	private float[]	_runDyn_VerticalRatio_UI;
 
-	/**
-	 * Swimming data have a different number of time slices than the other data series !!!
-	 * @since Version 18.10
-	 */
+// SET_FORMATTING_ON
 
-	/**
-	 * Swimming data: Relative time in seconds to the tour start time. Contains
-	 * {@link Short#MIN_VALUE} when value is not set.
-	 */
-	@Transient
-	public int[]		swim_Time;
+   /**
+    * Swimming data have a different number of time slices than the other data series !!!
+    *
+    * @since Version 18.10
+    */
 
-	/**
-	 * Swimming data: Activity is defined in {@link LengthType} e.g. active, idle. Contains {@link Short#MIN_VALUE} when value is not
-	 * set.
-	 */
-	@Transient
-	public short[]		swim_LengthType;
-	@Transient
-	private float[]	_swim_LengthType_UI;
+   /**
+    * Swimming data: Relative time in seconds to the tour start time. Contains
+    * {@link Short#MIN_VALUE} when value is not set.
+    */
+   @Transient
+   public int[]     swim_Time;
 
-	/**
-	 * Swimming data: Number of strokes. Contains {@link Short#MIN_VALUE} when value is not set.
-	 */
-	@Transient
-	public short[]		swim_Strokes;
-	@Transient
-	private float[]	_swim_Strokes_UI;
+   /**
+    * Swimming data: Activity is defined in {@link LengthType} e.g. active, idle. Contains
+    * {@link Short#MIN_VALUE} when value is not set.
+    */
+   @Transient
+   public short[]   swim_LengthType;
+   @Transient
+   private float[]  _swim_LengthType_UI;
 
-	/**
-	 * Swimming data: Stroke style is defined in {@link SwimStroke}  e.g. freestyle, breaststroke... Contains {@link Short#MIN_VALUE}
-	 * when value is not set.
-	 */
-	@Transient
-	public short[]		swim_StrokeStyle;
-	@Transient
-	private float[]	_swim_StrokeStyle_UI;
+   /**
+    * Swimming data: Number of strokes. Contains {@link Short#MIN_VALUE} when value is not set.
+    */
+   @Transient
+   public short[]   swim_Strokes;
+   @Transient
+   private float[]  _swim_Strokes_UI;
 
-	/**
-	 * Swimming data: Swimming cadence in strokes/min. Contains {@link Short#MIN_VALUE} when value is
-	 * not set.
-	 */
-	@Transient
-	public short[]		swim_Cadence;
-	@Transient
-	private float[]	_swim_Cadence_UI;
+   /**
+    * Swimming data: Stroke style is defined in {@link SwimStroke} e.g. freestyle, breaststroke...
+    * Contains {@link Short#MIN_VALUE} when value is not set.
+    */
+   @Transient
+   public short[]   swim_StrokeStyle;
+   @Transient
+   private float[]  _swim_StrokeStyle_UI;
 
-	/**
-	 * Is <code>true</code> when {@link #cadenceSerie} is computed from swimming cadence {@link #swim_Cadence} values.
-	 */
-	@Transient
-	public boolean 	isSwimCadence;
+   /**
+    * Swimming data: Swimming cadence in strokes/min. Contains {@link Short#MIN_VALUE} when value is
+    * not set.
+    */
+   @Transient
+   public short[]   swim_Cadence;
+   @Transient
+   private float[]  _swim_Cadence_UI;
 
-	/**
-	 * Computed swim data serie
-	 */
-	@Transient
-	private float[]	_swim_Swolf;
+   /**
+    * Is <code>true</code> when {@link #cadenceSerie} is computed from swimming cadence
+    * {@link #swim_Cadence} values.
+    */
+   @Transient
+   public boolean   isSwimCadence;
 
-	/**
-	 * When <code>true</code> the data are visible, otherwise they are hidden.
-	 * This is used to show surfing and hide the none surfing parts.
-	 */
-	@Transient
+   /**
+    * Computed swim data serie
+    */
+   @Transient
+   private float[]  _swim_Swolf;
+
+   /**
+    * When values are <code>true</code>, then the data are visible, otherwise they are hidden. This
+    * is used to show surfing parts and to hide the none surfing parts.
+    * <p>
+    * When <code>null</code> then it will be ignored and all data points are visible.
+    */
+   @Transient
    public boolean[] visibleDataPointSerie;
 
-// SET_FORMATTING_ON
+   /**
+    * When <code>true</code> then {@link #visibleDataPointSerie} will be saved, otherwise it will be
+    * ignored when the tour is saved.
+    */
+   @Transient
+   public boolean   isSaveVisibleDataPoints;
 
    public TourData() {}
 
@@ -8338,9 +8349,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
 
       // surfing
-//      if (isSaveVisibleDataPoints) {
-//         serieData.visibleDataPoint = visibleDataPointSerie;
-//      }
+      if (isSaveVisibleDataPoints) {
+         serieData.visibleDataPoint = visibleDataPointSerie;
+      }
 
       // time serie size
       numberOfTimeSlices = timeSerie == null ? 0 : timeSerie.length;

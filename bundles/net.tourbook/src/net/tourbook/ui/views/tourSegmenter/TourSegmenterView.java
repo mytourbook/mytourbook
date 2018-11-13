@@ -1916,9 +1916,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private void createUI_10_Header(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(4).extendedMargins(3, 3, 3, 5).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
       {
          {
             // tour title
@@ -1971,7 +1970,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
          // pagebook: segmenter type
          _pageBookSegmenter = new PageBook(container, SWT.NONE);
-         GridDataFactory.fillDefaults().grab(true, false).span(4, 1).applyTo(_pageBookSegmenter);
+         GridDataFactory.fillDefaults()
+//               .grab(true, false)
+               .span(4, 1)
+               .applyTo(_pageBookSegmenter);
          {
             _pageSegType_DPAltitude = createUI_42_SegmenterBy_DPAltitude(_pageBookSegmenter);
             _pageSegType_DPPulse = createUI_43_SegmenterBy_DPPulse(_pageBookSegmenter);
@@ -1988,9 +1990,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private Composite createUI_42_SegmenterBy_DPAltitude(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
       {
          _spinnerDPTolerance_Altitude = createUI_DP_Tolerance(container);
          _lblAltitudeUpDP = createUI_DP_Info(container);
@@ -2003,7 +2004,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private Composite createUI_43_SegmenterBy_DPPulse(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
          _spinnerDPTolerance_Pulse = createUI_DP_Tolerance(container);
@@ -2015,7 +2015,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private Composite createUI_44_SegmenterBy_DPPower(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
          _spinnerDPTolerance_Power = createUI_DP_Tolerance(container);
@@ -2030,7 +2029,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
        * display NONE, this is not easy to do - or I didn't find an easier way
        */
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().applyTo(container);
       {
          final Canvas canvas = new Canvas(container, SWT.NONE);
@@ -2043,7 +2041,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private Composite createUI_46_SegmenterBy_Distance(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
       {
 
@@ -2053,7 +2050,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
          // spinner: distance
          _spinnerDistance = new Spinner(container, SWT.BORDER);
-         GridDataFactory.fillDefaults().applyTo(_spinnerDistance);
          _spinnerDistance.setMinimum(1); // 0.1
          _spinnerDistance.setMaximum(_maxDistanceSpinner);
          _spinnerDistance.setPageIncrement(_spinnerDistancePage);
@@ -2075,9 +2071,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          // text: distance value
          _lblDistanceValue = new Label(container, SWT.NONE);
          _lblDistanceValue.setText(Messages.tour_segmenter_segType_byDistance_defaultDistance);
-         GridDataFactory.fillDefaults()//
+         GridDataFactory.fillDefaults()
                .align(SWT.FILL, SWT.CENTER)
-               .grab(true, false)
                .applyTo(_lblDistanceValue);
       }
 
@@ -2087,7 +2082,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private Composite createUI_48_SegmenterBy_MinAltitude(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(5).applyTo(container);
       {
          // label: min alti diff
@@ -2096,7 +2090,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
          // spinner: minimum altitude
          _spinnerMinAltitude = new Spinner(container, SWT.BORDER);
-         GridDataFactory.fillDefaults().applyTo(_spinnerMinAltitude);
          _spinnerMinAltitude.setMinimum(1); // 0.1
          _spinnerMinAltitude.setMaximum(10000); // 1000
          _spinnerMinAltitude.setDigits(1);
@@ -2128,12 +2121,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private Composite createUI_50_SegmenterBy_BreakTime(final Composite parent) {
 
       _containerBreakTime = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(_containerBreakTime);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(_containerBreakTime);
 //		_containerBreakTime.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
       {
          final Composite container = new Composite(_containerBreakTime, SWT.NONE);
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
          GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
          {
             createUI_51_TourBreakTime(container);
@@ -2152,10 +2143,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private void createUI_51_TourBreakTime(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()//
-//				.span(2, 1)
-            .grab(true, false)
-            .applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
       {
@@ -2174,8 +2161,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          _lblTourBreakTime = new Label(container, SWT.NONE);
          GridDataFactory.fillDefaults()//
                .align(SWT.FILL, SWT.CENTER)
-               .grab(true, false)
-//					.span(2, 1)
                .applyTo(_lblTourBreakTime);
       }
    }
@@ -2183,11 +2168,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private void createUI_52_BreakTimePageBook(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults()//
             .numColumns(2)
             .applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
       {
          /*
           * label: compute break time by
@@ -2214,7 +2198,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
           * pagebook: break algorithm
           */
          _pageBookBreakTime = new PageBook(container, SWT.NONE);
-         GridDataFactory.fillDefaults().span(2, 1).grab(true, false).applyTo(_pageBookBreakTime);
+         GridDataFactory.fillDefaults()
+               .span(2, 1)
+               .applyTo(_pageBookBreakTime);
          {
             _pageBreakBy_AvgSliceSpeed = createUI_53_BreakBy_AvgSliceSpeed(_pageBookBreakTime);
             _pageBreakBy_AvgSpeed = createUI_54_BreakBy_AvgSpeed(_pageBookBreakTime);
@@ -2237,7 +2223,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private Composite createUI_53_BreakBy_AvgSliceSpeed(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
       {
@@ -2252,8 +2237,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
             // spinner: minimum speed
             _spinnerBreak_MinAvgSpeedAS = new Spinner(container, SWT.BORDER);
-            GridDataFactory.fillDefaults()//
-                  .applyTo(_spinnerBreak_MinAvgSpeedAS);
             _spinnerBreak_MinAvgSpeedAS.setMinimum(0); // 0.0 km/h
             _spinnerBreak_MinAvgSpeedAS.setMaximum(PrefPageComputedValues.BREAK_MAX_SPEED_KM_H); // 10.0 km/h
             _spinnerBreak_MinAvgSpeedAS.setDigits(1);
@@ -2281,8 +2264,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
             // spinner: minimum speed
             _spinnerBreak_MinSliceSpeedAS = new Spinner(container, SWT.BORDER);
-            GridDataFactory.fillDefaults()//
-                  .applyTo(_spinnerBreak_MinSliceSpeedAS);
             _spinnerBreak_MinSliceSpeedAS.setMinimum(0); // 0.0 km/h
             _spinnerBreak_MinSliceSpeedAS.setMaximum(PrefPageComputedValues.BREAK_MAX_SPEED_KM_H); // 10.0 km/h
             _spinnerBreak_MinSliceSpeedAS.setDigits(1);
@@ -2310,8 +2291,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
             // spinner: minimum slice time
             _spinnerBreak_MinSliceTimeAS = new Spinner(container, SWT.BORDER);
-            GridDataFactory.fillDefaults()//
-                  .applyTo(_spinnerBreak_MinSliceTimeAS);
             _spinnerBreak_MinSliceTimeAS.setMinimum(0); // 0 sec
             _spinnerBreak_MinSliceTimeAS.setMaximum(10); // 10 sec
             _spinnerBreak_MinSliceTimeAS.addMouseWheelListener(new MouseWheelListener() {
@@ -2334,7 +2313,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private Composite createUI_54_BreakBy_AvgSpeed(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
       {
@@ -2349,7 +2327,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
          // spinner: minimum speed
          _spinnerBreak_MinAvgSpeed = new Spinner(container, SWT.BORDER);
-         GridDataFactory.fillDefaults().hint(_spinnerWidth, SWT.DEFAULT).applyTo(_spinnerBreak_MinAvgSpeed);
          _spinnerBreak_MinAvgSpeed.setMinimum(0); // 0.0 km/h
          _spinnerBreak_MinAvgSpeed.setMaximum(PrefPageComputedValues.BREAK_MAX_SPEED_KM_H); // 10.0 km/h
          _spinnerBreak_MinAvgSpeed.setDigits(1);
@@ -2366,6 +2343,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                onSelect_BreakTime();
             }
          });
+         GridDataFactory.fillDefaults()
+               .hint(_spinnerWidth, SWT.DEFAULT)
+               .applyTo(_spinnerBreak_MinAvgSpeed);
 
          // label: km/h
          label = new Label(container, SWT.NONE);
@@ -2378,7 +2358,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private Composite createUI_55_BreakBy_SliceSpeed(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
       {
@@ -2393,7 +2372,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
          // spinner: minimum speed
          _spinnerBreak_MinSliceSpeed = new Spinner(container, SWT.BORDER);
-         GridDataFactory.fillDefaults().hint(_spinnerWidth, SWT.DEFAULT).applyTo(_spinnerBreak_MinSliceSpeed);
          _spinnerBreak_MinSliceSpeed.setMinimum(0); // 0.0 km/h
          _spinnerBreak_MinSliceSpeed.setMaximum(PrefPageComputedValues.BREAK_MAX_SPEED_KM_H); // 10.0 km/h
          _spinnerBreak_MinSliceSpeed.setDigits(1);
@@ -2410,6 +2388,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                onSelect_BreakTime();
             }
          });
+         GridDataFactory.fillDefaults()
+               .hint(_spinnerWidth, SWT.DEFAULT)
+               .applyTo(_spinnerBreak_MinSliceSpeed);
 
          // label: km/h
          label = new Label(container, SWT.NONE);
@@ -2422,7 +2403,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private Composite createUI_56_BreakBy_TimeDistance(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
       {
          /*
@@ -2436,7 +2416,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
             // spinner: break minimum time
             _spinnerBreak_ShortestTime = new Spinner(container, SWT.BORDER);
-            GridDataFactory.fillDefaults().hint(_spinnerWidth, SWT.DEFAULT).applyTo(_spinnerBreak_ShortestTime);
             _spinnerBreak_ShortestTime.setMinimum(1);
             _spinnerBreak_ShortestTime.setMaximum(120); // 120 seconds
             _spinnerBreak_ShortestTime.addSelectionListener(new SelectionAdapter() {
@@ -2452,6 +2431,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                   onSelect_BreakTime();
                }
             });
+            GridDataFactory.fillDefaults().hint(_spinnerWidth, SWT.DEFAULT).applyTo(_spinnerBreak_ShortestTime);
 
             // label: unit
             label = new Label(container, SWT.NONE);
@@ -2469,7 +2449,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
             // spinner: break minimum time
             _spinnerBreak_MaxDistance = new Spinner(container, SWT.BORDER);
-            GridDataFactory.fillDefaults().hint(_spinnerWidth, SWT.DEFAULT).applyTo(_spinnerBreak_MaxDistance);
             _spinnerBreak_MaxDistance.setMinimum(1);
             _spinnerBreak_MaxDistance.setMaximum(1000); // 1000 m/yards
             _spinnerBreak_MaxDistance.addSelectionListener(new SelectionAdapter() {
@@ -2485,14 +2464,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                   onSelect_BreakTime();
                }
             });
+            GridDataFactory.fillDefaults().hint(_spinnerWidth, SWT.DEFAULT).applyTo(_spinnerBreak_MaxDistance);
 
             // label: unit
             _lblBreakDistanceUnit = new Label(container, SWT.NONE);
             _lblBreakDistanceUnit.setText(net.tourbook.common.UI.UNIT_LABEL_DISTANCE_M_OR_YD);
-            GridDataFactory.fillDefaults()//
-//						.span(2, 1)
-                  .align(SWT.FILL, SWT.CENTER)
-                  .applyTo(_lblBreakDistanceUnit);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblBreakDistanceUnit);
          }
 
          /*
@@ -2507,7 +2484,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
             // spinner: slice diff break time
             _spinnerBreak_SliceDiff = new Spinner(container, SWT.BORDER);
-            GridDataFactory.fillDefaults().hint(_spinnerWidth, SWT.DEFAULT).applyTo(_spinnerBreak_SliceDiff);
             _spinnerBreak_SliceDiff.setMinimum(0);
             _spinnerBreak_SliceDiff.setMaximum(60); // minutes
             _spinnerBreak_SliceDiff.addSelectionListener(new SelectionAdapter() {
@@ -2523,6 +2499,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                   onSelect_BreakTime();
                }
             });
+            GridDataFactory.fillDefaults().hint(_spinnerWidth, SWT.DEFAULT).applyTo(_spinnerBreak_SliceDiff);
 
             // label: unit
             label = new Label(container, SWT.NONE);
@@ -2538,6 +2515,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(false, true).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
       {
          /*
           * button: restore from defaults
@@ -2578,7 +2556,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_CYAN));
       {
          {
             /*
@@ -2636,7 +2614,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             // label: unit
             _lblSurfing_MinStartStopSpeed_Unit = new Label(container, SWT.NONE);
             _lblSurfing_MinStartStopSpeed_Unit.setText(UI.UNIT_LABEL_SPEED);
-            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).applyTo(_lblSurfing_MinStartStopSpeed_Unit);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblSurfing_MinStartStopSpeed_Unit);
          }
          {
             /*
@@ -2659,7 +2637,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             // label: unit
             _lblSurfing_MinSurfingSpeed_Unit = new Label(container, SWT.NONE);
             _lblSurfing_MinSurfingSpeed_Unit.setText(UI.UNIT_LABEL_SPEED);
-            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).applyTo(_lblSurfing_MinSurfingSpeed_Unit);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblSurfing_MinSurfingSpeed_Unit);
          }
          {
             /*
@@ -2682,7 +2660,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             // label: unit
             _lblSurfing_MinSurfingTimeDuration_Unit = new Label(container, SWT.NONE);
             _lblSurfing_MinSurfingTimeDuration_Unit.setText(Messages.App_Unit_Seconds_Small);
-            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).applyTo(_lblSurfing_MinSurfingTimeDuration_Unit);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblSurfing_MinSurfingTimeDuration_Unit);
          }
          {
             /*
@@ -2707,7 +2685,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                // label: unit
                _lblSurfing_MinSurfingDistance_Unit = new Label(container, SWT.NONE);
                _lblSurfing_MinSurfingDistance_Unit.setText(UI.UNIT_LABEL_DISTANCE_M_OR_YD);
-               GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).applyTo(_lblSurfing_MinSurfingDistance_Unit);
+               GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblSurfing_MinSurfingDistance_Unit);
             }
          }
       }
@@ -2718,11 +2696,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
-//            .grab(true, false)
             .indent(20, 0)
             .applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
       {
          {
             /*
@@ -2763,7 +2740,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
-            .grab(true, true)
+            .grab(false, true)
             .align(SWT.FILL, SWT.END)
             .applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
@@ -2874,8 +2851,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       final Label label = new Label(parent, SWT.TRAIL);
 
       GridDataFactory.fillDefaults()//
-            .align(SWT.END, SWT.CENTER)
-            .grab(true, false)
+            .align(SWT.FILL, SWT.CENTER)
+//            .grab(true, false)
             .hint(_pc.convertWidthInCharsToPixels(18), SWT.DEFAULT)
             .applyTo(label);
 
@@ -2884,38 +2861,43 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
    private Spinner createUI_DP_Tolerance(final Composite parent) {
 
-      // label: DP Tolerance
-      final Link linkDP = new Link(parent, SWT.NONE);
-      linkDP.setText(Messages.Tour_Segmenter_Label_DPTolerance);
-      linkDP.setToolTipText(Messages.Tour_Segmenter_Label_DPTolerance_Tooltip);
-      linkDP.addSelectionListener(new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            WEB.openUrl(PrefPageComputedValues.URL_DOUGLAS_PEUCKER_ALGORITHM);
-         }
-      });
+      {
+         // label: DP Tolerance
+         final Link linkDP = new Link(parent, SWT.NONE);
+         linkDP.setText(Messages.Tour_Segmenter_Label_DPTolerance);
+         linkDP.setToolTipText(Messages.Tour_Segmenter_Label_DPTolerance_Tooltip);
+         linkDP.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               WEB.openUrl(PrefPageComputedValues.URL_DOUGLAS_PEUCKER_ALGORITHM);
+            }
+         });
+      }
 
-      // spinner: DP tolerance
-      final Spinner spinner = new Spinner(parent, SWT.BORDER);
-      GridDataFactory.fillDefaults().applyTo(spinner);
-      spinner.setMinimum(1); // 0.1
-      spinner.setMaximum(10000); // 1000
-      spinner.setDigits(1);
+      Spinner spinner;
+      {
+         // spinner: DP tolerance
+         spinner = new Spinner(parent, SWT.BORDER);
+//         GridDataFactory.fillDefaults().applyTo(spinner);
+         spinner.setMinimum(1); // 0.1
+         spinner.setMaximum(10000); // 1000
+         spinner.setDigits(1);
 
-      spinner.addSelectionListener(new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onSelect_Tolerance();
-         }
-      });
+         spinner.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               onSelect_Tolerance();
+            }
+         });
 
-      spinner.addMouseWheelListener(new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
-            UI.adjustSpinnerValueOnMouseScroll(event);
-            onSelect_Tolerance();
-         }
-      });
+         spinner.addMouseWheelListener(new MouseWheelListener() {
+            @Override
+            public void mouseScrolled(final MouseEvent event) {
+               UI.adjustSpinnerValueOnMouseScroll(event);
+               onSelect_Tolerance();
+            }
+         });
+      }
 
       return spinner;
    }
@@ -3129,7 +3111,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             colDef.printValue_0(cell, value);
 
             if (segment.isTotal) {
-               setTotalStyle(cell);
+               setStyle_ColumnTotal(cell);
             }
          }
       });
@@ -3158,7 +3140,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             colDef.printValue_0(cell, value);
 
             if (segment.isTotal) {
-               setTotalStyle(cell);
+               setStyle_ColumnTotal(cell);
             }
          }
       });
@@ -3282,7 +3264,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             colDef.printDetailValue(cell, value);
 
             if (segment.isTotal) {
-               setTotalStyle(cell);
+               setStyle_ColumnTotal(cell);
             }
          }
       });
@@ -3339,8 +3321,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             if (segment.isTotal) {
                cell.setText(UI.EMPTY_STRING);
             } else {
+
                cell.setText(Integer.toString(segment.sequence));
+
+               if (segment.filter == 1) {
+                  setStyle_Filter(cell);
+               }
             }
+
          }
       });
    }
@@ -3379,6 +3367,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                cell.setText(startIndex == endIndex
                      ? Integer.toString(uiStartIndex)
                      : uiStartIndex + UI.DASH_WITH_SPACE + uiEndIndex);
+
+               if (segment.filter == 1) {
+                  setStyle_Filter(cell);
+               }
             }
          }
       });
@@ -3410,7 +3402,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             }
 
             if (segment.isTotal) {
-               setTotalStyle(cell);
+               setStyle_ColumnTotal(cell);
             }
          }
       });
@@ -3464,9 +3456,15 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
             colDef.printDetailValue(cell, value);
 
-            if (segment.isTotal) {
-               setTotalStyle(cell);
+            if (segment.filter == 1) {
+
+               setStyle_Filter(cell);
+
+            } else if (segment.isTotal) {
+
+               setStyle_ColumnTotal(cell);
             }
+
          }
       });
    }
@@ -3492,8 +3490,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
             colDef.printDetailValue(cell, value);
 
-            if (segment.isTotal) {
-               setTotalStyle(cell);
+            if (segment.filter == 1) {
+               setStyle_Filter(cell);
+            } else if (segment.isTotal) {
+               setStyle_ColumnTotal(cell);
             }
          }
       });
@@ -3545,7 +3545,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             colDef.printDetailValue(cell, value);
 
             if (segment.isTotal) {
-               setTotalStyle(cell);
+               setStyle_ColumnTotal(cell);
             }
          }
       });
@@ -3601,7 +3601,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             colDef.printDetailValue(cell, value);
 
             if (segment.isTotal) {
-               setTotalStyle(cell);
+               setStyle_ColumnTotal(cell);
             }
          }
       });
@@ -3629,7 +3629,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             colDef.printDetailValue(cell, value);
 
             if (segment.isTotal) {
-               setTotalStyle(cell);
+               setStyle_ColumnTotal(cell);
             }
          }
       });
@@ -3656,8 +3656,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
             colDef.printDetailValue(cell, value);
 
-            if (segment.isTotal) {
-               setTotalStyle(cell);
+            if (segment.filter == 1) {
+               setStyle_Filter(cell);
+            } else if (segment.isTotal) {
+               setStyle_ColumnTotal(cell);
             }
          }
       });
@@ -4113,6 +4115,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
    private void onSaveTour_Altitude() {
 
+      if (_savedDpToleranceAltitude == -1) {
+         return;
+      }
+
       _tourData.setTourAltUp(_altitudeUp);
       _tourData.setTourAltDown(_altitudeDown);
 
@@ -4123,11 +4129,15 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       removeVisibleDataPointsBeforeNextTourIsSet();
 
-      _tourData = saveTour();
+      final TourData tourData = saveTour();
+      if (tourData != null) {
 
-      // create segments with newly saved tour that it can be displayed in the tour chart
-      createSegments(false);
-      updateUI_Altitude();
+         _tourData = tourData;
+
+         // create segments with newly saved tour that it can be displayed in the tour chart
+         createSegments(false);
+         updateUI_Altitude();
+      }
    }
 
    private void onSelect_BreakTime() {
@@ -4631,8 +4641,17 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    }
 
    private void onSurfing_SaveTour() {
-      // TODO Auto-generated method stub
 
+      _tourData.isSaveVisibleDataPoints = true;
+      {
+         _isTourDirty = true;
+
+         final TourData tourData = saveTour();
+         if (tourData != null) {
+            _tourData = tourData;
+         }
+      }
+      _tourData.isSaveVisibleDataPoints = false;
    }
 
    @Override
@@ -4989,14 +5008,22 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       saveBreakTimeValues_InState();
    }
 
+   /**
+    * @return Returns saved tour entity or <code>null</code> when saving is not done.
+    */
    private TourData saveTour() {
+
+      // check if the tour editor contains a modified tour
+      if (TourManager.isTourEditorModified()) {
+         return null;
+      }
 
       if (_tourData != null) {
          // it's possible that the break time serie was overwritten
          _tourData.setBreakTimeSerie(null);
       }
 
-      if (_isTourDirty == false || _tourData == null || _savedDpToleranceAltitude == -1) {
+      if (_isTourDirty == false || _tourData == null) {
          // nothing to do
          return null;
       }
@@ -5121,9 +5148,15 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       }
    }
 
-   private void setTotalStyle(final ViewerCell cell) {
+   private void setStyle_ColumnTotal(final ViewerCell cell) {
 
       cell.setBackground(_colorCache.get(STATE_COLOR_TOTALS));
+   }
+
+   private void setStyle_Filter(final ViewerCell cell) {
+
+      cell.setBackground(_colorCache.get(SEGMENTER_FILTER_BACKGROUND_HEADER));
+//      cell.setBackground(_colorCache.get(SEGMENTER_FILTER_BACKGROUND));
    }
 
    /**
