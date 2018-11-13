@@ -187,6 +187,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	public static final Float 			RUN_DYN_DATA_MULTIPLIER				= 100f;
 
+	public static final short        DISABLED_SURFING_VALUES          = -1;
+
 	/**
 	 * Device Id for manually created tours
 	 */
@@ -391,7 +393,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * Number of HR zones which are available for this tour, is 0 when HR zones are not defined.
 	 */
 	private int							numberOfHrZones					= 0;							// db-version 18
-
 	/**
 	 * Time for all HR zones are contained in {@link #hrZone0} ... {@link #hrZone9}. Each tour can
 	 * have up to 10 HR zones, when HR zone value is <code>-1</code> then this zone is not set.
@@ -407,6 +408,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	private int							hrZone6								= -1;							// db-version 16
 	private int							hrZone7								= -1;							// db-version 16
 	private int							hrZone8								= -1;							// db-version 16
+
 	private int							hrZone9								= -1;							// db-version 16
 
 	/**
@@ -490,7 +492,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/** Functional Threshold Power (FTP) */
 	private int							power_FTP;
-
 	/** Total work in Joule */
 	private long						power_TotalWork;
 	private float						power_TrainingStressScore;
@@ -639,39 +640,49 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 */
 	private int							numberOfTimeSlices;
 
-	/**
-	 * Time adjustment in seconds, this is an average value for all photos.
-	 */
-	private int							photoTimeAdjustment;
+   /**
+    * Time adjustment in seconds, this is an average value for all photos.
+    */
+   private int photoTimeAdjustment;
 
 	// ############################################# GEARS #############################################
 
-	private int							frontShiftCount;
+   private int frontShiftCount;
 
-	private int							rearShiftCount;
+	private int	rearShiftCount;
 
-	// ############################################# RUNNING DYNAMICS #######################################
+   // ############################################# RUNNING DYNAMICS #######################################
 
-	private short						runDyn_StanceTime_Min;
-	private short						runDyn_StanceTime_Max;
-	private float						runDyn_StanceTime_Avg;
+   private short runDyn_StanceTime_Min;
+   private short runDyn_StanceTime_Max;
+	private float runDyn_StanceTime_Avg;
 
-	private short						runDyn_StanceTimeBalance_Min;
-	private short						runDyn_StanceTimeBalance_Max;
-	private float						runDyn_StanceTimeBalance_Avg;
+   private short runDyn_StanceTimeBalance_Min;
+   private short runDyn_StanceTimeBalance_Max;
+	private float runDyn_StanceTimeBalance_Avg;
 
-	private short						runDyn_StepLength_Min;
-	private short						runDyn_StepLength_Max;
-	private float						runDyn_StepLength_Avg;
+   private short runDyn_StepLength_Min;
+   private short runDyn_StepLength_Max;
+	private float runDyn_StepLength_Avg;
 
-	private short						runDyn_VerticalOscillation_Min;
-	private short						runDyn_VerticalOscillation_Max;
-	private float						runDyn_VerticalOscillation_Avg;
+   private short runDyn_VerticalOscillation_Min;
+   private short runDyn_VerticalOscillation_Max;
+	private float runDyn_VerticalOscillation_Avg;
 
-	private short						runDyn_VerticalRatio_Min;
-	private short						runDyn_VerticalRatio_Max;
-	private float						runDyn_VerticalRatio_Avg;
+   private short runDyn_VerticalRatio_Min;
+   private short runDyn_VerticalRatio_Max;
+   private float runDyn_VerticalRatio_Avg;
 
+   // ############################################# SURFING #######################################
+
+   // -1 indicate that the value is not set
+
+   private short surfing_MinSpeed_StartStop = DISABLED_SURFING_VALUES;
+   private short surfing_MinSpeed_Surfing   = DISABLED_SURFING_VALUES;
+   private short surfing_MinTimeDuration    = DISABLED_SURFING_VALUES;
+
+   private boolean surfing_IsMinDistance;
+   private short surfing_MinDistance        = DISABLED_SURFING_VALUES;
 
 	// ############################################# GEO BOUNDS #############################################
 
@@ -683,6 +694,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 //	private int							latitudeMaxE6;								// db-version 35
 //	private int							longitudeMinE6;							// db-version 35
 //	private int							longitudeMaxE6;							// db-version 35
+
 
 
 	// ############################################# UNUSED FIELDS - START #############################################
@@ -1087,7 +1099,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 */
 	@Transient
 	public int							offsetDDRecord;
-
 	/*
 	 * data for the tour segments
 	 */
@@ -1097,14 +1108,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	private int[]						segmentSerie_Time_Recording;
 	@Transient
 	public int[]						segmentSerie_Time_Driving;
+
 	@Transient
 	private int[]						segmentSerie_Time_Break;
-
 	@Transient
 	private float[]					segmentSerie_Distance_Diff;
+
 	@Transient
 	private float[]					segmentSerie_Distance_Total;
-
 	@Transient
 	public float[]						segmentSerie_Altitude_Diff;
 	@Transient
@@ -1113,9 +1124,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	public float[]						segmentSerie_Altitude_UpDown_Hour;
 	@Transient
 	public float						segmentSerieTotal_Altitude_Down;
+
 	@Transient
 	public float						segmentSerieTotal_Altitude_Up;
-
 	@Transient
 	public float[]						segmentSerie_Speed;
 	@Transient
@@ -1128,6 +1139,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	public float[]						segmentSerie_Power;
 	@Transient
 	public float[]						segmentSerie_Gradient;
+
 	@Transient
 	public float[]						segmentSerie_Pulse;
 
@@ -1387,7 +1399,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 */
 	@Transient
 	public boolean					isBackupImportFile;
-
 	/*
 	 * Running dynamics data
 	 *
@@ -1407,28 +1418,28 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 */
 	@Transient
 	public short[]		runDyn_StanceTime;
+
 	@Transient
 	private float[] 	_runDyn_StanceTime_UI;
-
 	@Transient
 	public short[]		runDyn_StanceTimeBalance;
+
 	@Transient
 	private float[] 	_runDyn_StanceTimeBalance_UI;
-
 	@Transient
 	public short[]		runDyn_StepLength;
 	@Transient
 	private float[]	_runDyn_StepLength_UI;
+
 	@Transient
 	private float[]	_runDyn_StepLength_UI_Imperial;
-
 	@Transient
 	public short[]		runDyn_VerticalOscillation;
 	@Transient
 	private float[]	_runDyn_VerticalOscillation_UI;
+
 	@Transient
 	private float[]	_runDyn_VerticalOscillation_UI_Imperial;
-
 	@Transient
 	public short[]		runDyn_VerticalRatio;
 	@Transient
@@ -1448,39 +1459,39 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    @Transient
    public int[]     swim_Time;
-
    /**
     * Swimming data: Activity is defined in {@link LengthType} e.g. active, idle. Contains
     * {@link Short#MIN_VALUE} when value is not set.
     */
    @Transient
    public short[]   swim_LengthType;
+
    @Transient
    private float[]  _swim_LengthType_UI;
-
    /**
     * Swimming data: Number of strokes. Contains {@link Short#MIN_VALUE} when value is not set.
     */
    @Transient
    public short[]   swim_Strokes;
+
    @Transient
    private float[]  _swim_Strokes_UI;
-
    /**
     * Swimming data: Stroke style is defined in {@link SwimStroke} e.g. freestyle, breaststroke...
     * Contains {@link Short#MIN_VALUE} when value is not set.
     */
    @Transient
    public short[]   swim_StrokeStyle;
+
    @Transient
    private float[]  _swim_StrokeStyle_UI;
-
    /**
     * Swimming data: Swimming cadence in strokes/min. Contains {@link Short#MIN_VALUE} when value is
     * not set.
     */
    @Transient
    public short[]   swim_Cadence;
+
    @Transient
    private float[]  _swim_Cadence_UI;
 
@@ -1505,7 +1516,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    @Transient
    public boolean[] visibleDataPointSerie;
-
    /**
     * When <code>true</code> then {@link #visibleDataPointSerie} will be saved, otherwise it will be
     * ignored when the tour is saved.
@@ -7451,6 +7461,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return startWeekYear;
    }
 
+   public short getSurfing_MinDistance() {
+      return surfing_MinDistance;
+   }
+
+   public short getSurfing_MinSpeed_StartStop() {
+      return surfing_MinSpeed_StartStop;
+   }
+
+   public short getSurfing_MinSpeed_Surfing() {
+      return surfing_MinSpeed_Surfing;
+   }
+
+   public short getSurfing_MinTimeDuration() {
+      return surfing_MinTimeDuration;
+   }
+
    /**
     * @return Returns the UI values for cadence.
     */
@@ -8089,6 +8115,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public boolean isStrideSensorPresent() {
       return isStrideSensorPresent == 1;
+   }
+
+   public boolean isSurfing_IsMinDistance() {
+      return surfing_IsMinDistance;
    }
 
    public boolean isTimeSerieWithTimeZoneAdjustment() {
@@ -8841,6 +8871,26 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public void setStartPulse(final short startPulse) {
       this.startPulse = startPulse;
+   }
+
+   public void setSurfing_IsMinDistance(final boolean surfing_IsMinDistance) {
+      this.surfing_IsMinDistance = surfing_IsMinDistance;
+   }
+
+   public void setSurfing_MinDistance(final short surfing_MinDistance) {
+      this.surfing_MinDistance = surfing_MinDistance;
+   }
+
+   public void setSurfing_MinSpeed_StartStop(final short surfing_MinSpeed_StartStop) {
+      this.surfing_MinSpeed_StartStop = surfing_MinSpeed_StartStop;
+   }
+
+   public void setSurfing_MinSpeed_Surfing(final short surfing_MinSpeed_Surfing) {
+      this.surfing_MinSpeed_Surfing = surfing_MinSpeed_Surfing;
+   }
+
+   public void setSurfing_MinTimeDuration(final short surfing_MinTimeDuration) {
+      this.surfing_MinTimeDuration = surfing_MinTimeDuration;
    }
 
    public void setTimeSerieDouble(final double[] timeSerieDouble) {
