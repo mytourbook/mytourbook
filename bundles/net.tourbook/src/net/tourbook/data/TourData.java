@@ -653,36 +653,36 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    // ############################################# RUNNING DYNAMICS #######################################
 
-   private short runDyn_StanceTime_Min;
-   private short runDyn_StanceTime_Max;
-	private float runDyn_StanceTime_Avg;
+   private short     runDyn_StanceTime_Min;
+   private short     runDyn_StanceTime_Max;
+	private float     runDyn_StanceTime_Avg;
 
-   private short runDyn_StanceTimeBalance_Min;
-   private short runDyn_StanceTimeBalance_Max;
-	private float runDyn_StanceTimeBalance_Avg;
+   private short     runDyn_StanceTimeBalance_Min;
+   private short     runDyn_StanceTimeBalance_Max;
+	private float     runDyn_StanceTimeBalance_Avg;
 
-   private short runDyn_StepLength_Min;
-   private short runDyn_StepLength_Max;
-	private float runDyn_StepLength_Avg;
+   private short     runDyn_StepLength_Min;
+   private short     runDyn_StepLength_Max;
+	private float     runDyn_StepLength_Avg;
 
-   private short runDyn_VerticalOscillation_Min;
-   private short runDyn_VerticalOscillation_Max;
-	private float runDyn_VerticalOscillation_Avg;
+   private short     runDyn_VerticalOscillation_Min;
+   private short     runDyn_VerticalOscillation_Max;
+	private float     runDyn_VerticalOscillation_Avg;
 
-   private short runDyn_VerticalRatio_Min;
-   private short runDyn_VerticalRatio_Max;
-   private float runDyn_VerticalRatio_Avg;
+   private short     runDyn_VerticalRatio_Min;
+   private short     runDyn_VerticalRatio_Max;
+   private float     runDyn_VerticalRatio_Avg;
 
    // ############################################# SURFING #######################################
 
    // -1 indicate that the value is not set
 
-   private short surfing_MinSpeed_StartStop = DISABLED_SURFING_VALUES;
-   private short surfing_MinSpeed_Surfing   = DISABLED_SURFING_VALUES;
-   private short surfing_MinTimeDuration    = DISABLED_SURFING_VALUES;
+   private short     surfing_MinSpeed_StartStop = DISABLED_SURFING_VALUES;
+   private short     surfing_MinSpeed_Surfing   = DISABLED_SURFING_VALUES;
+   private short     surfing_MinTimeDuration    = DISABLED_SURFING_VALUES;
 
-   private boolean surfing_IsMinDistance;
-   private short surfing_MinDistance        = DISABLED_SURFING_VALUES;
+   private boolean   surfing_IsMinDistance;
+   private short     surfing_MinDistance        = DISABLED_SURFING_VALUES;
 
 	// ############################################# GEO BOUNDS #############################################
 

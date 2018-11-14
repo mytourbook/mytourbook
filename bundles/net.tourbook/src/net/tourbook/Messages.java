@@ -2296,7 +2296,11 @@ public class Messages extends NLS {
    public static String Tour_Segmenter_Surfing_Label_MinSurfTimeDuration_Tooltip;
    public static String Tour_Segmenter_Surfing_Label_StartStopSpeedThreshold;
    public static String Tour_Segmenter_Surfing_Label_StartStopSpeedThreshold_Tooltip;
-
+   public static String Tour_Segmenter_SurfingFilter_All;
+   public static String Tour_Segmenter_SurfingFilter_OnlyNotSurfing;
+   public static String Tour_Segmenter_SurfingFilter_OnlySurfing;
+   public static String Tour_Segmenter_SurfingFilter_Paddling;
+   public static String Tour_Segmenter_SurfingFilter_Surfing;
    public static String Tour_Segmenter_Type_ByAltitude_Marker;
    public static String Tour_Segmenter_Type_ByAltitude_Merged;
    public static String Tour_Segmenter_Type_ByBreakTime;

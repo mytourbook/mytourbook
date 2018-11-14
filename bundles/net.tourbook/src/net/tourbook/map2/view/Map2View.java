@@ -2247,10 +2247,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
       } else if (selection instanceof SelectionChartXSliderPosition) {
 
          final SelectionChartXSliderPosition xSliderPos = (SelectionChartXSliderPosition) selection;
-         final Chart chart = xSliderPos.getChart();
-         if (chart == null) {
-            return;
-         }
 
          final Object customData = xSliderPos.getCustomData();
          if (customData instanceof SelectedTourSegmenterSegments) {
@@ -2262,6 +2258,11 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
             selectTourSegments((SelectedTourSegmenterSegments) customData);
 
          } else {
+
+            final Chart chart = xSliderPos.getChart();
+            if (chart == null) {
+               return;
+            }
 
             final ChartDataModel chartDataModel = chart.getChartDataModel();
             final Object tourId = chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
