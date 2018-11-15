@@ -228,6 +228,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 *
 	 * @since DB version 22
 	 */
+	@XmlElement
 	private long						tourStartTime;
 
 	/**
@@ -235,36 +236,43 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 *
 	 * @since DB version 22
 	 */
+	@XmlElement
 	private long						tourEndTime;
 
 	/**
 	 * year of tour start
 	 */
+	@XmlElement
 	private short						startYear;
 
 	/**
 	 * mm (d) month of tour
 	 */
+	@XmlElement
 	private short						startMonth;
 
 	/**
 	 * dd (d) day of tour
 	 */
+	@XmlElement
 	private short						startDay;
 
 	/**
 	 * HH (d) hour of tour
 	 */
+	@XmlElement
 	private short						startHour;
 
 	/**
 	 * MM (d) minute of tour
 	 */
+	@XmlElement
 	private short						startMinute;
 
 	/**
 	 *
 	 */
+	@XmlElement
 	private int							startSecond;														// db-version 7
 
 	/**
@@ -272,6 +280,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * <p>
 	 * This is used in sql queries.
 	 */
+	@XmlElement
 	private short						startWeek;
 
 	/**
@@ -303,6 +312,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	/**
 	 * Time zone ID or <code>null</code> when the time zone ID is not available.
 	 */
+	@XmlElement
 	private String						timeZoneId;
 
 	// ############################################# DISTANCE #############################################
@@ -408,7 +418,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	private int							hrZone6								= -1;							// db-version 16
 	private int							hrZone7								= -1;							// db-version 16
 	private int							hrZone8								= -1;							// db-version 16
-
 	private int							hrZone9								= -1;							// db-version 16
 
 	/**
@@ -492,6 +501,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	/** Functional Threshold Power (FTP) */
 	private int							power_FTP;
+
 	/** Total work in Joule */
 	private long						power_TotalWork;
 	private float						power_TrainingStressScore;
@@ -828,12 +838,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * The array {@link #timeSerie} is <code>null</code> for a manually created tour, it is
 	 * <b>always</b> set when tour is from a device or an imported file.
 	 */
+	@XmlElementWrapper(name = "TimeSeries")
+	@XmlElement(name = "TimeSerie")
 	@Transient
 	public int[]						timeSerie;
 
 	/**
 	 * Contains the absolute distance in m (metric system) or <code>null</code> when not available
 	 */
+	@XmlElementWrapper(name = "DistanceSeries")
+	@XmlElement(name = "DistanceSerie")
 	@Transient
 	public float[]						distanceSerie;
 
@@ -853,6 +867,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * Contains the absolute altitude in meter (metric system) or <code>null</code> when not
 	 * available.
 	 */
+	@XmlElementWrapper(name = "AltitudeSeries")
+	@XmlElement(name = "AltitudeSerie")
 	@Transient
 	public float[]						altitudeSerie;
 
@@ -884,9 +900,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	@Transient
 	private float[]					srtmSerieImperial;
 
+	@XmlElementWrapper(name = "CadenceSeries")
+	@XmlElement(name = "CadenceSerie")
 	@Transient
 	private float[]					cadenceSerie;
 
+	@XmlElementWrapper(name = "PulseSeries")
+	@XmlElement(name = "PulseSerie")
 	@Transient
 	public float[]						pulseSerie;
 
@@ -906,6 +926,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	/**
 	 * Contains the temperature in the metric measurement system.
 	 */
+	@XmlElementWrapper(name = "TemperatureSeries")
+	@XmlElement(name = "TemperatureSerie")
 	@Transient
 	public float[]						temperatureSerie;
 
@@ -921,6 +943,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * the metric speed serie is required when computing the power even if the current measurement
 	 * system is imperial
 	 */
+	@XmlElementWrapper(name = "SpeedSeries")
+	@XmlElement(name = "SpeedSerie")
 	@Transient
 	private float[]					speedSerie;
 
@@ -958,6 +982,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	@Transient
 	private float[]					paceSerieMinuteImperial;
 
+	@XmlElementWrapper(name = "PowerSeries")
+	@XmlElement(name = "PowerSerie")
 	@Transient
 	private float[]					powerSerie;
 
@@ -986,9 +1012,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	/**
 	 * Contains tour latitude data or <code>null</code> when GPS data are not available.
 	 */
+	@XmlElementWrapper(name = "LatitudeSeries")
+	@XmlElement(name = "LatitudeSerie")
 	@Transient
 	public double[]					latitudeSerie;
 
+	@XmlElementWrapper(name = "LongitudeSeries")
+	@XmlElement(name = "LongitudeSerie")
 	@Transient
 	public double[]					longitudeSerie;
 
@@ -1448,7 +1478,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 // SET_FORMATTING_ON
 
    /**
-    * Swimming data have a different number of time slices than the other data series !!!
+    * Swimming data has a different number of time slices than the other data series !!!
     *
     * @since Version 18.10
     */
@@ -9768,7 +9798,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public String toXml() {
 
       try {
-         final JAXBContext context = JAXBContext.newInstance(this.getClass());
+         final JAXBContext context = JAXBContext.newInstance(TourData.class);
          final Marshaller marshaller = context.createMarshaller();
          final StringWriter sw = new StringWriter();
          marshaller.marshal(this, sw);
