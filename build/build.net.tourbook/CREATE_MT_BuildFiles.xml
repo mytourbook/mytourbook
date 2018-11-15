@@ -64,7 +64,7 @@
 
 				<exclude name="**/bin/**" />
 				<exclude name="**/classes/**" />
-				<exclude name="**/testFiles**" />
+				<exclude name="**/testFiles/**" />
 
 				<!-- ignore empty files -->
 				<size value="0" when="more" />
