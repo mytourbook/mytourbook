@@ -229,7 +229,6 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       }
    }
 
-
    private void createUI_30_OtherOptions(final Composite parent) {
 
       {
@@ -301,22 +300,8 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
    private void onChangeFontInEditor() {
 
-      enableControls();
-
-      // resize slideout
-//      final Shell shell = _shellContainer.getShell();
-//      shell.pack(true);
-//      _uiContainer.pack();
-
-      /*
-       * Update state
-       */
+      // update state, this will fire IMappingPreferences.THEME_FONT_LOGGING event which will recreate the font
       _valueFontEditor.store();
-
-      /*
-       * Update UI
-       */
-//      _tourSegmenterView.fireSegmentLayerChanged();
    }
 
    /**
