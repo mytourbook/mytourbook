@@ -2228,6 +2228,11 @@ public class Messages extends NLS {
    public static String Tour_Filter_Operator_Season_UntilToday_From_YearStart;
    public static String Tour_Filter_Operator_StartsWith;
 
+   public static String Tour_Info_Flag_Array;
+   public static String Tour_Info_Flag_Database;
+   public static String Tour_Info_Label_AllFields;
+   public static String Tour_Info_Label_AllFields_Tooltip;
+
    public static String Tour_Log_Action_Clear_Tooltip;
 
    public static String Tour_Marker_Column_Description_ShortCut;
@@ -2274,6 +2279,7 @@ public class Messages extends NLS {
    public static String Tour_Segmenter_Action_ShowHideSegmentsInTourChart_Tooltip;
    public static String Tour_Segmenter_Button_SaveTour;
    public static String Tour_Segmenter_Button_SaveTour_Tooltip;
+   public static String Tour_Segmenter_Button_SurfingSaveState_Tooltip;
    public static String Tour_Segmenter_Button_SurfingSaveTour_Tooltip;
    public static String Tour_Segmenter_Label_AltitudeUpDown_Tooltip;
    public static String Tour_Segmenter_Label_DPTolerance;

@@ -15,7 +15,9 @@
  *******************************************************************************/
 package net.tourbook.ui.views;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -73,9 +75,11 @@ import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 
 public class TourInfoView extends ViewPart {
 
-   public static final String      ID         = "net.tourbook.ui.views.TourInfoView"; //$NON-NLS-1$
+   public static final String      ID                   = "net.tourbook.ui.views.TourInfoView"; //$NON-NLS-1$
 
-   private final IPreferenceStore  _prefStore = TourbookPlugin.getPrefStore();
+   private static final String     ANNOTATION_TRANSIENT = "Transient";                          //$NON-NLS-1$
+
+   private final IPreferenceStore  _prefStore           = TourbookPlugin.getPrefStore();
 
    private PostSelectionProvider   _postSelectionProvider;
    private ISelectionListener      _postSelectionListener;
@@ -87,12 +91,17 @@ public class TourInfoView extends ViewPart {
    /*
     * UI controls
     */
-   private PageBook          _pageBook;
+   private PageBook  _pageBook;
 
-   private Composite         _pageNoData;
-   private Composite         _pageContent;
+   private Composite _pageNoData;
+   private Composite _pageContent;
 
-   private Text              _txtAllFields;
+   /**
+    * With a label, the content can easily be scrolled but cannot be selected
+    */
+   private Label     _txtAllFields;
+//   private Text    _txtAllFields;
+
    private Text              _txtDateTimeCreated;
    private Text              _txtDateTimeModified;
    private Text              _txtDeviceName;
@@ -116,19 +125,65 @@ public class TourInfoView extends ViewPart {
    public static Collection<Field> getAllFields(final Class<?> type) {
 
       final TreeSet<Field> fields = new TreeSet<>(
+
             new Comparator<Field>() {
+
                @Override
-               public int compare(final Field o1, final Field o2) {
-                  int res = o1.getName().compareTo(o2.getName());
-                  if (0 != res) {
-                     return res;
+               public int compare(final Field field1, final Field field2) {
+
+                  /*
+                   * 1st Sort: db fields
+                   */
+                  boolean isTransient1 = false;
+                  for (final Annotation annotation : field1.getAnnotations()) {
+                     isTransient1 = ANNOTATION_TRANSIENT.equals(annotation.annotationType().getSimpleName());
                   }
-                  res = o1.getDeclaringClass().getSimpleName().compareTo(o2.getDeclaringClass().getSimpleName());
-                  if (0 != res) {
-                     return res;
+                  boolean isTransient2 = false;
+                  for (final Annotation annotation : field2.getAnnotations()) {
+                     isTransient2 = ANNOTATION_TRANSIENT.equals(annotation.annotationType().getSimpleName());
                   }
-                  res = o1.getDeclaringClass().getName().compareTo(o2.getDeclaringClass().getName());
-                  return res;
+
+                  if (isTransient1 && !isTransient2) {
+                     return 1;
+                  } else if (isTransient2 && !isTransient1) {
+                     return -1;
+                  }
+
+                  /*
+                   * 2nd Sort: array
+                   */
+                  final Class<?> fieldType1 = field1.getType();
+                  boolean isArray1 = false;
+                  if (fieldType1 != null) {
+                     isArray1 = fieldType1.isArray();
+                  }
+                  final Class<?> fieldType2 = field2.getType();
+                  boolean isArray2 = false;
+                  if (fieldType2 != null) {
+                     isArray2 = fieldType2.isArray();
+                  }
+                  if (isArray1 && !isArray2) {
+                     return -1;
+                  } else if (isArray2 && !isArray1) {
+                     return 1;
+                  }
+
+                  /*
+                   * Sort by name
+                   */
+                  int compareResult = field1.getName().compareTo(field2.getName());
+                  if (0 != compareResult) {
+                     return compareResult;
+                  }
+
+                  compareResult = field1.getDeclaringClass().getSimpleName().compareTo(field2.getDeclaringClass().getSimpleName());
+                  if (0 != compareResult) {
+                     return compareResult;
+                  }
+
+                  compareResult = field1.getDeclaringClass().getName().compareTo(field2.getDeclaringClass().getName());
+
+                  return compareResult;
                }
             });
 
@@ -143,32 +198,60 @@ public class TourInfoView extends ViewPart {
 
       final StringBuilder sb = new StringBuilder();
 
+      int fieldNumber = 1;
+
       for (final Field field : getAllFields(obj.getClass())) {
 
-         field.setAccessible(true);
-         final String name = field.getName();
-         Object value = null;
+         final int modifiers = field.getModifiers();
 
+         // skip contstants
+         final boolean isConstant = Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers);
+         if (isConstant) {
+            continue;
+         }
+
+         // transient flag, isTransient is not working !!!
+         boolean isTransient = false;
+         for (final Annotation annotation : field.getAnnotations()) {
+            isTransient = ANNOTATION_TRANSIENT.equals(annotation.annotationType().getSimpleName());
+         }
+
+         // name
+         field.setAccessible(true);
+         final String fieldName = field.getName();
+
+         // value
+         Object value = null;
          try {
             value = field.get(obj);
          } catch (IllegalArgumentException | IllegalAccessException e) {
             e.printStackTrace();
          }
-
-         String valueString = "";
+         String valueString = UI.EMPTY_STRING;
          if (value != null) {
             valueString = value.toString();
          }
-         sb.append(String.format("%s %-40s = %s\n",
 
-               value == null ? " " : "*",
-//               field.getDeclaringClass().getSimpleName(),
-               name,
+         // type
+         final Class<?> fieldType = field.getType();
+
+         // is array flag
+         boolean isArray = false;
+         if (fieldType != null) {
+            isArray = fieldType.isArray();
+         }
+
+//       sb.append(String.format("%-4d %-3s %-3s %-40s %-20s %s\n", //$NON-NLS-1$
+         sb.append(String.format("%-4d %-3s %-3s %-40s %s\n", //$NON-NLS-1$
+
+               fieldNumber++,
+               isTransient ? UI.EMPTY_STRING : Messages.Tour_Info_Flag_Database,
+               isArray ? Messages.Tour_Info_Flag_Array : UI.EMPTY_STRING,
+               fieldName,
+//               fieldType == null ? UI.EMPTY_STRING : fieldType.getSimpleName(),
                valueString
 
          ));
-//       sb.append(String.format("%-50s\n", field.getName()));
-
       }
 
       return sb.toString();
@@ -492,16 +575,20 @@ public class TourInfoView extends ViewPart {
 
    private void createUI_30_AllFields(final Composite parent) {
 
-      _txtAllFields = new Text(parent,
-            SWT.MULTI
-                  | SWT.BORDER //
-                  | SWT.READ_ONLY
-//                  | SWT.WRAP
-//                  | SWT.V_SCROLL
-//                  | SWT.H_SCROLL//
-      );
+      final Label label = createUI_Label(parent, Messages.Tour_Info_Label_AllFields);
+      label.setToolTipText(Messages.Tour_Info_Label_AllFields_Tooltip);
+      GridDataFactory.fillDefaults().indent(0, 20).applyTo(label);
 
-//      _txtAllFields = new Label(parent, SWT.READ_ONLY | SWT.BORDER | SWT.WRAP);
+//      _txtAllFields = new Text(parent,
+//            SWT.MULTI
+//                  | SWT.BORDER //
+//                  | SWT.READ_ONLY);
+
+      _txtAllFields = new Label(parent,
+            SWT.READ_ONLY
+//                  | SWT.BORDER
+//                  | SWT.WRAP
+      );
 
       _txtAllFields.setFont(net.tourbook.ui.UI.getLogFont());
 

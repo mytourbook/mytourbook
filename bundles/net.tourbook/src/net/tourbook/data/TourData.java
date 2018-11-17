@@ -8284,6 +8284,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
+    * @return Returns <code>true</code> when the {@link #visibleDataPointSerie} is saved in the
+    *         tour.
+    */
+   public boolean isVisibleDataPointSerieSaved() {
+
+      return serieData.visibleDataPoint != null;
+   }
+
+   /**
     * Called after the object was loaded from the persistence store
     */
    @PostLoad

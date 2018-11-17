@@ -63,6 +63,16 @@ public class ActionTourChartSegmenterConfig extends ContributionItem {
 
       _imageEnabled = TourbookPlugin.getImageDescriptor(IMAGE_TOUR_SEGMENTS).createImage();
       _imageDisabled = TourbookPlugin.getImageDescriptor(IMAGE_TOUR_SEGMENTS_DISABLED).createImage();
+
+      _parent.addDisposeListener(new DisposeListener() {
+
+         @Override
+         public void widgetDisposed(final DisposeEvent e) {
+
+            _imageEnabled.dispose();
+            _imageDisabled.dispose();
+         }
+      });
    }
 
    @Override

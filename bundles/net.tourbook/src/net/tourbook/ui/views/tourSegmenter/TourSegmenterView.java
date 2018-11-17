@@ -49,10 +49,12 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Button;
@@ -420,10 +422,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private Composite                      _parent;
    //
    private PageBook                       _pageBookUI;
-
    private PageBook                       _pageBookSegmenter;
-
    private PageBook                       _pageBookBreakTime;
+   //
    private Button                         _btnSaveTourDP;
    private Button                         _btnSaveTourMin;
    //
@@ -444,6 +445,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private Composite                      _pageSegType_DPPower;
    private Composite                      _pageSegType_DPPulse;
    private Composite                      _pageSegType_Surfing;
+   //
    private Button                         _btnSurfing_RestoreDefaults;
    private Button                         _btnSurfing_SaveTour;
    //
@@ -456,6 +458,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private Combo                          _comboSurfing_SegmenterFilter;
    //
    private ImageComboLabel                _lblTitle;
+   //
+   private CLabel                         _iconSaveSurfingState;
+   //
+   private Image                          _imageSurfingSaveState;
    //
    private Label                          _lblAltitudeUpDP;
    private Label                          _lblAltitudeUpMin;
@@ -2786,7 +2792,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             .grab(false, true)
             .align(SWT.FILL, SWT.END)
             .applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
       {
          {
@@ -2804,6 +2810,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
             UI.setButtonLayoutData(_btnSurfing_RestoreDefaults);
          }
+
+         // spacer
+         new Label(container, SWT.NONE);
+
          {
             /*
              * Button: Save tour
@@ -2819,6 +2829,20 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             });
 
             UI.setButtonLayoutData(_btnSurfing_SaveTour);
+         }
+         {
+            /*
+             * Save indicator
+             */
+
+            _iconSaveSurfingState = new CLabel(container, SWT.NONE);
+            _iconSaveSurfingState.setImage(_imageSurfingSaveState);
+            _iconSaveSurfingState.setToolTipText(Messages.Tour_Segmenter_Button_SurfingSaveState_Tooltip);
+
+            GridDataFactory.fillDefaults()
+                  .align(SWT.CENTER, SWT.CENTER)
+                  .applyTo(_iconSaveSurfingState);
+
          }
       }
    }
@@ -3747,6 +3771,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
       _colorCache.dispose();
+      _imageSurfingSaveState.dispose();
 
       super.dispose();
    }
@@ -3775,12 +3800,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       // disable save that hidden segments do not get lost in the tour
       _btnSurfing_SaveTour.setEnabled(isOneTour && isShowOnlySelectedSegments == false);
+      _iconSaveSurfingState.setEnabled(isOneTour && isShowOnlySelectedSegments == false);
 
       _chkIsSurfingSegmenterEnabled.setEnabled(isOneTour);
       _chkIsMinSurfingDistance.setEnabled(isSurfingEnabled);
       _chkIsShowOnlySelectedSegments.setEnabled(isSurfingEnabled);
 
       _comboSurfing_SegmenterFilter.setEnabled(isSurfingEnabled);
+
 
       _lblSurfing_MinStartStopSpeed.setEnabled(isSurfingEnabled);
       _lblSurfing_MinStartStopSpeed_Unit.setEnabled(isSurfingEnabled);
@@ -3797,6 +3824,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       _spinnerSurfing_MinSurfingDistance.setEnabled(isSurfingEnabled && isMinDistance);
       _lblSurfing_MinSurfingDistance_Unit.setEnabled(isSurfingEnabled && isMinDistance);
+
    }
 
    private void fillToolbar() {
@@ -4113,6 +4141,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       _pc = new PixelConverter(parent);
       _spinnerWidth = _pc.convertWidthInCharsToPixels(_isOSX ? 10 : 5);
 
+      _imageSurfingSaveState = TourbookPlugin.getImageDescriptor(Messages.Image__save).createImage(true);
+
       _defaultSurfing_SelectionListener = new SelectionAdapter() {
          @Override
          public void widgetSelected(final SelectionEvent e) {
@@ -4253,6 +4283,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          }
       }
       _tourData.isSaveVisibleDataPoints = false;
+
+      // update surfing save state
+      restoreState_FromTour();
    }
 
    private void onSelect_BreakTime() {
@@ -5048,6 +5081,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       _spinnerSurfing_MinSpeed_Surfing.setSelection(minSpeed_Surfing_UI);
       _spinnerSurfing_MinSurfingDistance.setSelection(minDistance_UI);
       _spinnerSurfing_MinTimeDuration.setSelection(state_MinTimeDuration);
+
+      _iconSaveSurfingState.setImage(_tourData.isVisibleDataPointSerieSaved() ? _imageSurfingSaveState : null);
    }
 
    /**
