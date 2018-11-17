@@ -1,6 +1,5 @@
 package net.tourbook.preferences;
 
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
