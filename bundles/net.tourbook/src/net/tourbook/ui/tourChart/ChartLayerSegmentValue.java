@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -21,16 +21,6 @@ package net.tourbook.ui.tourChart;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
-import net.tourbook.chart.Chart;
-import net.tourbook.chart.ChartDataYSerie;
-import net.tourbook.chart.ChartMouseEvent;
-import net.tourbook.chart.GraphDrawingData;
-import net.tourbook.chart.IChartLayer;
-import net.tourbook.chart.SelectionChartXSliderPosition;
-import net.tourbook.common.UI;
-import net.tourbook.data.TourData;
-import net.tourbook.tour.TourManager;
-
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -41,542 +31,563 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
+import net.tourbook.chart.Chart;
+import net.tourbook.chart.ChartDataYSerie;
+import net.tourbook.chart.ChartMouseEvent;
+import net.tourbook.chart.GraphDrawingData;
+import net.tourbook.chart.IChartLayer;
+import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.common.UI;
+import net.tourbook.data.TourData;
+import net.tourbook.tour.TourManager;
+
 /**
  * This layer displays the average values for a segment.
  */
 public class ChartLayerSegmentValue implements IChartLayer {
 
-	private TourChart								_tourChart;
-	private TourData								_tourData;
+   private TourChart _tourChart;
+   private TourData  _tourData;
 
-	// hide small values
-	private boolean									_isHideSmallValues;
-	private double									_smallValue;
+   // hide small values
+   private boolean _isHideSmallValues;
+   private double  _smallValue;
 
-	// show lines
-	private boolean									_isShowSegmenterLine;
-	private int										_lineOpacity;
+   // show lines
+   private boolean                                _isShowSegmenterLine;
+   private int                                    _lineOpacity;
 
-	private boolean									_isShowDecimalPlaces;
-	private boolean									_isShowSegmenterValues;
-	private int										_stackedValues;
-	private double[]								_xDataSerie;
+   private boolean                                _isShowDecimalPlaces;
+   private boolean                                _isShowSegmenterValues;
+   private int                                    _stackedValues;
+   private double[]                               _xDataSerie;
 
-	/**
-	 * Area where the graph is painted.
-	 */
-	private ArrayList<Rectangle>					_allGraphAreas		= new ArrayList<>();
+   /**
+    * Area where the graph is painted.
+    */
+   private ArrayList<Rectangle>                   _allGraphAreas      = new ArrayList<>();
 
-	private ArrayList<ArrayList<SegmenterSegment>>	_allPaintedSegments	= new ArrayList<>();
+   private ArrayList<ArrayList<SegmenterSegment>> _allPaintedSegments = new ArrayList<>();
 
-	private int										_paintedGraphIndex;
+   private int                                    _paintedGraphIndex;
 
-	private final NumberFormat						_nf1				= NumberFormat.getNumberInstance();
+   private final NumberFormat                     _nf1                = NumberFormat.getNumberInstance();
 
-	{
-		_nf1.setMinimumFractionDigits(1);
-		_nf1.setMaximumFractionDigits(1);
-	}
+   {
+      _nf1.setMinimumFractionDigits(1);
+      _nf1.setMaximumFractionDigits(1);
+   }
 
-	public ChartLayerSegmentValue(final TourChart tourChart) {
+   public ChartLayerSegmentValue(final TourChart tourChart) {
 
-		_tourChart = tourChart;
-	}
+      _tourChart = tourChart;
+   }
 
-	/**
-	 */
-	@Override
-	public void draw(	final GC gc,
-						final GraphDrawingData graphDrawingData,
-						final Chart chart,
-						final PixelConverter pixelConverter) {
+   /**
+    */
+   @Override
+   public void draw(final GC gc,
+                    final GraphDrawingData graphDrawingData,
+                    final Chart chart,
+                    final PixelConverter pixelConverter) {
 
-		/**
-		 * Cleanup hovering data.
-		 * <p>
-		 * Remove previous data, this is a bit tricky because the first graph which is painted in
-		 * this layer can be 1 or 0.
-		 */
-		if (graphDrawingData.graphIndex <= _paintedGraphIndex) {
-			_allGraphAreas.clear();
-			_allPaintedSegments.clear();
-		}
-		_paintedGraphIndex = graphDrawingData.graphIndex;
+      /**
+       * Cleanup hovering data.
+       * <p>
+       * Remove previous data, this is a bit tricky because the first graph which is painted in this
+       * layer can be 1 or 0.
+       */
+      if (graphDrawingData.graphIndex <= _paintedGraphIndex) {
+         _allGraphAreas.clear();
+         _allPaintedSegments.clear();
+      }
+      _paintedGraphIndex = graphDrawingData.graphIndex;
 
-		final ChartDataYSerie yData = graphDrawingData.getYData();
+      final ChartDataYSerie yData = graphDrawingData.getYData();
 
-		final Object segmentConfigObject = yData.getCustomData(TourManager.CUSTOM_DATA_SEGMENT_VALUES);
-		if ((segmentConfigObject instanceof ConfigGraphSegment) == false) {
-			return;
-		}
+      final Object segmentConfigObject = yData.getCustomData(TourManager.CUSTOM_DATA_SEGMENT_VALUES);
+      if ((segmentConfigObject instanceof ConfigGraphSegment) == false) {
+         return;
+      }
 
-		final ConfigGraphSegment segmentConfig = (ConfigGraphSegment) segmentConfigObject;
-		final float[] segmentValues = segmentConfig.segmentDataSerie;
+      final ConfigGraphSegment segmentConfig = (ConfigGraphSegment) segmentConfigObject;
+      final float[] segmentValues = segmentConfig.segmentDataSerie;
 
-		// check segment values
-		if (segmentValues == null) {
-			return;
-		}
+      // check segment values
+      if (segmentValues == null) {
+         return;
+      }
 
-		_tourChart.setLineSelectionDirty();
+      _tourChart.setLineSelectionDirty();
 
-		final IValueLabelProvider segmentLabelProvider = segmentConfig.labelProvider;
+      final IValueLabelProvider segmentLabelProvider = segmentConfig.labelProvider;
 
-		boolean toggleAboveBelow = false;
+      boolean toggleAboveBelow = false;
 
-		final int graphWidth = graphDrawingData.getChartDrawingData().devVisibleChartWidth;
-		final int devYTop = graphDrawingData.getDevYTop();
-		final int devYBottom = graphDrawingData.getDevYBottom();
-		final long devGraphImageXOffset = chart.getXXDevViewPortLeftBorder();
+      final int graphWidth = graphDrawingData.getChartDrawingData().devVisibleChartWidth;
+      final int devYTop = graphDrawingData.getDevYTop();
+      final int devYBottom = graphDrawingData.getDevYBottom();
+      final long devGraphImageXOffset = chart.getXXDevViewPortLeftBorder();
 
-		final float graphYBottom = graphDrawingData.getGraphYBottom();
+      final float graphYBottom = graphDrawingData.getGraphYBottom();
 
-		final int valueDivisor = yData.getValueDivisor();
-		final double scaleX = graphDrawingData.getScaleX();
-		final double scaleY = graphDrawingData.getScaleY();
+      final int valueDivisor = yData.getValueDivisor();
+      final double scaleX = graphDrawingData.getScaleX();
+      final double scaleY = graphDrawingData.getScaleY();
 
-		final double minValueAdjustment = segmentConfig.minValueAdjustment;
-		final double maxValue = yData.getAvgPositiveValue();
-		final double hideThreshold = maxValue * _smallValue * minValueAdjustment;
+      final double minValueAdjustment = segmentConfig.minValueAdjustment;
+      final double maxValue = yData.getAvgPositiveValue();
+      final double hideThreshold = maxValue * _smallValue * minValueAdjustment;
 
-		final int[] segmentSerieIndex = _tourData.segmentSerieIndex;
-		final int segmentSerieSize = segmentSerieIndex.length;
+      final int[] segmentSerieIndex = _tourData.segmentSerieIndex;
+      final int segmentSerieSize = segmentSerieIndex.length;
 
-		final Long[] multipleTourIds = _tourData.multipleTourIds;
-		final int[] multipleTourStartIndex = _tourData.multipleTourStartIndex;
-		int tourIndex = 0;
-		int nextTourStartIndex = 0;
+      final Long[] multipleTourIds = _tourData.multipleTourIds;
+      final int[] multipleTourStartIndex = _tourData.multipleTourStartIndex;
+      int tourIndex = 0;
+      int nextTourStartIndex = 0;
 
-		final ValueOverlapChecker overlapChecker = new ValueOverlapChecker(_stackedValues);
+      final ValueOverlapChecker overlapChecker = new ValueOverlapChecker(_stackedValues);
 
-		int devXPrev = Integer.MIN_VALUE;
+      int devXPrev = Integer.MIN_VALUE;
 
-		final Display display = Display.getCurrent();
+      final Display display = Display.getCurrent();
 
-		// setup font for values
-		final Font fontBackup = gc.getFont();
-		gc.setFont(_tourChart.getValueFont());
+      // setup font for values
+      final Font fontBackup = gc.getFont();
+      gc.setFont(_tourChart.getValueFont());
 
-		gc.setLineStyle(SWT.LINE_SOLID);
+      gc.setLineStyle(SWT.LINE_SOLID);
 
-		final Rectangle graphArea = new Rectangle(0, devYTop, graphWidth, devYBottom - devYTop);
-		_allGraphAreas.add(graphArea);
+      final Rectangle graphArea = new Rectangle(0, devYTop, graphWidth, devYBottom - devYTop);
+      _allGraphAreas.add(graphArea);
 
-		// painted labels for each graph
-		final ArrayList<SegmenterSegment> paintedSegment = new ArrayList<>();
-		_allPaintedSegments.add(paintedSegment);
+      // painted labels for each graph
+      final ArrayList<SegmenterSegment> paintedSegment = new ArrayList<>();
+      _allPaintedSegments.add(paintedSegment);
 
-		// do not draw over the graph area
-		gc.setClipping(graphArea);
+      // do not draw over the graph area
+      gc.setClipping(graphArea);
 
-		final RGB segmentRGB = segmentConfig.segmentLineRGB;
-		final Color segmentColor = new Color(display, segmentRGB);
-		gc.setForeground(segmentColor);
-		{
-			int segmentIndex;
+      final RGB segmentRGB = segmentConfig.segmentLineRGB;
+      final Color segmentColor = new Color(display, segmentRGB);
+      gc.setForeground(segmentColor);
+      {
+         int segmentIndex;
 
-			for (segmentIndex = 0; segmentIndex < segmentSerieSize; segmentIndex++) {
+         for (segmentIndex = 0; segmentIndex < segmentSerieSize; segmentIndex++) {
 
-				// get current value
-				final int dataSerieIndex = segmentSerieIndex[segmentIndex];
-				final int devXSegment = (int) (_xDataSerie[dataSerieIndex] * scaleX - devGraphImageXOffset);
-				final int segmentWidth = devXSegment - devXPrev;
+            // get current value
+            final int dataSerieIndex = segmentSerieIndex[segmentIndex];
+            final int devXSegment = (int) (_xDataSerie[dataSerieIndex] * scaleX - devGraphImageXOffset);
+            final int segmentWidth = devXSegment - devXPrev;
 
-				// optimize performance
-				if (devXSegment < 0 || devXSegment > graphWidth) {
+            // optimize performance
+            if (devXSegment < 0 || devXSegment > graphWidth) {
 
-					// get next value
-					if (segmentIndex < segmentSerieSize - 2) {
+               // get next value
+               if (segmentIndex < segmentSerieSize - 2) {
 
-						final int serieIndexNext = segmentSerieIndex[segmentIndex + 1];
-						final int devXValueNext = (int) (_xDataSerie[serieIndexNext] * scaleX - devGraphImageXOffset);
+                  final int serieIndexNext = segmentSerieIndex[segmentIndex + 1];
+                  final int devXValueNext = (int) (_xDataSerie[serieIndexNext] * scaleX - devGraphImageXOffset);
 
-						if (devXValueNext < 0) {
+                  if (devXValueNext < 0) {
 
-							// current and next value are outside of the visible area
-							continue;
-						}
-					}
+                     // current and next value are outside of the visible area
+                     continue;
+                  }
+               }
 
-					// get previous value
-					if (segmentIndex > 0) {
+               // get previous value
+               if (segmentIndex > 0) {
 
-						final int serieIndexPrev = segmentSerieIndex[segmentIndex - 1];
-						final int devXValuePrev = (int) (_xDataSerie[serieIndexPrev] * scaleX - devGraphImageXOffset);
+                  final int serieIndexPrev = segmentSerieIndex[segmentIndex - 1];
+                  final int devXValuePrev = (int) (_xDataSerie[serieIndexPrev] * scaleX - devGraphImageXOffset);
 
-						if (devXValuePrev > graphWidth) {
+                  if (devXValuePrev > graphWidth) {
 
-							// current and previous value are outside of the visible area
-							break;
-						}
-					}
-				}
+                     // current and previous value are outside of the visible area
+                     break;
+                  }
+               }
+            }
 
-				final float graphYValue = segmentValues[segmentIndex] * valueDivisor;
-				final int devYGraph = (int) (scaleY * (graphYValue - graphYBottom));
-				final int devYSegment = devYBottom - devYGraph;
+            final float graphYValue = segmentValues[segmentIndex] * valueDivisor;
+            final int devYGraph = (int) (scaleY * (graphYValue - graphYBottom));
+            final int devYSegment = devYBottom - devYGraph;
 
-				boolean isShowValueText = true;
+            boolean isShowValueText = true;
 
-				if (_isHideSmallValues) {
+            if (_isHideSmallValues) {
 
-					// check values if they are small enough
+               // check values if they are small enough
 
-					if (graphYValue >= 0) {
-						if (graphYValue < hideThreshold) {
-							isShowValueText = false;
-						}
-					} else {
+               if (graphYValue >= 0) {
+                  if (graphYValue < hideThreshold) {
+                     isShowValueText = false;
+                  }
+               } else {
 
-						// value <0
-						if (-graphYValue < hideThreshold) {
-							isShowValueText = false;
-						}
-					}
-				}
+                  // value <0
+                  if (-graphYValue < hideThreshold) {
+                     isShowValueText = false;
+                  }
+               }
+            }
 
-				/*
-				 * Get value text
-				 */
-				String valueText;
-				if (segmentLabelProvider != null) {
+            /*
+             * Get value text
+             */
+            String valueText;
+            if (segmentLabelProvider != null) {
 
-					// get value text from a label provider
-					valueText = segmentLabelProvider.getLabel(graphYValue);
+               // get value text from a label provider
+               valueText = segmentLabelProvider.getLabel(graphYValue);
 
-				} else {
+            } else {
 
-					if (graphYValue < 0.0 || graphYValue > 0.0) {
+               if (graphYValue < 0.0 || graphYValue > 0.0) {
 
-						valueText = _isShowDecimalPlaces //
-								? _nf1.format(graphYValue)
-								: Integer.toString((int) (graphYValue > 0 //
-										? (graphYValue + 0.5)
-										: (graphYValue - 0.5)));
+                  valueText = _isShowDecimalPlaces //
+                        ? _nf1.format(graphYValue)
+                        : Integer.toString((int) (graphYValue > 0 //
+                              ? (graphYValue + 0.5)
+                              : (graphYValue - 0.5)));
 
-					} else {
+               } else {
 
-						// hide digits
-						valueText = UI.ZERO;
-					}
-				}
+                  // hide digits
+                  valueText = UI.ZERO;
+               }
+            }
 
-				final SegmenterSegment segmenterSegment = new SegmenterSegment();
+            final SegmenterSegment segmenterSegment = new SegmenterSegment();
 
-				/*
-				 * Connect two segments with a line
-				 */
-				if (devXPrev == Integer.MIN_VALUE) {
+            /*
+             * Connect two segments with a line
+             */
+            if (devXPrev == Integer.MIN_VALUE) {
 
-					// first visible segment
+               // first visible segment
 
-					devXPrev = devXSegment;
+               devXPrev = devXSegment;
 
-				} else {
+            } else {
 
-					if (_isShowSegmenterLine /* && isShowValueText */) {
+               if (_isShowSegmenterLine /* && isShowValueText */) {
 
-						gc.setAlpha(_lineOpacity);
-						gc.drawLine(//
-								devXPrev,
-								devYSegment,
-								devXSegment,
-								devYSegment);
-					}
+                  gc.setAlpha(_lineOpacity);
+                  gc.drawLine(//
+                        devXPrev,
+                        devYSegment,
+                        devXSegment,
+                        devYSegment);
+               }
 
-					segmenterSegment.paintedX1 = devXPrev;
-					segmenterSegment.paintedY1 = devYSegment;
+               segmenterSegment.paintedX1 = devXPrev;
+               segmenterSegment.paintedY1 = devYSegment;
 
-					segmenterSegment.paintedX2 = devXSegment;
-					segmenterSegment.paintedY2 = devYSegment;
+               segmenterSegment.paintedX2 = devXSegment;
+               segmenterSegment.paintedY2 = devYSegment;
 
-					segmenterSegment.hoveredLineRect = new Rectangle(//
-							devXPrev,
-							devYSegment - SegmenterSegment.EXPANDED_HOVER_SIZE2,
-							segmentWidth,
-							SegmenterSegment.EXPANDED_HOVER_SIZE);
+               segmenterSegment.hoveredLineRect = new Rectangle(//
+                     devXPrev,
+                     devYSegment - SegmenterSegment.EXPANDED_HOVER_SIZE2,
+                     segmentWidth,
+                     SegmenterSegment.EXPANDED_HOVER_SIZE);
 
-					segmenterSegment.paintedRGB = segmentRGB;
+               segmenterSegment.paintedRGB = segmentRGB;
 
-					if (_isShowSegmenterValues) {
+               if (_isShowSegmenterValues) {
 
-						final Point textExtent = gc.textExtent(valueText);
+                  final Point textExtent = gc.textExtent(valueText);
 
-						final int textWidth = textExtent.x;
-						final int textHeight = textExtent.y;
+                  final int textWidth = textExtent.x;
+                  final int textHeight = textExtent.y;
 
-						final int devXText = devXPrev + segmentWidth / 2 - textWidth / 2;
+                  final int devXText = devXPrev + segmentWidth / 2 - textWidth / 2;
 
-						final boolean isValueUp = graphYValue > 0;
-						int devYText;
-						boolean isDrawAbove;
+                  final boolean isValueUp = graphYValue > 0;
+                  int devYText;
+                  boolean isDrawAbove;
 
-						if (segmentConfig.canHaveNegativeValues) {
+                  if (segmentConfig.canHaveNegativeValues) {
 
-							isDrawAbove = isValueUp;
+                     isDrawAbove = isValueUp;
 
-						} else {
+                  } else {
 
-							// toggle above/below segment line
-							isDrawAbove = toggleAboveBelow = !toggleAboveBelow;
-						}
+                     // toggle above/below segment line
+                     isDrawAbove = toggleAboveBelow = !toggleAboveBelow;
+                  }
 
-						if (isDrawAbove) {
+                  if (isDrawAbove) {
 
-							// draw above segment line
-							devYText = devYSegment - textHeight;
+                     // draw above segment line
+                     devYText = devYSegment - textHeight;
 
-						} else {
+                  } else {
 
-							// draw below segment line
-							devYText = devYSegment + 2;
-						}
+                     // draw below segment line
+                     devYText = devYSegment + 2;
+                  }
 
-						final int borderWidth = 5;
-						final int borderWidth2 = 2 * borderWidth;
-						final int borderHeight = 0;
-						final int borderHeight2 = 2 * borderHeight;
-						final int textHeightWithBorder = textHeight + borderHeight2;
+                  final int borderWidth = 5;
+                  final int borderWidth2 = 2 * borderWidth;
+                  final int borderHeight = 0;
+                  final int borderHeight2 = 2 * borderHeight;
+                  final int textHeightWithBorder = textHeight + borderHeight2;
 
-						/*
-						 * Ensure the value text do not overlap, if possible :-)
-						 */
-						final Rectangle textRect = new Rectangle(//
-								devXText - borderWidth2,
-								devYText - borderHeight,
-								textWidth + borderWidth2,
-								textHeightWithBorder);
+                  /*
+                   * Ensure the value text do not overlap, if possible :-)
+                   */
+                  final Rectangle textRect = new Rectangle(//
+                        devXText - borderWidth2,
+                        devYText - borderHeight,
+                        textWidth + borderWidth2,
+                        textHeightWithBorder);
 
-						final Rectangle validRect = overlapChecker.getValidRect(
-								textRect,
-								isValueUp,
-								textHeightWithBorder,
-								valueText);
+                  final Rectangle validRect = overlapChecker.getValidRect(
+                        textRect,
+                        isValueUp,
+                        textHeightWithBorder,
+                        valueText);
 
-						// don't draw over the graph borders
-						if (validRect != null && validRect.y > devYTop && validRect.y + textHeight < devYBottom) {
+                  // don't draw over the graph borders
+                  if (validRect != null && validRect.y > devYTop && validRect.y + textHeight < devYBottom) {
 
-							if (isShowValueText) {
+                     if (isShowValueText) {
 
-								// keep current valid rectangle
-								overlapChecker.setupNext(validRect, isValueUp);
+                        // keep current valid rectangle
+                        overlapChecker.setupNext(validRect, isValueUp);
 
-								gc.setAlpha(0xff);
-								gc.drawText(//
-										valueText,
-										devXText,
-										validRect.y,
-										true);
+                        gc.setAlpha(0xff);
+                        gc.drawText(//
+                              valueText,
+                              devXText,
+                              validRect.y,
+                              true);
 
-								// ensure that only visible labels can be hovered
-								segmenterSegment.isValueVisible = true;
-							}
+                        // ensure that only visible labels can be hovered
+                        segmenterSegment.isValueVisible = true;
+                     }
 
-							segmenterSegment.paintedLabel = validRect;
+                     segmenterSegment.paintedLabel = validRect;
 
-							// keep area to detect hovered segments, enlarge it with the hover border to easier hit the label
+                     // keep area to detect hovered segments, enlarge it with the hover border to easier hit the label
 //							final Rectangle hoveredRect = new Rectangle(//
 //									(validRect.x + borderWidth),
 //									(validRect.y + borderHeight - SegmenterSegment.EXPANDED_HOVER_SIZE2),
 //									(validRect.width - borderWidth2 + SegmenterSegment.EXPANDED_HOVER_SIZE),
 //									(validRect.height - borderHeight2 + SegmenterSegment.EXPANDED_HOVER_SIZE));
 
-							final Rectangle hoveredRect = new Rectangle(
-									(validRect.x),
-									(validRect.y + borderHeight - SegmenterSegment.EXPANDED_HOVER_SIZE2),
-									(validRect.width - borderWidth2 + SegmenterSegment.EXPANDED_HOVER_SIZE),
-									(validRect.height - borderHeight2 + SegmenterSegment.EXPANDED_HOVER_SIZE));
+                     final Rectangle hoveredRect = new Rectangle(
+                           (validRect.x),
+                           (validRect.y + borderHeight - SegmenterSegment.EXPANDED_HOVER_SIZE2),
+                           (validRect.width - borderWidth2 + SegmenterSegment.EXPANDED_HOVER_SIZE),
+                           (validRect.height - borderHeight2 + SegmenterSegment.EXPANDED_HOVER_SIZE));
 
-							segmenterSegment.hoveredLabelRect = hoveredRect;
+                     segmenterSegment.hoveredLabelRect = hoveredRect;
 
 //								/*
 //								 * Debugging
 //								 */
 //								gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
 //								gc.drawRectangle(hoveredRect);
-						}
-					}
-				}
+                  }
+               }
+            }
 
-				/*
-				 * Set slider positions
-				 */
-				final int prevSegmentIndex = segmentIndex - 1;
-				final int leftIndex = prevSegmentIndex < 0
-						? SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION
-						: segmentSerieIndex[prevSegmentIndex];
+            /*
+             * Set slider positions
+             */
+            final int leftIndex;
+            final int prevSegmentIndex = segmentIndex - 1;
+            if (prevSegmentIndex < 0) {
 
-				segmenterSegment.xSliderSerieIndexLeft = leftIndex;
-				segmenterSegment.xSliderSerieIndexRight = dataSerieIndex;
+               leftIndex = SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION;
 
-				segmenterSegment.segmentIndex = segmentIndex;
+            } else {
 
-				segmenterSegment.serieIndex = dataSerieIndex;
-				segmenterSegment.graphX = _xDataSerie[dataSerieIndex];
+               final int leftSerieIndex = segmentSerieIndex[prevSegmentIndex];
 
-				segmenterSegment.devGraphWidth = graphWidth;
-				segmenterSegment.devYGraphTop = devYTop;
+               leftIndex = leftSerieIndex == 0 ? 0
 
-				/*
-				 * Get tour id for each segment
-				 */
-				if (_tourData.isMultipleTours()) {
+                     // ensure that the correct time slice is selected in the tour editor
+                     : leftSerieIndex + 1;
+            }
 
-					// multiple tours are displayed
+            segmenterSegment.xSliderSerieIndexLeft = leftIndex;
+            segmenterSegment.xSliderSerieIndexRight = dataSerieIndex;
 
-					/*
-					 * This algorithm is highly complicated because of the complex start values but
-					 * now it seams to work.
-					 */
-					for (; tourIndex < multipleTourStartIndex.length;) {
+            segmenterSegment.segmentIndex = segmentIndex;
 
-						if (nextTourStartIndex == 0) {
+            segmenterSegment.serieIndex = dataSerieIndex;
+            segmenterSegment.graphX = _xDataSerie[dataSerieIndex];
 
-							// 1st segment
+            segmenterSegment.devGraphWidth = graphWidth;
+            segmenterSegment.devYGraphTop = devYTop;
 
-							nextTourStartIndex = multipleTourStartIndex[1];
+            /*
+             * Get tour id for each segment
+             */
+            if (_tourData.isMultipleTours()) {
 
-							segmenterSegment.tourId = multipleTourIds[0];
-							break;
+               // multiple tours are displayed
 
-						} else {
+               /*
+                * This algorithm is highly complicated because of the complex start values but now
+                * it seams to work.
+                */
+               for (; tourIndex < multipleTourStartIndex.length;) {
 
-							// 2nd...n segments
+                  if (nextTourStartIndex == 0) {
 
-							if (dataSerieIndex <= nextTourStartIndex) {
+                     // 1st segment
 
-								segmenterSegment.tourId = multipleTourIds[tourIndex];
-								break;
+                     nextTourStartIndex = multipleTourStartIndex[1];
 
-							} else {
+                     segmenterSegment.tourId = multipleTourIds[0];
+                     break;
 
-								tourIndex++;
+                  } else {
 
-								if (tourIndex >= multipleTourStartIndex.length - 1) {
-									nextTourStartIndex = Integer.MAX_VALUE;
-								} else {
-									nextTourStartIndex = multipleTourStartIndex[tourIndex + 1];
-								}
-							}
-						}
-					}
+                     // 2nd...n segments
 
-				} else {
+                     if (dataSerieIndex <= nextTourStartIndex) {
 
-					// a single tour is displayed
+                        segmenterSegment.tourId = multipleTourIds[tourIndex];
+                        break;
 
-					segmenterSegment.tourId = _tourData.getTourId();
-				}
+                     } else {
 
-				paintedSegment.add(segmenterSegment);
+                        tourIndex++;
 
-				// advance to the next point
-				devXPrev = devXSegment;
-			}
-		}
-		segmentColor.dispose();
+                        if (tourIndex >= multipleTourStartIndex.length - 1) {
+                           nextTourStartIndex = Integer.MAX_VALUE;
+                        } else {
+                           nextTourStartIndex = multipleTourStartIndex[tourIndex + 1];
+                        }
+                     }
+                  }
+               }
 
-		// reset clipping
-		gc.setClipping((Rectangle) null);
+            } else {
 
-		// restore font
-		gc.setFont(fontBackup);
+               // a single tour is displayed
 
-		gc.setAlpha(0xff);
-	}
+               segmenterSegment.tourId = _tourData.getTourId();
+            }
 
-	ArrayList<Rectangle> getAllGraphAreas() {
-		return _allGraphAreas;
-	}
+            paintedSegment.add(segmenterSegment);
 
-	/**
-	 * @param mouseEvent
-	 * @return Returns the hovered {@link ChartLabel} or <code>null</code> when a {@link ChartLabel}
-	 *         is not hovered.
-	 */
-	SegmenterSegment getHoveredSegment(final ChartMouseEvent mouseEvent) {
+            // advance to the next point
+            devXPrev = devXSegment;
+         }
+      }
+      segmentColor.dispose();
 
-		for (int graphIndex = 0; graphIndex < _allGraphAreas.size(); graphIndex++) {
+      // reset clipping
+      gc.setClipping((Rectangle) null);
 
-			final Rectangle graphArea = _allGraphAreas.get(graphIndex);
+      // restore font
+      gc.setFont(fontBackup);
 
-			if (graphArea.contains(mouseEvent.devXMouse, mouseEvent.devYMouse)) {
+      gc.setAlpha(0xff);
+   }
 
-				// mouse is hovering the graph area
+   ArrayList<Rectangle> getAllGraphAreas() {
+      return _allGraphAreas;
+   }
 
-				final SegmenterSegment hoveredSegment = getHoveredSegment_10(
-						graphIndex,
-						mouseEvent.devXMouse,
-						mouseEvent.devYMouse);
+   /**
+    * @param mouseEvent
+    * @return Returns the hovered {@link ChartLabel} or <code>null</code> when a {@link ChartLabel}
+    *         is not hovered.
+    */
+   SegmenterSegment getHoveredSegment(final ChartMouseEvent mouseEvent) {
 
-				if (hoveredSegment != null) {
-					// hovered segment is hit
-					return hoveredSegment;
-				}
-			}
-		}
+      for (int graphIndex = 0; graphIndex < _allGraphAreas.size(); graphIndex++) {
 
-		return null;
-	}
+         final Rectangle graphArea = _allGraphAreas.get(graphIndex);
 
-	private SegmenterSegment getHoveredSegment_10(final int graphIndex, final int devXMouse, final int devYMouse) {
+         if (graphArea.contains(mouseEvent.devXMouse, mouseEvent.devYMouse)) {
 
-		final ArrayList<SegmenterSegment> paintedSegments = _allPaintedSegments.get(graphIndex);
+            // mouse is hovering the graph area
 
-		for (final SegmenterSegment paintedSegment : paintedSegments) {
+            final SegmenterSegment hoveredSegment = getHoveredSegment_10(
+                  graphIndex,
+                  mouseEvent.devXMouse,
+                  mouseEvent.devYMouse);
 
-			final Rectangle hoveredLabel = paintedSegment.hoveredLabelRect;
-			final Rectangle hoveredRect = paintedSegment.hoveredLineRect;
+            if (hoveredSegment != null) {
+               // hovered segment is hit
+               return hoveredSegment;
+            }
+         }
+      }
 
-			if ((hoveredLabel != null && hoveredLabel.contains(devXMouse, devYMouse))
-					|| (hoveredRect != null && hoveredRect.contains(devXMouse, devYMouse))) {
+      return null;
+   }
 
-				// segment is hit
-				return paintedSegment;
-			}
-		}
+   private SegmenterSegment getHoveredSegment_10(final int graphIndex, final int devXMouse, final int devYMouse) {
 
-		return null;
-	}
+      final ArrayList<SegmenterSegment> paintedSegments = _allPaintedSegments.get(graphIndex);
 
-	ArrayList<ArrayList<SegmenterSegment>> getPaintedSegments() {
-		return _allPaintedSegments;
-	}
+      for (final SegmenterSegment paintedSegment : paintedSegments) {
 
-	void setIsShowDecimalPlaces(final boolean isShowDecimalPlaces) {
-		_isShowDecimalPlaces = isShowDecimalPlaces;
-	}
+         final Rectangle hoveredLabel = paintedSegment.hoveredLabelRect;
+         final Rectangle hoveredRect = paintedSegment.hoveredLineRect;
 
-	void setIsShowSegmenterValues(final boolean isShowSegmenterValues) {
-		_isShowSegmenterValues = isShowSegmenterValues;
-	}
+         if ((hoveredLabel != null && hoveredLabel.contains(devXMouse, devYMouse))
+               || (hoveredRect != null && hoveredRect.contains(devXMouse, devYMouse))) {
 
-	void setLineProperties(final boolean isShowSegmenterLine, final int lineOpacity) {
+            // segment is hit
+            return paintedSegment;
+         }
+      }
 
-		_isShowSegmenterLine = isShowSegmenterLine;
-		_lineOpacity = (int) (lineOpacity / 100.0 * 255);
-	}
+      return null;
+   }
 
-	void setSmallHiddenValuesProperties(final boolean isHideSmallValues, final int smallValue) {
+   ArrayList<ArrayList<SegmenterSegment>> getPaintedSegments() {
+      return _allPaintedSegments;
+   }
 
-		_isHideSmallValues = isHideSmallValues;
-		_smallValue = smallValue / 100.0;
-	}
+   void setIsShowDecimalPlaces(final boolean isShowDecimalPlaces) {
+      _isShowDecimalPlaces = isShowDecimalPlaces;
+   }
 
-	void setStackedValues(final int stackedValues) {
-		_stackedValues = stackedValues;
-	}
+   void setIsShowSegmenterValues(final boolean isShowSegmenterValues) {
+      _isShowSegmenterValues = isShowSegmenterValues;
+   }
 
-	void setTourData(final TourData tourData) {
+   void setLineProperties(final boolean isShowSegmenterLine, final int lineOpacity) {
 
-		_tourData = tourData;
+      _isShowSegmenterLine = isShowSegmenterLine;
+      _lineOpacity = (int) (lineOpacity / 100.0 * 255);
+   }
 
-		// initialize painted labels
-		_allPaintedSegments.clear();
-		_allGraphAreas.clear();
-	}
+   void setSmallHiddenValuesProperties(final boolean isHideSmallValues, final int smallValue) {
 
-	void setXDataSerie(final double[] dataSerie) {
-		_xDataSerie = dataSerie;
-	}
+      _isHideSmallValues = isHideSmallValues;
+      _smallValue = smallValue / 100.0;
+   }
+
+   void setStackedValues(final int stackedValues) {
+      _stackedValues = stackedValues;
+   }
+
+   void setTourData(final TourData tourData) {
+
+      _tourData = tourData;
+
+      // initialize painted labels
+      _allPaintedSegments.clear();
+      _allGraphAreas.clear();
+   }
+
+   void setXDataSerie(final double[] dataSerie) {
+      _xDataSerie = dataSerie;
+   }
 }
