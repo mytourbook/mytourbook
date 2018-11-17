@@ -236,7 +236,7 @@ public class SuuntoJsonProcessor {
 				TourMarker tourMarker = it.next();
 				_lapCounter = Integer.valueOf(tourMarker.getLabel());
 			}
-			activityToReUse.setTourMarkers(new HashSet<>());
+			activityToReUse.setTourMarkers(new HashSet<TourMarker>());
 
 			tourData = activityToReUse;
 			_sampleList = sampleListToReUse;

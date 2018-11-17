@@ -24,6 +24,7 @@ New
   The smoothing algorithm can create speed value peeks which also can influence the surfing event recognition.
   Peeks can occure when there are missing distance values, e.g. when there was no GPS signal in a wave or underwater.
 
+* Import Suunto Spartan/9 files, contributed by Frederic
 
 
 Improvements
