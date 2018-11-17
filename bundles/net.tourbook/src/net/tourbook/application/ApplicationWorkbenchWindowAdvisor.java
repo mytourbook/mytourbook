@@ -533,7 +533,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		MapBookmarkManager.saveState();
 		SwimStrokeManager.saveState();
 
-		FTSearchManager.close();
+		FTSearchManager.closeIndexReaderSuggester();
 		WebContentServer.stop();
 
 		_applicationActionBarAdvisor._personContribItem.saveState();

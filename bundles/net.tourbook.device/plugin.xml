@@ -224,6 +224,15 @@
       </page>
    </extension>
    
+   <extension	point="org.eclipse.ui.preferencePages">
+      <page
+            category="net.tourbook.preferences.PrefPageImport"
+            class="net.tourbook.device.suunto.Suunto9ImportPreferences"
+            id="net.tourbook.device.suunto.Suunto9PreferencesPage"
+            name="Suunto Spartan/9">
+      </page>
+   </extension>
+   
    <extension	point="org.eclipse.core.runtime.preferences">
       <initializer
             class="net.tourbook.device.polar.hrm.PreferenceInitializer">
@@ -254,6 +263,14 @@
 			fileextension="sml"
 			id="net.tourbook.device.Suunto3"
 			name="Suunto 3">
+		</device>
+		
+		<!-- Suunto Spartan/9 -->
+		<device
+			class="net.tourbook.device.suunto.Suunto9DeviceDataReader"
+			fileextension="gz"
+			id="net.tourbook.device.Suunto9"
+			name="Suunto Spartan/9">
 		</device>
 
 		<!-- TUR -->

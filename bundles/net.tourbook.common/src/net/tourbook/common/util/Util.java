@@ -89,6 +89,7 @@ public class Util {
 	public static final String	UNIQUE_ID_SUFFIX_SPORT_TRACKS_FITLOG	= "24168";	//$NON-NLS-1$
 	public static final String	UNIQUE_ID_SUFFIX_SUUNTO2					= "92145";	//$NON-NLS-1$
 	public static final String	UNIQUE_ID_SUFFIX_SUUNTO3					= "73198";	//$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_SUUNTO9					= "93281";	//$NON-NLS-1$
 
 	/*
 	 * Default xml tags
@@ -137,7 +138,7 @@ public class Util {
 
 	/**
 	 * Revers an array sort order.
-	 *
+	 * 
 	 * @param arr
 	 * @return
 	 */
@@ -411,7 +412,7 @@ public class Util {
 
 	/**
 	 * Creates a {@link ZonedDateTime} from the number: YYYYMMDDhhmmss
-	 *
+	 * 
 	 * @param yyyymmddhhmmss
 	 * @return
 	 */
@@ -429,7 +430,7 @@ public class Util {
 
 	/**
 	 * creates a double array backup
-	 *
+	 * 
 	 * @param original
 	 * @return Returns a copy of a <code>double[]</code> or <code>null</code> when the original data
 	 *         is <code>null</code>.
@@ -449,7 +450,7 @@ public class Util {
 
 	/**
 	 * creates a float array backup
-	 *
+	 * 
 	 * @param original
 	 * @return Returns a copy of a <code>float[]</code> or <code>null</code> when the original data
 	 *         is <code>null</code>.
@@ -469,7 +470,7 @@ public class Util {
 
 	/**
 	 * creates a int array backup
-	 *
+	 * 
 	 * @param original
 	 * @return the backup array or <code>null</code> when the original data is <code>null</code>
 	 */
@@ -1084,7 +1085,7 @@ public class Util {
 			return defaultValue;
 		}
 
-		final ArrayList<Integer> intValues = new ArrayList<>();
+		final ArrayList<Integer> intValues = new ArrayList<Integer>();
 
 		for (final String stringValue : stringValues) {
 
@@ -1140,7 +1141,7 @@ public class Util {
 			return defaultValue;
 		}
 
-		final ArrayList<Long> longValues = new ArrayList<>();
+		final ArrayList<Long> longValues = new ArrayList<Long>();
 
 		for (final String stringValue : stringValues) {
 
@@ -1197,7 +1198,7 @@ public class Util {
 
 	/**
 	 * Remove duplicate items from a list and add a new item.
-	 *
+	 * 
 	 * @param allItems
 	 * @param newItem
 	 * @param maxItems
@@ -1211,7 +1212,7 @@ public class Util {
 			return allItems;
 		}
 
-		final ArrayList<String> newItems = new ArrayList<>();
+		final ArrayList<String> newItems = new ArrayList<String>();
 
 		newItems.add(newItem);
 
@@ -1503,7 +1504,7 @@ public class Util {
 
 	/**
 	 * Get long array from xml list/item tags.
-	 *
+	 * 
 	 * @param memento
 	 * @param listKeyName
 	 * @return
@@ -1558,7 +1559,7 @@ public class Util {
 
 	/**
 	 * RBG values are in child tag as attributes
-	 *
+	 * 
 	 * @param xmlConfig
 	 * @param childTag
 	 * @param defaultRgb
@@ -1593,7 +1594,7 @@ public class Util {
 
 	/**
 	 * found here: http://www.odi.ch/prog/design/datetime.php
-	 *
+	 * 
 	 * @param cal
 	 * @return
 	 */
@@ -1645,7 +1646,7 @@ public class Util {
 
 	/**
 	 * Parses SAX attribute
-	 *
+	 * 
 	 * @param attributes
 	 * @param attributeName
 	 * @return Returns double value or {@link Double#MIN_VALUE} when attribute is not available or
@@ -1680,7 +1681,7 @@ public class Util {
 
 	/**
 	 * Parses SAX attribute
-	 *
+	 * 
 	 * @param attributes
 	 * @param attributeName
 	 * @return Returns float value or {@link Float#MIN_VALUE} when attribute is not available or
@@ -1715,7 +1716,7 @@ public class Util {
 
 	/**
 	 * Parses SAX attribute
-	 *
+	 * 
 	 * @param attributes
 	 * @param attributeName
 	 * @return Returns integer value or {@link Integer#MIN_VALUE} when attribute is not available or
@@ -1736,7 +1737,7 @@ public class Util {
 
 	/**
 	 * Parses SAX attribute
-	 *
+	 * 
 	 * @param attributes
 	 * @param attributeName
 	 * @return Returns integer value or 0 when attribute is not available or cannot be parsed.
@@ -1756,7 +1757,7 @@ public class Util {
 
 	/**
 	 * Parses SAX attribute
-	 *
+	 * 
 	 * @param attributes
 	 * @param attributeName
 	 * @return Returns long value or {@link Long#MIN_VALUE} when attribute is not available or cannot
@@ -1777,7 +1778,7 @@ public class Util {
 
 	/**
 	 * Load a text file.
-	 *
+	 * 
 	 * @param fileName
 	 * @return Returns the content from a text file
 	 */
@@ -1869,7 +1870,7 @@ public class Util {
 
 	/**
 	 * Round floating value to an inverse long value.
-	 *
+	 * 
 	 * @param graphValue
 	 * @param graphUnit
 	 * @return
@@ -1905,7 +1906,7 @@ public class Util {
 
 	/**
 	 * Round number of units to a 'month suitable' format.
-	 *
+	 * 
 	 * @param defaultUnitValue
 	 * @return
 	 */
@@ -2122,7 +2123,7 @@ public class Util {
 	/**
 	 * Round floating value by removing the trailing part, which causes problem when creating units.
 	 * For the value 200.00004 the .00004 part will be removed
-	 *
+	 * 
 	 * @param graphValue
 	 * @param graphUnit
 	 * @return
@@ -2175,7 +2176,7 @@ public class Util {
 
 	/**
 	 * Selects an item in the combo box which is retrieved from a state.
-	 *
+	 * 
 	 * @param state
 	 * @param stateKey
 	 * @param comboStates
@@ -2206,7 +2207,7 @@ public class Util {
 	/**
 	 * Selects a text item in the combo box. When text item is not available, the first item is
 	 * selected
-	 *
+	 * 
 	 * @param combo
 	 * @param comboItems
 	 * @param selectedItem
@@ -2229,7 +2230,7 @@ public class Util {
 
 	/**
 	 * Set the state for an integer array, integer values are converted into string value.
-	 *
+	 * 
 	 * @param state
 	 * @param stateKey
 	 * @param intValues
@@ -2317,7 +2318,7 @@ public class Util {
 
 	/**
 	 * Set values into xml list/item tags.
-	 *
+	 * 
 	 * @param memento
 	 * @param listKeyName
 	 * @param values
@@ -2336,7 +2337,7 @@ public class Util {
 
 	/**
 	 * Creates a child for the color.
-	 *
+	 * 
 	 * @param xmlColor
 	 * @param tagName
 	 * @param rgb
@@ -2356,7 +2357,7 @@ public class Util {
 
 	/**
 	 * Open view
-	 *
+	 * 
 	 * @param viewId
 	 * @param isActivateView
 	 *           View is activated when <code>true</code>, otherwise it is only visible.
@@ -2426,7 +2427,7 @@ public class Util {
 
 	/**
 	 * Writes a XML memento into a XML file.
-	 *
+	 * 
 	 * @param xmlMemento
 	 * @param xmlFile
 	 */
