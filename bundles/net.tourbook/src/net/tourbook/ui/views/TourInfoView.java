@@ -26,6 +26,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.TreeSet;
 
+import org.eclipse.e4.ui.di.PersistState;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -54,6 +56,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourReference;
@@ -75,18 +78,23 @@ import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 
 public class TourInfoView extends ViewPart {
 
-   public static final String      ID                   = "net.tourbook.ui.views.TourInfoView"; //$NON-NLS-1$
+   public static final String            ID                         = "net.tourbook.ui.views.TourInfoView"; //$NON-NLS-1$
 
-   private static final String     ANNOTATION_TRANSIENT = "Transient";                          //$NON-NLS-1$
+   private static final String           ANNOTATION_TRANSIENT       = "Transient";                          //$NON-NLS-1$
 
-   private final IPreferenceStore  _prefStore           = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore                 = TourbookPlugin.getPrefStore();
+   private static final IDialogSettings  _state                     = TourbookPlugin.getState(ID);
 
-   private PostSelectionProvider   _postSelectionProvider;
-   private ISelectionListener      _postSelectionListener;
-   private IPropertyChangeListener _prefChangeListener;
-   private ITourEventListener      _tourEventListener;
+   private static final String           STATE_VIEW_SCROLL_POSITION = "STATE_VIEW_SCROLL_POSITION";         //$NON-NLS-1$
 
-   private TourData                _tourData;
+   private PostSelectionProvider         _postSelectionProvider;
+   private ISelectionListener            _postSelectionListener;
+   private IPropertyChangeListener       _prefChangeListener;
+   private ITourEventListener            _tourEventListener;
+
+   private boolean                       _isUIRestored;
+
+   private TourData                      _tourData;
 
    /*
     * UI controls
@@ -646,6 +654,7 @@ public class TourInfoView extends ViewPart {
       final ScrollBar vertBar = _uiContainer.getVerticalBar();
 
       if (vertBar != null) {
+
          // vertical bar is displayed
          infoContainerWidth -= vertBar.getSize().x;
       }
@@ -718,10 +727,33 @@ public class TourInfoView extends ViewPart {
       }
    }
 
+   private void restoreState_UI() {
+
+      if (_isUIRestored) {
+         return;
+      }
+
+      _isUIRestored = true;
+
+      final int scrollPos = Util.getStateInt(_state, STATE_VIEW_SCROLL_POSITION, -1);
+      if (scrollPos != -1) {
+
+         // scroll to the previous position
+
+         _uiContainer.setOrigin(0, scrollPos);
+      }
+   }
+
+   @PersistState
+   private void saveState() {
+
+      _state.put(STATE_VIEW_SCROLL_POSITION, _uiContainer.getVerticalBar().getSelection());
+   }
+
    @Override
    public void setFocus() {
 
-      _pageBook.setFocus();
+//      _pageBook.setFocus();
    }
 
    private void showInvalidPage() {
@@ -888,6 +920,8 @@ public class TourInfoView extends ViewPart {
        * layout container to resize the labels
        */
       onResize();
+
+      restoreState_UI();
    }
 
    private void updateUI_RefTourInfo(final Collection<TourReference> refTours) {
