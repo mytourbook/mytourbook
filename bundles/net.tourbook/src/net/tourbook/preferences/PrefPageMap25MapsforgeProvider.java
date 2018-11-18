@@ -19,6 +19,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Locale;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -409,10 +410,10 @@ public class PrefPageMap25MapsforgeProvider extends PreferencePage implements IW
 			}
 			{
 				/*
-				 * Field: Tile Url
+				 * Field: Styles
 				 */
 				final Label label = new Label(container, SWT.NONE);
-				label.setText(Messages.Pref_Map25_Provider_Label_TileUrl);
+				label.setText("Availible Styles");
 
 				_txtTileUrl = new Text(container, SWT.READ_ONLY);
 				GridDataFactory
@@ -782,12 +783,14 @@ public class PrefPageMap25MapsforgeProvider extends PreferencePage implements IW
 
 			MapsforgeStyleParser mf_style_parser = new MapsforgeStyleParser();
 			//java.util.List<Item> mf_styles = mf_style_parser.readConfig("C:\\Users\\top\\BTSync\\oruxmaps\\mapstyles\\ELV4\\Elevate.xml");
-			java.util.List<Item> mf_styles = mf_style_parser.readConfig(_txtTilePath.getText().trim());
+			java.util.List<Style> mf_styles = mf_style_parser.readXML(_txtTilePath.getText().trim());
 			//System.out.println("####### PrefPageMap25MapsforgeProvider Stylecount: " + mf_styles.size());
 			this._styles ="Aviable Styles: ";
-			for (Item item : mf_styles) {
-				this._styles += item.getXmlLayer();
-				this._styles += ",";
+			for (Style style : mf_styles) {
+				this._styles += style.getXmlLayer();
+				this._styles += " (";
+				this._styles += style.getName(Locale.getDefault().toString());
+				this._styles += "),";
 				//System.out.println(item.getXmlLayer());
 			}
 			this._styles += "all";
