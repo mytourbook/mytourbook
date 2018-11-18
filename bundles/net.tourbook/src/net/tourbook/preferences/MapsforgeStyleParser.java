@@ -76,7 +76,7 @@ public class MapsforgeStyleParser {
 								//System.out.println("default style.: " + defaultstyle);
 							}
 						}
-					}					
+					}				
 					// If we have an item(layer) element, we create a new item
 					if (startElement.getName().getLocalPart().equals(XML_LAYER)) {
 						Style = false;
