@@ -399,6 +399,9 @@ public class Messages extends NLS {
    public static String        app_unit_minutes;
    public static String        app_unit_seconds;
 
+   public static String        App__False;
+   public static String        App__True;
+
    public static String        App_Action_About;
    public static String        App_Action_Add;
    public static String        App_Action_ApplyDefaults;
@@ -2291,8 +2294,10 @@ public class Messages extends NLS {
    public static String Tour_Segmenter_Label_DPTolerance_Tooltip;
    public static String Tour_Segmenter_Label_no_chart;
    public static String Tour_Segmenter_Label_NumberOfSegments_Tooltip;
+   public static String Tour_Segmenter_Surfing_Button_RestoreFromDefaults_Tooltip;
    public static String Tour_Segmenter_Surfing_Button_RestoreFromTour;
    public static String Tour_Segmenter_Surfing_Button_RestoreFromTour_Tooltip;
+   public static String Tour_Segmenter_Surfing_Button_RestoreFromTourWithData_Tooltip;
    public static String Tour_Segmenter_Surfing_Checkbox_IsMinSurfingDistance;
    public static String Tour_Segmenter_Surfing_Checkbox_IsShowOnlySelectedSegments;
    public static String Tour_Segmenter_Surfing_Checkbox_IsShowOnlySurfingSegments;
