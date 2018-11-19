@@ -18,12 +18,11 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
-// http://www.vogella.com/tutorials/JavaXML/article.html
-
 /**
- * reading Mapsforge theme
+ * reading Mapsforge theme. after making instance call readXML
  * @author telemaxx
- * after making instance call readXML
+ * @see http://www.vogella.com/tutorials/JavaXML/article.html
+ * 
  */
 public class MapsforgeStyleParser {
 	static final String ID = "id";
@@ -88,8 +87,10 @@ public class MapsforgeStyleParser {
 								item.setXmlLayer(attribute.getValue());
 							}
 							if (attribute.getName().toString().equals(VISIBLE)) {
-								item.setXmlLayer(attribute.getValue());
-								Style = true;
+								if(attribute.getValue().equals("true")){
+								//item.setXmlLayer(attribute.getValue());
+									Style = true;
+								}
 							}
 						}
 					}
@@ -158,11 +159,10 @@ public class MapsforgeStyleParser {
 }
 
 /**
- * Bean Style containes a visible Style
+ * Bean: Style containes a visible Style
  * @author telemaxx
  *
  */
-
 class Style {
 	private Map<String, String> name = new HashMap<String, String>();
    private String xmlLayer;
@@ -174,18 +174,30 @@ class Style {
 	public void setDefaultLanguage(String language) {
       this.defaultlanguage = language;
   }   
-   
+   /**
+    * get the style name like
+    * @return String containing the stylename like "elv-mtb"
+    */
    public String getXmlLayer() {
       return xmlLayer;
   }
 	public void setXmlLayer(String xmlLayer) {
       this.xmlLayer = xmlLayer;
   } 
-	
+	/**
+	 * set the style name with a given language
+	 * @param language
+	 * @param name
+	 */
    public void setName(String language, String name) {
    	//System.out.println("setname: " + language + " name: " + name);
 		this.name.put(language, name);
 	}
+   /**
+    * getting a local name of the mapstyle
+    * @param language string like "en"
+    * @return a String with the local name like "hiking"
+    */
    public String getName(String language) {
    	if(language.equals("default")){
    		return name.get(defaultlanguage);
@@ -196,7 +208,10 @@ class Style {
    		return name.get(defaultlanguage);
    	}
    }
-   
+   /**
+    * getting the name as map with all localizations
+    * @return Map<String language,String name>
+    */
    public Map<String, String> getName() {
    	return name;
    }  

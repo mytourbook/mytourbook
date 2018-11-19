@@ -356,9 +356,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		if(_is_mf_Map) {
 			System.out.println("##### loadtheme: is mf map setting textscale " +   _mf_TextScale);
 			CanvasAdapter.textScale = _mf_TextScale;
-			if(styleId != null && styleId.equals("all")) {
-				return;
-			}
 			mMap.setTheme(new ExternalRenderTheme(_mf_themeFilePath, new XmlRenderThemeMenuCallback() {
 				@Override
 				public Set<String> getCategories(XmlRenderThemeStyleMenu renderThemeStyleMenu) {
@@ -366,10 +363,12 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 					String style = styleId != null ? styleId : renderThemeStyleMenu.getDefaultValue();
 					// Retrieve the layer from the style id
 					XmlRenderThemeStyleLayer renderThemeStyleLayer = renderThemeStyleMenu.getLayer(style);
-					if (renderThemeStyleLayer == null) {
+					if(styleId != null && styleId.equals("all")) {
+						return null;
+					} else if (renderThemeStyleLayer == null) {
 						System.err.println("##### loadtheme:  Invalid style \"" + style + "\" so i show all styles");
 						return null;
-					}
+					} else 
 					System.out.println("####### loadtheme:  selected Style: " + renderThemeStyleLayer.getTitle(_mf_prefered_language));
 					// First get the selected layer's categories that are enabled together
 					Set<String> categories = renderThemeStyleLayer.getCategories();
