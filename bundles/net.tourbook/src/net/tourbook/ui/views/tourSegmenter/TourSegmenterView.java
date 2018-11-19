@@ -448,7 +448,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private Composite                      _pageSegType_Surfing;
    //
    private Button                         _btnSurfing_DeleteTourSegments;
-   private Button                         _btnSurfing_RestoreDefaults;
+   private Button                         _btnSurfing_RestoreFrom_Defaults;
+   private Button                         _btnSurfing_RestoreFrom_Tour;
    private Button                         _btnSurfing_SaveTourSegments;
    //
    private Button                         _chkIsMinSurfingDistance;
@@ -2631,14 +2632,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
          }
 
-         createUI_62_SurfingFields(container);
-         createUI_64_Surfing2ndColumn(container);
+         createUI_62_Surfing_Fields(container);
+         createUI_64_Surfing_Options(container);
       }
 
       return container;
    }
 
-   private Composite createUI_62_SurfingFields(final Composite parent) {
+   private Composite createUI_62_Surfing_Fields(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
@@ -2739,29 +2740,64 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblSurfing_MinSurfingDistance_Unit);
             }
          }
+
+         createUI_63_Surfing_RestoreActions(container);
+      }
+      return container;
+   }
+
+   private void createUI_63_Surfing_RestoreActions(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()
+//          .grab(true, false)
+            .span(3, 1)
+            .applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      {
          {
             /*
              * Button: Restore defaults
              */
-            _btnSurfing_RestoreDefaults = new Button(container, SWT.NONE);
-            _btnSurfing_RestoreDefaults.setText(Messages.App_Action_RestoreDefault);
-            _btnSurfing_RestoreDefaults.addSelectionListener(new SelectionAdapter() {
+            _btnSurfing_RestoreFrom_Defaults = new Button(container, SWT.NONE);
+            _btnSurfing_RestoreFrom_Defaults.setText(Messages.App_Action_RestoreDefault);
+            _btnSurfing_RestoreFrom_Defaults.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
                   onSurfing_ResetToDefaults();
                }
             });
 
-            GridDataFactory.fillDefaults()
-                  .span(3, 1)
-                  .align(SWT.BEGINNING, SWT.FILL)
-                  .applyTo(_btnSurfing_RestoreDefaults);
+//            GridDataFactory.fillDefaults()
+//                  .span(3, 1)
+//                  .align(SWT.BEGINNING, SWT.FILL)
+//                  .applyTo(_btnSurfing_RestoreFrom_Defaults);
+         }
+         {
+            /*
+             * Button: Restore from tour
+             */
+            _btnSurfing_RestoreFrom_Tour = new Button(container, SWT.NONE);
+            _btnSurfing_RestoreFrom_Tour.setText(Messages.Tour_Segmenter_Surfing_Button_RestoreFromTour);
+            _btnSurfing_RestoreFrom_Tour.setToolTipText(Messages.Tour_Segmenter_Surfing_Button_RestoreFromTour_Tooltip);
+            _btnSurfing_RestoreFrom_Tour.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onSurfing_ResetFromTour();
+               }
+            });
+
+//            GridDataFactory.fillDefaults()
+//                  .span(3, 1)
+//                  .align(SWT.BEGINNING, SWT.FILL)
+//                  .applyTo(_btnSurfing_RestoreFrom_Tour);
+            UI.setButtonLayoutData(_btnSurfing_RestoreFrom_Defaults);
+            UI.setButtonLayoutData(_btnSurfing_RestoreFrom_Tour);
          }
       }
-      return container;
    }
 
-   private void createUI_64_Surfing2ndColumn(final Composite parent) {
+   private void createUI_64_Surfing_Options(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
@@ -3823,6 +3859,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       final boolean isTourSaved = _tourData != null && _tourData.getTourPerson() != null;
       final boolean isMultipleTours = _tourData != null && _tourData.isMultipleTours();
       final boolean isVisiblePointsSaved_ForSurfing = _tourData != null && _tourData.isVisiblePointsSaved_ForSurfing();
+      final boolean isSurfingParametersSaved = isSurfingParametersSavedInTour();
 
       final boolean isOneTour = isTourSaved && isMultipleTours == false;
       final boolean isSurfingEnabled = isOneTour && _chkIsSurfingSegmenterEnabled.getSelection();
@@ -3833,7 +3870,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       _btnSurfing_SaveTourSegments.setEnabled(isSurfingEnabled);
       _btnSurfing_DeleteTourSegments.setEnabled(isOneTour && isVisiblePointsSaved_ForSurfing);
 
-      _btnSurfing_RestoreDefaults.setEnabled(isSurfingEnabled);
+      _btnSurfing_RestoreFrom_Defaults.setEnabled(isSurfingEnabled);
+      _btnSurfing_RestoreFrom_Tour.setEnabled(isSurfingEnabled && isSurfingParametersSaved);
 
       _chkIsSurfingSegmenterEnabled.setEnabled(isOneTour);
       _chkIsMinSurfingDistance.setEnabled(isSurfingEnabled);
@@ -4209,6 +4247,19 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       return isSegmentLayerVisible;
    }
 
+   /**
+    * @return Returns <code>true</code> when tour contains surfing parameters
+    */
+   private boolean isSurfingParametersSavedInTour() {
+
+      if (_tourData != null) {
+
+         return _tourData.getSurfing_MinSpeed_StartStop() != TourData.SURFING_VALUE_IS_NOT_SET;
+      }
+
+      return false;
+   }
+
    private boolean isSurfingSegmenterFiltered() {
       return _comboSurfing_SegmenterFilter.getSelectionIndex() != 0;
    }
@@ -4394,7 +4445,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                   final boolean isShowOnlySelectedSegments = _chkIsShowOnlySelectedSegments.getSelection();
 
                   if (isShowOnlySelectedSegments) {
+
                      onSurfing_ShowOnlySelectedSegments();
+
+                     // skip default selection provider
+                     return;
                   }
 
                   break;
@@ -4671,6 +4726,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             PrefPageComputedValues.ID,
             null,
             PrefPageComputedValues.TAB_FOLDER_BREAK_TIME).open();
+   }
+
+   private void onSurfing_ResetFromTour() {
+
+      restoreState_FromTour();
+      onSelect_Surfing();
    }
 
    private void onSurfing_ResetToDefaults() {

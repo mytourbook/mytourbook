@@ -2291,6 +2291,8 @@ public class Messages extends NLS {
    public static String Tour_Segmenter_Label_DPTolerance_Tooltip;
    public static String Tour_Segmenter_Label_no_chart;
    public static String Tour_Segmenter_Label_NumberOfSegments_Tooltip;
+   public static String Tour_Segmenter_Surfing_Button_RestoreFromTour;
+   public static String Tour_Segmenter_Surfing_Button_RestoreFromTour_Tooltip;
    public static String Tour_Segmenter_Surfing_Checkbox_IsMinSurfingDistance;
    public static String Tour_Segmenter_Surfing_Checkbox_IsShowOnlySelectedSegments;
    public static String Tour_Segmenter_Surfing_Checkbox_IsShowOnlySurfingSegments;
