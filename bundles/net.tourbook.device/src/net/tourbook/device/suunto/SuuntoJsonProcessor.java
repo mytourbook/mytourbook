@@ -80,6 +80,8 @@ public class SuuntoJsonProcessor {
 		if (tourData == null)
 			return null;
 
+		boolean isIndoorTour = !jsonFileContent.contains("GPSAltitude");
+
 		boolean isPaused = false;
 
 		boolean reusePreviousTimeEntry;
@@ -173,7 +175,8 @@ public class SuuntoJsonProcessor {
 			wasDataPopulated |= TryAddCadenceData(new JSONObject(currentSampleData), timeData);
 
 			// Barometric Altitude
-			if (_prefStore.getInt(IPreferences.ALTITUDE_DATA_SOURCE) == 1) {
+			if (_prefStore.getInt(IPreferences.ALTITUDE_DATA_SOURCE) == 1 ||
+					isIndoorTour) {
 				wasDataPopulated |= TryAddAltitudeData(new JSONObject(currentSampleData), timeData);
 			}
 
@@ -181,7 +184,8 @@ public class SuuntoJsonProcessor {
 			wasDataPopulated |= TryAddPowerData(new JSONObject(currentSampleData), timeData);
 
 			// Distance
-			if (_prefStore.getInt(IPreferences.DISTANCE_DATA_SOURCE) == 1) {
+			if (_prefStore.getInt(IPreferences.DISTANCE_DATA_SOURCE) == 1 ||
+					isIndoorTour) {
 				wasDataPopulated |= TryAddDistanceData(new JSONObject(currentSampleData), timeData);
 			}
 
@@ -192,11 +196,17 @@ public class SuuntoJsonProcessor {
 				_sampleList.add(timeData);
 		}
 
-		// removing the entries that don't have GPS data
+		// Cleaning-up the processed entries as there should only be entries
+		// every x seconds, no entries should be in between (entries with milliseconds).
 		Iterator<TimeData> sampleListIterator = _sampleList.iterator();
 		while (sampleListIterator.hasNext()) {
 			TimeData currentTimeData = sampleListIterator.next();
-			if (currentTimeData.longitude == Double.MIN_VALUE && currentTimeData.latitude == Double.MIN_VALUE)
+
+			// Removing the entries that don't have GPS data
+			// In the case where the activity is an indoor tour,
+			// we remove the entries that don't have altitude data
+			if ((!isIndoorTour && currentTimeData.longitude == Double.MIN_VALUE && currentTimeData.latitude == Double.MIN_VALUE) ||
+					(isIndoorTour && currentTimeData.absoluteAltitude == Float.MIN_VALUE))
 				sampleListIterator.remove();
 		}
 
