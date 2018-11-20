@@ -2751,11 +2751,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                   onSurfing_ResetToDefaults();
                }
             });
-
-//            GridDataFactory.fillDefaults()
-//                  .span(3, 1)
-//                  .align(SWT.BEGINNING, SWT.FILL)
-//                  .applyTo(_btnSurfing_RestoreFrom_Defaults);
          }
          {
             /*
@@ -2771,12 +2766,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                }
             });
 
-//            GridDataFactory.fillDefaults()
-//                  .span(3, 1)
-//                  .align(SWT.BEGINNING, SWT.FILL)
-//                  .applyTo(_btnSurfing_RestoreFrom_Tour);
-            UI.setButtonLayoutData(_btnSurfing_RestoreFrom_Defaults);
-            UI.setButtonLayoutData(_btnSurfing_RestoreFrom_Tour);
+// Sometime the button are toooooo wide
+//            UI.setButtonLayoutData(_btnSurfing_RestoreFrom_Defaults);
+//            UI.setButtonLayoutData(_btnSurfing_RestoreFrom_Tour);
          }
       }
    }
