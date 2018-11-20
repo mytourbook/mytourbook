@@ -54,6 +54,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
@@ -219,7 +220,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private static final RGB    SEGMENTER_FILTER_1_BACKGROUND_RGB        = new RGB(250, 255, 232);
    private static final RGB    SEGMENTER_FILTER_1_BACKGROUND_RGB_HEADER = new RGB(224, 250, 155);
    private static final RGB    SEGMENTER_FILTER_2_BACKGROUND_RGB        = new RGB(229, 242, 255);
-   private static final RGB    SEGMENTER_FILTER_2_BACKGROUND_RGB_HEADER = new RGB(255, 180, 113);
+   private static final RGB    SEGMENTER_FILTER_2_BACKGROUND_RGB_HEADER = new RGB(167, 214, 255);
    //
    static final String         STATE_COLOR_ALTITUDE_DOWN                = "STATE_COLOR_ALTITUDE_DOWN";            //$NON-NLS-1$
    static final String         STATE_COLOR_ALTITUDE_UP                  = "STATE_COLOR_ALTITUDE_UP";              //$NON-NLS-1$
@@ -4489,11 +4490,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                   final boolean isShowOnlySelectedSegments = _chkIsShowOnlySelectedSegments.getSelection();
 
                   if (isShowOnlySelectedSegments) {
-
                      onSurfing_ShowOnlySelectedSegments();
-
-                     // skip default selection provider
-                     return;
                   }
 
                   break;
@@ -4850,46 +4847,34 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       updateUI_SegmenterBackground();
 
-      _tourData.visibleDataPointSerie = createVisibleDataPoints(getSelectedSurfingFilter());
+      final SurfingFilterType selectedSurfingFilter = getSelectedSurfingFilter();
+      _tourData.visibleDataPointSerie = createVisibleDataPoints(selectedSurfingFilter);
 
-      // show empty segments
-//      reloadViewer();
-
+      // this will create tour segments from the visible data points
       _segmentViewer.refresh(false);
 
       enableActions_Surfing();
+
+      // set default color
+      Color bgColor = null;
+
+      switch (selectedSurfingFilter) {
+      case NotSurfing:
+         bgColor = _colorCache.get(SEGMENTER_FILTER_2_BACKGROUND_HEADER);
+         break;
+      case Surfing:
+         bgColor = _colorCache.get(SEGMENTER_FILTER_1_BACKGROUND_HEADER);
+         break;
+      case All:
+         break;
+      }
+
+      _comboSurfing_SegmenterFilter.setBackground(bgColor);
 
       TourManager.fireEventWithCustomData(//
             TourEventId.SEGMENT_LAYER_CHANGED,
             _tourData,
             TourSegmenterView.this);
-
-//      switch (getSelectedSurfingFilter()) {
-//      case All:
-//
-//         // hide segmenter data points
-//
-//         restoreVisibleDataPointsBeforeNextTourIsSet();
-//
-//         _tourData.visibleDataPointSerie = null;
-//
-//         // show empty segments
-//         reloadViewer();
-//
-//         enableActions_Surfing();
-//
-//         TourManager.fireEventWithCustomData(//
-//               TourEventId.SEGMENT_LAYER_CHANGED,
-//               _tourData,
-//               TourSegmenterView.this);
-//
-//         break;
-//
-//      default:
-//         break;
-//      }
-
-//      _segmentViewer.refresh(false);
    }
 
    private void onSurfing_ShowOnlySelectedSegments() {
