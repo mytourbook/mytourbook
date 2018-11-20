@@ -187,7 +187,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	public static final Float 			RUN_DYN_DATA_MULTIPLIER				= 100f;
 
-	public static final short        DISABLED_SURFING_VALUES          = -1;
+	public static final short        SURFING_VALUE_IS_NOT_SET         = -1;
 
 	/**
 	 * Device Id for manually created tours
@@ -199,7 +199,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 	 * disabled because they are not available, tour duration can be edited<br>
 	 * this is the id of the deviceDataReader
 	 */
-	public static final String			DEVICE_ID_CSV_TOUR_DATA_READER		= "net.tourbook.device.CSVTourDataReader";														//$NON-NLS-1$
+	public static final String			DEVICE_ID_CSV_TOUR_DATA_READER	= "net.tourbook.device.CSVTourDataReader";														//$NON-NLS-1$
 
 	/**
 	 * THIS IS NOT UNUSED !!!<br>
@@ -685,14 +685,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    // ############################################# SURFING #######################################
 
-   // -1 indicate that the value is not set
+   // -1 indicate that the value is not yet set
 
-   private short     surfing_MinSpeed_StartStop = DISABLED_SURFING_VALUES;
-   private short     surfing_MinSpeed_Surfing   = DISABLED_SURFING_VALUES;
-   private short     surfing_MinTimeDuration    = DISABLED_SURFING_VALUES;
+   private short     surfing_MinSpeed_StartStop = SURFING_VALUE_IS_NOT_SET;
+   private short     surfing_MinSpeed_Surfing   = SURFING_VALUE_IS_NOT_SET;
+   private short     surfing_MinTimeDuration    = SURFING_VALUE_IS_NOT_SET;
 
    private boolean   surfing_IsMinDistance;
-   private short     surfing_MinDistance        = DISABLED_SURFING_VALUES;
+   private short     surfing_MinDistance        = SURFING_VALUE_IS_NOT_SET;
 
 	// ############################################# GEO BOUNDS #############################################
 
@@ -1546,12 +1546,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    @Transient
    public boolean[] visibleDataPointSerie;
+
    /**
-    * When <code>true</code> then {@link #visibleDataPointSerie} will be saved, otherwise it will be
-    * ignored when the tour is saved.
+    *
     */
    @Transient
-   public boolean   isSaveVisibleDataPoints;
+   public boolean[] visiblePoints_ForSurfing;
 
    public TourData() {}
 
@@ -8284,6 +8284,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
+    * @return Returns <code>true</code> when the {@link SerieData#visiblePoints_Surfing} is saved in
+    *         the tour.
+    */
+   public boolean isVisiblePointsSaved_ForSurfing() {
+
+      // serieData can be null for multiple tours
+
+      return serieData != null && serieData.visiblePoints_Surfing != null;
+   }
+
+   /**
     * Called after the object was loaded from the persistence store
     */
    @PostLoad
@@ -8348,8 +8359,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       swim_Time = serieData.swim_Time;
       isSwimCadence = swim_Cadence != null;
 
-      // surfing
-      visibleDataPointSerie = serieData.visibleDataPoint;
+      // currently only surfing data can be made visible/hidden
+      visibleDataPointSerie = serieData.visiblePoints_Surfing;
    }
 
    /**
@@ -8362,6 +8373,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public void onPrePersist() {
 
+      /*
+       * Create new data series
+       */
       serieData = new SerieData();
 
       serieData.timeSerie = timeSerie;
@@ -8408,10 +8422,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          serieData.cadenceSerie20 = null;
       }
 
-      // surfing
-      if (isSaveVisibleDataPoints) {
-         serieData.visibleDataPoint = visibleDataPointSerie;
-      }
+      serieData.visiblePoints_Surfing = visiblePoints_ForSurfing;
 
       // time serie size
       numberOfTimeSlices = timeSerie == null ? 0 : timeSerie.length;
@@ -8444,6 +8455,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       if (_sortedMarkers != null) {
          _sortedMarkers.clear();
          _sortedMarkers = null;
+      }
+   }
+
+   /**
+    * Set {@link #visibleDataPointSerie} to it's saved values.
+    */
+   public void restoreVisiblePoints_ForSurfing() {
+
+      if (serieData != null) {
+         visibleDataPointSerie = serieData.visiblePoints_Surfing;
       }
    }
 
@@ -9695,6 +9716,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
 
       return isAvailable;
+   }
+
+   /**
+    * Set surfing visible points which can be saved in the tour.
+    *
+    * @param visiblePoints_ForSurfing
+    */
+   public void setVisiblePoints_ForSurfing(final boolean[] visiblePoints_ForSurfing) {
+
+      this.visiblePoints_ForSurfing = visiblePoints_ForSurfing;
    }
 
    public void setWayPoints(final ArrayList<TourWayPoint> wptList) {

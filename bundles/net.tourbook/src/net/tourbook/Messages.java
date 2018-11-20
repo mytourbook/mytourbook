@@ -399,6 +399,9 @@ public class Messages extends NLS {
    public static String        app_unit_minutes;
    public static String        app_unit_seconds;
 
+   public static String        App__False;
+   public static String        App__True;
+
    public static String        App_Action_About;
    public static String        App_Action_Add;
    public static String        App_Action_ApplyDefaults;
@@ -954,12 +957,13 @@ public class Messages extends NLS {
    public static String        Image__State_Deleted_Device;
    public static String        Image__State_DeletedTour_View;
    public static String        Image__State_Error;
-
    public static String        Image__State_Info;
    public static String        Image__State_MovedTour;
    public static String        Image__State_MovedTour_View;
+   public static String        Image__State_NotSavedInTour;
    public static String        Image__State_OK;
    public static String        Image__State_Save;
+   public static String        Image__State_SavedInTour;
    public static String        Image__State_SaveTour;
    public static String        Image__State_TourMarker;
    public static String        Image__SyncMapWithOtherMap;
@@ -2228,6 +2232,11 @@ public class Messages extends NLS {
    public static String Tour_Filter_Operator_Season_UntilToday_From_YearStart;
    public static String Tour_Filter_Operator_StartsWith;
 
+   public static String Tour_Info_Flag_Array;
+   public static String Tour_Info_Flag_Database;
+   public static String Tour_Info_Label_AllFields;
+   public static String Tour_Info_Label_AllFields_Tooltip;
+
    public static String Tour_Log_Action_Clear_Tooltip;
 
    public static String Tour_Marker_Column_Description_ShortCut;
@@ -2274,13 +2283,21 @@ public class Messages extends NLS {
    public static String Tour_Segmenter_Action_ShowHideSegmentsInTourChart_Tooltip;
    public static String Tour_Segmenter_Button_SaveTour;
    public static String Tour_Segmenter_Button_SaveTour_Tooltip;
-   public static String Tour_Segmenter_Button_SurfingSaveTour_Tooltip;
+   public static String Tour_Segmenter_Button_Surfing_DeleteTourSegments;
+   public static String Tour_Segmenter_Button_Surfing_DeleteTourSegments_Tooltip;
+   public static String Tour_Segmenter_Button_Surfing_IsNotSaveState_Tooltip;
+   public static String Tour_Segmenter_Button_Surfing_IsSaveState_Tooltip;
+   public static String Tour_Segmenter_Button_Surfing_SaveTourSegments_Tooltip;
+   public static String Tour_Segmenter_Button_SurfingSaveState_Tooltip;
    public static String Tour_Segmenter_Label_AltitudeUpDown_Tooltip;
    public static String Tour_Segmenter_Label_DPTolerance;
    public static String Tour_Segmenter_Label_DPTolerance_Tooltip;
    public static String Tour_Segmenter_Label_no_chart;
    public static String Tour_Segmenter_Label_NumberOfSegments_Tooltip;
-
+   public static String Tour_Segmenter_Surfing_Button_RestoreFromDefaults_Tooltip;
+   public static String Tour_Segmenter_Surfing_Button_RestoreFromTour;
+   public static String Tour_Segmenter_Surfing_Button_RestoreFromTour_Tooltip;
+   public static String Tour_Segmenter_Surfing_Button_RestoreFromTourWithData_Tooltip;
    public static String Tour_Segmenter_Surfing_Checkbox_IsMinSurfingDistance;
    public static String Tour_Segmenter_Surfing_Checkbox_IsShowOnlySelectedSegments;
    public static String Tour_Segmenter_Surfing_Checkbox_IsShowOnlySurfingSegments;

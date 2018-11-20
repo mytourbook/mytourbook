@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -16,17 +16,6 @@
 package net.tourbook.preferences;
 
 import java.util.ArrayList;
-
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.util.TableLayoutComposite;
-import net.tourbook.data.TourType;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.tour.TourTypeFilterManager;
-import net.tourbook.tourType.TourTypeImage;
-import net.tourbook.ui.TourTypeFilter;
-import net.tourbook.ui.TourTypeFilterSet;
-import net.tourbook.ui.UI;
 
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -63,6 +52,8 @@ import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -71,774 +62,846 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.util.TableLayoutComposite;
+import net.tourbook.data.TourType;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.tour.TourTypeFilterManager;
+import net.tourbook.tourType.TourTypeImage;
+import net.tourbook.ui.TourTypeFilter;
+import net.tourbook.ui.TourTypeFilterSet;
+import net.tourbook.ui.UI;
+
 public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkbenchPreferencePage {
 
-	private final IPreferenceStore		_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
+   private final IPreferenceStore    _prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
-	private IPropertyChangeListener		_prefChangeListener;
+   private SelectionAdapter          _defaultSelectionAdapter;
+   private MouseWheelListener        _defaultMouseWheelListener;
+   private IPropertyChangeListener   _prefChangeListener;
 
-	private long						_dragStartViewerLeft;
+   private long                      _dragStartViewerLeft;
 
-	private boolean						_isModified;
+   private boolean                   _isModified;
 
-	private ArrayList<TourType>			_tourTypes;
-	private ArrayList<TourTypeFilter>	_filterList;
+   private ArrayList<TourType>       _tourTypes;
+   private ArrayList<TourTypeFilter> _filterList;
 
-	private TourTypeFilter				_activeFilter;
+   private TourTypeFilter            _activeFilter;
 
-	/*
-	 * UI controls
-	 */
-	private TableViewer					_filterViewer;
+   /*
+    * UI controls
+    */
+   private TableViewer         _filterViewer;
 
-	private CheckboxTableViewer			_tourTypeViewer;
+   private CheckboxTableViewer _tourTypeViewer;
 
-	private Button						_btnNew;
-	private Button						_btnRename;
-	private Button						_btnRemove;
-	private Button						_btnUp;
-	private Button						_btnDown;
+   private Button              _btnNew;
+   private Button              _btnRename;
+   private Button              _btnRemove;
+   private Button              _btnUp;
+   private Button              _btnDown;
 
-	private Button						_chkTourTypeContextMenu;
+   private Button              _chkTourTypeContextMenu;
 
-	public PrefPageTourTypeFilterList() {}
+   private Spinner             _spinnerRecentTourTypes;
 
-	public PrefPageTourTypeFilterList(final String title) {
-		super(title);
-	}
+   public PrefPageTourTypeFilterList() {}
 
-	public PrefPageTourTypeFilterList(final String title, final ImageDescriptor image) {
-		super(title, image);
-	}
+   public PrefPageTourTypeFilterList(final String title) {
+      super(title);
+   }
 
-	private void addPrefListener() {
+   public PrefPageTourTypeFilterList(final String title, final ImageDescriptor image) {
+      super(title, image);
+   }
 
-		_prefChangeListener = new IPropertyChangeListener() {
-			@Override
-			public void propertyChange(final PropertyChangeEvent event) {
+   private void addPrefListener() {
 
-				if (event.getProperty().equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
-					updateViewers();
-				}
-			}
-		};
+      _prefChangeListener = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
 
-		_prefStore.addPropertyChangeListener(_prefChangeListener);
-	}
+            if (event.getProperty().equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
+               updateViewers();
+            }
+         }
+      };
 
-	@Override
-	protected Control createContents(final Composite parent) {
+      _prefStore.addPropertyChangeListener(_prefChangeListener);
+   }
 
-		final Composite ui = createUI(parent);
+   @Override
+   protected Control createContents(final Composite parent) {
 
-		restoreState();
+      initUI();
 
-		addPrefListener();
+      final Composite ui = createUI(parent);
 
-		updateViewers();
+      restoreState();
 
-		return ui;
-	}
+      addPrefListener();
 
-	private Composite createUI(final Composite parent) {
+      updateViewers();
 
-		Label label = new Label(parent, SWT.WRAP);
-		label.setText(Messages.Pref_TourTypes_root_title);
-		label.setLayoutData(new GridData(SWT.NONE, SWT.NONE, true, false));
+      return ui;
+   }
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
-		{
-			createUI_10_FilterViewer(container);
-			createUI_20_TourTypeViewer(container);
-			createUI_30_Buttons(container);
-		}
+   private Composite createUI(final Composite parent) {
 
-		// hint to use drag & drop
-		label = new Label(parent, SWT.WRAP);
-		label.setText(Messages.Pref_TourTypes_dnd_hint);
-		label.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
+      Label label = new Label(parent, SWT.WRAP);
+      label.setText(Messages.Pref_TourTypes_root_title);
+      label.setLayoutData(new GridData(SWT.NONE, SWT.NONE, true, false));
 
-		/*
-		 * show tour type context menu on mouse over
-		 */
-		_chkTourTypeContextMenu = new Button(parent, SWT.CHECK | SWT.WRAP);
-		GridDataFactory.fillDefaults().indent(0, 10).applyTo(_chkTourTypeContextMenu);
-		_chkTourTypeContextMenu.setText(Messages.Pref_Appearance_ShowTourTypeContextMenu);
-		_chkTourTypeContextMenu.setToolTipText(Messages.Pref_Appearance_ShowTourTypeContextMenu_Tooltip);
-		_chkTourTypeContextMenu.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				_isModified = true;
-			}
-		});
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+      {
+         createUI_10_FilterViewer(container);
+         createUI_20_TourTypeViewer(container);
+         createUI_30_Buttons(container);
+      }
 
-		// spacer
-		new Label(parent, SWT.WRAP);
-
-		return container;
-	}
-
-	private void createUI_10_FilterViewer(final Composite parent) {
-
-		final TableLayoutComposite layouter = new TableLayoutComposite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).hint(200, SWT.DEFAULT).applyTo(layouter);
-
-		final Table table = new Table(layouter, (SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION));
-		table.setHeaderVisible(false);
-		table.setLinesVisible(false);
-
-		TableViewerColumn tvc;
-
-		_filterViewer = new TableViewer(table);
-
-		// column: name + image
-		tvc = new TableViewerColumn(_filterViewer, SWT.NONE);
-		tvc.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final TourTypeFilter filter = ((TourTypeFilter) cell.getElement());
-				final int filterType = filter.getFilterType();
-
-				String filterName = null;
-				Image filterImage = null;
-
-				// set filter name/image
-				switch (filterType) {
-				case TourTypeFilter.FILTER_TYPE_DB:
-					final TourType tourType = filter.getTourType();
-					filterName = tourType.getName();
-					filterImage = TourTypeImage.getTourTypeImage(tourType.getTypeId());
-					break;
+      // hint to use drag & drop
+      label = new Label(parent, SWT.WRAP);
+      label.setText(Messages.Pref_TourTypes_dnd_hint);
+      label.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
 
-				case TourTypeFilter.FILTER_TYPE_SYSTEM:
-					filterName = filter.getSystemFilterName();
-					filterImage = UI.IMAGE_REGISTRY.get(UI.IMAGE_TOUR_TYPE_FILTER_SYSTEM);
-					break;
+      createUI_50_Options(parent);
 
-				case TourTypeFilter.FILTER_TYPE_TOURTYPE_SET:
-					filterName = filter.getTourTypeSet().getName();
-					filterImage = UI.IMAGE_REGISTRY.get(UI.IMAGE_TOUR_TYPE_FILTER);
-					break;
+      // spacer
+      new Label(parent, SWT.WRAP);
 
-				default:
-					break;
-				}
+      return container;
+   }
 
-				cell.setText(filterName);
-				cell.setImage(filterImage);
-			}
-		});
-		layouter.addColumnData(new ColumnWeightData(1));
+   private void createUI_10_FilterViewer(final Composite parent) {
+
+      final TableLayoutComposite layouter = new TableLayoutComposite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).hint(200, SWT.DEFAULT).applyTo(layouter);
+
+      final Table table = new Table(layouter, (SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION));
+      table.setHeaderVisible(false);
+      table.setLinesVisible(false);
+
+      TableViewerColumn tvc;
+
+      _filterViewer = new TableViewer(table);
+
+      // column: name + image
+      tvc = new TableViewerColumn(_filterViewer, SWT.NONE);
+      tvc.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourTypeFilter filter = ((TourTypeFilter) cell.getElement());
+            final int filterType = filter.getFilterType();
+
+            String filterName = null;
+            Image filterImage = null;
+
+            // set filter name/image
+            switch (filterType) {
+            case TourTypeFilter.FILTER_TYPE_DB:
+               final TourType tourType = filter.getTourType();
+               filterName = tourType.getName();
+               filterImage = TourTypeImage.getTourTypeImage(tourType.getTypeId());
+               break;
+
+            case TourTypeFilter.FILTER_TYPE_SYSTEM:
+               filterName = filter.getSystemFilterName();
+               filterImage = UI.IMAGE_REGISTRY.get(UI.IMAGE_TOUR_TYPE_FILTER_SYSTEM);
+               break;
+
+            case TourTypeFilter.FILTER_TYPE_TOURTYPE_SET:
+               filterName = filter.getTourTypeSet().getName();
+               filterImage = UI.IMAGE_REGISTRY.get(UI.IMAGE_TOUR_TYPE_FILTER);
+               break;
 
-		_filterViewer.setContentProvider(new IStructuredContentProvider() {
-			@Override
-			public void dispose() {}
+            default:
+               break;
+            }
 
-			@Override
-			public Object[] getElements(final Object inputElement) {
-				return _filterList.toArray();
-			}
+            cell.setText(filterName);
+            cell.setImage(filterImage);
+         }
+      });
+      layouter.addColumnData(new ColumnWeightData(1));
 
-			@Override
-			public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
-		});
+      _filterViewer.setContentProvider(new IStructuredContentProvider() {
+         @Override
+         public void dispose() {}
 
-		_filterViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			@Override
-			public void selectionChanged(final SelectionChangedEvent event) {
-				onSelectFilter();
-			}
-		});
+         @Override
+         public Object[] getElements(final Object inputElement) {
+            return _filterList.toArray();
+         }
 
-		_filterViewer.addDoubleClickListener(new IDoubleClickListener() {
-			@Override
-			public void doubleClick(final DoubleClickEvent event) {
-				onRenameFilterSet();
-			}
-		});
+         @Override
+         public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
+      });
 
-		/*
-		 * set drag adapter
-		 */
-		_filterViewer.addDragSupport(
-				DND.DROP_MOVE,
-				new Transfer[] { LocalSelectionTransfer.getTransfer() },
-				new DragSourceListener() {
+      _filterViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+         @Override
+         public void selectionChanged(final SelectionChangedEvent event) {
+            onSelectFilter();
+         }
+      });
 
-					@Override
-					public void dragFinished(final DragSourceEvent event) {
+      _filterViewer.addDoubleClickListener(new IDoubleClickListener() {
+         @Override
+         public void doubleClick(final DoubleClickEvent event) {
+            onRenameFilterSet();
+         }
+      });
 
-						final LocalSelectionTransfer transfer = LocalSelectionTransfer.getTransfer();
+      /*
+       * set drag adapter
+       */
+      _filterViewer.addDragSupport(
+            DND.DROP_MOVE,
+            new Transfer[] { LocalSelectionTransfer.getTransfer() },
+            new DragSourceListener() {
 
-						if (event.doit == false) {
-							return;
-						}
+               @Override
+               public void dragFinished(final DragSourceEvent event) {
 
-						transfer.setSelection(null);
-						transfer.setSelectionSetTime(0);
-					}
+                  final LocalSelectionTransfer transfer = LocalSelectionTransfer.getTransfer();
 
-					@Override
-					public void dragSetData(final DragSourceEvent event) {
-						// data are set in LocalSelectionTransfer
-					}
+                  if (event.doit == false) {
+                     return;
+                  }
 
-					@Override
-					public void dragStart(final DragSourceEvent event) {
+                  transfer.setSelection(null);
+                  transfer.setSelectionSetTime(0);
+               }
 
-						final LocalSelectionTransfer transfer = LocalSelectionTransfer.getTransfer();
-						final ISelection selection = _filterViewer.getSelection();
+               @Override
+               public void dragSetData(final DragSourceEvent event) {
+                  // data are set in LocalSelectionTransfer
+               }
 
-						transfer.setSelection(selection);
-						transfer.setSelectionSetTime(_dragStartViewerLeft = event.time & 0xFFFFFFFFL);
+               @Override
+               public void dragStart(final DragSourceEvent event) {
 
-						event.doit = !selection.isEmpty();
-					}
-				});
+                  final LocalSelectionTransfer transfer = LocalSelectionTransfer.getTransfer();
+                  final ISelection selection = _filterViewer.getSelection();
 
-		/*
-		 * set drop adapter
-		 */
-		final ViewerDropAdapter viewerDropAdapter = new ViewerDropAdapter(_filterViewer) {
+                  transfer.setSelection(selection);
+                  transfer.setSelectionSetTime(_dragStartViewerLeft = event.time & 0xFFFFFFFFL);
 
-			private Widget	_tableItem;
+                  event.doit = !selection.isEmpty();
+               }
+            });
 
-			@Override
-			public void dragOver(final DropTargetEvent dropEvent) {
+      /*
+       * set drop adapter
+       */
+      final ViewerDropAdapter viewerDropAdapter = new ViewerDropAdapter(_filterViewer) {
 
-				// keep table item
-				_tableItem = dropEvent.item;
+         private Widget _tableItem;
 
-				super.dragOver(dropEvent);
-			}
+         @Override
+         public void dragOver(final DropTargetEvent dropEvent) {
 
-			@Override
-			public boolean performDrop(final Object data) {
+            // keep table item
+            _tableItem = dropEvent.item;
 
-				if (data instanceof StructuredSelection) {
-					final StructuredSelection selection = (StructuredSelection) data;
+            super.dragOver(dropEvent);
+         }
 
-					if (selection.getFirstElement() instanceof TourTypeFilter) {
+         @Override
+         public boolean performDrop(final Object data) {
 
-						final TourTypeFilter filterItem = (TourTypeFilter) selection.getFirstElement();
+            if (data instanceof StructuredSelection) {
+               final StructuredSelection selection = (StructuredSelection) data;
 
-						final int location = getCurrentLocation();
-						final Table filterTable = _filterViewer.getTable();
+               if (selection.getFirstElement() instanceof TourTypeFilter) {
 
-						/*
-						 * check if drag was startet from this filter, remove the filter item before
-						 * the new filter is inserted
-						 */
-						if (LocalSelectionTransfer.getTransfer().getSelectionSetTime() == _dragStartViewerLeft) {
-							_filterViewer.remove(filterItem);
-						}
+                  final TourTypeFilter filterItem = (TourTypeFilter) selection.getFirstElement();
 
-						int filterIndex;
+                  final int location = getCurrentLocation();
+                  final Table filterTable = _filterViewer.getTable();
 
-						if (_tableItem == null) {
+                  /*
+                   * check if drag was startet from this filter, remove the filter item before the
+                   * new filter is inserted
+                   */
+                  if (LocalSelectionTransfer.getTransfer().getSelectionSetTime() == _dragStartViewerLeft) {
+                     _filterViewer.remove(filterItem);
+                  }
 
-							_filterViewer.add(filterItem);
-							filterIndex = filterTable.getItemCount() - 1;
+                  int filterIndex;
 
-						} else {
+                  if (_tableItem == null) {
 
-							// get index of the target in the table
-							filterIndex = filterTable.indexOf((TableItem) _tableItem);
-							if (filterIndex == -1) {
-								return false;
-							}
+                     _filterViewer.add(filterItem);
+                     filterIndex = filterTable.getItemCount() - 1;
 
-							if (location == LOCATION_BEFORE) {
-								_filterViewer.insert(filterItem, filterIndex);
-							} else if (location == LOCATION_AFTER || location == LOCATION_ON) {
-								_filterViewer.insert(filterItem, ++filterIndex);
-							}
-						}
+                  } else {
 
-						// reselect filter item
-						_filterViewer.setSelection(new StructuredSelection(filterItem));
+                     // get index of the target in the table
+                     filterIndex = filterTable.indexOf((TableItem) _tableItem);
+                     if (filterIndex == -1) {
+                        return false;
+                     }
 
-						// set focus to selection
-						filterTable.setSelection(filterIndex);
-						filterTable.setFocus();
+                     if (location == LOCATION_BEFORE) {
+                        _filterViewer.insert(filterItem, filterIndex);
+                     } else if (location == LOCATION_AFTER || location == LOCATION_ON) {
+                        _filterViewer.insert(filterItem, ++filterIndex);
+                     }
+                  }
 
-						_isModified = true;
+                  // reselect filter item
+                  _filterViewer.setSelection(new StructuredSelection(filterItem));
 
-						return true;
-					}
-				}
+                  // set focus to selection
+                  filterTable.setSelection(filterIndex);
+                  filterTable.setFocus();
+
+                  _isModified = true;
 
-				return false;
-			}
+                  return true;
+               }
+            }
 
-			@Override
-			public boolean validateDrop(final Object target, final int operation, final TransferData transferType) {
+            return false;
+         }
 
-				final ISelection selection = LocalSelectionTransfer.getTransfer().getSelection();
-				if (selection instanceof StructuredSelection) {
-					final Object dragFilter = ((StructuredSelection) selection).getFirstElement();
-					if (target == dragFilter) {
-						return false;
-					}
-				}
+         @Override
+         public boolean validateDrop(final Object target, final int operation, final TransferData transferType) {
 
-				if (LocalSelectionTransfer.getTransfer().isSupportedType(transferType) == false) {
-					return false;
-				}
+            final ISelection selection = LocalSelectionTransfer.getTransfer().getSelection();
+            if (selection instanceof StructuredSelection) {
+               final Object dragFilter = ((StructuredSelection) selection).getFirstElement();
+               if (target == dragFilter) {
+                  return false;
+               }
+            }
 
-				return true;
-			}
+            if (LocalSelectionTransfer.getTransfer().isSupportedType(transferType) == false) {
+               return false;
+            }
 
-		};
+            return true;
+         }
 
-		_filterViewer.addDropSupport(
-				DND.DROP_MOVE,
-				new Transfer[] { LocalSelectionTransfer.getTransfer() },
-				viewerDropAdapter);
-	}
+      };
 
-	private void createUI_20_TourTypeViewer(final Composite parent) {
+      _filterViewer.addDropSupport(
+            DND.DROP_MOVE,
+            new Transfer[] { LocalSelectionTransfer.getTransfer() },
+            viewerDropAdapter);
+   }
 
-		final TableLayoutComposite layouter = new TableLayoutComposite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).hint(200, SWT.DEFAULT).applyTo(layouter);
+   private void createUI_20_TourTypeViewer(final Composite parent) {
 
-		final Table table = new Table(
-				layouter,
-				(SWT.CHECK | SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION));
+      final TableLayoutComposite layouter = new TableLayoutComposite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).hint(200, SWT.DEFAULT).applyTo(layouter);
 
-		table.setHeaderVisible(false);
-		table.setLinesVisible(false);
+      final Table table = new Table(
+            layouter,
+            (SWT.CHECK | SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION));
 
-		_tourTypeViewer = new CheckboxTableViewer(table);
+      table.setHeaderVisible(false);
+      table.setLinesVisible(false);
 
-		TableViewerColumn tvc;
+      _tourTypeViewer = new CheckboxTableViewer(table);
 
-		// column: name
-		tvc = new TableViewerColumn(_tourTypeViewer, SWT.NONE);
-		tvc.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final TourType tourType = ((TourType) cell.getElement());
-				cell.setText(tourType.getName());
-				cell.setImage(TourTypeImage.getTourTypeImage(tourType.getTypeId()));
-			}
-		});
-		layouter.addColumnData(new ColumnWeightData(1));
+      TableViewerColumn tvc;
 
-		_tourTypeViewer.setContentProvider(new IStructuredContentProvider() {
+      // column: name
+      tvc = new TableViewerColumn(_tourTypeViewer, SWT.NONE);
+      tvc.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+            final TourType tourType = ((TourType) cell.getElement());
+            cell.setText(tourType.getName());
+            cell.setImage(TourTypeImage.getTourTypeImage(tourType.getTypeId()));
+         }
+      });
+      layouter.addColumnData(new ColumnWeightData(1));
 
-			@Override
-			public void dispose() {}
+      _tourTypeViewer.setContentProvider(new IStructuredContentProvider() {
 
-			@Override
-			public Object[] getElements(final Object inputElement) {
-				return _tourTypes.toArray();
-			}
+         @Override
+         public void dispose() {}
 
-			@Override
-			public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
-		});
+         @Override
+         public Object[] getElements(final Object inputElement) {
+            return _tourTypes.toArray();
+         }
 
-		_tourTypeViewer.addCheckStateListener(new ICheckStateListener() {
-			@Override
-			public void checkStateChanged(final CheckStateChangedEvent event) {
-				_isModified = true;
-			}
-		});
+         @Override
+         public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
+      });
 
-		_tourTypeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			@Override
-			public void selectionChanged(final SelectionChangedEvent event) {
-				onSelectTourType();
-			}
-		});
+      _tourTypeViewer.addCheckStateListener(new ICheckStateListener() {
+         @Override
+         public void checkStateChanged(final CheckStateChangedEvent event) {
+            _isModified = true;
+         }
+      });
 
-		_tourTypeViewer.addDoubleClickListener(new IDoubleClickListener() {
-			@Override
-			public void doubleClick(final DoubleClickEvent event) {
+      _tourTypeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+         @Override
+         public void selectionChanged(final SelectionChangedEvent event) {
+            onSelectTourType();
+         }
+      });
 
-				/*
-				 * invert check state
-				 */
-				final TourType tourType = (TourType) ((StructuredSelection) _tourTypeViewer.getSelection())
-						.getFirstElement();
+      _tourTypeViewer.addDoubleClickListener(new IDoubleClickListener() {
+         @Override
+         public void doubleClick(final DoubleClickEvent event) {
 
-				final boolean isChecked = _tourTypeViewer.getChecked(tourType);
+            /*
+             * invert check state
+             */
+            final TourType tourType = (TourType) ((StructuredSelection) _tourTypeViewer.getSelection())
+                  .getFirstElement();
 
-				_tourTypeViewer.setChecked(tourType, !isChecked);
+            final boolean isChecked = _tourTypeViewer.getChecked(tourType);
+
+            _tourTypeViewer.setChecked(tourType, !isChecked);
 
 //				getSelectedTourTypes();
-			}
-		});
-	}
-
-	private void createUI_30_Buttons(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().applyTo(container);
-		GridLayoutFactory.fillDefaults().margins(0, 0).applyTo(container);
-		{
-			// button: new
-			_btnNew = new Button(container, SWT.NONE);
-			_btnNew.setText(Messages.Pref_TourTypeFilter_button_new);
-			setButtonLayoutData(_btnNew);
-			_btnNew.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onNewFilterSet();
-				}
-			});
-
-			// button: rename
-			_btnRename = new Button(container, SWT.NONE);
-			_btnRename.setText(Messages.Pref_TourTypeFilter_button_rename);
-			setButtonLayoutData(_btnRename);
-			_btnRename.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onRenameFilterSet();
-				}
-			});
-
-			// button: delete
-			_btnRemove = new Button(container, SWT.NONE);
-			_btnRemove.setText(Messages.Pref_TourTypeFilter_button_remove);
-			setButtonLayoutData(_btnRemove);
-			_btnRemove.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onDeleteFilterSet();
-				}
-			});
-
-			// spacer
-			new Label(container, SWT.NONE);
-
-			// button: up
-			_btnUp = new Button(container, SWT.NONE);
-			_btnUp.setText(Messages.PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_up);
-			setButtonLayoutData(_btnUp);
-			_btnUp.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onMoveUp();
-				}
-			});
-
-			// button: down
-			_btnDown = new Button(container, SWT.NONE);
-			_btnDown.setText(Messages.PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_down);
-			setButtonLayoutData(_btnDown);
-			_btnDown.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onMoveDown();
-				}
-			});
-		}
-	}
-
-	@Override
-	public void dispose() {
-
-		_prefStore.removePropertyChangeListener(_prefChangeListener);
-
-		super.dispose();
-	}
-
-	private void enableButtons() {
-
-		final IStructuredSelection selection = (IStructuredSelection) _filterViewer.getSelection();
-
-		final TourTypeFilter filterItem = (TourTypeFilter) selection.getFirstElement();
-		final Table filterTable = _filterViewer.getTable();
-
-		_btnUp.setEnabled(filterItem != null && filterTable.getSelectionIndex() > 0);
-
-		_btnDown.setEnabled(filterItem != null && filterTable.getSelectionIndex() < filterTable.getItemCount() - 1);
-
-		_btnRename.setEnabled(filterItem != null
-				&& filterItem.getFilterType() == TourTypeFilter.FILTER_TYPE_TOURTYPE_SET);
-
-		_btnRemove.setEnabled(filterItem != null
-				&& filterItem.getFilterType() == TourTypeFilter.FILTER_TYPE_TOURTYPE_SET);
-	}
-
-	@Override
-	public void init(final IWorkbench workbench) {
-		setPreferenceStore(_prefStore);
-	}
-
-	@Override
-	public boolean isValid() {
+         }
+      });
+   }
+
+   private void createUI_30_Buttons(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().applyTo(container);
+      GridLayoutFactory.fillDefaults().margins(0, 0).applyTo(container);
+      {
+         // button: new
+         _btnNew = new Button(container, SWT.NONE);
+         _btnNew.setText(Messages.Pref_TourTypeFilter_button_new);
+         setButtonLayoutData(_btnNew);
+         _btnNew.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               onNewFilterSet();
+            }
+         });
+
+         // button: rename
+         _btnRename = new Button(container, SWT.NONE);
+         _btnRename.setText(Messages.Pref_TourTypeFilter_button_rename);
+         setButtonLayoutData(_btnRename);
+         _btnRename.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               onRenameFilterSet();
+            }
+         });
+
+         // button: delete
+         _btnRemove = new Button(container, SWT.NONE);
+         _btnRemove.setText(Messages.Pref_TourTypeFilter_button_remove);
+         setButtonLayoutData(_btnRemove);
+         _btnRemove.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               onDeleteFilterSet();
+            }
+         });
+
+         // spacer
+         new Label(container, SWT.NONE);
+
+         // button: up
+         _btnUp = new Button(container, SWT.NONE);
+         _btnUp.setText(Messages.PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_up);
+         setButtonLayoutData(_btnUp);
+         _btnUp.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               onMoveUp();
+            }
+         });
+
+         // button: down
+         _btnDown = new Button(container, SWT.NONE);
+         _btnDown.setText(Messages.PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_down);
+         setButtonLayoutData(_btnDown);
+         _btnDown.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               onMoveDown();
+            }
+         });
+      }
+   }
+
+   private void createUI_50_Options(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      {
+         {
+            /*
+             * show tour type context menu on mouse over
+             */
+            _chkTourTypeContextMenu = new Button(container, SWT.CHECK | SWT.WRAP);
+            _chkTourTypeContextMenu.setText(Messages.Pref_Appearance_ShowTourTypeContextMenu);
+            _chkTourTypeContextMenu.setToolTipText(Messages.Pref_Appearance_ShowTourTypeContextMenu_Tooltip);
+            _chkTourTypeContextMenu.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  _isModified = true;
+               }
+            });
+            GridDataFactory.fillDefaults()
+                  .span(2, 1)
+                  .indent(0, 10)
+                  .applyTo(_chkTourTypeContextMenu);
+         }
+         {
+            /*
+             * number of recent tour types
+             */
+            final Label label = new Label(container, NONE);
+            label.setText(Messages.Pref_Appearance_NumberOfRecent_TourTypes);
+            label.setToolTipText(Messages.Pref_Appearance_NumberOfRecent_TourTypes_Tooltip);
 
-		saveState();
+            // spinner
+            _spinnerRecentTourTypes = new Spinner(container, SWT.BORDER);
+            _spinnerRecentTourTypes.setToolTipText(Messages.Pref_Appearance_NumberOfRecent_TourTypes_Tooltip);
+            _spinnerRecentTourTypes.setMinimum(0);
+            _spinnerRecentTourTypes.setMaximum(9);
+            _spinnerRecentTourTypes.addSelectionListener(_defaultSelectionAdapter);
+            _spinnerRecentTourTypes.addMouseWheelListener(_defaultMouseWheelListener);
+            GridDataFactory.fillDefaults()
+//                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+                  .align(SWT.BEGINNING, SWT.CENTER)
+                  .applyTo(_spinnerRecentTourTypes);
+         }
+      }
+   }
 
-		return true;
-	}
+   @Override
+   public void dispose() {
 
-	private void onDeleteFilterSet() {
+      _prefStore.removePropertyChangeListener(_prefChangeListener);
 
-		final TourTypeFilter filterItem = (TourTypeFilter) ((IStructuredSelection) _filterViewer.getSelection())
-				.getFirstElement();
+      super.dispose();
+   }
 
-		if (filterItem == null || filterItem.getFilterType() != TourTypeFilter.FILTER_TYPE_TOURTYPE_SET) {
-			return;
-		}
+   private void enableButtons() {
 
-		final Table filterTable = _filterViewer.getTable();
-		final int selectionIndex = filterTable.getSelectionIndex();
+      final IStructuredSelection selection = (IStructuredSelection) _filterViewer.getSelection();
 
-		_filterViewer.remove(filterItem);
+      final TourTypeFilter filterItem = (TourTypeFilter) selection.getFirstElement();
+      final Table filterTable = _filterViewer.getTable();
 
-		// select next filter item
-		final int nextIndex = Math.min(filterTable.getItemCount() - 1, selectionIndex);
-		_filterViewer.setSelection(new StructuredSelection(_filterViewer.getElementAt(nextIndex)));
+      _btnUp.setEnabled(filterItem != null && filterTable.getSelectionIndex() > 0);
+      _btnDown.setEnabled(filterItem != null && filterTable.getSelectionIndex() < filterTable.getItemCount() - 1);
 
-		_isModified = true;
-	}
+      _btnRename.setEnabled(filterItem != null && filterItem.getFilterType() == TourTypeFilter.FILTER_TYPE_TOURTYPE_SET);
+      _btnRemove.setEnabled(filterItem != null && filterItem.getFilterType() == TourTypeFilter.FILTER_TYPE_TOURTYPE_SET);
+   }
 
-	private void onMoveDown() {
+   @Override
+   public void init(final IWorkbench workbench) {
+      setPreferenceStore(_prefStore);
+   }
 
-		final TourTypeFilter filterItem = (TourTypeFilter) ((IStructuredSelection) _filterViewer.getSelection())
-				.getFirstElement();
+   private void initUI() {
 
-		if (filterItem == null) {
-			return;
-		}
+      _defaultSelectionAdapter = new SelectionAdapter() {
+         @Override
+         public void widgetSelected(final SelectionEvent e) {
+            onChangeProperty();
+         }
+      };
 
-		final Table filterTable = _filterViewer.getTable();
-		final int selectionIndex = filterTable.getSelectionIndex();
+      _defaultMouseWheelListener = new MouseWheelListener() {
+         @Override
+         public void mouseScrolled(final MouseEvent event) {
+            net.tourbook.common.UI.adjustSpinnerValueOnMouseScroll(event);
+            onChangeProperty();
+         }
+      };
+   }
 
-		if (selectionIndex < filterTable.getItemCount() - 1) {
+   @Override
+   public boolean isValid() {
 
-			_filterViewer.remove(filterItem);
-			_filterViewer.insert(filterItem, selectionIndex + 1);
+      saveState();
 
-			// reselect moved item
-			_filterViewer.setSelection(new StructuredSelection(filterItem));
+      return true;
+   }
 
-			if (filterTable.getSelectionIndex() == filterTable.getItemCount() - 1) {
-				_btnUp.setFocus();
-			} else {
-				_btnDown.setFocus();
-			}
+   /**
+    * Property was changed, fire a property change event
+    */
+   private void onChangeProperty() {
+      _isModified = true;
+   }
 
-			_isModified = true;
-		}
-	}
+   private void onDeleteFilterSet() {
 
-	private void onMoveUp() {
+      final TourTypeFilter filterItem = (TourTypeFilter) ((IStructuredSelection) _filterViewer.getSelection())
+            .getFirstElement();
 
-		final TourTypeFilter filterItem = (TourTypeFilter) ((IStructuredSelection) _filterViewer.getSelection())
-				.getFirstElement();
+      if (filterItem == null || filterItem.getFilterType() != TourTypeFilter.FILTER_TYPE_TOURTYPE_SET) {
+         return;
+      }
 
-		if (filterItem == null) {
-			return;
-		}
+      final Table filterTable = _filterViewer.getTable();
+      final int selectionIndex = filterTable.getSelectionIndex();
 
-		final Table filterTable = _filterViewer.getTable();
+      _filterViewer.remove(filterItem);
 
-		final int selectionIndex = filterTable.getSelectionIndex();
-		if (selectionIndex > 0) {
-			_filterViewer.remove(filterItem);
-			_filterViewer.insert(filterItem, selectionIndex - 1);
+      // select next filter item
+      final int nextIndex = Math.min(filterTable.getItemCount() - 1, selectionIndex);
+      _filterViewer.setSelection(new StructuredSelection(_filterViewer.getElementAt(nextIndex)));
 
-			// reselect moved item
-			_filterViewer.setSelection(new StructuredSelection(filterItem));
+      _isModified = true;
+   }
 
-			if (filterTable.getSelectionIndex() == 0) {
-				_btnDown.setFocus();
-			} else {
-				_btnUp.setFocus();
-			}
+   private void onMoveDown() {
 
-			_isModified = true;
-		}
-	}
+      final TourTypeFilter filterItem = (TourTypeFilter) ((IStructuredSelection) _filterViewer.getSelection())
+            .getFirstElement();
 
-	private void onNewFilterSet() {
+      if (filterItem == null) {
+         return;
+      }
 
-		final InputDialog inputDialog = new InputDialog(
-				getShell(),
-				Messages.Pref_TourTypeFilter_dlg_new_title,
-				Messages.Pref_TourTypeFilter_dlg_new_message,
-				UI.EMPTY_STRING,
-				null);
+      final Table filterTable = _filterViewer.getTable();
+      final int selectionIndex = filterTable.getSelectionIndex();
 
-		inputDialog.open();
+      if (selectionIndex < filterTable.getItemCount() - 1) {
 
-		if (inputDialog.getReturnCode() != Window.OK) {
-			return;
-		}
+         _filterViewer.remove(filterItem);
+         _filterViewer.insert(filterItem, selectionIndex + 1);
 
-		// create new filterset
-		final TourTypeFilterSet filterSet = new TourTypeFilterSet();
-		filterSet.setName(inputDialog.getValue().trim());
+         // reselect moved item
+         _filterViewer.setSelection(new StructuredSelection(filterItem));
 
-		final TourTypeFilter tourTypeFilter = new TourTypeFilter(filterSet);
+         if (filterTable.getSelectionIndex() == filterTable.getItemCount() - 1) {
+            _btnUp.setFocus();
+         } else {
+            _btnDown.setFocus();
+         }
 
-		// update model and viewer
-		_filterViewer.add(tourTypeFilter);
-		_filterList.add(tourTypeFilter);
+         _isModified = true;
+      }
+   }
 
-		// select new set
-		_filterViewer.setSelection(new StructuredSelection(tourTypeFilter), true);
+   private void onMoveUp() {
 
-		_tourTypeViewer.getTable().setFocus();
+      final TourTypeFilter filterItem = (TourTypeFilter) ((IStructuredSelection) _filterViewer.getSelection())
+            .getFirstElement();
 
-		_isModified = true;
-	}
+      if (filterItem == null) {
+         return;
+      }
 
-	private void onRenameFilterSet() {
+      final Table filterTable = _filterViewer.getTable();
 
-		final TourTypeFilter filter = (TourTypeFilter) ((StructuredSelection) _filterViewer.getSelection())
-				.getFirstElement();
+      final int selectionIndex = filterTable.getSelectionIndex();
+      if (selectionIndex > 0) {
+         _filterViewer.remove(filterItem);
+         _filterViewer.insert(filterItem, selectionIndex - 1);
 
-		final InputDialog inputDialog = new InputDialog(
-				getShell(),
-				Messages.Pref_TourTypeFilter_dlg_rename_title,
-				Messages.Pref_TourTypeFilter_dlg_rename_message,
-				filter.getFilterName(),
-				null);
+         // reselect moved item
+         _filterViewer.setSelection(new StructuredSelection(filterItem));
 
-		inputDialog.open();
+         if (filterTable.getSelectionIndex() == 0) {
+            _btnDown.setFocus();
+         } else {
+            _btnUp.setFocus();
+         }
 
-		if (inputDialog.getReturnCode() != Window.OK) {
-			return;
-		}
+         _isModified = true;
+      }
+   }
 
-		// update model
-		filter.setName(inputDialog.getValue().trim());
+   private void onNewFilterSet() {
 
-		// update viewer
-		_filterViewer.update(filter, null);
+      final InputDialog inputDialog = new InputDialog(
+            getShell(),
+            Messages.Pref_TourTypeFilter_dlg_new_title,
+            Messages.Pref_TourTypeFilter_dlg_new_message,
+            UI.EMPTY_STRING,
+            null);
 
-		_isModified = true;
-	}
+      inputDialog.open();
 
-	private void onSelectFilter() {
+      if (inputDialog.getReturnCode() != Window.OK) {
+         return;
+      }
 
-		final TourTypeFilter filterItem = (TourTypeFilter) ((StructuredSelection) _filterViewer.getSelection())
-				.getFirstElement();
+      // create new filterset
+      final TourTypeFilterSet filterSet = new TourTypeFilterSet();
+      filterSet.setName(inputDialog.getValue().trim());
 
-		if (filterItem == null) {
-			return;
-		}
+      final TourTypeFilter tourTypeFilter = new TourTypeFilter(filterSet);
 
-		_activeFilter = filterItem;
+      // update model and viewer
+      _filterViewer.add(tourTypeFilter);
+      _filterList.add(tourTypeFilter);
 
-		final int filterType = filterItem.getFilterType();
+      // select new set
+      _filterViewer.setSelection(new StructuredSelection(tourTypeFilter), true);
 
-		Object[] tourTypes;
-		switch (filterType) {
-		case TourTypeFilter.FILTER_TYPE_SYSTEM:
-			final int systemFilter = filterItem.getSystemFilterId();
-			_tourTypeViewer.setAllChecked(systemFilter == TourTypeFilter.SYSTEM_FILTER_ID_ALL);
-			_tourTypeViewer.getTable().setEnabled(false);
+      _tourTypeViewer.getTable().setFocus();
 
-			break;
+      _isModified = true;
+   }
 
-		case TourTypeFilter.FILTER_TYPE_DB:
-			final TourType tourType = filterItem.getTourType();
-			_tourTypeViewer.setCheckedElements(new Object[] { tourType });
-			_tourTypeViewer.getTable().setEnabled(false);
-			break;
+   private void onRenameFilterSet() {
 
-		case TourTypeFilter.FILTER_TYPE_TOURTYPE_SET:
-			_tourTypeViewer.getTable().setEnabled(true);
-			tourTypes = filterItem.getTourTypeSet().getTourTypes();
-			if (tourTypes == null) {
-				_tourTypeViewer.setAllChecked(false);
-			} else {
-				_tourTypeViewer.setCheckedElements(tourTypes);
-			}
-			break;
+      final TourTypeFilter filter = (TourTypeFilter) ((StructuredSelection) _filterViewer.getSelection())
+            .getFirstElement();
 
-		default:
-			break;
-		}
+      final InputDialog inputDialog = new InputDialog(
+            getShell(),
+            Messages.Pref_TourTypeFilter_dlg_rename_title,
+            Messages.Pref_TourTypeFilter_dlg_rename_message,
+            filter.getFilterName(),
+            null);
 
-		enableButtons();
-	}
+      inputDialog.open();
 
-	private void onSelectTourType() {
+      if (inputDialog.getReturnCode() != Window.OK) {
+         return;
+      }
 
-		if (_activeFilter == null) {
-			return;
-		}
+      // update model
+      filter.setName(inputDialog.getValue().trim());
 
-		// set tour types for current filter set
-		if (_activeFilter.getFilterType() == TourTypeFilter.FILTER_TYPE_TOURTYPE_SET) {
-			_activeFilter.getTourTypeSet().setTourTypes(_tourTypeViewer.getCheckedElements());
-		}
-	}
+      // update viewer
+      _filterViewer.update(filter, null);
 
-	@Override
-	protected void performDefaults() {
+      _isModified = true;
+   }
 
-		_isModified = true;
+   private void onSelectFilter() {
 
-		_chkTourTypeContextMenu.setSelection(_prefStore
-				.getDefaultBoolean(ITourbookPreferences.APPEARANCE_SHOW_TOUR_TYPE_CONTEXT_MENU));
+      final TourTypeFilter filterItem = (TourTypeFilter) ((StructuredSelection) _filterViewer.getSelection())
+            .getFirstElement();
 
-		super.performDefaults();
+      if (filterItem == null) {
+         return;
+      }
 
-		// this do not work, I have no idea why, but with the apply button it works :-(
+      _activeFilter = filterItem;
+
+      final int filterType = filterItem.getFilterType();
+
+      Object[] tourTypes;
+      switch (filterType) {
+      case TourTypeFilter.FILTER_TYPE_SYSTEM:
+         final int systemFilter = filterItem.getSystemFilterId();
+         _tourTypeViewer.setAllChecked(systemFilter == TourTypeFilter.SYSTEM_FILTER_ID_ALL);
+         _tourTypeViewer.getTable().setEnabled(false);
+
+         break;
+
+      case TourTypeFilter.FILTER_TYPE_DB:
+         final TourType tourType = filterItem.getTourType();
+         _tourTypeViewer.setCheckedElements(new Object[] { tourType });
+         _tourTypeViewer.getTable().setEnabled(false);
+         break;
+
+      case TourTypeFilter.FILTER_TYPE_TOURTYPE_SET:
+         _tourTypeViewer.getTable().setEnabled(true);
+         tourTypes = filterItem.getTourTypeSet().getTourTypes();
+         if (tourTypes == null) {
+            _tourTypeViewer.setAllChecked(false);
+         } else {
+            _tourTypeViewer.setCheckedElements(tourTypes);
+         }
+         break;
+
+      default:
+         break;
+      }
+
+      enableButtons();
+   }
+
+   private void onSelectTourType() {
+
+      if (_activeFilter == null) {
+         return;
+      }
+
+      // set tour types for current filter set
+      if (_activeFilter.getFilterType() == TourTypeFilter.FILTER_TYPE_TOURTYPE_SET) {
+         _activeFilter.getTourTypeSet().setTourTypes(_tourTypeViewer.getCheckedElements());
+      }
+   }
+
+   @Override
+   protected void performDefaults() {
+
+      _isModified = true;
+
+      _chkTourTypeContextMenu.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.APPEARANCE_SHOW_TOUR_TYPE_CONTEXT_MENU));
+      _spinnerRecentTourTypes.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TOUR_TYPES));
+
+      super.performDefaults();
+
+      // this do not work, I have no idea why, but with the apply button it works :-(
 //		fireModificationEvent();
-	}
+   }
 
-	@Override
-	public boolean performOk() {
+   @Override
+   public boolean performOk() {
 
-		saveState();
+      saveState();
 
-		return true;
-	}
+      return true;
+   }
 
-	private void restoreState() {
+   private void restoreState() {
 
-		_chkTourTypeContextMenu.setSelection(//
-				_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_SHOW_TOUR_TYPE_CONTEXT_MENU));
+      _chkTourTypeContextMenu.setSelection(_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_SHOW_TOUR_TYPE_CONTEXT_MENU));
+      _spinnerRecentTourTypes.setSelection(_prefStore.getInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TOUR_TYPES));
+   }
 
-	}
+   private void saveState() {
 
-	private void saveState() {
+      if (_isModified) {
 
-		if (_isModified) {
+         _isModified = false;
 
-			_isModified = false;
+         TourTypeFilterManager.writeXMLFilterFile(_filterViewer);
 
-			TourTypeFilterManager.writeXMLFilterFile(_filterViewer);
+         _prefStore.setValue(ITourbookPreferences.APPEARANCE_SHOW_TOUR_TYPE_CONTEXT_MENU, _chkTourTypeContextMenu.getSelection());
+         _prefStore.setValue(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TOUR_TYPES, _spinnerRecentTourTypes.getSelection());
 
-			_prefStore.setValue(
-					ITourbookPreferences.APPEARANCE_SHOW_TOUR_TYPE_CONTEXT_MENU,
-					_chkTourTypeContextMenu.getSelection());
+         // fire modify event
+         _prefStore.setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED, Math.random());
+      }
+   }
 
-			// fire modify event
-			_prefStore.setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED, Math.random());
-		}
-	}
+   private void updateViewers() {
 
-	private void updateViewers() {
+      _filterList = TourTypeFilterManager.readTourTypeFilters();
+      _tourTypes = TourDatabase.getAllTourTypes();
 
-		_filterList = TourTypeFilterManager.readTourTypeFilters();
-		_tourTypes = TourDatabase.getAllTourTypes();
+      // show contents in the viewers
+      _filterViewer.setInput(new Object());
+      _tourTypeViewer.setInput(new Object());
 
-		// show contents in the viewers
-		_filterViewer.setInput(new Object());
-		_tourTypeViewer.setInput(new Object());
-
-		enableButtons();
-	}
+      enableButtons();
+   }
 
 }

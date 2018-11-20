@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,6 +21,8 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
@@ -40,102 +42,114 @@ import org.eclipse.ui.PlatformUI;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.font.FontFieldEditorExtended;
+
+import de.byteholder.geoclipse.preferences.IMappingPreferences;
 
 public class PrefPageAppearance extends PreferencePage implements IWorkbenchPreferencePage {
 
-	public static final String		ID			= "net.tourbook.preferences.PrefPageAppearance";	//$NON-NLS-1$
+   private static final String THEME_FONT_LOGGING_PREVIEW_TEXT = de.byteholder.geoclipse.preferences.Messages.Theme_Font_Logging_PREVIEW_TEXT;
+   private static final String THEME_FONT_LOGGING              = de.byteholder.geoclipse.preferences.Messages.Theme_Font_Logging;
 
-	private final boolean			_isOSX		= net.tourbook.common.UI.IS_OSX;
-	private final boolean			_isLinux	= net.tourbook.common.UI.IS_LINUX;
+   //
 
-	private final IPreferenceStore	_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
+   public static final String     ID          = "net.tourbook.preferences.PrefPageAppearance"; //$NON-NLS-1$
 
-	private boolean					_isModified	= false;
+   private final boolean          _isOSX      = net.tourbook.common.UI.IS_OSX;
+   private final boolean          _isLinux    = net.tourbook.common.UI.IS_LINUX;
 
-	/*
-	 * UI tools
-	 */
-	private int						_hintDefaultSpinnerWidth;
-	private PixelConverter			_pc;
-	private SelectionAdapter		_defaultSelectionAdapter;
-	private MouseWheelListener		_defaultMouseWheelListener;
+   private final IPreferenceStore _prefStore  = TourbookPlugin.getPrefStore();
 
-	/*
-	 * UI controls
-	 */
-	private Spinner					_spinnerRecentTourTypes;
-	private Spinner					_spinnerRecentTags;
-	private Button					_chkMemMonitor;
-	private Button					_btnResetAllToggleDialogs;
+   private boolean                _isModified = false;
 
-	private Button					_chkAutoOpenTagging;
-	private Spinner					_spinnerAutoOpenDelay;
-	private Label					_lblAutoTagDelay;
-	private Label					_lblAutoOpenMS;
-	private Button					_chkTaggingAnimation;
+   /*
+    * UI tools
+    */
+   private int                _hintDefaultSpinnerWidth;
+   private PixelConverter     _pc;
+   private SelectionAdapter   _defaultSelectionAdapter;
+   private MouseWheelListener _defaultMouseWheelListener;
 
-	public PrefPageAppearance() {
+   /*
+    * UI controls
+    */
+   private Composite               _uiContainer;
+
+   private Button                  _btnResetAllToggleDialogs;
+
+   private Button                  _chkAutoOpenTagging;
+   private Button                  _chkMemMonitor;
+   private Button                  _chkTaggingAnimation;
+
+   private Label                   _lblAutoTagDelay;
+   private Label                   _lblAutoOpenMS;
+
+   private Spinner                 _spinnerRecentTags;
+   private Spinner                 _spinnerAutoOpenDelay;
+
+   private FontFieldEditorExtended _valueFontEditor;
+
+   public PrefPageAppearance() {
 //		noDefaultAndApplyButton();
-	}
+   }
 
-	@Override
-	protected Control createContents(final Composite parent) {
+   @Override
+   protected Control createContents(final Composite parent) {
 
-		initUITools(parent);
+      initUI(parent);
 
-		final Composite container = createUI(parent);
+      final Composite container = createUI(parent);
 
-		restoreState();
-		enableControls();
+      restoreState();
+      enableControls();
 
-		return container;
-	}
+      return container;
+   }
 
-	private Composite createUI(final Composite parent) {
+   private Composite createUI(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().spacing(5, 15).applyTo(container);
-		{
+      _uiContainer = new Composite(parent, SWT.NONE);
+//      GridDataFactory.fillDefaults().grab(true, false).applyTo(_uiContainer);
+      GridLayoutFactory.fillDefaults().applyTo(_uiContainer);
+      {
 
-			createUI_10_Tagging(container);
-			createUI_20_RecentEntries(container);
-			createUI_30_MemoryMonitor(container);
-			createUI_40_ResetAllToggleDialogs(container);
-		}
+         createUI_10_Tagging(_uiContainer);
+         createUI_20_LogFont(_uiContainer);
+         createUI_30_OtherOptions(_uiContainer);
+      }
 
-		return container;
-	}
+      return _uiContainer;
+   }
 
-	private void createUI_10_Tagging(final Composite parent) {
+   private void createUI_10_Tagging(final Composite parent) {
 
-		final Group group = new Group(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
-		group.setText(Messages.Pref_Appearance_Group_Tagging);
-		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
-		{
-			/*
-			 * number of recent tags
-			 */
-			final Label label = new Label(group, NONE);
-			label.setText(Messages.pref_appearance_number_of_recent_tags);
-			label.setToolTipText(Messages.pref_appearance_number_of_recent_tags_tooltip);
+      final Group group = new Group(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+      group.setText(Messages.Pref_Appearance_Group_Tagging);
+      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
+      {
+         /*
+          * number of recent tags
+          */
+         final Label label = new Label(group, NONE);
+         label.setText(Messages.pref_appearance_number_of_recent_tags);
+         label.setToolTipText(Messages.pref_appearance_number_of_recent_tags_tooltip);
 
-			// spinner
-			_spinnerRecentTags = new Spinner(group, SWT.BORDER);
-			GridDataFactory.fillDefaults()//
-					.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
-					.align(SWT.BEGINNING, SWT.CENTER)
-					.applyTo(_spinnerRecentTags);
-			_spinnerRecentTags.setToolTipText(Messages.pref_appearance_number_of_recent_tags_tooltip);
-			_spinnerRecentTags.setMinimum(0);
-			_spinnerRecentTags.setMaximum(9);
-			_spinnerRecentTags.addSelectionListener(_defaultSelectionAdapter);
-			_spinnerRecentTags.addMouseWheelListener(_defaultMouseWheelListener);
+         // spinner
+         _spinnerRecentTags = new Spinner(group, SWT.BORDER);
+         GridDataFactory.fillDefaults()//
+               .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+               .align(SWT.BEGINNING, SWT.CENTER)
+               .applyTo(_spinnerRecentTags);
+         _spinnerRecentTags.setToolTipText(Messages.pref_appearance_number_of_recent_tags_tooltip);
+         _spinnerRecentTags.setMinimum(0);
+         _spinnerRecentTags.setMaximum(9);
+         _spinnerRecentTags.addSelectionListener(_defaultSelectionAdapter);
+         _spinnerRecentTags.addMouseWheelListener(_defaultMouseWheelListener);
 
-			/*
-			 * autoopen tagging
-			 */
+         /*
+          * autoopen tagging
+          */
 //				eclipse 3.7 supports this feature
 //				if (_isOSX) {
 //					// label: OSX is not supported, feature is not working
@@ -143,272 +157,273 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 //					GridDataFactory.fillDefaults().span(3, 1).applyTo(label);
 //					label.setText(Messages.Pref_Appearance_Label_NoOSXSupport);
 //				}
-			_chkAutoOpenTagging = new Button(group, SWT.CHECK);
-			GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkAutoOpenTagging);
-			_chkAutoOpenTagging.setText(Messages.Pref_Appearance_Check_AutoOpenTagging);
-			_chkAutoOpenTagging.addSelectionListener(_defaultSelectionAdapter);
-			_chkAutoOpenTagging.setToolTipText(Messages.Pref_Appearance_Label_AutoOpenTagging_Tooltip);
+         _chkAutoOpenTagging = new Button(group, SWT.CHECK);
+         GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkAutoOpenTagging);
+         _chkAutoOpenTagging.setText(Messages.Pref_Appearance_Check_AutoOpenTagging);
+         _chkAutoOpenTagging.addSelectionListener(_defaultSelectionAdapter);
+         _chkAutoOpenTagging.setToolTipText(Messages.Pref_Appearance_Label_AutoOpenTagging_Tooltip);
 
-			final Composite autoTagContainer = new Composite(group, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(false, false).indent(16, 0).span(2, 1).applyTo(autoTagContainer);
-			GridLayoutFactory.fillDefaults().numColumns(3).applyTo(autoTagContainer);
-			{
+         final Composite autoTagContainer = new Composite(group, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(false, false).indent(16, 0).span(2, 1).applyTo(autoTagContainer);
+         GridLayoutFactory.fillDefaults().numColumns(3).applyTo(autoTagContainer);
+         {
 
-				// label: delay
-				_lblAutoTagDelay = new Label(autoTagContainer, SWT.NONE);
-				_lblAutoTagDelay.setText(Messages.Pref_Appearance_Label_AutoOpenTaggingDelay);
-				_lblAutoTagDelay.setToolTipText(Messages.Pref_Appearance_Label_AutoOpenTagging_Tooltip);
+            // label: delay
+            _lblAutoTagDelay = new Label(autoTagContainer, SWT.NONE);
+            _lblAutoTagDelay.setText(Messages.Pref_Appearance_Label_AutoOpenTaggingDelay);
+            _lblAutoTagDelay.setToolTipText(Messages.Pref_Appearance_Label_AutoOpenTagging_Tooltip);
 
-				// spinner
-				_spinnerAutoOpenDelay = new Spinner(autoTagContainer, SWT.BORDER);
-				GridDataFactory.fillDefaults()//
-						.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
-						.align(SWT.BEGINNING, SWT.CENTER)
-						.applyTo(_spinnerAutoOpenDelay);
-				_spinnerAutoOpenDelay.setMinimum(0);
-				_spinnerAutoOpenDelay.setMaximum(3000);
-				_spinnerAutoOpenDelay.addSelectionListener(_defaultSelectionAdapter);
-				_spinnerAutoOpenDelay.addMouseWheelListener(_defaultMouseWheelListener);
+            // spinner
+            _spinnerAutoOpenDelay = new Spinner(autoTagContainer, SWT.BORDER);
+            GridDataFactory.fillDefaults()//
+                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+                  .align(SWT.BEGINNING, SWT.CENTER)
+                  .applyTo(_spinnerAutoOpenDelay);
+            _spinnerAutoOpenDelay.setMinimum(0);
+            _spinnerAutoOpenDelay.setMaximum(3000);
+            _spinnerAutoOpenDelay.addSelectionListener(_defaultSelectionAdapter);
+            _spinnerAutoOpenDelay.addMouseWheelListener(_defaultMouseWheelListener);
 
-				// label: ms
-				_lblAutoOpenMS = new Label(autoTagContainer, SWT.NONE);
-				_lblAutoOpenMS.setText(UI.UNIT_MS);
+            // label: ms
+            _lblAutoOpenMS = new Label(autoTagContainer, SWT.NONE);
+            _lblAutoOpenMS.setText(UI.UNIT_MS);
 
-				// check: show animation
-				_chkTaggingAnimation = new Button(autoTagContainer, SWT.CHECK);
-				GridDataFactory.fillDefaults().span(3, 1).applyTo(_chkTaggingAnimation);
-				_chkTaggingAnimation.setText(Messages.Pref_Appearance_Check_TaggingAnimation);
-				_chkTaggingAnimation.addSelectionListener(_defaultSelectionAdapter);
-			}
-		}
-	}
+            // check: show animation
+            _chkTaggingAnimation = new Button(autoTagContainer, SWT.CHECK);
+            GridDataFactory.fillDefaults().span(3, 1).applyTo(_chkTaggingAnimation);
+            _chkTaggingAnimation.setText(Messages.Pref_Appearance_Check_TaggingAnimation);
+            _chkTaggingAnimation.addSelectionListener(_defaultSelectionAdapter);
+         }
+      }
+   }
 
-	private void createUI_20_RecentEntries(final Composite parent) {
+   private void createUI_20_LogFont(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-		{
+      final Group group = new Group(parent, SWT.NONE);
+      group.setText(THEME_FONT_LOGGING);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(group);
+      {
+         {
+            /*
+             * Font editor
+             */
+            final Composite fontContainer = new Composite(group, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(fontContainer);
+            GridLayoutFactory.swtDefaults().numColumns(1).applyTo(fontContainer);
+//            fontContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+            {
+               _valueFontEditor = new FontFieldEditorExtended(IMappingPreferences.THEME_FONT_LOGGING,
+                     UI.EMPTY_STRING,
+                     THEME_FONT_LOGGING_PREVIEW_TEXT,
+                     fontContainer);
 
-			/*
-			 * number of recent tour types
-			 */
-			final Label label = new Label(container, NONE);
-			label.setText(Messages.Pref_Appearance_NumberOfRecent_TourTypes);
-			label.setToolTipText(Messages.Pref_Appearance_NumberOfRecent_TourTypes_Tooltip);
+               _valueFontEditor.setPropertyChangeListener(new IPropertyChangeListener() {
+                  @Override
+                  public void propertyChange(final PropertyChangeEvent event) {
+                     onChangeFontInEditor();
+                  }
+               });
+            }
+         }
+      }
+   }
 
-			// spinner
-			_spinnerRecentTourTypes = new Spinner(container, SWT.BORDER);
-			GridDataFactory.fillDefaults()//
-					.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
-					.align(SWT.BEGINNING, SWT.CENTER)
-					.applyTo(_spinnerRecentTourTypes);
-			_spinnerRecentTourTypes.setToolTipText(Messages.Pref_Appearance_NumberOfRecent_TourTypes_Tooltip);
-			_spinnerRecentTourTypes.setMinimum(0);
-			_spinnerRecentTourTypes.setMaximum(9);
-			_spinnerRecentTourTypes.addSelectionListener(_defaultSelectionAdapter);
-			_spinnerRecentTourTypes.addMouseWheelListener(_defaultMouseWheelListener);
-		}
-	}
+   private void createUI_30_OtherOptions(final Composite parent) {
 
-	/**
-	 * memory monitor
-	 */
-	private void createUI_30_MemoryMonitor(final Composite parent) {
+      {
+         /*
+          * Memory monitor
+          */
+         _chkMemMonitor = new Button(parent, SWT.CHECK);
+         _chkMemMonitor.setText(Messages.pref_appearance_showMemoryMonitor);
+//         GridDataFactory.fillDefaults().indent(0, 10).applyTo(_chkMemMonitor);
+      }
+      {
+         /*
+          * Reset all toggle dialogs
+          */
+         _btnResetAllToggleDialogs = new Button(parent, SWT.PUSH);
+         _btnResetAllToggleDialogs.setText(Messages.Pref_Appearance_Button_ResetAllToggleDialogs);
+         _btnResetAllToggleDialogs.setToolTipText(Messages.Pref_Appearance_Button_ResetAllToggleDialogs_Tooltip);
+         _btnResetAllToggleDialogs.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               onResetAllToggleDialogs();
+            }
+         });
+         GridDataFactory.fillDefaults()//
+//               .indent(0, 10)
+               .align(SWT.BEGINNING, SWT.FILL)
+               .applyTo(_btnResetAllToggleDialogs);
+      }
+   }
 
-		_chkMemMonitor = new Button(parent, SWT.CHECK);
-		GridDataFactory.fillDefaults().indent(0, 10).applyTo(_chkMemMonitor);
-		_chkMemMonitor.setText(Messages.pref_appearance_showMemoryMonitor);
-	}
+   private void enableControls() {
 
-	private void createUI_40_ResetAllToggleDialogs(final Composite parent) {
+      final boolean isTagAutoOpen = _chkAutoOpenTagging.getSelection();
+      final boolean isEnabled = true; // eclipse 3.7 supports this feature in OSX
 
-		_btnResetAllToggleDialogs = new Button(parent, SWT.PUSH);
-		GridDataFactory.fillDefaults()//
-				.indent(0, 10)
-				.align(SWT.BEGINNING, SWT.FILL)
-				.applyTo(_btnResetAllToggleDialogs);
-		_btnResetAllToggleDialogs.setText(Messages.Pref_Appearance_Button_ResetAllToggleDialogs);
-		_btnResetAllToggleDialogs.setToolTipText(Messages.Pref_Appearance_Button_ResetAllToggleDialogs_Tooltip);
-		_btnResetAllToggleDialogs.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onResetAllToggleDialogs();
-			}
-		});
-	}
+      _chkAutoOpenTagging.setEnabled(isEnabled);
+      _lblAutoOpenMS.setEnabled(isEnabled && isTagAutoOpen);
+      _lblAutoTagDelay.setEnabled(isEnabled && isTagAutoOpen);
+      _spinnerAutoOpenDelay.setEnabled(isEnabled && isTagAutoOpen);
+      _chkTaggingAnimation.setEnabled(isEnabled && isTagAutoOpen);
+   }
 
-	private void enableControls() {
+   @Override
+   public void init(final IWorkbench workbench) {
+      setPreferenceStore(_prefStore);
+   }
 
-		final boolean isTagAutoOpen = _chkAutoOpenTagging.getSelection();
-		final boolean isEnabled = true; // eclipse 3.7 supports this feature in OSX
+   private void initUI(final Composite parent) {
 
-		_chkAutoOpenTagging.setEnabled(isEnabled);
-		_lblAutoOpenMS.setEnabled(isEnabled && isTagAutoOpen);
-		_lblAutoTagDelay.setEnabled(isEnabled && isTagAutoOpen);
-		_spinnerAutoOpenDelay.setEnabled(isEnabled && isTagAutoOpen);
-		_chkTaggingAnimation.setEnabled(isEnabled && isTagAutoOpen);
-	}
+      _pc = new PixelConverter(parent);
+      _hintDefaultSpinnerWidth = _isLinux ? SWT.DEFAULT : _pc.convertWidthInCharsToPixels(_isOSX ? 10 : 5);
 
-	@Override
-	public void init(final IWorkbench workbench) {
-		setPreferenceStore(_prefStore);
-	}
+      _defaultSelectionAdapter = new SelectionAdapter() {
+         @Override
+         public void widgetSelected(final SelectionEvent e) {
+            onChangeProperty();
+            enableControls();
+         }
+      };
 
-	private void initUITools(final Composite parent) {
+      _defaultMouseWheelListener = new MouseWheelListener() {
+         @Override
+         public void mouseScrolled(final MouseEvent event) {
+            UI.adjustSpinnerValueOnMouseScroll(event);
+            onChangeProperty();
+         }
+      };
+   }
 
-		_pc = new PixelConverter(parent);
-		_hintDefaultSpinnerWidth = _isLinux ? SWT.DEFAULT : _pc.convertWidthInCharsToPixels(_isOSX ? 10 : 5);
+   private void onChangeFontInEditor() {
 
-		_defaultSelectionAdapter = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onChangeProperty();
-				enableControls();
-			}
-		};
+      // update state, this will fire IMappingPreferences.THEME_FONT_LOGGING event which will recreate the font
+      _valueFontEditor.store();
+   }
 
-		_defaultMouseWheelListener = new MouseWheelListener() {
-			@Override
-			public void mouseScrolled(final MouseEvent event) {
-				UI.adjustSpinnerValueOnMouseScroll(event);
-				onChangeProperty();
-			}
-		};
-	}
+   /**
+    * Property was changed, fire a property change event
+    */
+   private void onChangeProperty() {
+      _isModified = true;
+   }
 
-	/**
-	 * Property was changed, fire a property change event
-	 */
-	private void onChangeProperty() {
-		_isModified = true;
-	}
+   private void onResetAllToggleDialogs() {
 
-	private void onResetAllToggleDialogs() {
+      _prefStore.setValue(ITourbookPreferences.TOURDATA_EDITOR_CONFIRMATION_REVERT_TOUR, false);
+      _prefStore.setValue(ITourbookPreferences.MAP_VIEW_CONFIRMATION_SHOW_DIM_WARNING, false);
 
-		_prefStore.setValue(ITourbookPreferences.TOURDATA_EDITOR_CONFIRMATION_REVERT_TOUR, false);
-		_prefStore.setValue(ITourbookPreferences.MAP_VIEW_CONFIRMATION_SHOW_DIM_WARNING, false);
+      _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_ALL_TIME_SLICES, false);
+      _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_ALTITUDE_VALUES, false);
+      _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_CADENCE_VALUES, false);
+      _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_GEAR_VALUES, false);
+      _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_POWER_AND_SPEED_VALUES, false);
+      _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_POWER_AND_PULSE_VALUES, false);
+      _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_RUNNING_DYNAMICS_VALUES, false);
+      _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_SWIMMING_VALUES, false);
+      _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_TEMPERATURE_VALUES, false);
+      _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR, false);
+      _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR_MARKER, false);
+      _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_SHOW_HISTORY_TOUR_SAVE_WARNING, false);
+      _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_SHOW_STAR_RATING_SAVE_WARNING, false);
 
-		_prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_ALL_TIME_SLICES, false);
-		_prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_ALTITUDE_VALUES, false);
-		_prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_CADENCE_VALUES, false);
-		_prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_GEAR_VALUES, false);
-		_prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_POWER_AND_SPEED_VALUES, false);
-		_prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_POWER_AND_PULSE_VALUES, false);
-		_prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_RUNNING_DYNAMICS_VALUES, false);
-		_prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_SWIMMING_VALUES, false);
-		_prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_TEMPERATURE_VALUES, false);
-		_prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR, false);
-		_prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR_MARKER, false);
-		_prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_SHOW_HISTORY_TOUR_SAVE_WARNING, false);
-		_prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_SHOW_STAR_RATING_SAVE_WARNING, false);
+      MessageDialog.openInformation(getShell(),
+            Messages.Pref_Appearance_Dialog_ResetAllToggleDialogs_Title,
+            Messages.Pref_Appearance_Dialog_ResetAllToggleDialogs_Message);
+   }
 
-		MessageDialog.openInformation(
-				getShell(),
-				Messages.Pref_Appearance_Dialog_ResetAllToggleDialogs_Title,
-				Messages.Pref_Appearance_Dialog_ResetAllToggleDialogs_Message);
-	}
+   @Override
+   protected void performApply() {
 
-	@Override
-	protected void performApply() {
+      saveState();
 
-		saveState();
+      super.performApply();
+   }
 
-		super.performApply();
-	}
+   @Override
+   protected void performDefaults() {
 
-	@Override
-	protected void performDefaults() {
+      _isModified = true;
 
-		_isModified = true;
+      _spinnerRecentTags.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS));
 
-		_spinnerRecentTags.setSelection(//
-				_prefStore.getDefaultInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS));
+      _chkAutoOpenTagging.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN));
+      _chkTaggingAnimation.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION));
+      _spinnerAutoOpenDelay.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY));
 
-		_spinnerRecentTourTypes.setSelection(//
-				_prefStore.getDefaultInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TOUR_TYPES));
+      _chkMemMonitor.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR));
 
-		_chkAutoOpenTagging.setSelection(_prefStore
-				.getDefaultBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN));
-		_chkTaggingAnimation.setSelection(_prefStore
-				.getDefaultBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION));
-		_spinnerAutoOpenDelay.setSelection(_prefStore
-				.getDefaultInt(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY));
+      // set font editor default values
+      _valueFontEditor.loadDefault();
+      _valueFontEditor.store();
 
-		_chkMemMonitor.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR));
+      super.performDefaults();
 
-		super.performDefaults();
-
-		// this do not work, I have no idea why, but with the apply button it works :-(
+      // this do not work, I have no idea why, but with the apply button it works :-(
 //		fireModificationEvent();
 
-		enableControls();
-	}
+      enableControls();
+   }
 
-	@Override
-	public boolean performOk() {
+   @Override
+   public boolean performOk() {
 
-		saveState();
+      saveState();
 
-		final boolean isShowMemoryOld = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR);
+      final boolean isShowMemoryOld = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR);
 
-		final boolean isOK = super.performOk();
+      final boolean isOK = super.performOk();
 
-		final boolean isShowMemoryNew = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR);
+      final boolean isShowMemoryNew = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR);
 
-		if (isOK && _isModified) {
-			_isModified = false;
-		}
+      if (isOK && _isModified) {
+         _isModified = false;
+      }
 
-		if (isShowMemoryNew != isShowMemoryOld) {
-			if (MessageDialog.openQuestion(
-					Display.getDefault().getActiveShell(),
-					Messages.pref_appearance_showMemoryMonitor_title,
-					Messages.pref_appearance_showMemoryMonitor_message)) {
+      if (isShowMemoryNew != isShowMemoryOld) {
+         if (MessageDialog.openQuestion(
+               Display.getDefault().getActiveShell(),
+               Messages.pref_appearance_showMemoryMonitor_title,
+               Messages.pref_appearance_showMemoryMonitor_message)) {
 
-				Display.getCurrent().asyncExec(new Runnable() {
-					@Override
-					public void run() {
-						PlatformUI.getWorkbench().restart();
-					}
-				});
-			}
-		}
+            Display.getCurrent().asyncExec(new Runnable() {
+               @Override
+               public void run() {
+                  PlatformUI.getWorkbench().restart();
+               }
+            });
+         }
+      }
 
-		return isOK;
-	}
+      return isOK;
+   }
 
-	private void restoreState() {
+   private void restoreState() {
 
-		_spinnerRecentTags.setSelection(//
-				_prefStore.getInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS));
+      _spinnerRecentTags.setSelection(_prefStore.getInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS));
 
-		_spinnerRecentTourTypes.setSelection(//
-				_prefStore.getInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TOUR_TYPES));
+      _chkAutoOpenTagging.setSelection(_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN));
+      _chkTaggingAnimation.setSelection(_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION));
+      _spinnerAutoOpenDelay.setSelection(_prefStore.getInt(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY));
 
-		_chkAutoOpenTagging.setSelection(_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN));
-		_chkTaggingAnimation.setSelection(_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION));
-		_spinnerAutoOpenDelay.setSelection(_prefStore.getInt(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY));
+      _chkMemMonitor.setSelection(_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR));
 
-		_chkMemMonitor.setSelection(_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR));
-	}
+      _valueFontEditor.setPreferenceStore(_prefStore);
+      _valueFontEditor.load();
 
-	private void saveState() {
+   }
 
-		_prefStore.setValue(//
-				ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS,
-				_spinnerRecentTags.getSelection());
+   private void saveState() {
 
-		_prefStore.setValue(
-				ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TOUR_TYPES,
-				_spinnerRecentTourTypes.getSelection());
+      _prefStore.setValue(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS, _spinnerRecentTags.getSelection());
 
-		_prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN, _chkAutoOpenTagging.getSelection());
-		_prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION, _chkTaggingAnimation.getSelection());
-		_prefStore.setValue(
-				ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY,
-				_spinnerAutoOpenDelay.getSelection());
+      _prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN, _chkAutoOpenTagging.getSelection());
+      _prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION, _chkTaggingAnimation.getSelection());
+      _prefStore.setValue(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY, _spinnerAutoOpenDelay.getSelection());
 
-		_prefStore.setValue(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR, _chkMemMonitor.getSelection());
-	}
+      _prefStore.setValue(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR, _chkMemMonitor.getSelection());
+   }
 }

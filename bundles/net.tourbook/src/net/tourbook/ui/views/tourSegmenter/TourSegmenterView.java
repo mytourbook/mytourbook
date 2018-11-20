@@ -49,10 +49,13 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Button;
@@ -188,13 +191,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    public static final int     STATE_SMALL_VALUE_SIZE_DEFAULT                 = 50;
    public static final String  STATE_STACKED_VISIBLE_VALUES                   = "STATE_STACKED_VISIBLE_VALUES";           //$NON-NLS-1$
    public static final int     STATE_STACKED_VISIBLE_VALUES_DEFAULT           = 2;
-   private static final String STATE_SURFING_IS_SEGMENTER_ENABLED             = "STATE_SURFING_IS_SEGMENTER_ENABLED";     //$NON-NLS-1$
    //
    /*
     * Surfing
     */
-   private static final boolean           STATE_SURFING_IS_SEGMENTER_ENABLED_DEFAULT           = true;
-   //
    private static final String            STATE_SURFING_IS_SHOW_ONLY_SELECTED_SEGMENTS         = "STATE_SURFING_IS_SHOW_ONLY_SELECTED_SEGMENTS";//$NON-NLS-1$
    private static final boolean           STATE_SURFING_IS_SHOW_ONLY_SELECTED_SEGMENTS_DEFAULT = false;
    private static final String            STATE_SURFING_SEGMENT_FILTER                         = "STATE_SURFING_SEGMENT_FILTER";                //$NON-NLS-1$
@@ -213,33 +213,34 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    /*
     * Colors
     */
-   private static final String                   SEGMENTER_FILTER_1_BACKGROUND            = "SEGMENTER_FILTER_1_BACKGROUND";        //$NON-NLS-1$
-   private static final String                   SEGMENTER_FILTER_1_BACKGROUND_HEADER     = "SEGMENTER_FILTER_1_BACKGROUND_HEADER"; //$NON-NLS-1$
-   private static final String                   SEGMENTER_FILTER_2_BACKGROUND            = "SEGMENTER_FILTER_2_BACKGROUND";        //$NON-NLS-1$
-   private static final String                   SEGMENTER_FILTER_2_BACKGROUND_HEADER     = "SEGMENTER_FILTER_2_BACKGROUND_HEADER"; //$NON-NLS-1$
-   private static final RGB                      SEGMENTER_FILTER_1_BACKGROUND_RGB        = new RGB(244, 255, 244);
-   private static final RGB                      SEGMENTER_FILTER_1_BACKGROUND_RGB_HEADER = new RGB(209, 255, 214);
-   private static final RGB                      SEGMENTER_FILTER_2_BACKGROUND_RGB        = new RGB(255, 255, 242);
-   private static final RGB                      SEGMENTER_FILTER_2_BACKGROUND_RGB_HEADER = new RGB(255, 255, 209);
+   private static final String SEGMENTER_FILTER_1_BACKGROUND            = "SEGMENTER_FILTER_1_BACKGROUND";        //$NON-NLS-1$
+   private static final String SEGMENTER_FILTER_1_BACKGROUND_HEADER     = "SEGMENTER_FILTER_1_BACKGROUND_HEADER"; //$NON-NLS-1$
+   private static final String SEGMENTER_FILTER_2_BACKGROUND            = "SEGMENTER_FILTER_2_BACKGROUND";        //$NON-NLS-1$
+   private static final String SEGMENTER_FILTER_2_BACKGROUND_HEADER     = "SEGMENTER_FILTER_2_BACKGROUND_HEADER"; //$NON-NLS-1$
+   private static final RGB    SEGMENTER_FILTER_1_BACKGROUND_RGB        = new RGB(250, 255, 232);
+   private static final RGB    SEGMENTER_FILTER_1_BACKGROUND_RGB_HEADER = new RGB(224, 250, 155);
+   private static final RGB    SEGMENTER_FILTER_2_BACKGROUND_RGB        = new RGB(229, 242, 255);
+   private static final RGB    SEGMENTER_FILTER_2_BACKGROUND_RGB_HEADER = new RGB(167, 214, 255);
    //
-   static final String                           STATE_COLOR_ALTITUDE_DOWN                = "STATE_COLOR_ALTITUDE_DOWN";            //$NON-NLS-1$
-   static final String                           STATE_COLOR_ALTITUDE_UP                  = "STATE_COLOR_ALTITUDE_UP";              //$NON-NLS-1$
-   static final String                           STATE_COLOR_TOTALS                       = "STATE_COLOR_TOTALS";                   //$NON-NLS-1$
-   static final RGB                              STATE_COLOR_ALTITUDE_DOWN_DEFAULT        = new RGB(0, 240, 0);
-   static final RGB                              STATE_COLOR_ALTITUDE_UP_DEFAULT          = new RGB(255, 66, 22);
-   static final RGB                              STATE_COLOR_TOTALS_DEFAULT               = new RGB(253, 236, 115);
+   static final String         STATE_COLOR_ALTITUDE_DOWN                = "STATE_COLOR_ALTITUDE_DOWN";            //$NON-NLS-1$
+   static final String         STATE_COLOR_ALTITUDE_UP                  = "STATE_COLOR_ALTITUDE_UP";              //$NON-NLS-1$
+   static final String         STATE_COLOR_TOTALS                       = "STATE_COLOR_TOTALS";                   //$NON-NLS-1$
+   static final RGB            STATE_COLOR_ALTITUDE_DOWN_DEFAULT        = new RGB(0, 240, 0);
+   static final RGB            STATE_COLOR_ALTITUDE_UP_DEFAULT          = new RGB(255, 66, 22);
+   static final RGB            STATE_COLOR_TOTALS_DEFAULT               = new RGB(255, 232, 144);
    //
-   private static final float                    SPEED_DIGIT_VALUE                        = 10.0f;
    //
-   private static final IPreferenceStore         _prefStore                               = TourbookPlugin.getPrefStore();
-   private static final IDialogSettings          _state                                   = TourbookPlugin.getState(ID);
+   private static final float                    SPEED_DIGIT_VALUE = 10.0f;
+   //
+   private static final IPreferenceStore         _prefStore        = TourbookPlugin.getPrefStore();
+   private static final IDialogSettings          _state            = TourbookPlugin.getState(ID);
    //
    /**
     * Contains all available segmenters.
     * <p>
     * The sequence defines how they are displayed in the combobox.
     */
-   private static final ArrayList<TourSegmenter> _allTourSegmenter                        = new ArrayList<>();
+   private static final ArrayList<TourSegmenter> _allTourSegmenter = new ArrayList<>();
    static {
 
       _allTourSegmenter.add(new TourSegmenter(
@@ -370,7 +371,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private boolean                        _isClearView;
    private boolean                        _isInSelection;
    private boolean                        _isSaving;
-   private boolean                        _isSegmenterEnabled;
    private boolean                        _isSegmenterFiltered;
    private boolean                        _isTourDirty        = false;
    //
@@ -420,10 +420,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private Composite                      _parent;
    //
    private PageBook                       _pageBookUI;
-
    private PageBook                       _pageBookSegmenter;
-
    private PageBook                       _pageBookBreakTime;
+   //
    private Button                         _btnSaveTourDP;
    private Button                         _btnSaveTourMin;
    //
@@ -444,18 +443,25 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private Composite                      _pageSegType_DPPower;
    private Composite                      _pageSegType_DPPulse;
    private Composite                      _pageSegType_Surfing;
-   private Button                         _btnSurfing_RestoreDefaults;
-   private Button                         _btnSurfing_SaveTour;
+   //
+   private Button                         _btnSurfing_DeleteTourSegments;
+   private Button                         _btnSurfing_RestoreFrom_Defaults;
+   private Button                         _btnSurfing_RestoreFrom_Tour;
+   private Button                         _btnSurfing_SaveTourSegments;
    //
    private Button                         _chkIsMinSurfingDistance;
    private Button                         _chkIsShowOnlySelectedSegments;
-   private Button                         _chkIsSurfingSegmenterEnabled;
    //
    private Combo                          _comboBreakMethod;
    private Combo                          _comboSegmenterType;
    private Combo                          _comboSurfing_SegmenterFilter;
    //
    private ImageComboLabel                _lblTitle;
+   //
+   private CLabel                         _iconSaveSurfingState;
+   //
+   private Image                          _imageSurfing_SaveState;
+   private Image                          _imageSurfing_NotSaveState;
    //
    private Label                          _lblAltitudeUpDP;
    private Label                          _lblAltitudeUpMin;
@@ -635,7 +641,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       @Override
       public Object[] getElements(final Object parent) {
 
-         if (_tourData == null || _isSegmenterEnabled == false) {
+         if (_tourData == null) {
             return new Object[0];
          } else {
 
@@ -659,8 +665,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       public boolean select(final Viewer viewer, final Object parentElement, final Object element) {
 
          if (_isSegmenterFiltered == false) {
+
+            // all segments are displayed
             return true;
          }
+
+         // segments are filtered
 
          final TourSegment segment = (TourSegment) element;
 
@@ -745,7 +755,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
                _state.put(STATE_IS_SEGMENTER_ACTIVE, false);
 
-               removeVisibleDataPointsBeforeNextTourIsSet();
+               restoreVisibleDataPointsBeforeNextTourIsSet();
 
                fireSegmentLayerChanged();
             }
@@ -1050,7 +1060,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       _pageBookUI.showPage(_pageNoData);
 
-      removeVisibleDataPointsBeforeNextTourIsSet();
+      restoreVisibleDataPointsBeforeNextTourIsSet();
       _tourData = null;
       _tourChart = null;
 
@@ -1174,57 +1184,69 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          return;
       }
 
+      boolean isUpdateVisibleDataPoints = false;
+      int[] forcedIndices;
+
       final SegmenterType selectedSegmenterType = selectedSegmenter.segmenterType;
 
-      if (selectedSegmenterType == SegmenterType.ByAltitudeWithDP) {
+      switch (selectedSegmenterType) {
 
+      case ByAltitudeWithDP:
          createSegmentsBy_AltitudeWithDP();
+         break;
 
-      } else if (selectedSegmenterType == SegmenterType.ByAltitudeWithDPMerged) {
+      case ByAltitudeWithDPMerged:
 
-         final int[] forcedIndices = getTourIndices();
-
+         forcedIndices = getTourIndices();
          _tourData.segmentSerieIndex = createSegmentsBy_AltitudeWithDPMerged(forcedIndices);
 
-      } else if (selectedSegmenterType == SegmenterType.ByAltitudeWithMarker) {
+         break;
 
-         final int[] forcedIndices = getTourAndMarkerIndices();
+      case ByAltitudeWithMarker:
 
+         forcedIndices = getTourAndMarkerIndices();
          final int[] segmentSerieIndices = createSegmentsBy_AltitudeWithDPMerged(forcedIndices);
 
          createSegmentsBy_AltitudeWithMarker(forcedIndices, segmentSerieIndices);
 
-      } else if (selectedSegmenterType == SegmenterType.ByPowerWithDP) {
+         break;
 
-         createSegmentsBy_PowerWithDP();
-
-      } else if (selectedSegmenterType == SegmenterType.ByPulseWithDP) {
-
-         createSegmentsBy_PulseWithDP();
-
-      } else if (selectedSegmenterType == SegmenterType.ByDistance) {
-
-         createSegmentsBy_Distance();
-
-      } else if (selectedSegmenterType == SegmenterType.ByMarker) {
-
-         createSegmentsBy_Marker();
-
-      } else if (selectedSegmenterType == SegmenterType.ByComputedAltiUpDown) {
-
-         createSegmentsBy_AltiUpDown();
-
-      } else if (selectedSegmenterType == SegmenterType.ByBreakTime) {
-
+      case ByBreakTime:
          createSegmentsBy_BreakTime();
+         break;
 
-      } else if (selectedSegmenterType == SegmenterType.Surfing) {
+      case ByComputedAltiUpDown:
+         createSegmentsBy_AltiUpDown();
+         break;
 
+      case ByDistance:
+         createSegmentsBy_Distance();
+         break;
+
+      case ByMarker:
+         createSegmentsBy_Marker();
+         break;
+
+      case ByPowerWithDP:
+         createSegmentsBy_PowerWithDP();
+         break;
+
+      case ByPulseWithDP:
+         createSegmentsBy_PulseWithDP();
+         break;
+
+      case Surfing:
          createSegmentsBy_Surfing();
+         isUpdateVisibleDataPoints = true;
+         break;
       }
 
-      // update table and create the tour segments in tour data
+      // update table and create the tour segments in TourData
       reloadViewer();
+
+      if (isUpdateVisibleDataPoints) {
+         _tourData.visibleDataPointSerie = createVisibleDataPoints(getSelectedSurfingFilter());
+      }
 
       if (isFireEvent) {
          fireSegmentLayerChanged();
@@ -1744,16 +1766,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
    private void createSegmentsBy_Surfing() {
 
-      final boolean isSurfingEnabled = _chkIsSurfingSegmenterEnabled.getSelection();
-      if (isSurfingEnabled == false) {
-         return;
-      }
-
       final int[] timeSerie = _tourData.timeSerie;
       final float[] distanceSerie = _tourData.getMetricDistanceSerie();
       final float[] speedSerie = _tourData.getSpeedSerieMetric();
 
-      final boolean[] visibleDataPointSerie = _tourData.visibleDataPointSerie = new boolean[timeSerie.length];
+//      final boolean[] visibleDataPointSerie = new boolean[timeSerie.length];
 
       final int lastSerieIndex = timeSerie.length - 1;
 
@@ -1881,7 +1898,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          }
 
          // overwrite old values
-         visibleDataPointSerie[serieIndex] = false;
+//         visibleDataPointSerie[serieIndex] = false;
 
          if (prevIsSurfing && isSurfing == false) {
 
@@ -1906,10 +1923,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                // mark as surfing segment
                segmentSerieFilter.add(1);
 
-               // set datapoints visible, this is used in the map
-               for (int surfSerieIndex = segmentStartIndex + 1; surfSerieIndex <= segmentEndIndex; surfSerieIndex++) {
-                  visibleDataPointSerie[surfSerieIndex] = true;
-               }
+//               // set datapoints visible, this is used in the map
+//               for (int surfSerieIndex = segmentStartIndex + 1; surfSerieIndex <= segmentEndIndex; surfSerieIndex++) {
+//                  visibleDataPointSerie[surfSerieIndex] = true;
+//               }
             }
          }
 
@@ -1957,7 +1974,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridLayoutFactory.fillDefaults().numColumns(4).extendedMargins(3, 3, 3, 5).applyTo(container);
-//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
       {
          {
             // tour title
@@ -2598,36 +2615,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_CYAN));
       {
-         {
-            /*
-             * Enable/disable segmenter
-             */
-            _chkIsSurfingSegmenterEnabled = new Button(container, SWT.CHECK);
-            _chkIsSurfingSegmenterEnabled.setText(Messages.Tour_Segmenter_Surfing_Checkbox_IsSurfingEnabled);
-            _chkIsSurfingSegmenterEnabled.setToolTipText(Messages.Tour_Segmenter_Surfing_Label_IsSurfingEnabled_Tooltip);
-            _chkIsSurfingSegmenterEnabled.addSelectionListener(new SelectionAdapter() {
-
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onSelect_Surfing_IsEnabled();
-               }
-            });
-
-            GridDataFactory.fillDefaults()
-                  .align(SWT.FILL, SWT.CENTER)
-                  .span(2, 1)
-                  .applyTo(_chkIsSurfingSegmenterEnabled);
-
-         }
-
-         createUI_62_SurfingFields(container);
-         createUI_64_Surfing2ndColumn(container);
+         createUI_62_Surfing_Fields(container);
+         createUI_64_Surfing_Options(container);
       }
 
       return container;
    }
 
-   private Composite createUI_62_SurfingFields(final Composite parent) {
+   private Composite createUI_62_Surfing_Fields(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
@@ -2728,11 +2723,65 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblSurfing_MinSurfingDistance_Unit);
             }
          }
+
+         createUI_63_Surfing_RestoreActions(container);
       }
       return container;
    }
 
-   private void createUI_64_Surfing2ndColumn(final Composite parent) {
+   private void createUI_63_Surfing_RestoreActions(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()
+//          .grab(true, false)
+            .span(3, 1)
+            .applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      {
+         {
+            /*
+             * Button: Restore defaults
+             */
+            _btnSurfing_RestoreFrom_Defaults = new Button(container, SWT.NONE);
+            _btnSurfing_RestoreFrom_Defaults.setText(Messages.App_Action_RestoreDefault);
+            _btnSurfing_RestoreFrom_Defaults.setToolTipText(Messages.Tour_Segmenter_Surfing_Button_RestoreFromDefaults_Tooltip);
+            _btnSurfing_RestoreFrom_Defaults.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onSurfing_ResetToDefaults();
+               }
+            });
+
+//            GridDataFactory.fillDefaults()
+//                  .span(3, 1)
+//                  .align(SWT.BEGINNING, SWT.FILL)
+//                  .applyTo(_btnSurfing_RestoreFrom_Defaults);
+         }
+         {
+            /*
+             * Button: Restore from tour
+             */
+            _btnSurfing_RestoreFrom_Tour = new Button(container, SWT.NONE);
+            _btnSurfing_RestoreFrom_Tour.setText(Messages.Tour_Segmenter_Surfing_Button_RestoreFromTour);
+            _btnSurfing_RestoreFrom_Tour.setToolTipText(Messages.Tour_Segmenter_Surfing_Button_RestoreFromTour_Tooltip);
+            _btnSurfing_RestoreFrom_Tour.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onSurfing_ResetFromTour();
+               }
+            });
+
+//            GridDataFactory.fillDefaults()
+//                  .span(3, 1)
+//                  .align(SWT.BEGINNING, SWT.FILL)
+//                  .applyTo(_btnSurfing_RestoreFrom_Tour);
+            UI.setButtonLayoutData(_btnSurfing_RestoreFrom_Defaults);
+            UI.setButtonLayoutData(_btnSurfing_RestoreFrom_Tour);
+         }
+      }
+   }
+
+   private void createUI_64_Surfing_Options(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
@@ -2750,7 +2799,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             _comboSurfing_SegmenterFilter.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
-                  onSelect_Surfing_SegmentFilter();
+                  onSurfing_SelectSegmentFilter();
                }
             });
 
@@ -2770,7 +2819,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
                @Override
                public void widgetSelected(final SelectionEvent e) {
-                  onSelect_Surfing_ShowOnlySelectedSegments();
+                  onSurfing_ShowOnlySelectedSegments();
                }
             });
          }
@@ -2782,45 +2831,71 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private void createUI_66_SurfingActions(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()
-            .grab(false, true)
-            .align(SWT.FILL, SWT.END)
-            .applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      GridDataFactory.fillDefaults().grab(false, true).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
       {
+         final Composite actionContainer = new Composite(container, SWT.NONE);
+         GridDataFactory.fillDefaults()
+               .grab(false, true)
+               .align(SWT.FILL, SWT.END)
+               .applyTo(actionContainer);
+         GridLayoutFactory.fillDefaults().numColumns(1).applyTo(actionContainer);
          {
-            /*
-             * Button: Restore defaults
-             */
-            _btnSurfing_RestoreDefaults = new Button(container, SWT.NONE);
-            _btnSurfing_RestoreDefaults.setText(Messages.App_Action_RestoreDefault);
-            _btnSurfing_RestoreDefaults.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onSurfing_ResetToDefaults();
-               }
-            });
-
-            UI.setButtonLayoutData(_btnSurfing_RestoreDefaults);
+            {
+               /*
+                * Button: Save surfing segments
+                */
+               _btnSurfing_SaveTourSegments = new Button(actionContainer, SWT.NONE);
+               _btnSurfing_SaveTourSegments.setText(Messages.Tour_Segmenter_Button_SaveTour);
+               _btnSurfing_SaveTourSegments.setToolTipText(Messages.Tour_Segmenter_Button_Surfing_SaveTourSegments_Tooltip);
+               _btnSurfing_SaveTourSegments.addSelectionListener(new SelectionAdapter() {
+                  @Override
+                  public void widgetSelected(final SelectionEvent e) {
+                     onSurfing_SaveTour(true);
+                  }
+               });
+               GridDataFactory.fillDefaults().applyTo(_btnSurfing_SaveTourSegments);
+            }
+            {
+               /*
+                * Button: Delete surfing segments
+                */
+               _btnSurfing_DeleteTourSegments = new Button(actionContainer, SWT.NONE);
+               _btnSurfing_DeleteTourSegments.setText(Messages.Tour_Segmenter_Button_Surfing_DeleteTourSegments);
+               _btnSurfing_DeleteTourSegments.setToolTipText(Messages.Tour_Segmenter_Button_Surfing_DeleteTourSegments_Tooltip);
+               _btnSurfing_DeleteTourSegments.addSelectionListener(new SelectionAdapter() {
+                  @Override
+                  public void widgetSelected(final SelectionEvent e) {
+                     onSurfing_SaveTour(false);
+                  }
+               });
+               GridDataFactory.fillDefaults().applyTo(_btnSurfing_DeleteTourSegments);
+            }
          }
          {
             /*
-             * Button: Save tour
+             * Save indicator
              */
-            _btnSurfing_SaveTour = new Button(container, SWT.NONE);
-            _btnSurfing_SaveTour.setText(Messages.Tour_Segmenter_Button_SaveTour);
-            _btnSurfing_SaveTour.setToolTipText(Messages.Tour_Segmenter_Button_SurfingSaveTour_Tooltip);
-            _btnSurfing_SaveTour.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onSaveTour_Surfing();
-               }
-            });
+            _iconSaveSurfingState = new CLabel(container, SWT.NONE);
+            _iconSaveSurfingState.setImage(_imageSurfing_SaveState);
+            _iconSaveSurfingState.setToolTipText(Messages.Tour_Segmenter_Button_SurfingSaveState_Tooltip);
 
-            UI.setButtonLayoutData(_btnSurfing_SaveTour);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.FILL, SWT.END)
+                  .grab(false, true)
+                  .applyTo(_iconSaveSurfingState);
          }
       }
+
+      /*
+       * Set button width lately otherwise sometimes they are toooo wide
+       */
+//      container.getParent().layout(true, true);
+
+//      UI.setButtonLayoutData(_btnSurfing_RestoreDefaults);
+//      UI.setButtonLayoutData(_btnSurfing_SaveTour);
+
    }
 
    private void createUI_70_Viewer(final Composite parent) {
@@ -2943,6 +3018,63 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       }
 
       return spinner;
+   }
+
+   /**
+    * Create visible datapoints from the surfing filter.
+    *
+    * @param surfingFilterType
+    *           Surfing type for which the visible datapoints are created.
+    * @return
+    */
+   private boolean[] createVisibleDataPoints(final SurfingFilterType surfingFilterType) {
+
+      final int[] timeSerie = _tourData.timeSerie;
+      final boolean[] visibleDataPointSerie = new boolean[timeSerie.length];
+
+      switch (surfingFilterType) {
+
+      case All:
+
+         // all segments are visible
+         Arrays.fill(visibleDataPointSerie, true);
+
+         break;
+
+      case Surfing:
+
+         for (final TourSegment tourSegment : _allTourSegments) {
+
+            final int segmentStartIndex = tourSegment.serieIndex_Start;
+            final int segmentEndIndex = tourSegment.serieIndex_End;
+
+            if (tourSegment.filter == 1) {
+
+               for (int surfSerieIndex = segmentStartIndex + 1; surfSerieIndex <= segmentEndIndex; surfSerieIndex++) {
+                  visibleDataPointSerie[surfSerieIndex] = true;
+               }
+            }
+         }
+         break;
+
+      case NotSurfing:
+
+         for (final TourSegment tourSegment : _allTourSegments) {
+
+            final int segmentStartIndex = tourSegment.serieIndex_Start;
+            final int segmentEndIndex = tourSegment.serieIndex_End;
+
+            if (tourSegment.filter == 2) {
+
+               for (int surfSerieIndex = segmentStartIndex + 1; surfSerieIndex <= segmentEndIndex; surfSerieIndex++) {
+                  visibleDataPointSerie[surfSerieIndex] = true;
+               }
+            }
+         }
+         break;
+      }
+
+      return visibleDataPointSerie;
    }
 
    private void defineAllColumns() {
@@ -3748,6 +3880,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       _colorCache.dispose();
 
+      _imageSurfing_SaveState.dispose();
+      _imageSurfing_NotSaveState.dispose();
+
       super.dispose();
    }
 
@@ -3762,21 +3897,23 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
    private void enableActions_Surfing() {
 
+      final boolean isTourSaved = _tourData != null && _tourData.getTourPerson() != null;
       final boolean isMultipleTours = _tourData != null && _tourData.isMultipleTours();
-      final boolean isOneTour = isMultipleTours == false;
+      final boolean isVisiblePointsSaved_ForSurfing = _tourData != null && _tourData.isVisiblePointsSaved_ForSurfing();
+      final boolean isSurfingParametersSaved = isSurfingParametersSavedInTour();
 
-      final boolean isSurfingEnabled = isOneTour && _chkIsSurfingSegmenterEnabled.getSelection();
-      final boolean isShowOnlySelectedSegments = _chkIsShowOnlySelectedSegments.getSelection();
+      final boolean isOneTour = isTourSaved && isMultipleTours == false;
+      final boolean isSurfingEnabled = isOneTour;
       final boolean isMinDistance = _chkIsMinSurfingDistance.getSelection();
 
       _segmentViewer.getTable().setEnabled(isSurfingEnabled);
 
-      _btnSurfing_RestoreDefaults.setEnabled(isSurfingEnabled);
+      _btnSurfing_SaveTourSegments.setEnabled(isSurfingEnabled);
+      _btnSurfing_DeleteTourSegments.setEnabled(isOneTour && isVisiblePointsSaved_ForSurfing);
 
-      // disable save that hidden segments do not get lost in the tour
-      _btnSurfing_SaveTour.setEnabled(isOneTour && isShowOnlySelectedSegments == false);
+      _btnSurfing_RestoreFrom_Defaults.setEnabled(isSurfingEnabled);
+      _btnSurfing_RestoreFrom_Tour.setEnabled(isSurfingEnabled && isSurfingParametersSaved);
 
-      _chkIsSurfingSegmenterEnabled.setEnabled(isOneTour);
       _chkIsMinSurfingDistance.setEnabled(isSurfingEnabled);
       _chkIsShowOnlySelectedSegments.setEnabled(isSurfingEnabled);
 
@@ -3797,6 +3934,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       _spinnerSurfing_MinSurfingDistance.setEnabled(isSurfingEnabled && isMinDistance);
       _lblSurfing_MinSurfingDistance_Unit.setEnabled(isSurfingEnabled && isMinDistance);
+
    }
 
    private void fillToolbar() {
@@ -4113,6 +4251,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       _pc = new PixelConverter(parent);
       _spinnerWidth = _pc.convertWidthInCharsToPixels(_isOSX ? 10 : 5);
 
+      _imageSurfing_SaveState = TourbookPlugin.getImageDescriptor(Messages.Image__State_SavedInTour).createImage(true);
+      _imageSurfing_NotSaveState = TourbookPlugin.getImageDescriptor(Messages.Image__State_NotSavedInTour).createImage(true);
+
       _defaultSurfing_SelectionListener = new SelectionAdapter() {
          @Override
          public void widgetSelected(final SelectionEvent e) {
@@ -4146,8 +4287,26 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       return isSegmentLayerVisible;
    }
 
+   /**
+    * @return Returns <code>true</code> when tour contains surfing parameters
+    */
+   private boolean isSurfingParametersSavedInTour() {
+
+      if (_tourData != null) {
+
+         return _tourData.getSurfing_MinSpeed_StartStop() != TourData.SURFING_VALUE_IS_NOT_SET;
+      }
+
+      return false;
+   }
+
+   /**
+    * @return Returns <code>true</code> when segments are filtered, otherwise all segments are
+    *         displayed.
+    */
    private boolean isSurfingSegmenterFiltered() {
-      return _comboSurfing_SegmenterFilter.getSelectionIndex() != 0;
+
+      return getSelectedSurfingFilter() != SurfingFilterType.All;
    }
 
    /**
@@ -4189,7 +4348,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       _isTourDirty = true;
 
-      removeVisibleDataPointsBeforeNextTourIsSet();
+      restoreVisibleDataPointsBeforeNextTourIsSet();
 
       final TourData tourData = saveTour();
       if (tourData != null) {
@@ -4200,59 +4359,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          createSegments(false);
          updateUI_Altitude();
       }
-   }
-
-   private void onSaveTour_Surfing() {
-
-      final boolean isVisibleDataPoints = _tourData.visibleDataPointSerie != null;
-      if (isVisibleDataPoints) {
-
-         // visible data points are available -> save surfing parameters
-
-         int minDistance = _spinnerSurfing_MinSurfingDistance.getSelection();
-         int minSpeed_StartStop = _spinnerSurfing_MinSpeed_StartStop.getSelection();
-         int minSpeed_Surfing = _spinnerSurfing_MinSpeed_Surfing.getSelection();
-
-         final boolean isMinDistance = _chkIsMinSurfingDistance.getSelection();
-         final int minTimeDuration = _spinnerSurfing_MinTimeDuration.getSelection();
-
-         if (net.tourbook.ui.UI.UNIT_VALUE_DISTANCE == UNIT_MILE) {
-
-            // convert imperial -> metric
-
-            minSpeed_StartStop = (int) (minSpeed_StartStop / UNIT_MILE + 0.5);
-            minSpeed_Surfing = (int) (minSpeed_Surfing / UNIT_MILE + 0.5);
-
-            minDistance = (int) (minDistance / UNIT_YARD + 0.5);
-         }
-
-         _tourData.setSurfing_IsMinDistance(isMinDistance);
-         _tourData.setSurfing_MinDistance((short) minDistance);
-         _tourData.setSurfing_MinSpeed_StartStop((short) minSpeed_StartStop);
-         _tourData.setSurfing_MinSpeed_Surfing((short) minSpeed_Surfing);
-         _tourData.setSurfing_MinTimeDuration((short) minTimeDuration);
-
-      } else {
-
-         // visible data points are NOT available -> remove surfing parameters
-
-         _tourData.setSurfing_IsMinDistance(false); // this must not be set because min distance value -1 indicates the state
-         _tourData.setSurfing_MinDistance(TourData.DISABLED_SURFING_VALUES);
-         _tourData.setSurfing_MinSpeed_StartStop(TourData.DISABLED_SURFING_VALUES);
-         _tourData.setSurfing_MinSpeed_Surfing(TourData.DISABLED_SURFING_VALUES);
-         _tourData.setSurfing_MinTimeDuration(TourData.DISABLED_SURFING_VALUES);
-      }
-
-      _tourData.isSaveVisibleDataPoints = true;
-      {
-         _isTourDirty = true;
-
-         final TourData tourData = saveTour();
-         if (tourData != null) {
-            _tourData = tourData;
-         }
-      }
-      _tourData.isSaveVisibleDataPoints = false;
    }
 
    private void onSelect_BreakTime() {
@@ -4384,7 +4490,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                   final boolean isShowOnlySelectedSegments = _chkIsShowOnlySelectedSegments.getSelection();
 
                   if (isShowOnlySelectedSegments) {
-                     onSelect_Surfing_ShowOnlySelectedSegments();
+                     onSurfing_ShowOnlySelectedSegments();
                   }
 
                   break;
@@ -4420,7 +4526,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          _userSelectedSegmenterType = selectedSegmenterType;
       }
 
-      _isSegmenterEnabled = true;
       _isSegmenterFiltered = false;
 
       if (selectedSegmenterType == SegmenterType.ByAltitudeWithDP
@@ -4460,7 +4565,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
          _pageBookSegmenter.showPage(_pageSegType_Surfing);
 
-         _isSegmenterEnabled = _chkIsSurfingSegmenterEnabled.getSelection();
          _isSegmenterFiltered = isSurfingSegmenterFiltered();
          _selectedSurfingFilter = _comboSurfing_SegmenterFilter.getSelectionIndex();
 
@@ -4480,84 +4584,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       enableActions_Surfing();
 
       createSegments(true);
-   }
-
-   private void onSelect_Surfing_IsEnabled() {
-
-      _isSegmenterEnabled = _chkIsSurfingSegmenterEnabled.getSelection();
-
-      if (_isSegmenterEnabled) {
-
-         onSelect_Surfing();
-
-      } else {
-
-         // hide segmenter data points
-
-         _tourData.visibleDataPointSerie = null;
-
-         // show empty segments
-         reloadViewer();
-
-         enableActions_Surfing();
-
-         TourManager.fireEventWithCustomData(//
-               TourEventId.SEGMENT_LAYER_CHANGED,
-               _tourData,
-               TourSegmenterView.this);
-      }
-   }
-
-   private void onSelect_Surfing_SegmentFilter() {
-
-      _isSegmenterFiltered = isSurfingSegmenterFiltered();
-      _selectedSurfingFilter = _comboSurfing_SegmenterFilter.getSelectionIndex();
-
-      updateUI_SegmenterBackground();
-
-      _segmentViewer.refresh(false);
-   }
-
-   private void onSelect_Surfing_ShowOnlySelectedSegments() {
-
-      final boolean isShowOnlySelectedSegments = _chkIsShowOnlySelectedSegments.getSelection();
-
-      if (isShowOnlySelectedSegments) {
-
-         // hide segments in the map which are not selected
-
-         final int[] timeSerie = _tourData.timeSerie;
-         final boolean[] visibleDataPointSerie = _tourData.visibleDataPointSerie = new boolean[timeSerie.length];
-
-         final IStructuredSelection selection = _segmentViewer.getStructuredSelection();
-         for (final Object selectedItem : selection.toList()) {
-
-            if (selectedItem instanceof TourSegment) {
-
-               final TourSegment tourSegment = (TourSegment) selectedItem;
-
-               final int segmentStartIndex = tourSegment.serieIndex_Start;
-               final int segmentEndIndex = tourSegment.serieIndex_End;
-
-               for (int surfSerieIndex = segmentStartIndex + 1; surfSerieIndex <= segmentEndIndex; surfSerieIndex++) {
-                  visibleDataPointSerie[surfSerieIndex] = true;
-               }
-            }
-         }
-
-         TourManager.fireEventWithCustomData(//
-               TourEventId.SEGMENT_LAYER_CHANGED,
-               _tourData,
-               TourSegmenterView.this);
-
-         enableActions_Surfing();
-
-      } else {
-
-         // recreate all segments
-
-         onSelect_Surfing();
-      }
    }
 
    private void onSelect_Tolerance() {
@@ -4604,10 +4630,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       if (_isSaving) {
          return;
       }
-
-//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//				+ ("\tonSelectionChanged:\t" + selection));
-//		// TODO remove SYSTEM.OUT.PRINTLN
 
       /*
        * run selection async because a tour could be modified and needs to be saved, modifications
@@ -4741,6 +4763,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             PrefPageComputedValues.TAB_FOLDER_BREAK_TIME).open();
    }
 
+   private void onSurfing_ResetFromTour() {
+
+      restoreState_FromTour();
+      onSelect_Surfing();
+   }
+
    private void onSurfing_ResetToDefaults() {
 
       _chkIsMinSurfingDistance.setSelection(STATE_SURFING_IS_MIN_DISTANCE_DEFAULT);
@@ -4755,6 +4783,140 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       _spinnerSurfing_MinSpeed_Surfing.setSelection((int) (STATE_SURFING_MIN_SPEED_SURFING_DEFAULT * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
 
       onSelect_Surfing();
+   }
+
+   /**
+    * @param isUpdateTour
+    *           When <code>true</code> visible surfing data are saved otherwise they are removed.
+    */
+   private void onSurfing_SaveTour(final boolean isUpdateTour) {
+
+      if (isUpdateTour) {
+
+         _tourData.visibleDataPointSerie = createVisibleDataPoints(SurfingFilterType.Surfing);
+
+         _tourData.setVisiblePoints_ForSurfing(_tourData.visibleDataPointSerie);
+
+      } else {
+
+         // delete visible data points for surfing
+
+         _tourData.setVisiblePoints_ForSurfing(null);
+      }
+
+      int minDistance = _spinnerSurfing_MinSurfingDistance.getSelection();
+      int minSpeed_StartStop = _spinnerSurfing_MinSpeed_StartStop.getSelection();
+      int minSpeed_Surfing = _spinnerSurfing_MinSpeed_Surfing.getSelection();
+
+      final boolean isMinDistance = _chkIsMinSurfingDistance.getSelection();
+      final int minTimeDuration = _spinnerSurfing_MinTimeDuration.getSelection();
+
+      if (net.tourbook.ui.UI.UNIT_VALUE_DISTANCE == UNIT_MILE) {
+
+         // convert imperial -> metric
+
+         minSpeed_StartStop = (int) (minSpeed_StartStop / UNIT_MILE + 0.5);
+         minSpeed_Surfing = (int) (minSpeed_Surfing / UNIT_MILE + 0.5);
+
+         minDistance = (int) (minDistance / UNIT_YARD + 0.5);
+      }
+
+      _tourData.setSurfing_IsMinDistance(isMinDistance);
+      _tourData.setSurfing_MinDistance((short) minDistance);
+      _tourData.setSurfing_MinSpeed_StartStop((short) minSpeed_StartStop);
+      _tourData.setSurfing_MinSpeed_Surfing((short) minSpeed_Surfing);
+      _tourData.setSurfing_MinTimeDuration((short) minTimeDuration);
+
+      _isTourDirty = true;
+      final TourData tourData = saveTour();
+
+      if (tourData != null) {
+         _tourData = tourData;
+      }
+
+      // update surfing save state
+      restoreState_FromTour();
+   }
+
+   private void onSurfing_SelectSegmentFilter() {
+
+      restoreVisibleDataPointsBeforeNextTourIsSet();
+
+      _isSegmenterFiltered = isSurfingSegmenterFiltered();
+      _selectedSurfingFilter = _comboSurfing_SegmenterFilter.getSelectionIndex();
+
+      updateUI_SegmenterBackground();
+
+      final SurfingFilterType selectedSurfingFilter = getSelectedSurfingFilter();
+      _tourData.visibleDataPointSerie = createVisibleDataPoints(selectedSurfingFilter);
+
+      // this will create tour segments from the visible data points
+      _segmentViewer.refresh(false);
+
+      enableActions_Surfing();
+
+      // set default color
+      Color bgColor = null;
+
+      switch (selectedSurfingFilter) {
+      case NotSurfing:
+         bgColor = _colorCache.get(SEGMENTER_FILTER_2_BACKGROUND_HEADER);
+         break;
+      case Surfing:
+         bgColor = _colorCache.get(SEGMENTER_FILTER_1_BACKGROUND_HEADER);
+         break;
+      case All:
+         break;
+      }
+
+      _comboSurfing_SegmenterFilter.setBackground(bgColor);
+
+      TourManager.fireEventWithCustomData(//
+            TourEventId.SEGMENT_LAYER_CHANGED,
+            _tourData,
+            TourSegmenterView.this);
+   }
+
+   private void onSurfing_ShowOnlySelectedSegments() {
+
+      final boolean isShowOnlySelectedSegments = _chkIsShowOnlySelectedSegments.getSelection();
+
+      if (isShowOnlySelectedSegments) {
+
+         // hide segments in the map which are not selected
+
+         final int[] timeSerie = _tourData.timeSerie;
+         final boolean[] visibleDataPointSerie = _tourData.visibleDataPointSerie = new boolean[timeSerie.length];
+
+         final IStructuredSelection selection = _segmentViewer.getStructuredSelection();
+         for (final Object selectedItem : selection.toList()) {
+
+            if (selectedItem instanceof TourSegment) {
+
+               final TourSegment tourSegment = (TourSegment) selectedItem;
+
+               final int segmentStartIndex = tourSegment.serieIndex_Start;
+               final int segmentEndIndex = tourSegment.serieIndex_End;
+
+               for (int surfSerieIndex = segmentStartIndex + 1; surfSerieIndex <= segmentEndIndex; surfSerieIndex++) {
+                  visibleDataPointSerie[surfSerieIndex] = true;
+               }
+            }
+         }
+
+         TourManager.fireEventWithCustomData(//
+               TourEventId.SEGMENT_LAYER_CHANGED,
+               _tourData,
+               TourSegmenterView.this);
+
+         enableActions_Surfing();
+
+      } else {
+
+         // recreate all segments
+
+         onSelect_Surfing();
+      }
    }
 
    @Override
@@ -4780,17 +4942,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       // force content to be reloaded
       _segmentViewer.setInput(new Object[0]);
-   }
-
-   /**
-    * Prevent that visible points are saved accidently, visible points must be saved explicitly !!!
-    */
-   private void removeVisibleDataPointsBeforeNextTourIsSet() {
-
-      if (_tourData != null) {
-
-         _tourData.visibleDataPointSerie = null;
-      }
    }
 
    /**
@@ -4971,19 +5122,17 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       /*
        * Surfing
        */
-      _chkIsSurfingSegmenterEnabled.setSelection(Util.getStateBoolean(_state,
-            STATE_SURFING_IS_SEGMENTER_ENABLED,
-            STATE_SURFING_IS_SEGMENTER_ENABLED_DEFAULT));
+      final Enum<SurfingFilterType> stateSurfingFilterId = Util.getStateEnum(_state,
+            STATE_SURFING_SEGMENT_FILTER,
+            SurfingFilterType.All);
+      selectSurfingFilter(stateSurfingFilterId);
 
       _chkIsShowOnlySelectedSegments.setSelection(Util.getStateBoolean(_state,
             STATE_SURFING_IS_SHOW_ONLY_SELECTED_SEGMENTS,
             STATE_SURFING_IS_SHOW_ONLY_SELECTED_SEGMENTS_DEFAULT));
 
-      final Enum<SurfingFilterType> stateSurfingFilterId = Util.getStateEnum(_state, STATE_SURFING_SEGMENT_FILTER, SurfingFilterType.All);
-      selectSurfingFilter(stateSurfingFilterId);
-
       /*
-       * Surfing states which are also available in a tour
+       * Surfing states which are also saved in a tour
        */
       _spinnerSurfing_MinTimeDuration.setSelection(Util.getStateInt(_state,
             STATE_SURFING_MIN_TIME_DURATION,
@@ -5019,23 +5168,23 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       final short surfing_MinSpeed_Surfing = _tourData.getSurfing_MinSpeed_Surfing();
       final short surfing_MinTimeDuration = _tourData.getSurfing_MinTimeDuration();
 
-      final boolean state_IsMinDistance = surfing_MinDistance == TourData.DISABLED_SURFING_VALUES
+      final boolean state_IsMinDistance = surfing_MinDistance == TourData.SURFING_VALUE_IS_NOT_SET
             ? STATE_SURFING_IS_MIN_DISTANCE_DEFAULT
             : surfing_IsMinDistance;
 
-      final int stateMinDistance = surfing_MinDistance == TourData.DISABLED_SURFING_VALUES
+      final int stateMinDistance = surfing_MinDistance == TourData.SURFING_VALUE_IS_NOT_SET
             ? STATE_SURFING_MIN_DISTANCE_DEFAULT
             : surfing_MinDistance;
 
-      final int state_MinSpeed_StartStop = surfing_MinSpeed_StartStop == TourData.DISABLED_SURFING_VALUES
+      final int state_MinSpeed_StartStop = surfing_MinSpeed_StartStop == TourData.SURFING_VALUE_IS_NOT_SET
             ? STATE_SURFING_MIN_SPEED_START_STOP_DEFAULT
             : surfing_MinSpeed_StartStop;
 
-      final int state_MinSpeed_Surfing = surfing_MinSpeed_Surfing == TourData.DISABLED_SURFING_VALUES
+      final int state_MinSpeed_Surfing = surfing_MinSpeed_Surfing == TourData.SURFING_VALUE_IS_NOT_SET
             ? STATE_SURFING_MIN_SPEED_SURFING_DEFAULT
             : surfing_MinSpeed_Surfing;
 
-      final short state_MinTimeDuration = surfing_MinTimeDuration == TourData.DISABLED_SURFING_VALUES
+      final short state_MinTimeDuration = surfing_MinTimeDuration == TourData.SURFING_VALUE_IS_NOT_SET
             ? STATE_SURFING_MIN_TIME_DURATION_DEFAULT
             : surfing_MinTimeDuration;
 
@@ -5048,6 +5197,28 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       _spinnerSurfing_MinSpeed_Surfing.setSelection(minSpeed_Surfing_UI);
       _spinnerSurfing_MinSurfingDistance.setSelection(minDistance_UI);
       _spinnerSurfing_MinTimeDuration.setSelection(state_MinTimeDuration);
+
+      final boolean isVisibleDataPointSerieSaved = _tourData.isVisiblePointsSaved_ForSurfing();
+      if (isVisibleDataPointSerieSaved) {
+
+         _iconSaveSurfingState.setToolTipText(Messages.Tour_Segmenter_Button_Surfing_IsSaveState_Tooltip);
+         _iconSaveSurfingState.setImage(_imageSurfing_SaveState);
+
+      } else {
+
+         _iconSaveSurfingState.setToolTipText(Messages.Tour_Segmenter_Button_Surfing_IsNotSaveState_Tooltip);
+         _iconSaveSurfingState.setImage(_imageSurfing_NotSaveState);
+      }
+   }
+
+   /**
+    * Prevent that visible points are saved accidently, visible points must be saved explicitly !!!
+    */
+   private void restoreVisibleDataPointsBeforeNextTourIsSet() {
+
+      if (_tourData != null) {
+         _tourData.restoreVisiblePoints_ForSurfing();
+      }
    }
 
    /**
@@ -5145,7 +5316,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       Util.setStateEnum(_state, STATE_SURFING_SEGMENT_FILTER, getSelectedSurfingFilter());
 
       _state.put(STATE_SURFING_IS_MIN_DISTANCE, _chkIsMinSurfingDistance.getSelection());
-      _state.put(STATE_SURFING_IS_SEGMENTER_ENABLED, _chkIsSurfingSegmenterEnabled.getSelection());
       _state.put(STATE_SURFING_IS_SHOW_ONLY_SELECTED_SEGMENTS, _chkIsShowOnlySelectedSegments.getSelection());
       _state.put(STATE_SURFING_MIN_DISTANCE, minSurfingDistance);
       _state.put(STATE_SURFING_MIN_SPEED_START_STOP, minSpeed_StartStop);
@@ -5326,14 +5496,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       if (_isSegmenterFiltered) {
 
-         if (filter == 1) {
-
-            cell.setBackground(_colorCache.get(SEGMENTER_FILTER_1_BACKGROUND));
-
-         } else if (filter == 2) {
-
-            cell.setBackground(_colorCache.get(SEGMENTER_FILTER_2_BACKGROUND));
-         }
+//         if (filter == 1) {
+//
+//            cell.setBackground(_colorCache.get(SEGMENTER_FILTER_1_BACKGROUND));
+//
+//         } else if (filter == 2) {
+//
+//            cell.setBackground(_colorCache.get(SEGMENTER_FILTER_2_BACKGROUND));
+//         }
       } else {
 
          // show surfing segments with more contrast
@@ -5359,7 +5529,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       _isDirtyDisabled = true;
       {
-         removeVisibleDataPointsBeforeNextTourIsSet();
+         restoreVisibleDataPointsBeforeNextTourIsSet();
 
          _tourData = tourData;
 
@@ -5378,6 +5548,33 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          final boolean canSaveTour = _tourData.getTourPerson() != null;
          _btnSaveTourDP.setEnabled(canSaveTour);
          _btnSaveTourMin.setEnabled(canSaveTour);
+
+         _btnSurfing_RestoreFrom_Tour.setToolTipText(String.format(
+
+               Messages.Tour_Segmenter_Surfing_Button_RestoreFromTourWithData_Tooltip,
+
+               // min start/stop speed
+               _tourData.getSurfing_MinSpeed_StartStop(),
+               UI.UNIT_LABEL_SPEED,
+
+               // min surfing speed
+               _tourData.getSurfing_MinSpeed_Surfing(),
+               UI.UNIT_LABEL_SPEED,
+
+               // min time duration
+               _tourData.getSurfing_MinTimeDuration(),
+               Messages.App_Unit_Seconds_Small,
+
+               // min distance
+               _tourData.getSurfing_MinDistance(),
+               UI.UNIT_LABEL_DISTANCE_M_OR_YD,
+
+               // is min distance
+               _tourData.isSurfing_IsMinDistance()
+                     ? Messages.App__True
+                     : Messages.App__False
+         //
+         ));
 
          restoreState_FromTour();
       }
@@ -5676,12 +5873,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
          if (_selectedSurfingFilter == 1) {
 
-            segmenterTable.setBackground(_colorCache.get(SEGMENTER_FILTER_1_BACKGROUND));
+//            segmenterTable.setBackground(_colorCache.get(SEGMENTER_FILTER_1_BACKGROUND));
             segmenterTable.setHeaderBackground(_colorCache.get(SEGMENTER_FILTER_1_BACKGROUND_HEADER));
 
          } else if (_selectedSurfingFilter == 2) {
 
-            segmenterTable.setBackground(_colorCache.get(SEGMENTER_FILTER_2_BACKGROUND));
+//            segmenterTable.setBackground(_colorCache.get(SEGMENTER_FILTER_2_BACKGROUND));
             segmenterTable.setHeaderBackground(_colorCache.get(SEGMENTER_FILTER_2_BACKGROUND_HEADER));
          }
 
