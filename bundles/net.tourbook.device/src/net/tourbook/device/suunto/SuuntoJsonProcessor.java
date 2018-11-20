@@ -80,7 +80,7 @@ public class SuuntoJsonProcessor {
 		if (tourData == null)
 			return null;
 
-		boolean isIndoorTour = !jsonFileContent.contains("GPSAltitude");
+		boolean isIndoorTour = !jsonFileContent.contains(TAG_GPSALTITUDE);
 
 		boolean isPaused = false;
 
