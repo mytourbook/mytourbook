@@ -1411,11 +1411,15 @@ public class TourMapPainter extends MapPainter {
       final int tileWidth = tileSize;
       final int tileHeight = tileSize;
 
-      int devFromWithOffsetX = 0;
-      int devFromWithOffsetY = 0;
+      int devFrom_WithOffsetX = 0;
+      int devFrom_WithOffsetY = 0;
 
       final double[] latitudeSerie = tourData.latitudeSerie;
       final double[] longitudeSerie = tourData.longitudeSerie;
+      final boolean[] visibleDataPointSerie = tourData.visibleDataPointSerie;
+
+      boolean isFirstVisibleDataPoint = false;
+      boolean isPrevVisibleDataPoint = false;
 
       /*
        * world positions are cached to optimize performance when multiple tours are selected
@@ -1498,26 +1502,38 @@ public class TourMapPainter extends MapPainter {
 
             if (_prefIsDrawLine) {
 
-               // check if position is in the viewport
+               // draw as a line
 
                // get positions with the part offset
-               final int devToWithOffsetX = devX + devPartOffset;
-               final int devToWithOffsetY = devY + devPartOffset;
+               final int devTo_WithOffsetX = devX + devPartOffset;
+               final int devTo_WithOffsetY = devY + devPartOffset;
 
                if (serieIndex == 0) {
 
                   // keep position
-                  devFromWithOffsetX = devToWithOffsetX;
-                  devFromWithOffsetY = devToWithOffsetY;
+                  devFrom_WithOffsetX = devTo_WithOffsetX;
+                  devFrom_WithOffsetY = devTo_WithOffsetY;
 
                   continue;
                }
 
                Color color = null;
 
+               boolean isVisibleDataPoint = true;
+               if (visibleDataPointSerie != null) {
+
+                  isVisibleDataPoint = visibleDataPointSerie[serieIndex];
+
+                  if (isPrevVisibleDataPoint == false && isVisibleDataPoint) {
+
+                     isFirstVisibleDataPoint = true;
+                  }
+               }
+
                // this condition is an inline for:
                // tileViewport.contains(tileWorldPos.x, tileWorldPos.y)
 
+               // check if position is in the viewport
                if ((tourWorldPixelX >= tileWorldPixelX)
                      && (tourWorldPixelY >= tileWorldPixelY)
                      && tourWorldPixelX < (tileWorldPixelX + tileWidth)
@@ -1526,25 +1542,38 @@ public class TourMapPainter extends MapPainter {
                   // current position is inside the tile
 
                   // check if position has changed
-                  if (devToWithOffsetX != devFromWithOffsetX || devToWithOffsetY != devFromWithOffsetY) {
+                  if (devTo_WithOffsetX != devFrom_WithOffsetX || devTo_WithOffsetY != devFrom_WithOffsetY) {
 
                      isTourInTile = true;
 
-                     color = getTourColor(
-                           tourData,
-                           serieIndex,
-                           isBorder,
-                           true,
-                           isGeoCompareRefTour,
-                           isInRefTourPart);
+                     if (isVisibleDataPoint) {
 
-                     drawTour_20_Line(
-                           gcTile,
-                           devFromWithOffsetX,
-                           devFromWithOffsetY,
-                           devToWithOffsetX,
-                           devToWithOffsetY,
-                           color);
+                        color = getTourColor(
+                              tourData,
+                              serieIndex,
+                              isBorder,
+                              true,
+                              isGeoCompareRefTour,
+                              isInRefTourPart);
+
+                        if (isFirstVisibleDataPoint) {
+
+                           if (color != null) {
+                              gcTile.setForeground(color);
+                           }
+
+                           drawTour_40_Dot(gcTile, devFrom_WithOffsetX, devFrom_WithOffsetY, color);
+
+                        }
+
+                        drawTour_20_Line(
+                              gcTile,
+                              devFrom_WithOffsetX,
+                              devFrom_WithOffsetY,
+                              devTo_WithOffsetX,
+                              devTo_WithOffsetY,
+                              color);
+                     }
                   }
 
                   lastInsideIndex = serieIndex;
@@ -1552,25 +1581,30 @@ public class TourMapPainter extends MapPainter {
 
                // current position is outside the tile
 
-               if (serieIndex == lastInsideIndex + 1) {
+               if (isVisibleDataPoint) {
 
-                  /*
-                   * this position is the first which is outside of the tile, draw a line from the
-                   * last inside to the first outside position
-                   */
+                  if (serieIndex == lastInsideIndex + 1) {
 
-                  drawTour_20_Line(
-                        gcTile,
-                        devFromWithOffsetX,
-                        devFromWithOffsetY,
-                        devToWithOffsetX,
-                        devToWithOffsetY,
-                        color);
+                     /*
+                      * this position is the first which is outside of the tile, draw a line from
+                      * the last inside to the first outside position
+                      */
+
+                     drawTour_20_Line(
+                           gcTile,
+                           devFrom_WithOffsetX,
+                           devFrom_WithOffsetY,
+                           devTo_WithOffsetX,
+                           devTo_WithOffsetY,
+                           color);
+                  }
                }
 
-               // keep position
-               devFromWithOffsetX = devToWithOffsetX;
-               devFromWithOffsetY = devToWithOffsetY;
+               // keep positions
+               devFrom_WithOffsetX = devTo_WithOffsetX;
+               devFrom_WithOffsetY = devTo_WithOffsetY;
+
+               isPrevVisibleDataPoint = isVisibleDataPoint;
 
             } else {
 
@@ -1586,31 +1620,40 @@ public class TourMapPainter extends MapPainter {
                   // current position is inside the tile
 
                   // optimize drawing: check if position has changed
-                  if (devX != devFromWithOffsetX && devY != devFromWithOffsetY) {
+                  if (devX != devFrom_WithOffsetX && devY != devFrom_WithOffsetY) {
 
-                     isTourInTile = true;
+                     boolean isVisibleDataPoint = true;
 
-                     // adjust positions with the part offset
-                     devX += devPartOffset;
-                     devY += devPartOffset;
-
-                     final Color color = getTourColor(
-                           tourData,
-                           serieIndex,
-                           isBorder,
-                           false,
-                           isGeoCompareRefTour,
-                           isInRefTourPart);
-
-                     if (_prefIsDrawSquare) {
-                        drawTour_30_Square(gcTile, devX, devY, color);
-                     } else {
-                        drawTour_40_Dot(gcTile, devX, devY, color);
+                     if (visibleDataPointSerie != null) {
+                        isVisibleDataPoint = visibleDataPointSerie[serieIndex];
                      }
 
-                     // set previous pixel
-                     devFromWithOffsetX = devX;
-                     devFromWithOffsetY = devY;
+                     if (isVisibleDataPoint) {
+
+                        isTourInTile = true;
+
+                        // adjust positions with the part offset
+                        devX += devPartOffset;
+                        devY += devPartOffset;
+
+                        final Color color = getTourColor(
+                              tourData,
+                              serieIndex,
+                              isBorder,
+                              false,
+                              isGeoCompareRefTour,
+                              isInRefTourPart);
+
+                        if (_prefIsDrawSquare) {
+                           drawTour_30_Square(gcTile, devX, devY, color);
+                        } else {
+                           drawTour_40_Dot(gcTile, devX, devY, color);
+                        }
+
+                        // set previous pixel
+                        devFrom_WithOffsetX = devX;
+                        devFrom_WithOffsetY = devY;
+                     }
                   }
                }
             }
@@ -2005,8 +2048,9 @@ public class TourMapPainter extends MapPainter {
        */
       if (isGeoCompareRefTour) {
 
-         return _colorCache.getColor(
-               isInRefTourPart ? _prefGeoCompare_CompartTourPart_RGB : _prefGeoCompare_RefTour_RGB);
+         return _colorCache.getColor(isInRefTourPart
+               ? _prefGeoCompare_CompartTourPart_RGB
+               : _prefGeoCompare_RefTour_RGB);
       }
 
       /*

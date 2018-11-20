@@ -17,8 +17,14 @@ Version 18.12.0                                                   ?. December 20
 
 
 New
-===	
+===
 
+* Tour segmenter for surfing	
+  The surfing speed depends on the speed smoothing algorithm, according are the surfing events recognized or not.
+  The smoothing algorithm can create speed value peeks which also can influence the surfing event recognition.
+  Peeks can occure when there are missing distance values, e.g. when there was no GPS signal in a wave or underwater.
+
+* Import Suunto Spartan/9 files, contributed by Frederic
 
 
 Improvements
@@ -29,6 +35,9 @@ Improvements
   Updating this view automatically would need some UI adjustments but this UI will be deprecated later on and is now in the maintanance mode.
   The fulltext index can be deleted (when MyTourbook is closed), it will be recreated when the "Search Tours" view is opened. 
 
+* Map 2D
+  - Increased max zoom level 18 -> 19
+ 
  
 Bugfix 	
 ======

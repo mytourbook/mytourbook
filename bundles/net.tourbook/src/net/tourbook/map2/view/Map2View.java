@@ -305,6 +305,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
    private ISelectionListener        _postSelectionListener;
    private IPropertyChangeListener   _prefChangeListener;
    private ITourEventListener        _tourEventListener;
+
    /**
     * Contains all tours which are displayed in the map.
     */
@@ -1113,6 +1114,10 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
             } else if (eventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof ISelection) {
 
                onSelectionChanged((ISelection) eventData);
+
+            } else if (eventId == TourEventId.SEGMENT_LAYER_CHANGED) {
+
+               resetMap();
             }
          }
       };
@@ -2242,10 +2247,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
       } else if (selection instanceof SelectionChartXSliderPosition) {
 
          final SelectionChartXSliderPosition xSliderPos = (SelectionChartXSliderPosition) selection;
-         final Chart chart = xSliderPos.getChart();
-         if (chart == null) {
-            return;
-         }
 
          final Object customData = xSliderPos.getCustomData();
          if (customData instanceof SelectedTourSegmenterSegments) {
@@ -2257,6 +2258,11 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
             selectTourSegments((SelectedTourSegmenterSegments) customData);
 
          } else {
+
+            final Chart chart = xSliderPos.getChart();
+            if (chart == null) {
+               return;
+            }
 
             final ChartDataModel chartDataModel = chart.getChartDataModel();
             final Object tourId = chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);

@@ -103,7 +103,8 @@ public class TourDatabase {
    /**
     * version for the database which is required that the tourbook application works successfully
     */
-   private static final int TOURBOOK_DB_VERSION = 35;
+   private static final int TOURBOOK_DB_VERSION = 36;
+//	private static final int TOURBOOK_DB_VERSION = 36; // 18.12
 //	private static final int TOURBOOK_DB_VERSION = 35; // 18.7
 //	private static final int TOURBOOK_DB_VERSION = 34; // 18.5
 //	private static final int TOURBOOK_DB_VERSION = 33; // 17.12
@@ -208,6 +209,8 @@ public class TourDatabase {
 
    private static final String DEFAULT_0                       = "0";                                                    //$NON-NLS-1$
    private static final String DEFAULT_1_0                     = "1.0";                                                  //$NON-NLS-1$
+   private static final String DEFAULT_FALSE                   = "false";                                                //$NON-NLS-1$
+   private static final String DEFAULT_IGNORED                 = "-1";                                                   //$NON-NLS-1$
 
    private static final String PERSISTENCE_UNIT_NAME           = "tourdatabase";                                         //$NON-NLS-1$
 
@@ -344,13 +347,31 @@ public class TourDatabase {
                                         final String columnName,
                                         final String defaultValue) throws SQLException {
 
-         final String sql = ""// 															//$NON-NLS-1$
-               + "ALTER TABLE " + table //													//$NON-NLS-1$
-               + "	ADD COLUMN	" + columnName + " BIGINT DEFAULT " + defaultValue; //		//$NON-NLS-1$ //$NON-NLS-2$
+         final String sql = ""//                                                          //$NON-NLS-1$
+               + "ALTER TABLE " + table //                                                //$NON-NLS-1$
+               + "	ADD COLUMN	" + columnName + " BIGINT DEFAULT " + defaultValue; //   //$NON-NLS-1$ //$NON-NLS-2$
 
          exec(stmt, sql);
+      }
 
-         return;
+      /**
+       * @param stmt
+       * @param table
+       * @param columnName
+       * @param defaultValue
+       *           Default value.
+       * @throws SQLException
+       */
+      private static void AddCol_Boolean(final Statement stmt,
+                                         final String table,
+                                         final String columnName,
+                                         final String defaultValue) throws SQLException {
+
+         final String sql = ""//                                                          //$NON-NLS-1$
+               + "ALTER TABLE " + table //                                                //$NON-NLS-1$
+               + "   ADD COLUMN " + columnName + " BOOLEAN DEFAULT " + defaultValue; //   //$NON-NLS-1$ //$NON-NLS-2$
+
+         exec(stmt, sql);
       }
 
       private static void AddCol_Double(final Statement stmt,
@@ -375,8 +396,6 @@ public class TourDatabase {
                + "	ADD COLUMN	" + columnName + " FLOAT DEFAULT  " + defaultValue; //		//$NON-NLS-1$ //$NON-NLS-2$
 
          exec(stmt, sql);
-
-         return;
       }
 
       /**
@@ -1122,7 +1141,7 @@ public class TourDatabase {
 
    private static void exec(final Statement stmt, final String sql) throws SQLException {
 
-      StatusUtil.log(sql);
+      StatusUtil.logInfo(sql);
       System.out.println();
 
       stmt.execute(sql);
@@ -1137,7 +1156,7 @@ public class TourDatabase {
 
    private static void execUpdate(final Statement stmt, final String sql) throws SQLException {
 
-      StatusUtil.log(sql);
+      StatusUtil.logInfo(sql);
       System.out.println();
 
       stmt.executeUpdate(sql);
@@ -2767,6 +2786,18 @@ public class TourDatabase {
             //
             // version 35 end ---------
 
+            // version 36 start  -  18.12
+            //
+            + "	surfing_IsMinDistance        			   BOOLEAN  DEFAULT FALSE,					\n" //$NON-NLS-1$
+
+            + "	surfing_MinDistance          			   SMALLINT DEFAULT -1,						\n" //$NON-NLS-1$
+            + "	surfing_MinSpeed_StartStop          	SMALLINT DEFAULT -1,						\n" //$NON-NLS-1$
+            + "	surfing_MinSpeed_Surfing          		SMALLINT DEFAULT -1,						\n" //$NON-NLS-1$
+            + "	surfing_MinTimeDuration          		SMALLINT DEFAULT -1,						\n" //$NON-NLS-1$
+
+            //
+            // version 36 end ---------
+
             //				// version 35 start  -  18.?
             //				//
             //				+ "	LatitudeMinE6			INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
@@ -4271,9 +4302,7 @@ public class TourDatabase {
             currentDbVersion = newVersion = updateDbDesign_023_to_024(conn, monitor);
          }
 
-         /*
-          * 24 -> 25
-          */
+         // 24 -> 25
          boolean isPostUpdate25 = false;
 
          if (currentDbVersion == 24) {
@@ -4281,86 +4310,71 @@ public class TourDatabase {
             currentDbVersion = newVersion = updateDbDesign_024_to_025(conn, monitor);
          }
 
-         /*
-          * 25 -> 26
-          */
+         // 25 -> 26
          if (currentDbVersion == 25) {
             currentDbVersion = newVersion = updateDbDesign_025_to_026(conn, monitor);
          }
 
-         /*
-          * 26 -> 27
-          */
+         // 26 -> 27
          if (currentDbVersion == 26) {
             currentDbVersion = newVersion = updateDbDesign_026_to_027(conn, monitor);
          }
 
-         /*
-          * 27 -> 28
-          */
+         // 27 -> 28
          boolean isPostUpdate28 = false;
          if (currentDbVersion == 27) {
             isPostUpdate28 = true;
             currentDbVersion = newVersion = updateDbDesign_027_to_028(conn, monitor);
          }
 
-         /*
-          * 28 -> 29
-          */
+         // 28 -> 29
          boolean isPostUpdate29 = false;
          if (currentDbVersion == 28) {
             isPostUpdate29 = true;
             currentDbVersion = newVersion = updateDbDesign_028_to_029(conn, monitor);
          }
 
-         /*
-          * 29 -> 30
-          */
+         // 29 -> 30
          if (currentDbVersion == 29) {
             currentDbVersion = newVersion = updateDbDesign_029_to_030(conn, monitor);
          }
 
-         /*
-          * 30 -> 31
-          */
+         // 30 -> 31
          if (currentDbVersion == 30) {
             currentDbVersion = newVersion = updateDbDesign_030_to_031(conn, monitor);
          }
 
-         /*
-          * 31 -> 32
-          */
+         // 31 -> 32
          boolean isPostUpdate32 = false;
          if (currentDbVersion == 31) {
             isPostUpdate32 = true;
             currentDbVersion = newVersion = updateDbDesign_031_to_032(conn, monitor);
          }
 
-         /*
-          * 32 -> 33
-          */
+         // 32 -> 33
          if (currentDbVersion == 32) {
             currentDbVersion = newVersion = updateDbDesign_032_to_033(conn, monitor);
          }
 
-         /*
-          * 33 -> 34
-          */
+         // 33 -> 34
          boolean isPostUpdate34 = false;
          if (currentDbVersion == 33) {
             isPostUpdate34 = true;
             currentDbVersion = newVersion = updateDbDesign_033_to_034(conn, monitor);
          }
 
-         /*
-          * 34 -> 35
-          */
+         // 34 -> 35
          if (currentDbVersion == 34) {
             currentDbVersion = newVersion = updateDbDesign_034_to_035(conn, monitor);
          }
 
+         // 35 -> 36
+         if (currentDbVersion == 35) {
+            currentDbVersion = newVersion = updateDbDesign_035_to_036(conn, monitor);
+         }
+
          /*
-          * update version number
+          * Update version number
           */
          updateDbDesign_VersionNumber(conn, newVersion);
 
@@ -6226,21 +6240,25 @@ public class TourDatabase {
          // check if db is updated to version 30
          if (isColumnAvailable(conn, TABLE_TOUR_DATA, "power_Avg") == false) { //$NON-NLS-1$
 
+// SET_FORMATTING_OFF
+
             // Add new columns
-            SQL.AddCol_Float(stmt, TABLE_TOUR_DATA, "power_Avg", DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "power_Max", DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "power_Normalized", DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "power_FTP", DEFAULT_0); //$NON-NLS-1$
+            SQL.AddCol_Float (stmt, TABLE_TOUR_DATA, "power_Avg",                         DEFAULT_0); //$NON-NLS-1$
+            SQL.AddCol_Int   (stmt, TABLE_TOUR_DATA, "power_Max",                         DEFAULT_0); //$NON-NLS-1$
+            SQL.AddCol_Int   (stmt, TABLE_TOUR_DATA, "power_Normalized",                  DEFAULT_0); //$NON-NLS-1$
+            SQL.AddCol_Int   (stmt, TABLE_TOUR_DATA, "power_FTP",                         DEFAULT_0); //$NON-NLS-1$
 
-            SQL.AddCol_BigInt(stmt, TABLE_TOUR_DATA, "power_TotalWork", DEFAULT_0);//$NON-NLS-1$
-            SQL.AddCol_Float(stmt, TABLE_TOUR_DATA, "power_TrainingStressScore", DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_Float(stmt, TABLE_TOUR_DATA, "power_IntensityFactor", DEFAULT_0); //$NON-NLS-1$
+            SQL.AddCol_BigInt(stmt, TABLE_TOUR_DATA, "power_TotalWork",                   DEFAULT_0); //$NON-NLS-1$
+            SQL.AddCol_Float (stmt, TABLE_TOUR_DATA, "power_TrainingStressScore",         DEFAULT_0); //$NON-NLS-1$
+            SQL.AddCol_Float (stmt, TABLE_TOUR_DATA, "power_IntensityFactor",             DEFAULT_0); //$NON-NLS-1$
 
-            SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "power_PedalLeftRightBalance", DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_Float(stmt, TABLE_TOUR_DATA, "power_AvgLeftTorqueEffectiveness", DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_Float(stmt, TABLE_TOUR_DATA, "power_AvgRightTorqueEffectiveness", DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_Float(stmt, TABLE_TOUR_DATA, "power_AvgLeftPedalSmoothness", DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_Float(stmt, TABLE_TOUR_DATA, "power_AvgRightPedalSmoothness", DEFAULT_0); //$NON-NLS-1$
+            SQL.AddCol_Int   (stmt, TABLE_TOUR_DATA, "power_PedalLeftRightBalance",       DEFAULT_0); //$NON-NLS-1$
+            SQL.AddCol_Float (stmt, TABLE_TOUR_DATA, "power_AvgLeftTorqueEffectiveness",  DEFAULT_0); //$NON-NLS-1$
+            SQL.AddCol_Float (stmt, TABLE_TOUR_DATA, "power_AvgRightTorqueEffectiveness", DEFAULT_0); //$NON-NLS-1$
+            SQL.AddCol_Float (stmt, TABLE_TOUR_DATA, "power_AvgLeftPedalSmoothness",      DEFAULT_0); //$NON-NLS-1$
+            SQL.AddCol_Float (stmt, TABLE_TOUR_DATA, "power_AvgRightPedalSmoothness",     DEFAULT_0); //$NON-NLS-1$
+
+// SET_FORMATTING_ON
          }
       }
       stmt.close();
@@ -6501,25 +6519,70 @@ public class TourDatabase {
 				// Add new columns
 				SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_StanceTime_Min", 				DEFAULT_0); //$NON-NLS-1$
 				SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_StanceTime_Max", 				DEFAULT_0); //$NON-NLS-1$
-				SQL.AddCol_Float(	  stmt, TABLE_TOUR_DATA, "runDyn_StanceTime_Avg", 				DEFAULT_0); //$NON-NLS-1$
+				SQL.AddCol_Float   (stmt, TABLE_TOUR_DATA, "runDyn_StanceTime_Avg", 				DEFAULT_0); //$NON-NLS-1$
 
 				SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_StanceTimeBalance_Min", 	DEFAULT_0); //$NON-NLS-1$
 				SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_StanceTimeBalance_Max", 	DEFAULT_0); //$NON-NLS-1$
-				SQL.AddCol_Float(	  stmt, TABLE_TOUR_DATA, "runDyn_StanceTimeBalance_Avg", 	DEFAULT_0); //$NON-NLS-1$
+				SQL.AddCol_Float   (stmt, TABLE_TOUR_DATA, "runDyn_StanceTimeBalance_Avg", 	DEFAULT_0); //$NON-NLS-1$
 
 				SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_StepLength_Min", 				DEFAULT_0); //$NON-NLS-1$
 				SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_StepLength_Max", 				DEFAULT_0); //$NON-NLS-1$
-				SQL.AddCol_Float(	  stmt, TABLE_TOUR_DATA, "runDyn_StepLength_Avg", 				DEFAULT_0); //$NON-NLS-1$
+				SQL.AddCol_Float   (stmt, TABLE_TOUR_DATA, "runDyn_StepLength_Avg", 				DEFAULT_0); //$NON-NLS-1$
 
 				SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_VerticalOscillation_Min", 	DEFAULT_0); //$NON-NLS-1$
 				SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_VerticalOscillation_Max", 	DEFAULT_0); //$NON-NLS-1$
-				SQL.AddCol_Float(	  stmt, TABLE_TOUR_DATA, "runDyn_VerticalOscillation_Avg", 	DEFAULT_0); //$NON-NLS-1$
+				SQL.AddCol_Float   (stmt, TABLE_TOUR_DATA, "runDyn_VerticalOscillation_Avg", 	DEFAULT_0); //$NON-NLS-1$
 
 				SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_VerticalRatio_Min", 			DEFAULT_0); //$NON-NLS-1$
 				SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_VerticalRatio_Max", 			DEFAULT_0); //$NON-NLS-1$
-				SQL.AddCol_Float(	  stmt, TABLE_TOUR_DATA, "runDyn_VerticalRatio_Avg", 			DEFAULT_0); //$NON-NLS-1$
+				SQL.AddCol_Float   (stmt, TABLE_TOUR_DATA, "runDyn_VerticalRatio_Avg", 			DEFAULT_0); //$NON-NLS-1$
 
 // SET_FORMATTING_ON
+         }
+      }
+      stmt.close();
+
+      logDb_UpdateEnd(newDbVersion);
+
+      return newDbVersion;
+   }
+
+   private int updateDbDesign_035_to_036(final Connection conn, final IProgressMonitor monitor) throws SQLException {
+
+      final int newDbVersion = 36;
+
+      logDb_UpdateStart(newDbVersion);
+      updateMonitor(monitor, newDbVersion);
+
+      final Statement stmt = conn.createStatement();
+      {
+         // check if db is updated to version 36
+         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "surfing_MinSpeed_StartStop") == false) { //$NON-NLS-1$
+
+//          // version 36 start  -  18.12
+//          //
+//          + "   surfing_IsMinDistance                  BOOLEAN  DEFAULT FALSE,             \n" //$NON-NLS-1$
+
+//          + "   surfing_MinDistance                    SMALLINT DEFAULT -1,                \n" //$NON-NLS-1$
+//          + "   surfing_MinSpeed_StartStop             SMALLINT DEFAULT -1,                \n" //$NON-NLS-1$
+//          + "   surfing_MinSpeed_Surfing               SMALLINT DEFAULT -1,                \n" //$NON-NLS-1$
+//          + "   surfing_MinTimeDuration                SMALLINT DEFAULT -1,                \n" //$NON-NLS-1$
+//
+//          //
+//          // version 36 end ---------
+
+// SET_FORMATTING_OFF
+
+            // Add new columns
+            SQL.AddCol_Boolean (stmt, TABLE_TOUR_DATA, "surfing_IsMinDistance",           DEFAULT_FALSE); //$NON-NLS-1$
+
+            SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "surfing_MinDistance",             DEFAULT_IGNORED); //$NON-NLS-1$
+            SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "surfing_MinSpeed_StartStop",      DEFAULT_IGNORED); //$NON-NLS-1$
+            SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "surfing_MinSpeed_Surfing",        DEFAULT_IGNORED); //$NON-NLS-1$
+            SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "surfing_MinTimeDuration",         DEFAULT_IGNORED); //$NON-NLS-1$
+
+// SET_FORMATTING_ON
+
          }
       }
       stmt.close();
