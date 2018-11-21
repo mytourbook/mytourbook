@@ -687,7 +687,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    // -1 indicate that the value is not yet set
 
-   private short     surfing_NumberOfEvents        = SURFING_VALUE_IS_NOT_SET;
+   private short     surfing_NumberOfEvents        = 0; // must be 0 because of totals in tourbook view
    private short     surfing_MinSpeed_StartStop    = SURFING_VALUE_IS_NOT_SET;
    private short     surfing_MinSpeed_Surfing      = SURFING_VALUE_IS_NOT_SET;
    private short     surfing_MinTimeDuration       = SURFING_VALUE_IS_NOT_SET;

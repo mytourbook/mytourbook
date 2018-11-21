@@ -119,7 +119,8 @@ import net.tourbook.web.WEB;
  */
 public class TourSegmenterView extends ViewPart implements ITourViewer {
 
-   public static final String  ID                                                 = "net.tourbook.views.TourSegmenter";           //$NON-NLS-1$
+   public static final String ID = "net.tourbook.views.TourSegmenter"; //$NON-NLS-1$
+
    //
    private static final float  UNIT_MILE                                          = net.tourbook.ui.UI.UNIT_MILE;
    private static final float  UNIT_YARD                                          = net.tourbook.ui.UI.UNIT_YARD;
@@ -197,18 +198,18 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
     */
    private static final String            STATE_SURFING_IS_SHOW_ONLY_SELECTED_SEGMENTS         = "STATE_SURFING_IS_SHOW_ONLY_SELECTED_SEGMENTS";//$NON-NLS-1$
    private static final boolean           STATE_SURFING_IS_SHOW_ONLY_SELECTED_SEGMENTS_DEFAULT = false;
-   private static final String            STATE_SURFING_SEGMENT_FILTER                         = "STATE_SURFING_SEGMENT_FILTER";                //$NON-NLS-1$
-   private static final SurfingFilterType STATE_SURFING_SEGMENT_FILTER_DEFAULT                 = SurfingFilterType.All;
    private static final String            STATE_SURFING_IS_MIN_DISTANCE                        = "STATE_SURFING_IS_MIN_DISTANCE";               //$NON-NLS-1$
-   private static final boolean           STATE_SURFING_IS_MIN_DISTANCE_DEFAULT                = false;
+   private static final boolean           STATE_SURFING_IS_MIN_DISTANCE_DEFAULT                = true;
    private static final String            STATE_SURFING_MIN_SPEED_START_STOP                   = "STATE_SURFING_MIN_SPEED_START_STOP";          //$NON-NLS-1$
-   private static final int               STATE_SURFING_MIN_SPEED_START_STOP_DEFAULT           = 9;
+   private static final int               STATE_SURFING_MIN_SPEED_START_STOP_DEFAULT           = 12;
    private static final String            STATE_SURFING_MIN_SPEED_SURFING                      = "STATE_SURFING_MIN_SPEED_SURFING";             //$NON-NLS-1$
-   private static final int               STATE_SURFING_MIN_SPEED_SURFING_DEFAULT              = 13;
+   private static final int               STATE_SURFING_MIN_SPEED_SURFING_DEFAULT              = 16;
    private static final String            STATE_SURFING_MIN_TIME_DURATION                      = "STATE_SURFING_MIN_TIME_DURATION";             //$NON-NLS-1$
    private static final int               STATE_SURFING_MIN_TIME_DURATION_DEFAULT              = 6;
    private static final String            STATE_SURFING_MIN_DISTANCE                           = "STATE_SURFING_MIN_DISTANCE";                  //$NON-NLS-1$
    private static final int               STATE_SURFING_MIN_DISTANCE_DEFAULT                   = 10;
+   private static final String            STATE_SURFING_SEGMENT_FILTER                         = "STATE_SURFING_SEGMENT_FILTER";                //$NON-NLS-1$
+   private static final SurfingFilterType STATE_SURFING_SEGMENT_FILTER_DEFAULT                 = SurfingFilterType.All;
    //
    /*
     * Colors
@@ -311,42 +312,42 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       _allSortableColumns.add(TableColumnFactory.POWERTRAIN_AVG_CADENCE_ID);
       _allSortableColumns.add(TableColumnFactory.TIME_RECORDING_TIME_ID);
    }
-
-   private static final SurfingFilter[] _allSurfingSegmentFilter  = new SurfingFilter[] {
+   private static final SurfingFilter[] _allSurfingSegmentFilter = new SurfingFilter[] {
 
          new SurfingFilter(SurfingFilterType.All, Messages.Tour_Segmenter_SurfingFilter_All),
          new SurfingFilter(SurfingFilterType.Surfing, Messages.Tour_Segmenter_SurfingFilter_Surfing),
          new SurfingFilter(SurfingFilterType.NotSurfing, Messages.Tour_Segmenter_SurfingFilter_Paddling),
    };
 
-   private final boolean                _isOSX                    = net.tourbook.common.UI.IS_OSX;
+   private final boolean                _isOSX                   = net.tourbook.common.UI.IS_OSX;
+
    //
-   private TableViewer                  _segmentViewer;
-   private SegmenterComparator          _segmentComparator        = new SegmenterComparator();
-   private ColumnManager                _columnManager;
+   private TableViewer             _segmentViewer;
+   private SegmenterComparator     _segmentComparator        = new SegmenterComparator();
+   private ColumnManager           _columnManager;
    //
-   private TourData                     _tourData;
+   private TourData                _tourData;
    //
-   private float                        _dpToleranceAltitude;
-   private float                        _dpToleranceAltitudeMultipleTours;
-   private float                        _dpTolerancePower;
-   private float                        _dpTolerancePulse;
+   private float                   _dpToleranceAltitude;
+   private float                   _dpToleranceAltitudeMultipleTours;
+   private float                   _dpTolerancePower;
+   private float                   _dpTolerancePulse;
    //
-   private float                        _savedDpToleranceAltitude = -1;
+   private float                   _savedDpToleranceAltitude = -1;
    //
-   private SelectionAdapter             _columnSortListener;
-   private MouseWheelListener           _defaultSurfing_MouseWheelListener;
-   private SelectionAdapter             _defaultSurfing_SelectionListener;
-   private IPartListener2               _partListener;
-   private PostSelectionProvider        _postSelectionProvider;
-   private ISelectionListener           _postSelectionListener;
-   private IPropertyChangeListener      _prefChangeListener;
-   private ITourEventListener           _tourEventListener;
+   private SelectionAdapter        _columnSortListener;
+   private MouseWheelListener      _defaultSurfing_MouseWheelListener;
+   private SelectionAdapter        _defaultSurfing_SelectionListener;
+   private IPartListener2          _partListener;
+   private PostSelectionProvider   _postSelectionProvider;
+   private ISelectionListener      _postSelectionListener;
+   private IPropertyChangeListener _prefChangeListener;
+   private ITourEventListener      _tourEventListener;
    //
-   private final NumberFormat           _nf_0_0                   = NumberFormat.getNumberInstance();
-   private final NumberFormat           _nf_1_0                   = NumberFormat.getNumberInstance();
-   private final NumberFormat           _nf_1_1                   = NumberFormat.getNumberInstance();
-   private final NumberFormat           _nf_3_3                   = NumberFormat.getNumberInstance();
+   private final NumberFormat      _nf_0_0                   = NumberFormat.getNumberInstance();
+   private final NumberFormat      _nf_1_0                   = NumberFormat.getNumberInstance();
+   private final NumberFormat      _nf_1_1                   = NumberFormat.getNumberInstance();
+   private final NumberFormat      _nf_3_3                   = NumberFormat.getNumberInstance();
    {
       _nf_0_0.setMinimumFractionDigits(0);
       _nf_0_0.setMaximumFractionDigits(0);
@@ -385,12 +386,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private SegmenterType                  _userSelectedSegmenterType;
    private long                           _tourBreakTime;
    private float                          _breakUIMinAvgSpeedAS;
-
    private float                          _breakUIMinSliceSpeedAS;
 
    private int                            _breakUIMinSliceTimeAS;
 
    private float                          _breakUIMinAvgSpeed;
+
    private float                          _breakUIMinSliceSpeed;
    private int                            _breakUIShortestBreakTime;
    private int                            _breakUISliceDiff;
@@ -706,6 +707,18 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       ByBreakTime, //
 
       Surfing, //
+   }
+
+   private class SurfingData {
+
+      private boolean[] __visibleDataPointSerie;
+      private int       __numSurfingEvents;
+
+      public SurfingData(final boolean[] visibleDataPointSerie, final int numSurfingEvents) {
+
+         __visibleDataPointSerie = visibleDataPointSerie;
+         __numSurfingEvents = numSurfingEvents;
+      }
    }
 
    private static class SurfingFilter {
@@ -1245,7 +1258,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       reloadViewer();
 
       if (isUpdateVisibleDataPoints) {
-         _tourData.visibleDataPointSerie = createVisibleDataPoints(getSelectedSurfingFilter());
+         _tourData.visibleDataPointSerie = createVisibleDataPoints(getSelectedSurfingFilter()).__visibleDataPointSerie;
       }
 
       if (isFireEvent) {
@@ -1796,7 +1809,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       segmentSerieIndex.add(0);
       segmentSerieFilter.add(0);
 
-      short numSurfing = 0;
       boolean isSurfing = false;
       boolean isSurfing_Distance = false;
       boolean isSurfing_MinSpeed = false;
@@ -1912,8 +1924,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
                // setup surfing values
 
-               numSurfing++;
-
                segmentSerieIndex.add(segmentStartIndex);
                segmentSerieIndex.add(segmentEndIndex);
 
@@ -1940,7 +1950,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          segmentSerieFilter.add(0);
       }
 
-      _tourData.setSurfing_NumberOfEvents(numSurfing);
       _tourData.segmentSerieIndex = segmentSerieIndex.toArray();
       _tourData.segmentSerieFilter = segmentSerieFilter.toArray();
    }
@@ -3015,7 +3024,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
     *           Surfing type for which the visible datapoints are created.
     * @return
     */
-   private boolean[] createVisibleDataPoints(final SurfingFilterType surfingFilterType) {
+   private SurfingData createVisibleDataPoints(final SurfingFilterType surfingFilterType) {
+
+      int numSurfingEvents = 0;
 
       final int[] timeSerie = _tourData.timeSerie;
       final boolean[] visibleDataPointSerie = new boolean[timeSerie.length];
@@ -3039,6 +3050,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                final int segmentEndIndex = tourSegment.serieIndex_End;
 
                if (tourSegment.filter == 1) {
+
+                  numSurfingEvents++;
 
                   for (int surfSerieIndex = segmentStartIndex + 1; surfSerieIndex <= segmentEndIndex; surfSerieIndex++) {
                      visibleDataPointSerie[surfSerieIndex] = true;
@@ -3068,7 +3081,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          break;
       }
 
-      return visibleDataPointSerie;
+      return new SurfingData(visibleDataPointSerie, numSurfingEvents);
    }
 
    private void defineAllColumns() {
@@ -4787,9 +4800,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       if (isUpdateTour) {
 
-         _tourData.visibleDataPointSerie = createVisibleDataPoints(SurfingFilterType.Surfing);
+         final SurfingData surfingData = createVisibleDataPoints(SurfingFilterType.Surfing);
+
+         _tourData.visibleDataPointSerie = surfingData.__visibleDataPointSerie;
 
          _tourData.setVisiblePoints_ForSurfing(_tourData.visibleDataPointSerie);
+         _tourData.setSurfing_NumberOfEvents((short) surfingData.__numSurfingEvents);
 
       } else {
 
@@ -4843,7 +4859,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       updateUI_SegmenterBackground();
 
       final SurfingFilterType selectedSurfingFilter = getSelectedSurfingFilter();
-      _tourData.visibleDataPointSerie = createVisibleDataPoints(selectedSurfingFilter);
+      _tourData.visibleDataPointSerie = createVisibleDataPoints(selectedSurfingFilter).__visibleDataPointSerie;
 
       // this will create tour segments from the visible data points
       _segmentViewer.refresh(false);
