@@ -64,7 +64,9 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "NumberOfPhotos,            " + NL //$NON-NLS-1$
 
             + "FrontShiftCount,           " + NL //$NON-NLS-1$
-            + "RearShiftCount             " + NL //$NON-NLS-1$
+            + "RearShiftCount,            " + NL //$NON-NLS-1$
+
+            + "surfing_NumberOfEvents     " + NL //$NON-NLS-1$
       ;
 
       SQL_SUM_COLUMNS = NL
@@ -89,14 +91,16 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "AVG( CASE WHEN WeatherWindSpd = 0   THEN NULL ELSE WeatherWindSpd END ),   " + NL //                        15   //$NON-NLS-1$
             + "AVG( CASE WHEN RestPulse = 0        THEN NULL ELSE RestPulse END ),        " + NL //                        16   //$NON-NLS-1$
             //
-            + "SUM(Calories),             " + NL // 17   //$NON-NLS-1$
-            + "SUM(Power_TotalWork),      " + NL // 18   //$NON-NLS-1$
+            + "SUM(Calories),                " + NL // 17   //$NON-NLS-1$
+            + "SUM(Power_TotalWork),         " + NL // 18   //$NON-NLS-1$
 
-            + "SUM(NumberOfTimeSlices),   " + NL // 19   //$NON-NLS-1$
-            + "SUM(NumberOfPhotos),       " + NL // 20   //$NON-NLS-1$
+            + "SUM(NumberOfTimeSlices),      " + NL // 19   //$NON-NLS-1$
+            + "SUM(NumberOfPhotos),          " + NL // 20   //$NON-NLS-1$
             //
-            + "SUM(FrontShiftCount),      " + NL // 21   //$NON-NLS-1$
-            + "SUM(RearShiftCount)        " + NL // 22   //$NON-NLS-1$
+            + "SUM(FrontShiftCount),         " + NL // 21   //$NON-NLS-1$
+            + "SUM(RearShiftCount),          " + NL // 22   //$NON-NLS-1$
+
+            + "SUM(surfing_NumberOfEvents)   " + NL // 23   //$NON-NLS-1$
       ;
    }
 
@@ -207,6 +211,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
    // ----------- SURFING ---------
 
+   int     col_Surfing_NumberOfEvents;
    short   col_Surfing_MinSpeed_StartStop;
    short   col_Surfing_MinSpeed_Surfing;
    short   col_Surfing_MinTimeDuration;
@@ -259,14 +264,16 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       colWindSpd        = result.getInt(startIndex + 15);
       colRestPulse      = result.getInt(startIndex + 16);
 
-      colCalories             = result.getLong(startIndex + 17);
-      colPower_TotalWork      = result.getLong(startIndex + 18);
+      colCalories                = result.getLong(startIndex + 17);
+      colPower_TotalWork         = result.getLong(startIndex + 18);
 
-      colNumberOfTimeSlices   = result.getInt(startIndex + 19);
-      colNumberOfPhotos       = result.getInt(startIndex + 20);
+      colNumberOfTimeSlices      = result.getInt(startIndex + 19);
+      colNumberOfPhotos          = result.getInt(startIndex + 20);
 
-      colFrontShiftCount      = result.getInt(startIndex + 21);
-      colRearShiftCount       = result.getInt(startIndex + 22);
+      colFrontShiftCount         = result.getInt(startIndex + 21);
+      colRearShiftCount          = result.getInt(startIndex + 22);
+
+      col_Surfing_NumberOfEvents = result.getInt(startIndex + 23);
 
 // SET_FORMATTING_ON
 

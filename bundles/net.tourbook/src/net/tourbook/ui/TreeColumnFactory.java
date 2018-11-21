@@ -26,6 +26,8 @@ import net.tourbook.common.util.TreeColumnDefinition;
 
 public abstract class TreeColumnFactory {
 
+   private static final String           APP_UNIT_SECONDS_SMALL = net.tourbook.Messages.App_Unit_Seconds_Small;
+
    public static final TreeColumnFactory ALTITUDE_DOWN;
    public static final TreeColumnFactory ALTITUDE_UP;
    public static final TreeColumnFactory ALTITUDE_MAX;
@@ -78,8 +80,11 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory RUN_DYN_VERTICAL_RATIO_MAX;
    public static final TreeColumnFactory RUN_DYN_VERTICAL_RATIO_AVG;
 
+   public static final TreeColumnFactory SURFING_MIN_DISTANCE;
    public static final TreeColumnFactory SURFING_MIN_SPEED_START_STOP;
    public static final TreeColumnFactory SURFING_MIN_SPEED_SURFING;
+   public static final TreeColumnFactory SURFING_MIN_TIME_DURATION;
+   public static final TreeColumnFactory SURFING_NUMBER_OF_EVENTS;
 
    public static final TreeColumnFactory TIME_DATE;
    public static final TreeColumnFactory TIME_DRIVING_TIME;
@@ -119,8 +124,6 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory WEATHER_CLOUDS;
    public static final TreeColumnFactory WEATHER_WIND_DIR;
    public static final TreeColumnFactory WEATHER_WIND_SPEED;
-
-   public static final TreeColumnFactory SURFING_MIN_TIME_DURATION;
 
    static {
 
@@ -1431,16 +1434,39 @@ public abstract class TreeColumnFactory {
        * Surfing
        */
 
+      SURFING_MIN_DISTANCE = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final String unitLabel = UI.SPACE1 + UI.UNIT_LABEL_DISTANCE_M_OR_YD;
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "SURFING_MIN_DISTANCE", SWT.TRAIL); //$NON-NLS-1$
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Surfing);
+
+            colDef.setColumnLabel(Messages.ColumnFactory_Surfing_MinDistance_Label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_Surfing_MinDistance_Header + unitLabel);
+            colDef.setColumnUnit(UI.UNIT_LABEL_DISTANCE_M_OR_YD);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Surfing_MinDistance_Label);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         };
+      };
+
       SURFING_MIN_SPEED_START_STOP = new TreeColumnFactory() {
          @Override
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
                                                   final PixelConverter pixelConverter) {
 
-            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "SURFING_MIN_SPEED_START_STOP", SWT.TRAIL); //$NON-NLS-1$
-
             final String unitLabel = UI.SPACE1 + UI.UNIT_LABEL_SPEED;
 
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "SURFING_MIN_SPEED_START_STOP", SWT.TRAIL); //$NON-NLS-1$
+
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Surfing);
+
             colDef.setColumnLabel(Messages.ColumnFactory_Surfing_MinSpeed_StartStop_Label);
             colDef.setColumnHeaderText(Messages.ColumnFactory_Surfing_MinSpeed_StartStop_Header + unitLabel);
             colDef.setColumnUnit(UI.UNIT_LABEL_SPEED);
@@ -1457,17 +1483,18 @@ public abstract class TreeColumnFactory {
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
                                                   final PixelConverter pixelConverter) {
 
-            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "SURFING_MIN_SPEED_SURFING", SWT.TRAIL); //$NON-NLS-1$
-
             final String unitLabel = UI.SPACE1 + UI.UNIT_LABEL_SPEED;
 
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "SURFING_MIN_SPEED_SURFING", SWT.TRAIL); //$NON-NLS-1$
+
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Surfing);
+
             colDef.setColumnLabel(Messages.ColumnFactory_Surfing_MinSpeed_Surfing_Label);
             colDef.setColumnHeaderText(Messages.ColumnFactory_Surfing_MinSpeed_Surfing_Header + unitLabel);
             colDef.setColumnUnit(UI.UNIT_LABEL_SPEED);
             colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Surfing_MinSpeed_Surfing_Label);
 
-            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
             return colDef;
          };
@@ -1481,54 +1508,37 @@ public abstract class TreeColumnFactory {
             final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "SURFING_MIN_TIME_DURATION", SWT.TRAIL); //$NON-NLS-1$
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Surfing);
+
             colDef.setColumnLabel(Messages.ColumnFactory_Surfing_MinTimeDuration_Label);
             colDef.setColumnHeaderText(Messages.ColumnFactory_Surfing_MinTimeDuration_Header);
-            colDef.setColumnUnit(UI.UNIT_LABEL_SPEED);
+            colDef.setColumnUnit(APP_UNIT_SECONDS_SMALL);
             colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Surfing_MinTimeDuration_Label);
 
-            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
             return colDef;
          };
       };
 
-//      private short     surfing_MinSpeed_StartStop = SURFING_VALUE_IS_NOT_SET;
-//      private short     surfing_MinSpeed_Surfing   = SURFING_VALUE_IS_NOT_SET;
-//      private short     surfing_MinTimeDuration    = SURFING_VALUE_IS_NOT_SET;
-//
-//      private boolean   surfing_IsMinDistance;
-//      private short     surfing_MinDistance        = SURFING_VALUE_IS_NOT_SET;
+      SURFING_NUMBER_OF_EVENTS = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
 
-//Tour_Segmenter_Surfing_Label_MinSurfTimeDuration                = Min surfing &duration
-//Tour_Segmenter_Surfing_Label_MinSurfTimeDuration_Tooltip        = Required duration time to identify as a surfing event
-//Tour_Segmenter_Surfing_Label_MinSurfingDistance                 = Minimum surfing &distance
-//Tour_Segmenter_Surfing_Label_MinSurfingDistance_Tooltip         = Required distance to identify as a surfing event
-//Tour_Segmenter_Surfing_Label_MinSurfingSpeed                    = Min surfing s&peed
-//Tour_Segmenter_Surfing_Label_MinSurfingSpeed_Tooltip            = Required speed to identify as a surfing event
-//Tour_Segmenter_Surfing_Label_StartStopSpeedThreshold            = Min st&art/stop speed
-//Tour_Segmenter_Surfing_Label_StartStopSpeedThreshold_Tooltip    = Required speed to start and stop a surfing event
-//Tour_Segmenter_Surfing_Label_StartStopSpeedThreshold            = Min st&art/stop speed
-//Tour_Segmenter_Surfing_Label_StartStopSpeedThreshold_Tooltip    = Required speed to start and stop a surfing event
-//Tour_Segmenter_Surfing_Label_StartStopSpeedThreshold            = Min st&art/stop speed
-//Tour_Segmenter_Surfing_Label_StartStopSpeedThreshold_Tooltip    = Required speed to start and stop a surfing event
-//Tour_Segmenter_Surfing_Label_StartStopSpeedThreshold            = Min st&art/stop speed
-//Tour_Segmenter_Surfing_Label_StartStopSpeedThreshold_Tooltip    = Required speed to start and stop a surfing event
-//Tour_Segmenter_Surfing_Label_StartStopSpeedThreshold            = Min st&art/stop speed
-//Tour_Segmenter_Surfing_Label_StartStopSpeedThreshold_Tooltip    = Required speed to start and stop a surfing event
-//Tour_Segmenter_Surfing_Label_StartStopSpeedThreshold            = Min st&art/stop speed
-//Tour_Segmenter_Surfing_Label_StartStopSpeedThreshold_Tooltip    = Required speed to start and stop a surfing event
-//Tour_Segmenter_Surfing_Label_StartStopSpeedThreshold            = Min st&art/stop speed
-//Tour_Segmenter_Surfing_Label_StartStopSpeedThreshold_Tooltip    = Required speed to start and stop a surfing event
-//Tour_Segmenter_Surfing_Label_StartStopSpeedThreshold            = Min st&art/stop speed
-//Tour_Segmenter_Surfing_Label_StartStopSpeedThreshold_Tooltip    = Required speed to start and stop a surfing event
-//Tour_Segmenter_Surfing_Label_StartStopSpeedThreshold            = Min st&art/stop speed
-//Tour_Segmenter_Surfing_Label_StartStopSpeedThreshold_Tooltip    = Required speed to start and stop a surfing event
-//Tour_Segmenter_Surfing_Label_StartStopSpeedThreshold            = Min st&art/stop speed
-//Tour_Segmenter_Surfing_Label_StartStopSpeedThreshold_Tooltip    = Required speed to start and stop a surfing event
-//Tour_Segmenter_Surfing_Label_StartStopSpeedThreshold            = Min st&art/stop speed
-//Tour_Segmenter_Surfing_Label_StartStopSpeedThreshold_Tooltip    = Required speed to start and stop a surfing event
-//Tour_Segmenter_Surfing_Label_StartStopSpeedThreshold            = Min st&art/stop speed
-//Tour_Segmenter_Surfing_Label_StartStopSpeedThreshold_Tooltip    = Required speed to start and stop a surfing event
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "SURFING_NUMBER_OF_EVENTS", SWT.TRAIL); //$NON-NLS-1$
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Surfing);
+
+            colDef.setColumnLabel(Messages.ColumnFactory_Surfing_NumberOfEvents_Label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_Surfing_NumberOfEvents_Header);
+            colDef.setColumnUnit(UI.SYMBOL_NUMBER_SIGN);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Surfing_NumberOfEvents_Label);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+
+            return colDef;
+         };
+      };
 
       /*
        * Time

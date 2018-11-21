@@ -1770,8 +1770,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       final float[] distanceSerie = _tourData.getMetricDistanceSerie();
       final float[] speedSerie = _tourData.getSpeedSerieMetric();
 
-//      final boolean[] visibleDataPointSerie = new boolean[timeSerie.length];
-
       final int lastSerieIndex = timeSerie.length - 1;
 
       // get surfing values in metric measurement
@@ -1798,6 +1796,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       segmentSerieIndex.add(0);
       segmentSerieFilter.add(0);
 
+      short numSurfing = 0;
       boolean isSurfing = false;
       boolean isSurfing_Distance = false;
       boolean isSurfing_MinSpeed = false;
@@ -1897,9 +1896,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             isSurfing = false;
          }
 
-         // overwrite old values
-//         visibleDataPointSerie[serieIndex] = false;
-
          if (prevIsSurfing && isSurfing == false) {
 
             // surfing has stopped
@@ -1914,6 +1910,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
             } else {
 
+               // setup surfing values
+
+               numSurfing++;
+
                segmentSerieIndex.add(segmentStartIndex);
                segmentSerieIndex.add(segmentEndIndex);
 
@@ -1922,11 +1922,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
                // mark as surfing segment
                segmentSerieFilter.add(1);
-
-//               // set datapoints visible, this is used in the map
-//               for (int surfSerieIndex = segmentStartIndex + 1; surfSerieIndex <= segmentEndIndex; surfSerieIndex++) {
-//                  visibleDataPointSerie[surfSerieIndex] = true;
-//               }
             }
          }
 
@@ -1945,6 +1940,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          segmentSerieFilter.add(0);
       }
 
+      _tourData.setSurfing_NumberOfEvents(numSurfing);
       _tourData.segmentSerieIndex = segmentSerieIndex.toArray();
       _tourData.segmentSerieFilter = segmentSerieFilter.toArray();
    }
@@ -2635,8 +2631,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
             // label
             _lblSurfing_MinStartStopSpeed = new Label(container, SWT.NONE);
-            _lblSurfing_MinStartStopSpeed.setText(Messages.Tour_Segmenter_Surfing_Label_StartStopSpeedThreshold);
-            _lblSurfing_MinStartStopSpeed.setToolTipText(Messages.Tour_Segmenter_Surfing_Label_StartStopSpeedThreshold_Tooltip);
+            _lblSurfing_MinStartStopSpeed.setText(Messages.Tour_Segmenter_Surfing_Label_MinSpeed_StartStop);
+            _lblSurfing_MinStartStopSpeed.setToolTipText(Messages.Tour_Segmenter_Surfing_Label_MinSpeed_StartStop_Tooltip);
 
             // spinner: speed
             _spinnerSurfing_MinSpeed_StartStop = new Spinner(container, SWT.BORDER);
@@ -2658,8 +2654,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
             // label
             _lblSurfing_MinSurfingSpeed = new Label(container, SWT.NONE);
-            _lblSurfing_MinSurfingSpeed.setText(Messages.Tour_Segmenter_Surfing_Label_MinSurfingSpeed);
-            _lblSurfing_MinSurfingSpeed.setToolTipText(Messages.Tour_Segmenter_Surfing_Label_MinSurfingSpeed_Tooltip);
+            _lblSurfing_MinSurfingSpeed.setText(Messages.Tour_Segmenter_Surfing_Label_MinSpeed_Surfing);
+            _lblSurfing_MinSurfingSpeed.setToolTipText(Messages.Tour_Segmenter_Surfing_Label_MinSpeed_Surfing_Tooltip);
 
             // spinner: seconds
             _spinnerSurfing_MinSpeed_Surfing = new Spinner(container, SWT.BORDER);
@@ -2681,8 +2677,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
             // label
             _lblSurfing_MinSurfingTimeDuration = new Label(container, SWT.NONE);
-            _lblSurfing_MinSurfingTimeDuration.setText(Messages.Tour_Segmenter_Surfing_Label_MinSurfTimeDuration);
-            _lblSurfing_MinSurfingTimeDuration.setToolTipText(Messages.Tour_Segmenter_Surfing_Label_MinSurfTimeDuration_Tooltip);
+            _lblSurfing_MinSurfingTimeDuration.setText(Messages.Tour_Segmenter_Surfing_Label_MinTimeDuration);
+            _lblSurfing_MinSurfingTimeDuration.setToolTipText(Messages.Tour_Segmenter_Surfing_Label_MinTimeDuration_Tooltip);
 
             // spinner: seconds
             _spinnerSurfing_MinTimeDuration = new Spinner(container, SWT.BORDER);
@@ -2704,8 +2700,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
             {
                _chkIsMinSurfingDistance = new Button(container, SWT.CHECK);
-               _chkIsMinSurfingDistance.setText(Messages.Tour_Segmenter_Surfing_Checkbox_IsMinSurfingDistance);
-               _chkIsMinSurfingDistance.setToolTipText(Messages.Tour_Segmenter_Surfing_Label_MinSurfingDistance_Tooltip);
+               _chkIsMinSurfingDistance.setText(Messages.Tour_Segmenter_Surfing_Checkbox_IsMinDistance);
+               _chkIsMinSurfingDistance.setToolTipText(Messages.Tour_Segmenter_Surfing_Label_MinDistance_Tooltip);
                _chkIsMinSurfingDistance.addSelectionListener(_defaultSurfing_SelectionListener);
                GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_chkIsMinSurfingDistance);
 
@@ -3035,15 +3031,18 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       case Surfing:
 
-         for (final TourSegment tourSegment : _allTourSegments) {
+         if (_allTourSegments != null) {
 
-            final int segmentStartIndex = tourSegment.serieIndex_Start;
-            final int segmentEndIndex = tourSegment.serieIndex_End;
+            for (final TourSegment tourSegment : _allTourSegments) {
 
-            if (tourSegment.filter == 1) {
+               final int segmentStartIndex = tourSegment.serieIndex_Start;
+               final int segmentEndIndex = tourSegment.serieIndex_End;
 
-               for (int surfSerieIndex = segmentStartIndex + 1; surfSerieIndex <= segmentEndIndex; surfSerieIndex++) {
-                  visibleDataPointSerie[surfSerieIndex] = true;
+               if (tourSegment.filter == 1) {
+
+                  for (int surfSerieIndex = segmentStartIndex + 1; surfSerieIndex <= segmentEndIndex; surfSerieIndex++) {
+                     visibleDataPointSerie[surfSerieIndex] = true;
+                  }
                }
             }
          }
@@ -3051,15 +3050,18 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       case NotSurfing:
 
-         for (final TourSegment tourSegment : _allTourSegments) {
+         if (_allTourSegments != null) {
 
-            final int segmentStartIndex = tourSegment.serieIndex_Start;
-            final int segmentEndIndex = tourSegment.serieIndex_End;
+            for (final TourSegment tourSegment : _allTourSegments) {
 
-            if (tourSegment.filter == 2) {
+               final int segmentStartIndex = tourSegment.serieIndex_Start;
+               final int segmentEndIndex = tourSegment.serieIndex_End;
 
-               for (int surfSerieIndex = segmentStartIndex + 1; surfSerieIndex <= segmentEndIndex; surfSerieIndex++) {
-                  visibleDataPointSerie[surfSerieIndex] = true;
+               if (tourSegment.filter == 2) {
+
+                  for (int surfSerieIndex = segmentStartIndex + 1; surfSerieIndex <= segmentEndIndex; surfSerieIndex++) {
+                     visibleDataPointSerie[surfSerieIndex] = true;
+                  }
                }
             }
          }
@@ -4794,6 +4796,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          // delete visible data points for surfing
 
          _tourData.setVisiblePoints_ForSurfing(null);
+         _tourData.setSurfing_NumberOfEvents((short) 0);
       }
 
       int minDistance = _spinnerSurfing_MinSurfingDistance.getSelection();

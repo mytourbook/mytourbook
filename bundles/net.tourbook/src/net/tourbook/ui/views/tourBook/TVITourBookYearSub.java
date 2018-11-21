@@ -169,11 +169,12 @@ public class TVITourBookYearSub extends TVITourBookItem {
             //
             // ---------- SURFING -------------
             //
-            + "surfing_MinSpeed_StartStop, " //             70   //$NON-NLS-1$
-            + "surfing_MinSpeed_Surfing, " //               71   //$NON-NLS-1$
-            + "surfing_MinTimeDuration, " //                72   //$NON-NLS-1$
-            + "surfing_IsMinDistance, " //                  73   //$NON-NLS-1$
-            + "surfing_MinDistance" //                      74   //$NON-NLS-1$
+            + "surfing_NumberOfEvents, " //                 70   //$NON-NLS-1$
+            + "surfing_MinSpeed_StartStop, " //             71   //$NON-NLS-1$
+            + "surfing_MinSpeed_Surfing, " //               72   //$NON-NLS-1$
+            + "surfing_MinTimeDuration, " //                73   //$NON-NLS-1$
+            + "surfing_IsMinDistance, " //                  74   //$NON-NLS-1$
+            + "surfing_MinDistance" //                      75   //$NON-NLS-1$
 
             + UI.NEW_LINE
 
@@ -349,12 +350,13 @@ public class TVITourBookYearSub extends TVITourBookItem {
 
                // ---------- SURFING -------------
 
-               tourItem.col_Surfing_MinSpeed_StartStop      = result.getShort(70);
-               tourItem.col_Surfing_MinSpeed_Surfing        = result.getShort(71);
-               tourItem.col_Surfing_MinTimeDuration         = result.getShort(72);
+               tourItem.col_Surfing_NumberOfEvents          = result.getShort(70);
+               tourItem.col_Surfing_MinSpeed_StartStop      = result.getShort(71);
+               tourItem.col_Surfing_MinSpeed_Surfing        = result.getShort(72);
+               tourItem.col_Surfing_MinTimeDuration         = result.getShort(73);
 
-               tourItem.col_Surfing_IsMinDistance           = result.getBoolean(73);
-               tourItem.col_Surfing_MinDistance             = result.getShort(74);
+               tourItem.col_Surfing_IsMinDistance           = result.getBoolean(74);
+               tourItem.col_Surfing_MinDistance             = result.getShort(75);
 
 // SET_FORMATTING_ON
 

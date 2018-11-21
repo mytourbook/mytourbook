@@ -320,14 +320,20 @@ public class Messages extends NLS {
    public static String        ColumnFactory_SerieStartEndIndex_Tooltip;
    public static String        ColumnFactory_SpeedDiff_Label;
    public static String        ColumnFactory_SpeedDiff_Tooltip;
-   
+
+   public static String        ColumnFactory_Surfing_IsMinDistance_Header;
+   public static String        ColumnFactory_Surfing_IsMinDistance_Label;
+   public static String        ColumnFactory_Surfing_MinDistance_Header;
+   public static String        ColumnFactory_Surfing_MinDistance_Label;
    public static String        ColumnFactory_Surfing_MinSpeed_StartStop_Header;
    public static String        ColumnFactory_Surfing_MinSpeed_StartStop_Label;
    public static String        ColumnFactory_Surfing_MinSpeed_Surfing_Header;
    public static String        ColumnFactory_Surfing_MinSpeed_Surfing_Label;
    public static String        ColumnFactory_Surfing_MinTimeDuration_Header;
    public static String        ColumnFactory_Surfing_MinTimeDuration_Label;
-   
+   public static String        ColumnFactory_Surfing_NumberOfEvents_Header;
+   public static String        ColumnFactory_Surfing_NumberOfEvents_Label;
+
    public static String        ColumnFactory_Swim_Cadence_Label;
    public static String        ColumnFactory_Swim_Cadence_Tooltip;
    public static String        ColumnFactory_Swim_Strokes_Label;

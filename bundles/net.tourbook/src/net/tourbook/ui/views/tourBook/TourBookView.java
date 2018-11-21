@@ -985,18 +985,11 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       defineColumn_RunDyn_VerticalRatio_Avg();
 
       // Surfing
+      defineColumn_Surfing_NumberOfEvents();
       defineColumn_Surfing_MinSpeed_StartStop();
       defineColumn_Surfing_MinSpeed_Surfing();
       defineColumn_Surfing_MinTimeDuration();
-//      defineColumn_Surfing_IsMinDistance();
-//      defineColumn_Surfing_MinDistance();
-
-//	   private short     surfing_MinSpeed_StartStop = SURFING_VALUE_IS_NOT_SET;
-//	   private short     surfing_MinSpeed_Surfing   = SURFING_VALUE_IS_NOT_SET;
-//	   private short     surfing_MinTimeDuration    = SURFING_VALUE_IS_NOT_SET;
-//
-//	   private boolean   surfing_IsMinDistance;
-//	   private short     surfing_MinDistance        = SURFING_VALUE_IS_NOT_SET;
+      defineColumn_Surfing_MinDistance();
 
       // Device
       defineColumn_Device_Name();
@@ -2168,6 +2161,39 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    }
 
    /**
+    * Column: Surfing - Min distance
+    */
+   private void defineColumn_Surfing_MinDistance() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.SURFING_MIN_DISTANCE.createColumn(_columnManager, _pc);
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            final short value = ((TVITourBookItem) element).col_Surfing_MinDistance;
+            final boolean isMinDistance = ((TVITourBookItem) element).col_Surfing_IsMinDistance;
+
+            if (value == 0 || value == TourData.SURFING_VALUE_IS_NOT_SET || isMinDistance == false) {
+               cell.setText(UI.EMPTY_STRING);
+            } else {
+
+               int minSurfingDistance = value;
+
+               // convert imperial -> metric
+               if (net.tourbook.ui.UI.UNIT_VALUE_DISTANCE == net.tourbook.ui.UI.UNIT_MILE) {
+                  minSurfingDistance = (int) (minSurfingDistance / net.tourbook.ui.UI.UNIT_YARD + 0.5);
+               }
+
+               cell.setText(Integer.toString(minSurfingDistance));
+            }
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
     * Column: Surfing - Min start/stop speed
     */
    private void defineColumn_Surfing_MinSpeed_StartStop() {
@@ -2180,7 +2206,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             final Object element = cell.getElement();
             final short value = ((TVITourBookItem) element).col_Surfing_MinSpeed_StartStop;
 
-            if (value == 0) {
+            if (value == 0 || value == TourData.SURFING_VALUE_IS_NOT_SET) {
                cell.setText(UI.EMPTY_STRING);
             } else {
                cell.setText(Integer.toString(value));
@@ -2204,7 +2230,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             final Object element = cell.getElement();
             final short value = ((TVITourBookItem) element).col_Surfing_MinSpeed_Surfing;
 
-            if (value == 0) {
+            if (value == 0 || value == TourData.SURFING_VALUE_IS_NOT_SET) {
                cell.setText(UI.EMPTY_STRING);
             } else {
                cell.setText(Integer.toString(value));
@@ -2228,7 +2254,31 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             final Object element = cell.getElement();
             final short value = ((TVITourBookItem) element).col_Surfing_MinTimeDuration;
 
-            if (value == 0) {
+            if (value == 0 || value == TourData.SURFING_VALUE_IS_NOT_SET) {
+               cell.setText(UI.EMPTY_STRING);
+            } else {
+               cell.setText(Integer.toString(value));
+            }
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
+    * Column: Surfing - Number of surfing events
+    */
+   private void defineColumn_Surfing_NumberOfEvents() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.SURFING_NUMBER_OF_EVENTS.createColumn(_columnManager, _pc);
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            final int value = ((TVITourBookItem) element).col_Surfing_NumberOfEvents;
+
+            if (value == 0 || value == TourData.SURFING_VALUE_IS_NOT_SET) {
                cell.setText(UI.EMPTY_STRING);
             } else {
                cell.setText(Integer.toString(value));

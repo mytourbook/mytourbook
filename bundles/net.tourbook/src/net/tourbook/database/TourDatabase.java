@@ -2788,12 +2788,13 @@ public class TourDatabase {
 
             // version 36 start  -  18.12
             //
-            + "	surfing_IsMinDistance        			   BOOLEAN  DEFAULT FALSE,					\n" //$NON-NLS-1$
-
-            + "	surfing_MinDistance          			   SMALLINT DEFAULT -1,						\n" //$NON-NLS-1$
+            + "	surfing_NumberOfEvents              	SMALLINT DEFAULT -1,						\n" //$NON-NLS-1$
             + "	surfing_MinSpeed_StartStop          	SMALLINT DEFAULT -1,						\n" //$NON-NLS-1$
             + "	surfing_MinSpeed_Surfing          		SMALLINT DEFAULT -1,						\n" //$NON-NLS-1$
             + "	surfing_MinTimeDuration          		SMALLINT DEFAULT -1,						\n" //$NON-NLS-1$
+
+            + "	surfing_IsMinDistance        			   BOOLEAN  DEFAULT FALSE,					\n" //$NON-NLS-1$
+            + "	surfing_MinDistance          			   SMALLINT DEFAULT -1,						\n" //$NON-NLS-1$
 
             //
             // version 36 end ---------
@@ -6557,16 +6558,17 @@ public class TourDatabase {
       final Statement stmt = conn.createStatement();
       {
          // check if db is updated to version 36
-         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "surfing_MinSpeed_StartStop") == false) { //$NON-NLS-1$
+         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "surfing_NumberOfEvents") == false) { //$NON-NLS-1$
 
 //          // version 36 start  -  18.12
 //          //
-//          + "   surfing_IsMinDistance                  BOOLEAN  DEFAULT FALSE,             \n" //$NON-NLS-1$
-
-//          + "   surfing_MinDistance                    SMALLINT DEFAULT -1,                \n" //$NON-NLS-1$
-//          + "   surfing_MinSpeed_StartStop             SMALLINT DEFAULT -1,                \n" //$NON-NLS-1$
-//          + "   surfing_MinSpeed_Surfing               SMALLINT DEFAULT -1,                \n" //$NON-NLS-1$
-//          + "   surfing_MinTimeDuration                SMALLINT DEFAULT -1,                \n" //$NON-NLS-1$
+//            + "   surfing_NumberOfEvents                 SMALLINT DEFAULT -1,                \n" //$NON-NLS-1$
+//            + "   surfing_MinSpeed_StartStop             SMALLINT DEFAULT -1,                \n" //$NON-NLS-1$
+//            + "   surfing_MinSpeed_Surfing               SMALLINT DEFAULT -1,                \n" //$NON-NLS-1$
+//            + "   surfing_MinTimeDuration                SMALLINT DEFAULT -1,                \n" //$NON-NLS-1$
+//
+//            + "   surfing_IsMinDistance                  BOOLEAN  DEFAULT FALSE,             \n" //$NON-NLS-1$
+//            + "   surfing_MinDistance                    SMALLINT DEFAULT -1,                \n" //$NON-NLS-1$
 //
 //          //
 //          // version 36 end ---------
@@ -6574,11 +6576,13 @@ public class TourDatabase {
 // SET_FORMATTING_OFF
 
             // Add new columns
-            SQL.AddCol_Boolean (stmt, TABLE_TOUR_DATA, "surfing_IsMinDistance",           DEFAULT_FALSE); //$NON-NLS-1$
+            SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "surfing_NumberOfEvents",          DEFAULT_IGNORED); //$NON-NLS-1$
 
             SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "surfing_MinDistance",             DEFAULT_IGNORED); //$NON-NLS-1$
             SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "surfing_MinSpeed_StartStop",      DEFAULT_IGNORED); //$NON-NLS-1$
             SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "surfing_MinSpeed_Surfing",        DEFAULT_IGNORED); //$NON-NLS-1$
+
+            SQL.AddCol_Boolean (stmt, TABLE_TOUR_DATA, "surfing_IsMinDistance",           DEFAULT_FALSE);   //$NON-NLS-1$
             SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "surfing_MinTimeDuration",         DEFAULT_IGNORED); //$NON-NLS-1$
 
 // SET_FORMATTING_ON
