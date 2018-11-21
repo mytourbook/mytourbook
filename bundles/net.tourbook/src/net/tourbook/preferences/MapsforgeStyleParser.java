@@ -44,6 +44,7 @@ public class MapsforgeStyleParser {
 	 * reading mapsforgetheme and return a list with selectable layers
 	 * @param xmlFile
 	 * @return
+	 * 
 	 */
 	@SuppressWarnings({ "unchecked", "null" })
 	public List<Style> readXML(String xmlFile) {
