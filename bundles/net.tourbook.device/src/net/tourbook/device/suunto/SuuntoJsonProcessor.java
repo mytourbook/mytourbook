@@ -27,7 +27,7 @@ public class SuuntoJsonProcessor {
 	final IPreferenceStore			_prefStore			= TourbookPlugin.getDefault().getPreferenceStore();
 
 	public static final String		TAG_SAMPLES			= "Samples";													//$NON-NLS-1$
-	private static final String	TAG_SAMPLE			= "Sample";														//$NON-NLS-1$
+	public static final String		TAG_SAMPLE			= "Sample";														//$NON-NLS-1$
 	public static final String		TAG_TIMEISO8601	= "TimeISO8601";												//$NON-NLS-1$
 	public static final String		TAG_ATTRIBUTES		= "Attributes";												//$NON-NLS-1$
 	public static final String		TAG_SOURCE			= "Source";														//$NON-NLS-1$
@@ -35,16 +35,16 @@ public class SuuntoJsonProcessor {
 	private static final String	TAG_LAP				= "Lap";															//$NON-NLS-1$
 	private static final String	TAG_MANUAL			= "Manual";														//$NON-NLS-1$
 	private static final String	TAG_DISTANCE		= "Distance";													//$NON-NLS-1$
-	private static final String	TAG_GPSALTITUDE	= "GPSAltitude";												//$NON-NLS-1$
-	private static final String	TAG_LATITUDE		= "Latitude";													//$NON-NLS-1$
-	private static final String	TAG_LONGITUDE		= "Longitude";													//$NON-NLS-1$
+	public static final String		TAG_GPSALTITUDE	= "GPSAltitude";												//$NON-NLS-1$
+	public static final String		TAG_LATITUDE		= "Latitude";													//$NON-NLS-1$
+	public static final String		TAG_LONGITUDE		= "Longitude";													//$NON-NLS-1$
 	private static final String	TAG_TYPE				= "Start";														//$NON-NLS-1$
 	private static final String	TAG_START			= "Type";														//$NON-NLS-1$
 	private static final String	TAG_PAUSE			= "Pause";														//$NON-NLS-1$
 	private static final String	TAG_HR				= "HR";															//$NON-NLS-1$
 	private static final String	TAG_SPEED			= "Speed";														//$NON-NLS-1$
 	private static final String	TAG_CADENCE			= "Cadence";													//$NON-NLS-1$
-	private static final String	TAG_ALTITUDE		= "Altitude";													//$NON-NLS-1$
+	public static final String		TAG_ALTITUDE		= "Altitude";													//$NON-NLS-1$
 	private static final String	TAG_POWER			= "Power";														//$NON-NLS-1$
 	private static final String	TAG_TEMPERATURE	= "Temperature";												//$NON-NLS-1$
 
