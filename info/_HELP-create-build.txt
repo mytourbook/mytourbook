@@ -5,7 +5,7 @@
 
 * Set version number in gradle.properties in the .git root
 * Set version number as described below (Build with POM)
-* Run gradlew in C:\DAT\MT\mytourbook\build\build.net.tourbook this will run the default task
+* Run "gradlew" in "C:\DAT\MT\mytourbook\build\build.net.tourbook" this will run the default task
 
 
 #################
@@ -38,10 +38,12 @@ Switch to workspace "C:\DAT\ws_mt-NL-projects"
 
 	- refresh all projects with F5
 	- Replace text (Ctrl-H) "x.y.0.qualifier" to "a.b.0.qualifier" in all NL projects
-	- Replace text (Ctrl-H) "x.y.0" to "a.b.0" in 
-	    - All NL projects 
-	    - "site.xml" in the project "translation-test-update-site" that the 
-	      translation test update site can be build OTHERWISE it is NOT working 
+	
+			THIS SEEMS TO BE OBSOLETE
+			- Replace text (Ctrl-H) "x.y.0" to "a.b.0" in 
+			    - All NL projects 
+			    - "site.xml" in the project "translation-test-update-site" that the 
+			      translation test update site can be build OTHERWISE it is NOT working 
 
 	
 Switch to workspace "C:\DAT\ws_MT-e48"

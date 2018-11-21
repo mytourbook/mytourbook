@@ -19,6 +19,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Locale;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -79,7 +80,7 @@ public class PrefPageMap25MapsforgeProvider extends PreferencePage implements IW
 
 		new TileEncodingData(TileEncoding.MVT, Messages.Pref_Map25_Encoding_Mapzen),
 		new TileEncodingData(TileEncoding.VTM, Messages.Pref_Map25_Encoding_OpenScienceMap),
-		new TileEncodingData(TileEncoding.MF, "local Mapsforgefile")
+		new TileEncodingData(TileEncoding.MF, "Local Mapsforgefile")
 	};
 
 	
@@ -117,6 +118,7 @@ public class PrefPageMap25MapsforgeProvider extends PreferencePage implements IW
 	private Text							_txtTilePath;
 	private Text							_txtTileUrl;
 	private Text							_txtUrl;
+	private String							_styles = "";
 	//
 	private Combo							_comboTileEncoding;
 
@@ -408,10 +410,10 @@ public class PrefPageMap25MapsforgeProvider extends PreferencePage implements IW
 			}
 			{
 				/*
-				 * Field: Tile Url
+				 * Field: Styles
 				 */
 				final Label label = new Label(container, SWT.NONE);
-				label.setText(Messages.Pref_Map25_Provider_Label_TileUrl);
+				label.setText("Availible Styles");
 
 				_txtTileUrl = new Text(container, SWT.READ_ONLY);
 				GridDataFactory
@@ -733,9 +735,9 @@ public class PrefPageMap25MapsforgeProvider extends PreferencePage implements IW
 	 * @return Returns <code>true</code> when person is valid, otherwise <code>false</code>.
 	 */
 	private boolean isDataValid() {
-
+		//String styles ="Aviable Styles: ";
 		final boolean isNewProvider = _newProvider != null;
-
+		
 		if (isNewProvider || _isMapProviderModified) {
 
 			if (_txtProviderName.getText().trim().equals(UI.EMPTY_STRING)) {
@@ -746,7 +748,7 @@ public class PrefPageMap25MapsforgeProvider extends PreferencePage implements IW
 				setErrorMessage("Mapfile (.map) is required, cant be empty");
 				return false;
 				
-			} else if (checkFile(_txtUrl.getText().trim()).equals("1")) {  //TO DO: call checkFile only once
+			} else if (checkFile(_txtUrl.getText().trim()).equals("1")) {  //TO DO: call checkFile() only once per event
 				setErrorMessage("Mapfile does not exist");
 				return false;
 				
@@ -760,22 +762,40 @@ public class PrefPageMap25MapsforgeProvider extends PreferencePage implements IW
 	
 			} else if (_txtTilePath.getText().trim().equals(UI.EMPTY_STRING)) {
 				setErrorMessage("Themefile (.xml) is required");
+				this._styles ="";
 				return false;
 				
 			} else if (checkFile(_txtTilePath.getText().trim()).equals("1")) {
 				setErrorMessage("Themefile does not exist");
+				this._styles ="";
 				return false;
 				
 			} else if (checkFile(_txtTilePath.getText().trim()).equals("2")) {
 				setErrorMessage("Themefile is not a file");
+				this._styles ="";
 				return false;
 				
 			} else if (checkFile(_txtTilePath.getText().trim()).equals("3")) {
 				setErrorMessage("can not read the theme file");
+				this._styles ="";
 				return false;
 			}
 
-
+			MapsforgeStyleParser mf_style_parser = new MapsforgeStyleParser();
+			//java.util.List<Item> mf_styles = mf_style_parser.readConfig("C:\\Users\\top\\BTSync\\oruxmaps\\mapstyles\\ELV4\\Elevate.xml");
+			java.util.List<Style> mf_styles = mf_style_parser.readXML(_txtTilePath.getText().trim());
+			//System.out.println("####### PrefPageMap25MapsforgeProvider Stylecount: " + mf_styles.size());
+			this._styles ="Aviable Styles: ";
+			for (Style style : mf_styles) {
+				this._styles += style.getXmlLayer();
+				this._styles += " (";
+				this._styles += style.getName(Locale.getDefault().toString());
+				this._styles += "),";
+				//System.out.println(item.getXmlLayer());
+			}
+			this._styles += "all";
+			//System.out.println("####### PrefPageMap25MapsforgeProvider isDataValid: " + styles);
+			
 			/*
 			 * Check that at least 1 map provider is enabled
 			 */
@@ -792,17 +812,16 @@ public class PrefPageMap25MapsforgeProvider extends PreferencePage implements IW
 			if (isCurrentEnabled || numEnabledOtherMapProviders > 0) {
 				// at least one is enabled
 			} else {
-
 				setErrorMessage(Messages.Pref_Map25_Provider_Error_EnableMapProvider);
 
 				return false;
-			}
-		}
+			} //end if at least one is enabled
+		} // end if modified
 
 		setErrorMessage(null);
 
 		return true;
-	}
+	} //end function isDataValid
 
 	private boolean isSaveMapProvider() {
 
@@ -1084,11 +1103,9 @@ public class PrefPageMap25MapsforgeProvider extends PreferencePage implements IW
 	}
 
 	private void updateUI_Data() {
-
-		final String tileUrl = _txtUrl.getText() + _txtTilePath.getText();
-
+		//final String tileUrl = _txtUrl.getText() + _txtTilePath.getText();
 		//_txtTileUrl.setText(tileUrl);
-		_txtTileUrl.setText("");
+		_txtTileUrl.setText(_styles);
 	}
 
 	private void updateUI_FromProvider(final Map25Provider mapProvider) {

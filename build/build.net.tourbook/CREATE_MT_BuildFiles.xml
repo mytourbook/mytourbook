@@ -15,12 +15,12 @@
 	<property name="path-root"							value="c:/DAT" />
 
 	<property name="path-mt-bundles"					value="${path-root}/MT/mytourbook/bundles" />
-	<property name="path-mt-nl"							value="${path-root}/MT/mytourbook/LANGUAGE-FRAGMENTS" />
+	<property name="path-mt-nl"						value="${path-root}/MT/mytourbook/LANGUAGE-FRAGMENTS" />
 
-	<property name="path-mt-build"						value="${path-root}/mytourbook-BUILD-autocreated" />
+	<property name="path-mt-build"					value="${path-root}/mytourbook-BUILD-autocreated" />
 
 	<property name="path-build-core"					value="${path-mt-build}/core" />
-	<property name="path-build-translation"				value="${path-mt-build}/translation" />
+	<property name="path-build-translation"		value="${path-mt-build}/translation" />
 
 	<!--
 		DEFAULT target
@@ -56,16 +56,15 @@
 				<include name="pom.xml" />
 					
 				<include name="net.tourbook*/**/*" />
-				<include name="de.byteholder*/**/*" />
-				<include name="org.apache.derby*/**" />
-				
-				
+
+			   
 				<exclude name="**/plugin_*.properties" />
 				<exclude name="**/feature_*.properties" />
 				<exclude name="**/messages_*.properties" />
 
 				<exclude name="**/bin/**" />
 				<exclude name="**/classes/**" />
+				<exclude name="**/testFiles/**" />
 
 				<!-- ignore empty files -->
 				<size value="0" when="more" />

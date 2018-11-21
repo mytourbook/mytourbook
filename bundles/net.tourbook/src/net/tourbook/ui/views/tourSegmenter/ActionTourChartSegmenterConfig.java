@@ -1,23 +1,19 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.views.tourSegmenter;
-
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
 
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.swt.SWT;
@@ -34,173 +30,203 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
+
 public class ActionTourChartSegmenterConfig extends ContributionItem {
 
-	private static final String					IMAGE_TOUR_SEGMENTS				= Messages.Image__TourSegments;
-	private static final String					IMAGE_TOUR_SEGMENTS_DISABLED	= Messages.Image__TourSegments_Disabled;
+   private static final String                  IMAGE_TOUR_SEGMENTS          = Messages.Image__TourSegments;
+   private static final String                  IMAGE_TOUR_SEGMENTS_DISABLED = Messages.Image__TourSegments_Disabled;
 
-	private TourSegmenterView					_tourSegmenterView;
+   private TourSegmenterView                    _tourSegmenterView;
 
-	private ToolBar								_toolBar;
-	private ToolItem							_actionToolItem;
+   private ToolBar                              _toolBar;
+   private ToolItem                             _actionToolItem;
 
-	private SlideoutTourChartSegmenterProperties	_slideoutTCSConfig;
+   private SlideoutTourChartSegmenterProperties _slideoutTCSConfig;
 
-	/*
-	 * UI controls
-	 */
-	private Control								_parent;
+   /*
+    * UI controls
+    */
+   private Control _parent;
 
-	private Image								_imageEnabled;
-	private Image								_imageDisabled;
+   private Image   _imageEnabled;
+   private Image   _imageDisabled;
 
-	public ActionTourChartSegmenterConfig(final TourSegmenterView tourSegmenterView, final Control parent) {
+   private Boolean _initialIsSelected = null;
 
-		_tourSegmenterView = tourSegmenterView;
-		_parent = parent;
+   public ActionTourChartSegmenterConfig(final TourSegmenterView tourSegmenterView, final Control parent) {
 
-		_imageEnabled = TourbookPlugin.getImageDescriptor(IMAGE_TOUR_SEGMENTS).createImage();
-		_imageDisabled = TourbookPlugin.getImageDescriptor(IMAGE_TOUR_SEGMENTS_DISABLED).createImage();
-	}
+      _tourSegmenterView = tourSegmenterView;
+      _parent = parent;
 
-	@Override
-	public void fill(final ToolBar toolbar, final int index) {
+      _imageEnabled = TourbookPlugin.getImageDescriptor(IMAGE_TOUR_SEGMENTS).createImage();
+      _imageDisabled = TourbookPlugin.getImageDescriptor(IMAGE_TOUR_SEGMENTS_DISABLED).createImage();
 
-		if (_actionToolItem == null && toolbar != null) {
+      _parent.addDisposeListener(new DisposeListener() {
 
-			toolbar.addDisposeListener(new DisposeListener() {
-				@Override
-				public void widgetDisposed(final DisposeEvent e) {
-					_actionToolItem.dispose();
-					_actionToolItem = null;
-				}
-			});
+         @Override
+         public void widgetDisposed(final DisposeEvent e) {
 
-			_toolBar = toolbar;
+            _imageEnabled.dispose();
+            _imageDisabled.dispose();
+         }
+      });
+   }
 
-			_actionToolItem = new ToolItem(toolbar, SWT.CHECK);
-			_actionToolItem.setImage(_imageEnabled);
-			_actionToolItem.setDisabledImage(_imageDisabled);
-			_actionToolItem.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onAction();
-				}
-			});
+   @Override
+   public void fill(final ToolBar toolbar, final int index) {
 
-			toolbar.addMouseMoveListener(new MouseMoveListener() {
-				@Override
-				public void mouseMove(final MouseEvent e) {
+      if (_actionToolItem == null && toolbar != null) {
 
-					final Point mousePosition = new Point(e.x, e.y);
-					final ToolItem hoveredItem = toolbar.getItem(mousePosition);
+         toolbar.addDisposeListener(new DisposeListener() {
+            @Override
+            public void widgetDisposed(final DisposeEvent e) {
+               _actionToolItem.dispose();
+               _actionToolItem = null;
+            }
+         });
 
-					onMouseMove(hoveredItem, e);
-				}
-			});
+         _toolBar = toolbar;
 
-			_slideoutTCSConfig = new SlideoutTourChartSegmenterProperties(_parent, _toolBar, _tourSegmenterView);
+         _actionToolItem = new ToolItem(toolbar, SWT.CHECK);
+         _actionToolItem.setImage(_imageEnabled);
+         _actionToolItem.setDisabledImage(_imageDisabled);
+         _actionToolItem.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               onAction();
+            }
+         });
 
-			updateUI_Action();
-		}
-	}
+         toolbar.addMouseMoveListener(new MouseMoveListener() {
+            @Override
+            public void mouseMove(final MouseEvent e) {
 
-	private void onAction() {
+               final Point mousePosition = new Point(e.x, e.y);
+               final ToolItem hoveredItem = toolbar.getItem(mousePosition);
 
-		final boolean isActionSelected = _actionToolItem.getSelection();
+               onMouseMove(hoveredItem, e);
+            }
+         });
 
-		// update state
-		TourSegmenterView.getState().put(TourSegmenterView.STATE_IS_SHOW_TOUR_SEGMENTS, isActionSelected);
+         _slideoutTCSConfig = new SlideoutTourChartSegmenterProperties(_parent, _toolBar, _tourSegmenterView);
 
-		updateUI_Action();
+         /**
+          * This is highly complex
+          * <p>
+          * The initial selection is not working because the toolbar is created 2 times !!!
+          */
+         if (_initialIsSelected != null) {
+            _actionToolItem.setSelection(_initialIsSelected);
+         }
 
-		if (isActionSelected) {
+         updateUI_Action();
+      }
+   }
 
-			final Rectangle itemBounds = _actionToolItem.getBounds();
+   private void onAction() {
 
-			final Point itemDisplayPosition = _toolBar.toDisplay(itemBounds.x, itemBounds.y);
+      final boolean isActionSelected = _actionToolItem.getSelection();
 
-			itemBounds.x = itemDisplayPosition.x;
-			itemBounds.y = itemDisplayPosition.y;
+      // update state
+      TourSegmenterView.getState().put(TourSegmenterView.STATE_IS_SHOW_TOUR_SEGMENTS, isActionSelected);
 
-			openSlideout(itemBounds, false);
+      updateUI_Action();
 
-		} else {
+      if (isActionSelected) {
 
-			_slideoutTCSConfig.close();
-		}
+         final Rectangle itemBounds = _actionToolItem.getBounds();
 
-		_tourSegmenterView.fireSegmentLayerChanged();
-	}
+         final Point itemDisplayPosition = _toolBar.toDisplay(itemBounds.x, itemBounds.y);
 
-	private void onMouseMove(final ToolItem item, final MouseEvent mouseEvent) {
+         itemBounds.x = itemDisplayPosition.x;
+         itemBounds.y = itemDisplayPosition.y;
 
-		// ignore other items
-		if (item != _actionToolItem) {
-			return;
-		}
+         openSlideout(itemBounds, false);
 
-		// check if action is active
-		if (_actionToolItem.getSelection() == false || _actionToolItem.isEnabled() == false) {
-			return;
-		}
+      } else {
 
-		final boolean isToolItemHovered = item == _actionToolItem;
+         _slideoutTCSConfig.close();
+      }
 
-		Rectangle itemBounds = null;
+      _tourSegmenterView.fireSegmentLayerChanged();
+   }
 
-		if (isToolItemHovered) {
+   private void onMouseMove(final ToolItem item, final MouseEvent mouseEvent) {
 
-			itemBounds = item.getBounds();
+      // ignore other items
+      if (item != _actionToolItem) {
+         return;
+      }
 
-			final Point itemDisplayPosition = _toolBar.toDisplay(itemBounds.x, itemBounds.y);
+      // check if action is active
+      if (_actionToolItem.getSelection() == false || _actionToolItem.isEnabled() == false) {
+         return;
+      }
 
-			itemBounds.x = itemDisplayPosition.x;
-			itemBounds.y = itemDisplayPosition.y;
-		}
+      final boolean isToolItemHovered = item == _actionToolItem;
 
-		openSlideout(itemBounds, true);
-	}
+      Rectangle itemBounds = null;
 
-	private void openSlideout(final Rectangle itemBounds, final boolean isOpenDelayed) {
+      if (isToolItemHovered) {
 
-		_slideoutTCSConfig.open(itemBounds, isOpenDelayed);
-	}
+         itemBounds = item.getBounds();
 
-	public void setEnabled(final boolean isEnabled) {
+         final Point itemDisplayPosition = _toolBar.toDisplay(itemBounds.x, itemBounds.y);
 
-		_actionToolItem.setEnabled(isEnabled);
+         itemBounds.x = itemDisplayPosition.x;
+         itemBounds.y = itemDisplayPosition.y;
+      }
 
-		if (isEnabled && _actionToolItem.getSelection() == false) {
+      openSlideout(itemBounds, true);
+   }
 
-			// show default icon
-			_actionToolItem.setImage(_imageEnabled);
-		}
-	}
+   private void openSlideout(final Rectangle itemBounds, final boolean isOpenDelayed) {
 
-	public void setSelected(final boolean isSelected) {
+      _slideoutTCSConfig.open(itemBounds, isOpenDelayed);
+   }
 
-		if (_actionToolItem == null) {
-			// this happened
-			return;
-		}
+   public void setEnabled(final boolean isEnabled) {
 
-		_actionToolItem.setSelection(isSelected);
+      _actionToolItem.setEnabled(isEnabled);
 
-		updateUI_Action();
-	}
+      if (isEnabled && _actionToolItem.getSelection() == false) {
 
-	private void updateUI_Action() {
+         // show default icon
+         _actionToolItem.setImage(_imageEnabled);
+      }
+   }
 
-		if (_actionToolItem.getSelection()) {
+   public void setSelected(final boolean isSelected) {
 
-			// hide tooltip because the tour info options slideout is displayed
+      // keep selection
+      if (_initialIsSelected == null) {
+         _initialIsSelected = isSelected;
+      }
 
-			_actionToolItem.setToolTipText(UI.EMPTY_STRING);
+      if (_actionToolItem == null) {
+         // this happened
+         return;
+      }
 
-		} else {
+      _actionToolItem.setSelection(isSelected);
 
-			_actionToolItem.setToolTipText(Messages.Tour_Segmenter_Action_ShowHideSegmentsInTourChart_Tooltip);
-		}
-	}
+      updateUI_Action();
+   }
+
+   private void updateUI_Action() {
+
+      if (_actionToolItem.getSelection()) {
+
+         // hide tooltip because the tour info options slideout is displayed
+
+         _actionToolItem.setToolTipText(UI.EMPTY_STRING);
+
+      } else {
+
+         _actionToolItem.setToolTipText(Messages.Tour_Segmenter_Action_ShowHideSegmentsInTourChart_Tooltip);
+      }
+   }
 }
