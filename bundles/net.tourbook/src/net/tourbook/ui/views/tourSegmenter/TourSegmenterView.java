@@ -4467,21 +4467,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                   true);
 
             /*
-             * Add custom data but only when the segment layer is visible
+             * Extend default selection with the segment positions
              */
-            if (isSegmentLayerVisible()) {
+            final SelectedTourSegmenterSegments selectedSegments = new SelectedTourSegmenterSegments();
+            selectedSegments.tourData = _tourData;
+            selectedSegments.xSliderSerieIndexLeft = serieStartIndex;
+            selectedSegments.xSliderSerieIndexRight = serieEndIndex;
 
-               /*
-                * Extend default selection with the segment positions
-                */
-
-               final SelectedTourSegmenterSegments selectedSegments = new SelectedTourSegmenterSegments();
-               selectedSegments.tourData = _tourData;
-               selectedSegments.xSliderSerieIndexLeft = serieStartIndex;
-               selectedSegments.xSliderSerieIndexRight = serieEndIndex;
-
-               selectionSliderPosition.setCustomData(selectedSegments);
-            }
+            selectionSliderPosition.setCustomData(selectedSegments);
 
             /*
              * Do segmenter specific actions
