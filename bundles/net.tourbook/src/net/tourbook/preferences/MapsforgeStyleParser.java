@@ -41,7 +41,7 @@ public class MapsforgeStyleParser {
 	String defaultstyle = "";
 
 	/**
-	 * reading mapsforgetheme and return a list mit selectable layers
+	 * reading mapsforgetheme and return a list with selectable layers
 	 * @param xmlFile
 	 * @return
 	 */
