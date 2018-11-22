@@ -22,6 +22,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TimeZone;
 
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.Display;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
+
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.Util;
@@ -29,12 +35,6 @@ import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.tour.TourManager;
-
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.widgets.Display;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * This Suunto importer is implemented with info from
@@ -44,103 +44,101 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class Suunto3SAXHandler extends DefaultHandler {
 
-	private static final double				RADIANT_TO_DEGREE		= 57.2957795131;
+	private static final double				RADIANT_TO_DEGREE			= 57.2957795131;
 
-	/**
-	 * This time is used when a time is not available.
-	 */
-	private static final long				DEFAULT_TIME;
+	private static final SimpleDateFormat	TIME_FORMAT					= new SimpleDateFormat(		//
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");																			//$NON-NLS-1$
+	private static final SimpleDateFormat	TIME_FORMAT_SSSZ			= new SimpleDateFormat(		//
+			"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");																		//$NON-NLS-1$
+	private static final SimpleDateFormat	TIME_FORMAT_RFC822		= new SimpleDateFormat(		//
+			"yyyy-MM-dd'T'HH:mm:ssZ");
+	private static final SimpleDateFormat	TIME_FORMAT_LOCAL			= new SimpleDateFormat(		//
+			"yyyy-MM-dd'T'HH:mm:ss");																				//$NON-NLS-1$
 
-	static {
-
-		DEFAULT_TIME = ZonedDateTime
-				.of(2007, 4, 1, 0, 0, 0, 0, TimeTools.getDefaultTimeZone())
-				.toInstant()
-				.toEpochMilli();
-	}
-
-	private static final SimpleDateFormat	TIME_FORMAT				= new SimpleDateFormat(//
-																			"yyyy-MM-dd'T'HH:mm:ss'Z'");		//$NON-NLS-1$
-	private static final SimpleDateFormat	TIME_FORMAT_SSSZ		= new SimpleDateFormat(//
-																			"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");	//$NON-NLS-1$
-	private static final SimpleDateFormat	TIME_FORMAT_RFC822		= new SimpleDateFormat(//
-																			"yyyy-MM-dd'T'HH:mm:ssZ");			//$NON-NLS-1$
-
-	private static final String				SAMPLE_TYPE_GPS_BASE	= "gps-base";								//$NON-NLS-1$
-	private static final String				SAMPLE_TYPE_GPS_TINY	= "gps-tiny";								//$NON-NLS-1$
-	private static final String				SAMPLE_TYPE_GPS_SMALL	= "gps-small";								//$NON-NLS-1$
-	private static final String				SAMPLE_TYPE_PERIODIC	= "periodic";								//$NON-NLS-1$
+	private static final String				SAMPLE_TYPE_GPS_BASE		= "gps-base";					//$NON-NLS-1$
+	private static final String				SAMPLE_TYPE_GPS_TINY		= "gps-tiny";					//$NON-NLS-1$
+	private static final String				SAMPLE_TYPE_GPS_SMALL	= "gps-small";					//$NON-NLS-1$
+	private static final String				SAMPLE_TYPE_PERIODIC		= "periodic";					//$NON-NLS-1$
 
 	// root tags
-	private static final String				TAG_DEVLOG				= "DeviceLog";								//$NON-NLS-1$
-	private static final String				TAG_DEVLOG_DEVICE		= "Device";								//$NON-NLS-1$
-	private static final String				TAG_DEVLOG_HEADER		= "Header";								//$NON-NLS-1$
-	private static final String				TAG_DEVLOG_SAMPLES		= "Samples";								//$NON-NLS-1$
+	private static final String	TAG_DEVLOG				= "DeviceLog";	//$NON-NLS-1$
+	private static final String	TAG_DEVLOG_DEVICE		= "Device";		//$NON-NLS-1$
+	private static final String	TAG_DEVLOG_HEADER		= "Header";		//$NON-NLS-1$
+	private static final String	TAG_DEVLOG_SAMPLES	= "Samples";	//$NON-NLS-1$
 
 	// header tags
-	private static final String				TAG_ENERGY				= "Energy";								//$NON-NLS-1$
+	private static final String	TAG_ENERGY		= "Energy";		//$NON-NLS-1$
+	private static final String	TAG_DATETIME	= "DateTime";	//$NON-NLS-1$
 
 	// device tags
-	private static final String				TAG_DEVICE_SW			= "SW";									//$NON-NLS-1$
-	private static final String				TAG_DEVICE_NAME			= "Name";									//$NON-NLS-1$
+	private static final String	TAG_DEVICE_SW		= "SW";		//$NON-NLS-1$
+	private static final String	TAG_DEVICE_NAME	= "Name";	//$NON-NLS-1$
 
 	// sample tags
-	private static final String				TAG_ALTITUDE			= "Altitude";								//$NON-NLS-1$
-	private static final String				TAG_CADENCE				= "Cadence";								//$NON-NLS-1$
-	private static final String				TAG_DISTANCE			= "Distance";								//$NON-NLS-1$
-	private static final String				TAG_EVENTS				= "Events";								//$NON-NLS-1$
-	private static final String				TAG_HR					= "HR";									//$NON-NLS-1$
-	private static final String				TAG_LAP					= "Lap";									//$NON-NLS-1$
-	private static final String				TAG_LATITUDE			= "Latitude";								//$NON-NLS-1$
-	private static final String				TAG_LONGITUDE			= "Longitude";								//$NON-NLS-1$
-	private static final String				TAG_SAMPLE				= "Sample";								//$NON-NLS-1$
-	private static final String				TAG_SAMPLE_TYPE			= "SampleType";							//$NON-NLS-1$
-	private static final String				TAG_TEMPERATURE			= "Temperature";							//$NON-NLS-1$
-	private static final String				TAG_UTC					= "UTC";									//$NON-NLS-1$
+	private static final String	TAG_ALTITUDE		= "Altitude";		//$NON-NLS-1$
+	private static final String	TAG_CADENCE			= "Cadence";		//$NON-NLS-1$
+	private static final String	TAG_DISTANCE		= "Distance";		//$NON-NLS-1$
+	private static final String	TAG_EVENTS			= "Events";			//$NON-NLS-1$
+	private static final String	TAG_HR				= "HR";				//$NON-NLS-1$
+	private static final String	TAG_LAP				= "Lap";				//$NON-NLS-1$
+	private static final String	TAG_LATITUDE		= "Latitude";		//$NON-NLS-1$
+	private static final String	TAG_LONGITUDE		= "Longitude";		//$NON-NLS-1$
+	private static final String	TAG_SAMPLE			= "Sample";			//$NON-NLS-1$
+	private static final String	TAG_SAMPLE_TYPE	= "SampleType";	//$NON-NLS-1$
+	private static final String	TAG_TEMPERATURE	= "Temperature";	//$NON-NLS-1$
+	private static final String	TAG_UTC				= "UTC";				//$NON-NLS-1$
+	private static final String	TAG_TIME				= "Time";			//$NON-NLS-1$
 
 	//
-	private HashMap<Long, TourData>			_alreadyImportedTours;
-	private HashMap<Long, TourData>			_newlyImportedTours;
-	private TourbookDevice					_device;
+	private HashMap<Long, TourData>	_alreadyImportedTours;
+	private HashMap<Long, TourData>	_newlyImportedTours;
+	private TourbookDevice				_device;
 	private String							_importFilePath;
 	//
 	private TimeData						_sampleData;
-	private ArrayList<TimeData>				_sampleList				= new ArrayList<TimeData>();
+	private ArrayList<TimeData>		_sampleList	= new ArrayList<TimeData>();
 
 	private TimeData						_gpsData;
-	private ArrayList<TimeData>				_gpsList				= new ArrayList<TimeData>();
+	private ArrayList<TimeData>		_gpsList		= new ArrayList<TimeData>();
 
 	private TimeData						_markerData;
-	private ArrayList<TimeData>				_markerList				= new ArrayList<TimeData>();
+	private ArrayList<TimeData>		_markerList	= new ArrayList<TimeData>();
 
-	private boolean							_isImported;
+	private boolean						_isImported;
 
-	private StringBuilder					_characters				= new StringBuilder();
+	private StringBuilder				_characters	= new StringBuilder();
 	private String							_currentSampleType;
+	private long							_currentUtcTime;
 	private long							_currentTime;
 	private long							_prevSampleTime;
 
-	private boolean							_isInDevice;
-	private boolean							_isInDeviceSW;
-	private boolean							_isInDeviceName;
+	private boolean						_isInDevice;
+	private boolean						_isInDeviceSW;
+	private boolean						_isInDeviceName;
 
-	private boolean							_isInSamples;
-	private boolean							_isInHeader;
+	private boolean						_isInSamples;
+	private boolean						_isInHeader;
 
-	private boolean							_isInAltitude;
-	private boolean							_isInCadence;
-	private boolean							_isInDistance;
-	private boolean							_isInEnergy;
-	private boolean							_isInEvents;
-	private boolean							_isInHR;
-	private boolean							_isInLatitude;
-	private boolean							_isInLongitude;
-	private boolean							_isInSample;
-	private boolean							_isInSampleType;
-	private boolean							_isInUTC;
-	private boolean							_isInTemperature;
+	private boolean						_isInAltitude;
+	private boolean						_isInCadence;
+	private boolean						_isInDistance;
+	private boolean						_isInEnergy;
+	private boolean						_isInDateTime;
+	private boolean						_isInEvents;
+	private boolean						_isInHR;
+	private boolean						_isInLatitude;
+	private boolean						_isInLongitude;
+	private boolean						_isInSample;
+	private boolean						_isInSampleType;
+	private boolean						_isInUTC;
+	private boolean						_isInTime;
+	private boolean						_isInTemperature;
 
 	private int								_tourCalories;
+	/**
+	 * This time is used when a time is not available.
+	 */
+	private long							_tourStartTime;
 	private String							_tourDeviceSW;
 	private String							_tourDeviceName;
 
@@ -151,12 +149,16 @@ public class Suunto3SAXHandler extends DefaultHandler {
 		TIME_FORMAT.setTimeZone(utc);
 		TIME_FORMAT_SSSZ.setTimeZone(utc);
 		TIME_FORMAT_RFC822.setTimeZone(utc);
+
+		// TIME_FORMAT_LOCAL
+		// For indoor activities, even though the time is provided in the UTC element
+		// is the actual recorded local time.
 	}
 
 	public Suunto3SAXHandler(	final TourbookDevice deviceDataReader,
-								final String importFileName,
-								final HashMap<Long, TourData> alreadyImportedTours,
-								final HashMap<Long, TourData> newlyImportedTours) {
+										final String importFileName,
+										final HashMap<Long, TourData> alreadyImportedTours,
+										final HashMap<Long, TourData> newlyImportedTours) {
 
 		_device = deviceDataReader;
 		_importFilePath = importFileName;
@@ -167,20 +169,9 @@ public class Suunto3SAXHandler extends DefaultHandler {
 	@Override
 	public void characters(final char[] chars, final int startIndex, final int length) throws SAXException {
 
-		if (_isInSampleType //
-				|| _isInAltitude
-				|| _isInCadence
-				|| _isInDistance
-				|| _isInEnergy
-				|| _isInHR
-				|| _isInLatitude
-				|| _isInLongitude
-				|| _isInDeviceSW
-				|| _isInDeviceName
-				|| _isInTemperature
-				|| _isInUTC
-		//
-		) {
+		if (_isInSampleType
+				|| _isInAltitude || _isInCadence || _isInDistance || _isInEnergy || _isInDateTime || _isInHR || _isInLatitude
+				|| _isInLongitude || _isInDeviceSW || _isInDeviceName || _isInTemperature || _isInUTC || _isInTime) {
 			_characters.append(chars, startIndex, length);
 		}
 	}
@@ -255,6 +246,15 @@ public class Suunto3SAXHandler extends DefaultHandler {
 			_isInEnergy = false;
 
 			_tourCalories = (int) (Util.parseFloat(_characters.toString()) / 4184);
+		} else if (name.equals(TAG_DATETIME)) {
+
+			_isInDateTime = false;
+
+			try {
+				_tourStartTime = TIME_FORMAT_LOCAL.parse(_characters.toString()).getTime();
+			} catch (ParseException e) {
+				openError(e);
+			}
 		}
 	}
 
@@ -284,7 +284,7 @@ public class Suunto3SAXHandler extends DefaultHandler {
 
 			if (_isInEvents) {
 
-				// ignore this value because <Distance> can also occure within <Events>
+				// ignore this value because <Distance> can also occur within <Events>
 
 			} else {
 
@@ -334,48 +334,53 @@ public class Suunto3SAXHandler extends DefaultHandler {
 			final String timeString = _characters.toString();
 
 			try {
-				_currentTime = ZonedDateTime.parse(timeString).toInstant().toEpochMilli();
+				_currentUtcTime = ZonedDateTime.parse(timeString).toInstant().toEpochMilli();
 			} catch (final Exception e0) {
 				try {
-					_currentTime = TIME_FORMAT.parse(timeString).getTime();
+					_currentUtcTime = TIME_FORMAT.parse(timeString).getTime();
 				} catch (final ParseException e1) {
 					try {
-						_currentTime = TIME_FORMAT_SSSZ.parse(timeString).getTime();
+						_currentUtcTime = TIME_FORMAT_SSSZ.parse(timeString).getTime();
 					} catch (final ParseException e2) {
 						try {
-							_currentTime = TIME_FORMAT_RFC822.parse(timeString).getTime();
+							_currentUtcTime = TIME_FORMAT_RFC822.parse(timeString).getTime();
 						} catch (final ParseException e3) {
-
-							Display.getDefault().syncExec(new Runnable() {
-								@Override
-								public void run() {
-									final String message = e3.getMessage();
-									MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", message); //$NON-NLS-1$
-									System.err.println(message + " in " + _importFilePath); //$NON-NLS-1$
-								}
-							});
+							try {
+								_currentUtcTime = TIME_FORMAT_LOCAL.parse(timeString).getTime();
+							} catch (final ParseException e4) {
+								openError(e4);
+							}
 						}
 					}
 				}
 			}
+		} else if (name.equals(TAG_TIME))
+
+		{
+			_isInTime = false;
+			_currentTime = Double.valueOf(_characters.toString()).longValue();
 		}
 	}
 
 	private void finalizeSample() {
 
 		final long sampleTime;
-		if (_currentTime == Long.MIN_VALUE) {
+		if (_currentUtcTime == Long.MIN_VALUE &&
+				_currentTime != Long.MIN_VALUE) {
 
-			sampleTime = DEFAULT_TIME;
+			if (!_sampleList.isEmpty() && _sampleList.get(0).absoluteTime != Long.MIN_VALUE) {
+				sampleTime = ((_sampleList.get(0).absoluteTime / 1000) + _currentTime) * 1000;
+			} else {
+				sampleTime = _tourStartTime;
+			}
 
 		} else {
 
 			/*
 			 * Remove milliseconds because this can cause wrong data. Position of a marker can be at
-			 * the wrong second and multiple samples can have the same second but other
-			 * milliseconds.
+			 * the wrong second and multiple samples can have the same second but other milliseconds.
 			 */
-			sampleTime = _currentTime / 1000 * 1000;
+			sampleTime = _currentUtcTime / 1000 * 1000;
 		}
 
 		/*
@@ -399,9 +404,8 @@ public class Suunto3SAXHandler extends DefaultHandler {
 					 */
 					boolean isSkipSample = false;
 
-					if (_currentTime != Long.MIN_VALUE //
-							&& _prevSampleTime != Long.MIN_VALUE
-							&& sampleTime == _prevSampleTime) {
+					if ((_currentUtcTime != Long.MIN_VALUE || _currentTime != Long.MIN_VALUE)
+							&& _prevSampleTime != Long.MIN_VALUE && sampleTime == _prevSampleTime) {
 
 						isSkipSample = true;
 					}
@@ -432,6 +436,7 @@ public class Suunto3SAXHandler extends DefaultHandler {
 		_gpsData = null;
 		_markerData = null;
 
+		_currentUtcTime = Long.MIN_VALUE;
 		_currentTime = Long.MIN_VALUE;
 		_currentSampleType = null;
 	}
@@ -702,6 +707,10 @@ public class Suunto3SAXHandler extends DefaultHandler {
 
 			isData = true;
 			_isInEnergy = true;
+		} else if (name.equals(TAG_DATETIME)) {
+
+			isData = true;
+			_isInDateTime = true;
 		}
 
 		if (isData) {
@@ -764,6 +773,10 @@ public class Suunto3SAXHandler extends DefaultHandler {
 
 			isData = true;
 			_isInUTC = true;
+		} else if (name.equals(TAG_TIME)) {
+
+			isData = true;
+			_isInTime = true;
 		}
 
 		if (isData) {
@@ -771,5 +784,18 @@ public class Suunto3SAXHandler extends DefaultHandler {
 			// clear char buffer
 			_characters.delete(0, _characters.length());
 		}
+	}
+
+	private void openError(Exception e) {
+		Display.getDefault().syncExec(new Runnable() {
+			@Override
+			public void run() {
+				final String message = e.getMessage();
+				MessageDialog.openError(Display.getCurrent().getActiveShell(),
+						"Error", //$NON-NLS-1$
+						message);
+				System.err.println(message + " in " + _importFilePath); //$NON-NLS-1$
+			}
+		});
 	}
 }
