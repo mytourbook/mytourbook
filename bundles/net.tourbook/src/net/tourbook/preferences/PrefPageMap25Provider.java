@@ -74,9 +74,9 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
    private static final TileEncodingData[] _allTileEncoding                 = new TileEncodingData[] {
 
-         new TileEncodingData(TileEncoding.MVT, Messages.Pref_Map25_Encoding_Mapzen),
-         new TileEncodingData(TileEncoding.VTM, Messages.Pref_Map25_Encoding_OpenScienceMap),
-         new TileEncodingData(TileEncoding.MF, "local Mapsforgefile")
+         new TileEncodingData(TileEncoding.MVT, Messages.Pref_Map25_Encoding_Mapzen, false),
+         new TileEncodingData(TileEncoding.VTM, Messages.Pref_Map25_Encoding_OpenScienceMap, false),
+         new TileEncodingData(TileEncoding.MF, Messages.Pref_Map25_Encoding_Mapsforge_Offline, true)
    };
 
    private final IDialogSettings           _state                           = TourbookPlugin.getState(ID);
@@ -105,14 +105,22 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
    private Button      _btnDeleteProvider;
    private Button      _btnUpdateProvider;
    //
+   private Combo       _comboTileEncoding;
+   //
+   private Label       _lblAPIKey;
+   private Label       _lblDescription;
+   private Label       _lblProviderName;
+   private Label       _lblTileEncoding;
+   private Label       _lblTilePath;
+   private Label       _lblTileUrl;
+   private Label       _lblUrl;
+   //
    private Text        _txtAPIKey;
    private Text        _txtDescription;
    private Text        _txtProviderName;
    private Text        _txtTilePath;
    private Text        _txtTileUrl;
    private Text        _txtUrl;
-   //
-   private Combo       _comboTileEncoding;
 
    private class MapProvider_ContentProvider implements IStructuredContentProvider {
 
@@ -136,10 +144,13 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
       private TileEncoding __encoding;
       private String       __text;
+      private boolean      __isOffline;
 
-      public TileEncodingData(final TileEncoding encoding, final String text) {
+      public TileEncodingData(final TileEncoding encoding, final String text, final boolean isOffline) {
+
          __encoding = encoding;
          __text = text;
+         __isOffline = isOffline;
       }
    }
 
@@ -270,7 +281,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
       _mapProviderViewer.addSelectionChangedListener(new ISelectionChangedListener() {
          @Override
          public void selectionChanged(final SelectionChangedEvent event) {
-            onProvider_Select();
+            onSelect_MapProvider();
          }
       });
 
@@ -361,8 +372,8 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
             /*
              * Field: Provider name
              */
-            final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Pref_Map25_Provider_Label_ProviderName);
+            _lblProviderName = new Label(container, SWT.NONE);
+            _lblProviderName.setText(Messages.Pref_Map25_Provider_Label_ProviderName);
 
             _txtProviderName = new Text(container, SWT.BORDER);
             GridDataFactory
@@ -373,10 +384,33 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
          }
          {
             /*
+             * Field: Tile Encoding
+             */
+            _lblTileEncoding = new Label(container, SWT.NONE);
+            _lblTileEncoding.setText(Messages.Pref_Map25_Provider_Label_TileEncoding);
+
+            _comboTileEncoding = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
+//          GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(_comboTileEncoding);
+            _comboTileEncoding.setVisibleItemCount(20);
+            _comboTileEncoding.addSelectionListener(new SelectionAdapter() {
+
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onSelect_TileEncoding();
+               }
+            });
+
+            // fill combobox
+            for (final TileEncodingData encodingData : _allTileEncoding) {
+               _comboTileEncoding.add(encodingData.__text);
+            }
+         }
+         {
+            /*
              * Field: Url
              */
-            final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Pref_Map25_Provider_Label_Url);
+            _lblUrl = new Label(container, SWT.NONE);
+            _lblUrl.setText(Messages.Pref_Map25_Provider_Label_Url);
 
             _txtUrl = new Text(container, SWT.BORDER);
             GridDataFactory
@@ -390,8 +424,8 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
             /*
              * Field: Tile path
              */
-            final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Pref_Map25_Provider_Label_TilePath);
+            _lblTilePath = new Label(container, SWT.NONE);
+            _lblTilePath.setText(Messages.Pref_Map25_Provider_Label_TilePath);
 
             _txtTilePath = new Text(container, SWT.BORDER);
             GridDataFactory
@@ -404,8 +438,8 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
             /*
              * Field: Tile Url
              */
-            final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Pref_Map25_Provider_Label_TileUrl);
+            _lblTileUrl = new Label(container, SWT.NONE);
+            _lblTileUrl.setText(Messages.Pref_Map25_Provider_Label_TileUrl);
 
             _txtTileUrl = new Text(container, SWT.READ_ONLY);
             GridDataFactory
@@ -415,27 +449,10 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
          }
          {
             /*
-             * Field: Tile Encoding
-             */
-            final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Pref_Map25_Provider_Label_TileEncoding);
-
-            _comboTileEncoding = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
-//				GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(_comboTileEncoding);
-            _comboTileEncoding.setVisibleItemCount(20);
-            _comboTileEncoding.addSelectionListener(_defaultSelectionListener);
-
-            // fill combobox
-            for (final TileEncodingData encodingData : _allTileEncoding) {
-               _comboTileEncoding.add(encodingData.__text);
-            }
-         }
-         {
-            /*
              * Field: API key
              */
-            final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Pref_Map25_Provider_Label_APIKey);
+            _lblAPIKey = new Label(container, SWT.NONE);
+            _lblAPIKey.setText(Messages.Pref_Map25_Provider_Label_APIKey);
 
             _txtAPIKey = new Text(container, SWT.BORDER);
             GridDataFactory
@@ -448,12 +465,12 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
             /*
              * Field: Description
              */
-            final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Pref_Map25_Provider_Label_Description);
+            _lblDescription = new Label(container, SWT.NONE);
+            _lblDescription.setText(Messages.Pref_Map25_Provider_Label_Description);
             GridDataFactory
                   .fillDefaults()//
                   .align(SWT.FILL, SWT.BEGINNING)
-                  .applyTo(label);
+                  .applyTo(_lblDescription);
 
             _txtDescription = new Text(container, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
             GridDataFactory
@@ -633,9 +650,9 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
    private void enableControls() {
 
       final boolean isSelected = _selectedMapProvider != null;
-      final boolean isEnabled = isSelected ? _selectedMapProvider.isEnabled : false;
+      final boolean isEnabled = _selectedMapProvider.isEnabled || _chkIsMapProviderEnabled.getSelection();
       final boolean isNew = _newProvider != null;
-      final boolean canEdit = isSelected || isNew;
+      final boolean canEdit = isEnabled || isNew;
 
       final boolean isDefaultProvider = _selectedMapProvider.isDefault;
       final boolean isCustomProvider = isDefaultProvider == false;
@@ -652,11 +669,22 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
       _chkIsMapProviderEnabled.setEnabled(isCustomProvider && (isSelected || isNew));
       _comboTileEncoding.setEnabled(canEdit);
+
       _txtAPIKey.setEnabled(canEdit);
       _txtDescription.setEnabled(canEdit);
       _txtProviderName.setEnabled(canEdit);
       _txtTilePath.setEnabled(canEdit);
+      _txtTileUrl.setEnabled(canEdit);
       _txtUrl.setEnabled(canEdit);
+
+      _lblAPIKey.setEnabled(canEdit);
+      _lblDescription.setEnabled(canEdit);
+      _lblProviderName.setEnabled(canEdit);
+      _lblTileEncoding.setEnabled(canEdit);
+      _lblTilePath.setEnabled(canEdit);
+      _lblTileUrl.setEnabled(canEdit);
+      _lblUrl.setEnabled(canEdit);
+
    }
 
    private int getEncodingIndex(final TileEncoding tileEncoding) {
@@ -898,7 +926,19 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
       enableControls();
    }
 
-   private void onProvider_Select() {
+   private void onProvider_Update() {
+
+      if (isDataValid() == false) {
+         return;
+      }
+
+      updateModelAndUI();
+      enableControls();
+
+      _mapProviderViewer.getTable().setFocus();
+   }
+
+   private void onSelect_MapProvider() {
 
       final IStructuredSelection selection = (IStructuredSelection) _mapProviderViewer.getSelection();
       final Map25Provider mapProvider = (Map25Provider) selection.getFirstElement();
@@ -916,16 +956,9 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
       enableControls();
    }
 
-   private void onProvider_Update() {
+   private void onSelect_TileEncoding() {
+      // TODO Auto-generated method stub
 
-      if (isDataValid() == false) {
-         return;
-      }
-
-      updateModelAndUI();
-      enableControls();
-
-      _mapProviderViewer.getTable().setFocus();
    }
 
    @Override

@@ -827,7 +827,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		 * with this code i got always good S3DB, but online buildings did not look good
 		 * i have also to check if the layers becomes more, if i switch the mapprovider
 		 */
-/*		// Buildings or S3DB  Block I
+		// Buildings or S3DB  Block I
 		_layer_mf_S3DB_Building = new S3DBLayer(mMap,_layer_BaseMap);  //this is working for mf, onlinemaps missing 2 walls and roof
 		//_layer_mf_S3DB_Building = new S3DBLayer(mMap,l);  //private S3DBLayer	_layer_mf_S3DB_Building; //is working, but S3DB only once after programm start
 		_layer_Building = new BuildingLayer(mMap, _layer_BaseMap);
@@ -835,7 +835,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 			// S3DB
 			_layer_mf_S3DB_Building.setEnabled(true);
 			System.out.println("############ setupMap layer: adding S3DBlayer ");
-			l.setRenderTheme(_mf_IRenderTheme);
+			_l.setRenderTheme(_mf_IRenderTheme);
 			layers.remove(_layer_Building);
 			layers.add(_layer_mf_S3DB_Building);
 		} else {
@@ -844,27 +844,27 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 			System.out.println("############ setupMap layer: adding Building Layer ");
 			layers.remove(_layer_mf_S3DB_Building);
 			layers.add(_layer_Building);
-		}*/
-		
-		// building Block II
-		_layer_Building = new BuildingLayer(mMap, _layer_BaseMap);
-		//if(!_is_mf_Map) {
-			_layer_Building.setEnabled(false);
-		//	layers.remove(_layer_mf_S3DB_Building);
-			layers.add(_layer_Building);
-		//}
-		
-		// S3DB Block II
-		_layer_mf_S3DB_Building = new S3DBLayer(mMap,_l);
-		//_layer_mf_S3DB_Building = new S3DBLayer(mMap,_layer_BaseMap);
-		if(_is_mf_Map) {
-			//_layer_mf_S3DB = new S3DBLayer(mMap,_mf_VectorTileLayer_S3DB);
-			_layer_mf_S3DB_Building.setEnabled(true);
-			System.out.println("############ setupMaplayer: adding S3DBlayer ");
-			//_mf_VectorTileLayer_S3DB.setRenderTheme(_mf_IRenderTheme);
-			//layers.remove(_layer_Building);
-			layers.add(_layer_mf_S3DB_Building);
 		}
+		
+//		// building Block II
+//		_layer_Building = new BuildingLayer(mMap, _layer_BaseMap);
+//		//if(!_is_mf_Map) {
+//			_layer_Building.setEnabled(false);
+//		//	layers.remove(_layer_mf_S3DB_Building);
+//			layers.add(_layer_Building);
+//		//}
+//		
+//		// S3DB Block II
+//		_layer_mf_S3DB_Building = new S3DBLayer(mMap,_l);
+//		//_layer_mf_S3DB_Building = new S3DBLayer(mMap,_layer_BaseMap);
+//		if(_is_mf_Map) {
+//			//_layer_mf_S3DB = new S3DBLayer(mMap,_mf_VectorTileLayer_S3DB);
+//			_layer_mf_S3DB_Building.setEnabled(true);
+//			System.out.println("############ setupMaplayer: adding S3DBlayer ");
+//			//_mf_VectorTileLayer_S3DB.setRenderTheme(_mf_IRenderTheme);
+//			//layers.remove(_layer_Building);
+//			layers.add(_layer_mf_S3DB_Building);
+//		}
 		
 		// label
 		_layer_Label = new LabelLayerMT(mMap, _layer_BaseMap);
