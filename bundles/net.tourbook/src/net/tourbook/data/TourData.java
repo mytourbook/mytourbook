@@ -687,12 +687,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    // -1 indicate that the value is not yet set
 
-   private short     surfing_MinSpeed_StartStop = SURFING_VALUE_IS_NOT_SET;
-   private short     surfing_MinSpeed_Surfing   = SURFING_VALUE_IS_NOT_SET;
-   private short     surfing_MinTimeDuration    = SURFING_VALUE_IS_NOT_SET;
+   private short     surfing_NumberOfEvents        = 0; // must be 0 because of totals in tourbook view
+   private short     surfing_MinSpeed_StartStop    = SURFING_VALUE_IS_NOT_SET;
+   private short     surfing_MinSpeed_Surfing      = SURFING_VALUE_IS_NOT_SET;
+   private short     surfing_MinTimeDuration       = SURFING_VALUE_IS_NOT_SET;
 
    private boolean   surfing_IsMinDistance;
-   private short     surfing_MinDistance        = SURFING_VALUE_IS_NOT_SET;
+   private short     surfing_MinDistance           = SURFING_VALUE_IS_NOT_SET;
 
 	// ############################################# GEO BOUNDS #############################################
 
@@ -7507,6 +7508,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return surfing_MinTimeDuration;
    }
 
+   public short getSurfing_NumberOfEvents() {
+      return surfing_NumberOfEvents;
+   }
+
    /**
     * @return Returns the UI values for cadence.
     */
@@ -8943,6 +8948,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public void setSurfing_MinTimeDuration(final short surfing_MinTimeDuration) {
       this.surfing_MinTimeDuration = surfing_MinTimeDuration;
    }
+
+   public void setSurfing_NumberOfEvents(final short surfing_NumberOfEvents) {
+      this.surfing_NumberOfEvents = surfing_NumberOfEvents;
+    }
 
    public void setTimeSerieDouble(final double[] timeSerieDouble) {
       this.timeSerieDouble = timeSerieDouble;
