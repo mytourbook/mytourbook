@@ -1445,7 +1445,9 @@ public class Messages extends NLS {
    public static String        Pref_Map25_Provider_Error_UrlIsRequired;
    public static String        Pref_Map25_Provider_Label_APIKey;
    public static String        Pref_Map25_Provider_Label_Description;
+   public static String        Pref_Map25_Provider_Label_MapFile;
    public static String        Pref_Map25_Provider_Label_ProviderName;
+   public static String        Pref_Map25_Provider_Label_ThemeFile;
    public static String        Pref_Map25_Provider_Label_TileEncoding;
    public static String        Pref_Map25_Provider_Label_TilePath;
    public static String        Pref_Map25_Provider_Label_TileUrl;

@@ -57,6 +57,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.ui.part.PageBook;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -72,10 +73,13 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
    private static final String             STATE_LAST_SELECTED_MAP_PROVIDER = "STATE_LAST_SELECTED_MAP_PROVIDER";                 //$NON-NLS-1$
 
+   /**
+    * First encoding is the default.
+    */
    private static final TileEncodingData[] _allTileEncoding                 = new TileEncodingData[] {
 
-         new TileEncodingData(TileEncoding.MVT, Messages.Pref_Map25_Encoding_Mapzen, false),
          new TileEncodingData(TileEncoding.VTM, Messages.Pref_Map25_Encoding_OpenScienceMap, false),
+         new TileEncodingData(TileEncoding.MVT, Messages.Pref_Map25_Encoding_Mapzen, false),
          new TileEncodingData(TileEncoding.MF, Messages.Pref_Map25_Encoding_Mapsforge_Offline, true)
    };
 
@@ -93,34 +97,55 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
    private boolean                         _isMapProviderModified;
    private boolean                         _isInUpdateUI;
    //
+   /**
+    * Contains the controls which are displayed in the first column, these controls are used to get
+    * the maximum width and set the first column within the differenct section to the same width
+    */
+   private final ArrayList<Control>        _firstColumnControls             = new ArrayList<>();
+   //
    /*
     * UI Controls
     */
    private TableViewer _mapProviderViewer;
    //
-   private Button      _chkIsMapProviderEnabled;
    //
-   private Button      _btnAddProvider;
-   private Button      _btnCancel;
-   private Button      _btnDeleteProvider;
-   private Button      _btnUpdateProvider;
+   private Composite _parent;
+   private Composite _uiInnerContainer;
+   private PageBook  _pageBook_OnOffline;
+   private Composite _pageMaps_Online;
+   private Composite _pageMaps_Offline;
    //
-   private Combo       _comboTileEncoding;
+   private Button    _btnAddProvider;
+   private Button    _btnCancel;
+   private Button    _btnDeleteProvider;
+   private Button    _btnMapFile;
+   private Button    _btnThemeFile;
+   private Button    _btnUpdateProvider;
    //
-   private Label       _lblAPIKey;
-   private Label       _lblDescription;
-   private Label       _lblProviderName;
-   private Label       _lblTileEncoding;
-   private Label       _lblTilePath;
-   private Label       _lblTileUrl;
-   private Label       _lblUrl;
+   private Button    _chkIsMapProviderEnabled;
    //
-   private Text        _txtAPIKey;
-   private Text        _txtDescription;
-   private Text        _txtProviderName;
-   private Text        _txtTilePath;
-   private Text        _txtTileUrl;
-   private Text        _txtUrl;
+   private Combo     _comboTileEncoding;
+   //
+   private Label     _lblAPIKey;
+   private Label     _lblDescription;
+   private Label     _lblMapFile;
+   private Label     _lblProviderName;
+   private Label     _lblThemeFile;
+   private Label     _lblTileEncoding;
+   private Label     _lblTilePath;
+   private Label     _lblTileUrl;
+   private Label     _lblUrl;
+   //
+   private Text      _txtAPIKey;
+   private Text      _txtDescription;
+   private Text      _txtMapFile;
+   private Text      _txtProviderName;
+   private Text      _txtThemeFile;
+   private Text      _txtTilePath;
+   private Text      _txtTileUrl;
+   private Text      _txtUrl;
+
+   private Composite parent;
 
    private class MapProvider_ContentProvider implements IStructuredContentProvider {
 
@@ -217,23 +242,37 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
          final Label label = new Label(container, SWT.WRAP);
          label.setText(Messages.Pref_Map25_Provider_Label_Title);
 
-         final Composite innerContainer = new Composite(container, SWT.NONE);
+         _uiInnerContainer = new Composite(container, SWT.NONE);
          GridDataFactory
                .fillDefaults()//
                .grab(true, true)
-               .applyTo(innerContainer);
-         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(innerContainer);
+               .applyTo(_uiInnerContainer);
+         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(_uiInnerContainer);
          {
-            createUI_10_Provider_Viewer(innerContainer);
-            createUI_20_Provider_Actions(innerContainer);
+            createUI_10_Provider_Viewer(_uiInnerContainer);
+            createUI_20_Provider_Actions(_uiInnerContainer);
 
-            createUI_30_Details(innerContainer);
-            createUI_40_Details_Actions(innerContainer);
+            createUI_30_Details(_uiInnerContainer);
+            createUI_90_Details_Actions(_uiInnerContainer);
          }
 
          // placeholder
          new Label(container, SWT.NONE);
       }
+
+      // with e4 the layouts are not yet set -> NPE's -> run async which worked
+      parent.getShell().getDisplay().asyncExec(new Runnable() {
+         @Override
+         public void run() {
+
+            // compute width for all controls and equalize column width for the different sections
+            container.layout(true, true);
+            UI.setEqualizeColumWidths(_firstColumnControls);
+
+            // this must be layouted otherwise the initial layout is not as is should be
+            container.layout(true, true);
+         }
+      });
 
       return container;
    }
@@ -374,6 +413,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
              */
             _lblProviderName = new Label(container, SWT.NONE);
             _lblProviderName.setText(Messages.Pref_Map25_Provider_Label_ProviderName);
+            _firstColumnControls.add(_lblProviderName);
 
             _txtProviderName = new Text(container, SWT.BORDER);
             GridDataFactory
@@ -388,6 +428,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
              */
             _lblTileEncoding = new Label(container, SWT.NONE);
             _lblTileEncoding.setText(Messages.Pref_Map25_Provider_Label_TileEncoding);
+            _firstColumnControls.add(_lblTileEncoding);
 
             _comboTileEncoding = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
 //          GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(_comboTileEncoding);
@@ -405,62 +446,16 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
                _comboTileEncoding.add(encodingData.__text);
             }
          }
+
+         _pageBook_OnOffline = new PageBook(container, SWT.NONE);
+         GridDataFactory.fillDefaults().span(2, 1).grab(true, false).applyTo(_pageBook_OnOffline);
          {
-            /*
-             * Field: Url
-             */
-            _lblUrl = new Label(container, SWT.NONE);
-            _lblUrl.setText(Messages.Pref_Map25_Provider_Label_Url);
-
-            _txtUrl = new Text(container, SWT.BORDER);
-            GridDataFactory
-                  .fillDefaults()//
-                  .grab(true, false)
-                  .applyTo(_txtUrl);
-            _txtUrl.addModifyListener(_defaultModifyListener);
+            _pageMaps_Online = createUI_50_Maps_Online(_pageBook_OnOffline);
+            _pageMaps_Offline = createUI_52_Maps_Offline(_pageBook_OnOffline);
          }
+         // set any page
+         _pageBook_OnOffline.showPage(_pageMaps_Offline);
 
-         {
-            /*
-             * Field: Tile path
-             */
-            _lblTilePath = new Label(container, SWT.NONE);
-            _lblTilePath.setText(Messages.Pref_Map25_Provider_Label_TilePath);
-
-            _txtTilePath = new Text(container, SWT.BORDER);
-            GridDataFactory
-                  .fillDefaults()//
-                  .grab(true, false)
-                  .applyTo(_txtTilePath);
-            _txtTilePath.addModifyListener(_defaultModifyListener);
-         }
-         {
-            /*
-             * Field: Tile Url
-             */
-            _lblTileUrl = new Label(container, SWT.NONE);
-            _lblTileUrl.setText(Messages.Pref_Map25_Provider_Label_TileUrl);
-
-            _txtTileUrl = new Text(container, SWT.READ_ONLY);
-            GridDataFactory
-                  .fillDefaults()//
-                  .grab(true, false)
-                  .applyTo(_txtTileUrl);
-         }
-         {
-            /*
-             * Field: API key
-             */
-            _lblAPIKey = new Label(container, SWT.NONE);
-            _lblAPIKey.setText(Messages.Pref_Map25_Provider_Label_APIKey);
-
-            _txtAPIKey = new Text(container, SWT.BORDER);
-            GridDataFactory
-                  .fillDefaults()//
-                  .grab(true, false)
-                  .applyTo(_txtAPIKey);
-            _txtAPIKey.addModifyListener(_defaultModifyListener);
-         }
          {
             /*
              * Field: Description
@@ -471,6 +466,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
                   .fillDefaults()//
                   .align(SWT.FILL, SWT.BEGINNING)
                   .applyTo(_lblDescription);
+            _firstColumnControls.add(_lblDescription);
 
             _txtDescription = new Text(container, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
             GridDataFactory
@@ -484,7 +480,147 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
    }
 
-   private void createUI_40_Details_Actions(final Composite parent) {
+   private Composite createUI_50_Maps_Online(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+//      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      {
+         {
+            /*
+             * Field: Url
+             */
+            _lblUrl = new Label(container, SWT.NONE);
+            _lblUrl.setText(Messages.Pref_Map25_Provider_Label_Url);
+            _firstColumnControls.add(_lblUrl);
+
+            _txtUrl = new Text(container, SWT.BORDER);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtUrl);
+            _txtUrl.addModifyListener(_defaultModifyListener);
+         }
+
+         {
+            /*
+             * Field: Tile path
+             */
+            _lblTilePath = new Label(container, SWT.NONE);
+            _lblTilePath.setText(Messages.Pref_Map25_Provider_Label_TilePath);
+            _firstColumnControls.add(_lblTilePath);
+
+            _txtTilePath = new Text(container, SWT.BORDER);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtTilePath);
+            _txtTilePath.addModifyListener(_defaultModifyListener);
+         }
+         {
+            /*
+             * Field: Tile Url
+             */
+            _lblTileUrl = new Label(container, SWT.NONE);
+            _lblTileUrl.setText(Messages.Pref_Map25_Provider_Label_TileUrl);
+            _firstColumnControls.add(_lblTileUrl);
+
+            _txtTileUrl = new Text(container, SWT.READ_ONLY);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtTileUrl);
+         }
+         {
+            /*
+             * Field: API key
+             */
+            _lblAPIKey = new Label(container, SWT.NONE);
+            _lblAPIKey.setText(Messages.Pref_Map25_Provider_Label_APIKey);
+            _firstColumnControls.add(_lblAPIKey);
+
+            _txtAPIKey = new Text(container, SWT.BORDER);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtAPIKey);
+            _txtAPIKey.addModifyListener(_defaultModifyListener);
+         }
+      }
+
+      return container;
+   }
+
+   private Composite createUI_52_Maps_Offline(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+//      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      {
+         {
+            /*
+             * Field: Map file
+             */
+            _lblMapFile = new Label(container, SWT.NONE);
+            _lblMapFile.setText(Messages.Pref_Map25_Provider_Label_MapFile);
+            _firstColumnControls.add(_lblMapFile);
+
+            final Composite containerMapFile = new Composite(container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(containerMapFile);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerMapFile);
+            {
+               {
+                  _txtMapFile = new Text(containerMapFile, SWT.BORDER);
+                  _txtMapFile.addModifyListener(_defaultModifyListener);
+                  GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtMapFile);
+               }
+
+               {
+                  /*
+                   * Button: browse...
+                   */
+                  _btnMapFile = new Button(containerMapFile, SWT.PUSH);
+                  _btnMapFile.setText(Messages.app_btn_browse);
+                  _btnMapFile.addSelectionListener(new SelectionAdapter() {
+                     @Override
+                     public void widgetSelected(final SelectionEvent e) {
+                        onSelect_File_Map();
+                     }
+                  });
+                  GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_btnMapFile);
+                  setButtonLayoutData(_btnMapFile);
+               }
+            }
+         }
+         {
+            /*
+             * Field: Theme file
+             */
+            _lblThemeFile = new Label(container, SWT.NONE);
+            _lblThemeFile.setText(Messages.Pref_Map25_Provider_Label_ThemeFile);
+            _firstColumnControls.add(_lblThemeFile);
+
+            final Composite containerThemeFile = new Composite(container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(containerThemeFile);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerThemeFile);
+            {
+               {
+                  _txtThemeFile = new Text(containerThemeFile, SWT.BORDER);
+                  _txtThemeFile.addModifyListener(_defaultModifyListener);
+                  GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtThemeFile);
+               }
+
+               {
+                  /*
+                   * Button: browse...
+                   */
+                  _btnThemeFile = new Button(containerThemeFile, SWT.PUSH);
+                  _btnThemeFile.setText(Messages.app_btn_browse);
+                  _btnThemeFile.addSelectionListener(new SelectionAdapter() {
+                     @Override
+                     public void widgetSelected(final SelectionEvent e) {
+                        onSelect_File_Theme();
+                     }
+                  });
+                  GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_btnThemeFile);
+                  setButtonLayoutData(_btnThemeFile);
+               }
+            }
+         }
+      }
+
+      return container;
+   }
+
+   private void createUI_90_Details_Actions(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory
@@ -647,6 +783,14 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 //		}
    }
 
+   @Override
+   public void dispose() {
+
+      _firstColumnControls.clear();
+
+      super.dispose();
+   }
+
    private void enableControls() {
 
       final boolean isSelected = _selectedMapProvider != null;
@@ -664,27 +808,33 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
       _btnAddProvider.setEnabled(!_isMapProviderModified && isValid);
       _btnDeleteProvider.setEnabled(isCustomProvider && isSelected && !isNew && !_isMapProviderModified);
 
-      _btnUpdateProvider.setEnabled(_isMapProviderModified && isValid);
       _btnCancel.setEnabled(_isMapProviderModified);
+      _btnMapFile.setEnabled(canEdit);
+      _btnThemeFile.setEnabled(canEdit);
+      _btnUpdateProvider.setEnabled(_isMapProviderModified && isValid);
 
       _chkIsMapProviderEnabled.setEnabled(isCustomProvider && (isSelected || isNew));
-      _comboTileEncoding.setEnabled(canEdit);
 
-      _txtAPIKey.setEnabled(canEdit);
-      _txtDescription.setEnabled(canEdit);
-      _txtProviderName.setEnabled(canEdit);
-      _txtTilePath.setEnabled(canEdit);
-      _txtTileUrl.setEnabled(canEdit);
-      _txtUrl.setEnabled(canEdit);
+      _comboTileEncoding.setEnabled(canEdit);
 
       _lblAPIKey.setEnabled(canEdit);
       _lblDescription.setEnabled(canEdit);
+      _lblMapFile.setEnabled(canEdit);
       _lblProviderName.setEnabled(canEdit);
+      _lblThemeFile.setEnabled(canEdit);
       _lblTileEncoding.setEnabled(canEdit);
       _lblTilePath.setEnabled(canEdit);
       _lblTileUrl.setEnabled(canEdit);
       _lblUrl.setEnabled(canEdit);
 
+      _txtAPIKey.setEnabled(canEdit);
+      _txtDescription.setEnabled(canEdit);
+      _txtMapFile.setEnabled(canEdit);
+      _txtThemeFile.setEnabled(canEdit);
+      _txtProviderName.setEnabled(canEdit);
+      _txtTilePath.setEnabled(canEdit);
+      _txtTileUrl.setEnabled(canEdit);
+      _txtUrl.setEnabled(canEdit);
    }
 
    private int getEncodingIndex(final TileEncoding tileEncoding) {
@@ -716,17 +866,17 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
       return defaultIndex;
    }
 
-   private TileEncoding getSelectedEncoding() {
+   private TileEncodingData getSelectedEncoding() {
 
       final int selectedIndex = _comboTileEncoding.getSelectionIndex();
 
       if (selectedIndex < 0) {
 
          // return default
-         return TileEncoding.VTM;
+         return _allTileEncoding[0];
       }
 
-      return _allTileEncoding[selectedIndex].__encoding;
+      return _allTileEncoding[selectedIndex];
    }
 
    @Override
@@ -751,6 +901,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
    private void initUI(final Composite parent) {
 
+      _parent = parent;
    }
 
    /**
@@ -938,6 +1089,30 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
       _mapProviderViewer.getTable().setFocus();
    }
 
+   private void onSelect_File_Map() {
+      // TODO Auto-generated method stub
+
+//      final DirectoryDialog dialog = new DirectoryDialog(_parent.getShell(), SWT.SAVE);
+//
+//      dialog.setText(Messages.Dialog_ImportConfig_Dialog_BackupFolder_Title);
+//      dialog.setMessage(Messages.Dialog_ImportConfig_Dialog_BackupFolder_Message);
+//      dialog.setFilterPath(filterOSPath);
+//
+//      final String selectedFolder = dialog.open();
+//
+//      if (selectedFolder != null) {
+//
+//         setErrorMessage(null);
+//
+//         _backupHistoryItems.onSelectFolderInDialog(selectedFolder);
+//      }
+   }
+
+   private void onSelect_File_Theme() {
+      // TODO Auto-generated method stub
+
+   }
+
    private void onSelect_MapProvider() {
 
       final IStructuredSelection selection = (IStructuredSelection) _mapProviderViewer.getSelection();
@@ -957,8 +1132,10 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
    }
 
    private void onSelect_TileEncoding() {
-      // TODO Auto-generated method stub
 
+      updateUI_TileEncoding();
+
+      onProvider_Modify();
    }
 
    @Override
@@ -1092,7 +1269,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
       mapProvider.url = _txtUrl.getText();
       mapProvider.isEnabled = _chkIsMapProviderEnabled.getSelection();
 
-      mapProvider.tileEncoding = getSelectedEncoding();
+      mapProvider.tileEncoding = getSelectedEncoding().__encoding;
    }
 
    private void updateUI_Data() {
@@ -1128,10 +1305,23 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
             _comboTileEncoding.select(getEncodingIndex(mapProvider.tileEncoding));
          }
-
+         updateUI_TileEncoding();
          updateUI_Data();
       }
       _isInUpdateUI = false;
+   }
+
+   private void updateUI_TileEncoding() {
+
+      final TileEncodingData selectedEncodingData = getSelectedEncoding();
+
+      if (selectedEncodingData.__isOffline) {
+         _pageBook_OnOffline.showPage(_pageMaps_Offline);
+      } else {
+         _pageBook_OnOffline.showPage(_pageMaps_Online);
+      }
+
+      _uiInnerContainer.layout(true, true);
    }
 
 }
