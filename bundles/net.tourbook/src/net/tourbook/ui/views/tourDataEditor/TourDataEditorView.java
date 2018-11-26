@@ -2733,9 +2733,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
             // set menu items
 
             ActionSetTourTypeMenu.fillMenu(menuMgr, TourDataEditorView.this, false);
-
-            menuMgr.add(new Separator());
-            menuMgr.add(_actionOpenTourTypePrefs);
          }
       });
 
