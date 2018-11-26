@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -786,7 +786,7 @@ public class Suunto3SAXHandler extends DefaultHandler {
 		}
 	}
 
-	private void openError(Exception e) {
+	private void openError(final Exception e) {
 		Display.getDefault().syncExec(new Runnable() {
 			@Override
 			public void run() {
