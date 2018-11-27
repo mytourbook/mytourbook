@@ -21,21 +21,32 @@ import de.byteholder.geoclipse.map.UI;
 
 public class Map25Provider implements Cloneable {
 
-   private String      _id;
-   private UUID        _uuid;
+   private String _id;
+   private UUID   _uuid;
 
-   public boolean      isEnabled;
-   public boolean      isDefault;
+   public boolean isEnabled;
+   public boolean isDefault;
 
-   public String       name         = UI.EMPTY_STRING;
-   public String       description  = UI.EMPTY_STRING;
+   public boolean isOfflineMap;
 
-   public String       url          = UI.EMPTY_STRING;
-   public String       tilePath     = UI.EMPTY_STRING;
+   public String  name        = UI.EMPTY_STRING;
+   public String  description = UI.EMPTY_STRING;
 
-   public String       apiKey       = UI.EMPTY_STRING;
+   /*
+    * Online map provider
+    */
+   public String url      = UI.EMPTY_STRING;
+   public String tilePath = UI.EMPTY_STRING;
+   public String apiKey   = UI.EMPTY_STRING;
 
-   public TileEncoding tileEncoding = TileEncoding.MVT;
+   /*
+    * Offline map provider
+    */
+   public String       mapFilepath   = UI.EMPTY_STRING;
+   public String       themeFilepath = UI.EMPTY_STRING;
+   public String       themeStyle  = UI.EMPTY_STRING;
+
+   public TileEncoding tileEncoding  = TileEncoding.MVT;
 
    public Map25Provider() {
 
@@ -120,15 +131,32 @@ public class Map25Provider implements Cloneable {
 
    @Override
    public String toString() {
-      return "Map25Provider [" //$NON-NLS-1$
-//          + "id=" + id + ", "
-            + "name=" + name + ", " //$NON-NLS-1$ //$NON-NLS-2$
-            //          + "description=" + description + ", "
-            //          + "offlineFolder=" + offlineFolder + ", "
-            //          + "url=" + url + ", "
-            //          + "tilePath=" + tilePath + ", "
-            //          + "apiKey=" + apiKey
-            + "]"; //$NON-NLS-1$
+
+      return
+
+      getClass().getName() + "\n" //$NON-NLS-1$
+
+            + "_id            = " + _id + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "_uuid          = " + _uuid + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "isEnabled      = " + isEnabled + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "isDefault      = " + isDefault + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "name           = " + name + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "description    = " + description + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "isOfflineMap   = " + isOfflineMap + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "tileEncoding   = " + tileEncoding + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "url            = " + url + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "tilePath       = " + tilePath + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "apiKey         = " + apiKey + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "mapFilepath    = " + mapFilepath + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "themeFilepath  = " + themeFilepath + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "themeStyle     = " + themeStyle + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+
+      ;
    }
 
 }

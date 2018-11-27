@@ -109,7 +109,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
    private TableViewer _mapProviderViewer;
    //
    //
-   private Composite _parent;
+//   private Composite _parent;
    private Composite _uiInnerContainer;
    private PageBook  _pageBook_OnOffline;
    private Composite _pageMaps_Online;
@@ -128,9 +128,10 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
    //
    private Label     _lblAPIKey;
    private Label     _lblDescription;
-   private Label     _lblMapFile;
+   private Label     _lblMapFilepath;
    private Label     _lblProviderName;
-   private Label     _lblThemeFile;
+   private Label     _lblThemeFilepath;
+   private Label     _lblThemeStyle;
    private Label     _lblTileEncoding;
    private Label     _lblTilePath;
    private Label     _lblTileUrl;
@@ -138,14 +139,15 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
    //
    private Text      _txtAPIKey;
    private Text      _txtDescription;
-   private Text      _txtMapFile;
+   private Text      _txtMapFilepath;
    private Text      _txtProviderName;
-   private Text      _txtThemeFile;
+   private Text      _txtThemeFilepath;
+   private Text      _txtThemeStyle;
    private Text      _txtTilePath;
    private Text      _txtTileUrl;
    private Text      _txtUrl;
 
-   private Composite parent;
+//   private Composite parent;
 
    private class MapProvider_ContentProvider implements IStructuredContentProvider {
 
@@ -549,18 +551,18 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
             /*
              * Field: Map file
              */
-            _lblMapFile = new Label(container, SWT.NONE);
-            _lblMapFile.setText(Messages.Pref_Map25_Provider_Label_MapFile);
-            _firstColumnControls.add(_lblMapFile);
+            _lblMapFilepath = new Label(container, SWT.NONE);
+            _lblMapFilepath.setText(Messages.Pref_Map25_Provider_Label_MapFilepath);
+            _firstColumnControls.add(_lblMapFilepath);
 
             final Composite containerMapFile = new Composite(container, SWT.NONE);
             GridDataFactory.fillDefaults().grab(true, false).applyTo(containerMapFile);
             GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerMapFile);
             {
                {
-                  _txtMapFile = new Text(containerMapFile, SWT.BORDER);
-                  _txtMapFile.addModifyListener(_defaultModifyListener);
-                  GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtMapFile);
+                  _txtMapFilepath = new Text(containerMapFile, SWT.BORDER);
+                  _txtMapFilepath.addModifyListener(_defaultModifyListener);
+                  GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtMapFilepath);
                }
 
                {
@@ -582,20 +584,20 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
          }
          {
             /*
-             * Field: Theme file
+             * Field: Theme filepath
              */
-            _lblThemeFile = new Label(container, SWT.NONE);
-            _lblThemeFile.setText(Messages.Pref_Map25_Provider_Label_ThemeFile);
-            _firstColumnControls.add(_lblThemeFile);
+            _lblThemeFilepath = new Label(container, SWT.NONE);
+            _lblThemeFilepath.setText(Messages.Pref_Map25_Provider_Label_ThemeFilepath);
+            _firstColumnControls.add(_lblThemeFilepath);
 
             final Composite containerThemeFile = new Composite(container, SWT.NONE);
             GridDataFactory.fillDefaults().grab(true, false).applyTo(containerThemeFile);
             GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerThemeFile);
             {
                {
-                  _txtThemeFile = new Text(containerThemeFile, SWT.BORDER);
-                  _txtThemeFile.addModifyListener(_defaultModifyListener);
-                  GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtThemeFile);
+                  _txtThemeFilepath = new Text(containerThemeFile, SWT.BORDER);
+                  _txtThemeFilepath.addModifyListener(_defaultModifyListener);
+                  GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtThemeFilepath);
                }
 
                {
@@ -614,6 +616,18 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
                   setButtonLayoutData(_btnThemeFile);
                }
             }
+         }
+         {
+            /*
+             * Field: Theme style
+             */
+            _lblThemeStyle = new Label(container, SWT.NONE);
+            _lblThemeStyle.setText(Messages.Pref_Map25_Provider_Label_ThemeStyle);
+            _firstColumnControls.add(_lblThemeStyle);
+
+            _txtThemeStyle = new Text(container, SWT.BORDER);
+            _txtThemeStyle.addModifyListener(_defaultModifyListener);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtThemeStyle);
          }
       }
 
@@ -674,7 +688,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
       {
          /*
-          * Column: Can be used
+          * Column: Enabled
           */
          tvc = new TableViewerColumn(_mapProviderViewer, SWT.LEAD);
          tc = tvc.getColumn();
@@ -688,7 +702,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
                cell.setText(isEnabled ? Messages.App_Label_BooleanYes : Messages.App_Label_BooleanNo);
             }
          });
-         tableLayout.setColumnData(tc, new ColumnWeightData(4, minWidth));
+         tableLayout.setColumnData(tc, new ColumnWeightData(2, minWidth));
       }
       {
          /*
@@ -718,11 +732,11 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
                cell.setText(((Map25Provider) cell.getElement()).tileEncoding.name());
             }
          });
-         tableLayout.setColumnData(tc, new ColumnWeightData(4, minWidth));
+         tableLayout.setColumnData(tc, new ColumnWeightData(2, minWidth));
       }
       {
          /*
-          * Column: Url
+          * Column: Url / Map filename
           */
          tvc = new TableViewerColumn(_mapProviderViewer, SWT.LEAD);
          tc = tvc.getColumn();
@@ -730,14 +744,19 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
          tvc.setLabelProvider(new CellLabelProvider() {
             @Override
             public void update(final ViewerCell cell) {
-               cell.setText(((Map25Provider) cell.getElement()).url);
+
+               final Map25Provider map25Provider = (Map25Provider) cell.getElement();
+
+               cell.setText(map25Provider.isOfflineMap
+                     ? map25Provider.mapFilepath
+                     : map25Provider.url);
             }
          });
          tableLayout.setColumnData(tc, new ColumnWeightData(7, minWidth));
       }
       {
          /*
-          * Column: Tile path
+          * Column: Tile path / Theme filepath
           */
          tvc = new TableViewerColumn(_mapProviderViewer, SWT.LEAD);
          tc = tvc.getColumn();
@@ -745,14 +764,19 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
          tvc.setLabelProvider(new CellLabelProvider() {
             @Override
             public void update(final ViewerCell cell) {
-               cell.setText(((Map25Provider) cell.getElement()).tilePath);
+
+               final Map25Provider map25Provider = (Map25Provider) cell.getElement();
+
+               cell.setText(map25Provider.isOfflineMap
+                     ? map25Provider.themeFilepath
+                     : map25Provider.tilePath);
             }
          });
-         tableLayout.setColumnData(tc, new ColumnWeightData(5, minWidth));
+         tableLayout.setColumnData(tc, new ColumnWeightData(7, minWidth));
       }
       {
          /*
-          * Column: API key
+          * Column: API key / Theme style
           */
          tvc = new TableViewerColumn(_mapProviderViewer, SWT.LEAD);
          tc = tvc.getColumn();
@@ -760,10 +784,15 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
          tvc.setLabelProvider(new CellLabelProvider() {
             @Override
             public void update(final ViewerCell cell) {
-               cell.setText(((Map25Provider) cell.getElement()).apiKey);
+
+               final Map25Provider map25Provider = (Map25Provider) cell.getElement();
+
+               cell.setText(map25Provider.isOfflineMap
+                     ? map25Provider.themeStyle
+                     : map25Provider.apiKey);
             }
          });
-         tableLayout.setColumnData(tc, new ColumnWeightData(4, minWidth));
+         tableLayout.setColumnData(tc, new ColumnWeightData(3, minWidth));
       }
    }
 
@@ -819,9 +848,10 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
       _lblAPIKey.setEnabled(canEdit);
       _lblDescription.setEnabled(canEdit);
-      _lblMapFile.setEnabled(canEdit);
+      _lblMapFilepath.setEnabled(canEdit);
       _lblProviderName.setEnabled(canEdit);
-      _lblThemeFile.setEnabled(canEdit);
+      _lblThemeFilepath.setEnabled(canEdit);
+      _lblThemeStyle.setEnabled(canEdit);
       _lblTileEncoding.setEnabled(canEdit);
       _lblTilePath.setEnabled(canEdit);
       _lblTileUrl.setEnabled(canEdit);
@@ -829,8 +859,9 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
       _txtAPIKey.setEnabled(canEdit);
       _txtDescription.setEnabled(canEdit);
-      _txtMapFile.setEnabled(canEdit);
-      _txtThemeFile.setEnabled(canEdit);
+      _txtMapFilepath.setEnabled(canEdit);
+      _txtThemeFilepath.setEnabled(canEdit);
+      _txtThemeStyle.setEnabled(canEdit);
       _txtProviderName.setEnabled(canEdit);
       _txtTilePath.setEnabled(canEdit);
       _txtTileUrl.setEnabled(canEdit);
@@ -901,7 +932,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
    private void initUI(final Composite parent) {
 
-      _parent = parent;
+//      _parent = parent;
    }
 
    /**
@@ -913,23 +944,35 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
       if (isNewProvider || _isMapProviderModified) {
 
-         if (_txtProviderName.getText().trim().equals(UI.EMPTY_STRING)) {
+         if (getSelectedEncoding().__isOffline) {
 
-            setErrorMessage(Messages.Pref_Map25_Provider_Error_ProviderNameIsRequired);
+            // validate offline map
 
-            return false;
+            if (_txtMapFilepath.getText().trim().equals(UI.EMPTY_STRING)) {
+               setErrorMessage(Messages.Pref_Map25_Provider_Error_MapFilename_IsRequired);
+               return false;
 
-         } else if (_txtUrl.getText().trim().equals(UI.EMPTY_STRING)) {
+            } else if (_txtThemeFilepath.getText().trim().equals(UI.EMPTY_STRING)) {
+               setErrorMessage(Messages.Pref_Map25_Provider_Error_ThemeFilename_IsRequired);
+               return false;
+            }
 
-            setErrorMessage(Messages.Pref_Map25_Provider_Error_UrlIsRequired);
+         } else {
 
-            return false;
+            // validate online map
 
-         } else if (_txtTilePath.getText().trim().equals(UI.EMPTY_STRING)) {
+            if (_txtProviderName.getText().trim().equals(UI.EMPTY_STRING)) {
+               setErrorMessage(Messages.Pref_Map25_Provider_Error_ProviderNameIsRequired);
+               return false;
 
-            setErrorMessage(Messages.Pref_Map25_Provider_Error_TilePathIsRequired);
+            } else if (_txtUrl.getText().trim().equals(UI.EMPTY_STRING)) {
+               setErrorMessage(Messages.Pref_Map25_Provider_Error_UrlIsRequired);
+               return false;
 
-            return false;
+            } else if (_txtTilePath.getText().trim().equals(UI.EMPTY_STRING)) {
+               setErrorMessage(Messages.Pref_Map25_Provider_Error_TilePathIsRequired);
+               return false;
+            }
          }
 
          /*
@@ -1257,19 +1300,34 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
       _newProvider = null;
    }
 
+   /**
+    * Update map provider
+    */
    private void updateModelData(final Map25Provider mapProvider) {
 
-      /*
-       * Update map provider
-       */
-      mapProvider.apiKey = _txtAPIKey.getText();
-      mapProvider.description = _txtDescription.getText();
+      final TileEncodingData selectedEncoding = getSelectedEncoding();
+
       mapProvider.name = _txtProviderName.getText();
-      mapProvider.tilePath = _txtTilePath.getText();
-      mapProvider.url = _txtUrl.getText();
+      mapProvider.description = _txtDescription.getText();
       mapProvider.isEnabled = _chkIsMapProviderEnabled.getSelection();
 
-      mapProvider.tileEncoding = getSelectedEncoding().__encoding;
+      final boolean isOffline = selectedEncoding.__isOffline;
+      mapProvider.isOfflineMap = isOffline;
+
+      if (isOffline) {
+
+         mapProvider.mapFilepath = _txtMapFilepath.getText();
+         mapProvider.themeFilepath = _txtThemeFilepath.getText();
+         mapProvider.themeStyle = _txtThemeStyle.getText();
+
+      } else {
+
+         mapProvider.url = _txtUrl.getText();
+         mapProvider.tilePath = _txtTilePath.getText();
+         mapProvider.apiKey = _txtAPIKey.getText();
+      }
+
+      mapProvider.tileEncoding = selectedEncoding.__encoding;
    }
 
    private void updateUI_Data() {
@@ -1287,30 +1345,57 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
             _chkIsMapProviderEnabled.setSelection(false);
 
-            _txtAPIKey.setText(UI.EMPTY_STRING);
             _txtDescription.setText(UI.EMPTY_STRING);
             _txtProviderName.setText(UI.EMPTY_STRING);
+
+            _txtAPIKey.setText(UI.EMPTY_STRING);
             _txtUrl.setText(UI.EMPTY_STRING);
             _txtTilePath.setText(UI.EMPTY_STRING);
+
+            _txtMapFilepath.setText(UI.EMPTY_STRING);
+            _txtThemeFilepath.setText(UI.EMPTY_STRING);
+            _txtThemeStyle.setText(UI.EMPTY_STRING);
 
          } else {
 
             _chkIsMapProviderEnabled.setSelection(mapProvider.isEnabled);
 
-            _txtAPIKey.setText(mapProvider.apiKey);
             _txtDescription.setText(mapProvider.description);
             _txtProviderName.setText(mapProvider.name);
-            _txtUrl.setText(mapProvider.url);
-            _txtTilePath.setText(mapProvider.tilePath);
+
+            if (mapProvider.isOfflineMap) {
+
+               _txtAPIKey.setText(UI.EMPTY_STRING);
+               _txtUrl.setText(UI.EMPTY_STRING);
+               _txtTilePath.setText(UI.EMPTY_STRING);
+
+               _txtMapFilepath.setText(mapProvider.mapFilepath);
+               _txtThemeFilepath.setText(mapProvider.themeFilepath);
+               _txtThemeStyle.setText(mapProvider.themeStyle);
+
+            } else {
+
+               _txtAPIKey.setText(mapProvider.apiKey);
+               _txtUrl.setText(mapProvider.url);
+               _txtTilePath.setText(mapProvider.tilePath);
+
+               _txtMapFilepath.setText(UI.EMPTY_STRING);
+               _txtThemeFilepath.setText(UI.EMPTY_STRING);
+               _txtThemeStyle.setText(UI.EMPTY_STRING);
+            }
 
             _comboTileEncoding.select(getEncodingIndex(mapProvider.tileEncoding));
          }
+
          updateUI_TileEncoding();
          updateUI_Data();
       }
       _isInUpdateUI = false;
    }
 
+   /**
+    * Show tile encoding fields
+    */
    private void updateUI_TileEncoding() {
 
       final TileEncodingData selectedEncodingData = getSelectedEncoding();
@@ -1321,6 +1406,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
          _pageBook_OnOffline.showPage(_pageMaps_Online);
       }
 
+      // pages can have different heights
       _uiInnerContainer.layout(true, true);
    }
 

@@ -51,8 +51,12 @@ public class Map25ProviderManager {
    private static final String                             ATTR_DESCRIPTION          = "Description";                            //$NON-NLS-1$
    private static final String                             ATTR_IS_DEFAULT           = "IsDefault";                              //$NON-NLS-1$
    private static final String                             ATTR_IS_ENABLED           = "IsEnabled";                              //$NON-NLS-1$
+   private static final String                             ATTR_IS_OFFLINE_MAP       = "IsOfflineMap";                           //$NON-NLS-1$
    private static final String                             ATTR_MAP_PROVIDER_VERSION = "Version";                                //$NON-NLS-1$
+   private static final String                             ATTR_MAP_FILEPATH         = "MapFilepath";                            //$NON-NLS-1$
    private static final String                             ATTR_NAME                 = "Name";                                   //$NON-NLS-1$
+   private static final String                             ATTR_THEME_FILEPATH       = "ThemeFilepath";                          //$NON-NLS-1$
+   private static final String                             ATTR_THEME_STYLE          = "ThemeStyle";                             //$NON-NLS-1$
    private static final String                             ATTR_TILE_PATH            = "TilePath";                               //$NON-NLS-1$
    private static final String                             ATTR_TILE_ENCODING        = "TileEncoding";                           //$NON-NLS-1$
    private static final String                             ATTR_URL                  = "Url";                                    //$NON-NLS-1$
@@ -102,13 +106,13 @@ public class Map25ProviderManager {
       final Map25Provider mapProvider = new Map25Provider();
 
       mapProvider.isEnabled = false;
-      mapProvider.name = "Mapsforge";
-      mapProvider.url = "C:\\Users\\top\\BTSync\\oruxmaps\\mapfiles\\niedersachsen_V5.map";
+      mapProvider.name = "Mapsforge"; //$NON-NLS-1$
+      mapProvider.url = "C:\\Users\\top\\BTSync\\oruxmaps\\mapfiles\\niedersachsen_V5.map"; //$NON-NLS-1$
       mapProvider.tilePath = "C:\\Users\\top\\BTSync\\oruxmaps\\mapstyles\\ELV4\\Elevate.xml"; //$NON-NLS-1$
       mapProvider.tileEncoding = TileEncoding.MF;
       mapProvider.apiKey = "elv-mtb"; //$NON-NLS-1$
-      mapProvider.description = "Mapsforge Offlinemaps, eg. openandromaps.org\n"
-            + "url set to absolut mappath eg c:\\maps\\germany.map\n"
+      mapProvider.description = "Mapsforge Offlinemaps, eg. openandromaps.org\n" //$NON-NLS-1$
+            + "url set to absolut mappath eg c:\\maps\\germany.map\n" //$NON-NLS-1$
             + "tilepath set to absolut themepath eg.: c:\\themes\\Elevate.xml"; //$NON-NLS-1$
 
       return mapProvider;
@@ -222,7 +226,9 @@ public class Map25ProviderManager {
       final File xmlFile = getXmlFile();
 
       if (xmlFile.exists()) {
-         System.out.println("#################### xml exists");
+
+         System.out.println("#################### xml exists"); //$NON-NLS-1$
+
          try (BufferedReader reader = Files.newBufferedReader(Paths.get(xmlFile.toURI()))) {
 
             final XMLMemento xmlRoot = XMLMemento.createReadRoot(reader);
@@ -233,21 +239,34 @@ public class Map25ProviderManager {
 
                   final String xmlUUID = Util.getXmlString(xml, ATTR_UUID, UI.EMPTY_STRING);
 
-                  final Map25Provider mp = new Map25Provider(xmlUUID);
+                  final Map25Provider mapProvider = new Map25Provider(xmlUUID);
 
-                  mp.isDefault = Util.getXmlBoolean(xml, ATTR_IS_DEFAULT, false);
-                  mp.isEnabled = Util.getXmlBoolean(xml, ATTR_IS_ENABLED, false);
+                  mapProvider.isDefault = Util.getXmlBoolean(xml, ATTR_IS_DEFAULT, false);
+                  mapProvider.isEnabled = Util.getXmlBoolean(xml, ATTR_IS_ENABLED, false);
 
-                  mp.apiKey = Util.getXmlString(xml, ATTR_API_KEY, UI.EMPTY_STRING);
-                  mp.description = Util.getXmlString(xml, ATTR_DESCRIPTION, UI.EMPTY_STRING);
-                  mp.name = Util.getXmlString(xml, ATTR_NAME, UI.EMPTY_STRING);
-                  mp.tilePath = Util.getXmlString(xml, ATTR_TILE_PATH, UI.EMPTY_STRING);
-                  mp.url = Util.getXmlString(xml, ATTR_URL, UI.EMPTY_STRING);
+                  mapProvider.name = Util.getXmlString(xml, ATTR_NAME, UI.EMPTY_STRING);
+                  mapProvider.description = Util.getXmlString(xml, ATTR_DESCRIPTION, UI.EMPTY_STRING);
 
-                  mp.tileEncoding = (TileEncoding) Util.getXmlEnum(xml, ATTR_TILE_ENCODING, TileEncoding.VTM);
-                  System.out.println("################## Name, Url and tilePath: " + mp.name + " " + mp.url + mp.tilePath);
+                  mapProvider.isOfflineMap = Util.getXmlBoolean(xml, ATTR_IS_OFFLINE_MAP, false);
 
-                  allMapProvider.add(mp);
+                  if (mapProvider.isOfflineMap) {
+
+                     mapProvider.mapFilepath = Util.getXmlString(xml, ATTR_MAP_FILEPATH, UI.EMPTY_STRING);
+                     mapProvider.themeFilepath = Util.getXmlString(xml, ATTR_THEME_FILEPATH, UI.EMPTY_STRING);
+                     mapProvider.themeStyle = Util.getXmlString(xml, ATTR_THEME_STYLE, UI.EMPTY_STRING);
+
+                  } else {
+
+                     mapProvider.apiKey = Util.getXmlString(xml, ATTR_API_KEY, UI.EMPTY_STRING);
+                     mapProvider.tilePath = Util.getXmlString(xml, ATTR_TILE_PATH, UI.EMPTY_STRING);
+                     mapProvider.url = Util.getXmlString(xml, ATTR_URL, UI.EMPTY_STRING);
+                  }
+
+                  mapProvider.tileEncoding = (TileEncoding) Util.getXmlEnum(xml, ATTR_TILE_ENCODING, TileEncoding.VTM);
+
+                  System.out.println("################## Name, Url and tilePath: " + mapProvider.name + " " + mapProvider.url + mapProvider.tilePath); //$NON-NLS-1$ //$NON-NLS-2$
+
+                  allMapProvider.add(mapProvider);
                }
             }
 
@@ -342,17 +361,31 @@ public class Map25ProviderManager {
 
             final IMemento xml = xmlRoot.createChild(TAG_MAP_PROVIDER);
 
+            final boolean isOfflineMap = mapProvider.isOfflineMap;
+
+            xml.putString(ATTR_UUID, mapProvider.getId().toString());
+
             xml.putBoolean(ATTR_IS_ENABLED, mapProvider.isEnabled);
             xml.putBoolean(ATTR_IS_DEFAULT, mapProvider.isDefault);
 
-            xml.putString(ATTR_API_KEY, mapProvider.apiKey);
-            xml.putString(ATTR_DESCRIPTION, mapProvider.description);
             xml.putString(ATTR_NAME, mapProvider.name);
-            xml.putString(ATTR_TILE_PATH, mapProvider.tilePath);
-            xml.putString(ATTR_URL, mapProvider.url);
-            xml.putString(ATTR_UUID, mapProvider.getId().toString());
+            xml.putString(ATTR_DESCRIPTION, mapProvider.description);
 
             Util.setXmlEnum(xml, ATTR_TILE_ENCODING, mapProvider.tileEncoding);
+            xml.putBoolean(ATTR_IS_OFFLINE_MAP, isOfflineMap);
+
+            if (isOfflineMap) {
+
+               xml.putString(ATTR_MAP_FILEPATH, mapProvider.mapFilepath);
+               xml.putString(ATTR_THEME_FILEPATH, mapProvider.themeFilepath);
+               xml.putString(ATTR_THEME_STYLE, mapProvider.themeStyle);
+
+            } else {
+
+               xml.putString(ATTR_API_KEY, mapProvider.apiKey);
+               xml.putString(ATTR_TILE_PATH, mapProvider.tilePath);
+               xml.putString(ATTR_URL, mapProvider.url);
+            }
          }
 
       } catch (final Exception e) {
