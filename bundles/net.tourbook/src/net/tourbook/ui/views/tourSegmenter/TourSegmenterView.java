@@ -199,11 +199,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private static final String            STATE_SURFING_IS_SHOW_ONLY_SELECTED_SEGMENTS         = "STATE_SURFING_IS_SHOW_ONLY_SELECTED_SEGMENTS";//$NON-NLS-1$
    private static final boolean           STATE_SURFING_IS_SHOW_ONLY_SELECTED_SEGMENTS_DEFAULT = false;
    private static final String            STATE_SURFING_IS_MIN_DISTANCE                        = "STATE_SURFING_IS_MIN_DISTANCE";               //$NON-NLS-1$
-   private static final boolean           STATE_SURFING_IS_MIN_DISTANCE_DEFAULT                = true;
+   private static final boolean           STATE_SURFING_IS_MIN_DISTANCE_DEFAULT                = false;
    private static final String            STATE_SURFING_MIN_SPEED_START_STOP                   = "STATE_SURFING_MIN_SPEED_START_STOP";          //$NON-NLS-1$
-   private static final int               STATE_SURFING_MIN_SPEED_START_STOP_DEFAULT           = 12;
+   private static final int               STATE_SURFING_MIN_SPEED_START_STOP_DEFAULT           = 10;
    private static final String            STATE_SURFING_MIN_SPEED_SURFING                      = "STATE_SURFING_MIN_SPEED_SURFING";             //$NON-NLS-1$
-   private static final int               STATE_SURFING_MIN_SPEED_SURFING_DEFAULT              = 16;
+   private static final int               STATE_SURFING_MIN_SPEED_SURFING_DEFAULT              = 10;
    private static final String            STATE_SURFING_MIN_TIME_DURATION                      = "STATE_SURFING_MIN_TIME_DURATION";             //$NON-NLS-1$
    private static final int               STATE_SURFING_MIN_TIME_DURATION_DEFAULT              = 6;
    private static final String            STATE_SURFING_MIN_DISTANCE                           = "STATE_SURFING_MIN_DISTANCE";                  //$NON-NLS-1$
@@ -2821,11 +2821,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             });
          }
 
-         createUI_66_SurfingActions(container);
+         createUI_66_Surfing_Actions(container);
       }
    }
 
-   private void createUI_66_SurfingActions(final Composite parent) {
+   private void createUI_66_Surfing_Actions(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(false, true).applyTo(container);
