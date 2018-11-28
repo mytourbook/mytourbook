@@ -15,9 +15,11 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Locale;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -51,6 +53,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -61,6 +64,7 @@ import org.eclipse.ui.part.PageBook;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.NIO;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 import net.tourbook.map25.Map25Provider;
@@ -109,8 +113,9 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
    private TableViewer _mapProviderViewer;
    //
    //
-//   private Composite _parent;
+   private Composite _parent;
    private Composite _uiInnerContainer;
+
    private PageBook  _pageBook_OnOffline;
    private Composite _pageMaps_Online;
    private Composite _pageMaps_Offline;
@@ -285,10 +290,9 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
       final Composite layoutContainer = new Composite(parent, SWT.NONE);
       layoutContainer.setLayout(tableLayout);
-      GridDataFactory
-            .fillDefaults() //
+      GridDataFactory.fillDefaults()
             .grab(true, true)
-            .hint(convertWidthInCharsToPixels(70), convertHeightInCharsToPixels(10))
+            .hint(convertWidthInCharsToPixels(100), convertHeightInCharsToPixels(10))
             .applyTo(layoutContainer);
 
       /*
@@ -574,7 +578,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
                   _btnMapFile.addSelectionListener(new SelectionAdapter() {
                      @Override
                      public void widgetSelected(final SelectionEvent e) {
-                        onSelect_File_Map();
+                        onSelect_Filename_Map();
                      }
                   });
                   GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_btnMapFile);
@@ -609,7 +613,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
                   _btnThemeFile.addSelectionListener(new SelectionAdapter() {
                      @Override
                      public void widgetSelected(final SelectionEvent e) {
-                        onSelect_File_Theme();
+                        onSelect_Filename_Theme();
                      }
                   });
                   GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_btnThemeFile);
@@ -932,7 +936,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
    private void initUI(final Composite parent) {
 
-//      _parent = parent;
+      _parent = parent;
    }
 
    /**
@@ -1132,28 +1136,73 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
       _mapProviderViewer.getTable().setFocus();
    }
 
-   private void onSelect_File_Map() {
-      // TODO Auto-generated method stub
+   private void onSelect_Filename_Map() {
 
-//      final DirectoryDialog dialog = new DirectoryDialog(_parent.getShell(), SWT.SAVE);
-//
-//      dialog.setText(Messages.Dialog_ImportConfig_Dialog_BackupFolder_Title);
-//      dialog.setMessage(Messages.Dialog_ImportConfig_Dialog_BackupFolder_Message);
-//      dialog.setFilterPath(filterOSPath);
-//
-//      final String selectedFolder = dialog.open();
-//
-//      if (selectedFolder != null) {
-//
-//         setErrorMessage(null);
-//
-//         _backupHistoryItems.onSelectFolderInDialog(selectedFolder);
-//      }
+      String mapFile_Foldername = null;
+
+      final String userPathname = _txtMapFilepath.getText();
+      final Path mapFilepath = NIO.getPath(userPathname);
+
+      if (mapFilepath != null) {
+
+         final Path mapFile_Folder = mapFilepath.getParent();
+         if (mapFile_Folder != null) {
+
+            mapFile_Foldername = mapFile_Folder.toString();
+         }
+      }
+
+      final FileDialog dialog = new FileDialog(Display.getCurrent().getActiveShell(), SWT.SAVE);
+      dialog.setText(Messages.Pref_Map25_Dialog_MapFilename_Title);
+
+      dialog.setFilterPath(mapFile_Foldername);
+      dialog.setFileName("*." + Map25ProviderManager.MAPSFORGE_MAP_FILE_EXTENTION);//$NON-NLS-1$
+      dialog.setFilterExtensions(new String[] { Map25ProviderManager.MAPSFORGE_MAP_FILE_EXTENTION });
+
+      final String selectedFilepath = dialog.open();
+
+      if (selectedFilepath != null) {
+
+         setErrorMessage(null);
+
+         // update UI
+         _txtMapFilepath.setText(selectedFilepath);
+      }
    }
 
-   private void onSelect_File_Theme() {
-      // TODO Auto-generated method stub
+   private void onSelect_Filename_Theme() {
 
+      String mapStyle_Foldername = null;
+
+      final String userPathname = _txtThemeFilepath.getText();
+      final Path mapStyle_Filepath = NIO.getPath(userPathname);
+
+      if (mapStyle_Filepath != null) {
+
+         final Path mapStyle_Folder = mapStyle_Filepath.getParent();
+         if (mapStyle_Folder != null) {
+
+            mapStyle_Foldername = mapStyle_Folder.toString();
+         }
+      }
+
+      final FileDialog dialog = new FileDialog(Display.getCurrent().getActiveShell(), SWT.SAVE);
+      dialog.setText(Messages.Pref_Map25_Dialog_MapStyleFilename_Title);
+
+      dialog.setFilterPath(mapStyle_Foldername);
+      dialog.setFileName("*." + Map25ProviderManager.MAPSFORGE_STYLE_FILE_EXTENTION);//$NON-NLS-1$
+      dialog.setFilterExtensions(new String[] { Map25ProviderManager.MAPSFORGE_STYLE_FILE_EXTENTION });
+
+      final String selectedFilepath = dialog.open();
+
+      if (selectedFilepath == null) {
+         // dialog is canceled
+      }
+
+      setErrorMessage(null);
+
+      // update UI
+      _txtThemeFilepath.setText(selectedFilepath);
    }
 
    private void onSelect_MapProvider() {
@@ -1179,6 +1228,29 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
       updateUI_TileEncoding();
 
       onProvider_Modify();
+   }
+
+   private void parseThemeStyles() {
+
+      //java.util.List<Item> mf_styles = mf_style_parser.readConfig("C:\\Users\\top\\BTSync\\oruxmaps\\mapstyles\\ELV4\\Elevate.xml");
+
+      final MapsforgeStyleParser mfStyleParser = new MapsforgeStyleParser();
+      final java.util.List<Style> mf_styles = mfStyleParser.readXML(_txtTilePath.getText().trim());
+
+      //System.out.println("####### PrefPageMap25MapsforgeProvider Stylecount: " + mf_styles.size());
+
+      String styles = "Aviable Styles: ";
+
+      for (final Style style : mf_styles) {
+
+         styles += style.getXmlLayer();
+         styles += " (";
+         styles += style.getName(Locale.getDefault().toString());
+         styles += "),";
+         //System.out.println(item.getXmlLayer());
+      }
+      styles += "all";
+      //System.out.println("####### PrefPageMap25MapsforgeProvider isDataValid: " + styles);
    }
 
    @Override

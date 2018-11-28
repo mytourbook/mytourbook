@@ -1418,6 +1418,8 @@ public class Messages extends NLS {
    public static String        Pref_LiveUpdate_Checkbox;
    public static String        Pref_LiveUpdate_Checkbox_Tooltip;
 
+   public static String        Pref_Map25_Dialog_MapFilename_Title;
+   public static String        Pref_Map25_Dialog_MapStyleFilename_Title;
    public static String        Pref_Map25_Encoding_Mapsforge_Offline;
    public static String        Pref_Map25_Encoding_Mapzen;
    public static String        Pref_Map25_Encoding_OpenScienceMap;

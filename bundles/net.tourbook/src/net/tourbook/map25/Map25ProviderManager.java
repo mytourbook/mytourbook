@@ -38,29 +38,32 @@ import de.byteholder.geoclipse.mapprovider.IMapProviderListener;
 
 public class Map25ProviderManager {
 
-   private static final Bundle                             _bundle                   = TourbookPlugin.getDefault().getBundle();
-   private static final IPath                              _stateLocation            = Platform.getStateLocation(_bundle);
+   private static final Bundle                             _bundle                        = TourbookPlugin.getDefault().getBundle();
+   private static final IPath                              _stateLocation                 = Platform.getStateLocation(_bundle);
 
-   private static final String                             MAP_PROVIDER_FILE_NAME    = "map25-provider.xml";                     //$NON-NLS-1$
-   private static final int                                MAP_PROVIDER_VERSION      = 1;
+   private static final String                             MAP_PROVIDER_FILE_NAME         = "map25-provider.xml";                     //$NON-NLS-1$
+   private static final int                                MAP_PROVIDER_VERSION           = 1;
 
-   private static final String                             TAG_ROOT                  = "Map25Providers";                         //$NON-NLS-1$
-   private static final String                             TAG_MAP_PROVIDER          = "MapProvider";                            //$NON-NLS-1$
+   public static final String                              MAPSFORGE_MAP_FILE_EXTENTION   = "map";                                    //$NON-NLS-1$
+   public static final String                              MAPSFORGE_STYLE_FILE_EXTENTION = "xml";                                    //$NON-NLS-1$
 
-   private static final String                             ATTR_API_KEY              = "APIKey";                                 //$NON-NLS-1$
-   private static final String                             ATTR_DESCRIPTION          = "Description";                            //$NON-NLS-1$
-   private static final String                             ATTR_IS_DEFAULT           = "IsDefault";                              //$NON-NLS-1$
-   private static final String                             ATTR_IS_ENABLED           = "IsEnabled";                              //$NON-NLS-1$
-   private static final String                             ATTR_IS_OFFLINE_MAP       = "IsOfflineMap";                           //$NON-NLS-1$
-   private static final String                             ATTR_MAP_PROVIDER_VERSION = "Version";                                //$NON-NLS-1$
-   private static final String                             ATTR_MAP_FILEPATH         = "MapFilepath";                            //$NON-NLS-1$
-   private static final String                             ATTR_NAME                 = "Name";                                   //$NON-NLS-1$
-   private static final String                             ATTR_THEME_FILEPATH       = "ThemeFilepath";                          //$NON-NLS-1$
-   private static final String                             ATTR_THEME_STYLE          = "ThemeStyle";                             //$NON-NLS-1$
-   private static final String                             ATTR_TILE_PATH            = "TilePath";                               //$NON-NLS-1$
-   private static final String                             ATTR_TILE_ENCODING        = "TileEncoding";                           //$NON-NLS-1$
-   private static final String                             ATTR_URL                  = "Url";                                    //$NON-NLS-1$
-   private static final String                             ATTR_UUID                 = "UUID";                                   //$NON-NLS-1$
+   private static final String                             TAG_ROOT                       = "Map25Providers";                         //$NON-NLS-1$
+   private static final String                             TAG_MAP_PROVIDER               = "MapProvider";                            //$NON-NLS-1$
+
+   private static final String                             ATTR_API_KEY                   = "APIKey";                                 //$NON-NLS-1$
+   private static final String                             ATTR_DESCRIPTION               = "Description";                            //$NON-NLS-1$
+   private static final String                             ATTR_IS_DEFAULT                = "IsDefault";                              //$NON-NLS-1$
+   private static final String                             ATTR_IS_ENABLED                = "IsEnabled";                              //$NON-NLS-1$
+   private static final String                             ATTR_IS_OFFLINE_MAP            = "IsOfflineMap";                           //$NON-NLS-1$
+   private static final String                             ATTR_MAP_PROVIDER_VERSION      = "Version";                                //$NON-NLS-1$
+   private static final String                             ATTR_MAP_FILEPATH              = "MapFilepath";                            //$NON-NLS-1$
+   private static final String                             ATTR_NAME                      = "Name";                                   //$NON-NLS-1$
+   private static final String                             ATTR_THEME_FILEPATH            = "ThemeFilepath";                          //$NON-NLS-1$
+   private static final String                             ATTR_THEME_STYLE               = "ThemeStyle";                             //$NON-NLS-1$
+   private static final String                             ATTR_TILE_PATH                 = "TilePath";                               //$NON-NLS-1$
+   private static final String                             ATTR_TILE_ENCODING             = "TileEncoding";                           //$NON-NLS-1$
+   private static final String                             ATTR_URL                       = "Url";                                    //$NON-NLS-1$
+   private static final String                             ATTR_UUID                      = "UUID";                                   //$NON-NLS-1$
 
    private static boolean                                  _isDebugViewVisible;
    private static Map25DebugView                           _map25DebugView;
@@ -70,9 +73,9 @@ public class Map25ProviderManager {
    /**
     * Contains the default default map provider
     */
-   private static Map25Provider                            _defaultMapProvider       = createMapProvider_Default();
+   private static Map25Provider                            _defaultMapProvider            = createMapProvider_Default();
 
-   private static final ListenerList<IMapProviderListener> _mapProviderListeners     = new ListenerList<>(ListenerList.IDENTITY);
+   private static final ListenerList<IMapProviderListener> _mapProviderListeners          = new ListenerList<>(ListenerList.IDENTITY);
 
    public static void addMapProviderListener(final IMapProviderListener listener) {
       _mapProviderListeners.add(listener);
