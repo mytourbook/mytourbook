@@ -1431,12 +1431,12 @@ public class Messages extends NLS {
    public static String        Pref_Map25_Offline_Checkbox_UseDefaultLocation;
    public static String        Pref_Map25_Provider_Checkbox_IsEnabled;
    public static String        Pref_Map25_Provider_Checkbox_IsEnabled_Tooltip;
-   public static String        Pref_Map25_Provider_Column_APIKey;
+   public static String        Pref_Map25_Provider_Column_APIKey_ThemeStyle;
    public static String        Pref_Map25_Provider_Column_Enabled;
    public static String        Pref_Map25_Provider_Column_ProviderName;
    public static String        Pref_Map25_Provider_Column_TileEncoding;
-   public static String        Pref_Map25_Provider_Column_TilePath;
-   public static String        Pref_Map25_Provider_Column_Url;
+   public static String        Pref_Map25_Provider_Column_TilePath_ThemeFilename;
+   public static String        Pref_Map25_Provider_Column_Url_MapFilename;
    public static String        Pref_Map25_Provider_Dialog_ConfirmDeleteMapProvider_Message;
    public static String        Pref_Map25_Provider_Dialog_ConfirmDeleteMapProvider_Title;
    public static String        Pref_Map25_Provider_Dialog_SaveModifiedProvider_Message;

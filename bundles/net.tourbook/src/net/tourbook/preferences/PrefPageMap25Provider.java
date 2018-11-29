@@ -743,7 +743,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
           */
          tvc = new TableViewerColumn(_mapProviderViewer, SWT.LEAD);
          tc = tvc.getColumn();
-         tc.setText(Messages.Pref_Map25_Provider_Column_Url);
+         tc.setText(Messages.Pref_Map25_Provider_Column_Url_MapFilename);
          tvc.setLabelProvider(new CellLabelProvider() {
             @Override
             public void update(final ViewerCell cell) {
@@ -763,7 +763,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
           */
          tvc = new TableViewerColumn(_mapProviderViewer, SWT.LEAD);
          tc = tvc.getColumn();
-         tc.setText(Messages.Pref_Map25_Provider_Column_TilePath);
+         tc.setText(Messages.Pref_Map25_Provider_Column_TilePath_ThemeFilename);
          tvc.setLabelProvider(new CellLabelProvider() {
             @Override
             public void update(final ViewerCell cell) {
@@ -783,7 +783,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
           */
          tvc = new TableViewerColumn(_mapProviderViewer, SWT.LEAD);
          tc = tvc.getColumn();
-         tc.setText(Messages.Pref_Map25_Provider_Column_APIKey);
+         tc.setText(Messages.Pref_Map25_Provider_Column_APIKey_ThemeStyle);
          tvc.setLabelProvider(new CellLabelProvider() {
             @Override
             public void update(final ViewerCell cell) {
@@ -1490,7 +1490,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
       _comboThemeStyle.removeAll();
 
       for (final MapsforgeThemeStyle mapsforgeThemeStyle : mfStyles) {
-         _comboThemeStyle.add(mapsforgeThemeStyle.getName(USER_LOCALE) + " - " + mapsforgeThemeStyle.getXmlLayer());
+         _comboThemeStyle.add(mapsforgeThemeStyle.getName(USER_LOCALE) + UI.DASH_WITH_DOUBLE_SPACE + mapsforgeThemeStyle.getXmlLayer());
       }
 
       _comboThemeStyle.select(0);
