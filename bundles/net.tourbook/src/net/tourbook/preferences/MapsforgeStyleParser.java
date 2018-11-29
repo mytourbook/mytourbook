@@ -4,10 +4,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Generated;
 import javax.xml.stream.XMLEventReader;
@@ -47,9 +45,9 @@ public class MapsforgeStyleParser {
 	 * 
 	 */
 	@SuppressWarnings({ "unchecked", "null" })
-	public List<Style> readXML(String xmlFile) {
+	public List<MapsforgeThemeStyle> readXML(String xmlFile) {
 
-		List<Style> items = new ArrayList<Style>();
+		List<MapsforgeThemeStyle> items = new ArrayList<MapsforgeThemeStyle>();
 		try {
 			// First, create a new XMLInputFactory
 			XMLInputFactory inputFactory = XMLInputFactory.newInstance();
@@ -57,7 +55,7 @@ public class MapsforgeStyleParser {
 			InputStream in = new FileInputStream(xmlFile);
 			XMLEventReader eventReader = inputFactory.createXMLEventReader(in);
 			// read the XML document
-			Style item = null;
+			MapsforgeThemeStyle item = null;
 
 			while (eventReader.hasNext()) {
 				XMLEvent event = eventReader.nextEvent();
@@ -80,7 +78,7 @@ public class MapsforgeStyleParser {
 					// If we have an item(layer) element, we create a new item
 					if (startElement.getName().getLocalPart().equals(XML_LAYER)) {
 						Style = false;
-						item = new Style();
+						item = new MapsforgeThemeStyle();
 						Iterator<Attribute> attributes = startElement.getAttributes();
 						while (attributes.hasNext()) { //in the same line as <layer>
 							Attribute attribute = attributes.next();
@@ -146,79 +144,15 @@ public class MapsforgeStyleParser {
 	 */
 	public static void main(String args[]) {
 		MapsforgeStyleParser mapStyleParser = new MapsforgeStyleParser();
-		List<Style> styles = mapStyleParser.readXML("C:\\Users\\top\\BTSync\\oruxmaps\\mapstyles\\TMS\\Tiramisu_3_0_beta1.xml");
-		//List<Style> styles = mapStyleParser.readXML("C:\\Users\\top\\BTSync\\oruxmaps\\mapstyles\\ELV4\\Elevate.xml");
+		List<MapsforgeThemeStyle> styles = mapStyleParser.readXML("C:\\Users\\top\\BTSync\\oruxmaps\\mapstyles\\TMS\\Tiramisu_3_0_beta1.xml");
+		//List<MapsforgeThemeStyle> styles = mapStyleParser.readXML("C:\\Users\\top\\BTSync\\oruxmaps\\mapstyles\\ELV4\\Elevate.xml");
 		System.out.println("Stylecount: " + styles.size());
 		System.out.println("Defaultlanguage: " + mapStyleParser.getDefaultLanguage());
 		System.out.println("Defaultstyle:    " + mapStyleParser.getDefaultStyle());
 		//System.out.println("Defaultstylename de:" + styles.);
-		for (Style style : styles) {
+		for (MapsforgeThemeStyle style : styles) {
 			System.out.println(style);
 			System.out.println("local Name: " + style.getName(""));
 		}
 	}
-}
-
-/**
- * Bean: Style containes a visible Style
- * @author telemaxx
- *
- */
-class Style {
-	private Map<String, String> name = new HashMap<String, String>();
-   private String xmlLayer;
-   private String defaultlanguage = "de";
-
-   public String getDefaultLaguage() {
-      return defaultlanguage;
-  }
-	public void setDefaultLanguage(String language) {
-      this.defaultlanguage = language;
-  }   
-   /**
-    * get the style name like
-    * @return String containing the stylename like "elv-mtb"
-    */
-   public String getXmlLayer() {
-      return xmlLayer;
-  }
-	public void setXmlLayer(String xmlLayer) {
-      this.xmlLayer = xmlLayer;
-  } 
-	/**
-	 * set the style name with a given language
-	 * @param language
-	 * @param name
-	 */
-   public void setName(String language, String name) {
-   	//System.out.println("setname: " + language + " name: " + name);
-		this.name.put(language, name);
-	}
-   /**
-    * getting a local name of the mapstyle
-    * @param language string like "en"
-    * @return a String with the local name like "hiking"
-    */
-   public String getName(String language) {
-   	if(language.equals("default")){
-   		return name.get(defaultlanguage);
-   	} else
-   	if(name.containsKey(language)){
-   		return name.get(language);
-   	} else {
-   		return name.get(defaultlanguage);
-   	}
-   }
-   /**
-    * getting the name as map with all localizations
-    * @return Map<String language,String name>
-    */
-   public Map<String, String> getName() {
-   	return name;
-   }  
-   
-   @Override
-   public String toString() {
-       return "Item [xmlLAyer=" + xmlLayer + " Name= " + name.get(defaultlanguage) + "]";
-   }
 }

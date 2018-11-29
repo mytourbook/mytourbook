@@ -1458,6 +1458,8 @@ public class Messages extends NLS {
    public static String        Pref_Map25_Provider_Label_TileUrl;
    public static String        Pref_Map25_Provider_Label_Title;
    public static String        Pref_Map25_Provider_Label_Url;
+   public static String        Pref_Map25_Provider_ThemeStyle_Info_InvalidThemeFilename;
+   public static String        Pref_Map25_Provider_ThemeStyle_Info_NotAvailable;
 
    public static String        Pref_MapLayout_Checkbox_BorderColor_Color;
    public static String        Pref_MapLayout_Checkbox_BorderColor_Darker;

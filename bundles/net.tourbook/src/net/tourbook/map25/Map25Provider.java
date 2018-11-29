@@ -15,7 +15,10 @@
  *******************************************************************************/
 package net.tourbook.map25;
 
+import java.util.List;
 import java.util.UUID;
+
+import net.tourbook.preferences.MapsforgeThemeStyle;
 
 import de.byteholder.geoclipse.map.UI;
 
@@ -44,9 +47,15 @@ public class Map25Provider implements Cloneable {
     */
    public String       mapFilepath   = UI.EMPTY_STRING;
    public String       themeFilepath = UI.EMPTY_STRING;
-   public String       themeStyle  = UI.EMPTY_STRING;
+   public String       themeStyle    = UI.EMPTY_STRING;
 
    public TileEncoding tileEncoding  = TileEncoding.MVT;
+
+   /*
+    * Cached theme properties
+    */
+   public String                    cachedThemeFilepath;
+   public List<MapsforgeThemeStyle> cachedThemeStyles;
 
    public Map25Provider() {
 
@@ -117,10 +126,6 @@ public class Map25Provider implements Cloneable {
     */
    public String getId() {
       return _id;
-   }
-
-   public UUID getUuid() {
-      return _uuid;
    }
 
    @Override

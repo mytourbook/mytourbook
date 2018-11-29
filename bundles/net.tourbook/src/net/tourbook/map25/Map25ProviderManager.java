@@ -18,8 +18,10 @@ package net.tourbook.map25;
 import java.io.BufferedReader;
 import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.ListenerList;
@@ -30,9 +32,12 @@ import org.osgi.framework.Bundle;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.NIO;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
+import net.tourbook.preferences.MapsforgeStyleParser;
+import net.tourbook.preferences.MapsforgeThemeStyle;
 
 import de.byteholder.geoclipse.mapprovider.IMapProviderListener;
 
@@ -307,6 +312,29 @@ public class Map25ProviderManager {
       }
 
       return allMapProvider;
+   }
+
+   /**
+    * @param themeFilePathname
+    * @return Returns all styles in the theme file or <code>null</code> when the theme file is not
+    *         available.
+    */
+   public static List<MapsforgeThemeStyle> loadMapsforgeThemeStyles(final String themeFilePathname) {
+
+      if (themeFilePathname == null || themeFilePathname.length() == 0) {
+         return null;
+      }
+
+      final Path themeFilePath = NIO.getPath(themeFilePathname);
+      if (themeFilePath == null) {
+         return null;
+      }
+
+      final MapsforgeStyleParser mfStyleParser = new MapsforgeStyleParser();
+
+      final List<MapsforgeThemeStyle> mfStyles = mfStyleParser.readXML(themeFilePathname);
+
+      return mfStyles;
    }
 
    public static void removeMapProviderListener(final IMapProviderListener listener) {

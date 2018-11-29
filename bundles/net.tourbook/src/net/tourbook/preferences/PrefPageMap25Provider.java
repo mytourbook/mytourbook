@@ -19,6 +19,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Locale;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -52,7 +53,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
@@ -75,6 +75,8 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
    public static final String              ID                               = "net.tourbook.preferences.PrefPage_Map25_Provider"; //$NON-NLS-1$
 
+   private static final String             USER_LOCALE                      = Locale.getDefault().toString();
+
    private static final String             STATE_LAST_SELECTED_MAP_PROVIDER = "STATE_LAST_SELECTED_MAP_PROVIDER";                 //$NON-NLS-1$
 
    /**
@@ -88,7 +90,6 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
    };
 
    private final IDialogSettings           _state                           = TourbookPlugin.getState(ID);
-
    private ArrayList<Map25Provider>        _allMapProvider;
    //
    private ModifyListener                  _defaultModifyListener;
@@ -111,11 +112,9 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
     * UI Controls
     */
    private TableViewer _mapProviderViewer;
-   //
-   //
-   private Composite _parent;
-   private Composite _uiInnerContainer;
 
+   //
+   private Composite _uiInnerContainer;
    private PageBook  _pageBook_OnOffline;
    private Composite _pageMaps_Online;
    private Composite _pageMaps_Offline;
@@ -129,6 +128,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
    //
    private Button    _chkIsMapProviderEnabled;
    //
+   private Combo     _comboThemeStyle;
    private Combo     _comboTileEncoding;
    //
    private Label     _lblAPIKey;
@@ -147,9 +147,9 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
    private Text      _txtMapFilepath;
    private Text      _txtProviderName;
    private Text      _txtThemeFilepath;
-   private Text      _txtThemeStyle;
    private Text      _txtTilePath;
    private Text      _txtTileUrl;
+
    private Text      _txtUrl;
 
 //   private Composite parent;
@@ -629,9 +629,8 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
             _lblThemeStyle.setText(Messages.Pref_Map25_Provider_Label_ThemeStyle);
             _firstColumnControls.add(_lblThemeStyle);
 
-            _txtThemeStyle = new Text(container, SWT.BORDER);
-            _txtThemeStyle.addModifyListener(_defaultModifyListener);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtThemeStyle);
+            _comboThemeStyle = new Combo(container, SWT.READ_ONLY);
+            _comboThemeStyle.addModifyListener(_defaultModifyListener);
          }
       }
 
@@ -865,7 +864,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
       _txtDescription.setEnabled(canEdit);
       _txtMapFilepath.setEnabled(canEdit);
       _txtThemeFilepath.setEnabled(canEdit);
-      _txtThemeStyle.setEnabled(canEdit);
+      _comboThemeStyle.setEnabled(canEdit);
       _txtProviderName.setEnabled(canEdit);
       _txtTilePath.setEnabled(canEdit);
       _txtTileUrl.setEnabled(canEdit);
@@ -936,7 +935,6 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
    private void initUI(final Composite parent) {
 
-      _parent = parent;
    }
 
    /**
@@ -1009,8 +1007,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
    private boolean isSaveMapProvider() {
 
-      return (MessageDialog.openQuestion(
-            Display.getCurrent().getActiveShell(),
+      return (MessageDialog.openQuestion(getShell(),
             Messages.Pref_Map25_Provider_Dialog_SaveModifiedProvider_Title,
             NLS.bind(
                   Messages.Pref_Map25_Provider_Dialog_SaveModifiedProvider_Message,
@@ -1066,7 +1063,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 //		Are you sure to delete the map provider "{0}" and all it's offline images?
 
       if (MessageDialog.openConfirm(
-            Display.getCurrent().getActiveShell(),
+            getShell(),
             Messages.Pref_Map25_Provider_Dialog_ConfirmDeleteMapProvider_Title,
             NLS.bind(
                   Messages.Pref_Map25_Provider_Dialog_ConfirmDeleteMapProvider_Message,
@@ -1119,7 +1116,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
       _isModified = true;
       _isMapProviderModified = true;
 
-      updateUI_Data();
+      updateUI_TileUrl();
 
       enableControls();
    }
@@ -1152,7 +1149,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
          }
       }
 
-      final FileDialog dialog = new FileDialog(Display.getCurrent().getActiveShell(), SWT.SAVE);
+      final FileDialog dialog = new FileDialog(getShell(), SWT.SAVE);
       dialog.setText(Messages.Pref_Map25_Dialog_MapFilename_Title);
 
       dialog.setFilterPath(mapFile_Foldername);
@@ -1186,7 +1183,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
          }
       }
 
-      final FileDialog dialog = new FileDialog(Display.getCurrent().getActiveShell(), SWT.SAVE);
+      final FileDialog dialog = new FileDialog(getShell(), SWT.SAVE);
       dialog.setText(Messages.Pref_Map25_Dialog_MapStyleFilename_Title);
 
       dialog.setFilterPath(mapStyle_Foldername);
@@ -1203,6 +1200,9 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
       // update UI
       _txtThemeFilepath.setText(selectedFilepath);
+
+      // update theme styles
+      updateUI_ThemeStyle(selectedFilepath);
    }
 
    private void onSelect_MapProvider() {
@@ -1228,29 +1228,6 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
       updateUI_TileEncoding();
 
       onProvider_Modify();
-   }
-
-   private void parseThemeStyles() {
-
-      //java.util.List<Item> mf_styles = mf_style_parser.readConfig("C:\\Users\\top\\BTSync\\oruxmaps\\mapstyles\\ELV4\\Elevate.xml");
-
-      final MapsforgeStyleParser mfStyleParser = new MapsforgeStyleParser();
-      final java.util.List<Style> mf_styles = mfStyleParser.readXML(_txtTilePath.getText().trim());
-
-      //System.out.println("####### PrefPageMap25MapsforgeProvider Stylecount: " + mf_styles.size());
-
-      String styles = "Aviable Styles: ";
-
-      for (final Style style : mf_styles) {
-
-         styles += style.getXmlLayer();
-         styles += " (";
-         styles += style.getName(Locale.getDefault().toString());
-         styles += "),";
-         //System.out.println(item.getXmlLayer());
-      }
-      styles += "all";
-      //System.out.println("####### PrefPageMap25MapsforgeProvider isDataValid: " + styles);
    }
 
    @Override
@@ -1287,14 +1264,17 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
       /*
        * select last selected map provider
        */
-      final String lastMapProviderUrl = Util.getStateString(_state, STATE_LAST_SELECTED_MAP_PROVIDER, null);
+      final String lastMapProviderUUID = Util.getStateString(_state, STATE_LAST_SELECTED_MAP_PROVIDER, null);
       Map25Provider lastMapProvider = null;
+
       for (final Map25Provider mapProvider : _allMapProvider) {
-         if (mapProvider.url.equals(lastMapProviderUrl)) {
+
+         if (mapProvider.getId().equals(lastMapProviderUUID)) {
             lastMapProvider = mapProvider;
             break;
          }
       }
+
       if (lastMapProvider != null) {
          _mapProviderViewer.setSelection(new StructuredSelection(lastMapProvider));
       } else if (_allMapProvider.size() > 0) {
@@ -1336,9 +1316,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
       // selected map provider
       if (_selectedMapProvider != null) {
-         _state.put(
-               STATE_LAST_SELECTED_MAP_PROVIDER,
-               _selectedMapProvider.url);
+         _state.put(STATE_LAST_SELECTED_MAP_PROVIDER, _selectedMapProvider.getId());
       }
    }
 
@@ -1390,7 +1368,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
          mapProvider.mapFilepath = _txtMapFilepath.getText();
          mapProvider.themeFilepath = _txtThemeFilepath.getText();
-         mapProvider.themeStyle = _txtThemeStyle.getText();
+         mapProvider.themeStyle = _comboThemeStyle.getText();
 
       } else {
 
@@ -1400,13 +1378,6 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
       }
 
       mapProvider.tileEncoding = selectedEncoding.__encoding;
-   }
-
-   private void updateUI_Data() {
-
-      final String tileUrl = _txtUrl.getText() + _txtTilePath.getText();
-
-      _txtTileUrl.setText(tileUrl);
    }
 
    private void updateUI_FromProvider(final Map25Provider mapProvider) {
@@ -1426,7 +1397,6 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
             _txtMapFilepath.setText(UI.EMPTY_STRING);
             _txtThemeFilepath.setText(UI.EMPTY_STRING);
-            _txtThemeStyle.setText(UI.EMPTY_STRING);
 
          } else {
 
@@ -1443,7 +1413,6 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
                _txtMapFilepath.setText(mapProvider.mapFilepath);
                _txtThemeFilepath.setText(mapProvider.themeFilepath);
-               _txtThemeStyle.setText(mapProvider.themeStyle);
 
             } else {
 
@@ -1453,16 +1422,82 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
                _txtMapFilepath.setText(UI.EMPTY_STRING);
                _txtThemeFilepath.setText(UI.EMPTY_STRING);
-               _txtThemeStyle.setText(UI.EMPTY_STRING);
             }
 
             _comboTileEncoding.select(getEncodingIndex(mapProvider.tileEncoding));
          }
 
          updateUI_TileEncoding();
-         updateUI_Data();
+         updateUI_ThemeStyle(mapProvider == null ? null : mapProvider.themeFilepath);
+         updateUI_TileUrl();
       }
       _isInUpdateUI = false;
+   }
+
+   /**
+    * @param themeFilepath
+    *           Theme file pathname, can be <code>null</code>.
+    */
+   private void updateUI_ThemeStyle(final String themeFilepath) {
+
+      final boolean isInUpdateUI_Backup = _isInUpdateUI;
+      _isInUpdateUI = true;
+
+      if (themeFilepath == null) {
+
+         // a style cannot be displayed
+
+         _comboThemeStyle.removeAll();
+         _comboThemeStyle.add(Messages.Pref_Map25_Provider_ThemeStyle_Info_NotAvailable);
+         _comboThemeStyle.select(0);
+
+         _isInUpdateUI = isInUpdateUI_Backup;
+
+         return;
+      }
+
+      List<MapsforgeThemeStyle> mfStyles = null;
+
+      if (_selectedMapProvider.cachedThemeFilepath == null
+
+            // check if cached name has changed
+            || !_selectedMapProvider.cachedThemeFilepath.equals(themeFilepath)) {
+
+         // styles need to be loaded
+
+         mfStyles = Map25ProviderManager.loadMapsforgeThemeStyles(themeFilepath);
+
+         if (mfStyles == null) {
+
+            _comboThemeStyle.removeAll();
+            _comboThemeStyle.add(Messages.Pref_Map25_Provider_ThemeStyle_Info_InvalidThemeFilename);
+            _comboThemeStyle.select(0);
+
+            _isInUpdateUI = isInUpdateUI_Backup;
+
+            return;
+         }
+
+         // cache theme styles
+         _selectedMapProvider.cachedThemeFilepath = themeFilepath;
+         _selectedMapProvider.cachedThemeStyles = mfStyles;
+
+      } else {
+
+         mfStyles = _selectedMapProvider.cachedThemeStyles;
+      }
+
+      _comboThemeStyle.removeAll();
+
+      for (final MapsforgeThemeStyle mapsforgeThemeStyle : mfStyles) {
+         _comboThemeStyle.add(mapsforgeThemeStyle.getName(USER_LOCALE) + " - " + mapsforgeThemeStyle.getXmlLayer());
+      }
+
+      _comboThemeStyle.select(0);
+
+      _comboThemeStyle.getParent().layout();
+
+      _isInUpdateUI = isInUpdateUI_Backup;
    }
 
    /**
@@ -1480,6 +1515,13 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
       // pages can have different heights
       _uiInnerContainer.layout(true, true);
+   }
+
+   private void updateUI_TileUrl() {
+
+      final String tileUrl = _txtUrl.getText() + _txtTilePath.getText();
+
+      _txtTileUrl.setText(tileUrl);
    }
 
 }
