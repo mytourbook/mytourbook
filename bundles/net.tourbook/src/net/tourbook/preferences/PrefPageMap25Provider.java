@@ -913,6 +913,23 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
       return _allTileEncoding[selectedIndex];
    }
 
+   private String getSelectedThemeStyle(final List<MapsforgeThemeStyle> cachedThemeStyles) {
+
+      if (cachedThemeStyles == null) {
+         return UI.EMPTY_STRING;
+      }
+
+      final int selectedIndex = _comboThemeStyle.getSelectionIndex();
+
+      if (selectedIndex < 0) {
+
+         // return default
+         return cachedThemeStyles.get(0).getXmlLayer();
+      }
+
+      return cachedThemeStyles.get(selectedIndex).getXmlLayer();
+   }
+
    @Override
    public void init(final IWorkbench workbench) {
 
@@ -1202,7 +1219,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
       _txtThemeFilepath.setText(selectedFilepath);
 
       // update theme styles
-      updateUI_ThemeStyle(selectedFilepath);
+      updateUI_ThemeStyle(selectedFilepath, _newProvider != null ? _newProvider : _selectedMapProvider);
    }
 
    private void onSelect_MapProvider() {
@@ -1368,7 +1385,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
          mapProvider.mapFilepath = _txtMapFilepath.getText();
          mapProvider.themeFilepath = _txtThemeFilepath.getText();
-         mapProvider.themeStyle = _comboThemeStyle.getText();
+         mapProvider.themeStyle = getSelectedThemeStyle(mapProvider.cachedThemeStyles);
 
       } else {
 
@@ -1428,7 +1445,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
          }
 
          updateUI_TileEncoding();
-         updateUI_ThemeStyle(mapProvider == null ? null : mapProvider.themeFilepath);
+         updateUI_ThemeStyle(mapProvider == null ? null : mapProvider.themeFilepath, mapProvider);
          updateUI_TileUrl();
       }
       _isInUpdateUI = false;
@@ -1436,68 +1453,111 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
    /**
     * @param themeFilepath
-    *           Theme file pathname, can be <code>null</code>.
+    *           Theme file pathname, can be <code>null</code>
+    * @param mapProvider
+    *           Map provider, can be <code>null</code>
     */
-   private void updateUI_ThemeStyle(final String themeFilepath) {
+   private void updateUI_ThemeStyle(final String themeFilepath, final Map25Provider mapProvider) {
 
       final boolean isInUpdateUI_Backup = _isInUpdateUI;
       _isInUpdateUI = true;
+      {
+         updateUI_ThemeStyle_WithReselect(themeFilepath, mapProvider);
+
+         // adjust combo UI to different content
+         _comboThemeStyle.getParent().layout();
+
+      }
+      _isInUpdateUI = isInUpdateUI_Backup;
+   }
+
+   private void updateUI_ThemeStyle_WithReselect(final String themeFilepath, final Map25Provider mapProvider) {
+
+      _comboThemeStyle.removeAll();
 
       if (themeFilepath == null) {
 
          // a style cannot be displayed
 
-         _comboThemeStyle.removeAll();
          _comboThemeStyle.add(Messages.Pref_Map25_Provider_ThemeStyle_Info_NotAvailable);
          _comboThemeStyle.select(0);
-
-         _isInUpdateUI = isInUpdateUI_Backup;
 
          return;
       }
 
       List<MapsforgeThemeStyle> mfStyles = null;
 
-      if (_selectedMapProvider.cachedThemeFilepath == null
+      if (mapProvider != null) {
 
-            // check if cached name has changed
-            || !_selectedMapProvider.cachedThemeFilepath.equals(themeFilepath)) {
+         if (mapProvider.cachedThemeFilepath == null
 
-         // styles need to be loaded
+               // check if cached name has changed
+               || !mapProvider.cachedThemeFilepath.equals(themeFilepath)) {
 
-         mfStyles = Map25ProviderManager.loadMapsforgeThemeStyles(themeFilepath);
+            // styles needs to be loaded
 
-         if (mfStyles == null) {
+            mfStyles = Map25ProviderManager.loadMapsforgeThemeStyles(themeFilepath);
 
-            _comboThemeStyle.removeAll();
-            _comboThemeStyle.add(Messages.Pref_Map25_Provider_ThemeStyle_Info_InvalidThemeFilename);
-            _comboThemeStyle.select(0);
+            if (mfStyles == null) {
 
-            _isInUpdateUI = isInUpdateUI_Backup;
+               _comboThemeStyle.add(Messages.Pref_Map25_Provider_ThemeStyle_Info_InvalidThemeFilename);
+               _comboThemeStyle.select(0);
 
-            return;
+               return;
+            }
+
+            // cache theme styles
+            mapProvider.cachedThemeFilepath = themeFilepath;
+            mapProvider.cachedThemeStyles = mfStyles;
+
+         } else {
+
+            mfStyles = mapProvider.cachedThemeStyles;
          }
-
-         // cache theme styles
-         _selectedMapProvider.cachedThemeFilepath = themeFilepath;
-         _selectedMapProvider.cachedThemeStyles = mfStyles;
-
-      } else {
-
-         mfStyles = _selectedMapProvider.cachedThemeStyles;
       }
 
-      _comboThemeStyle.removeAll();
+      /*
+       * Fill combo with styles
+       */
+
+      if (mfStyles != null && mfStyles.size() == 0) {
+
+         _comboThemeStyle.add(Messages.Pref_Map25_Provider_ThemeStyle_Info_NoStyles);
+         _comboThemeStyle.select(0);
+
+         return;
+      }
 
       for (final MapsforgeThemeStyle mapsforgeThemeStyle : mfStyles) {
          _comboThemeStyle.add(mapsforgeThemeStyle.getName(USER_LOCALE) + UI.DASH_WITH_DOUBLE_SPACE + mapsforgeThemeStyle.getXmlLayer());
       }
 
-      _comboThemeStyle.select(0);
+      /*
+       * Reselect previous style
+       */
+      String themeStyle = null;
+      if (mapProvider != null) {
+         themeStyle = mapProvider.themeStyle;
+      }
 
-      _comboThemeStyle.getParent().layout();
+      if (themeStyle == null || themeStyle.trim().length() == 0) {
 
-      _isInUpdateUI = isInUpdateUI_Backup;
+         _comboThemeStyle.select(0);
+
+      } else {
+
+         for (int styleIndex = 0; styleIndex < mfStyles.size(); styleIndex++) {
+
+            final MapsforgeThemeStyle mapsforgeThemeStyle = mfStyles.get(styleIndex);
+
+            if (mapsforgeThemeStyle.getXmlLayer().equals(themeStyle)) {
+
+               _comboThemeStyle.select(styleIndex);
+
+               break;
+            }
+         }
+      }
    }
 
    /**
