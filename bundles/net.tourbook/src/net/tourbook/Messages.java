@@ -1888,6 +1888,8 @@ public class Messages extends NLS {
    public static String Slideout_Map25MarkerOptions_Label_SwapColor_Tooltip;
    public static String Slideout_Map25MarkerOptions_Label_Title;
 
+   public static String Slideout_Map25Provider_Label_MapProvider;
+
    public static String Slideout_Map_Bookmark_Label_NumBookmarkListItems;
    public static String Slideout_Map_Bookmark_Label_NumBookmarkListItems_Tooltip;
    public static String Slideout_Map_Bookmark_Label_NumContextMenuItems;
