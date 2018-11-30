@@ -783,10 +783,10 @@ public class PrefPageMap25MapsforgeProvider extends PreferencePage implements IW
 
 			MapsforgeStyleParser mf_style_parser = new MapsforgeStyleParser();
 			//java.util.List<Item> mf_styles = mf_style_parser.readConfig("C:\\Users\\top\\BTSync\\oruxmaps\\mapstyles\\ELV4\\Elevate.xml");
-			java.util.List<Style> mf_styles = mf_style_parser.readXML(_txtTilePath.getText().trim());
+			java.util.List<MapsforgeThemeStyle> mf_styles = mf_style_parser.readXML(_txtTilePath.getText().trim());
 			//System.out.println("####### PrefPageMap25MapsforgeProvider Stylecount: " + mf_styles.size());
 			this._styles ="Aviable Styles: ";
-			for (Style style : mf_styles) {
+			for (MapsforgeThemeStyle style : mf_styles) {
 				this._styles += style.getXmlLayer();
 				this._styles += " (";
 				this._styles += style.getName(Locale.getDefault().toString());

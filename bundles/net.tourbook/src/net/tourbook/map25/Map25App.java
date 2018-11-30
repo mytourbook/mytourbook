@@ -267,11 +267,11 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		_mf_prefered_language = Locale.getDefault().toString();
 
 		//_httpFactory = new OkHttpEngineMT.OkHttpFactoryMT();
-		System.out.println("############# create Layers: Map Name: " +_selectedMapProvider.name);
-		System.out.println("############# create Layers: Map URL:  " +_selectedMapProvider.url);
-		System.out.println("############# create Layers: Map tilepath:  " +_selectedMapProvider.tilePath);
-		System.out.println("############# create Layers: Map encoding: " +_selectedMapProvider.tileEncoding.toString());
-		System.out.println("############# create Layers: prefered language: " + _mf_prefered_language);
+		System.out.println("############# create Layers: Map Name:            " +_selectedMapProvider.name);
+		System.out.println("############# create Layers: Map mapFilepath:     " +_selectedMapProvider.mapFilepath);
+		System.out.println("############# create Layers: Map themeFilepath:   " +_selectedMapProvider.themeFilepath);
+		System.out.println("############# create Layers: Map encoding:        " +_selectedMapProvider.tileEncoding.toString());
+		System.out.println("############# create Layers: prefered language:   " + _mf_prefered_language);
 		
 		if (_selectedMapProvider.tileEncoding  != TileEncoding.MF) { // NOT mapsforge
 			_is_mf_Map = false;
@@ -285,14 +285,14 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		} else {  //mapsforge
 			_is_mf_Map = true;
 			_httpFactory = null;
-			_mf_mapFilePath = checkFile(_selectedMapProvider.url);
+			_mf_mapFilePath = checkFile(_selectedMapProvider.mapFilepath);
 			if (_mf_mapFilePath == null) {
-				throw new IllegalArgumentException("cannot read mapfile: " + _selectedMapProvider.url);
+				throw new IllegalArgumentException("cannot read mapfile: " + _selectedMapProvider.mapFilepath);
 			} else {
 				System.out.println("############# create Layers: Map Path: " + _mf_mapFilePath);
 			}
-			_mf_themeFilePath = checkFile(_selectedMapProvider.tilePath); //check theme path, null when not found
-			_mf_theme_styleID = _selectedMapProvider.apiKey;  // style inside theme eg elv-mtb
+			_mf_themeFilePath = checkFile(_selectedMapProvider.themeFilepath); //check theme path, null when not found
+			_mf_theme_styleID = _selectedMapProvider.themeStyle;  // style inside theme eg elv-mtb
 
 			final MapFileTileSource tileSource = new MapFileTileSource();	
 			tileSource.setMapFile(_mf_mapFilePath);
@@ -310,7 +310,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 					System.out.println("############# create Layers: themeloader done");
 					_l.setRenderTheme(_mf_IRenderTheme);
 					mMap.setTheme(_mf_IRenderTheme);
-					loadTheme(_selectedMapProvider.apiKey);
+					loadTheme(_selectedMapProvider.themeStyle);
 				} else {
 					System.out.println("############# create Layers: mapprovider has the same theme file");
 				}
@@ -667,14 +667,14 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 			System.out.println("############# setMapProvider setMapProvider its mf Map");
 			//_httpFactory = null;
 			final MapFileTileSource tileSource = new MapFileTileSource();
-			System.out.println("############# setMapProvider setMap to " + mapProvider.url);
-			System.out.println("############# setMapProvider setTheme to " + mapProvider.tilePath);
-			System.out.println("############# setMapProvider setStyle to " + mapProvider.apiKey);
-			tileSource.setMapFile(mapProvider.url);
+			System.out.println("############# setMapProvider setMap   to " + mapProvider.mapFilepath);
+			System.out.println("############# setMapProvider setTheme to " + mapProvider.themeFilepath);
+			System.out.println("############# setMapProvider setStyle to " + mapProvider.themeStyle);
+			tileSource.setMapFile(mapProvider.mapFilepath);
 			tileSource.setPreferredLanguage(_mf_prefered_language);
 				
 			_layer_BaseMap.setTileSource(tileSource);
-			_mf_mapFilePath = checkFile(mapProvider.url);
+			_mf_mapFilePath = checkFile(mapProvider.mapFilepath);
 
 /*			mMap.layers().remove(_layer_Building);
 			mMap.layers().remove(_layer_mf_S3DB_Building); // removing both, if switching from one mf to another mf
@@ -686,8 +686,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 			} else {
 				System.out.println("############# setMapProvider Map Path: " + _mf_mapFilePath);
 			}
-			_mf_themeFilePath = checkFile(mapProvider.tilePath);
-			_mf_theme_styleID = mapProvider.apiKey;
+			_mf_themeFilePath = checkFile(mapProvider.themeFilepath);
+			_mf_theme_styleID = mapProvider.themeStyle;
 
 				if (_mf_themeFilePath == null) {
 					System.out.println("############# setMapProvider Theme not found: " + _mf_mapFilePath + " using default OSMARENDER");
@@ -699,7 +699,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 						System.out.println("############# setMapProvider Theme loader done, now activating...");
 						_l.setRenderTheme(_mf_IRenderTheme);
 						////mMap.setTheme(_mf_IRenderTheme);
-						loadTheme(mapProvider.apiKey);  //whene starting with onlinemaps and switching to mf, osmarender is used ??? when uncommented it ok
+						loadTheme(mapProvider.themeStyle);  //whene starting with onlinemaps and switching to mf, osmarender is used ??? when uncommented it ok
 						System.out.println("############# setMapProvider ...activaded");
 					} else {
 						System.out.println("############# setMapProvider mapprovider has the same theme file and style");
@@ -772,15 +772,15 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		
 		mMap.setBaseMap(_layer_BaseMap);
 
-		_mf_mapFilePath = checkFile(_selectedMapProvider.url);
+		_mf_mapFilePath = checkFile(_selectedMapProvider.mapFilepath);
 		if (_mf_mapFilePath == null) {
-			throw new IllegalArgumentException("cannot read mapfile: " + _selectedMapProvider.url);
+			throw new IllegalArgumentException("cannot read mapfile: " + _selectedMapProvider.mapFilepath);
 		} else {
 			System.out.println("########## setupMap: Map Path: " + _mf_mapFilePath);
 		}
 
 		
-		_mf_themeFilePath = checkFile(_selectedMapProvider.tilePath);
+		_mf_themeFilePath = checkFile(_selectedMapProvider.themeFilepath);
 
 		if (_mf_themeFilePath == null) {
 			System.out.println("############# setupMap:  Theme not found: " + _mf_mapFilePath + " using default OSMARENDER");
@@ -788,7 +788,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		} else {
 			_l.setRenderTheme(_mf_IRenderTheme);
 			mMap.setTheme(ThemeLoader.load(_mf_themeFilePath));
-			loadTheme(mapProvider.apiKey);
+			loadTheme(mapProvider.themeStyle);
 		}
 
 		//CanvasAdapter.textScale = _mf_TextScale;		
@@ -827,7 +827,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		 * with this code i got always good S3DB, but online buildings did not look good
 		 * i have also to check if the layers becomes more, if i switch the mapprovider
 		 */
-/*		// Buildings or S3DB  Block I
+		// Buildings or S3DB  Block I
 		_layer_mf_S3DB_Building = new S3DBLayer(mMap,_layer_BaseMap);  //this is working for mf, onlinemaps missing 2 walls and roof
 		//_layer_mf_S3DB_Building = new S3DBLayer(mMap,l);  //private S3DBLayer	_layer_mf_S3DB_Building; //is working, but S3DB only once after programm start
 		_layer_Building = new BuildingLayer(mMap, _layer_BaseMap);
@@ -835,7 +835,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 			// S3DB
 			_layer_mf_S3DB_Building.setEnabled(true);
 			System.out.println("############ setupMap layer: adding S3DBlayer ");
-			l.setRenderTheme(_mf_IRenderTheme);
+			_l.setRenderTheme(_mf_IRenderTheme);
 			layers.remove(_layer_Building);
 			layers.add(_layer_mf_S3DB_Building);
 		} else {
@@ -844,27 +844,27 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 			System.out.println("############ setupMap layer: adding Building Layer ");
 			layers.remove(_layer_mf_S3DB_Building);
 			layers.add(_layer_Building);
-		}*/
-		
-		// building Block II
-		_layer_Building = new BuildingLayer(mMap, _layer_BaseMap);
-		//if(!_is_mf_Map) {
-			_layer_Building.setEnabled(false);
-		//	layers.remove(_layer_mf_S3DB_Building);
-			layers.add(_layer_Building);
-		//}
-		
-		// S3DB Block II
-		_layer_mf_S3DB_Building = new S3DBLayer(mMap,_l);
-		//_layer_mf_S3DB_Building = new S3DBLayer(mMap,_layer_BaseMap);
-		if(_is_mf_Map) {
-			//_layer_mf_S3DB = new S3DBLayer(mMap,_mf_VectorTileLayer_S3DB);
-			_layer_mf_S3DB_Building.setEnabled(true);
-			System.out.println("############ setupMaplayer: adding S3DBlayer ");
-			//_mf_VectorTileLayer_S3DB.setRenderTheme(_mf_IRenderTheme);
-			//layers.remove(_layer_Building);
-			layers.add(_layer_mf_S3DB_Building);
 		}
+		
+//		// building Block II
+//		_layer_Building = new BuildingLayer(mMap, _layer_BaseMap);
+//		//if(!_is_mf_Map) {
+//			_layer_Building.setEnabled(false);
+//		//	layers.remove(_layer_mf_S3DB_Building);
+//			layers.add(_layer_Building);
+//		//}
+//		
+//		// S3DB Block II
+//		_layer_mf_S3DB_Building = new S3DBLayer(mMap,_l);
+//		//_layer_mf_S3DB_Building = new S3DBLayer(mMap,_layer_BaseMap);
+//		if(_is_mf_Map) {
+//			//_layer_mf_S3DB = new S3DBLayer(mMap,_mf_VectorTileLayer_S3DB);
+//			_layer_mf_S3DB_Building.setEnabled(true);
+//			System.out.println("############ setupMaplayer: adding S3DBlayer ");
+//			//_mf_VectorTileLayer_S3DB.setRenderTheme(_mf_IRenderTheme);
+//			//layers.remove(_layer_Building);
+//			layers.add(_layer_mf_S3DB_Building);
+//		}
 		
 		// label
 		_layer_Label = new LabelLayerMT(mMap, _layer_BaseMap);

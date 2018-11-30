@@ -27,7 +27,7 @@ public class SuuntoJsonProcessor {
 	final IPreferenceStore			_prefStore			= TourbookPlugin.getDefault().getPreferenceStore();
 
 	public static final String		TAG_SAMPLES			= "Samples";													//$NON-NLS-1$
-	private static final String	TAG_SAMPLE			= "Sample";														//$NON-NLS-1$
+	public static final String		TAG_SAMPLE			= "Sample";														//$NON-NLS-1$
 	public static final String		TAG_TIMEISO8601	= "TimeISO8601";												//$NON-NLS-1$
 	public static final String		TAG_ATTRIBUTES		= "Attributes";												//$NON-NLS-1$
 	public static final String		TAG_SOURCE			= "Source";														//$NON-NLS-1$
@@ -35,16 +35,16 @@ public class SuuntoJsonProcessor {
 	private static final String	TAG_LAP				= "Lap";															//$NON-NLS-1$
 	private static final String	TAG_MANUAL			= "Manual";														//$NON-NLS-1$
 	private static final String	TAG_DISTANCE		= "Distance";													//$NON-NLS-1$
-	private static final String	TAG_GPSALTITUDE	= "GPSAltitude";												//$NON-NLS-1$
-	private static final String	TAG_LATITUDE		= "Latitude";													//$NON-NLS-1$
-	private static final String	TAG_LONGITUDE		= "Longitude";													//$NON-NLS-1$
+	public static final String		TAG_GPSALTITUDE	= "GPSAltitude";												//$NON-NLS-1$
+	public static final String		TAG_LATITUDE		= "Latitude";													//$NON-NLS-1$
+	public static final String		TAG_LONGITUDE		= "Longitude";													//$NON-NLS-1$
 	private static final String	TAG_TYPE				= "Start";														//$NON-NLS-1$
 	private static final String	TAG_START			= "Type";														//$NON-NLS-1$
 	private static final String	TAG_PAUSE			= "Pause";														//$NON-NLS-1$
 	private static final String	TAG_HR				= "HR";															//$NON-NLS-1$
 	private static final String	TAG_SPEED			= "Speed";														//$NON-NLS-1$
 	private static final String	TAG_CADENCE			= "Cadence";													//$NON-NLS-1$
-	private static final String	TAG_ALTITUDE		= "Altitude";													//$NON-NLS-1$
+	public static final String		TAG_ALTITUDE		= "Altitude";													//$NON-NLS-1$
 	private static final String	TAG_POWER			= "Power";														//$NON-NLS-1$
 	private static final String	TAG_TEMPERATURE	= "Temperature";												//$NON-NLS-1$
 
@@ -79,6 +79,8 @@ public class SuuntoJsonProcessor {
 
 		if (tourData == null)
 			return null;
+
+		boolean isIndoorTour = !jsonFileContent.contains(TAG_GPSALTITUDE);
 
 		boolean isPaused = false;
 
@@ -173,7 +175,8 @@ public class SuuntoJsonProcessor {
 			wasDataPopulated |= TryAddCadenceData(new JSONObject(currentSampleData), timeData);
 
 			// Barometric Altitude
-			if (_prefStore.getInt(IPreferences.ALTITUDE_DATA_SOURCE) == 1) {
+			if (_prefStore.getInt(IPreferences.ALTITUDE_DATA_SOURCE) == 1 ||
+					isIndoorTour) {
 				wasDataPopulated |= TryAddAltitudeData(new JSONObject(currentSampleData), timeData);
 			}
 
@@ -181,7 +184,8 @@ public class SuuntoJsonProcessor {
 			wasDataPopulated |= TryAddPowerData(new JSONObject(currentSampleData), timeData);
 
 			// Distance
-			if (_prefStore.getInt(IPreferences.DISTANCE_DATA_SOURCE) == 1) {
+			if (_prefStore.getInt(IPreferences.DISTANCE_DATA_SOURCE) == 1 ||
+					isIndoorTour) {
 				wasDataPopulated |= TryAddDistanceData(new JSONObject(currentSampleData), timeData);
 			}
 
@@ -192,11 +196,17 @@ public class SuuntoJsonProcessor {
 				_sampleList.add(timeData);
 		}
 
-		// removing the entries that don't have GPS data
+		// Cleaning-up the processed entries as there should only be entries
+		// every x seconds, no entries should be in between (entries with milliseconds).
 		Iterator<TimeData> sampleListIterator = _sampleList.iterator();
 		while (sampleListIterator.hasNext()) {
 			TimeData currentTimeData = sampleListIterator.next();
-			if (currentTimeData.longitude == Double.MIN_VALUE && currentTimeData.latitude == Double.MIN_VALUE)
+
+			// Removing the entries that don't have GPS data
+			// In the case where the activity is an indoor tour,
+			// we remove the entries that don't have altitude data
+			if ((!isIndoorTour && currentTimeData.longitude == Double.MIN_VALUE && currentTimeData.latitude == Double.MIN_VALUE) ||
+					(isIndoorTour && currentTimeData.absoluteAltitude == Float.MIN_VALUE))
 				sampleListIterator.remove();
 		}
 

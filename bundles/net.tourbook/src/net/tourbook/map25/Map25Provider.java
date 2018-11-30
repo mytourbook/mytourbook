@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,120 +15,153 @@
  *******************************************************************************/
 package net.tourbook.map25;
 
+import java.util.List;
 import java.util.UUID;
+
+import net.tourbook.preferences.MapsforgeThemeStyle;
 
 import de.byteholder.geoclipse.map.UI;
 
 public class Map25Provider implements Cloneable {
 
-	private String		_id;
-	private UUID		_uuid;
+   private String _id;
+   private UUID   _uuid;
 
-	public boolean		isEnabled;
-	public boolean		isDefault;
+   public boolean isEnabled;
+   public boolean isDefault;
 
-	public String		name			= UI.EMPTY_STRING;
-	public String		description		= UI.EMPTY_STRING;
+   public boolean isOfflineMap;
 
-	public String		url				= UI.EMPTY_STRING;
-	public String		tilePath		= UI.EMPTY_STRING;
+   public String  name        = UI.EMPTY_STRING;
+   public String  description = UI.EMPTY_STRING;
 
-	public String		apiKey			= UI.EMPTY_STRING;
+   /*
+    * Online map provider
+    */
+   public String url      = UI.EMPTY_STRING;
+   public String tilePath = UI.EMPTY_STRING;
+   public String apiKey   = UI.EMPTY_STRING;
 
-	public TileEncoding	tileEncoding	= TileEncoding.MVT;
+   /*
+    * Offline map provider
+    */
+   public String       mapFilepath   = UI.EMPTY_STRING;
+   public String       themeFilepath = UI.EMPTY_STRING;
+   public String       themeStyle    = UI.EMPTY_STRING;
 
-	public Map25Provider() {
+   public TileEncoding tileEncoding  = TileEncoding.MVT;
 
-		_uuid = UUID.randomUUID();
-		_id = _uuid.toString();
-	}
+   /*
+    * Cached theme properties
+    */
+   public String                    cachedThemeFilepath;
+   public List<MapsforgeThemeStyle> cachedThemeStyles;
 
-	/**
-	 * @param notCheckedUUID
-	 *            Contains a UUID string but it can be invalid.
-	 */
-	public Map25Provider(final String notCheckedUUID) {
+   public Map25Provider() {
 
-		UUID uuid;
-		try {
-			uuid = UUID.fromString(notCheckedUUID);
-		} catch (final Exception e) {
-			uuid = UUID.randomUUID();
-		}
+      _uuid = UUID.randomUUID();
+      _id = _uuid.toString();
+   }
 
-		_uuid = uuid;
-		_id = _uuid.toString();
-	}
+   /**
+    * @param notCheckedUUID
+    *           Contains a UUID string but it can be invalid.
+    */
+   public Map25Provider(final String notCheckedUUID) {
 
-	@Override
-	public Object clone() {
+      UUID uuid;
+      try {
+         uuid = UUID.fromString(notCheckedUUID);
+      } catch (final Exception e) {
+         uuid = UUID.randomUUID();
+      }
 
-		try {
+      _uuid = uuid;
+      _id = _uuid.toString();
+   }
 
-			final Map25Provider clonedProvider = (Map25Provider) super.clone();
+   @Override
+   public Object clone() {
 
-			return clonedProvider;
+      try {
 
-		} catch (final CloneNotSupportedException e) {
+         final Map25Provider clonedProvider = (Map25Provider) super.clone();
 
-			// this shouldn't happen, since we are Cloneable
-			throw new InternalError(e);
-		}
-	}
+         return clonedProvider;
 
-	@Override
-	public boolean equals(final Object obj) {
+      } catch (final CloneNotSupportedException e) {
 
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
+         // this shouldn't happen, since we are Cloneable
+         throw new InternalError(e);
+      }
+   }
 
-		final Map25Provider other = (Map25Provider) obj;
-		if (_uuid == null) {
-			if (other._uuid != null) {
-				return false;
-			}
-		} else if (!_uuid.equals(other._uuid)) {
-			return false;
-		}
+   @Override
+   public boolean equals(final Object obj) {
 
-		return true;
-	}
+      if (this == obj) {
+         return true;
+      }
+      if (obj == null) {
+         return false;
+      }
+      if (getClass() != obj.getClass()) {
+         return false;
+      }
 
-	/**
-	 * @return Returns the map provider {@link UUID} as string.
-	 */
-	public String getId() {
-		return _id;
-	}
+      final Map25Provider other = (Map25Provider) obj;
+      if (_uuid == null) {
+         if (other._uuid != null) {
+            return false;
+         }
+      } else if (!_uuid.equals(other._uuid)) {
+         return false;
+      }
 
-	public UUID getUuid() {
-		return _uuid;
-	}
+      return true;
+   }
 
-	@Override
-	public int hashCode() {
+   /**
+    * @return Returns the map provider {@link UUID} as string.
+    */
+   public String getId() {
+      return _id;
+   }
 
-		return _uuid.hashCode();
-	}
+   @Override
+   public int hashCode() {
 
-	@Override
-	public String toString() {
-		return "Map25Provider [" //$NON-NLS-1$
-//				+ "id=" + id + ", "
-				+ "name=" + name + ", " //$NON-NLS-1$ //$NON-NLS-2$
-				//				+ "description=" + description + ", "
-				//				+ "offlineFolder=" + offlineFolder + ", "
-				//				+ "url=" + url + ", "
-				//				+ "tilePath=" + tilePath + ", "
-				//				+ "apiKey=" + apiKey
-				+ "]"; //$NON-NLS-1$
-	}
+      return _uuid.hashCode();
+   }
+
+   @Override
+   public String toString() {
+
+      return
+
+      getClass().getName() + "\n" //$NON-NLS-1$
+
+            + "_id            = " + _id + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "_uuid          = " + _uuid + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "isEnabled      = " + isEnabled + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "isDefault      = " + isDefault + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "name           = " + name + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "description    = " + description + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "isOfflineMap   = " + isOfflineMap + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "tileEncoding   = " + tileEncoding + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "url            = " + url + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "tilePath       = " + tilePath + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "apiKey         = " + apiKey + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "mapFilepath    = " + mapFilepath + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "themeFilepath  = " + themeFilepath + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "themeStyle     = " + themeStyle + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+
+      ;
+   }
 
 }

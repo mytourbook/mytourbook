@@ -1,31 +1,26 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.preferences;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
-import net.tourbook.common.util.Util;
-import net.tourbook.map25.Map25Provider;
-import net.tourbook.map25.Map25ProviderManager;
-import net.tourbook.map25.TileEncoding;
+import java.util.List;
+import java.util.Locale;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -58,568 +53,753 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.ui.part.PageBook;
+
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.NIO;
+import net.tourbook.common.UI;
+import net.tourbook.common.util.Util;
+import net.tourbook.map25.Map25Provider;
+import net.tourbook.map25.Map25ProviderManager;
+import net.tourbook.map25.TileEncoding;
 
 public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchPreferencePage {
 
-// SET_FORMATTING_OFF
+   public static final String              ID                               = "net.tourbook.preferences.PrefPage_Map25_Provider"; //$NON-NLS-1$
 
-	public static final String				ID									= "net.tourbook.preferences.PrefPage_Map25_Provider";		//$NON-NLS-1$
+   private static final String             USER_LOCALE                      = Locale.getDefault().toString();
 
-	private static final String				STATE_LAST_SELECTED_MAP_PROVIDER	= "STATE_LAST_SELECTED_MAP_PROVIDER";					//$NON-NLS-1$
-	
-	private static final TileEncodingData[] _allTileEncoding					= new TileEncodingData[] {
+   private static final String             STATE_LAST_SELECTED_MAP_PROVIDER = "STATE_LAST_SELECTED_MAP_PROVIDER";                 //$NON-NLS-1$
 
-		new TileEncodingData(TileEncoding.MVT, Messages.Pref_Map25_Encoding_Mapzen),
-		new TileEncodingData(TileEncoding.VTM, Messages.Pref_Map25_Encoding_OpenScienceMap),
-		new TileEncodingData(TileEncoding.MF, "local Mapsforgefile")
-	};
+   /**
+    * First encoding is the default.
+    */
+   private static final TileEncodingData[] _allTileEncoding                 = new TileEncodingData[] {
 
-	
-// SET_FORMATTING_ON
+         new TileEncodingData(TileEncoding.VTM, Messages.Pref_Map25_Encoding_OpenScienceMap, false),
+         new TileEncodingData(TileEncoding.MVT, Messages.Pref_Map25_Encoding_Mapzen, false),
+         new TileEncodingData(TileEncoding.MF, Messages.Pref_Map25_Encoding_Mapsforge_Offline, true)
+   };
 
-	private final IDialogSettings			_state								= TourbookPlugin.getState(ID);
+   private final IDialogSettings           _state                           = TourbookPlugin.getState(ID);
+   private ArrayList<Map25Provider>        _allMapProvider;
+   //
+   private ModifyListener                  _defaultModifyListener;
+   private SelectionListener               _defaultSelectionListener;
+   //
+   private Map25Provider                   _newProvider;
+   private Map25Provider                   _selectedMapProvider;
+   //
+   private boolean                         _isModified;
+   private boolean                         _isMapProviderModified;
+   private boolean                         _isInUpdateUI;
+   //
+   /**
+    * Contains the controls which are displayed in the first column, these controls are used to get
+    * the maximum width and set the first column within the differenct section to the same width
+    */
+   private final ArrayList<Control>        _firstColumnControls             = new ArrayList<>();
+   //
+   /*
+    * UI Controls
+    */
+   private TableViewer _mapProviderViewer;
 
-	private ArrayList<Map25Provider>		_allMapProvider;
-	//
-	private ModifyListener					_defaultModifyListener;
-	private SelectionListener				_defaultSelectionListener;
-	//
-	private Map25Provider					_newProvider;
-	private Map25Provider					_selectedMapProvider;
-	//
-	private boolean							_isModified;
-	private boolean							_isMapProviderModified;
-	private boolean							_isInUpdateUI;
-	//
-	/*
-	 * UI Controls
-	 */
-	private TableViewer						_mapProviderViewer;
-	//
-	private Button							_chkIsEnabled;
-	//
-	private Button							_btnAddProvider;
-	private Button							_btnCancel;
-	private Button							_btnDeleteProvider;
-	private Button							_btnUpdateProvider;
-	//
-	private Text							_txtAPIKey;
-	private Text							_txtDescription;
-	private Text							_txtProviderName;
-	private Text							_txtTilePath;
-	private Text							_txtTileUrl;
-	private Text							_txtUrl;
-	//
-	private Combo							_comboTileEncoding;
+   //
+   private Composite _uiInnerContainer;
+   private PageBook  _pageBook_OnOffline;
+   private Composite _pageMaps_Online;
+   private Composite _pageMaps_Offline;
+   //
+   private Button    _btnAddProvider;
+   private Button    _btnCancel;
+   private Button    _btnDeleteProvider;
+   private Button    _btnMapFile;
+   private Button    _btnThemeFile;
+   private Button    _btnUpdateProvider;
+   //
+   private Button    _chkIsMapProviderEnabled;
+   //
+   private Combo     _comboThemeStyle;
+   private Combo     _comboTileEncoding;
+   //
+   private Label     _lblAPIKey;
+   private Label     _lblDescription;
+   private Label     _lblMapFilepath;
+   private Label     _lblProviderName;
+   private Label     _lblThemeFilepath;
+   private Label     _lblThemeStyle;
+   private Label     _lblTileEncoding;
+   private Label     _lblTilePath;
+   private Label     _lblTileUrl;
+   private Label     _lblUrl;
+   //
+   private Text      _txtAPIKey;
+   private Text      _txtDescription;
+   private Text      _txtMapFilepath;
+   private Text      _txtProviderName;
+   private Text      _txtThemeFilepath;
+   private Text      _txtTilePath;
+   private Text      _txtTileUrl;
 
-	private class MapProvider_ContentProvider implements IStructuredContentProvider {
+   private Text      _txtUrl;
 
-		public MapProvider_ContentProvider() {}
+//   private Composite parent;
 
-		@Override
-		public void dispose() {}
+   private class MapProvider_ContentProvider implements IStructuredContentProvider {
 
-		@Override
-		public Object[] getElements(final Object parent) {
-			return _allMapProvider.toArray(new Map25Provider[_allMapProvider.size()]);
-		}
+      public MapProvider_ContentProvider() {}
 
-		@Override
-		public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {
+      @Override
+      public void dispose() {}
 
-		}
-	}
+      @Override
+      public Object[] getElements(final Object parent) {
+         return _allMapProvider.toArray(new Map25Provider[_allMapProvider.size()]);
+      }
 
-	public static class TileEncodingData {
+      @Override
+      public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {
 
-		private TileEncoding	__encoding;
-		private String			__text;
+      }
+   }
 
-		public TileEncodingData(final TileEncoding encoding, final String text) {
-			__encoding = encoding;
-			__text = text;
-		}
-	}
+   public static class TileEncodingData {
 
-	private void addPrefListener() {
-		// TODO Auto-generated method stub
+      private TileEncoding __encoding;
+      private String       __text;
+      private boolean      __isOffline;
 
-	}
+      public TileEncodingData(final TileEncoding encoding, final String text, final boolean isOffline) {
 
-	@Override
-	protected Control createContents(final Composite parent) {
+         __encoding = encoding;
+         __text = text;
+         __isOffline = isOffline;
+      }
+   }
 
-		initUI(parent);
+   private void addPrefListener() {
+      // TODO Auto-generated method stub
 
-		final Composite container = createUI(parent);
+   }
 
-		// update viewer
-		_allMapProvider = createMapProviderClone();
-		_mapProviderViewer.setInput(new Object());
+   @Override
+   protected Control createContents(final Composite parent) {
 
-		// reselect previous map provider
-		restoreState();
+      initUI(parent);
 
-		enableControls();
-		addPrefListener();
+      final Composite container = createUI(parent);
 
-		return container;
-	}
+      // update viewer
+      _allMapProvider = createMapProviderClone();
+      _mapProviderViewer.setInput(new Object());
 
-	private ArrayList<Map25Provider> createMapProviderClone() {
+      // reselect previous map provider
+      restoreState();
 
-		/*
-		 * Clone original data
-		 */
-		final ArrayList<Map25Provider> clonedMapProvider = new ArrayList<>();
+      enableControls();
+      addPrefListener();
 
-		for (final Map25Provider mapProvider : Map25ProviderManager.getAllMapProviders()) {
-			clonedMapProvider.add((Map25Provider) mapProvider.clone());
-		}
+      return container;
+   }
 
-		/*
-		 * Sort by name
-		 */
-		Collections.sort(clonedMapProvider, new Comparator<Map25Provider>() {
+   private ArrayList<Map25Provider> createMapProviderClone() {
 
-			@Override
-			public int compare(final Map25Provider mp1, final Map25Provider mp2) {
-				return mp1.name.compareTo(mp2.name);
-			}
-		});
+      /*
+       * Clone original data
+       */
+      final ArrayList<Map25Provider> clonedMapProvider = new ArrayList<>();
 
-		return clonedMapProvider;
-	}
+      for (final Map25Provider mapProvider : Map25ProviderManager.getAllMapProviders()) {
+         clonedMapProvider.add((Map25Provider) mapProvider.clone());
+      }
 
-	private Composite createUI(final Composite parent) {
+      /*
+       * Sort by name
+       */
+      Collections.sort(clonedMapProvider, new Comparator<Map25Provider>() {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory
-				.fillDefaults()//
-				//				.grab(true, true)
-				.applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-		{
+         @Override
+         public int compare(final Map25Provider mp1, final Map25Provider mp2) {
+            return mp1.name.compareTo(mp2.name);
+         }
+      });
 
-			final Label label = new Label(container, SWT.WRAP);
-			label.setText(Messages.Pref_Map25_Provider_Label_Title);
+      return clonedMapProvider;
+   }
 
-			final Composite innerContainer = new Composite(container, SWT.NONE);
-			GridDataFactory
-					.fillDefaults()//
-					.grab(true, true)
-					.applyTo(innerContainer);
-			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(innerContainer);
-			{
-				createUI_10_Provider_Viewer(innerContainer);
-				createUI_20_Provider_Actions(innerContainer);
+   private Composite createUI(final Composite parent) {
 
-				createUI_30_Details(innerContainer);
-				createUI_40_Details_Actions(innerContainer);
-			}
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory
+            .fillDefaults()//
+            //				.grab(true, true)
+            .applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      {
 
-			// placeholder
-			new Label(container, SWT.NONE);
-		}
+         final Label label = new Label(container, SWT.WRAP);
+         label.setText(Messages.Pref_Map25_Provider_Label_Title);
 
-		return container;
-	}
+         _uiInnerContainer = new Composite(container, SWT.NONE);
+         GridDataFactory
+               .fillDefaults()//
+               .grab(true, true)
+               .applyTo(_uiInnerContainer);
+         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(_uiInnerContainer);
+         {
+            createUI_10_Provider_Viewer(_uiInnerContainer);
+            createUI_20_Provider_Actions(_uiInnerContainer);
 
-	private void createUI_10_Provider_Viewer(final Composite parent) {
+            createUI_30_Details(_uiInnerContainer);
+            createUI_90_Details_Actions(_uiInnerContainer);
+         }
 
-		final TableColumnLayout tableLayout = new TableColumnLayout();
+         // placeholder
+         new Label(container, SWT.NONE);
+      }
 
-		final Composite layoutContainer = new Composite(parent, SWT.NONE);
-		layoutContainer.setLayout(tableLayout);
-		GridDataFactory
-				.fillDefaults() //
-				.grab(true, true)
-				.hint(convertWidthInCharsToPixels(70), convertHeightInCharsToPixels(10))
-				.applyTo(layoutContainer);
+      // with e4 the layouts are not yet set -> NPE's -> run async which worked
+      parent.getShell().getDisplay().asyncExec(new Runnable() {
+         @Override
+         public void run() {
 
-		/*
-		 * create table
-		 */
-		final Table table = new Table(
-				layoutContainer,
-				(SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION));
+            // compute width for all controls and equalize column width for the different sections
+            container.layout(true, true);
+            UI.setEqualizeColumWidths(_firstColumnControls);
 
-		table.setHeaderVisible(true);
+            // this must be layouted otherwise the initial layout is not as is should be
+            container.layout(true, true);
+         }
+      });
 
-		_mapProviderViewer = new TableViewer(table);
-		defineAllColumns(tableLayout);
+      return container;
+   }
 
-		_mapProviderViewer.setUseHashlookup(true);
-		_mapProviderViewer.setContentProvider(new MapProvider_ContentProvider());
+   private void createUI_10_Provider_Viewer(final Composite parent) {
 
-		_mapProviderViewer.setComparator(new ViewerComparator() {
-			@Override
-			public int compare(final Viewer viewer, final Object e1, final Object e2) {
+      final TableColumnLayout tableLayout = new TableColumnLayout();
 
-				// compare by name
+      final Composite layoutContainer = new Composite(parent, SWT.NONE);
+      layoutContainer.setLayout(tableLayout);
+      GridDataFactory.fillDefaults()
+            .grab(true, true)
+            .hint(convertWidthInCharsToPixels(100), convertHeightInCharsToPixels(10))
+            .applyTo(layoutContainer);
 
-				final Map25Provider p1 = (Map25Provider) e1;
-				final Map25Provider p2 = (Map25Provider) e2;
+      /*
+       * create table
+       */
+      final Table table = new Table(
+            layoutContainer,
+            (SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION));
 
-				return p1.name.compareTo(p2.name);
-			}
-		});
+      table.setHeaderVisible(true);
 
-		_mapProviderViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			@Override
-			public void selectionChanged(final SelectionChangedEvent event) {
-				onProvider_Select();
-			}
-		});
+      _mapProviderViewer = new TableViewer(table);
+      defineAllColumns(tableLayout);
 
-		_mapProviderViewer.addDoubleClickListener(new IDoubleClickListener() {
-			@Override
-			public void doubleClick(final DoubleClickEvent event) {
+      _mapProviderViewer.setUseHashlookup(true);
+      _mapProviderViewer.setContentProvider(new MapProvider_ContentProvider());
 
-				_txtProviderName.setFocus();
-				_txtProviderName.selectAll();
-			}
-		});
+      _mapProviderViewer.setComparator(new ViewerComparator() {
+         @Override
+         public int compare(final Viewer viewer, final Object e1, final Object e2) {
 
-	}
+            // compare by name
 
-	private void createUI_20_Provider_Actions(final Composite parent) {
+            final Map25Provider p1 = (Map25Provider) e1;
+            final Map25Provider p2 = (Map25Provider) e2;
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory
-				.fillDefaults()//
-				//				.grab(false, true)
-				.applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+            return p1.name.compareTo(p2.name);
+         }
+      });
+
+      _mapProviderViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+         @Override
+         public void selectionChanged(final SelectionChangedEvent event) {
+            onSelect_MapProvider();
+         }
+      });
+
+      _mapProviderViewer.addDoubleClickListener(new IDoubleClickListener() {
+         @Override
+         public void doubleClick(final DoubleClickEvent event) {
+
+            _txtProviderName.setFocus();
+            _txtProviderName.selectAll();
+         }
+      });
+
+   }
+
+   private void createUI_20_Provider_Actions(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory
+            .fillDefaults()//
+            //				.grab(false, true)
+            .applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-		{
-			{
-				/*
-				 * Button: Add
-				 */
-				_btnAddProvider = new Button(container, SWT.NONE);
-				_btnAddProvider.setText(Messages.App_Action_Add);
-				setButtonLayoutData(_btnAddProvider);
-				_btnAddProvider.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-						onProvider_Add();
-					}
-				});
-			}
-			{
-				/*
-				 * Button: Delete
-				 */
-				_btnDeleteProvider = new Button(container, SWT.NONE);
-				_btnDeleteProvider.setText(Messages.App_Action_Delete);
-				setButtonLayoutData(_btnDeleteProvider);
-				_btnDeleteProvider.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-						onProvider_Delete();
-					}
-				});
-			}
-		}
-	}
+      {
+         {
+            /*
+             * Button: Add
+             */
+            _btnAddProvider = new Button(container, SWT.NONE);
+            _btnAddProvider.setText(Messages.App_Action_Add);
+            setButtonLayoutData(_btnAddProvider);
+            _btnAddProvider.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onProvider_Add();
+               }
+            });
+         }
+         {
+            /*
+             * Button: Delete
+             */
+            _btnDeleteProvider = new Button(container, SWT.NONE);
+            _btnDeleteProvider.setText(Messages.App_Action_Delete);
+            setButtonLayoutData(_btnDeleteProvider);
+            _btnDeleteProvider.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onProvider_Delete();
+               }
+            });
+         }
+      }
+   }
 
-	private void createUI_30_Details(final Composite parent) {
+   private void createUI_30_Details(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory
-				.fillDefaults()//
-				.grab(true, false)
-				.applyTo(container);
-		GridLayoutFactory
-				.fillDefaults()//
-				.numColumns(2)
-				.applyTo(container);
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory
+            .fillDefaults()//
+            .grab(true, false)
+            .applyTo(container);
+      GridLayoutFactory
+            .fillDefaults()//
+            .numColumns(2)
+            .applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-		{
+      {
 
-			{
-				/*
-				 * Checkbox: Is enabled
-				 */
-				// spacer
-				new Label(container, SWT.NONE);
+         {
+            /*
+             * Checkbox: Is enabled
+             */
+            // spacer
+            new Label(container, SWT.NONE);
 
-				_chkIsEnabled = new Button(container, SWT.CHECK);
-				_chkIsEnabled.setText(Messages.Pref_Map25_Provider_Checkbox_IsEnabled);
-				_chkIsEnabled.setToolTipText(Messages.Pref_Map25_Provider_Checkbox_IsEnabled_Tooltip);
-				_chkIsEnabled.addSelectionListener(_defaultSelectionListener);
-				GridDataFactory
-						.fillDefaults()//
-						.grab(true, false)
-						//						.span(2, 1)
-						.applyTo(_chkIsEnabled);
-			}
-			{
-				/*
-				 * Field: Provider name
-				 */
-				final Label label = new Label(container, SWT.NONE);
-				label.setText(Messages.Pref_Map25_Provider_Label_ProviderName);
+            _chkIsMapProviderEnabled = new Button(container, SWT.CHECK);
+            _chkIsMapProviderEnabled.setText(Messages.Pref_Map25_Provider_Checkbox_IsEnabled);
+            _chkIsMapProviderEnabled.setToolTipText(Messages.Pref_Map25_Provider_Checkbox_IsEnabled_Tooltip);
+            _chkIsMapProviderEnabled.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory
+                  .fillDefaults()//
+                  .grab(true, false)
+                  //						.span(2, 1)
+                  .applyTo(_chkIsMapProviderEnabled);
+         }
+         {
+            /*
+             * Field: Provider name
+             */
+            _lblProviderName = new Label(container, SWT.NONE);
+            _lblProviderName.setText(Messages.Pref_Map25_Provider_Label_ProviderName);
+            _firstColumnControls.add(_lblProviderName);
 
-				_txtProviderName = new Text(container, SWT.BORDER);
-				GridDataFactory
-						.fillDefaults()//
-						.grab(true, false)
-						.applyTo(_txtProviderName);
-				_txtProviderName.addModifyListener(_defaultModifyListener);
-			}
-			{
-				/*
-				 * Field: Url
-				 */
-				final Label label = new Label(container, SWT.NONE);
-				label.setText(Messages.Pref_Map25_Provider_Label_Url);
+            _txtProviderName = new Text(container, SWT.BORDER);
+            GridDataFactory
+                  .fillDefaults()//
+                  .grab(true, false)
+                  .applyTo(_txtProviderName);
+            _txtProviderName.addModifyListener(_defaultModifyListener);
+         }
+         {
+            /*
+             * Field: Tile Encoding
+             */
+            _lblTileEncoding = new Label(container, SWT.NONE);
+            _lblTileEncoding.setText(Messages.Pref_Map25_Provider_Label_TileEncoding);
+            _firstColumnControls.add(_lblTileEncoding);
 
-				_txtUrl = new Text(container, SWT.BORDER);
-				GridDataFactory
-						.fillDefaults()//
-						.grab(true, false)
-						.applyTo(_txtUrl);
-				_txtUrl.addModifyListener(_defaultModifyListener);
-			}
+            _comboTileEncoding = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
+//          GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(_comboTileEncoding);
+            _comboTileEncoding.setVisibleItemCount(20);
+            _comboTileEncoding.addSelectionListener(new SelectionAdapter() {
 
-			{
-				/*
-				 * Field: Tile path
-				 */
-				final Label label = new Label(container, SWT.NONE);
-				label.setText(Messages.Pref_Map25_Provider_Label_TilePath);
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onSelect_TileEncoding();
+               }
+            });
 
-				_txtTilePath = new Text(container, SWT.BORDER);
-				GridDataFactory
-						.fillDefaults()//
-						.grab(true, false)
-						.applyTo(_txtTilePath);
-				_txtTilePath.addModifyListener(_defaultModifyListener);
-			}
-			{
-				/*
-				 * Field: Tile Url
-				 */
-				final Label label = new Label(container, SWT.NONE);
-				label.setText(Messages.Pref_Map25_Provider_Label_TileUrl);
+            // fill combobox
+            for (final TileEncodingData encodingData : _allTileEncoding) {
+               _comboTileEncoding.add(encodingData.__text);
+            }
+         }
 
-				_txtTileUrl = new Text(container, SWT.READ_ONLY);
-				GridDataFactory
-						.fillDefaults()//
-						.grab(true, false)
-						.applyTo(_txtTileUrl);
-			}
-			{
-				/*
-				 * Field: Tile Encoding
-				 */
-				final Label label = new Label(container, SWT.NONE);
-				label.setText(Messages.Pref_Map25_Provider_Label_TileEncoding);
+         _pageBook_OnOffline = new PageBook(container, SWT.NONE);
+         GridDataFactory.fillDefaults().span(2, 1).grab(true, false).applyTo(_pageBook_OnOffline);
+         {
+            _pageMaps_Online = createUI_50_Maps_Online(_pageBook_OnOffline);
+            _pageMaps_Offline = createUI_52_Maps_Offline(_pageBook_OnOffline);
+         }
+         // set any page
+         _pageBook_OnOffline.showPage(_pageMaps_Offline);
 
-				_comboTileEncoding = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
-//				GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(_comboTileEncoding);
-				_comboTileEncoding.setVisibleItemCount(20);
-				_comboTileEncoding.addSelectionListener(_defaultSelectionListener);
+         {
+            /*
+             * Field: Description
+             */
+            _lblDescription = new Label(container, SWT.NONE);
+            _lblDescription.setText(Messages.Pref_Map25_Provider_Label_Description);
+            GridDataFactory
+                  .fillDefaults()//
+                  .align(SWT.FILL, SWT.BEGINNING)
+                  .applyTo(_lblDescription);
+            _firstColumnControls.add(_lblDescription);
 
-				// fill combobox
-				for (final TileEncodingData encodingData : _allTileEncoding) {
-					_comboTileEncoding.add(encodingData.__text);
-				}
-			}
-			{
-				/*
-				 * Field: API key
-				 */
-				final Label label = new Label(container, SWT.NONE);
-				label.setText(Messages.Pref_Map25_Provider_Label_APIKey);
+            _txtDescription = new Text(container, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
+            GridDataFactory
+                  .fillDefaults()//
+                  .hint(convertWidthInCharsToPixels(20), convertHeightInCharsToPixels(8))
+                  .grab(true, false)
+                  .applyTo(_txtDescription);
+            _txtDescription.addModifyListener(_defaultModifyListener);
+         }
+      }
 
-				_txtAPIKey = new Text(container, SWT.BORDER);
-				GridDataFactory
-						.fillDefaults()//
-						.grab(true, false)
-						.applyTo(_txtAPIKey);
-				_txtAPIKey.addModifyListener(_defaultModifyListener);
-			}
-			{
-				/*
-				 * Field: Description
-				 */
-				final Label label = new Label(container, SWT.NONE);
-				label.setText(Messages.Pref_Map25_Provider_Label_Description);
-				GridDataFactory
-						.fillDefaults()//
-						.align(SWT.FILL, SWT.BEGINNING)
-						.applyTo(label);
+   }
 
-				_txtDescription = new Text(container, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
-				GridDataFactory
-						.fillDefaults()//
-						.hint(convertWidthInCharsToPixels(20), convertHeightInCharsToPixels(8))
-						.grab(true, false)
-						.applyTo(_txtDescription);
-				_txtDescription.addModifyListener(_defaultModifyListener);
-			}
-		}
+   private Composite createUI_50_Maps_Online(final Composite parent) {
 
-	}
+      final Composite container = new Composite(parent, SWT.NONE);
+//      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      {
+         {
+            /*
+             * Field: Url
+             */
+            _lblUrl = new Label(container, SWT.NONE);
+            _lblUrl.setText(Messages.Pref_Map25_Provider_Label_Url);
+            _firstColumnControls.add(_lblUrl);
 
-	private void createUI_40_Details_Actions(final Composite parent) {
+            _txtUrl = new Text(container, SWT.BORDER);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtUrl);
+            _txtUrl.addModifyListener(_defaultModifyListener);
+         }
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory
-				.fillDefaults()//
-				//				.grab(false, true)
-				.applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+         {
+            /*
+             * Field: Tile path
+             */
+            _lblTilePath = new Label(container, SWT.NONE);
+            _lblTilePath.setText(Messages.Pref_Map25_Provider_Label_TilePath);
+            _firstColumnControls.add(_lblTilePath);
+
+            _txtTilePath = new Text(container, SWT.BORDER);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtTilePath);
+            _txtTilePath.addModifyListener(_defaultModifyListener);
+         }
+         {
+            /*
+             * Field: Tile Url
+             */
+            _lblTileUrl = new Label(container, SWT.NONE);
+            _lblTileUrl.setText(Messages.Pref_Map25_Provider_Label_TileUrl);
+            _firstColumnControls.add(_lblTileUrl);
+
+            _txtTileUrl = new Text(container, SWT.READ_ONLY);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtTileUrl);
+         }
+         {
+            /*
+             * Field: API key
+             */
+            _lblAPIKey = new Label(container, SWT.NONE);
+            _lblAPIKey.setText(Messages.Pref_Map25_Provider_Label_APIKey);
+            _firstColumnControls.add(_lblAPIKey);
+
+            _txtAPIKey = new Text(container, SWT.BORDER);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtAPIKey);
+            _txtAPIKey.addModifyListener(_defaultModifyListener);
+         }
+      }
+
+      return container;
+   }
+
+   private Composite createUI_52_Maps_Offline(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+//      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      {
+         {
+            /*
+             * Field: Map file
+             */
+            _lblMapFilepath = new Label(container, SWT.NONE);
+            _lblMapFilepath.setText(Messages.Pref_Map25_Provider_Label_MapFilepath);
+            _firstColumnControls.add(_lblMapFilepath);
+
+            final Composite containerMapFile = new Composite(container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(containerMapFile);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerMapFile);
+            {
+               {
+                  _txtMapFilepath = new Text(containerMapFile, SWT.BORDER);
+                  _txtMapFilepath.addModifyListener(_defaultModifyListener);
+                  GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtMapFilepath);
+               }
+
+               {
+                  /*
+                   * Button: browse...
+                   */
+                  _btnMapFile = new Button(containerMapFile, SWT.PUSH);
+                  _btnMapFile.setText(Messages.app_btn_browse);
+                  _btnMapFile.addSelectionListener(new SelectionAdapter() {
+                     @Override
+                     public void widgetSelected(final SelectionEvent e) {
+                        onSelect_Filename_Map();
+                     }
+                  });
+                  GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_btnMapFile);
+                  setButtonLayoutData(_btnMapFile);
+               }
+            }
+         }
+         {
+            /*
+             * Field: Theme filepath
+             */
+            _lblThemeFilepath = new Label(container, SWT.NONE);
+            _lblThemeFilepath.setText(Messages.Pref_Map25_Provider_Label_ThemeFilepath);
+            _firstColumnControls.add(_lblThemeFilepath);
+
+            final Composite containerThemeFile = new Composite(container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(containerThemeFile);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerThemeFile);
+            {
+               {
+                  _txtThemeFilepath = new Text(containerThemeFile, SWT.BORDER);
+                  _txtThemeFilepath.addModifyListener(_defaultModifyListener);
+                  GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtThemeFilepath);
+               }
+
+               {
+                  /*
+                   * Button: browse...
+                   */
+                  _btnThemeFile = new Button(containerThemeFile, SWT.PUSH);
+                  _btnThemeFile.setText(Messages.app_btn_browse);
+                  _btnThemeFile.addSelectionListener(new SelectionAdapter() {
+                     @Override
+                     public void widgetSelected(final SelectionEvent e) {
+                        onSelect_Filename_Theme();
+                     }
+                  });
+                  GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_btnThemeFile);
+                  setButtonLayoutData(_btnThemeFile);
+               }
+            }
+         }
+         {
+            /*
+             * Field: Theme style
+             */
+            _lblThemeStyle = new Label(container, SWT.NONE);
+            _lblThemeStyle.setText(Messages.Pref_Map25_Provider_Label_ThemeStyle);
+            _firstColumnControls.add(_lblThemeStyle);
+
+            _comboThemeStyle = new Combo(container, SWT.READ_ONLY);
+            _comboThemeStyle.addModifyListener(_defaultModifyListener);
+         }
+      }
+
+      return container;
+   }
+
+   private void createUI_90_Details_Actions(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory
+            .fillDefaults()//
+            //				.grab(false, true)
+            .applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-		{
-			{
-				/*
-				 * Button: Update
-				 */
-				_btnUpdateProvider = new Button(container, SWT.NONE);
-				_btnUpdateProvider.setText(Messages.app_action_update);
-				_btnUpdateProvider.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-						onProvider_Update();
-					}
-				});
-				setButtonLayoutData(_btnUpdateProvider);
-			}
-			{
-				/*
-				 * Button: Cancel
-				 */
-				_btnCancel = new Button(container, SWT.NONE);
-				_btnCancel.setText(Messages.App_Action_Cancel);
-				_btnCancel.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-						onProvider_Cancel();
-					}
-				});
-				setButtonLayoutData(_btnCancel);
+      {
+         {
+            /*
+             * Button: Update
+             */
+            _btnUpdateProvider = new Button(container, SWT.NONE);
+            _btnUpdateProvider.setText(Messages.app_action_update);
+            _btnUpdateProvider.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onProvider_Update();
+               }
+            });
+            setButtonLayoutData(_btnUpdateProvider);
+         }
+         {
+            /*
+             * Button: Cancel
+             */
+            _btnCancel = new Button(container, SWT.NONE);
+            _btnCancel.setText(Messages.App_Action_Cancel);
+            _btnCancel.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onProvider_Cancel();
+               }
+            });
+            setButtonLayoutData(_btnCancel);
 
 //				final GridData gd = (GridData) _btnCancel.getLayoutData();
 //				gd.verticalAlignment = SWT.BOTTOM;
 //				gd.grabExcessVerticalSpace = true;
-			}
-		}
-	}
+         }
+      }
+   }
 
-	private void defineAllColumns(final TableColumnLayout tableLayout) {
+   private void defineAllColumns(final TableColumnLayout tableLayout) {
 
-		final int minWidth = convertWidthInCharsToPixels(5);
+      final int minWidth = convertWidthInCharsToPixels(5);
 
-		TableViewerColumn tvc;
-		TableColumn tc;
+      TableViewerColumn tvc;
+      TableColumn tc;
 
-		{
-			/*
-			 * Column: Can be used
-			 */
-			tvc = new TableViewerColumn(_mapProviderViewer, SWT.LEAD);
-			tc = tvc.getColumn();
-			tc.setText(Messages.Pref_Map25_Provider_Column_Enabled);
-			tvc.setLabelProvider(new CellLabelProvider() {
-				@Override
-				public void update(final ViewerCell cell) {
+      {
+         /*
+          * Column: Enabled
+          */
+         tvc = new TableViewerColumn(_mapProviderViewer, SWT.LEAD);
+         tc = tvc.getColumn();
+         tc.setText(Messages.Pref_Map25_Provider_Column_Enabled);
+         tvc.setLabelProvider(new CellLabelProvider() {
+            @Override
+            public void update(final ViewerCell cell) {
 
-					final boolean isEnabled = ((Map25Provider) cell.getElement()).isEnabled;
+               final boolean isEnabled = ((Map25Provider) cell.getElement()).isEnabled;
 
-					cell.setText(isEnabled ? Messages.App_Label_BooleanYes : Messages.App_Label_BooleanNo);
-				}
-			});
-			tableLayout.setColumnData(tc, new ColumnWeightData(4, minWidth));
-		}
-		{
-			/*
-			 * Column: Provider name
-			 */
-			tvc = new TableViewerColumn(_mapProviderViewer, SWT.LEAD);
-			tc = tvc.getColumn();
-			tc.setText(Messages.Pref_Map25_Provider_Column_ProviderName);
-			tvc.setLabelProvider(new CellLabelProvider() {
-				@Override
-				public void update(final ViewerCell cell) {
-					cell.setText(((Map25Provider) cell.getElement()).name);
-				}
-			});
-			tableLayout.setColumnData(tc, new ColumnWeightData(5, minWidth));
-		}
-		{
-			/*
-			 * Column: Tile encoding
-			 */
-			tvc = new TableViewerColumn(_mapProviderViewer, SWT.LEAD);
-			tc = tvc.getColumn();
-			tc.setText(Messages.Pref_Map25_Provider_Column_TileEncoding);
-			tvc.setLabelProvider(new CellLabelProvider() {
-				@Override
-				public void update(final ViewerCell cell) {
-					cell.setText(((Map25Provider) cell.getElement()).tileEncoding.name());
-				}
-			});
-			tableLayout.setColumnData(tc, new ColumnWeightData(4, minWidth));
-		}
-		{
-			/*
-			 * Column: Url
-			 */
-			tvc = new TableViewerColumn(_mapProviderViewer, SWT.LEAD);
-			tc = tvc.getColumn();
-			tc.setText(Messages.Pref_Map25_Provider_Column_Url);
-			tvc.setLabelProvider(new CellLabelProvider() {
-				@Override
-				public void update(final ViewerCell cell) {
-					cell.setText(((Map25Provider) cell.getElement()).url);
-				}
-			});
-			tableLayout.setColumnData(tc, new ColumnWeightData(7, minWidth));
-		}
-		{
-			/*
-			 * Column: Tile path
-			 */
-			tvc = new TableViewerColumn(_mapProviderViewer, SWT.LEAD);
-			tc = tvc.getColumn();
-			tc.setText(Messages.Pref_Map25_Provider_Column_TilePath);
-			tvc.setLabelProvider(new CellLabelProvider() {
-				@Override
-				public void update(final ViewerCell cell) {
-					cell.setText(((Map25Provider) cell.getElement()).tilePath);
-				}
-			});
-			tableLayout.setColumnData(tc, new ColumnWeightData(5, minWidth));
-		}
-		{
-			/*
-			 * Column: API key
-			 */
-			tvc = new TableViewerColumn(_mapProviderViewer, SWT.LEAD);
-			tc = tvc.getColumn();
-			tc.setText(Messages.Pref_Map25_Provider_Column_APIKey);
-			tvc.setLabelProvider(new CellLabelProvider() {
-				@Override
-				public void update(final ViewerCell cell) {
-					cell.setText(((Map25Provider) cell.getElement()).apiKey);
-				}
-			});
-			tableLayout.setColumnData(tc, new ColumnWeightData(4, minWidth));
-		}
-	}
+               cell.setText(isEnabled ? Messages.App_Label_BooleanYes : Messages.App_Label_BooleanNo);
+            }
+         });
+         tableLayout.setColumnData(tc, new ColumnWeightData(2, minWidth));
+      }
+      {
+         /*
+          * Column: Provider name
+          */
+         tvc = new TableViewerColumn(_mapProviderViewer, SWT.LEAD);
+         tc = tvc.getColumn();
+         tc.setText(Messages.Pref_Map25_Provider_Column_ProviderName);
+         tvc.setLabelProvider(new CellLabelProvider() {
+            @Override
+            public void update(final ViewerCell cell) {
+               cell.setText(((Map25Provider) cell.getElement()).name);
+            }
+         });
+         tableLayout.setColumnData(tc, new ColumnWeightData(5, minWidth));
+      }
+      {
+         /*
+          * Column: Tile encoding
+          */
+         tvc = new TableViewerColumn(_mapProviderViewer, SWT.LEAD);
+         tc = tvc.getColumn();
+         tc.setText(Messages.Pref_Map25_Provider_Column_TileEncoding);
+         tvc.setLabelProvider(new CellLabelProvider() {
+            @Override
+            public void update(final ViewerCell cell) {
+               cell.setText(((Map25Provider) cell.getElement()).tileEncoding.name());
+            }
+         });
+         tableLayout.setColumnData(tc, new ColumnWeightData(2, minWidth));
+      }
+      {
+         /*
+          * Column: Url / Map filename
+          */
+         tvc = new TableViewerColumn(_mapProviderViewer, SWT.LEAD);
+         tc = tvc.getColumn();
+         tc.setText(Messages.Pref_Map25_Provider_Column_Url_MapFilename);
+         tvc.setLabelProvider(new CellLabelProvider() {
+            @Override
+            public void update(final ViewerCell cell) {
 
-	private void deleteOfflineMapFiles(final Map25Provider map25Provider) {
+               final Map25Provider map25Provider = (Map25Provider) cell.getElement();
+
+               cell.setText(map25Provider.isOfflineMap
+                     ? map25Provider.mapFilepath
+                     : map25Provider.url);
+            }
+         });
+         tableLayout.setColumnData(tc, new ColumnWeightData(7, minWidth));
+      }
+      {
+         /*
+          * Column: Tile path / Theme filepath
+          */
+         tvc = new TableViewerColumn(_mapProviderViewer, SWT.LEAD);
+         tc = tvc.getColumn();
+         tc.setText(Messages.Pref_Map25_Provider_Column_TilePath_ThemeFilename);
+         tvc.setLabelProvider(new CellLabelProvider() {
+            @Override
+            public void update(final ViewerCell cell) {
+
+               final Map25Provider map25Provider = (Map25Provider) cell.getElement();
+
+               cell.setText(map25Provider.isOfflineMap
+                     ? map25Provider.themeFilepath
+                     : map25Provider.tilePath);
+            }
+         });
+         tableLayout.setColumnData(tc, new ColumnWeightData(7, minWidth));
+      }
+      {
+         /*
+          * Column: API key / Theme style
+          */
+         tvc = new TableViewerColumn(_mapProviderViewer, SWT.LEAD);
+         tc = tvc.getColumn();
+         tc.setText(Messages.Pref_Map25_Provider_Column_APIKey_ThemeStyle);
+         tvc.setLabelProvider(new CellLabelProvider() {
+            @Override
+            public void update(final ViewerCell cell) {
+
+               final Map25Provider map25Provider = (Map25Provider) cell.getElement();
+
+               cell.setText(map25Provider.isOfflineMap
+                     ? map25Provider.themeStyle
+                     : map25Provider.apiKey);
+            }
+         });
+         tableLayout.setColumnData(tc, new ColumnWeightData(3, minWidth));
+      }
+   }
+
+   private void deleteOfflineMapFiles(final Map25Provider map25Provider) {
 
 //		if (MapProviderManager.deleteOfflineMap(map25Provider, false)) {
 //
@@ -633,317 +813,455 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 //			// clear map image cache
 //			map25Provider.disposeTileImages();
 //		}
-	}
+   }
 
-	private void enableControls() {
+   @Override
+   public void dispose() {
 
-		final boolean isSelected = _selectedMapProvider != null;
-		final boolean isEnabled = isSelected ? _selectedMapProvider.isEnabled : false;
-		final boolean isDefault = _selectedMapProvider.isDefault;
-		final boolean isNew = _newProvider != null;
-		final boolean canEdit = isEnabled && (isSelected || isNew);
-		final boolean isNotDefault = isDefault == false;
+      _firstColumnControls.clear();
 
-		final boolean isValid = isDataValid();
+      super.dispose();
+   }
 
-		_mapProviderViewer.getTable().setEnabled(!_isMapProviderModified && isValid);
+   private void enableControls() {
 
-		_btnAddProvider.setEnabled(!_isMapProviderModified && isValid);
-		_btnUpdateProvider.setEnabled(_isMapProviderModified && isValid);
-		_btnCancel.setEnabled(_isMapProviderModified);
-		_btnDeleteProvider.setEnabled(isSelected && isNotDefault);
+      final boolean isSelected = _selectedMapProvider != null;
+      final boolean isEnabled = _selectedMapProvider.isEnabled || _chkIsMapProviderEnabled.getSelection();
+      final boolean isNew = _newProvider != null;
+      final boolean canEdit = isEnabled || isNew;
 
-		_chkIsEnabled.setEnabled((isSelected || isNew) && isNotDefault);
-		_comboTileEncoding.setEnabled(canEdit);
-		_txtAPIKey.setEnabled(canEdit);
-		_txtDescription.setEnabled(canEdit);
-		_txtProviderName.setEnabled(canEdit);
-		_txtTilePath.setEnabled(canEdit);
-		_txtUrl.setEnabled(canEdit);
-	}
+      final boolean isDefaultProvider = _selectedMapProvider.isDefault;
+      final boolean isCustomProvider = isDefaultProvider == false;
 
-	private int getEncodingIndex(final TileEncoding tileEncoding) {
+      final boolean isValid = isDataValid();
 
-		for (int encodingIndex = 0; encodingIndex < _allTileEncoding.length; encodingIndex++) {
+      _mapProviderViewer.getTable().setEnabled(!_isMapProviderModified && isValid);
 
-			final TileEncodingData tileEncodingData = _allTileEncoding[encodingIndex];
+      _btnAddProvider.setEnabled(!_isMapProviderModified && isValid);
+      _btnDeleteProvider.setEnabled(isCustomProvider && isSelected && !isNew && !_isMapProviderModified);
 
-			if (tileEncoding.equals(tileEncodingData.__encoding)) {
-				return encodingIndex;
-			}
-		}
+      _btnCancel.setEnabled(_isMapProviderModified);
+      _btnMapFile.setEnabled(canEdit);
+      _btnThemeFile.setEnabled(canEdit);
+      _btnUpdateProvider.setEnabled(_isMapProviderModified && isValid);
 
-		/*
-		 * return default, open science map
-		 */
-		int defaultIndex = 0;
+      _chkIsMapProviderEnabled.setEnabled(isCustomProvider && (isSelected || isNew));
 
-		for (int encodingIndex = 0; encodingIndex < _allTileEncoding.length; encodingIndex++) {
+      _comboTileEncoding.setEnabled(canEdit);
 
-			final TileEncodingData tileEncodingData = _allTileEncoding[encodingIndex];
+      _lblAPIKey.setEnabled(canEdit);
+      _lblDescription.setEnabled(canEdit);
+      _lblMapFilepath.setEnabled(canEdit);
+      _lblProviderName.setEnabled(canEdit);
+      _lblThemeFilepath.setEnabled(canEdit);
+      _lblThemeStyle.setEnabled(canEdit);
+      _lblTileEncoding.setEnabled(canEdit);
+      _lblTilePath.setEnabled(canEdit);
+      _lblTileUrl.setEnabled(canEdit);
+      _lblUrl.setEnabled(canEdit);
 
-			if (tileEncodingData.__encoding.equals(TileEncoding.VTM)) {
-				defaultIndex = encodingIndex;
-				break;
-			}
-		}
+      _txtAPIKey.setEnabled(canEdit);
+      _txtDescription.setEnabled(canEdit);
+      _txtMapFilepath.setEnabled(canEdit);
+      _txtThemeFilepath.setEnabled(canEdit);
+      _comboThemeStyle.setEnabled(canEdit);
+      _txtProviderName.setEnabled(canEdit);
+      _txtTilePath.setEnabled(canEdit);
+      _txtTileUrl.setEnabled(canEdit);
+      _txtUrl.setEnabled(canEdit);
+   }
 
-		return defaultIndex;
-	}
+   private int getEncodingIndex(final TileEncoding tileEncoding) {
 
-	private TileEncoding getSelectedEncoding() {
+      for (int encodingIndex = 0; encodingIndex < _allTileEncoding.length; encodingIndex++) {
 
-		final int selectedIndex = _comboTileEncoding.getSelectionIndex();
+         final TileEncodingData tileEncodingData = _allTileEncoding[encodingIndex];
 
-		if (selectedIndex < 0) {
+         if (tileEncoding.equals(tileEncodingData.__encoding)) {
+            return encodingIndex;
+         }
+      }
 
-			// return default
-			return TileEncoding.VTM;
-		}
+      /*
+       * return default, open science map
+       */
+      int defaultIndex = 0;
 
-		return _allTileEncoding[selectedIndex].__encoding;
-	}
+      for (int encodingIndex = 0; encodingIndex < _allTileEncoding.length; encodingIndex++) {
 
-	@Override
-	public void init(final IWorkbench workbench) {
+         final TileEncodingData tileEncodingData = _allTileEncoding[encodingIndex];
 
-		noDefaultAndApplyButton();
+         if (tileEncodingData.__encoding.equals(TileEncoding.VTM)) {
+            defaultIndex = encodingIndex;
+            break;
+         }
+      }
 
-		_defaultModifyListener = new ModifyListener() {
-			@Override
-			public void modifyText(final ModifyEvent e) {
-				onProvider_Modify();
-			}
-		};
+      return defaultIndex;
+   }
 
-		_defaultSelectionListener = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onProvider_Modify();
-			}
-		};
-	}
+   private TileEncodingData getSelectedEncoding() {
 
-	private void initUI(final Composite parent) {
+      final int selectedIndex = _comboTileEncoding.getSelectionIndex();
 
-	}
+      if (selectedIndex < 0) {
 
-	/**
-	 * @return Returns <code>true</code> when person is valid, otherwise <code>false</code>.
-	 */
-	private boolean isDataValid() {
+         // return default
+         return _allTileEncoding[0];
+      }
 
-		final boolean isNewProvider = _newProvider != null;
+      return _allTileEncoding[selectedIndex];
+   }
 
-		if (isNewProvider || _isMapProviderModified) {
+   private String getSelectedThemeStyle(final List<MapsforgeThemeStyle> cachedThemeStyles) {
 
-			if (_txtProviderName.getText().trim().equals(UI.EMPTY_STRING)) {
+      if (cachedThemeStyles == null) {
+         return UI.EMPTY_STRING;
+      }
 
-				setErrorMessage(Messages.Pref_Map25_Provider_Error_ProviderNameIsRequired);
+      final int selectedIndex = _comboThemeStyle.getSelectionIndex();
 
-				return false;
+      if (selectedIndex < 0) {
 
-			} else if (_txtUrl.getText().trim().equals(UI.EMPTY_STRING)) {
+         // return default
+         return cachedThemeStyles.get(0).getXmlLayer();
+      }
 
-				setErrorMessage(Messages.Pref_Map25_Provider_Error_UrlIsRequired);
+      return cachedThemeStyles.get(selectedIndex).getXmlLayer();
+   }
 
-				return false;
+   @Override
+   public void init(final IWorkbench workbench) {
 
-			} else if (_txtTilePath.getText().trim().equals(UI.EMPTY_STRING)) {
+      noDefaultAndApplyButton();
 
-				setErrorMessage(Messages.Pref_Map25_Provider_Error_TilePathIsRequired);
+      _defaultModifyListener = new ModifyListener() {
+         @Override
+         public void modifyText(final ModifyEvent e) {
+            onProvider_Modify();
+         }
+      };
 
-				return false;
-			}
+      _defaultSelectionListener = new SelectionAdapter() {
+         @Override
+         public void widgetSelected(final SelectionEvent e) {
+            onProvider_Modify();
+         }
+      };
+   }
 
-			/*
-			 * Check that at least 1 map provider is enabled
-			 */
-			final boolean isCurrentEnabled = _chkIsEnabled.getSelection();
-			int numEnabledOtherMapProviders = 0;
+   private void initUI(final Composite parent) {
 
-			for (final Map25Provider map25Provider : _allMapProvider) {
+   }
 
-				if (map25Provider.isEnabled && map25Provider != _selectedMapProvider) {
-					numEnabledOtherMapProviders++;
-				}
-			}
+   /**
+    * @return Returns <code>true</code> when person is valid, otherwise <code>false</code>.
+    */
+   private boolean isDataValid() {
 
-			if (isCurrentEnabled || numEnabledOtherMapProviders > 0) {
-				// at least one is enabled
-			} else {
+      final boolean isNewProvider = _newProvider != null;
 
-				setErrorMessage(Messages.Pref_Map25_Provider_Error_EnableMapProvider);
+      if (isNewProvider || _isMapProviderModified) {
 
-				return false;
-			}
-		}
+         if (getSelectedEncoding().__isOffline) {
 
-		setErrorMessage(null);
+            // validate offline map
 
-		return true;
-	}
+            if (_txtMapFilepath.getText().trim().equals(UI.EMPTY_STRING)) {
+               setErrorMessage(Messages.Pref_Map25_Provider_Error_MapFilename_IsRequired);
+               return false;
 
-	private boolean isSaveMapProvider() {
+            } else if (_txtThemeFilepath.getText().trim().equals(UI.EMPTY_STRING)) {
+               setErrorMessage(Messages.Pref_Map25_Provider_Error_ThemeFilename_IsRequired);
+               return false;
+            }
 
-		return (MessageDialog.openQuestion(
-				Display.getCurrent().getActiveShell(),
-				Messages.Pref_Map25_Provider_Dialog_SaveModifiedProvider_Title,
-				NLS.bind(
-						Messages.Pref_Map25_Provider_Dialog_SaveModifiedProvider_Message,
+         } else {
 
-						// use name from the ui because it could be modified
-						_txtProviderName.getText())) == false);
-	}
+            // validate online map
 
-	@Override
-	public boolean okToLeave() {
+            if (_txtProviderName.getText().trim().equals(UI.EMPTY_STRING)) {
+               setErrorMessage(Messages.Pref_Map25_Provider_Error_ProviderNameIsRequired);
+               return false;
 
-		if (_isMapProviderModified && isDataValid()) {
+            } else if (_txtUrl.getText().trim().equals(UI.EMPTY_STRING)) {
+               setErrorMessage(Messages.Pref_Map25_Provider_Error_UrlIsRequired);
+               return false;
 
-			updateModelAndUI();
-			saveMapProviders(true);
-		}
+            } else if (_txtTilePath.getText().trim().equals(UI.EMPTY_STRING)) {
+               setErrorMessage(Messages.Pref_Map25_Provider_Error_TilePathIsRequired);
+               return false;
+            }
+         }
 
-		saveState();
+         /*
+          * Check that at least 1 map provider is enabled
+          */
+         final boolean isCurrentEnabled = _chkIsMapProviderEnabled.getSelection();
+         int numEnabledOtherMapProviders = 0;
 
-		return super.okToLeave();
-	}
+         for (final Map25Provider map25Provider : _allMapProvider) {
 
-	private void onProvider_Add() {
+            if (map25Provider.isEnabled && map25Provider != _selectedMapProvider) {
+               numEnabledOtherMapProviders++;
+            }
+         }
 
-		_newProvider = new Map25Provider();
+         if (isCurrentEnabled || numEnabledOtherMapProviders > 0) {
+            // at least one is enabled
+         } else {
 
-		_isModified = true;
-		_isMapProviderModified = true;
+            setErrorMessage(Messages.Pref_Map25_Provider_Error_EnableMapProvider);
 
-		updateUI_FromProvider(_newProvider);
-		enableControls();
+            return false;
+         }
+      }
 
-		// edit name
-		_txtProviderName.setFocus();
-	}
+      setErrorMessage(null);
 
-	private void onProvider_Cancel() {
+      return true;
+   }
 
-		_newProvider = null;
-		_isMapProviderModified = false;
+   private boolean isSaveMapProvider() {
 
-		updateUI_FromProvider(_selectedMapProvider);
-		enableControls();
+      return (MessageDialog.openQuestion(getShell(),
+            Messages.Pref_Map25_Provider_Dialog_SaveModifiedProvider_Title,
+            NLS.bind(
+                  Messages.Pref_Map25_Provider_Dialog_SaveModifiedProvider_Message,
 
-		_mapProviderViewer.getTable().setFocus();
-	}
+                  // use name from the ui because it could be modified
+                  _txtProviderName.getText())) == false);
+   }
 
-	private void onProvider_Delete() {
+   @Override
+   public boolean okToLeave() {
+
+      if (_isMapProviderModified && isDataValid()) {
+
+         updateModelAndUI();
+         saveMapProviders(true);
+      }
+
+      saveState();
+
+      return super.okToLeave();
+   }
+
+   private void onProvider_Add() {
+
+      _newProvider = new Map25Provider();
+
+      _newProvider.isEnabled = true;
+
+      _isModified = true;
+      _isMapProviderModified = true;
+
+      updateUI_FromProvider(_newProvider);
+      enableControls();
+
+      // edit name
+      _txtProviderName.setFocus();
+   }
+
+   private void onProvider_Cancel() {
+
+      _newProvider = null;
+      _isMapProviderModified = false;
+
+      updateUI_FromProvider(_selectedMapProvider);
+      enableControls();
+
+      _mapProviderViewer.getTable().setFocus();
+   }
+
+   private void onProvider_Delete() {
 
 //		Delete Map Provider
 //		Are you sure to delete the map provider "{0}" and all it's offline images?
 
-		if (MessageDialog.openConfirm(
-				Display.getCurrent().getActiveShell(),
-				Messages.Pref_Map25_Provider_Dialog_ConfirmDeleteMapProvider_Title,
-				NLS.bind(
-						Messages.Pref_Map25_Provider_Dialog_ConfirmDeleteMapProvider_Message,
-						_selectedMapProvider.name)) == false) {
-			return;
-		}
+      if (MessageDialog.openConfirm(
+            getShell(),
+            Messages.Pref_Map25_Provider_Dialog_ConfirmDeleteMapProvider_Title,
+            NLS.bind(
+                  Messages.Pref_Map25_Provider_Dialog_ConfirmDeleteMapProvider_Message,
+                  _selectedMapProvider.name)) == false) {
+         return;
+      }
 
-		_isModified = true;
-		_isMapProviderModified = false;
+      _isModified = true;
+      _isMapProviderModified = false;
 
-		// get map provider which will be selected when the current will be removed
-		final int selectionIndex = _mapProviderViewer.getTable().getSelectionIndex();
-		Object nextSelectedMapProvider = _mapProviderViewer.getElementAt(selectionIndex + 1);
-		if (nextSelectedMapProvider == null) {
-			nextSelectedMapProvider = _mapProviderViewer.getElementAt(selectionIndex - 1);
-		}
+      // get map provider which will be selected when the current will be removed
+      final int selectionIndex = _mapProviderViewer.getTable().getSelectionIndex();
+      Object nextSelectedMapProvider = _mapProviderViewer.getElementAt(selectionIndex + 1);
+      if (nextSelectedMapProvider == null) {
+         nextSelectedMapProvider = _mapProviderViewer.getElementAt(selectionIndex - 1);
+      }
 
-		// delete offline files
-		deleteOfflineMapFiles(_selectedMapProvider);
+      // delete offline files
+      deleteOfflineMapFiles(_selectedMapProvider);
 
-		// remove from model
-		_allMapProvider.remove(_selectedMapProvider);
+      // remove from model
+      _allMapProvider.remove(_selectedMapProvider);
 
-		// remove from viewer
-		_mapProviderViewer.remove(_selectedMapProvider);
+      // remove from viewer
+      _mapProviderViewer.remove(_selectedMapProvider);
 
-		if (nextSelectedMapProvider == null) {
+      if (nextSelectedMapProvider == null) {
 
-			_selectedMapProvider = null;
+         _selectedMapProvider = null;
 
-			updateUI_FromProvider(_selectedMapProvider);
+         updateUI_FromProvider(_selectedMapProvider);
 
-		} else {
+      } else {
 
-			// select another map provider at the same position
+         // select another map provider at the same position
 
-			_mapProviderViewer.setSelection(new StructuredSelection(nextSelectedMapProvider));
-			_mapProviderViewer.getTable().setFocus();
-		}
+         _mapProviderViewer.setSelection(new StructuredSelection(nextSelectedMapProvider));
+         _mapProviderViewer.getTable().setFocus();
+      }
 
-		enableControls();
-	}
+      enableControls();
+   }
 
-	private void onProvider_Modify() {
+   private void onProvider_Modify() {
 
-		if (_isInUpdateUI) {
-			return;
-		}
+      if (_isInUpdateUI) {
+         return;
+      }
 
-		_isModified = true;
-		_isMapProviderModified = true;
+      _isModified = true;
+      _isMapProviderModified = true;
 
-		updateUI_Data();
+      updateUI_TileUrl();
 
-		enableControls();
-	}
+      enableControls();
+   }
 
-	private void onProvider_Select() {
+   private void onProvider_Update() {
 
-		final IStructuredSelection selection = (IStructuredSelection) _mapProviderViewer.getSelection();
-		final Map25Provider mapProvider = (Map25Provider) selection.getFirstElement();
+      if (isDataValid() == false) {
+         return;
+      }
 
-		if (mapProvider != null) {
+      updateModelAndUI();
+      enableControls();
 
-			_selectedMapProvider = mapProvider;
+      _mapProviderViewer.getTable().setFocus();
+   }
 
-			updateUI_FromProvider(_selectedMapProvider);
+   private void onSelect_Filename_Map() {
 
-		} else {
-			// irgnore, this can happen when a refresh() of the table viewer is done
-		}
+      String mapFile_Foldername = null;
 
-		enableControls();
-	}
+      final String userPathname = _txtMapFilepath.getText();
+      final Path mapFilepath = NIO.getPath(userPathname);
 
-	private void onProvider_Update() {
+      if (mapFilepath != null) {
 
-		if (isDataValid() == false) {
-			return;
-		}
+         final Path mapFile_Folder = mapFilepath.getParent();
+         if (mapFile_Folder != null) {
 
-		updateModelAndUI();
-		enableControls();
+            mapFile_Foldername = mapFile_Folder.toString();
+         }
+      }
 
-		_mapProviderViewer.getTable().setFocus();
-	}
+      final FileDialog dialog = new FileDialog(getShell(), SWT.SAVE);
+      dialog.setText(Messages.Pref_Map25_Dialog_MapFilename_Title);
 
-	@Override
-	public boolean performCancel() {
+      dialog.setFilterPath(mapFile_Foldername);
+      dialog.setFileName("*." + Map25ProviderManager.MAPSFORGE_MAP_FILE_EXTENTION);//$NON-NLS-1$
+      dialog.setFilterExtensions(new String[] { Map25ProviderManager.MAPSFORGE_MAP_FILE_EXTENTION });
 
-		saveState();
+      final String selectedFilepath = dialog.open();
 
-		return super.performCancel();
-	}
+      if (selectedFilepath != null) {
 
-	@Override
-	public boolean performOk() {
+         setErrorMessage(null);
+
+         // update UI
+         _txtMapFilepath.setText(selectedFilepath);
+      }
+   }
+
+   private void onSelect_Filename_Theme() {
+
+      String mapStyle_Foldername = null;
+
+      final String userPathname = _txtThemeFilepath.getText();
+      final Path mapStyle_Filepath = NIO.getPath(userPathname);
+
+      if (mapStyle_Filepath != null) {
+
+         final Path mapStyle_Folder = mapStyle_Filepath.getParent();
+         if (mapStyle_Folder != null) {
+
+            mapStyle_Foldername = mapStyle_Folder.toString();
+         }
+      }
+
+      final FileDialog dialog = new FileDialog(getShell(), SWT.SAVE);
+      dialog.setText(Messages.Pref_Map25_Dialog_MapStyleFilename_Title);
+
+      dialog.setFilterPath(mapStyle_Foldername);
+      dialog.setFileName("*." + Map25ProviderManager.MAPSFORGE_STYLE_FILE_EXTENTION);//$NON-NLS-1$
+      dialog.setFilterExtensions(new String[] { Map25ProviderManager.MAPSFORGE_STYLE_FILE_EXTENTION });
+
+      final String selectedFilepath = dialog.open();
+
+      if (selectedFilepath == null) {
+         // dialog is canceled
+      }
+
+      setErrorMessage(null);
+
+      // update UI
+      _txtThemeFilepath.setText(selectedFilepath);
+
+      // update theme styles
+      updateUI_ThemeStyle(selectedFilepath, _newProvider != null ? _newProvider : _selectedMapProvider);
+   }
+
+   private void onSelect_MapProvider() {
+
+      final IStructuredSelection selection = (IStructuredSelection) _mapProviderViewer.getSelection();
+      final Map25Provider mapProvider = (Map25Provider) selection.getFirstElement();
+
+      if (mapProvider != null) {
+
+         _selectedMapProvider = mapProvider;
+
+         updateUI_FromProvider(_selectedMapProvider);
+
+      } else {
+         // irgnore, this can happen when a refresh() of the table viewer is done
+      }
+
+      enableControls();
+   }
+
+   private void onSelect_TileEncoding() {
+
+      updateUI_TileEncoding();
+
+      onProvider_Modify();
+   }
+
+   @Override
+   public boolean performCancel() {
+
+      saveState();
+
+      return super.performCancel();
+   }
+
+   @Override
+   public boolean performOk() {
 
 //		final boolean isModified = _isModelModified;
 
-		updateModelAndUI();
-		saveMapProviders(false);
+      updateModelAndUI();
+      saveMapProviders(false);
 
 //		if (isModified) {
 //			/*
@@ -953,153 +1271,317 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 //			return false;
 //		}
 
-		saveState();
+      saveState();
 
-		return true;
-	}
+      return true;
+   }
 
-	private void restoreState() {
+   private void restoreState() {
 
-		/*
-		 * select last selected map provider
-		 */
-		final String lastMapProviderUrl = Util.getStateString(_state, STATE_LAST_SELECTED_MAP_PROVIDER, null);
-		Map25Provider lastMapProvider = null;
-		for (final Map25Provider mapProvider : _allMapProvider) {
-			if (mapProvider.url.equals(lastMapProviderUrl)) {
-				lastMapProvider = mapProvider;
-				break;
-			}
-		}
-		if (lastMapProvider != null) {
-			_mapProviderViewer.setSelection(new StructuredSelection(lastMapProvider));
-		} else if (_allMapProvider.size() > 0) {
-			_mapProviderViewer.setSelection(new StructuredSelection(_allMapProvider.get(0)));
-		} else {
-			// nothing can be selected
-		}
+      /*
+       * select last selected map provider
+       */
+      final String lastMapProviderUUID = Util.getStateString(_state, STATE_LAST_SELECTED_MAP_PROVIDER, null);
+      Map25Provider lastMapProvider = null;
 
-		// set focus to selected map provider
-		final Table table = _mapProviderViewer.getTable();
-		table.setSelection(table.getSelectionIndex());
-	}
+      for (final Map25Provider mapProvider : _allMapProvider) {
 
-	/**
-	 * @param isAskToSave
-	 * @return Returns <code>false</code> when map provider is not saved.
-	 */
-	private void saveMapProviders(final boolean isAskToSave) {
+         if (mapProvider.getId().equals(lastMapProviderUUID)) {
+            lastMapProvider = mapProvider;
+            break;
+         }
+      }
 
-		if (!_isModified) {
+      if (lastMapProvider != null) {
+         _mapProviderViewer.setSelection(new StructuredSelection(lastMapProvider));
+      } else if (_allMapProvider.size() > 0) {
+         _mapProviderViewer.setSelection(new StructuredSelection(_allMapProvider.get(0)));
+      } else {
+         // nothing can be selected
+      }
 
-			// nothing is to save
-			return;
-		}
+      // set focus to selected map provider
+      final Table table = _mapProviderViewer.getTable();
+      table.setSelection(table.getSelectionIndex());
+   }
 
-		boolean isSaveIt = true;
+   /**
+    * @param isAskToSave
+    * @return Returns <code>false</code> when map provider is not saved.
+    */
+   private void saveMapProviders(final boolean isAskToSave) {
 
-		if (isAskToSave) {
-			isSaveIt = isSaveMapProvider();
-		}
+      if (!_isModified) {
 
-		if (isSaveIt) {
-			Map25ProviderManager.saveMapProvider(_allMapProvider);
-			_isModified = false;
-		}
-	}
+         // nothing is to save
+         return;
+      }
 
-	private void saveState() {
+      boolean isSaveIt = true;
 
-		// selected map provider
-		if (_selectedMapProvider != null) {
-			_state.put(
-					STATE_LAST_SELECTED_MAP_PROVIDER,
-					_selectedMapProvider.url);
-		}
-	}
+      if (isAskToSave) {
+         isSaveIt = isSaveMapProvider();
+      }
 
-	/**
-	 */
-	private void updateModelAndUI() {
+      if (isSaveIt) {
+         Map25ProviderManager.saveMapProvider(_allMapProvider);
+         _isModified = false;
+      }
+   }
 
-		final boolean isNewProvider = _newProvider != null;
-		final Map25Provider currentMapProvider = isNewProvider ? _newProvider : _selectedMapProvider;
+   private void saveState() {
 
-		if (_isMapProviderModified && isDataValid()) {
+      // selected map provider
+      if (_selectedMapProvider != null) {
+         _state.put(STATE_LAST_SELECTED_MAP_PROVIDER, _selectedMapProvider.getId());
+      }
+   }
 
-			updateModelData(currentMapProvider);
+   /**
+    */
+   private void updateModelAndUI() {
 
-			// update ui
-			if (isNewProvider) {
-				_allMapProvider.add(currentMapProvider);
-				_mapProviderViewer.add(currentMapProvider);
+      final boolean isNewProvider = _newProvider != null;
+      final Map25Provider currentMapProvider = isNewProvider ? _newProvider : _selectedMapProvider;
 
-			} else {
-				// !!! refreshing a map provider do not resort the table when sorting has changed so we refresh the viewer !!!
-				_mapProviderViewer.refresh();
-			}
+      if (_isMapProviderModified && isDataValid()) {
 
-			// select updated/new map provider
-			_mapProviderViewer.setSelection(new StructuredSelection(currentMapProvider), true);
-		}
+         updateModelData(currentMapProvider);
 
-		// update state
-		_isMapProviderModified = false;
-		_newProvider = null;
-	}
+         // update ui
+         if (isNewProvider) {
+            _allMapProvider.add(currentMapProvider);
+            _mapProviderViewer.add(currentMapProvider);
 
-	private void updateModelData(final Map25Provider mapProvider) {
+         } else {
+            // !!! refreshing a map provider do not resort the table when sorting has changed so we refresh the viewer !!!
+            _mapProviderViewer.refresh();
+         }
 
-		/*
-		 * Update map provider
-		 */
-		mapProvider.apiKey = _txtAPIKey.getText();
-		mapProvider.description = _txtDescription.getText();
-		mapProvider.name = _txtProviderName.getText();
-		mapProvider.tilePath = _txtTilePath.getText();
-		mapProvider.url = _txtUrl.getText();
-		mapProvider.isEnabled = _chkIsEnabled.getSelection();
+         // select updated/new map provider
+         _mapProviderViewer.setSelection(new StructuredSelection(currentMapProvider), true);
+      }
 
-		mapProvider.tileEncoding = getSelectedEncoding();
-	}
+      // update state
+      _isMapProviderModified = false;
+      _newProvider = null;
+   }
 
-	private void updateUI_Data() {
+   /**
+    * Update map provider
+    */
+   private void updateModelData(final Map25Provider mapProvider) {
 
-		final String tileUrl = _txtUrl.getText() + _txtTilePath.getText();
+      final TileEncodingData selectedEncoding = getSelectedEncoding();
 
-		_txtTileUrl.setText(tileUrl);
-	}
+      mapProvider.name = _txtProviderName.getText();
+      mapProvider.description = _txtDescription.getText();
+      mapProvider.isEnabled = _chkIsMapProviderEnabled.getSelection();
 
-	private void updateUI_FromProvider(final Map25Provider mapProvider) {
+      final boolean isOffline = selectedEncoding.__isOffline;
+      mapProvider.isOfflineMap = isOffline;
 
-		_isInUpdateUI = true;
-		{
-			if (mapProvider == null) {
+      if (isOffline) {
 
-				_chkIsEnabled.setSelection(false);
+         mapProvider.mapFilepath = _txtMapFilepath.getText();
+         mapProvider.themeFilepath = _txtThemeFilepath.getText();
+         mapProvider.themeStyle = getSelectedThemeStyle(mapProvider.cachedThemeStyles);
 
-				_txtAPIKey.setText(UI.EMPTY_STRING);
-				_txtDescription.setText(UI.EMPTY_STRING);
-				_txtProviderName.setText(UI.EMPTY_STRING);
-				_txtUrl.setText(UI.EMPTY_STRING);
-				_txtTilePath.setText(UI.EMPTY_STRING);
+      } else {
 
-			} else {
+         mapProvider.url = _txtUrl.getText();
+         mapProvider.tilePath = _txtTilePath.getText();
+         mapProvider.apiKey = _txtAPIKey.getText();
+      }
 
-				_chkIsEnabled.setSelection(mapProvider.isEnabled);
+      mapProvider.tileEncoding = selectedEncoding.__encoding;
+   }
 
-				_txtAPIKey.setText(mapProvider.apiKey);
-				_txtDescription.setText(mapProvider.description);
-				_txtProviderName.setText(mapProvider.name);
-				_txtUrl.setText(mapProvider.url);
-				_txtTilePath.setText(mapProvider.tilePath);
+   private void updateUI_FromProvider(final Map25Provider mapProvider) {
 
-				_comboTileEncoding.select(getEncodingIndex(mapProvider.tileEncoding));
-			}
+      _isInUpdateUI = true;
+      {
+         if (mapProvider == null) {
 
-			updateUI_Data();
-		}
-		_isInUpdateUI = false;
-	}
+            _chkIsMapProviderEnabled.setSelection(false);
+
+            _txtDescription.setText(UI.EMPTY_STRING);
+            _txtProviderName.setText(UI.EMPTY_STRING);
+
+            _txtAPIKey.setText(UI.EMPTY_STRING);
+            _txtUrl.setText(UI.EMPTY_STRING);
+            _txtTilePath.setText(UI.EMPTY_STRING);
+
+            _txtMapFilepath.setText(UI.EMPTY_STRING);
+            _txtThemeFilepath.setText(UI.EMPTY_STRING);
+
+         } else {
+
+            _chkIsMapProviderEnabled.setSelection(mapProvider.isEnabled);
+
+            _txtDescription.setText(mapProvider.description);
+            _txtProviderName.setText(mapProvider.name);
+
+            if (mapProvider.isOfflineMap) {
+
+               _txtAPIKey.setText(UI.EMPTY_STRING);
+               _txtUrl.setText(UI.EMPTY_STRING);
+               _txtTilePath.setText(UI.EMPTY_STRING);
+
+               _txtMapFilepath.setText(mapProvider.mapFilepath);
+               _txtThemeFilepath.setText(mapProvider.themeFilepath);
+
+            } else {
+
+               _txtAPIKey.setText(mapProvider.apiKey);
+               _txtUrl.setText(mapProvider.url);
+               _txtTilePath.setText(mapProvider.tilePath);
+
+               _txtMapFilepath.setText(UI.EMPTY_STRING);
+               _txtThemeFilepath.setText(UI.EMPTY_STRING);
+            }
+
+            _comboTileEncoding.select(getEncodingIndex(mapProvider.tileEncoding));
+         }
+
+         updateUI_TileEncoding();
+         updateUI_ThemeStyle(mapProvider == null ? null : mapProvider.themeFilepath, mapProvider);
+         updateUI_TileUrl();
+      }
+      _isInUpdateUI = false;
+   }
+
+   /**
+    * @param themeFilepath
+    *           Theme file pathname, can be <code>null</code>
+    * @param mapProvider
+    *           Map provider, can be <code>null</code>
+    */
+   private void updateUI_ThemeStyle(final String themeFilepath, final Map25Provider mapProvider) {
+
+      final boolean isInUpdateUI_Backup = _isInUpdateUI;
+      _isInUpdateUI = true;
+      {
+         updateUI_ThemeStyle_WithReselect(themeFilepath, mapProvider);
+
+         // adjust combo UI to different content
+         _comboThemeStyle.getParent().layout();
+
+      }
+      _isInUpdateUI = isInUpdateUI_Backup;
+   }
+
+   private void updateUI_ThemeStyle_WithReselect(final String themeFilepath, final Map25Provider mapProvider) {
+
+      _comboThemeStyle.removeAll();
+
+      if (themeFilepath == null) {
+
+         // a style cannot be displayed
+
+         _comboThemeStyle.add(Messages.Pref_Map25_Provider_ThemeStyle_Info_NotAvailable);
+         _comboThemeStyle.select(0);
+
+         return;
+      }
+
+      List<MapsforgeThemeStyle> mfStyles = null;
+
+      if (mapProvider != null) {
+
+         if (mapProvider.cachedThemeFilepath == null
+
+               // check if cached name has changed
+               || !mapProvider.cachedThemeFilepath.equals(themeFilepath)) {
+
+            // styles needs to be loaded
+
+            mfStyles = Map25ProviderManager.loadMapsforgeThemeStyles(themeFilepath);
+
+            if (mfStyles == null) {
+
+               _comboThemeStyle.add(Messages.Pref_Map25_Provider_ThemeStyle_Info_InvalidThemeFilename);
+               _comboThemeStyle.select(0);
+
+               return;
+            }
+
+            // cache theme styles
+            mapProvider.cachedThemeFilepath = themeFilepath;
+            mapProvider.cachedThemeStyles = mfStyles;
+
+         } else {
+
+            mfStyles = mapProvider.cachedThemeStyles;
+         }
+      }
+
+      /*
+       * Fill combo with styles
+       */
+
+      if (mfStyles != null && mfStyles.size() == 0) {
+
+         _comboThemeStyle.add(Messages.Pref_Map25_Provider_ThemeStyle_Info_NoStyles);
+         _comboThemeStyle.select(0);
+
+         return;
+      }
+
+      for (final MapsforgeThemeStyle mapsforgeThemeStyle : mfStyles) {
+         _comboThemeStyle.add(mapsforgeThemeStyle.getName(USER_LOCALE) + UI.DASH_WITH_DOUBLE_SPACE + mapsforgeThemeStyle.getXmlLayer());
+      }
+
+      /*
+       * Reselect previous style
+       */
+      String themeStyle = null;
+      if (mapProvider != null) {
+         themeStyle = mapProvider.themeStyle;
+      }
+
+      if (themeStyle == null || themeStyle.trim().length() == 0) {
+
+         _comboThemeStyle.select(0);
+
+      } else {
+
+         for (int styleIndex = 0; styleIndex < mfStyles.size(); styleIndex++) {
+
+            final MapsforgeThemeStyle mapsforgeThemeStyle = mfStyles.get(styleIndex);
+
+            if (mapsforgeThemeStyle.getXmlLayer().equals(themeStyle)) {
+
+               _comboThemeStyle.select(styleIndex);
+
+               break;
+            }
+         }
+      }
+   }
+
+   /**
+    * Show tile encoding fields
+    */
+   private void updateUI_TileEncoding() {
+
+      final TileEncodingData selectedEncodingData = getSelectedEncoding();
+
+      if (selectedEncodingData.__isOffline) {
+         _pageBook_OnOffline.showPage(_pageMaps_Offline);
+      } else {
+         _pageBook_OnOffline.showPage(_pageMaps_Online);
+      }
+
+      // pages can have different heights
+      _uiInnerContainer.layout(true, true);
+   }
+
+   private void updateUI_TileUrl() {
+
+      final String tileUrl = _txtUrl.getText() + _txtTilePath.getText();
+
+      _txtTileUrl.setText(tileUrl);
+   }
 
 }

@@ -91,9 +91,13 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		String jsonFileContent =
 				GetJsonContentFromGZipFile(importFilePath);
 
-		if (isValidJSONFile(jsonFileContent) == false) {
-			return false;
-		}
+		// At this point, we know that the given file is a valid JSON file.
+		// But to avoid for invalid activities to be parsed by other 
+		// parsers, we return true when a Suunto JSON file is not
+		// a valid activity.
+		if (!isValidActivity(jsonFileContent))
+			return true;
+
 		return ProcessFile(importFilePath, jsonFileContent);
 	}
 
@@ -126,8 +130,10 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 				String firstSample = samples.get(0).toString();
 				if (firstSample.contains(SuuntoJsonProcessor.TAG_ATTRIBUTES) &&
 						firstSample.contains(SuuntoJsonProcessor.TAG_SOURCE) &&
-						firstSample.contains(SuuntoJsonProcessor.TAG_TIMEISO8601))
+						firstSample.contains(SuuntoJsonProcessor.TAG_TIMEISO8601)) {
+					Util.closeReader(fileReader);
 					return true;
+				}
 
 			} catch (JSONException ex) {
 				StatusUtil.log(ex);
@@ -135,6 +141,55 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 			}
 
 		} catch (final Exception e) {
+			StatusUtil.log(e);
+			return false;
+		} finally {
+			Util.closeReader(fileReader);
+		}
+
+		return false;
+	}
+
+	/**
+	 * Check if the file is a valid Suunto Spartan/9 activity.
+	 * 
+	 * @param jsonFileContent
+	 *           The content to check.
+	 * @return Returns <code>true</code> when the file contains content of a valid activity.
+	 */
+	protected boolean isValidActivity(String jsonFileContent) {
+		BufferedReader fileReader = null;
+		try {
+
+			if (jsonFileContent == null ||
+					jsonFileContent == "") { //$NON-NLS-1$
+				return false;
+			}
+
+			try {
+				JSONObject jsonContent = new JSONObject(jsonFileContent);
+				JSONArray samples = (JSONArray) jsonContent.get(SuuntoJsonProcessor.TAG_SAMPLES);
+
+				for (int index = 0; index < samples.length(); ++index) {
+					String currentSample = samples.getJSONObject(index).toString();
+					if (currentSample.contains(SuuntoJsonProcessor.TAG_SAMPLE) &&
+							(currentSample.contains(SuuntoJsonProcessor.TAG_GPSALTITUDE) ||
+									currentSample.contains(SuuntoJsonProcessor.TAG_LONGITUDE) ||
+									currentSample.contains(SuuntoJsonProcessor.TAG_LATITUDE) ||
+									currentSample.contains(SuuntoJsonProcessor.TAG_ALTITUDE))) {
+						Util.closeReader(fileReader);
+						return true;
+					}
+				}
+
+			} catch (JSONException ex) {
+				StatusUtil.log(ex);
+				return false;
+			}
+
+		} catch (
+
+		final Exception e) {
 			StatusUtil.log(e);
 			return false;
 		} finally {
