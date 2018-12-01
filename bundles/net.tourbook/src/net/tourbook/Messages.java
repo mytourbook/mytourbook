@@ -1442,8 +1442,10 @@ public class Messages extends NLS {
    public static String        Pref_Map25_Provider_Dialog_SaveModifiedProvider_Message;
    public static String        Pref_Map25_Provider_Dialog_SaveModifiedProvider_Title;
    public static String        Pref_Map25_Provider_Error_EnableMapProvider;
+   public static String        Pref_Map25_Provider_Error_MapFilename_IsNotValid;
    public static String        Pref_Map25_Provider_Error_MapFilename_IsRequired;
    public static String        Pref_Map25_Provider_Error_ProviderNameIsRequired;
+   public static String        Pref_Map25_Provider_Error_ThemeFilename_IsNotValid;
    public static String        Pref_Map25_Provider_Error_ThemeFilename_IsRequired;
    public static String        Pref_Map25_Provider_Error_TilePathIsRequired;
    public static String        Pref_Map25_Provider_Error_UrlIsRequired;
@@ -1462,6 +1464,7 @@ public class Messages extends NLS {
    public static String        Pref_Map25_Provider_ThemeStyle_Info_InvalidThemeFilename;
    public static String        Pref_Map25_Provider_ThemeStyle_Info_NoStyles;
    public static String        Pref_Map25_Provider_ThemeStyle_Info_NotAvailable;
+   public static String        Pref_Map25_Provider_ThemeStyle_Info_NotSupported;
 
    public static String        Pref_MapLayout_Checkbox_BorderColor_Color;
    public static String        Pref_MapLayout_Checkbox_BorderColor_Darker;
@@ -1864,6 +1867,9 @@ public class Messages extends NLS {
    public static String Slideout_Map25MapOptions_Checkbox_UseDraggedKeyNavigation_Tooltip;
    public static String Slideout_Map25MapOptions_Group_MapLayer;
    public static String Slideout_Map25MapOptions_Label_MapOptions;
+
+   public static String Slideout_Map25MapProvider_Label_MapProvider;
+   public static String Slideout_Map25MapProvider_Label_ThemeStyle;
 
    public static String Slideout_Map25MarkerOptions_Checkbox_IsMarkerClustering;
    public static String Slideout_Map25MarkerOptions_Checkbox_IsShowMarkerPoint;

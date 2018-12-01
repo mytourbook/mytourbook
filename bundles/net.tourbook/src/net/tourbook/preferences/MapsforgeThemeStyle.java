@@ -1,6 +1,7 @@
 package net.tourbook.preferences;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -10,6 +11,8 @@ import java.util.Map;
  */
 public class MapsforgeThemeStyle {
 
+   private static final String USER_LOCALE     = Locale.getDefault().toString();
+
    private Map<String, String> name            = new HashMap<>();
 
    private String              xmlLayer;
@@ -17,6 +20,13 @@ public class MapsforgeThemeStyle {
 
    public String getDefaultLaguage() {
       return defaultlanguage;
+   }
+
+   /**
+    * @return Returns localized style name
+    */
+   public String getLocaleName() {
+      return getName(USER_LOCALE);
    }
 
    /**
@@ -49,7 +59,7 @@ public class MapsforgeThemeStyle {
    /**
     * get the style name like
     *
-    * @return String containing the stylename like "elv-mtb"
+    * @return Returns the stylename, e.g. "elv-mtb"
     */
    public String getXmlLayer() {
       return xmlLayer;
