@@ -67,11 +67,12 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.NIO;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
+import net.tourbook.map25.Map25App;
 import net.tourbook.map25.Map25Provider;
 import net.tourbook.map25.Map25ProviderManager;
 import net.tourbook.map25.TileEncoding;
 
-public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchPreferencePage {
+public class PrefPage_Map25Provider extends PreferencePage implements IWorkbenchPreferencePage {
 
    public static final String              ID                               = "net.tourbook.preferences.PrefPage_Map25_Provider"; //$NON-NLS-1$
 
@@ -101,6 +102,11 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
    private boolean                         _isModified;
    private boolean                         _isMapProviderModified;
    private boolean                         _isInUpdateUI;
+   //
+   /**
+    * Is <code>true</code> when the "All Style" is available in the style combo box.
+    */
+   private boolean                         _isThemeStyleAll;
    //
    /**
     * Contains the controls which are displayed in the first column, these controls are used to get
@@ -919,7 +925,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
          return UI.EMPTY_STRING;
       }
 
-      final int selectedIndex = _comboThemeStyle.getSelectionIndex();
+      int selectedIndex = _comboThemeStyle.getSelectionIndex();
 
       if (selectedIndex < 0) {
 
@@ -927,7 +933,21 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
          return cachedThemeStyles.get(0).getXmlLayer();
       }
 
-      return cachedThemeStyles.get(selectedIndex).getXmlLayer();
+      // adjust index when "All Styles" is available
+      if (_isThemeStyleAll) {
+         selectedIndex--;
+      }
+
+      if (selectedIndex < 0) {
+
+         // "All Styles" is selected
+
+         return Map25App.THEME_STYLE_ALL;
+
+      } else {
+
+         return cachedThemeStyles.get(selectedIndex).getXmlLayer();
+      }
    }
 
    @Override
@@ -1473,6 +1493,8 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
    private void updateUI_ThemeStyle_WithReselect(final String themeFilepath, final Map25Provider mapProvider) {
 
+      _isThemeStyleAll = false;
+
       _comboThemeStyle.removeAll();
 
       if (themeFilepath == null) {
@@ -1528,6 +1550,11 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
          return;
       }
 
+      // first item is "All Styles"
+      _isThemeStyleAll = true;
+      _comboThemeStyle.add(Messages.Pref_Map25_Provider_ThemeStyle_Info_All);
+
+      // fill mapsforge styles
       for (final MapsforgeThemeStyle mapsforgeThemeStyle : mfStyles) {
          _comboThemeStyle.add(mapsforgeThemeStyle.getName(USER_LOCALE) + UI.DASH_WITH_DOUBLE_SPACE + mapsforgeThemeStyle.getXmlLayer());
       }
@@ -1535,13 +1562,17 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
       /*
        * Reselect previous style
        */
+
       String themeStyle = null;
       if (mapProvider != null) {
          themeStyle = mapProvider.themeStyle;
       }
 
-      if (themeStyle == null || themeStyle.trim().length() == 0) {
+      if (themeStyle == null
+            || themeStyle.trim().length() == 0
+            || Map25App.THEME_STYLE_ALL.equals(themeStyle)) {
 
+         // select "All Styles"
          _comboThemeStyle.select(0);
 
       } else {
@@ -1551,6 +1582,9 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
             final MapsforgeThemeStyle mapsforgeThemeStyle = mfStyles.get(styleIndex);
 
             if (mapsforgeThemeStyle.getXmlLayer().equals(themeStyle)) {
+
+               // adjust index when "All Styles" is available
+               styleIndex++;
 
                _comboThemeStyle.select(styleIndex);
 

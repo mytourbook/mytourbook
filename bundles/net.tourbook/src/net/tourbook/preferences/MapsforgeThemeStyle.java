@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Bean: MapsforgeThemeStyle containes a visible Style
+ * Bean: MapsforgeThemeStyle containes a visible style
  *
  * @author telemaxx
  */
@@ -66,7 +66,6 @@ public class MapsforgeThemeStyle {
     * @param name
     */
    public void setName(final String language, final String name) {
-      //System.out.println("setname: " + language + " name: " + name);
       this.name.put(language, name);
    }
 
@@ -76,6 +75,11 @@ public class MapsforgeThemeStyle {
 
    @Override
    public String toString() {
-      return "Item [xmlLAyer=" + xmlLayer + " Name= " + name.get(defaultlanguage) + "]";
+
+      return "MapsforgeThemeStyle "
+
+            + "xmlLayer=" + xmlLayer + " "
+            + "name= " + name.get(defaultlanguage) + " "
+            + "\n";
    }
 }

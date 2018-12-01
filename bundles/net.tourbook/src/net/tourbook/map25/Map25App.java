@@ -96,6 +96,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 
 	private static final String		STATE_SUFFIX_MAP_CURRENT_POSITION	= "MapCurrentPosition";					//$NON-NLS-1$
 	static final String				STATE_SUFFIX_MAP_DEFAULT_POSITION	= "MapDefaultPosition";					//$NON-NLS-1$
+	
+   public static final String THEME_STYLE_ALL = "theme-style-all";
 
 	private static IDialogSettings	_state;
 	
@@ -363,7 +365,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 					String style = styleId != null ? styleId : renderThemeStyleMenu.getDefaultValue();
 					// Retrieve the layer from the style id
 					XmlRenderThemeStyleLayer renderThemeStyleLayer = renderThemeStyleMenu.getLayer(style);
-					if(styleId != null && styleId.equals("all")) {
+					if(THEME_STYLE_ALL.equals(styleId)) {
 						return null;
 					} else if (renderThemeStyleLayer == null) {
 						System.err.println("##### loadtheme:  Invalid style \"" + style + "\" so i show all styles");

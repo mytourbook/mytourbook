@@ -243,6 +243,13 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
    @Override
    public void mapProviderListChanged() {
 
+      if (_comboMapProvider == null) {
+
+         // this can occure when dialog is closed and the event is still fired
+
+         return;
+      }
+
       fillMapProvider();
    }
 
