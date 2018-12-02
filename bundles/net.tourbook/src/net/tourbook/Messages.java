@@ -261,6 +261,8 @@ public class Messages extends NLS {
    public static String        Dialog_DoubleClickAction_NoAction_Title;
 
    public static String        Dialog_Export_Checkbox_Description;
+   public static String        Dialog_Export_Checkbox_SurfingWaves;
+   public static String        Dialog_Export_Checkbox_SurfingWaves_Tooltip;
    public static String        Dialog_Export_Checkbox_TourFields;
    public static String        Dialog_Export_Checkbox_TourFields_Tooltip;
    public static String        Dialog_Export_Checkbox_WithBarometer;
