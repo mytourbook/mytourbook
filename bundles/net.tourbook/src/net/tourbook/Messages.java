@@ -1418,6 +1418,7 @@ public class Messages extends NLS {
    public static String        Pref_LiveUpdate_Checkbox;
    public static String        Pref_LiveUpdate_Checkbox_Tooltip;
 
+   public static String        Pref_Map25_Action_EditMapProviderPreferences_Tooltip;
    public static String        Pref_Map25_Dialog_MapFilename_Title;
    public static String        Pref_Map25_Dialog_MapStyleFilename_Title;
    public static String        Pref_Map25_Encoding_Mapsforge_Offline;
@@ -1433,6 +1434,7 @@ public class Messages extends NLS {
    public static String        Pref_Map25_Provider_Checkbox_IsEnabled_Tooltip;
    public static String        Pref_Map25_Provider_Column_APIKey_ThemeStyle;
    public static String        Pref_Map25_Provider_Column_Enabled;
+   public static String        Pref_Map25_Provider_Column_Offline;
    public static String        Pref_Map25_Provider_Column_ProviderName;
    public static String        Pref_Map25_Provider_Column_TileEncoding;
    public static String        Pref_Map25_Provider_Column_TilePath_ThemeFilename;
@@ -1867,7 +1869,9 @@ public class Messages extends NLS {
    public static String Slideout_Map25MapOptions_Checkbox_UseDraggedKeyNavigation_Tooltip;
    public static String Slideout_Map25MapOptions_Group_MapLayer;
    public static String Slideout_Map25MapOptions_Label_MapOptions;
-
+   
+   public static String Slideout_Map25MapProvider_Combo_MapProvider_Offline_Tooltip;
+   public static String Slideout_Map25MapProvider_Combo_MapProvider_Online_Tooltip;
    public static String Slideout_Map25MapProvider_Label_MapProvider;
    public static String Slideout_Map25MapProvider_Label_ThemeStyle;
 

@@ -100,7 +100,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
    private void createActions() {
 
       _actionPrefDialog = new ActionOpenPrefDialog(
-            Messages.Tour_Action_EditChartPreferences,
+            Messages.Pref_Map25_Action_EditMapProviderPreferences_Tooltip,
             PrefPage_Map25Provider.ID);
 
       _actionPrefDialog.closeThisTooltip(this);
@@ -350,6 +350,10 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
       }
 
       updateUI_ThemeStyle(selectedMapProvider);
+      updateUI_MapProvider_Tooltip(selectedMapProvider);
+
+      // update UI otherwise the old theme style box is displayed until the next redraw
+      _parent.update();
 
       _map25View.getMapApp().setMapProvider(selectedMapProvider);
    }
@@ -380,6 +384,9 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
       final Map25Provider currentMapProvider = getUsedMapProvider();
 
       selectMapProvider(currentMapProvider);
+
+      updateUI_ThemeStyle(currentMapProvider);
+      updateUI_MapProvider_Tooltip(currentMapProvider);
    }
 
    private void saveState() {
@@ -411,6 +418,50 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
       }
    }
 
+   private void updateUI_MapProvider_Tooltip(final Map25Provider mapProvider) {
+
+      String mpTooltip = UI.EMPTY_STRING;
+
+      if (mapProvider.isOfflineMap) {
+
+         // offline
+
+         final List<MapsforgeThemeStyle> themeStyles = mapProvider.getThemeStyles(false);
+
+         final CharSequence[] allThemeStyles = new CharSequence[themeStyles.size()];
+         for (int styleIndex = 0; styleIndex < themeStyles.size(); styleIndex++) {
+            final MapsforgeThemeStyle themeStyle = themeStyles.get(styleIndex);
+            allThemeStyles[styleIndex] = UI.SPACE4 + themeStyle.getLocaleName() + UI.DASH_WITH_SPACE + themeStyle.getXmlLayer();
+         }
+
+         final String themeStyleText = String.join(UI.NEW_LINE1, allThemeStyles);
+
+         mpTooltip = String.format(Messages.Slideout_Map25MapProvider_Combo_MapProvider_Offline_Tooltip,
+
+               mapProvider.tileEncoding,
+               mapProvider.mapFilepath,
+               mapProvider.themeFilepath,
+               themeStyleText
+
+         );
+
+      } else {
+
+         // online
+
+         mpTooltip = String.format(Messages.Slideout_Map25MapProvider_Combo_MapProvider_Online_Tooltip,
+
+               mapProvider.tileEncoding,
+               mapProvider.url + mapProvider.tilePath,
+               mapProvider.apiKey
+
+         );
+      }
+
+      _lblMapProvider.setToolTipText(mpTooltip);
+      _lblThemeStyle.setToolTipText(mpTooltip);
+   }
+
    private void updateUI_ThemeStyle(final Map25Provider mapProvider) {
 
       _comboThemeStyle.removeAll();
@@ -420,7 +471,10 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
          _comboThemeStyle.add(Messages.Pref_Map25_Provider_ThemeStyle_Info_NotSupported);
          _comboThemeStyle.select(0);
 
+         _lblThemeStyle.setEnabled(false);
          _comboThemeStyle.setEnabled(false);
+
+         _comboThemeStyle.getParent().layout(true, true);
 
          return;
       }
@@ -433,7 +487,10 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
          _comboThemeStyle.add(Messages.Pref_Map25_Provider_ThemeStyle_Info_InvalidThemeFilename);
          _comboThemeStyle.select(0);
 
+         _lblThemeStyle.setEnabled(false);
          _comboThemeStyle.setEnabled(false);
+
+         _comboThemeStyle.getParent().layout(true, true);
 
          return;
       }
@@ -441,7 +498,10 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
       /*
        * Fill combo with all styles
        */
+
+      _lblThemeStyle.setEnabled(true);
       _comboThemeStyle.setEnabled(true);
+
       int styleSelectIndex = 0;
 
       for (int styleIndex = 0; styleIndex < mfStyles.size(); styleIndex++) {
@@ -454,6 +514,8 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
             styleSelectIndex = styleIndex;
          }
       }
+
+      _comboThemeStyle.getParent().layout(true, true);
 
       // select map provider style
       _isInUpdateUI = true;

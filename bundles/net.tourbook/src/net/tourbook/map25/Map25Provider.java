@@ -54,8 +54,8 @@ public class Map25Provider implements Cloneable {
    /*
     * Cached theme properties
     */
-   private String                    cachedThemeFilepath;
-   private List<MapsforgeThemeStyle> cachedThemeStyles;
+   private String                    _cachedThemeFilepath;
+   private List<MapsforgeThemeStyle> _cachedThemeStyles;
 
    public Map25Provider() {
 
@@ -86,6 +86,9 @@ public class Map25Provider implements Cloneable {
       try {
 
          final Map25Provider clonedProvider = (Map25Provider) super.clone();
+
+         clonedProvider._cachedThemeFilepath = null;
+         clonedProvider._cachedThemeStyles = null;
 
          return clonedProvider;
 
@@ -129,33 +132,35 @@ public class Map25Provider implements Cloneable {
    }
 
    /**
-    * @param isForceReload
+    * Is loading the theme styles when not yet loaded.
+    *
+    * @param isForceThemeStyleReload
     * @return Returns theme styles or <code>null</code> when not available.
     */
-   public List<MapsforgeThemeStyle> getThemeStyles(boolean isForceReload) {
+   public List<MapsforgeThemeStyle> getThemeStyles(final boolean isForceThemeStyleReload) {
 
       List<MapsforgeThemeStyle> mfStyles;
 
-      if (isForceReload
+      if (isForceThemeStyleReload
 
             // styles are not yet loaded
-            || cachedThemeFilepath == null
+            || _cachedThemeFilepath == null
 
             // check if styles for the theme filepath are not yet loaded
-            || (cachedThemeFilepath != null && cachedThemeFilepath.equals(themeFilepath) == false)) {
+            || (_cachedThemeFilepath != null && _cachedThemeFilepath.equals(themeFilepath) == false)) {
 
          // styles needs to be loaded
          mfStyles = Map25ProviderManager.loadMapsforgeThemeStyles(themeFilepath);
 
          // mark styles to be loaded for this filepath
-         cachedThemeFilepath = themeFilepath;
+         _cachedThemeFilepath = themeFilepath;
 
          // cache theme styles
-         cachedThemeStyles = mfStyles;
+         _cachedThemeStyles = mfStyles;
 
       } else {
 
-         mfStyles = cachedThemeStyles;
+         mfStyles = _cachedThemeStyles;
       }
 
       return mfStyles;
