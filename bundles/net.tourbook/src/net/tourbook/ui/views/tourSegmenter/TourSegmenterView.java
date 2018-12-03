@@ -835,7 +835,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                _lblMinAltitude.setText(net.tourbook.common.UI.UNIT_LABEL_DISTANCE);
                _lblMinAltitude.pack(true);
 
-               updateUI_SurfingMeasurementValues();
+               updateUI_Surfing_MeasurementValues();
 
                createSegments(true);
 
@@ -2771,7 +2771,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                }
             });
 
-// Sometime the button are toooooo wide
+// Sometimes the button are toooooo wide
 //            UI.setButtonLayoutData(_btnSurfing_RestoreFrom_Defaults);
 //            UI.setButtonLayoutData(_btnSurfing_RestoreFrom_Tour);
          }
@@ -5213,6 +5213,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          _iconSaveSurfingState.setToolTipText(Messages.Tour_Segmenter_Button_Surfing_IsNotSaveState_Tooltip);
          _iconSaveSurfingState.setImage(_imageSurfing_NotSaveState);
       }
+
+      updateUI_Surfing_RestoreTour();
    }
 
    /**
@@ -5553,32 +5555,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          _btnSaveTourDP.setEnabled(canSaveTour);
          _btnSaveTourMin.setEnabled(canSaveTour);
 
-         _btnSurfing_RestoreFrom_Tour.setToolTipText(String.format(
-
-               Messages.Tour_Segmenter_Surfing_Button_RestoreFromTourWithData_Tooltip,
-
-               // min start/stop speed
-               _tourData.getSurfing_MinSpeed_StartStop(),
-               UI.UNIT_LABEL_SPEED,
-
-               // min surfing speed
-               _tourData.getSurfing_MinSpeed_Surfing(),
-               UI.UNIT_LABEL_SPEED,
-
-               // min time duration
-               _tourData.getSurfing_MinTimeDuration(),
-               Messages.App_Unit_Seconds_Small,
-
-               // min distance
-               _tourData.getSurfing_MinDistance(),
-               UI.UNIT_LABEL_DISTANCE_M_OR_YD,
-
-               // is min distance
-               _tourData.isSurfing_IsMinDistance()
-                     ? Messages.App__True
-                     : Messages.App__False
-         //
-         ));
+         updateUI_Surfing_RestoreTour();
 
          restoreState_FromTour();
       }
@@ -5950,7 +5927,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       }
    }
 
-   private void updateUI_SurfingMeasurementValues() {
+   private void updateUI_Surfing_MeasurementValues() {
 
       final int minDistance = _spinnerSurfing_MinSurfingDistance.getSelection();
       final int minSpeed_StartStop = _spinnerSurfing_MinSpeed_StartStop.getSelection();
@@ -5981,5 +5958,35 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       _lblSurfing_MinSurfingSpeed_Unit.setText(UI.UNIT_LABEL_SPEED);
 
       _lblSurfing_MinSurfingDistance_Unit.setText(UI.UNIT_LABEL_DISTANCE_M_OR_YD);
+   }
+
+   private void updateUI_Surfing_RestoreTour() {
+
+      _btnSurfing_RestoreFrom_Tour.setToolTipText(String.format(
+
+            Messages.Tour_Segmenter_Surfing_Button_RestoreFromTourWithData_Tooltip,
+
+            // min start/stop speed
+            _tourData.getSurfing_MinSpeed_StartStop(),
+            UI.UNIT_LABEL_SPEED,
+
+            // min surfing speed
+            _tourData.getSurfing_MinSpeed_Surfing(),
+            UI.UNIT_LABEL_SPEED,
+
+            // min time duration
+            _tourData.getSurfing_MinTimeDuration(),
+            Messages.App_Unit_Seconds_Small,
+
+            // min distance
+            _tourData.getSurfing_MinDistance(),
+            UI.UNIT_LABEL_DISTANCE_M_OR_YD,
+
+            // is min distance
+            _tourData.isSurfing_IsMinDistance()
+                  ? Messages.App__True
+                  : Messages.App__False
+      //
+      ));
    }
 }

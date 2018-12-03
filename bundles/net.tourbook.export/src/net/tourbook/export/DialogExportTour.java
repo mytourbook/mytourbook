@@ -506,7 +506,6 @@ public class DialogExportTour extends TitleAreaDialog {
              */
             _chkGPX_Description = new Button(parent, SWT.CHECK);
             _chkGPX_Description.setText(Messages.Dialog_Export_Checkbox_Description);
-//            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).applyTo(_chkGPX_Description);
          }
          {
             /*
@@ -515,7 +514,6 @@ public class DialogExportTour extends TitleAreaDialog {
             _chkGPX_Markers = new Button(parent, SWT.CHECK);
             _chkGPX_Markers.setText(Messages.dialog_export_chk_exportMarkers);
             _chkGPX_Markers.setToolTipText(Messages.dialog_export_chk_exportMarkers_tooltip);
-//            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).applyTo(_chkGPX_Markers);
          }
          {
             /*
@@ -524,7 +522,6 @@ public class DialogExportTour extends TitleAreaDialog {
             _chkGPX_NoneGPXFields = new Button(parent, SWT.CHECK);
             _chkGPX_NoneGPXFields.setText(Messages.Dialog_Export_Checkbox_TourFields);
             _chkGPX_NoneGPXFields.setToolTipText(Messages.Dialog_Export_Checkbox_TourFields_Tooltip);
-//            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).applyTo(_chkGPX_NoneGPXFields);
          }
          {
             /*
@@ -533,7 +530,14 @@ public class DialogExportTour extends TitleAreaDialog {
             _chkGPX_SurfingWaves = new Button(parent, SWT.CHECK);
             _chkGPX_SurfingWaves.setText(Messages.Dialog_Export_Checkbox_SurfingWaves);
             _chkGPX_SurfingWaves.setToolTipText(Messages.Dialog_Export_Checkbox_SurfingWaves_Tooltip);
-//            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).applyTo(_chkGPX_SurfingWaves);
+            _chkGPX_SurfingWaves.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+
+                  // setup filename
+                  enableFields();
+               }
+            });
          }
 
       } else if (_isSetup_TCX) {
@@ -1593,6 +1597,18 @@ public class DialogExportTour extends TitleAreaDialog {
          endIndex = _tourEndIndex;
       }
 
+      /*
+       * Manage surfing waves
+       */
+      boolean[] visibleDataPointSerie = null;
+      boolean isPrevDataPointVisible = false;
+      if (_exportState_GPX_IsExportSurfingWaves && tourData.isVisiblePointsSaved_ForSurfing()) {
+
+         visibleDataPointSerie = tourData.visibleDataPointSerie;
+         isPrevDataPointVisible = visibleDataPointSerie[0];
+      }
+      final boolean isExportSurfingWaves = visibleDataPointSerie != null;
+
       final GarminTrack track = new GarminTrack();
 
       /*
@@ -1605,9 +1621,41 @@ public class DialogExportTour extends TitleAreaDialog {
             track.setIdentification(tourTitle);
          }
 
-         final String tourDescription = tourData.getTourDescription();
-         if (tourDescription.length() > 0) {
-            track.setComment(tourDescription);
+         final StringBuilder sbTourDescription = new StringBuilder();
+
+         // add description from the tour
+         sbTourDescription.append(tourData.getTourDescription());
+
+         // append surfing parameters to the description
+         if (isExportSurfingWaves) {
+
+            if (sbTourDescription.length() > 0) {
+               sbTourDescription.append(UI.NEW_LINE2);
+            }
+
+            sbTourDescription.append(String.format(
+
+                  Messages.Dialog_Export_Description_SurfingWaves,
+
+                  // min start/stop speed
+                  tourData.getSurfing_MinSpeed_StartStop(),
+                  UI.UNIT_LABEL_SPEED,
+
+                  // min surfing speed
+                  tourData.getSurfing_MinSpeed_Surfing(),
+                  UI.UNIT_LABEL_SPEED,
+
+                  // min time duration
+                  tourData.getSurfing_MinTimeDuration(),
+                  Messages.App_Unit_Seconds_Small,
+
+                  // min distance
+                  tourData.isSurfing_IsMinDistance() ? tourData.getSurfing_MinDistance() : 0,
+                  UI.UNIT_LABEL_DISTANCE_M_OR_YD));
+         }
+
+         if (sbTourDescription.length() > 0) {
+            track.setComment(sbTourDescription.toString());
          }
       }
 
@@ -1619,8 +1667,36 @@ public class DialogExportTour extends TitleAreaDialog {
          final GarminTrackpointD304 tp304 = new GarminTrackpointD304();
          final GarminTrackpointAdapterExtended tpExt = new GarminTrackpointAdapterExtended(tp304);
 
+         /*
+          * Manage surfing
+          */
+         boolean isCreateTrackSegment = false;
+         if (isExportSurfingWaves) {
+
+            // export only surfing events
+
+            final boolean isDataPointVisible = visibleDataPointSerie[serieIndex];
+
+            if (isDataPointVisible && isDataPointVisible != isPrevDataPointVisible) {
+
+               // visibility has changed -> show track
+
+               isCreateTrackSegment = true;
+
+            } else if (isDataPointVisible == false) {
+
+               // hide time slices until they are visible again
+
+               isPrevDataPointVisible = false;
+
+               continue;
+            }
+
+            isPrevDataPointVisible = isDataPointVisible;
+         }
+
          // mark as a new track to create the <trkseg>...</trkseg> tags
-         if (serieIndex == startIndex) {
+         if (serieIndex == startIndex || isCreateTrackSegment) {
             tpExt.setNewTrack(true);
          }
 
@@ -2137,7 +2213,30 @@ public class DialogExportTour extends TitleAreaDialog {
 
          // display the tour date/time
 
-         _comboFile.setText(net.tourbook.ui.UI.format_yyyymmdd_hhmmss(minTourData));
+         String postFilename = UI.EMPTY_STRING;
+
+         if (_isSetup_GPX && _chkGPX_SurfingWaves.getSelection()) {
+
+            postFilename = String.format(
+
+                  "__%d-%d-%d-%d",
+
+                  // min start/stop speed
+                  minTourData.getSurfing_MinSpeed_StartStop(),
+
+                  // min surfing speed
+                  minTourData.getSurfing_MinSpeed_Surfing(),
+
+                  // min time duration
+                  minTourData.getSurfing_MinTimeDuration(),
+
+                  // min distance
+                  minTourData.isSurfing_IsMinDistance() ? minTourData.getSurfing_MinDistance() : 0
+
+            );
+         }
+
+         _comboFile.setText(net.tourbook.ui.UI.format_yyyymmdd_hhmmss(minTourData) + postFilename);
       }
    }
 
