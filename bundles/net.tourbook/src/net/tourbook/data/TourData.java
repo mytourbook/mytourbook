@@ -1543,7 +1543,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * When values are <code>true</code>, then the data are visible, otherwise they are hidden. This
     * is used to show surfing parts and to hide the none surfing parts.
     * <p>
-    * When <code>null</code> then it will be ignored and all data points are visible.
+    * With <code>null</code>, it will be ignored and all data points are visible.
     */
    @Transient
    public boolean[] visibleDataPointSerie;

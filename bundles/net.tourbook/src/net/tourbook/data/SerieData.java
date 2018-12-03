@@ -135,46 +135,46 @@ public class SerieData implements Serializable {
 
       final int maxLen = 10;
 
-      return "\n"
+      return "\n" //$NON-NLS-1$
 
-            + "   timeSerie                  " + (timeSerie != null          ? Arrays.toString(Arrays.copyOf(timeSerie,            Math.min(timeSerie.length, maxLen)))             : UI.EMPTY_STRING) + "\n"
+            + "   timeSerie                  " + (timeSerie != null          ? Arrays.toString(Arrays.copyOf(timeSerie,            Math.min(timeSerie.length, maxLen)))             : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "   distanceSerie20            " + (distanceSerie20 != null    ? Arrays.toString(Arrays.copyOf(distanceSerie20,      Math.min(distanceSerie20.length, maxLen)))       : UI.EMPTY_STRING) + "\n"
-            + "   altitudeSerie20            " + (altitudeSerie20 != null    ? Arrays.toString(Arrays.copyOf(altitudeSerie20,      Math.min(altitudeSerie20.length, maxLen)))       : UI.EMPTY_STRING) + "\n"
-            + "   cadenceSerie20             " + (cadenceSerie20 != null     ? Arrays.toString(Arrays.copyOf(cadenceSerie20,       Math.min(cadenceSerie20.length, maxLen)))        : UI.EMPTY_STRING) + "\n"
-            + "   pulseSerie20               " + (pulseSerie20 != null       ? Arrays.toString(Arrays.copyOf(pulseSerie20,         Math.min(pulseSerie20.length, maxLen)))          : UI.EMPTY_STRING) + "\n"
-            + "   temperatureSerie20         " + (temperatureSerie20 != null ? Arrays.toString(Arrays.copyOf(temperatureSerie20,   Math.min(temperatureSerie20.length, maxLen)))    : UI.EMPTY_STRING) + "\n"
-            + "   speedSerie20               " + (speedSerie20 != null       ? Arrays.toString(Arrays.copyOf(speedSerie20,         Math.min(speedSerie20.length, maxLen)))          : UI.EMPTY_STRING) + "\n"
-            + "   powerSerie20               " + (powerSerie20 != null       ? Arrays.toString(Arrays.copyOf(powerSerie20,         Math.min(powerSerie20.length, maxLen)))          : UI.EMPTY_STRING) + "\n"
+            + "   distanceSerie20            " + (distanceSerie20 != null    ? Arrays.toString(Arrays.copyOf(distanceSerie20,      Math.min(distanceSerie20.length, maxLen)))       : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   altitudeSerie20            " + (altitudeSerie20 != null    ? Arrays.toString(Arrays.copyOf(altitudeSerie20,      Math.min(altitudeSerie20.length, maxLen)))       : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   cadenceSerie20             " + (cadenceSerie20 != null     ? Arrays.toString(Arrays.copyOf(cadenceSerie20,       Math.min(cadenceSerie20.length, maxLen)))        : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   pulseSerie20               " + (pulseSerie20 != null       ? Arrays.toString(Arrays.copyOf(pulseSerie20,         Math.min(pulseSerie20.length, maxLen)))          : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   temperatureSerie20         " + (temperatureSerie20 != null ? Arrays.toString(Arrays.copyOf(temperatureSerie20,   Math.min(temperatureSerie20.length, maxLen)))    : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   speedSerie20               " + (speedSerie20 != null       ? Arrays.toString(Arrays.copyOf(speedSerie20,         Math.min(speedSerie20.length, maxLen)))          : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   powerSerie20               " + (powerSerie20 != null       ? Arrays.toString(Arrays.copyOf(powerSerie20,         Math.min(powerSerie20.length, maxLen)))          : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "   gears                      " + (gears != null              ? Arrays.toString(Arrays.copyOf(gears,                Math.min(gears.length, maxLen)))                 : UI.EMPTY_STRING) + "\n"
-            + "   longitude                  " + (longitude != null          ? Arrays.toString(Arrays.copyOf(longitude,            Math.min(longitude.length, maxLen)))             : UI.EMPTY_STRING) + "\n"
-            + "   latitude                   " + (latitude != null           ? Arrays.toString(Arrays.copyOf(latitude,             Math.min(latitude.length, maxLen)))              : UI.EMPTY_STRING) + "\n"
-            + "   pulseTimes                 " + (pulseTimes != null         ? Arrays.toString(Arrays.copyOf(pulseTimes,           Math.min(pulseTimes.length, maxLen)))            : UI.EMPTY_STRING) + "\n"
+            + "   gears                      " + (gears != null              ? Arrays.toString(Arrays.copyOf(gears,                Math.min(gears.length, maxLen)))                 : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   longitude                  " + (longitude != null          ? Arrays.toString(Arrays.copyOf(longitude,            Math.min(longitude.length, maxLen)))             : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   latitude                   " + (latitude != null           ? Arrays.toString(Arrays.copyOf(latitude,             Math.min(latitude.length, maxLen)))              : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   pulseTimes                 " + (pulseTimes != null         ? Arrays.toString(Arrays.copyOf(pulseTimes,           Math.min(pulseTimes.length, maxLen)))            : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "   runDyn_StanceTime          " + (runDyn_StanceTime != null           ? Arrays.toString(Arrays.copyOf(runDyn_StanceTime,          Math.min(runDyn_StanceTime.length, maxLen)))              : UI.EMPTY_STRING) + "\n"
-            + "   runDyn_StanceTimeBalance   " + (runDyn_StanceTimeBalance != null    ? Arrays.toString(Arrays.copyOf(runDyn_StanceTimeBalance,   Math.min(runDyn_StanceTimeBalance.length, maxLen)))       : UI.EMPTY_STRING) + "\n"
-            + "   runDyn_StepLength          " + (runDyn_StepLength != null           ? Arrays.toString(Arrays.copyOf(runDyn_StepLength,          Math.min(runDyn_StepLength.length, maxLen)))              : UI.EMPTY_STRING) + "\n"
-            + "   runDyn_VerticalOscillation " + (runDyn_VerticalOscillation != null  ? Arrays.toString(Arrays.copyOf(runDyn_VerticalOscillation, Math.min(runDyn_VerticalOscillation.length, maxLen)))     : UI.EMPTY_STRING) + "\n"
-            + "   runDyn_VerticalRatio       " + (runDyn_VerticalRatio != null        ? Arrays.toString(Arrays.copyOf(runDyn_VerticalRatio,       Math.min(runDyn_VerticalRatio.length, maxLen)))           : UI.EMPTY_STRING) + "\n"
+            + "   runDyn_StanceTime          " + (runDyn_StanceTime != null           ? Arrays.toString(Arrays.copyOf(runDyn_StanceTime,          Math.min(runDyn_StanceTime.length, maxLen)))              : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   runDyn_StanceTimeBalance   " + (runDyn_StanceTimeBalance != null    ? Arrays.toString(Arrays.copyOf(runDyn_StanceTimeBalance,   Math.min(runDyn_StanceTimeBalance.length, maxLen)))       : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   runDyn_StepLength          " + (runDyn_StepLength != null           ? Arrays.toString(Arrays.copyOf(runDyn_StepLength,          Math.min(runDyn_StepLength.length, maxLen)))              : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   runDyn_VerticalOscillation " + (runDyn_VerticalOscillation != null  ? Arrays.toString(Arrays.copyOf(runDyn_VerticalOscillation, Math.min(runDyn_VerticalOscillation.length, maxLen)))     : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   runDyn_VerticalRatio       " + (runDyn_VerticalRatio != null        ? Arrays.toString(Arrays.copyOf(runDyn_VerticalRatio,       Math.min(runDyn_VerticalRatio.length, maxLen)))           : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "   swim_LengthType            " + (swim_LengthType != null        ? Arrays.toString(Arrays.copyOf(swim_LengthType,         Math.min(swim_LengthType.length, maxLen)))       : UI.EMPTY_STRING) + "\n"
-            + "   swim_Cadence               " + (swim_Cadence != null           ? Arrays.toString(Arrays.copyOf(swim_Cadence,            Math.min(swim_Cadence.length, maxLen)))          : UI.EMPTY_STRING) + "\n"
-            + "   swim_Strokes               " + (swim_Strokes != null           ? Arrays.toString(Arrays.copyOf(swim_Strokes,            Math.min(swim_Strokes.length, maxLen)))          : UI.EMPTY_STRING) + "\n"
-            + "   swim_StrokeStyle           " + (swim_StrokeStyle != null       ? Arrays.toString(Arrays.copyOf(swim_StrokeStyle,        Math.min(swim_StrokeStyle.length, maxLen)))      : UI.EMPTY_STRING) + "\n"
-            + "   swim_Time                  " + (swim_Time != null              ? Arrays.toString(Arrays.copyOf(swim_Time,               Math.min(swim_Time.length, maxLen)))             : UI.EMPTY_STRING) + "\n"
+            + "   swim_LengthType            " + (swim_LengthType != null        ? Arrays.toString(Arrays.copyOf(swim_LengthType,         Math.min(swim_LengthType.length, maxLen)))       : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   swim_Cadence               " + (swim_Cadence != null           ? Arrays.toString(Arrays.copyOf(swim_Cadence,            Math.min(swim_Cadence.length, maxLen)))          : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   swim_Strokes               " + (swim_Strokes != null           ? Arrays.toString(Arrays.copyOf(swim_Strokes,            Math.min(swim_Strokes.length, maxLen)))          : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   swim_StrokeStyle           " + (swim_StrokeStyle != null       ? Arrays.toString(Arrays.copyOf(swim_StrokeStyle,        Math.min(swim_StrokeStyle.length, maxLen)))      : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   swim_Time                  " + (swim_Time != null              ? Arrays.toString(Arrays.copyOf(swim_Time,               Math.min(swim_Time.length, maxLen)))             : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "   visiblePoints_Surfing      " + (visiblePoints_Surfing != null  ? Arrays.toString(Arrays.copyOf(visiblePoints_Surfing,   Math.min(visiblePoints_Surfing.length, maxLen)))    : UI.EMPTY_STRING) + "\n"
+            + "   visiblePoints_Surfing      " + (visiblePoints_Surfing != null  ? Arrays.toString(Arrays.copyOf(visiblePoints_Surfing,   Math.min(visiblePoints_Surfing.length, maxLen)))    : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "   distanceSerie              " + (distanceSerie != null          ? Arrays.toString(Arrays.copyOf(distanceSerie,           Math.min(distanceSerie.length, maxLen)))         : UI.EMPTY_STRING) + "\n"
-            + "   altitudeSerie              " + (altitudeSerie != null          ? Arrays.toString(Arrays.copyOf(altitudeSerie,           Math.min(altitudeSerie.length, maxLen)))         : UI.EMPTY_STRING) + "\n"
-            + "   cadenceSerie               " + (cadenceSerie != null           ? Arrays.toString(Arrays.copyOf(cadenceSerie,            Math.min(cadenceSerie.length, maxLen)))          : UI.EMPTY_STRING) + "\n"
-            + "   pulseSerie                 " + (pulseSerie != null             ? Arrays.toString(Arrays.copyOf(pulseSerie,              Math.min(pulseSerie.length, maxLen)))            : UI.EMPTY_STRING) + "\n"
-            + "   temperatureSerie           " + (temperatureSerie != null       ? Arrays.toString(Arrays.copyOf(temperatureSerie,        Math.min(temperatureSerie.length, maxLen)))      : UI.EMPTY_STRING) + "\n"
-            + "   speedSerie                 " + (speedSerie != null             ? Arrays.toString(Arrays.copyOf(speedSerie,              Math.min(speedSerie.length, maxLen)))            : UI.EMPTY_STRING) + "\n"
-            + "   powerSerie                 " + (powerSerie != null             ? Arrays.toString(Arrays.copyOf(powerSerie,              Math.min(powerSerie.length, maxLen)))            : UI.EMPTY_STRING) + "\n"
+            + "   distanceSerie              " + (distanceSerie != null          ? Arrays.toString(Arrays.copyOf(distanceSerie,           Math.min(distanceSerie.length, maxLen)))         : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   altitudeSerie              " + (altitudeSerie != null          ? Arrays.toString(Arrays.copyOf(altitudeSerie,           Math.min(altitudeSerie.length, maxLen)))         : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   cadenceSerie               " + (cadenceSerie != null           ? Arrays.toString(Arrays.copyOf(cadenceSerie,            Math.min(cadenceSerie.length, maxLen)))          : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   pulseSerie                 " + (pulseSerie != null             ? Arrays.toString(Arrays.copyOf(pulseSerie,              Math.min(pulseSerie.length, maxLen)))            : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   temperatureSerie           " + (temperatureSerie != null       ? Arrays.toString(Arrays.copyOf(temperatureSerie,        Math.min(temperatureSerie.length, maxLen)))      : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   speedSerie                 " + (speedSerie != null             ? Arrays.toString(Arrays.copyOf(speedSerie,              Math.min(speedSerie.length, maxLen)))            : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   powerSerie                 " + (powerSerie != null             ? Arrays.toString(Arrays.copyOf(powerSerie,              Math.min(powerSerie.length, maxLen)))            : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "   deviceMarker               " + (deviceMarker != null           ? Arrays.toString(Arrays.copyOf(deviceMarker,            Math.min(deviceMarker.length, maxLen)))          : UI.EMPTY_STRING) ;
+            + "   deviceMarker               " + (deviceMarker != null           ? Arrays.toString(Arrays.copyOf(deviceMarker,            Math.min(deviceMarker.length, maxLen)))          : UI.EMPTY_STRING) ; //$NON-NLS-1$
    }
 
 // SET_FORMATTING_ON

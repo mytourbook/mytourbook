@@ -750,7 +750,7 @@ public class FTSearchManager {
 
          final java.nio.file.Path rootPath = getLuceneIndexRootPath();
 
-         TourLogManager.logInfo(String.format("Deleting lucene root folder \"%s\"", rootPath.toString()));
+         TourLogManager.logInfo(String.format(Messages.Search_Manager_Log_DeletingLuceneRootFolder, rootPath.toString()));
 
          Files.walkFileTree(rootPath, new SimpleFileVisitor<java.nio.file.Path>() {
 
@@ -771,7 +771,7 @@ public class FTSearchManager {
             }
          });
 
-         TourLogManager.logInfo("Lucene root folder is deleted");
+         TourLogManager.logInfo(Messages.Search_Manager_Log_LuceneRootFolderIsDeleted);
 
          indexWriter = new IndexWriter(indexStore, getIndexWriterConfig());
       }
