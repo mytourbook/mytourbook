@@ -21,6 +21,7 @@ import java.util.Locale;
 //import java.io.FileNotFoundException;
 import java.util.Set;
 
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.map25.Map25TileSource.Builder;
 import net.tourbook.map25.OkHttpEngineMT.OkHttpFactoryMT;
@@ -96,6 +97,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 
 	private static final String		STATE_SUFFIX_MAP_CURRENT_POSITION	= "MapCurrentPosition";					//$NON-NLS-1$
 	static final String				STATE_SUFFIX_MAP_DEFAULT_POSITION	= "MapDefaultPosition";					//$NON-NLS-1$
+	
+   public static final String THEME_STYLE_ALL = "theme-style-all";
 
 	private static IDialogSettings	_state;
 	
@@ -363,7 +366,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 					String style = styleId != null ? styleId : renderThemeStyleMenu.getDefaultValue();
 					// Retrieve the layer from the style id
 					XmlRenderThemeStyleLayer renderThemeStyleLayer = renderThemeStyleMenu.getLayer(style);
-					if(styleId != null && styleId.equals("all")) {
+					if(THEME_STYLE_ALL.equals(styleId)) {
 						return null;
 					} else if (renderThemeStyleLayer == null) {
 						System.err.println("##### loadtheme:  Invalid style \"" + style + "\" so i show all styles");
@@ -682,7 +685,13 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 			mMap.layers().add(_layer_mf_S3DB_Building);			*/
 			
 			if (_mf_mapFilePath == null) {
-				throw new IllegalArgumentException("############# setMapProvider cannot read mapfile: " + _mf_mapFilePath);
+			   
+            StatusUtil.showStatus(String.format(
+                  "Cannot read map file \"%s\" in map provider \"%s\"", 
+                  mapProvider.mapFilepath, 
+                  mapProvider.name));
+            
+            throw new IllegalArgumentException("############# setMapProvider cannot read mapfile: " + _mf_mapFilePath);
 			} else {
 				System.out.println("############# setMapProvider Map Path: " + _mf_mapFilePath);
 			}

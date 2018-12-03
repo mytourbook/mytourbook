@@ -261,10 +261,13 @@ public class Messages extends NLS {
    public static String        Dialog_DoubleClickAction_NoAction_Title;
 
    public static String        Dialog_Export_Checkbox_Description;
+   public static String        Dialog_Export_Checkbox_SurfingWaves;
+   public static String        Dialog_Export_Checkbox_SurfingWaves_Tooltip;
    public static String        Dialog_Export_Checkbox_TourFields;
    public static String        Dialog_Export_Checkbox_TourFields_Tooltip;
    public static String        Dialog_Export_Checkbox_WithBarometer;
    public static String        Dialog_Export_Checkbox_WithBarometer_Tooltip;
+   public static String        Dialog_Export_Description_SurfingWaves;
    public static String        Dialog_Export_Error_CourseNameIsInvalid;
    public static String        Dialog_Export_Group_Custom;
    public static String        Dialog_Export_Group_Custom_Tooltip;
@@ -1418,6 +1421,7 @@ public class Messages extends NLS {
    public static String        Pref_LiveUpdate_Checkbox;
    public static String        Pref_LiveUpdate_Checkbox_Tooltip;
 
+   public static String        Pref_Map25_Action_EditMapProviderPreferences_Tooltip;
    public static String        Pref_Map25_Dialog_MapFilename_Title;
    public static String        Pref_Map25_Dialog_MapStyleFilename_Title;
    public static String        Pref_Map25_Encoding_Mapsforge_Offline;
@@ -1433,6 +1437,7 @@ public class Messages extends NLS {
    public static String        Pref_Map25_Provider_Checkbox_IsEnabled_Tooltip;
    public static String        Pref_Map25_Provider_Column_APIKey_ThemeStyle;
    public static String        Pref_Map25_Provider_Column_Enabled;
+   public static String        Pref_Map25_Provider_Column_Offline;
    public static String        Pref_Map25_Provider_Column_ProviderName;
    public static String        Pref_Map25_Provider_Column_TileEncoding;
    public static String        Pref_Map25_Provider_Column_TilePath_ThemeFilename;
@@ -1442,8 +1447,10 @@ public class Messages extends NLS {
    public static String        Pref_Map25_Provider_Dialog_SaveModifiedProvider_Message;
    public static String        Pref_Map25_Provider_Dialog_SaveModifiedProvider_Title;
    public static String        Pref_Map25_Provider_Error_EnableMapProvider;
+   public static String        Pref_Map25_Provider_Error_MapFilename_IsNotValid;
    public static String        Pref_Map25_Provider_Error_MapFilename_IsRequired;
    public static String        Pref_Map25_Provider_Error_ProviderNameIsRequired;
+   public static String        Pref_Map25_Provider_Error_ThemeFilename_IsNotValid;
    public static String        Pref_Map25_Provider_Error_ThemeFilename_IsRequired;
    public static String        Pref_Map25_Provider_Error_TilePathIsRequired;
    public static String        Pref_Map25_Provider_Error_UrlIsRequired;
@@ -1458,9 +1465,11 @@ public class Messages extends NLS {
    public static String        Pref_Map25_Provider_Label_TileUrl;
    public static String        Pref_Map25_Provider_Label_Title;
    public static String        Pref_Map25_Provider_Label_Url;
+   public static String        Pref_Map25_Provider_ThemeStyle_Info_All;
    public static String        Pref_Map25_Provider_ThemeStyle_Info_InvalidThemeFilename;
    public static String        Pref_Map25_Provider_ThemeStyle_Info_NoStyles;
    public static String        Pref_Map25_Provider_ThemeStyle_Info_NotAvailable;
+   public static String        Pref_Map25_Provider_ThemeStyle_Info_NotSupported;
 
    public static String        Pref_MapLayout_Checkbox_BorderColor_Color;
    public static String        Pref_MapLayout_Checkbox_BorderColor_Darker;
@@ -1698,6 +1707,8 @@ public class Messages extends NLS {
 //	public static String		SignImage_Viewer_Column_Name_Label;
 
    public static String Search_Manager_CreateFTIndex;
+   public static String Search_Manager_Log_DeletingLuceneRootFolder;
+   public static String Search_Manager_Log_LuceneRootFolderIsDeleted;
 
    public static String Search_View_Action_ExternalSearchUI;
    public static String Search_View_Action_ExternalSearchUI_Tooltip;
@@ -1863,6 +1874,11 @@ public class Messages extends NLS {
    public static String Slideout_Map25MapOptions_Checkbox_UseDraggedKeyNavigation_Tooltip;
    public static String Slideout_Map25MapOptions_Group_MapLayer;
    public static String Slideout_Map25MapOptions_Label_MapOptions;
+   
+   public static String Slideout_Map25MapProvider_Combo_MapProvider_Offline_Tooltip;
+   public static String Slideout_Map25MapProvider_Combo_MapProvider_Online_Tooltip;
+   public static String Slideout_Map25MapProvider_Label_MapProvider;
+   public static String Slideout_Map25MapProvider_Label_ThemeStyle;
 
    public static String Slideout_Map25MarkerOptions_Checkbox_IsMarkerClustering;
    public static String Slideout_Map25MarkerOptions_Checkbox_IsShowMarkerPoint;
@@ -2313,22 +2329,15 @@ public class Messages extends NLS {
    public static String Tour_Segmenter_Surfing_Button_RestoreFromTourWithData_Tooltip;
    public static String Tour_Segmenter_Surfing_Checkbox_IsMinDistance;
    public static String Tour_Segmenter_Surfing_Checkbox_IsShowOnlySelectedSegments;
-   public static String Tour_Segmenter_Surfing_Checkbox_IsShowOnlySurfingSegments;
-   public static String Tour_Segmenter_Surfing_Checkbox_IsSurfingEnabled;
    public static String Tour_Segmenter_Surfing_Label_IsShowOnlySelectedSegments_Tooltip;
-   public static String Tour_Segmenter_Surfing_Label_IsShowOnlySurfingSegments_Tooltip;
-   public static String Tour_Segmenter_Surfing_Label_IsSurfingEnabled_Tooltip;
    public static String Tour_Segmenter_Surfing_Label_MinDistance_Tooltip;
    public static String Tour_Segmenter_Surfing_Label_MinSpeed_StartStop;
    public static String Tour_Segmenter_Surfing_Label_MinSpeed_StartStop_Tooltip;
    public static String Tour_Segmenter_Surfing_Label_MinSpeed_Surfing;
    public static String Tour_Segmenter_Surfing_Label_MinSpeed_Surfing_Tooltip;
-   public static String Tour_Segmenter_Surfing_Label_MinSurfingDistance;
    public static String Tour_Segmenter_Surfing_Label_MinTimeDuration;
    public static String Tour_Segmenter_Surfing_Label_MinTimeDuration_Tooltip;
    public static String Tour_Segmenter_SurfingFilter_All;
-   public static String Tour_Segmenter_SurfingFilter_OnlyNotSurfing;
-   public static String Tour_Segmenter_SurfingFilter_OnlySurfing;
    public static String Tour_Segmenter_SurfingFilter_Paddling;
    public static String Tour_Segmenter_SurfingFilter_Surfing;
    public static String Tour_Segmenter_Type_ByAltitude_Marker;

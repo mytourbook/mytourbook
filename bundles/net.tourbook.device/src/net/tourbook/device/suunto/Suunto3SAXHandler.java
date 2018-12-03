@@ -51,7 +51,7 @@ public class Suunto3SAXHandler extends DefaultHandler {
 	private static final SimpleDateFormat	TIME_FORMAT_SSSZ			= new SimpleDateFormat(		//
 			"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");																		//$NON-NLS-1$
 	private static final SimpleDateFormat	TIME_FORMAT_RFC822		= new SimpleDateFormat(		//
-			"yyyy-MM-dd'T'HH:mm:ssZ");
+			"yyyy-MM-dd'T'HH:mm:ssZ");                                                          //$NON-NLS-1$
 	private static final SimpleDateFormat	TIME_FORMAT_LOCAL			= new SimpleDateFormat(		//
 			"yyyy-MM-dd'T'HH:mm:ss");																				//$NON-NLS-1$
 

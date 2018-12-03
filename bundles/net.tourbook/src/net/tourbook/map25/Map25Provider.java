@@ -54,8 +54,8 @@ public class Map25Provider implements Cloneable {
    /*
     * Cached theme properties
     */
-   public String                    cachedThemeFilepath;
-   public List<MapsforgeThemeStyle> cachedThemeStyles;
+   private String                    _cachedThemeFilepath;
+   private List<MapsforgeThemeStyle> _cachedThemeStyles;
 
    public Map25Provider() {
 
@@ -86,6 +86,9 @@ public class Map25Provider implements Cloneable {
       try {
 
          final Map25Provider clonedProvider = (Map25Provider) super.clone();
+
+         clonedProvider._cachedThemeFilepath = null;
+         clonedProvider._cachedThemeStyles = null;
 
          return clonedProvider;
 
@@ -128,6 +131,41 @@ public class Map25Provider implements Cloneable {
       return _id;
    }
 
+   /**
+    * Is loading the theme styles when not yet loaded.
+    *
+    * @param isForceThemeStyleReload
+    * @return Returns theme styles or <code>null</code> when not available.
+    */
+   public List<MapsforgeThemeStyle> getThemeStyles(final boolean isForceThemeStyleReload) {
+
+      List<MapsforgeThemeStyle> mfStyles;
+
+      if (isForceThemeStyleReload
+
+            // styles are not yet loaded
+            || _cachedThemeFilepath == null
+
+            // check if styles for the theme filepath are not yet loaded
+            || (_cachedThemeFilepath != null && _cachedThemeFilepath.equals(themeFilepath) == false)) {
+
+         // styles needs to be loaded
+         mfStyles = Map25ProviderManager.loadMapsforgeThemeStyles(themeFilepath);
+
+         // mark styles to be loaded for this filepath
+         _cachedThemeFilepath = themeFilepath;
+
+         // cache theme styles
+         _cachedThemeStyles = mfStyles;
+
+      } else {
+
+         mfStyles = _cachedThemeStyles;
+      }
+
+      return mfStyles;
+   }
+
    @Override
    public int hashCode() {
 
@@ -141,14 +179,13 @@ public class Map25Provider implements Cloneable {
 
       getClass().getName() + "\n" //$NON-NLS-1$
 
-            + "_id            = " + _id + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "_uuid          = " + _uuid + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-
+            + "name           = " + name + "\n" //$NON-NLS-1$ //$NON-NLS-2$
             + "isEnabled      = " + isEnabled + "\n" //$NON-NLS-1$ //$NON-NLS-2$
             + "isDefault      = " + isDefault + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-
-            + "name           = " + name + "\n" //$NON-NLS-1$ //$NON-NLS-2$
             + "description    = " + description + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+
+//            + "_id            = " + _id + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "_uuid          = " + _uuid + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
             + "isOfflineMap   = " + isOfflineMap + "\n" //$NON-NLS-1$ //$NON-NLS-2$
             + "tileEncoding   = " + tileEncoding + "\n" //$NON-NLS-1$ //$NON-NLS-2$

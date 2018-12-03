@@ -1,14 +1,17 @@
 package net.tourbook.preferences;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
- * Bean: MapsforgeThemeStyle containes a visible Style
+ * Bean: MapsforgeThemeStyle containes a visible style
  *
  * @author telemaxx
  */
 public class MapsforgeThemeStyle {
+
+   private static final String USER_LOCALE     = Locale.getDefault().toString();
 
    private Map<String, String> name            = new HashMap<>();
 
@@ -17,6 +20,13 @@ public class MapsforgeThemeStyle {
 
    public String getDefaultLaguage() {
       return defaultlanguage;
+   }
+
+   /**
+    * @return Returns localized style name
+    */
+   public String getLocaleName() {
+      return getName(USER_LOCALE);
    }
 
    /**
@@ -49,7 +59,7 @@ public class MapsforgeThemeStyle {
    /**
     * get the style name like
     *
-    * @return String containing the stylename like "elv-mtb"
+    * @return Returns the stylename, e.g. "elv-mtb"
     */
    public String getXmlLayer() {
       return xmlLayer;
@@ -66,7 +76,6 @@ public class MapsforgeThemeStyle {
     * @param name
     */
    public void setName(final String language, final String name) {
-      //System.out.println("setname: " + language + " name: " + name);
       this.name.put(language, name);
    }
 
@@ -76,6 +85,11 @@ public class MapsforgeThemeStyle {
 
    @Override
    public String toString() {
-      return "Item [xmlLAyer=" + xmlLayer + " Name= " + name.get(defaultlanguage) + "]";
+
+      return "MapsforgeThemeStyle "
+
+            + "xmlLayer=" + xmlLayer + " "
+            + "name= " + name.get(defaultlanguage) + " "
+            + "\n";
    }
 }

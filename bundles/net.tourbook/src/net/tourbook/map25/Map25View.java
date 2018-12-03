@@ -78,7 +78,6 @@ import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map.bookmark.MapBookmarkManager;
 import net.tourbook.map.bookmark.MapLocation;
 import net.tourbook.map25.action.ActionMap25_ShowMarker;
-import net.tourbook.map25.action.ActionSelectMap25Provider;
 import net.tourbook.map25.action.ActionShowEntireTour;
 import net.tourbook.map25.action.ActionSyncMap2WithOtherMap;
 import net.tourbook.map25.action.ActionSynchMapWithChartSlider;
@@ -164,7 +163,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    private ActionMap25_MapProvider       _actionMapProvider;
    private ActionMap25_Options           _actionMapOptions;
    private ActionMap25_ShowMarker        _actionShowMarker_WithOptions;
-   private ActionSelectMap25Provider     _actionSelectMapProvider;
+//   private ActionSelectMap25Provider     _actionSelectMapProvider;
    private ActionSynchMapWithChartSlider _actionSyncMap_WithChartSlider;
    private ActionSyncMap2WithOtherMap    _actionSyncMap_WithOtherMap;
    private ActionSynchMapWithTour        _actionSyncMap_WithTour;
@@ -201,6 +200,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
    private class ActionMap25_MapProvider extends ActionToolbarSlideout {
 
+      private SlideoutMap25_MapProvider __slideoutMap25_MapProvider;
+
       public ActionMap25_MapProvider() {
 
          super(
@@ -210,7 +211,10 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
-         return new SlideoutMap25_MapProvider(_parent, toolbar, Map25View.this);
+
+         __slideoutMap25_MapProvider = new SlideoutMap25_MapProvider(_parent, toolbar, Map25View.this);
+
+         return __slideoutMap25_MapProvider;
       }
 
       @Override
@@ -584,7 +588,6 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
       _actionMapProvider = new ActionMap25_MapProvider();
       _actionMapOptions = new ActionMap25_Options();
-      _actionSelectMapProvider = new ActionSelectMap25Provider(this);
       _actionShowEntireTour = new ActionShowEntireTour(this);
       _actionSyncMap_WithOtherMap = new ActionSyncMap2WithOtherMap(this);
       _actionSyncMap_WithTour = new ActionSynchMapWithTour(this);
@@ -889,7 +892,6 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       tbm.add(_actionMapOptions);
       tbm.add(_actionMapBookmarks);
       tbm.add(_actionMapProvider);
-      tbm.add(_actionSelectMapProvider);
 
       /*
        * fill view menu
@@ -1557,7 +1559,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
    void updateUI_SelectedMapProvider(final Map25Provider selectedMapProvider) {
 
-      _actionSelectMapProvider.updateUI_SelectedMapProvider(selectedMapProvider);
+      _actionMapProvider.__slideoutMap25_MapProvider.selectMapProvider(selectedMapProvider);
    }
 
    private void updateUI_SyncSliderAction() {

@@ -198,6 +198,7 @@ import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
+import net.tourbook.ui.views.tourSegmenter.SelectedTourSegmenterSegments;
 
 // author: Wolfgang Schramm
 // create: 24.08.2007
@@ -6579,6 +6580,25 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
                         selectTimeSlice(xSliderPosition);
                      }
                   }
+               }
+            }
+
+         } else {
+
+            final Object customData = xSliderPosition.getCustomData();
+            if (customData instanceof SelectedTourSegmenterSegments) {
+
+               final SelectedTourSegmenterSegments selectedSegments = (SelectedTourSegmenterSegments) customData;
+               final TourData tourData = selectedSegments.tourData;
+
+               _selectionTourId = tourData.getTourId();
+               if (currentTourId == _selectionTourId) {
+
+                  isCurrentTourSelected = true;
+                  selectedTourData = tourData;
+
+                  // select time slices
+                  selectTimeSlice(xSliderPosition);
                }
             }
          }

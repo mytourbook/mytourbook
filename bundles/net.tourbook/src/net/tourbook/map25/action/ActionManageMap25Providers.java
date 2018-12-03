@@ -17,7 +17,7 @@ package net.tourbook.map25.action;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.map2.Messages;
-import net.tourbook.preferences.PrefPageMap25Provider;
+import net.tourbook.preferences.PrefPage_Map25Provider;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.widgets.Display;
@@ -38,7 +38,7 @@ public class ActionManageMap25Providers extends Action {
 		PreferencesUtil
 				.createPreferenceDialogOn(
 						Display.getCurrent().getActiveShell(),
-						PrefPageMap25Provider.ID,
+						PrefPage_Map25Provider.ID,
 						null,
 						null)
 				.open();

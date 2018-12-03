@@ -18,7 +18,9 @@ package net.tourbook.map25.ui;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
@@ -37,11 +39,14 @@ import org.eclipse.swt.widgets.ToolBar;
 
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
+import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.map25.Map25Provider;
 import net.tourbook.map25.Map25ProviderManager;
 import net.tourbook.map25.Map25View;
+import net.tourbook.preferences.MapsforgeThemeStyle;
+import net.tourbook.preferences.PrefPage_Map25Provider;
 
 import de.byteholder.geoclipse.mapprovider.IMapProviderListener;
 
@@ -56,16 +61,24 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
    private PixelConverter           _pc;
 
+   private ActionOpenPrefDialog     _actionPrefDialog;
+
    private Map25View                _map25View;
 
-   private ArrayList<Map25Provider> _allMapProvider;
+   private ArrayList<Map25Provider> _allEnabledMapProvider;
 
    private boolean                  _isInUpdateUI;
 
    /*
     * UI controls
     */
-   private Combo _comboMapProvider;
+   private Composite _parent;
+
+   private Combo     _comboMapProvider;
+   private Combo     _comboThemeStyle;
+
+   private Label     _lblMapProvider;
+   private Label     _lblThemeStyle;
 
    /**
     * @param ownerControl
@@ -86,6 +99,12 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
    private void createActions() {
 
+      _actionPrefDialog = new ActionOpenPrefDialog(
+            Messages.Pref_Map25_Action_EditMapProviderPreferences_Tooltip,
+            PrefPage_Map25Provider.ID);
+
+      _actionPrefDialog.closeThisTooltip(this);
+      _actionPrefDialog.setShell(_parent.getShell());
    }
 
    @Override
@@ -110,14 +129,13 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
       {
          final Composite container = new Composite(shellContainer, SWT.NONE);
          GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-         GridLayoutFactory
-               .fillDefaults()//
-               .applyTo(container);
+         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 //			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
          {
             createUI_10_Title(container);
-            createUI_20_MapProvider(container);
+            createUI_12_Actions(container);
          }
+         createUI_20_MapProvider(shellContainer);
       }
 
       return shellContainer;
@@ -134,19 +152,57 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
       GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
    }
 
+   private void createUI_12_Actions(final Composite parent) {
+
+      final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
+      GridDataFactory
+            .fillDefaults()//
+            .grab(true, false)
+            .align(SWT.END, SWT.BEGINNING)
+            .applyTo(toolbar);
+
+      final ToolBarManager tbm = new ToolBarManager(toolbar);
+
+      tbm.add(_actionPrefDialog);
+
+      tbm.update(true);
+   }
+
    private void createUI_20_MapProvider(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
          {
+            /*
+             * Map provider
+             */
+            _lblMapProvider = new Label(container, SWT.NONE);
+            _lblMapProvider.setText(Messages.Slideout_Map25MapProvider_Label_MapProvider);
+
             _comboMapProvider = new Combo(container, SWT.READ_ONLY);
             _comboMapProvider.addFocusListener(_keepOpenListener);
             _comboMapProvider.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
                   onSelect_MapProvider();
+               }
+            });
+         }
+         {
+            /*
+             * Theme style
+             */
+            _lblThemeStyle = new Label(container, SWT.NONE);
+            _lblThemeStyle.setText(Messages.Slideout_Map25MapProvider_Label_ThemeStyle);
+
+            _comboThemeStyle = new Combo(container, SWT.READ_ONLY);
+            _comboThemeStyle.addFocusListener(_keepOpenListener);
+            _comboThemeStyle.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onSelect_ThemeStyle();
                }
             });
          }
@@ -162,8 +218,18 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
    private void fillMapProvider() {
 
       final ArrayList<Map25Provider> allMapProviders = Map25ProviderManager.getAllMapProviders();
+      final ArrayList<Map25Provider> allEnabledMapProviders = new ArrayList<>();
 
-      Collections.sort(allMapProviders, new Comparator<Map25Provider>() {
+      for (final Map25Provider map25Provider : allMapProviders) {
+
+         // hide disabled map provider
+
+         if (map25Provider.isEnabled) {
+            allEnabledMapProviders.add(map25Provider);
+         }
+      }
+
+      Collections.sort(allEnabledMapProviders, new Comparator<Map25Provider>() {
 
          @Override
          public int compare(final Map25Provider mp1, final Map25Provider mp2) {
@@ -171,21 +237,13 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
          }
       });
 
-      _allMapProvider = allMapProviders;
+      _allEnabledMapProvider = allEnabledMapProviders;
 
       _comboMapProvider.removeAll();
 
-      for (final Map25Provider map25Provider : allMapProviders) {
+      for (final Map25Provider map25Provider : allEnabledMapProviders) {
          _comboMapProvider.add(map25Provider.name);
       }
-   }
-
-   /**
-    * @return Returns the used map provider in the map
-    */
-   private Map25Provider getCurrentMapProvider() {
-
-      return _map25View.getMapApp().getSelectedMapProvider();
    }
 
    private Map25Provider getSelectedMapProvider() {
@@ -194,15 +252,25 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
       if (selectedIndex < 0) {
 
-         return _allMapProvider.get(0);
+         return _allEnabledMapProvider.get(0);
 
       } else {
 
-         return _allMapProvider.get(selectedIndex);
+         return _allEnabledMapProvider.get(selectedIndex);
       }
    }
 
+   /**
+    * @return Returns the map provider which is currently used in the map
+    */
+   private Map25Provider getUsedMapProvider() {
+
+      return _map25View.getMapApp().getSelectedMapProvider();
+   }
+
    private void initUI(final Composite parent) {
+
+      _parent = parent;
 
       _pc = new PixelConverter(parent);
 
@@ -243,6 +311,13 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
    @Override
    public void mapProviderListChanged() {
 
+      if (_comboMapProvider == null) {
+
+         // this can occure when dialog is closed and the event is still fired
+
+         return;
+      }
+
       fillMapProvider();
    }
 
@@ -270,11 +345,35 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
       final Map25Provider selectedMapProvider = getSelectedMapProvider();
 
       // check if a new map provider is selected
-      if (selectedMapProvider == getCurrentMapProvider()) {
+      if (selectedMapProvider == getUsedMapProvider()) {
          return;
       }
 
+      updateUI_ThemeStyle(selectedMapProvider);
+      updateUI_MapProvider_Tooltip(selectedMapProvider);
+
+      // update UI otherwise the old theme style box is displayed until the next redraw
+      _parent.update();
+
       _map25View.getMapApp().setMapProvider(selectedMapProvider);
+   }
+
+   private void onSelect_ThemeStyle() {
+
+      if (_isInUpdateUI) {
+         return;
+      }
+
+      final Map25Provider mapProvider = getSelectedMapProvider();
+      final List<MapsforgeThemeStyle> mfStyles = mapProvider.getThemeStyles(false);
+
+      final int selectedStyleIndex = _comboThemeStyle.getSelectionIndex();
+
+      // update model
+      mapProvider.themeStyle = mfStyles.get(selectedStyleIndex).getXmlLayer();
+
+      // update UI
+      _map25View.getMapApp().setMapProvider(mapProvider);
    }
 
    private void restoreState() {
@@ -282,11 +381,31 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
       /*
        * Reselect map provider
        */
-      final Map25Provider currentMapProvider = getCurrentMapProvider();
-      for (int providerIndex = 0; providerIndex < _allMapProvider.size(); providerIndex++) {
+      final Map25Provider currentMapProvider = getUsedMapProvider();
 
-         final Map25Provider map25Provider = _allMapProvider.get(providerIndex);
-         if (currentMapProvider.equals(map25Provider)) {
+      selectMapProvider(currentMapProvider);
+
+      updateUI_ThemeStyle(currentMapProvider);
+      updateUI_MapProvider_Tooltip(currentMapProvider);
+   }
+
+   private void saveState() {
+
+   }
+
+   public void selectMapProvider(final Map25Provider mapProvider) {
+
+      if (_allEnabledMapProvider == null) {
+
+         // this can occure when not yet fully setup
+
+         return;
+      }
+
+      for (int providerIndex = 0; providerIndex < _allEnabledMapProvider.size(); providerIndex++) {
+
+         final Map25Provider map25Provider = _allEnabledMapProvider.get(providerIndex);
+         if (mapProvider.equals(map25Provider)) {
 
             _isInUpdateUI = true;
             {
@@ -297,11 +416,113 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
             break;
          }
       }
-
    }
 
-   private void saveState() {
+   private void updateUI_MapProvider_Tooltip(final Map25Provider mapProvider) {
 
+      String mpTooltip = UI.EMPTY_STRING;
+
+      if (mapProvider.isOfflineMap) {
+
+         // offline
+
+         final List<MapsforgeThemeStyle> themeStyles = mapProvider.getThemeStyles(false);
+
+         final CharSequence[] allThemeStyles = new CharSequence[themeStyles.size()];
+         for (int styleIndex = 0; styleIndex < themeStyles.size(); styleIndex++) {
+            final MapsforgeThemeStyle themeStyle = themeStyles.get(styleIndex);
+            allThemeStyles[styleIndex] = UI.SPACE4 + themeStyle.getLocaleName() + UI.DASH_WITH_SPACE + themeStyle.getXmlLayer();
+         }
+
+         final String themeStyleText = String.join(UI.NEW_LINE1, allThemeStyles);
+
+         mpTooltip = String.format(Messages.Slideout_Map25MapProvider_Combo_MapProvider_Offline_Tooltip,
+
+               mapProvider.tileEncoding,
+               mapProvider.mapFilepath,
+               mapProvider.themeFilepath,
+               themeStyleText
+
+         );
+
+      } else {
+
+         // online
+
+         mpTooltip = String.format(Messages.Slideout_Map25MapProvider_Combo_MapProvider_Online_Tooltip,
+
+               mapProvider.tileEncoding,
+               mapProvider.url + mapProvider.tilePath,
+               mapProvider.apiKey
+
+         );
+      }
+
+      _lblMapProvider.setToolTipText(mpTooltip);
+      _lblThemeStyle.setToolTipText(mpTooltip);
+   }
+
+   private void updateUI_ThemeStyle(final Map25Provider mapProvider) {
+
+      _comboThemeStyle.removeAll();
+
+      if (mapProvider.isOfflineMap == false) {
+
+         _comboThemeStyle.add(Messages.Pref_Map25_Provider_ThemeStyle_Info_NotSupported);
+         _comboThemeStyle.select(0);
+
+         _lblThemeStyle.setEnabled(false);
+         _comboThemeStyle.setEnabled(false);
+
+         _comboThemeStyle.getParent().layout(true, true);
+
+         return;
+      }
+
+      final List<MapsforgeThemeStyle> mfStyles = mapProvider.getThemeStyles(false);
+
+      // check if style is valid
+      if (mfStyles == null) {
+
+         _comboThemeStyle.add(Messages.Pref_Map25_Provider_ThemeStyle_Info_InvalidThemeFilename);
+         _comboThemeStyle.select(0);
+
+         _lblThemeStyle.setEnabled(false);
+         _comboThemeStyle.setEnabled(false);
+
+         _comboThemeStyle.getParent().layout(true, true);
+
+         return;
+      }
+
+      /*
+       * Fill combo with all styles
+       */
+
+      _lblThemeStyle.setEnabled(true);
+      _comboThemeStyle.setEnabled(true);
+
+      int styleSelectIndex = 0;
+
+      for (int styleIndex = 0; styleIndex < mfStyles.size(); styleIndex++) {
+
+         final MapsforgeThemeStyle mfStyle = mfStyles.get(styleIndex);
+
+         _comboThemeStyle.add(mfStyle.getLocaleName());
+
+         if (mfStyle.getXmlLayer().equals(mapProvider.themeStyle)) {
+            styleSelectIndex = styleIndex;
+         }
+      }
+
+      _comboThemeStyle.getParent().layout(true, true);
+
+      // select map provider style
+      _isInUpdateUI = true;
+      {
+         _comboThemeStyle.select(styleSelectIndex);
+      }
+      _isInUpdateUI = false;
    }
 
 }
