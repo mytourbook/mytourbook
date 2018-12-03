@@ -2710,7 +2710,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             {
                _chkIsMinSurfingDistance = new Button(container, SWT.CHECK);
                _chkIsMinSurfingDistance.setText(Messages.Tour_Segmenter_Surfing_Checkbox_IsMinDistance);
-               _chkIsMinSurfingDistance.setToolTipText(Messages.Tour_Segmenter_Surfing_Label_MinDistance_Tooltip);
+               _chkIsMinSurfingDistance.setToolTipText(Messages.Tour_Segmenter_Surfing_Checkbox_IsMinDistance_Tooltip);
                _chkIsMinSurfingDistance.addSelectionListener(_defaultSurfing_SelectionListener);
                GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_chkIsMinSurfingDistance);
 
@@ -2844,8 +2844,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                 * Button: Save surfing segments
                 */
                _btnSurfing_SaveTourSegments = new Button(actionContainer, SWT.NONE);
-               _btnSurfing_SaveTourSegments.setText(Messages.Tour_Segmenter_Button_SaveTour);
-               _btnSurfing_SaveTourSegments.setToolTipText(Messages.Tour_Segmenter_Button_Surfing_SaveTourSegments_Tooltip);
+               _btnSurfing_SaveTourSegments.setText(Messages.Tour_Segmenter_Surfing_Button_SaveWaves);
+               _btnSurfing_SaveTourSegments.setToolTipText(Messages.Tour_Segmenter_Surfing_Button_SaveWaves_Tooltip);
                _btnSurfing_SaveTourSegments.addSelectionListener(new SelectionAdapter() {
                   @Override
                   public void widgetSelected(final SelectionEvent e) {
@@ -2859,8 +2859,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                 * Button: Delete surfing segments
                 */
                _btnSurfing_DeleteTourSegments = new Button(actionContainer, SWT.NONE);
-               _btnSurfing_DeleteTourSegments.setText(Messages.Tour_Segmenter_Button_Surfing_DeleteTourSegments);
-               _btnSurfing_DeleteTourSegments.setToolTipText(Messages.Tour_Segmenter_Button_Surfing_DeleteTourSegments_Tooltip);
+               _btnSurfing_DeleteTourSegments.setText(Messages.Tour_Segmenter_Surfing_Button_DeleteWaves);
+               _btnSurfing_DeleteTourSegments.setToolTipText(Messages.Tour_Segmenter_Surfing_Button_DeleteWaves_Tooltip);
                _btnSurfing_DeleteTourSegments.addSelectionListener(new SelectionAdapter() {
                   @Override
                   public void widgetSelected(final SelectionEvent e) {
@@ -2876,7 +2876,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
              */
             _iconSaveSurfingState = new CLabel(container, SWT.NONE);
             _iconSaveSurfingState.setImage(_imageSurfing_SaveState);
-            _iconSaveSurfingState.setToolTipText(Messages.Tour_Segmenter_Button_SurfingSaveState_Tooltip);
 
             GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.END)
@@ -5205,12 +5204,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       final boolean isVisibleDataPointSerieSaved = _tourData.isVisiblePointsSaved_ForSurfing();
       if (isVisibleDataPointSerieSaved) {
 
-         _iconSaveSurfingState.setToolTipText(Messages.Tour_Segmenter_Button_Surfing_IsSaveState_Tooltip);
+         _iconSaveSurfingState.setToolTipText(Messages.Tour_Segmenter_Surfing_Button_IsSaveState_Tooltip);
          _iconSaveSurfingState.setImage(_imageSurfing_SaveState);
 
       } else {
 
-         _iconSaveSurfingState.setToolTipText(Messages.Tour_Segmenter_Button_Surfing_IsNotSaveState_Tooltip);
+         _iconSaveSurfingState.setToolTipText(Messages.Tour_Segmenter_Surfing_Button_IsNotSaveState_Tooltip);
          _iconSaveSurfingState.setImage(_imageSurfing_NotSaveState);
       }
 
