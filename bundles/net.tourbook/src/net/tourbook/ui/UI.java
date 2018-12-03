@@ -1066,7 +1066,7 @@ public class UI {
 
             String prefFontDataCleaned = prefFontData;
 
-            if (prefFontData.endsWith(";")) {
+            if (prefFontData.endsWith(";")) { //$NON-NLS-1$
 
                // remove ; at the end, after many years, I found that a ; at the end do not set the correct font
 

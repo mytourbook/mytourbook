@@ -1690,6 +1690,8 @@ public class Messages extends NLS {
 //	public static String		SignImage_Viewer_Column_Name_Label;
 
    public static String Search_Manager_CreateFTIndex;
+   public static String Search_Manager_Log_DeletingLuceneRootFolder;
+   public static String Search_Manager_Log_LuceneRootFolderIsDeleted;
 
    public static String Search_View_Action_ExternalSearchUI;
    public static String Search_View_Action_ExternalSearchUI_Tooltip;

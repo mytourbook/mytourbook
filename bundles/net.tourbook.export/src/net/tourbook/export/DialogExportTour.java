@@ -2216,10 +2216,12 @@ public class DialogExportTour extends TitleAreaDialog {
          String postFilename = UI.EMPTY_STRING;
 
          if (_isSetup_GPX && _chkGPX_SurfingWaves.getSelection()) {
+            
+            // append surfing parameters
 
             postFilename = String.format(
 
-                  "__%d-%d-%d-%d",
+                  "__%d-%d-%d-%d", //$NON-NLS-1$
 
                   // min start/stop speed
                   minTourData.getSurfing_MinSpeed_StartStop(),
