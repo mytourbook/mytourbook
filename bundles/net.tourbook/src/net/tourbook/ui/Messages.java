@@ -321,8 +321,6 @@ public class Messages extends NLS {
    public static String        ColumnFactory_SpeedDiff_Label;
    public static String        ColumnFactory_SpeedDiff_Tooltip;
 
-   public static String        ColumnFactory_Surfing_IsMinDistance_Header;
-   public static String        ColumnFactory_Surfing_IsMinDistance_Label;
    public static String        ColumnFactory_Surfing_MinDistance_Header;
    public static String        ColumnFactory_Surfing_MinDistance_Label;
    public static String        ColumnFactory_Surfing_MinSpeed_StartStop_Header;
