@@ -4786,12 +4786,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    }
 
    /**
-    * @param isUpdateTour
+    * @param isUpdateOrRemove
     *           When <code>true</code> visible surfing data are saved otherwise they are removed.
     */
-   private void onSurfing_SaveTour(final boolean isUpdateTour) {
+   private void onSurfing_SaveTour(final boolean isUpdateOrRemove) {
 
-      if (isUpdateTour) {
+      if (isUpdateOrRemove) {
 
          final SurfingData surfingData = createVisibleDataPoints(SurfingFilterType.Surfing);
 
@@ -4835,11 +4835,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       final TourData tourData = saveTour();
 
       if (tourData != null) {
-         _tourData = tourData;
-      }
 
-      // update surfing save state
-      restoreState_FromTour();
+         _tourData = tourData;
+
+         setTour(tourData, true);
+      }
    }
 
    private void onSurfing_SelectSegmentFilter() {
