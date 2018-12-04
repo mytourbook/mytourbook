@@ -526,6 +526,12 @@
 			<!-- Search -->
 	
 				<command
+					commandId="command.net.tourbook.search.SearchView_2"
+					icon="icons/search.png"
+					label="%View_Name_SearchAll"
+					mnemonic="%View_Name_SearchAll_Mnemonic"/>
+	
+				<command
 					commandId="command.net.tourbook.search.SearchView"
 					icon="icons/search.png"
 					label="%View_Name_SearchAll"
@@ -970,6 +976,13 @@ THIS IS NOT YET FULLY IMPLEMENTED
 				<!-- Search -->
 
 				<command
+					commandId="command.net.tourbook.search.SearchView_2"
+					icon="icons/search.png"
+					label="%View_Name_SearchAll"
+					tooltip="%View_Name_SearchAll_Tooltip"
+				/>
+
+				<command
 					commandId="command.net.tourbook.search.SearchView"
 					icon="icons/search.png"
 					label="%View_Name_SearchAll"
@@ -1156,6 +1169,12 @@ THIS IS NOT YET FULLY IMPLEMENTED
             name="%view_name_Statistics"
             defaultHandler="net.tourbook.statistic.ActionHandlerOpenViewStatistic"
             />
+
+		<command
+			id="command.net.tourbook.search.SearchView_2"
+			name="%View_Name_SearchAll"
+			defaultHandler="net.tourbook.search.ActionHandler_OpenSearchView_2"
+			/>
 
 		<command
 			id="command.net.tourbook.search.SearchView"
@@ -1589,6 +1608,14 @@ THIS IS NOT YET FULLY IMPLEMENTED
 
 			<view
 				category="net.tourbook.category.Tools"
+				class="net.tourbook.search.SearchView_2"
+				icon="icons/search.png"
+				id="net.tourbook.search.SearchView_2"
+				name="%View_Name_SearchAll"
+			/>
+
+			<view
+				category="net.tourbook.category.Tools"
 				class="net.tourbook.search.SearchView"
 				icon="icons/search.png"
 				id="net.tourbook.search.SearchView"
@@ -1873,7 +1900,7 @@ THIS IS NOT YET FULLY IMPLEMENTED
 		<!-- Tools -->
 	
 		<key
-			commandId="command.net.tourbook.search.SearchView"
+			commandId="command.net.tourbook.search.SearchView_2"
 			sequence="%Shortcut_Key_App_Search"
 			contextId="org.eclipse.ui.contexts.window"
 			schemeId="net.tourbook.scheme"/>

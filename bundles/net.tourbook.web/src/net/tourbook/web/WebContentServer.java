@@ -426,14 +426,14 @@ public class WebContentServer {
 
       try {
 
-         final String extension = WEB.setResponseHeaderContentType(httpExchange, file);
+         final String fileExtension = WEB.setResponseHeaderContentType(httpExchange, file);
 
          httpExchange.sendResponseHeaders(200, 0);
 
          fs = new FileInputStream(file);
          os = httpExchange.getResponseBody();
 
-         if (extension.equals(WEB.FILE_EXTENSION_MTHTML)) {
+         if (fileExtension.equals(WEB.FILE_EXTENSION_MTHTML)) {
 
             // replaces also values in .mthtml files
 
