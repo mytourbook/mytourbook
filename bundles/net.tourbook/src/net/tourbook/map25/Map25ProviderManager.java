@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
+import org.oscim.theme.VtmThemes;
 import org.osgi.framework.Bundle;
 
 import net.tourbook.Messages;
@@ -43,32 +44,36 @@ import de.byteholder.geoclipse.mapprovider.IMapProviderListener;
 
 public class Map25ProviderManager {
 
-   private static final Bundle                             _bundle                        = TourbookPlugin.getDefault().getBundle();
-   private static final IPath                              _stateLocation                 = Platform.getStateLocation(_bundle);
+   private static final Bundle                             _bundle                         = TourbookPlugin.getDefault().getBundle();
+   private static final IPath                              _stateLocation                  = Platform.getStateLocation(_bundle);
 
-   private static final String                             MAP_PROVIDER_FILE_NAME         = "map25-provider.xml";                     //$NON-NLS-1$
-   private static final int                                MAP_PROVIDER_VERSION           = 1;
+   private static final String                             MAP_PROVIDER_FILE_NAME          = "map25-provider.xml";                     //$NON-NLS-1$
+   private static final int                                MAP_PROVIDER_VERSION            = 1;
 
-   public static final String                              MAPSFORGE_MAP_FILE_EXTENTION   = "map";                                    //$NON-NLS-1$
-   public static final String                              MAPSFORGE_STYLE_FILE_EXTENTION = "xml";                                    //$NON-NLS-1$
+   public static final String                              MAPSFORGE_MAP_FILE_EXTENTION    = "map";                                    //$NON-NLS-1$
+   public static final String                              MAPSFORGE_STYLE_FILE_EXTENTION  = "xml";                                    //$NON-NLS-1$
 
-   private static final String                             TAG_ROOT                       = "Map25Providers";                         //$NON-NLS-1$
-   private static final String                             TAG_MAP_PROVIDER               = "MapProvider";                            //$NON-NLS-1$
+   private static final String                             TAG_ROOT                        = "Map25Providers";                         //$NON-NLS-1$
+   private static final String                             TAG_MAP_PROVIDER                = "MapProvider";                            //$NON-NLS-1$
 
-   private static final String                             ATTR_API_KEY                   = "APIKey";                                 //$NON-NLS-1$
-   private static final String                             ATTR_DESCRIPTION               = "Description";                            //$NON-NLS-1$
-   private static final String                             ATTR_IS_DEFAULT                = "IsDefault";                              //$NON-NLS-1$
-   private static final String                             ATTR_IS_ENABLED                = "IsEnabled";                              //$NON-NLS-1$
-   private static final String                             ATTR_IS_OFFLINE_MAP            = "IsOfflineMap";                           //$NON-NLS-1$
-   private static final String                             ATTR_MAP_PROVIDER_VERSION      = "Version";                                //$NON-NLS-1$
-   private static final String                             ATTR_MAP_FILEPATH              = "MapFilepath";                            //$NON-NLS-1$
-   private static final String                             ATTR_NAME                      = "Name";                                   //$NON-NLS-1$
-   private static final String                             ATTR_THEME_FILEPATH            = "ThemeFilepath";                          //$NON-NLS-1$
-   private static final String                             ATTR_THEME_STYLE               = "ThemeStyle";                             //$NON-NLS-1$
-   private static final String                             ATTR_TILE_PATH                 = "TilePath";                               //$NON-NLS-1$
-   private static final String                             ATTR_TILE_ENCODING             = "TileEncoding";                           //$NON-NLS-1$
-   private static final String                             ATTR_URL                       = "Url";                                    //$NON-NLS-1$
-   private static final String                             ATTR_UUID                      = "UUID";                                   //$NON-NLS-1$
+   private static final String                             ATTR_DESCRIPTION                = "Description";                            //$NON-NLS-1$
+   private static final String                             ATTR_IS_DEFAULT                 = "IsDefault";                              //$NON-NLS-1$
+   private static final String                             ATTR_IS_ENABLED                 = "IsEnabled";                              //$NON-NLS-1$
+   private static final String                             ATTR_IS_OFFLINE_MAP             = "IsOfflineMap";                           //$NON-NLS-1$
+   private static final String                             ATTR_MAP_PROVIDER_VERSION       = "Version";                                //$NON-NLS-1$
+   private static final String                             ATTR_NAME                       = "Name";                                   //$NON-NLS-1$
+   private static final String                             ATTR_THEME                      = "Theme";                                  //$NON-NLS-1$
+   private static final String                             ATTR_TILE_ENCODING              = "TileEncoding";                           //$NON-NLS-1$
+   private static final String                             ATTR_UUID                       = "UUID";                                   //$NON-NLS-1$
+
+   private static final String                             ATTR_OFFLINE_IS_THEME_FROM_FILE = "Offline_IsThemeFromFile";                //$NON-NLS-1$
+   private static final String                             ATTR_OFFLINE_MAP_FILEPATH       = "Offline_MapFilepath";                    //$NON-NLS-1$
+   private static final String                             ATTR_OFFLINE_THEME_FILEPATH     = "Offline_ThemeFilepath";                  //$NON-NLS-1$
+   private static final String                             ATTR_OFFLINE_THEME_STYLE        = "Offline_ThemeStyle";                     //$NON-NLS-1$
+
+   private static final String                             ATTR_ONELINE_API_KEY            = "Online_APIKey";                          //$NON-NLS-1$
+   private static final String                             ATTR_ONELINE_TILE_PATH          = "Online_TilePath";                        //$NON-NLS-1$
+   private static final String                             ATTR_ONELINE_URL                = "Online_Url";                             //$NON-NLS-1$
 
    private static boolean                                  _isDebugViewVisible;
    private static Map25DebugView                           _map25DebugView;
@@ -78,9 +83,9 @@ public class Map25ProviderManager {
    /**
     * Contains the default default map provider
     */
-   private static Map25Provider                            _defaultMapProvider            = createMapProvider_Default();
+   private static Map25Provider                            _defaultMapProvider             = createMapProvider_Default();
 
-   private static final ListenerList<IMapProviderListener> _mapProviderListeners          = new ListenerList<>(ListenerList.IDENTITY);
+   private static final ListenerList<IMapProviderListener> _mapProviderListeners           = new ListenerList<>(ListenerList.IDENTITY);
 
    public static void addMapProviderListener(final IMapProviderListener listener) {
       _mapProviderListeners.add(listener);
@@ -96,8 +101,8 @@ public class Map25ProviderManager {
       mapProvider.isDefault = true;
       mapProvider.isEnabled = true;
       mapProvider.name = Messages.Map25_Provider_OpenScienceMap_Name;
-      mapProvider.url = "http://opensciencemap.org/tiles/vtm"; //$NON-NLS-1$
-      mapProvider.tilePath = "/{Z}/{X}/{Y}.vtm"; //$NON-NLS-1$
+      mapProvider.online_url = "http://opensciencemap.org/tiles/vtm"; //$NON-NLS-1$
+      mapProvider.online_TilePath = "/{Z}/{X}/{Y}.vtm"; //$NON-NLS-1$
       mapProvider.tileEncoding = TileEncoding.VTM;
       mapProvider.description = Messages.Map25_Provider_OpenScienceMap_Description;
 
@@ -115,10 +120,10 @@ public class Map25ProviderManager {
 
       mapProvider.isEnabled = false;
       mapProvider.name = "Mapsforge"; //$NON-NLS-1$
-      mapProvider.url = "C:\\Users\\top\\BTSync\\oruxmaps\\mapfiles\\niedersachsen_V5.map"; //$NON-NLS-1$
-      mapProvider.tilePath = "C:\\Users\\top\\BTSync\\oruxmaps\\mapstyles\\ELV4\\Elevate.xml"; //$NON-NLS-1$
+      mapProvider.online_url = "C:\\Users\\top\\BTSync\\oruxmaps\\mapfiles\\niedersachsen_V5.map"; //$NON-NLS-1$
+      mapProvider.online_TilePath = "C:\\Users\\top\\BTSync\\oruxmaps\\mapstyles\\ELV4\\Elevate.xml"; //$NON-NLS-1$
       mapProvider.tileEncoding = TileEncoding.MF;
-      mapProvider.apiKey = "elv-mtb"; //$NON-NLS-1$
+      mapProvider.online_ApiKey = "elv-mtb"; //$NON-NLS-1$
       mapProvider.description = "Mapsforge Offlinemaps, eg. openandromaps.org\n" //$NON-NLS-1$
             + "url set to absolut mappath eg c:\\maps\\germany.map\n" //$NON-NLS-1$
             + "tilepath set to absolut themepath eg.: c:\\themes\\Elevate.xml"; //$NON-NLS-1$
@@ -135,10 +140,10 @@ public class Map25ProviderManager {
 
       mapProvider.isEnabled = false;
       mapProvider.name = Messages.Map25_Provider_MapzenVectorTiles_Name;
-      mapProvider.url = "https://tile.mapzen.com/mapzen/vector/v1/all"; //$NON-NLS-1$
-      mapProvider.tilePath = "/{Z}/{X}/{Y}.mvt"; //$NON-NLS-1$
+      mapProvider.online_url = "https://tile.mapzen.com/mapzen/vector/v1/all"; //$NON-NLS-1$
+      mapProvider.online_TilePath = "/{Z}/{X}/{Y}.mvt"; //$NON-NLS-1$
       mapProvider.tileEncoding = TileEncoding.MVT;
-      mapProvider.apiKey = "mapzen-xxxxxxx"; //$NON-NLS-1$
+      mapProvider.online_ApiKey = "mapzen-xxxxxxx"; //$NON-NLS-1$
       mapProvider.description = Messages.Map25_Provider_MapzenVectorTiles_Description;
 
       return mapProvider;
@@ -153,8 +158,8 @@ public class Map25ProviderManager {
 
       mapProvider.isEnabled = false;
       mapProvider.name = Messages.Map25_Provider_MyTileServer_Name;
-      mapProvider.url = "http://192.168.99.99:8080/all"; //$NON-NLS-1$
-      mapProvider.tilePath = "/{Z}/{X}/{Y}.mvt"; //$NON-NLS-1$
+      mapProvider.online_url = "http://192.168.99.99:8080/all"; //$NON-NLS-1$
+      mapProvider.online_TilePath = "/{Z}/{X}/{Y}.mvt"; //$NON-NLS-1$
       mapProvider.tileEncoding = TileEncoding.MVT;
       mapProvider.description = Messages.Map25_Provider_MyTileServer_Description;
 
@@ -185,6 +190,19 @@ public class Map25ProviderManager {
       return _defaultMapProvider;
    }
 
+   public static Enum<VtmThemes> getDefaultTheme(final TileEncoding tileEncoding) {
+
+      switch (tileEncoding) {
+      case MVT:
+         return VtmThemes.MAPZEN;
+
+      // Open Science Map
+      case VTM:
+      default:
+         return VtmThemes.DEFAULT;
+      }
+   }
+
    /**
     * @return Returns the map vtm debug view when it is visible, otherwise <code>null</code>
     */
@@ -207,6 +225,36 @@ public class Map25ProviderManager {
       }
 
       return getDefaultMapProvider();
+   }
+
+   public static int getThemeIndex(final Enum<VtmThemes> requestedTheme, final TileEncoding tileEncoding) {
+
+      final VtmThemes[] allThemes = VtmThemes.values();
+
+      for (int themeIndex = 0; themeIndex < allThemes.length; themeIndex++) {
+
+         final VtmThemes themeItem = allThemes[themeIndex];
+
+         if (requestedTheme.equals(themeItem)) {
+            return themeIndex;
+         }
+      }
+
+      /*
+       * Return default
+       */
+      final Enum<VtmThemes> defaultTheme = getDefaultTheme(tileEncoding);
+
+      for (int encodingIndex = 0; encodingIndex < allThemes.length; encodingIndex++) {
+
+         final VtmThemes themeItem = allThemes[encodingIndex];
+
+         if (themeItem.equals(defaultTheme)) {
+            return encodingIndex;
+         }
+      }
+
+      return 0;
    }
 
    private static File getXmlFile() {
@@ -245,34 +293,40 @@ public class Map25ProviderManager {
                final XMLMemento xml = (XMLMemento) mementoChild;
                if (TAG_MAP_PROVIDER.equals(xml.getType())) {
 
+// SET_FORMATTING_OFF
                   final String xmlUUID = Util.getXmlString(xml, ATTR_UUID, UI.EMPTY_STRING);
 
                   final Map25Provider mapProvider = new Map25Provider(xmlUUID);
 
-                  mapProvider.isDefault = Util.getXmlBoolean(xml, ATTR_IS_DEFAULT, false);
-                  mapProvider.isEnabled = Util.getXmlBoolean(xml, ATTR_IS_ENABLED, false);
+                  mapProvider.isDefault      = Util.getXmlBoolean(xml, ATTR_IS_DEFAULT, false);
+                  mapProvider.isEnabled      = Util.getXmlBoolean(xml, ATTR_IS_ENABLED, false);
 
-                  mapProvider.name = Util.getXmlString(xml, ATTR_NAME, UI.EMPTY_STRING);
-                  mapProvider.description = Util.getXmlString(xml, ATTR_DESCRIPTION, UI.EMPTY_STRING);
+                  mapProvider.name           = Util.getXmlString(xml, ATTR_NAME, UI.EMPTY_STRING);
+                  mapProvider.description    = Util.getXmlString(xml, ATTR_DESCRIPTION, UI.EMPTY_STRING);
 
-                  mapProvider.isOfflineMap = Util.getXmlBoolean(xml, ATTR_IS_OFFLINE_MAP, false);
+                  mapProvider.isOfflineMap   = Util.getXmlBoolean(xml, ATTR_IS_OFFLINE_MAP, false);
 
                   if (mapProvider.isOfflineMap) {
 
-                     mapProvider.mapFilepath = Util.getXmlString(xml, ATTR_MAP_FILEPATH, UI.EMPTY_STRING);
-                     mapProvider.themeFilepath = Util.getXmlString(xml, ATTR_THEME_FILEPATH, UI.EMPTY_STRING);
-                     mapProvider.themeStyle = Util.getXmlString(xml, ATTR_THEME_STYLE, UI.EMPTY_STRING);
+                     mapProvider.offline_IsThemeFromFile    = Util.getXmlBoolean(xml, ATTR_OFFLINE_IS_THEME_FROM_FILE, true);
+                     mapProvider.offline_MapFilepath        = Util.getXmlString(xml, ATTR_OFFLINE_MAP_FILEPATH, UI.EMPTY_STRING);
+                     mapProvider.offline_ThemeFilepath      = Util.getXmlString(xml, ATTR_OFFLINE_THEME_FILEPATH, UI.EMPTY_STRING);
+                     mapProvider.offline_ThemeStyle         = Util.getXmlString(xml, ATTR_OFFLINE_THEME_STYLE, UI.EMPTY_STRING);
 
                   } else {
 
-                     mapProvider.apiKey = Util.getXmlString(xml, ATTR_API_KEY, UI.EMPTY_STRING);
-                     mapProvider.tilePath = Util.getXmlString(xml, ATTR_TILE_PATH, UI.EMPTY_STRING);
-                     mapProvider.url = Util.getXmlString(xml, ATTR_URL, UI.EMPTY_STRING);
+                     mapProvider.online_ApiKey              = Util.getXmlString(xml, ATTR_ONELINE_API_KEY, UI.EMPTY_STRING);
+                     mapProvider.online_TilePath            = Util.getXmlString(xml, ATTR_ONELINE_TILE_PATH, UI.EMPTY_STRING);
+                     mapProvider.online_url                 = Util.getXmlString(xml, ATTR_ONELINE_URL, UI.EMPTY_STRING);
                   }
+// SET_FORMATTING_ON
 
-                  mapProvider.tileEncoding = (TileEncoding) Util.getXmlEnum(xml, ATTR_TILE_ENCODING, TileEncoding.VTM);
+                  final TileEncoding tileEncoding = (TileEncoding) Util.getXmlEnum(xml, ATTR_TILE_ENCODING, TileEncoding.VTM);
+                  mapProvider.tileEncoding = tileEncoding;
+                  mapProvider.theme = Util.getXmlEnum(xml, ATTR_THEME, getDefaultTheme(tileEncoding));
 
-                  System.out.println("################## Name, Url and tilePath: " + mapProvider.name + " " + mapProvider.url + mapProvider.tilePath); //$NON-NLS-1$ //$NON-NLS-2$
+                  System.out.println("################## Name, Url and online_TilePath: " + mapProvider.name + " " + mapProvider.online_url //$NON-NLS-1$//$NON-NLS-2$
+                        + mapProvider.online_TilePath);
 
                   allMapProvider.add(mapProvider);
                }
@@ -402,21 +456,24 @@ public class Map25ProviderManager {
             xml.putString(ATTR_NAME, mapProvider.name);
             xml.putString(ATTR_DESCRIPTION, mapProvider.description);
 
-            Util.setXmlEnum(xml, ATTR_TILE_ENCODING, mapProvider.tileEncoding);
             xml.putBoolean(ATTR_IS_OFFLINE_MAP, isOfflineMap);
 
             if (isOfflineMap) {
 
-               xml.putString(ATTR_MAP_FILEPATH, mapProvider.mapFilepath);
-               xml.putString(ATTR_THEME_FILEPATH, mapProvider.themeFilepath);
-               xml.putString(ATTR_THEME_STYLE, mapProvider.themeStyle);
+               xml.putBoolean(ATTR_OFFLINE_IS_THEME_FROM_FILE, mapProvider.offline_IsThemeFromFile);
+               xml.putString(ATTR_OFFLINE_MAP_FILEPATH, mapProvider.offline_MapFilepath);
+               xml.putString(ATTR_OFFLINE_THEME_FILEPATH, mapProvider.offline_ThemeFilepath);
+               xml.putString(ATTR_OFFLINE_THEME_STYLE, mapProvider.offline_ThemeStyle);
 
             } else {
 
-               xml.putString(ATTR_API_KEY, mapProvider.apiKey);
-               xml.putString(ATTR_TILE_PATH, mapProvider.tilePath);
-               xml.putString(ATTR_URL, mapProvider.url);
+               xml.putString(ATTR_ONELINE_API_KEY, mapProvider.online_ApiKey);
+               xml.putString(ATTR_ONELINE_TILE_PATH, mapProvider.online_TilePath);
+               xml.putString(ATTR_ONELINE_URL, mapProvider.online_url);
             }
+
+            Util.setXmlEnum(xml, ATTR_THEME, mapProvider.theme);
+            Util.setXmlEnum(xml, ATTR_TILE_ENCODING, mapProvider.tileEncoding);
          }
 
       } catch (final Exception e) {

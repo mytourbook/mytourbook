@@ -18,36 +18,49 @@ package net.tourbook.map25;
 import java.util.List;
 import java.util.UUID;
 
+import org.oscim.theme.VtmThemes;
+
 import net.tourbook.preferences.MapsforgeThemeStyle;
 
 import de.byteholder.geoclipse.map.UI;
 
 public class Map25Provider implements Cloneable {
 
-   private String _id;
-   private UUID   _uuid;
+   private String         _id;
+   private UUID           _uuid;
 
-   public boolean isEnabled;
-   public boolean isDefault;
+   public boolean         isEnabled;
+   public boolean         isDefault;
 
-   public boolean isOfflineMap;
+   /**
+    *
+    */
+   public boolean         isOfflineMap;
 
-   public String  name        = UI.EMPTY_STRING;
-   public String  description = UI.EMPTY_STRING;
+   public String          name        = UI.EMPTY_STRING;
+   public String          description = UI.EMPTY_STRING;
+
+   /**
+    * Requires that {@link #isOfflineMap} is <code>true</code> which is setting the theme filepath
+    * {@link #offline_ThemeFilepath}
+    */
+   public boolean         offline_IsThemeFromFile;
+
+   public Enum<VtmThemes> theme;
 
    /*
     * Online map provider
     */
-   public String url      = UI.EMPTY_STRING;
-   public String tilePath = UI.EMPTY_STRING;
-   public String apiKey   = UI.EMPTY_STRING;
+   public String online_url      = UI.EMPTY_STRING;
+   public String online_TilePath = UI.EMPTY_STRING;
+   public String online_ApiKey   = UI.EMPTY_STRING;
 
    /*
     * Offline map provider
     */
-   public String       mapFilepath   = UI.EMPTY_STRING;
-   public String       themeFilepath = UI.EMPTY_STRING;
-   public String       themeStyle    = UI.EMPTY_STRING;
+   public String       offline_MapFilepath   = UI.EMPTY_STRING;
+   public String       offline_ThemeFilepath = UI.EMPTY_STRING;
+   public String       offline_ThemeStyle    = UI.EMPTY_STRING;
 
    public TileEncoding tileEncoding  = TileEncoding.MVT;
 
@@ -147,13 +160,13 @@ public class Map25Provider implements Cloneable {
             || _cachedThemeFilepath == null
 
             // check if styles for the theme filepath are not yet loaded
-            || (_cachedThemeFilepath != null && _cachedThemeFilepath.equals(themeFilepath) == false)) {
+            || (_cachedThemeFilepath != null && _cachedThemeFilepath.equals(offline_ThemeFilepath) == false)) {
 
          // styles needs to be loaded
-         mfStyles = Map25ProviderManager.loadMapsforgeThemeStyles(themeFilepath);
+         mfStyles = Map25ProviderManager.loadMapsforgeThemeStyles(offline_ThemeFilepath);
 
          // mark styles to be loaded for this filepath
-         _cachedThemeFilepath = themeFilepath;
+         _cachedThemeFilepath = offline_ThemeFilepath;
 
          // cache theme styles
          _cachedThemeStyles = mfStyles;
@@ -190,13 +203,13 @@ public class Map25Provider implements Cloneable {
             + "isOfflineMap   = " + isOfflineMap + "\n" //$NON-NLS-1$ //$NON-NLS-2$
             + "tileEncoding   = " + tileEncoding + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "url            = " + url + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "tilePath       = " + tilePath + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "apiKey         = " + apiKey + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "url            = " + online_url + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "online_TilePath       = " + online_TilePath + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "online_ApiKey         = " + online_ApiKey + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "mapFilepath    = " + mapFilepath + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "themeFilepath  = " + themeFilepath + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "themeStyle     = " + themeStyle + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "offline_MapFilepath    = " + offline_MapFilepath + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "offline_ThemeFilepath  = " + offline_ThemeFilepath + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "offline_ThemeStyle     = " + offline_ThemeStyle + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
       ;
    }

@@ -23,12 +23,9 @@ import java.util.List;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Combo;
@@ -36,6 +33,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
+import org.oscim.theme.VtmThemes;
 
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
@@ -55,11 +53,7 @@ import de.byteholder.geoclipse.mapprovider.IMapProviderListener;
  */
 public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapProviderListener {
 
-   private SelectionAdapter         _defaultSelectionListener;
-   private MouseWheelListener       _defaultMouseWheelListener;
    private FocusListener            _keepOpenListener;
-
-   private PixelConverter           _pc;
 
    private ActionOpenPrefDialog     _actionPrefDialog;
 
@@ -75,9 +69,11 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
    private Composite _parent;
 
    private Combo     _comboMapProvider;
+   private Combo     _comboTheme;
    private Combo     _comboThemeStyle;
 
    private Label     _lblMapProvider;
+   private Label     _lblTheme;
    private Label     _lblThemeStyle;
 
    /**
@@ -117,7 +113,6 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
       final Composite ui = createUI(parent);
 
       restoreState();
-      enableActions();
 
       return ui;
    }
@@ -135,7 +130,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
             createUI_10_Title(container);
             createUI_12_Actions(container);
          }
-         createUI_20_MapProvider(shellContainer);
+         createUI_20_Options(shellContainer);
       }
 
       return shellContainer;
@@ -147,7 +142,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
        * Label: Slideout title
        */
       final Label label = new Label(parent, SWT.NONE);
-      label.setText(Messages.Slideout_Map25Provider_Label_MapProvider);
+      label.setText(Messages.Slideout_Map25Provider_Label_MapProvider_Title);
       MTFont.setBannerFont(label);
       GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
    }
@@ -168,7 +163,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
       tbm.update(true);
    }
 
-   private void createUI_20_MapProvider(final Composite parent) {
+   private void createUI_20_Options(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -179,7 +174,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
              * Map provider
              */
             _lblMapProvider = new Label(container, SWT.NONE);
-            _lblMapProvider.setText(Messages.Slideout_Map25MapProvider_Label_MapProvider);
+            _lblMapProvider.setText(Messages.Slideout_Map25Provider_Label_MapProvider);
 
             _comboMapProvider = new Combo(container, SWT.READ_ONLY);
             _comboMapProvider.addFocusListener(_keepOpenListener);
@@ -192,10 +187,26 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
          }
          {
             /*
+             * Combo: Theme
+             */
+            _lblTheme = new Label(container, SWT.NONE);
+            _lblTheme.setText(Messages.Slideout_Map25Provider_Label_DefaultTheme);
+
+            _comboTheme = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
+            _comboTheme.addFocusListener(_keepOpenListener);
+            _comboTheme.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onSelect_Theme();
+               }
+            });
+         }
+         {
+            /*
              * Theme style
              */
             _lblThemeStyle = new Label(container, SWT.NONE);
-            _lblThemeStyle.setText(Messages.Slideout_Map25MapProvider_Label_ThemeStyle);
+            _lblThemeStyle.setText(Messages.Slideout_Map25Provider_Label_ThemeStyle);
 
             _comboThemeStyle = new Combo(container, SWT.READ_ONLY);
             _comboThemeStyle.addFocusListener(_keepOpenListener);
@@ -209,10 +220,6 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
       }
 
       fillMapProvider();
-   }
-
-   private void enableActions() {
-
    }
 
    private void fillMapProvider() {
@@ -272,23 +279,6 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
       _parent = parent;
 
-      _pc = new PixelConverter(parent);
-
-      _defaultSelectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onChangeUI();
-         }
-      };
-
-      _defaultMouseWheelListener = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
-            UI.adjustSpinnerValueOnMouseScroll(event);
-            onChangeUI();
-         }
-      };
-
       _keepOpenListener = new FocusListener() {
 
          @Override
@@ -321,13 +311,6 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
       fillMapProvider();
    }
 
-   private void onChangeUI() {
-
-      saveState();
-
-      enableActions();
-   }
-
    @Override
    protected void onDispose() {
 
@@ -349,13 +332,37 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
          return;
       }
 
+      updateUI_Theme(selectedMapProvider);
       updateUI_ThemeStyle(selectedMapProvider);
       updateUI_MapProvider_Tooltip(selectedMapProvider);
 
       // update UI otherwise the old theme style box is displayed until the next redraw
       _parent.update();
 
-      _map25View.getMapApp().setMapProvider(selectedMapProvider);
+      // update UI
+      updateMap(selectedMapProvider);
+   }
+
+   private void onSelect_Theme() {
+
+      final Map25Provider mapProvider = getSelectedMapProvider();
+
+      final int selectedIndex = _comboTheme.getSelectionIndex();
+
+      mapProvider.offline_IsThemeFromFile = mapProvider.isOfflineMap && selectedIndex == 0;
+
+      int themeIndex = selectedIndex;
+
+      // adjust index for offline maps because the first item is not a theme
+      if (mapProvider.isOfflineMap) {
+         themeIndex--;
+      }
+
+      final VtmThemes[] themeValues = VtmThemes.values();
+      mapProvider.theme = themeValues[themeIndex];
+
+      // update UI
+      updateMap(mapProvider);
    }
 
    private void onSelect_ThemeStyle() {
@@ -370,10 +377,10 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
       final int selectedStyleIndex = _comboThemeStyle.getSelectionIndex();
 
       // update model
-      mapProvider.themeStyle = mfStyles.get(selectedStyleIndex).getXmlLayer();
+      mapProvider.offline_ThemeStyle = mfStyles.get(selectedStyleIndex).getXmlLayer();
 
       // update UI
-      _map25View.getMapApp().setMapProvider(mapProvider);
+      updateMap(mapProvider);
    }
 
    private void restoreState() {
@@ -385,12 +392,9 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
       selectMapProvider(currentMapProvider);
 
+      updateUI_Theme(currentMapProvider);
       updateUI_ThemeStyle(currentMapProvider);
       updateUI_MapProvider_Tooltip(currentMapProvider);
-   }
-
-   private void saveState() {
-
    }
 
    public void selectMapProvider(final Map25Provider mapProvider) {
@@ -418,6 +422,11 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
       }
    }
 
+   private void updateMap(final Map25Provider mapProvider) {
+
+      _map25View.getMapApp().setMapProvider(mapProvider);
+   }
+
    private void updateUI_MapProvider_Tooltip(final Map25Provider mapProvider) {
 
       String mpTooltip = UI.EMPTY_STRING;
@@ -436,11 +445,11 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
          final String themeStyleText = String.join(UI.NEW_LINE1, allThemeStyles);
 
-         mpTooltip = String.format(Messages.Slideout_Map25MapProvider_Combo_MapProvider_Offline_Tooltip,
+         mpTooltip = String.format(Messages.Slideout_Map25Provider_Combo_MapProvider_Offline_Tooltip,
 
                mapProvider.tileEncoding,
-               mapProvider.mapFilepath,
-               mapProvider.themeFilepath,
+               mapProvider.offline_MapFilepath,
+               mapProvider.offline_ThemeFilepath,
                themeStyleText
 
          );
@@ -449,11 +458,11 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
          // online
 
-         mpTooltip = String.format(Messages.Slideout_Map25MapProvider_Combo_MapProvider_Online_Tooltip,
+         mpTooltip = String.format(Messages.Slideout_Map25Provider_Combo_MapProvider_Online_Tooltip,
 
                mapProvider.tileEncoding,
-               mapProvider.url + mapProvider.tilePath,
-               mapProvider.apiKey
+               mapProvider.online_url + mapProvider.online_TilePath,
+               mapProvider.online_ApiKey
 
          );
       }
@@ -462,11 +471,57 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
       _lblThemeStyle.setToolTipText(mpTooltip);
    }
 
+   private void updateUI_Theme(final Map25Provider mapProvider) {
+
+      /*
+       * Fill theme combo
+       */
+      _comboTheme.removeAll();
+
+      if (mapProvider != null && mapProvider.isOfflineMap) {
+
+         // add an additional option to use the theme from the theme file
+
+         _comboTheme.add(Messages.Pref_Map25_Provider_Theme_FromThemeFile);
+      }
+
+      // fill combobox
+      for (final VtmThemes vtmTheme : VtmThemes.values()) {
+         _comboTheme.add(vtmTheme.toString());
+      }
+
+      /*
+       * Select theme
+       */
+      if (mapProvider == null) {
+         _comboTheme.select(0);
+         return;
+      }
+
+      if (mapProvider.isOfflineMap && mapProvider.offline_IsThemeFromFile) {
+
+         // select: theme is from a file
+         _comboTheme.select(0);
+         return;
+      }
+
+      int themeIndex = Map25ProviderManager.getThemeIndex(mapProvider.theme, mapProvider.tileEncoding);
+      if (mapProvider.isOfflineMap) {
+
+         // adjust because of the offline additional item
+
+         themeIndex++;
+      }
+      _comboTheme.select(themeIndex);
+   }
+
    private void updateUI_ThemeStyle(final Map25Provider mapProvider) {
 
       _comboThemeStyle.removeAll();
 
       if (mapProvider.isOfflineMap == false) {
+
+         // online map has no theme styles
 
          _comboThemeStyle.add(Messages.Pref_Map25_Provider_ThemeStyle_Info_NotSupported);
          _comboThemeStyle.select(0);
@@ -480,9 +535,9 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
       }
 
       final List<MapsforgeThemeStyle> mfStyles = mapProvider.getThemeStyles(false);
-
-      // check if style is valid
       if (mfStyles == null) {
+
+         // invalid style file
 
          _comboThemeStyle.add(Messages.Pref_Map25_Provider_ThemeStyle_Info_InvalidThemeFilename);
          _comboThemeStyle.select(0);
@@ -510,7 +565,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
          _comboThemeStyle.add(mfStyle.getLocaleName());
 
-         if (mfStyle.getXmlLayer().equals(mapProvider.themeStyle)) {
+         if (mfStyle.getXmlLayer().equals(mapProvider.offline_ThemeStyle)) {
             styleSelectIndex = styleIndex;
          }
       }

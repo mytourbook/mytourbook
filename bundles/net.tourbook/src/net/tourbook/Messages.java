@@ -1439,6 +1439,7 @@ public class Messages extends NLS {
    public static String        Pref_Map25_Provider_Column_Enabled;
    public static String        Pref_Map25_Provider_Column_Offline;
    public static String        Pref_Map25_Provider_Column_ProviderName;
+   public static String        Pref_Map25_Provider_Column_Theme;
    public static String        Pref_Map25_Provider_Column_TileEncoding;
    public static String        Pref_Map25_Provider_Column_TilePath_ThemeFilename;
    public static String        Pref_Map25_Provider_Column_Url_MapFilename;
@@ -1455,6 +1456,7 @@ public class Messages extends NLS {
    public static String        Pref_Map25_Provider_Error_TilePathIsRequired;
    public static String        Pref_Map25_Provider_Error_UrlIsRequired;
    public static String        Pref_Map25_Provider_Label_APIKey;
+   public static String        Pref_Map25_Provider_Label_DefaultTheme;
    public static String        Pref_Map25_Provider_Label_Description;
    public static String        Pref_Map25_Provider_Label_MapFilepath;
    public static String        Pref_Map25_Provider_Label_ProviderName;
@@ -1465,6 +1467,7 @@ public class Messages extends NLS {
    public static String        Pref_Map25_Provider_Label_TileUrl;
    public static String        Pref_Map25_Provider_Label_Title;
    public static String        Pref_Map25_Provider_Label_Url;
+   public static String        Pref_Map25_Provider_Theme_FromThemeFile;
    public static String        Pref_Map25_Provider_ThemeStyle_Info_All;
    public static String        Pref_Map25_Provider_ThemeStyle_Info_InvalidThemeFilename;
    public static String        Pref_Map25_Provider_ThemeStyle_Info_NoStyles;
@@ -1874,11 +1877,6 @@ public class Messages extends NLS {
    public static String Slideout_Map25MapOptions_Checkbox_UseDraggedKeyNavigation_Tooltip;
    public static String Slideout_Map25MapOptions_Group_MapLayer;
    public static String Slideout_Map25MapOptions_Label_MapOptions;
-   
-   public static String Slideout_Map25MapProvider_Combo_MapProvider_Offline_Tooltip;
-   public static String Slideout_Map25MapProvider_Combo_MapProvider_Online_Tooltip;
-   public static String Slideout_Map25MapProvider_Label_MapProvider;
-   public static String Slideout_Map25MapProvider_Label_ThemeStyle;
 
    public static String Slideout_Map25MarkerOptions_Checkbox_IsMarkerClustering;
    public static String Slideout_Map25MarkerOptions_Checkbox_IsShowMarkerPoint;
@@ -1904,7 +1902,12 @@ public class Messages extends NLS {
    public static String Slideout_Map25MarkerOptions_Label_SwapColor_Tooltip;
    public static String Slideout_Map25MarkerOptions_Label_Title;
 
+   public static String Slideout_Map25Provider_Combo_MapProvider_Offline_Tooltip;
+   public static String Slideout_Map25Provider_Combo_MapProvider_Online_Tooltip;
+   public static String Slideout_Map25Provider_Label_DefaultTheme;
    public static String Slideout_Map25Provider_Label_MapProvider;
+   public static String Slideout_Map25Provider_Label_MapProvider_Title;
+   public static String Slideout_Map25Provider_Label_ThemeStyle;
 
    public static String Slideout_Map_Bookmark_Label_NumBookmarkListItems;
    public static String Slideout_Map_Bookmark_Label_NumBookmarkListItems_Tooltip;
