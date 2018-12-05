@@ -341,6 +341,9 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
       // update UI
       updateMap(selectedMapProvider);
+
+      // set map provider which should be selected when the pref dialog is opened
+      _actionPrefDialog.setPrefData(selectedMapProvider);
    }
 
    private void onSelect_Theme() {
@@ -358,8 +361,11 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
          themeIndex--;
       }
 
+      //update model
       final VtmThemes[] themeValues = VtmThemes.values();
       mapProvider.theme = themeValues[themeIndex];
+
+      Map25ProviderManager.saveMapProvider();
 
       // update UI
       updateMap(mapProvider);
@@ -379,9 +385,12 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
       // update model
       mapProvider.offline_ThemeStyle = mfStyles.get(selectedStyleIndex).getXmlLayer();
 
+      Map25ProviderManager.saveMapProvider();
+
       // update UI
       updateMap(mapProvider);
    }
+
 
    private void restoreState() {
 

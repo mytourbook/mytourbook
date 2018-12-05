@@ -198,6 +198,17 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
       }
    }
 
+   @Override
+   public void applyData(final Object data) {
+
+      if (data instanceof Map25Provider) {
+
+         final Map25Provider mapProvider = (Map25Provider) data;
+
+         selectMapProvider(mapProvider.getId());
+      }
+   }
+
    /**
     * When the current map provider is disabled -> use default map provider
     */
@@ -329,7 +340,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
       layoutContainer.setLayout(tableLayout);
       GridDataFactory.fillDefaults()
             .grab(true, true)
-            .hint(400, convertHeightInCharsToPixels(10))
+            .hint(700, convertHeightInCharsToPixels(10))
             .applyTo(layoutContainer);
 
       /*
@@ -1326,27 +1337,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
        * select last selected map provider
        */
       final String lastMapProviderUUID = Util.getStateString(_state, STATE_LAST_SELECTED_MAP_PROVIDER, null);
-      Map25Provider lastMapProvider = null;
-
-      for (final Map25Provider mapProvider : _allMapProvider) {
-
-         if (mapProvider.getId().equals(lastMapProviderUUID)) {
-            lastMapProvider = mapProvider;
-            break;
-         }
-      }
-
-      if (lastMapProvider != null) {
-         _mapProviderViewer.setSelection(new StructuredSelection(lastMapProvider));
-      } else if (_allMapProvider.size() > 0) {
-         _mapProviderViewer.setSelection(new StructuredSelection(_allMapProvider.get(0)));
-      } else {
-         // nothing can be selected
-      }
-
-      // set focus to selected map provider
-      final Table table = _mapProviderViewer.getTable();
-      table.setSelection(table.getSelectionIndex());
+      selectMapProvider(lastMapProviderUUID);
    }
 
    /**
@@ -1369,7 +1360,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
 
       if (isSaveIt) {
 
-         Map25ProviderManager.saveMapProvider(_allMapProvider);
+         Map25ProviderManager.saveMapProvider_WithNewModel(_allMapProvider);
 
          checkMapProvider();
 
@@ -1383,6 +1374,31 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
       if (_selectedMapProvider != null) {
          _state.put(STATE_LAST_SELECTED_MAP_PROVIDER, _selectedMapProvider.getId());
       }
+   }
+
+   private void selectMapProvider(final String mapProviderUUID) {
+
+      Map25Provider lastMapProvider = null;
+
+      for (final Map25Provider mapProvider : _allMapProvider) {
+
+         if (mapProvider.getId().equals(mapProviderUUID)) {
+            lastMapProvider = mapProvider;
+            break;
+         }
+      }
+
+      if (lastMapProvider != null) {
+         _mapProviderViewer.setSelection(new StructuredSelection(lastMapProvider));
+      } else if (_allMapProvider.size() > 0) {
+         _mapProviderViewer.setSelection(new StructuredSelection(_allMapProvider.get(0)));
+      } else {
+         // nothing can be selected
+      }
+
+      // set focus to selected map provider
+      final Table table = _mapProviderViewer.getTable();
+      table.setSelection(table.getSelectionIndex());
    }
 
    /**

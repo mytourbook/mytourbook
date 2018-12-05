@@ -414,13 +414,10 @@ public class Map25ProviderManager {
       }
    }
 
-   public static void saveMapProvider(final ArrayList<Map25Provider> allMapProvider) {
-
-      replaceDefault(allMapProvider);
-
-      // update model
-      _allMapProvider.clear();
-      _allMapProvider.addAll(allMapProvider);
+   /**
+    * Save all map providers from the model {@link #_allMapProvider}
+    */
+   public static void saveMapProvider() {
 
       final XMLMemento xmlRoot = saveMapProvider_10_CreateXml();
       final File xmlFile = getXmlFile();
@@ -493,6 +490,22 @@ public class Map25ProviderManager {
       xmlRoot.putInteger(ATTR_MAP_PROVIDER_VERSION, MAP_PROVIDER_VERSION);
 
       return xmlRoot;
+   }
+
+   /**
+    * Save all map provider with new model
+    *
+    * @param allMapProvider
+    */
+   public static void saveMapProvider_WithNewModel(final ArrayList<Map25Provider> allMapProvider) {
+
+      replaceDefault(allMapProvider);
+
+      // update model
+      _allMapProvider.clear();
+      _allMapProvider.addAll(allMapProvider);
+
+      saveMapProvider();
    }
 
    static void setDebugView(final Map25DebugView map25DebugView) {

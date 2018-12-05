@@ -62,7 +62,7 @@ public class Map25Provider implements Cloneable {
    public String       offline_ThemeFilepath = UI.EMPTY_STRING;
    public String       offline_ThemeStyle    = UI.EMPTY_STRING;
 
-   public TileEncoding tileEncoding  = TileEncoding.MVT;
+   public TileEncoding tileEncoding          = TileEncoding.MVT;
 
    /*
     * Cached theme properties
@@ -202,14 +202,16 @@ public class Map25Provider implements Cloneable {
 
             + "isOfflineMap   = " + isOfflineMap + "\n" //$NON-NLS-1$ //$NON-NLS-2$
             + "tileEncoding   = " + tileEncoding + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "theme          = " + theme + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "url            = " + online_url + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "online_TilePath       = " + online_TilePath + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "online_ApiKey         = " + online_ApiKey + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "online_url              = " + online_url + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "online_TilePath         = " + online_TilePath + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "online_ApiKey           = " + online_ApiKey + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "offline_MapFilepath    = " + offline_MapFilepath + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "offline_ThemeFilepath  = " + offline_ThemeFilepath + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "offline_ThemeStyle     = " + offline_ThemeStyle + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "offline_MapFilepath     = " + offline_MapFilepath + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "offline_ThemeFilepath   = " + offline_ThemeFilepath + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "offline_ThemeStyle      = " + offline_ThemeStyle + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "offline_IsThemeFromFile = " + offline_IsThemeFromFile + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
       ;
    }
