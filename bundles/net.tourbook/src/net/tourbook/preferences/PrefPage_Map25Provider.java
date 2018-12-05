@@ -829,7 +829,10 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
          tvc.setLabelProvider(new CellLabelProvider() {
             @Override
             public void update(final ViewerCell cell) {
-               cell.setText(((Map25Provider) cell.getElement()).theme.name());
+
+               final Enum<VtmThemes> theme = ((Map25Provider) cell.getElement()).theme;
+
+               cell.setText(theme == null ? UI.EMPTY_STRING : theme.name());
             }
          });
          tableLayout.setColumnData(tc, new ColumnWeightData(3, minWidth));
@@ -1012,19 +1015,32 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
       return _allTileEncoding[selectedIndex];
    }
 
-   private Enum<VtmThemes> getSelectedTheme(final TileEncoding tileEncoding) {
+   private Enum<VtmThemes> getSelectedTheme(final boolean isOfflineMap, final TileEncoding tileEncoding) {
 
       final VtmThemes[] themeValues = VtmThemes.values();
 
       final int selectedIndex = _comboTheme.getSelectionIndex();
 
       if (selectedIndex < 0) {
-
-         // return default
-         return Map25ProviderManager.getDefaultTheme(tileEncoding);
+         // this should not occure
+         return null;
       }
 
-      return themeValues[selectedIndex];
+      if (isOfflineMap && selectedIndex == 0) {
+
+         // offline map is using theme from a file
+         return null;
+      }
+
+      int themeIndex = selectedIndex;
+      if (isOfflineMap) {
+
+         // adjust because of the additional offline item: theme is from a file
+
+         themeIndex--;
+      }
+
+      return themeValues[themeIndex];
    }
 
    private String getSelectedThemeStyle(final List<MapsforgeThemeStyle> cachedThemeStyles) {
@@ -1437,16 +1453,20 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
    private void updateModelData(final Map25Provider mapProvider) {
 
       final TileEncodingData selectedEncoding = getSelectedEncoding();
+      final TileEncoding tileEncoding = selectedEncoding.__encoding;
+      final boolean isOfflineMap = selectedEncoding.__isOffline;
 
+      mapProvider.isEnabled = _chkIsMapProviderEnabled.getSelection();
       mapProvider.name = _txtProviderName.getText();
       mapProvider.description = _txtDescription.getText();
-      mapProvider.isEnabled = _chkIsMapProviderEnabled.getSelection();
 
-      final boolean isOffline = selectedEncoding.__isOffline;
-      mapProvider.isOfflineMap = isOffline;
+      mapProvider.isOfflineMap = isOfflineMap;
 
-      if (isOffline) {
+      final Enum<VtmThemes> selectedTheme = getSelectedTheme(isOfflineMap, tileEncoding);
 
+      if (isOfflineMap) {
+
+         mapProvider.offline_IsThemeFromFile = selectedTheme == null ? true : false;
          mapProvider.offline_MapFilepath = _txtOffline_MapFilepath.getText();
          mapProvider.offline_ThemeFilepath = _txtOffline_ThemeFilepath.getText();
          mapProvider.offline_ThemeStyle = getSelectedThemeStyle(mapProvider.getThemeStyles(false));
@@ -1458,9 +1478,8 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
          mapProvider.online_ApiKey = _txtOnline_APIKey.getText();
       }
 
-      final TileEncoding tileEncoding = mapProvider.tileEncoding;
-      mapProvider.tileEncoding = selectedEncoding.__encoding;
-      mapProvider.theme = getSelectedTheme(tileEncoding);
+      mapProvider.tileEncoding = tileEncoding;
+      mapProvider.theme = selectedTheme;
    }
 
    private void updateUI_FromProvider(final Map25Provider mapProvider) {
@@ -1546,7 +1565,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
          return;
       }
 
-      if (mapProvider.isOfflineMap && mapProvider.offline_IsThemeFromFile) {
+      if (mapProvider.isOfflineMap && mapProvider.offline_IsThemeFromFile || mapProvider.theme == null) {
 
          // select: theme is from a file
          _comboTheme.select(0);
