@@ -18,6 +18,8 @@ package net.tourbook.ui.views.tourSegmenter;
 import gnu.trove.list.array.TIntArrayList;
 
 import java.text.NumberFormat;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -327,6 +329,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private ColumnManager           _columnManager;
    //
    private TourData                _tourData;
+   private int                     _tourStartDayTime;
    //
    private float                   _dpToleranceAltitude;
    private float                   _dpToleranceAltitudeMultipleTours;
@@ -387,11 +390,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private long                           _tourBreakTime;
    private float                          _breakUIMinAvgSpeedAS;
    private float                          _breakUIMinSliceSpeedAS;
-
    private int                            _breakUIMinSliceTimeAS;
-
    private float                          _breakUIMinAvgSpeed;
-
    private float                          _breakUIMinSliceSpeed;
    private int                            _breakUIShortestBreakTime;
    private int                            _breakUISliceDiff;
@@ -411,96 +411,97 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    //
    private boolean                        _isGetInitialTours;
    private ArrayList<TourSegment>         _allTourSegments;
+   //
    /*
     * UI resources
     */
-   private final ColorCache               _colorCache         = new ColorCache();
+   private final ColorCache _colorCache = new ColorCache();
    /*
     * UI controls
     */
-   private Composite                      _parent;
+   private Composite        _parent;
    //
-   private PageBook                       _pageBookUI;
-   private PageBook                       _pageBookSegmenter;
-   private PageBook                       _pageBookBreakTime;
+   private PageBook         _pageBookUI;
+   private PageBook         _pageBookSegmenter;
+   private PageBook         _pageBookBreakTime;
    //
-   private Button                         _btnSaveTourDP;
-   private Button                         _btnSaveTourMin;
+   private Button           _btnSaveTourDP;
+   private Button           _btnSaveTourMin;
    //
-   private Composite                      _containerBreakTime;
-   private Composite                      _viewerContainer;
+   private Composite        _containerBreakTime;
+   private Composite        _viewerContainer;
    //
-   private Composite                      _pageSegmenter;
-   private Composite                      _pageBreakBy_AvgSliceSpeed;
-   private Composite                      _pageBreakBy_AvgSpeed;
-   private Composite                      _pageBreakBy_SliceSpeed;
-   private Composite                      _pageBreakBy_TimeDistance;
-   private Composite                      _pageNoData;
-   private Composite                      _pageSegType_ByAltiUpDown;
-   private Composite                      _pageSegType_ByBreakTime;
-   private Composite                      _pageSegType_ByDistance;
-   private Composite                      _pageSegType_ByMarker;
-   private Composite                      _pageSegType_DPAltitude;
-   private Composite                      _pageSegType_DPPower;
-   private Composite                      _pageSegType_DPPulse;
-   private Composite                      _pageSegType_Surfing;
+   private Composite        _pageSegmenter;
+   private Composite        _pageBreakBy_AvgSliceSpeed;
+   private Composite        _pageBreakBy_AvgSpeed;
+   private Composite        _pageBreakBy_SliceSpeed;
+   private Composite        _pageBreakBy_TimeDistance;
+   private Composite        _pageNoData;
+   private Composite        _pageSegType_ByAltiUpDown;
+   private Composite        _pageSegType_ByBreakTime;
+   private Composite        _pageSegType_ByDistance;
+   private Composite        _pageSegType_ByMarker;
+   private Composite        _pageSegType_DPAltitude;
+   private Composite        _pageSegType_DPPower;
+   private Composite        _pageSegType_DPPulse;
+   private Composite        _pageSegType_Surfing;
    //
-   private Button                         _btnSurfing_DeleteTourSegments;
-   private Button                         _btnSurfing_RestoreFrom_Defaults;
-   private Button                         _btnSurfing_RestoreFrom_Tour;
-   private Button                         _btnSurfing_SaveTourSegments;
+   private Button           _btnSurfing_DeleteTourSegments;
+   private Button           _btnSurfing_RestoreFrom_Defaults;
+   private Button           _btnSurfing_RestoreFrom_Tour;
+   private Button           _btnSurfing_SaveTourSegments;
    //
-   private Button                         _chkIsMinSurfingDistance;
-   private Button                         _chkIsShowOnlySelectedSegments;
+   private Button           _chkIsMinSurfingDistance;
+   private Button           _chkIsShowOnlySelectedSegments;
    //
-   private Combo                          _comboBreakMethod;
-   private Combo                          _comboSegmenterType;
-   private Combo                          _comboSurfing_SegmenterFilter;
+   private Combo            _comboBreakMethod;
+   private Combo            _comboSegmenterType;
+   private Combo            _comboSurfing_SegmenterFilter;
    //
-   private ImageComboLabel                _lblTitle;
+   private ImageComboLabel  _lblTitle;
    //
-   private CLabel                         _iconSaveSurfingState;
+   private CLabel           _iconSaveSurfingState;
    //
-   private Image                          _imageSurfing_SaveState;
-   private Image                          _imageSurfing_NotSaveState;
+   private Image            _imageSurfing_SaveState;
+   private Image            _imageSurfing_NotSaveState;
    //
-   private Label                          _lblAltitudeUpDP;
-   private Label                          _lblAltitudeUpMin;
-   private Label                          _lblBreakDistanceUnit;
-   private Label                          _lblDistanceValue;
-   private Label                          _lblMinAltitude;
-   private Label                          _lblNumSegments;
-   private Label                          _lblSurfing_MinStartStopSpeed;
-   private Label                          _lblSurfing_MinStartStopSpeed_Unit;
-   private Label                          _lblSurfing_MinSurfingDistance_Unit;
-   private Label                          _lblSurfing_MinSurfingSpeed;
-   private Label                          _lblSurfing_MinSurfingSpeed_Unit;
-   private Label                          _lblSurfing_MinSurfingTimeDuration;
-   private Label                          _lblSurfing_MinSurfingTimeDuration_Unit;
-   private Label                          _lblTourBreakTime;
+   private Label            _lblAltitudeUpDP;
+   private Label            _lblAltitudeUpMin;
+   private Label            _lblBreakDistanceUnit;
+   private Label            _lblDistanceValue;
+   private Label            _lblMinAltitude;
+   private Label            _lblNumSegments;
+   private Label            _lblSurfing_MinStartStopSpeed;
+   private Label            _lblSurfing_MinStartStopSpeed_Unit;
+   private Label            _lblSurfing_MinSurfingDistance_Unit;
+   private Label            _lblSurfing_MinSurfingSpeed;
+   private Label            _lblSurfing_MinSurfingSpeed_Unit;
+   private Label            _lblSurfing_MinSurfingTimeDuration;
+   private Label            _lblSurfing_MinSurfingTimeDuration_Unit;
+   private Label            _lblTourBreakTime;
    //
-   private Spinner                        _spinnerBreak_MinAvgSpeedAS;
-   private Spinner                        _spinnerBreak_MinSliceSpeedAS;
-   private Spinner                        _spinnerBreak_MinSliceTimeAS;
-   private Spinner                        _spinnerBreak_MinAvgSpeed;
-   private Spinner                        _spinnerBreak_MinSliceSpeed;
-   private Spinner                        _spinnerBreak_ShortestTime;
-   private Spinner                        _spinnerBreak_MaxDistance;
-   private Spinner                        _spinnerBreak_SliceDiff;
-   private Spinner                        _spinnerDistance;
-   private Spinner                        _spinnerDPTolerance_Altitude;
-   private Spinner                        _spinnerDPTolerance_Power;
-   private Spinner                        _spinnerDPTolerance_Pulse;
-   private Spinner                        _spinnerMinAltitude;
-   private Spinner                        _spinnerSurfing_MinSurfingDistance;
-   private Spinner                        _spinnerSurfing_MinSpeed_Surfing;
-   private Spinner                        _spinnerSurfing_MinTimeDuration;
-   private Spinner                        _spinnerSurfing_MinSpeed_StartStop;
+   private Spinner          _spinnerBreak_MinAvgSpeedAS;
+   private Spinner          _spinnerBreak_MinSliceSpeedAS;
+   private Spinner          _spinnerBreak_MinSliceTimeAS;
+   private Spinner          _spinnerBreak_MinAvgSpeed;
+   private Spinner          _spinnerBreak_MinSliceSpeed;
+   private Spinner          _spinnerBreak_ShortestTime;
+   private Spinner          _spinnerBreak_MaxDistance;
+   private Spinner          _spinnerBreak_SliceDiff;
+   private Spinner          _spinnerDistance;
+   private Spinner          _spinnerDPTolerance_Altitude;
+   private Spinner          _spinnerDPTolerance_Power;
+   private Spinner          _spinnerDPTolerance_Pulse;
+   private Spinner          _spinnerMinAltitude;
+   private Spinner          _spinnerSurfing_MinSurfingDistance;
+   private Spinner          _spinnerSurfing_MinSpeed_Surfing;
+   private Spinner          _spinnerSurfing_MinTimeDuration;
+   private Spinner          _spinnerSurfing_MinSpeed_StartStop;
    /**
     * {@link TourChart} contains the chart for the tour, this is necessary to move the slider in the
     * chart to a selected segment
     */
-   private TourChart                      _tourChart;
+   private TourChart        _tourChart;
 
    private class SegmenterComparator extends ViewerComparator {
 
@@ -2710,7 +2711,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             {
                _chkIsMinSurfingDistance = new Button(container, SWT.CHECK);
                _chkIsMinSurfingDistance.setText(Messages.Tour_Segmenter_Surfing_Checkbox_IsMinDistance);
-               _chkIsMinSurfingDistance.setToolTipText(Messages.Tour_Segmenter_Surfing_Label_MinDistance_Tooltip);
+               _chkIsMinSurfingDistance.setToolTipText(Messages.Tour_Segmenter_Surfing_Checkbox_IsMinDistance_Tooltip);
                _chkIsMinSurfingDistance.addSelectionListener(_defaultSurfing_SelectionListener);
                GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_chkIsMinSurfingDistance);
 
@@ -2844,8 +2845,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                 * Button: Save surfing segments
                 */
                _btnSurfing_SaveTourSegments = new Button(actionContainer, SWT.NONE);
-               _btnSurfing_SaveTourSegments.setText(Messages.Tour_Segmenter_Button_SaveTour);
-               _btnSurfing_SaveTourSegments.setToolTipText(Messages.Tour_Segmenter_Button_Surfing_SaveTourSegments_Tooltip);
+               _btnSurfing_SaveTourSegments.setText(Messages.Tour_Segmenter_Surfing_Button_SaveWaves);
+               _btnSurfing_SaveTourSegments.setToolTipText(Messages.Tour_Segmenter_Surfing_Button_SaveWaves_Tooltip);
                _btnSurfing_SaveTourSegments.addSelectionListener(new SelectionAdapter() {
                   @Override
                   public void widgetSelected(final SelectionEvent e) {
@@ -2859,8 +2860,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                 * Button: Delete surfing segments
                 */
                _btnSurfing_DeleteTourSegments = new Button(actionContainer, SWT.NONE);
-               _btnSurfing_DeleteTourSegments.setText(Messages.Tour_Segmenter_Button_Surfing_DeleteTourSegments);
-               _btnSurfing_DeleteTourSegments.setToolTipText(Messages.Tour_Segmenter_Button_Surfing_DeleteTourSegments_Tooltip);
+               _btnSurfing_DeleteTourSegments.setText(Messages.Tour_Segmenter_Surfing_Button_DeleteWaves);
+               _btnSurfing_DeleteTourSegments.setToolTipText(Messages.Tour_Segmenter_Surfing_Button_DeleteWaves_Tooltip);
                _btnSurfing_DeleteTourSegments.addSelectionListener(new SelectionAdapter() {
                   @Override
                   public void widgetSelected(final SelectionEvent e) {
@@ -2876,7 +2877,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
              */
             _iconSaveSurfingState = new CLabel(container, SWT.NONE);
             _iconSaveSurfingState.setImage(_imageSurfing_SaveState);
-            _iconSaveSurfingState.setToolTipText(Messages.Tour_Segmenter_Button_SurfingSaveState_Tooltip);
 
             GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.END)
@@ -3090,6 +3090,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       defineColumn_Time_Recording();
       defineColumn_Time_Driving();
       defineColumn_Time_Paused();
+      defineColumn_Time_TimeOfDay();
 
       defineColumn_Motion_DistanceTotal();
       defineColumn_Motion_Distance();
@@ -3870,6 +3871,31 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             } else {
                final int value = segment.time_Total;
                colDef.printDetailValue(cell, value);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Time of day in hh:mm:ss
+    */
+   private void defineColumn_Time_TimeOfDay() {
+
+      final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_TIME_OF_DAY_HH_MM_SS.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourSegment segment = (TourSegment) cell.getElement();
+
+            if (segment.isTotal) {
+               cell.setText(UI.EMPTY_STRING);
+            } else {
+
+               final int serieIndex = segment.serieIndex_Start;
+
+               cell.setText(UI.format_hh_mm_ss(_tourStartDayTime + _tourData.timeSerie[serieIndex]));
             }
          }
       });
@@ -5205,12 +5231,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       final boolean isVisibleDataPointSerieSaved = _tourData.isVisiblePointsSaved_ForSurfing();
       if (isVisibleDataPointSerieSaved) {
 
-         _iconSaveSurfingState.setToolTipText(Messages.Tour_Segmenter_Button_Surfing_IsSaveState_Tooltip);
+         _iconSaveSurfingState.setToolTipText(Messages.Tour_Segmenter_Surfing_Button_IsSaveState_Tooltip);
          _iconSaveSurfingState.setImage(_imageSurfing_SaveState);
 
       } else {
 
-         _iconSaveSurfingState.setToolTipText(Messages.Tour_Segmenter_Button_Surfing_IsNotSaveState_Tooltip);
+         _iconSaveSurfingState.setToolTipText(Messages.Tour_Segmenter_Surfing_Button_IsNotSaveState_Tooltip);
          _iconSaveSurfingState.setImage(_imageSurfing_NotSaveState);
       }
 
@@ -5541,6 +5567,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
          _pageBookUI.showPage(_pageSegmenter);
          enableActions();
+
+         final ZonedDateTime tourStartTime = _tourData.getTourStartTime();
+         _tourStartDayTime = tourStartTime.get(ChronoField.SECOND_OF_DAY);
 
          // update tour title
          _lblTitle.setText(getTourTitle());

@@ -27,7 +27,7 @@ public class Map25TileSource extends UrlTileSource {
 	public static class Builder<T extends Builder<T>> extends UrlTileSource.Builder<T> {
 
 		public Builder() {
-			super(_mapProvider.url, _mapProvider.tilePath, 1, 17);
+			super(_mapProvider.online_url, _mapProvider.online_TilePath, 1, 17);
 		}
 
 		@Override
