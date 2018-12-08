@@ -71,9 +71,9 @@ public class Map25ProviderManager {
    private static final String                             ATTR_OFFLINE_THEME_FILEPATH     = "Offline_ThemeFilepath";                  //$NON-NLS-1$
    private static final String                             ATTR_OFFLINE_THEME_STYLE        = "Offline_ThemeStyle";                     //$NON-NLS-1$
 
-   private static final String                             ATTR_ONELINE_API_KEY            = "Online_APIKey";                          //$NON-NLS-1$
-   private static final String                             ATTR_ONELINE_TILE_PATH          = "Online_TilePath";                        //$NON-NLS-1$
-   private static final String                             ATTR_ONELINE_URL                = "Online_Url";                             //$NON-NLS-1$
+   private static final String                             ATTR_ONLINE_API_KEY            = "Online_APIKey";                          //$NON-NLS-1$
+   private static final String                             ATTR_ONLINE_TILE_PATH          = "Online_TilePath";                        //$NON-NLS-1$
+   private static final String                             ATTR_ONLINE_URL                = "Online_Url";                             //$NON-NLS-1$
 
    private static boolean                                  _isDebugViewVisible;
    private static Map25DebugView                           _map25DebugView;
@@ -315,9 +315,9 @@ public class Map25ProviderManager {
 
                   } else {
 
-                     mapProvider.online_ApiKey              = Util.getXmlString(xml, ATTR_ONELINE_API_KEY, UI.EMPTY_STRING);
-                     mapProvider.online_TilePath            = Util.getXmlString(xml, ATTR_ONELINE_TILE_PATH, UI.EMPTY_STRING);
-                     mapProvider.online_url                 = Util.getXmlString(xml, ATTR_ONELINE_URL, UI.EMPTY_STRING);
+                     mapProvider.online_ApiKey              = Util.getXmlString(xml, ATTR_ONLINE_API_KEY, UI.EMPTY_STRING);
+                     mapProvider.online_TilePath            = Util.getXmlString(xml, ATTR_ONLINE_TILE_PATH, UI.EMPTY_STRING);
+                     mapProvider.online_url                 = Util.getXmlString(xml, ATTR_ONLINE_URL, UI.EMPTY_STRING);
                   }
 // SET_FORMATTING_ON
 
@@ -464,9 +464,9 @@ public class Map25ProviderManager {
 
             } else {
 
-               xml.putString(ATTR_ONELINE_API_KEY, mapProvider.online_ApiKey);
-               xml.putString(ATTR_ONELINE_TILE_PATH, mapProvider.online_TilePath);
-               xml.putString(ATTR_ONELINE_URL, mapProvider.online_url);
+               xml.putString(ATTR_ONLINE_API_KEY, mapProvider.online_ApiKey);
+               xml.putString(ATTR_ONLINE_TILE_PATH, mapProvider.online_TilePath);
+               xml.putString(ATTR_ONLINE_URL, mapProvider.online_url);
             }
 
             Util.setXmlEnum(xml, ATTR_THEME, mapProvider.theme);
