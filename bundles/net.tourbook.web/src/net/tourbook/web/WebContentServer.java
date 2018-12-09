@@ -54,17 +54,13 @@ public class WebContentServer {
    private static final boolean IS_DEBUG_PORT            = false;
    private static final int     NUMBER_OF_SERVER_THREADS = 1;
 
-   // logs: time, url
-   private static boolean LOG_URL  = false;
-   private static boolean LOG_DOJO = false;
+   private static boolean       LOG_URL                  = true;                                        // logs: time, url
+   private static boolean       LOG_DOJO                 = false;
 
-   // logs: header
-   private static boolean LOG_HEADER = false;
+   private static boolean       LOG_HEADER               = false;                                       // logs: header
+   public static boolean        LOG_XHR                  = false;                                       // logs: xhr
 
-   // logs: xhr
-   public static boolean  LOG_XHR    = false;
-
-   private static boolean IS_LOGGING = LOG_URL || LOG_XHR || LOG_HEADER || LOG_DOJO;
+   private static boolean       IS_LOGGING               = LOG_URL || LOG_XHR || LOG_HEADER || LOG_DOJO;
 
    // variables which are replaced in .mthtml files
    private static final String            MTHTML_DOJO_SEARCH          = "DOJO_SEARCH";          //$NON-NLS-1$
@@ -91,8 +87,6 @@ public class WebContentServer {
    private static final String            DOJO_PUT_SELECTOR           = "/put-selector/";       //$NON-NLS-1$
    private static final String            DOJO_XSTYLE                 = "/xstyle/";             //$NON-NLS-1$
 
-   public static final String             SERVER_URL;
-
    private static Map<String, XHRHandler> _allXHRHandler              = new HashMap<>();
    private static Map<String, Object>     _mthtmlValues               = new HashMap<>();
 
@@ -104,6 +98,8 @@ public class WebContentServer {
 
    private static InetSocketAddress       inetAddress;
    private static IconRequestHandler      _iconRequestHandler;
+
+   public static final String             SERVER_URL;
 
    static {
 
@@ -121,28 +117,28 @@ public class WebContentServer {
 //
 // This font is disabled because it is not easy to read it.
 //
-//		/*
-//		 * Set css font to the same as the whole app.
-//		 */
-//		final FontData dlgFont = JFaceResources.getDialogFont().getFontData()[0];
+//      /*
+//       * Set css font to the same as the whole app.
+//       */
+//      final FontData dlgFont = JFaceResources.getDialogFont().getFontData()[0];
 //
-//		final float fontHeight = dlgFont.getHeight() * 1.0f;
-//		final String fontSize = String.format(Locale.US, "%.1f", fontHeight);
+//      final float fontHeight = dlgFont.getHeight() * 1.0f;
+//      final String fontSize = String.format(Locale.US, "%.1f", fontHeight);
 //
-//		final String cssFont = ""//
-//				+ "<style>															\n"
-//				+ "body																\n"
-//				+ "{																\n"
-//				+ ("	font-family:	" + dlgFont.getName() + ", sans-serif;		\n")
-//				+ ("	font-size:		" + fontSize + "pt;							\n")
+//      final String cssFont = ""//
+//            + "<style>                                                      \n"
+//            + "body                                                         \n"
+//            + "{                                                            \n"
+//            + ("   font-family:   " + dlgFont.getName() + ", sans-serif;    \n")
+//            + ("   font-size:      " + fontSize + "pt;                      \n")
 //
-//				/*
-//				 * IE do not set the font weight correctly, 599 is too light compared the external
-//				 * IE, 600 is heavier than the external IE, 400 is by definition the default.
-//				 */
-//				+ "		font-weight:	400;										\n"
-//				+ "}																\n"
-//				+ "</STYLE>															\n";
+//            /*
+//             * IE do not set the font weight correctly, 599 is too light compared the external
+//             * IE, 600 is heavier than the external IE, 400 is by definition the default.
+//             */
+//            + "      font-weight:   400;                                    \n"
+//            + "}                                                            \n"
+//            + "</STYLE>                                                     \n";
 
       // Steps when switching between DEBUG and RELEASE build:
       // =====================================================
@@ -155,18 +151,18 @@ public class WebContentServer {
             ? "" //$NON-NLS-1$
 
                   // DEBUG build
-                  + "	<link rel='stylesheet' href='search.css'>					\n" //$NON-NLS-1$
-                  + "	<script src='/dojo/dojo.js'></script>						\n" //$NON-NLS-1$
+                  + "   <link rel='stylesheet' href='search.css'>                     \n" //$NON-NLS-1$
+                  + "   <script src='/dojo/dojo.js'></script>                         \n" //$NON-NLS-1$
 
             : "" //$NON-NLS-1$
 
                   // RELEASE build
-                  + "	<link rel='stylesheet' href='search.css.jgz'>				\n" //$NON-NLS-1$
-                  + "	<script src='/dojo/dojo.js.jgz'></script>					\n" //$NON-NLS-1$
-                  + "	<script src='/tourbook/search/SearchApp.js.jgz'></script>	\n" //$NON-NLS-1$
+                  + "   <link rel='stylesheet' href='search.css.jgz'>                 \n" //$NON-NLS-1$
+                  + "   <script src='/dojo/dojo.js.jgz'></script>                     \n" //$NON-NLS-1$
+                  + "   <script src='/tourbook/search/SearchApp.js.jgz'></script>     \n" //$NON-NLS-1$
       ;
 
-//		dojoSearch += cssFont;
+//      dojoSearch += cssFont;
 
       /*
        * Get valid locale, invalid locale will cause errors of not supported Dojo files.
@@ -199,7 +195,7 @@ public class WebContentServer {
       }
    }
 
-   private String[]                       set;
+   private String[] set;
 
    private static class DefaultHandler implements HttpHandler {
 
@@ -221,158 +217,15 @@ public class WebContentServer {
 
    private static void handle(final HttpExchange httpExchange) {
 
-      final long start = System.nanoTime();
+      if (WEB.UI_FRAMEWORK.equals(WEB.UIFramework.Dojo)) {
 
-      final StringBuilder log = new StringBuilder();
+         handle_Dojo(httpExchange);
 
-      try {
+      } else if (WEB.UI_FRAMEWORK.equals(WEB.UIFramework.Vue)) {
 
-         boolean isResourceUrl = false;
-
-         final File rootFile = WEB.getFile(ROOT_FILE_PATH_NAME);
-         final String rootPath = rootFile.getCanonicalFile().getPath();
-
-         final URI requestURI = httpExchange.getRequestURI();
-         String requestUriPath = requestURI.getPath();
-
-         final Headers requestHeaders = httpExchange.getRequestHeaders();
-         final Set<Entry<String, List<String>>> headerEntries = requestHeaders.entrySet();
-
-         final String xhrValue = requestHeaders.getFirst(XHR_HEADER_KEY);
-         final boolean isXHR = XHR_HEADER_VALUE.equals(xhrValue);
-
-         final boolean isIconRequest = requestUriPath.startsWith(ICON_RESOURCE_REQUEST);
-
-         boolean isDojoRequest = false;
-
-         if (WEB.IS_DEBUG
-               && (requestUriPath.startsWith(DOJO_ROOT)
-                     || requestUriPath.startsWith(DOJO_DIJIT)
-                     || requestUriPath.startsWith(DOJO_DGRID)
-                     || requestUriPath.startsWith(DOJO_DSTORE)
-                     || requestUriPath.startsWith(DOJO_PUT_SELECTOR) || requestUriPath.startsWith(DOJO_XSTYLE))
-         //
-         ) {
-            isDojoRequest = true;
-            requestUriPath = WEB.DOJO_TOOLKIT_FOLDER + requestUriPath;
-         }
-
-         /*
-          * Log request
-          */
-         if (isDojoRequest) {
-            if (LOG_DOJO) {
-               log.append(requestUriPath);
-            }
-         } else if (isXHR) {
-
-            if (LOG_XHR) {
-               log.append(requestUriPath);
-               logParameter(httpExchange, log);
-            }
-
-         } else {
-
-            if (LOG_URL) {
-               log.append(requestUriPath);
-            }
-            if (LOG_HEADER && isXHR) {
-               logHeader(log, headerEntries);
-            }
-         }
-
-         /*
-          * Handle request
-          */
-         if (isIconRequest) {
-
-            final String iconFilename = requestUriPath.substring(
-                  ICON_RESOURCE_REQUEST.length(),
-                  requestUriPath.length());
-
-            handle_Icon(httpExchange, iconFilename, log);
-
-         } else if (isXHR) {
-
-            // XHR request
-
-            handle_XHR(httpExchange, requestUriPath, log);
-
-         } else {
-
-            String requestedOSPath = null;
-
-            if (isDojoRequest) {
-
-               // Dojo requests
-
-               isResourceUrl = true;
-               requestedOSPath = WEB.DEBUG_PATH_DOJO + requestUriPath;
-
-            } else if (requestUriPath.startsWith(REQUEST_PATH_TOURBOOK)) {
-
-               // Tourbook widget requests
-
-               isResourceUrl = true;
-               requestedOSPath = rootPath + requestUriPath;
-
-            } else if (requestUriPath.startsWith(URI_INNER_PROTOCOL_FILE)) {
-
-               isResourceUrl = true;
-               requestedOSPath = requestUriPath.substring(URI_INNER_PROTOCOL_FILE.length());
-
-            } else {
-
-               // default request
-
-               requestedOSPath = rootPath + requestUriPath;
-            }
-
-            if (requestedOSPath != null) {
-
-               final File file = new File(requestedOSPath).getCanonicalFile();
-
-               if (LOG_URL) {
-//						log.append("\t-->\t" + file.toString());
-               }
-
-               if (!file.getPath().startsWith(rootPath) && !isResourceUrl) {
-
-                  // Suspected path traversal attack: reject with 403 error.
-
-                  handle_403(httpExchange, file);
-
-               } else if (!file.isFile()) {
-
-                  // Object does not exist or is not a file: reject with 404 error.
-
-                  handle_404(httpExchange, file, requestUriPath);
-
-               } else {
-
-                  // Object exists and is a file: accept with response code 200.
-
-                  handle_File(httpExchange, file);
-               }
-            }
-         }
-
-      } catch (final Exception e) {
-         StatusUtil.log(e);
-      } finally {
-
-         if (log.length() > 0 && IS_LOGGING) {
-
-            final String msg = String.format("%s %5.1f ms  %-16s [%s] %s", // //$NON-NLS-1$
-                  UI.timeStampNano(),
-                  (float) (System.nanoTime() - start) / 1000000,
-                  Thread.currentThread().getName(),
-                  WebContentServer.class.getSimpleName(),
-                  log);
-
-            System.out.println(msg);
-         }
+         handle_Vue(httpExchange);
       }
+
    }
 
    private static void handle_403(final HttpExchange httpExchange, final File file) {
@@ -417,7 +270,161 @@ public class WebContentServer {
       }
    }
 
-   private static void handle_File(final HttpExchange httpExchange, final File file) {
+   private static void handle_Dojo(final HttpExchange httpExchange) {
+
+      final long start = System.nanoTime();
+
+      final StringBuilder log = new StringBuilder();
+
+      try {
+
+         final URI requestURI = httpExchange.getRequestURI();
+         String requestUriPath = requestURI.getPath();
+
+         final Headers requestHeaders = httpExchange.getRequestHeaders();
+         final Set<Entry<String, List<String>>> headerEntries = requestHeaders.entrySet();
+
+         final String xhrValue = requestHeaders.getFirst(XHR_HEADER_KEY);
+         final boolean isXHR = XHR_HEADER_VALUE.equals(xhrValue);
+
+         boolean isDojoRequest = false;
+
+         if (WEB.IS_DEBUG
+
+               && (requestUriPath.startsWith(DOJO_ROOT)
+                     || requestUriPath.startsWith(DOJO_DIJIT)
+                     || requestUriPath.startsWith(DOJO_DGRID)
+                     || requestUriPath.startsWith(DOJO_DSTORE)
+                     || requestUriPath.startsWith(DOJO_PUT_SELECTOR)
+                     || requestUriPath.startsWith(DOJO_XSTYLE))
+
+         ) {
+            isDojoRequest = true;
+            requestUriPath = WEB.DOJO_TOOLKIT_FOLDER + requestUriPath;
+         }
+
+         /*
+          * Log request
+          */
+         if (isDojoRequest) {
+            if (LOG_DOJO) {
+               log.append(requestUriPath);
+            }
+         } else if (isXHR) {
+
+            if (LOG_XHR) {
+               log.append(requestUriPath);
+               logParameter(httpExchange, log);
+            }
+
+         } else {
+
+            if (LOG_URL) {
+               log.append(requestUriPath);
+            }
+            if (LOG_HEADER && isXHR) {
+               logHeader(log, headerEntries);
+            }
+         }
+
+         /*
+          * Handle request
+          */
+         final boolean isIconRequest = requestUriPath.startsWith(ICON_RESOURCE_REQUEST);
+         if (isIconRequest) {
+
+            final String iconFilename = requestUriPath.substring(ICON_RESOURCE_REQUEST.length(), requestUriPath.length());
+
+            handle_Dojo_Icon(httpExchange, iconFilename, log);
+
+         } else if (isXHR) {
+
+            // XHR request
+
+            handle_Dojo_XHR(httpExchange, requestUriPath, log);
+
+         } else {
+
+            String requestedOSPath = null;
+            boolean isResourceUrl = false;
+
+            final File rootFile = WEB.getFile(ROOT_FILE_PATH_NAME);
+            final String rootPath = rootFile.getCanonicalFile().getPath();
+
+            if (isDojoRequest) {
+
+               // Dojo requests
+
+               isResourceUrl = true;
+               requestedOSPath = WEB.DEBUG_PATH_DOJO + requestUriPath;
+
+            } else if (requestUriPath.startsWith(REQUEST_PATH_TOURBOOK)) {
+
+               // Tourbook widget requests
+
+               isResourceUrl = true;
+               requestedOSPath = rootPath + requestUriPath;
+
+            } else if (requestUriPath.startsWith(URI_INNER_PROTOCOL_FILE)) {
+
+               isResourceUrl = true;
+               requestedOSPath = requestUriPath.substring(URI_INNER_PROTOCOL_FILE.length());
+
+            } else {
+
+               // default request
+
+               requestedOSPath = rootPath + requestUriPath;
+            }
+
+            if (requestedOSPath != null) {
+
+               final File file = new File(requestedOSPath).getCanonicalFile();
+
+               if (LOG_URL) {
+//                  log.append("\t-->\t" + file.toString());
+               }
+
+               if (!file.getPath().startsWith(rootPath) && !isResourceUrl) {
+
+                  // Suspected path traversal attack: reject with 403 error.
+
+                  handle_403(httpExchange, file);
+
+               } else if (!file.isFile()) {
+
+                  // Object does not exist or is not a file: reject with 404 error.
+
+                  handle_404(httpExchange, file, requestUriPath);
+
+               } else {
+
+                  // Object exists and is a file: accept with response code 200.
+
+                  handle_Dojo_File(httpExchange, file);
+               }
+            }
+         }
+
+      } catch (final Exception e) {
+         StatusUtil.log(e);
+      } finally {
+
+         if (log.length() > 0 && IS_LOGGING) {
+
+            final String msg = String.format("%s %5.1f ms  %-16s [%s] %s", // //$NON-NLS-1$
+                  UI.timeStampNano(),
+                  (float) (System.nanoTime() - start) / 1000000,
+                  Thread.currentThread().getName(),
+                  WebContentServer.class.getSimpleName(),
+                  log);
+
+            System.out.println(msg);
+         }
+      }
+   }
+
+   private static void handle_Dojo_File(final HttpExchange httpExchange, final File file) {
 
       FileInputStream fs = null;
       OutputStream os = null;
@@ -468,7 +475,7 @@ public class WebContentServer {
       }
    }
 
-   private static void handle_Icon(final HttpExchange httpExchange, final String iconFilename, final StringBuilder log) {
+   private static void handle_Dojo_Icon(final HttpExchange httpExchange, final String iconFilename, final StringBuilder log) {
 
       try {
 
@@ -483,7 +490,7 @@ public class WebContentServer {
       }
    }
 
-   private static void handle_XHR(final HttpExchange httpExchange, final String requestUriPath, final StringBuilder log) {
+   private static void handle_Dojo_XHR(final HttpExchange httpExchange, final String requestUriPath, final StringBuilder log) {
 
       final InputStream reqBody = null;
 
@@ -491,19 +498,19 @@ public class WebContentServer {
 
          if (LOG_XHR) {
 
-//				reqBody = httpExchange.getRequestBody();
+//            reqBody = httpExchange.getRequestBody();
 //
-//				final StringBuilder sb = new StringBuilder();
-//				final byte[] buffer = new byte[0x10000];
+//            final StringBuilder sb = new StringBuilder();
+//            final byte[] buffer = new byte[0x10000];
 //
-//				while (reqBody.read(buffer) != -1) {
-//					sb.append(buffer);
-//				}
+//            while (reqBody.read(buffer) != -1) {
+//               sb.append(buffer);
+//            }
 //
-//				// log content
-//				log.append("\nXHR-\n");
-//				log.append(sb.toString());
-//				log.append("\n-XHR\n");
+//            // log content
+//            log.append("\nXHR-\n");
+//            log.append(sb.toString());
+//            log.append("\n-XHR\n");
          }
 
          final String xhrKey = requestUriPath;
@@ -525,6 +532,162 @@ public class WebContentServer {
 
    }
 
+   private static void handle_Vue(final HttpExchange httpExchange) {
+
+      final long start = System.nanoTime();
+
+      final StringBuilder log = new StringBuilder();
+
+      try {
+
+         final URI requestURI = httpExchange.getRequestURI();
+         String requestUriPath = requestURI.getPath();
+
+         final Headers requestHeaders = httpExchange.getRequestHeaders();
+         final Set<Entry<String, List<String>>> headerEntries = requestHeaders.entrySet();
+
+         final String xhrValue = requestHeaders.getFirst(XHR_HEADER_KEY);
+         final boolean isXHR = XHR_HEADER_VALUE.equals(xhrValue);
+
+         boolean isDojoRequest = false;
+
+         if (WEB.IS_DEBUG
+
+               && (requestUriPath.startsWith(DOJO_ROOT)
+                     || requestUriPath.startsWith(DOJO_DIJIT)
+                     || requestUriPath.startsWith(DOJO_DGRID)
+                     || requestUriPath.startsWith(DOJO_DSTORE)
+                     || requestUriPath.startsWith(DOJO_PUT_SELECTOR)
+                     || requestUriPath.startsWith(DOJO_XSTYLE))
+
+         ) {
+            isDojoRequest = true;
+            requestUriPath = WEB.DOJO_TOOLKIT_FOLDER + requestUriPath;
+         }
+
+         /*
+          * Log request
+          */
+         if (isDojoRequest) {
+            if (LOG_DOJO) {
+               log.append(requestUriPath);
+            }
+         } else if (isXHR) {
+
+            if (LOG_XHR) {
+               log.append(requestUriPath);
+               logParameter(httpExchange, log);
+            }
+
+         } else {
+
+            if (LOG_URL) {
+               log.append(requestUriPath);
+            }
+            if (LOG_HEADER && isXHR) {
+               logHeader(log, headerEntries);
+            }
+         }
+
+         /*
+          * Handle request
+          */
+         final boolean isIconRequest = requestUriPath.startsWith(ICON_RESOURCE_REQUEST);
+         if (isIconRequest) {
+
+            final String iconFilename = requestUriPath.substring(
+                  ICON_RESOURCE_REQUEST.length(),
+                  requestUriPath.length());
+
+            handle_Dojo_Icon(httpExchange, iconFilename, log);
+
+         } else if (isXHR) {
+
+            // XHR request
+
+            handle_Dojo_XHR(httpExchange, requestUriPath, log);
+
+         } else {
+
+            String requestedOSPath = null;
+            boolean isResourceUrl = false;
+
+            final File rootFile = WEB.getFile(ROOT_FILE_PATH_NAME);
+            final String rootPath = rootFile.getCanonicalFile().getPath();
+
+            if (isDojoRequest) {
+
+               // Dojo requests
+
+               isResourceUrl = true;
+               requestedOSPath = WEB.DEBUG_PATH_DOJO + requestUriPath;
+
+            } else if (requestUriPath.startsWith(REQUEST_PATH_TOURBOOK)) {
+
+               // Tourbook widget requests
+
+               isResourceUrl = true;
+               requestedOSPath = rootPath + requestUriPath;
+
+            } else if (requestUriPath.startsWith(URI_INNER_PROTOCOL_FILE)) {
+
+               isResourceUrl = true;
+               requestedOSPath = requestUriPath.substring(URI_INNER_PROTOCOL_FILE.length());
+
+            } else {
+
+               // default request
+
+               requestedOSPath = rootPath + requestUriPath;
+            }
+
+            if (requestedOSPath != null) {
+
+               final File file = new File(requestedOSPath).getCanonicalFile();
+
+               if (LOG_URL) {
+//                log.append("\t-->\t" + file.toString());
+               }
+
+               if (!file.getPath().startsWith(rootPath) && !isResourceUrl) {
+
+                  // Suspected path traversal attack: reject with 403 error.
+
+                  handle_403(httpExchange, file);
+
+               } else if (!file.isFile()) {
+
+                  // Object does not exist or is not a file: reject with 404 error.
+
+                  handle_404(httpExchange, file, requestUriPath);
+
+               } else {
+
+                  // Object exists and is a file: accept with response code 200.
+
+                  handle_Dojo_File(httpExchange, file);
+               }
+            }
+         }
+
+      } catch (final Exception e) {
+         StatusUtil.log(e);
+      } finally {
+
+         if (log.length() > 0 && IS_LOGGING) {
+
+            final String msg = String.format("%s %5.1f ms  %-16s [%s] %s", // //$NON-NLS-1$
+                  UI.timeStampNano(),
+                  (float) (System.nanoTime() - start) / 1000000,
+                  Thread.currentThread().getName(),
+                  WebContentServer.class.getSimpleName(),
+                  log);
+
+            System.out.println(msg);
+         }
+      }
+   }
+
    private static void logHeader(final StringBuilder log, final Set<Entry<String, List<String>>> headerEntries) {
 
       log.append("\n");//$NON-NLS-1$
@@ -539,8 +702,7 @@ public class WebContentServer {
       // get parameters from url query string
 
       @SuppressWarnings("unchecked")
-      final Map<String, Object> params = (Map<String, Object>) httpExchange
-            .getAttribute(RequestParameterFilter.ATTRIBUTE_PARAMETERS);
+      final Map<String, Object> params = (Map<String, Object>) httpExchange.getAttribute(RequestParameterFilter.ATTRIBUTE_PARAMETERS);
 
       if (params.size() > 0) {
          log.append("\tparams: " + params);//$NON-NLS-1$

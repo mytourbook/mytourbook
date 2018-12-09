@@ -59,6 +59,7 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.web.RequestParameterFilter;
 import net.tourbook.web.WEB;
+import net.tourbook.web.WEB.UIFramework;
 import net.tourbook.web.WebContentServer;
 import net.tourbook.web.XHRHandler;
 
@@ -67,1328 +68,1336 @@ import net.tourbook.web.XHRHandler;
  */
 public class SearchMgr implements XHRHandler {
 
-	private static final String	SEARCH_APP_ACTION_EDIT_MARKER				= tourbook.search.nls.Messages.Search_App_Action_EditMarker;
-	private static final String	SEARCH_APP_ACTION_EDIT_TOUR				= tourbook.search.nls.Messages.Search_App_Action_EditTour;
-
-	private static final String	IMAGE_ACTION_TOUR_WAY_POINT				= net.tourbook.map2.Messages.Image_Action_TourWayPoint;
-
-	final static IDialogSettings	state												= TourbookPlugin.getState("net.tourbook.search.SearchMgr");	//$NON-NLS-1$
-
-	private static final String	JSON_STATE_SEARCH_TEXT						= "searchText";															//$NON-NLS-1$
-
-	private static final String	STATE_CURRENT_SEARCH_TEXT					= "STATE_CURRENT_SEARCH_TEXT";										//$NON-NLS-1$
-
-	static final String				STATE_IS_EASE_SEARCHING						= "STATE_IS_EASE_SEARCHING";											//$NON-NLS-1$
-	static final boolean				STATE_IS_EASE_SEARCHING_DEFAULT			= true;
-
-	static final String				STATE_IS_SHOW_CONTENT_ALL					= "STATE_IS_SHOW_CONTENT_ALL";										//$NON-NLS-1$
-	static final boolean				STATE_IS_SHOW_CONTENT_ALL_DEFAULT		= true;
-	static final String				STATE_IS_SHOW_CONTENT_MARKER				= "STATE_IS_SHOW_CONTENT_MARKER";									//$NON-NLS-1$
-	static final boolean				STATE_IS_SHOW_CONTENT_MARKER_DEFAULT	= true;
-	static final String				STATE_IS_SHOW_CONTENT_TOUR					= "STATE_IS_SHOW_CONTENT_TOUR";										//$NON-NLS-1$
-	static final boolean				STATE_IS_SHOW_CONTENT_TOUR_DEFAULT		= true;
-	static final String				STATE_IS_SHOW_CONTENT_WAYPOINT			= "STATE_IS_SHOW_CONTENT_WAYPOINT";									//$NON-NLS-1$
-	static final boolean				STATE_IS_SHOW_CONTENT_WAYPOINT_DEFAULT	= true;
-	//
-	static final String				STATE_IS_SHOW_DATE							= "STATE_IS_SHOW_DATE";													//$NON-NLS-1$
-	static final boolean				STATE_IS_SHOW_DATE_DEFAULT					= false;
-	static final String				STATE_IS_SHOW_TIME							= "STATE_IS_SHOW_TIME";													//$NON-NLS-1$
-	static final boolean				STATE_IS_SHOW_TIME_DEFAULT					= false;
-	static final String				STATE_IS_SHOW_DESCRIPTION					= "STATE_IS_SHOW_DESCRIPTION";										//$NON-NLS-1$
-	static final boolean				STATE_IS_SHOW_DESCRIPTION_DEFAULT		= true;
-	static final String				STATE_IS_SHOW_ITEM_NUMBER					= "STATE_IS_SHOW_ITEM_NUMBER";										//$NON-NLS-1$
-	static final boolean				STATE_IS_SHOW_ITEM_NUMBER_DEFAULT		= false;
-	static final String				STATE_IS_SHOW_LUCENE_DOC_ID				= "STATE_IS_SHOW_LUCENE_DOC_ID";										//$NON-NLS-1$
-	static final boolean				STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT		= false;
-	//
-	static final String				STATE_IS_SORT_DATE_ASCENDING				= "STATE_IS_SORT_DATE_ASCENDING";									//$NON-NLS-1$
-	static final boolean				STATE_IS_SORT_DATE_ASCENDING_DEFAULT	= false;
-
-	private static final String	REQUEST_HEADER_RANGE							= "Range";																	//$NON-NLS-1$
-
-	private static final String	CONTENT_RANGE_ITEMS							= "items %d-%d/%d";														//$NON-NLS-1$
-	private static final String	CONTENT_RANGE_ZERO							= "0-0/0";																	//$NON-NLS-1$
-
-	/*
-	 * This will handle all xhr actions, they are also defined in SearchMgr.js
-	 */
-	private static final String	XHR_SEARCH_INPUT_HANDLER		= "/xhrSearch";				//$NON-NLS-1$
-	//
-	private static final String	XHR_ACTION_ITEM_ACTION			= "itemAction";				//$NON-NLS-1$
-	private static final String	XHR_ACTION_PROPOSALS				= "proposals";					//$NON-NLS-1$
-	private static final String	XHR_ACTION_SEARCH					= "search";						//$NON-NLS-1$
-	private static final String	XHR_ACTION_SELECT					= "select";						//$NON-NLS-1$
-	private static final String	XHR_ACTION_GET_SEARCH_OPTIONS	= "getSearchOptions";		//$NON-NLS-1$
-	private static final String	XHR_ACTION_SET_SEARCH_OPTIONS	= "setSearchOptions";		//$NON-NLS-1$
-	private static final String	XHR_ACTION_GET_STATE				= "getState";					//$NON-NLS-1$
-	//
-	private static final String	XHR_PARAM_ACTION					= "action";						//$NON-NLS-1$
-	private static final String	XHR_PARAM_ACTION_URL				= "actionUrl";					//$NON-NLS-1$
-	private static final String	XHR_PARAM_SEARCH_OPTIONS		= "searchOptions";			//$NON-NLS-1$
-	private static final String	XHR_PARAM_SEARCH_TEXT			= JSON_STATE_SEARCH_TEXT;
-	private static final String	XHR_PARAM_SELECTED_ITEMS		= "selectedItems";			//$NON-NLS-1$
-
-	/*
-	 * JSON response values
-	 */
-	private static final String	JSON_ID									= "id";						//$NON-NLS-1$
-	private static final String	JSON_NAME								= "name";					//$NON-NLS-1$
-	private static final String	JSON_HTML_CONTENT						= "htmlContent";			//$NON-NLS-1$
-	private static final String	JSON_ITEM_ACTION_URL_EDIT_ITEM	= "actionUrl_EditItem";	//$NON-NLS-1$
-	private static final String	JSON_ITEM_IS_MARKER					= "item_IsMarker";		//$NON-NLS-1$
-	private static final String	JSON_ITEM_IS_TOUR						= "item_IsTour";			//$NON-NLS-1$
-	private static final String	JSON_ITEM_IS_WAYPOINT				= "item_IsWaypoint";		//$NON-NLS-1$
-	private static final String	JSON_ITEM_ID_TOUR_ID					= "itemId_TourId";		//$NON-NLS-1$
-	private static final String	JSON_ITEM_ID_MARKER_ID				= "itemId_MarkerId";		//$NON-NLS-1$
-	//
-	//
-	// search options
-	private static final String	JSON_IS_SEARCH_OPTIONS_DEFAULT	= "isSearchOptionsDefault";	//$NON-NLS-1$
-	//
-	private static final String	JSON_IS_EASE_SEARCHING				= "isEaseSearching";				//$NON-NLS-1$
-	private static final String	JSON_IS_SHOW_CONTENT_ALL			= "isShowContentAll";			//$NON-NLS-1$
-	private static final String	JSON_IS_SHOW_CONTENT_MARKER		= "isShowContentMarker";		//$NON-NLS-1$
-	private static final String	JSON_IS_SHOW_CONTENT_TOUR			= "isShowContentTour";			//$NON-NLS-1$
-	private static final String	JSON_IS_SHOW_CONTENT_WAYPOINT		= "isShowContentWaypoint";		//$NON-NLS-1$
-	private static final String	JSON_IS_SHOW_DATE						= "isShowDate";					//$NON-NLS-1$
-	private static final String	JSON_IS_SHOW_TIME						= "isShowTime";					//$NON-NLS-1$
-	private static final String	JSON_IS_SHOW_DESCRIPTION			= "isShowDescription";			//$NON-NLS-1$
-	private static final String	JSON_IS_SHOW_ITEM_NUMBER			= "isShowItemNumber";			//$NON-NLS-1$
-	private static final String	JSON_IS_SHOW_LUCENE_ID				= "isShowLuceneID";				//$NON-NLS-1$
-	private static final String	JSON_IS_SORT_BY_DATE_ASCENDING	= "isSortByDateAscending";		//$NON-NLS-1$
-	//
-	private static final String	SEARCH_FOLDER							= "/tourbook/search/";			//$NON-NLS-1$
-	private static final String	SEARCH_PAGE								= "search.mthtml";				//$NON-NLS-1$
-	//
-	/**
-	 * This is necessary otherwise XULrunner in Linux do not fire a location change event.
-	 */
-	static String						ACTION_URL;
-	static String						SEARCH_URL;
-	//
-	private static String			_actionUrl_EditImage;
-	private static String			_iconUrl_Tour;
-	private static String			_iconUrl_Marker;
-	private static String			_iconUrl_WayPoint;
-	//
-	private static boolean			_isUI_EaseSearching;
-	private static boolean			_isUI_ShowContentAll;
-	private static boolean			_isUI_ShowContentMarker;
-	private static boolean			_isUI_ShowContentTour;
-	private static boolean			_isUI_ShowContentWaypoint;
-	private static boolean			_isUI_ShowDate;
-	private static boolean			_isUI_ShowTime;
-	private static boolean			_isUI_ShowDescription;
-	private static boolean			_isUI_ShowItemNumber;
-	private static boolean			_isUI_ShowLuceneDocId;
-	private static boolean			_isUI_SortDateAscending;
-	//
-	static final String				TAG_TD									= "<td>";							//$NON-NLS-1$
-	static final String				TAG_TD_END								= "</td>";							//$NON-NLS-1$
-	static final String				CSS_ITEM_CONTAINER					= "item-container";				//$NON-NLS-1$
+   private static final String  SEARCH_APP_ACTION_EDIT_MARKER          = tourbook.search.nls.Messages.Search_App_Action_EditMarker;
+   private static final String  SEARCH_APP_ACTION_EDIT_TOUR            = tourbook.search.nls.Messages.Search_App_Action_EditTour;
+
+   private static final String  IMAGE_ACTION_TOUR_WAY_POINT            = net.tourbook.map2.Messages.Image_Action_TourWayPoint;
+
+   final static IDialogSettings state                                  = TourbookPlugin.getState("net.tourbook.search.SearchMgr"); //$NON-NLS-1$
+
+   private static final String  JSON_STATE_SEARCH_TEXT                 = "searchText";                                             //$NON-NLS-1$
+
+   private static final String  STATE_CURRENT_SEARCH_TEXT              = "STATE_CURRENT_SEARCH_TEXT";                              //$NON-NLS-1$
+
+   static final String          STATE_IS_EASE_SEARCHING                = "STATE_IS_EASE_SEARCHING";                                //$NON-NLS-1$
+   static final boolean         STATE_IS_EASE_SEARCHING_DEFAULT        = true;
+
+   static final String          STATE_IS_SHOW_CONTENT_ALL              = "STATE_IS_SHOW_CONTENT_ALL";                              //$NON-NLS-1$
+   static final boolean         STATE_IS_SHOW_CONTENT_ALL_DEFAULT      = true;
+   static final String          STATE_IS_SHOW_CONTENT_MARKER           = "STATE_IS_SHOW_CONTENT_MARKER";                           //$NON-NLS-1$
+   static final boolean         STATE_IS_SHOW_CONTENT_MARKER_DEFAULT   = true;
+   static final String          STATE_IS_SHOW_CONTENT_TOUR             = "STATE_IS_SHOW_CONTENT_TOUR";                             //$NON-NLS-1$
+   static final boolean         STATE_IS_SHOW_CONTENT_TOUR_DEFAULT     = true;
+   static final String          STATE_IS_SHOW_CONTENT_WAYPOINT         = "STATE_IS_SHOW_CONTENT_WAYPOINT";                         //$NON-NLS-1$
+   static final boolean         STATE_IS_SHOW_CONTENT_WAYPOINT_DEFAULT = true;
+   //
+   static final String          STATE_IS_SHOW_DATE                     = "STATE_IS_SHOW_DATE";                                     //$NON-NLS-1$
+   static final boolean         STATE_IS_SHOW_DATE_DEFAULT             = false;
+   static final String          STATE_IS_SHOW_TIME                     = "STATE_IS_SHOW_TIME";                                     //$NON-NLS-1$
+   static final boolean         STATE_IS_SHOW_TIME_DEFAULT             = false;
+   static final String          STATE_IS_SHOW_DESCRIPTION              = "STATE_IS_SHOW_DESCRIPTION";                              //$NON-NLS-1$
+   static final boolean         STATE_IS_SHOW_DESCRIPTION_DEFAULT      = true;
+   static final String          STATE_IS_SHOW_ITEM_NUMBER              = "STATE_IS_SHOW_ITEM_NUMBER";                              //$NON-NLS-1$
+   static final boolean         STATE_IS_SHOW_ITEM_NUMBER_DEFAULT      = false;
+   static final String          STATE_IS_SHOW_LUCENE_DOC_ID            = "STATE_IS_SHOW_LUCENE_DOC_ID";                            //$NON-NLS-1$
+   static final boolean         STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT    = false;
+   //
+   static final String          STATE_IS_SORT_DATE_ASCENDING           = "STATE_IS_SORT_DATE_ASCENDING";                           //$NON-NLS-1$
+   static final boolean         STATE_IS_SORT_DATE_ASCENDING_DEFAULT   = false;
+
+   private static final String  REQUEST_HEADER_RANGE                   = "Range";                                                  //$NON-NLS-1$
+
+   private static final String  CONTENT_RANGE_ITEMS                    = "items %d-%d/%d";                                         //$NON-NLS-1$
+   private static final String  CONTENT_RANGE_ZERO                     = "0-0/0";                                                  //$NON-NLS-1$
+
+   /*
+    * This will handle all xhr actions, they are also defined in SearchMgr.js
+    */
+   private static final String XHR_SEARCH_INPUT_HANDLER      = "/xhrSearch";          //$NON-NLS-1$
+   //
+   private static final String XHR_ACTION_ITEM_ACTION        = "itemAction";          //$NON-NLS-1$
+   private static final String XHR_ACTION_PROPOSALS          = "proposals";           //$NON-NLS-1$
+   private static final String XHR_ACTION_SEARCH             = "search";              //$NON-NLS-1$
+   private static final String XHR_ACTION_SELECT             = "select";              //$NON-NLS-1$
+   private static final String XHR_ACTION_GET_SEARCH_OPTIONS = "getSearchOptions";    //$NON-NLS-1$
+   private static final String XHR_ACTION_SET_SEARCH_OPTIONS = "setSearchOptions";    //$NON-NLS-1$
+   private static final String XHR_ACTION_GET_STATE          = "getState";            //$NON-NLS-1$
+   //
+   private static final String XHR_PARAM_ACTION              = "action";              //$NON-NLS-1$
+   private static final String XHR_PARAM_ACTION_URL          = "actionUrl";           //$NON-NLS-1$
+   private static final String XHR_PARAM_SEARCH_OPTIONS      = "searchOptions";       //$NON-NLS-1$
+   private static final String XHR_PARAM_SEARCH_TEXT         = JSON_STATE_SEARCH_TEXT;
+   private static final String XHR_PARAM_SELECTED_ITEMS      = "selectedItems";       //$NON-NLS-1$
+
+   /*
+    * JSON response values
+    */
+   private static final String JSON_ID                        = "id";                 //$NON-NLS-1$
+   private static final String JSON_NAME                      = "name";               //$NON-NLS-1$
+   private static final String JSON_HTML_CONTENT              = "htmlContent";        //$NON-NLS-1$
+   private static final String JSON_ITEM_ACTION_URL_EDIT_ITEM = "actionUrl_EditItem"; //$NON-NLS-1$
+   private static final String JSON_ITEM_IS_MARKER            = "item_IsMarker";      //$NON-NLS-1$
+   private static final String JSON_ITEM_IS_TOUR              = "item_IsTour";        //$NON-NLS-1$
+   private static final String JSON_ITEM_IS_WAYPOINT          = "item_IsWaypoint";    //$NON-NLS-1$
+   private static final String JSON_ITEM_ID_TOUR_ID           = "itemId_TourId";      //$NON-NLS-1$
+   private static final String JSON_ITEM_ID_MARKER_ID         = "itemId_MarkerId";    //$NON-NLS-1$
+   //
+   //
+   // search options
+   private static final String JSON_IS_SEARCH_OPTIONS_DEFAULT = "isSearchOptionsDefault"; //$NON-NLS-1$
+   //
+   private static final String JSON_IS_EASE_SEARCHING         = "isEaseSearching";        //$NON-NLS-1$
+   private static final String JSON_IS_SHOW_CONTENT_ALL       = "isShowContentAll";       //$NON-NLS-1$
+   private static final String JSON_IS_SHOW_CONTENT_MARKER    = "isShowContentMarker";    //$NON-NLS-1$
+   private static final String JSON_IS_SHOW_CONTENT_TOUR      = "isShowContentTour";      //$NON-NLS-1$
+   private static final String JSON_IS_SHOW_CONTENT_WAYPOINT  = "isShowContentWaypoint";  //$NON-NLS-1$
+   private static final String JSON_IS_SHOW_DATE              = "isShowDate";             //$NON-NLS-1$
+   private static final String JSON_IS_SHOW_TIME              = "isShowTime";             //$NON-NLS-1$
+   private static final String JSON_IS_SHOW_DESCRIPTION       = "isShowDescription";      //$NON-NLS-1$
+   private static final String JSON_IS_SHOW_ITEM_NUMBER       = "isShowItemNumber";       //$NON-NLS-1$
+   private static final String JSON_IS_SHOW_LUCENE_ID         = "isShowLuceneID";         //$NON-NLS-1$
+   private static final String JSON_IS_SORT_BY_DATE_ASCENDING = "isSortByDateAscending";  //$NON-NLS-1$
+   //
+   private static final String SEARCH_FOLDER                  = "/tourbook/search/";      //$NON-NLS-1$
+   private static final String SEARCH_PAGE                    = "search.mthtml";          //$NON-NLS-1$
+   //
+   /**
+    * This is necessary otherwise XULrunner in Linux do not fire a location change event.
+    */
+   static String               ACTION_URL;
+   static String               SEARCH_URL;
+   //
+   private static String       _actionUrl_EditImage;
+   private static String       _iconUrl_Tour;
+   private static String       _iconUrl_Marker;
+   private static String       _iconUrl_WayPoint;
+   //
+   private static boolean      _isUI_EaseSearching;
+   private static boolean      _isUI_ShowContentAll;
+   private static boolean      _isUI_ShowContentMarker;
+   private static boolean      _isUI_ShowContentTour;
+   private static boolean      _isUI_ShowContentWaypoint;
+   private static boolean      _isUI_ShowDate;
+   private static boolean      _isUI_ShowTime;
+   private static boolean      _isUI_ShowDescription;
+   private static boolean      _isUI_ShowItemNumber;
+   private static boolean      _isUI_ShowLuceneDocId;
+   private static boolean      _isUI_SortDateAscending;
+   //
+   static final String         TAG_TD                         = "<td>";                   //$NON-NLS-1$
+   static final String         TAG_TD_END                     = "</td>";                  //$NON-NLS-1$
+   static final String         CSS_ITEM_CONTAINER             = "item-container";         //$NON-NLS-1$
 
-	static final String				PAGE_ABOUT_BLANK						= "about:blank";					//$NON-NLS-1$
+   static final String         PAGE_ABOUT_BLANK               = "about:blank";            //$NON-NLS-1$
 
-	static final String				HREF_TOKEN								= "&";								//$NON-NLS-1$
-	static final String				HREF_VALUE_SEP							= "=";								//$NON-NLS-1$
+   static final String         HREF_TOKEN                     = "&";                      //$NON-NLS-1$
+   static final String         HREF_VALUE_SEP                 = "=";                      //$NON-NLS-1$
 
-	static final String				PARAM_ACTION							= "action";							//$NON-NLS-1$
-	static final String				PARAM_DOC_ID							= "docId";							//$NON-NLS-1$
-	static final String				PARAM_MARKER_ID						= "markerId";						//$NON-NLS-1$
-	static final String				PARAM_TOUR_ID							= "tourId";							//$NON-NLS-1$
+   static final String         PARAM_ACTION                   = "action";                 //$NON-NLS-1$
+   static final String         PARAM_DOC_ID                   = "docId";                  //$NON-NLS-1$
+   static final String         PARAM_MARKER_ID                = "markerId";               //$NON-NLS-1$
+   static final String         PARAM_TOUR_ID                  = "tourId";                 //$NON-NLS-1$
 
-	static final String				ACTION_EDIT_MARKER					= "EditMarker";					//$NON-NLS-1$
-	static final String				ACTION_EDIT_TOUR						= "EditTour";						//$NON-NLS-1$
-	static final String				ACTION_SELECT_TOUR					= "SelectTour";					//$NON-NLS-1$
-	static final String				ACTION_SELECT_MARKER					= "SelectMarker";					//$NON-NLS-1$
-	static final String				ACTION_SELECT_WAY_POINT				= "SelectWayPoint";				//$NON-NLS-1$
+   static final String         ACTION_EDIT_MARKER             = "EditMarker";             //$NON-NLS-1$
+   static final String         ACTION_EDIT_TOUR               = "EditTour";               //$NON-NLS-1$
+   static final String         ACTION_SELECT_TOUR             = "SelectTour";             //$NON-NLS-1$
+   static final String         ACTION_SELECT_MARKER           = "SelectMarker";           //$NON-NLS-1$
+   static final String         ACTION_SELECT_WAY_POINT        = "SelectWayPoint";         //$NON-NLS-1$
 
-	static final String				HREF_ACTION_EDIT_MARKER;
-	static final String				HREF_ACTION_EDIT_TOUR;
-	static final String				HREF_ACTION_SELECT_TOUR;
-	static final String				HREF_ACTION_SELECT_MARKER;
-	static final String				HREF_ACTION_SELECT_WAY_POINT;
+   static final String         HREF_ACTION_EDIT_MARKER;
+   static final String         HREF_ACTION_EDIT_TOUR;
+   static final String         HREF_ACTION_SELECT_TOUR;
+   static final String         HREF_ACTION_SELECT_MARKER;
+   static final String         HREF_ACTION_SELECT_WAY_POINT;
 
-	static final String				HREF_PARAM_DOC_ID;
-	static final String				HREF_PARAM_MARKER_ID;
-	static final String				HREF_PARAM_TOUR_ID;
+   static final String         HREF_PARAM_DOC_ID;
+   static final String         HREF_PARAM_MARKER_ID;
+   static final String         HREF_PARAM_TOUR_ID;
 
-	static {
+// SET_FORMATTING_OFF
 
-		ACTION_URL = WebContentServer.SERVER_URL + "/action?"; //$NON-NLS-1$
-		SEARCH_URL = WebContentServer.SERVER_URL + SEARCH_FOLDER + SEARCH_PAGE;
+   static {
 
-		// e.g. ...&action=EditMarker...
+      ACTION_URL = WebContentServer.SERVER_URL + "/action?"; //$NON-NLS-1$
+      SEARCH_URL =
 
-		final String HREF_ACTION = HREF_TOKEN + PARAM_ACTION + HREF_VALUE_SEP;
+            WEB.UI_FRAMEWORK.equals(UIFramework.Dojo) ?  WebContentServer.SERVER_URL + SEARCH_FOLDER + SEARCH_PAGE
+          : WEB.UI_FRAMEWORK.equals(UIFramework.Vue) ?   WebContentServer.SERVER_URL + "/tourbook/search/index.html"
+          : "";
 
-		HREF_ACTION_EDIT_MARKER = HREF_ACTION + ACTION_EDIT_MARKER;
-		HREF_ACTION_EDIT_TOUR = HREF_ACTION + ACTION_EDIT_TOUR;
-		HREF_ACTION_SELECT_TOUR = HREF_ACTION + ACTION_SELECT_TOUR;
-		HREF_ACTION_SELECT_MARKER = HREF_ACTION + ACTION_SELECT_MARKER;
-		HREF_ACTION_SELECT_WAY_POINT = HREF_ACTION + ACTION_SELECT_WAY_POINT;
+      // e.g. ...&action=EditMarker...
 
-		HREF_PARAM_DOC_ID = HREF_TOKEN + PARAM_DOC_ID + HREF_VALUE_SEP;
-		HREF_PARAM_MARKER_ID = HREF_TOKEN + PARAM_MARKER_ID + HREF_VALUE_SEP;
-		HREF_PARAM_TOUR_ID = HREF_TOKEN + PARAM_TOUR_ID + HREF_VALUE_SEP;
+      final String HREF_ACTION      = HREF_TOKEN + PARAM_ACTION + HREF_VALUE_SEP;
 
-		/*
-		 * set image urls
-		 */
-		_iconUrl_Tour = getIconUrl(Messages.Image__Tour);
-		_iconUrl_Marker = getIconUrl(Messages.Image__TourMarker);
-		_iconUrl_WayPoint = getIconUrl(IMAGE_ACTION_TOUR_WAY_POINT);
+      HREF_ACTION_EDIT_MARKER       = HREF_ACTION + ACTION_EDIT_MARKER;
+      HREF_ACTION_EDIT_TOUR         = HREF_ACTION + ACTION_EDIT_TOUR;
+      HREF_ACTION_SELECT_TOUR       = HREF_ACTION + ACTION_SELECT_TOUR;
+      HREF_ACTION_SELECT_MARKER     = HREF_ACTION + ACTION_SELECT_MARKER;
+      HREF_ACTION_SELECT_WAY_POINT  = HREF_ACTION + ACTION_SELECT_WAY_POINT;
 
-		_actionUrl_EditImage = getIconUrl(Messages.Image__quick_edit);
+      HREF_PARAM_DOC_ID             = HREF_TOKEN + PARAM_DOC_ID + HREF_VALUE_SEP;
+      HREF_PARAM_MARKER_ID          = HREF_TOKEN + PARAM_MARKER_ID + HREF_VALUE_SEP;
+      HREF_PARAM_TOUR_ID            = HREF_TOKEN + PARAM_TOUR_ID + HREF_VALUE_SEP;
 
-		// initialize search options
-		setInternalSearchOptions();
-	}
+      /*
+       * set image urls
+       */
+      _iconUrl_Tour        = getIconUrl(Messages.Image__Tour);
+      _iconUrl_Marker      = getIconUrl(Messages.Image__TourMarker);
+      _iconUrl_WayPoint    = getIconUrl(IMAGE_ACTION_TOUR_WAY_POINT);
 
-	private static SearchMgr	_searchMgr;
+      _actionUrl_EditImage = getIconUrl(Messages.Image__quick_edit);
 
-	private static ISearchView	_searchView;
+      // initialize search options
+      setInternalSearchOptions();
+   }
 
-	private static boolean		_isModalDialogOpen	= false;
+// SET_FORMATTING_ON
 
-	private class ItemResponse {
+   private static SearchMgr   _searchMgr;
 
-		String	actionUrl_EditItem;
+   private static ISearchView _searchView;
 
-		String	createdHtml;
+   private static boolean     _isModalDialogOpen = false;
 
-		boolean	item_IsMarker;
-		boolean	item_IsTour;
-		boolean	item_IsWayPoint;
+   private class ItemResponse {
 
-		String	itemId_TourId;
-		String	itemId_MarkerId;		// is marker or waypoint
-	}
+      String  actionUrl_EditItem;
 
-	/**
-	 * !!! With an active shell the dialog positions are maintained !!!
-	 *
-	 * @return
-	 */
-	private static Shell getActiveShell() {
+      String  createdHtml;
 
-		final Display display = Display.getDefault();
-		final Shell[] allShells = display.getShells();
+      boolean item_IsMarker;
+      boolean item_IsTour;
+      boolean item_IsWayPoint;
 
-		final Shell activeShell = allShells[allShells.length - 1];
+      String  itemId_TourId;
+      String  itemId_MarkerId;   // is marker or waypoint
+   }
 
-		activeShell.forceActive();
-		activeShell.forceFocus();
+   /**
+    * !!! With an active shell the dialog positions are maintained !!!
+    *
+    * @return
+    */
+   private static Shell getActiveShell() {
 
-		return activeShell;
-	}
+      final Display display = Display.getDefault();
+      final Shell[] allShells = display.getShells();
 
-	private static String getIconUrl(final String iconImage) {
+      final Shell activeShell = allShells[allShells.length - 1];
 
-		final String iconUrl = net.tourbook.ui.UI.getIconUrl(iconImage);
+      activeShell.forceActive();
+      activeShell.forceFocus();
 
-		return WebContentServer.SERVER_URL + '/' + iconUrl;
-	}
+      return activeShell;
+   }
 
-	private static SearchMgr getInstance() {
+   private static String getIconUrl(final String iconImage) {
 
-		if (_searchMgr == null) {
-			_searchMgr = new SearchMgr();
-		}
+      final String iconUrl = net.tourbook.ui.UI.getIconUrl(iconImage);
 
-		return _searchMgr;
-	}
+      return WebContentServer.SERVER_URL + '/' + iconUrl;
+   }
 
-	/**
-	 * @param location
-	 * @return Returns <code>true</code> when a action is performed.
-	 */
-	private static boolean hrefAction(final String location) {
+   private static SearchMgr getInstance() {
 
-		if (_searchView == null) {
-			return false;
-		}
+      if (_searchMgr == null) {
+         _searchMgr = new SearchMgr();
+      }
 
-		String action = null;
+      return _searchMgr;
+   }
 
-		long tourId = -1;
-		long markerId = -1;
+   /**
+    * @param location
+    * @return Returns <code>true</code> when a action is performed.
+    */
+   private static boolean hrefAction(final String location) {
 
-		final String[] urlParameter = location.split(HREF_TOKEN);
+      if (_searchView == null) {
+         return false;
+      }
 
-		// loop all url parameter
-		for (final String part : urlParameter) {
+      String action = null;
 
-			final int valueSepPos = part.indexOf(HREF_VALUE_SEP);
+      long tourId = -1;
+      long markerId = -1;
 
-			String key;
-			String value = null;
+      final String[] urlParameter = location.split(HREF_TOKEN);
 
-			if (valueSepPos == -1) {
-				key = part;
-			} else {
-				key = part.substring(0, valueSepPos);
-				value = part.substring(valueSepPos + 1, part.length());
-			}
+      // loop all url parameter
+      for (final String part : urlParameter) {
 
-			if (key == null) {
-				// this should not happen
-				return false;
-			}
+         final int valueSepPos = part.indexOf(HREF_VALUE_SEP);
 
-			switch (key) {
-			case PARAM_ACTION:
-				action = value;
-				break;
+         String key;
+         String value = null;
 
-			case PARAM_MARKER_ID:
-				markerId = Long.parseLong(value);
-				break;
+         if (valueSepPos == -1) {
+            key = part;
+         } else {
+            key = part.substring(0, valueSepPos);
+            value = part.substring(valueSepPos + 1, part.length());
+         }
 
-			case PARAM_TOUR_ID:
-				tourId = Long.parseLong(value);
-				break;
+         if (key == null) {
+            // this should not happen
+            return false;
+         }
 
-			default:
-				break;
-			}
-		}
+         switch (key) {
+         case PARAM_ACTION:
+            action = value;
+            break;
 
-		if (action == null) {
+         case PARAM_MARKER_ID:
+            markerId = Long.parseLong(value);
+            break;
 
-			final boolean isAppUrl = location.startsWith(WebContentServer.SERVER_URL);
+         case PARAM_TOUR_ID:
+            tourId = Long.parseLong(value);
+            break;
 
-			// check if an external links is called
-			if (location.startsWith(WEB.PROTOCOL_HTTP) && !isAppUrl) {
+         default:
+            break;
+         }
+      }
 
-				// identified external link
+      if (action == null) {
 
-				Display.getDefault().asyncExec(new Runnable() {
-					@Override
-					public void run() {
-						WEB.openUrl(location);
-					}
-				});
+         final boolean isAppUrl = location.startsWith(WebContentServer.SERVER_URL);
 
-				return true;
-			}
+         // check if an external links is called
+         if (location.startsWith(WEB.PROTOCOL_HTTP) && !isAppUrl) {
 
-			return false;
-		}
+            // identified external link
 
-		switch (action) {
+            Display.getDefault().asyncExec(new Runnable() {
+               @Override
+               public void run() {
+                  WEB.openUrl(location);
+               }
+            });
 
-		case ACTION_EDIT_TOUR:
+            return true;
+         }
 
-			hrefAction_Tour_Edit(tourId);
+         return false;
+      }
 
-			break;
+      switch (action) {
 
-		case ACTION_SELECT_TOUR:
+      case ACTION_EDIT_TOUR:
 
-			hrefAction_Tour_Select(new SelectionTourId(tourId));
+         hrefAction_Tour_Edit(tourId);
 
-			break;
+         break;
 
-		case ACTION_EDIT_MARKER:
-		case ACTION_SELECT_MARKER:
+      case ACTION_SELECT_TOUR:
 
-			hrefAction_Marker(action, tourId, markerId);
+         hrefAction_Tour_Select(new SelectionTourId(tourId));
 
-			break;
+         break;
 
-		case ACTION_SELECT_WAY_POINT:
+      case ACTION_EDIT_MARKER:
+      case ACTION_SELECT_MARKER:
 
-			hrefAction_WayPoint(tourId, markerId);
+         hrefAction_Marker(action, tourId, markerId);
 
-			break;
-		}
+         break;
 
-		return true;
-	}
+      case ACTION_SELECT_WAY_POINT:
 
-	private static void hrefAction_Marker(final String action, final long tourId, final long markerId) {
+         hrefAction_WayPoint(tourId, markerId);
 
-		// get tour by id
-		final TourData tourData = TourManager.getTour(tourId);
-		if (tourData == null) {
-			return;
-		}
+         break;
+      }
 
-		TourMarker selectedTourMarker = null;
+      return true;
+   }
 
-		// get marker by id
-		for (final TourMarker tourMarker : tourData.getTourMarkers()) {
-			if (tourMarker.getMarkerId() == markerId) {
-				selectedTourMarker = tourMarker;
-				break;
-			}
-		}
+   private static void hrefAction_Marker(final String action, final long tourId, final long markerId) {
 
-		if (selectedTourMarker == null) {
-			return;
-		}
+      // get tour by id
+      final TourData tourData = TourManager.getTour(tourId);
+      if (tourData == null) {
+         return;
+      }
 
-		switch (action) {
-		case SearchMgr.ACTION_EDIT_MARKER:
-			hrefAction_Marker_Edit(tourData, selectedTourMarker);
-			break;
+      TourMarker selectedTourMarker = null;
 
-		case SearchMgr.ACTION_SELECT_MARKER:
-			hrefAction_Marker_Select(tourData, selectedTourMarker);
-			break;
-		}
-	}
+      // get marker by id
+      for (final TourMarker tourMarker : tourData.getTourMarkers()) {
+         if (tourMarker.getMarkerId() == markerId) {
+            selectedTourMarker = tourMarker;
+            break;
+         }
+      }
 
-	private static void hrefAction_Marker_Edit(final TourData tourData, final TourMarker tourMarker) {
+      if (selectedTourMarker == null) {
+         return;
+      }
 
-		final Shell activeShell = getActiveShell();
+      switch (action) {
+      case SearchMgr.ACTION_EDIT_MARKER:
+         hrefAction_Marker_Edit(tourData, selectedTourMarker);
+         break;
 
-		// ensure this dialog is modal (only one dialog can be opened)
-		if (_isModalDialogOpen) {
+      case SearchMgr.ACTION_SELECT_MARKER:
+         hrefAction_Marker_Select(tourData, selectedTourMarker);
+         break;
+      }
+   }
 
-			MessageDialog.openInformation(
-					activeShell,
-					Messages.App_Action_Dialog_ActionIsInProgress_Title,
-					Messages.App_Action_Dialog_ActionIsInProgress_Message);
+   private static void hrefAction_Marker_Edit(final TourData tourData, final TourMarker tourMarker) {
 
-			return;
-		}
+      final Shell activeShell = getActiveShell();
 
-		if (tourData.isManualTour()) {
-			// a manually created tour do not have time slices -> no markers
-			return;
-		}
+      // ensure this dialog is modal (only one dialog can be opened)
+      if (_isModalDialogOpen) {
 
-		_isModalDialogOpen = true;
+         MessageDialog.openInformation(
+               activeShell,
+               Messages.App_Action_Dialog_ActionIsInProgress_Title,
+               Messages.App_Action_Dialog_ActionIsInProgress_Message);
 
-		try {
+         return;
+      }
 
-			final DialogMarker dialogMarker = new DialogMarker(//
-					activeShell,
-					tourData,
-					tourMarker);
+      if (tourData.isManualTour()) {
+         // a manually created tour do not have time slices -> no markers
+         return;
+      }
 
-			if (dialogMarker.open() == Window.OK) {
-				saveModifiedTour(tourData);
-			}
+      _isModalDialogOpen = true;
 
-		} finally {
+      try {
 
-			_isModalDialogOpen = false;
-		}
-	}
+         final DialogMarker dialogMarker = new DialogMarker(//
+               activeShell,
+               tourData,
+               tourMarker);
 
-	private static void hrefAction_Marker_Select(final TourData tourData, final TourMarker selectedTourMarker) {
+         if (dialogMarker.open() == Window.OK) {
+            saveModifiedTour(tourData);
+         }
 
-		if (_searchView == null) {
-			return;
-		}
+      } finally {
 
-		final ArrayList<TourMarker> selectedTourMarkers = new ArrayList<>();
-		selectedTourMarkers.add(selectedTourMarker);
+         _isModalDialogOpen = false;
+      }
+   }
 
-		final SelectionTourMarker markerSelection = new SelectionTourMarker(tourData, selectedTourMarkers);
+   private static void hrefAction_Marker_Select(final TourData tourData, final TourMarker selectedTourMarker) {
 
-		updateSelectionProvider(markerSelection);
+      if (_searchView == null) {
+         return;
+      }
 
-		TourManager.fireEventWithCustomData(//
-				TourEventId.MARKER_SELECTION,
-				markerSelection,
-				_searchView.getPart());
-	}
+      final ArrayList<TourMarker> selectedTourMarkers = new ArrayList<>();
+      selectedTourMarkers.add(selectedTourMarker);
 
-	private static void hrefAction_Tour_Edit(final Long tourId) {
+      final SelectionTourMarker markerSelection = new SelectionTourMarker(tourData, selectedTourMarkers);
 
-		final Shell activeShell = getActiveShell();
+      updateSelectionProvider(markerSelection);
 
-		// ensure this dialog is modal (only one dialog can be opened)
-		if (_isModalDialogOpen) {
+      TourManager.fireEventWithCustomData(//
+            TourEventId.MARKER_SELECTION,
+            markerSelection,
+            _searchView.getPart());
+   }
 
-			MessageDialog.openInformation(
-					activeShell,
-					Messages.App_Action_Dialog_ActionIsInProgress_Title,
-					Messages.App_Action_Dialog_ActionIsInProgress_Message);
+   private static void hrefAction_Tour_Edit(final Long tourId) {
 
-			return;
-		}
+      final Shell activeShell = getActiveShell();
 
-		// get tour by id
-		final TourData tourData = TourManager.getTour(tourId);
-		if (tourData == null) {
-			return;
-		}
+      // ensure this dialog is modal (only one dialog can be opened)
+      if (_isModalDialogOpen) {
 
-		_isModalDialogOpen = true;
+         MessageDialog.openInformation(
+               activeShell,
+               Messages.App_Action_Dialog_ActionIsInProgress_Title,
+               Messages.App_Action_Dialog_ActionIsInProgress_Message);
 
-		try {
+         return;
+      }
 
-			final DialogQuickEdit dialogQuickEdit = new DialogQuickEdit(//
-					activeShell,
-					tourData);
+      // get tour by id
+      final TourData tourData = TourManager.getTour(tourId);
+      if (tourData == null) {
+         return;
+      }
 
-			if (dialogQuickEdit.open() == Window.OK) {
+      _isModalDialogOpen = true;
 
-				saveModifiedTour(tourData);
-			}
+      try {
 
-		} finally {
-			_isModalDialogOpen = false;
-		}
-	}
+         final DialogQuickEdit dialogQuickEdit = new DialogQuickEdit(//
+               activeShell,
+               tourData);
 
-	private static void hrefAction_Tour_Select(final ISelection selection) {
+         if (dialogQuickEdit.open() == Window.OK) {
 
-		updateSelectionProvider(selection);
+            saveModifiedTour(tourData);
+         }
 
-		TourManager.fireEventWithCustomData(//
-				TourEventId.TOUR_SELECTION,
-				selection,
-				_searchView.getPart());
-	}
+      } finally {
+         _isModalDialogOpen = false;
+      }
+   }
 
-	private static void hrefAction_WayPoint(final long tourId, final long markerId) {
+   private static void hrefAction_Tour_Select(final ISelection selection) {
 
-		if (_searchView == null) {
-			return;
-		}
+      updateSelectionProvider(selection);
 
-		// get tour by id
-		final TourData tourData = TourManager.getTour(tourId);
-		if (tourData == null) {
-			return;
-		}
+      TourManager.fireEventWithCustomData(//
+            TourEventId.TOUR_SELECTION,
+            selection,
+            _searchView.getPart());
+   }
 
-		TourWayPoint selectedWayPoint = null;
+   private static void hrefAction_WayPoint(final long tourId, final long markerId) {
 
-		// get marker by id
-		Set<TourWayPoint> tourWayPoints = tourData.getTourWayPoints();
+      if (_searchView == null) {
+         return;
+      }
+
+      // get tour by id
+      final TourData tourData = TourManager.getTour(tourId);
+      if (tourData == null) {
+         return;
+      }
+
+      TourWayPoint selectedWayPoint = null;
+
+      // get marker by id
+      final Set<TourWayPoint> tourWayPoints = tourData.getTourWayPoints();
       for (final TourWayPoint wayPoint : tourWayPoints) {
-			if (wayPoint.getWayPointId() == markerId) {
-				selectedWayPoint = wayPoint;
-				break;
-			}
-		}
+         if (wayPoint.getWayPointId() == markerId) {
+            selectedWayPoint = wayPoint;
+            break;
+         }
+      }
 
-		if (selectedWayPoint == null) {
-			return;
-		}
+      if (selectedWayPoint == null) {
+         return;
+      }
 
-		// fire selection
-		final ISelection selection = new StructuredSelection(selectedWayPoint);
-		_searchView.getPostSelectionProvider().setSelection(selection);
-	}
+      // fire selection
+      final ISelection selection = new StructuredSelection(selectedWayPoint);
+      _searchView.getPostSelectionProvider().setSelection(selection);
+   }
 
-	static void onBrowserLocation(final LocationEvent event) {
+   static void onBrowserLocation(final LocationEvent event) {
 
-		final String location = event.location;
+      final String location = event.location;
 
-		if (hrefAction(location)) {
+      if (hrefAction(location)) {
 
-			// keep current page when an action is performed, OTHERWISE the current page will disappear or is replaced :-(
-			event.doit = false;
-		}
-	}
+         // keep current page when an action is performed, OTHERWISE the current page will disappear or is replaced :-(
+         event.doit = false;
+      }
+   }
 
-	/**
-	 * Set defaults for the search options in the state.
-	 */
-	static void saveDefaultSearchOption() {
+   /**
+    * Set defaults for the search options in the state.
+    */
+   static void saveDefaultSearchOption() {
 
-		state.put(STATE_IS_EASE_SEARCHING, STATE_IS_EASE_SEARCHING_DEFAULT);
+      state.put(STATE_IS_EASE_SEARCHING, STATE_IS_EASE_SEARCHING_DEFAULT);
 
-		state.put(STATE_IS_SHOW_CONTENT_ALL, STATE_IS_SHOW_CONTENT_ALL_DEFAULT);
-		state.put(STATE_IS_SHOW_CONTENT_MARKER, STATE_IS_SHOW_CONTENT_MARKER_DEFAULT);
-		state.put(STATE_IS_SHOW_CONTENT_TOUR, STATE_IS_SHOW_CONTENT_TOUR_DEFAULT);
-		state.put(STATE_IS_SHOW_CONTENT_WAYPOINT, STATE_IS_SHOW_CONTENT_WAYPOINT_DEFAULT);
+      state.put(STATE_IS_SHOW_CONTENT_ALL, STATE_IS_SHOW_CONTENT_ALL_DEFAULT);
+      state.put(STATE_IS_SHOW_CONTENT_MARKER, STATE_IS_SHOW_CONTENT_MARKER_DEFAULT);
+      state.put(STATE_IS_SHOW_CONTENT_TOUR, STATE_IS_SHOW_CONTENT_TOUR_DEFAULT);
+      state.put(STATE_IS_SHOW_CONTENT_WAYPOINT, STATE_IS_SHOW_CONTENT_WAYPOINT_DEFAULT);
 
-		state.put(STATE_IS_SHOW_DATE, STATE_IS_SHOW_DATE_DEFAULT);
-		state.put(STATE_IS_SHOW_TIME, STATE_IS_SHOW_TIME_DEFAULT);
-		state.put(STATE_IS_SHOW_ITEM_NUMBER, STATE_IS_SHOW_ITEM_NUMBER_DEFAULT);
-		state.put(STATE_IS_SHOW_LUCENE_DOC_ID, STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT);
+      state.put(STATE_IS_SHOW_DATE, STATE_IS_SHOW_DATE_DEFAULT);
+      state.put(STATE_IS_SHOW_TIME, STATE_IS_SHOW_TIME_DEFAULT);
+      state.put(STATE_IS_SHOW_ITEM_NUMBER, STATE_IS_SHOW_ITEM_NUMBER_DEFAULT);
+      state.put(STATE_IS_SHOW_LUCENE_DOC_ID, STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT);
 
-		state.put(STATE_IS_SORT_DATE_ASCENDING, STATE_IS_SORT_DATE_ASCENDING_DEFAULT);
-	}
+      state.put(STATE_IS_SORT_DATE_ASCENDING, STATE_IS_SORT_DATE_ASCENDING_DEFAULT);
+   }
 
-	private static void saveModifiedTour(final TourData tourData) {
+   private static void saveModifiedTour(final TourData tourData) {
 
-		/*
-		 * Run async because a tour save will fire a tour change event.
-		 */
-		Display.getDefault().asyncExec(new Runnable() {
-			@Override
-			public void run() {
-				TourManager.saveModifiedTour(tourData);
-			}
-		});
-	}
+      /*
+       * Run async because a tour save will fire a tour change event.
+       */
+      Display.getDefault().asyncExec(new Runnable() {
+         @Override
+         public void run() {
+            TourManager.saveModifiedTour(tourData);
+         }
+      });
+   }
 
-	/**
-	 * Set internal search options from the state. These internal options are used when creating the
-	 * search result.
-	 */
-	static void setInternalSearchOptions() {
+   /**
+    * Set internal search options from the state. These internal options are used when creating the
+    * search result.
+    */
+   static void setInternalSearchOptions() {
 
-		_isUI_EaseSearching = Util.getStateBoolean(state, //
-				STATE_IS_EASE_SEARCHING,
-				STATE_IS_EASE_SEARCHING_DEFAULT);
+      _isUI_EaseSearching = Util.getStateBoolean(state, //
+            STATE_IS_EASE_SEARCHING,
+            STATE_IS_EASE_SEARCHING_DEFAULT);
 
-		_isUI_ShowContentAll = Util.getStateBoolean(state, //
-				STATE_IS_SHOW_CONTENT_ALL,
-				STATE_IS_SHOW_CONTENT_ALL_DEFAULT);
+      _isUI_ShowContentAll = Util.getStateBoolean(state, //
+            STATE_IS_SHOW_CONTENT_ALL,
+            STATE_IS_SHOW_CONTENT_ALL_DEFAULT);
 
-		_isUI_ShowContentMarker = Util.getStateBoolean(state, //
-				STATE_IS_SHOW_CONTENT_MARKER,
-				STATE_IS_SHOW_CONTENT_MARKER_DEFAULT);
+      _isUI_ShowContentMarker = Util.getStateBoolean(state, //
+            STATE_IS_SHOW_CONTENT_MARKER,
+            STATE_IS_SHOW_CONTENT_MARKER_DEFAULT);
 
-		_isUI_ShowContentTour = Util.getStateBoolean(state, //
-				STATE_IS_SHOW_CONTENT_TOUR,
-				STATE_IS_SHOW_CONTENT_TOUR_DEFAULT);
+      _isUI_ShowContentTour = Util.getStateBoolean(state, //
+            STATE_IS_SHOW_CONTENT_TOUR,
+            STATE_IS_SHOW_CONTENT_TOUR_DEFAULT);
 
-		_isUI_ShowContentWaypoint = Util.getStateBoolean(state, //
-				STATE_IS_SHOW_CONTENT_WAYPOINT,
-				STATE_IS_SHOW_CONTENT_WAYPOINT_DEFAULT);
+      _isUI_ShowContentWaypoint = Util.getStateBoolean(state, //
+            STATE_IS_SHOW_CONTENT_WAYPOINT,
+            STATE_IS_SHOW_CONTENT_WAYPOINT_DEFAULT);
 
-		_isUI_ShowDate = Util.getStateBoolean(state, //
-				STATE_IS_SHOW_DATE,
-				STATE_IS_SHOW_DATE_DEFAULT);
-		_isUI_ShowTime = Util.getStateBoolean(state, //
-				STATE_IS_SHOW_TIME,
-				STATE_IS_SHOW_TIME_DEFAULT);
+      _isUI_ShowDate = Util.getStateBoolean(state, //
+            STATE_IS_SHOW_DATE,
+            STATE_IS_SHOW_DATE_DEFAULT);
+      _isUI_ShowTime = Util.getStateBoolean(state, //
+            STATE_IS_SHOW_TIME,
+            STATE_IS_SHOW_TIME_DEFAULT);
 
-		_isUI_ShowDescription = Util.getStateBoolean(state, //
-				STATE_IS_SHOW_DESCRIPTION,
-				STATE_IS_SHOW_DESCRIPTION_DEFAULT);
+      _isUI_ShowDescription = Util.getStateBoolean(state, //
+            STATE_IS_SHOW_DESCRIPTION,
+            STATE_IS_SHOW_DESCRIPTION_DEFAULT);
 
-		_isUI_ShowLuceneDocId = Util.getStateBoolean(state, //
-				STATE_IS_SHOW_LUCENE_DOC_ID,
-				STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT);
+      _isUI_ShowLuceneDocId = Util.getStateBoolean(state, //
+            STATE_IS_SHOW_LUCENE_DOC_ID,
+            STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT);
 
-		_isUI_ShowItemNumber = Util.getStateBoolean(state, //
-				STATE_IS_SHOW_ITEM_NUMBER,
-				STATE_IS_SHOW_ITEM_NUMBER_DEFAULT);
+      _isUI_ShowItemNumber = Util.getStateBoolean(state, //
+            STATE_IS_SHOW_ITEM_NUMBER,
+            STATE_IS_SHOW_ITEM_NUMBER_DEFAULT);
 
-		_isUI_SortDateAscending = Util.getStateBoolean(state, //
-				STATE_IS_SORT_DATE_ASCENDING,
-				STATE_IS_SORT_DATE_ASCENDING_DEFAULT);
+      _isUI_SortDateAscending = Util.getStateBoolean(state, //
+            STATE_IS_SORT_DATE_ASCENDING,
+            STATE_IS_SORT_DATE_ASCENDING_DEFAULT);
 
-		// set sorting in the search manager
-		FTSearchManager.setSearchOptions(
-				_isUI_ShowContentAll,
-				_isUI_ShowContentMarker,
-				_isUI_ShowContentTour,
-				_isUI_ShowContentWaypoint,
-				_isUI_SortDateAscending);
-	}
+      // set sorting in the search manager
+      FTSearchManager.setSearchOptions(
+            _isUI_ShowContentAll,
+            _isUI_ShowContentMarker,
+            _isUI_ShowContentTour,
+            _isUI_ShowContentWaypoint,
+            _isUI_SortDateAscending);
+   }
 
-	/**
-	 * Web content server is available only when the search view is opened.
-	 *
-	 * @param searchView
-	 */
-	public static void setSearchView(final ISearchView searchView) {
+   /**
+    * Web content server is available only when the search view is opened.
+    *
+    * @param searchView
+    */
+   public static void setSearchView(final ISearchView searchView) {
 
-		if (searchView == null) {
+      if (searchView == null) {
 
-			// shutdown search service
+         // shutdown search service
 
-			FTSearchManager.closeIndexReaderSuggester();
+         FTSearchManager.closeIndexReaderSuggester();
 
-			WebContentServer.stop();
+         WebContentServer.stop();
 
-			WebContentServer.removeXHRHandler(XHR_SEARCH_INPUT_HANDLER);
-			WebContentServer.setIconRequestHandler(null);
+         WebContentServer.removeXHRHandler(XHR_SEARCH_INPUT_HANDLER);
+         WebContentServer.setIconRequestHandler(null);
 
-		} else {
+      } else {
 
-			// start search service
+         // start search service
 
-			WebContentServer.start();
+         WebContentServer.start();
 
-			WebContentServer.addXHRHandler(XHR_SEARCH_INPUT_HANDLER, SearchMgr.getInstance());
-			WebContentServer.setIconRequestHandler(IconRequestMgr.getInstance());
-		}
+         WebContentServer.addXHRHandler(XHR_SEARCH_INPUT_HANDLER, SearchMgr.getInstance());
+         WebContentServer.setIconRequestHandler(IconRequestMgr.getInstance());
+      }
 
-		_searchView = searchView;
-	}
+      _searchView = searchView;
+   }
 
-	/**
-	 * Ensure that the selection provider contains the same data.
-	 *
-	 * @param selection
-	 */
-	private static void updateSelectionProvider(final ISelection selection) {
+   /**
+    * Ensure that the selection provider contains the same data.
+    *
+    * @param selection
+    */
+   private static void updateSelectionProvider(final ISelection selection) {
 
-		_searchView.getPostSelectionProvider().setSelectionNoFireEvent(selection);
-	}
+      _searchView.getPostSelectionProvider().setSelectionNoFireEvent(selection);
+   }
 
-	private ItemResponse createHTML_10_Item(final SearchResultItem resultItem, final int itemNumber) {
+   private ItemResponse createHTML_10_Item(final SearchResultItem resultItem, final int itemNumber) {
 
-		final int docId = resultItem.docId;
-		final int docSource = resultItem.docSource;
-		final String markerId = resultItem.markerId;
-		final String tourId = resultItem.tourId;
+      final int docId = resultItem.docId;
+      final int docSource = resultItem.docSource;
+      final String markerId = resultItem.markerId;
+      final String tourId = resultItem.tourId;
 
-		final boolean isTour = docSource == FTSearchManager.DOC_SOURCE_TOUR;
-		final boolean isMarker = docSource == FTSearchManager.DOC_SOURCE_TOUR_MARKER;
-		final boolean isWayPoint = docSource == FTSearchManager.DOC_SOURCE_WAY_POINT;
+      final boolean isTour = docSource == FTSearchManager.DOC_SOURCE_TOUR;
+      final boolean isMarker = docSource == FTSearchManager.DOC_SOURCE_TOUR_MARKER;
+      final boolean isWayPoint = docSource == FTSearchManager.DOC_SOURCE_WAY_POINT;
 
-		String iconUrl = null;
+      String iconUrl = null;
 
-		String hoverMessage = null;
-		String hrefEditItem = null;
-		String itemTitleText = null;
+      String hoverMessage = null;
+      String hrefEditItem = null;
+      String itemTitleText = null;
 //		String itemId = null;
 
-		if (isTour) {
+      if (isTour) {
 
-			final String tourTitle = resultItem.title;
-			if (tourTitle != null) {
-				itemTitleText = tourTitle;
-			}
+         final String tourTitle = resultItem.title;
+         if (tourTitle != null) {
+            itemTitleText = tourTitle;
+         }
 
-			hrefEditItem = ACTION_URL
-					+ HREF_ACTION_EDIT_TOUR
-					+ (HREF_PARAM_TOUR_ID + tourId)
-					+ (HREF_PARAM_DOC_ID + docId);
+         hrefEditItem = ACTION_URL
+               + HREF_ACTION_EDIT_TOUR
+               + (HREF_PARAM_TOUR_ID + tourId)
+               + (HREF_PARAM_DOC_ID + docId);
 
-			iconUrl = _iconUrl_Tour;
-			hoverMessage = SEARCH_APP_ACTION_EDIT_TOUR;
+         iconUrl = _iconUrl_Tour;
+         hoverMessage = SEARCH_APP_ACTION_EDIT_TOUR;
 
-		} else if (isMarker) {
+      } else if (isMarker) {
 
-			final String tourMarkerLabel = resultItem.title;
-			if (tourMarkerLabel != null) {
-				itemTitleText = tourMarkerLabel;
-			}
+         final String tourMarkerLabel = resultItem.title;
+         if (tourMarkerLabel != null) {
+            itemTitleText = tourMarkerLabel;
+         }
 
-			hrefEditItem = ACTION_URL
-					+ HREF_ACTION_EDIT_MARKER
-					+ (HREF_PARAM_TOUR_ID + tourId)
-					+ (HREF_PARAM_MARKER_ID + markerId)
-					+ (HREF_PARAM_DOC_ID + docId);
+         hrefEditItem = ACTION_URL
+               + HREF_ACTION_EDIT_MARKER
+               + (HREF_PARAM_TOUR_ID + tourId)
+               + (HREF_PARAM_MARKER_ID + markerId)
+               + (HREF_PARAM_DOC_ID + docId);
 
-			iconUrl = _iconUrl_Marker;
-			hoverMessage = SEARCH_APP_ACTION_EDIT_MARKER;
+         iconUrl = _iconUrl_Marker;
+         hoverMessage = SEARCH_APP_ACTION_EDIT_MARKER;
 
-		} else if (isWayPoint) {
+      } else if (isWayPoint) {
 
-			final String tourMarkerLabel = resultItem.title;
-			if (tourMarkerLabel != null) {
-				itemTitleText = tourMarkerLabel;
-			}
+         final String tourMarkerLabel = resultItem.title;
+         if (tourMarkerLabel != null) {
+            itemTitleText = tourMarkerLabel;
+         }
 
-			iconUrl = _iconUrl_WayPoint;
-			hoverMessage = SEARCH_APP_ACTION_EDIT_MARKER;
-		}
+         iconUrl = _iconUrl_WayPoint;
+         hoverMessage = SEARCH_APP_ACTION_EDIT_MARKER;
+      }
 
-		if (itemTitleText == null) {
-			itemTitleText = UI.EMPTY_STRING;
-		}
+      if (itemTitleText == null) {
+         itemTitleText = UI.EMPTY_STRING;
+      }
 
-		String itemTitle = itemTitleText;
-		if (itemTitle.length() == 0) {
-			// show new line that the icon is not overwritten
-			itemTitle = "</br>"; //$NON-NLS-1$
-		}
+      String itemTitle = itemTitleText;
+      if (itemTitle.length() == 0) {
+         // show new line that the icon is not overwritten
+         itemTitle = "</br>"; //$NON-NLS-1$
+      }
 
-		final String description = resultItem.description;
-		final boolean isDescription = _isUI_ShowDescription && description != null;
+      final String description = resultItem.description;
+      final boolean isDescription = _isUI_ShowDescription && description != null;
 
-		final StringBuilder sb = new StringBuilder();
+      final StringBuilder sb = new StringBuilder();
 
-		// hovered actions
-		if (hrefEditItem != null) {
+      // hovered actions
+      if (hrefEditItem != null) {
 
-			sb.append("<div class='action-container'>" //$NON-NLS-1$
-					+ ("<table><tbody><tr>") //$NON-NLS-1$
-					+ (TAG_TD + createHTML_20_Action(hrefEditItem, hoverMessage, _actionUrl_EditImage) + TAG_TD_END)
-					+ "</tr></tbody></table>" // //$NON-NLS-1$
-					+ "</div>\n"); //$NON-NLS-1$
-		}
+         sb.append("<div class='action-container'>" //$NON-NLS-1$
+               + ("<table><tbody><tr>") //$NON-NLS-1$
+               + (TAG_TD + createHTML_20_Action(hrefEditItem, hoverMessage, _actionUrl_EditImage) + TAG_TD_END)
+               + "</tr></tbody></table>" // //$NON-NLS-1$
+               + "</div>\n"); //$NON-NLS-1$
+      }
 
-		sb.append("<table><tbody><tr>"); //$NON-NLS-1$
-		{
-			/*
-			 * Item image
-			 */
-			sb.append("<td class='item-image'>"); //$NON-NLS-1$
-			sb.append("<img src='" + iconUrl + "'></img>"); //$NON-NLS-1$ //$NON-NLS-2$
-			sb.append(TAG_TD_END);
+      sb.append("<table><tbody><tr>"); //$NON-NLS-1$
+      {
+         /*
+          * Item image
+          */
+         sb.append("<td class='item-image'>"); //$NON-NLS-1$
+         sb.append("<img src='" + iconUrl + "'></img>"); //$NON-NLS-1$ //$NON-NLS-2$
+         sb.append(TAG_TD_END);
 
-			/*
-			 * Item content
-			 */
-			sb.append("<td style='width:100%;'>"); //$NON-NLS-1$
-			{
-				// title
-				if (isDescription) {
-					sb.append("<span class='item-title'>" + itemTitle + "</span>"); //$NON-NLS-1$ //$NON-NLS-2$
-				} else {
-					sb.append("<span class='item-title-no-description'>" + itemTitle + "</span>"); //$NON-NLS-1$ //$NON-NLS-2$
-				}
+         /*
+          * Item content
+          */
+         sb.append("<td style='width:100%;'>"); //$NON-NLS-1$
+         {
+            // title
+            if (isDescription) {
+               sb.append("<span class='item-title'>" + itemTitle + "</span>"); //$NON-NLS-1$ //$NON-NLS-2$
+            } else {
+               sb.append("<span class='item-title-no-description'>" + itemTitle + "</span>"); //$NON-NLS-1$ //$NON-NLS-2$
+            }
 
-				// description
-				if (isDescription) {
-					sb.append("<div class='item-description'>"); //$NON-NLS-1$
-					sb.append(description);
-					sb.append("</div>\n"); //$NON-NLS-1$
-				}
+            // description
+            if (isDescription) {
+               sb.append("<div class='item-description'>"); //$NON-NLS-1$
+               sb.append(description);
+               sb.append("</div>\n"); //$NON-NLS-1$
+            }
 
-				// info
-				if (_isUI_ShowDate || _isUI_ShowTime || _isUI_ShowItemNumber || _isUI_ShowLuceneDocId) {
+            // info
+            if (_isUI_ShowDate || _isUI_ShowTime || _isUI_ShowItemNumber || _isUI_ShowLuceneDocId) {
 
-					sb.append("<div class='item-info'>"); //$NON-NLS-1$
-					sb.append("<table><tbody><tr>"); //$NON-NLS-1$
-					{
-						if (_isUI_ShowDate || _isUI_ShowTime) {
+               sb.append("<div class='item-info'>"); //$NON-NLS-1$
+               sb.append("<table><tbody><tr>"); //$NON-NLS-1$
+               {
+                  if (_isUI_ShowDate || _isUI_ShowTime) {
 
-							final long tourStartTime = resultItem.tourStartTime;
-							if (tourStartTime != 0) {
+                     final long tourStartTime = resultItem.tourStartTime;
+                     if (tourStartTime != 0) {
 
-								final ZonedDateTime dt = TimeTools.getZonedDateTime(tourStartTime);
+                        final ZonedDateTime dt = TimeTools.getZonedDateTime(tourStartTime);
 
-								String dateTimeText = null;
+                        String dateTimeText = null;
 
-								if (_isUI_ShowDate && _isUI_ShowTime) {
+                        if (_isUI_ShowDate && _isUI_ShowTime) {
 
-									dateTimeText = dt.format(TimeTools.Formatter_DateTime_MS);
+                           dateTimeText = dt.format(TimeTools.Formatter_DateTime_MS);
 
-								} else if (_isUI_ShowDate) {
+                        } else if (_isUI_ShowDate) {
 
-									dateTimeText = dt.format(TimeTools.Formatter_Date_M);
+                           dateTimeText = dt.format(TimeTools.Formatter_Date_M);
 
-								} else if (_isUI_ShowTime) {
+                        } else if (_isUI_ShowTime) {
 
-									dateTimeText = dt.format(TimeTools.Formatter_Time_S);
-								}
+                           dateTimeText = dt.format(TimeTools.Formatter_Time_S);
+                        }
 
-								sb.append(TAG_TD + dateTimeText + TAG_TD_END);
-							}
-						}
+                        sb.append(TAG_TD + dateTimeText + TAG_TD_END);
+                     }
+                  }
 
-						if (_isUI_ShowItemNumber) {
-							sb.append(TAG_TD + Integer.toString(itemNumber) + TAG_TD_END);
+                  if (_isUI_ShowItemNumber) {
+                     sb.append(TAG_TD + Integer.toString(itemNumber) + TAG_TD_END);
 // for debugging
 //                     sb.append(TAG_TD + tourId + TAG_TD_END);
 //                     sb.append(TAG_TD + markerId + TAG_TD_END);
-						}
+                  }
 
-						if (_isUI_ShowLuceneDocId) {
-							sb.append(TAG_TD + String.format("%d", docId) + TAG_TD_END); //$NON-NLS-1$
-						}
-					}
-					sb.append("</tr></tbody></table>"); //$NON-NLS-1$
-					sb.append("</div>\n"); //$NON-NLS-1$
-				}
-			}
-			sb.append(TAG_TD_END);
-		}
-		sb.append("</tr></tbody></table>"); //$NON-NLS-1$
+                  if (_isUI_ShowLuceneDocId) {
+                     sb.append(TAG_TD + String.format("%d", docId) + TAG_TD_END); //$NON-NLS-1$
+                  }
+               }
+               sb.append("</tr></tbody></table>"); //$NON-NLS-1$
+               sb.append("</div>\n"); //$NON-NLS-1$
+            }
+         }
+         sb.append(TAG_TD_END);
+      }
+      sb.append("</tr></tbody></table>"); //$NON-NLS-1$
 
-		final ItemResponse itemResponse = new ItemResponse();
+      final ItemResponse itemResponse = new ItemResponse();
 
-		itemResponse.createdHtml = sb.toString();
-		itemResponse.actionUrl_EditItem = hrefEditItem;
+      itemResponse.createdHtml = sb.toString();
+      itemResponse.actionUrl_EditItem = hrefEditItem;
 
-		itemResponse.item_IsMarker = isMarker;
-		itemResponse.item_IsTour = isTour;
-		itemResponse.item_IsWayPoint = isWayPoint;
+      itemResponse.item_IsMarker = isMarker;
+      itemResponse.item_IsTour = isTour;
+      itemResponse.item_IsWayPoint = isWayPoint;
 
-		itemResponse.itemId_MarkerId = markerId;
-		itemResponse.itemId_TourId = tourId;
+      itemResponse.itemId_MarkerId = markerId;
+      itemResponse.itemId_TourId = tourId;
 
-		return itemResponse;
-	}
+      return itemResponse;
+   }
 
-	private String createHTML_20_Action(final String actionUrl, final String hoverMessage, final String backgroundImage) {
+   private String createHTML_20_Action(final String actionUrl, final String hoverMessage, final String backgroundImage) {
 
-		String url;
+      String url;
 
-		/*
-		 * Action is fired with an xhr request to the server
-		 */
+      /*
+       * Action is fired with an xhr request to the server
+       */
 
-		url = " href='#anchor-without-scrolling'" //$NON-NLS-1$
-				+ " onclick=" //$NON-NLS-1$
-				+ "'" //$NON-NLS-1$
-				+ (" tourbook.search.SearchApp.action(\"" + actionUrl + "\");") //$NON-NLS-1$ //$NON-NLS-2$
-				+ " return false;" //$NON-NLS-1$
-				+ "'"; //$NON-NLS-1$
+      url = " href='#anchor-without-scrolling'" //$NON-NLS-1$
+            + " onclick=" //$NON-NLS-1$
+            + "'" //$NON-NLS-1$
+            + (" tourbook.search.SearchApp.action(\"" + actionUrl + "\");") //$NON-NLS-1$ //$NON-NLS-2$
+            + " return false;" //$NON-NLS-1$
+            + "'"; //$NON-NLS-1$
 
-		return "<a class='action'" // //$NON-NLS-1$
-				+ (" style='background-image: url(" + backgroundImage + ");'") //$NON-NLS-1$ //$NON-NLS-2$
-				+ url
-				+ (" title='" + hoverMessage + "'") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ">" // //$NON-NLS-1$
-				+ "</a>"; //$NON-NLS-1$
-	}
+      return "<a class='action'" // //$NON-NLS-1$
+            + (" style='background-image: url(" + backgroundImage + ");'") //$NON-NLS-1$ //$NON-NLS-2$
+            + url
+            + (" title='" + hoverMessage + "'") //$NON-NLS-1$ //$NON-NLS-2$
+            + ">" // //$NON-NLS-1$
+            + "</a>"; //$NON-NLS-1$
+   }
 
-	private String getContentRange(final SearchResult searchResult, final int searchPosFrom, final int allItemSize) {
+   private String getContentRange(final SearchResult searchResult, final int searchPosFrom, final int allItemSize) {
 
-		String contentRange;
+      String contentRange;
 
-		if (searchResult == null || allItemSize == 0) {
+      if (searchResult == null || allItemSize == 0) {
 
-			contentRange = CONTENT_RANGE_ZERO;
+         contentRange = CONTENT_RANGE_ZERO;
 
-		} else {
+      } else {
 
-			contentRange = String.format(
-					CONTENT_RANGE_ITEMS,
-					searchPosFrom,
-					(searchPosFrom + allItemSize - 1),
-					searchResult.totalHits);
-		}
+         contentRange = String.format(
+               CONTENT_RANGE_ITEMS,
+               searchPosFrom,
+               (searchPosFrom + allItemSize - 1),
+               searchResult.totalHits);
+      }
 
-		return contentRange;
-	}
+      return contentRange;
+   }
 
-	@Override
-	public void handleXHREvent(final HttpExchange httpExchange, final StringBuilder log) throws IOException {
+   @Override
+   public void handleXHREvent(final HttpExchange httpExchange, final StringBuilder log) throws IOException {
 
-		// get parameters from url query string
-		@SuppressWarnings("unchecked")
-		final Map<String, Object> params = (Map<String, Object>) httpExchange
-				.getAttribute(RequestParameterFilter.ATTRIBUTE_PARAMETERS);
+      // get parameters from url query string
+      @SuppressWarnings("unchecked")
+      final Map<String, Object> params = (Map<String, Object>) httpExchange
+            .getAttribute(RequestParameterFilter.ATTRIBUTE_PARAMETERS);
 
-		String response = UI.EMPTY_STRING;
-		final Object action = params.get(XHR_PARAM_ACTION);
+      String response = UI.EMPTY_STRING;
+      final Object action = params.get(XHR_PARAM_ACTION);
 
-		if (XHR_ACTION_SEARCH.equals(action)) {
+      if (XHR_ACTION_SEARCH.equals(action)) {
 
-			response = xhr_Search(params, httpExchange, log);
+         response = xhr_Search(params, httpExchange, log);
 
-		} else if (XHR_ACTION_ITEM_ACTION.equals(action)) {
+      } else if (XHR_ACTION_ITEM_ACTION.equals(action)) {
 
-			xhr_ItemAction(params);
+         xhr_ItemAction(params);
 
-		} else if (XHR_ACTION_SELECT.equals(action)) {
+      } else if (XHR_ACTION_SELECT.equals(action)) {
 
-			xhr_Select(params);
+         xhr_Select(params);
 
-		} else if (XHR_ACTION_GET_SEARCH_OPTIONS.equals(action)) {
+      } else if (XHR_ACTION_GET_SEARCH_OPTIONS.equals(action)) {
 
-			response = xhr_GetSearchOptions(params);
+         response = xhr_GetSearchOptions(params);
 
-		} else if (XHR_ACTION_GET_STATE.equals(action)) {
+      } else if (XHR_ACTION_GET_STATE.equals(action)) {
 
-			response = xhr_GetState(params);
+         response = xhr_GetState(params);
 
-		} else if (XHR_ACTION_SET_SEARCH_OPTIONS.equals(action)) {
+      } else if (XHR_ACTION_SET_SEARCH_OPTIONS.equals(action)) {
 
-			response = xhr_SetSearchOptions(params);
+         response = xhr_SetSearchOptions(params);
 
 //		} else if (XHR_ACTION_GET_STATE.equals(action)) {
 //
 //			xhr_SetState(params);
 
-		} else if (XHR_ACTION_PROPOSALS.equals(action)) {
+      } else if (XHR_ACTION_PROPOSALS.equals(action)) {
 
-			response = xhr_Proposals(params);
-		}
+         response = xhr_Proposals(params);
+      }
 
-		writeRespone(httpExchange, response);
-	}
+      writeRespone(httpExchange, response);
+   }
 
-	private void writeRespone(final HttpExchange httpExchange, final String response) {
+   private void writeRespone(final HttpExchange httpExchange, final String response) {
 
-		OutputStream os = null;
+      OutputStream os = null;
 
-		try {
+      try {
 
 //			response.setContentType("application/json;charset=UTF-8");
-			final byte[] convertedResponse = response.getBytes(WEB.UTF_8);
+         final byte[] convertedResponse = response.getBytes(WEB.UTF_8);
 
-			httpExchange.sendResponseHeaders(200, convertedResponse.length);
+         httpExchange.sendResponseHeaders(200, convertedResponse.length);
 
-			os = httpExchange.getResponseBody();
-			os.write(convertedResponse);
+         os = httpExchange.getResponseBody();
+         os.write(convertedResponse);
 
-		} catch (final Exception e) {
-			StatusUtil.log(e);
-		} finally {
-			Util.close(os);
-		}
-	}
+      } catch (final Exception e) {
+         StatusUtil.log(e);
+      } finally {
+         Util.close(os);
+      }
+   }
 
-	private String xhr_GetSearchOptions(final Map<String, Object> params) {
+   private String xhr_GetSearchOptions(final Map<String, Object> params) {
 
-		// ensure state options are set
-		setInternalSearchOptions();
+      // ensure state options are set
+      setInternalSearchOptions();
 
-		final JSONObject responceObj = new JSONObject();
+      final JSONObject responceObj = new JSONObject();
 
-		responceObj.put(JSON_IS_EASE_SEARCHING, _isUI_EaseSearching);
+      responceObj.put(JSON_IS_EASE_SEARCHING, _isUI_EaseSearching);
 
-		responceObj.put(JSON_IS_SHOW_CONTENT_ALL, _isUI_ShowContentAll);
-		responceObj.put(JSON_IS_SHOW_CONTENT_MARKER, _isUI_ShowContentMarker);
-		responceObj.put(JSON_IS_SHOW_CONTENT_TOUR, _isUI_ShowContentTour);
-		responceObj.put(JSON_IS_SHOW_CONTENT_WAYPOINT, _isUI_ShowContentWaypoint);
+      responceObj.put(JSON_IS_SHOW_CONTENT_ALL, _isUI_ShowContentAll);
+      responceObj.put(JSON_IS_SHOW_CONTENT_MARKER, _isUI_ShowContentMarker);
+      responceObj.put(JSON_IS_SHOW_CONTENT_TOUR, _isUI_ShowContentTour);
+      responceObj.put(JSON_IS_SHOW_CONTENT_WAYPOINT, _isUI_ShowContentWaypoint);
 
-		responceObj.put(JSON_IS_SHOW_DATE, _isUI_ShowDate);
-		responceObj.put(JSON_IS_SHOW_TIME, _isUI_ShowTime);
-		responceObj.put(JSON_IS_SHOW_DESCRIPTION, _isUI_ShowDescription);
-		responceObj.put(JSON_IS_SHOW_ITEM_NUMBER, _isUI_ShowItemNumber);
-		responceObj.put(JSON_IS_SHOW_LUCENE_ID, _isUI_ShowLuceneDocId);
+      responceObj.put(JSON_IS_SHOW_DATE, _isUI_ShowDate);
+      responceObj.put(JSON_IS_SHOW_TIME, _isUI_ShowTime);
+      responceObj.put(JSON_IS_SHOW_DESCRIPTION, _isUI_ShowDescription);
+      responceObj.put(JSON_IS_SHOW_ITEM_NUMBER, _isUI_ShowItemNumber);
+      responceObj.put(JSON_IS_SHOW_LUCENE_ID, _isUI_ShowLuceneDocId);
 
-		responceObj.put(JSON_IS_SORT_BY_DATE_ASCENDING, _isUI_SortDateAscending);
+      responceObj.put(JSON_IS_SORT_BY_DATE_ASCENDING, _isUI_SortDateAscending);
 
-		return responceObj.toString();
-	}
+      return responceObj.toString();
+   }
 
-	private String xhr_GetState(final Map<String, Object> params) {
+   private String xhr_GetState(final Map<String, Object> params) {
 
-		final String searchText = Util.getStateString(state, STATE_CURRENT_SEARCH_TEXT, UI.EMPTY_STRING);
+      final String searchText = Util.getStateString(state, STATE_CURRENT_SEARCH_TEXT, UI.EMPTY_STRING);
 
-		final JSONObject responceObj = new JSONObject();
+      final JSONObject responceObj = new JSONObject();
 
-		responceObj.put(JSON_STATE_SEARCH_TEXT, searchText);
+      responceObj.put(JSON_STATE_SEARCH_TEXT, searchText);
 
-		return responceObj.toString();
-	}
+      return responceObj.toString();
+   }
 
-	private void xhr_ItemAction(final Map<String, Object> params) throws UnsupportedEncodingException {
+   private void xhr_ItemAction(final Map<String, Object> params) throws UnsupportedEncodingException {
 
-		final Object xhrParameter = params.get(XHR_PARAM_ACTION_URL);
+      final Object xhrParameter = params.get(XHR_PARAM_ACTION_URL);
 
-		if (xhrParameter instanceof String) {
+      if (xhrParameter instanceof String) {
 
-			final String xhrAction = URLDecoder.decode((String) xhrParameter, WEB.UTF_8);
+         final String xhrAction = URLDecoder.decode((String) xhrParameter, WEB.UTF_8);
 
-			// run in UI thread
-			Display.getDefault().asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					hrefAction(xhrAction);
-				}
-			});
-		}
-	}
+         // run in UI thread
+         Display.getDefault().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+               hrefAction(xhrAction);
+            }
+         });
+      }
+   }
 
-	private String xhr_Proposals(final Map<String, Object> params) throws UnsupportedEncodingException {
+   private String xhr_Proposals(final Map<String, Object> params) throws UnsupportedEncodingException {
 
-		final JSONObject jsonResponse = new JSONObject();
+      final JSONObject jsonResponse = new JSONObject();
 
-		List<LookupResult> proposals = null;
-		final Object xhrSearchText = params.get(XHR_PARAM_SEARCH_TEXT);
+      List<LookupResult> proposals = null;
+      final Object xhrSearchText = params.get(XHR_PARAM_SEARCH_TEXT);
 
-		if (xhrSearchText instanceof String) {
+      if (xhrSearchText instanceof String) {
 
-			final String searchText = URLDecoder.decode((String) xhrSearchText, WEB.UTF_8);
+         final String searchText = URLDecoder.decode((String) xhrSearchText, WEB.UTF_8);
 
-			proposals = FTSearchManager.getProposals(searchText);
-		}
+         proposals = FTSearchManager.getProposals(searchText);
+      }
 
-		if (proposals == null || proposals.size() == 0) {
-			return UI.EMPTY_STRING;
-		}
+      if (proposals == null || proposals.size() == 0) {
+         return UI.EMPTY_STRING;
+      }
 
-		final JSONArray allItems = new JSONArray();
-		for (final LookupResult lookupResult : proposals) {
+      final JSONArray allItems = new JSONArray();
+      for (final LookupResult lookupResult : proposals) {
 
-			final String proposal = lookupResult.key.toString();
+         final String proposal = lookupResult.key.toString();
 
-			final JSONObject item = new JSONObject();
-			item.put(JSON_ID, proposal);
-			item.put(JSON_NAME, proposal);
+         final JSONObject item = new JSONObject();
+         item.put(JSON_ID, proposal);
+         item.put(JSON_NAME, proposal);
 
-			allItems.put(item);
-		}
+         allItems.put(item);
+      }
 
-		jsonResponse.put("items", allItems); //$NON-NLS-1$
+      jsonResponse.put("items", allItems); //$NON-NLS-1$
 
-		final String response = jsonResponse.toString();
+      final String response = jsonResponse.toString();
 
-		return response;
-	}
+      return response;
+   }
 
-	private String xhr_Search(final Map<String, Object> params, final HttpExchange httpExchange, final StringBuilder log)
-			throws UnsupportedEncodingException {
+   private String xhr_Search(final Map<String, Object> params, final HttpExchange httpExchange, final StringBuilder log)
+         throws UnsupportedEncodingException {
 
-		final long start = System.nanoTime();
+      final long start = System.nanoTime();
 
-		final Headers headers = httpExchange.getRequestHeaders();
+      final Headers headers = httpExchange.getRequestHeaders();
 
-		final JSONArray allItems = new JSONArray();
+      final JSONArray allItems = new JSONArray();
 
-		final String xhrSearchText = (String) params.get(XHR_PARAM_SEARCH_TEXT);
-		final String range = headers.getFirst(REQUEST_HEADER_RANGE);
+      final String xhrSearchText = (String) params.get(XHR_PARAM_SEARCH_TEXT);
+      final String range = headers.getFirst(REQUEST_HEADER_RANGE);
 
-		int searchPosFrom = 0;
-		int searchPosTo = 0;
+      int searchPosFrom = 0;
+      int searchPosTo = 0;
 
-		if (range != null) {
+      if (range != null) {
 
-			final String[] ranges = range.substring("items=".length()).split("-"); //$NON-NLS-1$ //$NON-NLS-2$
+         final String[] ranges = range.substring("items=".length()).split("-"); //$NON-NLS-1$ //$NON-NLS-2$
 
-			searchPosFrom = Integer.valueOf(ranges[0]);
-			searchPosTo = Integer.valueOf(ranges[1]);
-		}
+         searchPosFrom = Integer.valueOf(ranges[0]);
+         searchPosTo = Integer.valueOf(ranges[1]);
+      }
 
-		SearchResult searchResult = null;
-		int allItemSize = 0;
+      SearchResult searchResult = null;
+      int allItemSize = 0;
 
-		if (xhrSearchText != null) {
+      if (xhrSearchText != null) {
 
-			if (WebContentServer.LOG_XHR) {
-				log.append("range: " + searchPosFrom + "-" + searchPosTo + "\t" + headers.entrySet()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			}
+         if (WebContentServer.LOG_XHR) {
+            log.append("range: " + searchPosFrom + "-" + searchPosTo + "\t" + headers.entrySet()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+         }
 
-			String searchText = URLDecoder.decode(xhrSearchText, WEB.UTF_8);
+         String searchText = URLDecoder.decode(xhrSearchText, WEB.UTF_8);
 
-			// keep search text in state
-			state.put(STATE_CURRENT_SEARCH_TEXT, searchText);
+         // keep search text in state
+         state.put(STATE_CURRENT_SEARCH_TEXT, searchText);
 
-			// ensure white space is removed
-			searchText = searchText.trim();
+         // ensure white space is removed
+         searchText = searchText.trim();
 
-			if (searchText.endsWith(UI.SYMBOL_STAR) == false && _isUI_EaseSearching) {
+         if (searchText.endsWith(UI.SYMBOL_STAR) == false && _isUI_EaseSearching) {
 
-				// Append a * otherwise nothing is found
-				searchText += UI.SYMBOL_STAR;
-			}
+            // Append a * otherwise nothing is found
+            searchText += UI.SYMBOL_STAR;
+         }
 
-			searchResult = FTSearchManager.searchByPosition(searchText, searchPosFrom, searchPosTo);
+         searchResult = FTSearchManager.searchByPosition(searchText, searchPosFrom, searchPosTo);
 
-			/*
-			 * create items html
-			 */
-			int itemIndex = 0;
+         /*
+          * create items html
+          */
+         int itemIndex = 0;
 
-			for (final SearchResultItem resultItem : searchResult.items) {
+         for (final SearchResultItem resultItem : searchResult.items) {
 
-				final StringBuilder sb = new StringBuilder();
-				final int itemNumber = searchPosFrom + (++itemIndex);
-				ItemResponse itemResponse = null;
+            final StringBuilder sb = new StringBuilder();
+            final int itemNumber = searchPosFrom + (++itemIndex);
+            ItemResponse itemResponse = null;
 
-				sb.append("<div" + (" class='" + CSS_ITEM_CONTAINER + "'") + " id='" + resultItem.docId + "'>\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-				{
-					itemResponse = createHTML_10_Item(resultItem, itemNumber);
-					sb.append(itemResponse.createdHtml);
-				}
-				sb.append("</div>\n"); //$NON-NLS-1$
+            sb.append("<div" + (" class='" + CSS_ITEM_CONTAINER + "'") + " id='" + resultItem.docId + "'>\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+            {
+               itemResponse = createHTML_10_Item(resultItem, itemNumber);
+               sb.append(itemResponse.createdHtml);
+            }
+            sb.append("</div>\n"); //$NON-NLS-1$
 
-				/*
-				 * Create JSON for an item.
-				 */
-				final JSONObject jsonResponse = new JSONObject();
+            /*
+             * Create JSON for an item.
+             */
+            final JSONObject jsonResponse = new JSONObject();
 
-				// set unique grid row id
-				jsonResponse.put(JSON_ID, resultItem.docId);
+            // set unique grid row id
+            jsonResponse.put(JSON_ID, resultItem.docId);
 
-				jsonResponse.put(JSON_HTML_CONTENT, sb.toString());
-				jsonResponse.put(JSON_ITEM_ACTION_URL_EDIT_ITEM, itemResponse.actionUrl_EditItem);
-				jsonResponse.put(JSON_ITEM_ID_TOUR_ID, itemResponse.itemId_TourId);
-				jsonResponse.put(JSON_ITEM_ID_MARKER_ID, itemResponse.itemId_MarkerId);
-				jsonResponse.put(JSON_ITEM_IS_MARKER, itemResponse.item_IsMarker);
-				jsonResponse.put(JSON_ITEM_IS_TOUR, itemResponse.item_IsTour);
-				jsonResponse.put(JSON_ITEM_IS_WAYPOINT, itemResponse.item_IsWayPoint);
+            jsonResponse.put(JSON_HTML_CONTENT, sb.toString());
+            jsonResponse.put(JSON_ITEM_ACTION_URL_EDIT_ITEM, itemResponse.actionUrl_EditItem);
+            jsonResponse.put(JSON_ITEM_ID_TOUR_ID, itemResponse.itemId_TourId);
+            jsonResponse.put(JSON_ITEM_ID_MARKER_ID, itemResponse.itemId_MarkerId);
+            jsonResponse.put(JSON_ITEM_IS_MARKER, itemResponse.item_IsMarker);
+            jsonResponse.put(JSON_ITEM_IS_TOUR, itemResponse.item_IsTour);
+            jsonResponse.put(JSON_ITEM_IS_WAYPOINT, itemResponse.item_IsWayPoint);
 
-				allItems.put(jsonResponse);
-			}
+            allItems.put(jsonResponse);
+         }
 
-			allItemSize = allItems.length();
+         allItemSize = allItems.length();
 
-		} else {
+      } else {
 
-			// also keep empty search text
+         // also keep empty search text
 
 //			state.put(STATE_CURRENT_SEARCH_TEXT, UI.EMPTY_STRING);
-		}
+      }
 
-		final Headers responseHeaders = httpExchange.getResponseHeaders();
-		responseHeaders.set(WEB.RESPONSE_HEADER_CONTENT_TYPE, WEB.CONTENT_TYPE_APPLICATION_JSON);
+      final Headers responseHeaders = httpExchange.getResponseHeaders();
+      responseHeaders.set(WEB.RESPONSE_HEADER_CONTENT_TYPE, WEB.CONTENT_TYPE_APPLICATION_JSON);
 
-		// this is very important otherwise nothing is displayed
-		responseHeaders.set(
-				WEB.RESPONSE_HEADER_CONTENT_RANGE,
-				getContentRange(searchResult, searchPosFrom, allItemSize));
+      // this is very important otherwise nothing is displayed
+      responseHeaders.set(
+            WEB.RESPONSE_HEADER_CONTENT_RANGE,
+            getContentRange(searchResult, searchPosFrom, allItemSize));
 
-		final float timeDiff = (float) (System.nanoTime() - start) / 1000000;
-		String searchTime;
-		if (timeDiff < 1.0) {
-			searchTime = String.format("%.2f ms", timeDiff); //$NON-NLS-1$
-		} else if (timeDiff < 10.0) {
-			searchTime = String.format("%.1f ms", timeDiff); //$NON-NLS-1$
-		} else {
-			searchTime = String.format("%.0f ms", timeDiff); //$NON-NLS-1$
-		}
+      final float timeDiff = (float) (System.nanoTime() - start) / 1000000;
+      String searchTime;
+      if (timeDiff < 1.0) {
+         searchTime = String.format("%.2f ms", timeDiff); //$NON-NLS-1$
+      } else if (timeDiff < 10.0) {
+         searchTime = String.format("%.1f ms", timeDiff); //$NON-NLS-1$
+      } else {
+         searchTime = String.format("%.0f ms", timeDiff); //$NON-NLS-1$
+      }
 
-		final long totalHits = searchResult == null ? 0 : searchResult.totalHits;
+      final long totalHits = searchResult == null ? 0 : searchResult.totalHits;
 
-		/*
-		 * Create JSON response
-		 */
-		final JSONObject response = new JSONObject();
+      /*
+       * Create JSON response
+       */
+      final JSONObject response = new JSONObject();
 
-		response.put("items", allItems); //$NON-NLS-1$
-		response.put("searchTime", searchTime); //$NON-NLS-1$
-		response.put("totalHits", totalHits); //$NON-NLS-1$
+      response.put("items", allItems); //$NON-NLS-1$
+      response.put("searchTime", searchTime); //$NON-NLS-1$
+      response.put("totalHits", totalHits); //$NON-NLS-1$
 
-		return response.toString();
-	}
+      return response.toString();
+   }
 
-	private void xhr_Select(final Map<String, Object> params) throws UnsupportedEncodingException {
+   private void xhr_Select(final Map<String, Object> params) throws UnsupportedEncodingException {
 
-		final Object selectedItems = params.get(XHR_PARAM_SELECTED_ITEMS);
+      final Object selectedItems = params.get(XHR_PARAM_SELECTED_ITEMS);
 
-		if (selectedItems != null) {
+      if (selectedItems != null) {
 
-			final JSONArray jsonSelectedItems = WEB.parseJSONArray(selectedItems);
+         final JSONArray jsonSelectedItems = WEB.parseJSONArray(selectedItems);
 
-			Runnable runnable = null;
+         Runnable runnable = null;
 
-			if (jsonSelectedItems.length() == 1) {
+         if (jsonSelectedItems.length() == 1) {
 
-				// 1 item is selected
+            // 1 item is selected
 
-				final Object item = jsonSelectedItems.get(0);
+            final Object item = jsonSelectedItems.get(0);
 
-				if (item instanceof JSONObject) {
+            if (item instanceof JSONObject) {
 
-					final JSONObject itemObject = (JSONObject) item;
+               final JSONObject itemObject = (JSONObject) item;
 
-					final long markerId = itemObject.optLong(JSON_ITEM_ID_MARKER_ID, Long.MIN_VALUE);
-					final long tourId = itemObject.optLong(JSON_ITEM_ID_TOUR_ID, Long.MIN_VALUE);
+               final long markerId = itemObject.optLong(JSON_ITEM_ID_MARKER_ID, Long.MIN_VALUE);
+               final long tourId = itemObject.optLong(JSON_ITEM_ID_TOUR_ID, Long.MIN_VALUE);
 
-					runnable = new Runnable() {
-						@Override
-						public void run() {
+               runnable = new Runnable() {
+                  @Override
+                  public void run() {
 
-							if (itemObject.optBoolean(JSON_ITEM_IS_TOUR)) {
+                     if (itemObject.optBoolean(JSON_ITEM_IS_TOUR)) {
 
-								hrefAction_Tour_Select(new SelectionTourId(tourId));
+                        hrefAction_Tour_Select(new SelectionTourId(tourId));
 
-							} else if (itemObject.optBoolean(JSON_ITEM_IS_MARKER)) {
+                     } else if (itemObject.optBoolean(JSON_ITEM_IS_MARKER)) {
 
-								hrefAction_Marker(SearchMgr.ACTION_SELECT_MARKER, tourId, markerId);
+                        hrefAction_Marker(SearchMgr.ACTION_SELECT_MARKER, tourId, markerId);
 
-							} else if (itemObject.optBoolean(JSON_ITEM_IS_WAYPOINT)) {
+                     } else if (itemObject.optBoolean(JSON_ITEM_IS_WAYPOINT)) {
 
-								hrefAction_WayPoint(tourId, markerId);
-							}
-						}
-					};
-				}
+                        hrefAction_WayPoint(tourId, markerId);
+                     }
+                  }
+               };
+            }
 
-			} else {
+         } else {
 
-				// multiple items are selected
+            // multiple items are selected
 
-				// !!! currently only multiple tours are supported !!!
+            // !!! currently only multiple tours are supported !!!
 
-				final ArrayList<Long> tourIds = new ArrayList<>();
+            final ArrayList<Long> tourIds = new ArrayList<>();
 
-				for (final Object item : jsonSelectedItems) {
+            for (final Object item : jsonSelectedItems) {
 
-					if (item instanceof JSONObject) {
+               if (item instanceof JSONObject) {
 
-						final JSONObject itemObject = (JSONObject) item;
+                  final JSONObject itemObject = (JSONObject) item;
 
-						if (itemObject.optBoolean(JSON_ITEM_IS_TOUR)) {
+                  if (itemObject.optBoolean(JSON_ITEM_IS_TOUR)) {
 
-							final long tourId = itemObject.optLong(JSON_ITEM_ID_TOUR_ID, Long.MIN_VALUE);
+                     final long tourId = itemObject.optLong(JSON_ITEM_ID_TOUR_ID, Long.MIN_VALUE);
 
-							tourIds.add(tourId);
-						}
-					}
-				}
+                     tourIds.add(tourId);
+                  }
+               }
+            }
 
-				final int numTours = tourIds.size();
+            final int numTours = tourIds.size();
 
-				if (numTours > 0) {
+            if (numTours > 0) {
 
-					runnable = new Runnable() {
-						@Override
-						public void run() {
+               runnable = new Runnable() {
+                  @Override
+                  public void run() {
 
-							final ISelection selection = numTours == 1 //
+                     final ISelection selection = numTours == 1 //
 
-									// it is possible that only 1 tour and other items are selected
-									? new SelectionTourId(tourIds.get(0))
+                           // it is possible that only 1 tour and other items are selected
+                           ? new SelectionTourId(tourIds.get(0))
 
-									: new SelectionTourIds(tourIds);
+                           : new SelectionTourIds(tourIds);
 
-							hrefAction_Tour_Select(selection);
-						}
-					};
-				}
-			}
+                     hrefAction_Tour_Select(selection);
+                  }
+               };
+            }
+         }
 
-			// run in UI thread
-			if (runnable != null) {
-				Display.getDefault().asyncExec(runnable);
-			}
-		}
-	}
+         // run in UI thread
+         if (runnable != null) {
+            Display.getDefault().asyncExec(runnable);
+         }
+      }
+   }
 
-	/**
-	 * Set search options from the web UI.
-	 *
-	 * @param params
-	 * @return
-	 * @throws UnsupportedEncodingException
-	 */
-	private String xhr_SetSearchOptions(final Map<String, Object> params) throws UnsupportedEncodingException {
+   /**
+    * Set search options from the web UI.
+    *
+    * @param params
+    * @return
+    * @throws UnsupportedEncodingException
+    */
+   private String xhr_SetSearchOptions(final Map<String, Object> params) throws UnsupportedEncodingException {
 
-		final JSONObject responceObj = new JSONObject();
+      final JSONObject responceObj = new JSONObject();
 
-		final Object xhrSearchOptions = params.get(XHR_PARAM_SEARCH_OPTIONS);
-		final JSONObject jsonSearchOptions = WEB.parseJSONObject(xhrSearchOptions);
+      final Object xhrSearchOptions = params.get(XHR_PARAM_SEARCH_OPTIONS);
+      final JSONObject jsonSearchOptions = WEB.parseJSONObject(xhrSearchOptions);
 
-		if (jsonSearchOptions.isNull("isRestoreDefaults") == false) { //$NON-NLS-1$
+      if (jsonSearchOptions.isNull("isRestoreDefaults") == false) { //$NON-NLS-1$
 
-			// the action 'Restore Default' is selected in the web UI
+         // the action 'Restore Default' is selected in the web UI
 
-			saveDefaultSearchOption();
-			setInternalSearchOptions();
+         saveDefaultSearchOption();
+         setInternalSearchOptions();
 
-			// set flag that defaults are returned
-			responceObj.put(JSON_IS_SEARCH_OPTIONS_DEFAULT, true);
+         // set flag that defaults are returned
+         responceObj.put(JSON_IS_SEARCH_OPTIONS_DEFAULT, true);
 
-			// create xhr response with default values
-			responceObj.put(JSON_IS_EASE_SEARCHING, STATE_IS_EASE_SEARCHING_DEFAULT);
+         // create xhr response with default values
+         responceObj.put(JSON_IS_EASE_SEARCHING, STATE_IS_EASE_SEARCHING_DEFAULT);
 
-			responceObj.put(JSON_IS_SHOW_CONTENT_ALL, STATE_IS_SHOW_CONTENT_ALL_DEFAULT);
-			responceObj.put(JSON_IS_SHOW_CONTENT_MARKER, STATE_IS_SHOW_CONTENT_MARKER_DEFAULT);
-			responceObj.put(JSON_IS_SHOW_CONTENT_TOUR, STATE_IS_SHOW_CONTENT_TOUR_DEFAULT);
-			responceObj.put(JSON_IS_SHOW_CONTENT_WAYPOINT, STATE_IS_SHOW_CONTENT_WAYPOINT_DEFAULT);
+         responceObj.put(JSON_IS_SHOW_CONTENT_ALL, STATE_IS_SHOW_CONTENT_ALL_DEFAULT);
+         responceObj.put(JSON_IS_SHOW_CONTENT_MARKER, STATE_IS_SHOW_CONTENT_MARKER_DEFAULT);
+         responceObj.put(JSON_IS_SHOW_CONTENT_TOUR, STATE_IS_SHOW_CONTENT_TOUR_DEFAULT);
+         responceObj.put(JSON_IS_SHOW_CONTENT_WAYPOINT, STATE_IS_SHOW_CONTENT_WAYPOINT_DEFAULT);
 
-			responceObj.put(JSON_IS_SHOW_DATE, STATE_IS_SHOW_DATE_DEFAULT);
-			responceObj.put(JSON_IS_SHOW_TIME, STATE_IS_SHOW_TIME_DEFAULT);
-			responceObj.put(JSON_IS_SHOW_DESCRIPTION, STATE_IS_SHOW_DESCRIPTION_DEFAULT);
-			responceObj.put(JSON_IS_SHOW_ITEM_NUMBER, STATE_IS_SHOW_ITEM_NUMBER_DEFAULT);
-			responceObj.put(JSON_IS_SHOW_LUCENE_ID, STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT);
+         responceObj.put(JSON_IS_SHOW_DATE, STATE_IS_SHOW_DATE_DEFAULT);
+         responceObj.put(JSON_IS_SHOW_TIME, STATE_IS_SHOW_TIME_DEFAULT);
+         responceObj.put(JSON_IS_SHOW_DESCRIPTION, STATE_IS_SHOW_DESCRIPTION_DEFAULT);
+         responceObj.put(JSON_IS_SHOW_ITEM_NUMBER, STATE_IS_SHOW_ITEM_NUMBER_DEFAULT);
+         responceObj.put(JSON_IS_SHOW_LUCENE_ID, STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT);
 
-			responceObj.put(JSON_IS_SORT_BY_DATE_ASCENDING, STATE_IS_SORT_DATE_ASCENDING_DEFAULT);
+         responceObj.put(JSON_IS_SORT_BY_DATE_ASCENDING, STATE_IS_SORT_DATE_ASCENDING_DEFAULT);
 
-		} else {
+      } else {
 
-			// update state
+         // update state
 
-			state.put(STATE_IS_EASE_SEARCHING, jsonSearchOptions.getBoolean(JSON_IS_EASE_SEARCHING));
+         state.put(STATE_IS_EASE_SEARCHING, jsonSearchOptions.getBoolean(JSON_IS_EASE_SEARCHING));
 
-			state.put(STATE_IS_SHOW_CONTENT_ALL, jsonSearchOptions.getBoolean(JSON_IS_SHOW_CONTENT_ALL));
-			state.put(STATE_IS_SHOW_CONTENT_MARKER, jsonSearchOptions.getBoolean(JSON_IS_SHOW_CONTENT_MARKER));
-			state.put(STATE_IS_SHOW_CONTENT_TOUR, jsonSearchOptions.getBoolean(JSON_IS_SHOW_CONTENT_TOUR));
-			state.put(STATE_IS_SHOW_CONTENT_WAYPOINT, jsonSearchOptions.getBoolean(JSON_IS_SHOW_CONTENT_WAYPOINT));
+         state.put(STATE_IS_SHOW_CONTENT_ALL, jsonSearchOptions.getBoolean(JSON_IS_SHOW_CONTENT_ALL));
+         state.put(STATE_IS_SHOW_CONTENT_MARKER, jsonSearchOptions.getBoolean(JSON_IS_SHOW_CONTENT_MARKER));
+         state.put(STATE_IS_SHOW_CONTENT_TOUR, jsonSearchOptions.getBoolean(JSON_IS_SHOW_CONTENT_TOUR));
+         state.put(STATE_IS_SHOW_CONTENT_WAYPOINT, jsonSearchOptions.getBoolean(JSON_IS_SHOW_CONTENT_WAYPOINT));
 
-			state.put(STATE_IS_SHOW_DATE, jsonSearchOptions.getBoolean(JSON_IS_SHOW_DATE));
-			state.put(STATE_IS_SHOW_TIME, jsonSearchOptions.getBoolean(JSON_IS_SHOW_TIME));
-			state.put(STATE_IS_SHOW_DESCRIPTION, jsonSearchOptions.getBoolean(JSON_IS_SHOW_DESCRIPTION));
-			state.put(STATE_IS_SHOW_ITEM_NUMBER, jsonSearchOptions.getBoolean(JSON_IS_SHOW_ITEM_NUMBER));
-			state.put(STATE_IS_SHOW_LUCENE_DOC_ID, jsonSearchOptions.getBoolean(JSON_IS_SHOW_LUCENE_ID));
+         state.put(STATE_IS_SHOW_DATE, jsonSearchOptions.getBoolean(JSON_IS_SHOW_DATE));
+         state.put(STATE_IS_SHOW_TIME, jsonSearchOptions.getBoolean(JSON_IS_SHOW_TIME));
+         state.put(STATE_IS_SHOW_DESCRIPTION, jsonSearchOptions.getBoolean(JSON_IS_SHOW_DESCRIPTION));
+         state.put(STATE_IS_SHOW_ITEM_NUMBER, jsonSearchOptions.getBoolean(JSON_IS_SHOW_ITEM_NUMBER));
+         state.put(STATE_IS_SHOW_LUCENE_DOC_ID, jsonSearchOptions.getBoolean(JSON_IS_SHOW_LUCENE_ID));
 
-			state.put(STATE_IS_SORT_DATE_ASCENDING, jsonSearchOptions.getBoolean(JSON_IS_SORT_BY_DATE_ASCENDING));
+         state.put(STATE_IS_SORT_DATE_ASCENDING, jsonSearchOptions.getBoolean(JSON_IS_SORT_BY_DATE_ASCENDING));
 
-			setInternalSearchOptions();
+         setInternalSearchOptions();
 
-			// create xhr response
-			responceObj.put(JSON_IS_SEARCH_OPTIONS_DEFAULT, false);
-		}
+         // create xhr response
+         responceObj.put(JSON_IS_SEARCH_OPTIONS_DEFAULT, false);
+      }
 
-		return responceObj.toString();
-	}
+      return responceObj.toString();
+   }
 
 }

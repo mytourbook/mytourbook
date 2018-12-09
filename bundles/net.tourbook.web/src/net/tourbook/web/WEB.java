@@ -56,7 +56,11 @@ public class WEB {
     * {@value #WEB_CONTENT_DEVELOPMENT_FOLDER} folder otherwise it is delivered from the
     * {@value #WEB_CONTENT_RELEASE_FOLDER} folder.
     */
-   static boolean IS_DEBUG = false;
+   static boolean            IS_DEBUG         = true;
+
+   public static UIFramework UI_FRAMEWORK     = UIFramework.Vue;
+
+   static String             DEFAULT_LANGUAGE = "en";            //$NON-NLS-1$
 
    /*
     * It is very complicated to support testing for language translators, therefore it is currently
@@ -64,32 +68,42 @@ public class WEB {
     */
 //	static boolean									IS_DEBUG_NLS								= true;
 
-   static String                        DEFAULT_LANGUAGE                       = "en";                                            //$NON-NLS-1$
-
    /**
     * Supported languages.
     */
-   static String[]                      SUPPORTED_LANGUAGES                    =
+   static String[]            SUPPORTED_LANGUAGES =
          {
-               "cs",                                                                                                              //$NON-NLS-1$
-               "de",                                                                                                              //$NON-NLS-1$
+               "cs",                                                           //$NON-NLS-1$
+               "de",                                                           //$NON-NLS-1$
                DEFAULT_LANGUAGE,
-               "es",                                                                                                              //$NON-NLS-1$
-               "fr",                                                                                                              //$NON-NLS-1$
-               "it",                                                                                                              //$NON-NLS-1$
-               "nl"                                                                                                               //$NON-NLS-1$
+               "es",                                                           //$NON-NLS-1$
+               "fr",                                                           //$NON-NLS-1$
+               "it",                                                           //$NON-NLS-1$
+               "nl"                                                            //$NON-NLS-1$
          };
 
-   static final String                  DEBUG_PATH_DOJO                        = "C:/E/js-resources/dojo/";                       //$NON-NLS-1$
-//   private static final String          DEBUG_PATH_XUL_RUNNER                  = "C:/E/XULRunner/";                               //$NON-NLS-1$
-//   private static final String          DEBUG_PATH_FIREBUG_LITE                = "/WebContent-firebug-lite";                      //$NON-NLS-1$
+   static final String        DEBUG_PATH_DOJO     = "C:/E/js-resources/dojo/"; //$NON-NLS-1$
 
-   public static final String           PROTOCOL_HTTP                          = "http://";                                       //$NON-NLS-1$
+   public static final String PROTOCOL_HTTP       = "http://";                 //$NON-NLS-1$
 
-   static final String                  DOJO_TOOLKIT_FOLDER                    = "/MyTourbook-DojoToolkit";                       //$NON-NLS-1$
+   static final String        DOJO_TOOLKIT_FOLDER = "/MyTourbook-DojoToolkit"; //$NON-NLS-1$
 
-   private static final String          WEB_CONTENT_DEVELOPMENT_FOLDER         = "/WebContent-dev";                               //$NON-NLS-1$
-   private static final String          WEB_CONTENT_RELEASE_FOLDER             = "/WebContent-rel";                               //$NON-NLS-1$
+// SET_FORMATTING_OFF
+
+   private static final String WEB_CONTENT_DEVELOPMENT_FOLDER =
+
+                 UI_FRAMEWORK.equals(UIFramework.Dojo) ?    "/WebContent-dev"
+               : UI_FRAMEWORK.equals(UIFramework.Vue) ?     "/WebContent_Vue-dev"
+               : "";
+
+   private static final String WEB_CONTENT_RELEASE_FOLDER =
+
+                 UI_FRAMEWORK.equals(UIFramework.Dojo) ?    "/WebContent-rel"
+               : UI_FRAMEWORK.equals(UIFramework.Vue) ?     "/WebContent_Vue-rel"
+               : "";
+
+// SET_FORMATTING_ON
+
    private static final String          RESOURCE_PATH                          = "/tourbook/resources/";                          //$NON-NLS-1$
 
    /**
@@ -102,22 +116,23 @@ public class WEB {
    public static final String           UTF_8                                  = "UTF-8";                                         //$NON-NLS-1$
 
    private static final String          URL_SPACE                              = " ";                                             //$NON-NLS-1$
+
    private static final String          URL_SPACE_REPLACEMENT                  = "%20";                                           //$NON-NLS-1$
    private static final String          URL_SQB_OPEN                           = "\\[";                                           //$NON-NLS-1$
    private static final String          URL_SQB_OPEN_REPLACEMENT               = "%5B";                                           //$NON-NLS-1$
    private static final String          URL_SQB_CLOSE                          = "\\]";                                           //$NON-NLS-1$
    private static final String          URL_SQB_CLOSE_REPLACEMENT              = "%5D";                                           //$NON-NLS-1$
-
    public static final String           HTML_ELEMENT_BR                        = "<br>";                                          //$NON-NLS-1$
 
    public static final String           RESPONSE_HEADER_ACCEPT_LANGUAGE        = "Accept-Language";                               //$NON-NLS-1$
+
    private static final String          RESPONSE_HEADER_CONTENT_ENCODING       = "Content-Encoding";                              //$NON-NLS-1$
    public static final String           RESPONSE_HEADER_CONTENT_RANGE          = "Content-Range";                                 //$NON-NLS-1$
    public static final String           RESPONSE_HEADER_CONTENT_TYPE           = "Content-Type";                                  //$NON-NLS-1$
-
    private static final String          CONTENT_ENCODING_GZIP                  = "gzip";                                          //$NON-NLS-1$
 
    private static final String          CONTENT_TYPE_APPLICATION_JAVASCRIPT    = "application/javascript";                        //$NON-NLS-1$
+
    public static final String           CONTENT_TYPE_APPLICATION_JSON          = "application/json";                              //$NON-NLS-1$
    private static final String          CONTENT_TYPE_APPLICATION_X_JAVASCRIPT  = "application/x-javascript; charset=UTF-8";       //$NON-NLS-1$
    private static final String          CONTENT_TYPE_IMAGE_GIF                 = "image/gif";                                     //$NON-NLS-1$
@@ -127,8 +142,8 @@ public class WEB {
    private static final String          CONTENT_TYPE_TEXT_CSS                  = "text/css";                                      //$NON-NLS-1$
    private static final String          CONTENT_TYPE_TEXT_HTML                 = "text/html";                                     //$NON-NLS-1$
    private static final String          CONTENT_TYPE_UNKNOWN                   = "application/octet-stream";                      //$NON-NLS-1$
-
    private static final String          FILE_EXTENSION_CSS                     = "css";                                           //$NON-NLS-1$
+
    private static final String          FILE_EXTENSION_GIF                     = "gif";                                           //$NON-NLS-1$
    private static final String          FILE_EXTENSION_HTML                    = "html";                                          //$NON-NLS-1$
    private static final String          FILE_EXTENSION_ICO                     = "ico";                                           //$NON-NLS-1$
@@ -137,7 +152,6 @@ public class WEB {
    private static final String          FILE_EXTENSION_JS                      = "js";                                            //$NON-NLS-1$
    private static final String          FILE_EXTENSION_MAP                     = "map";                                           //$NON-NLS-1$
    private static final String          FILE_EXTENSION_PNG                     = "png";                                           //$NON-NLS-1$
-
    /**
     * This file extension is for HTML pages which contain variable replacements, processed in
     * {@link ReplacingOutputStream}.
@@ -145,11 +159,15 @@ public class WEB {
    public static final String           FILE_EXTENSION_MTHTML                  = "mthtml";                                        //$NON-NLS-1$
 
    public static final String           STATE_EXTERNAL_WEB_BROWSER             = "STATE_EXTERNAL_WEB_BROWSER";                    //$NON-NLS-1$
+
    public static final String           STATE_EXTERNAL_WEB_BROWSER_DEFAULT     = UI.EMPTY_STRING;
    public static final String           STATE_USE_EXTERNAL_WEB_BROWSER         = "STATE_USE_EXTERNAL_WEB_BROWSER";                //$NON-NLS-1$
    public static final boolean          STATE_USE_EXTERNAL_WEB_BROWSER_DEFAULT = false;
-
    private static final IDialogSettings _state                                 = Activator.getState(WEB.class.getCanonicalName());
+
+   public static enum UIFramework {
+      Dojo, Vue
+   }
 
    /**
     * Converts Java newline into HTML newline.
