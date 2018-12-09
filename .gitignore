@@ -4,6 +4,7 @@ target/
 repositories/
 **/build/
 **/tmp/
+**/node_modules/
 
 .apt_generated
 
