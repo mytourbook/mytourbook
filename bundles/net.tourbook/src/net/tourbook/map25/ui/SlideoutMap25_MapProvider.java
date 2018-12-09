@@ -251,6 +251,12 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
       for (final Map25Provider map25Provider : allEnabledMapProviders) {
          _comboMapProvider.add(map25Provider.name);
       }
+      
+      /*
+       * Reselect map provider
+       */
+      final Map25Provider currentMapProvider = getUsedMapProvider();
+      selectMapProvider(currentMapProvider);
    }
 
    private Map25Provider getSelectedMapProvider() {
@@ -429,7 +435,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
          final Map25Provider map25Provider = _allEnabledMapProvider.get(providerIndex);
          if (mapProvider.equals(map25Provider)) {
-
+            
             _isInUpdateUI = true;
             {
                _comboMapProvider.select(providerIndex);
