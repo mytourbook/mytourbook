@@ -105,7 +105,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 	private static String	_mf_mapFilePath = null;
 	private static String	_mf_themeFilePath = null;
 	private static String	_mf_theme_styleID = null;
-	private static Boolean	_mf_offline_IsThemeFromFile = null;	
+	private Boolean	_mf_offline_IsThemeFromFile = null;	
 
 	private static Map25View		_map25View;
 	private static LwjglApplication	_lwjglApp;
@@ -405,8 +405,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		
 		else {  //is mapsforge map
 			System.out.println("####### loadtheme: is mf map setting textscale " +   _mf_TextScale);
+			System.out.println("####### loadtheme: is mf map IsThemeFileFromFile " +  _mf_offline_IsThemeFromFile);
 			mMap.clearMap();
-			if (_selectedMapProvider.offline_IsThemeFromFile) { //external theme
+			if (_mf_offline_IsThemeFromFile) { //external theme
 				CanvasAdapter.textScale = _mf_TextScale;
 				mMap.setTheme(new ExternalRenderTheme(_mf_themeFilePath, new XmlRenderThemeMenuCallback() {
 					@Override
@@ -751,6 +752,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 			_layer_BaseMap.setTileSource(tileSource);
 			_mf_mapFilePath = checkFile(mapProvider.offline_MapFilepath);
 
+
 /*			mMap.layers().remove(_layer_Building);
 			mMap.layers().remove(_layer_mf_S3DB_Building); // removing both, if switching from one mf to another mf
 			_layer_mf_S3DB_Building = new S3DBLayer(mMap,_layer_BaseMap);
@@ -774,7 +776,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 				
 				_mf_themeFilePath = checkFile(mapProvider.offline_ThemeFilepath);
 				_mf_theme_styleID = mapProvider.offline_ThemeStyle;
-				_mf_offline_IsThemeFromFile = true;
+				this._mf_offline_IsThemeFromFile = true;
 		
 				if (_mf_themeFilePath == null) {
 					System.out.println("############# setMapProvider: Theme not found: " + _mf_mapFilePath + " using default OSMARENDER");
@@ -837,7 +839,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 
 		setupMap_Layers();
 
-		mMap.setTheme(getTheme(mapProvider));
+		//mMap.setTheme(getTheme(mapProvider));
+		mMap.setTheme((ThemeFile) Map25ProviderManager.getDefaultTheme(TileEncoding.VTM));
 
 		/**
 		 * Map Viewport
@@ -947,23 +950,16 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 
 		// building Block II
 		_layer_Building = new BuildingLayer(mMap, _layer_BaseMap);
-		//if(!_is_mf_Map) {
 			_layer_Building.setEnabled(false);
-		//	layers.remove(_layer_mf_S3DB_Building);
 			layers.add(_layer_Building);
-		//}
 		
-		// S3DB Block II
-		_layer_mf_S3DB_Building = new S3DBLayer(mMap,_l);
-		//_layer_mf_S3DB_Building = new S3DBLayer(mMap,_layer_BaseMap);
+		// S3DB Block II, S3DB is complicate -> removed
+		/*_layer_mf_S3DB_Building = new S3DBLayer(mMap,_l);
 		if(_is_mf_Map) {
-			//_layer_mf_S3DB = new S3DBLayer(mMap,_mf_VectorTileLayer_S3DB);
 			_layer_mf_S3DB_Building.setEnabled(true);
 			System.out.println("############ setupMaplayer: adding S3DBlayer ");
-			//_mf_VectorTileLayer_S3DB.setRenderTheme(_mf_IRenderTheme);
-			//layers.remove(_layer_Building);
 			layers.add(_layer_mf_S3DB_Building);
-		}
+		}*/
 
 		// label
 		_layer_Label = new LabelLayerMT(mMap, _layer_BaseMap);
