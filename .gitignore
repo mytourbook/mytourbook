@@ -3,6 +3,7 @@ bin
 target/
 repositories/
 **/build/
+**/node_modules/
 **/tmp/
 
 .apt_generated

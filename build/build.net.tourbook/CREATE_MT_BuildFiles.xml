@@ -67,6 +67,7 @@
 				<exclude name="**/bin/**" />
 				<exclude name="**/classes/**" />
 				<exclude name="**/testFiles/**" />
+				<exclude name="**/node_modules/**" />
 
 				<!-- ignore empty files -->
 				<size value="0" when="more" />

@@ -1,54 +1,60 @@
-Version 18.12.0                                                   ?. December 2018
-
-*************************************************** ALL *************************************************** 
-
- !!! Tour database cannot be opened with the OLD version of MyTourbook !!! 
-
-*************************************************** ALL *************************************************** 
+Version 18.12.0                                        11. December 2018
 
 
+This is VERY important
+======================
+Create a BACKUP of your tour data BEFORE you start version 18.12
 
-*************************************************** DEVELOPER *************************************************** 
+Why ?
 
- * Updated java formatter
- * Renamed apache + geclipse plugins
-
-*************************************************** DEVELOPER *************************************************** 
-
-
-New
-===
-
-* Tour segmenter for surfing	
-  The surfing speed depends on the speed smoothing algorithm, according are the surfing events recognized or not.
-  The smoothing algorithm can create speed value peeks which also can influence the surfing event recognition.
-  Peeks can occure when there are missing distance values, e.g. when there was no GPS signal in a wave or underwater.
-
-* Import Suunto Spartan/9 files, contributed by Frederic
+Version 18.12 will upgrade the tour database to a new database version. 
+After this is done, there is NO possibility to open the tour database 
+with an older version of MyTourbook.
 
 
+New I
+=====	
+
+* Surfing
+  - Tour Segmenter
+    Segmenter for surfing, converts the whole tour into surfing segments
+  - Tour Book View
+    Additional surfing columns
+
+ 
+New II 	
+======
+
+* Import Suunto Spartan/9 Files
+  Provided by Frederic Bard
+ 
+ 
 Improvements
-============
+============	
 
-* Tour fulltext is updated when tour/marker/waypoint is modified/added/deleted
-  The "Search Tours" view is NOT updated automatically, this needs to be done manually either by entering a MODIFIED search text or changing the "Search Options" otherwise the view is not updated. 
-  Updating this view automatically would need some UI adjustments but this UI will be deprecated later on and is now in the maintanance mode.
-  The fulltext index can be deleted (when MyTourbook is closed), it will be recreated when the "Search Tours" view is opened. 
+* Search Tours
+  The tour fulltext index is now updated when a tour/marker/waypoint is 
+  modified/added/deleted.
+
+  The Search Tours  view is NOT updated automatically, this needs to be 
+  done manually either by entering a modified search text or changing 
+  the Search Options.
+
+  An automatically update of this view would need some UI adjustments, 
+  however this UI will be deprecated later on and is being replaced with
+  a new UI, therefor it is now in maintanance mode.
+ 
 
 * Map 2D
-  Increased max zoom level 18 -> 19
+  Increased max zoom level 18 -> 19 for the default map (OpenStreetMap)
 
-* Tour Info 
-  Show all internal data of a tour
  
+* Tour Info View
+  Shows all internal fiels for a tour
+
  
-Bugfix 	
+System 	
 ======
 
-* 
-
-System	
-======
-
-* Derby database 10.14.2 
-  Lucene fulltext search engine 7.5.0
+* Derby database 10.14.2
+* Lucene fulltext search engine 7.5.0
