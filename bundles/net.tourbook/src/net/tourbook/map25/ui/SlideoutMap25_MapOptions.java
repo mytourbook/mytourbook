@@ -59,6 +59,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 	 */
 	private Button				_chkShowLayer_Building;
 	//private Button				_chkShowLayer_S3DB;
+	private Button				_chkShowLayer_Hillshading;
 	private Button				_chkShowLayer_TileInfo;
 	private Button				_chkShowLayer_BaseMap;
 	private Button				_chkShowLayer_Scale;
@@ -167,6 +168,15 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 	//		_chkShowLayer_S3DB = new Button(group, SWT.CHECK);
 	//		_chkShowLayer_S3DB.setText("Advanced Builings");
 	//		_chkShowLayer_S3DB.addSelectionListener(_layerSelectionListener);
+				;
+			}
+			{
+			/*
+			 * Hillshading
+			 */
+			_chkShowLayer_Hillshading = new Button(group, SWT.CHECK);
+			_chkShowLayer_Hillshading.setText("Hillshading");
+			_chkShowLayer_Hillshading.addSelectionListener(_layerSelectionListener);
 				;
 			}			
 			{
@@ -289,7 +299,8 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
 		mapApp.getLayer_BaseMap().setEnabled(_chkShowLayer_BaseMap.getSelection());
 		mapApp.getLayer_Building().setEnabled(_chkShowLayer_Building.getSelection());
-		//mapApp.getLayer_S3DB().setEnabled(_chkShowLayer_S3DB.getSelection());		
+		//mapApp.getLayer_S3DB().setEnabled(_chkShowLayer_S3DB.getSelection());
+		mapApp.getLayer_HillShading().setEnabled(_chkShowLayer_Hillshading.getSelection());
 		mapApp.getLayer_Label().setEnabled(_chkShowLayer_Label.getSelection());
 		mapApp.getLayer_TileInfo().setEnabled(_chkShowLayer_TileInfo.getSelection());
 		mapApp.getLayer_ScaleBar().setEnabled(_chkShowLayer_Scale.getSelection());
@@ -303,7 +314,8 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
 		_chkShowLayer_BaseMap.setSelection(mapApp.getLayer_BaseMap().isEnabled());
 		_chkShowLayer_Building.setSelection(mapApp.getLayer_Building().isEnabled());
-		//_chkShowLayer_S3DB.setSelection(mapApp.getLayer_S3DB().isEnabled());		
+		//_chkShowLayer_S3DB.setSelection(mapApp.getLayer_S3DB().isEnabled());
+		_chkShowLayer_Hillshading.setSelection(mapApp.getLayer_HillShading().isEnabled());
 		_chkShowLayer_Label.setSelection(mapApp.getLayer_Label().isEnabled());
 		_chkShowLayer_TileInfo.setSelection(mapApp.getLayer_TileInfo().isEnabled());
 		_chkShowLayer_Scale.setSelection(mapApp.getLayer_ScaleBar().isEnabled());
