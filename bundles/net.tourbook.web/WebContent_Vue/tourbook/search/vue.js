@@ -3,6 +3,7 @@
  * (c) 2014-2018 Evan You
  * Released under the MIT License.
  */
+/*eslint-disable no-extra-parens, quotes, semi, no-shadow, no-else-return, no-implicit-coercion, no-unused-params, no-undef-expression, no-invalid-this, no-param-reassign, curly, no-eq-null, no-use-before-define, no-extend-native, no-undef, no-unused-vars, radix, no-new-func*/
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
 	typeof define === 'function' && define.amd ? define(factory) :

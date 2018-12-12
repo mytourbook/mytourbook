@@ -3,7 +3,7 @@
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry including="**/*.java|**/*.properties" kind="src" path="WebContent-dev"/>
-	<classpathentry kind="src" path="WebContent_Vue-dev"/>
+	<classpathentry kind="src" path="WebContent_Vue"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
 		<attributes>
 			<attribute name="module" value="true"/>
