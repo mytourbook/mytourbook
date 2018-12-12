@@ -334,7 +334,8 @@ public class TourDatabase {
    private int                                   _dbVersionAfterUpdate;
 
    private boolean                               _isDerbyEmbedded;
-   private boolean                               _isChecked_DbUpgraded;
+   private boolean                               _isChecked_DbUpgraded_Before;
+   private boolean                               _isChecked_DbUpgraded_After;
    private boolean                               _isChecked_DbCreated;
 
    /**
@@ -3379,7 +3380,7 @@ public class TourDatabase {
 
       final String dbUrl = DERBY_URL;
 
-      logDriverManagerGetConnection(dbUrl);
+      logDriverManager_GetConnection(dbUrl);
 
       return DriverManager.getConnection(dbUrl, TABLE_SCHEMA, TABLE_SCHEMA);
    }
@@ -3542,7 +3543,7 @@ public class TourDatabase {
       System.out.println(NLS.bind(Messages.Tour_Database_Update, dbVersion));
    }
 
-   private void logDriverManagerGetConnection(final String dbUrl) {
+   private void logDriverManager_GetConnection(final String dbUrl) {
 
       StatusUtil.logInfo("Derby command executed: " + dbUrl); //$NON-NLS-1$
    }
@@ -3637,7 +3638,7 @@ public class TourDatabase {
                   return;
                }
 
-               sqlInit_80_Check_DbIsUpgraded(monitor);
+               sqlInit_80_Check_DbIsUpgraded_After(monitor);
 
                sqlInit_90_SetupEntityManager(monitor);
 
@@ -3840,7 +3841,7 @@ public class TourDatabase {
 
          final String dbUrl = DERBY_URL + DERBY_URL_COMMAND_CREATE_TRUE;
 
-         logDriverManagerGetConnection(dbUrl);
+         logDriverManager_GetConnection(dbUrl);
 
          conn = DriverManager.getConnection(dbUrl, TABLE_SCHEMA, TABLE_SCHEMA);
 
@@ -3931,13 +3932,7 @@ public class TourDatabase {
       } catch (final SQLException e) {
          UI.showSQLException(e);
       } finally {
-         try {
-            if (conn != null) {
-               conn.close();
-            }
-         } catch (final SQLException e) {
-            UI.showSQLException(e);
-         }
+         Util.closeSql(conn);
       }
    }
 
@@ -3956,17 +3951,18 @@ public class TourDatabase {
          return false;
       }
 
-      Connection conn = null;
+      Connection conn1 = null;
+      Connection conn2 = null;
       Statement stmt1 = null;
       Statement stmt2 = null;
 
       try {
 
-         conn = getConnection_Simple();
+         conn1 = getConnection_Simple();
          {
             String sql = "SELECT * FROM " + TABLE_DB_VERSION; //$NON-NLS-1$
 
-            stmt1 = conn.createStatement();
+            stmt1 = conn1.createStatement();
             final ResultSet result = stmt1.executeQuery(sql);
 
             if (result.next()) {
@@ -3976,11 +3972,13 @@ public class TourDatabase {
                _dbVersionBeforeUpdate = result.getInt(1);
                _dbVersionAfterUpdate = _dbVersionBeforeUpdate;
 
-               StatusUtil.logInfo("Database version: " + _dbVersionBeforeUpdate); //$NON-NLS-1$
+               StatusUtil.logInfo("Current database version: " + _dbVersionBeforeUpdate); //$NON-NLS-1$
 
                if (_dbVersionBeforeUpdate < TOURBOOK_DB_VERSION) {
 
-                  if (updateDbDesign(conn, _dbVersionBeforeUpdate, monitor) == false) {
+                  conn2 = sqlInit_70_Check_DbIsUpgraded_Before(_dbVersionBeforeUpdate, monitor);
+
+                  if (updateDbDesign(conn2, _dbVersionBeforeUpdate, monitor) == false) {
                      return false;
                   }
 
@@ -4005,7 +4003,7 @@ public class TourDatabase {
                sql = "INSERT INTO " + TABLE_DB_VERSION //								//$NON-NLS-1$
                      + " VALUES (" + Integer.toString(TOURBOOK_DB_VERSION) + ")"; //			//$NON-NLS-1$ //$NON-NLS-2$
 
-               stmt2 = conn.createStatement();
+               stmt2 = conn1.createStatement();
                stmt2.executeUpdate(sql);
             }
          }
@@ -4024,7 +4022,8 @@ public class TourDatabase {
 
       } finally {
 
-         Util.closeSql(conn);
+         Util.closeSql(conn1);
+         Util.closeSql(conn2);
          Util.closeSql(stmt1);
          Util.closeSql(stmt2);
       }
@@ -4032,27 +4031,50 @@ public class TourDatabase {
       return _isVersionChecked;
    }
 
-   private void sqlInit_80_Check_DbIsUpgraded(final IProgressMonitor monitor) {
+   /**
+    * Check BEFORE the data structure is modified otherwise this can fail when a new feature is use,
+    * e.g. BOOLEAN
+    *
+    * @param dbVersionBeforeUpdate
+    * @param monitor
+    * @return
+    */
+   private Connection sqlInit_70_Check_DbIsUpgraded_Before(final int dbVersionBeforeUpdate, final IProgressMonitor monitor) {
 
-      if (_isChecked_DbUpgraded) {
-         return;
+      if (_isChecked_DbUpgraded_Before) {
+
+         Connection conn = null;
+         try {
+            conn = getConnection_Simple();
+         } catch (final SQLException e) {
+            UI.showSQLException(e);
+         }
+         return conn;
       }
 
       boolean isUpgradeNeeded = false;
 
-      if (_dbVersionBeforeUpdate < 26 && _dbVersionAfterUpdate >= 26) {
+      if (dbVersionBeforeUpdate < 36) {
 
-         // db version 26: update to derby 10.11.1.1 to implement text search with lucene
+         // db version 36: update to derby 10.14.2 to use BOOLEAN datatype
 
          isUpgradeNeeded = true;
       }
 
-      if (!isUpgradeNeeded) {
+      if (isUpgradeNeeded == false) {
 
-         _isChecked_DbUpgraded = true;
+         _isChecked_DbUpgraded_Before = true;
 
-         return;
+         Connection conn = null;
+         try {
+            conn = getConnection_Simple();
+         } catch (final SQLException e) {
+            UI.showSQLException(e);
+         }
+         return conn;
       }
+
+      StatusUtil.logInfo(String.format("DB upgrade BEFORE is needed %d", _dbVersionBeforeUpdate));
 
       Connection conn = null;
 
@@ -4064,7 +4086,7 @@ public class TourDatabase {
          // shutdown database that all connections are closed, THIS WILL ALWAYS CREATE AN EXCEPTION
          final String dbUrl_ShutDown = DERBY_URL + DERBY_URL_COMMAND_SHUTDOWN_TRUE;
 
-         logDriverManagerGetConnection(dbUrl_ShutDown);
+         logDriverManager_GetConnection(dbUrl_ShutDown);
 
          conn = DriverManager.getConnection(dbUrl_ShutDown, TABLE_SCHEMA, TABLE_SCHEMA);
 
@@ -4086,13 +4108,94 @@ public class TourDatabase {
 
          final String dbUrl_Upgrade = DERBY_URL + DERBY_URL_COMMAND_UPGRADE_TRUE;
 
-         logDriverManagerGetConnection(dbUrl_Upgrade);
+         logDriverManager_GetConnection(dbUrl_Upgrade);
 
          monitor.subTask(Messages.Database_Monitor_UpgradeDatabase);
 
          conn = DriverManager.getConnection(dbUrl_Upgrade, TABLE_SCHEMA, TABLE_SCHEMA);
 
-         _isChecked_DbUpgraded = true;
+         _isChecked_DbUpgraded_Before = true;
+
+      } catch (final SQLException e) {
+         UI.showSQLException(e);
+      } finally {
+         Util.closeSql(conn);
+      }
+
+      /*
+       * Return simple connection
+       */
+      try {
+         conn = getConnection_Simple();
+      } catch (final SQLException e) {
+         UI.showSQLException(e);
+      }
+      return conn;
+   }
+
+   private void sqlInit_80_Check_DbIsUpgraded_After(final IProgressMonitor monitor) {
+
+      if (_isChecked_DbUpgraded_After) {
+         return;
+      }
+
+      boolean isUpgradeNeeded = false;
+
+      if (_dbVersionBeforeUpdate < 26 && _dbVersionAfterUpdate >= 26) {
+
+         // db version 26: update to derby 10.11.1.1 to implement text search with lucene
+
+         isUpgradeNeeded = true;
+      }
+
+      if (isUpgradeNeeded == false) {
+
+         _isChecked_DbUpgraded_After = true;
+
+         return;
+      }
+
+      StatusUtil.logInfo(String.format("DB upgrade AFTER is needed %d -> %d", _dbVersionBeforeUpdate, _dbVersionAfterUpdate));
+
+      Connection conn = null;
+
+      /*
+       * Shutdown db
+       */
+      try {
+
+         // shutdown database that all connections are closed, THIS WILL ALWAYS CREATE AN EXCEPTION
+         final String dbUrl_ShutDown = DERBY_URL + DERBY_URL_COMMAND_SHUTDOWN_TRUE;
+
+         logDriverManager_GetConnection(dbUrl_ShutDown);
+
+         conn = DriverManager.getConnection(dbUrl_ShutDown, TABLE_SCHEMA, TABLE_SCHEMA);
+
+      } catch (final SQLException e) {
+
+         final String sqlExceptionText = Util.getSQLExceptionText(e);
+
+         // log also the stacktrace
+         StatusUtil.log(sqlExceptionText + Util.getStackTrace(e));
+
+      } finally {
+         Util.closeSql(conn);
+      }
+
+      /*
+       * Upgrade database
+       */
+      try {
+
+         final String dbUrl_Upgrade = DERBY_URL + DERBY_URL_COMMAND_UPGRADE_TRUE;
+
+         logDriverManager_GetConnection(dbUrl_Upgrade);
+
+         monitor.subTask(Messages.Database_Monitor_UpgradeDatabase);
+
+         conn = DriverManager.getConnection(dbUrl_Upgrade, TABLE_SCHEMA, TABLE_SCHEMA);
+
+         _isChecked_DbUpgraded_After = true;
 
       } catch (final SQLException e) {
          UI.showSQLException(e);
@@ -6709,6 +6812,8 @@ public class TourDatabase {
       final String sql = "UPDATE " + TABLE_DB_VERSION + " SET VERSION=" + newVersion; //$NON-NLS-1$ //$NON-NLS-2$
 
       conn.createStatement().executeUpdate(sql);
+
+      StatusUtil.logInfo("New database version is set: " + newVersion); //$NON-NLS-1$
 
       _dbVersionAfterUpdate = newVersion;
    }
