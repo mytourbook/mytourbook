@@ -37,6 +37,18 @@
       <input v-model="message">
    </div>
 
+   <div id="app-7">
+      <ol>
+         <todo-item v-for="item in groceryList" v-bind:todo="item" v-bind:key="item.id"></todo-item>
+      </ol>
+   </div>
+
+   <div id="components-demo">
+      <button-counter></button-counter>
+   </div>
+
+
+
    <script>
       /*eslint-disable no-unused-vars */
       /*globals Vue */
@@ -94,9 +106,42 @@
       /////////////////////////////////////////////////////////////
 
       Vue.component('todo-item', {
-         template: '<li>This is a todo</li>'
+
+         props: ['todo'],
+         template: '<li>{{ todo.text}}</li>'
       });
 
+      var app7 = new Vue({
+
+         el: '#app-7',
+
+         data: {
+            groceryList: [
+               { id: 0, text: 'Gemüse' },
+               { id: 1, text: 'Käse' },
+               { id: 2, text: 'Anything else' },
+            ]
+         },
+
+         created: function () {
+
+            // `this` points to the vm instance
+            console.log('created() - groceryList is: ' + this.groceryList)
+         }
+      });
+
+      /////////////////////////////////////////////////////////////
+
+      Vue.component('button-counter', {
+
+         data: function () {
+            return { count: 0 }
+         },
+
+         template: '<button v-on:click="count++;">Your clicked me {{count}} time.</button>'
+      })
+
+      new Vue({ el: '#components-demo' })
 
    </script>
 </body>
