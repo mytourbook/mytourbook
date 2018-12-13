@@ -1,0 +1,19 @@
+Version 18.12.1                                        12. December 2018
+
+
+This is VERY important
+======================
+Create a BACKUP of your tour data BEFORE you start version 18.12
+
+Why ?
+
+Version 18.12 will upgrade the tour database to a new database version. 
+After this is done, there is NO possibility to open the tour database 
+with an older version of MyTourbook.
+
+
+Bugfix
+======
+
+* Fixed sql exception
+  Use of 'BOOLEAN' requires database to be upgraded from version 10.5 to version 10.7 or later.
