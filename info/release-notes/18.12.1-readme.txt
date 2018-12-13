@@ -1,4 +1,4 @@
-Version 18.12.1                                        12. December 2018
+Version 18.12.1                                        13. December 2018
 
 
 This is VERY important
@@ -10,6 +10,13 @@ Why ?
 Version 18.12 will upgrade the tour database to a new database version. 
 After this is done, there is NO possibility to open the tour database 
 with an older version of MyTourbook.
+
+
+Translation 	
+===========
+
+* Italian (Doriano Cometto)
+* German
 
 
 Bugfix
