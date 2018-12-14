@@ -93,13 +93,13 @@ public class WEB {
    private static final String WEB_CONTENT_DEVELOPMENT_FOLDER =
 
                  UI_FRAMEWORK.equals(UIFramework.Dojo) ?    "/WebContent-dev"
-               : UI_FRAMEWORK.equals(UIFramework.Vue) ?     "/WebContent_Vue"
+               : UI_FRAMEWORK.equals(UIFramework.Vue) ?     "/WebContent_Vue2"
                : "";
 
    private static final String WEB_CONTENT_RELEASE_FOLDER =
 
                  UI_FRAMEWORK.equals(UIFramework.Dojo) ?    "/WebContent-rel"
-               : UI_FRAMEWORK.equals(UIFramework.Vue) ?     "/WebContent_Vue"
+               : UI_FRAMEWORK.equals(UIFramework.Vue) ?     "/WebContent_Vue2"
                : "";
 
 // SET_FORMATTING_ON
