@@ -104,6 +104,7 @@ public class Map25ProviderManager {
       mapProvider.online_url = "http://opensciencemap.org/tiles/vtm"; //$NON-NLS-1$
       mapProvider.online_TilePath = "/{Z}/{X}/{Y}.vtm"; //$NON-NLS-1$
       mapProvider.tileEncoding = TileEncoding.VTM;
+      mapProvider.theme = VtmThemes.DEFAULT;
       mapProvider.description = Messages.Map25_Provider_OpenScienceMap_Description;
 
       _defaultMapProvider = mapProvider;
@@ -119,14 +120,19 @@ public class Map25ProviderManager {
       final Map25Provider mapProvider = new Map25Provider();
 
       mapProvider.isEnabled = false;
-      mapProvider.name = "Mapsforge"; //$NON-NLS-1$
-      mapProvider.online_url = "C:\\Users\\top\\BTSync\\oruxmaps\\mapfiles\\niedersachsen_V5.map"; //$NON-NLS-1$
-      mapProvider.online_TilePath = "C:\\Users\\top\\BTSync\\oruxmaps\\mapstyles\\ELV4\\Elevate.xml"; //$NON-NLS-1$
+      mapProvider.name = "0_OpenandromapV4Map_OpenandromapTheme_Switzerland"; //$NON-NLS-1$
+      mapProvider.offline_MapFilepath = "C:\\OfflineMaps\\mapfiles\\www.openandromaps.org\\Switzerland_ML.map"; //$NON-NLS-1$
+      mapProvider.offline_ThemeFilepath = "C:\\OfflineMaps\\mapstyles\\www.openandromaps.org\\Elements.xml"; //$NON-NLS-1$
       mapProvider.tileEncoding = TileEncoding.MF;
-      mapProvider.online_ApiKey = "elv-mtb"; //$NON-NLS-1$
-      mapProvider.description = "Mapsforge Offlinemaps, eg. openandromaps.org\n" //$NON-NLS-1$
-            + "url set to absolut mappath eg c:\\maps\\germany.map\n" //$NON-NLS-1$
-            + "tilepath set to absolut themepath eg.: c:\\themes\\Elevate.xml"; //$NON-NLS-1$
+      mapProvider.offline_ThemeStyle = "elv-mtb"; //$NON-NLS-1$
+      mapProvider.description = "This popular maps are made for outdoor."
+      		+ "They shows cycling and higing routes and also contour lines.\n"
+      		+ "In some countries this contour lines are made from ultra precise LIDAR data, rest via strm.\n"
+      		+ "before using, you must download maps and themes\n"
+      		+ "Map: https://www.openandromaps.org/en/downloads/europe\n"
+      		+ "Search youre country, expand the entry via plus sign and select Multilingual Map\n"
+      		+ "Theme: https://www.openandromaps.org/en/legend/elevate-mountain-hike-theme\n"
+      		+ "Search \"Elevate 4\", \"manual download\" and select \"normal version\"";
 
       return mapProvider;
    }

@@ -291,7 +291,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 			_l = mMap.setBaseMap(tileSource);
 			//_l.setRenderTheme(ThemeLoader.load(VtmThemes.DEFAULT));
 			//loadTheme(null);
-			//System.out.println("############# create Layers: " + (_selectedMapProvider.toString()));
+			//System.out.println("############# create Layers: with _selected mapprovider" + (_selectedMapProvider.toString()));
+
 			//mMap.setTheme((ThemeFile) _selectedMapProvider.theme);
 			setupMap(_selectedMapProvider, tileSource);
 			
@@ -403,16 +404,16 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		if (!_is_mf_Map) { // NOT mapsforge
 			System.out.println("####### loadtheme: is online map setting textscale " +   _vtm_TextScale);
 			CanvasAdapter.textScale = _vtm_TextScale;
-			/*
-			if (_selectedMapProvider.theme != null && _selectedMapProvider.theme != VtmThemes.MAPZEN && _selectedMapProvider.theme != VtmThemes.OPENMAPTILES) {
+			// if problems with switching themes via keyboard, maybe this block is the problem
+			/*if (_selectedMapProvider.theme != null && _selectedMapProvider.theme != VtmThemes.MAPZEN && _selectedMapProvider.theme != VtmThemes.OPENMAPTILES) {
 				System.out.println("############# setMapProvider: onlinemap using internal theme: " + _selectedMapProvider.theme);
 				mMap.setTheme((ThemeFile) _selectedMapProvider.theme);			
 			} else { //when null or when not working MAPZEN or OPENMAPTILES is selected, using DEFAULT theme instead
 				System.out.println("############# setMapProvider: onlinemap using internal default theme: " + _selectedMapProvider.theme);
 				mMap.setTheme(VtmThemes.DEFAULT);
-			}
-			mMap.clearMap();*/
-			mMap.updateMap(true);
+			}*/
+			mMap.clearMap();
+			mMap.updateMap(false);
 		}
 		
 		else {  //is mapsforge map
@@ -455,8 +456,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 				}
 				_mf_offline_IsThemeFromFile = false;
 			}
-			mMap.clearMap();
-			mMap.updateMap(true);
+			//mMap.clearMap();
+			mMap.updateMap(false);
 
 		} /* else {  // its online map, but loadtheme is normaly not called than
 			System.out.println("####### loadtheme: is online map setting textscale " +   _vtm_TextScale);
@@ -853,8 +854,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 
 		setupMap_Layers();
 
+		System.out.println("############# setupMap:  mMap.setTheme(getTheme(mapProvider))" + getTheme(mapProvider));
+		//System.out.println("############# setupMap:  Map25ProviderManager.getDefaultTheme(TileEncoding.VTM)" + Map25ProviderManager.getDefaultTheme(TileEncoding.VTM));
 		mMap.setTheme(getTheme(mapProvider));
-		mMap.setTheme((ThemeFile) Map25ProviderManager.getDefaultTheme(TileEncoding.VTM));
+		//mMap.setTheme((ThemeFile) Map25ProviderManager.getDefaultTheme(TileEncoding.VTM));
 
 		/**
 		 * Map Viewport
