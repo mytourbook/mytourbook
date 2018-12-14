@@ -293,10 +293,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 			//loadTheme(null);
 			//System.out.println("############# create Layers: with _selected mapprovider" + (_selectedMapProvider.toString()));
 
-			//mMap.setTheme((ThemeFile) _selectedMapProvider.theme);
-			setupMap(_selectedMapProvider, tileSource);
-			
+			//mMap.setTheme((ThemeFile) _selectedMapProvider.theme); //trying. with this keys 1-5 wont work
 			loadTheme(null);
+			setupMap(_selectedMapProvider, tileSource);
 			
 			System.out.println("############# create Layers: is online map with theme: " + _selectedMapProvider.theme.name());
 		} else {  //mapsforge
@@ -369,8 +368,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 			this._last_offline_IsThemeFromFile = _mf_offline_IsThemeFromFile;
 			*/
 			//setupMap(_selectedMapProvider, tileSource);
+			//mMap.setTheme((ThemeFile) _selectedMapProvider.theme); //trying
 			loadTheme(_mf_theme_styleID);
 			setupMap(_selectedMapProvider, tileSource);
+			
 			System.out.println("############# create Layers: leaving");
 		}
 
@@ -413,7 +414,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 				mMap.setTheme(VtmThemes.DEFAULT);
 			}*/
 			mMap.clearMap();
-			mMap.updateMap(false);
+			mMap.updateMap(true);
 		}
 		
 		else {  //is mapsforge map
@@ -457,7 +458,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 				_mf_offline_IsThemeFromFile = false;
 			}
 			//mMap.clearMap();
-			mMap.updateMap(false);
+			mMap.updateMap(true);
 
 		} /* else {  // its online map, but loadtheme is normaly not called than
 			System.out.println("####### loadtheme: is online map setting textscale " +   _vtm_TextScale);
