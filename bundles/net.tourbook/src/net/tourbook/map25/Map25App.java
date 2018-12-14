@@ -932,10 +932,11 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		System.out.println("################ setupMap_Layers:  entering");
 		final Layers layers = mMap.layers();
 		
-		// hillshading
-		_layer_HillShadingLayer = new BitmapTileLayer(mMap, DefaultSources.HIKEBIKE_HILLSHADE.build(), 4000000);
+		// hillshading with 2MB Cache
+		_layer_HillShadingLayer = new BitmapTileLayer(mMap, DefaultSources.HIKEBIKE_HILLSHADE.build(), 1 << 21);
+		_layer_HillShadingLayer.setEnabled(false);
 		mMap.layers().add(_layer_HillShadingLayer);
-
+		
 		// tour
 		_layer_Tour = new TourLayer(mMap);
 		_layer_Tour.setEnabled(false);
