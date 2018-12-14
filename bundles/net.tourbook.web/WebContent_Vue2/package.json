@@ -1,0 +1,32 @@
+{
+   "name": "webcontent_vue2",
+   "version": "1.0.0",
+   "description": "",
+   "main": "main.js",
+   "author": "",
+   "license": "ISC",
+   
+   "scripts": {
+      "clean": "rimraf dist",
+      "build": "npm run clean && webpack --mode production",
+      "serve": "webpack-dev-server --mode development"
+   },
+   
+   "devDependencies": {
+      "@babel/core": "^7.2.0",
+      "@babel/preset-env": "^7.2.0",
+      "babel-loader": "^8.0.4",
+      "css-loader": "^2.0.0",
+      "html-webpack-plugin": "^3.2.0",
+      "rimraf": "^2.6.2",
+      "vue": "^2.5.21",
+      "vue-loader": "^15.4.2",
+      "vue-style-loader": "^4.1.2",
+      "vue-template-compiler": "^2.5.21",
+      "webpack": "^4.27.1",
+      "webpack-cli": "^3.1.2",
+      "webpack-dev-server": "^3.1.10"
+   },
+   
+   "dependencies": {}
+}

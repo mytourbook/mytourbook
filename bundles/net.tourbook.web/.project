@@ -69,4 +69,15 @@
 		<nature>org.eclipse.wst.common.modulecore.ModuleCoreNature</nature>
 		<nature>org.eclipse.babel.editor.rbeNature</nature>
 	</natures>
+	<filteredResources>
+		<filter>
+			<id>1544775223809</id>
+			<name>WebContent_Vue2</name>
+			<type>26</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-false-node_modules</arguments>
+			</matcher>
+		</filter>
+	</filteredResources>
 </projectDescription>
