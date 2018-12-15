@@ -26,27 +26,27 @@ import de.byteholder.geoclipse.map.UI;
 
 public class Map25Provider implements Cloneable {
 
-   private String         _id;
-   private UUID           _uuid;
+   private String   _id;
+   private UUID     _uuid;
 
-   public boolean         isEnabled;
-   public boolean         isDefault;
+   public boolean   isEnabled;
+   public boolean   isDefault;
 
    /**
     *
     */
-   public boolean         isOfflineMap;
+   public boolean   isOfflineMap;
 
-   public String          name        = UI.EMPTY_STRING;
-   public String          description = UI.EMPTY_STRING;
+   public String    name        = UI.EMPTY_STRING;
+   public String    description = UI.EMPTY_STRING;
 
    /**
     * Requires that {@link #isOfflineMap} is <code>true</code> which is setting the theme filepath
     * {@link #offline_ThemeFilepath}
     */
-   public boolean         offline_IsThemeFromFile;
+   public boolean   offline_IsThemeFromFile;
 
-   public Enum<VtmThemes> theme;
+   public VtmThemes theme;
 
    /*
     * Online map provider
@@ -72,8 +72,7 @@ public class Map25Provider implements Cloneable {
 
    public Map25Provider() {
 
-      _uuid = UUID.randomUUID();
-      _id = _uuid.toString();
+      setUUID();
    }
 
    /**
@@ -183,6 +182,12 @@ public class Map25Provider implements Cloneable {
    public int hashCode() {
 
       return _uuid.hashCode();
+   }
+
+   public void setUUID() {
+
+      _uuid = UUID.randomUUID();
+      _id = _uuid.toString();
    }
 
    @Override

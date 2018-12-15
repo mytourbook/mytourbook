@@ -71,9 +71,9 @@ public class Map25ProviderManager {
    private static final String                             ATTR_OFFLINE_THEME_FILEPATH     = "Offline_ThemeFilepath";                  //$NON-NLS-1$
    private static final String                             ATTR_OFFLINE_THEME_STYLE        = "Offline_ThemeStyle";                     //$NON-NLS-1$
 
-   private static final String                             ATTR_ONLINE_API_KEY            = "Online_APIKey";                          //$NON-NLS-1$
-   private static final String                             ATTR_ONLINE_TILE_PATH          = "Online_TilePath";                        //$NON-NLS-1$
-   private static final String                             ATTR_ONLINE_URL                = "Online_Url";                             //$NON-NLS-1$
+   private static final String                             ATTR_ONLINE_API_KEY             = "Online_APIKey";                          //$NON-NLS-1$
+   private static final String                             ATTR_ONLINE_TILE_PATH           = "Online_TilePath";                        //$NON-NLS-1$
+   private static final String                             ATTR_ONLINE_URL                 = "Online_Url";                             //$NON-NLS-1$
 
    private static boolean                                  _isDebugViewVisible;
    private static Map25DebugView                           _map25DebugView;
@@ -126,13 +126,13 @@ public class Map25ProviderManager {
       mapProvider.tileEncoding = TileEncoding.MF;
       mapProvider.offline_ThemeStyle = "elv-mtb"; //$NON-NLS-1$
       mapProvider.description = "This popular maps are made for outdoor."
-      		+ "They shows cycling and higing routes and also contour lines.\n"
-      		+ "In some countries this contour lines are made from ultra precise LIDAR data, rest via strm.\n"
-      		+ "before using, you must download maps and themes\n"
-      		+ "Map: https://www.openandromaps.org/en/downloads/europe\n"
-      		+ "Search youre country, expand the entry via plus sign and select Multilingual Map\n"
-      		+ "Theme: https://www.openandromaps.org/en/legend/elevate-mountain-hike-theme\n"
-      		+ "Search \"Elevate 4\", \"manual download\" and select \"normal version\"";
+            + "They shows cycling and higing routes and also contour lines.\n"
+            + "In some countries this contour lines are made from ultra precise LIDAR data, rest via strm.\n"
+            + "before using, you must download maps and themes\n"
+            + "Map: https://www.openandromaps.org/en/downloads/europe\n"
+            + "Search youre country, expand the entry via plus sign and select Multilingual Map\n"
+            + "Theme: https://www.openandromaps.org/en/legend/elevate-mountain-hike-theme\n"
+            + "Search \"Elevate 4\", \"manual download\" and select \"normal version\"";
 
       return mapProvider;
    }
@@ -327,9 +327,13 @@ public class Map25ProviderManager {
                   }
 // SET_FORMATTING_ON
 
+                  final boolean isOfflineThemeFromFile = mapProvider.isOfflineMap && mapProvider.offline_IsThemeFromFile;
                   final TileEncoding tileEncoding = (TileEncoding) Util.getXmlEnum(xml, ATTR_TILE_ENCODING, TileEncoding.VTM);
+
                   mapProvider.tileEncoding = tileEncoding;
-                  mapProvider.theme = Util.getXmlEnum(xml, ATTR_THEME, getDefaultTheme(tileEncoding));
+                  mapProvider.theme = isOfflineThemeFromFile
+                        ? null
+                        : (VtmThemes) Util.getXmlEnum(xml, ATTR_THEME, getDefaultTheme(tileEncoding));
 
                   System.out.println("################## Name, Url and online_TilePath: " + mapProvider.name + " " + mapProvider.online_url //$NON-NLS-1$//$NON-NLS-2$
                         + mapProvider.online_TilePath);

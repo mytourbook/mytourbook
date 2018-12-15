@@ -126,12 +126,13 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
    private Composite _pageMaps_Online;
    private Composite _pageMaps_Offline;
    //
-   private Button    _btnAddProvider;
-   private Button    _btnCancel;
-   private Button    _btnDeleteProvider;
-   private Button    _btnOffline_MapFile;
-   private Button    _btnOffline_ThemeFile;
-   private Button    _btnUpdateProvider;
+   private Button    _btnOffline_Browse_MapFile;
+   private Button    _btnOffline_Browse_ThemeFile;
+   private Button    _btnProvider_Add;
+   private Button    _btnProvider_Cancel;
+   private Button    _btnProvider_Copy;
+   private Button    _btnProvider_Delete;
+   private Button    _btnProvider_Update;
    //
    private Button    _chkIsMapProviderEnabled;
    //
@@ -340,7 +341,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
       layoutContainer.setLayout(tableLayout);
       GridDataFactory.fillDefaults()
             .grab(true, true)
-            .hint(700, convertHeightInCharsToPixels(10))
+            .hint(700, convertHeightInCharsToPixels(20))
             .applyTo(layoutContainer);
 
       /*
@@ -403,13 +404,13 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
             /*
              * Button: Add
              */
-            _btnAddProvider = new Button(container, SWT.NONE);
-            _btnAddProvider.setText(Messages.App_Action_Add);
-            setButtonLayoutData(_btnAddProvider);
-            _btnAddProvider.addSelectionListener(new SelectionAdapter() {
+            _btnProvider_Add = new Button(container, SWT.NONE);
+            _btnProvider_Add.setText(Messages.App_Action_Add);
+            setButtonLayoutData(_btnProvider_Add);
+            _btnProvider_Add.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
-                  onProvider_Add();
+                  onProvider_Add(new Map25Provider());
                }
             });
          }
@@ -417,13 +418,27 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
             /*
              * Button: Delete
              */
-            _btnDeleteProvider = new Button(container, SWT.NONE);
-            _btnDeleteProvider.setText(Messages.App_Action_Delete);
-            setButtonLayoutData(_btnDeleteProvider);
-            _btnDeleteProvider.addSelectionListener(new SelectionAdapter() {
+            _btnProvider_Delete = new Button(container, SWT.NONE);
+            _btnProvider_Delete.setText(Messages.App_Action_Delete);
+            setButtonLayoutData(_btnProvider_Delete);
+            _btnProvider_Delete.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
                   onProvider_Delete();
+               }
+            });
+         }
+         {
+            /*
+             * Button: Copy
+             */
+            _btnProvider_Copy = new Button(container, SWT.NONE);
+            _btnProvider_Copy.setText(Messages.App_Action_Copy);
+            setButtonLayoutData(_btnProvider_Copy);
+            _btnProvider_Copy.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onProvider_Copy();
                }
             });
          }
@@ -448,6 +463,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
             /*
              * Checkbox: Is enabled
              */
+
             // spacer
             new Label(container, SWT.NONE);
 
@@ -637,16 +653,16 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
                   /*
                    * Button: browse...
                    */
-                  _btnOffline_MapFile = new Button(containerMapFile, SWT.PUSH);
-                  _btnOffline_MapFile.setText(Messages.app_btn_browse);
-                  _btnOffline_MapFile.addSelectionListener(new SelectionAdapter() {
+                  _btnOffline_Browse_MapFile = new Button(containerMapFile, SWT.PUSH);
+                  _btnOffline_Browse_MapFile.setText(Messages.app_btn_browse);
+                  _btnOffline_Browse_MapFile.addSelectionListener(new SelectionAdapter() {
                      @Override
                      public void widgetSelected(final SelectionEvent e) {
                         onSelect_MapFilename();
                      }
                   });
-                  GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_btnOffline_MapFile);
-                  setButtonLayoutData(_btnOffline_MapFile);
+                  GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_btnOffline_Browse_MapFile);
+                  setButtonLayoutData(_btnOffline_Browse_MapFile);
                }
             }
          }
@@ -672,16 +688,16 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
                   /*
                    * Button: browse...
                    */
-                  _btnOffline_ThemeFile = new Button(containerThemeFile, SWT.PUSH);
-                  _btnOffline_ThemeFile.setText(Messages.app_btn_browse);
-                  _btnOffline_ThemeFile.addSelectionListener(new SelectionAdapter() {
+                  _btnOffline_Browse_ThemeFile = new Button(containerThemeFile, SWT.PUSH);
+                  _btnOffline_Browse_ThemeFile.setText(Messages.app_btn_browse);
+                  _btnOffline_Browse_ThemeFile.addSelectionListener(new SelectionAdapter() {
                      @Override
                      public void widgetSelected(final SelectionEvent e) {
                         onSelect_ThemeFilename();
                      }
                   });
-                  GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_btnOffline_ThemeFile);
-                  setButtonLayoutData(_btnOffline_ThemeFile);
+                  GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_btnOffline_Browse_ThemeFile);
+                  setButtonLayoutData(_btnOffline_Browse_ThemeFile);
                }
             }
          }
@@ -715,29 +731,29 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
             /*
              * Button: Update
              */
-            _btnUpdateProvider = new Button(container, SWT.NONE);
-            _btnUpdateProvider.setText(Messages.app_action_update);
-            _btnUpdateProvider.addSelectionListener(new SelectionAdapter() {
+            _btnProvider_Update = new Button(container, SWT.NONE);
+            _btnProvider_Update.setText(Messages.app_action_update);
+            _btnProvider_Update.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
                   onProvider_Update();
                }
             });
-            setButtonLayoutData(_btnUpdateProvider);
+            setButtonLayoutData(_btnProvider_Update);
          }
          {
             /*
              * Button: Cancel
              */
-            _btnCancel = new Button(container, SWT.NONE);
-            _btnCancel.setText(Messages.App_Action_Cancel);
-            _btnCancel.addSelectionListener(new SelectionAdapter() {
+            _btnProvider_Cancel = new Button(container, SWT.NONE);
+            _btnProvider_Cancel.setText(Messages.App_Action_Cancel);
+            _btnProvider_Cancel.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
                   onProvider_Cancel();
                }
             });
-            setButtonLayoutData(_btnCancel);
+            setButtonLayoutData(_btnProvider_Cancel);
 
 //				final GridData gd = (GridData) _btnCancel.getLayoutData();
 //				gd.verticalAlignment = SWT.BOTTOM;
@@ -830,9 +846,18 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
             @Override
             public void update(final ViewerCell cell) {
 
-               final Enum<VtmThemes> theme = ((Map25Provider) cell.getElement()).theme;
+               final Map25Provider mapProvider = (Map25Provider) cell.getElement();
 
-               cell.setText(theme == null ? UI.EMPTY_STRING : theme.name());
+               final Enum<VtmThemes> theme = mapProvider.theme;
+               final boolean isOfflineFromFile = mapProvider.isOfflineMap && mapProvider.offline_IsThemeFromFile;
+
+               cell.setText(isOfflineFromFile
+
+                     ? Messages.Pref_Map25_Provider_Theme_FromThemeFile
+
+                     : theme == null
+                           ? UI.EMPTY_STRING
+                           : theme.name());
             }
          });
          tableLayout.setColumnData(tc, new ColumnWeightData(3, minWidth));
@@ -929,21 +954,24 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
       final boolean isEnabled = _selectedMapProvider.isEnabled || _chkIsMapProviderEnabled.getSelection();
       final boolean isNew = _newProvider != null;
       final boolean canEdit = isEnabled || isNew;
+      final boolean isNotModified = !_isMapProviderModified;
 
       final boolean isDefaultProvider = _selectedMapProvider.isDefault;
       final boolean isCustomProvider = isDefaultProvider == false;
 
       final boolean isValid = validateData();
 
-      _mapProviderViewer.getTable().setEnabled(!_isMapProviderModified && isValid);
+      _mapProviderViewer.getTable().setEnabled(isNotModified && isValid);
 
-      _btnAddProvider.setEnabled(!_isMapProviderModified && isValid);
-      _btnDeleteProvider.setEnabled(isCustomProvider && isSelected && !isNew && !_isMapProviderModified);
+      _btnProvider_Add.setEnabled(isNotModified && isValid);
+      _btnProvider_Delete.setEnabled(isNotModified && isSelected && isCustomProvider && !isNew);
+      _btnProvider_Cancel.setEnabled(_isMapProviderModified);
+      _btnProvider_Copy.setEnabled(isNotModified && isSelected);
+      _btnProvider_Update.setEnabled(_isMapProviderModified && isValid);
+      _btnProvider_Update.setText(isNew ? Messages.App_Action_UpdateNew : Messages.app_action_update);
 
-      _btnCancel.setEnabled(_isMapProviderModified);
-      _btnOffline_MapFile.setEnabled(canEdit);
-      _btnOffline_ThemeFile.setEnabled(canEdit);
-      _btnUpdateProvider.setEnabled(_isMapProviderModified && isValid);
+      _btnOffline_Browse_MapFile.setEnabled(canEdit);
+      _btnOffline_Browse_ThemeFile.setEnabled(canEdit);
 
       _chkIsMapProviderEnabled.setEnabled(isCustomProvider && (isSelected || isNew));
 
@@ -971,6 +999,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
       _txtOnline_TilePath.setEnabled(canEdit);
       _txtTileUrl.setEnabled(canEdit);
       _txtOnline_Url.setEnabled(canEdit);
+
    }
 
    private int getEncodingIndex(final TileEncoding tileEncoding) {
@@ -1015,7 +1044,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
       return _allTileEncoding[selectedIndex];
    }
 
-   private Enum<VtmThemes> getSelectedTheme(final boolean isOfflineMap, final TileEncoding tileEncoding) {
+   private VtmThemes getSelectedTheme(final boolean isOfflineMap, final TileEncoding tileEncoding) {
 
       final VtmThemes[] themeValues = VtmThemes.values();
 
@@ -1123,9 +1152,9 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
       return super.okToLeave();
    }
 
-   private void onProvider_Add() {
+   private void onProvider_Add(final Map25Provider map25Provider) {
 
-      _newProvider = new Map25Provider();
+      _newProvider = map25Provider;
 
       _newProvider.isEnabled = true;
 
@@ -1148,6 +1177,19 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
       enableControls();
 
       _mapProviderViewer.getTable().setFocus();
+   }
+
+   private void onProvider_Copy() {
+
+      final Map25Provider clonedMapProvider = (Map25Provider) _selectedMapProvider.clone();
+
+      // make the clone unique
+      clonedMapProvider.setUUID();
+
+      // set a unique name
+      clonedMapProvider.name = clonedMapProvider.getId().substring(0, 4) + UI.DASH_WITH_DOUBLE_SPACE + _selectedMapProvider.name;
+
+      onProvider_Add(clonedMapProvider);
    }
 
    private void onProvider_Delete() {
@@ -1462,7 +1504,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
 
       mapProvider.isOfflineMap = isOfflineMap;
 
-      final Enum<VtmThemes> selectedTheme = getSelectedTheme(isOfflineMap, tileEncoding);
+      final VtmThemes selectedTheme = getSelectedTheme(isOfflineMap, tileEncoding);
 
       if (isOfflineMap) {
 
