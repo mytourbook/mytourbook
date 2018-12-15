@@ -122,15 +122,20 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 
 	private BuildingLayer			_layer_Building;
 	private S3DBLayer					_layer_mf_S3DB_Building;
-	private BitmapTileLayer			 _layer_HillShadingLayer = null;
+	
+	/**
+	 * The opacity can be set in the layer but not read. This will keep the state of the hillshading opacity.
+	 */
+   private int                   _layer_HillShading_Opacity;
 	
 	private LabelLayerMT				_layer_Label;
 	private MarkerLayer				_layer_Marker;
+	private BitmapTileLayer			_layer_HillShading;
 	private MapScaleBarLayer		_layer_ScaleBar;
-	private TileGridLayerMT			_layer_TileInfo;
-	private TourLayer					_layer_Tour;
 	private SliderLocation_Layer	_layer_SliderLocation;
 	private SliderPath_Layer		_layer_SliderPath;
+	private TileGridLayerMT			_layer_TileInfo;
+	private TourLayer					_layer_Tour;
 
 	private OkHttpFactoryMT			_httpFactory;
 
@@ -524,9 +529,13 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 	}
 	
 	public BitmapTileLayer getLayer_HillShading() {
-		return _layer_HillShadingLayer;
+		return _layer_HillShading;
 	}
-
+	
+	public int getLayer_HillShading_Opacity() {
+      return _layer_HillShading_Opacity;
+   }
+	
 	public LabelLayerMT getLayer_Label() {
 		return _layer_Label;
 	}
@@ -718,6 +727,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		_state.put(STATE_MAP_POS_TILT + stateSuffixName, mapPosition.tilt);
 		_state.put(STATE_MAP_POS_ZOOM_LEVEL + stateSuffixName, mapPosition.zoomLevel);
 	}
+
+	public void setLayer_HillShading_Opacity(int layer_HillShading_Opacity) {
+      _layer_HillShading_Opacity = layer_HillShading_Opacity;
+   }  
 
 	public void setMapProvider(final Map25Provider mapProvider) {
 
@@ -937,9 +950,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		final Layers layers = mMap.layers();
 		
 		// hillshading with 2MB Cache
-		_layer_HillShadingLayer = new BitmapTileLayer(mMap, DefaultSources.HIKEBIKE_HILLSHADE.build(), 1 << 21);
-		_layer_HillShadingLayer.setEnabled(false);
-		mMap.layers().add(_layer_HillShadingLayer);
+		_layer_HillShading = new BitmapTileLayer(mMap, DefaultSources.HIKEBIKE_HILLSHADE.build(), 1 << 21);
+		_layer_HillShading.setEnabled(false);
+		mMap.layers().add(_layer_HillShading);
 		
 		// tour
 		_layer_Tour = new TourLayer(mMap);
@@ -1069,7 +1082,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		//System.out.println("############ check file:  file_path: " +  file.getAbsolutePath());
 		//return file;
 		return file.getAbsolutePath();
-	}	
-
+	}
 
 }
