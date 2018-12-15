@@ -40,6 +40,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.map25.Map25App;
 import net.tourbook.map25.Map25Provider;
 import net.tourbook.map25.Map25ProviderManager;
 import net.tourbook.map25.Map25View;
@@ -251,7 +252,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
       for (final Map25Provider map25Provider : allEnabledMapProviders) {
          _comboMapProvider.add(map25Provider.name);
       }
-      
+
       /*
        * Reselect map provider
        */
@@ -380,11 +381,14 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
          mapProvider.theme = themeValues[themeIndex];
       }
 
-
       Map25ProviderManager.saveMapProvider();
 
       // update UI
       updateUI_Theme_Style(mapProvider);
+
+      // update UI otherwise the old theme style box is displayed until the next redraw
+      _parent.update();
+
       updateMap(mapProvider);
    }
 
@@ -395,12 +399,27 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
       }
 
       final Map25Provider mapProvider = getSelectedMapProvider();
+
       final List<MapsforgeThemeStyle> mfStyles = mapProvider.getThemeStyles(false);
 
-      final int selectedStyleIndex = _comboThemeStyle.getSelectionIndex();
+      int selectedStyleIndex = _comboThemeStyle.getSelectionIndex();
+      String selectedThemeStyle;
+
+      if (selectedStyleIndex == 0) {
+
+         // first item is "All Styles"
+         selectedThemeStyle = Map25App.THEME_STYLE_ALL;
+
+      } else {
+
+         // mfStyles do not contain "All Styles" !!!
+         selectedStyleIndex--;
+
+         selectedThemeStyle = mfStyles.get(selectedStyleIndex).getXmlLayer();
+      }
 
       // update model
-      mapProvider.offline_ThemeStyle = mfStyles.get(selectedStyleIndex).getXmlLayer();
+      mapProvider.offline_ThemeStyle = selectedThemeStyle;
 
       Map25ProviderManager.saveMapProvider();
 
@@ -435,7 +454,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
          final Map25Provider map25Provider = _allEnabledMapProvider.get(providerIndex);
          if (mapProvider.equals(map25Provider)) {
-            
+
             _isInUpdateUI = true;
             {
                _comboMapProvider.select(providerIndex);
@@ -604,11 +623,11 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
       }
 
       /*
-       * Fill combo with all styles
+       * Fill combo with all available styles
        */
 
-      _lblThemeStyle.setEnabled(true);
-      _comboThemeStyle.setEnabled(true);
+      // first item is "All Styles"
+      _comboThemeStyle.add(Messages.Pref_Map25_Provider_ThemeStyle_Info_All);
 
       int styleSelectIndex = 0;
 
@@ -619,9 +638,12 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
          _comboThemeStyle.add(mfStyle.getLocaleName());
 
          if (mfStyle.getXmlLayer().equals(mapProvider.offline_ThemeStyle)) {
-            styleSelectIndex = styleIndex;
+            styleSelectIndex = styleIndex + 1;
          }
       }
+
+      _lblThemeStyle.setEnabled(true);
+      _comboThemeStyle.setEnabled(true);
 
       _comboThemeStyle.getParent().layout(true, true);
 
