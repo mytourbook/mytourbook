@@ -71,9 +71,9 @@
 	</natures>
 	<filteredResources>
 		<filter>
-			<id>1544775223809</id>
-			<name>WebContent_Vue2</name>
-			<type>26</type>
+			<id>1544952888309</id>
+			<name></name>
+			<type>30</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
 				<arguments>1.0-name-matches-false-false-node_modules</arguments>
