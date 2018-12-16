@@ -4,7 +4,7 @@
       alt="Vue logo"
       src="./assets/logo.png"
     >
-    <HelloWorld msg="MT with Vue AND hotreplacement !!!" />
+    <HelloWorld msg="MT with Vue AND hotreplacement, very cool auch mit Umlaute äöü" />
   </div>
 </template>
 
