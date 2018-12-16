@@ -60,7 +60,7 @@ public class WEB {
 
    public static UIFramework UI_FRAMEWORK     = UIFramework.Vue;
 
-   static String             DEFAULT_LANGUAGE = "en";            //$NON-NLS-1$
+   static String             DEFAULT_LANGUAGE = "en";           //$NON-NLS-1$
 
    /*
     * It is very complicated to support testing for language translators, therefore it is currently
@@ -88,18 +88,21 @@ public class WEB {
 
    static final String        DOJO_TOOLKIT_FOLDER = "/MyTourbook-DojoToolkit"; //$NON-NLS-1$
 
+   public static final String WEB_CONTENT_VUE     = "/tourbook-search-www";
+
 // SET_FORMATTING_OFF
 
-   private static final String WEB_CONTENT_DEVELOPMENT_FOLDER =
+
+   private static final String WEB_CONTENT_DEVELOPMENT_FOLDER  =
 
                  UI_FRAMEWORK.equals(UIFramework.Dojo) ?    "/WebContent-dev"
-               : UI_FRAMEWORK.equals(UIFramework.Vue) ?     "/WebContent_Vue2"
+               : UI_FRAMEWORK.equals(UIFramework.Vue) ?     WEB_CONTENT_VUE
                : "";
 
    private static final String WEB_CONTENT_RELEASE_FOLDER =
 
                  UI_FRAMEWORK.equals(UIFramework.Dojo) ?    "/WebContent-rel"
-               : UI_FRAMEWORK.equals(UIFramework.Vue) ?     "/WebContent_Vue2"
+               : UI_FRAMEWORK.equals(UIFramework.Vue) ?     WEB_CONTENT_VUE
                : "";
 
 // SET_FORMATTING_ON

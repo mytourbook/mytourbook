@@ -222,7 +222,8 @@ public class SearchMgr implements XHRHandler {
       SEARCH_URL =
 
             WEB.UI_FRAMEWORK.equals(UIFramework.Dojo) ?  WebContentServer.SERVER_URL + SEARCH_FOLDER + SEARCH_PAGE
-          : WEB.UI_FRAMEWORK.equals(UIFramework.Vue) ?   WebContentServer.SERVER_URL + "/dist/index.html"
+          : WEB.UI_FRAMEWORK.equals(UIFramework.Vue) ?   WebContentServer.SERVER_URL + "/index.html"
+//                C:\DAT\MT\mytourbook\bundles\net.tourbook.web\WebContent_Vue_External\index.html
           : "";
 
       // e.g. ...&action=EditMarker...
