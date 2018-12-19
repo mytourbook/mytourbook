@@ -732,7 +732,8 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
              * Button: Update
              */
             _btnProvider_Update = new Button(container, SWT.NONE);
-            _btnProvider_Update.setText(Messages.app_action_update);
+            // !!! set initially the longest text that the layout is properly !!!
+            _btnProvider_Update.setText(Messages.App_Action_UpdateNew);
             _btnProvider_Update.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
