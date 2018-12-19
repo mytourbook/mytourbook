@@ -1348,6 +1348,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
 
       if (selectedFilepath == null) {
          // dialog is canceled
+         return;
       }
 
       setErrorMessage(null);
