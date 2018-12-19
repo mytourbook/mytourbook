@@ -1239,6 +1239,7 @@ public class Messages extends NLS {
    public static String        Map25_Provider_MapzenVectorTiles_Name;
    public static String        Map25_Provider_MyTileServer_Description;
    public static String        Map25_Provider_MyTileServer_Name;
+   public static String        Map25_Provider_OpenAndoMap_Description;
    public static String        Map25_Provider_OpenScienceMap_Description;
    public static String        Map25_Provider_OpenScienceMap_Name;
 

@@ -4074,7 +4074,7 @@ public class TourDatabase {
          return conn;
       }
 
-      StatusUtil.logInfo(String.format("DB upgrade BEFORE is needed %d", _dbVersionBeforeUpdate));
+      StatusUtil.logInfo(String.format("DB upgrade BEFORE is needed %d", _dbVersionBeforeUpdate)); //$NON-NLS-1$
 
       Connection conn = null;
 
@@ -4155,7 +4155,7 @@ public class TourDatabase {
          return;
       }
 
-      StatusUtil.logInfo(String.format("DB upgrade AFTER is needed %d -> %d", _dbVersionBeforeUpdate, _dbVersionAfterUpdate));
+      StatusUtil.logInfo(String.format("DB upgrade AFTER is needed %d -> %d", _dbVersionBeforeUpdate, _dbVersionAfterUpdate)); //$NON-NLS-1$
 
       Connection conn = null;
 

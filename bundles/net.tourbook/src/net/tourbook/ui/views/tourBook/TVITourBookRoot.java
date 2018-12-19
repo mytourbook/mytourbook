@@ -51,7 +51,7 @@ public class TVITourBookRoot extends TVITourBookItem {
       final String sqlFilterWhereClause = sqlFilter.getWhereClause().trim();
       final boolean isSqlWhereClause = sqlFilterWhereClause.length() > 0;
       final String sqlWhereClause = isSqlWhereClause
-            ? " WHERE 1=1 " + sqlFilterWhereClause + NL
+            ? " WHERE 1=1 " + sqlFilterWhereClause + NL //$NON-NLS-1$
             : UI.EMPTY_STRING;
 
       if (sqlFilter.isTagFilterActive()) {

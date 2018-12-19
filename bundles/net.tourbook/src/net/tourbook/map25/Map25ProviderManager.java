@@ -125,14 +125,7 @@ public class Map25ProviderManager {
       mapProvider.offline_ThemeFilepath = "C:\\OfflineMaps\\mapstyles\\www.openandromaps.org\\Elements.xml"; //$NON-NLS-1$
       mapProvider.tileEncoding = TileEncoding.MF;
       mapProvider.offline_ThemeStyle = "elv-mtb"; //$NON-NLS-1$
-      mapProvider.description = "This popular maps are made for outdoor."
-            + "They shows cycling and higing routes and also contour lines.\n"
-            + "In some countries this contour lines are made from ultra precise LIDAR data, rest via strm.\n"
-            + "before using, you must download maps and themes\n"
-            + "Map: https://www.openandromaps.org/en/downloads/europe\n"
-            + "Search youre country, expand the entry via plus sign and select Multilingual Map\n"
-            + "Theme: https://www.openandromaps.org/en/legend/elevate-mountain-hike-theme\n"
-            + "Search \"Elevate 4\", \"manual download\" and select \"normal version\"";
+      mapProvider.description = Messages.Map25_Provider_OpenAndoMap_Description;
 
       return mapProvider;
    }

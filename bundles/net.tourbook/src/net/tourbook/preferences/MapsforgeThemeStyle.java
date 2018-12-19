@@ -16,7 +16,7 @@ public class MapsforgeThemeStyle {
    private Map<String, String> name            = new HashMap<>();
 
    private String              xmlLayer;
-   private String              defaultlanguage = "en";
+   private String              defaultlanguage = "en"; //$NON-NLS-1$
 
    public String getDefaultLaguage() {
       return defaultlanguage;
@@ -47,7 +47,7 @@ public class MapsforgeThemeStyle {
     */
    public String getName(final String language) {
 
-      if ("default".equals(language)) {
+      if ("default".equals(language)) { //$NON-NLS-1$
          return name.get(defaultlanguage);
       } else if (name.containsKey(language)) {
          return name.get(language);
@@ -86,10 +86,10 @@ public class MapsforgeThemeStyle {
    @Override
    public String toString() {
 
-      return "MapsforgeThemeStyle "
+      return "MapsforgeThemeStyle " //$NON-NLS-1$
 
-            + "xmlLayer=" + xmlLayer + " "
-            + "name= " + name.get(defaultlanguage) + " "
-            + "\n";
+            + "xmlLayer=" + xmlLayer + " " //$NON-NLS-1$ //$NON-NLS-2$
+            + "name= " + name.get(defaultlanguage) + " " //$NON-NLS-1$ //$NON-NLS-2$
+            + "\n"; //$NON-NLS-1$
    }
 }
