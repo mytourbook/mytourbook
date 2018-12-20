@@ -1,7 +1,28 @@
-Version 18.13.0                                        ?. December 2018
+Version 18.13.0                                        22. December 2018
 
 
 New 	
-===========
+===
 
-* 
+* 2.5D Map
+
+  Provided by Thomas Theussing
+
+  * Installed offline maps
+  * Hillshading layer
+
+  Issues which are not yet fixed
+
+    * Switching the map provider/theme/style is sometimes not working 
+      properly depending on the previous selection
+    * Cartography layer can sometimes not be set hidden for installed 
+      offline maps
+
+
+Bugfix   
+======
+
+* Tour Book View
+
+  Fixed propably Apache Derby bug which interchanged rollup row with the
+  last result row when there is no WHERE clause in the SQL statement
