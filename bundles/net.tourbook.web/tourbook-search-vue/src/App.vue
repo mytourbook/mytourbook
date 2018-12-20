@@ -1,41 +1,48 @@
 <template>
+
   <v-app>
-    <v-toolbar app>
-      
-      <v-toolbar-title class="headline text-uppercase">
-        <span>Vuetify</span>
-        <span class="font-weight-light">MATERIAL DESIGN</span>
-      </v-toolbar-title>
-
-      <v-spacer></v-spacer>
-      
-      <v-btn
-        flat
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-      >
-        <span class="mr-2">Latest Release</span>
-      </v-btn>
-    </v-toolbar>
-
-    <v-content>
-      <HelloWorld/>
-    </v-content>
+   <table style="width: 100%">
+      <tr>
+         <td>
+            <div id="domInfo" class="actionIcon iconPhotoTooltip" tabindex="0">&nbsp;</div>
+         </td>
+         <td style="width: 99%; padding-left: 0.2em; padding-right: 0.4em;">
+            <v-autocomplete
+               label="label"
+               :items="items"
+               v-model="value"
+            ></v-autocomplete>
+            <div id="domSearchInput"></div>
+         </td>
+         <td style="margin-right: 0.2em">
+            <div id="domAction_StartSearch"></div>
+         </td>
+         <td>
+            <div id="domAppStatus" style="padding-left: 0.2em;">&nbsp;</div>
+         </td>
+         <td>
+            <div id="domAction_SearchOptions"></div>
+         </td>
+      </tr>
+   </table>
+    <v-container>
+   </v-container>
   </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld'
+
+import HelloWorld from "./components/HelloWorld";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
     HelloWorld
   },
-  data () {
+  data() {
     return {
       //
-    }
+    };
   }
-}
+};
 </script>
