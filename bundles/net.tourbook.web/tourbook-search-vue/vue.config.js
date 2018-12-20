@@ -15,8 +15,11 @@ module.exports = {
       : `http://localhost:${port}/`,
 
    baseUrl: process.env.NODE_ENV === 'production'
-   ? '/' // mess up assetsDir if this is blank
-   : `http://localhost:${port}/`,
+      ? '/' // mess up assetsDir if this is blank
+      : `http://localhost:${port}/`,
+
+   // IE11 support
+   transpileDependencies:[/node_modules[/\\\\]vuetify[/\\\\]/],
 
    lintOnSave: false
 }
