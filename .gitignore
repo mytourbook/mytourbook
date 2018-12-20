@@ -1,10 +1,12 @@
 
 bin
+dist/
 target/
 repositories/
 **/build/
 **/node_modules/
 **/tmp/
+**/node_modules/
 
 .apt_generated
 
