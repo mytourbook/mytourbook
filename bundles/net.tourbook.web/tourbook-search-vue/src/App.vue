@@ -1,33 +1,37 @@
 <template>
 
-  <v-app>
-   <table style="width: 100%">
-      <tr>
-         <td>
-            <div id="domInfo" class="actionIcon iconPhotoTooltip" tabindex="0">&nbsp;</div>
-         </td>
-         <td style="width: 99%; padding-left: 0.2em; padding-right: 0.4em;">
-            <v-autocomplete
-               label="label"
-               :items="items"
-               v-model="value"
-            ></v-autocomplete>
-            <div id="domSearchInput"></div>
-         </td>
-         <td style="margin-right: 0.2em">
-            <div id="domAction_StartSearch"></div>
-         </td>
-         <td>
-            <div id="domAppStatus" style="padding-left: 0.2em;">&nbsp;</div>
-         </td>
-         <td>
-            <div id="domAction_SearchOptions"></div>
-         </td>
-      </tr>
-   </table>
-    <v-container>
-   </v-container>
-  </v-app>
+   <v-app>
+  
+      <table style="width: 100%; xborder:1px solid;">
+         <tr>
+            <td style="width:24px;">
+               <v-tooltip bottom>
+                  <div slot="activator" id="domInfo" class="actionIcon iconPhotoTooltip" tabindex="0">&nbsp;</div>
+                  <span>Tooltip</span>
+               </v-tooltip>
+            </td>
+            <td style="">
+               <v-autocomplete
+                  label="Search Tours, Marker and Waypoints"
+                  :items="items"
+                  v-model="value"
+               ></v-autocomplete>
+               <div id="domSearchInput"></div>
+            </td>
+            <td style="width:24px;">
+               <div slot="activator" id="domActionSearch" class="actionIcon iconSearch" tabindex="10">&nbsp;</div>
+            </td>
+            <td style="width:80px;">
+               <div id="domAppStatus" style="padding-left: 0.2em;">&nbsp;</div>
+            </td>
+            <td style="width:24px;">
+               <div slot="activator" id="domAction_Options" class="actionIcon iconOptions" tabindex="20">&nbsp;</div>
+            </td>
+         </tr>
+      </table>
+      <v-container>
+      </v-container>
+   </v-app>
 </template>
 
 <script>
@@ -35,10 +39,12 @@
 import HelloWorld from "./components/HelloWorld";
 
 export default {
+	
   name: "App",
   components: {
     HelloWorld
   },
+  
   data() {
     return {
       //
@@ -46,3 +52,9 @@ export default {
   }
 };
 </script>
+
+<style> 
+
+@import './assets/search.css'; 
+
+</style> 

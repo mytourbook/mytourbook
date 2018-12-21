@@ -6,7 +6,7 @@ import 'babel-polyfill'
 import 'typeface-roboto'
 
 // material design icons
-import "vue-material-design-icons/styles.css"
+import 'material-design-icons-iconfont/dist/material-design-icons.css' // Ensure you are using css-loader
 
 import Vue from "vue";
 import './plugins/vuetify'

@@ -1,0 +1,19 @@
+
+
+/*
+   Search actions
+*/
+.actionIcon
+{
+   /* set width/height wider than the image -> the focus rubberband looks much better */
+   width:                  20px; 
+   height:                 20px; 
+   background-repeat:      no-repeat;
+   background-position:    center;
+}
+
+.iconOptions {             background-image: url("/$MT-ICON$/options.png");}
+.iconPhotoTooltip {        background-image: url("/$MT-ICON$/photo-tooltip.png");}
+.iconSearch {              background-image: url("/$MT-ICON$/search.png");}
+.iconTourChart {           background-image: url("/$MT-ICON$/tour-chart.png");}
+.iconTourMarker {          background-image: url("/$MT-ICON$/tour-marker.png");}
