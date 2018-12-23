@@ -73,29 +73,28 @@
       <!-- Eclipse 4.8 local repositories -->
    
       <repository>
-         <id>eclipse.platform.4.8</id>                                  <layout>p2</layout>
+         <id>eclipse.platform.4.8</id>                                        <layout>p2</layout>
          <url>jar:file:repositories/org.eclipse.platform-4.8.zip!/</url>
       </repository>
    
       <repository>
-         <id>eclipse.rcp.4.8</id>                                       <layout>p2</layout>
+         <id>eclipse.rcp.4.8</id>                                             <layout>p2</layout>
          <url>jar:file:repositories/org.eclipse.rcp-4.8.zip!/</url>
       </repository>
    
       <repository>
-         <id>eclipse.jdt.4.8</id>                                       <layout>p2</layout>
+         <id>eclipse.jdt.4.8</id>                                             <layout>p2</layout>
          <url>jar:file:repositories/org.eclipse.jdt-4.8.zip!/</url>
       </repository>
    
       <repository>
-         <id>eclipse.pde.4.8</id>                                       <layout>p2</layout>
+         <id>eclipse.pde.4.8</id>                                             <layout>p2</layout>
          <url>jar:file:repositories/org.eclipse.pde-4.8.zip!/</url>
       </repository>
-
       
       <repository>
-         <id>eclipse.3.8.2.nl</id>                                      <layout>p2</layout>
-         <url>file:build/build.eclipse.3.8.2.nl.update-site</url>
+         <id>eclipse.4.8.nl</id>                                              <layout>p2</layout>
+         <url>file:build/build.eclipse.4.8.nl.update-site</url>
       </repository>
 
 

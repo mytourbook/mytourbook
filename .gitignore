@@ -3,10 +3,9 @@ bin
 dist/
 target/
 repositories/
-**/build/
 **/node_modules/
 **/tmp/
-**/node_modules/
+**/*vtm*/**/build/
 
 .apt_generated
 
