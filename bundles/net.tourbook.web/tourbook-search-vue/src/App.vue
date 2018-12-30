@@ -27,6 +27,7 @@
             </td>
             <td style="width:80px;">
                <div id="domAppStatus" style="padding-left: 0.2em;">&nbsp;</div>
+               <div>{{ $t('message.hello') }}</div>
             </td>
             <td style="width:24px;">
                <div slot="activator" id="domAction_Options" class="actionIcon iconOptions" tabindex="4">&nbsp;</div>
@@ -39,36 +40,28 @@
 </template>
 
 <script>
-
-
 export default {
-	
-  name: "App",
-  components: {
+   name: "App",
+   components: {},
 
-  },
-  
-  data: () => ({
+   data: () => ({
+      value: "this is a value",
 
-       value:'this is a value',
+      searchItems: [
+         { itemText: "abc 1", id: 1 },
+         { itemText: "bcd 2", id: 2 },
+         { itemText: "cde 3", id: 3 },
+         { itemText: "def 4", id: 4 }
+      ],
 
-       searchItems: [
-
-          {itemText: 'abc 1', id: 1},
-          {itemText: 'bcd 2', id: 2},
-          {itemText: 'cde 3', id: 3},
-          {itemText: 'def 4', id: 4},
-       ],
-
-       Messages: {
-          Search_App_Text_Search_PlaceHolder : 'Search Tours, Marker and Waypoints'
-       }
-    })
+      Messages: {
+         Search_App_Text_Search_PlaceHolder:
+            "Search Tours, Marker and Waypoints"
+      }
+   })
 };
 </script>
 
 <style>
-
-@import './assets/search.css'; 
-
-</style> 
+@import "./assets/search.css";
+</style>
