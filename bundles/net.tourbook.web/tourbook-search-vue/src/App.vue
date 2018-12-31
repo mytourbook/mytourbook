@@ -1,20 +1,19 @@
 <template>
-
    <v-app>
   
       <table style="width: 100%; xborder:1px solid;">
          <tr>
             <td style="width:24px;">
                <v-tooltip bottom>
-                  <div slot="activator" id="domInfo" class="actionIcon iconPhotoTooltip" tabindex="1">&nbsp;</div>
-                  <div>some text 2</div>
+                  <div slot="activator" id="domInfo" class="actionIcon iconPhotoTooltip" tabindex="1"></div>
+                  <div v-html="$t('message.Search_App_Tooltip')"></div>
                </v-tooltip>
             </td>
             <td style="">
                <v-autocomplete 
-                  :label="Messages.Search_App_Text_Search_PlaceHolder"
-                  :items="searchItems"
-                  item-text="itemText"
+                  :label      ="$t('message.Search_App_Text_Search_PlaceHolder')"
+                  :items      ="searchItems"
+                  item-text   ="itemText"
                   autofocus
 
                   class="no-transition"
@@ -34,13 +33,17 @@
             </td>
          </tr>
       </table>
-      <v-container>
+
+      <v-container> 
       </v-container>
+
    </v-app>
 </template>
 
 <script>
+
 export default {
+
    name: "App",
    components: {},
 

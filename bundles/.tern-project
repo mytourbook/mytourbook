@@ -1,6 +1,7 @@
 {
 	"plugins": {
-		"requirejs": {}
+		"requirejs": {},
+		"node": {}
 	},
 	"ecmaVersion": 6,
 	"libs": [
