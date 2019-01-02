@@ -20,7 +20,7 @@
                   }">
 
                   <div class="popper">
-                     <div v-html="$t('message.Search_App_Tooltip')"></div>
+                     <div v-html="$t('message.Search_App_Tooltip', {hrefLucene: Search_App_Tooltip_Url})"></div>
                   </div>
 
                   <button slot="reference">
@@ -46,7 +46,7 @@
             </td>
             <td style="width:80px;">
                <div id="domAppStatus" style="padding-left: 0.2em;">&nbsp;</div>
-               <div>{{ $t('message.hello') }}</div>
+               <div>{{ $t('message.ftState') }}</div>
             </td>
             <td style="width:24px;">
                <div slot="activator" id="domAction_Options" class="actionIcon iconOptions" tabindex="4">&nbsp;</div>
@@ -62,9 +62,9 @@
 
 <script>
 import VuePopper from 'vue-popperjs'
-// import 'vue-popperjs/dist/css/vue-popper.css';
 
 export default {
+   //
    name: 'App',
 
    components: {
@@ -74,7 +74,17 @@ export default {
    data: () => ({
       value: 'this is a value',
 
-      searchItems: [{ itemText: 'abc 1', id: 1 }, { itemText: 'bcd 2', id: 2 }, { itemText: 'cde 3', id: 3 }, { itemText: 'def 4', id: 4 }]
+      // prettier-ignore
+      searchItems: 
+      [
+         { itemText: 'abc 1', id: 1 }, 
+         { itemText: 'bcd 2', id: 2 }, 
+         { itemText: 'cde 3', id: 3 }, 
+         { itemText: 'def 4', id: 4 },
+      ],
+
+      // long url's are truncated in the Messages editor.
+      Search_App_Tooltip_Url: 'http://lucene.apache.org/core/7_5_0/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#Wildcard_Searches'
    })
 }
 </script>
