@@ -6,10 +6,17 @@
             <td style="width:24px;">
                
                <popper
+                  class="app-tooltip"
                   trigger="hover"
+                  :delay-on-mouse-out=10
+                  :visible-arrow=false
                   :options="{
                      placement: 'bottom',
-                     modifiers: { offset: { offset: '0,0px' } }
+                     modifiers: { 
+                        
+                        offset: { offset: '0, -5px' } ,
+                        flip: { enabled: false }
+                     }
                   }">
 
                   <div class="popper">

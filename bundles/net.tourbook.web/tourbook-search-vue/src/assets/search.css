@@ -3,7 +3,6 @@
 .v-text-field > .v-input__control > .v-input__slot:before,
 .v-text-field > .v-input__control > .v-input__slot:after
 {
-   xxx-webkit-transition:  none; 
    transition:          none; 
 }
 
@@ -24,3 +23,23 @@
 .iconSearch {              background-image: url("/$MT-ICON$/search.png");}
 .iconTourChart {           background-image: url("/$MT-ICON$/tour-chart.png");}
 .iconTourMarker {          background-image: url("/$MT-ICON$/tour-marker.png");}
+
+
+/*
+  App info tooltip
+*/
+.app-tooltip .popper {
+   position:          absolute;
+   background:        #eee;
+   color:             #444;
+   width:             350px;
+   border-radius:     0px;
+   box-shadow:        0 0 2px rgba(0, 0, 0, 0.5);
+   padding:           10px;
+   text-align:        left;
+}
+
+/* Hide popper arrow, have not found a better solution */
+.app-tooltip .popper__arrow {
+   display:          none;
+}
