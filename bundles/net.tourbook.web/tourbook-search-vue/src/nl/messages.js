@@ -1,4 +1,4 @@
-
+// prettier-ignore
 const messages = {
 
    en: {
@@ -12,9 +12,8 @@ const messages = {
       message: {
          Search_App_Text_Search_PlaceHolder                 : 'Touren, Markierungen und Wegpunkte suchen',
          Search_App_Tooltip                                 : '<b>Platzhaltersuche</b><br><br>' + '' + 'Eine Suche kann auch mit * oder ? Platzhalter und anderen Optionen durchgeführt werden.<br><br>' + 'Die Dokumentation darüber findet man in der englischen Beschreibung <a href=\'{0}\'>Lucene query parser description.</a><br><br>' + '' + 'Lucene ist die intern verwendete Suchmaschine.',
-         }
+      }
    },
-
 }
 
 export default messages

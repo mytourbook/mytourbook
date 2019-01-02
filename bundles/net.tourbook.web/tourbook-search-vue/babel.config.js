@@ -1,8 +1,8 @@
 module.exports = {
    presets: [
-      "@vue/app",
+      '@vue/app',
 
       // IE11 support
-      "@babel/preset-env"
+      '@babel/preset-env'
    ]
-};
+}

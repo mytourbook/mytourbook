@@ -4,10 +4,23 @@
       <table style="width: 100%; xborder:1px solid;">
          <tr>
             <td style="width:24px;">
-               <v-tooltip bottom>
-                  <div slot="activator" id="domInfo" class="actionIcon iconPhotoTooltip" tabindex="1"></div>
-                  <div v-html="$t('message.Search_App_Tooltip')"></div>
-               </v-tooltip>
+               
+               <popper
+                  trigger="hover"
+                  :options="{
+                     placement: 'bottom',
+                     modifiers: { offset: { offset: '0,0px' } }
+                  }">
+
+                  <div class="popper">
+                     <div v-html="$t('message.Search_App_Tooltip')"></div>
+                  </div>
+
+                  <button slot="reference">
+                     <div slot="activator" id="domInfo" class="actionIcon iconPhotoTooltip" tabindex="1"></div>
+                  </button>
+
+               </popper>
             </td>
             <td style="">
                <v-autocomplete 
@@ -41,30 +54,24 @@
 </template>
 
 <script>
+import VuePopper from 'vue-popperjs'
+// import 'vue-popperjs/dist/css/vue-popper.css';
 
 export default {
+   name: 'App',
 
-   name: "App",
-   components: {},
+   components: {
+      popper: VuePopper
+   },
 
    data: () => ({
-      value: "this is a value",
+      value: 'this is a value',
 
-      searchItems: [
-         { itemText: "abc 1", id: 1 },
-         { itemText: "bcd 2", id: 2 },
-         { itemText: "cde 3", id: 3 },
-         { itemText: "def 4", id: 4 }
-      ],
-
-      Messages: {
-         Search_App_Text_Search_PlaceHolder:
-            "Search Tours, Marker and Waypoints"
-      }
+      searchItems: [{ itemText: 'abc 1', id: 1 }, { itemText: 'bcd 2', id: 2 }, { itemText: 'cde 3', id: 3 }, { itemText: 'def 4', id: 4 }]
    })
-};
+}
 </script>
 
 <style>
-@import "./assets/search.css";
+@import './assets/search.css';
 </style>
