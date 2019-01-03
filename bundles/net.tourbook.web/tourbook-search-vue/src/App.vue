@@ -5,7 +5,7 @@
          <tr>
             <td style="width:24px;">
                
-               <popper
+               <VuePopper
                   class="app-tooltip"
                   trigger="hover"
                   :delay-on-mouse-out=10
@@ -20,14 +20,14 @@
                   }">
 
                   <div class="popper">
-                     <div v-html="$t('message.Search_App_Tooltip', {hrefLucene: Search_App_Tooltip_Url})"></div>
+                     <div v-html="$t('message.Search_App_Tooltip', [Search_App_Tooltip_Url])"></div>
                   </div>
 
                   <button slot="reference">
                      <div slot="activator" id="domInfo" class="actionIcon iconPhotoTooltip" tabindex="1"></div>
                   </button>
 
-               </popper>
+               </VuePopper>
             </td>
             <td style="">
                <v-autocomplete 
@@ -48,8 +48,9 @@
                <div id="domAppStatus" style="padding-left: 0.2em;">&nbsp;</div>
                <div>{{ $t('message.ftState') }}</div>
             </td>
+            
             <td style="width:24px;">
-               <div slot="activator" id="domAction_Options" class="actionIcon iconOptions" tabindex="4">&nbsp;</div>
+               <SlideoutSearchOptions/>
             </td>
          </tr>
       </table>
@@ -61,18 +62,20 @@
 </template>
 
 <script>
+//
 import VuePopper from 'vue-popperjs'
+import SlideoutSearchOptions from './components/SlideoutSearchOptions'
 
 export default {
    //
    name: 'App',
 
    components: {
-      popper: VuePopper
+      SlideoutSearchOptions,
+      VuePopper,
    },
 
    data: () => ({
-      value: 'this is a value',
 
       // prettier-ignore
       searchItems: 
