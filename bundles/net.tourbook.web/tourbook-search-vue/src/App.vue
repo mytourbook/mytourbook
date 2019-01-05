@@ -19,7 +19,7 @@
                      }
                   }">
 
-                  <div class="popper">
+                  <div class="popper" style="padding:10px;">
                      <div v-html="$t('message.Search_App_Tooltip', [Search_App_Tooltip_Url])"></div>
                   </div>
 

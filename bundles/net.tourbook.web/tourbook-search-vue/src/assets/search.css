@@ -29,17 +29,33 @@
   App info tooltip
 */
 .app-tooltip .popper {
-   position:          absolute;
-   background:        #eee;
-   color:             #444;
-   width:             350px;
+   xposition:          absolute;
+   width:             400px;
+   border:            1px #BBB solid;
    border-radius:     0px;
-   box-shadow:        0 0 2px rgba(0, 0, 0, 0.5);
-   padding:           10px;
+   padding:           0px;
+   background:        #fff;
+   color:             #444;
+   box-shadow:        0 0 0px rgba(0, 0, 0, 0.5);
    text-align:        left;
 }
 
 /* Hide popper arrow, have not found a better solution */
 .app-tooltip .popper__arrow {
    display:          none;
+}
+
+/* Ignore vuetify formatting */
+.app-tooltip .v-subheader
+{
+   padding:          0px;
+   margin:           0px;
+   height:           auto;
+}
+
+/* Ignore vuetify formatting */
+.app-tooltip .v-input
+{
+   padding:          0px;
+   margin:           0px;
 }

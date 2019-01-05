@@ -1,0 +1,228 @@
+<VuePopper
+   class="app-tooltip"
+   trigger="hover"
+   :delay-on-mouse-out=1000000
+   :visible-arrow=false
+   :options="{
+      //
+      placement: 'bottom-end',
+      modifiers: { 
+         
+         offset: { offset: '0, -5px' } ,
+         flip: { enabled: false }
+      }
+   }">
+
+   <button slot="reference">
+      <div slot="activator" id="domAction_Options" class="actionIcon iconOptions" tabindex="4"></div>
+   </button>
+
+   <div class="popper">
+   
+      <v-toolbar dark color="primary"
+         height="30"
+         flat
+      >
+        <v-toolbar-title class="white--text">{{$t('message.Search_Options_Dialog_Header')}}</v-toolbar-title>
+      </v-toolbar>
+   
+
+      <div style="padding:10px; white-space: nowrap;">
+      	
+   		<!-- <div id="domSearchStatus" style="padding-bottom:0.2em;"></div> -->
+   	
+   	
+   		<!-- Group: What should be searched -->
+   		
+         <v-subheader>{{$t('message.Search_Options_Group_Content')}}</v-subheader>
+
+   		<div>
+   			
+   			<!-- Show All (tour, marker, waypoint)-->
+   			
+            <v-checkbox
+               :label="$t('message.Search_Options_Checkbox_ShowContentAll')"
+               hide-details
+               v-model="apChkShowContentAll"
+               @click="apSearchAll"
+            />
+            
+            <v-layout row>
+               
+               <v-checkbox
+                  :label="$t('message.Search_Options_Checkbox_ShowContentTour')"
+                  style="padding-left:2em;"
+                  hide-details
+                  v-model="apChkShowContentTour"
+                  @click="apSelection"
+               />
+
+               <v-checkbox
+                  :label="$t('message.Search_Options_Checkbox_ShowContentMarker')"
+                  hide-details
+                  v-model="apChkShowContentMarker"
+                  @click="apSelection"
+               />
+
+               <v-checkbox
+                  :label="$t('message.Search_Options_Checkbox_ShowContentWaypoint')"
+                  hide-details
+                  v-model="apChkShowContentWaypoint"
+                  @click="apSelection"
+               />
+
+            </v-layout>
+
+   			<!-- Do ease searching -->
+            <v-checkbox
+               :label="$t('message.Search_Options_Checkbox_EaseSearching')"
+               hide-details
+               v-model="apChkEaseSearching"
+               @click="apSelection"
+            />
+   			
+   			<div class="fieldVertSpaceTop">
+   				<input 
+   					type="checkbox" 
+   					id="apChkEaseSearching"
+   					data-dojo-type="dijit/form/CheckBox" 
+   					data-dojo-attach-point="apChkEaseSearching"
+   					data-dojo-attach-event="click:apSelection"/> 
+   				<label 
+   					id="apChkEaseSearching_Label"
+   					for="apChkEaseSearching" v-html="$t('message.Search_Options_Checkbox_EaseSearching')"></label>
+   				<div 
+   					data-dojo-type="dijit/Tooltip" 
+   					data-dojo-attach-point="apChk_EaseSearching_Tooltip"
+   					data-dojo-props="
+   						connectId:['apChkEaseSearching_Label'],
+   						position:['below']"></div>
+   			</div>
+   		</div>
+   		
+   		<br>
+   		
+   		
+   		<!-- Group: Sorting -->
+   		
+   		<div 
+   			data-dojo-type="dijit/TitlePane" 
+   			data-dojo-props="toggleable:false, title: '$t('message.Search_Options_Group_Sorting')'">
+   			
+   			<table>
+   			
+   				<!-- Sort by date -->
+   				<tr>
+   					<td style="padding-right:2em;">
+   						$t('message.Search_Options_Label_SortAscending')					
+   					</td>
+   					<td>
+   					
+   						<!-- sort ascending -->
+   						<input 
+   							type="radio" 
+   					    	name="sorting" 
+   							id="apSortByDateAscending"
+   							data-dojo-type="dijit/form/RadioButton"
+   							data-dojo-attach-point="apSortByDateAscending"
+   							data-dojo-attach-event="change:apSelection"/>
+   						<label for="apSortByDateAscending" v-html="$t('message.Search_Options_Radio_SortAscending')"></label>
+   					
+   						<!-- sort descending -->
+   						<input 
+   							type="radio" 
+   					    	name="sorting" 
+   							id="apSortByDateDescending"
+   							data-dojo-type="dijit/form/RadioButton"
+   							data-dojo-attach-point="apSortByDateDescending"
+   							data-dojo-attach-event="change:apSelection"/>
+   						<label for="apSortByDateDescending" v-html="$t('message.Search_Options_Radio_SortDescending')"></label>
+   					</td>
+   				</tr>
+   			</table>
+   		</div>
+   		
+   		<br>
+   		
+   		
+   		<!-- Group: Result -->
+   		
+   		<div 
+   			data-dojo-type	="dijit/TitlePane" 
+   			data-dojo-props	="toggleable:false, title: '$t('message.Search_Options_Group_Result')'">
+   			
+   			<!-- Show description -->
+   			<div>
+   				<input 
+   					type					="checkbox" 
+   					id						="apChkShowDescription"
+   					data-dojo-attach-point	="apChkShowDescription"
+   					data-dojo-type			="dijit/form/CheckBox" 
+   					data-dojo-attach-event	="click:apSelection"/> 
+   				<label for="apChkShowDescription" v-html="$t('message.Search_Options_Checkbox_ShowDescription')"></label>
+   				<br>
+   			</div>
+   			
+   			<!-- Show date -->
+   			<div class="fieldVertSpaceTop">
+   				<input 
+   					type					="checkbox" 
+   					id						="apChkShowDate"
+   					data-dojo-attach-point	="apChkShowDate"
+   					data-dojo-type			="dijit/form/CheckBox" 
+   					data-dojo-attach-event	="click:apSelection"/> 
+   				<label for="apChkShowDate" v-html="$t('message.Search_Options_Checkbox_ShowDate')"></label>
+   				<br>
+   			</div>
+   			
+   			<!-- Show time -->
+   			<div class="fieldVertSpaceTop">
+   				<input 
+   					type					="checkbox" 
+   					id						="apChkShowTime"
+   					data-dojo-attach-point	="apChkShowTime"
+   					data-dojo-type			="dijit/form/CheckBox" 
+   					data-dojo-attach-event	="click:apSelection"/> 
+   				<label for="apChkShowTime" v-html="$t('message.Search_Options_Checkbox_ShowTime')"></label>
+   				<br>
+   			</div>
+   			
+   			<!-- Show item number -->
+   			<div class="fieldVertSpaceTop">
+   				<input 
+   					type					="checkbox" 
+   					id						="apChkShowItemNumber"
+   					data-dojo-attach-point	="apChkShowItemNumber"
+   					data-dojo-type			="dijit/form/CheckBox" 
+   					data-dojo-attach-event	="click:apSelection"/> 
+   				<label for="apChkShowItemNumber" v-html="$t('message.Search_Options_Checkbox_ShowItemNumber')"></label>
+   			</div>
+   			
+   			<!-- Show Lucene doc ID -->
+   			<div class="fieldVertSpaceTop">
+   				<input 
+   					type					="checkbox" 
+   					id						="apChkShowLuceneID"
+   					data-dojo-attach-point	="apChkShowLuceneID"
+   					data-dojo-type			="dijit/form/CheckBox" 
+   					data-dojo-attach-event	="click:apSelection"/> 
+   				<label for="apChkShowLuceneID" v-html="$t('message.Search_Options_Checkbox_ShowLuceneDocId')"></label>
+   			</div>
+   		</div>
+   		
+   		<br>
+   		
+   		<!-- Actions -->
+   		<div style="text-align:right;">
+   			<span 
+   				id						="apActionDefaults"
+   				data-dojo-attach-point	="apActionDefaults"
+   				data-dojo-type			="dijit/form/Button"
+   				data-dojo-attach-event	="click:apActionRestoreDefaults"
+   				 v-html="$t('message.Search_Options_Action_RestoreDefaults')"></span> 
+   		</div>
+      </div>
+
+   </div>
+
+</VuePopper>
