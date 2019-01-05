@@ -29,7 +29,6 @@
   App info tooltip
 */
 .app-tooltip .popper {
-   xposition:          absolute;
    width:             400px;
    border:            1px #BBB solid;
    border-radius:     0px;
@@ -49,6 +48,7 @@
 .app-tooltip .v-subheader
 {
    padding:          0px;
+   padding-bottom:   10px;
    margin:           0px;
    height:           auto;
 }
@@ -56,6 +56,14 @@
 /* Ignore vuetify formatting */
 .app-tooltip .v-input
 {
-   padding:          0px;
-   margin:           0px;
+   padding-top:      2px;
+   padding-bottom:   2px;
+   margin-top:       0px;
+}
+
+hr
+{
+   margin:           15px 0;
+   border-top:       1px solid #ccc;
+   border-bottom:    0px;
 }

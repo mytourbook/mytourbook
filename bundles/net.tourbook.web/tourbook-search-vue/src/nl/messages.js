@@ -48,14 +48,19 @@ const messages = {
    		Search_App_Action_StartSearch_Tooltip              : 'Suche starten.',
    		Search_App_Label_Status_Tooltip                    : 'Anzahl der Suchergebnisse - Zeit für die Suche',
    		Search_App_Text_Search_PlaceHolder                 : 'Touren, Markierungen und Wegpunkte suchen',
-   		Search_App_Tooltip                     				: '<b>Platzhaltersuche</b><br><br>' 
+   		Search_App_Tooltip                     				: '<b>Platzhalter Suche</b><br><br>' 
 																	   			+ 'Eine Suche kann auch mit * oder ? Platzhalter und anderen Optionen durchgeführt werden.<br><br>' 
 																	   			+ 'Die Dokumentation darüber findet man in der englischen Beschreibung <a href="{0}" target="_blank">Lucene query parser description.</a><br><br>' 
 																	   			+ 'Lucene ist die intern verwendete Suchmaschine.',
    		Search_Grid_Label_NoDataMessage                    : 'Keine Suchergebnisse gefunden.',
    		Search_Options_Action_RestoreDefaults              : 'Standardwerte wiederherstellen',
    		Search_Options_Checkbox_EaseSearching              : 'Einfaches Suchen verwenden',
-   		Search_Options_Checkbox_EaseSearching_Tooltip      : '<b>* Platzhalter Suche</b><br>' + 'Wenn <i>Einfaches Suchen</i> ausgewählt ist, wird der * Platzhalter an den zu suchenden Text angehängt, dieser Platzhalter wird intern hinzugefügt und ist nicht sichtbar.<br><br>' + '' + '<b>Erweiterte Suchoptionen</b><br>' + 'Es kann hilfreich sein, <i>Einfaches Suchen</i> zu deaktivieren wenn die Suche mit den erweiteren Suchoptionen der Lucene Suchmaschine durchgeführt wird.',
+         Search_Options_Checkbox_EaseSearching_Tooltip      : '<b>* Platzhalter Suche</b><br>' 
+                                                               + 'Wenn <i>Einfaches Suchen</i> ausgewählt ist, '
+                                                               + 'wird der * Platzhalter an den zu suchenden Text angehängt, '
+                                                               + 'dieser Platzhalter wird intern hinzugefügt und ist nicht sichtbar.<br><br>' 
+                                                               + '<b>Erweiterte Suchoptionen</b><br>' 
+                                                               + 'Es kann hilfreich sein, <i>Einfaches Suchen</i> zu deaktivieren wenn die Suche mit den erweiteren Suchoptionen der Lucene Suchmaschine durchgeführt wird.',
    		Search_Options_Checkbox_ShowContentAll             : 'Alles',
    		Search_Options_Checkbox_ShowContentMarker          : 'Markierungen',
    		Search_Options_Checkbox_ShowContentTour            : 'Touren',
