@@ -66,7 +66,7 @@ export default {
        * Selection is from an attach point.
        */
       apSelection: function() {
-         // 
+         //
          // if (this._isValid()) {
          // 	var searchOptions = //
          // 	{
@@ -87,7 +87,7 @@ export default {
       },
 
       _enableControls: function() {
-         // 
+         //
          // var isShowContentAll = this.apChkShowContentAll.get('checked');
          // this.apChkShowContentTour.set('disabled', isShowContentAll);
          // this.apChkShowContentMarker.set('disabled', isShowContentAll);

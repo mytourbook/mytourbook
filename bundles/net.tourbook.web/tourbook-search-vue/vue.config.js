@@ -7,7 +7,9 @@ const path = require('path')
 const webpack = require('webpack')
 
 module.exports = {
+   //
    devServer: {
+      //
       // set Cross-Origin Resource Sharing (CORS)
       headers: {
          'Access-Control-Allow-Origin': '*'
@@ -32,5 +34,17 @@ module.exports = {
    // IE11 support
    transpileDependencies: [/node_modules[/\\\\]vuetify[/\\\\]/],
 
-   lintOnSave: false
+   lintOnSave: false,
+
+   // Webpack configuration
+   // configureWebpack: {
+   //    module: {
+   //       rules: [
+   //         {
+   //           test: /\.styl$/,
+   //           loader: ['style-loader', 'css-loader', 'stylus-loader']
+   //         }
+   //       ]
+   //     }
+   // }
 }

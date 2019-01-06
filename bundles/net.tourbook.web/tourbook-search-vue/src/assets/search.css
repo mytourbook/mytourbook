@@ -1,9 +1,40 @@
+/* Increase contrast */
+.theme--light
+.v-label
+{
+   color: rgba(0,0,0,0.9);
+}
+.theme--light
+.v-label--is-disabled 
+{
+   color: rgba(0,0,0,0.38);
+}
+ 
+/* Reduce size */
+.v-label, 
+.v-input 
+{
+   font-size:        13px;
+}
+
+.v-input--selection-controls__input
+{
+   width:            22px;
+   height:           22px;
+   margin-right:     0px;
+}
+ 
+ /* reduce size for checkbox/radio */
+.v-icon 
+{
+	font-size:        22px;
+}
 
 /* Hide line animation when entering/exiting input field */
 .v-text-field > .v-input__control > .v-input__slot:before,
 .v-text-field > .v-input__control > .v-input__slot:after
 {
-   transition:          none; 
+   transition:       none; 
 }
 
 /*
@@ -28,8 +59,13 @@
 /*
   App info tooltip
 */
-.app-tooltip .popper {
-   width:             400px;
+.app-tooltip .v-toolbar__title 
+{
+   font-size:        16px;
+}
+.app-tooltip .popper 
+{
+   xwidth:             400px;
    border:            1px #BBB solid;
    border-radius:     0px;
    padding:           0px;
@@ -40,8 +76,16 @@
 }
 
 /* Hide popper arrow, have not found a better solution */
-.app-tooltip .popper__arrow {
+.app-tooltip .popper__arrow 
+{
    display:          none;
+}
+
+.accent--text
+{
+   /* this is not working */
+   xcolor:            #aaa  !important;
+   xcaret-color:      #aaa  !important;
 }
 
 /* Ignore vuetify formatting */

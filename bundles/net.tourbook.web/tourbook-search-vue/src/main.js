@@ -1,5 +1,7 @@
 /* no-unused-vars */
 
+import './stylus/main.styl'
+
 // IE11 support
 import 'babel-polyfill'
 
