@@ -567,7 +567,9 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
    public void actionSetDefaultPosition() {
 
-      if (_defaultPosition == null) {
+      if (_defaultPosition == null) { 
+         if (_map.getMapProvider() == null)
+            return;
 
          _map.setZoom(_map.getMapProvider().getMinimumZoomLevel());
          _map.setMapCenter(new GeoPosition(0, 0));
@@ -3462,7 +3464,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
       _map.setShowOverlays(isShowOverlays);
       _map.setShowLegend(false);
 
-      _map.paint();
+      actionSetDefaultPosition();
    }
 
    /**
