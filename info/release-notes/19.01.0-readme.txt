@@ -5,6 +5,14 @@ New
 ===
 
 
+Improvements
+============
+
+* Tour Import
+  
+  - Import <ns2:Speed> and <ns2:Watts> tags from .tcx files
+
+
 Bugfix   
 ======
 
