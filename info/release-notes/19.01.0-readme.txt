@@ -1,0 +1,13 @@
+Version 19.0?.0                                        ?. Month 2019
+
+
+New 	
+===
+
+
+Bugfix   
+======
+
+* Tour Import
+
+  - Fixed NPE when importing .fit files 
