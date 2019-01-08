@@ -55,21 +55,24 @@
                   hide-details
                   v-model     ="apChkShowContentTour"
                   @click      ="apSelection"
-               />
-
-               <v-checkbox
+                  :disabled   ="apChkShowContentAll === true"
+                  />
+                  
+                  <v-checkbox
                   :label      ="$t('message.Search_Options_Checkbox_ShowContentMarker')"
                   hide-details
                   v-model     ="apChkShowContentMarker"
                   @click      ="apSelection"
-               />
-
-
-               <v-checkbox
+                  :disabled   ="apChkShowContentAll === true"
+                  />
+                  
+                  
+                  <v-checkbox
                   :label      ="$t('message.Search_Options_Checkbox_ShowContentWaypoint')"
                   hide-details
                   v-model     ="apChkShowContentWaypoint"
                   @click      ="apSelection"
+                  :disabled   ="apChkShowContentAll === true"
                />
 
             </v-layout>
