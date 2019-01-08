@@ -59,6 +59,19 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 import org.oscim.core.MapPosition;
 
+import de.byteholder.geoclipse.GeoclipseExtensions;
+import de.byteholder.geoclipse.map.IMapContextProvider;
+import de.byteholder.geoclipse.map.Map;
+import de.byteholder.geoclipse.map.MapLegend;
+import de.byteholder.geoclipse.map.event.IMapInfoListener;
+import de.byteholder.geoclipse.map.event.IMapPositionListener;
+import de.byteholder.geoclipse.map.event.IPOIListener;
+import de.byteholder.geoclipse.map.event.IPositionListener;
+import de.byteholder.geoclipse.map.event.MapPOIEvent;
+import de.byteholder.geoclipse.map.event.MapPositionEvent;
+import de.byteholder.geoclipse.mapprovider.MP;
+import de.byteholder.geoclipse.mapprovider.MapProviderManager;
+import de.byteholder.gpx.PointOfInterest;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
@@ -156,20 +169,6 @@ import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 import net.tourbook.ui.views.tourSegmenter.SelectedTourSegmenterSegments;
-
-import de.byteholder.geoclipse.GeoclipseExtensions;
-import de.byteholder.geoclipse.map.IMapContextProvider;
-import de.byteholder.geoclipse.map.Map;
-import de.byteholder.geoclipse.map.MapLegend;
-import de.byteholder.geoclipse.map.event.IMapInfoListener;
-import de.byteholder.geoclipse.map.event.IMapPositionListener;
-import de.byteholder.geoclipse.map.event.IPOIListener;
-import de.byteholder.geoclipse.map.event.IPositionListener;
-import de.byteholder.geoclipse.map.event.MapPOIEvent;
-import de.byteholder.geoclipse.map.event.MapPositionEvent;
-import de.byteholder.geoclipse.mapprovider.MP;
-import de.byteholder.geoclipse.mapprovider.MapProviderManager;
-import de.byteholder.gpx.PointOfInterest;
 
 /**
  * @author Wolfgang Schramm
@@ -568,8 +567,9 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
    public void actionSetDefaultPosition() {
 
       if (_defaultPosition == null) { 
-         if (_map.getMapProvider() == null)
-            return;
+      	
+      	 if (_map.getMapProvider() == null)
+             return;
 
          _map.setZoom(_map.getMapProvider().getMinimumZoomLevel());
          _map.setMapCenter(new GeoPosition(0, 0));
@@ -2734,6 +2734,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
       if (TourManager.isLatLonAvailable(tourData) == false) {
          showDefaultMap(_isShowPhoto);
+         actionSetDefaultPosition();
          return;
       }
 
@@ -3464,7 +3465,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
       _map.setShowOverlays(isShowOverlays);
       _map.setShowLegend(false);
 
-      actionSetDefaultPosition();
+      _map.paint();
    }
 
    /**
