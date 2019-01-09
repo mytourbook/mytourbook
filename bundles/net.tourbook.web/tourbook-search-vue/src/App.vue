@@ -20,7 +20,7 @@
                   }">
 
                   <div class="popper" style="width:350px; padding:10px;">
-                     <div v-html="$t('message.Search_App_Tooltip', [Search_App_Tooltip_Url])"></div>
+                     <div v-html="$t('message.Search_App_Tooltip', [SearchMgr.Search_App_Tooltip_Url])"></div>
                   </div>
 
                   <button slot="reference">
@@ -66,6 +66,8 @@
 import VuePopper from 'vue-popperjs'
 import SlideoutSearchOptions from './components/SlideoutSearchOptions'
 
+import SearchMgr from './SearchMgr'
+
 export default {
    //
    name: 'App',
@@ -77,6 +79,8 @@ export default {
 
    data: () => ({
 
+      SearchMgr,
+
       searchItems: 
       [
          { itemText: 'abc 1', id: 1 }, 
@@ -86,7 +90,8 @@ export default {
       ],
 
       // long url's are truncated in the Messages editor.
-      Search_App_Tooltip_Url: 'http://lucene.apache.org/core/7_5_0/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#Wildcard_Searches'
+      // Search_App_Tooltip_Url: 'http://lucene.apache.org/core/7_5_0/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#Wildcard_Searches'
+      // Search_App_Tooltip_Url: ,
    })
 }
 </script>

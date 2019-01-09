@@ -13,13 +13,13 @@ import 'material-design-icons-iconfont/dist/material-design-icons.css' // Ensure
 
 import Vue from 'vue'
 
-// i18n
+// i18n - message...
 import i18n from './nl/i18n-setup'
 
-// // ajax
-// import axios from 'axios'
-// import VueAxios from 'vue-axios'
-// Vue.use(VueAxios, axios)
+// ajax
+import axios from 'axios'
+import VueAxios from 'vue-axios'
+Vue.use(VueAxios, axios)
 
 // // lodash
 // import VueLodash from 'vue-lodash'

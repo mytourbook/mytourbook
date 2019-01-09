@@ -55,10 +55,10 @@ public class WebContentServer {
    private static final int     NUMBER_OF_SERVER_THREADS = 1;
 
    private static boolean       LOG_URL                  = true;                                        // logs: time, url
-   private static boolean       LOG_DOJO                 = false;
+   private static boolean       LOG_DOJO                 = true;
 
-   private static boolean       LOG_HEADER               = false;                                       // logs: header
-   public static boolean        LOG_XHR                  = false;                                       // logs: xhr
+   private static boolean       LOG_HEADER               = true;                                        // logs: header
+   public static boolean        LOG_XHR                  = true;                                        // logs: xhr
 
    private static boolean       IS_LOGGING               = LOG_URL || LOG_XHR || LOG_HEADER || LOG_DOJO;
 

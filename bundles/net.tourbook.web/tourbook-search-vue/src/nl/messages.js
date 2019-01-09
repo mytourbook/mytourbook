@@ -1,8 +1,10 @@
-const messages = {
+/* beautify ignore:start */
 
+const messages = {
+   
    en: {
       message: {
-                                                   
+         
          Search_App_Action_EditMarker                       : 'Edit Marker',
          Search_App_Action_EditTour                         : 'Edit Tour',
          Search_App_Action_SearchOptions_Tooltip            : 'Search Options.',
@@ -16,7 +18,9 @@ const messages = {
          Search_Grid_Label_NoDataMessage                    : 'No search results found.',
          Search_Options_Action_RestoreDefaults              : 'Restore Defaults',
          Search_Options_Checkbox_EaseSearching              : 'Use ease searching',
-         Search_Options_Checkbox_EaseSearching_Tooltip      : '<b>* Wildcard Search</b><br>' + 'When <i>Use ease searching</i> is selected, a * wildcard is appended to the search text, this is done internally which is not visible.<br><br>' + '' + '<b>Extended Search</b><br>' + 'It can be helpfull to deactivate <i>Use ease searching</i> when doing a search with Lucene query parser options.',
+         Search_Options_Checkbox_EaseSearching_Tooltip      : '<b>* Wildcard Search</b><br>' 
+                                                               + 'When <i>Use ease searching</i> is selected, a * wildcard is appended to the search text, this is done internally which is not visible.<br><br>' 
+                                                               + '<b>Extended Search</b><br>' + 'It can be helpfull to deactivate <i>Use ease searching</i> when doing a search with Lucene query parser options.',
          Search_Options_Checkbox_ShowContentAll             : 'All',
          Search_Options_Checkbox_ShowContentMarker          : 'Markers',
          Search_Options_Checkbox_ShowContentTour            : 'Tours',
@@ -34,13 +38,12 @@ const messages = {
          Search_Options_Radio_SortAscending                 : 'Ascending',
          Search_Options_Radio_SortDescending                : 'Descending',
          Search_Validation_SearchFilter                     : 'Nothing can be found with these search options.'
-                                                   
       }
    },
    
    de: {
       message: {
-                                                   
+         
          Search_App_Action_EditMarker                       : 'Markierung bearbeiten',
          Search_App_Action_EditTour                         : 'Tour bearbeiten',
          Search_App_Action_SearchOptions_Tooltip            : 'Einstellungen für die Suche.',
@@ -77,9 +80,10 @@ const messages = {
          Search_Options_Radio_SortAscending                 : 'Aufsteigend',
          Search_Options_Radio_SortDescending                : 'Absteigend',
          Search_Validation_SearchFilter                     : 'Mit diesen Einstellungen kann nichts gefunden werden.'
-                                                   
       }
    },
 }
+
+/* beautify ignore:end */
 
 export default messages

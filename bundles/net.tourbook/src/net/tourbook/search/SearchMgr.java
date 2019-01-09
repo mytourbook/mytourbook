@@ -959,11 +959,25 @@ public class SearchMgr implements XHRHandler {
 
       // get parameters from url query string
       @SuppressWarnings("unchecked")
-      final Map<String, Object> params = (Map<String, Object>) httpExchange
-            .getAttribute(RequestParameterFilter.ATTRIBUTE_PARAMETERS);
+      final Map<String, Object> params = (Map<String, Object>) httpExchange.getAttribute(RequestParameterFilter.ATTRIBUTE_PARAMETERS);
+
+      /*
+       * With axios the data are wrapped additional :-(
+       */
+      JSONObject jsonParams = null;
+      for (final String key : params.keySet()) {
+
+         jsonParams = new JSONObject(key);
+
+         break;
+      }
+
+      if (jsonParams == null) {
+         return;
+      }
 
       String response = UI.EMPTY_STRING;
-      final Object action = params.get(XHR_PARAM_ACTION);
+      final Object action = jsonParams.get(XHR_PARAM_ACTION);
 
       if (XHR_ACTION_SEARCH.equals(action)) {
 

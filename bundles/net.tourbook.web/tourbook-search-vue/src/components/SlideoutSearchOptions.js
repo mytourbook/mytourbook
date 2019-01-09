@@ -1,4 +1,6 @@
 import VuePopper from 'vue-popperjs'
+import SearchMgr from '../SearchMgr'
+import Axios from 'axios';
 
 export default {
 
@@ -29,9 +31,14 @@ export default {
       }
    }),
 
+   mounted: function() {
+
+      this._restoreState()
+   },
+
    methods: {
 
-      apActionRestoreDefaults: function apActionRestoreDefaults() {
+      apActionRestoreDefaults: function() {
 
          this._setSearchOptions( //
             {
@@ -42,7 +49,7 @@ export default {
       /**
        * Search all checkbox
        */
-      apSearchAll: function apSearchAll() {
+      apSearchAll: function() {
 
          this._enableControls();
 
@@ -53,7 +60,7 @@ export default {
       /**
        * Selection is from an attach point.
        */
-      apSelection: function apSelection() {
+      apSelection: function() {
 
          if (this._isValid()) {
 
@@ -79,7 +86,7 @@ export default {
          }
       },
 
-      _isValid: function _isValid() {
+      _isValid: function() {
 
          var //
             statusText = '', //
@@ -116,7 +123,7 @@ export default {
          return isValid;
       },
 
-      _enableControls: function _enableControls() {
+      _enableControls: function() {
 
          var isShowContentAll = this.apChkShowContentAll.get('checked');
 
@@ -128,31 +135,51 @@ export default {
       /**
        * 
        */
-      _restoreState: function _restoreState(callBack) {
+      _restoreState: function(callBack) {
 
          var _this = this;
 
-         var xhrQuery = {};
-         xhrQuery[SearchMgr.XHR_PARAM_ACTION] = SearchMgr.XHR_ACTION_GET_SEARCH_OPTIONS;
+         var xhrData = {};
+         xhrData[SearchMgr.XHR_PARAM_ACTION] = SearchMgr.XHR_ACTION_GET_SEARCH_OPTIONS;
 
-         xhr(SearchMgr.XHR_SEARCH_HANDLER, {
+         this.axios.request({
 
-            handleAs: 'json',
-            preventCache: true,
-            timeout: SearchMgr.XHR_TIMEOUT,
+               url: SearchMgr.XHR_SEARCH_HANDLER,
+               method: 'post',
 
-            query: xhrQuery
+               headers: { 'X-Requested-With': 'XMLHttpRequest' },
+               timeout: SearchMgr.XHR_TIMEOUT, // default is `0` (no timeout)
 
-         }).then(function(xhrData) {
+               data: xhrData,
+            }
 
-            _this._updateUI_FromState(_this, xhrData);
-         });
+         ).then(function(response) {
+
+            console.log(response);
+
+         }).catch(function(error) {
+
+            console.log(error);
+         })
+
+         // xhr(SearchMgr.XHR_SEARCH_HANDLER, {
+
+         //    handleAs: 'json',
+         //    preventCache: true,
+         //    timeout: SearchMgr.XHR_TIMEOUT,
+
+         //    query: xhrQuery
+
+         // }).then(function(xhrData) {
+
+         //    _this._updateUI_FromState(_this, xhrData);
+         // });
       },
 
       /**
        * Set search options in the backend and reload current search with new search options.
        */
-      _setSearchOptions: function _setSearchOptions(searchOptions) {
+      _setSearchOptions: function(searchOptions) {
 
          var _this = this;
 
@@ -184,7 +211,7 @@ export default {
          });
       },
 
-      _updateUI_FromState: function _updateUI_FromState(dialog, xhrData) {
+      _updateUI_FromState: function(dialog, xhrData) {
 
          dialog.apChkEaseSearching.set('checked', xhrData.isEaseSearching);
 
