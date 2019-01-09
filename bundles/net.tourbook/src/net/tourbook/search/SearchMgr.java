@@ -1012,19 +1012,31 @@ public class SearchMgr implements XHRHandler {
          response = xhr_Proposals(params);
       }
 
-      writeRespone(httpExchange, response);
+      writeResponse(httpExchange, response);
    }
 
-   private void writeRespone(final HttpExchange httpExchange, final String response) {
+   private void writeResponse(final HttpExchange httpExchange, final String response) {
 
       OutputStream os = null;
 
       try {
 
-//			response.setContentType("application/json;charset=UTF-8");
          final byte[] convertedResponse = response.getBytes(WEB.UTF_8);
 
-         httpExchange.sendResponseHeaders(200, convertedResponse.length);
+// this old implementation ...
+//         
+//         httpExchange.sendResponseHeaders(200, convertedResponse.length);
+//         
+// ...causes this exception
+//         
+//         java.io.IOException: insufficient bytes written to stream
+//         at sun.net.httpserver.FixedLengthOutputStream.close(FixedLengthOutputStream.java:89)
+//         at sun.net.httpserver.PlaceholderOutputStream.close(ExchangeImpl.java:454)
+//         at net.tourbook.common.util.Util.close(Util.java:211)
+//         at net.tourbook.search.SearchMgr.writeResponse(SearchMgr.java:1035)
+//         at net.tourbook.search.SearchMgr.handleXHREvent(SearchMgr.java:1015)
+
+         httpExchange.sendResponseHeaders(200, 0);
 
          os = httpExchange.getResponseBody();
          os.write(convertedResponse);
