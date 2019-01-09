@@ -568,9 +568,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
       if (_defaultPosition == null) { 
       	
-      	 if (_map.getMapProvider() == null)
-             return;
-
          _map.setZoom(_map.getMapProvider().getMinimumZoomLevel());
          _map.setMapCenter(new GeoPosition(0, 0));
 
@@ -2734,7 +2731,12 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
       if (TourManager.isLatLonAvailable(tourData) == false) {
          showDefaultMap(_isShowPhoto);
-         actionSetDefaultPosition();
+         
+         //We reset the map layer to force repainting
+         //which gets rid of all possible previous displayed track.
+         if(_map.getMapProvider()!= null)
+         	_map.setMapProviderWithReset(_map.getMapProvider());
+         
          return;
       }
 
