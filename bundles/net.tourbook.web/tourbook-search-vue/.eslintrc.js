@@ -5,9 +5,8 @@ module.exports = {
       node: true
    },
 
-   extends: [
+   extends: [ 
       'plugin:vue/essential',
-      '@vue/prettier' // configured in .prettierrc.js
    ],
 
    rules: {
