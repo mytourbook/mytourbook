@@ -20,7 +20,6 @@ export default {
       apChkShowItemNumber: '',
       apChkShowLuceneID: '',
 
-      // prettier-ignore
       tooltipOptions: {
          placement: 'bottom',
          modifiers: {

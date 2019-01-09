@@ -77,7 +77,6 @@ export default {
 
    data: () => ({
 
-      // prettier-ignore
       searchItems: 
       [
          { itemText: 'abc 1', id: 1 }, 
