@@ -88,8 +88,8 @@ task mt_30_CopyProduct {
 
 	doLast {
 
-//		From:	C:\DAT\MT\mytourbook\build\build.net.tourbook
-//	    Into:	C:\DAT\MT\mytourbook\build\build.net.tourbook.product\target\products
+//    From:	C:\DAT\MT\mytourbook\build\build.net.tourbook
+//    Into:	C:\DAT\MT\mytourbook\build\build.net.tourbook.product\target\products
 
 		println '\tFrom ' + _dirProductBuilt       
 		println '\tInto ' + _dirProductArchive

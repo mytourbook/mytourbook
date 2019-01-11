@@ -1,9 +1,0 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Name: %Bundle-Name
-Bundle-SymbolicName: net.tourbook.rxtx.linux64;singleton:=true
-Bundle-Version: 2.1.8.v2008-09-ubuntu
-Bundle-Vendor: %Bundle-Vendor
-Fragment-Host: net.tourbook.rxtx;bundle-version="2.1.8"
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Bundle-Localization: plugin

@@ -9,10 +9,12 @@
 		C:\DAT\MT\mytourbook\bundles
 		
 		C:\DAT\mytourbook-BUILD-autocreated
-		
 	-->
-
+		
+	<!--
 	<property name="path-root"							value="c:/DAT" />
+	-->
+	<property name="path-root"							value="../../../.." />
 
 	<property name="path-mt-bundles"					value="${path-root}/MT/mytourbook/bundles" />
 	<property name="path-mt-nl"						value="${path-root}/MT/mytourbook/LANGUAGE-FRAGMENTS" />
@@ -65,6 +67,7 @@
 				<exclude name="**/bin/**" />
 				<exclude name="**/classes/**" />
 				<exclude name="**/testFiles/**" />
+				<exclude name="**/node_modules/**" />
 
 				<!-- ignore empty files -->
 				<size value="0" when="more" />

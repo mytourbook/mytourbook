@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -104,2159 +104,2279 @@ import net.tourbook.ui.FileCollisionBehavior;
 
 public class DialogExportTour extends TitleAreaDialog {
 
-	private static final String				EXPORT_ID_GPX					= "net.tourbook.export.gpx";			//$NON-NLS-1$
-	private static final String				EXPORT_ID_TCX					= "net.tourbook.export.tcx";			//$NON-NLS-1$
+   private static final String EXPORT_ID_GPX                     = "net.tourbook.export.gpx";           //$NON-NLS-1$
+   private static final String EXPORT_ID_TCX                     = "net.tourbook.export.tcx";           //$NON-NLS-1$
 
-	private static final String				STATE_GPX_IS_ABSOLUTE_DISTANCE	= "STATE_GPX_IS_ABSOLUTE_DISTANCE";	//$NON-NLS-1$
-	private static final String				STATE_GPX_IS_EXPORT_DESCRITION	= "STATE_GPX_IS_EXPORT_DESCRITION";	//$NON-NLS-1$
-	private static final String				STATE_GPX_IS_EXPORT_MARKERS		= "STATE_GPX_IS_EXPORT_MARKERS";		//$NON-NLS-1$
-	private static final String				STATE_GPX_IS_EXPORT_TOUR_DATA	= "STATE_GPX_IS_EXPORT_TOUR_DATA";		//$NON-NLS-1$
-	private static final String				STATE_GPX_IS_WITH_BAROMETER		= "STATE_GPX_IS_WITH_BAROMETER";		//$NON-NLS-1$
+   private static final String STATE_GPX_IS_ABSOLUTE_DISTANCE    = "STATE_GPX_IS_ABSOLUTE_DISTANCE";    //$NON-NLS-1$
+   private static final String STATE_GPX_IS_EXPORT_DESCRITION    = "STATE_GPX_IS_EXPORT_DESCRITION";    //$NON-NLS-1$
+   private static final String STATE_GPX_IS_EXPORT_MARKERS       = "STATE_GPX_IS_EXPORT_MARKERS";       //$NON-NLS-1$
+   private static final String STATE_GPX_IS_EXPORT_TOUR_DATA     = "STATE_GPX_IS_EXPORT_TOUR_DATA";     //$NON-NLS-1$
+   private static final String STATE_GPX_IS_EXPORT_SURFING_WAVES = "STATE_GPX_IS_EXPORT_SURFING_WAVES"; //$NON-NLS-1$
+   private static final String STATE_GPX_IS_WITH_BAROMETER       = "STATE_GPX_IS_WITH_BAROMETER";       //$NON-NLS-1$
 
-	private static final String				STATE_TCX_IS_COURSES			= "STATE_TCX_IS_COURSES";				//$NON-NLS-1$
-	private static final String				STATE_TCX_IS_EXPORT_DESCRITION	= "STATE_TCX_IS_EXPORT_DESCRITION";	//$NON-NLS-1$
-	private static final String				STATE_TCX_IS_NAME_FROM_TOUR		= "STATE_TCX_IS_NAME_FROM_TOUR";		//$NON-NLS-1$
-	private static final String				STATE_TCX_COURSE_NAME			= "STATE_TCX_COURSE_NAME";				//$NON-NLS-1$
+   private static final String STATE_TCX_IS_COURSES              = "STATE_TCX_IS_COURSES";              //$NON-NLS-1$
+   private static final String STATE_TCX_IS_EXPORT_DESCRITION    = "STATE_TCX_IS_EXPORT_DESCRITION";    //$NON-NLS-1$
+   private static final String STATE_TCX_IS_NAME_FROM_TOUR       = "STATE_TCX_IS_NAME_FROM_TOUR";       //$NON-NLS-1$
+   private static final String STATE_TCX_COURSE_NAME             = "STATE_TCX_COURSE_NAME";             //$NON-NLS-1$
 
-	private static final String				STATE_CAMOUFLAGE_SPEED			= "camouflageSpeedValue";				//$NON-NLS-1$
-	private static final String				STATE_IS_CAMOUFLAGE_SPEED		= "isCamouflageSpeed";					//$NON-NLS-1$
-	private static final String				STATE_IS_EXPORT_TOUR_RANGE		= "isExportTourRange";					//$NON-NLS-1$
-	private static final String				STATE_IS_OVERWRITE_FILES		= "isOverwriteFiles";					//$NON-NLS-1$
-	private static final String				STATE_IS_MERGE_ALL_TOURS		= "isMergeAllTours";					//$NON-NLS-1$
-	private static final String				STATE_EXPORT_PATH_NAME			= "exportPathName";					//$NON-NLS-1$
-	private static final String				STATE_EXPORT_FILE_NAME			= "exportFileName";					//$NON-NLS-1$
+   private static final String STATE_CAMOUFLAGE_SPEED            = "camouflageSpeedValue";              //$NON-NLS-1$
+   private static final String STATE_IS_CAMOUFLAGE_SPEED         = "isCamouflageSpeed";                 //$NON-NLS-1$
+   private static final String STATE_IS_EXPORT_TOUR_RANGE        = "isExportTourRange";                 //$NON-NLS-1$
+   private static final String STATE_IS_OVERWRITE_FILES          = "isOverwriteFiles";                  //$NON-NLS-1$
+   private static final String STATE_IS_MERGE_ALL_TOURS          = "isMergeAllTours";                   //$NON-NLS-1$
+   private static final String STATE_EXPORT_PATH_NAME            = "exportPathName";                    //$NON-NLS-1$
+   private static final String STATE_EXPORT_FILE_NAME            = "exportFileName";                    //$NON-NLS-1$
 
-	/**
-	 * This is a special parameter to force elevation values from the device and not from the
-	 * lat/lon + srtm data <a
-	 * href="http://strava.github.io/api/v3/uploads/">http://strava.github.io/api/v3/uploads/</a>.
-	 *
-	 * @since 15.6
-	 */
-	private static final String				STRAVA_WITH_BAROMETER			= " with barometer";					//$NON-NLS-1$
+   /**
+    * This is a special parameter to force elevation values from the device and not from the lat/lon
+    * + srtm data
+    * <a href="http://strava.github.io/api/v3/uploads/">http://strava.github.io/api/v3/uploads/</a>.
+    *
+    * @since 15.6
+    */
+   private static final String STRAVA_WITH_BAROMETER             = " with barometer";                   //$NON-NLS-1$
 
-	/*
-	 * Velocity (VC) context values
-	 */
-	private static final String				VC_HAS_TOUR_MARKERS				= "hasTourMarkers";					//$NON-NLS-1$
-	private static final String				VC_HAS_TRACKS					= "hasTracks";							//$NON-NLS-1$
-	private static final String				VC_HAS_WAY_POINTS				= "hasWayPoints";						//$NON-NLS-1$
-	private static final String				VC_IS_EXPORT_ALL_TOUR_DATA		= "isExportAllTourData";				//$NON-NLS-1$
+   /*
+    * Velocity (VC) context values
+    */
+   private static final String            VC_HAS_TOUR_MARKERS        = "hasTourMarkers";                                   //$NON-NLS-1$
+   private static final String            VC_HAS_TRACKS              = "hasTracks";                                        //$NON-NLS-1$
+   private static final String            VC_HAS_WAY_POINTS          = "hasWayPoints";                                     //$NON-NLS-1$
+   private static final String            VC_IS_EXPORT_ALL_TOUR_DATA = "isExportAllTourData";                              //$NON-NLS-1$
 
-	private static final String				VC_LAP							= "lap";								//$NON-NLS-1$
-	private static final String				VC_TOUR_DATA					= "tourData";							//$NON-NLS-1$
-	private static final String				VC_TOUR_MARKERS					= "tourMarkers";						//$NON-NLS-1$
-	private static final String				VC_TRACKS						= "tracks";							//$NON-NLS-1$
-	private static final String				VC_WAY_POINTS					= "wayPoints";							//$NON-NLS-1$
+   private static final String            VC_LAP                     = "lap";                                              //$NON-NLS-1$
+   private static final String            VC_TOUR_DATA               = "tourData";                                         //$NON-NLS-1$
+   private static final String            VC_TOUR_MARKERS            = "tourMarkers";                                      //$NON-NLS-1$
+   private static final String            VC_TRACKS                  = "tracks";                                           //$NON-NLS-1$
+   private static final String            VC_WAY_POINTS              = "wayPoints";                                        //$NON-NLS-1$
 
-	private static final String				ZERO							= "0";									//$NON-NLS-1$
+   private static final String            ZERO                       = "0";                                                //$NON-NLS-1$
 
-	private static final int				VERTICAL_SECTION_MARGIN			= 10;
-	private static final int				SIZING_TEXT_FIELD_WIDTH			= 250;
-	private static final int				COMBO_HISTORY_LENGTH			= 20;
+   private static final int               VERTICAL_SECTION_MARGIN    = 10;
+   private static final int               SIZING_TEXT_FIELD_WIDTH    = 250;
+   private static final int               COMBO_HISTORY_LENGTH       = 20;
 
-	private static String					_dlgDefaultMessage;
-	//
-	private static final DecimalFormat		_nf1							= (DecimalFormat) NumberFormat
-																					.getInstance(Locale.US);
-	private static final DecimalFormat		_nf3							= (DecimalFormat) NumberFormat
-																					.getInstance(Locale.US);
-	private static final DecimalFormat		_nf8							= (DecimalFormat) NumberFormat
-																					.getInstance(Locale.US);
+   private static String                  _dlgDefaultMessage;
+   //
+   private static final DecimalFormat     _nf1                       = (DecimalFormat) NumberFormat.getInstance(Locale.US);
+   private static final DecimalFormat     _nf3                       = (DecimalFormat) NumberFormat.getInstance(Locale.US);
+   private static final DecimalFormat     _nf8                       = (DecimalFormat) NumberFormat.getInstance(Locale.US);
 
-	private static final DateTimeFormatter	_dtIso							= ISODateTimeFormat.dateTimeNoMillis();
-	private static final SimpleDateFormat	_dateFormat						= new SimpleDateFormat();
+   private static final DateTimeFormatter _dtIso                     = ISODateTimeFormat.dateTimeNoMillis();
+   private static final SimpleDateFormat  _dateFormat                = new SimpleDateFormat();
 
-	static {
+   static {
 
-		_nf1.setMinimumFractionDigits(1);
-		_nf1.setMaximumFractionDigits(1);
-		_nf1.setGroupingUsed(false);
+      _nf1.setMinimumFractionDigits(1);
+      _nf1.setMaximumFractionDigits(1);
+      _nf1.setGroupingUsed(false);
 
-		_nf3.setMinimumFractionDigits(1);
-		_nf3.setMaximumFractionDigits(3);
-		_nf3.setGroupingUsed(false);
+      _nf3.setMinimumFractionDigits(1);
+      _nf3.setMaximumFractionDigits(3);
+      _nf3.setGroupingUsed(false);
 
-		_nf8.setMinimumFractionDigits(1);
-		_nf8.setMaximumFractionDigits(8);
-		_nf8.setGroupingUsed(false);
+      _nf8.setMinimumFractionDigits(1);
+      _nf8.setMaximumFractionDigits(8);
+      _nf8.setGroupingUsed(false);
 
-		_dtIso.withZoneUTC();
-		_dateFormat.applyPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"); //$NON-NLS-1$
-		_dateFormat.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
-	}
+      _dtIso.withZoneUTC();
+      _dateFormat.applyPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"); //$NON-NLS-1$
+      _dateFormat.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
+   }
 
-	private final String					_formatTemplate;
+   private final String              _formatTemplate;
 
-	private final IDialogSettings			_state							= TourbookPlugin
-																					.getState("DialogExportTour");	//$NON-NLS-1$
+   private final IDialogSettings     _state = TourbookPlugin
+         .getState("DialogExportTour");                                       //$NON-NLS-1$
 
-	private final ExportTourExtension		_exportExtensionPoint;
+   private final ExportTourExtension _exportExtensionPoint;
 
-	private final ArrayList<TourData>		_tourDataList;
-	private final int						_tourStartIndex;
-	private final int						_tourEndIndex;
+   private final ArrayList<TourData> _tourDataList;
+   private final int                 _tourStartIndex;
+   private final int                 _tourEndIndex;
 
-	/**
-	 * Is <code>true</code> when multiple tours are selected and NOT merged into 1 file.
-	 */
-	private boolean							_isExport_MultipleToursWithMultipleFiles;
+   /**
+    * Is <code>true</code> when multiple tours are selected and NOT merged into 1 file.
+    */
+   private boolean                   _isExport_MultipleToursWithMultipleFiles;
 
-	private boolean							_isInUIInit;
+   private boolean                   _isInUIInit;
 
-	/**
-	 * Is <code>true</code> when GPX export.
-	 */
-	private boolean							_isSetup_GPX;
+   /**
+    * Is <code>true</code> when GPX export.
+    */
+   private boolean                   _isSetup_GPX;
 
-	/**
-	 * Is <code>true</code> when TCX export.
-	 */
-	private boolean							_isSetup_TCX;
+   /**
+    * Is <code>true</code> when TCX export.
+    */
+   private boolean                   _isSetup_TCX;
 
-	/**
-	 * Is <code>true</code> when only a part is exported.
-	 */
-	private boolean							_isSetup_TourRange;
+   /**
+    * Is <code>true</code> when only a part is exported.
+    */
+   private boolean                   _isSetup_TourRange;
 
-	/**
-	 * Is <code>true</code> when multiple tours are exported.
-	 */
-	private boolean							_isSetup_MultipleTours;
+   /**
+    * Is <code>true</code> when multiple tours are exported.
+    */
+   private boolean                   _isSetup_MultipleTours;
 
-	private int								_mergedDistance;
-	private ZonedDateTime					_mergedTime;
+   private int                       _mergedDistance;
+   private ZonedDateTime             _mergedTime;
 
-	private Point							_shellDefaultSize;
+   private Point                     _shellDefaultSize;
 
-	private float							_exportState_CamouflageSpeed;
-	private FileCollisionBehavior			_exportState_FileCollisionBehaviour;
-	private boolean							_exportState_isAbsoluteDistance;
-	private boolean							_exportState_IsCamouflageSpeed;
-	private boolean							_exportState_IsDescription;
-	private boolean							_exportState_IsMergeTours;
-	private boolean							_exportState_IsOverwriteFiles;
-	private boolean							_exportState_IsRange;
+   private float                     _exportState_CamouflageSpeed;
+   private FileCollisionBehavior     _exportState_FileCollisionBehaviour;
+   private boolean                   _exportState_isAbsoluteDistance;
+   private boolean                   _exportState_IsCamouflageSpeed;
+   private boolean                   _exportState_IsDescription;
+   private boolean                   _exportState_IsMergeTours;
+   private boolean                   _exportState_IsOverwriteFiles;
+   private boolean                   _exportState_IsRange;
 
-	private boolean							_exportState_GPX_IsExportMarkers;
-	private boolean							_exportState_GPX_IsExportAllTourData;
-	private boolean							_exportState_GPX_IsExportWithBarometer;
+   private boolean                   _exportState_GPX_IsExportAllTourData;
+   private boolean                   _exportState_GPX_IsExportMarkers;
+   private boolean                   _exportState_GPX_IsExportSurfingWaves;
+   private boolean                   _exportState_GPX_IsExportWithBarometer;
 
-	private String							_exportState_TCX_CourseName;
-	private boolean							_exportState_TCX_IsCourses;
+   private String                    _exportState_TCX_CourseName;
+   private boolean                   _exportState_TCX_IsCourses;
 
-	private PixelConverter					_pc;
+   private PixelConverter            _pc;
 
-	/*
-	 * UI controls
-	 */
-	private Button							_btnSelectDirectory;
-	private Button							_btnSelectFile;
+   /*
+    * UI controls
+    */
+   private Button    _btnSelectDirectory;
+   private Button    _btnSelectFile;
 
-	private Button							_chkCamouflageSpeed;
-	private Button							_chkExportTourRange;
-	private Button							_chkMergeAllTours;
-	private Button							_chkOverwriteFiles;
+   private Button    _chkCamouflageSpeed;
+   private Button    _chkExportTourRange;
+   private Button    _chkMergeAllTours;
+   private Button    _chkOverwriteFiles;
 
-	private Button							_chkGPX_Description;
-	private Button							_rdoGPX_DistanceAbsolute;
-	private Button							_rdoGPX_DistanceRelative;
-	private Button							_chkGPX_Markers;
-	private Button							_chkGPX_NoneGPXFields;
-	private Button							_chkGPX_WithBarometer;
+   private Button    _chkGPX_Description;
+   private Button    _rdoGPX_DistanceAbsolute;
+   private Button    _rdoGPX_DistanceRelative;
+   private Button    _chkGPX_Markers;
+   private Button    _chkGPX_NoneGPXFields;
+   private Button    _chkGPX_SurfingWaves;
+   private Button    _chkGPX_WithBarometer;
 
-	private Button							_chkTCX_Description;
-	private Button							_rdoTCX_Activities;
-	private Button							_rdoTCX_Courses;
-	private Button							_rdoTCX_NameFromField;
-	private Button							_rdoTCX_NameFromTour;
+   private Button    _chkTCX_Description;
+   private Button    _rdoTCX_Activities;
+   private Button    _rdoTCX_Courses;
+   private Button    _rdoTCX_NameFromField;
+   private Button    _rdoTCX_NameFromTour;
 
-	private Combo							_comboFile;
-	private Combo							_comboPath;
-	private Combo							_comboTcxCourseName;
+   private Combo     _comboFile;
+   private Combo     _comboPath;
+   private Combo     _comboTcxCourseName;
 
-	private Composite						_dlgContainer;
-	private Composite						_inputContainer;
+   private Composite _dlgContainer;
+   private Composite _inputContainer;
 
-	private Label							_lblCoumouflageSpeedUnit;
-	private Label							_lblTcxCourseName;
-	private Label							_lblTcxNameFrom;
+   private Label     _lblCoumouflageSpeedUnit;
+   private Label     _lblTcxCourseName;
+   private Label     _lblTcxNameFrom;
 
-	private Spinner							_spinnerCamouflageSpeed;
+   private Spinner   _spinnerCamouflageSpeed;
 
-	private Text							_txtFilePath;
+   private Text      _txtFilePath;
 
-	/**
-	 * @param parentShell
-	 * @param exportExtensionPoint
-	 * @param tourDataList
-	 * @param tourStartIndex
-	 * @param tourEndIndex
-	 * @param formatTemplate
-	 * @param isOptionDistance
-	 */
-	public DialogExportTour(final Shell parentShell,
-							final ExportTourExtension exportExtensionPoint,
-							final ArrayList<TourData> tourDataList,
-							final int tourStartIndex,
-							final int tourEndIndex,
-							final String formatTemplate) {
+   /**
+    * @param parentShell
+    * @param exportExtensionPoint
+    * @param tourDataList
+    * @param tourStartIndex
+    * @param tourEndIndex
+    * @param formatTemplate
+    * @param isOptionDistance
+    */
+   public DialogExportTour(final Shell parentShell,
+                           final ExportTourExtension exportExtensionPoint,
+                           final ArrayList<TourData> tourDataList,
+                           final int tourStartIndex,
+                           final int tourEndIndex,
+                           final String formatTemplate) {
 
-		super(parentShell);
+      super(parentShell);
 
-		int shellStyle = getShellStyle();
+      int shellStyle = getShellStyle();
 
-		shellStyle = //
-		SWT.NONE //
-				| SWT.TITLE
-				| SWT.CLOSE
-				| SWT.MIN
+      shellStyle = //
+            SWT.NONE //
+                  | SWT.TITLE
+                  | SWT.CLOSE
+                  | SWT.MIN
 //				| SWT.MAX
-				| SWT.RESIZE
-				| SWT.NONE;
+                  | SWT.RESIZE
+                  | SWT.NONE;
 
-		// make dialog resizable
-		setShellStyle(shellStyle);
+      // make dialog resizable
+      setShellStyle(shellStyle);
 
-		_exportExtensionPoint = exportExtensionPoint;
-		_formatTemplate = formatTemplate;
+      _exportExtensionPoint = exportExtensionPoint;
+      _formatTemplate = formatTemplate;
 
-		_tourDataList = tourDataList;
-		_tourStartIndex = tourStartIndex;
-		_tourEndIndex = tourEndIndex;
+      _tourDataList = tourDataList;
+      _tourStartIndex = tourStartIndex;
+      _tourEndIndex = tourEndIndex;
 
-		_isSetup_GPX = _exportExtensionPoint.getExportId().equalsIgnoreCase(EXPORT_ID_GPX);
-		_isSetup_TCX = _exportExtensionPoint.getExportId().equalsIgnoreCase(EXPORT_ID_TCX);
+      _isSetup_GPX = _exportExtensionPoint.getExportId().equalsIgnoreCase(EXPORT_ID_GPX);
+      _isSetup_TCX = _exportExtensionPoint.getExportId().equalsIgnoreCase(EXPORT_ID_TCX);
 
-		_isSetup_MultipleTours = _tourDataList.size() > 1;
-		_isSetup_TourRange = _tourDataList.size() == 1 //
-				&& _tourStartIndex >= 0
-				&& _tourEndIndex > -1;
+      _isSetup_MultipleTours = _tourDataList.size() > 1;
+      _isSetup_TourRange = _tourDataList.size() == 1 //
+            && _tourStartIndex >= 0
+            && _tourEndIndex > -1;
 
-		_dlgDefaultMessage = NLS.bind(Messages.dialog_export_dialog_message, _exportExtensionPoint.getVisibleName());
+      _dlgDefaultMessage = NLS.bind(Messages.dialog_export_dialog_message, _exportExtensionPoint.getVisibleName());
 
-		// initialize velocity
-		VelocityService.init();
-	}
+      // initialize velocity
+      VelocityService.init();
+   }
 
-	@Override
-	public boolean close() {
+   @Override
+   public boolean close() {
 
-		saveState();
+      saveState();
 
-		return super.close();
-	}
+      return super.close();
+   }
 
-	@Override
-	protected void configureShell(final Shell shell) {
+   @Override
+   protected void configureShell(final Shell shell) {
 
-		super.configureShell(shell);
+      super.configureShell(shell);
 
-		shell.setText(Messages.dialog_export_shell_text);
+      shell.setText(Messages.dialog_export_shell_text);
 
-		shell.addListener(SWT.Resize, new Listener() {
-			@Override
-			public void handleEvent(final Event event) {
+      shell.addListener(SWT.Resize, new Listener() {
+         @Override
+         public void handleEvent(final Event event) {
 
-				// allow resizing the width but not the height
+            // allow resizing the width but not the height
 
-				if (_shellDefaultSize == null) {
-					_shellDefaultSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-				}
+            if (_shellDefaultSize == null) {
+               _shellDefaultSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+            }
 
-				final Point shellSize = shell.getSize();
+            final Point shellSize = shell.getSize();
 
-				/*
-				 * this is not working, the shell is flickering when the shell size is below min
-				 * size and I found no way to prevent a resize :-(
-				 */
+            /*
+             * this is not working, the shell is flickering when the shell size is below min size
+             * and I found no way to prevent a resize :-(
+             */
 //				if (shellSize.x < _shellDefaultSize.x) {
 //					event.doit = false;
 //				}
 
-				shellSize.x = shellSize.x < _shellDefaultSize.x ? _shellDefaultSize.x : shellSize.x;
-				shellSize.y = _shellDefaultSize.y;
+            shellSize.x = shellSize.x < _shellDefaultSize.x ? _shellDefaultSize.x : shellSize.x;
+            shellSize.y = _shellDefaultSize.y;
 
-				shell.setSize(shellSize);
-			}
-		});
-	}
+            shell.setSize(shellSize);
+         }
+      });
+   }
 
-	@Override
-	public void create() {
+   @Override
+   public void create() {
 
-		super.create();
+      super.create();
 
-		setTitle(Messages.dialog_export_dialog_title);
-		setMessage(_dlgDefaultMessage);
+      setTitle(Messages.dialog_export_dialog_title);
+      setMessage(_dlgDefaultMessage);
 
-		_isInUIInit = true;
-		{
-			restoreState();
-		}
-		_isInUIInit = false;
+      _isInUIInit = true;
+      {
+         restoreState();
+      }
+      _isInUIInit = false;
 
 //		validateFields();
-		enableFields();
-	}
+      enableFields();
+   }
 
-	@Override
-	protected final void createButtonsForButtonBar(final Composite parent) {
+   @Override
+   protected final void createButtonsForButtonBar(final Composite parent) {
 
-		super.createButtonsForButtonBar(parent);
+      super.createButtonsForButtonBar(parent);
 
-		// set text for the OK button
-		getButton(IDialogConstants.OK_ID).setText(Messages.dialog_export_btn_export);
-	}
+      // set text for the OK button
+      getButton(IDialogConstants.OK_ID).setText(Messages.dialog_export_btn_export);
+   }
 
-	@Override
-	protected Control createDialogArea(final Composite parent) {
+   @Override
+   protected Control createDialogArea(final Composite parent) {
 
-		initUI(parent);
+      initUI(parent);
 
-		_dlgContainer = (Composite) super.createDialogArea(parent);
+      _dlgContainer = (Composite) super.createDialogArea(parent);
 
-		createUI(_dlgContainer);
+      createUI(_dlgContainer);
 
-		return _dlgContainer;
-	}
+      return _dlgContainer;
+   }
 
-	private void createUI(final Composite parent) {
+   private void createUI(final Composite parent) {
 
-		_inputContainer = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(_inputContainer);
-		GridLayoutFactory.swtDefaults().margins(10, 5).applyTo(_inputContainer);
+      _inputContainer = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(_inputContainer);
+      GridLayoutFactory.swtDefaults().margins(10, 5).applyTo(_inputContainer);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-		{
-			createUI_10_Options(_inputContainer);
-			createUI_90_ExportFile(_inputContainer);
-		}
-	}
+      {
+         createUI_10_Options(_inputContainer);
+         createUI_90_ExportFile(_inputContainer);
+      }
+   }
 
-	private void createUI_10_Options(final Composite parent) {
+   private void createUI_10_Options(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-		{
-			createUI_12_OptionsLeft(container);
-			createUI_14_OptionsRight(container);
-		}
-	}
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      {
+         createUI_12_OptionsLeft(container);
+         createUI_14_OptionsRight(container);
+      }
+   }
 
-	private void createUI_12_OptionsLeft(final Composite parent) {
+   private void createUI_12_OptionsLeft(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-		{
-			/*
-			 * What
-			 */
-			final Group groupWhat = new Group(container, SWT.NONE);
-			groupWhat.setText(Messages.Dialog_Export_Group_What);
-			groupWhat.setToolTipText(Messages.Dialog_Export_Group_What_Tooltip);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(groupWhat);
-			GridLayoutFactory.swtDefaults().applyTo(groupWhat);
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      {
+         /*
+          * What
+          */
+         final Group groupWhat = new Group(container, SWT.NONE);
+         groupWhat.setText(Messages.Dialog_Export_Group_What);
+         groupWhat.setToolTipText(Messages.Dialog_Export_Group_What_Tooltip);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(groupWhat);
+         GridLayoutFactory.swtDefaults().applyTo(groupWhat);
 //			groupWhat.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
-			{
-				createUI_20_Option_What(groupWhat);
-				createUI_40_Option_TourRange(groupWhat);
-			}
+         {
+            createUI_20_Option_What(groupWhat);
+            createUI_40_Option_TourRange(groupWhat);
+         }
 
-			/*
-			 * How
-			 */
-			final Group groupHow = new Group(container, SWT.NONE);
-			groupHow.setText(Messages.Dialog_Export_Group_How);
-			groupHow.setToolTipText(Messages.Dialog_Export_Group_How_Tooltip);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(groupHow);
-			GridLayoutFactory.swtDefaults().applyTo(groupHow);
+         /*
+          * How
+          */
+         final Group groupHow = new Group(container, SWT.NONE);
+         groupHow.setText(Messages.Dialog_Export_Group_How);
+         groupHow.setToolTipText(Messages.Dialog_Export_Group_How_Tooltip);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(groupHow);
+         GridLayoutFactory.swtDefaults().applyTo(groupHow);
 //			groupHow.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
-			{
-				createUI_50_Option_How(groupHow);
-			}
-		}
-	}
-
-	private void createUI_14_OptionsRight(final Composite parent) {
-
-		/*
-		 * Custom options
-		 */
-		if (_isSetup_GPX) {
-
-			final Group groupCustomGPX = new Group(parent, SWT.NONE);
-			groupCustomGPX.setText(Messages.Dialog_Export_Group_Custom);
-			groupCustomGPX.setToolTipText(Messages.Dialog_Export_Group_Custom_Tooltip);
-			GridDataFactory.fillDefaults().grab(false, false).applyTo(groupCustomGPX);
-			GridLayoutFactory.swtDefaults().applyTo(groupCustomGPX);
-			{
-				createUI_72_Option_GPX_Custom(groupCustomGPX);
-			}
-		}
-	}
-
-	private void createUI_20_Option_What(final Composite parent) {
-
-		if (_isSetup_GPX) {
-
-			/*
-			 * checkbox: export description
-			 */
-			_chkGPX_Description = new Button(parent, SWT.CHECK);
-			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).applyTo(_chkGPX_Description);
-			_chkGPX_Description.setText(Messages.Dialog_Export_Checkbox_Description);
-
-			/*
-			 * checkbox: export markers
-			 */
-			_chkGPX_Markers = new Button(parent, SWT.CHECK);
-			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).applyTo(_chkGPX_Markers);
-			_chkGPX_Markers.setText(Messages.dialog_export_chk_exportMarkers);
-			_chkGPX_Markers.setToolTipText(Messages.dialog_export_chk_exportMarkers_tooltip);
-
-			/*
-			 * checkbox: export tour data
-			 */
-			_chkGPX_NoneGPXFields = new Button(parent, SWT.CHECK);
-			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).applyTo(_chkGPX_NoneGPXFields);
-			_chkGPX_NoneGPXFields.setText(Messages.Dialog_Export_Checkbox_TourFields);
-			_chkGPX_NoneGPXFields.setToolTipText(Messages.Dialog_Export_Checkbox_TourFields_Tooltip);
-
-		} else if (_isSetup_TCX) {
-
-			/*
-			 * checkbox: export description
-			 */
-			_chkTCX_Description = new Button(parent, SWT.CHECK);
-			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).applyTo(_chkTCX_Description);
-			_chkTCX_Description.setText(Messages.dialog_export_chk_exportNotes);
-			_chkTCX_Description.setToolTipText(Messages.dialog_export_chk_exportNotes_tooltip);
-		}
-	}
-
-	private void createUI_40_Option_TourRange(final Composite parent) {
-
-		if (_isSetup_TourRange == false) {
-			return;
-		}
-
-		String tourRangeUI = null;
-
-		final TourData tourData = _tourDataList.get(0);
-		final int[] timeSerie = tourData.timeSerie;
-		if (timeSerie != null) {
-
-			final float[] distanceSerie = tourData.distanceSerie;
-			final boolean isDistance = distanceSerie != null;
-
-			final int startTime = timeSerie[_tourStartIndex];
-			final int endTime = timeSerie[_tourEndIndex];
-
-			final ZonedDateTime dtTour = tourData.getTourStartTime();
-
-			final String uiStartTime = dtTour.plusSeconds(startTime).format(TimeTools.Formatter_Time_M);
-			final String uiEndTime = dtTour.plusSeconds(endTime).format(TimeTools.Formatter_Time_M);
-
-			if (isDistance) {
-
-				tourRangeUI = NLS.bind(
-						Messages.dialog_export_chk_tourRangeWithDistance,
-						new Object[] {
-
-								uiStartTime,
-								uiEndTime,
-
-								_nf3.format(distanceSerie[_tourStartIndex]
-										/ 1000
-										/ net.tourbook.ui.UI.UNIT_VALUE_DISTANCE),
-								_nf3.format(distanceSerie[_tourEndIndex]
-										/ 1000
-										/ net.tourbook.ui.UI.UNIT_VALUE_DISTANCE),
-
-								UI.UNIT_LABEL_DISTANCE,
-
-								// adjust by 1 to corresponds to the number in the tour editor
-								_tourStartIndex + 1,
-								_tourEndIndex + 1 });
-
-			} else {
-
-				tourRangeUI = NLS.bind(Messages.dialog_export_chk_tourRangeWithoutDistance, new Object[] {
-						uiStartTime,
-						uiEndTime,
-						_tourStartIndex + 1,
-						_tourEndIndex + 1 });
-			}
-		}
-
-		/*
-		 * checkbox: tour range
-		 */
-		_chkExportTourRange = new Button(parent, SWT.CHECK);
-		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_chkExportTourRange);
-
-		_chkExportTourRange.setText(tourRangeUI != null ? tourRangeUI : Messages.dialog_export_chk_tourRangeDisabled);
-
-		_chkExportTourRange.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				enableFields();
-			}
-		});
-	}
-
-	private void createUI_50_Option_How(final Composite parent) {
-
-		if (_isSetup_MultipleTours) {
-
-			/*
-			 * checkbox: merge all tours
-			 */
-			_chkMergeAllTours = new Button(parent, SWT.CHECK);
-			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).applyTo(_chkMergeAllTours);
-			_chkMergeAllTours.setText(Messages.dialog_export_chk_mergeAllTours);
-			_chkMergeAllTours.setToolTipText(Messages.dialog_export_chk_mergeAllTours_tooltip);
-			_chkMergeAllTours.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					enableFields();
-					setFileName();
-				}
-			});
-		}
-
-		createUI_60_Option_Speed(parent);
-
-		if (_isSetup_GPX) {
-
-			createUI_70_Option_GPX_Distance(parent);
-
-		} else if (_isSetup_TCX) {
-
-			createUI_80_Option_TCX_ActivitiesCourses(parent);
-		}
-	}
-
-	private void createUI_60_Option_Speed(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
-		{
-			/*
-			 * checkbox: camouflage speed
-			 */
-			_chkCamouflageSpeed = new Button(container, SWT.CHECK);
-			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_chkCamouflageSpeed);
-			_chkCamouflageSpeed.setText(Messages.dialog_export_chk_camouflageSpeed);
-			_chkCamouflageSpeed.setToolTipText(Messages.dialog_export_chk_camouflageSpeed_tooltip);
-			_chkCamouflageSpeed.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-
-					validateFields();
-					enableFields();
-
-					if (_chkCamouflageSpeed.getSelection()) {
-						_spinnerCamouflageSpeed.setFocus();
-					}
-				}
-			});
-
-			// text: speed
-			_spinnerCamouflageSpeed = new Spinner(container, SWT.BORDER);
-			GridDataFactory.fillDefaults() //
-					.align(SWT.BEGINNING, SWT.FILL)
-					.applyTo(_spinnerCamouflageSpeed);
-			_spinnerCamouflageSpeed.setToolTipText(Messages.dialog_export_chk_camouflageSpeedInput_tooltip);
-			_spinnerCamouflageSpeed.setPageIncrement(10);
-			_spinnerCamouflageSpeed.setMinimum(1);
-			_spinnerCamouflageSpeed.setMaximum(1000);
-			_spinnerCamouflageSpeed.addMouseWheelListener(new MouseWheelListener() {
-				@Override
-				public void mouseScrolled(final MouseEvent event) {
-					Util.adjustSpinnerValueOnMouseScroll(event);
-				}
-			});
-
-			// label: unit
-			_lblCoumouflageSpeedUnit = new Label(container, SWT.NONE);
-			_lblCoumouflageSpeedUnit.setText(UI.SYMBOL_AVERAGE_WITH_SPACE + UI.UNIT_LABEL_SPEED);
-			GridDataFactory
-					.fillDefaults()
-					.grab(true, false)
-					.align(SWT.BEGINNING, SWT.CENTER)
-					.applyTo(_lblCoumouflageSpeedUnit);
-		}
-	}
-
-	private void createUI_70_Option_GPX_Distance(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
-		{
-			// label
-			final Label label = new Label(container, SWT.NONE);
-			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(label);
-			label.setText(Messages.Dialog_Export_Label_GPX_DistanceValues);
-
-			// radio
-			{
-				_rdoGPX_DistanceAbsolute = new Button(container, SWT.RADIO);
-				_rdoGPX_DistanceAbsolute.setText(Messages.Dialog_Export_Radio_GPX_DistanceAbsolute);
-				_rdoGPX_DistanceAbsolute.setToolTipText(Messages.Dialog_Export_Radio_GPX_DistanceAbsolute_Tooltip);
-
-				_rdoGPX_DistanceRelative = new Button(container, SWT.RADIO);
-				GridDataFactory.fillDefaults().grab(true, false).applyTo(_rdoGPX_DistanceRelative);
-				_rdoGPX_DistanceRelative.setText(Messages.Dialog_Export_Radio_GPX_DistanceRelative);
-				_rdoGPX_DistanceRelative.setToolTipText(Messages.Dialog_Export_Radio_GPX_DistanceRelative_Tooltip);
-			}
-		}
-	}
-
-	private void createUI_72_Option_GPX_Custom(final Composite parent) {
-
-		/*
-		 * checkbox: export with barometer
-		 */
-		_chkGPX_WithBarometer = new Button(parent, SWT.CHECK);
-		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).applyTo(_chkGPX_WithBarometer);
-		_chkGPX_WithBarometer.setText(Messages.Dialog_Export_Checkbox_WithBarometer);
-		_chkGPX_WithBarometer.setToolTipText(Messages.Dialog_Export_Checkbox_WithBarometer_Tooltip);
-	}
-
-	private void createUI_80_Option_TCX_ActivitiesCourses(final Composite parent) {
-
-		final SelectionAdapter defaultSelectionListener = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				enableFields();
-				setFileName();
-			}
-		};
-
-		final SelectionAdapter nameSelectionListener = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				updateUI_CourseName();
-				enableFields();
-				setFileName();
-			}
-		};
-
-		final ModifyListener nameModifyListener = new ModifyListener() {
-			@Override
-			public void modifyText(final ModifyEvent e) {
-				validateFields();
-			}
-		};
-
-		// container
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-		{
-			{
-				/*
-				 * label: tcx type
-				 */
-				final Label label = new Label(container, SWT.NONE);
-				GridDataFactory.fillDefaults().applyTo(label);
-				label.setText(Messages.Dialog_Export_Label_TCX_Type);
-
-				final Composite containerActivities = new Composite(container, SWT.NONE);
-				GridDataFactory.fillDefaults().grab(true, false).applyTo(containerActivities);
-				GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerActivities);
-				{
-					/*
-					 * radio: activities
-					 */
-					_rdoTCX_Courses = new Button(containerActivities, SWT.RADIO);
-					GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_rdoTCX_Courses);
-					_rdoTCX_Courses.setText(Messages.Dialog_Export_Radio_TCX_Courses);
-					_rdoTCX_Courses.setToolTipText(Messages.Dialog_Export_Radio_TCX_Courses_Tooltip);
-					_rdoTCX_Courses.addSelectionListener(defaultSelectionListener);
-
-					/*
-					 * radio: activities
-					 */
-					_rdoTCX_Activities = new Button(containerActivities, SWT.RADIO);
-					GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_rdoTCX_Activities);
-					_rdoTCX_Activities.setText(Messages.Dialog_Export_Radio_TCX_Aktivities);
-					_rdoTCX_Activities.setToolTipText(Messages.Dialog_Export_Radio_TCX_Aktivities_Tooltip);
-					_rdoTCX_Activities.addSelectionListener(defaultSelectionListener);
-				}
-			}
-
-			{
-				/*
-				 * label: course name from
-				 */
-				_lblTcxNameFrom = new Label(container, SWT.NONE);
-				GridDataFactory.fillDefaults().applyTo(_lblTcxNameFrom);
-				_lblTcxNameFrom.setText(Messages.Dialog_Export_Label_TCX_NameFrom);
-				_lblTcxNameFrom.setToolTipText(Messages.Dialog_Export_Label_TCX_NameFrom_Tooltip);
-
-				final Composite containerNameFrom = new Composite(container, SWT.NONE);
-				GridDataFactory.fillDefaults().grab(true, false).applyTo(containerNameFrom);
-				GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerNameFrom);
-				{
-					/*
-					 * radio: from tour
-					 */
-					_rdoTCX_NameFromTour = new Button(containerNameFrom, SWT.RADIO);
-					GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_rdoTCX_NameFromTour);
-					_rdoTCX_NameFromTour.setText(Messages.Dialog_Export_Radio_TCX_NameFromTour);
-					_rdoTCX_NameFromTour.addSelectionListener(nameSelectionListener);
-
-					/*
-					 * radio: from text field
-					 */
-					_rdoTCX_NameFromField = new Button(containerNameFrom, SWT.RADIO);
-					GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_rdoTCX_NameFromField);
-					_rdoTCX_NameFromField.setText(Messages.Dialog_Export_Radio_TCX_NameFromField);
-					_rdoTCX_NameFromField.addSelectionListener(nameSelectionListener);
-				}
-			}
-
-			{
-				/*
-				 * label: course name
-				 */
-				_lblTcxCourseName = new Label(container, SWT.NONE);
-				GridDataFactory.fillDefaults().applyTo(_lblTcxCourseName);
-				_lblTcxCourseName.setText(Messages.Dialog_Export_Label_TCX_CourseName);
-
-				/*
-				 * combo: name
-				 */
-				_comboTcxCourseName = new Combo(container, SWT.SINGLE | SWT.BORDER);
-				GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_comboTcxCourseName);
-				_comboTcxCourseName.setVisibleItemCount(20);
-				_comboTcxCourseName.addModifyListener(nameModifyListener);
-			}
-		}
-	}
-
-	private void createUI_90_ExportFile(final Composite parent) {
-
-		Label label;
-
-		final ModifyListener filePathModifyListener = new ModifyListener() {
-			@Override
-			public void modifyText(final ModifyEvent e) {
-				validateFields();
-			}
-		};
-
-		/*
-		 * group: filename
-		 */
-		final Group group = new Group(parent, SWT.NONE);
-		group.setText(Messages.dialog_export_group_exportFileName);
-		GridDataFactory.fillDefaults().grab(true, false).indent(0, VERTICAL_SECTION_MARGIN).applyTo(group);
-		GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
-		{
-			/*
-			 * label: filename
-			 */
-			label = new Label(group, SWT.NONE);
-			label.setText(Messages.dialog_export_label_fileName);
-
-			/*
-			 * combo: path
-			 */
-			_comboFile = new Combo(group, SWT.SINGLE | SWT.BORDER);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(_comboFile);
-			((GridData) _comboFile.getLayoutData()).widthHint = SIZING_TEXT_FIELD_WIDTH;
-			_comboFile.setVisibleItemCount(20);
-			_comboFile.addVerifyListener(net.tourbook.common.UI.verifyFilenameInput());
-			_comboFile.addModifyListener(filePathModifyListener);
-			_comboFile.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					validateFields();
-				}
-			});
-
-			/*
-			 * button: browse
-			 */
-			_btnSelectFile = new Button(group, SWT.PUSH);
-			_btnSelectFile.setText(Messages.app_btn_browse);
-			_btnSelectFile.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onSelectBrowseFile();
-					validateFields();
-				}
-			});
-			setButtonLayoutData(_btnSelectFile);
-
-			// -----------------------------------------------------------------------------
-
-			/*
-			 * label: path
-			 */
-			label = new Label(group, SWT.NONE);
-			label.setText(Messages.dialog_export_label_exportFilePath);
-
-			/*
-			 * combo: path
-			 */
-			_comboPath = new Combo(group, SWT.SINGLE | SWT.BORDER);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(_comboPath);
-			((GridData) _comboPath.getLayoutData()).widthHint = SIZING_TEXT_FIELD_WIDTH;
-			_comboPath.setVisibleItemCount(20);
-			_comboPath.addModifyListener(filePathModifyListener);
-			_comboPath.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					validateFields();
-				}
-			});
-
-			/*
-			 * button: browse
-			 */
-			_btnSelectDirectory = new Button(group, SWT.PUSH);
-			_btnSelectDirectory.setText(Messages.app_btn_browse);
-			_btnSelectDirectory.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onSelectBrowseDirectory();
-					validateFields();
-				}
-			});
-			setButtonLayoutData(_btnSelectDirectory);
-
-			// -----------------------------------------------------------------------------
-
-			/*
-			 * label: file path
-			 */
-			label = new Label(group, SWT.NONE);
-			label.setText(Messages.dialog_export_label_filePath);
-
-			/*
-			 * text: filename
-			 */
-			_txtFilePath = new Text(group, /* SWT.BORDER | */SWT.READ_ONLY);
-			GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_txtFilePath);
-			_txtFilePath.setToolTipText(Messages.dialog_export_txt_filePath_tooltip);
-			_txtFilePath.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-
-			// -----------------------------------------------------------------------------
-
-			/*
-			 * checkbox: overwrite files
-			 */
-			_chkOverwriteFiles = new Button(group, SWT.CHECK);
-			GridDataFactory.fillDefaults()//
-					.align(SWT.BEGINNING, SWT.CENTER)
-					.span(3, 1)
-					.indent(0, _pc.convertVerticalDLUsToPixels(4))
-					.applyTo(_chkOverwriteFiles);
-			_chkOverwriteFiles.setText(Messages.dialog_export_chk_overwriteFiles);
-			_chkOverwriteFiles.setToolTipText(Messages.dialog_export_chk_overwriteFiles_tooltip);
-		}
-
-	}
-
-	private void doExport() throws IOException {
-
-		// disable button's
-		getButton(IDialogConstants.OK_ID).setEnabled(false);
-		getButton(IDialogConstants.CANCEL_ID).setEnabled(false);
-
-		_exportState_IsCamouflageSpeed = _chkCamouflageSpeed.getSelection();
-		_exportState_IsOverwriteFiles = _chkOverwriteFiles.getSelection();
-
-		_exportState_CamouflageSpeed = _spinnerCamouflageSpeed.getSelection();
-		_exportState_CamouflageSpeed *= net.tourbook.ui.UI.UNIT_VALUE_DISTANCE / 3.6f;
-		_exportState_FileCollisionBehaviour = new FileCollisionBehavior();
-
-		if (_isSetup_TourRange) {
-			_exportState_IsRange = _chkExportTourRange.getSelection();
-		}
-
-		if (_isSetup_MultipleTours) {
-			_exportState_IsMergeTours = _chkMergeAllTours.getSelection();
-		}
-
-		if (_isSetup_GPX) {
-
-			_exportState_isAbsoluteDistance = _rdoGPX_DistanceAbsolute.getSelection();
-
-			_exportState_GPX_IsExportAllTourData = _chkGPX_NoneGPXFields.getSelection();
-			_exportState_IsDescription = _chkGPX_Description.getSelection();
-			_exportState_GPX_IsExportMarkers = _chkGPX_Markers.getSelection();
-			_exportState_GPX_IsExportWithBarometer = _chkGPX_WithBarometer.getSelection();
-
-		} else if (_isSetup_TCX) {
-
-			// .tcx files do always contain absolute distances
-			_exportState_isAbsoluteDistance = true;
-
-			_exportState_IsDescription = _chkTCX_Description.getSelection();
-
-			_exportState_TCX_IsCourses = _rdoTCX_Courses.getSelection();
-			_exportState_TCX_CourseName = _comboTcxCourseName.getText();
-		}
-
-		final String exportFileName = _txtFilePath.getText();
-
-		if (_tourDataList.size() == 1) {
-
-			// export one tour
-
-			final ArrayList<GarminTrack> tracks = new ArrayList<>();
-			final ArrayList<TourWayPoint> wayPoints = new ArrayList<>();
-			final ArrayList<TourMarker> tourMarkers = new ArrayList<>();
-
-			final TourData tourData = _tourDataList.get(0);
-			final ZonedDateTime trackStartTime = tourData.getTourStartTime();
-
-			final GarminLap tourLap = doExport_50_Lap(tourData);
-
-			final GarminTrack track = doExport_60_TrackPoints(tourData, trackStartTime);
-			if (track != null) {
-				tracks.add(track);
-			}
-
-			doExport_70_WayPoints(wayPoints, tourMarkers, tourData, trackStartTime);
-
-			doExport_10_Tour(tourData, tracks, wayPoints, tourMarkers, tourLap, exportFileName);
-
-		} else {
-
-			/*
-			 * export multiple tours
-			 */
-
-			final String exportPathName;
-
-			if (_exportState_IsMergeTours) {
-				exportPathName = exportFileName;
-			} else {
-				exportPathName = getExportPathName();
-			}
-
-			try {
-
-				final IRunnableWithProgress exportRunnable = new IRunnableWithProgress() {
-					@Override
-					public void run(final IProgressMonitor monitor) throws InvocationTargetException,
-							InterruptedException {
-
-						try {
-
-							doExport_05_Runnable(monitor, exportPathName);
-
-						} catch (final IOException e) {
-							StatusUtil.log(e);
-						}
-					}
-				};
-
-				new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, true, exportRunnable);
-
-			} catch (final InvocationTargetException e) {
-				StatusUtil.showStatus(e);
-			} catch (final InterruptedException e) {
-				StatusUtil.showStatus(e);
-			}
-
-		}
-	}
-
-	private void doExport_05_Runnable(final IProgressMonitor monitor, final String exportFileName) throws IOException {
-
-		int exported = 0;
-		final int tourSize = _tourDataList.size();
-
-		monitor.beginTask(UI.EMPTY_STRING, tourSize);
-
-		if (_exportState_IsMergeTours) {
-
-			/*
-			 * merge all tours into one
-			 */
-
-			_mergedTime = _tourDataList.get(0).getTourStartTime();
-			_mergedDistance = 0;
-
-			final ArrayList<GarminTrack> tracks = new ArrayList<>();
-			final ArrayList<TourWayPoint> wayPoints = new ArrayList<>();
-			final ArrayList<TourMarker> tourMarkers = new ArrayList<>();
-
-			final GarminLap tourLap = new GarminLap();
-
-			// create tracklist and lap
-			for (final TourData tourData : _tourDataList) {
-
-				if (monitor.isCanceled()) {
-					return;
-				}
-
-				monitor.worked(1);
-				monitor.subTask(NLS.bind(Messages.Dialog_Export_SubTask_Export, new Object[] {
-						++exported,
-						tourSize,
-						TourManager.getTourTitle(tourData) }));
-
-				doExport_52_Laps(tourData, tourLap);
-
-				ZonedDateTime trackStartTime;
-				if (_exportState_IsCamouflageSpeed) {
-					trackStartTime = _mergedTime;
-				} else {
-					trackStartTime = tourData.getTourStartTime();
-				}
-
-				final GarminTrack track = doExport_60_TrackPoints(tourData, trackStartTime);
-				if (track != null) {
-					tracks.add(track);
-				}
-
-				doExport_70_WayPoints(wayPoints, tourMarkers, tourData, trackStartTime);
-			}
-
-			/*
-			 * There is currently no listener to stop the velocity evalute method
-			 */
-			monitor.subTask(NLS.bind(Messages.Dialog_Export_SubTask_CreatingExportFile, exportFileName));
-
-			doExport_10_Tour(null, tracks, wayPoints, tourMarkers, tourLap, exportFileName);
-
-		} else {
-
-			/*
-			 * export each tour separately
-			 */
-
-			final IPath exportFilePath = new Path(exportFileName).addTrailingSeparator();
-			final String fileExtension = _exportExtensionPoint.getFileExtension();
-
-			for (final TourData tourData : _tourDataList) {
-
-				if (monitor.isCanceled()) {
-					break;
-				}
-
-				// create file path name
-				final String tourFileName = net.tourbook.ui.UI.format_yyyymmdd_hhmmss(tourData);
-
-				final String exportFilePathName = exportFilePath
-						.append(tourFileName)
-						.addFileExtension(fileExtension)
-						.toOSString();
-
-				monitor.worked(1);
-				monitor.subTask(NLS.bind(Messages.Dialog_Export_SubTask_Export, new Object[] {
-						++exported,
-						tourSize,
-						exportFilePathName }));
-
-				final ArrayList<GarminTrack> tracks = new ArrayList<>();
-				final ArrayList<TourWayPoint> wayPoints = new ArrayList<>();
-				final ArrayList<TourMarker> tourMarkers = new ArrayList<>();
-
-				final ZonedDateTime trackStartTime = tourData.getTourStartTime();
-
-				final GarminLap tourLap = doExport_50_Lap(tourData);
-
-				final GarminTrack track = doExport_60_TrackPoints(tourData, trackStartTime);
-
-				if (track != null) {
-					tracks.add(track);
-				}
-
-				doExport_70_WayPoints(wayPoints, tourMarkers, tourData, trackStartTime);
-
-				doExport_10_Tour(tourData, tracks, wayPoints, tourMarkers, tourLap, exportFilePathName);
-
-				// check if overwrite dialog was canceled
-				if (_exportState_FileCollisionBehaviour.value == FileCollisionBehavior.DIALOG_IS_CANCELED) {
-					break;
-				}
-			}
-		}
-	}
-
-	private void doExport_10_Tour(	final TourData tourData,
-									final ArrayList<GarminTrack> tracks,
-									final ArrayList<TourWayPoint> wayPoints,
-									final ArrayList<TourMarker> tourMarkers,
-									final GarminLap lap,
-									final String exportFileName) throws IOException {
-
-		boolean isOverwrite = true;
-
-		final File exportFile = new File(exportFileName);
-		if (exportFile.exists()) {
-			if (_exportState_IsOverwriteFiles) {
-				// overwrite is enabled in the UI
-			} else {
-				isOverwrite = net.tourbook.ui.UI.confirmOverwrite(_exportState_FileCollisionBehaviour, exportFile);
-			}
-		}
-
-		if (isOverwrite == false) {
-			return;
-		}
-
-		final VelocityContext vc = new VelocityContext();
-
-		// math tool to convert float into double
-		vc.put("math", new MathTool());//$NON-NLS-1$
-
-		if (_isSetup_GPX) {
-
-			vc.put(VC_IS_EXPORT_ALL_TOUR_DATA, _exportState_GPX_IsExportAllTourData && tourData != null);
-
-		} else if (_isSetup_TCX) {
-
-			vc.put("iscourses", _exportState_TCX_IsCourses); //$NON-NLS-1$
-			vc.put("coursename", _exportState_TCX_CourseName); //$NON-NLS-1$
-		}
-
-		vc.put(VC_LAP, lap);
-		vc.put(VC_TRACKS, tracks);
-		vc.put(VC_WAY_POINTS, wayPoints);
-		vc.put(VC_TOUR_MARKERS, tourMarkers);
-		vc.put(VC_TOUR_DATA, tourData);
-
-		vc.put(VC_HAS_TOUR_MARKERS, Boolean.valueOf(tourMarkers.size() > 0));
-		vc.put(VC_HAS_TRACKS, Boolean.valueOf(tracks.size() > 0));
-		vc.put(VC_HAS_WAY_POINTS, Boolean.valueOf(wayPoints.size() > 0));
-
-		vc.put("dateformat", _dateFormat); //$NON-NLS-1$
-		vc.put("dtIso", _dtIso); //$NON-NLS-1$
-		vc.put("nf1", _nf1); //$NON-NLS-1$
-		vc.put("nf3", _nf3); //$NON-NLS-1$
-		vc.put("nf8", _nf8); //$NON-NLS-1$
-
-		doExport_20_TourValues(vc);
-
-		final Writer exportWriter = new BufferedWriter(new OutputStreamWriter(
-				new FileOutputStream(exportFile),
-				UI.UTF_8));
-
-		final Reader templateReader = new InputStreamReader(this.getClass().getResourceAsStream(_formatTemplate));
-
-		try {
-
-			Velocity.evaluate(vc, exportWriter, "MyTourbook", templateReader); //$NON-NLS-1$
-
-		} catch (final Exception e) {
-			StatusUtil.showStatus(e);
-		} finally {
-			exportWriter.close();
-		}
-	}
-
-	/**
-	 * Adds some values to the velocity context (e.g. date, ...).
-	 *
-	 * @param vcContext
-	 *            the velocity context holding all the data
-	 */
-	private void doExport_20_TourValues(final VelocityContext vcContext) {
-
-		/*
-		 * Current time, date
-		 */
-		final Calendar now = Calendar.getInstance();
-		final Date creationDate = now.getTime();
-		vcContext.put("creation_date", creationDate); //$NON-NLS-1$
-
-		doExport_21_Creator(vcContext);
-		doExport_22_MinMax_LatLon(vcContext);
-		doExport_24_MinMax_Other(vcContext, creationDate);
-	}
-
-	private void doExport_21_Creator(final VelocityContext vcContext) {
-
-		final Version version = Activator.getDefault().getVersion();
-
-		/*
-		 * Version
-		 */
-		String pluginMajorVersion = ZERO;
-		String pluginMinorVersion = ZERO;
-		String pluginMicroVersion = ZERO;
-		String pluginQualifierVersion = ZERO;
-
-		if (version != null) {
-			pluginMajorVersion = Integer.toString(version.getMajor());
-			pluginMinorVersion = Integer.toString(version.getMinor());
-			pluginMicroVersion = Integer.toString(version.getMicro());
-			pluginQualifierVersion = version.getQualifier();
-		}
-
-		vcContext.put("pluginMajorVersion", pluginMajorVersion); //$NON-NLS-1$
-		vcContext.put("pluginMinorVersion", pluginMinorVersion); //$NON-NLS-1$
-		vcContext.put("pluginMicroVersion", pluginMicroVersion); //$NON-NLS-1$
-		vcContext.put("pluginQualifierVersion", pluginQualifierVersion); //$NON-NLS-1$
-
-		/*
-		 * Creator
-		 */
-		String creatorText = String.format("MyTourbook %d.%d.%d.%s - http://mytourbook.sourceforge.net",//$NON-NLS-1$
-				version.getMajor(),
-				version.getMinor(),
-				version.getMicro(),
-				version.getQualifier());
-
-		if (_exportState_GPX_IsExportWithBarometer) {
-			creatorText += STRAVA_WITH_BAROMETER;
-		}
-
-		vcContext.put("creator", creatorText); //$NON-NLS-1$
-	}
-
-	/**
-	 * Calculate min/max values for latitude/longitude.
-	 */
-	private void doExport_22_MinMax_LatLon(final VelocityContext vcContext) {
-
-		/*
-		 * Extent of waypoint, routes and tracks:
-		 */
-		double min_latitude = 90.0;
-		double min_longitude = 180.0;
-		double max_latitude = -90.0;
-		double max_longitude = -180.0;
-
-		final List<?> routes = (List<?>) vcContext.get("routes"); //$NON-NLS-1$
-		if (routes != null) {
-			final Iterator<?> route_iterator = routes.iterator();
-			while (route_iterator.hasNext()) {
-				final GPSRoute route = (GPSRoute) route_iterator.next();
-				min_longitude = route.getMinLongitude();
-				max_longitude = route.getMaxLongitude();
-				min_latitude = route.getMinLatitude();
-				max_latitude = route.getMaxLatitude();
-			}
-		}
-
-		final List<?> wayPoints = (List<?>) vcContext.get(VC_WAY_POINTS);
-		if (wayPoints != null) {
-			final Iterator<?> waypoint_iterator = wayPoints.iterator();
-			while (waypoint_iterator.hasNext()) {
-				final TourWayPoint waypoint = (TourWayPoint) waypoint_iterator.next();
-				min_longitude = Math.min(min_longitude, waypoint.getLongitude());
-				max_longitude = Math.max(max_longitude, waypoint.getLongitude());
-				min_latitude = Math.min(min_latitude, waypoint.getLatitude());
-				max_latitude = Math.max(max_latitude, waypoint.getLatitude());
-			}
-		}
-
-		final List<?> tourMarkers = (List<?>) vcContext.get(VC_TOUR_MARKERS);
-		if (tourMarkers != null) {
-
-			for (final Object element : tourMarkers) {
-				if (element instanceof TourMarker) {
-
-					final TourMarker tourMarker = (TourMarker) element;
-
-					final double longitude = tourMarker.getLongitude();
-					final double latitude = tourMarker.getLatitude();
-
-					if (longitude != TourDatabase.DEFAULT_DOUBLE) {
-
-						min_longitude = Math.min(min_longitude, longitude);
-						max_longitude = Math.max(max_longitude, longitude);
-						min_latitude = Math.min(min_latitude, latitude);
-						max_latitude = Math.max(max_latitude, latitude);
-					}
-				}
-			}
-		}
-
-		final List<?> tracks = (List<?>) vcContext.get(VC_TRACKS);
-		if (tracks != null) {
-			final Iterator<?> track_iterator = tracks.iterator();
-			while (track_iterator.hasNext()) {
-				final GPSTrack track = (GPSTrack) track_iterator.next();
-				min_longitude = Math.min(min_longitude, track.getMinLongitude());
-				max_longitude = Math.max(max_longitude, track.getMaxLongitude());
-				min_latitude = Math.min(min_latitude, track.getMinLatitude());
-				max_latitude = Math.max(max_latitude, track.getMaxLatitude());
-			}
-		}
-
-		vcContext.put("min_latitude", new Double(min_latitude)); //$NON-NLS-1$
-		vcContext.put("min_longitude", new Double(min_longitude)); //$NON-NLS-1$
-		vcContext.put("max_latitude", new Double(max_latitude)); //$NON-NLS-1$
-		vcContext.put("max_longitude", new Double(max_longitude)); //$NON-NLS-1$
-	}
-
-	/**
-	 * Min/max time, heart, cadence and other values.
-	 */
-	private void doExport_24_MinMax_Other(final VelocityContext vcContext, final Date creationDate) {
-
-		Date starttime = null;
-		Date endtime = null;
-		int heartNum = 0;
-		long heartSum = 0;
-		int cadNum = 0;
-		long cadSum = 0;
-		short maximumheartrate = 0;
-		double totaldistance = 0;
-
-		final List<?> tracks = (List<?>) vcContext.get(VC_TRACKS);
-
-		for (final Object name : tracks) {
-
-			final GPSTrack track = (GPSTrack) name;
-			for (final Iterator<?> wpIter = track.getWaypoints().iterator(); wpIter.hasNext();) {
-
-				final GPSTrackpoint wp = (GPSTrackpoint) wpIter.next();
-
-				// starttime, totaltime
-				if (wp.getDate() != null) {
-					if (starttime == null) {
-						starttime = wp.getDate();
-					}
-					endtime = wp.getDate();
-				}
-
-				if (wp instanceof GarminTrackpointAdapter) {
-
-					final GarminTrackpointAdapter gta = (GarminTrackpointAdapter) wp;
-
-					// average heartrate, maximum heartrate
-					if (gta.hasValidHeartrate()) {
-						heartSum += gta.getHeartrate();
-						heartNum++;
-						if (gta.getHeartrate() > maximumheartrate) {
-							maximumheartrate = gta.getHeartrate();
-						}
-					}
-
-					// average cadence
-					if (gta.hasValidCadence()) {
-						cadSum += gta.getCadence();
-						cadNum++;
-					}
-
-					// totaldistance
-					if (gta.hasValidDistance()) {
-						totaldistance = gta.getDistance();
-					}
-				}
-			}
-		}
-
-		if (starttime != null) {
-			vcContext.put("starttime", starttime); //$NON-NLS-1$
-		} else {
-			vcContext.put("starttime", creationDate); //$NON-NLS-1$
-		}
-
-		if ((starttime != null) && (endtime != null)) {
-			vcContext.put("totaltime", ((double) endtime.getTime() - starttime.getTime()) / 1000); //$NON-NLS-1$
-		} else {
-			vcContext.put("totaltime", (double) 0); //$NON-NLS-1$
-		}
-
-		vcContext.put("totaldistance", totaldistance); //$NON-NLS-1$
-
-		if (maximumheartrate != 0) {
-			vcContext.put("maximumheartrate", maximumheartrate); //$NON-NLS-1$
-		}
-
-		if (heartNum != 0) {
-			vcContext.put("averageheartrate", heartSum / heartNum); //$NON-NLS-1$
-		}
-
-		if (cadNum != 0) {
-			vcContext.put("averagecadence", cadSum / cadNum); //$NON-NLS-1$
-		}
-	}
-
-	private GarminLap doExport_50_Lap(final TourData tourData) {
-
-		final GarminLap lap = new GarminLap();
-
-		/*
-		 * Calories
-		 */
-		lap.setCalories(tourData.getCalories());
-
-		/*
-		 * Description
-		 */
-		if (_exportState_IsDescription) {
-			final String notes = tourData.getTourDescription();
-			if ((notes != null) && (notes.length() > 0)) {
-				lap.setNotes(notes);
-			}
-		}
-
-		return lap;
-	}
-
-	private void doExport_52_Laps(final TourData tourData, final GarminLap tourLap) {
-
-		/*
-		 * Calories
-		 */
-		int calories = tourLap.getCalories();
-		calories += tourData.getCalories();
-		tourLap.setCalories(calories);
-
-		/*
-		 * Description
-		 */
-		if (_exportState_IsDescription) {
-
-			final String notes = tourData.getTourDescription();
-
-			if ((notes != null) && (notes.length() > 0)) {
-
-				final String lapNotes = tourLap.getNotes();
-
-				if (lapNotes == null) {
-					tourLap.setNotes(notes);
-				} else {
-					tourLap.setNotes(lapNotes + "\n" + notes); //$NON-NLS-1$
-				}
-			}
-		}
-
-	}
-
-	/**
-	 * @param tourData
-	 * @param trackDateTime
-	 * @return Returns a track or <code>null</code> when tour data cannot be exported.
-	 */
-	private GarminTrack doExport_60_TrackPoints(final TourData tourData, final ZonedDateTime trackDateTime) {
-
-		final int[] timeSerie = tourData.timeSerie;
-
-		// check if all dataseries are available
-		if ((timeSerie == null) /* || (latitudeSerie == null) || (longitudeSerie == null) */) {
-			return null;
-		}
-
-		final float[] altitudeSerie = tourData.altitudeSerie;
-		final float[] cadenceSerie = tourData.getCadenceSerie();
-		final float[] distanceSerie = tourData.distanceSerie;
-		final long[] gearSerie = tourData.gearSerie;
-		final double[] latitudeSerie = tourData.latitudeSerie;
-		final double[] longitudeSerie = tourData.longitudeSerie;
-		final float[] pulseSerie = tourData.pulseSerie;
-		final float[] temperatureSerie = tourData.temperatureSerie;
-
-		final boolean isAltitude = (altitudeSerie != null) && (altitudeSerie.length > 0);
-		final boolean isCadence = (cadenceSerie != null) && (cadenceSerie.length > 0);
-		final boolean isDistance = (distanceSerie != null) && (distanceSerie.length > 0);
-		final boolean isGear = (gearSerie != null) && (gearSerie.length > 0);
-		final boolean isPulse = (pulseSerie != null) && (pulseSerie.length > 0);
-		final boolean isTemperature = (temperatureSerie != null) && (temperatureSerie.length > 0);
-
-		int prevTime = -1;
-		ZonedDateTime lastTrackDateTime = null;
-
-		// default is to use all trackpoints
-		int startIndex = 0;
-		int endIndex = timeSerie.length - 1;
-
-		// adjust start/end when a part is exported
-		if (_exportState_IsRange) {
-			startIndex = _tourStartIndex;
-			endIndex = _tourEndIndex;
-		}
-
-		final GarminTrack track = new GarminTrack();
-
-		/*
-		 * Track title/description
-		 */
-		if (_exportState_IsDescription) {
-
-			final String tourTitle = tourData.getTourTitle();
-			if (tourTitle.length() > 0) {
-				track.setIdentification(tourTitle);
-			}
-
-			final String tourDescription = tourData.getTourDescription();
-			if (tourDescription.length() > 0) {
-				track.setComment(tourDescription);
-			}
-		}
-
-		/*
-		 * loop: trackpoints
-		 */
-		for (int serieIndex = startIndex; serieIndex <= endIndex; serieIndex++) {
-
-			final GarminTrackpointD304 tp304 = new GarminTrackpointD304();
-			final GarminTrackpointAdapterExtended tpExt = new GarminTrackpointAdapterExtended(tp304);
-
-			// mark as a new track to create the <trkseg>...</trkseg> tags
-			if (serieIndex == startIndex) {
-				tpExt.setNewTrack(true);
-			}
-
-			if (isAltitude) {
-				tpExt.setAltitude(altitudeSerie[serieIndex]);
-			}
-
-			// I don't know if this is according to the rules to have a gpx/tcx without lat/lon
-			if (latitudeSerie != null && longitudeSerie != null) {
-				tpExt.setLatitude(latitudeSerie[serieIndex]);
-				tpExt.setLongitude(longitudeSerie[serieIndex]);
-			}
-
-			float distance = 0;
-			if (isDistance) {
-
-				if (_exportState_isAbsoluteDistance) {
-
-					distance = distanceSerie[serieIndex];
-
-				} else if (distanceSerie != null) {
-
-					// skip first distance difference
-					if (serieIndex > startIndex) {
-						distance = distanceSerie[serieIndex] - distanceSerie[serieIndex - 1];
-					}
-				}
-			}
-
-			int relativeTime;
-			if (_exportState_IsCamouflageSpeed && isDistance) {
-
-				// camouflage speed
-
-				relativeTime = (int) (distance / _exportState_CamouflageSpeed);
-
-			} else {
-
-				// keep recorded speed
-
-				relativeTime = timeSerie[serieIndex];
-			}
-
-			if (isDistance) {
-				tpExt.setDistance(distance + _mergedDistance);
-			}
-
-			if (isCadence) {
-				tp304.setCadence((short) cadenceSerie[serieIndex]);
-			}
-
-			if (isPulse) {
-				tp304.setHeartrate((short) pulseSerie[serieIndex]);
-			}
-
-			if (isTemperature) {
-				tpExt.setTemperature(temperatureSerie[serieIndex]);
-			}
-
-			if (isGear) {
-				tpExt.setGear(gearSerie[serieIndex]);
-			}
-
-			// ignore trackpoints which have the same time
-			if (relativeTime != prevTime) {
-
-				lastTrackDateTime = trackDateTime.plusSeconds(relativeTime);
-
-				tpExt.setDate(Date.from(lastTrackDateTime.toInstant()));
-
-				track.addWaypoint(tpExt);
-			}
-
-			prevTime = relativeTime;
-		}
-
-		/*
-		 * Keep values for the next merged tour
-		 */
-		if (isDistance && _exportState_isAbsoluteDistance) {
-
-			final float distanceDiff = distanceSerie[endIndex] - distanceSerie[startIndex];
-			_mergedDistance += distanceDiff;
-		}
-
-		_mergedTime = lastTrackDateTime;
-
-		return track;
-	}
-
-	private void doExport_70_WayPoints(	final ArrayList<TourWayPoint> exportedWayPoints,
-										final ArrayList<TourMarker> exportedTourMarkers,
-										final TourData tourData,
-										final ZonedDateTime tourStartTime) {
-
-		// get markers when this option is checked
-		if (_exportState_GPX_IsExportMarkers == false) {
-			return;
-		}
-
-		final int[] timeSerie = tourData.timeSerie;
-		final float[] altitudeSerie = tourData.altitudeSerie;
-		final double[] latitudeSerie = tourData.latitudeSerie;
-		final double[] longitudeSerie = tourData.longitudeSerie;
-		final float[] distanceSerie = tourData.distanceSerie;
-
-		final Set<TourMarker> tourMarkers = tourData.getTourMarkers();
-		final Set<TourWayPoint> tourWayPoints = tourData.getTourWayPoints();
-
-		// ensure required dataseries are available
-		if (timeSerie == null || latitudeSerie == null || longitudeSerie == null) {
-			return;
-		}
-
-		final boolean isAltitude = altitudeSerie != null;
-		final boolean isDistance = (distanceSerie != null) && (distanceSerie.length > 0);
-
-		// default is to use all trackpoints
-		int startIndex = 0;
-		int endIndex = timeSerie.length - 1;
-		boolean isRange = false;
-
-		// adjust start/end when a part is exported
-		if (_exportState_IsRange) {
-			startIndex = _tourStartIndex;
-			endIndex = _tourEndIndex;
-			isRange = true;
-		}
-
-		/*
-		 * Create exported tour marker
-		 */
-		for (final TourMarker tourMarker : tourMarkers) {
-
-			final int serieIndex = tourMarker.getSerieIndex();
-
-			// skip markers when they are not in the defined range
-			if (isRange) {
-				if ((serieIndex < startIndex) || (serieIndex > endIndex)) {
-					continue;
-				}
-			}
-
-			/*
-			 * get distance
-			 */
-			float distance = 0;
-			if (isDistance) {
-
-				if (_exportState_isAbsoluteDistance) {
-
-					distance = distanceSerie[serieIndex];
-
-				} else if (distanceSerie != null) {
-
-					// skip first distance difference
-					if (serieIndex > startIndex) {
-						distance = distanceSerie[serieIndex] - distanceSerie[serieIndex - 1];
-					}
-				}
-			}
-
-			/*
-			 * get time
-			 */
-			int relativeTime;
-			if (_exportState_IsCamouflageSpeed && isDistance) {
-
-				// camouflage speed
-
-				relativeTime = (int) (distance / _exportState_CamouflageSpeed);
-
-			} else {
-
-				// keep recorded speed
-
-				relativeTime = timeSerie[serieIndex];
-			}
-
-			final ZonedDateTime zonedMarkerTime = tourStartTime.plusSeconds(relativeTime);
-			final long absoluteMarkerTime = zonedMarkerTime.toInstant().toEpochMilli();
-
-			/*
-			 * Setup exported tour marker
-			 */
-			final TourMarker exportedTourMarker = tourMarker.clone();
-
-			exportedTourMarker.setTime(relativeTime, absoluteMarkerTime);
-			exportedTourMarker.setLatitude(latitudeSerie[serieIndex]);
-			exportedTourMarker.setLongitude(longitudeSerie[serieIndex]);
-
-			if (isAltitude) {
-				exportedTourMarker.setAltitude(altitudeSerie[serieIndex]);
-			}
-
-			if (isDistance) {
-				exportedTourMarker.setDistance(distance);
-			}
-
-			exportedTourMarkers.add(exportedTourMarker);
-		}
-
-		for (final TourWayPoint twp : tourWayPoints) {
-
-			final TourWayPoint wayPoint = new TourWayPoint();
-
-			wayPoint.setTime(twp.getTime());
-			wayPoint.setLatitude(twp.getLatitude());
-			wayPoint.setLongitude(twp.getLongitude());
-
-			wayPoint.setName(twp.getName());
-
-			// <desc>...</desc>
-			final String comment = twp.getComment();
-			final String description = twp.getDescription();
-			final String descText = description != null ? description : comment;
-			if (descText != null) {
-				wayPoint.setComment(descText);
-			}
-
-			wayPoint.setAltitude(twp.getAltitude());
-
-			wayPoint.setUrlAddress(twp.getUrlAddress());
-			wayPoint.setUrlText(twp.getUrlText());
+         {
+            createUI_50_Option_How(groupHow);
+         }
+      }
+   }
+
+   private void createUI_14_OptionsRight(final Composite parent) {
+
+      /*
+       * Custom options
+       */
+      if (_isSetup_GPX) {
+
+         final Group groupCustomGPX = new Group(parent, SWT.NONE);
+         groupCustomGPX.setText(Messages.Dialog_Export_Group_Custom);
+         groupCustomGPX.setToolTipText(Messages.Dialog_Export_Group_Custom_Tooltip);
+         GridDataFactory.fillDefaults().grab(false, false).applyTo(groupCustomGPX);
+         GridLayoutFactory.swtDefaults().applyTo(groupCustomGPX);
+         {
+            createUI_72_Option_GPX_Custom(groupCustomGPX);
+         }
+      }
+   }
+
+   private void createUI_20_Option_What(final Composite parent) {
+
+      if (_isSetup_GPX) {
+         {
+            /*
+             * checkbox: export description
+             */
+            _chkGPX_Description = new Button(parent, SWT.CHECK);
+            _chkGPX_Description.setText(Messages.Dialog_Export_Checkbox_Description);
+         }
+         {
+            /*
+             * checkbox: export markers
+             */
+            _chkGPX_Markers = new Button(parent, SWT.CHECK);
+            _chkGPX_Markers.setText(Messages.dialog_export_chk_exportMarkers);
+            _chkGPX_Markers.setToolTipText(Messages.dialog_export_chk_exportMarkers_tooltip);
+         }
+         {
+            /*
+             * checkbox: export tour data
+             */
+            _chkGPX_NoneGPXFields = new Button(parent, SWT.CHECK);
+            _chkGPX_NoneGPXFields.setText(Messages.Dialog_Export_Checkbox_TourFields);
+            _chkGPX_NoneGPXFields.setToolTipText(Messages.Dialog_Export_Checkbox_TourFields_Tooltip);
+         }
+         {
+            /*
+             * checkbox: export tour data
+             */
+            _chkGPX_SurfingWaves = new Button(parent, SWT.CHECK);
+            _chkGPX_SurfingWaves.setText(Messages.Dialog_Export_Checkbox_SurfingWaves);
+            _chkGPX_SurfingWaves.setToolTipText(Messages.Dialog_Export_Checkbox_SurfingWaves_Tooltip);
+            _chkGPX_SurfingWaves.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+
+                  // setup filename
+                  enableFields();
+               }
+            });
+         }
+
+      } else if (_isSetup_TCX) {
+         {
+            /*
+             * checkbox: export description
+             */
+            _chkTCX_Description = new Button(parent, SWT.CHECK);
+            _chkTCX_Description.setText(Messages.dialog_export_chk_exportNotes);
+            _chkTCX_Description.setToolTipText(Messages.dialog_export_chk_exportNotes_tooltip);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).applyTo(_chkTCX_Description);
+         }
+      }
+   }
+
+   private void createUI_40_Option_TourRange(final Composite parent) {
+
+      if (_isSetup_TourRange == false) {
+         return;
+      }
+
+      String tourRangeUI = null;
+
+      final TourData tourData = _tourDataList.get(0);
+      final int[] timeSerie = tourData.timeSerie;
+      if (timeSerie != null) {
+
+         final float[] distanceSerie = tourData.distanceSerie;
+         final boolean isDistance = distanceSerie != null;
+
+         final int startTime = timeSerie[_tourStartIndex];
+         final int endTime = timeSerie[_tourEndIndex];
+
+         final ZonedDateTime dtTour = tourData.getTourStartTime();
+
+         final String uiStartTime = dtTour.plusSeconds(startTime).format(TimeTools.Formatter_Time_M);
+         final String uiEndTime = dtTour.plusSeconds(endTime).format(TimeTools.Formatter_Time_M);
+
+         if (isDistance) {
+
+            tourRangeUI = NLS.bind(
+                  Messages.dialog_export_chk_tourRangeWithDistance,
+                  new Object[] {
+
+                        uiStartTime,
+                        uiEndTime,
+
+                        _nf3.format(distanceSerie[_tourStartIndex]
+                              / 1000
+                              / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE),
+                        _nf3.format(distanceSerie[_tourEndIndex]
+                              / 1000
+                              / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE),
+
+                        UI.UNIT_LABEL_DISTANCE,
+
+                        // adjust by 1 to corresponds to the number in the tour editor
+                        _tourStartIndex + 1,
+                        _tourEndIndex + 1 });
+
+         } else {
+
+            tourRangeUI = NLS.bind(Messages.dialog_export_chk_tourRangeWithoutDistance,
+                  new Object[] {
+                        uiStartTime,
+                        uiEndTime,
+                        _tourStartIndex + 1,
+                        _tourEndIndex + 1 });
+         }
+      }
+
+      /*
+       * checkbox: tour range
+       */
+      _chkExportTourRange = new Button(parent, SWT.CHECK);
+      GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_chkExportTourRange);
+
+      _chkExportTourRange.setText(tourRangeUI != null ? tourRangeUI : Messages.dialog_export_chk_tourRangeDisabled);
+
+      _chkExportTourRange.addSelectionListener(new SelectionAdapter() {
+         @Override
+         public void widgetSelected(final SelectionEvent e) {
+            enableFields();
+         }
+      });
+   }
+
+   private void createUI_50_Option_How(final Composite parent) {
+
+      if (_isSetup_MultipleTours) {
+
+         /*
+          * checkbox: merge all tours
+          */
+         _chkMergeAllTours = new Button(parent, SWT.CHECK);
+         GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).applyTo(_chkMergeAllTours);
+         _chkMergeAllTours.setText(Messages.dialog_export_chk_mergeAllTours);
+         _chkMergeAllTours.setToolTipText(Messages.dialog_export_chk_mergeAllTours_tooltip);
+         _chkMergeAllTours.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               enableFields();
+               setFileName();
+            }
+         });
+      }
+
+      createUI_60_Option_Speed(parent);
+
+      if (_isSetup_GPX) {
+
+         createUI_70_Option_GPX_Distance(parent);
+
+      } else if (_isSetup_TCX) {
+
+         createUI_80_Option_TCX_ActivitiesCourses(parent);
+      }
+   }
+
+   private void createUI_60_Option_Speed(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+      {
+         /*
+          * checkbox: camouflage speed
+          */
+         _chkCamouflageSpeed = new Button(container, SWT.CHECK);
+         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_chkCamouflageSpeed);
+         _chkCamouflageSpeed.setText(Messages.dialog_export_chk_camouflageSpeed);
+         _chkCamouflageSpeed.setToolTipText(Messages.dialog_export_chk_camouflageSpeed_tooltip);
+         _chkCamouflageSpeed.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+
+               validateFields();
+               enableFields();
+
+               if (_chkCamouflageSpeed.getSelection()) {
+                  _spinnerCamouflageSpeed.setFocus();
+               }
+            }
+         });
+
+         // text: speed
+         _spinnerCamouflageSpeed = new Spinner(container, SWT.BORDER);
+         GridDataFactory.fillDefaults() //
+               .align(SWT.BEGINNING, SWT.FILL)
+               .applyTo(_spinnerCamouflageSpeed);
+         _spinnerCamouflageSpeed.setToolTipText(Messages.dialog_export_chk_camouflageSpeedInput_tooltip);
+         _spinnerCamouflageSpeed.setPageIncrement(10);
+         _spinnerCamouflageSpeed.setMinimum(1);
+         _spinnerCamouflageSpeed.setMaximum(1000);
+         _spinnerCamouflageSpeed.addMouseWheelListener(new MouseWheelListener() {
+            @Override
+            public void mouseScrolled(final MouseEvent event) {
+               Util.adjustSpinnerValueOnMouseScroll(event);
+            }
+         });
+
+         // label: unit
+         _lblCoumouflageSpeedUnit = new Label(container, SWT.NONE);
+         _lblCoumouflageSpeedUnit.setText(UI.SYMBOL_AVERAGE_WITH_SPACE + UI.UNIT_LABEL_SPEED);
+         GridDataFactory
+               .fillDefaults()
+               .grab(true, false)
+               .align(SWT.BEGINNING, SWT.CENTER)
+               .applyTo(_lblCoumouflageSpeedUnit);
+      }
+   }
+
+   private void createUI_70_Option_GPX_Distance(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+      {
+         // label
+         final Label label = new Label(container, SWT.NONE);
+         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(label);
+         label.setText(Messages.Dialog_Export_Label_GPX_DistanceValues);
+
+         // radio
+         {
+            _rdoGPX_DistanceAbsolute = new Button(container, SWT.RADIO);
+            _rdoGPX_DistanceAbsolute.setText(Messages.Dialog_Export_Radio_GPX_DistanceAbsolute);
+            _rdoGPX_DistanceAbsolute.setToolTipText(Messages.Dialog_Export_Radio_GPX_DistanceAbsolute_Tooltip);
+
+            _rdoGPX_DistanceRelative = new Button(container, SWT.RADIO);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_rdoGPX_DistanceRelative);
+            _rdoGPX_DistanceRelative.setText(Messages.Dialog_Export_Radio_GPX_DistanceRelative);
+            _rdoGPX_DistanceRelative.setToolTipText(Messages.Dialog_Export_Radio_GPX_DistanceRelative_Tooltip);
+         }
+      }
+   }
+
+   private void createUI_72_Option_GPX_Custom(final Composite parent) {
+
+      /*
+       * checkbox: export with barometer
+       */
+      _chkGPX_WithBarometer = new Button(parent, SWT.CHECK);
+      GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).applyTo(_chkGPX_WithBarometer);
+      _chkGPX_WithBarometer.setText(Messages.Dialog_Export_Checkbox_WithBarometer);
+      _chkGPX_WithBarometer.setToolTipText(Messages.Dialog_Export_Checkbox_WithBarometer_Tooltip);
+   }
+
+   private void createUI_80_Option_TCX_ActivitiesCourses(final Composite parent) {
+
+      final SelectionAdapter defaultSelectionListener = new SelectionAdapter() {
+         @Override
+         public void widgetSelected(final SelectionEvent e) {
+            enableFields();
+            setFileName();
+         }
+      };
+
+      final SelectionAdapter nameSelectionListener = new SelectionAdapter() {
+         @Override
+         public void widgetSelected(final SelectionEvent e) {
+            updateUI_CourseName();
+            enableFields();
+            setFileName();
+         }
+      };
+
+      final ModifyListener nameModifyListener = new ModifyListener() {
+         @Override
+         public void modifyText(final ModifyEvent e) {
+            validateFields();
+         }
+      };
+
+      // container
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      {
+         {
+            /*
+             * label: tcx type
+             */
+            final Label label = new Label(container, SWT.NONE);
+            GridDataFactory.fillDefaults().applyTo(label);
+            label.setText(Messages.Dialog_Export_Label_TCX_Type);
+
+            final Composite containerActivities = new Composite(container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(containerActivities);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerActivities);
+            {
+               /*
+                * radio: activities
+                */
+               _rdoTCX_Courses = new Button(containerActivities, SWT.RADIO);
+               GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_rdoTCX_Courses);
+               _rdoTCX_Courses.setText(Messages.Dialog_Export_Radio_TCX_Courses);
+               _rdoTCX_Courses.setToolTipText(Messages.Dialog_Export_Radio_TCX_Courses_Tooltip);
+               _rdoTCX_Courses.addSelectionListener(defaultSelectionListener);
+
+               /*
+                * radio: activities
+                */
+               _rdoTCX_Activities = new Button(containerActivities, SWT.RADIO);
+               GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_rdoTCX_Activities);
+               _rdoTCX_Activities.setText(Messages.Dialog_Export_Radio_TCX_Aktivities);
+               _rdoTCX_Activities.setToolTipText(Messages.Dialog_Export_Radio_TCX_Aktivities_Tooltip);
+               _rdoTCX_Activities.addSelectionListener(defaultSelectionListener);
+            }
+         }
+
+         {
+            /*
+             * label: course name from
+             */
+            _lblTcxNameFrom = new Label(container, SWT.NONE);
+            GridDataFactory.fillDefaults().applyTo(_lblTcxNameFrom);
+            _lblTcxNameFrom.setText(Messages.Dialog_Export_Label_TCX_NameFrom);
+            _lblTcxNameFrom.setToolTipText(Messages.Dialog_Export_Label_TCX_NameFrom_Tooltip);
+
+            final Composite containerNameFrom = new Composite(container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(containerNameFrom);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerNameFrom);
+            {
+               /*
+                * radio: from tour
+                */
+               _rdoTCX_NameFromTour = new Button(containerNameFrom, SWT.RADIO);
+               GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_rdoTCX_NameFromTour);
+               _rdoTCX_NameFromTour.setText(Messages.Dialog_Export_Radio_TCX_NameFromTour);
+               _rdoTCX_NameFromTour.addSelectionListener(nameSelectionListener);
+
+               /*
+                * radio: from text field
+                */
+               _rdoTCX_NameFromField = new Button(containerNameFrom, SWT.RADIO);
+               GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_rdoTCX_NameFromField);
+               _rdoTCX_NameFromField.setText(Messages.Dialog_Export_Radio_TCX_NameFromField);
+               _rdoTCX_NameFromField.addSelectionListener(nameSelectionListener);
+            }
+         }
+
+         {
+            /*
+             * label: course name
+             */
+            _lblTcxCourseName = new Label(container, SWT.NONE);
+            GridDataFactory.fillDefaults().applyTo(_lblTcxCourseName);
+            _lblTcxCourseName.setText(Messages.Dialog_Export_Label_TCX_CourseName);
+
+            /*
+             * combo: name
+             */
+            _comboTcxCourseName = new Combo(container, SWT.SINGLE | SWT.BORDER);
+            GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_comboTcxCourseName);
+            _comboTcxCourseName.setVisibleItemCount(20);
+            _comboTcxCourseName.addModifyListener(nameModifyListener);
+         }
+      }
+   }
+
+   private void createUI_90_ExportFile(final Composite parent) {
+
+      Label label;
+
+      final ModifyListener filePathModifyListener = new ModifyListener() {
+         @Override
+         public void modifyText(final ModifyEvent e) {
+            validateFields();
+         }
+      };
+
+      /*
+       * group: filename
+       */
+      final Group group = new Group(parent, SWT.NONE);
+      group.setText(Messages.dialog_export_group_exportFileName);
+      GridDataFactory.fillDefaults().grab(true, false).indent(0, VERTICAL_SECTION_MARGIN).applyTo(group);
+      GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
+      {
+         /*
+          * label: filename
+          */
+         label = new Label(group, SWT.NONE);
+         label.setText(Messages.dialog_export_label_fileName);
+
+         /*
+          * combo: path
+          */
+         _comboFile = new Combo(group, SWT.SINGLE | SWT.BORDER);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(_comboFile);
+         ((GridData) _comboFile.getLayoutData()).widthHint = SIZING_TEXT_FIELD_WIDTH;
+         _comboFile.setVisibleItemCount(20);
+         _comboFile.addVerifyListener(net.tourbook.common.UI.verifyFilenameInput());
+         _comboFile.addModifyListener(filePathModifyListener);
+         _comboFile.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               validateFields();
+            }
+         });
+
+         /*
+          * button: browse
+          */
+         _btnSelectFile = new Button(group, SWT.PUSH);
+         _btnSelectFile.setText(Messages.app_btn_browse);
+         _btnSelectFile.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               onSelectBrowseFile();
+               validateFields();
+            }
+         });
+         setButtonLayoutData(_btnSelectFile);
+
+         // -----------------------------------------------------------------------------
+
+         /*
+          * label: path
+          */
+         label = new Label(group, SWT.NONE);
+         label.setText(Messages.dialog_export_label_exportFilePath);
+
+         /*
+          * combo: path
+          */
+         _comboPath = new Combo(group, SWT.SINGLE | SWT.BORDER);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(_comboPath);
+         ((GridData) _comboPath.getLayoutData()).widthHint = SIZING_TEXT_FIELD_WIDTH;
+         _comboPath.setVisibleItemCount(20);
+         _comboPath.addModifyListener(filePathModifyListener);
+         _comboPath.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               validateFields();
+            }
+         });
+
+         /*
+          * button: browse
+          */
+         _btnSelectDirectory = new Button(group, SWT.PUSH);
+         _btnSelectDirectory.setText(Messages.app_btn_browse);
+         _btnSelectDirectory.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               onSelectBrowseDirectory();
+               validateFields();
+            }
+         });
+         setButtonLayoutData(_btnSelectDirectory);
+
+         // -----------------------------------------------------------------------------
+
+         /*
+          * label: file path
+          */
+         label = new Label(group, SWT.NONE);
+         label.setText(Messages.dialog_export_label_filePath);
+
+         /*
+          * text: filename
+          */
+         _txtFilePath = new Text(group, /* SWT.BORDER | */SWT.READ_ONLY);
+         GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_txtFilePath);
+         _txtFilePath.setToolTipText(Messages.dialog_export_txt_filePath_tooltip);
+         _txtFilePath.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+
+         // -----------------------------------------------------------------------------
+
+         /*
+          * checkbox: overwrite files
+          */
+         _chkOverwriteFiles = new Button(group, SWT.CHECK);
+         GridDataFactory.fillDefaults()//
+               .align(SWT.BEGINNING, SWT.CENTER)
+               .span(3, 1)
+               .indent(0, _pc.convertVerticalDLUsToPixels(4))
+               .applyTo(_chkOverwriteFiles);
+         _chkOverwriteFiles.setText(Messages.dialog_export_chk_overwriteFiles);
+         _chkOverwriteFiles.setToolTipText(Messages.dialog_export_chk_overwriteFiles_tooltip);
+      }
+
+   }
+
+   private void doExport() throws IOException {
+
+      // disable button's
+      getButton(IDialogConstants.OK_ID).setEnabled(false);
+      getButton(IDialogConstants.CANCEL_ID).setEnabled(false);
+
+      _exportState_IsCamouflageSpeed = _chkCamouflageSpeed.getSelection();
+      _exportState_IsOverwriteFiles = _chkOverwriteFiles.getSelection();
+
+      _exportState_CamouflageSpeed = _spinnerCamouflageSpeed.getSelection();
+      _exportState_CamouflageSpeed *= net.tourbook.ui.UI.UNIT_VALUE_DISTANCE / 3.6f;
+      _exportState_FileCollisionBehaviour = new FileCollisionBehavior();
+
+      if (_isSetup_TourRange) {
+         _exportState_IsRange = _chkExportTourRange.getSelection();
+      }
+
+      if (_isSetup_MultipleTours) {
+         _exportState_IsMergeTours = _chkMergeAllTours.getSelection();
+      }
+
+      if (_isSetup_GPX) {
+
+         _exportState_isAbsoluteDistance = _rdoGPX_DistanceAbsolute.getSelection();
+
+         _exportState_GPX_IsExportAllTourData = _chkGPX_NoneGPXFields.getSelection();
+         _exportState_IsDescription = _chkGPX_Description.getSelection();
+         _exportState_GPX_IsExportMarkers = _chkGPX_Markers.getSelection();
+         _exportState_GPX_IsExportWithBarometer = _chkGPX_WithBarometer.getSelection();
+         _exportState_GPX_IsExportSurfingWaves = _chkGPX_SurfingWaves.getSelection();
+
+      } else if (_isSetup_TCX) {
+
+         // .tcx files do always contain absolute distances
+         _exportState_isAbsoluteDistance = true;
+
+         _exportState_IsDescription = _chkTCX_Description.getSelection();
+
+         _exportState_TCX_IsCourses = _rdoTCX_Courses.getSelection();
+         _exportState_TCX_CourseName = _comboTcxCourseName.getText();
+      }
+
+      final String exportFileName = _txtFilePath.getText();
+
+      if (_tourDataList.size() == 1) {
+
+         // export one tour
+
+         final ArrayList<GarminTrack> tracks = new ArrayList<>();
+         final ArrayList<TourWayPoint> wayPoints = new ArrayList<>();
+         final ArrayList<TourMarker> tourMarkers = new ArrayList<>();
+
+         final TourData tourData = _tourDataList.get(0);
+         final ZonedDateTime trackStartTime = tourData.getTourStartTime();
+
+         final GarminLap tourLap = doExport_50_Lap(tourData);
+
+         final GarminTrack track = doExport_60_TrackPoints(tourData, trackStartTime);
+         if (track != null) {
+            tracks.add(track);
+         }
+
+         doExport_70_WayPoints(wayPoints, tourMarkers, tourData, trackStartTime);
+
+         doExport_10_Tour(tourData, tracks, wayPoints, tourMarkers, tourLap, exportFileName);
+
+      } else {
+
+         /*
+          * export multiple tours
+          */
+
+         final String exportPathName;
+
+         if (_exportState_IsMergeTours) {
+            exportPathName = exportFileName;
+         } else {
+            exportPathName = getExportPathName();
+         }
+
+         try {
+
+            final IRunnableWithProgress exportRunnable = new IRunnableWithProgress() {
+               @Override
+               public void run(final IProgressMonitor monitor) throws InvocationTargetException,
+                     InterruptedException {
+
+                  try {
+
+                     doExport_05_Runnable(monitor, exportPathName);
+
+                  } catch (final IOException e) {
+                     StatusUtil.log(e);
+                  }
+               }
+            };
+
+            new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, true, exportRunnable);
+
+         } catch (final InvocationTargetException e) {
+            StatusUtil.showStatus(e);
+         } catch (final InterruptedException e) {
+            StatusUtil.showStatus(e);
+         }
+
+      }
+   }
+
+   private void doExport_05_Runnable(final IProgressMonitor monitor, final String exportFileName) throws IOException {
+
+      int exported = 0;
+      final int tourSize = _tourDataList.size();
+
+      monitor.beginTask(UI.EMPTY_STRING, tourSize);
+
+      if (_exportState_IsMergeTours) {
+
+         /*
+          * merge all tours into one
+          */
+
+         _mergedTime = _tourDataList.get(0).getTourStartTime();
+         _mergedDistance = 0;
+
+         final ArrayList<GarminTrack> tracks = new ArrayList<>();
+         final ArrayList<TourWayPoint> wayPoints = new ArrayList<>();
+         final ArrayList<TourMarker> tourMarkers = new ArrayList<>();
+
+         final GarminLap tourLap = new GarminLap();
+
+         // create tracklist and lap
+         for (final TourData tourData : _tourDataList) {
+
+            if (monitor.isCanceled()) {
+               return;
+            }
+
+            monitor.worked(1);
+            monitor.subTask(NLS.bind(Messages.Dialog_Export_SubTask_Export,
+                  new Object[] {
+                        ++exported,
+                        tourSize,
+                        TourManager.getTourTitle(tourData) }));
+
+            doExport_52_Laps(tourData, tourLap);
+
+            ZonedDateTime trackStartTime;
+            if (_exportState_IsCamouflageSpeed) {
+               trackStartTime = _mergedTime;
+            } else {
+               trackStartTime = tourData.getTourStartTime();
+            }
+
+            final GarminTrack track = doExport_60_TrackPoints(tourData, trackStartTime);
+            if (track != null) {
+               tracks.add(track);
+            }
+
+            doExport_70_WayPoints(wayPoints, tourMarkers, tourData, trackStartTime);
+         }
+
+         /*
+          * There is currently no listener to stop the velocity evalute method
+          */
+         monitor.subTask(NLS.bind(Messages.Dialog_Export_SubTask_CreatingExportFile, exportFileName));
+
+         doExport_10_Tour(null, tracks, wayPoints, tourMarkers, tourLap, exportFileName);
+
+      } else {
+
+         /*
+          * export each tour separately
+          */
+
+         final IPath exportFilePath = new Path(exportFileName).addTrailingSeparator();
+         final String fileExtension = _exportExtensionPoint.getFileExtension();
+
+         for (final TourData tourData : _tourDataList) {
+
+            if (monitor.isCanceled()) {
+               break;
+            }
+
+            // create file path name
+            final String tourFileName = net.tourbook.ui.UI.format_yyyymmdd_hhmmss(tourData);
+
+            final String exportFilePathName = exportFilePath
+                  .append(tourFileName)
+                  .addFileExtension(fileExtension)
+                  .toOSString();
+
+            monitor.worked(1);
+            monitor.subTask(NLS.bind(Messages.Dialog_Export_SubTask_Export,
+                  new Object[] {
+                        ++exported,
+                        tourSize,
+                        exportFilePathName }));
+
+            final ArrayList<GarminTrack> tracks = new ArrayList<>();
+            final ArrayList<TourWayPoint> wayPoints = new ArrayList<>();
+            final ArrayList<TourMarker> tourMarkers = new ArrayList<>();
+
+            final ZonedDateTime trackStartTime = tourData.getTourStartTime();
+
+            final GarminLap tourLap = doExport_50_Lap(tourData);
+
+            final GarminTrack track = doExport_60_TrackPoints(tourData, trackStartTime);
+
+            if (track != null) {
+               tracks.add(track);
+            }
+
+            doExport_70_WayPoints(wayPoints, tourMarkers, tourData, trackStartTime);
+
+            doExport_10_Tour(tourData, tracks, wayPoints, tourMarkers, tourLap, exportFilePathName);
+
+            // check if overwrite dialog was canceled
+            if (_exportState_FileCollisionBehaviour.value == FileCollisionBehavior.DIALOG_IS_CANCELED) {
+               break;
+            }
+         }
+      }
+   }
+
+   private void doExport_10_Tour(final TourData tourData,
+                                 final ArrayList<GarminTrack> tracks,
+                                 final ArrayList<TourWayPoint> wayPoints,
+                                 final ArrayList<TourMarker> tourMarkers,
+                                 final GarminLap lap,
+                                 final String exportFileName) throws IOException {
+
+      boolean isOverwrite = true;
+
+      final File exportFile = new File(exportFileName);
+      if (exportFile.exists()) {
+         if (_exportState_IsOverwriteFiles) {
+            // overwrite is enabled in the UI
+         } else {
+            isOverwrite = net.tourbook.ui.UI.confirmOverwrite(_exportState_FileCollisionBehaviour, exportFile);
+         }
+      }
+
+      if (isOverwrite == false) {
+         return;
+      }
+
+      final VelocityContext vc = new VelocityContext();
+
+      // math tool to convert float into double
+      vc.put("math", new MathTool());//$NON-NLS-1$
+
+      if (_isSetup_GPX) {
+
+         vc.put(VC_IS_EXPORT_ALL_TOUR_DATA, _exportState_GPX_IsExportAllTourData && tourData != null);
+
+      } else if (_isSetup_TCX) {
+
+         vc.put("iscourses", _exportState_TCX_IsCourses); //$NON-NLS-1$
+         vc.put("coursename", _exportState_TCX_CourseName); //$NON-NLS-1$
+      }
+
+      vc.put(VC_LAP, lap);
+      vc.put(VC_TRACKS, tracks);
+      vc.put(VC_WAY_POINTS, wayPoints);
+      vc.put(VC_TOUR_MARKERS, tourMarkers);
+      vc.put(VC_TOUR_DATA, tourData);
+
+      vc.put(VC_HAS_TOUR_MARKERS, Boolean.valueOf(tourMarkers.size() > 0));
+      vc.put(VC_HAS_TRACKS, Boolean.valueOf(tracks.size() > 0));
+      vc.put(VC_HAS_WAY_POINTS, Boolean.valueOf(wayPoints.size() > 0));
+
+      vc.put("dateformat", _dateFormat); //$NON-NLS-1$
+      vc.put("dtIso", _dtIso); //$NON-NLS-1$
+      vc.put("nf1", _nf1); //$NON-NLS-1$
+      vc.put("nf3", _nf3); //$NON-NLS-1$
+      vc.put("nf8", _nf8); //$NON-NLS-1$
+
+      doExport_20_TourValues(vc);
+
+      final Writer exportWriter = new BufferedWriter(new OutputStreamWriter(
+            new FileOutputStream(exportFile),
+            UI.UTF_8));
+
+      final Reader templateReader = new InputStreamReader(this.getClass().getResourceAsStream(_formatTemplate));
+
+      try {
+
+         Velocity.evaluate(vc, exportWriter, "MyTourbook", templateReader); //$NON-NLS-1$
+
+      } catch (final Exception e) {
+         StatusUtil.showStatus(e);
+      } finally {
+         exportWriter.close();
+      }
+   }
+
+   /**
+    * Adds some values to the velocity context (e.g. date, ...).
+    *
+    * @param vcContext
+    *           the velocity context holding all the data
+    */
+   private void doExport_20_TourValues(final VelocityContext vcContext) {
+
+      /*
+       * Current time, date
+       */
+      final Calendar now = Calendar.getInstance();
+      final Date creationDate = now.getTime();
+      vcContext.put("creation_date", creationDate); //$NON-NLS-1$
+
+      doExport_21_Creator(vcContext);
+      doExport_22_MinMax_LatLon(vcContext);
+      doExport_24_MinMax_Other(vcContext, creationDate);
+   }
+
+   private void doExport_21_Creator(final VelocityContext vcContext) {
+
+      final Version version = Activator.getDefault().getVersion();
+
+      /*
+       * Version
+       */
+      String pluginMajorVersion = ZERO;
+      String pluginMinorVersion = ZERO;
+      String pluginMicroVersion = ZERO;
+      String pluginQualifierVersion = ZERO;
+
+      if (version != null) {
+         pluginMajorVersion = Integer.toString(version.getMajor());
+         pluginMinorVersion = Integer.toString(version.getMinor());
+         pluginMicroVersion = Integer.toString(version.getMicro());
+         pluginQualifierVersion = version.getQualifier();
+      }
+
+      vcContext.put("pluginMajorVersion", pluginMajorVersion); //$NON-NLS-1$
+      vcContext.put("pluginMinorVersion", pluginMinorVersion); //$NON-NLS-1$
+      vcContext.put("pluginMicroVersion", pluginMicroVersion); //$NON-NLS-1$
+      vcContext.put("pluginQualifierVersion", pluginQualifierVersion); //$NON-NLS-1$
+
+      /*
+       * Creator
+       */
+      String creatorText = String.format("MyTourbook %d.%d.%d.%s - http://mytourbook.sourceforge.net", //$NON-NLS-1$
+            version.getMajor(),
+            version.getMinor(),
+            version.getMicro(),
+            version.getQualifier());
+
+      if (_exportState_GPX_IsExportWithBarometer) {
+         creatorText += STRAVA_WITH_BAROMETER;
+      }
+
+      vcContext.put("creator", creatorText); //$NON-NLS-1$
+   }
+
+   /**
+    * Calculate min/max values for latitude/longitude.
+    */
+   private void doExport_22_MinMax_LatLon(final VelocityContext vcContext) {
+
+      /*
+       * Extent of waypoint, routes and tracks:
+       */
+      double min_latitude = 90.0;
+      double min_longitude = 180.0;
+      double max_latitude = -90.0;
+      double max_longitude = -180.0;
+
+      final List<?> routes = (List<?>) vcContext.get("routes"); //$NON-NLS-1$
+      if (routes != null) {
+         final Iterator<?> route_iterator = routes.iterator();
+         while (route_iterator.hasNext()) {
+            final GPSRoute route = (GPSRoute) route_iterator.next();
+            min_longitude = route.getMinLongitude();
+            max_longitude = route.getMaxLongitude();
+            min_latitude = route.getMinLatitude();
+            max_latitude = route.getMaxLatitude();
+         }
+      }
+
+      final List<?> wayPoints = (List<?>) vcContext.get(VC_WAY_POINTS);
+      if (wayPoints != null) {
+         final Iterator<?> waypoint_iterator = wayPoints.iterator();
+         while (waypoint_iterator.hasNext()) {
+            final TourWayPoint waypoint = (TourWayPoint) waypoint_iterator.next();
+            min_longitude = Math.min(min_longitude, waypoint.getLongitude());
+            max_longitude = Math.max(max_longitude, waypoint.getLongitude());
+            min_latitude = Math.min(min_latitude, waypoint.getLatitude());
+            max_latitude = Math.max(max_latitude, waypoint.getLatitude());
+         }
+      }
+
+      final List<?> tourMarkers = (List<?>) vcContext.get(VC_TOUR_MARKERS);
+      if (tourMarkers != null) {
+
+         for (final Object element : tourMarkers) {
+            if (element instanceof TourMarker) {
+
+               final TourMarker tourMarker = (TourMarker) element;
+
+               final double longitude = tourMarker.getLongitude();
+               final double latitude = tourMarker.getLatitude();
+
+               if (longitude != TourDatabase.DEFAULT_DOUBLE) {
+
+                  min_longitude = Math.min(min_longitude, longitude);
+                  max_longitude = Math.max(max_longitude, longitude);
+                  min_latitude = Math.min(min_latitude, latitude);
+                  max_latitude = Math.max(max_latitude, latitude);
+               }
+            }
+         }
+      }
+
+      final List<?> tracks = (List<?>) vcContext.get(VC_TRACKS);
+      if (tracks != null) {
+         final Iterator<?> track_iterator = tracks.iterator();
+         while (track_iterator.hasNext()) {
+            final GPSTrack track = (GPSTrack) track_iterator.next();
+            min_longitude = Math.min(min_longitude, track.getMinLongitude());
+            max_longitude = Math.max(max_longitude, track.getMaxLongitude());
+            min_latitude = Math.min(min_latitude, track.getMinLatitude());
+            max_latitude = Math.max(max_latitude, track.getMaxLatitude());
+         }
+      }
+
+      vcContext.put("min_latitude", Double.valueOf(min_latitude)); //$NON-NLS-1$
+      vcContext.put("min_longitude", Double.valueOf(min_longitude)); //$NON-NLS-1$
+      vcContext.put("max_latitude", Double.valueOf(max_latitude)); //$NON-NLS-1$
+      vcContext.put("max_longitude", Double.valueOf(max_longitude)); //$NON-NLS-1$
+   }
+
+   /**
+    * Min/max time, heart, cadence and other values.
+    */
+   private void doExport_24_MinMax_Other(final VelocityContext vcContext, final Date creationDate) {
+
+      Date starttime = null;
+      Date endtime = null;
+      int heartNum = 0;
+      long heartSum = 0;
+      int cadNum = 0;
+      long cadSum = 0;
+      short maximumheartrate = 0;
+      double totaldistance = 0;
+
+      final List<?> tracks = (List<?>) vcContext.get(VC_TRACKS);
+
+      for (final Object name : tracks) {
+
+         final GPSTrack track = (GPSTrack) name;
+         for (final Iterator<?> wpIter = track.getWaypoints().iterator(); wpIter.hasNext();) {
+
+            final GPSTrackpoint wp = (GPSTrackpoint) wpIter.next();
+
+            // starttime, totaltime
+            if (wp.getDate() != null) {
+               if (starttime == null) {
+                  starttime = wp.getDate();
+               }
+               endtime = wp.getDate();
+            }
+
+            if (wp instanceof GarminTrackpointAdapter) {
+
+               final GarminTrackpointAdapter gta = (GarminTrackpointAdapter) wp;
+
+               // average heartrate, maximum heartrate
+               if (gta.hasValidHeartrate()) {
+                  heartSum += gta.getHeartrate();
+                  heartNum++;
+                  if (gta.getHeartrate() > maximumheartrate) {
+                     maximumheartrate = gta.getHeartrate();
+                  }
+               }
+
+               // average cadence
+               if (gta.hasValidCadence()) {
+                  cadSum += gta.getCadence();
+                  cadNum++;
+               }
+
+               // totaldistance
+               if (gta.hasValidDistance()) {
+                  totaldistance = gta.getDistance();
+               }
+            }
+         }
+      }
+
+      if (starttime != null) {
+         vcContext.put("starttime", starttime); //$NON-NLS-1$
+      } else {
+         vcContext.put("starttime", creationDate); //$NON-NLS-1$
+      }
+
+      if ((starttime != null) && (endtime != null)) {
+         vcContext.put("totaltime", ((double) endtime.getTime() - starttime.getTime()) / 1000); //$NON-NLS-1$
+      } else {
+         vcContext.put("totaltime", (double) 0); //$NON-NLS-1$
+      }
+
+      vcContext.put("totaldistance", totaldistance); //$NON-NLS-1$
+
+      if (maximumheartrate != 0) {
+         vcContext.put("maximumheartrate", maximumheartrate); //$NON-NLS-1$
+      }
+
+      if (heartNum != 0) {
+         vcContext.put("averageheartrate", heartSum / heartNum); //$NON-NLS-1$
+      }
+
+      if (cadNum != 0) {
+         vcContext.put("averagecadence", cadSum / cadNum); //$NON-NLS-1$
+      }
+   }
+
+   private GarminLap doExport_50_Lap(final TourData tourData) {
+
+      final GarminLap lap = new GarminLap();
+
+      /*
+       * Calories
+       */
+      lap.setCalories(tourData.getCalories());
+
+      /*
+       * Description
+       */
+      if (_exportState_IsDescription) {
+         final String notes = tourData.getTourDescription();
+         if ((notes != null) && (notes.length() > 0)) {
+            lap.setNotes(notes);
+         }
+      }
+
+      return lap;
+   }
+
+   private void doExport_52_Laps(final TourData tourData, final GarminLap tourLap) {
+
+      /*
+       * Calories
+       */
+      int calories = tourLap.getCalories();
+      calories += tourData.getCalories();
+      tourLap.setCalories(calories);
+
+      /*
+       * Description
+       */
+      if (_exportState_IsDescription) {
+
+         final String notes = tourData.getTourDescription();
+
+         if ((notes != null) && (notes.length() > 0)) {
+
+            final String lapNotes = tourLap.getNotes();
+
+            if (lapNotes == null) {
+               tourLap.setNotes(notes);
+            } else {
+               tourLap.setNotes(lapNotes + "\n" + notes); //$NON-NLS-1$
+            }
+         }
+      }
+
+   }
+
+   /**
+    * @param tourData
+    * @param trackDateTime
+    * @return Returns a track or <code>null</code> when tour data cannot be exported.
+    */
+   private GarminTrack doExport_60_TrackPoints(final TourData tourData, final ZonedDateTime trackDateTime) {
+
+      final int[] timeSerie = tourData.timeSerie;
+
+      // check if all dataseries are available
+      if ((timeSerie == null) /* || (latitudeSerie == null) || (longitudeSerie == null) */) {
+         return null;
+      }
+
+      final float[] altitudeSerie = tourData.altitudeSerie;
+      final float[] cadenceSerie = tourData.getCadenceSerie();
+      final float[] distanceSerie = tourData.distanceSerie;
+      final long[] gearSerie = tourData.gearSerie;
+      final double[] latitudeSerie = tourData.latitudeSerie;
+      final double[] longitudeSerie = tourData.longitudeSerie;
+      final float[] pulseSerie = tourData.pulseSerie;
+      final float[] temperatureSerie = tourData.temperatureSerie;
+
+      final boolean isAltitude = (altitudeSerie != null) && (altitudeSerie.length > 0);
+      final boolean isCadence = (cadenceSerie != null) && (cadenceSerie.length > 0);
+      final boolean isDistance = (distanceSerie != null) && (distanceSerie.length > 0);
+      final boolean isGear = (gearSerie != null) && (gearSerie.length > 0);
+      final boolean isPulse = (pulseSerie != null) && (pulseSerie.length > 0);
+      final boolean isTemperature = (temperatureSerie != null) && (temperatureSerie.length > 0);
+
+      int prevTime = -1;
+      ZonedDateTime lastTrackDateTime = null;
+
+      // default is to use all trackpoints
+      int startIndex = 0;
+      int endIndex = timeSerie.length - 1;
+
+      // adjust start/end when a part is exported
+      if (_exportState_IsRange) {
+         startIndex = _tourStartIndex;
+         endIndex = _tourEndIndex;
+      }
+
+      /*
+       * Manage surfing waves
+       */
+      boolean[] visibleDataPointSerie = null;
+      boolean isPrevDataPointVisible = false;
+      if (_exportState_GPX_IsExportSurfingWaves && tourData.isVisiblePointsSaved_ForSurfing()) {
+
+         visibleDataPointSerie = tourData.visibleDataPointSerie;
+         isPrevDataPointVisible = visibleDataPointSerie[0];
+      }
+      final boolean isExportSurfingWaves = visibleDataPointSerie != null;
+
+      final GarminTrack track = new GarminTrack();
+
+      /*
+       * Track title/description
+       */
+      if (_exportState_IsDescription) {
+
+         final String tourTitle = tourData.getTourTitle();
+         if (tourTitle.length() > 0) {
+            track.setIdentification(tourTitle);
+         }
+
+         final StringBuilder sbTourDescription = new StringBuilder();
+
+         // add description from the tour
+         sbTourDescription.append(tourData.getTourDescription());
+
+         // append surfing parameters to the description
+         if (isExportSurfingWaves) {
+
+            if (sbTourDescription.length() > 0) {
+               sbTourDescription.append(UI.NEW_LINE2);
+            }
+
+            sbTourDescription.append(String.format(
+
+                  Messages.Dialog_Export_Description_SurfingWaves,
+
+                  // min start/stop speed
+                  tourData.getSurfing_MinSpeed_StartStop(),
+                  UI.UNIT_LABEL_SPEED,
+
+                  // min surfing speed
+                  tourData.getSurfing_MinSpeed_Surfing(),
+                  UI.UNIT_LABEL_SPEED,
+
+                  // min time duration
+                  tourData.getSurfing_MinTimeDuration(),
+                  Messages.App_Unit_Seconds_Small,
+
+                  // min distance
+                  tourData.isSurfing_IsMinDistance() ? tourData.getSurfing_MinDistance() : 0,
+                  UI.UNIT_LABEL_DISTANCE_M_OR_YD));
+         }
+
+         if (sbTourDescription.length() > 0) {
+            track.setComment(sbTourDescription.toString());
+         }
+      }
+
+      /*
+       * loop: trackpoints
+       */
+      for (int serieIndex = startIndex; serieIndex <= endIndex; serieIndex++) {
+
+         final GarminTrackpointD304 tp304 = new GarminTrackpointD304();
+         final GarminTrackpointAdapterExtended tpExt = new GarminTrackpointAdapterExtended(tp304);
+
+         /*
+          * Manage surfing
+          */
+         boolean isCreateTrackSegment = false;
+         if (isExportSurfingWaves) {
+
+            // export only surfing events
+
+            final boolean isDataPointVisible = visibleDataPointSerie[serieIndex];
+
+            if (isDataPointVisible && isDataPointVisible != isPrevDataPointVisible) {
+
+               // visibility has changed -> show track
+
+               isCreateTrackSegment = true;
+
+            } else if (isDataPointVisible == false) {
+
+               // hide time slices until they are visible again
+
+               isPrevDataPointVisible = false;
+
+               continue;
+            }
+
+            isPrevDataPointVisible = isDataPointVisible;
+         }
+
+         // mark as a new track to create the <trkseg>...</trkseg> tags
+         if (serieIndex == startIndex || isCreateTrackSegment) {
+            tpExt.setNewTrack(true);
+         }
+
+         if (isAltitude) {
+            tpExt.setAltitude(altitudeSerie[serieIndex]);
+         }
+
+         // I don't know if this is according to the rules to have a gpx/tcx without lat/lon
+         if (latitudeSerie != null && longitudeSerie != null) {
+            tpExt.setLatitude(latitudeSerie[serieIndex]);
+            tpExt.setLongitude(longitudeSerie[serieIndex]);
+         }
+
+         float distance = 0;
+         if (isDistance) {
+
+            if (_exportState_isAbsoluteDistance) {
+
+               distance = distanceSerie[serieIndex];
+
+            } else if (distanceSerie != null) {
+
+               // skip first distance difference
+               if (serieIndex > startIndex) {
+                  distance = distanceSerie[serieIndex] - distanceSerie[serieIndex - 1];
+               }
+            }
+         }
+
+         int relativeTime;
+         if (_exportState_IsCamouflageSpeed && isDistance) {
+
+            // camouflage speed
+
+            relativeTime = (int) (distance / _exportState_CamouflageSpeed);
+
+         } else {
+
+            // keep recorded speed
+
+            relativeTime = timeSerie[serieIndex];
+         }
+
+         if (isDistance) {
+            tpExt.setDistance(distance + _mergedDistance);
+         }
+
+         if (isCadence) {
+            tp304.setCadence((short) cadenceSerie[serieIndex]);
+         }
+
+         if (isPulse) {
+            tp304.setHeartrate((short) pulseSerie[serieIndex]);
+         }
+
+         if (isTemperature) {
+            tpExt.setTemperature(temperatureSerie[serieIndex]);
+         }
+
+         if (isGear) {
+            tpExt.setGear(gearSerie[serieIndex]);
+         }
+
+         // ignore trackpoints which have the same time
+         if (relativeTime != prevTime) {
+
+            lastTrackDateTime = trackDateTime.plusSeconds(relativeTime);
+
+            tpExt.setDate(Date.from(lastTrackDateTime.toInstant()));
+
+            track.addWaypoint(tpExt);
+         }
+
+         prevTime = relativeTime;
+      }
+
+      /*
+       * Keep values for the next merged tour
+       */
+      if (isDistance && _exportState_isAbsoluteDistance) {
+
+         final float distanceDiff = distanceSerie[endIndex] - distanceSerie[startIndex];
+         _mergedDistance += distanceDiff;
+      }
+
+      _mergedTime = lastTrackDateTime;
+
+      return track;
+   }
+
+   private void doExport_70_WayPoints(final ArrayList<TourWayPoint> exportedWayPoints,
+                                      final ArrayList<TourMarker> exportedTourMarkers,
+                                      final TourData tourData,
+                                      final ZonedDateTime tourStartTime) {
+
+      // get markers when this option is checked
+      if (_exportState_GPX_IsExportMarkers == false) {
+         return;
+      }
+
+      final int[] timeSerie = tourData.timeSerie;
+      final float[] altitudeSerie = tourData.altitudeSerie;
+      final double[] latitudeSerie = tourData.latitudeSerie;
+      final double[] longitudeSerie = tourData.longitudeSerie;
+      final float[] distanceSerie = tourData.distanceSerie;
+
+      final Set<TourMarker> tourMarkers = tourData.getTourMarkers();
+      final Set<TourWayPoint> tourWayPoints = tourData.getTourWayPoints();
+
+      // ensure required dataseries are available
+      if (timeSerie == null || latitudeSerie == null || longitudeSerie == null) {
+         return;
+      }
+
+      final boolean isAltitude = altitudeSerie != null;
+      final boolean isDistance = (distanceSerie != null) && (distanceSerie.length > 0);
+
+      // default is to use all trackpoints
+      int startIndex = 0;
+      int endIndex = timeSerie.length - 1;
+      boolean isRange = false;
+
+      // adjust start/end when a part is exported
+      if (_exportState_IsRange) {
+         startIndex = _tourStartIndex;
+         endIndex = _tourEndIndex;
+         isRange = true;
+      }
+
+      /*
+       * Create exported tour marker
+       */
+      for (final TourMarker tourMarker : tourMarkers) {
+
+         final int serieIndex = tourMarker.getSerieIndex();
+
+         // skip markers when they are not in the defined range
+         if (isRange) {
+            if ((serieIndex < startIndex) || (serieIndex > endIndex)) {
+               continue;
+            }
+         }
+
+         /*
+          * get distance
+          */
+         float distance = 0;
+         if (isDistance) {
+
+            if (_exportState_isAbsoluteDistance) {
+
+               distance = distanceSerie[serieIndex];
+
+            } else if (distanceSerie != null) {
+
+               // skip first distance difference
+               if (serieIndex > startIndex) {
+                  distance = distanceSerie[serieIndex] - distanceSerie[serieIndex - 1];
+               }
+            }
+         }
+
+         /*
+          * get time
+          */
+         int relativeTime;
+         if (_exportState_IsCamouflageSpeed && isDistance) {
+
+            // camouflage speed
+
+            relativeTime = (int) (distance / _exportState_CamouflageSpeed);
+
+         } else {
+
+            // keep recorded speed
+
+            relativeTime = timeSerie[serieIndex];
+         }
+
+         final ZonedDateTime zonedMarkerTime = tourStartTime.plusSeconds(relativeTime);
+         final long absoluteMarkerTime = zonedMarkerTime.toInstant().toEpochMilli();
+
+         /*
+          * Setup exported tour marker
+          */
+         final TourMarker exportedTourMarker = tourMarker.clone();
+
+         exportedTourMarker.setTime(relativeTime, absoluteMarkerTime);
+         exportedTourMarker.setLatitude(latitudeSerie[serieIndex]);
+         exportedTourMarker.setLongitude(longitudeSerie[serieIndex]);
+
+         if (isAltitude) {
+            exportedTourMarker.setAltitude(altitudeSerie[serieIndex]);
+         }
+
+         if (isDistance) {
+            exportedTourMarker.setDistance(distance);
+         }
+
+         exportedTourMarkers.add(exportedTourMarker);
+      }
+
+      for (final TourWayPoint twp : tourWayPoints) {
+
+         final TourWayPoint wayPoint = new TourWayPoint();
+
+         wayPoint.setTime(twp.getTime());
+         wayPoint.setLatitude(twp.getLatitude());
+         wayPoint.setLongitude(twp.getLongitude());
+
+         wayPoint.setName(twp.getName());
+
+         // <desc>...</desc>
+         final String comment = twp.getComment();
+         final String description = twp.getDescription();
+         final String descText = description != null ? description : comment;
+         if (descText != null) {
+            wayPoint.setComment(descText);
+         }
+
+         wayPoint.setAltitude(twp.getAltitude());
+
+         wayPoint.setUrlAddress(twp.getUrlAddress());
+         wayPoint.setUrlText(twp.getUrlText());
 //
 //			// <sym>...</sym>
 //			wayPoint.setSymbolName(twp.getSymbol());
 
-			exportedWayPoints.add(wayPoint);
-		}
-	}
+         exportedWayPoints.add(wayPoint);
+      }
+   }
 
-	private void enableExportButton(final boolean isEnabled) {
-		final Button okButton = getButton(IDialogConstants.OK_ID);
-		if (okButton != null) {
-			okButton.setEnabled(isEnabled);
-		}
-	}
+   private void enableExportButton(final boolean isEnabled) {
+      final Button okButton = getButton(IDialogConstants.OK_ID);
+      if (okButton != null) {
+         okButton.setEnabled(isEnabled);
+      }
+   }
 
-	private void enableFields() {
+   private void enableFields() {
 
-		final boolean isCamouflageSpeed = _chkCamouflageSpeed.getSelection();
-		final boolean isSingleTour = _isSetup_MultipleTours == false;
-		boolean isMergeIntoOneTour = false;
+      final boolean isCamouflageSpeed = _chkCamouflageSpeed.getSelection();
+      final boolean isSingleTour = _isSetup_MultipleTours == false;
+      boolean isMergeIntoOneTour = false;
 
-		if (_isSetup_MultipleTours) {
+      if (_isSetup_MultipleTours) {
 
-			isMergeIntoOneTour = _chkMergeAllTours.getSelection();
-			_chkMergeAllTours.setEnabled(_isSetup_MultipleTours);
-		}
+         isMergeIntoOneTour = _chkMergeAllTours.getSelection();
+         _chkMergeAllTours.setEnabled(_isSetup_MultipleTours);
+      }
 
-		_isExport_MultipleToursWithMultipleFiles = _isSetup_MultipleTours && isMergeIntoOneTour == false;
+      _isExport_MultipleToursWithMultipleFiles = _isSetup_MultipleTours && isMergeIntoOneTour == false;
 
-		if (_isSetup_GPX) {
+      if (_isSetup_GPX) {
 
-			final boolean isNoneGPX = isSingleTour || _isExport_MultipleToursWithMultipleFiles;
-			_chkGPX_NoneGPXFields.setEnabled(isNoneGPX);
-			if (!isNoneGPX) {
-				// deselect when not checked
-				_chkGPX_NoneGPXFields.setSelection(false);
-			}
+         final boolean isNoneGPX = isSingleTour || _isExport_MultipleToursWithMultipleFiles;
+         _chkGPX_NoneGPXFields.setEnabled(isNoneGPX);
+         if (!isNoneGPX) {
+            // deselect when not checked
+            _chkGPX_NoneGPXFields.setSelection(false);
+         }
 
-		} else if (_isSetup_TCX) {
+      } else if (_isSetup_TCX) {
 
-			final boolean isCourse = _rdoTCX_Courses.getSelection();
-			final boolean isFromField = _rdoTCX_NameFromField.getSelection();
+         final boolean isCourse = _rdoTCX_Courses.getSelection();
+         final boolean isFromField = _rdoTCX_NameFromField.getSelection();
 
-			_lblTcxNameFrom.setEnabled(isCourse);
-			_rdoTCX_NameFromTour.setEnabled(isCourse);
-			_rdoTCX_NameFromField.setEnabled(isCourse);
+         _lblTcxNameFrom.setEnabled(isCourse);
+         _rdoTCX_NameFromTour.setEnabled(isCourse);
+         _rdoTCX_NameFromField.setEnabled(isCourse);
 
-			_lblTcxCourseName.setEnabled(isCourse && isFromField);
-			_comboTcxCourseName.setEnabled(isCourse && isFromField);
-		}
+         _lblTcxCourseName.setEnabled(isCourse && isFromField);
+         _comboTcxCourseName.setEnabled(isCourse && isFromField);
+      }
 
-		_comboFile.setEnabled(isSingleTour || isMergeIntoOneTour);
-		_btnSelectFile.setEnabled(isSingleTour || isMergeIntoOneTour);
+      _comboFile.setEnabled(isSingleTour || isMergeIntoOneTour);
+      _btnSelectFile.setEnabled(isSingleTour || isMergeIntoOneTour);
 
-		_spinnerCamouflageSpeed.setEnabled(isCamouflageSpeed);
-		_lblCoumouflageSpeedUnit.setEnabled(isCamouflageSpeed);
+      _spinnerCamouflageSpeed.setEnabled(isCamouflageSpeed);
+      _lblCoumouflageSpeedUnit.setEnabled(isCamouflageSpeed);
 
-		setFileName();
-	}
+      setFileName();
+   }
 
-	private String getCourseName() {
-		return _comboTcxCourseName.getText().trim();
-	}
+   private String getCourseName() {
+      return _comboTcxCourseName.getText().trim();
+   }
 
-	@Override
-	protected IDialogSettings getDialogBoundsSettings() {
-		// keep window size and position
-		return _state;
-	}
+   @Override
+   protected IDialogSettings getDialogBoundsSettings() {
+      // keep window size and position
+      return _state;
+   }
 
-	private String getExportFileName() {
-		return _comboFile.getText().trim();
-	}
+   private String getExportFileName() {
+      return _comboFile.getText().trim();
+   }
 
-	private String getExportPathName() {
-		return _comboPath.getText().trim();
-	}
+   private String getExportPathName() {
+      return _comboPath.getText().trim();
+   }
 
-	private void initUI(final Composite parent) {
+   private void initUI(final Composite parent) {
 
-		_pc = new PixelConverter(parent);
-	}
+      _pc = new PixelConverter(parent);
+   }
 
-	@Override
-	protected void okPressed() {
+   @Override
+   protected void okPressed() {
 
-		net.tourbook.ui.UI.disableAllControls(_inputContainer);
+      net.tourbook.ui.UI.disableAllControls(_inputContainer);
 
-		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-			@Override
-			public void run() {
-				try {
-					doExport();
-				} catch (final IOException e) {
-					StatusUtil.log(e);
-				}
-			}
-		});
+      BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+         @Override
+         public void run() {
+            try {
+               doExport();
+            } catch (final IOException e) {
+               StatusUtil.log(e);
+            }
+         }
+      });
 
-		super.okPressed();
-	}
+      super.okPressed();
+   }
 
-	private void onSelectBrowseDirectory() {
+   private void onSelectBrowseDirectory() {
 
-		final DirectoryDialog dialog = new DirectoryDialog(_dlgContainer.getShell(), SWT.SAVE);
-		dialog.setText(Messages.dialog_export_dir_dialog_text);
-		dialog.setMessage(Messages.dialog_export_dir_dialog_message);
+      final DirectoryDialog dialog = new DirectoryDialog(_dlgContainer.getShell(), SWT.SAVE);
+      dialog.setText(Messages.dialog_export_dir_dialog_text);
+      dialog.setMessage(Messages.dialog_export_dir_dialog_message);
 
-		dialog.setFilterPath(getExportPathName());
+      dialog.setFilterPath(getExportPathName());
 
-		final String selectedDirectoryName = dialog.open();
+      final String selectedDirectoryName = dialog.open();
 
-		if (selectedDirectoryName != null) {
-			setErrorMessage(null);
-			_comboPath.setText(selectedDirectoryName);
-		}
-	}
+      if (selectedDirectoryName != null) {
+         setErrorMessage(null);
+         _comboPath.setText(selectedDirectoryName);
+      }
+   }
 
-	private void onSelectBrowseFile() {
+   private void onSelectBrowseFile() {
 
-		final String fileExtension = _exportExtensionPoint.getFileExtension();
+      final String fileExtension = _exportExtensionPoint.getFileExtension();
 
-		final FileDialog dialog = new FileDialog(_dlgContainer.getShell(), SWT.SAVE);
-		dialog.setText(Messages.dialog_export_file_dialog_text);
+      final FileDialog dialog = new FileDialog(_dlgContainer.getShell(), SWT.SAVE);
+      dialog.setText(Messages.dialog_export_file_dialog_text);
 
-		dialog.setFilterPath(getExportPathName());
-		dialog.setFilterExtensions(new String[] { fileExtension });
-		dialog.setFileName("*." + fileExtension);//$NON-NLS-1$
+      dialog.setFilterPath(getExportPathName());
+      dialog.setFilterExtensions(new String[] { fileExtension });
+      dialog.setFileName("*." + fileExtension);//$NON-NLS-1$
 
-		final String selectedFilePath = dialog.open();
+      final String selectedFilePath = dialog.open();
 
-		if (selectedFilePath != null) {
-			setErrorMessage(null);
-			_comboFile.setText(new Path(selectedFilePath).toFile().getName());
-		}
-	}
+      if (selectedFilePath != null) {
+         setErrorMessage(null);
+         _comboFile.setText(new Path(selectedFilePath).toFile().getName());
+      }
+   }
 
-	private void restoreState() {
+   private void restoreState() {
 
-		if (_isSetup_GPX) {
+      if (_isSetup_GPX) {
 
-			final boolean isAbsoluteDistance = Util.getStateBoolean(_state, STATE_GPX_IS_ABSOLUTE_DISTANCE, true);
+         final boolean isAbsoluteDistance = Util.getStateBoolean(_state, STATE_GPX_IS_ABSOLUTE_DISTANCE, true);
 
-			_chkGPX_Description.setSelection(_state.getBoolean(STATE_GPX_IS_EXPORT_DESCRITION));
-			_chkGPX_Markers.setSelection(_state.getBoolean(STATE_GPX_IS_EXPORT_MARKERS));
-			_chkGPX_NoneGPXFields.setSelection(_state.getBoolean(STATE_GPX_IS_EXPORT_TOUR_DATA));
-			_chkGPX_WithBarometer.setSelection(_state.getBoolean(STATE_GPX_IS_WITH_BAROMETER));
+         _chkGPX_Description.setSelection(_state.getBoolean(STATE_GPX_IS_EXPORT_DESCRITION));
+         _chkGPX_Markers.setSelection(_state.getBoolean(STATE_GPX_IS_EXPORT_MARKERS));
+         _chkGPX_NoneGPXFields.setSelection(_state.getBoolean(STATE_GPX_IS_EXPORT_TOUR_DATA));
+         _chkGPX_SurfingWaves.setSelection(_state.getBoolean(STATE_GPX_IS_EXPORT_SURFING_WAVES));
+         _chkGPX_WithBarometer.setSelection(_state.getBoolean(STATE_GPX_IS_WITH_BAROMETER));
 
-			_rdoGPX_DistanceAbsolute.setSelection(isAbsoluteDistance);
-			_rdoGPX_DistanceRelative.setSelection(!isAbsoluteDistance);
+         _rdoGPX_DistanceAbsolute.setSelection(isAbsoluteDistance);
+         _rdoGPX_DistanceRelative.setSelection(!isAbsoluteDistance);
 
-		} else if (_isSetup_TCX) {
+      } else if (_isSetup_TCX) {
 
-			final boolean isCourses = Util.getStateBoolean(_state, STATE_TCX_IS_COURSES, true);
-			final boolean isFromTour = Util.getStateBoolean(_state, STATE_TCX_IS_NAME_FROM_TOUR, true);
+         final boolean isCourses = Util.getStateBoolean(_state, STATE_TCX_IS_COURSES, true);
+         final boolean isFromTour = Util.getStateBoolean(_state, STATE_TCX_IS_NAME_FROM_TOUR, true);
 
-			_chkTCX_Description.setSelection(_state.getBoolean(STATE_TCX_IS_EXPORT_DESCRITION));
+         _chkTCX_Description.setSelection(_state.getBoolean(STATE_TCX_IS_EXPORT_DESCRITION));
 
-			_rdoTCX_Courses.setSelection(isCourses);
-			_rdoTCX_Activities.setSelection(!isCourses);
+         _rdoTCX_Courses.setSelection(isCourses);
+         _rdoTCX_Activities.setSelection(!isCourses);
 
-			_rdoTCX_NameFromTour.setSelection(isFromTour);
-			_rdoTCX_NameFromField.setSelection(!isFromTour);
+         _rdoTCX_NameFromTour.setSelection(isFromTour);
+         _rdoTCX_NameFromField.setSelection(!isFromTour);
 
-			UI.restoreCombo(_comboTcxCourseName, _state.getArray(STATE_TCX_COURSE_NAME));
+         UI.restoreCombo(_comboTcxCourseName, _state.getArray(STATE_TCX_COURSE_NAME));
 
-			updateUI_CourseName();
-		}
+         updateUI_CourseName();
+      }
 
-		// merge all tours
-		if (_isSetup_MultipleTours) {
-			_chkMergeAllTours.setSelection(_state.getBoolean(STATE_IS_MERGE_ALL_TOURS));
-		}
+      // merge all tours
+      if (_isSetup_MultipleTours) {
+         _chkMergeAllTours.setSelection(_state.getBoolean(STATE_IS_MERGE_ALL_TOURS));
+      }
 
-		// export tour part
-		if (_isSetup_TourRange) {
-			_chkExportTourRange.setSelection(_state.getBoolean(STATE_IS_EXPORT_TOUR_RANGE));
-		}
+      // export tour part
+      if (_isSetup_TourRange) {
+         _chkExportTourRange.setSelection(_state.getBoolean(STATE_IS_EXPORT_TOUR_RANGE));
+      }
 
-		// camouflage speed
-		_chkCamouflageSpeed.setSelection(_state.getBoolean(STATE_IS_CAMOUFLAGE_SPEED));
-		_spinnerCamouflageSpeed.setSelection(Util.getStateInt(_state, STATE_CAMOUFLAGE_SPEED, 10));
+      // camouflage speed
+      _chkCamouflageSpeed.setSelection(_state.getBoolean(STATE_IS_CAMOUFLAGE_SPEED));
+      _spinnerCamouflageSpeed.setSelection(Util.getStateInt(_state, STATE_CAMOUFLAGE_SPEED, 10));
 
-		// export file/path
-		UI.restoreCombo(_comboFile, _state.getArray(STATE_EXPORT_FILE_NAME));
-		UI.restoreCombo(_comboPath, _state.getArray(STATE_EXPORT_PATH_NAME));
-		_chkOverwriteFiles.setSelection(_state.getBoolean(STATE_IS_OVERWRITE_FILES));
-	}
+      // export file/path
+      UI.restoreCombo(_comboFile, _state.getArray(STATE_EXPORT_FILE_NAME));
+      UI.restoreCombo(_comboPath, _state.getArray(STATE_EXPORT_PATH_NAME));
+      _chkOverwriteFiles.setSelection(_state.getBoolean(STATE_IS_OVERWRITE_FILES));
+   }
 
-	private void saveState() {
+   private void saveState() {
 
-		if (_isSetup_GPX) {
+      if (_isSetup_GPX) {
 
-			_state.put(STATE_GPX_IS_EXPORT_DESCRITION, _chkGPX_Description.getSelection());
-			_state.put(STATE_GPX_IS_ABSOLUTE_DISTANCE, _rdoGPX_DistanceAbsolute.getSelection());
-			_state.put(STATE_GPX_IS_EXPORT_MARKERS, _chkGPX_Markers.getSelection());
-			_state.put(STATE_GPX_IS_EXPORT_TOUR_DATA, _chkGPX_NoneGPXFields.getSelection());
-			_state.put(STATE_GPX_IS_WITH_BAROMETER, _chkGPX_WithBarometer.getSelection());
+         _state.put(STATE_GPX_IS_EXPORT_DESCRITION, _chkGPX_Description.getSelection());
+         _state.put(STATE_GPX_IS_ABSOLUTE_DISTANCE, _rdoGPX_DistanceAbsolute.getSelection());
+         _state.put(STATE_GPX_IS_EXPORT_MARKERS, _chkGPX_Markers.getSelection());
+         _state.put(STATE_GPX_IS_EXPORT_TOUR_DATA, _chkGPX_NoneGPXFields.getSelection());
+         _state.put(STATE_GPX_IS_EXPORT_SURFING_WAVES, _chkGPX_SurfingWaves.getSelection());
+         _state.put(STATE_GPX_IS_WITH_BAROMETER, _chkGPX_WithBarometer.getSelection());
 
-		} else if (_isSetup_TCX) {
+      } else if (_isSetup_TCX) {
 
-			_state.put(STATE_TCX_IS_COURSES, _rdoTCX_Courses.getSelection());
-			_state.put(STATE_TCX_IS_EXPORT_DESCRITION, _chkTCX_Description.getSelection());
-			_state.put(STATE_TCX_IS_NAME_FROM_TOUR, _rdoTCX_NameFromTour.getSelection());
-			_state.put(
-					STATE_TCX_COURSE_NAME,
-					Util.getUniqueItems(_comboTcxCourseName.getItems(), getCourseName(), COMBO_HISTORY_LENGTH));
-		}
+         _state.put(STATE_TCX_IS_COURSES, _rdoTCX_Courses.getSelection());
+         _state.put(STATE_TCX_IS_EXPORT_DESCRITION, _chkTCX_Description.getSelection());
+         _state.put(STATE_TCX_IS_NAME_FROM_TOUR, _rdoTCX_NameFromTour.getSelection());
+         _state.put(
+               STATE_TCX_COURSE_NAME,
+               Util.getUniqueItems(_comboTcxCourseName.getItems(), getCourseName(), COMBO_HISTORY_LENGTH));
+      }
 
-		// merge all tours
-		if (_isSetup_MultipleTours) {
-			_state.put(STATE_IS_MERGE_ALL_TOURS, _chkMergeAllTours.getSelection());
-		}
+      // merge all tours
+      if (_isSetup_MultipleTours) {
+         _state.put(STATE_IS_MERGE_ALL_TOURS, _chkMergeAllTours.getSelection());
+      }
 
-		// export tour part
-		if (_isSetup_TourRange) {
-			_state.put(STATE_IS_EXPORT_TOUR_RANGE, _chkExportTourRange.getSelection());
-		}
+      // export tour part
+      if (_isSetup_TourRange) {
+         _state.put(STATE_IS_EXPORT_TOUR_RANGE, _chkExportTourRange.getSelection());
+      }
 
-		// camouflage speed
-		_state.put(STATE_IS_CAMOUFLAGE_SPEED, _chkCamouflageSpeed.getSelection());
-		_state.put(STATE_CAMOUFLAGE_SPEED, _spinnerCamouflageSpeed.getSelection());
+      // camouflage speed
+      _state.put(STATE_IS_CAMOUFLAGE_SPEED, _chkCamouflageSpeed.getSelection());
+      _state.put(STATE_CAMOUFLAGE_SPEED, _spinnerCamouflageSpeed.getSelection());
 
-		// export file/path
-		if (validateFilePath()) {
-			_state.put(
-					STATE_EXPORT_PATH_NAME,
-					Util.getUniqueItems(_comboPath.getItems(), getExportPathName(), COMBO_HISTORY_LENGTH));
-			_state.put(
-					STATE_EXPORT_FILE_NAME,
-					Util.getUniqueItems(_comboFile.getItems(), getExportFileName(), COMBO_HISTORY_LENGTH));
-		}
-		_state.put(STATE_IS_OVERWRITE_FILES, _chkOverwriteFiles.getSelection());
-	}
+      // export file/path
+      if (validateFilePath()) {
+         _state.put(
+               STATE_EXPORT_PATH_NAME,
+               Util.getUniqueItems(_comboPath.getItems(), getExportPathName(), COMBO_HISTORY_LENGTH));
+         _state.put(
+               STATE_EXPORT_FILE_NAME,
+               Util.getUniqueItems(_comboFile.getItems(), getExportFileName(), COMBO_HISTORY_LENGTH));
+      }
+      _state.put(STATE_IS_OVERWRITE_FILES, _chkOverwriteFiles.getSelection());
+   }
 
-	private void setError(final String message) {
-		setErrorMessage(message);
-		enableExportButton(false);
-	}
+   private void setError(final String message) {
+      setErrorMessage(message);
+      enableExportButton(false);
+   }
 
-	/**
-	 * Set filename with the first tour date/time, when tour is merged "<#default>" is displayed
-	 */
-	private void setFileName() {
+   /**
+    * Set filename with the first tour date/time, when tour is merged "<#default>" is displayed
+    */
+   private void setFileName() {
 
-		// search for the first tour
-		TourData minTourData = null;
-		final long minTourMillis = 0;
+      // search for the first tour
+      TourData minTourData = null;
+      final long minTourMillis = 0;
 
-		for (final TourData tourData : _tourDataList) {
+      for (final TourData tourData : _tourDataList) {
 
-			if (minTourData == null) {
-				minTourData = tourData;
-			} else {
+         if (minTourData == null) {
+            minTourData = tourData;
+         } else {
 
-				final long tourMillis = tourData.getTourStartTime().toInstant().toEpochMilli();
+            final long tourMillis = tourData.getTourStartTime().toInstant().toEpochMilli();
 
-				if (tourMillis < minTourMillis) {
-					minTourData = tourData;
-				}
-			}
-		}
+            if (tourMillis < minTourMillis) {
+               minTourData = tourData;
+            }
+         }
+      }
 
-		if (_isExport_MultipleToursWithMultipleFiles) {
+      if (_isExport_MultipleToursWithMultipleFiles) {
 
-			// use default file name for each exported tour
+         // use default file name for each exported tour
 
-			_comboFile.setText(Messages.dialog_export_label_DefaultFileName);
+         _comboFile.setText(Messages.dialog_export_label_DefaultFileName);
 
-		} else if (_isSetup_TourRange) {
+      } else if (_isSetup_TourRange) {
 
-			// display the start date/time
+         // display the start date/time
 
-			final ZonedDateTime dtTour = minTourData.getTourStartTime();
+         final ZonedDateTime dtTour = minTourData.getTourStartTime();
 
-			// adjust start time
-			final int startTime = minTourData.timeSerie[_tourStartIndex];
-			final ZonedDateTime tourTime = dtTour.plusSeconds(startTime);
+         // adjust start time
+         final int startTime = minTourData.timeSerie[_tourStartIndex];
+         final ZonedDateTime tourTime = dtTour.plusSeconds(startTime);
 
-			_comboFile.setText(UI.format_yyyymmdd_hhmmss(
-					tourTime.getYear(),
-					tourTime.getMonthValue(),
-					tourTime.getDayOfMonth(),
-					tourTime.getHour(),
-					tourTime.getMinute(),
-					tourTime.getSecond()));
-		} else {
+         _comboFile.setText(UI.format_yyyymmdd_hhmmss(
+               tourTime.getYear(),
+               tourTime.getMonthValue(),
+               tourTime.getDayOfMonth(),
+               tourTime.getHour(),
+               tourTime.getMinute(),
+               tourTime.getSecond()));
+      } else {
 
-			// display the tour date/time
+         // display the tour date/time
 
-			_comboFile.setText(net.tourbook.ui.UI.format_yyyymmdd_hhmmss(minTourData));
-		}
-	}
+         String postFilename = UI.EMPTY_STRING;
 
-	private void updateUI_CourseName() {
+         if (_isSetup_GPX && _chkGPX_SurfingWaves.getSelection()) {
+            
+            // append surfing parameters
 
-		if (_isSetup_TCX == false) {
-			return;
-		}
+            postFilename = String.format(
 
-		if (_rdoTCX_NameFromTour.getSelection()) {
+                  "__%d-%d-%d-%d", //$NON-NLS-1$
 
-			/*
-			 * set course name from tour
-			 */
+                  // min start/stop speed
+                  minTourData.getSurfing_MinSpeed_StartStop(),
 
-			String courseName = UI.EMPTY_STRING;
+                  // min surfing speed
+                  minTourData.getSurfing_MinSpeed_Surfing(),
 
-			for (final TourData tourData : _tourDataList) {
-				final String tourTitle = tourData.getTourTitle().trim();
-				if (tourTitle.length() > 0) {
-					courseName = tourTitle;
-					break;
-				}
-			}
-			_comboTcxCourseName.setText(courseName);
-		}
-	}
+                  // min time duration
+                  minTourData.getSurfing_MinTimeDuration(),
 
-	private void validateFields() {
+                  // min distance
+                  minTourData.isSurfing_IsMinDistance() ? minTourData.getSurfing_MinDistance() : 0
 
-		if (_isInUIInit) {
-			return;
-		}
+            );
+         }
 
-		/*
-		 * validate fields
-		 */
+         _comboFile.setText(net.tourbook.ui.UI.format_yyyymmdd_hhmmss(minTourData) + postFilename);
+      }
+   }
 
-		if (_isSetup_TCX) {
-			if (_rdoTCX_Courses.getSelection() && getCourseName().length() == 0) {
-				setError(Messages.Dialog_Export_Error_CourseNameIsInvalid);
-				_comboTcxCourseName.setFocus();
-				return;
-			}
-		}
+   private void updateUI_CourseName() {
 
-		if (validateFilePath() == false) {
-			return;
-		}
+      if (_isSetup_TCX == false) {
+         return;
+      }
 
-		setErrorMessage(null);
-		enableExportButton(true);
-	}
+      if (_rdoTCX_NameFromTour.getSelection()) {
 
-	private boolean validateFilePath() {
+         /*
+          * set course name from tour
+          */
 
-		// check path
-		IPath filePath = new Path(getExportPathName());
-		if (new File(filePath.toOSString()).exists() == false) {
+         String courseName = UI.EMPTY_STRING;
 
-			// invalid path
-			setError(NLS.bind(Messages.dialog_export_msg_pathIsNotAvailable, filePath.toOSString()));
-			return false;
-		}
+         for (final TourData tourData : _tourDataList) {
+            final String tourTitle = tourData.getTourTitle().trim();
+            if (tourTitle.length() > 0) {
+               courseName = tourTitle;
+               break;
+            }
+         }
+         _comboTcxCourseName.setText(courseName);
+      }
+   }
 
-		boolean returnValue = false;
+   private void validateFields() {
 
-		if (_isExport_MultipleToursWithMultipleFiles) {
+      if (_isInUIInit) {
+         return;
+      }
 
-			// only the path is checked, the file name is created automatically for each exported tour
+      /*
+       * validate fields
+       */
 
-			setMessage(_dlgDefaultMessage);
+      if (_isSetup_TCX) {
+         if (_rdoTCX_Courses.getSelection() && getCourseName().length() == 0) {
+            setError(Messages.Dialog_Export_Error_CourseNameIsInvalid);
+            _comboTcxCourseName.setFocus();
+            return;
+         }
+      }
 
-			// build file path with extension
-			filePath = filePath
-					.addTrailingSeparator()
-					.append(Messages.dialog_export_label_DefaultFileName)
-					.addFileExtension(_exportExtensionPoint.getFileExtension());
+      if (validateFilePath() == false) {
+         return;
+      }
 
-			returnValue = true;
+      setErrorMessage(null);
+      enableExportButton(true);
+   }
 
-		} else {
+   private boolean validateFilePath() {
 
-			String fileName = getExportFileName();
+      // check path
+      IPath filePath = new Path(getExportPathName());
+      if (new File(filePath.toOSString()).exists() == false) {
 
-			// remove extentions
-			final int extPos = fileName.indexOf('.');
-			if (extPos != -1) {
-				fileName = fileName.substring(0, extPos);
-			}
+         // invalid path
+         setError(NLS.bind(Messages.dialog_export_msg_pathIsNotAvailable, filePath.toOSString()));
+         return false;
+      }
 
-			// build file path with extension
-			filePath = filePath
-					.addTrailingSeparator()
-					.append(fileName)
-					.addFileExtension(_exportExtensionPoint.getFileExtension());
+      boolean returnValue = false;
 
-			final File newFile = new File(filePath.toOSString());
+      if (_isExport_MultipleToursWithMultipleFiles) {
 
-			if ((fileName.length() == 0) || newFile.isDirectory()) {
+         // only the path is checked, the file name is created automatically for each exported tour
 
-				// invalid filename
+         setMessage(_dlgDefaultMessage);
 
-				setError(Messages.dialog_export_msg_fileNameIsInvalid);
+         // build file path with extension
+         filePath = filePath
+               .addTrailingSeparator()
+               .append(Messages.dialog_export_label_DefaultFileName)
+               .addFileExtension(_exportExtensionPoint.getFileExtension());
 
-			} else if (newFile.exists()) {
+         returnValue = true;
 
-				// file already exists
+      } else {
 
-				setMessage(
-						NLS.bind(Messages.dialog_export_msg_fileAlreadyExists, filePath.toOSString()),
-						IMessageProvider.WARNING);
-				returnValue = true;
+         String fileName = getExportFileName();
 
-			} else {
+         // remove extentions
+         final int extPos = fileName.indexOf('.');
+         if (extPos != -1) {
+            fileName = fileName.substring(0, extPos);
+         }
 
-				setMessage(_dlgDefaultMessage);
+         // build file path with extension
+         filePath = filePath
+               .addTrailingSeparator()
+               .append(fileName)
+               .addFileExtension(_exportExtensionPoint.getFileExtension());
 
-				try {
-					final boolean isFileCreated = newFile.createNewFile();
+         final File newFile = new File(filePath.toOSString());
 
-					// name is correct
+         if ((fileName.length() == 0) || newFile.isDirectory()) {
 
-					if (isFileCreated) {
-						// delete file because the file is created for checking validity
-						newFile.delete();
-					}
-					returnValue = true;
+            // invalid filename
 
-				} catch (final IOException ioe) {
-					setError(Messages.dialog_export_msg_fileNameIsInvalid);
-				}
+            setError(Messages.dialog_export_msg_fileNameIsInvalid);
 
-			}
-		}
+         } else if (newFile.exists()) {
 
-		_txtFilePath.setText(filePath.toOSString());
+            // file already exists
 
-		return returnValue;
-	}
+            setMessage(
+                  NLS.bind(Messages.dialog_export_msg_fileAlreadyExists, filePath.toOSString()),
+                  IMessageProvider.WARNING);
+            returnValue = true;
+
+         } else {
+
+            setMessage(_dlgDefaultMessage);
+
+            try {
+               final boolean isFileCreated = newFile.createNewFile();
+
+               // name is correct
+
+               if (isFileCreated) {
+                  // delete file because the file is created for checking validity
+                  newFile.delete();
+               }
+               returnValue = true;
+
+            } catch (final IOException ioe) {
+               setError(Messages.dialog_export_msg_fileNameIsInvalid);
+            }
+
+         }
+      }
+
+      _txtFilePath.setText(filePath.toOSString());
+
+      return returnValue;
+   }
 }

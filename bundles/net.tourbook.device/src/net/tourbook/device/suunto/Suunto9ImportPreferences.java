@@ -18,12 +18,14 @@ import net.tourbook.application.TourbookPlugin;
 
 public class Suunto9ImportPreferences extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
+	@SuppressWarnings("serial")
 	private final static ArrayList<String>	AltitudeData	= new ArrayList<String>() {
 																				{
 																					add(Messages.pref_altitude_gps);
 																					add(Messages.pref_altitude_barometer);
 																				}
 																			};
+	@SuppressWarnings("serial")
 	private final static ArrayList<String>	DistanceData	= new ArrayList<String>() {
 																				{
 																					add(Messages.pref_distance_gps);

@@ -235,7 +235,6 @@ public class UI {
 	public static String						UNIT_LABEL_DISTANCE;
 	public static String						UNIT_LABEL_DISTANCE_M_OR_YD;
 	public static String						UNIT_LABEL_DISTANCE_MM_OR_INCH;
-	public static String						UNIT_LABEL_MS;
 	public static String						UNIT_LABEL_ALTITUDE;
 	public static String						UNIT_LABEL_ALTIMETER;
 	public static String						UNIT_LABEL_TEMPERATURE;

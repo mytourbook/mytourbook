@@ -40,6 +40,7 @@ Switch to workspace "C:\DAT\ws_mt-NL-projects"
 	- Replace text (Ctrl-H) "x.y.0.qualifier" to "a.b.0.qualifier" in all NL projects
 	
 			THIS SEEMS TO BE OBSOLETE
+			
 			- Replace text (Ctrl-H) "x.y.0" to "a.b.0" in 
 			    - All NL projects 
 			    - "site.xml" in the project "translation-test-update-site" that the 

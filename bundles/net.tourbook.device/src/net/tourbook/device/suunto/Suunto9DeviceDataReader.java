@@ -89,17 +89,21 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		}
 
 		String jsonFileContent =
-				GetJsonContentFromGZipFile(importFilePath);
+				GetJsonContentFromGZipFile(importFilePath, false);
 
-		if (isValidJSONFile(jsonFileContent) == false) {
-			return false;
-		}
+		// At this point, we know that the given file is a valid JSON file.
+		// But to avoid for invalid activities to be parsed by other 
+		// parsers, we return true when a Suunto JSON file is not
+		// a valid activity.
+		if (!isValidActivity(jsonFileContent))
+			return true;
+
 		return ProcessFile(importFilePath, jsonFileContent);
 	}
 
 	@Override
 	public boolean validateRawData(final String fileName) {
-		String jsonFileContent = GetJsonContentFromGZipFile(fileName);
+		String jsonFileContent = GetJsonContentFromGZipFile(fileName, true);
 		return isValidJSONFile(jsonFileContent);
 	}
 
@@ -126,8 +130,10 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 				String firstSample = samples.get(0).toString();
 				if (firstSample.contains(SuuntoJsonProcessor.TAG_ATTRIBUTES) &&
 						firstSample.contains(SuuntoJsonProcessor.TAG_SOURCE) &&
-						firstSample.contains(SuuntoJsonProcessor.TAG_TIMEISO8601))
+						firstSample.contains(SuuntoJsonProcessor.TAG_TIMEISO8601)) {
+					Util.closeReader(fileReader);
 					return true;
+				}
 
 			} catch (JSONException ex) {
 				StatusUtil.log(ex);
@@ -145,13 +151,63 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 	}
 
 	/**
+	 * Check if the file is a valid Suunto Spartan/9 activity.
+	 * 
+	 * @param jsonFileContent
+	 *           The content to check.
+	 * @return Returns <code>true</code> when the file contains content of a valid activity.
+	 */
+	protected boolean isValidActivity(String jsonFileContent) {
+		BufferedReader fileReader = null;
+		try {
+
+			if (jsonFileContent == null ||
+					jsonFileContent == "") { //$NON-NLS-1$
+				return false;
+			}
+
+			try {
+				JSONObject jsonContent = new JSONObject(jsonFileContent);
+				JSONArray samples = (JSONArray) jsonContent.get(SuuntoJsonProcessor.TAG_SAMPLES);
+
+				for (int index = 0; index < samples.length(); ++index) {
+					String currentSample = samples.getJSONObject(index).toString();
+					if (currentSample.contains(SuuntoJsonProcessor.TAG_SAMPLE) &&
+							(currentSample.contains(SuuntoJsonProcessor.TAG_GPSALTITUDE) ||
+									currentSample.contains(SuuntoJsonProcessor.TAG_LONGITUDE) ||
+									currentSample.contains(SuuntoJsonProcessor.TAG_LATITUDE) ||
+									currentSample.contains(SuuntoJsonProcessor.TAG_ALTITUDE))) {
+						Util.closeReader(fileReader);
+						return true;
+					}
+				}
+
+			} catch (JSONException ex) {
+				StatusUtil.log(ex);
+				return false;
+			}
+
+		} catch (
+
+		final Exception e) {
+			StatusUtil.log(e);
+			return false;
+		} finally {
+			Util.closeReader(fileReader);
+		}
+
+		return false;
+	}
+
+	/**
 	 * Retrieves the JSON content from a GZip Suunto file.
 	 * 
 	 * @param gzipFilePath
 	 *           The absolute file path of the Suunto file.
+	 * @param isValidatingFile 
 	 * @return Returns the JSON content.
 	 */
-	private String GetJsonContentFromGZipFile(String gzipFilePath) {
+	private String GetJsonContentFromGZipFile(String gzipFilePath, boolean isValidatingFile) {
 		String jsonFileContent = null;
 		try {
 			GZIPInputStream gzip = new GZIPInputStream(new FileInputStream(gzipFilePath));
@@ -164,7 +220,18 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 			gzip.close();
 
 		} catch (IOException e) {
-			StatusUtil.log(e);
+
+         if (isValidatingFile) {
+            
+            /*
+             * Log only when reading the zip file, during a validation, an exception can be very
+             * likely and should not be displayed
+             */
+            
+         } else {
+            StatusUtil.log(e);
+         }
+         
 			return ""; //$NON-NLS-1$
 		}
 

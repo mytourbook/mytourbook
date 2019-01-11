@@ -1,22 +1,19 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.common.font;
-
-import net.tourbook.common.Messages;
-import net.tourbook.common.UI;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.ListenerList;
@@ -46,6 +43,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 
+import net.tourbook.common.Messages;
+import net.tourbook.common.UI;
+
 /**
  * This is a copy of {@link orgFontFieldEditor} with an open & close listener which is fired when
  * the dialog is opened or closes. There are also other adjustments.
@@ -54,425 +54,425 @@ import org.eclipse.swt.widgets.Text;
  */
 public class FontFieldEditorExtended extends FieldEditor {
 
-	private final ListenerList	_openListeners	= new ListenerList();
+   private final ListenerList<IFontDialogListener> _openListeners = new ListenerList<>();
 
-	/**
-	 * The text for the change font button, or <code>null</code> if missing.
-	 */
-	private String				_buttonText;
+   /**
+    * The text for the change font button, or <code>null</code> if missing.
+    */
+   private String                                  _buttonText;
 
-	/**
-	 * The text for the preview, or <code>null</code> if no preview is desired
-	 */
-	private String				_previewAreaText;
+   /**
+    * The text for the preview, or <code>null</code> if no preview is desired
+    */
+   private String                                  _previewAreaText;
 
-	/*
-	 * UI controls
-	 */
-	/**
-	 * The change font button, or <code>null</code> if none (before creation and after disposal).
-	 */
-	private Button				_btnChangeFont	= null;
+   /*
+    * UI controls
+    */
+   /**
+    * The change font button, or <code>null</code> if none (before creation and after disposal).
+    */
+   private Button           _btnChangeFont = null;
 
-	/**
-	 * Font data for the chosen font button, or <code>null</code> if none.
-	 */
-	private FontData[]			chosenFont;
+   /**
+    * Font data for the chosen font button, or <code>null</code> if none.
+    */
+   private FontData[]       chosenFont;
 
-	/**
-	 * Editor lable.
-	 */
-	private Label				_lblEditor;
+   /**
+    * Editor lable.
+    */
+   private Label            _lblEditor;
 
-	/**
-	 * The label that displays the selected font, or <code>null</code> if none.
-	 */
-	private Label				_lblSelectedFont;
+   /**
+    * The label that displays the selected font, or <code>null</code> if none.
+    */
+   private Label            _lblSelectedFont;
 
-	/**
-	 * The previewer, or <code>null</code> if none.
-	 */
-	private DefaultPreviewer	_fontPreviewer;
+   /**
+    * The previewer, or <code>null</code> if none.
+    */
+   private DefaultPreviewer _fontPreviewer;
 
-	private Label				_lblFontSize;
+   private Label            _lblFontSize;
 
-	private Composite			_containerFontSize;
-	private Spinner				_spinFontSize;
+   private Composite        _containerFontSize;
+   private Spinner          _spinFontSize;
 
-	/**
-	 * Internal font previewer implementation.
-	 */
-	private class DefaultPreviewer {
+   /**
+    * Internal font previewer implementation.
+    */
+   private class DefaultPreviewer {
 
-		private String	_previewText;
+      private String _previewText;
 
-		private Font	_previewFont;
-		private Text	_txtPreviewText;
+      private Font   _previewFont;
+      private Text   _txtPreviewText;
 
-		/**
-		 * Constructor for the previewer.
-		 * 
-		 * @param previewText
-		 * @param parent
-		 */
-		public DefaultPreviewer(final String previewText, final Composite parent) {
+      /**
+       * Constructor for the previewer.
+       *
+       * @param previewText
+       * @param parent
+       */
+      public DefaultPreviewer(final String previewText, final Composite parent) {
 
-			_previewText = previewText;
+         _previewText = previewText;
 
-			_txtPreviewText = new Text(parent, SWT.READ_ONLY | SWT.BORDER | SWT.WRAP);
-			_txtPreviewText.addDisposeListener(new DisposeListener() {
-				@Override
-				public void widgetDisposed(final DisposeEvent e) {
-					if (_previewFont != null) {
-						_previewFont.dispose();
-					}
-				}
-			});
+         _txtPreviewText = new Text(parent, SWT.READ_ONLY | SWT.BORDER | SWT.WRAP);
+         _txtPreviewText.addDisposeListener(new DisposeListener() {
+            @Override
+            public void widgetDisposed(final DisposeEvent e) {
+               if (_previewFont != null) {
+                  _previewFont.dispose();
+               }
+            }
+         });
 
-			if (_previewText != null) {
-				_txtPreviewText.setText(_previewText);
-			}
-		}
+         if (_previewText != null) {
+            _txtPreviewText.setText(_previewText);
+         }
+      }
 
-		/**
-		 * @return the control the previewer is using
-		 */
-		public Control getControl() {
-			return _txtPreviewText;
-		}
+      /**
+       * @return the control the previewer is using
+       */
+      public Control getControl() {
+         return _txtPreviewText;
+      }
 
-		public int getPreferredHeight() {
-			return convertHorizontalDLUsToPixels(_txtPreviewText, 5 * 8);
-		}
+      public int getPreferredHeight() {
+         return convertHorizontalDLUsToPixels(_txtPreviewText, 5 * 8);
+      }
 
-		/**
-		 * @return the preferred size of the previewer.
-		 */
-		public int getPreferredWidth() {
-			return convertHorizontalDLUsToPixels(_txtPreviewText, 40 * 4);
-		}
+      /**
+       * @return the preferred size of the previewer.
+       */
+      public int getPreferredWidth() {
+         return convertHorizontalDLUsToPixels(_txtPreviewText, 40 * 4);
+      }
 
-		public void setEnabled(final boolean isEnabled) {
-			_txtPreviewText.setEnabled(isEnabled);
-		}
+      public void setEnabled(final boolean isEnabled) {
+         _txtPreviewText.setEnabled(isEnabled);
+      }
 
-		/**
-		 * Set the font to display with
-		 * 
-		 * @param fontData
-		 */
-		public void setFont(final FontData[] fontData) {
+      /**
+       * Set the font to display with
+       *
+       * @param fontData
+       */
+      public void setFont(final FontData[] fontData) {
 
-			if (_previewFont != null) {
-				_previewFont.dispose();
-			}
+         if (_previewFont != null) {
+            _previewFont.dispose();
+         }
 
-			_previewFont = new Font(_txtPreviewText.getDisplay(), fontData);
-			_txtPreviewText.setFont(_previewFont);
-		}
-	}
+         _previewFont = new Font(_txtPreviewText.getDisplay(), fontData);
+         _txtPreviewText.setFont(_previewFont);
+      }
+   }
 
-	/**
-	 * Creates a new font field editor
-	 */
-	protected FontFieldEditorExtended() {}
+   /**
+    * Creates a new font field editor
+    */
+   protected FontFieldEditorExtended() {}
 
-	/**
-	 * Creates a font field editor without a preview.
-	 * 
-	 * @param name
-	 *            the name of the preference this field editor works on
-	 * @param labelText
-	 *            the label text of the field editor
-	 * @param parent
-	 *            the parent of the field editor's control
-	 */
-	public FontFieldEditorExtended(final String name, final String labelText, final Composite parent) {
-		this(name, labelText, null, parent);
+   /**
+    * Creates a font field editor without a preview.
+    *
+    * @param name
+    *           the name of the preference this field editor works on
+    * @param labelText
+    *           the label text of the field editor
+    * @param parent
+    *           the parent of the field editor's control
+    */
+   public FontFieldEditorExtended(final String name, final String labelText, final Composite parent) {
+      this(name, labelText, null, parent);
 
-	}
+   }
 
-	/**
-	 * Creates a font field editor with an optional preview area.
-	 * 
-	 * @param name
-	 *            the name of the preference this field editor works on
-	 * @param labelText
-	 *            the label text of the field editor
-	 * @param previewAreaText
-	 *            the text used for the preview window. If it is <code>null</code> there will be no
-	 *            preview area,
-	 * @param parent
-	 *            the parent of the field editor's control
-	 */
-	public FontFieldEditorExtended(	final String name,
-									final String labelText,
-									final String previewAreaText,
-									final Composite parent) {
-		init(name, labelText);
+   /**
+    * Creates a font field editor with an optional preview area.
+    *
+    * @param name
+    *           the name of the preference this field editor works on
+    * @param labelText
+    *           the label text of the field editor
+    * @param previewAreaText
+    *           the text used for the preview window. If it is <code>null</code> there will be no
+    *           preview area,
+    * @param parent
+    *           the parent of the field editor's control
+    */
+   public FontFieldEditorExtended(final String name,
+                                  final String labelText,
+                                  final String previewAreaText,
+                                  final Composite parent) {
+      init(name, labelText);
 
-		_previewAreaText = previewAreaText;
-		_buttonText = JFaceResources.getString("openChange"); //$NON-NLS-1$
+      _previewAreaText = previewAreaText;
+      _buttonText = JFaceResources.getString("openChange"); //$NON-NLS-1$
 
-		createControl(parent);
-	}
+      createControl(parent);
+   }
 
-	public void addOpenListener(final IFontDialogListener listener) {
-		_openListeners.add(listener);
-	}
+   public void addOpenListener(final IFontDialogListener listener) {
+      _openListeners.add(listener);
+   }
 
-	@Override
-	protected void adjustForNumColumns(final int numColumns) {
+   @Override
+   protected void adjustForNumColumns(final int numColumns) {
 
-		GridData data = new GridData();
-		if (_lblSelectedFont.getLayoutData() != null) {
-			data = (GridData) _lblSelectedFont.getLayoutData();
-		}
+      GridData data = new GridData();
+      if (_lblSelectedFont.getLayoutData() != null) {
+         data = (GridData) _lblSelectedFont.getLayoutData();
+      }
 
-		data.horizontalSpan = numColumns - getNumberOfControls() + 1;
-		_lblSelectedFont.setLayoutData(data);
-	}
+      data.horizontalSpan = numColumns - getNumberOfControls() + 1;
+      _lblSelectedFont.setLayoutData(data);
+   }
 
-	@Override
-	protected void applyFont() {
+   @Override
+   protected void applyFont() {
 
-		if (chosenFont != null && _fontPreviewer != null) {
-			_fontPreviewer.setFont(chosenFont);
-		}
-	}
+      if (chosenFont != null && _fontPreviewer != null) {
+         _fontPreviewer.setFont(chosenFont);
+      }
+   }
 
-	@Override
-	protected void doFillIntoGrid(final Composite parent, final int numColumns) {
+   @Override
+   protected void doFillIntoGrid(final Composite parent, final int numColumns) {
 
 //		parent.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
-		{
-			/*
-			 * Label: Font editor
-			 */
-			// create editor label
-			_lblEditor = getLabelControl(parent);
+      {
+         /*
+          * Label: Font editor
+          */
+         // create editor label
+         _lblEditor = getLabelControl(parent);
 
-			final GridData gd = new GridData();
-			gd.verticalAlignment = SWT.BEGINNING;
+         final GridData gd = new GridData();
+         gd.verticalAlignment = SWT.BEGINNING;
 
-			_lblEditor.setLayoutData(gd);
-		}
+         _lblEditor.setLayoutData(gd);
+      }
 
-		{
-			/*
-			 * Label: Selected font
-			 */
-			_lblSelectedFont = getValueControl(parent);
+      {
+         /*
+          * Label: Selected font
+          */
+         _lblSelectedFont = getValueControl(parent);
 
-			final GridData gd = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
-			gd.horizontalSpan = numColumns - getNumberOfControls() + 1;
-			_lblSelectedFont.setLayoutData(gd);
-		}
+         final GridData gd = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
+         gd.horizontalSpan = numColumns - getNumberOfControls() + 1;
+         _lblSelectedFont.setLayoutData(gd);
+      }
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
-		{
-			{
-				/*
-				 * Button: Change font
-				 */
-				_btnChangeFont = getChangeControl(container);
+      {
+         {
+            /*
+             * Button: Change font
+             */
+            _btnChangeFont = getChangeControl(container);
 
-				final int widthHint = convertHorizontalDLUsToPixels(_btnChangeFont, IDialogConstants.BUTTON_WIDTH);
-				final int defaultWidth = _btnChangeFont.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x;
+            final int widthHint = convertHorizontalDLUsToPixels(_btnChangeFont, IDialogConstants.BUTTON_WIDTH);
+            final int defaultWidth = _btnChangeFont.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x;
 
-				final GridData gd = new GridData();
-				gd.widthHint = Math.max(widthHint, defaultWidth);
-				gd.verticalAlignment = SWT.BEGINNING;
-				gd.horizontalSpan = 2;
-				_btnChangeFont.setLayoutData(gd);
-			}
-			{
-				/*
-				 * Font size
-				 */
-				_containerFontSize = new Composite(container, SWT.NONE);
-				GridDataFactory.fillDefaults().grab(true, false).applyTo(_containerFontSize);
-				GridLayoutFactory.fillDefaults().numColumns(2).applyTo(_containerFontSize);
+            final GridData gd = new GridData();
+            gd.widthHint = Math.max(widthHint, defaultWidth);
+            gd.verticalAlignment = SWT.BEGINNING;
+            gd.horizontalSpan = 2;
+            _btnChangeFont.setLayoutData(gd);
+         }
+         {
+            /*
+             * Font size
+             */
+            _containerFontSize = new Composite(container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_containerFontSize);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(_containerFontSize);
 //				_containerFontSize.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
-				{
-					// Label
-					_lblFontSize = new Label(_containerFontSize, SWT.NONE);
-					GridDataFactory.fillDefaults()//
-							.align(SWT.FILL, SWT.CENTER)
-							.applyTo(_lblFontSize);
-					_lblFontSize.setText(Messages.Font_Editor_Label_FontSize);
+            {
+               // Label
+               _lblFontSize = new Label(_containerFontSize, SWT.NONE);
+               GridDataFactory.fillDefaults()//
+                     .align(SWT.FILL, SWT.CENTER)
+                     .applyTo(_lblFontSize);
+               _lblFontSize.setText(Messages.Font_Editor_Label_FontSize);
 
-					// Spinner
-					_spinFontSize = new Spinner(_containerFontSize, SWT.BORDER);
-					_spinFontSize.setMinimum(2);
-					_spinFontSize.setMaximum(100);
-					_spinFontSize.setPageIncrement(5);
-					_spinFontSize.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(final SelectionEvent e) {
-							onChangeFontSize();
-						}
-					});
-					_spinFontSize.addMouseWheelListener(new MouseWheelListener() {
+               // Spinner
+               _spinFontSize = new Spinner(_containerFontSize, SWT.BORDER);
+               _spinFontSize.setMinimum(2);
+               _spinFontSize.setMaximum(100);
+               _spinFontSize.setPageIncrement(5);
+               _spinFontSize.addSelectionListener(new SelectionAdapter() {
+                  @Override
+                  public void widgetSelected(final SelectionEvent e) {
+                     onChangeFontSize();
+                  }
+               });
+               _spinFontSize.addMouseWheelListener(new MouseWheelListener() {
 
-						@Override
-						public void mouseScrolled(final MouseEvent event) {
-							UI.adjustSpinnerValueOnMouseScroll(event);
-							onChangeFontSize();
-						}
-					});
-				}
-			}
-		}
-		{
-			/*
-			 * Font preview
-			 */
-			if (_previewAreaText != null) {
+                  @Override
+                  public void mouseScrolled(final MouseEvent event) {
+                     UI.adjustSpinnerValueOnMouseScroll(event);
+                     onChangeFontSize();
+                  }
+               });
+            }
+         }
+      }
+      {
+         /*
+          * Font preview
+          */
+         if (_previewAreaText != null) {
 
-				_fontPreviewer = new DefaultPreviewer(_previewAreaText, parent);
+            _fontPreviewer = new DefaultPreviewer(_previewAreaText, parent);
 
-				final GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-				gd.widthHint = _fontPreviewer.getPreferredWidth();
-				gd.heightHint = _fontPreviewer.getPreferredHeight();
-				gd.verticalSpan = 2;
-				_fontPreviewer.getControl().setLayoutData(gd);
-			}
-		}
-	}
+            final GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+            gd.widthHint = _fontPreviewer.getPreferredWidth();
+            gd.heightHint = _fontPreviewer.getPreferredHeight();
+            gd.verticalSpan = 2;
+            _fontPreviewer.getControl().setLayoutData(gd);
+         }
+      }
+   }
 
-	@Override
-	protected void doLoad() {
+   @Override
+   protected void doLoad() {
 
-		if (_btnChangeFont == null) {
-			return;
-		}
+      if (_btnChangeFont == null) {
+         return;
+      }
 
-		updateFont(PreferenceConverter.getFontDataArray(getPreferenceStore(), getPreferenceName()));
-	}
+      updateFont(PreferenceConverter.getFontDataArray(getPreferenceStore(), getPreferenceName()));
+   }
 
-	@Override
-	protected void doLoadDefault() {
+   @Override
+   protected void doLoadDefault() {
 
-		if (_btnChangeFont == null) {
-			return;
-		}
+      if (_btnChangeFont == null) {
+         return;
+      }
 
-		updateFont(PreferenceConverter.getDefaultFontDataArray(getPreferenceStore(), getPreferenceName()));
-	}
+      updateFont(PreferenceConverter.getDefaultFontDataArray(getPreferenceStore(), getPreferenceName()));
+   }
 
-	@Override
-	protected void doStore() {
+   @Override
+   protected void doStore() {
 
-		if (chosenFont != null) {
-			PreferenceConverter.setValue(getPreferenceStore(), getPreferenceName(), chosenFont);
-		}
-	}
+      if (chosenFont != null) {
+         PreferenceConverter.setValue(getPreferenceStore(), getPreferenceName(), chosenFont);
+      }
+   }
 
-	private void fireFontChanged(final FontData font) {
+   private void fireFontChanged(final FontData font) {
 
-		FontData[] oldFont = chosenFont;
-		if (oldFont == null) {
-			oldFont = JFaceResources.getDefaultFont().getFontData();
-		}
-		setPresentsDefaultValue(false);
+      FontData[] oldFont = chosenFont;
+      if (oldFont == null) {
+         oldFont = JFaceResources.getDefaultFont().getFontData();
+      }
+      setPresentsDefaultValue(false);
 
-		final FontData[] newFontData = new FontData[1];
-		newFontData[0] = font;
-		updateFont(newFontData);
+      final FontData[] newFontData = new FontData[1];
+      newFontData[0] = font;
+      updateFont(newFontData);
 
-		fireValueChanged(VALUE, oldFont[0], font);
-	}
+      fireValueChanged(VALUE, oldFont[0], font);
+   }
 
-	/**
-	 * Fire an open event that the dialog is opened or closes.
-	 */
-	private void fireOpenEvent(final boolean isOpened) {
+   /**
+    * Fire an open event that the dialog is opened or closes.
+    */
+   private void fireOpenEvent(final boolean isOpened) {
 
-		final Object[] listeners = _openListeners.getListeners();
+      final Object[] listeners = _openListeners.getListeners();
 
-		for (final Object listener : listeners) {
+      for (final Object listener : listeners) {
 
-			final IFontDialogListener dialogListener = (IFontDialogListener) listener;
+         final IFontDialogListener dialogListener = (IFontDialogListener) listener;
 
-			SafeRunnable.run(new SafeRunnable() {
-				@Override
-				public void run() {
-					dialogListener.fontDialogOpened(isOpened);
-				}
-			});
-		}
-	}
+         SafeRunnable.run(new SafeRunnable() {
+            @Override
+            public void run() {
+               dialogListener.fontDialogOpened(isOpened);
+            }
+         });
+      }
+   }
 
-	/**
-	 * Returns the change button for this field editor.
-	 * 
-	 * @param parent
-	 *            The Composite to create the button in if required.
-	 * @return the change button
-	 */
-	protected Button getChangeControl(final Composite parent) {
+   /**
+    * Returns the change button for this field editor.
+    *
+    * @param parent
+    *           The Composite to create the button in if required.
+    * @return the change button
+    */
+   protected Button getChangeControl(final Composite parent) {
 
-		if (_btnChangeFont == null) {
+      if (_btnChangeFont == null) {
 
-			_btnChangeFont = new Button(parent, SWT.PUSH);
-			if (_buttonText != null) {
-				_btnChangeFont.setText(_buttonText);
-			}
+         _btnChangeFont = new Button(parent, SWT.PUSH);
+         if (_buttonText != null) {
+            _btnChangeFont.setText(_buttonText);
+         }
 
-			_btnChangeFont.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent event) {
+         _btnChangeFont.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent event) {
 
-					final FontDialog fontDialog = new FontDialog(_btnChangeFont.getShell());
+               final FontDialog fontDialog = new FontDialog(_btnChangeFont.getShell());
 
-					if (chosenFont != null) {
-						fontDialog.setFontList(chosenFont);
-					}
+               if (chosenFont != null) {
+                  fontDialog.setFontList(chosenFont);
+               }
 
-					fontDialog.setEffectsVisible(false);
+               fontDialog.setEffectsVisible(false);
 
-					fireOpenEvent(true);
+               fireOpenEvent(true);
 
-					final FontData font = fontDialog.open();
+               final FontData font = fontDialog.open();
 
-					fireOpenEvent(false);
+               fireOpenEvent(false);
 
-					if (font != null) {
-						fireFontChanged(font);
-					}
+               if (font != null) {
+                  fireFontChanged(font);
+               }
 
-				}
-			});
-			_btnChangeFont.addDisposeListener(new DisposeListener() {
-				@Override
-				public void widgetDisposed(final DisposeEvent event) {
-					_btnChangeFont = null;
-				}
-			});
-			_btnChangeFont.setFont(parent.getFont());
-			setButtonLayoutData(_btnChangeFont);
-		} else {
+            }
+         });
+         _btnChangeFont.addDisposeListener(new DisposeListener() {
+            @Override
+            public void widgetDisposed(final DisposeEvent event) {
+               _btnChangeFont = null;
+            }
+         });
+         _btnChangeFont.setFont(parent.getFont());
+         setButtonLayoutData(_btnChangeFont);
+      } else {
 // parent check will fail because of the rearranged controls, e.g. font size
 //			checkParent(_btnChangeFont, parent);
-		}
-		return _btnChangeFont;
-	}
+      }
+      return _btnChangeFont;
+   }
 
-	/**
-	 * Get the system default font data.
-	 * 
-	 * @return FontData[]
-	 */
-	private FontData[] getDefaultFontData() {
-		return _lblSelectedFont.getDisplay().getSystemFont().getFontData();
-	}
+   /**
+    * Get the system default font data.
+    *
+    * @return FontData[]
+    */
+   private FontData[] getDefaultFontData() {
+      return _lblSelectedFont.getDisplay().getSystemFont().getFontData();
+   }
 
-	@Override
-	public int getNumberOfControls() {
+   @Override
+   public int getNumberOfControls() {
 
 //		if (_fontPreviewer == null) {
 //			return 3;
@@ -480,173 +480,174 @@ public class FontFieldEditorExtended extends FieldEditor {
 //
 //		return 4;
 
-		return 2;
-	}
+      return 2;
+   }
 
-	/**
-	 * Returns the preferred preview height.
-	 * 
-	 * @return the height, or <code>-1</code> if no previewer is installed
-	 */
-	public int getPreferredPreviewHeight() {
+   /**
+    * Returns the preferred preview height.
+    *
+    * @return the height, or <code>-1</code> if no previewer is installed
+    */
+   public int getPreferredPreviewHeight() {
 
-		if (_fontPreviewer == null) {
-			return -1;
-		}
+      if (_fontPreviewer == null) {
+         return -1;
+      }
 
-		return _fontPreviewer.getPreferredHeight();
-	}
+      return _fontPreviewer.getPreferredHeight();
+   }
 
-	/**
-	 * Returns the preview control for this field editor.
-	 * 
-	 * @return the preview control
-	 */
-	public Control getPreviewControl() {
-		if (_fontPreviewer == null) {
-			return null;
-		}
+   /**
+    * Returns the preview control for this field editor.
+    *
+    * @return the preview control
+    */
+   public Control getPreviewControl() {
+      if (_fontPreviewer == null) {
+         return null;
+      }
 
-		return _fontPreviewer.getControl();
-	}
+      return _fontPreviewer.getControl();
+   }
 
-	/**
-	 * Returns the value control for this field editor. The value control displays the currently
-	 * selected font name.
-	 * 
-	 * @param parent
-	 *            The Composite to create the viewer in if required
-	 * @return the value control
-	 */
-	protected Label getValueControl(final Composite parent) {
+   /**
+    * Returns the value control for this field editor. The value control displays the currently
+    * selected font name.
+    *
+    * @param parent
+    *           The Composite to create the viewer in if required
+    * @return the value control
+    */
+   protected Label getValueControl(final Composite parent) {
 
-		if (_lblSelectedFont == null) {
-			_lblSelectedFont = new Label(parent, SWT.LEFT);
-			_lblSelectedFont.setFont(parent.getFont());
-			_lblSelectedFont.addDisposeListener(new DisposeListener() {
-				@Override
-				public void widgetDisposed(final DisposeEvent event) {
-					_lblSelectedFont = null;
-				}
-			});
-		} else {
-			checkParent(_lblSelectedFont, parent);
-		}
+      if (_lblSelectedFont == null) {
+         _lblSelectedFont = new Label(parent, SWT.LEFT);
+         _lblSelectedFont.setFont(parent.getFont());
+         _lblSelectedFont.addDisposeListener(new DisposeListener() {
+            @Override
+            public void widgetDisposed(final DisposeEvent event) {
+               _lblSelectedFont = null;
+            }
+         });
+      } else {
+         checkParent(_lblSelectedFont, parent);
+      }
 
-		return _lblSelectedFont;
-	}
+      return _lblSelectedFont;
+   }
 
-	private void onChangeFontSize() {
+   private void onChangeFontSize() {
 
-		final FontData[] selectedFont = chosenFont;
+      final FontData[] selectedFont = chosenFont;
 
-		final FontData font = selectedFont[0];
-		font.setHeight(_spinFontSize.getSelection());
+      final FontData font = selectedFont[0];
+      font.setHeight(_spinFontSize.getSelection());
 
-		final FontData[] validFont = JFaceResources.getFontRegistry().filterData(
-				selectedFont,
-				_lblSelectedFont.getDisplay());
+      final FontData[] validFont = JFaceResources.getFontRegistry()
+            .filterData(
+                  selectedFont,
+                  _lblSelectedFont.getDisplay());
 
-		fireFontChanged(validFont[0]);
-	}
+      fireFontChanged(validFont[0]);
+   }
 
-	public void removeOpenListener(final IFontDialogListener listener) {
-		_openListeners.remove(listener);
-	}
+   public void removeOpenListener(final IFontDialogListener listener) {
+      _openListeners.remove(listener);
+   }
 
-	/**
-	 * Sets the text of the change button.
-	 * 
-	 * @param text
-	 *            the new text
-	 */
-	public void setChangeButtonText(final String text) {
+   /**
+    * Sets the text of the change button.
+    *
+    * @param text
+    *           the new text
+    */
+   public void setChangeButtonText(final String text) {
 
-		Assert.isNotNull(text);
+      Assert.isNotNull(text);
 
-		_buttonText = text;
-		if (_btnChangeFont != null) {
-			_btnChangeFont.setText(text);
-		}
-	}
+      _buttonText = text;
+      if (_btnChangeFont != null) {
+         _btnChangeFont.setText(text);
+      }
+   }
 
-	@Override
-	public void setEnabled(final boolean isEnabled, final Composite parent) {
+   @Override
+   public void setEnabled(final boolean isEnabled, final Composite parent) {
 
-		super.setEnabled(isEnabled, parent);
+      super.setEnabled(isEnabled, parent);
 
-		getChangeControl(parent).setEnabled(isEnabled);
-		getValueControl(parent).setEnabled(isEnabled);
+      getChangeControl(parent).setEnabled(isEnabled);
+      getValueControl(parent).setEnabled(isEnabled);
 
-		if (_fontPreviewer != null) {
-			_fontPreviewer.setEnabled(isEnabled);
-		}
+      if (_fontPreviewer != null) {
+         _fontPreviewer.setEnabled(isEnabled);
+      }
 
-		_lblFontSize.setEnabled(isEnabled);
-		_spinFontSize.setEnabled(isEnabled);
-	}
+      _lblFontSize.setEnabled(isEnabled);
+      _spinFontSize.setEnabled(isEnabled);
+   }
 
-	/**
-	 * Set indent for the first column fields.
-	 * 
-	 * @param horizontalIndent
-	 * @param verticalIndent
-	 */
-	public void setFirstColumnIndent(final int horizontalIndent, final int verticalIndent) {
+   /**
+    * Set indent for the first column fields.
+    *
+    * @param horizontalIndent
+    * @param verticalIndent
+    */
+   public void setFirstColumnIndent(final int horizontalIndent, final int verticalIndent) {
 
-		GridData gd = (GridData) _lblEditor.getLayoutData();
-		gd.horizontalIndent = horizontalIndent;
-		gd.verticalIndent = verticalIndent;
+      GridData gd = (GridData) _lblEditor.getLayoutData();
+      gd.horizontalIndent = horizontalIndent;
+      gd.verticalIndent = verticalIndent;
 
-		gd = (GridData) _btnChangeFont.getLayoutData();
-		gd.horizontalIndent = horizontalIndent;
-		gd.verticalIndent = verticalIndent;
+      gd = (GridData) _btnChangeFont.getLayoutData();
+      gd.horizontalIndent = horizontalIndent;
+      gd.verticalIndent = verticalIndent;
 
-		gd = (GridData) _containerFontSize.getLayoutData();
-		gd.horizontalIndent = horizontalIndent;
-		gd.verticalIndent = verticalIndent;
-	}
+      gd = (GridData) _containerFontSize.getLayoutData();
+      gd.horizontalIndent = horizontalIndent;
+      gd.verticalIndent = verticalIndent;
+   }
 
-	/**
-	 * Store the default preference for the field being edited
-	 */
-	protected void setToDefault() {
+   /**
+    * Store the default preference for the field being edited
+    */
+   protected void setToDefault() {
 
-		final FontData[] defaultFontData = PreferenceConverter.getDefaultFontDataArray(
-				getPreferenceStore(),
-				getPreferenceName());
+      final FontData[] defaultFontData = PreferenceConverter.getDefaultFontDataArray(
+            getPreferenceStore(),
+            getPreferenceName());
 
-		PreferenceConverter.setValue(getPreferenceStore(), getPreferenceName(), defaultFontData);
-	}
+      PreferenceConverter.setValue(getPreferenceStore(), getPreferenceName(), defaultFontData);
+   }
 
-	/**
-	 * Updates the change font button and the previewer to reflect the newly selected font.
-	 * 
-	 * @param font
-	 *            The FontData[] to update with.
-	 */
-	private void updateFont(final FontData font[]) {
+   /**
+    * Updates the change font button and the previewer to reflect the newly selected font.
+    *
+    * @param font
+    *           The FontData[] to update with.
+    */
+   private void updateFont(final FontData font[]) {
 
-		FontData[] bestFont = JFaceResources.getFontRegistry().filterData(font, _lblSelectedFont.getDisplay());
+      FontData[] bestFont = JFaceResources.getFontRegistry().filterData(font, _lblSelectedFont.getDisplay());
 
-		//if we have nothing valid do as best we can
-		if (bestFont == null) {
-			bestFont = getDefaultFontData();
-		}
+      //if we have nothing valid do as best we can
+      if (bestFont == null) {
+         bestFont = getDefaultFontData();
+      }
 
-		//Now cache this value in the receiver
-		this.chosenFont = bestFont;
+      //Now cache this value in the receiver
+      this.chosenFont = bestFont;
 
-		if (_lblSelectedFont != null) {
-			_lblSelectedFont.setText(StringConverter.asString(chosenFont[0]));
-		}
-		if (_fontPreviewer != null) {
-			_fontPreviewer.setFont(bestFont);
-		}
+      if (_lblSelectedFont != null) {
+         _lblSelectedFont.setText(StringConverter.asString(chosenFont[0]));
+      }
+      if (_fontPreviewer != null) {
+         _fontPreviewer.setFont(bestFont);
+      }
 
-		// update font size widget
-		final int fontHeight = bestFont[0].getHeight();
-		_spinFontSize.setSelection(fontHeight);
-	}
+      // update font size widget
+      final int fontHeight = bestFont[0].getHeight();
+      _spinFontSize.setSelection(fontHeight);
+   }
 
 }

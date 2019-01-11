@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.Set;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -38,12 +39,16 @@ import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.layout.GridData;
@@ -78,6 +83,8 @@ import net.tourbook.tour.photo.TourPhotoLinkView;
 import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.web.WEB;
+
+import de.byteholder.geoclipse.preferences.IMappingPreferences;
 
 public class UI {
 
@@ -238,15 +245,15 @@ public class UI {
    public static final float         UNIT_FAHRENHEIT_ADD           = 32;
 
    public final static ImageRegistry IMAGE_REGISTRY;
-   private static final String       PART_NAME_GRAPH_ID            = "graphId-";               //$NON-NLS-1$
-   private static final String       PART_NAME_DISABLED            = "-disabled";              //$NON-NLS-1$
 
-   public static final String        IMAGE_TOUR_TYPE_FILTER        = "tourType-filter";        //$NON-NLS-1$
-   public static final String        IMAGE_TOUR_TYPE_FILTER_SYSTEM = "tourType-filter-system"; //$NON-NLS-1$
+   private static final String       PART_NAME_GRAPH_ID            = "graphId-";                 //$NON-NLS-1$
+   private static final String       PART_NAME_DISABLED            = "-disabled";                //$NON-NLS-1$
+
+   public static final String        IMAGE_TOUR_TYPE_FILTER        = "tourType-filter";          //$NON-NLS-1$
+   public static final String        IMAGE_TOUR_TYPE_FILTER_SYSTEM = "tourType-filter-system";   //$NON-NLS-1$
 
    private static StringBuilder      _formatterSB                  = new StringBuilder();
-   private static Formatter          _formatter                    = new Formatter(
-         _formatterSB);
+   private static Formatter          _formatter                    = new Formatter(_formatterSB);
 
    private static DateFormat         _dateFormatterShort;
    private static DateFormat         _timeFormatterShort;
@@ -255,10 +262,14 @@ public class UI {
    public static Styler              TAG_CATEGORY_STYLER;
    public static Styler              TAG_SUB_STYLER;
 
+   private static final String       DEFAULT_MONO_FONT             = "Courier";                  //$NON-NLS-1$
+   private static Font               _fontForLogging;
+
    static {
 
       updateUnits();
       setViewColorsFromPrefStore();
+      setupFonts();
 
       /*
        * load often used images into the image registry
@@ -862,6 +873,10 @@ public class UI {
       return EMPTY_STRING;
    }
 
+   public static Font getLogFont() {
+      return _fontForLogging;
+   }
+
    /**
     * Checks if propertyData has the same tour as the oldTourData
     *
@@ -997,13 +1012,88 @@ public class UI {
       label.setLayoutData(gd);
    }
 
+   private static void setupFonts() {
+
+      final Display display = Display.getCurrent();
+      Assert.isNotNull(display);
+
+      // hookup dispose
+      display.disposeExec(new Runnable() {
+         @Override
+         public void run() {
+            if (_fontForLogging != null) {
+               _fontForLogging.dispose();
+            }
+         }
+      });
+
+      setupFonts_Logging(display);
+
+      // update font after it changed
+      final IPreferenceStore prefStore = TourbookPlugin.getPrefStore();
+      prefStore.addPropertyChangeListener(new IPropertyChangeListener() {
+
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
+
+            final String property = event.getProperty();
+
+            if (property.equals(IMappingPreferences.THEME_FONT_LOGGING)) {
+
+               if (_fontForLogging != null) {
+
+                  _fontForLogging.dispose();
+                  _fontForLogging = null;
+               }
+
+               setupFonts_Logging(display);
+
+               // fire event after the font is recreated to update the UI
+               prefStore.setValue(ITourbookPreferences.FONT_LOGGING_IS_MODIFIED, Math.random());
+            }
+         }
+      });
+
+   }
+
+   private static void setupFonts_Logging(final Display display) {
+
+      final IPreferenceStore prefStore = TourbookPlugin.getPrefStore();
+
+      final String prefFontData = prefStore.getString(IMappingPreferences.THEME_FONT_LOGGING);
+      if (prefFontData.length() > 0) {
+         try {
+
+            String prefFontDataCleaned = prefFontData;
+
+            if (prefFontData.endsWith(";")) { //$NON-NLS-1$
+
+               // remove ; at the end, after many years, I found that a ; at the end do not set the correct font
+
+               prefFontDataCleaned = prefFontData.substring(0, prefFontData.length() - 1);
+            }
+
+            final FontData fontData = new FontData(prefFontDataCleaned);
+
+            _fontForLogging = new Font(display, fontData);
+
+         } catch (final Exception e) {
+            // ignore
+         }
+      }
+
+      if (_fontForLogging == null) {
+         _fontForLogging = new Font(display, DEFAULT_MONO_FONT, 9, SWT.NORMAL);
+      }
+   }
+
    /**
     * Set tag colors in the JFace color registry from the pref store
     */
    public static void setViewColorsFromPrefStore() {
 
       // pref store var cannot be set from a static field because it can be null !!!
-      final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+      final IPreferenceStore prefStore = TourbookPlugin.getPrefStore();
 
       final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
 
@@ -1093,14 +1183,8 @@ public class UI {
             Util.getPrefixPrefInt(prefStore, gridPrefix, ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE),
             Util.getPrefixPrefInt(prefStore, gridPrefix, ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE),
 
-            Util.getPrefixPrefBoolean(
-                  prefStore,
-                  gridPrefix,
-                  ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
-            Util.getPrefixPrefBoolean(
-                  prefStore,
-                  gridPrefix,
-                  ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES),
+            Util.getPrefixPrefBoolean(prefStore, gridPrefix, ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
+            Util.getPrefixPrefBoolean(prefStore, gridPrefix, ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES),
 
             prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR),
             PreferenceConverter.getColor(prefStore, ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR));

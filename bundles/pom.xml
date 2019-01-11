@@ -1,63 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project 
 
-	xsi:schemaLocation	="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-	xmlns						="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi				="http://www.w3.org/2001/XMLSchema-instance">
+   xsi:schemaLocation   ="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+   xmlns                ="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi           ="http://www.w3.org/2001/XMLSchema-instance">
 
-	<modelVersion>4.0.0</modelVersion>
+   <modelVersion>4.0.0</modelVersion>
 
-	<artifactId>mytourbook-bundles</artifactId>		<groupId>net.tourbook</groupId>
-																	<version>18.12.0-SNAPSHOT</version>
-	<packaging>pom</packaging>
+   <artifactId>mytourbook-bundles</artifactId>     <groupId>net.tourbook</groupId>
+                                                   <version>18.13.0-SNAPSHOT</version>
+   <packaging>pom</packaging>
 
-	<parent>
-		<artifactId>mytourbook-app</artifactId>		<groupId>net.tourbook</groupId>
-																	<version>18.12.0-SNAPSHOT</version>
-													
-		<relativePath>../../MT/mytourbook/pom.xml</relativePath>
-	</parent>
-	
-	<modules>
+   <parent>
+      <artifactId>mytourbook-app</artifactId>      <groupId>net.tourbook</groupId>
+                                                   <version>18.13.0-SNAPSHOT</version>
 
-		<module>net.tourbook</module>
-		<module>net.tourbook.branding</module>
-		<module>net.tourbook.chart</module>
-		<module>net.tourbook.common</module>
-		<module>net.tourbook.device</module>
-		<module>net.tourbook.device.garmin</module>
-		<module>net.tourbook.device.garmin.fit</module>
-		<module>net.tourbook.device.nmea</module>
-		<module>net.tourbook.export</module>
-		<module>net.tourbook.p2</module>
-		<module>net.tourbook.photo</module>
-		<module>net.tourbook.printing</module>
-		<module>net.tourbook.statistics</module>
-		<module>net.tourbook.web</module>
+      <relativePath>../../MT/mytourbook/pom.xml</relativePath>
+   </parent>
 
-		<module>net.tourbook.ext.apache</module>
-		<module>net.tourbook.ext.ejb3_3.4.0</module>
-		<module>net.tourbook.ext.geoclipse</module>
-		<module>net.tourbook.ext.jars</module>
-		<module>net.tourbook.ext.jars.printing</module>
-		<module>net.tourbook.ext.rxtx.linux32_2.2</module>
-		<module>net.tourbook.ext.rxtx.linux64_2.2</module>
-		<module>net.tourbook.ext.rxtx.macosx_2.2</module>
-		<module>net.tourbook.ext.rxtx.win32_2.2</module>
-		<module>net.tourbook.ext.rxtx.win64_2.2</module>
-		<module>net.tourbook.ext.rxtx_2.2</module>
-		<module>net.tourbook.ext.velocity</module>
-		<module>net.tourbook.ext.vtm</module>
-		<module>net.tourbook.ext.vtm.linux</module>
-		<module>net.tourbook.ext.vtm.macosx</module>
-		<module>net.tourbook.ext.vtm.windows</module>
-		<module>net.tourbook.ext.worldwind.linux32_2.0</module>
-		<module>net.tourbook.ext.worldwind.linux64_2.0</module>
-		<module>net.tourbook.ext.worldwind.macosx_2.0</module>
-		<module>net.tourbook.ext.worldwind.win32_2.0</module>
-		<module>net.tourbook.ext.worldwind.win64_2.0</module>
-		<module>net.tourbook.ext.worldwind_2.0</module>
+   <modules>
 
-	</modules>
+      <module>net.tourbook</module>
+      <module>net.tourbook.branding</module>
+      <module>net.tourbook.chart</module>
+      <module>net.tourbook.common</module>
+      <module>net.tourbook.device</module>
+      <module>net.tourbook.device.garmin</module>
+      <module>net.tourbook.device.garmin.fit</module>
+      <module>net.tourbook.device.nmea</module>
+      <module>net.tourbook.export</module>
+      <module>net.tourbook.p2</module>
+      <module>net.tourbook.photo</module>
+      <module>net.tourbook.printing</module>
+      <module>net.tourbook.statistics</module>
+      <module>net.tourbook.web</module>
+
+      <module>net.tourbook.ext.apache</module>
+      <module>net.tourbook.ext.ejb3_3.4.0</module>
+      <module>net.tourbook.ext.geoclipse</module>
+      <module>net.tourbook.ext.jars</module>
+      <module>net.tourbook.ext.jars.printing</module>
+      <module>net.tourbook.ext.rxtx.linux32_2.2</module>
+      <module>net.tourbook.ext.rxtx.linux64_2.2</module>
+      <module>net.tourbook.ext.rxtx.macosx_2.2</module>
+      <module>net.tourbook.ext.rxtx.win32_2.2</module>
+      <module>net.tourbook.ext.rxtx.win64_2.2</module>
+      <module>net.tourbook.ext.rxtx_2.2</module>
+      <module>net.tourbook.ext.velocity</module>
+      <module>net.tourbook.ext.vtm</module>
+      <module>net.tourbook.ext.vtm.linux</module>
+      <module>net.tourbook.ext.vtm.macosx</module>
+      <module>net.tourbook.ext.vtm.windows</module>
+      <module>net.tourbook.ext.worldwind.linux32_2.0</module>
+      <module>net.tourbook.ext.worldwind.linux64_2.0</module>
+      <module>net.tourbook.ext.worldwind.macosx_2.0</module>
+      <module>net.tourbook.ext.worldwind.win32_2.0</module>
+      <module>net.tourbook.ext.worldwind.win64_2.0</module>
+      <module>net.tourbook.ext.worldwind_2.0</module>
+
+   </modules>
 
 </project>

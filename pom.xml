@@ -1,179 +1,179 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project 
 
-	xmlns						="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi				="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation	="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	
-	<modelVersion>4.0.0</modelVersion>
-	
-	<name>MyTourbook App</name>
+   xmlns                ="http://maven.apache.org/POM/4.0.0"
+   xmlns:xsi            ="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation   ="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-	<artifactId>mytourbook-app</artifactId>		<groupId>net.tourbook</groupId>
-																<version>18.12.0-SNAPSHOT</version>
-	<packaging>pom</packaging>
-	
-	<properties>
-		<tycho.version>0.24.0</tycho.version>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  
-	</properties>
+   <modelVersion>4.0.0</modelVersion>
 
-	<modules>
-		<!-- artifact.bundles -->
-		<module>../../mytourbook-BUILD-autocreated/core</module>
-		
-		<!-- artifact.mytourbook.plugins.i18 -->
-		<module>../../mytourbook-BUILD-autocreated/translation</module>
-	</modules>
-	
+   <name>MyTourbook App</name>
 
-	<profiles>
-	
-		<profile>
-			<id>build-release</id>
-			<modules>
-				<module>features</module>
-				<module>build</module>
-			</modules>
-		
-		</profile>
+   <artifactId>mytourbook-app</artifactId>   <groupId>net.tourbook</groupId>
+                                             <version>18.13.0-SNAPSHOT</version>
+   <packaging>pom</packaging>
+   
+   <properties>
+      <tycho.version>0.24.0</tycho.version>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  
+   </properties>
 
-		<profile>
-			<id>build-update-site</id>
-			<modules>
-				<module>features</module>
-				<module>build/build.update-site</module>
-			</modules>
-		</profile>
+   <modules>
+      <!-- artifact.bundles -->
+      <module>../../mytourbook-BUILD-autocreated/core</module>
+      
+      <!-- artifact.mytourbook.plugins.i18 -->
+      <module>../../mytourbook-BUILD-autocreated/translation</module>
+   </modules>
+   
 
-		<profile>
-			<id>build-update-site-no-nl</id>
-			<modules>
-				<module>features</module>
-				<module>build/build.update-site-no-NL</module>
-			</modules>
-		</profile>
-	
-	</profiles>
+   <profiles>
+   
+      <profile>
+         <id>build-release</id>
+         <modules>
+            <module>features</module>
+            <module>build</module>
+         </modules>
+      
+      </profile>
+
+      <profile>
+         <id>build-update-site</id>
+         <modules>
+            <module>features</module>
+            <module>build/build.update-site</module>
+         </modules>
+      </profile>
+
+      <profile>
+         <id>build-update-site-no-nl</id>
+         <modules>
+            <module>features</module>
+            <module>build/build.update-site-no-NL</module>
+         </modules>
+      </profile>
+   
+   </profiles>
 
 
-	<repositories>
-	
+   <repositories>
+   
 
-		<!-- Eclipse E4 web repositories 
-		
-		<repository>
-			<id>eclipse-photon</id>
-			<layout>p2</layout>
-			<url>http://download.eclipse.org/releases/photon</url>
-		</repository>
-		
-		-->
-		
-		<!-- Eclipse 4.8 local repositories -->
-	
-		<repository>
-			<id>eclipse.platform.4.8</id>												<layout>p2</layout>
-			<url>jar:file:repositories/org.eclipse.platform-4.8.zip!/</url>
-		</repository>
-	
-		<repository>
-			<id>eclipse.rcp.4.8</id>													<layout>p2</layout>
-			<url>jar:file:repositories/org.eclipse.rcp-4.8.zip!/</url>
-		</repository>
-	
-		<repository>
-			<id>eclipse.jdt.4.8</id>													<layout>p2</layout>
-			<url>jar:file:repositories/org.eclipse.jdt-4.8.zip!/</url>
-		</repository>
-	
-		<repository>
-			<id>eclipse.pde.4.8</id>													<layout>p2</layout>
-			<url>jar:file:repositories/org.eclipse.pde-4.8.zip!/</url>
-		</repository>
+      <!-- Eclipse E4 web repositories 
+      
+      <repository>
+         <id>eclipse-photon</id>
+         <layout>p2</layout>
+         <url>http://download.eclipse.org/releases/photon</url>
+      </repository>
+      
+      -->
+      
+      <!-- Eclipse 4.8 local repositories -->
+   
+      <repository>
+         <id>eclipse.platform.4.8</id>                                  <layout>p2</layout>
+         <url>jar:file:repositories/org.eclipse.platform-4.8.zip!/</url>
+      </repository>
+   
+      <repository>
+         <id>eclipse.rcp.4.8</id>                                       <layout>p2</layout>
+         <url>jar:file:repositories/org.eclipse.rcp-4.8.zip!/</url>
+      </repository>
+   
+      <repository>
+         <id>eclipse.jdt.4.8</id>                                       <layout>p2</layout>
+         <url>jar:file:repositories/org.eclipse.jdt-4.8.zip!/</url>
+      </repository>
+   
+      <repository>
+         <id>eclipse.pde.4.8</id>                                       <layout>p2</layout>
+         <url>jar:file:repositories/org.eclipse.pde-4.8.zip!/</url>
+      </repository>
 
-		
-		<repository>
-			<id>eclipse.3.8.2.nl</id>													<layout>p2</layout>
-			<url>file:build/build.eclipse.3.8.2.nl.update-site</url>
-		</repository>
-		
-		
-	</repositories>
-	
-	<build>
-	
+      
+      <repository>
+         <id>eclipse.3.8.2.nl</id>                                      <layout>p2</layout>
+         <url>file:build/build.eclipse.3.8.2.nl.update-site</url>
+      </repository>
+
+
+   </repositories>
+
+   <build>
+
 <!-- 
-		<defaultGoal>clean verify</defaultGoal>
+      <defaultGoal>clean verify</defaultGoal>
 -->
-	
-		<plugins>
-        			
-			<plugin>
-				<artifactId>tycho-maven-plugin</artifactId>					<groupId>org.eclipse.tycho</groupId>
-																							<version>${tycho.version}</version>
-				<extensions>true</extensions>
-			</plugin>
+   
+      <plugins>
 
-			<plugin>
-				<artifactId>tycho-compiler-plugin</artifactId>				<groupId>org.eclipse.tycho</groupId>
-																							<version>${tycho.version}</version>
-				<configuration>
+         <plugin>
+            <artifactId>tycho-maven-plugin</artifactId>              <groupId>org.eclipse.tycho</groupId>
+                                                                     <version>${tycho.version}</version>
+            <extensions>true</extensions>
+         </plugin>
+
+         <plugin>
+            <artifactId>tycho-compiler-plugin</artifactId>           <groupId>org.eclipse.tycho</groupId>
+                                                                     <version>${tycho.version}</version>
+            <configuration>
 
 
-					<!-- Fix this problem (and propably others)
-					
-					 Access restriction: The method 'BaseDateTime.getMillis()' is not API 
-					 (restriction on classpath entry 'C:\DAT\MT\mytourbook\bundles\net.tourbook.ext.jars\joda-time-2.1.jar')
-					 
-					 -->
-					<compilerArgument>-warn:none</compilerArgument>     
-					<compilerArgument>-err:none</compilerArgument>      
-				</configuration>
-			</plugin>
-			
-			<plugin>
-				<artifactId>tycho-packaging-plugin</artifactId>				<groupId>org.eclipse.tycho</groupId>
-																							<version>${tycho.version}</version>
-				<configuration>
-				
-					<!-- !!! Hide default user name in manifest files and set a new name !!! -->
-					<archive>
-						<addMavenDescriptor>false</addMavenDescriptor>
-						<manifestEntries>
-							<Built-By>MyTourbook App Builder</Built-By>
-						</manifestEntries>
-					</archive>
-					
-					<!-- set qualifier date format, 'v' is a prefix 
-					<format>'v'yyyyMMdd-HHmm</format>
-					
-					the 'v' do NOT work with the update site (testing translated texts)
-					
-					-->
-					<format>yyyyMMdd-HHmm</format>
-					
-				</configuration>
-			</plugin>			
-			
-			<plugin>
-				<artifactId>target-platform-configuration</artifactId>	<groupId>org.eclipse.tycho</groupId>
-																							<version>${tycho.version}</version>
-				<configuration>
-					<resolver>p2</resolver>
-					<environments>
-						<environment>	<os>linux</os>		<ws>gtk</ws>		<arch>x86</arch>			</environment>
-						<environment>	<os>linux</os>		<ws>gtk</ws>		<arch>x86_64</arch>		</environment>
-						<environment>	<os>win32</os>		<ws>win32</ws>		<arch>x86</arch>			</environment>
-						<environment>	<os>win32</os>		<ws>win32</ws>		<arch>x86_64</arch>		</environment>
+               <!-- Fix this problem (and propably others)
 
-						<environment>	<os>macosx</os>	<ws>cocoa</ws>		<arch>x86_64</arch>		</environment>
-						
-					</environments>
-				</configuration>
-			</plugin>
+                Access restriction: The method 'BaseDateTime.getMillis()' is not API 
+                (restriction on classpath entry 'C:\DAT\MT\mytourbook\bundles\net.tourbook.ext.jars\joda-time-2.1.jar')
 
-		</plugins>
-	</build>
+                -->
+               <compilerArgument>-warn:none</compilerArgument>     
+               <compilerArgument>-err:none</compilerArgument>      
+            </configuration>
+         </plugin>
+
+         <plugin>
+            <artifactId>tycho-packaging-plugin</artifactId>          <groupId>org.eclipse.tycho</groupId>
+                                                                     <version>${tycho.version}</version>
+            <configuration>
+
+               <!-- !!! Hide default user name in manifest files and set a new name !!! -->
+               <archive>
+                  <addMavenDescriptor>false</addMavenDescriptor>
+                  <manifestEntries>
+                     <Built-By>MyTourbook App Builder</Built-By>
+                  </manifestEntries>
+               </archive>
+
+               <!-- set qualifier date format, 'v' is a prefix 
+               <format>'v'yyyyMMdd-HHmm</format>
+
+               the 'v' do NOT work with the update site (testing translated texts)
+
+               -->
+               <format>yyyyMMdd-HHmm</format>
+
+            </configuration>
+         </plugin>         
+
+         <plugin>
+            <artifactId>target-platform-configuration</artifactId>   <groupId>org.eclipse.tycho</groupId>
+                                                                     <version>${tycho.version}</version>
+            <configuration>
+               <resolver>p2</resolver>
+               <environments>
+                  <environment>   <os>linux</os>      <ws>gtk</ws>      <arch>x86</arch>         </environment>
+                  <environment>   <os>linux</os>      <ws>gtk</ws>      <arch>x86_64</arch>      </environment>
+                  <environment>   <os>win32</os>      <ws>win32</ws>    <arch>x86</arch>         </environment>
+                  <environment>   <os>win32</os>      <ws>win32</ws>    <arch>x86_64</arch>      </environment>
+
+                  <environment>   <os>macosx</os>   <ws>cocoa</ws>      <arch>x86_64</arch>      </environment>
+
+               </environments>
+            </configuration>
+         </plugin>
+
+      </plugins>
+   </build>
 
 </project>

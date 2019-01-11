@@ -264,15 +264,9 @@
 			<page
 				name="%Pref_Page_Map25_MapProvider"
 				id="net.tourbook.preferences.PrefPage_Map25_Provider"
-				class="net.tourbook.preferences.PrefPageMap25Provider"
+				class="net.tourbook.preferences.PrefPage_Map25Provider"
 				category="net.tourbook.preferences.PrefPage_Map25"
 			/>
-			<page
-				name="Mapsforge Provider"
-				id="net.tourbook.preferences.PrefPage_Map25_Mapsforge_Provider"
-				class="net.tourbook.preferences.PrefPageMap25MapsforgeProvider"
-				category="net.tourbook.preferences.PrefPage_Map25"
-			/>			
 			<page
 				name="%Pref_Page_Map25_OfflineMap"
 				id="net.tourbook.preferences.PrefPage_Map25_OfflineMap"
