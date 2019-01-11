@@ -1012,6 +1012,9 @@ public class SearchMgr implements XHRHandler {
          response = xhr_Proposals(params);
       }
 
+      final Headers responseHeaders = httpExchange.getResponseHeaders();
+      responseHeaders.set(WEB.RESPONSE_HEADER_CONTENT_TYPE, WEB.CONTENT_TYPE_APPLICATION_JSON);
+
       writeResponse(httpExchange, response);
    }
 
@@ -1024,11 +1027,11 @@ public class SearchMgr implements XHRHandler {
          final byte[] convertedResponse = response.getBytes(WEB.UTF_8);
 
 // this old implementation ...
-//         
+//
 //         httpExchange.sendResponseHeaders(200, convertedResponse.length);
-//         
+//
 // ...causes this exception
-//         
+//
 //         java.io.IOException: insufficient bytes written to stream
 //         at sun.net.httpserver.FixedLengthOutputStream.close(FixedLengthOutputStream.java:89)
 //         at sun.net.httpserver.PlaceholderOutputStream.close(ExchangeImpl.java:454)
