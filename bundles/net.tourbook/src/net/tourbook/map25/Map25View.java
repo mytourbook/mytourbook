@@ -83,6 +83,8 @@ import net.tourbook.map25.action.ActionShowEntireTour;
 import net.tourbook.map25.action.ActionSyncMap2WithOtherMap;
 import net.tourbook.map25.action.ActionSynchMapWithChartSlider;
 import net.tourbook.map25.action.ActionSynchMapWithTour;
+import net.tourbook.map25.action.ActionZoomIn;
+import net.tourbook.map25.action.ActionZoomOut;
 import net.tourbook.map25.layer.marker.MapMarker;
 import net.tourbook.map25.layer.marker.MarkerLayer;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
@@ -149,12 +151,14 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    {}
    //
    private Map25App                      _mapApp;
+   //private Map                           _map;
    //
    private OpenDialogManager             _openDlgMgr     = new OpenDialogManager();
    private final MapInfoManager          _mapInfoManager = MapInfoManager.getInstance();
    //
    private boolean                       _isPartVisible;
    private boolean                       _isShowTour;
+   private boolean                       _isInZoom;
    //
    private IPartListener2                _partListener;
    private ISelectionListener            _postSelectionListener;
@@ -174,6 +178,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    private ActionSynchMapWithTour        _actionSyncMap_WithTour;
    private ActionShowEntireTour          _actionShowEntireTour;
    private ActionShowTour_WithConfig     _actionShowTour_WithOptions;
+   private ActionZoomIn                  _actionZoom_In;
+   private ActionZoomOut                 _actionZoom_Out;   
    //
    /** Contains only geo tours */
    private ArrayList<TourData>           _allTourData    = new ArrayList<>();
@@ -401,6 +407,43 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       }
    }
 
+   public void actionZoomIn() {
+   	final Map map25 = _mapApp.getMap();
+   	
+      map25.post(new Runnable() {
+
+         @Override
+         public void run() {
+
+            final Animator animator = map25.animator();
+
+            animator.cancel();
+            animator.animateZoom(500, 1.5, 0, 0);
+            map25.updateMap(true);
+         }
+      });
+   	
+   }
+
+   public void actionZoomOut() {
+   	final Map map25 = _mapApp.getMap();
+   	
+      map25.post(new Runnable() {
+
+         @Override
+         public void run() {
+
+            final Animator animator = map25.animator();
+
+            animator.cancel();
+            animator.animateZoom(500, 0.75, 0, 0);
+            map25.updateMap(true);
+         }
+      });   
+
+   }
+   
+   
    public void actionZoomShowEntireTour() {
 
       if (_allBoundingBox == null) {
@@ -598,7 +641,9 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       _actionSyncMap_WithTour = new ActionSynchMapWithTour(this);
       _actionSyncMap_WithChartSlider = new ActionSynchMapWithChartSlider(this);
       _actionShowTour_WithOptions = new ActionShowTour_WithConfig();
-
+      _actionZoom_In = new ActionZoomIn(this);
+      _actionZoom_Out = new ActionZoomOut(this);
+      
    }
 
    private BoundingBox createBoundingBox(final GeoPoint[] geoPoints) {
@@ -885,7 +930,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
        */
       final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
-      tbm.add(_actionMapBookmarks);
+      tbm.add(_actionMapBookmarks);  //should be moved to position like in Map2View
 
       tbm.add(new Separator());
 
@@ -897,6 +942,11 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
       tbm.add(new Separator());
 
+      tbm.add(_actionZoom_In);
+      tbm.add(_actionZoom_Out);
+      
+      tbm.add(new Separator());      
+      
       tbm.add(_actionShowMarker_WithOptions);
       tbm.add(_actionMapOptions);
       tbm.add(_actionMapProvider);
