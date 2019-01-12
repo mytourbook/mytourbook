@@ -11,9 +11,10 @@
                   :delay-on-mouse-out=10
                   :visible-arrow=false
                   :options="{
+                  
                      placement: 'bottom',
-                     modifiers: { 
-                        
+                     modifiers: 
+                     { 
                         offset: { offset: '0, -5px' } ,
                         flip: { enabled: false }
                      }

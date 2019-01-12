@@ -22,7 +22,7 @@ export default {
       apChkShowItemNumber: '',
       apChkShowLuceneID: '',
 
-      vm_searchStatus: '',
+      vm_SearchStatus: '',
 
       tooltipOptions: {
          placement: 'bottom',
@@ -75,6 +75,18 @@ export default {
 
             this._setSearchOptions(searchOptions)
          }
+      },
+
+      // VuePopper event when search options is displayed
+      vm_SearchOptions_Show: function(data) {
+         
+         console.log(data)
+      },
+      
+      // VuePopper event when search options is hidden
+      vm_SearchOptions_Hide: function(data) {
+
+         console.log(data)
       },
 
       _isValid: function() {
