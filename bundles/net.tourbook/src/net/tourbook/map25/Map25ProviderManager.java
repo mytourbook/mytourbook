@@ -470,6 +470,7 @@ public class Map25ProviderManager {
                xml.putString(ATTR_ONLINE_API_KEY, mapProvider.online_ApiKey);
                xml.putString(ATTR_ONLINE_TILE_PATH, mapProvider.online_TilePath);
                xml.putString(ATTR_ONLINE_URL, mapProvider.online_url);
+               
             }
 
             Util.setXmlEnum(xml, ATTR_THEME, mapProvider.theme);
