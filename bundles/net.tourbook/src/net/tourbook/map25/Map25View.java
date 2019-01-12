@@ -179,7 +179,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    private ActionShowEntireTour          _actionShowEntireTour;
    private ActionShowTour_WithConfig     _actionShowTour_WithOptions;
    private ActionZoomIn                  _actionZoom_In;
-   private ActionZoomOut                 _actionZoom_Out;   
+   private ActionZoomOut                 _actionZoom_Out;
+   private double                        _zoomFactor = 1.5;
    //
    /** Contains only geo tours */
    private ArrayList<TourData>           _allTourData    = new ArrayList<>();
@@ -418,7 +419,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
             final Animator animator = map25.animator();
 
             animator.cancel();
-            animator.animateZoom(500, 1.5, 0, 0);
+            animator.animateZoom(500, _zoomFactor, 0, 0);
             map25.updateMap(true);
          }
       });
@@ -436,7 +437,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
             final Animator animator = map25.animator();
 
             animator.cancel();
-            animator.animateZoom(500, 0.75, 0, 0);
+            animator.animateZoom(500, 1/_zoomFactor, 0, 0);
             map25.updateMap(true);
          }
       });   
