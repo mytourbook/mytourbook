@@ -102,8 +102,8 @@ public class SearchMgr implements XHRHandler {
    static final String          STATE_IS_SHOW_LUCENE_DOC_ID            = "STATE_IS_SHOW_LUCENE_DOC_ID";                            //$NON-NLS-1$
    static final boolean         STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT    = false;
    //
-   static final String          STATE_IS_SORT_DATE_ASCENDING           = "STATE_IS_SORT_DATE_ASCENDING";                           //$NON-NLS-1$
-   static final boolean         STATE_IS_SORT_DATE_ASCENDING_DEFAULT   = false;
+   private static final String  STATE_IS_SORT_DATE_ASCENDING           = "STATE_IS_SORT_DATE_ASCENDING";                           //$NON-NLS-1$
+   private static final boolean STATE_IS_SORT_DATE_ASCENDING_DEFAULT   = false;
 
    private static final String  REQUEST_HEADER_RANGE                   = "Range";                                                  //$NON-NLS-1$
 
@@ -119,8 +119,8 @@ public class SearchMgr implements XHRHandler {
    private static final String XHR_ACTION_PROPOSALS          = "proposals";           //$NON-NLS-1$
    private static final String XHR_ACTION_SEARCH             = "search";              //$NON-NLS-1$
    private static final String XHR_ACTION_SELECT             = "select";              //$NON-NLS-1$
-   private static final String XHR_ACTION_GET_SEARCH_OPTIONS = "getSearchOptions";    //$NON-NLS-1$
-   private static final String XHR_ACTION_SET_SEARCH_OPTIONS = "setSearchOptions";    //$NON-NLS-1$
+   private static final String XHR_ACTION_SEARCH_OPTIONS_GET = "getSearchOptions";    //$NON-NLS-1$
+   private static final String XHR_ACTION_SEARCH_OPTIONS_SET = "setSearchOptions";    //$NON-NLS-1$
    private static final String XHR_ACTION_GET_STATE          = "getState";            //$NON-NLS-1$
    //
    private static final String XHR_PARAM_ACTION              = "action";              //$NON-NLS-1$
@@ -934,6 +934,19 @@ public class SearchMgr implements XHRHandler {
             + "</a>"; //$NON-NLS-1$
    }
 
+   /**
+    * With axios the data are wrapped additional :-(
+    */
+   private JSONObject getAxiosParams(final Map<String, Object> params) {
+
+      for (final String key : params.keySet()) {
+
+         return new JSONObject(key);
+      }
+
+      return null;
+   }
+
    private String getContentRange(final SearchResult searchResult, final int searchPosFrom, final int allItemSize) {
 
       String contentRange;
@@ -961,17 +974,7 @@ public class SearchMgr implements XHRHandler {
       @SuppressWarnings("unchecked")
       final Map<String, Object> params = (Map<String, Object>) httpExchange.getAttribute(RequestParameterFilter.ATTRIBUTE_PARAMETERS);
 
-      /*
-       * With axios the data are wrapped additional :-(
-       */
-      JSONObject jsonParams = null;
-      for (final String key : params.keySet()) {
-
-         jsonParams = new JSONObject(key);
-
-         break;
-      }
-
+      final JSONObject jsonParams = getAxiosParams(params);
       if (jsonParams == null) {
          return;
       }
@@ -981,35 +984,35 @@ public class SearchMgr implements XHRHandler {
 
       if (XHR_ACTION_SEARCH.equals(action)) {
 
-         response = xhr_Search(params, httpExchange, log);
+         response = xhr_Search(jsonParams, httpExchange, log);
 
       } else if (XHR_ACTION_ITEM_ACTION.equals(action)) {
 
-         xhr_ItemAction(params);
+         xhr_ItemAction(jsonParams);
 
       } else if (XHR_ACTION_SELECT.equals(action)) {
 
-         xhr_Select(params);
+         xhr_Select(jsonParams);
 
-      } else if (XHR_ACTION_GET_SEARCH_OPTIONS.equals(action)) {
+      } else if (XHR_ACTION_SEARCH_OPTIONS_GET.equals(action)) {
 
-         response = xhr_GetSearchOptions(params);
+         response = xhr_SearchOptions_Get(jsonParams);
 
       } else if (XHR_ACTION_GET_STATE.equals(action)) {
 
-         response = xhr_GetState(params);
+         response = xhr_GetState(jsonParams);
 
-      } else if (XHR_ACTION_SET_SEARCH_OPTIONS.equals(action)) {
+      } else if (XHR_ACTION_SEARCH_OPTIONS_SET.equals(action)) {
 
-         response = xhr_SetSearchOptions(params);
+         response = xhr_SearchOptions_Set(jsonParams);
 
 //		} else if (XHR_ACTION_GET_STATE.equals(action)) {
 //
-//			xhr_SetState(params);
+//			xhr_SetState(jsonParams);
 
       } else if (XHR_ACTION_PROPOSALS.equals(action)) {
 
-         response = xhr_Proposals(params);
+         response = xhr_Proposals(jsonParams);
       }
 
       final Headers responseHeaders = httpExchange.getResponseHeaders();
@@ -1051,32 +1054,7 @@ public class SearchMgr implements XHRHandler {
       }
    }
 
-   private String xhr_GetSearchOptions(final Map<String, Object> params) {
-
-      // ensure state options are set
-      setInternalSearchOptions();
-
-      final JSONObject responceObj = new JSONObject();
-
-      responceObj.put(JSON_IS_EASE_SEARCHING, _isUI_EaseSearching);
-
-      responceObj.put(JSON_IS_SHOW_CONTENT_ALL, _isUI_ShowContentAll);
-      responceObj.put(JSON_IS_SHOW_CONTENT_MARKER, _isUI_ShowContentMarker);
-      responceObj.put(JSON_IS_SHOW_CONTENT_TOUR, _isUI_ShowContentTour);
-      responceObj.put(JSON_IS_SHOW_CONTENT_WAYPOINT, _isUI_ShowContentWaypoint);
-
-      responceObj.put(JSON_IS_SHOW_DATE, _isUI_ShowDate);
-      responceObj.put(JSON_IS_SHOW_TIME, _isUI_ShowTime);
-      responceObj.put(JSON_IS_SHOW_DESCRIPTION, _isUI_ShowDescription);
-      responceObj.put(JSON_IS_SHOW_ITEM_NUMBER, _isUI_ShowItemNumber);
-      responceObj.put(JSON_IS_SHOW_LUCENE_ID, _isUI_ShowLuceneDocId);
-
-      responceObj.put(JSON_IS_SORT_BY_DATE_ASCENDING, _isUI_SortDateAscending);
-
-      return responceObj.toString();
-   }
-
-   private String xhr_GetState(final Map<String, Object> params) {
+   private String xhr_GetState(final JSONObject jsonParams) {
 
       final String searchText = Util.getStateString(state, STATE_CURRENT_SEARCH_TEXT, UI.EMPTY_STRING);
 
@@ -1087,9 +1065,9 @@ public class SearchMgr implements XHRHandler {
       return responceObj.toString();
    }
 
-   private void xhr_ItemAction(final Map<String, Object> params) throws UnsupportedEncodingException {
+   private void xhr_ItemAction(final JSONObject jsonParams) throws UnsupportedEncodingException {
 
-      final Object xhrParameter = params.get(XHR_PARAM_ACTION_URL);
+      final Object xhrParameter = jsonParams.get(XHR_PARAM_ACTION_URL);
 
       if (xhrParameter instanceof String) {
 
@@ -1105,12 +1083,12 @@ public class SearchMgr implements XHRHandler {
       }
    }
 
-   private String xhr_Proposals(final Map<String, Object> params) throws UnsupportedEncodingException {
+   private String xhr_Proposals(final JSONObject jsonParams) throws UnsupportedEncodingException {
 
       final JSONObject jsonResponse = new JSONObject();
 
       List<LookupResult> proposals = null;
-      final Object xhrSearchText = params.get(XHR_PARAM_SEARCH_TEXT);
+      final Object xhrSearchText = jsonParams.get(XHR_PARAM_SEARCH_TEXT);
 
       if (xhrSearchText instanceof String) {
 
@@ -1142,7 +1120,7 @@ public class SearchMgr implements XHRHandler {
       return response;
    }
 
-   private String xhr_Search(final Map<String, Object> params, final HttpExchange httpExchange, final StringBuilder log)
+   private String xhr_Search(final JSONObject jsonParams, final HttpExchange httpExchange, final StringBuilder log)
          throws UnsupportedEncodingException {
 
       final long start = System.nanoTime();
@@ -1151,7 +1129,7 @@ public class SearchMgr implements XHRHandler {
 
       final JSONArray allItems = new JSONArray();
 
-      final String xhrSearchText = (String) params.get(XHR_PARAM_SEARCH_TEXT);
+      final String xhrSearchText = (String) jsonParams.get(XHR_PARAM_SEARCH_TEXT);
       final String range = headers.getFirst(REQUEST_HEADER_RANGE);
 
       int searchPosFrom = 0;
@@ -1268,9 +1246,110 @@ public class SearchMgr implements XHRHandler {
       return response.toString();
    }
 
-   private void xhr_Select(final Map<String, Object> params) throws UnsupportedEncodingException {
+   private String xhr_SearchOptions_Get(final JSONObject jsonParams) {
 
-      final Object selectedItems = params.get(XHR_PARAM_SELECTED_ITEMS);
+      // ensure state options are set
+      setInternalSearchOptions();
+
+      final JSONObject responceObj = new JSONObject();
+
+// SET_FORMATTING_OFF
+
+      responceObj.put(JSON_IS_EASE_SEARCHING,         _isUI_EaseSearching);
+
+      responceObj.put(JSON_IS_SHOW_CONTENT_ALL,       _isUI_ShowContentAll);
+      responceObj.put(JSON_IS_SHOW_CONTENT_MARKER,    _isUI_ShowContentMarker);
+      responceObj.put(JSON_IS_SHOW_CONTENT_TOUR,      _isUI_ShowContentTour);
+      responceObj.put(JSON_IS_SHOW_CONTENT_WAYPOINT,  _isUI_ShowContentWaypoint);
+
+      responceObj.put(JSON_IS_SHOW_DATE,              _isUI_ShowDate);
+      responceObj.put(JSON_IS_SHOW_TIME,              _isUI_ShowTime);
+      responceObj.put(JSON_IS_SHOW_DESCRIPTION,       _isUI_ShowDescription);
+      responceObj.put(JSON_IS_SHOW_ITEM_NUMBER,       _isUI_ShowItemNumber);
+      responceObj.put(JSON_IS_SHOW_LUCENE_ID,         _isUI_ShowLuceneDocId);
+
+      responceObj.put(JSON_IS_SORT_BY_DATE_ASCENDING, _isUI_SortDateAscending);
+
+// SET_FORMATTING_ON
+
+      return responceObj.toString();
+   }
+
+   /**
+    * Set search options from the web UI.
+    *
+    * @param params
+    * @return
+    * @throws UnsupportedEncodingException
+    */
+   private String xhr_SearchOptions_Set(final JSONObject params) throws UnsupportedEncodingException {
+
+      final JSONObject responceObj = new JSONObject();
+
+      final Object xhrSearchOptions = params.get(XHR_PARAM_SEARCH_OPTIONS);
+      final JSONObject jsonSearchOptions = WEB.parseJSONObject(xhrSearchOptions);
+
+// SET_FORMATTING_OFF
+
+      if (jsonSearchOptions.isNull("isRestoreDefaults") == false) { //$NON-NLS-1$
+
+         // the action 'Restore Default' is selected in the web UI
+
+         saveDefaultSearchOption();
+         setInternalSearchOptions();
+
+         // set flag that defaults are returned
+         responceObj.put(JSON_IS_SEARCH_OPTIONS_DEFAULT, true);
+
+         // create xhr response with default values
+         responceObj.put(JSON_IS_EASE_SEARCHING,         STATE_IS_EASE_SEARCHING_DEFAULT);
+
+         responceObj.put(JSON_IS_SHOW_CONTENT_ALL,       STATE_IS_SHOW_CONTENT_ALL_DEFAULT);
+         responceObj.put(JSON_IS_SHOW_CONTENT_MARKER,    STATE_IS_SHOW_CONTENT_MARKER_DEFAULT);
+         responceObj.put(JSON_IS_SHOW_CONTENT_TOUR,      STATE_IS_SHOW_CONTENT_TOUR_DEFAULT);
+         responceObj.put(JSON_IS_SHOW_CONTENT_WAYPOINT,  STATE_IS_SHOW_CONTENT_WAYPOINT_DEFAULT);
+
+         responceObj.put(JSON_IS_SHOW_DATE,              STATE_IS_SHOW_DATE_DEFAULT);
+         responceObj.put(JSON_IS_SHOW_TIME,              STATE_IS_SHOW_TIME_DEFAULT);
+         responceObj.put(JSON_IS_SHOW_DESCRIPTION,       STATE_IS_SHOW_DESCRIPTION_DEFAULT);
+         responceObj.put(JSON_IS_SHOW_ITEM_NUMBER,       STATE_IS_SHOW_ITEM_NUMBER_DEFAULT);
+         responceObj.put(JSON_IS_SHOW_LUCENE_ID,         STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT);
+
+         responceObj.put(JSON_IS_SORT_BY_DATE_ASCENDING, STATE_IS_SORT_DATE_ASCENDING_DEFAULT);
+
+      } else {
+
+         // update state
+
+         state.put(STATE_IS_EASE_SEARCHING,        jsonSearchOptions.getBoolean(JSON_IS_EASE_SEARCHING));
+
+         state.put(STATE_IS_SHOW_CONTENT_ALL,      jsonSearchOptions.getBoolean(JSON_IS_SHOW_CONTENT_ALL));
+         state.put(STATE_IS_SHOW_CONTENT_MARKER,   jsonSearchOptions.getBoolean(JSON_IS_SHOW_CONTENT_MARKER));
+         state.put(STATE_IS_SHOW_CONTENT_TOUR,     jsonSearchOptions.getBoolean(JSON_IS_SHOW_CONTENT_TOUR));
+         state.put(STATE_IS_SHOW_CONTENT_WAYPOINT, jsonSearchOptions.getBoolean(JSON_IS_SHOW_CONTENT_WAYPOINT));
+
+         state.put(STATE_IS_SHOW_DATE,             jsonSearchOptions.getBoolean(JSON_IS_SHOW_DATE));
+         state.put(STATE_IS_SHOW_TIME,             jsonSearchOptions.getBoolean(JSON_IS_SHOW_TIME));
+         state.put(STATE_IS_SHOW_DESCRIPTION,      jsonSearchOptions.getBoolean(JSON_IS_SHOW_DESCRIPTION));
+         state.put(STATE_IS_SHOW_ITEM_NUMBER,      jsonSearchOptions.getBoolean(JSON_IS_SHOW_ITEM_NUMBER));
+         state.put(STATE_IS_SHOW_LUCENE_DOC_ID,    jsonSearchOptions.getBoolean(JSON_IS_SHOW_LUCENE_ID));
+
+         state.put(STATE_IS_SORT_DATE_ASCENDING,   jsonSearchOptions.getBoolean(JSON_IS_SORT_BY_DATE_ASCENDING));
+
+         setInternalSearchOptions();
+
+         // create xhr response
+         responceObj.put(JSON_IS_SEARCH_OPTIONS_DEFAULT, false);
+      }
+
+// SET_FORMATTING_ON
+
+      return responceObj.toString();
+   }
+
+   private void xhr_Select(final JSONObject jsonParams) throws UnsupportedEncodingException {
+
+      final Object selectedItems = jsonParams.get(XHR_PARAM_SELECTED_ITEMS);
 
       if (selectedItems != null) {
 
@@ -1360,74 +1439,6 @@ public class SearchMgr implements XHRHandler {
             Display.getDefault().asyncExec(runnable);
          }
       }
-   }
-
-   /**
-    * Set search options from the web UI.
-    *
-    * @param params
-    * @return
-    * @throws UnsupportedEncodingException
-    */
-   private String xhr_SetSearchOptions(final Map<String, Object> params) throws UnsupportedEncodingException {
-
-      final JSONObject responceObj = new JSONObject();
-
-      final Object xhrSearchOptions = params.get(XHR_PARAM_SEARCH_OPTIONS);
-      final JSONObject jsonSearchOptions = WEB.parseJSONObject(xhrSearchOptions);
-
-      if (jsonSearchOptions.isNull("isRestoreDefaults") == false) { //$NON-NLS-1$
-
-         // the action 'Restore Default' is selected in the web UI
-
-         saveDefaultSearchOption();
-         setInternalSearchOptions();
-
-         // set flag that defaults are returned
-         responceObj.put(JSON_IS_SEARCH_OPTIONS_DEFAULT, true);
-
-         // create xhr response with default values
-         responceObj.put(JSON_IS_EASE_SEARCHING, STATE_IS_EASE_SEARCHING_DEFAULT);
-
-         responceObj.put(JSON_IS_SHOW_CONTENT_ALL, STATE_IS_SHOW_CONTENT_ALL_DEFAULT);
-         responceObj.put(JSON_IS_SHOW_CONTENT_MARKER, STATE_IS_SHOW_CONTENT_MARKER_DEFAULT);
-         responceObj.put(JSON_IS_SHOW_CONTENT_TOUR, STATE_IS_SHOW_CONTENT_TOUR_DEFAULT);
-         responceObj.put(JSON_IS_SHOW_CONTENT_WAYPOINT, STATE_IS_SHOW_CONTENT_WAYPOINT_DEFAULT);
-
-         responceObj.put(JSON_IS_SHOW_DATE, STATE_IS_SHOW_DATE_DEFAULT);
-         responceObj.put(JSON_IS_SHOW_TIME, STATE_IS_SHOW_TIME_DEFAULT);
-         responceObj.put(JSON_IS_SHOW_DESCRIPTION, STATE_IS_SHOW_DESCRIPTION_DEFAULT);
-         responceObj.put(JSON_IS_SHOW_ITEM_NUMBER, STATE_IS_SHOW_ITEM_NUMBER_DEFAULT);
-         responceObj.put(JSON_IS_SHOW_LUCENE_ID, STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT);
-
-         responceObj.put(JSON_IS_SORT_BY_DATE_ASCENDING, STATE_IS_SORT_DATE_ASCENDING_DEFAULT);
-
-      } else {
-
-         // update state
-
-         state.put(STATE_IS_EASE_SEARCHING, jsonSearchOptions.getBoolean(JSON_IS_EASE_SEARCHING));
-
-         state.put(STATE_IS_SHOW_CONTENT_ALL, jsonSearchOptions.getBoolean(JSON_IS_SHOW_CONTENT_ALL));
-         state.put(STATE_IS_SHOW_CONTENT_MARKER, jsonSearchOptions.getBoolean(JSON_IS_SHOW_CONTENT_MARKER));
-         state.put(STATE_IS_SHOW_CONTENT_TOUR, jsonSearchOptions.getBoolean(JSON_IS_SHOW_CONTENT_TOUR));
-         state.put(STATE_IS_SHOW_CONTENT_WAYPOINT, jsonSearchOptions.getBoolean(JSON_IS_SHOW_CONTENT_WAYPOINT));
-
-         state.put(STATE_IS_SHOW_DATE, jsonSearchOptions.getBoolean(JSON_IS_SHOW_DATE));
-         state.put(STATE_IS_SHOW_TIME, jsonSearchOptions.getBoolean(JSON_IS_SHOW_TIME));
-         state.put(STATE_IS_SHOW_DESCRIPTION, jsonSearchOptions.getBoolean(JSON_IS_SHOW_DESCRIPTION));
-         state.put(STATE_IS_SHOW_ITEM_NUMBER, jsonSearchOptions.getBoolean(JSON_IS_SHOW_ITEM_NUMBER));
-         state.put(STATE_IS_SHOW_LUCENE_DOC_ID, jsonSearchOptions.getBoolean(JSON_IS_SHOW_LUCENE_ID));
-
-         state.put(STATE_IS_SORT_DATE_ASCENDING, jsonSearchOptions.getBoolean(JSON_IS_SORT_BY_DATE_ASCENDING));
-
-         setInternalSearchOptions();
-
-         // create xhr response
-         responceObj.put(JSON_IS_SEARCH_OPTIONS_DEFAULT, false);
-      }
-
-      return responceObj.toString();
    }
 
 }

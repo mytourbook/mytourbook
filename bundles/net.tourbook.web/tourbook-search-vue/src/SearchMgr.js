@@ -30,7 +30,7 @@ export default {
    /**
     * Timeout in ms for xhr requests.
     */
-   XHR_TIMEOUT:                     10000,
+   XHR_TIMEOUT:                     3000,
 
 /* beautify ignore:end */
 

@@ -46,7 +46,7 @@
             </td>
             <td style="width:80px;">
                <div id="domAppStatus" style="padding-left: 0.2em;">&nbsp;</div>
-               <div>{{ $t('message.ftState') }}</div>
+               <!-- <div>{{ $t('message.ftState') }}</div> -->
             </td>
             
             <td style="width:24px;">

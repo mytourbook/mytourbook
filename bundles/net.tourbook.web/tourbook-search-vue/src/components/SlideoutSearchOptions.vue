@@ -8,11 +8,11 @@
       :delay-on-mouse-out  =1000000
       :options             ="{
          //
-         placement: 'bottom-end',
-         modifiers: { 
-            
-            offset: { offset: '0, -5px' } ,
-            flip: { enabled: false }
+         placement:           'bottom-end',
+         modifiers: 
+         { 
+            offset            : { offset: '0px, -5px' } ,
+            flip              : { enabled: false },
          }
       }">
 
@@ -32,7 +32,9 @@
 
          <div style="padding:10px;">
             
-            <div style="padding-bottom:0.2em;">{{searchStatus}}</div>
+            <p style="xpadding-bottom:1em; color:#f00; max-width:250px;"
+               v-if="vm_searchStatus !== ''"
+            >{{vm_searchStatus}}</p>
             
             
             <!-- Group: What should be searched -->
@@ -46,7 +48,7 @@
                <v-checkbox
                   :label      ="$t('message.Search_Options_Checkbox_ShowContentAll')"
                   v-model     ="apChkShowContentAll"
-                  @click      ="apSearchAll"
+                  @click      ="apSelection"
                   hide-details
                />
                
@@ -198,253 +200,7 @@
 </template>
 
 
-<script>
-
-import VuePopper from 'vue-popperjs'
-import SearchMgr from '../SearchMgr'
-import Axios from 'axios';
-
-export default {
-
-   components: {
-      VuePopper
-   },
-
-   data: () => ({
-
-      apChkShowContentAll: '',
-      apChkShowContentTour: '',
-      apChkShowContentMarker: '',
-      apChkShowContentWaypoint: '',
-      apChkEaseSearching: '',
-      apSortByDate: '',
-      apChkShowDescription: '',
-      apChkShowDate: '',
-      apChkShowTime: '',
-      apChkShowItemNumber: '',
-      apChkShowLuceneID: '',
-
-      searchStatus:'',
-
-      tooltipOptions: {
-         placement: 'bottom',
-         modifiers: {
-            offset: { offset: '0, -5px' },
-            flip: { enabled: false }
-         }
-      }
-   }),
-
-   mounted: function() {
-
-      this._restoreState()
-   },
-
-   methods: {
-
-      apActionRestoreDefaults: function() {
-
-         this._setSearchOptions( //
-            {
-               isRestoreDefaults: true
-            });
-      },
-
-      /**
-       * Search all checkbox
-       */
-      apSearchAll: function() {
-
-         // this._enableControls();
-
-         // // fire selection
-         // this.apSelection();
-      },
-
-      /**
-       * Selection is from an attach point.
-       */
-      apSelection: function() {
-
-         if (this._isValid()) {
-
-            var searchOptions = //
-               {
-                  // isEaseSearching: this.apChkEaseSearching.get('checked'),
-
-                  // isShowContentAll: this.apChkShowContentAll.get('checked'),
-                  // isShowContentTour: this.apChkShowContentTour.get('checked'),
-                  // isShowContentMarker: this.apChkShowContentMarker.get('checked'),
-                  // isShowContentWaypoint: this.apChkShowContentWaypoint.get('checked'),
-
-                  // isSortByDateAscending: this.apSortByDateAscending.get('checked'),
-
-                  // isShowDate: this.apChkShowDate.get('checked'),
-                  // isShowTime: this.apChkShowTime.get('checked'),
-                  // isShowDescription: this.apChkShowDescription.get('checked'),
-                  // isShowItemNumber: this.apChkShowItemNumber.get('checked'),
-                  // isShowLuceneID: this.apChkShowLuceneID.get('checked')
-               };
-
-            this._setSearchOptions(searchOptions);
-         }
-      },
-
-      _isValid: function() {
-         
-         var isValid = true
-
-         var isShowContentAll = this.apChkShowContentAll
-         var isShowContentTour = this.apChkShowContentTour
-         var isShowContentMarker = this.apChkShowContentMarker
-         var isShowContentWaypoint = this.apChkShowContentWaypoint
-
-         var statusText = ''
-
-         if (isShowContentAll) {
-
-            // content is valid
-
-            this.searchStatus = '';
-
-         } else {
-
-            // at least one content must be checked
-
-            if (isShowContentTour == false
-               && isShowContentMarker == false
-               && isShowContentWaypoint == false) {
-
-               this.searchStatus = this.$t('message.Search_Validation_SearchFilter')
-               isValid = false;
-            }
-         }
-
-         // update status
-
-         // resize dialog because status text has changed and can be too long 
-         // this._dialog.resize();
-
-         return isValid;
-      },
-
-      _enableControls: function() {
-
-         // var isShowContentAll = this.apChkShowContentAll.get('checked');
-
-         // this.apChkShowContentTour.set('disabled', isShowContentAll);
-         // this.apChkShowContentMarker.set('disabled', isShowContentAll);
-         // this.apChkShowContentWaypoint.set('disabled', isShowContentAll);
-      },
-
-      /**
-       * 
-       */
-      _restoreState: function(callBack) {
-
-         var _this = this;
-
-         var xhrData = {};
-         xhrData[SearchMgr.XHR_PARAM_ACTION] = SearchMgr.XHR_ACTION_GET_SEARCH_OPTIONS;
-
-         this.axios.request({
-
-               url: SearchMgr.XHR_SEARCH_HANDLER,
-               method: 'post',
-
-               headers: { 'X-Requested-With': 'XMLHttpRequest' },
-               timeout: SearchMgr.XHR_TIMEOUT, // default is `0` (no timeout)
-
-               data: xhrData,
-            }
-
-         ).then(function(response) {
-
-            // console.log('data:')
-            // console.log(response.data);
-            
-            // console.log('status:');
-            // console.log(response.status);
-            
-            // console.log('statusText:');
-            // console.log(response.statusText);
-
-            // console.log('headers:')
-            // console.log(response.headers);
-
-            // console.log('config:');
-            // console.log(response.config);
-
-            _this._updateUI_FromState(_this, response.data);
-
-         }).catch(function(error) {
-// debugger
-            console.log(error);
-         })
-      },
-
-      /**
-       * Set search options in the backend and reload current search with new search options.
-       */
-      _setSearchOptions: function(searchOptions) {
-
-         var _this = this;
-
-         var jsonSearchOptions = JSON.stringify(searchOptions);
-
-         var xhrQuery = {};
-         xhrQuery[SearchMgr.XHR_PARAM_ACTION] = SearchMgr.XHR_ACTION_SET_SEARCH_OPTIONS;
-         xhrQuery[SearchMgr.XHR_PARAM_SEARCH_OPTIONS] = encodeURIComponent(jsonSearchOptions);
-
-         xhr(SearchMgr.XHR_SEARCH_HANDLER, {
-
-            handleAs: 'json',
-            preventCache: true,
-            timeout: SearchMgr.XHR_TIMEOUT,
-
-            query: xhrQuery
-
-         }).then(function(xhrData) {
-
-            if (xhrData.isSearchOptionsDefault) {
-
-               // set defaults in the UI
-               _this._updateUI_FromState(_this, xhrData);
-            }
-
-            // repeat previous search
-
-            _this._searchApp._searchInput.startSearch(true);
-         });
-      },
-
-      _updateUI_FromState: function(_this, xhrData) {
-
-         _this.apChkEaseSearching = xhrData.isEaseSearching
-
-         _this.apChkShowContentAll = xhrData.isShowContentAll
-         _this.apChkShowContentTour = xhrData.isShowContentTour
-         _this.apChkShowContentMarker = xhrData.isShowContentMarker
-         _this.apChkShowContentWaypoint = xhrData.isShowContentWaypoint
-
-         _this.apSortByDateAscending = xhrData.isSortByDateAscending
-         _this.apSortByDateDescending = !xhrData.isSortByDateAscending
-
-         _this.apChkShowDate = xhrData.isShowDate
-         _this.apChkShowTime = xhrData.isShowTime
-         _this.apChkShowDescription = xhrData.isShowDescription
-         _this.apChkShowItemNumber = xhrData.isShowItemNumber
-         _this.apChkShowLuceneID = xhrData.isShowLuceneID
-
-         _this._enableControls()
-         _this._isValid()
-      }
-   }
-}
-
-
-</script>
-
+<script src="./SlideoutSearchOptions.vue.js"></script>
 
 <style>/* @import '../assets/search.css'; */</style> 
 
