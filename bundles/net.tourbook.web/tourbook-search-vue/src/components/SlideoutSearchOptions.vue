@@ -32,7 +32,7 @@
 
          <div style="padding:10px;">
             
-            <!-- <div id="domSearchStatus" style="padding-bottom:0.2em;"></div> -->
+            <div style="padding-bottom:0.2em;">{{searchStatus}}</div>
             
             
             <!-- Group: What should be searched -->
@@ -224,6 +224,8 @@ export default {
       apChkShowItemNumber: '',
       apChkShowLuceneID: '',
 
+      searchStatus:'',
+
       tooltipOptions: {
          placement: 'bottom',
          modifiers: {
@@ -290,17 +292,20 @@ export default {
 
       _isValid: function() {
          
-            var statusText = ''
-            var isValid = true
+         var isValid = true
 
-            // isShowContentAll = this.apChkShowContentAll.get('checked'), //
-            // isShowContentTour = this.apChkShowContentTour.get('checked'), //
-            // isShowContentMarker = this.apChkShowContentMarker.get('checked'), //
-            // isShowContentWaypoint = this.apChkShowContentWaypoint.get('checked');
+         var isShowContentAll = this.apChkShowContentAll
+         var isShowContentTour = this.apChkShowContentTour
+         var isShowContentMarker = this.apChkShowContentMarker
+         var isShowContentWaypoint = this.apChkShowContentWaypoint
+
+         var statusText = ''
 
          if (isShowContentAll) {
 
             // content is valid
+
+            this.searchStatus = '';
 
          } else {
 
@@ -310,16 +315,15 @@ export default {
                && isShowContentMarker == false
                && isShowContentWaypoint == false) {
 
-               statusText = Messages.Search_Validation_SearchFilter;
+               this.searchStatus = this.$t('message.Search_Validation_SearchFilter')
                isValid = false;
             }
          }
 
          // update status
-         dom.byId('domSearchStatus').innerHTML = statusText;
 
          // resize dialog because status text has changed and can be too long 
-         this._dialog.resize();
+         // this._dialog.resize();
 
          return isValid;
       },
@@ -371,23 +375,12 @@ export default {
             // console.log('config:');
             // console.log(response.config);
 
+            _this._updateUI_FromState(_this, response.data);
+
          }).catch(function(error) {
 // debugger
             console.log(error);
          })
-
-         // xhr(SearchMgr.XHR_SEARCH_HANDLER, {
-
-         //    handleAs: 'json',
-         //    preventCache: true,
-         //    timeout: SearchMgr.XHR_TIMEOUT,
-
-         //    query: xhrQuery
-
-         // }).then(function(xhrData) {
-
-         //    _this._updateUI_FromState(_this, xhrData);
-         // });
       },
 
       /**
@@ -425,26 +418,26 @@ export default {
          });
       },
 
-      _updateUI_FromState: function(dialog, xhrData) {
+      _updateUI_FromState: function(_this, xhrData) {
 
-         // dialog.apChkEaseSearching.set('checked', xhrData.isEaseSearching);
+         _this.apChkEaseSearching = xhrData.isEaseSearching
 
-         // dialog.apChkShowContentAll.set('checked', xhrData.isShowContentAll);
-         // dialog.apChkShowContentTour.set('checked', xhrData.isShowContentTour);
-         // dialog.apChkShowContentMarker.set('checked', xhrData.isShowContentMarker);
-         // dialog.apChkShowContentWaypoint.set('checked', xhrData.isShowContentWaypoint);
+         _this.apChkShowContentAll = xhrData.isShowContentAll
+         _this.apChkShowContentTour = xhrData.isShowContentTour
+         _this.apChkShowContentMarker = xhrData.isShowContentMarker
+         _this.apChkShowContentWaypoint = xhrData.isShowContentWaypoint
 
-         // dialog.apSortByDateAscending.set('checked', xhrData.isSortByDateAscending);
-         // dialog.apSortByDateDescending.set('checked', !xhrData.isSortByDateAscending);
+         _this.apSortByDateAscending = xhrData.isSortByDateAscending
+         _this.apSortByDateDescending = !xhrData.isSortByDateAscending
 
-         // dialog.apChkShowDate.set('checked', xhrData.isShowDate);
-         // dialog.apChkShowTime.set('checked', xhrData.isShowTime);
-         // dialog.apChkShowDescription.set('checked', xhrData.isShowDescription);
-         // dialog.apChkShowItemNumber.set('checked', xhrData.isShowItemNumber);
-         // dialog.apChkShowLuceneID.set('checked', xhrData.isShowLuceneID);
+         _this.apChkShowDate = xhrData.isShowDate
+         _this.apChkShowTime = xhrData.isShowTime
+         _this.apChkShowDescription = xhrData.isShowDescription
+         _this.apChkShowItemNumber = xhrData.isShowItemNumber
+         _this.apChkShowLuceneID = xhrData.isShowLuceneID
 
-         // dialog._enableControls();
-         // dialog._isValid();
+         _this._enableControls()
+         _this._isValid()
       }
    }
 }
