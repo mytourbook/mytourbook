@@ -315,8 +315,10 @@ public class Map25ProviderManager {
                   } else {
 
                      mapProvider.online_ApiKey              = Util.getXmlString(xml, ATTR_ONLINE_API_KEY, UI.EMPTY_STRING);
-                     mapProvider.online_TilePath            = Util.getXmlString(xml, ATTR_ONLINE_TILE_PATH, UI.EMPTY_STRING);
-                     mapProvider.online_url                 = Util.getXmlString(xml, ATTR_ONLINE_URL, UI.EMPTY_STRING);
+                     //mapProvider.online_TilePath            = Util.getXmlString(xml, ATTR_ONLINE_TILE_PATH, UI.EMPTY_STRING);
+                     //mapProvider.online_url                 = Util.getXmlString(xml, ATTR_ONLINE_URL, UI.EMPTY_STRING);                    
+                     mapProvider.online_TilePath            = Util.getXmlString(xml, ATTR_ONLINE_TILE_PATH, "/{Z}/{X}/{Y}.vtm");
+                     mapProvider.online_url                 = Util.getXmlString(xml, ATTR_ONLINE_URL, "http://opensciencemap.org/tiles/vtm");
                   }
 // SET_FORMATTING_ON
 
