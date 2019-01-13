@@ -35,6 +35,7 @@
                   :label      ="$t('message.Search_App_Text_Search_PlaceHolder')"
                   :items      ="searchItems"
                   item-text   ="itemText"
+                  ref         ="ref_SearchInput"
                   autofocus
 
                   class="no-transition"

@@ -1,6 +1,6 @@
 import VuePopper from 'vue-popperjs'
 import SearchMgr from '../SearchMgr'
-import Axios from 'axios'
+// import Axios from 'axios'
 
 export default {
 
@@ -22,7 +22,7 @@ export default {
       apChkShowItemNumber: '',
       apChkShowLuceneID: '',
 
-      vm_SearchStatus: '',
+      ap_SearchStatus: '',
 
       tooltipOptions: {
          placement: 'bottom',
@@ -79,14 +79,18 @@ export default {
 
       // VuePopper event when search options is displayed
       vm_SearchOptions_Show: function(data) {
-         
-         console.log(data)
+
+         // blur focus from the search imput field, that it is displayed normally
+         this.$parent.$parent.$refs.ref_SearchInput.blur()
+
+         // this is highly complicated to set focus to a checkbox -> this could I not yet solve 
+         this.$refs.ref_SearchOptions_Reference.focus()
       },
-      
+
       // VuePopper event when search options is hidden
       vm_SearchOptions_Hide: function(data) {
 
-         console.log(data)
+         this.$parent.$parent.$refs.ref_SearchInput.focus()
       },
 
       _isValid: function() {
@@ -118,7 +122,7 @@ export default {
 
          // update status
 
-         this.vm_searchStatus = statusText
+         this.ap_SearchStatus = statusText
 
          // resize dialog because status text has changed and can be too long 
          // this._dialog.resize()

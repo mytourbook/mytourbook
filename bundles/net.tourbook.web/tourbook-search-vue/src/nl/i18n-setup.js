@@ -19,7 +19,7 @@ function getBrowserLocale() {
 
    let userLanguage = browserLanguage.substring(0, 2)
 
-   console.log(userLanguage)
+   // console.log('userLanguage: ' + userLanguage)
 
    return userLanguage
 }

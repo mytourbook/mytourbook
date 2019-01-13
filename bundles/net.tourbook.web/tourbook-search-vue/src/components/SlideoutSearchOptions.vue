@@ -21,7 +21,7 @@
    >
 
       <button slot="reference">
-         <div slot="activator" id="apSearchOptionsReference" class="actionIcon iconOptions" tabindex="4"></div>
+         <div slot="activator" ref="ref_SearchOptions_Reference" class="actionIcon iconOptions" tabindex="4"></div>
       </button>
 
       <div class="popper">
@@ -37,8 +37,8 @@
          <div style="padding:10px;">
             
             <p style="xpadding-bottom:1em; color:#f00; max-width:250px;"
-               v-if="vm_SearchStatus !== ''"
-            >{{vm_SearchStatus}}</p>
+               v-if="ap_SearchStatus !== ''"
+            >{{ap_SearchStatus}}</p>
             
             
             <!-- Group: What should be searched -->
