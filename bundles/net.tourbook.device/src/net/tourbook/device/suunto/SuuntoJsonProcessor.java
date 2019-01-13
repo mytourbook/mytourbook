@@ -118,6 +118,8 @@ public class SuuntoJsonProcessor {
 				currentZonedDateTime = currentZonedDateTime.plusSeconds(1);
 
 			long currentTime = currentZonedDateTime.toInstant().toEpochMilli();
+			if(currentTime <= tourData.getTourStartTimeMS())
+				continue;
 
 			if (_sampleList.size() > 0) {
 				// Looking in the last 10 entries to see if their time is identical to the
@@ -198,7 +200,9 @@ public class SuuntoJsonProcessor {
 
 		// Cleaning-up the processed entries as there should only be entries
 		// every x seconds, no entries should be in between (entries with milliseconds).
+		// Also, we need to make sure that they truly are in chronological order.
 		Iterator<TimeData> sampleListIterator = _sampleList.iterator();
+		long previousAbsoluteTime = 0;
 		while (sampleListIterator.hasNext()) {
 			TimeData currentTimeData = sampleListIterator.next();
 
@@ -206,10 +210,13 @@ public class SuuntoJsonProcessor {
 			// In the case where the activity is an indoor tour,
 			// we remove the entries that don't have altitude data
 			if ((!isIndoorTour && currentTimeData.longitude == Double.MIN_VALUE && currentTimeData.latitude == Double.MIN_VALUE) ||
-					(isIndoorTour && currentTimeData.absoluteAltitude == Float.MIN_VALUE))
+					(isIndoorTour && currentTimeData.absoluteAltitude == Float.MIN_VALUE) ||
+					currentTimeData.absoluteTime <= previousAbsoluteTime)
 				sampleListIterator.remove();
+			else
+				previousAbsoluteTime = currentTimeData.absoluteTime;
 		}
-
+		
 		tourData.createTimeSeries(_sampleList, true);
 
 		return tourData;
