@@ -1,6 +1,5 @@
 import VuePopper from 'vue-popperjs'
 import SearchMgr from '../SearchMgr'
-// import Axios from 'axios'
 
 export default {
 
@@ -78,7 +77,7 @@ export default {
       },
 
       // VuePopper event when search options is displayed
-      vm_SearchOptions_Show: function(data) {
+      ae_SearchOptions_Show: function(data) {
 
          // blur focus from the search imput field, that it is displayed normally
          this.$parent.$parent.$refs.ref_SearchInput.blur()
@@ -88,7 +87,7 @@ export default {
       },
 
       // VuePopper event when search options is hidden
-      vm_SearchOptions_Hide: function(data) {
+      ae_SearchOptions_Hide: function(data) {
 
          this.$parent.$parent.$refs.ref_SearchInput.focus()
       },

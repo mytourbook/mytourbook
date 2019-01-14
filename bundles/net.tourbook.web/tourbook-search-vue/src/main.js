@@ -16,7 +16,7 @@ import Vue from 'vue'
 // i18n - message...
 import i18n from './nl/i18n-setup'
 
-// ajax
+// ajax with axios
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 Vue.use(VueAxios, axios)

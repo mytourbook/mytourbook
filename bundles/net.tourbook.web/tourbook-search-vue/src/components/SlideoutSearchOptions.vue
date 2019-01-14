@@ -16,8 +16,8 @@
          },
       }"
 
-      v-on:show = "vm_SearchOptions_Show"
-      v-on:hide = "vm_SearchOptions_Hide"
+      @show = "ae_SearchOptions_Show"
+      @hide = "ae_SearchOptions_Hide"
    >
 
       <button slot="reference">
@@ -206,7 +206,9 @@
 
 <script src="./SlideoutSearchOptions.vue.js"></script>
 
-<style>/* @import '../assets/search.css'; */</style> 
+<style> 
+@import '../assets/search.css';
+</style> 
 
 
 
