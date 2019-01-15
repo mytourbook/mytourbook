@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -29,184 +29,211 @@ import net.tourbook.ui.UI;
 
 public class DataProvider_HrZone_Month extends DataProvider {
 
-	private static DataProvider_HrZone_Month	_instance;
+   private static DataProvider_HrZone_Month _instance;
 
-	private TourData_MonthHrZones				_monthData;
+   private TourData_MonthHrZones            _monthData;
 
-	private DataProvider_HrZone_Month() {}
+   private DataProvider_HrZone_Month() {}
 
-	public static DataProvider_HrZone_Month getInstance() {
-		if (_instance == null) {
-			_instance = new DataProvider_HrZone_Month();
-		}
-		return _instance;
-	}
+   public static DataProvider_HrZone_Month getInstance() {
+      if (_instance == null) {
+         _instance = new DataProvider_HrZone_Month();
+      }
+      return _instance;
+   }
 
-	TourData_MonthHrZones getMonthData(	final TourPerson person,
-										final TourTypeFilter tourTypeFilter,
-										final int lastYear,
-										final int numYears,
-										final boolean refreshData) {
+   TourData_MonthHrZones getMonthData(final TourPerson person,
+                                      final TourTypeFilter tourTypeFilter,
+                                      final int lastYear,
+                                      final int numYears,
+                                      final boolean refreshData) {
 
-		/*
-		 * check if the required data are already loaded
-		 */
-		if (_activePerson == person
-				&& _activeTourTypeFilter == tourTypeFilter
-				&& lastYear == _lastYear
-				&& numYears == _numberOfYears
-				&& refreshData == false) {
-			return _monthData;
-		}
+      /*
+       * check if the required data are already loaded
+       */
+      if (_activePerson == person
+            && _activeTourTypeFilter == tourTypeFilter
+            && lastYear == _lastYear
+            && numYears == _numberOfYears
+            && refreshData == false) {
+         return _monthData;
+      }
 
-		_activePerson = person;
-		_activeTourTypeFilter = tourTypeFilter;
-		_lastYear = lastYear;
-		_numberOfYears = numYears;
+      _activePerson = person;
+      _activeTourTypeFilter = tourTypeFilter;
 
-		_monthData = new TourData_MonthHrZones();
+      _lastYear = lastYear;
+      _numberOfYears = numYears;
 
-		String fromTourData;
+      _monthData = new TourData_MonthHrZones();
 
-		final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
-		if (sqlFilter.isTagFilterActive()) {
+      String fromTourData;
 
-			// with tag filter
+      final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+      if (sqlFilter.isTagFilterActive()) {
 
-			fromTourData = NL
+         // with tag filter
 
-					+ "FROM (			" + NL //$NON-NLS-1$
+         fromTourData = NL
 
-					+ " SELECT			" + NL //$NON-NLS-1$
+               + "FROM (         " + NL //$NON-NLS-1$
 
-					+ "  StartYear,		" + NL //$NON-NLS-1$
-					+ "  StartMonth,					" + NL //$NON-NLS-1$
+               + " SELECT        " + NL //$NON-NLS-1$
 
-					+ "  HrZone0,		" + NL //$NON-NLS-1$
-					+ "  HrZone1,		" + NL //$NON-NLS-1$
-					+ "  HrZone2,		" + NL //$NON-NLS-1$
-					+ "  HrZone3,		" + NL //$NON-NLS-1$
-					+ "  HrZone4,		" + NL //$NON-NLS-1$
-					+ "  HrZone5,		" + NL //$NON-NLS-1$
-					+ "  HrZone6,		" + NL //$NON-NLS-1$
-					+ "  HrZone7,		" + NL //$NON-NLS-1$
-					+ "  HrZone8,		" + NL //$NON-NLS-1$
-					+ "  HrZone9		" + NL //$NON-NLS-1$
+               + "  StartYear,   " + NL //$NON-NLS-1$
+               + "  StartMonth,  " + NL //$NON-NLS-1$
 
-					+ (" FROM " + TourDatabase.TABLE_TOUR_DATA) + NL//$NON-NLS-1$
+               + "  HrZone0,     " + NL //$NON-NLS-1$
+               + "  HrZone1,     " + NL //$NON-NLS-1$
+               + "  HrZone2,     " + NL //$NON-NLS-1$
+               + "  HrZone3,     " + NL //$NON-NLS-1$
+               + "  HrZone4,     " + NL //$NON-NLS-1$
+               + "  HrZone5,     " + NL //$NON-NLS-1$
+               + "  HrZone6,     " + NL //$NON-NLS-1$
+               + "  HrZone7,     " + NL //$NON-NLS-1$
+               + "  HrZone8,     " + NL //$NON-NLS-1$
+               + "  HrZone9      " + NL //$NON-NLS-1$
 
-					// get tag id's
-					+ (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag") + NL //$NON-NLS-1$ //$NON-NLS-2$
-					+ (" ON tourID = jTdataTtag.TourData_tourId") + NL //$NON-NLS-1$
+               + (" FROM " + TourDatabase.TABLE_TOUR_DATA) + NL//$NON-NLS-1$
 
-					+ (" WHERE StartYear IN (" + getYearList(lastYear, numYears) + ")") + NL //$NON-NLS-1$ //$NON-NLS-2$
-					+ (" AND NumberOfHrZones > 0") + NL //$NON-NLS-1$
-					+ sqlFilter.getWhereClause() + NL
+               // get tag id's
+               + (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag") + NL //$NON-NLS-1$ //$NON-NLS-2$
+               + (" ON tourID = jTdataTtag.TourData_tourId") + NL //$NON-NLS-1$
 
-					+ ") td" //$NON-NLS-1$
-			;
+               + (" WHERE StartYear IN (" + getYearList(lastYear, numYears) + ")") + NL //$NON-NLS-1$ //$NON-NLS-2$
+               + (" AND NumberOfHrZones > 0") + NL //$NON-NLS-1$
+               + sqlFilter.getWhereClause() + NL
 
-		} else {
+               + ") td" //$NON-NLS-1$
+         ;
 
-			// without tag filter
+      } else {
 
-			fromTourData = NL
+         // without tag filter
 
-					+ (" FROM " + TourDatabase.TABLE_TOUR_DATA) + NL //$NON-NLS-1$
+         fromTourData = NL
 
-					+ (" WHERE StartYear IN (" + getYearList(lastYear, numYears) + ")") + NL //$NON-NLS-1$ //$NON-NLS-2$
-					+ (" AND NumberOfHrZones > 0") + NL //$NON-NLS-1$
-					+ sqlFilter.getWhereClause() + NL
+               + (" FROM " + TourDatabase.TABLE_TOUR_DATA) + NL //$NON-NLS-1$
 
-			;
-		}
+               + (" WHERE StartYear IN (" + getYearList(lastYear, numYears) + ")") + NL //$NON-NLS-1$ //$NON-NLS-2$
+               + (" AND NumberOfHrZones > 0") + NL //$NON-NLS-1$
+               + sqlFilter.getWhereClause() + NL
 
-		final String sqlString = NL +
+         ;
+      }
 
-				"SELECT" + NL //$NON-NLS-1$
+      final String sqlString = NL +
 
-				+ " StartYear,		" + NL // 										1 //$NON-NLS-1$
-				+ " StartMonth,		" + NL // 										2 //$NON-NLS-1$
+            "SELECT" + NL //$NON-NLS-1$
 
-				+ " SUM(CASE WHEN hrZone0 > 0 THEN hrZone0 ELSE 0 END)," + NL //	3 //$NON-NLS-1$
-				+ " SUM(CASE WHEN hrZone1 > 0 THEN hrZone1 ELSE 0 END)," + NL //	4 //$NON-NLS-1$
-				+ " SUM(CASE WHEN hrZone2 > 0 THEN hrZone2 ELSE 0 END)," + NL //	5 //$NON-NLS-1$
-				+ " SUM(CASE WHEN hrZone3 > 0 THEN hrZone3 ELSE 0 END)," + NL //	6 //$NON-NLS-1$
-				+ " SUM(CASE WHEN hrZone4 > 0 THEN hrZone4 ELSE 0 END)," + NL //	7 //$NON-NLS-1$
-				+ " SUM(CASE WHEN hrZone5 > 0 THEN hrZone5 ELSE 0 END)," + NL //	8 //$NON-NLS-1$
-				+ " SUM(CASE WHEN hrZone6 > 0 THEN hrZone6 ELSE 0 END)," + NL //	9 //$NON-NLS-1$
-				+ " SUM(CASE WHEN hrZone7 > 0 THEN hrZone7 ELSE 0 END)," + NL //	10 //$NON-NLS-1$
-				+ " SUM(CASE WHEN hrZone8 > 0 THEN hrZone8 ELSE 0 END)," + NL //	11 //$NON-NLS-1$
-				+ " SUM(CASE WHEN hrZone9 > 0 THEN hrZone9 ELSE 0 END)" + NL //		12 //$NON-NLS-1$
+            + " StartYear,       " + NL //                                    1 //$NON-NLS-1$
+            + " StartMonth,      " + NL //                                    2 //$NON-NLS-1$
 
-				+ fromTourData
+            + " SUM(CASE WHEN hrZone0 > 0 THEN hrZone0 ELSE 0 END)," + NL //  3 //$NON-NLS-1$
+            + " SUM(CASE WHEN hrZone1 > 0 THEN hrZone1 ELSE 0 END)," + NL //  4 //$NON-NLS-1$
+            + " SUM(CASE WHEN hrZone2 > 0 THEN hrZone2 ELSE 0 END)," + NL //  5 //$NON-NLS-1$
+            + " SUM(CASE WHEN hrZone3 > 0 THEN hrZone3 ELSE 0 END)," + NL //  6 //$NON-NLS-1$
+            + " SUM(CASE WHEN hrZone4 > 0 THEN hrZone4 ELSE 0 END)," + NL //  7 //$NON-NLS-1$
+            + " SUM(CASE WHEN hrZone5 > 0 THEN hrZone5 ELSE 0 END)," + NL //  8 //$NON-NLS-1$
+            + " SUM(CASE WHEN hrZone6 > 0 THEN hrZone6 ELSE 0 END)," + NL //  9 //$NON-NLS-1$
+            + " SUM(CASE WHEN hrZone7 > 0 THEN hrZone7 ELSE 0 END)," + NL //  10 //$NON-NLS-1$
+            + " SUM(CASE WHEN hrZone8 > 0 THEN hrZone8 ELSE 0 END)," + NL //  11 //$NON-NLS-1$
+            + " SUM(CASE WHEN hrZone9 > 0 THEN hrZone9 ELSE 0 END)" + NL //   12 //$NON-NLS-1$
 
-				+ (" GROUP BY StartYear, StartMonth") + NL //							//$NON-NLS-1$
-				+ (" ORDER BY StartYear, StartMonth") + NL //							//$NON-NLS-1$
-		;
+            + fromTourData
 
-		try {
+            + (" GROUP BY StartYear, StartMonth") + NL //                     //$NON-NLS-1$
+            + (" ORDER BY StartYear, StartMonth") + NL //                     //$NON-NLS-1$
+      ;
 
-			final int maxZones = 10; // hr zones: 0...9
-			final int serieLength = maxZones;
-			final int valueLength = 12 * numYears;
+      try {
 
-			final int[][] dbHrZones = new int[serieLength][valueLength];
+         final int maxZones = 10; // hr zones: 0...9
+         final int serieLength = maxZones;
+         final int valueLength = 12 * numYears;
 
-			final Connection conn = TourDatabase.getInstance().getConnection();
-			{
-				final PreparedStatement statement = conn.prepareStatement(sqlString);
-				sqlFilter.setParameters(statement, 1);
+         final int[][] dbHrZones = new int[serieLength][valueLength];
 
-				final ResultSet result = statement.executeQuery();
-				while (result.next()) {
+         final Connection conn = TourDatabase.getInstance().getConnection();
+         {
+            final PreparedStatement statement = conn.prepareStatement(sqlString);
+            sqlFilter.setParameters(statement, 1);
 
-					final int dbYear = result.getInt(1);
-					final int dbMonth = result.getInt(2);
+            final ResultSet result = statement.executeQuery();
+            while (result.next()) {
 
-					final int yearIndex = numYears - (lastYear - dbYear + 1);
-					final int monthIndex = (dbMonth - 1) + yearIndex * 12;
+               final int dbYear = result.getInt(1);
+               final int dbMonth = result.getInt(2);
 
-					dbHrZones[0][monthIndex] = result.getInt(3);
-					dbHrZones[1][monthIndex] = result.getInt(4);
-					dbHrZones[2][monthIndex] = result.getInt(5);
-					dbHrZones[3][monthIndex] = result.getInt(6);
-					dbHrZones[4][monthIndex] = result.getInt(7);
-					dbHrZones[5][monthIndex] = result.getInt(8);
-					dbHrZones[6][monthIndex] = result.getInt(9);
-					dbHrZones[7][monthIndex] = result.getInt(10);
-					dbHrZones[8][monthIndex] = result.getInt(11);
-					dbHrZones[9][monthIndex] = result.getInt(12);
-				}
-			}
-			conn.close();
+               final int yearIndex = numYears - (lastYear - dbYear + 1);
+               final int monthIndex = (dbMonth - 1) + yearIndex * 12;
 
-			_monthData.hrZoneValues = dbHrZones;
+               dbHrZones[0][monthIndex] = result.getInt(3);
+               dbHrZones[1][monthIndex] = result.getInt(4);
+               dbHrZones[2][monthIndex] = result.getInt(5);
+               dbHrZones[3][monthIndex] = result.getInt(6);
+               dbHrZones[4][monthIndex] = result.getInt(7);
+               dbHrZones[5][monthIndex] = result.getInt(8);
+               dbHrZones[6][monthIndex] = result.getInt(9);
+               dbHrZones[7][monthIndex] = result.getInt(10);
+               dbHrZones[8][monthIndex] = result.getInt(11);
+               dbHrZones[9][monthIndex] = result.getInt(12);
+            }
+         }
+         conn.close();
 
-//			System.out.println("HR Zones\t");
-//			// TODO remove SYSTEM.OUT.PRINTLN
-//
-//			for (int zoneIndex = 0; zoneIndex < 10; zoneIndex++) {
-//				for (int monthIndex = 0; monthIndex < 12; monthIndex++) {
-//					final int hrZone = dbHrZones[zoneIndex][monthIndex];
-//					if (hrZone > 0) {
-//						System.out.println("\tz:" + zoneIndex + "\tm:" + monthIndex + "\thr:" + hrZone);
-//						// TODO remove SYSTEM.OUT.PRINTLN
-//					}
-//				}
-//				System.out.println("\t");
-//				// TODO remove SYSTEM.OUT.PRINTLN
-//			}
-//
-//			System.out.println("\t");
-//			System.out.println("\t");
-//// TODO remove SYSTEM.OUT.PRINTLN
+         _monthData.hrZoneValues = dbHrZones;
 
-		} catch (final SQLException e) {
-			UI.showSQLException(e);
-		}
+      } catch (final SQLException e) {
+         UI.showSQLException(e);
+      }
 
-		return _monthData;
-	}
+      if (isLogStatisticValues) {
+         logValues();
+      }
+
+      return _monthData;
+   }
+
+   private void logValues() {
+
+      System.out.println("" //$NON-NLS-1$
+
+            + "    date," //$NON-NLS-1$
+            + "     zone1,     zone2,     zone3,     zone4,     zone5,     zone6,     zone7,     zone8,     zone9,     zone10"); //$NON-NLS-1$
+
+      final int[][] hrZoneValues = _monthData.hrZoneValues;
+      final int numMonths = hrZoneValues[0].length;
+      final int firstYear = _lastYear - _numberOfYears + 1;
+
+      for (int monthIndex = 0; monthIndex < numMonths; monthIndex++) {
+
+         final int yearIndex = monthIndex / 12;
+         final int year = firstYear + yearIndex;
+
+         final int month = (monthIndex % 12) + 1;
+
+         System.out.println(String.format("" //$NON-NLS-1$
+
+               + "%3d-%d," //$NON-NLS-1$
+               + "%10d,%10d,%10d,%10d,%10d,%10d,%10d,%10d,%10d,%10d", //$NON-NLS-1$
+
+               month,
+               year,
+
+               hrZoneValues[0][monthIndex],
+               hrZoneValues[1][monthIndex],
+               hrZoneValues[2][monthIndex],
+               hrZoneValues[3][monthIndex],
+               hrZoneValues[4][monthIndex],
+               hrZoneValues[5][monthIndex],
+               hrZoneValues[6][monthIndex],
+               hrZoneValues[7][monthIndex],
+               hrZoneValues[8][monthIndex],
+               hrZoneValues[9][monthIndex]));
+      }
+
+      System.out.println();
+   }
 
 }
