@@ -197,9 +197,9 @@ public class DataProvider_HrZone_Month extends DataProvider {
 
    private void logValues() {
 
-      System.out.println("" //$NON-NLS-1$
+      System.out.println("\n" //$NON-NLS-1$
 
-            + "    date," //$NON-NLS-1$
+            + "month-year," //$NON-NLS-1$
             + "     zone1,     zone2,     zone3,     zone4,     zone5,     zone6,     zone7,     zone8,     zone9,     zone10"); //$NON-NLS-1$
 
       final int[][] hrZoneValues = _monthData.hrZoneValues;
@@ -215,7 +215,7 @@ public class DataProvider_HrZone_Month extends DataProvider {
 
          System.out.println(String.format("" //$NON-NLS-1$
 
-               + "%3d-%d," //$NON-NLS-1$
+               + "%5d-%d," //$NON-NLS-1$
                + "%10d,%10d,%10d,%10d,%10d,%10d,%10d,%10d,%10d,%10d", //$NON-NLS-1$
 
                month,

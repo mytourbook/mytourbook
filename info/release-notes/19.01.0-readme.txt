@@ -11,6 +11,11 @@ Improvements
 * Tour Import
   
   - Import <ns2:Speed> and <ns2:Watts> tags from .tcx files
+  
+  
+* Statistics
+
+  - Log HR zone values, can be activated with the command line parameter: -DlogStatisticValues
 
 
 Bugfix   

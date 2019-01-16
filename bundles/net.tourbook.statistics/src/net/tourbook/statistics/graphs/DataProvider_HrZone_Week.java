@@ -215,10 +215,13 @@ public class DataProvider_HrZone_Week extends DataProvider {
 
    private void logValues() {
 
-      System.out.println("" //$NON-NLS-1$
+//      for (int yearIndex = 0; yearIndex < _years.length; yearIndex++) {
+//         System.out.println(String.format("%5d %3d", _years[yearIndex], _yearWeeks[yearIndex]));
+//      }
 
-            + "    date," //$NON-NLS-1$
-            + " idx"
+      System.out.println("\n" //$NON-NLS-1$
+
+            + " week-year," //$NON-NLS-1$
             + "     zone1,     zone2,     zone3,     zone4,     zone5,     zone6,     zone7,     zone8,     zone9,     zone10"); //$NON-NLS-1$
 
       final int[][] hrZoneValues = _weekData.hrZoneValues;
@@ -226,31 +229,44 @@ public class DataProvider_HrZone_Week extends DataProvider {
 
       int yearIndex = 0;
       int prevSumWeeks = 0;
-      int sumWeeks = _yearWeeks[yearIndex];
+      int sumYearWeeks = _yearWeeks[yearIndex];
 
       for (int weekIndex = 0; weekIndex < numWeeks; weekIndex++) {
 
-         if (weekIndex > sumWeeks) {
+         if (weekIndex < sumYearWeeks) {
+
+            // is still in the same year
+
+         } else {
+
+            // advance to the next year
+
+//            System.out.println();
 
             yearIndex++;
 
-            sumWeeks += _yearWeeks[yearIndex];
-            prevSumWeeks += _yearWeeks[yearIndex];
+            final int yearWeeks = _yearWeeks[yearIndex];
+
+            prevSumWeeks = sumYearWeeks;
+            sumYearWeeks += yearWeeks;
          }
 
-         final int year = _lastYear - _numberOfYears + yearIndex;
+         final int year = _years[yearIndex];
          final int week = weekIndex - prevSumWeeks;
 
          System.out.println(String.format("" //$NON-NLS-1$
 
-               + "%3d-%d," //$NON-NLS-1$
-               + "%5d,"
+//               + "weekIndex:%4d     sumWeeks:%4d     prevSumWeeks:%4d       "
+
+               + "%5d-%d," //$NON-NLS-1$
                + "%10d,%10d,%10d,%10d,%10d,%10d,%10d,%10d,%10d,%10d", //$NON-NLS-1$
 
-               week + 1,
-               year + 1,
+//               weekIndex,
+//               sumYearWeeks,
+//               prevSumWeeks,
 
-               weekIndex,
+               week + 1,
+               year,
 
                hrZoneValues[0][weekIndex],
                hrZoneValues[1][weekIndex],
@@ -263,7 +279,5 @@ public class DataProvider_HrZone_Week extends DataProvider {
                hrZoneValues[8][weekIndex],
                hrZoneValues[9][weekIndex]));
       }
-
-      System.out.println();
    }
 }
