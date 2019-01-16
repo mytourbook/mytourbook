@@ -31,15 +31,23 @@
                </VuePopper>
             </td>
             <td style="">
+
                <v-autocomplete 
-                  :label      ="$t('message.Search_App_Text_Search_PlaceHolder')"
-                  :items      ="searchItems"
-                  item-text   ="itemText"
+                  :label               ="$t('message.Search_App_Text_Search_PlaceHolder')"
+                  :items               ="searchItems"
+
+                  :search-input.sync   ="loadProposals"
+
+                  item-text   ="name"
                   ref         ="ref_SearchInput"
                   autofocus
 
                   class="no-transition"
                   tabindex="2"
+
+                  :menu-props =" {
+                                    maxHeight:'70vh'
+                                 }"
                />
                <div id="domSearchInput"></div>
             </td>

@@ -38,6 +38,15 @@
 }
 
 /*
+   Search proposal, show smaller
+*/
+.v-list__tile
+{
+   font-size:        13px;
+   height:           24px;
+}
+
+/*
    Search actions
 */
 .actionIcon
