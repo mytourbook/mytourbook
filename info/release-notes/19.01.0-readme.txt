@@ -11,6 +11,7 @@ Improvements
 * Tour Import
   
   - Import <ns2:Speed> and <ns2:Watts> tags from .tcx files
+  - Import <gpxx:hr>, <gpxx:temp> and <gpxx:Temperature> tags von .gpx files
   
   
 * Statistics
