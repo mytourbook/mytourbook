@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -156,6 +156,7 @@ public class Messages extends NLS {
 
    public static String        Image___Empty16;
 
+   public static String        Image__App_Close;
    public static String        Image__App_Close_Themed;
    public static String        Image__BookOpen_Themed;
    public static String        Image__ColumnCategory;
