@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -23,102 +23,104 @@ import net.tourbook.ui.TourTypeFilter;
 
 public abstract class DataProvider {
 
-	static final char		NL			= net.tourbook.common.UI.NEW_LINE;
+   static final char    NL                   = net.tourbook.common.UI.NEW_LINE;
 
-	static ZonedDateTime	calendar8	= ZonedDateTime.now().with(TimeTools.calendarWeek.dayOfWeek(), 1);
+   static final boolean isLogStatisticValues = System.getProperty("logStatisticValues") != null;               //$NON-NLS-1$
 
-	TourPerson				_activePerson;
-	TourTypeFilter			_activeTourTypeFilter;
+   static ZonedDateTime calendar8            = ZonedDateTime.now().with(TimeTools.calendarWeek.dayOfWeek(), 1);
 
-	int						_lastYear;
+   TourPerson           _activePerson;
+   TourTypeFilter       _activeTourTypeFilter;
 
-	int						_numberOfYears;
+   int                  _lastYear;
 
-	/**
-	 * all years
-	 */
-	int[]					_years;
+   int                  _numberOfYears;
 
-	/**
-	 * number of days in a year
-	 */
-	int[]					_yearDays;
+   /**
+    * all years
+    */
+   int[]                _years;
 
-	/**
-	 * number of weeks in a year
-	 */
-	int[]					_yearWeeks;
+   /**
+    * number of days in a year
+    */
+   int[]                _yearDays;
 
-	/**
-	 * @param finalYear
-	 * @param numberOfYears
-	 * @return Returns a list with all years
-	 */
-	static String getYearList(final int finalYear, final int numberOfYears) {
+   /**
+    * number of weeks in a year
+    */
+   int[]                _yearWeeks;
 
-		final StringBuilder sb = new StringBuilder();
+   /**
+    * @param finalYear
+    * @param numberOfYears
+    * @return Returns a list with all years
+    */
+   static String getYearList(final int finalYear, final int numberOfYears) {
 
-		for (int currentYear = finalYear; currentYear >= finalYear - numberOfYears + 1; currentYear--) {
+      final StringBuilder sb = new StringBuilder();
 
-			if (currentYear != finalYear) {
-				sb.append(',');
-			}
+      for (int currentYear = finalYear; currentYear >= finalYear - numberOfYears + 1; currentYear--) {
 
-			sb.append(Integer.toString(currentYear));
-		}
+         if (currentYear != finalYear) {
+            sb.append(',');
+         }
 
-		return sb.toString();
-	}
+         sb.append(Integer.toString(currentYear));
+      }
 
-	/**
-	 * @param currentYear
-	 * @param numberOfYears
-	 * @return Returns the number of days between {@link #_lastYear} and currentYear
-	 */
-	int getYearDOYs(final int selectedYear) {
+      return sb.toString();
+   }
 
-		int yearDOYs = 0;
-		int yearIndex = 0;
+   /**
+    * @param currentYear
+    * @param numberOfYears
+    * @return Returns the number of days between {@link #_lastYear} and currentYear
+    */
+   int getYearDOYs(final int selectedYear) {
 
-		for (int currentYear = _lastYear - _numberOfYears + 1; currentYear < selectedYear; currentYear++) {
+      int yearDOYs = 0;
+      int yearIndex = 0;
 
-			if (currentYear == selectedYear) {
-				return yearDOYs;
-			}
+      for (int currentYear = _lastYear - _numberOfYears + 1; currentYear < selectedYear; currentYear++) {
 
-			yearDOYs += _yearDays[yearIndex];
+         if (currentYear == selectedYear) {
+            return yearDOYs;
+         }
 
-			yearIndex++;
-		}
+         yearDOYs += _yearDays[yearIndex];
 
-		return yearDOYs;
-	}
+         yearIndex++;
+      }
 
-	/**
-	 * Get different data for each year, data are set into <br>
-	 * <br>
-	 * All years in {@link #years} <br>
-	 * Number of day's in {@link #_yearDays} <br>
-	 * Number of week's in {@link #_yearWeeks}
-	 */
-	void initYearNumbers() {
+      return yearDOYs;
+   }
 
-		_years = new int[_numberOfYears];
-		_yearDays = new int[_numberOfYears];
-		_yearWeeks = new int[_numberOfYears];
+   /**
+    * Get different data for each year, data are set into <br>
+    * <br>
+    * All years in {@link #years} <br>
+    * Number of day's in {@link #_yearDays} <br>
+    * Number of week's in {@link #_yearWeeks}
+    */
+   void initYearNumbers() {
 
-		final int firstYear = _lastYear - _numberOfYears + 1;
-		int yearIndex = 0;
+      _years = new int[_numberOfYears];
+      _yearDays = new int[_numberOfYears];
+      _yearWeeks = new int[_numberOfYears];
 
-		for (int currentYear = firstYear; currentYear <= _lastYear; currentYear++) {
+      final int firstYear = _lastYear - _numberOfYears + 1;
+      int yearIndex = 0;
 
-			_years[yearIndex] = currentYear;
+      for (int currentYear = firstYear; currentYear <= _lastYear; currentYear++) {
 
-			_yearDays[yearIndex] = TimeTools.getNumberOfDaysWithYear(currentYear);
-			_yearWeeks[yearIndex] = TimeTools.getNumberOfWeeksWithYear(currentYear);
+         _years[yearIndex] = currentYear;
 
-			yearIndex++;
-		}
-	}
+         _yearDays[yearIndex] = TimeTools.getNumberOfDaysWithYear(currentYear);
+         _yearWeeks[yearIndex] = TimeTools.getNumberOfWeeksWithYear(currentYear);
+
+         yearIndex++;
+      }
+   }
 
 }

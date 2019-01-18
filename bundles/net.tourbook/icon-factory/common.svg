@@ -3671,9 +3671,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="12.438647"
-     inkscape:cx="214.55046"
-     inkscape:cy="908.63229"
+     inkscape:zoom="17.590903"
+     inkscape:cx="96.915113"
+     inkscape:cy="629.43893"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -6533,5 +6533,31 @@
        inkscape:export-xdpi="96"
        inkscape:export-ydpi="96"
        sodipodi:nodetypes="ccccc" />
+    <rect
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:none;fill-opacity:0.05116278;stroke:#3a9ff7;stroke-width:0;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       id="rect4471-8-4-0-6-8-5-9"
+       width="15.999996"
+       height="15.999983"
+       x="75"
+       y="401.36221"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook.common\icons\app-close.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <path
+       style="display:inline;fill:#a1a1a1;fill-rule:evenodd;stroke:#a1a1a1;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;fill-opacity:1"
+       d="m 77.530324,403.8924 10.939425,10.93944 z"
+       id="path2856-1"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook.common\icons\app-close.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <path
+       style="display:inline;fill:#a1a1a1;fill-rule:evenodd;stroke:#a1a1a1;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;fill-opacity:1"
+       d="M 88.46975,403.89252 77.5304,414.83186 Z"
+       id="path2856-6-3"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook.common\icons\app-close.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
   </g>
 </svg>
