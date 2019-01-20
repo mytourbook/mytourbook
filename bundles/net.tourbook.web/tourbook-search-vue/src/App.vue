@@ -32,22 +32,24 @@
             </td>
             <td style="">
 
-               <v-autocomplete 
-                  :label               ="$t('message.Search_App_Text_Search_PlaceHolder')"
-                  :items               ="searchItems"
-
-                  :search-input.sync   ="loadProposals"
+               <v-combobox 
+                  :label      ="$t('message.Search_App_Text_Search_PlaceHolder')"
+                  :items      ="allSearchProposal"
+                  v-model     ="searchInputValue"
 
                   item-text   ="name"
                   ref         ="ref_SearchInput"
+
+                  class       ="no-transition"
+                  :menu-props =" { maxHeight:'70vh' }"
+
+                  tabindex    ="2"
                   autofocus
 
-                  class="no-transition"
-                  tabindex="2"
+                  return-object
 
-                  :menu-props =" {
-                                    maxHeight:'70vh'
-                                 }"
+                  :search-input.sync   ="searchInputSync"
+                  @change              ="onChange_SearchInput"
                />
                <div id="domSearchInput"></div>
             </td>
@@ -66,6 +68,9 @@
       </table>
 
       <v-container> 
+         <SearchResultList
+            :allSearchResultItems="allSearchResultItems"
+         />
       </v-container>
 
    </v-app>

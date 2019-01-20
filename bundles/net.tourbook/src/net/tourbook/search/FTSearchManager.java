@@ -1111,6 +1111,7 @@ public class FTSearchManager {
                final int docId = docids[hitIndex];
                final Document doc = indexReader.document(docId, fieldsToLoad);
 
+               resultItem.id = hitIndex;
                resultItem.docId = docId;
                // resultItem.score = scoreDocs[docStartIndex + hitIndex].score;
 

@@ -33,6 +33,8 @@ public class SearchResultItem {
     */
    int docId;
 
+   int id;
+
    @Override
    public String toString() {
       return "SearchResultItem [" //$NON-NLS-1$

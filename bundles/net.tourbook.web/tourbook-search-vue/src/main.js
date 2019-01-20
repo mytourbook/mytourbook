@@ -11,6 +11,11 @@ import 'typeface-roboto'
 // material design icons
 import 'material-design-icons-iconfont/dist/material-design-icons.css' // Ensure you are using css-loader
 
+// search result list
+import VueVirtualScroller from 'vue-virtual-scroller'
+Vue.use(VueVirtualScroller)
+import intersectionObserver from 'intersection-observer'
+
 import Vue from 'vue'
 
 // i18n - message...

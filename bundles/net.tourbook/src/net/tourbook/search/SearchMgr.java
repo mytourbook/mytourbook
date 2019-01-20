@@ -1133,7 +1133,7 @@ public class SearchMgr implements XHRHandler {
       final String range = headers.getFirst(REQUEST_HEADER_RANGE);
 
       int searchPosFrom = 0;
-      int searchPosTo = 0;
+      int searchPosTo = 9999999;
 
       if (range != null) {
 
