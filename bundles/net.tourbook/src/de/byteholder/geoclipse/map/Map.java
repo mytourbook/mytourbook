@@ -23,6 +23,19 @@
  */
 package de.byteholder.geoclipse.map;
 
+import de.byteholder.geoclipse.Messages;
+import de.byteholder.geoclipse.map.event.IMapInfoListener;
+import de.byteholder.geoclipse.map.event.IMapPositionListener;
+import de.byteholder.geoclipse.map.event.IPOIListener;
+import de.byteholder.geoclipse.map.event.IPositionListener;
+import de.byteholder.geoclipse.map.event.MapPOIEvent;
+import de.byteholder.geoclipse.map.event.MapPositionEvent;
+import de.byteholder.geoclipse.mapprovider.ImageDataResources;
+import de.byteholder.geoclipse.mapprovider.MP;
+import de.byteholder.geoclipse.mapprovider.MapProviderManager;
+import de.byteholder.geoclipse.preferences.IMappingPreferences;
+import de.byteholder.geoclipse.ui.TextWrapPainter;
+
 import java.awt.Dimension;
 import java.awt.geom.Point2D;
 import java.io.UnsupportedEncodingException;
@@ -109,19 +122,6 @@ import net.tourbook.ui.IInfoToolTipProvider;
 import net.tourbook.ui.IMapToolTipProvider;
 import net.tourbook.ui.MTRectangle;
 
-import de.byteholder.geoclipse.Messages;
-import de.byteholder.geoclipse.map.event.IMapInfoListener;
-import de.byteholder.geoclipse.map.event.IMapPositionListener;
-import de.byteholder.geoclipse.map.event.IPOIListener;
-import de.byteholder.geoclipse.map.event.IPositionListener;
-import de.byteholder.geoclipse.map.event.MapPOIEvent;
-import de.byteholder.geoclipse.map.event.MapPositionEvent;
-import de.byteholder.geoclipse.mapprovider.ImageDataResources;
-import de.byteholder.geoclipse.mapprovider.MP;
-import de.byteholder.geoclipse.mapprovider.MapProviderManager;
-import de.byteholder.geoclipse.preferences.IMappingPreferences;
-import de.byteholder.geoclipse.ui.TextWrapPainter;
-
 public class Map extends Canvas {
 
    /**
@@ -147,19 +147,19 @@ public class Map extends Canvas {
    /*
     * Wikipedia data
     */
-//	private static final String WIKI_PARAMETER_DIM							= "dim";																	//$NON-NLS-1$
+//   private static final String WIKI_PARAMETER_DIM                     = "dim";                                                   //$NON-NLS-1$
    private static final String WIKI_PARAMETER_TYPE = "type"; //$NON-NLS-1$
 
-//	http://toolserver.org/~geohack/geohack.php?pagename=Sydney&language=de&params=33.85_S_151.2_E_region:AU-NSW_type:city(3641422)
-//	http://toolserver.org/~geohack/geohack.php?pagename=Palm_Island,_Queensland&params=18_44_S_146_35_E_scale:20000_type:city
-//	http://toolserver.org/~geohack/geohack.php?pagename=P%C3%B3voa_de_Varzim&params=41_22_57_N_8_46_45_W_region:PT_type:city//
+//   http://toolserver.org/~geohack/geohack.php?pagename=Sydney&language=de&params=33.85_S_151.2_E_region:AU-NSW_type:city(3641422)
+//   http://toolserver.org/~geohack/geohack.php?pagename=Palm_Island,_Queensland&params=18_44_S_146_35_E_scale:20000_type:city
+//   http://toolserver.org/~geohack/geohack.php?pagename=P%C3%B3voa_de_Varzim&params=41_22_57_N_8_46_45_W_region:PT_type:city//
 //
-//	where D is degrees, M is minutes, S is seconds, and NS/EWO are the directions
+//   where D is degrees, M is minutes, S is seconds, and NS/EWO are the directions
 //
-//	D;D
-//	D_N_D_E
-//	D_M_N_D_M_E
-//	D_M_S_N_D_M_S_E
+//   D;D
+//   D_N_D_E
+//   D_M_N_D_M_E
+//   D_M_S_N_D_M_S_E
 
    private static final String PATTERN_SEPARATOR                          = "_";                               //$NON-NLS-1$
    private static final String PATTERN_END                                = "_?(.*)";                          //$NON-NLS-1$
@@ -173,10 +173,10 @@ public class Map extends Canvas {
    private static final String PATTERN_DIRECTION_NS                       = "([NS])_";                         //$NON-NLS-1$
    private static final String PATTERN_DIRECTION_WE                       = "([WE])";                          //$NON-NLS-1$
 
-//	private static final String		PATTERN_WIKI_POSITION_10					= "([-+]?[0-9]*\\.?[0-9]+)_([NS])_([-+]?[0-9]*\\.?[0-9]+)_([WE])_?(.*)";	//$NON-NLS-1$
-//	private static final String		PATTERN_WIKI_POSITION_20					= "([0-9]*)_([NS])_([0-9]*)_([WE])_?(.*)";									//$NON-NLS-1$
-//	private static final String		PATTERN_WIKI_POSITION_21					= "([0-9]*)_([0-9]*)_([NS])_([0-9]*)_([0-9]*)_([WE])_?(.*)";				//$NON-NLS-1$
-//	private static final String		PATTERN_WIKI_POSITION_22					= "([0-9]*)_([0-9]*)_([0-9]*)_([NS])_([0-9]*)_([0-9]*)_([0-9]*)_([WE])_?(.*)";	//$NON-NLS-1$
+//   private static final String      PATTERN_WIKI_POSITION_10               = "([-+]?[0-9]*\\.?[0-9]+)_([NS])_([-+]?[0-9]*\\.?[0-9]+)_([WE])_?(.*)";   //$NON-NLS-1$
+//   private static final String      PATTERN_WIKI_POSITION_20               = "([0-9]*)_([NS])_([0-9]*)_([WE])_?(.*)";                           //$NON-NLS-1$
+//   private static final String      PATTERN_WIKI_POSITION_21               = "([0-9]*)_([0-9]*)_([NS])_([0-9]*)_([0-9]*)_([WE])_?(.*)";            //$NON-NLS-1$
+//   private static final String      PATTERN_WIKI_POSITION_22               = "([0-9]*)_([0-9]*)_([0-9]*)_([NS])_([0-9]*)_([0-9]*)_([0-9]*)_([WE])_?(.*)";   //$NON-NLS-1$
 
    private static final String  PATTERN_WIKI_POSITION_D_D             = PATTERN_DOUBLE + ";"                                        //$NON-NLS-1$
          + PATTERN_DOUBLE
@@ -224,8 +224,8 @@ public class Map extends Canvas {
    private final IPreferenceStore _prefStore                 = TourbookPlugin.getPrefStore();
    {
       MAP_TRANSPARENT_RGB = net.tourbook.common.UI.IS_OSX //
-//				? new RGB(0x7e, 0x7f, 0x80)
-//				? new RGB(0xfe, 0x00, 0x00)
+//            ? new RGB(0x7e, 0x7f, 0x80)
+//            ? new RGB(0xfe, 0x00, 0x00)
             ? new RGB(0xfe, 0xfe, 0xfe)
             : new RGB(0xfe, 0xfe, 0xfe)
 //
@@ -323,40 +323,40 @@ public class Map extends Canvas {
       _nfLatLon.setMaximumFractionDigits(5);
    }
 
-   private final TextWrapPainter             _textWrapper             = new TextWrapPainter();
+   private final TextWrapPainter                    _textWrapper             = new TextWrapPainter();
 
    /**
     * cache for overlay images
     */
-   private OverlayImageCache                 _overlayImageCache;
+   private OverlayImageCache                        _overlayImageCache;
 
    /**
     * This queue contains tiles which overlay image must be painted
     */
-   private final ConcurrentLinkedQueue<Tile> _tileOverlayPaintQueue   = new ConcurrentLinkedQueue<>();
+   private final ConcurrentLinkedQueue<Tile>        _tileOverlayPaintQueue   = new ConcurrentLinkedQueue<>();
 
-   private boolean                           _isRunningDrawOverlay;
+   private boolean                                  _isRunningDrawOverlay;
 
-   private String                            _overlayKey;
+   private String                                   _overlayKey;
 
    /**
     * this painter is called when the map is painted in the onPaint event
     */
-   private IDirectPainter                    _directMapPainter;
+   private IDirectPainter                           _directMapPainter;
 
-   private final DirectPainterContext        _directMapPainterContext = new DirectPainterContext();
+   private final DirectPainterContext               _directMapPainterContext = new DirectPainterContext();
 
    /**
     * when <code>true</code> the overlays are painted
     */
-   private boolean                           _isDrawOverlays;
+   private boolean                                  _isDrawOverlays;
 
    /**
     * contains a legend which is painted in the map
     */
-   private MapLegend                         _mapLegend;
+   private MapLegend                                _mapLegend;
 
-   private boolean                           _isLegendVisible;
+   private boolean                                  _isLegendVisible;
 
    /**
     * This is the most important point for the map because all operations depend on it.
@@ -371,7 +371,7 @@ public class Map extends Canvas {
     * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     * <br>
     */
-   private Point2D                           _worldPixelMapCenter     = null;
+   private Point2D                                  _worldPixelMapCenter     = null;
    /**
     * Viewport in the map where the {@link #_mapImage} is painted <br>
     * <br>
@@ -383,27 +383,27 @@ public class Map extends Canvas {
     * I havn't yet fully understood how it works but I adjusted the map successfully in 10.7 and
     * tried to document this behaviour.
     */
-   private Rectangle                         _worldPixelTopLeftViewport;
+   private Rectangle                                _worldPixelTopLeftViewport;
    /**
     * Size in device pixel where the map is displayed
     */
-   private Rectangle                         _devMapViewport;
+   private Rectangle                                _devMapViewport;
 
    /**
     * Size of the map in tiles at the current zoom level {@link #_mapZoomLevel} (num tiles tall by
     * num tiles wide)
     */
-   private Dimension                         _mapTileSize;
+   private Dimension                                _mapTileSize;
    /**
     * Size of a tile in pixel (tile is quadratic)
     */
-   private int                               _tilePixelSize;
+   private int                                      _tilePixelSize;
 
    /**
     * Contains the client area of the map without trimmings, this rectangle has the width and height
     * of the map image
     */
-   private Rectangle                         _clientArea;
+   private Rectangle                                _clientArea;
 
    private final ListenerList<IMapInfoListener>     _allMapInfoListener      = new ListenerList<>(ListenerList.IDENTITY);
    private final ListenerList<IMapPositionListener> _allMapPositionListener  = new ListenerList<>(ListenerList.IDENTITY);
@@ -441,26 +441,29 @@ public class Map extends Canvas {
    private long            _lastMapDrawTime;
 
    /*
-    * these 4 tile positions correspond to the tiles which are needed to draw the map
+    * These 4 tile positions correspond to the tiles which are needed to draw the map
     */
-   private int                 _tilePosMinX;
-   private int                 _tilePosMaxX;
-   private int                 _tilePosMinY;
-   private int                 _tilePosMaxY;
+   private int           _tilePosMinX;
+   private int           _tilePosMaxX;
+   private int           _tilePosMinY;
+   private int           _tilePosMaxY;
    //
-   private final Display       _display;
-   private final Thread        _displayThread;
+   private final Display _display;
+   private final Thread  _displayThread;
    //
-   private int                 _jobCounterSplitImages = 0;
-   private Object              _splitJobFamily        = new Object();
-   private boolean             _isCancelSplitJobs;
+   private int           _jobCounterSplitImages = 0;
+   private Object        _splitJobFamily        = new Object();
+   private boolean       _isCancelSplitJobs;
    //
    /**
-    * when <code>true</code> the tour is painted in the map in the enhanced mode otherwise in the
+    * When <code>true</code> the tour is painted in the map in the enhanced mode otherwise in the
     * simple mode
     */
-   private boolean             _isTourPaintMethodEnhanced;
+   private boolean       _isTourPaintMethodEnhanced;
    //
+   /*
+    * Download offline images
+    */
    private boolean             _isSelectOfflineArea;
    private boolean             _isOfflineSelectionStarted;
    private boolean             _isPaintOfflineArea;
@@ -481,15 +484,15 @@ public class Map extends Canvas {
    /**
     * Is <code>true</code> when the map context menu can be displayed
     */
-   private boolean             _isContextMenuEnabled  = true;
+   private boolean             _isContextMenuEnabled = true;
 
    private DropTarget          _dropTarget;
 
-   private boolean             _isRedrawEnabled       = true;
+   private boolean             _isRedrawEnabled      = true;
 
    private HoveredAreaContext  _hoveredAreaContext;
 
-   private int                 _overlayAlpha          = 0xff;
+   private int                 _overlayAlpha         = 0xff;
 
    /**
     * This observer is called in the {@link Tile} when a tile image is set into the tile
@@ -609,7 +612,8 @@ public class Map extends Canvas {
 
       _previousOfflineArea = _currentOfflineArea;
 
-      _offlineDevAreaStart = _offlineDevAreaEnd = null;
+      _offlineDevAreaStart = null;
+      _offlineDevAreaEnd = null;
 
       _isPaintOfflineArea = true;
       _isSelectOfflineArea = true;
@@ -645,7 +649,7 @@ public class Map extends Canvas {
          @Override
          public void focusLost(final FocusEvent e) {
 // this is critical because the tool tip get's hidden when there are actions available in the tool tip shell
-//				hidePoiToolTip();
+//            hidePoiToolTip();
          }
       });
 
@@ -1120,7 +1124,7 @@ public class Map extends Canvas {
    private Set<GeoPosition> getBoundingBoxPositions(final String boundingBox) {
 
 // example
-//		"48.4838981628418,48.5500030517578,9.02030849456787,9.09173774719238"
+//      "48.4838981628418,48.5500030517578,9.02030849456787,9.09173774719238"
 
       final String[] boundingBoxValues = boundingBox.split(","); //$NON-NLS-1$
 
@@ -1879,7 +1883,7 @@ public class Map extends Canvas {
 
          } else if (mouseEvent.button == 2) {
             // if the middle mouse button is clicked, recenter the view
-//				recenterMap(event.x, event.y);
+//            recenterMap(event.x, event.y);
          }
       }
 
@@ -2241,7 +2245,7 @@ public class Map extends Canvas {
       final Color borderColor = new Color(_display, 0xF1, 0xEE, 0xE8);
       {
          gc.setForeground(borderColor);
-//			gc.drawText(scaleText, devXText + 1, devYText + 1, true);
+//         gc.drawText(scaleText, devXText + 1, devYText + 1, true);
 
          gc.drawText(scaleText, devXText - 1, devYText, true);
          gc.drawText(scaleText, devXText + 1, devYText, true);
@@ -2259,7 +2263,7 @@ public class Map extends Canvas {
       gc.setLineWidth(1);
 
       /*
-       * draw previous area box
+       * Draw previous area box
        */
       if (_previousOfflineArea != null) {
 
@@ -2300,7 +2304,7 @@ public class Map extends Canvas {
       }
 
       /*
-       * draw tile box for tiles which are selected within the area box
+       * Draw tile box for tiles which are selected within the area box
        */
       final int devTileStartX = _offlineDevTileStart.x;
       final int devTileStartY = _offlineDevTileStart.y;
@@ -2360,7 +2364,7 @@ public class Map extends Canvas {
 
       gc.setLineStyle(SWT.LINE_SOLID);
       gc.setForeground(SYS_COLOR_WHITE);
-//		gc.drawRectangle(devX + 1, devY + 1, devWidth - 2, devHeight - 2);
+//      gc.drawRectangle(devX + 1, devY + 1, devWidth - 2, devHeight - 2);
 
       gc.setBackground(_display.getSystemColor(SWT.COLOR_DARK_YELLOW));
       gc.setAlpha(0x30);
@@ -2390,22 +2394,13 @@ public class Map extends Canvas {
 
          // display offline area geo position
 
-         final GeoPosition geoStart = _mp.pixelToGeo(
-               new Point2D.Double(
-                     _offlineWorldStart.x,
-                     _offlineWorldStart.y),
-               _mapZoomLevel);
+         final GeoPosition geoStart = _mp.pixelToGeo(new Point2D.Double(_offlineWorldStart.x, _offlineWorldStart.y), _mapZoomLevel);
+         final GeoPosition geoEnd = _mp.pixelToGeo(new Point2D.Double(_offlineWorldEnd.x, _offlineWorldEnd.y), _mapZoomLevel);
 
          sb.append("   "); //$NON-NLS-1$
          sb.append(_nfLatLon.format(geoStart.latitude));
          sb.append(" / "); //$NON-NLS-1$
          sb.append(_nfLatLon.format(geoStart.longitude));
-
-         final GeoPosition geoEnd = _mp.pixelToGeo(
-               new Point2D.Double(//
-                     _offlineWorldEnd.x,
-                     _offlineWorldEnd.y),
-               _mapZoomLevel);
 
          sb.append(" - "); //$NON-NLS-1$
          sb.append(_nfLatLon.format(geoEnd.latitude));
@@ -2727,9 +2722,9 @@ public class Map extends Canvas {
     *
     * y,x
     *
-    * 0,0		0,1		0,2
-    * 1,0		1,1		1,2
-    * 2,0		2,1		2,2
+    * 0,0      0,1      0,2
+    * 1,0      1,1      1,2
+    * 2,0      2,1      2,2
     * </pre>
     *
     * @param tile
@@ -2994,8 +2989,8 @@ public class Map extends Canvas {
 
             gcMapImage.drawImage(_mp.getLoadingImage(), devTileViewport.x, devTileViewport.y);
 
-//				gc.setForeground(_display.getSystemColor(SWT.COLOR_BLACK));
-//				gc.drawString(Messages.geoclipse_extensions_loading, devTileViewport.x, devTileViewport.y, true);
+//            gc.setForeground(_display.getSystemColor(SWT.COLOR_BLACK));
+//            gc.drawString(Messages.geoclipse_extensions_loading, devTileViewport.x, devTileViewport.y, true);
          }
       }
    }
@@ -3113,7 +3108,7 @@ public class Map extends Canvas {
 
                      // this method will do an endless loop and is disabled
                      // -> this problem is currently not solved
-                     //	queueOverlayPainting(tile);
+                     //   queueOverlayPainting(tile);
                      return;
                   }
                }
@@ -3401,7 +3396,7 @@ public class Map extends Canvas {
             double lon = 0;
             String otherParams = null;
 
-            //	match D;D
+            //   match D;D
 
             final Matcher wikiPos1Matcher = _patternWikiPosition_D_D.matcher(position);
             if (wikiPos1Matcher.matches()) {
@@ -3422,7 +3417,7 @@ public class Map extends Canvas {
                }
             } else {
 
-               //	match D_N_D_E
+               //   match D_N_D_E
 
                final Matcher wikiPos20Matcher = _patternWikiPosition_D_N_D_E.matcher(position);
                if (wikiPos20Matcher.matches()) {
@@ -3535,7 +3530,7 @@ public class Map extends Canvas {
             // get zoom level from parameter values
             if (otherParams != null) {
 
-//								String dim = null;
+//                        String dim = null;
                String type = null;
 
                final String[] allKeyValues = _patternWikiParamter.split(otherParams);
@@ -3548,8 +3543,8 @@ public class Map extends Canvas {
 
                      if (splittedKeyValue[0].startsWith(WIKI_PARAMETER_TYPE)) {
                         type = splittedKeyValue[1];
-//										} else if (splittedKeyValue[0].startsWith(WIKI_PARAMETER_DIM)) {
-//											dim = splittedKeyValue[1];
+//                              } else if (splittedKeyValue[0].startsWith(WIKI_PARAMETER_DIM)) {
+//                                 dim = splittedKeyValue[1];
                      }
                   }
                }
@@ -3557,51 +3552,51 @@ public class Map extends Canvas {
                /*
                 * !!! disabled because the zoom level is not correct !!!
                 */
-//								if (dim != null) {
-//									final int scale = Integer.parseInt(dim);
-//									zoom = (int) (18 - (Math.round(Math.log(scale) - Math.log(1693)))) - 1;//, [2, 18];
-//								} else
+//                        if (dim != null) {
+//                           final int scale = Integer.parseInt(dim);
+//                           zoom = (int) (18 - (Math.round(Math.log(scale) - Math.log(1693)))) - 1;//, [2, 18];
+//                        } else
 
                if (type != null) {
 
 // source: https://wiki.toolserver.org/view/GeoHack
 //
-// type: 	 										ratio 	 		m / pixel	{scale} 	{mmscale}	{span}	{altitude}	{zoom}	{osmzoom}
+// type:                                   ratio           m / pixel   {scale}    {mmscale}   {span}   {altitude}   {zoom}   {osmzoom}
 //
-// country, satellite 								1 : 10,000,000 	3528 		10000000 	10000000 	10.0 	1430 		1 		5
-// state 											1 : 3,000,000 	1058 		3000000 	4000000 	3.0 	429 		3 		7
-// adm1st 											1 : 1,000,000 	353 		1000000 	1000000 	1.0 	143 		4 		9
-// adm2nd (default) 								1 : 300,000 	106 		300000 		200000 		0.3 	42 			5 		11
-// adm3rd, city, mountain, isle, river, waterbody 	1 : 100,000 	35.3 		100000 		100000 		0.1 	14 			6 		12
-// event, forest, glacier 							1 : 50,000 		17.6 		50000 		50000 		0.05 	7 			7 		13
-// airport 											1 : 30,000 		10.6 		30000 		25000 		0.03 	4 			7 		14
-// edu, pass, landmark, railwaystation 				1 : 10,000 		3.53 		10000 		10000 		0.01 	1 			8 		15
+// country, satellite                         1 : 10,000,000    3528       10000000    10000000    10.0    1430       1       5
+// state                                  1 : 3,000,000    1058       3000000    4000000    3.0    429       3       7
+// adm1st                                  1 : 1,000,000    353       1000000    1000000    1.0    143       4       9
+// adm2nd (default)                         1 : 300,000    106       300000       200000       0.3    42          5       11
+// adm3rd, city, mountain, isle, river, waterbody    1 : 100,000    35.3       100000       100000       0.1    14          6       12
+// event, forest, glacier                      1 : 50,000       17.6       50000       50000       0.05    7          7       13
+// airport                                  1 : 30,000       10.6       30000       25000       0.03    4          7       14
+// edu, pass, landmark, railwaystation             1 : 10,000       3.53       10000       10000       0.01    1          8       15
 
-                  if (type.equals("country") // 				//$NON-NLS-1$
-                        || type.equals("satellite")) { //	//$NON-NLS-1$
+                  if (type.equals("country") //             //$NON-NLS-1$
+                        || type.equals("satellite")) { //   //$NON-NLS-1$
                      zoom = 5 - 1;
-                  } else if (type.equals("state")) { //		//$NON-NLS-1$
+                  } else if (type.equals("state")) { //      //$NON-NLS-1$
                      zoom = 7 - 1;
-                  } else if (type.equals("adm1st")) { //		//$NON-NLS-1$
+                  } else if (type.equals("adm1st")) { //      //$NON-NLS-1$
                      zoom = 9 - 1;
-                  } else if (type.equals("adm2nd")) { //		//$NON-NLS-1$
+                  } else if (type.equals("adm2nd")) { //      //$NON-NLS-1$
                      zoom = 11 - 1;
-                  } else if (type.equals("adm3rd") //			//$NON-NLS-1$
-                        || type.equals("city") //			//$NON-NLS-1$
-                        || type.equals("mountain") //		//$NON-NLS-1$
-                        || type.equals("isle") //			//$NON-NLS-1$
-                        || type.equals("river") //			//$NON-NLS-1$
-                        || type.equals("waterbody")) { //	//$NON-NLS-1$
+                  } else if (type.equals("adm3rd") //         //$NON-NLS-1$
+                        || type.equals("city") //         //$NON-NLS-1$
+                        || type.equals("mountain") //      //$NON-NLS-1$
+                        || type.equals("isle") //         //$NON-NLS-1$
+                        || type.equals("river") //         //$NON-NLS-1$
+                        || type.equals("waterbody")) { //   //$NON-NLS-1$
                      zoom = 12 - 1;
-                  } else if (type.equals("event")//			//$NON-NLS-1$
-                        || type.equals("forest") // 		//$NON-NLS-1$
-                        || type.equals("glacier")) { //		//$NON-NLS-1$
+                  } else if (type.equals("event")//         //$NON-NLS-1$
+                        || type.equals("forest") //       //$NON-NLS-1$
+                        || type.equals("glacier")) { //      //$NON-NLS-1$
                      zoom = 13 - 1;
-                  } else if (type.equals("airport")) { //		//$NON-NLS-1$
+                  } else if (type.equals("airport")) { //      //$NON-NLS-1$
                      zoom = 14 - 1;
-                  } else if (type.equals("edu") //			//$NON-NLS-1$
-                        || type.equals("pass") //			//$NON-NLS-1$
-                        || type.equals("landmark") //		//$NON-NLS-1$
+                  } else if (type.equals("edu") //         //$NON-NLS-1$
+                        || type.equals("pass") //         //$NON-NLS-1$
+                        || type.equals("landmark") //      //$NON-NLS-1$
                         || type.equals("railwaystation")) { //$NON-NLS-1$
                      zoom = 15 - 1;
                   }
@@ -3931,10 +3926,10 @@ public class Map extends Canvas {
 
       _mp = mp;
 
-//		// check if the map is initialized
-//		if (_worldPixelViewport == null) {
-//			onResize();
-//		}
+//      // check if the map is initialized
+//      if (_worldPixelViewport == null) {
+//         onResize();
+//      }
 
       /*
        * !!! initialize map by setting the zoom level which setups all important data !!!
@@ -4259,7 +4254,7 @@ public class Map extends Canvas {
       updateViewPortData();
 
       updateTourToolTip();
-//		updatePoiVisibility();
+//      updatePoiVisibility();
 
       fireMapPositionEvent(true);
    }

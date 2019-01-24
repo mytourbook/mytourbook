@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -36,225 +36,225 @@ import net.tourbook.ui.SQLFilter;
 
 public class GeoPartTourLoader {
 
-	private static final AtomicLong							_loaderExecuterId	= new AtomicLong();
-	private static final LinkedBlockingDeque<GeoPartItem>	_loaderWaitingQueue	= new LinkedBlockingDeque<>();
-	private static ExecutorService							_loadingExecutor;
+   private static final AtomicLong                       _loaderExecuterId   = new AtomicLong();
+   private static final LinkedBlockingDeque<GeoPartItem> _loaderWaitingQueue = new LinkedBlockingDeque<>();
+   private static ExecutorService                        _loadingExecutor;
 
-	static {
+   static {
 
-		final ThreadFactory threadFactory = new ThreadFactory() {
+      final ThreadFactory threadFactory = new ThreadFactory() {
 
-			@Override
-			public Thread newThread(final Runnable r) {
+         @Override
+         public Thread newThread(final Runnable r) {
 
-				final Thread thread = new Thread(r, "Loading geo part tours");//$NON-NLS-1$
+            final Thread thread = new Thread(r, "Loading geo part tours");//$NON-NLS-1$
 
-				thread.setPriority(Thread.MIN_PRIORITY);
-				thread.setDaemon(true);
+            thread.setPriority(Thread.MIN_PRIORITY);
+            thread.setDaemon(true);
 
-				return thread;
-			}
-		};
+            return thread;
+         }
+      };
 
-		_loadingExecutor = Executors.newSingleThreadExecutor(threadFactory);
-	}
+      _loadingExecutor = Executors.newSingleThreadExecutor(threadFactory);
+   }
 
-	private static boolean loadTourGeoPartsFromDB(final GeoPartItem loaderItem) {
+   private static boolean loadTourGeoPartsFromDB(final GeoPartItem loaderItem) {
 
-		if (loaderItem.isCanceled) {
-			return false;
-		}
+      if (loaderItem.isCanceled) {
+         return false;
+      }
 
-		final long start = System.currentTimeMillis();
+      final long start = System.currentTimeMillis();
 
-		final int[] requestedGeoParts = loaderItem.geoParts;
-		final int numGeoParts = requestedGeoParts.length;
+      final int[] requestedGeoParts = loaderItem.geoParts;
+      final int numGeoParts = requestedGeoParts.length;
 
-		if (numGeoParts == 0) {
+      if (numGeoParts == 0) {
 
-			// there are no geoparts, set empty list to have valid data
+         // there are no geoparts, set empty list to have valid data
 
-			loaderItem.tourIds = new long[] {};
+         loaderItem.tourIds = new long[] {};
 
-			return true;
-		}
+         return true;
+      }
 
-		final boolean isAppFilter = loaderItem.isUseAppFilter;
+      final boolean isAppFilter = loaderItem.isUseAppFilter;
 
-		/*
-		 * Create sql parameters
-		 */
-		final StringBuilder sqlInParameters = new StringBuilder();
-		for (int partIndex = 0; partIndex < numGeoParts; partIndex++) {
-			if (partIndex == 0) {
-				sqlInParameters.append(" ?"); //$NON-NLS-1$
-			} else {
-				sqlInParameters.append(", ?"); //$NON-NLS-1$
-			}
-		}
+      /*
+       * Create sql parameters
+       */
+      final StringBuilder sqlInParameters = new StringBuilder();
+      for (int partIndex = 0; partIndex < numGeoParts; partIndex++) {
+         if (partIndex == 0) {
+            sqlInParameters.append(" ?"); //$NON-NLS-1$
+         } else {
+            sqlInParameters.append(", ?"); //$NON-NLS-1$
+         }
+      }
 
-		Connection conn = null;
-		String select = null;
+      Connection conn = null;
+      String select = null;
 
-		try {
-
-// this is very slow
-//			final SQLFilter appFilter = new SQLFilter(SQLFilter.TAG_FILTER);
-			final SQLFilter appFilter = new SQLFilter();
-
-			final char NL = UI.NEW_LINE;
-
-			final String selectGeoPart = "SELECT" + NL //		  					//$NON-NLS-1$
-
-					+ " DISTINCT TourId " + NL //									//$NON-NLS-1$
-
-					+ (" FROM " + TourDatabase.TABLE_TOUR_GEO_PARTS + NL) //		//$NON-NLS-1$
-					+ (" WHERE GeoPart IN (" + sqlInParameters + ")") + NL //		//$NON-NLS-1$ //$NON-NLS-2$
-			;
-
-			if (isAppFilter) {
-
-				final String selectAppFilter = "SELECT" + NL //			  			//$NON-NLS-1$
-
-						+ " TourId" + NL //											//$NON-NLS-1$
-						+ " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //			//$NON-NLS-1$
+      try {
 
 // this is very slow
-//						// get tag id's
-//						+ (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag") + NL //$NON-NLS-1$ //$NON-NLS-2$
-//						+ (" ON tourID = jTdataTtag.TourData_tourId") + NL //$NON-NLS-1$
+//         final SQLFilter appFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+         final SQLFilter appFilter = new SQLFilter();
 
-						+ " WHERE 1=1 " + appFilter.getWhereClause() + NL//			//$NON-NLS-1$
-				;
+         final char NL = UI.NEW_LINE;
 
-				select = selectGeoPart
+         final String selectGeoPart = "SELECT" + NL //                       //$NON-NLS-1$
 
-						+ " AND TourId IN (" + selectAppFilter + ")"; //$NON-NLS-1$ //$NON-NLS-2$
-			} else {
+               + " DISTINCT TourId " + NL //                           //$NON-NLS-1$
 
-				select = selectGeoPart;
-			}
+               + (" FROM " + TourDatabase.TABLE_TOUR_GEO_PARTS + NL) //      //$NON-NLS-1$
+               + (" WHERE GeoPart IN (" + sqlInParameters + ")") + NL //      //$NON-NLS-1$ //$NON-NLS-2$
+         ;
 
-			conn = TourDatabase.getInstance().getConnection();
+         if (isAppFilter) {
 
-			/*
-			 * Fill parameters
-			 */
-			final PreparedStatement statement = conn.prepareStatement(select);
+            final String selectAppFilter = "SELECT" + NL //                    //$NON-NLS-1$
 
-			for (int partIndex = 0; partIndex < numGeoParts; partIndex++) {
-				statement.setInt(partIndex + 1, requestedGeoParts[partIndex]);
-			}
+                  + " TourId" + NL //                                 //$NON-NLS-1$
+                  + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //         //$NON-NLS-1$
 
-			if (isAppFilter) {
-				appFilter.setParameters(statement, 1 + numGeoParts);
-			}
+// this is very slow
+//                  // get tag id's
+//                  + (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag") + NL //$NON-NLS-1$ //$NON-NLS-2$
+//                  + (" ON tourID = jTdataTtag.TourData_tourId") + NL //$NON-NLS-1$
 
-			/*
-			 * Get tour id's
-			 */
-			final ResultSet result = statement.executeQuery();
+                  + " WHERE 1=1 " + appFilter.getWhereClause() + NL//         //$NON-NLS-1$
+            ;
 
-			final TLongArrayList tourIds = new TLongArrayList();
+            select = selectGeoPart
 
-			while (result.next()) {
-				tourIds.add(result.getLong(1));
-			}
+                  + " AND TourId IN (" + selectAppFilter + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+         } else {
 
-			loaderItem.tourIds = tourIds.toArray();
+            select = selectGeoPart;
+         }
 
-		} catch (final SQLException e) {
+         conn = TourDatabase.getInstance().getConnection();
 
-			StatusUtil.log(select);
-			net.tourbook.ui.UI.showSQLException(e);
+         /*
+          * Fill parameters
+          */
+         final PreparedStatement statement = conn.prepareStatement(select);
 
-		} finally {
+         for (int partIndex = 0; partIndex < numGeoParts; partIndex++) {
+            statement.setInt(partIndex + 1, requestedGeoParts[partIndex]);
+         }
 
-			Util.closeSql(conn);
-		}
+         if (isAppFilter) {
+            appFilter.setParameters(statement, 1 + numGeoParts);
+         }
 
-		final long timeDiff = System.currentTimeMillis() - start;
+         /*
+          * Get tour id's
+          */
+         final ResultSet result = statement.executeQuery();
 
-		loaderItem.sqlRunningTime = timeDiff;
+         final TLongArrayList tourIds = new TLongArrayList();
 
-//		System.out.println(
-//				(UI.timeStampNano() + " [" + GeoPart_TourLoader.class.getSimpleName() + "] ")
-//						+ "loadTourGeoPartsFromDB\t" + timeDiff + " ms");
+         while (result.next()) {
+            tourIds.add(result.getLong(1));
+         }
+
+         loaderItem.tourIds = tourIds.toArray();
+
+      } catch (final SQLException e) {
+
+         StatusUtil.log(select);
+         net.tourbook.ui.UI.showSQLException(e);
+
+      } finally {
+
+         Util.closeSql(conn);
+      }
+
+      final long timeDiff = System.currentTimeMillis() - start;
+
+      loaderItem.sqlRunningTime = timeDiff;
+
+//      System.out.println(
+//            (UI.timeStampNano() + " [" + GeoPart_TourLoader.class.getSimpleName() + "] ")
+//                  + "loadTourGeoPartsFromDB\t" + timeDiff + " ms");
 //// TODO remove SYSTEM.OUT.PRINTLN
 
-		if (loaderItem.isCanceled) {
-			return false;
-		}
+      if (loaderItem.isCanceled) {
+         return false;
+      }
 
-		return true;
-	}
+      return true;
+   }
 
-	/**
-	 * @param geoParts
-	 *            Requested geo parts
-	 * @param lonPartNormalized
-	 * @param latPartNormalized
-	 * @param useAppFilter
-	 * @param previousLoaderItem
-	 * @param geoPartView
-	 * @return
-	 */
-	static GeoPartItem loadToursFromGeoParts(	final int[] geoParts,
-												final NormalizedGeoData normalizedTourPart,
-												final boolean useAppFilter,
-												final GeoPartItem previousLoaderItem,
-												final GeoCompareView geoPartView) {
+   /**
+    * @param geoParts
+    *           Requested geo parts
+    * @param lonPartNormalized
+    * @param latPartNormalized
+    * @param useAppFilter
+    * @param previousLoaderItem
+    * @param geoPartView
+    * @return
+    */
+   static GeoPartItem loadToursFromGeoParts(final int[] geoParts,
+                                            final NormalizedGeoData normalizedTourPart,
+                                            final boolean useAppFilter,
+                                            final GeoPartItem previousLoaderItem,
+                                            final GeoCompareView geoPartView) {
 
-		stopLoading(previousLoaderItem);
+      stopLoading(previousLoaderItem);
 
-		// invalidate old requests
-		final long executerId = _loaderExecuterId.incrementAndGet();
+      // invalidate old requests
+      final long executerId = _loaderExecuterId.incrementAndGet();
 
-//		System.out.println(
-//				("[" + GeoPartTourLoader.class.getSimpleName() + "] loadToursFromGeoParts()")
-//						+ ("\texecuterId: " + executerId));
+//      System.out.println(
+//            ("[" + GeoPartTourLoader.class.getSimpleName() + "] loadToursFromGeoParts()")
+//                 + ("\texecuterId: " + executerId));
 //// TODO remove SYSTEM.OUT.PRINTLN
 
-		final GeoPartItem loaderItem = new GeoPartItem(
-				executerId,
-				geoParts,
-				normalizedTourPart,
-				useAppFilter);
+      final GeoPartItem loaderItem = new GeoPartItem(
+            executerId,
+            geoParts,
+            normalizedTourPart,
+            useAppFilter);
 
-		_loaderWaitingQueue.add(loaderItem);
+      _loaderWaitingQueue.add(loaderItem);
 
-		final Runnable executorTask = new Runnable() {
-			@Override
-			public void run() {
+      final Runnable executorTask = new Runnable() {
+         @Override
+         public void run() {
 
-				// get last added loader item
-				final GeoPartItem loaderItem = _loaderWaitingQueue.pollFirst();
+            // get last added loader item
+            final GeoPartItem loaderItem = _loaderWaitingQueue.pollFirst();
 
-				if (loaderItem == null) {
-					return;
-				}
+            if (loaderItem == null) {
+               return;
+            }
 
-				if (loadTourGeoPartsFromDB(loaderItem)) {
-					geoPartView.compare_40_CompareTours(loaderItem);
-				}
-			}
-		};
+            if (loadTourGeoPartsFromDB(loaderItem)) {
+               geoPartView.compare_40_CompareTours(loaderItem);
+            }
+         }
+      };
 
-		_loadingExecutor.submit(executorTask);
+      _loadingExecutor.submit(executorTask);
 
-		return loaderItem;
-	}
+      return loaderItem;
+   }
 
-	/**
-	 * Stop loading and comparing of the tours in the waiting queue.
-	 * 
-	 * @param loaderItem
-	 */
-	static void stopLoading(final GeoPartItem loaderItem) {
+   /**
+    * Stop loading and comparing of the tours in the waiting queue.
+    *
+    * @param loaderItem
+    */
+   static void stopLoading(final GeoPartItem loaderItem) {
 
-		if (loaderItem != null) {
-			loaderItem.isCanceled = true;
-		}
-	}
+      if (loaderItem != null) {
+         loaderItem.isCanceled = true;
+      }
+   }
 
 }

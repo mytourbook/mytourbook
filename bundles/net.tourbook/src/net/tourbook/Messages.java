@@ -796,6 +796,7 @@ public class Messages extends NLS {
    public static String        HRV_View_Label_RightChartBorder;
    public static String        HRV_View_Label_RightChartBorder_Tooltip;
 
+
    public static String        Image__App_Add;
    public static String        Image__App_Add_2x;
    public static String        Image__App_Cancel;
@@ -806,7 +807,6 @@ public class Messages extends NLS {
    public static String        Image__App_Close;
    public static String        Image__App_Edit_Paste;
    public static String        Image__App_Filter;
-
    public static String        Image__App_Filter_Disabled;
    public static String        Image__App_OK;
    public static String        Image__App_RestoreDefault;
@@ -951,9 +951,8 @@ public class Messages extends NLS {
    public static String        Image__synch_statistics_Disabled;
    public static String        Image__SearchExternal;
    public static String        Image__SearchExternal_Disabled;
-
+   public static String        Image__SearchToursByLocation;
    public static String        Image__Smoothing;
-
    public static String        Image__Smoothing_Disabled;
    public static String        Image__State_AdjustTemperature;
    public static String        Image__State_Copy;
