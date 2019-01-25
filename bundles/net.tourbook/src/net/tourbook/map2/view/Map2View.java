@@ -470,7 +470,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
       public ActionSearchTourByLocation() {
 
-         setText(Messages.Map_Action_SearchToursByLocation);
+         setText(Messages.Map_Action_SearchTourByLocation);
 
          setImageDescriptor(TourbookPlugin.getImageDescriptor(IMAGE_SEARCH_TOURS_BY_LOCATION));
       }
@@ -583,8 +583,8 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
    }
 
    public void actionSearchTourByLocation(final Event event) {
-      // TODO Auto-generated method stub
 
+      _map.actionManageOfflineImages(event);
    }
 
    public void actionSetDefaultPosition() {
