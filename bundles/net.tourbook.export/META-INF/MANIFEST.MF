@@ -11,7 +11,7 @@ Require-Bundle: org.eclipse.core.runtime,
  net.tourbook.ext.jars,
  net.tourbook.common,
  net.tourbook.ext.velocity
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Import-Package: net.tourbook,
  net.tourbook.application,
@@ -28,3 +28,4 @@ Import-Package: net.tourbook,
  org.dinopolis.gpstool.gpsinput,
  org.dinopolis.gpstool.gpsinput.garmin,
  org.dinopolis.util.text
+Automatic-Module-Name: net.tourbook.export

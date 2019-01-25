@@ -190,4 +190,5 @@ Export-Package: com.enterprisedt,
  org.xmlpull.v1,
  org.xmlunit.builder,
  org.xmlunit.diff
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Automatic-Module-Name: net.tourbook.ext.jars

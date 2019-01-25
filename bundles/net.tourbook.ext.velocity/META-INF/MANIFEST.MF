@@ -62,3 +62,4 @@ Export-Package: net.tourbook.ext.velocity,
  org.dinopolis.util.servicediscovery,
  org.dinopolis.util.text
 Import-Package: net.tourbook.common.util
+Automatic-Module-Name: net.tourbook.ext.velocity

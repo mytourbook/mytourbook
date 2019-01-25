@@ -13,7 +13,7 @@ Require-Bundle: org.eclipse.core.runtime,
  net.tourbook.ext.jars.printing
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: MyTourbook
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ClassPath: .,
  fit-20.66.00.jar
 Import-Package: net.tourbook.common,
@@ -22,3 +22,4 @@ Import-Package: net.tourbook.common,
  net.tourbook.importdata,
  net.tourbook.tour,
  net.tourbook.ui.tourChart
+Automatic-Module-Name: net.tourbook.device.garmin.fit

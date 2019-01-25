@@ -207,3 +207,4 @@ Export-Package:
  org.apache.xmlgraphics.xmp.schemas.pdf,
  org.w3c.dom,
  org.w3c.dom.events
+Automatic-Module-Name: net.tourbook.ext.jars.printing

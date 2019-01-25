@@ -39,3 +39,4 @@ Export-Package: org.geotools.data.ows;
    org.opengis.referencing.crs,
    org.opengis.util"
 Bundle-Vendor: Geoclipse
+Automatic-Module-Name: net.tourbook.ext.geoclipse

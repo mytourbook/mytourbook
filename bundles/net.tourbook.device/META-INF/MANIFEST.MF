@@ -13,7 +13,7 @@ Bundle-ActivationPolicy: lazy
 Export-Package: net.tourbook.device,
  net.tourbook.device.polar.hrm
 Bundle-Vendor: MyTourbook
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: de.byteholder.geoclipse.map,
  net.tourbook,
  net.tourbook.application,
@@ -33,3 +33,4 @@ Import-Package: de.byteholder.geoclipse.map,
  org.json,
  org.xmlunit.diff,
  org.xmlunit.builder
+Automatic-Module-Name: net.tourbook.device

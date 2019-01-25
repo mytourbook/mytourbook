@@ -11,7 +11,7 @@ Require-Bundle: org.eclipse.ui,
  net.tourbook.common,
  net.tourbook.ext.jars,
  net.tourbook.ext.jars.printing
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Import-Package: net.tourbook.application,
  net.tourbook.common,
@@ -21,3 +21,4 @@ Import-Package: net.tourbook.application,
  net.tourbook.ui,
  org.apache.fop.apps,
  org.apache.xmlgraphics.util
+Automatic-Module-Name: net.tourbook.printing

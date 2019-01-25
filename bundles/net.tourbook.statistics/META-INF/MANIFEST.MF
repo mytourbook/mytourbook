@@ -12,7 +12,7 @@ Require-Bundle: org.eclipse.ui,
  net.tourbook.common
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: %Bundle-Vendor
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: gnu.trove.list.array,
  net.tourbook,
  net.tourbook.application,
@@ -29,3 +29,4 @@ Import-Package: gnu.trove.list.array,
  net.tourbook.ui,
  net.tourbook.ui.action,
  org.eclipse.ui.forms.widgets
+Automatic-Module-Name: net.tourbook.statistics

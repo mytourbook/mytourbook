@@ -4,7 +4,7 @@ Bundle-Name: Web Resources
 Bundle-SymbolicName: net.tourbook.web;singleton:=true
 Bundle-Version: 18.13.1.qualifier
 Bundle-Activator: net.tourbook.web.Activator
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: MyTourbook
 Bundle-Localization: plugin
@@ -18,3 +18,4 @@ Import-Package: net.tourbook.common,
  net.tourbook.common.util,
  org.json
 Bundle-ClassPath: .
+Automatic-Module-Name: net.tourbook.web
