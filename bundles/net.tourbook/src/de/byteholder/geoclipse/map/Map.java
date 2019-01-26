@@ -322,8 +322,8 @@ public class Map extends Canvas {
       _nf3.setMaximumFractionDigits(3);
 
       _nfLatLon = NumberFormat.getNumberInstance();
-      _nfLatLon.setMinimumFractionDigits(5);
-      _nfLatLon.setMaximumFractionDigits(5);
+      _nfLatLon.setMinimumFractionDigits(4);
+      _nfLatLon.setMaximumFractionDigits(4);
    }
 
    private final TextWrapPainter                    _textWrapper             = new TextWrapPainter();
@@ -406,7 +406,8 @@ public class Map extends Canvas {
    /**
     * Size of a geo grid 0.01 degree in pixel
     */
-   private int                                      _geoGridPixelSize;
+   private int                                      _geoGridPixelSizeX;
+   private int                                      _geoGridPixelSizeY;
 
    /**
     * Contains the client area of the map without trimmings, this rectangle has the width and height
@@ -477,10 +478,10 @@ public class Map extends Canvas {
    private boolean   _offline_IsOfflineSelectionStarted;
    private boolean   _offline_IsPaintOfflineArea;
 
-   private Point     _offline_DevGeoStart;
-   private Point     _offline_DevGeoEnd;
-   private Point     _offline_DevMouseStart;
-   private Point     _offline_DevMouseEnd;
+   private Point     _offline_DevGeoGrid_Start;
+   private Point     _offline_DevGeoGrid_End;
+   private Point     _offline_DevMouse_Start;
+   private Point     _offline_DevMouse_End;
    private Point     _offline_DevTileStart;
    private Point     _offline_DevTileEnd;
 
@@ -601,7 +602,7 @@ public class Map extends Canvas {
          return;
       }
 
-      if (_offline_DevMouseStart != null //
+      if (_offline_DevMouse_Start != null //
 
             && _offline_CurrentOfflineArea != null
             && (event.stateMask & SWT.CONTROL) != 0) {
@@ -624,8 +625,8 @@ public class Map extends Canvas {
 //      _offline_PreviousOfflineArea = _offline_CurrentOfflineArea;
 //      _offline_PreviousOfflineArea_MapZoomLevel = _mapZoomLevel;
 
-      _offline_DevMouseStart = null;
-      _offline_DevMouseEnd = null;
+      _offline_DevMouse_Start = null;
+      _offline_DevMouse_End = null;
 
       _offline_IsPaintOfflineArea = true;
       _offline_IsSelectingOfflineArea = true;
@@ -1551,15 +1552,27 @@ public class Map extends Canvas {
 
       // truncate below round to 0.01
 
-      final double geoLat = Math.round(geoPos.latitude * 100) / 100;
-      final double geoLon = Math.round(geoPos.longitude * 100) / 100;
+      final double geoLat = (int) (geoPos.latitude * 100) / 100.0;
+      final double geoLon = (int) (geoPos.longitude * 100) / 100.0;
 
       final java.awt.Point worldGrid = _mp.geoToPixel(new GeoPosition(geoLat, geoLon), _mapZoomLevel);
 
       // get device rectangle for position
-      return new Point(//
+      final Point gridGeoPos = new Point(//
             worldGrid.x - _worldPixelTopLeftViewport.x,
             worldGrid.y - _worldPixelTopLeftViewport.y);
+
+//      System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ()")
+//
+//            + String.format("%3.3f %3.3f", geoLat, geoLon)
+//            + ("\tgeoLat: " + geoLat * 100.0)
+//            + ("\tgeoLon: " + geoLon * 100.0)
+////            + ("\t: " + )
+////            + ("\t: " + )
+//      );
+//// TODO remove SYSTEM.OUT.PRINTLN
+
+      return gridGeoPos;
    }
 
    private Point offline_GetTilePosition(final int worldPosX, final int worldPosY) {
@@ -1615,11 +1628,11 @@ public class Map extends Canvas {
       final int worldMouseX = _worldPixelTopLeftViewport.x + mouseEvent.x;
       final int worldMouseY = _worldPixelTopLeftViewport.y + mouseEvent.y;
 
-      _offline_DevMouseEnd = new Point(mouseEvent.x, mouseEvent.y);
+      _offline_DevMouse_End = new Point(mouseEvent.x, mouseEvent.y);
       _offline_WorldEnd = new Point(worldMouseX, worldMouseY);
 
       _offline_DevTileEnd = offline_GetTilePosition(worldMouseX, worldMouseY);
-      _offline_DevGeoEnd = offline_GetGeoGridPosition(worldMouseX, worldMouseY);
+      _offline_DevGeoGrid_End = offline_GetGeoGridPosition(worldMouseX, worldMouseY);
    }
 
    /**
@@ -1794,14 +1807,14 @@ public class Map extends Canvas {
          final int worldMouseX = _worldPixelTopLeftViewport.x + mouseEvent.x;
          final int worldMouseY = _worldPixelTopLeftViewport.y + mouseEvent.y;
 
-         _offline_DevMouseStart = new Point(mouseEvent.x, mouseEvent.y);
-         _offline_DevMouseEnd = _offline_DevMouseStart;
+         _offline_DevMouse_Start = new Point(mouseEvent.x, mouseEvent.y);
+         _offline_DevMouse_End = _offline_DevMouse_Start;
 
          _offline_WorldStart = new Point(worldMouseX, worldMouseY);
          _offline_WorldEnd = _offline_WorldStart;
 
          _offline_DevTileStart = offline_GetTilePosition(worldMouseX, worldMouseY);
-         _offline_DevGeoStart = offline_GetGeoGridPosition(worldMouseX, worldMouseY);
+         _offline_DevGeoGrid_Start = offline_GetGeoGridPosition(worldMouseX, worldMouseY);
 
          redraw();
 
@@ -2347,7 +2360,7 @@ public class Map extends Canvas {
       }
 
       // check if mouse button is hit which sets the start position
-      if ((_offline_DevMouseStart == null) || (_offline_WorldMouseMove == null)) {
+      if ((_offline_DevMouse_Start == null) || (_offline_WorldMouseMove == null)) {
          return;
       }
 
@@ -2377,69 +2390,165 @@ public class Map extends Canvas {
 //         }
 //      }
 
+      final int devArea_Start_X = _offline_DevMouse_Start.x;
+      final int devArea_Start_Y = _offline_DevMouse_Start.y;
+      final int devArea_End_X = _offline_DevMouse_End.x;
+      final int devArea_End_Y = _offline_DevMouse_End.y;
+
+      final int devArea_X1;
+      final int devArea_Y1;
+
+      final int devArea_X2;
+      final int devArea_Y2;
+
+      final int devArea_Width;
+      final int devArea_Height;
+
+      if (devArea_Start_X < devArea_End_X) {
+
+         devArea_X1 = devArea_Start_X;
+         devArea_X2 = devArea_End_X;
+         devArea_Width = devArea_End_X - devArea_Start_X;
+
+      } else {
+
+         devArea_X1 = devArea_End_X;
+         devArea_X2 = devArea_Start_X;
+         devArea_Width = devArea_Start_X - devArea_End_X;
+      }
+
+      if (devArea_Start_Y < devArea_End_Y) {
+
+         devArea_Y1 = devArea_Start_Y;
+         devArea_Y2 = devArea_End_Y;
+         devArea_Height = devArea_End_Y - devArea_Start_Y;
+
+      } else {
+
+         devArea_Y1 = devArea_End_Y;
+         devArea_Y2 = devArea_Start_Y;
+         devArea_Height = devArea_Start_Y - devArea_End_Y;
+      }
+
       /*
        * Draw geo grid
        */
-      final int devGeoStartX = _offline_DevGeoStart.x;
-      final int devGeoStartY = _offline_DevGeoStart.y;
-      final int devGeoEndX = _offline_DevGeoEnd.x;
-      final int devGeoEndY = _offline_DevGeoEnd.y;
 
-      final int devGeoStartX2 = Math.min(devGeoStartX, devGeoEndX);
-      final int devGeoStartY2 = Math.min(devGeoStartY, devGeoEndY);
-      final int devGeoEndX2 = Math.max(devGeoStartX, devGeoEndX);
-      final int devGeoEndY2 = Math.max(devGeoStartY, devGeoEndY);
+      if (_geoGridPixelSizeX < 3 || _geoGridPixelSizeY < 6) {
 
-      final int minPixelSize = 10;
-      final int geoGridPixelSize = _geoGridPixelSize < minPixelSize
-            ? minPixelSize
-            : _geoGridPixelSize;
+         // geo grid has almost the same rectangle as the selected area
 
-      for (int devX = devGeoStartX2; devX <= devGeoEndX2; devX += geoGridPixelSize) {
-         for (int devY = devGeoStartY2; devY <= devGeoEndY2; devY += geoGridPixelSize) {
+      } else {
+
+         final int devGrid_StartX = _offline_DevGeoGrid_Start.x;
+         final int devGrid_StartY = _offline_DevGeoGrid_Start.y;
+
+         final int devGrid_EndX = _offline_DevGeoGrid_End.x;
+         final int devGrid_EndY = _offline_DevGeoGrid_End.y;
+
+         final int devGrid_X1 = Math.min(devGrid_StartX, devGrid_EndX);
+         final int devGrid_Y1 = Math.min(devGrid_StartY, devGrid_EndY);
+
+         final int devGrid_X2 = Math.max(devGrid_StartX, devGrid_EndX);
+         final int devGrid_Y2 = Math.max(devGrid_StartY, devGrid_EndY);
+
+//         System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//
+//               + String.format(
+//
+//                     "Area %4d...%-4d  - %4d...%-4d",
+//
+//                     devArea_X1,
+//                     devArea_X2,
+//
+//                     devArea_Y1,
+//                     devArea_Y2
+//
+//               ));
+//
+//         System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//
+//               + String.format(
+//
+//                     "Grid %4d...%-4d  - %4d...%-4d",
+//
+//                     devGrid_X1,
+//                     devGrid_X2,
+//
+//                     devGrid_Y1,
+//                     devGrid_Y2
+//
+//               ));
+//         System.out.println();
+//// TODO remove SYSTEM.OUT.PRINTLN
+
+         int devGrid_X1_adj;
+         int devGrid_Y1_adj;
+         int devGrid_X2_adj;
+         int devGrid_Y2_adj;
+
+         if (devGrid_X1 > devArea_X1) {
+            devGrid_X1_adj = devGrid_X1 - _geoGridPixelSizeX;
+         } else {
+            devGrid_X1_adj = devGrid_X1;
+         }
+         if (devGrid_X2 > devArea_X2) {
+            devGrid_X2_adj = devGrid_X2 - _geoGridPixelSizeX;
+         } else {
+            devGrid_X2_adj = devGrid_X2;
+         }
+
+//         if (devGrid_Y1 < devArea_Y1) {
+//         devGrid_Y1_adj = devGrid_Y1 - _geoGridPixelSizeY;
+//         } else {
+         devGrid_Y1_adj = devGrid_Y1;
+//         }
+//         if (devGrid_Y2 > devArea_Y2) {
+//         devGrid_Y2_adj = devGrid_Y2 - _geoGridPixelSizeY;
+//         } else {
+         devGrid_Y2_adj = devGrid_Y2;
+//         }
+
+         if (_geoGridPixelSizeX < 16 || _geoGridPixelSizeY < 32) {
+
+            // reduce number of rectangles -> draw only a box
+
+            final int width = devGrid_X2_adj - devGrid_X1_adj;
+            final int height = devGrid_Y2_adj - devGrid_Y1_adj;
 
             gc.setLineStyle(SWT.LINE_SOLID);
-            gc.setForeground(_display.getSystemColor(SWT.COLOR_RED));
-            gc.drawRectangle(devX, devY, geoGridPixelSize, geoGridPixelSize);
+            gc.setForeground(_display.getSystemColor(SWT.COLOR_WHITE));
+            gc.drawRectangle(devGrid_X1_adj, devGrid_Y1_adj, width, height);
 
-            gc.setLineStyle(SWT.LINE_DASH);
-            gc.setForeground(SYS_COLOR_DARK_GRAY);
-            gc.drawRectangle(devX, devY, geoGridPixelSize, geoGridPixelSize);
+         } else {
+
+            // draw geo grid
+
+            for (int devX = devGrid_X1_adj; devX <= devGrid_X2_adj; devX += _geoGridPixelSizeX) {
+               for (int devY = devGrid_Y1_adj; devY <= devGrid_Y2_adj; devY += _geoGridPixelSizeY) {
+
+                  gc.setLineStyle(SWT.LINE_SOLID);
+                  gc.setForeground(_display.getSystemColor(SWT.COLOR_RED));
+                  gc.drawRectangle(devX, devY, _geoGridPixelSizeX, _geoGridPixelSizeY);
+
+                  gc.setLineStyle(SWT.LINE_DASH);
+//                  gc.setForeground(_display.getSystemColor(SWT.COLOR_YELLOW));
+                  gc.setForeground(_display.getSystemColor(SWT.COLOR_YELLOW));
+                  gc.drawRectangle(devX, devY, _geoGridPixelSizeX, _geoGridPixelSizeY);
+               }
+            }
          }
       }
 
       /*
        * draw selected area box
        */
-      final int devAreaX1 = _offline_DevMouseStart.x;
-      final int devAreaX2 = _offline_DevMouseEnd.x;
-      final int devAreaY1 = _offline_DevMouseStart.y;
-      final int devAreaY2 = _offline_DevMouseEnd.y;
-      final int devX;
-      final int devY;
-      final int devWidth;
-      final int devHeight;
 
-      if (devAreaX1 < devAreaX2) {
-         devX = devAreaX1;
-         devWidth = devAreaX2 - devAreaX1;
-      } else {
-         devX = devAreaX2;
-         devWidth = devAreaX1 - devAreaX2;
-      }
-      if (devAreaY1 < devAreaY2) {
-         devY = devAreaY1;
-         devHeight = devAreaY2 - devAreaY1;
-      } else {
-         devY = devAreaY2;
-         devHeight = devAreaY1 - devAreaY2;
-      }
-
-      _offline_CurrentOfflineArea = new Rectangle(devX, devY, devWidth, devHeight);
+      _offline_CurrentOfflineArea = new Rectangle(devArea_X1, devArea_Y1, devArea_Width, devArea_Height);
 
       gc.setLineStyle(SWT.LINE_SOLID);
       gc.setForeground(SYS_COLOR_BLACK);
-      gc.drawRectangle(devX, devY, devWidth, devHeight);
+      gc.drawRectangle(devArea_X1, devArea_Y1, devArea_Width, devArea_Height);
 
       gc.setLineStyle(SWT.LINE_SOLID);
       gc.setForeground(SYS_COLOR_WHITE);
@@ -2447,7 +2556,7 @@ public class Map extends Canvas {
 
       gc.setBackground(_display.getSystemColor(SWT.COLOR_DARK_YELLOW));
       gc.setAlpha(0x30);
-      gc.fillRectangle(devX + 1, devY + 1, devWidth - 2, devHeight - 2);
+      gc.fillRectangle(devArea_X1 + 1, devArea_Y1 + 1, devArea_Width - 2, devArea_Height - 2);
       gc.setAlpha(0xff);
 
       /*
@@ -2456,9 +2565,9 @@ public class Map extends Canvas {
       gc.setForeground(SYS_COLOR_BLACK);
       gc.setBackground(SYS_COLOR_WHITE);
       final Point textExtend = gc.textExtent(Messages.Offline_Area_Label_AreaMarker);
-      int devYMarker = devY - textExtend.y;
+      int devYMarker = devArea_Y1 - textExtend.y;
       devYMarker = devYMarker < 0 ? 0 : devYMarker;
-      gc.drawText(Messages.Offline_Area_Label_AreaMarker, devX, devYMarker);
+      gc.drawText(Messages.Offline_Area_Label_AreaMarker, devArea_X1, devYMarker);
    }
 
    private void paintOfflineArea_10_Info(final GC gc) {
@@ -2469,7 +2578,7 @@ public class Map extends Canvas {
       final StringBuilder sb = new StringBuilder();
       sb.append(Messages.Offline_Area_Label_SelectInfo);
 
-      if (_offline_DevMouseStart != null) {
+      if (_offline_DevMouse_Start != null) {
 
          // display offline area geo position
 
@@ -4600,14 +4709,22 @@ public class Map extends Canvas {
       final GeoPosition geoPos = _mp.pixelToGeo(viewportMapCenter_worldPixel, _mapZoomLevel);
 
       // round to 0.01
-      final double geoLat1 = Math.round(geoPos.latitude * 100) / 100;
-      final double geoLon1 = Math.round(geoPos.longitude * 100) / 100;
+      final double geoLat1 = Math.round(geoPos.latitude * 100) / 100.0;
+      final double geoLon1 = Math.round(geoPos.longitude * 100) / 100.0;
+      final double geoLat2 = geoLat1 + 0.01;
       final double geoLon2 = geoLon1 + 0.01;
 
       final java.awt.Point worldGrid1 = _mp.geoToPixel(new GeoPosition(geoLat1, geoLon1), _mapZoomLevel);
-      final java.awt.Point worldGrid2 = _mp.geoToPixel(new GeoPosition(geoLat1, geoLon2), _mapZoomLevel);
+      final java.awt.Point worldGrid2 = _mp.geoToPixel(new GeoPosition(geoLat2, geoLon2), _mapZoomLevel);
 
-      _geoGridPixelSize = worldGrid2.x - worldGrid1.x;
+      _geoGridPixelSizeX = Math.abs(worldGrid2.x - worldGrid1.x);
+      _geoGridPixelSizeY = Math.abs(worldGrid2.y - worldGrid1.y);
+
+//      System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ()")
+//            + ("\t_geoGridPixelSizeX: " + _geoGridPixelSizeX)
+//            + ("\t_geoGridPixelSizeY: " + _geoGridPixelSizeY)
+//            );
+//// TODO remove SYSTEM.OUT.PRINTLN
    }
 
    public void zoomIn() {
