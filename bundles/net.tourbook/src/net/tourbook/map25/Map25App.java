@@ -77,6 +77,7 @@ import org.oscim.theme.ThemeLoader;
 import org.oscim.theme.VtmThemes;
 import org.oscim.theme.XmlRenderThemeMenuCallback;
 import org.oscim.theme.XmlRenderThemeStyleLayer;
+import org.oscim.tiling.TileSource;
 import org.oscim.tiling.TileSource.OpenResult;
 import org.oscim.tiling.source.UrlTileSource;
 import org.oscim.tiling.source.bitmap.DefaultSources;
@@ -930,8 +931,13 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		System.out.println("################ setupMap_Layers:  entering"); //$NON-NLS-1$
 		final Layers layers = mMap.layers();
 		
-		// hillshading with 2MB RAM Cache
-		_layer_HillShading = new BitmapTileLayer(mMap, DefaultSources.HIKEBIKE_HILLSHADE.build(), 1 << 21);
+		// hillshading with 2MB RAM Cache, using existing _httpfactory with diskcache
+      TileSource hillshadingSource =  DefaultSources.HIKEBIKE_HILLSHADE
+            .httpFactory(_httpFactory)
+            .zoomMin(1)
+            .zoomMax(16)
+            .build();  
+		_layer_HillShading = new BitmapTileLayer(mMap, hillshadingSource, 1 << 21);
 		_layer_HillShading.setEnabled(false);
 		mMap.layers().add(_layer_HillShading);
 		
