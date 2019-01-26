@@ -1711,6 +1711,9 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
       tbm.add(_actionShowAllFilteredPhotos);
       tbm.add(_actionSyncMap_WithPhoto);
       tbm.add(new Separator());
+      
+      tbm.add(_actionMapBookmarks);
+      tbm.add(new Separator());
 
       tbm.add(_actionShowTour);
       tbm.add(_actionZoom_ShowEntireTour);
@@ -1725,7 +1728,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
       tbm.add(_actionZoom_Centered);
       tbm.add(new Separator());
 
-      tbm.add(_actionMapBookmarks);
+      //tbm.add(_actionMapBookmarks);
       tbm.add(_actionSelectMapProvider);
 
       /*
