@@ -930,7 +930,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 	private void setupMap_Layers() {
 		System.out.println("################ setupMap_Layers:  entering"); //$NON-NLS-1$
 		final Layers layers = mMap.layers();
-		
+
 		// hillshading with 2MB RAM Cache, using existing _httpfactory with diskcache
       TileSource hillshadingSource =  DefaultSources.HIKEBIKE_HILLSHADE
             .httpFactory(_httpFactory)
