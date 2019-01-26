@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <TourData>
 	<tourStartTime>1536852810738</tourStartTime>
-	<tourEndTime>1536857112738</tourEndTime>
+	<tourEndTime>1536857109738</tourEndTime>
 	<startYear>2018</startYear>
 	<startMonth>9</startMonth>
 	<startDay>13</startDay>
@@ -9,14 +9,14 @@
 	<startMinute>33</startMinute>
 	<startSecond>30</startSecond>
 	<startWeek>37</startWeek>
-	<tourRecordingTime>4302</tourRecordingTime>
-	<tourDrivingTime>3698</tourDrivingTime>
+	<tourRecordingTime>4299</tourRecordingTime>
+	<tourDrivingTime>3695</tourDrivingTime>
 	<timeZoneId>America/Boise</timeZoneId>
 	<tourDistance>6608.0</tourDistance>
 	<tourAltUp>343</tourAltUp>
 	<tourAltDown>343</tourAltDown>
 	<restPulse>0</restPulse>
-	<avgPulse>137.03874</avgPulse>
+	<avgPulse>137.06508</avgPulse>
 	<maxPulse>184.79999</maxPulse>
 	<maxAltitude>2016.2</maxAltitude>
 	<maxSpeed>10.398374</maxSpeed>
@@ -24,18 +24,20 @@
 	<TourMarkers/>
 	<TimeSeries>
 		<TimeSerie>0</TimeSerie>
-		<TimeSerie>3</TimeSerie>
-		<TimeSerie>26</TimeSerie>
-		<TimeSerie>30</TimeSerie>
-		<TimeSerie>35</TimeSerie>
+		<TimeSerie>23</TimeSerie>
+		<TimeSerie>27</TimeSerie>
+		<TimeSerie>32</TimeSerie>
+		<TimeSerie>36</TimeSerie>
 		<TimeSerie>39</TimeSerie>
+		<TimeSerie>41</TimeSerie>
 		<TimeSerie>42</TimeSerie>
+		<TimeSerie>43</TimeSerie>
 		<TimeSerie>44</TimeSerie>
 		<TimeSerie>45</TimeSerie>
-		<TimeSerie>46</TimeSerie>
-		<TimeSerie>47</TimeSerie>
-		<TimeSerie>48</TimeSerie>
-		<TimeSerie>52</TimeSerie>
+		<TimeSerie>49</TimeSerie>
+		<TimeSerie>53</TimeSerie>
+		<TimeSerie>54</TimeSerie>
+		<TimeSerie>55</TimeSerie>
 		<TimeSerie>56</TimeSerie>
 		<TimeSerie>57</TimeSerie>
 		<TimeSerie>58</TimeSerie>
@@ -49,34 +51,34 @@
 		<TimeSerie>66</TimeSerie>
 		<TimeSerie>67</TimeSerie>
 		<TimeSerie>68</TimeSerie>
-		<TimeSerie>69</TimeSerie>
 		<TimeSerie>70</TimeSerie>
-		<TimeSerie>71</TimeSerie>
-		<TimeSerie>73</TimeSerie>
-		<TimeSerie>75</TimeSerie>
-		<TimeSerie>77</TimeSerie>
-		<TimeSerie>83</TimeSerie>
-		<TimeSerie>87</TimeSerie>
+		<TimeSerie>72</TimeSerie>
+		<TimeSerie>74</TimeSerie>
+		<TimeSerie>80</TimeSerie>
+		<TimeSerie>84</TimeSerie>
+		<TimeSerie>85</TimeSerie>
 		<TimeSerie>88</TimeSerie>
+		<TimeSerie>89</TimeSerie>
+		<TimeSerie>90</TimeSerie>
 		<TimeSerie>91</TimeSerie>
 		<TimeSerie>92</TimeSerie>
 		<TimeSerie>93</TimeSerie>
 		<TimeSerie>94</TimeSerie>
 		<TimeSerie>95</TimeSerie>
 		<TimeSerie>96</TimeSerie>
-		<TimeSerie>97</TimeSerie>
 		<TimeSerie>98</TimeSerie>
-		<TimeSerie>99</TimeSerie>
-		<TimeSerie>101</TimeSerie>
-		<TimeSerie>103</TimeSerie>
+		<TimeSerie>100</TimeSerie>
+		<TimeSerie>102</TimeSerie>
+		<TimeSerie>104</TimeSerie>
 		<TimeSerie>105</TimeSerie>
-		<TimeSerie>107</TimeSerie>
+		<TimeSerie>106</TimeSerie>
 		<TimeSerie>108</TimeSerie>
 		<TimeSerie>109</TimeSerie>
+		<TimeSerie>110</TimeSerie>
 		<TimeSerie>111</TimeSerie>
-		<TimeSerie>112</TimeSerie>
-		<TimeSerie>113</TimeSerie>
-		<TimeSerie>114</TimeSerie>
+		<TimeSerie>116</TimeSerie>
+		<TimeSerie>117</TimeSerie>
+		<TimeSerie>118</TimeSerie>
 		<TimeSerie>119</TimeSerie>
 		<TimeSerie>120</TimeSerie>
 		<TimeSerie>121</TimeSerie>
@@ -84,106 +86,106 @@
 		<TimeSerie>123</TimeSerie>
 		<TimeSerie>124</TimeSerie>
 		<TimeSerie>125</TimeSerie>
-		<TimeSerie>126</TimeSerie>
 		<TimeSerie>127</TimeSerie>
 		<TimeSerie>128</TimeSerie>
 		<TimeSerie>130</TimeSerie>
-		<TimeSerie>131</TimeSerie>
-		<TimeSerie>133</TimeSerie>
-		<TimeSerie>135</TimeSerie>
-		<TimeSerie>142</TimeSerie>
+		<TimeSerie>132</TimeSerie>
+		<TimeSerie>139</TimeSerie>
+		<TimeSerie>147</TimeSerie>
+		<TimeSerie>149</TimeSerie>
 		<TimeSerie>150</TimeSerie>
-		<TimeSerie>152</TimeSerie>
-		<TimeSerie>153</TimeSerie>
-		<TimeSerie>163</TimeSerie>
+		<TimeSerie>160</TimeSerie>
+		<TimeSerie>164</TimeSerie>
+		<TimeSerie>165</TimeSerie>
 		<TimeSerie>167</TimeSerie>
-		<TimeSerie>168</TimeSerie>
-		<TimeSerie>170</TimeSerie>
+		<TimeSerie>169</TimeSerie>
+		<TimeSerie>171</TimeSerie>
 		<TimeSerie>172</TimeSerie>
 		<TimeSerie>174</TimeSerie>
 		<TimeSerie>175</TimeSerie>
-		<TimeSerie>177</TimeSerie>
 		<TimeSerie>178</TimeSerie>
-		<TimeSerie>181</TimeSerie>
+		<TimeSerie>180</TimeSerie>
 		<TimeSerie>183</TimeSerie>
-		<TimeSerie>186</TimeSerie>
-		<TimeSerie>188</TimeSerie>
-		<TimeSerie>190</TimeSerie>
-		<TimeSerie>192</TimeSerie>
-		<TimeSerie>194</TimeSerie>
-		<TimeSerie>201</TimeSerie>
-		<TimeSerie>210</TimeSerie>
-		<TimeSerie>215</TimeSerie>
-		<TimeSerie>219</TimeSerie>
-		<TimeSerie>224</TimeSerie>
-		<TimeSerie>229</TimeSerie>
-		<TimeSerie>235</TimeSerie>
-		<TimeSerie>248</TimeSerie>
-		<TimeSerie>269</TimeSerie>
-		<TimeSerie>281</TimeSerie>
+		<TimeSerie>185</TimeSerie>
+		<TimeSerie>187</TimeSerie>
+		<TimeSerie>189</TimeSerie>
+		<TimeSerie>191</TimeSerie>
+		<TimeSerie>198</TimeSerie>
+		<TimeSerie>207</TimeSerie>
+		<TimeSerie>212</TimeSerie>
+		<TimeSerie>216</TimeSerie>
+		<TimeSerie>221</TimeSerie>
+		<TimeSerie>226</TimeSerie>
+		<TimeSerie>232</TimeSerie>
+		<TimeSerie>245</TimeSerie>
+		<TimeSerie>266</TimeSerie>
+		<TimeSerie>278</TimeSerie>
+		<TimeSerie>282</TimeSerie>
 		<TimeSerie>285</TimeSerie>
-		<TimeSerie>288</TimeSerie>
-		<TimeSerie>290</TimeSerie>
+		<TimeSerie>287</TimeSerie>
+		<TimeSerie>289</TimeSerie>
 		<TimeSerie>292</TimeSerie>
-		<TimeSerie>295</TimeSerie>
-		<TimeSerie>308</TimeSerie>
-		<TimeSerie>314</TimeSerie>
-		<TimeSerie>331</TimeSerie>
-		<TimeSerie>337</TimeSerie>
-		<TimeSerie>342</TimeSerie>
-		<TimeSerie>346</TimeSerie>
-		<TimeSerie>350</TimeSerie>
-		<TimeSerie>354</TimeSerie>
-		<TimeSerie>452</TimeSerie>
-		<TimeSerie>458</TimeSerie>
-		<TimeSerie>459</TimeSerie>
-		<TimeSerie>463</TimeSerie>
-		<TimeSerie>467</TimeSerie>
-		<TimeSerie>468</TimeSerie>
-		<TimeSerie>472</TimeSerie>
-		<TimeSerie>478</TimeSerie>
-		<TimeSerie>484</TimeSerie>
-		<TimeSerie>491</TimeSerie>
-		<TimeSerie>498</TimeSerie>
-		<TimeSerie>503</TimeSerie>
-		<TimeSerie>509</TimeSerie>
-		<TimeSerie>515</TimeSerie>
-		<TimeSerie>517</TimeSerie>
-		<TimeSerie>524</TimeSerie>
-		<TimeSerie>531</TimeSerie>
-		<TimeSerie>541</TimeSerie>
-		<TimeSerie>545</TimeSerie>
-		<TimeSerie>550</TimeSerie>
-		<TimeSerie>554</TimeSerie>
-		<TimeSerie>559</TimeSerie>
-		<TimeSerie>564</TimeSerie>
-		<TimeSerie>568</TimeSerie>
-		<TimeSerie>572</TimeSerie>
-		<TimeSerie>576</TimeSerie>
-		<TimeSerie>580</TimeSerie>
-		<TimeSerie>584</TimeSerie>
+		<TimeSerie>305</TimeSerie>
+		<TimeSerie>311</TimeSerie>
+		<TimeSerie>328</TimeSerie>
+		<TimeSerie>334</TimeSerie>
+		<TimeSerie>339</TimeSerie>
+		<TimeSerie>343</TimeSerie>
+		<TimeSerie>347</TimeSerie>
+		<TimeSerie>351</TimeSerie>
+		<TimeSerie>449</TimeSerie>
+		<TimeSerie>455</TimeSerie>
+		<TimeSerie>456</TimeSerie>
+		<TimeSerie>460</TimeSerie>
+		<TimeSerie>464</TimeSerie>
+		<TimeSerie>465</TimeSerie>
+		<TimeSerie>469</TimeSerie>
+		<TimeSerie>475</TimeSerie>
+		<TimeSerie>481</TimeSerie>
+		<TimeSerie>488</TimeSerie>
+		<TimeSerie>495</TimeSerie>
+		<TimeSerie>500</TimeSerie>
+		<TimeSerie>506</TimeSerie>
+		<TimeSerie>512</TimeSerie>
+		<TimeSerie>514</TimeSerie>
+		<TimeSerie>521</TimeSerie>
+		<TimeSerie>528</TimeSerie>
+		<TimeSerie>538</TimeSerie>
+		<TimeSerie>542</TimeSerie>
+		<TimeSerie>547</TimeSerie>
+		<TimeSerie>551</TimeSerie>
+		<TimeSerie>556</TimeSerie>
+		<TimeSerie>561</TimeSerie>
+		<TimeSerie>565</TimeSerie>
+		<TimeSerie>569</TimeSerie>
+		<TimeSerie>573</TimeSerie>
+		<TimeSerie>577</TimeSerie>
+		<TimeSerie>581</TimeSerie>
+		<TimeSerie>585</TimeSerie>
+		<TimeSerie>586</TimeSerie>
 		<TimeSerie>588</TimeSerie>
-		<TimeSerie>589</TimeSerie>
-		<TimeSerie>591</TimeSerie>
-		<TimeSerie>596</TimeSerie>
-		<TimeSerie>600</TimeSerie>
-		<TimeSerie>604</TimeSerie>
-		<TimeSerie>643</TimeSerie>
-		<TimeSerie>651</TimeSerie>
-		<TimeSerie>655</TimeSerie>
-		<TimeSerie>660</TimeSerie>
-		<TimeSerie>670</TimeSerie>
+		<TimeSerie>593</TimeSerie>
+		<TimeSerie>597</TimeSerie>
+		<TimeSerie>601</TimeSerie>
+		<TimeSerie>640</TimeSerie>
+		<TimeSerie>648</TimeSerie>
+		<TimeSerie>652</TimeSerie>
+		<TimeSerie>657</TimeSerie>
+		<TimeSerie>667</TimeSerie>
+		<TimeSerie>671</TimeSerie>
 		<TimeSerie>674</TimeSerie>
 		<TimeSerie>677</TimeSerie>
-		<TimeSerie>680</TimeSerie>
-		<TimeSerie>684</TimeSerie>
-		<TimeSerie>688</TimeSerie>
-		<TimeSerie>694</TimeSerie>
-		<TimeSerie>705</TimeSerie>
-		<TimeSerie>709</TimeSerie>
-		<TimeSerie>713</TimeSerie>
-		<TimeSerie>719</TimeSerie>
-		<TimeSerie>723</TimeSerie>
+		<TimeSerie>681</TimeSerie>
+		<TimeSerie>685</TimeSerie>
+		<TimeSerie>691</TimeSerie>
+		<TimeSerie>702</TimeSerie>
+		<TimeSerie>706</TimeSerie>
+		<TimeSerie>710</TimeSerie>
+		<TimeSerie>716</TimeSerie>
+		<TimeSerie>720</TimeSerie>
+		<TimeSerie>745</TimeSerie>
+		<TimeSerie>746</TimeSerie>
+		<TimeSerie>747</TimeSerie>
 		<TimeSerie>748</TimeSerie>
 		<TimeSerie>749</TimeSerie>
 		<TimeSerie>750</TimeSerie>
@@ -202,29 +204,29 @@
 		<TimeSerie>763</TimeSerie>
 		<TimeSerie>764</TimeSerie>
 		<TimeSerie>765</TimeSerie>
-		<TimeSerie>766</TimeSerie>
 		<TimeSerie>767</TimeSerie>
-		<TimeSerie>768</TimeSerie>
-		<TimeSerie>770</TimeSerie>
-		<TimeSerie>774</TimeSerie>
-		<TimeSerie>779</TimeSerie>
-		<TimeSerie>785</TimeSerie>
-		<TimeSerie>790</TimeSerie>
-		<TimeSerie>795</TimeSerie>
-		<TimeSerie>800</TimeSerie>
-		<TimeSerie>804</TimeSerie>
+		<TimeSerie>771</TimeSerie>
+		<TimeSerie>776</TimeSerie>
+		<TimeSerie>782</TimeSerie>
+		<TimeSerie>787</TimeSerie>
+		<TimeSerie>792</TimeSerie>
+		<TimeSerie>797</TimeSerie>
+		<TimeSerie>801</TimeSerie>
+		<TimeSerie>806</TimeSerie>
 		<TimeSerie>809</TimeSerie>
-		<TimeSerie>812</TimeSerie>
-		<TimeSerie>816</TimeSerie>
-		<TimeSerie>820</TimeSerie>
-		<TimeSerie>825</TimeSerie>
-		<TimeSerie>830</TimeSerie>
-		<TimeSerie>835</TimeSerie>
-		<TimeSerie>840</TimeSerie>
-		<TimeSerie>844</TimeSerie>
-		<TimeSerie>849</TimeSerie>
+		<TimeSerie>813</TimeSerie>
+		<TimeSerie>817</TimeSerie>
+		<TimeSerie>822</TimeSerie>
+		<TimeSerie>827</TimeSerie>
+		<TimeSerie>832</TimeSerie>
+		<TimeSerie>837</TimeSerie>
+		<TimeSerie>841</TimeSerie>
+		<TimeSerie>846</TimeSerie>
+		<TimeSerie>850</TimeSerie>
+		<TimeSerie>851</TimeSerie>
 		<TimeSerie>853</TimeSerie>
 		<TimeSerie>854</TimeSerie>
+		<TimeSerie>855</TimeSerie>
 		<TimeSerie>856</TimeSerie>
 		<TimeSerie>857</TimeSerie>
 		<TimeSerie>858</TimeSerie>
@@ -232,52 +234,52 @@
 		<TimeSerie>860</TimeSerie>
 		<TimeSerie>861</TimeSerie>
 		<TimeSerie>862</TimeSerie>
-		<TimeSerie>863</TimeSerie>
-		<TimeSerie>864</TimeSerie>
-		<TimeSerie>865</TimeSerie>
-		<TimeSerie>870</TimeSerie>
+		<TimeSerie>867</TimeSerie>
+		<TimeSerie>871</TimeSerie>
+		<TimeSerie>872</TimeSerie>
+		<TimeSerie>873</TimeSerie>
 		<TimeSerie>874</TimeSerie>
 		<TimeSerie>875</TimeSerie>
 		<TimeSerie>876</TimeSerie>
 		<TimeSerie>877</TimeSerie>
 		<TimeSerie>878</TimeSerie>
 		<TimeSerie>879</TimeSerie>
-		<TimeSerie>880</TimeSerie>
-		<TimeSerie>881</TimeSerie>
 		<TimeSerie>882</TimeSerie>
-		<TimeSerie>885</TimeSerie>
-		<TimeSerie>893</TimeSerie>
-		<TimeSerie>899</TimeSerie>
+		<TimeSerie>890</TimeSerie>
+		<TimeSerie>896</TimeSerie>
+		<TimeSerie>900</TimeSerie>
 		<TimeSerie>903</TimeSerie>
+		<TimeSerie>904</TimeSerie>
+		<TimeSerie>905</TimeSerie>
 		<TimeSerie>906</TimeSerie>
 		<TimeSerie>907</TimeSerie>
 		<TimeSerie>908</TimeSerie>
 		<TimeSerie>909</TimeSerie>
 		<TimeSerie>910</TimeSerie>
 		<TimeSerie>911</TimeSerie>
-		<TimeSerie>912</TimeSerie>
-		<TimeSerie>913</TimeSerie>
-		<TimeSerie>914</TimeSerie>
+		<TimeSerie>915</TimeSerie>
+		<TimeSerie>916</TimeSerie>
+		<TimeSerie>917</TimeSerie>
 		<TimeSerie>918</TimeSerie>
 		<TimeSerie>919</TimeSerie>
 		<TimeSerie>920</TimeSerie>
 		<TimeSerie>921</TimeSerie>
-		<TimeSerie>922</TimeSerie>
-		<TimeSerie>923</TimeSerie>
-		<TimeSerie>924</TimeSerie>
-		<TimeSerie>952</TimeSerie>
+		<TimeSerie>949</TimeSerie>
+		<TimeSerie>953</TimeSerie>
 		<TimeSerie>956</TimeSerie>
-		<TimeSerie>959</TimeSerie>
-		<TimeSerie>961</TimeSerie>
+		<TimeSerie>958</TimeSerie>
+		<TimeSerie>972</TimeSerie>
+		<TimeSerie>974</TimeSerie>
 		<TimeSerie>975</TimeSerie>
 		<TimeSerie>977</TimeSerie>
-		<TimeSerie>978</TimeSerie>
-		<TimeSerie>980</TimeSerie>
-		<TimeSerie>982</TimeSerie>
+		<TimeSerie>979</TimeSerie>
+		<TimeSerie>981</TimeSerie>
+		<TimeSerie>983</TimeSerie>
 		<TimeSerie>984</TimeSerie>
 		<TimeSerie>986</TimeSerie>
-		<TimeSerie>987</TimeSerie>
+		<TimeSerie>988</TimeSerie>
 		<TimeSerie>989</TimeSerie>
+		<TimeSerie>990</TimeSerie>
 		<TimeSerie>991</TimeSerie>
 		<TimeSerie>992</TimeSerie>
 		<TimeSerie>993</TimeSerie>
@@ -291,38 +293,38 @@
 		<TimeSerie>1001</TimeSerie>
 		<TimeSerie>1002</TimeSerie>
 		<TimeSerie>1003</TimeSerie>
-		<TimeSerie>1004</TimeSerie>
 		<TimeSerie>1005</TimeSerie>
 		<TimeSerie>1006</TimeSerie>
+		<TimeSerie>1007</TimeSerie>
 		<TimeSerie>1008</TimeSerie>
 		<TimeSerie>1009</TimeSerie>
 		<TimeSerie>1010</TimeSerie>
-		<TimeSerie>1011</TimeSerie>
 		<TimeSerie>1012</TimeSerie>
 		<TimeSerie>1013</TimeSerie>
+		<TimeSerie>1014</TimeSerie>
 		<TimeSerie>1015</TimeSerie>
 		<TimeSerie>1016</TimeSerie>
 		<TimeSerie>1017</TimeSerie>
 		<TimeSerie>1018</TimeSerie>
-		<TimeSerie>1019</TimeSerie>
 		<TimeSerie>1020</TimeSerie>
 		<TimeSerie>1021</TimeSerie>
 		<TimeSerie>1023</TimeSerie>
 		<TimeSerie>1024</TimeSerie>
 		<TimeSerie>1026</TimeSerie>
-		<TimeSerie>1027</TimeSerie>
-		<TimeSerie>1029</TimeSerie>
+		<TimeSerie>1028</TimeSerie>
 		<TimeSerie>1031</TimeSerie>
+		<TimeSerie>1032</TimeSerie>
 		<TimeSerie>1034</TimeSerie>
-		<TimeSerie>1035</TimeSerie>
+		<TimeSerie>1036</TimeSerie>
 		<TimeSerie>1037</TimeSerie>
+		<TimeSerie>1038</TimeSerie>
 		<TimeSerie>1039</TimeSerie>
 		<TimeSerie>1040</TimeSerie>
 		<TimeSerie>1041</TimeSerie>
 		<TimeSerie>1042</TimeSerie>
-		<TimeSerie>1043</TimeSerie>
 		<TimeSerie>1044</TimeSerie>
 		<TimeSerie>1045</TimeSerie>
+		<TimeSerie>1046</TimeSerie>
 		<TimeSerie>1047</TimeSerie>
 		<TimeSerie>1048</TimeSerie>
 		<TimeSerie>1049</TimeSerie>
@@ -336,50 +338,49 @@
 		<TimeSerie>1057</TimeSerie>
 		<TimeSerie>1058</TimeSerie>
 		<TimeSerie>1059</TimeSerie>
-		<TimeSerie>1060</TimeSerie>
 		<TimeSerie>1061</TimeSerie>
 		<TimeSerie>1062</TimeSerie>
+		<TimeSerie>1063</TimeSerie>
 		<TimeSerie>1064</TimeSerie>
-		<TimeSerie>1065</TimeSerie>
 		<TimeSerie>1066</TimeSerie>
 		<TimeSerie>1067</TimeSerie>
-		<TimeSerie>1069</TimeSerie>
+		<TimeSerie>1068</TimeSerie>
 		<TimeSerie>1070</TimeSerie>
 		<TimeSerie>1071</TimeSerie>
+		<TimeSerie>1072</TimeSerie>
 		<TimeSerie>1073</TimeSerie>
 		<TimeSerie>1074</TimeSerie>
-		<TimeSerie>1075</TimeSerie>
 		<TimeSerie>1076</TimeSerie>
-		<TimeSerie>1077</TimeSerie>
-		<TimeSerie>1079</TimeSerie>
+		<TimeSerie>1078</TimeSerie>
 		<TimeSerie>1081</TimeSerie>
-		<TimeSerie>1084</TimeSerie>
-		<TimeSerie>1086</TimeSerie>
-		<TimeSerie>1088</TimeSerie>
-		<TimeSerie>1090</TimeSerie>
+		<TimeSerie>1083</TimeSerie>
+		<TimeSerie>1085</TimeSerie>
+		<TimeSerie>1087</TimeSerie>
+		<TimeSerie>1089</TimeSerie>
 		<TimeSerie>1092</TimeSerie>
-		<TimeSerie>1095</TimeSerie>
-		<TimeSerie>1097</TimeSerie>
+		<TimeSerie>1094</TimeSerie>
+		<TimeSerie>1096</TimeSerie>
 		<TimeSerie>1099</TimeSerie>
+		<TimeSerie>1101</TimeSerie>
 		<TimeSerie>1102</TimeSerie>
-		<TimeSerie>1104</TimeSerie>
+		<TimeSerie>1103</TimeSerie>
 		<TimeSerie>1105</TimeSerie>
 		<TimeSerie>1106</TimeSerie>
 		<TimeSerie>1108</TimeSerie>
-		<TimeSerie>1109</TimeSerie>
-		<TimeSerie>1111</TimeSerie>
-		<TimeSerie>1113</TimeSerie>
+		<TimeSerie>1110</TimeSerie>
+		<TimeSerie>1112</TimeSerie>
+		<TimeSerie>1114</TimeSerie>
 		<TimeSerie>1115</TimeSerie>
 		<TimeSerie>1117</TimeSerie>
 		<TimeSerie>1118</TimeSerie>
 		<TimeSerie>1120</TimeSerie>
-		<TimeSerie>1121</TimeSerie>
-		<TimeSerie>1123</TimeSerie>
-		<TimeSerie>1125</TimeSerie>
+		<TimeSerie>1122</TimeSerie>
+		<TimeSerie>1124</TimeSerie>
+		<TimeSerie>1126</TimeSerie>
 		<TimeSerie>1127</TimeSerie>
-		<TimeSerie>1129</TimeSerie>
+		<TimeSerie>1128</TimeSerie>
 		<TimeSerie>1130</TimeSerie>
-		<TimeSerie>1131</TimeSerie>
+		<TimeSerie>1132</TimeSerie>
 		<TimeSerie>1133</TimeSerie>
 		<TimeSerie>1135</TimeSerie>
 		<TimeSerie>1136</TimeSerie>
@@ -387,28 +388,29 @@
 		<TimeSerie>1139</TimeSerie>
 		<TimeSerie>1141</TimeSerie>
 		<TimeSerie>1142</TimeSerie>
-		<TimeSerie>1144</TimeSerie>
+		<TimeSerie>1143</TimeSerie>
 		<TimeSerie>1145</TimeSerie>
 		<TimeSerie>1146</TimeSerie>
 		<TimeSerie>1148</TimeSerie>
 		<TimeSerie>1149</TimeSerie>
-		<TimeSerie>1151</TimeSerie>
+		<TimeSerie>1150</TimeSerie>
 		<TimeSerie>1152</TimeSerie>
-		<TimeSerie>1153</TimeSerie>
+		<TimeSerie>1154</TimeSerie>
 		<TimeSerie>1155</TimeSerie>
 		<TimeSerie>1157</TimeSerie>
-		<TimeSerie>1158</TimeSerie>
-		<TimeSerie>1160</TimeSerie>
-		<TimeSerie>1162</TimeSerie>
-		<TimeSerie>1164</TimeSerie>
-		<TimeSerie>1166</TimeSerie>
+		<TimeSerie>1159</TimeSerie>
+		<TimeSerie>1161</TimeSerie>
+		<TimeSerie>1163</TimeSerie>
+		<TimeSerie>1165</TimeSerie>
+		<TimeSerie>1167</TimeSerie>
 		<TimeSerie>1168</TimeSerie>
 		<TimeSerie>1170</TimeSerie>
 		<TimeSerie>1171</TimeSerie>
+		<TimeSerie>1172</TimeSerie>
 		<TimeSerie>1173</TimeSerie>
-		<TimeSerie>1174</TimeSerie>
 		<TimeSerie>1175</TimeSerie>
 		<TimeSerie>1176</TimeSerie>
+		<TimeSerie>1177</TimeSerie>
 		<TimeSerie>1178</TimeSerie>
 		<TimeSerie>1179</TimeSerie>
 		<TimeSerie>1180</TimeSerie>
@@ -419,137 +421,137 @@
 		<TimeSerie>1185</TimeSerie>
 		<TimeSerie>1186</TimeSerie>
 		<TimeSerie>1187</TimeSerie>
-		<TimeSerie>1188</TimeSerie>
 		<TimeSerie>1189</TimeSerie>
 		<TimeSerie>1190</TimeSerie>
+		<TimeSerie>1191</TimeSerie>
 		<TimeSerie>1192</TimeSerie>
-		<TimeSerie>1193</TimeSerie>
-		<TimeSerie>1194</TimeSerie>
-		<TimeSerie>1195</TimeSerie>
-		<TimeSerie>1200</TimeSerie>
-		<TimeSerie>1206</TimeSerie>
-		<TimeSerie>1210</TimeSerie>
-		<TimeSerie>1212</TimeSerie>
-		<TimeSerie>1220</TimeSerie>
-		<TimeSerie>1225</TimeSerie>
-		<TimeSerie>1233</TimeSerie>
-		<TimeSerie>1240</TimeSerie>
-		<TimeSerie>1247</TimeSerie>
-		<TimeSerie>1254</TimeSerie>
-		<TimeSerie>1261</TimeSerie>
-		<TimeSerie>1270</TimeSerie>
-		<TimeSerie>1276</TimeSerie>
-		<TimeSerie>1281</TimeSerie>
-		<TimeSerie>1287</TimeSerie>
-		<TimeSerie>1293</TimeSerie>
-		<TimeSerie>1304</TimeSerie>
-		<TimeSerie>1308</TimeSerie>
-		<TimeSerie>1312</TimeSerie>
+		<TimeSerie>1197</TimeSerie>
+		<TimeSerie>1203</TimeSerie>
+		<TimeSerie>1207</TimeSerie>
+		<TimeSerie>1209</TimeSerie>
+		<TimeSerie>1217</TimeSerie>
+		<TimeSerie>1222</TimeSerie>
+		<TimeSerie>1230</TimeSerie>
+		<TimeSerie>1237</TimeSerie>
+		<TimeSerie>1244</TimeSerie>
+		<TimeSerie>1251</TimeSerie>
+		<TimeSerie>1258</TimeSerie>
+		<TimeSerie>1267</TimeSerie>
+		<TimeSerie>1273</TimeSerie>
+		<TimeSerie>1278</TimeSerie>
+		<TimeSerie>1284</TimeSerie>
+		<TimeSerie>1290</TimeSerie>
+		<TimeSerie>1301</TimeSerie>
+		<TimeSerie>1305</TimeSerie>
+		<TimeSerie>1309</TimeSerie>
+		<TimeSerie>1313</TimeSerie>
 		<TimeSerie>1316</TimeSerie>
-		<TimeSerie>1319</TimeSerie>
-		<TimeSerie>1324</TimeSerie>
-		<TimeSerie>1328</TimeSerie>
-		<TimeSerie>1333</TimeSerie>
-		<TimeSerie>1337</TimeSerie>
-		<TimeSerie>1342</TimeSerie>
-		<TimeSerie>1346</TimeSerie>
-		<TimeSerie>1351</TimeSerie>
-		<TimeSerie>1355</TimeSerie>
+		<TimeSerie>1321</TimeSerie>
+		<TimeSerie>1325</TimeSerie>
+		<TimeSerie>1330</TimeSerie>
+		<TimeSerie>1334</TimeSerie>
+		<TimeSerie>1339</TimeSerie>
+		<TimeSerie>1343</TimeSerie>
+		<TimeSerie>1348</TimeSerie>
+		<TimeSerie>1352</TimeSerie>
+		<TimeSerie>1356</TimeSerie>
 		<TimeSerie>1359</TimeSerie>
 		<TimeSerie>1362</TimeSerie>
-		<TimeSerie>1365</TimeSerie>
-		<TimeSerie>1369</TimeSerie>
+		<TimeSerie>1366</TimeSerie>
+		<TimeSerie>1371</TimeSerie>
 		<TimeSerie>1374</TimeSerie>
-		<TimeSerie>1377</TimeSerie>
+		<TimeSerie>1378</TimeSerie>
 		<TimeSerie>1381</TimeSerie>
-		<TimeSerie>1384</TimeSerie>
-		<TimeSerie>1388</TimeSerie>
-		<TimeSerie>1392</TimeSerie>
-		<TimeSerie>1397</TimeSerie>
-		<TimeSerie>1401</TimeSerie>
-		<TimeSerie>1407</TimeSerie>
-		<TimeSerie>1411</TimeSerie>
-		<TimeSerie>1416</TimeSerie>
-		<TimeSerie>1420</TimeSerie>
-		<TimeSerie>1424</TimeSerie>
-		<TimeSerie>1428</TimeSerie>
-		<TimeSerie>1433</TimeSerie>
-		<TimeSerie>1437</TimeSerie>
-		<TimeSerie>1441</TimeSerie>
-		<TimeSerie>1445</TimeSerie>
-		<TimeSerie>1450</TimeSerie>
-		<TimeSerie>1454</TimeSerie>
-		<TimeSerie>1460</TimeSerie>
-		<TimeSerie>1464</TimeSerie>
-		<TimeSerie>1469</TimeSerie>
-		<TimeSerie>1475</TimeSerie>
-		<TimeSerie>1479</TimeSerie>
-		<TimeSerie>1484</TimeSerie>
-		<TimeSerie>1490</TimeSerie>
-		<TimeSerie>1497</TimeSerie>
-		<TimeSerie>1505</TimeSerie>
-		<TimeSerie>1506</TimeSerie>
+		<TimeSerie>1385</TimeSerie>
+		<TimeSerie>1389</TimeSerie>
+		<TimeSerie>1394</TimeSerie>
+		<TimeSerie>1398</TimeSerie>
+		<TimeSerie>1404</TimeSerie>
+		<TimeSerie>1408</TimeSerie>
+		<TimeSerie>1413</TimeSerie>
+		<TimeSerie>1417</TimeSerie>
+		<TimeSerie>1421</TimeSerie>
+		<TimeSerie>1425</TimeSerie>
+		<TimeSerie>1430</TimeSerie>
+		<TimeSerie>1434</TimeSerie>
+		<TimeSerie>1438</TimeSerie>
+		<TimeSerie>1442</TimeSerie>
+		<TimeSerie>1447</TimeSerie>
+		<TimeSerie>1451</TimeSerie>
+		<TimeSerie>1457</TimeSerie>
+		<TimeSerie>1461</TimeSerie>
+		<TimeSerie>1466</TimeSerie>
+		<TimeSerie>1472</TimeSerie>
+		<TimeSerie>1476</TimeSerie>
+		<TimeSerie>1481</TimeSerie>
+		<TimeSerie>1487</TimeSerie>
+		<TimeSerie>1494</TimeSerie>
+		<TimeSerie>1502</TimeSerie>
+		<TimeSerie>1503</TimeSerie>
+		<TimeSerie>1504</TimeSerie>
 		<TimeSerie>1507</TimeSerie>
+		<TimeSerie>1508</TimeSerie>
 		<TimeSerie>1510</TimeSerie>
-		<TimeSerie>1511</TimeSerie>
-		<TimeSerie>1513</TimeSerie>
-		<TimeSerie>1517</TimeSerie>
-		<TimeSerie>1522</TimeSerie>
-		<TimeSerie>1528</TimeSerie>
-		<TimeSerie>1532</TimeSerie>
-		<TimeSerie>1537</TimeSerie>
-		<TimeSerie>1542</TimeSerie>
+		<TimeSerie>1514</TimeSerie>
+		<TimeSerie>1519</TimeSerie>
+		<TimeSerie>1525</TimeSerie>
+		<TimeSerie>1529</TimeSerie>
+		<TimeSerie>1534</TimeSerie>
+		<TimeSerie>1539</TimeSerie>
+		<TimeSerie>1546</TimeSerie>
 		<TimeSerie>1549</TimeSerie>
-		<TimeSerie>1552</TimeSerie>
-		<TimeSerie>1554</TimeSerie>
-		<TimeSerie>1561</TimeSerie>
+		<TimeSerie>1551</TimeSerie>
+		<TimeSerie>1558</TimeSerie>
+		<TimeSerie>1559</TimeSerie>
+		<TimeSerie>1560</TimeSerie>
 		<TimeSerie>1562</TimeSerie>
 		<TimeSerie>1563</TimeSerie>
-		<TimeSerie>1565</TimeSerie>
+		<TimeSerie>1564</TimeSerie>
 		<TimeSerie>1566</TimeSerie>
-		<TimeSerie>1567</TimeSerie>
+		<TimeSerie>1568</TimeSerie>
 		<TimeSerie>1569</TimeSerie>
 		<TimeSerie>1571</TimeSerie>
 		<TimeSerie>1572</TimeSerie>
-		<TimeSerie>1574</TimeSerie>
+		<TimeSerie>1573</TimeSerie>
 		<TimeSerie>1575</TimeSerie>
-		<TimeSerie>1576</TimeSerie>
-		<TimeSerie>1578</TimeSerie>
-		<TimeSerie>1580</TimeSerie>
-		<TimeSerie>1582</TimeSerie>
-		<TimeSerie>1591</TimeSerie>
-		<TimeSerie>1599</TimeSerie>
-		<TimeSerie>1608</TimeSerie>
+		<TimeSerie>1577</TimeSerie>
+		<TimeSerie>1579</TimeSerie>
+		<TimeSerie>1588</TimeSerie>
+		<TimeSerie>1596</TimeSerie>
+		<TimeSerie>1605</TimeSerie>
+		<TimeSerie>1614</TimeSerie>
+		<TimeSerie>1616</TimeSerie>
 		<TimeSerie>1617</TimeSerie>
-		<TimeSerie>1619</TimeSerie>
-		<TimeSerie>1620</TimeSerie>
-		<TimeSerie>1629</TimeSerie>
-		<TimeSerie>1649</TimeSerie>
-		<TimeSerie>1659</TimeSerie>
-		<TimeSerie>1661</TimeSerie>
+		<TimeSerie>1626</TimeSerie>
+		<TimeSerie>1646</TimeSerie>
+		<TimeSerie>1656</TimeSerie>
+		<TimeSerie>1658</TimeSerie>
+		<TimeSerie>1660</TimeSerie>
 		<TimeSerie>1663</TimeSerie>
-		<TimeSerie>1666</TimeSerie>
-		<TimeSerie>1684</TimeSerie>
-		<TimeSerie>1711</TimeSerie>
-		<TimeSerie>1740</TimeSerie>
-		<TimeSerie>1751</TimeSerie>
-		<TimeSerie>1762</TimeSerie>
-		<TimeSerie>1776</TimeSerie>
-		<TimeSerie>1821</TimeSerie>
-		<TimeSerie>1911</TimeSerie>
-		<TimeSerie>1926</TimeSerie>
-		<TimeSerie>1935</TimeSerie>
-		<TimeSerie>1953</TimeSerie>
-		<TimeSerie>1960</TimeSerie>
-		<TimeSerie>1965</TimeSerie>
-		<TimeSerie>1975</TimeSerie>
-		<TimeSerie>1982</TimeSerie>
-		<TimeSerie>1987</TimeSerie>
-		<TimeSerie>1992</TimeSerie>
-		<TimeSerie>2000</TimeSerie>
-		<TimeSerie>2004</TimeSerie>
-		<TimeSerie>2005</TimeSerie>
+		<TimeSerie>1681</TimeSerie>
+		<TimeSerie>1708</TimeSerie>
+		<TimeSerie>1737</TimeSerie>
+		<TimeSerie>1748</TimeSerie>
+		<TimeSerie>1759</TimeSerie>
+		<TimeSerie>1773</TimeSerie>
+		<TimeSerie>1818</TimeSerie>
+		<TimeSerie>1908</TimeSerie>
+		<TimeSerie>1923</TimeSerie>
+		<TimeSerie>1932</TimeSerie>
+		<TimeSerie>1950</TimeSerie>
+		<TimeSerie>1957</TimeSerie>
+		<TimeSerie>1962</TimeSerie>
+		<TimeSerie>1972</TimeSerie>
+		<TimeSerie>1979</TimeSerie>
+		<TimeSerie>1984</TimeSerie>
+		<TimeSerie>1989</TimeSerie>
+		<TimeSerie>1997</TimeSerie>
+		<TimeSerie>2001</TimeSerie>
+		<TimeSerie>2002</TimeSerie>
+		<TimeSerie>2007</TimeSerie>
+		<TimeSerie>2009</TimeSerie>
 		<TimeSerie>2010</TimeSerie>
+		<TimeSerie>2011</TimeSerie>
 		<TimeSerie>2012</TimeSerie>
 		<TimeSerie>2013</TimeSerie>
 		<TimeSerie>2014</TimeSerie>
@@ -559,131 +561,131 @@
 		<TimeSerie>2018</TimeSerie>
 		<TimeSerie>2019</TimeSerie>
 		<TimeSerie>2020</TimeSerie>
-		<TimeSerie>2021</TimeSerie>
 		<TimeSerie>2022</TimeSerie>
 		<TimeSerie>2023</TimeSerie>
+		<TimeSerie>2024</TimeSerie>
 		<TimeSerie>2025</TimeSerie>
 		<TimeSerie>2026</TimeSerie>
 		<TimeSerie>2027</TimeSerie>
 		<TimeSerie>2028</TimeSerie>
-		<TimeSerie>2029</TimeSerie>
 		<TimeSerie>2030</TimeSerie>
-		<TimeSerie>2031</TimeSerie>
-		<TimeSerie>2033</TimeSerie>
-		<TimeSerie>2040</TimeSerie>
-		<TimeSerie>2045</TimeSerie>
-		<TimeSerie>2050</TimeSerie>
-		<TimeSerie>2059</TimeSerie>
-		<TimeSerie>2065</TimeSerie>
-		<TimeSerie>2069</TimeSerie>
-		<TimeSerie>2075</TimeSerie>
-		<TimeSerie>2082</TimeSerie>
-		<TimeSerie>2088</TimeSerie>
-		<TimeSerie>2097</TimeSerie>
-		<TimeSerie>2104</TimeSerie>
-		<TimeSerie>2110</TimeSerie>
-		<TimeSerie>2116</TimeSerie>
-		<TimeSerie>2123</TimeSerie>
-		<TimeSerie>2137</TimeSerie>
-		<TimeSerie>2143</TimeSerie>
-		<TimeSerie>2148</TimeSerie>
-		<TimeSerie>2152</TimeSerie>
-		<TimeSerie>2158</TimeSerie>
-		<TimeSerie>2163</TimeSerie>
-		<TimeSerie>2167</TimeSerie>
-		<TimeSerie>2172</TimeSerie>
-		<TimeSerie>2176</TimeSerie>
-		<TimeSerie>2180</TimeSerie>
-		<TimeSerie>2185</TimeSerie>
-		<TimeSerie>2190</TimeSerie>
-		<TimeSerie>2197</TimeSerie>
-		<TimeSerie>2205</TimeSerie>
-		<TimeSerie>2212</TimeSerie>
-		<TimeSerie>2220</TimeSerie>
-		<TimeSerie>2226</TimeSerie>
-		<TimeSerie>2231</TimeSerie>
-		<TimeSerie>2236</TimeSerie>
-		<TimeSerie>2247</TimeSerie>
-		<TimeSerie>2253</TimeSerie>
-		<TimeSerie>2258</TimeSerie>
-		<TimeSerie>2265</TimeSerie>
-		<TimeSerie>2270</TimeSerie>
-		<TimeSerie>2277</TimeSerie>
-		<TimeSerie>2285</TimeSerie>
-		<TimeSerie>2293</TimeSerie>
-		<TimeSerie>2307</TimeSerie>
-		<TimeSerie>2311</TimeSerie>
-		<TimeSerie>2317</TimeSerie>
-		<TimeSerie>2322</TimeSerie>
-		<TimeSerie>2328</TimeSerie>
-		<TimeSerie>2333</TimeSerie>
-		<TimeSerie>2340</TimeSerie>
-		<TimeSerie>2349</TimeSerie>
+		<TimeSerie>2037</TimeSerie>
+		<TimeSerie>2042</TimeSerie>
+		<TimeSerie>2047</TimeSerie>
+		<TimeSerie>2056</TimeSerie>
+		<TimeSerie>2062</TimeSerie>
+		<TimeSerie>2066</TimeSerie>
+		<TimeSerie>2072</TimeSerie>
+		<TimeSerie>2079</TimeSerie>
+		<TimeSerie>2085</TimeSerie>
+		<TimeSerie>2094</TimeSerie>
+		<TimeSerie>2101</TimeSerie>
+		<TimeSerie>2107</TimeSerie>
+		<TimeSerie>2113</TimeSerie>
+		<TimeSerie>2120</TimeSerie>
+		<TimeSerie>2134</TimeSerie>
+		<TimeSerie>2140</TimeSerie>
+		<TimeSerie>2145</TimeSerie>
+		<TimeSerie>2149</TimeSerie>
+		<TimeSerie>2155</TimeSerie>
+		<TimeSerie>2160</TimeSerie>
+		<TimeSerie>2164</TimeSerie>
+		<TimeSerie>2169</TimeSerie>
+		<TimeSerie>2173</TimeSerie>
+		<TimeSerie>2177</TimeSerie>
+		<TimeSerie>2182</TimeSerie>
+		<TimeSerie>2187</TimeSerie>
+		<TimeSerie>2194</TimeSerie>
+		<TimeSerie>2202</TimeSerie>
+		<TimeSerie>2209</TimeSerie>
+		<TimeSerie>2217</TimeSerie>
+		<TimeSerie>2223</TimeSerie>
+		<TimeSerie>2228</TimeSerie>
+		<TimeSerie>2233</TimeSerie>
+		<TimeSerie>2244</TimeSerie>
+		<TimeSerie>2250</TimeSerie>
+		<TimeSerie>2255</TimeSerie>
+		<TimeSerie>2262</TimeSerie>
+		<TimeSerie>2267</TimeSerie>
+		<TimeSerie>2274</TimeSerie>
+		<TimeSerie>2282</TimeSerie>
+		<TimeSerie>2290</TimeSerie>
+		<TimeSerie>2304</TimeSerie>
+		<TimeSerie>2308</TimeSerie>
+		<TimeSerie>2314</TimeSerie>
+		<TimeSerie>2319</TimeSerie>
+		<TimeSerie>2325</TimeSerie>
+		<TimeSerie>2330</TimeSerie>
+		<TimeSerie>2337</TimeSerie>
+		<TimeSerie>2346</TimeSerie>
+		<TimeSerie>2354</TimeSerie>
 		<TimeSerie>2357</TimeSerie>
-		<TimeSerie>2360</TimeSerie>
-		<TimeSerie>2364</TimeSerie>
+		<TimeSerie>2361</TimeSerie>
+		<TimeSerie>2363</TimeSerie>
+		<TimeSerie>2365</TimeSerie>
 		<TimeSerie>2366</TimeSerie>
+		<TimeSerie>2367</TimeSerie>
 		<TimeSerie>2368</TimeSerie>
 		<TimeSerie>2369</TimeSerie>
 		<TimeSerie>2370</TimeSerie>
 		<TimeSerie>2371</TimeSerie>
 		<TimeSerie>2372</TimeSerie>
-		<TimeSerie>2373</TimeSerie>
 		<TimeSerie>2374</TimeSerie>
 		<TimeSerie>2375</TimeSerie>
-		<TimeSerie>2377</TimeSerie>
+		<TimeSerie>2376</TimeSerie>
 		<TimeSerie>2378</TimeSerie>
 		<TimeSerie>2379</TimeSerie>
+		<TimeSerie>2380</TimeSerie>
 		<TimeSerie>2381</TimeSerie>
-		<TimeSerie>2382</TimeSerie>
 		<TimeSerie>2383</TimeSerie>
-		<TimeSerie>2384</TimeSerie>
+		<TimeSerie>2385</TimeSerie>
 		<TimeSerie>2386</TimeSerie>
+		<TimeSerie>2387</TimeSerie>
 		<TimeSerie>2388</TimeSerie>
 		<TimeSerie>2389</TimeSerie>
-		<TimeSerie>2390</TimeSerie>
 		<TimeSerie>2391</TimeSerie>
 		<TimeSerie>2392</TimeSerie>
 		<TimeSerie>2394</TimeSerie>
 		<TimeSerie>2395</TimeSerie>
+		<TimeSerie>2396</TimeSerie>
 		<TimeSerie>2397</TimeSerie>
-		<TimeSerie>2398</TimeSerie>
 		<TimeSerie>2399</TimeSerie>
 		<TimeSerie>2400</TimeSerie>
+		<TimeSerie>2401</TimeSerie>
 		<TimeSerie>2402</TimeSerie>
 		<TimeSerie>2403</TimeSerie>
 		<TimeSerie>2404</TimeSerie>
 		<TimeSerie>2405</TimeSerie>
 		<TimeSerie>2406</TimeSerie>
 		<TimeSerie>2407</TimeSerie>
-		<TimeSerie>2408</TimeSerie>
 		<TimeSerie>2409</TimeSerie>
-		<TimeSerie>2410</TimeSerie>
+		<TimeSerie>2411</TimeSerie>
 		<TimeSerie>2412</TimeSerie>
+		<TimeSerie>2413</TimeSerie>
 		<TimeSerie>2414</TimeSerie>
-		<TimeSerie>2415</TimeSerie>
 		<TimeSerie>2416</TimeSerie>
 		<TimeSerie>2417</TimeSerie>
 		<TimeSerie>2419</TimeSerie>
-		<TimeSerie>2420</TimeSerie>
-		<TimeSerie>2422</TimeSerie>
-		<TimeSerie>2424</TimeSerie>
-		<TimeSerie>2426</TimeSerie>
-		<TimeSerie>2428</TimeSerie>
+		<TimeSerie>2421</TimeSerie>
+		<TimeSerie>2423</TimeSerie>
+		<TimeSerie>2425</TimeSerie>
+		<TimeSerie>2445</TimeSerie>
+		<TimeSerie>2446</TimeSerie>
 		<TimeSerie>2448</TimeSerie>
 		<TimeSerie>2449</TimeSerie>
-		<TimeSerie>2451</TimeSerie>
+		<TimeSerie>2450</TimeSerie>
 		<TimeSerie>2452</TimeSerie>
 		<TimeSerie>2453</TimeSerie>
+		<TimeSerie>2454</TimeSerie>
 		<TimeSerie>2455</TimeSerie>
 		<TimeSerie>2456</TimeSerie>
 		<TimeSerie>2457</TimeSerie>
 		<TimeSerie>2458</TimeSerie>
 		<TimeSerie>2459</TimeSerie>
 		<TimeSerie>2460</TimeSerie>
-		<TimeSerie>2461</TimeSerie>
 		<TimeSerie>2462</TimeSerie>
 		<TimeSerie>2463</TimeSerie>
+		<TimeSerie>2464</TimeSerie>
 		<TimeSerie>2465</TimeSerie>
 		<TimeSerie>2466</TimeSerie>
 		<TimeSerie>2467</TimeSerie>
@@ -695,346 +697,342 @@
 		<TimeSerie>2473</TimeSerie>
 		<TimeSerie>2474</TimeSerie>
 		<TimeSerie>2475</TimeSerie>
-		<TimeSerie>2476</TimeSerie>
-		<TimeSerie>2477</TimeSerie>
 		<TimeSerie>2478</TimeSerie>
+		<TimeSerie>2479</TimeSerie>
+		<TimeSerie>2480</TimeSerie>
 		<TimeSerie>2481</TimeSerie>
 		<TimeSerie>2482</TimeSerie>
-		<TimeSerie>2483</TimeSerie>
 		<TimeSerie>2484</TimeSerie>
 		<TimeSerie>2485</TimeSerie>
 		<TimeSerie>2487</TimeSerie>
 		<TimeSerie>2488</TimeSerie>
-		<TimeSerie>2490</TimeSerie>
+		<TimeSerie>2489</TimeSerie>
 		<TimeSerie>2491</TimeSerie>
 		<TimeSerie>2492</TimeSerie>
+		<TimeSerie>2493</TimeSerie>
 		<TimeSerie>2494</TimeSerie>
 		<TimeSerie>2495</TimeSerie>
 		<TimeSerie>2496</TimeSerie>
 		<TimeSerie>2497</TimeSerie>
 		<TimeSerie>2498</TimeSerie>
-		<TimeSerie>2499</TimeSerie>
-		<TimeSerie>2500</TimeSerie>
-		<TimeSerie>2501</TimeSerie>
-		<TimeSerie>2507</TimeSerie>
-		<TimeSerie>2511</TimeSerie>
-		<TimeSerie>2515</TimeSerie>
-		<TimeSerie>2522</TimeSerie>
-		<TimeSerie>2527</TimeSerie>
-		<TimeSerie>2532</TimeSerie>
-		<TimeSerie>2536</TimeSerie>
-		<TimeSerie>2540</TimeSerie>
-		<TimeSerie>2545</TimeSerie>
-		<TimeSerie>2549</TimeSerie>
-		<TimeSerie>2553</TimeSerie>
-		<TimeSerie>2557</TimeSerie>
-		<TimeSerie>2562</TimeSerie>
-		<TimeSerie>2567</TimeSerie>
-		<TimeSerie>2572</TimeSerie>
-		<TimeSerie>2578</TimeSerie>
-		<TimeSerie>2584</TimeSerie>
-		<TimeSerie>2589</TimeSerie>
-		<TimeSerie>2593</TimeSerie>
-		<TimeSerie>2598</TimeSerie>
-		<TimeSerie>2603</TimeSerie>
-		<TimeSerie>2607</TimeSerie>
-		<TimeSerie>2612</TimeSerie>
-		<TimeSerie>2616</TimeSerie>
-		<TimeSerie>2632</TimeSerie>
-		<TimeSerie>2651</TimeSerie>
-		<TimeSerie>2657</TimeSerie>
-		<TimeSerie>2669</TimeSerie>
-		<TimeSerie>2674</TimeSerie>
-		<TimeSerie>2678</TimeSerie>
-		<TimeSerie>2684</TimeSerie>
-		<TimeSerie>2689</TimeSerie>
-		<TimeSerie>2695</TimeSerie>
-		<TimeSerie>2707</TimeSerie>
-		<TimeSerie>2799</TimeSerie>
-		<TimeSerie>2804</TimeSerie>
-		<TimeSerie>2811</TimeSerie>
-		<TimeSerie>2819</TimeSerie>
-		<TimeSerie>2825</TimeSerie>
-		<TimeSerie>2831</TimeSerie>
-		<TimeSerie>2835</TimeSerie>
-		<TimeSerie>2839</TimeSerie>
-		<TimeSerie>2843</TimeSerie>
-		<TimeSerie>2848</TimeSerie>
-		<TimeSerie>2852</TimeSerie>
-		<TimeSerie>2857</TimeSerie>
-		<TimeSerie>2864</TimeSerie>
-		<TimeSerie>2877</TimeSerie>
-		<TimeSerie>2882</TimeSerie>
-		<TimeSerie>2890</TimeSerie>
-		<TimeSerie>2897</TimeSerie>
-		<TimeSerie>2902</TimeSerie>
-		<TimeSerie>2907</TimeSerie>
-		<TimeSerie>2911</TimeSerie>
-		<TimeSerie>2916</TimeSerie>
-		<TimeSerie>2920</TimeSerie>
-		<TimeSerie>2925</TimeSerie>
-		<TimeSerie>2930</TimeSerie>
-		<TimeSerie>2934</TimeSerie>
-		<TimeSerie>2940</TimeSerie>
-		<TimeSerie>2947</TimeSerie>
-		<TimeSerie>2951</TimeSerie>
-		<TimeSerie>2956</TimeSerie>
-		<TimeSerie>2960</TimeSerie>
-		<TimeSerie>2965</TimeSerie>
-		<TimeSerie>2970</TimeSerie>
-		<TimeSerie>2975</TimeSerie>
-		<TimeSerie>2988</TimeSerie>
-		<TimeSerie>2996</TimeSerie>
-		<TimeSerie>3003</TimeSerie>
-		<TimeSerie>3009</TimeSerie>
-		<TimeSerie>3014</TimeSerie>
-		<TimeSerie>3019</TimeSerie>
-		<TimeSerie>3025</TimeSerie>
-		<TimeSerie>3030</TimeSerie>
-		<TimeSerie>3036</TimeSerie>
-		<TimeSerie>3045</TimeSerie>
-		<TimeSerie>3054</TimeSerie>
-		<TimeSerie>3063</TimeSerie>
+		<TimeSerie>2504</TimeSerie>
+		<TimeSerie>2508</TimeSerie>
+		<TimeSerie>2512</TimeSerie>
+		<TimeSerie>2519</TimeSerie>
+		<TimeSerie>2524</TimeSerie>
+		<TimeSerie>2529</TimeSerie>
+		<TimeSerie>2533</TimeSerie>
+		<TimeSerie>2537</TimeSerie>
+		<TimeSerie>2542</TimeSerie>
+		<TimeSerie>2546</TimeSerie>
+		<TimeSerie>2550</TimeSerie>
+		<TimeSerie>2554</TimeSerie>
+		<TimeSerie>2559</TimeSerie>
+		<TimeSerie>2564</TimeSerie>
+		<TimeSerie>2569</TimeSerie>
+		<TimeSerie>2575</TimeSerie>
+		<TimeSerie>2581</TimeSerie>
+		<TimeSerie>2586</TimeSerie>
+		<TimeSerie>2590</TimeSerie>
+		<TimeSerie>2595</TimeSerie>
+		<TimeSerie>2600</TimeSerie>
+		<TimeSerie>2604</TimeSerie>
+		<TimeSerie>2609</TimeSerie>
+		<TimeSerie>2613</TimeSerie>
+		<TimeSerie>2629</TimeSerie>
+		<TimeSerie>2648</TimeSerie>
+		<TimeSerie>2654</TimeSerie>
+		<TimeSerie>2666</TimeSerie>
+		<TimeSerie>2671</TimeSerie>
+		<TimeSerie>2675</TimeSerie>
+		<TimeSerie>2681</TimeSerie>
+		<TimeSerie>2686</TimeSerie>
+		<TimeSerie>2692</TimeSerie>
+		<TimeSerie>2704</TimeSerie>
+		<TimeSerie>2796</TimeSerie>
+		<TimeSerie>2801</TimeSerie>
+		<TimeSerie>2808</TimeSerie>
+		<TimeSerie>2816</TimeSerie>
+		<TimeSerie>2822</TimeSerie>
+		<TimeSerie>2828</TimeSerie>
+		<TimeSerie>2832</TimeSerie>
+		<TimeSerie>2836</TimeSerie>
+		<TimeSerie>2840</TimeSerie>
+		<TimeSerie>2845</TimeSerie>
+		<TimeSerie>2849</TimeSerie>
+		<TimeSerie>2854</TimeSerie>
+		<TimeSerie>2861</TimeSerie>
+		<TimeSerie>2874</TimeSerie>
+		<TimeSerie>2879</TimeSerie>
+		<TimeSerie>2887</TimeSerie>
+		<TimeSerie>2894</TimeSerie>
+		<TimeSerie>2899</TimeSerie>
+		<TimeSerie>2904</TimeSerie>
+		<TimeSerie>2908</TimeSerie>
+		<TimeSerie>2913</TimeSerie>
+		<TimeSerie>2917</TimeSerie>
+		<TimeSerie>2922</TimeSerie>
+		<TimeSerie>2927</TimeSerie>
+		<TimeSerie>2931</TimeSerie>
+		<TimeSerie>2937</TimeSerie>
+		<TimeSerie>2944</TimeSerie>
+		<TimeSerie>2948</TimeSerie>
+		<TimeSerie>2953</TimeSerie>
+		<TimeSerie>2957</TimeSerie>
+		<TimeSerie>2962</TimeSerie>
+		<TimeSerie>2967</TimeSerie>
+		<TimeSerie>2972</TimeSerie>
+		<TimeSerie>2985</TimeSerie>
+		<TimeSerie>2993</TimeSerie>
+		<TimeSerie>3000</TimeSerie>
+		<TimeSerie>3006</TimeSerie>
+		<TimeSerie>3011</TimeSerie>
+		<TimeSerie>3016</TimeSerie>
+		<TimeSerie>3022</TimeSerie>
+		<TimeSerie>3027</TimeSerie>
+		<TimeSerie>3033</TimeSerie>
+		<TimeSerie>3042</TimeSerie>
+		<TimeSerie>3051</TimeSerie>
+		<TimeSerie>3060</TimeSerie>
+		<TimeSerie>3064</TimeSerie>
+		<TimeSerie>3066</TimeSerie>
 		<TimeSerie>3067</TimeSerie>
-		<TimeSerie>3069</TimeSerie>
+		<TimeSerie>3068</TimeSerie>
 		<TimeSerie>3070</TimeSerie>
 		<TimeSerie>3071</TimeSerie>
 		<TimeSerie>3073</TimeSerie>
-		<TimeSerie>3074</TimeSerie>
-		<TimeSerie>3076</TimeSerie>
-		<TimeSerie>3080</TimeSerie>
-		<TimeSerie>3084</TimeSerie>
+		<TimeSerie>3077</TimeSerie>
+		<TimeSerie>3081</TimeSerie>
+		<TimeSerie>3083</TimeSerie>
+		<TimeSerie>3085</TimeSerie>
 		<TimeSerie>3086</TimeSerie>
 		<TimeSerie>3088</TimeSerie>
-		<TimeSerie>3089</TimeSerie>
-		<TimeSerie>3091</TimeSerie>
+		<TimeSerie>3090</TimeSerie>
 		<TimeSerie>3093</TimeSerie>
+		<TimeSerie>3095</TimeSerie>
 		<TimeSerie>3096</TimeSerie>
 		<TimeSerie>3098</TimeSerie>
 		<TimeSerie>3099</TimeSerie>
 		<TimeSerie>3101</TimeSerie>
 		<TimeSerie>3102</TimeSerie>
 		<TimeSerie>3104</TimeSerie>
-		<TimeSerie>3105</TimeSerie>
 		<TimeSerie>3107</TimeSerie>
+		<TimeSerie>3109</TimeSerie>
 		<TimeSerie>3110</TimeSerie>
-		<TimeSerie>3112</TimeSerie>
-		<TimeSerie>3113</TimeSerie>
+		<TimeSerie>3116</TimeSerie>
+		<TimeSerie>3117</TimeSerie>
 		<TimeSerie>3119</TimeSerie>
 		<TimeSerie>3120</TimeSerie>
-		<TimeSerie>3122</TimeSerie>
+		<TimeSerie>3121</TimeSerie>
 		<TimeSerie>3123</TimeSerie>
-		<TimeSerie>3124</TimeSerie>
+		<TimeSerie>3125</TimeSerie>
 		<TimeSerie>3126</TimeSerie>
+		<TimeSerie>3127</TimeSerie>
 		<TimeSerie>3128</TimeSerie>
 		<TimeSerie>3129</TimeSerie>
 		<TimeSerie>3130</TimeSerie>
-		<TimeSerie>3131</TimeSerie>
 		<TimeSerie>3132</TimeSerie>
-		<TimeSerie>3133</TimeSerie>
-		<TimeSerie>3135</TimeSerie>
+		<TimeSerie>3134</TimeSerie>
 		<TimeSerie>3137</TimeSerie>
-		<TimeSerie>3140</TimeSerie>
+		<TimeSerie>3139</TimeSerie>
+		<TimeSerie>3141</TimeSerie>
 		<TimeSerie>3142</TimeSerie>
+		<TimeSerie>3143</TimeSerie>
 		<TimeSerie>3144</TimeSerie>
-		<TimeSerie>3145</TimeSerie>
 		<TimeSerie>3146</TimeSerie>
 		<TimeSerie>3147</TimeSerie>
-		<TimeSerie>3149</TimeSerie>
+		<TimeSerie>3148</TimeSerie>
 		<TimeSerie>3150</TimeSerie>
-		<TimeSerie>3151</TimeSerie>
-		<TimeSerie>3153</TimeSerie>
-		<TimeSerie>3157</TimeSerie>
-		<TimeSerie>3166</TimeSerie>
-		<TimeSerie>3171</TimeSerie>
-		<TimeSerie>3173</TimeSerie>
-		<TimeSerie>3179</TimeSerie>
-		<TimeSerie>3187</TimeSerie>
-		<TimeSerie>3200</TimeSerie>
-		<TimeSerie>3208</TimeSerie>
-		<TimeSerie>3217</TimeSerie>
-		<TimeSerie>3225</TimeSerie>
-		<TimeSerie>3235</TimeSerie>
-		<TimeSerie>3245</TimeSerie>
-		<TimeSerie>3253</TimeSerie>
-		<TimeSerie>3259</TimeSerie>
-		<TimeSerie>3263</TimeSerie>
-		<TimeSerie>3268</TimeSerie>
-		<TimeSerie>3274</TimeSerie>
-		<TimeSerie>3279</TimeSerie>
-		<TimeSerie>3285</TimeSerie>
-		<TimeSerie>3293</TimeSerie>
-		<TimeSerie>3302</TimeSerie>
-		<TimeSerie>3312</TimeSerie>
-		<TimeSerie>3323</TimeSerie>
-		<TimeSerie>3329</TimeSerie>
-		<TimeSerie>3337</TimeSerie>
-		<TimeSerie>3345</TimeSerie>
-		<TimeSerie>3353</TimeSerie>
-		<TimeSerie>3362</TimeSerie>
-		<TimeSerie>3370</TimeSerie>
-		<TimeSerie>3376</TimeSerie>
-		<TimeSerie>3385</TimeSerie>
-		<TimeSerie>3391</TimeSerie>
-		<TimeSerie>3399</TimeSerie>
-		<TimeSerie>3409</TimeSerie>
-		<TimeSerie>3418</TimeSerie>
-		<TimeSerie>3430</TimeSerie>
-		<TimeSerie>3445</TimeSerie>
-		<TimeSerie>3460</TimeSerie>
-		<TimeSerie>3473</TimeSerie>
-		<TimeSerie>3478</TimeSerie>
-		<TimeSerie>3487</TimeSerie>
-		<TimeSerie>3505</TimeSerie>
-		<TimeSerie>3540</TimeSerie>
-		<TimeSerie>3635</TimeSerie>
-		<TimeSerie>3645</TimeSerie>
-		<TimeSerie>3652</TimeSerie>
-		<TimeSerie>3657</TimeSerie>
-		<TimeSerie>3663</TimeSerie>
-		<TimeSerie>3671</TimeSerie>
-		<TimeSerie>3679</TimeSerie>
-		<TimeSerie>3686</TimeSerie>
-		<TimeSerie>3694</TimeSerie>
-		<TimeSerie>3703</TimeSerie>
-		<TimeSerie>3712</TimeSerie>
-		<TimeSerie>3720</TimeSerie>
+		<TimeSerie>3154</TimeSerie>
+		<TimeSerie>3163</TimeSerie>
+		<TimeSerie>3168</TimeSerie>
+		<TimeSerie>3170</TimeSerie>
+		<TimeSerie>3176</TimeSerie>
+		<TimeSerie>3184</TimeSerie>
+		<TimeSerie>3197</TimeSerie>
+		<TimeSerie>3205</TimeSerie>
+		<TimeSerie>3214</TimeSerie>
+		<TimeSerie>3222</TimeSerie>
+		<TimeSerie>3232</TimeSerie>
+		<TimeSerie>3242</TimeSerie>
+		<TimeSerie>3250</TimeSerie>
+		<TimeSerie>3256</TimeSerie>
+		<TimeSerie>3260</TimeSerie>
+		<TimeSerie>3265</TimeSerie>
+		<TimeSerie>3271</TimeSerie>
+		<TimeSerie>3276</TimeSerie>
+		<TimeSerie>3282</TimeSerie>
+		<TimeSerie>3290</TimeSerie>
+		<TimeSerie>3299</TimeSerie>
+		<TimeSerie>3309</TimeSerie>
+		<TimeSerie>3320</TimeSerie>
+		<TimeSerie>3326</TimeSerie>
+		<TimeSerie>3334</TimeSerie>
+		<TimeSerie>3342</TimeSerie>
+		<TimeSerie>3350</TimeSerie>
+		<TimeSerie>3359</TimeSerie>
+		<TimeSerie>3367</TimeSerie>
+		<TimeSerie>3373</TimeSerie>
+		<TimeSerie>3382</TimeSerie>
+		<TimeSerie>3388</TimeSerie>
+		<TimeSerie>3396</TimeSerie>
+		<TimeSerie>3406</TimeSerie>
+		<TimeSerie>3415</TimeSerie>
+		<TimeSerie>3427</TimeSerie>
+		<TimeSerie>3442</TimeSerie>
+		<TimeSerie>3457</TimeSerie>
+		<TimeSerie>3470</TimeSerie>
+		<TimeSerie>3475</TimeSerie>
+		<TimeSerie>3484</TimeSerie>
+		<TimeSerie>3502</TimeSerie>
+		<TimeSerie>3537</TimeSerie>
+		<TimeSerie>3632</TimeSerie>
+		<TimeSerie>3642</TimeSerie>
+		<TimeSerie>3649</TimeSerie>
+		<TimeSerie>3654</TimeSerie>
+		<TimeSerie>3660</TimeSerie>
+		<TimeSerie>3668</TimeSerie>
+		<TimeSerie>3676</TimeSerie>
+		<TimeSerie>3683</TimeSerie>
+		<TimeSerie>3691</TimeSerie>
+		<TimeSerie>3700</TimeSerie>
+		<TimeSerie>3709</TimeSerie>
+		<TimeSerie>3717</TimeSerie>
+		<TimeSerie>3721</TimeSerie>
+		<TimeSerie>3722</TimeSerie>
 		<TimeSerie>3724</TimeSerie>
 		<TimeSerie>3725</TimeSerie>
-		<TimeSerie>3727</TimeSerie>
-		<TimeSerie>3728</TimeSerie>
-		<TimeSerie>3737</TimeSerie>
-		<TimeSerie>3748</TimeSerie>
-		<TimeSerie>3754</TimeSerie>
-		<TimeSerie>3761</TimeSerie>
-		<TimeSerie>3767</TimeSerie>
-		<TimeSerie>3776</TimeSerie>
-		<TimeSerie>3782</TimeSerie>
-		<TimeSerie>3791</TimeSerie>
+		<TimeSerie>3734</TimeSerie>
+		<TimeSerie>3745</TimeSerie>
+		<TimeSerie>3751</TimeSerie>
+		<TimeSerie>3758</TimeSerie>
+		<TimeSerie>3764</TimeSerie>
+		<TimeSerie>3773</TimeSerie>
+		<TimeSerie>3779</TimeSerie>
+		<TimeSerie>3788</TimeSerie>
+		<TimeSerie>3796</TimeSerie>
+		<TimeSerie>3798</TimeSerie>
 		<TimeSerie>3799</TimeSerie>
+		<TimeSerie>3800</TimeSerie>
 		<TimeSerie>3801</TimeSerie>
-		<TimeSerie>3802</TimeSerie>
-		<TimeSerie>3803</TimeSerie>
-		<TimeSerie>3804</TimeSerie>
-		<TimeSerie>3809</TimeSerie>
-		<TimeSerie>3818</TimeSerie>
-		<TimeSerie>3823</TimeSerie>
-		<TimeSerie>3828</TimeSerie>
-		<TimeSerie>3832</TimeSerie>
-		<TimeSerie>3836</TimeSerie>
-		<TimeSerie>3841</TimeSerie>
-		<TimeSerie>3846</TimeSerie>
-		<TimeSerie>3853</TimeSerie>
+		<TimeSerie>3806</TimeSerie>
+		<TimeSerie>3815</TimeSerie>
+		<TimeSerie>3820</TimeSerie>
+		<TimeSerie>3825</TimeSerie>
+		<TimeSerie>3829</TimeSerie>
+		<TimeSerie>3833</TimeSerie>
+		<TimeSerie>3838</TimeSerie>
+		<TimeSerie>3843</TimeSerie>
+		<TimeSerie>3850</TimeSerie>
+		<TimeSerie>3856</TimeSerie>
 		<TimeSerie>3859</TimeSerie>
-		<TimeSerie>3862</TimeSerie>
+		<TimeSerie>3863</TimeSerie>
 		<TimeSerie>3866</TimeSerie>
-		<TimeSerie>3869</TimeSerie>
-		<TimeSerie>3873</TimeSerie>
-		<TimeSerie>3881</TimeSerie>
-		<TimeSerie>3897</TimeSerie>
-		<TimeSerie>3917</TimeSerie>
-		<TimeSerie>3925</TimeSerie>
-		<TimeSerie>3938</TimeSerie>
-		<TimeSerie>3954</TimeSerie>
-		<TimeSerie>3959</TimeSerie>
-		<TimeSerie>3965</TimeSerie>
-		<TimeSerie>3970</TimeSerie>
-		<TimeSerie>3975</TimeSerie>
-		<TimeSerie>3979</TimeSerie>
-		<TimeSerie>3983</TimeSerie>
-		<TimeSerie>3987</TimeSerie>
-		<TimeSerie>3992</TimeSerie>
-		<TimeSerie>3997</TimeSerie>
-		<TimeSerie>4001</TimeSerie>
-		<TimeSerie>4006</TimeSerie>
-		<TimeSerie>4011</TimeSerie>
-		<TimeSerie>4015</TimeSerie>
+		<TimeSerie>3870</TimeSerie>
+		<TimeSerie>3878</TimeSerie>
+		<TimeSerie>3894</TimeSerie>
+		<TimeSerie>3914</TimeSerie>
+		<TimeSerie>3922</TimeSerie>
+		<TimeSerie>3935</TimeSerie>
+		<TimeSerie>3951</TimeSerie>
+		<TimeSerie>3956</TimeSerie>
+		<TimeSerie>3962</TimeSerie>
+		<TimeSerie>3967</TimeSerie>
+		<TimeSerie>3972</TimeSerie>
+		<TimeSerie>3976</TimeSerie>
+		<TimeSerie>3980</TimeSerie>
+		<TimeSerie>3984</TimeSerie>
+		<TimeSerie>3989</TimeSerie>
+		<TimeSerie>3994</TimeSerie>
+		<TimeSerie>3998</TimeSerie>
+		<TimeSerie>4003</TimeSerie>
+		<TimeSerie>4008</TimeSerie>
+		<TimeSerie>4012</TimeSerie>
+		<TimeSerie>4016</TimeSerie>
+		<TimeSerie>4017</TimeSerie>
+		<TimeSerie>4018</TimeSerie>
 		<TimeSerie>4019</TimeSerie>
 		<TimeSerie>4020</TimeSerie>
-		<TimeSerie>4021</TimeSerie>
-		<TimeSerie>4022</TimeSerie>
-		<TimeSerie>4023</TimeSerie>
+		<TimeSerie>4025</TimeSerie>
+		<TimeSerie>4027</TimeSerie>
 		<TimeSerie>4028</TimeSerie>
-		<TimeSerie>4030</TimeSerie>
-		<TimeSerie>4031</TimeSerie>
-		<TimeSerie>4035</TimeSerie>
-		<TimeSerie>4040</TimeSerie>
-		<TimeSerie>4045</TimeSerie>
-		<TimeSerie>4051</TimeSerie>
-		<TimeSerie>4056</TimeSerie>
-		<TimeSerie>4062</TimeSerie>
-		<TimeSerie>4067</TimeSerie>
-		<TimeSerie>4074</TimeSerie>
-		<TimeSerie>4080</TimeSerie>
+		<TimeSerie>4032</TimeSerie>
+		<TimeSerie>4037</TimeSerie>
+		<TimeSerie>4042</TimeSerie>
+		<TimeSerie>4048</TimeSerie>
+		<TimeSerie>4053</TimeSerie>
+		<TimeSerie>4059</TimeSerie>
+		<TimeSerie>4064</TimeSerie>
+		<TimeSerie>4071</TimeSerie>
+		<TimeSerie>4077</TimeSerie>
+		<TimeSerie>4084</TimeSerie>
 		<TimeSerie>4087</TimeSerie>
 		<TimeSerie>4090</TimeSerie>
-		<TimeSerie>4093</TimeSerie>
-		<TimeSerie>4102</TimeSerie>
-		<TimeSerie>4106</TimeSerie>
-		<TimeSerie>4110</TimeSerie>
-		<TimeSerie>4114</TimeSerie>
+		<TimeSerie>4099</TimeSerie>
+		<TimeSerie>4103</TimeSerie>
+		<TimeSerie>4107</TimeSerie>
+		<TimeSerie>4111</TimeSerie>
+		<TimeSerie>4116</TimeSerie>
 		<TimeSerie>4119</TimeSerie>
-		<TimeSerie>4122</TimeSerie>
-		<TimeSerie>4126</TimeSerie>
-		<TimeSerie>4130</TimeSerie>
-		<TimeSerie>4134</TimeSerie>
-		<TimeSerie>4145</TimeSerie>
-		<TimeSerie>4150</TimeSerie>
-		<TimeSerie>4157</TimeSerie>
-		<TimeSerie>4161</TimeSerie>
-		<TimeSerie>4165</TimeSerie>
-		<TimeSerie>4169</TimeSerie>
-		<TimeSerie>4173</TimeSerie>
-		<TimeSerie>4181</TimeSerie>
-		<TimeSerie>4189</TimeSerie>
+		<TimeSerie>4123</TimeSerie>
+		<TimeSerie>4127</TimeSerie>
+		<TimeSerie>4131</TimeSerie>
+		<TimeSerie>4142</TimeSerie>
+		<TimeSerie>4147</TimeSerie>
+		<TimeSerie>4154</TimeSerie>
+		<TimeSerie>4158</TimeSerie>
+		<TimeSerie>4162</TimeSerie>
+		<TimeSerie>4166</TimeSerie>
+		<TimeSerie>4170</TimeSerie>
+		<TimeSerie>4178</TimeSerie>
+		<TimeSerie>4186</TimeSerie>
+		<TimeSerie>4188</TimeSerie>
 		<TimeSerie>4191</TimeSerie>
-		<TimeSerie>4194</TimeSerie>
-		<TimeSerie>4196</TimeSerie>
+		<TimeSerie>4193</TimeSerie>
+		<TimeSerie>4197</TimeSerie>
 		<TimeSerie>4200</TimeSerie>
+		<TimeSerie>4201</TimeSerie>
 		<TimeSerie>4203</TimeSerie>
-		<TimeSerie>4204</TimeSerie>
-		<TimeSerie>4206</TimeSerie>
-		<TimeSerie>4210</TimeSerie>
-		<TimeSerie>4212</TimeSerie>
+		<TimeSerie>4207</TimeSerie>
+		<TimeSerie>4209</TimeSerie>
+		<TimeSerie>4214</TimeSerie>
 		<TimeSerie>4217</TimeSerie>
-		<TimeSerie>4220</TimeSerie>
-		<TimeSerie>4222</TimeSerie>
-		<TimeSerie>4228</TimeSerie>
+		<TimeSerie>4219</TimeSerie>
+		<TimeSerie>4225</TimeSerie>
+		<TimeSerie>4229</TimeSerie>
+		<TimeSerie>4231</TimeSerie>
 		<TimeSerie>4232</TimeSerie>
-		<TimeSerie>4234</TimeSerie>
+		<TimeSerie>4233</TimeSerie>
 		<TimeSerie>4235</TimeSerie>
 		<TimeSerie>4236</TimeSerie>
-		<TimeSerie>4238</TimeSerie>
-		<TimeSerie>4239</TimeSerie>
+		<TimeSerie>4237</TimeSerie>
 		<TimeSerie>4240</TimeSerie>
+		<TimeSerie>4242</TimeSerie>
 		<TimeSerie>4243</TimeSerie>
-		<TimeSerie>4245</TimeSerie>
-		<TimeSerie>4246</TimeSerie>
-		<TimeSerie>4247</TimeSerie>
+		<TimeSerie>4244</TimeSerie>
+		<TimeSerie>4249</TimeSerie>
+		<TimeSerie>4251</TimeSerie>
 		<TimeSerie>4252</TimeSerie>
+		<TimeSerie>4253</TimeSerie>
 		<TimeSerie>4254</TimeSerie>
-		<TimeSerie>4255</TimeSerie>
-		<TimeSerie>4256</TimeSerie>
-		<TimeSerie>4257</TimeSerie>
-		<TimeSerie>4262</TimeSerie>
+		<TimeSerie>4259</TimeSerie>
+		<TimeSerie>4264</TimeSerie>
 		<TimeSerie>4267</TimeSerie>
-		<TimeSerie>4270</TimeSerie>
-		<TimeSerie>4276</TimeSerie>
-		<TimeSerie>4281</TimeSerie>
-		<TimeSerie>4285</TimeSerie>
+		<TimeSerie>4273</TimeSerie>
+		<TimeSerie>4278</TimeSerie>
+		<TimeSerie>4282</TimeSerie>
+		<TimeSerie>4286</TimeSerie>
 		<TimeSerie>4289</TimeSerie>
+		<TimeSerie>4290</TimeSerie>
+		<TimeSerie>4291</TimeSerie>
 		<TimeSerie>4292</TimeSerie>
 		<TimeSerie>4293</TimeSerie>
-		<TimeSerie>4294</TimeSerie>
 		<TimeSerie>4295</TimeSerie>
-		<TimeSerie>4296</TimeSerie>
 		<TimeSerie>4298</TimeSerie>
-		<TimeSerie>4301</TimeSerie>
-		<TimeSerie>4302</TimeSerie>
+		<TimeSerie>4299</TimeSerie>
 	</TimeSeries>
 	<DistanceSeries>
 		<DistanceSerie>0.0</DistanceSerie>
-		<DistanceSerie>1.2692307</DistanceSerie>
 		<DistanceSerie>11.0</DistanceSerie>
 		<DistanceSerie>23.0</DistanceSerie>
 		<DistanceSerie>34.0</DistanceSerie>
@@ -2043,7 +2041,6 @@
 		<DistanceSerie>6608.0</DistanceSerie>
 	</DistanceSeries>
 	<AltitudeSeries>
-		<AltitudeSerie>1970.0</AltitudeSerie>
 		<AltitudeSerie>1970.2</AltitudeSerie>
 		<AltitudeSerie>1970.0</AltitudeSerie>
 		<AltitudeSerie>1970.2</AltitudeSerie>
@@ -3054,7 +3051,6 @@
 	</AltitudeSeries>
 	<CadenceSeries>
 		<CadenceSerie>0.0</CadenceSerie>
-		<CadenceSerie>0.0</CadenceSerie>
 		<CadenceSerie>69.0</CadenceSerie>
 		<CadenceSerie>79.979996</CadenceSerie>
 		<CadenceSerie>85.020004</CadenceSerie>
@@ -4063,7 +4059,6 @@
 		<CadenceSerie>0.0</CadenceSerie>
 	</CadenceSeries>
 	<PulseSeries>
-		<PulseSerie>1.4E-45</PulseSerie>
 		<PulseSerie>94.8</PulseSerie>
 		<PulseSerie>100.2</PulseSerie>
 		<PulseSerie>109.8</PulseSerie>
@@ -5076,7 +5071,6 @@
 		<TemperatureSerie>26.24002</TemperatureSerie>
 		<TemperatureSerie>26.24002</TemperatureSerie>
 		<TemperatureSerie>26.24002</TemperatureSerie>
-		<TemperatureSerie>26.24002</TemperatureSerie>
 		<TemperatureSerie>26.230011</TemperatureSerie>
 		<TemperatureSerie>26.209991</TemperatureSerie>
 		<TemperatureSerie>26.200012</TemperatureSerie>
@@ -6083,86 +6077,85 @@
 		<TemperatureSerie>22.300018</TemperatureSerie>
 	</TemperatureSeries>
 	<SpeedSeries>
-		<SpeedSerie>2.0388763</SpeedSerie>
-		<SpeedSerie>3.0502636</SpeedSerie>
-		<SpeedSerie>5.5660944</SpeedSerie>
-		<SpeedSerie>6.4199595</SpeedSerie>
-		<SpeedSerie>7.1913958</SpeedSerie>
-		<SpeedSerie>7.6224785</SpeedSerie>
-		<SpeedSerie>7.7408123</SpeedSerie>
-		<SpeedSerie>7.8610277</SpeedSerie>
-		<SpeedSerie>7.9831367</SpeedSerie>
-		<SpeedSerie>8.075163</SpeedSerie>
-		<SpeedSerie>8.174139</SpeedSerie>
-		<SpeedSerie>8.302964</SpeedSerie>
-		<SpeedSerie>8.676978</SpeedSerie>
-		<SpeedSerie>8.628541</SpeedSerie>
-		<SpeedSerie>8.738836</SpeedSerie>
-		<SpeedSerie>8.692343</SpeedSerie>
-		<SpeedSerie>8.680605</SpeedSerie>
-		<SpeedSerie>8.677294</SpeedSerie>
-		<SpeedSerie>8.657601</SpeedSerie>
-		<SpeedSerie>8.60701</SpeedSerie>
-		<SpeedSerie>8.616235</SpeedSerie>
-		<SpeedSerie>8.559179</SpeedSerie>
-		<SpeedSerie>8.516095</SpeedSerie>
-		<SpeedSerie>8.447175</SpeedSerie>
-		<SpeedSerie>8.378082</SpeedSerie>
-		<SpeedSerie>8.301949</SpeedSerie>
-		<SpeedSerie>8.21941</SpeedSerie>
-		<SpeedSerie>8.138635</SpeedSerie>
-		<SpeedSerie>7.9964957</SpeedSerie>
-		<SpeedSerie>7.771079</SpeedSerie>
-		<SpeedSerie>7.576243</SpeedSerie>
-		<SpeedSerie>7.0578175</SpeedSerie>
-		<SpeedSerie>7.3346105</SpeedSerie>
-		<SpeedSerie>7.5334687</SpeedSerie>
-		<SpeedSerie>7.667832</SpeedSerie>
-		<SpeedSerie>7.7403116</SpeedSerie>
-		<SpeedSerie>7.864281</SpeedSerie>
-		<SpeedSerie>7.860231</SpeedSerie>
-		<SpeedSerie>7.8760295</SpeedSerie>
-		<SpeedSerie>7.884911</SpeedSerie>
-		<SpeedSerie>7.8974137</SpeedSerie>
-		<SpeedSerie>7.8913593</SpeedSerie>
-		<SpeedSerie>7.946818</SpeedSerie>
-		<SpeedSerie>7.9629254</SpeedSerie>
-		<SpeedSerie>7.875923</SpeedSerie>
-		<SpeedSerie>7.807036</SpeedSerie>
-		<SpeedSerie>7.755767</SpeedSerie>
-		<SpeedSerie>7.71141</SpeedSerie>
-		<SpeedSerie>7.7273173</SpeedSerie>
-		<SpeedSerie>7.6820855</SpeedSerie>
-		<SpeedSerie>7.582188</SpeedSerie>
-		<SpeedSerie>7.5801873</SpeedSerie>
-		<SpeedSerie>7.513672</SpeedSerie>
-		<SpeedSerie>7.298471</SpeedSerie>
-		<SpeedSerie>7.2264304</SpeedSerie>
-		<SpeedSerie>7.2710333</SpeedSerie>
-		<SpeedSerie>7.122304</SpeedSerie>
-		<SpeedSerie>7.0219913</SpeedSerie>
-		<SpeedSerie>6.921457</SpeedSerie>
-		<SpeedSerie>6.821166</SpeedSerie>
-		<SpeedSerie>6.69632</SpeedSerie>
-		<SpeedSerie>6.5725822</SpeedSerie>
-		<SpeedSerie>6.4503884</SpeedSerie>
-		<SpeedSerie>6.2757807</SpeedSerie>
-		<SpeedSerie>6.0075784</SpeedSerie>
-		<SpeedSerie>5.8455997</SpeedSerie>
-		<SpeedSerie>5.489909</SpeedSerie>
-		<SpeedSerie>4.690071</SpeedSerie>
-		<SpeedSerie>4.0729513</SpeedSerie>
-		<SpeedSerie>4.185409</SpeedSerie>
-		<SpeedSerie>4.1529408</SpeedSerie>
-		<SpeedSerie>3.8431795</SpeedSerie>
+		<SpeedSerie>3.0445497</SpeedSerie>
+		<SpeedSerie>5.545034</SpeedSerie>
+		<SpeedSerie>6.407338</SpeedSerie>
+		<SpeedSerie>7.183112</SpeedSerie>
+		<SpeedSerie>7.6165385</SpeedSerie>
+		<SpeedSerie>7.7360926</SpeedSerie>
+		<SpeedSerie>7.856809</SpeedSerie>
+		<SpeedSerie>7.979426</SpeedSerie>
+		<SpeedSerie>8.0719</SpeedSerie>
+		<SpeedSerie>8.171273</SpeedSerie>
+		<SpeedSerie>8.301263</SpeedSerie>
+		<SpeedSerie>8.675948</SpeedSerie>
+		<SpeedSerie>8.627599</SpeedSerie>
+		<SpeedSerie>8.738025</SpeedSerie>
+		<SpeedSerie>8.691647</SpeedSerie>
+		<SpeedSerie>8.680009</SpeedSerie>
+		<SpeedSerie>8.676785</SpeedSerie>
+		<SpeedSerie>8.65717</SpeedSerie>
+		<SpeedSerie>8.606646</SpeedSerie>
+		<SpeedSerie>8.615929</SpeedSerie>
+		<SpeedSerie>8.558925</SpeedSerie>
+		<SpeedSerie>8.515884</SpeedSerie>
+		<SpeedSerie>8.447001</SpeedSerie>
+		<SpeedSerie>8.377942</SpeedSerie>
+		<SpeedSerie>8.301836</SpeedSerie>
+		<SpeedSerie>8.219321</SpeedSerie>
+		<SpeedSerie>8.138567</SpeedSerie>
+		<SpeedSerie>7.996464</SpeedSerie>
+		<SpeedSerie>7.771068</SpeedSerie>
+		<SpeedSerie>7.576247</SpeedSerie>
+		<SpeedSerie>7.057847</SpeedSerie>
+		<SpeedSerie>7.334641</SpeedSerie>
+		<SpeedSerie>7.5334964</SpeedSerie>
+		<SpeedSerie>7.667861</SpeedSerie>
+		<SpeedSerie>7.740339</SpeedSerie>
+		<SpeedSerie>7.8643074</SpeedSerie>
+		<SpeedSerie>7.8602567</SpeedSerie>
+		<SpeedSerie>7.876055</SpeedSerie>
+		<SpeedSerie>7.8849354</SpeedSerie>
+		<SpeedSerie>7.897437</SpeedSerie>
+		<SpeedSerie>7.8913817</SpeedSerie>
+		<SpeedSerie>7.9468393</SpeedSerie>
+		<SpeedSerie>7.9629455</SpeedSerie>
+		<SpeedSerie>7.8759413</SpeedSerie>
+		<SpeedSerie>7.807052</SpeedSerie>
+		<SpeedSerie>7.755781</SpeedSerie>
+		<SpeedSerie>7.7114234</SpeedSerie>
+		<SpeedSerie>7.72733</SpeedSerie>
+		<SpeedSerie>7.682097</SpeedSerie>
+		<SpeedSerie>7.582199</SpeedSerie>
+		<SpeedSerie>7.580197</SpeedSerie>
+		<SpeedSerie>7.5136814</SpeedSerie>
+		<SpeedSerie>7.298478</SpeedSerie>
+		<SpeedSerie>7.226437</SpeedSerie>
+		<SpeedSerie>7.271039</SpeedSerie>
+		<SpeedSerie>7.1223097</SpeedSerie>
+		<SpeedSerie>7.021996</SpeedSerie>
+		<SpeedSerie>6.921462</SpeedSerie>
+		<SpeedSerie>6.8211703</SpeedSerie>
+		<SpeedSerie>6.6963243</SpeedSerie>
+		<SpeedSerie>6.572586</SpeedSerie>
+		<SpeedSerie>6.4503922</SpeedSerie>
+		<SpeedSerie>6.275784</SpeedSerie>
+		<SpeedSerie>6.007581</SpeedSerie>
+		<SpeedSerie>5.845602</SpeedSerie>
+		<SpeedSerie>5.489911</SpeedSerie>
+		<SpeedSerie>4.6900725</SpeedSerie>
+		<SpeedSerie>4.0729523</SpeedSerie>
+		<SpeedSerie>4.1854095</SpeedSerie>
+		<SpeedSerie>4.1529417</SpeedSerie>
+		<SpeedSerie>3.8431797</SpeedSerie>
 		<SpeedSerie>4.566849</SpeedSerie>
 		<SpeedSerie>4.5296564</SpeedSerie>
 		<SpeedSerie>4.6352477</SpeedSerie>
-		<SpeedSerie>4.6550784</SpeedSerie>
+		<SpeedSerie>4.655079</SpeedSerie>
 		<SpeedSerie>4.70062</SpeedSerie>
-		<SpeedSerie>4.674987</SpeedSerie>
+		<SpeedSerie>4.6749873</SpeedSerie>
 		<SpeedSerie>4.736997</SpeedSerie>
-		<SpeedSerie>4.6841393</SpeedSerie>
+		<SpeedSerie>4.6841397</SpeedSerie>
 		<SpeedSerie>4.7188597</SpeedSerie>
 		<SpeedSerie>4.6905866</SpeedSerie>
 		<SpeedSerie>4.5986753</SpeedSerie>
@@ -7093,7 +7086,6 @@
 		<SpeedSerie>3.6785452</SpeedSerie>
 	</SpeedSeries>
 	<LatitudeSeries>
-		<LatitudeSerie>42.07620437507046</LatitudeSerie>
 		<LatitudeSerie>42.076243231257735</LatitudeSerie>
 		<LatitudeSerie>42.07633551470252</LatitudeSerie>
 		<LatitudeSerie>42.07643265517072</LatitudeSerie>
@@ -8103,7 +8095,6 @@
 		<LatitudeSerie>42.07616066185977</LatitudeSerie>
 	</LatitudeSeries>
 	<LongitudeSeries>
-		<LongitudeSerie>-113.721656419425</LongitudeSerie>
 		<LongitudeSerie>-113.721656419425</LongitudeSerie>
 		<LongitudeSerie>-113.7217049896591</LongitudeSerie>
 		<LongitudeSerie>-113.7217535598932</LongitudeSerie>

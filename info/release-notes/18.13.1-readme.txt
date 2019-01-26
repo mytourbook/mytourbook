@@ -1,0 +1,51 @@
+Version 18.13.1                                        23. January 2019
+
+
+Improvements   
+============
+
+* Tour Info Tooltip
+
+  - Added close button
+
+ 
+* Tour Import
+
+  New supported tags:
+
+  - .tcx files
+    <ns2:Speed>
+    <ns2:Watts>
+
+  - .gpx files
+    <gpxx:hr>
+    <gpxx:temp>
+    <gpxx:Temperature>
+
+
+* Statistics
+
+  - Log HR zone values after a statistic is computed. This logging is 
+    displayed in the console, it can be activated with the command line 
+    parameter: -DlogStatisticValues
+
+
+* Minor UI Adjustments
+
+  - Wording (Frederic Bard)
+  - Layout (Thomas Theussing)
+
+
+Translation
+===========   
+
+* Czech (Lukas Novotny) 
+
+
+Bugfix
+======   
+
+* Tour Import
+
+  - Fixed NPE when importing .fit files
+

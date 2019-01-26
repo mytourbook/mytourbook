@@ -12,17 +12,17 @@
  Build VTM Plugin
 #################
 
-	Setup Gradle environment
-	- Set org.gradle.java.home=C:/Program Files/Java/jdk1.8 in C:\Users\WolfgangSchramm\.gradle\gradle.properties
+   Setup Gradle environment
+   - Set org.gradle.java.home=C:/Program Files/Java/jdk1.8 in C:\Users\WolfgangSchramm\.gradle\gradle.properties
 
-	Update manifest.MF
-	- Select 'EGradle virtual root project' in 'Package Explorer'
-	- Select in the contextmenu 'Egradle/Refresh eclipse dependencies'  
-	
-	Build plugin
-	- Open 'Gradle Tasks' view
-	- Select 'net.tourbook.ext.vtm'
-	- Double click 'assemble'
+   Update manifest.MF
+   - Select 'EGradle virtual root project' in 'Package Explorer'
+   - Select in the contextmenu 'Egradle/Refresh eclipse dependencies'  
+   
+   Build plugin
+   - Open 'Gradle Tasks' view
+   - Select 'net.tourbook.ext.vtm'
+   - Double click 'assemble'
 
 
 
@@ -36,17 +36,17 @@ Build with POM (since 16.4)
 Switch to workspace "C:\DAT\ws_mt-NL-projects" 
 ----------------------------------------------
 
-	- refresh all projects with F5
-	- Replace text (Ctrl-H) "x.y.0.qualifier" to "a.b.0.qualifier" in all NL projects
-	
-			THIS SEEMS TO BE OBSOLETE
-			
-			- Replace text (Ctrl-H) "x.y.0" to "a.b.0" in 
-			    - All NL projects 
-			    - "site.xml" in the project "translation-test-update-site" that the 
-			      translation test update site can be build OTHERWISE it is NOT working 
+   - refresh all projects with F5
+   - Replace text (Ctrl-H) "x.y.0.qualifier" to "a.b.0.qualifier" in all NL projects
+   
+         THIS SEEMS TO BE OBSOLETE
+         
+         - Replace text (Ctrl-H) "x.y.0" to "a.b.0" in 
+             - All NL projects 
+             - "site.xml" in the project "translation-test-update-site" that the 
+               translation test update site can be build OTHERWISE it is NOT working 
 
-	
+   
 Switch to workspace "C:\DAT\ws_MT-e48"
 --------------------------------------
 
@@ -54,82 +54,83 @@ Switch to workspace "C:\DAT\ws_MT-e48"
 Set version number / year
 -------------------------
 
-	- Replace year in "net.tourbook.application.ApplicationVersion"
-	- Replace text (Ctrl-H) "x.y.0-SNAPSHOT" to "a.b.0-SNAPSHOT" 		in all "pom*.xml"
-	- Replace text (Ctrl-H) "x.y.0.qualifier" to "a.b.0.qualifier" 	in all other files
-	- Replace text (Ctrl-H) "x.y.z" to "a.b.c" 								in "about.mappings"
-	- Replace text (Ctrl-H) "x.y.z" to "a.b.c" 								in these files
-	 
-	    BUT ONLY WHEN A MAJOR RELEASE IS CREATED DON'T MODIFY match="equivalent" VERSION WHEN AN UPDATE SITE IS CREATED
+   - Replace year in "net.tourbook.application.ApplicationVersion"
+   
+   - Replace text (Ctrl-H) "x.y.0-SNAPSHOT"     to "a.b.0-SNAPSHOT"     in all "pom*.xml"
+   - Replace text (Ctrl-H) "x.y.0.qualifier"    to "a.b.0.qualifier"    in all other files
+   - Replace text (Ctrl-H) "x.y.z"              to "a.b.c"              in "about.mappings"
+   - Replace text (Ctrl-H) "x.y.z"              to "a.b.c"              in these files
+    
+       BUT ONLY WHEN A MAJOR RELEASE IS CREATED DON'T MODIFY match="equivalent" VERSION WHEN AN UPDATE SITE IS CREATED
 
-		"feature.xml" in "feature.net.tourbook.app"
-		"feature.xml" in "feature.net.tourbook.app.nl" 
+      "feature.xml" in "feature.net.tourbook.app"
+      "feature.xml" in "feature.net.tourbook.app.nl" 
 
-			This version ensures that a software update is done ONLY for the current version, VERY TRICKY
-			<import feature="feature.net.tourbook.app.version" version="16.2.0" match="equivalent"/>
-	
-	
-	Win-Installer
-		- Set version number in "INSTALL-UPDATES\installer-net.tourbook\win-Inno.Setup\mytourbook-include-app.iss"
+         This version ensures that a software update is done ONLY for the current version, VERY TRICKY
+         <import feature="feature.net.tourbook.app.version" version="16.2.0" match="equivalent"/>
+   
+   
+   Win-Installer
+      - Set version number in "INSTALL-UPDATES\installer-net.tourbook\win-Inno.Setup\mytourbook-include-app.iss"
 
 
 Remove debug code
 -----------------
 
-	* Section "configIni" in "net.tourbook.product"
-	
-	  Disable	"<win32>config-win-DEBUG.ini</win32>"
-	  Enable	"<win32>config-win.ini</win32>"
+   * Section "configIni" in "net.tourbook.product"
+   
+     Disable   "<win32>config-win-DEBUG.ini</win32>"
+     Enable   "<win32>config-win.ini</win32>"
 
 
 Create Dojo files, when web-UI in net.tourbook.web is modified
 --------------------------------------------------------------
 
-	- Set "IS_DEBUG = false" in net.tourbook.web.WEB 
-	- 1. run script /net.tourbook.ant/build-files/Convert-i18-To-Dojo.xml
-	- 2. run script /net.tourbook.web/build-files/Create-Dojo-Bundle.xml
+   - Set "IS_DEBUG = false" in net.tourbook.web.WEB 
+   - 1. run script /net.tourbook.ant/build-files/Convert-i18-To-Dojo.xml
+   - 2. run script /net.tourbook.web/build-files/Create-Dojo-Bundle.xml
 
 
 Copy/Merge app files to build folder
 --------------------------
-	Run ant script "CREATE_MT_BuildFiles.xml" in project "build.net.tourbook"
+   Run ant script "CREATE_MT_BuildFiles.xml" in project "build.net.tourbook"
 
 
 Build Product
 --------------
-	Open cmd
-		- Select folder "C:\DAT\MT\mytourbook"
-		- Run "mvn verify -P build-release"
-		- Run "mvn verify -P build-release -X --log-file ../log.txt"
-		  this will log into a file
+   Open cmd
+      - Select folder "C:\DAT\MT\mytourbook"
+      - Run "mvn verify -P build-release"
+      - Run "mvn verify -P build-release -X --log-file ../log.txt"
+        this will log into a file
 
 
 Build Update site
 ------------------
-	Open cmd
-		- Select folder "C:\DAT\MT\mytourbook"
-		- Run "mvn verify -P build-update-site"
+   Open cmd
+      - Select folder "C:\DAT\MT\mytourbook"
+      - Run "mvn verify -P build-update-site"
 
 
-	* without NL
+   * without NL
 
-	Open cmd
-		- Select folder "C:\DAT\MT\mytourbook"
-		- Run "mvn verify -P build-update-site-no-nl"
+   Open cmd
+      - Select folder "C:\DAT\MT\mytourbook"
+      - Run "mvn verify -P build-update-site-no-nl"
 
 
 
 * Test translations
 -------------------
-	
-	- Select favorite mt-TRANSLATION-TEST in Q-Dir
-	- Select folder "C:\DAT\ws_mt-Translation-TEST"
-	- Delete all folders and files but NOT ".metadata"
-	- Extract "mt-translations.zip" into this folder
+   
+   - Select favorite mt-TRANSLATION-TEST in Q-Dir
+   - Select folder "C:\DAT\ws_mt-Translation-TEST"
+   - Delete all folders and files but NOT ".metadata"
+   - Extract "mt-translations.zip" into this folder
 
-	- Switch to workspace "C:\DAT\ws_mt-Translation-TEST"
-		- Refresh all projects with F5
-		- Run Project/clean... for all projects
+   - Switch to workspace "C:\DAT\ws_mt-Translation-TEST"
+      - Refresh all projects with F5
+      - Run Project/clean... for all projects
 
 
 
@@ -162,40 +163,40 @@ Create Translation Archive
 
 - switch to workspace "C:\DAT\ws_MT-e38"
 
-	- set version number in "feature.net.tourbook.app"
-	- force feature version number into net.tourbook.* plugins
-	- set synch option back to "synch versions on build (recommended)"
+   - set version number in "feature.net.tourbook.app"
+   - force feature version number into net.tourbook.* plugins
+   - set synch option back to "synch versions on build (recommended)"
 
 
 - switch to workspace "C:\DAT\ws_mt-NL-projects" 
 
-	- refresh all projects with F5
+   - refresh all projects with F5
 
-	- set version number into "feature.xml" in "feature.net.tourbook.app.nl"
-	- force feature version number into the *.nl fragments
-	- set synch option back to "synch versions on build (recommended)"
+   - set version number into "feature.xml" in "feature.net.tourbook.app.nl"
+   - force feature version number into the *.nl fragments
+   - set synch option back to "synch versions on build (recommended)"
 
-	- set version number into "feature.xml" in "feature.z-Dummy-Host"
-	- force feature version number into dummy host plugins
-	- set synch option back to "synch versions on build (recommended)"
+   - set version number into "feature.xml" in "feature.z-Dummy-Host"
+   - force feature version number into dummy host plugins
+   - set synch option back to "synch versions on build (recommended)"
 
-	
+   
 - switch to workspace "C:\DAT\ws_MT-e38"
 
-	- run script "Create_Translation_Archive"
+   - run script "Create_Translation_Archive"
 
 
 * Test translations
 -------------------
-	
-	- select favorite mt-TRANSLATION-TEST in Q-Dir
-	- select folder "C:\DAT\ws_mt-Translation-TEST"
-	- delete all folders but NOT ".metadata"
-	- extract "mt-translations.zip" into this folder
+   
+   - select favorite mt-TRANSLATION-TEST in Q-Dir
+   - select folder "C:\DAT\ws_mt-Translation-TEST"
+   - delete all folders but NOT ".metadata"
+   - extract "mt-translations.zip" into this folder
 
-	- switch to workspace "C:\DAT\ws_mt-Translation-TEST"
-		- refresh all projects with F5
-		- run Project/clean... for all projects
+   - switch to workspace "C:\DAT\ws_mt-Translation-TEST"
+      - refresh all projects with F5
+      - run Project/clean... for all projects
 
 
 
@@ -212,26 +213,26 @@ requirements:
 
 - switch to workspace "C:\DAT\ws_mt-with-GIT or ws_MT-E4"
 
-	- set version number in
-		- about.mappings
-		- net.tourbook.application.ApplicationVersion
-	
-	- run script "Create_MyTourbook_BuildFiles" in plugin net.tourbook/build-files
+   - set version number in
+      - about.mappings
+      - net.tourbook.application.ApplicationVersion
+   
+   - run script "Create_MyTourbook_BuildFiles" in plugin net.tourbook/build-files
 
-	
+   
 - switch to workspace "C:\DAT\mytourbook-BUILD-ws"
-	
-	- refresh all projects with F5
-	- run Project/clean... for all projects
+   
+   - refresh all projects with F5
+   - run Project/clean... for all projects
 
-	- update version number in build.feature.net.tourbook.product
-	- replace feature net.tourbook.product.feature with new version number
-	- set build target correctly ???
-	- delete old exported files when a reexport is done, 
-	  export will add new files to an existing product archive
-	- run product export wizard in the product file
+   - update version number in build.feature.net.tourbook.product
+   - replace feature net.tourbook.product.feature with new version number
+   - set build target correctly ???
+   - delete old exported files when a reexport is done, 
+     export will add new files to an existing product archive
+   - run product export wizard in the product file
 
-	
+   
 
 ##################
 
@@ -245,13 +246,13 @@ Create Update Site
 
 - switch to workspace "C:\DAT\ws_mt-with-GIT or ws_MT-E4"
 
-	- run script "Create_MyTourbook_BuildFiles"
+   - run script "Create_MyTourbook_BuildFiles"
 
 
 - switch to workspace "C:\DAT\mytourbook-BUILD-ws"
-	
-	- refresh all projects with F5
-	- run Project/clean... for all projects
+   
+   - refresh all projects with F5
+   - run Project/clean... for all projects
 
 - run script "clear-update-site.xml" in the project "update-site.mytourbook"
 - build the update site within site.xml
