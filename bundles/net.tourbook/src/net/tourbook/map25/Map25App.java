@@ -16,12 +16,22 @@
 package net.tourbook.map25;
 
 import java.awt.Canvas;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Dialog.ModalityType;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Locale;
 //import java.io.FileNotFoundException;
 import java.util.Set;
 import java.util.UUID;
+
+import javax.swing.Box;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 
 //import org.apache.commons.io.FileUtils;
 //import org.apache.commons.io.comparator.SizeFileComparator;
@@ -156,6 +166,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 	private IRenderTheme				_mf_IRenderTheme;
 	private float						_mf_TextScale = 2.0f;
 	private float						_vtm_TextScale = 1.0f;
+	
+   private JFrame _pleaseWaitFrame;
+   private JDialog _pleaseWaitDialog;
+   private JLabel _pleaseWaitLabel;	
 
 	/**
 	 * Is <code>true</code> when a tour marker is hit.
@@ -291,6 +305,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		_mf_prefered_language = Locale.getDefault().toString();
 
 		_httpFactory = new OkHttpEngineMT.OkHttpFactoryMT();
+		
+		init_pleaseWaitWindow();
 		
 		 //256 MB Diskcache
 		/*OkHttpClient.Builder builder = new OkHttpClient.Builder();
@@ -731,6 +747,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 
 			_mf_themeFilePath = ""; // so if mf is next themefile is parsed //$NON-NLS-1$
 		} else { //it mapsforge map
+		   pleaseWaitWindow(true,"switching to online map...");
 			this._is_mf_Map = true;
 			CanvasAdapter.textScale = _mf_TextScale;
 			System.out.println("############# setMapProvider: setMapProvider its mf Map"); //$NON-NLS-1$
@@ -785,7 +802,11 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 					mMap.setTheme(VtmThemes.DEFAULT);   // ThemeLoader.load(_mf_themeFilePath));
 				} else {
 					if (!_mf_themeFilePath.equals(_last_mf_themeFilePath) || !_mf_theme_styleID.equals(_last_mf_theme_styleID) || _mf_offline_IsThemeFromFile != _last_offline_IsThemeFromFile ) {  //only parsing when different file	
-						System.out.println("############# setMapProvider: Theme loader started"); //$NON-NLS-1$
+					   
+					   Path p = Paths.get(_mf_themeFilePath);
+					   pleaseWaitWindow(true,"activating externa theme: " + p.getFileName().toString() + " Style: " + mapProvider.offline_ThemeStyle);
+					   
+					   System.out.println("############# setMapProvider: Theme loader started"); //$NON-NLS-1$
 						this._mf_IRenderTheme = ThemeLoader.load(_mf_themeFilePath);
 						System.out.println("############# setMapProvider: Theme loader done, now activating..."); //$NON-NLS-1$
 						_l.setRenderTheme(_mf_IRenderTheme);
@@ -817,6 +838,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		this._last_mf_theme_styleID = _mf_theme_styleID;
 		this._last_offline_IsThemeFromFile = _mf_offline_IsThemeFromFile;
 		_selectedMapProvider = mapProvider;
+		pleaseWaitWindow(false);
 	}
 
 	/**
@@ -1151,5 +1173,36 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		//return file;
 		return file.getAbsolutePath();
 	}
+	
+   /**
+    * please wait window
+    * @param show true or false
+    * {@link http://www.java2s.com/Tutorials/Java/Swing_How_to/JFrame/Create_Modeless_and_model_Dialog_from_JFrame.htm}
+    */
+   public void pleaseWaitWindow(Boolean show) {
+      _pleaseWaitDialog.setVisible(show);
+      _pleaseWaitFrame.setVisible(show);
+   }
+
+   public void pleaseWaitWindow(Boolean show, String Text) {
+      _pleaseWaitLabel.setText(Text);
+      pleaseWaitWindow(show);
+   }  
+   
+   public void init_pleaseWaitWindow() {
+      _pleaseWaitLabel = new JLabel("loading theme, please be patient");
+      
+      _pleaseWaitFrame = new JFrame();
+      _pleaseWaitFrame.setUndecorated(true);
+      _pleaseWaitFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+      _pleaseWaitFrame.pack();
+
+      _pleaseWaitDialog = new JDialog(_pleaseWaitFrame, "Please Wait...", ModalityType.MODELESS);
+      _pleaseWaitDialog.setLayout(new FlowLayout());
+      _pleaseWaitDialog.add(_pleaseWaitLabel);
+      _pleaseWaitDialog.add(Box.createRigidArea(new Dimension(200, 50)));
+      _pleaseWaitDialog.pack();
+      _pleaseWaitDialog.setLocationRelativeTo(null);
+   }	
 
 }
