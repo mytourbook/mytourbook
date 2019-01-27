@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -230,9 +230,10 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
    private static final String   MEMENTO_TOUR_COLOR_ID                                 = "tour-color-id";                                      //$NON-NLS-1$
 
+   static final String           PREF_DEBUG_MAP_DIM_LEVEL                              = "MapDebug.MapDimLevel";                               //$NON-NLS-1$
+   static final String           PREF_DEBUG_MAP_SHOW_GEO_GRID                          = "PREF_DEBUG_MAP_SHOW_GEO_GRID";                       //$NON-NLS-1$
    static final String           PREF_SHOW_TILE_INFO                                   = "MapDebug.ShowTileInfo";                              //$NON-NLS-1$
    static final String           PREF_SHOW_TILE_BORDER                                 = "MapDebug.ShowTileBorder";                            //$NON-NLS-1$
-   static final String           PREF_DEBUG_MAP_DIM_LEVEL                              = "MapDebug.MapDimLevel";                               //$NON-NLS-1$
    //
    static final String           STATE_IS_SHOW_IN_TOOLBAR_ALTITUDE                     = "STATE_IS_SHOW_IN_TOOLBAR_ALTITUDE";                  //$NON-NLS-1$
    static final String           STATE_IS_SHOW_IN_TOOLBAR_GRADIENT                     = "STATE_IS_SHOW_IN_TOOLBAR_GRADIENT";                  //$NON-NLS-1$
@@ -1004,14 +1005,17 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
             final String property = event.getProperty();
 
-            if (property.equals(PREF_SHOW_TILE_INFO) || property.equals(PREF_SHOW_TILE_BORDER)) {
+            if (property.equals(PREF_SHOW_TILE_INFO)
+                  || property.equals(PREF_SHOW_TILE_BORDER)
+                  || property.equals(PREF_DEBUG_MAP_SHOW_GEO_GRID)) {
 
                // map properties has changed
 
+               final boolean isShowGeoGrid = _prefStore.getBoolean(PREF_DEBUG_MAP_SHOW_GEO_GRID);
                final boolean isShowTileInfo = _prefStore.getBoolean(PREF_SHOW_TILE_INFO);
                final boolean isShowTileBorder = _prefStore.getBoolean(PREF_SHOW_TILE_BORDER);
 
-               _map.setShowDebugInfo(isShowTileInfo, isShowTileBorder);
+               _map.setShowDebugInfo(isShowTileInfo, isShowTileBorder, isShowGeoGrid);
                _map.paint();
 
             } else if (property.equals(PREF_DEBUG_MAP_DIM_LEVEL)) {
@@ -3221,10 +3225,11 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
       }
 
       // debug info
+      final boolean isShowGeoGrid = _prefStore.getBoolean(PREF_DEBUG_MAP_SHOW_GEO_GRID);
       final boolean isShowTileInfo = _prefStore.getBoolean(Map2View.PREF_SHOW_TILE_INFO);
       final boolean isShowTileBorder = _prefStore.getBoolean(PREF_SHOW_TILE_BORDER);
 
-      _map.setShowDebugInfo(isShowTileInfo, isShowTileBorder);
+      _map.setShowDebugInfo(isShowTileInfo, isShowTileBorder, isShowGeoGrid);
 
       // set dim level/color after the map providers are set
       if (_mapDimLevel == -1) {

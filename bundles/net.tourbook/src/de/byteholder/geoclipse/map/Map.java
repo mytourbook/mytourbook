@@ -263,6 +263,7 @@ public class Map extends Canvas {
     */
    private boolean                _isShowTileInfo;
    private boolean                _isShowTileBorder;
+   private boolean                _isShowGeoGrid;
 
    /**
     * Factory used by this component to grab the tiles necessary for painting the map.
@@ -406,8 +407,8 @@ public class Map extends Canvas {
    /**
     * Size of a geo grid 0.01 degree in pixel
     */
-   private int                                      _geoGridPixelSizeX;
-   private int                                      _geoGridPixelSizeY;
+   private double                                   _geoGridPixelSizeX;
+   private double                                   _geoGridPixelSizeY;
 
    /**
     * Contains the client area of the map without trimmings, this rectangle has the width and height
@@ -1544,6 +1545,13 @@ public class Map extends Canvas {
       redraw();
    }
 
+   /**
+    * Create geo grid position from world position
+    *
+    * @param worldPosX
+    * @param worldPosY
+    * @return
+    */
    private Point offline_GetGeoGridPosition(final int worldPosX, final int worldPosY) {
 
       final Point2D.Double worldPixel = new Point2D.Double(worldPosX, worldPosY);
@@ -2148,6 +2156,10 @@ public class Map extends Canvas {
             if (_isScaleVisible) {
                paint_50_Scale(gcMapImage);
             }
+
+            if (_isShowGeoGrid) {
+               paint_GeoGrid(gcMapImage);
+            }
          }
 
       } catch (final Exception e) {
@@ -2313,9 +2325,48 @@ public class Map extends Canvas {
       borderColor.dispose();
    }
 
-   private void paintOfflineArea(final GC gc) {
+   private void paint_GeoGrid(final GC gc) {
+
+      if (_geoGridPixelSizeX < 7) {
+         return;
+      }
+
+      final Point devGeoGrid = offline_GetGeoGridPosition(_worldPixelTopLeftViewport.x, _worldPixelTopLeftViewport.y);
+
+      final int width = _worldPixelTopLeftViewport.width;
+      final int height = _worldPixelTopLeftViewport.height;
+
+      final int numX = (int) (width / _geoGridPixelSizeX);
+      final int numY = (int) (height / _geoGridPixelSizeY);
 
       gc.setLineWidth(1);
+      gc.setLineStyle(SWT.LINE_SOLID);
+      gc.setForeground(_display.getSystemColor(SWT.COLOR_YELLOW));
+
+      final int topLeftX = devGeoGrid.x;
+      final int topLeftY = devGeoGrid.y;
+
+      // draw vertical lines
+      for (int indexX = -1; indexX < numX + 1; indexX++) {
+
+         final int devX = (int) (topLeftX + indexX * _geoGridPixelSizeX);
+
+         gc.drawLine(devX, 0, devX, height);
+      }
+
+      // draw horizontal lines
+      for (int indexY = -1; indexY < numY + 1; indexY++) {
+
+         final int devY = (int) (topLeftY + indexY * _geoGridPixelSizeY);
+
+         gc.drawLine(0, devY, width, devY);
+      }
+
+   }
+
+   private void paintOfflineArea(final GC gc) {
+
+      gc.setLineWidth(2);
 
       /*
        * Draw previous area box
@@ -2488,12 +2539,12 @@ public class Map extends Canvas {
          int devGrid_Y2_adj;
 
          if (devGrid_X1 > devArea_X1) {
-            devGrid_X1_adj = devGrid_X1 - _geoGridPixelSizeX;
+            devGrid_X1_adj = (int) (devGrid_X1 - _geoGridPixelSizeX);
          } else {
             devGrid_X1_adj = devGrid_X1;
          }
          if (devGrid_X2 > devArea_X2) {
-            devGrid_X2_adj = devGrid_X2 - _geoGridPixelSizeX;
+            devGrid_X2_adj = (int) (devGrid_X2 - _geoGridPixelSizeX);
          } else {
             devGrid_X2_adj = devGrid_X2;
          }
@@ -2524,17 +2575,23 @@ public class Map extends Canvas {
 
             // draw geo grid
 
-            for (int devX = devGrid_X1_adj; devX <= devGrid_X2_adj; devX += _geoGridPixelSizeX) {
-               for (int devY = devGrid_Y1_adj; devY <= devGrid_Y2_adj; devY += _geoGridPixelSizeY) {
+            final int geoGridPixelSizeX = (int) _geoGridPixelSizeX;
+            final int geoGridPixelSizeY = (int) _geoGridPixelSizeY;
+
+            for (double devX = devGrid_X1_adj; devX <= devGrid_X2_adj; devX += _geoGridPixelSizeX) {
+               for (double devY = devGrid_Y1_adj; devY <= devGrid_Y2_adj; devY += _geoGridPixelSizeY) {
+
+                  final int devXInt = (int) devX;
+                  final int devYInt = (int) devY;
 
                   gc.setLineStyle(SWT.LINE_SOLID);
-                  gc.setForeground(_display.getSystemColor(SWT.COLOR_RED));
-                  gc.drawRectangle(devX, devY, _geoGridPixelSizeX, _geoGridPixelSizeY);
+                  gc.setForeground(_display.getSystemColor(SWT.COLOR_BLACK));
+                  gc.drawRectangle(devXInt, devYInt, geoGridPixelSizeX, geoGridPixelSizeY);
 
-                  gc.setLineStyle(SWT.LINE_DASH);
+                  gc.setLineStyle(SWT.LINE_DOT);
 //                  gc.setForeground(_display.getSystemColor(SWT.COLOR_YELLOW));
-                  gc.setForeground(_display.getSystemColor(SWT.COLOR_YELLOW));
-                  gc.drawRectangle(devX, devY, _geoGridPixelSizeX, _geoGridPixelSizeY);
+                  gc.setForeground(_display.getSystemColor(SWT.COLOR_WHITE));
+                  gc.drawRectangle(devXInt, devYInt, geoGridPixelSizeX, geoGridPixelSizeY);
                }
             }
          }
@@ -4284,16 +4341,25 @@ public class Map extends Canvas {
       }
    }
 
+   public void setShowDebugInfo(final boolean isShowDebugInfo, final boolean isShowTileBorder) {
+
+      setShowDebugInfo(isShowDebugInfo, isShowTileBorder, false);
+   }
+
    /**
     * Set if the tile borders should be drawn. Mainly used for debugging.
     *
     * @param isShowDebugInfo
     *           new value of this drawTileBorders
     * @param isShowTileBorder
+    * @param isShowGeoGrid
     */
-   public void setShowDebugInfo(final boolean isShowDebugInfo, final boolean isShowTileBorder) {
+   public void setShowDebugInfo(final boolean isShowDebugInfo, final boolean isShowTileBorder, final boolean isShowGeoGrid) {
+
       _isShowTileInfo = isShowDebugInfo;
       _isShowTileBorder = isShowTileBorder;
+      _isShowGeoGrid = isShowGeoGrid;
+
       paint();
    }
 
@@ -4714,8 +4780,8 @@ public class Map extends Canvas {
       final double geoLat2 = geoLat1 + 0.01;
       final double geoLon2 = geoLon1 + 0.01;
 
-      final java.awt.Point worldGrid1 = _mp.geoToPixel(new GeoPosition(geoLat1, geoLon1), _mapZoomLevel);
-      final java.awt.Point worldGrid2 = _mp.geoToPixel(new GeoPosition(geoLat2, geoLon2), _mapZoomLevel);
+      final Point2D.Double worldGrid1 = _mp.geoToPixelDouble(new GeoPosition(geoLat1, geoLon1), _mapZoomLevel);
+      final Point2D.Double worldGrid2 = _mp.geoToPixelDouble(new GeoPosition(geoLat2, geoLon2), _mapZoomLevel);
 
       _geoGridPixelSizeX = Math.abs(worldGrid2.x - worldGrid1.x);
       _geoGridPixelSizeY = Math.abs(worldGrid2.y - worldGrid1.y);

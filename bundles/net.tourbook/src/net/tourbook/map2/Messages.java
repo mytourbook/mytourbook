@@ -112,6 +112,7 @@ public class Messages extends NLS {
    public static String        Map_Action_SyncPhotoWithMap_Tooltip;
    public static String        Map_Action_ToggleMarker;
 
+   public static String        Map_Properties_ShowGeoGrid;
    public static String        Map_Properties_ShowTileBorder;
    public static String        Map_Properties_ShowTileInfo;
 
