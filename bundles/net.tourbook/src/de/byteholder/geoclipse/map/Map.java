@@ -24,6 +24,7 @@
 package de.byteholder.geoclipse.map;
 
 import de.byteholder.geoclipse.Messages;
+import de.byteholder.geoclipse.map.event.IMapGridListener;
 import de.byteholder.geoclipse.map.event.IMapInfoListener;
 import de.byteholder.geoclipse.map.event.IMapPositionListener;
 import de.byteholder.geoclipse.map.event.IPOIListener;
@@ -261,9 +262,9 @@ public class Map extends Canvas {
     * looking, very much a product of testing Consider whether this should really be a property or
     * not.
     */
-   private boolean                _isShowTileInfo;
-   private boolean                _isShowTileBorder;
-   private boolean                _isShowGeoGrid;
+   private boolean                _isShowDebug_TileInfo;
+   private boolean                _isShowDebug_TileBorder;
+   private boolean                _isShowDebug_GeoGrid;
 
    /**
     * Factory used by this component to grab the tiles necessary for painting the map.
@@ -416,6 +417,7 @@ public class Map extends Canvas {
     */
    private Rectangle                                _clientArea;
 
+   private final ListenerList<IMapGridListener>     _allMapGridListener      = new ListenerList<>(ListenerList.IDENTITY);
    private final ListenerList<IMapInfoListener>     _allMapInfoListener      = new ListenerList<>(ListenerList.IDENTITY);
    private final ListenerList<IMapPositionListener> _allMapPositionListener  = new ListenerList<>(ListenerList.IDENTITY);
    private final ListenerList<IPositionListener>    _mousePositionListeners  = new ListenerList<>(ListenerList.IDENTITY);
@@ -475,22 +477,39 @@ public class Map extends Canvas {
    /*
     * Download offline images
     */
-   private boolean   _offline_IsSelectingOfflineArea;
-   private boolean   _offline_IsOfflineSelectionStarted;
-   private boolean   _offline_IsPaintOfflineArea;
+   private boolean _offline_IsSelectingOfflineArea;
+   private boolean _offline_IsOfflineSelectionStarted;
+   private boolean _offline_IsPaintOfflineArea;
 
-   private Point     _offline_DevMouse_Start;
-   private Point     _offline_DevMouse_End;
-   private Point     _offline_DevTileStart;
-   private Point     _offline_DevTileEnd;
+   private Point   _offline_DevMouse_Start;
+   private Point   _offline_DevMouse_End;
+   private Point   _offline_DevTileStart;
+   private Point   _offline_DevTileEnd;
 
-   private Point     _offline_WorldMouse_Start;
-   private Point     _offline_WorldMouse_End;
-   private Point     _offline_WorldMouse_Move;
+   private Point   _offline_WorldMouse_Start;
+   private Point   _offline_WorldMouse_End;
+   private Point   _offline_WorldMouse_Move;
 
-   private Rectangle _offline_CurrentOfflineArea;
-//   private Rectangle           _offline_PreviousOfflineArea;
-//   private int                 _offline_PreviousOfflineArea_MapZoomLevel;
+//   private Rectangle _offline_CurrentOfflineArea;
+//   private Rectangle _offline_PreviousOfflineArea;
+//   private int       _offline_PreviousOfflineArea_MapZoomLevel;
+
+   /*
+    * Select map grid
+    */
+   private boolean             _grid_IsSelecting;
+   private boolean             _grid_IsSelectionStarted;
+   private boolean             _grid_IsPaintGeoGrid;
+
+   private Point               _grid_DevMouse_Start;
+   private Point               _grid_DevMouse_End;
+
+   private Point               _grid_WorldMouse_Start;
+   private Point               _grid_WorldMouse_End;
+   private Point               _grid_WorldMouse_Move;
+
+   private GeoPosition         _grid_SelectedPosition_Geo_1;
+   private GeoPosition         _grid_SelectedPosition_Geo_2;
 
    private IMapContextProvider _mapContextProvider;
 
@@ -601,34 +620,48 @@ public class Map extends Canvas {
          return;
       }
 
-      if (_offline_DevMouse_Start != null //
-
-            && _offline_CurrentOfflineArea != null
-            && (event.stateMask & SWT.CONTROL) != 0) {
-
-         /*
-          * use old offline area when the ctrl-key is pressed
-          */
-
+//      if (_offline_DevMouse_Start != null //
+//
+//            && _offline_CurrentOfflineArea != null
+//            && (event.stateMask & SWT.CONTROL) != 0) {
+//
+//         /*
+//          * use old offline area when the ctrl-key is pressed
+//          */
+//
 //         _offline_PreviousOfflineArea = null;
-         _offline_IsPaintOfflineArea = true;
-
-         redraw();
-         paint();
-
-         offline_OpenOfflineImageDialog();
-
-         return;
-      }
+//         _offline_IsPaintOfflineArea = true;
+//
+//         redraw();
+//         paint();
+//
+//         offline_OpenOfflineImageDialog();
+//
+//         return;
+//      }
 
 //      _offline_PreviousOfflineArea = _offline_CurrentOfflineArea;
 //      _offline_PreviousOfflineArea_MapZoomLevel = _mapZoomLevel;
 
+      _offline_IsPaintOfflineArea = true;
+      _offline_IsSelectingOfflineArea = true;
+
       _offline_DevMouse_Start = null;
       _offline_DevMouse_End = null;
 
-      _offline_IsPaintOfflineArea = true;
-      _offline_IsSelectingOfflineArea = true;
+      setCursor(_cursorCross);
+
+      redraw();
+      paint();
+   }
+
+   public void actionSearchTourByLocation(final Event event) {
+
+      _grid_IsSelecting = true;
+      _grid_IsPaintGeoGrid = true;
+
+      _grid_DevMouse_Start = null;
+      _grid_DevMouse_End = null;
 
       setCursor(_cursorCross);
 
@@ -795,6 +828,10 @@ public class Map extends Canvas {
             });
          }
       });
+   }
+
+   public void addMapGridListener(final IMapGridListener mapListener) {
+      _allMapGridListener.add(mapListener);
    }
 
    public void addMapInfoListener(final IMapInfoListener mapInfoListener) {
@@ -1034,6 +1071,15 @@ public class Map extends Canvas {
 
    public void disposeTiles() {
       _mp.disposeTiles();
+   }
+
+   private void fireMapGridEvent() {
+
+      final Object[] listeners = _allMapGridListener.getListeners();
+
+      for (final Object listener : listeners) {
+         ((IMapGridListener) listener).onMapGrid(_grid_SelectedPosition_Geo_1, _grid_SelectedPosition_Geo_2);
+      }
    }
 
    private void fireMapInfoEvent() {
@@ -1343,6 +1389,30 @@ public class Map extends Canvas {
       return zoom;
    }
 
+   /**
+    * Hide offline area and all states
+    */
+   private void grid_DisableSelection() {
+
+      _grid_IsSelecting = false;
+      _grid_IsPaintGeoGrid = false;
+      _grid_IsSelectionStarted = false;
+
+      _isContextMenuEnabled = true;
+
+      setCursor(_cursorDefault);
+      redraw();
+   }
+
+   private void grid_UpdateEndPosition(final MouseEvent mouseEvent) {
+
+      final int worldMouseX = _worldPixelTopLeftViewport.x + mouseEvent.x;
+      final int worldMouseY = _worldPixelTopLeftViewport.y + mouseEvent.y;
+
+      _grid_DevMouse_End = new Point(mouseEvent.x, mouseEvent.y);
+      _grid_WorldMouse_End = new Point(worldMouseX, worldMouseY);
+   }
+
    private void hideHoveredArea() {
 
       if (_tourToolTip == null) {
@@ -1574,16 +1644,6 @@ public class Map extends Canvas {
        */
       gridGeoPos.y -= _geoGridPixelSizeY;
 
-//      System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ()")
-//
-//            + String.format("%3.3f %3.3f", geoLat, geoLon)
-//            + ("\tgeoLat: " + geoLat * 100.0)
-//            + ("\tgeoLon: " + geoLon * 100.0)
-////            + ("\t: " + )
-////            + ("\t: " + )
-//      );
-//// TODO remove SYSTEM.OUT.PRINTLN
-
       return gridGeoPos;
    }
 
@@ -1619,12 +1679,12 @@ public class Map extends Canvas {
 
    private void offline_OpenOfflineImageDialog() {
 
-//      new DialogManageOfflineImages(
-//            _display.getActiveShell(),
-//            _mp,
-//            _offline_WorldStart,
-//            _offline_WorldEnd,
-//            _mapZoomLevel).open();
+      new DialogManageOfflineImages(
+            _display.getActiveShell(),
+            _mp,
+            _offline_WorldMouse_Start,
+            _offline_WorldMouse_End,
+            _mapZoomLevel).open();
 
       offline_DisableOfflineAreaSelection();
 
@@ -1741,6 +1801,11 @@ public class Map extends Canvas {
          return;
       }
 
+      if (_grid_IsSelecting) {
+         grid_DisableSelection();
+         return;
+      }
+
       // accelerate with Ctrl + Shift key
       int offset = (event.stateMask & SWT.CTRL) != 0 ? 20 : 1;
 
@@ -1828,6 +1893,21 @@ public class Map extends Canvas {
 
          redraw();
 
+      } else if (_grid_IsSelecting) {
+
+         _grid_IsSelectionStarted = true;
+
+         final int worldMouseX = _worldPixelTopLeftViewport.x + mouseEvent.x;
+         final int worldMouseY = _worldPixelTopLeftViewport.y + mouseEvent.y;
+
+         _grid_DevMouse_Start = new Point(mouseEvent.x, mouseEvent.y);
+         _grid_DevMouse_End = _grid_DevMouse_Start;
+
+         _grid_WorldMouse_Start = new Point(worldMouseX, worldMouseY);
+         _grid_WorldMouse_End = _grid_WorldMouse_Start;
+
+         redraw();
+
       } else {
 
          // if the left mb is clicked remember this point (for panning)
@@ -1859,6 +1939,18 @@ public class Map extends Canvas {
          _offline_WorldMouse_Move = new Point(worldMouseX, worldMouseY);
 
          offline_UpdateOfflineAreaEndPosition(mouseEvent);
+
+         paint();
+
+         fireMapInfoEvent();
+
+         return;
+
+      } else if (_grid_IsSelecting) {
+
+         _grid_WorldMouse_Move = new Point(worldMouseX, worldMouseY);
+
+         grid_UpdateEndPosition(mouseEvent);
 
          paint();
 
@@ -1944,14 +2036,39 @@ public class Map extends Canvas {
          // reset cursor
          setCursor(_cursorDefault);
 
-         // hide previous area
+         // hide selection
          _offline_IsSelectingOfflineArea = false;
-//         _offline_PreviousOfflineArea = null;
 
          redraw();
          paint();
 
          offline_OpenOfflineImageDialog();
+
+      } else if (_grid_IsSelecting) {
+
+         // finalize grid selecting
+
+         _isContextMenuEnabled = false;
+
+         if (_grid_IsSelectionStarted == false) {
+
+            /*
+             * offline selection is not started, this can happen when the right mouse button is
+             * clicked
+             */
+            grid_DisableSelection();
+
+            return;
+         }
+
+         grid_UpdateEndPosition(mouseEvent);
+
+         grid_DisableSelection();
+
+         redraw();
+         paint();
+
+         fireMapGridEvent();
 
       } else {
 
@@ -2039,7 +2156,11 @@ public class Map extends Canvas {
          }
 
          if (_offline_IsPaintOfflineArea) {
-            paintOfflineArea(gc);
+            paint_OfflineArea(gc);
+         }
+
+         if (_grid_IsPaintGeoGrid) {
+            paint_Grid(gc);
          }
       }
    }
@@ -2159,8 +2280,8 @@ public class Map extends Canvas {
                paint_50_Scale(gcMapImage);
             }
 
-            if (_isShowGeoGrid) {
-               paint_GeoGrid(gcMapImage);
+            if (_isShowDebug_GeoGrid) {
+               paint_Debug_GeoGrid(gcMapImage);
             }
          }
 
@@ -2327,7 +2448,7 @@ public class Map extends Canvas {
       borderColor.dispose();
    }
 
-   private void paint_GeoGrid(final GC gc) {
+   private void paint_Debug_GeoGrid(final GC gc) {
 
       final double geoGridPixelSizeX = _geoGridPixelSizeX;
       final double geoGridPixelSizeY = _geoGridPixelSizeY;
@@ -2393,7 +2514,363 @@ public class Map extends Canvas {
       }
    }
 
-   private void paintOfflineArea(final GC gc) {
+   private void paint_Grid(final GC gc) {
+
+      gc.setLineWidth(2);
+
+      /*
+       * show info in the top/right corner that selection for the offline area is activ
+       */
+      if (_grid_IsSelecting) {
+         paint_Grid_Info(gc);
+      }
+
+      // check if mouse button is hit which sets the start position
+      if ((_grid_DevMouse_Start == null) || (_grid_WorldMouse_Move == null)) {
+
+         if (_grid_WorldMouse_Move != null) {
+            paint_Grid_Rectangle(gc, _grid_WorldMouse_Move, _grid_WorldMouse_Move);
+         }
+
+         return;
+      }
+
+      final int devArea_Start_X = _grid_DevMouse_Start.x;
+      final int devArea_Start_Y = _grid_DevMouse_Start.y;
+      final int devArea_End_X = _grid_DevMouse_End.x;
+      final int devArea_End_Y = _grid_DevMouse_End.y;
+
+      final int devArea_X1;
+      final int devArea_Y1;
+
+      final int devArea_Width;
+      final int devArea_Height;
+
+      if (devArea_Start_X < devArea_End_X) {
+
+         devArea_X1 = devArea_Start_X;
+         devArea_Width = devArea_End_X - devArea_Start_X;
+
+      } else {
+
+         devArea_X1 = devArea_End_X;
+         devArea_Width = devArea_Start_X - devArea_End_X;
+      }
+
+      if (devArea_Start_Y < devArea_End_Y) {
+
+         devArea_Y1 = devArea_Start_Y;
+         devArea_Height = devArea_End_Y - devArea_Start_Y;
+
+      } else {
+
+         devArea_Y1 = devArea_End_Y;
+         devArea_Height = devArea_Start_Y - devArea_End_Y;
+      }
+
+      /*
+       * Draw geo grid
+       */
+
+      if (_geoGridPixelSizeX < 3 || _geoGridPixelSizeY < 6) {
+
+         // geo grid has almost the same rectangle as the selected area
+
+      } else {
+
+         paint_Grid_Rectangle(gc, _grid_WorldMouse_Start, _grid_WorldMouse_End);
+      }
+
+      /*
+       * draw selected area box
+       */
+
+//      _offline_CurrentOfflineArea = new Rectangle(devArea_X1, devArea_Y1, devArea_Width, devArea_Height);
+
+      gc.setLineStyle(SWT.LINE_SOLID);
+      gc.setForeground(SYS_COLOR_BLACK);
+      gc.drawRectangle(devArea_X1, devArea_Y1, devArea_Width, devArea_Height);
+
+      gc.setLineStyle(SWT.LINE_SOLID);
+      gc.setForeground(SYS_COLOR_WHITE);
+//      gc.drawRectangle(devX + 1, devY + 1, devWidth - 2, devHeight - 2);
+
+      gc.setBackground(_display.getSystemColor(SWT.COLOR_DARK_YELLOW));
+      gc.setAlpha(0x30);
+      gc.fillRectangle(devArea_X1 + 1, devArea_Y1 + 1, devArea_Width - 2, devArea_Height - 2);
+      gc.setAlpha(0xff);
+
+      /*
+       * Draw text marker
+       */
+//      final Point textExtend = gc.textExtent(Messages.Offline_Area_Label_AreaMarker);
+//      int devYMarker = devArea_Y1 - textExtend.y;
+//      devYMarker = devYMarker < 0 ? 0 : devYMarker;
+//
+//      gc.setForeground(SYS_COLOR_BLACK);
+//      gc.setBackground(SYS_COLOR_WHITE);
+//      gc.drawText(Messages.Offline_Area_Label_AreaMarker, devArea_X1, devYMarker);
+   }
+
+   private void paint_Grid_Info(final GC gc) {
+
+      gc.setForeground(SYS_COLOR_BLACK);
+      gc.setBackground(SYS_COLOR_YELLOW);
+
+      final StringBuilder sb = new StringBuilder();
+
+      if (_grid_DevMouse_Start != null) {
+
+         // display offline area geo position
+
+         final Point2D.Double worldPixel_Start = new Point2D.Double(_grid_WorldMouse_Start.x, _grid_WorldMouse_Start.y);
+         final Point2D.Double worldPixel_End = new Point2D.Double(_grid_WorldMouse_End.x, _grid_WorldMouse_End.y);
+
+         final GeoPosition geoStart = _mp.pixelToGeo(worldPixel_Start, _mapZoomLevel);
+         final GeoPosition geoEnd = _mp.pixelToGeo(worldPixel_End, _mapZoomLevel);
+
+         sb.append(String.format(" %s / %s  ...  %s / %s", //$NON-NLS-1$
+               _nfLatLon.format(geoStart.latitude),
+               _nfLatLon.format(geoStart.longitude),
+               _nfLatLon.format(geoEnd.latitude),
+               _nfLatLon.format(geoEnd.longitude)));
+
+      } else {
+
+         // display mouse move geo position
+
+         if (_grid_WorldMouse_Move != null) {
+
+            final Point2D.Double worldPixel_Mouse = new Point2D.Double(_grid_WorldMouse_Move.x, _grid_WorldMouse_Move.y);
+
+            final GeoPosition mouseGeo = _mp.pixelToGeo(worldPixel_Mouse, _mapZoomLevel);
+
+            sb.append(String.format(" %s / %s", //$NON-NLS-1$
+                  _nfLatLon.format(mouseGeo.latitude),
+                  _nfLatLon.format(mouseGeo.longitude)));
+         }
+      }
+
+      gc.drawText(sb.toString(), 0, 0);
+   }
+
+   /**
+    * Paint a rectangle which shows the grid.
+    *
+    * @param gc
+    * @param worldStart
+    * @param worldEnd
+    */
+   private void paint_Grid_Rectangle(final GC gc, final Point worldStart, final Point worldEnd) {
+
+      final int worldStartX = worldStart.x;
+      final int worldStartY = worldStart.y;
+      final int worldEndX = worldEnd.x;
+      final int worldEndY = worldEnd.y;
+
+      // XY1: top/left
+      final int world_X1 = Math.min(worldStartX, worldEndX);
+      final int world_Y1 = Math.min(worldStartY, worldEndY);
+
+      // XY2: bottom/right
+      final int world_X2 = Math.max(worldStartX, worldEndX);
+      final int world_Y2 = Math.max(worldStartY, worldEndY);
+
+      final Point2D.Double worldPixel_1 = new Point2D.Double(world_X1, world_Y1);
+      final Point2D.Double worldPixel_2 = new Point2D.Double(world_X2, world_Y2);
+
+      _grid_SelectedPosition_Geo_1 = _mp.pixelToGeo(worldPixel_1, _mapZoomLevel);
+      _grid_SelectedPosition_Geo_2 = _mp.pixelToGeo(worldPixel_2, _mapZoomLevel);
+
+      final double gridSize = 0.01;
+
+      // adjust to 0.01°
+      final double geoLat1 = (int) (_grid_SelectedPosition_Geo_1.latitude * 100) / 100.0;
+      final double geoLon1 = (int) (_grid_SelectedPosition_Geo_1.longitude * 100) / 100.0;
+
+      final double geoLat2 = (int) (_grid_SelectedPosition_Geo_2.latitude * 100) / 100.0;
+      final double geoLon2 = (int) (_grid_SelectedPosition_Geo_2.longitude * 100) / 100.0;
+
+      /*
+       * Adjust Y that X and Y are at the top/left position otherwise Y is at the bottom/left
+       * position
+       */
+      _grid_SelectedPosition_Geo_1.latitude -= gridSize;
+      _grid_SelectedPosition_Geo_2.latitude -= gridSize;
+
+      final Point devGeoGrid_1 = offline_GetDevGeoGridPosition(world_X1, world_Y1);
+      final Point devGeoGrid_2 = offline_GetDevGeoGridPosition(world_X2, world_Y2);
+
+      int devGrid_X1 = devGeoGrid_1.x;
+      int devGrid_Y1 = devGeoGrid_1.y;
+
+      int devGrid_X2 = devGeoGrid_2.x;
+      int devGrid_Y2 = devGeoGrid_2.y;
+
+      final int geoGridPixelSizeX = (int) _geoGridPixelSizeX;
+      final int geoGridPixelSizeY = (int) _geoGridPixelSizeY;
+
+      /**
+       * Adjust lat/lon +/-, this algorithm is created with many many many try and error
+       */
+      if (geoLat1 > 0 && geoLon1 > 0 && geoLat2 > 0 && geoLon2 > 0) {
+
+         // 1: + / +
+         // 2: + / +
+
+         //     |
+         //     | xx
+         // ---------
+         //     |
+         //     |
+
+         devGrid_X2 += geoGridPixelSizeX;
+         devGrid_Y2 += geoGridPixelSizeY;
+
+         _grid_SelectedPosition_Geo_2.longitude += gridSize;
+         _grid_SelectedPosition_Geo_2.latitude += gridSize;
+
+      } else if (geoLat1 > 0 && geoLon1 > 0 && geoLat2 < 0 && geoLon2 > 0) {
+
+         // 1: + / +
+         // 2: - / +
+
+         //     |
+         //     | xx
+         // ------xx-
+         //     | xx
+         //     |
+
+         devGrid_X2 += geoGridPixelSizeX;
+         devGrid_Y2 += geoGridPixelSizeY * 2;
+
+      } else if (geoLat1 < 0 && geoLon1 > 0 && geoLat2 < 0 && geoLon2 > 0) {
+
+         // 1: - / +
+         // 2: - / +
+
+         //     |
+         //     |
+         // ---------
+         //     | xx
+         //     |
+
+         devGrid_X2 += geoGridPixelSizeX;
+         devGrid_Y1 += geoGridPixelSizeY;
+         devGrid_Y2 += geoGridPixelSizeY * 2;
+
+      } else if (geoLat1 > 0 && geoLon1 < 0 && geoLat2 > 0 && geoLon2 < 0) {
+
+         // 1: + / -
+         // 2: + / -
+
+         //     |
+         //  xx |
+         // ---------
+         //     |
+         //     |
+
+         devGrid_X1 -= geoGridPixelSizeX;
+         devGrid_Y2 += geoGridPixelSizeY;
+
+      } else if (geoLat1 > 0 && geoLon1 < 0 && geoLat2 < 0 && geoLon2 < 0) {
+
+         // 1: + / -
+         // 2: - / -
+
+         //     |
+         //  xx |
+         // -xx------
+         //  xx |
+         //     |
+
+         devGrid_X1 -= geoGridPixelSizeX;
+         devGrid_Y2 += geoGridPixelSizeY * 2;
+
+      } else if (geoLat1 < 0 && geoLon1 < 0 && geoLat2 < 0 && geoLon2 < 0) {
+
+         // 1: - / -
+         // 2: - / -
+
+         //     |
+         //     |
+         // ---------
+         //  xx |
+         //     |
+
+         devGrid_X1 -= geoGridPixelSizeX;
+         devGrid_Y1 += geoGridPixelSizeY;
+
+         devGrid_Y2 += geoGridPixelSizeY * 2;
+
+      } else if (geoLat1 > 0 && geoLon1 < 0 && geoLat2 > 0 && geoLon2 > 0) {
+
+         // 1: + / -
+         // 2: + / +
+
+         //     |
+         //   xxxxx
+         // ---------
+         //     |
+         //     |
+
+         devGrid_X1 -= geoGridPixelSizeX;
+         devGrid_Y2 += geoGridPixelSizeY;
+
+         devGrid_X2 += geoGridPixelSizeX;
+
+      } else if (geoLat1 < 0 && geoLon1 < 0 && geoLat2 < 0 && geoLon2 > 0) {
+
+         // 1: - / -
+         // 2: - / +
+
+         //     |
+         //     |
+         // ---------
+         //   xxxxx
+         //     |
+
+         devGrid_X1 -= geoGridPixelSizeX;
+         devGrid_Y1 += geoGridPixelSizeY;
+
+         devGrid_X2 += geoGridPixelSizeX;
+         devGrid_Y2 += geoGridPixelSizeY * 2;
+
+      } else if (geoLat1 > 0 && geoLon1 < 0 && geoLat2 < 0 && geoLon2 > 0) {
+
+         // 1: + / -
+         // 2: - / +
+
+         //     |
+         //   xxxxx
+         // --xxxxx--
+         //   xxxxx
+         //     |
+
+         devGrid_X1 -= geoGridPixelSizeX;
+
+         devGrid_X2 += geoGridPixelSizeX;
+         devGrid_Y2 += geoGridPixelSizeY * 2;
+      }
+
+      if (_geoGridPixelSizeX < 3 || _geoGridPixelSizeY < 6) {
+
+         // geo grid has almost the same rectangle as the selected area
+
+      } else {
+
+         // draw geo grid
+
+         final int width = devGrid_X2 - devGrid_X1;
+         final int height = devGrid_Y2 - devGrid_Y1;
+
+         gc.setLineStyle(SWT.LINE_SOLID);
+         gc.setForeground(_display.getSystemColor(SWT.COLOR_WHITE));
+         gc.drawRectangle(devGrid_X1, devGrid_Y1, width, height);
+      }
+   }
+
+   private void paint_OfflineArea(final GC gc) {
 
       gc.setLineWidth(2);
 
@@ -2436,7 +2913,7 @@ public class Map extends Canvas {
        * show info in the top/right corner that selection for the offline area is activ
        */
       if (_offline_IsSelectingOfflineArea) {
-         paintOfflineArea_10_Info(gc);
+         paint_OfflineArea_10_Info(gc);
       }
 
       // check if mouse button is hit which sets the start position
@@ -2447,28 +2924,28 @@ public class Map extends Canvas {
       /*
        * Draw tile box for tiles which are selected within the area box
        */
-//      final int devTileStartX = _offline_DevTileStart.x;
-//      final int devTileStartY = _offline_DevTileStart.y;
-//      final int devTileEndX = _offline_DevTileEnd.x;
-//      final int devTileEndY = _offline_DevTileEnd.y;
-//
-//      final int devTileStartX2 = Math.min(devTileStartX, devTileEndX);
-//      final int devTileStartY2 = Math.min(devTileStartY, devTileEndY);
-//      final int devTileEndX2 = Math.max(devTileStartX, devTileEndX);
-//      final int devTileEndY2 = Math.max(devTileStartY, devTileEndY);
-//
-//      for (int devX = devTileStartX2; devX <= devTileEndX2; devX += _tilePixelSize) {
-//         for (int devY = devTileStartY2; devY <= devTileEndY2; devY += _tilePixelSize) {
-//
-//            gc.setLineStyle(SWT.LINE_SOLID);
-//            gc.setForeground(_display.getSystemColor(SWT.COLOR_YELLOW));
-//            gc.drawRectangle(devX, devY, _tilePixelSize, _tilePixelSize);
-//
-//            gc.setLineStyle(SWT.LINE_DASH);
-//            gc.setForeground(SYS_COLOR_DARK_GRAY);
-//            gc.drawRectangle(devX, devY, _tilePixelSize, _tilePixelSize);
-//         }
-//      }
+      final int devTileStartX = _offline_DevTileStart.x;
+      final int devTileStartY = _offline_DevTileStart.y;
+      final int devTileEndX = _offline_DevTileEnd.x;
+      final int devTileEndY = _offline_DevTileEnd.y;
+
+      final int devTileStartX2 = Math.min(devTileStartX, devTileEndX);
+      final int devTileStartY2 = Math.min(devTileStartY, devTileEndY);
+      final int devTileEndX2 = Math.max(devTileStartX, devTileEndX);
+      final int devTileEndY2 = Math.max(devTileStartY, devTileEndY);
+
+      for (int devX = devTileStartX2; devX <= devTileEndX2; devX += _tilePixelSize) {
+         for (int devY = devTileStartY2; devY <= devTileEndY2; devY += _tilePixelSize) {
+
+            gc.setLineStyle(SWT.LINE_SOLID);
+            gc.setForeground(_display.getSystemColor(SWT.COLOR_YELLOW));
+            gc.drawRectangle(devX, devY, _tilePixelSize, _tilePixelSize);
+
+            gc.setLineStyle(SWT.LINE_DASH);
+            gc.setForeground(SYS_COLOR_DARK_GRAY);
+            gc.drawRectangle(devX, devY, _tilePixelSize, _tilePixelSize);
+         }
+      }
 
       final int devArea_Start_X = _offline_DevMouse_Start.x;
       final int devArea_Start_Y = _offline_DevMouse_Start.y;
@@ -2504,213 +2981,14 @@ public class Map extends Canvas {
       }
 
       /*
-       * Draw geo grid
+       * Draw selected area box
        */
-
-      if (_geoGridPixelSizeX < 3 || _geoGridPixelSizeY < 6) {
-
-         // geo grid has almost the same rectangle as the selected area
-
-      } else {
-
-         final int worldStartX = _offline_WorldMouse_Start.x;
-         final int worldStartY = _offline_WorldMouse_Start.y;
-         final int worldEndX = _offline_WorldMouse_End.x;
-         final int worldEndY = _offline_WorldMouse_End.y;
-
-         // XY1: top/left
-         final int world_X1 = Math.min(worldStartX, worldEndX);
-         final int world_Y1 = Math.min(worldStartY, worldEndY);
-
-         // XY2: bottom/right
-         final int world_X2 = Math.max(worldStartX, worldEndX);
-         final int world_Y2 = Math.max(worldStartY, worldEndY);
-
-         final Point2D.Double worldPixel_Start = new Point2D.Double(world_X1, world_Y1);
-         final Point2D.Double worldPixel_End = new Point2D.Double(world_X2, world_Y2);
-         final GeoPosition geo_1 = _mp.pixelToGeo(worldPixel_Start, _mapZoomLevel);
-         final GeoPosition geo_2 = _mp.pixelToGeo(worldPixel_End, _mapZoomLevel);
-
-         final Point devGeoGrid_1 = offline_GetDevGeoGridPosition(world_X1, world_Y1);
-         final Point devGeoGrid_2 = offline_GetDevGeoGridPosition(world_X2, world_Y2);
-
-         int devGrid_X1 = devGeoGrid_1.x;
-         int devGrid_Y1 = devGeoGrid_1.y;
-
-         int devGrid_X2 = devGeoGrid_2.x;
-         int devGrid_Y2 = devGeoGrid_2.y;
-
-         final double geoLat1 = geo_1.latitude;
-         final double geoLon1 = geo_1.longitude;
-
-         final double geoLat2 = geo_2.latitude;
-         final double geoLon2 = geo_2.longitude;
-
-         final int geoGridPixelSizeX = (int) _geoGridPixelSizeX;
-         final int geoGridPixelSizeY = (int) _geoGridPixelSizeY;
-
-         /**
-          * Adjust lat/lon +/-, this algorithm is created with many many many try and error
-          */
-         if (geoLat1 > 0 && geoLon1 > 0 && geoLat2 > 0 && geoLon2 > 0) {
-
-            // 1: + / +
-            // 2: + / +
-
-            //     |
-            //     | xx
-            // ---------
-            //     |
-            //     |
-
-            devGrid_X2 += geoGridPixelSizeX;
-            devGrid_Y2 += geoGridPixelSizeY;
-
-         } else if (geoLat1 > 0 && geoLon1 > 0 && geoLat2 < 0 && geoLon2 > 0) {
-
-            // 1: + / +
-            // 2: - / +
-
-            //     |
-            //     | xx
-            // ------xx-
-            //     | xx
-            //     |
-
-            devGrid_X2 += geoGridPixelSizeX;
-            devGrid_Y2 += geoGridPixelSizeY * 2;
-
-         } else if (geoLat1 < 0 && geoLon1 > 0 && geoLat2 < 0 && geoLon2 > 0) {
-
-            // 1: - / +
-            // 2: - / +
-
-            //     |
-            //     |
-            // ---------
-            //     | xx
-            //     |
-
-            devGrid_X2 += geoGridPixelSizeX;
-            devGrid_Y1 += geoGridPixelSizeY;
-            devGrid_Y2 += geoGridPixelSizeY * 2;
-
-         } else if (geoLat1 > 0 && geoLon1 < 0 && geoLat2 > 0 && geoLon2 < 0) {
-
-            // 1: + / -
-            // 2: + / -
-
-            //     |
-            //  xx |
-            // ---------
-            //     |
-            //     |
-
-            devGrid_X1 -= geoGridPixelSizeX;
-            devGrid_Y2 += geoGridPixelSizeY;
-
-         } else if (geoLat1 > 0 && geoLon1 < 0 && geoLat2 < 0 && geoLon2 < 0) {
-
-            // 1: + / -
-            // 2: - / -
-
-            //     |
-            //  xx |
-            // -xx------
-            //  xx |
-            //     |
-
-            devGrid_X1 -= geoGridPixelSizeX;
-            devGrid_Y2 += geoGridPixelSizeY * 2;
-
-         } else if (geoLat1 < 0 && geoLon1 < 0 && geoLat2 < 0 && geoLon2 < 0) {
-
-            // 1: - / -
-            // 2: - / -
-
-            //     |
-            //     |
-            // ---------
-            //  xx |
-            //     |
-
-            devGrid_X1 -= geoGridPixelSizeX;
-            devGrid_Y1 += geoGridPixelSizeY;
-
-            devGrid_Y2 += geoGridPixelSizeY * 2;
-
-         } else if (geoLat1 > 0 && geoLon1 < 0 && geoLat2 > 0 && geoLon2 > 0) {
-
-            // 1: + / -
-            // 2: + / +
-
-            //     |
-            //   xxxxx
-            // ---------
-            //     |
-            //     |
-
-            devGrid_X1 -= geoGridPixelSizeX;
-            devGrid_Y2 += geoGridPixelSizeY;
-
-            devGrid_X2 += geoGridPixelSizeX;
-
-         } else if (geoLat1 < 0 && geoLon1 < 0 && geoLat2 < 0 && geoLon2 > 0) {
-
-            // 1: - / -
-            // 2: - / +
-
-            //     |
-            //     |
-            // ---------
-            //   xxxxx
-            //     |
-
-            devGrid_X1 -= geoGridPixelSizeX;
-            devGrid_Y1 += geoGridPixelSizeY;
-
-            devGrid_X2 += geoGridPixelSizeX;
-            devGrid_Y2 += geoGridPixelSizeY * 2;
-
-         } else if (geoLat1 > 0 && geoLon1 < 0 && geoLat2 < 0 && geoLon2 > 0) {
-
-            // 1: + / -
-            // 2: - / +
-
-            //     |
-            //   xxxxx
-            // --xxxxx--
-            //   xxxxx
-            //     |
-
-            devGrid_X1 -= geoGridPixelSizeX;
-
-            devGrid_X2 += geoGridPixelSizeX;
-            devGrid_Y2 += geoGridPixelSizeY * 2;
-         }
-
-         // draw geo grid
-         final int width = devGrid_X2 - devGrid_X1;
-         final int height = devGrid_Y2 - devGrid_Y1;
-
-         gc.setLineStyle(SWT.LINE_SOLID);
-         gc.setForeground(_display.getSystemColor(SWT.COLOR_WHITE));
-         gc.drawRectangle(devGrid_X1, devGrid_Y1, width, height);
-      }
-
-      /*
-       * draw selected area box
-       */
-
-      _offline_CurrentOfflineArea = new Rectangle(devArea_X1, devArea_Y1, devArea_Width, devArea_Height);
-
       gc.setLineStyle(SWT.LINE_SOLID);
       gc.setForeground(SYS_COLOR_BLACK);
       gc.drawRectangle(devArea_X1, devArea_Y1, devArea_Width, devArea_Height);
 
       gc.setLineStyle(SWT.LINE_SOLID);
       gc.setForeground(SYS_COLOR_WHITE);
-//      gc.drawRectangle(devX + 1, devY + 1, devWidth - 2, devHeight - 2);
 
       gc.setBackground(_display.getSystemColor(SWT.COLOR_DARK_YELLOW));
       gc.setAlpha(0x30);
@@ -2720,22 +2998,22 @@ public class Map extends Canvas {
       /*
        * Draw text marker
        */
-//      final Point textExtend = gc.textExtent(Messages.Offline_Area_Label_AreaMarker);
-//      int devYMarker = devArea_Y1 - textExtend.y;
-//      devYMarker = devYMarker < 0 ? 0 : devYMarker;
-//
-//      gc.setForeground(SYS_COLOR_BLACK);
-//      gc.setBackground(SYS_COLOR_WHITE);
-//      gc.drawText(Messages.Offline_Area_Label_AreaMarker, devArea_X1, devYMarker);
+      final Point textExtend = gc.textExtent(Messages.Offline_Area_Label_AreaMarker);
+      int devYMarker = devArea_Y1 - textExtend.y;
+      devYMarker = devYMarker < 0 ? 0 : devYMarker;
+
+      gc.setForeground(SYS_COLOR_BLACK);
+      gc.setBackground(SYS_COLOR_WHITE);
+      gc.drawText(Messages.Offline_Area_Label_AreaMarker, devArea_X1, devYMarker);
    }
 
-   private void paintOfflineArea_10_Info(final GC gc) {
+   private void paint_OfflineArea_10_Info(final GC gc) {
 
       gc.setForeground(SYS_COLOR_BLACK);
       gc.setBackground(SYS_COLOR_YELLOW);
 
       final StringBuilder sb = new StringBuilder();
-      sb.append(Messages.Offline_Area_Label_SelectInfo);
+      sb.append(UI.SPACE + Messages.Offline_Area_Label_SelectInfo);
 
       if (_offline_DevMouse_Start != null) {
 
@@ -2747,7 +3025,7 @@ public class Map extends Canvas {
          final GeoPosition geoStart = _mp.pixelToGeo(worldPixel_Start, _mapZoomLevel);
          final GeoPosition geoEnd = _mp.pixelToGeo(worldPixel_End, _mapZoomLevel);
 
-         sb.append(String.format("   %s / %s  - %s / %s", //$NON-NLS-1$
+         sb.append(String.format("   %s / %s  ...  %s / %s", //$NON-NLS-1$
                _nfLatLon.format(geoStart.latitude),
                _nfLatLon.format(geoStart.longitude),
                _nfLatLon.format(geoEnd.latitude),
@@ -2763,7 +3041,7 @@ public class Map extends Canvas {
 
             final GeoPosition mouseGeo = _mp.pixelToGeo(worldPixel_Mouse, _mapZoomLevel);
 
-            sb.append(String.format("   %s / %s",
+            sb.append(String.format("   %s / %s", //$NON-NLS-1$
                   _nfLatLon.format(mouseGeo.latitude),
                   _nfLatLon.format(mouseGeo.longitude)));
          }
@@ -3270,7 +3548,7 @@ public class Map extends Canvas {
          gcMapImage.setAlpha(0xff);
       }
 
-      if (_isShowTileInfo || _isShowTileBorder) {
+      if (_isShowDebug_TileInfo || _isShowDebug_TileBorder) {
          paintTile30_Info(gcMapImage, tile, devTileViewport);
       }
    }
@@ -3502,14 +3780,14 @@ public class Map extends Canvas {
          return;
       }
 
-      if (_isShowTileBorder) {
+      if (_isShowDebug_TileBorder) {
 
          // draw tile border
          gc.setForeground(SYS_COLOR_DARK_GRAY);
          gc.drawRectangle(devTileViewport.x, devTileViewport.y, _tilePixelSize, _tilePixelSize);
       }
 
-      if (_isShowTileInfo) {
+      if (_isShowDebug_TileInfo) {
 
          // draw tile info
          gc.setForeground(SYS_COLOR_WHITE);
@@ -4458,9 +4736,9 @@ public class Map extends Canvas {
     */
    public void setShowDebugInfo(final boolean isShowDebugInfo, final boolean isShowTileBorder, final boolean isShowGeoGrid) {
 
-      _isShowTileInfo = isShowDebugInfo;
-      _isShowTileBorder = isShowTileBorder;
-      _isShowGeoGrid = isShowGeoGrid;
+      _isShowDebug_TileInfo = isShowDebugInfo;
+      _isShowDebug_TileBorder = isShowTileBorder;
+      _isShowDebug_GeoGrid = isShowGeoGrid;
 
       paint();
    }

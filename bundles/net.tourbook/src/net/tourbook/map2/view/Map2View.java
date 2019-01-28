@@ -19,6 +19,7 @@ import de.byteholder.geoclipse.GeoclipseExtensions;
 import de.byteholder.geoclipse.map.IMapContextProvider;
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.MapLegend;
+import de.byteholder.geoclipse.map.event.IMapGridListener;
 import de.byteholder.geoclipse.map.event.IMapInfoListener;
 import de.byteholder.geoclipse.map.event.IMapPositionListener;
 import de.byteholder.geoclipse.map.event.IPOIListener;
@@ -478,7 +479,8 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
       @Override
       public void runWithEvent(final Event event) {
-         actionSearchTourByLocation(event);
+
+         _map.actionSearchTourByLocation(event);
       }
    }
 
@@ -581,11 +583,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
       _defaultZoom = _map.getZoom();
       _defaultPosition = _map.getGeoCenter();
-   }
-
-   public void actionSearchTourByLocation(final Event event) {
-
-      _map.actionManageOfflineImages(event);
    }
 
    public void actionSetDefaultPosition() {
@@ -937,6 +934,45 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
             _actionShowPOI.setEnabled(true);
             _actionShowPOI.setChecked(true);
+         }
+      });
+
+      _map.addMapGridListener(new IMapGridListener() {
+
+         @Override
+         public void onMapGrid(final GeoPosition topLeft, final GeoPosition bottomRight) {
+            // TODO Auto-generated method stub
+
+            final double geoLat1 = (int) (topLeft.latitude * 100) / 100.0;
+            final double geoLon1 = (int) (topLeft.longitude * 100) / 100.0;
+
+            final double geoLat2 = (int) (bottomRight.latitude * 100) / 100.0;
+            final double geoLon2 = (int) (bottomRight.longitude * 100) / 100.0;
+
+            System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] () ")
+
+                  + String.format("Lat %2.4f  %2.4f   Lon %2.4f  %2.4f"
+
+//                      + "    1:%s    2:%s"
+            ,
+
+                        geoLat1,
+                        geoLat2,
+
+                        geoLon1,
+                        geoLon2
+
+//                        topLeft,
+//                        bottomRight
+            )
+
+//                  + ("\ttopLeft: " + topLeft)
+//                  + ("\tbottomRight: " + bottomRight)
+//                  + ("\tbottomRight: " + bottomRight)
+
+            );
+// TODO remove SYSTEM.OUT.PRINTLN
+
          }
       });
 
