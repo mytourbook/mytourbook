@@ -508,7 +508,14 @@ public class Map extends Canvas {
    private Point               _grid_WorldMouse_End;
    private Point               _grid_WorldMouse_Move;
 
+   /**
+    * Top/left position
+    */
    private GeoPosition         _grid_SelectedPosition_Geo_1;
+
+   /**
+    * Bottom/right position
+    */
    private GeoPosition         _grid_SelectedPosition_Geo_2;
 
    private IMapContextProvider _mapContextProvider;
@@ -2684,19 +2691,25 @@ public class Map extends Canvas {
 
       final double gridSize = 0.01;
 
-      // adjust to 0.01°
-      final double geoLat1 = (int) (_grid_SelectedPosition_Geo_1.latitude * 100) / 100.0;
-      final double geoLon1 = (int) (_grid_SelectedPosition_Geo_1.longitude * 100) / 100.0;
+      final double geoLat1 = _grid_SelectedPosition_Geo_1.latitude;
+      final double geoLon1 = _grid_SelectedPosition_Geo_1.longitude;
 
-      final double geoLat2 = (int) (_grid_SelectedPosition_Geo_2.latitude * 100) / 100.0;
-      final double geoLon2 = (int) (_grid_SelectedPosition_Geo_2.longitude * 100) / 100.0;
+      final double geoLat2 = _grid_SelectedPosition_Geo_2.latitude;
+      final double geoLon2 = _grid_SelectedPosition_Geo_2.longitude;
+
+      // set lat/lon to grid 0.01°
+      double geoGrid_Lat1 = (int) (geoLat1 * 100) / 100.0;
+      final double geoGrid_Lon1 = (int) (geoLon1 * 100) / 100.0;
+
+      double geoGrid_Lat2 = (int) (geoLat2 * 100) / 100.0;
+      double geoGrid_Lon2 = (int) (geoLon2 * 100) / 100.0;
 
       /*
        * Adjust Y that X and Y are at the top/left position otherwise Y is at the bottom/left
        * position
        */
-      _grid_SelectedPosition_Geo_1.latitude -= gridSize;
-      _grid_SelectedPosition_Geo_2.latitude -= gridSize;
+//      geoGrid_Lat1 -= gridSize;
+//      geoGrid_Lat2 -= gridSize;
 
       final Point devGeoGrid_1 = offline_GetDevGeoGridPosition(world_X1, world_Y1);
       final Point devGeoGrid_2 = offline_GetDevGeoGridPosition(world_X2, world_Y2);
@@ -2727,8 +2740,12 @@ public class Map extends Canvas {
          devGrid_X2 += geoGridPixelSizeX;
          devGrid_Y2 += geoGridPixelSizeY;
 
-         _grid_SelectedPosition_Geo_2.longitude += gridSize;
-         _grid_SelectedPosition_Geo_2.latitude += gridSize;
+         geoGrid_Lat1 += gridSize;
+         geoGrid_Lon2 += gridSize;
+//         geoGrid_Lat2 += gridSize;
+
+//         System.out.println("1");
+//// TODO remove SYSTEM.OUT.PRINTLN
 
       } else if (geoLat1 > 0 && geoLon1 > 0 && geoLat2 < 0 && geoLon2 > 0) {
 
@@ -2743,6 +2760,12 @@ public class Map extends Canvas {
 
          devGrid_X2 += geoGridPixelSizeX;
          devGrid_Y2 += geoGridPixelSizeY * 2;
+
+         geoGrid_Lon2 += gridSize;
+         geoGrid_Lat2 += gridSize * 2;
+
+//         System.out.println("2");
+//// TODO remove SYSTEM.OUT.PRINTLN
 
       } else if (geoLat1 < 0 && geoLon1 > 0 && geoLat2 < 0 && geoLon2 > 0) {
 
@@ -2759,6 +2782,14 @@ public class Map extends Canvas {
          devGrid_Y1 += geoGridPixelSizeY;
          devGrid_Y2 += geoGridPixelSizeY * 2;
 
+         geoGrid_Lon2 += gridSize;
+
+//         geoGrid_Lat1 -= gridSize;
+         geoGrid_Lat2 -= gridSize * 1;
+
+//         System.out.println("3");
+//// TODO remove SYSTEM.OUT.PRINTLN
+
       } else if (geoLat1 > 0 && geoLon1 < 0 && geoLat2 > 0 && geoLon2 < 0) {
 
          // 1: + / -
@@ -2773,6 +2804,9 @@ public class Map extends Canvas {
          devGrid_X1 -= geoGridPixelSizeX;
          devGrid_Y2 += geoGridPixelSizeY;
 
+//         System.out.println("4");
+//// TODO remove SYSTEM.OUT.PRINTLN
+
       } else if (geoLat1 > 0 && geoLon1 < 0 && geoLat2 < 0 && geoLon2 < 0) {
 
          // 1: + / -
@@ -2786,6 +2820,9 @@ public class Map extends Canvas {
 
          devGrid_X1 -= geoGridPixelSizeX;
          devGrid_Y2 += geoGridPixelSizeY * 2;
+
+//         System.out.println("5");
+//// TODO remove SYSTEM.OUT.PRINTLN
 
       } else if (geoLat1 < 0 && geoLon1 < 0 && geoLat2 < 0 && geoLon2 < 0) {
 
@@ -2803,6 +2840,9 @@ public class Map extends Canvas {
 
          devGrid_Y2 += geoGridPixelSizeY * 2;
 
+//         System.out.println("6");
+//// TODO remove SYSTEM.OUT.PRINTLN
+
       } else if (geoLat1 > 0 && geoLon1 < 0 && geoLat2 > 0 && geoLon2 > 0) {
 
          // 1: + / -
@@ -2818,6 +2858,9 @@ public class Map extends Canvas {
          devGrid_Y2 += geoGridPixelSizeY;
 
          devGrid_X2 += geoGridPixelSizeX;
+
+//         System.out.println("7");
+//// TODO remove SYSTEM.OUT.PRINTLN
 
       } else if (geoLat1 < 0 && geoLon1 < 0 && geoLat2 < 0 && geoLon2 > 0) {
 
@@ -2836,6 +2879,9 @@ public class Map extends Canvas {
          devGrid_X2 += geoGridPixelSizeX;
          devGrid_Y2 += geoGridPixelSizeY * 2;
 
+//         System.out.println("8");
+//// TODO remove SYSTEM.OUT.PRINTLN
+
       } else if (geoLat1 > 0 && geoLon1 < 0 && geoLat2 < 0 && geoLon2 > 0) {
 
          // 1: + / -
@@ -2851,7 +2897,35 @@ public class Map extends Canvas {
 
          devGrid_X2 += geoGridPixelSizeX;
          devGrid_Y2 += geoGridPixelSizeY * 2;
+
+//         System.out.println("9");
+//// TODO remove SYSTEM.OUT.PRINTLN
       }
+
+      _grid_SelectedPosition_Geo_1 = new GeoPosition(geoGrid_Lat1, geoGrid_Lon1);
+      _grid_SelectedPosition_Geo_2 = new GeoPosition(geoGrid_Lat2, geoGrid_Lon2);
+
+      System.out.println();
+
+      System.out.println(String.format(
+
+            "1: x(lon) %3.4f  y(lat) %3.4f",
+
+            _grid_SelectedPosition_Geo_1.longitude,
+            _grid_SelectedPosition_Geo_1.latitude
+
+      ));
+
+      System.out.println(String.format(
+
+            "2: x(lon) %3.4f  y(lat) %3.4f",
+
+            _grid_SelectedPosition_Geo_2.longitude,
+            _grid_SelectedPosition_Geo_2.latitude
+
+      ));
+
+// TODO remove SYSTEM.OUT.PRINTLN
 
       if (_geoGridPixelSizeX < 3 || _geoGridPixelSizeY < 6) {
 
