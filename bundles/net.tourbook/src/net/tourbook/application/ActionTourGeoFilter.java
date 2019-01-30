@@ -46,7 +46,6 @@ public class ActionTourGeoFilter extends ActionToolbarSlideoutAdv {
    protected AdvancedSlideout createSlideout(final ToolItem toolItem) {
 
       _slideoutTourGeoFilter = new SlideoutTourGeoFilter(toolItem, _state);
-
       _slideoutTourGeoFilter.setSlideoutLocation(SlideoutLocation.BELOW_CENTER);
 
       return _slideoutTourGeoFilter;
@@ -57,7 +56,7 @@ public class ActionTourGeoFilter extends ActionToolbarSlideoutAdv {
 
       super.onSelect();
 
-      // update tour filter
+      // update tour geo filter
       TourGeoFilterManager.setFilterEnabled(getSelection());
    }
 

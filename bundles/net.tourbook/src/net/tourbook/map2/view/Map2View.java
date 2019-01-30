@@ -158,6 +158,7 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourInfoIconToolTipProvider;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.filter.geo.TourGeoFilterManager;
 import net.tourbook.tour.photo.DialogPhotoProperties;
 import net.tourbook.tour.photo.IPhotoPropertiesListener;
 import net.tourbook.tour.photo.PhotoPropertiesEvent;
@@ -948,16 +949,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
             final double geoLat2 = (int) (bottomRight.latitude * 100) / 100.0;
             final double geoLon2 = (int) (bottomRight.longitude * 100) / 100.0;
 
-            System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] () ")
-
-                  + String.format("Lat %2.2f  %2.2f   Lon %3.2f  %3.2f",
-
-                        geoLat1,
-                        geoLat2,
-
-                        geoLon1,
-                        geoLon2));
-// TODO remove SYSTEM.OUT.PRINTLN
+            TourGeoFilterManager.setFilter(geoLat1, geoLon1, geoLat2, geoLon2);
          }
       });
 

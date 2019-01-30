@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -24,8 +24,9 @@ import java.util.Set;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourPerson;
 import net.tourbook.tag.tour.filter.TourTagFilterManager;
-import net.tourbook.tour.filter.TourFilterManager;
 import net.tourbook.tour.filter.SQLFilterData;
+import net.tourbook.tour.filter.TourFilterManager;
+import net.tourbook.tour.filter.geo.TourGeoFilterManager;
 
 /**
  * The filter provides a sql WHERE which contains all tour filter, e.g. selected person, tour type,
@@ -112,11 +113,21 @@ public class SQLFilter {
 		/*
 		 * App Filter: Tour data
 		 */
-		final SQLFilterData tourDataSqlData = TourFilterManager.getSQL();
-		if (tourDataSqlData != null) {
+      final SQLFilterData tourSqlData = TourFilterManager.getSQL();
+      if (tourSqlData != null) {
 
-			sb.append(tourDataSqlData.getWhereString());
-			_parameters.addAll(tourDataSqlData.getParameters());
+         sb.append(tourSqlData.getWhereString());
+         _parameters.addAll(tourSqlData.getParameters());
+      }
+
+      /*
+       * App Filter: Tour geo location
+       */
+      final SQLFilterData tourSqlGeoData = TourGeoFilterManager.getSQL();
+      if (tourSqlGeoData != null) {
+
+         sb.append(tourSqlGeoData.getWhereString());
+         _parameters.addAll(tourSqlGeoData.getParameters());
 		}
 
 		/*
@@ -158,7 +169,7 @@ public class SQLFilter {
 
 	/**
 	 * Sets the parameters into the filter statement
-	 * 
+	 *
 	 * @param statement
 	 * @param startIndex
 	 *            Sets the parameter start index, the first parameter is 1
