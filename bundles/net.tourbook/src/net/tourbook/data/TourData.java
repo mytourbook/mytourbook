@@ -1060,7 +1060,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    /**
     * Contains the rough geo parts of the tour or <code>null</code> when geo data are not available. A
-    * grid square is an integer of lat and lon * 100 (1570 m)
+    * grid square is an integer of lat + 90° and lon + 180° multiplied by 100 (1570 m)
     *
     * <pre>
 
@@ -1092,10 +1092,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Latitude/longitude multiplied with {@link #_normalizedGeoAccuracy}
     */
    @Transient
-   private NormalizedGeoData      _rasterizedLatLon;
+   private NormalizedGeoData     _rasterizedLatLon;
 
    @Transient
-   private int                     _normalizedGeoAccuracy;
+   private int                   _normalizedGeoAccuracy;
 
    /**
     * Index of the segmented data in the data series
@@ -1124,56 +1124,56 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * oooo (o) DD-record // offset
     */
    @Transient
-   public int                     offsetDDRecord;
+   public int                    offsetDDRecord;
    /*
     * data for the tour segments
     */
    @Transient
-   private int[]                  segmentSerie_Time_Total;
+   private int[]                 segmentSerie_Time_Total;
    @Transient
-   private int[]                  segmentSerie_Time_Recording;
+   private int[]                 segmentSerie_Time_Recording;
    @Transient
    public int[]                  segmentSerie_Time_Driving;
 
    @Transient
-   private int[]                  segmentSerie_Time_Break;
+   private int[]                 segmentSerie_Time_Break;
    @Transient
    private float[]               segmentSerie_Distance_Diff;
 
    @Transient
    private float[]               segmentSerie_Distance_Total;
    @Transient
-   public float[]                  segmentSerie_Altitude_Diff;
+   public float[]                segmentSerie_Altitude_Diff;
    @Transient
-   public float[]                  segmentSerie_Altitude_Diff_Computed;
+   public float[]                segmentSerie_Altitude_Diff_Computed;
    @Transient
-   public float[]                  segmentSerie_Altitude_UpDown_Hour;
+   public float[]                segmentSerie_Altitude_UpDown_Hour;
    @Transient
    public float                  segmentSerieTotal_Altitude_Down;
 
    @Transient
    public float                  segmentSerieTotal_Altitude_Up;
    @Transient
-   public float[]                  segmentSerie_Speed;
+   public float[]                segmentSerie_Speed;
    @Transient
-   public float[]                  segmentSerie_Cadence;
+   public float[]                segmentSerie_Cadence;
    @Transient
-   public float[]                  segmentSerie_Pace;
+   public float[]                segmentSerie_Pace;
    @Transient
-   public float[]                  segmentSerie_Pace_Diff;
+   public float[]                segmentSerie_Pace_Diff;
    @Transient
-   public float[]                  segmentSerie_Power;
+   public float[]                segmentSerie_Power;
    @Transient
-   public float[]                  segmentSerie_Gradient;
+   public float[]                segmentSerie_Gradient;
 
    @Transient
-   public float[]                  segmentSerie_Pulse;
+   public float[]                segmentSerie_Pulse;
 
    /**
     * Keep original import file path, this is used when the tour file should be deleted.
     */
    @Transient
-   public String                  importFilePathOriginal;
+   public String                 importFilePathOriginal;
 
    /**
     * Latitude for the center position in the map or {@link Double#MIN_VALUE} when the position is
@@ -3223,24 +3223,25 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          lastIndex = partLatitude.length;
       }
 
+      // unique set with all geo parts
       final TIntHashSet allGeoParts = new TIntHashSet();
 
       for (int serieIndex = firstIndex; serieIndex < lastIndex; serieIndex++) {
 
-//         int latPart = (int) (latitude * 100);
-//         int lonPart = (int) (longitude * 100);
-//
-//         lat      ( -90 ... + 90) * 100 =  -9_000 +  9_000 = 18_000
-//         lon      (-180 ... +180) * 100 = -18_000 + 18_000 = 36_000
-//
-//         max      (9_000 + 9_000) * 100_000 = 18_000 * 100_000  = 1_800_000_000
-//
-//                                    Integer.MAX_VALUE = 2_147_483_647
+         //         int latPart = (int) (latitude * 100);
+         //         int lonPart = (int) (longitude * 100);
+         //
+         //         lat      ( -90 ... + 90) * 100 =  -9_000 +  9_000 = 18_000
+         //         lon      (-180 ... +180) * 100 = -18_000 + 18_000 = 36_000
+         //
+         //         max      (9_000 + 9_000) * 100_000 = 18_000 * 100_000  = 1_800_000_000
+         //
+         //                                    Integer.MAX_VALUE = 2_147_483_647
 
          final double latitude = partLatitude[serieIndex];
          final double longitude = partLongitude[serieIndex];
 
-         final int latPart = (int) (latitude * 100);
+         final int latPart = (int) (latitude * 100); 
          final int lonPart = (int) (longitude * 100);
 
          final int latLonPart = (latPart + 9_000) * 100_000 + (lonPart + 18_000);
@@ -3369,98 +3370,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       returnData.normalizedDistance = normalizedDistance - measureStartDistance;
 
       return returnData;
-   }
-
-   /**
-    * Rasterize lat/lon tour data
-    * <ul>
-    * <li>from first to last index</li>
-    * <li>added lat:90 or lon:180 to have positive values</li>
-    * <li>multiplied with geo accuracy</li>
-    * <li>removed subsequent duplicates</li>
-    * </ul>
-    *
-    * @param indexStart
-    * @param indexEnd
-    * @param geoAccuracy
-    * @param normalizedDistance
-    * @return Returns rasterized lat/lon data of the tour or <code>null</code> when not available
-    */
-   public NormalizedGeoData computeGeo_NormalizeLatLon_OLD(final int indexStart,
-                                                           final int indexEnd,
-                                                           final int geoAccuracy,
-                                                           final int normalizedDistance) {
-
-      if (latitudeSerie == null || distanceSerie == null) {
-         return null;
-      }
-
-      // validate indices
-      int firstIndex = indexStart < indexEnd ? indexStart : indexEnd;
-      int lastIndex = indexStart > indexEnd ? indexStart : indexEnd;
-
-      if (firstIndex < 0) {
-         firstIndex = 0;
-      }
-
-      final int numSlices = latitudeSerie.length;
-
-      if (lastIndex > numSlices) {
-         lastIndex = numSlices;
-      }
-
-      final int[] allNormalizedLat = new int[numSlices];
-      final int[] allNormalizedLon = new int[numSlices];
-      final int[] allNormalizedOriginalIndices = new int[numSlices];
-
-      int prevLatNormalized = Integer.MIN_VALUE;
-      int prevLonNormalized = Integer.MIN_VALUE;
-
-      int normalizedIndex = -1;
-
-      for (int serieIndex = firstIndex; serieIndex < lastIndex; serieIndex++) {
-
-         // convert lat + lon into a positive value
-         final double latValueWithOffset = latitudeSerie[serieIndex] + NORMALIZED_LATITUDE_OFFSET;
-         final double lonValueWithOffset = longitudeSerie[serieIndex] + NORMALIZED_LONGITUDE_OFFSET;
-
-         final int latNormalized = (int) (latValueWithOffset * geoAccuracy);
-         final int lonNormalized = (int) (lonValueWithOffset * geoAccuracy);
-
-         if (latNormalized != prevLatNormalized || lonNormalized != prevLonNormalized) {
-
-            // lat/lon have changed
-
-            normalizedIndex++;
-
-            allNormalizedLat[normalizedIndex] = latNormalized;
-            allNormalizedLon[normalizedIndex] = lonNormalized;
-
-            // keep original index
-            allNormalizedOriginalIndices[normalizedIndex] = serieIndex + firstIndex;
-         }
-
-         prevLatNormalized = latNormalized;
-         prevLonNormalized = lonNormalized;
-      }
-
-      final int normalizedLength = normalizedIndex + 1;
-
-      final NormalizedGeoData normalizedGeoData = new NormalizedGeoData();
-
-      normalizedGeoData.tourId = tourId;
-
-      normalizedGeoData.originalFirstIndex = firstIndex;
-      normalizedGeoData.originalLastIndex = lastIndex;
-
-      normalizedGeoData.normalizedLat = Arrays.copyOf(allNormalizedLat, normalizedLength);
-      normalizedGeoData.normalizedLon = Arrays.copyOf(allNormalizedLon, normalizedLength);
-
-      normalizedGeoData.normalized2OriginalIndices = Arrays.copyOf(allNormalizedOriginalIndices, normalizedLength);
-
-      normalizedGeoData.geoAccuracy = geoAccuracy;
-
-      return normalizedGeoData;
    }
 
    /**

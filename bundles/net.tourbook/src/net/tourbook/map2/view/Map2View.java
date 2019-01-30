@@ -941,7 +941,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
          @Override
          public void onMapGrid(final GeoPosition topLeft, final GeoPosition bottomRight) {
-            // TODO Auto-generated method stub
 
             final double geoLat1 = (int) (topLeft.latitude * 100) / 100.0;
             final double geoLon1 = (int) (topLeft.longitude * 100) / 100.0;
@@ -951,28 +950,14 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
             System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] () ")
 
-                  + String.format("Lat %2.4f  %2.4f   Lon %2.4f  %2.4f"
-
-//                      + "    1:%s    2:%s"
-            ,
+                  + String.format("Lat %2.2f  %2.2f   Lon %3.2f  %3.2f",
 
                         geoLat1,
                         geoLat2,
 
                         geoLon1,
-                        geoLon2
-
-//                        topLeft,
-//                        bottomRight
-            )
-
-//                  + ("\ttopLeft: " + topLeft)
-//                  + ("\tbottomRight: " + bottomRight)
-//                  + ("\tbottomRight: " + bottomRight)
-
-            );
+                        geoLon2));
 // TODO remove SYSTEM.OUT.PRINTLN
-
          }
       });
 

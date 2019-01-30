@@ -796,7 +796,6 @@ public class Messages extends NLS {
    public static String        HRV_View_Label_RightChartBorder;
    public static String        HRV_View_Label_RightChartBorder_Tooltip;
 
-
    public static String        Image__App_Add;
    public static String        Image__App_Add_2x;
    public static String        Image__App_Cancel;
@@ -989,6 +988,7 @@ public class Messages extends NLS {
    public static String        Image__TourBook_Week;
    public static String        Image__TourFilter;
    public static String        Image__TourFilter_Disabled;
+   public static String        Image__TourGeoFilter;
    public static String        Image__TourInfo;
    public static String        Image__TourInfo_Disabled;
    public static String        Image__TourLog;
@@ -2266,6 +2266,8 @@ public class Messages extends NLS {
    public static String Tour_Filter_Operator_Season_UntilToday_From_Date;
    public static String Tour_Filter_Operator_Season_UntilToday_From_YearStart;
    public static String Tour_Filter_Operator_StartsWith;
+
+   public static String Tour_GeoFilter_Action_Tooltip;
 
    public static String Tour_Info_Flag_Array;
    public static String Tour_Info_Flag_Database;
