@@ -281,13 +281,14 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
    };
 
 
-   private final IPreferenceStore   _prefStore                               = TourbookPlugin.getPrefStore();
-   private final IDialogSettings    _state                                   = TourbookPlugin.getState(ID);
 
-   private final ImageDescriptor    _imageSyncWithSlider                     = TourbookPlugin.getImageDescriptor(Messages.image_action_synch_with_slider);
-   private final ImageDescriptor    _imageSyncWithSlider_Disabled            = TourbookPlugin.getImageDescriptor(Messages.image_action_synch_with_slider_disabled);
-   private final ImageDescriptor    _imageSyncWithSlider_Centered            = TourbookPlugin.getImageDescriptor(Messages.Image_Action_SynchWithSlider_Centered);
-   private final ImageDescriptor    _imageSyncWithSlider_Centered_Disabled   = TourbookPlugin.getImageDescriptor(Messages.Image_Action_SynchWithSlider_Centered_Disabled);
+   private final IPreferenceStore   _prefStore                             = TourbookPlugin.getPrefStore();
+   private final IDialogSettings    _state                                 = TourbookPlugin.getState(ID);
+
+   private final ImageDescriptor    _imageSyncWithSlider                   = TourbookPlugin.getImageDescriptor(Messages.image_action_synch_with_slider);
+   private final ImageDescriptor    _imageSyncWithSlider_Disabled          = TourbookPlugin.getImageDescriptor(Messages.image_action_synch_with_slider_disabled);
+   private final ImageDescriptor    _imageSyncWithSlider_Centered          = TourbookPlugin.getImageDescriptor(Messages.Image_Action_SynchWithSlider_Centered);
+   private final ImageDescriptor    _imageSyncWithSlider_Centered_Disabled = TourbookPlugin.getImageDescriptor(Messages.Image_Action_SynchWithSlider_Centered_Disabled);
 
 // SET_FORMATTING_ON
 
@@ -296,6 +297,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
    private final DirectMappingPainter        _directMappingPainter    = new DirectMappingPainter();
    private final MapInfoManager              _mapInfoManager          = MapInfoManager.getInstance();
+
    private final TourPainterConfiguration    _tourPainterConfig       = TourPainterConfiguration.getInstance();
 
    private boolean                           _isPartVisible;
@@ -304,7 +306,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
     * contains selection which was set when the part is hidden
     */
    private ISelection                        _selectionWhenHidden;
-
    private IPartListener2                    _partListener;
    private ISelectionListener                _postSelectionListener;
    private IPropertyChangeListener           _prefChangeListener;
@@ -320,10 +321,10 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
     * contains photos which are displayed in the map
     */
    private final ArrayList<Photo>            _allPhotos               = new ArrayList<>();
+
    private final ArrayList<Photo>            _filteredPhotos          = new ArrayList<>();
 
    private boolean                           _isPhotoFilterActive;
-
    private int                               _photoFilterRatingStars;
    private int                               _photoFilterRatingStarOperator;
 
@@ -342,6 +343,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
    private boolean                           _isInZoom;
 
    private int                               _defaultZoom;
+
    private GeoPosition                       _defaultPosition;
 
    /**
@@ -353,7 +355,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
     * tool tips
     */
    private TourToolTip _tourToolTip;
-
    private String      _poiName;
    private GeoPosition _poiPosition;
    private int         _poiZoomLevel;
@@ -363,22 +364,23 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
     */
    private int                           _currentLeftSliderValueIndex;
    private int                           _currentRightSliderValueIndex;
+
    private int                           _currentSelectedSliderValueIndex;
 
    private MapLegend                     _mapLegend;
 
    private long                          _previousOverlayKey;
-
    private int                           _mapDimLevel         = -1;
+
    private RGB                           _mapDimColor;
 
    private int                           _selectedProfileKey  = 0;
 
    private MapGraphId                    _tourColorId;
-
    private int                           _hashTourId;
    private int                           _hashTourData;
    private long                          _hashTourOverlayKey;
+
    private int                           _hashAllPhotos;
 
    private final AtomicInteger           _asyncCounter        = new AtomicInteger();
@@ -388,7 +390,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
     * save in a tour) is displayed.
     */
    private boolean                       _isLinkPhotoDisplayed;
-
    private SliderPathPaintingData        _sliderPathPaintingData;
    private OpenDialogManager             _openDlgMgr          = new OpenDialogManager();
 
@@ -396,7 +397,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
    private long                          _lastFiredSyncEventTime;
 
    private HashMap<MapGraphId, Action>   _allTourColorActions = new HashMap<>();
-
    private ActionTourColor               _actionTourColorAltitude;
    private ActionTourColor               _actionTourColorGradient;
    private ActionTourColor               _actionTourColorPulse;
@@ -439,6 +439,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
    private ActionZoomOut                 _actionZoom_Out;
    private ActionZoomCentered            _actionZoom_Centered;
    private ActionZoomShowEntireMap       _actionZoom_ShowEntireMap;
+
    private ActionZoomShowEntireTour      _actionZoom_ShowEntireTour;
 
    /*
@@ -940,14 +941,31 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
       _map.addMapGridListener(new IMapGridListener() {
 
+         private static final double GEO_ROUNDING = 0.000_000_1;
+
+         private double geoRounding(double geoPos) {
+
+            if (geoPos >= 0) {
+               geoPos += GEO_ROUNDING;
+            } else {
+               geoPos -= GEO_ROUNDING;
+            }
+
+            return geoPos;
+         }
+
          @Override
          public void onMapGrid(final GeoPosition topLeft, final GeoPosition bottomRight) {
 
-            final double geoLat1 = (int) (topLeft.latitude * 100) / 100.0;
-            final double geoLon1 = (int) (topLeft.longitude * 100) / 100.0;
+            final double topLeft_Latitude = geoRounding(topLeft.latitude);
+            final double topLeft_Longitude = geoRounding(topLeft.longitude);
+            final double bottomRight_Latitude = geoRounding(bottomRight.latitude);
+            final double bottomRight_Longitude = geoRounding(bottomRight.longitude);
 
-            final double geoLat2 = (int) (bottomRight.latitude * 100) / 100.0;
-            final double geoLon2 = (int) (bottomRight.longitude * 100) / 100.0;
+            final double geoLat1 = (int) (topLeft_Latitude * 100) / 100.0;
+            final double geoLon1 = (int) (topLeft_Longitude * 100) / 100.0;
+            final double geoLat2 = (int) (bottomRight_Latitude * 100) / 100.0;
+            final double geoLon2 = (int) (bottomRight_Longitude * 100) / 100.0;
 
             TourGeoFilterManager.setFilter(geoLat1, geoLon1, geoLat2, geoLon2);
          }

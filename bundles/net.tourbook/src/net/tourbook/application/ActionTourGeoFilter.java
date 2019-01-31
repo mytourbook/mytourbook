@@ -46,7 +46,7 @@ public class ActionTourGeoFilter extends ActionToolbarSlideoutAdv {
    protected AdvancedSlideout createSlideout(final ToolItem toolItem) {
 
       _slideoutTourGeoFilter = new SlideoutTourGeoFilter(toolItem, _state);
-      _slideoutTourGeoFilter.setSlideoutLocation(SlideoutLocation.BELOW_CENTER);
+      _slideoutTourGeoFilter.setSlideoutLocation(SlideoutLocation.ABOVE_CENTER);
 
       return _slideoutTourGeoFilter;
    }

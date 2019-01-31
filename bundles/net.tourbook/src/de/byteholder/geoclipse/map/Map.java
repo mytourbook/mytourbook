@@ -2529,7 +2529,7 @@ public class Map extends Canvas {
        * show info in the top/right corner that selection for the offline area is activ
        */
       if (_grid_IsSelecting) {
-         paint_Grid_Info(gc);
+         paint_Grid_Info(gc, -1);
       }
 
       // check if mouse button is hit which sets the start position
@@ -2585,8 +2585,11 @@ public class Map extends Canvas {
 
       } else {
 
-         paint_Grid_Rectangle(gc, _grid_WorldMouse_Start, _grid_WorldMouse_End);
+         final int numGridRectangle = paint_Grid_Rectangle(gc, _grid_WorldMouse_Start, _grid_WorldMouse_End);
+
+         paint_Grid_Info(gc, numGridRectangle);
       }
+
 
       /*
        * draw selected area box
@@ -2619,7 +2622,11 @@ public class Map extends Canvas {
 //      gc.drawText(Messages.Offline_Area_Label_AreaMarker, devArea_X1, devYMarker);
    }
 
-   private void paint_Grid_Info(final GC gc) {
+   /**
+    * @param gc
+    * @param numGridRectangle
+    */
+   private void paint_Grid_Info(final GC gc, final int numGridRectangle) {
 
       gc.setForeground(SYS_COLOR_BLACK);
       gc.setBackground(SYS_COLOR_YELLOW);
@@ -2628,7 +2635,7 @@ public class Map extends Canvas {
 
       if (_grid_DevMouse_Start != null) {
 
-         // display offline area geo position
+         // display selected area
 
          final Point2D.Double worldPixel_Start = new Point2D.Double(_grid_WorldMouse_Start.x, _grid_WorldMouse_Start.y);
          final Point2D.Double worldPixel_End = new Point2D.Double(_grid_WorldMouse_End.x, _grid_WorldMouse_End.y);
@@ -2658,6 +2665,10 @@ public class Map extends Canvas {
          }
       }
 
+      if (numGridRectangle > -1) {
+         sb.append(String.format(" :: %d", numGridRectangle));
+      }
+
       gc.drawText(sb.toString(), 0, 0);
    }
 
@@ -2667,8 +2678,9 @@ public class Map extends Canvas {
     * @param gc
     * @param worldStart
     * @param worldEnd
+    * @return Returns number of grid rectangles
     */
-   private void paint_Grid_Rectangle(final GC gc, final Point worldStart, final Point worldEnd) {
+   private int paint_Grid_Rectangle(final GC gc, final Point worldStart, final Point worldEnd) {
 
       final int worldStartX = worldStart.x;
       final int worldStartY = worldStart.y;
@@ -2686,16 +2698,16 @@ public class Map extends Canvas {
       final Point2D.Double worldPixel_1 = new Point2D.Double(world_X1, world_Y1);
       final Point2D.Double worldPixel_2 = new Point2D.Double(world_X2, world_Y2);
 
-      _grid_SelectedPosition_Geo_1 = _mp.pixelToGeo(worldPixel_1, _mapZoomLevel);
-      _grid_SelectedPosition_Geo_2 = _mp.pixelToGeo(worldPixel_2, _mapZoomLevel);
+      final GeoPosition selectedPosition_Geo_1 = _mp.pixelToGeo(worldPixel_1, _mapZoomLevel);
+      final GeoPosition selectedPosition_Geo_2 = _mp.pixelToGeo(worldPixel_2, _mapZoomLevel);
 
       final double gridSize = 0.01;
 
-      final double geoLat1 = _grid_SelectedPosition_Geo_1.latitude;
-      final double geoLon1 = _grid_SelectedPosition_Geo_1.longitude;
+      final double geoLat1 = selectedPosition_Geo_1.latitude;
+      final double geoLon1 = selectedPosition_Geo_1.longitude;
 
-      final double geoLat2 = _grid_SelectedPosition_Geo_2.latitude;
-      final double geoLon2 = _grid_SelectedPosition_Geo_2.longitude;
+      final double geoLat2 = selectedPosition_Geo_2.latitude;
+      final double geoLon2 = selectedPosition_Geo_2.longitude;
 
       // set lat/lon to grid 0.01°
       double geoGrid_Lat1 = (int) (geoLat1 * 100) / 100.0;
@@ -2703,13 +2715,6 @@ public class Map extends Canvas {
 
       double geoGrid_Lat2 = (int) (geoLat2 * 100) / 100.0;
       double geoGrid_Lon2 = (int) (geoLon2 * 100) / 100.0;
-
-      /*
-       * Adjust Y that X and Y are at the top/left position otherwise Y is at the bottom/left
-       * position
-       */
-//      geoGrid_Lat1 -= gridSize;
-//      geoGrid_Lat2 -= gridSize;
 
       final Point devGeoGrid_1 = offline_GetDevGeoGridPosition(world_X1, world_Y1);
       final Point devGeoGrid_2 = offline_GetDevGeoGridPosition(world_X2, world_Y2);
@@ -2952,6 +2957,14 @@ public class Map extends Canvas {
 //
 //// TODO remove SYSTEM.OUT.PRINTLN
 
+      final int width = devGrid_X2 - devGrid_X1;
+      final int height = devGrid_Y2 - devGrid_Y1;
+
+      final double numX = width / _geoGridPixelSizeX;
+      final double numY = height / _geoGridPixelSizeY;
+
+      final int numGridRectangle = (int) Math.round(numX * numY);
+
       if (_geoGridPixelSizeX < 3 || _geoGridPixelSizeY < 6) {
 
          // geo grid has almost the same rectangle as the selected area
@@ -2960,13 +2973,12 @@ public class Map extends Canvas {
 
          // draw geo grid
 
-         final int width = devGrid_X2 - devGrid_X1;
-         final int height = devGrid_Y2 - devGrid_Y1;
-
          gc.setLineStyle(SWT.LINE_SOLID);
          gc.setForeground(_display.getSystemColor(SWT.COLOR_WHITE));
          gc.drawRectangle(devGrid_X1, devGrid_Y1, width, height);
       }
+
+      return numGridRectangle;
    }
 
    private void paint_OfflineArea(final GC gc) {

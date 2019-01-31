@@ -127,17 +127,13 @@ public class TourGeoFilterManager {
 //      final int latLonPart = (latPart + 9_000) * 100_000 + (lonPart + 18_000);
 
       final double gridRounding = 0.000_000_1;
-      final double gridSize = 0.01 + gridRounding;
+      final double gridSize = 0.01;// + gridRounding;
 
       final double normalizedLat1 = _geo_Selected_Lat_1 + TourData.NORMALIZED_LATITUDE_OFFSET;
       final double normalizedLat2 = _geo_Selected_Lat_2 + TourData.NORMALIZED_LATITUDE_OFFSET;
 
       final double normalizedLon1 = _geo_Selected_Lon_1 + TourData.NORMALIZED_LONGITUDE_OFFSET;
       final double normalizedLon2 = _geo_Selected_Lon_2 + TourData.NORMALIZED_LONGITUDE_OFFSET;
-
-//      System.out.println();
-
-//      final TIntArrayList allGeoParts = new TIntArrayList();
 
       for (double normalizedLon = normalizedLon1; normalizedLon < normalizedLon2; normalizedLon += gridSize) {
 
@@ -153,8 +149,6 @@ public class TourGeoFilterManager {
             final int lonPart = (int) Math.round(longitude100);
 
             final int latLonPart = (latPart + 9_000) * 100_000 + (lonPart + 18_000);
-
-//            allGeoParts.add(latLonPart);
 
             sqlParameters.add(latLonPart);
 
