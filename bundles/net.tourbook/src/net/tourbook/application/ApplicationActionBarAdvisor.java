@@ -228,7 +228,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
             coolBar.add(tbItemContribItem);
             tbMgr_TourFilter.add(_actionTour_GeoFilter);
 
-            TourGeoFilterManager.setTourGeoFilterAction(_actionTour_GeoFilter);
+            TourGeoFilterManager.setAction_TourGeoFilter(_actionTour_GeoFilter);
          }
          {
             /*

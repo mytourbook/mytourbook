@@ -508,15 +508,17 @@ public class Map extends Canvas {
    private Point               _grid_WorldMouse_End;
    private Point               _grid_WorldMouse_Move;
 
+   private boolean             _grid_IsShowLastGeoGrid;
+
    /**
     * Top/left position
     */
-   private GeoPosition         _grid_SelectedPosition_Geo_1;
+   private Point               _grid_SelectedPosition_Geo_1_E2;
 
    /**
     * Bottom/right position
     */
-   private GeoPosition         _grid_SelectedPosition_Geo_2;
+   private Point               _grid_SelectedPosition_Geo_2_E2;
 
    private IMapContextProvider _mapContextProvider;
 
@@ -1085,7 +1087,7 @@ public class Map extends Canvas {
       final Object[] listeners = _allMapGridListener.getListeners();
 
       for (final Object listener : listeners) {
-         ((IMapGridListener) listener).onMapGrid(_grid_SelectedPosition_Geo_1, _grid_SelectedPosition_Geo_2);
+         ((IMapGridListener) listener).onMapGrid(_grid_SelectedPosition_Geo_1_E2, _grid_SelectedPosition_Geo_2_E2, _mapZoomLevel);
       }
    }
 
@@ -2072,6 +2074,8 @@ public class Map extends Canvas {
 
          grid_DisableSelection();
 
+         _grid_IsShowLastGeoGrid = true;
+
          redraw();
          paint();
 
@@ -2168,6 +2172,10 @@ public class Map extends Canvas {
 
          if (_grid_IsPaintGeoGrid) {
             paint_Grid(gc);
+         }
+
+         if (_grid_IsShowLastGeoGrid) {
+            paint_Grid_Last(gc);
          }
       }
    }
@@ -2590,7 +2598,6 @@ public class Map extends Canvas {
          paint_Grid_Info(gc, numGridRectangle);
       }
 
-
       /*
        * draw selected area box
        */
@@ -2672,6 +2679,11 @@ public class Map extends Canvas {
       gc.drawText(sb.toString(), 0, 0);
    }
 
+   private void paint_Grid_Last(final GC gc) {
+
+      paint_Grid_Rectangle(gc, _grid_WorldMouse_Start, _grid_WorldMouse_End);
+   }
+
    /**
     * Paint a rectangle which shows the grid.
     *
@@ -2701,20 +2713,18 @@ public class Map extends Canvas {
       final GeoPosition selectedPosition_Geo_1 = _mp.pixelToGeo(worldPixel_1, _mapZoomLevel);
       final GeoPosition selectedPosition_Geo_2 = _mp.pixelToGeo(worldPixel_2, _mapZoomLevel);
 
-      final double gridSize = 0.01;
-
       final double geoLat1 = selectedPosition_Geo_1.latitude;
       final double geoLon1 = selectedPosition_Geo_1.longitude;
 
       final double geoLat2 = selectedPosition_Geo_2.latitude;
       final double geoLon2 = selectedPosition_Geo_2.longitude;
 
-      // set lat/lon to grid 0.01°
-      double geoGrid_Lat1 = (int) (geoLat1 * 100) / 100.0;
-      double geoGrid_Lon1 = (int) (geoLon1 * 100) / 100.0;
+      // set lat/lon to a grid of 0.01°
+      int geoGrid_Lat1_E2 = (int) Math.round(geoLat1 * 100);
+      int geoGrid_Lon1_E2 = (int) Math.round(geoLon1 * 100);
 
-      double geoGrid_Lat2 = (int) (geoLat2 * 100) / 100.0;
-      double geoGrid_Lon2 = (int) (geoLon2 * 100) / 100.0;
+      int geoGrid_Lat2_E2 = (int) Math.round(geoLat2 * 100);
+      int geoGrid_Lon2_E2 = (int) Math.round(geoLon2 * 100);
 
       final Point devGeoGrid_1 = offline_GetDevGeoGridPosition(world_X1, world_Y1);
       final Point devGeoGrid_2 = offline_GetDevGeoGridPosition(world_X2, world_Y2);
@@ -2727,6 +2737,8 @@ public class Map extends Canvas {
 
       final int geoGridPixelSizeX = (int) _geoGridPixelSizeX;
       final int geoGridPixelSizeY = (int) _geoGridPixelSizeY;
+
+      final int gridSize_E2 = 1;
 
       /**
        * Adjust lat/lon +/-, this algorithm is created with many many many try and error
@@ -2745,8 +2757,8 @@ public class Map extends Canvas {
          devGrid_X2 += geoGridPixelSizeX;
          devGrid_Y2 += geoGridPixelSizeY;
 
-         geoGrid_Lon2 += gridSize; // X1
-         geoGrid_Lat1 += gridSize; // Y1
+         geoGrid_Lon2_E2 += gridSize_E2; // X1
+         geoGrid_Lat1_E2 += gridSize_E2; // Y1
 
 //         System.out.println("1");
 //// TODO remove SYSTEM.OUT.PRINTLN
@@ -2765,10 +2777,10 @@ public class Map extends Canvas {
          devGrid_X2 += geoGridPixelSizeX;
          devGrid_Y2 += geoGridPixelSizeY * 2;
 
-         geoGrid_Lon2 += gridSize; // X2
+         geoGrid_Lon2_E2 += gridSize_E2; // X2
 
-         geoGrid_Lat1 += gridSize; // Y1
-         geoGrid_Lat2 -= gridSize; // Y2
+         geoGrid_Lat1_E2 += gridSize_E2; // Y1
+         geoGrid_Lat2_E2 -= gridSize_E2; // Y2
 
 //         System.out.println("2");
 //// TODO remove SYSTEM.OUT.PRINTLN
@@ -2788,8 +2800,8 @@ public class Map extends Canvas {
          devGrid_Y1 += geoGridPixelSizeY;
          devGrid_Y2 += geoGridPixelSizeY * 2;
 
-         geoGrid_Lon2 += gridSize; // X2
-         geoGrid_Lat2 -= gridSize; // Y2
+         geoGrid_Lon2_E2 += gridSize_E2; // X2
+         geoGrid_Lat2_E2 -= gridSize_E2; // Y2
 
 //         System.out.println("3");
 //// TODO remove SYSTEM.OUT.PRINTLN
@@ -2808,8 +2820,8 @@ public class Map extends Canvas {
          devGrid_X1 -= geoGridPixelSizeX;
          devGrid_Y2 += geoGridPixelSizeY;
 
-         geoGrid_Lon1 -= gridSize; // X1
-         geoGrid_Lat1 += gridSize; // Y1
+         geoGrid_Lon1_E2 -= gridSize_E2; // X1
+         geoGrid_Lat1_E2 += gridSize_E2; // Y1
 
 //         System.out.println("4");
 //// TODO remove SYSTEM.OUT.PRINTLN
@@ -2828,10 +2840,10 @@ public class Map extends Canvas {
          devGrid_X1 -= geoGridPixelSizeX;
          devGrid_Y2 += geoGridPixelSizeY * 2;
 
-         geoGrid_Lon1 -= gridSize; // X1
-         geoGrid_Lat1 += gridSize; // Y1
+         geoGrid_Lon1_E2 -= gridSize_E2; // X1
+         geoGrid_Lat1_E2 += gridSize_E2; // Y1
 
-         geoGrid_Lat2 -= gridSize; // Y2
+         geoGrid_Lat2_E2 -= gridSize_E2; // Y2
 
 //         System.out.println("5");
 //// TODO remove SYSTEM.OUT.PRINTLN
@@ -2852,8 +2864,8 @@ public class Map extends Canvas {
 
          devGrid_Y2 += geoGridPixelSizeY * 2;
 
-         geoGrid_Lon1 -= gridSize; // X1
-         geoGrid_Lat2 -= gridSize; // Y2
+         geoGrid_Lon1_E2 -= gridSize_E2; // X1
+         geoGrid_Lat2_E2 -= gridSize_E2; // Y2
 
 //         System.out.println("6");
 //// TODO remove SYSTEM.OUT.PRINTLN
@@ -2874,10 +2886,10 @@ public class Map extends Canvas {
 
          devGrid_X2 += geoGridPixelSizeX;
 
-         geoGrid_Lon1 -= gridSize; // X1
-         geoGrid_Lat1 += gridSize; // Y1
+         geoGrid_Lon1_E2 -= gridSize_E2; // X1
+         geoGrid_Lat1_E2 += gridSize_E2; // Y1
 
-         geoGrid_Lon2 += gridSize; // X2
+         geoGrid_Lon2_E2 += gridSize_E2; // X2
 
 //         System.out.println("7");
 //// TODO remove SYSTEM.OUT.PRINTLN
@@ -2899,10 +2911,10 @@ public class Map extends Canvas {
          devGrid_X2 += geoGridPixelSizeX;
          devGrid_Y2 += geoGridPixelSizeY * 2;
 
-         geoGrid_Lon1 -= gridSize; // X1
+         geoGrid_Lon1_E2 -= gridSize_E2; // X1
 
-         geoGrid_Lon2 += gridSize; // X2
-         geoGrid_Lat2 -= gridSize; // Y2
+         geoGrid_Lon2_E2 += gridSize_E2; // X2
+         geoGrid_Lat2_E2 -= gridSize_E2; // Y2
 
 //         System.out.println("8");
 //// TODO remove SYSTEM.OUT.PRINTLN
@@ -2923,34 +2935,37 @@ public class Map extends Canvas {
          devGrid_X2 += geoGridPixelSizeX;
          devGrid_Y2 += geoGridPixelSizeY * 2;
 
-         geoGrid_Lon1 -= gridSize; // X1
-         geoGrid_Lat1 += gridSize; // Y1
+         geoGrid_Lon1_E2 -= gridSize_E2; // X1
+         geoGrid_Lat1_E2 += gridSize_E2; // Y1
 
-         geoGrid_Lon2 += gridSize; // X2
-         geoGrid_Lat2 -= gridSize; // Y2
+         geoGrid_Lon2_E2 += gridSize_E2; // X2
+         geoGrid_Lat2_E2 -= gridSize_E2; // Y2
 
 //         System.out.println("9");
 //// TODO remove SYSTEM.OUT.PRINTLN
       }
 
-      _grid_SelectedPosition_Geo_1 = new GeoPosition(geoGrid_Lat1, geoGrid_Lon1);
-      _grid_SelectedPosition_Geo_2 = new GeoPosition(geoGrid_Lat2, geoGrid_Lon2);
+      // x: longitude
+      // y: latitude
+
+      _grid_SelectedPosition_Geo_1_E2 = new Point(geoGrid_Lon1_E2, geoGrid_Lat1_E2);
+      _grid_SelectedPosition_Geo_2_E2 = new Point(geoGrid_Lon2_E2, geoGrid_Lat2_E2);
 
 //      System.out.println(String.format(
 //
-//            "1: x(lon) %3.2f  y(lat) %3.2f",
+//            "1: x(lon) %d  y(lat) %d",
 //
-//            _grid_SelectedPosition_Geo_1.longitude,
-//            _grid_SelectedPosition_Geo_1.latitude
+//            _grid_SelectedPosition_Geo_1_E2.x,
+//            _grid_SelectedPosition_Geo_1_E2.y
 //
 //      ));
 //
 //      System.out.println(String.format(
 //
-//            "2: x(lon) %3.2f  y(lat) %3.2f",
+//            "2: x(lon) %d  y(lat) %d",
 //
-//            _grid_SelectedPosition_Geo_2.longitude,
-//            _grid_SelectedPosition_Geo_2.latitude
+//            _grid_SelectedPosition_Geo_2_E2.x,
+//            _grid_SelectedPosition_Geo_2_E2.y
 //
 //      ));
 //      System.out.println();
@@ -4854,13 +4869,20 @@ public class Map extends Canvas {
       paint();
    }
 
+   public void setShowLastGeoGrid(final boolean isVisibility) {
+
+      _grid_IsShowLastGeoGrid = isVisibility;
+
+      paint();
+   }
+
    /**
     * Legend will be drawn into the map when the visibility is <code>true</code>
     *
-    * @param visibility
+    * @param isVisibility
     */
-   public void setShowLegend(final boolean visibility) {
-      _isLegendVisible = visibility;
+   public void setShowLegend(final boolean isVisibility) {
+      _isLegendVisible = isVisibility;
    }
 
    /**

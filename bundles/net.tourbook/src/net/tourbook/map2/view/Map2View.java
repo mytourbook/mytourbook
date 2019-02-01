@@ -941,33 +941,12 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
       _map.addMapGridListener(new IMapGridListener() {
 
-         private static final double GEO_ROUNDING = 0.000_000_1;
-
-         private double geoRounding(double geoPos) {
-
-            if (geoPos >= 0) {
-               geoPos += GEO_ROUNDING;
-            } else {
-               geoPos -= GEO_ROUNDING;
-            }
-
-            return geoPos;
-         }
-
          @Override
-         public void onMapGrid(final GeoPosition topLeft, final GeoPosition bottomRight) {
+         public void onMapGrid(final org.eclipse.swt.graphics.Point topLeftE2,
+                               final org.eclipse.swt.graphics.Point bottomRightE2,
+                               final int mapZoomLevel) {
 
-            final double topLeft_Latitude = geoRounding(topLeft.latitude);
-            final double topLeft_Longitude = geoRounding(topLeft.longitude);
-            final double bottomRight_Latitude = geoRounding(bottomRight.latitude);
-            final double bottomRight_Longitude = geoRounding(bottomRight.longitude);
-
-            final double geoLat1 = (int) (topLeft_Latitude * 100) / 100.0;
-            final double geoLon1 = (int) (topLeft_Longitude * 100) / 100.0;
-            final double geoLat2 = (int) (bottomRight_Latitude * 100) / 100.0;
-            final double geoLon2 = (int) (bottomRight_Longitude * 100) / 100.0;
-
-            TourGeoFilterManager.setFilter(geoLat1, geoLon1, geoLat2, geoLon2);
+            TourGeoFilterManager.setFilter(topLeftE2, bottomRightE2, mapZoomLevel);
          }
       });
 
@@ -1171,6 +1150,15 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
             } else if (eventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof ISelection) {
 
                onSelectionChanged((ISelection) eventData);
+
+            } else if (eventId == TourEventId.MAP_SHOW_LAST_GEO_GRID) {
+
+               if (eventData instanceof Boolean) {
+
+                  final Boolean isVisible = (Boolean) eventData;
+
+                  _map.setShowLastGeoGrid(isVisible);
+               }
 
             } else if (eventId == TourEventId.SEGMENT_LAYER_CHANGED) {
 

@@ -165,7 +165,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public static final double          MAX_GEO_DIFF                      = 0.0001;
 
    public static final double          NORMALIZED_LATITUDE_OFFSET        = 90.0;
+   public static final int             NORMALIZED_LATITUDE_OFFSET_E2     = 9000;
    public static final double          NORMALIZED_LONGITUDE_OFFSET       = 180.0;
+   public static final int             NORMALIZED_LONGITUDE_OFFSET_E2    = 18000;
 
    private static final String         TIME_ZONE_ID_EUROPE_BERLIN        = "Europe/Berlin";                         //$NON-NLS-1$
 
@@ -3241,7 +3243,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          final double latitude = partLatitude[serieIndex];
          final double longitude = partLongitude[serieIndex];
 
-         final int latPart = (int) (latitude * 100); 
+         final int latPart = (int) (latitude * 100);
          final int lonPart = (int) (longitude * 100);
 
          final int latLonPart = (latPart + 9_000) * 100_000 + (lonPart + 18_000);

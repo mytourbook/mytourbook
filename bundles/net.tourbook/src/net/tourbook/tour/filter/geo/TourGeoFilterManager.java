@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
@@ -38,6 +39,8 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
 import net.tourbook.tour.filter.SQLFilterData;
 
 public class TourGeoFilterManager {
@@ -56,14 +59,14 @@ public class TourGeoFilterManager {
 
    private static ActionTourGeoFilter    _actionTourFilter;
 
-   private static boolean                _isTourGeoFilterEnabled;
+   private static boolean                _isTourGeoFilterSelected;
 
    private static int[]                  _fireEventCounter        = new int[1];
 
-   private static double                 _geo_Selected_Lat_1;
-   private static double                 _geo_Selected_Lon_1;
-   private static double                 _geo_Selected_Lat_2;
-   private static double                 _geo_Selected_Lon_2;
+   private static Point                  _geo_1_TopLeft_E2;
+   private static Point                  _geo_2_BottomRight_E2;
+
+   private static int                    _mapZoomLevel;
 
    /**
     * Fire event that the tour filter has changed.
@@ -98,7 +101,7 @@ public class TourGeoFilterManager {
     */
    public static SQLFilterData getSQL() {
 
-      if (_isTourGeoFilterEnabled == false /* || _selectedProfile == null */) {
+      if (_isTourGeoFilterSelected == false || _geo_1_TopLeft_E2 == null) {
 
          // tour filter is not enabled or not selected
 
@@ -118,54 +121,40 @@ public class TourGeoFilterManager {
       //
       //                                    Integer.MAX_VALUE = 2_147_483_647
 
-//      final double latitude = partLatitude[serieIndex];
-//      final double longitude = partLongitude[serieIndex];
-//
-//      final int latPart = (int) (latitude * 100);
-//      final int lonPart = (int) (longitude * 100);
-//
-//      final int latLonPart = (latPart + 9_000) * 100_000 + (lonPart + 18_000);
+      // x: longitude
+      // y: latitude
 
-      final double gridRounding = 0.000_000_1;
-      final double gridSize = 0.01;// + gridRounding;
+      final int normalizedLat1 = _geo_1_TopLeft_E2.y + TourData.NORMALIZED_LATITUDE_OFFSET_E2;
+      final int normalizedLat2 = _geo_2_BottomRight_E2.y + TourData.NORMALIZED_LATITUDE_OFFSET_E2;
 
-      final double normalizedLat1 = _geo_Selected_Lat_1 + TourData.NORMALIZED_LATITUDE_OFFSET;
-      final double normalizedLat2 = _geo_Selected_Lat_2 + TourData.NORMALIZED_LATITUDE_OFFSET;
+      final int normalizedLon1 = _geo_1_TopLeft_E2.x + TourData.NORMALIZED_LONGITUDE_OFFSET_E2;
+      final int normalizedLon2 = _geo_2_BottomRight_E2.x + TourData.NORMALIZED_LONGITUDE_OFFSET_E2;
 
-      final double normalizedLon1 = _geo_Selected_Lon_1 + TourData.NORMALIZED_LONGITUDE_OFFSET;
-      final double normalizedLon2 = _geo_Selected_Lon_2 + TourData.NORMALIZED_LONGITUDE_OFFSET;
+      final double gridSize_E2 = 1; // 0.01°
 
-      for (double normalizedLon = normalizedLon1; normalizedLon < normalizedLon2; normalizedLon += gridSize) {
+      for (int normalizedLon = normalizedLon1; normalizedLon < normalizedLon2; normalizedLon += gridSize_E2) {
 
-         for (double normalizedLat = normalizedLat2; normalizedLat < normalizedLat1; normalizedLat += gridSize) {
+         for (int normalizedLat = normalizedLat2; normalizedLat < normalizedLat1; normalizedLat += gridSize_E2) {
 
-            final double latitude = normalizedLat - TourData.NORMALIZED_LATITUDE_OFFSET;
-            final double longitude = normalizedLon - TourData.NORMALIZED_LONGITUDE_OFFSET;
+            final int latitudeE2 = normalizedLat - TourData.NORMALIZED_LATITUDE_OFFSET_E2;
+            final int longitudeE2 = normalizedLon - TourData.NORMALIZED_LONGITUDE_OFFSET_E2;
 
-            final double latitude100 = latitude * 100;
-            final double longitude100 = longitude * 100;
-
-            final int latPart = (int) Math.round(latitude100);
-            final int lonPart = (int) Math.round(longitude100);
-
-            final int latLonPart = (latPart + 9_000) * 100_000 + (lonPart + 18_000);
+            final int latLonPart = (latitudeE2 + 9_000) * 100_000 + (longitudeE2 + 18_000);
 
             sqlParameters.add(latLonPart);
 
 //            System.out.println(String.format("lon(x) %d  lat(y) %d  %s",
 //
-//                  lonPart,
-//                  latPart,
+//                  longitudeE2,
+//                  latitudeE2,
 //
 //                  Integer.toString(latLonPart)
 //
 //            ));
-// TODO remove SYSTEM.OUT.PRINTLN
-
+//// TODO remove SYSTEM.OUT.PRINTLN
          }
       }
 
-//      final int numGeoParts = allGeoParts.size();
       final int numGeoParts = sqlParameters.size();
 
       /*
@@ -272,8 +261,9 @@ public class TourGeoFilterManager {
 
    public static void restoreState() {
 
-      _isTourGeoFilterEnabled = _prefStore.getBoolean(ITourbookPreferences.APP_TOUR_GEO_FILTER_IS_SELECTED);
-      _actionTourFilter.setSelection(_isTourGeoFilterEnabled);
+      _isTourGeoFilterSelected = _prefStore.getBoolean(ITourbookPreferences.APP_TOUR_GEO_FILTER_IS_SELECTED);
+
+      _actionTourFilter.setSelection(_isTourGeoFilterSelected);
 
 //      readFilterProfile();
    }
@@ -288,26 +278,22 @@ public class TourGeoFilterManager {
 //      Util.writeXml(xmlRoot, xmlFile);
    }
 
-   public static void setFilter(final double geoLat1, final double geoLon1, final double geoLat2, final double geoLon2) {
+   public static void setAction_TourGeoFilter(final ActionTourGeoFilter _actionTourGeoFilter) {
 
-      _geo_Selected_Lat_1 = geoLat1;
-      _geo_Selected_Lon_1 = geoLon1;
+      _actionTourFilter = _actionTourGeoFilter;
+   }
 
-      _geo_Selected_Lat_2 = geoLat2;
-      _geo_Selected_Lon_2 = geoLon2;
+   public static void setFilter(final Point topLeftE2, final Point bottomRightE2, final int mapZoomLevel) {
 
-//      System.out.println((UI.timeStampNano() + " [" + TourGeoFilterManager.class.getSimpleName() + "] () ")
-//
-//            + String.format("Lat %2.2f  %2.2f   Lon %3.2f  %3.2f",
-//
-//                  geoLat1,
-//                  geoLat2,
-//
-//                  geoLon1,
-//                  geoLon2));
-//TODO remove SYSTEM.OUT.PRINTLN
+      _geo_1_TopLeft_E2 = topLeftE2;
+      _geo_2_BottomRight_E2 = bottomRightE2;
+      _mapZoomLevel = mapZoomLevel;
 
-      _actionTourFilter.setEnabled(true);
+      // ensure the action is selected
+      _actionTourFilter.setSelection(true);
+
+      // set selection state
+      _isTourGeoFilterSelected = true;
 
       fireTourFilterModifyEvent();
    }
@@ -319,13 +305,12 @@ public class TourGeoFilterManager {
     */
    public static void setFilterEnabled(final boolean isEnabled) {
 
-      _isTourGeoFilterEnabled = isEnabled;
+      _isTourGeoFilterSelected = isEnabled;
+
+      // show/hide geo grid in map
+      TourManager.fireEventWithCustomData(TourEventId.MAP_SHOW_LAST_GEO_GRID, _isTourGeoFilterSelected, null);
 
       fireTourFilterModifyEvent();
-   }
-
-   public static void setTourGeoFilterAction(final ActionTourGeoFilter _actionTourGeoFilter) {
-      _actionTourFilter = _actionTourGeoFilter;
    }
 
    /**
