@@ -2014,6 +2014,19 @@ public class Messages extends NLS {
    public static String Slideout_TourFilter_Link_TextSearchHint;
    public static String Slideout_TourFilter_Link_TextSearchHint_Tooltip;
 
+   public static String Slideout_TourGeoFilter_Column_Created_Label;
+   public static String Slideout_TourGeoFilter_Column_Latitude1_Header;
+   public static String Slideout_TourGeoFilter_Column_Latitude1_Label;
+   public static String Slideout_TourGeoFilter_Column_Latitude2_Header;
+   public static String Slideout_TourGeoFilter_Column_Latitude2_Label;
+   public static String Slideout_TourGeoFilter_Column_Longitude1_Header;
+   public static String Slideout_TourGeoFilter_Column_Longitude1_Label;
+   public static String Slideout_TourGeoFilter_Column_Longitude2_Header;
+   public static String Slideout_TourGeoFilter_Column_Longitude2_Label;
+   public static String Slideout_TourGeoFilter_Column_NumGeoParts_Header;
+   public static String Slideout_TourGeoFilter_Column_NumGeoParts_Label;
+   public static String Slideout_TourGeoFilter_Label_Title;
+
    public static String Slideout_TourInfoOptions_Checkbox_IsShowInfoTooltip;
    public static String Slideout_TourInfoOptions_Checkbox_IsShowTourSeparator;
    public static String Slideout_TourInfoOptions_Checkbox_IsShowTourSeparator_Tooltip;

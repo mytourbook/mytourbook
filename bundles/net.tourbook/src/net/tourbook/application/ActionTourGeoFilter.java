@@ -15,8 +15,10 @@
  *******************************************************************************/
 package net.tourbook.application;
 
+
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.ToolItem;
 
 import net.tourbook.Messages;
@@ -58,6 +60,21 @@ public class ActionTourGeoFilter extends ActionToolbarSlideoutAdv {
 
       // update tour geo filter
       TourGeoFilterManager.setFilterEnabled(getSelection());
+   }
+
+   public void showSlideout() {
+
+      // open immediately
+      _slideoutTourGeoFilter.open(false);
+
+      // delay to be sure that the slideout is opened
+      Display.getCurrent().asyncExec(new Runnable() {
+         @Override
+         public void run() {
+
+            _slideoutTourGeoFilter.refreshViewer();
+         }
+      });
    }
 
 }

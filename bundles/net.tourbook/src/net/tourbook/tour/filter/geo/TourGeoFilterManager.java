@@ -45,28 +45,26 @@ import net.tourbook.tour.filter.SQLFilterData;
 
 public class TourGeoFilterManager {
 
-   private static final Bundle           _bundle                  = TourbookPlugin.getDefault().getBundle();
+   private static final Bundle                 _bundle                  = TourbookPlugin.getDefault().getBundle();
 
-   private static final IPath            _stateLocation           = Platform.getStateLocation(_bundle);
-   private final static IPreferenceStore _prefStore               = TourbookPlugin.getPrefStore();
+   private static final IPath                  _stateLocation           = Platform.getStateLocation(_bundle);
+   private final static IPreferenceStore       _prefStore               = TourbookPlugin.getPrefStore();
 
-   private static final String           TOUR_FILTER_FILE_NAME    = "tour-geo-filter.xml";                  //$NON-NLS-1$
-   private static final int              TOUR_FILTER_VERSION      = 1;
+   private static final String                 TOUR_FILTER_FILE_NAME    = "tour-geo-filter.xml";                  //$NON-NLS-1$
+   private static final int                    TOUR_FILTER_VERSION      = 1;
 
-   private static final String           TAG_ROOT                 = "TourGeoFilterItems";                   //$NON-NLS-1$
+   private static final String                 TAG_ROOT                 = "TourGeoFilterItems";                   //$NON-NLS-1$
 
-   private static final String           ATTR_TOUR_FILTER_VERSION = "tourFilterVersion";                    //$NON-NLS-1$
+   private static final String                 ATTR_TOUR_FILTER_VERSION = "tourFilterVersion";                    //$NON-NLS-1$
 
-   private static ActionTourGeoFilter    _actionTourFilter;
+   private static ActionTourGeoFilter          _actionTourGeoFilter;
 
-   private static boolean                _isTourGeoFilterSelected;
+   private static boolean                      _isGeoFilterEnabled;
 
-   private static int[]                  _fireEventCounter        = new int[1];
+   private static int[]                        _fireEventCounter        = new int[1];
 
-   private static Point                  _geo_1_TopLeft_E2;
-   private static Point                  _geo_2_BottomRight_E2;
-
-   private static int                    _mapZoomLevel;
+   private static ArrayList<TourGeoFilterItem> _allTourGeoFilter        = new ArrayList<>();
+   private static TourGeoFilterItem            _selectedFilter;
 
    /**
     * Fire event that the tour filter has changed.
@@ -95,13 +93,17 @@ public class TourGeoFilterManager {
 
    }
 
+   static ArrayList<TourGeoFilterItem> getAllGeoFilter() {
+      return _allTourGeoFilter;
+   }
+
    /**
     * @return Returns sql data for the selected tour filter profile or <code>null</code> when not
     *         available.
     */
    public static SQLFilterData getSQL() {
 
-      if (_isTourGeoFilterSelected == false || _geo_1_TopLeft_E2 == null) {
+      if (_isGeoFilterEnabled == false || _selectedFilter == null) {
 
          // tour filter is not enabled or not selected
 
@@ -124,11 +126,11 @@ public class TourGeoFilterManager {
       // x: longitude
       // y: latitude
 
-      final int normalizedLat1 = _geo_1_TopLeft_E2.y + TourData.NORMALIZED_LATITUDE_OFFSET_E2;
-      final int normalizedLat2 = _geo_2_BottomRight_E2.y + TourData.NORMALIZED_LATITUDE_OFFSET_E2;
+      final int normalizedLat1 = _selectedFilter.topLeftE2.y + TourData.NORMALIZED_LATITUDE_OFFSET_E2;
+      final int normalizedLat2 = _selectedFilter.bottomRightE2.y + TourData.NORMALIZED_LATITUDE_OFFSET_E2;
 
-      final int normalizedLon1 = _geo_1_TopLeft_E2.x + TourData.NORMALIZED_LONGITUDE_OFFSET_E2;
-      final int normalizedLon2 = _geo_2_BottomRight_E2.x + TourData.NORMALIZED_LONGITUDE_OFFSET_E2;
+      final int normalizedLon1 = _selectedFilter.topLeftE2.x + TourData.NORMALIZED_LONGITUDE_OFFSET_E2;
+      final int normalizedLon2 = _selectedFilter.bottomRightE2.x + TourData.NORMALIZED_LONGITUDE_OFFSET_E2;
 
       final double gridSize_E2 = 1; // 0.01°
 
@@ -261,16 +263,16 @@ public class TourGeoFilterManager {
 
    public static void restoreState() {
 
-      _isTourGeoFilterSelected = _prefStore.getBoolean(ITourbookPreferences.APP_TOUR_GEO_FILTER_IS_SELECTED);
+      _isGeoFilterEnabled = _prefStore.getBoolean(ITourbookPreferences.APP_TOUR_GEO_FILTER_IS_SELECTED);
 
-      _actionTourFilter.setSelection(_isTourGeoFilterSelected);
+      _actionTourGeoFilter.setSelection(_isGeoFilterEnabled);
 
 //      readFilterProfile();
    }
 
    public static void saveState() {
 
-      _prefStore.setValue(ITourbookPreferences.APP_TOUR_GEO_FILTER_IS_SELECTED, _actionTourFilter.getSelection());
+      _prefStore.setValue(ITourbookPreferences.APP_TOUR_GEO_FILTER_IS_SELECTED, _actionTourGeoFilter.getSelection());
 //
 //      final XMLMemento xmlRoot = writeFilterProfile();
 //      final File xmlFile = getXmlFile();
@@ -278,22 +280,25 @@ public class TourGeoFilterManager {
 //      Util.writeXml(xmlRoot, xmlFile);
    }
 
-   public static void setAction_TourGeoFilter(final ActionTourGeoFilter _actionTourGeoFilter) {
+   public static void setAction_TourGeoFilter(final ActionTourGeoFilter actionTourGeoFilter) {
 
-      _actionTourFilter = _actionTourGeoFilter;
+      _actionTourGeoFilter = actionTourGeoFilter;
    }
 
    public static void setFilter(final Point topLeftE2, final Point bottomRightE2, final int mapZoomLevel) {
 
-      _geo_1_TopLeft_E2 = topLeftE2;
-      _geo_2_BottomRight_E2 = bottomRightE2;
-      _mapZoomLevel = mapZoomLevel;
+      _selectedFilter = new TourGeoFilterItem(topLeftE2, bottomRightE2, mapZoomLevel);
+
+      _allTourGeoFilter.add(_selectedFilter);
 
       // ensure the action is selected
-      _actionTourFilter.setSelection(true);
+      _actionTourGeoFilter.setSelection(true);
+
+      // show the slideout with the new geo filter
+      _actionTourGeoFilter.showSlideout();
 
       // set selection state
-      _isTourGeoFilterSelected = true;
+      _isGeoFilterEnabled = true;
 
       fireTourFilterModifyEvent();
    }
@@ -305,10 +310,10 @@ public class TourGeoFilterManager {
     */
    public static void setFilterEnabled(final boolean isEnabled) {
 
-      _isTourGeoFilterSelected = isEnabled;
+      _isGeoFilterEnabled = isEnabled;
 
       // show/hide geo grid in map
-      TourManager.fireEventWithCustomData(TourEventId.MAP_SHOW_LAST_GEO_GRID, _isTourGeoFilterSelected, null);
+      TourManager.fireEventWithCustomData(TourEventId.MAP_SHOW_LAST_GEO_GRID, _isGeoFilterEnabled, null);
 
       fireTourFilterModifyEvent();
    }

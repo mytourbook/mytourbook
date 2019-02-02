@@ -499,7 +499,7 @@ public class Map extends Canvas {
     */
    private boolean             _grid_IsSelecting;
    private boolean             _grid_IsSelectionStarted;
-   private boolean             _grid_IsPaintGeoGrid;
+   private boolean             _grid_IsShowSelectingGrid;
 
    private Point               _grid_DevMouse_Start;
    private Point               _grid_DevMouse_End;
@@ -508,7 +508,14 @@ public class Map extends Canvas {
    private Point               _grid_WorldMouse_End;
    private Point               _grid_WorldMouse_Move;
 
+   private GeoPosition         _grid_GeoMouse_Start;
+   private GeoPosition         _grid_GeoMouse_End;
+
    private boolean             _grid_IsShowLastGeoGrid;
+   private GeoPosition         _grid_GeoLast_Start;
+   private GeoPosition         _grid_GeoLast_End;
+   private Point               _grid_WorldLast_Start;
+   private Point               _grid_WorldLast_End;
 
    /**
     * Top/left position
@@ -667,7 +674,7 @@ public class Map extends Canvas {
    public void actionSearchTourByLocation(final Event event) {
 
       _grid_IsSelecting = true;
-      _grid_IsPaintGeoGrid = true;
+      _grid_IsShowSelectingGrid = true;
 
       _grid_DevMouse_Start = null;
       _grid_DevMouse_End = null;
@@ -1404,7 +1411,7 @@ public class Map extends Canvas {
    private void grid_DisableSelection() {
 
       _grid_IsSelecting = false;
-      _grid_IsPaintGeoGrid = false;
+      _grid_IsShowSelectingGrid = false;
       _grid_IsSelectionStarted = false;
 
       _isContextMenuEnabled = true;
@@ -1420,6 +1427,8 @@ public class Map extends Canvas {
 
       _grid_DevMouse_End = new Point(mouseEvent.x, mouseEvent.y);
       _grid_WorldMouse_End = new Point(worldMouseX, worldMouseY);
+      _grid_GeoMouse_End = _mp.pixelToGeo(new Point2D.Double(_grid_WorldMouse_End.x, _grid_WorldMouse_End.y), _mapZoomLevel);
+
    }
 
    private void hideHoveredArea() {
@@ -1915,6 +1924,9 @@ public class Map extends Canvas {
          _grid_WorldMouse_Start = new Point(worldMouseX, worldMouseY);
          _grid_WorldMouse_End = _grid_WorldMouse_Start;
 
+         _grid_GeoMouse_Start = _mp.pixelToGeo(new Point2D.Double(_grid_WorldMouse_Start.x, _grid_WorldMouse_Start.y), _mapZoomLevel);
+         _grid_GeoMouse_End = _mp.pixelToGeo(new Point2D.Double(_grid_WorldMouse_End.x, _grid_WorldMouse_End.y), _mapZoomLevel);
+
          redraw();
 
       } else {
@@ -2000,7 +2012,7 @@ public class Map extends Canvas {
             /*
              * old hovered context is not valid any more, update the hovered context
              */
-            updateTourToolTipHoveredArea();
+            updateTourToolTip_HoveredArea();
          }
       }
 
@@ -2074,7 +2086,19 @@ public class Map extends Canvas {
 
          grid_DisableSelection();
 
+         /*
+          * Show selected grid
+          */
          _grid_IsShowLastGeoGrid = true;
+
+         _grid_GeoLast_Start = _grid_GeoMouse_Start;
+         _grid_GeoLast_End = _grid_GeoMouse_End;
+
+         final java.awt.Point worldLast_Start = _mp.geoToPixel(_grid_GeoLast_Start, _mapZoomLevel);
+         final java.awt.Point worldLast_End = _mp.geoToPixel(_grid_GeoLast_End, _mapZoomLevel);
+
+         _grid_WorldLast_Start = new Point(worldLast_Start.x, worldLast_Start.y);
+         _grid_WorldLast_End = new Point(worldLast_End.x, worldLast_End.y);
 
          redraw();
          paint();
@@ -2170,12 +2194,11 @@ public class Map extends Canvas {
             paint_OfflineArea(gc);
          }
 
-         if (_grid_IsPaintGeoGrid) {
-            paint_Grid(gc);
-         }
-
          if (_grid_IsShowLastGeoGrid) {
             paint_Grid_Last(gc);
+         }
+         if (_grid_IsShowSelectingGrid) {
+            paint_Grid(gc);
          }
       }
    }
@@ -2544,7 +2567,7 @@ public class Map extends Canvas {
       if ((_grid_DevMouse_Start == null) || (_grid_WorldMouse_Move == null)) {
 
          if (_grid_WorldMouse_Move != null) {
-            paint_Grid_Rectangle(gc, _grid_WorldMouse_Move, _grid_WorldMouse_Move);
+            paint_Grid_Rectangle(gc, _grid_WorldMouse_Move, _grid_WorldMouse_Move, false);
          }
 
          return;
@@ -2593,7 +2616,7 @@ public class Map extends Canvas {
 
       } else {
 
-         final int numGridRectangle = paint_Grid_Rectangle(gc, _grid_WorldMouse_Start, _grid_WorldMouse_End);
+         final int numGridRectangle = paint_Grid_Rectangle(gc, _grid_WorldMouse_Start, _grid_WorldMouse_End, false);
 
          paint_Grid_Info(gc, numGridRectangle);
       }
@@ -2681,7 +2704,11 @@ public class Map extends Canvas {
 
    private void paint_Grid_Last(final GC gc) {
 
-      paint_Grid_Rectangle(gc, _grid_WorldMouse_Start, _grid_WorldMouse_End);
+      if (_grid_WorldLast_Start == null) {
+         return;
+      }
+
+      paint_Grid_Rectangle(gc, _grid_WorldLast_Start, _grid_WorldLast_End, true);
    }
 
    /**
@@ -2690,9 +2717,15 @@ public class Map extends Canvas {
     * @param gc
     * @param worldStart
     * @param worldEnd
+    * @param isPaintLastGridSelection
+    *           When <code>true</code>, the last selected grid is painted, otherwise the currently
+    *           selecting grid
     * @return Returns number of grid rectangles
     */
-   private int paint_Grid_Rectangle(final GC gc, final Point worldStart, final Point worldEnd) {
+   private int paint_Grid_Rectangle(final GC gc,
+                                    final Point worldStart,
+                                    final Point worldEnd,
+                                    final boolean isPaintLastGridSelection) {
 
       final int worldStartX = worldStart.x;
       final int worldStartY = worldStart.y;
@@ -2719,12 +2752,23 @@ public class Map extends Canvas {
       final double geoLat2 = selectedPosition_Geo_2.latitude;
       final double geoLon2 = selectedPosition_Geo_2.longitude;
 
-      // set lat/lon to a grid of 0.01°
-      int geoGrid_Lat1_E2 = (int) Math.round(geoLat1 * 100);
-      int geoGrid_Lon1_E2 = (int) Math.round(geoLon1 * 100);
+//      final double latitude = partLatitude[serieIndex];
+//      final double longitude = partLongitude[serieIndex];
+//
+//      final int latPart = (int) (latitude * 100);
+//      final int lonPart = (int) (longitude * 100);
 
-      int geoGrid_Lat2_E2 = (int) Math.round(geoLat2 * 100);
-      int geoGrid_Lon2_E2 = (int) Math.round(geoLon2 * 100);
+      // set lat/lon to a grid of 0.01°
+//      int geoGrid_Lat1_E2 = (int) Math.round(geoLat1 * 100);
+//      int geoGrid_Lon1_E2 = (int) Math.round(geoLon1 * 100);
+//
+//      int geoGrid_Lat2_E2 = (int) Math.round(geoLat2 * 100);
+//      int geoGrid_Lon2_E2 = (int) Math.round(geoLon2 * 100);
+      int geoGrid_Lat1_E2 = (int) (geoLat1 * 100);
+      int geoGrid_Lon1_E2 = (int) (geoLon1 * 100);
+
+      int geoGrid_Lat2_E2 = (int) (geoLat2 * 100);
+      int geoGrid_Lon2_E2 = (int) (geoLon2 * 100);
 
       final Point devGeoGrid_1 = offline_GetDevGeoGridPosition(world_X1, world_Y1);
       final Point devGeoGrid_2 = offline_GetDevGeoGridPosition(world_X2, world_Y2);
@@ -2980,18 +3024,23 @@ public class Map extends Canvas {
 
       final int numGridRectangle = (int) Math.round(numX * numY);
 
-      if (_geoGridPixelSizeX < 3 || _geoGridPixelSizeY < 6) {
+//      if (width < 3 || height < 6) {
+//
+//         // geo grid has almost the same rectangle as the selected area
+//
+//      } else {
+//
+//      }
 
-         // geo grid has almost the same rectangle as the selected area
+      // draw geo grid
+      final Color gridColor = isPaintLastGridSelection
+            ? _display.getSystemColor(SWT.COLOR_YELLOW)
+            : _display.getSystemColor(SWT.COLOR_WHITE);
 
-      } else {
-
-         // draw geo grid
-
-         gc.setLineStyle(SWT.LINE_SOLID);
-         gc.setForeground(_display.getSystemColor(SWT.COLOR_WHITE));
-         gc.drawRectangle(devGrid_X1, devGrid_Y1, width, height);
-      }
+      gc.setLineStyle(SWT.LINE_SOLID);
+      gc.setLineWidth(2);
+      gc.setForeground(gridColor);
+      gc.drawRectangle(devGrid_X1, devGrid_Y1, width, height);
 
       return numGridRectangle;
    }
@@ -5017,6 +5066,7 @@ public class Map extends Canvas {
 
       updateTourToolTip();
 //      updatePoiVisibility();
+      updateGeoGridAfterZoom();
 
       fireMapPositionEvent(true);
    }
@@ -5048,6 +5098,30 @@ public class Map extends Canvas {
          Job.getJobManager().cancel(_splitJobFamily);
       }
       _isCancelSplitJobs = false;
+   }
+
+   /**
+    * Update geo grid world position when zoom level changes
+    */
+   private void updateGeoGridAfterZoom() {
+
+      if (_grid_GeoMouse_Start != null) {
+
+         final java.awt.Point worldMouse_Start = _mp.geoToPixel(_grid_GeoMouse_Start, _mapZoomLevel);
+         final java.awt.Point worldMouse_End = _mp.geoToPixel(_grid_GeoMouse_End, _mapZoomLevel);
+
+         _grid_WorldMouse_Start = new Point(worldMouse_Start.x, worldMouse_Start.y);
+         _grid_WorldMouse_End = new Point(worldMouse_End.x, worldMouse_End.y);
+      }
+
+      if (_grid_GeoLast_Start != null) {
+
+         final java.awt.Point worldLast_Start = _mp.geoToPixel(_grid_GeoLast_Start, _mapZoomLevel);
+         final java.awt.Point worldLast_End = _mp.geoToPixel(_grid_GeoLast_End, _mapZoomLevel);
+
+         _grid_WorldLast_Start = new Point(worldLast_Start.x, worldLast_Start.y);
+         _grid_WorldLast_End = new Point(worldLast_End.x, worldLast_End.y);
+      }
    }
 
    public void updateGraphColors() {
@@ -5151,7 +5225,7 @@ public class Map extends Canvas {
           * redraw must be forced because the hovered area can be the same but can be at a different
           * location
           */
-         updateTourToolTipHoveredArea();
+         updateTourToolTip_HoveredArea();
 
          _tourToolTip.update();
       }
@@ -5163,7 +5237,7 @@ public class Map extends Canvas {
     *
     * @param isForceRedraw
     */
-   private void updateTourToolTipHoveredArea() {
+   private void updateTourToolTip_HoveredArea() {
 
       final HoveredAreaContext oldHoveredContext = _hoveredAreaContext;
       HoveredAreaContext newHoveredContext = null;
