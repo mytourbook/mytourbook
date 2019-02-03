@@ -41,16 +41,22 @@ public class MapInfoManager {
    {
       _nf0.setMinimumFractionDigits(0);
       _nf0.setMaximumFractionDigits(0);
+
       _nf1.setMinimumFractionDigits(1);
       _nf1.setMaximumFractionDigits(1);
+
       _nf2.setMinimumFractionDigits(2);
       _nf2.setMaximumFractionDigits(2);
+
       _nf3.setMinimumFractionDigits(3);
       _nf3.setMaximumFractionDigits(3);
+
       _nf4.setMinimumFractionDigits(4);
       _nf4.setMaximumFractionDigits(4);
+
       _nf5.setMinimumFractionDigits(5);
       _nf5.setMaximumFractionDigits(5);
+
       _nf6.setMinimumFractionDigits(6);
       _nf6.setMaximumFractionDigits(6);
    }
@@ -84,6 +90,7 @@ public class MapInfoManager {
 
       _latitude = latitude;
       _longitude = longitude;
+
       _mapZoomLevel = zoomLevel;
 
       updateUI();
@@ -102,6 +109,8 @@ public class MapInfoManager {
          _infoWidget.setText(Messages.statusLine_mapInfo_defaultText);
 
       } else {
+
+         // reduce digits when not necessary
 
          double lon = _longitude % 360;
          lon = lon > 180 ? //
