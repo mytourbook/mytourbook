@@ -213,7 +213,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
    /**
     * On Linux an asynch selection event is fired since e4
     */
-   private static final String    FIX_LINUX_ASYNC_EVENT         = "FIX_LINUX_ASYNC_EVENT";
+   private static final String    FIX_LINUX_ASYNC_EVENT_1         = "FIX_LINUX_ASYNC_EVENT_1";
+   private static final String    FIX_LINUX_ASYNC_EVENT_2         = "FIX_LINUX_ASYNC_EVENT_2";
    //
    private static final String    GRAPH_LABEL_HEARTBEAT_UNIT    = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
    private static final String    VALUE_UNIT_K_CALORIES         = net.tourbook.ui.Messages.Value_Unit_KCalories;
@@ -3084,8 +3085,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
             @Override
             public void widgetSelected(final SelectionEvent e) {
 
-               if (_isLinux && e.widget.getData(FIX_LINUX_ASYNC_EVENT) != null) {
-                  e.widget.setData(FIX_LINUX_ASYNC_EVENT, null);
+               if (_isLinux && e.widget.getData(FIX_LINUX_ASYNC_EVENT_1) != null) {
+                  e.widget.setData(FIX_LINUX_ASYNC_EVENT_1, null);
+                  return;
+               }
+
+               if (_isLinux && e.widget.getData(FIX_LINUX_ASYNC_EVENT_2) != null) {
+                  e.widget.setData(FIX_LINUX_ASYNC_EVENT_2, null);
                   return;
                }
 
@@ -3128,8 +3134,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
                @Override
                public void widgetSelected(final SelectionEvent e) {
 
-                  if (_isLinux && e.widget.getData(FIX_LINUX_ASYNC_EVENT) != null) {
-                     e.widget.setData(FIX_LINUX_ASYNC_EVENT, null);
+                  if (_isLinux && e.widget.getData(FIX_LINUX_ASYNC_EVENT_1) != null) {
+                     e.widget.setData(FIX_LINUX_ASYNC_EVENT_1, null);
+                     return;
+                  }
+
+                  if (_isLinux && e.widget.getData(FIX_LINUX_ASYNC_EVENT_2) != null) {
+                     e.widget.setData(FIX_LINUX_ASYNC_EVENT_2, null);
                      return;
                   }
 
@@ -3860,8 +3871,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
             @Override
             public void widgetSelected(final SelectionEvent e) {
 
-               if (_isLinux && e.widget.getData(FIX_LINUX_ASYNC_EVENT) != null) {
-                  e.widget.setData(FIX_LINUX_ASYNC_EVENT, null);
+               if (_isLinux && e.widget.getData(FIX_LINUX_ASYNC_EVENT_1) != null) {
+                  e.widget.setData(FIX_LINUX_ASYNC_EVENT_1, null);
                   return;
                }
 
@@ -7823,14 +7834,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
        */
       final float avgTemperature = UI.convertTemperatureFromMetric(_tourData.getAvgTemperature());
 
-      _spinTemperature.setData(FIX_LINUX_ASYNC_EVENT, true);
+      _spinTemperature.setData(FIX_LINUX_ASYNC_EVENT_1, true);
       _spinTemperature.setDigits(1);
       _spinTemperature.setSelection((int) ((avgTemperature * 10) + 0.5));
 
       // set start date/time without time zone
       final ZonedDateTime tourStartTime = _tourData.getTourStartTime();
-      _dtTourDate.setData(FIX_LINUX_ASYNC_EVENT, true);
-      _dtStartTime.setData(FIX_LINUX_ASYNC_EVENT, true);
+      _dtTourDate.setData(FIX_LINUX_ASYNC_EVENT_1, true);
+      _dtTourDate.setData(FIX_LINUX_ASYNC_EVENT_2, true);
+      _dtStartTime.setData(FIX_LINUX_ASYNC_EVENT_1, true);
+      _dtStartTime.setData(FIX_LINUX_ASYNC_EVENT_2, true);
       _dtTourDate.setDate(tourStartTime.getYear(), tourStartTime.getMonthValue() - 1, tourStartTime.getDayOfMonth());
       _dtStartTime.setTime(tourStartTime.getHour(), tourStartTime.getMinute(), tourStartTime.getSecond());
 
