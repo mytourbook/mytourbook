@@ -166,7 +166,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 	private IRenderTheme				_mf_IRenderTheme;
 	private float						_mf_TextScale = 0.75f;
 	private float						_vtm_TextScale = 0.75f;
-   private float                 _mf_UserScale = 2.5f;
+   private float                 _mf_UserScale = 2.50f;
    private float                 _vtm_UserScale = 2.0f;	
 	
    private JFrame _pleaseWaitFrame;
