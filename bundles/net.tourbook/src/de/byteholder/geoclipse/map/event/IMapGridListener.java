@@ -17,17 +17,20 @@ package de.byteholder.geoclipse.map.event;
 
 import org.eclipse.swt.graphics.Point;
 
+import net.tourbook.common.map.GeoPosition;
+
 public interface IMapGridListener {
 
    /**
     * Is called when a map grid is selected.
     *
-    * @param mapZoomLevel
     * @param Lat/lon
     *           top/left, multiplied with 100
     * @param Lat/lon
     *           bottom/right, multiplied with 100
+    * @param mapZoomLevel
+    * @param mapGeoCenter
     */
-   public void onMapGrid(Point topLeftE2, Point bottomRightE2, int mapZoomLevel);
+   public void onMapGrid(Point topLeftE2, Point bottomRightE2, int mapZoomLevel, GeoPosition mapGeoCenter);
 
 }

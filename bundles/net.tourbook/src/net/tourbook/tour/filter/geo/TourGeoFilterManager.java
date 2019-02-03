@@ -33,6 +33,7 @@ import org.osgi.framework.Version;
 import net.tourbook.application.ActionTourGeoFilter;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
@@ -45,25 +46,36 @@ import net.tourbook.tour.filter.SQLFilterData;
 
 public class TourGeoFilterManager {
 
-   private static final Bundle                 _bundle                  = TourbookPlugin.getDefault().getBundle();
+   private static final Bundle                 _bundle                       = TourbookPlugin.getDefault().getBundle();
 
-   private static final IPath                  _stateLocation           = Platform.getStateLocation(_bundle);
-   private final static IPreferenceStore       _prefStore               = TourbookPlugin.getPrefStore();
+   private static final IPath                  _stateLocation                = Platform.getStateLocation(_bundle);
+   private final static IPreferenceStore       _prefStore                    = TourbookPlugin.getPrefStore();
 
-   private static final String                 TOUR_FILTER_FILE_NAME    = "tour-geo-filter.xml";                  //$NON-NLS-1$
-   private static final int                    TOUR_FILTER_VERSION      = 1;
+   private static final String                 TOUR_FILTER_FILE_NAME         = "tour-geo-filter.xml";                  //$NON-NLS-1$
+   private static final int                    TOUR_FILTER_VERSION           = 1;
 
-   private static final String                 TAG_ROOT                 = "TourGeoFilterItems";                   //$NON-NLS-1$
+   private static final String                 TAG_GEO_FILTER                = "GeoFilter";                            //$NON-NLS-1$
+   private static final String                 TAG_ROOT                      = "TourGeoFilterItems";                   //$NON-NLS-1$
 
-   private static final String                 ATTR_TOUR_FILTER_VERSION = "tourFilterVersion";                    //$NON-NLS-1$
+   private static final String                 ATTR_CREATED                  = "created";                              //$NON-NLS-1$
+   private static final String                 ATTR_GEO_PARTS                = "geoParts";                             //$NON-NLS-1$
+   private static final String                 ATTR_LATITUDE_1               = "latitude1";                            //$NON-NLS-1$;
+   private static final String                 ATTR_LONGITUDE_1              = "longitude1";                           //$NON-NLS-1$;;
+   private static final String                 ATTR_LATITUDE_2               = "latitude2";                            //$NON-NLS-1$;;
+   private static final String                 ATTR_LONGITUDE_2              = "longitude2";                           //$NON-NLS-1$;;
+   private static final String                 ATTR_MAP_GEO_CENTER_LATITUDE  = "mapGeoCenterLatitude";                 //$NON-NLS-1$
+   private static final String                 ATTR_MAP_GEO_CENTER_LONGITUDE = "mapGeoCenterLongitude";                //$NON-NLS-1$
+   private static final String                 ATTR_MAP_ZOOM_LEVEL           = "mapZoomLevel";                         //$NON-NLS-1$
+
+   private static final String                 ATTR_TOUR_FILTER_VERSION      = "tourFilterVersion";                    //$NON-NLS-1$
 
    private static ActionTourGeoFilter          _actionTourGeoFilter;
 
    private static boolean                      _isGeoFilterEnabled;
 
-   private static int[]                        _fireEventCounter        = new int[1];
+   private static int[]                        _fireEventCounter             = new int[1];
 
-   private static ArrayList<TourGeoFilterItem> _allTourGeoFilter        = new ArrayList<>();
+   private static ArrayList<TourGeoFilterItem> _allTourGeoFilter             = new ArrayList<>();
    private static TourGeoFilterItem            _selectedFilter;
 
    /**
@@ -195,89 +207,23 @@ public class TourGeoFilterManager {
       return layerFile;
    }
 
-   /**
-    * Read filter profile xml file.
-    *
-    * @return
-    */
-   private static void readFilterProfile() {
-
-      final File xmlFile = getXmlFile();
-
-      if (xmlFile.exists()) {
-
-         try (InputStreamReader reader = new InputStreamReader(new FileInputStream(xmlFile), UI.UTF_8)) {
-
-            final XMLMemento xmlRoot = XMLMemento.createReadRoot(reader);
-            for (final IMemento mementoChild : xmlRoot.getChildren()) {
-
-//               final XMLMemento xmlProfile = (XMLMemento) mementoChild;
-//               if (TAG_PROFILE.equals(xmlProfile.getType())) {
-//
-//                  final TourFilterProfile tourFilterProfile = new TourFilterProfile();
-//
-//                  tourFilterProfile.name = Util.getXmlString(xmlProfile, ATTR_NAME, UI.EMPTY_STRING);
-//
-//                  _filterProfiles.add(tourFilterProfile);
-//
-//                  // set selected profile
-//                  if (Util.getXmlBoolean(xmlProfile, ATTR_IS_SELECTED, false)) {
-//                     _selectedProfile = tourFilterProfile;
-//                  }
-//
-//                  // loop: all properties
-//                  for (final IMemento mementoProperty : xmlProfile.getChildren(TAG_PROPERTY)) {
-//
-//                     final XMLMemento xmlProperty = (XMLMemento) mementoProperty;
-//
-//                     final TourFilterFieldId fieldId = (TourFilterFieldId) Util.getXmlEnum(//
-//                           xmlProperty,
-//                           ATTR_FIELD_ID,
-//                           TourFilterFieldId.TIME_TOUR_DATE);
-//
-//                     final TourFilterFieldOperator fieldOperator = (TourFilterFieldOperator) Util.getXmlEnum(//
-//                           xmlProperty,
-//                           ATTR_FIELD_OPERATOR,
-//                           TourFilterFieldOperator.EQUALS);
-//
-//                     final TourFilterFieldConfig fieldConfig = getFieldConfig(fieldId);
-//
-//                     final TourFilterProperty filterProperty = new TourFilterProperty();
-//
-//                     filterProperty.fieldConfig = fieldConfig;
-//                     filterProperty.fieldOperator = fieldOperator;
-//                     filterProperty.isEnabled = Util.getXmlBoolean(xmlProperty, ATTR_IS_ENABLED, true);
-//
-//                     readFilterProfile_10_PropertyDetail(xmlProperty, filterProperty);
-//
-//                     tourFilterProfile.filterProperties.add(filterProperty);
-//                  }
-//               }
-            }
-
-         } catch (final Exception e) {
-            StatusUtil.log(e);
-         }
-      }
-   }
-
    public static void restoreState() {
 
       _isGeoFilterEnabled = _prefStore.getBoolean(ITourbookPreferences.APP_TOUR_GEO_FILTER_IS_SELECTED);
 
       _actionTourGeoFilter.setSelection(_isGeoFilterEnabled);
 
-//      readFilterProfile();
+      xmlReadGeoFilter();
    }
 
    public static void saveState() {
 
       _prefStore.setValue(ITourbookPreferences.APP_TOUR_GEO_FILTER_IS_SELECTED, _actionTourGeoFilter.getSelection());
-//
-//      final XMLMemento xmlRoot = writeFilterProfile();
-//      final File xmlFile = getXmlFile();
-//
-//      Util.writeXml(xmlRoot, xmlFile);
+
+      final XMLMemento xmlRoot = xmlWriteGeoFilter();
+      final File xmlFile = getXmlFile();
+
+      Util.writeXml(xmlRoot, xmlFile);
    }
 
    public static void setAction_TourGeoFilter(final ActionTourGeoFilter actionTourGeoFilter) {
@@ -285,9 +231,9 @@ public class TourGeoFilterManager {
       _actionTourGeoFilter = actionTourGeoFilter;
    }
 
-   public static void setFilter(final Point topLeftE2, final Point bottomRightE2, final int mapZoomLevel) {
+   public static void setFilter(final Point topLeftE2, final Point bottomRightE2, final int mapZoomLevel, final GeoPosition mapGeoCenter) {
 
-      _selectedFilter = new TourGeoFilterItem(topLeftE2, bottomRightE2, mapZoomLevel);
+      _selectedFilter = new TourGeoFilterItem(topLeftE2, bottomRightE2, mapZoomLevel, mapGeoCenter);
 
       _allTourGeoFilter.add(_selectedFilter);
 
@@ -319,43 +265,79 @@ public class TourGeoFilterManager {
    }
 
    /**
+    * Read filter profile xml file.
+    *
     * @return
     */
-   private static XMLMemento writeFilterProfile() {
+   private static void xmlReadGeoFilter() {
+
+      final File xmlFile = getXmlFile();
+
+      if (xmlFile.exists()) {
+
+         try (InputStreamReader reader = new InputStreamReader(new FileInputStream(xmlFile), UI.UTF_8)) {
+
+            final XMLMemento xmlRoot = XMLMemento.createReadRoot(reader);
+            for (final IMemento mementoChild : xmlRoot.getChildren()) {
+
+               final XMLMemento xmlGeoFilter = (XMLMemento) mementoChild;
+               if (TAG_GEO_FILTER.equals(xmlGeoFilter.getType())) {
+
+                  final TourGeoFilterItem geoFilter = new TourGeoFilterItem();
+
+                  geoFilter.created = Util.getXmlDateTime(xmlGeoFilter, ATTR_CREATED, TimeTools.now());
+                  geoFilter.createdMS = TimeTools.toEpochMilli(geoFilter.created);
+
+                  geoFilter.numGeoParts = Util.getXmlInteger(xmlGeoFilter, ATTR_GEO_PARTS, 0);
+
+                  geoFilter.latitude1 = Util.getXmlDouble(xmlGeoFilter, ATTR_LATITUDE_1, 0);
+                  geoFilter.longitude1 = Util.getXmlDouble(xmlGeoFilter, ATTR_LONGITUDE_1, 0);
+                  geoFilter.latitude2 = Util.getXmlDouble(xmlGeoFilter, ATTR_LATITUDE_2, 0);
+                  geoFilter.longitude2 = Util.getXmlDouble(xmlGeoFilter, ATTR_LONGITUDE_2, 0);
+
+                  geoFilter.mapZoomLevel = Util.getXmlInteger(xmlGeoFilter, ATTR_MAP_ZOOM_LEVEL, 6);
+                  geoFilter.mapGeoCenter = new GeoPosition(
+                        Util.getXmlDouble(xmlGeoFilter, ATTR_MAP_GEO_CENTER_LATITUDE, 0),
+                        Util.getXmlDouble(xmlGeoFilter, ATTR_MAP_GEO_CENTER_LONGITUDE, 0));
+
+                  _allTourGeoFilter.add(geoFilter);
+               }
+            }
+
+         } catch (final Exception e) {
+            StatusUtil.log(e);
+         }
+      }
+   }
+
+   /**
+    * @return
+    */
+   private static XMLMemento xmlWriteGeoFilter() {
 
       XMLMemento xmlRoot = null;
 
       try {
 
-         xmlRoot = writeFilterProfile_10_Root();
+         xmlRoot = xmlWriteGeoFilter_10_Root();
 
-         // loop: profiles
-//         for (final TourFilterProfile tourFilterProfile : _filterProfiles) {
-//
-//            final IMemento xmlProfile = xmlRoot.createChild(TAG_PROFILE);
-//
-//            xmlProfile.putString(ATTR_NAME, tourFilterProfile.name);
-//
-//            // set flag for active profile
-//            if (tourFilterProfile == _selectedProfile) {
-//               xmlProfile.putBoolean(ATTR_IS_SELECTED, true);
-//            }
-//
-//            // loop: properties
-//            for (final TourFilterProperty filterProperty : tourFilterProfile.filterProperties) {
-//
-//               final TourFilterFieldConfig fieldConfig = filterProperty.fieldConfig;
-//               final TourFilterFieldOperator fieldOperator = filterProperty.fieldOperator;
-//
-//               final IMemento xmlProperty = xmlProfile.createChild(TAG_PROPERTY);
-//
-//               Util.setXmlEnum(xmlProperty, ATTR_FIELD_ID, fieldConfig.fieldId);
-//               Util.setXmlEnum(xmlProperty, ATTR_FIELD_OPERATOR, fieldOperator);
-//               xmlProperty.putBoolean(ATTR_IS_ENABLED, filterProperty.isEnabled);
-//
-//               writeFilterProfile_20_PropertyDetail(xmlProperty, filterProperty);
-//            }
-//         }
+         // loop: all geo filter
+         for (final TourGeoFilterItem geoFilter : _allTourGeoFilter) {
+
+            final IMemento xmlFilter = xmlRoot.createChild(TAG_GEO_FILTER);
+
+            xmlFilter.putString(ATTR_CREATED, geoFilter.created.toString());
+            xmlFilter.putInteger(ATTR_GEO_PARTS, geoFilter.numGeoParts);
+
+            xmlFilter.putFloat(ATTR_LATITUDE_1, (float) geoFilter.latitude1);
+            xmlFilter.putFloat(ATTR_LONGITUDE_1, (float) geoFilter.longitude1);
+            xmlFilter.putFloat(ATTR_LATITUDE_2, (float) geoFilter.latitude2);
+            xmlFilter.putFloat(ATTR_LONGITUDE_2, (float) geoFilter.longitude2);
+
+            xmlFilter.putInteger(ATTR_MAP_ZOOM_LEVEL, geoFilter.mapZoomLevel);
+            Util.setXmlDouble(xmlFilter, ATTR_MAP_GEO_CENTER_LATITUDE, geoFilter.mapGeoCenter.latitude);
+            Util.setXmlDouble(xmlFilter, ATTR_MAP_GEO_CENTER_LONGITUDE, geoFilter.mapGeoCenter.longitude);
+         }
 
       } catch (final Exception e) {
          StatusUtil.log(e);
@@ -364,7 +346,7 @@ public class TourGeoFilterManager {
       return xmlRoot;
    }
 
-   private static XMLMemento writeFilterProfile_10_Root() {
+   private static XMLMemento xmlWriteGeoFilter_10_Root() {
 
       final XMLMemento xmlRoot = XMLMemento.createWriteRoot(TAG_ROOT);
 

@@ -158,6 +158,7 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourInfoIconToolTipProvider;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.filter.geo.TourGeoFilterItem;
 import net.tourbook.tour.filter.geo.TourGeoFilterManager;
 import net.tourbook.tour.photo.DialogPhotoProperties;
 import net.tourbook.tour.photo.IPhotoPropertiesListener;
@@ -584,7 +585,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
    public void actionSaveDefaultPosition() {
 
       _defaultZoom = _map.getZoom();
-      _defaultPosition = _map.getGeoCenter();
+      _defaultPosition = _map.getMapGeoCenter();
    }
 
    public void actionSetDefaultPosition() {
@@ -944,9 +945,10 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
          @Override
          public void onMapGrid(final org.eclipse.swt.graphics.Point topLeftE2,
                                final org.eclipse.swt.graphics.Point bottomRightE2,
-                               final int mapZoomLevel) {
+                               final int mapZoomLevel,
+                               final GeoPosition mapGeoCenter) {
 
-            TourGeoFilterManager.setFilter(topLeftE2, bottomRightE2, mapZoomLevel);
+            TourGeoFilterManager.setFilter(topLeftE2, bottomRightE2, mapZoomLevel, mapGeoCenter);
          }
       });
 
@@ -1151,13 +1153,20 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
                onSelectionChanged((ISelection) eventData);
 
+            } else if (eventId == TourEventId.MAP_SHOW_GEO_GRID) {
+
+               if (eventData instanceof TourGeoFilterItem) {
+
+                  _map.showGeoGrid((TourGeoFilterItem) eventData);
+               }
+
             } else if (eventId == TourEventId.MAP_SHOW_LAST_GEO_GRID) {
 
                if (eventData instanceof Boolean) {
 
                   final Boolean isVisible = (Boolean) eventData;
 
-                  _map.setShowLastGeoGrid(isVisible);
+                  _map.showLastGeoGrid(isVisible);
                }
 
             } else if (eventId == TourEventId.SEGMENT_LAYER_CHANGED) {
@@ -1927,7 +1936,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
    @Override
    public MapLocation getMapLocation() {
 
-      final GeoPosition mapPosition = _map.getGeoCenter();
+      final GeoPosition mapPosition = _map.getMapGeoCenter();
       final int mapZoomLevel = _map.getZoom() - 1;
 
       return new MapLocation(mapPosition, mapZoomLevel);
@@ -2109,7 +2118,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
    private void keepMapPosition(final TourData tourData) {
 
-      final GeoPosition centerPosition = _map.getGeoCenter();
+      final GeoPosition centerPosition = _map.getMapGeoCenter();
 
       tourData.mapZoomLevel = _map.getZoom();
       tourData.mapCenterPositionLatitude = centerPosition.latitude;
@@ -2159,6 +2168,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
       MapManager.fireSyncMapEvent(mapPosition, this, 0);
    }
+
 
    @Override
    public void onSelectBookmark(final MapBookmark mapBookmark) {

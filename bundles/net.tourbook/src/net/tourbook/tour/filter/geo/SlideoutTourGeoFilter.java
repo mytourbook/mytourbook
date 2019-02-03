@@ -16,7 +16,7 @@
 package net.tourbook.tour.filter.geo;
 
 import java.text.NumberFormat;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
 import org.eclipse.jface.action.IMenuListener;
@@ -71,6 +71,8 @@ import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.common.util.Util;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
 
 /**
  * Slideout with the tour geo filters.
@@ -133,62 +135,49 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
          final TourGeoFilterItem item1 = (TourGeoFilterItem) e1;
          final TourGeoFilterItem item2 = (TourGeoFilterItem) e2;
 
-         final boolean _isSortByTime = true;
-         final double rc = 0;
+         boolean _isSortByTime = true;
+         double rc = 0;
 
          // Determine which column and do the appropriate sort
-//         switch (__sortColumnId) {
-//
-//         case COLUMN_GEO_DIFF:
-//         case COLUMN_GEO_DIFF_RELATIVE:
-//
-//            final long minDiffValue1 = item1.minDiffValue;
-//            final long minDiffValue2 = item2.minDiffValue;
-//
-//            if (minDiffValue1 >= 0 && minDiffValue2 >= 0) {
-//
-//               rc = minDiffValue1 - minDiffValue2;
-//
-//            } else if (minDiffValue1 >= 0) {
-//
-//               rc = -Integer.MAX_VALUE;
-//
-//            } else if (minDiffValue2 >= 0) {
-//
-//               rc = Integer.MAX_VALUE;
-//
-//            } else {
-//
-//               rc = minDiffValue1 - minDiffValue2;
-//            }
-//
-//            break;
-//
-//         case COLUMN_TOUR_START_DATE:
-//
-//            // sorting by date is already set
-//            break;
-//
-//         case COLUMN_AVG_PULSE:
-//            rc = item1.avgPulse - item2.avgPulse;
-//            break;
-//
-//         case COLUMN_AVG_SPEED:
-//            rc = item1.avgSpeed - item2.avgSpeed;
-//            break;
-//
-//         default:
-//            _isSortByTime = true;
-//         }
-//
-//         if (rc == 0 && _isSortByTime) {
-//            rc = item1.tourStartTimeMS - item2.tourStartTimeMS;
-//         }
-//
-//         // if descending order, flip the direction
-//         if (__sortDirection == DESCENDING) {
-//            rc = -rc;
-//         }
+         switch (__sortColumnId) {
+
+         case COLUMN_GEO_PARTS:
+            rc = item1.numGeoParts - item2.numGeoParts;
+            break;
+
+         case COLUMN_LATITUDE_1:
+            rc = item1.latitude1 - item2.latitude1;
+            break;
+
+         case COLUMN_LONGITUDE_1:
+            rc = item1.longitude1 - item2.longitude1;
+            break;
+
+         case COLUMN_LATITUDE_2:
+            rc = item1.latitude2 - item2.latitude2;
+            break;
+
+         case COLUMN_LONGITUDE_2:
+            rc = item1.longitude2 - item2.longitude2;
+            break;
+
+         case COLUMN_CREATED_DATE_TIME:
+
+            // sorting by date is already set
+            break;
+
+         default:
+            _isSortByTime = true;
+         }
+
+         if (rc == 0 && _isSortByTime) {
+            rc = item1.createdMS - item2.createdMS;
+         }
+
+         // if descending order, flip the direction
+         if (__sortDirection == DESCENDING) {
+            rc = -rc;
+         }
 
          /*
           * MUST return 1 or -1 otherwise long values are not sorted correctly.
@@ -367,7 +356,7 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
 
          @Override
          public void selectionChanged(final SelectionChangedEvent event) {
-//            onSelect_ComparerItem(event);
+            onSelect_GeoPartItem(event);
          }
       });
 
@@ -496,7 +485,7 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
          public void update(final ViewerCell cell) {
 
             final TourGeoFilterItem item = (TourGeoFilterItem) cell.getElement();
-            final LocalDateTime created = item.created;
+            final ZonedDateTime created = item.created;
 
             cell.setText(created.format(TimeTools.Formatter_DateTime_SM));
          }
@@ -780,6 +769,15 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
 //
 //         _profileViewer.getTable().setFocus();
 //      }
+   }
+
+   private void onSelect_GeoPartItem(final SelectionChangedEvent event) {
+
+      final Object selectedItem = event.getStructuredSelection().getFirstElement();
+
+      _selectedFilter = (TourGeoFilterItem) selectedItem;
+
+      TourManager.fireEventWithCustomData(TourEventId.MAP_SHOW_GEO_GRID, _selectedFilter, null);
    }
 
    private void onSelect_SortColumn(final SelectionEvent e) {

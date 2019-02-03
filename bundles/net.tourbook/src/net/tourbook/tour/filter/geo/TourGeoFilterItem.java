@@ -15,32 +15,44 @@
  *******************************************************************************/
 package net.tourbook.tour.filter.geo;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import org.eclipse.swt.graphics.Point;
 
+import net.tourbook.common.map.GeoPosition;
+import net.tourbook.common.time.TimeTools;
+
 public class TourGeoFilterItem {
 
-   final Point   topLeftE2;
-   final Point   bottomRightE2;
+   Point              topLeftE2;
+   Point              bottomRightE2;
 
-   final int     mapZoomLevel;
+   public int         mapZoomLevel;
+   public GeoPosition mapGeoCenter;
 
-   final double  latitude1;
-   final double  longitude1;
+   public double      latitude1;
+   public double      longitude1;
 
-   final double  latitude2;
-   final double  longitude2;
+   public double      latitude2;
+   public double      longitude2;
 
-   LocalDateTime created;
-   int           numGeoParts;
+   ZonedDateTime      created;
+   long               createdMS;
 
-   public TourGeoFilterItem(final Point topLeftE2, final Point bottomRightE2, final int mapZoomLevel) {
+   int                numGeoParts;
+
+   public TourGeoFilterItem() {}
+
+   public TourGeoFilterItem(final Point topLeftE2,
+                            final Point bottomRightE2,
+                            final int mapZoomLevel,
+                            final GeoPosition mapGeoCenter) {
 
       this.topLeftE2 = topLeftE2;
       this.bottomRightE2 = bottomRightE2;
 
       this.mapZoomLevel = mapZoomLevel;
+      this.mapGeoCenter = mapGeoCenter;
 
       latitude1 = topLeftE2.y / 100.0d;
       longitude1 = topLeftE2.x / 100.0d;
@@ -48,9 +60,10 @@ public class TourGeoFilterItem {
       latitude2 = bottomRightE2.y / 100.0d;
       longitude2 = bottomRightE2.x / 100.0d;
 
-      created = LocalDateTime.now();
+      created = TimeTools.now();
+      createdMS = TimeTools.toEpochMilli(created);
 
-      final int width = topLeftE2.x - bottomRightE2.x;
+      final int width = bottomRightE2.x - topLeftE2.x;
       final int height = topLeftE2.y - bottomRightE2.y;
 
       numGeoParts = width * height;

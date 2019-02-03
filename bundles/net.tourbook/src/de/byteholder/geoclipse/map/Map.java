@@ -119,6 +119,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.map2.view.WayPointToolTipProvider;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.filter.geo.TourGeoFilterItem;
 import net.tourbook.ui.IInfoToolTipProvider;
 import net.tourbook.ui.IMapToolTipProvider;
 import net.tourbook.ui.MTRectangle;
@@ -1093,14 +1094,20 @@ public class Map extends Canvas {
 
       final Object[] listeners = _allMapGridListener.getListeners();
 
+      final GeoPosition geoCenter = getMapGeoCenter();
+
       for (final Object listener : listeners) {
-         ((IMapGridListener) listener).onMapGrid(_grid_SelectedPosition_Geo_1_E2, _grid_SelectedPosition_Geo_2_E2, _mapZoomLevel);
+         ((IMapGridListener) listener).onMapGrid(
+               _grid_SelectedPosition_Geo_1_E2,
+               _grid_SelectedPosition_Geo_2_E2,
+               _mapZoomLevel,
+               geoCenter);
       }
    }
 
    private void fireMapInfoEvent() {
 
-      final GeoPosition geoCenter = getGeoCenter();
+      final GeoPosition geoCenter = getMapGeoCenter();
 
       final Object[] listeners = _allMapInfoListener.getListeners();
 
@@ -1115,7 +1122,7 @@ public class Map extends Canvas {
     */
    private void fireMapPositionEvent(final boolean isZoomed) {
 
-      final GeoPosition geoCenter = getGeoCenter();
+      final GeoPosition geoCenter = getMapGeoCenter();
 
       final Object[] listeners = _allMapPositionListener.getListeners();
 
@@ -1220,25 +1227,25 @@ public class Map extends Canvas {
    }
 
    /**
+    * @return Returns the legend of the map
+    */
+   public MapLegend getLegend() {
+      return _mapLegend;
+   }
+
+   /**
     * A property indicating the center position of the map, or <code>null</code> when a tile factory
     * is not set
     *
     * @return Returns the current center position of the map in latitude/longitude
     */
-   public GeoPosition getGeoCenter() {
+   public GeoPosition getMapGeoCenter() {
 
       if (_mp == null) {
          return null;
       }
 
       return _mp.pixelToGeo(_worldPixelMapCenter, _mapZoomLevel);
-   }
-
-   /**
-    * @return Returns the legend of the map
-    */
-   public MapLegend getLegend() {
-      return _mapLegend;
    }
 
    /**
@@ -2414,7 +2421,7 @@ public class Map extends Canvas {
       final float metricWidth = 111.32f / _distanceUnitValue;
 
       //
-      final GeoPosition mapCenter = getGeoCenter();
+      final GeoPosition mapCenter = getMapGeoCenter();
       final double latitude = mapCenter.latitude;
       final double longitude = mapCenter.longitude;
 
@@ -4714,7 +4721,7 @@ public class Map extends Canvas {
          // stop downloading images for the old map provider
          _mp.resetAll(true);
 
-         center = getGeoCenter();
+         center = getMapGeoCenter();
          zoom = _mapZoomLevel;
          refresh = true;
       }
@@ -4918,13 +4925,6 @@ public class Map extends Canvas {
       paint();
    }
 
-   public void setShowLastGeoGrid(final boolean isVisibility) {
-
-      _grid_IsShowLastGeoGrid = isVisibility;
-
-      paint();
-   }
-
    /**
     * Legend will be drawn into the map when the visibility is <code>true</code>
     *
@@ -5069,6 +5069,25 @@ public class Map extends Canvas {
       updateGeoGridAfterZoom();
 
       fireMapPositionEvent(true);
+   }
+
+   public void showGeoGrid(final TourGeoFilterItem geoFilter) {
+      // TODO Auto-generated method stub
+
+      _grid_IsShowLastGeoGrid = true;
+
+      _grid_GeoLast_Start = new GeoPosition(geoFilter.latitude1, geoFilter.longitude1);
+      _grid_GeoLast_End = new GeoPosition(geoFilter.latitude2, geoFilter.longitude2);
+
+      setZoom(geoFilter.mapZoomLevel + 1);
+      setMapCenter(new GeoPosition(geoFilter.mapGeoCenter.latitude, geoFilter.mapGeoCenter.longitude));
+   }
+
+   public void showLastGeoGrid(final boolean isVisibility) {
+
+      _grid_IsShowLastGeoGrid = isVisibility;
+
+      paint();
    }
 
    private void showPoi() {
