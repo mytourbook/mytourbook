@@ -232,8 +232,12 @@ public class MarkerRenderer extends BucketRenderer {
 
 		final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
-		_fgColor = ColorUtil.getARGB(config.markerOutline_Color, 0xff);
-		_bgColor = ColorUtil.getARGB(config.markerFill_Color, config.markerFill_Opacity);
+		_fgColor = ColorUtil.getARGB(config.markerOutline_Color, (int) (config.markerOutline_Opacity / 100.0 * 0xff));
+		_bgColor = ColorUtil.getARGB(config.markerFill_Color,    (int) (config.markerFill_Opacity    / 100.0 * 0xff));
+		
+		/*System.out.println("***textOpacy: " + config.markerOutline_Opacity);
+		System.out.println("***FillOpacy: " + config.markerFill_Opacity);
+		System.out.println("***bgColor: " + _bgColor);*/
 		
 		_clusterSymbolSizeDP = config.clusterSymbol_Size;
 		_clusterSymbolWeight = config.clusterSymbol_Weight;
@@ -806,49 +810,62 @@ public class MarkerRenderer extends BucketRenderer {
 
 			} else {
 
-				// normal item, use its marker
-			   
-            /*int colorGreen  = 0xFF63f51f;
-            int colorBlue   = 0xFF0000FF;
-            int colorPurple = 0xffcc00cc;
-            int colorBlack  = 0xff000000;*/
-
-				MarkerSymbol markerSymbol = projItem.mapMarker.markerSymbol;
+			   MarkerSymbol markerSymbol = projItem.mapMarker.markerSymbol;
 			   if (markerSymbol == null) {
 			      markerSymbol = _defaultMarkerSymbol;
 			   }
 
-				final Paint textPainter = CanvasAdapter.newPaint();
-				String name = projItem.mapMarker.title;
-            //textPainter.setColor(colorGreen);
-				
-				int textwidth  = (int) textPainter.getTextWidth(name);
-				int textheight = (int) textPainter.getTextHeight(name);
-				//System.out.println("**** texthoehe in px: " + textheight);
-				
-				int symbolWidth = markerSymbol.getBitmap().getWidth();
-				
-				int margin = 20;
-				int xSize = java.lang.Math.max(textwidth,symbolWidth) + margin;
-				int ySize = textheight + symbolWidth + margin;
+			   final Paint textPainter = CanvasAdapter.newPaint();
+			   textPainter.setStyle(Paint.Style.STROKE);
+			   textPainter.setColor(_fgColor);
+
+			   //fillRectangle has no painter
+			   final Paint fillPainter = CanvasAdapter.newPaint();
+			   fillPainter.setColor(_bgColor);
+			   fillPainter.setStyle(Paint.Style.FILL);
+
+			   String title = projItem.mapMarker.title;
+
+			   int textwidth  = (int) textPainter.getTextWidth(title);
+			   int textheight = (int) textPainter.getTextHeight(title);
+			   //System.out.println("**** texthoehe in px: " + textheight);
+
+			   int symbolWidth = markerSymbol.getBitmap().getWidth();
+
+			   int margin = 20;
+			   int xSize = java.lang.Math.max(textwidth,symbolWidth) + margin;
+			   int ySize = textheight + symbolWidth + margin;
 
 			   Bitmap bitmap = CanvasAdapter.newBitmap(xSize, ySize, 0);
 			   org.oscim.backend.canvas.Canvas textCanvas = CanvasAdapter.newCanvas();
 
+			   /*canvas.fillRectangle does not support a painter object
+			    * so i could not use transparent colors
+			    * as workaround i created a bitmap (fillbitmap) with the size of the textbox 
+			    * this box i filled totally with an oversized filled circle
+			    * (Canvas.drawCircle does support a painter object)
+			    * */
+
+			   Bitmap fillBitmap = CanvasAdapter.newBitmap( xSize, textheight+5, 0);
+			   org.oscim.backend.canvas.Canvas fillCanvas = CanvasAdapter.newCanvas();
+
 			   textCanvas.setBitmap(bitmap);
+			   fillCanvas.setBitmap(fillBitmap);		   
 
-			   textCanvas.fillRectangle(0, 0, xSize, textheight+5, _bgColor);
-			   textPainter.setStyle(Paint.Style.STROKE);
-			   textPainter.setColor(_fgColor);
+			   //textCanvas.fillRectangle(0, 0, xSize, textheight+5, _bgColor);
+			   fillCanvas.drawCircle(0, 0, xSize, fillPainter);
 
+			   fillCanvas.drawText(title, margin/2, textheight, textPainter);
+
+			   textCanvas.drawBitmap(fillBitmap, 0, 0);
 			   textCanvas.drawBitmap(markerSymbol.getBitmap(), xSize/2-(symbolWidth/2), ySize/2-(symbolWidth/2));
 			   //textCanvas.drawCircle(xSize/2, ySize/2, 10, textPainter);
-			   textCanvas.drawText(name, margin/2, textheight, textPainter);
+			   //textCanvas.drawText(title, margin/2, textheight, textPainter);
 
-				//mapSymbol.set(projItem.mapX, projItem.mapY, markerSymbol.getBitmap(), markerSymbol.mBillboard);
-				mapSymbol.set(projItem.mapX, projItem.mapY, bitmap, markerSymbol.mBillboard);
-				mapSymbol.offset = markerSymbol.getHotspot();
-				mapSymbol.billboard = markerSymbol.isBillboard();
+			   //mapSymbol.set(projItem.mapX, projItem.mapY, markerSymbol.getBitmap(), markerSymbol.mBillboard);
+			   mapSymbol.set(projItem.mapX, projItem.mapY, bitmap, markerSymbol.mBillboard);
+			   mapSymbol.offset = markerSymbol.getHotspot();
+			   mapSymbol.billboard = markerSymbol.isBillboard();
 			}
 
 			_symbolBucket.pushSymbol(mapSymbol);
