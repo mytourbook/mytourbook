@@ -26,8 +26,6 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -42,16 +40,13 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -63,7 +58,7 @@ import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Widget;
 
 import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.util.ColumnDefinition;
@@ -79,37 +74,36 @@ import net.tourbook.tour.TourManager;
  */
 public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourViewer {
 
-   private static final String                STATE_SORT_COLUMN_DIRECTION = "STATE_SORT_COLUMN_DIRECTION";         //$NON-NLS-1$
-   private static final String                STATE_SORT_COLUMN_ID        = "STATE_SORT_COLUMN_ID";                //$NON-NLS-1$
+   private static final String STATE_SORT_COLUMN_DIRECTION = "STATE_SORT_COLUMN_DIRECTION"; //$NON-NLS-1$
+   private static final String STATE_SORT_COLUMN_ID        = "STATE_SORT_COLUMN_ID";        //$NON-NLS-1$
 
-   private static final String                COLUMN_CREATED_DATE_TIME    = "createdDateTime";                     //$NON-NLS-1$
-   private static final String                COLUMN_GEO_PARTS            = "geoParts";                            //$NON-NLS-1$
-   private static final String                COLUMN_LATITUDE_1           = "latitude1";                           //$NON-NLS-1$
-   private static final String                COLUMN_LONGITUDE_1          = "longitude1";                          //$NON-NLS-1$
-   private static final String                COLUMN_LATITUDE_2           = "latitude2";                           //$NON-NLS-1$
-   private static final String                COLUMN_LONGITUDE_2          = "longitude2";                          //$NON-NLS-1$
-   private static final String                COLUMN_SEQUENCE             = "sequence";                            //$NON-NLS-1$
+   private static final String COLUMN_CREATED_DATE_TIME    = "createdDateTime";             //$NON-NLS-1$
+   private static final String COLUMN_GEO_PARTS            = "geoParts";                    //$NON-NLS-1$
+   private static final String COLUMN_LATITUDE_1           = "latitude1";                   //$NON-NLS-1$
+   private static final String COLUMN_LONGITUDE_1          = "longitude1";                  //$NON-NLS-1$
+   private static final String COLUMN_LATITUDE_2           = "latitude2";                   //$NON-NLS-1$
+   private static final String COLUMN_LONGITUDE_2          = "longitude2";                  //$NON-NLS-1$
+   private static final String COLUMN_SEQUENCE             = "sequence";                    //$NON-NLS-1$
 
-   private final IPreferenceStore             _prefStore                  = TourbookPlugin.getPrefStore();
+//   private final IPreferenceStore             _prefStore                  = TourbookPlugin.getPrefStore();
    private final IDialogSettings              _state;
 
    private TableViewer                        _geoFilterViewer;
-   private CompareResultComparator            _geoPartComparator          = new CompareResultComparator();
+   private CompareResultComparator            _geoPartComparator = new CompareResultComparator();
    private ColumnManager                      _columnManager;
 
-   private final ArrayList<TourGeoFilterItem> _allGeoFilter               = TourGeoFilterManager.getAllGeoFilter();
+   private final ArrayList<TourGeoFilterItem> _allGeoFilter      = TourGeoFilterManager.getAllGeoFilter();
    private TourGeoFilterItem                  _selectedFilter;
 
    private ToolItem                           _tourFilterItem;
 
-   private boolean                            _isInUpdate;
+//   private boolean                            _isInUpdate;
 
-   private SelectionAdapter                   _columnSortListener;
-   private ModifyListener                     _defaultModifyListener;
-   private FocusListener                      _keepOpenListener;
-   private IPropertyChangeListener            _prefChangeListener;
+   private SelectionAdapter _columnSortListener;
+//   private ModifyListener                     _defaultModifyListener;
+//   private FocusListener                      _keepOpenListener;
 
-   private final NumberFormat                 _nf2                        = NumberFormat.getInstance();
+   private final NumberFormat _nf2 = NumberFormat.getInstance();
    {
       _nf2.setMinimumFractionDigits(2);
       _nf2.setMaximumFractionDigits(2);
@@ -120,6 +114,9 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
     */
    private PixelConverter _pc;
    private Composite      _viewerContainer;
+
+   private Button         _btnDeleteGeoFilter;
+   private Button         _btnDeleteGeoFilterAll;
 
    private class CompareResultComparator extends ViewerComparator {
 
@@ -302,8 +299,7 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
       GridLayoutFactory.fillDefaults().applyTo(shellContainer);
       {
          final Composite container = new Composite(shellContainer, SWT.NONE);
-         GridDataFactory
-               .fillDefaults()//
+         GridDataFactory.fillDefaults()
                .grab(true, true)
                .applyTo(container);
          GridLayoutFactory.swtDefaults().applyTo(container);
@@ -314,6 +310,8 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
             {
                createUI_100_FilterViewer(_viewerContainer);
             }
+
+            createUI_200_ViewerActions(container);
          }
       }
    }
@@ -356,7 +354,7 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
 
          @Override
          public void selectionChanged(final SelectionChangedEvent event) {
-            onSelect_GeoPartItem(event);
+            onGeoFilter_Select(event);
          }
       });
 
@@ -376,11 +374,7 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
             switch (e.keyCode) {
 
             case SWT.DEL:
-//             onBookmark_Delete();
-               break;
-
-            case SWT.F2:
-//             onBookmark_Rename(false);
+               onGeoFilter_Delete();
                break;
 
             default:
@@ -426,6 +420,46 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
 //      final Menu tableHeaderContextMenu = menuMgr.createContextMenu(table);
 //
 //      _columnManager.createHeaderContextMenu(table, tableHeaderContextMenu);
+   }
+
+   private void createUI_200_ViewerActions(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().applyTo(container);
+      GridLayoutFactory.fillDefaults()
+            .margins(0, 0)
+            .numColumns(2)
+            .applyTo(container);
+      {
+         {
+            /*
+             * Button: delete geo filter
+             */
+            _btnDeleteGeoFilter = new Button(container, SWT.NONE);
+            _btnDeleteGeoFilter.setText(Messages.App_Action_Delete);
+            _btnDeleteGeoFilter.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onGeoFilter_Delete();
+               }
+            });
+            UI.setButtonLayoutData(_btnDeleteGeoFilter);
+         }
+         {
+            /*
+             * Button: delete all geo filter
+             */
+            _btnDeleteGeoFilterAll = new Button(container, SWT.NONE);
+            _btnDeleteGeoFilterAll.setText(Messages.App_Action_Delete_All);
+            _btnDeleteGeoFilterAll.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onGeoFilter_Delete_All();
+               }
+            });
+            UI.setButtonLayoutData(_btnDeleteGeoFilterAll);
+         }
+      }
    }
 
    private void defineAllColumns() {
@@ -632,21 +666,12 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
       });
    }
 
-   private void doLiveUpdate() {
-
-      enableControls();
-
-      fireModifyEvent();
-   }
-
    private void enableControls() {
 
-      final boolean isProfileSelected = _selectedFilter != null;
-   }
+      final boolean isFilterSelected = _selectedFilter != null;
 
-   private void fireModifyEvent() {
-
-//      TourFilterManager.fireTourFilterModifyEvent();
+      _btnDeleteGeoFilter.setEnabled(isFilterSelected);
+      _btnDeleteGeoFilterAll.setEnabled(_allGeoFilter.size() > 0);
    }
 
    @Override
@@ -708,49 +733,30 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
          }
       };
 
-      _defaultModifyListener = new ModifyListener() {
-         @Override
-         public void modifyText(final ModifyEvent e) {
-//            onProfile_Modify();
-         }
-      };
-
-      _keepOpenListener = new FocusListener() {
-
-         @Override
-         public void focusGained(final FocusEvent e) {
-
-            /*
-             * This will fix the problem that when the list of a combobox is displayed, then the
-             * slideout will disappear :-(((
-             */
-            setIsKeepOpenInternally(true);
-         }
-
-         @Override
-         public void focusLost(final FocusEvent e) {
-            setIsKeepOpenInternally(false);
-         }
-      };
-   }
-
-   private boolean isFilterDisposed() {
-
-//      if (_filterOuterContainer != null && _filterOuterContainer.isDisposed()) {
+//      _defaultModifyListener = new ModifyListener() {
+//         @Override
+//         public void modifyText(final ModifyEvent e) {
+////            onProfile_Modify();
+//         }
+//      };
 //
-//         /*
-//          * This can happen when a sub dialog was closed and the mouse is outside of the slideout ->
-//          * this is closing the slideout
-//          */
-//         return true;
-//      }
-
-      return false;
-   }
-
-   private void onDisposeSlideout() {
-
-      _prefStore.removePropertyChangeListener(_prefChangeListener);
+//      _keepOpenListener = new FocusListener() {
+//
+//         @Override
+//         public void focusGained(final FocusEvent e) {
+//
+//            /*
+//             * This will fix the problem that when the list of a combobox is displayed, then the
+//             * slideout will disappear :-(((
+//             */
+//            setIsKeepOpenInternally(true);
+//         }
+//
+//         @Override
+//         public void focusLost(final FocusEvent e) {
+//            setIsKeepOpenInternally(false);
+//         }
+//      };
    }
 
    @Override
@@ -771,13 +777,79 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
 //      }
    }
 
-   private void onSelect_GeoPartItem(final SelectionChangedEvent event) {
+   private void onGeoFilter_Delete() {
+
+      final Object filterItem = _geoFilterViewer.getStructuredSelection().getFirstElement();
+
+      if (filterItem == null) {
+         return;
+      }
+
+      // update model
+      _allGeoFilter.remove(filterItem);
+
+      // update UI
+      final Table filterTable = _geoFilterViewer.getTable();
+      final int selectionIndex = filterTable.getSelectionIndex();
+
+      _geoFilterViewer.remove(filterItem);
+
+      // select next filter item
+      final int nextIndex = Math.min(filterTable.getItemCount() - 1, selectionIndex);
+      if (nextIndex < 0) {
+
+         _selectedFilter = null;
+
+         // fire event to hide geo grid
+         TourManager.fireEventWithCustomData(TourEventId.MAP_SHOW_GEO_GRID, null, null);
+
+      } else {
+
+         // set new selection this will also fire the event
+
+         _geoFilterViewer.setSelection(new StructuredSelection(_geoFilterViewer.getElementAt(nextIndex)));
+      }
+
+      enableControls();
+
+      // set focus back to table
+      _geoFilterViewer.getTable().setFocus();
+   }
+
+   private void onGeoFilter_Delete_All() {
+
+      final Object filterItem = _geoFilterViewer.getStructuredSelection().getFirstElement();
+
+      if (filterItem == null) {
+         return;
+      }
+
+      // update model
+      _allGeoFilter.clear();
+
+      // update UI
+      _geoFilterViewer.refresh();
+
+      // fire event to hide geo grid
+      TourManager.fireEventWithCustomData(TourEventId.MAP_SHOW_GEO_GRID, null, null);
+
+      enableControls();
+
+      // set focus back to table
+      _geoFilterViewer.getTable().setFocus();
+   }
+
+   private void onGeoFilter_Select(final SelectionChangedEvent event) {
 
       final Object selectedItem = event.getStructuredSelection().getFirstElement();
 
       _selectedFilter = (TourGeoFilterItem) selectedItem;
 
       TourManager.fireEventWithCustomData(TourEventId.MAP_SHOW_GEO_GRID, _selectedFilter, null);
+
+      TourGeoFilterManager.selectFilter(_selectedFilter);
+
+      enableControls();
    }
 
    private void onSelect_SortColumn(final SelectionEvent e) {
@@ -791,7 +863,7 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
             _geoPartComparator.setSortColumn(e.widget);
             _geoFilterViewer.refresh();
          }
-         updateUI_SelectCompareItem(selectionBackup);
+         updateUI_SelectGeoFilterItem(selectionBackup);
       }
       _viewerContainer.setRedraw(true);
    }
@@ -827,22 +899,6 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
 
    private void restoreState() {
 
-      /*
-       * Get previous selected profile
-       */
-//      TourGeoFilter selectedProfile = TourFilterManager.getSelectedProfile();
-//
-//      if (selectedProfile == null) {
-//
-//         // select first profile
-//
-//         selectedProfile = (TourGeoFilter) _profileViewer.getElementAt(0);
-//      }
-//
-//      if (selectedProfile != null) {
-//         selectProfile(selectedProfile);
-//      }
-
    }
 
    private void restoreState_BeforeUI() {
@@ -870,14 +926,6 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
       super.saveState();
    }
 
-   private void selectProfile(final TourGeoFilterItem selectedProfile) {
-
-      _geoFilterViewer.setSelection(new StructuredSelection(selectedProfile));
-
-      final Table table = _geoFilterViewer.getTable();
-      table.setSelection(table.getSelectionIndices());
-   }
-
    @Override
    public void updateColumnHeader(final ColumnDefinition colDef) {}
 
@@ -886,15 +934,15 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
     *
     * @param selection
     */
-   private void updateUI_SelectCompareItem(final ISelection selection) {
+   private void updateUI_SelectGeoFilterItem(final ISelection selection) {
 
-      _isInUpdate = true;
+//      _isInUpdate = true;
       {
          _geoFilterViewer.setSelection(selection, true);
 
          _geoFilterViewer.getTable().showSelection();
       }
-      _isInUpdate = false;
+//      _isInUpdate = false;
    }
 
    /**

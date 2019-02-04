@@ -59,13 +59,14 @@ public class TourGeoFilterManager {
 
    private static final String                 ATTR_CREATED                  = "created";                              //$NON-NLS-1$
    private static final String                 ATTR_GEO_PARTS                = "geoParts";                             //$NON-NLS-1$
-   private static final String                 ATTR_LATITUDE_1               = "latitude1";                            //$NON-NLS-1$;
-   private static final String                 ATTR_LONGITUDE_1              = "longitude1";                           //$NON-NLS-1$;;
-   private static final String                 ATTR_LATITUDE_2               = "latitude2";                            //$NON-NLS-1$;;
-   private static final String                 ATTR_LONGITUDE_2              = "longitude2";                           //$NON-NLS-1$;;
    private static final String                 ATTR_MAP_GEO_CENTER_LATITUDE  = "mapGeoCenterLatitude";                 //$NON-NLS-1$
    private static final String                 ATTR_MAP_GEO_CENTER_LONGITUDE = "mapGeoCenterLongitude";                //$NON-NLS-1$
    private static final String                 ATTR_MAP_ZOOM_LEVEL           = "mapZoomLevel";                         //$NON-NLS-1$
+
+   private static final String                 ATTR_TOP_LEFT_X_E2            = "topLeft_X_E2";                         //$NON-NLS-1$
+   private static final String                 ATTR_TOP_LEFT_Y_E2            = "topLeft_Y_E2";                         //$NON-NLS-1$
+   private static final String                 ATTR_BOTTOM_RIGHT_X_E2        = "bottomRight_X_E2";                     //$NON-NLS-1$
+   private static final String                 ATTR_BOTTOM_RIGHT_Y_E2        = "bottomRight_Y_E2";                     //$NON-NLS-1$
 
    private static final String                 ATTR_TOUR_FILTER_VERSION      = "tourFilterVersion";                    //$NON-NLS-1$
 
@@ -226,12 +227,35 @@ public class TourGeoFilterManager {
       Util.writeXml(xmlRoot, xmlFile);
    }
 
+   /**
+    * Filter is selected in the geo filter slideout
+    *
+    * @param selectedFilter
+    */
+   public static void selectFilter(final TourGeoFilterItem selectedFilter) {
+
+      if (_selectedFilter == selectedFilter) {
+
+         // prevent reselecting
+
+         return;
+      }
+
+      _selectedFilter = selectedFilter;
+
+
+      fireTourFilterModifyEvent();
+   }
+
    public static void setAction_TourGeoFilter(final ActionTourGeoFilter actionTourGeoFilter) {
 
       _actionTourGeoFilter = actionTourGeoFilter;
    }
 
-   public static void setFilter(final Point topLeftE2, final Point bottomRightE2, final int mapZoomLevel, final GeoPosition mapGeoCenter) {
+   public static void setFilter(final Point topLeftE2,
+                                final Point bottomRightE2,
+                                final int mapZoomLevel,
+                                final GeoPosition mapGeoCenter) {
 
       _selectedFilter = new TourGeoFilterItem(topLeftE2, bottomRightE2, mapZoomLevel, mapGeoCenter);
 
@@ -290,10 +314,19 @@ public class TourGeoFilterManager {
 
                   geoFilter.numGeoParts = Util.getXmlInteger(xmlGeoFilter, ATTR_GEO_PARTS, 0);
 
-                  geoFilter.latitude1 = Util.getXmlDouble(xmlGeoFilter, ATTR_LATITUDE_1, 0);
-                  geoFilter.longitude1 = Util.getXmlDouble(xmlGeoFilter, ATTR_LONGITUDE_1, 0);
-                  geoFilter.latitude2 = Util.getXmlDouble(xmlGeoFilter, ATTR_LATITUDE_2, 0);
-                  geoFilter.longitude2 = Util.getXmlDouble(xmlGeoFilter, ATTR_LONGITUDE_2, 0);
+                  geoFilter.topLeftE2 = new Point(
+                        Util.getXmlInteger(xmlGeoFilter, ATTR_TOP_LEFT_X_E2, 0),
+                        Util.getXmlInteger(xmlGeoFilter, ATTR_TOP_LEFT_Y_E2, 0));
+
+                  geoFilter.bottomRightE2 = new Point(
+                        Util.getXmlInteger(xmlGeoFilter, ATTR_BOTTOM_RIGHT_X_E2, 0),
+                        Util.getXmlInteger(xmlGeoFilter, ATTR_BOTTOM_RIGHT_Y_E2, 0));
+
+                  // x:long  y:lat
+                  geoFilter.latitude1 = geoFilter.topLeftE2.y / 100.0d;
+                  geoFilter.longitude1 = geoFilter.topLeftE2.x / 100.0d;
+                  geoFilter.latitude2 = geoFilter.bottomRightE2.y / 100.0d;
+                  geoFilter.longitude2 = geoFilter.bottomRightE2.x / 100.0d;
 
                   geoFilter.mapZoomLevel = Util.getXmlInteger(xmlGeoFilter, ATTR_MAP_ZOOM_LEVEL, 6);
                   geoFilter.mapGeoCenter = new GeoPosition(
@@ -329,10 +362,10 @@ public class TourGeoFilterManager {
             xmlFilter.putString(ATTR_CREATED, geoFilter.created.toString());
             xmlFilter.putInteger(ATTR_GEO_PARTS, geoFilter.numGeoParts);
 
-            xmlFilter.putFloat(ATTR_LATITUDE_1, (float) geoFilter.latitude1);
-            xmlFilter.putFloat(ATTR_LONGITUDE_1, (float) geoFilter.longitude1);
-            xmlFilter.putFloat(ATTR_LATITUDE_2, (float) geoFilter.latitude2);
-            xmlFilter.putFloat(ATTR_LONGITUDE_2, (float) geoFilter.longitude2);
+            xmlFilter.putInteger(ATTR_TOP_LEFT_X_E2, geoFilter.topLeftE2.x);
+            xmlFilter.putInteger(ATTR_TOP_LEFT_Y_E2, geoFilter.topLeftE2.y);
+            xmlFilter.putInteger(ATTR_BOTTOM_RIGHT_X_E2, geoFilter.bottomRightE2.x);
+            xmlFilter.putInteger(ATTR_BOTTOM_RIGHT_Y_E2, geoFilter.bottomRightE2.y);
 
             xmlFilter.putInteger(ATTR_MAP_ZOOM_LEVEL, geoFilter.mapZoomLevel);
             Util.setXmlDouble(xmlFilter, ATTR_MAP_GEO_CENTER_LATITUDE, geoFilter.mapGeoCenter.latitude);

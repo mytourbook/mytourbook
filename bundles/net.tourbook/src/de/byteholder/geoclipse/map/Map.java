@@ -5068,18 +5068,38 @@ public class Map extends Canvas {
 //      updatePoiVisibility();
       updateGeoGridAfterZoom();
 
+      // update zoom level in status bar
+      fireMapInfoEvent();
+
       fireMapPositionEvent(true);
    }
 
    public void showGeoGrid(final TourGeoFilterItem geoFilter) {
-      // TODO Auto-generated method stub
+
+      if (geoFilter == null) {
+
+         // hide geo grid
+
+         _grid_IsShowLastGeoGrid = false;
+
+         redraw();
+
+         return;
+      }
 
       _grid_IsShowLastGeoGrid = true;
 
-      _grid_GeoLast_Start = new GeoPosition(geoFilter.latitude1, geoFilter.longitude1);
-      _grid_GeoLast_End = new GeoPosition(geoFilter.latitude2, geoFilter.longitude2);
+      final double geoGridRaster = 0.01;
 
-      setZoom(geoFilter.mapZoomLevel + 1);
+      _grid_GeoLast_Start = new GeoPosition(
+            geoFilter.latitude1 - geoGridRaster,
+            geoFilter.longitude1 + geoGridRaster);
+
+      _grid_GeoLast_End = new GeoPosition(
+            geoFilter.latitude2,
+            geoFilter.longitude2);
+
+      setZoom(geoFilter.mapZoomLevel);
       setMapCenter(new GeoPosition(geoFilter.mapGeoCenter.latitude, geoFilter.mapGeoCenter.longitude));
    }
 

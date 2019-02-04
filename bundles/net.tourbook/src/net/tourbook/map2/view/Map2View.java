@@ -1158,6 +1158,12 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
                if (eventData instanceof TourGeoFilterItem) {
 
                   _map.showGeoGrid((TourGeoFilterItem) eventData);
+
+               } else if (eventData == null) {
+
+                  // hide geo grid
+
+                  _map.showGeoGrid(null);
                }
 
             } else if (eventId == TourEventId.MAP_SHOW_LAST_GEO_GRID) {
@@ -2168,7 +2174,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
       MapManager.fireSyncMapEvent(mapPosition, this, 0);
    }
-
 
    @Override
    public void onSelectBookmark(final MapBookmark mapBookmark) {
