@@ -85,7 +85,6 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
    private static final String COLUMN_LONGITUDE_2          = "longitude2";                  //$NON-NLS-1$
    private static final String COLUMN_SEQUENCE             = "sequence";                    //$NON-NLS-1$
 
-//   private final IPreferenceStore             _prefStore                  = TourbookPlugin.getPrefStore();
    private final IDialogSettings              _state;
 
    private TableViewer                        _geoFilterViewer;
@@ -775,6 +774,7 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
 //
 //         _profileViewer.getTable().setFocus();
 //      }
+      _geoFilterViewer.getTable().setFocus();
    }
 
    private void onGeoFilter_Delete() {
@@ -845,8 +845,10 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
 
       _selectedFilter = (TourGeoFilterItem) selectedItem;
 
+      // show geo grid in the map
       TourManager.fireEventWithCustomData(TourEventId.MAP_SHOW_GEO_GRID, _selectedFilter, null);
 
+      // run tour filter for all opened tour directory views
       TourGeoFilterManager.selectFilter(_selectedFilter);
 
       enableControls();

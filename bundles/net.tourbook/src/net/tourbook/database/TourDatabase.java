@@ -103,7 +103,8 @@ public class TourDatabase {
    /**
     * version for the database which is required that the tourbook application works successfully
     */
-   private static final int TOURBOOK_DB_VERSION = 36;
+   private static final int TOURBOOK_DB_VERSION = 37;
+//   private static final int TOURBOOK_DB_VERSION = 36; // 19.2
 //   private static final int TOURBOOK_DB_VERSION = 36; // 18.12
 //   private static final int TOURBOOK_DB_VERSION = 35; // 18.7
 //   private static final int TOURBOOK_DB_VERSION = 34; // 18.5
@@ -179,51 +180,48 @@ public class TourDatabase {
    private static final String JOINTABLE__TOURPERSON__TOURPERSON_HRZONE = TABLE_TOUR_PERSON + "_" + TABLE_TOUR_PERSON_HRZONE; //$NON-NLS-1$
 
    // never used tables, is needed to drop them
-   private final static String TABLE_TOUR_CATEGORY             = "TourCategory";                                         //$NON-NLS-1$
-   private final static String TABLE_TOURCATEGORY__TOURDATA    = TABLE_TOUR_CATEGORY + "_" + TABLE_TOUR_DATA;            //$NON-NLS-1$
+   private final static String                    TABLE_TOUR_CATEGORY             = "TourCategory";                                         //$NON-NLS-1$
+   private final static String                    TABLE_TOURCATEGORY__TOURDATA    = TABLE_TOUR_CATEGORY + "_" + TABLE_TOUR_DATA;            //$NON-NLS-1$
 
    /**
     * Is <code>-1</code>, this is the id for a not saved entity
     */
-   public static final int     ENTITY_IS_NOT_SAVED             = -1;
+   public static final int                        ENTITY_IS_NOT_SAVED             = -1;
    //
-   private static final String ENTITY_ID_BIKE                  = "BikeID";                                               //$NON-NLS-1$
-   private static final String ENTITY_ID_COMPARED              = "ComparedID";                                           //$NON-NLS-1$
-   private static final String ENTITY_ID_HR_ZONE               = "HrZoneID";                                             //$NON-NLS-1$
-   private static final String ENTITY_ID_MARKER                = "MarkerID";                                             //$NON-NLS-1$
-   private static final String ENTITY_ID_PERSON                = "PersonID";                                             //$NON-NLS-1$
-   private static final String ENTITY_ID_PHOTO                 = "PhotoID";                                              //$NON-NLS-1$
-   private static final String ENTITY_ID_REF                   = "RefID";                                                //$NON-NLS-1$
-   private static final String ENTITY_ID_TAG                   = "TagID";                                                //$NON-NLS-1$
-   private static final String ENTITY_ID_TAG_CATEGORY          = "TagCategoryID";                                        //$NON-NLS-1$
-   public static final String  ENTITY_ID_TOUR                  = "TourID";                                               //$NON-NLS-1$
-   private static final String ENTITY_ID_TYPE                  = "TypeID";                                               //$NON-NLS-1$
-   public static final String  ENTITY_ID_WAY_POINT             = "WayPointID";                                           //$NON-NLS-1$
+   private static final String                    ENTITY_ID_BIKE                  = "BikeID";                                               //$NON-NLS-1$
+   private static final String                    ENTITY_ID_COMPARED              = "ComparedID";                                           //$NON-NLS-1$
+   private static final String                    ENTITY_ID_HR_ZONE               = "HrZoneID";                                             //$NON-NLS-1$
+   private static final String                    ENTITY_ID_MARKER                = "MarkerID";                                             //$NON-NLS-1$
+   private static final String                    ENTITY_ID_PERSON                = "PersonID";                                             //$NON-NLS-1$
+   private static final String                    ENTITY_ID_PHOTO                 = "PhotoID";                                              //$NON-NLS-1$
+   private static final String                    ENTITY_ID_REF                   = "RefID";                                                //$NON-NLS-1$
+   private static final String                    ENTITY_ID_TAG                   = "TagID";                                                //$NON-NLS-1$
+   private static final String                    ENTITY_ID_TAG_CATEGORY          = "TagCategoryID";                                        //$NON-NLS-1$
+   public static final String                     ENTITY_ID_TOUR                  = "TourID";                                               //$NON-NLS-1$
+   private static final String                    ENTITY_ID_TYPE                  = "TypeID";                                               //$NON-NLS-1$
+   public static final String                     ENTITY_ID_WAY_POINT             = "WayPointID";                                           //$NON-NLS-1$
    //
-   private static final String KEY_BIKE                        = TABLE_TOUR_BIKE + "_" + ENTITY_ID_BIKE;                 //$NON-NLS-1$
-   private static final String KEY_PERSON                      = TABLE_TOUR_PERSON + "_" + ENTITY_ID_PERSON;             //$NON-NLS-1$
-   private static final String KEY_TAG                         = TABLE_TOUR_TAG + "_" + ENTITY_ID_TAG;                   //$NON-NLS-1$
-   private static final String KEY_TAG_CATEGORY                = TABLE_TOUR_TAG_CATEGORY + "_" + ENTITY_ID_TAG_CATEGORY; //$NON-NLS-1$
-   public static final String  KEY_TOUR                        = TABLE_TOUR_DATA + "_" + ENTITY_ID_TOUR;                 //$NON-NLS-1$
-   private static final String KEY_TYPE                        = TABLE_TOUR_TYPE + "_" + ENTITY_ID_TYPE;                 //$NON-NLS-1$
+   private static final String                    KEY_BIKE                        = TABLE_TOUR_BIKE + "_" + ENTITY_ID_BIKE;                 //$NON-NLS-1$
+   private static final String                    KEY_PERSON                      = TABLE_TOUR_PERSON + "_" + ENTITY_ID_PERSON;             //$NON-NLS-1$
+   private static final String                    KEY_TAG                         = TABLE_TOUR_TAG + "_" + ENTITY_ID_TAG;                   //$NON-NLS-1$
+   private static final String                    KEY_TAG_CATEGORY                = TABLE_TOUR_TAG_CATEGORY + "_" + ENTITY_ID_TAG_CATEGORY; //$NON-NLS-1$
+   public static final String                     KEY_TOUR                        = TABLE_TOUR_DATA + "_" + ENTITY_ID_TOUR;                 //$NON-NLS-1$
+   private static final String                    KEY_TYPE                        = TABLE_TOUR_TYPE + "_" + ENTITY_ID_TYPE;                 //$NON-NLS-1$
 
-   private static final String DEFAULT_0                       = "0";                                                    //$NON-NLS-1$
-   private static final String DEFAULT_1_0                     = "1.0";                                                  //$NON-NLS-1$
-   private static final String DEFAULT_FALSE                   = "false";                                                //$NON-NLS-1$
-   private static final String DEFAULT_IGNORED                 = "-1";                                                   //$NON-NLS-1$
+   private static final String                    DEFAULT_0                       = "0";                                                    //$NON-NLS-1$
+   private static final String                    DEFAULT_1_0                     = "1.0";                                                  //$NON-NLS-1$
+   private static final String                    DEFAULT_FALSE                   = "false";                                                //$NON-NLS-1$
+   private static final String                    DEFAULT_IGNORED                 = "-1";                                                   //$NON-NLS-1$
 
-   private static final String PERSISTENCE_UNIT_NAME           = "tourdatabase";                                         //$NON-NLS-1$
+   private static final String                    PERSISTENCE_UNIT_NAME           = "tourdatabase";                                         //$NON-NLS-1$
 
-   private static final String DERBY_DATABASE                  = "derby-database";                                       //$NON-NLS-1$
-   private static final String DERBY_DB_TOURBOOK               = "tourbook";                                             //$NON-NLS-1$
-   private static String       DERBY_DRIVER_CLASS;
-   private static String       DERBY_URL;
-   private static final String DERBY_URL_COMMAND_CREATE_TRUE   = ";create=true";                                         //$NON-NLS-1$
-   private static final String DERBY_URL_COMMAND_SHUTDOWN_TRUE = ";shutdown=true";                                       //$NON-NLS-1$
-   private static final String DERBY_URL_COMMAND_UPGRADE_TRUE  = ";upgrade=true";                                        //$NON-NLS-1$
-
-// SET_FORMATTING_OFF
-// SET_FORMATTING_ON
+   private static final String                    DERBY_DATABASE                  = "derby-database";                                       //$NON-NLS-1$
+   private static final String                    DERBY_DB_TOURBOOK               = "tourbook";                                             //$NON-NLS-1$
+   private static String                          DERBY_DRIVER_CLASS;
+   private static String                          DERBY_URL;
+   private static final String                    DERBY_URL_COMMAND_CREATE_TRUE   = ";create=true";                                         //$NON-NLS-1$
+   private static final String                    DERBY_URL_COMMAND_SHUTDOWN_TRUE = ";shutdown=true";                                       //$NON-NLS-1$
+   private static final String                    DERBY_URL_COMMAND_UPGRADE_TRUE  = ";upgrade=true";                                        //$NON-NLS-1$
    //
    private static volatile TourDatabase           _instance;
 
@@ -239,26 +237,19 @@ public class TourDatabase {
    /**
     * Key is category ID or <code>-1</code> for the root.
     */
-   private static HashMap<Long, TagCollection>    _tagCollections = new HashMap<>();
+   private static HashMap<Long, TagCollection>    _tagCollections                 = new HashMap<>();
 
    /*
     * cached distinct fields
     */
-   private static TreeSet<String>        _dbTourTitles;
-   private static TreeSet<String>        _dbTourStartPlace;
-   private static TreeSet<String>        _dbTourEndPlace;
-   private static TreeSet<String>        _dbTourMarkerNames;
+   private static TreeSet<String>                _dbTourTitles;
+   private static TreeSet<String>                _dbTourStartPlace;
+   private static TreeSet<String>                _dbTourEndPlace;
+   private static TreeSet<String>                _dbTourMarkerNames;
 
-   private static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore         _prefStore    = TourbookPlugin.getPrefStore();
 
-// SET_FORMATTING_OFF
-// SET_FORMATTING_ON
-
-   private final static String                   _databasePath = Platform
-         .getInstanceLocation()
-         .getURL()
-         .getPath()
-         + DERBY_DATABASE;
+   private final static String                   _databasePath = Platform.getInstanceLocation().getURL().getPath() + DERBY_DATABASE;
 
    private static NetworkServerControl           _server;
 
@@ -279,15 +270,15 @@ public class TourDatabase {
 
 //   Derby Limitations
 //
-//   Smallest          DOUBLE    -1.79769E+308
-//   Largest             DOUBLE     1.79769E+308
-//   Smallest positive DOUBLE       2.225E-307
-//   Largest negative    DOUBLE    -2.225E-307
+//   Smallest           DOUBLE    -1.79769E+308
+//   Largest            DOUBLE     1.79769E+308
+//   Smallest positive  DOUBLE       2.225E-307
+//   Largest negative   DOUBLE      -2.225E-307
 //
-//   Smallest          REAL       -3.402E+38
-//   Largest            REAL        3.402E+38
-//   Smallest positive   REAL        1.175E-37
-//   Largest negative   REAL       -1.175E-37
+//   Smallest           REAL         -3.402E+38
+//   Largest            REAL          3.402E+38
+//   Smallest positive  REAL          1.175E-37
+//   Largest negative   REAL         -1.175E-37
 
    public static final float   DEFAULT_FLOAT  = -1E+35f;
    // This is Float.MIN_VALUE
@@ -545,7 +536,7 @@ public class TourDatabase {
             generateID = "GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1)"; //$NON-NLS-1$
          }
 
-//          SUBJECT CHAR(64) NOT NULL CONSTRAINT OUT_TRAY_PK PRIMARY KEY,
+//       SUBJECT CHAR(64) NOT NULL CONSTRAINT OUT_TRAY_PK PRIMARY KEY,
 
          return "   " //$NON-NLS-1$
                + (fieldName + " BIGINT NOT NULL ") //$NON-NLS-1$
@@ -2845,9 +2836,11 @@ public class TourDatabase {
        */
       exec(stmt, "CREATE TABLE " + TABLE_TOUR_GEO_PARTS + "   (                           \n" //$NON-NLS-1$ //$NON-NLS-2$
       //
-            + "   TourId               BIGINT   NOT NULL,                                 \n" //$NON-NLS-1$
-            + "   GeoPart              INTEGER  NOT NULL                                  \n" //$NON-NLS-1$
-            //
+            + "   TourId         BIGINT   NOT NULL,                                       \n" //$NON-NLS-1$
+            + "   GeoPart        INTEGER  NOT NULL,                                       \n" //$NON-NLS-1$
+
+            + "   CONSTRAINT     PK_TourId_GeoPart PRIMARY KEY (TourId, GeoPart)          \n" //$NON-NLS-1$
+
             + ")"); //$NON-NLS-1$
 
       SQL.CreateIndex(stmt, TABLE_TOUR_GEO_PARTS, "TourId"); //$NON-NLS-1$
@@ -3218,27 +3211,27 @@ public class TourDatabase {
        */
       //                                             //$NON-NLS-1$
 
-      exec(stmt, "CREATE TABLE " + TABLE_TOUR_TYPE + "   (                                    \n" //$NON-NLS-1$ //$NON-NLS-2$
+      exec(stmt, "CREATE TABLE " + TABLE_TOUR_TYPE + "   (                                      \n" //$NON-NLS-1$ //$NON-NLS-2$
       //
             + SQL.CreateField_EntityId(ENTITY_ID_TYPE, true)
             //
-            + "   name            VARCHAR(" + TourType.DB_LENGTH_NAME + "),                     \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   name                 VARCHAR(" + TourType.DB_LENGTH_NAME + "),                \n" //$NON-NLS-1$ //$NON-NLS-2$
             //
             + "   colorBrightRed       SMALLINT NOT NULL,                                       \n" //$NON-NLS-1$
-            + "   colorBrightGreen    SMALLINT NOT NULL,                                       \n" //$NON-NLS-1$
-            + "   colorBrightBlue    SMALLINT NOT NULL,                                       \n" //$NON-NLS-1$
-            + "   colorDarkRed       SMALLINT NOT NULL,                                       \n" //$NON-NLS-1$
+            + "   colorBrightGreen     SMALLINT NOT NULL,                                       \n" //$NON-NLS-1$
+            + "   colorBrightBlue      SMALLINT NOT NULL,                                       \n" //$NON-NLS-1$
+            + "   colorDarkRed         SMALLINT NOT NULL,                                       \n" //$NON-NLS-1$
             + "   colorDarkGreen       SMALLINT NOT NULL,                                       \n" //$NON-NLS-1$
-            + "   colorDarkBlue       SMALLINT NOT NULL,                                       \n" //$NON-NLS-1$
-            + "   colorLineRed       SMALLINT NOT NULL,                                       \n" //$NON-NLS-1$
+            + "   colorDarkBlue        SMALLINT NOT NULL,                                       \n" //$NON-NLS-1$
+            + "   colorLineRed         SMALLINT NOT NULL,                                       \n" //$NON-NLS-1$
             + "   colorLineGreen       SMALLINT NOT NULL,                                       \n" //$NON-NLS-1$
-            + "   colorLineBlue       SMALLINT NOT NULL,                                       \n" //$NON-NLS-1$
+            + "   colorLineBlue        SMALLINT NOT NULL,                                       \n" //$NON-NLS-1$
 
             // version 19 start
             //
-            + "   colorTextRed       SMALLINT DEFAULT 0,                                       \n" //$NON-NLS-1$
-            + "   colorTextGreen       SMALLINT DEFAULT 0,                                       \n" //$NON-NLS-1$
-            + "   colorTextBlue       SMALLINT DEFAULT 0                                       \n" //$NON-NLS-1$
+            + "   colorTextRed         SMALLINT DEFAULT 0,                                      \n" //$NON-NLS-1$
+            + "   colorTextGreen       SMALLINT DEFAULT 0,                                      \n" //$NON-NLS-1$
+            + "   colorTextBlue        SMALLINT DEFAULT 0                                       \n" //$NON-NLS-1$
             //
             // version 19 end ---------
             //
@@ -4475,6 +4468,11 @@ public class TourDatabase {
          // 35 -> 36
          if (currentDbVersion == 35) {
             currentDbVersion = newVersion = updateDbDesign_035_to_036(conn, monitor);
+         }
+
+         // 36 -> 37
+         if (currentDbVersion == 36) {
+            currentDbVersion = newVersion = updateDbDesign_036_to_037(conn, monitor);
          }
 
          /*
@@ -6690,6 +6688,33 @@ public class TourDatabase {
 
 // SET_FORMATTING_ON
 
+         }
+      }
+      stmt.close();
+
+      logDb_UpdateEnd(newDbVersion);
+
+      return newDbVersion;
+   }
+
+   private int updateDbDesign_036_to_037(final Connection conn, final IProgressMonitor monitor) throws SQLException {
+
+      final int newDbVersion = 37;
+
+      logDb_UpdateStart(newDbVersion);
+      updateMonitor(monitor, newDbVersion);
+
+      final Statement stmt = conn.createStatement();
+      {
+         // check if db is available
+         if (isTableAvailable(conn, TABLE_TOUR_GEO_PARTS)) {
+
+            final String sql = ""//                                                          //$NON-NLS-1$
+
+                  + "ALTER TABLE " + TABLE_TOUR_GEO_PARTS //                                 //$NON-NLS-1$
+                  + "   ADD CONSTRAINT PK_TourId_GeoPart PRIMARY KEY (TourId, GeoPart)"; //  //$NON-NLS-1$
+
+            exec(stmt, sql);
          }
       }
       stmt.close();

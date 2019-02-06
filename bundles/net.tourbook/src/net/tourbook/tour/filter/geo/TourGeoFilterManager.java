@@ -186,12 +186,12 @@ public class TourGeoFilterManager {
 
       final char NL = UI.NEW_LINE;
 
-      final String selectGeoPart = "SELECT" + NL //                       //$NON-NLS-1$
+      final String selectGeoPart = "SELECT" + NL //                     //$NON-NLS-1$
 
-            + " DISTINCT TourId " + NL //                           //$NON-NLS-1$
+            + " DISTINCT TourId " + NL //                               //$NON-NLS-1$
 
-            + (" FROM " + TourDatabase.TABLE_TOUR_GEO_PARTS + NL) //      //$NON-NLS-1$
-            + (" WHERE GeoPart IN (" + sqlInParameters + ")") + NL //      //$NON-NLS-1$ //$NON-NLS-2$
+            + (" FROM " + TourDatabase.TABLE_TOUR_GEO_PARTS + NL) //    //$NON-NLS-1$
+            + (" WHERE GeoPart IN (" + sqlInParameters + ")") + NL //   //$NON-NLS-1$ //$NON-NLS-2$
       ;
 
       sqlWhere.append(" AND TourId IN (" + selectGeoPart + ") ");
