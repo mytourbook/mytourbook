@@ -1,0 +1,21 @@
+Version 19.2.0                                        23. January 2019
+
+
+Improvements   
+============
+
+
+
+Translation
+===========   
+
+* 
+
+
+Bugfix
+======   
+
+* Tour Editor
+
+  - Fixed Linux async problem: modify flag is set when opening a tour/event
+
