@@ -1,0 +1,26 @@
+Version 19.2.0                                        23. January 2019
+
+
+Improvements   
+============
+
+
+
+Translation
+===========   
+
+* 
+
+
+Bugfix
+======   
+
+* Tour Editor
+
+  - Fixed Linux async problem: modify flag is set when opening a tour/event
+
+
+* .Tour Import 
+
+  - .fit file
+    Fixed NPE when a lap has not an absolute time, this occured with files from Sigma-ROX 12.0
