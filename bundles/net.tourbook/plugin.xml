@@ -699,6 +699,10 @@
 				mnemonic="%command_tour_map_name_Mnemonic"
 				tooltip="%command_tour_map_name_tooltip"/>
 
+			<separator
+				name="sep_Bookmarks"
+				visible="false"/>
+
 		</menuContribution>
 		
 		
@@ -2054,7 +2058,7 @@ THIS IS NOT YET FULLY IMPLEMENTED
 
    <extension point="org.eclipse.ui.menus">
 
-		<menuContribution locationURI="menu:m_Map?endof=sep_Map" >
+		<menuContribution locationURI="menu:m_Map?endof=sep_Bookmarks" >
 		            
 			<command commandId="net.tourbook.map.bookmark.command.MapBookmarkView"
 				icon="icons/map-bookmark.png"
