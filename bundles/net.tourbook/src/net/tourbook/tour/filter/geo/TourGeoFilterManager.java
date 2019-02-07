@@ -20,16 +20,6 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IMemento;
-import org.eclipse.ui.XMLMemento;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.Version;
-
 import net.tourbook.application.ActionTourGeoFilter;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -44,40 +34,61 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.filter.SQLFilterData;
 
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IMemento;
+import org.eclipse.ui.XMLMemento;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.Version;
+
 public class TourGeoFilterManager {
 
-   private static final Bundle                 _bundle                       = TourbookPlugin.getDefault().getBundle();
+   private static final Bundle                 _bundle                            = TourbookPlugin.getDefault().getBundle();
 
-   private static final IPath                  _stateLocation                = Platform.getStateLocation(_bundle);
-   private final static IPreferenceStore       _prefStore                    = TourbookPlugin.getPrefStore();
+   private final static IPreferenceStore       _prefStore                         = TourbookPlugin.getPrefStore();
+   private static final IDialogSettings        _state                             = TourbookPlugin.getState("TourGeoFilter"); //$NON-NLS-1$
+   private static final IPath                  _stateLocation                     = Platform.getStateLocation(_bundle);
 
-   private static final String                 TOUR_FILTER_FILE_NAME         = "tour-geo-filter.xml";                  //$NON-NLS-1$
-   private static final int                    TOUR_FILTER_VERSION           = 1;
+   static final String                         STATE_IS_INCLUDE_GEO_PARTS         = "STATE_IS_INCLUDE_GEO_PARTS";             //$NON-NLS-1$
+   static final boolean                        STATE_IS_INCLUDE_GEO_PARTS_DEFAULT = true;
 
-   private static final String                 TAG_GEO_FILTER                = "GeoFilter";                            //$NON-NLS-1$
-   private static final String                 TAG_ROOT                      = "TourGeoFilterItems";                   //$NON-NLS-1$
+   static final String                         STATE_SORT_COLUMN_DIRECTION        = "STATE_SORT_COLUMN_DIRECTION";            //$NON-NLS-1$
+   static final String                         STATE_SORT_COLUMN_ID               = "STATE_SORT_COLUMN_ID";                   //$NON-NLS-1$
 
-   private static final String                 ATTR_CREATED                  = "created";                              //$NON-NLS-1$
-   private static final String                 ATTR_GEO_PARTS                = "geoParts";                             //$NON-NLS-1$
-   private static final String                 ATTR_MAP_GEO_CENTER_LATITUDE  = "mapGeoCenterLatitude";                 //$NON-NLS-1$
-   private static final String                 ATTR_MAP_GEO_CENTER_LONGITUDE = "mapGeoCenterLongitude";                //$NON-NLS-1$
-   private static final String                 ATTR_MAP_ZOOM_LEVEL           = "mapZoomLevel";                         //$NON-NLS-1$
+   private static final String                 TOUR_FILTER_FILE_NAME              = "tour-geo-filter.xml";                    //$NON-NLS-1$
+   private static final int                    TOUR_FILTER_VERSION                = 1;
 
-   private static final String                 ATTR_TOP_LEFT_X_E2            = "topLeft_X_E2";                         //$NON-NLS-1$
-   private static final String                 ATTR_TOP_LEFT_Y_E2            = "topLeft_Y_E2";                         //$NON-NLS-1$
-   private static final String                 ATTR_BOTTOM_RIGHT_X_E2        = "bottomRight_X_E2";                     //$NON-NLS-1$
-   private static final String                 ATTR_BOTTOM_RIGHT_Y_E2        = "bottomRight_Y_E2";                     //$NON-NLS-1$
+   private static final String                 TAG_GEO_FILTER                     = "GeoFilter";                              //$NON-NLS-1$
+   private static final String                 TAG_ROOT                           = "TourGeoFilterItems";                     //$NON-NLS-1$
 
-   private static final String                 ATTR_TOUR_FILTER_VERSION      = "tourFilterVersion";                    //$NON-NLS-1$
+   private static final String                 ATTR_ACTIVE_GEO_FILTER_ID          = "activeGeoFilterId";                      //$NON-NLS-1$
+   private static final String                 ATTR_CREATED                       = "created";                                //$NON-NLS-1$
+   private static final String                 ATTR_GEO_PARTS                     = "geoParts";                               //$NON-NLS-1$
+   private static final String                 ATTR_MAP_GEO_CENTER_LATITUDE       = "mapGeoCenterLatitude";                   //$NON-NLS-1$
+   private static final String                 ATTR_MAP_GEO_CENTER_LONGITUDE      = "mapGeoCenterLongitude";                  //$NON-NLS-1$
+   private static final String                 ATTR_MAP_ZOOM_LEVEL                = "mapZoomLevel";                           //$NON-NLS-1$
+
+   private static final String                 ATTR_TOP_LEFT_X_E2                 = "topLeft_X_E2";                           //$NON-NLS-1$
+   private static final String                 ATTR_TOP_LEFT_Y_E2                 = "topLeft_Y_E2";                           //$NON-NLS-1$
+   private static final String                 ATTR_BOTTOM_RIGHT_X_E2             = "bottomRight_X_E2";                       //$NON-NLS-1$
+   private static final String                 ATTR_BOTTOM_RIGHT_Y_E2             = "bottomRight_Y_E2";                       //$NON-NLS-1$
+
+   private static final String                 ATTR_TOUR_FILTER_VERSION           = "tourFilterVersion";                      //$NON-NLS-1$
 
    private static ActionTourGeoFilter          _actionTourGeoFilter;
 
    private static boolean                      _isGeoFilterEnabled;
 
-   private static int[]                        _fireEventCounter             = new int[1];
+   private static int[]                        _fireEventCounter                  = new int[1];
 
-   private static ArrayList<TourGeoFilterItem> _allTourGeoFilter             = new ArrayList<>();
+   private static ArrayList<TourGeoFilterItem> _allTourGeoFilter                  = new ArrayList<>();
    private static TourGeoFilterItem            _selectedFilter;
+
+   private static String                       _fromXml_ActiveGeoFilterId;
 
    /**
     * Fire event that the tour filter has changed.
@@ -110,18 +121,54 @@ public class TourGeoFilterManager {
       return _allTourGeoFilter;
    }
 
+   private static TourGeoFilterItem getGeoFilter() {
+
+      if (_selectedFilter != null) {
+         return _selectedFilter;
+      }
+
+      if (_fromXml_ActiveGeoFilterId == null) {
+         return null;
+      }
+
+      for (final TourGeoFilterItem tourGeoFilterItem : _allTourGeoFilter) {
+
+         if (_fromXml_ActiveGeoFilterId.equals(tourGeoFilterItem.id)) {
+
+            _selectedFilter = tourGeoFilterItem;
+
+            return tourGeoFilterItem;
+         }
+      }
+
+      return null;
+   }
+
    /**
     * @return Returns sql data for the selected tour filter profile or <code>null</code> when not
     *         available.
     */
    public static SQLFilterData getSQL() {
 
-      if (_isGeoFilterEnabled == false || _selectedFilter == null) {
+      if (_isGeoFilterEnabled == false) {
 
-         // tour filter is not enabled or not selected
+         // tour filter is not enabled
 
          return null;
       }
+
+      final TourGeoFilterItem geoFilter = getGeoFilter();
+
+      if (geoFilter == null) {
+
+         // tour filter is not selected
+
+         return null;
+      }
+
+      final boolean isIncludeGeoParts = Util.getStateBoolean(_state,
+            TourGeoFilterManager.STATE_IS_INCLUDE_GEO_PARTS,
+            TourGeoFilterManager.STATE_IS_INCLUDE_GEO_PARTS_DEFAULT);
 
       final StringBuilder sqlWhere = new StringBuilder();
       final ArrayList<Object> sqlParameters = new ArrayList<>();
@@ -139,11 +186,11 @@ public class TourGeoFilterManager {
       // x: longitude
       // y: latitude
 
-      final int normalizedLat1 = _selectedFilter.topLeftE2.y + TourData.NORMALIZED_LATITUDE_OFFSET_E2;
-      final int normalizedLat2 = _selectedFilter.bottomRightE2.y + TourData.NORMALIZED_LATITUDE_OFFSET_E2;
+      final int normalizedLat1 = geoFilter.topLeftE2.y + TourData.NORMALIZED_LATITUDE_OFFSET_E2;
+      final int normalizedLat2 = geoFilter.bottomRightE2.y + TourData.NORMALIZED_LATITUDE_OFFSET_E2;
 
-      final int normalizedLon1 = _selectedFilter.topLeftE2.x + TourData.NORMALIZED_LONGITUDE_OFFSET_E2;
-      final int normalizedLon2 = _selectedFilter.bottomRightE2.x + TourData.NORMALIZED_LONGITUDE_OFFSET_E2;
+      final int normalizedLon1 = geoFilter.topLeftE2.x + TourData.NORMALIZED_LONGITUDE_OFFSET_E2;
+      final int normalizedLon2 = geoFilter.bottomRightE2.x + TourData.NORMALIZED_LONGITUDE_OFFSET_E2;
 
       final double gridSize_E2 = 1; // 0.01°
 
@@ -186,7 +233,7 @@ public class TourGeoFilterManager {
 
       final char NL = UI.NEW_LINE;
 
-      final String selectGeoPart = "SELECT" + NL //                     //$NON-NLS-1$
+      final String selectAllTourIds = "SELECT" + NL //                     //$NON-NLS-1$
 
             + " DISTINCT TourId " + NL //                               //$NON-NLS-1$
 
@@ -194,11 +241,24 @@ public class TourGeoFilterManager {
             + (" WHERE GeoPart IN (" + sqlInParameters + ")") + NL //   //$NON-NLS-1$ //$NON-NLS-2$
       ;
 
-      sqlWhere.append(" AND TourId IN (" + selectGeoPart + ") ");
+      // include or exclude geo parts
+      final String sqlIncludeExcludeGeoParts = isIncludeGeoParts ? UI.EMPTY_STRING : "NOT";
+
+      sqlWhere.append(" AND TourId " + sqlIncludeExcludeGeoParts + " IN (" + selectAllTourIds + ") ");
+
+      System.out.println((UI.timeStampNano() + " [" + "] ()")
+            + ("\tsqlWhere: " + sqlWhere)
+//            + ("\t: " + )
+      );
+// TODO remove SYSTEM.OUT.PRINTLN
 
       final SQLFilterData tourFilterSQLData = new SQLFilterData(sqlWhere.toString(), sqlParameters);
 
       return tourFilterSQLData;
+   }
+
+   public static IDialogSettings getState() {
+      return _state;
    }
 
    private static File getXmlFile() {
@@ -242,7 +302,6 @@ public class TourGeoFilterManager {
       }
 
       _selectedFilter = selectedFilter;
-
 
       fireTourFilterModifyEvent();
    }
@@ -302,6 +361,9 @@ public class TourGeoFilterManager {
          try (InputStreamReader reader = new InputStreamReader(new FileInputStream(xmlFile), UI.UTF_8)) {
 
             final XMLMemento xmlRoot = XMLMemento.createReadRoot(reader);
+
+            _fromXml_ActiveGeoFilterId = Util.getXmlString(xmlRoot, ATTR_ACTIVE_GEO_FILTER_ID, null);
+
             for (final IMemento mementoChild : xmlRoot.getChildren()) {
 
                final XMLMemento xmlGeoFilter = (XMLMemento) mementoChild;
@@ -353,6 +415,10 @@ public class TourGeoFilterManager {
       try {
 
          xmlRoot = xmlWriteGeoFilter_10_Root();
+
+         if (_selectedFilter != null) {
+            xmlRoot.putString(ATTR_ACTIVE_GEO_FILTER_ID, _selectedFilter.id);
+         }
 
          // loop: all geo filter
          for (final TourGeoFilterItem geoFilter : _allTourGeoFilter) {

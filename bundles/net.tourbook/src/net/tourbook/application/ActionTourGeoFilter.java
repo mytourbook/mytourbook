@@ -16,11 +16,6 @@
 package net.tourbook.application;
 
 
-import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.ToolItem;
-
 import net.tourbook.Messages;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.tooltip.SlideoutLocation;
@@ -28,11 +23,14 @@ import net.tourbook.tour.filter.ActionToolbarSlideoutAdv;
 import net.tourbook.tour.filter.geo.SlideoutTourGeoFilter;
 import net.tourbook.tour.filter.geo.TourGeoFilterManager;
 
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.ToolItem;
+
 public class ActionTourGeoFilter extends ActionToolbarSlideoutAdv {
 
    private static final ImageDescriptor _actionImageDescriptor = TourbookPlugin.getImageDescriptor(Messages.Image__TourGeoFilter);
 
-   private static final IDialogSettings _state                 = TourbookPlugin.getState("TourGeoFilter");                        //$NON-NLS-1$
 
    private SlideoutTourGeoFilter        _slideoutTourGeoFilter;
 
@@ -47,7 +45,7 @@ public class ActionTourGeoFilter extends ActionToolbarSlideoutAdv {
    @Override
    protected AdvancedSlideout createSlideout(final ToolItem toolItem) {
 
-      _slideoutTourGeoFilter = new SlideoutTourGeoFilter(toolItem, _state);
+      _slideoutTourGeoFilter = new SlideoutTourGeoFilter(toolItem);
       _slideoutTourGeoFilter.setSlideoutLocation(SlideoutLocation.ABOVE_CENTER);
 
       return _slideoutTourGeoFilter;

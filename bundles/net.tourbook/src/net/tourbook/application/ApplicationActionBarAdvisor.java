@@ -15,6 +15,13 @@
  *******************************************************************************/
 package net.tourbook.application;
 
+import net.tourbook.Messages;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tag.tour.filter.TourTagFilterManager;
+import net.tourbook.tour.TourTypeFilterManager;
+import net.tourbook.tour.filter.TourFilterManager;
+import net.tourbook.tour.filter.geo.TourGeoFilterManager;
+
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IContributionItem;
@@ -33,13 +40,6 @@ import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 import org.eclipse.ui.actions.ContributionItemFactory;
 import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
-
-import net.tourbook.Messages;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tag.tour.filter.TourTagFilterManager;
-import net.tourbook.tour.TourTypeFilterManager;
-import net.tourbook.tour.filter.TourFilterManager;
-import net.tourbook.tour.filter.geo.TourGeoFilterManager;
 
 /**
  * An action bar advisor is responsible for creating, adding, and disposing of the fGraphActions
