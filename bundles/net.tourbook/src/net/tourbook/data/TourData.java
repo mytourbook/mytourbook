@@ -67,11 +67,6 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.widgets.Display;
-import org.hibernate.annotations.Cascade;
-
 import net.tourbook.Messages;
 import net.tourbook.algorithm.DPPoint;
 import net.tourbook.algorithm.DouglasPeuckerSimplifier;
@@ -107,6 +102,11 @@ import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.ISmoothingAlgorithm;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
+
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.widgets.Display;
+import org.hibernate.annotations.Cascade;
 
 /**
  * Tour data contains all data for a tour (except markers), an entity will be saved in the database
@@ -210,13 +210,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @Transient
    private static IPreferenceStore     _prefStore                        = TourbookPlugin.getPrefStore();
 
+// SET_FORMATTING_OFF
+
    /**
     * Unique entity id which identifies the tour
     */
    @Id
-   private Long                        tourId;
-
-// SET_FORMATTING_OFF
+   private Long                  tourId;
 
    // ############################################# DATE #############################################
 
@@ -604,12 +604,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * positive or negative time offset in seconds for the merged tour
     */
-   private int                     mergedTourTimeOffset;                                 // db-version 7
+   private int                   mergedTourTimeOffset;                                 // db-version 7
 
    /**
     * altitude difference for the merged tour
     */
-   private int                     mergedAltitudeOffset;                                 // db-version 7
+   private int                   mergedAltitudeOffset;                                 // db-version 7
 
    /**
     * Unique plugin id for the device data reader which created this tour, this id is defined in
@@ -617,7 +617,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * <p>
     * a better name would be <i>pluginId</i>
     */
-   private String                  devicePluginId;
+   private String                devicePluginId;
 
    // ############################################# PLUGIN DATA #############################################
 
@@ -626,13 +626,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * <p>
     * a better name would be <i>pluginName</i>
     */
-   private String                  devicePluginName;                                       // db-version 4
+   private String                devicePluginName;                                       // db-version 4
 
    /**
     * Deflection point in the conconi test, this value is the index for the data serie on the
     * x-axis
     */
-   private int                     conconiDeflection;
+   private int                   conconiDeflection;
 
    // ############################################# PHOTO  DATA #############################################
 
@@ -640,70 +640,72 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Number of photos.
     */
    @SuppressWarnings("unused")
-   private int                     numberOfPhotos;
+   private int                   numberOfPhotos;
 
    /**
     * Number of time slices in {@link #timeSerie}
     */
-   private int                     numberOfTimeSlices;
+   private int                   numberOfTimeSlices;
 
    /**
     * Time adjustment in seconds, this is an average value for all photos.
     */
-   private int photoTimeAdjustment;
+   private int                   photoTimeAdjustment;
 
    // ############################################# GEARS #############################################
 
-   private int frontShiftCount;
-
-   private int   rearShiftCount;
+   private int                   frontShiftCount;
+   private int                   rearShiftCount;
 
    // ############################################# RUNNING DYNAMICS #######################################
 
-   private short     runDyn_StanceTime_Min;
-   private short     runDyn_StanceTime_Max;
-   private float     runDyn_StanceTime_Avg;
+   private short                 runDyn_StanceTime_Min;
+   private short                 runDyn_StanceTime_Max;
+   private float                 runDyn_StanceTime_Avg;
 
-   private short     runDyn_StanceTimeBalance_Min;
-   private short     runDyn_StanceTimeBalance_Max;
-   private float     runDyn_StanceTimeBalance_Avg;
+   private short                 runDyn_StanceTimeBalance_Min;
+   private short                 runDyn_StanceTimeBalance_Max;
+   private float                 runDyn_StanceTimeBalance_Avg;
 
-   private short     runDyn_StepLength_Min;
-   private short     runDyn_StepLength_Max;
-   private float     runDyn_StepLength_Avg;
+   private short                 runDyn_StepLength_Min;
+   private short                 runDyn_StepLength_Max;
+   private float                 runDyn_StepLength_Avg;
 
-   private short     runDyn_VerticalOscillation_Min;
-   private short     runDyn_VerticalOscillation_Max;
-   private float     runDyn_VerticalOscillation_Avg;
+   private short                 runDyn_VerticalOscillation_Min;
+   private short                 runDyn_VerticalOscillation_Max;
+   private float                 runDyn_VerticalOscillation_Avg;
 
-   private short     runDyn_VerticalRatio_Min;
-   private short     runDyn_VerticalRatio_Max;
-   private float     runDyn_VerticalRatio_Avg;
+   private short                 runDyn_VerticalRatio_Min;
+   private short                 runDyn_VerticalRatio_Max;
+   private float                 runDyn_VerticalRatio_Avg;
 
    // ############################################# SURFING #######################################
 
    // -1 indicate that the value is not yet set
 
-   private short     surfing_NumberOfEvents        = 0; // must be 0 because of totals in tourbook view
-   private short     surfing_MinSpeed_StartStop    = SURFING_VALUE_IS_NOT_SET;
-   private short     surfing_MinSpeed_Surfing      = SURFING_VALUE_IS_NOT_SET;
-   private short     surfing_MinTimeDuration       = SURFING_VALUE_IS_NOT_SET;
+   private short                 surfing_NumberOfEvents        = 0; // must be 0 because of totals in tourbook view
+   private short                 surfing_MinSpeed_StartStop    = SURFING_VALUE_IS_NOT_SET;
+   private short                 surfing_MinSpeed_Surfing      = SURFING_VALUE_IS_NOT_SET;
+   private short                 surfing_MinTimeDuration       = SURFING_VALUE_IS_NOT_SET;
 
-   private boolean   surfing_IsMinDistance;
-   private short     surfing_MinDistance           = SURFING_VALUE_IS_NOT_SET;
+   private boolean               surfing_IsMinDistance;
+   private short                 surfing_MinDistance           = SURFING_VALUE_IS_NOT_SET;
 
    // ############################################# GEO BOUNDS #############################################
+
+   /**
+    * Is <code>true</code> when latitude/longitude data are available
+    */
+   private boolean               hasGeoData;
 
     /*
      * The geo bound values are in microdegrees (degrees * 10^6).
      */
 
-//   private int                     latitudeMinE6;                        // db-version 35
-//   private int                     latitudeMaxE6;                        // db-version 35
-//   private int                     longitudeMinE6;                     // db-version 35
-//   private int                     longitudeMaxE6;                     // db-version 35
-
-
+//   private int                 latitudeMinE6;                        // db-version 35
+//   private int                 latitudeMaxE6;                        // db-version 35
+//   private int                 longitudeMinE6;                     // db-version 35
+//   private int                 longitudeMaxE6;                     // db-version 35
 
    // ############################################# UNUSED FIELDS - START #############################################
    /**
@@ -712,34 +714,34 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * is not used any more since 6.12.2006 but it's necessary then it's a field in the database
     */
    @SuppressWarnings("unused")
-   private int                     distance;
+   private int                      distance;
 
    @SuppressWarnings("unused")
-   private float                  deviceAvgSpeed;                     // db-version 12
+   private float                    deviceAvgSpeed;                     // db-version 12
 
    @SuppressWarnings("unused")
-   private int                     deviceDistance;
+   private int                      deviceDistance;
 
    /**
     * Profile id which is defined by the device
     */
    @SuppressWarnings("unused")
-   private short                  deviceMode;                           // db-version 3
+   private short                    deviceMode;                           // db-version 3
 
    @SuppressWarnings("unused")
-   private int                     deviceTotalUp;
+   private int                      deviceTotalUp;
 
    @SuppressWarnings("unused")
-   private int                     deviceTotalDown;
+   private int                      deviceTotalDown;
 
    @SuppressWarnings("unused")
-   private long                  deviceTravelTime;
+   private long                     deviceTravelTime;
 
    @SuppressWarnings("unused")
-   private int                     deviceWheel;
+   private int                      deviceWheel;
 
    @SuppressWarnings("unused")
-   private int                     deviceWeight;
+   private int                      deviceWeight;
 
    // ############################################# UNUSED FIELDS - END #############################################
 
@@ -747,14 +749,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * All data series for time, altitude,... A BLOB CANNOT BE MULTIPLE !
     */
    @Basic(optional = false)
-   private SerieData               serieData;
+   private SerieData                   serieData;
 
    /**
     * Photos for this tour
     */
    @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-   private Set<TourPhoto>            tourPhotos                        = new HashSet<>();
+   private Set<TourPhoto>              tourPhotos                          = new HashSet<>();
 
    // ############################################# ASSOCIATED ENTITIES #############################################
 
@@ -765,28 +767,28 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
    @XmlElementWrapper(name = "TourMarkers")
    @XmlElement(name = "TourMarker")
-   private Set<TourMarker>            tourMarkers                        = new HashSet<>();
+   private Set<TourMarker>             tourMarkers                         = new HashSet<>();
 
    /**
     * Contains the tour way points
     */
    @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-   private final Set<TourWayPoint>   tourWayPoints                     = new HashSet<>();
+   private final Set<TourWayPoint>     tourWayPoints                       = new HashSet<>();
 
    /**
     * Reference tours
     */
    @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-   private final Set<TourReference>   tourReferences                     = new HashSet<>();
+   private final Set<TourReference>    tourReferences                     = new HashSet<>();
 
    /**
     * Tags
     */
    @ManyToMany(fetch = EAGER)
    @JoinTable(inverseJoinColumns = @JoinColumn(name = "TOURTAG_TagID", referencedColumnName = "TagID"))
-   private Set<TourTag>               tourTags                           = new HashSet<>();
+   private Set<TourTag>                tourTags                            = new HashSet<>();
 
 //   /**
 //    * SharedMarker
@@ -799,20 +801,20 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Category of the tour, e.g. bike, mountainbike, jogging, inlinescating
     */
    @ManyToOne
-   private TourType               tourType;
+   private TourType                    tourType;
 
    /**
     * Person which created this tour or <code>null</code> when the tour is not saved in the
     * database
     */
    @ManyToOne
-   private TourPerson            tourPerson;
+   private TourPerson                  tourPerson;
 
    /**
     * plugin id for the device which was used for this tour Bike used for this tour
     */
    @ManyToOne
-   private TourBike               tourBike;
+   private TourBike                    tourBike;
 
    /**
     * <br>
@@ -839,7 +841,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @XmlElementWrapper(name = "TimeSeries")
    @XmlElement(name = "TimeSerie")
    @Transient
-   public int[]                  timeSerie;
+   public int[]               timeSerie;
 
    /**
     * Contains the absolute distance in m (metric system) or <code>null</code> when not available
@@ -847,19 +849,19 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @XmlElementWrapper(name = "DistanceSeries")
    @XmlElement(name = "DistanceSerie")
    @Transient
-   public float[]                  distanceSerie;
+   public float[]             distanceSerie;
 
    /**
     * Distance values with double type to display it on the x-axis
     */
    @Transient
-   private double[]               distanceSerieDouble;
+   private double[]           distanceSerieDouble;
 
    /**
     * contains the absolute distance in miles/1000 (imperial system)
     */
    @Transient
-   private double[]               distanceSerieDoubleImperial;
+   private double[]           distanceSerieDoubleImperial;
 
    /**
     * Contains the absolute altitude in meter (metric system) or <code>null</code> when not
@@ -868,13 +870,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @XmlElementWrapper(name = "AltitudeSeries")
    @XmlElement(name = "AltitudeSerie")
    @Transient
-   public float[]                  altitudeSerie;
+   public float[]             altitudeSerie;
 
    /**
     * smoothed altitude serie is used to display the tour chart when not <code>null</code>
     */
    @Transient
-   private float[]               altitudeSerieSmoothed;
+   private float[]            altitudeSerieSmoothed;
 
    /**
     * contains the absolute altitude in feet (imperial system)
@@ -906,7 +908,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @XmlElementWrapper(name = "PulseSeries")
    @XmlElement(name = "PulseSerie")
    @Transient
-   public float[]                  pulseSerie;
+   public float[]                pulseSerie;
 
    @Transient
    private float[]               pulseSerieSmoothed;
@@ -919,7 +921,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * <code>true</code> is set when a time slice is a break.
     */
    @Transient
-   private boolean[]               breakTimeSerie;
+   private boolean[]             breakTimeSerie;
 
    /**
     * Contains the temperature in the metric measurement system.
@@ -927,7 +929,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @XmlElementWrapper(name = "TemperatureSeries")
    @XmlElement(name = "TemperatureSerie")
    @Transient
-   public float[]                  temperatureSerie;
+   public float[]                temperatureSerie;
 
    /**
     * contains the temperature in the imperial measurement system
@@ -999,10 +1001,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private float[]               altimeterSerieImperial;
 
    @Transient
-   public float[]                  gradientSerie;
+   public float[]                gradientSerie;
 
    @Transient
-   public float[]                  tourCompareSerie;
+   public float[]                tourCompareSerie;
 
    /*
     * GPS data
@@ -1037,7 +1039,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * </code>
     */
    @Transient
-   public long[]                  gearSerie;
+   public long[]                 gearSerie;
 
    /**
     * Gears have this format:
@@ -1049,7 +1051,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * _gears[4] = rear gear number, starting with 1<br>
     */
    @Transient
-   private float[][]               _gears;
+   private float[][]             _gears;
 
    /**
     * Contains the bounds of the tour in latitude/longitude:
@@ -1088,28 +1090,28 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * </pre>
     */
    @Transient
-   public int[]                  geoGrid;
+   public int[]               geoGrid;
 
    /**
     * Latitude/longitude multiplied with {@link #_normalizedGeoAccuracy}
     */
    @Transient
-   private NormalizedGeoData     _rasterizedLatLon;
+   private NormalizedGeoData  _rasterizedLatLon;
 
    @Transient
-   private int                   _normalizedGeoAccuracy;
+   private int                _normalizedGeoAccuracy;
 
    /**
     * Index of the segmented data in the data series
     */
    @Transient
-   public int[]                  segmentSerieIndex;
+   public int[]               segmentSerieIndex;
 
    /**
     *
     */
    @Transient
-   public int[]                  segmentSerieFilter;
+   public int[]               segmentSerieFilter;
 
    /**
     * 2nd Index of the segmented data in the data series.
@@ -1120,88 +1122,88 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * create the inner segments, e.g. altitude with DP.
     */
    @Transient
-   public int[]                  segmentSerieIndex2nd;
+   public int[]               segmentSerieIndex2nd;
 
    /**
     * oooo (o) DD-record // offset
     */
    @Transient
-   public int                    offsetDDRecord;
+   public int                 offsetDDRecord;
    /*
     * data for the tour segments
     */
    @Transient
-   private int[]                 segmentSerie_Time_Total;
+   private int[]              segmentSerie_Time_Total;
    @Transient
-   private int[]                 segmentSerie_Time_Recording;
+   private int[]              segmentSerie_Time_Recording;
    @Transient
-   public int[]                  segmentSerie_Time_Driving;
+   public int[]               segmentSerie_Time_Driving;
 
    @Transient
-   private int[]                 segmentSerie_Time_Break;
+   private int[]              segmentSerie_Time_Break;
    @Transient
-   private float[]               segmentSerie_Distance_Diff;
+   private float[]            segmentSerie_Distance_Diff;
 
    @Transient
-   private float[]               segmentSerie_Distance_Total;
+   private float[]            segmentSerie_Distance_Total;
    @Transient
-   public float[]                segmentSerie_Altitude_Diff;
+   public float[]             segmentSerie_Altitude_Diff;
    @Transient
-   public float[]                segmentSerie_Altitude_Diff_Computed;
+   public float[]             segmentSerie_Altitude_Diff_Computed;
    @Transient
-   public float[]                segmentSerie_Altitude_UpDown_Hour;
+   public float[]             segmentSerie_Altitude_UpDown_Hour;
    @Transient
-   public float                  segmentSerieTotal_Altitude_Down;
+   public float               segmentSerieTotal_Altitude_Down;
 
    @Transient
-   public float                  segmentSerieTotal_Altitude_Up;
+   public float               segmentSerieTotal_Altitude_Up;
    @Transient
-   public float[]                segmentSerie_Speed;
+   public float[]             segmentSerie_Speed;
    @Transient
-   public float[]                segmentSerie_Cadence;
+   public float[]             segmentSerie_Cadence;
    @Transient
-   public float[]                segmentSerie_Pace;
+   public float[]             segmentSerie_Pace;
    @Transient
-   public float[]                segmentSerie_Pace_Diff;
+   public float[]             segmentSerie_Pace_Diff;
    @Transient
-   public float[]                segmentSerie_Power;
+   public float[]             segmentSerie_Power;
    @Transient
-   public float[]                segmentSerie_Gradient;
+   public float[]             segmentSerie_Gradient;
 
    @Transient
-   public float[]                segmentSerie_Pulse;
+   public float[]             segmentSerie_Pulse;
 
    /**
     * Keep original import file path, this is used when the tour file should be deleted.
     */
    @Transient
-   public String                 importFilePathOriginal;
+   public String              importFilePathOriginal;
 
    /**
     * Latitude for the center position in the map or {@link Double#MIN_VALUE} when the position is
     * not set
     */
    @Transient
-   public double                  mapCenterPositionLatitude            = Double.MIN_VALUE;
+   public double              mapCenterPositionLatitude            = Double.MIN_VALUE;
 
    /**
     * Longitude for the center position in the map or {@link Double#MIN_VALUE} when the position is
     * not set
     */
    @Transient
-   public double                  mapCenterPositionLongitude            = Double.MIN_VALUE;
+   public double              mapCenterPositionLongitude            = Double.MIN_VALUE;
 
    /**
     * Zoomlevel in the map
     */
    @Transient
-   public int                     mapZoomLevel;
+   public int                 mapZoomLevel;
 
    /**
     * caches the world positions for the tour lat/long values for each zoom level
     */
    @Transient
-   private final TIntObjectHashMap<Point[]>                  _tourWorldPosition   = new TIntObjectHashMap<>();
+   private final TIntObjectHashMap<Point[]>                    _tourWorldPosition   = new TIntObjectHashMap<>();
 
    /**
     * caches the world positions for the way point lat/long values for each zoom level
@@ -1215,45 +1217,45 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * tour cannot be saved again, it must be reloaded from the file system
     */
    @Transient
-   public boolean               isTourDeleted   = false;
+   public boolean             isTourDeleted   = false;
 
    /**
     * 2nd data serie, this is used in the {@link ChartLayer2ndAltiSerie} to display the merged tour
     * or the adjusted altitude
     */
    @Transient
-   public float[]               dataSerie2ndAlti;
+   public float[]             dataSerie2ndAlti;
 
    /**
     * altitude difference between this tour and the merge tour with metric measurement
     */
    @Transient
-   public float[]               dataSerieDiffTo2ndAlti;
+   public float[]             dataSerieDiffTo2ndAlti;
 
    /**
     * contains the altitude serie which is adjusted
     */
    @Transient
-   public float[]               dataSerieAdjustedAlti;
+   public float[]             dataSerieAdjustedAlti;
 
    /**
     * contains special data points
     */
    @Transient
-   public SplineData            splineDataPoints;
+   public SplineData          splineDataPoints;
 
    /**
     * Contains a spline data serie
     */
    @Transient
-   public float[]               dataSerieSpline;
+   public float[]             dataSerieSpline;
 
    /**
     * when a tour is not saved, the tour id is not defined, therefore the tour data are provided
     * from the import view when tours are merged to display the merge layer
     */
    @Transient
-   private TourData            _mergeSourceTourData;
+   private TourData           _mergeSourceTourData;
 
    @Transient
    private ZonedDateTime      _dateTimeCreated;
@@ -1307,28 +1309,28 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     */
    @Transient
-   public boolean               isHistoryTour;
+   public boolean             isHistoryTour;
 
    /**
     * Time serie for history dates, {@link Long} is used instead of {@link Integer} which is used
     * in {@link #timeSerie} but has a limit of about 67 years {@link Integer#MAX_VALUE}.
     */
    @Transient
-   public long[]               timeSerieHistory;
+   public long[]              timeSerieHistory;
 
    /**
     * Time in double precicion that x-axis values are displayed at the correct position, this is
     * not the case when max chart pixels is 1'000'000'000 with floating point.
     */
    @Transient
-   private double[]            timeSerieHistoryDouble;
+   private double[]           timeSerieHistoryDouble;
 
    /**
     * Contains adjusted time serie when tour is overlapping 1. April 1893. There was a time shift
     * of 6:32 minutes when CET (Central European Time) was born.
     */
    @Transient
-   private double[]            timeSerieWithTimeZoneAdjustment;
+   private double[]           timeSerieWithTimeZoneAdjustment;
 
    /**
     * {@link TourData} contains multiple tours or a virtual tour. It is created when multiple tours
@@ -1341,7 +1343,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Contains the tour id's
     */
    @Transient
-   public Long[]               multipleTourIds;
+   public Long[]              multipleTourIds;
 
    /**
     * Contains the tour start index in the data series for each tour.
@@ -1353,7 +1355,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Contains the tour start time for each tour.
     */
    @Transient
-   public long[]               multipleTourStartTime;
+   public long[]              multipleTourStartTime;
 
    /**
     * Contains tour titles for each tour.
@@ -1376,10 +1378,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public ArrayList<TourMarker>   multiTourMarkers;
 
    @Transient
-   public boolean               multipleTour_IsCadenceRpm;
+   public boolean             multipleTour_IsCadenceRpm;
 
    @Transient
-   public boolean               multipleTour_IsCadenceSpm;
+   public boolean             multipleTour_IsCadenceSpm;
 
    /**
     * Contains the swim start index in the swim data series for each tour.
@@ -1391,7 +1393,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * A value is <code>true</code> when cadence is 0.
     */
    @Transient
-   private boolean[]            _cadenceGaps;
+   private boolean[]          _cadenceGaps;
 
    /**
     * Contains the cadence data serie when the {@link #cadenceMultiplier} != 1.0;
@@ -1410,14 +1412,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Is <code>true</code> when tour file is deleted in the device and in the backup folder.
     */
    @Transient
-   public boolean               isTourFileDeleted;
+   public boolean             isTourFileDeleted;
 
    /**
     * Is <code>true</code> when the tour file is deleted in the device folder but is kept in the
     * backup folder.
     */
    @Transient
-   public boolean               isTourFileMoved;
+   public boolean             isTourFileMoved;
 
    /**
     * Is <code>true</code> when the tour import file existed in the backup folder and not in the
@@ -1426,7 +1428,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * <b>THIS FILE SHOULD NOT BE DELETED.</b>
     */
    @Transient
-   public boolean               isBackupImportFile;
+   public boolean             isBackupImportFile;
    /*
     * Running dynamics data
     *
@@ -1444,35 +1446,34 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @since Version 18.7
     */
-// SET_FORMATTING_ON
    @Transient
-   public short[]  runDyn_StanceTime;
+   public short[]       runDyn_StanceTime;
 
    @Transient
-   private float[] _runDyn_StanceTime_UI;
+   private float[]      _runDyn_StanceTime_UI;
    @Transient
-   public short[]  runDyn_StanceTimeBalance;
+   public short[]       runDyn_StanceTimeBalance;
 
    @Transient
-   private float[] _runDyn_StanceTimeBalance_UI;
+   private float[]      _runDyn_StanceTimeBalance_UI;
    @Transient
-   public short[]  runDyn_StepLength;
+   public short[]       runDyn_StepLength;
    @Transient
-   private float[] _runDyn_StepLength_UI;
+   private float[]      _runDyn_StepLength_UI;
 
    @Transient
-   private float[] _runDyn_StepLength_UI_Imperial;
+   private float[]      _runDyn_StepLength_UI_Imperial;
    @Transient
-   public short[]  runDyn_VerticalOscillation;
+   public short[]       runDyn_VerticalOscillation;
    @Transient
-   private float[] _runDyn_VerticalOscillation_UI;
+   private float[]      _runDyn_VerticalOscillation_UI;
 
    @Transient
-   private float[] _runDyn_VerticalOscillation_UI_Imperial;
+   private float[]      _runDyn_VerticalOscillation_UI_Imperial;
    @Transient
-   public short[]  runDyn_VerticalRatio;
+   public short[]       runDyn_VerticalRatio;
    @Transient
-   private float[] _runDyn_VerticalRatio_UI;
+   private float[]      _runDyn_VerticalRatio_UI;
 
    /**
     * Swimming data has a different number of time slices than the other data series !!!
@@ -1485,55 +1486,55 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * {@link Short#MIN_VALUE} when value is not set.
     */
    @Transient
-   public int[]     swim_Time;
+   public int[]         swim_Time;
    /**
     * Swimming data: Activity is defined in {@link LengthType} e.g. active, idle. Contains
     * {@link Short#MIN_VALUE} when value is not set.
     */
    @Transient
-   public short[]   swim_LengthType;
+   public short[]       swim_LengthType;
 
    @Transient
-   private float[]  _swim_LengthType_UI;
+   private float[]      _swim_LengthType_UI;
    /**
     * Swimming data: Number of strokes. Contains {@link Short#MIN_VALUE} when value is not set.
     */
    @Transient
-   public short[]   swim_Strokes;
+   public short[]       swim_Strokes;
 
    @Transient
-   private float[]  _swim_Strokes_UI;
+   private float[]      _swim_Strokes_UI;
    /**
     * Swimming data: Stroke style is defined in {@link SwimStroke} e.g. freestyle, breaststroke...
     * Contains {@link Short#MIN_VALUE} when value is not set.
     */
    @Transient
-   public short[]   swim_StrokeStyle;
+   public short[]       swim_StrokeStyle;
 
    @Transient
-   private float[]  _swim_StrokeStyle_UI;
+   private float[]      _swim_StrokeStyle_UI;
    /**
     * Swimming data: Swimming cadence in strokes/min. Contains {@link Short#MIN_VALUE} when value is
     * not set.
     */
    @Transient
-   public short[]   swim_Cadence;
+   public short[]       swim_Cadence;
 
    @Transient
-   private float[]  _swim_Cadence_UI;
+   private float[]      _swim_Cadence_UI;
 
    /**
     * Is <code>true</code> when {@link #cadenceSerie} is computed from swimming cadence
     * {@link #swim_Cadence} values.
     */
    @Transient
-   public boolean   isSwimCadence;
+   public boolean       isSwimCadence;
 
    /**
     * Computed swim data serie
     */
    @Transient
-   private float[]  _swim_Swolf;
+   private float[]      _swim_Swolf;
 
    /**
     * When values are <code>true</code>, then the data are visible, otherwise they are hidden. This
@@ -1542,13 +1543,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * With <code>null</code>, it will be ignored and all data points are visible.
     */
    @Transient
-   public boolean[] visibleDataPointSerie;
+   public boolean[]     visibleDataPointSerie;
 
    /**
     *
     */
    @Transient
-   public boolean[] visiblePoints_ForSurfing;
+   public boolean[]     visiblePoints_ForSurfing;
+
+// SET_FORMATTING_ON
 
    public TourData() {}
 
@@ -1581,7 +1584,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       double mapMaxLongitude = 0;
 
       // get FIRST VALID latitude/longitude
-      boolean isGPS = false;
+      hasGeoData = false;
       if ((latitudeSerie != null) && (longitudeSerie != null)) {
 
          for (int timeIndex = 0; timeIndex < timeSerie.length; timeIndex++) {
@@ -1590,7 +1593,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
                mapMinLatitude = mapMaxLatitude = latitudeSerie[timeIndex] + 90;
                mapMinLongitude = mapMaxLongitude = longitudeSerie[timeIndex] + 180;
 
-               isGPS = true;
+               hasGeoData = true;
 
                break;
             }
@@ -1649,7 +1652,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             sumRunDyn_VerticalRatio += runDyn_VerticalRatio[serieIndex];
          }
 
-         if (isGPS) {
+         if (hasGeoData) {
 
             final double latitude = latitudeSerie[serieIndex];
             final double longitude = longitudeSerie[serieIndex];
@@ -1726,6 +1729,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          longitudeSerie = null;
          _rasterizedLatLon = null;
          geoGrid = null;
+         hasGeoData = false;
       }
 
       if (sumRunDyn_StanceTime == 0) {
@@ -7902,6 +7906,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return timeZoneId != null;
    }
 
+   public boolean hasGeoData() {
+      return hasGeoData;
+   }
+
    /**
     * @see java.lang.Object#hashCode()
     */
@@ -8253,6 +8261,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       if (speedSerie != null) {
          isSpeedSerieFromDevice = true;
       }
+
+      hasGeoData = latitudeSerie != null && latitudeSerie.length > 0;
 
       // running dynamics
       runDyn_StanceTime = serieData.runDyn_StanceTime;
@@ -8616,6 +8626,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       this.frontShiftCount = frontShifts;
       this.rearShiftCount = rearShifts;
+   }
+
+   public void setHasGeoData(final boolean hasGeoData) {
+      this.hasGeoData = hasGeoData;
    }
 
    /**
