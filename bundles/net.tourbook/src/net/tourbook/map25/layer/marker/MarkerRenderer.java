@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.map25.layer.marker;
 
-import java.awt.Rectangle;
-import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -819,51 +817,88 @@ public class MarkerRenderer extends BucketRenderer {
 			   textPainter.setStyle(Paint.Style.STROKE);
 			   textPainter.setColor(_fgColor);
 
-			   //fillRectangle has no painter
 			   final Paint fillPainter = CanvasAdapter.newPaint();
-			   fillPainter.setColor(_bgColor);
 			   fillPainter.setStyle(Paint.Style.FILL);
 
 			   String title = projItem.mapMarker.title;
+			   String subtitle = projItem.mapMarker.description;
+			   //System.out.println("***** subtitle: " +  subtitle + " and length: " + subtitle.length());
 
-			   int textwidth  = (int) textPainter.getTextWidth(title);
-			   int textheight = (int) textPainter.getTextHeight(title);
-			   //System.out.println("**** texthoehe in px: " + textheight);
+			   int margin = 3;
+			   int dist2symbol = 20;
+			   
+			   int titleWidth  = ((int) textPainter.getTextWidth(title) + 2 * margin);
+			   int titleHeight = ((int) textPainter.getTextHeight(title) + 2 * margin);
 
-			   int symbolWidth = markerSymbol.getBitmap().getWidth();
+            int symbolWidth = markerSymbol.getBitmap().getWidth();
 
-			   int margin = 20;
-			   int xSize = java.lang.Math.max(textwidth,symbolWidth) + margin;
-			   int ySize = textheight + symbolWidth + margin;
+            int subtitleWidth = 0;
+            int subtitleHeight = 0;
+            boolean hasSubtitle = false;
+			   if (subtitle.length()>1) {
+               if (subtitle.startsWith("#")){
+                  subtitle = subtitle.substring(1); // not the first # char
+                  subtitle = subtitle.split("\\R", 2)[0]; // only first line
+                  subtitleWidth  = ((int) textPainter.getTextWidth(subtitle)) + 2 * margin;
+                  subtitleHeight = ((int) textPainter.getTextHeight(subtitle)) + 2 * margin;
+                  hasSubtitle = true;
+               }
+			   }
+			   
+			   int xSize = java.lang.Math.max(titleWidth, subtitleWidth);
+			   xSize = java.lang.Math.max(xSize, symbolWidth);
 
-			   Bitmap bitmap = CanvasAdapter.newBitmap(xSize, ySize, 0);
-			   org.oscim.backend.canvas.Canvas textCanvas = CanvasAdapter.newCanvas();
+			   int ySize = titleHeight + symbolWidth + dist2symbol;
+
+			   Bitmap markerBitmap = CanvasAdapter.newBitmap(xSize, ySize, 0);
+			   org.oscim.backend.canvas.Canvas markerCanvas = CanvasAdapter.newCanvas();
 
 			   /*canvas.fillRectangle does not support a painter object
 			    * so i could not use transparent colors
-			    * as workaround i created a bitmap (fillbitmap) with the size of the textbox 
+			    * as workaround i created a bitmap with the size of the box 
 			    * this box i filled totally with an oversized filled circle
 			    * (Canvas.drawCircle does support a painter object)
 			    * */
 
-			   Bitmap fillBitmap = CanvasAdapter.newBitmap( xSize, textheight+5, 0);
-			   org.oscim.backend.canvas.Canvas fillCanvas = CanvasAdapter.newCanvas();
+			   Bitmap titleBitmap = CanvasAdapter.newBitmap( titleWidth + margin, titleHeight + margin, 0);
+			   org.oscim.backend.canvas.Canvas titleCanvas = CanvasAdapter.newCanvas();
 
-			   textCanvas.setBitmap(bitmap);
-			   fillCanvas.setBitmap(fillBitmap);		   
+			   markerCanvas.setBitmap(markerBitmap);
+			   
+			   { // testing block
+			   /*
+			    * the following two lines displaying a transparent box.
+			    * only for testing purposes, normaly uncommented
+			    */
+			   //fillPainter.setColor(0x40ffffff);
+			   //markerCanvas.drawCircle(0, 0, xSize*2, fillPainter);
+			   }
+			   
+			   fillPainter.setColor(_bgColor);
+			   titleCanvas.setBitmap(titleBitmap);	
 
-			   //textCanvas.fillRectangle(0, 0, xSize, textheight+5, _bgColor);
-			   fillCanvas.drawCircle(0, 0, xSize, fillPainter);
+			   //titleCanvas.fillRectangle(0, 0, xSize, textheight+5, _bgColor); //wont work with painter, so no transparency
+			   titleCanvas.drawCircle(0, 0, xSize*2, fillPainter);
 
-			   fillCanvas.drawText(title, margin/2, textheight, textPainter);
+			   titleCanvas.drawText(title, margin, titleHeight - margin , textPainter);
 
-			   textCanvas.drawBitmap(fillBitmap, 0, 0);
-			   textCanvas.drawBitmap(markerSymbol.getBitmap(), xSize/2-(symbolWidth/2), ySize/2-(symbolWidth/2));
-			   //textCanvas.drawCircle(xSize/2, ySize/2, 10, textPainter);
-			   //textCanvas.drawText(title, margin/2, textheight, textPainter);
+
+			   if (hasSubtitle) {
+	            Bitmap subtitleBitmap = CanvasAdapter.newBitmap( subtitleWidth + margin, subtitleHeight + margin, 0);
+	            org.oscim.backend.canvas.Canvas subtitleCanvas = CanvasAdapter.newCanvas();
+	            subtitleCanvas.setBitmap(subtitleBitmap); 
+	            subtitleCanvas.drawCircle(0, 0, xSize*2, fillPainter);
+	            subtitleCanvas.drawText(subtitle, margin, titleHeight - margin, textPainter);
+	            markerCanvas.drawBitmap(subtitleBitmap, xSize/2-(subtitleWidth/2), ySize - (subtitleHeight + margin));
+			   } else {
+			      ;
+			   }
+			   
+			   markerCanvas.drawBitmap(titleBitmap, xSize/2-(titleWidth/2), 0);
+			   markerCanvas.drawBitmap(markerSymbol.getBitmap(), xSize/2-(symbolWidth/2), ySize/2-(symbolWidth/2));
 
 			   //mapSymbol.set(projItem.mapX, projItem.mapY, markerSymbol.getBitmap(), markerSymbol.mBillboard);
-			   mapSymbol.set(projItem.mapX, projItem.mapY, bitmap, markerSymbol.mBillboard);
+			   mapSymbol.set(projItem.mapX, projItem.mapY, markerBitmap, markerSymbol.mBillboard);
 			   mapSymbol.offset = markerSymbol.getHotspot();
 			   mapSymbol.billboard = markerSymbol.isBillboard();
 			}
