@@ -54,6 +54,24 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
+import net.tourbook.common.map.GeoPosition;
+import net.tourbook.common.util.HoveredAreaContext;
+import net.tourbook.common.util.IToolTipHideListener;
+import net.tourbook.common.util.IToolTipProvider;
+import net.tourbook.common.util.ITourToolTipProvider;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.TourToolTip;
+import net.tourbook.common.util.Util;
+import net.tourbook.data.TourWayPoint;
+import net.tourbook.map2.view.WayPointToolTipProvider;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.filter.geo.TourGeoFilterItem;
+import net.tourbook.ui.IInfoToolTipProvider;
+import net.tourbook.ui.IMapToolTipProvider;
+import net.tourbook.ui.MTRectangle;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
@@ -105,24 +123,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
-import net.tourbook.common.map.GeoPosition;
-import net.tourbook.common.util.HoveredAreaContext;
-import net.tourbook.common.util.IToolTipHideListener;
-import net.tourbook.common.util.IToolTipProvider;
-import net.tourbook.common.util.ITourToolTipProvider;
-import net.tourbook.common.util.StatusUtil;
-import net.tourbook.common.util.TourToolTip;
-import net.tourbook.common.util.Util;
-import net.tourbook.data.TourWayPoint;
-import net.tourbook.map2.view.WayPointToolTipProvider;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.filter.geo.TourGeoFilterItem;
-import net.tourbook.ui.IInfoToolTipProvider;
-import net.tourbook.ui.IMapToolTipProvider;
-import net.tourbook.ui.MTRectangle;
 
 @SuppressWarnings("deprecation")
 public class Map extends Canvas {
@@ -2617,16 +2617,14 @@ public class Map extends Canvas {
        * Draw geo grid
        */
 
-      if (_geoGridPixelSizeX < 3 || _geoGridPixelSizeY < 6) {
+      paint_Grid_Rectangle(gc, _grid_WorldMouse_Start, _grid_WorldMouse_End, false);
 
-         // geo grid has almost the same rectangle as the selected area
+      final int width = _grid_SelectedPosition_Geo_2_E2.x - _grid_SelectedPosition_Geo_1_E2.x;
+      final int height = _grid_SelectedPosition_Geo_1_E2.y - _grid_SelectedPosition_Geo_2_E2.y;
 
-      } else {
+      final int numGeoParts = width * height;
 
-         final int numGridRectangle = paint_Grid_Rectangle(gc, _grid_WorldMouse_Start, _grid_WorldMouse_End, false);
-
-         paint_Grid_Info(gc, numGridRectangle);
-      }
+      paint_Grid_Info(gc, numGeoParts);
 
       /*
        * draw selected area box
@@ -2729,10 +2727,10 @@ public class Map extends Canvas {
     *           selecting grid
     * @return Returns number of grid rectangles
     */
-   private int paint_Grid_Rectangle(final GC gc,
-                                    final Point worldStart,
-                                    final Point worldEnd,
-                                    final boolean isPaintLastGridSelection) {
+   private void paint_Grid_Rectangle(final GC gc,
+                                     final Point worldStart,
+                                     final Point worldEnd,
+                                     final boolean isPaintLastGridSelection) {
 
       final int worldStartX = worldStart.x;
       final int worldStartY = worldStart.y;
@@ -3023,21 +3021,12 @@ public class Map extends Canvas {
 //
 //// TODO remove SYSTEM.OUT.PRINTLN
 
-      final int width = devGrid_X2 - devGrid_X1;
-      final int height = devGrid_Y2 - devGrid_Y1;
+      int width = devGrid_X2 - devGrid_X1;
+      int height = devGrid_Y2 - devGrid_Y1;
 
-      final double numX = width / _geoGridPixelSizeX;
-      final double numY = height / _geoGridPixelSizeY;
-
-      final int numGridRectangle = (int) Math.round(numX * numY);
-
-//      if (width < 3 || height < 6) {
-//
-//         // geo grid has almost the same rectangle as the selected area
-//
-//      } else {
-//
-//      }
+      // ensure it is visible
+      width = Math.max(1, width);
+      height = Math.max(1, height);
 
       // draw geo grid
       final Color gridColor = isPaintLastGridSelection
@@ -3048,8 +3037,6 @@ public class Map extends Canvas {
       gc.setLineWidth(2);
       gc.setForeground(gridColor);
       gc.drawRectangle(devGrid_X1, devGrid_Y1, width, height);
-
-      return numGridRectangle;
    }
 
    private void paint_OfflineArea(final GC gc) {

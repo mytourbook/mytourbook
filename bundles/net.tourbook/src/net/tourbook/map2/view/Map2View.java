@@ -37,44 +37,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.eclipse.e4.ui.di.PersistState;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.dialogs.MessageDialogWithToggle;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.PreferenceConverter;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.window.Window;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.PaletteData;
-import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.ui.IPartListener2;
-import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchPartReference;
-import org.eclipse.ui.part.ViewPart;
-import org.oscim.core.MapPosition;
-
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
@@ -174,6 +136,44 @@ import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 import net.tourbook.ui.views.tourSegmenter.SelectedTourSegmenterSegments;
+
+import org.eclipse.e4.ui.di.PersistState;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceConverter;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.window.Window;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.PaletteData;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.part.ViewPart;
+import org.oscim.core.MapPosition;
 
 /**
  * @author Wolfgang Schramm
@@ -379,7 +379,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
    private MapGraphId                    _tourColorId;
    private int                           _hashTourId;
-   private int                           _hashTourData;
+   private int                           _hashAllTourData;
    private long                          _hashTourOverlayKey;
 
    private int                           _hashAllPhotos;
@@ -2701,7 +2701,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
        */
       final int tourIdsHashCode = tourIdList.hashCode();
       final int allToursHashCode = _allTourData.hashCode();
-      if (tourIdsHashCode == _hashTourId && allToursHashCode == _hashTourData) {
+      if (tourIdsHashCode == _hashTourId && allToursHashCode == _hashAllTourData) {
          return;
       }
 
@@ -2717,14 +2717,14 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
       long newOverlayKey = _hashTourOverlayKey;
 
-      if (tourIdList.hashCode() != _hashTourId || _allTourData.hashCode() != _hashTourData) {
+      if (tourIdList.hashCode() != _hashTourId || _allTourData.hashCode() != _hashAllTourData) {
 
          // tour data needs to be loaded
 
          newOverlayKey = TourManager.loadTourData(tourIdList, _allTourData, true);
 
          _hashTourId = tourIdList.hashCode();
-         _hashTourData = _allTourData.hashCode();
+         _hashAllTourData = _allTourData.hashCode();
          _hashTourOverlayKey = newOverlayKey;
       }
 
@@ -3582,6 +3582,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
                _allTourData.clear();
                _allTourData.addAll(tourDataList);
+               _hashAllTourData = _allTourData.hashCode();
 
                paintTours_10_All();
             }
@@ -3716,6 +3717,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
          _allTourData.clear();
          _allTourData.add(tourData);
+         _hashAllTourData = _allTourData.hashCode();
 
          paintTours_10_All();
       }

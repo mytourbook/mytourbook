@@ -21,6 +21,7 @@ import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.tooltip.SlideoutLocation;
 import net.tourbook.tour.filter.ActionToolbarSlideoutAdv;
 import net.tourbook.tour.filter.geo.SlideoutTourGeoFilter;
+import net.tourbook.tour.filter.geo.TourGeoFilterItem;
 import net.tourbook.tour.filter.geo.TourGeoFilterManager;
 
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -60,7 +61,7 @@ public class ActionTourGeoFilter extends ActionToolbarSlideoutAdv {
       TourGeoFilterManager.setFilterEnabled(getSelection());
    }
 
-   public void showSlideout() {
+   public void showSlideout(final TourGeoFilterItem selectedFilter) {
 
       // open immediately
       _slideoutTourGeoFilter.open(false);
@@ -70,7 +71,7 @@ public class ActionTourGeoFilter extends ActionToolbarSlideoutAdv {
          @Override
          public void run() {
 
-            _slideoutTourGeoFilter.refreshViewer();
+            _slideoutTourGeoFilter.refreshViewer(selectedFilter);
          }
       });
    }

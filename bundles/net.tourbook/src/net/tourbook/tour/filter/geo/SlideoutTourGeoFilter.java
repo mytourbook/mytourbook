@@ -117,6 +117,8 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
    private Button         _rdoGeoParts_Exclude;
    private Button         _rdoGeoParts_Include;
 
+   private Label          _lblGeoParts;
+
    private class CompareResultComparator extends ViewerComparator {
 
       private static final int ASCENDING       = 0;
@@ -450,9 +452,9 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
              * Radio: Search geo parts
              */
             // label
-            final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Slideout_TourGeoFilter_Label_FilterIncludeExclude);
-            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
+            _lblGeoParts = new Label(container, SWT.NONE);
+            _lblGeoParts.setText(Messages.Slideout_TourGeoFilter_Label_FilterIncludeExclude);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(_lblGeoParts);
 
             final Composite radioContainer = new Composite(container, SWT.NONE);
             GridDataFactory.fillDefaults().grab(true, false).applyTo(radioContainer);
@@ -564,6 +566,7 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
          }
       });
    }
+
    /**
     * Column: Zoomlevel
     */
@@ -708,6 +711,9 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
 
       _btnDeleteGeoFilter.setEnabled(isFilterSelected);
       _btnDeleteGeoFilterAll.setEnabled(_allGeoFilter.size() > 0);
+
+      _rdoGeoParts_Exclude.setEnabled(isFilterSelected);
+      _rdoGeoParts_Include.setEnabled(isFilterSelected);
    }
 
    @Override
@@ -869,9 +875,7 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
 
    private void onGeoFilter_Delete_All() {
 
-      final Object filterItem = _geoFilterViewer.getStructuredSelection().getFirstElement();
-
-      if (filterItem == null) {
+      if (_allGeoFilter.size() == 0) {
          return;
       }
 
@@ -939,9 +943,12 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
       return _geoFilterViewer;
    }
 
-   public void refreshViewer() {
+   public void refreshViewer(final TourGeoFilterItem selectedFilter) {
 
       _geoFilterViewer.refresh();
+
+      _geoFilterViewer.setSelection(new StructuredSelection(selectedFilter), true);
+      _geoFilterViewer.getTable().showSelection();
    }
 
    @Override
@@ -958,6 +965,22 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
             TourGeoFilterManager.STATE_IS_INCLUDE_GEO_PARTS_DEFAULT);
       _rdoGeoParts_Include.setSelection(isIncludeGeoParts);
       _rdoGeoParts_Exclude.setSelection(isIncludeGeoParts == false);
+
+      // reselect filter item
+      final String selectedFilterId = Util.getStateString(_state, TourGeoFilterManager.STATE_SELECTED_GEO_FILTER_ID, null);
+      if (selectedFilterId != null) {
+
+         for (final TourGeoFilterItem tourGeoFilterItem : _allGeoFilter) {
+
+            if (tourGeoFilterItem.id.equals(selectedFilterId)) {
+
+               _geoFilterViewer.setSelection(new StructuredSelection(tourGeoFilterItem), true);
+               _geoFilterViewer.getTable().showSelection();
+
+               break;
+            }
+         }
+      }
    }
 
    private void restoreState_BeforeUI() {
@@ -973,6 +996,10 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
 
    @Override
    protected void saveState() {
+
+      if (_selectedFilter != null) {
+         _state.put(TourGeoFilterManager.STATE_SELECTED_GEO_FILTER_ID, _selectedFilter.id);
+      }
 
       // viewer columns
       _state.put(TourGeoFilterManager.STATE_SORT_COLUMN_ID, _geoPartComparator.__sortColumnId);
@@ -1002,8 +1029,23 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
 //      _isInUpdate = true;
       {
          _geoFilterViewer.setSelection(selection, true);
-
          _geoFilterViewer.getTable().showSelection();
+
+//       // focus can have changed when resorted, set focus to the selected item
+//       int selectedIndex = 0;
+//       final Table table = _geoFilterViewer.getTable();
+//       final TableItem[] items = table.getItems();
+//       for (int itemIndex = 0; itemIndex < items.length; itemIndex++) {
+//
+//          final TableItem tableItem = items[itemIndex];
+//
+//          if (tableItem.getData() == selectedProfile) {
+//             selectedIndex = itemIndex;
+//          }
+//       }
+//       table.setSelection(selectedIndex);
+//       table.showSelection();
+
       }
 //      _isInUpdate = false;
    }

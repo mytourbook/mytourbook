@@ -53,9 +53,9 @@ public class TourGeoFilterManager {
    private static final IDialogSettings        _state                             = TourbookPlugin.getState("TourGeoFilter"); //$NON-NLS-1$
    private static final IPath                  _stateLocation                     = Platform.getStateLocation(_bundle);
 
+   public static final String                  STATE_SELECTED_GEO_FILTER_ID       = "STATE_SELECTED_GEO_FILTER_ID";           //$NON-NLS-1$
    static final String                         STATE_IS_INCLUDE_GEO_PARTS         = "STATE_IS_INCLUDE_GEO_PARTS";             //$NON-NLS-1$
    static final boolean                        STATE_IS_INCLUDE_GEO_PARTS_DEFAULT = true;
-
    static final String                         STATE_SORT_COLUMN_DIRECTION        = "STATE_SORT_COLUMN_DIRECTION";            //$NON-NLS-1$
    static final String                         STATE_SORT_COLUMN_ID               = "STATE_SORT_COLUMN_ID";                   //$NON-NLS-1$
 
@@ -67,6 +67,7 @@ public class TourGeoFilterManager {
 
    private static final String                 ATTR_ACTIVE_GEO_FILTER_ID          = "activeGeoFilterId";                      //$NON-NLS-1$
    private static final String                 ATTR_CREATED                       = "created";                                //$NON-NLS-1$
+   private static final String                 ATTR_GEO_FILTER_ID                 = "geoFilterId";                            //$NON-NLS-1$
    private static final String                 ATTR_GEO_PARTS                     = "geoParts";                               //$NON-NLS-1$
    private static final String                 ATTR_MAP_GEO_CENTER_LATITUDE       = "mapGeoCenterLatitude";                   //$NON-NLS-1$
    private static final String                 ATTR_MAP_GEO_CENTER_LONGITUDE      = "mapGeoCenterLongitude";                  //$NON-NLS-1$
@@ -233,7 +234,7 @@ public class TourGeoFilterManager {
 
       final char NL = UI.NEW_LINE;
 
-      final String selectAllTourIds = "SELECT" + NL //                     //$NON-NLS-1$
+      final String selectAllTourIds = "SELECT" + NL //                  //$NON-NLS-1$
 
             + " DISTINCT TourId " + NL //                               //$NON-NLS-1$
 
@@ -242,15 +243,11 @@ public class TourGeoFilterManager {
       ;
 
       // include or exclude geo parts
-      final String sqlIncludeExcludeGeoParts = isIncludeGeoParts ? UI.EMPTY_STRING : "NOT";
+      final String sqlIncludeExcludeGeoParts = isIncludeGeoParts ? UI.EMPTY_STRING : "NOT"; //$NON-NLS-1$
 
-      sqlWhere.append(" AND TourId " + sqlIncludeExcludeGeoParts + " IN (" + selectAllTourIds + ") ");
-
-      System.out.println((UI.timeStampNano() + " [" + "] ()")
-            + ("\tsqlWhere: " + sqlWhere)
-//            + ("\t: " + )
-      );
-// TODO remove SYSTEM.OUT.PRINTLN
+      sqlWhere.append("" //$NON-NLS-1$
+            + " AND HasGeoData" + NL //$NON-NLS-1$
+            + " AND TourId " + sqlIncludeExcludeGeoParts + " IN (" + selectAllTourIds + ") "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
       final SQLFilterData tourFilterSQLData = new SQLFilterData(sqlWhere.toString(), sqlParameters);
 
@@ -324,7 +321,7 @@ public class TourGeoFilterManager {
       _actionTourGeoFilter.setSelection(true);
 
       // show the slideout with the new geo filter
-      _actionTourGeoFilter.showSlideout();
+      _actionTourGeoFilter.showSlideout(_selectedFilter);
 
       // set selection state
       _isGeoFilterEnabled = true;
@@ -370,6 +367,12 @@ public class TourGeoFilterManager {
                if (TAG_GEO_FILTER.equals(xmlGeoFilter.getType())) {
 
                   final TourGeoFilterItem geoFilter = new TourGeoFilterItem();
+
+                  // id
+                  final String filterId = Util.getXmlString(xmlGeoFilter, ATTR_GEO_FILTER_ID, null);
+                  if (filterId != null) {
+                     geoFilter.id = filterId;
+                  }
 
                   geoFilter.created = Util.getXmlDateTime(xmlGeoFilter, ATTR_CREATED, TimeTools.now());
                   geoFilter.createdMS = TimeTools.toEpochMilli(geoFilter.created);
@@ -424,6 +427,8 @@ public class TourGeoFilterManager {
          for (final TourGeoFilterItem geoFilter : _allTourGeoFilter) {
 
             final IMemento xmlFilter = xmlRoot.createChild(TAG_GEO_FILTER);
+
+            xmlFilter.putString(ATTR_GEO_FILTER_ID, geoFilter.id);
 
             xmlFilter.putString(ATTR_CREATED, geoFilter.created.toString());
             xmlFilter.putInteger(ATTR_GEO_PARTS, geoFilter.numGeoParts);
