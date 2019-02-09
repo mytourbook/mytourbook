@@ -1226,6 +1226,9 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 		tbm.add(_actionTourColorGradient);
 		tbm.add(_actionTourColorHrZone);
 		tbm.add(new Separator());
+		
+      tbm.add(_actionMapBookmarks);	
+      tbm.add(new Separator());
 
 		tbm.add(_actionShowTourInMap);
 		tbm.add(_actionShowEntireTour);
@@ -1235,7 +1238,6 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 		tbm.add(new Separator());
 
 		tbm.add(_actionShowMarker);
-		tbm.add(_actionMapBookmarks);
 		tbm.add(_actionShowMap3Layer);
 
 		/*

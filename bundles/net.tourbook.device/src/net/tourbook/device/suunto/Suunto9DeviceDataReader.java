@@ -89,7 +89,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		}
 
 		String jsonFileContent =
-				GetJsonContentFromGZipFile(importFilePath);
+				GetJsonContentFromGZipFile(importFilePath, false);
 
 		// At this point, we know that the given file is a valid JSON file.
 		// But to avoid for invalid activities to be parsed by other 
@@ -103,7 +103,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
 	@Override
 	public boolean validateRawData(final String fileName) {
-		String jsonFileContent = GetJsonContentFromGZipFile(fileName);
+		String jsonFileContent = GetJsonContentFromGZipFile(fileName, true);
 		return isValidJSONFile(jsonFileContent);
 	}
 
@@ -204,9 +204,10 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 	 * 
 	 * @param gzipFilePath
 	 *           The absolute file path of the Suunto file.
+	 * @param isValidatingFile 
 	 * @return Returns the JSON content.
 	 */
-	private String GetJsonContentFromGZipFile(String gzipFilePath) {
+	private String GetJsonContentFromGZipFile(String gzipFilePath, boolean isValidatingFile) {
 		String jsonFileContent = null;
 		try {
 			GZIPInputStream gzip = new GZIPInputStream(new FileInputStream(gzipFilePath));
@@ -219,7 +220,18 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 			gzip.close();
 
 		} catch (IOException e) {
-			StatusUtil.log(e);
+
+         if (isValidatingFile) {
+            
+            /*
+             * Log only when reading the zip file, during a validation, an exception can be very
+             * likely and should not be displayed
+             */
+            
+         } else {
+            StatusUtil.log(e);
+         }
+         
 			return ""; //$NON-NLS-1$
 		}
 

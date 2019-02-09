@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook.ext.jars"
       label="Feature for external jar files"
-      version="18.13.0.qualifier"
+      version="18.13.1.qualifier"
       provider-name="MyTourbook"
       plugin="net.tourbook.branding">
 
