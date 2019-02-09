@@ -6557,7 +6557,7 @@ public class TourDatabase {
    }
 
    /**
-    * Set lat/lon min/max values
+    * Set geo parts
     *
     * @param conn
     * @param monitor
@@ -6759,7 +6759,7 @@ public class TourDatabase {
    }
 
    /**
-    * Set lat/lon min/max values
+    * Set hasGeoData
     *
     * @param conn
     * @param monitor
@@ -6780,6 +6780,16 @@ public class TourDatabase {
       try {
 
          long lastUpdateTime = startTime;
+
+         final PreparedStatement stmtUpdate = conn.prepareStatement( //
+
+               "UPDATE " + TABLE_TOUR_DATA //         //$NON-NLS-1$
+
+                     + " SET" //                      //$NON-NLS-1$
+
+                     + " HasGeoData=?" //             // 1 //$NON-NLS-1$
+
+                     + " WHERE tourId=?"); //         //$NON-NLS-1$
 
          // loop: all tours
          for (final Long tourId : allTours) {
@@ -6807,11 +6817,13 @@ public class TourDatabase {
 
             final TourData tourData = em.find(TourData.class, tourId);
 
+            // set hasGeoData flag when lat/lon is available
             if (tourData != null && tourData.latitudeSerie != null && tourData.latitudeSerie.length > 0) {
 
-               tourData.setHasGeoData(true);
+               stmtUpdate.setBoolean(1, true);
+               stmtUpdate.setLong(2, tourId);
 
-               TourDatabase.saveEntity(tourData, tourId, TourData.class);
+               stmtUpdate.executeUpdate();
             }
          }
 
