@@ -26,4 +26,5 @@ Bugfix
     Fixed NPE when a lap has not an absolute time, this occured with files from Sigma-ROX 12.0
     
   - gpx
-   "Convert waypoints into tour markers" did not work 
+    - "Convert waypoints into tour markers" did not work
+    - Set correct marker position when waypoint is converted into tour marker 

@@ -67,11 +67,6 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.widgets.Display;
-import org.hibernate.annotations.Cascade;
-
 import net.tourbook.Messages;
 import net.tourbook.algorithm.DPPoint;
 import net.tourbook.algorithm.DouglasPeuckerSimplifier;
@@ -107,6 +102,11 @@ import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.ISmoothingAlgorithm;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
+
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.widgets.Display;
+import org.hibernate.annotations.Cascade;
 
 /**
  * Tour data contains all data for a tour (except markers), an entity will be saved in the database
@@ -4569,70 +4569,90 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          return;
       }
 
-      final int timeDiffRange = 10_000;
+      // get a copy of the way points
+      final Set<TourWayPoint> remainingWayPoints = new HashSet<>();
+      remainingWayPoints.addAll(tourWayPoints);
 
       final ArrayList<TourWayPoint> removedWayPoints = new ArrayList<>();
 
-      for (final TourWayPoint wp : tourWayPoints) {
+      /**
+       * Approach waypoint time to the nearest time slice time
+       */
+      for (int timeDiffRange = 0; timeDiffRange < 10; timeDiffRange++) {
 
-         final long wpTime = wp.getTime();
-         final double wpLat = wp.getLatitude();
-         final double wpLon = wp.getLongitude();
+         final int timeDiffRangeMS = timeDiffRange * 1000;
 
-         for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
+         for (final TourWayPoint wp : remainingWayPoints) {
 
-            final int relativeTime = timeSerie[serieIndex];
-            final long tourTime = tourStartTime + relativeTime * 1000;
+            final long wpTime = wp.getTime();
+            final double wpLat = wp.getLatitude();
+            final double wpLon = wp.getLongitude();
 
-            long timeDiff = tourTime - wpTime;
-            if (timeDiff < 0) {
-               timeDiff = -timeDiff;
-            }
+            for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
 
-            if (timeDiff < timeDiffRange) {
+               final int relativeTime = timeSerie[serieIndex];
+               final long tourTime = tourStartTime + relativeTime * 1000;
 
-               final double tourLat = latitudeSerie[serieIndex];
-               final double tourLon = longitudeSerie[serieIndex];
-
-               double latDiff = tourLat - wpLat;
-               double lonDiff = tourLon - wpLon;
-
-               if (latDiff < 0) {
-                  latDiff = -latDiff;
-               }
-               if (lonDiff < 0) {
-                  lonDiff = -lonDiff;
+               // get absolute time diff
+               long timeDiff = tourTime - wpTime;
+               if (timeDiff < 0) {
+                  timeDiff = -timeDiff;
                }
 
-               if (latDiff < MAX_GEO_DIFF && lonDiff < MAX_GEO_DIFF) {
+               if (timeDiff <= timeDiffRangeMS) {
 
-                  // time and position is the same
+                  final double tourLat = latitudeSerie[serieIndex];
+                  final double tourLon = longitudeSerie[serieIndex];
 
-                  final TourMarker tourMarker = new TourMarker(this, ChartLabel.MARKER_TYPE_CUSTOM);
+                  double latDiff = tourLat - wpLat;
+                  double lonDiff = tourLon - wpLon;
 
-                  tourMarker.setSerieIndex(serieIndex);
-                  tourMarker.setTime(relativeTime, wpTime);
-
-                  tourMarker.setLatitude(wpLat);
-                  tourMarker.setLongitude(wpLon);
-
-                  tourMarker.setDescription(wp.getDescription());
-                  tourMarker.setLabel(wp.getName());
-
-                  tourMarker.setUrlAddress(wp.getUrlAddress());
-                  tourMarker.setUrlText(wp.getUrlText());
-
-                  final float altitude = wp.getAltitude();
-                  if (altitude != Float.MIN_VALUE) {
-                     tourMarker.setAltitude(altitude);
+                  if (latDiff < 0) {
+                     latDiff = -latDiff;
+                  }
+                  if (lonDiff < 0) {
+                     lonDiff = -lonDiff;
                   }
 
-                  tourMarkers.add(tourMarker);
-                  removedWayPoints.add(wp);
+                  if (latDiff < MAX_GEO_DIFF && lonDiff < MAX_GEO_DIFF) {
 
-                  break;
+                     // time and position is the same
+
+                     final TourMarker tourMarker = new TourMarker(this, ChartLabel.MARKER_TYPE_CUSTOM);
+
+                     tourMarker.setSerieIndex(serieIndex);
+                     tourMarker.setTime(relativeTime, wpTime);
+
+                     tourMarker.setLatitude(wpLat);
+                     tourMarker.setLongitude(wpLon);
+
+                     tourMarker.setDescription(wp.getDescription());
+                     tourMarker.setLabel(wp.getName());
+
+                     tourMarker.setUrlAddress(wp.getUrlAddress());
+                     tourMarker.setUrlText(wp.getUrlText());
+
+                     final float altitude = wp.getAltitude();
+                     if (altitude != Float.MIN_VALUE) {
+                        tourMarker.setAltitude(altitude);
+                     }
+
+                     tourMarkers.add(tourMarker);
+
+                     remainingWayPoints.remove(wp);
+                     removedWayPoints.add(wp);
+
+                     break;
+                  }
                }
             }
+         }
+
+         if (remainingWayPoints.size() == 0) {
+
+            // all waypoints are converted
+
+            break;
          }
       }
 
@@ -8951,7 +8971,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public void setSurfing_NumberOfEvents(final short surfing_NumberOfEvents) {
       this.surfing_NumberOfEvents = surfing_NumberOfEvents;
-    }
+   }
 
    public void setTimeSerieDouble(final double[] timeSerieDouble) {
       this.timeSerieDouble = timeSerieDouble;
