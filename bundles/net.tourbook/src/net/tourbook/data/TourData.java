@@ -7931,6 +7931,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
+    * @return Returns <code>true</code> when latitude/longitude data are available
+    */
+   /**
     * @see java.lang.Object#hashCode()
     */
    @Override

@@ -13,7 +13,12 @@ Translation
 
 
 Bugfix
-======   
+======
+
+* All Maps
+
+  - Fixed reselecting multiple tours, e.g. in Tour Book view, from only one selected tour, it did not redisplay multiple tours again. This bug is available since the beginning of selecting multiple tours
+
 
 * Tour Editor
 

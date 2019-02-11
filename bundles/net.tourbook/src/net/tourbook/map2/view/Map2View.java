@@ -378,11 +378,11 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
    private int                           _selectedProfileKey  = 0;
 
    private MapGraphId                    _tourColorId;
-   private int                           _hashTourId;
-   private int                           _hashAllTourData;
-   private long                          _hashTourOverlayKey;
-
-   private int                           _hashAllPhotos;
+   //
+   private int                           _hash_AllTourIds;
+   private int                           _hash_AllTourData;
+   private long                          _hash_TourOverlayKey;
+   private int                           _hash_AllPhotos;
 
    private final AtomicInteger           _asyncCounter        = new AtomicInteger();
 
@@ -2446,6 +2446,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
             _allTourData.add(refTourData);
             _allTourData.add(comparedTourData);
+            _hash_AllTourData = _allTourData.hashCode();
 
             paintTours_10_All();
 
@@ -2633,13 +2634,13 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
        */
 // DISABLED BECAUSE PHOTOS ARE NOT ALWAYS DISPLAYED
       final int allNewPhotoHash = allNewPhotos.hashCode();
-      if (allNewPhotoHash == _hashAllPhotos) {
+      if (allNewPhotoHash == _hash_AllPhotos) {
          return;
       }
 
       _allPhotos.clear();
       _allPhotos.addAll(allNewPhotos);
-      _hashAllPhotos = _allPhotos.hashCode();
+      _hash_AllPhotos = _allPhotos.hashCode();
 
       runPhotoFilter();
 
@@ -2694,14 +2695,14 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
       return allPhotos;
    }
 
-   private void paintTours(final ArrayList<Long> tourIdList) {
+   private void paintTours(final ArrayList<Long> allTourIds) {
 
       /*
        * TESTING if a map redraw can be avoided, 15.6.2015
        */
-      final int tourIdsHashCode = tourIdList.hashCode();
-      final int allToursHashCode = _allTourData.hashCode();
-      if (tourIdsHashCode == _hashTourId && allToursHashCode == _hashAllTourData) {
+      final int allTourIds_Hash = allTourIds.hashCode();
+      final int allTourData_Hash = _allTourData.hashCode();
+      if (allTourIds_Hash == _hash_AllTourIds && allTourData_Hash == _hash_AllTourData) {
          return;
       }
 
@@ -2715,17 +2716,17 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
       _map.setShowOverlays(_isShowTour || _isShowPhoto);
       _map.setShowLegend(_isShowTour && _isShowLegend);
 
-      long newOverlayKey = _hashTourOverlayKey;
+      long newOverlayKey = _hash_TourOverlayKey;
 
-      if (tourIdList.hashCode() != _hashTourId || _allTourData.hashCode() != _hashAllTourData) {
+      if (allTourIds.hashCode() != _hash_AllTourIds || _allTourData.hashCode() != _hash_AllTourData) {
 
          // tour data needs to be loaded
 
-         newOverlayKey = TourManager.loadTourData(tourIdList, _allTourData, true);
+         newOverlayKey = TourManager.loadTourData(allTourIds, _allTourData, true);
 
-         _hashTourId = tourIdList.hashCode();
-         _hashAllTourData = _allTourData.hashCode();
-         _hashTourOverlayKey = newOverlayKey;
+         _hash_AllTourIds = allTourIds.hashCode();
+         _hash_AllTourData = _allTourData.hashCode();
+         _hash_TourOverlayKey = newOverlayKey;
       }
 
       _tourPainterConfig.setTourData(_allTourData, _isShowTour);
@@ -2826,6 +2827,11 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
        */
       _allTourData.clear();
       _allTourData.add(tourData);
+      _hash_AllTourData = _allTourData.hashCode();
+
+      // reset also ALL tour id's, otherwiese a reselected multiple tour is not displayed
+      // it took some time to debug this issue !!!
+      _hash_AllTourIds = tourData.getTourId().hashCode();
 
       _tourInfoToolTipProvider.setTourDataList(_allTourData);
 
@@ -3582,7 +3588,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
                _allTourData.clear();
                _allTourData.addAll(tourDataList);
-               _hashAllTourData = _allTourData.hashCode();
+               _hash_AllTourData = _allTourData.hashCode();
 
                paintTours_10_All();
             }
@@ -3717,7 +3723,8 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
          _allTourData.clear();
          _allTourData.add(tourData);
-         _hashAllTourData = _allTourData.hashCode();
+         _hash_AllTourData = _allTourData.hashCode();
+         _hash_AllTourIds = tourData.getTourId().hashCode();
 
          paintTours_10_All();
       }
