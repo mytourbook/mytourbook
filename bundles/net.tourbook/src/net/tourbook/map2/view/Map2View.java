@@ -1087,6 +1087,12 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
                   _map.disposeTiles();
                   _map.paint();
                }
+
+            } else if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
+
+               // this can occure when tour geo filter color is modified
+
+               _map.paint();
             }
          }
       };

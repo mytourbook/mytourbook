@@ -21,6 +21,8 @@ import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
+import net.tourbook.common.color.ColorSelectorExtended;
+import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.util.ColumnDefinition;
@@ -38,6 +40,8 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -72,7 +76,7 @@ import org.eclipse.swt.widgets.Widget;
 /**
  * Slideout with the tour geo filters.
  */
-public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourViewer {
+public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourViewer, IColorSelectorListener {
 
    private static final String                COLUMN_CREATED_DATE_TIME = "createdDateTime";                     //$NON-NLS-1$
    private static final String                COLUMN_GEO_PARTS         = "geoParts";                            //$NON-NLS-1$
@@ -93,12 +97,11 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
 
    private ToolItem                           _tourFilterItem;
 
-//   private boolean                            _isInUpdate;
+   private SelectionAdapter                   _columnSortListener;
+   private IPropertyChangeListener            _defaultChangePropertyListener;
+   private SelectionAdapter                   _defaultSelectionListener;
 
-   private SelectionAdapter   _columnSortListener;
-   private SelectionAdapter   _defaultSelectionListener;
-
-   private final NumberFormat _nf2 = NumberFormat.getInstance();
+   private final NumberFormat                 _nf2                     = NumberFormat.getInstance();
    {
       _nf2.setMinimumFractionDigits(2);
       _nf2.setMaximumFractionDigits(2);
@@ -107,17 +110,19 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
    /*
     * UI controls
     */
-   private PixelConverter _pc;
+   private PixelConverter        _pc;
 
-   private Composite      _viewerContainer;
+   private Composite             _viewerContainer;
 
-   private Button         _btnDeleteGeoFilter;
-   private Button         _btnDeleteGeoFilterAll;
+   private Button                _btnDeleteGeoFilter;
+   private Button                _btnDeleteGeoFilterAll;
+   private Button                _rdoGeoParts_Exclude;
+   private Button                _rdoGeoParts_Include;
 
-   private Button         _rdoGeoParts_Exclude;
-   private Button         _rdoGeoParts_Include;
+   private Label                 _lblGeoParts_IncludeExclude;
 
-   private Label          _lblGeoParts;
+   private ColorSelectorExtended _colorGeoPart_HoverSelecting;
+   private ColorSelectorExtended _colorGeoPart_Selected;
 
    private class CompareResultComparator extends ViewerComparator {
 
@@ -239,6 +244,11 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
 
       setShellFadeOutDelaySteps(30);
       setTitleText(Messages.Slideout_TourGeoFilter_Label_Title);
+   }
+
+   @Override
+   public void colorDialogOpened(final boolean isAnotherDialogOpened) {
+      setIsAnotherDialogOpened(isAnotherDialogOpened);
    }
 
    @Override
@@ -444,7 +454,9 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
    private void createUI_400_Options(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().applyTo(container);
+      GridDataFactory.fillDefaults()
+            .indent(10, 0)
+            .applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
          {
@@ -452,9 +464,9 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
              * Radio: Search geo parts
              */
             // label
-            _lblGeoParts = new Label(container, SWT.NONE);
-            _lblGeoParts.setText(Messages.Slideout_TourGeoFilter_Label_FilterIncludeExclude);
-            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(_lblGeoParts);
+            _lblGeoParts_IncludeExclude = new Label(container, SWT.NONE);
+            _lblGeoParts_IncludeExclude.setText(Messages.Slideout_TourGeoFilter_Label_FilterIncludeExclude);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(_lblGeoParts_IncludeExclude);
 
             final Composite radioContainer = new Composite(container, SWT.NONE);
             GridDataFactory.fillDefaults().grab(true, false).applyTo(radioContainer);
@@ -470,6 +482,30 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
                _rdoGeoParts_Exclude.setText(Messages.Slideout_TourGeoFilter_Radio_GeoParts_Exclude);
                _rdoGeoParts_Exclude.addSelectionListener(_defaultSelectionListener);
             }
+         }
+         {
+            /*
+             * Color: Selected geo part
+             */
+            // label
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(Messages.Slideout_TourGeoFilter_Color_GeoParts_Selected);
+
+            // border color
+            _colorGeoPart_Selected = new ColorSelectorExtended(container);
+            _colorGeoPart_Selected.addListener(_defaultChangePropertyListener);
+         }
+         {
+            /*
+             * Color: Hover/selecting geo part
+             */
+            // label
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(Messages.Slideout_TourGeoFilter_Color_GeoParts_HoverSelecting);
+
+            // border color
+            _colorGeoPart_HoverSelecting = new ColorSelectorExtended(container);
+            _colorGeoPart_HoverSelecting.addListener(_defaultChangePropertyListener);
          }
       }
    }
@@ -782,6 +818,12 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
          }
       };
 
+      _defaultChangePropertyListener = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
+            onChangeUI();
+         }
+      };
 //      _defaultModifyListener = new ModifyListener() {
 //         @Override
 //         public void modifyText(final ModifyEvent e) {
@@ -966,6 +1008,14 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
       _rdoGeoParts_Include.setSelection(isIncludeGeoParts);
       _rdoGeoParts_Exclude.setSelection(isIncludeGeoParts == false);
 
+      // colors
+      _colorGeoPart_HoverSelecting.setColorValue(Util.getStateRGB(_state,
+            TourGeoFilterManager.STATE_RGB_GEO_PARTS_HOVER,
+            TourGeoFilterManager.STATE_RGB_GEO_PARTS_HOVER_DEFAULT));
+      _colorGeoPart_Selected.setColorValue(Util.getStateRGB(_state,
+            TourGeoFilterManager.STATE_RGB_GEO_PARTS_SELECTED,
+            TourGeoFilterManager.STATE_RGB_GEO_PARTS_SELECTED_DEFAULT));
+
       // reselect filter item
       final String selectedFilterId = Util.getStateString(_state, TourGeoFilterManager.STATE_SELECTED_GEO_FILTER_ID, null);
       if (selectedFilterId != null) {
@@ -1014,6 +1064,10 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
 
       // options
       _state.put(TourGeoFilterManager.STATE_IS_INCLUDE_GEO_PARTS, _rdoGeoParts_Include.getSelection());
+
+      // colors
+      Util.setState(_state, TourGeoFilterManager.STATE_RGB_GEO_PARTS_HOVER, _colorGeoPart_HoverSelecting.getColorValue());
+      Util.setState(_state, TourGeoFilterManager.STATE_RGB_GEO_PARTS_SELECTED, _colorGeoPart_Selected.getColorValue());
    }
 
    @Override

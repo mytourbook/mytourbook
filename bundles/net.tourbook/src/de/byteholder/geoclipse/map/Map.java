@@ -56,6 +56,7 @@ import java.util.regex.Pattern;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.color.ColorCacheSWT;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.util.HoveredAreaContext;
 import net.tourbook.common.util.IToolTipHideListener;
@@ -68,6 +69,7 @@ import net.tourbook.data.TourWayPoint;
 import net.tourbook.map2.view.WayPointToolTipProvider;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.filter.geo.TourGeoFilterItem;
+import net.tourbook.tour.filter.geo.TourGeoFilterManager;
 import net.tourbook.ui.IInfoToolTipProvider;
 import net.tourbook.ui.IMapToolTipProvider;
 import net.tourbook.ui.MTRectangle;
@@ -183,17 +185,17 @@ public class Map extends Canvas {
 //   private static final String      PATTERN_WIKI_POSITION_21               = "([0-9]*)_([0-9]*)_([NS])_([0-9]*)_([0-9]*)_([WE])_?(.*)";            //$NON-NLS-1$
 //   private static final String      PATTERN_WIKI_POSITION_22               = "([0-9]*)_([0-9]*)_([0-9]*)_([NS])_([0-9]*)_([0-9]*)_([0-9]*)_([WE])_?(.*)";   //$NON-NLS-1$
 
-   private static final String  PATTERN_WIKI_POSITION_D_D             = PATTERN_DOUBLE + ";"                                        //$NON-NLS-1$
+   private static final String        PATTERN_WIKI_POSITION_D_D             = PATTERN_DOUBLE + ";"                                        //$NON-NLS-1$
          + PATTERN_DOUBLE
          + PATTERN_END;
 
-   private static final String  PATTERN_WIKI_POSITION_D_N_D_E         = PATTERN_DOUBLE_SEP
+   private static final String        PATTERN_WIKI_POSITION_D_N_D_E         = PATTERN_DOUBLE_SEP
          + PATTERN_DIRECTION_NS
          + PATTERN_DOUBLE_SEP
          + PATTERN_DIRECTION_WE
          + PATTERN_END;
 
-   private static final String  PATTERN_WIKI_POSITION_D_M_N_D_M_E     = PATTERN_DOUBLE_SEP
+   private static final String        PATTERN_WIKI_POSITION_D_M_N_D_M_E     = PATTERN_DOUBLE_SEP
          + PATTERN_DOUBLE_SEP
          + PATTERN_DIRECTION_NS
          + PATTERN_DOUBLE_SEP
@@ -201,7 +203,7 @@ public class Map extends Canvas {
          + PATTERN_DIRECTION_WE
          + PATTERN_END;
 
-   private static final String  PATTERN_WIKI_POSITION_D_M_S_N_D_M_S_E = PATTERN_DOUBLE_SEP
+   private static final String        PATTERN_WIKI_POSITION_D_M_S_N_D_M_S_E = PATTERN_DOUBLE_SEP
          + PATTERN_DOUBLE_SEP
          + PATTERN_DOUBLE_SEP
          + PATTERN_DIRECTION_NS
@@ -211,13 +213,15 @@ public class Map extends Canvas {
          + PATTERN_DIRECTION_WE
          + PATTERN_END;
 
-   private static final Pattern _patternWikiUrl                       = Pattern.compile(PATTERN_WIKI_URL);
-   private static final Pattern _patternWikiPosition_D_D              = Pattern.compile(PATTERN_WIKI_POSITION_D_D);
-   private static final Pattern _patternWikiPosition_D_N_D_E          = Pattern.compile(PATTERN_WIKI_POSITION_D_N_D_E);
-   private static final Pattern _patternWikiPosition_D_M_N_D_M_E      = Pattern.compile(PATTERN_WIKI_POSITION_D_M_N_D_M_E);
-   private static final Pattern _patternWikiPosition_D_M_S_N_D_M_S_E  = Pattern.compile(PATTERN_WIKI_POSITION_D_M_S_N_D_M_S_E);
-   private static final Pattern _patternWikiParamter                  = Pattern.compile(PATTERN_SEPARATOR);
-   private static final Pattern _patternWikiKeyValue                  = Pattern.compile(PATTERN_WIKI_PARAMETER_KEY_VALUE_SEPARATOR);
+   private static final Pattern       _patternWikiUrl                       = Pattern.compile(PATTERN_WIKI_URL);
+   private static final Pattern       _patternWikiPosition_D_D              = Pattern.compile(PATTERN_WIKI_POSITION_D_D);
+   private static final Pattern       _patternWikiPosition_D_N_D_E          = Pattern.compile(PATTERN_WIKI_POSITION_D_N_D_E);
+   private static final Pattern       _patternWikiPosition_D_M_N_D_M_E      = Pattern.compile(PATTERN_WIKI_POSITION_D_M_N_D_M_E);
+   private static final Pattern       _patternWikiPosition_D_M_S_N_D_M_S_E  = Pattern.compile(PATTERN_WIKI_POSITION_D_M_S_N_D_M_S_E);
+   private static final Pattern       _patternWikiParamter                  = Pattern.compile(PATTERN_SEPARATOR);
+   private static final Pattern       _patternWikiKeyValue                  = Pattern.compile(PATTERN_WIKI_PARAMETER_KEY_VALUE_SEPARATOR);
+
+   private final static ColorCacheSWT _colorCache                           = new ColorCacheSWT();
 
    // [181,208,208] is the color of water in the standard OSM material
    public static final RGB        OSM_BACKGROUND_RGB         = new RGB(181, 208, 208);
@@ -1081,6 +1085,7 @@ public class Map extends Canvas {
    }
 
    private void disposeResource(final Resource resource) {
+
       if ((resource != null) && !resource.isDisposed()) {
          resource.dispose();
       }
@@ -1764,6 +1769,7 @@ public class Map extends Canvas {
       }
 
       _overlayImageCache.dispose();
+      _colorCache.dispose();
 
       if (_directMapPainter != null) {
          _directMapPainter.dispose();
@@ -2202,10 +2208,10 @@ public class Map extends Canvas {
          }
 
          if (_grid_IsShowLastGeoGrid) {
-            paint_Grid_Last(gc);
+            paint_GridBox_20_Previous(gc);
          }
          if (_grid_IsShowSelectingGrid) {
-            paint_Grid(gc);
+            paint_GridBox_10_Selecting(gc);
          }
       }
    }
@@ -2559,7 +2565,7 @@ public class Map extends Canvas {
       }
    }
 
-   private void paint_Grid(final GC gc) {
+   private void paint_GridBox_10_Selecting(final GC gc) {
 
       gc.setLineWidth(2);
 
@@ -2567,14 +2573,14 @@ public class Map extends Canvas {
        * show info in the top/right corner that selection for the offline area is activ
        */
       if (_grid_IsSelecting) {
-         paint_Grid_Info(gc, -1);
+         paint_GridBox_90_Info(gc, -1);
       }
 
       // check if mouse button is hit which sets the start position
       if ((_grid_DevMouse_Start == null) || (_grid_WorldMouse_Move == null)) {
 
          if (_grid_WorldMouse_Move != null) {
-            paint_Grid_Rectangle(gc, _grid_WorldMouse_Move, _grid_WorldMouse_Move, false);
+            paint_GridBox_50_Rectangle(gc, _grid_WorldMouse_Move, _grid_WorldMouse_Move, false);
          }
 
          return;
@@ -2617,20 +2623,14 @@ public class Map extends Canvas {
        * Draw geo grid
        */
 
-      paint_Grid_Rectangle(gc, _grid_WorldMouse_Start, _grid_WorldMouse_End, false);
+      paint_GridBox_50_Rectangle(gc, _grid_WorldMouse_Start, _grid_WorldMouse_End, false);
 
       final int width = _grid_SelectedPosition_Geo_2_E2.x - _grid_SelectedPosition_Geo_1_E2.x;
       final int height = _grid_SelectedPosition_Geo_1_E2.y - _grid_SelectedPosition_Geo_2_E2.y;
 
       final int numGeoParts = width * height;
 
-      paint_Grid_Info(gc, numGeoParts);
-
-      /*
-       * draw selected area box
-       */
-
-//      _offline_CurrentOfflineArea = new Rectangle(devArea_X1, devArea_Y1, devArea_Width, devArea_Height);
+      paint_GridBox_90_Info(gc, numGeoParts);
 
       gc.setLineStyle(SWT.LINE_SOLID);
       gc.setForeground(SYS_COLOR_BLACK);
@@ -2638,30 +2638,325 @@ public class Map extends Canvas {
 
       gc.setLineStyle(SWT.LINE_SOLID);
       gc.setForeground(SYS_COLOR_WHITE);
-//      gc.drawRectangle(devX + 1, devY + 1, devWidth - 2, devHeight - 2);
 
       gc.setBackground(_display.getSystemColor(SWT.COLOR_DARK_YELLOW));
       gc.setAlpha(0x30);
       gc.fillRectangle(devArea_X1 + 1, devArea_Y1 + 1, devArea_Width - 2, devArea_Height - 2);
       gc.setAlpha(0xff);
+   }
 
-      /*
-       * Draw text marker
+   private void paint_GridBox_20_Previous(final GC gc) {
+
+      if (_grid_WorldLast_Start == null) {
+         return;
+      }
+
+      paint_GridBox_50_Rectangle(gc, _grid_WorldLast_Start, _grid_WorldLast_End, true);
+   }
+
+   /**
+    * Paint a rectangle which shows a grid box
+    *
+    * @param gc
+    * @param worldStart
+    * @param worldEnd
+    * @param isPaintLastGridSelection
+    *           When <code>true</code>, the last selected grid is painted, otherwise the currently
+    *           selecting grid
+    * @return Returns number of grid rectangles
+    */
+   private void paint_GridBox_50_Rectangle(final GC gc,
+                                           final Point worldStart,
+                                           final Point worldEnd,
+                                           final boolean isPaintLastGridSelection) {
+
+      final int worldStartX = worldStart.x;
+      final int worldStartY = worldStart.y;
+      final int worldEndX = worldEnd.x;
+      final int worldEndY = worldEnd.y;
+
+      // XY1: top/left
+      final int world_X1 = Math.min(worldStartX, worldEndX);
+      final int world_Y1 = Math.min(worldStartY, worldEndY);
+
+      // XY2: bottom/right
+      final int world_X2 = Math.max(worldStartX, worldEndX);
+      final int world_Y2 = Math.max(worldStartY, worldEndY);
+
+      final Point2D.Double worldPixel_1 = new Point2D.Double(world_X1, world_Y1);
+      final Point2D.Double worldPixel_2 = new Point2D.Double(world_X2, world_Y2);
+
+      final GeoPosition selectedPosition_Geo_1 = _mp.pixelToGeo(worldPixel_1, _mapZoomLevel);
+      final GeoPosition selectedPosition_Geo_2 = _mp.pixelToGeo(worldPixel_2, _mapZoomLevel);
+
+      final double geoLat1 = selectedPosition_Geo_1.latitude;
+      final double geoLon1 = selectedPosition_Geo_1.longitude;
+
+      final double geoLat2 = selectedPosition_Geo_2.latitude;
+      final double geoLon2 = selectedPosition_Geo_2.longitude;
+
+      // set lat/lon to a grid of 0.01°
+      int geoGrid_Lat1_E2 = (int) (geoLat1 * 100);
+      int geoGrid_Lon1_E2 = (int) (geoLon1 * 100);
+
+      int geoGrid_Lat2_E2 = (int) (geoLat2 * 100);
+      int geoGrid_Lon2_E2 = (int) (geoLon2 * 100);
+
+      final Point devGeoGrid_1 = offline_GetDevGeoGridPosition(world_X1, world_Y1);
+      final Point devGeoGrid_2 = offline_GetDevGeoGridPosition(world_X2, world_Y2);
+
+      int devGrid_X1 = devGeoGrid_1.x;
+      int devGrid_Y1 = devGeoGrid_1.y;
+
+      int devGrid_X2 = devGeoGrid_2.x;
+      int devGrid_Y2 = devGeoGrid_2.y;
+
+      final int geoGridPixelSizeX = (int) _geoGridPixelSizeX;
+      final int geoGridPixelSizeY = (int) _geoGridPixelSizeY;
+
+      final int gridSize_E2 = 1;
+
+      /**
+       * Adjust lat/lon +/-, this algorithm is created with many many many try and error
        */
-//      final Point textExtend = gc.textExtent(Messages.Offline_Area_Label_AreaMarker);
-//      int devYMarker = devArea_Y1 - textExtend.y;
-//      devYMarker = devYMarker < 0 ? 0 : devYMarker;
+      if (geoLat1 > 0 && geoLon1 > 0 && geoLat2 > 0 && geoLon2 > 0) {
+
+         // 1: + / +
+         // 2: + / +
+
+         //     |
+         //     | xx
+         // ---------
+         //     |
+         //     |
+
+         devGrid_X2 += geoGridPixelSizeX;
+         devGrid_Y2 += geoGridPixelSizeY;
+
+         geoGrid_Lon2_E2 += gridSize_E2; // X1
+         geoGrid_Lat1_E2 += gridSize_E2; // Y1
+
+      } else if (geoLat1 > 0 && geoLon1 > 0 && geoLat2 < 0 && geoLon2 > 0) {
+
+         // 1: + / +
+         // 2: - / +
+
+         //     |
+         //     | xx
+         // ------xx-
+         //     | xx
+         //     |
+
+         devGrid_X2 += geoGridPixelSizeX;
+         devGrid_Y2 += geoGridPixelSizeY * 2;
+
+         geoGrid_Lon2_E2 += gridSize_E2; // X2
+
+         geoGrid_Lat1_E2 += gridSize_E2; // Y1
+         geoGrid_Lat2_E2 -= gridSize_E2; // Y2
+
+      } else if (geoLat1 < 0 && geoLon1 > 0 && geoLat2 < 0 && geoLon2 > 0) {
+
+         // 1: - / +
+         // 2: - / +
+
+         //     |
+         //     |
+         // ---------
+         //     | xx
+         //     |
+
+         devGrid_X2 += geoGridPixelSizeX;
+         devGrid_Y1 += geoGridPixelSizeY;
+         devGrid_Y2 += geoGridPixelSizeY * 2;
+
+         geoGrid_Lon2_E2 += gridSize_E2; // X2
+         geoGrid_Lat2_E2 -= gridSize_E2; // Y2
+
+      } else if (geoLat1 > 0 && geoLon1 < 0 && geoLat2 > 0 && geoLon2 < 0) {
+
+         // 1: + / -
+         // 2: + / -
+
+         //     |
+         //  xx |
+         // ---------
+         //     |
+         //     |
+
+         devGrid_X1 -= geoGridPixelSizeX;
+         devGrid_Y2 += geoGridPixelSizeY;
+
+         geoGrid_Lon1_E2 -= gridSize_E2; // X1
+         geoGrid_Lat1_E2 += gridSize_E2; // Y1
+
+      } else if (geoLat1 > 0 && geoLon1 < 0 && geoLat2 < 0 && geoLon2 < 0) {
+
+         // 1: + / -
+         // 2: - / -
+
+         //     |
+         //  xx |
+         // -xx------
+         //  xx |
+         //     |
+
+         devGrid_X1 -= geoGridPixelSizeX;
+         devGrid_Y2 += geoGridPixelSizeY * 2;
+
+         geoGrid_Lon1_E2 -= gridSize_E2; // X1
+         geoGrid_Lat1_E2 += gridSize_E2; // Y1
+
+         geoGrid_Lat2_E2 -= gridSize_E2; // Y2
+
+      } else if (geoLat1 < 0 && geoLon1 < 0 && geoLat2 < 0 && geoLon2 < 0) {
+
+         // 1: - / -
+         // 2: - / -
+
+         //     |
+         //     |
+         // ---------
+         //  xx |
+         //     |
+
+         devGrid_X1 -= geoGridPixelSizeX;
+         devGrid_Y1 += geoGridPixelSizeY;
+
+         devGrid_Y2 += geoGridPixelSizeY * 2;
+
+         geoGrid_Lon1_E2 -= gridSize_E2; // X1
+         geoGrid_Lat2_E2 -= gridSize_E2; // Y2
+
+      } else if (geoLat1 > 0 && geoLon1 < 0 && geoLat2 > 0 && geoLon2 > 0) {
+
+         // 1: + / -
+         // 2: + / +
+
+         //     |
+         //   xxxxx
+         // ---------
+         //     |
+         //     |
+
+         devGrid_X1 -= geoGridPixelSizeX;
+         devGrid_Y2 += geoGridPixelSizeY;
+
+         devGrid_X2 += geoGridPixelSizeX;
+
+         geoGrid_Lon1_E2 -= gridSize_E2; // X1
+         geoGrid_Lat1_E2 += gridSize_E2; // Y1
+
+         geoGrid_Lon2_E2 += gridSize_E2; // X2
+
+      } else if (geoLat1 < 0 && geoLon1 < 0 && geoLat2 < 0 && geoLon2 > 0) {
+
+         // 1: - / -
+         // 2: - / +
+
+         //     |
+         //     |
+         // ---------
+         //   xxxxx
+         //     |
+
+         devGrid_X1 -= geoGridPixelSizeX;
+         devGrid_Y1 += geoGridPixelSizeY;
+
+         devGrid_X2 += geoGridPixelSizeX;
+         devGrid_Y2 += geoGridPixelSizeY * 2;
+
+         geoGrid_Lon1_E2 -= gridSize_E2; // X1
+
+         geoGrid_Lon2_E2 += gridSize_E2; // X2
+         geoGrid_Lat2_E2 -= gridSize_E2; // Y2
+
+      } else if (geoLat1 > 0 && geoLon1 < 0 && geoLat2 < 0 && geoLon2 > 0) {
+
+         // 1: + / -
+         // 2: - / +
+
+         //     |
+         //   xxxxx
+         // --xxxxx--
+         //   xxxxx
+         //     |
+
+         devGrid_X1 -= geoGridPixelSizeX;
+
+         devGrid_X2 += geoGridPixelSizeX;
+         devGrid_Y2 += geoGridPixelSizeY * 2;
+
+         geoGrid_Lon1_E2 -= gridSize_E2; // X1
+         geoGrid_Lat1_E2 += gridSize_E2; // Y1
+
+         geoGrid_Lon2_E2 += gridSize_E2; // X2
+         geoGrid_Lat2_E2 -= gridSize_E2; // Y2
+      }
+
+      // x: longitude
+      // y: latitude
+
+      _grid_SelectedPosition_Geo_1_E2 = new Point(geoGrid_Lon1_E2, geoGrid_Lat1_E2);
+      _grid_SelectedPosition_Geo_2_E2 = new Point(geoGrid_Lon2_E2, geoGrid_Lat2_E2);
+
+//      System.out.println(String.format(
 //
-//      gc.setForeground(SYS_COLOR_BLACK);
-//      gc.setBackground(SYS_COLOR_WHITE);
-//      gc.drawText(Messages.Offline_Area_Label_AreaMarker, devArea_X1, devYMarker);
+//            "1: x(lon) %d  y(lat) %d",
+//
+//            _grid_SelectedPosition_Geo_1_E2.x,
+//            _grid_SelectedPosition_Geo_1_E2.y
+//
+//      ));
+//
+//      System.out.println(String.format(
+//
+//            "2: x(lon) %d  y(lat) %d",
+//
+//            _grid_SelectedPosition_Geo_2_E2.x,
+//            _grid_SelectedPosition_Geo_2_E2.y
+//
+//      ));
+//      System.out.println();
+//
+//// TODO remove SYSTEM.OUT.PRINTLN
+
+      int width = devGrid_X2 - devGrid_X1;
+      int height = devGrid_Y2 - devGrid_Y1;
+
+      // ensure it is always visible
+      width = Math.max(1, width);
+      height = Math.max(1, height);
+
+      // draw geo grid
+      final Color boxColor;
+      if (isPaintLastGridSelection) {
+         final RGB hoverRGB = Util.getStateRGB(TourGeoFilterManager.getState(),
+               TourGeoFilterManager.STATE_RGB_GEO_PARTS_SELECTED,
+               TourGeoFilterManager.STATE_RGB_GEO_PARTS_SELECTED_DEFAULT);
+
+         boxColor = _colorCache.getColorRGB(hoverRGB);
+
+      } else {
+
+         final RGB hoverRGB = Util.getStateRGB(TourGeoFilterManager.getState(),
+               TourGeoFilterManager.STATE_RGB_GEO_PARTS_HOVER,
+               TourGeoFilterManager.STATE_RGB_GEO_PARTS_HOVER_DEFAULT);
+
+         boxColor = _colorCache.getColorRGB(hoverRGB);
+      }
+
+      gc.setLineStyle(SWT.LINE_SOLID);
+      gc.setLineWidth(2);
+      gc.setForeground(boxColor);
+      gc.drawRectangle(devGrid_X1, devGrid_Y1, width, height);
    }
 
    /**
     * @param gc
     * @param numGridRectangle
     */
-   private void paint_Grid_Info(final GC gc, final int numGridRectangle) {
+   private void paint_GridBox_90_Info(final GC gc, final int numGridRectangle) {
 
       gc.setForeground(SYS_COLOR_BLACK);
       gc.setBackground(SYS_COLOR_YELLOW);
@@ -2705,338 +3000,6 @@ public class Map extends Canvas {
       }
 
       gc.drawText(sb.toString(), 0, 0);
-   }
-
-   private void paint_Grid_Last(final GC gc) {
-
-      if (_grid_WorldLast_Start == null) {
-         return;
-      }
-
-      paint_Grid_Rectangle(gc, _grid_WorldLast_Start, _grid_WorldLast_End, true);
-   }
-
-   /**
-    * Paint a rectangle which shows the grid.
-    *
-    * @param gc
-    * @param worldStart
-    * @param worldEnd
-    * @param isPaintLastGridSelection
-    *           When <code>true</code>, the last selected grid is painted, otherwise the currently
-    *           selecting grid
-    * @return Returns number of grid rectangles
-    */
-   private void paint_Grid_Rectangle(final GC gc,
-                                     final Point worldStart,
-                                     final Point worldEnd,
-                                     final boolean isPaintLastGridSelection) {
-
-      final int worldStartX = worldStart.x;
-      final int worldStartY = worldStart.y;
-      final int worldEndX = worldEnd.x;
-      final int worldEndY = worldEnd.y;
-
-      // XY1: top/left
-      final int world_X1 = Math.min(worldStartX, worldEndX);
-      final int world_Y1 = Math.min(worldStartY, worldEndY);
-
-      // XY2: bottom/right
-      final int world_X2 = Math.max(worldStartX, worldEndX);
-      final int world_Y2 = Math.max(worldStartY, worldEndY);
-
-      final Point2D.Double worldPixel_1 = new Point2D.Double(world_X1, world_Y1);
-      final Point2D.Double worldPixel_2 = new Point2D.Double(world_X2, world_Y2);
-
-      final GeoPosition selectedPosition_Geo_1 = _mp.pixelToGeo(worldPixel_1, _mapZoomLevel);
-      final GeoPosition selectedPosition_Geo_2 = _mp.pixelToGeo(worldPixel_2, _mapZoomLevel);
-
-      final double geoLat1 = selectedPosition_Geo_1.latitude;
-      final double geoLon1 = selectedPosition_Geo_1.longitude;
-
-      final double geoLat2 = selectedPosition_Geo_2.latitude;
-      final double geoLon2 = selectedPosition_Geo_2.longitude;
-
-//      final double latitude = partLatitude[serieIndex];
-//      final double longitude = partLongitude[serieIndex];
-//
-//      final int latPart = (int) (latitude * 100);
-//      final int lonPart = (int) (longitude * 100);
-
-      // set lat/lon to a grid of 0.01°
-//      int geoGrid_Lat1_E2 = (int) Math.round(geoLat1 * 100);
-//      int geoGrid_Lon1_E2 = (int) Math.round(geoLon1 * 100);
-//
-//      int geoGrid_Lat2_E2 = (int) Math.round(geoLat2 * 100);
-//      int geoGrid_Lon2_E2 = (int) Math.round(geoLon2 * 100);
-      int geoGrid_Lat1_E2 = (int) (geoLat1 * 100);
-      int geoGrid_Lon1_E2 = (int) (geoLon1 * 100);
-
-      int geoGrid_Lat2_E2 = (int) (geoLat2 * 100);
-      int geoGrid_Lon2_E2 = (int) (geoLon2 * 100);
-
-      final Point devGeoGrid_1 = offline_GetDevGeoGridPosition(world_X1, world_Y1);
-      final Point devGeoGrid_2 = offline_GetDevGeoGridPosition(world_X2, world_Y2);
-
-      int devGrid_X1 = devGeoGrid_1.x;
-      int devGrid_Y1 = devGeoGrid_1.y;
-
-      int devGrid_X2 = devGeoGrid_2.x;
-      int devGrid_Y2 = devGeoGrid_2.y;
-
-      final int geoGridPixelSizeX = (int) _geoGridPixelSizeX;
-      final int geoGridPixelSizeY = (int) _geoGridPixelSizeY;
-
-      final int gridSize_E2 = 1;
-
-      /**
-       * Adjust lat/lon +/-, this algorithm is created with many many many try and error
-       */
-      if (geoLat1 > 0 && geoLon1 > 0 && geoLat2 > 0 && geoLon2 > 0) {
-
-         // 1: + / +
-         // 2: + / +
-
-         //     |
-         //     | xx
-         // ---------
-         //     |
-         //     |
-
-         devGrid_X2 += geoGridPixelSizeX;
-         devGrid_Y2 += geoGridPixelSizeY;
-
-         geoGrid_Lon2_E2 += gridSize_E2; // X1
-         geoGrid_Lat1_E2 += gridSize_E2; // Y1
-
-//         System.out.println("1");
-//// TODO remove SYSTEM.OUT.PRINTLN
-
-      } else if (geoLat1 > 0 && geoLon1 > 0 && geoLat2 < 0 && geoLon2 > 0) {
-
-         // 1: + / +
-         // 2: - / +
-
-         //     |
-         //     | xx
-         // ------xx-
-         //     | xx
-         //     |
-
-         devGrid_X2 += geoGridPixelSizeX;
-         devGrid_Y2 += geoGridPixelSizeY * 2;
-
-         geoGrid_Lon2_E2 += gridSize_E2; // X2
-
-         geoGrid_Lat1_E2 += gridSize_E2; // Y1
-         geoGrid_Lat2_E2 -= gridSize_E2; // Y2
-
-//         System.out.println("2");
-//// TODO remove SYSTEM.OUT.PRINTLN
-
-      } else if (geoLat1 < 0 && geoLon1 > 0 && geoLat2 < 0 && geoLon2 > 0) {
-
-         // 1: - / +
-         // 2: - / +
-
-         //     |
-         //     |
-         // ---------
-         //     | xx
-         //     |
-
-         devGrid_X2 += geoGridPixelSizeX;
-         devGrid_Y1 += geoGridPixelSizeY;
-         devGrid_Y2 += geoGridPixelSizeY * 2;
-
-         geoGrid_Lon2_E2 += gridSize_E2; // X2
-         geoGrid_Lat2_E2 -= gridSize_E2; // Y2
-
-//         System.out.println("3");
-//// TODO remove SYSTEM.OUT.PRINTLN
-
-      } else if (geoLat1 > 0 && geoLon1 < 0 && geoLat2 > 0 && geoLon2 < 0) {
-
-         // 1: + / -
-         // 2: + / -
-
-         //     |
-         //  xx |
-         // ---------
-         //     |
-         //     |
-
-         devGrid_X1 -= geoGridPixelSizeX;
-         devGrid_Y2 += geoGridPixelSizeY;
-
-         geoGrid_Lon1_E2 -= gridSize_E2; // X1
-         geoGrid_Lat1_E2 += gridSize_E2; // Y1
-
-//         System.out.println("4");
-//// TODO remove SYSTEM.OUT.PRINTLN
-
-      } else if (geoLat1 > 0 && geoLon1 < 0 && geoLat2 < 0 && geoLon2 < 0) {
-
-         // 1: + / -
-         // 2: - / -
-
-         //     |
-         //  xx |
-         // -xx------
-         //  xx |
-         //     |
-
-         devGrid_X1 -= geoGridPixelSizeX;
-         devGrid_Y2 += geoGridPixelSizeY * 2;
-
-         geoGrid_Lon1_E2 -= gridSize_E2; // X1
-         geoGrid_Lat1_E2 += gridSize_E2; // Y1
-
-         geoGrid_Lat2_E2 -= gridSize_E2; // Y2
-
-//         System.out.println("5");
-//// TODO remove SYSTEM.OUT.PRINTLN
-
-      } else if (geoLat1 < 0 && geoLon1 < 0 && geoLat2 < 0 && geoLon2 < 0) {
-
-         // 1: - / -
-         // 2: - / -
-
-         //     |
-         //     |
-         // ---------
-         //  xx |
-         //     |
-
-         devGrid_X1 -= geoGridPixelSizeX;
-         devGrid_Y1 += geoGridPixelSizeY;
-
-         devGrid_Y2 += geoGridPixelSizeY * 2;
-
-         geoGrid_Lon1_E2 -= gridSize_E2; // X1
-         geoGrid_Lat2_E2 -= gridSize_E2; // Y2
-
-//         System.out.println("6");
-//// TODO remove SYSTEM.OUT.PRINTLN
-
-      } else if (geoLat1 > 0 && geoLon1 < 0 && geoLat2 > 0 && geoLon2 > 0) {
-
-         // 1: + / -
-         // 2: + / +
-
-         //     |
-         //   xxxxx
-         // ---------
-         //     |
-         //     |
-
-         devGrid_X1 -= geoGridPixelSizeX;
-         devGrid_Y2 += geoGridPixelSizeY;
-
-         devGrid_X2 += geoGridPixelSizeX;
-
-         geoGrid_Lon1_E2 -= gridSize_E2; // X1
-         geoGrid_Lat1_E2 += gridSize_E2; // Y1
-
-         geoGrid_Lon2_E2 += gridSize_E2; // X2
-
-//         System.out.println("7");
-//// TODO remove SYSTEM.OUT.PRINTLN
-
-      } else if (geoLat1 < 0 && geoLon1 < 0 && geoLat2 < 0 && geoLon2 > 0) {
-
-         // 1: - / -
-         // 2: - / +
-
-         //     |
-         //     |
-         // ---------
-         //   xxxxx
-         //     |
-
-         devGrid_X1 -= geoGridPixelSizeX;
-         devGrid_Y1 += geoGridPixelSizeY;
-
-         devGrid_X2 += geoGridPixelSizeX;
-         devGrid_Y2 += geoGridPixelSizeY * 2;
-
-         geoGrid_Lon1_E2 -= gridSize_E2; // X1
-
-         geoGrid_Lon2_E2 += gridSize_E2; // X2
-         geoGrid_Lat2_E2 -= gridSize_E2; // Y2
-
-//         System.out.println("8");
-//// TODO remove SYSTEM.OUT.PRINTLN
-
-      } else if (geoLat1 > 0 && geoLon1 < 0 && geoLat2 < 0 && geoLon2 > 0) {
-
-         // 1: + / -
-         // 2: - / +
-
-         //     |
-         //   xxxxx
-         // --xxxxx--
-         //   xxxxx
-         //     |
-
-         devGrid_X1 -= geoGridPixelSizeX;
-
-         devGrid_X2 += geoGridPixelSizeX;
-         devGrid_Y2 += geoGridPixelSizeY * 2;
-
-         geoGrid_Lon1_E2 -= gridSize_E2; // X1
-         geoGrid_Lat1_E2 += gridSize_E2; // Y1
-
-         geoGrid_Lon2_E2 += gridSize_E2; // X2
-         geoGrid_Lat2_E2 -= gridSize_E2; // Y2
-
-//         System.out.println("9");
-//// TODO remove SYSTEM.OUT.PRINTLN
-      }
-
-      // x: longitude
-      // y: latitude
-
-      _grid_SelectedPosition_Geo_1_E2 = new Point(geoGrid_Lon1_E2, geoGrid_Lat1_E2);
-      _grid_SelectedPosition_Geo_2_E2 = new Point(geoGrid_Lon2_E2, geoGrid_Lat2_E2);
-
-//      System.out.println(String.format(
-//
-//            "1: x(lon) %d  y(lat) %d",
-//
-//            _grid_SelectedPosition_Geo_1_E2.x,
-//            _grid_SelectedPosition_Geo_1_E2.y
-//
-//      ));
-//
-//      System.out.println(String.format(
-//
-//            "2: x(lon) %d  y(lat) %d",
-//
-//            _grid_SelectedPosition_Geo_2_E2.x,
-//            _grid_SelectedPosition_Geo_2_E2.y
-//
-//      ));
-//      System.out.println();
-//
-//// TODO remove SYSTEM.OUT.PRINTLN
-
-      int width = devGrid_X2 - devGrid_X1;
-      int height = devGrid_Y2 - devGrid_Y1;
-
-      // ensure it is visible
-      width = Math.max(1, width);
-      height = Math.max(1, height);
-
-      // draw geo grid
-      final Color gridColor = isPaintLastGridSelection
-            ? _display.getSystemColor(SWT.COLOR_YELLOW)
-            : _display.getSystemColor(SWT.COLOR_WHITE);
-
-      gc.setLineStyle(SWT.LINE_SOLID);
-      gc.setLineWidth(2);
-      gc.setForeground(gridColor);
-      gc.drawRectangle(devGrid_X1, devGrid_Y1, width, height);
    }
 
    private void paint_OfflineArea(final GC gc) {
