@@ -227,11 +227,12 @@ public class TourManager {
    private static LabelProviderMMSS                      _labelProviderMMSS  = new LabelProviderMMSS();
    private static LabelProviderInt                       _labelProviderInt   = new LabelProviderInt();
    //
-   private static TourData                               _multipleTourData;
-   private static ArrayList<TourData>                    _multipleTourData_List;
-   private static int                                    _multipleTourDataHash;
-   private static int                                    _multipleTourData_List_Hash;
-   private static long                                   _multipleTourData_List_Key;
+   private static TourData                               _joined_TourData;
+   private static int                                    _joined_TourIds_Hash;
+   private static ArrayList<TourData>                    _allLoaded_TourData;
+   private static int                                    _allLoaded_TourData_Hash;
+   private static long                                   _allLoaded_TourData_Key;
+   private static int                                    _allLoaded_TourIds_Hash;
    //
    private static final ListenerList<ITourEventListener> _tourEventListeners = new ListenerList<>(ListenerList.IDENTITY);
    private static final ListenerList<ITourSaveListener>  _tourSaveListeners  = new ListenerList<>(ListenerList.IDENTITY);
@@ -334,8 +335,8 @@ public class TourManager {
                 * multiple tours can have the wrong person for hr zones
                 */
 
-               _multipleTourData = null;
-               _multipleTourData_List = null;
+               _joined_TourData = null;
+               _allLoaded_TourData = null;
             }
          }
       });
@@ -487,8 +488,8 @@ public class TourManager {
 
    public static void clearMultipleTourData() {
 
-      _multipleTourData = null;
-      _multipleTourData_List = null;
+      _joined_TourData = null;
+      _allLoaded_TourData = null;
    }
 
    /**
@@ -654,11 +655,13 @@ public class TourManager {
     * @param tourIds
     * @return
     */
-   public static TourData createMultipleTourData(final ArrayList<Long> tourIds) {
+   public static TourData createJoinedTourData(final ArrayList<Long> tourIds) {
 
       // check if the requested data are already available
-      if (_multipleTourData != null && tourIds.hashCode() == _multipleTourDataHash) {
-         return _multipleTourData;
+      final int tourIds_Hash = tourIds.hashCode();
+
+      if (_joined_TourData != null && tourIds_Hash == _joined_TourIds_Hash) {
+         return _joined_TourData;
       }
 
       final ArrayList<TourData> allMultipleTours = new ArrayList<>();
@@ -696,51 +699,51 @@ public class TourManager {
          }
       }
 
-      final TourData multiTourData = new TourData();
+      final TourData joinedTourData = new TourData();
 
-      multiTourData.setupMultipleTour();
+      joinedTourData.setupMultipleTour();
 
       final int numTours = validatedMultipleTours.size();
 
       final float[] cadenceSerieData = new float[numTimeSlices];
-      multiTourData.setCadenceSerie(cadenceSerieData);
+      joinedTourData.setCadenceSerie(cadenceSerieData);
 
-      final int[] toTimeSerie = multiTourData.timeSerie = new int[numTimeSlices];
-      final float[] toAltitudeSerie = multiTourData.altitudeSerie = new float[numTimeSlices];
+      final int[] toTimeSerie = joinedTourData.timeSerie = new int[numTimeSlices];
+      final float[] toAltitudeSerie = joinedTourData.altitudeSerie = new float[numTimeSlices];
       final float[] toCadenceSerie = cadenceSerieData;
-      final float[] toDistanceSerie = multiTourData.distanceSerie = new float[numTimeSlices];
-      final long[] toGearSerie = multiTourData.gearSerie = new long[numTimeSlices];
-      final double[] toLatitudeSerie = multiTourData.latitudeSerie = new double[numTimeSlices];
-      final double[] toLongitudeSerie = multiTourData.longitudeSerie = new double[numTimeSlices];
+      final float[] toDistanceSerie = joinedTourData.distanceSerie = new float[numTimeSlices];
+      final long[] toGearSerie = joinedTourData.gearSerie = new long[numTimeSlices];
+      final double[] toLatitudeSerie = joinedTourData.latitudeSerie = new double[numTimeSlices];
+      final double[] toLongitudeSerie = joinedTourData.longitudeSerie = new double[numTimeSlices];
       final float[] toPowerSerie = new float[numTimeSlices];
-      final float[] toPulseSerie = multiTourData.pulseSerie = new float[numTimeSlices];
-      final float[] toTemperaturSerie = multiTourData.temperatureSerie = new float[numTimeSlices];
+      final float[] toPulseSerie = joinedTourData.pulseSerie = new float[numTimeSlices];
+      final float[] toTemperaturSerie = joinedTourData.temperatureSerie = new float[numTimeSlices];
 
-      final short[] toRunDyn_StanceTime = multiTourData.runDyn_StanceTime = new short[numTimeSlices];
-      final short[] toRunDyn_StanceTimeBalance = multiTourData.runDyn_StanceTimeBalance = new short[numTimeSlices];
-      final short[] toRunDyn_StepLength = multiTourData.runDyn_StepLength = new short[numTimeSlices];
-      final short[] toRunDyn_VertOscillation = multiTourData.runDyn_VerticalOscillation = new short[numTimeSlices];
-      final short[] toRunDyn_VertRatio = multiTourData.runDyn_VerticalRatio = new short[numTimeSlices];
+      final short[] toRunDyn_StanceTime = joinedTourData.runDyn_StanceTime = new short[numTimeSlices];
+      final short[] toRunDyn_StanceTimeBalance = joinedTourData.runDyn_StanceTimeBalance = new short[numTimeSlices];
+      final short[] toRunDyn_StepLength = joinedTourData.runDyn_StepLength = new short[numTimeSlices];
+      final short[] toRunDyn_VertOscillation = joinedTourData.runDyn_VerticalOscillation = new short[numTimeSlices];
+      final short[] toRunDyn_VertRatio = joinedTourData.runDyn_VerticalRatio = new short[numTimeSlices];
 
-      final short[] toswim_LengthType = multiTourData.swim_LengthType = new short[numSwimTimeSlices];
-      final short[] toSwim_Cadence = multiTourData.swim_Cadence = new short[numSwimTimeSlices];
-      final short[] toSwim_Strokes = multiTourData.swim_Strokes = new short[numSwimTimeSlices];
-      final short[] toSwim_StrokeStyle = multiTourData.swim_StrokeStyle = new short[numSwimTimeSlices];
-      final int[] toSwim_Time = multiTourData.swim_Time = new int[numSwimTimeSlices];
+      final short[] toswim_LengthType = joinedTourData.swim_LengthType = new short[numSwimTimeSlices];
+      final short[] toSwim_Cadence = joinedTourData.swim_Cadence = new short[numSwimTimeSlices];
+      final short[] toSwim_Strokes = joinedTourData.swim_Strokes = new short[numSwimTimeSlices];
+      final short[] toSwim_StrokeStyle = joinedTourData.swim_StrokeStyle = new short[numSwimTimeSlices];
+      final int[] toSwim_Time = joinedTourData.swim_Time = new int[numSwimTimeSlices];
 
-      final Long[] allTourIds = multiTourData.multipleTourIds = new Long[numTours];
-      final int[] allStartIndex = multiTourData.multipleTourStartIndex = new int[numTours];
-      final long[] allStartTime = multiTourData.multipleTourStartTime = new long[numTours];
-      final String[] allTourTitle = multiTourData.multipleTourTitles = new String[numTours];
-      final ArrayList<TourMarker> allTourMarker = multiTourData.multiTourMarkers = new ArrayList<>();
-      final int[] allTourMarkerNumbers = multiTourData.multipleNumberOfMarkers = new int[numTours];
-      final int[] allSwimStartIndex = multiTourData.multipleSwimStartIndex = new int[numTours];
+      final Long[] allTourIds = joinedTourData.multipleTourIds = new Long[numTours];
+      final int[] allStartIndex = joinedTourData.multipleTourStartIndex = new int[numTours];
+      final long[] allStartTime = joinedTourData.multipleTourStartTime = new long[numTours];
+      final String[] allTourTitle = joinedTourData.multipleTourTitles = new String[numTours];
+      final ArrayList<TourMarker> allTourMarker = joinedTourData.multiTourMarkers = new ArrayList<>();
+      final int[] allTourMarkerNumbers = joinedTourData.multipleNumberOfMarkers = new int[numTours];
+      final int[] allSwimStartIndex = joinedTourData.multipleSwimStartIndex = new int[numTours];
 
       final HashSet<TourPhoto> allTourPhoto = new HashSet<>();
 
       // fixing IndexOutOfBoundsException: Index: 0, Size: 0
       if (numTours == 0) {
-         return multiTourData;
+         return joinedTourData;
       }
 
       int toStartIndex = 0;
@@ -985,93 +988,93 @@ public class TourManager {
        * Remove data series when not available
        */
       if (!isAltitudeSerie) {
-         multiTourData.altitudeSerie = null;
+         joinedTourData.altitudeSerie = null;
       }
       if (!isCadenceSerie) {
-         multiTourData.setCadenceSerie(null);
+         joinedTourData.setCadenceSerie(null);
       }
       if (!isDistanceSerie) {
-         multiTourData.distanceSerie = null;
+         joinedTourData.distanceSerie = null;
       }
       if (!isGearSerie) {
-         multiTourData.gearSerie = null;
+         joinedTourData.gearSerie = null;
       }
       if (!isLatLonSerie) {
-         multiTourData.latitudeSerie = null;
-         multiTourData.longitudeSerie = null;
+         joinedTourData.latitudeSerie = null;
+         joinedTourData.longitudeSerie = null;
       }
       if (isPowerSerie) {
-         multiTourData.setPowerSerie(toPowerSerie);
+         joinedTourData.setPowerSerie(toPowerSerie);
       }
       if (!isPulseSerie) {
-         multiTourData.pulseSerie = null;
+         joinedTourData.pulseSerie = null;
       }
       if (!isTempSerie) {
-         multiTourData.temperatureSerie = null;
+         joinedTourData.temperatureSerie = null;
       }
 
       /*
        * Running dynamics
        */
       if (isRunDyn_StanceTime == false) {
-         multiTourData.clear_RunDyn_StanceTime();
+         joinedTourData.clear_RunDyn_StanceTime();
       }
       if (isRunDyn_StanceTimeBalance == false) {
-         multiTourData.clear_RunDyn_StanceTimeBalance();
+         joinedTourData.clear_RunDyn_StanceTimeBalance();
       }
       if (isRunDyn_StepLength == false) {
-         multiTourData.clear_RunDyn_StepLength();
+         joinedTourData.clear_RunDyn_StepLength();
       }
       if (isRunDyn_VerticalOscillation == false) {
-         multiTourData.clear_RunDyn_VerticalOscillation();
+         joinedTourData.clear_RunDyn_VerticalOscillation();
       }
       if (isRunDyn_VerticalRatio == false) {
-         multiTourData.clear_RunDyn_VerticalRatio();
+         joinedTourData.clear_RunDyn_VerticalRatio();
       }
 
       /*
        * Swimming
        */
       if (isswim_LengthType == false) {
-         multiTourData.clear_swim_LengthType();
+         joinedTourData.clear_swim_LengthType();
       }
       if (isSwim_Cadence == false) {
-         multiTourData.clear_Swim_Cadence();
+         joinedTourData.clear_Swim_Cadence();
       }
       if (isSwim_Strokes == false) {
-         multiTourData.clear_Swim_Strokes();
+         joinedTourData.clear_Swim_Strokes();
       }
       if (isSwim_StrokeStyle == false) {
-         multiTourData.clear_Swim_StrokeStyle();
+         joinedTourData.clear_Swim_StrokeStyle();
       }
       if (isSwim_Time == false) {
-         multiTourData.clear_Swim_Time();
+         joinedTourData.clear_Swim_Time();
       }
 
-      setupMultiTourMarker(multiTourData);
-      multiTourData.setTourPhotos(allTourPhoto, null);
+      setupMultiTourMarker(joinedTourData);
+      joinedTourData.setTourPhotos(allTourPhoto, null);
 
       final TourData firstTour = validatedMultipleTours.get(0);
       final ZonedDateTime tourStartTime = TimeTools.getZonedDateTime(firstTour.getTourStartTimeMS());
 
-      multiTourData.setTourStartTime(tourStartTime);
-      multiTourData.setTourRecordingTime(tourRecordingTime);
-      multiTourData.setTourDistance(tourDistance);
+      joinedTourData.setTourStartTime(tourStartTime);
+      joinedTourData.setTourRecordingTime(tourRecordingTime);
+      joinedTourData.setTourDistance(tourDistance);
 
       // computing these values is VERY cpu intensive because of the DP algorithm
-      multiTourData.setTourAltUp(tourAltUp);
-      multiTourData.setTourAltDown(tourAltDown);
+      joinedTourData.setTourAltUp(tourAltUp);
+      joinedTourData.setTourAltDown(tourAltDown);
 
-      multiTourData.computeTourDrivingTime();
-      multiTourData.computeComputedValues();
+      joinedTourData.computeTourDrivingTime();
+      joinedTourData.computeComputedValues();
 
-      multiTourData.multipleTour_IsCadenceRpm = isCadenceRpm;
-      multiTourData.multipleTour_IsCadenceSpm = isCadenceSpm;
+      joinedTourData.multipleTour_IsCadenceRpm = isCadenceRpm;
+      joinedTourData.multipleTour_IsCadenceSpm = isCadenceSpm;
 
-      _multipleTourData = multiTourData;
-      _multipleTourDataHash = tourIds.hashCode();
+      _joined_TourData = joinedTourData;
+      _joined_TourIds_Hash = tourIds.hashCode();
 
-      return multiTourData;
+      return joinedTourData;
    }
 
    /**
@@ -1172,7 +1175,7 @@ public class TourManager {
 
       if (tourEventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
 
-         _multipleTourData = null;
+         _joined_TourData = null;
       }
 
       listener.tourChanged(part, tourEventId, customData);
@@ -1567,6 +1570,8 @@ public class TourManager {
       }
 
       return true;
+      
+//      return tourData.hasGeoData();
    }
 
    /**
@@ -1623,12 +1628,17 @@ public class TourManager {
                                    final boolean isCheckLatLon) {
 
       // check if the requested data are already available
-      if (_multipleTourData_List != null && allTourIds.hashCode() == _multipleTourData_List_Hash) {
+      final int allTourIds_Hash = allTourIds.hashCode();
+      final int allTourData_Hash = allTourData.hashCode();
+
+      if (_allLoaded_TourData != null
+            && allTourIds_Hash == _allLoaded_TourIds_Hash
+            && allTourData_Hash == _allLoaded_TourData_Hash) {
 
          allTourData.clear();
-         allTourData.addAll(_multipleTourData_List);
+         allTourData.addAll(_allLoaded_TourData);
 
-         return _multipleTourData_List_Key;
+         return _allLoaded_TourData_Key;
       }
 
       allTourData.clear();
@@ -1699,11 +1709,12 @@ public class TourManager {
          }
       }
 
-      _multipleTourData_List = allTourData;
-      _multipleTourData_List_Hash = allTourIds.hashCode();
-      _multipleTourData_List_Key = newOverlayKey[0];
+      _allLoaded_TourIds_Hash = allTourIds.hashCode();
+      _allLoaded_TourData = allTourData;
+      _allLoaded_TourData_Hash = allTourData.hashCode();
+      _allLoaded_TourData_Key = newOverlayKey[0];
 
-      return newOverlayKey[0];
+      return _allLoaded_TourData_Key;
    }
 
    /**
@@ -2223,7 +2234,7 @@ public class TourManager {
                                                         final boolean canFireNotification) {
 
       // reset multiple tour data cache
-      _multipleTourData = null;
+      _joined_TourData = null;
 
       final ArrayList<TourData> savedTours = new ArrayList<>();
 
