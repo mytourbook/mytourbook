@@ -15,9 +15,9 @@
  *******************************************************************************/
 package de.byteholder.geoclipse.map.event;
 
-import org.eclipse.swt.graphics.Point;
-
 import net.tourbook.common.map.GeoPosition;
+
+import org.eclipse.swt.graphics.Point;
 
 public interface IMapGridListener {
 
@@ -30,7 +30,13 @@ public interface IMapGridListener {
     *           bottom/right, multiplied with 100
     * @param mapZoomLevel
     * @param mapGeoCenter
+    * @param isGridSelected
+    *           Is <code>true</code> when grid is selected, otherwise mouse is just moved
     */
-   public void onMapGrid(Point topLeftE2, Point bottomRightE2, int mapZoomLevel, GeoPosition mapGeoCenter);
+   public void onMapGrid(Point topLeftE2,
+                         Point bottomRightE2,
+                         int mapZoomLevel,
+                         GeoPosition mapGeoCenter,
+                         boolean isGridSelected);
 
 }

@@ -120,6 +120,7 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourInfoIconToolTipProvider;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.filter.geo.GeoFilterTourLoader;
 import net.tourbook.tour.filter.geo.TourGeoFilterItem;
 import net.tourbook.tour.filter.geo.TourGeoFilterManager;
 import net.tourbook.tour.photo.DialogPhotoProperties;
@@ -946,9 +947,17 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
          public void onMapGrid(final org.eclipse.swt.graphics.Point topLeftE2,
                                final org.eclipse.swt.graphics.Point bottomRightE2,
                                final int mapZoomLevel,
-                               final GeoPosition mapGeoCenter) {
+                               final GeoPosition mapGeoCenter,
+                               final boolean isGridSelected) {
 
-            TourGeoFilterManager.setFilter(topLeftE2, bottomRightE2, mapZoomLevel, mapGeoCenter);
+            if (isGridSelected) {
+
+               TourGeoFilterManager.setFilter(topLeftE2, bottomRightE2, mapZoomLevel, mapGeoCenter);
+
+            } else {
+
+               GeoFilterTourLoader.loadToursFromGeoParts();
+            }
          }
       });
 

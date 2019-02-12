@@ -1095,7 +1095,7 @@ public class Map extends Canvas {
       _mp.disposeTiles();
    }
 
-   private void fireMapGridEvent() {
+   private void fireMapGridEvent(final boolean isGridSelected) {
 
       final Object[] listeners = _allMapGridListener.getListeners();
 
@@ -1106,7 +1106,8 @@ public class Map extends Canvas {
                _grid_SelectedPosition_Geo_1_E2,
                _grid_SelectedPosition_Geo_2_E2,
                _mapZoomLevel,
-               geoCenter);
+               geoCenter,
+               isGridSelected);
       }
    }
 
@@ -1418,13 +1419,14 @@ public class Map extends Canvas {
    }
 
    /**
-    * Hide offline area and all states
+    * Hide geo grid and reset all states
     */
    private void grid_DisableSelection() {
 
       _grid_IsSelecting = false;
       _grid_IsShowSelectingGrid = false;
       _grid_IsSelectionStarted = false;
+      _grid_WorldMouse_Move = null;
 
       _isContextMenuEnabled = true;
 
@@ -1989,6 +1991,7 @@ public class Map extends Canvas {
          paint();
 
          fireMapInfoEvent();
+         fireMapGridEvent(false);
 
          return;
 
@@ -2116,7 +2119,7 @@ public class Map extends Canvas {
          redraw();
          paint();
 
-         fireMapGridEvent();
+         fireMapGridEvent(true);
 
       } else {
 

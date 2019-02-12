@@ -6806,7 +6806,8 @@ public class TourDatabase {
 
                   final String percent = String.format("%.1f", (float) tourIndex / numTours * 100.0);//$NON-NLS-1$
 
-                  final String message = NLS.bind(Messages.Tour_Database_PostUpdate_037_SetHasGeoData, new Object[] { tourIndex, numTours, percent });
+                  final String message = NLS.bind(Messages.Tour_Database_PostUpdate_037_SetHasGeoData,
+                        new Object[] { tourIndex, numTours, percent });
 
                   monitor.subTask(message);
                   System.out.println(message);
