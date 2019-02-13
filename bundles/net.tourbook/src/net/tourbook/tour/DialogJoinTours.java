@@ -1343,6 +1343,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
        * setup tour data
        */
       _joinedTourData.setTourStartTime(joinedTourStart);
+      _joinedTourData.setTimeZoneId(joinedTourStart.getZone().getId());
 
       // tour id must be created after the tour date/time is set
       _joinedTourData.createTourId();
