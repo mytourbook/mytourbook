@@ -27,9 +27,16 @@ Bugfix
 
 * Tour Import 
 
-  - fit
+  - .fit File
     Fixed NPE when a lap has not an absolute time, this occured with files from Sigma-ROX 12.0
     
-  - gpx
+  - .gpx File
     - "Convert waypoints into tour markers" did not work
-    - Set correct marker position when waypoint is converted into tour marker 
+    - Set correct marker position when waypoint is converted into tour marker
+    
+  - Set speed from device by discovering any time slices and not only the first 
+   
+    
+* Join Tours
+
+  - Set speed from device according to the joined tours

@@ -5339,6 +5339,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		final boolean isGPS 									= setupStartingValues_LatLon(timeDataSerie);
 		final boolean isPower 								= setupStartingValues_Power(timeDataSerie);
 		final boolean isPulse 								= setupStartingValues_Pulse(timeDataSerie);
+		final boolean isSpeed 								= setupStartingValues_Speed(timeDataSerie);
 		final boolean isTemperature 						= setupStartingValues_Temperature(timeDataSerie);
 
 		final boolean isRunDyn_StanceTime 				= setupStartingValues_RunDyn_StanceTime(timeDataSerie);
@@ -5348,17 +5349,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 		final boolean isRunDyn_VerticalRatio			= setupStartingValues_RunDyn_VerticalRatio(timeDataSerie);
 
 // SET_FORMATTING_ON
-
-      /*
-       * Speed
-       */
-      boolean isSpeed = false;
-      if (firstTimeDataItem.speed != Float.MIN_VALUE) {
-         speedSerie = new float[serieSize];
-         isSpeed = true;
-
-         isSpeedSerieFromDevice = true;
-      }
 
       // time in seconds relative to the tour start
       long recordingTime = 0;
@@ -9704,6 +9694,37 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
          runDyn_VerticalRatio = new short[serieSize];
          isAvailable = true;
+      }
+
+      return isAvailable;
+   }
+
+   private boolean setupStartingValues_Speed(final TimeData[] timeDataSerie) {
+
+      boolean isAvailable = false;
+
+      // find valid speed slices
+      for (final TimeData timeData : timeDataSerie) {
+
+         if (timeData.speed != Float.MIN_VALUE) {
+            isAvailable = true;
+            break;
+         }
+      }
+
+      if (isAvailable) {
+
+         // cleanup speed serie, remove invalid values
+
+         for (final TimeData timeData : timeDataSerie) {
+
+            if (timeData.speed == Float.MIN_VALUE) {
+               timeData.speed = 0;
+            }
+         }
+
+         speedSerie = new float[timeDataSerie.length];
+         isSpeedSerieFromDevice = true;
       }
 
       return isAvailable;
