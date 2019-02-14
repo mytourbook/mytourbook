@@ -15,27 +15,34 @@
  *******************************************************************************/
 package net.tourbook.tour.filter.geo;
 
+import org.eclipse.swt.graphics.Point;
+
 /**
  * Contains all data for a tour comparison
  */
 public class GeoFilterLoaderItem {
 
-   long    executorId;
+   long          executorId;
 
    /**
     * When <code>true</code> then the loading/comparing of tours in this loader is canceled.
     */
-   boolean isCanceled;
+   boolean       isCanceled;
 
    /**
     * /** Time in ms to calculate sql data
     */
-   long    sqlRunningTime;
+   long          sqlRunningTime;
 
    /**
     *
     */
-   boolean isReselectedInUI;
+   boolean       isReselectedInUI;
+
+   public Point  topLeftE2;
+   public Point  bottomRightE2;
+
+   public String gridBoxText;
 
    @SuppressWarnings("unused")
    private GeoFilterLoaderItem() {}

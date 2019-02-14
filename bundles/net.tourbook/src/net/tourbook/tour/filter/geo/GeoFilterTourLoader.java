@@ -15,16 +15,29 @@
  *******************************************************************************/
 package net.tourbook.tour.filter.geo;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicLong;
 
-import net.tourbook.data.NormalizedGeoData;
-import net.tourbook.ui.views.geoCompare.GeoCompareView;
+import net.tourbook.common.UI;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.Util;
+import net.tourbook.data.TourData;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.map2.view.Map2View;
+
+import org.eclipse.swt.graphics.Point;
 
 public class GeoFilterTourLoader {
+
+   private static final char                                     NL                  = UI.NEW_LINE;
 
    private static final AtomicLong                               _loaderExecuterId   = new AtomicLong();
    private static final LinkedBlockingDeque<GeoFilterLoaderItem> _loaderWaitingQueue = new LinkedBlockingDeque<>();
@@ -49,141 +62,8 @@ public class GeoFilterTourLoader {
       _loadingExecutor = Executors.newSingleThreadExecutor(threadFactory);
    }
 
-   private static boolean loadTourGeoPartsFromDB(final GeoFilterLoaderItem loaderItem) {
-
-      if (loaderItem.isCanceled) {
-         return false;
-      }
-
-//      final long start = System.currentTimeMillis();
-//
-//      final int[] requestedGeoParts = loaderItem.geoParts;
-//      final int numGeoParts = requestedGeoParts.length;
-//
-//      if (numGeoParts == 0) {
-//
-//         // there are no geoparts, set empty list to have valid data
-//
-//         loaderItem.tourIds = new long[] {};
-//
-//         return true;
-//      }
-//
-//      final boolean isAppFilter = loaderItem.isUseAppFilter;
-//
-//      /*
-//       * Create sql parameters
-//       */
-//      final StringBuilder sqlInParameters = new StringBuilder();
-//      for (int partIndex = 0; partIndex < numGeoParts; partIndex++) {
-//         if (partIndex == 0) {
-//            sqlInParameters.append(" ?"); //$NON-NLS-1$
-//         } else {
-//            sqlInParameters.append(", ?"); //$NON-NLS-1$
-//         }
-//      }
-//
-//      Connection conn = null;
-//      String select = null;
-//
-//      try {
-//
-//// this is very slow
-////       final SQLFilter appFilter = new SQLFilter(SQLFilter.TAG_FILTER);
-//         final SQLFilter appFilter = new SQLFilter();
-//
-//         final char NL = UI.NEW_LINE;
-//
-//         final String selectGeoPart = ""
-//
-//               + "SELECT" + NL //                       //$NON-NLS-1$
-//
-//               + " DISTINCT TourId " + NL //                           //$NON-NLS-1$
-//
-//               + (" FROM " + TourDatabase.TABLE_TOUR_GEO_PARTS + NL) //      //$NON-NLS-1$
-//               + (" WHERE GeoPart IN (" + sqlInParameters + ")") + NL //      //$NON-NLS-1$ //$NON-NLS-2$
-//         ;
-//
-//         if (isAppFilter) {
-//
-//            final String selectAppFilter = ""
-//
-//                  + "SELECT" + NL //                    //$NON-NLS-1$
-//
-//                  + " TourId" + NL //                                 //$NON-NLS-1$
-//                  + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //         //$NON-NLS-1$
-//
-//// this is very slow
-////                // get tag id's
-////                + (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag") + NL //$NON-NLS-1$ //$NON-NLS-2$
-////                + (" ON tourID = jTdataTtag.TourData_tourId") + NL //$NON-NLS-1$
-//
-//                  + " WHERE 1=1 " + appFilter.getWhereClause() + NL//         //$NON-NLS-1$
-//            ;
-//
-//            select = selectGeoPart
-//
-//                  + " AND TourId IN (" + selectAppFilter + ")"; //$NON-NLS-1$ //$NON-NLS-2$
-//         } else {
-//
-//            select = selectGeoPart;
-//         }
-//
-//         conn = TourDatabase.getInstance().getConnection();
-//
-//         /*
-//          * Fill parameters
-//          */
-//         final PreparedStatement statement = conn.prepareStatement(select);
-//
-//         for (int partIndex = 0; partIndex < numGeoParts; partIndex++) {
-//            statement.setInt(partIndex + 1, requestedGeoParts[partIndex]);
-//         }
-//
-//         if (isAppFilter) {
-//            appFilter.setParameters(statement, 1 + numGeoParts);
-//         }
-//
-//         /*
-//          * Get tour id's
-//          */
-//         final ResultSet result = statement.executeQuery();
-//
-//         final TLongArrayList tourIds = new TLongArrayList();
-//
-//         while (result.next()) {
-//            tourIds.add(result.getLong(1));
-//         }
-//
-//         loaderItem.tourIds = tourIds.toArray();
-//
-//      } catch (final SQLException e) {
-//
-//         StatusUtil.log(select);
-//         net.tourbook.ui.UI.showSQLException(e);
-//
-//      } finally {
-//
-//         Util.closeSql(conn);
-//      }
-//
-//      final long timeDiff = System.currentTimeMillis() - start;
-//
-//      loaderItem.sqlRunningTime = timeDiff;
-//
-////      System.out.println(
-////            (UI.timeStampNano() + " [" + GeoPart_TourLoader.class.getSimpleName() + "] ")
-////                  + "loadTourGeoPartsFromDB\t" + timeDiff + " ms");
-////// TODO remove SYSTEM.OUT.PRINTLN
-
-      if (loaderItem.isCanceled) {
-         return false;
-      }
-
-      return true;
-   }
-
    /**
+    * @param map2View
     * @param geoParts
     *           Requested geo parts
     * @param lonPartNormalized
@@ -192,25 +72,22 @@ public class GeoFilterTourLoader {
     * @param previousLoaderItem
     * @param geoPartView
     * @return
+    * @return
     */
-   static GeoFilterLoaderItem loadToursFromGeoParts(final int[] geoParts,
-                                                    final NormalizedGeoData normalizedTourPart,
-                                                    final boolean useAppFilter,
-                                                    final GeoFilterLoaderItem previousLoaderItem,
-                                                    final GeoCompareView geoPartView) {
+   public static GeoFilterLoaderItem loadToursFromGeoParts(final Point topLeftE2,
+                                                           final Point bottomRightE2,
+                                                           final GeoFilterLoaderItem previousGeoFilterItem,
+                                                           final Map2View map2View) {
 
-      stopLoading(previousLoaderItem);
+      stopLoading(previousGeoFilterItem);
 
       // invalidate old requests
       final long executerId = _loaderExecuterId.incrementAndGet();
 
-//      System.out.println(
-//            ("[" + GeoPartTourLoader.class.getSimpleName() + "] loadToursFromGeoParts()")
-//                 + ("\texecuterId: " + executerId));
-//// TODO remove SYSTEM.OUT.PRINTLN
+      final GeoFilterLoaderItem loaderItem = new GeoFilterLoaderItem(executerId);
 
-      final GeoFilterLoaderItem loaderItem = new GeoFilterLoaderItem(
-            executerId);
+      loaderItem.topLeftE2 = topLeftE2;
+      loaderItem.bottomRightE2 = bottomRightE2;
 
       _loaderWaitingQueue.add(loaderItem);
 
@@ -225,8 +102,8 @@ public class GeoFilterTourLoader {
                return;
             }
 
-            if (loadTourGeoPartsFromDB(loaderItem)) {
-//               geoPartView.compare_40_CompareTours(loaderItem);
+            if (loadToursFromGeoParts_FromDB(loaderItem)) {
+               map2View.geoFilter_20_Result(loaderItem);
             }
          }
       };
@@ -236,12 +113,142 @@ public class GeoFilterTourLoader {
       return loaderItem;
    }
 
+   private static boolean loadToursFromGeoParts_FromDB(final GeoFilterLoaderItem loaderItem) {
+
+      if (loaderItem.isCanceled) {
+         return false;
+      }
+
+      final long start = System.currentTimeMillis();
+
+      final StringBuilder sqlWhere = new StringBuilder();
+      final ArrayList<Integer> allLatLonParts = new ArrayList<>();
+
+      //         int latPart = (int) (latitude * 100);
+      //         int lonPart = (int) (longitude * 100);
+      //
+      //         lat      ( -90 ... + 90) * 100 =  -9_000 +  9_000 = 18_000
+      //         lon      (-180 ... +180) * 100 = -18_000 + 18_000 = 36_000
+      //
+      //         max      (9_000 + 9_000) * 100_000 = 18_000 * 100_000  = 1_800_000_000
+      //
+      //                                    Integer.MAX_VALUE = 2_147_483_647
+
+      // x: longitude
+      // y: latitude
+
+      final int normalizedLat1 = loaderItem.topLeftE2.y + TourData.NORMALIZED_LATITUDE_OFFSET_E2;
+      final int normalizedLat2 = loaderItem.bottomRightE2.y + TourData.NORMALIZED_LATITUDE_OFFSET_E2;
+
+      final int normalizedLon1 = loaderItem.topLeftE2.x + TourData.NORMALIZED_LONGITUDE_OFFSET_E2;
+      final int normalizedLon2 = loaderItem.bottomRightE2.x + TourData.NORMALIZED_LONGITUDE_OFFSET_E2;
+
+      final double gridSize_E2 = 1; // 0.01°
+
+      for (int normalizedLon = normalizedLon1; normalizedLon < normalizedLon2; normalizedLon += gridSize_E2) {
+
+         for (int normalizedLat = normalizedLat2; normalizedLat < normalizedLat1; normalizedLat += gridSize_E2) {
+
+            final int latitudeE2 = normalizedLat - TourData.NORMALIZED_LATITUDE_OFFSET_E2;
+            final int longitudeE2 = normalizedLon - TourData.NORMALIZED_LONGITUDE_OFFSET_E2;
+
+            final int latLonPart = (latitudeE2 + 9_000) * 100_000 + (longitudeE2 + 18_000);
+
+            allLatLonParts.add(latLonPart);
+
+//            System.out.println(String.format("lon(x) %d  lat(y) %d  %s",
+//
+//                  longitudeE2,
+//                  latitudeE2,
+//
+//                  Integer.toString(latLonPart)
+//
+//            ));
+//// TODO remove SYSTEM.OUT.PRINTLN
+         }
+      }
+
+      final int numGeoParts = allLatLonParts.size();
+
+      /*
+       * Create sql parameters
+       */
+      final StringBuilder sqlInParameters = new StringBuilder();
+      for (int partIndex = 0; partIndex < numGeoParts; partIndex++) {
+         if (partIndex == 0) {
+            sqlInParameters.append(" ?"); //                               //$NON-NLS-1$
+         } else {
+            sqlInParameters.append(", ?"); //                              //$NON-NLS-1$
+         }
+      }
+
+      final String selectAllTourIds = ""
+
+            + "SELECT" + NL //                     //$NON-NLS-1$
+
+            + " DISTINCT TourId " + NL //                                  //$NON-NLS-1$
+
+            + (" FROM " + TourDatabase.TABLE_TOUR_GEO_PARTS + NL) //       //$NON-NLS-1$
+            + (" WHERE GeoPart IN (" + sqlInParameters + ")") + NL //      //$NON-NLS-1$ //$NON-NLS-2$
+      ;
+
+      Connection conn = null;
+
+      final ArrayList<Long> allTourIds = new ArrayList<>();
+
+      try {
+
+         conn = TourDatabase.getInstance().getConnection();
+
+         final PreparedStatement stmtSelect = conn.prepareStatement(selectAllTourIds);
+
+         // fillup parameters
+         for (int partIndex = 0; partIndex < allLatLonParts.size(); partIndex++) {
+            final Integer latLonPart = allLatLonParts.get(partIndex);
+            stmtSelect.setInt(partIndex + 1, latLonPart);
+         }
+
+         final ResultSet result = stmtSelect.executeQuery();
+
+         while (result.next()) {
+
+            if (loaderItem.isCanceled) {
+               return false;
+            }
+
+            allTourIds.add(result.getLong(1));
+         }
+
+      } catch (final SQLException e) {
+
+         StatusUtil.log(selectAllTourIds);
+         net.tourbook.ui.UI.showSQLException(e);
+
+      } finally {
+
+         Util.closeSql(conn);
+      }
+
+      final long timeDiff = System.currentTimeMillis() - start;
+      loaderItem.sqlRunningTime = timeDiff;
+
+      final String timeInMs = timeDiff > 50 ? " - " + Long.toString(timeDiff) + " ms" : "";
+      loaderItem.gridBoxText = "Tours: " + Integer.toString(allTourIds.size()) + timeInMs;
+
+//      System.out.println(""
+////            (UI.timeStampNano() + " [" + GeoFilterTourLoader.class.getSimpleName() + "] ")
+//            + "load\t" + timeDiff + " ms");
+//// TODO remove SYSTEM.OUT.PRINTLN
+
+      return true;
+   }
+
    /**
-    * Stop loading and comparing of the tours in the waiting queue.
+    * Stop loading the tours in the waiting queue.
     *
     * @param loaderItem
     */
-   static void stopLoading(final GeoFilterLoaderItem loaderItem) {
+   public static void stopLoading(final GeoFilterLoaderItem loaderItem) {
 
       if (loaderItem != null) {
          loaderItem.isCanceled = true;

@@ -120,6 +120,7 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourInfoIconToolTipProvider;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.filter.geo.GeoFilterLoaderItem;
 import net.tourbook.tour.filter.geo.GeoFilterTourLoader;
 import net.tourbook.tour.filter.geo.TourGeoFilterItem;
 import net.tourbook.tour.filter.geo.TourGeoFilterManager;
@@ -282,7 +283,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
          MapGraphId.HrZone,
    };
 
-
+   private static final int         DELAY_BEFORE_STARTING_GEO_FILTER          = 300;
 
    private final IPreferenceStore   _prefStore                             = TourbookPlugin.getPrefStore();
    private final IDialogSettings    _state                                 = TourbookPlugin.getState(ID);
@@ -364,85 +365,90 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
    /*
     * current position for the x-sliders
     */
-   private int                           _currentLeftSliderValueIndex;
-   private int                           _currentRightSliderValueIndex;
+   private int                            _currentLeftSliderValueIndex;
+   private int                            _currentRightSliderValueIndex;
 
-   private int                           _currentSelectedSliderValueIndex;
+   private int                            _currentSelectedSliderValueIndex;
 
-   private MapLegend                     _mapLegend;
+   private MapLegend                      _mapLegend;
 
-   private long                          _previousOverlayKey;
-   private int                           _mapDimLevel         = -1;
+   private long                           _previousOverlayKey;
+   private int                            _mapDimLevel         = -1;
 
-   private RGB                           _mapDimColor;
+   private RGB                            _mapDimColor;
 
-   private int                           _selectedProfileKey  = 0;
+   private int                            _selectedProfileKey  = 0;
 
-   private MapGraphId                    _tourColorId;
+   private MapGraphId                     _tourColorId;
    //
-   private int                           _hash_AllTourIds;
-   private int                           _hash_AllTourData;
-   private long                          _hash_TourOverlayKey;
-   private int                           _hash_AllPhotos;
+   private int                            _hash_AllTourIds;
+   private int                            _hash_AllTourData;
+   private long                           _hash_TourOverlayKey;
+   private int                            _hash_AllPhotos;
 
-   private final AtomicInteger           _asyncCounter        = new AtomicInteger();
+   private final AtomicInteger            _asyncCounter        = new AtomicInteger();
 
    /**
     * Is <code>true</code> when a link photo is displayed, otherwise a tour photo (photo which is
     * save in a tour) is displayed.
     */
-   private boolean                       _isLinkPhotoDisplayed;
-   private SliderPathPaintingData        _sliderPathPaintingData;
-   private OpenDialogManager             _openDlgMgr          = new OpenDialogManager();
+   private boolean                        _isLinkPhotoDisplayed;
+   private SliderPathPaintingData         _sliderPathPaintingData;
+   private OpenDialogManager              _openDlgMgr          = new OpenDialogManager();
 
-   private boolean                       _isInMapSync;
-   private long                          _lastFiredSyncEventTime;
+   private boolean                        _isInMapSync;
+   private long                           _lastFiredSyncEventTime;
 
-   private HashMap<MapGraphId, Action>   _allTourColorActions = new HashMap<>();
-   private ActionTourColor               _actionTourColorAltitude;
-   private ActionTourColor               _actionTourColorGradient;
-   private ActionTourColor               _actionTourColorPulse;
-   private ActionTourColor               _actionTourColorSpeed;
-   private ActionTourColor               _actionTourColorPace;
-   private ActionTourColor               _actionTourColorHrZone;
-   private ActionTourColor               _actionTourColor_RunDyn_StepLength;
+   private HashMap<MapGraphId, Action>    _allTourColorActions = new HashMap<>();
+   private ActionTourColor                _actionTourColorAltitude;
+   private ActionTourColor                _actionTourColorGradient;
+   private ActionTourColor                _actionTourColorPulse;
+   private ActionTourColor                _actionTourColorSpeed;
+   private ActionTourColor                _actionTourColorPace;
+   private ActionTourColor                _actionTourColorHrZone;
+   private ActionTourColor                _actionTourColor_RunDyn_StepLength;
 
-   private ActionDimMap                  _actionDimMap;
-   private ActionOpenPrefDialog          _actionEditMap2Preferences;
-   private ActionMap2_Graphs             _actionMap2TourColors;
-   private ActionMapBookmarks            _actionMapBookmarks;
-   private ActionMap2Color               _actionMap2Color;
-   private ActionManageMapProviders      _actionManageProvider;
-   private ActionPhotoProperties         _actionPhotoFilter;
-   private ActionReloadFailedMapImages   _actionReloadFailedMapImages;
-   private ActionSaveDefaultPosition     _actionSaveDefaultPosition;
-   private ActionSearchTourByLocation    _actionSearchTourByLocation;
-   private ActionSelectMapProvider       _actionSelectMapProvider;
-   private ActionSetDefaultPosition      _actionSetDefaultPosition;
-   private ActionShowAllFilteredPhotos   _actionShowAllFilteredPhotos;
-   private ActionShowLegendInMap         _actionShowLegendInMap;
-   private ActionShowPhotos              _actionShowPhotos;
-   private ActionShowPOI                 _actionShowPOI;
-   private ActionShowScaleInMap          _actionShowScaleInMap;
-   private ActionShowSliderInMap         _actionShowSliderInMap;
-   private ActionShowSliderInLegend      _actionShowSliderInLegend;
-   private ActionShowStartEndInMap       _actionShowStartEndInMap;
-   private ActionShowTour                _actionShowTour;
-   private ActionShowTourInfoInMap       _actionShowTourInfoInMap;
-   private ActionShowTourMarker          _actionShowTourMarker;
-   private ActionShowWayPoints           _actionShowWayPoints;
-   private ActionSyncZoomLevelAdjustment _actionSyncZoomLevelAdjustment;
-   private ActionSyncMapWithOtherMap     _actionSyncMap_WithOtherMap;
-   private ActionSyncMapWithPhoto        _actionSyncMap_WithPhoto;
-   private ActionSyncMapWithSlider       _actionSyncMap_WithChartSlider;
-   private ActionSyncMapWithTour         _actionSyncMap_WithTour;
+   private ActionDimMap                   _actionDimMap;
+   private ActionOpenPrefDialog           _actionEditMap2Preferences;
+   private ActionMap2_Graphs              _actionMap2TourColors;
+   private ActionMapBookmarks             _actionMapBookmarks;
+   private ActionMap2Color                _actionMap2Color;
+   private ActionManageMapProviders       _actionManageProvider;
+   private ActionPhotoProperties          _actionPhotoFilter;
+   private ActionReloadFailedMapImages    _actionReloadFailedMapImages;
+   private ActionSaveDefaultPosition      _actionSaveDefaultPosition;
+   private ActionSearchTourByLocation     _actionSearchTourByLocation;
+   private ActionSelectMapProvider        _actionSelectMapProvider;
+   private ActionSetDefaultPosition       _actionSetDefaultPosition;
+   private ActionShowAllFilteredPhotos    _actionShowAllFilteredPhotos;
+   private ActionShowLegendInMap          _actionShowLegendInMap;
+   private ActionShowPhotos               _actionShowPhotos;
+   private ActionShowPOI                  _actionShowPOI;
+   private ActionShowScaleInMap           _actionShowScaleInMap;
+   private ActionShowSliderInMap          _actionShowSliderInMap;
+   private ActionShowSliderInLegend       _actionShowSliderInLegend;
+   private ActionShowStartEndInMap        _actionShowStartEndInMap;
+   private ActionShowTour                 _actionShowTour;
+   private ActionShowTourInfoInMap        _actionShowTourInfoInMap;
+   private ActionShowTourMarker           _actionShowTourMarker;
+   private ActionShowWayPoints            _actionShowWayPoints;
+   private ActionSyncZoomLevelAdjustment  _actionSyncZoomLevelAdjustment;
+   private ActionSyncMapWithOtherMap      _actionSyncMap_WithOtherMap;
+   private ActionSyncMapWithPhoto         _actionSyncMap_WithPhoto;
+   private ActionSyncMapWithSlider        _actionSyncMap_WithChartSlider;
+   private ActionSyncMapWithTour          _actionSyncMap_WithTour;
 
-   private ActionZoomIn                  _actionZoom_In;
-   private ActionZoomOut                 _actionZoom_Out;
-   private ActionZoomCentered            _actionZoom_Centered;
-   private ActionZoomShowEntireMap       _actionZoom_ShowEntireMap;
+   private ActionZoomIn                   _actionZoom_In;
+   private ActionZoomOut                  _actionZoom_Out;
+   private ActionZoomCentered             _actionZoom_Centered;
+   private ActionZoomShowEntireMap        _actionZoom_ShowEntireMap;
 
-   private ActionZoomShowEntireTour      _actionZoom_ShowEntireTour;
+   private ActionZoomShowEntireTour       _actionZoom_ShowEntireTour;
+
+   private org.eclipse.swt.graphics.Point _geoFilter_TopLeftE2;
+   private org.eclipse.swt.graphics.Point _geoFilter_BottomRightE2;
+   private GeoFilterLoaderItem            _geoFilter_PreviousGeoFilterItem;
+   private AtomicInteger                  _geoFilter_RunningId = new AtomicInteger();
 
    /*
     * UI controls
@@ -956,7 +962,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
             } else {
 
-               GeoFilterTourLoader.loadToursFromGeoParts();
+               geoFilter_10_Loader(topLeftE2, bottomRightE2);
             }
          }
       });
@@ -1051,10 +1057,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
             } else if (property.equals(ITourbookPreferences.MAP_LAYOUT_MAP_DIMM_COLOR)) {
 
-               actionDimMap(
-                     PreferenceConverter.getColor(
-                           _prefStore,
-                           ITourbookPreferences.MAP_LAYOUT_MAP_DIMM_COLOR));
+               actionDimMap(PreferenceConverter.getColor(_prefStore, ITourbookPreferences.MAP_LAYOUT_MAP_DIMM_COLOR));
 
             } else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
 
@@ -1069,8 +1072,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
             } else if (property.equals(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD)) {
 
-               _map.setTourPaintMethodEnhanced(//
-                     event.getNewValue().equals(PrefPageMap2Appearance.TOUR_PAINT_METHOD_COMPLEX));
+               _map.setTourPaintMethodEnhanced(event.getNewValue().equals(PrefPageMap2Appearance.TOUR_PAINT_METHOD_COMPLEX));
 
             } else if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)
                   || property.equals(ITourbookPreferences.MAP2_OPTIONS_IS_MODIFIED)) {
@@ -1933,6 +1935,78 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
                GRAPH_CONTRIBUTION_ID_SLIDEOUT,
                _allTourColorActions.get(graphId));
       }
+   }
+
+   private void geoFilter_10_Loader(final org.eclipse.swt.graphics.Point topLeftE2, final org.eclipse.swt.graphics.Point bottomRightE2) {
+
+      if (_geoFilter_TopLeftE2 != null
+            && topLeftE2.equals(_geoFilter_TopLeftE2)
+            && bottomRightE2.equals(_geoFilter_BottomRightE2)) {
+
+         // this is already loaded
+
+         return;
+      }
+
+      // hide previous info
+//      _map.setGridBox(null);
+
+      final int runnableRunningId = _geoFilter_RunningId.incrementAndGet();
+
+      GeoFilterTourLoader.stopLoading(_geoFilter_PreviousGeoFilterItem);
+
+      // delay tour comparator, moving the slider can occure very often
+//    _parent.getDisplay().timerExec(DELAY_BEFORE_STARTING_GEO_FILTER, new Runnable() {
+      _parent.getDisplay().timerExec(50, new Runnable() {
+
+         private int __runningId = runnableRunningId;
+
+         @Override
+         public void run() {
+
+            if (_parent.isDisposed()) {
+               return;
+            }
+
+            final int currentId = _geoFilter_RunningId.get();
+
+            if (__runningId != currentId) {
+
+               // a newer runnable is created
+
+               return;
+            }
+
+            _geoFilter_TopLeftE2 = topLeftE2;
+            _geoFilter_BottomRightE2 = bottomRightE2;
+
+            _geoFilter_PreviousGeoFilterItem = GeoFilterTourLoader.loadToursFromGeoParts(
+                  topLeftE2,
+                  bottomRightE2,
+                  _geoFilter_PreviousGeoFilterItem,
+                  Map2View.this);
+         }
+      });
+
+   }
+
+   public void geoFilter_20_Result(final GeoFilterLoaderItem loaderItem) {
+      // TODO Auto-generated method stub
+
+      // update UI
+      Display.getDefault().asyncExec(new Runnable() {
+         @Override
+         public void run() {
+
+            if (_parent.isDisposed()) {
+               return;
+            }
+
+            _map.setGridBox(loaderItem.gridBoxText);
+
+            _map.paint();
+         }
+      });
    }
 
    private IMapColorProvider getColorProvider(final MapGraphId colorId) {

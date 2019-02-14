@@ -522,6 +522,11 @@ public class Map extends Canvas {
    private Point               _grid_WorldLast_Start;
    private Point               _grid_WorldLast_End;
 
+   private String              _grid_BoxInfo;
+   private String              _grid_BoxInfo_Previous;
+   private Point               _grid_BoxInfo_Position;
+   private Point               _grid_BoxInfo_PreviousPosition;
+
    /**
     * Top/left position
     */
@@ -2583,7 +2588,10 @@ public class Map extends Canvas {
       if ((_grid_DevMouse_Start == null) || (_grid_WorldMouse_Move == null)) {
 
          if (_grid_WorldMouse_Move != null) {
-            paint_GridBox_50_Rectangle(gc, _grid_WorldMouse_Move, _grid_WorldMouse_Move, false);
+
+            final Point topLeft = paint_GridBox_50_Rectangle(gc, _grid_WorldMouse_Move, _grid_WorldMouse_Move, false);
+
+            _grid_BoxInfo_Position = paint_GridBox_60_BoxInfo(gc, _grid_BoxInfo, topLeft);
          }
 
          return;
@@ -2626,7 +2634,8 @@ public class Map extends Canvas {
        * Draw geo grid
        */
 
-      paint_GridBox_50_Rectangle(gc, _grid_WorldMouse_Start, _grid_WorldMouse_End, false);
+      final Point topLeft = paint_GridBox_50_Rectangle(gc, _grid_WorldMouse_Start, _grid_WorldMouse_End, false);
+      paint_GridBox_60_BoxInfo(gc, _grid_BoxInfo, topLeft);
 
       final int width = _grid_SelectedPosition_Geo_2_E2.x - _grid_SelectedPosition_Geo_1_E2.x;
       final int height = _grid_SelectedPosition_Geo_1_E2.y - _grid_SelectedPosition_Geo_2_E2.y;
@@ -2654,7 +2663,8 @@ public class Map extends Canvas {
          return;
       }
 
-      paint_GridBox_50_Rectangle(gc, _grid_WorldLast_Start, _grid_WorldLast_End, true);
+      final Point topLeft = paint_GridBox_50_Rectangle(gc, _grid_WorldLast_Start, _grid_WorldLast_End, true);
+      paint_GridBox_60_BoxInfo(gc, _grid_BoxInfo_Previous, topLeft);
    }
 
    /**
@@ -2666,12 +2676,12 @@ public class Map extends Canvas {
     * @param isPaintLastGridSelection
     *           When <code>true</code>, the last selected grid is painted, otherwise the currently
     *           selecting grid
-    * @return Returns number of grid rectangles
+    * @return Returns top/left box position in the viewport
     */
-   private void paint_GridBox_50_Rectangle(final GC gc,
-                                           final Point worldStart,
-                                           final Point worldEnd,
-                                           final boolean isPaintLastGridSelection) {
+   private Point paint_GridBox_50_Rectangle(final GC gc,
+                                            final Point worldStart,
+                                            final Point worldEnd,
+                                            final boolean isPaintLastGridSelection) {
 
       final int worldStartX = worldStart.x;
       final int worldStartY = worldStart.y;
@@ -2953,6 +2963,31 @@ public class Map extends Canvas {
       gc.setLineWidth(2);
       gc.setForeground(boxColor);
       gc.drawRectangle(devGrid_X1, devGrid_Y1, width, height);
+
+      return new Point(devGrid_X1, devGrid_Y1);
+   }
+
+   private Point paint_GridBox_60_BoxInfo(final GC gc, final String infoText, final Point topLeft) {
+
+      if (infoText == null) {
+         return null;
+      }
+
+      final Point textSize = gc.stringExtent(infoText);
+
+      final int devX = topLeft.x;
+      final int devY = topLeft.y - textSize.y - 5;
+
+      gc.setForeground(SYS_COLOR_WHITE);
+      gc.drawString(infoText, devX + 1, devY + 1, true);
+      gc.drawString(infoText, devX - 1, devY + 1, true);
+      gc.drawString(infoText, devX + 1, devY - 1, true);
+      gc.drawString(infoText, devX - 1, devY - 1, true);
+
+      gc.setForeground(SYS_COLOR_BLACK);
+      gc.drawString(infoText, devX, devY, true);
+
+      return new Point(devX, devY);
    }
 
    /**
@@ -3002,7 +3037,7 @@ public class Map extends Canvas {
          sb.append(String.format(" :: %d", numGridRectangle));
       }
 
-      gc.drawText(sb.toString(), 0, 0);
+      gc.drawString(sb.toString(), 0, 0);
    }
 
    private void paint_OfflineArea(final GC gc) {
@@ -4472,6 +4507,14 @@ public class Map extends Canvas {
 
    public void setDirectPainter(final IDirectPainter directPainter) {
       _directMapPainter = directPainter;
+   }
+
+   public void setGridBox(final String gridBoxText) {
+
+      _grid_BoxInfo_Previous = _grid_BoxInfo;
+      _grid_BoxInfo_PreviousPosition = _grid_BoxInfo_Position;
+
+      _grid_BoxInfo = gridBoxText;
    }
 
    public void setIsZoomWithMousePosition(final boolean isZoomWithMousePosition) {
