@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tour.filter.geo;
 
-import de.byteholder.geoclipse.map.GridBoxItem;
+import de.byteholder.geoclipse.map.MapGridBoxItem;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -59,6 +59,8 @@ public class TourGeoFilterManager {
    static final String                         STATE_SELECTED_GEO_FILTER_ID         = "STATE_SELECTED_GEO_FILTER_ID";           //$NON-NLS-1$
    static final String                         STATE_IS_INCLUDE_GEO_PARTS           = "STATE_IS_INCLUDE_GEO_PARTS";             //$NON-NLS-1$
    static final boolean                        STATE_IS_INCLUDE_GEO_PARTS_DEFAULT   = true;
+   static final String                         STATE_IS_USE_APP_FILTERS             = "STATE_IS_USE_APP_FILTERS";               //$NON-NLS-1$
+   static final boolean                        STATE_IS_USE_APP_FILTERS_DEFAULT     = true;
    static final String                         STATE_SORT_COLUMN_DIRECTION          = "STATE_SORT_COLUMN_DIRECTION";            //$NON-NLS-1$
    static final String                         STATE_SORT_COLUMN_ID                 = "STATE_SORT_COLUMN_ID";                   //$NON-NLS-1$
 
@@ -131,6 +133,9 @@ public class TourGeoFilterManager {
       return _allTourGeoFilter;
    }
 
+   /**
+    * @return Returns current active geo filter or <code>null</code> when a filter is not selected
+    */
    private static TourGeoFilterItem getGeoFilter() {
 
       if (_selectedFilter != null) {
@@ -321,7 +326,7 @@ public class TourGeoFilterManager {
                                 final Point bottomRightE2,
                                 final int mapZoomLevel,
                                 final GeoPosition mapGeoCenter,
-                                final GridBoxItem gridBoxItem) {
+                                final MapGridBoxItem gridBoxItem) {
 
       _selectedFilter = new TourGeoFilterItem(topLeftE2, bottomRightE2, mapZoomLevel, mapGeoCenter, gridBoxItem);
 
@@ -349,7 +354,11 @@ public class TourGeoFilterManager {
       _isGeoFilterEnabled = isEnabled;
 
       // show/hide geo grid in map
-      TourManager.fireEventWithCustomData(TourEventId.MAP_SHOW_LAST_GEO_GRID, _isGeoFilterEnabled, null);
+      TourManager.fireEventWithCustomData(TourEventId.MAP_SHOW_GEO_GRID,
+            isEnabled
+                  ? getGeoFilter()
+                  : null,
+            null);
 
       fireTourFilterModifyEvent();
    }

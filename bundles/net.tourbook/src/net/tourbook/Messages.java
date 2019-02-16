@@ -2015,6 +2015,7 @@ public class Messages extends NLS {
    public static String Slideout_TourFilter_Link_TextSearchHint;
    public static String Slideout_TourFilter_Link_TextSearchHint_Tooltip;
 
+   public static String Slideout_TourGeoFilter_Checkbox_UseAppFilter;
    public static String Slideout_TourGeoFilter_Color_GeoParts_HoverSelecting;
    public static String Slideout_TourGeoFilter_Color_GeoParts_Selected;
    public static String Slideout_TourGeoFilter_Column_Created_Label;

@@ -116,6 +116,7 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
 
    private Button                _btnDeleteGeoFilter;
    private Button                _btnDeleteGeoFilterAll;
+   private Button                _chkIsUseAppFilter;
    private Button                _rdoGeoParts_Exclude;
    private Button                _rdoGeoParts_Include;
 
@@ -459,6 +460,18 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
             .applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
+//         Messages.GeoCompare_View_Action_AppFilter_Tooltip
+         {
+            /*
+             * Slider path
+             */
+            // checkbox
+            _chkIsUseAppFilter = new Button(container, SWT.CHECK);
+            _chkIsUseAppFilter.setText(Messages.Slideout_TourGeoFilter_Checkbox_UseAppFilter);
+            _chkIsUseAppFilter.setToolTipText(Messages.GeoCompare_View_Action_AppFilter_Tooltip);
+            _chkIsUseAppFilter.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsUseAppFilter);
+         }
          {
             /*
              * Radio: Search geo parts
@@ -1001,20 +1014,20 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
 
    private void restoreState() {
 
+// SET_FORMATTING_OFF
+
       // options
-      final boolean isIncludeGeoParts = Util.getStateBoolean(_state,
-            TourGeoFilterManager.STATE_IS_INCLUDE_GEO_PARTS,
-            TourGeoFilterManager.STATE_IS_INCLUDE_GEO_PARTS_DEFAULT);
+      _chkIsUseAppFilter.setSelection(Util.getStateBoolean(_state,         TourGeoFilterManager.STATE_IS_USE_APP_FILTERS,     TourGeoFilterManager.STATE_IS_USE_APP_FILTERS_DEFAULT));
+
+      final boolean isIncludeGeoParts = Util.getStateBoolean(_state,       TourGeoFilterManager.STATE_IS_INCLUDE_GEO_PARTS,   TourGeoFilterManager.STATE_IS_INCLUDE_GEO_PARTS_DEFAULT);
       _rdoGeoParts_Include.setSelection(isIncludeGeoParts);
       _rdoGeoParts_Exclude.setSelection(isIncludeGeoParts == false);
 
       // colors
-      _colorGeoPart_HoverSelecting.setColorValue(Util.getStateRGB(_state,
-            TourGeoFilterManager.STATE_RGB_GEO_PARTS_HOVER,
-            TourGeoFilterManager.STATE_RGB_GEO_PARTS_HOVER_DEFAULT));
-      _colorGeoPart_Selected.setColorValue(Util.getStateRGB(_state,
-            TourGeoFilterManager.STATE_RGB_GEO_PARTS_SELECTED,
-            TourGeoFilterManager.STATE_RGB_GEO_PARTS_SELECTED_DEFAULT));
+      _colorGeoPart_HoverSelecting.setColorValue(Util.getStateRGB(_state,  TourGeoFilterManager.STATE_RGB_GEO_PARTS_HOVER,    TourGeoFilterManager.STATE_RGB_GEO_PARTS_HOVER_DEFAULT));
+      _colorGeoPart_Selected.setColorValue(Util.getStateRGB(_state,        TourGeoFilterManager.STATE_RGB_GEO_PARTS_SELECTED, TourGeoFilterManager.STATE_RGB_GEO_PARTS_SELECTED_DEFAULT));
+
+// SET_FORMATTING_ON
 
       // reselect filter item
       final String selectedFilterId = Util.getStateString(_state, TourGeoFilterManager.STATE_SELECTED_GEO_FILTER_ID, null);
@@ -1064,6 +1077,7 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
 
       // options
       _state.put(TourGeoFilterManager.STATE_IS_INCLUDE_GEO_PARTS, _rdoGeoParts_Include.getSelection());
+      _state.put(TourGeoFilterManager.STATE_IS_USE_APP_FILTERS, _chkIsUseAppFilter.getSelection());
 
       // colors
       Util.setState(_state, TourGeoFilterManager.STATE_RGB_GEO_PARTS_HOVER, _colorGeoPart_HoverSelecting.getColorValue());

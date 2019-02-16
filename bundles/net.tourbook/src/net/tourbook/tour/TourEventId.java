@@ -108,10 +108,10 @@ public enum TourEventId {
     * GEO GRID
     */
 
-   /**
-    * Show/hide geo grid in map, event data contains true/false.
-    */
-   MAP_SHOW_LAST_GEO_GRID,
+//   /**
+//    * Show/hide geo grid in map, event data contains true/false.
+//    */
+//   MAP_SHOW_LAST_GEO_GRID,
 
    /**
     * Show geo grid in the map, event data contains {@link TourGeoFilterItem}

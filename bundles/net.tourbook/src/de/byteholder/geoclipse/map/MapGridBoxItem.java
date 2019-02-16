@@ -19,7 +19,7 @@ import net.tourbook.common.map.GeoPosition;
 
 import org.eclipse.swt.graphics.Point;
 
-public class GridBoxItem {
+public class MapGridBoxItem {
 
    boolean       isSelectionStarted;
 

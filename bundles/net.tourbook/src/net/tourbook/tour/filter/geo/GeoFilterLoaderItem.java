@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tour.filter.geo;
 
-import de.byteholder.geoclipse.map.GridBoxItem;
+import de.byteholder.geoclipse.map.MapGridBoxItem;
 
 import org.eclipse.swt.graphics.Point;
 
@@ -44,7 +44,7 @@ public class GeoFilterLoaderItem {
    public Point       topLeftE2;
    public Point       bottomRightE2;
 
-   public GridBoxItem mapGridBoxItem;
+   public MapGridBoxItem mapGridBoxItem;
 
    @SuppressWarnings("unused")
    private GeoFilterLoaderItem() {}

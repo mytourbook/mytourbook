@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tour.filter.geo;
 
-import de.byteholder.geoclipse.map.GridBoxItem;
+import de.byteholder.geoclipse.map.MapGridBoxItem;
 
 import java.time.ZonedDateTime;
 
@@ -26,26 +26,26 @@ import org.eclipse.swt.graphics.Point;
 
 public class TourGeoFilterItem {
 
-   String             id = Long.toString(System.nanoTime());
+   String                id = Long.toString(System.nanoTime());
 
-   Point              topLeftE2;
-   Point              bottomRightE2;
+   Point                 topLeftE2;
+   Point                 bottomRightE2;
 
-   public int         mapZoomLevel;
-   public GeoPosition mapGeoCenter;
+   public int            mapZoomLevel;
+   public GeoPosition    mapGeoCenter;
 
-   public double      latitude1;
-   public double      longitude1;
+   public double         latitude1;
+   public double         longitude1;
 
-   public double      latitude2;
-   public double      longitude2;
+   public double         latitude2;
+   public double         longitude2;
 
-   ZonedDateTime      created;
-   long               createdMS;
+   ZonedDateTime         created;
+   long                  createdMS;
 
-   int                numGeoParts;
+   int                   numGeoParts;
 
-   GridBoxItem        gridBoxItem;
+   public MapGridBoxItem mapGridBoxItem;
 
    public TourGeoFilterItem() {}
 
@@ -53,7 +53,7 @@ public class TourGeoFilterItem {
                             final Point bottomRightE2,
                             final int mapZoomLevel,
                             final GeoPosition mapGeoCenter,
-                            final GridBoxItem gridBoxItem) {
+                            final MapGridBoxItem mapGridBoxItem) {
 
       this.topLeftE2 = topLeftE2;
       this.bottomRightE2 = bottomRightE2;
@@ -61,7 +61,7 @@ public class TourGeoFilterItem {
       this.mapZoomLevel = mapZoomLevel;
       this.mapGeoCenter = mapGeoCenter;
 
-      this.gridBoxItem = gridBoxItem;
+      this.mapGridBoxItem = mapGridBoxItem;
 
       latitude1 = topLeftE2.y / 100.0d;
       longitude1 = topLeftE2.x / 100.0d;

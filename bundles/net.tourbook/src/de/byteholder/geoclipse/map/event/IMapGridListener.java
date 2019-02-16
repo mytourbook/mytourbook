@@ -15,7 +15,7 @@
  *******************************************************************************/
 package de.byteholder.geoclipse.map.event;
 
-import de.byteholder.geoclipse.map.GridBoxItem;
+import de.byteholder.geoclipse.map.MapGridBoxItem;
 
 import net.tourbook.common.map.GeoPosition;
 
@@ -42,6 +42,6 @@ public interface IMapGridListener {
                          int mapZoomLevel,
                          GeoPosition mapGeoCenter,
                          boolean isGridSelected,
-                         GridBoxItem gridBoxItem);
+                         MapGridBoxItem gridBoxItem);
 
 }

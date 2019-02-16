@@ -551,8 +551,8 @@ public class Map extends Canvas {
 //   private Point  _grid_BoxInfo_Position;
 //   private Point       _grid_BoxInfo_PreviousPosition;
 
-   private GridBoxItem _grid_SelectingGridBoxItem;
-   private GridBoxItem _grid_GridBoxItemSelected;
+   private MapGridBoxItem _grid_SelectingGridBoxItem;
+   private MapGridBoxItem _grid_GridBoxItemSelected;
 
    /**
     * This observer is called in the {@link Tile} when a tile image is set into the tile
@@ -685,7 +685,7 @@ public class Map extends Canvas {
 
    public void actionSearchTourByLocation(final Event event) {
 
-      _grid_SelectingGridBoxItem = new GridBoxItem();
+      _grid_SelectingGridBoxItem = new MapGridBoxItem();
 
       // set initial mouse move position from the current mouse position
       _grid_SelectingGridBoxItem.worldMouse_Move = new Point(
@@ -1103,7 +1103,7 @@ public class Map extends Canvas {
       _mp.disposeTiles();
    }
 
-   private void fireMapGridEvent(final boolean isGridSelected, final GridBoxItem gridBoxItem) {
+   private void fireMapGridEvent(final boolean isGridSelected, final MapGridBoxItem gridBoxItem) {
 
       final Object[] listeners = _allMapGridListener.getListeners();
 
@@ -1438,7 +1438,7 @@ public class Map extends Canvas {
       redraw();
    }
 
-   private void grid_UpdateEndPosition(final MouseEvent mouseEvent, final GridBoxItem gridBoxItem) {
+   private void grid_UpdateEndPosition(final MouseEvent mouseEvent, final MapGridBoxItem gridBoxItem) {
 
       final int worldMouseX = _worldPixelTopLeftViewport.x + mouseEvent.x;
       final int worldMouseY = _worldPixelTopLeftViewport.y + mouseEvent.y;
@@ -2574,7 +2574,7 @@ public class Map extends Canvas {
       }
    }
 
-   private void paint_GridBox_10_Selecting(final GC gc, final GridBoxItem gridBoxItem) {
+   private void paint_GridBox_10_Selecting(final GC gc, final MapGridBoxItem gridBoxItem) {
 
       gc.setLineWidth(2);
 
@@ -2658,7 +2658,7 @@ public class Map extends Canvas {
       gc.setAlpha(0xff);
    }
 
-   private void paint_GridBox_20_Selected(final GC gc, final GridBoxItem gridBoxItem) {
+   private void paint_GridBox_20_Selected(final GC gc, final MapGridBoxItem gridBoxItem) {
 
       final Point topLeft = paint_GridBox_50_Rectangle(gc,
             gridBoxItem.world_Start,
@@ -2952,7 +2952,7 @@ public class Map extends Canvas {
     * @param gridBoxItem
     * @param numGridRectangle
     */
-   private void paint_GridBox_70_Info_LatLon(final GC gc, final GridBoxItem gridBoxItem) {
+   private void paint_GridBox_70_Info_LatLon(final GC gc, final MapGridBoxItem gridBoxItem) {
 
       gc.setForeground(SYS_COLOR_BLACK);
       gc.setBackground(SYS_COLOR_YELLOW);
@@ -2992,7 +2992,7 @@ public class Map extends Canvas {
       gc.drawString(sb.toString(), 0, 0);
    }
 
-   private void paint_GridBox_80_Info_Box(final GC gc, final GridBoxItem gridBoxItem, final Point topLeft) {
+   private void paint_GridBox_80_Info_Box(final GC gc, final MapGridBoxItem gridBoxItem, final Point topLeft) {
 
       final String infoText = gridBoxItem.gridBoxText;
 
@@ -5045,34 +5045,45 @@ public class Map extends Canvas {
 
          // hide geo grid
 
-         _grid_IsShowLastGeoGrid = false;
+         _grid_GridBoxItemSelected = null;
 
          redraw();
 
-         return;
+      } else {
+
+         // show requested grid box
+
+         final MapGridBoxItem mapGridBoxItem = geoFilter.mapGridBoxItem;
+
+         if (mapGridBoxItem == null) {
+
+            // This can occure when geofilter is loaded from xml file and not created in the map
+
+            System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ()")
+                  + ("\t: mapGridBoxItem == null"));
+// TODO remove SYSTEM.OUT.PRINTLN
+
+         } else {
+
+            _grid_GridBoxItemSelected = mapGridBoxItem;
+
+            setZoom(geoFilter.mapZoomLevel);
+
+            final Rectangle wpMapViewPort = getWorldPixelTopLeftViewport(_worldPixelMapCenter);
+
+            // chck if gird box is already visible
+
+            if (wpMapViewPort.contains(_grid_GridBoxItemSelected.world_Start)
+                  && wpMapViewPort.contains(_grid_GridBoxItemSelected.world_End)) {
+
+               // grid box is visile -> nothing to do
+
+            } else {
+
+               setMapCenter(new GeoPosition(geoFilter.mapGeoCenter.latitude, geoFilter.mapGeoCenter.longitude));
+            }
+         }
       }
-
-      _grid_IsShowLastGeoGrid = true;
-
-      final double geoGridRaster = 0.01;
-
-      _grid_GeoLast_Start = new GeoPosition(
-            geoFilter.latitude1 - geoGridRaster,
-            geoFilter.longitude1 + geoGridRaster);
-
-      _grid_GeoLast_End = new GeoPosition(
-            geoFilter.latitude2,
-            geoFilter.longitude2);
-
-      setZoom(geoFilter.mapZoomLevel);
-      setMapCenter(new GeoPosition(geoFilter.mapGeoCenter.latitude, geoFilter.mapGeoCenter.longitude));
-   }
-
-   public void showLastGeoGrid(final boolean isVisibility) {
-
-      _grid_IsShowLastGeoGrid = isVisibility;
-
-      paint();
    }
 
    private void showPoi() {

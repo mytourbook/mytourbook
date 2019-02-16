@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tour.filter.geo;
 
-import de.byteholder.geoclipse.map.GridBoxItem;
+import de.byteholder.geoclipse.map.MapGridBoxItem;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -34,12 +34,16 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.map2.view.Map2View;
+import net.tourbook.ui.SQLFilter;
 
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.graphics.Point;
 
 public class GeoFilterTourLoader {
 
    private static final char                                     NL                  = UI.NEW_LINE;
+
+   private final static IDialogSettings                          _state              = TourGeoFilterManager.getState();
 
    private static final AtomicLong                               _loaderExecuterId   = new AtomicLong();
    private static final LinkedBlockingDeque<GeoFilterLoaderItem> _loaderWaitingQueue = new LinkedBlockingDeque<>();
@@ -80,7 +84,7 @@ public class GeoFilterTourLoader {
    public static GeoFilterLoaderItem loadToursFromGeoParts(final Point topLeftE2,
                                                            final Point bottomRightE2,
                                                            final GeoFilterLoaderItem previousGeoFilterItem,
-                                                           final GridBoxItem gridBoxItem,
+                                                           final MapGridBoxItem gridBoxItem,
                                                            final Map2View map2View) {
 
       stopLoading(previousGeoFilterItem);
@@ -174,29 +178,57 @@ public class GeoFilterTourLoader {
          }
       }
 
-      final int numGeoParts = allLatLonParts.size();
+      final boolean isAppFilter = Util.getStateBoolean(_state,
+            TourGeoFilterManager.STATE_IS_USE_APP_FILTERS,
+            TourGeoFilterManager.STATE_IS_USE_APP_FILTERS_DEFAULT);
 
       /*
-       * Create sql parameters
+       * Create geo part sql parameters
        */
-      final StringBuilder sqlInParameters = new StringBuilder();
+      final int numGeoParts = allLatLonParts.size();
+      final StringBuilder sqlGeoPartParameters = new StringBuilder();
       for (int partIndex = 0; partIndex < numGeoParts; partIndex++) {
          if (partIndex == 0) {
-            sqlInParameters.append(" ?"); //                               //$NON-NLS-1$
+            sqlGeoPartParameters.append(" ?"); //                             //$NON-NLS-1$
          } else {
-            sqlInParameters.append(", ?"); //                              //$NON-NLS-1$
+            sqlGeoPartParameters.append(", ?"); //                            //$NON-NLS-1$
          }
       }
 
-      final String selectAllTourIds = ""
+      final String selectGeoPartTourIds = ""
 
-            + "SELECT" + NL //                     //$NON-NLS-1$
+            + "SELECT" + NL //                                                //$NON-NLS-1$
 
-            + " DISTINCT TourId " + NL //                                  //$NON-NLS-1$
+            + " DISTINCT TourId " + NL //                                     //$NON-NLS-1$
 
-            + (" FROM " + TourDatabase.TABLE_TOUR_GEO_PARTS + NL) //       //$NON-NLS-1$
-            + (" WHERE GeoPart IN (" + sqlInParameters + ")") + NL //      //$NON-NLS-1$ //$NON-NLS-2$
+            + (" FROM " + TourDatabase.TABLE_TOUR_GEO_PARTS + NL) //          //$NON-NLS-1$
+            + (" WHERE GeoPart IN (" + sqlGeoPartParameters + ")") + NL //    //$NON-NLS-1$ //$NON-NLS-2$
       ;
+
+      String select;
+      SQLFilter appFilter = null;
+
+      if (isAppFilter) {
+
+         appFilter = new SQLFilter();
+
+         final String selectAppFilter = ""
+
+               + "SELECT" + NL //                                       //$NON-NLS-1$
+
+               + " TourId" + NL //                                      //$NON-NLS-1$
+               + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //        //$NON-NLS-1$
+
+               + " WHERE 1=1 " + appFilter.getWhereClause() + NL//      //$NON-NLS-1$
+         ;
+
+         select = selectGeoPartTourIds
+
+               + " AND TourId IN (" + selectAppFilter + ")"; //         //$NON-NLS-1$ //$NON-NLS-2$
+      } else {
+
+         select = selectGeoPartTourIds;
+      }
 
       Connection conn = null;
 
@@ -206,12 +238,15 @@ public class GeoFilterTourLoader {
 
          conn = TourDatabase.getInstance().getConnection();
 
-         final PreparedStatement stmtSelect = conn.prepareStatement(selectAllTourIds);
+         final PreparedStatement stmtSelect = conn.prepareStatement(select);
 
          // fillup parameters
-         for (int partIndex = 0; partIndex < allLatLonParts.size(); partIndex++) {
-            final Integer latLonPart = allLatLonParts.get(partIndex);
-            stmtSelect.setInt(partIndex + 1, latLonPart);
+         for (int partIndex = 0; partIndex < numGeoParts; partIndex++) {
+            stmtSelect.setInt(partIndex + 1, allLatLonParts.get(partIndex));
+         }
+
+         if (isAppFilter) {
+            appFilter.setParameters(stmtSelect, 1 + numGeoParts);
          }
 
          final ResultSet result = stmtSelect.executeQuery();
@@ -227,7 +262,7 @@ public class GeoFilterTourLoader {
 
       } catch (final SQLException e) {
 
-         StatusUtil.log(selectAllTourIds);
+         StatusUtil.log(select);
          net.tourbook.ui.UI.showSQLException(e);
 
       } finally {

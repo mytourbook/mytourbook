@@ -16,9 +16,9 @@
 package net.tourbook.map2.view;
 
 import de.byteholder.geoclipse.GeoclipseExtensions;
-import de.byteholder.geoclipse.map.GridBoxItem;
 import de.byteholder.geoclipse.map.IMapContextProvider;
 import de.byteholder.geoclipse.map.Map;
+import de.byteholder.geoclipse.map.MapGridBoxItem;
 import de.byteholder.geoclipse.map.MapLegend;
 import de.byteholder.geoclipse.map.event.IMapGridListener;
 import de.byteholder.geoclipse.map.event.IMapInfoListener;
@@ -956,7 +956,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
                                final int mapZoomLevel,
                                final GeoPosition mapGeoCenter,
                                final boolean isGridSelected,
-                               final GridBoxItem gridBoxItem) {
+                               final MapGridBoxItem gridBoxItem) {
 
             if (isGridSelected) {
 
@@ -1177,6 +1177,8 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
                if (eventData instanceof TourGeoFilterItem) {
 
+                  // show geo filter
+
                   _map.showGeoGrid((TourGeoFilterItem) eventData);
 
                } else if (eventData == null) {
@@ -1184,15 +1186,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
                   // hide geo grid
 
                   _map.showGeoGrid(null);
-               }
-
-            } else if (eventId == TourEventId.MAP_SHOW_LAST_GEO_GRID) {
-
-               if (eventData instanceof Boolean) {
-
-                  final Boolean isVisible = (Boolean) eventData;
-
-                  _map.showLastGeoGrid(isVisible);
                }
 
             } else if (eventId == TourEventId.SEGMENT_LAYER_CHANGED) {
@@ -1942,7 +1935,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
    private void geoFilter_10_Loader(final org.eclipse.swt.graphics.Point topLeftE2,
                                     final org.eclipse.swt.graphics.Point bottomRightE2,
-                                    final GridBoxItem gridBoxItem) {
+                                    final MapGridBoxItem gridBoxItem) {
 
       if (_geoFilter_TopLeftE2 != null
             && topLeftE2.equals(_geoFilter_TopLeftE2)
