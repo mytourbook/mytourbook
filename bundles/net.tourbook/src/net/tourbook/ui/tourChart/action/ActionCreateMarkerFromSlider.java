@@ -87,7 +87,7 @@ public class ActionCreateMarkerFromSlider extends Action {
 
 		if (altitudeSerie != null) {
 			tourMarker.setAltitude(altitudeSerie[serieIndex]);
-			tourMarker.setDescription("#alti: " + (int)altitudeSerie[serieIndex] + " m");
+			//tourMarker.setDescription("#alti: " + (int)altitudeSerie[serieIndex] + " m");
 		}
 
 		if (distSerie != null) {
