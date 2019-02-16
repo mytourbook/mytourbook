@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.tour.filter.geo;
 
+import de.byteholder.geoclipse.map.GridBoxItem;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -63,6 +65,7 @@ public class GeoFilterTourLoader {
    }
 
    /**
+    * @param gridBoxItem
     * @param map2View
     * @param geoParts
     *           Requested geo parts
@@ -77,6 +80,7 @@ public class GeoFilterTourLoader {
    public static GeoFilterLoaderItem loadToursFromGeoParts(final Point topLeftE2,
                                                            final Point bottomRightE2,
                                                            final GeoFilterLoaderItem previousGeoFilterItem,
+                                                           final GridBoxItem gridBoxItem,
                                                            final Map2View map2View) {
 
       stopLoading(previousGeoFilterItem);
@@ -88,6 +92,8 @@ public class GeoFilterTourLoader {
 
       loaderItem.topLeftE2 = topLeftE2;
       loaderItem.bottomRightE2 = bottomRightE2;
+
+      loaderItem.mapGridBoxItem = gridBoxItem;
 
       _loaderWaitingQueue.add(loaderItem);
 
@@ -233,7 +239,7 @@ public class GeoFilterTourLoader {
       loaderItem.sqlRunningTime = timeDiff;
 
       final String timeInMs = timeDiff > 50 ? " - " + Long.toString(timeDiff) + " ms" : "";
-      loaderItem.gridBoxText = "Tours: " + Integer.toString(allTourIds.size()) + timeInMs;
+      loaderItem.mapGridBoxItem.gridBoxText = "Tours: " + Integer.toString(allTourIds.size()) + timeInMs;
 
 //      System.out.println(""
 ////            (UI.timeStampNano() + " [" + GeoFilterTourLoader.class.getSimpleName() + "] ")

@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.tour.filter.geo;
 
+import de.byteholder.geoclipse.map.GridBoxItem;
+
 import java.time.ZonedDateTime;
 
 import net.tourbook.common.map.GeoPosition;
@@ -43,18 +45,23 @@ public class TourGeoFilterItem {
 
    int                numGeoParts;
 
+   GridBoxItem        gridBoxItem;
+
    public TourGeoFilterItem() {}
 
    public TourGeoFilterItem(final Point topLeftE2,
                             final Point bottomRightE2,
                             final int mapZoomLevel,
-                            final GeoPosition mapGeoCenter) {
+                            final GeoPosition mapGeoCenter,
+                            final GridBoxItem gridBoxItem) {
 
       this.topLeftE2 = topLeftE2;
       this.bottomRightE2 = bottomRightE2;
 
       this.mapZoomLevel = mapZoomLevel;
       this.mapGeoCenter = mapGeoCenter;
+
+      this.gridBoxItem = gridBoxItem;
 
       latitude1 = topLeftE2.y / 100.0d;
       longitude1 = topLeftE2.x / 100.0d;
@@ -70,7 +77,6 @@ public class TourGeoFilterItem {
 
       numGeoParts = width * height;
    }
-
 
    @Override
    public boolean equals(final Object obj) {

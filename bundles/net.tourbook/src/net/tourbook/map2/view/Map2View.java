@@ -16,6 +16,7 @@
 package net.tourbook.map2.view;
 
 import de.byteholder.geoclipse.GeoclipseExtensions;
+import de.byteholder.geoclipse.map.GridBoxItem;
 import de.byteholder.geoclipse.map.IMapContextProvider;
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.MapLegend;
@@ -954,17 +955,19 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
                                final org.eclipse.swt.graphics.Point bottomRightE2,
                                final int mapZoomLevel,
                                final GeoPosition mapGeoCenter,
-                               final boolean isGridSelected) {
+                               final boolean isGridSelected,
+                               final GridBoxItem gridBoxItem) {
 
             if (isGridSelected) {
 
-               TourGeoFilterManager.setFilter(topLeftE2, bottomRightE2, mapZoomLevel, mapGeoCenter);
+               TourGeoFilterManager.setFilter(topLeftE2, bottomRightE2, mapZoomLevel, mapGeoCenter, gridBoxItem);
 
             } else {
 
-               geoFilter_10_Loader(topLeftE2, bottomRightE2);
+               geoFilter_10_Loader(topLeftE2, bottomRightE2, gridBoxItem);
             }
          }
+
       });
 
       _map.addMapInfoListener(this);
@@ -1937,7 +1940,9 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
       }
    }
 
-   private void geoFilter_10_Loader(final org.eclipse.swt.graphics.Point topLeftE2, final org.eclipse.swt.graphics.Point bottomRightE2) {
+   private void geoFilter_10_Loader(final org.eclipse.swt.graphics.Point topLeftE2,
+                                    final org.eclipse.swt.graphics.Point bottomRightE2,
+                                    final GridBoxItem gridBoxItem) {
 
       if (_geoFilter_TopLeftE2 != null
             && topLeftE2.equals(_geoFilter_TopLeftE2)
@@ -1957,7 +1962,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
       // delay tour comparator, moving the slider can occure very often
 //    _parent.getDisplay().timerExec(DELAY_BEFORE_STARTING_GEO_FILTER, new Runnable() {
-      _parent.getDisplay().timerExec(50, new Runnable() {
+      _parent.getDisplay().timerExec(0, new Runnable() {
 
          private int __runningId = runnableRunningId;
 
@@ -1984,6 +1989,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
                   topLeftE2,
                   bottomRightE2,
                   _geoFilter_PreviousGeoFilterItem,
+                  gridBoxItem,
                   Map2View.this);
          }
       });
@@ -2002,8 +2008,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
                return;
             }
 
-            _map.setGridBox(loaderItem.gridBoxText);
-
+            // update map with the updated number of tours in a grid box
             _map.paint();
          }
       });

@@ -13,35 +13,28 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package de.byteholder.geoclipse.map.event;
-
-import de.byteholder.geoclipse.map.GridBoxItem;
+package de.byteholder.geoclipse.map;
 
 import net.tourbook.common.map.GeoPosition;
 
 import org.eclipse.swt.graphics.Point;
 
-public interface IMapGridListener {
+public class GridBoxItem {
 
-   /**
-    * Is called when a map grid is selected.
-    *
-    * @param Lat/lon
-    *           top/left, multiplied with 100
-    * @param Lat/lon
-    *           bottom/right, multiplied with 100
-    * @param mapZoomLevel
-    * @param mapGeoCenter
-    * @param isGridSelected
-    *           Is <code>true</code> when grid is selected, otherwise mouse is just moved
-    * @param gridBoxItem
-    *           Map grid box item
-    */
-   public void onMapGrid(Point topLeftE2,
-                         Point bottomRightE2,
-                         int mapZoomLevel,
-                         GeoPosition mapGeoCenter,
-                         boolean isGridSelected,
-                         GridBoxItem gridBoxItem);
+   boolean       isSelectionStarted;
+
+   Point         worldMouse_Move;
+
+   Point         dev_Start;
+   Point         dev_End;
+
+   Point         world_Start;
+   Point         world_End;
+
+   GeoPosition   geo_Start;
+   GeoPosition   geo_End;
+
+   public String gridBoxText;
+   Point         gridBoxText_Position;
 
 }
