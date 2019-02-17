@@ -99,6 +99,7 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
 
    private SelectionAdapter                   _columnSortListener;
    private IPropertyChangeListener            _defaultChangePropertyListener;
+//   private MouseWheelListener                 _defaultMouseWheelListener;
    private SelectionAdapter                   _defaultSelectionListener;
 
    private final NumberFormat                 _nf2                     = NumberFormat.getInstance();
@@ -110,17 +111,20 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
    /*
     * UI controls
     */
-   private PixelConverter        _pc;
+   private PixelConverter _pc;
 
-   private Composite             _viewerContainer;
+   private Composite      _viewerContainer;
 
-   private Button                _btnDeleteGeoFilter;
-   private Button                _btnDeleteGeoFilterAll;
-   private Button                _chkIsUseAppFilter;
-   private Button                _rdoGeoParts_Exclude;
-   private Button                _rdoGeoParts_Include;
+   private Button         _btnDeleteGeoFilter;
+   private Button         _btnDeleteGeoFilterAll;
+   private Button         _chkIsUseAppFilter;
+   private Button         _rdoGeoParts_Exclude;
+   private Button         _rdoGeoParts_Include;
 
-   private Label                 _lblGeoParts_IncludeExclude;
+   private Label          _lblGeoParts_IncludeExclude;
+//   private Label                 _lblGridSize;
+//
+//   private Spinner               _spinnerGridBoxSize;
 
    private ColorSelectorExtended _colorGeoPart_HoverSelecting;
    private ColorSelectorExtended _colorGeoPart_Selected;
@@ -463,7 +467,7 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
 //         Messages.GeoCompare_View_Action_AppFilter_Tooltip
          {
             /*
-             * Slider path
+             * Use app filter
              */
             // checkbox
             _chkIsUseAppFilter = new Button(container, SWT.CHECK);
@@ -472,6 +476,21 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
             _chkIsUseAppFilter.addSelectionListener(_defaultSelectionListener);
             GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsUseAppFilter);
          }
+//         {
+//            /*
+//             * Grid box size
+//             */
+//            // label
+//            _lblGridSize = new Label(container, SWT.NONE);
+//            _lblGridSize.setText(Messages.Slideout_TourGeoFilter_Spinner_GridBoxSize);
+//
+//            // spinner
+//            _spinnerGridBoxSize = new Spinner(container, SWT.BORDER);
+//            _spinnerGridBoxSize.setMinimum(TourGeoFilterManager.STATE_GRID_BOX_SIZE_MIN);
+//            _spinnerGridBoxSize.setMaximum(TourGeoFilterManager.STATE_GRID_BOX_SIZE_MAX);
+//            _spinnerGridBoxSize.addSelectionListener(_defaultSelectionListener);
+//            _spinnerGridBoxSize.addMouseWheelListener(_defaultMouseWheelListener);
+//         }
          {
             /*
              * Radio: Search geo parts
@@ -761,6 +780,7 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
       _btnDeleteGeoFilter.setEnabled(isFilterSelected);
       _btnDeleteGeoFilterAll.setEnabled(_allGeoFilter.size() > 0);
 
+      _lblGeoParts_IncludeExclude.setEnabled(isFilterSelected);
       _rdoGeoParts_Exclude.setEnabled(isFilterSelected);
       _rdoGeoParts_Include.setEnabled(isFilterSelected);
    }
@@ -837,10 +857,12 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
             onChangeUI();
          }
       };
-//      _defaultModifyListener = new ModifyListener() {
+
+//      _defaultMouseWheelListener = new MouseWheelListener() {
 //         @Override
-//         public void modifyText(final ModifyEvent e) {
-////            onProfile_Modify();
+//         public void mouseScrolled(final MouseEvent event) {
+//            UI.adjustSpinnerValueOnMouseScroll(event);
+//            onChangeUI();
 //         }
 //      };
 //
@@ -1017,11 +1039,13 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
 // SET_FORMATTING_OFF
 
       // options
-      _chkIsUseAppFilter.setSelection(Util.getStateBoolean(_state,         TourGeoFilterManager.STATE_IS_USE_APP_FILTERS,     TourGeoFilterManager.STATE_IS_USE_APP_FILTERS_DEFAULT));
+//      _spinnerGridBoxSize.setSelection(      Util.getStateInt(_state,         TourGeoFilterManager.STATE_GRID_BOX_SIZE,          TourGeoFilterManager.STATE_GRID_BOX_SIZE_DEFAULT));
 
-      final boolean isIncludeGeoParts = Util.getStateBoolean(_state,       TourGeoFilterManager.STATE_IS_INCLUDE_GEO_PARTS,   TourGeoFilterManager.STATE_IS_INCLUDE_GEO_PARTS_DEFAULT);
+      final boolean isIncludeGeoParts =   Util.getStateBoolean(_state,     TourGeoFilterManager.STATE_IS_INCLUDE_GEO_PARTS,   TourGeoFilterManager.STATE_IS_INCLUDE_GEO_PARTS_DEFAULT);
       _rdoGeoParts_Include.setSelection(isIncludeGeoParts);
       _rdoGeoParts_Exclude.setSelection(isIncludeGeoParts == false);
+
+      _chkIsUseAppFilter.setSelection(    Util.getStateBoolean(_state,     TourGeoFilterManager.STATE_IS_USE_APP_FILTERS,     TourGeoFilterManager.STATE_IS_USE_APP_FILTERS_DEFAULT));
 
       // colors
       _colorGeoPart_HoverSelecting.setColorValue(Util.getStateRGB(_state,  TourGeoFilterManager.STATE_RGB_GEO_PARTS_HOVER,    TourGeoFilterManager.STATE_RGB_GEO_PARTS_HOVER_DEFAULT));
@@ -1076,6 +1100,7 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
    private void saveState_UI() {
 
       // options
+//      _state.put(TourGeoFilterManager.STATE_GRID_BOX_SIZE, _spinnerGridBoxSize.getSelection());
       _state.put(TourGeoFilterManager.STATE_IS_INCLUDE_GEO_PARTS, _rdoGeoParts_Include.getSelection());
       _state.put(TourGeoFilterManager.STATE_IS_USE_APP_FILTERS, _chkIsUseAppFilter.getSelection());
 

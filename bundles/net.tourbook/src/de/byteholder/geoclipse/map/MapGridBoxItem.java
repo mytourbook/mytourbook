@@ -37,4 +37,6 @@ public class MapGridBoxItem {
    public String gridBoxText;
    Point         gridBoxText_Position;
 
+   int           gridBoxSizeMuliplier;
+
 }

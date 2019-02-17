@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019- Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,85 +34,91 @@ import net.tourbook.tour.filter.geo.TourGeoFilterManager;
  */
 public class SQLFilter {
 
-	private static final Set<SQLAppFilter>	_defaultAppFilter	= new HashSet<>();
+   private static final Set<SQLAppFilter> _defaultAppFilter = new HashSet<>();
 
-	/**
-	 * Exclude all special app filter
-	 */
-	public static final Set<SQLAppFilter>	NO_PHOTOS			= new HashSet<>();
+   /**
+    * Exclude all special app filter
+    */
+   public static final Set<SQLAppFilter>  NO_PHOTOS         = new HashSet<>();
 
-	/**
-	 * Use sql app filter with {@link SQLAppFilter#Photo} and {@link SQLAppFilter#Tag}
-	 */
-	public static final Set<SQLAppFilter>	TAG_FILTER			= new HashSet<>();
+   public static final Set<SQLAppFilter>  NO_GEO_LOCATION   = new HashSet<>();
 
-	static {
+   /**
+    * Use sql app filter with {@link SQLAppFilter#Photo} and {@link SQLAppFilter#Tag}
+    */
+   public static final Set<SQLAppFilter>  TAG_FILTER        = new HashSet<>();
 
-		// default is using the photo filter
-		_defaultAppFilter.add(SQLAppFilter.Photo);
+   static {
 
-		TAG_FILTER.add(SQLAppFilter.Photo);
-		TAG_FILTER.add(SQLAppFilter.Tag);
-	}
+      // default is using the photo filter
+      _defaultAppFilter.add(SQLAppFilter.Photo);
+      _defaultAppFilter.add(SQLAppFilter.GeoLocation);
 
-	private String				_sqlWhereClause	= UI.EMPTY_STRING;
-	private ArrayList<Object>	_parameters		= new ArrayList<>();
+      NO_GEO_LOCATION.add(SQLAppFilter.Photo);
 
-	private boolean				_isTagFilterActive;
+      TAG_FILTER.add(SQLAppFilter.Photo);
+      TAG_FILTER.add(SQLAppFilter.GeoLocation);
+      TAG_FILTER.add(SQLAppFilter.Tag);
+   }
 
-	/**
-	 * Create sql app filter with the photo filter
-	 */
-	public SQLFilter() {
-		this(_defaultAppFilter);
-	}
+   private String            _sqlWhereClause = UI.EMPTY_STRING;
+   private ArrayList<Object> _parameters     = new ArrayList<>();
 
-	/**
-	 * @param appFilter
-	 */
-	public SQLFilter(final Set<SQLAppFilter> appFilter) {
+   private boolean           _isTagFilterActive;
 
-		final StringBuilder sb = new StringBuilder();
+   /**
+    * Create sql app filter with the photo filter
+    */
+   public SQLFilter() {
+      this(_defaultAppFilter);
+   }
 
-		/*
-		 * App filter: Person
-		 */
-		final TourPerson activePerson = TourbookPlugin.getActivePerson();
-		if (activePerson == null) {
+   /**
+    * @param appFilter
+    */
+   public SQLFilter(final Set<SQLAppFilter> appFilter) {
 
-			// select all people
+      final StringBuilder sb = new StringBuilder();
 
-		} else {
+      /*
+       * App filter: Person
+       */
+      final TourPerson activePerson = TourbookPlugin.getActivePerson();
+      if (activePerson == null) {
 
-			// select only one person
+         // select all people
 
-			sb.append(" AND TourData.tourPerson_personId = ?\n"); //$NON-NLS-1$
-			_parameters.add(activePerson.getPersonId());
-		}
+      } else {
 
-		/*
-		 * App filter: Photo
-		 */
-		if (appFilter.contains(SQLAppFilter.Photo) && TourbookPlugin.getActivePhotoFilter()) {
+         // select only one person
 
-			sb.append(" AND TourData.numberOfPhotos > 0\n"); //$NON-NLS-1$
-		}
+         sb.append(" AND TourData.tourPerson_personId = ?\n"); //$NON-NLS-1$
+         _parameters.add(activePerson.getPersonId());
+      }
 
-		/*
-		 * App filter: Tour type
-		 */
-		final TourTypeFilter activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
-		if (activeTourTypeFilter != null) {
+      /*
+       * App filter: Photo
+       */
+      if (appFilter.contains(SQLAppFilter.Photo) && TourbookPlugin.getActivePhotoFilter()) {
 
-			final TourTypeSQLData sqlData = activeTourTypeFilter.getSQLData();
+         sb.append(" AND TourData.numberOfPhotos > 0\n"); //$NON-NLS-1$
+      }
 
-			sb.append(sqlData.getWhereString());
-			_parameters.addAll(sqlData.getParameters());
-		}
+      /*
+       * App filter: Tour type
+       */
+      final TourTypeFilter activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
+      if (activeTourTypeFilter != null) {
 
-		/*
-		 * App Filter: Tour data
-		 */
+         final TourTypeSQLData sqlData = activeTourTypeFilter.getSQLData();
+
+         sb.append(sqlData.getWhereString());
+         _parameters.addAll(sqlData.getParameters());
+      }
+
+      /*
+       * App Filter: Tour data
+       */
       final SQLFilterData tourSqlData = TourFilterManager.getSQL();
       if (tourSqlData != null) {
 
@@ -123,98 +129,101 @@ public class SQLFilter {
       /*
        * App Filter: Tour geo location
        */
-      final SQLFilterData tourSqlGeoData = TourGeoFilterManager.getSQL();
-      if (tourSqlGeoData != null) {
+      if (appFilter.contains(SQLAppFilter.GeoLocation)) {
 
-         sb.append(tourSqlGeoData.getWhereString());
-         _parameters.addAll(tourSqlGeoData.getParameters());
-		}
+         final SQLFilterData tourSqlGeoData = TourGeoFilterManager.getSQL();
+         if (tourSqlGeoData != null) {
 
-		/*
-		 * App Filter: Tour tags
-		 */
-		_isTagFilterActive = false;
+            sb.append(tourSqlGeoData.getWhereString());
+            _parameters.addAll(tourSqlGeoData.getParameters());
+         }
+      }
 
-		if (appFilter.contains(SQLAppFilter.Tag)) {
+      /*
+       * App Filter: Tour tags
+       */
+      _isTagFilterActive = false;
 
-			final SQLFilterData tourTagSqlData = TourTagFilterManager.getSQL();
+      if (appFilter.contains(SQLAppFilter.Tag)) {
 
-			if (tourTagSqlData != null) {
+         final SQLFilterData tourTagSqlData = TourTagFilterManager.getSQL();
 
-				_isTagFilterActive = true;
+         if (tourTagSqlData != null) {
 
-				sb.append(tourTagSqlData.getWhereString());
-				_parameters.addAll(tourTagSqlData.getParameters());
-			}
-		}
+            _isTagFilterActive = true;
 
-		_sqlWhereClause = sb.toString();
-	}
+            sb.append(tourTagSqlData.getWhereString());
+            _parameters.addAll(tourTagSqlData.getParameters());
+         }
+      }
 
-	/**
-	 * @return Returns the WHERE clause to filter tours by the app filter, e.g. person, tour types,
-	 *         ...
-	 */
-	public String getWhereClause() {
-		return _sqlWhereClause;
-	}
+      _sqlWhereClause = sb.toString();
+   }
 
-	/**
-	 * @return Returns <code>true</code> when the tag filter is being used, it is enabled and has at
-	 *         least 1 tag
-	 */
-	public boolean isTagFilterActive() {
-		return _isTagFilterActive;
-	}
+   /**
+    * @return Returns the WHERE clause to filter tours by the app filter, e.g. person, tour types,
+    *         ...
+    */
+   public String getWhereClause() {
+      return _sqlWhereClause;
+   }
 
-	/**
-	 * Sets the parameters into the filter statement
-	 *
-	 * @param statement
-	 * @param startIndex
-	 *            Sets the parameter start index, the first parameter is 1
-	 * @throws SQLException
-	 */
-	public void setParameters(final PreparedStatement statement, final int startIndex) throws SQLException {
+   /**
+    * @return Returns <code>true</code> when the tag filter is being used, it is enabled and has at
+    *         least 1 tag
+    */
+   public boolean isTagFilterActive() {
+      return _isTagFilterActive;
+   }
 
-		int parameterIndex = startIndex;
+   /**
+    * Sets the parameters into the filter statement
+    *
+    * @param statement
+    * @param startIndex
+    *           Sets the parameter start index, the first parameter is 1
+    * @throws SQLException
+    */
+   public void setParameters(final PreparedStatement statement, final int startIndex) throws SQLException {
 
-		for (final Object parameter : _parameters) {
+      int parameterIndex = startIndex;
 
-			if (parameter instanceof Long) {
+      for (final Object parameter : _parameters) {
 
-				statement.setLong(parameterIndex, (Long) parameter);
-				parameterIndex++;
+         if (parameter instanceof Long) {
 
-			} else if (parameter instanceof Integer) {
+            statement.setLong(parameterIndex, (Long) parameter);
+            parameterIndex++;
 
-				statement.setInt(parameterIndex, (Integer) parameter);
-				parameterIndex++;
+         } else if (parameter instanceof Integer) {
 
-			} else if (parameter instanceof Float) {
+            statement.setInt(parameterIndex, (Integer) parameter);
+            parameterIndex++;
 
-				statement.setFloat(parameterIndex, (Float) parameter);
-				parameterIndex++;
+         } else if (parameter instanceof Float) {
 
-			} else if (parameter instanceof Double) {
+            statement.setFloat(parameterIndex, (Float) parameter);
+            parameterIndex++;
 
-				statement.setDouble(parameterIndex, (Double) parameter);
-				parameterIndex++;
+         } else if (parameter instanceof Double) {
 
-			} else if (parameter instanceof String) {
+            statement.setDouble(parameterIndex, (Double) parameter);
+            parameterIndex++;
 
-				statement.setString(parameterIndex, (String) parameter);
-				parameterIndex++;
+         } else if (parameter instanceof String) {
 
-			} else {
+            statement.setString(parameterIndex, (String) parameter);
+            parameterIndex++;
 
-				throw new RuntimeException("SQL filter parameter is not supported, " + parameter.getClass());//$NON-NLS-1$
-			}
-		}
-	}
+         } else {
 
-	@Override
-	public String toString() {
-		return _sqlWhereClause;
-	}
+            throw new RuntimeException("SQL filter parameter is not supported, " + parameter.getClass());//$NON-NLS-1$
+         }
+      }
+   }
+
+   @Override
+   public String toString() {
+      return _sqlWhereClause;
+   }
 }

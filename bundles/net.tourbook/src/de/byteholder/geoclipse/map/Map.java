@@ -524,35 +524,8 @@ public class Map extends Canvas {
 
    private int                 _overlayAlpha         = 0xff;
 
-   /*
-    * Select map grid
-    */
-//   private boolean     _grid_IsSelecting;
-//   private boolean     _grid_IsSelectionStarted;
-//   private boolean     _grid_IsShowSelectingGrid;
-
-//   private Point       _grid_DevMouse_Start;
-//   private Point       _grid_DevMouse_End;
-//   private Point       _grid_WorldMouse_Start;
-//   private Point       _grid_WorldMouse_End;
-//   private GeoPosition _grid_GeoMouse_Start;
-//   private GeoPosition _grid_GeoMouse_End;
-
-//   private Point       _grid_WorldMouse_Move;
-
-//   private boolean _grid_IsShowLastGeoGrid;
-//   private GeoPosition _grid_GeoLast_Start;
-//   private GeoPosition _grid_GeoLast_End;
-//   private Point       _grid_WorldLast_Start;
-//   private Point       _grid_WorldLast_End;
-
-//   private String _grid_BoxInfo;
-//   private String _grid_BoxInfo_Previous;
-//   private Point  _grid_BoxInfo_Position;
-//   private Point       _grid_BoxInfo_PreviousPosition;
-
-   private MapGridBoxItem _grid_SelectingGridBoxItem;
-   private MapGridBoxItem _grid_GridBoxItemSelected;
+   private MapGridBoxItem      _grid_GridBoxItem_Hovered;
+   private MapGridBoxItem      _grid_GridBoxItem_Selected;
 
    /**
     * This observer is called in the {@link Tile} when a tile image is set into the tile
@@ -685,12 +658,16 @@ public class Map extends Canvas {
 
    public void actionSearchTourByLocation(final Event event) {
 
-      _grid_SelectingGridBoxItem = new MapGridBoxItem();
+      _grid_GridBoxItem_Hovered = new MapGridBoxItem();
 
       // set initial mouse move position from the current mouse position
-      _grid_SelectingGridBoxItem.worldMouse_Move = new Point(
+      _grid_GridBoxItem_Hovered.worldMouse_Move = new Point(
             _worldPixelTopLeftViewport.x + _mouseMovePositionX,
             _worldPixelTopLeftViewport.y + _mouseMovePositionY);
+
+      _grid_GridBoxItem_Hovered.gridBoxSizeMuliplier = Util.getStateInt(TourGeoFilterManager.getState(),
+            TourGeoFilterManager.STATE_GRID_BOX_SIZE,
+            TourGeoFilterManager.STATE_GRID_BOX_SIZE_DEFAULT);
 
       setCursor(_cursorCross);
 
@@ -859,7 +836,7 @@ public class Map extends Canvas {
       });
    }
 
-   public void addMapGridListener(final IMapGridListener mapListener) {
+   public void addMapGridBoxListener(final IMapGridListener mapListener) {
       _allMapGridListener.add(mapListener);
    }
 
@@ -1839,9 +1816,9 @@ public class Map extends Canvas {
          return;
       }
 
-      if (_grid_SelectingGridBoxItem != null) {
+      if (_grid_GridBoxItem_Hovered != null) {
 
-         _grid_SelectingGridBoxItem = null;
+         _grid_GridBoxItem_Hovered = null;
 
          grid_DisableGridBoxSelection();
 
@@ -1937,23 +1914,23 @@ public class Map extends Canvas {
 
          redraw();
 
-      } else if (_grid_SelectingGridBoxItem != null) {
+      } else if (_grid_GridBoxItem_Hovered != null) {
 
-         _grid_SelectingGridBoxItem.isSelectionStarted = true;
+         _grid_GridBoxItem_Hovered.isSelectionStarted = true;
 
          final int worldMouseX = _worldPixelTopLeftViewport.x + mouseEvent.x;
          final int worldMouseY = _worldPixelTopLeftViewport.y + mouseEvent.y;
          final Point worldMousePosition = new Point(worldMouseX, worldMouseY);
 
-         _grid_SelectingGridBoxItem.dev_Start = devMousePosition;
-         _grid_SelectingGridBoxItem.dev_End = devMousePosition;
+         _grid_GridBoxItem_Hovered.dev_Start = devMousePosition;
+         _grid_GridBoxItem_Hovered.dev_End = devMousePosition;
 
-         _grid_SelectingGridBoxItem.world_Start = worldMousePosition;
-         _grid_SelectingGridBoxItem.world_End = worldMousePosition;
+         _grid_GridBoxItem_Hovered.world_Start = worldMousePosition;
+         _grid_GridBoxItem_Hovered.world_End = worldMousePosition;
 
          final GeoPosition geoMousePosition = _mp.pixelToGeo(new Point2D.Double(worldMousePosition.x, worldMousePosition.y), _mapZoomLevel);
-         _grid_SelectingGridBoxItem.geo_Start = geoMousePosition;
-         _grid_SelectingGridBoxItem.geo_End = geoMousePosition;
+         _grid_GridBoxItem_Hovered.geo_Start = geoMousePosition;
+         _grid_GridBoxItem_Hovered.geo_End = geoMousePosition;
 
          redraw();
 
@@ -1995,16 +1972,16 @@ public class Map extends Canvas {
 
          return;
 
-      } else if (_grid_SelectingGridBoxItem != null) {
+      } else if (_grid_GridBoxItem_Hovered != null) {
 
-         _grid_SelectingGridBoxItem.worldMouse_Move = new Point(worldMouseX, worldMouseY);
+         _grid_GridBoxItem_Hovered.worldMouse_Move = new Point(worldMouseX, worldMouseY);
 
-         grid_UpdateEndPosition(mouseEvent, _grid_SelectingGridBoxItem);
+         grid_UpdateEndPosition(mouseEvent, _grid_GridBoxItem_Hovered);
 
          paint();
 
          fireMapInfoEvent();
-         fireMapGridEvent(false, _grid_SelectingGridBoxItem);
+         fireMapGridEvent(false, _grid_GridBoxItem_Hovered);
 
          return;
 
@@ -2094,17 +2071,17 @@ public class Map extends Canvas {
 
          offline_OpenOfflineImageDialog();
 
-      } else if (_grid_SelectingGridBoxItem != null) {
+      } else if (_grid_GridBoxItem_Hovered != null) {
 
          // finalize grid selecting
 
          _isContextMenuEnabled = false;
 
-         if (_grid_SelectingGridBoxItem.isSelectionStarted == false) {
+         if (_grid_GridBoxItem_Hovered.isSelectionStarted == false) {
 
             // this can happen when the right mouse button is clicked
 
-            _grid_SelectingGridBoxItem = null;
+            _grid_GridBoxItem_Hovered = null;
 
             grid_DisableGridBoxSelection();
 
@@ -2115,17 +2092,17 @@ public class Map extends Canvas {
           * Show selected grid box
           */
 
-         grid_UpdateEndPosition(mouseEvent, _grid_SelectingGridBoxItem);
+         grid_UpdateEndPosition(mouseEvent, _grid_GridBoxItem_Hovered);
 
-         _grid_GridBoxItemSelected = _grid_SelectingGridBoxItem;
-         _grid_SelectingGridBoxItem = null;
+         _grid_GridBoxItem_Selected = _grid_GridBoxItem_Hovered;
+         _grid_GridBoxItem_Hovered = null;
 
          grid_DisableGridBoxSelection();
 
          redraw();
          paint();
 
-         fireMapGridEvent(true, _grid_GridBoxItemSelected);
+         fireMapGridEvent(true, _grid_GridBoxItem_Selected);
 
       } else {
 
@@ -2216,11 +2193,11 @@ public class Map extends Canvas {
             paint_OfflineArea(gc);
          }
 
-         if (_grid_GridBoxItemSelected != null) {
-            paint_GridBox_20_Selected(gc, _grid_GridBoxItemSelected);
+         if (_grid_GridBoxItem_Selected != null) {
+            paint_GridBox_20_Selected(gc, _grid_GridBoxItem_Selected);
          }
-         if (_grid_SelectingGridBoxItem != null) {
-            paint_GridBox_10_Selecting(gc, _grid_SelectingGridBoxItem);
+         if (_grid_GridBoxItem_Hovered != null) {
+            paint_GridBox_10_Hovered(gc, _grid_GridBoxItem_Hovered);
          }
       }
    }
@@ -2574,7 +2551,7 @@ public class Map extends Canvas {
       }
    }
 
-   private void paint_GridBox_10_Selecting(final GC gc, final MapGridBoxItem gridBoxItem) {
+   private void paint_GridBox_10_Hovered(final GC gc, final MapGridBoxItem gridBoxItem) {
 
       gc.setLineWidth(2);
 
@@ -2596,37 +2573,37 @@ public class Map extends Canvas {
          return;
       }
 
-      final int devArea_Start_X = gridBoxItem.dev_Start.x;
-      final int devArea_Start_Y = gridBoxItem.dev_Start.y;
-      final int devArea_End_X = gridBoxItem.dev_End.x;
-      final int devArea_End_Y = gridBoxItem.dev_End.y;
+      final int dev_Start_X = gridBoxItem.dev_Start.x;
+      final int dev_Start_Y = gridBoxItem.dev_Start.y;
+      final int dev_End_X = gridBoxItem.dev_End.x;
+      final int dev_End_Y = gridBoxItem.dev_End.y;
 
-      final int devArea_X1;
-      final int devArea_Y1;
+      final int dev_X1;
+      final int dev_Y1;
 
-      final int devArea_Width;
-      final int devArea_Height;
+      final int dev_Width;
+      final int dev_Height;
 
-      if (devArea_Start_X < devArea_End_X) {
+      if (dev_Start_X < dev_End_X) {
 
-         devArea_X1 = devArea_Start_X;
-         devArea_Width = devArea_End_X - devArea_Start_X;
+         dev_X1 = dev_Start_X;
+         dev_Width = dev_End_X - dev_Start_X;
 
       } else {
 
-         devArea_X1 = devArea_End_X;
-         devArea_Width = devArea_Start_X - devArea_End_X;
+         dev_X1 = dev_End_X;
+         dev_Width = dev_Start_X - dev_End_X;
       }
 
-      if (devArea_Start_Y < devArea_End_Y) {
+      if (dev_Start_Y < dev_End_Y) {
 
-         devArea_Y1 = devArea_Start_Y;
-         devArea_Height = devArea_End_Y - devArea_Start_Y;
+         dev_Y1 = dev_Start_Y;
+         dev_Height = dev_End_Y - dev_Start_Y;
 
       } else {
 
-         devArea_Y1 = devArea_End_Y;
-         devArea_Height = devArea_Start_Y - devArea_End_Y;
+         dev_Y1 = dev_End_Y;
+         dev_Height = dev_Start_Y - dev_End_Y;
       }
 
       /*
@@ -2640,21 +2617,16 @@ public class Map extends Canvas {
 
       paint_GridBox_80_Info_Box(gc, gridBoxItem, topLeft);
 
-//      final int width = _grid_SelectedPosition_Geo_2_E2.x - _grid_SelectedPosition_Geo_1_E2.x;
-//      final int height = _grid_SelectedPosition_Geo_1_E2.y - _grid_SelectedPosition_Geo_2_E2.y;
-//      final int numGeoParts = width * height;
-//      paint_GridBox_90_Info(gc, numGeoParts);
-
       gc.setLineStyle(SWT.LINE_SOLID);
       gc.setForeground(SYS_COLOR_BLACK);
-      gc.drawRectangle(devArea_X1, devArea_Y1, devArea_Width, devArea_Height);
+      gc.drawRectangle(dev_X1, dev_Y1, dev_Width, dev_Height);
 
       gc.setLineStyle(SWT.LINE_SOLID);
       gc.setForeground(SYS_COLOR_WHITE);
 
       gc.setBackground(_display.getSystemColor(SWT.COLOR_DARK_YELLOW));
       gc.setAlpha(0x30);
-      gc.fillRectangle(devArea_X1 + 1, devArea_Y1 + 1, devArea_Width - 2, devArea_Height - 2);
+      gc.fillRectangle(dev_X1 + 1, dev_Y1 + 1, dev_Width - 2, dev_Height - 2);
       gc.setAlpha(0xff);
    }
 
@@ -5039,13 +5011,17 @@ public class Map extends Canvas {
       fireMapPositionEvent(true);
    }
 
+   /**
+    * @param geoFilter
+    *           Show geo grid box, when <code>null</code> the selected grid box is set to hidden
+    */
    public void showGeoGrid(final TourGeoFilterItem geoFilter) {
 
       if (geoFilter == null) {
 
          // hide geo grid
 
-         _grid_GridBoxItemSelected = null;
+         _grid_GridBoxItem_Selected = null;
 
          redraw();
 
@@ -5065,7 +5041,7 @@ public class Map extends Canvas {
 
          } else {
 
-            _grid_GridBoxItemSelected = mapGridBoxItem;
+            _grid_GridBoxItem_Selected = mapGridBoxItem;
 
             setZoom(geoFilter.mapZoomLevel);
 
@@ -5073,8 +5049,8 @@ public class Map extends Canvas {
 
             // chck if gird box is already visible
 
-            if (wpMapViewPort.contains(_grid_GridBoxItemSelected.world_Start)
-                  && wpMapViewPort.contains(_grid_GridBoxItemSelected.world_End)) {
+            if (wpMapViewPort.contains(_grid_GridBoxItem_Selected.world_Start)
+                  && wpMapViewPort.contains(_grid_GridBoxItem_Selected.world_End)) {
 
                // grid box is visile -> nothing to do
 
@@ -5120,22 +5096,22 @@ public class Map extends Canvas {
     */
    private void updateGeoGridAfterZoom() {
 
-      if (_grid_SelectingGridBoxItem != null && _grid_SelectingGridBoxItem.geo_Start != null) {
+      if (_grid_GridBoxItem_Hovered != null && _grid_GridBoxItem_Hovered.geo_Start != null) {
 
-         final java.awt.Point world_Start = _mp.geoToPixel(_grid_SelectingGridBoxItem.geo_Start, _mapZoomLevel);
-         final java.awt.Point world_End = _mp.geoToPixel(_grid_SelectingGridBoxItem.geo_End, _mapZoomLevel);
+         final java.awt.Point world_Start = _mp.geoToPixel(_grid_GridBoxItem_Hovered.geo_Start, _mapZoomLevel);
+         final java.awt.Point world_End = _mp.geoToPixel(_grid_GridBoxItem_Hovered.geo_End, _mapZoomLevel);
 
-         _grid_SelectingGridBoxItem.world_Start = new Point(world_Start.x, world_Start.y);
-         _grid_SelectingGridBoxItem.world_End = new Point(world_End.x, world_End.y);
+         _grid_GridBoxItem_Hovered.world_Start = new Point(world_Start.x, world_Start.y);
+         _grid_GridBoxItem_Hovered.world_End = new Point(world_End.x, world_End.y);
       }
 
-      if (_grid_GridBoxItemSelected != null && _grid_GridBoxItemSelected.geo_Start != null) {
+      if (_grid_GridBoxItem_Selected != null && _grid_GridBoxItem_Selected.geo_Start != null) {
 
-         final java.awt.Point worldLast_Start = _mp.geoToPixel(_grid_GridBoxItemSelected.geo_Start, _mapZoomLevel);
-         final java.awt.Point worldLast_End = _mp.geoToPixel(_grid_GridBoxItemSelected.geo_End, _mapZoomLevel);
+         final java.awt.Point worldLast_Start = _mp.geoToPixel(_grid_GridBoxItem_Selected.geo_Start, _mapZoomLevel);
+         final java.awt.Point worldLast_End = _mp.geoToPixel(_grid_GridBoxItem_Selected.geo_End, _mapZoomLevel);
 
-         _grid_GridBoxItemSelected.world_Start = new Point(worldLast_Start.x, worldLast_Start.y);
-         _grid_GridBoxItemSelected.world_End = new Point(worldLast_End.x, worldLast_End.y);
+         _grid_GridBoxItem_Selected.world_Start = new Point(worldLast_Start.x, worldLast_Start.y);
+         _grid_GridBoxItem_Selected.world_End = new Point(worldLast_End.x, worldLast_End.y);
       }
    }
 

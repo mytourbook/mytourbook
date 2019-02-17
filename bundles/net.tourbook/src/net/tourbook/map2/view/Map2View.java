@@ -284,8 +284,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
          MapGraphId.HrZone,
    };
 
-   private static final int         DELAY_BEFORE_STARTING_GEO_FILTER          = 300;
-
    private final IPreferenceStore   _prefStore                             = TourbookPlugin.getPrefStore();
    private final IDialogSettings    _state                                 = TourbookPlugin.getState(ID);
 
@@ -948,7 +946,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
          }
       });
 
-      _map.addMapGridListener(new IMapGridListener() {
+      _map.addMapGridBoxListener(new IMapGridListener() {
 
          @Override
          public void onMapGrid(final org.eclipse.swt.graphics.Point topLeftE2,
@@ -1179,7 +1177,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
                   // show geo filter
 
-                  _map.showGeoGrid((TourGeoFilterItem) eventData);
+                  x_map.showGeoGrid((TourGeoFilterItem) eventData);
 
                } else if (eventData == null) {
 
@@ -1946,16 +1944,12 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
          return;
       }
 
-      // hide previous info
-//      _map.setGridBox(null);
-
       final int runnableRunningId = _geoFilter_RunningId.incrementAndGet();
 
       GeoFilterTourLoader.stopLoading(_geoFilter_PreviousGeoFilterItem);
 
-      // delay tour comparator, moving the slider can occure very often
-//    _parent.getDisplay().timerExec(DELAY_BEFORE_STARTING_GEO_FILTER, new Runnable() {
-      _parent.getDisplay().timerExec(0, new Runnable() {
+      // delay geo part loader, moving the mouse can occure very often
+      _parent.getDisplay().timerExec(50, new Runnable() {
 
          private int __runningId = runnableRunningId;
 
@@ -1990,7 +1984,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
    }
 
    public void geoFilter_20_Result(final GeoFilterLoaderItem loaderItem) {
-      // TODO Auto-generated method stub
 
       // update UI
       Display.getDefault().asyncExec(new Runnable() {
@@ -2001,8 +1994,19 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
                return;
             }
 
-            // update map with the updated number of tours in a grid box
-            _map.paint();
+            final ArrayList<Long> allLoadedTourIds = loaderItem.allLoadedTourIds;
+
+            if (allLoadedTourIds.size() > 0) {
+
+               // hide previous grid box selection
+               _map.showGeoGrid(null);
+
+               // update map with the updated number of tours in a grid box
+               xpaintTours(allLoadedTourIds);
+
+               enableActions();
+            }
+
          }
       });
    }

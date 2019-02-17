@@ -2033,6 +2033,7 @@ public class Messages extends NLS {
    public static String Slideout_TourGeoFilter_Label_Title;
    public static String Slideout_TourGeoFilter_Radio_GeoParts_Exclude;
    public static String Slideout_TourGeoFilter_Radio_GeoParts_Include;
+   public static String Slideout_TourGeoFilter_Spinner_GridBoxSize;
 
    public static String Slideout_TourInfoOptions_Checkbox_IsShowInfoTooltip;
    public static String Slideout_TourInfoOptions_Checkbox_IsShowTourSeparator;

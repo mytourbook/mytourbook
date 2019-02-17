@@ -56,11 +56,15 @@ public class TourGeoFilterManager {
    private static final IDialogSettings        _state                               = TourbookPlugin.getState("TourGeoFilter"); //$NON-NLS-1$
    private static final IPath                  _stateLocation                       = Platform.getStateLocation(_bundle);
 
-   static final String                         STATE_SELECTED_GEO_FILTER_ID         = "STATE_SELECTED_GEO_FILTER_ID";           //$NON-NLS-1$
+   public static final String                  STATE_GRID_BOX_SIZE                  = "STATE_GRID_BOX_SIZE";                    //$NON-NLS-1$
+   public static final int                     STATE_GRID_BOX_SIZE_DEFAULT          = 1;
+   static final int                            STATE_GRID_BOX_SIZE_MIN              = 1;
+   static final int                            STATE_GRID_BOX_SIZE_MAX              = 10;
    static final String                         STATE_IS_INCLUDE_GEO_PARTS           = "STATE_IS_INCLUDE_GEO_PARTS";             //$NON-NLS-1$
    static final boolean                        STATE_IS_INCLUDE_GEO_PARTS_DEFAULT   = true;
    static final String                         STATE_IS_USE_APP_FILTERS             = "STATE_IS_USE_APP_FILTERS";               //$NON-NLS-1$
    static final boolean                        STATE_IS_USE_APP_FILTERS_DEFAULT     = true;
+   static final String                         STATE_SELECTED_GEO_FILTER_ID         = "STATE_SELECTED_GEO_FILTER_ID";           //$NON-NLS-1$
    static final String                         STATE_SORT_COLUMN_DIRECTION          = "STATE_SORT_COLUMN_DIRECTION";            //$NON-NLS-1$
    static final String                         STATE_SORT_COLUMN_ID                 = "STATE_SORT_COLUMN_ID";                   //$NON-NLS-1$
 

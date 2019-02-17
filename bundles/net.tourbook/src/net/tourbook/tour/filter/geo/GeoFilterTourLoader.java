@@ -131,7 +131,6 @@ public class GeoFilterTourLoader {
 
       final long start = System.currentTimeMillis();
 
-      final StringBuilder sqlWhere = new StringBuilder();
       final ArrayList<Integer> allLatLonParts = new ArrayList<>();
 
       //         int latPart = (int) (latitude * 100);
@@ -210,7 +209,8 @@ public class GeoFilterTourLoader {
 
       if (isAppFilter) {
 
-         appFilter = new SQLFilter();
+         // get app filter without geo location, this is added here
+         appFilter = new SQLFilter(SQLFilter.NO_GEO_LOCATION);
 
          final String selectAppFilter = ""
 
@@ -240,10 +240,10 @@ public class GeoFilterTourLoader {
 
          final PreparedStatement stmtSelect = conn.prepareStatement(select);
 
-         // fillup parameters
-         for (int partIndex = 0; partIndex < numGeoParts; partIndex++) {
-            stmtSelect.setInt(partIndex + 1, allLatLonParts.get(partIndex));
-         }
+            // fillup parameters
+            for (int partIndex = 0; partIndex < numGeoParts; partIndex++) {
+               stmtSelect.setInt(partIndex + 1, allLatLonParts.get(partIndex));
+            }
 
          if (isAppFilter) {
             appFilter.setParameters(stmtSelect, 1 + numGeoParts);
@@ -274,7 +274,10 @@ public class GeoFilterTourLoader {
       loaderItem.sqlRunningTime = timeDiff;
 
       final String timeInMs = timeDiff > 50 ? " - " + Long.toString(timeDiff) + " ms" : "";
+
       loaderItem.mapGridBoxItem.gridBoxText = "Tours: " + Integer.toString(allTourIds.size()) + timeInMs;
+
+      loaderItem.allLoadedTourIds = allTourIds;
 
 //      System.out.println(""
 ////            (UI.timeStampNano() + " [" + GeoFilterTourLoader.class.getSimpleName() + "] ")
