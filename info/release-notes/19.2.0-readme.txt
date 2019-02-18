@@ -1,15 +1,11 @@
-Version 19.2.0                                        23. January 2019
+Version 19.2.0                                        2?. February 2019
 
 
-Improvements   
-============
+New   
+===
 
-
-
-Translation
-===========   
-
-* 
+* EXPERIMENTAL: Search Tour by Location
+  This feature is in a very early stage and has some issues, but in some parts it is working 
 
 
 Bugfix
