@@ -5,7 +5,7 @@ New
 ===
 
 * EXPERIMENTAL: Search Tour by Location
-  This feature is in a very early stage and has some issues, but in some parts it is working 
+  This feature is in a very early stage and has some issues, but in some parts it is already working 
 
 
 Bugfix
