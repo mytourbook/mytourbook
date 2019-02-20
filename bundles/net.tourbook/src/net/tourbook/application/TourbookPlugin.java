@@ -18,6 +18,11 @@ package net.tourbook.application;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.data.TourPerson;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.ui.TourTypeFilter;
+
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -29,11 +34,6 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Version;
-
-import net.tourbook.common.util.StatusUtil;
-import net.tourbook.data.TourPerson;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.TourTypeFilter;
 
 /**
  * The main plugin class to be used in the desktop.

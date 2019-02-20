@@ -36,133 +36,133 @@ import org.eclipse.ui.splash.BasicSplashHandler;
  */
 public class MyTourbookSplashHandler extends BasicSplashHandler {
 
-	@Override
-	public void init(final Shell splash) {
+   @Override
+   public void init(final Shell splash) {
 
-		super.init(splash);
+      super.init(splash);
 
-		// keep the splash handler to be used outside of this splash handlers
-		TourbookPlugin.setSplashHandler(this);
+      // keep the splash handler to be used outside of this splash handlers
+      TourbookPlugin.setSplashHandler(this);
 
-		String progressRectString = null;
-		String messageRectString = null;
-//		String foregroundColorString = null;
+      String progressRectString = null;
+      String messageRectString = null;
+//    String foregroundColorString = null;
 
-		final IProduct product = Platform.getProduct();
-		if (product != null) {
-			progressRectString = product.getProperty(IProductConstants.STARTUP_PROGRESS_RECT);
-			messageRectString = product.getProperty(IProductConstants.STARTUP_MESSAGE_RECT);
-//			foregroundColorString = product.getProperty(IProductConstants.STARTUP_FOREGROUND_COLOR);
-		}
+      final IProduct product = Platform.getProduct();
+      if (product != null) {
+         progressRectString = product.getProperty(IProductConstants.STARTUP_PROGRESS_RECT);
+         messageRectString = product.getProperty(IProductConstants.STARTUP_MESSAGE_RECT);
+//       foregroundColorString = product.getProperty(IProductConstants.STARTUP_FOREGROUND_COLOR);
+      }
 
-		// set progressbar position
-		Rectangle progressRect = parseRect(progressRectString);
-		if (progressRect == null) {
-			progressRect = new Rectangle(10, 0, 300, 15);
-		}
-		setProgressRect(progressRect);
+      // set progressbar position
+      Rectangle progressRect = parseRect(progressRectString);
+      if (progressRect == null) {
+         progressRect = new Rectangle(10, 0, 300, 15);
+      }
+      setProgressRect(progressRect);
 
-		// set message position
-		Rectangle messageRect = parseRect(messageRectString);
-		if (messageRect == null) {
-			messageRect = new Rectangle(10, 25, 300, 15);
-		}
-		setMessageRect(messageRect);
+      // set message position
+      Rectangle messageRect = parseRect(messageRectString);
+      if (messageRect == null) {
+         messageRect = new Rectangle(10, 25, 300, 15);
+      }
+      setMessageRect(messageRect);
 
-		// set message color
-		int foregroundColorInteger;
-//		try {
-//			// debug color
-//			foregroundColorInteger = Integer.parseInt(foregroundColorString, 16);
-//		} catch (final Exception ex) {
-//			// production color, debug is not using this color
-//			foregroundColorInteger = 0x2d84f6;
-//		}
-//		foregroundColorInteger = 0x2d84f6;
-//		foregroundColorInteger = 0x2a7ce7;
-		foregroundColorInteger = 0xffffff;
+      // set message color
+      int foregroundColorInteger;
+//    try {
+//       // debug color
+//       foregroundColorInteger = Integer.parseInt(foregroundColorString, 16);
+//    } catch (final Exception ex) {
+//       // production color, debug is not using this color
+//       foregroundColorInteger = 0x2d84f6;
+//    }
+//    foregroundColorInteger = 0x2d84f6;
+//    foregroundColorInteger = 0x2a7ce7;
+      foregroundColorInteger = 0xffffff;
 
-		setForeground(new RGB(
-				(foregroundColorInteger & 0xFF0000) >> 16,
-				(foregroundColorInteger & 0xFF00) >> 8,
-				foregroundColorInteger & 0xFF));
+      setForeground(new RGB(
+            (foregroundColorInteger & 0xFF0000) >> 16,
+            (foregroundColorInteger & 0xFF00) >> 8,
+            foregroundColorInteger & 0xFF));
 
-//		final String buildId = "Version " + System.getProperty("eclipse.buildId", "Unknown Version"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+//    final String buildId = "Version " + System.getProperty("eclipse.buildId", "Unknown Version"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-		getContent().addPaintListener(new PaintListener() {
+      getContent().addPaintListener(new PaintListener() {
 
-			@Override
-			public void paintControl(final PaintEvent e) {
-				onPaint(e);
-			}
-		});
-	}
+         @Override
+         public void paintControl(final PaintEvent e) {
+            onPaint(e);
+         }
+      });
+   }
 
-	private void onPaint(final PaintEvent e) {
+   private void onPaint(final PaintEvent e) {
 
-		final GC gc = e.gc;
-		gc.setForeground(getForeground());
+      final GC gc = e.gc;
+      gc.setForeground(getForeground());
 
-		final int borderRight = 385;
-		final int borderBottom = 101;
+      final int borderRight = 385;
+      final int borderBottom = 101;
 
-		final String copyRight = NLS.bind(Messages.App_Splash_Copyright, ApplicationVersion.SPLASH_COPYRIGHT_YEAR);
-		final int textHeight = gc.textExtent(copyRight).y;
+      final String copyRight = NLS.bind(Messages.App_Splash_Copyright, ApplicationVersion.SPLASH_COPYRIGHT_YEAR);
+      final int textHeight = gc.textExtent(copyRight).y;
 
-		final String version = "Version " + ApplicationVersion.getVersionSimple(); //$NON-NLS-1$
-		final Point versionExtent = gc.textExtent(version);
+      final String version = "Version " + ApplicationVersion.getVersionSimple(); //$NON-NLS-1$
+      final Point versionExtent = gc.textExtent(version);
 
-		final String qualifier = ApplicationVersion.getVersionQualifier();
-		final Point qualifierExtent = gc.textExtent(qualifier);
+      final String qualifier = ApplicationVersion.getVersionQualifier();
+      final Point qualifierExtent = gc.textExtent(qualifier);
 
-		final String dataLocation = Platform.getInstanceLocation().getURL().getPath();
-		final Point dataLocationExtent = gc.textExtent(dataLocation);
+      final String dataLocation = Platform.getInstanceLocation().getURL().getPath();
+      final Point dataLocationExtent = gc.textExtent(dataLocation);
 
-		gc.drawText(version,//
-				borderRight - versionExtent.x,
-				borderBottom - versionExtent.y - 2 - qualifierExtent.y,
-				true);
+      gc.drawText(version,//
+            borderRight - versionExtent.x,
+            borderBottom - versionExtent.y - 2 - qualifierExtent.y,
+            true);
 
-		// show location when data location is in debug mode
-		if (dataLocation.contains("DEBUG")) { //$NON-NLS-1$
+      // show location when data location is in debug mode
+      if (dataLocation.contains("DEBUG")) { //$NON-NLS-1$
 
-			gc.drawText(dataLocation, //
-					borderRight - dataLocationExtent.x,
-					borderBottom - versionExtent.y,
-					true);
+         gc.drawText(dataLocation, //
+               borderRight - dataLocationExtent.x,
+               borderBottom - versionExtent.y,
+               true);
 
-		} else {
+      } else {
 
-			gc.drawText(qualifier, //
-					borderRight - qualifierExtent.x,
-					borderBottom - versionExtent.y,
-					true);
-		}
+         gc.drawText(qualifier, //
+               borderRight - qualifierExtent.x,
+               borderBottom - versionExtent.y,
+               true);
+      }
 
-		gc.drawText(copyRight, 5, 162 - textHeight, true);
-	}
+      gc.drawText(copyRight, 5, 162 - textHeight, true);
+   }
 
-	private Rectangle parseRect(final String string) {
-		if (string == null) {
-			return null;
-		}
-		int x, y, w, h;
-		int lastPos = 0;
-		try {
-			int i = string.indexOf(',', lastPos);
-			x = Integer.parseInt(string.substring(lastPos, i));
-			lastPos = i + 1;
-			i = string.indexOf(',', lastPos);
-			y = Integer.parseInt(string.substring(lastPos, i));
-			lastPos = i + 1;
-			i = string.indexOf(',', lastPos);
-			w = Integer.parseInt(string.substring(lastPos, i));
-			lastPos = i + 1;
-			h = Integer.parseInt(string.substring(lastPos));
-		} catch (final RuntimeException e) {
-			// sloppy error handling
-			return null;
-		}
-		return new Rectangle(x, y, w, h);
-	}
+   private Rectangle parseRect(final String string) {
+      if (string == null) {
+         return null;
+      }
+      int x, y, w, h;
+      int lastPos = 0;
+      try {
+         int i = string.indexOf(',', lastPos);
+         x = Integer.parseInt(string.substring(lastPos, i));
+         lastPos = i + 1;
+         i = string.indexOf(',', lastPos);
+         y = Integer.parseInt(string.substring(lastPos, i));
+         lastPos = i + 1;
+         i = string.indexOf(',', lastPos);
+         w = Integer.parseInt(string.substring(lastPos, i));
+         lastPos = i + 1;
+         h = Integer.parseInt(string.substring(lastPos));
+      } catch (final RuntimeException e) {
+         // sloppy error handling
+         return null;
+      }
+      return new Rectangle(x, y, w, h);
+   }
 }
