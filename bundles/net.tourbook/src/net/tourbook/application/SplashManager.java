@@ -99,7 +99,7 @@ public class SplashManager {
 //      Rectangle messageRect = parseRect(messageRectString);
 //      if (messageRect == null) {
 ////         messageRect = new Rectangle(10, 25, 300, 15);
-      final Rectangle messageRect = new Rectangle(5, 124, 390, 15);
+      final Rectangle messageRect = new Rectangle(5, 120, 390, 20);
 //      }
       setTextBounds(messageRect);
 
