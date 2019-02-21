@@ -133,14 +133,21 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 	private Map25Provider			_selectedMapProvider;
 	private TileManager				_tileManager;
 
+	/*
+	 * if i could replace "_l" against "_layer_BaseMap", everything would be easier...
+	 * _l = mMap.setBaseMap(tileSource);  returns VectorTileLayer
+	 */
 	private OsmTileLayerMT			_layer_BaseMap;   //extends extends VectorTileLayer
 	private VectorTileLayer 		_l;	
 
 	private BuildingLayer			_layer_Building;
 	private S3DBLayer					_layer_mf_S3DB_Building;
+	private TileSource            _hillshadingSource = null;
 	private MapFileTileSource		 _tileSourceOffline;
 	private MultiMapFileTileSource _tileSourceOfflineMM;
+	
 	private int							_tileSourceOfflineMapCount = 0;
+	
 	
 	/**
 	 * The opacity can be set in the layer but not read. This will keep the state of the hillshading opacity.
@@ -169,9 +176,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
    private float                 _mf_UserScale = 2.50f;
    private float                 _vtm_UserScale = 2.0f;	
 	
-   private JFrame _pleaseWaitFrame;
-   private JDialog _pleaseWaitDialog;
-   private JLabel _pleaseWaitLabel;	
 
 	/**
 	 * Is <code>true</code> when a tour marker is hit.
@@ -308,8 +312,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 
 		_httpFactory = new OkHttpEngineMT.OkHttpFactoryMT();
 		
-		init_pleaseWaitWindow();
-		
 		 //256 MB Diskcache
 		/*OkHttpClient.Builder builder = new OkHttpClient.Builder();
 		File cacheDirectory = new File(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString());
@@ -428,8 +430,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 						int n = 0;
 						int overlaycount = renderThemeStyleLayer.getOverlays().size();
 						for (XmlRenderThemeStyleLayer overlay : renderThemeStyleLayer.getOverlays()) {
-						   _pleaseWaitLabel.setText("activating external overlay: " + ++n + " of " + overlaycount);
-						   _pleaseWaitLabel.paintImmediately(_pleaseWaitLabel.getVisibleRect());
 							if (overlay.isEnabled())
 								categories.addAll(overlay.getCategories());
 						}
@@ -452,7 +452,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 			mMap.updateMap(true);
 
 		}
-		//pleaseWaitWindow(false);
+
 	}
 
 	private UrlTileSource createTileSource(final Map25Provider mapProvider, final OkHttpFactoryMT httpFactory) {
@@ -717,6 +717,12 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 	public void setMapProvider(final Map25Provider mapProvider) {
 
 		System.out.println("############# setMapProvider entering setMapProvider"); //$NON-NLS-1$
+		System.out.println("############# setMapProvider layers before: " + mMap.layers().toString() + " size: " + mMap.layers().size());
+		/*boolean label_layer_was_enabled = getLayer_Label().isEnabled();
+		boolean building_layer_was_enabled = getLayer_Building().isEnabled();
+		mMap.layers().remove(_layer_Label);
+		mMap.layers().remove(_layer_Building);*/
+		
 		//if NOT mapsforge map
 		System.out.println("############# setMapProvider MapProviderENCODING: " + mapProvider.tileEncoding); //$NON-NLS-1$
 		if (mapProvider.tileEncoding  != TileEncoding.MF) { // NOT mapsforge
@@ -738,12 +744,13 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 				System.out.println("############# setMapProvider: onlinemap using internal default theme: " + mapProvider.theme); //$NON-NLS-1$
 				mMap.setTheme(VtmThemes.DEFAULT);
 			}
-			mMap.clearMap();
-			mMap.updateMap(true);
+			_layer_Building = new BuildingLayer(mMap, _layer_BaseMap);
+			
+	//		mMap.clearMap();
+	//		mMap.updateMap(true);
 
 			_mf_themeFilePath = ""; // so if mf is next themefile is parsed //$NON-NLS-1$
 		} else { //it mapsforge map
-		   pleaseWaitWindow(true,"switching to offline map...");
 			this._is_mf_Map = true;
 			CanvasAdapter.textScale = _mf_TextScale;
 			CanvasAdapter.userScale = _mf_UserScale;
@@ -799,10 +806,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 					mMap.setTheme(VtmThemes.DEFAULT);   // ThemeLoader.load(_mf_themeFilePath));
 				} else {
 					if (!_mf_themeFilePath.equals(_last_mf_themeFilePath) || !_mf_theme_styleID.equals(_last_mf_theme_styleID) || _mf_offline_IsThemeFromFile != _last_offline_IsThemeFromFile ) {  //only parsing when different file	
-					   
-					   Path p = Paths.get(_mf_themeFilePath);
-					   pleaseWaitWindow(true,"activating externa theme: " + p.getFileName().toString() + " Style: " + mapProvider.offline_ThemeStyle);
-					   
 					   System.out.println("############# setMapProvider: Theme loader started"); //$NON-NLS-1$
 						this._mf_IRenderTheme = ThemeLoader.load(_mf_themeFilePath);
 						System.out.println("############# setMapProvider: Theme loader done, now activating..."); //$NON-NLS-1$
@@ -825,17 +828,24 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 				}
 				_mf_offline_IsThemeFromFile = false;
 			}
-			
-			mMap.clearMap();
-			mMap.updateMap(true);
+			//_layer_Building = new BuildingLayer(mMap, _layer_BaseMap);
 		}
+		
+      /*_layer_Label = new LabelLayerMT(mMap, _layer_BaseMap);
+      _layer_Label.setEnabled(label_layer_was_enabled);
+      mMap.layers().add(_layer_Label);
+
+      _layer_Building.setEnabled(building_layer_was_enabled);
+      mMap.layers().add(_layer_Building);*/
+      
+      mMap.clearMap();
+      mMap.updateMap(true);	
 
 		System.out.println("############# setMapProvider: set language : " + _mf_prefered_language); //$NON-NLS-1$
 		this._last_mf_themeFilePath = _mf_themeFilePath;
 		this._last_mf_theme_styleID = _mf_theme_styleID;
 		this._last_offline_IsThemeFromFile = _mf_offline_IsThemeFromFile;
 		_selectedMapProvider = mapProvider;
-		pleaseWaitWindow(false);
 	}
 
 	/**
@@ -958,12 +968,12 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		final Layers layers = mMap.layers();
 
 		// hillshading with 1MB RAM Cache, using existing _httpfactory with diskcache
-      TileSource hillshadingSource =  DefaultSources.HIKEBIKE_HILLSHADE
+      _hillshadingSource =  DefaultSources.HIKEBIKE_HILLSHADE
             .httpFactory(_httpFactory)
             .zoomMin(1)
             .zoomMax(16)
             .build();  
-		_layer_HillShading = new BitmapTileLayer(mMap, hillshadingSource, 1 << 20);
+		_layer_HillShading = new BitmapTileLayer(mMap, _hillshadingSource, 1 << 20);
 		_layer_HillShading.setEnabled(false);
 		mMap.layers().add(_layer_HillShading);
 		
@@ -1179,35 +1189,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		return file.getAbsolutePath();
 	}
 	
-   /**
-    * please wait window
-    * @param show true or false
-    * {@link http://www.java2s.com/Tutorials/Java/Swing_How_to/JFrame/Create_Modeless_and_model_Dialog_from_JFrame.htm}
-    */
-   public void pleaseWaitWindow(Boolean show) {
-      _pleaseWaitDialog.setVisible(show);
-      _pleaseWaitFrame.setVisible(show);
-   }
 
-   public void pleaseWaitWindow(Boolean show, String Text) {
-      _pleaseWaitLabel.setText(Text);
-      pleaseWaitWindow(show);
-   }  
-   
-   public void init_pleaseWaitWindow() {
-      _pleaseWaitLabel = new JLabel("loading theme, please be patient");
-      
-      _pleaseWaitFrame = new JFrame();
-      _pleaseWaitFrame.setUndecorated(true);
-      _pleaseWaitFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-      _pleaseWaitFrame.pack();
-
-      _pleaseWaitDialog = new JDialog(_pleaseWaitFrame, "Please Wait...", ModalityType.MODELESS);
-      _pleaseWaitDialog.setLayout(new FlowLayout());
-      _pleaseWaitDialog.add(_pleaseWaitLabel);
-      _pleaseWaitDialog.add(Box.createRigidArea(new Dimension(200, 50)));
-      _pleaseWaitDialog.pack();
-      _pleaseWaitDialog.setLocationRelativeTo(null);
-   }	
 
 }
