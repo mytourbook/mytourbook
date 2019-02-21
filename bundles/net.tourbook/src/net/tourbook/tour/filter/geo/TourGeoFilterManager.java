@@ -442,29 +442,31 @@ public class TourGeoFilterManager {
 
          xmlRoot = xmlWriteGeoFilter_10_Root();
 
-         if (_selectedFilter != null) {
-            xmlRoot.putString(ATTR_ACTIVE_GEO_FILTER_ID, _selectedFilter.id);
-         }
+// This is currently disabled because loaded filters do not yet work         
 
-         // loop: all geo filter
-         for (final TourGeoFilterItem geoFilter : _allTourGeoFilter) {
-
-            final IMemento xmlFilter = xmlRoot.createChild(TAG_GEO_FILTER);
-
-            xmlFilter.putString(ATTR_GEO_FILTER_ID, geoFilter.id);
-
-            xmlFilter.putString(ATTR_CREATED, geoFilter.created.toString());
-            xmlFilter.putInteger(ATTR_GEO_PARTS, geoFilter.numGeoParts);
-
-            xmlFilter.putInteger(ATTR_TOP_LEFT_X_E2, geoFilter.topLeftE2.x);
-            xmlFilter.putInteger(ATTR_TOP_LEFT_Y_E2, geoFilter.topLeftE2.y);
-            xmlFilter.putInteger(ATTR_BOTTOM_RIGHT_X_E2, geoFilter.bottomRightE2.x);
-            xmlFilter.putInteger(ATTR_BOTTOM_RIGHT_Y_E2, geoFilter.bottomRightE2.y);
-
-            xmlFilter.putInteger(ATTR_MAP_ZOOM_LEVEL, geoFilter.mapZoomLevel);
-            Util.setXmlDouble(xmlFilter, ATTR_MAP_GEO_CENTER_LATITUDE, geoFilter.mapGeoCenter.latitude);
-            Util.setXmlDouble(xmlFilter, ATTR_MAP_GEO_CENTER_LONGITUDE, geoFilter.mapGeoCenter.longitude);
-         }
+//         if (_selectedFilter != null) {
+//            xmlRoot.putString(ATTR_ACTIVE_GEO_FILTER_ID, _selectedFilter.id);
+//         }
+//
+//         // loop: all geo filter
+//         for (final TourGeoFilterItem geoFilter : _allTourGeoFilter) {
+//
+//            final IMemento xmlFilter = xmlRoot.createChild(TAG_GEO_FILTER);
+//
+//            xmlFilter.putString(ATTR_GEO_FILTER_ID, geoFilter.id);
+//
+//            xmlFilter.putString(ATTR_CREATED, geoFilter.created.toString());
+//            xmlFilter.putInteger(ATTR_GEO_PARTS, geoFilter.numGeoParts);
+//
+//            xmlFilter.putInteger(ATTR_TOP_LEFT_X_E2, geoFilter.topLeftE2.x);
+//            xmlFilter.putInteger(ATTR_TOP_LEFT_Y_E2, geoFilter.topLeftE2.y);
+//            xmlFilter.putInteger(ATTR_BOTTOM_RIGHT_X_E2, geoFilter.bottomRightE2.x);
+//            xmlFilter.putInteger(ATTR_BOTTOM_RIGHT_Y_E2, geoFilter.bottomRightE2.y);
+//
+//            xmlFilter.putInteger(ATTR_MAP_ZOOM_LEVEL, geoFilter.mapZoomLevel);
+//            Util.setXmlDouble(xmlFilter, ATTR_MAP_GEO_CENTER_LATITUDE, geoFilter.mapGeoCenter.latitude);
+//            Util.setXmlDouble(xmlFilter, ATTR_MAP_GEO_CENTER_LONGITUDE, geoFilter.mapGeoCenter.longitude);
+//         }
 
       } catch (final Exception e) {
          StatusUtil.log(e);

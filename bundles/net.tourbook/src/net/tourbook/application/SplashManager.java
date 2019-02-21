@@ -378,6 +378,9 @@ public class SplashManager {
 
    public void setMessage(final String message) {
 
+      // log message if the splash screen do not show it
+      System.out.println("Splash message: " + message);//$NON-NLS-1$
+
       if (textLabel != null && !textLabel.isDisposed()) {
 
          splashShell.getDisplay().syncExec(new Runnable() {
