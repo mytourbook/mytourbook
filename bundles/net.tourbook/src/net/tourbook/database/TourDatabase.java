@@ -54,7 +54,6 @@ import javax.persistence.Persistence;
 import javax.persistence.Query;
 
 import net.tourbook.Messages;
-import net.tourbook.application.MyTourbookSplashHandler;
 import net.tourbook.application.SplashManager;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.NIO;
@@ -2288,13 +2287,13 @@ public class TourDatabase {
 
          if (progress instanceof IProgressMonitor) {
 
-            IProgressMonitor monitor = (IProgressMonitor) progress;
+            final IProgressMonitor monitor = (IProgressMonitor) progress;
 
             monitor.subTask(msg);
 
          } else if (progress instanceof SplashManager) {
 
-            SplashManager splashManager = (SplashManager) progress;
+            final SplashManager splashManager = (SplashManager) progress;
 
             splashManager.setMessage(msg);
          }
@@ -3630,26 +3629,17 @@ public class TourDatabase {
       try {
 
          /*
-          * Get progress monitor
-          */
-         final IProgressMonitor progressMonitor;
-         final MyTourbookSplashHandler splashHandler = TourbookPlugin.getSplashHandler();
-         if (splashHandler == null) {
-            progressMonitor = new NullProgressMonitor();
-         } else {
-            progressMonitor = splashHandler.getBundleProgressMonitor();
-         }
-
-         /*
           * Check or setup sql
           */
-         final IRunnableWithProgress runnable = new IRunnableWithProgress() {
+         final Runnable runnable = new Runnable() {
             @Override
-            public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+            public void run() {
+
+               final SplashManager splashManager = SplashManager.getInstance();
 
                try {
 
-                  sqlInit_20_CheckServer();
+                  sqlInit_20_CheckServer(splashManager);
                   sqlInit_30_Check_DbIsCreated();
 
                } catch (final Throwable e) {
@@ -3658,29 +3648,25 @@ public class TourDatabase {
                   return;
                }
 
-               final SplashManager splashManager = SplashManager.getInstance();
-
                sqlInit_40_CheckTable(splashManager);
 
                if (sqlInit_60_IsVersionValid(splashManager) == false) {
                   return;
                }
 
-               sqlInit_80_Check_DbIsUpgraded_After(monitor);
+               sqlInit_80_Check_DbIsUpgraded_After(splashManager);
 
-               sqlInit_90_SetupEntityManager(monitor);
+               sqlInit_90_SetupEntityManager(splashManager);
+
+               splashManager.setMessage(Messages.App_SplashMessage_Finalize);
 
                returnState[0] = true;
             }
 
          };
 
-         runnable.run(progressMonitor);
+         runnable.run();
 
-      } catch (final InvocationTargetException e) {
-         StatusUtil.log(e);
-      } catch (final InterruptedException e) {
-         StatusUtil.log(e);
       } finally {
          _isDbInitialized = returnState[0];
       }
@@ -3691,10 +3677,11 @@ public class TourDatabase {
    /**
     * Check if the server is available
     *
+    * @param splashManager
     * @throws Throwable
     * @throws MyTourbookException
     */
-   private void sqlInit_20_CheckServer() throws Throwable {
+   private void sqlInit_20_CheckServer(final SplashManager splashManager) throws Throwable {
 
       if (_isDerbyEmbedded) {
          return;
@@ -3707,13 +3694,7 @@ public class TourDatabase {
 
       try {
 
-         final MyTourbookSplashHandler splashHandler = TourbookPlugin.getSplashHandler();
-
-         final IProgressMonitor monitor = splashHandler == null //
-               ? null
-               : splashHandler.getBundleProgressMonitor();
-
-         sqlInit_22_CheckServer_CreateRunnable().run(monitor);
+         sqlInit_22_CheckServer_CreateRunnable(splashManager).run(new NullProgressMonitor());
 
       } catch (final InvocationTargetException e) {
 
@@ -3740,8 +3721,10 @@ public class TourDatabase {
    /**
     * Checks if the database server is running, if not it will start the server. startServerJob has
     * a job when the server is not yet started
+    *
+    * @param splashManager
     */
-   private IRunnableWithProgress sqlInit_22_CheckServer_CreateRunnable() {
+   private IRunnableWithProgress sqlInit_22_CheckServer_CreateRunnable(final SplashManager splashManager) {
 
       // create runnable for stating the derby server
 
@@ -3749,8 +3732,8 @@ public class TourDatabase {
          @Override
          public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
-            if (monitor != null) {
-               monitor.subTask(createUIServerStateMessage(0));
+            if (splashManager != null) {
+               splashManager.setMessage(createUIServerStateMessage(0));
             }
 
             try {
@@ -3791,8 +3774,8 @@ public class TourDatabase {
 
                   try {
 
-                     if (monitor != null) {
-                        monitor.subTask(createUIServerStateMessage(pingCounter));
+                     if (splashManager != null) {
+                        splashManager.setMessage(createUIServerStateMessage(pingCounter));
                      }
                      _server.ping();
 
@@ -3826,8 +3809,8 @@ public class TourDatabase {
                // make the first connection, this takes longer as the subsequent ones
                try {
 
-                  if (monitor != null) {
-                     monitor.subTask(Messages.Database_Monitor_SetupPooledConnection);
+                  if (splashManager != null) {
+                     splashManager.setMessage(Messages.Database_Monitor_SetupPooledConnection);
                   }
 
                   final Connection connection = getConnection_Simple();
@@ -4161,7 +4144,7 @@ public class TourDatabase {
       return conn;
    }
 
-   private void sqlInit_80_Check_DbIsUpgraded_After(final IProgressMonitor monitor) {
+   private void sqlInit_80_Check_DbIsUpgraded_After(final SplashManager splashManager) {
 
       if (_isChecked_DbUpgraded_After) {
          return;
@@ -4219,7 +4202,7 @@ public class TourDatabase {
 
          logDriverManager_GetConnection(dbUrl_Upgrade);
 
-         monitor.subTask(Messages.Database_Monitor_UpgradeDatabase);
+         splashManager.setMessage(Messages.Database_Monitor_UpgradeDatabase);
 
          conn = DriverManager.getConnection(dbUrl_Upgrade, TABLE_SCHEMA, TABLE_SCHEMA);
 
@@ -4232,16 +4215,14 @@ public class TourDatabase {
       }
    }
 
-   private synchronized void sqlInit_90_SetupEntityManager(final IProgressMonitor monitor) {
+   private synchronized void sqlInit_90_SetupEntityManager(final SplashManager splashManager) {
 
       final Map<String, Object> configOverrides = new HashMap<>();
 
       configOverrides.put("hibernate.connection.url", DERBY_URL); //$NON-NLS-1$
       configOverrides.put("hibernate.connection.driver_class", DERBY_DRIVER_CLASS); //$NON-NLS-1$
 
-      monitor.subTask(Messages.Database_Monitor_persistent_service_task);
-
-      SplashManager.getInstance().setMessage(Messages.Database_Monitor_persistent_service_task);
+      splashManager.setMessage(Messages.Database_Monitor_persistent_service_task);
 
       _emFactory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME, configOverrides);
    }
@@ -6831,7 +6812,6 @@ public class TourDatabase {
                         new Object[] { tourIndex, numTours, percent });
 
                   splashManager.setMessage(message);
-                  System.out.println(message);
                }
 
                tourIndex++;

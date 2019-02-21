@@ -1178,8 +1178,8 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
                   // show geo filter
 
                   _map.showGeoGrid((TourGeoFilterItem) eventData);
-                  System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ()"));
-// TODO remove SYSTEM.OUT.PRINTLN
+//                  System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ()"));
+//// TODO remove SYSTEM.OUT.PRINTLN
 
                } else if (eventData == null) {
 
@@ -2007,8 +2007,8 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
                   // update map with the updated number of tours in a grid box
                   paintTours(allLoadedTourIds);
-                  System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ()"));
-// TODO remove SYSTEM.OUT.PRINTLN
+//                  System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ()"));
+//// TODO remove SYSTEM.OUT.PRINTLN
                }
 
                enableActions();

@@ -71,8 +71,8 @@ public class TourGeoFilterManager {
    public static final String                  STATE_RGB_GEO_PARTS_HOVER            = "STATE_RGB_GEO_PARTS_HOVER";              //$NON-NLS-1$
    public static final String                  STATE_RGB_GEO_PARTS_SELECTED         = "STATE_RGB_GEO_PARTS_SELECTED";           //$NON-NLS-1$
 
-   public static final RGB                     STATE_RGB_GEO_PARTS_HOVER_DEFAULT    = new RGB(0x0, 0x0, 0xff);
-   public static final RGB                     STATE_RGB_GEO_PARTS_SELECTED_DEFAULT = new RGB(0xff, 0x0, 0x0);
+   public static final RGB                     STATE_RGB_GEO_PARTS_HOVER_DEFAULT    = new RGB(0x00, 0x81, 0xFF);
+   public static final RGB                     STATE_RGB_GEO_PARTS_SELECTED_DEFAULT = new RGB(0x95, 0xB4, 0x00);
 
    private static final String                 TOUR_FILTER_FILE_NAME                = "tour-geo-filter.xml";                    //$NON-NLS-1$
    private static final int                    TOUR_FILTER_VERSION                  = 1;

@@ -243,7 +243,7 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
 
    public SlideoutTourGeoFilter(final ToolItem toolItem) {
 
-      super(toolItem.getParent(), _state, new int[] { 900, 200, 900, 200 });
+      super(toolItem.getParent(), _state, new int[] { 700, 200, 700, 200 });
 
       _tourFilterItem = toolItem;
 
@@ -526,6 +526,7 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
             // border color
             _colorGeoPart_Selected = new ColorSelectorExtended(container);
             _colorGeoPart_Selected.addListener(_defaultChangePropertyListener);
+            _colorGeoPart_Selected.addOpenListener(this);
          }
          {
             /*
@@ -538,6 +539,7 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
             // border color
             _colorGeoPart_HoverSelecting = new ColorSelectorExtended(container);
             _colorGeoPart_HoverSelecting.addListener(_defaultChangePropertyListener);
+            _colorGeoPart_HoverSelecting.addOpenListener(this);
          }
       }
    }

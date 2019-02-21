@@ -1,18 +1,39 @@
+/*******************************************************************************
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation version 2 of the License.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+ *******************************************************************************/
 package net.tourbook.application;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import net.tourbook.Messages;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -53,6 +74,36 @@ public class SplashManager {
    private Label       textLabel;
    private Color       textColor;
    private Font        textFont;
+
+   private SplashManager() {
+
+//      String progressRectString = null;
+//      final String messageRectString = null;
+//
+//      final IProduct product = Platform.getProduct();
+//      if (product != null) {
+//
+//         progressRectString = product.getProperty(IProductConstants.STARTUP_PROGRESS_RECT);
+//         messageRectString = product.getProperty(IProductConstants.STARTUP_MESSAGE_RECT);
+//         foregroundColorString = product.getProperty(IProductConstants.STARTUP_FOREGROUND_COLOR);
+//      }
+//
+//      // set progressbar position
+//      Rectangle progressRect = parseRect(progressRectString);
+//      if (progressRect == null) {
+//         progressRect = new Rectangle(10, 0, 300, 15);
+//      }
+//      setProgressBarBounds(progressRect);
+
+      // set message position
+//      Rectangle messageRect = parseRect(messageRectString);
+//      if (messageRect == null) {
+////         messageRect = new Rectangle(10, 25, 300, 15);
+      final Rectangle messageRect = new Rectangle(5, 124, 390, 15);
+//      }
+      setTextBounds(messageRect);
+
+   }
 
    public static ImageDescriptor getImageDescriptor(final String pluginId, String path) {
 
@@ -153,47 +204,6 @@ public class SplashManager {
       return pb;
    }
 
-   private Shell createSplashShell() {
-
-      final Shell shell = new Shell(SWT.TOOL | SWT.NO_TRIM);
-      final Image image = createBackgroundImage(shell);
-      shell.setBackgroundImage(image);
-      shell.setBackgroundMode(SWT.INHERIT_DEFAULT);
-      final Rectangle imageBounds = image.getBounds();
-
-      /*
-       * final GridLayout layout = new GridLayout(); layout.numColumns = 1; layout.marginHeight =
-       * 40; layout.marginWidth = 20; layout.verticalSpacing = 6; layout.horizontalSpacing = 6;
-       * shell.setLayout(layout);
-       */
-      textLabel = createTextLabel(shell);
-      if (textRect == null) {
-         textRect = new Rectangle(20,
-               imageBounds.height - 60,
-               imageBounds.width - 40,
-               40);
-      }
-      textLabel.setBounds(textRect);
-
-      if (totalWork != 0) {
-         progressBar = createProgressBar(shell);
-         if (progressRect == null) {
-            progressRect = new Rectangle(0,
-                  imageBounds.height - 14
-                        - progressBar.getBorderWidth(),
-                  imageBounds.width
-                        - progressBar.getBorderWidth(),
-                  14);
-         }
-         progressBar.setBounds(progressRect);
-      }
-
-      shell.setSize(imageBounds.width, imageBounds.height);
-      shell.setLocation(getMonitorCenter(shell));
-
-      return shell;
-   }
-
    private Label createTextLabel(final Composite parent) {
 
       final Label label = new Label(parent, SWT.WRAP);
@@ -217,6 +227,109 @@ public class SplashManager {
       return label;
    }
 
+   private Shell createUI_SplashShell() {
+
+      final Shell shell = new Shell(SWT.TOOL | SWT.NO_TRIM);
+      final Image image = createBackgroundImage(shell);
+
+      shell.setBackgroundImage(image);
+      shell.setBackgroundMode(SWT.INHERIT_DEFAULT);
+
+      final Rectangle imageBounds = image.getBounds();
+
+      textLabel = createTextLabel(shell);
+      if (textRect == null) {
+         textRect = new Rectangle(20,
+               imageBounds.height - 60,
+               imageBounds.width - 40,
+               40);
+      }
+      textLabel.setBounds(textRect);
+
+      if (totalWork != 0) {
+         progressBar = createProgressBar(shell);
+         if (progressRect == null) {
+            progressRect = new Rectangle(0,
+                  imageBounds.height - 14
+                        - progressBar.getBorderWidth(),
+                  imageBounds.width
+                        - progressBar.getBorderWidth(),
+                  14);
+         }
+         progressBar.setBounds(progressRect);
+      }
+
+      shell.addDisposeListener(new DisposeListener() {
+
+         @Override
+         public void widgetDisposed(final DisposeEvent e) {
+            onDispose();
+         }
+      });
+
+      shell.addPaintListener(new PaintListener() {
+
+         @Override
+         public void paintControl(final PaintEvent e) {
+            onPaint(e);
+         }
+      });
+
+      shell.setSize(imageBounds.width, imageBounds.height);
+      shell.setLocation(getMonitorCenter(shell));
+
+      return shell;
+   }
+
+   private void onDispose() {
+      // TODO Auto-generated method stub
+
+   }
+
+   private void onPaint(final PaintEvent e) {
+
+      final GC gc = e.gc;
+      gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_WHITE));
+
+      final int borderRight = 385;
+      final int borderBottom = 101;
+
+      final String copyRight = NLS.bind(Messages.App_Splash_Copyright, ApplicationVersion.SPLASH_COPYRIGHT_YEAR);
+      final int textHeight = gc.textExtent(copyRight).y;
+
+      final String version = "Version " + ApplicationVersion.getVersionSimple(); //$NON-NLS-1$
+      final Point versionExtent = gc.textExtent(version);
+
+      final String qualifier = ApplicationVersion.getVersionQualifier();
+      final Point qualifierExtent = gc.textExtent(qualifier);
+
+      final String dataLocation = Platform.getInstanceLocation().getURL().getPath();
+      final Point dataLocationExtent = gc.textExtent(dataLocation);
+
+      gc.drawText(version, //
+            borderRight - versionExtent.x,
+            borderBottom - versionExtent.y - 2 - qualifierExtent.y,
+            true);
+
+      // show location when data location is in debug mode
+      if (dataLocation.contains("DEBUG")) { //$NON-NLS-1$
+
+         gc.drawText(dataLocation, //
+               borderRight - dataLocationExtent.x,
+               borderBottom - versionExtent.y,
+               true);
+
+      } else {
+
+         gc.drawText(qualifier, //
+               borderRight - qualifierExtent.x,
+               borderBottom - versionExtent.y,
+               true);
+      }
+
+      gc.drawText(copyRight, 5, 162 - textHeight, true);
+   }
+
    public void open() {
 
       if (pluginId == null) {
@@ -229,16 +342,19 @@ public class SplashManager {
                "The SplashImagePath has not been set.");
       }
 
-      splashShell = createSplashShell();
+      splashShell = createUI_SplashShell();
       splashShell.open();
    }
 
    private Rectangle parseRect(final String string) {
+
       if (string == null) {
          return null;
       }
+
       int x, y, w, h;
       int lastPos = 0;
+
       try {
          int i = string.indexOf(',', lastPos);
          x = Integer.parseInt(string.substring(lastPos, i));
@@ -250,10 +366,13 @@ public class SplashManager {
          w = Integer.parseInt(string.substring(lastPos, i));
          lastPos = i + 1;
          h = Integer.parseInt(string.substring(lastPos));
+
       } catch (final RuntimeException e) {
+
          // sloppy error handling
          return null;
       }
+
       return new Rectangle(x, y, w, h);
    }
 
@@ -267,7 +386,6 @@ public class SplashManager {
 
                textLabel.setText(message);
 
-               // splashShell.layout();
                splashShell.update();
             }
          });
@@ -300,6 +418,7 @@ public class SplashManager {
    public void setTextBounds(final Rectangle rect) {
 
       Assert.isLegal(rect != null);
+
       this.textRect = rect;
       if (textLabel != null) {
          textLabel.setBounds(rect);
@@ -307,7 +426,9 @@ public class SplashManager {
    }
 
    public void setTextColor(final Color color) {
+
       Assert.isLegal(color != null);
+
       this.textColor = color;
       if (textLabel != null) {
          textLabel.setForeground(color);
@@ -317,6 +438,7 @@ public class SplashManager {
    public void setTextFont(final Font font) {
 
       Assert.isLegal(font != null);
+
       this.textFont = font;
       if (textLabel != null) {
          textLabel.setFont(font);

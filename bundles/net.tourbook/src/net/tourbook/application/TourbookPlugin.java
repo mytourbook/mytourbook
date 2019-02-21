@@ -50,24 +50,22 @@ public class TourbookPlugin extends AbstractUIPlugin {
    public static final String EXT_POINT_EXTERNAL_DEVICE_DATA_READER = "externalDeviceDataReader"; //$NON-NLS-1$
 
    // The shared instance.
-   private static TourbookPlugin          _instance;
+   private static TourbookPlugin _instance;
 
-   private static ResourceBundle          _resourceBundle;
+   private static ResourceBundle _resourceBundle;
 
    /**
     * Active person which is selected in the app toolbar, when <code>null</code> then 'All People'
     * are selected.
     */
-   private static TourPerson              _activePerson;
+   private static TourPerson     _activePerson;
 
-   private static TourTypeFilter          _activeTourTypeFilter;
-   private static boolean                 _isPhotoFilterActive;
+   private static TourTypeFilter _activeTourTypeFilter;
+   private static boolean        _isPhotoFilterActive;
 
-   private static MyTourbookSplashHandler _splashHandler;
+   private static BundleContext  _bundleContext;
 
-   private static BundleContext           _bundleContext;
-
-   private Version                        _version;
+   private Version               _version;
 
    /**
     * The constructor.
@@ -159,10 +157,6 @@ public class TourbookPlugin extends AbstractUIPlugin {
       }
    }
 
-   public static MyTourbookSplashHandler getSplashHandler() {
-      return _splashHandler;
-   }
-
    /**
     * This is a shortcut for {@link getDefault().getDialogSettingsSection(String)}
     *
@@ -186,10 +180,6 @@ public class TourbookPlugin extends AbstractUIPlugin {
       _activeTourTypeFilter = tourTypeFilter;
 
       TourDatabase.updateActiveTourTypeList(tourTypeFilter);
-   }
-
-   public static void setSplashHandler(final MyTourbookSplashHandler splashHandler) {
-      _splashHandler = splashHandler;
    }
 
    /**

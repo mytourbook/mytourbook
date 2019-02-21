@@ -479,6 +479,9 @@ public class Messages extends NLS {
 
    public static String        App_Splash_Copyright;
 
+   public static String        App_SplashMessage_Finalize;
+   public static String        App_SplashMessage_StartingApplication;
+
    public static String        App_Title;
 
    public static String        App_ToggleState_DoNotShowAgain;
