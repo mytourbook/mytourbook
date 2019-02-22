@@ -2278,7 +2278,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		final int factoryMaxZoom = mp.getMaximumZoomLevel();
 
 		final int mapZoom = _map.getZoom();
-		final GeoPosition mapCenter = _map.getGeoCenter();
+		final GeoPosition mapCenter = _map.getMapGeoCenter();
 
 		if (mapZoom < factoryMinZoom) {
 			_map.setZoom(factoryMinZoom);
@@ -2462,7 +2462,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		 * initialized the map with new zoom levels !!!
 		 */
 		final int oldZoomLevel = _map.getZoom();
-		final GeoPosition mapCenter = _map.getGeoCenter();
+		final GeoPosition mapCenter = _map.getMapGeoCenter();
 
 		final int newFactoryMinZoom = _spinMinZoom.getSelection() - Map.UI_MIN_ZOOM_LEVEL;
 		final int newFactoryMaxZoom = _spinMaxZoom.getSelection() - Map.UI_MIN_ZOOM_LEVEL;
@@ -2482,7 +2482,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 		// keep map position
 		_mpProfile.setLastUsedZoom(_map.getZoom());
-		_mpProfile.setLastUsedPosition(_map.getGeoCenter());
+		_mpProfile.setLastUsedPosition(_map.getMapGeoCenter());
 
 		// set positions of map provider
 		int tblItemIndex = 0;

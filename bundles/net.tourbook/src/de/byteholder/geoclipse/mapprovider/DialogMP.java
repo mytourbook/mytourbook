@@ -69,7 +69,7 @@ public class DialogMP extends TitleAreaDialog {
    protected void actionSetFavoritePosition() {
 
       final int zoom = _map.getZoom();
-      final GeoPosition centerPosition = _map.getGeoCenter();
+      final GeoPosition centerPosition = _map.getMapGeoCenter();
 
       _mp.setFavoriteZoom(zoom);
       _mp.setFavoritePosition(centerPosition);

@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -29,250 +29,250 @@ import org.eclipse.swt.widgets.Display;
 
 public class CalendarProfile implements Cloneable {
 
-	private static int					_cloneCounter;
-	private static final boolean		_isLogCalendarProfile	= System.getProperty("logCalendarProfile") != null;	//$NON-NLS-1$
+   private static int                _cloneCounter;
+   private static final boolean      _isLogCalendarProfile = System.getProperty("logCalendarProfile") != null; //$NON-NLS-1$
 
-	/**
-	 * <b>VERY IMPORTANT</b>
-	 * <p>
-	 * When using 'simple' formatting WITH the locale de then a , (comma) is set and not a . (dot)
-	 * <p>
-	 * -> this is not a float !!!
-	 */
-	private final static NumberFormat	_nf1					= NumberFormat.getNumberInstance(Locale.US);
+   /**
+    * <b>VERY IMPORTANT</b>
+    * <p>
+    * When using 'simple' formatting WITH the locale de then a , (comma) is set and not a . (dot)
+    * <p>
+    * -> this is not a float !!!
+    */
+   private final static NumberFormat _nf1                  = NumberFormat.getNumberInstance(Locale.US);
 
-	static {
+   static {
 
-		_nf1.setMinimumFractionDigits(1);
-		_nf1.setMaximumFractionDigits(1);
-	}
+      _nf1.setMinimumFractionDigits(1);
+      _nf1.setMaximumFractionDigits(1);
+   }
 
-	/*
-	 * Set default values also here to ensure that a valid value is set. A default value would not
-	 * be set when an xml tag is not available.
-	 */
+   /*
+    * Set default values also here to ensure that a valid value is set. A default value would not be
+    * set when an xml tag is not available.
+    */
 
-	// profile
-	String				id							= Long.toString(System.nanoTime());
-	String				profileName					= Messages.Calendar_Profile_Name_Default;
+   // profile
+   String    id                  = Long.toString(System.nanoTime());
+   String    profileName         = Messages.Calendar_Profile_Name_Default;
 
-	/**
-	 * Profile default id.
-	 */
-	DefaultId			defaultId					= CalendarProfileManager.DEFAULT_PROFILE_DEFAULT_ID;
+   /**
+    * Profile default id.
+    */
+   DefaultId defaultId           = CalendarProfileManager.DEFAULT_PROFILE_DEFAULT_ID;
 
-	/**
-	 * Is <code>true</code> when the profile is an app default
-	 */
-	boolean				isDefaultDefault			= false;
+   /**
+    * Is <code>true</code> when the profile is an app default
+    */
+   boolean   isDefaultDefault    = false;
 
-	/**
-	 * Is <code>true</code> when the profile can be a parent of a user default id.
-	 */
-	boolean				isUserParentDefault			= false;
+   /**
+    * Is <code>true</code> when the profile can be a parent of a user default id.
+    */
+   boolean   isUserParentDefault = false;
 
-	/**
-	 * Contains the user parent id, {@link DefaultId} is then set to {@link DefaultId#USER_ID} and
-	 * {@link #isUserParentDefault} == <code>true</code>
-	 */
-	String				userParentDefaultId			= UI.EMPTY_STRING;
+   /**
+    * Contains the user parent id, {@link DefaultId} is then set to {@link DefaultId#USER_ID} and
+    * {@link #isUserParentDefault} == <code>true</code>
+    */
+   String    userParentDefaultId = UI.EMPTY_STRING;
 
-	/**
-	 * Contains the {@link #userParentDefaultId} when this is a child of a user parent default id.
-	 */
-	String				userDefaultId				= UI.EMPTY_STRING;
+   /**
+    * Contains the {@link #userParentDefaultId} when this is a child of a user parent default id.
+    */
+   String    userDefaultId       = UI.EMPTY_STRING;
 
 // SET_FORMATTING_OFF
-	//
-	// layout
-	boolean					isToggleMonthColor			= false;
-	boolean					isWeekRowHeight				= CalendarProfileManager.DEFAULT_IS_WEEK_ROW_HEIGHT;
-	boolean					useDraggedScrolling			= false;
-	RGB 					alternateMonthRGB			= CalendarProfileManager.DEFAULT_ALTERNATE_MONTH_RGB;
-	RGB 					alternateMonth2RGB			= CalendarProfileManager.DEFAULT_ALTERNATE_MONTH2_RGB;
-	RGB						calendarBackgroundRGB		= CalendarProfileManager.DEFAULT_CALENDAR_BACKGROUND_RGB;
-	RGB						calendarForegroundRGB		= CalendarProfileManager.DEFAULT_CALENDAR_FOREBACKGROUND_RGB;
-	RGB						dayHoveredRGB				= CalendarProfileManager.DEFAULT_DAY_HOVERED_RGB;
-	RGB						daySelectedRGB				= CalendarProfileManager.DEFAULT_DAY_SELECTED_RGB;
-	RGB 					dayTodayRGB					= CalendarProfileManager.DEFAULT_DAY_TODAY_RGB;
-	int						weekHeight					= CalendarProfileManager.DEFAULT_WEEK_HEIGHT;
-	int						weekRows					= CalendarProfileManager.DEFAULT_WEEK_ROWS;
-	//
-	// 1. Date column
-	boolean					isShowDateColumn			= true;
-	DateColumnContent		dateColumnContent			= CalendarProfileManager.DEFAULT_DATE_COLUMN_CONTENT;
-	FontData				dateColumnFont				= createFont(1.7f, SWT.BOLD);
-	int						dateColumnWidth				= CalendarProfileManager.DEFAULT_DATE_COLUMN_WIDTH;
-	//
-	// 2. Year columns
-	boolean 				isShowYearColumns			= true;
-	boolean 				isYearColumnDayWidth		= CalendarProfileManager.DEFAULT_IS_YEAR_COLUMN_DAY_WIDTH;
-	int						yearColumns					= CalendarProfileManager.DEFAULT_YEAR_COLUMNS;
-	int 					yearColumnsSpacing			= CalendarProfileManager.DEFAULT_YEAR_COLUMNS_SPACING;
-	ColumnStart				yearColumnsStart			= CalendarProfileManager.DEFAULT_YEAR_COLUMNS_LAYOUT;
-	int 					yearColumnDayWidth			= CalendarProfileManager.DEFAULT_YEAR_COLUMN_DAY_WIDTH;
-	FontData 				yearHeaderFont				= createFont(2.8f, SWT.BOLD);
-	//
-	// 3. Week summary column
-	boolean					isShowSummaryColumn			= true;
-	boolean 				isShowWeekValueUnit			= true;
-	FormatterData[]			allWeekFormatterData		= CalendarProfileManager.DEFAULT_WEEK_FORMATTER_DATA;
-	int						weekColumnWidth				= CalendarProfileManager.DEFAULT_WEEK_COLUMN_WIDTH;
-	int						weekMarginTop				= CalendarProfileManager.DEFAULT_WEEK_MARGIN_TOP;
-	int						weekMarginLeft				= CalendarProfileManager.DEFAULT_WEEK_MARGIN_LEFT;
-	int						weekMarginBottom			= CalendarProfileManager.DEFAULT_WEEK_MARGIN_BOTTOM;
-	int						weekMarginRight				= CalendarProfileManager.DEFAULT_WEEK_MARGIN_RIGHT;
-	CalendarColor			weekValueColor				= CalendarProfileManager.DEFAULT_WEEK_VALUE_COLOR;
-	FontData				weekValueFont				= createFont(1.2f, SWT.BOLD);
-	RGB 					weekValueRGB				= CalendarProfileManager.DEFAULT_WEEK_VALUE_RGB;
-	//
-	// day date
-	boolean					isHideDayDateWhenNoTour		= true;
-	boolean					isShowDayDate				= false;
-	boolean 				isShowDayDateWeekendColor	= CalendarProfileManager.DEFAULT_IS_SHOW_DAY_DATE_WEEKEND_COLOR;
-	FontData				dayDateFont					= createFont(1.2f, SWT.BOLD);
-	DayDateFormat			dayDateFormat				= CalendarProfileManager.DEFAULT_DAY_DATE_FORMAT;
-	int 					dayDateMarginTop			= CalendarProfileManager.DEFAULT_DAY_DATE_MARGIN_TOP;
-	int 					dayDateMarginLeft			= CalendarProfileManager.DEFAULT_DAY_DATE_MARGIN_LEFT;
-	//
-	// day layout
-	boolean 				isDayContentVertical		= true;
-	//
-	// tour background
-	TourBackground			tourBackground				= CalendarProfileManager.DEFAULT_TOUR_BACKGROUND;
-	CalendarColor			tourBackground1Color		= CalendarProfileManager.DEFAULT_TOUR_BACKGROUND_COLOR1;
-	CalendarColor			tourBackground2Color		= CalendarProfileManager.DEFAULT_TOUR_BACKGROUND_COLOR2;
-	RGB						tourBackground1RGB			= CalendarProfileManager.DEFAULT_TOUR_BACKGROUND_1_RGB;
-	RGB						tourBackground2RGB			= CalendarProfileManager.DEFAULT_TOUR_BACKGROUND_2_RGB;
-	int						tourBackgroundWidth			= CalendarProfileManager.DEFAULT_TOUR_BACKGROUND_WIDTH;
-	TourBorder 				tourBorder					= CalendarProfileManager.DEFAULT_TOUR_BORDER;
-	int		 				tourBorderWidth				= CalendarProfileManager.DEFAULT_TOUR_BORDER_WIDTH;
-	CalendarColor 			tourBorderColor				= CalendarProfileManager.DEFAULT_TOUR_BORDER_COLOR;
-	CalendarColor			tourDraggedColor			= CalendarProfileManager.DEFAULT_TOUR_DRAGGED_COLOR;
-	CalendarColor			tourHoveredColor			= CalendarProfileManager.DEFAULT_TOUR_HOVERED_COLOR;
-	CalendarColor			tourSelectedColor			= CalendarProfileManager.DEFAULT_TOUR_SELECTED_COLOR;
-	RGB						tourBorderRGB				= CalendarProfileManager.DEFAULT_TOUR_BORDER_RGB;
-	RGB						tourDraggedRGB				= CalendarProfileManager.DEFAULT_TOUR_DRAGGED_RGB;
-	RGB						tourHoveredRGB				= CalendarProfileManager.DEFAULT_TOUR_HOVERED_RGB;
-	RGB						tourSelectedRGB				= CalendarProfileManager.DEFAULT_TOUR_SELECTED_RGB;
-	//
-	// tour content
-	boolean 				isShowTourContent			= true;
-	boolean					isShowTourValueUnit			= true;
-	boolean					isTruncateTourText			= CalendarProfileManager.DEFAULT_IS_TRUNCATE_TOUR_TEXT;
-	FormatterData[]			allTourFormatterData		= CalendarProfileManager.DEFAULT_TOUR_FORMATTER_DATA;
-	int						tourMarginTop				= CalendarProfileManager.DEFAULT_TOUR_MARGIN_TOP;
-	int						tourMarginLeft				= CalendarProfileManager.DEFAULT_TOUR_MARGIN_LEFT;
-	int						tourMarginBottom			= CalendarProfileManager.DEFAULT_TOUR_MARGIN_BOTTOM;
-	int						tourMarginRight				= CalendarProfileManager.DEFAULT_TOUR_MARGIN_RIGHT;
-	int						tourTruncatedLines			= CalendarProfileManager.DEFAULT_TOUR_TRUNCATED_LINES;
-	int 					tourValueColumns			= CalendarProfileManager.DEFAULT_TOUR_VALUE_COLUMNS;
-	FontData				tourContentFont				= createFont(0.9f, SWT.NORMAL);
-	FontData				tourTitleFont				= createFont(1.2f, SWT.BOLD);
-	FontData				tourValueFont				= createFont(1.1f, SWT.BOLD);
-	CalendarColor			tourContentColor			= CalendarProfileManager.DEFAULT_TOUR_COLOR;
-	CalendarColor 			tourTitleColor				= CalendarProfileManager.DEFAULT_TOUR_COLOR;
-	CalendarColor			tourValueColor				= CalendarProfileManager.DEFAULT_TOUR_COLOR;
-	RGB						tourContentRGB				= CalendarProfileManager.DEFAULT_TOUR_CONTENT_RGB;
-	RGB						tourTitleRGB				= CalendarProfileManager.DEFAULT_TOUR_TITLE_RGB;
-	RGB						tourValueRGB				= CalendarProfileManager.DEFAULT_TOUR_VALUE_RGB;
+   //
+   // layout
+   boolean           isToggleMonthColor         = false;
+   boolean           isWeekRowHeight            = CalendarProfileManager.DEFAULT_IS_WEEK_ROW_HEIGHT;
+   boolean           useDraggedScrolling        = false;
+   RGB               alternateMonthRGB          = CalendarProfileManager.DEFAULT_ALTERNATE_MONTH_RGB;
+   RGB               alternateMonth2RGB         = CalendarProfileManager.DEFAULT_ALTERNATE_MONTH2_RGB;
+   RGB               calendarBackgroundRGB      = CalendarProfileManager.DEFAULT_CALENDAR_BACKGROUND_RGB;
+   RGB               calendarForegroundRGB      = CalendarProfileManager.DEFAULT_CALENDAR_FOREBACKGROUND_RGB;
+   RGB               dayHoveredRGB              = CalendarProfileManager.DEFAULT_DAY_HOVERED_RGB;
+   RGB               daySelectedRGB             = CalendarProfileManager.DEFAULT_DAY_SELECTED_RGB;
+   RGB               dayTodayRGB                = CalendarProfileManager.DEFAULT_DAY_TODAY_RGB;
+   int               weekHeight                 = CalendarProfileManager.DEFAULT_WEEK_HEIGHT;
+   int               weekRows                   = CalendarProfileManager.DEFAULT_WEEK_ROWS;
+   //
+   // 1. Date column
+   boolean           isShowDateColumn           = true;
+   DateColumnContent dateColumnContent          = CalendarProfileManager.DEFAULT_DATE_COLUMN_CONTENT;
+   FontData          dateColumnFont             = createFont(1.7f, SWT.BOLD);
+   int               dateColumnWidth            = CalendarProfileManager.DEFAULT_DATE_COLUMN_WIDTH;
+   //
+   // 2. Year columns
+   boolean           isShowYearColumns          = true;
+   boolean           isYearColumnDayWidth       = CalendarProfileManager.DEFAULT_IS_YEAR_COLUMN_DAY_WIDTH;
+   int               yearColumns                = CalendarProfileManager.DEFAULT_YEAR_COLUMNS;
+   int               yearColumnsSpacing         = CalendarProfileManager.DEFAULT_YEAR_COLUMNS_SPACING;
+   ColumnStart       yearColumnsStart           = CalendarProfileManager.DEFAULT_YEAR_COLUMNS_LAYOUT;
+   int               yearColumnDayWidth         = CalendarProfileManager.DEFAULT_YEAR_COLUMN_DAY_WIDTH;
+   FontData          yearHeaderFont             = createFont(2.8f, SWT.BOLD);
+   //
+   // 3. Week summary column
+   boolean           isShowSummaryColumn        = true;
+   boolean           isShowWeekValueUnit        = true;
+   FormatterData[]   allWeekFormatterData       = CalendarProfileManager.DEFAULT_WEEK_FORMATTER_DATA;
+   int               weekColumnWidth            = CalendarProfileManager.DEFAULT_WEEK_COLUMN_WIDTH;
+   int               weekMarginTop              = CalendarProfileManager.DEFAULT_WEEK_MARGIN_TOP;
+   int               weekMarginLeft             = CalendarProfileManager.DEFAULT_WEEK_MARGIN_LEFT;
+   int               weekMarginBottom           = CalendarProfileManager.DEFAULT_WEEK_MARGIN_BOTTOM;
+   int               weekMarginRight            = CalendarProfileManager.DEFAULT_WEEK_MARGIN_RIGHT;
+   CalendarColor     weekValueColor             = CalendarProfileManager.DEFAULT_WEEK_VALUE_COLOR;
+   FontData          weekValueFont              = createFont(1.2f, SWT.BOLD);
+   RGB               weekValueRGB               = CalendarProfileManager.DEFAULT_WEEK_VALUE_RGB;
+   //
+   // day date
+   boolean           isHideDayDateWhenNoTour    = true;
+   boolean           isShowDayDate              = false;
+   boolean           isShowDayDateWeekendColor  = CalendarProfileManager.DEFAULT_IS_SHOW_DAY_DATE_WEEKEND_COLOR;
+   FontData          dayDateFont                = createFont(1.2f, SWT.BOLD);
+   DayDateFormat     dayDateFormat              = CalendarProfileManager.DEFAULT_DAY_DATE_FORMAT;
+   int               dayDateMarginTop           = CalendarProfileManager.DEFAULT_DAY_DATE_MARGIN_TOP;
+   int               dayDateMarginLeft          = CalendarProfileManager.DEFAULT_DAY_DATE_MARGIN_LEFT;
+   //
+   // day layout
+   boolean           isDayContentVertical       = true;
+   //
+   // tour background
+   TourBackground    tourBackground             = CalendarProfileManager.DEFAULT_TOUR_BACKGROUND;
+   CalendarColor     tourBackground1Color       = CalendarProfileManager.DEFAULT_TOUR_BACKGROUND_COLOR1;
+   CalendarColor     tourBackground2Color       = CalendarProfileManager.DEFAULT_TOUR_BACKGROUND_COLOR2;
+   RGB               tourBackground1RGB         = CalendarProfileManager.DEFAULT_TOUR_BACKGROUND_1_RGB;
+   RGB               tourBackground2RGB         = CalendarProfileManager.DEFAULT_TOUR_BACKGROUND_2_RGB;
+   int               tourBackgroundWidth        = CalendarProfileManager.DEFAULT_TOUR_BACKGROUND_WIDTH;
+   TourBorder        tourBorder                 = CalendarProfileManager.DEFAULT_TOUR_BORDER;
+   int               tourBorderWidth            = CalendarProfileManager.DEFAULT_TOUR_BORDER_WIDTH;
+   CalendarColor     tourBorderColor            = CalendarProfileManager.DEFAULT_TOUR_BORDER_COLOR;
+   CalendarColor     tourDraggedColor           = CalendarProfileManager.DEFAULT_TOUR_DRAGGED_COLOR;
+   CalendarColor     tourHoveredColor           = CalendarProfileManager.DEFAULT_TOUR_HOVERED_COLOR;
+   CalendarColor     tourSelectedColor          = CalendarProfileManager.DEFAULT_TOUR_SELECTED_COLOR;
+   RGB               tourBorderRGB              = CalendarProfileManager.DEFAULT_TOUR_BORDER_RGB;
+   RGB               tourDraggedRGB             = CalendarProfileManager.DEFAULT_TOUR_DRAGGED_RGB;
+   RGB               tourHoveredRGB             = CalendarProfileManager.DEFAULT_TOUR_HOVERED_RGB;
+   RGB               tourSelectedRGB            = CalendarProfileManager.DEFAULT_TOUR_SELECTED_RGB;
+   //
+   // tour content
+   boolean           isShowTourContent          = true;
+   boolean           isShowTourValueUnit        = true;
+   boolean           isTruncateTourText         = CalendarProfileManager.DEFAULT_IS_TRUNCATE_TOUR_TEXT;
+   FormatterData[]   allTourFormatterData       = CalendarProfileManager.DEFAULT_TOUR_FORMATTER_DATA;
+   int               tourMarginTop              = CalendarProfileManager.DEFAULT_TOUR_MARGIN_TOP;
+   int               tourMarginLeft             = CalendarProfileManager.DEFAULT_TOUR_MARGIN_LEFT;
+   int               tourMarginBottom           = CalendarProfileManager.DEFAULT_TOUR_MARGIN_BOTTOM;
+   int               tourMarginRight            = CalendarProfileManager.DEFAULT_TOUR_MARGIN_RIGHT;
+   int               tourTruncatedLines         = CalendarProfileManager.DEFAULT_TOUR_TRUNCATED_LINES;
+   int               tourValueColumns           = CalendarProfileManager.DEFAULT_TOUR_VALUE_COLUMNS;
+   FontData          tourContentFont            = createFont(0.9f, SWT.NORMAL);
+   FontData          tourTitleFont              = createFont(1.2f, SWT.BOLD);
+   FontData          tourValueFont              = createFont(1.1f, SWT.BOLD);
+   CalendarColor     tourContentColor           = CalendarProfileManager.DEFAULT_TOUR_COLOR;
+   CalendarColor     tourTitleColor             = CalendarProfileManager.DEFAULT_TOUR_COLOR;
+   CalendarColor     tourValueColor             = CalendarProfileManager.DEFAULT_TOUR_COLOR;
+   RGB               tourContentRGB             = CalendarProfileManager.DEFAULT_TOUR_CONTENT_RGB;
+   RGB               tourTitleRGB               = CalendarProfileManager.DEFAULT_TOUR_TITLE_RGB;
+   RGB               tourValueRGB               = CalendarProfileManager.DEFAULT_TOUR_VALUE_RGB;
 
 // SET_FORMATTING_ON
 
-	/**
-	 * @param relSize
-	 * @param style
-	 * @return
-	 */
-	static FontData createFont(final float relSize, final int style) {
+   /**
+    * @param relSize
+    * @param style
+    * @return
+    */
+   static FontData createFont(final float relSize, final int style) {
 
-		final Display display = Display.getDefault();
+      final Display display = Display.getDefault();
 
-		// !!! getFontData() MUST be created for EVERY font otherwise they use all the SAME font !!!
-		final FontData[] fontData = display.getSystemFont().getFontData();
+      // !!! getFontData() MUST be created for EVERY font otherwise they use all the SAME font !!!
+      final FontData[] fontData = display.getSystemFont().getFontData();
 
-		for (final FontData element : fontData) {
+      for (final FontData element : fontData) {
 
-			element.setHeight((int) (element.getHeight() * relSize));
-			element.setStyle(style);
+         element.setHeight((int) (element.getHeight() * relSize));
+         element.setStyle(style);
 
-			break;
-		}
+         break;
+      }
 
-		return fontData[0];
-	}
+      return fontData[0];
+   }
 
-	private static FontData createFont(final FontData otherFontData) {
+   private static FontData createFont(final FontData otherFontData) {
 
-		final Display display = Display.getDefault();
+      final Display display = Display.getDefault();
 
-		// !!! getFontData() MUST be created for EVERY font otherwise they use all the SAME font !!!
-		final FontData[] fontData = display.getSystemFont().getFontData();
+      // !!! getFontData() MUST be created for EVERY font otherwise they use all the SAME font !!!
+      final FontData[] fontData = display.getSystemFont().getFontData();
 
-		final FontData firstFontData = fontData[0];
+      final FontData firstFontData = fontData[0];
 
-		firstFontData.setName(otherFontData.getName());
-		firstFontData.setHeight(otherFontData.getHeight());
-		firstFontData.setStyle(otherFontData.getStyle());
+      firstFontData.setName(otherFontData.getName());
+      firstFontData.setHeight(otherFontData.getHeight());
+      firstFontData.setStyle(otherFontData.getStyle());
 
-		return firstFontData;
-	}
+      return firstFontData;
+   }
 
-	@Override
-	protected CalendarProfile clone() {
+   @Override
+   protected CalendarProfile clone() {
 
-		CalendarProfile clonedProfile = null;
+      CalendarProfile clonedProfile = null;
 
-		try {
+      try {
 
-			clonedProfile = (CalendarProfile) super.clone();
+         clonedProfile = (CalendarProfile) super.clone();
 
-			clonedProfile.id = Long.toString(System.nanoTime());
+         clonedProfile.id = Long.toString(System.nanoTime());
 
-			// create a unique name
-			clonedProfile.profileName = profileName + UI.SPACE + ++_cloneCounter;
+         // create a unique name
+         clonedProfile.profileName = profileName + UI.SPACE + ++_cloneCounter;
 
-			clonedProfile.yearHeaderFont = createFont(yearHeaderFont);
-			clonedProfile.dateColumnFont = createFont(dateColumnFont);
-			clonedProfile.dayDateFont = createFont(dayDateFont);
-			clonedProfile.tourContentFont = createFont(tourContentFont);
-			clonedProfile.tourTitleFont = createFont(tourTitleFont);
-			clonedProfile.tourValueFont = createFont(tourValueFont);
-			clonedProfile.weekValueFont = createFont(weekValueFont);
+         clonedProfile.yearHeaderFont = createFont(yearHeaderFont);
+         clonedProfile.dateColumnFont = createFont(dateColumnFont);
+         clonedProfile.dayDateFont = createFont(dayDateFont);
+         clonedProfile.tourContentFont = createFont(tourContentFont);
+         clonedProfile.tourTitleFont = createFont(tourTitleFont);
+         clonedProfile.tourValueFont = createFont(tourValueFont);
+         clonedProfile.weekValueFont = createFont(weekValueFont);
 
-			clonedProfile.allTourFormatterData = clone_FormatterData(allTourFormatterData);
-			clonedProfile.allWeekFormatterData = clone_FormatterData(allWeekFormatterData);
+         clonedProfile.allTourFormatterData = clone_FormatterData(allTourFormatterData);
+         clonedProfile.allWeekFormatterData = clone_FormatterData(allWeekFormatterData);
 
-		} catch (final CloneNotSupportedException e) {
-			StatusUtil.log(e);
-		}
+      } catch (final CloneNotSupportedException e) {
+         StatusUtil.log(e);
+      }
 
-		return clonedProfile;
-	}
+      return clonedProfile;
+   }
 
-	private FormatterData[] clone_FormatterData(final FormatterData[] allFormatterData) {
+   private FormatterData[] clone_FormatterData(final FormatterData[] allFormatterData) {
 
-		final FormatterData[] clonedFormatterData = new FormatterData[allFormatterData.length];
+      final FormatterData[] clonedFormatterData = new FormatterData[allFormatterData.length];
 
-		for (int formatterIndex = 0; formatterIndex < allFormatterData.length; formatterIndex++) {
+      for (int formatterIndex = 0; formatterIndex < allFormatterData.length; formatterIndex++) {
 
-			final FormatterData formatterData = allFormatterData[formatterIndex];
+         final FormatterData formatterData = allFormatterData[formatterIndex];
 
-			clonedFormatterData[formatterIndex] = formatterData.clone();
-		}
+         clonedFormatterData[formatterIndex] = formatterData.clone();
+      }
 
-		return clonedFormatterData;
-	}
+      return clonedFormatterData;
+   }
 
-	void dump() {
+   void dump() {
 
-		if (_isLogCalendarProfile == false) {
-			return;
-		}
+      if (_isLogCalendarProfile == false) {
+         return;
+      }
 
-		final CalendarProfile profile = this;
+      final CalendarProfile profile = this;
 
-		final StringBuilder sb = new StringBuilder();
+      final StringBuilder sb = new StringBuilder();
 
 // SET_FORMATTING_OFF
 
@@ -400,175 +400,175 @@ public class CalendarProfile implements Cloneable {
 
 // SET_FORMATTING_ON
 
-		System.out.print(sb.toString());
-	}
+      System.out.print(sb.toString());
+   }
 
-	private String dump_Font(final FontData fontData) {
+   private String dump_Font(final FontData fontData) {
 
-		final Display display = Display.getDefault();
+      final Display display = Display.getDefault();
 
-		// !!! getFontData() MUST be created for EVERY font otherwise they use all the SAME font !!!
-		final FontData[] allSystemFontData = display.getSystemFont().getFontData();
-		final FontData systemFontData = allSystemFontData[0];
+      // !!! getFontData() MUST be created for EVERY font otherwise they use all the SAME font !!!
+      final FontData[] allSystemFontData = display.getSystemFont().getFontData();
+      final FontData systemFontData = allSystemFontData[0];
 
-		final float fontHeight = (float) fontData.getHeight() / (float) systemFontData.getHeight() + 0.05f;
-		final String fontHeightText = _nf1.format(fontHeight);
+      final float fontHeight = (float) fontData.getHeight() / (float) systemFontData.getHeight() + 0.05f;
+      final String fontHeightText = _nf1.format(fontHeight);
 
-		final int fontStyle = fontData.getStyle();
-		String fontStyleText;
+      final int fontStyle = fontData.getStyle();
+      String fontStyleText;
 
-		if (fontStyle == SWT.BOLD) {
-			fontStyleText = "SWT.BOLD"; //$NON-NLS-1$
-		} else if (fontStyle == SWT.ITALIC) {
-			fontStyleText = "SWT.ITALIC"; //$NON-NLS-1$
-		} else {
-			fontStyleText = "SWT.NORMAL"; //$NON-NLS-1$
-		}
+      if (fontStyle == SWT.BOLD) {
+         fontStyleText = "SWT.BOLD"; //$NON-NLS-1$
+      } else if (fontStyle == SWT.ITALIC) {
+         fontStyleText = "SWT.ITALIC"; //$NON-NLS-1$
+      } else {
+         fontStyleText = "SWT.NORMAL"; //$NON-NLS-1$
+      }
 
-		return String.format("CalendarProfile.createFont(%sf, %s)", fontHeightText, fontStyleText); //$NON-NLS-1$
-	}
+      return String.format("CalendarProfile.createFont(%sf, %s)", fontHeightText, fontStyleText); //$NON-NLS-1$
+   }
 
-	private String dump_Formatter(final FormatterData[] allFormatterData, final String tourOrWeek) {
+   private String dump_Formatter(final FormatterData[] allFormatterData, final String tourOrWeek) {
 
-		final StringBuilder sb = new StringBuilder();
+      final StringBuilder sb = new StringBuilder();
 
-		sb.append("new FormatterData[] {"); //$NON-NLS-1$
-		sb.append("\n"); //$NON-NLS-1$
-		sb.append("\n"); //$NON-NLS-1$
+      sb.append("new FormatterData[] {"); //$NON-NLS-1$
+      sb.append("\n"); //$NON-NLS-1$
+      sb.append("\n"); //$NON-NLS-1$
 
-		for (final FormatterData formatterData : allFormatterData) {
+      for (final FormatterData formatterData : allFormatterData) {
 
-			final String isEnabled = formatterData.isEnabled ? "true" : "false"; //$NON-NLS-1$ //$NON-NLS-2$
+         final String isEnabled = formatterData.isEnabled ? "true" : "false"; //$NON-NLS-1$ //$NON-NLS-2$
 
-			String formatterID = UI.EMPTY_STRING;
+         String formatterID = UI.EMPTY_STRING;
 
-			switch (formatterData.id) {
+         switch (formatterData.id) {
 
-			case ALTITUDE:
-				formatterID = FormatterID.ALTITUDE.name();
+         case ALTITUDE:
+            formatterID = FormatterID.ALTITUDE.name();
 
-				break;
+            break;
 
-			case DISTANCE:
-				formatterID = FormatterID.DISTANCE.name();
-				break;
+         case DISTANCE:
+            formatterID = FormatterID.DISTANCE.name();
+            break;
 
-			case PACE:
-				formatterID = FormatterID.PACE.name();
-				break;
+         case PACE:
+            formatterID = FormatterID.PACE.name();
+            break;
 
-			case SPEED:
-				formatterID = FormatterID.SPEED.name();
-				break;
+         case SPEED:
+            formatterID = FormatterID.SPEED.name();
+            break;
 
-			case TIME_MOVING:
-				formatterID = FormatterID.TIME_MOVING.name();
-				break;
+         case TIME_MOVING:
+            formatterID = FormatterID.TIME_MOVING.name();
+            break;
 
-			case TIME_PAUSED:
-				formatterID = FormatterID.TIME_PAUSED.name();
-				break;
+         case TIME_PAUSED:
+            formatterID = FormatterID.TIME_PAUSED.name();
+            break;
 
-			case TIME_RECORDING:
-				formatterID = FormatterID.TIME_RECORDING.name();
-				break;
+         case TIME_RECORDING:
+            formatterID = FormatterID.TIME_RECORDING.name();
+            break;
 
-			case TOUR_DESCRIPTION:
-				formatterID = FormatterID.TOUR_DESCRIPTION.name();
-				break;
+         case TOUR_DESCRIPTION:
+            formatterID = FormatterID.TOUR_DESCRIPTION.name();
+            break;
 
-			case TOUR_TITLE:
-				formatterID = FormatterID.TOUR_TITLE.name();
-				break;
+         case TOUR_TITLE:
+            formatterID = FormatterID.TOUR_TITLE.name();
+            break;
 
-			case ENERGY_KCAL:
-				formatterID = FormatterID.ENERGY_KCAL.name();
-				break;
+         case ENERGY_KCAL:
+            formatterID = FormatterID.ENERGY_KCAL.name();
+            break;
 
-			case ENERGY_MJ:
-				formatterID = FormatterID.ENERGY_MJ.name();
-				break;
+         case ENERGY_MJ:
+            formatterID = FormatterID.ENERGY_MJ.name();
+            break;
 
-			case EMPTY:
-			default:
-				formatterID = FormatterID.EMPTY.name();
-				break;
-			}
+         case EMPTY:
+         default:
+            formatterID = FormatterID.EMPTY.name();
+            break;
+         }
 
-			sb.append(
-					String.format(
-							"\tnew FormatterData(%-10s %-30s ValueFormat.%s),\n", //$NON-NLS-1$
-							isEnabled + ",", //$NON-NLS-1$
-							"FormatterID." + formatterID + ",", //$NON-NLS-1$ //$NON-NLS-2$
-							formatterData.valueFormat.name()));
+         sb.append(
+               String.format(
+                     "\tnew FormatterData(%-10s %-30s ValueFormat.%s),\n", //$NON-NLS-1$
+                     isEnabled + ",", //$NON-NLS-1$
+                     "FormatterID." + formatterID + ",", //$NON-NLS-1$ //$NON-NLS-2$
+                     formatterData.valueFormat.name()));
 
-		}
+      }
 
-		sb.append("\n"); //$NON-NLS-1$
-		sb.append("};"); //$NON-NLS-1$
+      sb.append("\n"); //$NON-NLS-1$
+      sb.append("};"); //$NON-NLS-1$
 
-		return sb.toString();
-	}
+      return sb.toString();
+   }
 
-	private String dump_RGB(final RGB rgb) {
+   private String dump_RGB(final RGB rgb) {
 
-		return "new RGB (" + rgb.red + ", " + rgb.green + ", " + rgb.blue + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-	}
+      return "new RGB (" + rgb.red + ", " + rgb.green + ", " + rgb.blue + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+   }
 
-	@Override
-	public boolean equals(final Object obj) {
+   @Override
+   public boolean equals(final Object obj) {
 
-		if (this == obj) {
-			return true;
-		}
+      if (this == obj) {
+         return true;
+      }
 
-		if (obj == null) {
-			return false;
-		}
+      if (obj == null) {
+         return false;
+      }
 
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
+      if (getClass() != obj.getClass()) {
+         return false;
+      }
 
-		final CalendarProfile other = (CalendarProfile) obj;
+      final CalendarProfile other = (CalendarProfile) obj;
 
-		if (id == null) {
-			if (other.id != null) {
-				return false;
-			}
-		} else if (!id.equals(other.id)) {
-			return false;
-		}
+      if (id == null) {
+         if (other.id != null) {
+            return false;
+         }
+      } else if (!id.equals(other.id)) {
+         return false;
+      }
 
-		return true;
-	}
+      return true;
+   }
 
-	@Override
-	public int hashCode() {
+   @Override
+   public int hashCode() {
 
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + ((id == null) ? 0 : id.hashCode());
 
-		return result;
-	}
+      return result;
+   }
 
-	@Override
-	public String toString() {
-		return "CalendarProfile [" //$NON-NLS-1$
+   @Override
+   public String toString() {
+      return "CalendarProfile [" //$NON-NLS-1$
 
-				+ "id=" + id + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "profileName=" + profileName + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "id=" + id + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "profileName=" + profileName + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
-				+ "defaultId=" + defaultId + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "defaultId=" + defaultId + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
-				+ "isDefaultDefault=" + isDefaultDefault + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "isUserParentDefault=" + isUserParentDefault + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "isDefaultDefault=" + isDefaultDefault + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "isUserParentDefault=" + isUserParentDefault + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
-				+ "userParentDefaultId=" + userParentDefaultId + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "userDefaultId=" + userDefaultId + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "userParentDefaultId=" + userParentDefaultId + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "userDefaultId=" + userDefaultId + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
-				+ "]"; //$NON-NLS-1$
-	}
+            + "]"; //$NON-NLS-1$
+   }
 
 }

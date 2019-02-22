@@ -1,0 +1,38 @@
+Version 19.2.0                                        2?. February 2019
+
+
+New   
+===
+
+* EXPERIMENTAL: Search Tour by Location
+  This feature is in a very early stage and has some issues, but in some parts it is already working 
+
+
+Bugfix
+======
+
+* All Maps
+
+  - Fixed reselecting multiple tours, e.g. in Tour Book view, from only one selected tour, it did not redisplay multiple tours again. This bug is available since the beginning of selecting multiple tours
+
+
+* Tour Editor
+
+  - Fixed Linux async problem: modify flag is set when opening a tour/event
+
+
+* Tour Import 
+
+  - .fit File
+    Fixed NPE when a lap has not an absolute time, this occured with files from Sigma-ROX 12.0
+    
+  - .gpx File
+    - "Convert waypoints into tour markers" did not work
+    - Set correct marker position when waypoint is converted into tour marker
+    
+  - Set speed from device by discovering any time slices and not only the first 
+   
+    
+* Join Tours
+
+  - Set speed from device according to the joined tours

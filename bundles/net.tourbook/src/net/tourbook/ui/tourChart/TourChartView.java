@@ -896,7 +896,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 	 */
 	private void updateChart(final ArrayList<Long> tourIds) {
 
-		final TourData multipleTourData = TourManager.createMultipleTourData(tourIds);
+		final TourData multipleTourData = TourManager.createJoinedTourData(tourIds);
 
 		updateChart(multipleTourData);
 
