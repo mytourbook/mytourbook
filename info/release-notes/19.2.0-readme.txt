@@ -1,17 +1,22 @@
-Version 19.2.0                                        2?. February 2019
+Version 19.2.0                                         23. February 2019
+
 
 New   
 ===
 
 * Search Tour by Location
 
-  Find all tours in the map where you drove through, this is some kind 
-  of a heat map
+  It finds all tours in the map within a geo rectangle of 0.01°
+  (~ 1.5 km / 1 mi).
 
   Examples
+ 
+  1. All displayed tours have passed through the selected area (yellow 
+     rectangle), e.g. this can find tours which are started from home.
 
-  1. The selected area contains tours
-  2. Tours are excluded from the selected area
+  2. It can also find tours which did not drive through the selected 
+     area, e.g. this can find tour which are not started from home.
+
 
   EXPERIMENTAL
 
