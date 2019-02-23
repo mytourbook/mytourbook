@@ -977,11 +977,34 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
    private void addPartListener() {
 
       _partListener = new IPartListener2() {
-         @Override
-         public void partActivated(final IWorkbenchPartReference partRef) {}
+
+         private void onPartVisible(final IWorkbenchPartReference partRef) {
+
+            if (partRef.getPart(false) == Map2View.this) {
+
+               if (_isPartVisible == false) {
+
+                  _isPartVisible = true;
+
+                  if (_selectionWhenHidden != null) {
+
+                     onSelectionChanged(_selectionWhenHidden);
+
+                     _selectionWhenHidden = null;
+                  }
+               }
+            }
+         }
 
          @Override
-         public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
+         public void partActivated(final IWorkbenchPartReference partRef) {
+            onPartVisible(partRef);
+         }
+
+         @Override
+         public void partBroughtToTop(final IWorkbenchPartReference partRef) {
+            onPartVisible(partRef);
+         }
 
          @Override
          public void partClosed(final IWorkbenchPartReference partRef) {
@@ -1005,21 +1028,13 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
          public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
          @Override
-         public void partOpened(final IWorkbenchPartReference partRef) {}
+         public void partOpened(final IWorkbenchPartReference partRef) {
+            onPartVisible(partRef);
+         }
 
          @Override
          public void partVisible(final IWorkbenchPartReference partRef) {
-            if (partRef.getPart(false) == Map2View.this) {
-
-               _isPartVisible = true;
-
-               if (_selectionWhenHidden != null) {
-
-                  onSelectionChanged(_selectionWhenHidden);
-
-                  _selectionWhenHidden = null;
-               }
-            }
+            onPartVisible(partRef);
          }
       };
       getViewSite().getPage().addPartListener(_partListener);
