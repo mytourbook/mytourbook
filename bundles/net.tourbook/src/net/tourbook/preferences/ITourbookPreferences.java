@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -291,7 +291,8 @@ public interface ITourbookPreferences {
 
    public static final String APP_DATA_SPEED_MIN_TIMESLICE_VALUE      = "application.data-speed-min-timeslice-value"; //$NON-NLS-1$
 
-   public static final String APP_TOUR_DATA_FILTER_IS_SELECTED        = "APP_TOUR_DATA_FILTER_IS_SELECTED";           //$NON-NLS-1$
+   public static final String APP_TOUR_GEO_FILTER_IS_SELECTED         = "APP_TOUR_DATA_FILTER_IS_SELECTED";           //$NON-NLS-1$
+   public static final String APP_TOUR_DATA_FILTER_IS_SELECTED        = "APP_TOUR_GEO_FILTER_IS_SELECTED";            //$NON-NLS-1$
    public static final String APP_TOUR_TAG_FILTER_IS_SELECTED         = "APP_TOUR_TAG_FILTER_IS_SELECTED";            //$NON-NLS-1$
 
    /**

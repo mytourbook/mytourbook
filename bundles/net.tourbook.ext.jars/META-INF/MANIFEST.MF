@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: External jar's
 Bundle-SymbolicName: net.tourbook.ext.jars;singleton:=true
-Bundle-Version: 18.13.1.qualifier
+Bundle-Version: 19.2.0.qualifier
 Eclipse-BuddyPolicy: registered
 Bundle-Vendor: MyTourbook
 Bundle-ClassPath: joda-time-2.9.4.jar,
@@ -190,4 +190,5 @@ Export-Package: com.enterprisedt,
  org.xmlpull.v1,
  org.xmlunit.builder,
  org.xmlunit.diff
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Automatic-Module-Name: net.tourbook.ext.jars

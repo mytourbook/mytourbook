@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -208,8 +208,13 @@ import net.tourbook.ui.views.tourSegmenter.SelectedTourSegmenterSegments;
  */
 public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITourProvider2 {
 
-   public static final String ID = "net.tourbook.views.TourDataEditorView"; //$NON-NLS-1$
+   public static final String     ID                            = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
 
+   /**
+    * On Linux an asynch selection event is fired since e4
+    */
+   private static final String    FIX_LINUX_ASYNC_EVENT_1         = "FIX_LINUX_ASYNC_EVENT_1";
+   private static final String    FIX_LINUX_ASYNC_EVENT_2         = "FIX_LINUX_ASYNC_EVENT_2";
    //
    private static final String    GRAPH_LABEL_HEARTBEAT_UNIT    = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
    private static final String    VALUE_UNIT_K_CALORIES         = net.tourbook.ui.Messages.Value_Unit_KCalories;
@@ -361,7 +366,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
    private MouseWheelListener                 _mouseWheelListener;
    private SelectionAdapter                   _selectionListener;
    private SelectionAdapter                   _tourTimeListener;
-   private SelectionAdapter                   _dateTimeListener;
    //
    private PixelConverter                     _pc;
 
@@ -443,7 +447,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
    private boolean                            _isTimeZoneManuallyModified;
    private boolean                            _isTemperatureManuallyModified;
    private boolean                            _isWindSpeedManuallyModified;
-   private boolean                            _isSetDigits            = false;
 
    /*
     * measurement unit values
@@ -2567,25 +2570,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       };
 
       /*
-       * listener for tour date/time
-       */
-      _dateTimeListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-
-            if (_isSetField || _isSavingInProgress) {
-               return;
-            }
-
-            setTourDirty();
-
-            updateUI_Title();
-
-            onModifyContent();
-         }
-      };
-
-      /*
        * listener for recording/driving/paused time
        */
       _tourTimeListener = new SelectionAdapter() {
@@ -3097,7 +3081,31 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
          _dtTourDate = new DateTime(container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
          GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).applyTo(_dtTourDate);
          _tk.adapt(_dtTourDate, true, false);
-         _dtTourDate.addSelectionListener(_dateTimeListener);
+         _dtTourDate.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+
+               if (_isLinux && e.widget.getData(FIX_LINUX_ASYNC_EVENT_1) != null) {
+                  e.widget.setData(FIX_LINUX_ASYNC_EVENT_1, null);
+                  return;
+               }
+
+               if (_isLinux && e.widget.getData(FIX_LINUX_ASYNC_EVENT_2) != null) {
+                  e.widget.setData(FIX_LINUX_ASYNC_EVENT_2, null);
+                  return;
+               }
+
+               if (_isSetField || _isSavingInProgress) {
+                  return;
+               }
+
+               setTourDirty();
+
+               updateUI_Title();
+
+               onModifyContent();
+            }
+         });
 
          //////////////////////////////////////
          createUI_LabelSeparator(container);
@@ -3122,7 +3130,31 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
             _dtStartTime = new DateTime(container, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
             _tk.adapt(_dtStartTime, true, false);
-            _dtStartTime.addSelectionListener(_dateTimeListener);
+            _dtStartTime.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+
+                  if (_isLinux && e.widget.getData(FIX_LINUX_ASYNC_EVENT_1) != null) {
+                     e.widget.setData(FIX_LINUX_ASYNC_EVENT_1, null);
+                     return;
+                  }
+
+                  if (_isLinux && e.widget.getData(FIX_LINUX_ASYNC_EVENT_2) != null) {
+                     e.widget.setData(FIX_LINUX_ASYNC_EVENT_2, null);
+                     return;
+                  }
+
+                  if (_isSetField || _isSavingInProgress) {
+                     return;
+                  }
+
+                  setTourDirty();
+
+                  updateUI_Title();
+
+                  onModifyContent();
+               }
+            });
          }
       }
    }
@@ -3834,12 +3866,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
                setTourDirty();
             }
          });
+
          _spinTemperature.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent e) {
 
-               if (_isSetDigits) {
-                  _isSetDigits = false;
+               if (_isLinux && e.widget.getData(FIX_LINUX_ASYNC_EVENT_1) != null) {
+                  e.widget.setData(FIX_LINUX_ASYNC_EVENT_1, null);
                   return;
                }
 
@@ -3850,6 +3883,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
                setTourDirty();
             }
          });
+
          _spinTemperature.addMouseWheelListener(new MouseWheelListener() {
             @Override
             public void mouseScrolled(final MouseEvent event) {
@@ -7800,16 +7834,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
        */
       final float avgTemperature = UI.convertTemperatureFromMetric(_tourData.getAvgTemperature());
 
-      /*
-       * on Linux .setDigit() fires an asynch selection event that the flag _isSetField is not
-       * recognized
-       */
-      _isSetDigits = true;
+      _spinTemperature.setData(FIX_LINUX_ASYNC_EVENT_1, true);
       _spinTemperature.setDigits(1);
       _spinTemperature.setSelection((int) ((avgTemperature * 10) + 0.5));
 
       // set start date/time without time zone
       final ZonedDateTime tourStartTime = _tourData.getTourStartTime();
+      _dtTourDate.setData(FIX_LINUX_ASYNC_EVENT_1, true);
+      _dtTourDate.setData(FIX_LINUX_ASYNC_EVENT_2, true);
+      _dtStartTime.setData(FIX_LINUX_ASYNC_EVENT_1, true);
+      _dtStartTime.setData(FIX_LINUX_ASYNC_EVENT_2, true);
       _dtTourDate.setDate(tourStartTime.getYear(), tourStartTime.getMonthValue() - 1, tourStartTime.getDayOfMonth());
       _dtStartTime.setTime(tourStartTime.getHour(), tourStartTime.getMinute(), tourStartTime.getSecond());
 

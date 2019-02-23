@@ -1,6 +1,6 @@
 /* *****************************************************************************
  *  Copyright (C) 2008 Michael Kanis and others
- *  
+ *
  *  This file is part of Geoclipse.
  *
  *  Geoclipse is free software: you can redistribute it and/or modify
@@ -14,17 +14,17 @@
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with Geoclipse.  If not, see <http://www.gnu.org/licenses/>. 
+ *  along with Geoclipse.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
 package de.byteholder.geoclipse.map;
- 
+
+import de.byteholder.geoclipse.mapprovider.MP;
+
 import java.awt.Point;
 import java.awt.geom.Point2D;
 
 import net.tourbook.common.map.GeoPosition;
-
-import de.byteholder.geoclipse.mapprovider.MP;
 
 /**
  * @author Joshua Marinacci
@@ -36,13 +36,15 @@ public abstract class Projection {
 	 * Given a position (latitude/longitude pair) and a zoom level, return the appropriate point in
 	 * <em>pixels</em>. The zoom level is necessary because pixel coordinates are in terms of the
 	 * zoom level
-	 * 
+	 *
 	 * @param geoPosition
 	 *            A lat/lon pair
 	 * @param zoomLevel
 	 *            the zoom level to extract the pixel coordinate for
 	 */
 	public abstract Point geoToPixel(GeoPosition geoPosition, int zoomLevel, MP mp);
+
+   public abstract Point2D.Double geoToPixelDouble(GeoPosition geoPosition, int zoomLevel, MP mp);
 
 	/**
 	 * @param position1

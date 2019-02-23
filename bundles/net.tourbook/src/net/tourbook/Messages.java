@@ -414,6 +414,7 @@ public class Messages extends NLS {
    public static String        App_Action_Columns;
    public static String        App_Action_Copy;
    public static String        App_Action_Delete;
+   public static String        App_Action_Delete_All;
    public static String        App_Action_Delete_WithConfirm;
    public static String        App_Action_DeleteProfile;
    public static String        App_Action_Dialog_ActionIsInProgress_Message;
@@ -477,6 +478,9 @@ public class Messages extends NLS {
    public static String        App_Link_RestoreDefaultValues;
 
    public static String        App_Splash_Copyright;
+
+   public static String        App_SplashMessage_Finalize;
+   public static String        App_SplashMessage_StartingApplication;
 
    public static String        App_Title;
 
@@ -806,7 +810,6 @@ public class Messages extends NLS {
    public static String        Image__App_Close;
    public static String        Image__App_Edit_Paste;
    public static String        Image__App_Filter;
-
    public static String        Image__App_Filter_Disabled;
    public static String        Image__App_OK;
    public static String        Image__App_RestoreDefault;
@@ -951,9 +954,8 @@ public class Messages extends NLS {
    public static String        Image__synch_statistics_Disabled;
    public static String        Image__SearchExternal;
    public static String        Image__SearchExternal_Disabled;
-
+   public static String        Image__SearchToursByLocation;
    public static String        Image__Smoothing;
-
    public static String        Image__Smoothing_Disabled;
    public static String        Image__State_AdjustTemperature;
    public static String        Image__State_Copy;
@@ -990,6 +992,7 @@ public class Messages extends NLS {
    public static String        Image__TourBook_Week;
    public static String        Image__TourFilter;
    public static String        Image__TourFilter_Disabled;
+   public static String        Image__TourGeoFilter;
    public static String        Image__TourInfo;
    public static String        Image__TourInfo_Disabled;
    public static String        Image__TourLog;
@@ -2015,6 +2018,26 @@ public class Messages extends NLS {
    public static String Slideout_TourFilter_Link_TextSearchHint;
    public static String Slideout_TourFilter_Link_TextSearchHint_Tooltip;
 
+   public static String Slideout_TourGeoFilter_Checkbox_UseAppFilter;
+   public static String Slideout_TourGeoFilter_Color_GeoParts_HoverSelecting;
+   public static String Slideout_TourGeoFilter_Color_GeoParts_Selected;
+   public static String Slideout_TourGeoFilter_Column_Created_Label;
+   public static String Slideout_TourGeoFilter_Column_Latitude1_Header;
+   public static String Slideout_TourGeoFilter_Column_Latitude1_Label;
+   public static String Slideout_TourGeoFilter_Column_Latitude2_Header;
+   public static String Slideout_TourGeoFilter_Column_Latitude2_Label;
+   public static String Slideout_TourGeoFilter_Column_Longitude1_Header;
+   public static String Slideout_TourGeoFilter_Column_Longitude1_Label;
+   public static String Slideout_TourGeoFilter_Column_Longitude2_Header;
+   public static String Slideout_TourGeoFilter_Column_Longitude2_Label;
+   public static String Slideout_TourGeoFilter_Column_NumGeoParts_Header;
+   public static String Slideout_TourGeoFilter_Column_NumGeoParts_Label;
+   public static String Slideout_TourGeoFilter_Label_FilterIncludeExclude;
+   public static String Slideout_TourGeoFilter_Label_Title;
+   public static String Slideout_TourGeoFilter_Radio_GeoParts_Exclude;
+   public static String Slideout_TourGeoFilter_Radio_GeoParts_Include;
+   public static String Slideout_TourGeoFilter_Spinner_GridBoxSize;
+
    public static String Slideout_TourInfoOptions_Checkbox_IsShowInfoTooltip;
    public static String Slideout_TourInfoOptions_Checkbox_IsShowTourSeparator;
    public static String Slideout_TourInfoOptions_Checkbox_IsShowTourSeparator_Tooltip;
@@ -2175,6 +2198,7 @@ public class Messages extends NLS {
    public static String Tour_Database_PostUpdate_029_SetImportFileName;
    public static String Tour_Database_PostUpdate_032_SetTourTimeZone;
    public static String Tour_Database_PostUpdate_034_SetTourGeoParts;
+   public static String Tour_Database_PostUpdate_037_SetHasGeoData;
    public static String Tour_Database_PostUpdate011_SetTourCreateTime;
    public static String Tour_Database_PostUpdate020_ConvertIntToFloat;
    public static String Tour_Database_PostUpdate021_SetTourStartEndTime;
@@ -2267,6 +2291,8 @@ public class Messages extends NLS {
    public static String Tour_Filter_Operator_Season_UntilToday_From_Date;
    public static String Tour_Filter_Operator_Season_UntilToday_From_YearStart;
    public static String Tour_Filter_Operator_StartsWith;
+
+   public static String Tour_GeoFilter_Action_Tooltip;
 
    public static String Tour_Info_Flag_Array;
    public static String Tour_Info_Flag_Database;

@@ -25,31 +25,31 @@ import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 
 public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 
-	@Override
-	public WorkbenchWindowAdvisor createWorkbenchWindowAdvisor(final IWorkbenchWindowConfigurer configurer) {
-		return new ApplicationWorkbenchWindowAdvisor(this, configurer);
-	}
+   @Override
+   public WorkbenchWindowAdvisor createWorkbenchWindowAdvisor(final IWorkbenchWindowConfigurer configurer) {
+      return new ApplicationWorkbenchWindowAdvisor(this, configurer);
+   }
 
-	@Override
-	public String getInitialWindowPerspectiveId() {
-		// set default perspective
-		return PerspectiveFactoryTourBook.PERSPECTIVE_ID;
-	}
+   @Override
+   public String getInitialWindowPerspectiveId() {
+      // set default perspective
+      return PerspectiveFactoryTourBook.PERSPECTIVE_ID;
+   }
 
-	@Override
-	public String getMainPreferencePageId() {
-		// set default pref page
-		return PrefPageGeneral.ID;
-	}
+   @Override
+   public String getMainPreferencePageId() {
+      // set default pref page
+      return PrefPageGeneral.ID;
+   }
 
-	@Override
-	public void initialize(final IWorkbenchConfigurer configurer) {
-		configurer.setSaveAndRestore(true);
-	}
+   @Override
+   public void initialize(final IWorkbenchConfigurer configurer) {
+      configurer.setSaveAndRestore(true);
+   }
 
-	@Override
-	public boolean preShutdown() {
-		return TourManager.getInstance().saveTours();
-	}
+   @Override
+   public boolean preShutdown() {
+      return TourManager.getInstance().saveTours();
+   }
 
 }
