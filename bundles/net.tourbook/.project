@@ -6,26 +6,6 @@
 	</projects>
 	<buildSpec>
 		<buildCommand>
-			<name>org.eclipse.ui.externaltools.ExternalToolBuilder</name>
-			<triggers>full,incremental,</triggers>
-			<arguments>
-				<dictionary>
-					<key>LaunchConfigHandle</key>
-					<value>&lt;project&gt;/.externalToolBuilders/tern.eclipse.ide.core.ternBuilder (1).launch</value>
-				</dictionary>
-			</arguments>
-		</buildCommand>
-		<buildCommand>
-			<name>org.eclipse.ui.externaltools.ExternalToolBuilder</name>
-			<triggers>full,incremental,</triggers>
-			<arguments>
-				<dictionary>
-					<key>LaunchConfigHandle</key>
-					<value>&lt;project&gt;/.externalToolBuilders/org.eclipse.wst.jsdt.core.javascriptValidator (1).launch</value>
-				</dictionary>
-			</arguments>
-		</buildCommand>
-		<buildCommand>
 			<name>org.eclipse.jdt.core.javabuilder</name>
 			<arguments>
 			</arguments>
@@ -41,17 +21,12 @@
 			</arguments>
 		</buildCommand>
 		<buildCommand>
-			<name>org.eclipse.babel.editor.rbeBuilder</name>
-			<arguments>
-			</arguments>
-		</buildCommand>
-		<buildCommand>
 			<name>org.eclipse.ui.externaltools.ExternalToolBuilder</name>
 			<triggers>full,incremental,</triggers>
 			<arguments>
 				<dictionary>
 					<key>LaunchConfigHandle</key>
-					<value>&lt;project&gt;/.externalToolBuilders/org.eclipse.wst.validation.validationbuilder (2).launch</value>
+					<value>&lt;project&gt;/.externalToolBuilders/org.eclipse.babel.editor.rbeBuilder (4).launch</value>
 				</dictionary>
 			</arguments>
 		</buildCommand>
@@ -60,9 +35,6 @@
 		<nature>org.eclipse.pde.PluginNature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>org.eclipse.babel.editor.rbeNature</nature>
-		<nature>org.eclipse.wst.common.project.facet.core.nature</nature>
-		<nature>org.eclipse.wst.jsdt.core.jsNature</nature>
-		<nature>org.eclipse.wst.common.modulecore.ModuleCoreNature</nature>
 	</natures>
 	<linkedResources>
 		<link>

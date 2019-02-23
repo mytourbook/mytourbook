@@ -26,34 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.e4.ui.di.PersistState;
-import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.awt.SWT_AWT;
-import org.eclipse.swt.events.MenuAdapter;
-import org.eclipse.swt.events.MenuEvent;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.ui.IPartListener2;
-import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchPartReference;
-import org.eclipse.ui.part.ViewPart;
-import org.oscim.core.BoundingBox;
-import org.oscim.core.GeoPoint;
-import org.oscim.core.MapPosition;
-import org.oscim.layers.tile.bitmap.BitmapTileLayer;
-import org.oscim.map.Animator;
-import org.oscim.map.Map;
-import org.oscim.utils.animation.Easing;
-
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
@@ -103,6 +75,34 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.tourChart.TourChart;
+
+import org.eclipse.e4.ui.di.PersistState;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.awt.SWT_AWT;
+import org.eclipse.swt.events.MenuAdapter;
+import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.part.ViewPart;
+import org.oscim.core.BoundingBox;
+import org.oscim.core.GeoPoint;
+import org.oscim.core.MapPosition;
+import org.oscim.layers.tile.bitmap.BitmapTileLayer;
+import org.oscim.map.Animator;
+import org.oscim.map.Map;
+import org.oscim.utils.animation.Easing;
 
 public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDialogs, IMapBookmarkListener,
       IMapSyncListener {
@@ -410,7 +410,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
    public void actionZoomIn() {
    	final Map map25 = _mapApp.getMap();
-   	
+
       map25.post(new Runnable() {
 
          @Override
@@ -423,12 +423,12 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
             map25.updateMap(true);
          }
       });
-   	
+
    }
 
    public void actionZoomOut() {
    	final Map map25 = _mapApp.getMap();
-   	
+
       map25.post(new Runnable() {
 
          @Override
@@ -440,11 +440,11 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
             animator.animateZoom(500, 1/_zoomFactor, 0, 0);
             map25.updateMap(true);
          }
-      });   
+      });
 
    }
-   
-   
+
+
    public void actionZoomShowEntireTour() {
 
       if (_allBoundingBox == null) {
@@ -482,11 +482,33 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
       _partListener = new IPartListener2() {
 
-         @Override
-         public void partActivated(final IWorkbenchPartReference partRef) {}
+         private void onPartVisible(final IWorkbenchPartReference partRef) {
+
+            if (partRef.getPart(false) == Map25View.this) {
+
+               if (_isPartVisible == false) {
+
+                  _isPartVisible = true;
+
+                  if (_lastHiddenSelection != null) {
+
+                     onSelectionChanged(_lastHiddenSelection);
+
+                     _lastHiddenSelection = null;
+                  }
+               }
+            }
+         }
 
          @Override
-         public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
+         public void partActivated(final IWorkbenchPartReference partRef) {
+            onPartVisible(partRef);
+         }
+
+         @Override
+         public void partBroughtToTop(final IWorkbenchPartReference partRef) {
+            onPartVisible(partRef);
+         }
 
          @Override
          public void partClosed(final IWorkbenchPartReference partRef) {}
@@ -506,22 +528,13 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
          public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
          @Override
-         public void partOpened(final IWorkbenchPartReference partRef) {}
+         public void partOpened(final IWorkbenchPartReference partRef) {
+            onPartVisible(partRef);
+         }
 
          @Override
          public void partVisible(final IWorkbenchPartReference partRef) {
-
-            if (partRef.getPart(false) == Map25View.this) {
-
-               _isPartVisible = true;
-
-               if (_lastHiddenSelection != null) {
-
-                  onSelectionChanged(_lastHiddenSelection);
-
-                  _lastHiddenSelection = null;
-               }
-            }
+            onPartVisible(partRef);
          }
       };
       getViewSite().getPage().addPartListener(_partListener);
@@ -644,7 +657,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       _actionShowTour_WithOptions = new ActionShowTour_WithConfig();
       _actionZoom_In = new ActionZoomIn(this);
       _actionZoom_Out = new ActionZoomOut(this);
-      
+
    }
 
    private BoundingBox createBoundingBox(final GeoPoint[] geoPoints) {
@@ -945,9 +958,9 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
       tbm.add(_actionZoom_In);
       tbm.add(_actionZoom_Out);
-      
-      tbm.add(new Separator());      
-      
+
+      tbm.add(new Separator());
+
       tbm.add(_actionShowMarker_WithOptions);
       tbm.add(_actionMapOptions);
       tbm.add(_actionMapProvider);
@@ -1391,8 +1404,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       _mapApp.getLayer_Marker().setEnabled(isMarkerVisible);
 
       // hillshading layer
-      BitmapTileLayer layer_HillShading = _mapApp.getLayer_HillShading();
-      int layerHillshadingOpacity = Util.getStateInt(_state, STATE_LAYER_HILLSHADING_OPACITY, 100);
+      final BitmapTileLayer layer_HillShading = _mapApp.getLayer_HillShading();
+      final int layerHillshadingOpacity = Util.getStateInt(_state, STATE_LAYER_HILLSHADING_OPACITY, 100);
       _mapApp.setLayer_HillShading_Opacity(layerHillshadingOpacity);
 
       layer_HillShading.setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_HILLSHADING_VISIBLE, true));
@@ -1431,7 +1444,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       _state.put(STATE_IS_LAYER_TILE_INFO_VISIBLE, _mapApp.getLayer_TileInfo().isEnabled());
       _state.put(STATE_IS_LAYER_TOUR_VISIBLE, _mapApp.getLayer_Tour().isEnabled());
       _state.put(STATE_IS_LAYER_SCALE_BAR_VISIBLE, _mapApp.getLayer_ScaleBar().isEnabled());
-      
+
       // hillshading layer
       _state.put(STATE_IS_LAYER_HILLSHADING_VISIBLE, _mapApp.getLayer_HillShading().isEnabled());
       _state.put(STATE_LAYER_HILLSHADING_OPACITY, _mapApp.getLayer_HillShading_Opacity());

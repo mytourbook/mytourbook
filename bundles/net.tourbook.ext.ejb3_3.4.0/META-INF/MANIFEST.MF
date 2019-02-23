@@ -154,3 +154,4 @@ Export-Package: javassist,
  org.hibernate.type,
  org.hibernate.usertype,
  org.hibernate.util
+Automatic-Module-Name: net.tourbook.ext.ejb3

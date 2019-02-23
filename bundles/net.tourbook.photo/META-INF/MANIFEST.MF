@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Photo Gallery
 Bundle-SymbolicName: net.tourbook.photo;singleton:=true
-Bundle-Version: 18.13.1.qualifier
+Bundle-Version: 19.2.0.qualifier
 Bundle-Activator: net.tourbook.photo.internal.Activator
 Bundle-Localization: plugin
 Bundle-Vendor: MyTourbook
@@ -11,7 +11,7 @@ Require-Bundle: org.eclipse.ui,
  net.tourbook.common,
  net.tourbook.ext.jars,
  org.eclipse.e4.ui.di
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Export-Package: net.tourbook.photo
 Import-Package: net.tourbook.common,
@@ -22,3 +22,4 @@ Import-Package: net.tourbook.common,
  net.tourbook.common.tooltip,
  net.tourbook.common.util,
  net.tourbook.common.weather
+Automatic-Module-Name: net.tourbook.photo

@@ -4718,7 +4718,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
                   } else {
 
-                     tourData = TourManager.createMultipleTourData(tourIds);
+                     tourData = TourManager.createJoinedTourData(tourIds);
                   }
                }
 

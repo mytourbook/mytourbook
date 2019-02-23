@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourBook;
 
+import de.byteholder.geoclipse.map.UI;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -27,8 +29,6 @@ import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.common.util.Util;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.SQLFilter;
-
-import de.byteholder.geoclipse.map.UI;
 
 public class TVITourBookRoot extends TVITourBookItem {
 
@@ -121,6 +121,9 @@ public class TVITourBookRoot extends TVITourBookItem {
 
          TVITourBookYear yearItem = null;
 
+         int yearIndex = 0;
+         int summaryIndex = 0;
+
          final ResultSet result = statement.executeQuery();
          while (result.next()) {
 
@@ -134,25 +137,38 @@ public class TVITourBookRoot extends TVITourBookItem {
 
             yearItem.colTourDateTime = new TourDateTime(calendar8.withYear(dbYear));
             yearItem.addSumColumns(result, 2);
+
+            if (isShowSummaryRow && dbYear == 0) {
+
+               // this should be the summary row
+               summaryIndex = yearIndex;
+
+               // add summary flag to the last row
+               yearItem.isRowSummary = true;
+            }
+
+            yearIndex++;
          }
 
          /**
-          * There seems to be a bug in derby that the rollup row and the last row are interchanged
-          * -> interchange them back
+          * It can happen that the summary row is not the last row (seems to be a bug in derby)
           */
-         final boolean isRollupDerbyBug = isSqlWhereClause == false && isShowSummaryRow;
          final int numChildren = children.size();
-         if (isRollupDerbyBug && numChildren > 1) {
 
-            final TreeViewerItem lastYearItem = children.remove(numChildren - 1);
-            children.add(numChildren - 2, lastYearItem);
+         if (isShowSummaryRow
 
-            yearItem = (TVITourBookYear) children.get(numChildren - 1);
-         }
+               // ensure there are items
+               && numChildren > 0
 
-         // add summary flag to the last row
-         if (yearItem != null && isShowSummaryRow) {
-            yearItem.isRowSummary = true;
+               // check last position
+               && summaryIndex != numChildren - 1) {
+
+            // wrong summary row detected
+            
+            // move summary to the end
+            final TreeViewerItem summarytYearItem = children.remove(summaryIndex);
+
+            children.add(summarytYearItem);
          }
 
       } catch (final SQLException e) {
