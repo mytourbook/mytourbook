@@ -43,35 +43,6 @@ import java.util.ArrayList;
 
 import javax.swing.SwingUtilities;
 
-import org.eclipse.e4.ui.di.PersistState;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.ActionContributionItem;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.awt.SWT_AWT;
-import org.eclipse.swt.events.MenuAdapter;
-import org.eclipse.swt.events.MenuEvent;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.ToolItem;
-import org.eclipse.ui.IActionBars;
-import org.eclipse.ui.IPartListener2;
-import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchPartReference;
-import org.eclipse.ui.part.ViewPart;
-import org.oscim.core.MapPosition;
-
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
@@ -148,6 +119,35 @@ import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.tourChart.TourChart;
+
+import org.eclipse.e4.ui.di.PersistState;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ActionContributionItem;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.awt.SWT_AWT;
+import org.eclipse.swt.events.MenuAdapter;
+import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.part.ViewPart;
+import org.oscim.core.MapPosition;
 
 /**
  * Display 3-D map with tour tracks.
@@ -564,11 +564,34 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 	private void addPartListener() {
 
 		_partListener = new IPartListener2() {
-			@Override
-			public void partActivated(final IWorkbenchPartReference partRef) {}
+
+         private void onPartVisible(final IWorkbenchPartReference partRef) {
+
+            if (partRef.getPart(false) == Map3View.this) {
+
+               if (_isPartVisible == false) {
+
+                  _isPartVisible = true;
+
+                  if (_lastHiddenSelection != null) {
+
+                     onSelectionChanged(_lastHiddenSelection);
+
+                     _lastHiddenSelection = null;
+                  }
+               }
+            }
+         }
 
 			@Override
-			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
+         public void partActivated(final IWorkbenchPartReference partRef) {
+            onPartVisible(partRef);
+         }
+
+			@Override
+         public void partBroughtToTop(final IWorkbenchPartReference partRef) {
+            onPartVisible(partRef);
+         }
 
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {}
@@ -587,22 +610,14 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 			public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
 			@Override
-			public void partOpened(final IWorkbenchPartReference partRef) {}
+         public void partOpened(final IWorkbenchPartReference partRef) {
+            onPartVisible(partRef);
+         }
 
 			@Override
 			public void partVisible(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == Map3View.this) {
-
-					_isPartVisible = true;
-
-					if (_lastHiddenSelection != null) {
-
-						onSelectionChanged(_lastHiddenSelection);
-
-						_lastHiddenSelection = null;
-					}
-				}
-			}
+            onPartVisible(partRef);
+         }
 		};
 		getViewSite().getPage().addPartListener(_partListener);
 	}
@@ -1226,8 +1241,8 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 		tbm.add(_actionTourColorGradient);
 		tbm.add(_actionTourColorHrZone);
 		tbm.add(new Separator());
-		
-      tbm.add(_actionMapBookmarks);	
+
+      tbm.add(_actionMapBookmarks);
       tbm.add(new Separator());
 
 		tbm.add(_actionShowTourInMap);

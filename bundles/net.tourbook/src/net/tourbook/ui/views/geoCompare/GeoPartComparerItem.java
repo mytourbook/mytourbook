@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,49 +17,58 @@ package net.tourbook.ui.views.geoCompare;
 
 import java.time.ZonedDateTime;
 
+import net.tourbook.common.UI;
+import net.tourbook.data.TourType;
+
 /**
  * Contains data for one comapred tour
  */
 public class GeoPartComparerItem {
 
-	public long			tourId;
+   public long        tourId;
 
-	public GeoPartItem	geoPartItem;
+   public GeoPartItem geoPartItem;
 
-	/*
-	 * Compare results
-	 */
-	public float[]		tourLatLonDiff;
+   /*
+    * Compare results
+    */
+   public float[] tourLatLonDiff;
 
-	public int			tourFirstIndex;
-	public int			tourLastIndex;
+   public int     tourFirstIndex;
+   public int     tourLastIndex;
 
-	/**
-	 * <ul>
-	 * <li>-2 : Value is not yet set</li>
-	 * <li>-1 : Value is invalid</li>
-	 * <li>0...max : A Valid value is set</li>
-	 * </ul>
-	 */
-	long				minDiffValue	= -2;
+   /**
+    * <ul>
+    * <li>-2 : Value is not yet set</li>
+    * <li>-1 : Value is invalid</li>
+    * <li>0...max : A Valid value is set</li>
+    * </ul>
+    */
+   long           minDiffValue = -2;
 
-	float				avgPulse;
-	float				avgSpeed;
+   float          avgPulse;
+   float          avgSpeed;
 
-	ZonedDateTime		tourStartTime;
-	long				tourStartTimeMS;
+   ZonedDateTime  tourStartTime;
+   long           tourStartTimeMS;
 
-	public GeoPartComparerItem(final long tourId, final GeoPartItem geoPartItem) {
+   /**
+    * Ensure title it is set for sorting
+    */
+   String         tourTitle    = UI.EMPTY_STRING;
+   TourType       tourType;
 
-		this.tourId = tourId;
-		this.geoPartItem = geoPartItem;
-	}
+   public GeoPartComparerItem(final long tourId, final GeoPartItem geoPartItem) {
 
-	@Override
-	public String toString() {
-		return "GeoPartComparerItem [" //$NON-NLS-1$
-				+ "tourId=" + tourId + ", " //$NON-NLS-1$ //$NON-NLS-2$
-				+ "geoPartItem=" + geoPartItem + "]"; //$NON-NLS-1$ //$NON-NLS-2$
-	}
+      this.tourId = tourId;
+      this.geoPartItem = geoPartItem;
+   }
+
+   @Override
+   public String toString() {
+      return "GeoPartComparerItem [" //$NON-NLS-1$
+            + "tourId=" + tourId + ", " //$NON-NLS-1$ //$NON-NLS-2$
+            + "geoPartItem=" + geoPartItem + "]"; //$NON-NLS-1$ //$NON-NLS-2$
+   }
 
 }

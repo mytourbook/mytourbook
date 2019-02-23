@@ -21,14 +21,14 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.ui.IWorkbenchPart;
-
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.NormalizedGeoData;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourManager;
+
+import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.ui.IWorkbenchPart;
 
 public class GeoCompareManager {
 
@@ -227,6 +227,9 @@ public class GeoCompareManager {
 
          comparerItem.tourFirstIndex = origStartIndex;
          comparerItem.tourLastIndex = origEndIndex;
+
+         comparerItem.tourTitle = tourData.getTourTitle();
+         comparerItem.tourType = tourData.getTourType();
       }
 
       final ZonedDateTime tourStartTime = tourData.getTourStartTime();
