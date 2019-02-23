@@ -48,6 +48,8 @@ import org.oscim.utils.FastMath;
 import org.oscim.utils.TimSort;
 import org.oscim.utils.geom.GeometryUtils;
 
+//import com.badlogic.gdx.graphics.Color;
+
 /**
  * Original: {@link org.oscim.layers.marker.MarkerRenderer}
  */
@@ -113,6 +115,9 @@ public class MarkerRenderer extends BucketRenderer {
 
 	private MarkerSymbol					_defaultMarkerSymbol;
 
+	private int _fgColor;
+	private int _bgColor;
+	
 	private final MarkerLayer				_markerLayer;
 	private final SymbolBucket				_symbolBucket;
 
@@ -225,6 +230,13 @@ public class MarkerRenderer extends BucketRenderer {
 
 		final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
+		_fgColor = ColorUtil.getARGB(config.markerOutline_Color, (int) (config.markerOutline_Opacity / 100.0 * 0xff));
+		_bgColor = ColorUtil.getARGB(config.markerFill_Color,    (int) (config.markerFill_Opacity    / 100.0 * 0xff));
+		
+		/*System.out.println("***textOpacy: " + config.markerOutline_Opacity);
+		System.out.println("***FillOpacy: " + config.markerFill_Opacity);
+		System.out.println("***bgColor: " + _bgColor);*/
+		
 		_clusterSymbolSizeDP = config.clusterSymbol_Size;
 		_clusterSymbolWeight = config.clusterSymbol_Weight;
 		_clusterOutlineSize = config.clusterOutline_Size;
@@ -528,6 +540,12 @@ public class MarkerRenderer extends BucketRenderer {
 
 			canvas.drawCircle(noClippingPos, noClippingPos, outlineRadius, outlinePainter);
 		}
+		
+		/*final Paint textPainter = CanvasAdapter.newPaint();
+		textPainter.setStyle(Paint.Style.STROKE);
+		textPainter.setColor(ColorUtil.getARGB(config.markerOutline_Color, markerOutline_Opacity));
+		canvas.drawText("--Test--", noClippingPos-20, noClippingPos, textPainter);*/
+
 
 		final boolean isBillboard = config.markerOrientation == Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
 
@@ -790,17 +808,99 @@ public class MarkerRenderer extends BucketRenderer {
 
 			} else {
 
-				// normal item, use its marker
+			   MarkerSymbol markerSymbol = projItem.mapMarker.markerSymbol;
+			   if (markerSymbol == null) {
+			      markerSymbol = _defaultMarkerSymbol;
+			   }
 
-				MarkerSymbol markerSymbol = projItem.mapMarker.markerSymbol;
+			   final Paint textPainter = CanvasAdapter.newPaint();
+			   textPainter.setStyle(Paint.Style.STROKE);
+			   textPainter.setColor(_fgColor);
 
-				if (markerSymbol == null) {
-					markerSymbol = _defaultMarkerSymbol;
-				}
+			   final Paint fillPainter = CanvasAdapter.newPaint();
+			   fillPainter.setStyle(Paint.Style.FILL);
 
-				mapSymbol.set(projItem.mapX, projItem.mapY, markerSymbol.getBitmap(), markerSymbol.mBillboard);
-				mapSymbol.offset = markerSymbol.getHotspot();
-				mapSymbol.billboard = markerSymbol.isBillboard();
+			   String title = projItem.mapMarker.title;
+			   String subtitle = projItem.mapMarker.description;
+			   //System.out.println("***** subtitle: " +  subtitle + " and length: " + subtitle.length());
+
+			   int margin = 3;
+			   int dist2symbol = 20;
+			   
+			   int titleWidth  = ((int) textPainter.getTextWidth(title) + 2 * margin);
+			   int titleHeight = ((int) textPainter.getTextHeight(title) + 2 * margin);
+
+            int symbolWidth = markerSymbol.getBitmap().getWidth();
+
+            int subtitleWidth = 0;
+            int subtitleHeight = 0;
+            boolean hasSubtitle = false;
+			   if (subtitle.length()>1) {
+               if (subtitle.startsWith("#")){
+                  subtitle = subtitle.substring(1); // not the first # char
+                  subtitle = subtitle.split("\\R", 2)[0]; // only first line
+                  subtitleWidth  = ((int) textPainter.getTextWidth(subtitle)) + 2 * margin;
+                  subtitleHeight = ((int) textPainter.getTextHeight(subtitle)) + 2 * margin;
+                  hasSubtitle = true;
+               }
+			   }
+			   
+			   int xSize = java.lang.Math.max(titleWidth, subtitleWidth);
+			   xSize = java.lang.Math.max(xSize, symbolWidth);
+
+			   int ySize = titleHeight + symbolWidth + dist2symbol;
+
+			   Bitmap markerBitmap = CanvasAdapter.newBitmap(xSize, ySize, 0);
+			   org.oscim.backend.canvas.Canvas markerCanvas = CanvasAdapter.newCanvas();
+
+			   /*canvas.fillRectangle does not support a painter object
+			    * so i could not use transparent colors
+			    * as workaround i created a bitmap with the size of the box 
+			    * this box i filled totally with an oversized filled circle
+			    * (Canvas.drawCircle does support a painter object)
+			    * */
+
+			   Bitmap titleBitmap = CanvasAdapter.newBitmap( titleWidth + margin, titleHeight + margin, 0);
+			   org.oscim.backend.canvas.Canvas titleCanvas = CanvasAdapter.newCanvas();
+
+			   markerCanvas.setBitmap(markerBitmap);
+			   
+			   { // testing block
+			   /*
+			    * the following two lines displaying a transparent box.
+			    * only for testing purposes, normaly uncommented
+			    */
+			   //fillPainter.setColor(0x40ffffff);
+			   //markerCanvas.drawCircle(0, 0, xSize*2, fillPainter);
+			   }
+			   
+			   fillPainter.setColor(_bgColor);
+			   titleCanvas.setBitmap(titleBitmap);	
+
+			   //titleCanvas.fillRectangle(0, 0, xSize, textheight+5, _bgColor); //wont work with painter, so no transparency
+			   titleCanvas.drawCircle(0, 0, xSize*2, fillPainter);
+
+			   titleCanvas.drawText(title, margin, titleHeight - margin , textPainter);
+
+
+			   if (hasSubtitle) {
+	            Bitmap subtitleBitmap = CanvasAdapter.newBitmap( subtitleWidth + margin, subtitleHeight + margin, 0);
+	            org.oscim.backend.canvas.Canvas subtitleCanvas = CanvasAdapter.newCanvas();
+	            subtitleCanvas.setBitmap(subtitleBitmap); 
+	            subtitleCanvas.drawCircle(0, 0, xSize*2, fillPainter);
+	            subtitleCanvas.drawText(subtitle, margin, titleHeight - margin, textPainter);
+	            markerCanvas.drawBitmap(subtitleBitmap, xSize/2-(subtitleWidth/2), ySize - (subtitleHeight + margin));
+			   } else {
+			      ;
+			   }
+			   
+			   markerCanvas.drawBitmap(titleBitmap, xSize/2-(titleWidth/2), 0);
+			   markerCanvas.drawBitmap(markerSymbol.getBitmap(), xSize/2-(symbolWidth/2), ySize/2-(symbolWidth/2));
+
+			   //mapSymbol.set(projItem.mapX, projItem.mapY, markerSymbol.getBitmap(), markerSymbol.mBillboard);
+			   mapSymbol.set(projItem.mapX, projItem.mapY, markerBitmap, markerSymbol.mBillboard);
+			   mapSymbol.offset = markerSymbol.getHotspot();
+			   mapSymbol.billboard = markerSymbol.isBillboard();
 			}
 
 			_symbolBucket.pushSymbol(mapSymbol);
