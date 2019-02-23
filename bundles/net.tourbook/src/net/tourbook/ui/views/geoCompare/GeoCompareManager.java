@@ -229,6 +229,7 @@ public class GeoCompareManager {
          comparerItem.tourLastIndex = origEndIndex;
 
          comparerItem.tourTitle = tourData.getTourTitle();
+         comparerItem.tourType = tourData.getTourType();
       }
 
       final ZonedDateTime tourStartTime = tourData.getTourStartTime();

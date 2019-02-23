@@ -17,6 +17,9 @@ package net.tourbook.ui.views.geoCompare;
 
 import java.time.ZonedDateTime;
 
+import net.tourbook.common.UI;
+import net.tourbook.data.TourType;
+
 /**
  * Contains data for one comapred tour
  */
@@ -49,7 +52,11 @@ public class GeoPartComparerItem {
    ZonedDateTime  tourStartTime;
    long           tourStartTimeMS;
 
-   String         tourTitle;
+   /**
+    * Ensure title it is set for sorting
+    */
+   String         tourTitle    = UI.EMPTY_STRING;
+   TourType       tourType;
 
    public GeoPartComparerItem(final long tourId, final GeoPartItem geoPartItem) {
 

@@ -42,6 +42,8 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.NormalizedGeoData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
+import net.tourbook.data.TourType;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
@@ -51,6 +53,7 @@ import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.tourCatalog.ReferenceTourManager;
@@ -93,6 +96,7 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -1292,7 +1296,9 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       defineColumn_20_Time_TourStartDate();
       defineColumn_30_Motion_AvgSpeed();
       defineColumn_40_Body_AvgPulse();
-      defineColumn_50_Tour_Title();
+
+      defineColumn_50_Tour_Type();
+      defineColumn_52_Tour_Title();
 
 //		defineColumn_80_StartIndex();
 //		defineColumn_82_EndIndex();
@@ -1470,9 +1476,37 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    }
 
    /**
-    * column: tour title
+    * Column: Tour type image
     */
-   private void defineColumn_50_Tour_Title() {
+   private void defineColumn_50_Tour_Type() {
+
+      final ColumnDefinition colDef = TableColumnFactory.TOUR_TYPE.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourType tourType = ((GeoPartComparerItem) cell.getElement()).tourType;
+
+            if (tourType == null) {
+               cell.setImage(TourTypeImage.getTourTypeImage(TourDatabase.ENTITY_IS_NOT_SAVED));
+            } else {
+
+               final long tourTypeId = tourType.getTypeId();
+               final Image tourTypeImage = TourTypeImage.getTourTypeImage(tourTypeId);
+
+               cell.setImage(tourTypeImage);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Tour title
+    */
+   private void defineColumn_52_Tour_Title() {
 
       final ColumnDefinition colDef = TableColumnFactory.TOUR_TITLE.createColumn(_columnManager, _pc);
 
