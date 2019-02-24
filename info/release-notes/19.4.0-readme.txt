@@ -1,0 +1,18 @@
+Version 19.4.0                                         ?. February 2019
+
+
+New   
+===
+
+ 
+Improvements   
+============
+
+* Search Tour by Location
+ 
+  - Autoscroll map when mouse is near the map border
+
+ 
+Bugfix   
+======
+
