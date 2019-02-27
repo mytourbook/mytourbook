@@ -3517,8 +3517,6 @@ public class TourDatabase {
 
       try {
 
-         final String requestedKeyName = key.toUpperCase();
-
          /**
           * Finally found a solution here
           * https://github.com/splicemachine/spliceengine/blob/master/splice_machine/src/test/java/com/splicemachine/derby/impl/sql/catalog/SqlProcedureColsIT.java
@@ -3534,11 +3532,13 @@ public class TourDatabase {
          final Statement stmt = conn.createStatement();
          final ResultSet rs = stmt.executeQuery(sql);
 
+         final String keyUpper = key.toUpperCase();
+
          while (rs.next()) {
 
             final String dbKeyName = rs.getString("PK_NAME"); //$NON-NLS-1$
 
-            if (requestedKeyName.equals(dbKeyName.toUpperCase())) {
+            if (keyUpper.equals(dbKeyName.toUpperCase())) {
 
                return true;
             }
