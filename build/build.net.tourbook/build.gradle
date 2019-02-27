@@ -145,17 +145,8 @@ task mt_50_CreateExeFiles {
 		
 		def winInnoSetupDirName = _dirWinInnoSetup.absolutePath
 		
-		def win32SetupConfigFilename = file(winInnoSetupDirName + '/mytourbook-core-32-create-setup_exe.iss').absolutePath
 		def win64SetupConfigFilename = file(winInnoSetupDirName + '/mytourbook-core-64-create-setup_exe.iss').absolutePath
 		
-		exec {
-		
-			println '\twin 32'
-		
-			commandLine 'cmd', '/c', _pathInnoSetupCompilerApp
-			args		win32SetupConfigFilename
-		}
-
 		exec {
 		
 			println '\twin 64'
