@@ -1,19 +1,28 @@
-Version 19.3.0                                         ?. March 2019
+Version 19.3.0                                             1. March 2019
 
 
-32 Bit Platform is Dropped
-==========================
+32 Bit Platforms are dropped
+============================
 
-There was an issue that the pref dialog took veeeery long to open it with Linux. This problem is fixed in Eclipse 4.10 but 4.10 do support only 64 bit platform 
--> MyTourbook do now support only 64 bit platform
+Why ?
 
- 
-Improvements
+There was the problem that the preference dialog took a very long time 
+(minutes) to open it with Linux.
+
+This issue has been fixed in Eclipse 4.9. However, to use the latest 
+official version of Eclipse 4.10, this version is now used, but it only
+supports the 64 bit platforms
+
+-> MyTourbook now only support the 64 bit platforms
+
+
+Improvements   
 ============
 
 * Search Tour by Location
- 
-  - Scroll map when mouse is near the map border, this feature has issues when selecting a rectangle
+
+  - Scroll map when mouse is near the map border, this feature has 
+    issues when selecting a rectangle
 
  
 Bugfix   
@@ -21,15 +30,17 @@ Bugfix
 
 * Easy Import Dialog
 
-  - Dialog did not open after 1 item was created, this occured only with Linux
-  
+  - Dialog did not open after 1 item was created, this occured only with
+    Linux
 
+ 
 * System
 
-  - Fixed sql exception when primary key already exists, this was the reason why version 19.2 was removed
-  
-  
-System
+ - Fixed sql exception when primary key already exists, this was the
+   reason why version 19.2 was removed
+
+ 
+System   
 ======
 
-* Eclipse 4.10
+* Eclipse 4.10 64 bit
