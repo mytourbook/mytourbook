@@ -118,7 +118,6 @@ public class Map25DebugView extends ViewPart {
 	private void createUI(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory
 				.swtDefaults()//
 				.numColumns(2)

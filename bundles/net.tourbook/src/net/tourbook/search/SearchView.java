@@ -195,7 +195,6 @@ public class SearchView extends ViewPart implements ISearchView {
 	private void createUI(final Composite parent) {
 
 		_pageBook = new PageBook(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBook);
 
 		if (UI.IS_WIN) {
 

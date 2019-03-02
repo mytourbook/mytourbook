@@ -72,7 +72,7 @@ public class TourGeoFilterManager {
    public static final String                  STATE_RGB_GEO_PARTS_SELECTED         = "STATE_RGB_GEO_PARTS_SELECTED";           //$NON-NLS-1$
 
    public static final RGB                     STATE_RGB_GEO_PARTS_HOVER_DEFAULT    = new RGB(0x00, 0x81, 0xFF);
-   public static final RGB                     STATE_RGB_GEO_PARTS_SELECTED_DEFAULT = new RGB(0x95, 0xB4, 0x00);
+   public static final RGB                     STATE_RGB_GEO_PARTS_SELECTED_DEFAULT = new RGB(180, 255, 0);
 
    private static final String                 TOUR_FILTER_FILE_NAME                = "tour-geo-filter.xml";                    //$NON-NLS-1$
    private static final int                    TOUR_FILTER_VERSION                  = 1;
@@ -442,7 +442,7 @@ public class TourGeoFilterManager {
 
          xmlRoot = xmlWriteGeoFilter_10_Root();
 
-// This is currently disabled because loaded filters do not yet work         
+// This is currently disabled because loaded filters do not yet work
 
 //         if (_selectedFilter != null) {
 //            xmlRoot.putString(ATTR_ACTIVE_GEO_FILTER_ID, _selectedFilter.id);

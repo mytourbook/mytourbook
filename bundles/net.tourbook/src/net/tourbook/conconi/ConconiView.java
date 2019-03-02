@@ -627,7 +627,7 @@ public class ConconiView extends ViewPart {
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.fillDefaults().spacing(0, 0).numColumns(2).applyTo(container);
-		_page_ConconiTest.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//		_page_ConconiTest.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
 			createUI_30_Test(container);
 			createUI_40_ExtendedScaling(container);

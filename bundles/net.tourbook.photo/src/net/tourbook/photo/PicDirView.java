@@ -255,7 +255,6 @@ public class PicDirView extends ViewPart implements IPhotoEventListener {
 		_picDirFolder = new PicDirFolder(this, _picDirImages, _state);
 
 		final Composite masterDetailContainer = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(masterDetailContainer);
 		GridLayoutFactory.fillDefaults().applyTo(masterDetailContainer);
 		{
 			// file folder

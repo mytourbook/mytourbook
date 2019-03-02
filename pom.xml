@@ -10,7 +10,7 @@
    <name>MyTourbook App</name>
 
    <artifactId>mytourbook-app</artifactId>   <groupId>net.tourbook</groupId>
-                                             <version>19.2.0-SNAPSHOT</version>
+                                             <version>19.3.0-SNAPSHOT</version>
    <packaging>pom</packaging>
    
    <properties>
@@ -70,26 +70,28 @@
       
       -->
       
-      <!-- Eclipse 4.8 local repositories -->
+      <!-- Eclipse 4.10 local repositories downloaded from 
+         https://download.eclipse.org/eclipse/downloads/drops4/R-4.10-201812060815/ 
+      -->
    
       <repository>
-         <id>eclipse.platform.4.8</id>                                  <layout>p2</layout>
-         <url>jar:file:repositories/org.eclipse.platform-4.8.zip!/</url>
+         <id>eclipse.platform.4.10</id>                                  <layout>p2</layout>
+         <url>jar:file:repositories/org.eclipse.platform-4.10.zip!/</url>
       </repository>
    
       <repository>
-         <id>eclipse.rcp.4.8</id>                                       <layout>p2</layout>
-         <url>jar:file:repositories/org.eclipse.rcp-4.8.zip!/</url>
+         <id>eclipse.rcp.4.10</id>                                       <layout>p2</layout>
+         <url>jar:file:repositories/org.eclipse.rcp-4.10.zip!/</url>
       </repository>
    
       <repository>
-         <id>eclipse.jdt.4.8</id>                                       <layout>p2</layout>
-         <url>jar:file:repositories/org.eclipse.jdt-4.8.zip!/</url>
+         <id>eclipse.jdt.4.10</id>                                       <layout>p2</layout>
+         <url>jar:file:repositories/org.eclipse.jdt-4.10.zip!/</url>
       </repository>
    
       <repository>
-         <id>eclipse.pde.4.8</id>                                       <layout>p2</layout>
-         <url>jar:file:repositories/org.eclipse.pde-4.8.zip!/</url>
+         <id>eclipse.pde.4.10</id>                                       <layout>p2</layout>
+         <url>jar:file:repositories/org.eclipse.pde-4.10.zip!/</url>
       </repository>
 
       
@@ -162,11 +164,9 @@
             <configuration>
                <resolver>p2</resolver>
                <environments>
-                  <environment>   <os>linux</os>      <ws>gtk</ws>      <arch>x86</arch>         </environment>
-                  <environment>   <os>linux</os>      <ws>gtk</ws>      <arch>x86_64</arch>      </environment>
-                  <environment>   <os>win32</os>      <ws>win32</ws>    <arch>x86</arch>         </environment>
-                  <environment>   <os>win32</os>      <ws>win32</ws>    <arch>x86_64</arch>      </environment>
 
+                  <environment>   <os>linux</os>      <ws>gtk</ws>      <arch>x86_64</arch>      </environment>
+                  <environment>   <os>win32</os>      <ws>win32</ws>    <arch>x86_64</arch>      </environment>
                   <environment>   <os>macosx</os>   <ws>cocoa</ws>      <arch>x86_64</arch>      </environment>
 
                </environments>

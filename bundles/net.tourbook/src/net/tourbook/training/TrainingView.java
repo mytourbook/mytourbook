@@ -423,7 +423,6 @@ public class TrainingView extends ViewPart {
 		initUI(parent);
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
 		GridLayoutFactory.fillDefaults()//
 				.spacing(0, 0)
 				.applyTo(container);

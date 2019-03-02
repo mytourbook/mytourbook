@@ -417,7 +417,6 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 	private void createUI(final Composite parent) {
 
 		_pageBook = new PageBook(parent, SWT.NONE);
-		_pageBook.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		_pageNoData = net.tourbook.common.UI.createUI_PageNoData(_pageBook, Messages.UI_Label_no_chart_is_selected);
 

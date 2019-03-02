@@ -327,7 +327,7 @@ class HistoryItems {
 	private String[] reverseHistory(final LinkedHashSet<String> folderHistory) {
 
 		final String[] folterItems = folderHistory.toArray(new String[folderHistory.size()]);
-		final String[] reversedArray = (String[]) Util.arrayReverse(folterItems);
+		final String[] reversedArray = Util.arrayReverse(folterItems);
 
 		return reversedArray;
 	}

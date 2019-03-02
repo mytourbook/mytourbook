@@ -8,12 +8,12 @@
    <modelVersion>4.0.0</modelVersion>
 
    <artifactId>mytourbook-bundles</artifactId>     <groupId>net.tourbook</groupId>
-                                                   <version>19.2.0-SNAPSHOT</version>
+                                                   <version>19.3.0-SNAPSHOT</version>
    <packaging>pom</packaging>
 
    <parent>
       <artifactId>mytourbook-app</artifactId>      <groupId>net.tourbook</groupId>
-                                                   <version>19.2.0-SNAPSHOT</version>
+                                                   <version>19.3.0-SNAPSHOT</version>
 
       <relativePath>../../MT/mytourbook/pom.xml</relativePath>
    </parent>
@@ -40,10 +40,8 @@
       <module>net.tourbook.ext.geoclipse</module>
       <module>net.tourbook.ext.jars</module>
       <module>net.tourbook.ext.jars.printing</module>
-      <module>net.tourbook.ext.rxtx.linux32_2.2</module>
       <module>net.tourbook.ext.rxtx.linux64_2.2</module>
       <module>net.tourbook.ext.rxtx.macosx_2.2</module>
-      <module>net.tourbook.ext.rxtx.win32_2.2</module>
       <module>net.tourbook.ext.rxtx.win64_2.2</module>
       <module>net.tourbook.ext.rxtx_2.2</module>
       <module>net.tourbook.ext.velocity</module>
@@ -51,10 +49,8 @@
       <module>net.tourbook.ext.vtm.linux</module>
       <module>net.tourbook.ext.vtm.macosx</module>
       <module>net.tourbook.ext.vtm.windows</module>
-      <module>net.tourbook.ext.worldwind.linux32_2.0</module>
       <module>net.tourbook.ext.worldwind.linux64_2.0</module>
       <module>net.tourbook.ext.worldwind.macosx_2.0</module>
-      <module>net.tourbook.ext.worldwind.win32_2.0</module>
       <module>net.tourbook.ext.worldwind.win64_2.0</module>
       <module>net.tourbook.ext.worldwind_2.0</module>
 

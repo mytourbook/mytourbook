@@ -384,7 +384,6 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 		});
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
 		GridLayoutFactory
 				.fillDefaults()//
 				.numColumns(1)

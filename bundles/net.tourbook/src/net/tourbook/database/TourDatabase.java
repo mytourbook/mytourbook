@@ -104,7 +104,7 @@ public class TourDatabase {
     * version for the database which is required that the tourbook application works successfully
     */
    private static final int TOURBOOK_DB_VERSION = 37;
-//   private static final int TOURBOOK_DB_VERSION = 36; // 19.2
+//   private static final int TOURBOOK_DB_VERSION = 37; // 19.2
 //   private static final int TOURBOOK_DB_VERSION = 36; // 18.12
 //   private static final int TOURBOOK_DB_VERSION = 35; // 18.7
 //   private static final int TOURBOOK_DB_VERSION = 34; // 18.5
@@ -3513,6 +3513,46 @@ public class TourDatabase {
       return false;
    }
 
+   private boolean isPrimaryKeyAvailable(final Connection conn, final String table, final String key) {
+
+      try {
+
+         /**
+          * Finally found a solution here
+          * https://github.com/splicemachine/spliceengine/blob/master/splice_machine/src/test/java/com/splicemachine/derby/impl/sql/catalog/SqlProcedureColsIT.java
+          * to get the primary keys
+          */
+
+         /**
+          * Table MUST be UPPERCASE, otherwise it is not working !!!
+          */
+         final String tableUpper = table.toUpperCase();
+         final String sql = "CALL SYSIBM.SQLPRIMARYKEYS(NULL, NULL, '" + tableUpper + "', NULL)"; //$NON-NLS-1$ //$NON-NLS-2$
+
+         final Statement stmt = conn.createStatement();
+         final ResultSet rs = stmt.executeQuery(sql);
+
+         final String keyUpper = key.toUpperCase();
+
+         while (rs.next()) {
+
+            final String dbKeyName = rs.getString("PK_NAME"); //$NON-NLS-1$
+
+            if (keyUpper.equals(dbKeyName.toUpperCase())) {
+
+               return true;
+            }
+         }
+
+         stmt.close();
+
+      } catch (final SQLException e) {
+         UI.showSQLException(e);
+      }
+
+      return false;
+   }
+
    private boolean isTableAvailable(final Connection conn, final String table) {
 
       try {
@@ -6475,7 +6515,7 @@ public class TourDatabase {
                final float timeDiff = currentTime - lastUpdateTime;
 
                // reduce logging
-               if (timeDiff > 100) {
+               if (timeDiff > 500) {
 
                   lastUpdateTime = currentTime;
 
@@ -6590,7 +6630,7 @@ public class TourDatabase {
                final float timeDiff = currentTime - lastUpdateTime;
 
                // reduce logging
-               if (timeDiff > 200) {
+               if (timeDiff > 500) {
 
                   lastUpdateTime = currentTime;
 
@@ -6745,12 +6785,16 @@ public class TourDatabase {
          // check if db is available
          if (isTableAvailable(conn, TABLE_TOUR_GEO_PARTS)) {
 
-            final String sql = ""//                                                          //$NON-NLS-1$
+            // check if db already contains the constraint
+            if (isPrimaryKeyAvailable(conn, TABLE_TOUR_GEO_PARTS, "PK_TourId_GeoPart") == false) { //$NON-NLS-1$
 
-                  + "ALTER TABLE " + TABLE_TOUR_GEO_PARTS //                                 //$NON-NLS-1$
-                  + "   ADD CONSTRAINT PK_TourId_GeoPart PRIMARY KEY (TourId, GeoPart)"; //  //$NON-NLS-1$
+               final String sql = ""//                                                          //$NON-NLS-1$
 
-            exec(stmt, sql);
+                     + "ALTER TABLE " + TABLE_TOUR_GEO_PARTS //                                 //$NON-NLS-1$
+                     + "   ADD CONSTRAINT PK_TourId_GeoPart PRIMARY KEY (TourId, GeoPart)"; //  //$NON-NLS-1$
+
+               exec(stmt, sql);
+            }
          }
       }
       stmt.close();
