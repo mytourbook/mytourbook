@@ -714,16 +714,18 @@ public abstract class ToolTip {
 
 	private void toolTipHide(final Shell tip, final Event event) {
 
-		if (control != null && !control.isDisposed() && tip != null && !tip.isDisposed() && shouldHideToolTip(event)) {
+      if (control != null && !control.isDisposed()) {
+         control.getShell().removeListener(SWT.Deactivate, shellListener);
+      }
 
-			control.getShell().removeListener(SWT.Deactivate, shellListener);
+      if (tip != null && !tip.isDisposed() && shouldHideToolTip(event)) {
 
-			currentArea = null;
-			passOnEvent(tip, event);
-			tip.dispose();
-			CURRENT_TOOLTIP = null;
-			afterHideToolTip(event);
-		}
+         currentArea = null;
+         passOnEvent(tip, event);
+         tip.dispose();
+         CURRENT_TOOLTIP = null;
+         afterHideToolTip(event);
+      }
 	}
 
 	private void toolTipHookBothRecursively(final Control c) {
