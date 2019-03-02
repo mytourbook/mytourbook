@@ -40,12 +40,11 @@ public class Map2DebugView extends ViewPart {
 
    private Scale              _scaleDimMap;
 
-   private void createLayout(final Composite parent) {
+   private void createUI(final Composite parent) {
 
       Label label;
 
       final Composite infoContainer = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(infoContainer);
       GridLayoutFactory.swtDefaults().numColumns(2).applyTo(infoContainer);
       {
          /*
@@ -111,7 +110,7 @@ public class Map2DebugView extends ViewPart {
    @Override
    public void createPartControl(final Composite parent) {
 
-      createLayout(parent);
+      createUI(parent);
 
       restoreSettings();
    }

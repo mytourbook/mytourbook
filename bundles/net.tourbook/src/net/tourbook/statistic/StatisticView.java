@@ -375,8 +375,6 @@ public class StatisticView extends ViewPart implements ITourProvider {
 //		GridLayoutFactory.fillDefaults().applyTo(parent);
 
 		_statContainer = new Composite(parent, SWT.NONE);
-
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(_statContainer);
 		GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(_statContainer);
 		{
 			createUI_10_Toolbar(_statContainer);

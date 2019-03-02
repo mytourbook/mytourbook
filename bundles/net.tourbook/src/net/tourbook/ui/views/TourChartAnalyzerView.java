@@ -295,7 +295,6 @@ public class TourChartAnalyzerView extends ViewPart {
 		_partContainer = parent;
 
 		_pageBook = new PageBook(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBook);
 
 		_pageNoData = UI.createUI_PageNoData(_pageBook, Messages.TourAnalyzer_Label_NoTourOrChart);
 

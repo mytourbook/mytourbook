@@ -2213,7 +2213,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private void createUI(final Composite parent) {
 
       _topPageBook = new PageBook(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(_topPageBook);
 
       _topPage_OldUI = createUI_05_Page_OldUI(_topPageBook);
       _topPage_Startup = createUI_10_Page_Startup(_topPageBook);
