@@ -482,7 +482,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
       public ActionSearchTourByLocation() {
 
          setText(Messages.Map_Action_SearchTourByLocation);
-
          setImageDescriptor(TourbookPlugin.getImageDescriptor(IMAGE_SEARCH_TOURS_BY_LOCATION));
       }
 
