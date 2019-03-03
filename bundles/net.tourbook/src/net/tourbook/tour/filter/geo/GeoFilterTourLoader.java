@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.tour.filter.geo;
 
-import de.byteholder.geoclipse.map.MapGridBoxItem;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -38,6 +36,8 @@ import net.tourbook.ui.SQLFilter;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.graphics.Point;
+
+import de.byteholder.geoclipse.map.MapGridBoxItem;
 
 public class GeoFilterTourLoader {
 
@@ -106,14 +106,19 @@ public class GeoFilterTourLoader {
          public void run() {
 
             // get last added loader item
-            final GeoFilterLoaderItem loaderItem = _loaderWaitingQueue.pollFirst();
+            final GeoFilterLoaderItem geoLoaderData = _loaderWaitingQueue.pollFirst();
 
-            if (loaderItem == null) {
+            if (geoLoaderData == null) {
                return;
             }
 
-            if (loadToursFromGeoParts_FromDB(loaderItem)) {
-               map2View.geoFilter_20_Result(loaderItem);
+            // show loading state
+            geoLoaderData.mapGridBoxItem.gridBoxText = "Loading...";
+            map2View.redrawMap();
+
+
+            if (loadToursFromGeoParts_FromDB(geoLoaderData)) {
+               map2View.geoFilter_20_Result(geoLoaderData);
             }
          }
       };
@@ -123,9 +128,9 @@ public class GeoFilterTourLoader {
       return loaderItem;
    }
 
-   private static boolean loadToursFromGeoParts_FromDB(final GeoFilterLoaderItem loaderItem) {
+   private static boolean loadToursFromGeoParts_FromDB(final GeoFilterLoaderItem geoLoaderData) {
 
-      if (loaderItem.isCanceled) {
+      if (geoLoaderData.isCanceled) {
          return false;
       }
 
@@ -146,11 +151,11 @@ public class GeoFilterTourLoader {
       // x: longitude
       // y: latitude
 
-      final int normalizedLat1 = loaderItem.topLeftE2.y + TourData.NORMALIZED_LATITUDE_OFFSET_E2;
-      final int normalizedLat2 = loaderItem.bottomRightE2.y + TourData.NORMALIZED_LATITUDE_OFFSET_E2;
+      final int normalizedLat1 = geoLoaderData.topLeftE2.y + TourData.NORMALIZED_LATITUDE_OFFSET_E2;
+      final int normalizedLat2 = geoLoaderData.bottomRightE2.y + TourData.NORMALIZED_LATITUDE_OFFSET_E2;
 
-      final int normalizedLon1 = loaderItem.topLeftE2.x + TourData.NORMALIZED_LONGITUDE_OFFSET_E2;
-      final int normalizedLon2 = loaderItem.bottomRightE2.x + TourData.NORMALIZED_LONGITUDE_OFFSET_E2;
+      final int normalizedLon1 = geoLoaderData.topLeftE2.x + TourData.NORMALIZED_LONGITUDE_OFFSET_E2;
+      final int normalizedLon2 = geoLoaderData.bottomRightE2.x + TourData.NORMALIZED_LONGITUDE_OFFSET_E2;
 
       final double gridSize_E2 = 1; // 0.01°
 
@@ -253,7 +258,7 @@ public class GeoFilterTourLoader {
 
          while (result.next()) {
 
-            if (loaderItem.isCanceled) {
+            if (geoLoaderData.isCanceled) {
                return false;
             }
 
@@ -271,13 +276,13 @@ public class GeoFilterTourLoader {
       }
 
       final long timeDiff = System.currentTimeMillis() - start;
-      loaderItem.sqlRunningTime = timeDiff;
+      geoLoaderData.sqlRunningTime = timeDiff;
 
       final String timeInMs = timeDiff > 50 ? " - " + Long.toString(timeDiff) + " ms" : "";
 
-      loaderItem.mapGridBoxItem.gridBoxText = "Tours: " + Integer.toString(allTourIds.size()) + timeInMs;
+      geoLoaderData.mapGridBoxItem.gridBoxText = "Tours: " + Integer.toString(allTourIds.size()) + timeInMs;
 
-      loaderItem.allLoadedTourIds = allTourIds;
+      geoLoaderData.allLoadedTourIds = allTourIds;
 
 //      System.out.println(""
 ////            (UI.timeStampNano() + " [" + GeoFilterTourLoader.class.getSimpleName() + "] ")

@@ -3204,6 +3204,23 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
    }
 
+   public void redrawMap() {
+
+      Display.getDefault().asyncExec(new Runnable() {
+         @Override
+         public void run() {
+
+            if (_parent.isDisposed()) {
+               return;
+            }
+
+//            _map.paint();
+            _map.redraw();
+
+         }
+      });
+   }
+
    private void resetMap() {
 
       if (_allTourData.size() == 0) {
