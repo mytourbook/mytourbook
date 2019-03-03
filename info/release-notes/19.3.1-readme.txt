@@ -4,12 +4,20 @@ Version 19.3.1                                             3. March 2019
 Bugfix   
 ======
 
-* Fixed ClassCastException in
+* Fixed ClassCastException in the Views
 
-  - Photo View
-  - Tour Photos View
-  - Training View
-  
-  - This exception occured in views which where not modified for months or years. 
-  - The problem was, that invalid data were set in the parent UI control of the view and it seems, that Eclipse 4.9/10 have changed their code which revealed it.
-  - Found the same problem in 17 other views but there was no error because a custom toolbar is not displayed which caused the exception
+  - Photos
+  - Tour Photos
+  - Training
+
+ 
+  - This exception occured in views which where not modified for months 
+    or years
+    
+  - The problem was, that invalid data were set in the parent UI control
+    of the view and it seems, that Eclipse 4.9 or 4.10 have changed 
+    their code which revealed it
+    
+  - The same problematic code was found in 17 other views but there was 
+    no error because a custom toolbar is not yet displayed, this caused 
+    the exception
