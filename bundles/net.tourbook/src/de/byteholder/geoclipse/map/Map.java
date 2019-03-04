@@ -414,10 +414,10 @@ public class Map extends Canvas {
    private int                                      _tilePixelSize;
 
    /**
-    * Size of a geo grid 0.01 degree in pixel
+    * Size of a geo grid of 0.01 degree in pixel
     */
-   private double                                   _geoGridPixelSizeX;
-   private double                                   _geoGridPixelSizeY;
+   private double                                   _devGridPixelSize_X;
+   private double                                   _devGridPixelSize_Y;
 
    /**
     * Contains the client area of the map without trimmings, this rectangle has the width and height
@@ -668,10 +668,12 @@ public class Map extends Canvas {
 
       _grid_GridBoxItem_Hovered = new MapGridBoxItem();
 
-      // set initial mouse move position from the current mouse position
-      _grid_GridBoxItem_Hovered.worldMouse_Move = new Point(
+      final Point worldMouse_Move = new Point(
             _worldPixelTopLeftViewport.x + _mouseMovePositionX,
             _worldPixelTopLeftViewport.y + _mouseMovePositionY);
+
+      // set initial mouse move position from the current mouse position
+      _grid_GridBoxItem_Hovered.worldMouse_Move = worldMouse_Move;
 
       _grid_GridBoxItem_Hovered.gridBoxSizeMuliplier = Util.getStateInt(TourGeoFilterManager.getState(),
             TourGeoFilterManager.STATE_GRID_BOX_SIZE,
@@ -1098,6 +1100,7 @@ public class Map extends Canvas {
       final GeoPosition geoCenter = getMapGeoCenter();
 
       for (final Object listener : listeners) {
+
          ((IMapGridListener) listener).onMapGrid(
                _grid_SelectedPosition_Geo_1_E2,
                _grid_SelectedPosition_Geo_2_E2,
@@ -1413,6 +1416,260 @@ public class Map extends Canvas {
       setZoom(zoom);
 
       return zoom;
+   }
+
+   private GridRaster grid_CreateGridRaster(final Point worldStart, final Point worldEnd) {
+
+      final int worldStartX = worldStart.x;
+      final int worldStartY = worldStart.y;
+      final int worldEndX = worldEnd.x;
+      final int worldEndY = worldEnd.y;
+
+      // XY1: top/left
+      final int world_X1 = Math.min(worldStartX, worldEndX);
+      final int world_Y1 = Math.min(worldStartY, worldEndY);
+
+      // XY2: bottom/right
+      final int world_X2 = Math.max(worldStartX, worldEndX);
+      final int world_Y2 = Math.max(worldStartY, worldEndY);
+
+      final Point2D.Double worldPixel_1 = new Point2D.Double(world_X1, world_Y1);
+      final Point2D.Double worldPixel_2 = new Point2D.Double(world_X2, world_Y2);
+
+      final GeoPosition selectedPosition_Geo_1 = _mp.pixelToGeo(worldPixel_1, _mapZoomLevel);
+      final GeoPosition selectedPosition_Geo_2 = _mp.pixelToGeo(worldPixel_2, _mapZoomLevel);
+
+      final double geoLat1 = selectedPosition_Geo_1.latitude;
+      final double geoLon1 = selectedPosition_Geo_1.longitude;
+
+      final double geoLat2 = selectedPosition_Geo_2.latitude;
+      final double geoLon2 = selectedPosition_Geo_2.longitude;
+
+      // set lat/lon to a grid of 0.01°
+      int geoGrid_Lat1_E2 = (int) (geoLat1 * 100);
+      int geoGrid_Lon1_E2 = (int) (geoLon1 * 100);
+
+      int geoGrid_Lat2_E2 = (int) (geoLat2 * 100);
+      int geoGrid_Lon2_E2 = (int) (geoLon2 * 100);
+
+      final Point devGeoGrid_1 = offline_GetDevGeoGridPosition(world_X1, world_Y1);
+      final Point devGeoGrid_2 = offline_GetDevGeoGridPosition(world_X2, world_Y2);
+
+      int devGrid_X1 = devGeoGrid_1.x;
+      int devGrid_Y1 = devGeoGrid_1.y;
+
+      int devGrid_X2 = devGeoGrid_2.x;
+      int devGrid_Y2 = devGeoGrid_2.y;
+
+      final int geoGridPixelSizeX = (int) _devGridPixelSize_X;
+      final int geoGridPixelSizeY = (int) _devGridPixelSize_Y;
+
+      final int gridSize_E2 = 1;
+
+      /**
+       * Adjust lat/lon +/-, this algorithm is created with many many many try and error
+       */
+      if (geoLat1 > 0 && geoLon1 > 0 && geoLat2 > 0 && geoLon2 > 0) {
+
+         // 1: + / +
+         // 2: + / +
+
+         //     |
+         //     | xx
+         // ---------
+         //     |
+         //     |
+
+         devGrid_X2 += geoGridPixelSizeX;
+         devGrid_Y2 += geoGridPixelSizeY;
+
+         geoGrid_Lon2_E2 += gridSize_E2; // X1
+         geoGrid_Lat1_E2 += gridSize_E2; // Y1
+
+      } else if (geoLat1 > 0 && geoLon1 > 0 && geoLat2 < 0 && geoLon2 > 0) {
+
+         // 1: + / +
+         // 2: - / +
+
+         //     |
+         //     | xx
+         // ------xx-
+         //     | xx
+         //     |
+
+         devGrid_X2 += geoGridPixelSizeX;
+         devGrid_Y2 += geoGridPixelSizeY * 2;
+
+         geoGrid_Lon2_E2 += gridSize_E2; // X2
+
+         geoGrid_Lat1_E2 += gridSize_E2; // Y1
+         geoGrid_Lat2_E2 -= gridSize_E2; // Y2
+
+      } else if (geoLat1 < 0 && geoLon1 > 0 && geoLat2 < 0 && geoLon2 > 0) {
+
+         // 1: - / +
+         // 2: - / +
+
+         //     |
+         //     |
+         // ---------
+         //     | xx
+         //     |
+
+         devGrid_X2 += geoGridPixelSizeX;
+         devGrid_Y1 += geoGridPixelSizeY;
+         devGrid_Y2 += geoGridPixelSizeY * 2;
+
+         geoGrid_Lon2_E2 += gridSize_E2; // X2
+         geoGrid_Lat2_E2 -= gridSize_E2; // Y2
+
+      } else if (geoLat1 > 0 && geoLon1 < 0 && geoLat2 > 0 && geoLon2 < 0) {
+
+         // 1: + / -
+         // 2: + / -
+
+         //     |
+         //  xx |
+         // ---------
+         //     |
+         //     |
+
+         devGrid_X1 -= geoGridPixelSizeX;
+         devGrid_Y2 += geoGridPixelSizeY;
+
+         geoGrid_Lon1_E2 -= gridSize_E2; // X1
+         geoGrid_Lat1_E2 += gridSize_E2; // Y1
+
+      } else if (geoLat1 > 0 && geoLon1 < 0 && geoLat2 < 0 && geoLon2 < 0) {
+
+         // 1: + / -
+         // 2: - / -
+
+         //     |
+         //  xx |
+         // -xx------
+         //  xx |
+         //     |
+
+         devGrid_X1 -= geoGridPixelSizeX;
+         devGrid_Y2 += geoGridPixelSizeY * 2;
+
+         geoGrid_Lon1_E2 -= gridSize_E2; // X1
+         geoGrid_Lat1_E2 += gridSize_E2; // Y1
+
+         geoGrid_Lat2_E2 -= gridSize_E2; // Y2
+
+      } else if (geoLat1 < 0 && geoLon1 < 0 && geoLat2 < 0 && geoLon2 < 0) {
+
+         // 1: - / -
+         // 2: - / -
+
+         //     |
+         //     |
+         // ---------
+         //  xx |
+         //     |
+
+         devGrid_X1 -= geoGridPixelSizeX;
+         devGrid_Y1 += geoGridPixelSizeY;
+
+         devGrid_Y2 += geoGridPixelSizeY * 2;
+
+         geoGrid_Lon1_E2 -= gridSize_E2; // X1
+         geoGrid_Lat2_E2 -= gridSize_E2; // Y2
+
+      } else if (geoLat1 > 0 && geoLon1 < 0 && geoLat2 > 0 && geoLon2 > 0) {
+
+         // 1: + / -
+         // 2: + / +
+
+         //     |
+         //   xxxxx
+         // ---------
+         //     |
+         //     |
+
+         devGrid_X1 -= geoGridPixelSizeX;
+         devGrid_Y2 += geoGridPixelSizeY;
+
+         devGrid_X2 += geoGridPixelSizeX;
+
+         geoGrid_Lon1_E2 -= gridSize_E2; // X1
+         geoGrid_Lat1_E2 += gridSize_E2; // Y1
+
+         geoGrid_Lon2_E2 += gridSize_E2; // X2
+
+      } else if (geoLat1 < 0 && geoLon1 < 0 && geoLat2 < 0 && geoLon2 > 0) {
+
+         // 1: - / -
+         // 2: - / +
+
+         //     |
+         //     |
+         // ---------
+         //   xxxxx
+         //     |
+
+         devGrid_X1 -= geoGridPixelSizeX;
+         devGrid_Y1 += geoGridPixelSizeY;
+
+         devGrid_X2 += geoGridPixelSizeX;
+         devGrid_Y2 += geoGridPixelSizeY * 2;
+
+         geoGrid_Lon1_E2 -= gridSize_E2; // X1
+
+         geoGrid_Lon2_E2 += gridSize_E2; // X2
+         geoGrid_Lat2_E2 -= gridSize_E2; // Y2
+
+      } else if (geoLat1 > 0 && geoLon1 < 0 && geoLat2 < 0 && geoLon2 > 0) {
+
+         // 1: + / -
+         // 2: - / +
+
+         //     |
+         //   xxxxx
+         // --xxxxx--
+         //   xxxxx
+         //     |
+
+         devGrid_X1 -= geoGridPixelSizeX;
+
+         devGrid_X2 += geoGridPixelSizeX;
+         devGrid_Y2 += geoGridPixelSizeY * 2;
+
+         geoGrid_Lon1_E2 -= gridSize_E2; // X1
+         geoGrid_Lat1_E2 += gridSize_E2; // Y1
+
+         geoGrid_Lon2_E2 += gridSize_E2; // X2
+         geoGrid_Lat2_E2 -= gridSize_E2; // Y2
+      }
+
+      int devWidth = devGrid_X2 - devGrid_X1;
+      int devHeight = devGrid_Y2 - devGrid_Y1;
+
+      // ensure it is always visible
+      devWidth = Math.max(1, devWidth);
+      devHeight = Math.max(1, devHeight);
+
+      final GridRaster gridRaster = new GridRaster();
+
+      gridRaster.devGrid_X1 = devGrid_X1;
+      gridRaster.devGrid_Y1 = devGrid_Y1;
+
+      gridRaster.devWidth = devWidth;
+      gridRaster.devHeight = devHeight;
+
+      gridRaster.numWidth = (int) (devWidth / _devGridPixelSize_X + 0.5);
+      gridRaster.numHeight = (int) (devHeight / _devGridPixelSize_Y + 0.5);
+
+      gridRaster.geoGrid_Lon1_E2 = geoGrid_Lon1_E2; // X1
+      gridRaster.geoGrid_Lat1_E2 = geoGrid_Lat1_E2; // Y1
+
+      gridRaster.geoGrid_Lon2_E2 = geoGrid_Lon2_E2; // X2
+      gridRaster.geoGrid_Lat2_E2 = geoGrid_Lat2_E2; // Y2
+
+      return gridRaster;
+
    }
 
    /**
@@ -1790,7 +2047,7 @@ public class Map extends Canvas {
        * Adjust Y that X and Y are at the top/left position otherwise Y is at the bottom/left
        * position
        */
-      gridGeoPos.y -= _geoGridPixelSizeY;
+      gridGeoPos.y -= _devGridPixelSize_Y;
 
       return gridGeoPos;
    }
@@ -2097,10 +2354,11 @@ public class Map extends Canvas {
 
       final int worldMouseX = _worldPixelTopLeftViewport.x + _mouseMovePositionX;
       final int worldMouseY = _worldPixelTopLeftViewport.y + _mouseMovePositionY;
+      final Point worldMouse_Move = new Point(worldMouseX, worldMouseY);
 
       if (_offline_IsSelectingOfflineArea) {
 
-         _offline_WorldMouse_Move = new Point(worldMouseX, worldMouseY);
+         _offline_WorldMouse_Move = worldMouse_Move;
 
          offline_UpdateOfflineAreaEndPosition(mouseEvent);
 
@@ -2112,7 +2370,7 @@ public class Map extends Canvas {
 
       } else if (_grid_GridBoxItem_Hovered != null) {
 
-         _grid_GridBoxItem_Hovered.worldMouse_Move = new Point(worldMouseX, worldMouseY);
+         _grid_GridBoxItem_Hovered.worldMouse_Move = worldMouse_Move;
 
          final Point mouseBorderPosition = grid_GetMouseBorderPosition();
          if (mouseBorderPosition != null) {
@@ -2638,8 +2896,8 @@ public class Map extends Canvas {
 
    private void paint_Debug_GeoGrid(final GC gc) {
 
-      final double geoGridPixelSizeX = _geoGridPixelSizeX;
-      final double geoGridPixelSizeY = _geoGridPixelSizeY;
+      final double geoGridPixelSizeX = _devGridPixelSize_X;
+      final double geoGridPixelSizeY = _devGridPixelSize_Y;
 
       double geoGridPixelSizeXAdjusted = geoGridPixelSizeX;
       double geoGridPixelSizeYAdjusted = geoGridPixelSizeY;
@@ -2711,12 +2969,15 @@ public class Map extends Canvas {
        */
       paint_GridBox_70_Info_LatLon(gc, gridBoxItem);
 
-      // check if mouse button is hit which sets the start position
-      if ((gridBoxItem.dev_Start == null)) {
+      // check if mouse button is hit, this sets the start position
+      if (gridBoxItem.dev_Start == null) {
+
+         // continue just hovering
 
          final Point topLeft = paint_GridBox_50_Rectangle(gc,
                gridBoxItem.worldMouse_Move,
                gridBoxItem.worldMouse_Move,
+               gridBoxItem,
                false);
 
          paint_GridBox_80_Info_Box(gc, gridBoxItem, topLeft);
@@ -2764,6 +3025,7 @@ public class Map extends Canvas {
       final Point topLeft = paint_GridBox_50_Rectangle(gc,
             gridBoxItem.world_Start,
             gridBoxItem.world_End,
+            gridBoxItem,
             false);
 
       paint_GridBox_80_Info_Box(gc, gridBoxItem, topLeft);
@@ -2786,6 +3048,7 @@ public class Map extends Canvas {
       final Point topLeft = paint_GridBox_50_Rectangle(gc,
             gridBoxItem.world_Start,
             gridBoxItem.world_End,
+            gridBoxItem,
             true);
 
       paint_GridBox_80_Info_Box(gc, gridBoxItem, topLeft);
@@ -2797,6 +3060,8 @@ public class Map extends Canvas {
     * @param gc
     * @param worldStart
     * @param worldEnd
+    * @param gridBoxItem
+    * @param gridRaster
     * @param isPaintLastGridSelection
     *           When <code>true</code>, the last selected grid is painted, otherwise the currently
     *           selecting grid
@@ -2805,244 +3070,18 @@ public class Map extends Canvas {
    private Point paint_GridBox_50_Rectangle(final GC gc,
                                             final Point worldStart,
                                             final Point worldEnd,
+                                            final MapGridBoxItem gridBoxItem,
                                             final boolean isPaintLastGridSelection) {
 
-      final int worldStartX = worldStart.x;
-      final int worldStartY = worldStart.y;
-      final int worldEndX = worldEnd.x;
-      final int worldEndY = worldEnd.y;
+      final GridRaster gridRaster = grid_CreateGridRaster(worldStart, worldEnd);
 
-      // XY1: top/left
-      final int world_X1 = Math.min(worldStartX, worldEndX);
-      final int world_Y1 = Math.min(worldStartY, worldEndY);
-
-      // XY2: bottom/right
-      final int world_X2 = Math.max(worldStartX, worldEndX);
-      final int world_Y2 = Math.max(worldStartY, worldEndY);
-
-      final Point2D.Double worldPixel_1 = new Point2D.Double(world_X1, world_Y1);
-      final Point2D.Double worldPixel_2 = new Point2D.Double(world_X2, world_Y2);
-
-      final GeoPosition selectedPosition_Geo_1 = _mp.pixelToGeo(worldPixel_1, _mapZoomLevel);
-      final GeoPosition selectedPosition_Geo_2 = _mp.pixelToGeo(worldPixel_2, _mapZoomLevel);
-
-      final double geoLat1 = selectedPosition_Geo_1.latitude;
-      final double geoLon1 = selectedPosition_Geo_1.longitude;
-
-      final double geoLat2 = selectedPosition_Geo_2.latitude;
-      final double geoLon2 = selectedPosition_Geo_2.longitude;
-
-      // set lat/lon to a grid of 0.01°
-      int geoGrid_Lat1_E2 = (int) (geoLat1 * 100);
-      int geoGrid_Lon1_E2 = (int) (geoLon1 * 100);
-
-      int geoGrid_Lat2_E2 = (int) (geoLat2 * 100);
-      int geoGrid_Lon2_E2 = (int) (geoLon2 * 100);
-
-      final Point devGeoGrid_1 = offline_GetDevGeoGridPosition(world_X1, world_Y1);
-      final Point devGeoGrid_2 = offline_GetDevGeoGridPosition(world_X2, world_Y2);
-
-      int devGrid_X1 = devGeoGrid_1.x;
-      int devGrid_Y1 = devGeoGrid_1.y;
-
-      int devGrid_X2 = devGeoGrid_2.x;
-      int devGrid_Y2 = devGeoGrid_2.y;
-
-      final int geoGridPixelSizeX = (int) _geoGridPixelSizeX;
-      final int geoGridPixelSizeY = (int) _geoGridPixelSizeY;
-
-      final int gridSize_E2 = 1;
-
-      /**
-       * Adjust lat/lon +/-, this algorithm is created with many many many try and error
-       */
-      if (geoLat1 > 0 && geoLon1 > 0 && geoLat2 > 0 && geoLon2 > 0) {
-
-         // 1: + / +
-         // 2: + / +
-
-         //     |
-         //     | xx
-         // ---------
-         //     |
-         //     |
-
-         devGrid_X2 += geoGridPixelSizeX;
-         devGrid_Y2 += geoGridPixelSizeY;
-
-         geoGrid_Lon2_E2 += gridSize_E2; // X1
-         geoGrid_Lat1_E2 += gridSize_E2; // Y1
-
-      } else if (geoLat1 > 0 && geoLon1 > 0 && geoLat2 < 0 && geoLon2 > 0) {
-
-         // 1: + / +
-         // 2: - / +
-
-         //     |
-         //     | xx
-         // ------xx-
-         //     | xx
-         //     |
-
-         devGrid_X2 += geoGridPixelSizeX;
-         devGrid_Y2 += geoGridPixelSizeY * 2;
-
-         geoGrid_Lon2_E2 += gridSize_E2; // X2
-
-         geoGrid_Lat1_E2 += gridSize_E2; // Y1
-         geoGrid_Lat2_E2 -= gridSize_E2; // Y2
-
-      } else if (geoLat1 < 0 && geoLon1 > 0 && geoLat2 < 0 && geoLon2 > 0) {
-
-         // 1: - / +
-         // 2: - / +
-
-         //     |
-         //     |
-         // ---------
-         //     | xx
-         //     |
-
-         devGrid_X2 += geoGridPixelSizeX;
-         devGrid_Y1 += geoGridPixelSizeY;
-         devGrid_Y2 += geoGridPixelSizeY * 2;
-
-         geoGrid_Lon2_E2 += gridSize_E2; // X2
-         geoGrid_Lat2_E2 -= gridSize_E2; // Y2
-
-      } else if (geoLat1 > 0 && geoLon1 < 0 && geoLat2 > 0 && geoLon2 < 0) {
-
-         // 1: + / -
-         // 2: + / -
-
-         //     |
-         //  xx |
-         // ---------
-         //     |
-         //     |
-
-         devGrid_X1 -= geoGridPixelSizeX;
-         devGrid_Y2 += geoGridPixelSizeY;
-
-         geoGrid_Lon1_E2 -= gridSize_E2; // X1
-         geoGrid_Lat1_E2 += gridSize_E2; // Y1
-
-      } else if (geoLat1 > 0 && geoLon1 < 0 && geoLat2 < 0 && geoLon2 < 0) {
-
-         // 1: + / -
-         // 2: - / -
-
-         //     |
-         //  xx |
-         // -xx------
-         //  xx |
-         //     |
-
-         devGrid_X1 -= geoGridPixelSizeX;
-         devGrid_Y2 += geoGridPixelSizeY * 2;
-
-         geoGrid_Lon1_E2 -= gridSize_E2; // X1
-         geoGrid_Lat1_E2 += gridSize_E2; // Y1
-
-         geoGrid_Lat2_E2 -= gridSize_E2; // Y2
-
-      } else if (geoLat1 < 0 && geoLon1 < 0 && geoLat2 < 0 && geoLon2 < 0) {
-
-         // 1: - / -
-         // 2: - / -
-
-         //     |
-         //     |
-         // ---------
-         //  xx |
-         //     |
-
-         devGrid_X1 -= geoGridPixelSizeX;
-         devGrid_Y1 += geoGridPixelSizeY;
-
-         devGrid_Y2 += geoGridPixelSizeY * 2;
-
-         geoGrid_Lon1_E2 -= gridSize_E2; // X1
-         geoGrid_Lat2_E2 -= gridSize_E2; // Y2
-
-      } else if (geoLat1 > 0 && geoLon1 < 0 && geoLat2 > 0 && geoLon2 > 0) {
-
-         // 1: + / -
-         // 2: + / +
-
-         //     |
-         //   xxxxx
-         // ---------
-         //     |
-         //     |
-
-         devGrid_X1 -= geoGridPixelSizeX;
-         devGrid_Y2 += geoGridPixelSizeY;
-
-         devGrid_X2 += geoGridPixelSizeX;
-
-         geoGrid_Lon1_E2 -= gridSize_E2; // X1
-         geoGrid_Lat1_E2 += gridSize_E2; // Y1
-
-         geoGrid_Lon2_E2 += gridSize_E2; // X2
-
-      } else if (geoLat1 < 0 && geoLon1 < 0 && geoLat2 < 0 && geoLon2 > 0) {
-
-         // 1: - / -
-         // 2: - / +
-
-         //     |
-         //     |
-         // ---------
-         //   xxxxx
-         //     |
-
-         devGrid_X1 -= geoGridPixelSizeX;
-         devGrid_Y1 += geoGridPixelSizeY;
-
-         devGrid_X2 += geoGridPixelSizeX;
-         devGrid_Y2 += geoGridPixelSizeY * 2;
-
-         geoGrid_Lon1_E2 -= gridSize_E2; // X1
-
-         geoGrid_Lon2_E2 += gridSize_E2; // X2
-         geoGrid_Lat2_E2 -= gridSize_E2; // Y2
-
-      } else if (geoLat1 > 0 && geoLon1 < 0 && geoLat2 < 0 && geoLon2 > 0) {
-
-         // 1: + / -
-         // 2: - / +
-
-         //     |
-         //   xxxxx
-         // --xxxxx--
-         //   xxxxx
-         //     |
-
-         devGrid_X1 -= geoGridPixelSizeX;
-
-         devGrid_X2 += geoGridPixelSizeX;
-         devGrid_Y2 += geoGridPixelSizeY * 2;
-
-         geoGrid_Lon1_E2 -= gridSize_E2; // X1
-         geoGrid_Lat1_E2 += gridSize_E2; // Y1
-
-         geoGrid_Lon2_E2 += gridSize_E2; // X2
-         geoGrid_Lat2_E2 -= gridSize_E2; // Y2
-      }
+      gridBoxItem.gridRaster = gridRaster;
 
       // x: longitude
       // y: latitude
 
-      _grid_SelectedPosition_Geo_1_E2 = new Point(geoGrid_Lon1_E2, geoGrid_Lat1_E2);
-      _grid_SelectedPosition_Geo_2_E2 = new Point(geoGrid_Lon2_E2, geoGrid_Lat2_E2);
-
-      int width = devGrid_X2 - devGrid_X1;
-      int height = devGrid_Y2 - devGrid_Y1;
-
-      // ensure it is always visible
-      width = Math.max(1, width);
-      height = Math.max(1, height);
+      _grid_SelectedPosition_Geo_1_E2 = new Point(gridRaster.geoGrid_Lon1_E2, gridRaster.geoGrid_Lat1_E2);
+      _grid_SelectedPosition_Geo_2_E2 = new Point(gridRaster.geoGrid_Lon2_E2, gridRaster.geoGrid_Lat2_E2);
 
       // draw geo grid
       final Color boxColor;
@@ -3062,16 +3101,21 @@ public class Map extends Canvas {
          boxColor = _colorCache.getColorRGB(hoverRGB);
       }
 
+      final int devGrid_X1 = gridRaster.devGrid_X1;
+      final int devGrid_Y1 = gridRaster.devGrid_Y1;
+      final int devWidth = gridRaster.devWidth;
+      final int devHeight = gridRaster.devHeight;
+
       gc.setLineStyle(SWT.LINE_SOLID);
       gc.setLineWidth(1);
 
       // draw outline with selected color
       gc.setForeground(boxColor);
-      gc.drawRectangle(devGrid_X1 + 1, devGrid_Y1 + 1, width - 2, height - 2);
+      gc.drawRectangle(devGrid_X1 + 1, devGrid_Y1 + 1, devWidth - 2, devHeight - 2);
 
       // draw dark outline to make it more visible
       gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
-      gc.drawRectangle(devGrid_X1, devGrid_Y1, width, height);
+      gc.drawRectangle(devGrid_X1, devGrid_Y1, devWidth, devHeight);
 
       return new Point(devGrid_X1, devGrid_Y1);
    }
@@ -5518,8 +5562,8 @@ public class Map extends Canvas {
       final Point2D.Double worldGrid1 = _mp.geoToPixelDouble(new GeoPosition(geoLat1, geoLon1), _mapZoomLevel);
       final Point2D.Double worldGrid2 = _mp.geoToPixelDouble(new GeoPosition(geoLat2, geoLon2), _mapZoomLevel);
 
-      _geoGridPixelSizeX = Math.abs(worldGrid2.x - worldGrid1.x);
-      _geoGridPixelSizeY = Math.abs(worldGrid2.y - worldGrid1.y);
+      _devGridPixelSize_X = Math.abs(worldGrid2.x - worldGrid1.x);
+      _devGridPixelSize_Y = Math.abs(worldGrid2.y - worldGrid1.y);
 
 //      System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ()")
 //            + ("\t_geoGridPixelSizeX: " + _geoGridPixelSizeX)

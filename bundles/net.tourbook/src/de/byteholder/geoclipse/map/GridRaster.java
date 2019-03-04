@@ -15,30 +15,21 @@
  *******************************************************************************/
 package de.byteholder.geoclipse.map;
 
-import net.tourbook.common.map.GeoPosition;
+public class GridRaster {
 
-import org.eclipse.swt.graphics.Point;
+   int devGrid_X1;
+   int devGrid_Y1;
+   int devGrid_X2;
+   int devGrid_Y2;
 
-public class MapGridBoxItem {
+   int devWidth;
+   int devHeight;
 
-   boolean       isSelectionStarted;
+   int geoGrid_Lon1_E2;
+   int geoGrid_Lat1_E2;
+   int geoGrid_Lon2_E2;
+   int geoGrid_Lat2_E2;
 
-   Point         worldMouse_Move;
-
-   Point         dev_Start;
-   Point         dev_End;
-
-   Point         world_Start;
-   Point         world_End;
-
-   GeoPosition   geo_Start;
-   GeoPosition   geo_End;
-
-   public String gridBoxText;
-   Point         gridBoxText_Position;
-
-   int           gridBoxSizeMuliplier;
-
-   GridRaster    gridRaster;
-
+   int numWidth;
+   int numHeight;
 }

@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.tour.filter.geo;
 
+import de.byteholder.geoclipse.map.MapGridBoxItem;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -36,8 +38,6 @@ import net.tourbook.ui.SQLFilter;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.graphics.Point;
-
-import de.byteholder.geoclipse.map.MapGridBoxItem;
 
 public class GeoFilterTourLoader {
 
@@ -118,7 +118,16 @@ public class GeoFilterTourLoader {
 
 
             if (loadToursFromGeoParts_FromDB(geoLoaderData)) {
+
                map2View.geoFilter_20_Result(geoLoaderData);
+
+            } else {
+
+               // update loading state
+
+               // show loading state
+               geoLoaderData.mapGridBoxItem.gridBoxText = "Done";
+               map2View.redrawMap();
             }
          }
       };

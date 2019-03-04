@@ -2010,24 +2010,21 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
                return;
             }
 
-            final ArrayList<Long> allLoadedTourIds = loaderItem.allLoadedTourIds;
 
-            if (allLoadedTourIds.size() > 0) {
+            // hide previous grid box selection
+            _map.showGeoGrid(null);
 
-               // hide previous grid box selection
-               _map.showGeoGrid(null);
+            if (_isShowTour) {
 
-               if (_isShowTour) {
+               // show tours even when 0 are displayed
 
-                  // update map with the updated number of tours in a grid box
-                  paintTours(allLoadedTourIds);
-//                  System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ()"));
-//// TODO remove SYSTEM.OUT.PRINTLN
-               }
+               final ArrayList<Long> allLoadedTourIds = loaderItem.allLoadedTourIds;
 
-               enableActions();
+               // update map with the updated number of tours in a grid box
+               paintTours(allLoadedTourIds);
             }
 
+            enableActions();
          }
       });
    }
