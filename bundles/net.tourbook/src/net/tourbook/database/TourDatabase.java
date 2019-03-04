@@ -3677,6 +3677,7 @@ public class TourDatabase {
 
                final SplashManager splashManager = SplashManager.getInstance();
 
+               splashManager.setMessage(Messages.App_SplashMessage_StartingDatabase);
                try {
 
                   sqlInit_20_CheckServer(splashManager);

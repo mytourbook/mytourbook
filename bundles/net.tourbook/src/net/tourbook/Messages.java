@@ -481,6 +481,7 @@ public class Messages extends NLS {
 
    public static String        App_SplashMessage_Finalize;
    public static String        App_SplashMessage_StartingApplication;
+   public static String        App_SplashMessage_StartingDatabase;
 
    public static String        App_Title;
 
