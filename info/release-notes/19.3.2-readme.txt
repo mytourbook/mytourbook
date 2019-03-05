@@ -4,6 +4,12 @@ Version 19.3.2                                             ?. March 2019
 Bugfix   
 ======
 
+* Tour View
+
+   - Fixed ClassCastException, this was the same issue as in the other views Photos, Tour Photos and Training but was not yet discovered
+    
+    
+
 * Import
 
   - .gpx File
