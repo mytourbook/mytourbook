@@ -20,42 +20,52 @@ import com.garmin.fit.EventMesg;
 import com.garmin.fit.HrMesg;
 import com.garmin.fit.LengthMesg;
 import com.garmin.fit.LengthType;
+import com.garmin.fit.SessionMesg;
 import com.garmin.fit.SwimStroke;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
+import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.GearData;
 import net.tourbook.data.SwimData;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
+import net.tourbook.device.garmin.fit.Activator;
 import net.tourbook.device.garmin.fit.FitDataReader2;
+import net.tourbook.device.garmin.fit.IPreferences;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.ui.tourChart.ChartLabel;
+
+import org.eclipse.jface.preference.IPreferenceStore;
 
 /**
  * Collects all data from a fit file
  */
 public class FitData {
 
-   private FitDataReader2          fitDataReader2;
-   private String                  importFilePath;
+   private static final Integer    DEFAULT_MESSAGE_INDEX = Integer.valueOf(0);
 
-   private HashMap<Long, TourData> alreadyImportedTours;
-   private HashMap<Long, TourData> newlyImportedTours;
+   private IPreferenceStore        _prefStore            = Activator.getDefault().getPreferenceStore();
 
-   TourData                        tourData = new TourData();
+   private boolean                 _isIgnoreLastMarker;
+   private boolean                 _isSetLastMarker;
+   private int                     _lastMarkerTimeSlices;
 
-   // ========== FitContext ==========
+   private FitDataReader2          _fitDataReader2;
+   private String                  _importFilePathName;
 
-   private boolean                 _isHeartRateSensorPresent;
-   private boolean                 _isPowerSensorPresent;
-   private boolean                 _isSpeedSensorPresent;
-   private boolean                 _isStrideSensorPresent;
+   private HashMap<Long, TourData> _alreadyImportedTours;
+   private HashMap<Long, TourData> _newlyImportedTours;
+
+   private TourData                _tourData             = new TourData();
 
    private String                  _deviceId;
    private String                  _manufacturer;
@@ -63,45 +73,460 @@ public class FitData {
    private String                  _softwareVersion;
 
    private String                  _sessionIndex;
-   private ZonedDateTime           _sessionTime;
+   private ZonedDateTime           _sessionStartTime;
 
-   private float                   _lapDistance;
-   private int                     _lapTime;
+   private final List<TimeData>    _allTimeData          = new ArrayList<>();
 
-   private Map<Long, TourData>     _alreadyImportedTours;
-   private HashMap<Long, TourData> _newlyImportedTours;
+   private final List<GearData>    _allGearData          = new ArrayList<>();
+   private final List<SwimData>    _allSwimData          = new ArrayList<>();
+   private final List<TourMarker>  _allTourMarker        = new ArrayList<>();
 
-   private boolean                 _isIgnoreLastMarker;
-   private boolean                 _isSetLastMarker;
-   private int                     _lastMarkerTimeSlices;
+   private TimeData                _current_TimeData;
+   private TimeData                _previous_TimeData;
 
-   // ========== FitContextData ==========
+   private TourMarker              _current_TourMarker;
 
-   private final List<GearData>   _allGearData   = new ArrayList<>();
-   private final List<SwimData>   _allSwimData   = new ArrayList<>();
-   private final List<TimeData>   _allTimeData   = new ArrayList<>();
-   private final List<TourMarker> _allTourMarker = new ArrayList<>();
-
-   private TimeData               _current_TimeData;
-   private TimeData               _previous_TimeData;
-
-   private List<TimeData>         _current_AllTimeData;
-   private List<TimeData>         _previous_AllTimeData;
-
-   private TourMarker             _current_TourMarker;
-
-   private long                   _timeDiffMS;
+   private long                    _timeDiffMS;
 
    public FitData(final FitDataReader2 fitDataReader2,
                   final String importFilePath,
                   final HashMap<Long, TourData> alreadyImportedTours,
                   final HashMap<Long, TourData> newlyImportedTours) {
 
-      this.fitDataReader2 = fitDataReader2;
-      this.importFilePath = importFilePath;
-      this.alreadyImportedTours = alreadyImportedTours;
-      this.newlyImportedTours = newlyImportedTours;
+      this._fitDataReader2 = fitDataReader2;
+      this._importFilePathName = importFilePath;
+      this._alreadyImportedTours = alreadyImportedTours;
+      this._newlyImportedTours = newlyImportedTours;
 
+      _isIgnoreLastMarker = _prefStore.getBoolean(IPreferences.FIT_IS_IGNORE_LAST_MARKER);
+      _isSetLastMarker = _isIgnoreLastMarker == false;
+      _lastMarkerTimeSlices = _prefStore.getInt(IPreferences.FIT_IGNORE_LAST_MARKER_TIME_SLICES);
+
+   }
+
+   public void finalizeTour() {
+
+      // reset speed at first position
+      if (_allTimeData.size() > 0) {
+         _allTimeData.get(0).speed = Float.MIN_VALUE;
+      }
+
+// disabled, this is annoing
+//    tourData.setTourTitle(getTourTitle());
+//    tourData.setTourDescription(getTourDescription());
+
+      _tourData.setImportFilePath(_importFilePathName);
+
+      _tourData.setDeviceId(_deviceId);
+      _tourData.setDeviceName(getDeviceName());
+      _tourData.setDeviceFirmwareVersion(_softwareVersion);
+      _tourData.setDeviceTimeInterval((short) -1);
+
+      final long recordStartTime = _allTimeData.get(0).absoluteTime;
+
+      if (_sessionStartTime != null) {
+
+         final long sessionStartTime = _sessionStartTime.toInstant().toEpochMilli();
+
+         if (recordStartTime != sessionStartTime) {
+
+            final String message =
+                  "Import file %s has other session start time, sessionStartTime=%s recordStartTime=%s, Difference=%d sec";//$NON-NLS-1$
+
+            TourLogManager.logSubInfo(
+                  String.format(
+                        message,
+                        _importFilePathName,
+                        TimeTools.getZonedDateTime(sessionStartTime).format(TimeTools.Formatter_DateTime_M),
+                        TimeTools.getZonedDateTime(recordStartTime).format(TimeTools.Formatter_DateTime_M),
+                        (recordStartTime - sessionStartTime) / 1000));
+         }
+      }
+
+      final ZonedDateTime zonedStartTime = TimeTools.getZonedDateTime(recordStartTime);
+
+      _tourData.setTourStartTime(zonedStartTime);
+
+      _tourData.createTimeSeries(_allTimeData, false);
+
+      // after all data are added, the tour id can be created
+      final String uniqueId = _fitDataReader2.createUniqueId(_tourData, Util.UNIQUE_ID_SUFFIX_GARMIN_FIT);
+      final Long tourId = _tourData.createTourId(uniqueId);
+
+      if (_alreadyImportedTours.containsKey(tourId) == false) {
+
+         // add new tour to the map
+         _newlyImportedTours.put(tourId, _tourData);
+
+         // create additional data
+         _tourData.computeComputedValues();
+         _tourData.computeAltimeterGradientSerie();
+
+         // must be called after time series are created
+         finalizeTour_Gears(_tourData, _allGearData);
+
+         finalizeTour_Marker(_tourData, _allTourMarker);
+         finalizeTour_SwimData(_tourData, _allSwimData);
+      }
+   }
+
+   private void finalizeTour_Gears(final TourData tourData, final List<GearData> gearList) {
+
+      if (gearList == null) {
+         return;
+      }
+
+      /*
+       * validate gear list
+       */
+      final int[] timeSerie = tourData.timeSerie;
+      final long tourStartTime = tourData.getTourStartTimeMS();
+      final long tourEndTime = tourStartTime + (timeSerie[timeSerie.length - 1] * 1000);
+
+      final List<GearData> validatedGearList = new ArrayList<>();
+      GearData startGear = null;
+
+      for (final GearData gearData : gearList) {
+
+         final long gearTime = gearData.absoluteTime;
+
+         // ensure time is valid
+         if (gearTime < tourStartTime) {
+            startGear = gearData;
+         }
+
+         final int rearTeeth = gearData.getRearGearTeeth();
+
+         if (rearTeeth == 0) {
+
+            /**
+             * This case happened but it should not. After checking the raw data they contained the
+             * wrong values.
+             * <p>
+             * <code>
+             *
+             *  2015-08-30 08:12:50.092'345 [FitContextData]
+             *
+             *    Gears: GearData [absoluteTime=2015-08-27T17:39:08.000+02:00,
+             *          FrontGearNum   = 2,
+             *          FrontGearTeeth = 50,
+             *          RearGearNum    = 172,   <---
+             *          RearGearTeeth  = 0      <---
+             * ]
+             * </code>
+             */
+
+            /*
+             * Set valid value but make it visible that the values are wrong, visible value is 0x10
+             * / 0x30 = 0.33
+             */
+
+            gearData.gears = 0x10013001;
+         }
+
+         if (gearTime >= tourStartTime && gearTime <= tourEndTime) {
+
+            // set initial gears when available
+            if (startGear != null) {
+
+               // set time to tour start
+               startGear.absoluteTime = tourStartTime;
+
+               validatedGearList.add(startGear);
+               startGear = null;
+            }
+
+            validatedGearList.add(gearData);
+         }
+      }
+
+      if (validatedGearList.size() > 0) {
+
+         // set end gear
+         final GearData lastGearData = validatedGearList.get(validatedGearList.size() - 1);
+         if (lastGearData.absoluteTime < tourEndTime) {
+
+            final GearData lastGear = new GearData();
+            lastGear.absoluteTime = tourEndTime;
+            lastGear.gears = lastGearData.gears;
+
+            validatedGearList.add(lastGear);
+         }
+
+         tourData.setGears(validatedGearList);
+      }
+   }
+
+   private void finalizeTour_Marker(final TourData tourData, final List<TourMarker> allTourMarkers) {
+
+      if (allTourMarkers == null || allTourMarkers.size() == 0) {
+         return;
+      }
+
+      final int[] timeSerie = tourData.timeSerie;
+      final int serieSize = timeSerie.length;
+
+      final long absoluteTourStartTime = tourData.getTourStartTimeMS();
+      final long absoluteTourEndTime = tourData.getTourEndTimeMS();
+
+      final ArrayList<TourMarker> validatedTourMarkers = new ArrayList<>();
+      final int tourMarkerSize = allTourMarkers.size();
+
+      int markerIndex = 0;
+      int serieIndex = 0;
+
+      boolean isBreakMarkerLoop = false;
+
+      markerLoop:
+
+      for (; markerIndex < tourMarkerSize; markerIndex++) {
+
+         final TourMarker tourMarker = allTourMarkers.get(markerIndex);
+         final long absoluteMarkerTime = tourMarker.getDeviceLapTime();
+
+         boolean isSetMarker = false;
+
+         for (; serieIndex < serieSize; serieIndex++) {
+
+            int relativeTourTimeS = timeSerie[serieIndex];
+            long absoluteTourTime = absoluteTourStartTime + relativeTourTimeS * 1000;
+
+            final long timeDiffEnd = absoluteTourEndTime - absoluteMarkerTime;
+            if (timeDiffEnd < 0) {
+
+               // there cannot be a marker after the tour
+               if (markerIndex < tourMarkerSize) {
+
+                  // there are still markers available which are not set in the tour, set a last marker into the last time slice
+
+                  // set values for the last time slice
+                  serieIndex = serieSize - 1;
+                  relativeTourTimeS = timeSerie[serieIndex];
+                  absoluteTourTime = absoluteTourStartTime + relativeTourTimeS * 1000;
+
+                  isSetMarker = true;
+               }
+
+               isBreakMarkerLoop = true;
+            }
+
+            final long timeDiffMarker = absoluteMarkerTime - absoluteTourTime;
+            if (timeDiffMarker <= 0) {
+
+               // time for the marker is found
+
+               isSetMarker = true;
+            }
+
+            if (isSetMarker) {
+
+               /*
+                * a last marker can be set when it's far enough away from the end, this will disable
+                * the last tour marker
+                */
+               final boolean canSetLastMarker = _isIgnoreLastMarker
+                     && serieIndex < serieSize - _lastMarkerTimeSlices;
+
+               if (_isSetLastMarker || canSetLastMarker) {
+
+                  tourMarker.setTime(relativeTourTimeS, absoluteTourTime);
+                  tourMarker.setSerieIndex(serieIndex);
+
+                  tourData.completeTourMarker(tourMarker, serieIndex);
+
+                  validatedTourMarkers.add(tourMarker);
+               }
+
+               // check next marker
+               break;
+            }
+         }
+
+         if (isBreakMarkerLoop) {
+            break markerLoop;
+         }
+      }
+
+      final Set<TourMarker> tourTourMarkers = new HashSet<>(validatedTourMarkers);
+
+      tourData.setTourMarkers(tourTourMarkers);
+   }
+
+   /**
+    * Fill swim data into tourdata.
+    *
+    * @param tourData
+    * @param allTourSwimData
+    */
+   private void finalizeTour_SwimData(final TourData tourData, final List<SwimData> allTourSwimData) {
+
+      // check if swim data are available
+      if (allTourSwimData == null) {
+         return;
+      }
+
+      final long tourStartTime = tourData.getTourStartTimeMS();
+
+      final int swimDataSize = allTourSwimData.size();
+
+      final short[] lengthType = new short[swimDataSize];
+      final short[] cadence = new short[swimDataSize];
+      final short[] strokes = new short[swimDataSize];
+      final short[] strokeStyle = new short[swimDataSize];
+      final int[] swimTime = new int[swimDataSize];
+
+      tourData.swim_LengthType = lengthType;
+      tourData.swim_Cadence = cadence;
+      tourData.swim_Strokes = strokes;
+      tourData.swim_StrokeStyle = strokeStyle;
+      tourData.swim_Time = swimTime;
+
+      boolean isSwimLengthType = false;
+      boolean isSwimCadence = false;
+      boolean isSwimStrokes = false;
+      boolean isSwimStrokeStyle = false;
+      boolean isSwimTime = false;
+
+      for (int swimSerieIndex = 0; swimSerieIndex < allTourSwimData.size(); swimSerieIndex++) {
+
+         final SwimData swimData = allTourSwimData.get(swimSerieIndex);
+
+         final long absoluteSwimTime = swimData.absoluteTime;
+         final short relativeSwimTime = (short) ((absoluteSwimTime - tourStartTime) / 1000);
+
+         final short swimLengthType = swimData.swim_LengthType;
+         short swimCadence = swimData.swim_Cadence;
+         short swimStrokes = swimData.swim_Strokes;
+         final short swimStrokeStyle = swimData.swim_StrokeStyle;
+
+         /*
+          * Length type
+          */
+         if (swimLengthType != Short.MIN_VALUE && swimLengthType > 0) {
+            isSwimLengthType = true;
+         }
+
+         /*
+          * Cadence
+          */
+         if (swimCadence == Short.MIN_VALUE) {
+            swimCadence = 0;
+         }
+         if (swimCadence > 0) {
+            isSwimCadence = true;
+         }
+
+         /*
+          * Strokes
+          */
+         if (swimStrokes == Short.MIN_VALUE) {
+            swimStrokes = 0;
+         }
+         if (swimStrokes > 0) {
+            isSwimStrokes = true;
+         }
+
+         /*
+          * Stroke style
+          */
+         if (swimStrokeStyle != Short.MIN_VALUE && swimStrokeStyle > 0) {
+            isSwimStrokeStyle = true;
+         }
+
+         /*
+          * Swim time
+          */
+         if (relativeSwimTime > 0) {
+            isSwimTime = true;
+         }
+
+         lengthType[swimSerieIndex] = swimLengthType;
+         cadence[swimSerieIndex] = swimCadence;
+         strokes[swimSerieIndex] = swimStrokes;
+         strokeStyle[swimSerieIndex] = swimStrokeStyle;
+         swimTime[swimSerieIndex] = relativeSwimTime;
+      }
+
+      /*
+       * Cleanup data series
+       */
+      if (isSwimLengthType == false) {
+         tourData.swim_LengthType = null;
+      }
+      if (isSwimStrokes == false) {
+         tourData.swim_Strokes = null;
+      }
+      if (isSwimStrokeStyle == false) {
+         tourData.swim_StrokeStyle = null;
+      }
+      if (isSwimTime == false) {
+         tourData.swim_Time = null;
+      }
+
+      // cadence is very special
+      if (isSwimCadence) {
+         // removed 'normal' cadence data serie when swim cadence is available
+         tourData.setCadenceSerie(null);
+      } else {
+         tourData.swim_Cadence = null;
+      }
+   }
+
+   public TimeData getCurrent_TimeData() {
+
+      if (_current_TimeData == null) {
+         throw new IllegalArgumentException("Time data is not initialized"); //$NON-NLS-1$
+      }
+
+      return _current_TimeData;
+
+   }
+
+   public TourMarker getCurrent_TourMarker() {
+
+      if (_current_TourMarker == null) {
+         throw new IllegalArgumentException("Tour marker is not initialized"); //$NON-NLS-1$
+      }
+
+      return _current_TourMarker;
+   }
+
+   public String getDeviceName() {
+
+      final StringBuilder deviceName = new StringBuilder();
+
+      if (_manufacturer != null) {
+         deviceName.append(_manufacturer).append(UI.SPACE);
+      }
+
+      if (_garminProduct != null) {
+         deviceName.append(_garminProduct);
+      }
+
+      return deviceName.toString();
+   }
+
+   public TourData getTourData() {
+      return _tourData;
+   }
+
+   String getTourTitle() {
+
+      return String.format("%s (Session: %s)", _importFilePathName, _sessionIndex); //$NON-NLS-1$
+   }
+
+   public void onLap_10_Initialize() {
+
+      final List<TourMarker> tourMarkers = _allTourMarker;
+
+      _current_TourMarker = new TourMarker(_tourData, ChartLabel.MARKER_TYPE_DEVICE);
+
+      tourMarkers.add(_current_TourMarker);
+   }
+
+   public void onLap_20_Finalize() {
+
+      _current_TourMarker = null;
    }
 
    /**
@@ -111,21 +536,10 @@ public class FitData {
     */
    public void onMesg_Event(final EventMesg mesg) {
 
-      // ensure a tour is setup
-      setupSession_Tour_10_Initialize();
-
       final Long gearChangeData = mesg.getGearChangeData();
 
       // check if gear data are available, it can be null
       if (gearChangeData != null) {
-
-         // get gear list for current tour
-         List<GearData> tourGears = _allGearData.get(_current_TourContext);
-
-         if (tourGears == null) {
-            tourGears = new ArrayList<>();
-            _allGearData.put(_current_TourContext, tourGears);
-         }
 
          // create gear data for the current time
          final GearData gearData = new GearData();
@@ -140,7 +554,7 @@ public class FitData {
          gearData.absoluteTime = javaTime;
          gearData.gears = gearChangeData;
 
-         tourGears.add(gearData);
+         _allGearData.add(gearData);
       }
    }
 
@@ -151,9 +565,6 @@ public class FitData {
     * @param mesg
     */
    public void onMesg_Hr(final HrMesg mesg) {
-
-      // ensure tour is setup
-      setupSession_Tour_10_Initialize();
 
       final DateTime hrTime = mesg.getTimestamp();
 
@@ -212,12 +623,12 @@ public class FitData {
 
       /*
        * Get time diff between tour and hr recording. It is complicated because it also contains the
-       * garmin time offset. After several time and error processes this algorithm seems to be now
+       * garmin time offset. After several try and error processes this algorithm seems to be now
        * correct.
        */
       if (hrTime != null && _timeDiffMS == Long.MIN_VALUE && allEventTime.length > 0) {
 
-         final long firstTourTimeMS = _previous_AllTimeData.get(0).absoluteTime;
+         final long firstTourTimeMS = _allTimeData.get(0).absoluteTime;
          final long firstHrTimestampMS = hrTime.getDate().getTime();
 
          final long hr2TourTimeDiffMS = firstTourTimeMS - firstHrTimestampMS;
@@ -238,7 +649,7 @@ public class FitData {
          final long sliceJavaTime = sliceGarminTimeMS + _timeDiffMS;
 
          // merge HR data into an already existing time data
-         for (final TimeData timeData : _previous_AllTimeData) {
+         for (final TimeData timeData : _allTimeData) {
 
             if (timeData.absoluteTime == sliceJavaTime) {
 
@@ -300,12 +711,7 @@ public class FitData {
 //    setupSession_Tour_10_Initialize();
 
       // get gear list for current tour
-      List<SwimData> tourSwimData = _allSwimData.get(_current_TourContext);
-
-      if (tourSwimData == null) {
-         tourSwimData = new ArrayList<>();
-         _allSwimData.put(_current_TourContext, tourSwimData);
-      }
+      final List<SwimData> tourSwimData = _allSwimData;
 
       // create gear data for the current time
       final SwimData swimData = new SwimData();
@@ -397,44 +803,12 @@ public class FitData {
 
    }
 
-   public void setupLap_Marker_10_Initialize() {
-
-      setupSession_Tour_10_Initialize();
-
-      List<TourMarker> tourMarkers = _allTourMarker.get(_current_TourContext);
-
-      if (tourMarkers == null) {
-
-         tourMarkers = new ArrayList<>();
-
-         _allTourMarker.put(_current_TourContext, tourMarkers);
-      }
-
-      _current_TourMarker = new TourMarker(getCurrent_TourData(), ChartLabel.MARKER_TYPE_DEVICE);
-      tourMarkers.add(_current_TourMarker);
-   }
-
-   public void setupLap_Marker_20_Finalize() {
-
-      _current_TourMarker = null;
-   }
-
-   public void setupRecord_10_Initialize() {
-
-      // ensure tour is setup
-      setupSession_Tour_10_Initialize();
-
-      if (_current_AllTimeData == null) {
-
-         _current_AllTimeData = new ArrayList<>();
-
-         _allTimeData.put(_current_TourContext, _current_AllTimeData);
-      }
+   public void onRecord_10_Initialize() {
 
       _current_TimeData = new TimeData();
    }
 
-   public void setupRecord_20_Finalize() {
+   public void onRecord_20_Finalize() {
 
       if (_current_TimeData == null) {
          // this occured
@@ -496,33 +870,62 @@ public class FitData {
       }
 
       if (useThisTimeSlice) {
-         _current_AllTimeData.add(_current_TimeData);
+         _allTimeData.add(_current_TimeData);
       }
 
       _previous_TimeData = _current_TimeData;
       _current_TimeData = null;
    }
 
-   public void setupSession_Tour_10_Initialize() {
+   public void setDeviceId(final String deviceId) {
+      _deviceId = deviceId;
+   }
 
-      if (_current_TourContext == null) {
+   public void setGarminProduct(final String garminProduct) {
+      _garminProduct = garminProduct;
+   }
 
-         final TourData currentTourData = new TourData();
+   public void setHeartRateSensorPresent(final boolean isHeartRateSensorPresent) {
+      _tourData.setIsPulseSensorPresent(isHeartRateSensorPresent);
+   }
 
-         _current_TourContext = new TourContext(currentTourData);
+   public void setManufacturer(final String manufacturer) {
+      _manufacturer = manufacturer;
+   }
 
-         _allTourContext.add(_current_TourContext);
-      }
+   public void setPowerSensorPresent(final boolean isPowerSensorPresent) {
+      _tourData.setIsPowerSensorPresent(isPowerSensorPresent);
+   }
+
+   public void setSessionIndex(final SessionMesg mesg) {
+
+      final Integer fitMessageIndex = mesg.getFieldIntegerValue(254);
+
+      final Integer messageIndex = fitMessageIndex != null ? fitMessageIndex : DEFAULT_MESSAGE_INDEX;
+
+      _sessionIndex = messageIndex.toString();
+   }
+
+   public void setSessionStartTime(final ZonedDateTime dateTime) {
+      _sessionStartTime = dateTime;
+   }
+
+   public void setSoftwareVersion(final String softwareVersion) {
+      _softwareVersion = softwareVersion;
+   }
+
+   public void setSpeedSensorPresent(final boolean isSpeedSensorPresent) {
+      _tourData.setIsDistanceFromSensor(isSpeedSensorPresent);
+   }
+
+   public void setStrideSensorPresent(final boolean isStrideSensorPresent) {
+      _tourData.setIsStrideSensorPresent(isStrideSensorPresent);
    }
 
    public void setupSession_Tour_20_Finalize() {
 
-      setupRecord_20_Finalize();
+      onRecord_20_Finalize();
 
-      _previous_AllTimeData = _current_AllTimeData;
       _timeDiffMS = Long.MIN_VALUE;
-
-      _current_TourContext = null;
-      _current_AllTimeData = null;
    }
 }

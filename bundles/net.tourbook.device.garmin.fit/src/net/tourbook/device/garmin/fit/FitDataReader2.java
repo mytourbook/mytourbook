@@ -30,25 +30,24 @@ import java.util.HashMap;
 
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.data.TourData;
-import net.tourbook.device.garmin.fit.listeners.Activity_MesgListenerImpl;
-import net.tourbook.device.garmin.fit.listeners.BikeProfile_MesgListenerImpl;
-import net.tourbook.device.garmin.fit.listeners.DeviceInfo_MesgListenerImpl;
-import net.tourbook.device.garmin.fit.listeners.Event_MesgListenerImpl;
-import net.tourbook.device.garmin.fit.listeners.FileCreator_MesgListenerImpl;
-import net.tourbook.device.garmin.fit.listeners.FileId_MesgListenerImpl;
 import net.tourbook.device.garmin.fit.listeners.FitData;
-import net.tourbook.device.garmin.fit.listeners.Hr_MesgListenerImpl;
-import net.tourbook.device.garmin.fit.listeners.Lap_MesgListenerImpl;
-import net.tourbook.device.garmin.fit.listeners.Length_MesgListenerImpl;
+import net.tourbook.device.garmin.fit.listeners.MesgListener_Activity;
+import net.tourbook.device.garmin.fit.listeners.MesgListener_BikeProfile;
+import net.tourbook.device.garmin.fit.listeners.MesgListener_DeviceInfo;
+import net.tourbook.device.garmin.fit.listeners.MesgListener_Event;
+import net.tourbook.device.garmin.fit.listeners.MesgListener_FileCreator;
+import net.tourbook.device.garmin.fit.listeners.MesgListener_FileId;
+import net.tourbook.device.garmin.fit.listeners.MesgListener_Hr;
+import net.tourbook.device.garmin.fit.listeners.MesgListener_Lap;
+import net.tourbook.device.garmin.fit.listeners.MesgListener_Length;
+import net.tourbook.device.garmin.fit.listeners.MesgListener_Record;
 import net.tourbook.device.garmin.fit.listeners.MesgListener_Session;
-import net.tourbook.device.garmin.fit.listeners.Record_MesgListenerImpl;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.tour.TourLogManager;
 
 import org.apache.commons.io.IOUtils;
-import org.eclipse.jface.preference.IPreferenceStore;
 
 /**
  * Garmin FIT activity reader based on the official Garmin SDK.
@@ -57,19 +56,10 @@ import org.eclipse.jface.preference.IPreferenceStore;
  */
 public class FitDataReader2 extends TourbookDevice {
 
-   private static boolean          _isLogFitData = System.getProperty("logFitData") != null;   //$NON-NLS-1$
-   private boolean                 _isVersionLogged;
+   private static boolean _isLogFitData = System.getProperty("logFitData") != null; //$NON-NLS-1$
 
-   private IPreferenceStore        _prefStore    = Activator.getDefault().getPreferenceStore();
+   private boolean        _isVersionLogged;
 
-   private String                  _importFilePathName;
-
-   private HashMap<Long, TourData> _alreadyImportedTours;
-   private HashMap<Long, TourData> _newlyImportedTours;
-
-   private boolean                 _isIgnoreLastMarker;
-   private boolean                 _isSetLastMarker;
-   private int                     _lastMarkerTimeSlices;
 
    private void addDebugLogListener(final MesgBroadcaster broadcaster) {
 
@@ -369,13 +359,6 @@ public class FitDataReader2 extends TourbookDevice {
                                     final HashMap<Long, TourData> alreadyImportedTours,
                                     final HashMap<Long, TourData> newlyImportedTours) {
 
-      _importFilePathName = importFilePath;
-      _alreadyImportedTours = alreadyImportedTours;
-      _newlyImportedTours = newlyImportedTours;
-
-      _isIgnoreLastMarker = _prefStore.getBoolean(IPreferences.FIT_IS_IGNORE_LAST_MARKER);
-      _isSetLastMarker = _isIgnoreLastMarker == false;
-      _lastMarkerTimeSlices = _prefStore.getInt(IPreferences.FIT_IGNORE_LAST_MARKER_TIME_SLICES);
 
       boolean returnValue = false;
 
@@ -383,25 +366,25 @@ public class FitDataReader2 extends TourbookDevice {
 
          final MesgBroadcaster fitBroadcaster = new MesgBroadcaster(new Decode());
 
-         final FitData fitData = new FitData(//
+         final FitData fitData = new FitData(
                this,
                importFilePath,
                alreadyImportedTours,
                newlyImportedTours);
 
          // setup all fit listeners
-         fitBroadcaster.addListener(new MesgListener_Session(fitData));
 
-         fitBroadcaster.addListener(new Activity_MesgListenerImpl(context));
-         fitBroadcaster.addListener(new BikeProfile_MesgListenerImpl(context));
-         fitBroadcaster.addListener(new DeviceInfo_MesgListenerImpl(context));
-         fitBroadcaster.addListener(new Event_MesgListenerImpl(context));
-         fitBroadcaster.addListener(new FileCreator_MesgListenerImpl(context));
-         fitBroadcaster.addListener(new FileId_MesgListenerImpl(context));
-         fitBroadcaster.addListener(new Lap_MesgListenerImpl(context));
-         fitBroadcaster.addListener(new Record_MesgListenerImpl(context));
-         fitBroadcaster.addListener(new Hr_MesgListenerImpl(context));
-         fitBroadcaster.addListener(new Length_MesgListenerImpl(context));
+         fitBroadcaster.addListener(new MesgListener_Activity(fitData));
+         fitBroadcaster.addListener(new MesgListener_BikeProfile(fitData));
+         fitBroadcaster.addListener(new MesgListener_DeviceInfo(fitData));
+         fitBroadcaster.addListener(new MesgListener_Event(fitData));
+         fitBroadcaster.addListener(new MesgListener_FileCreator(fitData));
+         fitBroadcaster.addListener(new MesgListener_FileId(fitData));
+         fitBroadcaster.addListener(new MesgListener_Hr(fitData));
+         fitBroadcaster.addListener(new MesgListener_Lap(fitData));
+         fitBroadcaster.addListener(new MesgListener_Length(fitData));
+         fitBroadcaster.addListener(new MesgListener_Record(fitData));
+         fitBroadcaster.addListener(new MesgListener_Session(fitData));
 
          if (_isLogFitData) {
 
@@ -439,7 +422,7 @@ public class FitDataReader2 extends TourbookDevice {
 
          fitBroadcaster.run(fileInputStream);
 
-         context.finalizeTour();
+         fitData.finalizeTour();
 
          returnValue = true;
 
