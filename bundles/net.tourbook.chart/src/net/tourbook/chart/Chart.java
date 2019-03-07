@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,9 @@ package net.tourbook.chart;
 
 import java.util.HashMap;
 
+import net.tourbook.common.form.ViewForm;
+import net.tourbook.common.util.ITourToolTipProvider;
+
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
@@ -29,15 +32,11 @@ import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.ToolBar;
-
-import net.tourbook.common.form.ViewForm;
-import net.tourbook.common.util.ITourToolTipProvider;
 
 /**
  * Chart widget
@@ -190,9 +189,6 @@ public class Chart extends ViewForm {
 		gl.marginHeight = 0;
 		gl.verticalSpacing = 0;
 		setLayout(gl);
-
-		// set the layout for the chart
-		setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		_chartComponents = new ChartComponents(this, style);
 		setContent(_chartComponents);

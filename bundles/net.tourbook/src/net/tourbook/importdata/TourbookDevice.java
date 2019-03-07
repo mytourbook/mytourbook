@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -30,315 +30,321 @@ import net.tourbook.data.TourMarker;
 
 public abstract class TourbookDevice implements IRawDataReader {
 
-	private static final String		XML_COMMENT				= "<!--";											//$NON-NLS-1$
-	protected static final String	XML_START_ID			= "<?xml";											//$NON-NLS-1$
-	protected static final String	XML_HEADER				= "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";	//$NON-NLS-1$
+   private static final String   XML_COMMENT           = "<!--";                                           //$NON-NLS-1$
+   protected static final String XML_START_ID          = "<?xml";                                          //$NON-NLS-1$
+   protected static final String XML_HEADER            = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";    //$NON-NLS-1$
 
-	/**
-	 * Temperature scale when a device supports scaled temperature values. A value greater than 10
-	 * does not make sense for a tour program.
-	 * <p>
-	 * since version 10.11
-	 */
-	/*
-	 * disabled when float was introduces in 11.after8
-	 */
-//	public static final int	TEMPERATURE_SCALE		= 10;
+   private static final boolean  _isCreateRandomTourId = System.getProperty("createRandomTourId") != null; //$NON-NLS-1$
 
-	/**
-	 * Unique id for each device reader
-	 */
-	public String					deviceId;
+   /**
+    * Temperature scale when a device supports scaled temperature values. A value greater than 10
+    * does not make sense for a tour program.
+    * <p>
+    * since version 10.11
+    */
+   /*
+    * disabled when float was introduces in 11.after8
+    */
+//   public static final int   TEMPERATURE_SCALE      = 10;
 
-	/**
-	 * Visible device name, e.g. HAC4, HAC5
-	 */
-	public String					visibleName;
+   /**
+    * Unique id for each device reader
+    */
+   public String deviceId;
 
-	/**
-	 * File extension used when tour data are imported from a file
-	 */
-	public String					fileExtension;
+   /**
+    * Visible device name, e.g. HAC4, HAC5
+    */
+   public String visibleName;
 
-	/**
-	 * Sort priority (since version 10.11), default will sort devices to the end.
-	 */
-	public int						extensionSortPriority	= Integer.MAX_VALUE;
+   /**
+    * File extension used when tour data are imported from a file
+    */
+   public String fileExtension;
+
+   /**
+    * Sort priority (since version 10.11), default will sort devices to the end.
+    */
+   public int    extensionSortPriority = Integer.MAX_VALUE;
 
 // disabled in version 10.10, it seems to be not used anymore
-//	/**
-//	 * <code>true</code> when this device reader can read from the device, <code>false</code>
-//	 * (default) when the device reader can only import from a file
-//	 */
-//	public boolean	canReadFromDevice		= false;
+//   /**
+//    * <code>true</code> when this device reader can read from the device, <code>false</code>
+//    * (default) when the device reader can only import from a file
+//    */
+//   public boolean   canReadFromDevice      = false;
 //
-//	/**
-//	 * when <code>true</code>, multiple files can be selected in the import, default is
-//	 * <code>false</code>
-//	 */
-//	public boolean	canSelectMultipleFilesInImportDialog	= false;
+//   /**
+//    * when <code>true</code>, multiple files can be selected in the import, default is
+//    * <code>false</code>
+//    */
+//   public boolean   canSelectMultipleFilesInImportDialog   = false;
 
-	/**
-	 * When set to {@link RawDataManager#ADJUST_IMPORT_YEAR_IS_DISABLED} this is ignored otherwise
-	 * this year is used as the import year.
-	 */
-	public int						importYear				= RawDataManager.ADJUST_IMPORT_YEAR_IS_DISABLED;
+   /**
+    * When set to {@link RawDataManager#ADJUST_IMPORT_YEAR_IS_DISABLED} this is ignored otherwise
+    * this year is used as the import year.
+    */
+   public int     importYear           = RawDataManager.ADJUST_IMPORT_YEAR_IS_DISABLED;
 
-	/**
-	 * When <code>true</code> the tracks in one file will be merged into one track, a marker is
-	 * created for each track.
-	 */
-	public boolean					isMergeTracks			= false;
+   /**
+    * When <code>true</code> the tracks in one file will be merged into one track, a marker is
+    * created for each track.
+    */
+   public boolean isMergeTracks        = false;
 
-	/**
-	 * when <code>true</code> validate the checksum when importing data
-	 */
-	public boolean					isChecksumValidation	= true;
+   /**
+    * when <code>true</code> validate the checksum when importing data
+    */
+   public boolean isChecksumValidation = true;
 
-	/**
-	 * A tour id will be created with recording time when <code>true</code>.
-	 */
-	public boolean					isCreateTourIdWithRecordingTime;
+   /**
+    * A tour id will be created with recording time when <code>true</code>.
+    */
+   public boolean isCreateTourIdWithRecordingTime;
 
-	/**
-	 * When <code>true</code> imported waypoints will be converted into {@link TourMarker}.
-	 */
-	public boolean					isConvertWayPoints;
+   /**
+    * When <code>true</code> imported waypoints will be converted into {@link TourMarker}.
+    */
+   public boolean isConvertWayPoints;
 
-	public TourbookDevice() {}
+   public TourbookDevice() {}
 
-	public TourbookDevice(final String deviceName) {
-		visibleName = deviceName;
-	}
+   public TourbookDevice(final String deviceName) {
+      visibleName = deviceName;
+   }
 
-	public abstract String buildFileNameFromRawData(String rawDataFileName);
+   public abstract String buildFileNameFromRawData(String rawDataFileName);
 
-	/**
-	 * Check if the received data are correct for this device, Returns <code>true</code> when the
-	 * received data are correct for this device
-	 * 
-	 * @param byteIndex
-	 *            index in the byte stream, this will be incremented when the return value is true
-	 * @param newByte
-	 *            received byte
-	 * @return Return <code>true</code> when the receice data are correct for this device
-	 */
-	public abstract boolean checkStartSequence(int byteIndex, int newByte);
+   /**
+    * Check if the received data are correct for this device, Returns <code>true</code> when the
+    * received data are correct for this device
+    *
+    * @param byteIndex
+    *           index in the byte stream, this will be incremented when the return value is true
+    * @param newByte
+    *           received byte
+    * @return Return <code>true</code> when the receice data are correct for this device
+    */
+   public abstract boolean checkStartSequence(int byteIndex, int newByte);
 
-	/**
-	 * Creates a unique id for the tour, {@link TourData#createTimeSeries()} must be called ahead,
-	 * to create recording time.
-	 * <p>
-	 * Recording time is added to the tour id when {@link #isCreateTourIdWithRecordingTime} is
-	 * <code>true</code>.
-	 * 
-	 * @param tourData
-	 * @param distanceSerie
-	 * @param defaultKey
-	 *            The default key is used when distance serie is not available.
-	 * @return Returns a unique key for a tour.
-	 */
-	public String createUniqueId(final TourData tourData, final String defaultKey) {
+   /**
+    * Creates a unique id for the tour, {@link TourData#createTimeSeries()} must be called ahead, to
+    * create recording time.
+    * <p>
+    * Recording time is added to the tour id when {@link #isCreateTourIdWithRecordingTime} is
+    * <code>true</code>.
+    *
+    * @param tourData
+    * @param distanceSerie
+    * @param defaultKey
+    *           The default key is used when distance serie is not available.
+    * @return Returns a unique key for a tour.
+    */
+   public String createUniqueId(final TourData tourData, final String defaultKey) {
 
-		String uniqueKey;
-		final float[] distanceSerie = tourData.getMetricDistanceSerie();
+      if (_isCreateRandomTourId) {
+         return Double.valueOf(Math.random()).toString();
+      }
 
-		if (isCreateTourIdWithRecordingTime) {
+      String uniqueKey;
+      final float[] distanceSerie = tourData.getMetricDistanceSerie();
 
-			/*
-			 * 25.5.2009: added recording time to the tour distance for the unique key because tour
-			 * export and import found a wrong tour when exporting was done with camouflage speed ->
-			 * this resulted in a NEW tour
-			 */
-			final int tourRecordingTime = (int) tourData.getTourRecordingTime();
+      if (isCreateTourIdWithRecordingTime) {
 
-			if (distanceSerie == null) {
-				uniqueKey = Integer.toString(tourRecordingTime);
-			} else {
+         /*
+          * 25.5.2009: added recording time to the tour distance for the unique key because tour
+          * export and import found a wrong tour when exporting was done with camouflage speed ->
+          * this resulted in a NEW tour
+          */
+         final int tourRecordingTime = (int) tourData.getTourRecordingTime();
 
-				final long tourDistance = (long) distanceSerie[(distanceSerie.length - 1)];
+         if (distanceSerie == null) {
+            uniqueKey = Integer.toString(tourRecordingTime);
+         } else {
 
-				uniqueKey = Long.toString(tourDistance + tourRecordingTime);
-			}
+            final long tourDistance = (long) distanceSerie[(distanceSerie.length - 1)];
 
-		} else {
+            uniqueKey = Long.toString(tourDistance + tourRecordingTime);
+         }
 
-			/*
-			 * original version to create a tour id
-			 */
-			if (distanceSerie == null) {
-				uniqueKey = defaultKey;
-			} else {
-				uniqueKey = Integer.toString((int) distanceSerie[distanceSerie.length - 1]);
-			}
-		}
+      } else {
 
-		return uniqueKey;
-	}
+         /*
+          * original version to create a tour id
+          */
+         if (distanceSerie == null) {
+            uniqueKey = defaultKey;
+         } else {
+            uniqueKey = Integer.toString((int) distanceSerie[distanceSerie.length - 1]);
+         }
+      }
 
-	/**
-	 * @param tourData
-	 * @param tourDistance
-	 * @return Returns the legacy tour id with
-	 *         <p>
-	 *         <code>Integer.toString(tourDistance)</code>
-	 *         <p>
-	 *         as default, when recording time is not used as it was in the initial implementation.
-	 */
-	public String createUniqueId_Legacy(final TourData tourData, final int tourDistance) {
+      return uniqueKey;
+   }
 
-		String uniqueKey;
+   /**
+    * @param tourData
+    * @param tourDistance
+    * @return Returns the legacy tour id with
+    *         <p>
+    *         <code>Integer.toString(tourDistance)</code>
+    *         <p>
+    *         as default, when recording time is not used as it was in the initial implementation.
+    */
+   public String createUniqueId_Legacy(final TourData tourData, final int tourDistance) {
 
-		if (isCreateTourIdWithRecordingTime) {
+      String uniqueKey;
 
-			uniqueKey = Long.toString(tourDistance + tourData.getTourRecordingTime());
+      if (isCreateTourIdWithRecordingTime) {
 
-		} else {
+         uniqueKey = Long.toString(tourDistance + tourData.getTourRecordingTime());
 
-			/*
-			 * This represents the original (1st) implementation without recording time.
-			 */
+      } else {
 
-			uniqueKey = Integer.toString(tourDistance);
-		}
+         /*
+          * This represents the original (1st) implementation without recording time.
+          */
 
-		return uniqueKey;
-	}
+         uniqueKey = Integer.toString(tourDistance);
+      }
 
-	/**
-	 * @return Returns a list of files which are also imported additonal to the selected imported
-	 *         file or <code>null</code> otherwise.
-	 */
-	public ArrayList<String> getAdditionalImportedFiles() {
-		return null;
-	}
+      return uniqueKey;
+   }
 
-	/**
-	 * @param portName
-	 * @return returns the serial port parameters which are use to receive data from the device or
-	 *         <code>null</code> when data transfer from a device is not supported
-	 */
-	public abstract SerialParameters getPortParameters(String portName);
+   /**
+    * @return Returns a list of files which are also imported additonal to the selected imported
+    *         file or <code>null</code> otherwise.
+    */
+   public ArrayList<String> getAdditionalImportedFiles() {
+      return null;
+   }
 
-	/**
-	 * Returns the number of bytes which will be checked in the startsequence. For a HAC4/5 this can
-	 * be set to 4 because the first 4 bytes of the input stream are always the characters AFRO
-	 * 
-	 * @return
-	 */
-	public abstract int getStartSequenceSize();
+   /**
+    * @param portName
+    * @return returns the serial port parameters which are use to receive data from the device or
+    *         <code>null</code> when data transfer from a device is not supported
+    */
+   public abstract SerialParameters getPortParameters(String portName);
 
-	/**
-	 * Check if the file is a valid device xml file.
-	 * 
-	 * @param importFilePath
-	 * @param deviceTag
-	 *            The deviceTag starts on the second line of a xml file.
-	 * @return Returns <code>true</code> when the file contains content with the requested tag.
-	 */
-	protected boolean isValidXMLFile(final String importFilePath, final String deviceTag) {
+   /**
+    * Returns the number of bytes which will be checked in the startsequence. For a HAC4/5 this can
+    * be set to 4 because the first 4 bytes of the input stream are always the characters AFRO
+    *
+    * @return
+    */
+   public abstract int getStartSequenceSize();
 
-		return isValidXMLFile(importFilePath, deviceTag, false);
-	}
+   /**
+    * Check if the file is a valid device xml file.
+    *
+    * @param importFilePath
+    * @param deviceTag
+    *           The deviceTag starts on the second line of a xml file.
+    * @return Returns <code>true</code> when the file contains content with the requested tag.
+    */
+   protected boolean isValidXMLFile(final String importFilePath, final String deviceTag) {
 
-	/**
-	 * Check if the file is a valid device xml file.
-	 * 
-	 * @param importFilePath
-	 * @param deviceTag
-	 * @param isRemoveBOM
-	 *            When <code>true</code> the BOM (Byte Order Mark) is removed from the file.
-	 * @return Returns <code>true</code> when the file contains content with the requested tag.
-	 */
-	protected boolean isValidXMLFile(final String importFilePath, final String deviceTag, final boolean isRemoveBOM) {
+      return isValidXMLFile(importFilePath, deviceTag, false);
+   }
 
-		final String deviceTagLower = deviceTag.toLowerCase();
-		BufferedReader fileReader = null;
+   /**
+    * Check if the file is a valid device xml file.
+    *
+    * @param importFilePath
+    * @param deviceTag
+    * @param isRemoveBOM
+    *           When <code>true</code> the BOM (Byte Order Mark) is removed from the file.
+    * @return Returns <code>true</code> when the file contains content with the requested tag.
+    */
+   protected boolean isValidXMLFile(final String importFilePath, final String deviceTag, final boolean isRemoveBOM) {
 
-		try {
+      final String deviceTagLower = deviceTag.toLowerCase();
+      BufferedReader fileReader = null;
 
-			final FileInputStream inputStream = new FileInputStream(importFilePath);
+      try {
 
-			if (isRemoveBOM) {
+         final FileInputStream inputStream = new FileInputStream(importFilePath);
 
-				try {
-					FileUtils.consumeBOM(inputStream, UI.UTF_8);
-				} catch (final IOException e) {
-					// just ignore it
-				}
-			}
+         if (isRemoveBOM) {
 
-			fileReader = new BufferedReader(new InputStreamReader(inputStream, UI.UTF_8));
+            try {
+               FileUtils.consumeBOM(inputStream, UI.UTF_8);
+            } catch (final IOException e) {
+               // just ignore it
+            }
+         }
 
-			String line = fileReader.readLine();
-			if (line == null || line.toLowerCase().contains(XML_START_ID) == false) {
-				return false;
-			}
+         fileReader = new BufferedReader(new InputStreamReader(inputStream, UI.UTF_8));
 
-			final int maxLines = 100;
-			int lineCounter = 0;
+         String line = fileReader.readLine();
+         if (line == null || line.toLowerCase().contains(XML_START_ID) == false) {
+            return false;
+         }
 
-			while (true) {
+         final int maxLines = 100;
+         int lineCounter = 0;
 
-				if (line.toLowerCase().contains(deviceTagLower)) {
-					return true;
-				}
+         while (true) {
 
-				line = fileReader.readLine();
+            if (line.toLowerCase().contains(deviceTagLower)) {
+               return true;
+            }
 
-				if (line == null || lineCounter++ > maxLines) {
-					return false;
-				}
-			}
+            line = fileReader.readLine();
 
-		} catch (final Exception e1) {
-			StatusUtil.log(e1);
-		} finally {
-			Util.closeReader(fileReader);
-		}
+            if (line == null || lineCounter++ > maxLines) {
+               return false;
+            }
+         }
 
-		return true;
-	}
+      } catch (final Exception e1) {
+         StatusUtil.log(e1);
+      } finally {
+         Util.closeReader(fileReader);
+      }
 
-	public void setConvertWayPoints(final boolean isConvertWayPoints) {
-		this.isConvertWayPoints = isConvertWayPoints;
-	}
+      return true;
+   }
 
-	public void setCreateTourIdWithTime(final boolean isCreateTourIdWithTime) {
-		this.isCreateTourIdWithRecordingTime = isCreateTourIdWithTime;
-	}
+   public void setConvertWayPoints(final boolean isConvertWayPoints) {
+      this.isConvertWayPoints = isConvertWayPoints;
+   }
 
-	public void setImportYear(final int importYear) {
-		this.importYear = importYear;
-	}
+   public void setCreateTourIdWithTime(final boolean isCreateTourIdWithTime) {
+      this.isCreateTourIdWithRecordingTime = isCreateTourIdWithTime;
+   }
 
-	public void setIsChecksumValidation(final boolean isChecksumValidation) {
-		this.isChecksumValidation = isChecksumValidation;
-	}
+   public void setImportYear(final int importYear) {
+      this.importYear = importYear;
+   }
 
-	public void setMergeTracks(final boolean isMergeTracks) {
-		this.isMergeTracks = isMergeTracks;
-	}
+   public void setIsChecksumValidation(final boolean isChecksumValidation) {
+      this.isChecksumValidation = isChecksumValidation;
+   }
 
-	@Override
-	public String toString() {
-		return "TourbookDevice [deviceId=" //$NON-NLS-1$
-				+ deviceId
-				+ ", visibleName=" //$NON-NLS-1$
-				+ visibleName
-				+ ", fileExtension=" //$NON-NLS-1$
-				+ fileExtension
-				+ ", extensionSortPriority=" //$NON-NLS-1$
-				+ extensionSortPriority
-				+ "]"; //$NON-NLS-1$
-	}
+   public void setMergeTracks(final boolean isMergeTracks) {
+      this.isMergeTracks = isMergeTracks;
+   }
 
-	public String userConfirmationMessage() {
-		return UI.EMPTY_STRING;
-	}
+   @Override
+   public String toString() {
+      return "TourbookDevice [deviceId=" //$NON-NLS-1$
+            + deviceId
+            + ", visibleName=" //$NON-NLS-1$
+            + visibleName
+            + ", fileExtension=" //$NON-NLS-1$
+            + fileExtension
+            + ", extensionSortPriority=" //$NON-NLS-1$
+            + extensionSortPriority
+            + "]"; //$NON-NLS-1$
+   }
 
-	public boolean userConfirmationRequired() {
-		return false;
-	}
+   public String userConfirmationMessage() {
+      return UI.EMPTY_STRING;
+   }
+
+   public boolean userConfirmationRequired() {
+      return false;
+   }
 
 }

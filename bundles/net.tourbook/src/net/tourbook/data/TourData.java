@@ -4482,7 +4482,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       final Set<TourWayPoint> remainingWayPoints = new HashSet<>();
       remainingWayPoints.addAll(tourWayPoints);
 
-      final ArrayList<TourWayPoint> removedWayPoints = new ArrayList<>();
+      final ArrayList<TourWayPoint> allRemovedWayPoints = new ArrayList<>();
 
       /**
        * Approach waypoint time to the nearest time slice time
@@ -4490,6 +4490,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       for (int timeDiffRange = 0; timeDiffRange < 10; timeDiffRange++) {
 
          final int timeDiffRangeMS = timeDiffRange * 1000;
+
+         final ArrayList<TourWayPoint> removedWayPoints = new ArrayList<>();
 
          for (final TourWayPoint wp : remainingWayPoints) {
 
@@ -4548,14 +4550,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
                      tourMarkers.add(tourMarker);
 
-                     remainingWayPoints.remove(wp);
                      removedWayPoints.add(wp);
+                     allRemovedWayPoints.add(wp);
 
                      break;
                   }
                }
             }
          }
+
+         remainingWayPoints.removeAll(removedWayPoints);
 
          if (remainingWayPoints.size() == 0) {
 
@@ -4566,7 +4570,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
 
       // collapse waypoints
-      tourWayPoints.removeAll(removedWayPoints);
+      tourWayPoints.removeAll(allRemovedWayPoints);
    }
 
    /**
