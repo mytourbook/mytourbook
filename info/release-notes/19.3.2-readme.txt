@@ -1,12 +1,23 @@
 Version 19.3.2                                             ?. March 2019
 
 
+.fit Import
+===========
+
+This importer has been simplified/restructured to fix an issue. Afterwards it was tested with several different .fit files. 
+
+It is still possible that there are undiscovered issue. So check your data after the next imports to ensure that all values are valid.
+
+
+
 Bugfix   
 ======
 
+
+
 * Tour View
 
-   - Fixed ClassCastException, this was the same issue as in the other views Photos, Tour Photos and Training but was not yet discovered
+  - Fixed ClassCastException, this was the same issue as in the other views Photos, Tour Photos and Training but was not yet discovered
     
     
 
@@ -14,3 +25,7 @@ Bugfix
 
   - .gpx File
     Fixed ConcurrentModificationException when converting waypoints into tour markers
+    
+  - .fit File
+    Fixed total altitude values for Ciclo(CM 9.3A)
+  
