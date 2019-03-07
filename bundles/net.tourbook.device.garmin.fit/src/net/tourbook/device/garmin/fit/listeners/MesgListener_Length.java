@@ -17,19 +17,64 @@ package net.tourbook.device.garmin.fit.listeners;
 
 import com.garmin.fit.LengthMesg;
 import com.garmin.fit.LengthMesgListener;
+import com.garmin.fit.LengthType;
+import com.garmin.fit.SwimStroke;
+
+import java.util.List;
+
+import net.tourbook.data.SwimData;
 
 /**
- *
+ * Set swim data
  */
-public class MesgListener_Length extends AbstractMesgListener_FitData implements LengthMesgListener {
+public class MesgListener_Length extends AbstractMesgListener implements LengthMesgListener {
+
+   private List<SwimData> _swimData;
 
    public MesgListener_Length(final FitData fitData) {
-      super(fitData);
-	}
 
-	@Override
-	public void onMesg(final LengthMesg mesg) {
-      fitData.onMesg_Length(mesg);
-	}
+      super(fitData);
+
+      _swimData = fitData.getSwimData();
+   }
+
+   @Override
+   public void onMesg(final LengthMesg mesg) {
+
+      // create gear data for the current time
+      final SwimData swimData = new SwimData();
+
+      _swimData.add(swimData);
+
+      final com.garmin.fit.DateTime garminTime = mesg.getTimestamp();
+
+      // convert garmin time into java time
+      final long garminTimeS = garminTime.getTimestamp();
+      final long garminTimeMS = garminTimeS * 1000;
+      final long javaTime = garminTimeMS + com.garmin.fit.DateTime.OFFSET;
+
+      final Short avgSwimmingCadence = mesg.getAvgSwimmingCadence();
+      final LengthType lengthType = mesg.getLengthType();
+      final SwimStroke swimStrokeStyle = mesg.getSwimStroke();
+      final Integer numStrokes = mesg.getTotalStrokes();
+
+      swimData.absoluteTime = javaTime;
+
+      if (lengthType != null) {
+         swimData.swim_LengthType = lengthType.getValue();
+      }
+
+      if (avgSwimmingCadence != null) {
+         swimData.swim_Cadence = avgSwimmingCadence;
+      }
+
+      if (numStrokes != null) {
+         swimData.swim_Strokes = numStrokes.shortValue();
+      }
+
+      if (swimStrokeStyle != null) {
+         swimData.swim_StrokeStyle = swimStrokeStyle.getValue();
+      }
+   }
 
 }

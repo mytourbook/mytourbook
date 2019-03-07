@@ -20,7 +20,7 @@ import com.garmin.fit.FileCreatorMesgListener;
 
 import net.tourbook.device.garmin.fit.DataConverters;
 
-public class MesgListener_FileCreator extends AbstractMesgListener_FitData implements FileCreatorMesgListener {
+public class MesgListener_FileCreator extends AbstractMesgListener implements FileCreatorMesgListener {
 
    public MesgListener_FileCreator(final FitData fitData) {
       super(fitData);

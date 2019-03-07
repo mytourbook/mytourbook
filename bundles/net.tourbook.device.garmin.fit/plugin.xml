@@ -5,9 +5,9 @@
    <extension   point="net.tourbook.deviceDataReader">
 
       <device
-         id             ="net.tourbook.device.FitDataReader2"
+         id             ="net.tourbook.device.FitDataReader"
          name           ="Fit Import"
-         class          ="net.tourbook.device.garmin.fit.FitDataReader2"
+         class          ="net.tourbook.device.garmin.fit.FitDataReader"
          fileextension  ="fit"
       />
 

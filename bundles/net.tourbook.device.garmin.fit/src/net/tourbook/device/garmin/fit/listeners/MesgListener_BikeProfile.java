@@ -18,9 +18,9 @@ package net.tourbook.device.garmin.fit.listeners;
 import com.garmin.fit.BikeProfileMesg;
 import com.garmin.fit.BikeProfileMesgListener;
 
-public class MesgListener_BikeProfile extends AbstractMesgListener_FitData implements BikeProfileMesgListener {
+public class MesgListener_BikeProfile extends AbstractMesgListener implements BikeProfileMesgListener {
 
-   private static final String NL = "\n";//$NON-NLS-1$
+//   private static final String NL = "\n";//$NON-NLS-1$
 
    public MesgListener_BikeProfile(final FitData fitData) {
       super(fitData);
@@ -29,40 +29,40 @@ public class MesgListener_BikeProfile extends AbstractMesgListener_FitData imple
    @Override
    public void onMesg(final BikeProfileMesg mesg) {
 
-      final int numFrontGear = mesg.getNumFrontGear();
-      final int numRearGear = mesg.getNumRearGear();
-
-      final Short frontGear = mesg.getFrontGear(0);
-      final Short rearGear = mesg.getRearGear(0);
-
-      final Short frontGearNum = mesg.getFrontGearNum();
-      final Short rearGearNum = mesg.getRearGearNum();
-
-      System.out.println(String.format(
-
-            "" //$NON-NLS-1$
-                  + "MesgListener_BikeProfile" + NL + NL //$NON-NLS-1$
-
-                  + " Front num gears  %-5s" + NL //$NON-NLS-1$
-                  + " Rear num gears   %-5s" + NL + NL //$NON-NLS-1$
-
-                  + " Front teeth      %-5s" + NL //$NON-NLS-1$
-                  + " Rear teeth       %-5s" + NL + NL //$NON-NLS-1$
-
-                  + " frontGearNum     %-5s" + NL //$NON-NLS-1$
-                  + " rearGearNum      %-5s" + NL //$NON-NLS-1$
-
-            ,
-
-            numFrontGear,
-            numRearGear,
-
-            frontGear,
-            rearGear,
-
-            frontGearNum,
-            rearGearNum
-      ));
+//      final int numFrontGear = mesg.getNumFrontGear();
+//      final int numRearGear = mesg.getNumRearGear();
+//
+//      final Short frontGear = mesg.getFrontGear(0);
+//      final Short rearGear = mesg.getRearGear(0);
+//
+//      final Short frontGearNum = mesg.getFrontGearNum();
+//      final Short rearGearNum = mesg.getRearGearNum();
+//
+//      System.out.println(String.format(
+//
+//            "" //$NON-NLS-1$
+//                  + "MesgListener_BikeProfile" + NL + NL //$NON-NLS-1$
+//
+//                  + " Front num gears  %-5s" + NL //$NON-NLS-1$
+//                  + " Rear num gears   %-5s" + NL + NL //$NON-NLS-1$
+//
+//                  + " Front teeth      %-5s" + NL //$NON-NLS-1$
+//                  + " Rear teeth       %-5s" + NL + NL //$NON-NLS-1$
+//
+//                  + " frontGearNum     %-5s" + NL //$NON-NLS-1$
+//                  + " rearGearNum      %-5s" + NL //$NON-NLS-1$
+//
+//            ,
+//
+//            numFrontGear,
+//            numRearGear,
+//
+//            frontGear,
+//            rearGear,
+//
+//            frontGearNum,
+//            rearGearNum
+//      ));
    }
 
 }

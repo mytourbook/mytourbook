@@ -54,7 +54,7 @@ import org.apache.commons.io.IOUtils;
  *
  * @author Wolfgang Schramm
  */
-public class FitDataReader2 extends TourbookDevice {
+public class FitDataReader extends TourbookDevice {
 
    private static boolean _isLogFitData = System.getProperty("logFitData") != null; //$NON-NLS-1$
 
@@ -308,7 +308,7 @@ public class FitDataReader2 extends TourbookDevice {
                // field
                            + " %-5d %-30s %20s %s", //$NON-NLS-1$
 
-                           FitDataReader2.class.getSimpleName(),
+                           FitDataReader.class.getSimpleName(),
 
                            TimeTools.getZonedDateTime(javaTime), // 		show readable date/time
                            javaTime / 1000, //									java time in s
@@ -388,9 +388,7 @@ public class FitDataReader2 extends TourbookDevice {
 
          if (_isLogFitData) {
 
-            //
-            // START - show debug info
-            //
+            // show debug info
 
             System.out.println();
             System.out.println();
@@ -414,10 +412,6 @@ public class FitDataReader2 extends TourbookDevice {
             System.out.println();
 
             addDebugLogListener(fitBroadcaster);
-
-            //
-            // END - show debug info
-            //
          }
 
          fitBroadcaster.run(fileInputStream);

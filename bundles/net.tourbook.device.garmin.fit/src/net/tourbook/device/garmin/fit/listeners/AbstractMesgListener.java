@@ -18,11 +18,11 @@ package net.tourbook.device.garmin.fit.listeners;
 /**
  * Super class for all message listeners, provides access to the {@link FitData}.
  */
-public abstract class AbstractMesgListener_FitData {
+public abstract class AbstractMesgListener {
 
    protected final FitData fitData;
 
-   public AbstractMesgListener_FitData(final FitData fitData) {
+   public AbstractMesgListener(final FitData fitData) {
 
       this.fitData = fitData;
    }

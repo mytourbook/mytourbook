@@ -33,7 +33,7 @@ import org.eclipse.osgi.util.NLS;
 import org.joda.time.Period;
 import org.joda.time.PeriodType;
 
-public class MesgListener_Record extends AbstractMesgListener_FitData implements RecordMesgListener {
+public class MesgListener_Record extends AbstractMesgListener implements RecordMesgListener {
 
    private IPreferenceStore _prefStore            = Activator.getDefault().getPreferenceStore();
 
@@ -64,11 +64,11 @@ public class MesgListener_Record extends AbstractMesgListener_FitData implements
    @Override
    public void onMesg(final RecordMesg mesg) {
 
-      fitData.onRecord_10_Initialize();
+      fitData.onSetup_Record_10_Initialize();
       {
          setRecord(mesg);
       }
-      fitData.onRecord_20_Finalize();
+      fitData.onSetup_Record_20_Finalize();
    }
 
    private void setRecord(final RecordMesg mesg) {
@@ -139,7 +139,7 @@ public class MesgListener_Record extends AbstractMesgListener_FitData implements
              * Create a marker for the exceeded time slice
              */
 
-            fitData.onLap_10_Initialize();
+            fitData.onSetup_Lap_10_Initialize();
             {
                final TourMarker tourMarker = fitData.getCurrent_TourMarker();
 
@@ -157,7 +157,7 @@ public class MesgListener_Record extends AbstractMesgListener_FitData implements
 
                tourMarker.setDeviceLapTime(absoluteTime);
             }
-            fitData.onLap_20_Finalize();
+            fitData.onSetup_Lap_20_Finalize();
          }
       }
 

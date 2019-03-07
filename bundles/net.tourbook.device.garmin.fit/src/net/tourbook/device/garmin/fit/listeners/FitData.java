@@ -15,13 +15,7 @@
  *******************************************************************************/
 package net.tourbook.device.garmin.fit.listeners;
 
-import com.garmin.fit.DateTime;
-import com.garmin.fit.EventMesg;
-import com.garmin.fit.HrMesg;
-import com.garmin.fit.LengthMesg;
-import com.garmin.fit.LengthType;
 import com.garmin.fit.SessionMesg;
-import com.garmin.fit.SwimStroke;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -39,7 +33,7 @@ import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.device.garmin.fit.Activator;
-import net.tourbook.device.garmin.fit.FitDataReader2;
+import net.tourbook.device.garmin.fit.FitDataReader;
 import net.tourbook.device.garmin.fit.IPreferences;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.ui.tourChart.ChartLabel;
@@ -59,7 +53,7 @@ public class FitData {
    private boolean                 _isSetLastMarker;
    private int                     _lastMarkerTimeSlices;
 
-   private FitDataReader2          _fitDataReader2;
+   private FitDataReader           _fitDataReader2;
    private String                  _importFilePathName;
 
    private HashMap<Long, TourData> _alreadyImportedTours;
@@ -88,7 +82,7 @@ public class FitData {
 
    private long                    _timeDiffMS;
 
-   public FitData(final FitDataReader2 fitDataReader2,
+   public FitData(final FitDataReader fitDataReader2,
                   final String importFilePath,
                   final HashMap<Long, TourData> alreadyImportedTours,
                   final HashMap<Long, TourData> newlyImportedTours) {
@@ -472,7 +466,11 @@ public class FitData {
       }
    }
 
-   public TimeData getCurrent_TimeData() {
+   List<TimeData> getAllTimeData() {
+      return _allTimeData;
+   }
+
+   TimeData getCurrent_TimeData() {
 
       if (_current_TimeData == null) {
          throw new IllegalArgumentException("Time data is not initialized"); //$NON-NLS-1$
@@ -482,7 +480,7 @@ public class FitData {
 
    }
 
-   public TourMarker getCurrent_TourMarker() {
+   TourMarker getCurrent_TourMarker() {
 
       if (_current_TourMarker == null) {
          throw new IllegalArgumentException("Tour marker is not initialized"); //$NON-NLS-1$
@@ -491,7 +489,7 @@ public class FitData {
       return _current_TourMarker;
    }
 
-   public String getDeviceName() {
+   String getDeviceName() {
 
       final StringBuilder deviceName = new StringBuilder();
 
@@ -506,7 +504,19 @@ public class FitData {
       return deviceName.toString();
    }
 
-   public TourData getTourData() {
+   List<GearData> getGearData() {
+      return _allGearData;
+   }
+
+   List<SwimData> getSwimData() {
+      return _allSwimData;
+   }
+
+   long getTimeDiffMS() {
+      return _timeDiffMS;
+   }
+
+   TourData getTourData() {
       return _tourData;
    }
 
@@ -515,7 +525,7 @@ public class FitData {
       return String.format("%s (Session: %s)", _importFilePathName, _sessionIndex); //$NON-NLS-1$
    }
 
-   public void onLap_10_Initialize() {
+   void onSetup_Lap_10_Initialize() {
 
       final List<TourMarker> tourMarkers = _allTourMarker;
 
@@ -524,291 +534,17 @@ public class FitData {
       tourMarkers.add(_current_TourMarker);
    }
 
-   public void onLap_20_Finalize() {
+   void onSetup_Lap_20_Finalize() {
 
       _current_TourMarker = null;
    }
 
-   /**
-    * Gear data are available in the common {@link EventMesg}.
-    *
-    * @param mesg
-    */
-   public void onMesg_Event(final EventMesg mesg) {
-
-      final Long gearChangeData = mesg.getGearChangeData();
-
-      // check if gear data are available, it can be null
-      if (gearChangeData != null) {
-
-         // create gear data for the current time
-         final GearData gearData = new GearData();
-
-         final com.garmin.fit.DateTime garminTime = mesg.getTimestamp();
-
-         // convert garmin time into java time
-         final long garminTimeS = garminTime.getTimestamp();
-         final long garminTimeMS = garminTimeS * 1000;
-         final long javaTime = garminTimeMS + com.garmin.fit.DateTime.OFFSET;
-
-         gearData.absoluteTime = javaTime;
-         gearData.gears = gearChangeData;
-
-         _allGearData.add(gearData);
-      }
-   }
-
-   /**
-    * This is called AFTER the session is closed. Swimming is producing the hr event separately in
-    * it's own device.
-    *
-    * @param mesg
-    */
-   public void onMesg_Hr(final HrMesg mesg) {
-
-      final DateTime hrTime = mesg.getTimestamp();
-
-//    System.out.println(String.format(""
-//
-//          + "[%s]"
-//
-//          + " NumEventTimestamp %-3d"
-//          + " NumFilteredBpm %-3d"
-//
-//          + " Timestamp %-29s"
-//          + " timestamp %-15s"
-//          + " FractionalTimestamp: %-7.5f"
-////           + (" Time256: " + mesg.getTime256())
-//
-//          + " EventTimestamp %-90s "
-//          + " FilteredBpm %-45s "
-//
-//          + (" NumEventTimestamp12 %-5d")
-//          + (" EventTimestamp12 " + Arrays.toString(mesg.getEventTimestamp12())),
-//
-//          getClass().getSimpleName(),
-//
-//          mesg.getNumEventTimestamp(),
-//          mesg.getNumFilteredBpm(),
-//
-//          hrTime,
-//          hrTime == null ? "" : hrTime.getTimestamp(),
-//          mesg.getFractionalTimestamp() == null ? null : mesg.getFractionalTimestamp(),
-//
-//          Arrays.toString(mesg.getEventTimestamp()),
-//          Arrays.toString(mesg.getFilteredBpm()),
-//
-//          mesg.getNumEventTimestamp12())
-////TODO remove SYSTEM.OUT.PRINTLN
-//    );
-
-      boolean isTimeAvailable = false;
-
-      final int numEventTimestamp = mesg.getNumEventTimestamp();
-      if (numEventTimestamp < 1) {
-         return;
-      }
-
-      final Float[] allEventTime = mesg.getEventTimestamp();
-      final Short[] allFilteredBpm = mesg.getFilteredBpm();
-
-      if (allFilteredBpm.length != allEventTime.length) {
-
-         TourLogManager.logError(String.format("Fit file has different filtered data: EventTimestamp: %d - FilteredBpm: %d", //$NON-NLS-1$
-               allEventTime.length,
-               allFilteredBpm.length));
-
-         return;
-      }
-
-      /*
-       * Get time diff between tour and hr recording. It is complicated because it also contains the
-       * garmin time offset. After several try and error processes this algorithm seems to be now
-       * correct.
-       */
-      if (hrTime != null && _timeDiffMS == Long.MIN_VALUE && allEventTime.length > 0) {
-
-         final long firstTourTimeMS = _allTimeData.get(0).absoluteTime;
-         final long firstHrTimestampMS = hrTime.getDate().getTime();
-
-         final long hr2TourTimeDiffMS = firstTourTimeMS - firstHrTimestampMS;
-
-         final long firstHrTimeSec = Float.valueOf(allEventTime[0]).longValue();
-         final long firstHrTimeMS = firstHrTimeSec * 1000;
-
-         _timeDiffMS = firstTourTimeMS - firstHrTimeMS - hr2TourTimeDiffMS;
-      }
-
-      for (int timeStampIndex = 0; timeStampIndex < allEventTime.length; timeStampIndex++) {
-
-         final Float eventTimeStamp = allEventTime[timeStampIndex];
-         final Short filteredBpm = allFilteredBpm[timeStampIndex];
-
-         final double sliceGarminTimeS = eventTimeStamp;
-         final long sliceGarminTimeMS = (long) (sliceGarminTimeS * 1000);
-         final long sliceJavaTime = sliceGarminTimeMS + _timeDiffMS;
-
-         // merge HR data into an already existing time data
-         for (final TimeData timeData : _allTimeData) {
-
-            if (timeData.absoluteTime == sliceJavaTime) {
-
-               timeData.pulse = filteredBpm;
-               isTimeAvailable = true;
-
-//             System.out.println(String.format(""
-//
-//                   + "[%s]"
-//
-//                   + (" eventTimeStamp %-8.2f   ")
-//                   + (" sliceJavaTime %d   ")
-//                   + (" localDT %s   ")
-//                   + (" bpm %d"),
-//
-//                   getClass().getSimpleName(),
-//
-//                   eventTimeStamp,
-//                   sliceJavaTime,
-//                   new LocalDateTime(sliceJavaTime),
-//                   filteredBpm
-//
-//// TODO remove SYSTEM.OUT.PRINTLN
-//             ));
-
-               break;
-            }
-         }
-
-         if (isTimeAvailable == false) {
-
-            // timeslice is not yet created for this heartrate
-
-//          System.out.println(String.format(""
-//
-//                + "[%s]"
-//
-//                + (" eventTimeStamp %-8.2f   ")
-//                + (" sliceJavaTime %d   ")
-//                + (" localDT %s   ")
-//                + (" bpm %d - no timeslice"),
-//
-//                getClass().getSimpleName(),
-//
-//                eventTimeStamp,
-//                sliceJavaTime,
-//                new LocalDateTime(sliceJavaTime),
-//                filteredBpm
-//
-//// TODO remove SYSTEM.OUT.PRINTLN
-//          ));
-         }
-      }
-   }
-
-   public void onMesg_Length(final LengthMesg mesg) {
-
-      // ensure tour is setup
-//    setupSession_Tour_10_Initialize();
-
-      // get gear list for current tour
-      final List<SwimData> tourSwimData = _allSwimData;
-
-      // create gear data for the current time
-      final SwimData swimData = new SwimData();
-
-      tourSwimData.add(swimData);
-
-      final com.garmin.fit.DateTime garminTime = mesg.getTimestamp();
-
-      // convert garmin time into java time
-      final long garminTimeS = garminTime.getTimestamp();
-      final long garminTimeMS = garminTimeS * 1000;
-      final long javaTime = garminTimeMS + com.garmin.fit.DateTime.OFFSET;
-
-      final Short avgSwimmingCadence = mesg.getAvgSwimmingCadence();
-      final LengthType lengthType = mesg.getLengthType();
-      final SwimStroke swimStrokeStyle = mesg.getSwimStroke();
-      final Integer numStrokes = mesg.getTotalStrokes();
-
-      swimData.absoluteTime = javaTime;
-
-      if (lengthType != null) {
-         swimData.swim_LengthType = lengthType.getValue();
-      }
-
-      if (avgSwimmingCadence != null) {
-         swimData.swim_Cadence = avgSwimmingCadence;
-      }
-
-      if (numStrokes != null) {
-         swimData.swim_Strokes = numStrokes.shortValue();
-      }
-
-      if (swimStrokeStyle != null) {
-         swimData.swim_StrokeStyle = swimStrokeStyle.getValue();
-      }
-
-//    final long timestamp = mesg.getTimestamp().getDate().getTime();
-//
-//    System.out.println(String.format(""
-//
-//          + "[%s]"
-//
-//          + " Timestamp %-23s"
-////           + " StartTime %-23s"
-////           + " Time Diff %-6d"
-//
-//          + " LengthType %-10s"
-//
-//          + " SwimStroke %-15s"
-//          + " AvgSwimmingCadence %-6s"
-//          + " TotalStrokes %-5s"
-//
-////           + " NumStrokeCount %-3d"
-////           + " StrokeCount %-30s"
-//
-//          ,
-//
-//          getClass().getSimpleName(),
-//
-//          TimeTools.toLocalDateTime(timestamp),
-////           TimeTools.toLocalDateTime(mesg.getStartTime().getDate().getTime()),
-////           mesg.getTimestamp().getTimestamp() - mesg.getStartTime().getTimestamp(),
-//
-//          lengthType,
-//
-//          swimStrokeStyle == null ? "" : swimStrokeStyle.toString(),
-//          avgSwimmingCadence == null ? "" : avgSwimmingCadence.toString(),
-//          numStrokes == null ? "" : numStrokes.toString()
-//
-//    ));
-////TODO remove SYSTEM.OUT.PRINTLN
-
-//    [FitContextData] Timestamp 2018-09-01T14:51:01     LengthType ACTIVE     SwimStroke FREESTYLE       AvgSwimmingCadence 24     TotalStrokes 12
-//    [FitContextData] Timestamp 2018-09-01T14:51:26     LengthType ACTIVE     SwimStroke FREESTYLE       AvgSwimmingCadence 23     TotalStrokes 11
-//    [FitContextData] Timestamp 2018-09-01T14:52        LengthType ACTIVE     SwimStroke FREESTYLE       AvgSwimmingCadence 25     TotalStrokes 13
-//    [FitContextData] Timestamp 2018-09-01T14:52:30     LengthType ACTIVE     SwimStroke FREESTYLE       AvgSwimmingCadence 24     TotalStrokes 12
-//    [FitContextData] Timestamp 2018-09-01T14:53        LengthType ACTIVE     SwimStroke FREESTYLE       AvgSwimmingCadence 24     TotalStrokes 12
-//    [FitContextData] Timestamp 2018-09-01T14:53:19     LengthType ACTIVE     SwimStroke FREESTYLE       AvgSwimmingCadence 24     TotalStrokes 11
-//    [FitContextData] Timestamp 2018-09-01T14:54:34     LengthType IDLE       SwimStroke                 AvgSwimmingCadence        TotalStrokes
-//    [FitContextData] Timestamp 2018-09-01T14:55:25     LengthType ACTIVE     SwimStroke BREASTSTROKE    AvgSwimmingCadence 17     TotalStrokes 12
-//    [FitContextData] Timestamp 2018-09-01T14:56:09     LengthType ACTIVE     SwimStroke BREASTSTROKE    AvgSwimmingCadence 19     TotalStrokes 13
-//    [FitContextData] Timestamp 2018-09-01T14:56:50     LengthType ACTIVE     SwimStroke BREASTSTROKE    AvgSwimmingCadence 19     TotalStrokes 13
-//    [FitContextData] Timestamp 2018-09-01T14:57:19     LengthType ACTIVE     SwimStroke BREASTSTROKE    AvgSwimmingCadence 16     TotalStrokes 11
-//    [FitContextData] Timestamp 2018-09-01T14:59:05     LengthType IDLE       SwimStroke                 AvgSwimmingCadence        TotalStrokes
-//    [FitContextData] Timestamp 2018-09-01T14:59:42     LengthType ACTIVE     SwimStroke FREESTYLE       AvgSwimmingCadence 23     TotalStrokes 12
-//    [FitContextData] Timestamp 2018-09-01T15:00:10     LengthType ACTIVE     SwimStroke FREESTYLE       AvgSwimmingCadence 26     TotalStrokes 12
-//    [FitContextData] Timestamp 2018-09-01T15:00:38     LengthType ACTIVE     SwimStroke FREESTYLE       AvgSwimmingCadence 25     TotalStrokes 12
-//    [FitContextData] Timestamp 2018-09-01T15:01:09     LengthType ACTIVE     SwimStroke FREESTYLE       AvgSwimmingCadence 26     TotalStrokes 12
-
-   }
-
-   public void onRecord_10_Initialize() {
+   void onSetup_Record_10_Initialize() {
 
       _current_TimeData = new TimeData();
    }
 
-   public void onRecord_20_Finalize() {
+   void onSetup_Record_20_Finalize() {
 
       if (_current_TimeData == null) {
          // this occured
@@ -877,27 +613,34 @@ public class FitData {
       _current_TimeData = null;
    }
 
-   public void setDeviceId(final String deviceId) {
+   void onSetup_Session_20_Finalize() {
+
+      onSetup_Record_20_Finalize();
+
+      _timeDiffMS = Long.MIN_VALUE;
+   }
+
+   void setDeviceId(final String deviceId) {
       _deviceId = deviceId;
    }
 
-   public void setGarminProduct(final String garminProduct) {
+   void setGarminProduct(final String garminProduct) {
       _garminProduct = garminProduct;
    }
 
-   public void setHeartRateSensorPresent(final boolean isHeartRateSensorPresent) {
+   void setHeartRateSensorPresent(final boolean isHeartRateSensorPresent) {
       _tourData.setIsPulseSensorPresent(isHeartRateSensorPresent);
    }
 
-   public void setManufacturer(final String manufacturer) {
+   void setManufacturer(final String manufacturer) {
       _manufacturer = manufacturer;
    }
 
-   public void setPowerSensorPresent(final boolean isPowerSensorPresent) {
+   void setPowerSensorPresent(final boolean isPowerSensorPresent) {
       _tourData.setIsPowerSensorPresent(isPowerSensorPresent);
    }
 
-   public void setSessionIndex(final SessionMesg mesg) {
+   void setSessionIndex(final SessionMesg mesg) {
 
       final Integer fitMessageIndex = mesg.getFieldIntegerValue(254);
 
@@ -906,26 +649,24 @@ public class FitData {
       _sessionIndex = messageIndex.toString();
    }
 
-   public void setSessionStartTime(final ZonedDateTime dateTime) {
+   void setSessionStartTime(final ZonedDateTime dateTime) {
       _sessionStartTime = dateTime;
    }
 
-   public void setSoftwareVersion(final String softwareVersion) {
+   void setSoftwareVersion(final String softwareVersion) {
       _softwareVersion = softwareVersion;
    }
 
-   public void setSpeedSensorPresent(final boolean isSpeedSensorPresent) {
+   void setSpeedSensorPresent(final boolean isSpeedSensorPresent) {
       _tourData.setIsDistanceFromSensor(isSpeedSensorPresent);
    }
 
-   public void setStrideSensorPresent(final boolean isStrideSensorPresent) {
+   void setStrideSensorPresent(final boolean isStrideSensorPresent) {
       _tourData.setIsStrideSensorPresent(isStrideSensorPresent);
    }
 
-   public void setupSession_Tour_20_Finalize() {
+   void setTimeDiffMS(final long timeDiffMS) {
 
-      onRecord_20_Finalize();
-
-      _timeDiffMS = Long.MIN_VALUE;
+      _timeDiffMS = timeDiffMS;
    }
 }

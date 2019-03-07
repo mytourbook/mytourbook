@@ -27,7 +27,7 @@ import net.tourbook.data.TourMarker;
 /**
  * A {@link TourMarker} is set for each lap.
  */
-public class MesgListener_Lap extends AbstractMesgListener_FitData implements LapMesgListener {
+public class MesgListener_Lap extends AbstractMesgListener implements LapMesgListener {
 
    private int   _lapCounter;
 
@@ -45,11 +45,11 @@ public class MesgListener_Lap extends AbstractMesgListener_FitData implements La
    @Override
    public void onMesg(final LapMesg lapMesg) {
 
-      fitData.onLap_10_Initialize();
+      fitData.onSetup_Lap_10_Initialize();
       {
          setMarker(lapMesg);
       }
-      fitData.onLap_20_Finalize();
+      fitData.onSetup_Lap_20_Finalize();
    }
 
    private void setMarker(final LapMesg lapMesg) {

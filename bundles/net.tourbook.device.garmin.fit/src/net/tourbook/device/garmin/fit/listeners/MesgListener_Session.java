@@ -26,7 +26,7 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.data.TourData;
 import net.tourbook.device.garmin.fit.FitDataReaderException;
 
-public class MesgListener_Session extends AbstractMesgListener_FitData implements SessionMesgListener {
+public class MesgListener_Session extends AbstractMesgListener implements SessionMesgListener {
 
    public MesgListener_Session(final FitData fitData) {
       super(fitData);
@@ -164,6 +164,6 @@ public class MesgListener_Session extends AbstractMesgListener_FitData implement
          tourData.setPower_FTP(ftp);
       }
 
-      fitData.setupSession_Tour_20_Finalize();
+      fitData.onSetup_Session_20_Finalize();
    }
 }

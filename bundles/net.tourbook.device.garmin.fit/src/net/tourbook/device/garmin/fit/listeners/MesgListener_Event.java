@@ -18,15 +18,47 @@ package net.tourbook.device.garmin.fit.listeners;
 import com.garmin.fit.EventMesg;
 import com.garmin.fit.EventMesgListener;
 
-public class MesgListener_Event extends AbstractMesgListener_FitData implements EventMesgListener {
+import java.util.List;
+
+import net.tourbook.data.GearData;
+
+/**
+ * Set gear data
+ */
+public class MesgListener_Event extends AbstractMesgListener implements EventMesgListener {
+
+   List<GearData> _gearData;
 
    public MesgListener_Event(final FitData fitData) {
-      super(fitData);
-	}
 
-	@Override
-	public void onMesg(final EventMesg mesg) {
-      fitData.onMesg_Event(mesg);
-	}
+      super(fitData);
+
+      _gearData = fitData.getGearData();
+   }
+
+   @Override
+   public void onMesg(final EventMesg mesg) {
+
+      final Long gearChangeData = mesg.getGearChangeData();
+
+      // check if gear data are available, it can be null
+      if (gearChangeData != null) {
+
+         // create gear data for the current time
+         final GearData gearData = new GearData();
+
+         final com.garmin.fit.DateTime garminTime = mesg.getTimestamp();
+
+         // convert garmin time into java time
+         final long garminTimeS = garminTime.getTimestamp();
+         final long garminTimeMS = garminTimeS * 1000;
+         final long javaTime = garminTimeMS + com.garmin.fit.DateTime.OFFSET;
+
+         gearData.absoluteTime = javaTime;
+         gearData.gears = gearChangeData;
+
+         _gearData.add(gearData);
+      }
+   }
 
 }

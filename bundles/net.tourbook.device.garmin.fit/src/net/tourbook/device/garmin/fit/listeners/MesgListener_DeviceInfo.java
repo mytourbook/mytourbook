@@ -19,7 +19,7 @@ import com.garmin.fit.AntplusDeviceType;
 import com.garmin.fit.DeviceInfoMesg;
 import com.garmin.fit.DeviceInfoMesgListener;
 
-public class MesgListener_DeviceInfo extends AbstractMesgListener_FitData implements DeviceInfoMesgListener {
+public class MesgListener_DeviceInfo extends AbstractMesgListener implements DeviceInfoMesgListener {
 
 
    public MesgListener_DeviceInfo(final FitData fitData) {

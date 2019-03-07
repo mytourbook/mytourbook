@@ -20,7 +20,7 @@ import com.garmin.fit.ActivityMesgListener;
 
 import net.tourbook.tour.TourLogManager;
 
-public class MesgListener_Activity extends AbstractMesgListener_FitData implements ActivityMesgListener {
+public class MesgListener_Activity extends AbstractMesgListener implements ActivityMesgListener {
 
    public MesgListener_Activity(final FitData fitData) {
       super(fitData);
