@@ -19,7 +19,6 @@ import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.tag.ChangedTags;
-import net.tourbook.tour.filter.geo.TourGeoFilterItem;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 public enum TourEventId {
@@ -103,15 +102,6 @@ public enum TourEventId {
     * A tour marker is selected, event data contain a {@link SelectionTourMarker}.
     */
    MARKER_SELECTION,
-
-   /*
-    * GEO GRID
-    */
-
-//   /**
-//    * Show/hide geo grid in map, event data contains true/false.
-//    */
-//   MAP_SHOW_LAST_GEO_GRID,
 
    /**
     * Show geo grid in the map, event data contains {@link TourGeoFilterItem}

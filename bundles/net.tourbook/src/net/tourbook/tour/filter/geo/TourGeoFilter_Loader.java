@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tour.filter.geo;
 
-import de.byteholder.geoclipse.map.MapGridBoxItem;
+import de.byteholder.geoclipse.map.MapGridBox;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -39,14 +39,14 @@ import net.tourbook.ui.SQLFilter;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.graphics.Point;
 
-public class GeoFilterTourLoader {
+public class TourGeoFilter_Loader {
 
    private static final char                                     NL                  = UI.NEW_LINE;
 
-   private final static IDialogSettings                          _state              = TourGeoFilterManager.getState();
+   private final static IDialogSettings                          _state              = TourGeoFilter_Manager.getState();
 
    private static final AtomicLong                               _loaderExecuterId   = new AtomicLong();
-   private static final LinkedBlockingDeque<GeoFilterLoaderItem> _loaderWaitingQueue = new LinkedBlockingDeque<>();
+   private static final LinkedBlockingDeque<GeoFilter_LoaderItem> _loaderWaitingQueue = new LinkedBlockingDeque<>();
    private static ExecutorService                                _loadingExecutor;
 
    static {
@@ -71,6 +71,7 @@ public class GeoFilterTourLoader {
    /**
     * @param gridBoxItem
     * @param map2View
+    * @param tourGeoFilter
     * @param geoParts
     *           Requested geo parts
     * @param lonPartNormalized
@@ -81,23 +82,24 @@ public class GeoFilterTourLoader {
     * @return
     * @return
     */
-   public static GeoFilterLoaderItem loadToursFromGeoParts(final Point topLeftE2,
+   public static GeoFilter_LoaderItem loadToursFromGeoParts(final Point topLeftE2,
                                                            final Point bottomRightE2,
-                                                           final GeoFilterLoaderItem previousGeoFilterItem,
-                                                           final MapGridBoxItem gridBoxItem,
-                                                           final Map2View map2View) {
+                                                           final GeoFilter_LoaderItem previousGeoFilterItem,
+                                                           final MapGridBox gridBoxItem,
+                                                            final Map2View map2View,
+                                                            final TourGeoFilter tourGeoFilter) {
 
       stopLoading(previousGeoFilterItem);
 
       // invalidate old requests
       final long executerId = _loaderExecuterId.incrementAndGet();
 
-      final GeoFilterLoaderItem loaderItem = new GeoFilterLoaderItem(executerId);
+      final GeoFilter_LoaderItem loaderItem = new GeoFilter_LoaderItem(executerId);
 
       loaderItem.topLeftE2 = topLeftE2;
       loaderItem.bottomRightE2 = bottomRightE2;
 
-      loaderItem.mapGridBoxItem = gridBoxItem;
+      loaderItem.mapGridBox = gridBoxItem;
 
       _loaderWaitingQueue.add(loaderItem);
 
@@ -106,27 +108,27 @@ public class GeoFilterTourLoader {
          public void run() {
 
             // get last added loader item
-            final GeoFilterLoaderItem geoLoaderData = _loaderWaitingQueue.pollFirst();
+            final GeoFilter_LoaderItem geoLoaderData = _loaderWaitingQueue.pollFirst();
 
             if (geoLoaderData == null) {
                return;
             }
 
             // show loading state
-            geoLoaderData.mapGridBoxItem.gridBoxText = "Loading...";
+            geoLoaderData.mapGridBox.gridBoxText = "Loading...";
             map2View.redrawMap();
 
 
             if (loadToursFromGeoParts_FromDB(geoLoaderData)) {
 
-               map2View.geoFilter_20_ShowLoadedTours(geoLoaderData);
+               map2View.geoFilter_20_ShowLoadedTours(geoLoaderData, tourGeoFilter);
 
             } else {
 
                // update loading state
 
                // show loading state
-               geoLoaderData.mapGridBoxItem.gridBoxText = "Done";
+               geoLoaderData.mapGridBox.gridBoxText = "Done";
                map2View.redrawMap();
             }
          }
@@ -137,7 +139,7 @@ public class GeoFilterTourLoader {
       return loaderItem;
    }
 
-   private static boolean loadToursFromGeoParts_FromDB(final GeoFilterLoaderItem geoLoaderData) {
+   private static boolean loadToursFromGeoParts_FromDB(final GeoFilter_LoaderItem geoLoaderData) {
 
       if (geoLoaderData.isCanceled) {
          return false;
@@ -192,8 +194,8 @@ public class GeoFilterTourLoader {
       }
 
       final boolean isAppFilter = Util.getStateBoolean(_state,
-            TourGeoFilterManager.STATE_IS_USE_APP_FILTERS,
-            TourGeoFilterManager.STATE_IS_USE_APP_FILTERS_DEFAULT);
+            TourGeoFilter_Manager.STATE_IS_USE_APP_FILTERS,
+            TourGeoFilter_Manager.STATE_IS_USE_APP_FILTERS_DEFAULT);
 
       /*
        * Create geo part sql parameters
@@ -289,7 +291,7 @@ public class GeoFilterTourLoader {
 
       final String timeInMs = timeDiff > 50 ? " - " + Long.toString(timeDiff) + " ms" : "";
 
-      geoLoaderData.mapGridBoxItem.gridBoxText = "Tours: " + Integer.toString(allTourIds.size()) + timeInMs;
+      geoLoaderData.mapGridBox.gridBoxText = "Tours: " + Integer.toString(allTourIds.size()) + timeInMs;
 
       geoLoaderData.allLoadedTourIds = allTourIds;
 
@@ -306,7 +308,7 @@ public class GeoFilterTourLoader {
     *
     * @param loaderItem
     */
-   public static void stopLoading(final GeoFilterLoaderItem loaderItem) {
+   public static void stopLoading(final GeoFilter_LoaderItem loaderItem) {
 
       if (loaderItem != null) {
          loaderItem.isCanceled = true;

@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tour.filter.geo;
 
-import de.byteholder.geoclipse.map.MapGridBoxItem;
+import de.byteholder.geoclipse.map.MapGridBox;
 
 import java.time.ZonedDateTime;
 
@@ -24,36 +24,42 @@ import net.tourbook.common.time.TimeTools;
 
 import org.eclipse.swt.graphics.Point;
 
-public class TourGeoFilterItem {
+/**
+ * Tour geo filter is created in the map by selecting an area. This is displayed (and can be
+ * selected) in the tour geo filter slideout.
+ */
+public class TourGeoFilter {
 
-   String                id = Long.toString(System.nanoTime());
+   String             id = Long.toString(System.nanoTime());
 
-   public Point          topLeftE2;
-   public Point          bottomRightE2;
+   public Point       topLeftE2;
+   public Point       bottomRightE2;
 
-   public int            mapZoomLevel;
-   public GeoPosition    mapGeoCenter;
+   public int         mapZoomLevel;
+   public GeoPosition mapGeoCenter;
 
-   public double         latitude1;
-   public double         longitude1;
+   public double      latitude1;
+   public double      longitude1;
 
-   public double         latitude2;
-   public double         longitude2;
+   public double      latitude2;
+   public double      longitude2;
 
-   ZonedDateTime         created;
-   long                  createdMS;
+   ZonedDateTime      created;
+   long               createdMS;
 
-   int                   numGeoParts;
+   int                geoParts_Width;
+   int                geoParts_Height;
+   int                numGeoParts;
 
-   public MapGridBoxItem mapGridBoxItem;
+   public MapGridBox  mapGridBox;
 
-   public TourGeoFilterItem() {}
+   public TourGeoFilter() {}
 
-   public TourGeoFilterItem(final Point topLeftE2,
-                            final Point bottomRightE2,
-                            final int mapZoomLevel,
-                            final GeoPosition mapGeoCenter,
-                            final MapGridBoxItem mapGridBoxItem) {
+   public TourGeoFilter(final Point topLeftE2,
+                        final Point bottomRightE2,
+                        final int mapZoomLevel,
+                        final GeoPosition mapGeoCenter,
+                        final MapGridBox mapGridBox) {
 
       this.topLeftE2 = topLeftE2;
       this.bottomRightE2 = bottomRightE2;
@@ -61,7 +67,7 @@ public class TourGeoFilterItem {
       this.mapZoomLevel = mapZoomLevel;
       this.mapGeoCenter = mapGeoCenter;
 
-      this.mapGridBoxItem = mapGridBoxItem;
+      this.mapGridBox = mapGridBox;
 
       latitude1 = topLeftE2.y / 100.0d;
       longitude1 = topLeftE2.x / 100.0d;
@@ -72,10 +78,10 @@ public class TourGeoFilterItem {
       created = TimeTools.now();
       createdMS = TimeTools.toEpochMilli(created);
 
-      final int width = bottomRightE2.x - topLeftE2.x;
-      final int height = topLeftE2.y - bottomRightE2.y;
+      geoParts_Width = bottomRightE2.x - topLeftE2.x;
+      geoParts_Height = topLeftE2.y - bottomRightE2.y;
 
-      numGeoParts = width * height;
+      numGeoParts = geoParts_Width * geoParts_Height;
    }
 
    @Override
@@ -89,7 +95,7 @@ public class TourGeoFilterItem {
       if (getClass() != obj.getClass()) {
          return false;
       }
-      final TourGeoFilterItem other = (TourGeoFilterItem) obj;
+      final TourGeoFilter other = (TourGeoFilter) obj;
       if (id == null) {
          if (other.id != null) {
             return false;

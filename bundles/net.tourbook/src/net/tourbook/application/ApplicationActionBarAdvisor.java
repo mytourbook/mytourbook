@@ -20,7 +20,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.tour.filter.TourTagFilterManager;
 import net.tourbook.tour.TourTypeFilterManager;
 import net.tourbook.tour.filter.TourFilterManager;
-import net.tourbook.tour.filter.geo.TourGeoFilterManager;
+import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
 
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.GroupMarker;
@@ -228,7 +228,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
             coolBar.add(tbItemContribItem);
             tbMgr_TourFilter.add(_actionTour_GeoFilter);
 
-            TourGeoFilterManager.setAction_TourGeoFilter(_actionTour_GeoFilter);
+            TourGeoFilter_Manager.setAction_TourGeoFilter(_actionTour_GeoFilter);
          }
          {
             /*

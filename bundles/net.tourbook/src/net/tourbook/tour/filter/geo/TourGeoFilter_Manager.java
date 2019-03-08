@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tour.filter.geo;
 
-import de.byteholder.geoclipse.map.MapGridBoxItem;
+import de.byteholder.geoclipse.map.MapGridBox;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -48,7 +48,7 @@ import org.eclipse.ui.XMLMemento;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
-public class TourGeoFilterManager {
+public class TourGeoFilter_Manager {
 
    private static final Bundle                 _bundle                              = TourbookPlugin.getDefault().getBundle();
 
@@ -101,8 +101,8 @@ public class TourGeoFilterManager {
 
    private static int[]                        _fireEventCounter                    = new int[1];
 
-   private static ArrayList<TourGeoFilterItem> _allTourGeoFilter                    = new ArrayList<>();
-   private static TourGeoFilterItem            _selectedFilter;
+   private static ArrayList<TourGeoFilter> _allTourGeoFilter                    = new ArrayList<>();
+   private static TourGeoFilter            _selectedFilter;
 
    private static String                       _fromXml_ActiveGeoFilterId;
 
@@ -133,14 +133,14 @@ public class TourGeoFilterManager {
 
    }
 
-   static ArrayList<TourGeoFilterItem> getAllGeoFilter() {
+   static ArrayList<TourGeoFilter> getAllGeoFilter() {
       return _allTourGeoFilter;
    }
 
    /**
     * @return Returns current active geo filter or <code>null</code> when a filter is not selected
     */
-   private static TourGeoFilterItem getGeoFilter() {
+   private static TourGeoFilter getGeoFilter() {
 
       if (_selectedFilter != null) {
          return _selectedFilter;
@@ -150,7 +150,7 @@ public class TourGeoFilterManager {
          return null;
       }
 
-      for (final TourGeoFilterItem tourGeoFilterItem : _allTourGeoFilter) {
+      for (final TourGeoFilter tourGeoFilterItem : _allTourGeoFilter) {
 
          if (_fromXml_ActiveGeoFilterId.equals(tourGeoFilterItem.id)) {
 
@@ -176,7 +176,7 @@ public class TourGeoFilterManager {
          return null;
       }
 
-      final TourGeoFilterItem geoFilter = getGeoFilter();
+      final TourGeoFilter geoFilter = getGeoFilter();
 
       if (geoFilter == null) {
 
@@ -186,8 +186,8 @@ public class TourGeoFilterManager {
       }
 
       final boolean isIncludeGeoParts = Util.getStateBoolean(_state,
-            TourGeoFilterManager.STATE_IS_INCLUDE_GEO_PARTS,
-            TourGeoFilterManager.STATE_IS_INCLUDE_GEO_PARTS_DEFAULT);
+            TourGeoFilter_Manager.STATE_IS_INCLUDE_GEO_PARTS,
+            TourGeoFilter_Manager.STATE_IS_INCLUDE_GEO_PARTS_DEFAULT);
 
       final StringBuilder sqlWhere = new StringBuilder();
       final ArrayList<Object> sqlParameters = new ArrayList<>();
@@ -307,7 +307,7 @@ public class TourGeoFilterManager {
     *
     * @param selectedFilter
     */
-   public static void selectFilter(final TourGeoFilterItem selectedFilter) {
+   public static void selectFilter(final TourGeoFilter selectedFilter) {
 
       if (_selectedFilter == selectedFilter) {
 
@@ -330,9 +330,9 @@ public class TourGeoFilterManager {
                                 final Point bottomRightE2,
                                 final int mapZoomLevel,
                                 final GeoPosition mapGeoCenter,
-                                final MapGridBoxItem gridBoxItem) {
+                                final MapGridBox gridBoxItem) {
 
-      _selectedFilter = new TourGeoFilterItem(topLeftE2, bottomRightE2, mapZoomLevel, mapGeoCenter, gridBoxItem);
+      _selectedFilter = new TourGeoFilter(topLeftE2, bottomRightE2, mapZoomLevel, mapGeoCenter, gridBoxItem);
 
       _allTourGeoFilter.add(_selectedFilter);
 
@@ -389,7 +389,7 @@ public class TourGeoFilterManager {
                final XMLMemento xmlGeoFilter = (XMLMemento) mementoChild;
                if (TAG_GEO_FILTER.equals(xmlGeoFilter.getType())) {
 
-                  final TourGeoFilterItem geoFilter = new TourGeoFilterItem();
+                  final TourGeoFilter geoFilter = new TourGeoFilter();
 
                   // id
                   final String filterId = Util.getXmlString(xmlGeoFilter, ATTR_GEO_FILTER_ID, null);

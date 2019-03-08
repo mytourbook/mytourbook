@@ -18,7 +18,7 @@ package net.tourbook.map2.view;
 import de.byteholder.geoclipse.GeoclipseExtensions;
 import de.byteholder.geoclipse.map.IMapContextProvider;
 import de.byteholder.geoclipse.map.Map;
-import de.byteholder.geoclipse.map.MapGridBoxItem;
+import de.byteholder.geoclipse.map.MapGridBox;
 import de.byteholder.geoclipse.map.MapLegend;
 import de.byteholder.geoclipse.map.event.IMapGridListener;
 import de.byteholder.geoclipse.map.event.IMapInfoListener;
@@ -121,10 +121,10 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourInfoIconToolTipProvider;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.filter.geo.GeoFilterLoaderItem;
-import net.tourbook.tour.filter.geo.GeoFilterTourLoader;
-import net.tourbook.tour.filter.geo.TourGeoFilterItem;
-import net.tourbook.tour.filter.geo.TourGeoFilterManager;
+import net.tourbook.tour.filter.geo.GeoFilter_LoaderItem;
+import net.tourbook.tour.filter.geo.TourGeoFilter;
+import net.tourbook.tour.filter.geo.TourGeoFilter_Loader;
+import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
 import net.tourbook.tour.photo.DialogPhotoProperties;
 import net.tourbook.tour.photo.IPhotoPropertiesListener;
 import net.tourbook.tour.photo.PhotoPropertiesEvent;
@@ -444,9 +444,9 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
    private ActionZoomShowEntireTour       _actionZoom_ShowEntireTour;
 
-   private org.eclipse.swt.graphics.Point _geoFilter_TopLeftE2;
-   private org.eclipse.swt.graphics.Point _geoFilter_BottomRightE2;
-   private GeoFilterLoaderItem            _geoFilter_PreviousGeoFilterItem;
+   private org.eclipse.swt.graphics.Point _geoFilter_Loaded_TopLeft_E2;
+   private org.eclipse.swt.graphics.Point _geoFilter_Loaded_BottomRight_E2;
+   private GeoFilter_LoaderItem           _geoFilter_PreviousGeoLoaderItem;
    private AtomicInteger                  _geoFilter_RunningId = new AtomicInteger();
 
    /*
@@ -953,15 +953,15 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
                                final int mapZoomLevel,
                                final GeoPosition mapGeoCenter,
                                final boolean isGridSelected,
-                               final MapGridBoxItem gridBoxItem) {
+                               final MapGridBox gridBoxItem) {
 
             if (isGridSelected) {
 
-               TourGeoFilterManager.setFilter(topLeftE2, bottomRightE2, mapZoomLevel, mapGeoCenter, gridBoxItem);
+               TourGeoFilter_Manager.setFilter(topLeftE2, bottomRightE2, mapZoomLevel, mapGeoCenter, gridBoxItem);
 
             } else {
 
-               geoFilter_10_Loader(topLeftE2, bottomRightE2, gridBoxItem);
+               geoFilter_10_Loader(topLeftE2, bottomRightE2, gridBoxItem, null);
             }
          }
 
@@ -1187,18 +1187,21 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
             } else if (eventId == TourEventId.MAP_SHOW_GEO_GRID) {
 
-               if (eventData instanceof TourGeoFilterItem) {
+               if (eventData instanceof TourGeoFilter) {
 
                   // show geo filter
 
-                  final TourGeoFilterItem tourGeoFilterItem = (TourGeoFilterItem) eventData;
+                  final TourGeoFilter tourGeoFilter = (TourGeoFilter) eventData;
 
-                  final MapGridBoxItem gridBoxItem = new MapGridBoxItem();
+                  // show search rectangle
+                  _map.showGeoGrid(tourGeoFilter);
 
+                  // show tours in search rectangle
                   geoFilter_10_Loader(
-                        tourGeoFilterItem.topLeftE2,
-                        tourGeoFilterItem.bottomRightE2,
-                        gridBoxItem);
+                        tourGeoFilter.topLeftE2,
+                        tourGeoFilter.bottomRightE2,
+                        tourGeoFilter.mapGridBox,
+                        tourGeoFilter);
 
                } else if (eventData == null) {
 
@@ -1954,11 +1957,13 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
    private void geoFilter_10_Loader(final org.eclipse.swt.graphics.Point topLeftE2,
                                     final org.eclipse.swt.graphics.Point bottomRightE2,
-                                    final MapGridBoxItem gridBoxItem) {
+                                    final MapGridBox mapGridBox,
+                                    final TourGeoFilter tourGeoFilter) {
 
-      if (_geoFilter_TopLeftE2 != null
-            && topLeftE2.equals(_geoFilter_TopLeftE2)
-            && bottomRightE2.equals(_geoFilter_BottomRightE2)) {
+      // check if this area is already loaded
+      if (_geoFilter_Loaded_TopLeft_E2 != null
+            && topLeftE2.equals(_geoFilter_Loaded_TopLeft_E2)
+            && bottomRightE2.equals(_geoFilter_Loaded_BottomRight_E2)) {
 
          // this is already loaded
 
@@ -1967,7 +1972,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
       final int runnableRunningId = _geoFilter_RunningId.incrementAndGet();
 
-      GeoFilterTourLoader.stopLoading(_geoFilter_PreviousGeoFilterItem);
+      TourGeoFilter_Loader.stopLoading(_geoFilter_PreviousGeoLoaderItem);
 
       // delay geo part loader, moving the mouse can occure very often
       _parent.getDisplay().timerExec(50, new Runnable() {
@@ -1990,21 +1995,27 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
                return;
             }
 
-            _geoFilter_TopLeftE2 = topLeftE2;
-            _geoFilter_BottomRightE2 = bottomRightE2;
+            _geoFilter_Loaded_TopLeft_E2 = topLeftE2;
+            _geoFilter_Loaded_BottomRight_E2 = bottomRightE2;
 
-            _geoFilter_PreviousGeoFilterItem = GeoFilterTourLoader.loadToursFromGeoParts(
+            _geoFilter_PreviousGeoLoaderItem = TourGeoFilter_Loader.loadToursFromGeoParts(
                   topLeftE2,
                   bottomRightE2,
-                  _geoFilter_PreviousGeoFilterItem,
-                  gridBoxItem,
-                  Map2View.this);
+                  _geoFilter_PreviousGeoLoaderItem,
+                  mapGridBox,
+                  Map2View.this,
+                  tourGeoFilter);
          }
       });
 
    }
 
-   public void geoFilter_20_ShowLoadedTours(final GeoFilterLoaderItem loaderItem) {
+   /**
+    * @param loaderItem
+    * @param tourGeoFilter
+    *           Can be <code>null</code> then the geo grid will be hidden.
+    */
+   public void geoFilter_20_ShowLoadedTours(final GeoFilter_LoaderItem loaderItem, final TourGeoFilter tourGeoFilter) {
 
       // update UI
       Display.getDefault().asyncExec(new Runnable() {
@@ -2016,7 +2027,9 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
             }
 
             // hide previous grid box selection
-            _map.showGeoGrid(null);
+//            _map.showGeoGrid(null);
+
+            _map.showGeoGrid(tourGeoFilter);
 
             if (_isShowTour) {
 

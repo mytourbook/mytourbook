@@ -20,9 +20,9 @@ import net.tourbook.Messages;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.tooltip.SlideoutLocation;
 import net.tourbook.tour.filter.ActionToolbarSlideoutAdv;
-import net.tourbook.tour.filter.geo.SlideoutTourGeoFilter;
-import net.tourbook.tour.filter.geo.TourGeoFilterItem;
-import net.tourbook.tour.filter.geo.TourGeoFilterManager;
+import net.tourbook.tour.filter.geo.Slideout_TourGeoFilter;
+import net.tourbook.tour.filter.geo.TourGeoFilter;
+import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Display;
@@ -33,7 +33,7 @@ public class ActionTourGeoFilter extends ActionToolbarSlideoutAdv {
    private static final ImageDescriptor _actionImageDescriptor = TourbookPlugin.getImageDescriptor(Messages.Image__TourGeoFilter);
 
 
-   private SlideoutTourGeoFilter        _slideoutTourGeoFilter;
+   private Slideout_TourGeoFilter        _slideoutTourGeoFilter;
 
    public ActionTourGeoFilter() {
 
@@ -46,7 +46,7 @@ public class ActionTourGeoFilter extends ActionToolbarSlideoutAdv {
    @Override
    protected AdvancedSlideout createSlideout(final ToolItem toolItem) {
 
-      _slideoutTourGeoFilter = new SlideoutTourGeoFilter(toolItem);
+      _slideoutTourGeoFilter = new Slideout_TourGeoFilter(toolItem);
       _slideoutTourGeoFilter.setSlideoutLocation(SlideoutLocation.ABOVE_CENTER);
 
       return _slideoutTourGeoFilter;
@@ -58,10 +58,10 @@ public class ActionTourGeoFilter extends ActionToolbarSlideoutAdv {
       super.onSelect();
 
       // update tour geo filter
-      TourGeoFilterManager.setFilterEnabled(getSelection());
+      TourGeoFilter_Manager.setFilterEnabled(getSelection());
    }
 
-   public void showSlideout(final TourGeoFilterItem selectedFilter) {
+   public void showSlideout(final TourGeoFilter selectedFilter) {
 
       // open immediately
       _slideoutTourGeoFilter.open(false);

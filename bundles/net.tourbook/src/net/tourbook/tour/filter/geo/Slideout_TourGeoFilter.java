@@ -76,33 +76,33 @@ import org.eclipse.swt.widgets.Widget;
 /**
  * Slideout with the tour geo filters.
  */
-public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourViewer, IColorSelectorListener {
+public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourViewer, IColorSelectorListener {
 
-   private static final String                COLUMN_CREATED_DATE_TIME = "createdDateTime";                     //$NON-NLS-1$
-   private static final String                COLUMN_GEO_PARTS         = "geoParts";                            //$NON-NLS-1$
-   private static final String                COLUMN_LATITUDE_1        = "latitude1";                           //$NON-NLS-1$
-   private static final String                COLUMN_LONGITUDE_1       = "longitude1";                          //$NON-NLS-1$
-   private static final String                COLUMN_LATITUDE_2        = "latitude2";                           //$NON-NLS-1$
-   private static final String                COLUMN_LONGITUDE_2       = "longitude2";                          //$NON-NLS-1$
-   private static final String                COLUMN_SEQUENCE          = "sequence";                            //$NON-NLS-1$
+   private static final String            COLUMN_CREATED_DATE_TIME = "createdDateTime";                      //$NON-NLS-1$
+   private static final String            COLUMN_GEO_PARTS         = "geoParts";                             //$NON-NLS-1$
+   private static final String            COLUMN_LATITUDE_1        = "latitude1";                            //$NON-NLS-1$
+   private static final String            COLUMN_LONGITUDE_1       = "longitude1";                           //$NON-NLS-1$
+   private static final String            COLUMN_LATITUDE_2        = "latitude2";                            //$NON-NLS-1$
+   private static final String            COLUMN_LONGITUDE_2       = "longitude2";                           //$NON-NLS-1$
+   private static final String            COLUMN_SEQUENCE          = "sequence";                             //$NON-NLS-1$
 
-   private final static IDialogSettings       _state                   = TourGeoFilterManager.getState();
+   private final static IDialogSettings   _state                   = TourGeoFilter_Manager.getState();
 
-   private TableViewer                        _geoFilterViewer;
-   private CompareResultComparator            _geoPartComparator       = new CompareResultComparator();
-   private ColumnManager                      _columnManager;
+   private TableViewer                    _geoFilterViewer;
+   private CompareResultComparator        _geoPartComparator       = new CompareResultComparator();
+   private ColumnManager                  _columnManager;
 
-   private final ArrayList<TourGeoFilterItem> _allGeoFilter            = TourGeoFilterManager.getAllGeoFilter();
-   private TourGeoFilterItem                  _selectedFilter;
+   private final ArrayList<TourGeoFilter> _allGeoFilter            = TourGeoFilter_Manager.getAllGeoFilter();
+   private TourGeoFilter                  _selectedFilter;
 
-   private ToolItem                           _tourFilterItem;
+   private ToolItem                       _tourFilterItem;
 
-   private SelectionAdapter                   _columnSortListener;
-   private IPropertyChangeListener            _defaultChangePropertyListener;
+   private SelectionAdapter               _columnSortListener;
+   private IPropertyChangeListener        _defaultChangePropertyListener;
 //   private MouseWheelListener                 _defaultMouseWheelListener;
-   private SelectionAdapter                   _defaultSelectionListener;
+   private SelectionAdapter               _defaultSelectionListener;
 
-   private final NumberFormat                 _nf2                     = NumberFormat.getInstance();
+   private final NumberFormat             _nf2                     = NumberFormat.getInstance();
    {
       _nf2.setMinimumFractionDigits(2);
       _nf2.setMaximumFractionDigits(2);
@@ -140,8 +140,8 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
       @Override
       public int compare(final Viewer viewer, final Object e1, final Object e2) {
 
-         final TourGeoFilterItem item1 = (TourGeoFilterItem) e1;
-         final TourGeoFilterItem item2 = (TourGeoFilterItem) e2;
+         final TourGeoFilter item1 = (TourGeoFilter) e1;
+         final TourGeoFilter item2 = (TourGeoFilter) e2;
 
          boolean _isSortByTime = true;
          double rc = 0;
@@ -241,7 +241,7 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
       public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
    }
 
-   public SlideoutTourGeoFilter(final ToolItem toolItem) {
+   public Slideout_TourGeoFilter(final ToolItem toolItem) {
 
       super(toolItem.getParent(), _state, new int[] { 700, 200, 700, 200 });
 
@@ -601,7 +601,7 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
          @Override
          public void update(final ViewerCell cell) {
 
-            final TourGeoFilterItem item = (TourGeoFilterItem) cell.getElement();
+            final TourGeoFilter item = (TourGeoFilter) cell.getElement();
             final ZonedDateTime created = item.created;
 
             cell.setText(created.format(TimeTools.Formatter_DateTime_SM));
@@ -630,7 +630,7 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
          @Override
          public void update(final ViewerCell cell) {
 
-            final TourGeoFilterItem item = (TourGeoFilterItem) cell.getElement();
+            final TourGeoFilter item = (TourGeoFilter) cell.getElement();
 
             cell.setText(Integer.toString(item.numGeoParts));
          }
@@ -656,7 +656,7 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
          @Override
          public void update(final ViewerCell cell) {
 
-            final TourGeoFilterItem item = (TourGeoFilterItem) cell.getElement();
+            final TourGeoFilter item = (TourGeoFilter) cell.getElement();
 
             cell.setText(Integer.toString(item.mapZoomLevel + 1));
          }
@@ -684,7 +684,7 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
          @Override
          public void update(final ViewerCell cell) {
 
-            final TourGeoFilterItem item = (TourGeoFilterItem) cell.getElement();
+            final TourGeoFilter item = (TourGeoFilter) cell.getElement();
 
             cell.setText(_nf2.format(item.latitude1));
          }
@@ -712,7 +712,7 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
          @Override
          public void update(final ViewerCell cell) {
 
-            final TourGeoFilterItem item = (TourGeoFilterItem) cell.getElement();
+            final TourGeoFilter item = (TourGeoFilter) cell.getElement();
 
             cell.setText(_nf2.format(item.longitude1));
          }
@@ -740,7 +740,7 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
          @Override
          public void update(final ViewerCell cell) {
 
-            final TourGeoFilterItem item = (TourGeoFilterItem) cell.getElement();
+            final TourGeoFilter item = (TourGeoFilter) cell.getElement();
 
             cell.setText(_nf2.format(item.latitude2));
          }
@@ -768,7 +768,7 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
          @Override
          public void update(final ViewerCell cell) {
 
-            final TourGeoFilterItem item = (TourGeoFilterItem) cell.getElement();
+            final TourGeoFilter item = (TourGeoFilter) cell.getElement();
 
             cell.setText(_nf2.format(item.longitude2));
          }
@@ -891,7 +891,7 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
 
       saveState_UI();
 
-      TourGeoFilterManager.fireTourFilterModifyEvent();
+      TourGeoFilter_Manager.fireTourFilterModifyEvent();
    }
 
    @Override
@@ -977,13 +977,13 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
 
       final Object selectedItem = event.getStructuredSelection().getFirstElement();
 
-      _selectedFilter = (TourGeoFilterItem) selectedItem;
+      _selectedFilter = (TourGeoFilter) selectedItem;
 
       // show geo grid in the map
       TourManager.fireEventWithCustomData(TourEventId.MAP_SHOW_GEO_GRID, _selectedFilter, null);
 
       // run tour filter for all opened tour directory views
-      TourGeoFilterManager.selectFilter(_selectedFilter);
+      TourGeoFilter_Manager.selectFilter(_selectedFilter);
 
       enableControls();
    }
@@ -1022,7 +1022,7 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
       return _geoFilterViewer;
    }
 
-   public void refreshViewer(final TourGeoFilterItem selectedFilter) {
+   public void refreshViewer(final TourGeoFilter selectedFilter) {
 
       _geoFilterViewer.refresh();
 
@@ -1043,23 +1043,23 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
       // options
 //      _spinnerGridBoxSize.setSelection(      Util.getStateInt(_state,         TourGeoFilterManager.STATE_GRID_BOX_SIZE,          TourGeoFilterManager.STATE_GRID_BOX_SIZE_DEFAULT));
 
-      final boolean isIncludeGeoParts =   Util.getStateBoolean(_state,     TourGeoFilterManager.STATE_IS_INCLUDE_GEO_PARTS,   TourGeoFilterManager.STATE_IS_INCLUDE_GEO_PARTS_DEFAULT);
+      final boolean isIncludeGeoParts =   Util.getStateBoolean(_state,     TourGeoFilter_Manager.STATE_IS_INCLUDE_GEO_PARTS,   TourGeoFilter_Manager.STATE_IS_INCLUDE_GEO_PARTS_DEFAULT);
       _rdoGeoParts_Include.setSelection(isIncludeGeoParts);
       _rdoGeoParts_Exclude.setSelection(isIncludeGeoParts == false);
 
-      _chkIsUseAppFilter.setSelection(    Util.getStateBoolean(_state,     TourGeoFilterManager.STATE_IS_USE_APP_FILTERS,     TourGeoFilterManager.STATE_IS_USE_APP_FILTERS_DEFAULT));
+      _chkIsUseAppFilter.setSelection(    Util.getStateBoolean(_state,     TourGeoFilter_Manager.STATE_IS_USE_APP_FILTERS,     TourGeoFilter_Manager.STATE_IS_USE_APP_FILTERS_DEFAULT));
 
       // colors
-      _colorGeoPart_HoverSelecting.setColorValue(Util.getStateRGB(_state,  TourGeoFilterManager.STATE_RGB_GEO_PARTS_HOVER,    TourGeoFilterManager.STATE_RGB_GEO_PARTS_HOVER_DEFAULT));
-      _colorGeoPart_Selected.setColorValue(Util.getStateRGB(_state,        TourGeoFilterManager.STATE_RGB_GEO_PARTS_SELECTED, TourGeoFilterManager.STATE_RGB_GEO_PARTS_SELECTED_DEFAULT));
+      _colorGeoPart_HoverSelecting.setColorValue(Util.getStateRGB(_state,  TourGeoFilter_Manager.STATE_RGB_GEO_PARTS_HOVER,    TourGeoFilter_Manager.STATE_RGB_GEO_PARTS_HOVER_DEFAULT));
+      _colorGeoPart_Selected.setColorValue(Util.getStateRGB(_state,        TourGeoFilter_Manager.STATE_RGB_GEO_PARTS_SELECTED, TourGeoFilter_Manager.STATE_RGB_GEO_PARTS_SELECTED_DEFAULT));
 
 // SET_FORMATTING_ON
 
       // reselect filter item
-      final String selectedFilterId = Util.getStateString(_state, TourGeoFilterManager.STATE_SELECTED_GEO_FILTER_ID, null);
+      final String selectedFilterId = Util.getStateString(_state, TourGeoFilter_Manager.STATE_SELECTED_GEO_FILTER_ID, null);
       if (selectedFilterId != null) {
 
-         for (final TourGeoFilterItem tourGeoFilterItem : _allGeoFilter) {
+         for (final TourGeoFilter tourGeoFilterItem : _allGeoFilter) {
 
             if (tourGeoFilterItem.id.equals(selectedFilterId)) {
 
@@ -1075,8 +1075,8 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
    private void restoreState_BeforeUI() {
 
       // sorting
-      final String sortColumnId = Util.getStateString(_state, TourGeoFilterManager.STATE_SORT_COLUMN_ID, COLUMN_CREATED_DATE_TIME);
-      final int sortDirection = Util.getStateInt(_state, TourGeoFilterManager.STATE_SORT_COLUMN_DIRECTION, CompareResultComparator.DESCENDING);
+      final String sortColumnId = Util.getStateString(_state, TourGeoFilter_Manager.STATE_SORT_COLUMN_ID, COLUMN_CREATED_DATE_TIME);
+      final int sortDirection = Util.getStateInt(_state, TourGeoFilter_Manager.STATE_SORT_COLUMN_DIRECTION, CompareResultComparator.DESCENDING);
 
       // update comparator
       _geoPartComparator.__sortColumnId = sortColumnId;
@@ -1087,12 +1087,12 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
    protected void saveState() {
 
       if (_selectedFilter != null) {
-         _state.put(TourGeoFilterManager.STATE_SELECTED_GEO_FILTER_ID, _selectedFilter.id);
+         _state.put(TourGeoFilter_Manager.STATE_SELECTED_GEO_FILTER_ID, _selectedFilter.id);
       }
 
       // viewer columns
-      _state.put(TourGeoFilterManager.STATE_SORT_COLUMN_ID, _geoPartComparator.__sortColumnId);
-      _state.put(TourGeoFilterManager.STATE_SORT_COLUMN_DIRECTION, _geoPartComparator.__sortDirection);
+      _state.put(TourGeoFilter_Manager.STATE_SORT_COLUMN_ID, _geoPartComparator.__sortColumnId);
+      _state.put(TourGeoFilter_Manager.STATE_SORT_COLUMN_DIRECTION, _geoPartComparator.__sortDirection);
 
       _columnManager.saveState(_state);
 
@@ -1103,12 +1103,12 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
 
       // options
 //      _state.put(TourGeoFilterManager.STATE_GRID_BOX_SIZE, _spinnerGridBoxSize.getSelection());
-      _state.put(TourGeoFilterManager.STATE_IS_INCLUDE_GEO_PARTS, _rdoGeoParts_Include.getSelection());
-      _state.put(TourGeoFilterManager.STATE_IS_USE_APP_FILTERS, _chkIsUseAppFilter.getSelection());
+      _state.put(TourGeoFilter_Manager.STATE_IS_INCLUDE_GEO_PARTS, _rdoGeoParts_Include.getSelection());
+      _state.put(TourGeoFilter_Manager.STATE_IS_USE_APP_FILTERS, _chkIsUseAppFilter.getSelection());
 
       // colors
-      Util.setState(_state, TourGeoFilterManager.STATE_RGB_GEO_PARTS_HOVER, _colorGeoPart_HoverSelecting.getColorValue());
-      Util.setState(_state, TourGeoFilterManager.STATE_RGB_GEO_PARTS_SELECTED, _colorGeoPart_Selected.getColorValue());
+      Util.setState(_state, TourGeoFilter_Manager.STATE_RGB_GEO_PARTS_HOVER, _colorGeoPart_HoverSelecting.getColorValue());
+      Util.setState(_state, TourGeoFilter_Manager.STATE_RGB_GEO_PARTS_SELECTED, _colorGeoPart_Selected.getColorValue());
    }
 
    @Override

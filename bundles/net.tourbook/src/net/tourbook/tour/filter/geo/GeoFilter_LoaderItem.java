@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tour.filter.geo;
 
-import de.byteholder.geoclipse.map.MapGridBoxItem;
+import de.byteholder.geoclipse.map.MapGridBox;
 
 import java.util.ArrayList;
 
@@ -24,7 +24,7 @@ import org.eclipse.swt.graphics.Point;
 /**
  * Contains all data for a tour comparison
  */
-public class GeoFilterLoaderItem {
+public class GeoFilter_LoaderItem {
 
    long                   executorId;
 
@@ -43,19 +43,19 @@ public class GeoFilterLoaderItem {
    public Point           topLeftE2;
    public Point           bottomRightE2;
 
-   public MapGridBoxItem  mapGridBoxItem;
+   public MapGridBox      mapGridBox;
 
    @SuppressWarnings("unused")
-   private GeoFilterLoaderItem() {}
+   private GeoFilter_LoaderItem() {}
 
-   public GeoFilterLoaderItem(final long executorId) {
+   public GeoFilter_LoaderItem(final long executorId) {
 
       this.executorId = executorId;
    }
 
    @Override
    public String toString() {
-      return "GeoPartItem [" //$NON-NLS-1$
+      return "GeoFilterLoaderItem [" //$NON-NLS-1$
             + "executorId=" + executorId + ", " //$NON-NLS-1$ //$NON-NLS-2$
             //				+ "geoParts=" + Arrays.toString(geoParts) + ", "
             //				+ "latPartSerie5=" + Arrays.toString(latPartSerie5) + ", "
