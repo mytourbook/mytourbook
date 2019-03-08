@@ -40,7 +40,7 @@ public class ActionSyncMapWithOtherMap extends Action {
 	@Override
 	public void run() {
 
-		_map2View.actionSync_WithOtherMap(isChecked());
+		_map2View.action_SyncWith_OtherMap(isChecked());
 	}
 
 }

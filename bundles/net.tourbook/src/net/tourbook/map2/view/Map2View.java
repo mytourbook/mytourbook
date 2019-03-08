@@ -526,6 +526,123 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
    public Map2View() {}
 
+   public void action_SyncWith_ChartSlider() {
+
+      if (_allTourData.size() == 0) {
+         return;
+      }
+
+      /*
+       * Change state
+       */
+      boolean isSync = _isMapSynched_WithChartSlider;
+      boolean isCentered = _isMapSynched_WithChartSlider_IsCentered;
+
+      if (isSync && isCentered) {
+
+         isSync = true;
+         isCentered = false;
+
+      } else if (isSync) {
+
+         isSync = false;
+         isCentered = false;
+
+      } else {
+
+         isSync = true;
+         isCentered = true;
+      }
+
+      _isMapSynched_WithChartSlider = isSync;
+      _isMapSynched_WithChartSlider_IsCentered = isCentered;
+
+      updateChartSliderAction();
+
+      if (_isMapSynched_WithChartSlider) {
+
+         deactivateMapSync();
+         deactivatePhotoSync();
+
+         _actionShowTour.setSelection(true);
+
+         // map must be synched with selected tour
+         _isMapSynched_WithTour = true;
+         _actionSyncMap_WithTour.setChecked(true);
+
+         _map.setShowOverlays(true);
+
+         final TourData firstTourData = _allTourData.get(0);
+
+         positionMapTo_0_TourSliders(
+               firstTourData,
+               _currentLeftSliderValueIndex,
+               _currentRightSliderValueIndex,
+               _currentSelectedSliderValueIndex,
+               null);
+      }
+   }
+
+   public void action_SyncWith_OtherMap(final boolean isSelected) {
+
+      _isMapSynched_WithOtherMap = isSelected;
+
+      if (_isMapSynched_WithOtherMap) {
+
+         deactivatePhotoSync();
+         deactivateTourSync();
+         deactivateSliderSync();
+      }
+   }
+
+   /**
+    * Sync map with photo
+    */
+   public void action_SyncWith_Photo() {
+
+      _isMapSynched_WithPhoto = _actionSyncMap_WithPhoto.isChecked();
+
+      if (_isMapSynched_WithPhoto) {
+
+         deactivateMapSync();
+         deactivateTourSync();
+         deactivateSliderSync();
+
+         centerPhotos(_filteredPhotos, false);
+
+         _map.paint();
+      }
+
+      enableActions(true);
+   }
+
+   public void action_SyncWith_Tour() {
+
+      if (_allTourData.size() == 0) {
+         return;
+      }
+
+      _isMapSynched_WithTour = _actionSyncMap_WithTour.isChecked();
+
+      if (_isMapSynched_WithTour) {
+
+         deactivateMapSync();
+         deactivatePhotoSync();
+
+         // force tour to be repainted, that it is synched immediately
+         _previousTourData = null;
+
+         _actionShowTour.setSelection(true);
+         _map.setShowOverlays(true);
+
+         paintTours_20_One(_allTourData.get(0), true);
+
+      } else {
+
+         deactivateSliderSync();
+      }
+   }
+
    public void actionDimMap(final int dimLevel) {
 
       // check if the dim level/color was changed
@@ -746,123 +863,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
             _sliderPathPaintingData);
 
       _map.redraw();
-   }
-
-   public void actionSync_WithChartSlider() {
-
-      if (_allTourData.size() == 0) {
-         return;
-      }
-
-      /*
-       * Change state
-       */
-      boolean isSync = _isMapSynched_WithChartSlider;
-      boolean isCentered = _isMapSynched_WithChartSlider_IsCentered;
-
-      if (isSync && isCentered) {
-
-         isSync = true;
-         isCentered = false;
-
-      } else if (isSync) {
-
-         isSync = false;
-         isCentered = false;
-
-      } else {
-
-         isSync = true;
-         isCentered = true;
-      }
-
-      _isMapSynched_WithChartSlider = isSync;
-      _isMapSynched_WithChartSlider_IsCentered = isCentered;
-
-      updateChartSliderAction();
-
-      if (_isMapSynched_WithChartSlider) {
-
-         deactivateMapSync();
-         deactivatePhotoSync();
-
-         _actionShowTour.setSelection(true);
-
-         // map must be synched with selected tour
-         _isMapSynched_WithTour = true;
-         _actionSyncMap_WithTour.setChecked(true);
-
-         _map.setShowOverlays(true);
-
-         final TourData firstTourData = _allTourData.get(0);
-
-         positionMapTo_0_TourSliders(
-               firstTourData,
-               _currentLeftSliderValueIndex,
-               _currentRightSliderValueIndex,
-               _currentSelectedSliderValueIndex,
-               null);
-      }
-   }
-
-   public void actionSync_WithOtherMap(final boolean isSelected) {
-
-      _isMapSynched_WithOtherMap = isSelected;
-
-      if (_isMapSynched_WithOtherMap) {
-
-         deactivatePhotoSync();
-         deactivateTourSync();
-         deactivateSliderSync();
-      }
-   }
-
-   /**
-    * Sync map with photo
-    */
-   public void actionSync_WithPhoto() {
-
-      _isMapSynched_WithPhoto = _actionSyncMap_WithPhoto.isChecked();
-
-      if (_isMapSynched_WithPhoto) {
-
-         deactivateMapSync();
-         deactivateTourSync();
-         deactivateSliderSync();
-
-         centerPhotos(_filteredPhotos, false);
-
-         _map.paint();
-      }
-
-      enableActions(true);
-   }
-
-   public void actionSync_WithTour() {
-
-      if (_allTourData.size() == 0) {
-         return;
-      }
-
-      _isMapSynched_WithTour = _actionSyncMap_WithTour.isChecked();
-
-      if (_isMapSynched_WithTour) {
-
-         deactivateMapSync();
-         deactivatePhotoSync();
-
-         // force tour to be repainted, that it is synched immediately
-         _previousTourData = null;
-
-         _actionShowTour.setSelection(true);
-         _map.setShowOverlays(true);
-
-         paintTours_20_One(_allTourData.get(0), true);
-
-      } else {
-
-         deactivateSliderSync();
-      }
    }
 
    public void actionZoomIn() {
@@ -1191,9 +1191,14 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
                   // show geo filter
 
-                  _map.showGeoGrid((TourGeoFilterItem) eventData);
-//                  System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ()"));
-//// TODO remove SYSTEM.OUT.PRINTLN
+                  final TourGeoFilterItem tourGeoFilterItem = (TourGeoFilterItem) eventData;
+
+                  final MapGridBoxItem gridBoxItem = new MapGridBoxItem();
+
+                  geoFilter_10_Loader(
+                        tourGeoFilterItem.topLeftE2,
+                        tourGeoFilterItem.bottomRightE2,
+                        gridBoxItem);
 
                } else if (eventData == null) {
 
@@ -1999,7 +2004,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
    }
 
-   public void geoFilter_20_Result(final GeoFilterLoaderItem loaderItem) {
+   public void geoFilter_20_ShowLoadedTours(final GeoFilterLoaderItem loaderItem) {
 
       // update UI
       Display.getDefault().asyncExec(new Runnable() {
@@ -2009,7 +2014,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
             if (_parent.isDisposed()) {
                return;
             }
-
 
             // hide previous grid box selection
             _map.showGeoGrid(null);
@@ -2851,7 +2855,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
          _map.disposeOverlayImageCache();
       }
 
-      if (_isMapSynched_WithTour) {
+      if (_isMapSynched_WithTour && !_map.isSearchTourByLocation()) {
 
          // use default position for the tour
 
@@ -2970,7 +2974,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
       /*
        * set position and zoom level for the tour
        */
-      if (_isMapSynched_WithTour) {
+      if (_isMapSynched_WithTour && !_map.isSearchTourByLocation()) {
 
          if (((forceRedraw == false) && (_previousTourData != null)) || (tourData == _previousTourData)) {
 

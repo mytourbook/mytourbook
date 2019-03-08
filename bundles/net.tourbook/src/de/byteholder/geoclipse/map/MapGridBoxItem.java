@@ -26,19 +26,51 @@ public class MapGridBoxItem {
    Point         worldMouse_Move;
 
    Point         dev_Start;
+
    Point         dev_End;
-
    Point         world_Start;
+
    Point         world_End;
-
    GeoPosition   geo_Start;
+
    GeoPosition   geo_End;
-
    public String gridBoxText;
-   Point         gridBoxText_Position;
 
+   Point         gridBoxText_Position;
    int           gridBoxSizeMuliplier;
 
    GridRaster    gridRaster;
+
+   @Override
+   public String toString() {
+
+// SET_FORMATTING_OFF
+
+      return "MapGridBoxItem\n"
+            + "[\n"
+
+            + "isSelectionStarted="    + isSelectionStarted + "\n"
+
+            + "worldMouse_Move="       + worldMouse_Move + "\n"
+
+            + "dev_Start="             + dev_Start + "\n"
+            + "dev_End="               + dev_End + "\n"
+
+            + "world_Start="           + world_Start + "\n"
+            + "world_End="             + world_End + "\n"
+
+            + "geo_Start="             + geo_Start + "\n"
+            + "geo_End="               + geo_End + "\n"
+
+            + "gridBoxText="           + gridBoxText + "\n"
+            + "gridBoxText_Position="  + gridBoxText_Position + "\n"
+            + "gridBoxSizeMuliplier="  + gridBoxSizeMuliplier + "\n"
+
+            + "gridRaster="            + gridRaster + "\n"
+
+            + "]";
+
+// SET_FORMATTING_ON
+   }
 
 }

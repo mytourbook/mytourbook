@@ -28,8 +28,8 @@ public class TourGeoFilterItem {
 
    String                id = Long.toString(System.nanoTime());
 
-   Point                 topLeftE2;
-   Point                 bottomRightE2;
+   public Point          topLeftE2;
+   public Point          bottomRightE2;
 
    public int            mapZoomLevel;
    public GeoPosition    mapGeoCenter;

@@ -1970,6 +1970,15 @@ public class Map extends Canvas {
    }
 
    /**
+    * @return Returns <code>true</code> when 'Search tour by location' is active
+    */
+   public boolean isSearchTourByLocation() {
+
+      return _grid_GridBoxItem_Hovered != null || _isGridAutoScroll == true;
+
+   }
+
+   /**
     * Checks is a tile position is within a map. It is possible that the tile is outside of the map
     * when it's value is negative or greater than the map border.
     * <p>
@@ -2209,6 +2218,7 @@ public class Map extends Canvas {
          return;
       }
 
+      // stop tour search by location
       if (_grid_GridBoxItem_Hovered != null) {
 
          _grid_GridBoxItem_Hovered = null;

@@ -119,7 +119,7 @@ public class GeoFilterTourLoader {
 
             if (loadToursFromGeoParts_FromDB(geoLoaderData)) {
 
-               map2View.geoFilter_20_Result(geoLoaderData);
+               map2View.geoFilter_20_ShowLoadedTours(geoLoaderData);
 
             } else {
 

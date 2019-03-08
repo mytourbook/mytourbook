@@ -37,7 +37,7 @@ public class ActionSyncMapWithSlider extends Action {
 
 	@Override
 	public void run() {
-		_map2View.actionSync_WithChartSlider();
+		_map2View.action_SyncWith_ChartSlider();
 	}
 
 }
