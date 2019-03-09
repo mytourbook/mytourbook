@@ -1093,7 +1093,7 @@ public class Map extends Canvas {
       _mp.disposeTiles();
    }
 
-   private void fireMapGridEvent(final boolean isGridSelected, final MapGridBox gridBoxItem) {
+   private void fireMapGridEvent(final boolean isGridSelected, final MapGridBox mapGridBox) {
 
       final Object[] listeners = _allMapGridListener.getListeners();
 
@@ -1107,7 +1107,7 @@ public class Map extends Canvas {
                _mapZoomLevel,
                geoCenter,
                isGridSelected,
-               gridBoxItem);
+               mapGridBox);
       }
    }
 

@@ -25,24 +25,23 @@ import org.eclipse.swt.graphics.Point;
  */
 public class MapGridBox {
 
-   boolean       isSelectionStarted;
+   boolean           isSelectionStarted;
 
-   Point         worldMouse_Move;
+   Point             worldMouse_Move;
 
-   Point         dev_Start;
-   Point         dev_End;
+   Point             dev_Start;
+   Point             dev_End;
 
-   Point         world_Start;
-   Point         world_End;
+   Point             world_Start;
+   Point             world_End;
 
-   GeoPosition   geo_Start;
-   GeoPosition   geo_End;
+   GeoPosition       geo_Start;
+   GeoPosition       geo_End;
 
-   public String gridBoxText;
-   Point         gridBoxText_Position;
-//   int           gridBoxSizeMuliplier;
+   public String     gridBoxText;
+   Point             gridBoxText_Position;
 
-   GridRaster gridRaster;
+   public GridRaster gridRaster;
 
    @Override
    public String toString() {

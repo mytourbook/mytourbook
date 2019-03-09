@@ -2025,6 +2025,13 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
             if (_parent.isDisposed()) {
                return;
             }
+            
+            System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] geoFilter_20_ShowLoadedTours()") 
+                  + ("\ttourGeoFilter: " + tourGeoFilter)
+//                  + ("\t: " + )
+                  );
+// TODO remove SYSTEM.OUT.PRINTLN
+            
 
             // hide previous grid box selection
 //            _map.showGeoGrid(null);

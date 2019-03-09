@@ -21,6 +21,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -41,13 +42,13 @@ import org.eclipse.swt.graphics.Point;
 
 public class TourGeoFilter_Loader {
 
-   private static final char                                     NL                  = UI.NEW_LINE;
+   private static final char                                      NL                  = UI.NEW_LINE;
 
-   private final static IDialogSettings                          _state              = TourGeoFilter_Manager.getState();
+   private final static IDialogSettings                           _state              = TourGeoFilter_Manager.getState();
 
-   private static final AtomicLong                               _loaderExecuterId   = new AtomicLong();
+   private static final AtomicLong                                _loaderExecuterId   = new AtomicLong();
    private static final LinkedBlockingDeque<GeoFilter_LoaderItem> _loaderWaitingQueue = new LinkedBlockingDeque<>();
-   private static ExecutorService                                _loadingExecutor;
+   private static ExecutorService                                 _loadingExecutor;
 
    static {
 
@@ -69,7 +70,7 @@ public class TourGeoFilter_Loader {
    }
 
    /**
-    * @param gridBoxItem
+    * @param mapGridBox
     * @param map2View
     * @param tourGeoFilter
     * @param geoParts
@@ -83,9 +84,9 @@ public class TourGeoFilter_Loader {
     * @return
     */
    public static GeoFilter_LoaderItem loadToursFromGeoParts(final Point topLeftE2,
-                                                           final Point bottomRightE2,
-                                                           final GeoFilter_LoaderItem previousGeoFilterItem,
-                                                           final MapGridBox gridBoxItem,
+                                                            final Point bottomRightE2,
+                                                            final GeoFilter_LoaderItem previousGeoFilterItem,
+                                                            final MapGridBox mapGridBox,
                                                             final Map2View map2View,
                                                             final TourGeoFilter tourGeoFilter) {
 
@@ -99,7 +100,7 @@ public class TourGeoFilter_Loader {
       loaderItem.topLeftE2 = topLeftE2;
       loaderItem.bottomRightE2 = bottomRightE2;
 
-      loaderItem.mapGridBox = gridBoxItem;
+      loaderItem.mapGridBox = mapGridBox;
 
       _loaderWaitingQueue.add(loaderItem);
 
@@ -115,11 +116,17 @@ public class TourGeoFilter_Loader {
             }
 
             // show loading state
-            geoLoaderData.mapGridBox.gridBoxText = "Loading...";
+            final String loadingMessage;
+            if (mapGridBox == null || mapGridBox.gridRaster == null) {
+               loadingMessage = "Loading ...";
+            } else {
+               final int numParts = mapGridBox.gridRaster.numWidth * mapGridBox.gridRaster.numHeight;
+               loadingMessage = MessageFormat.format("Loading {0} parts...", numParts);
+            }
+            geoLoaderData.mapGridBox.gridBoxText = loadingMessage;
             map2View.redrawMap();
 
-
-            if (loadToursFromGeoParts_FromDB(geoLoaderData)) {
+            if (loadToursFromGeoParts_FromDB(geoLoaderData, tourGeoFilter)) {
 
                map2View.geoFilter_20_ShowLoadedTours(geoLoaderData, tourGeoFilter);
 
@@ -139,7 +146,7 @@ public class TourGeoFilter_Loader {
       return loaderItem;
    }
 
-   private static boolean loadToursFromGeoParts_FromDB(final GeoFilter_LoaderItem geoLoaderData) {
+   private static boolean loadToursFromGeoParts_FromDB(final GeoFilter_LoaderItem geoLoaderData, final TourGeoFilter tourGeoFilter) {
 
       if (geoLoaderData.isCanceled) {
          return false;
@@ -256,10 +263,10 @@ public class TourGeoFilter_Loader {
 
          final PreparedStatement stmtSelect = conn.prepareStatement(select);
 
-            // fillup parameters
-            for (int partIndex = 0; partIndex < numGeoParts; partIndex++) {
-               stmtSelect.setInt(partIndex + 1, allLatLonParts.get(partIndex));
-            }
+         // fillup parameters
+         for (int partIndex = 0; partIndex < numGeoParts; partIndex++) {
+            stmtSelect.setInt(partIndex + 1, allLatLonParts.get(partIndex));
+         }
 
          if (isAppFilter) {
             appFilter.setParameters(stmtSelect, 1 + numGeoParts);

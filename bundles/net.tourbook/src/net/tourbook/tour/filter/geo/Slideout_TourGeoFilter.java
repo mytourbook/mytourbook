@@ -889,7 +889,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
 
    private void onChangeUI() {
 
-      saveState_UI();
+      saveState_Options();
 
       TourGeoFilter_Manager.fireTourFilterModifyEvent();
    }
@@ -1085,6 +1085,8 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
 
    @Override
    protected void saveState() {
+      
+      // save UI
 
       if (_selectedFilter != null) {
          _state.put(TourGeoFilter_Manager.STATE_SELECTED_GEO_FILTER_ID, _selectedFilter.id);
@@ -1099,10 +1101,10 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
       super.saveState();
    }
 
-   private void saveState_UI() {
+   private void saveState_Options() {
 
-      // options
-//      _state.put(TourGeoFilterManager.STATE_GRID_BOX_SIZE, _spinnerGridBoxSize.getSelection());
+      // save options
+      
       _state.put(TourGeoFilter_Manager.STATE_IS_INCLUDE_GEO_PARTS, _rdoGeoParts_Include.getSelection());
       _state.put(TourGeoFilter_Manager.STATE_IS_USE_APP_FILTERS, _chkIsUseAppFilter.getSelection());
 
