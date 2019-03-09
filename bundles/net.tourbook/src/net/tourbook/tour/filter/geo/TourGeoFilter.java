@@ -32,8 +32,8 @@ public class TourGeoFilter {
 
    String             id = Long.toString(System.nanoTime());
 
-   public Point       topLeftE2;
-   public Point       bottomRightE2;
+   public Point       geo_TopLeft_E2;
+   public Point       geo_BottomRight_E2;
 
    public int         mapZoomLevel;
    public GeoPosition mapGeoCenter;
@@ -55,31 +55,31 @@ public class TourGeoFilter {
 
    public TourGeoFilter() {}
 
-   public TourGeoFilter(final Point topLeftE2,
-                        final Point bottomRightE2,
+   public TourGeoFilter(final Point geoTopLeftE2,
+                        final Point geoBottomRightE2,
                         final int mapZoomLevel,
                         final GeoPosition mapGeoCenter,
                         final MapGridBox mapGridBox) {
 
-      this.topLeftE2 = topLeftE2;
-      this.bottomRightE2 = bottomRightE2;
+      this.geo_TopLeft_E2 = geoTopLeftE2;
+      this.geo_BottomRight_E2 = geoBottomRightE2;
 
       this.mapZoomLevel = mapZoomLevel;
       this.mapGeoCenter = mapGeoCenter;
 
       this.mapGridBox = mapGridBox;
 
-      latitude1 = topLeftE2.y / 100.0d;
-      longitude1 = topLeftE2.x / 100.0d;
+      latitude1 = geoTopLeftE2.y / 100.0d;
+      longitude1 = geoTopLeftE2.x / 100.0d;
 
-      latitude2 = bottomRightE2.y / 100.0d;
-      longitude2 = bottomRightE2.x / 100.0d;
+      latitude2 = geoBottomRightE2.y / 100.0d;
+      longitude2 = geoBottomRightE2.x / 100.0d;
 
       created = TimeTools.now();
       createdMS = TimeTools.toEpochMilli(created);
 
-      geoParts_Width = bottomRightE2.x - topLeftE2.x;
-      geoParts_Height = topLeftE2.y - bottomRightE2.y;
+      geoParts_Width = geoBottomRightE2.x - geoTopLeftE2.x;
+      geoParts_Height = geoTopLeftE2.y - geoBottomRightE2.y;
 
       numGeoParts = geoParts_Width * geoParts_Height;
    }
@@ -121,8 +121,8 @@ public class TourGeoFilter {
 
             + "\n"
 
-            + " topLeftE2      = " + topLeftE2 + "\n"
-            + " bottomRightE2  = " + bottomRightE2 + "\n"
+            + " topLeftE2      = " + geo_TopLeft_E2 + "\n"
+            + " bottomRightE2  = " + geo_BottomRight_E2 + "\n"
             + " mapZoomLevel   = " + mapZoomLevel + "\n"
 
             + " latitude1      = " + latitude1 + "\n"

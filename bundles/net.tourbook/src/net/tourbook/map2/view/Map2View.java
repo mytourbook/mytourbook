@@ -121,7 +121,7 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourInfoIconToolTipProvider;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.filter.geo.GeoFilter_LoaderItem;
+import net.tourbook.tour.filter.geo.GeoFilter_LoaderData;
 import net.tourbook.tour.filter.geo.TourGeoFilter;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Loader;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
@@ -446,7 +446,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
    private org.eclipse.swt.graphics.Point _geoFilter_Loaded_TopLeft_E2;
    private org.eclipse.swt.graphics.Point _geoFilter_Loaded_BottomRight_E2;
-   private GeoFilter_LoaderItem           _geoFilter_PreviousGeoLoaderItem;
+   private GeoFilter_LoaderData           _geoFilter_PreviousGeoLoaderItem;
    private AtomicInteger                  _geoFilter_RunningId = new AtomicInteger();
 
    /*
@@ -1198,8 +1198,8 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
                   // show tours in search rectangle
                   geoFilter_10_Loader(
-                        tourGeoFilter.topLeftE2,
-                        tourGeoFilter.bottomRightE2,
+                        tourGeoFilter.geo_TopLeft_E2,
+                        tourGeoFilter.geo_BottomRight_E2,
                         tourGeoFilter.mapGridBox,
                         tourGeoFilter);
 
@@ -1955,19 +1955,19 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
       }
    }
 
-   private void geoFilter_10_Loader(final org.eclipse.swt.graphics.Point topLeftE2,
-                                    final org.eclipse.swt.graphics.Point bottomRightE2,
+   private void geoFilter_10_Loader(final org.eclipse.swt.graphics.Point geoTopLeftE2,
+                                    final org.eclipse.swt.graphics.Point geoBottomRightE2,
                                     final MapGridBox mapGridBox,
                                     final TourGeoFilter tourGeoFilter) {
 
       // check if this area is already loaded
       if (_geoFilter_Loaded_TopLeft_E2 != null
-            && topLeftE2.equals(_geoFilter_Loaded_TopLeft_E2)
-            && bottomRightE2.equals(_geoFilter_Loaded_BottomRight_E2)) {
+            && geoTopLeftE2.equals(_geoFilter_Loaded_TopLeft_E2)
+            && geoBottomRightE2.equals(_geoFilter_Loaded_BottomRight_E2)) {
 
          // this is already loaded
 
-         return;
+//         return;
       }
 
       final int runnableRunningId = _geoFilter_RunningId.incrementAndGet();
@@ -1995,12 +1995,12 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
                return;
             }
 
-            _geoFilter_Loaded_TopLeft_E2 = topLeftE2;
-            _geoFilter_Loaded_BottomRight_E2 = bottomRightE2;
+            _geoFilter_Loaded_TopLeft_E2 = geoTopLeftE2;
+            _geoFilter_Loaded_BottomRight_E2 = geoBottomRightE2;
 
             _geoFilter_PreviousGeoLoaderItem = TourGeoFilter_Loader.loadToursFromGeoParts(
-                  topLeftE2,
-                  bottomRightE2,
+                  geoTopLeftE2,
+                  geoBottomRightE2,
                   _geoFilter_PreviousGeoLoaderItem,
                   mapGridBox,
                   Map2View.this,
@@ -2015,7 +2015,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
     * @param tourGeoFilter
     *           Can be <code>null</code> then the geo grid will be hidden.
     */
-   public void geoFilter_20_ShowLoadedTours(final GeoFilter_LoaderItem loaderItem, final TourGeoFilter tourGeoFilter) {
+   public void geoFilter_20_ShowLoadedTours(final GeoFilter_LoaderData loaderItem, final TourGeoFilter tourGeoFilter) {
 
       // update UI
       Display.getDefault().asyncExec(new Runnable() {
@@ -2025,13 +2025,13 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
             if (_parent.isDisposed()) {
                return;
             }
-            
-            System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] geoFilter_20_ShowLoadedTours()") 
-                  + ("\ttourGeoFilter: " + tourGeoFilter)
-//                  + ("\t: " + )
-                  );
-// TODO remove SYSTEM.OUT.PRINTLN
-            
+
+//            System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] geoFilter_20_ShowLoadedTours()")
+//                  + ("\ttourGeoFilter: " + tourGeoFilter)
+////                  + ("\t: " + )
+//                  );
+//// TODO remove SYSTEM.OUT.PRINTLN
+
 
             // hide previous grid box selection
 //            _map.showGeoGrid(null);

@@ -43,6 +43,8 @@ public class MapGridBox {
 
    public GridRaster gridRaster;
 
+   public MapGridBox() {}
+
    @Override
    public String toString() {
 
@@ -67,7 +69,7 @@ public class MapGridBox {
             + " geo_Start="             + geo_Start + "\n"
             + " geo_End="               + geo_End + "\n"
 
-            + " gridBoxText="           + gridBoxText + "\n"
+//            + " gridBoxText="           + gridBoxText + "\n"
             + " gridBoxText_Position="  + gridBoxText_Position + "\n"
 //            + " gridBoxSizeMuliplier="  + gridBoxSizeMuliplier + "\n"
 

@@ -2970,35 +2970,35 @@ public class Map extends Canvas {
       }
    }
 
-   private void paint_GridBox_10_Hovered(final GC gc, final MapGridBox gridBoxItem) {
+   private void paint_GridBox_10_Hovered(final GC gc, final MapGridBox mapGridBox) {
 
       gc.setLineWidth(2);
 
       /*
        * show info in the top/right corner that selection for the offline area is activ
        */
-      paint_GridBox_70_Info_LatLon(gc, gridBoxItem);
+      paint_GridBox_70_Info_LatLon(gc, mapGridBox);
 
       // check if mouse button is hit, this sets the start position
-      if (gridBoxItem.dev_Start == null) {
+      if (mapGridBox.dev_Start == null) {
 
          // continue just hovering
 
          final Point topLeft = paint_GridBox_50_Rectangle(gc,
-               gridBoxItem.worldMouse_Move,
-               gridBoxItem.worldMouse_Move,
-               gridBoxItem,
+               mapGridBox.worldMouse_Move,
+               mapGridBox.worldMouse_Move,
+               mapGridBox,
                false);
 
-         paint_GridBox_80_Info_Box(gc, gridBoxItem, topLeft);
+         paint_GridBox_80_Info_Box(gc, mapGridBox, topLeft);
 
          return;
       }
 
-      final int dev_Start_X = gridBoxItem.dev_Start.x;
-      final int dev_Start_Y = gridBoxItem.dev_Start.y;
-      final int dev_End_X = gridBoxItem.dev_End.x;
-      final int dev_End_Y = gridBoxItem.dev_End.y;
+      final int dev_Start_X = mapGridBox.dev_Start.x;
+      final int dev_Start_Y = mapGridBox.dev_Start.y;
+      final int dev_End_X = mapGridBox.dev_End.x;
+      final int dev_End_Y = mapGridBox.dev_End.y;
 
       final int dev_X1;
       final int dev_Y1;
@@ -3033,12 +3033,12 @@ public class Map extends Canvas {
        */
 
       final Point topLeft = paint_GridBox_50_Rectangle(gc,
-            gridBoxItem.world_Start,
-            gridBoxItem.world_End,
-            gridBoxItem,
+            mapGridBox.world_Start,
+            mapGridBox.world_End,
+            mapGridBox,
             false);
 
-      paint_GridBox_80_Info_Box(gc, gridBoxItem, topLeft);
+      paint_GridBox_80_Info_Box(gc, mapGridBox, topLeft);
 
       gc.setLineStyle(SWT.LINE_SOLID);
       gc.setForeground(SYS_COLOR_BLACK);
@@ -3175,9 +3175,9 @@ public class Map extends Canvas {
       gc.drawString(sb.toString(), 0, 0);
    }
 
-   private void paint_GridBox_80_Info_Box(final GC gc, final MapGridBox gridBoxItem, final Point topLeft) {
+   private void paint_GridBox_80_Info_Box(final GC gc, final MapGridBox mapGridBox, final Point topLeft) {
 
-      final String infoText = gridBoxItem.gridBoxText;
+      final String infoText = mapGridBox.gridBoxText;
 
       if (infoText == null) {
          return;
@@ -3190,14 +3190,21 @@ public class Map extends Canvas {
 
       gc.setForeground(SYS_COLOR_WHITE);
       gc.drawString(infoText, devX + 1, devY + 1, true);
-      gc.drawString(infoText, devX - 1, devY + 1, true);
-      gc.drawString(infoText, devX + 1, devY - 1, true);
       gc.drawString(infoText, devX - 1, devY - 1, true);
+
+      gc.drawString(infoText, devX + 1, devY - 1, true);
+      gc.drawString(infoText, devX - 1, devY + 1, true);
+
+      gc.drawString(infoText, devX + 1, devY, true);
+      gc.drawString(infoText, devX - 1, devY, true);
+
+      gc.drawString(infoText, devX, devY + 1, true);
+      gc.drawString(infoText, devX, devY - 1, true);
 
       gc.setForeground(SYS_COLOR_BLACK);
       gc.drawString(infoText, devX, devY, true);
 
-      gridBoxItem.gridBoxText_Position = new Point(devX, devY);
+      mapGridBox.gridBoxText_Position = new Point(devX, devY);
    }
 
    private void paint_OfflineArea(final GC gc) {
@@ -5240,37 +5247,45 @@ public class Map extends Canvas {
 
          // show requested grid box
 
-         final MapGridBox mapGridBoxItem = tourGeoFilter.mapGridBox;
+         MapGridBox mapGridBox = tourGeoFilter.mapGridBox;
 
-         if (mapGridBoxItem == null) {
+         if (mapGridBox == null) {
 
             // This can occure when geofilter is loaded from xml file and not created in the map
 
-            System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ()") //$NON-NLS-1$ //$NON-NLS-2$
-                  + ("\t: mapGridBoxItem == null")); //$NON-NLS-1$
-// TODO remove SYSTEM.OUT.PRINTLN
+            // create map grid box from tour geo filter
+            mapGridBox = new MapGridBox();
+
+            final GeoPosition geo_Start = new GeoPosition(tourGeoFilter.latitude1, tourGeoFilter.longitude1);
+            final GeoPosition geo_End = new GeoPosition(tourGeoFilter.latitude2, tourGeoFilter.longitude2);
+
+            final java.awt.Point worldLast_Start = _mp.geoToPixel(geo_Start, tourGeoFilter.mapZoomLevel);
+            final java.awt.Point worldLast_End = _mp.geoToPixel(geo_End, tourGeoFilter.mapZoomLevel);
+
+            mapGridBox.world_Start = new Point(worldLast_Start.x, worldLast_Start.y);
+            mapGridBox.world_End = new Point(worldLast_End.x, worldLast_End.y);
+
+            tourGeoFilter.mapGridBox = mapGridBox;
+         }
+
+         _grid_GridBox_Selected = mapGridBox;
+
+         setZoom(tourGeoFilter.mapZoomLevel);
+
+         final Rectangle wpMapViewPort = getWorldPixelTopLeftViewport(_worldPixelMapCenter);
+
+         // chck if gird box is already visible
+
+         if (wpMapViewPort.contains(_grid_GridBox_Selected.world_Start)
+               && wpMapViewPort.contains(_grid_GridBox_Selected.world_End)) {
+
+            // grid box is visile -> nothing to do
 
          } else {
 
-            _grid_GridBox_Selected = mapGridBoxItem;
+            // recenter map to make it visible
 
-            setZoom(tourGeoFilter.mapZoomLevel);
-
-            final Rectangle wpMapViewPort = getWorldPixelTopLeftViewport(_worldPixelMapCenter);
-
-            // chck if gird box is already visible
-
-            if (wpMapViewPort.contains(_grid_GridBox_Selected.world_Start)
-                  && wpMapViewPort.contains(_grid_GridBox_Selected.world_End)) {
-
-               // grid box is visile -> nothing to do
-
-            } else {
-
-               // recenter map to make it visible
-
-               setMapCenter(new GeoPosition(tourGeoFilter.mapGeoCenter.latitude, tourGeoFilter.mapGeoCenter.longitude));
-            }
+            setMapCenter(new GeoPosition(tourGeoFilter.mapGeoCenter.latitude, tourGeoFilter.mapGeoCenter.longitude));
          }
       }
    }

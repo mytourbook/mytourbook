@@ -24,7 +24,7 @@ import org.eclipse.swt.graphics.Point;
 /**
  * Contains all data for a tour comparison
  */
-public class GeoFilter_LoaderItem {
+public class GeoFilter_LoaderData {
 
    long                   executorId;
 
@@ -40,22 +40,22 @@ public class GeoFilter_LoaderItem {
 
    public ArrayList<Long> allLoadedTourIds;
 
-   public Point           topLeftE2;
-   public Point           bottomRightE2;
+   public Point           geoTopLeftE2;
+   public Point           geoBottomRightE2;
 
    public MapGridBox      mapGridBox;
 
    @SuppressWarnings("unused")
-   private GeoFilter_LoaderItem() {}
+   private GeoFilter_LoaderData() {}
 
-   public GeoFilter_LoaderItem(final long executorId) {
+   public GeoFilter_LoaderData(final long executorId) {
 
       this.executorId = executorId;
    }
 
    @Override
    public String toString() {
-      return "GeoFilterLoaderItem [" //$NON-NLS-1$
+      return "GeoFilter_LoaderData [" //$NON-NLS-1$
             + "executorId=" + executorId + ", " //$NON-NLS-1$ //$NON-NLS-2$
             //				+ "geoParts=" + Arrays.toString(geoParts) + ", "
             //				+ "latPartSerie5=" + Arrays.toString(latPartSerie5) + ", "
