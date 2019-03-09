@@ -114,8 +114,8 @@ public class TourGeoFilter_Manager {
     *           Contains lat/lon geo parts for the geo top/left to bottom/right area
     * @return Return SELECT statement for the lat/lon geo parts
     */
-   static String createSelectStmtForGeoParts(final Point geoTopLeftE2,
-                                             final Point geoBottomRightE2,
+   static String createSelectStmtForGeoParts(final Point geo_TopLeft_E2,
+                                             final Point geo_BottomRight_E2,
                                              final ArrayList<Integer> allLatLonParts) {
 
       //         int latPart = (int) (latitude * 100);
@@ -131,13 +131,13 @@ public class TourGeoFilter_Manager {
       // x: longitude
       // y: latitude
 
-      final int normalizedLat1 = geoTopLeftE2.y + TourData.NORMALIZED_LATITUDE_OFFSET_E2;
-      final int normalizedLat2 = geoBottomRightE2.y + TourData.NORMALIZED_LATITUDE_OFFSET_E2;
+      final int normalizedLat1 = geo_TopLeft_E2.y + TourData.NORMALIZED_LATITUDE_OFFSET_E2;
+      final int normalizedLat2 = geo_BottomRight_E2.y + TourData.NORMALIZED_LATITUDE_OFFSET_E2;
 
-      final int normalizedLon1 = geoTopLeftE2.x + TourData.NORMALIZED_LONGITUDE_OFFSET_E2;
-      final int normalizedLon2 = geoBottomRightE2.x + TourData.NORMALIZED_LONGITUDE_OFFSET_E2;
+      final int normalizedLon1 = geo_TopLeft_E2.x + TourData.NORMALIZED_LONGITUDE_OFFSET_E2;
+      final int normalizedLon2 = geo_BottomRight_E2.x + TourData.NORMALIZED_LONGITUDE_OFFSET_E2;
 
-      final int partWidth = geoBottomRightE2.x - geoTopLeftE2.x;
+      final int partWidth = geo_BottomRight_E2.x - geo_TopLeft_E2.x;
 //    final int partHeight = geoTopLeftE2.y - geoBottomRightE2.y;
 
       String sqlWhere;
@@ -206,13 +206,12 @@ public class TourGeoFilter_Manager {
 
                sb.append(" OR (GeoPart >= ? AND GeoPart < ?) " + NL); //$NON-NLS-1$
             }
-
          }
 
          sqlWhere = sb.toString();
       }
 
-      final String selectWithAllTourIdsFromGeoParts = "" //$NON-NLS-1$
+      final String sqlSelectWithAllTourIdsFromGeoParts = "" //$NON-NLS-1$
 
             + "SELECT" + NL //                                                //$NON-NLS-1$
 
@@ -222,7 +221,7 @@ public class TourGeoFilter_Manager {
             + (" WHERE " + sqlWhere) + NL //    //$NON-NLS-1$
       ;
 
-      return selectWithAllTourIdsFromGeoParts;
+      return sqlSelectWithAllTourIdsFromGeoParts;
    }
 
    /**
@@ -308,85 +307,26 @@ public class TourGeoFilter_Manager {
             TourGeoFilter_Manager.STATE_IS_INCLUDE_GEO_PARTS,
             TourGeoFilter_Manager.STATE_IS_INCLUDE_GEO_PARTS_DEFAULT);
 
-      final StringBuilder sqlWhere = new StringBuilder();
       final ArrayList<Object> sqlParameters = new ArrayList<>();
 
-      //         int latPart = (int) (latitude * 100);
-      //         int lonPart = (int) (longitude * 100);
-      //
-      //         lat      ( -90 ... + 90) * 100 =  -9_000 +  9_000 = 18_000
-      //         lon      (-180 ... +180) * 100 = -18_000 + 18_000 = 36_000
-      //
-      //         max      (9_000 + 9_000) * 100_000 = 18_000 * 100_000  = 1_800_000_000
-      //
-      //                                    Integer.MAX_VALUE = 2_147_483_647
+      final ArrayList<Integer> allLatLonParts = new ArrayList<>();
 
-      // x: longitude
-      // y: latitude
+      final String sqlSelect_WithAllTourIds_FromGeoParts = createSelectStmtForGeoParts(
+            geoFilter.geo_TopLeft_E2,
+            geoFilter.geo_BottomRight_E2,
+            allLatLonParts);
 
-      final int normalizedLat1 = geoFilter.geo_TopLeft_E2.y + TourData.NORMALIZED_LATITUDE_OFFSET_E2;
-      final int normalizedLat2 = geoFilter.geo_BottomRight_E2.y + TourData.NORMALIZED_LATITUDE_OFFSET_E2;
-
-      final int normalizedLon1 = geoFilter.geo_TopLeft_E2.x + TourData.NORMALIZED_LONGITUDE_OFFSET_E2;
-      final int normalizedLon2 = geoFilter.geo_BottomRight_E2.x + TourData.NORMALIZED_LONGITUDE_OFFSET_E2;
-
-      final double gridSize_E2 = 1; // 0.01°
-
-      for (int normalizedLon = normalizedLon1; normalizedLon < normalizedLon2; normalizedLon += gridSize_E2) {
-
-         for (int normalizedLat = normalizedLat2; normalizedLat < normalizedLat1; normalizedLat += gridSize_E2) {
-
-            final int latitudeE2 = normalizedLat - TourData.NORMALIZED_LATITUDE_OFFSET_E2;
-            final int longitudeE2 = normalizedLon - TourData.NORMALIZED_LONGITUDE_OFFSET_E2;
-
-            final int latLonPart = (latitudeE2 + 9_000) * 100_000 + (longitudeE2 + 18_000);
-
-            sqlParameters.add(latLonPart);
-
-//            System.out.println(String.format("lon(x) %d  lat(y) %d  %s",
-//
-//                  longitudeE2,
-//                  latitudeE2,
-//
-//                  Integer.toString(latLonPart)
-//
-//            ));
-//// TODO remove SYSTEM.OUT.PRINTLN
-         }
-      }
-
-      final int numGeoParts = sqlParameters.size();
-
-      /*
-       * Create sql parameters
-       */
-      final StringBuilder sqlInParameters = new StringBuilder();
-      for (int partIndex = 0; partIndex < numGeoParts; partIndex++) {
-         if (partIndex == 0) {
-            sqlInParameters.append(" ?"); //$NON-NLS-1$
-         } else {
-            sqlInParameters.append(", ?"); //$NON-NLS-1$
-         }
-      }
-
-      final String sqlSelectWithAllTourIdsFromGeoParts = "" //$NON-NLS-1$
-
-            + "SELECT" + NL //                  //$NON-NLS-1$
-
-            + " DISTINCT TourId " + NL //                               //$NON-NLS-1$
-
-            + (" FROM " + TourDatabase.TABLE_TOUR_GEO_PARTS + NL) //    //$NON-NLS-1$
-            + (" WHERE GeoPart IN (" + sqlInParameters + ")") + NL //   //$NON-NLS-1$ //$NON-NLS-2$
-      ;
+      sqlParameters.addAll(allLatLonParts);
 
       // include or exclude geo parts
       final String sqlIncludeExcludeGeoParts = isIncludeGeoParts ? UI.EMPTY_STRING : "NOT"; //$NON-NLS-1$
 
-      sqlWhere.append("" //$NON-NLS-1$
-            + " AND HasGeoData" + NL //$NON-NLS-1$
-            + " AND TourId " + sqlIncludeExcludeGeoParts + " IN (" + sqlSelectWithAllTourIdsFromGeoParts + ") "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      final String sqlWhere = "" //$NON-NLS-1$
 
-      final SQLFilterData tourFilterSQLData = new SQLFilterData(sqlWhere.toString(), sqlParameters);
+            + " AND HasGeoData" + NL //$NON-NLS-1$
+            + " AND TourId " + sqlIncludeExcludeGeoParts + " IN (" + sqlSelect_WithAllTourIds_FromGeoParts + ") "; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+      final SQLFilterData tourFilterSQLData = new SQLFilterData(sqlWhere, sqlParameters);
 
       return tourFilterSQLData;
    }
