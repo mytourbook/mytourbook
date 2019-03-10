@@ -90,10 +90,10 @@ public class TourGeoFilter_Manager {
    private static final String             ATTR_MAP_GEO_CENTER_LONGITUDE        = "mapGeoCenterLongitude";                  //$NON-NLS-1$
    private static final String             ATTR_MAP_ZOOM_LEVEL                  = "mapZoomLevel";                           //$NON-NLS-1$
 
-   private static final String             ATTR_TOP_LEFT_X_E2                   = "topLeft_X_E2";                           //$NON-NLS-1$
-   private static final String             ATTR_TOP_LEFT_Y_E2                   = "topLeft_Y_E2";                           //$NON-NLS-1$
-   private static final String             ATTR_BOTTOM_RIGHT_X_E2               = "bottomRight_X_E2";                       //$NON-NLS-1$
-   private static final String             ATTR_BOTTOM_RIGHT_Y_E2               = "bottomRight_Y_E2";                       //$NON-NLS-1$
+   private static final String             ATTR_GEO_TOP_LEFT_X_E2               = "geo_TopLeft_X_E2";                       //$NON-NLS-1$
+   private static final String             ATTR_GEO_TOP_LEFT_Y_E2               = "geo_TopLeft_Y_E2";                       //$NON-NLS-1$
+   private static final String             ATTR_GEO_BOTTOM_RIGHT_X_E2           = "geo_BottomRight_X_E2";                   //$NON-NLS-1$
+   private static final String             ATTR_GEO_BOTTOM_RIGHT_Y_E2           = "geo_BottomRight_Y_E2";                   //$NON-NLS-1$
 
    private static final String             ATTR_TOUR_FILTER_VERSION             = "tourFilterVersion";                      //$NON-NLS-1$
 
@@ -112,7 +112,10 @@ public class TourGeoFilter_Manager {
     * @param geoLoaderData
     * @param allLatLonParts
     *           Contains lat/lon geo parts for the geo top/left to bottom/right area
-    * @return Return SELECT statement for the lat/lon geo parts
+    * @return Return SELECT statement for the lat/lon geo parts or <code>null</code> when geo parts
+    *         are not available.
+    *         <p>
+    *         The returned SELECT contains tour id's which are within the geo parts
     */
    static String createSelectStmtForGeoParts(final Point geo_TopLeft_E2,
                                              final Point geo_BottomRight_E2,
@@ -209,6 +212,12 @@ public class TourGeoFilter_Manager {
          }
 
          sqlWhere = sb.toString();
+      }
+
+      if (allLatLonParts.size() == 0) {
+
+         // prevent invalid sql
+         return null;
       }
 
       final String sqlSelectWithAllTourIdsFromGeoParts = "" //$NON-NLS-1$
@@ -315,6 +324,13 @@ public class TourGeoFilter_Manager {
             geoFilter.geo_TopLeft_E2,
             geoFilter.geo_BottomRight_E2,
             allLatLonParts);
+
+      if (sqlSelect_WithAllTourIds_FromGeoParts == null) {
+
+         // this can occure when there are not geo part which would cause a sql exception
+
+         return null;
+      }
 
       sqlParameters.addAll(allLatLonParts);
 
@@ -471,12 +487,12 @@ public class TourGeoFilter_Manager {
                   geoFilter.numGeoParts = Util.getXmlInteger(xmlGeoFilter, ATTR_GEO_PARTS, 0);
 
                   geoFilter.geo_TopLeft_E2 = new Point(
-                        Util.getXmlInteger(xmlGeoFilter, ATTR_TOP_LEFT_X_E2, 0),
-                        Util.getXmlInteger(xmlGeoFilter, ATTR_TOP_LEFT_Y_E2, 0));
+                        Util.getXmlInteger(xmlGeoFilter, ATTR_GEO_TOP_LEFT_X_E2, 0),
+                        Util.getXmlInteger(xmlGeoFilter, ATTR_GEO_TOP_LEFT_Y_E2, 0));
 
                   geoFilter.geo_BottomRight_E2 = new Point(
-                        Util.getXmlInteger(xmlGeoFilter, ATTR_BOTTOM_RIGHT_X_E2, 0),
-                        Util.getXmlInteger(xmlGeoFilter, ATTR_BOTTOM_RIGHT_Y_E2, 0));
+                        Util.getXmlInteger(xmlGeoFilter, ATTR_GEO_BOTTOM_RIGHT_X_E2, 0),
+                        Util.getXmlInteger(xmlGeoFilter, ATTR_GEO_BOTTOM_RIGHT_Y_E2, 0));
 
                   // x:long  y:lat
                   geoFilter.latitude1 = geoFilter.geo_TopLeft_E2.y / 100.0d;
@@ -526,10 +542,10 @@ public class TourGeoFilter_Manager {
             xmlFilter.putString(ATTR_CREATED, geoFilter.created.toString());
             xmlFilter.putInteger(ATTR_GEO_PARTS, geoFilter.numGeoParts);
 
-            xmlFilter.putInteger(ATTR_TOP_LEFT_X_E2, geoFilter.geo_TopLeft_E2.x);
-            xmlFilter.putInteger(ATTR_TOP_LEFT_Y_E2, geoFilter.geo_TopLeft_E2.y);
-            xmlFilter.putInteger(ATTR_BOTTOM_RIGHT_X_E2, geoFilter.geo_BottomRight_E2.x);
-            xmlFilter.putInteger(ATTR_BOTTOM_RIGHT_Y_E2, geoFilter.geo_BottomRight_E2.y);
+            xmlFilter.putInteger(ATTR_GEO_TOP_LEFT_X_E2, geoFilter.geo_TopLeft_E2.x);
+            xmlFilter.putInteger(ATTR_GEO_TOP_LEFT_Y_E2, geoFilter.geo_TopLeft_E2.y);
+            xmlFilter.putInteger(ATTR_GEO_BOTTOM_RIGHT_X_E2, geoFilter.geo_BottomRight_E2.x);
+            xmlFilter.putInteger(ATTR_GEO_BOTTOM_RIGHT_Y_E2, geoFilter.geo_BottomRight_E2.y);
 
             xmlFilter.putInteger(ATTR_MAP_ZOOM_LEVEL, geoFilter.mapZoomLevel);
             Util.setXmlDouble(xmlFilter, ATTR_MAP_GEO_CENTER_LATITUDE, geoFilter.mapGeoCenter.latitude);

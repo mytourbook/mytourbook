@@ -1806,16 +1806,16 @@ public class Map extends Canvas {
       }
    }
 
-   private void grid_UpdateEndPosition(final MouseEvent mouseEvent, final MapGridBox gridBoxItem) {
+   private void grid_UpdateEndPosition(final MouseEvent mouseEvent, final MapGridBox mapGridBox) {
 
       final int worldMouseX = _worldPixelTopLeftViewport.x + mouseEvent.x;
       final int worldMouseY = _worldPixelTopLeftViewport.y + mouseEvent.y;
 
       final Point worldMouse_End = new Point(worldMouseX, worldMouseY);
 
-      gridBoxItem.dev_End = new Point(mouseEvent.x, mouseEvent.y);
-      gridBoxItem.world_End = worldMouse_End;
-      gridBoxItem.geo_End = _mp.pixelToGeo(new Point2D.Double(worldMouse_End.x, worldMouse_End.y), _mapZoomLevel);
+      mapGridBox.dev_End = new Point(mouseEvent.x, mouseEvent.y);
+      mapGridBox.world_End = worldMouse_End;
+      mapGridBox.geo_End = _mp.pixelToGeo(new Point2D.Double(worldMouse_End.x, worldMouse_End.y), _mapZoomLevel);
    }
 
    private void hideHoveredArea() {
@@ -3053,15 +3053,15 @@ public class Map extends Canvas {
       gc.setAlpha(0xff);
    }
 
-   private void paint_GridBox_20_Selected(final GC gc, final MapGridBox gridBoxItem) {
+   private void paint_GridBox_20_Selected(final GC gc, final MapGridBox mapGridBox) {
 
       final Point topLeft = paint_GridBox_50_Rectangle(gc,
-            gridBoxItem.world_Start,
-            gridBoxItem.world_End,
-            gridBoxItem,
+            mapGridBox.world_Start,
+            mapGridBox.world_End,
+            mapGridBox,
             true);
 
-      paint_GridBox_80_Info_Box(gc, gridBoxItem, topLeft);
+      paint_GridBox_80_Info_Box(gc, mapGridBox, topLeft);
    }
 
    /**
@@ -5247,6 +5247,15 @@ public class Map extends Canvas {
 
          // show requested grid box
 
+         // prevent recenter
+         final boolean isZoomWithMousePosition = _isZoomWithMousePosition;
+         _isZoomWithMousePosition = false;
+         {
+            // set zoom level first, that recalculation is correct
+            setZoom(tourGeoFilter.mapZoomLevel);
+         }
+         _isZoomWithMousePosition = isZoomWithMousePosition;
+
          MapGridBox mapGridBox = tourGeoFilter.mapGridBox;
 
          if (mapGridBox == null) {
@@ -5262,6 +5271,9 @@ public class Map extends Canvas {
             final java.awt.Point worldLast_Start = _mp.geoToPixel(geo_Start, tourGeoFilter.mapZoomLevel);
             final java.awt.Point worldLast_End = _mp.geoToPixel(geo_End, tourGeoFilter.mapZoomLevel);
 
+            mapGridBox.geo_Start = geo_Start;
+            mapGridBox.geo_End = geo_End;
+
             mapGridBox.world_Start = new Point(worldLast_Start.x, worldLast_Start.y);
             mapGridBox.world_End = new Point(worldLast_End.x, worldLast_End.y);
 
@@ -5269,8 +5281,6 @@ public class Map extends Canvas {
          }
 
          _grid_GridBox_Selected = mapGridBox;
-
-         setZoom(tourGeoFilter.mapZoomLevel);
 
          final Rectangle wpMapViewPort = getWorldPixelTopLeftViewport(_worldPixelMapCenter);
 

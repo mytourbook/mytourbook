@@ -66,6 +66,8 @@ public class SQLFilter {
 
    private boolean           _isTagFilterActive;
 
+   private int               _lastParameterIndex;
+
    /**
     * Create sql app filter with the photo filter
     */
@@ -161,6 +163,14 @@ public class SQLFilter {
    }
 
    /**
+    * @return Returns the last parameter index +1 which was used for setting parameters in
+    *         {@link #setParameters(PreparedStatement, int)}
+    */
+   public int getLastParameterIndex() {
+      return _lastParameterIndex;
+   }
+
+   /**
     * @return Returns the WHERE clause to filter tours by the app filter, e.g. person, tour types,
     *         ...
     */
@@ -177,7 +187,9 @@ public class SQLFilter {
    }
 
    /**
-    * Sets the parameters into the filter statement
+    * Sets the app filter parameters into the filter statement.
+    * <p>
+    * The last used index can be retrieved with {@link #getLastParameterIndex()}
     *
     * @param statement
     * @param startIndex
@@ -220,6 +232,8 @@ public class SQLFilter {
             throw new RuntimeException("SQL filter parameter is not supported, " + parameter.getClass());//$NON-NLS-1$
          }
       }
+
+      _lastParameterIndex = parameterIndex;
    }
 
    @Override

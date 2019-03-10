@@ -56,7 +56,7 @@ public class TourGeoFilter_Loader {
          @Override
          public Thread newThread(final Runnable r) {
 
-            final Thread thread = new Thread(r, "Loading geo part tours");//$NON-NLS-1$
+            final Thread thread = new Thread(r, "Loading tours for geo parts");//$NON-NLS-1$
 
             thread.setPriority(Thread.MIN_PRIORITY);
             thread.setDaemon(true);
@@ -107,35 +107,44 @@ public class TourGeoFilter_Loader {
          @Override
          public void run() {
 
-            // get last added loader item
-            final GeoFilter_LoaderData geoLoaderData = _loaderWaitingQueue.pollFirst();
+            try {
 
-            if (geoLoaderData == null) {
-               return;
-            }
+               // get last added loader item
+               final GeoFilter_LoaderData geoLoaderData = _loaderWaitingQueue.pollFirst();
 
-            // show loading state
-            final String loadingMessage;
-            if (mapGridBox == null || mapGridBox.gridRaster == null) {
-               loadingMessage = "Loading ...";
-            } else {
-               final int numParts = mapGridBox.gridRaster.numWidth * mapGridBox.gridRaster.numHeight;
-               loadingMessage = MessageFormat.format("Loading {0} parts...", numParts);
-            }
-            geoLoaderData.mapGridBox.gridBoxText = loadingMessage;
-            map2View.redrawMap();
-
-            if (loadToursFromGeoParts_FromDB(geoLoaderData, tourGeoFilter)) {
-
-               map2View.geoFilter_20_ShowLoadedTours(geoLoaderData, tourGeoFilter);
-
-            } else {
-
-               // update loading state
+               if (geoLoaderData == null) {
+                  return;
+               }
 
                // show loading state
-               geoLoaderData.mapGridBox.gridBoxText = "Done";
+               final String loadingMessage;
+               if (mapGridBox == null || mapGridBox.gridRaster == null) {
+                  loadingMessage = "Loading ...";
+               } else {
+                  final int numParts = mapGridBox.gridRaster.numWidth * mapGridBox.gridRaster.numHeight;
+                  loadingMessage = MessageFormat.format("Loading {0} parts...", numParts);
+               }
+               geoLoaderData.mapGridBox.gridBoxText = loadingMessage;
                map2View.redrawMap();
+
+               if (loadToursFromGeoParts_FromDB(geoLoaderData, tourGeoFilter)) {
+
+                  map2View.geoFilter_20_ShowLoadedTours(geoLoaderData, tourGeoFilter);
+
+                  // sometimes the loading state is not updated
+                  map2View.redrawMap();
+
+               } else {
+
+                  // update loading state
+
+                  // show loading state
+                  geoLoaderData.mapGridBox.gridBoxText = "Done";
+                  map2View.redrawMap();
+               }
+
+            } catch (final Exception e) {
+               StatusUtil.log(e);
             }
          }
       };
@@ -155,7 +164,7 @@ public class TourGeoFilter_Loader {
 
       final ArrayList<Integer> allLatLonParts = new ArrayList<>();
 
-      final String selectStmt_GeoParts = TourGeoFilter_Manager.createSelectStmtForGeoParts(
+      final String selectTourIdsFromGeoParts = TourGeoFilter_Manager.createSelectStmtForGeoParts(
             geoLoaderData.geoTopLeftE2,
             geoLoaderData.geoBottomRightE2,
             allLatLonParts);
@@ -164,15 +173,23 @@ public class TourGeoFilter_Loader {
             TourGeoFilter_Manager.STATE_IS_USE_APP_FILTERS,
             TourGeoFilter_Manager.STATE_IS_USE_APP_FILTERS_DEFAULT);
 
-      String select;
+      final boolean isIncludeGeoParts = Util.getStateBoolean(_state,
+            TourGeoFilter_Manager.STATE_IS_INCLUDE_GEO_PARTS,
+            TourGeoFilter_Manager.STATE_IS_INCLUDE_GEO_PARTS_DEFAULT);
+
+      String sqlSelect;
       SQLFilter appFilter = null;
 
       if (isUseAppFilter) {
 
+         // with app filter
+
+         final String sqlIncludeExcludeGeoParts = isIncludeGeoParts ? UI.EMPTY_STRING : "NOT"; //$NON-NLS-1$
+
          // get app filter without geo location, this is added here
          appFilter = new SQLFilter(SQLFilter.NO_GEO_LOCATION);
 
-         final String selectAppFilter = ""
+         sqlSelect = ""
 
                + "SELECT" + NL //                                       //$NON-NLS-1$
 
@@ -180,15 +197,30 @@ public class TourGeoFilter_Loader {
                + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //        //$NON-NLS-1$
 
                + " WHERE 1=1 " + appFilter.getWhereClause() + NL//      //$NON-NLS-1$
-         ;
 
-         select = selectStmt_GeoParts
-
-               + " AND TourId IN (" + selectAppFilter + ")"; //         //$NON-NLS-1$ //$NON-NLS-2$
+               + " AND TourId " + sqlIncludeExcludeGeoParts + " IN (" + selectTourIdsFromGeoParts + ")"; //         //$NON-NLS-1$ //$NON-NLS-2$
 
       } else {
 
-         select = selectStmt_GeoParts;
+         // no app filter
+
+         if (isIncludeGeoParts) {
+
+            sqlSelect = selectTourIdsFromGeoParts;
+
+         } else {
+
+            // exclude geo parts
+
+            sqlSelect = ""
+
+                  + "SELECT" + NL //                                       //$NON-NLS-1$
+
+                  + " TourId" + NL //                                      //$NON-NLS-1$
+                  + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //        //$NON-NLS-1$
+
+                  + " WHERE TourId NOT IN (" + selectTourIdsFromGeoParts + ")"; //         //$NON-NLS-1$ //$NON-NLS-2$
+         }
       }
 
       final int numGeoParts = allLatLonParts.size();
@@ -200,15 +232,26 @@ public class TourGeoFilter_Loader {
 
          conn = TourDatabase.getInstance().getConnection();
 
-         final PreparedStatement stmtSelect = conn.prepareStatement(select);
+         final PreparedStatement stmtSelect = conn.prepareStatement(sqlSelect);
 
-         // fillup parameters
-         for (int partIndex = 0; partIndex < numGeoParts; partIndex++) {
-            stmtSelect.setInt(partIndex + 1, allLatLonParts.get(partIndex));
+         /*
+          * Fillup parameters
+          */
+
+         int lastAppFilterParamIndex = 1;
+
+         // app filter parameters
+         if (isUseAppFilter) {
+            appFilter.setParameters(stmtSelect, 1);
+            lastAppFilterParamIndex = appFilter.getLastParameterIndex();
          }
 
-         if (isUseAppFilter) {
-            appFilter.setParameters(stmtSelect, 1 + numGeoParts);
+         // geo part parameter
+         for (int partIndex = 0; partIndex < numGeoParts; partIndex++) {
+
+            final int paramIndex = lastAppFilterParamIndex + partIndex;
+
+            stmtSelect.setInt(paramIndex, allLatLonParts.get(partIndex));
          }
 
          final ResultSet result = stmtSelect.executeQuery();
@@ -224,7 +267,7 @@ public class TourGeoFilter_Loader {
 
       } catch (final SQLException e) {
 
-         StatusUtil.log(select);
+         StatusUtil.log(sqlSelect);
          net.tourbook.ui.UI.showSQLException(e);
 
       } finally {
