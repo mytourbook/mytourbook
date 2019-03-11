@@ -18,7 +18,7 @@ package net.tourbook.map2.view;
 import de.byteholder.geoclipse.GeoclipseExtensions;
 import de.byteholder.geoclipse.map.IMapContextProvider;
 import de.byteholder.geoclipse.map.Map;
-import de.byteholder.geoclipse.map.MapGridBox;
+import de.byteholder.geoclipse.map.MapGrid_StartEnd_Data;
 import de.byteholder.geoclipse.map.MapLegend;
 import de.byteholder.geoclipse.map.event.IMapGridListener;
 import de.byteholder.geoclipse.map.event.IMapInfoListener;
@@ -948,20 +948,29 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
       _map.addMapGridBoxListener(new IMapGridListener() {
 
          @Override
-         public void onMapGrid(final org.eclipse.swt.graphics.Point topLeftE2,
-                               final org.eclipse.swt.graphics.Point bottomRightE2,
-                               final int mapZoomLevel,
-                               final GeoPosition mapGeoCenter,
+         public void onMapGrid(final org.eclipse.swt.graphics.Point geo_TopLeft_E2,
+                               final org.eclipse.swt.graphics.Point geo_BottomRight_E2,
+                               final int map_ZoomLevel,
+                               final GeoPosition map_GeoCenter,
                                final boolean isGridSelected,
-                               final MapGridBox gridBoxItem) {
+                               final MapGrid_StartEnd_Data gridBoxItem) {
 
             if (isGridSelected) {
 
-               TourGeoFilter_Manager.setFilter(topLeftE2, bottomRightE2, mapZoomLevel, mapGeoCenter, gridBoxItem);
+               TourGeoFilter_Manager.createAndSetGeoFilter(
+                     geo_TopLeft_E2,
+                     geo_BottomRight_E2,
+                     map_ZoomLevel,
+                     map_GeoCenter,
+                     gridBoxItem);
 
             } else {
 
-               geoFilter_10_Loader(topLeftE2, bottomRightE2, gridBoxItem, null);
+               geoFilter_10_Loader(
+                     geo_TopLeft_E2,
+                     geo_BottomRight_E2,
+                     gridBoxItem,
+                     null);
             }
          }
 
@@ -1955,15 +1964,15 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
       }
    }
 
-   private void geoFilter_10_Loader(final org.eclipse.swt.graphics.Point geoTopLeftE2,
-                                    final org.eclipse.swt.graphics.Point geoBottomRightE2,
-                                    final MapGridBox mapGridBox,
+   private void geoFilter_10_Loader(final org.eclipse.swt.graphics.Point geo_TopLeft_E2,
+                                    final org.eclipse.swt.graphics.Point geo_BottomRight_E2,
+                                    final MapGrid_StartEnd_Data mapGridBox,
                                     final TourGeoFilter tourGeoFilter) {
 
       // check if this area is already loaded
       if (_geoFilter_Loaded_TopLeft_E2 != null
-            && geoTopLeftE2.equals(_geoFilter_Loaded_TopLeft_E2)
-            && geoBottomRightE2.equals(_geoFilter_Loaded_BottomRight_E2)) {
+            && geo_TopLeft_E2.equals(_geoFilter_Loaded_TopLeft_E2)
+            && geo_BottomRight_E2.equals(_geoFilter_Loaded_BottomRight_E2)) {
 
          // this is already loaded
 
@@ -1995,12 +2004,12 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
                return;
             }
 
-            _geoFilter_Loaded_TopLeft_E2 = geoTopLeftE2;
-            _geoFilter_Loaded_BottomRight_E2 = geoBottomRightE2;
+            _geoFilter_Loaded_TopLeft_E2 = geo_TopLeft_E2;
+            _geoFilter_Loaded_BottomRight_E2 = geo_BottomRight_E2;
 
             _geoFilter_PreviousGeoLoaderItem = TourGeoFilter_Loader.loadToursFromGeoParts(
-                  geoTopLeftE2,
-                  geoBottomRightE2,
+                  geo_TopLeft_E2,
+                  geo_BottomRight_E2,
                   _geoFilter_PreviousGeoLoaderItem,
                   mapGridBox,
                   Map2View.this,
@@ -3225,9 +3234,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
                return;
             }
 
-//            _map.paint();
             _map.redraw();
-
          }
       });
    }

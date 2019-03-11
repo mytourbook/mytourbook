@@ -15,7 +15,9 @@
  *******************************************************************************/
 package de.byteholder.geoclipse.map;
 
-public class GridRaster {
+import org.eclipse.swt.graphics.Point;
+
+public class MapGrid_Paint_Data {
 
    int        devGrid_X1;
    int        devGrid_Y1;
@@ -25,10 +27,8 @@ public class GridRaster {
    int        devWidth;
    int        devHeight;
 
-   int        geoGrid_Lon1_E2;
-   int        geoGrid_Lat1_E2;
-   int        geoGrid_Lon2_E2;
-   int        geoGrid_Lat2_E2;
+   Point      geo_TopLeft_E2;
+   Point      geo_BottomRight_E2;
 
    public int numWidth;
    public int numHeight;

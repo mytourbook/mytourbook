@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tour.filter.geo;
 
-import de.byteholder.geoclipse.map.MapGridBox;
+import de.byteholder.geoclipse.map.MapGrid_StartEnd_Data;
 
 import java.time.ZonedDateTime;
 
@@ -25,8 +25,8 @@ import net.tourbook.common.time.TimeTools;
 import org.eclipse.swt.graphics.Point;
 
 /**
- * Tour geo filter is created in the map by selecting an area. This is displayed (and can be
- * selected) in the tour geo filter slideout.
+ * A tour geo filter is created in the map by selecting an area. This geo filter is displayed (and
+ * can be selected) in the tour geo filter slideout.
  */
 public class TourGeoFilter {
 
@@ -38,11 +38,8 @@ public class TourGeoFilter {
    public int         mapZoomLevel;
    public GeoPosition mapGeoCenter;
 
-   public double      latitude1;
-   public double      longitude1;
-
-   public double      latitude2;
-   public double      longitude2;
+   public GeoPosition geo_TopLeft;
+   public GeoPosition geo_BottomRight;
 
    ZonedDateTime      created;
    long               createdMS;
@@ -51,7 +48,7 @@ public class TourGeoFilter {
    int                geoParts_Height;
    int                numGeoParts;
 
-   public MapGridBox  mapGridBox;
+   public MapGrid_StartEnd_Data  mapGridBox;
 
    public TourGeoFilter() {}
 
@@ -59,29 +56,27 @@ public class TourGeoFilter {
                         final Point geoBottomRightE2,
                         final int mapZoomLevel,
                         final GeoPosition mapGeoCenter,
-                        final MapGridBox mapGridBox) {
+                        final MapGrid_StartEnd_Data mapGridBox) {
 
-      this.geo_TopLeft_E2 = geoTopLeftE2;
-      this.geo_BottomRight_E2 = geoBottomRightE2;
+      geo_TopLeft_E2 = geoTopLeftE2;
+      geo_BottomRight_E2 = geoBottomRightE2;
+
+      geo_TopLeft = new GeoPosition(geoTopLeftE2.y / 100.0d, geoTopLeftE2.x / 100.0d);
+      geo_BottomRight = new GeoPosition(geoBottomRightE2.y / 100.0d, geoBottomRightE2.x / 100.0d);
+
+      geoParts_Width = geoBottomRightE2.x - geoTopLeftE2.x;
+      geoParts_Height = geoTopLeftE2.y - geoBottomRightE2.y;
+
+      numGeoParts = geoParts_Width * geoParts_Height;
 
       this.mapZoomLevel = mapZoomLevel;
       this.mapGeoCenter = mapGeoCenter;
 
       this.mapGridBox = mapGridBox;
 
-      latitude1 = geoTopLeftE2.y / 100.0d;
-      longitude1 = geoTopLeftE2.x / 100.0d;
-
-      latitude2 = geoBottomRightE2.y / 100.0d;
-      longitude2 = geoBottomRightE2.x / 100.0d;
-
       created = TimeTools.now();
       createdMS = TimeTools.toEpochMilli(created);
 
-      geoParts_Width = geoBottomRightE2.x - geoTopLeftE2.x;
-      geoParts_Height = geoTopLeftE2.y - geoBottomRightE2.y;
-
-      numGeoParts = geoParts_Width * geoParts_Height;
    }
 
    @Override
@@ -124,11 +119,6 @@ public class TourGeoFilter {
             + " topLeftE2      = " + geo_TopLeft_E2 + "\n"
             + " bottomRightE2  = " + geo_BottomRight_E2 + "\n"
             + " mapZoomLevel   = " + mapZoomLevel + "\n"
-
-            + " latitude1      = " + latitude1 + "\n"
-            + " longitude1     = " + longitude1 + "\n"
-            + " latitude2      = " + latitude2 + "\n"
-            + " longitude2     = " + longitude2 + "\n"
 
             + " created        = " + created + "\n"
             + " numGeoParts    = " + numGeoParts + "\n"

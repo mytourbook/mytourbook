@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tour.filter.geo;
 
-import de.byteholder.geoclipse.map.MapGridBox;
+import de.byteholder.geoclipse.map.MapGrid_StartEnd_Data;
 
 import java.util.ArrayList;
 
@@ -43,7 +43,7 @@ public class GeoFilter_LoaderData {
    public Point           geoTopLeftE2;
    public Point           geoBottomRightE2;
 
-   public MapGridBox      mapGridBox;
+   public MapGrid_StartEnd_Data      mapGridBox;
 
    @SuppressWarnings("unused")
    private GeoFilter_LoaderData() {}

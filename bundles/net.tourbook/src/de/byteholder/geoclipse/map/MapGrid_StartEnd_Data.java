@@ -23,27 +23,27 @@ import org.eclipse.swt.graphics.Point;
 /**
  * Contains map device data for a {@link TourGeoFilter}
  */
-public class MapGridBox {
+public class MapGrid_StartEnd_Data {
 
-   boolean           isSelectionStarted;
+   boolean                   isSelectionStarted;
 
-   Point             worldMouse_Move;
+   Point                     worldMouse_Move;
 
-   Point             dev_Start;
-   Point             dev_End;
+   Point                     dev_Start;
+   Point                     dev_End;
 
-   Point             world_Start;
-   Point             world_End;
+   Point                     world_Start;
+   Point                     world_End;
 
-   GeoPosition       geo_Start;
-   GeoPosition       geo_End;
+   GeoPosition               geo_Start;
+   GeoPosition               geo_End;
 
-   public String     gridBoxText;
-   Point             gridBoxText_Position;
+   public String             gridBox_Text;
+   Point                     gridBox_TextPosition;
 
-   public GridRaster gridRaster;
+   public MapGrid_Paint_Data gridPaintData;
 
-   public MapGridBox() {}
+   public MapGrid_StartEnd_Data() {}
 
    @Override
    public String toString() {
@@ -70,10 +70,10 @@ public class MapGridBox {
             + " geo_End="               + geo_End + "\n"
 
 //            + " gridBoxText="           + gridBoxText + "\n"
-            + " gridBoxText_Position="  + gridBoxText_Position + "\n"
+            + " gridBoxText_Position="  + gridBox_TextPosition + "\n"
 //            + " gridBoxSizeMuliplier="  + gridBoxSizeMuliplier + "\n"
 
-            + " gridRaster="            + gridRaster + "\n"
+            + " gridRaster="            + gridPaintData + "\n"
 
             + "]";
 

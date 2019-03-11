@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tour.filter.geo;
 
-import de.byteholder.geoclipse.map.MapGridBox;
+import de.byteholder.geoclipse.map.MapGrid_StartEnd_Data;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -107,6 +107,37 @@ public class TourGeoFilter_Manager {
    private static TourGeoFilter            _selectedFilter;
 
    private static String                   _fromXml_ActiveGeoFilterId;
+
+   /**
+    * Create a {@link TourGeoFilter} and set it as the currently selected geo filter.
+    *
+    * @param geo_TopLeft_E2
+    * @param geo_BbottomRight_E2
+    * @param map_ZoomLevel
+    * @param map_GeoCenter
+    * @param gridBoxItem
+    */
+   public static void createAndSetGeoFilter(final Point geo_TopLeft_E2,
+                                         final Point geo_BbottomRight_E2,
+                                         final int map_ZoomLevel,
+                                         final GeoPosition map_GeoCenter,
+                                         final MapGrid_StartEnd_Data gridBoxItem) {
+
+      _selectedFilter = new TourGeoFilter(geo_TopLeft_E2, geo_BbottomRight_E2, map_ZoomLevel, map_GeoCenter, gridBoxItem);
+
+      _allTourGeoFilter.add(_selectedFilter);
+
+      // ensure the action is selected
+      _actionTourGeoFilter.setSelection(true);
+
+      // show the slideout with the new geo filter
+      _actionTourGeoFilter.showSlideout(_selectedFilter);
+
+      // set selection state
+      _isGeoFilterEnabled = true;
+
+      fireTourFilterModifyEvent();
+   }
 
    /**
     * @param geoLoaderData
@@ -402,37 +433,6 @@ public class TourGeoFilter_Manager {
    }
 
    /**
-    * Create a {@link TourGeoFilter} and set it as the currently selected geo filter.
-    *
-    * @param topLeftE2
-    * @param bottomRightE2
-    * @param mapZoomLevel
-    * @param mapGeoCenter
-    * @param gridBoxItem
-    */
-   public static void setFilter(final Point topLeftE2,
-                                final Point bottomRightE2,
-                                final int mapZoomLevel,
-                                final GeoPosition mapGeoCenter,
-                                final MapGridBox gridBoxItem) {
-
-      _selectedFilter = new TourGeoFilter(topLeftE2, bottomRightE2, mapZoomLevel, mapGeoCenter, gridBoxItem);
-
-      _allTourGeoFilter.add(_selectedFilter);
-
-      // ensure the action is selected
-      _actionTourGeoFilter.setSelection(true);
-
-      // show the slideout with the new geo filter
-      _actionTourGeoFilter.showSlideout(_selectedFilter);
-
-      // set selection state
-      _isGeoFilterEnabled = true;
-
-      fireTourFilterModifyEvent();
-   }
-
-   /**
     * Sets the state if the tour filter is active or not.
     *
     * @param isEnabled
@@ -495,10 +495,8 @@ public class TourGeoFilter_Manager {
                         Util.getXmlInteger(xmlGeoFilter, ATTR_GEO_BOTTOM_RIGHT_Y_E2, 0));
 
                   // x:long  y:lat
-                  geoFilter.latitude1 = geoFilter.geo_TopLeft_E2.y / 100.0d;
-                  geoFilter.longitude1 = geoFilter.geo_TopLeft_E2.x / 100.0d;
-                  geoFilter.latitude2 = geoFilter.geo_BottomRight_E2.y / 100.0d;
-                  geoFilter.longitude2 = geoFilter.geo_BottomRight_E2.x / 100.0d;
+                  geoFilter.geo_TopLeft = new GeoPosition(geoFilter.geo_TopLeft_E2.y / 100.0d, geoFilter.geo_TopLeft_E2.x / 100.0d);
+                  geoFilter.geo_BottomRight = new GeoPosition(geoFilter.geo_BottomRight_E2.y / 100.0d, geoFilter.geo_BottomRight_E2.x / 100.0d);
 
                   geoFilter.mapZoomLevel = Util.getXmlInteger(xmlGeoFilter, ATTR_MAP_ZOOM_LEVEL, 6);
                   geoFilter.mapGeoCenter = new GeoPosition(

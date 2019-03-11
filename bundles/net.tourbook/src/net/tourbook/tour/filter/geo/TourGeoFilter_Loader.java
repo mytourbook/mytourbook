@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tour.filter.geo;
 
-import de.byteholder.geoclipse.map.MapGridBox;
+import de.byteholder.geoclipse.map.MapGrid_StartEnd_Data;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -85,7 +85,7 @@ public class TourGeoFilter_Loader {
    public static GeoFilter_LoaderData loadToursFromGeoParts(final Point geoTopLeftE2,
                                                             final Point geoBottomRightE2,
                                                             final GeoFilter_LoaderData previousGeoFilterItem,
-                                                            final MapGridBox mapGridBox,
+                                                            final MapGrid_StartEnd_Data mapGridBox,
                                                             final Map2View map2View,
                                                             final TourGeoFilter tourGeoFilter) {
 
@@ -118,13 +118,13 @@ public class TourGeoFilter_Loader {
 
                // show loading state
                final String loadingMessage;
-               if (mapGridBox == null || mapGridBox.gridRaster == null) {
+               if (mapGridBox == null || mapGridBox.gridPaintData == null) {
                   loadingMessage = "Loading ...";
                } else {
-                  final int numParts = mapGridBox.gridRaster.numWidth * mapGridBox.gridRaster.numHeight;
+                  final int numParts = mapGridBox.gridPaintData.numWidth * mapGridBox.gridPaintData.numHeight;
                   loadingMessage = MessageFormat.format("Loading {0} parts...", numParts);
                }
-               geoLoaderData.mapGridBox.gridBoxText = loadingMessage;
+               geoLoaderData.mapGridBox.gridBox_Text = loadingMessage;
                map2View.redrawMap();
 
                if (loadToursFromGeoParts_FromDB(geoLoaderData, tourGeoFilter)) {
@@ -139,7 +139,7 @@ public class TourGeoFilter_Loader {
                   // update loading state
 
                   // show loading state
-                  geoLoaderData.mapGridBox.gridBoxText = "Done";
+                  geoLoaderData.mapGridBox.gridBox_Text = "Done";
                   map2View.redrawMap();
                }
 
@@ -282,7 +282,7 @@ public class TourGeoFilter_Loader {
       final String timeInMs = timeDiff > 0 ? " - " + Long.toString(timeDiff) + " ms" : "";
 //      final String timeInMs = " - " + Long.toString(timeDiff) + " ms";
 
-      geoLoaderData.mapGridBox.gridBoxText = "Tours: " + Integer.toString(allTourIds.size()) + timeInMs;
+      geoLoaderData.mapGridBox.gridBox_Text = "Tours: " + Integer.toString(allTourIds.size()) + timeInMs;
 
       geoLoaderData.allLoadedTourIds = allTourIds;
 

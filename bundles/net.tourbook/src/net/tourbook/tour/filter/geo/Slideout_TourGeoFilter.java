@@ -140,8 +140,8 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
       @Override
       public int compare(final Viewer viewer, final Object e1, final Object e2) {
 
-         final TourGeoFilter item1 = (TourGeoFilter) e1;
-         final TourGeoFilter item2 = (TourGeoFilter) e2;
+         final TourGeoFilter geoFilter1 = (TourGeoFilter) e1;
+         final TourGeoFilter geoFilter2 = (TourGeoFilter) e2;
 
          boolean _isSortByTime = true;
          double rc = 0;
@@ -150,23 +150,23 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
          switch (__sortColumnId) {
 
          case COLUMN_GEO_PARTS:
-            rc = item1.numGeoParts - item2.numGeoParts;
+            rc = geoFilter1.numGeoParts - geoFilter2.numGeoParts;
             break;
 
          case COLUMN_LATITUDE_1:
-            rc = item1.latitude1 - item2.latitude1;
+            rc = geoFilter1.geo_TopLeft.latitude - geoFilter2.geo_TopLeft.latitude;
             break;
 
          case COLUMN_LONGITUDE_1:
-            rc = item1.longitude1 - item2.longitude1;
+            rc = geoFilter1.geo_TopLeft.longitude - geoFilter2.geo_TopLeft.longitude;
             break;
 
          case COLUMN_LATITUDE_2:
-            rc = item1.latitude2 - item2.latitude2;
+            rc = geoFilter1.geo_BottomRight.latitude - geoFilter2.geo_BottomRight.latitude;
             break;
 
          case COLUMN_LONGITUDE_2:
-            rc = item1.longitude2 - item2.longitude2;
+            rc = geoFilter1.geo_BottomRight.longitude - geoFilter2.geo_BottomRight.longitude;
             break;
 
          case COLUMN_CREATED_DATE_TIME:
@@ -179,7 +179,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
          }
 
          if (rc == 0 && _isSortByTime) {
-            rc = item1.createdMS - item2.createdMS;
+            rc = geoFilter1.createdMS - geoFilter2.createdMS;
          }
 
          // if descending order, flip the direction
@@ -686,7 +686,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
 
             final TourGeoFilter item = (TourGeoFilter) cell.getElement();
 
-            cell.setText(_nf2.format(item.latitude1));
+            cell.setText(_nf2.format(item.geo_TopLeft.latitude));
          }
       });
    }
@@ -714,7 +714,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
 
             final TourGeoFilter item = (TourGeoFilter) cell.getElement();
 
-            cell.setText(_nf2.format(item.longitude1));
+            cell.setText(_nf2.format(item.geo_TopLeft.longitude));
          }
       });
    }
@@ -742,7 +742,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
 
             final TourGeoFilter item = (TourGeoFilter) cell.getElement();
 
-            cell.setText(_nf2.format(item.latitude2));
+            cell.setText(_nf2.format(item.geo_BottomRight.latitude));
          }
       });
    }
@@ -770,7 +770,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
 
             final TourGeoFilter item = (TourGeoFilter) cell.getElement();
 
-            cell.setText(_nf2.format(item.longitude2));
+            cell.setText(_nf2.format(item.geo_BottomRight.longitude));
          }
       });
    }
@@ -1085,7 +1085,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
 
    @Override
    protected void saveState() {
-      
+
       // save UI
 
       if (_selectedFilter != null) {
@@ -1104,7 +1104,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
    private void saveState_Options() {
 
       // save options
-      
+
       _state.put(TourGeoFilter_Manager.STATE_IS_INCLUDE_GEO_PARTS, _rdoGeoParts_Include.getSelection());
       _state.put(TourGeoFilter_Manager.STATE_IS_USE_APP_FILTERS, _chkIsUseAppFilter.getSelection());
 

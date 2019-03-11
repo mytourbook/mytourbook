@@ -384,7 +384,7 @@ public class Map extends Canvas {
     * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     * <br>
     */
-   private Point2D                                  _worldPixelMapCenter     = null;
+   private Point2D                                  _worldPixel_MapCenter    = null;
    /**
     * Viewport in the map where the {@link #_mapImage} is painted <br>
     * <br>
@@ -396,7 +396,7 @@ public class Map extends Canvas {
     * I havn't yet fully understood how it works but I adjusted the map successfully in 10.7 and
     * tried to document this behaviour.
     */
-   private Rectangle                                _worldPixelTopLeftViewport;
+   private Rectangle                                _worldPixel_TopLeft_Viewport;
    /**
     * Size in device pixel where the map is displayed
     */
@@ -505,33 +505,33 @@ public class Map extends Canvas {
    /**
     * Top/left position
     */
-   private Point               _grid_SelectedPosition_Geo_1_E2;
+   private Point                      _grid_LastUsedPosition_Geo_TopLeft_E2;
 
    /**
     * Bottom/right position
     */
-   private Point               _grid_SelectedPosition_Geo_2_E2;
+   private Point                      _grid_LastUsedPosition_Geo_BottomRight_E2;
 
-   private IMapContextProvider _mapContextProvider;
+   private IMapContextProvider        _mapContextProvider;
 
    /**
     * Is <code>true</code> when the map context menu can be displayed
     */
-   private boolean             _isContextMenuEnabled   = true;
+   private boolean                    _isContextMenuEnabled   = true;
 
-   private DropTarget          _dropTarget;
+   private DropTarget                 _dropTarget;
 
-   private boolean             _isRedrawEnabled        = true;
+   private boolean                    _isRedrawEnabled        = true;
 
-   private HoveredAreaContext  _hoveredAreaContext;
+   private HoveredAreaContext         _hoveredAreaContext;
 
-   private int                 _overlayAlpha           = 0xff;
+   private int                        _overlayAlpha           = 0xff;
 
-   private MapGridBox          _grid_GridBox_Hovered;
-   private MapGridBox          _grid_GridBox_Selected;
+   private MapGrid_StartEnd_Data _grid_GridBox_Hovered;
+   private MapGrid_StartEnd_Data _grid_GridBox_Selected;
 
-   private int[]               _grid_AutoScrollCounter = new int[1];
-   private boolean             _grid_IsGridAutoScroll;
+   private int[]                      _grid_AutoScrollCounter = new int[1];
+   private boolean                    _grid_IsGridAutoScroll;
 
    /**
     * This observer is called in the {@link Tile} when a tile image is set into the tile
@@ -666,18 +666,12 @@ public class Map extends Canvas {
 
    public void actionSearchTourByLocation(final Event event) {
 
-      _grid_GridBox_Hovered = new MapGridBox();
+      _grid_GridBox_Hovered = new MapGrid_StartEnd_Data();
 
       // set initial mouse move position from the current mouse position
-      final Point worldMouse_Move = new Point(
-            _worldPixelTopLeftViewport.x + _mouseMovePositionX,
-            _worldPixelTopLeftViewport.y + _mouseMovePositionY);
-
-      _grid_GridBox_Hovered.worldMouse_Move = worldMouse_Move;
-
-//      _grid_GridBoxItem_Hovered.gridBoxSizeMuliplier = Util.getStateInt(TourGeoFilterManager.getState(),
-//            TourGeoFilterManager.STATE_GRID_BOX_SIZE,
-//            TourGeoFilterManager.STATE_GRID_BOX_SIZE_DEFAULT);
+      _grid_GridBox_Hovered.worldMouse_Move = new Point(
+            _worldPixel_TopLeft_Viewport.x + _mouseMovePositionX,
+            _worldPixel_TopLeft_Viewport.y + _mouseMovePositionY);
 
       setCursor(_cursorSearchTour);
 
@@ -1093,7 +1087,7 @@ public class Map extends Canvas {
       _mp.disposeTiles();
    }
 
-   private void fireMapGridEvent(final boolean isGridSelected, final MapGridBox mapGridBox) {
+   private void fireMapGridEvent(final boolean isGridSelected, final MapGrid_StartEnd_Data mapGridBox) {
 
       final Object[] listeners = _allMapGridListener.getListeners();
 
@@ -1102,8 +1096,8 @@ public class Map extends Canvas {
       for (final Object listener : listeners) {
 
          ((IMapGridListener) listener).onMapGrid(
-               _grid_SelectedPosition_Geo_1_E2,
-               _grid_SelectedPosition_Geo_2_E2,
+               _grid_LastUsedPosition_Geo_TopLeft_E2,
+               _grid_LastUsedPosition_Geo_BottomRight_E2,
                _mapZoomLevel,
                geoCenter,
                isGridSelected,
@@ -1147,7 +1141,7 @@ public class Map extends Canvas {
       /*
        * !!! DON'T OPTIMIZE THE NEXT LINE, OTHERWISE THE WRONG MOUSE POSITION IS FIRED !!!
        */
-      final Rectangle topLeftViewPort = getWorldPixelTopLeftViewport(_worldPixelMapCenter);
+      final Rectangle topLeftViewPort = getWorldPixelTopLeftViewport(_worldPixel_MapCenter);
 
       final int worldMouseX = topLeftViewPort.x + _mouseMovePositionX;
       final int worldMouseY = topLeftViewPort.y + _mouseMovePositionY;
@@ -1251,7 +1245,7 @@ public class Map extends Canvas {
          return null;
       }
 
-      return _mp.pixelToGeo(_worldPixelMapCenter, _mapZoomLevel);
+      return _mp.pixelToGeo(_worldPixel_MapCenter, _mapZoomLevel);
    }
 
    /**
@@ -1351,7 +1345,7 @@ public class Map extends Canvas {
     *         <b>width</b> and <b>height</b> contains the visible area in device pixel
     */
    public Rectangle getWorldPixelViewport() {
-      return getWorldPixelTopLeftViewport(_worldPixelMapCenter);
+      return getWorldPixelTopLeftViewport(_worldPixel_MapCenter);
    }
 
    /**
@@ -1418,7 +1412,19 @@ public class Map extends Canvas {
       return zoom;
    }
 
-   private GridRaster grid_CreateGridRaster(final Point worldStart, final Point worldEnd) {
+   /**
+    * Convert start/end positions into top-left/bottom-end positions
+    *
+    * @param worldStart
+    * @param worldEnd
+    * @return
+    */
+   private MapGrid_Paint_Data grid_CreatePaintPositions(final Point worldStart, final Point worldEnd) {
+
+//      System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] grid_CreateGridRaster()")
+//            + ("\tworldStart: " + worldStart)
+//            + ("\tworldEnd: " + worldEnd));
+//// TODO remove SYSTEM.OUT.PRINTLN
 
       final int worldStartX = worldStart.x;
       final int worldStartY = worldStart.y;
@@ -1651,24 +1657,21 @@ public class Map extends Canvas {
       devWidth = Math.max(1, devWidth);
       devHeight = Math.max(1, devHeight);
 
-      final GridRaster gridRaster = new GridRaster();
+      final MapGrid_Paint_Data gridPaintPos = new MapGrid_Paint_Data();
 
-      gridRaster.devGrid_X1 = devGrid_X1;
-      gridRaster.devGrid_Y1 = devGrid_Y1;
+      gridPaintPos.devGrid_X1 = devGrid_X1;
+      gridPaintPos.devGrid_Y1 = devGrid_Y1;
 
-      gridRaster.devWidth = devWidth;
-      gridRaster.devHeight = devHeight;
+      gridPaintPos.devWidth = devWidth;
+      gridPaintPos.devHeight = devHeight;
 
-      gridRaster.numWidth = (int) (devWidth / _devGridPixelSize_X + 0.5);
-      gridRaster.numHeight = (int) (devHeight / _devGridPixelSize_Y + 0.5);
+      gridPaintPos.numWidth = (int) (devWidth / _devGridPixelSize_X + 0.5);
+      gridPaintPos.numHeight = (int) (devHeight / _devGridPixelSize_Y + 0.5);
 
-      gridRaster.geoGrid_Lon1_E2 = geoGrid_Lon1_E2; // X1
-      gridRaster.geoGrid_Lat1_E2 = geoGrid_Lat1_E2; // Y1
+      gridPaintPos.geo_TopLeft_E2 = new Point(geoGrid_Lon1_E2, geoGrid_Lat1_E2); // X1 / Y1
+      gridPaintPos.geo_BottomRight_E2 = new Point(geoGrid_Lon2_E2, geoGrid_Lat2_E2); // X2 /Y2
 
-      gridRaster.geoGrid_Lon2_E2 = geoGrid_Lon2_E2; // X2
-      gridRaster.geoGrid_Lat2_E2 = geoGrid_Lat2_E2; // Y2
-
-      return gridRaster;
+      return gridPaintPos;
 
    }
 
@@ -1719,8 +1722,8 @@ public class Map extends Canvas {
             final int mapDiffX = mouseBorderPosition.x;
             final int mapDiffY = mouseBorderPosition.y;
 
-            final double oldCenterX = _worldPixelMapCenter.getX();
-            final double oldCenterY = _worldPixelMapCenter.getY();
+            final double oldCenterX = _worldPixel_MapCenter.getX();
+            final double oldCenterY = _worldPixel_MapCenter.getY();
 
             final double newCenterX = oldCenterX - mapDiffX;
             final double newCenterY = oldCenterY - mapDiffY;
@@ -1806,10 +1809,10 @@ public class Map extends Canvas {
       }
    }
 
-   private void grid_UpdateEndPosition(final MouseEvent mouseEvent, final MapGridBox mapGridBox) {
+   private void grid_UpdateEndPosition(final MouseEvent mouseEvent, final MapGrid_StartEnd_Data mapGridBox) {
 
-      final int worldMouseX = _worldPixelTopLeftViewport.x + mouseEvent.x;
-      final int worldMouseY = _worldPixelTopLeftViewport.y + mouseEvent.y;
+      final int worldMouseX = _worldPixel_TopLeft_Viewport.x + mouseEvent.x;
+      final int worldMouseY = _worldPixel_TopLeft_Viewport.y + mouseEvent.y;
 
       final Point worldMouse_End = new Point(worldMouseX, worldMouseY);
 
@@ -1843,8 +1846,8 @@ public class Map extends Canvas {
 
       final double tileDefaultCenter = (double) _tilePixelSize / 2;
 
-      _worldPixelMapCenter = new Point2D.Double(tileDefaultCenter, tileDefaultCenter);
-      _worldPixelTopLeftViewport = getWorldPixelTopLeftViewport(_worldPixelMapCenter);
+      _worldPixel_MapCenter = new Point2D.Double(tileDefaultCenter, tileDefaultCenter);
+      _worldPixel_TopLeft_Viewport = getWorldPixelTopLeftViewport(_worldPixel_MapCenter);
    }
 
    /**
@@ -2049,8 +2052,8 @@ public class Map extends Canvas {
 
       // get device rectangle for the position
       final Point gridGeoPos = new Point(//
-            worldGrid.x - _worldPixelTopLeftViewport.x,
-            worldGrid.y - _worldPixelTopLeftViewport.y);
+            worldGrid.x - _worldPixel_TopLeft_Viewport.x,
+            worldGrid.y - _worldPixel_TopLeft_Viewport.y);
 
       /*
        * Adjust Y that X and Y are at the top/left position otherwise Y is at the bottom/left
@@ -2087,8 +2090,8 @@ public class Map extends Canvas {
 
       // get device rectangle for this tile
       return new Point(//
-            tilePosX * _tilePixelSize - _worldPixelTopLeftViewport.x,
-            tilePosY * _tilePixelSize - _worldPixelTopLeftViewport.y);
+            tilePosX * _tilePixelSize - _worldPixel_TopLeft_Viewport.x,
+            tilePosY * _tilePixelSize - _worldPixel_TopLeft_Viewport.y);
    }
 
    private void offline_OpenOfflineImageDialog() {
@@ -2111,8 +2114,8 @@ public class Map extends Canvas {
 
    private void offline_UpdateOfflineAreaEndPosition(final MouseEvent mouseEvent) {
 
-      final int worldMouseX = _worldPixelTopLeftViewport.x + mouseEvent.x;
-      final int worldMouseY = _worldPixelTopLeftViewport.y + mouseEvent.y;
+      final int worldMouseX = _worldPixel_TopLeft_Viewport.x + mouseEvent.x;
+      final int worldMouseY = _worldPixel_TopLeft_Viewport.y + mouseEvent.y;
 
       _offline_DevMouse_End = new Point(mouseEvent.x, mouseEvent.y);
       _offline_WorldMouse_End = new Point(worldMouseX, worldMouseY);
@@ -2278,8 +2281,8 @@ public class Map extends Canvas {
          /*
           * set new map center
           */
-         final double x = _worldPixelTopLeftViewport.x + mouseEvent.x;
-         final double y = _worldPixelTopLeftViewport.y + mouseEvent.y;
+         final double x = _worldPixel_TopLeft_Viewport.x + mouseEvent.x;
+         final double y = _worldPixel_TopLeft_Viewport.y + mouseEvent.y;
 
          setMapCenterInWorldPixel(new Point2D.Double(x, y));
 
@@ -2306,8 +2309,8 @@ public class Map extends Canvas {
 
          _offline_IsOfflineSelectionStarted = true;
 
-         final int worldMouseX = _worldPixelTopLeftViewport.x + mouseEvent.x;
-         final int worldMouseY = _worldPixelTopLeftViewport.y + mouseEvent.y;
+         final int worldMouseX = _worldPixel_TopLeft_Viewport.x + mouseEvent.x;
+         final int worldMouseY = _worldPixel_TopLeft_Viewport.y + mouseEvent.y;
 
          _offline_DevMouse_Start = devMousePosition;
          _offline_DevMouse_End = devMousePosition;
@@ -2323,9 +2326,9 @@ public class Map extends Canvas {
 
          _grid_GridBox_Hovered.isSelectionStarted = true;
 
-         final int worldMouseX = _worldPixelTopLeftViewport.x + mouseEvent.x;
-         final int worldMouseY = _worldPixelTopLeftViewport.y + mouseEvent.y;
-         final Point worldMousePosition = new Point(worldMouseX, worldMouseY);
+         final Point worldMousePosition = new Point(
+               _worldPixel_TopLeft_Viewport.x + mouseEvent.x,
+               _worldPixel_TopLeft_Viewport.y + mouseEvent.y);
 
          _grid_GridBox_Hovered.dev_Start = devMousePosition;
          _grid_GridBox_Hovered.dev_End = devMousePosition;
@@ -2362,8 +2365,8 @@ public class Map extends Canvas {
       _mouseMovePositionX_Last = _mouseMovePositionX;
       _mouseMovePositionY_Last = _mouseMovePositionY;
 
-      final int worldMouseX = _worldPixelTopLeftViewport.x + _mouseMovePositionX;
-      final int worldMouseY = _worldPixelTopLeftViewport.y + _mouseMovePositionY;
+      final int worldMouseX = _worldPixel_TopLeft_Viewport.x + _mouseMovePositionX;
+      final int worldMouseY = _worldPixel_TopLeft_Viewport.y + _mouseMovePositionY;
       final Point worldMouse_Move = new Point(worldMouseX, worldMouseY);
 
       if (_offline_IsSelectingOfflineArea) {
@@ -2583,7 +2586,7 @@ public class Map extends Canvas {
             // is drawing sliders in map/legent
 
             _directMapPainterContext.gc = gc;
-            _directMapPainterContext.viewport = _worldPixelTopLeftViewport;
+            _directMapPainterContext.viewport = _worldPixel_TopLeft_Viewport;
 
             _directMapPainter.paint(_directMapPainterContext);
          }
@@ -2772,8 +2775,8 @@ public class Map extends Canvas {
             /*
              * convert tile world position into device position
              */
-            final int devTileX = tilePosX * _tilePixelSize - _worldPixelTopLeftViewport.x;
-            final int devTileY = tilePosY * _tilePixelSize - _worldPixelTopLeftViewport.y;
+            final int devTileX = tilePosX * _tilePixelSize - _worldPixel_TopLeft_Viewport.x;
+            final int devTileY = tilePosY * _tilePixelSize - _worldPixel_TopLeft_Viewport.y;
 
             final Rectangle devTileViewport = new Rectangle(devTileX, devTileY, _tilePixelSize, _tilePixelSize);
 
@@ -2810,7 +2813,7 @@ public class Map extends Canvas {
       final Rectangle imageBounds = legendImage.getBounds();
 
       // draw legend on bottom left
-      int yPos = _worldPixelTopLeftViewport.height - 5 - imageBounds.height;
+      int yPos = _worldPixel_TopLeft_Viewport.height - 5 - imageBounds.height;
       yPos = Math.max(5, yPos);
 
       final Point legendPosition = new Point(5, yPos);
@@ -2826,7 +2829,7 @@ public class Map extends Canvas {
     */
    private void paint_50_Scale(final GC gc) {
 
-      final int viewPortWidth = _worldPixelTopLeftViewport.width;
+      final int viewPortWidth = _worldPixel_TopLeft_Viewport.width;
 
       final int devScaleWidth = viewPortWidth / 3;
       final float metricWidth = 111.32f / _distanceUnitValue;
@@ -2859,7 +2862,7 @@ public class Map extends Canvas {
       final int devX1 = viewPortWidth - 5 - devScaleWidthRounded;
       final int devX2 = devX1 + devScaleWidthRounded;
 
-      final int devY = _worldPixelTopLeftViewport.height - 5 - 3;
+      final int devY = _worldPixel_TopLeft_Viewport.height - 5 - 3;
 
       final int devYScaleLines = devY;
 
@@ -2925,8 +2928,8 @@ public class Map extends Canvas {
          isAdjusted = true;
       }
 
-      final int vpWidth = _worldPixelTopLeftViewport.width;
-      final int vpHeight = _worldPixelTopLeftViewport.height;
+      final int vpWidth = _worldPixel_TopLeft_Viewport.width;
+      final int vpHeight = _worldPixel_TopLeft_Viewport.height;
 
       int numX = (int) (vpWidth / geoGridPixelSizeXAdjusted);
       int numY = (int) (vpHeight / geoGridPixelSizeYAdjusted);
@@ -2949,7 +2952,7 @@ public class Map extends Canvas {
          gc.setForeground(_display.getSystemColor(SWT.COLOR_BLUE));
       }
 
-      final Point devGeoGrid = offline_GetDevGeoGridPosition(_worldPixelTopLeftViewport.x, _worldPixelTopLeftViewport.y);
+      final Point devGeoGrid = offline_GetDevGeoGridPosition(_worldPixel_TopLeft_Viewport.x, _worldPixel_TopLeft_Viewport.y);
       final int topLeftX = devGeoGrid.x;
       final int topLeftY = devGeoGrid.y;
 
@@ -2970,7 +2973,7 @@ public class Map extends Canvas {
       }
    }
 
-   private void paint_GridBox_10_Hovered(final GC gc, final MapGridBox mapGridBox) {
+   private void paint_GridBox_10_Hovered(final GC gc, final MapGrid_StartEnd_Data mapGridBox) {
 
       gc.setLineWidth(2);
 
@@ -3053,7 +3056,7 @@ public class Map extends Canvas {
       gc.setAlpha(0xff);
    }
 
-   private void paint_GridBox_20_Selected(final GC gc, final MapGridBox mapGridBox) {
+   private void paint_GridBox_20_Selected(final GC gc, final MapGrid_StartEnd_Data mapGridBox) {
 
       final Point topLeft = paint_GridBox_50_Rectangle(gc,
             mapGridBox.world_Start,
@@ -3070,8 +3073,8 @@ public class Map extends Canvas {
     * @param gc
     * @param worldStart
     * @param worldEnd
-    * @param mapDevGeoBox
-    * @param gridRaster
+    * @param mapGrid_StartEnd_Pos
+    * @param gridPaintData
     * @param isPaintLastGridSelection
     *           When <code>true</code>, the last selected grid is painted, otherwise the currently
     *           selecting grid
@@ -3080,18 +3083,18 @@ public class Map extends Canvas {
    private Point paint_GridBox_50_Rectangle(final GC gc,
                                             final Point worldStart,
                                             final Point worldEnd,
-                                            final MapGridBox mapDevGeoBox,
+                                            final MapGrid_StartEnd_Data mapGrid_StartEnd_Pos,
                                             final boolean isPaintLastGridSelection) {
 
-      final GridRaster gridRaster = grid_CreateGridRaster(worldStart, worldEnd);
+      final MapGrid_Paint_Data gridPaintPos = grid_CreatePaintPositions(worldStart, worldEnd);
 
-      mapDevGeoBox.gridRaster = gridRaster;
+      mapGrid_StartEnd_Pos.gridPaintData = gridPaintPos;
 
       // x: longitude
       // y: latitude
 
-      _grid_SelectedPosition_Geo_1_E2 = new Point(gridRaster.geoGrid_Lon1_E2, gridRaster.geoGrid_Lat1_E2);
-      _grid_SelectedPosition_Geo_2_E2 = new Point(gridRaster.geoGrid_Lon2_E2, gridRaster.geoGrid_Lat2_E2);
+      _grid_LastUsedPosition_Geo_TopLeft_E2 = gridPaintPos.geo_TopLeft_E2;
+      _grid_LastUsedPosition_Geo_BottomRight_E2 = gridPaintPos.geo_BottomRight_E2;
 
       // draw geo grid
       final Color boxColor;
@@ -3111,10 +3114,10 @@ public class Map extends Canvas {
          boxColor = _colorCache.getColorRGB(hoverRGB);
       }
 
-      final int devGrid_X1 = gridRaster.devGrid_X1;
-      final int devGrid_Y1 = gridRaster.devGrid_Y1;
-      final int devWidth = gridRaster.devWidth;
-      final int devHeight = gridRaster.devHeight;
+      final int devGrid_X1 = gridPaintPos.devGrid_X1;
+      final int devGrid_Y1 = gridPaintPos.devGrid_Y1;
+      final int devWidth = gridPaintPos.devWidth;
+      final int devHeight = gridPaintPos.devHeight;
 
       gc.setLineStyle(SWT.LINE_SOLID);
       gc.setLineWidth(1);
@@ -3135,7 +3138,7 @@ public class Map extends Canvas {
     * @param mapDevGeoBox
     * @param numGridRectangle
     */
-   private void paint_GridBox_70_Info_LatLon(final GC gc, final MapGridBox mapDevGeoBox) {
+   private void paint_GridBox_70_Info_LatLon(final GC gc, final MapGrid_StartEnd_Data mapDevGeoBox) {
 
       gc.setForeground(SYS_COLOR_BLACK);
       gc.setBackground(SYS_COLOR_YELLOW);
@@ -3175,9 +3178,9 @@ public class Map extends Canvas {
       gc.drawString(sb.toString(), 0, 0);
    }
 
-   private void paint_GridBox_80_Info_Box(final GC gc, final MapGridBox mapGridBox, final Point topLeft) {
+   private void paint_GridBox_80_Info_Box(final GC gc, final MapGrid_StartEnd_Data mapGridBox, final Point topLeft) {
 
-      final String infoText = mapGridBox.gridBoxText;
+      final String infoText = mapGridBox.gridBox_Text;
 
       if (infoText == null) {
          return;
@@ -3204,7 +3207,7 @@ public class Map extends Canvas {
       gc.setForeground(SYS_COLOR_BLACK);
       gc.drawString(infoText, devX, devY, true);
 
-      mapGridBox.gridBoxText_Position = new Point(devX, devY);
+      mapGridBox.gridBox_TextPosition = new Point(devX, devY);
    }
 
    private void paint_OfflineArea(final GC gc) {
@@ -4306,8 +4309,8 @@ public class Map extends Canvas {
       final int mapDiffX = movePosition.x - _mouseDownPosition.x;
       final int mapDiffY = movePosition.y - _mouseDownPosition.y;
 
-      final double oldCenterX = _worldPixelMapCenter.getX();
-      final double oldCenterY = _worldPixelMapCenter.getY();
+      final double oldCenterX = _worldPixel_MapCenter.getX();
+      final double oldCenterY = _worldPixel_MapCenter.getY();
 
       final double newCenterX = oldCenterX - mapDiffX;
       final double newCenterY = oldCenterY - mapDiffY;
@@ -4604,7 +4607,7 @@ public class Map extends Canvas {
          return;
       }
 
-      final Rectangle bounds = _worldPixelTopLeftViewport;
+      final Rectangle bounds = _worldPixel_TopLeft_Viewport;
 
       final double newCenterX = bounds.x + bounds.width / 2.0 + xDiff;
       final double newCenterY = bounds.y + bounds.height / 2.0 + yDiff;
@@ -4744,14 +4747,14 @@ public class Map extends Canvas {
    }
 
    /**
-    * Sets the center of the map {@link #_worldPixelMapCenter} in world pixel coordinates with the
+    * Sets the center of the map {@link #_worldPixel_MapCenter} in world pixel coordinates with the
     * current zoomlevel
     *
     * @param newWorldPixelCenter
     */
    private void setMapCenterInWorldPixel(final Point2D newWorldPixelCenter) {
 
-      _worldPixelMapCenter = checkWorldPixel(newWorldPixelCenter);
+      _worldPixel_MapCenter = checkWorldPixel(newWorldPixelCenter);
 
       fireMousePosition();
    }
@@ -4851,7 +4854,7 @@ public class Map extends Canvas {
          // _mapZoomLevel == _mapZoomLevel
 
          // set new map center
-         _worldPixelMapCenter = wpMapCenter;
+         _worldPixel_MapCenter = wpMapCenter;
 
          updateViewPortData();
       }
@@ -5002,9 +5005,9 @@ public class Map extends Canvas {
          final WayPointToolTipProvider wpToolTipProvider = (WayPointToolTipProvider) tourToolTipProvider;
 
          final HoveredAreaContext hoveredContext = wpToolTipProvider.getHoveredContext(
-               _worldPixelTopLeftViewport.width / 2,
-               _worldPixelTopLeftViewport.height / 2,
-               _worldPixelTopLeftViewport,
+               _worldPixel_TopLeft_Viewport.width / 2,
+               _worldPixel_TopLeft_Viewport.height / 2,
+               _worldPixel_TopLeft_Viewport,
                _mp,
                _mapZoomLevel,
                _tilePixelSize,
@@ -5176,14 +5179,14 @@ public class Map extends Canvas {
       final Dimension oldMapTileSize = _mp.getMapTileSize(oldZoomLevel);
 
       // check if map is initialized or zoom level has not changed
-      Point2D wpCurrentMapCenter = _worldPixelMapCenter;
+      Point2D wpCurrentMapCenter = _worldPixel_MapCenter;
       if (wpCurrentMapCenter == null) {
 
          // setup map center
 
          initMap();
 
-         wpCurrentMapCenter = _worldPixelMapCenter;
+         wpCurrentMapCenter = _worldPixel_MapCenter;
       }
 
       _mapZoomLevel = adjustedZoomLevel;
@@ -5200,7 +5203,7 @@ public class Map extends Canvas {
 
          // set map center to the current mouse position
 
-         final Rectangle wpViewPort = _worldPixelTopLeftViewport;
+         final Rectangle wpViewPort = _worldPixel_TopLeft_Viewport;
 
          wpCurrentMapCenter = new Point2D.Double(
                wpViewPort.x + _mouseMovePositionX_Last,
@@ -5256,20 +5259,29 @@ public class Map extends Canvas {
          }
          _isZoomWithMousePosition = isZoomWithMousePosition;
 
-         MapGridBox mapGridBox = tourGeoFilter.mapGridBox;
+         MapGrid_StartEnd_Data mapGridBox = tourGeoFilter.mapGridBox;
 
          if (mapGridBox == null) {
 
             // This can occure when geofilter is loaded from xml file and not created in the map
 
             // create map grid box from tour geo filter
-            mapGridBox = new MapGridBox();
+            mapGridBox = new MapGrid_StartEnd_Data();
 
-            final GeoPosition geo_Start = new GeoPosition(tourGeoFilter.latitude1, tourGeoFilter.longitude1);
-            final GeoPosition geo_End = new GeoPosition(tourGeoFilter.latitude2, tourGeoFilter.longitude2);
+            final GeoPosition geo_Start = tourGeoFilter.geo_TopLeft;
+            final GeoPosition geo_End = tourGeoFilter.geo_BottomRight;
 
             final java.awt.Point worldLast_Start = _mp.geoToPixel(geo_Start, tourGeoFilter.mapZoomLevel);
             final java.awt.Point worldLast_End = _mp.geoToPixel(geo_End, tourGeoFilter.mapZoomLevel);
+
+//            final GridRaster gridRaster = grid_CreateGridRaster(new Point(worldLast_Start.x, worldLast_Start.y),
+//                  new Point(worldLast_End.x, worldLast_End.y));
+//
+//            // x: longitude
+//            // y: latitude
+//
+//            _grid_SelectedPosition_Geo_1_E2 = new Point(gridRaster.geoGrid_Lon1_E2, gridRaster.geoGrid_Lat1_E2);
+//            _grid_SelectedPosition_Geo_2_E2 = new Point(gridRaster.geoGrid_Lon2_E2, gridRaster.geoGrid_Lat2_E2);
 
             mapGridBox.geo_Start = geo_Start;
             mapGridBox.geo_End = geo_End;
@@ -5282,7 +5294,7 @@ public class Map extends Canvas {
 
          _grid_GridBox_Selected = mapGridBox;
 
-         final Rectangle wpMapViewPort = getWorldPixelTopLeftViewport(_worldPixelMapCenter);
+         final Rectangle wpMapViewPort = getWorldPixelTopLeftViewport(_worldPixel_MapCenter);
 
          // chck if gird box is already visible
 
@@ -5380,10 +5392,10 @@ public class Map extends Canvas {
 
       // adjust view port to contain the poi image
       final Rectangle adjustedViewport = new Rectangle(
-            _worldPixelTopLeftViewport.x,
-            _worldPixelTopLeftViewport.y,
-            _worldPixelTopLeftViewport.width,
-            _worldPixelTopLeftViewport.height);
+            _worldPixel_TopLeft_Viewport.x,
+            _worldPixel_TopLeft_Viewport.y,
+            _worldPixel_TopLeft_Viewport.width,
+            _worldPixel_TopLeft_Viewport.height);
 
       adjustedViewport.x -= _poiImageBounds.width;
       adjustedViewport.y -= _poiImageBounds.height;
@@ -5398,8 +5410,8 @@ public class Map extends Canvas {
             _poiImageBounds.height)) {
 
          // convert world position into device position
-         final int devPoiPosX = worldPoiPos.x - _worldPixelTopLeftViewport.x;
-         final int devPoiPosY = worldPoiPos.y - _worldPixelTopLeftViewport.y;
+         final int devPoiPosX = worldPoiPos.x - _worldPixel_TopLeft_Viewport.x;
+         final int devPoiPosY = worldPoiPos.y - _worldPixel_TopLeft_Viewport.y;
 
          // get poi size
          final int poiImageWidth = _poiImageBounds.width;
@@ -5503,7 +5515,7 @@ public class Map extends Canvas {
                final HoveredAreaContext hoveredContext = ((IMapToolTipProvider) tttProvider).getHoveredContext(
                      _mouseMovePositionX,
                      _mouseMovePositionY,
-                     _worldPixelTopLeftViewport,
+                     _worldPixel_TopLeft_Viewport,
                      _mp,
                      _mapZoomLevel,
                      _tilePixelSize,
@@ -5545,7 +5557,7 @@ public class Map extends Canvas {
     * Sets all viewport data which are necessary to draw the map tiles in
     * {@link #paint_30_Tiles(GC)}. Some values are cached to optimize performance.
     * <p>
-    * {@link #_worldPixelMapCenter} and {@link #_mapZoomLevel} are the base values for the other
+    * {@link #_worldPixel_MapCenter} and {@link #_mapZoomLevel} are the base values for the other
     * viewport fields.
     */
    private void updateViewPortData() {
@@ -5555,10 +5567,10 @@ public class Map extends Canvas {
          return;
       }
 
-      _worldPixelTopLeftViewport = getWorldPixelTopLeftViewport(_worldPixelMapCenter);
+      _worldPixel_TopLeft_Viewport = getWorldPixelTopLeftViewport(_worldPixel_MapCenter);
 
-      final int visiblePixelWidth = _worldPixelTopLeftViewport.width;
-      final int visiblePixelHeight = _worldPixelTopLeftViewport.height;
+      final int visiblePixelWidth = _worldPixel_TopLeft_Viewport.width;
+      final int visiblePixelHeight = _worldPixel_TopLeft_Viewport.height;
 
       _devMapViewport = new Rectangle(0, 0, visiblePixelWidth, visiblePixelHeight);
 
@@ -5573,8 +5585,8 @@ public class Map extends Canvas {
        * tileOffsetX and tileOffsetY are the x- and y-values for the offset of the visible screen to
        * the map's origin.
        */
-      final int tileOffsetX = (int) Math.floor((double) _worldPixelTopLeftViewport.x / (double) _tilePixelSize);
-      final int tileOffsetY = (int) Math.floor((double) _worldPixelTopLeftViewport.y / (double) _tilePixelSize);
+      final int tileOffsetX = (int) Math.floor((double) _worldPixel_TopLeft_Viewport.x / (double) _tilePixelSize);
+      final int tileOffsetY = (int) Math.floor((double) _worldPixel_TopLeft_Viewport.y / (double) _tilePixelSize);
 
       _tilePosMinX = tileOffsetX;
       _tilePosMinY = tileOffsetY;
@@ -5585,8 +5597,8 @@ public class Map extends Canvas {
        * Pixel size for one geo grid, 0.01 degree
        */
       final Point2D.Double viewportMapCenter_worldPixel = new Point2D.Double(
-            _worldPixelTopLeftViewport.x + visiblePixelWidth / 2,
-            _worldPixelTopLeftViewport.y + visiblePixelHeight / 2);
+            _worldPixel_TopLeft_Viewport.x + visiblePixelWidth / 2,
+            _worldPixel_TopLeft_Viewport.y + visiblePixelHeight / 2);
 
       final GeoPosition geoPos = _mp.pixelToGeo(viewportMapCenter_worldPixel, _mapZoomLevel);
 
@@ -5601,12 +5613,6 @@ public class Map extends Canvas {
 
       _devGridPixelSize_X = Math.abs(worldGrid2.x - worldGrid1.x);
       _devGridPixelSize_Y = Math.abs(worldGrid2.y - worldGrid1.y);
-
-//      System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ()")
-//            + ("\t_geoGridPixelSizeX: " + _geoGridPixelSizeX)
-//            + ("\t_geoGridPixelSizeY: " + _geoGridPixelSizeY)
-//            );
-//// TODO remove SYSTEM.OUT.PRINTLN
    }
 
    public void zoomIn() {
