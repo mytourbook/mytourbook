@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tour.filter.geo;
 
-import de.byteholder.geoclipse.map.MapGrid_StartEnd_Data;
+import de.byteholder.geoclipse.map.MapGridData;
 
 import java.time.ZonedDateTime;
 
@@ -30,25 +30,25 @@ import org.eclipse.swt.graphics.Point;
  */
 public class TourGeoFilter {
 
-   String             id = Long.toString(System.nanoTime());
+   String                       id = Long.toString(System.nanoTime());
 
-   public Point       geo_TopLeft_E2;
-   public Point       geo_BottomRight_E2;
+   public Point                 geo_TopLeft_E2;
+   public Point                 geo_BottomRight_E2;
 
-   public int         mapZoomLevel;
-   public GeoPosition mapGeoCenter;
+   public int                   mapZoomLevel;
+   public GeoPosition           mapGeoCenter;
 
-   public GeoPosition geo_TopLeft;
-   public GeoPosition geo_BottomRight;
+   public GeoPosition           geo_TopLeft;
+   public GeoPosition           geo_BottomRight;
 
-   ZonedDateTime      created;
-   long               createdMS;
+   ZonedDateTime                created;
+   long                         createdMS;
 
-   int                geoParts_Width;
-   int                geoParts_Height;
-   int                numGeoParts;
+   int                          geoParts_Width;
+   int                          geoParts_Height;
+   int                          numGeoParts;
 
-   public MapGrid_StartEnd_Data  mapGridBox;
+   public MapGridData mapGridData;
 
    public TourGeoFilter() {}
 
@@ -56,7 +56,7 @@ public class TourGeoFilter {
                         final Point geoBottomRightE2,
                         final int mapZoomLevel,
                         final GeoPosition mapGeoCenter,
-                        final MapGrid_StartEnd_Data mapGridBox) {
+                        final MapGridData mapGridData) {
 
       geo_TopLeft_E2 = geoTopLeftE2;
       geo_BottomRight_E2 = geoBottomRightE2;
@@ -72,7 +72,7 @@ public class TourGeoFilter {
       this.mapZoomLevel = mapZoomLevel;
       this.mapGeoCenter = mapGeoCenter;
 
-      this.mapGridBox = mapGridBox;
+      this.mapGridData = mapGridData;
 
       created = TimeTools.now();
       createdMS = TimeTools.toEpochMilli(created);

@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tour.filter.geo;
 
-import de.byteholder.geoclipse.map.MapGrid_StartEnd_Data;
+import de.byteholder.geoclipse.map.MapGridData;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -121,7 +121,7 @@ public class TourGeoFilter_Manager {
                                          final Point geo_BbottomRight_E2,
                                          final int map_ZoomLevel,
                                          final GeoPosition map_GeoCenter,
-                                         final MapGrid_StartEnd_Data gridBoxItem) {
+                                         final MapGridData gridBoxItem) {
 
       _selectedFilter = new TourGeoFilter(geo_TopLeft_E2, geo_BbottomRight_E2, map_ZoomLevel, map_GeoCenter, gridBoxItem);
 

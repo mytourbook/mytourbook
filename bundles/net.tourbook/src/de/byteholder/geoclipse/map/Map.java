@@ -505,33 +505,33 @@ public class Map extends Canvas {
    /**
     * Top/left position
     */
-   private Point                      _grid_LastUsedPosition_Geo_TopLeft_E2;
+   private Point               _grid_LastUsedPosition_Geo_TopLeft_E2;
 
    /**
     * Bottom/right position
     */
-   private Point                      _grid_LastUsedPosition_Geo_BottomRight_E2;
+   private Point               _grid_LastUsedPosition_Geo_BottomRight_E2;
 
-   private IMapContextProvider        _mapContextProvider;
+   private IMapContextProvider _mapContextProvider;
 
    /**
     * Is <code>true</code> when the map context menu can be displayed
     */
-   private boolean                    _isContextMenuEnabled   = true;
+   private boolean             _isContextMenuEnabled   = true;
 
-   private DropTarget                 _dropTarget;
+   private DropTarget          _dropTarget;
 
-   private boolean                    _isRedrawEnabled        = true;
+   private boolean             _isRedrawEnabled        = true;
 
-   private HoveredAreaContext         _hoveredAreaContext;
+   private HoveredAreaContext  _hoveredAreaContext;
 
-   private int                        _overlayAlpha           = 0xff;
+   private int                 _overlayAlpha           = 0xff;
 
-   private MapGrid_StartEnd_Data _grid_GridBox_Hovered;
-   private MapGrid_StartEnd_Data _grid_GridBox_Selected;
+   private MapGridData         _grid_Data_Hovered;
+   private MapGridData         _grid_Data_Selected;
 
-   private int[]                      _grid_AutoScrollCounter = new int[1];
-   private boolean                    _grid_IsGridAutoScroll;
+   private int[]               _grid_AutoScrollCounter = new int[1];
+   private boolean             _grid_IsGridAutoScroll;
 
    /**
     * This observer is called in the {@link Tile} when a tile image is set into the tile
@@ -666,12 +666,16 @@ public class Map extends Canvas {
 
    public void actionSearchTourByLocation(final Event event) {
 
-      _grid_GridBox_Hovered = new MapGrid_StartEnd_Data();
+      _grid_Data_Hovered = new MapGridData();
 
-      // set initial mouse move position from the current mouse position
-      _grid_GridBox_Hovered.worldMouse_Move = new Point(
+      final Point worldMousePosition = new Point(
             _worldPixel_TopLeft_Viewport.x + _mouseMovePositionX,
             _worldPixel_TopLeft_Viewport.y + _mouseMovePositionY);
+
+      // set initial mouse move position from the current mouse position
+      _grid_Data_Hovered.worldMouse_Move = worldMousePosition;
+
+//      _grid_Data_Hovered.world_Start = worldMousePosition;
 
       setCursor(_cursorSearchTour);
 
@@ -1087,7 +1091,7 @@ public class Map extends Canvas {
       _mp.disposeTiles();
    }
 
-   private void fireMapGridEvent(final boolean isGridSelected, final MapGrid_StartEnd_Data mapGridBox) {
+   private void fireMapGridEvent(final boolean isGridSelected, final MapGridData mapGridData) {
 
       final Object[] listeners = _allMapGridListener.getListeners();
 
@@ -1101,7 +1105,7 @@ public class Map extends Canvas {
                _mapZoomLevel,
                geoCenter,
                isGridSelected,
-               mapGridBox);
+               mapGridData);
       }
    }
 
@@ -1413,18 +1417,167 @@ public class Map extends Canvas {
    }
 
    /**
-    * Convert start/end positions into top-left/bottom-end positions
+    * Hide geo grid and reset all states
+    */
+   private void grid_DisableGridBoxSelection() {
+
+      _isContextMenuEnabled = true;
+
+      setCursor(_cursorDefault);
+      redraw();
+   }
+
+   /**
+    * @param mouseBorderPosition
+    * @param eventTime
+    */
+   private void grid_DoAutoScroll(final Point mouseBorderPosition) {
+
+      final int AUTO_SCROLL_INTERVAL = 50; // 20ms == 50fps
+
+      _grid_IsGridAutoScroll = true;
+      _grid_AutoScrollCounter[0]++;
+      setCursor(_cursorSearchTour_Scroll);
+
+      getDisplay().timerExec(AUTO_SCROLL_INTERVAL, new Runnable() {
+
+         final int __runnableScrollCounter = _grid_AutoScrollCounter[0];
+
+         @Override
+         public void run() {
+
+            if (__runnableScrollCounter != _grid_AutoScrollCounter[0]) {
+               // a new runnable is created
+               return;
+            }
+
+            if (isDisposed() || _grid_IsGridAutoScroll == false) {
+               // auto scrolling is stopped
+               return;
+            }
+
+            /*
+             * set new map center
+             */
+
+            final int mapDiffX = mouseBorderPosition.x;
+            final int mapDiffY = mouseBorderPosition.y;
+
+            final double oldCenterX = _worldPixel_MapCenter.getX();
+            final double oldCenterY = _worldPixel_MapCenter.getY();
+
+            final double newCenterX = oldCenterX - mapDiffX;
+            final double newCenterY = oldCenterY - mapDiffY;
+
+            // set new map center
+            setMapCenterInWorldPixel(new Point2D.Double(newCenterX, newCenterY));
+            updateViewPortData();
+
+            paint();
+
+            fireMapPositionEvent(false);
+
+            // start scrolling again when the bounds have not been reached
+            final Point mouseBorderPosition = grid_GetMouseBorderPosition();
+            final boolean isRepeatScrolling = mouseBorderPosition != null;
+            if (isRepeatScrolling) {
+               getDisplay().timerExec(AUTO_SCROLL_INTERVAL, this);
+            } else {
+               _grid_IsGridAutoScroll = false;
+               setCursor(_cursorSearchTour);
+            }
+         }
+      });
+   }
+
+   /**
+    * @param mouseEvent
+    * @return Returns mouse positon in the map border or <code>null</code> when the border is not
+    *         hovered. The returned absolute values are higher when the mouse is closer to the
+    *         border.
+    */
+   private Point grid_GetMouseBorderPosition() {
+
+      final int mapBorderSize = 30;
+
+      final int mapWidth = _clientArea.width;
+      final int mapHeight = _clientArea.height;
+
+      // check map min size
+      if (mapWidth < 2 * mapBorderSize || mapHeight < 2 * mapBorderSize) {
+         return null;
+      }
+
+      final int mouseX = _mouseMovePositionX;
+      final int mouseY = _mouseMovePositionY;
+
+      int x = 0;
+      int y = 0;
+
+      boolean isInBorder = false;
+
+      // check left border, returns -x
+      if (mouseX < mapBorderSize) {
+         isInBorder = true;
+         x = (mapBorderSize - mouseX);
+      }
+
+      // check right border, returns +x
+      if (mouseX > mapWidth - mapBorderSize) {
+         isInBorder = true;
+         x = -(mapBorderSize - (mapWidth - mouseX));
+      }
+
+      // check top border, returns +y
+      if (mouseY < mapBorderSize) {
+         isInBorder = true;
+         y = mapBorderSize - mouseY;
+      }
+
+      // check bottom border, returns -y
+      if (mouseY > mapHeight - mapBorderSize) {
+         isInBorder = true;
+         y = -(mapBorderSize - (mapHeight - mouseY));
+      }
+
+      if (isInBorder) {
+
+         return new Point(x, y);
+
+      } else {
+
+         return null;
+      }
+   }
+
+   private void grid_UpdateEndPosition(final MouseEvent mouseEvent, final MapGridData mapGridData) {
+
+      final int worldMouseX = _worldPixel_TopLeft_Viewport.x + mouseEvent.x;
+      final int worldMouseY = _worldPixel_TopLeft_Viewport.y + mouseEvent.y;
+
+      final Point worldMouse_End = new Point(worldMouseX, worldMouseY);
+
+      mapGridData.dev_End = new Point(mouseEvent.x, mouseEvent.y);
+      mapGridData.world_End = worldMouse_End;
+      mapGridData.geo_End = _mp.pixelToGeo(new Point2D.Double(worldMouse_End.x, worldMouse_End.y), _mapZoomLevel);
+
+      grid_UpdatePaintData(mapGridData.world_Start, mapGridData.world_End, mapGridData);
+   }
+
+   /**
+    * Convert start/end positions into top-left/bottom-end positions.
     *
     * @param worldStart
     * @param worldEnd
+    * @param mapGridData
     * @return
     */
-   private MapGrid_Paint_Data grid_CreatePaintPositions(final Point worldStart, final Point worldEnd) {
+   private void grid_UpdatePaintData(Point worldStart, final Point worldEnd, final MapGridData mapGridData) {
 
-//      System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] grid_CreateGridRaster()")
-//            + ("\tworldStart: " + worldStart)
-//            + ("\tworldEnd: " + worldEnd));
-//// TODO remove SYSTEM.OUT.PRINTLN
+      if (worldStart == null) {
+
+         worldStart = worldEnd;
+      }
 
       final int worldStartX = worldStart.x;
       final int worldStartY = worldStart.y;
@@ -1657,168 +1810,17 @@ public class Map extends Canvas {
       devWidth = Math.max(1, devWidth);
       devHeight = Math.max(1, devHeight);
 
-      final MapGrid_Paint_Data gridPaintPos = new MapGrid_Paint_Data();
+      mapGridData.devGrid_X1 = devGrid_X1;
+      mapGridData.devGrid_Y1 = devGrid_Y1;
 
-      gridPaintPos.devGrid_X1 = devGrid_X1;
-      gridPaintPos.devGrid_Y1 = devGrid_Y1;
+      mapGridData.devWidth = devWidth;
+      mapGridData.devHeight = devHeight;
 
-      gridPaintPos.devWidth = devWidth;
-      gridPaintPos.devHeight = devHeight;
+      mapGridData.numWidth = (int) (devWidth / _devGridPixelSize_X + 0.5);
+      mapGridData.numHeight = (int) (devHeight / _devGridPixelSize_Y + 0.5);
 
-      gridPaintPos.numWidth = (int) (devWidth / _devGridPixelSize_X + 0.5);
-      gridPaintPos.numHeight = (int) (devHeight / _devGridPixelSize_Y + 0.5);
-
-      gridPaintPos.geo_TopLeft_E2 = new Point(geoGrid_Lon1_E2, geoGrid_Lat1_E2); // X1 / Y1
-      gridPaintPos.geo_BottomRight_E2 = new Point(geoGrid_Lon2_E2, geoGrid_Lat2_E2); // X2 /Y2
-
-      return gridPaintPos;
-
-   }
-
-   /**
-    * Hide geo grid and reset all states
-    */
-   private void grid_DisableGridBoxSelection() {
-
-      _isContextMenuEnabled = true;
-
-      setCursor(_cursorDefault);
-      redraw();
-   }
-
-   /**
-    * @param mouseBorderPosition
-    * @param eventTime
-    */
-   private void grid_DoAutoScroll(final Point mouseBorderPosition) {
-
-      final int AUTO_SCROLL_INTERVAL = 50; // 20ms == 50fps
-
-      _grid_IsGridAutoScroll = true;
-      _grid_AutoScrollCounter[0]++;
-      setCursor(_cursorSearchTour_Scroll);
-
-      getDisplay().timerExec(AUTO_SCROLL_INTERVAL, new Runnable() {
-
-         final int __runnableScrollCounter = _grid_AutoScrollCounter[0];
-
-         @Override
-         public void run() {
-
-            if (__runnableScrollCounter != _grid_AutoScrollCounter[0]) {
-               // a new runnable is created
-               return;
-            }
-
-            if (isDisposed() || _grid_IsGridAutoScroll == false) {
-               // auto scrolling is stopped
-               return;
-            }
-
-            /*
-             * set new map center
-             */
-
-            final int mapDiffX = mouseBorderPosition.x;
-            final int mapDiffY = mouseBorderPosition.y;
-
-            final double oldCenterX = _worldPixel_MapCenter.getX();
-            final double oldCenterY = _worldPixel_MapCenter.getY();
-
-            final double newCenterX = oldCenterX - mapDiffX;
-            final double newCenterY = oldCenterY - mapDiffY;
-
-            // set new map center
-            setMapCenterInWorldPixel(new Point2D.Double(newCenterX, newCenterY));
-            updateViewPortData();
-
-            paint();
-
-            fireMapPositionEvent(false);
-
-            // start scrolling again when the bounds have not been reached
-            final Point mouseBorderPosition = grid_GetMouseBorderPosition();
-            final boolean isRepeatScrolling = mouseBorderPosition != null;
-            if (isRepeatScrolling) {
-               getDisplay().timerExec(AUTO_SCROLL_INTERVAL, this);
-            } else {
-               _grid_IsGridAutoScroll = false;
-               setCursor(_cursorSearchTour);
-            }
-         }
-      });
-   }
-
-   /**
-    * @param mouseEvent
-    * @return Returns mouse positon in the map border or <code>null</code> when the border is not
-    *         hovered. The returned absolute values are higher when the mouse is closer to the
-    *         border.
-    */
-   private Point grid_GetMouseBorderPosition() {
-
-      final int mapBorderSize = 30;
-
-      final int mapWidth = _clientArea.width;
-      final int mapHeight = _clientArea.height;
-
-      // check map min size
-      if (mapWidth < 2 * mapBorderSize || mapHeight < 2 * mapBorderSize) {
-         return null;
-      }
-
-      final int mouseX = _mouseMovePositionX;
-      final int mouseY = _mouseMovePositionY;
-
-      int x = 0;
-      int y = 0;
-
-      boolean isInBorder = false;
-
-      // check left border, returns -x
-      if (mouseX < mapBorderSize) {
-         isInBorder = true;
-         x = (mapBorderSize - mouseX);
-      }
-
-      // check right border, returns +x
-      if (mouseX > mapWidth - mapBorderSize) {
-         isInBorder = true;
-         x = -(mapBorderSize - (mapWidth - mouseX));
-      }
-
-      // check top border, returns +y
-      if (mouseY < mapBorderSize) {
-         isInBorder = true;
-         y = mapBorderSize - mouseY;
-      }
-
-      // check bottom border, returns -y
-      if (mouseY > mapHeight - mapBorderSize) {
-         isInBorder = true;
-         y = -(mapBorderSize - (mapHeight - mouseY));
-      }
-
-      if (isInBorder) {
-
-         return new Point(x, y);
-
-      } else {
-
-         return null;
-      }
-   }
-
-   private void grid_UpdateEndPosition(final MouseEvent mouseEvent, final MapGrid_StartEnd_Data mapGridBox) {
-
-      final int worldMouseX = _worldPixel_TopLeft_Viewport.x + mouseEvent.x;
-      final int worldMouseY = _worldPixel_TopLeft_Viewport.y + mouseEvent.y;
-
-      final Point worldMouse_End = new Point(worldMouseX, worldMouseY);
-
-      mapGridBox.dev_End = new Point(mouseEvent.x, mouseEvent.y);
-      mapGridBox.world_End = worldMouse_End;
-      mapGridBox.geo_End = _mp.pixelToGeo(new Point2D.Double(worldMouse_End.x, worldMouse_End.y), _mapZoomLevel);
+      mapGridData.geo_TopLeft_E2 = new Point(geoGrid_Lon1_E2, geoGrid_Lat1_E2); // X1 / Y1
+      mapGridData.geo_BottomRight_E2 = new Point(geoGrid_Lon2_E2, geoGrid_Lat2_E2); // X2 /Y2
    }
 
    private void hideHoveredArea() {
@@ -1977,7 +1979,7 @@ public class Map extends Canvas {
     */
    public boolean isSearchTourByLocation() {
 
-      return _grid_GridBox_Hovered != null || _grid_IsGridAutoScroll == true;
+      return _grid_Data_Hovered != null || _grid_IsGridAutoScroll == true;
 
    }
 
@@ -2222,9 +2224,9 @@ public class Map extends Canvas {
       }
 
       // stop tour search by location
-      if (_grid_GridBox_Hovered != null) {
+      if (_grid_Data_Hovered != null) {
 
-         _grid_GridBox_Hovered = null;
+         _grid_Data_Hovered = null;
          _grid_IsGridAutoScroll = false;
          setCursor(null);
 
@@ -2322,23 +2324,24 @@ public class Map extends Canvas {
 
          redraw();
 
-      } else if (_grid_GridBox_Hovered != null) {
+      } else if (_grid_Data_Hovered != null) {
 
-         _grid_GridBox_Hovered.isSelectionStarted = true;
+         _grid_Data_Hovered.isSelectionStarted = true;
 
          final Point worldMousePosition = new Point(
                _worldPixel_TopLeft_Viewport.x + mouseEvent.x,
                _worldPixel_TopLeft_Viewport.y + mouseEvent.y);
 
-         _grid_GridBox_Hovered.dev_Start = devMousePosition;
-         _grid_GridBox_Hovered.dev_End = devMousePosition;
+         _grid_Data_Hovered.dev_Start = devMousePosition;
+         _grid_Data_Hovered.dev_End = devMousePosition;
 
-         _grid_GridBox_Hovered.world_Start = worldMousePosition;
-         _grid_GridBox_Hovered.world_End = worldMousePosition;
+         _grid_Data_Hovered.world_Start = worldMousePosition;
+         _grid_Data_Hovered.world_End = worldMousePosition;
+         grid_UpdatePaintData(worldMousePosition, worldMousePosition, _grid_Data_Hovered);
 
          final GeoPosition geoMousePosition = _mp.pixelToGeo(new Point2D.Double(worldMousePosition.x, worldMousePosition.y), _mapZoomLevel);
-         _grid_GridBox_Hovered.geo_Start = geoMousePosition;
-         _grid_GridBox_Hovered.geo_End = geoMousePosition;
+         _grid_Data_Hovered.geo_Start = geoMousePosition;
+         _grid_Data_Hovered.geo_End = geoMousePosition;
 
          redraw();
 
@@ -2381,9 +2384,9 @@ public class Map extends Canvas {
 
          return;
 
-      } else if (_grid_GridBox_Hovered != null) {
+      } else if (_grid_Data_Hovered != null) {
 
-         _grid_GridBox_Hovered.worldMouse_Move = worldMouse_Move;
+         _grid_Data_Hovered.worldMouse_Move = worldMouse_Move;
 
          final Point mouseBorderPosition = grid_GetMouseBorderPosition();
          if (mouseBorderPosition != null) {
@@ -2395,12 +2398,12 @@ public class Map extends Canvas {
             return;
          }
 
-         grid_UpdateEndPosition(mouseEvent, _grid_GridBox_Hovered);
+         grid_UpdateEndPosition(mouseEvent, _grid_Data_Hovered);
 
          paint();
 
          fireMapInfoEvent();
-         fireMapGridEvent(false, _grid_GridBox_Hovered);
+         fireMapGridEvent(false, _grid_Data_Hovered);
 
          return;
 
@@ -2490,17 +2493,17 @@ public class Map extends Canvas {
 
          offline_OpenOfflineImageDialog();
 
-      } else if (_grid_GridBox_Hovered != null) {
+      } else if (_grid_Data_Hovered != null) {
 
          // finalize grid selecting
 
          _isContextMenuEnabled = false;
 
-         if (_grid_GridBox_Hovered.isSelectionStarted == false) {
+         if (_grid_Data_Hovered.isSelectionStarted == false) {
 
             // this can happen when the right mouse button is clicked
 
-            _grid_GridBox_Hovered = null;
+            _grid_Data_Hovered = null;
             _grid_IsGridAutoScroll = true;
 
             grid_DisableGridBoxSelection();
@@ -2512,11 +2515,11 @@ public class Map extends Canvas {
           * Show selected grid box
           */
 
-         grid_UpdateEndPosition(mouseEvent, _grid_GridBox_Hovered);
+         grid_UpdateEndPosition(mouseEvent, _grid_Data_Hovered);
 
-         _grid_GridBox_Selected = _grid_GridBox_Hovered;
+         _grid_Data_Selected = _grid_Data_Hovered;
 
-         _grid_GridBox_Hovered = null;
+         _grid_Data_Hovered = null;
          _grid_IsGridAutoScroll = true;
 
          grid_DisableGridBoxSelection();
@@ -2524,7 +2527,7 @@ public class Map extends Canvas {
          redraw();
          paint();
 
-         fireMapGridEvent(true, _grid_GridBox_Selected);
+         fireMapGridEvent(true, _grid_Data_Selected);
 
       } else {
 
@@ -2615,11 +2618,11 @@ public class Map extends Canvas {
             paint_OfflineArea(gc);
          }
 
-         if (_grid_GridBox_Selected != null) {
-            paint_GridBox_20_Selected(gc, _grid_GridBox_Selected);
+         if (_grid_Data_Selected != null) {
+            paint_GridBox_20_Selected(gc, _grid_Data_Selected);
          }
-         if (_grid_GridBox_Hovered != null) {
-            paint_GridBox_10_Hovered(gc, _grid_GridBox_Hovered);
+         if (_grid_Data_Hovered != null) {
+            paint_GridBox_10_Hovered(gc, _grid_Data_Hovered);
          }
       }
    }
@@ -2949,7 +2952,7 @@ public class Map extends Canvas {
       if (isAdjusted) {
          gc.setForeground(_display.getSystemColor(SWT.COLOR_RED));
       } else {
-         gc.setForeground(_display.getSystemColor(SWT.COLOR_BLUE));
+         gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
       }
 
       final Point devGeoGrid = offline_GetDevGeoGridPosition(_worldPixel_TopLeft_Viewport.x, _worldPixel_TopLeft_Viewport.y);
@@ -2973,35 +2976,35 @@ public class Map extends Canvas {
       }
    }
 
-   private void paint_GridBox_10_Hovered(final GC gc, final MapGrid_StartEnd_Data mapGridBox) {
+   private void paint_GridBox_10_Hovered(final GC gc, final MapGridData mapGridData) {
 
       gc.setLineWidth(2);
 
       /*
        * show info in the top/right corner that selection for the offline area is activ
        */
-      paint_GridBox_70_Info_LatLon(gc, mapGridBox);
+      paint_GridBox_70_Info_LatLon(gc, mapGridData);
 
       // check if mouse button is hit, this sets the start position
-      if (mapGridBox.dev_Start == null) {
+      if (mapGridData.dev_Start == null) {
 
          // continue just hovering
 
-         final Point topLeft = paint_GridBox_50_Rectangle(gc,
-               mapGridBox.worldMouse_Move,
-               mapGridBox.worldMouse_Move,
-               mapGridBox,
+         final Point devTopLeft = paint_GridBox_50_Rectangle(gc,
+               mapGridData.worldMouse_Move,
+               mapGridData.worldMouse_Move,
+               mapGridData,
                false);
 
-         paint_GridBox_80_Info_Box(gc, mapGridBox, topLeft);
+         paint_GridBox_80_Info_Box(gc, mapGridData, devTopLeft);
 
          return;
       }
 
-      final int dev_Start_X = mapGridBox.dev_Start.x;
-      final int dev_Start_Y = mapGridBox.dev_Start.y;
-      final int dev_End_X = mapGridBox.dev_End.x;
-      final int dev_End_Y = mapGridBox.dev_End.y;
+      final int dev_Start_X = mapGridData.dev_Start.x;
+      final int dev_Start_Y = mapGridData.dev_Start.y;
+      final int dev_End_X = mapGridData.dev_End.x;
+      final int dev_End_Y = mapGridData.dev_End.y;
 
       final int dev_X1;
       final int dev_Y1;
@@ -3035,13 +3038,13 @@ public class Map extends Canvas {
        * Draw geo grid
        */
 
-      final Point topLeft = paint_GridBox_50_Rectangle(gc,
-            mapGridBox.world_Start,
-            mapGridBox.world_End,
-            mapGridBox,
+      final Point devTopLeft = paint_GridBox_50_Rectangle(gc,
+            mapGridData.world_Start,
+            mapGridData.world_End,
+            mapGridData,
             false);
 
-      paint_GridBox_80_Info_Box(gc, mapGridBox, topLeft);
+      paint_GridBox_80_Info_Box(gc, mapGridData, devTopLeft);
 
       gc.setLineStyle(SWT.LINE_SOLID);
       gc.setForeground(SYS_COLOR_BLACK);
@@ -3056,15 +3059,15 @@ public class Map extends Canvas {
       gc.setAlpha(0xff);
    }
 
-   private void paint_GridBox_20_Selected(final GC gc, final MapGrid_StartEnd_Data mapGridBox) {
+   private void paint_GridBox_20_Selected(final GC gc, final MapGridData mapGridData) {
 
-      final Point topLeft = paint_GridBox_50_Rectangle(gc,
-            mapGridBox.world_Start,
-            mapGridBox.world_End,
-            mapGridBox,
+      final Point devTopLeft = paint_GridBox_50_Rectangle(gc,
+            mapGridData.world_Start,
+            mapGridData.world_End,
+            mapGridData,
             true);
 
-      paint_GridBox_80_Info_Box(gc, mapGridBox, topLeft);
+      paint_GridBox_80_Info_Box(gc, mapGridData, devTopLeft);
    }
 
    /**
@@ -3073,7 +3076,7 @@ public class Map extends Canvas {
     * @param gc
     * @param worldStart
     * @param worldEnd
-    * @param mapGrid_StartEnd_Pos
+    * @param mapGridData
     * @param gridPaintData
     * @param isPaintLastGridSelection
     *           When <code>true</code>, the last selected grid is painted, otherwise the currently
@@ -3083,18 +3086,14 @@ public class Map extends Canvas {
    private Point paint_GridBox_50_Rectangle(final GC gc,
                                             final Point worldStart,
                                             final Point worldEnd,
-                                            final MapGrid_StartEnd_Data mapGrid_StartEnd_Pos,
+                                            final MapGridData mapGridData,
                                             final boolean isPaintLastGridSelection) {
-
-      final MapGrid_Paint_Data gridPaintPos = grid_CreatePaintPositions(worldStart, worldEnd);
-
-      mapGrid_StartEnd_Pos.gridPaintData = gridPaintPos;
 
       // x: longitude
       // y: latitude
 
-      _grid_LastUsedPosition_Geo_TopLeft_E2 = gridPaintPos.geo_TopLeft_E2;
-      _grid_LastUsedPosition_Geo_BottomRight_E2 = gridPaintPos.geo_BottomRight_E2;
+      _grid_LastUsedPosition_Geo_TopLeft_E2 = mapGridData.geo_TopLeft_E2;
+      _grid_LastUsedPosition_Geo_BottomRight_E2 = mapGridData.geo_BottomRight_E2;
 
       // draw geo grid
       final Color boxColor;
@@ -3114,10 +3113,10 @@ public class Map extends Canvas {
          boxColor = _colorCache.getColorRGB(hoverRGB);
       }
 
-      final int devGrid_X1 = gridPaintPos.devGrid_X1;
-      final int devGrid_Y1 = gridPaintPos.devGrid_Y1;
-      final int devWidth = gridPaintPos.devWidth;
-      final int devHeight = gridPaintPos.devHeight;
+      final int devGrid_X1 = mapGridData.devGrid_X1;
+      final int devGrid_Y1 = mapGridData.devGrid_Y1;
+      final int devWidth = mapGridData.devWidth;
+      final int devHeight = mapGridData.devHeight;
 
       gc.setLineStyle(SWT.LINE_SOLID);
       gc.setLineWidth(1);
@@ -3138,7 +3137,7 @@ public class Map extends Canvas {
     * @param mapDevGeoBox
     * @param numGridRectangle
     */
-   private void paint_GridBox_70_Info_LatLon(final GC gc, final MapGrid_StartEnd_Data mapDevGeoBox) {
+   private void paint_GridBox_70_Info_LatLon(final GC gc, final MapGridData mapDevGeoBox) {
 
       gc.setForeground(SYS_COLOR_BLACK);
       gc.setBackground(SYS_COLOR_YELLOW);
@@ -3178,9 +3177,9 @@ public class Map extends Canvas {
       gc.drawString(sb.toString(), 0, 0);
    }
 
-   private void paint_GridBox_80_Info_Box(final GC gc, final MapGrid_StartEnd_Data mapGridBox, final Point topLeft) {
+   private void paint_GridBox_80_Info_Box(final GC gc, final MapGridData gridStartEndData, final Point topLeft) {
 
-      final String infoText = mapGridBox.gridBox_Text;
+      final String infoText = gridStartEndData.gridBox_Text;
 
       if (infoText == null) {
          return;
@@ -3191,6 +3190,9 @@ public class Map extends Canvas {
       final int devX = topLeft.x;
       final int devY = topLeft.y - textSize.y - 5;
 
+      /*
+       * Draw border around text to make it more visible
+       */
       gc.setForeground(SYS_COLOR_WHITE);
       gc.drawString(infoText, devX + 1, devY + 1, true);
       gc.drawString(infoText, devX - 1, devY - 1, true);
@@ -3204,10 +3206,11 @@ public class Map extends Canvas {
       gc.drawString(infoText, devX, devY + 1, true);
       gc.drawString(infoText, devX, devY - 1, true);
 
+      /*
+       * Draw text
+       */
       gc.setForeground(SYS_COLOR_BLACK);
       gc.drawString(infoText, devX, devY, true);
-
-      mapGridBox.gridBox_TextPosition = new Point(devX, devY);
    }
 
    private void paint_OfflineArea(final GC gc) {
@@ -5242,7 +5245,7 @@ public class Map extends Canvas {
 
          // hide geo grid
 
-         _grid_GridBox_Selected = null;
+         _grid_Data_Selected = null;
 
          redraw();
 
@@ -5259,14 +5262,14 @@ public class Map extends Canvas {
          }
          _isZoomWithMousePosition = isZoomWithMousePosition;
 
-         MapGrid_StartEnd_Data mapGridBox = tourGeoFilter.mapGridBox;
+         MapGridData mapGridData = tourGeoFilter.mapGridData;
 
-         if (mapGridBox == null) {
+         if (mapGridData == null) {
 
             // This can occure when geofilter is loaded from xml file and not created in the map
 
             // create map grid box from tour geo filter
-            mapGridBox = new MapGrid_StartEnd_Data();
+            mapGridData = new MapGridData();
 
             final GeoPosition geo_Start = tourGeoFilter.geo_TopLeft;
             final GeoPosition geo_End = tourGeoFilter.geo_BottomRight;
@@ -5274,32 +5277,29 @@ public class Map extends Canvas {
             final java.awt.Point worldLast_Start = _mp.geoToPixel(geo_Start, tourGeoFilter.mapZoomLevel);
             final java.awt.Point worldLast_End = _mp.geoToPixel(geo_End, tourGeoFilter.mapZoomLevel);
 
-//            final GridRaster gridRaster = grid_CreateGridRaster(new Point(worldLast_Start.x, worldLast_Start.y),
-//                  new Point(worldLast_End.x, worldLast_End.y));
-//
 //            // x: longitude
 //            // y: latitude
-//
-//            _grid_SelectedPosition_Geo_1_E2 = new Point(gridRaster.geoGrid_Lon1_E2, gridRaster.geoGrid_Lat1_E2);
-//            _grid_SelectedPosition_Geo_2_E2 = new Point(gridRaster.geoGrid_Lon2_E2, gridRaster.geoGrid_Lat2_E2);
+            final Point world_Start = new Point(worldLast_Start.x, worldLast_Start.y);
+            final Point world_End = new Point(worldLast_End.x, worldLast_End.y);
 
-            mapGridBox.geo_Start = geo_Start;
-            mapGridBox.geo_End = geo_End;
+            mapGridData.geo_Start = geo_Start;
+            mapGridData.geo_End = geo_End;
 
-            mapGridBox.world_Start = new Point(worldLast_Start.x, worldLast_Start.y);
-            mapGridBox.world_End = new Point(worldLast_End.x, worldLast_End.y);
+            mapGridData.world_Start = world_Start;
+            mapGridData.world_End = world_End;
+            grid_UpdatePaintData(world_Start, world_End, mapGridData);
 
-            tourGeoFilter.mapGridBox = mapGridBox;
+            tourGeoFilter.mapGridData = mapGridData;
          }
 
-         _grid_GridBox_Selected = mapGridBox;
+         _grid_Data_Selected = mapGridData;
 
          final Rectangle wpMapViewPort = getWorldPixelTopLeftViewport(_worldPixel_MapCenter);
 
          // chck if gird box is already visible
 
-         if (wpMapViewPort.contains(_grid_GridBox_Selected.world_Start)
-               && wpMapViewPort.contains(_grid_GridBox_Selected.world_End)) {
+         if (wpMapViewPort.contains(_grid_Data_Selected.world_Start)
+               && wpMapViewPort.contains(_grid_Data_Selected.world_End)) {
 
             // grid box is visile -> nothing to do
 
@@ -5346,22 +5346,33 @@ public class Map extends Canvas {
     */
    private void updateGeoGridAfterZoom() {
 
-      if (_grid_GridBox_Hovered != null && _grid_GridBox_Hovered.geo_Start != null) {
+      if (_grid_Data_Hovered != null && _grid_Data_Hovered.geo_Start != null) {
 
-         final java.awt.Point world_Start = _mp.geoToPixel(_grid_GridBox_Hovered.geo_Start, _mapZoomLevel);
-         final java.awt.Point world_End = _mp.geoToPixel(_grid_GridBox_Hovered.geo_End, _mapZoomLevel);
+         final java.awt.Point world_Start_awt = _mp.geoToPixel(_grid_Data_Hovered.geo_Start, _mapZoomLevel);
+         final java.awt.Point world_End_awt = _mp.geoToPixel(_grid_Data_Hovered.geo_End, _mapZoomLevel);
 
-         _grid_GridBox_Hovered.world_Start = new Point(world_Start.x, world_Start.y);
-         _grid_GridBox_Hovered.world_End = new Point(world_End.x, world_End.y);
+         final Point world_Start = UI.SWT_Point(world_Start_awt);
+         final Point world_End = UI.SWT_Point(world_End_awt);
+
+         _grid_Data_Hovered.world_Start = world_Start;
+         _grid_Data_Hovered.world_End = world_End;
+
+         grid_UpdatePaintData(world_Start, world_End, _grid_Data_Hovered);
+
       }
 
-      if (_grid_GridBox_Selected != null && _grid_GridBox_Selected.geo_Start != null) {
+      if (_grid_Data_Selected != null && _grid_Data_Selected.geo_Start != null) {
 
-         final java.awt.Point worldLast_Start = _mp.geoToPixel(_grid_GridBox_Selected.geo_Start, _mapZoomLevel);
-         final java.awt.Point worldLast_End = _mp.geoToPixel(_grid_GridBox_Selected.geo_End, _mapZoomLevel);
+         final java.awt.Point world_Start_awt = _mp.geoToPixel(_grid_Data_Selected.geo_Start, _mapZoomLevel);
+         final java.awt.Point world_End_awt = _mp.geoToPixel(_grid_Data_Selected.geo_End, _mapZoomLevel);
 
-         _grid_GridBox_Selected.world_Start = new Point(worldLast_Start.x, worldLast_Start.y);
-         _grid_GridBox_Selected.world_End = new Point(worldLast_End.x, worldLast_End.y);
+         final Point world_Start = UI.SWT_Point(world_Start_awt);
+         final Point world_End = UI.SWT_Point(world_End_awt);
+
+         _grid_Data_Selected.world_Start = world_Start;
+         _grid_Data_Selected.world_End = world_End;
+
+         grid_UpdatePaintData(world_Start, world_End, _grid_Data_Selected);
       }
    }
 

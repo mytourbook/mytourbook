@@ -18,7 +18,7 @@ package net.tourbook.map2.view;
 import de.byteholder.geoclipse.GeoclipseExtensions;
 import de.byteholder.geoclipse.map.IMapContextProvider;
 import de.byteholder.geoclipse.map.Map;
-import de.byteholder.geoclipse.map.MapGrid_StartEnd_Data;
+import de.byteholder.geoclipse.map.MapGridData;
 import de.byteholder.geoclipse.map.MapLegend;
 import de.byteholder.geoclipse.map.event.IMapGridListener;
 import de.byteholder.geoclipse.map.event.IMapInfoListener;
@@ -953,7 +953,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
                                final int map_ZoomLevel,
                                final GeoPosition map_GeoCenter,
                                final boolean isGridSelected,
-                               final MapGrid_StartEnd_Data gridBoxItem) {
+                               final MapGridData gridBoxItem) {
 
             if (isGridSelected) {
 
@@ -1209,7 +1209,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
                   geoFilter_10_Loader(
                         tourGeoFilter.geo_TopLeft_E2,
                         tourGeoFilter.geo_BottomRight_E2,
-                        tourGeoFilter.mapGridBox,
+                        tourGeoFilter.mapGridData,
                         tourGeoFilter);
 
                } else if (eventData == null) {
@@ -1966,7 +1966,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
    private void geoFilter_10_Loader(final org.eclipse.swt.graphics.Point geo_TopLeft_E2,
                                     final org.eclipse.swt.graphics.Point geo_BottomRight_E2,
-                                    final MapGrid_StartEnd_Data mapGridBox,
+                                    final MapGridData mapGridBox,
                                     final TourGeoFilter tourGeoFilter) {
 
       // check if this area is already loaded

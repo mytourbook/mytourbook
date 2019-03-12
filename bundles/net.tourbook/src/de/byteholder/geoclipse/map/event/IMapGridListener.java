@@ -15,7 +15,7 @@
  *******************************************************************************/
 package de.byteholder.geoclipse.map.event;
 
-import de.byteholder.geoclipse.map.MapGrid_StartEnd_Data;
+import de.byteholder.geoclipse.map.MapGridData;
 
 import net.tourbook.common.map.GeoPosition;
 
@@ -42,6 +42,6 @@ public interface IMapGridListener {
                          int mapZoomLevel,
                          GeoPosition mapGeoCenter,
                          boolean isGridSelected,
-                         MapGrid_StartEnd_Data gridBoxItem);
+                         MapGridData gridBoxItem);
 
 }
