@@ -27,7 +27,7 @@ public class MapGridData {
 
    boolean       isSelectionStarted;
 
-   Point         worldMouse_Move;
+   GeoPosition   geo_MouseMove;
 
    Point         dev_Start;
    Point         dev_End;
@@ -35,6 +35,9 @@ public class MapGridData {
    Point         world_Start;
    Point         world_End;
 
+   /**
+    * This geo position is set when the selecting of a geo grid has started.
+    */
    GeoPosition   geo_Start;
    GeoPosition   geo_End;
 
@@ -44,17 +47,17 @@ public class MapGridData {
     * Paint data
     */
 
-   int        devGrid_X1;
-   int        devGrid_Y1;
+   int          devGrid_X1;
+   int          devGrid_Y1;
 
-   int        devWidth;
-   int        devHeight;
+   int          devWidth;
+   int          devHeight;
 
-   public int numWidth = -1;
-   public int numHeight;
+   public int   numWidth = -1;
+   public int   numHeight;
 
-   Point      geo_TopLeft_E2;
-   Point      geo_BottomRight_E2;
+   public Point geo_TopLeft_E2;
+   public Point geo_BottomRight_E2;
 
    public MapGridData() {}
 
@@ -65,13 +68,11 @@ public class MapGridData {
 
       return ""
 
-            + "MapGeoDevBox\n"
+            + "MapGridData\n"
 
             + "[\n"
 
             + " isSelectionStarted="    + isSelectionStarted + "\n"
-
-            + " worldMouse_Move="       + worldMouse_Move + "\n"
 
             + " dev_Start="             + dev_Start + "\n"
             + " dev_End="               + dev_End + "\n"

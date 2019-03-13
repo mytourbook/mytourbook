@@ -19,29 +19,20 @@ import de.byteholder.geoclipse.map.MapGridData;
 
 import net.tourbook.common.map.GeoPosition;
 
-import org.eclipse.swt.graphics.Point;
-
 public interface IMapGridListener {
 
    /**
     * Is called when a map grid is selected.
     *
-    * @param Lat/lon
-    *           top/left, multiplied with 100
-    * @param Lat/lon
-    *           bottom/right, multiplied with 100
     * @param mapZoomLevel
     * @param mapGeoCenter
     * @param isGridSelected
     *           Is <code>true</code> when grid is selected, otherwise mouse is just moved
-    * @param gridBoxItem
-    *           Map grid box item
+    * @param mapGridData
     */
-   public void onMapGrid(Point topLeftE2,
-                         Point bottomRightE2,
-                         int mapZoomLevel,
+   public void onMapGrid(int mapZoomLevel,
                          GeoPosition mapGeoCenter,
                          boolean isGridSelected,
-                         MapGridData gridBoxItem);
+                         MapGridData mapGridData);
 
 }

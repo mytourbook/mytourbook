@@ -30,33 +30,34 @@ import org.eclipse.swt.graphics.Point;
  */
 public class TourGeoFilter {
 
-   String                       id = Long.toString(System.nanoTime());
+   String             id = Long.toString(System.nanoTime());
 
-   public Point                 geo_TopLeft_E2;
-   public Point                 geo_BottomRight_E2;
+   public Point       geo_TopLeft_E2;
+   public Point       geo_BottomRight_E2;
 
-   public int                   mapZoomLevel;
-   public GeoPosition           mapGeoCenter;
+   public int         mapZoomLevel;
+   public GeoPosition mapGeoCenter;
 
-   public GeoPosition           geo_TopLeft;
-   public GeoPosition           geo_BottomRight;
+   public GeoPosition geo_TopLeft;
+   public GeoPosition geo_BottomRight;
 
-   ZonedDateTime                created;
-   long                         createdMS;
+   ZonedDateTime      created;
+   long               createdMS;
 
-   int                          geoParts_Width;
-   int                          geoParts_Height;
-   int                          numGeoParts;
+   int                geoParts_Width;
+   int                geoParts_Height;
+   int                numGeoParts;
 
    public MapGridData mapGridData;
 
    public TourGeoFilter() {}
 
-   public TourGeoFilter(final Point geoTopLeftE2,
-                        final Point geoBottomRightE2,
-                        final int mapZoomLevel,
+   public TourGeoFilter(final int mapZoomLevel,
                         final GeoPosition mapGeoCenter,
                         final MapGridData mapGridData) {
+
+      final Point geoTopLeftE2 = mapGridData.geo_TopLeft_E2;
+      final Point geoBottomRightE2 = mapGridData.geo_BottomRight_E2;
 
       geo_TopLeft_E2 = geoTopLeftE2;
       geo_BottomRight_E2 = geoBottomRightE2;

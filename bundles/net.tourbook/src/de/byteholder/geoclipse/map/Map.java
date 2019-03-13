@@ -290,9 +290,9 @@ public class Map extends Canvas {
     * The overlay to delegate to for painting the "foreground" of the map component. This would
     * include painting waypoints, day/night, etc. Also receives mouse events.
     */
-   private final List<MapPainter> _overlays               = new ArrayList<>();
+   private final List<MapPainter> _overlays                = new ArrayList<>();
 
-   private final TileLoadObserver _tileImageLoadObserver  = new TileLoadObserver();
+   private final TileLoadObserver _tileImageLoadObserver   = new TileLoadObserver();
 
    private final Cursor           _cursorCross;
    private final Cursor           _cursorDefault;
@@ -300,17 +300,18 @@ public class Map extends Canvas {
    private final Cursor           _cursorSearchTour;
    private final Cursor           _cursorSearchTour_Scroll;
 
-   private final AtomicInteger    _redrawMapCounter       = new AtomicInteger();
-   private final AtomicInteger    _overlayRunnableCounter = new AtomicInteger();
+   private final AtomicInteger    _redrawMapCounter        = new AtomicInteger();
+   private final AtomicInteger    _overlayRunnableCounter  = new AtomicInteger();
 
    private boolean                _isLeftMouseButtonPressed;
    private boolean                _isMapPanned;
 
-   private int                    _mouseMovePositionX     = Integer.MIN_VALUE;
-   private int                    _mouseMovePositionY     = Integer.MIN_VALUE;
-   private int                    _mouseMovePositionX_Last;
-   private int                    _mouseMovePositionY_Last;
    private Point                  _mouseDownPosition;
+   private int                    _mouseMove_DevPosition_X = Integer.MIN_VALUE;
+   private int                    _mouseMove_DevPosition_Y = Integer.MIN_VALUE;
+   private int                    _mouseMove_DevPosition_X_Last;
+   private int                    _mouseMove_DevPosition_Y_Last;
+   private GeoPosition            _mouseMove_GeoPosition;
 
    private Thread                 _overlayThread;
    private long                   _nextOverlayRedrawTime;
@@ -502,16 +503,6 @@ public class Map extends Canvas {
 //   private Rectangle _offline_PreviousOfflineArea;
 //   private int       _offline_PreviousOfflineArea_MapZoomLevel;
 
-   /**
-    * Top/left position
-    */
-   private Point               _grid_LastUsedPosition_Geo_TopLeft_E2;
-
-   /**
-    * Bottom/right position
-    */
-   private Point               _grid_LastUsedPosition_Geo_BottomRight_E2;
-
    private IMapContextProvider _mapContextProvider;
 
    /**
@@ -669,13 +660,12 @@ public class Map extends Canvas {
       _grid_Data_Hovered = new MapGridData();
 
       final Point worldMousePosition = new Point(
-            _worldPixel_TopLeft_Viewport.x + _mouseMovePositionX,
-            _worldPixel_TopLeft_Viewport.y + _mouseMovePositionY);
+            _worldPixel_TopLeft_Viewport.x + _mouseMove_DevPosition_X,
+            _worldPixel_TopLeft_Viewport.y + _mouseMove_DevPosition_Y);
 
-      // set initial mouse move position from the current mouse position
-      _grid_Data_Hovered.worldMouse_Move = worldMousePosition;
-
-//      _grid_Data_Hovered.world_Start = worldMousePosition;
+      _grid_Data_Hovered.geo_MouseMove = _mp.pixelToGeo(
+            new Point2D.Double(worldMousePosition.x, worldMousePosition.y),
+            _mapZoomLevel);
 
       setCursor(_cursorSearchTour);
 
@@ -739,12 +729,12 @@ public class Map extends Canvas {
          public void mouseExit(final MouseEvent e) {
 
             // keep position for out of the map events, e.g. recenter map
-            _mouseMovePositionX_Last = _mouseMovePositionX;
-            _mouseMovePositionY_Last = _mouseMovePositionY;
+            _mouseMove_DevPosition_X_Last = _mouseMove_DevPosition_X;
+            _mouseMove_DevPosition_Y_Last = _mouseMove_DevPosition_Y;
 
             // set position out of the map that to tool tip is not activated again
-            _mouseMovePositionX = Integer.MIN_VALUE;
-            _mouseMovePositionY = Integer.MIN_VALUE;
+            _mouseMove_DevPosition_X = Integer.MIN_VALUE;
+            _mouseMove_DevPosition_Y = Integer.MIN_VALUE;
 
             // stop grid autoscrolling
             _grid_IsGridAutoScroll = false;
@@ -1100,8 +1090,6 @@ public class Map extends Canvas {
       for (final Object listener : listeners) {
 
          ((IMapGridListener) listener).onMapGrid(
-               _grid_LastUsedPosition_Geo_TopLeft_E2,
-               _grid_LastUsedPosition_Geo_BottomRight_E2,
                _mapZoomLevel,
                geoCenter,
                isGridSelected,
@@ -1138,7 +1126,7 @@ public class Map extends Canvas {
    private void fireMousePosition() {
 
       // check position, can initially be null
-      if ((_mouseMovePositionX == Integer.MIN_VALUE) || (_mp == null)) {
+      if ((_mouseMove_DevPosition_X == Integer.MIN_VALUE) || (_mp == null)) {
          return;
       }
 
@@ -1147,8 +1135,8 @@ public class Map extends Canvas {
        */
       final Rectangle topLeftViewPort = getWorldPixelTopLeftViewport(_worldPixel_MapCenter);
 
-      final int worldMouseX = topLeftViewPort.x + _mouseMovePositionX;
-      final int worldMouseY = topLeftViewPort.y + _mouseMovePositionY;
+      final int worldMouseX = topLeftViewPort.x + _mouseMove_DevPosition_X;
+      final int worldMouseY = topLeftViewPort.y + _mouseMove_DevPosition_Y;
 
       final GeoPosition geoPosition = _mp.pixelToGeo(new Point2D.Double(worldMouseX, worldMouseY), _mapZoomLevel);
       final MapPositionEvent event = new MapPositionEvent(geoPosition, _mapZoomLevel);
@@ -1460,8 +1448,8 @@ public class Map extends Canvas {
              * set new map center
              */
 
-            final int mapDiffX = mouseBorderPosition.x;
-            final int mapDiffY = mouseBorderPosition.y;
+            final int mapDiffX = mouseBorderPosition.x / 3;
+            final int mapDiffY = mouseBorderPosition.y / 3;
 
             final double oldCenterX = _worldPixel_MapCenter.getX();
             final double oldCenterY = _worldPixel_MapCenter.getY();
@@ -1472,6 +1460,7 @@ public class Map extends Canvas {
             // set new map center
             setMapCenterInWorldPixel(new Point2D.Double(newCenterX, newCenterY));
             updateViewPortData();
+            grid_UpdateGridData_AfterRelocation();
 
             paint();
 
@@ -1508,8 +1497,8 @@ public class Map extends Canvas {
          return null;
       }
 
-      final int mouseX = _mouseMovePositionX;
-      final int mouseY = _mouseMovePositionY;
+      final int mouseX = _mouseMove_DevPosition_X;
+      final int mouseY = _mouseMove_DevPosition_Y;
 
       int x = 0;
       int y = 0;
@@ -1561,7 +1550,7 @@ public class Map extends Canvas {
       mapGridData.world_End = worldMouse_End;
       mapGridData.geo_End = _mp.pixelToGeo(new Point2D.Double(worldMouse_End.x, worldMouse_End.y), _mapZoomLevel);
 
-      grid_UpdatePaintData(mapGridData.world_Start, mapGridData.world_End, mapGridData);
+      grid_UpdateGridData(mapGridData.world_Start, mapGridData.world_End, mapGridData);
    }
 
    /**
@@ -1572,9 +1561,11 @@ public class Map extends Canvas {
     * @param mapGridData
     * @return
     */
-   private void grid_UpdatePaintData(Point worldStart, final Point worldEnd, final MapGridData mapGridData) {
+   private void grid_UpdateGridData(Point worldStart, final Point worldEnd, final MapGridData mapGridData) {
 
       if (worldStart == null) {
+
+         // this can occure when hovering but not yet selected
 
          worldStart = worldEnd;
       }
@@ -1821,6 +1812,60 @@ public class Map extends Canvas {
 
       mapGridData.geo_TopLeft_E2 = new Point(geoGrid_Lon1_E2, geoGrid_Lat1_E2); // X1 / Y1
       mapGridData.geo_BottomRight_E2 = new Point(geoGrid_Lon2_E2, geoGrid_Lat2_E2); // X2 /Y2
+   }
+
+   /**
+    * Update geo grid world position when zoom level changes
+    */
+   private void grid_UpdateGridData_AfterRelocation() {
+
+      if (_grid_Data_Hovered != null) {
+
+         if (_grid_Data_Hovered.geo_Start != null) {
+
+            final java.awt.Point world_Start_awt = _mp.geoToPixel(_grid_Data_Hovered.geo_Start, _mapZoomLevel);
+            final java.awt.Point world_End_awt = _mp.geoToPixel(_grid_Data_Hovered.geo_End, _mapZoomLevel);
+
+            final Point world_Start = UI.SWT_Point(world_Start_awt);
+            final Point world_End = UI.SWT_Point(world_End_awt);
+
+            _grid_Data_Hovered.world_Start = world_Start;
+            _grid_Data_Hovered.world_End = world_End;
+
+            grid_UpdateGridData(world_Start, world_End, _grid_Data_Hovered);
+
+         } else {
+
+            /*
+             * When hovering has started then there is no geo_Start value but the painting data can
+             * be updated from the mouse move positions
+             */
+
+            final GeoPosition geo_MouseMove = _grid_Data_Hovered.geo_MouseMove;
+            if (geo_MouseMove != null) {
+
+               final Point world_MouseMove = UI.SWT_Point(_mp.geoToPixel(geo_MouseMove, _mapZoomLevel));
+
+               grid_UpdateGridData(world_MouseMove, world_MouseMove, _grid_Data_Hovered);
+            }
+         }
+      }
+
+      if (_grid_Data_Selected != null && _grid_Data_Selected.geo_Start != null) {
+
+         final java.awt.Point world_Start_awt = _mp.geoToPixel(_grid_Data_Selected.geo_Start, _mapZoomLevel);
+         final java.awt.Point world_End_awt = _mp.geoToPixel(_grid_Data_Selected.geo_End, _mapZoomLevel);
+
+         final Point world_Start = UI.SWT_Point(world_Start_awt);
+         final Point world_End = UI.SWT_Point(world_End_awt);
+
+         _grid_Data_Selected.world_Start = world_Start;
+         _grid_Data_Selected.world_End = world_End;
+
+         grid_UpdateGridData(world_Start, world_End, _grid_Data_Selected);
+      }
+
+      redraw();
    }
 
    private void hideHoveredArea() {
@@ -2337,7 +2382,7 @@ public class Map extends Canvas {
 
          _grid_Data_Hovered.world_Start = worldMousePosition;
          _grid_Data_Hovered.world_End = worldMousePosition;
-         grid_UpdatePaintData(worldMousePosition, worldMousePosition, _grid_Data_Hovered);
+         grid_UpdateGridData(worldMousePosition, worldMousePosition, _grid_Data_Hovered);
 
          final GeoPosition geoMousePosition = _mp.pixelToGeo(new Point2D.Double(worldMousePosition.x, worldMousePosition.y), _mapZoomLevel);
          _grid_Data_Hovered.geo_Start = geoMousePosition;
@@ -2361,16 +2406,19 @@ public class Map extends Canvas {
          return;
       }
 
-      _mouseMovePositionX = mouseEvent.x;
-      _mouseMovePositionY = mouseEvent.y;
+      _mouseMove_DevPosition_X = mouseEvent.x;
+      _mouseMove_DevPosition_Y = mouseEvent.y;
 
       // keep position for out of the map events, e.g. recenter map
-      _mouseMovePositionX_Last = _mouseMovePositionX;
-      _mouseMovePositionY_Last = _mouseMovePositionY;
+      _mouseMove_DevPosition_X_Last = _mouseMove_DevPosition_X;
+      _mouseMove_DevPosition_Y_Last = _mouseMove_DevPosition_Y;
 
-      final int worldMouseX = _worldPixel_TopLeft_Viewport.x + _mouseMovePositionX;
-      final int worldMouseY = _worldPixel_TopLeft_Viewport.y + _mouseMovePositionY;
+      final int worldMouseX = _worldPixel_TopLeft_Viewport.x + _mouseMove_DevPosition_X;
+      final int worldMouseY = _worldPixel_TopLeft_Viewport.y + _mouseMove_DevPosition_Y;
       final Point worldMouse_Move = new Point(worldMouseX, worldMouseY);
+
+      final GeoPosition geoMouseMove = _mp.pixelToGeo(new Point2D.Double(worldMouseX, worldMouseY), _mapZoomLevel);
+      _mouseMove_GeoPosition = geoMouseMove;
 
       if (_offline_IsSelectingOfflineArea) {
 
@@ -2386,7 +2434,7 @@ public class Map extends Canvas {
 
       } else if (_grid_Data_Hovered != null) {
 
-         _grid_Data_Hovered.worldMouse_Move = worldMouse_Move;
+         _grid_Data_Hovered.geo_MouseMove = geoMouseMove;
 
          final Point mouseBorderPosition = grid_GetMouseBorderPosition();
          if (mouseBorderPosition != null) {
@@ -2427,10 +2475,10 @@ public class Map extends Canvas {
             final int topLeftX = _hoveredAreaContext.hoveredTopLeftX;
             final int topLeftY = _hoveredAreaContext.hoveredTopLeftY;
 
-            if (_mouseMovePositionX >= topLeftX
-                  && _mouseMovePositionX < topLeftX + _hoveredAreaContext.hoveredWidth
-                  && _mouseMovePositionY >= topLeftY
-                  && _mouseMovePositionY < topLeftY + _hoveredAreaContext.hoveredHeight) {
+            if (_mouseMove_DevPosition_X >= topLeftX
+                  && _mouseMove_DevPosition_X < topLeftX + _hoveredAreaContext.hoveredWidth
+                  && _mouseMove_DevPosition_Y >= topLeftY
+                  && _mouseMove_DevPosition_Y < topLeftY + _hoveredAreaContext.hoveredHeight) {
 
                isContextValid = true;
             }
@@ -2448,10 +2496,10 @@ public class Map extends Canvas {
 
          // check if mouse is within the poi image
          if (_isPoiVisible
-               && (_mouseMovePositionX > _poiImageDevPosition.x)
-               && (_mouseMovePositionX < _poiImageDevPosition.x + _poiImageBounds.width)
-               && (_mouseMovePositionY > _poiImageDevPosition.y - _poiTTOffsetY - 5)
-               && (_mouseMovePositionY < _poiImageDevPosition.y + _poiImageBounds.height)) {
+               && (_mouseMove_DevPosition_X > _poiImageDevPosition.x)
+               && (_mouseMove_DevPosition_X < _poiImageDevPosition.x + _poiImageBounds.width)
+               && (_mouseMove_DevPosition_Y > _poiImageDevPosition.y - _poiTTOffsetY - 5)
+               && (_mouseMove_DevPosition_Y < _poiImageDevPosition.y + _poiImageBounds.height)) {
 
             // display poi
             showPoi();
@@ -2547,10 +2595,10 @@ public class Map extends Canvas {
       }
 
       // show poi info when mouse is within the poi image
-      if ((_mouseMovePositionX > _poiImageDevPosition.x)
-            && (_mouseMovePositionX < _poiImageDevPosition.x + _poiImageBounds.width)
-            && (_mouseMovePositionY > _poiImageDevPosition.y - _poiTTOffsetY - 5)
-            && (_mouseMovePositionY < _poiImageDevPosition.y + _poiImageBounds.height)) {
+      if ((_mouseMove_DevPosition_X > _poiImageDevPosition.x)
+            && (_mouseMove_DevPosition_X < _poiImageDevPosition.x + _poiImageBounds.width)
+            && (_mouseMove_DevPosition_Y > _poiImageDevPosition.y - _poiTTOffsetY - 5)
+            && (_mouseMove_DevPosition_Y < _poiImageDevPosition.y + _poiImageBounds.height)) {
 
          setPoiVisible(true);
       }
@@ -2990,11 +3038,7 @@ public class Map extends Canvas {
 
          // continue just hovering
 
-         final Point devTopLeft = paint_GridBox_50_Rectangle(gc,
-               mapGridData.worldMouse_Move,
-               mapGridData.worldMouse_Move,
-               mapGridData,
-               false);
+         final Point devTopLeft = paint_GridBox_50_Rectangle(gc, mapGridData, false);
 
          paint_GridBox_80_Info_Box(gc, mapGridData, devTopLeft);
 
@@ -3038,11 +3082,7 @@ public class Map extends Canvas {
        * Draw geo grid
        */
 
-      final Point devTopLeft = paint_GridBox_50_Rectangle(gc,
-            mapGridData.world_Start,
-            mapGridData.world_End,
-            mapGridData,
-            false);
+      final Point devTopLeft = paint_GridBox_50_Rectangle(gc, mapGridData, false);
 
       paint_GridBox_80_Info_Box(gc, mapGridData, devTopLeft);
 
@@ -3061,11 +3101,7 @@ public class Map extends Canvas {
 
    private void paint_GridBox_20_Selected(final GC gc, final MapGridData mapGridData) {
 
-      final Point devTopLeft = paint_GridBox_50_Rectangle(gc,
-            mapGridData.world_Start,
-            mapGridData.world_End,
-            mapGridData,
-            true);
+      final Point devTopLeft = paint_GridBox_50_Rectangle(gc, mapGridData, true);
 
       paint_GridBox_80_Info_Box(gc, mapGridData, devTopLeft);
    }
@@ -3084,16 +3120,11 @@ public class Map extends Canvas {
     * @return Returns top/left box position in the viewport
     */
    private Point paint_GridBox_50_Rectangle(final GC gc,
-                                            final Point worldStart,
-                                            final Point worldEnd,
                                             final MapGridData mapGridData,
                                             final boolean isPaintLastGridSelection) {
 
       // x: longitude
       // y: latitude
-
-      _grid_LastUsedPosition_Geo_TopLeft_E2 = mapGridData.geo_TopLeft_E2;
-      _grid_LastUsedPosition_Geo_BottomRight_E2 = mapGridData.geo_BottomRight_E2;
 
       // draw geo grid
       final Color boxColor;
@@ -3134,22 +3165,22 @@ public class Map extends Canvas {
 
    /**
     * @param gc
-    * @param mapDevGeoBox
+    * @param mapGridData
     * @param numGridRectangle
     */
-   private void paint_GridBox_70_Info_LatLon(final GC gc, final MapGridData mapDevGeoBox) {
+   private void paint_GridBox_70_Info_LatLon(final GC gc, final MapGridData mapGridData) {
 
       gc.setForeground(SYS_COLOR_BLACK);
       gc.setBackground(SYS_COLOR_YELLOW);
 
       final StringBuilder sb = new StringBuilder();
 
-      if (mapDevGeoBox.dev_Start != null) {
+      if (mapGridData.dev_Start != null) {
 
          // display selected area
 
-         final Point2D.Double worldPixel_Start = new Point2D.Double(mapDevGeoBox.world_Start.x, mapDevGeoBox.world_Start.y);
-         final Point2D.Double worldPixel_End = new Point2D.Double(mapDevGeoBox.world_End.x, mapDevGeoBox.world_End.y);
+         final Point2D.Double worldPixel_Start = new Point2D.Double(mapGridData.world_Start.x, mapGridData.world_Start.y);
+         final Point2D.Double worldPixel_End = new Point2D.Double(mapGridData.world_End.x, mapGridData.world_End.y);
 
          final GeoPosition geoStart = _mp.pixelToGeo(worldPixel_Start, _mapZoomLevel);
          final GeoPosition geoEnd = _mp.pixelToGeo(worldPixel_End, _mapZoomLevel);
@@ -3164,14 +3195,9 @@ public class Map extends Canvas {
 
          // display mouse move geo position
 
-         final Point worldMouse_Move = mapDevGeoBox.worldMouse_Move;
-         final Point2D.Double worldPixel_Mouse = new Point2D.Double(worldMouse_Move.x, worldMouse_Move.y);
-
-         final GeoPosition mouseGeo = _mp.pixelToGeo(worldPixel_Mouse, _mapZoomLevel);
-
          sb.append(String.format(" %s / %s", //$NON-NLS-1$
-               _nfLatLon.format(mouseGeo.latitude),
-               _nfLatLon.format(mouseGeo.longitude)));
+               _nfLatLon.format(_mouseMove_GeoPosition.latitude),
+               _nfLatLon.format(_mouseMove_GeoPosition.longitude)));
       }
 
       gc.drawString(sb.toString(), 0, 0);
@@ -4324,6 +4350,7 @@ public class Map extends Canvas {
       // set new map center
       setMapCenterInWorldPixel(new Point2D.Double(newCenterX, newCenterY));
       updateViewPortData();
+      grid_UpdateGridData_AfterRelocation();
 
       paint();
 
@@ -5209,8 +5236,8 @@ public class Map extends Canvas {
          final Rectangle wpViewPort = _worldPixel_TopLeft_Viewport;
 
          wpCurrentMapCenter = new Point2D.Double(
-               wpViewPort.x + _mouseMovePositionX_Last,
-               wpViewPort.y + _mouseMovePositionY_Last);
+               wpViewPort.x + _mouseMove_DevPosition_X_Last,
+               wpViewPort.y + _mouseMove_DevPosition_Y_Last);
 
       } else {
 
@@ -5227,7 +5254,7 @@ public class Map extends Canvas {
 
       updateTourToolTip();
 //      updatePoiVisibility();
-      updateGeoGridAfterZoom();
+      grid_UpdateGridData_AfterRelocation();
 
       // update zoom level in status bar
       fireMapInfoEvent();
@@ -5287,7 +5314,7 @@ public class Map extends Canvas {
 
             mapGridData.world_Start = world_Start;
             mapGridData.world_End = world_End;
-            grid_UpdatePaintData(world_Start, world_End, mapGridData);
+            grid_UpdateGridData(world_Start, world_End, mapGridData);
 
             tourGeoFilter.mapGridData = mapGridData;
          }
@@ -5339,41 +5366,6 @@ public class Map extends Canvas {
          Job.getJobManager().cancel(_splitJobFamily);
       }
       _isCancelSplitJobs = false;
-   }
-
-   /**
-    * Update geo grid world position when zoom level changes
-    */
-   private void updateGeoGridAfterZoom() {
-
-      if (_grid_Data_Hovered != null && _grid_Data_Hovered.geo_Start != null) {
-
-         final java.awt.Point world_Start_awt = _mp.geoToPixel(_grid_Data_Hovered.geo_Start, _mapZoomLevel);
-         final java.awt.Point world_End_awt = _mp.geoToPixel(_grid_Data_Hovered.geo_End, _mapZoomLevel);
-
-         final Point world_Start = UI.SWT_Point(world_Start_awt);
-         final Point world_End = UI.SWT_Point(world_End_awt);
-
-         _grid_Data_Hovered.world_Start = world_Start;
-         _grid_Data_Hovered.world_End = world_End;
-
-         grid_UpdatePaintData(world_Start, world_End, _grid_Data_Hovered);
-
-      }
-
-      if (_grid_Data_Selected != null && _grid_Data_Selected.geo_Start != null) {
-
-         final java.awt.Point world_Start_awt = _mp.geoToPixel(_grid_Data_Selected.geo_Start, _mapZoomLevel);
-         final java.awt.Point world_End_awt = _mp.geoToPixel(_grid_Data_Selected.geo_End, _mapZoomLevel);
-
-         final Point world_Start = UI.SWT_Point(world_Start_awt);
-         final Point world_End = UI.SWT_Point(world_End_awt);
-
-         _grid_Data_Selected.world_Start = world_Start;
-         _grid_Data_Selected.world_End = world_End;
-
-         grid_UpdatePaintData(world_Start, world_End, _grid_Data_Selected);
-      }
    }
 
    public void updateGraphColors() {
@@ -5504,8 +5496,8 @@ public class Map extends Canvas {
          if (tttProvider instanceof IInfoToolTipProvider) {
 
             final HoveredAreaContext hoveredContext = ((IInfoToolTipProvider) tttProvider).getHoveredContext(
-                  _mouseMovePositionX,
-                  _mouseMovePositionY);
+                  _mouseMove_DevPosition_X,
+                  _mouseMove_DevPosition_Y);
 
             if (hoveredContext != null) {
                newHoveredContext = hoveredContext;
@@ -5524,8 +5516,8 @@ public class Map extends Canvas {
             if (tttProvider instanceof IMapToolTipProvider) {
 
                final HoveredAreaContext hoveredContext = ((IMapToolTipProvider) tttProvider).getHoveredContext(
-                     _mouseMovePositionX,
-                     _mouseMovePositionY,
+                     _mouseMove_DevPosition_X,
+                     _mouseMove_DevPosition_Y,
                      _worldPixel_TopLeft_Viewport,
                      _mp,
                      _mapZoomLevel,

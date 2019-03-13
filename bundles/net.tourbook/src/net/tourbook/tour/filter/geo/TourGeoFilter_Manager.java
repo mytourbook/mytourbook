@@ -115,15 +115,13 @@ public class TourGeoFilter_Manager {
     * @param geo_BbottomRight_E2
     * @param map_ZoomLevel
     * @param map_GeoCenter
-    * @param gridBoxItem
+    * @param mapGridData
     */
-   public static void createAndSetGeoFilter(final Point geo_TopLeft_E2,
-                                         final Point geo_BbottomRight_E2,
-                                         final int map_ZoomLevel,
-                                         final GeoPosition map_GeoCenter,
-                                         final MapGridData gridBoxItem) {
+   public static void createAndSetGeoFilter(final int map_ZoomLevel,
+                                            final GeoPosition map_GeoCenter,
+                                            final MapGridData mapGridData) {
 
-      _selectedFilter = new TourGeoFilter(geo_TopLeft_E2, geo_BbottomRight_E2, map_ZoomLevel, map_GeoCenter, gridBoxItem);
+      _selectedFilter = new TourGeoFilter(map_ZoomLevel, map_GeoCenter, mapGridData);
 
       _allTourGeoFilter.add(_selectedFilter);
 

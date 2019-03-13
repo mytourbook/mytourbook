@@ -948,29 +948,18 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
       _map.addMapGridBoxListener(new IMapGridListener() {
 
          @Override
-         public void onMapGrid(final org.eclipse.swt.graphics.Point geo_TopLeft_E2,
-                               final org.eclipse.swt.graphics.Point geo_BottomRight_E2,
-                               final int map_ZoomLevel,
+         public void onMapGrid(final int map_ZoomLevel,
                                final GeoPosition map_GeoCenter,
                                final boolean isGridSelected,
-                               final MapGridData gridBoxItem) {
+                               final MapGridData mapGridData) {
 
             if (isGridSelected) {
 
-               TourGeoFilter_Manager.createAndSetGeoFilter(
-                     geo_TopLeft_E2,
-                     geo_BottomRight_E2,
-                     map_ZoomLevel,
-                     map_GeoCenter,
-                     gridBoxItem);
+               TourGeoFilter_Manager.createAndSetGeoFilter(map_ZoomLevel, map_GeoCenter, mapGridData);
 
             } else {
 
-               geoFilter_10_Loader(
-                     geo_TopLeft_E2,
-                     geo_BottomRight_E2,
-                     gridBoxItem,
-                     null);
+               geoFilter_10_Loader(mapGridData, null);
             }
          }
 
@@ -1206,11 +1195,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
                   _map.showGeoGrid(tourGeoFilter);
 
                   // show tours in search rectangle
-                  geoFilter_10_Loader(
-                        tourGeoFilter.geo_TopLeft_E2,
-                        tourGeoFilter.geo_BottomRight_E2,
-                        tourGeoFilter.mapGridData,
-                        tourGeoFilter);
+                  geoFilter_10_Loader(tourGeoFilter.mapGridData, tourGeoFilter);
 
                } else if (eventData == null) {
 
@@ -1964,10 +1949,11 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
       }
    }
 
-   private void geoFilter_10_Loader(final org.eclipse.swt.graphics.Point geo_TopLeft_E2,
-                                    final org.eclipse.swt.graphics.Point geo_BottomRight_E2,
-                                    final MapGridData mapGridBox,
+   private void geoFilter_10_Loader(final MapGridData mapGridData,
                                     final TourGeoFilter tourGeoFilter) {
+
+      final org.eclipse.swt.graphics.Point geo_TopLeft_E2 = mapGridData.geo_TopLeft_E2;
+      final org.eclipse.swt.graphics.Point geo_BottomRight_E2 = mapGridData.geo_BottomRight_E2;
 
       // check if this area is already loaded
       if (_geoFilter_Loaded_TopLeft_E2 != null
@@ -2011,7 +1997,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
                   geo_TopLeft_E2,
                   geo_BottomRight_E2,
                   _geoFilter_PreviousGeoLoaderItem,
-                  mapGridBox,
+                  mapGridData,
                   Map2View.this,
                   tourGeoFilter);
          }
