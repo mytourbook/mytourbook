@@ -22,6 +22,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.MessageFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -30,6 +31,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicLong;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.database.TourDatabase;
@@ -69,7 +71,7 @@ public class TourGeoFilter_Loader {
    }
 
    /**
-    * @param mapGridBox
+    * @param mapGridData
     * @param map2View
     * @param tourGeoFilter
     * @param geoParts
@@ -82,10 +84,10 @@ public class TourGeoFilter_Loader {
     * @return
     * @return
     */
-   public static GeoFilter_LoaderData loadToursFromGeoParts(final Point geoTopLeftE2,
-                                                            final Point geoBottomRightE2,
+   public static GeoFilter_LoaderData loadToursFromGeoParts(final Point geoParts_TopLeft_E2,
+                                                            final Point geoParts_BottomRight_E2,
                                                             final GeoFilter_LoaderData previousGeoFilterItem,
-                                                            final MapGridData mapGridBox,
+                                                            final MapGridData mapGridData,
                                                             final Map2View map2View,
                                                             final TourGeoFilter tourGeoFilter) {
 
@@ -96,10 +98,10 @@ public class TourGeoFilter_Loader {
 
       final GeoFilter_LoaderData loaderItem = new GeoFilter_LoaderData(executerId);
 
-      loaderItem.geoTopLeftE2 = geoTopLeftE2;
-      loaderItem.geoBottomRightE2 = geoBottomRightE2;
+      loaderItem.geoParts_TopLeft_E2 = geoParts_TopLeft_E2;
+      loaderItem.geoParts_BottomRight_E2 = geoParts_BottomRight_E2;
 
-      loaderItem.mapGridData = mapGridBox;
+      loaderItem.mapGridData = mapGridData;
 
       _loaderWaitingQueue.add(loaderItem);
 
@@ -118,10 +120,10 @@ public class TourGeoFilter_Loader {
 
                // show loading state
                final String loadingMessage;
-               if (mapGridBox == null || mapGridBox.numWidth == -1) {
+               if (mapGridData == null || mapGridData.numWidth == -1) {
                   loadingMessage = "Loading ...";
                } else {
-                  final int numParts = mapGridBox.numWidth * mapGridBox.numHeight;
+                  final int numParts = mapGridData.numWidth * mapGridData.numHeight;
                   loadingMessage = MessageFormat.format("Loading {0} parts...", numParts);
                }
                geoLoaderData.mapGridData.gridBox_Text = loadingMessage;
@@ -136,10 +138,10 @@ public class TourGeoFilter_Loader {
 
                } else {
 
-                  // update loading state
+                  // update loading state - this should not occure but is helpfull for testing
 
                   // show loading state
-                  geoLoaderData.mapGridData.gridBox_Text = "Done";
+                  geoLoaderData.mapGridData.gridBox_Text = TimeTools.Formatter_DateTime_SM.format(LocalDateTime.now());
                   map2View.redrawMap();
                }
 
@@ -165,9 +167,16 @@ public class TourGeoFilter_Loader {
       final ArrayList<Integer> allLatLonParts = new ArrayList<>();
 
       final String selectTourIdsFromGeoParts = TourGeoFilter_Manager.createSelectStmtForGeoParts(
-            geoLoaderData.geoTopLeftE2,
-            geoLoaderData.geoBottomRightE2,
+            geoLoaderData.geoParts_TopLeft_E2,
+            geoLoaderData.geoParts_BottomRight_E2,
             allLatLonParts);
+
+      if (selectTourIdsFromGeoParts == null) {
+
+         // this can occure when there are no geo parts, this would cause a sql exception
+
+         return false;
+      }
 
       final boolean isUseAppFilter = Util.getStateBoolean(_state,
             TourGeoFilter_Manager.STATE_IS_USE_APP_FILTERS,

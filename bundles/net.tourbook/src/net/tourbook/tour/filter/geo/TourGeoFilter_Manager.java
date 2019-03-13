@@ -85,15 +85,20 @@ public class TourGeoFilter_Manager {
    private static final String             ATTR_ACTIVE_GEO_FILTER_ID            = "activeGeoFilterId";                      //$NON-NLS-1$
    private static final String             ATTR_CREATED                         = "created";                                //$NON-NLS-1$
    private static final String             ATTR_GEO_FILTER_ID                   = "geoFilterId";                            //$NON-NLS-1$
-   private static final String             ATTR_GEO_PARTS                       = "geoParts";                               //$NON-NLS-1$
    private static final String             ATTR_MAP_GEO_CENTER_LATITUDE         = "mapGeoCenterLatitude";                   //$NON-NLS-1$
    private static final String             ATTR_MAP_GEO_CENTER_LONGITUDE        = "mapGeoCenterLongitude";                  //$NON-NLS-1$
    private static final String             ATTR_MAP_ZOOM_LEVEL                  = "mapZoomLevel";                           //$NON-NLS-1$
+   private static final String             ATTR_NUM_GEO_PARTS                   = "numGeoParts";                            //$NON-NLS-1$
 
-   private static final String             ATTR_GEO_TOP_LEFT_X_E2               = "geo_TopLeft_X_E2";                       //$NON-NLS-1$
-   private static final String             ATTR_GEO_TOP_LEFT_Y_E2               = "geo_TopLeft_Y_E2";                       //$NON-NLS-1$
-   private static final String             ATTR_GEO_BOTTOM_RIGHT_X_E2           = "geo_BottomRight_X_E2";                   //$NON-NLS-1$
-   private static final String             ATTR_GEO_BOTTOM_RIGHT_Y_E2           = "geo_BottomRight_Y_E2";                   //$NON-NLS-1$
+   private static final String             ATTR_GEO_LOCATION_TOP_LEFT_X_E2      = "geoLocation_TopLeft_X_E2";               //$NON-NLS-1$
+   private static final String             ATTR_GEO_LOCATION_TOP_LEFT_Y_E2      = "geoLocation_TopLeft_Y_E2";               //$NON-NLS-1$
+   private static final String             ATTR_GEO_LOCATION_BOTTOM_RIGHT_X_E2  = "geoLocation_BottomRight_X_E2";           //$NON-NLS-1$
+   private static final String             ATTR_GEO_LOCATION_BOTTOM_RIGHT_Y_E2  = "geoLocation_BottomRight_Y_E2";           //$NON-NLS-1$
+
+   private static final String             ATTR_GEO_PARTS_TOP_LEFT_X_E2         = "geoParts_TopLeft_X_E2";                  //$NON-NLS-1$
+   private static final String             ATTR_GEO_PARTS_TOP_LEFT_Y_E2         = "geoParts_TopLeft_Y_E2";                  //$NON-NLS-1$
+   private static final String             ATTR_GEO_PARTS_BOTTOM_RIGHT_X_E2     = "geoParts_BottomRight_X_E2";              //$NON-NLS-1$
+   private static final String             ATTR_GEO_PARTS_BOTTOM_RIGHT_Y_E2     = "geoParts_BottomRight_Y_E2";              //$NON-NLS-1$
 
    private static final String             ATTR_TOUR_FILTER_VERSION             = "tourFilterVersion";                      //$NON-NLS-1$
 
@@ -146,8 +151,8 @@ public class TourGeoFilter_Manager {
     *         <p>
     *         The returned SELECT contains tour id's which are within the geo parts
     */
-   static String createSelectStmtForGeoParts(final Point geo_TopLeft_E2,
-                                             final Point geo_BottomRight_E2,
+   static String createSelectStmtForGeoParts(final Point geoParts_TopLeft_E2,
+                                             final Point geoParts_BottomRight_E2,
                                              final ArrayList<Integer> allLatLonParts) {
 
       //         int latPart = (int) (latitude * 100);
@@ -161,15 +166,14 @@ public class TourGeoFilter_Manager {
       //                                    Integer.MAX_VALUE = 2_147_483_647
 
       // x: longitude
+      final int normalizedLon1 = geoParts_TopLeft_E2.x + TourData.NORMALIZED_LONGITUDE_OFFSET_E2;
+      final int normalizedLon2 = geoParts_BottomRight_E2.x + TourData.NORMALIZED_LONGITUDE_OFFSET_E2;
+
       // y: latitude
+      final int normalizedLat1 = geoParts_TopLeft_E2.y + TourData.NORMALIZED_LATITUDE_OFFSET_E2;
+      final int normalizedLat2 = geoParts_BottomRight_E2.y + TourData.NORMALIZED_LATITUDE_OFFSET_E2;
 
-      final int normalizedLat1 = geo_TopLeft_E2.y + TourData.NORMALIZED_LATITUDE_OFFSET_E2;
-      final int normalizedLat2 = geo_BottomRight_E2.y + TourData.NORMALIZED_LATITUDE_OFFSET_E2;
-
-      final int normalizedLon1 = geo_TopLeft_E2.x + TourData.NORMALIZED_LONGITUDE_OFFSET_E2;
-      final int normalizedLon2 = geo_BottomRight_E2.x + TourData.NORMALIZED_LONGITUDE_OFFSET_E2;
-
-      final int partWidth = geo_BottomRight_E2.x - geo_TopLeft_E2.x;
+      final int partWidth = geoParts_BottomRight_E2.x - geoParts_TopLeft_E2.x;
 //    final int partHeight = geoTopLeftE2.y - geoBottomRightE2.y;
 
       String sqlWhere;
@@ -350,13 +354,13 @@ public class TourGeoFilter_Manager {
       final ArrayList<Integer> allLatLonParts = new ArrayList<>();
 
       final String sqlSelect_WithAllTourIds_FromGeoParts = createSelectStmtForGeoParts(
-            geoFilter.geo_TopLeft_E2,
-            geoFilter.geo_BottomRight_E2,
+            geoFilter.geoParts_TopLeft_E2,
+            geoFilter.geoParts_BottomRight_E2,
             allLatLonParts);
 
       if (sqlSelect_WithAllTourIds_FromGeoParts == null) {
 
-         // this can occure when there are not geo part which would cause a sql exception
+         // this can occure when there are no geo parts, this would cause a sql exception
 
          return null;
       }
@@ -482,19 +486,38 @@ public class TourGeoFilter_Manager {
                   geoFilter.created = Util.getXmlDateTime(xmlGeoFilter, ATTR_CREATED, TimeTools.now());
                   geoFilter.createdMS = TimeTools.toEpochMilli(geoFilter.created);
 
-                  geoFilter.numGeoParts = Util.getXmlInteger(xmlGeoFilter, ATTR_GEO_PARTS, 0);
+                  geoFilter.numGeoParts = Util.getXmlInteger(xmlGeoFilter, ATTR_NUM_GEO_PARTS, 0);
 
-                  geoFilter.geo_TopLeft_E2 = new Point(
-                        Util.getXmlInteger(xmlGeoFilter, ATTR_GEO_TOP_LEFT_X_E2, 0),
-                        Util.getXmlInteger(xmlGeoFilter, ATTR_GEO_TOP_LEFT_Y_E2, 0));
+                  geoFilter.geoLocation_TopLeft_E2 = new Point(
+                        Util.getXmlInteger(xmlGeoFilter, ATTR_GEO_LOCATION_TOP_LEFT_X_E2, 0),
+                        Util.getXmlInteger(xmlGeoFilter, ATTR_GEO_LOCATION_TOP_LEFT_Y_E2, 0));
 
-                  geoFilter.geo_BottomRight_E2 = new Point(
-                        Util.getXmlInteger(xmlGeoFilter, ATTR_GEO_BOTTOM_RIGHT_X_E2, 0),
-                        Util.getXmlInteger(xmlGeoFilter, ATTR_GEO_BOTTOM_RIGHT_Y_E2, 0));
+                  geoFilter.geoLocation_BottomRight_E2 = new Point(
+                        Util.getXmlInteger(xmlGeoFilter, ATTR_GEO_LOCATION_BOTTOM_RIGHT_X_E2, 0),
+                        Util.getXmlInteger(xmlGeoFilter, ATTR_GEO_LOCATION_BOTTOM_RIGHT_Y_E2, 0));
+
+                  geoFilter.geoParts_TopLeft_E2 = new Point(
+                        Util.getXmlInteger(xmlGeoFilter, ATTR_GEO_PARTS_TOP_LEFT_X_E2, 0),
+                        Util.getXmlInteger(xmlGeoFilter, ATTR_GEO_PARTS_TOP_LEFT_Y_E2, 0));
+
+                  geoFilter.geoParts_BottomRight_E2 = new Point(
+                        Util.getXmlInteger(xmlGeoFilter, ATTR_GEO_PARTS_BOTTOM_RIGHT_X_E2, 0),
+                        Util.getXmlInteger(xmlGeoFilter, ATTR_GEO_PARTS_BOTTOM_RIGHT_Y_E2, 0));
 
                   // x:long  y:lat
-                  geoFilter.geo_TopLeft = new GeoPosition(geoFilter.geo_TopLeft_E2.y / 100.0d, geoFilter.geo_TopLeft_E2.x / 100.0d);
-                  geoFilter.geo_BottomRight = new GeoPosition(geoFilter.geo_BottomRight_E2.y / 100.0d, geoFilter.geo_BottomRight_E2.x / 100.0d);
+                  geoFilter.geoLocation_TopLeft = new GeoPosition(
+                        geoFilter.geoLocation_TopLeft_E2.y / 100.0d,
+                        geoFilter.geoLocation_TopLeft_E2.x / 100.0d);
+                  geoFilter.geoLocation_BottomRight = new GeoPosition(
+                        geoFilter.geoLocation_BottomRight_E2.y / 100.0d,
+                        geoFilter.geoLocation_BottomRight_E2.x / 100.0d);
+
+                  geoFilter.geoParts_TopLeft = new GeoPosition(
+                        geoFilter.geoParts_TopLeft_E2.y / 100.0d,
+                        geoFilter.geoParts_TopLeft_E2.x / 100.0d);
+                  geoFilter.geoParts_BottomRight = new GeoPosition(
+                        geoFilter.geoParts_BottomRight_E2.y / 100.0d,
+                        geoFilter.geoParts_BottomRight_E2.x / 100.0d);
 
                   geoFilter.mapZoomLevel = Util.getXmlInteger(xmlGeoFilter, ATTR_MAP_ZOOM_LEVEL, 6);
                   geoFilter.mapGeoCenter = new GeoPosition(
@@ -536,12 +559,17 @@ public class TourGeoFilter_Manager {
             xmlFilter.putString(ATTR_GEO_FILTER_ID, geoFilter.id);
 
             xmlFilter.putString(ATTR_CREATED, geoFilter.created.toString());
-            xmlFilter.putInteger(ATTR_GEO_PARTS, geoFilter.numGeoParts);
+            xmlFilter.putInteger(ATTR_NUM_GEO_PARTS, geoFilter.numGeoParts);
 
-            xmlFilter.putInteger(ATTR_GEO_TOP_LEFT_X_E2, geoFilter.geo_TopLeft_E2.x);
-            xmlFilter.putInteger(ATTR_GEO_TOP_LEFT_Y_E2, geoFilter.geo_TopLeft_E2.y);
-            xmlFilter.putInteger(ATTR_GEO_BOTTOM_RIGHT_X_E2, geoFilter.geo_BottomRight_E2.x);
-            xmlFilter.putInteger(ATTR_GEO_BOTTOM_RIGHT_Y_E2, geoFilter.geo_BottomRight_E2.y);
+            xmlFilter.putInteger(ATTR_GEO_LOCATION_TOP_LEFT_X_E2, geoFilter.geoLocation_TopLeft_E2.x);
+            xmlFilter.putInteger(ATTR_GEO_LOCATION_TOP_LEFT_Y_E2, geoFilter.geoLocation_TopLeft_E2.y);
+            xmlFilter.putInteger(ATTR_GEO_LOCATION_BOTTOM_RIGHT_X_E2, geoFilter.geoLocation_BottomRight_E2.x);
+            xmlFilter.putInteger(ATTR_GEO_LOCATION_BOTTOM_RIGHT_Y_E2, geoFilter.geoLocation_BottomRight_E2.y);
+
+            xmlFilter.putInteger(ATTR_GEO_PARTS_TOP_LEFT_X_E2, geoFilter.geoParts_TopLeft_E2.x);
+            xmlFilter.putInteger(ATTR_GEO_PARTS_TOP_LEFT_Y_E2, geoFilter.geoParts_TopLeft_E2.y);
+            xmlFilter.putInteger(ATTR_GEO_PARTS_BOTTOM_RIGHT_X_E2, geoFilter.geoParts_BottomRight_E2.x);
+            xmlFilter.putInteger(ATTR_GEO_PARTS_BOTTOM_RIGHT_Y_E2, geoFilter.geoParts_BottomRight_E2.y);
 
             xmlFilter.putInteger(ATTR_MAP_ZOOM_LEVEL, geoFilter.mapZoomLevel);
             Util.setXmlDouble(xmlFilter, ATTR_MAP_GEO_CENTER_LATITUDE, geoFilter.mapGeoCenter.latitude);

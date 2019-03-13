@@ -1453,6 +1453,10 @@ public class Map extends Canvas {
       int geoGrid_Lat2_E2 = (int) (geoLat2 * 100);
       int geoGrid_Lon2_E2 = (int) (geoLon2 * 100);
 
+      // keep geo location
+      mapGridData.geoLocation_TopLeft_E2 = new Point(geoGrid_Lon1_E2, geoGrid_Lat1_E2); // X1 / Y1
+      mapGridData.geoLocation_BottomRight_E2 = new Point(geoGrid_Lon2_E2, geoGrid_Lat2_E2); // X2 /Y2
+
       final Point devGeoGrid_1 = offline_GetDevGeoGridPosition(world_X1, world_Y1);
       final Point devGeoGrid_2 = offline_GetDevGeoGridPosition(world_X2, world_Y2);
 
@@ -1484,7 +1488,7 @@ public class Map extends Canvas {
          devGrid_X2 += geoGridPixelSizeX;
          devGrid_Y2 += geoGridPixelSizeY;
 
-         geoGrid_Lon2_E2 += gridSize_E2; // X1
+         geoGrid_Lon2_E2 += gridSize_E2; // X2
          geoGrid_Lat1_E2 += gridSize_E2; // Y1
 
       } else if (geoLat1 > 0 && geoLon1 > 0 && geoLat2 < 0 && geoLon2 > 0) {
@@ -1649,8 +1653,8 @@ public class Map extends Canvas {
       int devHeight = devGrid_Y2 - devGrid_Y1;
 
       // ensure it is always visible
-      devWidth = Math.max(1, devWidth);
-      devHeight = Math.max(1, devHeight);
+      devWidth = (int) Math.max(geoGridPixelSizeX * 0.7, devWidth);
+      devHeight = (int) Math.max(geoGridPixelSizeY * 0.7, devHeight);
 
       mapGridData.devGrid_X1 = devGrid_X1;
       mapGridData.devGrid_Y1 = devGrid_Y1;
@@ -1661,8 +1665,8 @@ public class Map extends Canvas {
       mapGridData.numWidth = (int) (devWidth / _devGridPixelSize_X + 0.5);
       mapGridData.numHeight = (int) (devHeight / _devGridPixelSize_Y + 0.5);
 
-      mapGridData.geo_TopLeft_E2 = new Point(geoGrid_Lon1_E2, geoGrid_Lat1_E2); // X1 / Y1
-      mapGridData.geo_BottomRight_E2 = new Point(geoGrid_Lon2_E2, geoGrid_Lat2_E2); // X2 /Y2
+      mapGridData.geoParts_TopLeft_E2 = new Point(geoGrid_Lon1_E2, geoGrid_Lat1_E2); // X1 / Y1
+      mapGridData.geoParts_BottomRight_E2 = new Point(geoGrid_Lon2_E2, geoGrid_Lat2_E2); // X2 /Y2
    }
 
    /**
@@ -5280,12 +5284,14 @@ public class Map extends Canvas {
 
          // show requested grid box
 
+         final int mapZoomLevel = tourGeoFilter.mapZoomLevel;
+
          // prevent recenter
          final boolean isZoomWithMousePosition = _isZoomWithMousePosition;
          _isZoomWithMousePosition = false;
          {
             // set zoom level first, that recalculation is correct
-            setZoom(tourGeoFilter.mapZoomLevel);
+            setZoom(mapZoomLevel);
          }
          _isZoomWithMousePosition = isZoomWithMousePosition;
 
@@ -5298,16 +5304,13 @@ public class Map extends Canvas {
             // create map grid box from tour geo filter
             mapGridData = new MapGridData();
 
-            final GeoPosition geo_Start = tourGeoFilter.geo_TopLeft;
-            final GeoPosition geo_End = tourGeoFilter.geo_BottomRight;
-
-            final java.awt.Point worldLast_Start = _mp.geoToPixel(geo_Start, tourGeoFilter.mapZoomLevel);
-            final java.awt.Point worldLast_End = _mp.geoToPixel(geo_End, tourGeoFilter.mapZoomLevel);
+            final GeoPosition geo_Start = tourGeoFilter.geoLocation_TopLeft;
+            final GeoPosition geo_End = tourGeoFilter.geoLocation_BottomRight;
 
             // x: longitude
             // y: latitude
-            final Point world_Start = new Point(worldLast_Start.x, worldLast_Start.y);
-            final Point world_End = new Point(worldLast_End.x, worldLast_End.y);
+            final Point world_Start = UI.SWT_Point(_mp.geoToPixel(geo_Start, mapZoomLevel));
+            final Point world_End = UI.SWT_Point(_mp.geoToPixel(geo_End, mapZoomLevel));
 
             mapGridData.geo_Start = geo_Start;
             mapGridData.geo_End = geo_End;

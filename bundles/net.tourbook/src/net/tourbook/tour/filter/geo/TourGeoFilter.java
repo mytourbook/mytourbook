@@ -27,19 +27,32 @@ import org.eclipse.swt.graphics.Point;
 /**
  * A tour geo filter is created in the map by selecting an area. This geo filter is displayed (and
  * can be selected) in the tour geo filter slideout.
+ * <p>
+ * Geo Locations vs. Geo Parts
+ * <p>
+ * <b>Geo Location</b></br>
+ * Geo location is used to show the geo filter area in the map
+ * <p>
+ * <b>Geo Parts</b></br>
+ * Geo parts are used to get tours from the sql database
+ * <p>
  */
 public class TourGeoFilter {
 
    String             id = Long.toString(System.nanoTime());
 
-   public Point       geo_TopLeft_E2;
-   public Point       geo_BottomRight_E2;
+   public GeoPosition geoLocation_TopLeft;
+   public GeoPosition geoLocation_BottomRight;
+   public GeoPosition geoParts_TopLeft;
+   public GeoPosition geoParts_BottomRight;
+
+   public Point       geoLocation_TopLeft_E2;
+   public Point       geoLocation_BottomRight_E2;
+   public Point       geoParts_TopLeft_E2;
+   public Point       geoParts_BottomRight_E2;
 
    public int         mapZoomLevel;
    public GeoPosition mapGeoCenter;
-
-   public GeoPosition geo_TopLeft;
-   public GeoPosition geo_BottomRight;
 
    ZonedDateTime      created;
    long               createdMS;
@@ -55,18 +68,23 @@ public class TourGeoFilter {
    public TourGeoFilter(final int mapZoomLevel,
                         final GeoPosition mapGeoCenter,
                         final MapGridData mapGridData) {
+// SET_FORMATTING_OFF
 
-      final Point geoTopLeftE2 = mapGridData.geo_TopLeft_E2;
-      final Point geoBottomRightE2 = mapGridData.geo_BottomRight_E2;
+      geoLocation_TopLeft_E2     = mapGridData.geoLocation_TopLeft_E2;
+      geoLocation_BottomRight_E2 = mapGridData.geoLocation_BottomRight_E2;
 
-      geo_TopLeft_E2 = geoTopLeftE2;
-      geo_BottomRight_E2 = geoBottomRightE2;
+      geoParts_TopLeft_E2        = mapGridData.geoParts_TopLeft_E2;
+      geoParts_BottomRight_E2    = mapGridData.geoParts_BottomRight_E2;
 
-      geo_TopLeft = new GeoPosition(geoTopLeftE2.y / 100.0d, geoTopLeftE2.x / 100.0d);
-      geo_BottomRight = new GeoPosition(geoBottomRightE2.y / 100.0d, geoBottomRightE2.x / 100.0d);
+      geoLocation_TopLeft        = new GeoPosition(geoLocation_TopLeft_E2.y / 100.0d,        geoLocation_TopLeft_E2.x / 100.0d);
+      geoLocation_BottomRight    = new GeoPosition(geoLocation_BottomRight_E2.y / 100.0d,    geoLocation_BottomRight_E2.x / 100.0d);
+      geoParts_TopLeft           = new GeoPosition(geoParts_TopLeft_E2.y / 100.0d,           geoParts_TopLeft_E2.x / 100.0d);
+      geoParts_BottomRight       = new GeoPosition(geoParts_BottomRight_E2.y / 100.0d,       geoParts_BottomRight_E2.x / 100.0d);
 
-      geoParts_Width = geoBottomRightE2.x - geoTopLeftE2.x;
-      geoParts_Height = geoTopLeftE2.y - geoBottomRightE2.y;
+      geoParts_Width = geoParts_BottomRight_E2.x - geoParts_TopLeft_E2.x;
+      geoParts_Height = geoParts_TopLeft_E2.y - geoParts_BottomRight_E2.y;
+
+// SET_FORMATTING_ON
 
       numGeoParts = geoParts_Width * geoParts_Height;
 
@@ -113,18 +131,36 @@ public class TourGeoFilter {
    @Override
    public String toString() {
 
-      return getClass().getName()
+      return ""
 
-            + "\n"
+            + "TourGeoFilter\n"
 
-            + " topLeftE2      = " + geo_TopLeft_E2 + "\n"
-            + " bottomRightE2  = " + geo_BottomRight_E2 + "\n"
-            + " mapZoomLevel   = " + mapZoomLevel + "\n"
+            + "[\n"
 
-            + " created        = " + created + "\n"
-            + " numGeoParts    = " + numGeoParts + "\n"
+            + "geoLocation_TopLeft           =" + geoLocation_TopLeft + "\n"
+            + "geoLocation_BottomRight       =" + geoLocation_BottomRight + "\n"
+            + "geoParts_TopLeft              =" + geoParts_TopLeft + "\n"
+            + "geoParts_BottomRight          =" + geoParts_BottomRight + "\n"
 
-            + "\n";
+            + "geoLocation_TopLeft_E2        =" + geoLocation_TopLeft_E2 + "\n"
+            + "geoLocation_BottomRight_E2    =" + geoLocation_BottomRight_E2 + "\n"
+            + "geoParts_TopLeft_E2           =" + geoParts_TopLeft_E2 + "\n"
+            + "geoParts_BottomRight_E2       =" + geoParts_BottomRight_E2 + "\n"
+
+            + "geoParts_Width       =" + geoParts_Width + "\n"
+            + "geoParts_Height      =" + geoParts_Height + "\n"
+            + "numGeoParts          =" + numGeoParts + "\n"
+
+            + "mapZoomLevel         =" + mapZoomLevel + "\n"
+            + "mapGeoCenter         =" + mapGeoCenter + "\n"
+
+            + "id                   =" + id + "\n"
+            + "created              =" + created + "\n"
+            + "createdMS            =" + createdMS + "\n"
+
+            + "mapGridData          =" + mapGridData + "\n"
+
+            + "]";
    }
 
 }

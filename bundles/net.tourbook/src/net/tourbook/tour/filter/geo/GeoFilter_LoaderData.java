@@ -40,8 +40,8 @@ public class GeoFilter_LoaderData {
 
    public ArrayList<Long> allLoadedTourIds;
 
-   public Point           geoTopLeftE2;
-   public Point           geoBottomRightE2;
+   public Point           geoParts_TopLeft_E2;
+   public Point           geoParts_BottomRight_E2;
 
    public MapGridData      mapGridData;
 

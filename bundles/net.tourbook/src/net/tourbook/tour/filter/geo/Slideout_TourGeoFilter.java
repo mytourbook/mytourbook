@@ -154,19 +154,19 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
             break;
 
          case COLUMN_LATITUDE_1:
-            rc = geoFilter1.geo_TopLeft.latitude - geoFilter2.geo_TopLeft.latitude;
+            rc = geoFilter1.geoLocation_TopLeft.latitude - geoFilter2.geoLocation_TopLeft.latitude;
             break;
 
          case COLUMN_LONGITUDE_1:
-            rc = geoFilter1.geo_TopLeft.longitude - geoFilter2.geo_TopLeft.longitude;
+            rc = geoFilter1.geoLocation_TopLeft.longitude - geoFilter2.geoLocation_TopLeft.longitude;
             break;
 
          case COLUMN_LATITUDE_2:
-            rc = geoFilter1.geo_BottomRight.latitude - geoFilter2.geo_BottomRight.latitude;
+            rc = geoFilter1.geoLocation_BottomRight.latitude - geoFilter2.geoLocation_BottomRight.latitude;
             break;
 
          case COLUMN_LONGITUDE_2:
-            rc = geoFilter1.geo_BottomRight.longitude - geoFilter2.geo_BottomRight.longitude;
+            rc = geoFilter1.geoLocation_BottomRight.longitude - geoFilter2.geoLocation_BottomRight.longitude;
             break;
 
          case COLUMN_CREATED_DATE_TIME:
@@ -686,7 +686,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
 
             final TourGeoFilter item = (TourGeoFilter) cell.getElement();
 
-            cell.setText(_nf2.format(item.geo_TopLeft.latitude));
+            cell.setText(_nf2.format(item.geoLocation_TopLeft.latitude));
          }
       });
    }
@@ -714,7 +714,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
 
             final TourGeoFilter item = (TourGeoFilter) cell.getElement();
 
-            cell.setText(_nf2.format(item.geo_TopLeft.longitude));
+            cell.setText(_nf2.format(item.geoLocation_TopLeft.longitude));
          }
       });
    }
@@ -742,7 +742,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
 
             final TourGeoFilter item = (TourGeoFilter) cell.getElement();
 
-            cell.setText(_nf2.format(item.geo_BottomRight.latitude));
+            cell.setText(_nf2.format(item.geoLocation_BottomRight.latitude));
          }
       });
    }
@@ -770,7 +770,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
 
             final TourGeoFilter item = (TourGeoFilter) cell.getElement();
 
-            cell.setText(_nf2.format(item.geo_BottomRight.longitude));
+            cell.setText(_nf2.format(item.geoLocation_BottomRight.longitude));
          }
       });
    }

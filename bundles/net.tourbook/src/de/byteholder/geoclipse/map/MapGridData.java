@@ -47,47 +47,61 @@ public class MapGridData {
     * Paint data
     */
 
-   int          devGrid_X1;
-   int          devGrid_Y1;
+   int        devGrid_X1;
+   int        devGrid_Y1;
 
-   int          devWidth;
-   int          devHeight;
+   int        devWidth;
+   int        devHeight;
 
-   public int   numWidth = -1;
-   public int   numHeight;
+   public int numWidth = -1;
+   public int numHeight;
 
-   public Point geo_TopLeft_E2;
-   public Point geo_BottomRight_E2;
+   /*
+    * Geo location in the map
+    */
+   public Point geoLocation_TopLeft_E2;
+   public Point geoLocation_BottomRight_E2;
+
+   /*
+    * Location for the geo parts
+    */
+   public Point geoParts_TopLeft_E2;
+   public Point geoParts_BottomRight_E2;
 
    public MapGridData() {}
 
    @Override
    public String toString() {
-
-// SET_FORMATTING_OFF
-
       return ""
 
             + "MapGridData\n"
 
-            + "[\n"
+            + "[" + "\n"
 
-            + " isSelectionStarted="    + isSelectionStarted + "\n"
+            + "dev_Start            =" + dev_Start + "\n"
+            + "dev_End              =" + dev_End + "\n"
+            + "devGrid_X1           =" + devGrid_X1 + "\n"
+            + "devGrid_Y1           =" + devGrid_Y1 + "\n"
+            + "devWidth             =" + devWidth + "\n"
+            + "devHeight            =" + devHeight + "\n"
 
-            + " dev_Start="             + dev_Start + "\n"
-            + " dev_End="               + dev_End + "\n"
+            + "world_Start          =" + world_Start + "\n"
+            + "world_End            =" + world_End + "\n"
 
-            + " world_Start="           + world_Start + "\n"
-            + " world_End="             + world_End + "\n"
+            + "geo_MouseMove        =" + geo_MouseMove + "\n"
+            + "geo_Start            =" + geo_Start + "\n"
+            + "geo_End              =" + geo_End + "\n"
 
-            + " geo_Start="             + geo_Start + "\n"
-            + " geo_End="               + geo_End + "\n"
+            + "geoLocation_TopLeft_E2        =" + geoLocation_TopLeft_E2 + "\n"
+            + "geoLocation_BottomRight_E2    =" + geoLocation_BottomRight_E2 + "\n"
+            + "geoParts_TopLeft_E2           =" + geoParts_TopLeft_E2 + "\n"
+            + "geoParts_BottomRight_E2       =" + geoParts_BottomRight_E2 + "\n"
 
-            + " gridBox_Text="          + gridBox_Text + "\n"
-
+            + "isSelectionStarted   =" + isSelectionStarted + "\n"
+            + "numWidth             =" + numWidth + "\n"
+            + "numHeight            =" + numHeight + "\n"
+            + "gridBox_Text         =" + gridBox_Text + "\n"
             + "]";
-
-// SET_FORMATTING_ON
    }
 
 }

@@ -1952,13 +1952,13 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
    private void geoFilter_10_Loader(final MapGridData mapGridData,
                                     final TourGeoFilter tourGeoFilter) {
 
-      final org.eclipse.swt.graphics.Point geo_TopLeft_E2 = mapGridData.geo_TopLeft_E2;
-      final org.eclipse.swt.graphics.Point geo_BottomRight_E2 = mapGridData.geo_BottomRight_E2;
+      final org.eclipse.swt.graphics.Point geoParts_TopLeft_E2 = mapGridData.geoParts_TopLeft_E2;
+      final org.eclipse.swt.graphics.Point geoParts_BottomRight_E2 = mapGridData.geoParts_BottomRight_E2;
 
       // check if this area is already loaded
       if (_geoFilter_Loaded_TopLeft_E2 != null
-            && geo_TopLeft_E2.equals(_geoFilter_Loaded_TopLeft_E2)
-            && geo_BottomRight_E2.equals(_geoFilter_Loaded_BottomRight_E2)) {
+            && geoParts_TopLeft_E2.equals(_geoFilter_Loaded_TopLeft_E2)
+            && geoParts_BottomRight_E2.equals(_geoFilter_Loaded_BottomRight_E2)) {
 
          // this is already loaded
 
@@ -1990,12 +1990,12 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
                return;
             }
 
-            _geoFilter_Loaded_TopLeft_E2 = geo_TopLeft_E2;
-            _geoFilter_Loaded_BottomRight_E2 = geo_BottomRight_E2;
+            _geoFilter_Loaded_TopLeft_E2 = geoParts_TopLeft_E2;
+            _geoFilter_Loaded_BottomRight_E2 = geoParts_BottomRight_E2;
 
             _geoFilter_PreviousGeoLoaderItem = TourGeoFilter_Loader.loadToursFromGeoParts(
-                  geo_TopLeft_E2,
-                  geo_BottomRight_E2,
+                  geoParts_TopLeft_E2,
+                  geoParts_BottomRight_E2,
                   _geoFilter_PreviousGeoLoaderItem,
                   mapGridData,
                   Map2View.this,
