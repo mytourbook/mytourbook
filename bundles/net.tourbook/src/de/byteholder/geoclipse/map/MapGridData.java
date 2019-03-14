@@ -36,7 +36,7 @@ public class MapGridData {
    Point         world_End;
 
    /**
-    * This geo position is set when the selecting of a geo grid has started.
+    * Geo start position is set when the selecting of a geo grid has started.
     */
    GeoPosition   geo_Start;
    GeoPosition   geo_End;

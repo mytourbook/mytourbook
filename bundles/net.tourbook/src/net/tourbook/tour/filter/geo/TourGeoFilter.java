@@ -151,12 +151,12 @@ public class TourGeoFilter {
             + "geoParts_Height      =" + geoParts_Height + "\n"
             + "numGeoParts          =" + numGeoParts + "\n"
 
-            + "mapZoomLevel         =" + mapZoomLevel + "\n"
-            + "mapGeoCenter         =" + mapGeoCenter + "\n"
-
-            + "id                   =" + id + "\n"
-            + "created              =" + created + "\n"
-            + "createdMS            =" + createdMS + "\n"
+//            + "mapZoomLevel         =" + mapZoomLevel + "\n"
+//            + "mapGeoCenter         =" + mapGeoCenter + "\n"
+//
+//            + "id                   =" + id + "\n"
+//            + "created              =" + created + "\n"
+//            + "createdMS            =" + createdMS + "\n"
 
             + "mapGridData          =" + mapGridData + "\n"
 

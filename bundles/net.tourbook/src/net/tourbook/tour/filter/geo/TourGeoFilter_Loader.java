@@ -141,7 +141,7 @@ public class TourGeoFilter_Loader {
                   // update loading state - this should not occure but is helpfull for testing
 
                   // show loading state
-                  geoLoaderData.mapGridData.gridBox_Text = TimeTools.Formatter_DateTime_SM.format(LocalDateTime.now());
+                  geoLoaderData.mapGridData.gridBox_Text = "Loading error: " + TimeTools.Formatter_DateTime_SM.format(LocalDateTime.now());
                   map2View.redrawMap();
                }
 

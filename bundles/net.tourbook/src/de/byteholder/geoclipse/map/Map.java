@@ -1424,37 +1424,30 @@ public class Map extends Canvas {
       final Point world_Start = UI.SWT_Point(_mp.geoToPixel(geo_Start, _mapZoomLevel));
       final Point world_End = UI.SWT_Point(_mp.geoToPixel(geo_End, _mapZoomLevel));
 
-      final int worldStartX = world_Start.x;
-      final int worldStartY = world_Start.y;
-      final int worldEndX = world_End.x;
-      final int worldEndY = world_End.y;
-
-      // XY1: top/left
-      final int world_X1 = Math.min(worldStartX, worldEndX);
-      final int world_Y1 = Math.min(worldStartY, worldEndY);
-
-      // XY2: bottom/right
-      final int world_X2 = Math.max(worldStartX, worldEndX);
-      final int world_Y2 = Math.max(worldStartY, worldEndY);
+      final int world_Start_X = world_Start.x;
+      final int world_Start_Y = world_Start.y;
+      final int world_End_X = world_End.x;
+      final int world_End_Y = world_End.y;
 
       // 1: top/left
       // 2: bottom/right
-      final GeoPosition geo_1;
-      final GeoPosition geo_2;
 
-      if (worldStartX <= worldEndX) {
-         geo_1 = geo_Start;
-         geo_2 = geo_End;
-      } else {
-         geo_1 = geo_End;
-         geo_2 = geo_Start;
-      }
+      double geoLat1 = 0;
+      double geoLon1 = 0;
 
-      final double geoLat1 = geo_1.latitude;
-      final double geoLon1 = geo_1.longitude;
+      double geoLat2 = 0;
+      double geoLon2 = 0;
 
-      final double geoLat2 = geo_2.latitude;
-      final double geoLon2 = geo_2.longitude;
+      // XY1: top/left
+      geoLon1 = world_Start_X <= world_End_X ? geo_Start.longitude : geo_End.longitude;
+      geoLat1 = world_Start_Y <= world_End_Y ? geo_Start.latitude : geo_End.latitude;
+
+      // XY2: bottom/right
+      geoLon2 = world_Start_X >= world_End_X ? geo_Start.longitude : geo_End.longitude;
+      geoLat2 = world_Start_Y >= world_End_Y ? geo_Start.latitude : geo_End.latitude;
+
+      final GeoPosition geo1 = new GeoPosition(geoLat1, geoLon1);
+      final GeoPosition geo2 = new GeoPosition(geoLat2, geoLon2);
 
       // set lat/lon to a grid of 0.01°
       int geoGrid_Lat1_E2 = (int) (geoLat1 * 100);
@@ -1467,14 +1460,14 @@ public class Map extends Canvas {
       mapGridData.geoLocation_TopLeft_E2 = new Point(geoGrid_Lon1_E2, geoGrid_Lat1_E2); // X1 / Y1
       mapGridData.geoLocation_BottomRight_E2 = new Point(geoGrid_Lon2_E2, geoGrid_Lat2_E2); // X2 /Y2
 
-      final Point devGeoGrid_1 = offline_GetDevGeoGridPosition(world_X1, world_Y1);
-      final Point devGeoGrid_2 = offline_GetDevGeoGridPosition(world_X2, world_Y2);
+      final Point devGrid_1 = grid_Geo2Dev(geo1);
+      final Point devGrid_2 = grid_Geo2Dev(geo2);
 
-      int devGrid_X1 = devGeoGrid_1.x;
-      int devGrid_Y1 = devGeoGrid_1.y;
+      int devGrid_X1 = devGrid_1.x;
+      int devGrid_Y1 = devGrid_1.y;
 
-      int devGrid_X2 = devGeoGrid_2.x;
-      int devGrid_Y2 = devGeoGrid_2.y;
+      int devGrid_X2 = devGrid_2.x;
+      int devGrid_Y2 = devGrid_2.y;
 
       final int geoGridPixelSizeX = (int) _devGridPixelSize_X;
       final int geoGridPixelSizeY = (int) _devGridPixelSize_Y;
@@ -1752,6 +1745,39 @@ public class Map extends Canvas {
             }
          }
       });
+   }
+
+   /**
+    * Create top/left geo grid position from world position
+    *
+    * @param worldPosX
+    * @param worldPosY
+    * @return
+    */
+   private Point grid_Geo2Dev(final GeoPosition geoPos) {
+
+      // truncate to 0.01
+
+      final double geoLat_E2 = geoPos.latitude * 100;
+      final double geoLon_E2 = geoPos.longitude * 100;
+
+      final double geoLat = (int) geoLat_E2 / 100.0;
+      final double geoLon = (int) geoLon_E2 / 100.0;
+
+      final java.awt.Point worldGrid = _mp.geoToPixel(new GeoPosition(geoLat, geoLon), _mapZoomLevel);
+
+      // get device rectangle for the position
+      final Point gridGeoPos = new Point(//
+            worldGrid.x - _worldPixel_TopLeft_Viewport.x,
+            worldGrid.y - _worldPixel_TopLeft_Viewport.y);
+
+      /*
+       * Adjust Y that X and Y are at the top/left position otherwise Y is at the bottom/left
+       * position
+       */
+      gridGeoPos.y -= _devGridPixelSize_Y;
+
+      return gridGeoPos;
    }
 
    /**
@@ -2104,8 +2130,11 @@ public class Map extends Canvas {
 
       // truncate to 0.01
 
-      final double geoLat = (int) (geoPos.latitude * 100) / 100.0;
-      final double geoLon = (int) (geoPos.longitude * 100) / 100.0;
+      final double geoLat_E2 = geoPos.latitude * 100;
+      final double geoLon_E2 = geoPos.longitude * 100;
+
+      final double geoLat = (int) geoLat_E2 / 100.0;
+      final double geoLon = (int) geoLon_E2 / 100.0;
 
       final java.awt.Point worldGrid = _mp.geoToPixel(new GeoPosition(geoLat, geoLon), _mapZoomLevel);
 
