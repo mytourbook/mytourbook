@@ -743,6 +743,7 @@ public class Messages extends NLS {
    public static String        Geo_Compare_Label_ReferenceTour;
 
    public static String        GeoCompare_View_Action_AppFilter_Tooltip;
+   public static String        GeoCompare_View_Action_IsSyncMapPosition_Tooltip;
    public static String        GeoCompare_View_Action_OnOff_Tooltip;
    public static String        GeoCompare_View_Column_GeoDiff_Header;
    public static String        GeoCompare_View_Column_GeoDiff_Label;
@@ -2020,6 +2021,7 @@ public class Messages extends NLS {
    public static String Slideout_TourFilter_Link_TextSearchHint;
    public static String Slideout_TourFilter_Link_TextSearchHint_Tooltip;
 
+   public static String Slideout_TourGeoFilter_Checkbox_IsSyncMapPosition;
    public static String Slideout_TourGeoFilter_Checkbox_UseAppFilter;
    public static String Slideout_TourGeoFilter_Color_GeoParts_HoverSelecting;
    public static String Slideout_TourGeoFilter_Color_GeoParts_Selected;

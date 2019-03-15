@@ -83,6 +83,7 @@ import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
@@ -128,29 +129,30 @@ import org.eclipse.swt.widgets.Listener;
 
 public class Map extends Canvas {
 
-   private static final String IMAGE_POI_IN_MAP                      = de.byteholder.geoclipse.poi.Messages.Image_POI_InMap;
-   private static final String IMAGE_SEARCH_TOURS_BY_LOCATION        = net.tourbook.Messages.Image__SearchToursByLocation;
-   private static final String IMAGE_SEARCH_TOURS_BY_LOCATION_SCROLL = net.tourbook.Messages.Image__SearchToursByLocation_Scroll;
+   private static final String          IMAGE_POI_IN_MAP                      = de.byteholder.geoclipse.poi.Messages.Image_POI_InMap;
+   private static final String          IMAGE_SEARCH_TOURS_BY_LOCATION        = net.tourbook.Messages.Image__SearchToursByLocation;
+   private static final String          IMAGE_SEARCH_TOURS_BY_LOCATION_SCROLL = net.tourbook.Messages.Image__SearchToursByLocation_Scroll;
 
+   private static final IDialogSettings _geoFilterState                       = TourGeoFilter_Manager.getState();
    /**
     * Min zoomlevels which the maps supports
     */
-   public static final int     MAP_MIN_ZOOM_LEVEL                    = 0;
+   public static final int              MAP_MIN_ZOOM_LEVEL                    = 0;
 
    /**
     * Max zoomlevels which the maps supports
     */
-   public static final int     MAP_MAX_ZOOM_LEVEL                    = 19;
+   public static final int              MAP_MAX_ZOOM_LEVEL                    = 19;
 
    /**
     * these zoom levels are displayed in the UI therefore they start with 1 instead of 0
     */
-   public static final int     UI_MIN_ZOOM_LEVEL                     = MAP_MIN_ZOOM_LEVEL + 1;
+   public static final int              UI_MIN_ZOOM_LEVEL                     = MAP_MIN_ZOOM_LEVEL + 1;
 
-   public static final int     UI_MAX_ZOOM_LEVEL                     = MAP_MAX_ZOOM_LEVEL + 1;
+   public static final int              UI_MAX_ZOOM_LEVEL                     = MAP_MAX_ZOOM_LEVEL + 1;
 
-   private static final String DIRECTION_E                           = "E";                                                      //$NON-NLS-1$
-   private static final String DIRECTION_N                           = "N";                                                      //$NON-NLS-1$
+   private static final String          DIRECTION_E                           = "E";                                                      //$NON-NLS-1$
+   private static final String          DIRECTION_N                           = "N";                                                      //$NON-NLS-1$
 
    /*
     * Wikipedia data
@@ -658,6 +660,7 @@ public class Map extends Canvas {
    public void actionSearchTourByLocation(final Event event) {
 
       _grid_Data_Hovered = new MapGridData();
+      TourGeoFilter_Manager.setGeoFilterSlideoutOpen(true);
 
       final Point worldMousePosition = new Point(
             _worldPixel_TopLeft_Viewport.x + _mouseMove_DevPosition_X,
@@ -1134,7 +1137,7 @@ public class Map extends Canvas {
        * !!! DON'T OPTIMIZE THE NEXT LINE, OTHERWISE THE WRONG MOUSE POSITION IS FIRED !!!
        */
       final Rectangle topLeftViewPort = getWorldPixel_TopLeft_Viewport(_worldPixel_MapCenter);
- 
+
       final int worldMouseX = topLeftViewPort.x + _mouseMove_DevPosition_X;
       final int worldMouseY = topLeftViewPort.y + _mouseMove_DevPosition_Y;
 
@@ -1684,6 +1687,8 @@ public class Map extends Canvas {
    private void grid_DisableGridBoxSelection() {
 
       _isContextMenuEnabled = true;
+
+      TourGeoFilter_Manager.setGeoFilterSlideoutOpen(false);
 
       setCursor(_cursorDefault);
       redraw();
@@ -2308,7 +2313,6 @@ public class Map extends Canvas {
 
          _grid_Data_Hovered = null;
          _grid_IsGridAutoScroll = false;
-         setCursor(null);
 
          grid_DisableGridBoxSelection();
 
@@ -3162,7 +3166,7 @@ public class Map extends Canvas {
       // draw geo grid
       final Color boxColor;
       if (isPaintLastGridSelection) {
-         final RGB hoverRGB = Util.getStateRGB(TourGeoFilter_Manager.getState(),
+         final RGB hoverRGB = Util.getStateRGB(_geoFilterState,
                TourGeoFilter_Manager.STATE_RGB_GEO_PARTS_SELECTED,
                TourGeoFilter_Manager.STATE_RGB_GEO_PARTS_SELECTED_DEFAULT);
 
@@ -3170,7 +3174,7 @@ public class Map extends Canvas {
 
       } else {
 
-         final RGB hoverRGB = Util.getStateRGB(TourGeoFilter_Manager.getState(),
+         final RGB hoverRGB = Util.getStateRGB(_geoFilterState,
                TourGeoFilter_Manager.STATE_RGB_GEO_PARTS_HOVER,
                TourGeoFilter_Manager.STATE_RGB_GEO_PARTS_HOVER_DEFAULT);
 
@@ -5308,16 +5312,23 @@ public class Map extends Canvas {
 
          // show requested grid box
 
-         final int mapZoomLevel = tourGeoFilter.mapZoomLevel;
+         final boolean isSyncMapPosition = Util.getStateBoolean(_geoFilterState,
+               TourGeoFilter_Manager.STATE_IS_SYNC_MAP_POSITION,
+               TourGeoFilter_Manager.STATE_IS_SYNC_MAP_POSITION_DEFAULT);
 
-         // prevent recenter
-         final boolean isZoomWithMousePosition = _isZoomWithMousePosition;
-         _isZoomWithMousePosition = false;
-         {
-            // set zoom level first, that recalculation is correct
-            setZoom(mapZoomLevel);
+         if (isSyncMapPosition) {
+
+            final int mapZoomLevel = tourGeoFilter.mapZoomLevel;
+
+            // prevent recenter
+            final boolean isZoomWithMousePosition = _isZoomWithMousePosition;
+            _isZoomWithMousePosition = false;
+            {
+               // set zoom level first, that recalculation is correct
+               setZoom(mapZoomLevel);
+            }
+            _isZoomWithMousePosition = isZoomWithMousePosition;
          }
-         _isZoomWithMousePosition = isZoomWithMousePosition;
 
          MapGridData mapGridData = tourGeoFilter.mapGridData;
 
@@ -5343,18 +5354,25 @@ public class Map extends Canvas {
 
          final Rectangle wpMapViewPort = getWorldPixel_TopLeft_Viewport(_worldPixel_MapCenter);
 
-         // chck if gird box is already visible
+         /*
+          * Reposition map
+          */
 
-         if (wpMapViewPort.contains(_grid_Data_Selected.world_Start)
-               && wpMapViewPort.contains(_grid_Data_Selected.world_End)) {
+         if (isSyncMapPosition) {
 
-            // grid box is visile -> nothing to do
+            // chck if gird box is already visible
 
-         } else {
+            if (wpMapViewPort.contains(_grid_Data_Selected.world_Start)
+                  && wpMapViewPort.contains(_grid_Data_Selected.world_End)) {
 
-            // recenter map to make it visible
+               // grid box is visile -> nothing to do
 
-            setMapCenter(new GeoPosition(tourGeoFilter.mapGeoCenter.latitude, tourGeoFilter.mapGeoCenter.longitude));
+            } else {
+
+               // recenter map to make it visible
+
+               setMapCenter(new GeoPosition(tourGeoFilter.mapGeoCenter.latitude, tourGeoFilter.mapGeoCenter.longitude));
+            }
          }
       }
    }

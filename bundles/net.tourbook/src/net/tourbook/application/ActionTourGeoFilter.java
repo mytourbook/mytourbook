@@ -61,6 +61,15 @@ public class ActionTourGeoFilter extends ActionToolbarSlideoutAdv {
       TourGeoFilter_Manager.setFilterEnabled(getSelection());
    }
 
+   public void setGeoFilterSlideoutOpen(final boolean isOpen) {
+
+      _slideoutTourGeoFilter.setIsKeepSlideoutOpen_DuringUIAction(isOpen);
+
+      if (isOpen) {
+         _slideoutTourGeoFilter.open(false);
+      }
+   }
+
    public void showSlideout(final TourGeoFilter selectedFilter) {
 
       // open immediately

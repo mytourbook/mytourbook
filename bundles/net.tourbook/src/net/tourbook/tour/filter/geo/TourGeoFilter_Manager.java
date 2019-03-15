@@ -64,8 +64,10 @@ public class TourGeoFilter_Manager {
    static final int                        STATE_GRID_BOX_SIZE_MAX              = 10;
    static final String                     STATE_IS_INCLUDE_GEO_PARTS           = "STATE_IS_INCLUDE_GEO_PARTS";             //$NON-NLS-1$
    static final boolean                    STATE_IS_INCLUDE_GEO_PARTS_DEFAULT   = true;
-   static final String                     STATE_IS_USE_APP_FILTERS             = "STATE_IS_USE_APP_FILTERS";               //$NON-NLS-1$
-   static final boolean                    STATE_IS_USE_APP_FILTERS_DEFAULT     = true;
+   public static final String              STATE_IS_SYNC_MAP_POSITION           = "STATE_IS_SYNC_MAP_POSITION";             //$NON-NLS-1$
+   public static final boolean             STATE_IS_SYNC_MAP_POSITION_DEFAULT   = true;
+   public static final String              STATE_IS_USE_APP_FILTERS             = "STATE_IS_USE_APP_FILTERS";               //$NON-NLS-1$
+   public static final boolean             STATE_IS_USE_APP_FILTERS_DEFAULT     = true;
    static final String                     STATE_SELECTED_GEO_FILTER_ID         = "STATE_SELECTED_GEO_FILTER_ID";           //$NON-NLS-1$
    static final String                     STATE_SORT_COLUMN_DIRECTION          = "STATE_SORT_COLUMN_DIRECTION";            //$NON-NLS-1$
    static final String                     STATE_SORT_COLUMN_ID                 = "STATE_SORT_COLUMN_ID";                   //$NON-NLS-1$
@@ -244,7 +246,7 @@ public class TourGeoFilter_Manager {
 
          sqlWhere = sb.toString();
       }
- 
+
       if (allLatLonParts.size() == 0) {
 
          // prevent invalid sql
@@ -449,6 +451,11 @@ public class TourGeoFilter_Manager {
             null);
 
       fireTourFilterModifyEvent();
+   }
+
+   public static void setGeoFilterSlideoutOpen(final boolean isOpen) {
+
+      _actionTourGeoFilter.setGeoFilterSlideoutOpen(isOpen);
    }
 
    /**

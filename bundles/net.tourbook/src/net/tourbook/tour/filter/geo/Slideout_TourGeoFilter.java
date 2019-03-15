@@ -100,7 +100,8 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
    private SelectionAdapter               _columnSortListener;
    private IPropertyChangeListener        _defaultChangePropertyListener;
    private SelectionAdapter               _defaultSelectionListener;
- 
+   private SelectionAdapter               _selectionListener_OnlyStateUpdate;
+
    private final NumberFormat             _nf2                     = NumberFormat.getInstance();
    {
       _nf2.setMinimumFractionDigits(2);
@@ -116,6 +117,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
 
    private Button                _btnDeleteGeoFilter;
    private Button                _btnDeleteGeoFilterAll;
+   private Button                _chkIsSyncMapPosition;
    private Button                _chkIsUseAppFilter;
    private Button                _rdoGeoParts_Exclude;
    private Button                _rdoGeoParts_Include;
@@ -460,7 +462,6 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
             .applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
-//         Messages.GeoCompare_View_Action_AppFilter_Tooltip
          {
             /*
              * Use app filter
@@ -472,32 +473,17 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
             _chkIsUseAppFilter.addSelectionListener(_defaultSelectionListener);
             GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsUseAppFilter);
          }
-//         {
-//            /*
-//             * Synch map position
-//             */
-//            // checkbox
-//            _chkIsUseAppFilter = new Button(container, SWT.CHECK);
-//            _chkIsUseAppFilter.setText(Messages.Slideout_TourGeoFilter_Checkbox_UseAppFilter);
-//            _chkIsUseAppFilter.setToolTipText(Messages.GeoCompare_View_Action_AppFilter_Tooltip);
-//            _chkIsUseAppFilter.addSelectionListener(_defaultSelectionListener);
-//            GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsUseAppFilter);
-//         }
-//         {
-//            /*
-//             * Grid box size
-//             */
-//            // label
-//            _lblGridSize = new Label(container, SWT.NONE);
-//            _lblGridSize.setText(Messages.Slideout_TourGeoFilter_Spinner_GridBoxSize);
-//
-//            // spinner
-//            _spinnerGridBoxSize = new Spinner(container, SWT.BORDER);
-//            _spinnerGridBoxSize.setMinimum(TourGeoFilterManager.STATE_GRID_BOX_SIZE_MIN);
-//            _spinnerGridBoxSize.setMaximum(TourGeoFilterManager.STATE_GRID_BOX_SIZE_MAX);
-//            _spinnerGridBoxSize.addSelectionListener(_defaultSelectionListener);
-//            _spinnerGridBoxSize.addMouseWheelListener(_defaultMouseWheelListener);
-//         }
+         {
+            /*
+             * Synch map position
+             */
+            // checkbox
+            _chkIsSyncMapPosition = new Button(container, SWT.CHECK);
+            _chkIsSyncMapPosition.setText(Messages.Slideout_TourGeoFilter_Checkbox_IsSyncMapPosition);
+            _chkIsSyncMapPosition.setToolTipText(Messages.GeoCompare_View_Action_IsSyncMapPosition_Tooltip);
+            _chkIsSyncMapPosition.addSelectionListener(_selectionListener_OnlyStateUpdate);
+            GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsSyncMapPosition);
+         }
          {
             /*
              * Radio: Search geo parts
@@ -856,6 +842,13 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
          }
       };
 
+      _selectionListener_OnlyStateUpdate = new SelectionAdapter() {
+         @Override
+         public void widgetSelected(final SelectionEvent e) {
+            saveState_Options();
+         }
+      };
+
       _defaultChangePropertyListener = new IPropertyChangeListener() {
          @Override
          public void propertyChange(final PropertyChangeEvent event) {
@@ -1055,15 +1048,16 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
       // options
 //      _spinnerGridBoxSize.setSelection(      Util.getStateInt(_state,         TourGeoFilterManager.STATE_GRID_BOX_SIZE,          TourGeoFilterManager.STATE_GRID_BOX_SIZE_DEFAULT));
 
-      final boolean isIncludeGeoParts =   Util.getStateBoolean(_state,     TourGeoFilter_Manager.STATE_IS_INCLUDE_GEO_PARTS,   TourGeoFilter_Manager.STATE_IS_INCLUDE_GEO_PARTS_DEFAULT);
+      final boolean isIncludeGeoParts =      Util.getStateBoolean(_state,     TourGeoFilter_Manager.STATE_IS_INCLUDE_GEO_PARTS,     TourGeoFilter_Manager.STATE_IS_INCLUDE_GEO_PARTS_DEFAULT);
       _rdoGeoParts_Include.setSelection(isIncludeGeoParts);
       _rdoGeoParts_Exclude.setSelection(isIncludeGeoParts == false);
 
-      _chkIsUseAppFilter.setSelection(    Util.getStateBoolean(_state,     TourGeoFilter_Manager.STATE_IS_USE_APP_FILTERS,     TourGeoFilter_Manager.STATE_IS_USE_APP_FILTERS_DEFAULT));
+      _chkIsUseAppFilter.setSelection(       Util.getStateBoolean(_state,     TourGeoFilter_Manager.STATE_IS_USE_APP_FILTERS,       TourGeoFilter_Manager.STATE_IS_USE_APP_FILTERS_DEFAULT));
+      _chkIsSyncMapPosition.setSelection(    Util.getStateBoolean(_state,     TourGeoFilter_Manager.STATE_IS_SYNC_MAP_POSITION,     TourGeoFilter_Manager.STATE_IS_SYNC_MAP_POSITION_DEFAULT));
 
       // colors
-      _colorGeoPart_HoverSelecting.setColorValue(Util.getStateRGB(_state,  TourGeoFilter_Manager.STATE_RGB_GEO_PARTS_HOVER,    TourGeoFilter_Manager.STATE_RGB_GEO_PARTS_HOVER_DEFAULT));
-      _colorGeoPart_Selected.setColorValue(Util.getStateRGB(_state,        TourGeoFilter_Manager.STATE_RGB_GEO_PARTS_SELECTED, TourGeoFilter_Manager.STATE_RGB_GEO_PARTS_SELECTED_DEFAULT));
+      _colorGeoPart_HoverSelecting.setColorValue(Util.getStateRGB(_state,     TourGeoFilter_Manager.STATE_RGB_GEO_PARTS_HOVER,      TourGeoFilter_Manager.STATE_RGB_GEO_PARTS_HOVER_DEFAULT));
+      _colorGeoPart_Selected.setColorValue(  Util.getStateRGB(_state,         TourGeoFilter_Manager.STATE_RGB_GEO_PARTS_SELECTED,   TourGeoFilter_Manager.STATE_RGB_GEO_PARTS_SELECTED_DEFAULT));
 
 // SET_FORMATTING_ON
 
@@ -1119,6 +1113,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
 
       _state.put(TourGeoFilter_Manager.STATE_IS_INCLUDE_GEO_PARTS, _rdoGeoParts_Include.getSelection());
       _state.put(TourGeoFilter_Manager.STATE_IS_USE_APP_FILTERS, _chkIsUseAppFilter.getSelection());
+      _state.put(TourGeoFilter_Manager.STATE_IS_SYNC_MAP_POSITION, _chkIsSyncMapPosition.getSelection());
 
       // colors
       Util.setState(_state, TourGeoFilter_Manager.STATE_RGB_GEO_PARTS_HOVER, _colorGeoPart_HoverSelecting.getColorValue());
