@@ -234,19 +234,17 @@ public class TourGeoFilter_Manager {
 
          for (int partIndex = 0; partIndex < allLatLonParts.size(); partIndex += 2) {
 
-            if (partIndex == 0) {
+            if (partIndex > 0) {
 
-               sb.append(" (GeoPart >= ? AND GeoPart < ?) " + NL); //$NON-NLS-1$
-
-            } else {
-
-               sb.append(" OR (GeoPart >= ? AND GeoPart < ?) " + NL); //$NON-NLS-1$
+               sb.append(" OR "); //$NON-NLS-1$
             }
+
+            sb.append(" (GeoPart >= ? AND GeoPart <= ?) " + NL); //$NON-NLS-1$
          }
 
          sqlWhere = sb.toString();
       }
-
+ 
       if (allLatLonParts.size() == 0) {
 
          // prevent invalid sql

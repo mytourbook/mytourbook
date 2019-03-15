@@ -99,9 +99,8 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
 
    private SelectionAdapter               _columnSortListener;
    private IPropertyChangeListener        _defaultChangePropertyListener;
-//   private MouseWheelListener                 _defaultMouseWheelListener;
    private SelectionAdapter               _defaultSelectionListener;
-
+ 
    private final NumberFormat             _nf2                     = NumberFormat.getInstance();
    {
       _nf2.setMinimumFractionDigits(2);
@@ -111,20 +110,17 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
    /*
     * UI controls
     */
-   private PixelConverter _pc;
+   private PixelConverter        _pc;
 
-   private Composite      _viewerContainer;
+   private Composite             _viewerContainer;
 
-   private Button         _btnDeleteGeoFilter;
-   private Button         _btnDeleteGeoFilterAll;
-   private Button         _chkIsUseAppFilter;
-   private Button         _rdoGeoParts_Exclude;
-   private Button         _rdoGeoParts_Include;
+   private Button                _btnDeleteGeoFilter;
+   private Button                _btnDeleteGeoFilterAll;
+   private Button                _chkIsUseAppFilter;
+   private Button                _rdoGeoParts_Exclude;
+   private Button                _rdoGeoParts_Include;
 
-   private Label          _lblGeoParts_IncludeExclude;
-//   private Label                 _lblGridSize;
-//
-//   private Spinner               _spinnerGridBoxSize;
+   private Label                 _lblGeoParts_IncludeExclude;
 
    private ColorSelectorExtended _colorGeoPart_HoverSelecting;
    private ColorSelectorExtended _colorGeoPart_Selected;
@@ -476,6 +472,17 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
             _chkIsUseAppFilter.addSelectionListener(_defaultSelectionListener);
             GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsUseAppFilter);
          }
+//         {
+//            /*
+//             * Synch map position
+//             */
+//            // checkbox
+//            _chkIsUseAppFilter = new Button(container, SWT.CHECK);
+//            _chkIsUseAppFilter.setText(Messages.Slideout_TourGeoFilter_Checkbox_UseAppFilter);
+//            _chkIsUseAppFilter.setToolTipText(Messages.GeoCompare_View_Action_AppFilter_Tooltip);
+//            _chkIsUseAppFilter.addSelectionListener(_defaultSelectionListener);
+//            GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsUseAppFilter);
+//         }
 //         {
 //            /*
 //             * Grid box size
@@ -887,7 +894,10 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
 
       saveState_Options();
 
-      TourGeoFilter_Manager.fireTourFilterModifyEvent();
+      if (_selectedFilter != null) {
+
+         onSelect_GeoFilter(_selectedFilter);
+      }
    }
 
    @Override
@@ -972,8 +982,14 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
    private void onGeoFilter_Select(final SelectionChangedEvent event) {
 
       final Object selectedItem = event.getStructuredSelection().getFirstElement();
+      final TourGeoFilter selectedGeoFilter = (TourGeoFilter) selectedItem;
 
-      _selectedFilter = (TourGeoFilter) selectedItem;
+      onSelect_GeoFilter(selectedGeoFilter);
+   }
+
+   private void onSelect_GeoFilter(final TourGeoFilter selectedGeoFilter) {
+
+      _selectedFilter = selectedGeoFilter;
 
       // show geo grid in the map
       TourManager.fireEventWithCustomData(TourEventId.MAP_SHOW_GEO_GRID, _selectedFilter, null);
