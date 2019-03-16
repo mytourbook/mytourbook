@@ -62,6 +62,8 @@ public class TourGeoFilter_Manager {
    public static final int                 STATE_GRID_BOX_SIZE_DEFAULT          = 1;
    static final int                        STATE_GRID_BOX_SIZE_MIN              = 1;
    static final int                        STATE_GRID_BOX_SIZE_MAX              = 10;
+   public static final String              STATE_IS_AUTO_OPEN_SLIDEOUT          = "STATE_IS_AUTO_OPEN_SLIDEOUT";            //$NON-NLS-1$
+   public static final boolean             STATE_IS_AUTO_OPEN_SLIDEOUT_DEFAULT  = true;
    static final String                     STATE_IS_INCLUDE_GEO_PARTS           = "STATE_IS_INCLUDE_GEO_PARTS";             //$NON-NLS-1$
    static final boolean                    STATE_IS_INCLUDE_GEO_PARTS_DEFAULT   = true;
    public static final String              STATE_IS_SYNC_MAP_POSITION           = "STATE_IS_SYNC_MAP_POSITION";             //$NON-NLS-1$
@@ -434,6 +436,11 @@ public class TourGeoFilter_Manager {
       _actionTourGeoFilter = actionTourGeoFilter;
    }
 
+   public static void setAndOpenGeoFilterSlideout(final boolean isOpen) {
+
+      _actionTourGeoFilter.setAndOpenGeoFilterSlideout(isOpen);
+   }
+
    /**
     * Sets the state if the tour filter is active or not.
     *
@@ -451,11 +458,6 @@ public class TourGeoFilter_Manager {
             null);
 
       fireTourFilterModifyEvent();
-   }
-
-   public static void setGeoFilterSlideoutOpen(final boolean isOpen) {
-
-      _actionTourGeoFilter.setGeoFilterSlideoutOpen(isOpen);
    }
 
    /**

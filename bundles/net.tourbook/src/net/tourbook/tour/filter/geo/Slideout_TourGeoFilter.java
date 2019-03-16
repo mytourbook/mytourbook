@@ -36,7 +36,9 @@ import net.tourbook.tour.TourManager;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
@@ -117,8 +119,11 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
 
    private Button                _btnDeleteGeoFilter;
    private Button                _btnDeleteGeoFilterAll;
+
+   private Button                _chkIsAutoOpenSlideout;
    private Button                _chkIsSyncMapPosition;
    private Button                _chkIsUseAppFilter;
+
    private Button                _rdoGeoParts_Exclude;
    private Button                _rdoGeoParts_Include;
 
@@ -297,11 +302,17 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
       GridLayoutFactory.fillDefaults().applyTo(container);
       {
-         _viewerContainer = new Composite(container, SWT.NONE);
-         GridDataFactory.fillDefaults().grab(true, true).applyTo(_viewerContainer);
-         GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
          {
-            createUI_210_FilterViewer(_viewerContainer);
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(Messages.Slideout_TourGeoFilter_Label_History);
+         }
+         {
+            _viewerContainer = new Composite(container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, true).applyTo(_viewerContainer);
+            GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
+            {
+               createUI_210_FilterViewer(_viewerContainer);
+            }
          }
 
          createUI_280_ViewerActions(container);
@@ -486,6 +497,17 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
          }
          {
             /*
+             * Open slideout when starting geo search
+             */
+            // checkbox
+            _chkIsAutoOpenSlideout = new Button(container, SWT.CHECK);
+            _chkIsAutoOpenSlideout.setText(Messages.Slideout_TourGeoFilter_Checkbox_IsAutoOpenSlideout);
+            _chkIsAutoOpenSlideout.setToolTipText(Messages.Slideout_TourGeoFilter_Checkbox_IsAutoOpenSlideout_Tooltip);
+            _chkIsAutoOpenSlideout.addSelectionListener(_selectionListener_OnlyStateUpdate);
+            GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsAutoOpenSlideout);
+         }
+         {
+            /*
              * Radio: Search geo parts
              */
             // label
@@ -510,29 +532,29 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
          }
          {
             /*
-             * Color: Selected geo part
+             * Color: Geo parts
              */
             // label
             final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Slideout_TourGeoFilter_Color_GeoParts_Selected);
+            label.setText(Messages.Slideout_TourGeoFilter_Label_GeoPartColor);
+            label.setToolTipText(Messages.Slideout_TourGeoFilter_Label_GeoPartColor_Tooltip);
 
-            // border color
-            _colorGeoPart_Selected = new ColorSelectorExtended(container);
-            _colorGeoPart_Selected.addListener(_defaultChangePropertyListener);
-            _colorGeoPart_Selected.addOpenListener(this);
-         }
-         {
-            /*
-             * Color: Hover/selecting geo part
-             */
-            // label
-            final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Slideout_TourGeoFilter_Color_GeoParts_HoverSelecting);
+            // colors
+            final Composite containerColors = new Composite(container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(containerColors);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerColors);
+            {
 
-            // border color
-            _colorGeoPart_HoverSelecting = new ColorSelectorExtended(container);
-            _colorGeoPart_HoverSelecting.addListener(_defaultChangePropertyListener);
-            _colorGeoPart_HoverSelecting.addOpenListener(this);
+               // hovering/selecting color
+               _colorGeoPart_HoverSelecting = new ColorSelectorExtended(containerColors);
+               _colorGeoPart_HoverSelecting.addListener(_defaultChangePropertyListener);
+               _colorGeoPart_HoverSelecting.addOpenListener(this);
+
+               // selectedcolor
+               _colorGeoPart_Selected = new ColorSelectorExtended(containerColors);
+               _colorGeoPart_Selected.addListener(_defaultChangePropertyListener);
+               _colorGeoPart_Selected.addOpenListener(this);
+            }
          }
       }
    }
@@ -957,6 +979,40 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
          return;
       }
 
+      setIsKeepOpenInternally(true);
+      int confirmDialogResult;
+      {
+//         confirmDialogResult = new MessageDialog(
+//               Display.getCurrent().getActiveShell(),
+//               Messages.Slideout_CalendarOptions_Dialog_DeleteProfile_Title,
+//               null,
+//               NLS.bind(Messages.Slideout_CalendarOptions_Dialog_DeleteProfile_Message, ""), //$NON-NLS-1$
+//               MessageDialog.QUESTION,
+//               new String[] {
+//                     Messages.App_Action_DeleteProfile,
+//                     IDialogConstants.CANCEL_LABEL
+//               },
+//               0).open();
+
+         confirmDialogResult = new MessageDialog(
+               getToolTipShell(),
+               Messages.Slideout_TourGeoFilter_Dialog_DeleteAllFilter_Title,
+               null,
+               Messages.Slideout_TourGeoFilter_Dialog_DeleteAllFilter_Message,
+               MessageDialog.QUESTION,
+               0,
+
+               Messages.App_Action_Delete_All,
+               IDialogConstants.CANCEL_LABEL
+
+         ).open();
+      }
+      setIsKeepOpenInternally(false);
+
+      if (confirmDialogResult != 0) {
+         return;
+      }
+
       // update model
       _allGeoFilter.clear();
 
@@ -1052,8 +1108,9 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
       _rdoGeoParts_Include.setSelection(isIncludeGeoParts);
       _rdoGeoParts_Exclude.setSelection(isIncludeGeoParts == false);
 
-      _chkIsUseAppFilter.setSelection(       Util.getStateBoolean(_state,     TourGeoFilter_Manager.STATE_IS_USE_APP_FILTERS,       TourGeoFilter_Manager.STATE_IS_USE_APP_FILTERS_DEFAULT));
+      _chkIsAutoOpenSlideout.setSelection(   Util.getStateBoolean(_state,     TourGeoFilter_Manager.STATE_IS_AUTO_OPEN_SLIDEOUT,    TourGeoFilter_Manager.STATE_IS_AUTO_OPEN_SLIDEOUT_DEFAULT));
       _chkIsSyncMapPosition.setSelection(    Util.getStateBoolean(_state,     TourGeoFilter_Manager.STATE_IS_SYNC_MAP_POSITION,     TourGeoFilter_Manager.STATE_IS_SYNC_MAP_POSITION_DEFAULT));
+      _chkIsUseAppFilter.setSelection(       Util.getStateBoolean(_state,     TourGeoFilter_Manager.STATE_IS_USE_APP_FILTERS,       TourGeoFilter_Manager.STATE_IS_USE_APP_FILTERS_DEFAULT));
 
       // colors
       _colorGeoPart_HoverSelecting.setColorValue(Util.getStateRGB(_state,     TourGeoFilter_Manager.STATE_RGB_GEO_PARTS_HOVER,      TourGeoFilter_Manager.STATE_RGB_GEO_PARTS_HOVER_DEFAULT));
@@ -1111,9 +1168,10 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
 
       // save options
 
+      _state.put(TourGeoFilter_Manager.STATE_IS_AUTO_OPEN_SLIDEOUT, _chkIsAutoOpenSlideout.getSelection());
       _state.put(TourGeoFilter_Manager.STATE_IS_INCLUDE_GEO_PARTS, _rdoGeoParts_Include.getSelection());
-      _state.put(TourGeoFilter_Manager.STATE_IS_USE_APP_FILTERS, _chkIsUseAppFilter.getSelection());
       _state.put(TourGeoFilter_Manager.STATE_IS_SYNC_MAP_POSITION, _chkIsSyncMapPosition.getSelection());
+      _state.put(TourGeoFilter_Manager.STATE_IS_USE_APP_FILTERS, _chkIsUseAppFilter.getSelection());
 
       // colors
       Util.setState(_state, TourGeoFilter_Manager.STATE_RGB_GEO_PARTS_HOVER, _colorGeoPart_HoverSelecting.getColorValue());

@@ -660,7 +660,13 @@ public class Map extends Canvas {
    public void actionSearchTourByLocation(final Event event) {
 
       _grid_Data_Hovered = new MapGridData();
-      TourGeoFilter_Manager.setGeoFilterSlideoutOpen(true);
+
+      final boolean isAutoOpenSlideout = Util.getStateBoolean(TourGeoFilter_Manager.getState(),
+            TourGeoFilter_Manager.STATE_IS_AUTO_OPEN_SLIDEOUT,
+            TourGeoFilter_Manager.STATE_IS_AUTO_OPEN_SLIDEOUT_DEFAULT);
+      if (isAutoOpenSlideout) {
+         TourGeoFilter_Manager.setAndOpenGeoFilterSlideout(true);
+      }
 
       final Point worldMousePosition = new Point(
             _worldPixel_TopLeft_Viewport.x + _mouseMove_DevPosition_X,
@@ -1415,8 +1421,7 @@ public class Map extends Canvas {
     * @param mapGridData
     * @return
     */
-   private void grid_Convert_StartEnd_2_TopLeft(
-                                                GeoPosition geo_Start,
+   private void grid_Convert_StartEnd_2_TopLeft(GeoPosition geo_Start,
                                                 final GeoPosition geo_End,
                                                 final MapGridData mapGridData) {
 
@@ -1469,8 +1474,8 @@ public class Map extends Canvas {
       mapGridData.geoLocation_TopLeft_E2 = new Point(geoGrid_Lon1_E2, geoGrid_Lat1_E2); // X1 / Y1
       mapGridData.geoLocation_BottomRight_E2 = new Point(geoGrid_Lon2_E2, geoGrid_Lat2_E2); // X2 /Y2
 
-      final Point devGrid_1 = grid_Geo2Dev(geo1);
-      final Point devGrid_2 = grid_Geo2Dev(geo2);
+      final Point devGrid_1 = grid_Geo2DevGrid(geo1);
+      final Point devGrid_2 = grid_Geo2DevGrid(geo2);
 
       int devGrid_X1 = devGrid_1.x;
       int devGrid_Y1 = devGrid_1.y;
@@ -1688,7 +1693,7 @@ public class Map extends Canvas {
 
       _isContextMenuEnabled = true;
 
-      TourGeoFilter_Manager.setGeoFilterSlideoutOpen(false);
+      TourGeoFilter_Manager.setAndOpenGeoFilterSlideout(false);
 
       setCursor(_cursorDefault);
       redraw();
@@ -1758,13 +1763,11 @@ public class Map extends Canvas {
    }
 
    /**
-    * Create top/left geo grid position from world position
+    * Convert geo position into grid dev position
     *
-    * @param worldPosX
-    * @param worldPosY
     * @return
     */
-   private Point grid_Geo2Dev(final GeoPosition geoPos) {
+   private Point grid_Geo2DevGrid(final GeoPosition geoPos) {
 
       // truncate to 0.01
 
@@ -2121,7 +2124,7 @@ public class Map extends Canvas {
     * @param worldPosY
     * @return
     */
-   private Point offline_GetDevGeoGridPosition(final int worldPosX, final int worldPosY) {
+   private Point offline_GetDevGridGeoPosition(final int worldPosX, final int worldPosY) {
 
       final Point2D.Double worldPixel = new Point2D.Double(worldPosX, worldPosY);
 
@@ -3040,7 +3043,7 @@ public class Map extends Canvas {
          gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
       }
 
-      final Point devGeoGrid = offline_GetDevGeoGridPosition(_worldPixel_TopLeft_Viewport.x, _worldPixel_TopLeft_Viewport.y);
+      final Point devGeoGrid = offline_GetDevGridGeoPosition(_worldPixel_TopLeft_Viewport.x, _worldPixel_TopLeft_Viewport.y);
       final int topLeftX = devGeoGrid.x;
       final int topLeftY = devGeoGrid.y;
 
@@ -3081,6 +3084,11 @@ public class Map extends Canvas {
 
          return;
       }
+
+//      final java.awt.Point worldGrid = _mp.geoToPixel(new GeoPosition(mapgr, geoLon), _mapZoomLevel);
+
+      final Point worldStart = mapGridData.world_Start;
+      final Point worldEnd = mapGridData.world_End;
 
       final int dev_Start_X = mapGridData.dev_Start.x;
       final int dev_Start_Y = mapGridData.dev_Start.y;

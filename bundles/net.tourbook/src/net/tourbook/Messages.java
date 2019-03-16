@@ -2021,10 +2021,11 @@ public class Messages extends NLS {
    public static String Slideout_TourFilter_Link_TextSearchHint;
    public static String Slideout_TourFilter_Link_TextSearchHint_Tooltip;
 
+   public static String Slideout_TourGeoFilter_Checkbox_IsAutoOpenSlideout;
+   public static String Slideout_TourGeoFilter_Checkbox_IsAutoOpenSlideout_Tooltip;
    public static String Slideout_TourGeoFilter_Checkbox_IsSyncMapPosition;
    public static String Slideout_TourGeoFilter_Checkbox_UseAppFilter;
    public static String Slideout_TourGeoFilter_Color_GeoParts_HoverSelecting;
-   public static String Slideout_TourGeoFilter_Color_GeoParts_Selected;
    public static String Slideout_TourGeoFilter_Column_Created_Label;
    public static String Slideout_TourGeoFilter_Column_Latitude1_Header;
    public static String Slideout_TourGeoFilter_Column_Latitude1_Label;
@@ -2036,7 +2037,12 @@ public class Messages extends NLS {
    public static String Slideout_TourGeoFilter_Column_Longitude2_Label;
    public static String Slideout_TourGeoFilter_Column_NumGeoParts_Header;
    public static String Slideout_TourGeoFilter_Column_NumGeoParts_Label;
+   public static String Slideout_TourGeoFilter_Dialog_DeleteAllFilter_Message;
+   public static String Slideout_TourGeoFilter_Dialog_DeleteAllFilter_Title;
    public static String Slideout_TourGeoFilter_Label_FilterIncludeExclude;
+   public static String Slideout_TourGeoFilter_Label_GeoPartColor;
+   public static String Slideout_TourGeoFilter_Label_GeoPartColor_Tooltip;
+   public static String Slideout_TourGeoFilter_Label_History;
    public static String Slideout_TourGeoFilter_Label_Title;
    public static String Slideout_TourGeoFilter_Radio_GeoParts_Exclude;
    public static String Slideout_TourGeoFilter_Radio_GeoParts_Include;

@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.application;
 
-
 import net.tourbook.Messages;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.tooltip.SlideoutLocation;
@@ -32,8 +31,7 @@ public class ActionTourGeoFilter extends ActionToolbarSlideoutAdv {
 
    private static final ImageDescriptor _actionImageDescriptor = TourbookPlugin.getImageDescriptor(Messages.Image__TourGeoFilter);
 
-
-   private Slideout_TourGeoFilter        _slideoutTourGeoFilter;
+   private Slideout_TourGeoFilter       _slideoutTourGeoFilter;
 
    public ActionTourGeoFilter() {
 
@@ -61,11 +59,14 @@ public class ActionTourGeoFilter extends ActionToolbarSlideoutAdv {
       TourGeoFilter_Manager.setFilterEnabled(getSelection());
    }
 
-   public void setGeoFilterSlideoutOpen(final boolean isOpen) {
+   /**
+    * @param isOpenState
+    */
+   public void setAndOpenGeoFilterSlideout(final boolean isOpenState) {
 
-      _slideoutTourGeoFilter.setIsKeepSlideoutOpen_DuringUIAction(isOpen);
+      _slideoutTourGeoFilter.setIsKeepSlideoutOpen_DuringUIAction(isOpenState);
 
-      if (isOpen) {
+      if (isOpenState) {
          _slideoutTourGeoFilter.open(false);
       }
    }
