@@ -526,7 +526,8 @@ public class Map extends Canvas {
    private int[]               _grid_AutoScrollCounter = new int[1];
    private boolean             _grid_IsGridAutoScroll;
 
-   private boolean             _grid_IsFastMapPainting;
+   private boolean             _isFastMapPainting;
+   private int                 _fastMapPainting_skippedValues;
 
    /**
     * This observer is called in the {@link Tile} when a tile image is set into the tile
@@ -672,9 +673,12 @@ public class Map extends Canvas {
       }
 
       // set fast map paining
-      _grid_IsFastMapPainting = Util.getStateBoolean(_geoFilterState,
+      _isFastMapPainting = Util.getStateBoolean(_geoFilterState,
             TourGeoFilter_Manager.STATE_IS_FAST_MAP_PAINTING,
             TourGeoFilter_Manager.STATE_IS_FAST_MAP_PAINTING_DEFAULT);
+      _fastMapPainting_skippedValues = Util.getStateInt(_geoFilterState,
+            TourGeoFilter_Manager.STATE_FAST_MAP_PAINTING_SKIPPED_VALUES,
+            TourGeoFilter_Manager.STATE_FAST_MAP_PAINTING_SKIPPED_VALUES_DEFAULT);
 
       final Point worldMousePosition = new Point(
             _worldPixel_TopLeft_Viewport.x + _mouseMove_DevPosition_X,
@@ -2343,7 +2347,7 @@ public class Map extends Canvas {
 
          _grid_Data_Hovered = null;
          _grid_IsGridAutoScroll = false;
-         _grid_IsFastMapPainting = false;
+         _isFastMapPainting = false;
 
          grid_DisableGridBoxSelection();
 
@@ -2618,7 +2622,7 @@ public class Map extends Canvas {
             // this can happen when the right mouse button is clicked
 
             _grid_Data_Hovered = null;
-            _grid_IsFastMapPainting = false;
+            _isFastMapPainting = false;
             _grid_IsGridAutoScroll = true;
 
             grid_DisableGridBoxSelection();
@@ -2635,7 +2639,7 @@ public class Map extends Canvas {
          _grid_Data_Selected = _grid_Data_Hovered;
 
          _grid_Data_Hovered = null;
-         _grid_IsFastMapPainting = false;
+         _isFastMapPainting = false;
          _grid_IsGridAutoScroll = true;
 
          grid_DisableGridBoxSelection();
@@ -3623,7 +3627,7 @@ public class Map extends Canvas {
                   }
 
                   // paint overlay
-                  if (!_isTourPaintMethodEnhanced || _grid_IsFastMapPainting) {
+                  if (!_isTourPaintMethodEnhanced || _isFastMapPainting) {
                      paint_Overlay_22_PaintTileBasic(tile);
                   } else {
                      paint_Overlay_30_PaintTileEnhanced(tile);
@@ -3671,7 +3675,13 @@ public class Map extends Canvas {
          // paint all overlays for the current tile
          for (final MapPainter overlayPainter : _overlays) {
 
-            final boolean isPainted = overlayPainter.doPaint(gc1Part, Map.this, tile, 1, _grid_IsFastMapPainting);
+            final boolean isPainted = overlayPainter.doPaint(
+                  gc1Part,
+                  Map.this,
+                  tile,
+                  1,
+                  _isFastMapPainting,
+                  _fastMapPainting_skippedValues);
 
             isOverlayPainted = isOverlayPainted || isPainted;
          }
@@ -3724,7 +3734,13 @@ public class Map extends Canvas {
          // paint all overlays for the current tile
          for (final MapPainter overlayPainter : _overlays) {
 
-            final boolean isPainted = overlayPainter.doPaint(_9PartGC, Map.this, tile, parts, _grid_IsFastMapPainting);
+            final boolean isPainted = overlayPainter.doPaint(
+                  _9PartGC,
+                  Map.this,
+                  tile,
+                  parts,
+                  _isFastMapPainting,
+                  _fastMapPainting_skippedValues);
 
             isOverlayPainted = isOverlayPainted || isPainted;
          }
@@ -4782,8 +4798,8 @@ public class Map extends Canvas {
       _directMapPainter = directPainter;
    }
 
-   public void setIsFastMapPainting(final boolean grid_IsFastMapPainting) {
-      _grid_IsFastMapPainting = grid_IsFastMapPainting;
+   public void setIsFastMapPainting(final boolean isFastMapPainting) {
+      _isFastMapPainting = isFastMapPainting;
    }
 
    public void setIsZoomWithMousePosition(final boolean isZoomWithMousePosition) {
@@ -5346,9 +5362,12 @@ public class Map extends Canvas {
    public void showGeoGrid(final TourGeoFilter tourGeoFilter) {
 
       // set fast map paining
-      _grid_IsFastMapPainting = Util.getStateBoolean(_geoFilterState,
+      _isFastMapPainting = Util.getStateBoolean(_geoFilterState,
             TourGeoFilter_Manager.STATE_IS_FAST_MAP_PAINTING,
             TourGeoFilter_Manager.STATE_IS_FAST_MAP_PAINTING_DEFAULT);
+      _fastMapPainting_skippedValues = Util.getStateInt(_geoFilterState,
+            TourGeoFilter_Manager.STATE_FAST_MAP_PAINTING_SKIPPED_VALUES,
+            TourGeoFilter_Manager.STATE_FAST_MAP_PAINTING_SKIPPED_VALUES_DEFAULT);
 
       if (tourGeoFilter == null) {
 
@@ -5356,7 +5375,7 @@ public class Map extends Canvas {
          _grid_Data_Selected = null;
 
          // disable fast painting
-         _grid_IsFastMapPainting = false;
+//         _isFastMapPainting = false;
 
          redraw();
 
@@ -5721,4 +5740,5 @@ public class Map extends Canvas {
       setZoom(_mapZoomLevel - 1);
       paint();
    }
+
 }

@@ -89,8 +89,7 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
          }
       };
 
-      _actionRestoreDefaults.setImageDescriptor(TourbookPlugin.getImageDescriptor(
-            Messages.Image__App_RestoreDefault));
+      _actionRestoreDefaults.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_RestoreDefault));
       _actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
    }
 
@@ -172,14 +171,10 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
             {
                // checkbox
                _chkZoomWithMousePosition = new Button(container, SWT.CHECK);
-               _chkZoomWithMousePosition.setText(
-                     Messages.Slideout_Map_Options_Checkbox_ZoomWithMousePosition);
-               _chkZoomWithMousePosition.setToolTipText(
-                     Messages.Slideout_Map_Options_Checkbox_ZoomWithMousePosition_Tooltip);
+               _chkZoomWithMousePosition.setText(Messages.Slideout_Map_Options_Checkbox_ZoomWithMousePosition);
+               _chkZoomWithMousePosition.setToolTipText(Messages.Slideout_Map_Options_Checkbox_ZoomWithMousePosition_Tooltip);
                _chkZoomWithMousePosition.addSelectionListener(_defaultState_SelectionListener);
-               GridDataFactory.fillDefaults()
-                     .span(2, 1)
-                     .applyTo(_chkZoomWithMousePosition);
+               GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkZoomWithMousePosition);
             }
          }
       }

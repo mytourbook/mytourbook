@@ -38,19 +38,13 @@ public class WaypointPainter extends MapPainter {
    @Override
    protected void dispose() {}
 
-//   @Override
-//   protected void doPaint(final GC gc, final Map map) {}
-
-   /**
-    * {@inheritDoc}
-    *
-    * @param e
-    * @param map
-    * @param width
-    * @param height
-    */
    @Override
-   protected boolean doPaint(final GC gc, final Map map, final Tile tile, final int parts, final boolean isPaintFast) {
+   protected boolean doPaint(final GC gc,
+                             final Map map,
+                             final Tile tile,
+                             final int parts,
+                             final boolean isPaintFast,
+                             final int fastPainting_SkippedValues) {
 
       if (renderer == null) {
          return false;
@@ -134,7 +128,6 @@ public class WaypointPainter extends MapPainter {
 
    @Override
    protected boolean isPaintingNeeded(final Map map, final Tile tile) {
-      // TODO Auto-generated method stub
       return true;
    }
 

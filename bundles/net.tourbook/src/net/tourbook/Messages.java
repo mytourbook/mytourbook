@@ -2027,7 +2027,9 @@ public class Messages extends NLS {
    public static String Slideout_TourGeoFilter_Checkbox_IsUseFastMapPainting;
    public static String Slideout_TourGeoFilter_Checkbox_IsUseFastMapPainting_Tooltip;
    public static String Slideout_TourGeoFilter_Checkbox_UseAppFilter;
+   public static String Slideout_TourGeoFilter_Color_GeoPartHover_Tooltip;
    public static String Slideout_TourGeoFilter_Color_GeoParts_HoverSelecting;
+   public static String Slideout_TourGeoFilter_Color_GeoPartSelected_Tooltip;
    public static String Slideout_TourGeoFilter_Column_Created_Label;
    public static String Slideout_TourGeoFilter_Column_Latitude1_Header;
    public static String Slideout_TourGeoFilter_Column_Latitude1_Label;
@@ -2048,6 +2050,7 @@ public class Messages extends NLS {
    public static String Slideout_TourGeoFilter_Label_Title;
    public static String Slideout_TourGeoFilter_Radio_GeoParts_Exclude;
    public static String Slideout_TourGeoFilter_Radio_GeoParts_Include;
+   public static String Slideout_TourGeoFilter_Spinner_FastMapPainting_SkippedValues_Tooltip;
    public static String Slideout_TourGeoFilter_Spinner_GridBoxSize;
 
    public static String Slideout_TourInfoOptions_Checkbox_IsShowInfoTooltip;

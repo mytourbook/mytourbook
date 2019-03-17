@@ -182,8 +182,16 @@ import org.oscim.core.MapPosition;
  * @author Wolfgang Schramm
  * @since 1.3.0
  */
-public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEventListener, IPhotoPropertiesListener,
-      IMapBookmarks, IMapBookmarkListener, IMapPositionListener, IMapSyncListener, IMapInfoListener {
+public class Map2View extends ViewPart implements
+
+      IMapContextProvider,
+      IPhotoEventListener,
+      IPhotoPropertiesListener,
+      IMapBookmarks,
+      IMapBookmarkListener,
+      IMapPositionListener,
+      IMapSyncListener,
+      IMapInfoListener {
 
 // SET_FORMATTING_OFF
 

@@ -50,71 +50,75 @@ import org.osgi.framework.Version;
 
 public class TourGeoFilter_Manager {
 
-   private static final char               NL                                   = UI.NEW_LINE;
+   private static final char               NL                                             = UI.NEW_LINE;
 
-   private static final Bundle             _bundle                              = TourbookPlugin.getDefault().getBundle();
+   private static final Bundle             _bundle                                        = TourbookPlugin.getDefault().getBundle();
 
-   private final static IPreferenceStore   _prefStore                           = TourbookPlugin.getPrefStore();
-   private static final IDialogSettings    _state                               = TourbookPlugin.getState("TourGeoFilter"); //$NON-NLS-1$
-   private static final IPath              _stateLocation                       = Platform.getStateLocation(_bundle);
+   private final static IPreferenceStore   _prefStore                                     = TourbookPlugin.getPrefStore();
+   private static final IDialogSettings    _state                                         = TourbookPlugin.getState("TourGeoFilter"); //$NON-NLS-1$
+   private static final IPath              _stateLocation                                 = Platform.getStateLocation(_bundle);
 
-   public static final String              STATE_GRID_BOX_SIZE                  = "STATE_GRID_BOX_SIZE";                    //$NON-NLS-1$
-   public static final int                 STATE_GRID_BOX_SIZE_DEFAULT          = 1;
-   static final int                        STATE_GRID_BOX_SIZE_MIN              = 1;
-   static final int                        STATE_GRID_BOX_SIZE_MAX              = 10;
-   public static final String              STATE_IS_AUTO_OPEN_SLIDEOUT          = "STATE_IS_AUTO_OPEN_SLIDEOUT";            //$NON-NLS-1$
-   public static final boolean             STATE_IS_AUTO_OPEN_SLIDEOUT_DEFAULT  = true;
-   public static final String              STATE_IS_FAST_MAP_PAINTING           = "STATE_IS_FAST_MAP_PAINTING";             //$NON-NLS-1$
-   public static final boolean             STATE_IS_FAST_MAP_PAINTING_DEFAULT   = true;
-   static final String                     STATE_IS_INCLUDE_GEO_PARTS           = "STATE_IS_INCLUDE_GEO_PARTS";             //$NON-NLS-1$
-   static final boolean                    STATE_IS_INCLUDE_GEO_PARTS_DEFAULT   = true;
-   public static final String              STATE_IS_SYNC_MAP_POSITION           = "STATE_IS_SYNC_MAP_POSITION";             //$NON-NLS-1$
-   public static final boolean             STATE_IS_SYNC_MAP_POSITION_DEFAULT   = true;
-   public static final String              STATE_IS_USE_APP_FILTERS             = "STATE_IS_USE_APP_FILTERS";               //$NON-NLS-1$
-   public static final boolean             STATE_IS_USE_APP_FILTERS_DEFAULT     = true;
-   static final String                     STATE_SELECTED_GEO_FILTER_ID         = "STATE_SELECTED_GEO_FILTER_ID";           //$NON-NLS-1$
-   static final String                     STATE_SORT_COLUMN_DIRECTION          = "STATE_SORT_COLUMN_DIRECTION";            //$NON-NLS-1$
-   static final String                     STATE_SORT_COLUMN_ID                 = "STATE_SORT_COLUMN_ID";                   //$NON-NLS-1$
+   public static final String              STATE_GRID_BOX_SIZE                            = "STATE_GRID_BOX_SIZE";                    //$NON-NLS-1$
+   public static final int                 STATE_GRID_BOX_SIZE_DEFAULT                    = 1;
+   static final int                        STATE_GRID_BOX_SIZE_MIN                        = 1;
+   static final int                        STATE_GRID_BOX_SIZE_MAX                        = 10;
 
-   public static final String              STATE_RGB_GEO_PARTS_HOVER            = "STATE_RGB_GEO_PARTS_HOVER";              //$NON-NLS-1$
-   public static final String              STATE_RGB_GEO_PARTS_SELECTED         = "STATE_RGB_GEO_PARTS_SELECTED";           //$NON-NLS-1$
+   static final String                     STATE_SELECTED_GEO_FILTER_ID                   = "STATE_SELECTED_GEO_FILTER_ID";           //$NON-NLS-1$
+   static final String                     STATE_SORT_COLUMN_DIRECTION                    = "STATE_SORT_COLUMN_DIRECTION";            //$NON-NLS-1$
+   static final String                     STATE_SORT_COLUMN_ID                           = "STATE_SORT_COLUMN_ID";                   //$NON-NLS-1$
 
-   public static final RGB                 STATE_RGB_GEO_PARTS_HOVER_DEFAULT    = new RGB(0x00, 0x81, 0xFF);
-   public static final RGB                 STATE_RGB_GEO_PARTS_SELECTED_DEFAULT = new RGB(180, 255, 0);
+   public static final String              STATE_FAST_MAP_PAINTING_SKIPPED_VALUES         = "STATE_FAST_MAP_PAINTING_SKIPPED_VALUES"; //$NON-NLS-1$
+   public static final int                 STATE_FAST_MAP_PAINTING_SKIPPED_VALUES_DEFAULT = 10;
+   public static final String              STATE_IS_AUTO_OPEN_SLIDEOUT                    = "STATE_IS_AUTO_OPEN_SLIDEOUT";            //$NON-NLS-1$
+   public static final boolean             STATE_IS_AUTO_OPEN_SLIDEOUT_DEFAULT            = true;
+   public static final String              STATE_IS_FAST_MAP_PAINTING                     = "STATE_IS_FAST_MAP_PAINTING";             //$NON-NLS-1$
+   public static final boolean             STATE_IS_FAST_MAP_PAINTING_DEFAULT             = true;
+   static final String                     STATE_IS_INCLUDE_GEO_PARTS                     = "STATE_IS_INCLUDE_GEO_PARTS";             //$NON-NLS-1$
+   static final boolean                    STATE_IS_INCLUDE_GEO_PARTS_DEFAULT             = true;
+   public static final String              STATE_IS_SYNC_MAP_POSITION                     = "STATE_IS_SYNC_MAP_POSITION";             //$NON-NLS-1$
+   public static final boolean             STATE_IS_SYNC_MAP_POSITION_DEFAULT             = true;
+   public static final String              STATE_IS_USE_APP_FILTERS                       = "STATE_IS_USE_APP_FILTERS";               //$NON-NLS-1$
+   public static final boolean             STATE_IS_USE_APP_FILTERS_DEFAULT               = true;
 
-   private static final String             TOUR_FILTER_FILE_NAME                = "tour-geo-filter.xml";                    //$NON-NLS-1$
-   private static final int                TOUR_FILTER_VERSION                  = 1;
+   public static final String              STATE_RGB_GEO_PARTS_HOVER                      = "STATE_RGB_GEO_PARTS_HOVER";              //$NON-NLS-1$
+   public static final String              STATE_RGB_GEO_PARTS_SELECTED                   = "STATE_RGB_GEO_PARTS_SELECTED";           //$NON-NLS-1$
 
-   private static final String             TAG_GEO_FILTER                       = "GeoFilter";                              //$NON-NLS-1$
-   private static final String             TAG_ROOT                             = "TourGeoFilterItems";                     //$NON-NLS-1$
+   public static final RGB                 STATE_RGB_GEO_PARTS_HOVER_DEFAULT              = new RGB(255, 0, 128);
+   public static final RGB                 STATE_RGB_GEO_PARTS_SELECTED_DEFAULT           = new RGB(180, 255, 0);
 
-   private static final String             ATTR_ACTIVE_GEO_FILTER_ID            = "activeGeoFilterId";                      //$NON-NLS-1$
-   private static final String             ATTR_CREATED                         = "created";                                //$NON-NLS-1$
-   private static final String             ATTR_GEO_FILTER_ID                   = "geoFilterId";                            //$NON-NLS-1$
-   private static final String             ATTR_MAP_GEO_CENTER_LATITUDE         = "mapGeoCenterLatitude";                   //$NON-NLS-1$
-   private static final String             ATTR_MAP_GEO_CENTER_LONGITUDE        = "mapGeoCenterLongitude";                  //$NON-NLS-1$
-   private static final String             ATTR_MAP_ZOOM_LEVEL                  = "mapZoomLevel";                           //$NON-NLS-1$
-   private static final String             ATTR_NUM_GEO_PARTS                   = "numGeoParts";                            //$NON-NLS-1$
+   private static final String             TOUR_FILTER_FILE_NAME                          = "tour-geo-filter.xml";                    //$NON-NLS-1$
+   private static final int                TOUR_FILTER_VERSION                            = 1;
 
-   private static final String             ATTR_GEO_LOCATION_TOP_LEFT_X_E2      = "geoLocation_TopLeft_X_E2";               //$NON-NLS-1$
-   private static final String             ATTR_GEO_LOCATION_TOP_LEFT_Y_E2      = "geoLocation_TopLeft_Y_E2";               //$NON-NLS-1$
-   private static final String             ATTR_GEO_LOCATION_BOTTOM_RIGHT_X_E2  = "geoLocation_BottomRight_X_E2";           //$NON-NLS-1$
-   private static final String             ATTR_GEO_LOCATION_BOTTOM_RIGHT_Y_E2  = "geoLocation_BottomRight_Y_E2";           //$NON-NLS-1$
+   private static final String             TAG_GEO_FILTER                                 = "GeoFilter";                              //$NON-NLS-1$
+   private static final String             TAG_ROOT                                       = "TourGeoFilterItems";                     //$NON-NLS-1$
 
-   private static final String             ATTR_GEO_PARTS_TOP_LEFT_X_E2         = "geoParts_TopLeft_X_E2";                  //$NON-NLS-1$
-   private static final String             ATTR_GEO_PARTS_TOP_LEFT_Y_E2         = "geoParts_TopLeft_Y_E2";                  //$NON-NLS-1$
-   private static final String             ATTR_GEO_PARTS_BOTTOM_RIGHT_X_E2     = "geoParts_BottomRight_X_E2";              //$NON-NLS-1$
-   private static final String             ATTR_GEO_PARTS_BOTTOM_RIGHT_Y_E2     = "geoParts_BottomRight_Y_E2";              //$NON-NLS-1$
+   private static final String             ATTR_ACTIVE_GEO_FILTER_ID                      = "activeGeoFilterId";                      //$NON-NLS-1$
+   private static final String             ATTR_CREATED                                   = "created";                                //$NON-NLS-1$
+   private static final String             ATTR_GEO_FILTER_ID                             = "geoFilterId";                            //$NON-NLS-1$
+   private static final String             ATTR_MAP_GEO_CENTER_LATITUDE                   = "mapGeoCenterLatitude";                   //$NON-NLS-1$
+   private static final String             ATTR_MAP_GEO_CENTER_LONGITUDE                  = "mapGeoCenterLongitude";                  //$NON-NLS-1$
+   private static final String             ATTR_MAP_ZOOM_LEVEL                            = "mapZoomLevel";                           //$NON-NLS-1$
+   private static final String             ATTR_NUM_GEO_PARTS                             = "numGeoParts";                            //$NON-NLS-1$
 
-   private static final String             ATTR_TOUR_FILTER_VERSION             = "tourFilterVersion";                      //$NON-NLS-1$
+   private static final String             ATTR_GEO_LOCATION_TOP_LEFT_X_E2                = "geoLocation_TopLeft_X_E2";               //$NON-NLS-1$
+   private static final String             ATTR_GEO_LOCATION_TOP_LEFT_Y_E2                = "geoLocation_TopLeft_Y_E2";               //$NON-NLS-1$
+   private static final String             ATTR_GEO_LOCATION_BOTTOM_RIGHT_X_E2            = "geoLocation_BottomRight_X_E2";           //$NON-NLS-1$
+   private static final String             ATTR_GEO_LOCATION_BOTTOM_RIGHT_Y_E2            = "geoLocation_BottomRight_Y_E2";           //$NON-NLS-1$
+
+   private static final String             ATTR_GEO_PARTS_TOP_LEFT_X_E2                   = "geoParts_TopLeft_X_E2";                  //$NON-NLS-1$
+   private static final String             ATTR_GEO_PARTS_TOP_LEFT_Y_E2                   = "geoParts_TopLeft_Y_E2";                  //$NON-NLS-1$
+   private static final String             ATTR_GEO_PARTS_BOTTOM_RIGHT_X_E2               = "geoParts_BottomRight_X_E2";              //$NON-NLS-1$
+   private static final String             ATTR_GEO_PARTS_BOTTOM_RIGHT_Y_E2               = "geoParts_BottomRight_Y_E2";              //$NON-NLS-1$
+
+   private static final String             ATTR_TOUR_FILTER_VERSION                       = "tourFilterVersion";                      //$NON-NLS-1$
 
    private static ActionTourGeoFilter      _actionTourGeoFilter;
 
    private static boolean                  _isGeoFilterEnabled;
 
-   private static int[]                    _fireEventCounter                    = new int[1];
+   private static int[]                    _fireEventCounter                              = new int[1];
 
-   private static ArrayList<TourGeoFilter> _allTourGeoFilter                    = new ArrayList<>();
+   private static ArrayList<TourGeoFilter> _allTourGeoFilter                              = new ArrayList<>();
    private static TourGeoFilter            _selectedFilter;
 
    private static String                   _fromXml_ActiveGeoFilterId;

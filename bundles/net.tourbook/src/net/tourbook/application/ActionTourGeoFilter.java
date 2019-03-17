@@ -15,9 +15,13 @@
  *******************************************************************************/
 package net.tourbook.application;
 
+import de.byteholder.geoclipse.map.Map;
+
 import net.tourbook.Messages;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.tooltip.SlideoutLocation;
+import net.tourbook.common.util.Util;
+import net.tourbook.map2.view.Map2View;
 import net.tourbook.tour.filter.ActionToolbarSlideoutAdv;
 import net.tourbook.tour.filter.geo.Slideout_TourGeoFilter;
 import net.tourbook.tour.filter.geo.TourGeoFilter;
@@ -26,6 +30,7 @@ import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.ui.IViewPart;
 
 public class ActionTourGeoFilter extends ActionToolbarSlideoutAdv {
 
@@ -50,13 +55,31 @@ public class ActionTourGeoFilter extends ActionToolbarSlideoutAdv {
       return _slideoutTourGeoFilter;
    }
 
+   private void disableMapFastPainting() {
+
+      final IViewPart view = Util.getView(Map2View.ID);
+      if (view instanceof Map2View) {
+
+         final Map2View map2View = (Map2View) view;
+         final Map map = map2View.getMap();
+
+         map.setIsFastMapPainting(false);
+      }
+   }
+
    @Override
    protected void onSelect() {
 
       super.onSelect();
 
+      final boolean isSelected = getSelection();
+
+      if (!isSelected) {
+         disableMapFastPainting();
+      }
+
       // update tour geo filter
-      TourGeoFilter_Manager.setFilterEnabled(getSelection());
+      TourGeoFilter_Manager.setFilterEnabled(isSelected);
    }
 
    /**

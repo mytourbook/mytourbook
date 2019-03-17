@@ -25,9 +25,16 @@ public abstract class AbstractPainter<T> {
     * @param isPaintFast
     *           When <code>true</code> then the fastest painting method will be used, otherwise the
     *           configured painting method
+    * @param fastPainting_SkippedValues
+    *           Number of values which are not painted
     * @return
     */
-   protected abstract boolean doPaint(final GC gc, final T map, final Tile tile, final int parts, final boolean isPaintFast);
+   protected abstract boolean doPaint(final GC gc,
+                                      final T map,
+                                      final Tile tile,
+                                      final int parts,
+                                      final boolean isPaintFast,
+                                      final int fastPainting_SkippedValues);
 
    /**
     * @param map

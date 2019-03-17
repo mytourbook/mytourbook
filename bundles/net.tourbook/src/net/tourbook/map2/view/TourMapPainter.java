@@ -145,6 +145,7 @@ public class TourMapPainter extends MapPainter {
    private int     _lineWidth2;
 
    private boolean _isFastPainting;
+   private int     _fastPainting_SkippedValues;
 
    {
       _nf1.setMinimumFractionDigits(1);
@@ -912,9 +913,15 @@ public class TourMapPainter extends MapPainter {
    }
 
    @Override
-   protected boolean doPaint(final GC gcTile, final Map map, final Tile tile, final int parts, final boolean isFastPainting) {
+   protected boolean doPaint(final GC gcTile,
+                             final Map map,
+                             final Tile tile,
+                             final int parts,
+                             final boolean isFastPainting,
+                             final int fastPainting_SkippedValues) {
 
       _isFastPainting = isFastPainting;
+      _fastPainting_SkippedValues = fastPainting_SkippedValues;
 
       initPainter();
 
@@ -1486,6 +1493,15 @@ public class TourMapPainter extends MapPainter {
          gcTile.setLineWidth(_lineWidth);
 
          for (int serieIndex = 0; serieIndex < longitudeSerie.length; serieIndex++) {
+
+            if (_isFastPainting) {
+
+               serieIndex += _fastPainting_SkippedValues;
+
+               if (serieIndex >= longitudeSerie.length) {
+                  serieIndex = longitudeSerie.length - 1;
+               }
+            }
 
             final Point tourWorldPixel = tourWorldPixelPosAll[serieIndex];
             final int tourWorldPixelX = tourWorldPixel.x;
