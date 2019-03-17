@@ -15,6 +15,11 @@
  *******************************************************************************/
 package net.tourbook.map2.view;
 
+import de.byteholder.geoclipse.map.Map;
+import de.byteholder.geoclipse.map.MapPainter;
+import de.byteholder.geoclipse.map.Tile;
+import de.byteholder.geoclipse.mapprovider.MP;
+
 import gnu.trove.map.hash.TIntObjectHashMap;
 
 import java.awt.Font;
@@ -27,24 +32,6 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
-import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.PreferenceConverter;
-import org.eclipse.jface.resource.ColorRegistry;
-import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Device;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.PaletteData;
-import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Display;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Util;
@@ -77,10 +64,23 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageMap2Appearance;
 import net.tourbook.ui.views.tourCatalog.ReferenceTourManager;
 
-import de.byteholder.geoclipse.map.Map;
-import de.byteholder.geoclipse.map.MapPainter;
-import de.byteholder.geoclipse.map.Tile;
-import de.byteholder.geoclipse.mapprovider.MP;
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceConverter;
+import org.eclipse.jface.resource.ColorRegistry;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Device;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.PaletteData;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * Paints a tour into the 2D map.
@@ -141,9 +141,10 @@ public class TourMapPainter extends MapPainter {
    private IMapColorProvider          _legendProvider;
 
    // painting parameter
-   private int _lineWidth;
+   private int     _lineWidth;
+   private int     _lineWidth2;
 
-   private int _lineWidth2;
+   private boolean _isFastPainting;
 
    {
       _nf1.setMinimumFractionDigits(1);
@@ -182,7 +183,7 @@ public class TourMapPainter extends MapPainter {
        * FindBugs
        */
 
-      init();
+      initPainter();
    }
 
    /**
@@ -845,7 +846,7 @@ public class TourMapPainter extends MapPainter {
             ITourbookPreferences.GEO_COMPARE_COMPARED_TOUR_PART_RGB);
    }
 
-   private static void init() {
+   private static void initPainter() {
 
       // setup only ONCE
       if (_bgColor != null) {
@@ -911,9 +912,11 @@ public class TourMapPainter extends MapPainter {
    }
 
    @Override
-   protected boolean doPaint(final GC gcTile, final Map map, final Tile tile, final int parts) {
+   protected boolean doPaint(final GC gcTile, final Map map, final Tile tile, final int parts, final boolean isFastPainting) {
 
-      init();
+      _isFastPainting = isFastPainting;
+
+      initPainter();
 
       final ArrayList<TourData> tourDataList = _tourPaintConfig.getTourData();
       final ArrayList<Photo> photoList = _tourPaintConfig.getPhotos();
@@ -1500,7 +1503,7 @@ public class TourMapPainter extends MapPainter {
                isInRefTourPart = serieIndex >= refTourStartIndex && serieIndex <= refTourEndIndex;
             }
 
-            if (_prefIsDrawLine) {
+            if (_prefIsDrawLine && _isFastPainting == false) {
 
                // draw as a line
 
@@ -1644,10 +1647,10 @@ public class TourMapPainter extends MapPainter {
                               isGeoCompareRefTour,
                               isInRefTourPart);
 
-                        if (_prefIsDrawSquare) {
-                           drawTour_30_Square(gcTile, devX, devY, color);
-                        } else {
+                        if (!_prefIsDrawSquare || _isFastPainting) {
                            drawTour_40_Dot(gcTile, devX, devY, color);
+                        } else {
+                           drawTour_30_Square(gcTile, devX, devY, color);
                         }
 
                         // set previous pixel

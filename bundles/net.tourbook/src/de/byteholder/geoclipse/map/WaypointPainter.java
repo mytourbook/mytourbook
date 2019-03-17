@@ -9,6 +9,8 @@
 
 package de.byteholder.geoclipse.map;
 
+import de.byteholder.gpx.Waypoint;
+
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -18,169 +20,167 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.widgets.Display;
 
-import de.byteholder.gpx.Waypoint;
-
 /**
  * Paints waypoints on a {@link Map}. This is an instance of {@link MapPainter} that in turn only
  * can draw on top of Maps.
- * 
+ *
  * @author rbair
  * @author Michael Kanis
  */
 public class WaypointPainter extends MapPainter {
 
-	private WaypointRenderer	renderer	= new DefaultWaypointRenderer();
+   private WaypointRenderer renderer = new DefaultWaypointRenderer();
 
-	private Set<Waypoint>		waypoints;
+   private Set<Waypoint>    waypoints;
 
-	public WaypointPainter() {}
+   public WaypointPainter() {}
 
-	@Override
-	protected void dispose() {}
+   @Override
+   protected void dispose() {}
 
-//	@Override
-//	protected void doPaint(final GC gc, final Map map) {}
- 
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * @param e
-	 * @param map
-	 * @param width
-	 * @param height
-	 */
-	@Override
-	protected boolean doPaint(final GC gc, final Map map, final Tile tile, final int parts) {
+//   @Override
+//   protected void doPaint(final GC gc, final Map map) {}
 
-		if (renderer == null) {
-			return false;
-		}
+   /**
+    * {@inheritDoc}
+    *
+    * @param e
+    * @param map
+    * @param width
+    * @param height
+    */
+   @Override
+   protected boolean doPaint(final GC gc, final Map map, final Tile tile, final int parts, final boolean isPaintFast) {
 
-		if (waypoints == null) {
-			return true;
-		}
+      if (renderer == null) {
+         return false;
+      }
 
-		// figure out which waypoints are within this map viewport
-		final org.eclipse.swt.graphics.Rectangle viewportBounds = map.getWorldPixelViewport();
-		final int zoom = map.getZoom();
-		final Dimension sizeInTiles = map.getMapProvider().getMapTileSize(zoom);
-		final int tileSize = map.getMapProvider().getTileSize();
-//		final Dimension sizeInPixels = new Dimension(sizeInTiles.width * tileSize, sizeInTiles.height * tileSize);
-		final int sizeInPixels = sizeInTiles.width * tileSize;
-		final int devPartOffset = ((parts - 1) / 2) * tileSize;
+      if (waypoints == null) {
+         return true;
+      }
 
-		int vpx = viewportBounds.x;
-		// normalize the left edge of the viewport to be positive
-		while (vpx < 0) {
-			vpx += sizeInPixels;
-		}
-		// normalize the left edge of the viewport to no wrap around the world
-		while (vpx > sizeInPixels) {
-			vpx -= sizeInPixels;
-		}
+      // figure out which waypoints are within this map viewport
+      final org.eclipse.swt.graphics.Rectangle viewportBounds = map.getWorldPixelViewport();
+      final int zoom = map.getZoom();
+      final Dimension sizeInTiles = map.getMapProvider().getMapTileSize(zoom);
+      final int tileSize = map.getMapProvider().getTileSize();
+//      final Dimension sizeInPixels = new Dimension(sizeInTiles.width * tileSize, sizeInTiles.height * tileSize);
+      final int sizeInPixels = sizeInTiles.width * tileSize;
+      final int devPartOffset = ((parts - 1) / 2) * tileSize;
 
-		// create two new viewports next to eachother
-		final Rectangle vp2 = new Rectangle(vpx, viewportBounds.y, viewportBounds.width, viewportBounds.height);
-		final Rectangle vp3 = new Rectangle(
-				vpx - sizeInPixels,
-				viewportBounds.y,
-				viewportBounds.width,
-				viewportBounds.height);
+      int vpx = viewportBounds.x;
+      // normalize the left edge of the viewport to be positive
+      while (vpx < 0) {
+         vpx += sizeInPixels;
+      }
+      // normalize the left edge of the viewport to no wrap around the world
+      while (vpx > sizeInPixels) {
+         vpx -= sizeInPixels;
+      }
 
-		//for each waypoint within these bounds
-		for (final Waypoint w : getWaypoints()) {
-			final Point point = map.getMapProvider().geoToPixel(w.getPosition(), map.getZoom());
-			if (vp2.contains(point)) {
-				final int x = (point.x - vp2.x);
-				final int y = (point.y - vp2.y);
+      // create two new viewports next to eachother
+      final Rectangle vp2 = new Rectangle(vpx, viewportBounds.y, viewportBounds.width, viewportBounds.height);
+      final Rectangle vp3 = new Rectangle(
+            vpx - sizeInPixels,
+            viewportBounds.y,
+            viewportBounds.width,
+            viewportBounds.height);
 
-				final Transform t = new Transform(Display.getCurrent());
+      //for each waypoint within these bounds
+      for (final Waypoint w : getWaypoints()) {
+         final Point point = map.getMapProvider().geoToPixel(w.getPosition(), map.getZoom());
+         if (vp2.contains(point)) {
+            final int x = (point.x - vp2.x);
+            final int y = (point.y - vp2.y);
 
-				t.translate(x, y);
-				gc.setTransform(t);
+            final Transform t = new Transform(Display.getCurrent());
 
-				paintWaypoint(w, map, gc, devPartOffset);
+            t.translate(x, y);
+            gc.setTransform(t);
 
-				gc.setTransform(null);
-				t.dispose();
-			}
-			if (vp3.contains(point)) {
-				final int x = (point.x - vp3.x);
-				final int y = (point.y - vp3.y);
+            paintWaypoint(w, map, gc, devPartOffset);
 
-				final Transform t = new Transform(Display.getCurrent());
+            gc.setTransform(null);
+            t.dispose();
+         }
+         if (vp3.contains(point)) {
+            final int x = (point.x - vp3.x);
+            final int y = (point.y - vp3.y);
 
-				t.translate(x, y);
-				gc.setTransform(t);
+            final Transform t = new Transform(Display.getCurrent());
 
-				paintWaypoint(w, map, gc, devPartOffset);
+            t.translate(x, y);
+            gc.setTransform(t);
 
-				gc.setTransform(null);
-				t.dispose();
-			}
-		}
+            paintWaypoint(w, map, gc, devPartOffset);
 
-		return true;
-	}
+            gc.setTransform(null);
+            t.dispose();
+         }
+      }
 
-	/**
-	 * Gets the current set of waypoints to paint
-	 * 
-	 * @return a typed Set of Waypoints
-	 */
-	public Set<Waypoint> getWaypoints() {
-		return waypoints;
-	}
- 
-	@Override
-	protected boolean isPaintingNeeded(final Map map, final Tile tile) {
-		// TODO Auto-generated method stub
-		return true;
-	}
+      return true;
+   }
 
-	/**
-	 * <p>
-	 * Override this method if you want more control over how a waypoint is painted than what you
-	 * can get by just plugging in a custom waypoint renderer. Most developers should not need to
-	 * override this method and can use a WaypointRenderer instead.
-	 * </p>
-	 * <p>
-	 * This method will be called to each waypoint with the graphics object pre-translated so that
-	 * 0,0 is at the center of the waypoint. This saves the developer from having to deal with
-	 * lat/long => screen coordinate transformations.
-	 * </p>
-	 * 
-	 * @param w
-	 *            the current waypoint
-	 * @param map
-	 *            the current map
-	 * @param devPartOffset
-	 * @param g
-	 *            the current graphics context
-	 * @see setRenderer(WaypointRenderer)
-	 * @see WaypointRenderer
-	 */
-	protected void paintWaypoint(final Waypoint w, final Map map, final GC gc, final int devPartOffset) {
-		renderer.paintWaypoint(gc, map, w, devPartOffset);
-	}
+   /**
+    * Gets the current set of waypoints to paint
+    *
+    * @return a typed Set of Waypoints
+    */
+   public Set<Waypoint> getWaypoints() {
+      return waypoints;
+   }
 
-	/**
-	 * Sets the waypoint renderer to use when painting waypoints
-	 * 
-	 * @param r
-	 *            the new WaypointRenderer to use
-	 */
-	public void setRenderer(final WaypointRenderer r) {
-		this.renderer = r;
-	}
+   @Override
+   protected boolean isPaintingNeeded(final Map map, final Tile tile) {
+      // TODO Auto-generated method stub
+      return true;
+   }
 
-	/**
-	 * Sets the current set of waypoints to paint
-	 * 
-	 * @param waypoints
-	 *            the new Set of Waypoints to use
-	 */
-	public void setWaypoints(final Set<Waypoint> waypoints) {
-		this.waypoints = waypoints;
-	}
+   /**
+    * <p>
+    * Override this method if you want more control over how a waypoint is painted than what you can
+    * get by just plugging in a custom waypoint renderer. Most developers should not need to
+    * override this method and can use a WaypointRenderer instead.
+    * </p>
+    * <p>
+    * This method will be called to each waypoint with the graphics object pre-translated so that
+    * 0,0 is at the center of the waypoint. This saves the developer from having to deal with
+    * lat/long => screen coordinate transformations.
+    * </p>
+    *
+    * @param w
+    *           the current waypoint
+    * @param map
+    *           the current map
+    * @param devPartOffset
+    * @param g
+    *           the current graphics context
+    * @see setRenderer(WaypointRenderer)
+    * @see WaypointRenderer
+    */
+   protected void paintWaypoint(final Waypoint w, final Map map, final GC gc, final int devPartOffset) {
+      renderer.paintWaypoint(gc, map, w, devPartOffset);
+   }
+
+   /**
+    * Sets the waypoint renderer to use when painting waypoints
+    *
+    * @param r
+    *           the new WaypointRenderer to use
+    */
+   public void setRenderer(final WaypointRenderer r) {
+      this.renderer = r;
+   }
+
+   /**
+    * Sets the current set of waypoints to paint
+    *
+    * @param waypoints
+    *           the new Set of Waypoints to use
+    */
+   public void setWaypoints(final Set<Waypoint> waypoints) {
+      this.waypoints = waypoints;
+   }
 }

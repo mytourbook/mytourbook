@@ -64,6 +64,8 @@ public class TourGeoFilter_Manager {
    static final int                        STATE_GRID_BOX_SIZE_MAX              = 10;
    public static final String              STATE_IS_AUTO_OPEN_SLIDEOUT          = "STATE_IS_AUTO_OPEN_SLIDEOUT";            //$NON-NLS-1$
    public static final boolean             STATE_IS_AUTO_OPEN_SLIDEOUT_DEFAULT  = true;
+   public static final String              STATE_IS_FAST_MAP_PAINTING           = "STATE_IS_FAST_MAP_PAINTING";             //$NON-NLS-1$
+   public static final boolean             STATE_IS_FAST_MAP_PAINTING_DEFAULT   = true;
    static final String                     STATE_IS_INCLUDE_GEO_PARTS           = "STATE_IS_INCLUDE_GEO_PARTS";             //$NON-NLS-1$
    static final boolean                    STATE_IS_INCLUDE_GEO_PARTS_DEFAULT   = true;
    public static final String              STATE_IS_SYNC_MAP_POSITION           = "STATE_IS_SYNC_MAP_POSITION";             //$NON-NLS-1$

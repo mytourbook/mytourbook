@@ -526,6 +526,8 @@ public class Map extends Canvas {
    private int[]               _grid_AutoScrollCounter = new int[1];
    private boolean             _grid_IsGridAutoScroll;
 
+   private boolean             _grid_IsFastMapPainting;
+
    /**
     * This observer is called in the {@link Tile} when a tile image is set into the tile
     */
@@ -587,7 +589,7 @@ public class Map extends Canvas {
       _poiImage = TourbookPlugin.getImageDescriptor(IMAGE_POI_IN_MAP).createImage();
       _poiImageBounds = _poiImage.getBounds();
 
-      paintOverlay_0_SetupThread();
+      paint_Overlay_0_SetupThread();
    }
 
    /**
@@ -661,12 +663,18 @@ public class Map extends Canvas {
 
       _grid_Data_Hovered = new MapGridData();
 
+      // auto open geo filter slideout
       final boolean isAutoOpenSlideout = Util.getStateBoolean(TourGeoFilter_Manager.getState(),
             TourGeoFilter_Manager.STATE_IS_AUTO_OPEN_SLIDEOUT,
             TourGeoFilter_Manager.STATE_IS_AUTO_OPEN_SLIDEOUT_DEFAULT);
       if (isAutoOpenSlideout) {
          TourGeoFilter_Manager.setAndOpenGeoFilterSlideout(true);
       }
+
+      // set fast map paining
+      _grid_IsFastMapPainting = Util.getStateBoolean(_geoFilterState,
+            TourGeoFilter_Manager.STATE_IS_FAST_MAP_PAINTING,
+            TourGeoFilter_Manager.STATE_IS_FAST_MAP_PAINTING_DEFAULT);
 
       final Point worldMousePosition = new Point(
             _worldPixel_TopLeft_Viewport.x + _mouseMove_DevPosition_X,
@@ -1474,8 +1482,8 @@ public class Map extends Canvas {
       mapGridData.geoLocation_TopLeft_E2 = new Point(geoGrid_Lon1_E2, geoGrid_Lat1_E2); // X1 / Y1
       mapGridData.geoLocation_BottomRight_E2 = new Point(geoGrid_Lon2_E2, geoGrid_Lat2_E2); // X2 /Y2
 
-      final Point devGrid_1 = grid_Geo2DevGrid(geo1);
-      final Point devGrid_2 = grid_Geo2DevGrid(geo2);
+      final Point devGrid_1 = grid_Geo2Dev_WithGeoGrid(geo1);
+      final Point devGrid_2 = grid_Geo2Dev_WithGeoGrid(geo2);
 
       int devGrid_X1 = devGrid_1.x;
       int devGrid_Y1 = devGrid_1.y;
@@ -1767,7 +1775,7 @@ public class Map extends Canvas {
     *
     * @return
     */
-   private Point grid_Geo2DevGrid(final GeoPosition geoPos) {
+   private Point grid_Geo2Dev_WithGeoGrid(final GeoPosition geoPos) {
 
       // truncate to 0.01
 
@@ -1858,11 +1866,9 @@ public class Map extends Canvas {
       final int worldMouseX = _worldPixel_TopLeft_Viewport.x + mouseEvent.x;
       final int worldMouseY = _worldPixel_TopLeft_Viewport.y + mouseEvent.y;
 
-      final Point dev_End = new Point(mouseEvent.x, mouseEvent.y);
       final Point worldMouse_End = new Point(worldMouseX, worldMouseY);
       final GeoPosition geo_End = _mp.pixelToGeo(new Point2D.Double(worldMouse_End.x, worldMouse_End.y), _mapZoomLevel);
 
-      mapGridData.dev_End = dev_End;
       mapGridData.geo_End = geo_End;
 
       grid_Convert_StartEnd_2_TopLeft(mapGridData.geo_Start, mapGridData.geo_End, mapGridData);
@@ -1906,6 +1912,27 @@ public class Map extends Canvas {
       }
 
       redraw();
+   }
+
+   /**
+    * Convert geo position into dev position
+    *
+    * @return
+    */
+   private Point grid_World2Dev(final Point worldPosition) {
+
+      // get device rectangle for the position
+      final Point gridGeoPos = new Point(//
+            worldPosition.x - _worldPixel_TopLeft_Viewport.x,
+            worldPosition.y - _worldPixel_TopLeft_Viewport.y);
+
+      /*
+       * Adjust Y that X and Y are at the top/left position otherwise Y is at the bottom/left
+       * position
+       */
+      gridGeoPos.y -= _devGridPixelSize_Y;
+
+      return gridGeoPos;
    }
 
    private void hideHoveredArea() {
@@ -2316,6 +2343,7 @@ public class Map extends Canvas {
 
          _grid_Data_Hovered = null;
          _grid_IsGridAutoScroll = false;
+         _grid_IsFastMapPainting = false;
 
          grid_DisableGridBoxSelection();
 
@@ -2419,8 +2447,7 @@ public class Map extends Canvas {
                _worldPixel_TopLeft_Viewport.x + mouseEvent.x,
                _worldPixel_TopLeft_Viewport.y + mouseEvent.y);
 
-         _grid_Data_Hovered.dev_Start = devMousePosition;
-         _grid_Data_Hovered.dev_End = devMousePosition;
+         _grid_Data_Hovered.isSelectionStarted = true;
 
          final GeoPosition geoMousePosition = _mp.pixelToGeo(new Point2D.Double(worldMousePosition.x, worldMousePosition.y), _mapZoomLevel);
          _grid_Data_Hovered.geo_Start = geoMousePosition;
@@ -2475,6 +2502,7 @@ public class Map extends Canvas {
       } else if (_grid_Data_Hovered != null) {
 
          _grid_Data_Hovered.geo_MouseMove = geoMouseMove;
+         grid_UpdateEndPosition(mouseEvent, _grid_Data_Hovered);
 
          final Point mouseBorderPosition = grid_GetMouseBorderPosition();
          if (mouseBorderPosition != null) {
@@ -2485,8 +2513,6 @@ public class Map extends Canvas {
 
             return;
          }
-
-         grid_UpdateEndPosition(mouseEvent, _grid_Data_Hovered);
 
          paint();
 
@@ -2592,6 +2618,7 @@ public class Map extends Canvas {
             // this can happen when the right mouse button is clicked
 
             _grid_Data_Hovered = null;
+            _grid_IsFastMapPainting = false;
             _grid_IsGridAutoScroll = true;
 
             grid_DisableGridBoxSelection();
@@ -2608,6 +2635,7 @@ public class Map extends Canvas {
          _grid_Data_Selected = _grid_Data_Hovered;
 
          _grid_Data_Hovered = null;
+         _grid_IsFastMapPainting = false;
          _grid_IsGridAutoScroll = true;
 
          grid_DisableGridBoxSelection();
@@ -2881,7 +2909,7 @@ public class Map extends Canvas {
 
                if (isTileOnMap(tilePosX, tilePosY)) {
 
-                  paintTile(gcMapImage, tilePosX, tilePosY, devTileViewport);
+                  paint_Tile(gcMapImage, tilePosX, tilePosY, devTileViewport);
 
                } else {
 
@@ -3066,6 +3094,12 @@ public class Map extends Canvas {
 
    private void paint_GridBox_10_Hovered(final GC gc, final MapGridData mapGridData) {
 
+      final Point world_Start = mapGridData.world_Start;
+      if (world_Start == null) {
+         // map grid is not yet initialized
+         return;
+      }
+
       gc.setLineWidth(2);
 
       /*
@@ -3074,7 +3108,7 @@ public class Map extends Canvas {
       paint_GridBox_70_Info_LatLon(gc, mapGridData);
 
       // check if mouse button is hit, this sets the start position
-      if (mapGridData.dev_Start == null) {
+      if (mapGridData.isSelectionStarted) {
 
          // continue just hovering
 
@@ -3085,15 +3119,13 @@ public class Map extends Canvas {
          return;
       }
 
-//      final java.awt.Point worldGrid = _mp.geoToPixel(new GeoPosition(mapgr, geoLon), _mapZoomLevel);
+      final Point dev_Start = grid_World2Dev(world_Start);
+      final Point dev_End = grid_World2Dev(mapGridData.world_End);
 
-      final Point worldStart = mapGridData.world_Start;
-      final Point worldEnd = mapGridData.world_End;
-
-      final int dev_Start_X = mapGridData.dev_Start.x;
-      final int dev_Start_Y = mapGridData.dev_Start.y;
-      final int dev_End_X = mapGridData.dev_End.x;
-      final int dev_End_Y = mapGridData.dev_End.y;
+      final int dev_Start_X = dev_Start.x;
+      final int dev_Start_Y = dev_Start.y;
+      final int dev_End_X = dev_End.x;
+      final int dev_End_Y = dev_End.y;
 
       final int dev_X1;
       final int dev_Y1;
@@ -3220,7 +3252,7 @@ public class Map extends Canvas {
 
       final StringBuilder sb = new StringBuilder();
 
-      if (mapGridData.dev_Start != null) {
+      if (mapGridData.isSelectionStarted) {
 
          // display selected area
 
@@ -3464,7 +3496,7 @@ public class Map extends Canvas {
    /**
     * Define and start the overlay thread
     */
-   private void paintOverlay_0_SetupThread() {
+   private void paint_Overlay_0_SetupThread() {
 
       _overlayImageCache = new OverlayImageCache();
 
@@ -3490,7 +3522,7 @@ public class Map extends Canvas {
                      if (_tileOverlayPaintQueue.size() > 0) {
 
                         // create overlay images
-                        paintOverlay_10_RunThread();
+                        paint_Overlay_10_RunThread();
                      }
                   }
 
@@ -3507,7 +3539,7 @@ public class Map extends Canvas {
       _overlayThread.start();
    }
 
-   private void paintOverlay_10_RunThread() {
+   private void paint_Overlay_10_RunThread() {
 
       final int currentRunnableCounter = _overlayRunnableCounter.incrementAndGet();
 
@@ -3535,7 +3567,7 @@ public class Map extends Canvas {
 
             try {
 
-               paintOverlay_20_Tiles();
+               paint_Overlay_20_Tiles();
 
             } catch (final Exception e) {
                e.printStackTrace();
@@ -3548,7 +3580,7 @@ public class Map extends Canvas {
       _display.asyncExec(uiOverlayRunnable);
    }
 
-   private void paintOverlay_20_Tiles() {
+   private void paint_Overlay_20_Tiles() {
 
       BusyIndicator.showWhile(_display, new Runnable() {
          @Override
@@ -3591,10 +3623,10 @@ public class Map extends Canvas {
                   }
 
                   // paint overlay
-                  if (_isTourPaintMethodEnhanced) {
-                     paintOverlay_30_PaintTileEnhanced(tile);
+                  if (!_isTourPaintMethodEnhanced || _grid_IsFastMapPainting) {
+                     paint_Overlay_22_PaintTileBasic(tile);
                   } else {
-                     paintOverlay_22_PaintTileBasic(tile);
+                     paint_Overlay_30_PaintTileEnhanced(tile);
                   }
 
                   // allow to display painted overlays
@@ -3618,7 +3650,7 @@ public class Map extends Canvas {
     *
     * @param tile
     */
-   private void paintOverlay_22_PaintTileBasic(final Tile tile) {
+   private void paint_Overlay_22_PaintTileBasic(final Tile tile) {
 
       boolean isOverlayPainted = false;
 
@@ -3639,7 +3671,7 @@ public class Map extends Canvas {
          // paint all overlays for the current tile
          for (final MapPainter overlayPainter : _overlays) {
 
-            final boolean isPainted = overlayPainter.doPaint(gc1Part, Map.this, tile, 1);
+            final boolean isPainted = overlayPainter.doPaint(gc1Part, Map.this, tile, 1, _grid_IsFastMapPainting);
 
             isOverlayPainted = isOverlayPainted || isPainted;
          }
@@ -3678,7 +3710,7 @@ public class Map extends Canvas {
     *
     * @param tile
     */
-   private void paintOverlay_30_PaintTileEnhanced(final Tile tile) {
+   private void paint_Overlay_30_PaintTileEnhanced(final Tile tile) {
 
       final int parts = 3;
 
@@ -3692,7 +3724,7 @@ public class Map extends Canvas {
          // paint all overlays for the current tile
          for (final MapPainter overlayPainter : _overlays) {
 
-            final boolean isPainted = overlayPainter.doPaint(_9PartGC, Map.this, tile, parts);
+            final boolean isPainted = overlayPainter.doPaint(_9PartGC, Map.this, tile, parts, _grid_IsFastMapPainting);
 
             isOverlayPainted = isOverlayPainted || isPainted;
          }
@@ -3719,7 +3751,7 @@ public class Map extends Canvas {
                @Override
                protected IStatus run(final IProgressMonitor monitor) {
 
-                  paintOverlay_31_SplitParts(tile, imageData9Parts);
+                  paint_Overlay_31_SplitParts(tile, imageData9Parts);
 
                   if (_isCancelSplitJobs) {
                      return Status.CANCEL_STATUS;
@@ -3761,7 +3793,7 @@ public class Map extends Canvas {
     * @param tile
     * @param imageData9Parts
     */
-   private void paintOverlay_31_SplitParts(final Tile tile, final ImageData imageData9Parts) {
+   private void paint_Overlay_31_SplitParts(final Tile tile, final ImageData imageData9Parts) {
 
       final TileCache tileCache = MP.getTileCache();
 
@@ -3931,10 +3963,10 @@ public class Map extends Canvas {
       }
    }
 
-   private void paintTile(final GC gcMapImage,
-                          final int tilePositionX,
-                          final int tilePositionY,
-                          final Rectangle devTileViewport) {
+   private void paint_Tile(final GC gcMapImage,
+                           final int tilePositionX,
+                           final int tilePositionY,
+                           final Rectangle devTileViewport) {
 
       // get tile from the map provider, this also starts the loading of the tile image
       final Tile tile = _mp.getTile(tilePositionX, tilePositionY, _mapZoomLevel);
@@ -3947,27 +3979,27 @@ public class Map extends Canvas {
          gcMapImage.drawImage(tileImage, devTileViewport.x, devTileViewport.y);
 
       } else {
-         paintTile10_Image(gcMapImage, tile, devTileViewport);
+         paint_Tile_10_Image(gcMapImage, tile, devTileViewport);
       }
 
       if (_isDrawOverlays) {
 
          gcMapImage.setAlpha(_overlayAlpha);
 
-         paintTile20_Overlay(gcMapImage, tile, devTileViewport);
+         paint_Tile_20_Overlay(gcMapImage, tile, devTileViewport);
 
          gcMapImage.setAlpha(0xff);
       }
 
       if (_isShowDebug_TileInfo || _isShowDebug_TileBorder) {
-         paintTile30_Info(gcMapImage, tile, devTileViewport);
+         paint_Tile_30_Info(gcMapImage, tile, devTileViewport);
       }
    }
 
    /**
     * draw the tile map image
     */
-   private void paintTile10_Image(final GC gcMapImage, final Tile tile, final Rectangle devTileViewport) {
+   private void paint_Tile_10_Image(final GC gcMapImage, final Tile tile, final Rectangle devTileViewport) {
 
       if (tile.isLoadingError()) {
 
@@ -3979,7 +4011,7 @@ public class Map extends Canvas {
          gcMapImage.setBackground(SYS_COLOR_GRAY);
          gcMapImage.fillRectangle(devTileViewport.x, devTileViewport.y, imageBounds.width, imageBounds.height);
 
-         paintTileInfoError(gcMapImage, devTileViewport, tile);
+         paint_TileInfo_Error(gcMapImage, devTileViewport, tile);
 
          return;
       }
@@ -3990,7 +4022,7 @@ public class Map extends Canvas {
 
          gcMapImage.drawImage(_mp.getErrorImage(), devTileViewport.x, devTileViewport.y);
 
-         paintTileInfoError(gcMapImage, devTileViewport, tile);
+         paint_TileInfo_Error(gcMapImage, devTileViewport, tile);
 
          return;
       }
@@ -4034,7 +4066,7 @@ public class Map extends Canvas {
     * @param devTileViewport
     *           Position of the tile
     */
-   private void paintTile20_Overlay(final GC gcMapImage, final Tile tile, final Rectangle devTileViewport) {
+   private void paint_Tile_20_Overlay(final GC gcMapImage, final Tile tile, final Rectangle devTileViewport) {
 
       /*
        * Priority 1: draw overlay image
@@ -4178,7 +4210,7 @@ public class Map extends Canvas {
     * @param tile
     * @param devTileViewport
     */
-   private void paintTile30_Info(final GC gc, final Tile tile, final Rectangle devTileViewport) {
+   private void paint_Tile_30_Info(final GC gc, final Tile tile, final Rectangle devTileViewport) {
 
       final ConcurrentHashMap<String, Tile> childrenWithErrors = tile.getChildrenWithErrors();
 
@@ -4186,7 +4218,7 @@ public class Map extends Canvas {
             || tile.isOfflineError()
             || ((childrenWithErrors != null) && (childrenWithErrors.size() > 0))) {
 
-         paintTileInfoError(gc, devTileViewport, tile);
+         paint_TileInfo_Error(gc, devTileViewport, tile);
 
          return;
       }
@@ -4206,13 +4238,13 @@ public class Map extends Canvas {
 
          final int leftMargin = 10;
 
-         paintTileInfoLatLon(gc, tile, devTileViewport, 10, leftMargin);
-         paintTileInfoPosition(gc, devTileViewport, tile, 50, leftMargin);
+         paint_TileInfo_LatLon(gc, tile, devTileViewport, 10, leftMargin);
+         paint_TileInfo_Position(gc, devTileViewport, tile, 50, leftMargin);
 
          // draw tile image path/url
          final StringBuilder sb = new StringBuilder();
 
-         paintTileInfoPath(tile, sb);
+         paint_TileInfo_Path(tile, sb);
 
          _textWrapper.printText(
                gc,
@@ -4223,7 +4255,7 @@ public class Map extends Canvas {
       }
    }
 
-   private void paintTileInfoError(final GC gc, final Rectangle devTileViewport, final Tile tile) {
+   private void paint_TileInfo_Error(final GC gc, final Rectangle devTileViewport, final Tile tile) {
 
       // draw tile border
       gc.setForeground(SYS_COLOR_DARK_GRAY);
@@ -4234,8 +4266,8 @@ public class Map extends Canvas {
 
       final int leftMargin = 10;
 
-      paintTileInfoLatLon(gc, tile, devTileViewport, 10, leftMargin);
-      paintTileInfoPosition(gc, devTileViewport, tile, 50, leftMargin);
+      paint_TileInfo_LatLon(gc, tile, devTileViewport, 10, leftMargin);
+      paint_TileInfo_Position(gc, devTileViewport, tile, 50, leftMargin);
 
       // display loading error
       final StringBuilder sb = new StringBuilder();
@@ -4257,12 +4289,12 @@ public class Map extends Canvas {
          }
       }
 
-      paintTileInfoPath(tile, sb);
+      paint_TileInfo_Path(tile, sb);
 
       final ArrayList<Tile> tileChildren = tile.getChildren();
       if (tileChildren != null) {
          for (final Tile childTile : tileChildren) {
-            paintTileInfoPath(childTile, sb);
+            paint_TileInfo_Path(childTile, sb);
          }
       }
 
@@ -4274,11 +4306,11 @@ public class Map extends Canvas {
             devTileViewport.width - 20);
    }
 
-   private void paintTileInfoLatLon(final GC gc,
-                                    final Tile tile,
-                                    final Rectangle devTileViewport,
-                                    final int topMargin,
-                                    final int leftMargin) {
+   private void paint_TileInfo_LatLon(final GC gc,
+                                      final Tile tile,
+                                      final Rectangle devTileViewport,
+                                      final int topMargin,
+                                      final int leftMargin) {
 
       final StringBuilder sb = new StringBuilder();
 
@@ -4326,7 +4358,7 @@ public class Map extends Canvas {
     * @param tile
     * @param sb
     */
-   private void paintTileInfoPath(final Tile tile, final StringBuilder sb) {
+   private void paint_TileInfo_Path(final Tile tile, final StringBuilder sb) {
 
       final String url = tile.getUrl();
       if (url != null) {
@@ -4345,16 +4377,16 @@ public class Map extends Canvas {
       final ArrayList<Tile> tileChildren = tile.getChildren();
       if (tileChildren != null) {
          for (final Tile childTile : tileChildren) {
-            paintTileInfoPath(childTile, sb);
+            paint_TileInfo_Path(childTile, sb);
          }
       }
    }
 
-   private void paintTileInfoPosition(final GC gc,
-                                      final Rectangle devTileViewport,
-                                      final Tile tile,
-                                      final int topMargin,
-                                      final int leftMargin) {
+   private void paint_TileInfo_Position(final GC gc,
+                                        final Rectangle devTileViewport,
+                                        final Tile tile,
+                                        final int topMargin,
+                                        final int leftMargin) {
 
       final StringBuilder text = new StringBuilder()//
             .append(Messages.TileInfo_Position_Zoom)
@@ -4748,6 +4780,10 @@ public class Map extends Canvas {
 
    public void setDirectPainter(final IDirectPainter directPainter) {
       _directMapPainter = directPainter;
+   }
+
+   public void setIsFastMapPainting(final boolean grid_IsFastMapPainting) {
+      _grid_IsFastMapPainting = grid_IsFastMapPainting;
    }
 
    public void setIsZoomWithMousePosition(final boolean isZoomWithMousePosition) {
@@ -5304,15 +5340,23 @@ public class Map extends Canvas {
 
    /**
     * @param tourGeoFilter
-    *           Show geo grid box, when <code>null</code> the selected grid box is set to hidden
+    *           Show geo grid box for this geo filter, when <code>null</code> the selected grid box
+    *           is set to hidden
     */
    public void showGeoGrid(final TourGeoFilter tourGeoFilter) {
+
+      // set fast map paining
+      _grid_IsFastMapPainting = Util.getStateBoolean(_geoFilterState,
+            TourGeoFilter_Manager.STATE_IS_FAST_MAP_PAINTING,
+            TourGeoFilter_Manager.STATE_IS_FAST_MAP_PAINTING_DEFAULT);
 
       if (tourGeoFilter == null) {
 
          // hide geo grid
-
          _grid_Data_Selected = null;
+
+         // disable fast painting
+         _grid_IsFastMapPainting = false;
 
          redraw();
 
@@ -5360,7 +5404,7 @@ public class Map extends Canvas {
 
          _grid_Data_Selected = mapGridData;
 
-         final Rectangle wpMapViewPort = getWorldPixel_TopLeft_Viewport(_worldPixel_MapCenter);
+         final Rectangle world_MapViewPort = getWorldPixel_TopLeft_Viewport(_worldPixel_MapCenter);
 
          /*
           * Reposition map
@@ -5370,8 +5414,8 @@ public class Map extends Canvas {
 
             // chck if gird box is already visible
 
-            if (wpMapViewPort.contains(_grid_Data_Selected.world_Start)
-                  && wpMapViewPort.contains(_grid_Data_Selected.world_End)) {
+            if (world_MapViewPort.contains(_grid_Data_Selected.world_Start)
+                  && world_MapViewPort.contains(_grid_Data_Selected.world_End)) {
 
                // grid box is visile -> nothing to do
 

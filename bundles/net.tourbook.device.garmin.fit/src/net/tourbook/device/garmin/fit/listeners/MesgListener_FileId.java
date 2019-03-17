@@ -87,7 +87,7 @@ public class MesgListener_FileId extends AbstractMesgListener implements FileIdM
 
             // Garmin Edge 1030 is not yet in the product list
 
-            fitData.setGarminProduct("EDGE1030");
+            fitData.setGarminProduct("EDGE 1030");
 
          } else {
             fitData.setGarminProduct(garminProductId.toString());

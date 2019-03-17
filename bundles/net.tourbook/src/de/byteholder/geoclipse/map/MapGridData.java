@@ -29,9 +29,6 @@ public class MapGridData {
 
    GeoPosition   geo_MouseMove;
 
-   Point         dev_Start;
-   Point         dev_End;
-
    Point         world_Start;
    Point         world_End;
 
@@ -78,8 +75,6 @@ public class MapGridData {
 
             + "[" + "\n"
 
-            + "dev_Start            =" + dev_Start + "\n"
-            + "dev_End              =" + dev_End + "\n"
             + "devGrid_X1           =" + devGrid_X1 + "\n"
             + "devGrid_Y1           =" + devGrid_Y1 + "\n"
             + "devWidth             =" + devWidth + "\n"

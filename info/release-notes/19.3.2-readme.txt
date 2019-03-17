@@ -4,10 +4,24 @@ Version 19.3.2                                             ?. March 2019
 .fit Import
 ===========
 
-This importer has been simplified/restructured to fix an issue. Afterwards it was tested with several different .fit files. 
+The importer for .fit files has been simplified/restructured to fix an issue. Afterwards it was tested with several different .fit files. 
 
 It is still possible that there are undiscovered issue. So check your data after the next imports to ensure that all values are valid.
 
+New
+===
+
+
+Improvements
+============
+
+
+Changes
+=======
+
+* 2D Map
+
+  - Move option "Zoom + center to the mouse position" into new "2D Map Option" slideout
 
 
 Bugfix   
@@ -24,8 +38,9 @@ Bugfix
 * Import
 
   - .gpx File
-    Fixed ConcurrentModificationException when converting waypoints into tour markers
+    - Fixed ConcurrentModificationException when converting waypoints into tour markers
     
   - .fit File
-    Fixed total altitude values for Ciclo(CM 9.3A)
+    - Fixed total altitude values for Ciclo(CM 9.3A)
+    - Display 'GARMIN EDGE 1030' instead of 'GARMIN 2713' in Data format 
   

@@ -2024,6 +2024,8 @@ public class Messages extends NLS {
    public static String Slideout_TourGeoFilter_Checkbox_IsAutoOpenSlideout;
    public static String Slideout_TourGeoFilter_Checkbox_IsAutoOpenSlideout_Tooltip;
    public static String Slideout_TourGeoFilter_Checkbox_IsSyncMapPosition;
+   public static String Slideout_TourGeoFilter_Checkbox_IsUseFastMapPainting;
+   public static String Slideout_TourGeoFilter_Checkbox_IsUseFastMapPainting_Tooltip;
    public static String Slideout_TourGeoFilter_Checkbox_UseAppFilter;
    public static String Slideout_TourGeoFilter_Color_GeoParts_HoverSelecting;
    public static String Slideout_TourGeoFilter_Column_Created_Label;
