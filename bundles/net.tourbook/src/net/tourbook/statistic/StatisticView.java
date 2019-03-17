@@ -24,31 +24,6 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
-import org.eclipse.e4.ui.di.PersistState;
-import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.PixelConverter;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Combo;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.ui.IPartListener2;
-import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchPartReference;
-import org.eclipse.ui.part.PageBook;
-import org.eclipse.ui.part.ViewPart;
-
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
@@ -70,1029 +45,1053 @@ import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
+import org.eclipse.e4.ui.di.PersistState;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.part.PageBook;
+import org.eclipse.ui.part.ViewPart;
+
 public class StatisticView extends ViewPart implements ITourProvider {
 
-	public static final String					ID									= "net.tourbook.statistic.StatisticView";				//$NON-NLS-1$
+   public static final String           ID                       = "net.tourbook.statistic.StatisticView";        //$NON-NLS-1$
 
-	private static final String				COMBO_MINIMUM_WIDTH			= "1234567890";												//$NON-NLS-1$
-	private static final String				COMBO_MAXIMUM_WIDTH			= "123456789012345678901234567890";						//$NON-NLS-1$
+   private static final String          COMBO_MINIMUM_WIDTH      = "1234567890";                                  //$NON-NLS-1$
+   private static final String          COMBO_MAXIMUM_WIDTH      = "123456789012345678901234567890";              //$NON-NLS-1$
 
-	private static final String				STATE_SELECTED_STATISTIC	= "statistic.container.selected_statistic";			//$NON-NLS-1$
-	private static final String				STATE_SELECTED_YEAR			= "statistic.container.selected-year";					//$NON-NLS-1$
-	private static final String				STATE_NUMBER_OF_YEARS		= "statistic.container.number_of_years";				//$NON-NLS-1$
+   private static final String          STATE_SELECTED_STATISTIC = "statistic.container.selected_statistic";      //$NON-NLS-1$
+   private static final String          STATE_SELECTED_YEAR      = "statistic.container.selected-year";           //$NON-NLS-1$
+   private static final String          STATE_NUMBER_OF_YEARS    = "statistic.container.number_of_years";         //$NON-NLS-1$
 
-	private static final char					NL									= net.tourbook.common.UI.NEW_LINE;
+   private static final char            NL                       = net.tourbook.common.UI.NEW_LINE;
 
-	private static final boolean				_isOSX							= net.tourbook.common.UI.IS_OSX;
-	private static final boolean				_isLinux							= net.tourbook.common.UI.IS_LINUX;
+   private static final boolean         _isOSX                   = net.tourbook.common.UI.IS_OSX;
+   private static final boolean         _isLinux                 = net.tourbook.common.UI.IS_LINUX;
 
-	private static boolean						_isInUpdateUI;
+   private static boolean               _isInUpdateUI;
 
-	private final IPreferenceStore			_prefStore						= TourbookPlugin.getPrefStore();
-	private final IPreferenceStore			_prefStoreCommon				= CommonActivator.getPrefStore();
-	private final IDialogSettings				_state							= TourbookPlugin.getState("TourStatisticsView");	//$NON-NLS-1$
+   private final IPreferenceStore       _prefStore               = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore       _prefStoreCommon         = CommonActivator.getPrefStore();
+   private final IDialogSettings        _state                   = TourbookPlugin.getState("TourStatisticsView"); //$NON-NLS-1$
 
-	private IPartListener2						_partListener;
-	private IPropertyChangeListener			_prefChangeListener;
-	private IPropertyChangeListener			_prefChangeListenerCommon;
-	private ITourEventListener					_tourEventListener;
-	private ISelectionListener					_postSelectionListener;
+   private IPartListener2               _partListener;
+   private IPropertyChangeListener      _prefChangeListener;
+   private IPropertyChangeListener      _prefChangeListenerCommon;
+   private ITourEventListener           _tourEventListener;
+   private ISelectionListener           _postSelectionListener;
 
-	private TourPerson							_activePerson;
+   private TourPerson                   _activePerson;
 
-	private TourTypeFilter						_activeTourTypeFilter;
+   private TourTypeFilter               _activeTourTypeFilter;
 
-	private int										_selectedYear					= -1;
+   private int                          _selectedYear            = -1;
 
-	private TourbookStatistic					_activeStatistic;
+   private TourbookStatistic            _activeStatistic;
 
-	/**
-	 * Contains all years which have tours for the selected tour type and person.
-	 */
-	private TIntArrayList						_availableYears;
+   /**
+    * Contains all years which have tours for the selected tour type and person.
+    */
+   private TIntArrayList                _availableYears;
 
-	/**
-	 * contains the statistics in the same sort order as the statistic combo box
-	 */
-	private ArrayList<TourbookStatistic>	_allStatisticProvider;
-	private ActionStatisticOptions			_actionStatisticOptions;
-	private ActionSynchChartScale				_actionSynchChartScale;
+   /**
+    * contains the statistics in the same sort order as the statistic combo box
+    */
+   private ArrayList<TourbookStatistic> _allStatisticProvider;
+   private ActionStatisticOptions       _actionStatisticOptions;
+   private ActionSynchChartScale        _actionSynchChartScale;
 
-	private boolean								_isSynchScaleEnabled;
-	private boolean								_isVerticalOrderDisabled;
+   private boolean                      _isSynchScaleEnabled;
+   private boolean                      _isVerticalOrderDisabled;
 
-	private int										_minimumComboWidth;
-	private int										_maximumComboWidth;
+   private int                          _minimumComboWidth;
+   private int                          _maximumComboWidth;
 
-	private PixelConverter						_pc;
+   private PixelConverter               _pc;
 
-	/*
-	 * UI controls
-	 */
-	private Combo									_comboYear;
-	private Combo									_comboStatistics;
-	private Combo									_comboNumberOfYears;
-	private Combo									_comboBarVerticalOrder;
+   /*
+    * UI controls
+    */
+   private Combo                    _comboYear;
+   private Combo                    _comboStatistics;
+   private Combo                    _comboNumberOfYears;
+   private Combo                    _comboBarVerticalOrder;
 
-	private Composite								_statContainer;
+   private Composite                _statContainer;
 
-	private PageBook								_pageBookStatistic;
+   private PageBook                 _pageBookStatistic;
 
-	private SlideoutStatisticOptions			_slideoutStatisticOptions;
+   private SlideoutStatisticOptions _slideoutStatisticOptions;
 
-	private class ActionStatisticOptions extends ActionToolbarSlideout {
+   private class ActionStatisticOptions extends ActionToolbarSlideout {
 
-		@Override
-		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+      @Override
+      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-			_slideoutStatisticOptions = new SlideoutStatisticOptions(_statContainer, toolbar);
+         _slideoutStatisticOptions = new SlideoutStatisticOptions(_statContainer, toolbar);
 
-			return _slideoutStatisticOptions;
-		}
+         return _slideoutStatisticOptions;
+      }
 
-	}
+   }
 
-	public static boolean isInUpdateUI() {
-		return _isInUpdateUI;
-	}
+   public static boolean isInUpdateUI() {
+      return _isInUpdateUI;
+   }
 
-	void actionSynchScale(final boolean isEnabled) {
+   void actionSynchScale(final boolean isEnabled) {
 
-		_isSynchScaleEnabled = isEnabled;
+      _isSynchScaleEnabled = isEnabled;
 
-		_activeStatistic.setSynchScale(_isSynchScaleEnabled);
+      _activeStatistic.setSynchScale(_isSynchScaleEnabled);
 
-		_activeStatistic.updateStatistic(
-				new StatisticContext(//
-						_activePerson,
-						_activeTourTypeFilter,
-						_selectedYear,
-						getNumberOfYears()));
-	}
+      _activeStatistic.updateStatistic(
+            new StatisticContext(//
+                  _activePerson,
+                  _activeTourTypeFilter,
+                  _selectedYear,
+                  getNumberOfYears()));
+   }
 
-	private void addPartListener() {
+   private void addPartListener() {
 
-		// set the part listener
-		_partListener = new IPartListener2() {
+      // set the part listener
+      _partListener = new IPartListener2() {
 
-			@Override
-			public void partActivated(final IWorkbenchPartReference partRef) {
+         @Override
+         public void partActivated(final IWorkbenchPartReference partRef) {
 
 //				if (partRef.getPart(false) == TourStatisticsView.this) {
 //
 //					int a = 0;
 //					a++;
 //				}
-			}
+         }
 
-			@Override
-			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
+         @Override
+         public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
-			@Override
-			public void partClosed(final IWorkbenchPartReference partRef) {}
+         @Override
+         public void partClosed(final IWorkbenchPartReference partRef) {}
 
-			@Override
-			public void partDeactivated(final IWorkbenchPartReference partRef) {}
+         @Override
+         public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
-			@Override
-			public void partHidden(final IWorkbenchPartReference partRef) {}
+         @Override
+         public void partHidden(final IWorkbenchPartReference partRef) {}
 
-			@Override
-			public void partInputChanged(final IWorkbenchPartReference partRef) {}
+         @Override
+         public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
-			@Override
-			public void partOpened(final IWorkbenchPartReference partRef) {}
+         @Override
+         public void partOpened(final IWorkbenchPartReference partRef) {}
 
-			@Override
-			public void partVisible(final IWorkbenchPartReference partRef) {}
-		};
+         @Override
+         public void partVisible(final IWorkbenchPartReference partRef) {}
+      };
 
-		// register the part listener
-		getSite().getPage().addPartListener(_partListener);
-	}
+      // register the part listener
+      getSite().getPage().addPartListener(_partListener);
+   }
 
-	private void addPrefListener() {
+   private void addPrefListener() {
 
-		_prefChangeListener = new IPropertyChangeListener() {
+      _prefChangeListener = new IPropertyChangeListener() {
 
-			@Override
-			public void propertyChange(final PropertyChangeEvent event) {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
 
-				final String property = event.getProperty();
+            final String property = event.getProperty();
 
-				/*
-				 * set a new chart configuration when the preferences has changed
-				 */
+            /*
+             * set a new chart configuration when the preferences has changed
+             */
 
-				if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)
-						|| property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)
-						|| property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)) {
+            if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)
+                  || property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)
+                  || property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)) {
 
-					_activePerson = TourbookPlugin.getActivePerson();
-					_activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
+               _activePerson = TourbookPlugin.getActivePerson();
+               _activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
 
-					updateStatistic();
+               updateStatistic();
 
-				} else if (property.equals(ITourbookPreferences.STATISTICS_STATISTIC_PROVIDER_IDS)) {
+            } else if (property.equals(ITourbookPreferences.STATISTICS_STATISTIC_PROVIDER_IDS)) {
 
-					refreshStatisticProvider();
+               refreshStatisticProvider();
 
-				} else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
+            } else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
 
-					// measurement system has changed
+               // measurement system has changed
 
-					UI.updateUnits();
+               UI.updateUnits();
 
-					updateStatistic();
-				}
-			}
-		};
+               updateStatistic();
+            }
+         }
+      };
 
-		// register the listener
-		_prefStore.addPropertyChangeListener(_prefChangeListener);
+      // register the listener
+      _prefStore.addPropertyChangeListener(_prefChangeListener);
 
-		/*
-		 * Common preferences
-		 */
-		_prefChangeListenerCommon = new IPropertyChangeListener() {
-			@Override
-			public void propertyChange(final PropertyChangeEvent event) {
+      /*
+       * Common preferences
+       */
+      _prefChangeListenerCommon = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
 
-				final String property = event.getProperty();
+            final String property = event.getProperty();
 
-				if (property.equals(ICommonPreferences.TIME_ZONE_LOCAL_ID)) {
+            if (property.equals(ICommonPreferences.TIME_ZONE_LOCAL_ID)) {
 
-					updateStatistic();
-				}
-			}
-		};
+               updateStatistic();
+            }
+         }
+      };
 
-		// register the listener
-		_prefStoreCommon.addPropertyChangeListener(_prefChangeListenerCommon);
-	}
+      // register the listener
+      _prefStoreCommon.addPropertyChangeListener(_prefChangeListenerCommon);
+   }
 
-	private void addSelectionListener() {
+   private void addSelectionListener() {
 
-		// this view part is a selection listener
-		_postSelectionListener = new ISelectionListener() {
+      // this view part is a selection listener
+      _postSelectionListener = new ISelectionListener() {
 
-			@Override
-			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
+         @Override
+         public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
-				if (part == StatisticView.this) {
-					return;
-				}
+            if (part == StatisticView.this) {
+               return;
+            }
 
-				if (selection instanceof SelectionDeletedTours) {
-					updateStatistic();
-				}
-			}
-		};
+            if (selection instanceof SelectionDeletedTours) {
+               updateStatistic();
+            }
+         }
+      };
 
-		// register selection listener in the page
-		getSite().getPage().addPostSelectionListener(_postSelectionListener);
-	}
+      // register selection listener in the page
+      getSite().getPage().addPostSelectionListener(_postSelectionListener);
+   }
 
-	private void addTourEventListener() {
+   private void addTourEventListener() {
 
-		_tourEventListener = new ITourEventListener() {
-			@Override
-			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object propertyData) {
+      _tourEventListener = new ITourEventListener() {
+         @Override
+         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object propertyData) {
 
-				if (eventId == TourEventId.TOUR_CHANGED && propertyData instanceof TourEvent) {
+            if (eventId == TourEventId.TOUR_CHANGED && propertyData instanceof TourEvent) {
+
+               if (part == StatisticView.this) {
+                  return;
+               }
+
+               if (((TourEvent) propertyData).isTourModified) {
+                  /*
+                   * ignore edit changes because the statistics show data only from saved data
+                   */
+                  return;
+               }
+
+               _isInUpdateUI = true;
+
+               // update statistics
+               updateStatistic();
+
+               _isInUpdateUI = false;
+
+            } else if (eventId == TourEventId.UPDATE_UI || //
+                  eventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
+
+               updateStatistic();
+            }
+         }
+      };
+      TourManager.getInstance().addTourEventListener(_tourEventListener);
+   }
+
+   public boolean canFireEvents() {
+
+      return _isInUpdateUI == false;
+   }
+
+   private void createActions() {
+
+      _actionStatisticOptions = new ActionStatisticOptions();
+      _actionSynchChartScale = new ActionSynchChartScale(this);
+   }
+
+   @Override
+   public void createPartControl(final Composite parent) {
+
+      initUI(parent);
+
+      createUI(parent);
+
+      createActions();
+      updateUI();
+
+      addPartListener();
+      addPrefListener();
+      addSelectionListener();
+      addTourEventListener();
+
+      /*
+       * Start async that the workspace is fully initialized with all data filters
+       */
+      parent.getDisplay().asyncExec(new Runnable() {
+         @Override
+         public void run() {
+
+            _activePerson = TourbookPlugin.getActivePerson();
+            _activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
+
+            restoreState();
+         }
+      });
+   }
+
+   private void createUI(final Composite parent) {
+
+      _statContainer = new Composite(parent, SWT.NONE);
+      GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(_statContainer);
+      {
+         createUI_10_Toolbar(_statContainer);
+
+         // pagebook: statistics
+         _pageBookStatistic = new PageBook(_statContainer, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBookStatistic);
+      }
+   }
+
+   private void createUI_10_Toolbar(final Composite parent) {
+
+      final int widgetSpacing = 15;
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory
+            .fillDefaults()//
+            .grab(true, false)
+            .align(SWT.BEGINNING, SWT.FILL)
+            .applyTo(container);
+      GridLayoutFactory
+            .fillDefaults()//
+            .numColumns(6)
+            .margins(3, 3)
+            .applyTo(container);
+      {
+         {
+            /*
+             * combo: statistics
+             */
+
+            _comboStatistics = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+            _comboStatistics.setToolTipText(Messages.Tour_Book_Combo_statistic_tooltip);
+            _comboStatistics.setVisibleItemCount(50);
+
+            _comboStatistics.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onSelectStatistic();
+               }
+            });
+         }
+
+         {
+            /*
+             * combo: year
+             */
+
+            _comboYear = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+            _comboYear.setToolTipText(Messages.Tour_Book_Combo_year_tooltip);
+            _comboYear.setVisibleItemCount(50);
+
+            GridDataFactory
+                  .fillDefaults()//
+                  .indent(widgetSpacing, 0)
+                  .hint(_pc.convertWidthInCharsToPixels(_isOSX ? 12 : _isLinux ? 12 : 5), SWT.DEFAULT)
+                  .applyTo(_comboYear);
+
+            _comboYear.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onSelectYear();
+               }
+            });
+         }
+
+         {
+            /*
+             * combo: year numbers
+             */
+
+            _comboNumberOfYears = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+            _comboNumberOfYears.setToolTipText(Messages.tour_statistic_number_of_years);
+            _comboNumberOfYears.setVisibleItemCount(50);
+
+            GridDataFactory
+                  .fillDefaults()//
+                  .indent(2, 0)
+                  .hint(_pc.convertWidthInCharsToPixels(_isOSX ? 8 : _isLinux ? 8 : 4), SWT.DEFAULT)
+                  .applyTo(_comboNumberOfYears);
+
+            _comboNumberOfYears.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onSelectYear();
+               }
+            });
+         }
+
+         {
+            /*
+             * combo: sequence for stacked charts
+             */
+
+            _comboBarVerticalOrder = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+            _comboBarVerticalOrder.setToolTipText(Messages.Tour_Statistic_Combo_BarVOrder_Tooltip);
+            _comboBarVerticalOrder.setVisibleItemCount(50);
+            _comboBarVerticalOrder.setVisible(false);
+
+            GridDataFactory
+                  .fillDefaults()//
+                  .indent(widgetSpacing, 0)
+                  //						.hint(defaultTextSize.x, SWT.DEFAULT)
+                  .applyTo(_comboBarVerticalOrder);
+
+            _comboBarVerticalOrder.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onSelectBarVerticalOrder();
+               }
+            });
+         }
+      }
+   }
+
+   @Override
+   public void dispose() {
+
+      // dispose all statistic resources
+      for (final TourbookStatistic statistic : getAvailableStatistics()) {
+         statistic.dispose();
+      }
+
+      getViewSite().getPage().removePartListener(_partListener);
+      getSite().getPage().removePostSelectionListener(_postSelectionListener);
+      TourManager.getInstance().removeTourEventListener(_tourEventListener);
+
+      _prefStore.removePropertyChangeListener(_prefChangeListener);
+      _prefStoreCommon.removePropertyChangeListener(_prefChangeListenerCommon);
+
+      super.dispose();
+   }
+
+   /**
+    * @param defaultYear
+    * @return Returns the index for the active year or <code>-1</code> when there are no years
+    *         available
+    */
+   private int getActiveYearComboboxIndex(final int defaultYear) {
+
+      int selectedYearIndex = -1;
+
+      if (_availableYears == null) {
+         return selectedYearIndex;
+      }
+
+      /*
+       * try to get the year index for the default year
+       */
+      if (defaultYear != -1) {
+
+         int yearIndex = 0;
+         for (final int year : _availableYears.toArray()) {
+
+            if (year == defaultYear) {
+
+               _selectedYear = defaultYear;
+
+               return yearIndex;
+            }
+            yearIndex++;
+         }
+      }
+
+      /*
+       * try to get year index of the selected year
+       */
+      int yearIndex = 0;
+      for (final int year : _availableYears.toArray()) {
+         if (year == _selectedYear) {
+            selectedYearIndex = yearIndex;
+            break;
+         }
+         yearIndex++;
+      }
+
+      return selectedYearIndex;
+   }
+
+   /**
+    * @return Returns all statistic plugins which are displayed in the statistic combo box
+    */
+   private ArrayList<TourbookStatistic> getAvailableStatistics() {
+
+      if (_allStatisticProvider == null) {
+         _allStatisticProvider = StatisticManager.getStatisticProviders();
+      }
+
+      return _allStatisticProvider;
+   }
+
+   /**
+    * @return Returns number of years which are selected in the combobox
+    */
+   private int getNumberOfYears() {
+
+      int numberOfYears = 1;
+      final int selectedIndex = _comboNumberOfYears.getSelectionIndex();
+
+      if (selectedIndex != -1) {
+         numberOfYears = selectedIndex + 1;
+      }
+
+      return numberOfYears;
+   }
+
+   @Override
+   public ArrayList<TourData> getSelectedTours() {
+
+      if (_activeStatistic == null) {
+         return null;
+      }
+
+      final Long selectedTourId = _activeStatistic.getSelectedTour();
+      if (selectedTourId == null) {
+         return null;
+      }
+
+      final TourData selectedTourData = TourManager.getInstance().getTourData(selectedTourId);
+      if (selectedTourData == null) {
+         return null;
+      } else {
+         final ArrayList<TourData> selectedTours = new ArrayList<>();
+         selectedTours.add(selectedTourData);
+         return selectedTours;
+      }
+   }
+
+   private void initUI(final Composite parent) {
+
+      _pc = new PixelConverter(parent);
+
+      final GC gc = new GC(parent);
+      {
+         _minimumComboWidth = gc.textExtent(COMBO_MINIMUM_WIDTH).x;
+         _maximumComboWidth = gc.textExtent(COMBO_MAXIMUM_WIDTH).x;
+      }
+      gc.dispose();
+   }
 
-					if (part == StatisticView.this) {
-						return;
-					}
-
-					if (((TourEvent) propertyData).isTourModified) {
-						/*
-						 * ignore edit changes because the statistics show data only from saved data
-						 */
-						return;
-					}
+   private void onSelectBarVerticalOrder() {
 
-					_isInUpdateUI = true;
-
-					// update statistics
-					updateStatistic();
-
-					_isInUpdateUI = false;
-
-				} else if (eventId == TourEventId.UPDATE_UI || //
-						eventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
-
-					updateStatistic();
-				}
-			}
-		};
-		TourManager.getInstance().addTourEventListener(_tourEventListener);
-	}
-
-	public boolean canFireEvents() {
-
-		return _isInUpdateUI == false;
-	}
-
-	private void createActions() {
-
-		_actionStatisticOptions = new ActionStatisticOptions();
-		_actionSynchChartScale = new ActionSynchChartScale(this);
-	}
-
-	@Override
-	public void createPartControl(final Composite parent) {
-
-		initUI(parent);
-
-		createUI(parent);
-
-		createActions();
-		updateUI();
-
-		addPartListener();
-		addPrefListener();
-		addSelectionListener();
-		addTourEventListener();
-
-		/*
-		 * Start async that the workspace is fully initialized with all data filters
-		 */
-		parent.getDisplay().asyncExec(new Runnable() {
-			@Override
-			public void run() {
-
-				_activePerson = TourbookPlugin.getActivePerson();
-				_activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
-
-				restoreState();
-			}
-		});
-	}
-
-	private void createUI(final Composite parent) {
-
-//		GridLayoutFactory.fillDefaults().applyTo(parent);
-
-		_statContainer = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(_statContainer);
-		{
-			createUI_10_Toolbar(_statContainer);
-
-			// pagebook: statistics
-			_pageBookStatistic = new PageBook(_statContainer, SWT.NONE);
-			_pageBookStatistic.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		}
-	}
-
-	private void createUI_10_Toolbar(final Composite parent) {
-
-		final int widgetSpacing = 15;
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory
-				.fillDefaults()//
-				.grab(true, false)
-				.align(SWT.BEGINNING, SWT.FILL)
-				.applyTo(container);
-		GridLayoutFactory
-				.fillDefaults()//
-				.numColumns(6)
-				.margins(3, 3)
-				.applyTo(container);
-		{
-			{
-				/*
-				 * combo: statistics
-				 */
-
-				_comboStatistics = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-				_comboStatistics.setToolTipText(Messages.Tour_Book_Combo_statistic_tooltip);
-				_comboStatistics.setVisibleItemCount(50);
-
-				_comboStatistics.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-						onSelectStatistic();
-					}
-				});
-			}
-
-			{
-				/*
-				 * combo: year
-				 */
-
-				_comboYear = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-				_comboYear.setToolTipText(Messages.Tour_Book_Combo_year_tooltip);
-				_comboYear.setVisibleItemCount(50);
-
-				GridDataFactory
-						.fillDefaults()//
-						.indent(widgetSpacing, 0)
-						.hint(_pc.convertWidthInCharsToPixels(_isOSX ? 12 : _isLinux ? 12 : 5), SWT.DEFAULT)
-						.applyTo(_comboYear);
-
-				_comboYear.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-						onSelectYear();
-					}
-				});
-			}
-
-			{
-				/*
-				 * combo: year numbers
-				 */
-
-				_comboNumberOfYears = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-				_comboNumberOfYears.setToolTipText(Messages.tour_statistic_number_of_years);
-				_comboNumberOfYears.setVisibleItemCount(50);
-
-				GridDataFactory
-						.fillDefaults()//
-						.indent(2, 0)
-						.hint(_pc.convertWidthInCharsToPixels(_isOSX ? 8 : _isLinux ? 8 : 4), SWT.DEFAULT)
-						.applyTo(_comboNumberOfYears);
-
-				_comboNumberOfYears.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-						onSelectYear();
-					}
-				});
-			}
-
-			{
-				/*
-				 * combo: sequence for stacked charts
-				 */
-
-				_comboBarVerticalOrder = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-				_comboBarVerticalOrder.setToolTipText(Messages.Tour_Statistic_Combo_BarVOrder_Tooltip);
-				_comboBarVerticalOrder.setVisibleItemCount(50);
-				_comboBarVerticalOrder.setVisible(false);
-
-				GridDataFactory
-						.fillDefaults()//
-						.indent(widgetSpacing, 0)
-						//						.hint(defaultTextSize.x, SWT.DEFAULT)
-						.applyTo(_comboBarVerticalOrder);
-
-				_comboBarVerticalOrder.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-						onSelectBarVerticalOrder();
-					}
-				});
-			}
-		}
-	}
-
-	@Override
-	public void dispose() {
-
-		// dispose all statistic resources
-		for (final TourbookStatistic statistic : getAvailableStatistics()) {
-			statistic.dispose();
-		}
-
-		getViewSite().getPage().removePartListener(_partListener);
-		getSite().getPage().removePostSelectionListener(_postSelectionListener);
-		TourManager.getInstance().removeTourEventListener(_tourEventListener);
-
-		_prefStore.removePropertyChangeListener(_prefChangeListener);
-		_prefStoreCommon.removePropertyChangeListener(_prefChangeListenerCommon);
-
-		super.dispose();
-	}
-
-	/**
-	 * @param defaultYear
-	 * @return Returns the index for the active year or <code>-1</code> when there are no years
-	 *         available
-	 */
-	private int getActiveYearComboboxIndex(final int defaultYear) {
-
-		int selectedYearIndex = -1;
-
-		if (_availableYears == null) {
-			return selectedYearIndex;
-		}
-
-		/*
-		 * try to get the year index for the default year
-		 */
-		if (defaultYear != -1) {
-
-			int yearIndex = 0;
-			for (final int year : _availableYears.toArray()) {
-
-				if (year == defaultYear) {
-
-					_selectedYear = defaultYear;
-
-					return yearIndex;
-				}
-				yearIndex++;
-			}
-		}
-
-		/*
-		 * try to get year index of the selected year
-		 */
-		int yearIndex = 0;
-		for (final int year : _availableYears.toArray()) {
-			if (year == _selectedYear) {
-				selectedYearIndex = yearIndex;
-				break;
-			}
-			yearIndex++;
-		}
-
-		return selectedYearIndex;
-	}
-
-	/**
-	 * @return Returns all statistic plugins which are displayed in the statistic combo box
-	 */
-	private ArrayList<TourbookStatistic> getAvailableStatistics() {
-
-		if (_allStatisticProvider == null) {
-			_allStatisticProvider = StatisticManager.getStatisticProviders();
-		}
-
-		return _allStatisticProvider;
-	}
-
-	/**
-	 * @return Returns number of years which are selected in the combobox
-	 */
-	private int getNumberOfYears() {
-
-		int numberOfYears = 1;
-		final int selectedIndex = _comboNumberOfYears.getSelectionIndex();
-
-		if (selectedIndex != -1) {
-			numberOfYears = selectedIndex + 1;
-		}
-
-		return numberOfYears;
-	}
-
-	@Override
-	public ArrayList<TourData> getSelectedTours() {
-
-		if (_activeStatistic == null) {
-			return null;
-		}
-
-		final Long selectedTourId = _activeStatistic.getSelectedTour();
-		if (selectedTourId == null) {
-			return null;
-		}
-
-		final TourData selectedTourData = TourManager.getInstance().getTourData(selectedTourId);
-		if (selectedTourData == null) {
-			return null;
-		} else {
-			final ArrayList<TourData> selectedTours = new ArrayList<>();
-			selectedTours.add(selectedTourData);
-			return selectedTours;
-		}
-	}
-
-	private void initUI(final Composite parent) {
-
-		_pc = new PixelConverter(parent);
-
-		final GC gc = new GC(parent);
-		{
-			_minimumComboWidth = gc.textExtent(COMBO_MINIMUM_WIDTH).x;
-			_maximumComboWidth = gc.textExtent(COMBO_MAXIMUM_WIDTH).x;
-		}
-		gc.dispose();
-	}
+      if (_activeStatistic == null) {
+         return;
+      }
 
-	private void onSelectBarVerticalOrder() {
+      _activeStatistic.setBarVerticalOrder(_comboBarVerticalOrder.getSelectionIndex());
+   }
 
-		if (_activeStatistic == null) {
-			return;
-		}
+   private void onSelectStatistic() {
 
-		_activeStatistic.setBarVerticalOrder(_comboBarVerticalOrder.getSelectionIndex());
-	}
+      if (setActiveStatistic() == false) {
+         return;
+      }
 
-	private void onSelectStatistic() {
+      updateStatistic_10_NoReload();
+   }
 
-		if (setActiveStatistic() == false) {
-			return;
-		}
+   private void onSelectYear() {
 
-		updateStatistic_10_NoReload();
-	}
+      final int selectedItem = _comboYear.getSelectionIndex();
+      if (selectedItem != -1) {
 
-	private void onSelectYear() {
+         _selectedYear = Integer.parseInt(_comboYear.getItem(selectedItem));
 
-		final int selectedItem = _comboYear.getSelectionIndex();
-		if (selectedItem != -1) {
+         updateStatistic_10_NoReload();
+      }
+   }
 
-			_selectedYear = Integer.parseInt(_comboYear.getItem(selectedItem));
+   void refreshStatisticProvider() {
 
-			updateStatistic_10_NoReload();
-		}
-	}
+      if (setActiveStatistic() == false) {
+         return;
+      }
 
-	void refreshStatisticProvider() {
+      _allStatisticProvider = StatisticManager.getStatisticProviders();
 
-		if (setActiveStatistic() == false) {
-			return;
-		}
+      _comboStatistics.removeAll();
+      int indexCounter = 0;
+      int selectedIndex = 0;
 
-		_allStatisticProvider = StatisticManager.getStatisticProviders();
+      // fill combobox with statistic names
+      for (final TourbookStatistic statistic : getAvailableStatistics()) {
 
-		_comboStatistics.removeAll();
-		int indexCounter = 0;
-		int selectedIndex = 0;
+         _comboStatistics.add(statistic.plugin_VisibleName);
 
-		// fill combobox with statistic names
-		for (final TourbookStatistic statistic : getAvailableStatistics()) {
+         if (_activeStatistic != null && _activeStatistic.plugin_StatisticId.equals(statistic.plugin_StatisticId)) {
+            selectedIndex = indexCounter;
+         }
 
-			_comboStatistics.add(statistic.plugin_VisibleName);
+         indexCounter++;
+      }
 
-			if (_activeStatistic != null && _activeStatistic.plugin_StatisticId.equals(statistic.plugin_StatisticId)) {
-				selectedIndex = indexCounter;
-			}
+      // reselect stat
+      _comboStatistics.select(selectedIndex);
+      onSelectStatistic();
+   }
 
-			indexCounter++;
-		}
+   /**
+    * create the year list for all tours and fill the year combobox with the available years
+    */
+   private void refreshYearCombobox() {
 
-		// reselect stat
-		_comboStatistics.select(selectedIndex);
-		onSelectStatistic();
-	}
+      final SQLFilter filter = new SQLFilter(SQLFilter.TAG_FILTER);
 
-	/**
-	 * create the year list for all tours and fill the year combobox with the available years
-	 */
-	private void refreshYearCombobox() {
+      String fromTourData;
 
-		final SQLFilter filter = new SQLFilter(SQLFilter.TAG_FILTER);
+      final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+      if (sqlFilter.isTagFilterActive()) {
 
-		String fromTourData;
+         // with tag filter
 
-		final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
-		if (sqlFilter.isTagFilterActive()) {
+         fromTourData = NL
 
-			// with tag filter
+               + "FROM (			" + NL //$NON-NLS-1$
 
-			fromTourData = NL
+               + " SELECT			" + NL //$NON-NLS-1$
 
-					+ "FROM (			" + NL //$NON-NLS-1$
+               + "  StartYear		" + NL //$NON-NLS-1$
 
-					+ " SELECT			" + NL //$NON-NLS-1$
+               + ("  FROM " + TourDatabase.TABLE_TOUR_DATA) + NL//$NON-NLS-1$
 
-					+ "  StartYear		" + NL //$NON-NLS-1$
+               // get tag id's
+               + "  LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + NL //$NON-NLS-1$ //$NON-NLS-2$
+               + "  ON tourID = jTdataTtag.TourData_tourId	" + NL //$NON-NLS-1$
 
-					+ ("  FROM " + TourDatabase.TABLE_TOUR_DATA) + NL//$NON-NLS-1$
+               + "  WHERE 1=1		" + NL //$NON-NLS-1$
+               + sqlFilter.getWhereClause()
 
-					// get tag id's
-					+ "  LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + NL //$NON-NLS-1$ //$NON-NLS-2$
-					+ "  ON tourID = jTdataTtag.TourData_tourId	" + NL //$NON-NLS-1$
+               + ") td				" + NL//$NON-NLS-1$
+         ;
 
-					+ "  WHERE 1=1		" + NL //$NON-NLS-1$
-					+ sqlFilter.getWhereClause()
+      } else {
 
-					+ ") td				" + NL//$NON-NLS-1$
-			;
+         // without tag filter
 
-		} else {
+         fromTourData = NL
 
-			// without tag filter
+               + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //$NON-NLS-1$
 
-			fromTourData = NL
+               + " WHERE 1=1			" + NL //$NON-NLS-1$
+               + sqlFilter.getWhereClause() + NL;
+      }
 
-					+ " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //$NON-NLS-1$
+      final String sqlString = NL +
 
-					+ " WHERE 1=1			" + NL //$NON-NLS-1$
-					+ sqlFilter.getWhereClause() + NL;
-		}
+            "SELECT						" + NL //$NON-NLS-1$
 
-		final String sqlString = NL +
+            + " StartYear				" + NL //$NON-NLS-1$
 
-				"SELECT						" + NL //$NON-NLS-1$
+            + fromTourData
 
-				+ " StartYear				" + NL //$NON-NLS-1$
+            + " GROUP BY STARTYEAR		" + NL //$NON-NLS-1$
+            + " ORDER BY STARTYEAR		" + NL//			//$NON-NLS-1$
+      ;
+      _availableYears = new TIntArrayList();
 
-				+ fromTourData
+      try {
+         final Connection conn = TourDatabase.getInstance().getConnection();
+         final PreparedStatement statement = conn.prepareStatement(sqlString);
+         filter.setParameters(statement, 1);
 
-				+ " GROUP BY STARTYEAR		" + NL //$NON-NLS-1$
-				+ " ORDER BY STARTYEAR		" + NL//			//$NON-NLS-1$
-		;
-		_availableYears = new TIntArrayList();
+         final ResultSet result = statement.executeQuery();
+
+         while (result.next()) {
+            _availableYears.add(result.getInt(1));
+         }
 
-		try {
-			final Connection conn = TourDatabase.getInstance().getConnection();
-			final PreparedStatement statement = conn.prepareStatement(sqlString);
-			filter.setParameters(statement, 1);
+         conn.close();
 
-			final ResultSet result = statement.executeQuery();
+      } catch (final SQLException e) {
+         UI.showSQLException(e);
+      }
 
-			while (result.next()) {
-				_availableYears.add(result.getInt(1));
-			}
+      _comboYear.removeAll();
 
-			conn.close();
+      /*
+       * add all years of the tours and the current year
+       */
+      final int thisYear = LocalDate.now().getYear();
 
-		} catch (final SQLException e) {
-			UI.showSQLException(e);
-		}
+      boolean isThisYearSet = false;
 
-		_comboYear.removeAll();
+      for (final int year : _availableYears.toArray()) {
 
-		/*
-		 * add all years of the tours and the current year
-		 */
-		final int thisYear = LocalDate.now().getYear();
+         if (year == thisYear) {
+            isThisYearSet = true;
+         }
 
-		boolean isThisYearSet = false;
+         _comboYear.add(Integer.toString(year));
+      }
 
-		for (final int year : _availableYears.toArray()) {
+      // add currenty year if not set
+      if (isThisYearSet == false) {
+         _availableYears.add(thisYear);
+         _comboYear.add(Integer.toString(thisYear));
+      }
+   }
 
-			if (year == thisYear) {
-				isThisYearSet = true;
-			}
+   /**
+    * Restore selected statistic
+    */
+   void restoreState() {
+
+      final ArrayList<TourbookStatistic> allAvailableStatistics = getAvailableStatistics();
+      if (allAvailableStatistics.size() == 0) {
+         return;
+      }
+
+      // select number of years
+      final int numberOfYearsIndex = Util.getStateInt(_state, STATE_NUMBER_OF_YEARS, 0);
+      _comboNumberOfYears.select(numberOfYearsIndex);
+
+      // select year
+      final int defaultYear = Util.getStateInt(_state, STATE_SELECTED_YEAR, -1);
+      refreshYearCombobox();
+      selectYear(defaultYear);
 
-			_comboYear.add(Integer.toString(year));
-		}
+      // select statistic
+      int prevStatIndex = 0;
+      final String mementoStatisticId = _state.get(STATE_SELECTED_STATISTIC);
+      if (mementoStatisticId != null) {
+         int statIndex = 0;
+         for (final TourbookStatistic statistic : allAvailableStatistics) {
+            if (mementoStatisticId.equalsIgnoreCase(statistic.plugin_StatisticId)) {
+               prevStatIndex = statIndex;
+               break;
+            }
+            statIndex++;
+         }
+      }
 
-		// add currenty year if not set
-		if (isThisYearSet == false) {
-			_availableYears.add(thisYear);
-			_comboYear.add(Integer.toString(thisYear));
-		}
-	}
+      // select statistic item
+      _comboStatistics.select(prevStatIndex);
+      onSelectStatistic();
 
-	/**
-	 * Restore selected statistic
-	 */
-	void restoreState() {
+      // restore statistic state, e.g. reselect previous selection
+      if (_state != null) {
+         allAvailableStatistics.get(prevStatIndex).restoreState(_state);
+      }
+   }
 
-		final ArrayList<TourbookStatistic> allAvailableStatistics = getAvailableStatistics();
-		if (allAvailableStatistics.size() == 0) {
-			return;
-		}
+   @PersistState
+   private void saveState() {
 
-		// select number of years
-		final int numberOfYearsIndex = Util.getStateInt(_state, STATE_NUMBER_OF_YEARS, 0);
-		_comboNumberOfYears.select(numberOfYearsIndex);
+      final ArrayList<TourbookStatistic> allAvailableStatistics = getAvailableStatistics();
+      if (allAvailableStatistics.size() == 0) {
+         return;
+      }
 
-		// select year
-		final int defaultYear = Util.getStateInt(_state, STATE_SELECTED_YEAR, -1);
-		refreshYearCombobox();
-		selectYear(defaultYear);
+      // keep statistic id for the selected statistic
+      final int selectionIndex = _comboStatistics.getSelectionIndex();
+      if (selectionIndex != -1) {
+         _state.put(STATE_SELECTED_STATISTIC, allAvailableStatistics.get(selectionIndex).plugin_StatisticId);
+      }
 
-		// select statistic
-		int prevStatIndex = 0;
-		final String mementoStatisticId = _state.get(STATE_SELECTED_STATISTIC);
-		if (mementoStatisticId != null) {
-			int statIndex = 0;
-			for (final TourbookStatistic statistic : allAvailableStatistics) {
-				if (mementoStatisticId.equalsIgnoreCase(statistic.plugin_StatisticId)) {
-					prevStatIndex = statIndex;
-					break;
-				}
-				statIndex++;
-			}
-		}
+      for (final TourbookStatistic tourbookStatistic : allAvailableStatistics) {
+         tourbookStatistic.saveState(_state);
+      }
 
-		// select statistic item
-		_comboStatistics.select(prevStatIndex);
-		onSelectStatistic();
+      _state.put(STATE_NUMBER_OF_YEARS, _comboNumberOfYears.getSelectionIndex());
+      _state.put(STATE_SELECTED_YEAR, _selectedYear);
+   }
 
-		// restore statistic state, e.g. reselect previous selection
-		if (_state != null) {
-			allAvailableStatistics.get(prevStatIndex).restoreState(_state);
-		}
-	}
+   private void selectYear(final int defaultYear) {
 
-	@PersistState
-	private void saveState() {
+      int selectedYearIndex = getActiveYearComboboxIndex(defaultYear);
+      if (selectedYearIndex == -1) {
 
-		final ArrayList<TourbookStatistic> allAvailableStatistics = getAvailableStatistics();
-		if (allAvailableStatistics.size() == 0) {
-			return;
-		}
+         /*
+          * the active year was not found in the combo box, it's possible that the combo box needs
+          * to be update
+          */
 
-		// keep statistic id for the selected statistic
-		final int selectionIndex = _comboStatistics.getSelectionIndex();
-		if (selectionIndex != -1) {
-			_state.put(STATE_SELECTED_STATISTIC, allAvailableStatistics.get(selectionIndex).plugin_StatisticId);
-		}
+         refreshYearCombobox();
+         selectedYearIndex = getActiveYearComboboxIndex(defaultYear);
 
-		for (final TourbookStatistic tourbookStatistic : allAvailableStatistics) {
-			tourbookStatistic.saveState(_state);
-		}
+         if (selectedYearIndex == -1) {
 
-		_state.put(STATE_NUMBER_OF_YEARS, _comboNumberOfYears.getSelectionIndex());
-		_state.put(STATE_SELECTED_YEAR, _selectedYear);
-	}
+            // year is still not selected
+            final int yearCount = _comboYear.getItemCount();
 
-	private void selectYear(final int defaultYear) {
+            // reselect the youngest year if years are available
+            if (yearCount > 0) {
+               selectedYearIndex = yearCount - 1;
+               _selectedYear = Integer.parseInt(_comboYear.getItem(yearCount - 1));
+            }
+         }
+      }
 
-		int selectedYearIndex = getActiveYearComboboxIndex(defaultYear);
-		if (selectedYearIndex == -1) {
+      _comboYear.select(selectedYearIndex);
+   }
 
-			/*
-			 * the active year was not found in the combo box, it's possible that the combo box needs
-			 * to be update
-			 */
+   /**
+    * @return Returns <code>true</code> when a statistic is selected and {@link #_activeStatistic}
+    *         is valid.
+    */
+   private boolean setActiveStatistic() {
 
-			refreshYearCombobox();
-			selectedYearIndex = getActiveYearComboboxIndex(defaultYear);
+      // get selected statistic
+      final int selectedIndex = _comboStatistics.getSelectionIndex();
+      if (selectedIndex == -1) {
+         _activeStatistic = null;
+         return false;
+      }
 
-			if (selectedYearIndex == -1) {
+      final ArrayList<TourbookStatistic> allAvailableStatistics = getAvailableStatistics();
+      if (allAvailableStatistics.size() == 0) {
+         return false;
+      }
 
-				// year is still not selected
-				final int yearCount = _comboYear.getItemCount();
+      final TourbookStatistic tourbookStatistic = allAvailableStatistics.get(selectedIndex);
 
-				// reselect the youngest year if years are available
-				if (yearCount > 0) {
-					selectedYearIndex = yearCount - 1;
-					_selectedYear = Integer.parseInt(_comboYear.getItem(yearCount - 1));
-				}
-			}
-		}
+      Composite statisticUI = tourbookStatistic.getUIControl();
 
-		_comboYear.select(selectedYearIndex);
-	}
+      if (statisticUI == null) {
 
-	/**
-	 * @return Returns <code>true</code> when a statistic is selected and {@link #_activeStatistic}
-	 *         is valid.
-	 */
-	private boolean setActiveStatistic() {
+         // create statistic UI in the pagebook for the selected statistic
 
-		// get selected statistic
-		final int selectedIndex = _comboStatistics.getSelectionIndex();
-		if (selectedIndex == -1) {
-			_activeStatistic = null;
-			return false;
-		}
+         statisticUI = new Composite(_pageBookStatistic, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, true).applyTo(statisticUI);
+         statisticUI.setLayout(new FillLayout());
+         {
+            tourbookStatistic.createUI(statisticUI, getViewSite());
+            tourbookStatistic.restoreStateEarly(_state);
+         }
+      }
 
-		final ArrayList<TourbookStatistic> allAvailableStatistics = getAvailableStatistics();
-		if (allAvailableStatistics.size() == 0) {
-			return false;
-		}
+      _activeStatistic = tourbookStatistic;
 
-		final TourbookStatistic tourbookStatistic = allAvailableStatistics.get(selectedIndex);
+      return true;
+   }
 
-		Composite statisticUI = tourbookStatistic.getUIControl();
+   @Override
+   public void setFocus() {
 
-		if (statisticUI == null) {
+      _comboStatistics.setFocus();
+   }
 
-			// create statistic UI in the pagebook for the selected statistic
+   /**
+    * Update all statistics which have been created because person or tour type could be changed and
+    * reload data.
+    *
+    * @param person
+    * @param tourTypeFilter
+    */
+   private void updateStatistic() {
 
-			statisticUI = new Composite(_pageBookStatistic, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, true).applyTo(statisticUI);
-			GridLayoutFactory.fillDefaults().applyTo(statisticUI);
-			{
-				tourbookStatistic.createUI(statisticUI, getViewSite());
-				tourbookStatistic.restoreStateEarly(_state);
-			}
-		}
+      if (setActiveStatistic() == false) {
+         return;
+      }
 
-		_activeStatistic = tourbookStatistic;
+      refreshYearCombobox();
+      selectYear(-1);
 
-		return true;
-	}
+      // tell all existing statistics the data have changed
+      for (final TourbookStatistic statistic : getAvailableStatistics()) {
 
-	@Override
-	public void setFocus() {
+         if (statistic.getUIControl() != null) {
 
-		_comboStatistics.setFocus();
-	}
+            statistic.setSynchScale(_isSynchScaleEnabled);
+            statistic.setDataDirty();
+         }
+      }
 
-	/**
-	 * Update all statistics which have been created because person or tour type could be changed and
-	 * reload data.
-	 *
-	 * @param person
-	 * @param tourTypeFilter
-	 */
-	private void updateStatistic() {
+      // refresh current statistic
+      final StatisticContext statContext = new StatisticContext(
+            _activePerson,
+            _activeTourTypeFilter,
+            _selectedYear,
+            getNumberOfYears());
 
-		if (setActiveStatistic() == false) {
-			return;
-		}
+      statContext.isRefreshData = true;
+      statContext.eventManager = this;
 
-		refreshYearCombobox();
-		selectYear(-1);
+      _activeStatistic.updateStatistic(statContext);
 
-		// tell all existing statistics the data have changed
-		for (final TourbookStatistic statistic : getAvailableStatistics()) {
+      updateStatistic_20_PostRefresh(statContext);
+   }
 
-			if (statistic.getUIControl() != null) {
+   /**
+    */
+   private void updateStatistic_10_NoReload() {
 
-				statistic.setSynchScale(_isSynchScaleEnabled);
-				statistic.setDataDirty();
-			}
-		}
+      // keep current year
+      if (_selectedYear == -1) {
+         return;
+      }
 
-		// refresh current statistic
-		final StatisticContext statContext = new StatisticContext(
-				_activePerson,
-				_activeTourTypeFilter,
-				_selectedYear,
-				getNumberOfYears());
+      if (setActiveStatistic() == false) {
+         // statistic is not available
+         return;
+      }
 
-		statContext.isRefreshData = true;
-		statContext.eventManager = this;
+      // display selected statistic
+      _pageBookStatistic.showPage(_activeStatistic.getUIControl());
 
-		_activeStatistic.updateStatistic(statContext);
+      selectYear(-1);
 
-		updateStatistic_20_PostRefresh(statContext);
-	}
+      _activeStatistic.setSynchScale(_isSynchScaleEnabled);
 
-	/**
-	 */
-	private void updateStatistic_10_NoReload() {
+      final StatisticContext statContext = new StatisticContext(
+            _activePerson,
+            _activeTourTypeFilter,
+            _selectedYear,
+            getNumberOfYears());
 
-		// keep current year
-		if (_selectedYear == -1) {
-			return;
-		}
+      _activeStatistic.updateStatistic(statContext);
 
-		if (setActiveStatistic() == false) {
-			// statistic is not available
-			return;
-		}
+      updateStatistic_20_PostRefresh(statContext);
+      updateUI_Toolbar();
+   }
 
-		// display selected statistic
-		_pageBookStatistic.showPage(_activeStatistic.getUIControl());
+   private void updateStatistic_20_PostRefresh(final StatisticContext statContext) {
 
-		selectYear(-1);
+      if (statContext.outIsBarReorderingSupported) {
 
-		_activeStatistic.setSynchScale(_isSynchScaleEnabled);
+         _comboBarVerticalOrder.setVisible(true);
 
-		final StatisticContext statContext = new StatisticContext(
-				_activePerson,
-				_activeTourTypeFilter,
-				_selectedYear,
-				getNumberOfYears());
+         updateStatistic_30_BarOrdering(statContext);
 
-		_activeStatistic.updateStatistic(statContext);
+         // vertical order feature is used
+         _isVerticalOrderDisabled = false;
 
-		updateStatistic_20_PostRefresh(statContext);
-		updateUI_Toolbar();
-	}
+      } else {
 
-	private void updateStatistic_20_PostRefresh(final StatisticContext statContext) {
+         if (_isVerticalOrderDisabled == false) {
 
-		if (statContext.outIsBarReorderingSupported) {
+            // disable vertical order feature
 
-			_comboBarVerticalOrder.setVisible(true);
+            _comboBarVerticalOrder.setVisible(false);
 
-			updateStatistic_30_BarOrdering(statContext);
+            _isVerticalOrderDisabled = true;
+         }
+      }
+   }
 
-			// vertical order feature is used
-			_isVerticalOrderDisabled = false;
+   private void updateStatistic_30_BarOrdering(final StatisticContext statContext) {
 
-		} else {
+      // check if enabled
+      if (!statContext.outIsUpdateBarNames) {
+         return;
+      }
 
-			if (_isVerticalOrderDisabled == false) {
+      _comboBarVerticalOrder.removeAll();
 
-				// disable vertical order feature
+      final String[] stackedNames = statContext.outBarNames;
 
-				_comboBarVerticalOrder.setVisible(false);
+      // hide combo when bars are not available
+      if (stackedNames == null) {
 
-				_isVerticalOrderDisabled = true;
-			}
-		}
-	}
+         _comboBarVerticalOrder.setEnabled(false);
+         _isVerticalOrderDisabled = true;
 
-	private void updateStatistic_30_BarOrdering(final StatisticContext statContext) {
+         return;
+      }
 
-		// check if enabled
-		if (!statContext.outIsUpdateBarNames) {
-			return;
-		}
+      for (final String name : stackedNames) {
+         _comboBarVerticalOrder.add(name);
+      }
 
-		_comboBarVerticalOrder.removeAll();
+      final int selectedIndex = statContext.outVerticalBarIndex;
+      final int checkedIndex = selectedIndex >= _comboBarVerticalOrder.getItemCount() ? 0 : selectedIndex;
 
-		final String[] stackedNames = statContext.outBarNames;
+      _comboBarVerticalOrder.select(checkedIndex);
+      _comboBarVerticalOrder.setEnabled(true);
 
-		// hide combo when bars are not available
-		if (stackedNames == null) {
+      /*
+       * Adjust the combo width
+       */
+      final int preferredWidth = _comboBarVerticalOrder.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x;
 
-			_comboBarVerticalOrder.setEnabled(false);
-			_isVerticalOrderDisabled = true;
+      final GridData gd = (GridData) _comboBarVerticalOrder.getLayoutData();
+      gd.widthHint = preferredWidth > _maximumComboWidth //
+            ? _maximumComboWidth
+            : preferredWidth < _minimumComboWidth //
+                  ? _minimumComboWidth
+                  : preferredWidth;
 
-			return;
-		}
+      _statContainer.layout(true, true);
+   }
 
-		for (final String name : stackedNames) {
-			_comboBarVerticalOrder.add(name);
-		}
+   private void updateUI() {
 
-		final int selectedIndex = statContext.outVerticalBarIndex;
-		final int checkedIndex = selectedIndex >= _comboBarVerticalOrder.getItemCount() ? 0 : selectedIndex;
+      // fill combobox with number of years
+      for (int years = 1; years <= 100; years++) {
+         _comboNumberOfYears.add(Integer.toString(years));
+      }
 
-		_comboBarVerticalOrder.select(checkedIndex);
-		_comboBarVerticalOrder.setEnabled(true);
+      // fill combobox with statistic names
+      for (final TourbookStatistic statistic : getAvailableStatistics()) {
+         _comboStatistics.add(statistic.plugin_VisibleName);
+      }
+   }
 
-		/*
-		 * Adjust the combo width
-		 */
-		final int preferredWidth = _comboBarVerticalOrder.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x;
+   /**
+    * Each statistic has it's own toolbar
+    */
+   private void updateUI_Toolbar() {
 
-		final GridData gd = (GridData) _comboBarVerticalOrder.getLayoutData();
-		gd.widthHint = preferredWidth > _maximumComboWidth //
-				? _maximumComboWidth
-				: preferredWidth < _minimumComboWidth //
-						? _minimumComboWidth
-						: preferredWidth;
+      // update view toolbar
+      final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+      tbm.removeAll();
 
-		_statContainer.layout(true, true);
-	}
+      tbm.add(_actionSynchChartScale);
+      tbm.add(_actionStatisticOptions);
 
-	private void updateUI() {
+      // add actions from the statistic
+      _activeStatistic.updateToolBar();
 
-		// fill combobox with number of years
-		for (int years = 1; years <= 100; years++) {
-			_comboNumberOfYears.add(Integer.toString(years));
-		}
+      // update toolbar to show added items
+      tbm.update(true);
 
-		// fill combobox with statistic names
-		for (final TourbookStatistic statistic : getAvailableStatistics()) {
-			_comboStatistics.add(statistic.plugin_VisibleName);
-		}
-	}
-
-	/**
-	 * Each statistic has it's own toolbar
-	 */
-	private void updateUI_Toolbar() {
-
-		// update view toolbar
-		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
-		tbm.removeAll();
-
-		tbm.add(_actionSynchChartScale);
-		tbm.add(_actionStatisticOptions);
-
-		// add actions from the statistic
-		_activeStatistic.updateToolBar();
-
-		// update toolbar to show added items
-		tbm.update(true);
-
-		// use slideout AFTER the toolbar is created/updated/filled, this creates it
-		_activeStatistic.setupStatisticSlideout(_slideoutStatisticOptions);
-		_slideoutStatisticOptions.setupGrid(//
-				_activeStatistic.getGridPrefPrefix(),
-				_activeStatistic.getEnabledGridOptions());
-	}
+      // use slideout AFTER the toolbar is created/updated/filled, this creates it
+      _activeStatistic.setupStatisticSlideout(_slideoutStatisticOptions);
+      _slideoutStatisticOptions.setupGrid(//
+            _activeStatistic.getGridPrefPrefix(),
+            _activeStatistic.getEnabledGridOptions());
+   }
 
 }

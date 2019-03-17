@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,24 +16,6 @@
 package net.tourbook.ui.tourChart;
 
 import java.util.ArrayList;
-
-import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IPartListener2;
-import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchPartReference;
-import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eclipse.ui.part.PageBook;
-import org.eclipse.ui.part.ViewPart;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -75,6 +57,24 @@ import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 import net.tourbook.ui.views.tourCatalog.TourCatalogView_ComparedTour;
 import net.tourbook.ui.views.tourSegmenter.TourSegmenterView;
 
+import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.part.PageBook;
+import org.eclipse.ui.part.ViewPart;
+
 // author: Wolfgang Schramm
 // create: 09.07.2007
 
@@ -82,882 +82,882 @@ import net.tourbook.ui.views.tourSegmenter.TourSegmenterView;
  * Shows the selected tour in a chart
  */
 public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoEventListener, ITourModifyListener,
-		IGeoCompareListener {
+      IGeoCompareListener {
 
-	public static final String			ID				= "net.tourbook.views.TourChartView";	//$NON-NLS-1$
+   public static final String      ID         = "net.tourbook.views.TourChartView"; //$NON-NLS-1$
 
-	private final IDialogSettings		_state		= TourbookPlugin.getState(ID);
-	private final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
+   private final IDialogSettings   _state     = TourbookPlugin.getState(ID);
+   private final IPreferenceStore  _prefStore = TourbookPlugin.getPrefStore();
 
-	private TourChartConfiguration	_tourChartConfig;
-	private TourData						_tourData;
-	private TourPhotoLink				_tourPhotoLink;
+   private TourChartConfiguration  _tourChartConfig;
+   private TourData                _tourData;
+   private TourPhotoLink           _tourPhotoLink;
 
-	/**
-	 * Chart update is forced, when previous selection was a photo link or current selection is a
-	 * photo link.
-	 */
-	private boolean						_isForceUpdate;
+   /**
+    * Chart update is forced, when previous selection was a photo link or current selection is a
+    * photo link.
+    */
+   private boolean                 _isForceUpdate;
 
-	private IPartListener2				_partListener;
-	private PostSelectionProvider		_postSelectionProvider;
-	private ISelectionListener			_postSelectionListener;
-	private IPropertyChangeListener	_prefChangeListener;
-	private ITourEventListener			_tourEventListener;
+   private IPartListener2          _partListener;
+   private PostSelectionProvider   _postSelectionProvider;
+   private ISelectionListener      _postSelectionListener;
+   private IPropertyChangeListener _prefChangeListener;
+   private ITourEventListener      _tourEventListener;
 
-	private boolean						_isInSaving;
-	private boolean						_isInSelectionChanged;
-	private boolean						_isInSliderPositionFired;
+   private boolean                 _isInSaving;
+   private boolean                 _isInSelectionChanged;
+   private boolean                 _isInSliderPositionFired;
 
-	private FormToolkit					_tk;
+   private FormToolkit             _tk;
 
-	/*
-	 * UI controls
-	 */
-	private PageBook						_pageBook;
-	private Composite						_pageNoData;
+   /*
+    * UI controls
+    */
+   private PageBook  _pageBook;
+   private Composite _pageNoData;
 
-	private TourChart						_tourChart;
+   private TourChart _tourChart;
 
-	private void addPartListener() {
+   private void addPartListener() {
 
-		_partListener = new IPartListener2() {
+      _partListener = new IPartListener2() {
 
-			@Override
-			public void partActivated(final IWorkbenchPartReference partRef) {
+         @Override
+         public void partActivated(final IWorkbenchPartReference partRef) {
 
-				if (partRef.getPart(false) == TourChartView.this) {
-//					_isPartActive = true;
-				}
-			}
+            if (partRef.getPart(false) == TourChartView.this) {
+//               _isPartActive = true;
+            }
+         }
 
-			@Override
-			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
+         @Override
+         public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
-			@Override
-			public void partClosed(final IWorkbenchPartReference partRef) {}
+         @Override
+         public void partClosed(final IWorkbenchPartReference partRef) {}
 
-			@Override
-			public void partDeactivated(final IWorkbenchPartReference partRef) {
+         @Override
+         public void partDeactivated(final IWorkbenchPartReference partRef) {
 
-				if (partRef.getPart(false) == TourChartView.this) {
-//					_isPartActive = false;
-				}
+            if (partRef.getPart(false) == TourChartView.this) {
+//               _isPartActive = false;
+            }
 
-				// ensure that at EACH part deactivation the photo tooltip gets hidden
-				_tourChart.partIsDeactivated();
-			}
+            // ensure that at EACH part deactivation the photo tooltip gets hidden
+            _tourChart.partIsDeactivated();
+         }
 
-			@Override
-			public void partHidden(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == TourChartView.this) {
-					_tourChart.partIsHidden();
-				}
-			}
+         @Override
+         public void partHidden(final IWorkbenchPartReference partRef) {
+            if (partRef.getPart(false) == TourChartView.this) {
+               _tourChart.partIsHidden();
+            }
+         }
 
-			@Override
-			public void partInputChanged(final IWorkbenchPartReference partRef) {}
+         @Override
+         public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
-			@Override
-			public void partOpened(final IWorkbenchPartReference partRef) {}
+         @Override
+         public void partOpened(final IWorkbenchPartReference partRef) {}
 
-			@Override
-			public void partVisible(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == TourChartView.this) {
-					_tourChart.partIsVisible();
-				}
-			}
-		};
+         @Override
+         public void partVisible(final IWorkbenchPartReference partRef) {
+            if (partRef.getPart(false) == TourChartView.this) {
+               _tourChart.partIsVisible();
+            }
+         }
+      };
 
-		getViewSite().getPage().addPartListener(_partListener);
-	}
+      getViewSite().getPage().addPartListener(_partListener);
+   }
 
-	private void addPrefListener() {
+   private void addPrefListener() {
 
-		_prefChangeListener = new IPropertyChangeListener() {
-			@Override
-			public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
 
-				final String property = event.getProperty();
+            final String property = event.getProperty();
 
-				/*
-				 * create a new chart configuration when the preferences has changed
-				 */
-				if (property.equals(ITourbookPreferences.GRAPH_VISIBLE)
-						|| property.equals(ITourbookPreferences.GRAPH_X_AXIS)
-						|| property.equals(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME)
-				//
-				//
-				) {
-					_tourChartConfig = TourManager.createDefaultTourChartConfig();
+            /*
+             * create a new chart configuration when the preferences has changed
+             */
+            if (property.equals(ITourbookPreferences.GRAPH_VISIBLE)
+                  || property.equals(ITourbookPreferences.GRAPH_X_AXIS)
+                  || property.equals(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME)
+            //
+            //
+            ) {
+               _tourChartConfig = TourManager.createDefaultTourChartConfig();
 
-					if (_tourChart != null) {
-						_tourChart.updateTourChart(_tourData, _tourChartConfig, false);
-					}
+               if (_tourChart != null) {
+                  _tourChart.updateTourChart(_tourData, _tourChartConfig, false);
+               }
 
-				} else if (
-				//
+            } else if (
+            //
 
-				/*
-				 * HR zone colors can be modified and person hash code has changed by saving the person
-				 * entity -> tour chart must be recreated
-				 */
-				property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)
+            /*
+             * HR zone colors can be modified and person hash code has changed by saving the person
+             * entity -> tour chart must be recreated
+             */
+            property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)
 
-						// multiple tours can have the wrong person for hr zones
-						|| property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
+                  // multiple tours can have the wrong person for hr zones
+                  || property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 
-					clearView();
-					showTour();
+               clearView();
+               showTour();
 
-				} else if (property.equals(ITourbookPreferences.GRAPH_MOUSE_MODE)) {
+            } else if (property.equals(ITourbookPreferences.GRAPH_MOUSE_MODE)) {
 
-					_tourChart.setMouseMode(event.getNewValue());
-				}
-			}
-		};
+               _tourChart.setMouseMode(event.getNewValue());
+            }
+         }
+      };
 
-		_prefStore.addPropertyChangeListener(_prefChangeListener);
-	}
+      _prefStore.addPropertyChangeListener(_prefChangeListener);
+   }
 
-	/**
-	 * listen for events when a tour is selected
-	 */
-	private void addSelectionListener() {
+   /**
+    * listen for events when a tour is selected
+    */
+   private void addSelectionListener() {
 
-		_postSelectionListener = new ISelectionListener() {
-			@Override
-			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
+      _postSelectionListener = new ISelectionListener() {
+         @Override
+         public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
-				if (part == TourChartView.this) {
-					return;
-				}
+            if (part == TourChartView.this) {
+               return;
+            }
 
-				onSelectionChanged(selection);
-			}
-		};
-		getSite().getPage().addPostSelectionListener(_postSelectionListener);
-	}
+            onSelectionChanged(selection);
+         }
+      };
+      getSite().getPage().addPostSelectionListener(_postSelectionListener);
+   }
 
-	private void addTourEventListener() {
+   private void addTourEventListener() {
 
-		_tourEventListener = new ITourEventListener() {
+      _tourEventListener = new ITourEventListener() {
 
-			@Override
-			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+         @Override
+         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
-				if (part == TourChartView.this) {
-					return;
-				}
+            if (part == TourChartView.this) {
+               return;
+            }
 
-				if (eventId == TourEventId.SEGMENT_LAYER_CHANGED) {
+            if (eventId == TourEventId.SEGMENT_LAYER_CHANGED) {
 
-					TourSegmenterView tourSegmenterView = null;
-					if (part instanceof TourSegmenterView) {
-						tourSegmenterView = (TourSegmenterView) part;
-					}
+               TourSegmenterView tourSegmenterView = null;
+               if (part instanceof TourSegmenterView) {
+                  tourSegmenterView = (TourSegmenterView) part;
+               }
 
-					if (tourSegmenterView != null && eventData instanceof TourData) {
+               if (tourSegmenterView != null && eventData instanceof TourData) {
 
-						final TourData eventTourData = (TourData) eventData;
+                  final TourData eventTourData = (TourData) eventData;
 
-						if (eventTourData.equals(_tourData)) {
+                  if (eventTourData.equals(_tourData)) {
 
-							_tourChart.updateTourSegmenter();
+                     _tourChart.updateTourSegmenter();
 
-						} else {
+                  } else {
 
-							/*
-							 * This case happened that this event contains not the same tourdata as the
-							 * tourchart, it occured for multiple tours in tourdata.
-							 */
+                     /*
+                      * This case happened that this event contains not the same tourdata as the
+                      * tourchart, it occured for multiple tours in tourdata.
+                      */
 
-							onSelectionChanged(new SelectionTourData(eventTourData));
+                     onSelectionChanged(new SelectionTourData(eventTourData));
 
-//							StatusUtil.log(new Exception("Event contained wrong tourdata."));
-						}
-					}
+//                     StatusUtil.log(new Exception("Event contained wrong tourdata."));
+                  }
+               }
 
-				} else if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
+            } else if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
 
-					_tourChart.updateTourChart(true, true);
+               _tourChart.updateTourChart(true, true);
 
-				} else if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
+            } else if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
 
-					if (_tourData == null || _isInSaving) {
-						return;
-					}
+               if (_tourData == null || _isInSaving) {
+                  return;
+               }
 
-					// get modified tours
-					final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
-					if (modifiedTours != null) {
+               // get modified tours
+               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+               if (modifiedTours != null) {
 
-						final long chartTourId = _tourData.getTourId();
+                  final long chartTourId = _tourData.getTourId();
 
-						// update chart with the modified tour
-						for (final TourData tourData : modifiedTours) {
+                  // update chart with the modified tour
+                  for (final TourData tourData : modifiedTours) {
 
-							if (tourData == null) {
+                     if (tourData == null) {
 
-								/*
-								 * tour is not set, this can be the case when a manual tour is discarded
-								 */
+                        /*
+                         * tour is not set, this can be the case when a manual tour is discarded
+                         */
 
-								clearView();
+                        clearView();
 
-								return;
-							}
+                        return;
+                     }
 
-							if (tourData.getTourId() == chartTourId) {
+                     if (tourData.getTourId() == chartTourId) {
 
-								updateChart(tourData);
+                        updateChart(tourData);
 
-								// removed old tour data from the selection provider
-								_postSelectionProvider.clearSelection();
+                        // removed old tour data from the selection provider
+                        _postSelectionProvider.clearSelection();
 
-								return;
-							}
-						}
+                        return;
+                     }
+                  }
 
-						// ensure that wrong data are not displayed
-						clearView();
-					}
+                  // ensure that wrong data are not displayed
+                  clearView();
+               }
 
-				} else if (eventId == TourEventId.TOUR_CHANGED) {
+            } else if (eventId == TourEventId.TOUR_CHANGED) {
 
-					if (_tourData == null) {
-						return;
-					}
+               if (_tourData == null) {
+                  return;
+               }
 
-					if (_tourData.isMultipleTours()) {
+               if (_tourData.isMultipleTours()) {
 
-						clearView();
-					}
+                  clearView();
+               }
 
-				} else if ((eventId == TourEventId.TOUR_SELECTION //
-						|| eventId == TourEventId.SLIDER_POSITION_CHANGED)
+            } else if ((eventId == TourEventId.TOUR_SELECTION //
+                  || eventId == TourEventId.SLIDER_POSITION_CHANGED)
 
-						&& eventData instanceof ISelection) {
+                  && eventData instanceof ISelection) {
 
-					if (part instanceof TourCatalogView_ComparedTour) {
+               if (part instanceof TourCatalogView_ComparedTour) {
 
-						// ignore -> this would modify the geo compare tour
+                  // ignore -> this would modify the geo compare tour
 
-						return;
-					}
+                  return;
+               }
 
-					onSelectionChanged((ISelection) eventData);
+               onSelectionChanged((ISelection) eventData);
 
-				} else if (eventId == TourEventId.MARKER_SELECTION && eventData instanceof SelectionTourMarker) {
+            } else if (eventId == TourEventId.MARKER_SELECTION && eventData instanceof SelectionTourMarker) {
 
-					onSelectionChanged_TourMarker((SelectionTourMarker) eventData);
+               onSelectionChanged_TourMarker((SelectionTourMarker) eventData);
 
-				} else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+            } else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
 
-					clearView();
+               clearView();
 
-				} else if (eventId == TourEventId.UPDATE_UI) {
+            } else if (eventId == TourEventId.UPDATE_UI) {
 
-					// check if this tour chart contains a tour which must be updated
+               // check if this tour chart contains a tour which must be updated
 
-					if (_tourData == null) {
-						return;
-					}
+               if (_tourData == null) {
+                  return;
+               }
 
-					final Long tourId = _tourData.getTourId();
+               final Long tourId = _tourData.getTourId();
 
-					// update editor
-					if (UI.containsTourId(eventData, tourId) != null) {
+               // update editor
+               if (UI.containsTourId(eventData, tourId) != null) {
 
-						// reload tour data and update chart
-						updateChart(TourManager.getInstance().getTourData(tourId));
-					}
-				}
-			}
-		};
+                  // reload tour data and update chart
+                  updateChart(TourManager.getInstance().getTourData(tourId));
+               }
+            }
+         }
+      };
 
-		TourManager.getInstance().addTourEventListener(_tourEventListener);
-	}
+      TourManager.getInstance().addTourEventListener(_tourEventListener);
+   }
 
-	private void clearView() {
+   private void clearView() {
 
-		_tourData = null;
-		_tourChart.updateChart(null, false);
+      _tourData = null;
+      _tourChart.updateChart(null, false);
 
-		_pageBook.showPage(_pageNoData);
+      _pageBook.showPage(_pageNoData);
 
-		// removed old tour data from the selection provider
-		_postSelectionProvider.clearSelection();
-	}
+      // removed old tour data from the selection provider
+      _postSelectionProvider.clearSelection();
+   }
 
-	@Override
-	public void createPartControl(final Composite parent) {
+   @Override
+   public void createPartControl(final Composite parent) {
 
-		createUI(parent);
+      createUI(parent);
 
-		restoreState();
+      restoreState();
 
-		addSelectionListener();
-		addPrefListener();
-		addTourEventListener();
-		addPartListener();
-		PhotoManager.addPhotoEventListener(this);
-		GeoCompareManager.addGeoCompareEventListener(this);
+      addSelectionListener();
+      addPrefListener();
+      addTourEventListener();
+      addPartListener();
+      PhotoManager.addPhotoEventListener(this);
+      GeoCompareManager.addGeoCompareEventListener(this);
 
-		// set this view part as selection provider
-		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
+      // set this view part as selection provider
+      getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
-		showTour();
-	}
+      showTour();
+   }
 
-	private void createUI(final Composite parent) {
+   private void createUI(final Composite parent) {
 
-		initUI(parent);
+      initUI(parent);
 
-		_pageBook = new PageBook(parent, SWT.NONE);
+      _pageBook = new PageBook(parent, SWT.NONE);
 
-		_pageNoData = UI.createPage(_tk, _pageBook, Messages.UI_Label_TourIsNotSelected);
+      _pageNoData = UI.createPage(_tk, _pageBook, Messages.UI_Label_TourIsNotSelected);
 
-		_tourChart = new TourChart(_pageBook, SWT.FLAT, this, _state);
-		_tourChart.setCanShowTourSegments(true);
-		_tourChart.setShowZoomActions(true);
-		_tourChart.setShowSlider(true);
-		_tourChart.setTourInfoActionsEnabled(true);
-		_tourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
-		_tourChart.setContextProvider(new TourChartContextProvider(this), true);
+      _tourChart = new TourChart(_pageBook, SWT.FLAT, this, _state);
+      _tourChart.setCanShowTourSegments(true);
+      _tourChart.setShowZoomActions(true);
+      _tourChart.setShowSlider(true);
+      _tourChart.setTourInfoActionsEnabled(true);
+      _tourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
+      _tourChart.setContextProvider(new TourChartContextProvider(this), true);
 
-		_tourChartConfig = TourManager.createDefaultTourChartConfig();
+      _tourChartConfig = TourManager.createDefaultTourChartConfig();
 
-		_tourChartConfig.canUseGeoCompareTool = true;
+      _tourChartConfig.canUseGeoCompareTool = true;
 
-		// set chart title
-		_tourChart.addDataModelListener(new IDataModelListener() {
-			@Override
-			public void dataModelChanged(final ChartDataModel chartDataModel) {
-//				chartDataModel.setTitle(TourManager.getTourTitleDetailed(_tourData));
-			}
-		});
+      // set chart title
+      _tourChart.addDataModelListener(new IDataModelListener() {
+         @Override
+         public void dataModelChanged(final ChartDataModel chartDataModel) {
+//            chartDataModel.setTitle(TourManager.getTourTitleDetailed(_tourData));
+         }
+      });
 
-		_tourChart.addTourModifyListener(this);
+      _tourChart.addTourModifyListener(this);
 
-		// fire a slider move selection when a slider was moved in the tour chart
-		_tourChart.addSliderMoveListener(new ISliderMoveListener() {
-			@Override
-			public void sliderMoved(final SelectionChartInfo chartInfoSelection) {
-				fireSliderPosition();
-			}
-		});
-	}
+      // fire a slider move selection when a slider was moved in the tour chart
+      _tourChart.addSliderMoveListener(new ISliderMoveListener() {
+         @Override
+         public void sliderMoved(final SelectionChartInfo chartInfoSelection) {
+            fireSliderPosition();
+         }
+      });
+   }
 
-	@Override
-	public void dispose() {
+   @Override
+   public void dispose() {
 
-		saveState();
+      saveState();
 
-		getSite().getPage().removePostSelectionListener(_postSelectionListener);
-		getViewSite().getPage().removePartListener(_partListener);
+      getSite().getPage().removePostSelectionListener(_postSelectionListener);
+      getViewSite().getPage().removePartListener(_partListener);
 
-		TourManager.getInstance().removeTourEventListener(_tourEventListener);
-		PhotoManager.removePhotoEventListener(this);
-		GeoCompareManager.removeGeoCompareListener(this);
+      TourManager.getInstance().removeTourEventListener(_tourEventListener);
+      PhotoManager.removePhotoEventListener(this);
+      GeoCompareManager.removeGeoCompareListener(this);
 
-		_prefStore.removePropertyChangeListener(_prefChangeListener);
+      _prefStore.removePropertyChangeListener(_prefChangeListener);
 
-		super.dispose();
-	}
+      super.dispose();
+   }
 
-	/**
-	 * Fire slider move event when the chart is drawn the first time or when the focus gets the
-	 * chart, this will move the sliders in the map to the correct position.
-	 */
-	private void fireSliderPosition() {
+   /**
+    * Fire slider move event when the chart is drawn the first time or when the focus gets the
+    * chart, this will move the sliders in the map to the correct position.
+    */
+   private void fireSliderPosition() {
 
-		// don't fire an slider event when in selection change event
-		if (_isInSelectionChanged) {
-			return;
-		}
+      // don't fire an slider event when in selection change event
+      if (_isInSelectionChanged) {
+         return;
+      }
 
-		final SelectionChartInfo chartInfo = _tourChart.getChartInfo();
-		if (chartInfo != null) {
+      final SelectionChartInfo chartInfo = _tourChart.getChartInfo();
+      if (chartInfo != null) {
 
-			_isInSliderPositionFired = true;
-			{
-				if (_isInSaving) {
+         _isInSliderPositionFired = true;
+         {
+            if (_isInSaving) {
 
-					final TourMarker hoveredMarker = _tourChart.getLastHoveredTourMarker();
+               final TourMarker hoveredMarker = _tourChart.getLastHoveredTourMarker();
 
-					if (hoveredMarker != null) {
+               if (hoveredMarker != null) {
 
-						chartInfo.selectedSliderValuesIndex = hoveredMarker.getSerieIndex();
-					}
-				}
+                  chartInfo.selectedSliderValuesIndex = hoveredMarker.getSerieIndex();
+               }
+            }
 
-				TourManager.fireEventWithCustomData(//
-						TourEventId.SLIDER_POSITION_CHANGED,
-						chartInfo,
-						TourChartView.this);
-			}
-			_isInSliderPositionFired = false;
-		}
-	}
+            TourManager.fireEventWithCustomData(//
+                  TourEventId.SLIDER_POSITION_CHANGED,
+                  chartInfo,
+                  TourChartView.this);
+         }
+         _isInSliderPositionFired = false;
+      }
+   }
 
-	@Override
-	public void geoCompareEvent(final IWorkbenchPart part, final GeoCompareEventId eventId, final Object eventData) {
-		// TODO Auto-generated method stub
+   @Override
+   public void geoCompareEvent(final IWorkbenchPart part, final GeoCompareEventId eventId, final Object eventData) {
+      // TODO Auto-generated method stub
 
-		if (part == TourChartView.this) {
-			return;
-		}
+      if (part == TourChartView.this) {
+         return;
+      }
 
-		switch (eventId) {
+      switch (eventId) {
 
-		case SET_COMPARING_ON:
+      case SET_COMPARING_ON:
 
-			break;
+         break;
 
-		case SET_COMPARING_OFF:
+      case SET_COMPARING_OFF:
 
-			break;
+         break;
 
-		default:
-			break;
-		}
-	}
+      default:
+         break;
+      }
+   }
 
-	@Override
-	public ArrayList<TourData> getSelectedTours() {
+   @Override
+   public ArrayList<TourData> getSelectedTours() {
 
-		if (_tourData == null) {
-			return null;
-		}
+      if (_tourData == null) {
+         return null;
+      }
 
-		final ArrayList<TourData> tourList = new ArrayList<>();
-		tourList.add(_tourData);
+      final ArrayList<TourData> tourList = new ArrayList<>();
+      tourList.add(_tourData);
 
-		return tourList;
-	}
+      return tourList;
+   }
 
-	@Override
-	public TourChart getTourChart() {
-		return _tourChart;
-	}
+   @Override
+   public TourChart getTourChart() {
+      return _tourChart;
+   }
 
-	private void initUI(final Composite parent) {
+   private void initUI(final Composite parent) {
 
-		_tk = new FormToolkit(parent.getDisplay());
-	}
+      _tk = new FormToolkit(parent.getDisplay());
+   }
 
-	private void onSelectionChanged(final ISelection selection) {
+   private void onSelectionChanged(final ISelection selection) {
 
-		// prevent to listen to own events
-		if (_isInSliderPositionFired) {
-			return;
-		}
+      // prevent to listen to own events
+      if (_isInSliderPositionFired) {
+         return;
+      }
 
-		if (_isInSaving) {
-			return;
-		}
+      if (_isInSaving) {
+         return;
+      }
 
-//		System.out.println((net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//				+ ("\t\t\tonSelectionChanged:\t" + selection));
-//		// TODO remove SYSTEM.OUT.PRINTLN
+//      System.out.println((net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//            + ("\t\t\tonSelectionChanged:\t" + selection));
+//      // TODO remove SYSTEM.OUT.PRINTLN
 
-		_isInSelectionChanged = true;
-		{
-			_isForceUpdate = _tourPhotoLink != null;
+      _isInSelectionChanged = true;
+      {
+         _isForceUpdate = _tourPhotoLink != null;
 
-			_tourPhotoLink = null;
+         _tourPhotoLink = null;
 
-			if (selection instanceof SelectionTourData) {
+         if (selection instanceof SelectionTourData) {
 
-				final SelectionTourData tourDataSelection = (SelectionTourData) selection;
+            final SelectionTourData tourDataSelection = (SelectionTourData) selection;
 
-				final TourData selectionTourData = tourDataSelection.getTourData();
-				if (selectionTourData != null) {
+            final TourData selectionTourData = tourDataSelection.getTourData();
+            if (selectionTourData != null) {
 
-					// prevent loading the same tour
-					if (_tourData != null && _tourData.equals(selectionTourData)) {
+               // prevent loading the same tour
+               if (_tourData != null && _tourData.equals(selectionTourData)) {
 
-						// do nothing
+                  // do nothing
 
-					} else {
+               } else {
 
-						updateChart(selectionTourData);
+                  updateChart(selectionTourData);
 
-						if (tourDataSelection.isSliderValueIndexAvailable()) {
+                  if (tourDataSelection.isSliderValueIndexAvailable()) {
 
-							// set slider positions
+                     // set slider positions
 
-							_tourChart.setXSliderPosition(
-									new SelectionChartXSliderPosition(//
-											_tourChart,
-											tourDataSelection.getLeftSliderValueIndex(),
-											tourDataSelection.getRightSliderValueIndex()));
-						}
-					}
-				}
+                     _tourChart.setXSliderPosition(
+                           new SelectionChartXSliderPosition(//
+                                 _tourChart,
+                                 tourDataSelection.getLeftSliderValueIndex(),
+                                 tourDataSelection.getRightSliderValueIndex()));
+                  }
+               }
+            }
 
-			} else if (selection instanceof SelectionTourId) {
+         } else if (selection instanceof SelectionTourId) {
 
-				final SelectionTourId selectionTourId = (SelectionTourId) selection;
-				final Long tourId = selectionTourId.getTourId();
+            final SelectionTourId selectionTourId = (SelectionTourId) selection;
+            final Long tourId = selectionTourId.getTourId();
 
-				updateChart(tourId);
+            updateChart(tourId);
 
-			} else if (selection instanceof SelectionTourIds) {
+         } else if (selection instanceof SelectionTourIds) {
 
-				// only 1 tour can be displayed in the tour chart
+            // only 1 tour can be displayed in the tour chart
 
-				final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+            final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
 
-				boolean isChartPainted = false;
+            boolean isChartPainted = false;
 
-				if (selection instanceof TourPhotoLinkSelection) {
+            if (selection instanceof TourPhotoLinkSelection) {
 
-					final ArrayList<TourPhotoLink> tourPhotoLinks = ((TourPhotoLinkSelection) selection).tourPhotoLinks;
+               final ArrayList<TourPhotoLink> tourPhotoLinks = ((TourPhotoLinkSelection) selection).tourPhotoLinks;
 
-					if (tourPhotoLinks.size() > 0) {
+               if (tourPhotoLinks.size() > 0) {
 
-						_tourPhotoLink = tourPhotoLinks.get(0);
+                  _tourPhotoLink = tourPhotoLinks.get(0);
 
-						if (_tourPhotoLink.isHistoryTour()) {
+                  if (_tourPhotoLink.isHistoryTour()) {
 
-							// paint history tour
+                     // paint history tour
 
-							updateChart(_tourPhotoLink.getHistoryTourData());
+                     updateChart(_tourPhotoLink.getHistoryTourData());
 
-							isChartPainted = true;
-						}
-					}
-				}
+                     isChartPainted = true;
+                  }
+               }
+            }
 
-				if (isChartPainted == false && tourIds != null && tourIds.size() > 0) {
+            if (isChartPainted == false && tourIds != null && tourIds.size() > 0) {
 
-					// paint regular tour
+               // paint regular tour
 
-					// force update when photo link selection occured
-					_isForceUpdate = _tourPhotoLink != null;
+               // force update when photo link selection occured
+               _isForceUpdate = _tourPhotoLink != null;
 
-					if (tourIds.size() > 1) {
+               if (tourIds.size() > 1) {
 
-						// show multiple tours
-						updateChart(tourIds);
+                  // show multiple tours
+                  updateChart(tourIds);
 
-					} else {
-						updateChart(tourIds.get(0));
-					}
-				}
+               } else {
+                  updateChart(tourIds.get(0));
+               }
+            }
 
-			} else if (selection instanceof SelectionChartInfo) {
+         } else if (selection instanceof SelectionChartInfo) {
 
-				final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
-				final ChartDataModel chartDataModel = chartInfo.chartDataModel;
+            final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
+            final ChartDataModel chartDataModel = chartInfo.chartDataModel;
 
-				if (chartDataModel != null) {
+            if (chartDataModel != null) {
 
-					final Object chartTourId = chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
-					if (chartTourId instanceof Long) {
+               final Object chartTourId = chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
+               if (chartTourId instanceof Long) {
 
-						updateChart(
-								(Long) chartTourId,
-								chartInfo.leftSliderValuesIndex,
-								chartInfo.rightSliderValuesIndex);
-					}
-				}
+                  updateChart(
+                        (Long) chartTourId,
+                        chartInfo.leftSliderValuesIndex,
+                        chartInfo.rightSliderValuesIndex);
+               }
+            }
 
-			} else if (selection instanceof SelectionChartXSliderPosition) {
+         } else if (selection instanceof SelectionChartXSliderPosition) {
 
-				final SelectionChartXSliderPosition xSliderPosition = (SelectionChartXSliderPosition) selection;
+            final SelectionChartXSliderPosition xSliderPosition = (SelectionChartXSliderPosition) selection;
 
-				final Chart chart = xSliderPosition.getChart();
-				if (chart != null && chart != _tourChart) {
+            final Chart chart = xSliderPosition.getChart();
+            if (chart != null && chart != _tourChart) {
 
-					// it's not the same chart, check if it's the same tour
+               // it's not the same chart, check if it's the same tour
 
-					final Object tourId = chart.getChartDataModel().getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
-					if (tourId instanceof Long) {
+               final Object tourId = chart.getChartDataModel().getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
+               if (tourId instanceof Long) {
 
-						final TourData tourData = TourManager.getInstance().getTourData((Long) tourId);
-						if (tourData != null) {
+                  final TourData tourData = TourManager.getInstance().getTourData((Long) tourId);
+                  if (tourData != null) {
 
-							if (_tourData != null && _tourData.equals(tourData)) {
+                     if (_tourData != null && _tourData.equals(tourData)) {
 
-								// it's the same tour, overwrite chart
+                        // it's the same tour, overwrite chart
 
-								xSliderPosition.setChart(_tourChart);
-							}
-						}
-					}
-				}
+                        xSliderPosition.setChart(_tourChart);
+                     }
+                  }
+               }
+            }
 
-				_tourChart.selectXSliders(xSliderPosition);
+            _tourChart.selectXSliders(xSliderPosition);
 
-			} else if (selection instanceof SelectionTourCatalogView) {
+         } else if (selection instanceof SelectionTourCatalogView) {
 
-				final SelectionTourCatalogView tourCatalogSelection = (SelectionTourCatalogView) selection;
+            final SelectionTourCatalogView tourCatalogSelection = (SelectionTourCatalogView) selection;
 
-				final TVICatalogRefTourItem refItem = tourCatalogSelection.getRefItem();
-				if (refItem != null) {
-					updateChart(refItem.getTourId());
-				}
+            final TVICatalogRefTourItem refItem = tourCatalogSelection.getRefItem();
+            if (refItem != null) {
+               updateChart(refItem.getTourId());
+            }
 
-			} else if (selection instanceof StructuredSelection) {
+         } else if (selection instanceof StructuredSelection) {
 
-				final Object firstElement = ((StructuredSelection) selection).getFirstElement();
-				if (firstElement instanceof TVICatalogComparedTour) {
+            final Object firstElement = ((StructuredSelection) selection).getFirstElement();
+            if (firstElement instanceof TVICatalogComparedTour) {
 
-					updateChart(((TVICatalogComparedTour) firstElement).getTourId());
+               updateChart(((TVICatalogComparedTour) firstElement).getTourId());
 
-				} else if (firstElement instanceof TVICompareResultComparedTour) {
+            } else if (firstElement instanceof TVICompareResultComparedTour) {
 
-					final TVICompareResultComparedTour compareResultItem = (TVICompareResultComparedTour) firstElement;
-					final TourData tourData = TourManager.getInstance().getTourData(compareResultItem.getComparedTourData().getTourId());
-					updateChart(tourData);
+               final TVICompareResultComparedTour compareResultItem = (TVICompareResultComparedTour) firstElement;
+               final TourData tourData = TourManager.getInstance().getTourData(compareResultItem.getComparedTourData().getTourId());
+               updateChart(tourData);
 
-				} else if (firstElement instanceof GeoPartComparerItem) {
+            } else if (firstElement instanceof GeoPartComparerItem) {
 
-					final GeoPartComparerItem geoCompareItem = (GeoPartComparerItem) firstElement;
+               final GeoPartComparerItem geoCompareItem = (GeoPartComparerItem) firstElement;
 
-					updateChart(
-							geoCompareItem.tourId,
-							geoCompareItem.tourFirstIndex,
-							geoCompareItem.tourLastIndex);
+               updateChart(
+                     geoCompareItem.tourId,
+                     geoCompareItem.tourFirstIndex,
+                     geoCompareItem.tourLastIndex);
 
-				}
+            }
 
-			} else if (selection instanceof SelectionDeletedTours) {
+         } else if (selection instanceof SelectionDeletedTours) {
 
-				clearView();
-			}
-		}
-		_isInSelectionChanged = false;
-	}
+            clearView();
+         }
+      }
+      _isInSelectionChanged = false;
+   }
 
-	private void onSelectionChanged_TourMarker(final SelectionTourMarker markerSelection) {
+   private void onSelectionChanged_TourMarker(final SelectionTourMarker markerSelection) {
 
-		_isInSelectionChanged = true;
-		{
-			final TourData tourData = markerSelection.getTourData();
-			final Long markerTourId = tourData.getTourId();
+      _isInSelectionChanged = true;
+      {
+         final TourData tourData = markerSelection.getTourData();
+         final Long markerTourId = tourData.getTourId();
 
-			/*
-			 * check if the marker tour is displayed
-			 */
-			if (_tourData == null || _tourData.getTourId().equals(markerTourId) == false) {
+         /*
+          * check if the marker tour is displayed
+          */
+         if (_tourData == null || _tourData.getTourId().equals(markerTourId) == false) {
 
-				// show tour
+            // show tour
 
-				updateChart(tourData);
-			}
+            updateChart(tourData);
+         }
 
-			/*
-			 * set slider position
-			 */
-			final ArrayList<TourMarker> tourMarker = markerSelection.getSelectedTourMarker();
-			final int numberOfTourMarkers = tourMarker.size();
-			final TourMarker firstTourMarker = tourMarker.get(0);
+         /*
+          * set slider position
+          */
+         final ArrayList<TourMarker> tourMarker = markerSelection.getSelectedTourMarker();
+         final int numberOfTourMarkers = tourMarker.size();
+         final TourMarker firstTourMarker = tourMarker.get(0);
 
-			int leftSliderValueIndex;
-			if (tourData.isMultipleTours()) {
-				leftSliderValueIndex = firstTourMarker.getMultiTourSerieIndex();
-			} else {
-				leftSliderValueIndex = firstTourMarker.getSerieIndex();
-			}
+         int leftSliderValueIndex;
+         if (tourData.isMultipleTours()) {
+            leftSliderValueIndex = firstTourMarker.getMultiTourSerieIndex();
+         } else {
+            leftSliderValueIndex = firstTourMarker.getSerieIndex();
+         }
 
-			int rightSliderValueIndex = 0;
+         int rightSliderValueIndex = 0;
 
-			if (numberOfTourMarkers == 1) {
+         if (numberOfTourMarkers == 1) {
 
-				rightSliderValueIndex = leftSliderValueIndex;
+            rightSliderValueIndex = leftSliderValueIndex;
 
-			} else if (numberOfTourMarkers > 1) {
+         } else if (numberOfTourMarkers > 1) {
 
-				final TourMarker lastTourMarker = tourMarker.get(numberOfTourMarkers - 1);
+            final TourMarker lastTourMarker = tourMarker.get(numberOfTourMarkers - 1);
 
-				if (tourData.isMultipleTours()) {
-					rightSliderValueIndex = lastTourMarker.getMultiTourSerieIndex();
-				} else {
-					rightSliderValueIndex = lastTourMarker.getSerieIndex();
-				}
-			}
+            if (tourData.isMultipleTours()) {
+               rightSliderValueIndex = lastTourMarker.getMultiTourSerieIndex();
+            } else {
+               rightSliderValueIndex = lastTourMarker.getSerieIndex();
+            }
+         }
 
-			final SelectionChartXSliderPosition xSliderPosition = new SelectionChartXSliderPosition(
-					_tourChart,
-					SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION,
-					leftSliderValueIndex,
-					rightSliderValueIndex);
+         final SelectionChartXSliderPosition xSliderPosition = new SelectionChartXSliderPosition(
+               _tourChart,
+               SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION,
+               leftSliderValueIndex,
+               rightSliderValueIndex);
 
-			xSliderPosition.setCenterSliderPosition(true);
+         xSliderPosition.setCenterSliderPosition(true);
 
-			_tourChart.selectXSliders(xSliderPosition);
-		}
-		_isInSelectionChanged = false;
-	}
+         _tourChart.selectXSliders(xSliderPosition);
+      }
+      _isInSelectionChanged = false;
+   }
 
-	@Override
-	public void photoEvent(final IViewPart viewPart, final PhotoEventId photoEventId, final Object data) {
+   @Override
+   public void photoEvent(final IViewPart viewPart, final PhotoEventId photoEventId, final Object data) {
 
-		if (photoEventId == PhotoEventId.PHOTO_SELECTION && data instanceof TourPhotoLinkSelection) {
+      if (photoEventId == PhotoEventId.PHOTO_SELECTION && data instanceof TourPhotoLinkSelection) {
 
-			final TourPhotoLinkSelection linkSelection = (TourPhotoLinkSelection) data;
+         final TourPhotoLinkSelection linkSelection = (TourPhotoLinkSelection) data;
 
-			onSelectionChanged(linkSelection);
-		}
-	}
+         onSelectionChanged(linkSelection);
+      }
+   }
 
-	private void restoreState() {
+   private void restoreState() {
 
-		_tourChart.restoreState();
-	}
+      _tourChart.restoreState();
+   }
 
-	private void saveState() {
+   private void saveState() {
 
-		if (_tourChart == null) {
-			// this occured when testing
-			return;
-		}
+      if (_tourChart == null) {
+         // this occured when testing
+         return;
+      }
 
-		_tourChart.saveState();
-	}
+      _tourChart.saveState();
+   }
 
-	@Override
-	public void setFocus() {
+   @Override
+   public void setFocus() {
 
-		_tourChart.setFocus();
+      _tourChart.setFocus();
 
-		/*
-		 * fire tour selection
-		 */
-		if (_tourData == null) {
+      /*
+       * fire tour selection
+       */
+      if (_tourData == null) {
 
-			_postSelectionProvider.clearSelection();
+         _postSelectionProvider.clearSelection();
 
-		} else {
+      } else {
 
-			final SelectionTourData selection = new SelectionTourData(_tourChart, _tourData);
+         final SelectionTourData selection = new SelectionTourData(_tourChart, _tourData);
 
-			_postSelectionProvider.setSelectionNoFireEvent(selection);
+         _postSelectionProvider.setSelectionNoFireEvent(selection);
 
-			fireSliderPosition();
-		}
-	}
+         fireSliderPosition();
+      }
+   }
 
-	private void showTour() {
+   private void showTour() {
 
-		final ISelection selection = getSite().getWorkbenchWindow().getSelectionService().getSelection();
-		onSelectionChanged(selection);
+      final ISelection selection = getSite().getWorkbenchWindow().getSelectionService().getSelection();
+      onSelectionChanged(selection);
 
-		if (_tourData == null) {
+      if (_tourData == null) {
 
-			_pageBook.showPage(_pageNoData);
+         _pageBook.showPage(_pageNoData);
 
-			// a tour is not displayed, find a tour provider which provides a tour
-			Display.getCurrent().asyncExec(new Runnable() {
-				@Override
-				public void run() {
+         // a tour is not displayed, find a tour provider which provides a tour
+         Display.getCurrent().asyncExec(new Runnable() {
+            @Override
+            public void run() {
 
-					// validate widget
-					if (_pageBook.isDisposed()) {
-						return;
-					}
+               // validate widget
+               if (_pageBook.isDisposed()) {
+                  return;
+               }
 
-					/*
-					 * check if tour was set from a selection provider
-					 */
-					if (_tourData != null) {
-						return;
-					}
+               /*
+                * check if tour was set from a selection provider
+                */
+               if (_tourData != null) {
+                  return;
+               }
 
-					final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
-					if (selectedTours != null && selectedTours.size() > 0) {
-						updateChart(selectedTours.get(0));
-					}
-				}
-			});
-		}
-	}
+               final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
+               if (selectedTours != null && selectedTours.size() > 0) {
+                  updateChart(selectedTours.get(0));
+               }
+            }
+         });
+      }
+   }
 
-	@Override
-	public void tourIsModified(final TourData tourData) {
+   @Override
+   public void tourIsModified(final TourData tourData) {
 
-		_isInSaving = true;
+      _isInSaving = true;
 
-		final TourData savedTourData = TourManager.saveModifiedTour(tourData);
+      final TourData savedTourData = TourManager.saveModifiedTour(tourData);
 
-		updateChart(savedTourData);
+      updateChart(savedTourData);
 
-		_isInSaving = false;
-	}
+      _isInSaving = false;
+   }
 
-	/**
-	 * Create virtual tour which contains multiple tours.
-	 *
-	 * @param tourIds
-	 */
-	private void updateChart(final ArrayList<Long> tourIds) {
+   /**
+    * Create virtual tour which contains multiple tours.
+    *
+    * @param tourIds
+    */
+   private void updateChart(final ArrayList<Long> tourIds) {
 
-		final TourData multipleTourData = TourManager.createJoinedTourData(tourIds);
+      final TourData multipleTourData = TourManager.createJoinedTourData(tourIds);
 
-		updateChart(multipleTourData);
+      updateChart(multipleTourData);
 
-		fireSliderPosition();
-	}
+      fireSliderPosition();
+   }
 
-	private void updateChart(final long tourId) {
+   private void updateChart(final long tourId) {
 
-		if (_tourData != null && _tourData.getTourId() == tourId && _isForceUpdate == false) {
-			// optimize
-			return;
-		}
+      if (_tourData != null && _tourData.getTourId() == tourId && _isForceUpdate == false) {
+         // optimize
+         return;
+      }
 
-		final TourData tourData = TourManager.getInstance().getTourData(tourId);
+      final TourData tourData = TourManager.getInstance().getTourData(tourId);
 
-		updateChart(tourData);
+      updateChart(tourData);
 
-		fireSliderPosition();
-	}
+      fireSliderPosition();
+   }
 
-	private void updateChart(final long tourId, final int leftSliderValuesIndex, final int rightSliderValuesIndex) {
+   private void updateChart(final long tourId, final int leftSliderValuesIndex, final int rightSliderValuesIndex) {
 
-		final TourData tourData = TourManager.getInstance().getTourData(tourId);
-		if (tourData != null) {
+      final TourData tourData = TourManager.getInstance().getTourData(tourId);
+      if (tourData != null) {
 
-			if (_tourData == null || _tourData.equals(tourData) == false) {
-				updateChart(tourData);
-			}
+         if (_tourData == null || _tourData.equals(tourData) == false) {
+            updateChart(tourData);
+         }
 
-			// set slider position
-			final SelectionChartXSliderPosition xSliderPosition = new SelectionChartXSliderPosition(
-					_tourChart,
-					leftSliderValuesIndex,
-					rightSliderValuesIndex);
+         // set slider position
+         final SelectionChartXSliderPosition xSliderPosition = new SelectionChartXSliderPosition(
+               _tourChart,
+               leftSliderValuesIndex,
+               rightSliderValuesIndex);
 
-			xSliderPosition.setCenterSliderPosition(true);
+         xSliderPosition.setCenterSliderPosition(true);
 
-			_tourChart.selectXSliders(xSliderPosition);
-		}
-	}
+         _tourChart.selectXSliders(xSliderPosition);
+      }
+   }
 
-	private void updateChart(final TourData tourData) {
+   private void updateChart(final TourData tourData) {
 
-		if (tourData == null) {
-			// nothing to do
-			return;
-		}
+      if (tourData == null) {
+         // nothing to do
+         return;
+      }
 
-		_tourData = tourData;
+      _tourData = tourData;
 
-		TourManager.getInstance().setActiveTourChart(_tourChart);
+      TourManager.getInstance().setActiveTourChart(_tourChart);
 
-		_pageBook.showPage(_tourChart);
+      _pageBook.showPage(_tourChart);
 
-		// set or reset photo link
-		_tourData.tourPhotoLink = _tourPhotoLink;
+      // set or reset photo link
+      _tourData.tourPhotoLink = _tourPhotoLink;
 
-		_tourChart.updateTourChart(_tourData, _tourChartConfig, false);
+      _tourChart.updateTourChart(_tourData, _tourChartConfig, false);
 
-		// set application window title tool tip
-		setTitleToolTip(TourManager.getTourDateShort(_tourData));
-	}
+      // set application window title tool tip
+      setTitleToolTip(TourManager.getTourDateShort(_tourData));
+   }
 
 }
