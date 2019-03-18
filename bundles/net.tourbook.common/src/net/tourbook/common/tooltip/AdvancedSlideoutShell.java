@@ -805,6 +805,24 @@ public abstract class AdvancedSlideoutShell {
       return displayBounds;
    }
 
+   private Shell getRootShell(final Shell shell) {
+
+      if (shell == null) {
+         return shell;
+      }
+
+      Composite prevParent = shell;
+      Composite parent = prevParent.getParent();
+
+      while (parent != null) {
+
+         prevParent = parent;
+         parent = parent.getParent();
+      }
+
+      return (Shell) prevParent;
+   }
+
    protected Color getShellColor_Background(final ColorRegistry colorRegistry) {
       return Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
    }
@@ -924,8 +942,17 @@ public abstract class AdvancedSlideoutShell {
 
                // hide tooltip when another shell is activated
 
-               if (_display.getActiveShell() != _visibleShell) {
-                  ttHide_WithAnimation();
+               final Shell activeShell = _display.getActiveShell();
+
+               if (activeShell != _visibleShell) {
+
+                  final Shell activeShell_Root = getRootShell(activeShell);
+                  final Shell visibleShell_Root = getRootShell(_visibleShell);
+
+                  if (activeShell_Root != visibleShell_Root) {
+
+                     ttHide_WithAnimation();
+                  }
                }
             }
          });
@@ -1149,29 +1176,48 @@ public abstract class AdvancedSlideoutShell {
                && _ownerControl != null
                && !_ownerControl.isDisposed()) {
 
-            _display.asyncExec(new Runnable() {
+            _display.asyncExec(() -> {
 
-               @Override
-               public void run() {
+               // hide tooltip when another shell is activated
 
-                  // hide tooltip when another shell is activated
-
-                  // check again
-                  if (_visibleShell == null
-                        || _visibleShell.isDisposed()
-                        || _ownerControl == null
-                        || _ownerControl.isDisposed()) {
-                     return;
-                  }
-
-                  if (_ownerControl.getShell() == _visibleShell.getDisplay().getActiveShell()) {
-
-                     // don't hide when main window is active
-                     return;
-                  }
-
-                  ttHide_WithAnimation();
+               // check again
+               if (_visibleShell == null
+                     || _visibleShell.isDisposed()
+                     || _ownerControl == null
+                     || _ownerControl.isDisposed()) {
+                  return;
                }
+
+               final Shell activeShell = _visibleShell.getDisplay().getActiveShell();
+               final Shell ownerShell = _ownerControl.getShell();
+
+               // check active shell
+               if (ownerShell == activeShell) {
+
+                  // don't hide when main window is active
+                  return;
+               }
+
+               /*
+                * Check also parent shells, this is necessary when progress dialogs are displayed,
+                * e.g. when loading tours
+                */
+               if (activeShell != null) {
+
+                  Composite parentShell = activeShell.getParent();
+                  while (parentShell != null) {
+
+                     if (ownerShell == parentShell) {
+
+                        // don't hide when main window is active
+                        return;
+                     }
+
+                     parentShell = parentShell.getParent();
+                  }
+               }
+
+               ttHide_WithAnimation();
             });
          }
 

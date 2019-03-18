@@ -30,6 +30,8 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.osgi.internal.framework.EquinoxBundle;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -92,6 +94,14 @@ public class TourbookPlugin extends AbstractUIPlugin {
     */
    public static TourTypeFilter getActiveTourTypeFilter() {
       return _activeTourTypeFilter;
+   }
+
+   /**
+    * @return Returns the shell of the app
+    */
+   public static Shell getAppShell() {
+
+      return PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
    }
 
    public static BundleContext getBundleContext() {
