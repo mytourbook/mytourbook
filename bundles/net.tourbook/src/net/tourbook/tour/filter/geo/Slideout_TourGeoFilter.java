@@ -534,7 +534,20 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
             _chkIsSyncMapPosition = new Button(container, SWT.CHECK);
             _chkIsSyncMapPosition.setText(Messages.Slideout_TourGeoFilter_Checkbox_IsSyncMapPosition);
             _chkIsSyncMapPosition.setToolTipText(Messages.GeoCompare_View_Action_IsSyncMapPosition_Tooltip);
-            _chkIsSyncMapPosition.addSelectionListener(_selectionListener_OnlyStateUpdate);
+            _chkIsSyncMapPosition.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+
+                  saveState_Options();
+
+                  if (_chkIsSyncMapPosition.getSelection()) {
+                     // reselect current geo filter
+                     if (_selectedFilter != null) {
+                        onSelect_GeoFilter(_selectedFilter);
+                     }
+                  }
+               }
+            });
             GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsSyncMapPosition);
          }
          {
@@ -894,9 +907,9 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
 
    private void enableControls() {
 
-      final boolean isFilterSelected = _selectedFilter != null;
+      final boolean isGeoFilterSelected = _selectedFilter != null;
 
-      _btnDeleteGeoFilter.setEnabled(isFilterSelected);
+      _btnDeleteGeoFilter.setEnabled(isGeoFilterSelected);
       _btnDeleteGeoFilterAll.setEnabled(_allGeoFilter.size() > 0);
    }
 
@@ -1027,7 +1040,6 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
       saveState_Options();
 
       if (_selectedFilter != null) {
-
          onSelect_GeoFilter(_selectedFilter);
       }
    }

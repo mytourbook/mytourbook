@@ -1930,12 +1930,6 @@ public class Map extends Canvas {
             worldPosition.x - _worldPixel_TopLeft_Viewport.x,
             worldPosition.y - _worldPixel_TopLeft_Viewport.y);
 
-      /*
-       * Adjust Y that X and Y are at the top/left position otherwise Y is at the bottom/left
-       * position
-       */
-      gridGeoPos.y -= _devGridPixelSize_Y;
-
       return gridGeoPos;
    }
 
@@ -3109,19 +3103,15 @@ public class Map extends Canvas {
       /*
        * show info in the top/right corner that selection for the offline area is activ
        */
-      paint_GridBox_70_Info_LatLon(gc, mapGridData);
+      paint_GridBox_70_Info_MouseGeoPos(gc, mapGridData);
 
       // check if mouse button is hit, this sets the start position
-      if (mapGridData.isSelectionStarted) {
-
-         // continue just hovering
-
-         final Point devTopLeft = paint_GridBox_50_Rectangle(gc, mapGridData, false);
-
-         paint_GridBox_80_Info_Box(gc, mapGridData, devTopLeft);
-
-         return;
-      }
+//      if (mapGridData.isSelectionStarted) {
+//
+//         final Point devTopLeft = paint_GridBox_50_Rectangle(gc, mapGridData, false);
+//
+//         paint_GridBox_80_Info_Text(gc, mapGridData, devTopLeft);
+//      }
 
       final Point dev_Start = grid_World2Dev(world_Start);
       final Point dev_End = grid_World2Dev(mapGridData.world_End);
@@ -3165,7 +3155,7 @@ public class Map extends Canvas {
 
       final Point devTopLeft = paint_GridBox_50_Rectangle(gc, mapGridData, false);
 
-      paint_GridBox_80_Info_Box(gc, mapGridData, devTopLeft);
+      paint_GridBox_80_Info_Text(gc, mapGridData, devTopLeft);
 
       gc.setLineStyle(SWT.LINE_SOLID);
       gc.setForeground(SYS_COLOR_BLACK);
@@ -3184,7 +3174,7 @@ public class Map extends Canvas {
 
       final Point devTopLeft = paint_GridBox_50_Rectangle(gc, mapGridData, true);
 
-      paint_GridBox_80_Info_Box(gc, mapGridData, devTopLeft);
+      paint_GridBox_80_Info_Text(gc, mapGridData, devTopLeft);
    }
 
    /**
@@ -3249,41 +3239,41 @@ public class Map extends Canvas {
     * @param mapGridData
     * @param numGridRectangle
     */
-   private void paint_GridBox_70_Info_LatLon(final GC gc, final MapGridData mapGridData) {
+   private void paint_GridBox_70_Info_MouseGeoPos(final GC gc, final MapGridData mapGridData) {
 
       gc.setForeground(SYS_COLOR_BLACK);
       gc.setBackground(SYS_COLOR_YELLOW);
 
       final StringBuilder sb = new StringBuilder();
 
-      if (mapGridData.isSelectionStarted) {
+//      if (mapGridData.isSelectionStarted) {
+//
+//         // display selected area
+//
+//         final GeoPosition geoStart = mapGridData.geo_Start;
+//         final GeoPosition geoEnd = mapGridData.geo_End;
+//
+//         sb.append(String.format(" %s / %s  ...  %s / %s", //$NON-NLS-1$
+//               _nfLatLon.format(geoStart.latitude),
+//               _nfLatLon.format(geoStart.longitude),
+//               _nfLatLon.format(geoEnd.latitude),
+//               _nfLatLon.format(geoEnd.longitude)));
+//
+//      } else {
+//
+      // display mouse move geo position
 
-         // display selected area
-
-         final GeoPosition geoStart = mapGridData.geo_Start;
-         final GeoPosition geoEnd = mapGridData.geo_End;
-
-         sb.append(String.format(" %s / %s  ...  %s / %s", //$NON-NLS-1$
-               _nfLatLon.format(geoStart.latitude),
-               _nfLatLon.format(geoStart.longitude),
-               _nfLatLon.format(geoEnd.latitude),
-               _nfLatLon.format(geoEnd.longitude)));
-
-      } else {
-
-         // display mouse move geo position
-
-         sb.append(String.format(" %s / %s", //$NON-NLS-1$
-               _nfLatLon.format(_mouseMove_GeoPosition.latitude),
-               _nfLatLon.format(_mouseMove_GeoPosition.longitude)));
-      }
+      sb.append(String.format(" %s / %s", //$NON-NLS-1$
+            _nfLatLon.format(_mouseMove_GeoPosition.latitude),
+            _nfLatLon.format(_mouseMove_GeoPosition.longitude)));
+//      }
 
       gc.drawString(sb.toString(), 0, 0);
    }
 
-   private void paint_GridBox_80_Info_Box(final GC gc, final MapGridData gridStartEndData, final Point topLeft) {
+   private void paint_GridBox_80_Info_Text(final GC gc, final MapGridData mapGridData, final Point topLeft) {
 
-      final String infoText = gridStartEndData.gridBox_Text;
+      final String infoText = mapGridData.gridBox_Text;
 
       if (infoText == null) {
          return;
