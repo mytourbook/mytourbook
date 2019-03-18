@@ -132,7 +132,7 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
              * Slideout title
              */
             final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Slideout_Map_TrackOptions_Label_Title);
+            label.setText(Messages.Slideout_Map_Options_Label_Title);
             MTFont.setBannerFont(label);
             GridDataFactory
                   .fillDefaults()//
