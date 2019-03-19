@@ -2,31 +2,34 @@
 <?eclipse version="3.2"?>
 <plugin>
 
-	<extension	point="net.tourbook.deviceDataReader">
-	
-		<device
-			class="net.tourbook.device.garmin.fit.FitDataReader"
-			fileextension="fit"
-			id="net.tourbook.device.FitDataReader"
-			name="Fit Import"/>
-			
-	</extension>
+   <extension   point="net.tourbook.deviceDataReader">
 
-	<extension	point="org.eclipse.ui.preferencePages">
-	
-		<page
-			category="net.tourbook.preferences.PrefPageImport"
-			class="net.tourbook.device.garmin.fit.PrefPageImportFit"
-			id="net.tourbook.device.PrefPageFit"
-			name="Fit"/>
+      <device
+         id             ="net.tourbook.device.FitDataReader"
+         name           ="Fit Import"
+         class          ="net.tourbook.device.garmin.fit.FitDataReader"
+         fileextension  ="fit"
+      />
 
-	</extension>
+   </extension>
 
-	<extension	point="org.eclipse.core.runtime.preferences">
-	
-		<initializer
-			class="net.tourbook.device.garmin.fit.PreferenceInitializer"/>
-			
-	</extension>
+   <extension   point="org.eclipse.ui.preferencePages">
+
+      <page
+         category    ="net.tourbook.preferences.PrefPageImport"
+         class       ="net.tourbook.device.garmin.fit.PrefPageImportFit"
+         id          ="net.tourbook.device.PrefPageFit"
+         name        ="Fit"
+      />
+
+   </extension>
+
+   <extension   point="org.eclipse.core.runtime.preferences">
+   
+      <initializer
+         class="net.tourbook.device.garmin.fit.PreferenceInitializer"
+      />
+
+   </extension>
 
 </plugin>

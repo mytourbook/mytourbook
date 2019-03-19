@@ -20,6 +20,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import net.tourbook.Messages;
+import net.tourbook.common.UI;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.FileLocator;
@@ -379,7 +380,7 @@ public class SplashManager {
    public void setMessage(final String message) {
 
       // log message if the splash screen do not show it
-      System.out.println("Splash message: " + message);//$NON-NLS-1$
+      System.out.println(UI.timeStamp() + " Splash message: " + message);//$NON-NLS-1$
 
       if (textLabel != null && !textLabel.isDisposed()) {
 

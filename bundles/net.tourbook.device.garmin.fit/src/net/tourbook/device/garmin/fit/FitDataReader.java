@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,63 +28,64 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 
-import org.apache.commons.io.IOUtils;
-
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.data.TourData;
-import net.tourbook.device.garmin.fit.listeners.Activity_MesgListenerImpl;
-import net.tourbook.device.garmin.fit.listeners.BikeProfile_MesgListenerImpl;
-import net.tourbook.device.garmin.fit.listeners.DeviceInfo_MesgListenerImpl;
-import net.tourbook.device.garmin.fit.listeners.Event_MesgListenerImpl;
-import net.tourbook.device.garmin.fit.listeners.FileCreator_MesgListenerImpl;
-import net.tourbook.device.garmin.fit.listeners.FileId_MesgListenerImpl;
-import net.tourbook.device.garmin.fit.listeners.Hr_MesgListenerImpl;
-import net.tourbook.device.garmin.fit.listeners.Lap_MesgListenerImpl;
-import net.tourbook.device.garmin.fit.listeners.Length_MesgListenerImpl;
-import net.tourbook.device.garmin.fit.listeners.Record_MesgListenerImpl;
-import net.tourbook.device.garmin.fit.listeners.Session_MesgListenerImpl;
+import net.tourbook.device.garmin.fit.listeners.FitData;
+import net.tourbook.device.garmin.fit.listeners.MesgListener_Activity;
+import net.tourbook.device.garmin.fit.listeners.MesgListener_BikeProfile;
+import net.tourbook.device.garmin.fit.listeners.MesgListener_DeviceInfo;
+import net.tourbook.device.garmin.fit.listeners.MesgListener_Event;
+import net.tourbook.device.garmin.fit.listeners.MesgListener_FileCreator;
+import net.tourbook.device.garmin.fit.listeners.MesgListener_FileId;
+import net.tourbook.device.garmin.fit.listeners.MesgListener_Hr;
+import net.tourbook.device.garmin.fit.listeners.MesgListener_Lap;
+import net.tourbook.device.garmin.fit.listeners.MesgListener_Length;
+import net.tourbook.device.garmin.fit.listeners.MesgListener_Record;
+import net.tourbook.device.garmin.fit.listeners.MesgListener_Session;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.tour.TourLogManager;
 
+import org.apache.commons.io.IOUtils;
+
 /**
  * Garmin FIT activity reader based on the official Garmin SDK.
  *
- * @author Marcin Kuthan <marcin.kuthan@gmail.com>
  * @author Wolfgang Schramm
  */
 public class FitDataReader extends TourbookDevice {
 
-	private static boolean	_isLogFitData	= System.getProperty("logFitData") != null;	//$NON-NLS-1$
+   private static boolean _isLogFitData = System.getProperty("logFitData") != null; //$NON-NLS-1$
 
-	private static boolean	_isVersionLogged;
+   private boolean        _isVersionLogged;
 
-	private void addAllLogListener(final MesgBroadcaster broadcaster) {
 
-		broadcaster.addListener(new MesgListener() {
-			@Override
-			public void onMesg(final Mesg mesg) {
+   private void addDebugLogListener(final MesgBroadcaster broadcaster) {
 
-				long garminTimestamp = 0;
+      broadcaster.addListener(new MesgListener() {
+         @Override
+         public void onMesg(final Mesg mesg) {
 
-				for (final Field field : mesg.getFields()) {
+            long garminTimestamp = 0;
 
-					final String fieldName = field.getName();
+            for (final Field field : mesg.getFields()) {
+
+               final String fieldName = field.getName();
 
 //					if (fieldName.equals("temperature")) { //$NON-NLS-1$
 //						int a = 0;
 //						a++;
 //					}
 
-					if (fieldName.equals("timestamp")) { //$NON-NLS-1$
-						garminTimestamp = (Long) field.getValue();
-					}
+               if (fieldName.equals("timestamp")) { //$NON-NLS-1$
+                  garminTimestamp = (Long) field.getValue();
+               }
 
-					/*
-					 * Set fields which should NOT be displayed in the log
-					 */
-					if (fieldName.equals("") // //$NON-NLS-1$
+               /*
+                * Set fields which should NOT be displayed in the log
+                */
+               if (fieldName.equals("") // //$NON-NLS-1$
 
 //							|| fieldName.equals("name") //															//$NON-NLS-1$
 //							|| fieldName.equals("time") //															//$NON-NLS-1$
@@ -288,193 +289,189 @@ public class FitDataReader extends TourbookDevice {
 //							|| fieldName.equals("weight_setting") //$NON-NLS-1$
 //
 //							|| fieldName.equals("unknown") //$NON-NLS-1$
-					//
-					) {
-						continue;
-					}
+               //
+               ) {
+                  continue;
+               }
 
-					final long javaTime = (garminTimestamp * 1000) + com.garmin.fit.DateTime.OFFSET;
+               final long javaTime = (garminTimestamp * 1000) + com.garmin.fit.DateTime.OFFSET;
 
-					System.out.println(
+               System.out.println(
 
-							String.format("" //$NON-NLS-1$
+                     String.format("" //$NON-NLS-1$
 
-									+ "[%s]" //$NON-NLS-1$
+                           + "[%s]" //$NON-NLS-1$
 
-					// time
-									+ " %-42s %d  %s  " //$NON-NLS-1$
+               // time
+                           + " %-42s %d  %s  " //$NON-NLS-1$
 
-					// field
-									+ " %-5d %-30s %20s %s", //$NON-NLS-1$
+               // field
+                           + " %-5d %-30s %20s %s", //$NON-NLS-1$
 
-									FitDataReader.class.getSimpleName(),
+                           FitDataReader.class.getSimpleName(),
 
-									TimeTools.getZonedDateTime(javaTime), // 		show readable date/time
-									javaTime / 1000, //									java time in s
-									Long.toString(garminTimestamp), //				garmin timestamp
+                           TimeTools.getZonedDateTime(javaTime), // 		show readable date/time
+                           javaTime / 1000, //									java time in s
+                           Long.toString(garminTimestamp), //				garmin timestamp
 
-									field.getNum(),
-									fieldName,
-									field.getValue(),
-									field.getUnits()));
-				}
-			}
-		});
-	}
+                           field.getNum(),
+                           fieldName,
+                           field.getValue(),
+                           field.getUnits()));
+            }
+         }
+      });
+   }
 
-	@Override
-	public String buildFileNameFromRawData(final String rawDataFileName) {
-		return null;
-	}
+   @Override
+   public String buildFileNameFromRawData(final String rawDataFileName) {
+      return null;
+   }
 
-	@Override
-	public boolean checkStartSequence(final int byteIndex, final int newByte) {
-		return false;
-	}
+   @Override
+   public boolean checkStartSequence(final int byteIndex, final int newByte) {
+      return false;
+   }
 
-	@Override
-	public String getDeviceModeName(final int modeId) {
-		return null;
-	}
+   @Override
+   public String getDeviceModeName(final int modeId) {
+      return null;
+   }
 
-	@Override
-	public SerialParameters getPortParameters(final String portName) {
-		return null;
-	}
+   @Override
+   public SerialParameters getPortParameters(final String portName) {
+      return null;
+   }
 
-	@Override
-	public int getStartSequenceSize() {
-		return 0;
-	}
+   @Override
+   public int getStartSequenceSize() {
+      return 0;
+   }
 
-	@Override
-	public int getTransferDataSize() {
-		return 0;
-	}
+   @Override
+   public int getTransferDataSize() {
+      return 0;
+   }
 
-	@Override
-	public boolean processDeviceData(final String importFilePath,
-												final DeviceData deviceData,
-												final HashMap<Long, TourData> alreadyImportedTours,
-												final HashMap<Long, TourData> newlyImportedTours) {
+   @Override
+   public boolean processDeviceData(final String importFilePath,
+                                    final DeviceData deviceData,
+                                    final HashMap<Long, TourData> alreadyImportedTours,
+                                    final HashMap<Long, TourData> newlyImportedTours) {
 
-		boolean returnValue = false;
 
-		try (FileInputStream fis = new FileInputStream(importFilePath)) {
+      boolean returnValue = false;
 
-			final MesgBroadcaster broadcaster = new MesgBroadcaster(new Decode());
+      try (FileInputStream fileInputStream = new FileInputStream(importFilePath)) {
 
-			final FitContext context = new FitContext(//
-					this,
-					importFilePath,
-					alreadyImportedTours,
-					newlyImportedTours);
+         final MesgBroadcaster fitBroadcaster = new MesgBroadcaster(new Decode());
 
-			// setup all fit listeners
-			broadcaster.addListener(new Activity_MesgListenerImpl(context));
-			broadcaster.addListener(new BikeProfile_MesgListenerImpl(context));
-			broadcaster.addListener(new DeviceInfo_MesgListenerImpl(context));
-			broadcaster.addListener(new Event_MesgListenerImpl(context));
-			broadcaster.addListener(new FileCreator_MesgListenerImpl(context));
-			broadcaster.addListener(new FileId_MesgListenerImpl(context));
-			broadcaster.addListener(new Lap_MesgListenerImpl(context));
-			broadcaster.addListener(new Record_MesgListenerImpl(context));
-			broadcaster.addListener(new Session_MesgListenerImpl(context));
-			broadcaster.addListener(new Hr_MesgListenerImpl(context));
-			broadcaster.addListener(new Length_MesgListenerImpl(context));
+         final FitData fitData = new FitData(
+               this,
+               importFilePath,
+               alreadyImportedTours,
+               newlyImportedTours);
 
-			if (_isLogFitData) {
+         // setup all fit listeners
 
-				//
-				// START - show debug info
-				//
+         fitBroadcaster.addListener(new MesgListener_Activity(fitData));
+         fitBroadcaster.addListener(new MesgListener_BikeProfile(fitData));
+         fitBroadcaster.addListener(new MesgListener_DeviceInfo(fitData));
+         fitBroadcaster.addListener(new MesgListener_Event(fitData));
+         fitBroadcaster.addListener(new MesgListener_FileCreator(fitData));
+         fitBroadcaster.addListener(new MesgListener_FileId(fitData));
+         fitBroadcaster.addListener(new MesgListener_Hr(fitData));
+         fitBroadcaster.addListener(new MesgListener_Lap(fitData));
+         fitBroadcaster.addListener(new MesgListener_Length(fitData));
+         fitBroadcaster.addListener(new MesgListener_Record(fitData));
+         fitBroadcaster.addListener(new MesgListener_Session(fitData));
 
-				System.out.println();
-				System.out.println();
-				System.out.println(
-						(System.currentTimeMillis() + " [" + getClass().getSimpleName() + "]") //$NON-NLS-1$ //$NON-NLS-2$
-								+ (" \t" + importFilePath)); //$NON-NLS-1$
-				System.out.println();
-				System.out.println(String.format(//
+         if (_isLogFitData) {
 
-						"%-15s %-66s %-5s %-30s %20s %s", //$NON-NLS-1$
+            // show debug info
 
-						"Java", //$NON-NLS-1$
-						"Timestamp", //$NON-NLS-1$
-						"Num", //$NON-NLS-1$
-						"Name", //$NON-NLS-1$
-						"Value", //$NON-NLS-1$
-						"Units" //$NON-NLS-1$
+            System.out.println();
+            System.out.println();
+            System.out.println(
+                  (System.currentTimeMillis() + " [" + getClass().getSimpleName() + "]") //$NON-NLS-1$ //$NON-NLS-2$
+                        + (" \t" + importFilePath)); //$NON-NLS-1$
+            System.out.println();
+            System.out.println(String.format(//
 
-				));
+                  "%-15s %-66s %-5s %-30s %20s %s", //$NON-NLS-1$
 
-				System.out.println();
+                  "Java", //$NON-NLS-1$
+                  "Timestamp", //$NON-NLS-1$
+                  "Num", //$NON-NLS-1$
+                  "Name", //$NON-NLS-1$
+                  "Value", //$NON-NLS-1$
+                  "Units" //$NON-NLS-1$
 
-				addAllLogListener(broadcaster);
+            ));
 
-				//
-				// END - show debug info
-				//
-			}
+            System.out.println();
 
-			broadcaster.run(fis);
+            addDebugLogListener(fitBroadcaster);
+         }
 
-			context.finalizeTour();
+         fitBroadcaster.run(fileInputStream);
 
-			returnValue = true;
+         fitData.finalizeTour();
 
-		} catch (final IOException e) {
-			TourLogManager.logError_CannotReadDataFile(importFilePath, e);
-		}
+         returnValue = true;
 
-		return returnValue;
-	}
+      } catch (final IOException e) {
+         TourLogManager.logError_CannotReadDataFile(importFilePath, e);
+      }
 
-	@Override
-	public boolean validateRawData(final String fileName) {
+      return returnValue;
+   }
 
-		boolean returnValue = false;
-		FileInputStream fis = null;
+   @Override
+   public boolean validateRawData(final String fileName) {
 
-		try {
+      boolean returnValue = false;
+      FileInputStream fis = null;
 
-			fis = new FileInputStream(fileName);
-			returnValue = new Decode().checkFileIntegrity(fis);
+      try {
 
-			if (returnValue) {
+         fis = new FileInputStream(fileName);
+         returnValue = new Decode().checkFileIntegrity(fis);
 
-				// log version if not yet done
+         if (returnValue) {
 
-				if (_isVersionLogged == false) {
+            // log version if not yet done
 
-					TourLogManager.logInfo(
-							String.format(
-									"FIT SDK %d.%d", //$NON-NLS-1$
-									Fit.PROFILE_VERSION_MAJOR,
-									Fit.PROFILE_VERSION_MINOR));
+            if (_isVersionLogged == false) {
 
-					_isVersionLogged = true;
-				}
+               TourLogManager.logInfo(
+                     String.format(
+                           "FIT SDK %d.%d", //$NON-NLS-1$
+                           Fit.PROFILE_VERSION_MAJOR,
+                           Fit.PROFILE_VERSION_MINOR));
 
-			} else {
+               _isVersionLogged = true;
+            }
 
-				TourLogManager.logError(
-						String.format(
-								"FIT checkFileIntegrity failed '%s' - FIT SDK %d.%d", //$NON-NLS-1$
-								fileName,
-								Fit.PROFILE_VERSION_MAJOR,
-								Fit.PROFILE_VERSION_MINOR));
-			}
+         } else {
 
-		} catch (final FileNotFoundException e) {
-			TourLogManager.logError_CannotReadDataFile(fileName, e);
-		} catch (final FitRuntimeException e) {
-			TourLogManager.logEx(String.format("Invalid data file '%s'", fileName), e); //$NON-NLS-1$
-		} finally {
-			IOUtils.closeQuietly(fis);
-		}
+            TourLogManager.logError(
+                  String.format(
+                        "FIT checkFileIntegrity failed '%s' - FIT SDK %d.%d", //$NON-NLS-1$
+                        fileName,
+                        Fit.PROFILE_VERSION_MAJOR,
+                        Fit.PROFILE_VERSION_MINOR));
+         }
 
-		return returnValue;
-	}
+      } catch (final FileNotFoundException e) {
+         TourLogManager.logError_CannotReadDataFile(fileName, e);
+      } catch (final FitRuntimeException e) {
+         TourLogManager.logEx(String.format("Invalid data file '%s'", fileName), e); //$NON-NLS-1$
+      } finally {
+         IOUtils.closeQuietly(fis);
+      }
+
+      return returnValue;
+   }
 
 }

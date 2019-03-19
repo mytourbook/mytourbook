@@ -21,13 +21,12 @@ import com.garmin.fit.FileIdMesgListener;
 import com.garmin.fit.GarminProduct;
 import com.garmin.fit.Manufacturer;
 
-import net.tourbook.device.garmin.fit.FitContext;
 import net.tourbook.tour.TourLogManager;
 
-public class FileId_MesgListenerImpl extends AbstractMesgListener implements FileIdMesgListener {
+public class MesgListener_FileId extends AbstractMesgListener implements FileIdMesgListener {
 
-   public FileId_MesgListenerImpl(final FitContext context) {
-      super(context);
+   public MesgListener_FileId(final FitData fitData) {
+      super(fitData);
    }
 
    @Override
@@ -54,7 +53,7 @@ public class FileId_MesgListenerImpl extends AbstractMesgListener implements Fil
       if (serialNumber == null) {
          TourLogManager.logError("File serial number is missing, device id cannot not be set");//$NON-NLS-1$
       } else {
-         context.setDeviceId(serialNumber.toString());
+         fitData.setDeviceId(serialNumber.toString());
       }
 
       /*
@@ -66,9 +65,9 @@ public class FileId_MesgListenerImpl extends AbstractMesgListener implements Fil
          final String manufacturerText = Manufacturer.getStringFromValue(manufacturerId);
 
          if (manufacturerText.length() > 0) {
-            context.setManufacturer(manufacturerText);
+            fitData.setManufacturer(manufacturerText);
          } else {
-            context.setManufacturer(manufacturerId.toString());
+            fitData.setManufacturer(manufacturerId.toString());
          }
       }
 
@@ -81,9 +80,17 @@ public class FileId_MesgListenerImpl extends AbstractMesgListener implements Fil
          final String garminProductName = GarminProduct.getStringFromValue(garminProductId);
 
          if (garminProductName.length() > 0) {
-            context.setGarminProduct(garminProductName);
+
+            fitData.setGarminProduct(garminProductName);
+
+         } else if (garminProductId == 2713) {
+
+            // Garmin Edge 1030 is not yet in the product list
+
+            fitData.setGarminProduct("EDGE1030");
+
          } else {
-            context.setGarminProduct(garminProductId.toString());
+            fitData.setGarminProduct(garminProductId.toString());
          }
       }
    }
