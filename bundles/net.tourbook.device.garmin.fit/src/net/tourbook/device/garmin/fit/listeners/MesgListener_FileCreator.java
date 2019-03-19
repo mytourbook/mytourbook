@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,20 +15,25 @@
  *******************************************************************************/
 package net.tourbook.device.garmin.fit.listeners;
 
-import com.garmin.fit.EventMesg;
-import com.garmin.fit.EventMesgListener;
+import com.garmin.fit.FileCreatorMesg;
+import com.garmin.fit.FileCreatorMesgListener;
 
-import net.tourbook.device.garmin.fit.FitContext;
+import net.tourbook.device.garmin.fit.DataConverters;
 
-public class Event_MesgListenerImpl extends AbstractMesgListener implements EventMesgListener {
+public class MesgListener_FileCreator extends AbstractMesgListener implements FileCreatorMesgListener {
 
-	public Event_MesgListenerImpl(final FitContext context) {
-		super(context);
-	}
+   public MesgListener_FileCreator(final FitData fitData) {
+      super(fitData);
+   }
 
-	@Override
-	public void onMesg(final EventMesg mesg) {
-		context.getContextData().onMesg_Event(mesg);
-	}
+   @Override
+   public void onMesg(final FileCreatorMesg mesg) {
+
+      final Integer softwareVersion = mesg.getSoftwareVersion();
+
+      if (softwareVersion != null) {
+         fitData.setSoftwareVersion(DataConverters.convertSoftwareVersion(softwareVersion));
+      }
+   }
 
 }

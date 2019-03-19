@@ -128,27 +128,29 @@ import org.eclipse.swt.widgets.Listener;
 
 public class Map extends Canvas {
 
-   private static final String IMAGE_POI_IN_MAP   = de.byteholder.geoclipse.poi.Messages.Image_POI_InMap;
+   private static final String IMAGE_POI_IN_MAP                      = de.byteholder.geoclipse.poi.Messages.Image_POI_InMap;
+   private static final String IMAGE_SEARCH_TOURS_BY_LOCATION        = net.tourbook.Messages.Image__SearchToursByLocation;
+   private static final String IMAGE_SEARCH_TOURS_BY_LOCATION_SCROLL = net.tourbook.Messages.Image__SearchToursByLocation_Scroll;
 
    /**
     * Min zoomlevels which the maps supports
     */
-   public static final int     MAP_MIN_ZOOM_LEVEL = 0;
+   public static final int     MAP_MIN_ZOOM_LEVEL                    = 0;
 
    /**
     * Max zoomlevels which the maps supports
     */
-   public static final int     MAP_MAX_ZOOM_LEVEL = 19;
+   public static final int     MAP_MAX_ZOOM_LEVEL                    = 19;
 
    /**
     * these zoom levels are displayed in the UI therefore they start with 1 instead of 0
     */
-   public static final int     UI_MIN_ZOOM_LEVEL  = MAP_MIN_ZOOM_LEVEL + 1;
+   public static final int     UI_MIN_ZOOM_LEVEL                     = MAP_MIN_ZOOM_LEVEL + 1;
 
-   public static final int     UI_MAX_ZOOM_LEVEL  = MAP_MAX_ZOOM_LEVEL + 1;
+   public static final int     UI_MAX_ZOOM_LEVEL                     = MAP_MAX_ZOOM_LEVEL + 1;
 
-   private static final String DIRECTION_E        = "E";                                                 //$NON-NLS-1$
-   private static final String DIRECTION_N        = "N";                                                 //$NON-NLS-1$
+   private static final String DIRECTION_E                           = "E";                                                      //$NON-NLS-1$
+   private static final String DIRECTION_N                           = "N";                                                      //$NON-NLS-1$
 
    /*
     * Wikipedia data
@@ -292,9 +294,11 @@ public class Map extends Canvas {
 
    private final TileLoadObserver _tileImageLoadObserver  = new TileLoadObserver();
 
-   private final Cursor           _cursorPan;
-   private final Cursor           _cursorDefault;
    private final Cursor           _cursorCross;
+   private final Cursor           _cursorDefault;
+   private final Cursor           _cursorPan;
+   private final Cursor           _cursorSearchTour;
+   private final Cursor           _cursorSearchTour_Scroll;
 
    private final AtomicInteger    _redrawMapCounter       = new AtomicInteger();
    private final AtomicInteger    _overlayRunnableCounter = new AtomicInteger();
@@ -575,6 +579,8 @@ public class Map extends Canvas {
       _cursorPan = new Cursor(_display, SWT.CURSOR_SIZEALL);
       _cursorCross = new Cursor(_display, SWT.CURSOR_CROSS);
       _cursorDefault = new Cursor(_display, SWT.CURSOR_ARROW);
+      _cursorSearchTour = UI.createCursorFromImage(TourbookPlugin.getImageDescriptor(IMAGE_SEARCH_TOURS_BY_LOCATION));
+      _cursorSearchTour_Scroll = UI.createCursorFromImage(TourbookPlugin.getImageDescriptor(IMAGE_SEARCH_TOURS_BY_LOCATION_SCROLL));
 
       _transparentColor = new Color(_display, MAP_TRANSPARENT_RGB);
       _defaultBackgroundColor = new Color(_display, MAP_DEFAULT_BACKGROUND_RGB);
@@ -671,7 +677,7 @@ public class Map extends Canvas {
             TourGeoFilterManager.STATE_GRID_BOX_SIZE,
             TourGeoFilterManager.STATE_GRID_BOX_SIZE_DEFAULT);
 
-      setCursor(_cursorCross);
+      setCursor(_cursorSearchTour);
 
       redraw();
       paint();
@@ -1430,6 +1436,7 @@ public class Map extends Canvas {
 
       _isGridAutoScroll = true;
       _grid_AutoScrollCounter[0]++;
+      setCursor(_cursorSearchTour_Scroll);
 
       getDisplay().timerExec(AUTO_SCROLL_INTERVAL, new Runnable() {
 
@@ -1476,8 +1483,8 @@ public class Map extends Canvas {
                getDisplay().timerExec(AUTO_SCROLL_INTERVAL, this);
             } else {
                _isGridAutoScroll = false;
+               setCursor(_cursorSearchTour);
             }
-
          }
       });
    }
@@ -1867,9 +1874,11 @@ public class Map extends Canvas {
       disposeResource(_9PartImage);
       disposeResource(_9PartGC);
 
+      disposeResource(_cursorCross);
       disposeResource(_cursorDefault);
       disposeResource(_cursorPan);
-      disposeResource(_cursorCross);
+      disposeResource(_cursorSearchTour);
+      disposeResource(_cursorSearchTour_Scroll);
 
       disposeResource(_defaultBackgroundColor);
       disposeResource(_transparentColor);
@@ -1947,6 +1956,7 @@ public class Map extends Canvas {
 
          _grid_GridBoxItem_Hovered = null;
          _isGridAutoScroll = false;
+         setCursor(null);
 
          grid_DisableGridBoxSelection();
 
@@ -5182,8 +5192,8 @@ public class Map extends Canvas {
 
             // This can occure when geofilter is loaded from xml file and not created in the map
 
-            System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ()")
-                  + ("\t: mapGridBoxItem == null"));
+            System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ()") //$NON-NLS-1$ //$NON-NLS-2$
+                  + ("\t: mapGridBoxItem == null")); //$NON-NLS-1$
 // TODO remove SYSTEM.OUT.PRINTLN
 
          } else {

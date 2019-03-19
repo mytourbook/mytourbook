@@ -481,6 +481,7 @@ public class Messages extends NLS {
 
    public static String        App_SplashMessage_Finalize;
    public static String        App_SplashMessage_StartingApplication;
+   public static String        App_SplashMessage_StartingDatabase;
 
    public static String        App_Title;
 
@@ -955,6 +956,7 @@ public class Messages extends NLS {
    public static String        Image__SearchExternal;
    public static String        Image__SearchExternal_Disabled;
    public static String        Image__SearchToursByLocation;
+   public static String        Image__SearchToursByLocation_Scroll;
    public static String        Image__Smoothing;
    public static String        Image__Smoothing_Disabled;
    public static String        Image__State_AdjustTemperature;

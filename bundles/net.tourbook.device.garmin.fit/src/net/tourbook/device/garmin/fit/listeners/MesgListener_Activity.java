@@ -15,16 +15,37 @@
  *******************************************************************************/
 package net.tourbook.device.garmin.fit.listeners;
 
-/**
- * Super class for all message listeners, provides access to the {@link FitData}.
- */
-public abstract class AbstractMesgListener {
+import com.garmin.fit.ActivityMesg;
+import com.garmin.fit.ActivityMesgListener;
 
-   protected final FitData fitData;
+import net.tourbook.tour.TourLogManager;
 
-   public AbstractMesgListener(final FitData fitData) {
+public class MesgListener_Activity extends AbstractMesgListener implements ActivityMesgListener {
 
-      this.fitData = fitData;
-   }
+   public MesgListener_Activity(final FitData fitData) {
+      super(fitData);
+	}
+
+	@Override
+	public void onMesg(final ActivityMesg mesg) {
+
+		final Integer numSessions = mesg.getNumSessions();
+
+		if (numSessions == null || numSessions < 1) {
+
+			final String message = "%s - Invalid number of sessions: %d, expected at least one session."; //$NON-NLS-1$
+
+			TourLogManager.logSubInfo(String.format(
+					message,
+               fitData.getTourTitle(),
+					numSessions));
+
+			/*
+			 * Do not throw an exception because the import can still be successful.
+			 */
+//			throw new FitDataReaderException(message); //$NON-NLS-1$
+		}
+
+	}
 
 }

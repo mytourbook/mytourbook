@@ -1,18 +1,29 @@
+/*******************************************************************************
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation version 2 of the License.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+ *******************************************************************************/
 package net.tourbook.device.garmin.fit.listeners;
 
-import net.tourbook.common.UI;
-import net.tourbook.device.garmin.fit.FitContext;
-
-import com.garmin.fit.AntNetwork;
 import com.garmin.fit.AntplusDeviceType;
 import com.garmin.fit.DeviceInfoMesg;
 import com.garmin.fit.DeviceInfoMesgListener;
 
-public class DeviceInfo_MesgListenerImpl extends AbstractMesgListener implements DeviceInfoMesgListener {
+public class MesgListener_DeviceInfo extends AbstractMesgListener implements DeviceInfoMesgListener {
 
 
-	public DeviceInfo_MesgListenerImpl(final FitContext context) {
-		super(context);
+   public MesgListener_DeviceInfo(final FitData fitData) {
+      super(fitData);
 	}
 
 	private boolean hasHeartRateSensor(final Short deviceType) {
@@ -37,7 +48,7 @@ public class DeviceInfo_MesgListenerImpl extends AbstractMesgListener implements
 
 	@Override
 	public void onMesg(final DeviceInfoMesg mesg) {
-		
+
 		final Short deviceType = mesg.getDeviceType();
 
 //		final DateTime timestamp = mesg.getTimestamp();
@@ -155,19 +166,19 @@ public class DeviceInfo_MesgListenerImpl extends AbstractMesgListener implements
 			 */
 
 			if (hasSpeedSensor) {
-				context.setSpeedSensorPresent(hasSpeedSensor);
+            fitData.setSpeedSensorPresent(hasSpeedSensor);
 			}
 
 			if (hasHeartRateSensor) {
-				context.setHeartRateSensorPresent(hasHeartRateSensor);
+            fitData.setHeartRateSensorPresent(hasHeartRateSensor);
 			}
 
 			if (hasPowerSensor) {
-				context.setPowerSensorPresent(hasPowerSensor);
+            fitData.setPowerSensorPresent(hasPowerSensor);
 			}
 
 			if (hasStrideSensor) {
-				context.setStrideSensorPresent(hasStrideSensor);
+            fitData.setStrideSensorPresent(hasStrideSensor);
 			}
 		}
 
@@ -189,39 +200,39 @@ public class DeviceInfo_MesgListenerImpl extends AbstractMesgListener implements
 //		}
 	}
 
-	private String removeNull(final AntNetwork value) {
-
-		return value == null //
-				? UI.EMPTY_STRING
-				: value.toString();
-	}
-
-	private String removeNull(final Integer value) {
-
-		return value == null //
-				? UI.EMPTY_STRING
-				: value.toString();
-	}
-
-	private String removeNull(final Long value) {
-
-		return value == null //
-				? UI.EMPTY_STRING
-				: value.toString();
-	}
-
-	private String removeNull(final Short value) {
-
-		return value == null //
-				? UI.EMPTY_STRING
-				: value.toString();
-	}
-
-	private String removeNull_3(final Float value) {
-
-		return value == null //
-				? UI.EMPTY_STRING
-				: String.format("%10.3f", value);//$NON-NLS-1$
-	}
+//	private String removeNull(final AntNetwork value) {
+//
+//		return value == null //
+//				? UI.EMPTY_STRING
+//				: value.toString();
+//	}
+//
+//	private String removeNull(final Integer value) {
+//
+//		return value == null //
+//				? UI.EMPTY_STRING
+//				: value.toString();
+//	}
+//
+//	private String removeNull(final Long value) {
+//
+//		return value == null //
+//				? UI.EMPTY_STRING
+//				: value.toString();
+//	}
+//
+//	private String removeNull(final Short value) {
+//
+//		return value == null //
+//				? UI.EMPTY_STRING
+//				: value.toString();
+//	}
+//
+//	private String removeNull_3(final Float value) {
+//
+//		return value == null //
+//				? UI.EMPTY_STRING
+//				: String.format("%10.3f", value);//$NON-NLS-1$
+//	}
 
 }

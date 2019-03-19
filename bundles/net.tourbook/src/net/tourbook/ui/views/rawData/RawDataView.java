@@ -44,6 +44,74 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.UI;
+import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.formatter.FormatManager;
+import net.tourbook.common.formatter.ValueFormat;
+import net.tourbook.common.preferences.ICommonPreferences;
+import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.time.TourDateTime;
+import net.tourbook.common.util.ColumnDefinition;
+import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.ITourViewer3;
+import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.TableColumnDefinition;
+import net.tourbook.common.util.Util;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourPerson;
+import net.tourbook.data.TourTag;
+import net.tourbook.data.TourType;
+import net.tourbook.data.TourWayPoint;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.extension.export.ActionExport;
+import net.tourbook.importdata.DeviceImportState;
+import net.tourbook.importdata.DialogEasyImportConfig;
+import net.tourbook.importdata.EasyConfig;
+import net.tourbook.importdata.EasyImportManager;
+import net.tourbook.importdata.ImportConfig;
+import net.tourbook.importdata.ImportDeviceState;
+import net.tourbook.importdata.ImportLauncher;
+import net.tourbook.importdata.OSFile;
+import net.tourbook.importdata.RawDataManager;
+import net.tourbook.importdata.SpeedTourType;
+import net.tourbook.importdata.TourTypeConfig;
+import net.tourbook.photo.ImageUtils;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageImport;
+import net.tourbook.tag.TagMenuManager;
+import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
+import net.tourbook.tour.ActionOpenMarkerDialog;
+import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.ITourItem;
+import net.tourbook.tour.SelectionDeletedTours;
+import net.tourbook.tour.SelectionTourData;
+import net.tourbook.tour.SelectionTourIds;
+import net.tourbook.tour.TourDoubleClickState;
+import net.tourbook.tour.TourEvent;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourLogManager;
+import net.tourbook.tour.TourLogState;
+import net.tourbook.tour.TourLogView;
+import net.tourbook.tour.TourManager;
+import net.tourbook.tour.TourTypeMenuManager;
+import net.tourbook.tourType.TourTypeImage;
+import net.tourbook.ui.ITourProviderAll;
+import net.tourbook.ui.TableColumnFactory;
+import net.tourbook.ui.action.ActionEditQuick;
+import net.tourbook.ui.action.ActionEditTour;
+import net.tourbook.ui.action.ActionJoinTours;
+import net.tourbook.ui.action.ActionModifyColumns;
+import net.tourbook.ui.action.ActionOpenTour;
+import net.tourbook.ui.action.ActionSetTourTypeMenu;
+import net.tourbook.ui.views.TableViewerTourInfoToolTip;
+import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
+import net.tourbook.web.WEB;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.GroupMarker;
@@ -116,73 +184,6 @@ import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 import org.joda.time.Period;
 import org.joda.time.PeriodType;
-
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.CommonActivator;
-import net.tourbook.common.UI;
-import net.tourbook.common.action.ActionOpenPrefDialog;
-import net.tourbook.common.formatter.FormatManager;
-import net.tourbook.common.preferences.ICommonPreferences;
-import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.time.TourDateTime;
-import net.tourbook.common.util.ColumnDefinition;
-import net.tourbook.common.util.ColumnManager;
-import net.tourbook.common.util.ITourViewer3;
-import net.tourbook.common.util.PostSelectionProvider;
-import net.tourbook.common.util.StatusUtil;
-import net.tourbook.common.util.TableColumnDefinition;
-import net.tourbook.common.util.Util;
-import net.tourbook.data.TourData;
-import net.tourbook.data.TourMarker;
-import net.tourbook.data.TourPerson;
-import net.tourbook.data.TourTag;
-import net.tourbook.data.TourType;
-import net.tourbook.data.TourWayPoint;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.extension.export.ActionExport;
-import net.tourbook.importdata.DeviceImportState;
-import net.tourbook.importdata.DialogEasyImportConfig;
-import net.tourbook.importdata.EasyConfig;
-import net.tourbook.importdata.EasyImportManager;
-import net.tourbook.importdata.ImportConfig;
-import net.tourbook.importdata.ImportDeviceState;
-import net.tourbook.importdata.ImportLauncher;
-import net.tourbook.importdata.OSFile;
-import net.tourbook.importdata.RawDataManager;
-import net.tourbook.importdata.SpeedTourType;
-import net.tourbook.importdata.TourTypeConfig;
-import net.tourbook.photo.ImageUtils;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.PrefPageImport;
-import net.tourbook.tag.TagMenuManager;
-import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
-import net.tourbook.tour.ActionOpenMarkerDialog;
-import net.tourbook.tour.ITourEventListener;
-import net.tourbook.tour.ITourItem;
-import net.tourbook.tour.SelectionDeletedTours;
-import net.tourbook.tour.SelectionTourData;
-import net.tourbook.tour.SelectionTourIds;
-import net.tourbook.tour.TourDoubleClickState;
-import net.tourbook.tour.TourEvent;
-import net.tourbook.tour.TourEventId;
-import net.tourbook.tour.TourLogManager;
-import net.tourbook.tour.TourLogState;
-import net.tourbook.tour.TourLogView;
-import net.tourbook.tour.TourManager;
-import net.tourbook.tour.TourTypeMenuManager;
-import net.tourbook.tourType.TourTypeImage;
-import net.tourbook.ui.ITourProviderAll;
-import net.tourbook.ui.TableColumnFactory;
-import net.tourbook.ui.action.ActionEditQuick;
-import net.tourbook.ui.action.ActionEditTour;
-import net.tourbook.ui.action.ActionJoinTours;
-import net.tourbook.ui.action.ActionModifyColumns;
-import net.tourbook.ui.action.ActionOpenTour;
-import net.tourbook.ui.action.ActionSetTourTypeMenu;
-import net.tourbook.ui.views.TableViewerTourInfoToolTip;
-import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
-import net.tourbook.web.WEB;
 
 /**
  *
@@ -3078,7 +3079,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             final TourData tourData = (TourData) cell.getElement();
 
-            cell.setText(tourData.getTourStartTime().format(TimeTools.Formatter_Time_S));
+            final ValueFormat valueFormatter = colDef.getValueFormat_Detail();
+
+            if (valueFormatter.equals(ValueFormat.TIME_HH_MM_SS)) {
+
+               cell.setText(tourData.getTourStartTime().format(TimeTools.Formatter_Time_M));
+
+            } else {
+
+               cell.setText(tourData.getTourStartTime().format(TimeTools.Formatter_Time_S));
+            }
          }
       });
    }
