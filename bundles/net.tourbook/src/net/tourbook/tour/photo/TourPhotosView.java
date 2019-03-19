@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,29 @@
 package net.tourbook.tour.photo;
 
 import java.util.ArrayList;
+
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.Util;
+import net.tourbook.data.TourData;
+import net.tourbook.photo.IPhotoEventListener;
+import net.tourbook.photo.IPhotoGalleryProvider;
+import net.tourbook.photo.IPhotoPreferences;
+import net.tourbook.photo.Photo;
+import net.tourbook.photo.PhotoEventId;
+import net.tourbook.photo.PhotoGallery;
+import net.tourbook.photo.PhotoManager;
+import net.tourbook.photo.PhotoSelection;
+import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.SelectionTourData;
+import net.tourbook.tour.SelectionTourId;
+import net.tourbook.tour.SelectionTourIds;
+import net.tourbook.tour.SelectionTourMarker;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
+import net.tourbook.ui.UI;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
@@ -45,29 +68,6 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
-
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.util.PostSelectionProvider;
-import net.tourbook.common.util.Util;
-import net.tourbook.data.TourData;
-import net.tourbook.photo.IPhotoEventListener;
-import net.tourbook.photo.IPhotoGalleryProvider;
-import net.tourbook.photo.IPhotoPreferences;
-import net.tourbook.photo.Photo;
-import net.tourbook.photo.PhotoEventId;
-import net.tourbook.photo.PhotoGallery;
-import net.tourbook.photo.PhotoManager;
-import net.tourbook.photo.PhotoSelection;
-import net.tourbook.tour.ITourEventListener;
-import net.tourbook.tour.SelectionTourData;
-import net.tourbook.tour.SelectionTourId;
-import net.tourbook.tour.SelectionTourIds;
-import net.tourbook.tour.SelectionTourMarker;
-import net.tourbook.tour.TourEventId;
-import net.tourbook.tour.TourManager;
-import net.tourbook.ui.UI;
 
 public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
@@ -327,7 +327,6 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 	private void createUI_10_Gallery(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 		{
 			_photoGallery = new PhotoGallery(_state);

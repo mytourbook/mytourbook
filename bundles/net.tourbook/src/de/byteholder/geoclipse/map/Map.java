@@ -126,30 +126,31 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
-@SuppressWarnings("deprecation")
 public class Map extends Canvas {
 
-   private static final String IMAGE_POI_IN_MAP   = de.byteholder.geoclipse.poi.Messages.Image_POI_InMap;
+   private static final String IMAGE_POI_IN_MAP                      = de.byteholder.geoclipse.poi.Messages.Image_POI_InMap;
+   private static final String IMAGE_SEARCH_TOURS_BY_LOCATION        = net.tourbook.Messages.Image__SearchToursByLocation;
+   private static final String IMAGE_SEARCH_TOURS_BY_LOCATION_SCROLL = net.tourbook.Messages.Image__SearchToursByLocation_Scroll;
 
    /**
     * Min zoomlevels which the maps supports
     */
-   public static final int     MAP_MIN_ZOOM_LEVEL = 0;
+   public static final int     MAP_MIN_ZOOM_LEVEL                    = 0;
 
    /**
     * Max zoomlevels which the maps supports
     */
-   public static final int     MAP_MAX_ZOOM_LEVEL = 19;
+   public static final int     MAP_MAX_ZOOM_LEVEL                    = 19;
 
    /**
     * these zoom levels are displayed in the UI therefore they start with 1 instead of 0
     */
-   public static final int     UI_MIN_ZOOM_LEVEL  = MAP_MIN_ZOOM_LEVEL + 1;
+   public static final int     UI_MIN_ZOOM_LEVEL                     = MAP_MIN_ZOOM_LEVEL + 1;
 
-   public static final int     UI_MAX_ZOOM_LEVEL  = MAP_MAX_ZOOM_LEVEL + 1;
+   public static final int     UI_MAX_ZOOM_LEVEL                     = MAP_MAX_ZOOM_LEVEL + 1;
 
-   private static final String DIRECTION_E        = "E";                                                 //$NON-NLS-1$
-   private static final String DIRECTION_N        = "N";                                                 //$NON-NLS-1$
+   private static final String DIRECTION_E                           = "E";                                                      //$NON-NLS-1$
+   private static final String DIRECTION_N                           = "N";                                                      //$NON-NLS-1$
 
    /*
     * Wikipedia data
@@ -293,9 +294,11 @@ public class Map extends Canvas {
 
    private final TileLoadObserver _tileImageLoadObserver  = new TileLoadObserver();
 
-   private final Cursor           _cursorPan;
-   private final Cursor           _cursorDefault;
    private final Cursor           _cursorCross;
+   private final Cursor           _cursorDefault;
+   private final Cursor           _cursorPan;
+   private final Cursor           _cursorSearchTour;
+   private final Cursor           _cursorSearchTour_Scroll;
 
    private final AtomicInteger    _redrawMapCounter       = new AtomicInteger();
    private final AtomicInteger    _overlayRunnableCounter = new AtomicInteger();
@@ -514,18 +517,21 @@ public class Map extends Canvas {
    /**
     * Is <code>true</code> when the map context menu can be displayed
     */
-   private boolean             _isContextMenuEnabled = true;
+   private boolean             _isContextMenuEnabled   = true;
 
    private DropTarget          _dropTarget;
 
-   private boolean             _isRedrawEnabled      = true;
+   private boolean             _isRedrawEnabled        = true;
 
    private HoveredAreaContext  _hoveredAreaContext;
 
-   private int                 _overlayAlpha         = 0xff;
+   private int                 _overlayAlpha           = 0xff;
 
    private MapGridBoxItem      _grid_GridBoxItem_Hovered;
    private MapGridBoxItem      _grid_GridBoxItem_Selected;
+
+   private int[]               _grid_AutoScrollCounter = new int[1];
+   private boolean             _isGridAutoScroll;
 
    /**
     * This observer is called in the {@link Tile} when a tile image is set into the tile
@@ -573,6 +579,8 @@ public class Map extends Canvas {
       _cursorPan = new Cursor(_display, SWT.CURSOR_SIZEALL);
       _cursorCross = new Cursor(_display, SWT.CURSOR_CROSS);
       _cursorDefault = new Cursor(_display, SWT.CURSOR_ARROW);
+      _cursorSearchTour = UI.createCursorFromImage(TourbookPlugin.getImageDescriptor(IMAGE_SEARCH_TOURS_BY_LOCATION));
+      _cursorSearchTour_Scroll = UI.createCursorFromImage(TourbookPlugin.getImageDescriptor(IMAGE_SEARCH_TOURS_BY_LOCATION_SCROLL));
 
       _transparentColor = new Color(_display, MAP_TRANSPARENT_RGB);
       _defaultBackgroundColor = new Color(_display, MAP_DEFAULT_BACKGROUND_RGB);
@@ -669,7 +677,7 @@ public class Map extends Canvas {
             TourGeoFilterManager.STATE_GRID_BOX_SIZE,
             TourGeoFilterManager.STATE_GRID_BOX_SIZE_DEFAULT);
 
-      setCursor(_cursorCross);
+      setCursor(_cursorSearchTour);
 
       redraw();
       paint();
@@ -708,17 +716,17 @@ public class Map extends Canvas {
 
          @Override
          public void mouseDoubleClick(final MouseEvent event) {
-            onMouseDoubleClick(event);
+            onMouse_DoubleClick(event);
          }
 
          @Override
          public void mouseDown(final MouseEvent event) {
-            onMouseDown(event);
+            onMouse_Down(event);
          }
 
          @Override
          public void mouseUp(final MouseEvent event) {
-            onMouseUp(event);
+            onMouse_Up(event);
          }
       });
 
@@ -737,6 +745,9 @@ public class Map extends Canvas {
             // set position out of the map that to tool tip is not activated again
             _mouseMovePositionX = Integer.MIN_VALUE;
             _mouseMovePositionY = Integer.MIN_VALUE;
+
+            // stop grid autoscrolling
+            _isGridAutoScroll = false;
          }
 
          @Override
@@ -746,28 +757,28 @@ public class Map extends Canvas {
       addMouseMoveListener(new MouseMoveListener() {
          @Override
          public void mouseMove(final MouseEvent event) {
-            onMouseMove(event);
+            onMouse_Move(event);
          }
       });
 
       addListener(SWT.MouseVerticalWheel, new Listener() {
          @Override
          public void handleEvent(final Event event) {
-            onMouseWheel(event);
+            onMouse_Wheel(event);
          }
       });
 
       addListener(SWT.MouseHorizontalWheel, new Listener() {
          @Override
          public void handleEvent(final Event event) {
-            onMouseWheel(event);
+            onMouse_Wheel(event);
          }
       });
 
       addListener(SWT.KeyDown, new Listener() {
          @Override
          public void handleEvent(final Event event) {
-            onKeyDown(event);
+            onKey_Down(event);
          }
       });
 
@@ -1415,6 +1426,129 @@ public class Map extends Canvas {
       redraw();
    }
 
+   /**
+    * @param mouseBorderPosition
+    * @param eventTime
+    */
+   private void grid_DoAutoScroll(final Point mouseBorderPosition) {
+
+      final int AUTO_SCROLL_INTERVAL = 50; // 20ms == 50fps
+
+      _isGridAutoScroll = true;
+      _grid_AutoScrollCounter[0]++;
+      setCursor(_cursorSearchTour_Scroll);
+
+      getDisplay().timerExec(AUTO_SCROLL_INTERVAL, new Runnable() {
+
+         final int __runnableScrollCounter = _grid_AutoScrollCounter[0];
+
+         @Override
+         public void run() {
+
+            if (__runnableScrollCounter != _grid_AutoScrollCounter[0]) {
+               // a new runnable is created
+               return;
+            }
+
+            if (isDisposed() || _isGridAutoScroll == false) {
+               // auto scrolling is stopped
+               return;
+            }
+
+            /*
+             * set new map center
+             */
+
+            final int mapDiffX = mouseBorderPosition.x;
+            final int mapDiffY = mouseBorderPosition.y;
+
+            final double oldCenterX = _worldPixelMapCenter.getX();
+            final double oldCenterY = _worldPixelMapCenter.getY();
+
+            final double newCenterX = oldCenterX - mapDiffX;
+            final double newCenterY = oldCenterY - mapDiffY;
+
+            // set new map center
+            setMapCenterInWorldPixel(new Point2D.Double(newCenterX, newCenterY));
+            updateViewPortData();
+
+            paint();
+
+            fireMapPositionEvent(false);
+
+            // start scrolling again when the bounds have not been reached
+            final Point mouseBorderPosition = grid_GetMouseBorderPosition();
+            final boolean isRepeatScrolling = mouseBorderPosition != null;
+            if (isRepeatScrolling) {
+               getDisplay().timerExec(AUTO_SCROLL_INTERVAL, this);
+            } else {
+               _isGridAutoScroll = false;
+               setCursor(_cursorSearchTour);
+            }
+         }
+      });
+   }
+
+   /**
+    * @param mouseEvent
+    * @return Returns mouse positon in the map border or <code>null</code> when the border is not
+    *         hovered. The returned absolute values are higher when the mouse is closer to the
+    *         border.
+    */
+   private Point grid_GetMouseBorderPosition() {
+
+      final int mapBorderSize = 30;
+
+      final int mapWidth = _clientArea.width;
+      final int mapHeight = _clientArea.height;
+
+      // check map min size
+      if (mapWidth < 2 * mapBorderSize || mapHeight < 2 * mapBorderSize) {
+         return null;
+      }
+
+      final int mouseX = _mouseMovePositionX;
+      final int mouseY = _mouseMovePositionY;
+
+      int x = 0;
+      int y = 0;
+
+      boolean isInBorder = false;
+
+      // check left border, returns -x
+      if (mouseX < mapBorderSize) {
+         isInBorder = true;
+         x = (mapBorderSize - mouseX);
+      }
+
+      // check right border, returns +x
+      if (mouseX > mapWidth - mapBorderSize) {
+         isInBorder = true;
+         x = -(mapBorderSize - (mapWidth - mouseX));
+      }
+
+      // check top border, returns +y
+      if (mouseY < mapBorderSize) {
+         isInBorder = true;
+         y = mapBorderSize - mouseY;
+      }
+
+      // check bottom border, returns -y
+      if (mouseY > mapHeight - mapBorderSize) {
+         isInBorder = true;
+         y = -(mapBorderSize - (mapHeight - mouseY));
+      }
+
+      if (isInBorder) {
+
+         return new Point(x, y);
+
+      } else {
+
+         return null;
+      }
+   }
+
    private void grid_UpdateEndPosition(final MouseEvent mouseEvent, final MapGridBoxItem gridBoxItem) {
 
       final int worldMouseX = _worldPixelTopLeftViewport.x + mouseEvent.x;
@@ -1740,9 +1874,11 @@ public class Map extends Canvas {
       disposeResource(_9PartImage);
       disposeResource(_9PartGC);
 
+      disposeResource(_cursorCross);
       disposeResource(_cursorDefault);
       disposeResource(_cursorPan);
-      disposeResource(_cursorCross);
+      disposeResource(_cursorSearchTour);
+      disposeResource(_cursorSearchTour_Scroll);
 
       disposeResource(_defaultBackgroundColor);
       disposeResource(_transparentColor);
@@ -1809,7 +1945,7 @@ public class Map extends Canvas {
       }
    }
 
-   private void onKeyDown(final Event event) {
+   private void onKey_Down(final Event event) {
 
       if (_offline_IsSelectingOfflineArea) {
          offline_DisableOfflineAreaSelection();
@@ -1819,6 +1955,8 @@ public class Map extends Canvas {
       if (_grid_GridBoxItem_Hovered != null) {
 
          _grid_GridBoxItem_Hovered = null;
+         _isGridAutoScroll = false;
+         setCursor(null);
 
          grid_DisableGridBoxSelection();
 
@@ -1866,7 +2004,7 @@ public class Map extends Canvas {
       }
    }
 
-   private void onMouseDoubleClick(final MouseEvent mouseEvent) {
+   private void onMouse_DoubleClick(final MouseEvent mouseEvent) {
 
       if (mouseEvent.button == 1) {
 
@@ -1885,7 +2023,7 @@ public class Map extends Canvas {
       }
    }
 
-   private void onMouseDown(final MouseEvent mouseEvent) {
+   private void onMouse_Down(final MouseEvent mouseEvent) {
 
       // check if left mouse button is pressed
       if (mouseEvent.button != 1) {
@@ -1944,7 +2082,7 @@ public class Map extends Canvas {
       }
    }
 
-   private void onMouseMove(final MouseEvent mouseEvent) {
+   private void onMouse_Move(final MouseEvent mouseEvent) {
 
       if (_mp == null) {
          return;
@@ -1975,6 +2113,16 @@ public class Map extends Canvas {
       } else if (_grid_GridBoxItem_Hovered != null) {
 
          _grid_GridBoxItem_Hovered.worldMouse_Move = new Point(worldMouseX, worldMouseY);
+
+         final Point mouseBorderPosition = grid_GetMouseBorderPosition();
+         if (mouseBorderPosition != null) {
+
+            // scroll map
+
+            grid_DoAutoScroll(mouseBorderPosition);
+
+            return;
+         }
 
          grid_UpdateEndPosition(mouseEvent, _grid_GridBoxItem_Hovered);
 
@@ -2042,7 +2190,7 @@ public class Map extends Canvas {
       fireMousePosition();
    }
 
-   private void onMouseUp(final MouseEvent mouseEvent) {
+   private void onMouse_Up(final MouseEvent mouseEvent) {
 
       if (_offline_IsSelectingOfflineArea) {
 
@@ -2082,6 +2230,7 @@ public class Map extends Canvas {
             // this can happen when the right mouse button is clicked
 
             _grid_GridBoxItem_Hovered = null;
+            _isGridAutoScroll = true;
 
             grid_DisableGridBoxSelection();
 
@@ -2095,7 +2244,9 @@ public class Map extends Canvas {
          grid_UpdateEndPosition(mouseEvent, _grid_GridBoxItem_Hovered);
 
          _grid_GridBoxItem_Selected = _grid_GridBoxItem_Hovered;
+
          _grid_GridBoxItem_Hovered = null;
+         _isGridAutoScroll = true;
 
          grid_DisableGridBoxSelection();
 
@@ -2132,7 +2283,7 @@ public class Map extends Canvas {
 
    }
 
-   private void onMouseWheel(final Event event) {
+   private void onMouse_Wheel(final Event event) {
 
       if (event.count < 0) {
          zoomOut();
@@ -2912,8 +3063,14 @@ public class Map extends Canvas {
       }
 
       gc.setLineStyle(SWT.LINE_SOLID);
-      gc.setLineWidth(2);
+      gc.setLineWidth(1);
+
+      // draw outline with selected color
       gc.setForeground(boxColor);
+      gc.drawRectangle(devGrid_X1 + 1, devGrid_Y1 + 1, width - 2, height - 2);
+
+      // draw dark outline to make it more visible
+      gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
       gc.drawRectangle(devGrid_X1, devGrid_Y1, width, height);
 
       return new Point(devGrid_X1, devGrid_Y1);
@@ -5035,8 +5192,8 @@ public class Map extends Canvas {
 
             // This can occure when geofilter is loaded from xml file and not created in the map
 
-            System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ()")
-                  + ("\t: mapGridBoxItem == null"));
+            System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ()") //$NON-NLS-1$ //$NON-NLS-2$
+                  + ("\t: mapGridBoxItem == null")); //$NON-NLS-1$
 // TODO remove SYSTEM.OUT.PRINTLN
 
          } else {

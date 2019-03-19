@@ -1009,7 +1009,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    private void createUI(final Composite parent) {
 
       _pageBook = new PageBook(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBook);
 
       _pageNoData = UI.createUI_PageNoData(_pageBook, Messages.GeoCompare_View_PageText_NoTourWithGeoData);
       _pageMultipleTours = UI.createUI_PageNoData(

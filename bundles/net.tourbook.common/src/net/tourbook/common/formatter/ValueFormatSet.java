@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,21 +17,31 @@ package net.tourbook.common.formatter;
 
 public class ValueFormatSet {
 
-	public static ValueFormat[]	Number	= new ValueFormat[] {
-										//
-			ValueFormat.NUMBER_1_0,
-			ValueFormat.NUMBER_1_1,
-			ValueFormat.NUMBER_1_2,
-			ValueFormat.NUMBER_1_3
+   public static ValueFormat[] Number    = new ValueFormat[] {
 
-										};
+         ValueFormat.NUMBER_1_0,
+         ValueFormat.NUMBER_1_1,
+         ValueFormat.NUMBER_1_2,
+         ValueFormat.NUMBER_1_3
 
-	public static ValueFormat[]	Time	= new ValueFormat[] {
-										//
-			ValueFormat.TIME_HH,
-			ValueFormat.TIME_HH_MM,
-			ValueFormat.TIME_HH_MM_SS
+   };
 
-										};
+   public static ValueFormat[] Time      = new ValueFormat[] {
+
+         ValueFormat.TIME_HH,
+         ValueFormat.TIME_HH_MM,
+         ValueFormat.TIME_HH_MM_SS
+
+   };
+
+   /**
+    * Only {@link ValueFormatter_Time_HHMM} or {@link ValueFormatter_Time_HHMMSS}
+    */
+   public static ValueFormat[] Time_mmss = new ValueFormat[] {
+
+         ValueFormat.TIME_HH_MM,
+         ValueFormat.TIME_HH_MM_SS
+
+   };
 
 }

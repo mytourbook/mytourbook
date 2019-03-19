@@ -482,7 +482,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
       public ActionSearchTourByLocation() {
 
          setText(Messages.Map_Action_SearchTourByLocation);
-
          setImageDescriptor(TourbookPlugin.getImageDescriptor(IMAGE_SEARCH_TOURS_BY_LOCATION));
       }
 
@@ -3203,6 +3202,23 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
       _map.setMapCenter(new GeoPosition(latitudeSerie[sliderIndex], longitudeSerie[sliderIndex]));
 
+   }
+
+   public void redrawMap() {
+
+      Display.getDefault().asyncExec(new Runnable() {
+         @Override
+         public void run() {
+
+            if (_parent.isDisposed()) {
+               return;
+            }
+
+//            _map.paint();
+            _map.redraw();
+
+         }
+      });
    }
 
    private void resetMap() {

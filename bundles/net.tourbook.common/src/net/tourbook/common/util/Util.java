@@ -142,12 +142,18 @@ public class Util {
     * @param arr
     * @return
     */
-   public static Object[] arrayReverse(final Object[] arr) {
+   public static String[] arrayReverse(final String[] arr) {
 
-      final List<Object> list = Arrays.asList(arr);
+      final List<String> list = Arrays.asList(arr);
       Collections.reverse(list);
 
-      return list.toArray();
+      String[] stringArray = new String[list.size()];
+      
+      for (int index = 0; index < list.size(); index++) {
+         stringArray[index] = list.get(index);
+      }
+      
+      return stringArray;
    }
 
    /**

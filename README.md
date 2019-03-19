@@ -19,6 +19,7 @@ _This document will not repeat already written text in the documentation._
 
 ## Commandline arguments
 
+### Logging
 
 **Log map 2.5 http traffic** 
 
@@ -29,10 +30,20 @@ _This document will not repeat already written text in the documentation._
 
 -DlogCalendarProfile
 
+**Log FIT data**
+
+-DlogFitData
+
+**Log statistic values**
+
+-DlogStatisticValues
+
+### Other
+
 **Scramble calendar content/values**
 
 -DscrambleCalendar
 
-**Log FIT data**
+**Each tour has a unique id so that a tour can be imported multiple times**
 
--DlogFitData
+-DcreateRandomTourId

@@ -1,111 +1,111 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project 
 
-	xsi:schemaLocation	="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" 
-	xmlns						="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi				="http://www.w3.org/2001/XMLSchema-instance">
+   xsi:schemaLocation   ="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" 
+   xmlns                ="http://maven.apache.org/POM/4.0.0"
+   xmlns:xsi            ="http://www.w3.org/2001/XMLSchema-instance">
 
-	<modelVersion>4.0.0</modelVersion>
+   <modelVersion>4.0.0</modelVersion>
 
-	<artifactId>mytourbook-product</artifactId>			<groupId>net.tourbook</groupId>
-																		<version>19.2.0-SNAPSHOT</version>
-	<packaging>eclipse-repository</packaging>
+   <artifactId>mytourbook-product</artifactId>        <groupId>net.tourbook</groupId>
+                                                      <version>19.3.2-SNAPSHOT</version>
+   <packaging>eclipse-repository</packaging>
 
-	<parent>
-		<artifactId>mytourbook-build</artifactId>			<groupId>net.tourbook</groupId>
-																		<version>19.2.0-SNAPSHOT</version>
-		<relativePath>..</relativePath>
-	</parent>
+   <parent>
+      <artifactId>mytourbook-build</artifactId>       <groupId>net.tourbook</groupId>
+                                                      <version>19.3.2-SNAPSHOT</version>
+      <relativePath>..</relativePath>
+   </parent>
 
-	<build>
-	
-	    <finalName>myproduct-${unqualifiedVersion}</finalName>
-	    
-		<plugins>
+   <build>
+   
+       <finalName>myproduct-${unqualifiedVersion}</finalName>
+       
+      <plugins>
 
-			<plugin>
-				<artifactId>tycho-p2-director-plugin</artifactId>	<groupId>org.eclipse.tycho</groupId>
-																					<version>${tycho.version}</version>
-				<executions>
-					<execution>
-						<id>create-distributions</id>
-						<goals>
-							<goal>materialize-products</goal>
-							<goal>archive-products</goal>
-						</goals>
-					</execution>
-				</executions>
-				
-				<configuration>
-					<products>
-						<product>
-						
-							<!-- select product with ID other.product.id for the classifiers "other-<os>.<ws>.<arch>" -->
-							<id>net.tourbook.product</id>
-							
-							<!--
-							<attachId>mytourbook_attachId</attachId>
-							-->
+         <plugin>
+            <artifactId>tycho-p2-director-plugin</artifactId>     <groupId>org.eclipse.tycho</groupId>
+                                                                  <version>${tycho.version}</version>
+            <executions>
+               <execution>
+                  <id>create-distributions</id>
+                  <goals>
+                     <goal>materialize-products</goal>
+                     <goal>archive-products</goal>
+                  </goals>
+               </execution>
+            </executions>
+            
+            <configuration>
+               <products>
+                  <product>
+                  
+                     <!-- select product with ID other.product.id for the classifiers "other-<os>.<ws>.<arch>" -->
+                     <id>net.tourbook.product</id>
+                     
+                     <!--
+                     <attachId>mytourbook_attachId</attachId>
+                     -->
 
-					      <!-- optional parameters -->
-					      <rootFolder>mytourbook</rootFolder>
-					        
-							<!-- 
-							${project.version}
-							<archiveFileName>CUSTOM_PREFIX__${unqualifiedVersion}__${buildQualifier}__</archiveFileName>
-							-->
-							<archiveFileName>mytourbook-${unqualifiedVersion}</archiveFileName>
+                     <!-- optional parameters -->
+                     <rootFolder>mytourbook</rootFolder>
+                       
+                     <!-- 
+                     ${project.version}
+                     <archiveFileName>CUSTOM_PREFIX__${unqualifiedVersion}__${buildQualifier}__</archiveFileName>
+                     -->
+                     <archiveFileName>mytourbook-${unqualifiedVersion}</archiveFileName>
 
-							<!-- macosx adjustment -->
-							<rootFolders>
-								<macosx>MyTourbook.app</macosx>
-							</rootFolders>
-						</product>
-					</products>
-				</configuration>
-  			</plugin>
+                     <!-- macosx adjustment -->
+                     <rootFolders>
+                        <macosx>MyTourbook.app</macosx>
+                     </rootFolders>
+                  </product>
+               </products>
+            </configuration>
+           </plugin>
 
-			<!-- macosx adjustment -->
-			<plugin>
-				<artifactId>tycho-p2-repository-plugin</artifactId>		<groupId>org.eclipse.tycho</groupId>
-																							<version>${tycho.version}</version>
-				<configuration>
-					<includeAllDependencies>true</includeAllDependencies>
-					<profileProperties>
-						<macosx-bundled>true</macosx-bundled>
-					</profileProperties>
-				</configuration>
-			</plugin>
+         <!-- macosx adjustment -->
+         <plugin>
+            <artifactId>tycho-p2-repository-plugin</artifactId>      <groupId>org.eclipse.tycho</groupId>
+                                                                     <version>${tycho.version}</version>
+            <configuration>
+               <includeAllDependencies>true</includeAllDependencies>
+               <profileProperties>
+                  <macosx-bundled>true</macosx-bundled>
+               </profileProperties>
+            </configuration>
+         </plugin>
 
-			<plugin>
-				<artifactId>maven-antrun-plugin</artifactId>	<version>1.8</version>
-				<executions>
-				
-					<execution>
-						<id>modify-product-archives</id>
-						<phase>package</phase>
-						<goals><goal>run</goal></goals>
-						
-						<configuration>
-							<target name="set-executable-flag">
-							
-								<ant antfile="build-SetExecutableFlag755.xml">
-									<property name="tycho-path"		value="${project.build.directory}"/>
-									<property name="tycho-version"	value="${unqualifiedVersion}"/>
-								</ant>
+         <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>   <version>1.8</version>
+            <executions>
+            
+               <execution>
+                  <id>modify-product-archives</id>
+                  <phase>package</phase>
+                  <goals><goal>run</goal></goals>
+                  
+                  <configuration>
+                     <target name="set-executable-flag">
+                     
+                        <ant antfile="build-SetExecutableFlag755.xml">
+                           <property name="tycho-path"      value="${project.build.directory}"/>
+                           <property name="tycho-version"   value="${unqualifiedVersion}"/>
+                        </ant>
 
-								<ant antfile="build-RenameProductArchives.xml">
-									<property name="tycho-path"		value="${project.build.directory}"/>
-									<property name="tycho-version"	value="${unqualifiedVersion}"/>
-								</ant>
-								
-							</target>
-						</configuration>
-						
-					</execution>
+                        <ant antfile="build-RenameProductArchives.xml">
+                           <property name="tycho-path"      value="${project.build.directory}"/>
+                           <property name="tycho-version"   value="${unqualifiedVersion}"/>
+                        </ant>
+                        
+                     </target>
+                  </configuration>
+                  
+               </execution>
  
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
+            </executions>
+         </plugin>
+      </plugins>
+   </build>
 </project>

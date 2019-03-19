@@ -1071,9 +1071,6 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
 	private void createUI(final Composite parent) {
 
-		// set parent griddata, this must be done AFTER the content is created, otherwise it fails !!!
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(parent);
-
 		// build GUI: container(SWT) -> Frame(AWT) -> Panel(AWT) -> WorldWindowGLCanvas(AWT)
 		_mapContainer = new Composite(parent, SWT.EMBEDDED);
 		GridDataFactory.fillDefaults().applyTo(_mapContainer);

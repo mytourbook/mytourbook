@@ -101,8 +101,7 @@ Build Product
    Open cmd
       - Select folder "C:\DAT\MT\mytourbook"
       - Run "mvn verify -P build-release"
-      - Run "mvn verify -P build-release -X --log-file ../log.txt"
-        this will log into a file
+      - Run "mvn verify -P build-release -X --log-file ../log.txt" - this will log into a file
 
 
 Build Update site

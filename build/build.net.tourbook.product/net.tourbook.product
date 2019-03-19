@@ -3,7 +3,7 @@
 
 <product 
 
-	version		="19.2.0.qualifier" 
+	version		="19.3.2.qualifier" 
 
 	name			="MyTourbook Product" 
 	id				="net.tourbook.product" 

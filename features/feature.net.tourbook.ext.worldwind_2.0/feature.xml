@@ -29,16 +29,6 @@
          unpack="false"/>
 
    <plugin
-         id="net.tourbook.ext.worldwind.linux32_2.0"
-         os="linux"
-         arch="x86"
-         download-size="0"
-         install-size="0"
-         version="2.1.20170207"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
          id="net.tourbook.ext.worldwind.linux64_2.0"
          os="linux"
          arch="x86_64"
@@ -52,16 +42,6 @@
          id="net.tourbook.ext.worldwind.macosx_2.0"
          os="macosx"
          arch="x86_64"
-         download-size="0"
-         install-size="0"
-         version="2.1.20170207"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="net.tourbook.ext.worldwind.win32_2.0"
-         os="win32"
-         arch="x86"
          download-size="0"
          install-size="0"
          version="2.1.20170207"

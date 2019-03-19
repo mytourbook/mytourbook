@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/feature.net.tourbook.app_19.2.0.qualifier.jar" id="feature.net.tourbook.app" version="19.2.0.qualifier">
+   <feature url="features/feature.net.tourbook.app_19.3.2.qualifier.jar" id="feature.net.tourbook.app" version="19.3.2.qualifier">
       <category name="MyTourbook"/>
    </feature>
-   <feature url="features/feature.net.tourbook.app.nl_19.2.0.qualifier.jar" id="feature.net.tourbook.app.nl" version="19.2.0.qualifier">
+   <feature url="features/feature.net.tourbook.app.nl_19.3.2.qualifier.jar" id="feature.net.tourbook.app.nl" version="19.3.2.qualifier">
       <category name="MyTourbook"/>
    </feature>
    <category-def name="MyTourbook" label="MyTourbook"/>
