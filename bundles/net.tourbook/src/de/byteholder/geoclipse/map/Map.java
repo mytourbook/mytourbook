@@ -672,13 +672,7 @@ public class Map extends Canvas {
          TourGeoFilter_Manager.setAndOpenGeoFilterSlideout(true);
       }
 
-      // set fast map paining
-      _isFastMapPainting = Util.getStateBoolean(_geoFilterState,
-            TourGeoFilter_Manager.STATE_IS_FAST_MAP_PAINTING,
-            TourGeoFilter_Manager.STATE_IS_FAST_MAP_PAINTING_DEFAULT);
-      _fastMapPainting_skippedValues = Util.getStateInt(_geoFilterState,
-            TourGeoFilter_Manager.STATE_FAST_MAP_PAINTING_SKIPPED_VALUES,
-            TourGeoFilter_Manager.STATE_FAST_MAP_PAINTING_SKIPPED_VALUES_DEFAULT);
+      grid_UpdatePaintingStateData();
 
       final Point worldMousePosition = new Point(
             _worldPixel_TopLeft_Viewport.x + _mouseMove_DevPosition_X,
@@ -1089,6 +1083,8 @@ public class Map extends Canvas {
       _tileOverlayPaintQueue.clear();
 
       _overlayImageCache.dispose();
+
+      grid_UpdatePaintingStateData();
    }
 
    private void disposeResource(final Resource resource) {
@@ -1916,6 +1912,18 @@ public class Map extends Canvas {
       }
 
       redraw();
+   }
+
+   private void grid_UpdatePaintingStateData() {
+
+      // set fast map paining
+      _isFastMapPainting = Util.getStateBoolean(_geoFilterState,
+            TourGeoFilter_Manager.STATE_IS_FAST_MAP_PAINTING,
+            TourGeoFilter_Manager.STATE_IS_FAST_MAP_PAINTING_DEFAULT);
+
+      _fastMapPainting_skippedValues = Util.getStateInt(_geoFilterState,
+            TourGeoFilter_Manager.STATE_FAST_MAP_PAINTING_SKIPPED_VALUES,
+            TourGeoFilter_Manager.STATE_FAST_MAP_PAINTING_SKIPPED_VALUES_DEFAULT);
    }
 
    /**
@@ -5351,13 +5359,7 @@ public class Map extends Canvas {
     */
    public void showGeoGrid(final TourGeoFilter tourGeoFilter) {
 
-      // set fast map paining
-      _isFastMapPainting = Util.getStateBoolean(_geoFilterState,
-            TourGeoFilter_Manager.STATE_IS_FAST_MAP_PAINTING,
-            TourGeoFilter_Manager.STATE_IS_FAST_MAP_PAINTING_DEFAULT);
-      _fastMapPainting_skippedValues = Util.getStateInt(_geoFilterState,
-            TourGeoFilter_Manager.STATE_FAST_MAP_PAINTING_SKIPPED_VALUES,
-            TourGeoFilter_Manager.STATE_FAST_MAP_PAINTING_SKIPPED_VALUES_DEFAULT);
+      grid_UpdatePaintingStateData();
 
       if (tourGeoFilter == null) {
 

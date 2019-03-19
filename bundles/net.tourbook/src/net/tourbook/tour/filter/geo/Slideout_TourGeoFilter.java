@@ -324,184 +324,15 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
       GridDataFactory.fillDefaults().grab(true, true).applyTo(shellContainer);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(shellContainer);
       {
-         createUI_200_Viewer(shellContainer);
-
          final Composite container = new Composite(shellContainer, SWT.NONE);
-         GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+         GridDataFactory.fillDefaults().grab(false, true).applyTo(container);
          GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
          {
             createUI_400_Options(container);
             createUI_490_Options_Actions(container);
          }
-      }
-   }
 
-   private void createUI_200_Viewer(final Composite parent) {
-
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-      GridLayoutFactory.fillDefaults().applyTo(container);
-      {
-         {
-            final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Slideout_TourGeoFilter_Label_History);
-         }
-         {
-            _viewerContainer = new Composite(container, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, true).applyTo(_viewerContainer);
-            GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
-            {
-               createUI_210_FilterViewer(_viewerContainer);
-            }
-         }
-
-         createUI_280_ViewerActions(container);
-      }
-   }
-
-   private void createUI_210_FilterViewer(final Composite parent) {
-
-      /*
-       * create table
-       */
-      final Table table = new Table(parent, SWT.FULL_SELECTION /* | SWT.MULTI /* | SWT.BORDER */);
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
-
-      table.setHeaderVisible(true);
-      table.setLinesVisible(false);
-
-      /*
-       * It took a while that the correct listener is set and also the checked item is fired and not
-       * the wrong selection.
-       */
-      table.addListener(SWT.Selection, new Listener() {
-
-         @Override
-         public void handleEvent(final Event event) {
-//            onGeoPart_Select(event);
-         }
-      });
-
-      /*
-       * create table viewer
-       */
-      _geoFilterViewer = new TableViewer(table);
-
-      _columnManager.createColumns(_geoFilterViewer);
-
-      _geoFilterViewer.setUseHashlookup(true);
-      _geoFilterViewer.setContentProvider(new GeoFilterProvider());
-      _geoFilterViewer.setComparator(_geoPartComparator);
-
-      _geoFilterViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-
-         @Override
-         public void selectionChanged(final SelectionChangedEvent event) {
-            onGeoFilter_Select(event);
-         }
-      });
-
-      _geoFilterViewer.addDoubleClickListener(new IDoubleClickListener() {
-
-         @Override
-         public void doubleClick(final DoubleClickEvent event) {
-//          onBookmark_Rename(true);
-         }
-      });
-
-      _geoFilterViewer.getTable().addKeyListener(new KeyListener() {
-
-         @Override
-         public void keyPressed(final KeyEvent e) {
-
-            switch (e.keyCode) {
-
-            case SWT.DEL:
-               onGeoFilter_Delete();
-               break;
-
-            default:
-               break;
-            }
-         }
-
-         @Override
-         public void keyReleased(final KeyEvent e) {}
-      });
-
-      updateUI_SetSortDirection(//
-            _geoPartComparator.__sortColumnId,
-            _geoPartComparator.__sortDirection);
-
-      createUI_220_ContextMenu();
-   }
-
-   /**
-    * Ceate the view context menus
-    */
-   private void createUI_220_ContextMenu() {
-
-      final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
-
-      menuMgr.setRemoveAllWhenShown(true);
-
-      menuMgr.addMenuListener(new IMenuListener() {
-         @Override
-         public void menuAboutToShow(final IMenuManager manager) {
-//          fillContextMenu(manager);
-         }
-      });
-
-      /**
-       * THIS IS NOT WORKING, IT CAUSES AN
-       * <p>
-       * java.lang.IllegalArgumentException: Widget has the wrong parent
-       * <p>
-       * which needs more time for investigation
-       */
-//      final Table table = _geoFilterViewer.getTable();
-//      final Menu tableHeaderContextMenu = menuMgr.createContextMenu(table);
-//
-//      _columnManager.createHeaderContextMenu(table, tableHeaderContextMenu);
-   }
-
-   private void createUI_280_ViewerActions(final Composite parent) {
-
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().applyTo(container);
-      GridLayoutFactory.fillDefaults()
-            .margins(0, 0)
-            .numColumns(2)
-            .applyTo(container);
-      {
-         {
-            /*
-             * Button: delete geo filter
-             */
-            _btnDeleteGeoFilter = new Button(container, SWT.NONE);
-            _btnDeleteGeoFilter.setText(Messages.App_Action_Delete);
-            _btnDeleteGeoFilter.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onGeoFilter_Delete();
-               }
-            });
-            UI.setButtonLayoutData(_btnDeleteGeoFilter);
-         }
-         {
-            /*
-             * Button: delete all geo filter
-             */
-            _btnDeleteGeoFilterAll = new Button(container, SWT.NONE);
-            _btnDeleteGeoFilterAll.setText(Messages.App_Action_Delete_All);
-            _btnDeleteGeoFilterAll.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onGeoFilter_Delete_All();
-               }
-            });
-            UI.setButtonLayoutData(_btnDeleteGeoFilterAll);
-         }
+         createUI_600_Viewer(shellContainer);
       }
    }
 
@@ -509,12 +340,65 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
-            .indent(10, 0)
+//            .indent(10, 0)
             .grab(true, true)
             .applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
       {
+         {
+            /*
+             * Radio: Include/exclude geo parts
+             */
+            // label
+            _lblGeoParts_IncludeExclude = new Label(container, SWT.NONE);
+            _lblGeoParts_IncludeExclude.setText(Messages.Slideout_TourGeoFilter_Label_FilterIncludeExclude);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(_lblGeoParts_IncludeExclude);
+
+            final Composite radioContainer = new Composite(container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(radioContainer);
+            GridLayoutFactory.fillDefaults().numColumns(1).applyTo(radioContainer);
+            {
+               // Radio: Line
+               _rdoGeoParts_Include = new Button(radioContainer, SWT.RADIO);
+               _rdoGeoParts_Include.setText(Messages.Slideout_TourGeoFilter_Radio_GeoParts_Include);
+               _rdoGeoParts_Include.setToolTipText(Messages.Slideout_TourGeoFilter_Radio_GeoParts_Include_Tooltip);
+               _rdoGeoParts_Include.addSelectionListener(_selectionListener_WithUpdateUI);
+
+               // Radio: Dot
+               _rdoGeoParts_Exclude = new Button(radioContainer, SWT.RADIO);
+               _rdoGeoParts_Exclude.setText(Messages.Slideout_TourGeoFilter_Radio_GeoParts_Exclude);
+               _rdoGeoParts_Exclude.setToolTipText(Messages.Slideout_TourGeoFilter_Radio_GeoParts_Exclude_Tooltip);
+               _rdoGeoParts_Exclude.addSelectionListener(_selectionListener_WithUpdateUI);
+            }
+         }
+         {
+            /*
+             * Color: Geo parts
+             */
+            // label
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(Messages.Slideout_TourGeoFilter_Label_GeoPartColor);
+
+            // colors
+            final Composite containerColors = new Composite(container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(containerColors);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerColors);
+            {
+
+               // hovering/selecting color
+               _colorGeoPart_HoverSelecting = new ColorSelectorExtended(containerColors);
+               _colorGeoPart_HoverSelecting.getButton().setToolTipText(Messages.Slideout_TourGeoFilter_Color_GeoPartHover_Tooltip);
+               _colorGeoPart_HoverSelecting.addListener(_defaultChangePropertyListener);
+               _colorGeoPart_HoverSelecting.addOpenListener(this);
+
+               // selected color
+               _colorGeoPart_Selected = new ColorSelectorExtended(containerColors);
+               _colorGeoPart_Selected.getButton().setToolTipText(Messages.Slideout_TourGeoFilter_Color_GeoPartSelected_Tooltip);
+               _colorGeoPart_Selected.addListener(_defaultChangePropertyListener);
+               _colorGeoPart_Selected.addOpenListener(this);
+            }
+         }
          {
             /*
              * Use app filter
@@ -591,54 +475,15 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
          }
          {
             /*
-             * Radio: Search geo parts
+             * Hint
              */
-            // label
-            _lblGeoParts_IncludeExclude = new Label(container, SWT.NONE);
-            _lblGeoParts_IncludeExclude.setText(Messages.Slideout_TourGeoFilter_Label_FilterIncludeExclude);
-            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(_lblGeoParts_IncludeExclude);
-
-            final Composite radioContainer = new Composite(container, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(radioContainer);
-            GridLayoutFactory.fillDefaults().numColumns(1).applyTo(radioContainer);
-            {
-               // Radio: Line
-               _rdoGeoParts_Include = new Button(radioContainer, SWT.RADIO);
-               _rdoGeoParts_Include.setText(Messages.Slideout_TourGeoFilter_Radio_GeoParts_Include);
-               _rdoGeoParts_Include.addSelectionListener(_selectionListener_WithUpdateUI);
-
-               // Radio: Dot
-               _rdoGeoParts_Exclude = new Button(radioContainer, SWT.RADIO);
-               _rdoGeoParts_Exclude.setText(Messages.Slideout_TourGeoFilter_Radio_GeoParts_Exclude);
-               _rdoGeoParts_Exclude.addSelectionListener(_selectionListener_WithUpdateUI);
-            }
-         }
-         {
-            /*
-             * Color: Geo parts
-             */
-            // label
             final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Slideout_TourGeoFilter_Label_GeoPartColor);
-
-            // colors
-            final Composite containerColors = new Composite(container, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(containerColors);
-            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerColors);
-            {
-
-               // hovering/selecting color
-               _colorGeoPart_HoverSelecting = new ColorSelectorExtended(containerColors);
-               _colorGeoPart_HoverSelecting.getButton().setToolTipText(Messages.Slideout_TourGeoFilter_Color_GeoPartHover_Tooltip);
-               _colorGeoPart_HoverSelecting.addListener(_defaultChangePropertyListener);
-               _colorGeoPart_HoverSelecting.addOpenListener(this);
-
-               // selected color
-               _colorGeoPart_Selected = new ColorSelectorExtended(containerColors);
-               _colorGeoPart_Selected.getButton().setToolTipText(Messages.Slideout_TourGeoFilter_Color_GeoPartSelected_Tooltip);
-               _colorGeoPart_Selected.addListener(_defaultChangePropertyListener);
-               _colorGeoPart_Selected.addOpenListener(this);
-            }
+            label.setText(Messages.Slideout_TourGeoFilter_Label_Hint);
+            GridDataFactory.fillDefaults()
+                  .grab(true, true)
+                  .span(2, 1)
+                  .align(SWT.FILL, SWT.END)
+                  .applyTo(label);
          }
       }
    }
@@ -650,13 +495,188 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
           * Restore action
           */
          final ToolBar toolbarUI = new ToolBar(parent, SWT.FLAT);
-         GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).applyTo(toolbarUI);
+         GridDataFactory.fillDefaults().align(SWT.FILL, SWT.FILL).applyTo(toolbarUI);
 
          final ToolBarManager toolbarManager = new ToolBarManager(toolbarUI);
 
          toolbarManager.add(_actionRestoreDefaults);
 
          toolbarManager.update(true);
+      }
+   }
+
+   private void createUI_600_Viewer(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()
+            .grab(true, true)
+            .indent(10, 0)
+            .applyTo(container);
+      GridLayoutFactory.fillDefaults().applyTo(container);
+      {
+         {
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(Messages.Slideout_TourGeoFilter_Label_History);
+         }
+         {
+            _viewerContainer = new Composite(container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, true).applyTo(_viewerContainer);
+            GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
+            {
+               createUI_610_FilterViewer(_viewerContainer);
+            }
+         }
+
+         createUI_680_ViewerActions(container);
+      }
+   }
+
+   private void createUI_610_FilterViewer(final Composite parent) {
+
+      /*
+       * create table
+       */
+      final Table table = new Table(parent, SWT.FULL_SELECTION /* | SWT.MULTI /* | SWT.BORDER */);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
+
+      table.setHeaderVisible(true);
+      table.setLinesVisible(false);
+
+      /*
+       * It took a while that the correct listener is set and also the checked item is fired and not
+       * the wrong selection.
+       */
+      table.addListener(SWT.Selection, new Listener() {
+
+         @Override
+         public void handleEvent(final Event event) {
+//            onGeoPart_Select(event);
+         }
+      });
+
+      /*
+       * create table viewer
+       */
+      _geoFilterViewer = new TableViewer(table);
+
+      _columnManager.createColumns(_geoFilterViewer);
+
+      _geoFilterViewer.setUseHashlookup(true);
+      _geoFilterViewer.setContentProvider(new GeoFilterProvider());
+      _geoFilterViewer.setComparator(_geoPartComparator);
+
+      _geoFilterViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+
+         @Override
+         public void selectionChanged(final SelectionChangedEvent event) {
+            onGeoFilter_Select(event);
+         }
+      });
+
+      _geoFilterViewer.addDoubleClickListener(new IDoubleClickListener() {
+
+         @Override
+         public void doubleClick(final DoubleClickEvent event) {
+//          onBookmark_Rename(true);
+         }
+      });
+
+      _geoFilterViewer.getTable().addKeyListener(new KeyListener() {
+
+         @Override
+         public void keyPressed(final KeyEvent e) {
+
+            switch (e.keyCode) {
+
+            case SWT.DEL:
+               onGeoFilter_Delete();
+               break;
+
+            default:
+               break;
+            }
+         }
+
+         @Override
+         public void keyReleased(final KeyEvent e) {}
+      });
+
+      updateUI_SetSortDirection(//
+            _geoPartComparator.__sortColumnId,
+            _geoPartComparator.__sortDirection);
+
+      createUI_620_ContextMenu();
+   }
+
+   /**
+    * Ceate the view context menus
+    */
+   private void createUI_620_ContextMenu() {
+
+      final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+
+      menuMgr.setRemoveAllWhenShown(true);
+
+      menuMgr.addMenuListener(new IMenuListener() {
+         @Override
+         public void menuAboutToShow(final IMenuManager manager) {
+//          fillContextMenu(manager);
+         }
+      });
+
+      /**
+       * THIS IS NOT WORKING, IT CAUSES AN
+       * <p>
+       * java.lang.IllegalArgumentException: Widget has the wrong parent
+       * <p>
+       * which needs more time for investigation
+       */
+//      final Table table = _geoFilterViewer.getTable();
+//      final Menu tableHeaderContextMenu = menuMgr.createContextMenu(table);
+//
+//      _columnManager.createHeaderContextMenu(table, tableHeaderContextMenu);
+   }
+
+   private void createUI_680_ViewerActions(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()
+            .grab(true, false)
+            .align(SWT.END, SWT.FILL)
+            .applyTo(container);
+      GridLayoutFactory.fillDefaults()
+            .margins(0, 0)
+            .numColumns(2)
+            .applyTo(container);
+      {
+         {
+            /*
+             * Button: delete geo filter
+             */
+            _btnDeleteGeoFilter = new Button(container, SWT.NONE);
+            _btnDeleteGeoFilter.setText(Messages.App_Action_Delete);
+            _btnDeleteGeoFilter.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onGeoFilter_Delete();
+               }
+            });
+            UI.setButtonLayoutData(_btnDeleteGeoFilter);
+         }
+         {
+            /*
+             * Button: delete all geo filter
+             */
+            _btnDeleteGeoFilterAll = new Button(container, SWT.NONE);
+            _btnDeleteGeoFilterAll.setText(Messages.App_Action_Delete_All);
+            _btnDeleteGeoFilterAll.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onGeoFilter_Delete_All();
+               }
+            });
+            UI.setButtonLayoutData(_btnDeleteGeoFilterAll);
+         }
       }
    }
 
@@ -900,6 +920,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
 
          final Map map = map2View.getMap();
 
+         map.disposeTiles();
          map.disposeOverlayImageCache();
          map.paint();
       }
@@ -911,6 +932,8 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
 
       _btnDeleteGeoFilter.setEnabled(isGeoFilterSelected);
       _btnDeleteGeoFilterAll.setEnabled(_allGeoFilter.size() > 0);
+
+      _chkIsSyncMapPosition.setEnabled(isGeoFilterSelected);
    }
 
    @Override
@@ -1201,7 +1224,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
       {
          _geoFilterViewer.getTable().dispose();
 
-         createUI_210_FilterViewer(_viewerContainer);
+         createUI_610_FilterViewer(_viewerContainer);
          _viewerContainer.layout();
 
          // update the viewer

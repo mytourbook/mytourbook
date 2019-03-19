@@ -2047,10 +2047,13 @@ public class Messages extends NLS {
    public static String Slideout_TourGeoFilter_Label_FilterIncludeExclude;
    public static String Slideout_TourGeoFilter_Label_GeoPartColor;
    public static String Slideout_TourGeoFilter_Label_GeoPartColor_Tooltip;
+   public static String Slideout_TourGeoFilter_Label_Hint;
    public static String Slideout_TourGeoFilter_Label_History;
    public static String Slideout_TourGeoFilter_Label_Title;
    public static String Slideout_TourGeoFilter_Radio_GeoParts_Exclude;
+   public static String Slideout_TourGeoFilter_Radio_GeoParts_Exclude_Tooltip;
    public static String Slideout_TourGeoFilter_Radio_GeoParts_Include;
+   public static String Slideout_TourGeoFilter_Radio_GeoParts_Include_Tooltip;
    public static String Slideout_TourGeoFilter_Spinner_FastMapPainting_SkippedValues_Tooltip;
    public static String Slideout_TourGeoFilter_Spinner_GridBoxSize;
 
