@@ -2032,6 +2032,7 @@ public class Messages extends NLS {
    public static String Slideout_TourGeoFilter_Color_GeoParts_HoverSelecting;
    public static String Slideout_TourGeoFilter_Color_GeoPartSelected_Tooltip;
    public static String Slideout_TourGeoFilter_Column_Created_Label;
+   public static String Slideout_TourGeoFilter_Column_FilterName_Label;
    public static String Slideout_TourGeoFilter_Column_Latitude1_Header;
    public static String Slideout_TourGeoFilter_Column_Latitude1_Label;
    public static String Slideout_TourGeoFilter_Column_Latitude2_Header;

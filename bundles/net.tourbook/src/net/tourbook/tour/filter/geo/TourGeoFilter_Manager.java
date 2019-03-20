@@ -94,6 +94,7 @@ public class TourGeoFilter_Manager {
 
    private static final String             ATTR_ACTIVE_GEO_FILTER_ID                      = "activeGeoFilterId";                      //$NON-NLS-1$
    private static final String             ATTR_CREATED                                   = "created";                                //$NON-NLS-1$
+   private static final String             ATTR_FILTER_NAME                               = "filterName";                             //$NON-NLS-1$
    private static final String             ATTR_GEO_FILTER_ID                             = "geoFilterId";                            //$NON-NLS-1$
    private static final String             ATTR_MAP_GEO_CENTER_LATITUDE                   = "mapGeoCenterLatitude";                   //$NON-NLS-1$
    private static final String             ATTR_MAP_GEO_CENTER_LONGITUDE                  = "mapGeoCenterLongitude";                  //$NON-NLS-1$
@@ -405,14 +406,14 @@ public class TourGeoFilter_Manager {
 
       _actionTourGeoFilter.setSelection(_isGeoFilterEnabled);
 
-      xmlReadGeoFilter();
+      xmlRead_GeoFilter();
    }
 
    public static void saveState() {
 
       _prefStore.setValue(ITourbookPreferences.APP_TOUR_GEO_FILTER_IS_SELECTED, _actionTourGeoFilter.getSelection());
 
-      final XMLMemento xmlRoot = xmlWriteGeoFilter();
+      final XMLMemento xmlRoot = xmlWrite_GeoFilter();
       final File xmlFile = getXmlFile();
 
       Util.writeXml(xmlRoot, xmlFile);
@@ -471,7 +472,7 @@ public class TourGeoFilter_Manager {
     *
     * @return
     */
-   private static void xmlReadGeoFilter() {
+   private static void xmlRead_GeoFilter() {
 
       final File xmlFile = getXmlFile();
 
@@ -496,6 +497,7 @@ public class TourGeoFilter_Manager {
                      geoFilter.id = filterId;
                   }
 
+                  geoFilter.filterName = Util.getXmlString(xmlGeoFilter, ATTR_FILTER_NAME, UI.EMPTY_STRING);
                   geoFilter.created = Util.getXmlDateTime(xmlGeoFilter, ATTR_CREATED, TimeTools.now());
                   geoFilter.createdMS = TimeTools.toEpochMilli(geoFilter.created);
 
@@ -550,13 +552,13 @@ public class TourGeoFilter_Manager {
    /**
     * @return
     */
-   private static XMLMemento xmlWriteGeoFilter() {
+   private static XMLMemento xmlWrite_GeoFilter() {
 
       XMLMemento xmlRoot = null;
 
       try {
 
-         xmlRoot = xmlWriteGeoFilter_10_Root();
+         xmlRoot = xmlWrite_GeoFilter_10_Root();
 
 // This is currently disabled because loaded filters do not yet work
 
@@ -571,6 +573,7 @@ public class TourGeoFilter_Manager {
 
             xmlFilter.putString(ATTR_GEO_FILTER_ID, geoFilter.id);
 
+            xmlFilter.putString(ATTR_FILTER_NAME, geoFilter.filterName);
             xmlFilter.putString(ATTR_CREATED, geoFilter.created.toString());
             xmlFilter.putInteger(ATTR_NUM_GEO_PARTS, geoFilter.numGeoParts);
 
@@ -596,7 +599,7 @@ public class TourGeoFilter_Manager {
       return xmlRoot;
    }
 
-   private static XMLMemento xmlWriteGeoFilter_10_Root() {
+   private static XMLMemento xmlWrite_GeoFilter_10_Root() {
 
       final XMLMemento xmlRoot = XMLMemento.createWriteRoot(TAG_ROOT);
 

@@ -19,6 +19,7 @@ import de.byteholder.geoclipse.map.MapGridData;
 
 import java.time.ZonedDateTime;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.time.TimeTools;
 
@@ -39,7 +40,7 @@ import org.eclipse.swt.graphics.Point;
  */
 public class TourGeoFilter {
 
-   String             id = Long.toString(System.nanoTime());
+   String             id         = Long.toString(System.nanoTime());
 
    public GeoPosition geoLocation_TopLeft;
    public GeoPosition geoLocation_BottomRight;
@@ -54,6 +55,7 @@ public class TourGeoFilter {
    public int         mapZoomLevel;
    public GeoPosition mapGeoCenter;
 
+   String             filterName = UI.EMPTY_STRING;
    ZonedDateTime      created;
    long               createdMS;
 

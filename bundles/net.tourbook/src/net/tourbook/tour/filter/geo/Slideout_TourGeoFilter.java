@@ -50,9 +50,11 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -60,6 +62,7 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
@@ -92,6 +95,7 @@ import org.eclipse.ui.IViewPart;
 public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourViewer, IColorSelectorListener {
 
    private static final String            COLUMN_CREATED_DATE_TIME = "createdDateTime";                      //$NON-NLS-1$
+   private static final String            COLUMN_FILTER_NAME       = "filterName";                           //$NON-NLS-1$
    private static final String            COLUMN_GEO_PARTS         = "geoParts";                             //$NON-NLS-1$
    private static final String            COLUMN_LATITUDE_1        = "latitude1";                            //$NON-NLS-1$
    private static final String            COLUMN_LONGITUDE_1       = "longitude1";                           //$NON-NLS-1$
@@ -102,6 +106,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
    private final static IDialogSettings   _state                   = TourGeoFilter_Manager.getState();
 
    private TableViewer                    _geoFilterViewer;
+   private TableColumnDefinition          _colDef_FilterName;
    private CompareResultComparator        _geoPartComparator       = new CompareResultComparator();
    private ColumnManager                  _columnManager;
 
@@ -248,6 +253,42 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
       }
    }
 
+   private class FilterName_EditingSupport extends EditingSupport {
+
+      private final TableViewer __viewer;
+      private final CellEditor  __editor;
+
+      public FilterName_EditingSupport(final TableViewer viewer) {
+
+         super(viewer);
+
+         this.__viewer = viewer;
+         this.__editor = new TextCellEditor(viewer.getTable());
+      }
+
+      @Override
+      protected boolean canEdit(final Object element) {
+         return true;
+      }
+
+      @Override
+      protected CellEditor getCellEditor(final Object element) {
+         return __editor;
+      }
+
+      @Override
+      protected Object getValue(final Object element) {
+         return ((TourGeoFilter) element).filterName;
+      }
+
+      @Override
+      protected void setValue(final Object element, final Object userInputValue) {
+
+         ((TourGeoFilter) element).filterName = (String) userInputValue;
+         __viewer.update(element, null);
+      }
+   }
+
    private class GeoFilterProvider implements IStructuredContentProvider {
 
       @Override
@@ -311,6 +352,10 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
 
       createUI(parent);
 
+      // editing support must be set AFTER the viewer is created
+      _colDef_FilterName.setEditingSupport(new FilterName_EditingSupport(_geoFilterViewer));
+      UI.setCellEditSupport(_geoFilterViewer);
+
       // load viewer
       updateUI_Viewer();
 
@@ -332,7 +377,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
             createUI_490_Options_Actions(container);
          }
 
-         createUI_600_Viewer(shellContainer);
+         createUI_600_FilterViewer(shellContainer);
       }
    }
 
@@ -505,7 +550,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
       }
    }
 
-   private void createUI_600_Viewer(final Composite parent) {
+   private void createUI_600_FilterViewer(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
@@ -523,7 +568,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
             GridDataFactory.fillDefaults().grab(true, true).applyTo(_viewerContainer);
             GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
             {
-               createUI_610_FilterViewer(_viewerContainer);
+               createUI_610_FilterViewer_Table(_viewerContainer);
             }
          }
 
@@ -531,7 +576,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
       }
    }
 
-   private void createUI_610_FilterViewer(final Composite parent) {
+   private void createUI_610_FilterViewer_Table(final Composite parent) {
 
       /*
        * create table
@@ -683,6 +728,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
    private void defineAllColumns() {
 
       defineColumn_00_SequenceNumber();
+      defineColumn_05_FilterName();
       defineColumn_10_Created();
       defineColumn_20_NumGeoParts();
       defineColumn_30_Zoomlevel();
@@ -715,6 +761,33 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
          }
       });
 
+   }
+
+   /**
+    * Column: Number of geo parts
+    */
+   private void defineColumn_05_FilterName() {
+
+      _colDef_FilterName = new TableColumnDefinition(_columnManager, COLUMN_FILTER_NAME, SWT.TRAIL);
+
+      _colDef_FilterName.setColumnLabel(Messages.Slideout_TourGeoFilter_Column_FilterName_Label);
+      _colDef_FilterName.setColumnHeaderText(Messages.Slideout_TourGeoFilter_Column_FilterName_Label);
+
+      _colDef_FilterName.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(12));
+
+      _colDef_FilterName.setIsDefaultColumn();
+      _colDef_FilterName.setCanModifyVisibility(false);
+      _colDef_FilterName.setColumnSelectionListener(_columnSortListener);
+
+      _colDef_FilterName.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourGeoFilter item = (TourGeoFilter) cell.getElement();
+
+            cell.setText(item.filterName);
+         }
+      });
    }
 
    /**
@@ -1224,7 +1297,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
       {
          _geoFilterViewer.getTable().dispose();
 
-         createUI_610_FilterViewer(_viewerContainer);
+         createUI_610_FilterViewer_Table(_viewerContainer);
          _viewerContainer.layout();
 
          // update the viewer
