@@ -1,4 +1,4 @@
-Version 19.3.2                                             ?. March 2019
+Version 19.4.0                                             ?. April 2019
 
 
 .fit Import
@@ -11,9 +11,15 @@ It is still possible that there are undiscovered issue. So check your data after
 New
 ===
 
+*
+
 
 Improvements
 ============
+
+* Search Tour by Location
+
+  - Option for fast map drawing 
 
 
 Changes
