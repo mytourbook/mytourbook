@@ -80,7 +80,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -108,8 +107,8 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
 
    private TableViewer                    _geoFilterViewer;
    private TableColumnDefinition          _colDef_FilterName;
-   private CompareResultComparator        _geoPartComparator       = new CompareResultComparator();
    private ColumnManager                  _columnManager;
+   private CompareResultComparator        _geoPartComparator       = new CompareResultComparator();
 
    private final ArrayList<TourGeoFilter> _allGeoFilter            = TourGeoFilter_Manager.getAllGeoFilter();
    private TourGeoFilter                  _selectedFilter;
@@ -286,7 +285,15 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
       protected void setValue(final Object element, final Object userInputValue) {
 
          ((TourGeoFilter) element).filterName = (String) userInputValue;
+
+         // update viewer
          __viewer.update(element, null);
+
+         // update name in map
+         getToolTipShell().getDisplay().asyncExec(() -> {
+
+            onSelect_GeoFilter(_selectedFilter);
+         });
       }
    }
 
@@ -315,14 +322,14 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
    }
 
    @Override
-   protected void beforeShellVisible(final Shell visibleShell, final boolean isVisible) {
+   protected void beforeShellVisible(final boolean isVisible) {
 
       /**
        * Context menu must be set lately, otherwise an "Widget has the wrong parent" exception
        * occures
        */
       if (isVisible) {
-         _columnManager.createHeaderContextMenu(_geoFilterViewer.getTable(), null, visibleShell);
+         _columnManager.createHeaderContextMenu(_geoFilterViewer.getTable(), null, getRRShellWithResize());
       }
    }
 
@@ -364,10 +371,6 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
       initUI(parent);
 
       createUI(parent);
-
-      // editing support must be set AFTER the viewer is created
-      _colDef_FilterName.setEditingSupport(new FilterName_EditingSupport(_geoFilterViewer));
-//      UI.setCellEditSupport(_geoFilterViewer);
 
       // load viewer
       updateUI_Viewer();
@@ -637,6 +640,11 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
        */
       _geoFilterViewer = new TableViewer(table);
 
+      // very important: the editing support must be set BEFORE the columns are created
+      _colDef_FilterName.setEditingSupport(new FilterName_EditingSupport(_geoFilterViewer));
+
+      UI.setCellEditSupport(_geoFilterViewer);
+
       _columnManager.createColumns(_geoFilterViewer);
       _columnManager.setSlideoutShell(this);
 
@@ -684,8 +692,17 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
       });
 
       /**
-       * ColumnManager context menu is set in {@link #beforeHideToolTip()}
+       * ColumnManager context menu is set in {@link #beforeHideToolTip()} but this works only until
+       * the column manager is recreating the viewer.
+       * <p>
+       * The slideout must be reopened that the context menu is working again :-(
        */
+
+      /*
+       * Set context menu after a viewer reload, even more complicated
+       */
+      _columnManager.createHeaderContextMenu(_geoFilterViewer.getTable(), null, getRRShellWithResize());
+
    }
 
    /**
@@ -758,6 +775,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
       colDef.setColumnHeaderToolTipText(Messages.GeoCompare_View_Column_SequenceNumber_Label);
 
       colDef.setIsDefaultColumn();
+      colDef.setCanModifyVisibility(false);
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
 
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -777,7 +795,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
     */
    private void defineColumn_05_FilterName() {
 
-      _colDef_FilterName = new TableColumnDefinition(_columnManager, COLUMN_FILTER_NAME, SWT.TRAIL);
+      _colDef_FilterName = new TableColumnDefinition(_columnManager, COLUMN_FILTER_NAME, SWT.LEAD);
 
       _colDef_FilterName.setColumnLabel(Messages.Slideout_TourGeoFilter_Column_FilterName_Label);
       _colDef_FilterName.setColumnHeaderText(Messages.Slideout_TourGeoFilter_Column_FilterName_Label);
@@ -812,7 +830,6 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(20));
 
       colDef.setIsDefaultColumn();
-      colDef.setCanModifyVisibility(false);
       colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -841,7 +858,6 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(6));
 
       colDef.setIsDefaultColumn();
-      colDef.setCanModifyVisibility(false);
       colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -895,7 +911,6 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
 
       colDef.setIsDefaultColumn();
-      colDef.setCanModifyVisibility(false);
       colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -923,7 +938,6 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
 
       colDef.setIsDefaultColumn();
-      colDef.setCanModifyVisibility(false);
       colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -951,7 +965,6 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
 
       colDef.setIsDefaultColumn();
-      colDef.setCanModifyVisibility(false);
       colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -979,7 +992,6 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
 
       colDef.setIsDefaultColumn();
-      colDef.setCanModifyVisibility(false);
       colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {

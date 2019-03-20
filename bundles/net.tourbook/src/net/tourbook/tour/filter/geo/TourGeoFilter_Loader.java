@@ -288,10 +288,14 @@ public class TourGeoFilter_Loader {
 
       geoLoaderData.sqlRunningTime = timeDiff;
 
-      final String timeInMs = timeDiff > 0 ? " - " + Long.toString(timeDiff) + " ms" : "";
-//      final String timeInMs = " - " + Long.toString(timeDiff) + " ms";
+      final String title = tourGeoFilter != null && tourGeoFilter.filterName.length() > 0
+            ? tourGeoFilter.filterName
+            : "Tours";
 
-      geoLoaderData.mapGridData.gridBox_Text = "Tours: " + Integer.toString(allTourIds.size()) + timeInMs;
+      final int numTours = allTourIds.size();
+      final String timeInMs = timeDiff > 0 ? " - " + Long.toString(timeDiff) + " ms" : "";
+
+      geoLoaderData.mapGridData.gridBox_Text = String.format("%s: %d %s", title, numTours, timeInMs);
 
       geoLoaderData.allLoadedTourIds = allTourIds;
 

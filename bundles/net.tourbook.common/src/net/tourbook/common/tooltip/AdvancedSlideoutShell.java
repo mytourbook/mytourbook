@@ -591,13 +591,12 @@ public abstract class AdvancedSlideoutShell {
    protected abstract void beforeHideToolTip();
 
    /**
-    * Is called just before the shell is set to be visible or hidden
+    * This is called just before the shell is set to be visible or hidden
     *
-    * @param visibleShell
     * @param isVisible
     *           Is <code>true</code> when visible otherwise hidden.
     */
-   protected void beforeShellVisible(final Shell visibleShell, final boolean isVisible) {}
+   protected void beforeShellVisible(final boolean isVisible) {}
 
    /**
     * <b>VERY IMPORTANT</b>
@@ -822,6 +821,14 @@ public abstract class AdvancedSlideoutShell {
       }
 
       return (Shell) prevParent;
+   }
+
+   /**
+    * @return Returns shell which is used when the slideout is hovered and the user can modify the
+    *         UI
+    */
+   public Shell getRRShellWithResize() {
+      return _rrShellWithResize.getShell();
    }
 
    protected Color getShellColor_Background(final ColorRegistry colorRegistry) {
@@ -1594,8 +1601,7 @@ public abstract class AdvancedSlideoutShell {
 
    private void setShellVisible(final boolean isVisible) {
 
-      //
-      beforeShellVisible(_rrShellWithResize.getShell(), isVisible);
+      beforeShellVisible(isVisible);
 
       _visibleShell.setVisible(isVisible);
 
@@ -1873,4 +1879,5 @@ public abstract class AdvancedSlideoutShell {
       _rrShellNoResize.updateColors(fgColor, bgColor);
       _rrShellWithResize.updateColors(fgColor, bgColor);
    }
+
 }
