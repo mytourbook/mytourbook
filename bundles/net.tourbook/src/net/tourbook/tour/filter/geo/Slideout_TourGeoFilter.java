@@ -80,6 +80,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -314,6 +315,18 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
    }
 
    @Override
+   protected void beforeShellVisible(final Shell visibleShell, final boolean isVisible) {
+
+      /**
+       * Context menu must be set lately, otherwise an "Widget has the wrong parent" exception
+       * occures
+       */
+      if (isVisible) {
+         _columnManager.createHeaderContextMenu(_geoFilterViewer.getTable(), null, visibleShell);
+      }
+   }
+
+   @Override
    public void colorDialogOpened(final boolean isAnotherDialogOpened) {
       setIsAnotherDialogOpened(isAnotherDialogOpened);
    }
@@ -354,7 +367,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
 
       // editing support must be set AFTER the viewer is created
       _colDef_FilterName.setEditingSupport(new FilterName_EditingSupport(_geoFilterViewer));
-      UI.setCellEditSupport(_geoFilterViewer);
+//      UI.setCellEditSupport(_geoFilterViewer);
 
       // load viewer
       updateUI_Viewer();
@@ -599,12 +612,33 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
          }
       });
 
+      table.addKeyListener(new KeyListener() {
+
+         @Override
+         public void keyPressed(final KeyEvent e) {
+
+            switch (e.keyCode) {
+
+            case SWT.DEL:
+               onGeoFilter_Delete();
+               break;
+
+            default:
+               break;
+            }
+         }
+
+         @Override
+         public void keyReleased(final KeyEvent e) {}
+      });
+
       /*
        * create table viewer
        */
       _geoFilterViewer = new TableViewer(table);
 
       _columnManager.createColumns(_geoFilterViewer);
+      _columnManager.setSlideoutShell(this);
 
       _geoFilterViewer.setUseHashlookup(true);
       _geoFilterViewer.setContentProvider(new GeoFilterProvider());
@@ -624,26 +658,6 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
          public void doubleClick(final DoubleClickEvent event) {
 //          onBookmark_Rename(true);
          }
-      });
-
-      _geoFilterViewer.getTable().addKeyListener(new KeyListener() {
-
-         @Override
-         public void keyPressed(final KeyEvent e) {
-
-            switch (e.keyCode) {
-
-            case SWT.DEL:
-               onGeoFilter_Delete();
-               break;
-
-            default:
-               break;
-            }
-         }
-
-         @Override
-         public void keyReleased(final KeyEvent e) {}
       });
 
       updateUI_SetSortDirection(//
@@ -670,18 +684,13 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
       });
 
       /**
-       * THIS IS NOT WORKING, IT CAUSES AN
-       * <p>
-       * java.lang.IllegalArgumentException: Widget has the wrong parent
-       * <p>
-       * which needs more time for investigation
+       * ColumnManager context menu is set in {@link #beforeHideToolTip()}
        */
-//      final Table table = _geoFilterViewer.getTable();
-//      final Menu tableHeaderContextMenu = menuMgr.createContextMenu(table);
-//
-//      _columnManager.createHeaderContextMenu(table, tableHeaderContextMenu);
    }
 
+   /**
+    * @param parent
+    */
    private void createUI_680_ViewerActions(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);

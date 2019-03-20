@@ -591,12 +591,13 @@ public abstract class AdvancedSlideoutShell {
    protected abstract void beforeHideToolTip();
 
    /**
-    * Is called just before the shell is set to visible or hidden
+    * Is called just before the shell is set to be visible or hidden
     *
+    * @param visibleShell
     * @param isVisible
     *           Is <code>true</code> when visible otherwise hidden.
     */
-   protected void beforeShellVisible(final boolean isVisible) {}
+   protected void beforeShellVisible(final Shell visibleShell, final boolean isVisible) {}
 
    /**
     * <b>VERY IMPORTANT</b>
@@ -1118,9 +1119,18 @@ public abstract class AdvancedSlideoutShell {
 
       final boolean isInTooltip = ttShellRect.contains(cursorLocation);
 
-      if (!isInTooltip) {
+      if (isInTooltip == false) {
 
          // mouse is not within the tooltip shell rectangle, reparent to NoResize shell
+
+         if (_isKeepSlideoutOpen || _isAnotherDialogOpened) {
+
+            /*
+             * This can occure when the column dialog is opened in the tour geo filter slideout,
+             * prevent to hide the column dialoag
+             */
+            return;
+         }
 
          closeInternalShells();
 
@@ -1343,9 +1353,6 @@ public abstract class AdvancedSlideoutShell {
     */
    private void reparentShell(final AbstractRRShell newReparentedShell) {
 
-//      System.out.println(UI.timeStampNano() + " reparentShell\t");
-//      // TODO remove SYSTEM.OUT.PRINTLN
-
       if (_visibleShell == newReparentedShell.getShell()) {
          // shell is already visible
          return;
@@ -1519,14 +1526,18 @@ public abstract class AdvancedSlideoutShell {
       _visibleShell = rrShell.getShell();
    }
 
-   protected void setIsAnotherDialogOpened(final boolean isDialogOpened) {
-
+   /**
+    * When <code>true</code> the slideout will be kept open until <code>false</code> is set
+    *
+    * @param isDialogOpened
+    */
+   public void setIsAnotherDialogOpened(final boolean isDialogOpened) {
       _isAnotherDialogOpened = isDialogOpened;
    }
 
    /**
     * @param isKeepOpen
-    *           When <code>true</code> then the slideout will never be closed.
+    *           When <code>true</code> then the slideout will never be closed automatically
     */
    protected void setIsKeepOpenInternally(final boolean isKeepOpen) {
       _isKeepOpenInternally = isKeepOpen;
@@ -1583,7 +1594,8 @@ public abstract class AdvancedSlideoutShell {
 
    private void setShellVisible(final boolean isVisible) {
 
-      beforeShellVisible(isVisible);
+      //
+      beforeShellVisible(_rrShellWithResize.getShell(), isVisible);
 
       _visibleShell.setVisible(isVisible);
 
