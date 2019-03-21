@@ -196,6 +196,10 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
             rc = geoFilter1.geoLocation_BottomRight.longitude - geoFilter2.geoLocation_BottomRight.longitude;
             break;
 
+         case COLUMN_FILTER_NAME:
+            rc = geoFilter1.filterName.compareTo(geoFilter2.filterName);
+            break;
+
          case COLUMN_CREATED_DATE_TIME:
 
             // sorting by date is already set
@@ -1027,8 +1031,6 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
 
       _btnDeleteGeoFilter.setEnabled(isGeoFilterSelected);
       _btnDeleteGeoFilterAll.setEnabled(_allGeoFilter.size() > 0);
-
-      _chkIsSyncMapPosition.setEnabled(isGeoFilterSelected);
    }
 
    @Override
