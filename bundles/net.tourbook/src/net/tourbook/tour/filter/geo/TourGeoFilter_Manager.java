@@ -443,11 +443,6 @@ public class TourGeoFilter_Manager {
       _actionTourGeoFilter = actionTourGeoFilter;
    }
 
-   public static void setAndOpenGeoFilterSlideout(final boolean isOpen) {
-
-      _actionTourGeoFilter.setAndOpenGeoFilterSlideout(isOpen);
-   }
-
    /**
     * Sets the state if the tour filter is active or not.
     *
@@ -465,6 +460,11 @@ public class TourGeoFilter_Manager {
             null);
 
       fireTourFilterModifyEvent();
+   }
+
+   public static void setGeoFilter_OpenSlideout(final boolean isOpen, final boolean isSelectPreviousGeoFilter) {
+
+      _actionTourGeoFilter.showSlideoutWithState(isOpen, isSelectPreviousGeoFilter);
    }
 
    /**

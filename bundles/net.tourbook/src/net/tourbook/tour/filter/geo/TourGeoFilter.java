@@ -97,7 +97,6 @@ public class TourGeoFilter {
 
       created = TimeTools.now();
       createdMS = TimeTools.toEpochMilli(created);
-
    }
 
    @Override

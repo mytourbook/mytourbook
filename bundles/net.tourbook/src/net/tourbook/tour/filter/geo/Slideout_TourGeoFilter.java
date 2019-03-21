@@ -94,24 +94,25 @@ import org.eclipse.ui.IViewPart;
  */
 public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourViewer, IColorSelectorListener {
 
-   private static final String            COLUMN_CREATED_DATE_TIME = "createdDateTime";                      //$NON-NLS-1$
-   private static final String            COLUMN_FILTER_NAME       = "filterName";                           //$NON-NLS-1$
-   private static final String            COLUMN_GEO_PARTS         = "geoParts";                             //$NON-NLS-1$
-   private static final String            COLUMN_LATITUDE_1        = "latitude1";                            //$NON-NLS-1$
-   private static final String            COLUMN_LONGITUDE_1       = "longitude1";                           //$NON-NLS-1$
-   private static final String            COLUMN_LATITUDE_2        = "latitude2";                            //$NON-NLS-1$
-   private static final String            COLUMN_LONGITUDE_2       = "longitude2";                           //$NON-NLS-1$
-   private static final String            COLUMN_SEQUENCE          = "sequence";                             //$NON-NLS-1$
+   private static final String            COLUMN_CREATED_DATE_TIME   = "createdDateTime";                      //$NON-NLS-1$
+   private static final String            COLUMN_FILTER_NAME         = "filterName";                           //$NON-NLS-1$
+   private static final String            COLUMN_GEO_PARTS           = "geoParts";                             //$NON-NLS-1$
+   private static final String            COLUMN_LATITUDE_1          = "latitude1";                            //$NON-NLS-1$
+   private static final String            COLUMN_LONGITUDE_1         = "longitude1";                           //$NON-NLS-1$
+   private static final String            COLUMN_LATITUDE_2          = "latitude2";                            //$NON-NLS-1$
+   private static final String            COLUMN_LONGITUDE_2         = "longitude2";                           //$NON-NLS-1$
+   private static final String            COLUMN_SEQUENCE            = "sequence";                             //$NON-NLS-1$
 
-   private final static IDialogSettings   _state                   = TourGeoFilter_Manager.getState();
+   private final static IDialogSettings   _state                     = TourGeoFilter_Manager.getState();
 
    private TableViewer                    _geoFilterViewer;
    private TableColumnDefinition          _colDef_FilterName;
    private ColumnManager                  _columnManager;
-   private CompareResultComparator        _geoPartComparator       = new CompareResultComparator();
+   private CompareResultComparator        _geoPartComparator         = new CompareResultComparator();
 
-   private final ArrayList<TourGeoFilter> _allGeoFilter            = TourGeoFilter_Manager.getAllGeoFilter();
+   private final ArrayList<TourGeoFilter> _allGeoFilter              = TourGeoFilter_Manager.getAllGeoFilter();
    private TourGeoFilter                  _selectedFilter;
+   private boolean                        _isSelectPreviousGeoFilter = true;
 
    private ToolItem                       _tourFilterItem;
 
@@ -124,7 +125,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
    private SelectionAdapter               _selectionListener_WithUpdateUI_WithRepainting;
    private SelectionAdapter               _selectionListener_OnlyStateUpdate;
 
-   private final NumberFormat             _nf2                     = NumberFormat.getInstance();
+   private final NumberFormat             _nf2                       = NumberFormat.getInstance();
    {
       _nf2.setMinimumFractionDigits(2);
       _nf2.setMaximumFractionDigits(2);
@@ -1392,18 +1393,21 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
 
 // SET_FORMATTING_ON
 
-      // reselect filter item
-      final String selectedFilterId = Util.getStateString(_state, TourGeoFilter_Manager.STATE_SELECTED_GEO_FILTER_ID, null);
-      if (selectedFilterId != null) {
+      if (_isSelectPreviousGeoFilter) {
 
-         for (final TourGeoFilter tourGeoFilterItem : _allGeoFilter) {
+         // reselect filter item
+         final String selectedFilterId = Util.getStateString(_state, TourGeoFilter_Manager.STATE_SELECTED_GEO_FILTER_ID, null);
+         if (selectedFilterId != null) {
 
-            if (tourGeoFilterItem.id.equals(selectedFilterId)) {
+            for (final TourGeoFilter tourGeoFilterItem : _allGeoFilter) {
 
-               _geoFilterViewer.setSelection(new StructuredSelection(tourGeoFilterItem), true);
-               _geoFilterViewer.getTable().showSelection();
+               if (tourGeoFilterItem.id.equals(selectedFilterId)) {
 
-               break;
+                  _geoFilterViewer.setSelection(new StructuredSelection(tourGeoFilterItem), true);
+                  _geoFilterViewer.getTable().showSelection();
+
+                  break;
+               }
             }
          }
       }
@@ -1453,6 +1457,10 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
       // colors
       Util.setState(_state, TourGeoFilter_Manager.STATE_RGB_GEO_PARTS_HOVER, _colorGeoPart_HoverSelecting.getColorValue());
       Util.setState(_state, TourGeoFilter_Manager.STATE_RGB_GEO_PARTS_SELECTED, _colorGeoPart_Selected.getColorValue());
+   }
+
+   public void setIsSelectPreviousGeoFilter(final boolean isSelectPreviousGeoFilter) {
+      _isSelectPreviousGeoFilter = isSelectPreviousGeoFilter;
    }
 
    @Override

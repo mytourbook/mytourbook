@@ -669,7 +669,7 @@ public class Map extends Canvas {
             TourGeoFilter_Manager.STATE_IS_AUTO_OPEN_SLIDEOUT,
             TourGeoFilter_Manager.STATE_IS_AUTO_OPEN_SLIDEOUT_DEFAULT);
       if (isAutoOpenSlideout) {
-         TourGeoFilter_Manager.setAndOpenGeoFilterSlideout(true);
+         TourGeoFilter_Manager.setGeoFilter_OpenSlideout(true, false);
       }
 
       grid_UpdatePaintingStateData();
@@ -1701,7 +1701,7 @@ public class Map extends Canvas {
 
       _isContextMenuEnabled = true;
 
-      TourGeoFilter_Manager.setAndOpenGeoFilterSlideout(false);
+      TourGeoFilter_Manager.setGeoFilter_OpenSlideout(false, false);
 
       setCursor(_cursorDefault);
       redraw();

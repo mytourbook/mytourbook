@@ -82,18 +82,6 @@ public class ActionTourGeoFilter extends ActionToolbarSlideoutAdv {
       TourGeoFilter_Manager.setFilterEnabled(isSelected);
    }
 
-   /**
-    * @param isOpenState
-    */
-   public void setAndOpenGeoFilterSlideout(final boolean isOpenState) {
-
-      _slideoutTourGeoFilter.setIsKeepSlideoutOpen_DuringUIAction(isOpenState);
-
-      if (isOpenState) {
-         _slideoutTourGeoFilter.open(false);
-      }
-   }
-
    public void showSlideout(final TourGeoFilter selectedFilter) {
 
       // open immediately
@@ -107,6 +95,20 @@ public class ActionTourGeoFilter extends ActionToolbarSlideoutAdv {
             _slideoutTourGeoFilter.refreshViewer(selectedFilter);
          }
       });
+   }
+
+   /**
+    * @param isOpenState
+    * @param isSelectPreviousGeoFilter
+    */ 
+   public void showSlideoutWithState(final boolean isOpenState, final boolean isSelectPreviousGeoFilter) {
+
+      _slideoutTourGeoFilter.setIsKeepSlideoutOpen_DuringUIAction(isOpenState);
+      _slideoutTourGeoFilter.setIsSelectPreviousGeoFilter(isSelectPreviousGeoFilter);
+
+      if (isOpenState) {
+         _slideoutTourGeoFilter.open(false);
+      }
    }
 
 }
