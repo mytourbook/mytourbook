@@ -572,6 +572,7 @@ public class Map extends Canvas {
       createContextMenu();
 
       updateGraphColors();
+      grid_UpdatePaintingStateData();
 
       _cursorPan = new Cursor(_display, SWT.CURSOR_SIZEALL);
       _cursorCross = new Cursor(_display, SWT.CURSOR_CROSS);
@@ -674,6 +675,7 @@ public class Map extends Canvas {
       }
 
       grid_UpdatePaintingStateData();
+      _isFastMapPainting_Active = true;
 
       final Point worldMousePosition = new Point(
             _worldPixel_TopLeft_Viewport.x + _mouseMove_DevPosition_X,
@@ -5379,6 +5381,9 @@ public class Map extends Canvas {
       } else {
 
          // show requested grid box
+
+         // geo grid is displayed
+         _isFastMapPainting_Active = true;
 
          final boolean isSyncMapPosition = Util.getStateBoolean(_geoFilterState,
                TourGeoFilter_Manager.STATE_IS_SYNC_MAP_POSITION,

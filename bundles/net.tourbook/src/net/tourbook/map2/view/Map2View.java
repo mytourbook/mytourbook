@@ -2041,28 +2041,25 @@ public class Map2View extends ViewPart implements
    public void geoFilter_20_ShowLoadedTours(final GeoFilter_LoaderData loaderItem, final TourGeoFilter tourGeoFilter) {
 
       // update UI
-      Display.getDefault().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      Display.getDefault().asyncExec(() -> {
 
-            if (_parent.isDisposed()) {
-               return;
-            }
-
-            _map.showGeoGrid(tourGeoFilter);
-
-            if (_isShowTour) {
-
-               // show tours even when 0 are displayed
-
-               final ArrayList<Long> allLoadedTourIds = loaderItem.allLoadedTourIds;
-
-               // update map with the updated number of tours in a grid box
-               paintTours(allLoadedTourIds);
-            }
-
-            enableActions();
+         if (_parent.isDisposed()) {
+            return;
          }
+
+         _map.showGeoGrid(tourGeoFilter);
+
+         if (_isShowTour) {
+
+            // show tours even when 0 are displayed
+
+            final ArrayList<Long> allLoadedTourIds = loaderItem.allLoadedTourIds;
+
+            // update map with the updated number of tours in a grid box
+            paintTours(allLoadedTourIds);
+         }
+
+         enableActions();
       });
    }
 
