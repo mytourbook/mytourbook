@@ -23,6 +23,8 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 //import java.io.FileNotFoundException;
 import java.util.Set;
@@ -54,7 +56,11 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.widgets.Display;
 import org.oscim.awt.AwtGraphics;
 import org.oscim.backend.GLAdapter;
+import org.oscim.backend.canvas.Bitmap;
+import org.oscim.backend.canvas.Color;
+import org.oscim.backend.canvas.Paint;
 import org.oscim.backend.CanvasAdapter;
+import org.oscim.core.GeoPoint;
 //import org.ocsim.backend
 import org.oscim.core.MapPosition;
 import org.oscim.core.MercatorProjection;
@@ -64,6 +70,14 @@ import org.oscim.gdx.GdxMap;
 import org.oscim.gdx.GestureHandlerImpl;
 import org.oscim.gdx.LwjglGL20;
 import org.oscim.gdx.MotionHandler;
+import org.oscim.layers.marker.ClusterMarkerRenderer;
+import org.oscim.layers.marker.ItemizedLayer;
+import org.oscim.layers.marker.MarkerItem;
+
+import org.oscim.layers.marker.MarkerRendererFactory;
+import org.oscim.layers.marker.MarkerSymbol.HotspotPlace;
+import org.oscim.layers.marker.MarkerSymbol;
+
 import org.oscim.layers.tile.TileManager;
 import org.oscim.layers.tile.bitmap.BitmapTileLayer;
 import org.oscim.layers.tile.buildings.BuildingLayer;
@@ -103,7 +117,7 @@ import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.utils.SharedLibraryLoader;
 import okhttp3.Cache;
 
-public class Map25App extends GdxMap implements OnItemGestureListener {
+public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedLayer.OnItemGestureListener<MarkerItem> {
 
 	private static final String		STATE_MAP_POS_X						= "STATE_MAP_POS_X";					//$NON-NLS-1$
 	private static final String		STATE_MAP_POS_Y						= "STATE_MAP_POS_Y";					//$NON-NLS-1$
@@ -176,6 +190,11 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
    private float                 _mf_UserScale = 2.50f;
    private float                 _vtm_UserScale = 2.0f;	
 	
+   MarkerSymbol symbol;
+   
+   ItemizedLayer<MarkerItem> mMarkerLayer;
+   private static final int COUNT = 5;
+   private static final float STEP = 100f / 110000f; // roughly 100 meters
 
 	/**
 	 * Is <code>true</code> when a tour marker is hit.
@@ -987,6 +1006,59 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		_layer_SliderPath.setEnabled(false);
 		layers.add(_layer_SliderPath);
 
+		// bookmarks
+		Bitmap bitmapPoi;
+      int DefaultIconSize = 10;
+
+      final Paint fillPainter = CanvasAdapter.newPaint();
+      fillPainter.setStyle(Paint.Style.FILL);
+      fillPainter.setColor(0xFFFF69B4); // 100percent pink
+
+      bitmapPoi = CanvasAdapter.newBitmap(DefaultIconSize, DefaultIconSize, 0);
+      org.oscim.backend.canvas.Canvas defaultMarkerCanvas = CanvasAdapter.newCanvas();  
+      defaultMarkerCanvas.setBitmap(bitmapPoi);
+
+      defaultMarkerCanvas.drawCircle(DefaultIconSize/2, DefaultIconSize/2, DefaultIconSize/2, fillPainter);
+
+      symbol = new MarkerSymbol(bitmapPoi, MarkerSymbol.HotspotPlace.CENTER, false);
+
+      
+      MarkerRendererFactory markerRendererFactory = new MarkerRendererFactory() {
+         @Override
+         public org.oscim.layers.marker.MarkerRenderer create(org.oscim.layers.marker.MarkerLayer markerLayer) {
+             return new ClusterMarkerRenderer(markerLayer, symbol, new ClusterMarkerRenderer.ClusterStyle(Color.WHITE, Color.BLUE)) {
+                 @Override
+                 protected Bitmap getClusterBitmap(int size) {
+                     // Can customize cluster bitmap here
+                     return super.getClusterBitmap(size);
+                 }
+             };
+         }
+     };
+     
+     mMarkerLayer = new ItemizedLayer<>(
+           mMap,
+           new ArrayList<MarkerItem>(),
+           markerRendererFactory,
+           this);
+     layers.add(mMarkerLayer);
+     
+     // Create some markers spaced STEP degrees
+     //Berlin: 52.513452, 13.363791
+     double berlin_lat = 52.513452;
+     double berlin_lon = 13.363791;
+     List<MarkerItem> pts = new ArrayList<>();
+     for (int x = -COUNT; x < COUNT; x++) {
+         for (int y = -COUNT; y < COUNT; y++) {
+             double random = STEP * Math.random() * 2;
+             MarkerItem item = new MarkerItem(y + ", " + x, "Title " + berlin_lat + "/" + berlin_lon,"Description "  + x + "/" + y,
+                     new GeoPoint(berlin_lat + y * STEP + random, berlin_lon + x * STEP + random)
+             );
+             pts.add(item);
+         }
+     }
+     mMarkerLayer.addItems(pts);
+     
 
 		/**
 		 * here i have to investigate
@@ -1086,6 +1158,28 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		}
 	}
 
+   @Override
+   public boolean onItemSingleTapUp(int index, MarkerItem item) {
+       if (item.getMarker() == null)
+           item.setMarker(symbol);
+       else
+           item.setMarker(null);
+
+       System.out.println("Marker tap " + item.getTitle());
+       return true;
+   }
+
+   @Override
+   public boolean onItemLongPress(int index, MarkerItem item) {
+       if (item.getMarker() == null)
+           item.setMarker(symbol);
+       else
+           item.setMarker(null);
+
+       System.out.println("Marker long press " + item.getTitle());
+       return true;
+   }
+	
 	
 	/**
 	 * gget a sorted list with mapsforgemap files
