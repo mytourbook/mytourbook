@@ -527,6 +527,7 @@ public class Map extends Canvas {
    private boolean             _grid_IsGridAutoScroll;
 
    private boolean             _isFastMapPainting;
+   private boolean             _isFastMapPainting_Active;
    private int                 _fastMapPainting_skippedValues;
 
    /**
@@ -2349,7 +2350,6 @@ public class Map extends Canvas {
 
          _grid_Data_Hovered = null;
          _grid_IsGridAutoScroll = false;
-         _isFastMapPainting = false;
 
          grid_DisableGridBoxSelection();
 
@@ -2624,7 +2624,6 @@ public class Map extends Canvas {
             // this can happen when the right mouse button is clicked
 
             _grid_Data_Hovered = null;
-            _isFastMapPainting = false;
             _grid_IsGridAutoScroll = true;
 
             grid_DisableGridBoxSelection();
@@ -2641,7 +2640,6 @@ public class Map extends Canvas {
          _grid_Data_Selected = _grid_Data_Hovered;
 
          _grid_Data_Hovered = null;
-         _isFastMapPainting = false;
          _grid_IsGridAutoScroll = true;
 
          grid_DisableGridBoxSelection();
@@ -3625,7 +3623,7 @@ public class Map extends Canvas {
                   }
 
                   // paint overlay
-                  if (!_isTourPaintMethodEnhanced || _isFastMapPainting) {
+                  if (_isTourPaintMethodEnhanced == false || (_isFastMapPainting && _isFastMapPainting_Active)) {
                      paint_Overlay_22_PaintTileBasic(tile);
                   } else {
                      paint_Overlay_30_PaintTileEnhanced(tile);
@@ -3678,7 +3676,7 @@ public class Map extends Canvas {
                   Map.this,
                   tile,
                   1,
-                  _isFastMapPainting,
+                  _isFastMapPainting && _isFastMapPainting_Active,
                   _fastMapPainting_skippedValues);
 
             isOverlayPainted = isOverlayPainted || isPainted;
@@ -3737,7 +3735,7 @@ public class Map extends Canvas {
                   Map.this,
                   tile,
                   parts,
-                  _isFastMapPainting,
+                  _isFastMapPainting && _isFastMapPainting_Active,
                   _fastMapPainting_skippedValues);
 
             isOverlayPainted = isOverlayPainted || isPainted;
@@ -4796,8 +4794,18 @@ public class Map extends Canvas {
       _directMapPainter = directPainter;
    }
 
-   public void setIsFastMapPainting(final boolean isFastMapPainting) {
-      _isFastMapPainting = isFastMapPainting;
+   /**
+    * Activate/deactivate fast painting, map will be repainted afterwards.
+    *
+    * @param isFastMapPaintingActive
+    */
+   public void setIsFastMapPainting_Active(final boolean isFastMapPaintingActive) {
+
+      _isFastMapPainting_Active = isFastMapPaintingActive;
+
+      disposeOverlayImageCache();
+
+      redraw();
    }
 
    public void setIsZoomWithMousePosition(final boolean isZoomWithMousePosition) {
@@ -5365,9 +5373,6 @@ public class Map extends Canvas {
 
          // hide geo grid
          _grid_Data_Selected = null;
-
-         // disable fast painting
-//         _isFastMapPainting = false;
 
          redraw();
 

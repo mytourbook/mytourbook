@@ -55,18 +55,6 @@ public class ActionTourGeoFilter extends ActionToolbarSlideoutAdv {
       return _slideoutTourGeoFilter;
    }
 
-   private void disableMapFastPainting() {
-
-      final IViewPart view = Util.getView(Map2View.ID);
-      if (view instanceof Map2View) {
-
-         final Map2View map2View = (Map2View) view;
-         final Map map = map2View.getMap();
-
-         map.setIsFastMapPainting(false);
-      }
-   }
-
    @Override
    protected void onSelect() {
 
@@ -74,8 +62,14 @@ public class ActionTourGeoFilter extends ActionToolbarSlideoutAdv {
 
       final boolean isSelected = getSelection();
 
-      if (!isSelected) {
-         disableMapFastPainting();
+      // activate/deactivate fast painting
+      final IViewPart view = Util.getView(Map2View.ID);
+      if (view instanceof Map2View) {
+
+         final Map2View map2View = (Map2View) view;
+         final Map map = map2View.getMap();
+
+         map.setIsFastMapPainting_Active(isSelected);
       }
 
       // update tour geo filter
@@ -100,7 +94,7 @@ public class ActionTourGeoFilter extends ActionToolbarSlideoutAdv {
    /**
     * @param isOpenState
     * @param isSelectPreviousGeoFilter
-    */ 
+    */
    public void showSlideoutWithState(final boolean isOpenState, final boolean isSelectPreviousGeoFilter) {
 
       _slideoutTourGeoFilter.setIsKeepSlideoutOpen_DuringUIAction(isOpenState);
