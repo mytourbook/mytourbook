@@ -26,7 +26,7 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.tag.tour.filter.TourTagFilterManager;
 import net.tourbook.tour.filter.SQLFilterData;
 import net.tourbook.tour.filter.TourFilterManager;
-import net.tourbook.tour.filter.geo.TourGeoFilterManager;
+import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
 
 /**
  * The filter provides a sql WHERE which contains all tour filter, e.g. selected person, tour type,
@@ -65,6 +65,8 @@ public class SQLFilter {
    private ArrayList<Object> _parameters     = new ArrayList<>();
 
    private boolean           _isTagFilterActive;
+
+   private int               _lastParameterIndex;
 
    /**
     * Create sql app filter with the photo filter
@@ -131,7 +133,7 @@ public class SQLFilter {
        */
       if (appFilter.contains(SQLAppFilter.GeoLocation)) {
 
-         final SQLFilterData tourSqlGeoData = TourGeoFilterManager.getSQL();
+         final SQLFilterData tourSqlGeoData = TourGeoFilter_Manager.getSQL();
          if (tourSqlGeoData != null) {
 
             sb.append(tourSqlGeoData.getWhereString());
@@ -161,6 +163,14 @@ public class SQLFilter {
    }
 
    /**
+    * @return Returns the last parameter index +1 which was used for setting parameters in
+    *         {@link #setParameters(PreparedStatement, int)}
+    */
+   public int getLastParameterIndex() {
+      return _lastParameterIndex;
+   }
+
+   /**
     * @return Returns the WHERE clause to filter tours by the app filter, e.g. person, tour types,
     *         ...
     */
@@ -177,7 +187,9 @@ public class SQLFilter {
    }
 
    /**
-    * Sets the parameters into the filter statement
+    * Sets the app filter parameters into the filter statement.
+    * <p>
+    * The last used index can be retrieved with {@link #getLastParameterIndex()}
     *
     * @param statement
     * @param startIndex
@@ -220,6 +232,8 @@ public class SQLFilter {
             throw new RuntimeException("SQL filter parameter is not supported, " + parameter.getClass());//$NON-NLS-1$
          }
       }
+
+      _lastParameterIndex = parameterIndex;
    }
 
    @Override

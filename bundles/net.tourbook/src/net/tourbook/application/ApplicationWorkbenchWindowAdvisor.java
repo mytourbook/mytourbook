@@ -81,7 +81,7 @@ import net.tourbook.tag.tour.filter.TourTagFilterManager;
 import net.tourbook.tour.TourTypeFilterManager;
 import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.tour.filter.TourFilterManager;
-import net.tourbook.tour.filter.geo.TourGeoFilterManager;
+import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
 import net.tourbook.tour.photo.TourPhotoManager;
 import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.tourType.TourTypeManager;
@@ -456,7 +456,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       TourTypeFilterManager.restoreState();
 
       TourFilterManager.restoreState();
-      TourGeoFilterManager.restoreState();
+      TourGeoFilter_Manager.restoreState();
       TourTagFilterManager.restoreState();
    }
 
@@ -532,7 +532,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       TourTypeManager.saveState();
 
       TourFilterManager.saveState();
-      TourGeoFilterManager.saveState();
+      TourGeoFilter_Manager.saveState();
       TourPhotoManager.saveState();
       MapBookmarkManager.saveState();
       SwimStrokeManager.saveState();

@@ -15,25 +15,28 @@
  *******************************************************************************/
 package net.tourbook.application;
 
+import de.byteholder.geoclipse.map.Map;
 
 import net.tourbook.Messages;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.tooltip.SlideoutLocation;
+import net.tourbook.common.util.Util;
+import net.tourbook.map2.view.Map2View;
 import net.tourbook.tour.filter.ActionToolbarSlideoutAdv;
-import net.tourbook.tour.filter.geo.SlideoutTourGeoFilter;
-import net.tourbook.tour.filter.geo.TourGeoFilterItem;
-import net.tourbook.tour.filter.geo.TourGeoFilterManager;
+import net.tourbook.tour.filter.geo.Slideout_TourGeoFilter;
+import net.tourbook.tour.filter.geo.TourGeoFilter;
+import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.ui.IViewPart;
 
 public class ActionTourGeoFilter extends ActionToolbarSlideoutAdv {
 
    private static final ImageDescriptor _actionImageDescriptor = TourbookPlugin.getImageDescriptor(Messages.Image__TourGeoFilter);
 
-
-   private SlideoutTourGeoFilter        _slideoutTourGeoFilter;
+   private Slideout_TourGeoFilter       _slideoutTourGeoFilter;
 
    public ActionTourGeoFilter() {
 
@@ -46,7 +49,7 @@ public class ActionTourGeoFilter extends ActionToolbarSlideoutAdv {
    @Override
    protected AdvancedSlideout createSlideout(final ToolItem toolItem) {
 
-      _slideoutTourGeoFilter = new SlideoutTourGeoFilter(toolItem);
+      _slideoutTourGeoFilter = new Slideout_TourGeoFilter(toolItem);
       _slideoutTourGeoFilter.setSlideoutLocation(SlideoutLocation.ABOVE_CENTER);
 
       return _slideoutTourGeoFilter;
@@ -57,11 +60,23 @@ public class ActionTourGeoFilter extends ActionToolbarSlideoutAdv {
 
       super.onSelect();
 
+      final boolean isSelected = getSelection();
+
+      // activate/deactivate fast painting
+      final IViewPart view = Util.getView(Map2View.ID);
+      if (view instanceof Map2View) {
+
+         final Map2View map2View = (Map2View) view;
+         final Map map = map2View.getMap();
+
+         map.setIsFastMapPainting_Active(isSelected);
+      }
+
       // update tour geo filter
-      TourGeoFilterManager.setFilterEnabled(getSelection());
+      TourGeoFilter_Manager.setFilterEnabled(isSelected);
    }
 
-   public void showSlideout(final TourGeoFilterItem selectedFilter) {
+   public void showSlideout(final TourGeoFilter selectedFilter) {
 
       // open immediately
       _slideoutTourGeoFilter.open(false);
@@ -74,6 +89,20 @@ public class ActionTourGeoFilter extends ActionToolbarSlideoutAdv {
             _slideoutTourGeoFilter.refreshViewer(selectedFilter);
          }
       });
+   }
+
+   /**
+    * @param isOpenState
+    * @param isSelectPreviousGeoFilter
+    */
+   public void showSlideoutWithState(final boolean isOpenState, final boolean isSelectPreviousGeoFilter) {
+
+      _slideoutTourGeoFilter.setIsKeepSlideoutOpen_DuringUIAction(isOpenState);
+      _slideoutTourGeoFilter.setIsSelectPreviousGeoFilter(isSelectPreviousGeoFilter);
+
+      if (isOpenState) {
+         _slideoutTourGeoFilter.open(false);
+      }
    }
 
 }

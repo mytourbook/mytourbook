@@ -53,7 +53,7 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Map 2D properties slideout
  */
-public class SlideoutMap2_TrackOptions extends ToolbarSlideout implements IColorSelectorListener {
+public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColorSelectorListener {
 
    private static final String     MAP_ACTION_EDIT2D_MAP_PREFERENCES = net.tourbook.map2.Messages.Map_Action_Edit2DMapPreferences;
 
@@ -84,7 +84,6 @@ public class SlideoutMap2_TrackOptions extends ToolbarSlideout implements IColor
    private Button                _chkShowSlider_Location;
    private Button                _chkShowSlider_Path;
    private Button                _chkTrackOpacity;
-   private Button                _chkZoomWithMousePosition;
    private Button                _rdoBorderColorDarker;
    private Button                _rdoBorderColorColor;
    private Button                _rdoPainting_Simple;
@@ -116,7 +115,7 @@ public class SlideoutMap2_TrackOptions extends ToolbarSlideout implements IColor
     * @param map2View
     * @param map2State
     */
-   public SlideoutMap2_TrackOptions(final Control ownerControl,
+   public Slideout_Map2_TrackOptions(final Control ownerControl,
                                     final ToolBar toolBar,
                                     final Map2View map2View,
                                     final IDialogSettings map2State) {
@@ -174,7 +173,6 @@ public class SlideoutMap2_TrackOptions extends ToolbarSlideout implements IColor
 
          createUI_20_TourTrack(shellContainer);
          createUI_50_ChartSlider(shellContainer);
-         createUI_60_MapOptions(shellContainer);
       }
 
       return shellContainer;
@@ -499,31 +497,6 @@ public class SlideoutMap2_TrackOptions extends ToolbarSlideout implements IColor
       }
    }
 
-   private void createUI_60_MapOptions(final Composite parent) {
-
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-      {
-         {
-            /*
-             * Zoom to mouse position
-             */
-            {
-               // checkbox
-               _chkZoomWithMousePosition = new Button(container, SWT.CHECK);
-               _chkZoomWithMousePosition.setText(
-                     Messages.Slideout_Map_Options_Checkbox_ZoomWithMousePosition);
-               _chkZoomWithMousePosition.setToolTipText(
-                     Messages.Slideout_Map_Options_Checkbox_ZoomWithMousePosition_Tooltip);
-               _chkZoomWithMousePosition.addSelectionListener(_defaultState_SelectionListener);
-               GridDataFactory.fillDefaults()
-                     .span(2, 1)
-                     .applyTo(_chkZoomWithMousePosition);
-            }
-         }
-      }
-   }
 
    private void enableControls() {
 
@@ -645,7 +618,7 @@ public class SlideoutMap2_TrackOptions extends ToolbarSlideout implements IColor
 
       enableControls();
 
-      _map2View.restoreState_Map2Options(true);
+      _map2View.restoreState_Map2_TrackOptions(true);
    }
 
    private void resetToDefaults() {
@@ -684,9 +657,6 @@ public class SlideoutMap2_TrackOptions extends ToolbarSlideout implements IColor
       final String paintingMethod = _prefStore.getDefaultString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD);
       _rdoPainting_Simple.setSelection(         PrefPageMap2Appearance.TOUR_PAINT_METHOD_SIMPLE.equals(paintingMethod));
       _rdoPainting_Complex.setSelection(        PrefPageMap2Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(paintingMethod));
-
-      // mouse zooming
-      _chkZoomWithMousePosition.setSelection(   Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT);
 
 // SET_FORMATTING_ON
 
@@ -730,9 +700,6 @@ public class SlideoutMap2_TrackOptions extends ToolbarSlideout implements IColor
       _rdoPainting_Simple.setSelection(         isComplex==false);
       _rdoPainting_Complex.setSelection(        isComplex);
 
-      // mouse zooming
-      _chkZoomWithMousePosition.setSelection(      Util.getStateBoolean(_state,    Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION,   Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT));
-
 // SET_FORMATTING_ON
    }
 
@@ -773,9 +740,6 @@ public class SlideoutMap2_TrackOptions extends ToolbarSlideout implements IColor
             _rdoPainting_Complex.getSelection()
                ? PrefPageMap2Appearance.TOUR_PAINT_METHOD_COMPLEX
                : PrefPageMap2Appearance.TOUR_PAINT_METHOD_SIMPLE);
-
-      // mouse zooming
-      _state.put(Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION,   _chkZoomWithMousePosition.getSelection());
 
 // SET_FORMATTING_ON
    }

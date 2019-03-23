@@ -39,7 +39,7 @@ import net.tourbook.common.util.Util;
 /**
  * Slideout for the map2 tour colors
  */
-public class SlideoutMap2_TourColors extends ToolbarSlideout {
+public class Slideout_Map2_TourColors extends ToolbarSlideout {
 
 	private IDialogSettings		_state;
 
@@ -60,7 +60,7 @@ public class SlideoutMap2_TourColors extends ToolbarSlideout {
 	private Button				_chkShowInChartToolbar_RunDyn_StepLength;
 	private Button				_chkShowInChartToolbar_HrZone;
 
-	public SlideoutMap2_TourColors(	final Control ownerControl,
+	public Slideout_Map2_TourColors(	final Control ownerControl,
 									final ToolBar toolBar,
 									final Map2View map2View,
 									final IDialogSettings state) {

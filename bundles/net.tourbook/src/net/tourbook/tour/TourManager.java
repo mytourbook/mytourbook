@@ -1569,7 +1569,7 @@ public class TourManager {
       }
 
       return true;
-      
+
 //      return tourData.hasGeoData();
    }
 
@@ -1685,7 +1685,11 @@ public class TourManager {
                }
             };
 
-            new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, true, saveRunnable);
+            /*
+             * Ensure to run in the app shell that a slideoutshell can get hidden without hiding the
+             * progress dialog, complicated !
+             */
+            new ProgressMonitorDialog(TourbookPlugin.getAppShell()).run(true, true, saveRunnable);
 
          } catch (final InvocationTargetException e) {
             StatusUtil.showStatus(e);
@@ -2280,7 +2284,7 @@ public class TourManager {
                }
             };
 
-            new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, false, saveRunnable);
+            new ProgressMonitorDialog(TourbookPlugin.getAppShell()).run(true, false, saveRunnable);
 
          } catch (final InvocationTargetException e) {
             StatusUtil.showStatus(e);
