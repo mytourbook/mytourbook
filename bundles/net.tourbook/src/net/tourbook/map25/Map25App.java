@@ -16,9 +16,6 @@
 package net.tourbook.map25;
 
 import java.awt.Canvas;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Dialog.ModalityType;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.nio.file.Path;
@@ -29,11 +26,6 @@ import java.util.Locale;
 //import java.io.FileNotFoundException;
 import java.util.Set;
 import java.util.UUID;
-
-import javax.swing.Box;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
 
 //import org.apache.commons.io.FileUtils;
 //import org.apache.commons.io.comparator.SizeFileComparator;
@@ -57,11 +49,8 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.widgets.Display;
 import org.oscim.awt.AwtGraphics;
 import org.oscim.backend.GLAdapter;
-import org.oscim.backend.canvas.Bitmap;
-import org.oscim.backend.canvas.Color;
-import org.oscim.backend.canvas.Paint;
 import org.oscim.backend.CanvasAdapter;
-import org.oscim.core.GeoPoint;
+
 //import org.ocsim.backend
 import org.oscim.core.MapPosition;
 import org.oscim.core.MercatorProjection;
@@ -71,12 +60,8 @@ import org.oscim.gdx.GdxMap;
 import org.oscim.gdx.GestureHandlerImpl;
 import org.oscim.gdx.LwjglGL20;
 import org.oscim.gdx.MotionHandler;
-import org.oscim.layers.marker.ClusterMarkerRenderer;
 import org.oscim.layers.marker.ItemizedLayer;
 import org.oscim.layers.marker.MarkerItem;
-
-import org.oscim.layers.marker.MarkerRendererFactory;
-import org.oscim.layers.marker.MarkerSymbol.HotspotPlace;
 import org.oscim.layers.marker.MarkerSymbol;
 
 import org.oscim.layers.tile.TileManager;
@@ -191,10 +176,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private float                 _mf_UserScale = 2.50f;
    private float                 _vtm_UserScale = 2.0f;	
 	
-   MarkerSymbol symbol;
    ItemizedLayer<MarkerItem> _layer_Bookmark;
-   private static final int COUNT = 5;
-   private static final float STEP = 100f / 110000f; // roughly 100 meters
    private MarkerToolkit _markertoolkit;
 
 	/**
@@ -529,6 +511,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	public S3DBLayer getLayer_S3DB() {
 		return _layer_mf_S3DB_Building;
 	}
+	
+   public ItemizedLayer<MarkerItem> getLayer_Bookmark() {
+      return _layer_Bookmark;
+   }	
 	
 	public BitmapTileLayer getLayer_HillShading() {
 		return _layer_HillShading;
@@ -1009,12 +995,13 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
 		// bookmarks
 		System.out.println("################ setupMap_Layers: calling constructor"); //$NON-NLS-1$
-		_markertoolkit = new MarkerToolkit();
+		_markertoolkit = new MarkerToolkit(MarkerToolkit.shape_star);
      _layer_Bookmark = new ItemizedLayer<>(
            mMap,
            new ArrayList<MarkerItem>(),
            _markertoolkit._markerRendererFactory,
            this);
+     //List<MarkerItem> pts = _markertoolkit.createDemoMarkerItemList();
      List<MarkerItem> pts = _markertoolkit.createMarkerItemList();
      _layer_Bookmark.addItems(pts);
      _layer_Bookmark.setEnabled(true);
@@ -1120,10 +1107,17 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 		}
 	}
 
+	public void updateUI_BookmarkLayer() {
+	   _layer_Bookmark.removeAllItems();
+	   List<MarkerItem> pts = _markertoolkit.createMarkerItemList();
+	   _layer_Bookmark.addItems(pts);
+	}
+	
    @Override
    public boolean onItemSingleTapUp(int index, MarkerItem item) {
        if (item.getMarker() == null)
-           item.setMarker(symbol);
+          ;
+          // item.setMarker(symbol);
        else
            item.setMarker(null);
 
@@ -1134,7 +1128,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    @Override
    public boolean onItemLongPress(int index, MarkerItem item) {
        if (item.getMarker() == null)
-           item.setMarker(symbol);
+          ;
+          // item.setMarker(symbol);
        else
            item.setMarker(null);
 

@@ -15,6 +15,10 @@ import org.oscim.layers.marker.MarkerRendererFactory;
 import org.oscim.layers.marker.MarkerSymbol;
 import org.oscim.layers.marker.MarkerSymbol.HotspotPlace;
 
+import net.tourbook.map.bookmark.MapBookmark;
+
+
+
 public class MarkerToolkit {
    ItemizedLayer<MarkerItem> mMarkerLayer;
    private int _fgColor = 0xFF000000; // 100 percent black. AARRGGBB
@@ -22,19 +26,37 @@ public class MarkerToolkit {
    public MarkerSymbol _symbol;
 
    private Bitmap _bitmapPoi;
-   private int _DefaultIconSize = 10;
+   private int _DefaultIconSize = 20;
    final Paint _fillPainter = CanvasAdapter.newPaint();
    public MarkerRendererFactory _markerRendererFactory;
+   public static int shape_star = 0;
+   public static int shape_circle = 1;
    
    
-   public MarkerToolkit() {
+   public MarkerToolkit(int shape) {
       System.out.println("*** Markertoolkit:  entering constructor"); //$NON-NLS-1$
       _fillPainter.setStyle(Paint.Style.FILL);
-      _fillPainter.setColor(0xFFFF69B4); // 100percent pink
+      
       _bitmapPoi = CanvasAdapter.newBitmap(_DefaultIconSize, _DefaultIconSize, 0);
       org.oscim.backend.canvas.Canvas defaultMarkerCanvas = CanvasAdapter.newCanvas();  
       defaultMarkerCanvas.setBitmap(_bitmapPoi);
-      defaultMarkerCanvas.drawCircle(_DefaultIconSize/2, _DefaultIconSize/2, _DefaultIconSize/2, _fillPainter);
+      float half = _DefaultIconSize/2;
+      if(shape == shape_circle) {
+         _fillPainter.setColor(0xFFFF69B4); // 100percent pink
+         defaultMarkerCanvas.drawCircle(half, half, half, _fillPainter);
+      } else {
+         /**
+          * link: https://stackoverflow.com/questions/16327588/how-to-make-star-shape-in-java
+          */
+         _fillPainter.setColor(0xFFFFFF00); // 100percent yellow
+         _fillPainter.setStrokeWidth(2);
+         defaultMarkerCanvas.drawLine(half * 0.1f  , half * 0.65f, half * 1.9f  , half * 0.65f, _fillPainter);
+         defaultMarkerCanvas.drawLine(half * 1.9f , half * 0.65f , half * 0.40f , half * 1.65f, _fillPainter);
+         defaultMarkerCanvas.drawLine(half * 0.40f , half * 1.65f, half         ,   0         , _fillPainter);
+         defaultMarkerCanvas.drawLine(half         ,   0         , half * 1.60f , half * 1.65f, _fillPainter);
+         defaultMarkerCanvas.drawLine(half * 1.60f , half * 1.65f, half * 0.1f  , half * 0.65f, _fillPainter);
+      }
+      
       _symbol = new MarkerSymbol(_bitmapPoi, MarkerSymbol.HotspotPlace.CENTER, false);
       
       _markerRendererFactory = new MarkerRendererFactory() {
@@ -49,9 +71,27 @@ public class MarkerToolkit {
              };
          }
      };
+     
+
+     
    }
    
+
+
    public List<MarkerItem> createMarkerItemList(){
+      List<MarkerItem> pts = new ArrayList<>();
+      for (final MapBookmark mapBookmark : net.tourbook.map.bookmark.MapBookmarkManager.getAllBookmarks()) {
+         System.out.println("*** Markertoolkit:  mapbookmark name: " + mapBookmark.name); //$NON-NLS-1$
+              MarkerItem item = new MarkerItem(mapBookmark.id, mapBookmark.name, "",
+                      new GeoPoint(mapBookmark.getLatitude(), mapBookmark.getLongitude())
+              );
+            item.setMarker(createAdvanceSymbol(item, _bitmapPoi));
+              pts.add(item);
+      }
+    return pts;  
+   }
+
+   public List<MarkerItem> createDemoMarkerItemList(){
       int COUNT = 5;
       float STEP = 100f / 110000f; // roughly 100 meters
       // Create some markers spaced STEP degrees
@@ -71,8 +111,6 @@ public class MarkerToolkit {
       } 
     return pts;  
    }
-
-
    
    /**
     * creates a transparent symbol with text and description.
