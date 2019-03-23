@@ -1,0 +1,52 @@
+Version 19.4.0                                             ?. April 2019
+
+
+.fit Import
+===========
+
+The importer for .fit files has been simplified/restructured to fix an issue. Afterwards it was tested with several different .fit files. 
+
+It is still possible that there are undiscovered issue. So check your data after the next imports to ensure that all values are valid.
+
+New
+===
+
+*
+
+
+Improvements
+============
+
+* Search Tour by Location
+
+  - Option for fast map drawing 
+
+
+Changes
+=======
+
+* 2D Map
+
+  - Move option "Zoom + center to the mouse position" into new "2D Map Option" slideout
+
+
+Bugfix   
+======
+
+
+
+* Tour View
+
+  - Fixed ClassCastException, this was the same issue as in the other views Photos, Tour Photos and Training but was not yet discovered
+    
+    
+
+* Import
+
+  - .gpx File
+    - Fixed ConcurrentModificationException when converting waypoints into tour markers
+    
+  - .fit File
+    - Fixed total altitude values for Ciclo(CM 9.3A)
+    - Display 'GARMIN EDGE 1030' instead of 'GARMIN 2713' in Data format 
+  

@@ -39,7 +39,7 @@ public class ActionSyncMapWithTour extends Action {
 
 	@Override
 	public void run() {
-		fMapView.actionSync_WithTour();
+		fMapView.action_SyncWith_Tour();
 	}
 
 }

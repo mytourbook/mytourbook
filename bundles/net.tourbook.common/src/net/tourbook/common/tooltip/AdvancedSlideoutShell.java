@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -42,1763 +42,1842 @@ import org.eclipse.swt.widgets.Shell;
  */
 public abstract class AdvancedSlideoutShell {
 
-	/**
-	 * how long each tick is when fading in/out (in ms)
-	 */
-	private static final int			FADE_TIME_INTERVAL					= UI.IS_OSX ? 10 : 10;
-
-	/**
-	 * Number of steps when fading in
-	 */
-	private static final int			SHELL_FADE_IN_STEPS					= 20;
-
-	/**
-	 * Number of steps when fading out
-	 */
-	private static final int			SHELL_FADE_OUT_STEPS				= 20;
-
-	/**
-	 * Number of steps before fading out
-	 */
-	private static final int			SHELL_FADE_OUT_DELAY_STEPS			= 20;
-
-	private static final int			SHELL_MOVE_STEPS					= 30;
-
-	private static final int			ALPHA_OPAQUE						= 0xff;
-
-	private static final String			STATE_HORIZ_SLIDEOUT_WIDTH			= "STATE_HORIZ_SLIDEOUT_WIDTH";				//$NON-NLS-1$
-	private static final String			STATE_HORIZ_SLIDEOUT_HEIGHT			= "STATE_HORIZ_SLIDEOUT_HEIGHT";			//$NON-NLS-1$
-	private static final String			STATE_VERT_SLIDEOUT_WIDTH			= "STATE_VERT_SLIDEOUT_WIDTH";				//$NON-NLS-1$
-	private static final String			STATE_VERT_SLIDEOUT_HEIGHT			= "STATE_VERT_SLIDEOUT_HEIGHT";				//$NON-NLS-1$
-
-	private static final String			STATE_IS_SLIDEOUT_PINNED			= "STATE_IS_SLIDEOUT_PINNED";				//$NON-NLS-1$
-	private static final String			STATE_HORIZ_SLIDEOUT_PIN_LOCATION_X	= "STATE_HORIZ_SLIDEOUT_PIN_LOCATION_X";	//$NON-NLS-1$
-	private static final String			STATE_HORIZ_SLIDEOUT_PIN_LOCATION_Y	= "STATE_HORIZ_SLIDEOUT_PIN_LOCATION_Y";	//$NON-NLS-1$
-	private static final String			STATE_VERT_SLIDEOUT_PIN_LOCATION_X	= "STATE_VERT_SLIDEOUT_PIN_LOCATION_X";		//$NON-NLS-1$
-	private static final String			STATE_VERT_SLIDEOUT_PIN_LOCATION_Y	= "STATE_VERT_SLIDEOUT_PIN_LOCATION_Y";		//$NON-NLS-1$
-
-	private static final String			STATE_IS_KEEP_SLIDEOUT_OPEN			= "STATE_IS_KEEP_SLIDEOUT_OPEN";			//$NON-NLS-1$
-
-	private static final int			MIN_SHELL_HORIZ_WIDTH				= 100;
-	private static final int			MIN_SHELL_HORIZ_HEIGHT				= 60;
-	private static final int			MIN_SHELL_VERT_WIDTH				= 100;
-	private static final int			MIN_SHELL_VERT_HEIGHT				= 60;
-
-	private int							_shellFadeInSteps					= SHELL_FADE_IN_STEPS;
-	private int							_shellFadeOutSteps					= SHELL_FADE_OUT_STEPS;
-	private int							_shellFadeOutDelaySteps				= SHELL_FADE_OUT_DELAY_STEPS;
-	private int							_shellMoveSteps						= SHELL_MOVE_STEPS;
-
-	private IDialogSettings				_state;
-
-	private OwnerControlListener		_ownerControlListener;
-	private OwnerShellListener			_ownerShellListener;
-	private ToolTipShellListener		_ttShellListener;
-	private ToolTipAllControlsListener	_ttAllControlsListener;
-	private ToolTipDisplayListener		_ttDisplayListener;
-
-	/**
-	 * Keep track of added display listener that no more than <b>1</b> is set.
-	 */
-	private boolean						_isDisplayListenerSet;
-
-	private boolean						_isShellToggled;
-
-	/**
-	 * Is <code>true</code> when shell is fading out, otherwise <code>false</code>.
-	 */
-	private boolean						_isShellFadingOut;
-
-	/**
-	 * Is <code>true</code> when shell is fading in, otherwise <code>false</code>.
-	 */
-	private boolean						_isShellFadingIn;
-
-	private Point						_shellStartLocation;
-	private Point						_shellEndLocation					= new Point(0, 0);
-
-	private int							_fadeOutDelayCounter;
-
-	private int							_horizContentWidth					= MIN_SHELL_HORIZ_WIDTH;
-	private int							_horizContentHeight					= MIN_SHELL_HORIZ_HEIGHT;
-	private int							_vertContentWidth					= MIN_SHELL_VERT_WIDTH;
-	private int							_vertContentHeight					= MIN_SHELL_VERT_HEIGHT;
-
-	private int							_horizPinLocationX;
-	private int							_horizPinLocationY;
-	private int							_vertPinLocationX;
-	private int							_vertPinLocationY;
-
-	private final AnimationTimer		_animationTimer;
-	private int							_animationMoveCounter;
-
-	private boolean						_isSlideoutPinned;
-
-	/**
-	 * This is used internally, when <code>true</code> then the slideout is NOT closed.
-	 */
-	private boolean						_isKeepOpenInternally;
-
-	/**
-	 * This is used from the UI with a keep open action.
-	 */
-	private boolean						_isKeepSlideoutOpen;
-
-	/**
-	 * Keep slideout open when another dialog (e.g. color selector) is currently opened.
-	 */
-	private boolean						_isAnotherDialogOpened;
-
-	private boolean						_isInShellResize;
-	private boolean						_isDoNotStopAnimation;
-
-	private AbstractRRShell				_visibleRRShell;
-	private AbstractRRShell				_rrShellWithResize;
-	private AbstractRRShell				_rrShellNoResize;
-
-	/*
-	 * UI resources
-	 */
-	private Display						_display;
-
-	private Composite					_ttContentArea;
-
-	/**
-	 * Tooltip shell which is currently be visible
-	 */
-	private Shell						_visibleShell;
-
-	/**
-	 * The control on whose action the tooltip is shown
-	 */
-	private Control						_ownerControl;
-
-	private final class AnimationTimer implements Runnable {
-		@Override
-		public void run() {
-			animation20_Runnable();
-		}
-	}
-
-	private class OwnerControlListener implements Listener {
-		@Override
-		public void handleEvent(final Event event) {
-			onOwnerControlEvent(event);
-		}
-	}
-
-	private final class OwnerShellListener implements Listener {
-		@Override
-		public void handleEvent(final Event event) {
-			onOwnerShellEvent(event);
-		}
-	}
-
-	public class RRShell extends AbstractRRShell {
-
-		public RRShell(final Shell parentShell, final int style, final String shellTitle, final boolean isResizeable) {
-			super(parentShell, style, shellTitle, isResizeable);
-		}
-
-		@Override
-		public Point getContentSize() {
-			return AdvancedSlideoutShell.this.getContentSize();
-		}
-	}
-
-	/**
-	 * This listener is added to ALL widgets within the tooltip shell.
-	 */
-	private class ToolTipAllControlsListener implements Listener {
-		@Override
-		public void handleEvent(final Event event) {
-			onTTAllControlsEvent(event);
-		}
-
-	}
-
-	private class ToolTipDisplayListener implements Listener {
-		@Override
-		public void handleEvent(final Event event) {
-
-			switch (event.type) {
-			case SWT.MouseMove:
-				onTTDisplayMouseMove(event);
-				break;
-			}
-		}
-	}
-
-	private final class ToolTipShellListener implements Listener {
-		@Override
-		public void handleEvent(final Event event) {
-			onTTShellEvent(event);
-		}
-	}
-
-	/**
-	 * Create new instance which add TooltipSupport to the widget
-	 * 
-	 * @param state
-	 * @param ownerControl
-	 *            The control on whose action the tooltip is shown
-	 * @param slideoutDefaultSize
-	 *            Slideout default size or <code>null</code> when not available.
-	 *            <p>
-	 *            The default default size is
-	 *            <p>
-	 * 
-	 *            <pre>
-	 *            horizContentDefaultWidth = 300;
-	 *            horizContentDefaultHeight = 150;
-	 * 
-	 *            vertContentDefaultWidth = 400;
-	 *            vertContentDefaultHeight = 250;
-	 * 
-	 *            </pre>
-	 */
-	public AdvancedSlideoutShell(	final Control ownerControl,
-									final IDialogSettings state,
-									final int[] slideoutDefaultSize) {
+   /**
+    * how long each tick is when fading in/out (in ms)
+    */
+   private static final int           FADE_TIME_INTERVAL                  = UI.IS_OSX ? 10 : 10;
+
+   /**
+    * Number of steps when fading in
+    */
+   private static final int           SHELL_FADE_IN_STEPS                 = 20;
+
+   /**
+    * Number of steps when fading out
+    */
+   private static final int           SHELL_FADE_OUT_STEPS                = 20;
+
+   /**
+    * Number of steps before fading out
+    */
+   private static final int           SHELL_FADE_OUT_DELAY_STEPS          = 20;
+
+   private static final int           SHELL_MOVE_STEPS                    = 30;
+
+   private static final int           ALPHA_OPAQUE                        = 0xff;
+
+   private static final String        STATE_HORIZ_SLIDEOUT_WIDTH          = "STATE_HORIZ_SLIDEOUT_WIDTH";          //$NON-NLS-1$
+   private static final String        STATE_HORIZ_SLIDEOUT_HEIGHT         = "STATE_HORIZ_SLIDEOUT_HEIGHT";         //$NON-NLS-1$
+   private static final String        STATE_VERT_SLIDEOUT_WIDTH           = "STATE_VERT_SLIDEOUT_WIDTH";           //$NON-NLS-1$
+   private static final String        STATE_VERT_SLIDEOUT_HEIGHT          = "STATE_VERT_SLIDEOUT_HEIGHT";          //$NON-NLS-1$
+
+   private static final String        STATE_IS_SLIDEOUT_PINNED            = "STATE_IS_SLIDEOUT_PINNED";            //$NON-NLS-1$
+   private static final String        STATE_HORIZ_SLIDEOUT_PIN_LOCATION_X = "STATE_HORIZ_SLIDEOUT_PIN_LOCATION_X"; //$NON-NLS-1$
+   private static final String        STATE_HORIZ_SLIDEOUT_PIN_LOCATION_Y = "STATE_HORIZ_SLIDEOUT_PIN_LOCATION_Y"; //$NON-NLS-1$
+   private static final String        STATE_VERT_SLIDEOUT_PIN_LOCATION_X  = "STATE_VERT_SLIDEOUT_PIN_LOCATION_X";  //$NON-NLS-1$
+   private static final String        STATE_VERT_SLIDEOUT_PIN_LOCATION_Y  = "STATE_VERT_SLIDEOUT_PIN_LOCATION_Y";  //$NON-NLS-1$
+
+   private static final String        STATE_IS_KEEP_SLIDEOUT_OPEN         = "STATE_IS_KEEP_SLIDEOUT_OPEN";         //$NON-NLS-1$
+
+   private static final int           MIN_SHELL_HORIZ_WIDTH               = 100;
+   private static final int           MIN_SHELL_HORIZ_HEIGHT              = 60;
+   private static final int           MIN_SHELL_VERT_WIDTH                = 100;
+   private static final int           MIN_SHELL_VERT_HEIGHT               = 60;
+
+   private int                        _shellFadeInSteps                   = SHELL_FADE_IN_STEPS;
+   private int                        _shellFadeOutSteps                  = SHELL_FADE_OUT_STEPS;
+   private int                        _shellFadeOutDelaySteps             = SHELL_FADE_OUT_DELAY_STEPS;
+   private int                        _shellMoveSteps                     = SHELL_MOVE_STEPS;
+
+   private IDialogSettings            _state;
+
+   private OwnerControlListener       _ownerControlListener;
+   private OwnerShellListener         _ownerShellListener;
+   private ToolTipShellListener       _ttShellListener;
+   private ToolTipAllControlsListener _ttAllControlsListener;
+   private ToolTipDisplayListener     _ttDisplayListener;
+
+   /**
+    * Keep track of added display listener that no more than <b>1</b> is set.
+    */
+   private boolean                    _isDisplayListenerSet;
+
+   private boolean                    _isShellToggled;
+
+   /**
+    * Is <code>true</code> when shell is fading out, otherwise <code>false</code>.
+    */
+   private boolean                    _isShellFadingOut;
+
+   /**
+    * Is <code>true</code> when shell is fading in, otherwise <code>false</code>.
+    */
+   private boolean                    _isShellFadingIn;
+
+   private Point                      _shellStartLocation;
+   private Point                      _shellEndLocation                   = new Point(0, 0);
+
+   private int                        _fadeOutDelayCounter;
+
+   private int                        _horizContentWidth                  = MIN_SHELL_HORIZ_WIDTH;
+   private int                        _horizContentHeight                 = MIN_SHELL_HORIZ_HEIGHT;
+   private int                        _vertContentWidth                   = MIN_SHELL_VERT_WIDTH;
+   private int                        _vertContentHeight                  = MIN_SHELL_VERT_HEIGHT;
+
+   private int                        _horizPinLocationX;
+   private int                        _horizPinLocationY;
+   private int                        _vertPinLocationX;
+   private int                        _vertPinLocationY;
+
+   private final AnimationTimer       _animationTimer;
+   private int                        _animationMoveCounter;
+
+   private boolean                    _isSlideoutPinned;
+
+   /**
+    * This is used internally, when <code>true</code> then the slideout is NOT closed.
+    */
+   private boolean                    _isKeepOpenInternally;
+
+   /**
+    * This is used from the UI with a keep open action.
+    */
+   private boolean                    _isKeepSlideoutOpen;
+
+   /**
+    * This is used when a UI action is ongoing to show info in the slideout, e.g. when
+    * hovering/selecting tour geo filter.
+    */
+   private boolean                    _isKeepSlideoutOpen_DuringUIAction;
+
+   /**
+    * Keep slideout open when another dialog (e.g. color selector) is currently opened.
+    */
+   private boolean                    _isAnotherDialogOpened;
+
+   private boolean                    _isInShellResize;
+   private boolean                    _isDoNotStopAnimation;
+
+   private AbstractRRShell            _visibleRRShell;
+   private AbstractRRShell            _rrShellWithResize;
+   private AbstractRRShell            _rrShellNoResize;
+
+   /*
+    * UI resources
+    */
+   private Display   _display;
+
+   private Composite _ttContentArea;
+
+   /**
+    * Tooltip shell which is currently be visible
+    */
+   private Shell     _visibleShell;
+
+   /**
+    * The control on whose action the tooltip is shown
+    */
+   private Control   _ownerControl;
+
+   private final class AnimationTimer implements Runnable {
+      @Override
+      public void run() {
+         animation20_Runnable();
+      }
+   }
+
+   private class OwnerControlListener implements Listener {
+      @Override
+      public void handleEvent(final Event event) {
+         onOwnerControlEvent(event);
+      }
+   }
+
+   private final class OwnerShellListener implements Listener {
+      @Override
+      public void handleEvent(final Event event) {
+         onOwnerShellEvent(event);
+      }
+   }
+
+   public class RRShell extends AbstractRRShell {
+
+      public RRShell(final Shell parentShell, final int style, final String shellTitle, final boolean isResizeable) {
+         super(parentShell, style, shellTitle, isResizeable);
+      }
+
+      @Override
+      public Point getContentSize() {
+         return AdvancedSlideoutShell.this.getContentSize();
+      }
+   }
+
+   /**
+    * This listener is added to ALL widgets within the tooltip shell.
+    */
+   private class ToolTipAllControlsListener implements Listener {
+      @Override
+      public void handleEvent(final Event event) {
+         onTTAllControlsEvent(event);
+      }
+
+   }
+
+   private class ToolTipDisplayListener implements Listener {
+      @Override
+      public void handleEvent(final Event event) {
+
+         switch (event.type) {
+         case SWT.MouseMove:
+            onTTDisplayMouseMove(event);
+            break;
+         }
+      }
+   }
+
+   private final class ToolTipShellListener implements Listener {
+      @Override
+      public void handleEvent(final Event event) {
+         onTTShellEvent(event);
+      }
+   }
+
+   /**
+    * Create new instance which add TooltipSupport to the widget
+    *
+    * @param state
+    * @param ownerControl
+    *           The control on whose action the tooltip is shown
+    * @param slideoutDefaultSize
+    *           Slideout default size or <code>null</code> when not available.
+    *           <p>
+    *           The default default size is
+    *           <p>
+    *
+    *           <pre>
+    *           horizContentDefaultWidth = 300;
+    *           horizContentDefaultHeight = 150;
+    *
+    *           vertContentDefaultWidth = 400;
+    *           vertContentDefaultHeight = 250;
+    *
+    *           </pre>
+    */
+   public AdvancedSlideoutShell(final Control ownerControl,
+                                final IDialogSettings state,
+                                final int[] slideoutDefaultSize) {
 
-		_ownerControl = ownerControl;
-		_state = state;
+      _ownerControl = ownerControl;
+      _state = state;
 
-		_display = _ownerControl.getDisplay();
+      _display = _ownerControl.getDisplay();
 
-		_ttAllControlsListener = new ToolTipAllControlsListener();
-		_ttShellListener = new ToolTipShellListener();
-		_ttDisplayListener = new ToolTipDisplayListener();
+      _ttAllControlsListener = new ToolTipAllControlsListener();
+      _ttShellListener = new ToolTipShellListener();
+      _ttDisplayListener = new ToolTipDisplayListener();
 
-		_ownerControlListener = new OwnerControlListener();
-		_ownerShellListener = new OwnerShellListener();
+      _ownerControlListener = new OwnerControlListener();
+      _ownerShellListener = new OwnerShellListener();
 
-		_animationTimer = new AnimationTimer();
+      _animationTimer = new AnimationTimer();
 
-		ownerControlAddListener();
+      ownerControlAddListener();
 
-		restoreState(slideoutDefaultSize);
-	}
+      restoreState(slideoutDefaultSize);
+   }
 
-	/**
-	 * This is called after the shell and content area are created.
-	 * 
-	 * @param shell
-	 */
-	protected abstract void afterCreateShell(Shell shell);
+   /**
+    * This is called after the shell and content area are created.
+    *
+    * @param shell
+    */
+   protected abstract void afterCreateShell(Shell shell);
 
-	private void animation10_Start() {
+   private void animation10_Start() {
 
-		final int a = 0;
+      final int a = 0;
 
-		if (a == 1) {
-			animation10_Start_Simple();
-		} else {
-			animation10_StartKomplex();
-		}
-	}
+      if (a == 1) {
+         animation10_Start_Simple();
+      } else {
+         animation10_StartKomplex();
+      }
+   }
 
-	private void animation10_Start_Simple() {
+   private void animation10_Start_Simple() {
 
-		if (_isShellFadingIn) {
+      if (_isShellFadingIn) {
 
-			// show tool tip
+         // show tool tip
 
-			final Point size = getContentSize();
+         final Point size = getContentSize();
 
-			final Point defaultLocation = getToolTipLocation(size);
+         final Point defaultLocation = getToolTipLocation(size);
 
-			final Point shellLocation = fixupDisplayBounds(size, defaultLocation);
+         final Point shellLocation = fixupDisplayBounds(size, defaultLocation);
 
-			_visibleRRShell.setShellLocation(shellLocation.x, shellLocation.y, 1);
+         _visibleRRShell.setShellLocation(shellLocation.x, shellLocation.y, 1);
 
-			reparentShell(_rrShellNoResize);
+         reparentShell(_rrShellNoResize);
 
-			_rrShellNoResize.setAlpha(0xff);
+         _rrShellNoResize.setAlpha(0xff);
 
-			setShellVisible(true);
+         setShellVisible(true);
 
-		} else {
+      } else {
 
-			// hide tooltip
+         // hide tooltip
 
-			setShellVisible(false);
-		}
-	}
+         setShellVisible(false);
+      }
+   }
 
-	private void animation10_StartKomplex() {
+   private void animation10_StartKomplex() {
 
-//		System.out.println(UI.timeStampNano() + " in " + _isShellFadingIn + ("\tout " + _isShellFadingOut));
-//		// TODO remove SYSTEM.OUT.PRINTLN
+//      System.out.println(UI.timeStampNano() + " in " + _isShellFadingIn + ("\tout " + _isShellFadingOut));
+//      // TODO remove SYSTEM.OUT.PRINTLN
 
-		if (_isKeepOpenInternally) {
+      if (_isKeepOpenInternally) {
 
-			// hiding has started, stop it and keep tooltip open
+         // hiding has started, stop it and keep tooltip open
 
-			_isKeepOpenInternally = false;
+         _isKeepOpenInternally = false;
 
-			final Point shellCurrentLocation = _visibleShell.getLocation();
+         final Point shellCurrentLocation = _visibleShell.getLocation();
 
-			_shellStartLocation = _shellEndLocation = shellCurrentLocation;
+         _shellStartLocation = _shellEndLocation = shellCurrentLocation;
 
-			_isShellFadingIn = true;
-			_isShellFadingOut = false;
+         _isShellFadingIn = true;
+         _isShellFadingOut = false;
 
-		} else {
+      } else {
 
-			if (_isShellFadingIn) {
+         if (_isShellFadingIn) {
 
-				// set fading in location
+            // set fading in location
 
-				final Point contentSize = _visibleRRShell.getContentSize();
-				final Point shellSize = _visibleRRShell.getShellSize(contentSize);
+            final Point contentSize = _visibleRRShell.getContentSize();
+            final Point shellSize = _visibleRRShell.getShellSize(contentSize);
 
-				Point contentLocation;
-				if (_isSlideoutPinned) {
+            Point contentLocation;
+            if (_isSlideoutPinned) {
 
-					if (isVerticalLayout()) {
-						contentLocation = new Point(_vertPinLocationX, _vertPinLocationY);
-					} else {
-						contentLocation = new Point(_horizPinLocationX, _horizPinLocationY);
-					}
+               if (isVerticalLayout()) {
+                  contentLocation = new Point(_vertPinLocationX, _vertPinLocationY);
+               } else {
+                  contentLocation = new Point(_horizPinLocationX, _horizPinLocationY);
+               }
 
-				} else {
-					contentLocation = getToolTipLocation(contentSize);
-				}
+            } else {
+               contentLocation = getToolTipLocation(contentSize);
+            }
 
-				Point newShellEndLocation = _visibleRRShell.getShellLocation(contentLocation);
-				newShellEndLocation = fixupDisplayBounds(shellSize, newShellEndLocation);
+            Point newShellEndLocation = _visibleRRShell.getShellLocation(contentLocation);
+            newShellEndLocation = fixupDisplayBounds(shellSize, newShellEndLocation);
 
-				final boolean isShellVisible = _visibleShell.isVisible();
+            final boolean isShellVisible = _visibleShell.isVisible();
 
-				if (isShellVisible //
-						&& newShellEndLocation.x == _shellEndLocation.x
-						&& newShellEndLocation.y == _shellEndLocation.y) {
+            if (isShellVisible //
+                  && newShellEndLocation.x == _shellEndLocation.x
+                  && newShellEndLocation.y == _shellEndLocation.y) {
 
-					// shell is already fading in with the correct location
+               // shell is already fading in with the correct location
 
-//					System.out.println(UI.timeStampNano() + " is in END location\t");
-//					// TODO remove SYSTEM.OUT.PRINTLN
+//               System.out.println(UI.timeStampNano() + " is in END location\t");
+//               // TODO remove SYSTEM.OUT.PRINTLN
 
-					return;
-				}
+               return;
+            }
 
-				// set new end location
-				_shellEndLocation = newShellEndLocation;
+            // set new end location
+            _shellEndLocation = newShellEndLocation;
 
-				if (_isSlideoutPinned == false && isShellVisible) {
+            if (_isSlideoutPinned == false && isShellVisible) {
 
-					// shell is already visible, move from the current position to the target position
+               // shell is already visible, move from the current position to the target position
 
-					_shellStartLocation = _visibleShell.getLocation();
+               _shellStartLocation = _visibleShell.getLocation();
 
-				} else {
+            } else {
 
-					// shell is not visible, set position directly without moving animation, do only fading animation
+               // shell is not visible, set position directly without moving animation, do only fading animation
 
-					_shellStartLocation = _shellEndLocation;
+               _shellStartLocation = _shellEndLocation;
 
-					_visibleRRShell.setShellLocation(_shellStartLocation.x, _shellStartLocation.y, 2);
+               _visibleRRShell.setShellLocation(_shellStartLocation.x, _shellStartLocation.y, 2);
 
-					reparentShell(_rrShellNoResize);
+               reparentShell(_rrShellNoResize);
 
-					setShellVisible(true);
-				}
+               setShellVisible(true);
+            }
 
-			} else if (_isShellFadingOut) {
+         } else if (_isShellFadingOut) {
 
-				// fading out has no movement
+            // fading out has no movement
 
-				_fadeOutDelayCounter = 0;
-			}
-		}
+            _fadeOutDelayCounter = 0;
+         }
+      }
 
-//		System.out.println(UI.timeStampNano() + " animation10_StartKomplex\t" );
-//		// TODO remove SYSTEM.OUT.PRINTLN
+//      System.out.println(UI.timeStampNano() + " animation10_StartKomplex\t" );
+//      // TODO remove SYSTEM.OUT.PRINTLN
 
-		// start animation now
-		_animationMoveCounter = 0;
-		animation20_Runnable();
-	}
+      // start animation now
+      _animationMoveCounter = 0;
+      animation20_Runnable();
+   }
 
-	private void animation20_Runnable() {
+   private void animation20_Runnable() {
 
-//		final long start = System.nanoTime();
+//      final long start = System.nanoTime();
 
-		if (isHidden()) {
-			return;
-		}
+      if (isHidden()) {
+         return;
+      }
 
-//		System.out.println(UI.timeStampNano() + " animation20_Runnable " + _isShellFadingIn + "  " + _isShellFadingOut);
-//		// TODO remove SYSTEM.OUT.PRINTLN
+//      System.out.println(UI.timeStampNano() + " animation20_Runnable " + _isShellFadingIn + "  " + _isShellFadingOut);
+//      // TODO remove SYSTEM.OUT.PRINTLN
 
-		try {
-			/*
-			 * endAlpha will be the final fadeIn/fadeOut value when the animation stops
-			 */
-			int finalFadeAlpha = -1;
+      try {
+         /*
+          * endAlpha will be the final fadeIn/fadeOut value when the animation stops
+          */
+         int finalFadeAlpha = -1;
 
-			int currentAlpha = _visibleShell.getAlpha();
-			boolean isLoopBreak = false;
+         int currentAlpha = _visibleShell.getAlpha();
+         boolean isLoopBreak = false;
 
-			_animationMoveCounter++;
+         _animationMoveCounter++;
 
-			while (true) {
+         while (true) {
 
-				int newAlpha = -1;
+            int newAlpha = -1;
 
-				if (_isShellFadingIn) {
+            if (_isShellFadingIn) {
 
-					final int shellStartX = _shellStartLocation.x;
-					final int shellStartY = _shellStartLocation.y;
-					final int shellEndX = _shellEndLocation.x;
-					final int shellEndY = _shellEndLocation.y;
+               final int shellStartX = _shellStartLocation.x;
+               final int shellStartY = _shellStartLocation.y;
+               final int shellEndX = _shellEndLocation.x;
+               final int shellEndY = _shellEndLocation.y;
 
-//					System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
-//							+ ("\tfrom:" + shellStartX)
-//							+ ("\tto:" + shellEndX)
-//							+ "\t"
-//							+ ("\tfrom:" + shellStartY)
-//							+ ("\tto:" + shellEndY)
-//					//
-//					);
-//					// TODO remove SYSTEM.OUT.PRINTLN
+//               System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
+//                     + ("\tfrom:" + shellStartX)
+//                     + ("\tto:" + shellEndX)
+//                     + "\t"
+//                     + ("\tfrom:" + shellStartY)
+//                     + ("\tto:" + shellEndY)
+//               //
+//               );
+//               // TODO remove SYSTEM.OUT.PRINTLN
 
-					final Point shellCurrentLocation = _visibleShell.getLocation();
+               final Point shellCurrentLocation = _visibleShell.getLocation();
 
-					final boolean isInTarget = shellCurrentLocation.x == shellEndX
-							&& shellCurrentLocation.y == shellEndY;
+               final boolean isInTarget = shellCurrentLocation.x == shellEndX
+                     && shellCurrentLocation.y == shellEndY;
 
-					final int diffAlpha = _shellFadeInSteps == 0 //
-							? ALPHA_OPAQUE
-							: ALPHA_OPAQUE / _shellFadeInSteps;
+               final int diffAlpha = _shellFadeInSteps == 0 //
+                     ? ALPHA_OPAQUE
+                     : ALPHA_OPAQUE / _shellFadeInSteps;
 
-					newAlpha = currentAlpha + diffAlpha;
-					if (newAlpha > ALPHA_OPAQUE) {
-						newAlpha = ALPHA_OPAQUE;
-					}
-					finalFadeAlpha = ALPHA_OPAQUE;
+               newAlpha = currentAlpha + diffAlpha;
+               if (newAlpha > ALPHA_OPAQUE) {
+                  newAlpha = ALPHA_OPAQUE;
+               }
+               finalFadeAlpha = ALPHA_OPAQUE;
 
-					if (isInTarget && currentAlpha == ALPHA_OPAQUE) {
+               if (isInTarget && currentAlpha == ALPHA_OPAQUE) {
 
-						// target is reached and fully visible, stop animation
+                  // target is reached and fully visible, stop animation
 
-						_isShellFadingIn = false;
+                  _isShellFadingIn = false;
 
-						return;
+                  return;
 
-					} else {
+               } else {
 
-						if (isInTarget == false) {
+                  if (isInTarget == false) {
 
-							// move to target
+                     // move to target
 
-							final int diffX = shellStartX - shellEndX;
-							final int diffY = shellStartY - shellEndY;
+                     final int diffX = shellStartX - shellEndX;
+                     final int diffY = shellStartY - shellEndY;
 
-							final double moveX = (double) diffX / _shellMoveSteps * _animationMoveCounter;
-							final double moveY = (double) diffY / _shellMoveSteps * _animationMoveCounter;
+                     final double moveX = (double) diffX / _shellMoveSteps * _animationMoveCounter;
+                     final double moveY = (double) diffY / _shellMoveSteps * _animationMoveCounter;
 
-							final int shellCurrentX = (int) (shellStartX - moveX);
-							final int shellCurrentY = (int) (shellStartY - moveY);
+                     final int shellCurrentX = (int) (shellStartX - moveX);
+                     final int shellCurrentY = (int) (shellStartY - moveY);
 
-							_visibleRRShell.setShellLocation(shellCurrentX, shellCurrentY, 3);
-						}
-					}
+                     _visibleRRShell.setShellLocation(shellCurrentX, shellCurrentY, 3);
+                  }
+               }
 
-				} else if (_isShellFadingOut) {
+            } else if (_isShellFadingOut) {
 
-					if (currentAlpha == 0xff && _fadeOutDelayCounter++ < _shellFadeOutDelaySteps) {
+               if (currentAlpha == 0xff && _fadeOutDelayCounter++ < _shellFadeOutDelaySteps) {
 
-						// delay fade out only when shell is fully visible
+                  // delay fade out only when shell is fully visible
 
-						_display.timerExec(FADE_TIME_INTERVAL, _animationTimer);
+                  _display.timerExec(FADE_TIME_INTERVAL, _animationTimer);
 
-						return;
-					}
+                  return;
+               }
 
-					final int alphaDiff = ALPHA_OPAQUE / _shellFadeOutSteps;
+               final int alphaDiff = ALPHA_OPAQUE / _shellFadeOutSteps;
 
-					newAlpha = currentAlpha - alphaDiff;
-					finalFadeAlpha = 0;
+               newAlpha = currentAlpha - alphaDiff;
+               finalFadeAlpha = 0;
 
-					if (newAlpha <= 0) {
+               if (newAlpha <= 0) {
 
-						// shell is not visible any more, hide it now
+                  // shell is not visible any more, hide it now
 
-						_visibleShell.setAlpha(0);
+                  _visibleShell.setAlpha(0);
 
-						// hide shell
-						setShellVisible(false);
+                  // hide shell
+                  setShellVisible(false);
 
-						_isShellFadingOut = false;
+                  _isShellFadingOut = false;
 
-						return;
-					}
-				}
+                  return;
+               }
+            }
 
-				if (newAlpha == -1) {
+            if (newAlpha == -1) {
 
-					return;
+               return;
 
-				} else {
+            } else {
 
-					if (newAlpha != currentAlpha) {
-						_visibleShell.setAlpha(newAlpha);
-					}
+               if (newAlpha != currentAlpha) {
+                  _visibleShell.setAlpha(newAlpha);
+               }
 
-					if (_visibleShell.getAlpha() != newAlpha) {
+               if (_visibleShell.getAlpha() != newAlpha) {
 
-						// platform do not support shell alpha, this occured on Ubuntu 12.04
+                  // platform do not support shell alpha, this occured on Ubuntu 12.04
 
-						if (isLoopBreak) {
-							break;
-						}
+                  if (isLoopBreak) {
+                     break;
+                  }
 
-						// loop only once
-						isLoopBreak = true;
+                  // loop only once
+                  isLoopBreak = true;
 
-						currentAlpha = finalFadeAlpha;
+                  currentAlpha = finalFadeAlpha;
 
-						continue;
+                  continue;
 
-					} else {
+               } else {
 
-						_display.timerExec(FADE_TIME_INTERVAL, _animationTimer);
+                  _display.timerExec(FADE_TIME_INTERVAL, _animationTimer);
 
-						break;
-					}
+                  break;
+               }
 
-				}
-			}
+            }
+         }
 
-		} catch (final Exception err) {
-			StatusUtil.log(err);
-		} finally {
+      } catch (final Exception err) {
+         StatusUtil.log(err);
+      } finally {
 
-//			final float timeDiff = (float) (System.nanoTime() - start) / 1000000;
-//			System.out.println(UI.timeStampNano() + " animation20_Runnable:\t" + timeDiff + " ms\t" + " ms");
-//			// TODO remove SYSTEM.OUT.PRINTLN
-		}
-	}
+//         final float timeDiff = (float) (System.nanoTime() - start) / 1000000;
+//         System.out.println(UI.timeStampNano() + " animation20_Runnable:\t" + timeDiff + " ms\t" + " ms");
+//         // TODO remove SYSTEM.OUT.PRINTLN
+      }
+   }
 
-	protected abstract void beforeHideToolTip();
+   protected abstract void beforeHideToolTip();
 
-	/**
-	 * Is called just before the shell is set to visible or hidden
-	 * 
-	 * @param isVisible
-	 *            Is <code>true</code> when visible otherwise hidden.
-	 */
-	protected void beforeShellVisible(final boolean isVisible) {}
+   /**
+    * This is called just before the shell is set to be visible or hidden
+    *
+    * @param isVisible
+    *           Is <code>true</code> when visible otherwise hidden.
+    */
+   protected void beforeShellVisible(final boolean isVisible) {}
 
-	/**
-	 * <b>VERY IMPORTANT</b>
-	 * <p>
-	 * Do not hide the tooltip when other shells (dialogs) are open, otherwise the app is blocked
-	 * and must be killed.
-	 * 
-	 * @return Returns <code>true</code> when shell can be closed, otherwise it CANNOT be closed.
-	 */
-	private boolean canCloseShell() {
+   /**
+    * <b>VERY IMPORTANT</b>
+    * <p>
+    * Do not hide the tooltip when other shells (dialogs) are open, otherwise the app is blocked and
+    * must be killed.
+    *
+    * @return Returns <code>true</code> when shell can be closed, otherwise it CANNOT be closed.
+    */
+   private boolean canCloseShell() {
 
-		if (_visibleShell == null || _visibleShell.isDisposed()) {
-			return true;
-		}
+      if (_visibleShell == null || _visibleShell.isDisposed()) {
+         return true;
+      }
 
-		if (_isKeepOpenInternally || _isKeepSlideoutOpen || _isAnotherDialogOpened) {
-			return false;
-		}
+      if (_isKeepOpenInternally || _isKeepSlideoutOpen || _isKeepSlideoutOpen_DuringUIAction || _isAnotherDialogOpened) {
+         return false;
+      }
 
-		final Shell[] openedShells = _visibleShell.getShells();
+      final Shell[] openedShells = _visibleShell.getShells();
 
-//		System.out.println(UI.timeStampNano() + "openedShells:" + openedShells.length);
+//      System.out.println(UI.timeStampNano() + "openedShells:" + openedShells.length);
 //
-//		for (final Shell shell : openedShells) {
-//			Util.dumpChildren(shell, 0);
-//		}
-
-		boolean canCloseShell = openedShells.length == 0;
-
-		if (openedShells.length > 0) {
-			canCloseShell = canCloseShell(openedShells);
-		}
-
-		return canCloseShell;
-	}
-
-	protected boolean canCloseShell(final Shell[] openedShells) {
-		return true;
-	}
-
-	/**
-	 * Close the slideout, any possible flags to keep it open are ignored, the shell will be also
-	 * disposed.
-	 */
-	public void close() {
-
-		ttHide_NoFlags();
-	}
-
-	protected abstract void closeInternalShells();
+//      for (final Shell shell : openedShells) {
+//         Util.dumpChildren(shell, 0);
+//      }
+
+      boolean canCloseShell = openedShells.length == 0;
+
+      if (openedShells.length > 0) {
+         canCloseShell = canCloseShell(openedShells);
+      }
+
+      return canCloseShell;
+   }
+
+   protected boolean canCloseShell(final Shell[] openedShells) {
+      return true;
+   }
+
+   /**
+    * Close the slideout, any possible flags to keep it open are ignored, the shell will be also
+    * disposed.
+    */
+   public void close() {
+
+      ttHide_NoFlags();
+   }
+
+   protected abstract void closeInternalShells();
 
-	/**
-	 * Creates the content area of the the tooltip.
-	 * 
-	 * @param parent
-	 *            the parent of the content area
-	 * @return the content area created
-	 */
-	protected abstract Composite createSlideoutContentArea(Composite parent);
+   /**
+    * Creates the content area of the the tooltip.
+    *
+    * @param parent
+    *           the parent of the content area
+    * @return the content area created
+    */
+   protected abstract Composite createSlideoutContentArea(Composite parent);
 
-	/**
-	 * Create a shell but do not display it
-	 * 
-	 * @return Returns <code>true</code> when shell is created.
-	 */
-	private void createUI() {
-
-		if (_visibleShell != null && !_visibleShell.isDisposed()) {
-			// shell is already created
-			return;
-		}
+   /**
+    * Create a shell but do not display it
+    *
+    * @return Returns <code>true</code> when shell is created.
+    */
+   private void createUI() {
+
+      if (_visibleShell != null && !_visibleShell.isDisposed()) {
+         // shell is already created
+         return;
+      }
 
-		/*
-		 * resize shell
-		 */
-		_rrShellWithResize = new RRShell(
-				_ownerControl.getShell(), //
-				SWT.ON_TOP //
-						//						| SWT.TOOL
-						| SWT.RESIZE
-						| SWT.NO_FOCUS,
-				getShellTitle_WithResize(),
-				true);
-
-		final Shell shellWithResize = _rrShellWithResize.getShell();
-		shellWithResize.addControlListener(new ControlAdapter() {
-			@Override
-			public void controlResized(final ControlEvent e) {
-				onTTShellResize(e);
-			}
-		});
-
-		ttShellAddListener(shellWithResize);
-
-		/*
-		 * no resize shell
-		 */
-		_rrShellNoResize = new RRShell(
-				_ownerControl.getShell(), //
-				SWT.ON_TOP //
-						//						| SWT.TOOL
-						| SWT.NO_FOCUS,
-				getShellTitle_NoResize(),
-				false);
-
-		ttShellAddListener(_rrShellNoResize.getShell());
-
-		setCurrentVisibleShell(_rrShellNoResize);
-
-		// set initial alpha
-		_visibleShell.setAlpha(0x0);
-
-		ownerShellAddListener();
-
-		// create UI
-		_ttContentArea = createSlideoutContentArea(_rrShellNoResize.getShellPage());
-
-		ttAllControlsAddListener(_visibleShell);
-
-		updateUI_Colors();
-
-		// restore slideout state
-		restoreState_SlideoutIsPinned(_isSlideoutPinned);
-		restoreState_KeepSlideoutOpen(_isKeepSlideoutOpen);
+      /*
+       * resize shell
+       */
+      _rrShellWithResize = new RRShell(
+            _ownerControl.getShell(), //
+            SWT.ON_TOP //
+                  //                  | SWT.TOOL
+                  | SWT.RESIZE
+                  | SWT.NO_FOCUS,
+            getShellTitle_WithResize(),
+            true);
+
+      final Shell shellWithResize = _rrShellWithResize.getShell();
+      shellWithResize.addControlListener(new ControlAdapter() {
+         @Override
+         public void controlResized(final ControlEvent e) {
+            onTTShellResize(e);
+         }
+      });
+
+      ttShellAddListener(shellWithResize);
+
+      /*
+       * no resize shell
+       */
+      _rrShellNoResize = new RRShell(
+            _ownerControl.getShell(), //
+            SWT.ON_TOP //
+                  //                  | SWT.TOOL
+                  | SWT.NO_FOCUS,
+            getShellTitle_NoResize(),
+            false);
+
+      ttShellAddListener(_rrShellNoResize.getShell());
+
+      setCurrentVisibleShell(_rrShellNoResize);
+
+      // set initial alpha
+      _visibleShell.setAlpha(0x0);
+
+      ownerShellAddListener();
+
+      // create UI
+      _ttContentArea = createSlideoutContentArea(_rrShellNoResize.getShellPage());
+
+      ttAllControlsAddListener(_visibleShell);
+
+      updateUI_Colors();
+
+      // restore slideout state
+      restoreState_SlideoutIsPinned(_isSlideoutPinned);
+      restoreState_KeepSlideoutOpen(_isKeepSlideoutOpen);
 
-		afterCreateShell(_visibleShell);
-	}
+      afterCreateShell(_visibleShell);
+   }
 
-	protected void doNotStopAnimation() {
-		_isDoNotStopAnimation = true;
-	}
-
-	private Point fixupDisplayBounds(final Point tipSize, final Point location) {
-
-		final Rectangle displayBounds = getDisplayBounds(location);
-		final Point tipRightBottom = new Point(location.x + tipSize.x, location.y + tipSize.y);
-
-		if (!(displayBounds.contains(location) && displayBounds.contains(tipRightBottom))) {
-
-			final int minVisibleSize = 50;
-
-			final int displayX = displayBounds.x;
-			final int displayY = displayBounds.y;
-
-			final int displayWidth = displayBounds.width;
-			final int displayHeight = displayBounds.height;
-
-			final int displayRight = displayX + displayWidth;
-			final int displayBottom = displayY + displayHeight;
-
-			if (location.x > displayRight - minVisibleSize) {
-				location.x = displayRight - minVisibleSize;
-			}
-
-			if (location.y > displayBottom - minVisibleSize) {
-				location.y = displayBottom - minVisibleSize;
-			}
-
-			if (location.x < displayX) {
-				location.x = displayX;
-			}
-
-			if (location.y < displayY) {
-				location.y = displayY;
-			}
-		}
-
-		return location;
-	}
-
-	/**
-	 * @return Returns size of the tooltip content
-	 */
-	protected Point getContentSize() {
-		if (isVerticalLayout()) {
-			return new Point(_vertContentWidth, _vertContentHeight);
-		} else {
-			return new Point(_horizContentWidth, _horizContentHeight);
-		}
-	}
-
-	private Rectangle getDisplayBounds(final Point location) {
-
-		Rectangle displayBounds;
-		final Monitor[] allMonitors = _ownerControl.getDisplay().getMonitors();
-
-		if (allMonitors.length > 1) {
-			// By default present in the monitor of the control
-			displayBounds = _ownerControl.getMonitor().getBounds();
-			final Point p = new Point(location.x, location.y);
-
-			// Search on which monitor the event occurred
-			Rectangle tmp;
-			for (final Monitor element : allMonitors) {
-				tmp = element.getBounds();
-				if (tmp.contains(p)) {
-					displayBounds = tmp;
-					break;
-				}
-			}
-
-		} else {
-			displayBounds = _ownerControl.getDisplay().getBounds();
-		}
-
-		return displayBounds;
-	}
-
-	protected Color getShellColor_Background(final ColorRegistry colorRegistry) {
-		return Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
-	};
-
-	protected Color getShellColor_Foreground(final ColorRegistry colorRegistry) {
-		return Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_FOREGROUND);
-	};
-
-	protected String getShellTitle_NoResize() {
-		return UI.EMPTY_STRING;
-	}
+   protected void doNotStopAnimation() {
+      _isDoNotStopAnimation = true;
+   }
 
-	protected String getShellTitle_WithResize() {
-		return UI.EMPTY_STRING;
-	}
+   private Point fixupDisplayBounds(final Point tipSize, final Point location) {
 
-	/**
-	 * Get tooltip location.
-	 * 
-	 * @param size
-	 *            Tooltip size
-	 * @return Returns location relative to the device.
-	 */
-	protected abstract Point getToolTipLocation(Point size);
+      final Rectangle displayBounds = getDisplayBounds(location);
+      final Point tipRightBottom = new Point(location.x + tipSize.x, location.y + tipSize.y);
 
-	/**
-	 * @return Return tooltip shell which is currently be visible.
-	 */
-	protected Shell getToolTipShell() {
-		return _visibleShell;
-	}
+      if (!(displayBounds.contains(location) && displayBounds.contains(tipRightBottom))) {
 
-	/**
-	 * Hide the currently active tool tip with animation.
-	 */
-	public void hide() {
-		ttHide_WithAnimation();
-	}
+         final int minVisibleSize = 50;
 
-	/**
-	 * Hide the currently active tool tip immediately.
-	 */
-	public void hideNow() {
-		ttHide_WithoutAnimation();
-	}
+         final int displayX = displayBounds.x;
+         final int displayY = displayBounds.y;
 
-	private boolean isHidden() {
+         final int displayWidth = displayBounds.width;
+         final int displayHeight = displayBounds.height;
 
-		return _visibleShell == null || _visibleShell.isDisposed() || _visibleShell.isVisible() == false;
-	}
+         final int displayRight = displayX + displayWidth;
+         final int displayBottom = displayY + displayHeight;
 
-	/**
-	 * @return Returns <code>true</code> to hide tooltip, <code>false</code> will not hide the
-	 *         tooltip.
-	 */
-	protected abstract boolean isToolTipDragged();
+         if (location.x > displayRight - minVisibleSize) {
+            location.x = displayRight - minVisibleSize;
+         }
 
-	protected boolean isToolTipPinned() {
-		return _isSlideoutPinned;
-	}
+         if (location.y > displayBottom - minVisibleSize) {
+            location.y = displayBottom - minVisibleSize;
+         }
+
+         if (location.x < displayX) {
+            location.x = displayX;
+         }
+
+         if (location.y < displayY) {
+            location.y = displayY;
+         }
+      }
+
+      return location;
+   }
+
+   /**
+    * @return Returns size of the tooltip content
+    */
+   protected Point getContentSize() {
+      if (isVerticalLayout()) {
+         return new Point(_vertContentWidth, _vertContentHeight);
+      } else {
+         return new Point(_horizContentWidth, _horizContentHeight);
+      }
+   }
+
+   private Rectangle getDisplayBounds(final Point location) {
+
+      Rectangle displayBounds;
+      final Monitor[] allMonitors = _ownerControl.getDisplay().getMonitors();
+
+      if (allMonitors.length > 1) {
+         // By default present in the monitor of the control
+         displayBounds = _ownerControl.getMonitor().getBounds();
+         final Point p = new Point(location.x, location.y);
+
+         // Search on which monitor the event occurred
+         Rectangle tmp;
+         for (final Monitor element : allMonitors) {
+            tmp = element.getBounds();
+            if (tmp.contains(p)) {
+               displayBounds = tmp;
+               break;
+            }
+         }
+
+      } else {
+         displayBounds = _ownerControl.getDisplay().getBounds();
+      }
+
+      return displayBounds;
+   }
+
+   private Shell getRootShell(final Shell shell) {
+
+      if (shell == null) {
+         return shell;
+      }
+
+      Composite prevParent = shell;
+      Composite parent = prevParent.getParent();
+
+      while (parent != null) {
+
+         prevParent = parent;
+         parent = parent.getParent();
+      }
+
+      return (Shell) prevParent;
+   }
+
+   /**
+    * @return Returns shell which is used when the slideout is hovered and the user can modify the
+    *         UI
+    */
+   public Shell getRRShellWithResize() {
+      return _rrShellWithResize.getShell();
+   }
+
+   protected Color getShellColor_Background(final ColorRegistry colorRegistry) {
+      return Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
+   }
+
+   protected Color getShellColor_Foreground(final ColorRegistry colorRegistry) {
+      return Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_FOREGROUND);
+   }
+
+   protected String getShellTitle_NoResize() {
+      return UI.EMPTY_STRING;
+   }
+
+   protected String getShellTitle_WithResize() {
+      return UI.EMPTY_STRING;
+   }
 
-	/**
-	 * A tooltip can have 2 layouts, vertical and horizontal, each of them has different screen
-	 * locations which are preserved in a state.
-	 * 
-	 * @return Returns <code>true</code> when vertical, otherwise it is horizontal.
-	 */
-	protected abstract boolean isVerticalLayout();
+   /**
+    * Get tooltip location.
+    *
+    * @param size
+    *           Tooltip size
+    * @return Returns location relative to the device.
+    */
+   protected abstract Point getToolTipLocation(Point size);
 
-	/**
-	 * @return Returns <code>true</code> when the shell for the tooltip is visible.
-	 */
-	public boolean isVisible() {
-		return !isHidden();
-	}
+   /**
+    * @return Return tooltip shell which is currently be visible.
+    */
+   protected Shell getToolTipShell() {
+      return _visibleShell;
+   }
 
-	private void onOwnerControlEvent(final Event event) {
+   /**
+    * Hide the currently active tool tip with animation.
+    */
+   public void hide() {
+      ttHide_WithAnimation();
+   }
 
-		if (_ownerControl == null || _ownerControl.isDisposed()) {
-			return;
-		}
+   /**
+    * Hide the currently active tool tip immediately.
+    */
+   public void hideNow() {
+      ttHide_WithoutAnimation();
+   }
 
-		switch (event.type) {
-		case SWT.Dispose:
+   private boolean isHidden() {
 
-			ttDispose(event);
+      return _visibleShell == null || _visibleShell.isDisposed() || _visibleShell.isVisible() == false;
+   }
 
-			ownerControlsRemoveListener();
+   public boolean isKeepSlideoutOpen_DuringUIAction() {
+      return _isKeepSlideoutOpen_DuringUIAction;
+   }
 
-			break;
+   /**
+    * @return Returns <code>true</code> to hide tooltip, <code>false</code> will not hide the
+    *         tooltip.
+    */
+   protected abstract boolean isToolTipDragged();
 
-		case SWT.Resize:
+   protected boolean isToolTipPinned() {
+      return _isSlideoutPinned;
+   }
 
-			showShellWhenVisible();
+   /**
+    * A tooltip can have 2 layouts, vertical and horizontal, each of them has different screen
+    * locations which are preserved in a state.
+    *
+    * @return Returns <code>true</code> when vertical, otherwise it is horizontal.
+    */
+   protected abstract boolean isVerticalLayout();
 
-			break;
-		}
-	}
+   /**
+    * @return Returns <code>true</code> when the shell for the tooltip is visible.
+    */
+   public boolean isVisible() {
+      return !isHidden();
+   }
 
-	private void onOwnerShellEvent(final Event event) {
+   private void onOwnerControlEvent(final Event event) {
 
-		if (_visibleShell == null || _visibleShell.isDisposed()) {
-			return;
-		}
+      if (_ownerControl == null || _ownerControl.isDisposed()) {
+         return;
+      }
 
-		switch (event.type) {
-		case SWT.Deactivate:
+      switch (event.type) {
+      case SWT.Dispose:
 
-			_display.asyncExec(new Runnable() {
+         ttDispose(event);
 
-				@Override
-				public void run() {
+         ownerControlsRemoveListener();
 
-					// hide tooltip when another shell is activated
+         break;
 
-					if (_display.getActiveShell() != _visibleShell) {
-						ttHide_WithAnimation();
-					}
-				}
-			});
-			break;
+      case SWT.Resize:
 
-		case SWT.Move:
+         showShellWhenVisible();
 
-			showShellWhenVisible();
-			break;
-		}
-	}
+         break;
+      }
+   }
 
-	protected abstract void onReparentShell(Shell reparentedShell);
+   private void onOwnerShellEvent(final Event event) {
 
-	private void onTTAllControlsEvent(final Event event) {
+      if (_visibleShell == null || _visibleShell.isDisposed()) {
+         return;
+      }
 
-//		System.out.println(UI.timeStampNano() + " onTTAllControlsEvent\t");
-//		// TODO remove SYSTEM.OUT.PRINTLN
+      switch (event.type) {
+      case SWT.Deactivate:
 
-		if (_visibleShell == null || _visibleShell.isDisposed()) {
-			return;
-		}
+         _display.asyncExec(new Runnable() {
 
-		switch (event.type) {
-		case SWT.KeyDown:
+            @Override
+            public void run() {
 
-			if (event.keyCode == SWT.ESC) {
-				hide();
-			}
+               // hide tooltip when another shell is activated
 
-			break;
+               final Shell activeShell = _display.getActiveShell();
 
-		case SWT.MouseEnter:
+               if (activeShell != _visibleShell) {
 
-//			System.out.println(UI.timeStampNano() + " _isDoNotStopAnimation " + _isDoNotStopAnimation);
-//			// TODO remove SYSTEM.OUT.PRINTLN
+                  final Shell activeShell_Root = getRootShell(activeShell);
+                  final Shell visibleShell_Root = getRootShell(_visibleShell);
 
-			if (_isDoNotStopAnimation == false) {
+                  if (activeShell_Root != visibleShell_Root) {
 
-				if (_isShellFadingIn || _isShellFadingOut) {
+                     ttHide_WithAnimation();
+                  }
+               }
+            }
+         });
+         break;
 
-					// stop animation
+      case SWT.Move:
 
-					_isShellFadingIn = false;
-					_isShellFadingOut = false;
-				}
-			}
+         showShellWhenVisible();
+         break;
+      }
+   }
 
-			reparentShell(_rrShellWithResize);
+   protected abstract void onReparentShell(Shell reparentedShell);
 
-			break;
+   private void onTTAllControlsEvent(final Event event) {
 
-		case SWT.MouseExit:
+//      System.out.println(UI.timeStampNano() + " onTTAllControlsEvent\t");
+//      // TODO remove SYSTEM.OUT.PRINTLN
 
-			if (_isShellToggled) {
+      if (_visibleShell == null || _visibleShell.isDisposed()) {
+         return;
+      }
 
-				// do this only once
+      switch (event.type) {
+      case SWT.KeyDown:
 
-				_isShellToggled = false;
-			}
+         if (event.keyCode == SWT.ESC) {
+            hide();
+         }
 
-			break;
-		}
-	}
+         break;
 
-	private void onTTDisplayMouseMove(final Event event) {
+      case SWT.MouseEnter:
 
-//		final long start = System.nanoTime();
+//         System.out.println(UI.timeStampNano() + " _isDoNotStopAnimation " + _isDoNotStopAnimation);
+//         // TODO remove SYSTEM.OUT.PRINTLN
 
-//		System.out.println(UI.timeStampNano() + " onTTDisplayMouseMove\t");
-//		// TODO remove SYSTEM.OUT.PRINTLN
+         if (_isDoNotStopAnimation == false) {
 
-		if (isHidden()) {
-			return;
-		}
+            if (_isShellFadingIn || _isShellFadingOut) {
 
-		if (isToolTipDragged()) {
-			// is true when tooltip is dragged with the mouse
-			return;
-		}
+               // stop animation
 
-		boolean isHide = false;
-		boolean isKeepVisible = false;
+               _isShellFadingIn = false;
+               _isShellFadingOut = false;
+            }
+         }
 
-		// get control which is hovered with the mouse after the exit, can be null
-		final Control hoveredControl = _display.getCursorControl();
+         reparentShell(_rrShellWithResize);
 
-		if (hoveredControl == null) {
+         break;
 
-//			System.out.println(UI.timeStampNano() + " exit 0 - Hide - hoveredControl==null");
-//			// TODO remove SYSTEM.OUT.PRINTLN
+      case SWT.MouseExit:
 
-			isHide = true;
+         if (_isShellToggled) {
 
-		} else {
+            // do this only once
 
-			/*
-			 * check if the hovered control is the owner control, if not, hide the tooltip
-			 */
-			Control hoveredParent = hoveredControl;
+            _isShellToggled = false;
+         }
 
-			// move up child-parent hierarchy until shell is reached
-			while (true) {
+         break;
+      }
+   }
 
-				if (hoveredParent == _visibleShell) {
+   private void onTTDisplayMouseMove(final Event event) {
 
-					// mouse is hovering in this tooltip
+//      final long start = System.nanoTime();
 
-					isKeepVisible = true;
+//      System.out.println(UI.timeStampNano() + " onTTDisplayMouseMove\t");
+//      // TODO remove SYSTEM.OUT.PRINTLN
 
-//					System.out.println(UI.timeStampNano() + " exit 1 - No hide - hoveredParent==shell");
-//					// TODO remove SYSTEM.OUT.PRINTLN
+      if (isHidden()) {
+         return;
+      }
 
-					break;
-				}
+      if (isToolTipDragged()) {
+         // is true when tooltip is dragged with the mouse
+         return;
+      }
 
-				if (hoveredParent == _ownerControl) {
+      boolean isHide = false;
+      boolean isKeepVisible = false;
 
-					// mouse is hovering the owner control
+      // get control which is hovered with the mouse after the exit, can be null
+      final Control hoveredControl = _display.getCursorControl();
 
-					isKeepVisible = true;
+      if (hoveredControl == null) {
 
-//					System.out.println(UI.timeStampNano() + " exit 2 - No hide - hoveredParent==owner");
-//					// TODO remove SYSTEM.OUT.PRINTLN
+//         System.out.println(UI.timeStampNano() + " exit 0 - Hide - hoveredControl==null");
+//         // TODO remove SYSTEM.OUT.PRINTLN
 
-					break;
-				}
+         isHide = true;
 
-				hoveredParent = hoveredParent.getParent();
+      } else {
 
-				if (hoveredParent == null) {
+         /*
+          * check if the hovered control is the owner control, if not, hide the tooltip
+          */
+         Control hoveredParent = hoveredControl;
 
-					// mouse has left the tooltip and the owner control
+         // move up child-parent hierarchy until shell is reached
+         while (true) {
 
-//					System.out.println(UI.timeStampNano() + " exit 3 - Hide - hoveredParent==null");
-//					// TODO remove SYSTEM.OUT.PRINTLN
+            if (hoveredParent == _visibleShell) {
 
-					isHide = true;
+               // mouse is hovering in this tooltip
 
-					break;
-				}
-			}
-		}
+               isKeepVisible = true;
 
-		/**
-		 * !!! this adjustment do not work on Linux because the tooltip gets hidden when the mouse
-		 * tries to mover over the tooltip <br>
-		 * <br>
-		 * it seems to work on windows and linux with margin 1, when set to 0 the tooltip do
-		 * sometime not be poped up again and the i-icons is not deaktivated<br>
-		 * wolfgang 2010-07-23
-		 */
+//               System.out.println(UI.timeStampNano() + " exit 1 - No hide - hoveredParent==shell");
+//               // TODO remove SYSTEM.OUT.PRINTLN
 
-		final Rectangle ttShellRect = _visibleShell.getBounds();
-		final int margin = 10;
+               break;
+            }
 
-		ttShellRect.x -= margin;
-		ttShellRect.y -= margin;
-		ttShellRect.width += 2 * margin;
-		ttShellRect.height += 2 * margin;
+            if (hoveredParent == _ownerControl) {
 
-		final Point cursorLocation = _display.getCursorLocation();
+               // mouse is hovering the owner control
 
-		final boolean isInTooltip = ttShellRect.contains(cursorLocation);
+               isKeepVisible = true;
 
-		if (!isInTooltip) {
+//               System.out.println(UI.timeStampNano() + " exit 2 - No hide - hoveredParent==owner");
+//               // TODO remove SYSTEM.OUT.PRINTLN
 
-			// mouse is not within the tooltip shell rectangle, reparent to NoResize shell
+               break;
+            }
 
-			closeInternalShells();
+            hoveredParent = hoveredParent.getParent();
 
-			reparentShell(_rrShellNoResize);
-		}
+            if (hoveredParent == null) {
 
-//		System.out.println(UI.timeStampNano()
-//				+ ("\tisKeepVisible:" + isKeepVisible)
-//				+ ("\tisHide:" + isHide)
-//				+ ("\tisInTooltip:" + isInTooltip));
-//		// TODO remove SYSTEM.OUT.PRINTLN
+               // mouse has left the tooltip and the owner control
 
-		if (isKeepVisible == false && isHide == false && isInTooltip == false) {
-			isHide = true;
-		}
+//               System.out.println(UI.timeStampNano() + " exit 3 - Hide - hoveredParent==null");
+//               // TODO remove SYSTEM.OUT.PRINTLN
 
-//		System.out.println(UI.timeStampNano()
-//				+ ("\tisKeepVisible:" + isKeepVisible)
-//				+ ("\tisHide:" + isHide)
-//				+ ("\tisInTooltip:" + isInTooltip));
-//		// TODO remove SYSTEM.OUT.PRINTLN
+               isHide = true;
 
-		if (isInTooltip && _isShellFadingOut) {
+               break;
+            }
+         }
+      }
 
-			// don't hide when mouse is hovering hiding tooltip
+      /**
+       * !!! this adjustment do not work on Linux because the tooltip gets hidden when the mouse
+       * tries to mover over the tooltip <br>
+       * <br>
+       * it seems to work on windows and linux with margin 1, when set to 0 the tooltip do sometime
+       * not be poped up again and the i-icons is not deaktivated<br>
+       * wolfgang 2010-07-23
+       */
 
-			_isKeepOpenInternally = true;
+      final Rectangle ttShellRect = _visibleShell.getBounds();
+      final int margin = 10;
 
-			ttShow();
+      ttShellRect.x -= margin;
+      ttShellRect.y -= margin;
+      ttShellRect.width += 2 * margin;
+      ttShellRect.height += 2 * margin;
 
-		} else if (isHide) {
+      final Point cursorLocation = _display.getCursorLocation();
 
-			// hide definitively
+      final boolean isInTooltip = ttShellRect.contains(cursorLocation);
 
-			if (canCloseShell() == false) {
-				return;
-			}
+      if (isInTooltip == false) {
 
-			ttHide_WithAnimation();
-		}
+         // mouse is not within the tooltip shell rectangle, reparent to NoResize shell
 
-//		System.out.println("time\t" + ((float) (System.nanoTime() - start) / 1000000) + " ms");
-//		// TODO remove SYSTEM.OUT.PRINTLN
-	}
+         if (_isKeepSlideoutOpen || _isAnotherDialogOpened) {
 
-	private void onTTShellEvent(final Event event) {
+            /*
+             * This can occure when the column dialog is opened in the tour geo filter slideout,
+             * prevent to hide the column dialoag
+             */
+            return;
+         }
 
-		switch (event.type) {
-		case SWT.Deactivate:
+         closeInternalShells();
 
-			if (_visibleShell != null
-					&& !_visibleShell.isDisposed()
-					&& _ownerControl != null
-					&& !_ownerControl.isDisposed()) {
+         reparentShell(_rrShellNoResize);
+      }
 
-				_display.asyncExec(new Runnable() {
+//      System.out.println(UI.timeStampNano()
+//            + ("\tisKeepVisible:" + isKeepVisible)
+//            + ("\tisHide:" + isHide)
+//            + ("\tisInTooltip:" + isInTooltip));
+//      // TODO remove SYSTEM.OUT.PRINTLN
 
-					@Override
-					public void run() {
+      if (isKeepVisible == false && isHide == false && isInTooltip == false) {
+         isHide = true;
+      }
 
-						// hide tooltip when another shell is activated
+//      System.out.println(UI.timeStampNano()
+//            + ("\tisKeepVisible:" + isKeepVisible)
+//            + ("\tisHide:" + isHide)
+//            + ("\tisInTooltip:" + isInTooltip));
+//      // TODO remove SYSTEM.OUT.PRINTLN
 
-						// check again
-						if (_visibleShell == null
-								|| _visibleShell.isDisposed()
-								|| _ownerControl == null
-								|| _ownerControl.isDisposed()) {
-							return;
-						}
+      if (isInTooltip && _isShellFadingOut) {
 
-						if (_ownerControl.getShell() == _visibleShell.getDisplay().getActiveShell()) {
+         // don't hide when mouse is hovering hiding tooltip
 
-							// don't hide when main window is active
-							return;
-						}
+         _isKeepOpenInternally = true;
 
-						ttHide_WithAnimation();
-					}
-				});
-			}
+         ttShow();
 
-			break;
+      } else if (isHide) {
 
-		case SWT.Dispose:
+         // hide definitively
 
-			saveState();
+         if (canCloseShell() == false) {
+            return;
+         }
 
-			break;
+         ttHide_WithAnimation();
+      }
 
-		}
+//      System.out.println("time\t" + ((float) (System.nanoTime() - start) / 1000000) + " ms");
+//      // TODO remove SYSTEM.OUT.PRINTLN
+   }
 
-	}
+   private void onTTShellEvent(final Event event) {
 
-	private void onTTShellResize(final ControlEvent event) {
+      switch (event.type) {
+      case SWT.Deactivate:
 
-		if (_isInShellResize) {
-			return;
-		}
+         if (_visibleShell != null
+               && !_visibleShell.isDisposed()
+               && _ownerControl != null
+               && !_ownerControl.isDisposed()) {
 
-		final Shell resizeShell = _rrShellWithResize.getShell();
-		final Point shellLocation = resizeShell.getLocation();
+            _display.asyncExec(() -> {
 
-		// ensure tooltip is not too large
-		final Rectangle displayBounds = getDisplayBounds(shellLocation);
-		final double maxHeight = displayBounds.height * 0.8;
-		final double maxWidth = displayBounds.width * 0.95;
+               // hide tooltip when another shell is activated
 
-		boolean isResizeAdjusted = false;
+               // check again
+               if (_visibleShell == null
+                     || _visibleShell.isDisposed()
+                     || _ownerControl == null
+                     || _ownerControl.isDisposed()) {
+                  return;
+               }
 
-		final Rectangle clientArea = resizeShell.getClientArea();
-		int newContentWidth = clientArea.width;
-		int newContentHeight = clientArea.height;
+               final Shell activeShell = _visibleShell.getDisplay().getActiveShell();
+               final Shell ownerShell = _ownerControl.getShell();
 
-		if (newContentHeight > maxHeight) {
-			newContentHeight = (int) maxHeight;
-			isResizeAdjusted = true;
-		} else if (newContentHeight < MIN_SHELL_HORIZ_HEIGHT) {
-			newContentHeight = MIN_SHELL_HORIZ_HEIGHT;
-			isResizeAdjusted = true;
-		}
+               // check active shell
+               if (ownerShell == activeShell) {
 
-		if (newContentWidth > maxWidth) {
-			newContentWidth = (int) maxWidth;
-			isResizeAdjusted = true;
-		} else if (newContentWidth < MIN_SHELL_HORIZ_WIDTH) {
-			newContentWidth = MIN_SHELL_HORIZ_WIDTH;
-			isResizeAdjusted = true;
-		}
+                  // don't hide when main window is active
+                  return;
+               }
 
-		if (isVerticalLayout()) {
-			_vertContentWidth = newContentWidth;
-			_vertContentHeight = newContentHeight;
-		} else {
-			_horizContentWidth = newContentWidth;
-			_horizContentHeight = newContentHeight;
-		}
+               /*
+                * Check also parent shells, this is necessary when progress dialogs are displayed,
+                * e.g. when loading tours
+                */
+               if (activeShell != null) {
 
-		if (isResizeAdjusted) {
-			_isInShellResize = true;
-			{
-				_rrShellWithResize.setContentSize(newContentWidth, newContentHeight);
-			}
-			_isInShellResize = false;
-		}
-	}
+                  Composite parentShell = activeShell.getParent();
+                  while (parentShell != null) {
 
-	/**
-	 * Activate tooltip support for this control
-	 */
-	private void ownerControlAddListener() {
+                     if (ownerShell == parentShell) {
 
-		ownerControlsRemoveListener();
+                        // don't hide when main window is active
+                        return;
+                     }
 
-		_ownerControl.addListener(SWT.Dispose, _ownerControlListener);
-		_ownerControl.addListener(SWT.Resize, _ownerControlListener);
-	}
+                     parentShell = parentShell.getParent();
+                  }
+               }
 
-	/**
-	 * Deactivate tooltip support for the underlying control
-	 */
-	private void ownerControlsRemoveListener() {
+               ttHide_WithAnimation();
+            });
+         }
 
-		_ownerControl.removeListener(SWT.Dispose, _ownerControlListener);
-		_ownerControl.removeListener(SWT.Resize, _ownerControlListener);
-	}
+         break;
 
-	private void ownerShellAddListener() {
+      case SWT.Dispose:
 
-		final Shell ownerShell = _ownerControl.getShell();
+         saveState();
 
-		ownerShell.addListener(SWT.Deactivate, _ownerShellListener);
-		ownerShell.addListener(SWT.Move, _ownerShellListener);
-	}
+         break;
 
-	private void ownerShellRemoveListener() {
+      }
 
-		final Shell ownerShell = _ownerControl.getShell();
+   }
 
-		ownerShell.removeListener(SWT.Deactivate, _ownerShellListener);
-		ownerShell.removeListener(SWT.Move, _ownerShellListener);
-	}
+   private void onTTShellResize(final ControlEvent event) {
 
-	private void passOnEvent(final Shell shell, final Event event) {
+      if (_isInShellResize) {
+         return;
+      }
 
-		if (_ownerControl != null
-				&& !_ownerControl.isDisposed()
-				&& event != null
-				&& event.widget != _ownerControl
-				&& event.type == SWT.MouseDown) {
+      final Shell resizeShell = _rrShellWithResize.getShell();
+      final Point shellLocation = resizeShell.getLocation();
 
-			// the following was left in order to fix bug 298770 with minimal change. In 3.7, the complete method should be removed.
-			shell.close();
-		}
-	}
+      // ensure tooltip is not too large
+      final Rectangle displayBounds = getDisplayBounds(shellLocation);
+      final double maxHeight = displayBounds.height * 0.8;
+      final double maxWidth = displayBounds.width * 0.95;
 
-	/**
-	 * Reparent shell
-	 * 
-	 * @param newReparentedShell
-	 *            Shell which should be used to display {@link #_ttContentArea}.
-	 */
-	private void reparentShell(final AbstractRRShell newReparentedShell) {
+      boolean isResizeAdjusted = false;
 
-//		System.out.println(UI.timeStampNano() + " reparentShell\t");
-//		// TODO remove SYSTEM.OUT.PRINTLN
+      final Rectangle clientArea = resizeShell.getClientArea();
+      int newContentWidth = clientArea.width;
+      int newContentHeight = clientArea.height;
 
-		if (_visibleShell == newReparentedShell.getShell()) {
-			// shell is already visible
-			return;
-		}
+      if (newContentHeight > maxHeight) {
+         newContentHeight = (int) maxHeight;
+         isResizeAdjusted = true;
+      } else if (newContentHeight < MIN_SHELL_HORIZ_HEIGHT) {
+         newContentHeight = MIN_SHELL_HORIZ_HEIGHT;
+         isResizeAdjusted = true;
+      }
 
-		final Shell prevShell = _visibleShell;
-		Shell reparentedShell;
+      if (newContentWidth > maxWidth) {
+         newContentWidth = (int) maxWidth;
+         isResizeAdjusted = true;
+      } else if (newContentWidth < MIN_SHELL_HORIZ_WIDTH) {
+         newContentWidth = MIN_SHELL_HORIZ_WIDTH;
+         isResizeAdjusted = true;
+      }
 
-		ttAllControlsRemoveListener(prevShell);
+      if (isVerticalLayout()) {
+         _vertContentWidth = newContentWidth;
+         _vertContentHeight = newContentHeight;
+      } else {
+         _horizContentWidth = newContentWidth;
+         _horizContentHeight = newContentHeight;
+      }
 
-		setCurrentVisibleShell(newReparentedShell);
+      if (isResizeAdjusted) {
+         _isInShellResize = true;
+         {
+            _rrShellWithResize.setContentSize(newContentWidth, newContentHeight);
+         }
+         _isInShellResize = false;
+      }
+   }
 
-		int trimDiffX = _rrShellWithResize.getShellTrimWidth() - _rrShellNoResize.getShellTrimWidth();
-		int trimDiffY = _rrShellWithResize.getShellTrimHeight() - _rrShellNoResize.getShellTrimHeight();
+   /**
+    * Activate tooltip support for this control
+    */
+   private void ownerControlAddListener() {
 
-		if (newReparentedShell == _rrShellWithResize) {
+      ownerControlsRemoveListener();
 
-			// setup resize shell
+      _ownerControl.addListener(SWT.Dispose, _ownerControlListener);
+      _ownerControl.addListener(SWT.Resize, _ownerControlListener);
+   }
 
-			_rrShellWithResize.reparentFromOtherShell(_rrShellNoResize, _ttContentArea);
+   /**
+    * Deactivate tooltip support for the underlying control
+    */
+   private void ownerControlsRemoveListener() {
 
-			reparentedShell = _rrShellWithResize.getShell();
+      _ownerControl.removeListener(SWT.Dispose, _ownerControlListener);
+      _ownerControl.removeListener(SWT.Resize, _ownerControlListener);
+   }
 
-			trimDiffX -= trimDiffX;
-			trimDiffY -= trimDiffY;
+   private void ownerShellAddListener() {
 
-		} else {
+      final Shell ownerShell = _ownerControl.getShell();
 
-			// setup no resize shell
+      ownerShell.addListener(SWT.Deactivate, _ownerShellListener);
+      ownerShell.addListener(SWT.Move, _ownerShellListener);
+   }
 
-			_rrShellNoResize.reparentFromOtherShell(_rrShellWithResize, _ttContentArea);
+   private void ownerShellRemoveListener() {
 
-			reparentedShell = _rrShellNoResize.getShell();
-		}
+      final Shell ownerShell = _ownerControl.getShell();
 
-		// fire reparent event
-		onReparentShell(reparentedShell);
+      ownerShell.removeListener(SWT.Deactivate, _ownerShellListener);
+      ownerShell.removeListener(SWT.Move, _ownerShellListener);
+   }
 
-		// hide previous shell
-		prevShell.setVisible(false);
+   private void passOnEvent(final Shell shell, final Event event) {
 
-		ttAllControlsAddListener(newReparentedShell.getShell());
+      if (_ownerControl != null
+            && !_ownerControl.isDisposed()
+            && event != null
+            && event.widget != _ownerControl
+            && event.type == SWT.MouseDown) {
 
-		final boolean isShellMoving = _isShellFadingIn && _isKeepOpenInternally == false;
-		if (isShellMoving) {
+         // the following was left in order to fix bug 298770 with minimal change. In 3.7, the complete method should be removed.
+         shell.close();
+      }
+   }
 
-			/*
-			 * adjust shell positions because the reparent shell contains another trim size, it took
-			 * me 2 whole days to finally fix this problem and find a solution but now the shell
-			 * reparenting is smoothly
-			 */
+   /**
+    * Reparent shell
+    *
+    * @param newReparentedShell
+    *           Shell which should be used to display {@link #_ttContentArea}.
+    */
+   private void reparentShell(final AbstractRRShell newReparentedShell) {
 
-			final int shellStartX = _shellStartLocation.x + trimDiffX;
-			final int shellStartY = _shellStartLocation.y + trimDiffY;
+      if (_visibleShell == newReparentedShell.getShell()) {
+         // shell is already visible
+         return;
+      }
 
-			final int shellEndX = _shellEndLocation.x + trimDiffX;
-			final int shellEndY = _shellEndLocation.y + trimDiffY;
+      final Shell prevShell = _visibleShell;
+      Shell reparentedShell;
 
-			_shellStartLocation = new Point(shellStartX, shellStartY);
-			_shellEndLocation = new Point(shellEndX, shellEndY);
-		}
-	}
+      ttAllControlsRemoveListener(prevShell);
 
-	private void restoreState(final int[] defaultSize) {
+      setCurrentVisibleShell(newReparentedShell);
 
-		int horizContentDefaultWidth;
-		int horizContentDefaultHeight;
-		int vertContentDefaultWidth;
-		int vertContentDefaultHeight;
+      int trimDiffX = _rrShellWithResize.getShellTrimWidth() - _rrShellNoResize.getShellTrimWidth();
+      int trimDiffY = _rrShellWithResize.getShellTrimHeight() - _rrShellNoResize.getShellTrimHeight();
 
-		if (defaultSize != null && defaultSize.length == 4) {
+      if (newReparentedShell == _rrShellWithResize) {
 
-			horizContentDefaultWidth = defaultSize[0];
-			horizContentDefaultHeight = defaultSize[1];
-			vertContentDefaultWidth = defaultSize[2];
-			vertContentDefaultHeight = defaultSize[3];
+         // setup resize shell
 
-		} else {
+         _rrShellWithResize.reparentFromOtherShell(_rrShellNoResize, _ttContentArea);
 
-			horizContentDefaultWidth = 300;
-			horizContentDefaultHeight = 150;
-			vertContentDefaultWidth = 400;
-			vertContentDefaultHeight = 250;
-		}
+         reparentedShell = _rrShellWithResize.getShell();
 
-		/*
-		 * get horizontal gallery values
-		 */
-		_horizContentWidth = Util.getStateInt(_state, STATE_HORIZ_SLIDEOUT_WIDTH, horizContentDefaultWidth);
-		_horizContentHeight = Util.getStateInt(_state, STATE_HORIZ_SLIDEOUT_HEIGHT, horizContentDefaultHeight);
+         trimDiffX -= trimDiffX;
+         trimDiffY -= trimDiffY;
 
-		// ensure min values
-		if (_horizContentWidth < MIN_SHELL_HORIZ_WIDTH) {
-			_horizContentWidth = MIN_SHELL_HORIZ_WIDTH;
-		}
+      } else {
 
-		if (_horizContentHeight < MIN_SHELL_HORIZ_HEIGHT) {
-			_horizContentHeight = MIN_SHELL_HORIZ_HEIGHT;
-		}
+         // setup no resize shell
 
-		/*
-		 * get vertical gallery values
-		 */
-		_vertContentWidth = Util.getStateInt(_state, STATE_VERT_SLIDEOUT_WIDTH, vertContentDefaultWidth);
-		_vertContentHeight = Util.getStateInt(_state, STATE_VERT_SLIDEOUT_HEIGHT, vertContentDefaultHeight);
+         _rrShellNoResize.reparentFromOtherShell(_rrShellWithResize, _ttContentArea);
 
-		// ensure min values
-		if (_vertContentWidth < MIN_SHELL_VERT_WIDTH) {
-			_vertContentWidth = MIN_SHELL_VERT_WIDTH;
-		}
+         reparentedShell = _rrShellNoResize.getShell();
+      }
 
-		if (_vertContentHeight < MIN_SHELL_VERT_HEIGHT) {
-			_vertContentHeight = MIN_SHELL_VERT_HEIGHT;
-		}
+      // fire reparent event
+      onReparentShell(reparentedShell);
 
-		/*
-		 * pinned locations
-		 */
-		_isSlideoutPinned = Util.getStateBoolean(_state, STATE_IS_SLIDEOUT_PINNED, false);
+      // hide previous shell
+      prevShell.setVisible(false);
 
-		final int defaultPosition = 20;
-		_horizPinLocationX = Util.getStateInt(_state, STATE_HORIZ_SLIDEOUT_PIN_LOCATION_X, defaultPosition);
-		_horizPinLocationY = Util.getStateInt(_state, STATE_HORIZ_SLIDEOUT_PIN_LOCATION_Y, defaultPosition);
-		_vertPinLocationX = Util.getStateInt(_state, STATE_VERT_SLIDEOUT_PIN_LOCATION_X, defaultPosition);
-		_vertPinLocationY = Util.getStateInt(_state, STATE_VERT_SLIDEOUT_PIN_LOCATION_Y, defaultPosition);
+      ttAllControlsAddListener(newReparentedShell.getShell());
 
-		_isKeepSlideoutOpen = Util.getStateBoolean(_state, STATE_IS_KEEP_SLIDEOUT_OPEN, false);
-	}
+      final boolean isShellMoving = _isShellFadingIn && _isKeepOpenInternally == false;
+      if (isShellMoving) {
 
-	/**
-	 * Restore keep open slideout state.
-	 * 
-	 * @param isKeepSlideoutOpen
-	 */
-	protected void restoreState_KeepSlideoutOpen(final boolean isKeepSlideoutOpen) {}
+         /*
+          * adjust shell positions because the reparent shell contains another trim size, it took me
+          * 2 whole days to finally fix this problem and find a solution but now the shell
+          * reparenting is smoothly
+          */
 
-	/**
-	 * Restore slideout pin state.
-	 * 
-	 * @param isSlideoutPinned
-	 */
-	protected void restoreState_SlideoutIsPinned(final boolean isSlideoutPinned) {}
+         final int shellStartX = _shellStartLocation.x + trimDiffX;
+         final int shellStartY = _shellStartLocation.y + trimDiffY;
 
-	/**
-	 * 
-	 */
-	protected void saveState() {
+         final int shellEndX = _shellEndLocation.x + trimDiffX;
+         final int shellEndY = _shellEndLocation.y + trimDiffY;
 
-		_state.put(STATE_HORIZ_SLIDEOUT_WIDTH, _horizContentWidth);
-		_state.put(STATE_HORIZ_SLIDEOUT_HEIGHT, _horizContentHeight);
-		_state.put(STATE_VERT_SLIDEOUT_WIDTH, _vertContentWidth);
-		_state.put(STATE_VERT_SLIDEOUT_HEIGHT, _vertContentHeight);
+         _shellStartLocation = new Point(shellStartX, shellStartY);
+         _shellEndLocation = new Point(shellEndX, shellEndY);
+      }
+   }
 
-		_state.put(STATE_IS_SLIDEOUT_PINNED, _isSlideoutPinned);
-		_state.put(STATE_HORIZ_SLIDEOUT_PIN_LOCATION_X, _horizPinLocationX);
-		_state.put(STATE_HORIZ_SLIDEOUT_PIN_LOCATION_Y, _horizPinLocationY);
-		_state.put(STATE_VERT_SLIDEOUT_PIN_LOCATION_X, _vertPinLocationX);
-		_state.put(STATE_VERT_SLIDEOUT_PIN_LOCATION_Y, _vertPinLocationY);
+   private void restoreState(final int[] defaultSize) {
 
-		_state.put(STATE_IS_KEEP_SLIDEOUT_OPEN, _isKeepSlideoutOpen);
-	}
+      int horizContentDefaultWidth;
+      int horizContentDefaultHeight;
+      int vertContentDefaultWidth;
+      int vertContentDefaultHeight;
 
-	/**
-	 * Set shell which is currently be visible.
-	 * 
-	 * @param rrShell
-	 */
-	private void setCurrentVisibleShell(final AbstractRRShell rrShell) {
+      if (defaultSize != null && defaultSize.length == 4) {
 
-		_visibleRRShell = rrShell;
-		_visibleShell = rrShell.getShell();
-	}
+         horizContentDefaultWidth = defaultSize[0];
+         horizContentDefaultHeight = defaultSize[1];
+         vertContentDefaultWidth = defaultSize[2];
+         vertContentDefaultHeight = defaultSize[3];
 
-	protected void setIsAnotherDialogOpened(final boolean isDialogOpened) {
+      } else {
 
-		_isAnotherDialogOpened = isDialogOpened;
-	}
+         horizContentDefaultWidth = 300;
+         horizContentDefaultHeight = 150;
+         vertContentDefaultWidth = 400;
+         vertContentDefaultHeight = 250;
+      }
 
-	/**
-	 * @param isKeepOpen
-	 *            When <code>true</code> then the slideout will never be closed.
-	 */
-	protected void setIsKeepOpenInternally(final boolean isKeepOpen) {
-		_isKeepOpenInternally = isKeepOpen;
-	}
+      /*
+       * get horizontal gallery values
+       */
+      _horizContentWidth = Util.getStateInt(_state, STATE_HORIZ_SLIDEOUT_WIDTH, horizContentDefaultWidth);
+      _horizContentHeight = Util.getStateInt(_state, STATE_HORIZ_SLIDEOUT_HEIGHT, horizContentDefaultHeight);
 
-	public void setIsKeepSlideoutOpen(final boolean isKeepSlideoutOpen) {
-		_isKeepSlideoutOpen = isKeepSlideoutOpen;
-	}
+      // ensure min values
+      if (_horizContentWidth < MIN_SHELL_HORIZ_WIDTH) {
+         _horizContentWidth = MIN_SHELL_HORIZ_WIDTH;
+      }
 
-	protected void setIsShellToggle() {
-		_isShellToggled = true;
-	}
+      if (_horizContentHeight < MIN_SHELL_HORIZ_HEIGHT) {
+         _horizContentHeight = MIN_SHELL_HORIZ_HEIGHT;
+      }
 
-	protected void setIsSlideoutPinned(final boolean isPinned) {
+      /*
+       * get vertical gallery values
+       */
+      _vertContentWidth = Util.getStateInt(_state, STATE_VERT_SLIDEOUT_WIDTH, vertContentDefaultWidth);
+      _vertContentHeight = Util.getStateInt(_state, STATE_VERT_SLIDEOUT_HEIGHT, vertContentDefaultHeight);
 
-		_isSlideoutPinned = isPinned;
+      // ensure min values
+      if (_vertContentWidth < MIN_SHELL_VERT_WIDTH) {
+         _vertContentWidth = MIN_SHELL_VERT_WIDTH;
+      }
 
-		if (isPinned) {
-			setSlideoutPinnedLocation();
-		}
-	}
+      if (_vertContentHeight < MIN_SHELL_VERT_HEIGHT) {
+         _vertContentHeight = MIN_SHELL_VERT_HEIGHT;
+      }
 
-	protected void setShellFadeInSteps(final int shellFadeInSteps) {
-		_shellFadeInSteps = shellFadeInSteps;
-	}
+      /*
+       * pinned locations
+       */
+      _isSlideoutPinned = Util.getStateBoolean(_state, STATE_IS_SLIDEOUT_PINNED, false);
 
-	protected void setShellFadeOutDelaySteps(final int shellFadeOutDelaySteps) {
-		_shellFadeOutDelaySteps = shellFadeOutDelaySteps;
-	}
+      final int defaultPosition = 20;
+      _horizPinLocationX = Util.getStateInt(_state, STATE_HORIZ_SLIDEOUT_PIN_LOCATION_X, defaultPosition);
+      _horizPinLocationY = Util.getStateInt(_state, STATE_HORIZ_SLIDEOUT_PIN_LOCATION_Y, defaultPosition);
+      _vertPinLocationX = Util.getStateInt(_state, STATE_VERT_SLIDEOUT_PIN_LOCATION_X, defaultPosition);
+      _vertPinLocationY = Util.getStateInt(_state, STATE_VERT_SLIDEOUT_PIN_LOCATION_Y, defaultPosition);
 
-	protected void setShellFadeOutSteps(final int shellFadeOutSteps) {
-		_shellFadeOutSteps = shellFadeOutSteps;
-	}
+      _isKeepSlideoutOpen = Util.getStateBoolean(_state, STATE_IS_KEEP_SLIDEOUT_OPEN, false);
+   }
 
-	protected void setShellLocation(final int diffX, final int diffY) {
+   /**
+    * Restore keep open slideout state.
+    *
+    * @param isKeepSlideoutOpen
+    */
+   protected void restoreState_KeepSlideoutOpen(final boolean isKeepSlideoutOpen) {}
 
-		final Rectangle shellBounds = _visibleShell.getBounds();
+   /**
+    * Restore slideout pin state.
+    *
+    * @param isSlideoutPinned
+    */
+   protected void restoreState_SlideoutIsPinned(final boolean isSlideoutPinned) {}
 
-		final Point size = new Point(shellBounds.width, shellBounds.height);
-		final Point newShellLocation = new Point(shellBounds.x - diffX, shellBounds.y - diffY);
+   /**
+    *
+    */
+   protected void saveState() {
 
-		final Point fixedLocation = fixupDisplayBounds(size, newShellLocation);
+      _state.put(STATE_HORIZ_SLIDEOUT_WIDTH, _horizContentWidth);
+      _state.put(STATE_HORIZ_SLIDEOUT_HEIGHT, _horizContentHeight);
+      _state.put(STATE_VERT_SLIDEOUT_WIDTH, _vertContentWidth);
+      _state.put(STATE_VERT_SLIDEOUT_HEIGHT, _vertContentHeight);
 
-		_visibleRRShell.setShellLocation(fixedLocation.x, fixedLocation.y, 4);
-	}
+      _state.put(STATE_IS_SLIDEOUT_PINNED, _isSlideoutPinned);
+      _state.put(STATE_HORIZ_SLIDEOUT_PIN_LOCATION_X, _horizPinLocationX);
+      _state.put(STATE_HORIZ_SLIDEOUT_PIN_LOCATION_Y, _horizPinLocationY);
+      _state.put(STATE_VERT_SLIDEOUT_PIN_LOCATION_X, _vertPinLocationX);
+      _state.put(STATE_VERT_SLIDEOUT_PIN_LOCATION_Y, _vertPinLocationY);
 
-	protected void setShellMoveSteps(final int shellMoveSteps) {
-		_shellMoveSteps = shellMoveSteps;
-	}
+      _state.put(STATE_IS_KEEP_SLIDEOUT_OPEN, _isKeepSlideoutOpen);
+   }
 
-	private void setShellVisible(final boolean isVisible) {
+   /**
+    * Set shell which is currently be visible.
+    *
+    * @param rrShell
+    */
+   private void setCurrentVisibleShell(final AbstractRRShell rrShell) {
 
-		beforeShellVisible(isVisible);
+      _visibleRRShell = rrShell;
+      _visibleShell = rrShell.getShell();
+   }
 
-		_visibleShell.setVisible(isVisible);
+   /**
+    * When <code>true</code> the slideout will be kept open until <code>false</code> is set
+    *
+    * @param isDialogOpened
+    */
+   public void setIsAnotherDialogOpened(final boolean isDialogOpened) {
+      _isAnotherDialogOpened = isDialogOpened;
+   }
 
-		if (isVisible) {
+   /**
+    * @param isKeepOpen
+    *           When <code>true</code> then the slideout will never be closed automatically
+    */
+   protected void setIsKeepOpenInternally(final boolean isKeepOpen) {
+      _isKeepOpenInternally = isKeepOpen;
+   }
 
-			ttDisplayAddListener();
+   public void setIsKeepSlideoutOpen(final boolean isKeepSlideoutOpen) {
+      _isKeepSlideoutOpen = isKeepSlideoutOpen;
+   }
 
-		} else {
+   public void setIsKeepSlideoutOpen_DuringUIAction(final boolean _isKeepSlideoutOpen_DuringUIAction) {
+      this._isKeepSlideoutOpen_DuringUIAction = _isKeepSlideoutOpen_DuringUIAction;
+   }
 
-			ttDisplayRemoveListener();
-		}
-	}
+   protected void setIsShellToggle() {
+      _isShellToggled = true;
+   }
 
-	/**
-	 * Set location where the tooltip is pinned.
-	 */
-	protected void setSlideoutPinnedLocation() {
+   protected void setIsSlideoutPinned(final boolean isPinned) {
 
-		final Point contentLocation = _visibleRRShell.getShellContentLocation();
+      _isSlideoutPinned = isPinned;
 
-		if (isVerticalLayout()) {
-			_vertPinLocationX = contentLocation.x;
-			_vertPinLocationY = contentLocation.y;
-		} else {
-			_horizPinLocationX = contentLocation.x;
-			_horizPinLocationY = contentLocation.y;
-		}
+      if (isPinned) {
+         setSlideoutPinnedLocation();
+      }
+   }
 
-		/*
-		 * end location must be set that a new animation finds the correct position where it should
-		 * be moved
-		 */
-		_shellEndLocation.x = contentLocation.x;
-		_shellEndLocation.y = contentLocation.y;
-	}
+   protected void setShellFadeInSteps(final int shellFadeInSteps) {
+      _shellFadeInSteps = shellFadeInSteps;
+   }
 
-	protected void showAtDefaultLocation() {
+   protected void setShellFadeOutDelaySteps(final int shellFadeOutDelaySteps) {
+      _shellFadeOutDelaySteps = shellFadeOutDelaySteps;
+   }
 
-		if (_visibleShell == null || _visibleShell.isDisposed()) {
-			return;
-		}
+   protected void setShellFadeOutSteps(final int shellFadeOutSteps) {
+      _shellFadeOutSteps = shellFadeOutSteps;
+   }
 
-		final Point size = _visibleShell.getSize();
-		final Point fixedLocation = fixupDisplayBounds(size, getToolTipLocation(size));
+   protected void setShellLocation(final int diffX, final int diffY) {
 
-		_visibleRRShell.setShellLocation(fixedLocation.x, fixedLocation.y, 4);
-	}
+      final Rectangle shellBounds = _visibleShell.getBounds();
 
-	protected boolean showShell() {
+      final Point size = new Point(shellBounds.width, shellBounds.height);
+      final Point newShellLocation = new Point(shellBounds.x - diffX, shellBounds.y - diffY);
 
-		/*
-		 * show tooltip only when this is the active shell, this check is necessary that when a tour
-		 * chart is opened in a dialog (e.g. adjust altitude) that a hidden tour chart tooltip in
-		 * the tour chart view is also displayed
-		 */
-//		if (_display.getActiveShell() != _ownerControl.getShell() || _ownerControl.isVisible() == false) {
-//			return false;
-//		}
+      final Point fixedLocation = fixupDisplayBounds(size, newShellLocation);
 
-		createUI();
+      _visibleRRShell.setShellLocation(fixedLocation.x, fixedLocation.y, 4);
+   }
 
-		ttShow();
+   protected void setShellMoveSteps(final int shellMoveSteps) {
+      _shellMoveSteps = shellMoveSteps;
+   }
 
-		return true;
-	}
+   private void setShellVisible(final boolean isVisible) {
 
-	private void showShellWhenVisible() {
+      beforeShellVisible(isVisible);
 
-		if (isHidden()) {
-			return;
-		}
+      _visibleShell.setVisible(isVisible);
 
-		ttShow();
-	}
+      if (isVisible) {
 
-	/**
-	 * ########################### Recursive #########################################<br>
-	 * <p>
-	 * Add listener to all controls within the tooltip
-	 * <p>
-	 * ########################### Recursive #########################################<br>
-	 * 
-	 * @param control
-	 */
-	private void ttAllControlsAddListener(final Control control) {
+         ttDisplayAddListener();
 
-		control.addListener(SWT.KeyDown, _ttAllControlsListener);
+      } else {
 
-		control.addListener(SWT.MouseDown, _ttAllControlsListener);
-		control.addListener(SWT.MouseUp, _ttAllControlsListener);
-		control.addListener(SWT.MouseMove, _ttAllControlsListener);
-		control.addListener(SWT.MouseExit, _ttAllControlsListener);
-		control.addListener(SWT.MouseEnter, _ttAllControlsListener);
+         ttDisplayRemoveListener();
+      }
+   }
 
-		if (control instanceof Composite) {
-			final Control[] children = ((Composite) control).getChildren();
-			for (final Control child : children) {
-				ttAllControlsAddListener(child);
-			}
-		}
-	}
+   /**
+    * Set location where the tooltip is pinned.
+    */
+   protected void setSlideoutPinnedLocation() {
 
-	/**
-	 * ########################### Recursive #########################################<br>
-	 * <p>
-	 * Removes listener from all controls within the tooltip
-	 * <p>
-	 * ########################### Recursive #########################################<br>
-	 * 
-	 * @param control
-	 */
-	private void ttAllControlsRemoveListener(final Control control) {
+      final Point contentLocation = _visibleRRShell.getShellContentLocation();
 
-		control.removeListener(SWT.KeyDown, _ttAllControlsListener);
+      if (isVerticalLayout()) {
+         _vertPinLocationX = contentLocation.x;
+         _vertPinLocationY = contentLocation.y;
+      } else {
+         _horizPinLocationX = contentLocation.x;
+         _horizPinLocationY = contentLocation.y;
+      }
 
-		control.removeListener(SWT.MouseDown, _ttAllControlsListener);
-		control.removeListener(SWT.MouseUp, _ttAllControlsListener);
-		control.removeListener(SWT.MouseMove, _ttAllControlsListener);
-		control.removeListener(SWT.MouseExit, _ttAllControlsListener);
-		control.removeListener(SWT.MouseEnter, _ttAllControlsListener);
+      /*
+       * end location must be set that a new animation finds the correct position where it should be
+       * moved
+       */
+      _shellEndLocation.x = contentLocation.x;
+      _shellEndLocation.y = contentLocation.y;
+   }
 
-		if (control instanceof Composite) {
-			final Control[] children = ((Composite) control).getChildren();
-			for (final Control child : children) {
-				ttAllControlsRemoveListener(child);
-			}
-		}
-	}
+   protected void showAtDefaultLocation() {
 
-	private void ttDisplayAddListener() {
+      if (_visibleShell == null || _visibleShell.isDisposed()) {
+         return;
+      }
 
-		if (_isDisplayListenerSet) {
-			return;
-		}
+      final Point size = _visibleShell.getSize();
+      final Point fixedLocation = fixupDisplayBounds(size, getToolTipLocation(size));
 
-		_display.addFilter(SWT.MouseMove, _ttDisplayListener);
+      _visibleRRShell.setShellLocation(fixedLocation.x, fixedLocation.y, 4);
+   }
 
-		_isDisplayListenerSet = true;
-	}
+   protected boolean showShell() {
 
-	private void ttDisplayRemoveListener() {
+      /*
+       * show tooltip only when this is the active shell, this check is necessary that when a tour
+       * chart is opened in a dialog (e.g. adjust altitude) that a hidden tour chart tooltip in the
+       * tour chart view is also displayed
+       */
+//      if (_display.getActiveShell() != _ownerControl.getShell() || _ownerControl.isVisible() == false) {
+//         return false;
+//      }
 
-		if (_isDisplayListenerSet == false) {
-			return;
-		}
+      createUI();
 
-		_display.removeFilter(SWT.MouseMove, _ttDisplayListener);
+      ttShow();
 
-		_isDisplayListenerSet = false;
-	}
+      return true;
+   }
 
-	private void ttDispose(final Event event) {
+   private void showShellWhenVisible() {
 
-		if (_visibleShell == null || _visibleShell.isDisposed()) {
-			return;
-		}
+      if (isHidden()) {
+         return;
+      }
 
-		// hide tooltip definitively
+      ttShow();
+   }
 
-		ownerShellRemoveListener();
-		ttDisplayRemoveListener();
+   /**
+    * ########################### Recursive #########################################<br>
+    * <p>
+    * Add listener to all controls within the tooltip
+    * <p>
+    * ########################### Recursive #########################################<br>
+    *
+    * @param control
+    */
+   private void ttAllControlsAddListener(final Control control) {
 
-		passOnEvent(_rrShellWithResize.getShell(), event);
-		_rrShellWithResize.dispose();
+      control.addListener(SWT.KeyDown, _ttAllControlsListener);
 
-		passOnEvent(_rrShellNoResize.getShell(), event);
-		_rrShellNoResize.dispose();
-	}
+      control.addListener(SWT.MouseDown, _ttAllControlsListener);
+      control.addListener(SWT.MouseUp, _ttAllControlsListener);
+      control.addListener(SWT.MouseMove, _ttAllControlsListener);
+      control.addListener(SWT.MouseExit, _ttAllControlsListener);
+      control.addListener(SWT.MouseEnter, _ttAllControlsListener);
 
-	/**
-	 * Hide current shell immediatedly without animation and any flags.
-	 */
-	private void ttHide_NoFlags() {
+      if (control instanceof Composite) {
+         final Control[] children = ((Composite) control).getChildren();
+         for (final Control child : children) {
+            ttAllControlsAddListener(child);
+         }
+      }
+   }
 
-		if (_visibleShell == null || _visibleShell.isDisposed()) {
-			return;
-		}
+   /**
+    * ########################### Recursive #########################################<br>
+    * <p>
+    * Removes listener from all controls within the tooltip
+    * <p>
+    * ########################### Recursive #########################################<br>
+    *
+    * @param control
+    */
+   private void ttAllControlsRemoveListener(final Control control) {
 
-		closeInternalShells();
+      control.removeListener(SWT.KeyDown, _ttAllControlsListener);
 
-		_visibleShell.setAlpha(0);
+      control.removeListener(SWT.MouseDown, _ttAllControlsListener);
+      control.removeListener(SWT.MouseUp, _ttAllControlsListener);
+      control.removeListener(SWT.MouseMove, _ttAllControlsListener);
+      control.removeListener(SWT.MouseExit, _ttAllControlsListener);
+      control.removeListener(SWT.MouseEnter, _ttAllControlsListener);
 
-		// hide shell
-		setShellVisible(false);
+      if (control instanceof Composite) {
+         final Control[] children = ((Composite) control).getChildren();
+         for (final Control child : children) {
+            ttAllControlsRemoveListener(child);
+         }
+      }
+   }
 
-		_isShellFadingIn = false;
-		_isShellFadingOut = false;
+   private void ttDisplayAddListener() {
 
-		_isDoNotStopAnimation = false;
+      if (_isDisplayListenerSet) {
+         return;
+      }
 
-		// finally dispose the UI
-		_visibleShell.dispose();
-		_visibleShell = null;
-	}
+      _display.addFilter(SWT.MouseMove, _ttDisplayListener);
 
-	private void ttHide_WithAnimation() {
+      _isDisplayListenerSet = true;
+   }
 
-		if (isHidden()) {
-			return;
-		}
+   private void ttDisplayRemoveListener() {
 
-		closeInternalShells();
+      if (_isDisplayListenerSet == false) {
+         return;
+      }
 
-		if (canCloseShell() == false) {
-			return;
-		}
+      _display.removeFilter(SWT.MouseMove, _ttDisplayListener);
 
-		beforeHideToolTip();
+      _isDisplayListenerSet = false;
+   }
 
-		_isDoNotStopAnimation = false;
+   private void ttDispose(final Event event) {
 
-		if (_isShellFadingOut) {
+      if (_visibleShell == null || _visibleShell.isDisposed()) {
+         return;
+      }
 
-			// shell is already fading out
-			return;
-		}
+      // hide tooltip definitively
 
-		// shell is not yet fading out
+      ownerShellRemoveListener();
+      ttDisplayRemoveListener();
 
-		_isShellFadingIn = false;
-		_isShellFadingOut = true;
+      passOnEvent(_rrShellWithResize.getShell(), event);
+      _rrShellWithResize.dispose();
 
-		animation10_Start();
-	}
+      passOnEvent(_rrShellNoResize.getShell(), event);
+      _rrShellNoResize.dispose();
+   }
 
-	/**
-	 * Hide current shell immediatedly without animation.
-	 */
-	protected void ttHide_WithoutAnimation() {
+   /**
+    * Hide current shell immediatedly without animation and any flags.
+    */
+   private void ttHide_NoFlags() {
 
-		closeInternalShells();
+      if (_visibleShell == null || _visibleShell.isDisposed()) {
+         return;
+      }
 
-		if (canCloseShell() == false) {
-			return;
-		}
+      closeInternalShells();
 
-		if (_visibleShell == null || _visibleShell.isDisposed()) {
-			return;
-		}
+      _visibleShell.setAlpha(0);
 
-		_visibleShell.setAlpha(0);
+      // hide shell
+      setShellVisible(false);
 
-		// hide shell
-		setShellVisible(false);
+      _isShellFadingIn = false;
+      _isShellFadingOut = false;
 
-		_isShellFadingIn = false;
-		_isShellFadingOut = false;
+      _isDoNotStopAnimation = false;
 
-		_isDoNotStopAnimation = false;
-	}
+      // finally dispose the UI
+      _visibleShell.dispose();
+      _visibleShell = null;
+   }
 
-	private void ttShellAddListener(final Shell shell) {
+   private void ttHide_WithAnimation() {
 
-		// hide tooltip if user selects outside of the shell
-		shell.addListener(SWT.Deactivate, _ttShellListener);
-		shell.addListener(SWT.Dispose, _ttShellListener);
-	}
+      if (isHidden()) {
+         return;
+      }
 
-	private void ttShow() {
+      closeInternalShells();
 
-		// shell is not yet fading in
+      if (canCloseShell() == false) {
+         return;
+      }
 
-		_isShellFadingIn = true;
-		_isShellFadingOut = false;
+      beforeHideToolTip();
 
-		animation10_Start();
-	}
+      _isDoNotStopAnimation = false;
 
-	private void updateUI_Colors() {
+      if (_isShellFadingOut) {
 
-		final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
-		final Color fgColor = getShellColor_Foreground(colorRegistry);
-		final Color bgColor = getShellColor_Background(colorRegistry);
+         // shell is already fading out
+         return;
+      }
 
-		_rrShellNoResize.updateColors(fgColor, bgColor);
-		_rrShellWithResize.updateColors(fgColor, bgColor);
-	}
+      // shell is not yet fading out
+
+      _isShellFadingIn = false;
+      _isShellFadingOut = true;
+
+      animation10_Start();
+   }
+
+   /**
+    * Hide current shell immediatedly without animation.
+    */
+   protected void ttHide_WithoutAnimation() {
+
+      closeInternalShells();
+
+      if (canCloseShell() == false) {
+         return;
+      }
+
+      if (_visibleShell == null || _visibleShell.isDisposed()) {
+         return;
+      }
+
+      _visibleShell.setAlpha(0);
+
+      // hide shell
+      setShellVisible(false);
+
+      _isShellFadingIn = false;
+      _isShellFadingOut = false;
+
+      _isDoNotStopAnimation = false;
+   }
+
+   private void ttShellAddListener(final Shell shell) {
+
+      // hide tooltip if user selects outside of the shell
+      shell.addListener(SWT.Deactivate, _ttShellListener);
+      shell.addListener(SWT.Dispose, _ttShellListener);
+   }
+
+   private void ttShow() {
+
+      // shell is not yet fading in
+
+      _isShellFadingIn = true;
+      _isShellFadingOut = false;
+
+      animation10_Start();
+   }
+
+   private void updateUI_Colors() {
+
+      final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
+      final Color fgColor = getShellColor_Foreground(colorRegistry);
+      final Color bgColor = getShellColor_Background(colorRegistry);
+
+      _rrShellNoResize.updateColors(fgColor, bgColor);
+      _rrShellWithResize.updateColors(fgColor, bgColor);
+   }
+
 }

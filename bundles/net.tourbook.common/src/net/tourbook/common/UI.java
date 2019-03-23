@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.Random;
 
+import net.tourbook.common.weather.IWeather;
+
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -84,8 +86,6 @@ import org.epics.css.dal.Timestamp;
 import org.epics.css.dal.Timestamp.Format;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
-
-import net.tourbook.common.weather.IWeather;
 
 public class UI {
 
@@ -673,6 +673,25 @@ public class UI {
       }
 
       return (temperature - UNIT_FAHRENHEIT_ADD) / UNIT_FAHRENHEIT_MULTI;
+   }
+
+   /**
+    * Create a cursor resource from an image descriptor. Cursor must be disposed.
+    *
+    * @param imageName
+    * @return
+    */
+   public static Cursor createCursorFromImage(final ImageDescriptor imageDescriptor) {
+
+      Cursor cursor;
+
+      final Image cursorImage = imageDescriptor.createImage();
+      {
+         cursor = new Cursor(Display.getDefault(), cursorImage.getImageData(), 0, 0);
+      }
+      cursorImage.dispose();
+
+      return cursor;
    }
 
    /**
@@ -1442,25 +1461,6 @@ public class UI {
       return new String(scrambledText);
    }
 
-   /**
-    * Create a cursor resource from an image descriptor. Cursor must be disposed.
-    *
-    * @param imageName
-    * @return
-    */
-   public static Cursor createCursorFromImage(ImageDescriptor imageDescriptor) {
-
-      Cursor cursor;
-
-      Image cursorImage = imageDescriptor.createImage();
-      {
-         cursor = new Cursor(Display.getDefault(), cursorImage.getImageData(), 0, 0);
-      }
-      cursorImage.dispose();
-
-      return cursor;
-   }
-
    public static void setBackgroundColorForAllChildren(final Control parent, final Color bgColor) {
 
       parent.setBackground(bgColor);
@@ -1897,6 +1897,16 @@ public class UI {
       }
 
       return shortedText;
+   }
+
+   /**
+    * Converts {@link java.awt.Point} into {@link org.eclipse.swt.graphics.Point}
+    *
+    * @param awtPoint
+    * @return
+    */
+   public static Point SWT_Point(final java.awt.Point awtPoint) {
+      return new Point(awtPoint.x, awtPoint.y);
    }
 
    public static String timeStamp() {

@@ -25,6 +25,20 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 
+import net.tourbook.common.Messages;
+import net.tourbook.common.UI;
+import net.tourbook.common.formatter.IValueFormatter;
+import net.tourbook.common.formatter.ValueFormat;
+import net.tourbook.common.formatter.ValueFormatter_Default;
+import net.tourbook.common.formatter.ValueFormatter_Number_1_0;
+import net.tourbook.common.formatter.ValueFormatter_Number_1_1;
+import net.tourbook.common.formatter.ValueFormatter_Number_1_2;
+import net.tourbook.common.formatter.ValueFormatter_Number_1_3;
+import net.tourbook.common.formatter.ValueFormatter_Time_HH;
+import net.tourbook.common.formatter.ValueFormatter_Time_HHMM;
+import net.tourbook.common.formatter.ValueFormatter_Time_HHMMSS;
+import net.tourbook.common.tooltip.AdvancedSlideoutShell;
+
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.AbstractColumnLayout;
@@ -52,6 +66,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ScrollBar;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -60,19 +75,6 @@ import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.XMLMemento;
-
-import net.tourbook.common.Messages;
-import net.tourbook.common.UI;
-import net.tourbook.common.formatter.IValueFormatter;
-import net.tourbook.common.formatter.ValueFormat;
-import net.tourbook.common.formatter.ValueFormatter_Default;
-import net.tourbook.common.formatter.ValueFormatter_Number_1_0;
-import net.tourbook.common.formatter.ValueFormatter_Number_1_1;
-import net.tourbook.common.formatter.ValueFormatter_Number_1_2;
-import net.tourbook.common.formatter.ValueFormatter_Number_1_3;
-import net.tourbook.common.formatter.ValueFormatter_Time_HH;
-import net.tourbook.common.formatter.ValueFormatter_Time_HHMM;
-import net.tourbook.common.formatter.ValueFormatter_Time_HHMMSS;
 
 /**
  * Manages the columns for a tree/table-viewer
@@ -147,14 +149,16 @@ public class ColumnManager {
    private Comparator<ColumnProfile>         _profileSorter;
 
    private final ITourViewer                 _tourViewer;
-
    private AbstractColumnLayout              _columnLayout;
+
    /**
     * Viewer which is managed by this {@link ColumnManager}.
     */
    private ColumnViewer                      _columnViewer;
 
    private ColumnWrapper                     _headerColumn;
+
+   private AdvancedSlideoutShell             _slideoutShell;
 
    /**
     * Context menu listener.
@@ -603,9 +607,8 @@ public class ColumnManager {
     * @param defaultContextMenu
     * @return
     */
-   private Menu createHCM_0_Menu(final Composite composite, final Menu defaultContextMenu) {
+   private Menu createHCM_0_Menu(final Composite composite, final Menu defaultContextMenu, final Shell shell) {
 
-      final Decorations shell = composite.getShell();
       final Menu headerContextMenu = new Menu(shell, SWT.POP_UP);
 
       /*
@@ -874,13 +877,27 @@ public class ColumnManager {
     *           can be <code>null</code>
     */
    public void createHeaderContextMenu(final Table table, final Menu defaultContextMenu) {
+      this.createHeaderContextMenu(table, defaultContextMenu, table.getShell());
+   }
+
+   /**
+    * set context menu depending on the position of the mouse
+    *
+    * @param table
+    * @param defaultContextMenu
+    *           can be <code>null</code>
+    * @param contextMenuShell
+    *           Shell for the context menu. For reparented dialogs, the correct shell must be
+    *           provided.
+    */
+   public void createHeaderContextMenu(final Table table, final Menu defaultContextMenu, final Shell contextMenuShell) {
 
       // remove old listener
       if (_tableMenuDetectListener != null) {
          table.removeListener(SWT.MenuDetect, _tableMenuDetectListener);
       }
 
-      final Menu headerContextMenu = createHCM_0_Menu(table, defaultContextMenu);
+      final Menu headerContextMenu = createHCM_0_Menu(table, defaultContextMenu, contextMenuShell);
 
       // add the context menu to the table
       _tableMenuDetectListener = new Listener() {
@@ -938,20 +955,34 @@ public class ColumnManager {
    }
 
    /**
-    * set context menu depending on the position of the mouse
+    * Set context menu depending on the position of the mouse
     *
     * @param tree
     * @param defaultContextMenu
     *           can be <code>null</code>
     */
    public void createHeaderContextMenu(final Tree tree, final Menu defaultContextMenu) {
+      this.createHeaderContextMenu(tree, defaultContextMenu, tree.getShell());
+   }
+
+   /**
+    * Set context menu depending on the position of the mouse
+    *
+    * @param tree
+    * @param defaultContextMenu
+    *           can be <code>null</code>
+    * @param contextMenuShell
+    *           Shell for the context menu. For reparented dialogs, the correct shell must be
+    *           provided.
+    */
+   public void createHeaderContextMenu(final Tree tree, final Menu defaultContextMenu, final Shell contextMenuShell) {
 
       // remove old listener
       if (_treeMenuDetectListener != null) {
          tree.removeListener(SWT.MenuDetect, _treeMenuDetectListener);
       }
 
-      final Menu headerContextMenu = createHCM_0_Menu(tree, defaultContextMenu);
+      final Menu headerContextMenu = createHCM_0_Menu(tree, defaultContextMenu, contextMenuShell);
 
       // add the context menu to the tree viewer
       _treeMenuDetectListener = new Listener() {
@@ -1455,7 +1486,16 @@ public class ColumnManager {
             _activeProfile,
             _allProfiles);
 
+      if (_slideoutShell != null) {
+         // prevent that the column dialog will freeze the app
+         _slideoutShell.setIsAnotherDialogOpened(true);
+      }
+
       columnDialog.open();
+
+      if (_slideoutShell != null) {
+         _slideoutShell.setIsAnotherDialogOpened(false);
+      }
    }
 
    /**
@@ -1747,6 +1787,10 @@ public class ColumnManager {
 
    void setIsShowColumnAnnotations(final boolean isShowColumnAnnotations) {
       _isShowColumnAnnotations = isShowColumnAnnotations;
+   }
+
+   public void setSlideoutShell(final AdvancedSlideoutShell slideoutShell) {
+      _slideoutShell = slideoutShell;
    }
 
    private void setupValueFormatter(final ColumnProfile activeProfile) {
