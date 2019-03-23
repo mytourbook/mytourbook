@@ -48,6 +48,7 @@ import net.tourbook.map25.layer.marker.MarkerConfig;
 import net.tourbook.map25.layer.marker.MarkerLayer;
 import net.tourbook.map25.layer.marker.MarkerLayer.OnItemGestureListener;
 import net.tourbook.map25.layer.marker.MarkerRenderer;
+import net.tourbook.map25.layer.marker.MarkerToolkit;
 import net.tourbook.map25.layer.tourtrack.SliderLocation_Layer;
 import net.tourbook.map25.layer.tourtrack.SliderPath_Layer;
 import net.tourbook.map25.layer.tourtrack.TourLayer;
@@ -191,10 +192,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private float                 _vtm_UserScale = 2.0f;	
 	
    MarkerSymbol symbol;
-   
-   ItemizedLayer<MarkerItem> mMarkerLayer;
+   ItemizedLayer<MarkerItem> _layer_Bookmark;
    private static final int COUNT = 5;
    private static final float STEP = 100f / 110000f; // roughly 100 meters
+   private MarkerToolkit _markertoolkit;
 
 	/**
 	 * Is <code>true</code> when a tour marker is hit.
@@ -1007,59 +1008,20 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 		layers.add(_layer_SliderPath);
 
 		// bookmarks
-		Bitmap bitmapPoi;
-      int DefaultIconSize = 10;
-
-      final Paint fillPainter = CanvasAdapter.newPaint();
-      fillPainter.setStyle(Paint.Style.FILL);
-      fillPainter.setColor(0xFFFF69B4); // 100percent pink
-
-      bitmapPoi = CanvasAdapter.newBitmap(DefaultIconSize, DefaultIconSize, 0);
-      org.oscim.backend.canvas.Canvas defaultMarkerCanvas = CanvasAdapter.newCanvas();  
-      defaultMarkerCanvas.setBitmap(bitmapPoi);
-
-      defaultMarkerCanvas.drawCircle(DefaultIconSize/2, DefaultIconSize/2, DefaultIconSize/2, fillPainter);
-
-      symbol = new MarkerSymbol(bitmapPoi, MarkerSymbol.HotspotPlace.CENTER, false);
-
-      
-      MarkerRendererFactory markerRendererFactory = new MarkerRendererFactory() {
-         @Override
-         public org.oscim.layers.marker.MarkerRenderer create(org.oscim.layers.marker.MarkerLayer markerLayer) {
-             return new ClusterMarkerRenderer(markerLayer, symbol, new ClusterMarkerRenderer.ClusterStyle(Color.WHITE, Color.BLUE)) {
-                 @Override
-                 protected Bitmap getClusterBitmap(int size) {
-                     // Can customize cluster bitmap here
-                     return super.getClusterBitmap(size);
-                 }
-             };
-         }
-     };
-     
-     mMarkerLayer = new ItemizedLayer<>(
+		System.out.println("################ setupMap_Layers: calling constructor"); //$NON-NLS-1$
+		_markertoolkit = new MarkerToolkit();
+     _layer_Bookmark = new ItemizedLayer<>(
            mMap,
            new ArrayList<MarkerItem>(),
-           markerRendererFactory,
+           _markertoolkit._markerRendererFactory,
            this);
-     layers.add(mMarkerLayer);
+     List<MarkerItem> pts = _markertoolkit.createMarkerItemList();
+     _layer_Bookmark.addItems(pts);
+     _layer_Bookmark.setEnabled(true);
+     layers.add(_layer_Bookmark);
      
-     // Create some markers spaced STEP degrees
-     //Berlin: 52.513452, 13.363791
-     double berlin_lat = 52.513452;
-     double berlin_lon = 13.363791;
-     List<MarkerItem> pts = new ArrayList<>();
-     for (int x = -COUNT; x < COUNT; x++) {
-         for (int y = -COUNT; y < COUNT; y++) {
-             double random = STEP * Math.random() * 2;
-             MarkerItem item = new MarkerItem(y + ", " + x, "Title " + berlin_lat + "/" + berlin_lon,"Description "  + x + "/" + y,
-                     new GeoPoint(berlin_lat + y * STEP + random, berlin_lon + x * STEP + random)
-             );
-             pts.add(item);
-         }
-     }
-     mMarkerLayer.addItems(pts);
      
-
+     //buildings
 		/**
 		 * here i have to investigate
 		 * with this code i got always good S3DB, but online buildings did not look good
