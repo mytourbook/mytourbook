@@ -67,6 +67,9 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
@@ -77,9 +80,11 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -136,6 +141,8 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
     */
    private PixelConverter        _pc;
 
+   private ScrolledComposite     _optionsContainer;
+   private Composite             _optionsContainer_Inner;
    private Composite             _viewerContainer;
 
    private Button                _btnDeleteGeoFilter;
@@ -404,6 +411,35 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
 
    private void createUI_400_Options(final Composite parent) {
 
+      /*
+       * scrolled container
+       */
+      _optionsContainer = new ScrolledComposite(parent, SWT.V_SCROLL | SWT.H_SCROLL);
+      _optionsContainer.setExpandVertical(true);
+      _optionsContainer.setExpandHorizontal(true);
+      _optionsContainer.addControlListener(new ControlAdapter() {
+         @Override
+         public void controlResized(final ControlEvent e) {
+            onResize_Options();
+         }
+      });
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(_optionsContainer);
+      {
+         _optionsContainer_Inner = new Composite(_optionsContainer, SWT.NONE);
+         _optionsContainer_Inner.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+         GridDataFactory.fillDefaults().grab(true, true).applyTo(_optionsContainer_Inner);
+         GridLayoutFactory.fillDefaults().applyTo(_optionsContainer_Inner);
+         {
+            createUI_410_Options(_optionsContainer_Inner);
+         }
+      }
+
+      // set content for scrolled composite
+      _optionsContainer.setContent(_optionsContainer_Inner);
+   }
+
+   private void createUI_410_Options(final Composite parent) {
+
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
 //            .indent(10, 0)
@@ -566,7 +602,6 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
          final ToolBarManager toolbarManager = new ToolBarManager(toolbarUI);
 
          toolbarManager.add(_actionRestoreDefaults);
-
          toolbarManager.update(true);
       }
    }
@@ -574,10 +609,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
    private void createUI_600_FilterViewer(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()
-            .grab(true, true)
-            .indent(10, 0)
-            .applyTo(container);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
       GridLayoutFactory.fillDefaults().applyTo(container);
       {
          {
@@ -1231,18 +1263,6 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
       setIsKeepOpenInternally(true);
       int confirmDialogResult;
       {
-//         confirmDialogResult = new MessageDialog(
-//               Display.getCurrent().getActiveShell(),
-//               Messages.Slideout_CalendarOptions_Dialog_DeleteProfile_Title,
-//               null,
-//               NLS.bind(Messages.Slideout_CalendarOptions_Dialog_DeleteProfile_Message, ""), //$NON-NLS-1$
-//               MessageDialog.QUESTION,
-//               new String[] {
-//                     Messages.App_Action_DeleteProfile,
-//                     IDialogConstants.CANCEL_LABEL
-//               },
-//               0).open();
-
          confirmDialogResult = new MessageDialog(
                getToolTipShell(),
                Messages.Slideout_TourGeoFilter_Dialog_DeleteAllFilter_Title,
@@ -1283,6 +1303,23 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
       final TourGeoFilter selectedGeoFilter = (TourGeoFilter) selectedItem;
 
       onSelect_GeoFilter(selectedGeoFilter);
+   }
+
+   private void onResize_Options() {
+
+      // horizontal scroll bar ishidden, only the vertical scrollbar can be displayed
+      int infoContainerWidth = _optionsContainer.getBounds().width;
+      final ScrollBar vertBar = _optionsContainer.getVerticalBar();
+
+      if (vertBar != null && vertBar.isVisible()) {
+
+         // vertical bar is displayed
+         infoContainerWidth -= vertBar.getSize().x;
+      }
+
+      final Point minSize = _optionsContainer_Inner.computeSize(infoContainerWidth, SWT.DEFAULT);
+
+      _optionsContainer.setMinSize(minSize);
    }
 
    private void onSelect_GeoFilter(final TourGeoFilter selectedGeoFilter) {
