@@ -30,16 +30,6 @@
          unpack="false"/>
 
    <plugin
-         id="net.tourbook.ext.rxtx.linux32_2.2"
-         os="linux"
-         arch="x86"
-         download-size="0"
-         install-size="0"
-         version="2.2.2.pre2"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
          id="net.tourbook.ext.rxtx.linux64_2.2"
          os="linux"
          arch="x86_64"
@@ -52,16 +42,6 @@
    <plugin
          id="net.tourbook.ext.rxtx.macosx_2.2"
          os="macosx"
-         download-size="0"
-         install-size="0"
-         version="2.2.2.pre2"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="net.tourbook.ext.rxtx.win32_2.2"
-         os="win32"
-         arch="x86"
          download-size="0"
          install-size="0"
          version="2.2.2.pre2"

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,11 @@ package net.tourbook.common.util;
 
 import java.text.NumberFormat;
 
+import net.tourbook.common.Messages;
+import net.tourbook.common.UI;
+import net.tourbook.common.formatter.IValueFormatter;
+import net.tourbook.common.formatter.ValueFormat;
+
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnLayoutData;
 import org.eclipse.jface.viewers.ColumnPixelData;
@@ -24,11 +29,6 @@ import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionAdapter;
-
-import net.tourbook.common.Messages;
-import net.tourbook.common.UI;
-import net.tourbook.common.formatter.IValueFormatter;
-import net.tourbook.common.formatter.ValueFormat;
 
 public class ColumnDefinition implements Cloneable {
 
@@ -70,11 +70,12 @@ public class ColumnDefinition implements Cloneable {
     * when <code>true</code> the visibility for this column can be changed
     */
    private boolean           _canModifyVisibility = true;
+
    protected int             _style;
+
    private CellLabelProvider _cellLabelProvider;
    private ControlListener   _columnControlListener;
    private String            _columnCategory;
-
    private String            _columnHeaderText;
    private String            _columnToolTipText;
 
@@ -82,7 +83,6 @@ public class ColumnDefinition implements Cloneable {
    private int               _columnWidth;
 
    private boolean           _isColumnResizable   = true;
-
    private boolean           _isColumnMoveable    = true;
 
    private SelectionAdapter  _columnSelectionListener;
@@ -95,41 +95,42 @@ public class ColumnDefinition implements Cloneable {
     */
    private boolean           _isDefaultColumn     = false;
 
-
-   private int              _defaultColumnWidth;
+   private int               _defaultColumnWidth;
 
    /**
     * column will have the width 0 to be hidden, this is necessary that the first visible column can
     * be right aligned
     */
-   private boolean          _isColumnHidden = false;
+   private boolean           _isColumnHidden      = false;
 
-   private EditingSupport   _editingSupport;
+   private EditingSupport    _editingSupport;
 
-   private ColumnLayoutData _columnLayoutData;
+   private ColumnLayoutData  _columnLayoutData;
 
    /*
     * Value formatter
     */
 
    /** Available value formats */
-   private ValueFormat[]    _availableFormats;
+   private ValueFormat[]   _availableFormats;
 
    /** Default value format */
-   private ValueFormat      _defaultValueFormat_Category;
+   private ValueFormat     _defaultValueFormat_Category;
 
    /** Default detail value format */
-   private ValueFormat      _defaultValueFormat_Detail;
+   private ValueFormat     _defaultValueFormat_Detail;
 
    /** Current value format */
-   private ValueFormat      _valueFormat_Category;
-   /** Current value formatter */
-   private IValueFormatter  _valueFormatter_Category;
-   /** Current value format */
-   private ValueFormat      _valueFormat_Detail;
+   private ValueFormat     _valueFormat_Category;
 
    /** Current value formatter */
-   private IValueFormatter  _valueFormatter_Detail;
+   private IValueFormatter _valueFormatter_Category;
+
+   /** Current value format */
+   private ValueFormat     _valueFormat_Detail;
+
+   /** Current value formatter */
+   private IValueFormatter _valueFormatter_Detail;
 
    ColumnDefinition(final String columnId, final int style) {
 

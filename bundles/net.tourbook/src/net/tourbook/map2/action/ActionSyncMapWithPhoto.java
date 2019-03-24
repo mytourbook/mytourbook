@@ -41,7 +41,7 @@ public class ActionSyncMapWithPhoto extends Action {
 
 	@Override
 	public void run() {
-		_mapView.actionSync_WithPhoto();
+		_mapView.action_SyncWith_Photo();
 	}
 
 }

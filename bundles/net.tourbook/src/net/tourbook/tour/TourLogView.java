@@ -350,7 +350,6 @@ public class TourLogView extends ViewPart {
 		final Color bgColor = Display.getCurrent().getSystemColor(SWT.COLOR_LIST_BACKGROUND);
 
 		_pageBook = new PageBook(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBook);
 
 		_page_NoBrowser = new Composite(_pageBook, SWT.NONE);
 		_page_NoBrowser.setBackground(bgColor);

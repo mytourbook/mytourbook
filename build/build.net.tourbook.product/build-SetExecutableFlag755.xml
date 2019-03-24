@@ -7,16 +7,13 @@
 		<echo message="tycho-path:     '${tycho-path}'"/>
 		<echo message="tycho-version:  '${tycho-version}'"/>
 
-		<antcall target="set-755-in-zip-file">
-			<param name="zip-file"				value="${tycho-path}\products\mytourbook-${tycho-version}-linux.gtk.x86.zip"/>
-			<param name="launcher-filepath"	value="mytourbook/mytourbook"/>
-		</antcall>
-	
+		<!-- Linux 64 bit -->
 		<antcall target="set-755-in-zip-file">
 			<param name="zip-file"				value="${tycho-path}\products\mytourbook-${tycho-version}-linux.gtk.x86_64.zip"/>
 			<param name="launcher-filepath"	value="mytourbook/mytourbook"/>
 		</antcall>
 	
+		<!-- MacOS 64 bit -->
 		<antcall target="set-755-in-zip-file">
 			<param name="zip-file"				value="${tycho-path}\products\mytourbook-${tycho-version}-macosx.cocoa.x86_64.zip"/>
 			<param name="launcher-filepath"	value="MyTourbook.app/Contents/MacOS/mytourbook"/>

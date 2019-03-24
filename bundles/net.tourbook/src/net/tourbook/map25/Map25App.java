@@ -16,22 +16,16 @@
 package net.tourbook.map25;
 
 import java.awt.Canvas;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Dialog.ModalityType;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 //import java.io.FileNotFoundException;
 import java.util.Set;
 import java.util.UUID;
-
-import javax.swing.Box;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
 
 //import org.apache.commons.io.FileUtils;
 //import org.apache.commons.io.comparator.SizeFileComparator;
@@ -46,6 +40,7 @@ import net.tourbook.map25.layer.marker.MarkerConfig;
 import net.tourbook.map25.layer.marker.MarkerLayer;
 import net.tourbook.map25.layer.marker.MarkerLayer.OnItemGestureListener;
 import net.tourbook.map25.layer.marker.MarkerRenderer;
+import net.tourbook.map25.layer.marker.MarkerToolkit;
 import net.tourbook.map25.layer.tourtrack.SliderLocation_Layer;
 import net.tourbook.map25.layer.tourtrack.SliderPath_Layer;
 import net.tourbook.map25.layer.tourtrack.TourLayer;
@@ -55,6 +50,7 @@ import org.eclipse.swt.widgets.Display;
 import org.oscim.awt.AwtGraphics;
 import org.oscim.backend.GLAdapter;
 import org.oscim.backend.CanvasAdapter;
+
 //import org.ocsim.backend
 import org.oscim.core.MapPosition;
 import org.oscim.core.MercatorProjection;
@@ -64,6 +60,10 @@ import org.oscim.gdx.GdxMap;
 import org.oscim.gdx.GestureHandlerImpl;
 import org.oscim.gdx.LwjglGL20;
 import org.oscim.gdx.MotionHandler;
+import org.oscim.layers.marker.ItemizedLayer;
+import org.oscim.layers.marker.MarkerItem;
+import org.oscim.layers.marker.MarkerSymbol;
+
 import org.oscim.layers.tile.TileManager;
 import org.oscim.layers.tile.bitmap.BitmapTileLayer;
 import org.oscim.layers.tile.buildings.BuildingLayer;
@@ -103,7 +103,7 @@ import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.utils.SharedLibraryLoader;
 import okhttp3.Cache;
 
-public class Map25App extends GdxMap implements OnItemGestureListener {
+public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedLayer.OnItemGestureListener<MarkerItem> {
 
 	private static final String		STATE_MAP_POS_X						= "STATE_MAP_POS_X";					//$NON-NLS-1$
 	private static final String		STATE_MAP_POS_Y						= "STATE_MAP_POS_Y";					//$NON-NLS-1$
@@ -176,6 +176,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
    private float                 _mf_UserScale = 2.50f;
    private float                 _vtm_UserScale = 2.0f;	
 	
+   ItemizedLayer<MarkerItem> _layer_Bookmark;
+   private MarkerToolkit _markertoolkit;
 
 	/**
 	 * Is <code>true</code> when a tour marker is hit.
@@ -509,6 +511,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 	public S3DBLayer getLayer_S3DB() {
 		return _layer_mf_S3DB_Building;
 	}
+	
+   public ItemizedLayer<MarkerItem> getLayer_Bookmark() {
+      return _layer_Bookmark;
+   }	
 	
 	public BitmapTileLayer getLayer_HillShading() {
 		return _layer_HillShading;
@@ -987,7 +993,22 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		_layer_SliderPath.setEnabled(false);
 		layers.add(_layer_SliderPath);
 
-
+		// bookmarks
+		System.out.println("################ setupMap_Layers: calling constructor"); //$NON-NLS-1$
+		_markertoolkit = new MarkerToolkit(MarkerToolkit.shape_star);
+     _layer_Bookmark = new ItemizedLayer<>(
+           mMap,
+           new ArrayList<MarkerItem>(),
+           _markertoolkit._markerRendererFactory,
+           this);
+     //List<MarkerItem> pts = _markertoolkit.createDemoMarkerItemList();
+     List<MarkerItem> pts = _markertoolkit.createMarkerItemList();
+     _layer_Bookmark.addItems(pts);
+     _layer_Bookmark.setEnabled(true);
+     layers.add(_layer_Bookmark);
+     
+     
+     //buildings
 		/**
 		 * here i have to investigate
 		 * with this code i got always good S3DB, but online buildings did not look good
@@ -1086,6 +1107,36 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		}
 	}
 
+	public void updateUI_BookmarkLayer() {
+	   _layer_Bookmark.removeAllItems();
+	   List<MarkerItem> pts = _markertoolkit.createMarkerItemList();
+	   _layer_Bookmark.addItems(pts);
+	}
+	
+   @Override
+   public boolean onItemSingleTapUp(int index, MarkerItem item) {
+       if (item.getMarker() == null)
+          ;
+          // item.setMarker(symbol);
+       else
+           item.setMarker(null);
+
+       System.out.println("Marker tap " + item.getTitle());
+       return true;
+   }
+
+   @Override
+   public boolean onItemLongPress(int index, MarkerItem item) {
+       if (item.getMarker() == null)
+          ;
+          // item.setMarker(symbol);
+       else
+           item.setMarker(null);
+
+       System.out.println("Marker long press " + item.getTitle());
+       return true;
+   }
+	
 	
 	/**
 	 * gget a sorted list with mapsforgemap files

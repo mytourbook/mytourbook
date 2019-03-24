@@ -18,16 +18,6 @@ package net.tourbook.statistics.graphs;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
-import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.TraverseEvent;
-import org.eclipse.swt.events.TraverseListener;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.ui.IViewSite;
-import org.eclipse.ui.IWorkbenchPart;
-
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
@@ -65,6 +55,16 @@ import net.tourbook.ui.ChartOptions_Grid;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.action.ActionEditQuick;
+
+import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.IWorkbenchPart;
 
 public abstract class StatisticDay extends TourbookStatistic implements IBarSelectionProvider, ITourProvider {
 

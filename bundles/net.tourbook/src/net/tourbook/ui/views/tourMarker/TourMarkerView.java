@@ -398,7 +398,6 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 	private void createUI(final Composite parent) {
 
 		_pageBook = new PageBook(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBook);
 
 		_pageNoData = net.tourbook.common.UI.createUI_PageNoData(_pageBook, Messages.UI_Label_no_chart_is_selected);
 

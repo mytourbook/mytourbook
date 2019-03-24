@@ -244,7 +244,6 @@ public class PoiView extends ViewPart implements Observer {
 	private void createUI(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
 		GridLayoutFactory.fillDefaults().spacing(0, 0).numColumns(1).applyTo(container);
 		{
 			final Composite queryContainer = new Composite(container, SWT.NONE);
