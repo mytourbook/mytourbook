@@ -11,8 +11,6 @@ package de.byteholder.geoclipse.map;
 import de.byteholder.geoclipse.mapprovider.ImageDataResources;
 import de.byteholder.geoclipse.mapprovider.MP;
 
-import gnu.trove.list.array.TLongArrayList;
-
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
@@ -41,6 +39,7 @@ public class Tile extends Observable {
 
 //   private static final double            MAX_LATITUDE_85_05112877   = 85.05112877;
 
+   private static final String             NL                 = "\n";                                //$NON-NLS-1$
    private static final String             COLUMN_2           = "  ";                                //$NON-NLS-1$
    private static final String             COLUMN_4           = "    ";                              //$NON-NLS-1$
    private static final String             COLUMN_5           = "     ";                             //$NON-NLS-1$
@@ -193,7 +192,7 @@ public class Tile extends Observable {
     * The hover rectangles will be set when a tile is painted
     */
    public ArrayList<Rectangle>             allHoverRectangle  = new ArrayList<>();
-   public TLongArrayList                   allHoverTourID     = new TLongArrayList();
+   public ArrayList<Long>                  allHoverTourID     = new ArrayList<>();
 
    /**
     * Create a new Tile at the specified tile point and zoom level
@@ -1100,15 +1099,25 @@ public class Tile extends Observable {
                   false
                   : true;
 
-      return (" z=" + Integer.toString(_zoom).concat(COLUMN_2).substring(0, 2)) // //$NON-NLS-1$
-            + (" x=" + Integer.toString(_x).concat(COLUMN_5).substring(0, 5)) //$NON-NLS-1$
-            + (" y=" + Integer.toString(_y).concat(COLUMN_5).substring(0, 5)) //$NON-NLS-1$
-            + (_isLoading ? " LOAD" : COLUMN_5) //$NON-NLS-1$
-            + (" img=" + (isImageOK ? "OK" : COLUMN_2)) //$NON-NLS-1$ //$NON-NLS-2$
-            + (isLoadingError() ? " ERR" : COLUMN_4) //$NON-NLS-1$
-            //
-            //                            0123456789012345678901234567890123456789
-            + (" key=" + _tileKey.concat("                                        ").substring(0, 40)) //$NON-NLS-1$ //$NON-NLS-2$
+      return ""
+
+//            + " z=" + Integer.toString(_zoom).concat(COLUMN_2).substring(0, 2) // //$NON-NLS-1$
+//            + " x=" + Integer.toString(_x).concat(COLUMN_5).substring(0, 5) //$NON-NLS-1$
+//            + " y=" + Integer.toString(_y).concat(COLUMN_5).substring(0, 5) + NL //$NON-NLS-1$
+
+            + " z=" + Integer.toString(_zoom) // //$NON-NLS-1$
+            + " x=" + Integer.toString(_x) //$NON-NLS-1$
+            + " y=" + Integer.toString(_y) + NL //$NON-NLS-1$
+
+            + "allHoverRectangle: " + allHoverRectangle.size() + NL
+
+//
+//            + (_isLoading ? " LOAD" : COLUMN_5) //$NON-NLS-1$
+//            + " img=" + (isImageOK ? "OK" : COLUMN_2) //$NON-NLS-1$ //$NON-NLS-2$
+//            + (isLoadingError() ? " ERR" : COLUMN_4) //$NON-NLS-1$
+//            //
+//            //                            0123456789012345678901234567890123456789
+//            + (" key=" + _tileKey.concat("                                        ").substring(0, 40)) //$NON-NLS-1$ //$NON-NLS-2$
       //
       ;
    }

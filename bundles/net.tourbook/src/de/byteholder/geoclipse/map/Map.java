@@ -475,6 +475,10 @@ public class Map extends Canvas {
    private int           _tilePosMinY;
    private int           _tilePosMaxY;
    //
+   private int           _numTileWidth;
+   private int           _numTileHeight;
+   private Tile[][]      _allPaintedTiles;
+   //
    private final Display _display;
    private final Thread  _displayThread;
    //
@@ -532,10 +536,6 @@ public class Map extends Canvas {
    private boolean             _isFastMapPainting;
    private boolean             _isFastMapPainting_Active;
    private int                 _fastMapPainting_skippedValues;
-
-   private int                 _numTileWidth;
-   private int                 _numTileHeight;
-   private Tile[][]            _allPaintedTiles;
 
    /**
     * This observer is called in the {@link Tile} when a tile image is set into the tile
@@ -2148,8 +2148,9 @@ public class Map extends Canvas {
    private void isTourHovered() {
 
       Tile hoveredTile = null;
-      int devHoveredTileX;
-      int devHoveredTileY;
+
+      int hoveredTileIndex_X = 0;
+      int hoveredTileIndex_Y = 0;
 
       /*
        * Get hovered tile
@@ -2159,8 +2160,16 @@ public class Map extends Canvas {
 
       final Tile[][] allPaintedTiles = _allPaintedTiles;
 
-      for (int tilePosX = _tilePosMinX, tileIndexX = 0; tilePosX <= _tilePosMaxX; tilePosX++, tileIndexX++) {
-         for (int tilePosY = _tilePosMinY, tileIndexY = 0; tilePosY <= _tilePosMaxY; tilePosY++, tileIndexY++) {
+      int devHoveredTileX = 0;
+      int devHoveredTileY = 0;
+
+      tileLoop:
+
+      for (int tilePosX = _tilePosMinX; tilePosX <= _tilePosMaxX; tilePosX++) {
+
+         hoveredTileIndex_Y = 0;
+
+         for (int tilePosY = _tilePosMinY; tilePosY <= _tilePosMaxY; tilePosY++) {
 
             /*
              * convert tile world position into device position
@@ -2176,16 +2185,58 @@ public class Map extends Canvas {
 
                   // this is the tile which is hovered by the mouse
 
-                  hoveredTile = allPaintedTiles[tileIndexX][tileIndexY];
-                  break;
+                  hoveredTile = allPaintedTiles[hoveredTileIndex_X][hoveredTileIndex_Y];
+
+                  break tileLoop;
                }
             }
+
+            hoveredTileIndex_Y++;
          }
+
+         hoveredTileIndex_X++;
       }
 
       if (hoveredTile == null) {
+
          // this should not occure
          return;
+      }
+
+      final ArrayList<Rectangle> allHoverRectangle = hoveredTile.allHoverRectangle;
+      if (allHoverRectangle.size() == 0) {
+
+         // nothing is painted in this tile
+         return;
+      }
+
+      /*
+       * Get mouse relative position in the tile
+       */
+
+      final int devMouseTileX = devMouseX - devHoveredTileX;
+      final int devMouseTileY = devMouseY - devHoveredTileY;
+
+      Long hoveredTourId = null;
+
+      for (int hoverIndex = 0; hoverIndex < allHoverRectangle.size(); hoverIndex++) {
+
+         final Rectangle hoveredRect = allHoverRectangle.get(hoverIndex);
+
+         if (hoveredRect.contains(devMouseTileX, devMouseTileY)) {
+
+            hoveredTourId = hoveredTile.allHoverTourID.get(hoverIndex);
+
+            break;
+         }
+      }
+
+      if (hoveredTourId != null) {
+
+         System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ()")
+               + ("\thoveredTile: " + hoveredTile)
+               + ("\tTourID: " + hoveredTourId));
+// TODO remove SYSTEM.OUT.PRINTLN
       }
    }
 
@@ -3714,11 +3765,14 @@ public class Map extends Canvas {
     */
    private void paint_Overlay_22_PaintTileBasic(final Tile tile) {
 
+      // cleanup previous positions
+      tile.allHoverRectangle.clear();
+      tile.allHoverTourID.clear();
+
       boolean isOverlayPainted = false;
 
       // create 1 part image/gc
-      final ImageData transparentImageData = de.byteholder.geoclipse.map.UI.createTransparentImageData(
-            _tilePixelSize);
+      final ImageData transparentImageData = de.byteholder.geoclipse.map.UI.createTransparentImageData(_tilePixelSize);
 
       final Image overlayImage = new Image(_display, transparentImageData);
       final GC gc1Part = new GC(overlayImage);
@@ -4044,10 +4098,6 @@ public class Map extends Canvas {
 
       // get tile from the map provider, this also starts the loading of the tile image
       final Tile tile = _mp.getTile(tilePositionX, tilePositionY, _mapZoomLevel);
-
-      // cleanup previous positions
-      tile.allHoverRectangle.clear();
-      tile.allHoverTourID.clear();
 
       final Image tileImage = tile.getCheckedMapImage();
       if (tileImage != null) {
@@ -5434,6 +5484,11 @@ public class Map extends Canvas {
     *           is set to hidden
     */
    public void showGeoGrid(final TourGeoFilter tourGeoFilter) {
+
+      if (_mp == null) {
+         // the map has currently no map provider
+         return;
+      }
 
       grid_UpdatePaintingStateData();
 
