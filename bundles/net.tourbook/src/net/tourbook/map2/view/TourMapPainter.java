@@ -1644,7 +1644,7 @@ public class TourMapPainter extends MapPainter {
                   // current position is inside the tile
 
                   // optimize drawing: check if position has changed
-                  if (devX != devFrom_WithOffsetX && devY != devFrom_WithOffsetY) {
+                  if (!(devX == devFrom_WithOffsetX && devY == devFrom_WithOffsetY)) {
 
                      boolean isVisibleDataPoint = true;
 
