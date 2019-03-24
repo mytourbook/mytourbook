@@ -33,6 +33,9 @@ Changes
 Bugfix   
 ======
 
+* 2D Map
+
+  - Fixed issue which lasted forever, that basic painting skipped values
 
 
 * Tour View
