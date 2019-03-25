@@ -198,7 +198,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
                }
                {
                   _btn_refresh_Bookmark = new Button(containerBookmark, SWT.PUSH);
-                  _btn_refresh_Bookmark.setText("update");
+                  _btn_refresh_Bookmark.setText("Update");
                   _btn_refresh_Bookmark.addListener(SWT.Selection, _btn_refresh_Bookmark_listener);
                }
             }
@@ -365,7 +365,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
             if (e.type == SWT.Selection){
                final Map25App mapApp = _map25View.getMapApp();
                mapApp.updateUI_BookmarkLayer();
-               System.out.println("+++ SlideoutListener:  button pressed"); //$NON-NLS-1$
+               //System.out.println("+++ SlideoutListener:  button pressed"); //$NON-NLS-1$
             }
          }
       };

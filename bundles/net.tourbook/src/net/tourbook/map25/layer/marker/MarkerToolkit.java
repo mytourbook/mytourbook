@@ -1,3 +1,22 @@
+/*******************************************************************************
+ * Copyright (C) 2019 Wolfgang Schramm and Contributors
+ * Copyright 2016-2018 devemux86
+ * Copyright 2017 nebular
+ * Copyright 2019 Thomas Theussing
+ * 
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation version 2 of the License.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+ *******************************************************************************/
+
 package net.tourbook.map25.layer.marker;
 
 import java.util.ArrayList;
@@ -15,37 +34,100 @@ import org.oscim.layers.marker.MarkerRendererFactory;
 import org.oscim.layers.marker.MarkerSymbol;
 import org.oscim.layers.marker.MarkerSymbol.HotspotPlace;
 
+import net.tourbook.common.color.ColorUtil;
 import net.tourbook.map.bookmark.MapBookmark;
-
+import net.tourbook.map25.Map25ConfigManager;
 
 
 public class MarkerToolkit {
    ItemizedLayer<MarkerItem> mMarkerLayer;
    private int _fgColor = 0xFF000000; // 100 percent black. AARRGGBB
    private int _bgColor = 0x80FF69B4; // 50 percent pink. AARRGGBB
+   private int _clusterSymbolSizeDP = net.tourbook.map25.layer.marker.MarkerRenderer.MAP_MARKER_CLUSTER_SIZE_DP;
+   private int _clusterForegroundColor = net.tourbook.map25.layer.marker.MarkerRenderer.CLUSTER_COLOR_TEXT;
+   private int _clusterBackgroundColor = net.tourbook.map25.layer.marker.MarkerRenderer.CLUSTER_COLOR_BACK;
+   private int  _clusterSymbolWeight;
+   private float  _clusterOutlineSize;
+   private Bitmap _clusterBitmap;
+   
    public MarkerSymbol _symbol;
+   private float _symbolSize = 10f;
+   private int _symbolSizeInt = 10;
 
    private Bitmap _bitmapPoi;
-   private int _DefaultIconSize = 20;
+
    final Paint _fillPainter = CanvasAdapter.newPaint();
+
    public MarkerRendererFactory _markerRendererFactory;
+   
    public static int shape_star = 0;
    public static int shape_circle = 1;
    
+   public static int modeDemo = 0;
+   public static int modeNormal = 1;
    
    public MarkerToolkit(int shape) {
-      System.out.println("*** Markertoolkit:  entering constructor"); //$NON-NLS-1$
+      final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
+
+      loadConfig();
+      //System.out.println("*** Markertoolkit:  entering constructor"); //$NON-NLS-1$
+
       _fillPainter.setStyle(Paint.Style.FILL);
       
-      _bitmapPoi = CanvasAdapter.newBitmap(_DefaultIconSize, _DefaultIconSize, 0);
+      _clusterBitmap = createClusterBitmap(1);
+      
+      _bitmapPoi = createPoiBitmap(shape_star);
+      
+      _symbol = new MarkerSymbol(_bitmapPoi, MarkerSymbol.HotspotPlace.CENTER, false);
+      
+      
+      _markerRendererFactory = new MarkerRendererFactory() {
+         @Override
+         public org.oscim.layers.marker.MarkerRenderer create(org.oscim.layers.marker.MarkerLayer markerLayer) {
+            return new ClusterMarkerRenderer(markerLayer, _symbol, new ClusterMarkerRenderer.ClusterStyle(Color.WHITE, Color.BLUE)) {
+               @Override
+               protected Bitmap getClusterBitmap(int size) {
+                  // Can customize cluster bitmap here
+                  //System.out.println("*** Markertoolkit:  cluster size: " + size); //$NON-NLS-1$
+                  _clusterBitmap = createClusterBitmap(size);
+                  return _clusterBitmap;
+               }
+            };
+         }
+      };
+   }
+   
+   public void loadConfig () {
+      final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
+      _fgColor = ColorUtil.getARGB(config.markerOutline_Color, (int) (config.markerOutline_Opacity / 100.0 * 0xff));
+      _bgColor = ColorUtil.getARGB(config.markerFill_Color,    (int) (config.markerFill_Opacity    / 100.0 * 0xff));
+      _clusterSymbolSizeDP = config.clusterSymbol_Size;
+      _clusterForegroundColor = ColorUtil.getARGB(
+            config.clusterOutline_Color,
+            (int) (config.clusterOutline_Opacity / 100.0 * 0xff));
+      _clusterBackgroundColor = ColorUtil.getARGB(
+            config.clusterFill_Color,
+            (int) (config.clusterFill_Opacity / 100.0 * 0xff));
+      _clusterSymbolWeight = config.clusterSymbol_Weight;
+      _clusterOutlineSize = config.clusterOutline_Size;
+      _symbolSize = ScreenUtils.getPixels(config.markerSymbol_Size);
+      _symbolSizeInt = (int) Math.ceil(_symbolSize);
+   }
+
+   public Bitmap createPoiBitmap(int shape) {
+      loadConfig();
+
+      _bitmapPoi = CanvasAdapter.newBitmap(_symbolSizeInt, _symbolSizeInt, 0);
+
       org.oscim.backend.canvas.Canvas defaultMarkerCanvas = CanvasAdapter.newCanvas();  
       defaultMarkerCanvas.setBitmap(_bitmapPoi);
-      float half = _DefaultIconSize/2;
+      float half = _symbolSizeInt/2;
+      
       if(shape == shape_circle) {
-         _fillPainter.setColor(0xFFFF69B4); // 100percent pink
+         _fillPainter.setColor(0x80FF69B4); // 50percent pink
          defaultMarkerCanvas.drawCircle(half, half, half, _fillPainter);
       } else {
-         /**
+         /*
           * link: https://stackoverflow.com/questions/16327588/how-to-make-star-shape-in-java
           */
          _fillPainter.setColor(0xFFFFFF00); // 100percent yellow
@@ -56,61 +138,61 @@ public class MarkerToolkit {
          defaultMarkerCanvas.drawLine(half         ,   0         , half * 1.60f , half * 1.65f, _fillPainter);
          defaultMarkerCanvas.drawLine(half * 1.60f , half * 1.65f, half * 0.1f  , half * 0.65f, _fillPainter);
       }
+     return _bitmapPoi;
       
-      _symbol = new MarkerSymbol(_bitmapPoi, MarkerSymbol.HotspotPlace.CENTER, false);
-      
-      _markerRendererFactory = new MarkerRendererFactory() {
-         @Override
-         public org.oscim.layers.marker.MarkerRenderer create(org.oscim.layers.marker.MarkerLayer markerLayer) {
-             return new ClusterMarkerRenderer(markerLayer, _symbol, new ClusterMarkerRenderer.ClusterStyle(Color.WHITE, Color.BLUE)) {
-                 @Override
-                 protected Bitmap getClusterBitmap(int size) {
-                     // Can customize cluster bitmap here
-                     return super.getClusterBitmap(size);
-                 }
-             };
-         }
-     };
-     
-
-     
    }
    
-
-
-   public List<MarkerItem> createMarkerItemList(){
-      List<MarkerItem> pts = new ArrayList<>();
-      for (final MapBookmark mapBookmark : net.tourbook.map.bookmark.MapBookmarkManager.getAllBookmarks()) {
-         System.out.println("*** Markertoolkit:  mapbookmark name: " + mapBookmark.name); //$NON-NLS-1$
-              MarkerItem item = new MarkerItem(mapBookmark.id, mapBookmark.name, "",
-                      new GeoPoint(mapBookmark.getLatitude(), mapBookmark.getLongitude())
-              );
-            item.setMarker(createAdvanceSymbol(item, _bitmapPoi));
-              pts.add(item);
-      }
-    return pts;  
+   public Bitmap createClusterBitmap(int size) {
+      //final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
+      final ScreenUtils.ClusterDrawable drawable = new ScreenUtils.ClusterDrawable(
+            _clusterSymbolSizeDP,
+            _clusterForegroundColor,
+            _clusterBackgroundColor,
+            Integer.toString(size),
+            _clusterSymbolWeight,
+            _clusterOutlineSize);
+      final Bitmap paintedBitmap = drawable.getBitmap();
+      return paintedBitmap;
    }
+   
+   
+   public List<MarkerItem> createMarkerItemList(int mode){
+      loadConfig();
+      createPoiBitmap(shape_star);
+      List<MarkerItem> pts = new ArrayList<>();
+     
+      for (final MapBookmark mapBookmark : net.tourbook.map.bookmark.MapBookmarkManager.getAllBookmarks()) {
+         //System.out.println("*** Markertoolkit:  mapbookmark name: " + mapBookmark.name); //$NON-NLS-1$
+         MarkerItem item = new MarkerItem(mapBookmark.id, mapBookmark.name, "",
+               new GeoPoint(mapBookmark.getLatitude(), mapBookmark.getLongitude())
+               );
+         item.setMarker(createAdvanceSymbol(item, _bitmapPoi));
+         pts.add(item);
+      }
 
-   public List<MarkerItem> createDemoMarkerItemList(){
+      if (mode == modeNormal) {return pts;};
+
       int COUNT = 5;
       float STEP = 100f / 110000f; // roughly 100 meters
       // Create some markers spaced STEP degrees
       //Berlin: 52.513452, 13.363791
-      double berlin_lat = 52.513452;
-      double berlin_lon = 13.363791;
-      List<MarkerItem> pts = new ArrayList<>();
+      //Rapperswil  47.2266239, 8.8184374
+      double demo_lat = 47.2266239;
+      double demo_lon = 8.8184374;
+      //List<MarkerItem> pts = new ArrayList<>();
       for (int x = -COUNT; x < COUNT; x++) {
-          for (int y = -COUNT; y < COUNT; y++) {
-              double random = STEP * Math.random() * 2;
-              MarkerItem item = new MarkerItem(y + ", " + x, "Title " + berlin_lat + "/" + berlin_lon,"#Description "  + x + "/" + y,
-                      new GeoPoint(berlin_lat + y * STEP + random, berlin_lon + x * STEP + random)
-              );
+         for (int y = -COUNT; y < COUNT; y++) {
+            double random = STEP * Math.random() * 2;
+            MarkerItem item = new MarkerItem(y + ", " + x, "Title " + demo_lat + "/" + demo_lon,"Description "  + x + "/" + y,
+                  new GeoPoint(demo_lat + y * STEP + random, demo_lon + x * STEP + random)
+                  );
             item.setMarker(createAdvanceSymbol(item, _bitmapPoi));
-              pts.add(item);
-          }
-      } 
-    return pts;  
+            pts.add(item);
+         }
+      }
+      return pts;  
    }
+   
    
    /**
     * creates a transparent symbol with text and description.
@@ -121,7 +203,8 @@ public class MarkerToolkit {
     * 
     */
    public MarkerSymbol createAdvanceSymbol(MarkerItem mItem, Bitmap poiBitmap) {
-      
+      loadConfig();
+      createPoiBitmap(shape_star);
       final Paint textPainter = CanvasAdapter.newPaint();
       textPainter.setStyle(Paint.Style.STROKE);
       textPainter.setColor(_fgColor);

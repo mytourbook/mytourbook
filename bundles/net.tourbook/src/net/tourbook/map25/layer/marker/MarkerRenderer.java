@@ -60,12 +60,12 @@ public class MarkerRenderer extends BucketRenderer {
 	/**
 	 * default color of number inside the icon. Would be super-cool to cook this into the map theme
 	 */
-	private static final int						CLUSTER_COLOR_TEXT			= 0xff8000c0;
+	public static final int						CLUSTER_COLOR_TEXT			= 0xff8000c0;
 
 	/**
 	 * default color of circle background
 	 */
-	private static final int						CLUSTER_COLOR_BACK			= 0xffffffff;
+	public static final int						CLUSTER_COLOR_BACK			= 0xffffffff;
 
 	/**
 	 * Map Cluster Icon Size. This is the biggest size for clusters of CLUSTER_MAXSIZE elements.
