@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2019  Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -44,1171 +44,1177 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public abstract class ValuePointToolTipShell {
 
-	private static final int					VALUE_POINT_OFFSET					= 20;
-
-	private static final String					STATE_VALUE_POINT_TOOLTIP_X			= "ValuePoint_ToolTip_DiffPositionX";				//$NON-NLS-1$
-	private static final String					STATE_VALUE_POINT_TOOLTIP_Y			= "ValuePoint_ToolTip_DiffPositionY";				//$NON-NLS-1$
-	private static final String					STATE_MOUSE_X_POSITION_RELATIVE		= "ValuePoint_ToolTip_MouseXPositionRelative";		//$NON-NLS-1$
-	private static final String					STATE_IS_TOOLTIP_ABOVE_VALUE_POINT	= "ValuePoint_ToolTip_IsToolTipAboveValuePoint";	//$NON-NLS-1$
-	static final String							STATE_VALUE_POINT_PIN_LOCATION		= "ValuePoint_ToolTip_PinnedLocation";				//$NON-NLS-1$
-
-	static final ValuePointToolTipPinLocation	DEFAULT_PIN_LOCATION				= ValuePointToolTipPinLocation.TopRight;
-
-	private static final String					STATE_VP_TOOLTIP_SCREEN_PINNED_X	= "ValuePoint_ToolTip_ScreenPinnedX";				//$NON-NLS-1$
-	private static final String					STATE_VP_TOOLTIP_SCREEN_PINNED_Y	= "ValuePoint_ToolTip_ScreenPinnedY";				//$NON-NLS-1$
+   private static final int                  VALUE_POINT_OFFSET                 = 20;
+
+   private static final String               STATE_VALUE_POINT_TOOLTIP_X        = "ValuePoint_ToolTip_DiffPositionX";            //$NON-NLS-1$
+   private static final String               STATE_VALUE_POINT_TOOLTIP_Y        = "ValuePoint_ToolTip_DiffPositionY";            //$NON-NLS-1$
+   private static final String               STATE_MOUSE_X_POSITION_RELATIVE    = "ValuePoint_ToolTip_MouseXPositionRelative";   //$NON-NLS-1$
+   private static final String               STATE_IS_TOOLTIP_ABOVE_VALUE_POINT = "ValuePoint_ToolTip_IsToolTipAboveValuePoint"; //$NON-NLS-1$
+   static final String                       STATE_VALUE_POINT_PIN_LOCATION     = "ValuePoint_ToolTip_PinnedLocation";           //$NON-NLS-1$
+
+   static final ValuePointToolTipPinLocation DEFAULT_PIN_LOCATION               = ValuePointToolTipPinLocation.TopRight;
+
+   private static final String               STATE_VP_TOOLTIP_SCREEN_PINNED_X   = "ValuePoint_ToolTip_ScreenPinnedX";            //$NON-NLS-1$
+   private static final String               STATE_VP_TOOLTIP_SCREEN_PINNED_Y   = "ValuePoint_ToolTip_ScreenPinnedY";            //$NON-NLS-1$
+
+   IDialogSettings                           state;
+
+   private ITooltipOwner                     _tooltipOwner;
 
-	IDialogSettings								state;
+   private Shell                             _ttShell;
 
-	private ITooltipOwner						_tooltipOwner;
+   private Object                            _currentArea;
+   private Control                           _ownerControl;
 
-	private Shell								_ttShell;
+   private OwnerShellListener                _ownerShellListener;
+   private OwnerControlListener              _ownerControlListener;
+   private TooltipListener                   _ttListener                        = new TooltipListener();
+   private TooltipShellListener              _ttShellListener                   = new TooltipShellListener();
+
+   private boolean                           _isTTDragged;
 
-	private Object								_currentArea;
-	private Control								_ownerControl;
+   private int                               _devXTTMouseDown;
+   private int                               _devYTTMouseDown;
+   private int                               _devXOwnerMouseMove;
+
+   /**
+    * Relative y position for the pinned location
+    * {@link ValuePointToolTipPinLocation#MouseXPosition}
+    */
+   private int                               _devPinnedMouseXPositionRelative;
+
+   /**
+    * Is <code>true</code> when the tool tip location is above the value point in the chart.
+    */
+   private boolean                           _isTTAboveValuePoint               = true;
+
+   /**
+    * Position where the hovered value is painted in the chart, the position is relative to the
+    * client.
+    */
+   private PointLong                         _ownerValueDevPosition             = new PointLong(0, 0);
+
+   int                                       chartMarginTop;
+   int                                       chartMarginBottom;
 
-	private OwnerShellListener					_ownerShellListener;
-	private OwnerControlListener				_ownerControlListener;
-	private TooltipListener						_ttListener							= new TooltipListener();
-	private TooltipShellListener				_ttShellListener					= new TooltipShellListener();
+   /**
+    * Relative location for the tooltip shell to the pinned location when it's moved with the mouse.
+    */
+   private Point                             _ttShellDiff                       = new Point(0, 0);
 
-	private boolean								_isTTDragged;
+   /**
+    * Contains position where the tt shell should be positioned
+    */
+   private Point                             _screenDefaultTTShellLocation;
 
-	private int									_devXTTMouseDown;
-	private int									_devYTTMouseDown;
-	private int									_devXOwnerMouseMove;
+   /**
+    * Screen location for the screen pinned location
+    */
+   private Point                             _screenScreenTTShellLocation;
 
-	/**
-	 * Relative y position for the pinned location
-	 * {@link ValuePointToolTipPinLocation#MouseXPosition}
-	 */
-	private int									_devPinnedMouseXPositionRelative;
-
-	/**
-	 * Is <code>true</code> when the tool tip location is above the value point in the chart.
-	 */
-	private boolean								_isTTAboveValuePoint				= true;
-
-	/**
-	 * Position where the hovered value is painted in the chart, the position is relative to the
-	 * client.
-	 */
-	private PointLong							_ownerValueDevPosition				= new PointLong(0, 0);
+   private Point                             _screenRequestedAnimationLocation  = new Point(0, 0);
 
-	int											chartMarginTop;
-	int											chartMarginBottom;
+   ValuePointToolTipPinLocation              pinnedLocation;
 
-	/**
-	 * Relative location for the tooltip shell to the pinned location when it's moved with the
-	 * mouse.
-	 */
-	private Point								_ttShellDiff						= new Point(0, 0);
+   /**
+    * This value is > 0 when tooltip could not be set at the default location
+    */
+   private int                               _defaultOffsetY;
+   private Display                           _display;
+   private Runnable                          _ttShellPositioningRunnable;
+   private int                               _animationCounter;
+   private int                               _repeatTime;
 
-	/**
-	 * Contains position where the tt shell should be positioned
-	 */
-	private Point								_screenDefaultTTShellLocation;
+   /*
+    * UI resources
+    */
+   private Cursor _cursorDragged;
+   private Cursor _cursorHand;
 
-	/**
-	 * Screen location for the screen pinned location
-	 */
-	private Point								_screenScreenTTShellLocation;
+   private class OwnerControlListener implements Listener {
+      @Override
+      public void handleEvent(final Event event) {
 
-	private Point								_screenRequestedAnimationLocation	= new Point(0, 0);
+         switch (event.type) {
+         case SWT.Dispose:
+            toolTipHide(_ttShell, event);
+            break;
 
-	ValuePointToolTipPinLocation				pinnedLocation;
+         case SWT.Resize:
+            onResizeOwner(event);
+         }
+      }
+   }
 
-	/**
-	 * This value is > 0 when tooltip could not be set at the default location
-	 */
-	private int									_defaultOffsetY;
-	private Display								_display;
-	private Runnable							_ttShellPositioningRunnable;
-	private int									_animationCounter;
-	private int									_repeatTime;
+   private final class OwnerShellListener implements Listener {
+      @Override
+      public void handleEvent(final Event event) {
 
-	/*
-	 * UI resources
-	 */
-	private Cursor								_cursorDragged;
-	private Cursor								_cursorHand;
+         if (_ownerControl == null || _ownerControl.isDisposed()) {
+            return;
+         }
 
-	private class OwnerControlListener implements Listener {
-		public void handleEvent(final Event event) {
+         switch (event.type) {
+         case SWT.Deactivate:
 
-			switch (event.type) {
-			case SWT.Dispose:
-				toolTipHide(_ttShell, event);
-				break;
+            _display.asyncExec(new Runnable() {
 
-			case SWT.Resize:
-				onResizeOwner(event);
-			}
-		}
-	}
+               @Override
+               public void run() {
 
-	private final class OwnerShellListener implements Listener {
-		public void handleEvent(final Event event) {
+                  // hide tooltip when another shell is activated
 
-			if (_ownerControl == null || _ownerControl.isDisposed()) {
-				return;
-			}
+                  if (_display.getActiveShell() != _ttShell) {
+                     toolTipHide(_ttShell, event);
+                  }
+               }
+            });
+            break;
 
-			switch (event.type) {
-			case SWT.Deactivate:
+         case SWT.Move:
+            onMoveOwner(event);
+            break;
+         }
+      }
+   }
 
-				_display.asyncExec(new Runnable() {
+   /**
+    * This listener is added to ALL widgets within the tooltip shell.
+    */
+   private class TooltipListener implements Listener {
+      @Override
+      public void handleEvent(final Event event) {
 
-					public void run() {
+         if (_ttShell == null || _ttShell.isDisposed()) {
+            return;
+         }
 
-						// hide tooltip when another shell is activated
+         if (event.widget instanceof Control) {
 
-						if (_display.getActiveShell() != _ttShell) {
-							toolTipHide(_ttShell, event);
-						}
-					}
-				});
-				break;
+            final Control control = (Control) event.widget;
+            boolean isToolbar = false;
 
-			case SWT.Move:
-				onMoveOwner(event);
-				break;
-			}
-		}
-	}
+            Cursor cursor = null;
 
-	/**
-	 * This listener is added to ALL widgets within the tooltip shell.
-	 */
-	private class TooltipListener implements Listener {
-		public void handleEvent(final Event event) {
+            if (control instanceof ToolBar) {
 
-			if (_ttShell == null || _ttShell.isDisposed()) {
-				return;
-			}
+               // disable other features when toolbar actions are hovered
+               isToolbar = true;
 
-			if (event.widget instanceof Control) {
+            } else {
 
-				final Control control = (Control) event.widget;
-				boolean isToolbar = false;
+               boolean isForwardEvent = false;
 
-				Cursor cursor = null;
+               switch (event.type) {
+               case SWT.MouseMove:
 
-				if (control instanceof ToolBar) {
+                  if (_isTTDragged) {
+                     onMoveTT(event);
+                  } else {
 
-					// disable other features when toolbar actions are hovered
-					isToolbar = true;
+                     /*
+                      * move value point in the chart when tooltip is hovered and the mouse position
+                      * is within the chart
+                      */
+                     isForwardEvent = true;
 
-				} else {
+                     cursor = _cursorHand;
+                  }
 
-					boolean isForwardEvent = false;
+                  break;
 
-					switch (event.type) {
-					case SWT.MouseMove:
+               case SWT.MouseDown:
 
-						if (_isTTDragged) {
-							onMoveTT(event);
-						} else {
+                  _isTTDragged = true;
 
-							/*
-							 * move value point in the chart when tooltip is hovered and the mouse
-							 * position is within the chart
-							 */
-							isForwardEvent = true;
+                  _devXTTMouseDown = event.x;
+                  _devYTTMouseDown = event.y;
 
-							cursor = _cursorHand;
-						}
+                  cursor = _cursorDragged;
 
-						break;
+                  break;
 
-					case SWT.MouseDown:
+               case SWT.MouseUp:
 
-						_isTTDragged = true;
+                  if (_isTTDragged) {
 
-						_devXTTMouseDown = event.x;
-						_devYTTMouseDown = event.y;
+                     _isTTDragged = false;
 
-						cursor = _cursorDragged;
+                     onMouseUpTT(event);
+                  }
 
-						break;
+                  cursor = _cursorHand;
 
-					case SWT.MouseUp:
+                  break;
 
-						if (_isTTDragged) {
+               case SWT.MouseVerticalWheel:
 
-							_isTTDragged = false;
+                  // pass to tt owner for zooming in/out
+                  isForwardEvent = true;
 
-							onMouseUpTT(event);
-						}
+                  break;
 
-						cursor = _cursorHand;
+               case SWT.MouseEnter:
 
-						break;
+                  isForwardEvent = true;
 
-					case SWT.MouseVerticalWheel:
+                  break;
 
-						// pass to tt owner for zooming in/out
-						isForwardEvent = true;
+               case SWT.MouseExit:
 
-						break;
+                  isForwardEvent = true;
+                  _isTTDragged = false;
 
-					case SWT.MouseEnter:
+                  break;
+               }
 
-						isForwardEvent = true;
+               if (isForwardEvent) {
+                  _tooltipOwner.handleMouseEvent(event, control.toDisplay(event.x, event.y));
+               }
+            }
 
-						break;
+            /*
+             * shell could be hidden (it was during testing)
+             */
+            if (_ttShell != null && !_ttShell.isDisposed()) {
 
-					case SWT.MouseExit:
+               if (cursor != null) {
 
-						isForwardEvent = true;
-						_isTTDragged = false;
+                  _ttShell.setCursor(cursor);
 
-						break;
-					}
+               } else if (isToolbar) {
 
-					if (isForwardEvent) {
-						_tooltipOwner.handleMouseEvent(event, control.toDisplay(event.x, event.y));
-					}
-				}
+                  // display normal cursor when toolbar actions are hovered
+                  _ttShell.setCursor(null);
+               }
+            }
+         }
+      }
+   }
 
-				/*
-				 * shell could be hidden (it was during testing)
-				 */
-				if (_ttShell != null && !_ttShell.isDisposed()) {
+   private final class TooltipShellListener implements Listener {
+      @Override
+      public void handleEvent(final Event e) {
 
-					if (cursor != null) {
+         if (_ttShell != null && !_ttShell.isDisposed() && _ownerControl != null && !_ownerControl.isDisposed()) {
 
-						_ttShell.setCursor(cursor);
+            _display.asyncExec(new Runnable() {
 
-					} else if (isToolbar) {
+               @Override
+               public void run() {
 
-						// display normal cursor when toolbar actions are hovered
-						_ttShell.setCursor(null);
-					}
-				}
-			}
-		}
-	}
+                  // hide tooltip when another shell is activated
 
-	private final class TooltipShellListener implements Listener {
-		public void handleEvent(final Event e) {
+                  // check again
+                  if (_ttShell == null
+                        || _ttShell.isDisposed()
+                        || _ownerControl == null
+                        || _ownerControl.isDisposed()) {
+                     return;
+                  }
 
-			if (_ttShell != null && !_ttShell.isDisposed() && _ownerControl != null && !_ownerControl.isDisposed()) {
+                  if (_ownerControl.getShell() == _ttShell.getDisplay().getActiveShell()) {
 
-				_display.asyncExec(new Runnable() {
+                     // don't hide when main window is active
+                     return;
+                  }
 
-					public void run() {
+                  toolTipHide(_ttShell, null);
+               }
+            });
+         }
+      }
+   }
 
-						// hide tooltip when another shell is activated
+   /**
+    * Create new instance which add TooltipSupport to the widget
+    *
+    * @param state
+    * @param control
+    *           the control on whose action the tooltip is shown
+    */
+   public ValuePointToolTipShell(final ITooltipOwner tooltipOwner, final IDialogSettings state) {
 
-						// check again
-						if (_ttShell == null
-								|| _ttShell.isDisposed()
-								|| _ownerControl == null
-								|| _ownerControl.isDisposed()) {
-							return;
-						}
+      _tooltipOwner = tooltipOwner;
+      _ownerControl = tooltipOwner.getControl();
+      _display = _ownerControl.getDisplay();
 
-						if (_ownerControl.getShell() == _ttShell.getDisplay().getActiveShell()) {
+      this.state = state;
 
-							// don't hide when main window is active
-							return;
-						}
+      _ownerControl.addDisposeListener(new DisposeListener() {
+         @Override
+         public void widgetDisposed(final DisposeEvent e) {
+            onDispose();
+         }
+      });
 
-						toolTipHide(_ttShell, null);
-					}
-				});
-			}
-		}
-	}
+      _ownerControlListener = new OwnerControlListener();
+      _ownerShellListener = new OwnerShellListener();
 
-	/**
-	 * Create new instance which add TooltipSupport to the widget
-	 * 
-	 * @param state
-	 * @param control
-	 *            the control on whose action the tooltip is shown
-	 */
-	public ValuePointToolTipShell(final ITooltipOwner tooltipOwner, final IDialogSettings state) {
+      addOwnerControlListener();
 
-		_tooltipOwner = tooltipOwner;
-		_ownerControl = tooltipOwner.getControl();
-		_display = _ownerControl.getDisplay();
+      _cursorDragged = new Cursor(_display, SWT.CURSOR_SIZEALL);
+      _cursorHand = new Cursor(_display, SWT.CURSOR_HAND);
 
-		this.state = state;
+      _ttShellPositioningRunnable = new Runnable() {
+         @Override
+         public void run() {
+            setTTShellLocation20Runnable();
+         }
+      };
 
-		_ownerControl.addDisposeListener(new DisposeListener() {
-			public void widgetDisposed(final DisposeEvent e) {
-				onDispose();
-			}
-		});
+      restoreState();
+   }
 
-		_ownerControlListener = new OwnerControlListener();
-		_ownerShellListener = new OwnerShellListener();
+   /**
+    * Pin the tooltip to a corder which is defined in PIN_LOCATION_...
+    *
+    * @param locationId
+    */
+   void actionPinLocation(final ValuePointToolTipPinLocation locationId) {
 
-		addOwnerControlListener();
+      // set new location
+      pinnedLocation = locationId;
 
-		_cursorDragged = new Cursor(_display, SWT.CURSOR_SIZEALL);
-		_cursorHand = new Cursor(_display, SWT.CURSOR_HAND);
+      if (_ttShell == null || _ttShell.isDisposed()) {
+         return;
+      }
 
-		_ttShellPositioningRunnable = new Runnable() {
-			public void run() {
-				setTTShellLocation20Runnable();
-			}
-		};
+//      if (pinnedLocation == ValuePointToolTipPinLocation.Screen) {
+//         return;
+//      }
 
-		restoreState();
-	}
+      // display at default location without offset
+      _ttShellDiff = new Point(0, 0);
 
-	/**
-	 * Pin the tooltip to a corder which is defined in PIN_LOCATION_...
-	 * 
-	 * @param locationId
-	 */
-	void actionPinLocation(final ValuePointToolTipPinLocation locationId) {
+      setTTShellLocation(false, true, true, true);
+   }
 
-		// set new location
-		pinnedLocation = locationId;
+   /**
+    * Activate tooltip support for this control
+    */
+   private void addOwnerControlListener() {
 
-		if (_ttShell == null || _ttShell.isDisposed()) {
-			return;
-		}
+      removeOwnerControlListener();
 
-//		if (pinnedLocation == ValuePointToolTipPinLocation.Screen) {
-//			return;
-//		}
+      _ownerControl.addListener(SWT.Dispose, _ownerControlListener);
+      _ownerControl.addListener(SWT.Resize, _ownerControlListener);
+   }
 
-		// display at default location without offset
-		_ttShellDiff = new Point(0, 0);
+   /**
+    * Add listener to all controls within the tooltip
+    * <p>
+    * ########################### Recursive #########################################<br>
+    *
+    * @param control
+    */
+   private void addTooltipListener(final Control control) {
 
-		setTTShellLocation(false, true, true, true);
-	}
+      control.addListener(SWT.MouseMove, _ttListener);
+      control.addListener(SWT.MouseDown, _ttListener);
+      control.addListener(SWT.MouseUp, _ttListener);
+      control.addListener(SWT.MouseEnter, _ttListener);
+      control.addListener(SWT.MouseExit, _ttListener);
+      control.addListener(SWT.MouseVerticalWheel, _ttListener);
 
-	/**
-	 * Activate tooltip support for this control
-	 */
-	private void addOwnerControlListener() {
+      if (control instanceof Composite) {
+         final Control[] children = ((Composite) control).getChildren();
+         for (final Control child : children) {
+            addTooltipListener(child);
+         }
+      }
+   }
 
-		removeOwnerControlListener();
+   /**
+    * Creates the content area of the the tooltip.
+    *
+    * @param event
+    *           the event that triggered the activation of the tooltip
+    * @param shell
+    *           the parent of the content area
+    * @return the content area created
+    */
+   protected abstract Composite createToolTipContentArea(Event event, Composite shell);
 
-		_ownerControl.addListener(SWT.Dispose, _ownerControlListener);
-		_ownerControl.addListener(SWT.Resize, _ownerControlListener);
-	}
+   /**
+    * @param tipSize
+    * @param tipLocation
+    * @param screenValuePoint
+    * @param isTTDragged
+    * @return
+    */
+   private Point fixupDisplayBounds(final Point tipSize,
+                                    final Point tipLocation,
+                                    final Point screenValuePoint,
+                                    final boolean isTTDragged) {
 
-	/**
-	 * Add listener to all controls within the tooltip
-	 * <p>
-	 * ########################### Recursive #########################################<br>
-	 * 
-	 * @param control
-	 */
-	private void addTooltipListener(final Control control) {
+      int tipLeft = tipLocation.x;
+      int tipTop = tipLocation.y;
+      final int tipWidth = tipSize.x;
+      final int tipHeight = tipSize.y;
+      final int tipRight = tipLeft + tipWidth;
+      final int tipBottom = tipTop + tipHeight;
 
-		control.addListener(SWT.MouseMove, _ttListener);
-		control.addListener(SWT.MouseDown, _ttListener);
-		control.addListener(SWT.MouseUp, _ttListener);
-		control.addListener(SWT.MouseEnter, _ttListener);
-		control.addListener(SWT.MouseExit, _ttListener);
-		control.addListener(SWT.MouseVerticalWheel, _ttListener);
+      Rectangle screenBounds;
 
-		if (control instanceof Composite) {
-			final Control[] children = ((Composite) control).getChildren();
-			for (final Control child : children) {
-				addTooltipListener(child);
-			}
-		}
-	}
+      final Monitor[] monitors = _display.getMonitors();
 
-	/**
-	 * Creates the content area of the the tooltip.
-	 * 
-	 * @param event
-	 *            the event that triggered the activation of the tooltip
-	 * @param shell
-	 *            the parent of the content area
-	 * @return the content area created
-	 */
-	protected abstract Composite createToolTipContentArea(Event event, Composite shell);
+      if (monitors.length > 1) {
+         // By default present in the monitor of the control
+         screenBounds = _ownerControl.getMonitor().getBounds();
+         final Point p = new Point(tipLeft, tipTop);
 
-	/**
-	 * @param tipSize
-	 * @param tipLocation
-	 * @param screenValuePoint
-	 * @param isTTDragged
-	 * @return
-	 */
-	private Point fixupDisplayBounds(	final Point tipSize,
-										final Point tipLocation,
-										final Point screenValuePoint,
-										final boolean isTTDragged) {
+         // Search on which monitor the event occurred
+         Rectangle tmp;
+         for (final Monitor monitor : monitors) {
+            tmp = monitor.getBounds();
+            if (tmp.contains(p)) {
+               screenBounds = tmp;
+               break;
+            }
+         }
 
-		int tipLeft = tipLocation.x;
-		int tipTop = tipLocation.y;
-		final int tipWidth = tipSize.x;
-		final int tipHeight = tipSize.y;
-		final int tipRight = tipLeft + tipWidth;
-		final int tipBottom = tipTop + tipHeight;
+      } else {
+         screenBounds = _display.getBounds();
+      }
 
-		Rectangle screenBounds;
+      // create a copy that the original value is not modified
+//      final Point newTipLocation = new Point(tipLeft, tipTop);
+      final Point tipBottomRight = new Point(tipRight, tipBottom);
 
-		final Monitor[] monitors = _display.getMonitors();
+      if (!(screenBounds.contains(tipLocation) && screenBounds.contains(tipBottomRight))) {
 
-		if (monitors.length > 1) {
-			// By default present in the monitor of the control
-			screenBounds = _ownerControl.getMonitor().getBounds();
-			final Point p = new Point(tipLeft, tipTop);
+         if (tipRight > screenBounds.x + screenBounds.width) {
+            tipLeft -= tipRight - (screenBounds.x + screenBounds.width);
+         }
 
-			// Search on which monitor the event occurred
-			Rectangle tmp;
-			for (final Monitor monitor : monitors) {
-				tmp = monitor.getBounds();
-				if (tmp.contains(p)) {
-					screenBounds = tmp;
-					break;
-				}
-			}
+         if (tipBottom > screenBounds.y + screenBounds.height) {
 
-		} else {
-			screenBounds = _display.getBounds();
-		}
+            // move to screen bottom
+            tipTop -= tipBottom - (screenBounds.y + screenBounds.height);
 
-		// create a copy that the original value is not modified
-//		final Point newTipLocation = new Point(tipLeft, tipTop);
-		final Point tipBottomRight = new Point(tipRight, tipBottom);
+            if (isTTDragged == false) {
 
-		if (!(screenBounds.contains(tipLocation) && screenBounds.contains(tipBottomRight))) {
+               // check if value point is covered by the tooltip
+               if (tipTop < screenValuePoint.y + VALUE_POINT_OFFSET) {
 
-			if (tipRight > screenBounds.x + screenBounds.width) {
-				tipLeft -= tipRight - (screenBounds.x + screenBounds.width);
-			}
+                  // this implementation do NOT respect multiple monitors
 
-			if (tipBottom > screenBounds.y + screenBounds.height) {
+                  // move tip above the value point
+                  tipTop = screenValuePoint.y - tipHeight - VALUE_POINT_OFFSET;
+               }
+            }
+         }
 
-				// move to screen bottom
-				tipTop -= tipBottom - (screenBounds.y + screenBounds.height);
+         if (tipLeft < screenBounds.x) {
+            // move to screen left
+            tipLeft = screenBounds.x;
+         }
 
-				if (isTTDragged == false) {
+         if (tipTop < screenBounds.y) {
 
-					// check if value point is covered by the tooltip
-					if (tipTop < screenValuePoint.y + VALUE_POINT_OFFSET) {
+            // move to screen top
+            tipTop = screenBounds.y;
 
-						// this implementation do NOT respect multiple monitors
+            if (isTTDragged == false) {
 
-						// move tip above the value point
-						tipTop = screenValuePoint.y - tipHeight - VALUE_POINT_OFFSET;
-					}
-				}
-			}
+               // check if value point is covered by the tooltip
+               if (tipTop + tipHeight > screenValuePoint.y - VALUE_POINT_OFFSET) {
 
-			if (tipLeft < screenBounds.x) {
-				// move to screen left
-				tipLeft = screenBounds.x;
-			}
+                  // this implementation do NOT respect multiple monitors
 
-			if (tipTop < screenBounds.y) {
+                  // move tip above the value point
+                  tipTop = screenValuePoint.y + VALUE_POINT_OFFSET;
+               }
+            }
+         }
+      }
 
-				// move to screen top
-				tipTop = screenBounds.y;
+      return new Point(tipLeft, tipTop);
+   }
 
-				if (isTTDragged == false) {
+   ValuePointToolTipPinLocation getPinnedLocation() {
+      return pinnedLocation;
+   }
 
-					// check if value point is covered by the tooltip
-					if (tipTop + tipHeight > screenValuePoint.y - VALUE_POINT_OFFSET) {
+   /**
+    * This method is called to check for which area the tooltip is created/hidden for. In case of
+    * {@link #NO_RECREATE} this is used to decide if the tooltip is hidden recreated.
+    * <code>By the default it is the widget the tooltip is created for but could be any object. To decide if
+    * the area changed the {@link Object#equals(Object)} method is used.</code>
+    *
+    * @param event
+    *           the event
+    * @return the area responsible for the tooltip creation or <code>null</code> this could be any
+    *         object describing the area (e.g. the {@link Control} onto which the tooltip is bound
+    *         to, a part of this area e.g. for {@link ColumnViewer} this could be a
+    *         {@link ViewerCell})
+    */
+   protected Object getToolTipArea(final Event event) {
+      return _ownerControl;
+   }
 
-						// this implementation do NOT respect multiple monitors
+   Shell getToolTipShell() {
+      return _ttShell;
+   }
 
-						// move tip above the value point
-						tipTop = screenValuePoint.y + VALUE_POINT_OFFSET;
-					}
-				}
-			}
-		}
+   /**
+    * Hide the currently active tool tip
+    */
+   public void hide() {
+      toolTipHide(_ttShell, null);
+   }
 
-		return new Point(tipLeft, tipTop);
-	}
+   void onDispose() {
 
-	ValuePointToolTipPinLocation getPinnedLocation() {
-		return pinnedLocation;
-	}
+      _cursorDragged = (Cursor) Util.disposeResource(_cursorDragged);
+      _cursorHand = (Cursor) Util.disposeResource(_cursorHand);
 
-	/**
-	 * This method is called to check for which area the tooltip is created/hidden for. In case of
-	 * {@link #NO_RECREATE} this is used to decide if the tooltip is hidden recreated.
-	 * <code>By the default it is the widget the tooltip is created for but could be any object. To decide if
-	 * the area changed the {@link Object#equals(Object)} method is used.</code>
-	 * 
-	 * @param event
-	 *            the event
-	 * @return the area responsible for the tooltip creation or <code>null</code> this could be any
-	 *         object describing the area (e.g. the {@link Control} onto which the tooltip is bound
-	 *         to, a part of this area e.g. for {@link ColumnViewer} this could be a
-	 *         {@link ViewerCell})
-	 */
-	protected Object getToolTipArea(final Event event) {
-		return _ownerControl;
-	}
+      removeOwnerControlListener();
+   }
 
-	Shell getToolTipShell() {
-		return _ttShell;
-	}
+   private void onMouseUpTT(final Event event) {
 
-	/**
-	 * Hide the currently active tool tip
-	 */
-	public void hide() {
-		toolTipHide(_ttShell, null);
-	}
+      /*
+       * get the tt vertical position
+       */
+      // value point position
+      final int devYValuePoint = _ownerControl.toDisplay(0, (int) _ownerValueDevPosition.y).y;
 
-	void onDispose() {
+      final Rectangle scrTTBounds = _ttShell.getBounds();
+      final int srcTTTop = scrTTBounds.y;
+      final int scrTTBottom = srcTTTop + scrTTBounds.height;
 
-		_cursorDragged = (Cursor) Util.disposeResource(_cursorDragged);
-		_cursorHand = (Cursor) Util.disposeResource(_cursorHand);
+      _isTTAboveValuePoint = devYValuePoint > scrTTBottom;
 
-		removeOwnerControlListener();
-	}
+      /*
+       * get tt relative position
+       */
+      final Point scrOwnerControlLocation = _ownerControl.toDisplay(0, 0);
+      final Point ownerSize = _ownerControl.getSize();
+      final int scrOwnerTop = scrOwnerControlLocation.y;
+      final int ownerHeight = ownerSize.y;
+      final int srcOwnerBottom = scrOwnerTop + ownerHeight;
 
-	private void onMouseUpTT(final Event event) {
+      if (_isTTAboveValuePoint) {
+         _devPinnedMouseXPositionRelative = scrOwnerTop - scrTTBottom;
+      } else {
+         _devPinnedMouseXPositionRelative = srcOwnerBottom - srcTTTop;
+      }
 
-		/*
-		 * get the tt vertical position
-		 */
-		// value point position
-		final int devYValuePoint = _ownerControl.toDisplay(0, (int) _ownerValueDevPosition.y).y;
+      setTTShellLocation(false, true, false, true);
+   }
 
-		final Rectangle scrTTBounds = _ttShell.getBounds();
-		final int srcTTTop = scrTTBounds.y;
-		final int scrTTBottom = srcTTTop + scrTTBounds.height;
+   /**
+    * The owner shell has been moved, adjust tooltip shell that it moves also with the owner control
+    * but preserves the display border.
+    */
+   private void onMoveOwner(final Event event) {
 
-		_isTTAboveValuePoint = devYValuePoint > scrTTBottom;
+      if (_ttShell == null || _ttShell.isDisposed()) {
+         return;
+      }
 
-		/*
-		 * get tt relative position
-		 */
-		final Point scrOwnerControlLocation = _ownerControl.toDisplay(0, 0);
-		final Point ownerSize = _ownerControl.getSize();
-		final int scrOwnerTop = scrOwnerControlLocation.y;
-		final int ownerHeight = ownerSize.y;
-		final int srcOwnerBottom = scrOwnerTop + ownerHeight;
+      setTTShellLocation(false, false, false, false);
+   }
 
-		if (_isTTAboveValuePoint) {
-			_devPinnedMouseXPositionRelative = scrOwnerTop - scrTTBottom;
-		} else {
-			_devPinnedMouseXPositionRelative = srcOwnerBottom - srcTTTop;
-		}
+   /**
+    * Tooltip location has been moved with the mouse.
+    *
+    * @param event
+    */
+   private void onMoveTT(final Event event) {
 
-		setTTShellLocation(false, true, false, true);
-	}
+      final int xDiff = event.x - _devXTTMouseDown;
+      final int yDiff = event.y - _devYTTMouseDown;
 
-	/**
-	 * The owner shell has been moved, adjust tooltip shell that it moves also with the owner
-	 * control but preserves the display border.
-	 */
-	private void onMoveOwner(final Event event) {
+      if (pinnedLocation == ValuePointToolTipPinLocation.Screen) {
 
-		if (_ttShell == null || _ttShell.isDisposed()) {
-			return;
-		}
+         _ttShellDiff.x = xDiff;
+         _ttShellDiff.y = yDiff;
 
-		setTTShellLocation(false, false, false, false);
-	}
+      } else if (pinnedLocation == ValuePointToolTipPinLocation.MouseXPosition) {
 
-	/**
-	 * Tooltip location has been moved with the mouse.
-	 * 
-	 * @param event
-	 */
-	private void onMoveTT(final Event event) {
+         _ttShellDiff.x = 0;
+         _ttShellDiff.y = yDiff;
 
-		final int xDiff = event.x - _devXTTMouseDown;
-		final int yDiff = event.y - _devYTTMouseDown;
+      } else {
 
-		if (pinnedLocation == ValuePointToolTipPinLocation.Screen) {
+         _ttShellDiff.x += xDiff;
+         _ttShellDiff.y += yDiff;
+      }
 
-			_ttShellDiff.x = xDiff;
-			_ttShellDiff.y = yDiff;
+      setTTShellLocation(true, false, false, true);
+   }
 
-		} else if (pinnedLocation == ValuePointToolTipPinLocation.MouseXPosition) {
+   /**
+    * Owner control is resized.
+    *
+    * @param event
+    */
+   private void onResizeOwner(final Event event) {
 
-			_ttShellDiff.x = 0;
-			_ttShellDiff.y = yDiff;
+      if (_ttShell == null || _ttShell.isDisposed()) {
+         return;
+      }
+
+      setTTShellLocation(false, false, false, false);
+   }
 
-		} else {
+   private void passOnEvent(final Shell tip, final Event event) {
+      if (_ownerControl != null
+            && !_ownerControl.isDisposed()
+            && event != null
+            && event.widget != _ownerControl
+            && event.type == SWT.MouseDown) {
+         // the following was left in order to fix bug 298770 with minimal change. In 3.7, the complete method should be removed.
+         tip.close();
+      }
+   }
+
+   /**
+    * Deactivate tooltip support for the underlying control
+    */
+   private void removeOwnerControlListener() {
+
+      _ownerControl.removeListener(SWT.Dispose, _ownerControlListener);
+      _ownerControl.removeListener(SWT.Resize, _ownerControlListener);
+   }
+
+   private void restoreState() {
+
+      /*
+       * restore value point tooltip location, when location is not set, don't set it to 0,0 instead
+       * use tooltip default location which is positioning the tooltip into the center of the chart
+       */
+      if (state.get(STATE_VALUE_POINT_TOOLTIP_X) != null) {
 
-			_ttShellDiff.x += xDiff;
-			_ttShellDiff.y += yDiff;
-		}
+         _ttShellDiff = new Point(//
+               Util.getStateInt(state, STATE_VALUE_POINT_TOOLTIP_X, 0),
+               Util.getStateInt(state, STATE_VALUE_POINT_TOOLTIP_Y, 0));
+      }
+
+      if (state.get(STATE_VP_TOOLTIP_SCREEN_PINNED_X) != null) {
 
-		setTTShellLocation(true, false, false, true);
-	}
+         _screenScreenTTShellLocation = new Point(
+               Util.getStateInt(state, STATE_VP_TOOLTIP_SCREEN_PINNED_X, 0),
+               Util.getStateInt(state, STATE_VP_TOOLTIP_SCREEN_PINNED_Y, 0));
+      }
 
-	/**
-	 * Owner control is resized.
-	 * 
-	 * @param event
-	 */
-	private void onResizeOwner(final Event event) {
+      // tooltip orientation
+      final String statePinnedLocation = Util.getStateString(
+            state,
+            STATE_VALUE_POINT_PIN_LOCATION,
+            DEFAULT_PIN_LOCATION.name());
+
+      pinnedLocation = ValuePointToolTipPinLocation.valueOf(statePinnedLocation);
 
-		if (_ttShell == null || _ttShell.isDisposed()) {
-			return;
-		}
+      _devPinnedMouseXPositionRelative = Util.getStateInt(state, STATE_MOUSE_X_POSITION_RELATIVE, 0);
+      _isTTAboveValuePoint = Util.getStateBoolean(state, STATE_IS_TOOLTIP_ABOVE_VALUE_POINT, true);
+   }
 
-		setTTShellLocation(false, false, false, false);
-	}
+   void saveState() {
+
+      state.put(STATE_VALUE_POINT_TOOLTIP_X, _ttShellDiff.x);
+      state.put(STATE_VALUE_POINT_TOOLTIP_Y, _ttShellDiff.y);
+
+      if (_screenScreenTTShellLocation != null) {
 
-	private void passOnEvent(final Shell tip, final Event event) {
-		if (_ownerControl != null
-				&& !_ownerControl.isDisposed()
-				&& event != null
-				&& event.widget != _ownerControl
-				&& event.type == SWT.MouseDown) {
-			// the following was left in order to fix bug 298770 with minimal change. In 3.7, the complete method should be removed.
-			tip.close();
-		}
-	}
+         state.put(STATE_VP_TOOLTIP_SCREEN_PINNED_X, _screenScreenTTShellLocation.x);
+         state.put(STATE_VP_TOOLTIP_SCREEN_PINNED_Y, _screenScreenTTShellLocation.y);
+      }
 
-	/**
-	 * Deactivate tooltip support for the underlying control
-	 */
-	private void removeOwnerControlListener() {
+      state.put(STATE_VALUE_POINT_PIN_LOCATION, pinnedLocation.name());
+      state.put(STATE_MOUSE_X_POSITION_RELATIVE, _devPinnedMouseXPositionRelative);
+      state.put(STATE_IS_TOOLTIP_ABOVE_VALUE_POINT, _isTTAboveValuePoint);
+   }
 
-		_ownerControl.removeListener(SWT.Dispose, _ownerControlListener);
-		_ownerControl.removeListener(SWT.Resize, _ownerControlListener);
-	}
+   void setShellVisible(final boolean isVisible) {
 
-	private void restoreState() {
+      if (_ttShell == null || _ttShell.isDisposed()) {
+         return;
+      }
 
-		/*
-		 * restore value point tooltip location, when location is not set, don't set it to 0,0
-		 * instead use tooltip default location which is positioning the tooltip into the center of
-		 * the chart
-		 */
-		if (state.get(STATE_VALUE_POINT_TOOLTIP_X) != null) {
+      _ttShell.setVisible(isVisible);
+   }
 
-			_ttShellDiff = new Point(//
-					Util.getStateInt(state, STATE_VALUE_POINT_TOOLTIP_X, 0),
-					Util.getStateInt(state, STATE_VALUE_POINT_TOOLTIP_Y, 0));
-		}
+   /**
+    * Set tooltip location according to the pinned location.
+    *
+    * @param isTTDragged
+    *           is <code>true</code> when the tooltip is dragged
+    * @param isAnimation
+    * @param isSetDefaultLocation
+    *           When <code>true</code> set tooltip to a default location
+    */
+   private void setTTShellLocation(final boolean isTTDragged,
+                                   final boolean isAnimation,
+                                   final boolean isSetDefaultLocation,
+                                   final boolean isCheckVPCovered) {
 
-		if (state.get(STATE_VP_TOOLTIP_SCREEN_PINNED_X) != null) {
+      final Point screenOwnerControlLocation = _ownerControl.toDisplay(0, 0);
+      final Point ownerSize = _ownerControl.getSize();
+      final int ownerWidth = ownerSize.x;
+      final int ownerHeight = ownerSize.y;
+      final int screenOwnerLeft = screenOwnerControlLocation.x;
+      final int screenOwnerTop = screenOwnerControlLocation.y;
+      final int screenOwnerBotton = screenOwnerTop + ownerHeight;
 
-			_screenScreenTTShellLocation = new Point(
-					Util.getStateInt(state, STATE_VP_TOOLTIP_SCREEN_PINNED_X, 0),
-					Util.getStateInt(state, STATE_VP_TOOLTIP_SCREEN_PINNED_Y, 0));
-		}
+      final Point ttSize = _ttShell.getSize();
+      final int ttWidth = ttSize.x;
+      final int ttHeight = ttSize.y;
 
-		// tooltip orientation
-		final String statePinnedLocation = Util.getStateString(
-				state,
-				STATE_VALUE_POINT_PIN_LOCATION,
-				DEFAULT_PIN_LOCATION.name());
+      // get edge default values
+      final int screenEdgeLeft = screenOwnerLeft;
+      final int screenEdgeRight = screenOwnerLeft + ownerWidth - ttWidth;
+      final int screenEdgeTop = screenOwnerTop + chartMarginTop;
+      final int screenEdgeBottom = screenOwnerBotton - ttHeight - chartMarginBottom;
 
-		pinnedLocation = ValuePointToolTipPinLocation.valueOf(statePinnedLocation);
+      final Point screenValuePoint = _ownerControl.toDisplay(
+            (int) _ownerValueDevPosition.x,
+            (int) _ownerValueDevPosition.y);
+      final int screenValuePointTop = screenValuePoint.y;
 
-		_devPinnedMouseXPositionRelative = Util.getStateInt(state, STATE_MOUSE_X_POSITION_RELATIVE, 0);
-		_isTTAboveValuePoint = Util.getStateBoolean(state, STATE_IS_TOOLTIP_ABOVE_VALUE_POINT, true);
-	}
+      boolean isSetLocation = isSetDefaultLocation;
+      boolean isCheckDefaultOffset = false;
+      final Point screenDefaultLocation = new Point(0, 0);
 
-	void saveState() {
+      switch (pinnedLocation) {
+      case Screen:
 
-		state.put(STATE_VALUE_POINT_TOOLTIP_X, _ttShellDiff.x);
-		state.put(STATE_VALUE_POINT_TOOLTIP_Y, _ttShellDiff.y);
+         // use default location when location was not yet set, center the tooltip in the center of the owner
+         if (_screenScreenTTShellLocation == null || isSetDefaultLocation) {
 
-		if (_screenScreenTTShellLocation != null) {
+            screenDefaultLocation.x = screenOwnerLeft + (ownerWidth / 2) - (ttWidth / 2);
+            screenDefaultLocation.y = screenOwnerTop + (ownerHeight / 2) - (ttHeight / 2);
 
-			state.put(STATE_VP_TOOLTIP_SCREEN_PINNED_X, _screenScreenTTShellLocation.x);
-			state.put(STATE_VP_TOOLTIP_SCREEN_PINNED_Y, _screenScreenTTShellLocation.y);
-		}
+            _screenScreenTTShellLocation = new Point(screenDefaultLocation.x, screenDefaultLocation.y);
+         }
 
-		state.put(STATE_VALUE_POINT_PIN_LOCATION, pinnedLocation.name());
-		state.put(STATE_MOUSE_X_POSITION_RELATIVE, _devPinnedMouseXPositionRelative);
-		state.put(STATE_IS_TOOLTIP_ABOVE_VALUE_POINT, _isTTAboveValuePoint);
-	}
+         screenDefaultLocation.x = _screenScreenTTShellLocation.x + _ttShellDiff.x;
+         screenDefaultLocation.y = _screenScreenTTShellLocation.y + _ttShellDiff.y;
 
-	void setShellVisible(final boolean isVisible) {
+         if (isTTDragged) {
 
-		if (_ttShell == null || _ttShell.isDisposed()) {
-			return;
-		}
+//            if (screenDefaultLocation.y > 1100) {
+//               int a = 0;
+//               a++;
+//            }
 
-		_ttShell.setVisible(isVisible);
-	}
+            // ensure that the dragged tooltip is within the screen border
+            final Point screenNewLocation = fixupDisplayBounds(
+                  ttSize,
+                  screenDefaultLocation,
+                  screenValuePoint,
+                  isTTDragged);
 
-	/**
-	 * Set tooltip location according to the pinned location.
-	 * 
-	 * @param isTTDragged
-	 *            is <code>true</code> when the tooltip is dragged
-	 * @param isAnimation
-	 * @param isSetDefaultLocation
-	 *            When <code>true</code> set tooltip to a default location
-	 */
-	private void setTTShellLocation(final boolean isTTDragged,
-									final boolean isAnimation,
-									final boolean isSetDefaultLocation,
-									final boolean isCheckVPCovered) {
+            screenDefaultLocation.x = screenNewLocation.x;
+            screenDefaultLocation.y = screenNewLocation.y;
 
-		final Point screenOwnerControlLocation = _ownerControl.toDisplay(0, 0);
-		final Point ownerSize = _ownerControl.getSize();
-		final int ownerWidth = ownerSize.x;
-		final int ownerHeight = ownerSize.y;
-		final int screenOwnerLeft = screenOwnerControlLocation.x;
-		final int screenOwnerTop = screenOwnerControlLocation.y;
-		final int screenOwnerBotton = screenOwnerTop + ownerHeight;
+            _screenScreenTTShellLocation.x = screenNewLocation.x;
+            _screenScreenTTShellLocation.y = screenNewLocation.y;
+            _ttShellDiff.x = 0;
+            _ttShellDiff.y = 0;
+         }
 
-		final Point ttSize = _ttShell.getSize();
-		final int ttWidth = ttSize.x;
-		final int ttHeight = ttSize.y;
+         isCheckDefaultOffset = true;
 
-		// get edge default values
-		final int screenEdgeLeft = screenOwnerLeft;
-		final int screenEdgeRight = screenOwnerLeft + ownerWidth - ttWidth;
-		final int screenEdgeTop = screenOwnerTop + chartMarginTop;
-		final int screenEdgeBottom = screenOwnerBotton - ttHeight - chartMarginBottom;
+         break;
 
-		final Point screenValuePoint = _ownerControl.toDisplay(
-				(int) _ownerValueDevPosition.x,
-				(int) _ownerValueDevPosition.y);
-		final int screenValuePointTop = screenValuePoint.y;
+      case MouseXPosition:
 
-		boolean isSetLocation = isSetDefaultLocation;
-		boolean isCheckDefaultOffset = false;
-		final Point screenDefaultLocation = new Point(0, 0);
+         if (isTTDragged) {
 
-		switch (pinnedLocation) {
-		case Screen:
+            // tooltip is currently dragged
 
-			// use default location when location was not yet set, center the tooltip in the center of the owner
-			if (_screenScreenTTShellLocation == null || isSetDefaultLocation) {
+            screenDefaultLocation.y = _screenDefaultTTShellLocation.y + _ttShellDiff.y;
 
-				screenDefaultLocation.x = screenOwnerLeft + (ownerWidth / 2) - (ttWidth / 2);
-				screenDefaultLocation.y = screenOwnerTop + (ownerHeight / 2) - (ttHeight / 2);
+         } else {
 
-				_screenScreenTTShellLocation = new Point(screenDefaultLocation.x, screenDefaultLocation.y);
-			}
+            int screenTTDefaultY;
 
-			screenDefaultLocation.x = _screenScreenTTShellLocation.x + _ttShellDiff.x;
-			screenDefaultLocation.y = _screenScreenTTShellLocation.y + _ttShellDiff.y;
+            if (_isTTAboveValuePoint) {
+               screenTTDefaultY = screenOwnerTop - _devPinnedMouseXPositionRelative - ttHeight;
+            } else {
+               screenTTDefaultY = screenOwnerBotton - _devPinnedMouseXPositionRelative;
+            }
 
-			if (isTTDragged) {
+            int devY = screenTTDefaultY;
 
-//				if (screenDefaultLocation.y > 1100) {
-//					int a = 0;
-//					a++;
-//				}
+            if (_isTTAboveValuePoint) {
 
-				// ensure that the dragged tooltip is within the screen border
-				final Point screenNewLocation = fixupDisplayBounds(
-						ttSize,
-						screenDefaultLocation,
-						screenValuePoint,
-						isTTDragged);
+               // tt must be above value point
 
-				screenDefaultLocation.x = screenNewLocation.x;
-				screenDefaultLocation.y = screenNewLocation.y;
+               if (screenValuePointTop < (screenTTDefaultY + ttHeight + VALUE_POINT_OFFSET)) {
+                  // set above value point
+                  devY = screenValuePointTop - VALUE_POINT_OFFSET - ttHeight;
+               }
 
-				_screenScreenTTShellLocation.x = screenNewLocation.x;
-				_screenScreenTTShellLocation.y = screenNewLocation.y;
-				_ttShellDiff.x = 0;
-				_ttShellDiff.y = 0;
-			}
+            } else {
 
-			isCheckDefaultOffset = true;
+               // tt must be below value point
 
-			break;
+               if (screenValuePointTop > (screenTTDefaultY - VALUE_POINT_OFFSET)) {
+                  // set below value point
+                  devY = screenValuePointTop + VALUE_POINT_OFFSET;
+               }
+            }
 
-		case MouseXPosition:
+            screenDefaultLocation.y = devY;
 
-			if (isTTDragged) {
+            isSetLocation = true;
+         }
 
-				// tooltip is currently dragged
+         screenDefaultLocation.x = screenOwnerLeft - (ttWidth / 2) + _devXOwnerMouseMove;
 
-				screenDefaultLocation.y = _screenDefaultTTShellLocation.y + _ttShellDiff.y;
+         break;
 
-			} else {
+      case TopLeft:
+         screenDefaultLocation.x = screenEdgeLeft + _ttShellDiff.x;
+         screenDefaultLocation.y = screenEdgeTop + _ttShellDiff.y;
+         isCheckDefaultOffset = true;
+         break;
 
-				int screenTTDefaultY;
+      case BottomLeft:
+         screenDefaultLocation.x = screenEdgeLeft + _ttShellDiff.x;
+         screenDefaultLocation.y = screenEdgeBottom + _ttShellDiff.y;
+         isCheckDefaultOffset = true;
+         break;
 
-				if (_isTTAboveValuePoint) {
-					screenTTDefaultY = screenOwnerTop - _devPinnedMouseXPositionRelative - ttHeight;
-				} else {
-					screenTTDefaultY = screenOwnerBotton - _devPinnedMouseXPositionRelative;
-				}
+      case BottomRight:
+         screenDefaultLocation.x = screenEdgeRight + _ttShellDiff.x;
+         screenDefaultLocation.y = screenEdgeBottom + _ttShellDiff.y;
+         isCheckDefaultOffset = true;
+         break;
 
-				int devY = screenTTDefaultY;
+      case TopRight:
+      default:
+         screenDefaultLocation.x = screenEdgeRight + _ttShellDiff.x;
+         screenDefaultLocation.y = screenEdgeTop + _ttShellDiff.y;
+         isCheckDefaultOffset = true;
+      }
 
-				if (_isTTAboveValuePoint) {
+      final int defaultY = screenDefaultLocation.y;
 
-					// tt must be above value point
+      // check if the new tooltip location is covering the value point
+      if (isCheckVPCovered && isCheckDefaultOffset) {
 
-					if (screenValuePointTop < (screenTTDefaultY + ttHeight + VALUE_POINT_OFFSET)) {
-						// set above value point
-						devY = screenValuePointTop - VALUE_POINT_OFFSET - ttHeight;
-					}
+         // increase tooltip size
+         Rectangle increasedShellArea;
+         if (isSetDefaultLocation) {
 
-				} else {
+            increasedShellArea = new Rectangle(//
+                  screenDefaultLocation.x - VALUE_POINT_OFFSET,
+                  screenDefaultLocation.y - VALUE_POINT_OFFSET,
+                  ttSize.x + 2 * VALUE_POINT_OFFSET,
+                  ttSize.y + 2 * VALUE_POINT_OFFSET);
 
-					// tt must be below value point
+         } else {
 
-					if (screenValuePointTop > (screenTTDefaultY - VALUE_POINT_OFFSET)) {
-						// set below value point
-						devY = screenValuePointTop + VALUE_POINT_OFFSET;
-					}
-				}
+            increasedShellArea = new Rectangle(//
+                  _screenRequestedAnimationLocation.x - VALUE_POINT_OFFSET,
+                  _screenRequestedAnimationLocation.y - VALUE_POINT_OFFSET + _defaultOffsetY,
+                  ttSize.x + 2 * VALUE_POINT_OFFSET,
+                  ttSize.y + 2 * VALUE_POINT_OFFSET);
+         }
 
-				screenDefaultLocation.y = devY;
+         // check if value point is hidden by the tooltip
+         if (increasedShellArea.contains(screenValuePoint)) {
 
-				isSetLocation = true;
-			}
+            int screenUncoveredPosY;
 
-			screenDefaultLocation.x = screenOwnerLeft - (ttWidth / 2) + _devXOwnerMouseMove;
+            switch (pinnedLocation) {
+            case BottomLeft:
+            case BottomRight:
 
-			break;
+               // show tooltip below the value point
+               screenUncoveredPosY = screenValuePointTop + VALUE_POINT_OFFSET;
+               break;
 
-		case TopLeft:
-			screenDefaultLocation.x = screenEdgeLeft + _ttShellDiff.x;
-			screenDefaultLocation.y = screenEdgeTop + _ttShellDiff.y;
-			isCheckDefaultOffset = true;
-			break;
+            case Screen:
+            case TopLeft:
+            case TopRight:
+            default:
+               // show tooltip above the value point
+               screenUncoveredPosY = screenValuePointTop - VALUE_POINT_OFFSET - ttHeight;
+               break;
+            }
 
-		case BottomLeft:
-			screenDefaultLocation.x = screenEdgeLeft + _ttShellDiff.x;
-			screenDefaultLocation.y = screenEdgeBottom + _ttShellDiff.y;
-			isCheckDefaultOffset = true;
-			break;
+            _defaultOffsetY = screenDefaultLocation.y - screenUncoveredPosY;
 
-		case BottomRight:
-			screenDefaultLocation.x = screenEdgeRight + _ttShellDiff.x;
-			screenDefaultLocation.y = screenEdgeBottom + _ttShellDiff.y;
-			isCheckDefaultOffset = true;
-			break;
+            screenDefaultLocation.y = screenUncoveredPosY;
 
-		case TopRight:
-		default:
-			screenDefaultLocation.x = screenEdgeRight + _ttShellDiff.x;
-			screenDefaultLocation.y = screenEdgeTop + _ttShellDiff.y;
-			isCheckDefaultOffset = true;
-		}
+         } else {
 
-		final int defaultY = screenDefaultLocation.y;
+            // reset, very important !!!
+            _defaultOffsetY = 0;
+         }
+      }
 
-		// check if the new tooltip location is covering the value point
-		if (isCheckVPCovered && isCheckDefaultOffset) {
+      _screenDefaultTTShellLocation = screenDefaultLocation;
 
-			// increase tooltip size
-			Rectangle increasedShellArea;
-			if (isSetDefaultLocation) {
+      final Point screenNewLocation = fixupDisplayBounds(ttSize, screenDefaultLocation, screenValuePoint, isTTDragged);
 
-				increasedShellArea = new Rectangle(//
-						screenDefaultLocation.x - VALUE_POINT_OFFSET,
-						screenDefaultLocation.y - VALUE_POINT_OFFSET,
-						ttSize.x + 2 * VALUE_POINT_OFFSET,
-						ttSize.y + 2 * VALUE_POINT_OFFSET);
+      if (isTTDragged || isAnimation == false) {
 
-			} else {
+         // no animation, set location directly
 
-				increasedShellArea = new Rectangle(//
-						_screenRequestedAnimationLocation.x - VALUE_POINT_OFFSET,
-						_screenRequestedAnimationLocation.y - VALUE_POINT_OFFSET + _defaultOffsetY,
-						ttSize.x + 2 * VALUE_POINT_OFFSET,
-						ttSize.y + 2 * VALUE_POINT_OFFSET);
-			}
+         _ttShell.setLocation(screenNewLocation);
 
-			// check if value point is hidden by the tooltip
-			if (increasedShellArea.contains(screenValuePoint)) {
+      } else {
 
-				int screenUncoveredPosY;
+         if (_defaultOffsetY != 0 || _screenRequestedAnimationLocation.y != defaultY || isSetLocation) {
 
-				switch (pinnedLocation) {
-				case BottomLeft:
-				case BottomRight:
+            // move when default location is not yet reached
 
-					// show tooltip below the value point
-					screenUncoveredPosY = screenValuePointTop + VALUE_POINT_OFFSET;
-					break;
+            _screenRequestedAnimationLocation = screenNewLocation;
 
-				case Screen:
-				case TopLeft:
-				case TopRight:
-				default:
-					// show tooltip above the value point
-					screenUncoveredPosY = screenValuePointTop - VALUE_POINT_OFFSET - ttHeight;
-					break;
-				}
+            setTTShellLocation10Start();
+         }
+      }
+   }
 
-				_defaultOffsetY = screenDefaultLocation.y - screenUncoveredPosY;
+   /**
+    * Move tooltip according to the mouse position.
+    *
+    * @param devXMouseMove
+    * @param devYMouseMove
+    * @param valueDevPosition
+    */
+   void setTTShellLocation(final int devXMouseMove, final int devYMouseMove, final PointLong valueDevPosition) {
 
-				screenDefaultLocation.y = screenUncoveredPosY;
+      _devXOwnerMouseMove = devXMouseMove;
 
-			} else {
+      if (valueDevPosition == null) {
+         _ownerValueDevPosition = new PointLong(0, 0);
+      } else {
+         _ownerValueDevPosition = valueDevPosition;
+      }
 
-				// reset, very important !!!
-				_defaultOffsetY = 0;
-			}
-		}
+      setTTShellLocation(false, true, false, true);
+   }
 
-		_screenDefaultTTShellLocation = screenDefaultLocation;
+   private synchronized void setTTShellLocation10Start() {
 
-		final Point screenNewLocation = fixupDisplayBounds(ttSize, screenDefaultLocation, screenValuePoint, isTTDragged);
+      final int oldCounter = _animationCounter;
 
-		if (isTTDragged || isAnimation == false) {
+      _animationCounter = 8;
+      _repeatTime = 30;
 
-			// no animation, set location directly
+      // check if animation is already running
+      if (oldCounter == 0) {
 
-			_ttShell.setLocation(screenNewLocation);
+         // animation is not running, start a new animantion
+         _display.syncExec(_ttShellPositioningRunnable);
 
-		} else {
+      } else {
 
-			if (_defaultOffsetY != 0 || _screenRequestedAnimationLocation.y != defaultY || isSetLocation) {
+         // do the first movement
+         setTTShellLocation20Runnable();
+      }
+   }
 
-				// move when default location is not yet reached
+   private void setTTShellLocation20Runnable() {
 
-				_screenRequestedAnimationLocation = screenNewLocation;
+      if (_animationCounter == 0 || _ownerControl.isDisposed() || _ttShell == null || _ttShell.isDisposed()) {
+         return;
+      }
 
-				setTTShellLocation10Start();
-			}
-		}
-	}
+      Point nextLocation = null;
+      final Point currentLocation = _ttShell.getLocation();
 
-	/**
-	 * Move tooltip according to the mouse position.
-	 * 
-	 * @param devXMouseMove
-	 * @param devYMouseMove
-	 * @param valueDevPosition
-	 */
-	void setTTShellLocation(final int devXMouseMove, final int devYMouseMove, final PointLong valueDevPosition) {
+      if (_animationCounter == 1) {
 
-		_devXOwnerMouseMove = devXMouseMove;
+         // this is the last movement, move to the desired location
 
-		if (valueDevPosition == null) {
-			_ownerValueDevPosition = new PointLong(0, 0);
-		} else {
-			_ownerValueDevPosition = valueDevPosition;
-		}
+         nextLocation = _screenRequestedAnimationLocation;
 
-		setTTShellLocation(false, true, false, true);
-	}
+      } else {
 
-	private synchronized void setTTShellLocation10Start() {
+         // animate movement
 
-		final int oldCounter = _animationCounter;
+         final Point requestedLocation = _screenRequestedAnimationLocation;
 
-		_animationCounter = 8;
-		_repeatTime = 30;
+         final float diffX = currentLocation.x - requestedLocation.x;
+         final float diffY = currentLocation.y - requestedLocation.y;
 
-		// check if animation is already running
-		if (oldCounter == 0) {
+         final float stepX = diffX / _animationCounter;
+         final float stepY = diffY / _animationCounter;
 
-			// animation is not running, start a new animantion
-			_display.syncExec(_ttShellPositioningRunnable);
+         final float stepCounter = (_animationCounter - 1) * 1f;
 
-		} else {
+         final float devXRemainder = stepX * stepCounter;
+         final float devYRemainder = stepY * stepCounter;
 
-			// do the first movement
-			setTTShellLocation20Runnable();
-		}
-	}
+         final float devX = requestedLocation.x + devXRemainder;
+         final float devY = requestedLocation.y + devYRemainder;
 
-	private void setTTShellLocation20Runnable() {
+         nextLocation = new Point((int) devX, (int) devY);
+      }
 
-		if (_animationCounter == 0 || _ownerControl.isDisposed() || _ttShell == null || _ttShell.isDisposed()) {
-			return;
-		}
+      _ttShell.setLocation(nextLocation);
 
-		Point nextLocation = null;
-		final Point currentLocation = _ttShell.getLocation();
+      _animationCounter--;
 
-		if (_animationCounter == 1) {
+      if (_animationCounter > 0) {
+         // start new animation
+         _display.timerExec(_repeatTime, _ttShellPositioningRunnable);
+      }
+   }
 
-			// this is the last movement, move to the desired location
+   /**
+    * Should the tooltip displayed because of the given event.
+    * <p>
+    * <b>Subclasses may overwrite this to get custom behavior</b>
+    * </p>
+    *
+    * @param event
+    *           the event
+    * @return <code>true</code> if tooltip should be displayed
+    */
+   protected boolean shouldCreateToolTip(final Event event) {
 
-			nextLocation = _screenRequestedAnimationLocation;
+      final Object ttArea = getToolTipArea(event);
 
-		} else {
+      // No new area close the current tooltip
+      if (ttArea == null) {
+         hide();
+         return false;
+      }
 
-			// animate movement
+      final boolean rv = !ttArea.equals(_currentArea);
+      return rv;
+   }
 
-			final Point requestedLocation = _screenRequestedAnimationLocation;
+   /**
+    * This method is called before the tooltip is hidden
+    *
+    * @param event
+    *           the event trying to hide the tooltip
+    * @return <code>true</code> if the tooltip should be hidden
+    */
+   private boolean shouldHideToolTip(final Event event) {
 
-			final float diffX = currentLocation.x - requestedLocation.x;
-			final float diffY = currentLocation.y - requestedLocation.y;
+      if (event != null && event.type == SWT.MouseMove) {
 
-			final float stepX = diffX / _animationCounter;
-			final float stepY = diffY / _animationCounter;
+         final Object ttArea = getToolTipArea(event);
 
-			final float stepCounter = (_animationCounter - 1) * 1f;
+         // No new area close the current tooltip
+         if (ttArea == null) {
+            hide();
+            return false;
+         }
 
-			final float devXRemainder = stepX * stepCounter;
-			final float devYRemainder = stepY * stepCounter;
+         final boolean rv = !ttArea.equals(_currentArea);
+         return rv;
+      }
 
-			final float devX = requestedLocation.x + devXRemainder;
-			final float devY = requestedLocation.y + devYRemainder;
+      return true;
+   }
 
-			nextLocation = new Point((int) devX, (int) devY);
-		}
+   /**
+    * Start up the tooltip programmatically
+    *
+    * @param location
+    *           the location relative to the control the tooltip is shown
+    */
+   public void show(final Point location) {
 
-		_ttShell.setLocation(nextLocation);
+      /*
+       * show tooltip only when this is the active shell, this check is necessary that when a tour
+       * chart is opened in a dialog (e.g. adjust altitude) that a hidden tour chart tooltip in the
+       * tour chart view is also displayed
+       */
+      if (_display.getActiveShell() != _ownerControl.getShell() || _ownerControl.isVisible() == false) {
+         return;
+      }
 
-		_animationCounter--;
+      final Event event = new Event();
+      event.x = location.x;
+      event.y = location.y;
+      event.widget = _ownerControl;
 
-		if (_animationCounter > 0) {
-			// start new animation
-			_display.timerExec(_repeatTime, _ttShellPositioningRunnable);
-		}
-	}
+      toolTipCreate(event);
+   }
 
-	/**
-	 * Should the tooltip displayed because of the given event.
-	 * <p>
-	 * <b>Subclasses may overwrite this to get custom behavior</b>
-	 * </p>
-	 * 
-	 * @param event
-	 *            the event
-	 * @return <code>true</code> if tooltip should be displayed
-	 */
-	protected boolean shouldCreateToolTip(final Event event) {
+   private void toolTipCreate(final Event event) {
 
-		final Object ttArea = getToolTipArea(event);
+      if (shouldCreateToolTip(event)) {
 
-		// No new area close the current tooltip
-		if (ttArea == null) {
-			hide();
-			return false;
-		}
+         final Shell shell = new Shell(_ownerControl.getShell(), //
+               SWT.ON_TOP //
+//                     | SWT.TOOL
+                     | SWT.NO_FOCUS
+                     | SWT.NO_TRIM
+         //
+         );
 
-		final boolean rv = !ttArea.equals(_currentArea);
-		return rv;
-	}
+         shell.setLayout(new FillLayout());
 
-	/**
-	 * This method is called before the tooltip is hidden
-	 * 
-	 * @param event
-	 *            the event trying to hide the tooltip
-	 * @return <code>true</code> if the tooltip should be hidden
-	 */
-	private boolean shouldHideToolTip(final Event event) {
+         toolTipOpen(shell, event);
+      }
+   }
 
-		if (event != null && event.type == SWT.MouseMove) {
+   private void toolTipHide(final Shell ttShell, final Event event) {
 
-			final Object ttArea = getToolTipArea(event);
+      // initialize next animation, otherwise tooltip would never be displayed again
+      _animationCounter = 0;
 
-			// No new area close the current tooltip
-			if (ttArea == null) {
-				hide();
-				return false;
-			}
+      if (ttShell == null || ttShell.isDisposed()) {
+         return;
+      }
 
-			final boolean rv = !ttArea.equals(_currentArea);
-			return rv;
-		}
+      if (shouldHideToolTip(event)) {
 
-		return true;
-	}
+         final Shell ownerShell = _ownerControl.getShell();
+         ownerShell.removeListener(SWT.Deactivate, _ownerShellListener);
+         ownerShell.removeListener(SWT.Move, _ownerShellListener);
 
-	/**
-	 * Start up the tooltip programmatically
-	 * 
-	 * @param location
-	 *            the location relative to the control the tooltip is shown
-	 */
-	public void show(final Point location) {
+         _currentArea = null;
 
-		/*
-		 * show tooltip only when this is the active shell, this check is necessary that when a tour
-		 * chart is opened in a dialog (e.g. adjust altitude) that a hidden tour chart tooltip in
-		 * the tour chart view is also displayed
-		 */
-		if (_display.getActiveShell() != _ownerControl.getShell() || _ownerControl.isVisible() == false) {
-			return;
-		}
+         passOnEvent(ttShell, event);
 
-		final Event event = new Event();
-		event.x = location.x;
-		event.y = location.y;
-		event.widget = _ownerControl;
+         ttShell.dispose();
+         _ttShell = null;
 
-		toolTipCreate(event);
-	}
+         return;
+      }
+   }
 
-	private void toolTipCreate(final Event event) {
+   private void toolTipOpen(final Shell shell, final Event event) {
 
-		if (shouldCreateToolTip(event)) {
+      // Ensure that only one Tooltip is shown in time
+      if (_ttShell != null) {
+         toolTipHide(_ttShell, null);
+      }
 
-			final Shell shell = new Shell(_ownerControl.getShell(), //
-					SWT.ON_TOP //
-//							| SWT.TOOL
-							| SWT.NO_FOCUS
-							| SWT.NO_TRIM
-			//
-			);
+      _ttShell = shell;
 
-			shell.setLayout(new FillLayout());
+      // close tooltip if user selects outside of the shell
+      _ttShell.addListener(SWT.Deactivate, _ttShellListener);
 
-			toolTipOpen(shell, event);
-		}
-	}
+      final Shell ownerShell = _ownerControl.getShell();
+      ownerShell.addListener(SWT.Deactivate, _ownerShellListener);
+      ownerShell.addListener(SWT.Move, _ownerShellListener);
 
-	private void toolTipHide(final Shell ttShell, final Event event) {
+      toolTipShow(event);
+   }
 
-		// initialize next animation, otherwise tooltip would never be displayed again
-		_animationCounter = 0;
+   private void toolTipShow(final Event event) {
 
-		if (ttShell == null || ttShell.isDisposed()) {
-			return;
-		}
+      if (!_ttShell.isDisposed()) {
 
-		if (shouldHideToolTip(event)) {
+         _currentArea = getToolTipArea(event);
 
-			final Shell ownerShell = _ownerControl.getShell();
-			ownerShell.removeListener(SWT.Deactivate, _ownerShellListener);
-			ownerShell.removeListener(SWT.Move, _ownerShellListener);
+         createToolTipContentArea(event, _ttShell);
 
-			_currentArea = null;
+         addTooltipListener(_ttShell);
 
-			passOnEvent(ttShell, event);
+         _ttShell.pack();
 
-			ttShell.dispose();
-			_ttShell = null;
+         setTTShellLocation(false, false, false, true);
 
-			return;
-		}
-	};
-
-	private void toolTipOpen(final Shell shell, final Event event) {
-
-		// Ensure that only one Tooltip is shown in time
-		if (_ttShell != null) {
-			toolTipHide(_ttShell, null);
-		}
-
-		_ttShell = shell;
-
-		// close tooltip if user selects outside of the shell
-		_ttShell.addListener(SWT.Deactivate, _ttShellListener);
-
-		final Shell ownerShell = _ownerControl.getShell();
-		ownerShell.addListener(SWT.Deactivate, _ownerShellListener);
-		ownerShell.addListener(SWT.Move, _ownerShellListener);
-
-		toolTipShow(event);
-	}
-
-	private void toolTipShow(final Event event) {
-
-		if (!_ttShell.isDisposed()) {
-
-			_currentArea = getToolTipArea(event);
-
-			createToolTipContentArea(event, _ttShell);
-
-			addTooltipListener(_ttShell);
-
-			_ttShell.pack();
-
-			setTTShellLocation(false, false, false, true);
-
-			_ttShell.setVisible(true);
-		}
-	}
+         _ttShell.setVisible(true);
+      }
+   }
 }
