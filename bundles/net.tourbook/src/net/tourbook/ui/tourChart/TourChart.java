@@ -326,7 +326,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private ChartMarkerToolTip					_tourMarkerTooltip;
 	private TourSegmenterTooltip				_tourSegmenterTooltip;
 	private ChartTitleToolTip					_tourTitleTooltip;
-	private ValuePointToolTipUI				_valuePointTooltip;
+	private ValuePoint_ToolTip_UI				_valuePointTooltip;
 	//
 	private ControlListener						_ttControlListener					= new ControlListener();
 	private IKeyListener							_chartKeyListener						= new ChartKeyListener();
@@ -851,7 +851,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				handleTooltipMouseEvent(event, mouseDisplayPosition);
 			}
 		};
-		_valuePointTooltip = new ValuePointToolTipUI(vpToolTipOwner, _state);
+		_valuePointTooltip = new ValuePoint_ToolTip_UI(vpToolTipOwner, _state);
 		setValuePointToolTipProvider(_valuePointTooltip);
 
 		_photoTooltip = new ChartPhotoToolTip(this, _state);

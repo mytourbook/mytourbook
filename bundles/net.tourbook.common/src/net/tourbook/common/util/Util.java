@@ -43,6 +43,9 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
+import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
+
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -72,9 +75,6 @@ import org.eclipse.ui.XMLMemento;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 import org.xml.sax.Attributes;
-
-import net.tourbook.common.UI;
-import net.tourbook.common.time.TimeTools;
 
 public class Util {
 
@@ -147,7 +147,7 @@ public class Util {
       final List<String> list = Arrays.asList(arr);
       Collections.reverse(list);
 
-      String[] stringArray = new String[list.size()];
+      final String[] stringArray = new String[list.size()];
       
       for (int index = 0; index < list.size(); index++) {
          stringArray[index] = list.get(index);
@@ -609,7 +609,6 @@ public class Util {
    }
 
    /**
-    * @param state
     * @param enumName
     * @param defaultValue
     * @return Returns a enum value from a string or the default value when the enum value is

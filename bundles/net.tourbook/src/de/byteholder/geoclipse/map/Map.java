@@ -58,6 +58,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorCacheSWT;
 import net.tourbook.common.map.GeoPosition;
+import net.tourbook.common.tooltip.IPinned_Tooltip_Owner;
 import net.tourbook.common.util.HoveredAreaContext;
 import net.tourbook.common.util.IToolTipHideListener;
 import net.tourbook.common.util.IToolTipProvider;
@@ -66,7 +67,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TourToolTip;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourWayPoint;
-import net.tourbook.map.HoveredTour;
+import net.tourbook.map.HoveredTour_ToolTip_UI;
 import net.tourbook.map2.view.WayPointToolTipProvider;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.filter.geo.TourGeoFilter;
@@ -124,11 +125,12 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Resource;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
-public class Map extends Canvas {
+public class Map extends Canvas implements IPinned_Tooltip_Owner {
 
    private static final String          IMAGE_POI_IN_MAP                      = de.byteholder.geoclipse.poi.Messages.Image_POI_InMap;
    private static final String          IMAGE_SEARCH_TOURS_BY_LOCATION        = net.tourbook.Messages.Image__SearchToursByLocation;
@@ -238,6 +240,7 @@ public class Map extends Canvas {
    private static RGB             MAP_TRANSPARENT_RGB;
 
    private final IPreferenceStore _prefStore                 = TourbookPlugin.getPrefStore();
+   private IDialogSettings        _state;
    {
       MAP_TRANSPARENT_RGB = net.tourbook.common.UI.IS_OSX //
 //            ? new RGB(0x7e, 0x7f, 0x80)
@@ -439,36 +442,36 @@ public class Map extends Canvas {
    private final ListenerList<IPOIListener>         _poiListeners            = new ListenerList<>(ListenerList.IDENTITY);
 
    // measurement system
-   private float           _distanceUnitValue   = 1;
-   private String          _distanceUnitLabel   = UI.EMPTY_STRING;
-   private boolean         _isScaleVisible;
+   private float                  _distanceUnitValue   = 1;
+   private String                 _distanceUnitLabel   = UI.EMPTY_STRING;
+   private boolean                _isScaleVisible;
 
-   private final Color     _transparentColor;
-   private final Color     _defaultBackgroundColor;
+   private final Color            _transparentColor;
+   private final Color            _defaultBackgroundColor;
    /*
     * POI image
     */
-   private boolean         _isPoiVisible;
-   private boolean         _isPoiPositionInViewport;
+   private boolean                _isPoiVisible;
+   private boolean                _isPoiPositionInViewport;
    //
-   private final Image     _poiImage;
-   private final Rectangle _poiImageBounds;
-   private final Point     _poiImageDevPosition = new Point(0, 0);
+   private final Image            _poiImage;
+   private final Rectangle        _poiImageBounds;
+   private final Point            _poiImageDevPosition = new Point(0, 0);
    /*
     * POI tooltip
     */
-   private PoiToolTip      _poi_Tooltip;
-   private final int       _poi_Tooltip_OffsetY = 5;
+   private PoiToolTip             _poi_Tooltip;
+   private final int              _poi_Tooltip_OffsetY = 5;
 
-   private TourToolTip     _tour_ToolTip;
+   private TourToolTip            _tour_ToolTip;
 
-   private HoveredTour     _hoveredTour;
+   private HoveredTour_ToolTip_UI _hovered_ToolTip;
 
    /**
     * when <code>true</code> the loading... image is not displayed
     */
-   private boolean         _isLiveView;
-   private long            _lastMapDrawTime;
+   private boolean                _isLiveView;
+   private long                   _lastMapDrawTime;
 
    /*
     * These 4 tile positions correspond to the tiles which are needed to draw the map
@@ -568,13 +571,16 @@ public class Map extends Canvas {
 
    /**
     * Create a new Map
+    *
+    * @param state
     */
-   public Map(final Composite parent, final int style) {
+   public Map(final Composite parent, final int style, final IDialogSettings state) {
 
       super(parent, style | SWT.DOUBLE_BUFFERED);
 
       _display = getDisplay();
       _displayThread = _display.getThread();
+      _state = state;
 
       addAllListener();
       addDropTarget();
@@ -601,6 +607,8 @@ public class Map extends Canvas {
 
       _poiImage = TourbookPlugin.getImageDescriptor(IMAGE_POI_IN_MAP).createImage();
       _poiImageBounds = _poiImage.getBounds();
+
+      _hovered_ToolTip = new HoveredTour_ToolTip_UI(this, _state);
 
       paint_Overlay_0_SetupThread();
    }
@@ -1248,11 +1256,9 @@ public class Map extends Canvas {
       return rect;
    }
 
-   /**
-    * @return Returns hovered tour or <code>null</code> when a tour is not hovered
-    */
-   public HoveredTour getHoveredTours() {
-      return _hoveredTour;
+   @Override
+   public Control getControl() {
+      return this;
    }
 
    /**
@@ -1961,6 +1967,12 @@ public class Map extends Canvas {
       return gridGeoPos;
    }
 
+   @Override
+   public void handleMouseEvent(final Event event, final Point mouseDisplayPosition) {
+      // TODO Auto-generated method stub
+
+   }
+
    private void hideHoveredArea() {
 
       if (_tour_ToolTip == null) {
@@ -2241,17 +2253,14 @@ public class Map extends Canvas {
          }
       }
 
-      _hoveredTour = null;
 
       if (hoveredTourId != null) {
 
-//         System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ()")
-//               + ("\thoveredTile: " + hoveredTile)
-//               + ("\tTourID: " + hoveredTourId));
-//// TODO remove SYSTEM.OUT.PRINTLN
+         final ArrayList<Long> allHoveredTours = new ArrayList<>();
 
-         _hoveredTour = new HoveredTour();
-         _hoveredTour.hoveredTours.add(hoveredTourId);
+         allHoveredTours.add(hoveredTourId);
+
+         _hovered_ToolTip.setHoveredTour(allHoveredTours);
 
          return true;
       }

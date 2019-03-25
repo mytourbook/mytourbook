@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
-enum ValuePointToolTipOrientation {
+enum ValuePoint_ToolTip_Orientation {
 
    Vertical,
 

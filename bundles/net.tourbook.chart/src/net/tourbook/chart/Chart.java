@@ -18,6 +18,7 @@ package net.tourbook.chart;
 import java.util.HashMap;
 
 import net.tourbook.common.form.ViewForm;
+import net.tourbook.common.tooltip.IPinned_ToolTip;
 import net.tourbook.common.util.ITourToolTipProvider;
 
 import org.eclipse.core.runtime.ListenerList;
@@ -1245,7 +1246,7 @@ public class Chart extends ViewForm {
 		getToolTipControl().setTourToolTipProvider(tourToolTip);
 	}
 
-	public void setValuePointToolTipProvider(final IValuePointToolTip valuePointToolTip) {
+	public void setValuePointToolTipProvider(final IPinned_ToolTip valuePointToolTip) {
 		_chartComponents.componentGraph.valuePointToolTip = valuePointToolTip;
 	}
 

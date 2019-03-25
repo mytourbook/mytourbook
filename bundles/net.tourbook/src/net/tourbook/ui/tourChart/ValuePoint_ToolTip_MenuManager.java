@@ -34,12 +34,12 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Widget;
 
-public class ValuePointToolTipMenuManager {
+public class ValuePoint_ToolTip_MenuManager {
 
    static final String                 STATE_VALUE_POINT_TOOLTIP_VISIBLE_GRAPHS = "ValuePoint_ToolTip_VisibleGraphs";     //$NON-NLS-1$
    static final String                 STATE_VALUE_POINT_TOOLTIP_ORIENTATION    = "ValuePoint_ToolTip_Orientation";       //$NON-NLS-1$
 
-   static ValuePointToolTipOrientation DEFAULT_ORIENTATION                      = ValuePointToolTipOrientation.Horizontal;
+   static ValuePoint_ToolTip_Orientation DEFAULT_ORIENTATION                      = ValuePoint_ToolTip_Orientation.Horizontal;
 
    static final long                   VALUE_ID_ALTIMETER                       = 1 << 1;
    static final long                   VALUE_ID_ALTITUDE                        = 1 << 2;
@@ -76,7 +76,7 @@ public class ValuePointToolTipMenuManager {
    private IDialogSettings             _state;
    private TourData                    _tourData;
 
-   private ValuePointToolTipUI         _valuePointToolTipUI;
+   private ValuePoint_ToolTip_UI         _valuePointToolTipUI;
 
    private Menu                        _menu                                    = null;
 
@@ -154,11 +154,11 @@ public class ValuePointToolTipMenuManager {
 
    private final class ActionOrientation extends Action {
 
-      private ValuePointToolTipOrientation _orientation;
+      private ValuePoint_ToolTip_Orientation _orientation;
 
-      public ActionOrientation(final ValuePointToolTipOrientation orientation) {
+      public ActionOrientation(final ValuePoint_ToolTip_Orientation orientation) {
 
-         if (orientation == ValuePointToolTipOrientation.Horizontal) {
+         if (orientation == ValuePoint_ToolTip_Orientation.Horizontal) {
             setText(Messages.Tooltip_ValuePoint_Action_Orientation_Horizontal);
          } else {
             setText(Messages.Tooltip_ValuePoint_Action_Orientation_Vertical);
@@ -216,7 +216,7 @@ public class ValuePointToolTipMenuManager {
          /*
           * set defaults into the state
           */
-         final ValuePointToolTipOrientation orientation = ValuePointToolTipMenuManager.DEFAULT_ORIENTATION;
+         final ValuePoint_ToolTip_Orientation orientation = ValuePoint_ToolTip_MenuManager.DEFAULT_ORIENTATION;
          _state.put(STATE_VALUE_POINT_TOOLTIP_ORIENTATION, orientation.name());
 
          _allVisibleValueIds = DEFAULT_GRAPHS;
@@ -267,7 +267,7 @@ public class ValuePointToolTipMenuManager {
       }
    }
 
-   public ValuePointToolTipMenuManager(final ValuePointToolTipUI valuePointToolTipUI, final IDialogSettings state) {
+   public ValuePoint_ToolTip_MenuManager(final ValuePoint_ToolTip_UI valuePointToolTipUI, final IDialogSettings state) {
 
       _valuePointToolTipUI = valuePointToolTipUI;
       _state = state;
@@ -329,8 +329,8 @@ public class ValuePointToolTipMenuManager {
       _actionHideToolTip = new ActionHideToolTip();
       _actionSetDefaults = new ActionSetDefaults();
       _actionCloseTTContextMenu = new ActionCloseTTContextMenu();
-      _actionHorizontalOrientation = new ActionOrientation(ValuePointToolTipOrientation.Horizontal);
-      _actionVerticalOrientation = new ActionOrientation(ValuePointToolTipOrientation.Vertical);
+      _actionHorizontalOrientation = new ActionOrientation(ValuePoint_ToolTip_Orientation.Horizontal);
+      _actionVerticalOrientation = new ActionOrientation(ValuePoint_ToolTip_Orientation.Vertical);
 
       createPinActions();
       createGraphActions();

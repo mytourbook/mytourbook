@@ -67,6 +67,7 @@ import org.eclipse.swt.widgets.Widget;
 import net.tourbook.common.PointLong;
 import net.tourbook.common.RectangleLong;
 import net.tourbook.common.UI;
+import net.tourbook.common.tooltip.IPinned_ToolTip;
 
 /**
  * Draws the graph and axis into the canvas
@@ -342,7 +343,7 @@ public class ChartComponentGraph extends Canvas {
 	/**
 	 * Tooltip for value points, can be <code>null</code> when not set.
 	 */
-	IValuePointToolTip						valuePointToolTip;
+	IPinned_ToolTip						valuePointToolTip;
 
 	private ChartYSlider						_hitYSlider;
 	private ChartYSlider						_ySliderDragged;

@@ -1,19 +1,30 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package de.byteholder.geoclipse.mapprovider;
+
+import de.byteholder.geoclipse.Messages;
+import de.byteholder.geoclipse.map.Map;
+import de.byteholder.geoclipse.map.Tile;
+import de.byteholder.geoclipse.map.UI;
+import de.byteholder.geoclipse.map.event.IPositionListener;
+import de.byteholder.geoclipse.map.event.ITileListener;
+import de.byteholder.geoclipse.map.event.MapPositionEvent;
+import de.byteholder.geoclipse.map.event.TileEventId;
+import de.byteholder.geoclipse.preferences.PrefPageMapProviders;
+import de.byteholder.geoclipse.ui.ViewerDetailForm;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -60,17 +71,6 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.part.PageBook;
 
-import de.byteholder.geoclipse.Messages;
-import de.byteholder.geoclipse.map.Map;
-import de.byteholder.geoclipse.map.Tile;
-import de.byteholder.geoclipse.map.UI;
-import de.byteholder.geoclipse.map.event.IPositionListener;
-import de.byteholder.geoclipse.map.event.ITileListener;
-import de.byteholder.geoclipse.map.event.MapPositionEvent;
-import de.byteholder.geoclipse.map.event.TileEventId;
-import de.byteholder.geoclipse.preferences.PrefPageMapProviders;
-import de.byteholder.geoclipse.ui.ViewerDetailForm;
-
 public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefaultActions {
 
 	private static final String						PARAMETER_TRAILING_CHAR					= "}";													//$NON-NLS-1$
@@ -97,33 +97,35 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 	// tremola
 	private static final String						DEFAULT_EXAMPLE							= "http://tile.openstreetmap.org/15/17165/11587.png";	//$NON-NLS-1$
 
+	private static final ReentrantLock				LOG_LOCK								= new ReentrantLock();
+
 	/*
 	 * UI controls
 	 */
 	private Display									_display;
-
 	private Button									_btnOk;
-	private Composite								_leftContainer;
 
+	private Composite								_leftContainer;
 	private ViewerDetailForm						_detailForm;
+
 	private ToolBar									_toolbar;
 
 	private Label									_lblMapInfo;
-
 	private Label									_lblTileInfo;
 	private Button									_chkShowTileInfo;
 	private Text									_txtExampleUrl;
 	private Text									_txtCustomUrl;
 	private Combo									_cboTileImageLog;
-	private Button									_btnShowMap;
 
+	private Button									_btnShowMap;
 	private Spinner									_spinMinZoom;
 	private Spinner									_spinMaxZoom;
 	private Button									_btnShowOsmMap;
 	private Composite								_partContainer;
-	private Button									_chkShowTileImageLog;
 
+	private Button									_chkShowTileImageLog;
 	private Label									_lblLog;
+
 	private Text									_txtImageFormat;
 
 	/*
@@ -141,7 +143,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 	/**
 	 * url parameter items which can be selected in the combobox for each parameter
 	 */
-	private final ArrayList<PartUIItem>				PART_ITEMS								= new ArrayList<PartUIItem>();
+	private final ArrayList<PartUIItem>				PART_ITEMS								= new ArrayList<>();
 
 	{
 		PART_ITEMS.add(new PartUIItem(//
@@ -184,40 +186,38 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 	/**
 	 * contains all rows with url parts which are displayed in the UI
 	 */
-	private final ArrayList<PartRow>				PART_ROWS								= new ArrayList<PartRow>();
+	private final ArrayList<PartRow>				PART_ROWS								= new ArrayList<>();
 
 	private final IDialogSettings					_dialogSettings;
 
 	private final PrefPageMapProviders				_prefPageMapFactory;
 
 	private String									_defaultMessage;
-
 	/**
 	 * contains the custom url with all url parts which are converted to a string
 	 */
 	private String									_customUrl;
-	private String									_previousCustomUrl;
 
+	private String									_previousCustomUrl;
 	private MPCustom								_mpCustom;
+
 	private final MP								_defaultMapProvider;
 
 	private boolean									_isInitUI								= false;
-
 	private boolean									_isEnableTileImageLogging;
-	private final ConcurrentLinkedQueue<LogEntry>	_logEntries								= new ConcurrentLinkedQueue<LogEntry>();
 
+	private final ConcurrentLinkedQueue<LogEntry>	_logEntries								= new ConcurrentLinkedQueue<>();
 	private int										_statUpdateCounter						= 0;
 	private int										_statIsQueued;
 	private int										_statStartLoading;
 	private int										_statEndLoading;
-	private int										_statErrorLoading;
 
+	private int										_statErrorLoading;
 	private int										_previousMinZoom;
+
 	private int										_previousMaxZoom;
 
 	private PixelConverter							_pc;
-
-	private static final ReentrantLock				LOG_LOCK								= new ReentrantLock();
 
 	enum PART_TYPE {
 		NONE, //
@@ -314,17 +314,20 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		_defaultMapProvider = MapProviderManager.getInstance().getDefaultMapProvider();
 	}
 
-	public void actionZoomIn() {
+	@Override
+   public void actionZoomIn() {
 		_map.setZoom(_map.getZoom() + 1);
 		_map.paint();
 	}
 
-	public void actionZoomOut() {
+	@Override
+   public void actionZoomOut() {
 		_map.setZoom(_map.getZoom() - 1);
 		_map.paint();
 	}
 
-	public void actionZoomOutToMinZoom() {
+	@Override
+   public void actionZoomOutToMinZoom() {
 		_map.setZoom(_map.getMapProvider().getMinimumZoomLevel());
 		_map.paint();
 	}
@@ -345,7 +348,8 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		shell.setText(Messages.Dialog_CustomConfig_DialogTitle);
 
 		shell.addDisposeListener(new DisposeListener() {
-			public void widgetDisposed(final DisposeEvent e) {
+			@Override
+         public void widgetDisposed(final DisposeEvent e) {
 
 				MP.removeTileListener(DialogMPCustom.this);
 			}
@@ -534,10 +538,11 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 	private HashMap<WIDGET_KEY, Widget> createUI212ParaWidgets(final Composite parent) {
 
-		final HashMap<WIDGET_KEY, Widget> paraWidgets = new HashMap<WIDGET_KEY, Widget>();
+		final HashMap<WIDGET_KEY, Widget> paraWidgets = new HashMap<>();
 
 		final MouseWheelListener mouseWheelListener = new MouseWheelListener() {
-			public void mouseScrolled(final MouseEvent event) {
+			@Override
+         public void mouseScrolled(final MouseEvent event) {
 
 				Util.adjustSpinnerValueOnMouseScroll(event);
 
@@ -551,7 +556,8 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		};
 
 		final ModifyListener modifyListener = new ModifyListener() {
-			public void modifyText(final ModifyEvent e) {
+			@Override
+         public void modifyText(final ModifyEvent e) {
 				updateUICustomUrl();
 			}
 		};
@@ -648,7 +654,8 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 					}
 				});
 				fromSpinner.addModifyListener(new ModifyListener() {
-					public void modifyText(final ModifyEvent e) {
+					@Override
+               public void modifyText(final ModifyEvent e) {
 						if (_isInitUI) {
 							return;
 						}
@@ -677,7 +684,8 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 					}
 				});
 				toSpinner.addModifyListener(new ModifyListener() {
-					public void modifyText(final ModifyEvent e) {
+					@Override
+               public void modifyText(final ModifyEvent e) {
 						onSelectRandomSpinnerMax(paraWidgets);
 					}
 				});
@@ -710,7 +718,8 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 		Label label;
 		final MouseWheelListener mouseWheelListener = new MouseWheelListener() {
-			public void mouseScrolled(final MouseEvent event) {
+			@Override
+         public void mouseScrolled(final MouseEvent event) {
 
 				Util.adjustSpinnerValueOnMouseScroll(event);
 
@@ -766,7 +775,8 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 					}
 				});
 				_spinMinZoom.addModifyListener(new ModifyListener() {
-					public void modifyText(final ModifyEvent e) {
+					@Override
+               public void modifyText(final ModifyEvent e) {
 						if (_isInitUI) {
 							return;
 						}
@@ -798,7 +808,8 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 					}
 				});
 				_spinMaxZoom.addModifyListener(new ModifyListener() {
-					public void modifyText(final ModifyEvent e) {
+					@Override
+               public void modifyText(final ModifyEvent e) {
 						if (_isInitUI) {
 							return;
 						}
@@ -890,7 +901,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 					.applyTo(_toolbar);
 		}
 
-		_map = new Map(parent, SWT.BORDER | SWT.FLAT);
+      _map = new Map(parent, SWT.BORDER | SWT.FLAT, _dialogSettings);
 		GridDataFactory.fillDefaults()//
 				.grab(true, true)
 				.applyTo(_map);
@@ -900,7 +911,8 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 		_map.addMousePositionListener(new IPositionListener() {
 
-			public void setPosition(final MapPositionEvent event) {
+			@Override
+         public void setPosition(final MapPositionEvent event) {
 
 				final GeoPosition mousePosition = event.mapGeoPosition;
 
@@ -980,13 +992,15 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtExampleUrl);
 			_txtExampleUrl.setToolTipText(Messages.Dialog_MapConfig_Label_ExampleUrl_Tooltip);
 			_txtExampleUrl.addFocusListener(new FocusListener() {
-				public void focusGained(final FocusEvent e) {
+				@Override
+            public void focusGained(final FocusEvent e) {
 					if (e.widget instanceof Text) {
 						((Text) e.widget).selectAll();
 					}
 				}
 
-				public void focusLost(final FocusEvent e) {}
+				@Override
+            public void focusLost(final FocusEvent e) {}
 			});
 
 			// ############################################################
@@ -1156,7 +1170,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 	/**
 	 * Shows the part page which is selected in the combo
-	 * 
+	 *
 	 * @param combo
 	 * @param rowWidgets
 	 */
@@ -1304,7 +1318,8 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		return partTypeIndex;
 	}
 
-	public void tileEvent(final TileEventId tileEventId, final Tile tile) {
+	@Override
+   public void tileEvent(final TileEventId tileEventId, final Tile tile) {
 
 		// check if logging is enable
 		if (_isEnableTileImageLogging == false) {
@@ -1360,7 +1375,8 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 				final int	fRunnableCounter	= _statUpdateCounter;
 
-				public void run() {
+				@Override
+            public void run() {
 
 					// check if this is the last created runnable
 					if (fRunnableCounter != _statUpdateCounter) {
@@ -1465,7 +1481,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 	 */
 	private void updateModelUrlParts() {
 
-		final ArrayList<UrlPart> urlParts = new ArrayList<UrlPart>();
+		final ArrayList<UrlPart> urlParts = new ArrayList<>();
 		int rowIndex = 0;
 
 		for (final PartRow row : PART_ROWS) {

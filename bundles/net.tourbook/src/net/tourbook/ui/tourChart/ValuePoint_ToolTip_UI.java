@@ -21,10 +21,10 @@ import java.util.ArrayList;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ColorCache;
-import net.tourbook.chart.IValuePointToolTip;
 import net.tourbook.common.PointLong;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.tooltip.IPinned_ToolTip;
 import net.tourbook.common.tooltip.IPinned_Tooltip_Owner;
 import net.tourbook.common.tooltip.Pinned_ToolTip_Shell;
 import net.tourbook.common.util.Util;
@@ -60,7 +60,7 @@ import org.eclipse.swt.widgets.ToolItem;
  * This tooltip is displayed when the mouse is hovered over a value point in a line graph and
  * displays value point information.
  */
-public class ValuePointToolTipUI extends Pinned_ToolTip_Shell implements IValuePointToolTip {
+public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinned_ToolTip {
 
 // SET_FORMATTING_OFF
 
@@ -97,7 +97,7 @@ public class ValuePointToolTipUI extends Pinned_ToolTip_Shell implements IValueP
 
    private TourData                     _tourData;
 
-   private ValuePointToolTipMenuManager _ttMenuMgr;
+   private ValuePoint_ToolTip_MenuManager _ttMenuMgr;
    private ActionOpenTooltipMenu        _actionOpenTooltipMenu;
 
    private int                          _devXMouse;
@@ -223,7 +223,7 @@ public class ValuePointToolTipUI extends Pinned_ToolTip_Shell implements IValueP
 
    private class ActionOpenTooltipMenu extends Action {
 
-      public ActionOpenTooltipMenu(final ValuePointToolTipMenuManager tooltipMenuManager) {
+      public ActionOpenTooltipMenu(final ValuePoint_ToolTip_MenuManager tooltipMenuManager) {
          super(null, Action.AS_PUSH_BUTTON);
 
          setToolTipText(Messages.Tooltip_ValuePoint_Action_OpenToolTipMenu_ToolTip);
@@ -236,7 +236,7 @@ public class ValuePointToolTipUI extends Pinned_ToolTip_Shell implements IValueP
       }
    }
 
-   public ValuePointToolTipUI(final IPinned_Tooltip_Owner tooltipOwner, final IDialogSettings state) {
+   public ValuePoint_ToolTip_UI(final IPinned_Tooltip_Owner tooltipOwner, final IDialogSettings state) {
 
       super(tooltipOwner, state);
 
@@ -245,19 +245,19 @@ public class ValuePointToolTipUI extends Pinned_ToolTip_Shell implements IValueP
 
       _allVisibleValueIds = Util.getStateLong(
             state,
-            ValuePointToolTipMenuManager.STATE_VALUE_POINT_TOOLTIP_VISIBLE_GRAPHS,
-            ValuePointToolTipMenuManager.DEFAULT_GRAPHS);
+            ValuePoint_ToolTip_MenuManager.STATE_VALUE_POINT_TOOLTIP_VISIBLE_GRAPHS,
+            ValuePoint_ToolTip_MenuManager.DEFAULT_GRAPHS);
 
       /*
        * orientation
        */
       final String stateOrientation = Util.getStateString(
             state,
-            ValuePointToolTipMenuManager.STATE_VALUE_POINT_TOOLTIP_ORIENTATION,
-            ValuePointToolTipMenuManager.DEFAULT_ORIENTATION.name());
+            ValuePoint_ToolTip_MenuManager.STATE_VALUE_POINT_TOOLTIP_ORIENTATION,
+            ValuePoint_ToolTip_MenuManager.DEFAULT_ORIENTATION.name());
 
-      _isHorizontal = ValuePointToolTipOrientation.valueOf(
-            stateOrientation) == ValuePointToolTipOrientation.Horizontal;
+      _isHorizontal = ValuePoint_ToolTip_Orientation.valueOf(
+            stateOrientation) == ValuePoint_ToolTip_Orientation.Horizontal;
 
       addPrefListener();
    }
@@ -271,16 +271,16 @@ public class ValuePointToolTipUI extends Pinned_ToolTip_Shell implements IValueP
       hide();
    }
 
-   void actionOrientation(final ValuePointToolTipOrientation orientation, final boolean isReopenToolTip) {
+   void actionOrientation(final ValuePoint_ToolTip_Orientation orientation, final boolean isReopenToolTip) {
 
-      _isHorizontal = orientation == ValuePointToolTipOrientation.Horizontal;
+      _isHorizontal = orientation == ValuePoint_ToolTip_Orientation.Horizontal;
 
       if (isReopenToolTip) {
          reopen();
       }
    }
 
-   void actionSetDefaults(final long allVisibleValues, final ValuePointToolTipOrientation orientation) {
+   void actionSetDefaults(final long allVisibleValues, final ValuePoint_ToolTip_Orientation orientation) {
 
       actionOrientation(orientation, false);
       actionVisibleValues(allVisibleValues);
@@ -347,7 +347,7 @@ public class ValuePointToolTipUI extends Pinned_ToolTip_Shell implements IValueP
 
    private void createActions() {
 
-      _ttMenuMgr = new ValuePointToolTipMenuManager(this, state);
+      _ttMenuMgr = new ValuePoint_ToolTip_MenuManager(this, state);
 
       _actionOpenTooltipMenu = new ActionOpenTooltipMenu(_ttMenuMgr);
    }
@@ -1358,27 +1358,27 @@ public class ValuePointToolTipUI extends Pinned_ToolTip_Shell implements IValueP
 
 // SET_FORMATTING_OFF
 
-      final long visibleId_Altimeter                = getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_ALTIMETER);
-      final long visibleId_Altitude                = getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_ALTITUDE);
-      final long visibleId_Cadence                = getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_CADENCE);
-      final long visibleId_ChartZoomFactor            = getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_CHART_ZOOM_FACTOR);
-      final long visibleId_Distance                = getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_DISTANCE);
-      final long visibleId_Gears                   = getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_GEARS);
-      final long visibleId_Gradient                = getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_GRADIENT);
-      final long visibleId_Pace                   = getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_PACE);
-      final long visibleId_Power                   = getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_POWER);
-      final long visibleId_Pulse                   = getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_PULSE);
-      final long visibleId_RunDyn_StanceTime            = getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_RUN_DYN_STANCE_TIME);
-      final long visibleId_RunDyn_StanceTimeBalance   = getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_RUN_DYN_STANCE_TIME_BALANCED);
-      final long visibleId_RunDyn_StepLength            = getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_RUN_DYN_STEP_LENGTH);
-      final long visibleId_RunDyn_VerticalOscillation   = getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_RUN_DYN_VERTICAL_OSCILLATION);
-      final long visibleId_RunDyn_VerticalRatio         = getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_RUN_DYN_VERTICAL_RATIO);
-      final long visibleId_Speed                   = getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_SPEED);
-      final long visibleId_Temperature             = getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_TEMPERATURE);
-      final long visibleId_TimeDuration             = getState(ttVisibleValues,   ValuePointToolTipMenuManager.VALUE_ID_TIME_DURATION);
-      final long visibleId_TimeOfDay                = getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_TIME_OF_DAY);
-      final long visibleId_TimeSlice                = getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_TIME_SLICES);
-      final long visibleId_TourCompareResult         = getState(ttVisibleValues, ValuePointToolTipMenuManager.VALUE_ID_TOUR_COMPARE_RESULT);
+      final long visibleId_Altimeter                = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_ALTIMETER);
+      final long visibleId_Altitude                = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_ALTITUDE);
+      final long visibleId_Cadence                = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_CADENCE);
+      final long visibleId_ChartZoomFactor            = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_CHART_ZOOM_FACTOR);
+      final long visibleId_Distance                = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_DISTANCE);
+      final long visibleId_Gears                   = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_GEARS);
+      final long visibleId_Gradient                = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_GRADIENT);
+      final long visibleId_Pace                   = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_PACE);
+      final long visibleId_Power                   = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_POWER);
+      final long visibleId_Pulse                   = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_PULSE);
+      final long visibleId_RunDyn_StanceTime            = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_RUN_DYN_STANCE_TIME);
+      final long visibleId_RunDyn_StanceTimeBalance   = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_RUN_DYN_STANCE_TIME_BALANCED);
+      final long visibleId_RunDyn_StepLength            = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_RUN_DYN_STEP_LENGTH);
+      final long visibleId_RunDyn_VerticalOscillation   = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_RUN_DYN_VERTICAL_OSCILLATION);
+      final long visibleId_RunDyn_VerticalRatio         = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_RUN_DYN_VERTICAL_RATIO);
+      final long visibleId_Speed                   = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_SPEED);
+      final long visibleId_Temperature             = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_TEMPERATURE);
+      final long visibleId_TimeDuration             = getState(ttVisibleValues,   ValuePoint_ToolTip_MenuManager.VALUE_ID_TIME_DURATION);
+      final long visibleId_TimeOfDay                = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_TIME_OF_DAY);
+      final long visibleId_TimeSlice                = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_TIME_SLICES);
+      final long visibleId_TourCompareResult         = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_TOUR_COMPARE_RESULT);
 
       final boolean isAvailable_Altimeter          = _tourData.getAltimeterSerie() != null;
       final boolean isAvailable_Altitude             = _tourData.getAltitudeSerie() != null;

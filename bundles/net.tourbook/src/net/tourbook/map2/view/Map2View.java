@@ -1542,7 +1542,7 @@ public class Map2View extends ViewPart implements
 
       _mapLegend = new MapLegend();
 
-      _map = new Map(parent, SWT.NONE);
+      _map = new Map(parent, SWT.NONE, _state);
       _map.setPainting(false);
 
       _map.setDirectPainter(_directMappingPainter);

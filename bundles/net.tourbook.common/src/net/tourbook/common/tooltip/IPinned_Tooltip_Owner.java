@@ -21,6 +21,9 @@ import org.eclipse.swt.widgets.Event;
 
 public interface IPinned_Tooltip_Owner {
 
+   /**
+    * @return Returns the owner of the tooltip
+    */
    public Control getControl();
 
    /**
@@ -28,4 +31,4 @@ public interface IPinned_Tooltip_Owner {
     * @param mouseDisplayPosition
     */
    public void handleMouseEvent(Event event, Point mouseDisplayPosition);
-} 
+}
