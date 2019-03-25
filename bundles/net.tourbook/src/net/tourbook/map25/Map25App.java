@@ -178,6 +178,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	
    ItemizedLayer<MarkerItem> _layer_Bookmark;
    private MarkerToolkit _markertoolkit;
+   private int _markerMode = MarkerToolkit.modeDemo; // MarkerToolkit.modeDemo or MarkerToolkit.modeNormal
 
 	/**
 	 * Is <code>true</code> when a tour marker is hit.
@@ -970,50 +971,37 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	}
 
 	private void setupMap_Layers() {
-		System.out.println("################ setupMap_Layers:  entering"); //$NON-NLS-1$
-		final Layers layers = mMap.layers();
+	   System.out.println("################ setupMap_Layers:  entering"); //$NON-NLS-1$
+	   final Layers layers = mMap.layers();
 
-		// hillshading with 1MB RAM Cache, using existing _httpfactory with diskcache
-      _hillshadingSource =  DefaultSources.HIKEBIKE_HILLSHADE
-            .httpFactory(_httpFactory)
-            .zoomMin(1)
-            .zoomMax(16)
-            .build();  
-		_layer_HillShading = new BitmapTileLayer(mMap, _hillshadingSource, 1 << 20);
-		_layer_HillShading.setEnabled(false);
-		mMap.layers().add(_layer_HillShading);
-		
-		// tour
-		_layer_Tour = new TourLayer(mMap);
-		_layer_Tour.setEnabled(false);
-		layers.add(_layer_Tour);
+	   // hillshading with 1MB RAM Cache, using existing _httpfactory with diskcache
+	   _hillshadingSource =  DefaultSources.HIKEBIKE_HILLSHADE
+	         .httpFactory(_httpFactory)
+	         .zoomMin(1)
+	         .zoomMax(16)
+	         .build();  
+	   _layer_HillShading = new BitmapTileLayer(mMap, _hillshadingSource, 1 << 20);
+	   _layer_HillShading.setEnabled(false);
+	   mMap.layers().add(_layer_HillShading);
 
-		// slider path
-		_layer_SliderPath = new SliderPath_Layer(mMap);
-		_layer_SliderPath.setEnabled(false);
-		layers.add(_layer_SliderPath);
+	   // tour
+	   _layer_Tour = new TourLayer(mMap);
+	   _layer_Tour.setEnabled(false);
+	   layers.add(_layer_Tour);
 
-		// bookmarks
-		System.out.println("################ setupMap_Layers: calling constructor"); //$NON-NLS-1$
-		_markertoolkit = new MarkerToolkit(MarkerToolkit.shape_star);
-     _layer_Bookmark = new ItemizedLayer<>(
-           mMap,
-           new ArrayList<MarkerItem>(),
-           _markertoolkit._markerRendererFactory,
-           this);
-     //List<MarkerItem> pts = _markertoolkit.createDemoMarkerItemList();
-     List<MarkerItem> pts = _markertoolkit.createMarkerItemList();
-     _layer_Bookmark.addItems(pts);
-     _layer_Bookmark.setEnabled(true);
-     layers.add(_layer_Bookmark);
-     
-     
-     //buildings
-		/**
-		 * here i have to investigate
-		 * with this code i got always good S3DB, but online buildings did not look good
-		 * i have also to check if the layers becomes more, if i switch the mapprovider
-		 */
+	   // slider path
+	   _layer_SliderPath = new SliderPath_Layer(mMap);
+	   _layer_SliderPath.setEnabled(false);
+	   layers.add(_layer_SliderPath);
+
+
+
+	   //buildings
+	   /**
+	    * here i have to investigate
+	    * with this code i got always good S3DB, but online buildings did not look good
+	    * i have also to check if the layers becomes more, if i switch the mapprovider
+	    */
 //		// Buildings or S3DB  Block I
 //		_layer_mf_S3DB_Building = new S3DBLayer(mMap,_layer_BaseMap);  //this is working for mf, onlinemaps missing 2 walls and roof
 //		//_layer_mf_S3DB_Building = new S3DBLayer(mMap,l);  //private S3DBLayer	_layer_mf_S3DB_Building; //is working, but S3DB only once after programm start
@@ -1033,49 +1021,63 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 //			layers.add(_layer_Building);
 //		}
 
-		// building Block II
-		_layer_Building = new BuildingLayer(mMap, _layer_BaseMap);
-			_layer_Building.setEnabled(false);
-			layers.add(_layer_Building);
-		
-		// S3DB Block II, S3DB is complicate -> removed
-		/*_layer_mf_S3DB_Building = new S3DBLayer(mMap,_l);
+	   // building Block II
+	   _layer_Building = new BuildingLayer(mMap, _layer_BaseMap);
+	   _layer_Building.setEnabled(false);
+	   layers.add(_layer_Building);
+
+	   // S3DB Block II, S3DB is complicate -> removed
+	   /*_layer_mf_S3DB_Building = new S3DBLayer(mMap,_l);
 		if(_is_mf_Map) {
 			_layer_mf_S3DB_Building.setEnabled(true);
 			System.out.println("############ setupMaplayer: adding S3DBlayer ");
 			layers.add(_layer_mf_S3DB_Building);
 		}*/
 
-		// label
-		_layer_Label = new LabelLayerMT(mMap, _layer_BaseMap);
-		_layer_Label.setEnabled(false);
-		layers.add(_layer_Label);
 
-		// marker
-		_layer_Marker = new MarkerLayer(mMap, this);
-		_layer_Marker.setEnabled(false);
-		layers.add(_layer_Marker);
+	   // bookmarks
+	   System.out.println("################ setupMap_Layers: calling constructor"); //$NON-NLS-1$
+	   _markertoolkit = new MarkerToolkit(MarkerToolkit.shape_star);
+	   _layer_Bookmark = new ItemizedLayer<>(
+	         mMap,
+	         new ArrayList<MarkerItem>(),
+	         _markertoolkit._markerRendererFactory,
+	         this);
+	   List<MarkerItem> pts = _markertoolkit.createMarkerItemList(_markerMode);
+	   _layer_Bookmark.addItems(pts);
+	   _layer_Bookmark.setEnabled(true);
+	   layers.add(_layer_Bookmark);	
 
-		// slider location
-		_layer_SliderLocation = new SliderLocation_Layer(mMap);
-		_layer_SliderLocation.setEnabled(false);
-		layers.add(_layer_SliderLocation);
+	   // label
+	   _layer_Label = new LabelLayerMT(mMap, _layer_BaseMap);
+	   _layer_Label.setEnabled(false);
+	   layers.add(_layer_Label);
 
-		// scale bar
-		_layer_ScaleBar = createLayer_ScaleBar();
-		layers.add(_layer_ScaleBar);
+	   // marker
+	   _layer_Marker = new MarkerLayer(mMap, this);
+	   _layer_Marker.setEnabled(false);
+	   layers.add(_layer_Marker);
 
-		// layercheck
-		layers.toString();
+	   // slider location
+	   _layer_SliderLocation = new SliderLocation_Layer(mMap);
+	   _layer_SliderLocation.setEnabled(false);
+	   layers.add(_layer_SliderLocation);
 
-		// tile info
-		_layer_TileInfo = new TileGridLayerMT(mMap);
-		_layer_TileInfo.setEnabled(false);
-		layers.add(_layer_TileInfo);
-		
-		
-		System.out.println("################ setupMap_Layers:  leaving"); //$NON-NLS-1$
-		
+	   // scale bar
+	   _layer_ScaleBar = createLayer_ScaleBar();
+	   layers.add(_layer_ScaleBar);
+
+	   // layercheck
+	   layers.toString();
+
+	   // tile info
+	   _layer_TileInfo = new TileGridLayerMT(mMap);
+	   _layer_TileInfo.setEnabled(false);
+	   layers.add(_layer_TileInfo);
+
+
+	   System.out.println("################ setupMap_Layers:  leaving"); //$NON-NLS-1$
+
 	}
 
 	void stop() {
@@ -1109,7 +1111,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
 	public void updateUI_BookmarkLayer() {
 	   _layer_Bookmark.removeAllItems();
-	   List<MarkerItem> pts = _markertoolkit.createMarkerItemList();
+	   List<MarkerItem> pts = _markertoolkit.createMarkerItemList(_markerMode);
 	   _layer_Bookmark.addItems(pts);
 	}
 	
