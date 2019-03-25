@@ -21,11 +21,12 @@ import java.util.ArrayList;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ColorCache;
-import net.tourbook.chart.ITooltipOwner;
 import net.tourbook.chart.IValuePointToolTip;
 import net.tourbook.common.PointLong;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.tooltip.IPinned_Tooltip_Owner;
+import net.tourbook.common.tooltip.Pinned_ToolTip_Shell;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -59,7 +60,7 @@ import org.eclipse.swt.widgets.ToolItem;
  * This tooltip is displayed when the mouse is hovered over a value point in a line graph and
  * displays value point information.
  */
-public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValuePointToolTip {
+public class ValuePointToolTipUI extends Pinned_ToolTip_Shell implements IValuePointToolTip {
 
 // SET_FORMATTING_OFF
 
@@ -235,7 +236,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
       }
    }
 
-   public ValuePointToolTipUI(final ITooltipOwner tooltipOwner, final IDialogSettings state) {
+   public ValuePointToolTipUI(final IPinned_Tooltip_Owner tooltipOwner, final IDialogSettings state) {
 
       super(tooltipOwner, state);
 
@@ -284,7 +285,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
       actionOrientation(orientation, false);
       actionVisibleValues(allVisibleValues);
 
-      state.put(STATE_VALUE_POINT_PIN_LOCATION, DEFAULT_PIN_LOCATION.name());
+      state.put(STATE_PINNED_TOOLTIP_PIN_LOCATION, DEFAULT_PIN_LOCATION.name());
 
       actionPinLocation(DEFAULT_PIN_LOCATION);
    }
@@ -1203,7 +1204,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
    }
 
    @Override
-   void onDispose() {
+   protected void onDispose() {
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
 
@@ -1258,10 +1259,10 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
    }
 
    @Override
-   public void setChartMargins(final int marginTop, final int marginBottom) {
+   public void setSnapBorder(final int marginTop, final int marginBottom) {
 
-      this.chartMarginTop = marginTop;
-      this.chartMarginBottom = marginBottom;
+      this.snapBorder_Top = marginTop;
+      this.snapBorder_Bottom = marginBottom;
    }
 
    /**

@@ -13,11 +13,10 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.tourChart;
+package net.tourbook.common.tooltip;
 
-import net.tourbook.chart.ITooltipOwner;
 import net.tourbook.common.PointLong;
-import net.tourbook.common.util.Util;
+import net.tourbook.common.util.Util; 
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.ColumnViewer;
@@ -42,88 +41,87 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Part of this tooltip is copied from {@link ToolTip}.
  */
-public abstract class ValuePointToolTipShell {
+public abstract class Pinned_ToolTip_Shell {
 
-   private static final int                  VALUE_POINT_OFFSET                 = 20;
+   private static final int                          VALUE_POINT_OFFSET                   = 20;
 
-   private static final String               STATE_VALUE_POINT_TOOLTIP_X        = "ValuePoint_ToolTip_DiffPositionX";            //$NON-NLS-1$
-   private static final String               STATE_VALUE_POINT_TOOLTIP_Y        = "ValuePoint_ToolTip_DiffPositionY";            //$NON-NLS-1$
-   private static final String               STATE_MOUSE_X_POSITION_RELATIVE    = "ValuePoint_ToolTip_MouseXPositionRelative";   //$NON-NLS-1$
-   private static final String               STATE_IS_TOOLTIP_ABOVE_VALUE_POINT = "ValuePoint_ToolTip_IsToolTipAboveValuePoint"; //$NON-NLS-1$
-   static final String                       STATE_VALUE_POINT_PIN_LOCATION     = "ValuePoint_ToolTip_PinnedLocation";           //$NON-NLS-1$
+   private static final String                       STATE_MOUSE_X_POSITION_RELATIVE      = "Pinned_ToolTip_MouseXPositionRelative";   //$NON-NLS-1$
+   private static final String                       STATE_IS_TOOLTIP_ABOVE_VALUE_POINT   = "Pinned_ToolTip_IsToolTipAboveValuePoint"; //$NON-NLS-1$
+   private static final String                       STATE_PINNED_TOOLTIP_X               = "Pinned_ToolTip_DiffPositionX";            //$NON-NLS-1$
+   private static final String                       STATE_PINNED_TOOLTIP_Y               = "Pinned_ToolTip_DiffPositionY";            //$NON-NLS-1$
+   protected static final String                     STATE_PINNED_TOOLTIP_PIN_LOCATION    = "Pinned_ToolTip_PinnedLocation";           //$NON-NLS-1$
 
-   static final ValuePointToolTipPinLocation DEFAULT_PIN_LOCATION               = ValuePointToolTipPinLocation.TopRight;
+   protected static final Pinned_ToolTip_PinLocation DEFAULT_PIN_LOCATION                 = Pinned_ToolTip_PinLocation.TopRight;
 
-   private static final String               STATE_VP_TOOLTIP_SCREEN_PINNED_X   = "ValuePoint_ToolTip_ScreenPinnedX";            //$NON-NLS-1$
-   private static final String               STATE_VP_TOOLTIP_SCREEN_PINNED_Y   = "ValuePoint_ToolTip_ScreenPinnedY";            //$NON-NLS-1$
+   private static final String                       STATE_PINNED_TOOLTIP_SCREEN_PINNED_X = "Pinned_ToolTip_ScreenPinnedX";            //$NON-NLS-1$
+   private static final String                       STATE_PINNED_TOOLTIP_SCREEN_PINNED_Y = "Pinned_ToolTip_ScreenPinnedY";            //$NON-NLS-1$
 
-   IDialogSettings                           state;
+   protected IDialogSettings                         state;
 
-   private ITooltipOwner                     _tooltipOwner;
+   private IPinned_Tooltip_Owner                     _tooltipOwner;
 
-   private Shell                             _ttShell;
+   private Shell                                     _ttShell;
 
-   private Object                            _currentArea;
-   private Control                           _ownerControl;
+   private Object                                    _currentArea;
+   private Control                                   _ownerControl;
 
-   private OwnerShellListener                _ownerShellListener;
-   private OwnerControlListener              _ownerControlListener;
-   private TooltipListener                   _ttListener                        = new TooltipListener();
-   private TooltipShellListener              _ttShellListener                   = new TooltipShellListener();
+   private OwnerShellListener                        _ownerShellListener;
+   private OwnerControlListener                      _ownerControlListener;
+   private TooltipListener                           _ttListener                          = new TooltipListener();
+   private TooltipShellListener                      _ttShellListener                     = new TooltipShellListener();
 
-   private boolean                           _isTTDragged;
+   private boolean                                   _isTTDragged;
 
-   private int                               _devXTTMouseDown;
-   private int                               _devYTTMouseDown;
-   private int                               _devXOwnerMouseMove;
+   private int                                       _devXTTMouseDown;
+   private int                                       _devYTTMouseDown;
+   private int                                       _devXOwnerMouseMove;
 
    /**
-    * Relative y position for the pinned location
-    * {@link ValuePointToolTipPinLocation#MouseXPosition}
+    * Relative y position for the pinned location {@link Pinned_ToolTip_PinLocation#MouseXPosition}
     */
-   private int                               _devPinnedMouseXPositionRelative;
+   private int                                       _devPinnedMouseXPositionRelative;
 
    /**
     * Is <code>true</code> when the tool tip location is above the value point in the chart.
     */
-   private boolean                           _isTTAboveValuePoint               = true;
+   private boolean                                   _isTTAboveValuePoint                 = true;
 
    /**
     * Position where the hovered value is painted in the chart, the position is relative to the
     * client.
     */
-   private PointLong                         _ownerValueDevPosition             = new PointLong(0, 0);
+   private PointLong                                 _ownerValueDevPosition               = new PointLong(0, 0);
 
-   int                                       chartMarginTop;
-   int                                       chartMarginBottom;
+   protected int                                     snapBorder_Top;
+   protected int                                     snapBorder_Bottom;
 
    /**
     * Relative location for the tooltip shell to the pinned location when it's moved with the mouse.
     */
-   private Point                             _ttShellDiff                       = new Point(0, 0);
+   private Point                                     _ttShellDiff                         = new Point(0, 0);
 
    /**
     * Contains position where the tt shell should be positioned
     */
-   private Point                             _screenDefaultTTShellLocation;
+   private Point                                     _screenDefaultTTShellLocation;
 
    /**
     * Screen location for the screen pinned location
     */
-   private Point                             _screenScreenTTShellLocation;
+   private Point                                     _screenScreenTTShellLocation;
 
-   private Point                             _screenRequestedAnimationLocation  = new Point(0, 0);
+   private Point                                     _screenRequestedAnimationLocation    = new Point(0, 0);
 
-   ValuePointToolTipPinLocation              pinnedLocation;
+   Pinned_ToolTip_PinLocation                        pinnedLocation;
 
    /**
     * This value is > 0 when tooltip could not be set at the default location
     */
-   private int                               _defaultOffsetY;
-   private Display                           _display;
-   private Runnable                          _ttShellPositioningRunnable;
-   private int                               _animationCounter;
-   private int                               _repeatTime;
+   private int                                       _defaultOffsetY;
+   private Display                                   _display;
+   private Runnable                                  _ttShellPositioningRunnable;
+   private int                                       _animationCounter;
+   private int                                       _repeatTime;
 
    /*
     * UI resources
@@ -333,7 +331,7 @@ public abstract class ValuePointToolTipShell {
     * @param control
     *           the control on whose action the tooltip is shown
     */
-   public ValuePointToolTipShell(final ITooltipOwner tooltipOwner, final IDialogSettings state) {
+   public Pinned_ToolTip_Shell(final IPinned_Tooltip_Owner tooltipOwner, final IDialogSettings state) {
 
       _tooltipOwner = tooltipOwner;
       _ownerControl = tooltipOwner.getControl();
@@ -371,7 +369,7 @@ public abstract class ValuePointToolTipShell {
     *
     * @param locationId
     */
-   void actionPinLocation(final ValuePointToolTipPinLocation locationId) {
+   public void actionPinLocation(final Pinned_ToolTip_PinLocation locationId) {
 
       // set new location
       pinnedLocation = locationId;
@@ -533,7 +531,7 @@ public abstract class ValuePointToolTipShell {
       return new Point(tipLeft, tipTop);
    }
 
-   ValuePointToolTipPinLocation getPinnedLocation() {
+   public Pinned_ToolTip_PinLocation getPinnedLocation() {
       return pinnedLocation;
    }
 
@@ -554,7 +552,7 @@ public abstract class ValuePointToolTipShell {
       return _ownerControl;
    }
 
-   Shell getToolTipShell() {
+   protected Shell getToolTipShell() {
       return _ttShell;
    }
 
@@ -565,7 +563,7 @@ public abstract class ValuePointToolTipShell {
       toolTipHide(_ttShell, null);
    }
 
-   void onDispose() {
+   protected void onDispose() {
 
       _cursorDragged = (Cursor) Util.disposeResource(_cursorDragged);
       _cursorHand = (Cursor) Util.disposeResource(_cursorHand);
@@ -628,12 +626,12 @@ public abstract class ValuePointToolTipShell {
       final int xDiff = event.x - _devXTTMouseDown;
       final int yDiff = event.y - _devYTTMouseDown;
 
-      if (pinnedLocation == ValuePointToolTipPinLocation.Screen) {
+      if (pinnedLocation == Pinned_ToolTip_PinLocation.Screen) {
 
          _ttShellDiff.x = xDiff;
          _ttShellDiff.y = yDiff;
 
-      } else if (pinnedLocation == ValuePointToolTipPinLocation.MouseXPosition) {
+      } else if (pinnedLocation == Pinned_ToolTip_PinLocation.MouseXPosition) {
 
          _ttShellDiff.x = 0;
          _ttShellDiff.y = yDiff;
@@ -687,49 +685,49 @@ public abstract class ValuePointToolTipShell {
        * restore value point tooltip location, when location is not set, don't set it to 0,0 instead
        * use tooltip default location which is positioning the tooltip into the center of the chart
        */
-      if (state.get(STATE_VALUE_POINT_TOOLTIP_X) != null) {
+      if (state.get(STATE_PINNED_TOOLTIP_X) != null) {
 
          _ttShellDiff = new Point(//
-               Util.getStateInt(state, STATE_VALUE_POINT_TOOLTIP_X, 0),
-               Util.getStateInt(state, STATE_VALUE_POINT_TOOLTIP_Y, 0));
+               Util.getStateInt(state, STATE_PINNED_TOOLTIP_X, 0),
+               Util.getStateInt(state, STATE_PINNED_TOOLTIP_Y, 0));
       }
 
-      if (state.get(STATE_VP_TOOLTIP_SCREEN_PINNED_X) != null) {
+      if (state.get(STATE_PINNED_TOOLTIP_SCREEN_PINNED_X) != null) {
 
          _screenScreenTTShellLocation = new Point(
-               Util.getStateInt(state, STATE_VP_TOOLTIP_SCREEN_PINNED_X, 0),
-               Util.getStateInt(state, STATE_VP_TOOLTIP_SCREEN_PINNED_Y, 0));
+               Util.getStateInt(state, STATE_PINNED_TOOLTIP_SCREEN_PINNED_X, 0),
+               Util.getStateInt(state, STATE_PINNED_TOOLTIP_SCREEN_PINNED_Y, 0));
       }
 
       // tooltip orientation
       final String statePinnedLocation = Util.getStateString(
             state,
-            STATE_VALUE_POINT_PIN_LOCATION,
+            STATE_PINNED_TOOLTIP_PIN_LOCATION,
             DEFAULT_PIN_LOCATION.name());
 
-      pinnedLocation = ValuePointToolTipPinLocation.valueOf(statePinnedLocation);
+      pinnedLocation = Pinned_ToolTip_PinLocation.valueOf(statePinnedLocation);
 
       _devPinnedMouseXPositionRelative = Util.getStateInt(state, STATE_MOUSE_X_POSITION_RELATIVE, 0);
       _isTTAboveValuePoint = Util.getStateBoolean(state, STATE_IS_TOOLTIP_ABOVE_VALUE_POINT, true);
    }
 
-   void saveState() {
+   public void saveState() {
 
-      state.put(STATE_VALUE_POINT_TOOLTIP_X, _ttShellDiff.x);
-      state.put(STATE_VALUE_POINT_TOOLTIP_Y, _ttShellDiff.y);
+      state.put(STATE_PINNED_TOOLTIP_X, _ttShellDiff.x);
+      state.put(STATE_PINNED_TOOLTIP_Y, _ttShellDiff.y);
 
       if (_screenScreenTTShellLocation != null) {
 
-         state.put(STATE_VP_TOOLTIP_SCREEN_PINNED_X, _screenScreenTTShellLocation.x);
-         state.put(STATE_VP_TOOLTIP_SCREEN_PINNED_Y, _screenScreenTTShellLocation.y);
+         state.put(STATE_PINNED_TOOLTIP_SCREEN_PINNED_X, _screenScreenTTShellLocation.x);
+         state.put(STATE_PINNED_TOOLTIP_SCREEN_PINNED_Y, _screenScreenTTShellLocation.y);
       }
 
-      state.put(STATE_VALUE_POINT_PIN_LOCATION, pinnedLocation.name());
+      state.put(STATE_PINNED_TOOLTIP_PIN_LOCATION, pinnedLocation.name());
       state.put(STATE_MOUSE_X_POSITION_RELATIVE, _devPinnedMouseXPositionRelative);
       state.put(STATE_IS_TOOLTIP_ABOVE_VALUE_POINT, _isTTAboveValuePoint);
    }
 
-   void setShellVisible(final boolean isVisible) {
+   public void setShellVisible(final boolean isVisible) {
 
       if (_ttShell == null || _ttShell.isDisposed()) {
          return;
@@ -767,8 +765,8 @@ public abstract class ValuePointToolTipShell {
       // get edge default values
       final int screenEdgeLeft = screenOwnerLeft;
       final int screenEdgeRight = screenOwnerLeft + ownerWidth - ttWidth;
-      final int screenEdgeTop = screenOwnerTop + chartMarginTop;
-      final int screenEdgeBottom = screenOwnerBotton - ttHeight - chartMarginBottom;
+      final int screenEdgeTop = screenOwnerTop + snapBorder_Top;
+      final int screenEdgeBottom = screenOwnerBotton - ttHeight - snapBorder_Bottom;
 
       final Point screenValuePoint = _ownerControl.toDisplay(
             (int) _ownerValueDevPosition.x,
@@ -981,7 +979,7 @@ public abstract class ValuePointToolTipShell {
     * @param devYMouseMove
     * @param valueDevPosition
     */
-   void setTTShellLocation(final int devXMouseMove, final int devYMouseMove, final PointLong valueDevPosition) {
+   protected void setTTShellLocation(final int devXMouseMove, final int devYMouseMove, final PointLong valueDevPosition) {
 
       _devXOwnerMouseMove = devXMouseMove;
 

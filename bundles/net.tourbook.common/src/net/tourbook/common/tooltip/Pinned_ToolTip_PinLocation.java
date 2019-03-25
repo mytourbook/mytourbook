@@ -13,12 +13,12 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.tourChart;
+package net.tourbook.common.tooltip;
 
 /**
  * Location where the value point tooltip is pinned.
  */
-enum ValuePointToolTipPinLocation {
+public enum Pinned_ToolTip_PinLocation {
 
    /**
     * Tooltip is pinned to the screen which means it is not pinned.
@@ -37,4 +37,4 @@ enum ValuePointToolTipPinLocation {
     * Tooltip is pinned to the mouse x position.
     */
    MouseXPosition
-}
+} 

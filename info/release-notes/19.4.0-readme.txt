@@ -27,7 +27,12 @@ Changes
 
 * 2D Map
 
-  - Move option "Zoom + center to the mouse position" into new "2D Map Option" slideout
+  - Moved option "Zoom + center to the mouse position" into new "2D Map Option" slideout
+  
+
+* Tour Chart
+
+  - Value point tooltip is reseted to defaults
 
 
 Bugfix   

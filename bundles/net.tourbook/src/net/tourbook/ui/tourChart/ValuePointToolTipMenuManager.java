@@ -17,6 +17,7 @@ package net.tourbook.ui.tourChart;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.tooltip.Pinned_ToolTip_PinLocation;
 import net.tourbook.data.TourData;
 
 import org.eclipse.jface.action.Action;
@@ -177,9 +178,9 @@ public class ValuePointToolTipMenuManager {
 
    private class ActionPinLocation extends Action {
 
-      public ValuePointToolTipPinLocation _locationId;
+      public Pinned_ToolTip_PinLocation _locationId;
 
-      public ActionPinLocation(final ValuePointToolTipPinLocation locationId, final String text) {
+      public ActionPinLocation(final Pinned_ToolTip_PinLocation locationId, final String text) {
          setText(text);
          _locationId = locationId;
       }
@@ -190,10 +191,10 @@ public class ValuePointToolTipMenuManager {
          _valuePointToolTipUI.actionPinLocation(_locationId);
 
          // reopen tooltip menu with the new location
-         if (_locationId == ValuePointToolTipPinLocation.TopLeft
-               || _locationId == ValuePointToolTipPinLocation.TopRight
-               || _locationId == ValuePointToolTipPinLocation.BottomLeft
-               || _locationId == ValuePointToolTipPinLocation.BottomRight
+         if (_locationId == Pinned_ToolTip_PinLocation.TopLeft
+               || _locationId == Pinned_ToolTip_PinLocation.TopRight
+               || _locationId == Pinned_ToolTip_PinLocation.BottomLeft
+               || _locationId == Pinned_ToolTip_PinLocation.BottomRight
          //
          ) {
 // this is very annoying
@@ -475,27 +476,27 @@ public class ValuePointToolTipMenuManager {
       _actionPinLocation_Header = new Action(Messages.Tooltip_ValuePoint_Action_PinLocation_Header) {};
 
       _actionPinLocation_Screen = new ActionPinLocation(
-            ValuePointToolTipPinLocation.Screen,
+            Pinned_ToolTip_PinLocation.Screen,
             Messages.Tooltip_ValuePoint_Action_PinLocation_Screen);
 
       _actionPinLocation_TopLeft = new ActionPinLocation(
-            ValuePointToolTipPinLocation.TopLeft,
+            Pinned_ToolTip_PinLocation.TopLeft,
             Messages.Tooltip_ValuePoint_Action_PinLocation_TopLeft);
 
       _actionPinLocation_TopRight = new ActionPinLocation(
-            ValuePointToolTipPinLocation.TopRight,
+            Pinned_ToolTip_PinLocation.TopRight,
             Messages.Tooltip_ValuePoint_Action_PinLocation_TopRight);
 
       _actionPinLocation_BottomLeft = new ActionPinLocation(
-            ValuePointToolTipPinLocation.BottomLeft,
+            Pinned_ToolTip_PinLocation.BottomLeft,
             Messages.Tooltip_ValuePoint_Action_PinLocation_BottomLeft);
 
       _actionPinLocation_BottomRight = new ActionPinLocation(
-            ValuePointToolTipPinLocation.BottomRight,
+            Pinned_ToolTip_PinLocation.BottomRight,
             Messages.Tooltip_ValuePoint_Action_PinLocation_BottomRight);
 
       _actionPinLocation_MouseXPosition = new ActionPinLocation(
-            ValuePointToolTipPinLocation.MouseXPosition,
+            Pinned_ToolTip_PinLocation.MouseXPosition,
             Messages.Tooltip_ValuePoint_Action_PinLocation_MouseXPosition);
    }
 
@@ -508,16 +509,16 @@ public class ValuePointToolTipMenuManager {
 
    private void enableActions() {
 
-      final ValuePointToolTipPinLocation pinnedLocation = _valuePointToolTipUI.getPinnedLocation();
+      final Pinned_ToolTip_PinLocation pinnedLocation = _valuePointToolTipUI.getPinnedLocation();
 
       _actionPinLocation_Header.setEnabled(false);
 
-      _actionPinLocation_Screen.setChecked(pinnedLocation == ValuePointToolTipPinLocation.Screen);
-      _actionPinLocation_TopLeft.setChecked(pinnedLocation == ValuePointToolTipPinLocation.TopLeft);
-      _actionPinLocation_TopRight.setChecked(pinnedLocation == ValuePointToolTipPinLocation.TopRight);
-      _actionPinLocation_BottomLeft.setChecked(pinnedLocation == ValuePointToolTipPinLocation.BottomLeft);
-      _actionPinLocation_BottomRight.setChecked(pinnedLocation == ValuePointToolTipPinLocation.BottomRight);
-      _actionPinLocation_MouseXPosition.setChecked(pinnedLocation == ValuePointToolTipPinLocation.MouseXPosition);
+      _actionPinLocation_Screen.setChecked(pinnedLocation == Pinned_ToolTip_PinLocation.Screen);
+      _actionPinLocation_TopLeft.setChecked(pinnedLocation == Pinned_ToolTip_PinLocation.TopLeft);
+      _actionPinLocation_TopRight.setChecked(pinnedLocation == Pinned_ToolTip_PinLocation.TopRight);
+      _actionPinLocation_BottomLeft.setChecked(pinnedLocation == Pinned_ToolTip_PinLocation.BottomLeft);
+      _actionPinLocation_BottomRight.setChecked(pinnedLocation == Pinned_ToolTip_PinLocation.BottomRight);
+      _actionPinLocation_MouseXPosition.setChecked(pinnedLocation == Pinned_ToolTip_PinLocation.MouseXPosition);
 
       _actionValue_Header.setEnabled(false);
 

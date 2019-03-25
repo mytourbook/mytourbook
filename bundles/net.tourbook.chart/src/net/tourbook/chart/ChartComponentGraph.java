@@ -8320,7 +8320,7 @@ public class ChartComponentGraph extends Canvas {
 		final int marginTop = _chartComponents.getDevChartMarginTop();
 		final int marginBottom = _chartComponents.getDevChartMarginBottom();
 
-		valuePointToolTip.setChartMargins(marginTop, marginBottom);
+		valuePointToolTip.setSnapBorder(marginTop, marginBottom);
 
 		// update custom overlay
 		_isOverlayDirty = true;
