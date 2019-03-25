@@ -67,7 +67,6 @@ import net.tourbook.common.util.TourToolTip;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.map.HoveredTour;
-import net.tourbook.map2.view.HoveredTour_ToolTip;
 import net.tourbook.map2.view.WayPointToolTipProvider;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.filter.geo.TourGeoFilter;
@@ -75,7 +74,7 @@ import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
 import net.tourbook.ui.IInfoToolTipProvider;
 import net.tourbook.ui.IMapToolTipProvider;
 import net.tourbook.ui.MTRectangle;
- 
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
@@ -440,36 +439,36 @@ public class Map extends Canvas {
    private final ListenerList<IPOIListener>         _poiListeners            = new ListenerList<>(ListenerList.IDENTITY);
 
    // measurement system
-   private float               _distanceUnitValue   = 1;
-   private String              _distanceUnitLabel   = UI.EMPTY_STRING;
-   private boolean             _isScaleVisible;
+   private float           _distanceUnitValue   = 1;
+   private String          _distanceUnitLabel   = UI.EMPTY_STRING;
+   private boolean         _isScaleVisible;
 
-   private final Color         _transparentColor;
-   private final Color         _defaultBackgroundColor;
+   private final Color     _transparentColor;
+   private final Color     _defaultBackgroundColor;
    /*
     * POI image
     */
-   private boolean             _isPoiVisible;
-   private boolean             _isPoiPositionInViewport;
+   private boolean         _isPoiVisible;
+   private boolean         _isPoiPositionInViewport;
    //
-   private final Image         _poiImage;
-   private final Rectangle     _poiImageBounds;
-   private final Point         _poiImageDevPosition = new Point(0, 0);
+   private final Image     _poiImage;
+   private final Rectangle _poiImageBounds;
+   private final Point     _poiImageDevPosition = new Point(0, 0);
    /*
     * POI tooltip
     */
-   private PoiToolTip          _poi_Tooltip;
-   private final int           _poi_Tooltip_OffsetY = 5;
+   private PoiToolTip      _poi_Tooltip;
+   private final int       _poi_Tooltip_OffsetY = 5;
 
-   private TourToolTip         _tour_ToolTip;
-   private HoveredTour_ToolTip _hoveredTour_ToolTip;
-   private HoveredTour         _hoveredTour;
+   private TourToolTip     _tour_ToolTip;
+
+   private HoveredTour     _hoveredTour;
 
    /**
     * when <code>true</code> the loading... image is not displayed
     */
-   private boolean             _isLiveView;
-   private long                _lastMapDrawTime;
+   private boolean         _isLiveView;
+   private long            _lastMapDrawTime;
 
    /*
     * These 4 tile positions correspond to the tiles which are needed to draw the map
@@ -602,8 +601,6 @@ public class Map extends Canvas {
 
       _poiImage = TourbookPlugin.getImageDescriptor(IMAGE_POI_IN_MAP).createImage();
       _poiImageBounds = _poiImage.getBounds();
-
-      _hoveredTour_ToolTip = new HoveredTour_ToolTip(this);
 
       paint_Overlay_0_SetupThread();
    }
@@ -2255,8 +2252,6 @@ public class Map extends Canvas {
 
          _hoveredTour = new HoveredTour();
          _hoveredTour.hoveredTours.add(hoveredTourId);
-
-         _hoveredTour_ToolTip.show(new Point(devMouseX, devMouseY));
 
          return true;
       }
