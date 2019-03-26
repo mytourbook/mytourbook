@@ -38,6 +38,7 @@ public class MarkerConfig {
 	 */
 	public boolean					isShowMarkerLabel		= true;
 	public boolean					isShowMarkerPoint		= true;
+	public boolean             isShowBookmark       = true;
 	public int						markerOrientation		= Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
 
 	public RGB						markerFill_Color		= Map25ConfigManager.DEFAULT_MARKER_FILL_COLOR;

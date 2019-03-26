@@ -70,8 +70,8 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
    private Button    _chkShowLayer_Label;
    private Button    _chkShowLayer_Scale;
    private Button    _chkShowLayer_TileInfo;
-   private Button    _chkShowLayer_Bookmark;
-   private Button    _btn_refresh_Bookmark;
+//   private Button    _chkShowLayer_Bookmark;
+//   private Button    _btn_refresh_Bookmark;
 //   private Button    _chkShowLayer_S3DB;
    private Button    _chkUseDraggedKeyboardNavigation;
 
@@ -187,7 +187,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
             /*
              * Bookmark
              */    
-            final Composite containerBookmark = new Composite(group, SWT.NONE);
+/*            final Composite containerBookmark = new Composite(group, SWT.NONE);
             GridDataFactory.fillDefaults().grab(true, false).applyTo(containerBookmark);
             GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerBookmark);
             {
@@ -201,7 +201,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
                   _btn_refresh_Bookmark.setText("Update");
                   _btn_refresh_Bookmark.addListener(SWT.Selection, _btn_refresh_Bookmark_listener);
                }
-            }
+            }*/
          }
 
          
@@ -404,7 +404,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
       mapApp.getLayer_Building().setEnabled(_chkShowLayer_Building.getSelection());
       mapApp.getLayer_HillShading().setEnabled(_chkShowLayer_Hillshading.getSelection());
       mapApp.getLayer_Label().setEnabled(_chkShowLayer_Label.getSelection());
-      mapApp.getLayer_Bookmark().setEnabled(_chkShowLayer_Bookmark.getSelection());
+//      mapApp.getLayer_Bookmark().setEnabled(_chkShowLayer_Bookmark.getSelection());
 //      mapApp.getLayer_S3DB().setEnabled(_chkShowLayer_S3DB.getSelection());
       mapApp.getLayer_ScaleBar().setEnabled(_chkShowLayer_Scale.getSelection());
       mapApp.getLayer_TileInfo().setEnabled(_chkShowLayer_TileInfo.getSelection());
@@ -422,7 +422,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
       _chkShowLayer_Building.setSelection(mapApp.getLayer_Building().isEnabled());
       _chkShowLayer_Hillshading.setSelection(mapApp.getLayer_HillShading().isEnabled());
       _chkShowLayer_Label.setSelection(mapApp.getLayer_Label().isEnabled());
-      _chkShowLayer_Bookmark.setSelection(mapApp.getLayer_Bookmark().isEnabled());
+//      _chkShowLayer_Bookmark.setSelection(mapApp.getLayer_Bookmark().isEnabled());
 //      _chkShowLayer_S3DB.setSelection(mapApp.getLayer_S3DB().isEnabled());
 
       _chkShowLayer_Scale.setSelection(mapApp.getLayer_ScaleBar().isEnabled());

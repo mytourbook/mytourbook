@@ -638,6 +638,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
 		updateUI_MarkerLayer();
 
+		updateUI_BookmarkLayer();
+		
 		mMap.render();
 	}
 
