@@ -99,6 +99,7 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
 	private Button					_chkIsMarkerClustering;
 //	private Button					_chkIsShowMarkerLabel;
 	private Button					_chkIsShowMarkerPoint;
+	private Button             _chkIsShowBookmark;
 
 	private Combo					_comboClusterAlgorithm;
 	private Combo					_comboClusterOrientation;
@@ -265,6 +266,14 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
 
 	private void createUI_20_MarkerPoint(final Composite parent) {
 
+	   
+      {
+         // checkbox: Show bookmark
+         _chkIsShowBookmark = new Button(parent, SWT.CHECK);
+         _chkIsShowBookmark.setText("Show bookmarks");
+         _chkIsShowBookmark.addSelectionListener(_defaultSelectionListener);
+         GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsShowBookmark);
+      }  
 		{
 			// checkbox: Show point
 			_chkIsShowMarkerPoint = new Button(parent, SWT.CHECK);
@@ -714,6 +723,7 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
 
 	private void enableControls() {
 
+	   final boolean isBookmark = _chkIsShowBookmark.getSelection();
 		final boolean isMarkerPoint = _chkIsShowMarkerPoint.getSelection();
 		final boolean isClustering = _chkIsMarkerClustering.getSelection() && isMarkerPoint;
 
@@ -995,8 +1005,10 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
 			/*
 			 * Marker
 			 */
-//			_chkIsShowMarkerLabel.setSelection(config.isShowMarkerLabel);
+         _chkIsShowBookmark.setSelection(config.isShowBookmark);
+//       _chkIsShowMarkerLabel.setSelection(config.isShowMarkerLabel);
 			_chkIsShowMarkerPoint.setSelection(config.isShowMarkerPoint);
+
 			_comboMarkerOrientation.select(getOrientationIndex(config.markerOrientation));
 
 			_colorClusterSymbol_Outline.setColorValue(config.clusterOutline_Color);
@@ -1040,6 +1052,7 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
 		 */
 //		config.isShowMarkerLabel = _chkIsShowMarkerLabel.getSelection();
 		config.isShowMarkerPoint = _chkIsShowMarkerPoint.getSelection();
+		config.isShowBookmark = _chkIsShowBookmark.getSelection();
 		config.markerOrientation = getSelectedOrientation(_comboMarkerOrientation);
 		config.markerSymbol_Size = _spinnerMarkerSymbol_Size.getSelection();
 		config.markerOutline_Size = _spinnerMarkerOutline_Size.getSelection() / 1.0f;
@@ -1069,6 +1082,7 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
 	private void updateUI_Map() {
 		
 		_map25View.getMapApp().onModifyMarkerConfig();
+		
 	}
 
 }

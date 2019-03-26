@@ -2327,6 +2327,12 @@ public class Map2View extends ViewPart implements
       }
       _isInSelectBookmark = false;
    }
+   
+   @Override
+   public void onModifiedBookmark(MapBookmark mapbookmark) {
+      // TODO Auto-generated method stub
+      
+   }
 
    private void onSelectionChanged(final ISelection selection) {
 
@@ -3892,4 +3898,6 @@ public class Map2View extends ViewPart implements
          paintTours_10_All();
       }
    }
+
+
 }

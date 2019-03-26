@@ -178,7 +178,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	
    ItemizedLayer<MarkerItem> _layer_Bookmark;
    private MarkerToolkit _markertoolkit;
-   private int _markerMode = MarkerToolkit.modeDemo; // MarkerToolkit.modeDemo or MarkerToolkit.modeNormal
+   private int _markerMode = MarkerToolkit.modeNormal; // MarkerToolkit.modeDemo or MarkerToolkit.modeNormal
 
 	/**
 	 * Is <code>true</code> when a tour marker is hit.
@@ -638,6 +638,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
 		updateUI_MarkerLayer();
 
+		updateUI_BookmarkLayer();
+		
 		mMap.render();
 	}
 
@@ -1110,9 +1112,12 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	}
 
 	public void updateUI_BookmarkLayer() {
+	   final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
+	   final boolean isShowBookmark = config.isShowBookmark;
 	   _layer_Bookmark.removeAllItems();
 	   List<MarkerItem> pts = _markertoolkit.createMarkerItemList(_markerMode);
 	   _layer_Bookmark.addItems(pts);
+	   _layer_Bookmark.setEnabled(isShowBookmark);
 	}
 	
    @Override
