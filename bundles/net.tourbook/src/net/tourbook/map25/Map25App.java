@@ -1112,9 +1112,12 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	}
 
 	public void updateUI_BookmarkLayer() {
+	   final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
+	   final boolean isShowBookmark = config.isShowBookmark;
 	   _layer_Bookmark.removeAllItems();
 	   List<MarkerItem> pts = _markertoolkit.createMarkerItemList(_markerMode);
 	   _layer_Bookmark.addItems(pts);
+	   _layer_Bookmark.setEnabled(isShowBookmark);
 	}
 	
    @Override
