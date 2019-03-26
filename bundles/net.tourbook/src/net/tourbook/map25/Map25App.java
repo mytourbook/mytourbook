@@ -178,7 +178,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	
    ItemizedLayer<MarkerItem> _layer_Bookmark;
    private MarkerToolkit _markertoolkit;
-   private int _markerMode = MarkerToolkit.modeDemo; // MarkerToolkit.modeDemo or MarkerToolkit.modeNormal
+   private int _markerMode = MarkerToolkit.modeNormal; // MarkerToolkit.modeDemo or MarkerToolkit.modeNormal
 
 	/**
 	 * Is <code>true</code> when a tour marker is hit.
