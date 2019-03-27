@@ -22,6 +22,12 @@ Improvements
   - Option for fast map drawing 
 
 
+* 2.5D Map
+
+  - Map bookmarks can be displayed in the map
+
+
+
 Changes
 =======
 
