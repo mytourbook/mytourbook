@@ -1835,8 +1835,7 @@ public class TourManager {
 
          tourData.timeSerie = removeTimeSlices_Integer(intSerie, firstIndex, lastIndex);
 
-         doubleSerie = tourData.getTimeSerieDouble();
-         tourData.setTimeSerieDouble(removeTimeSlices_Double(doubleSerie, firstIndex, lastIndex));
+         // time double serie is cleaned up further down in tourData.clearComputedSeries();
       }
 
       doubleSerie = tourData.latitudeSerie;
@@ -1877,15 +1876,15 @@ public class TourManager {
       /*
        * get speed/power data when it's from the device
        */
-      final boolean isTourPower = tourData.isPowerSerieFromDevice();
-      final boolean isTourSpeed = tourData.isSpeedSerieFromDevice();
-      if (isTourPower) {
+      final boolean isDevicePowerSerie = tourData.isPowerSerieFromDevice();
+      final boolean isDeviceSpeedSerie = tourData.isSpeedSerieFromDevice();
+      if (isDevicePowerSerie) {
          floatSerie = tourData.getPowerSerie();
          if (floatSerie != null) {
             tourData.setPowerSerie(removeTimeSlices_Float(floatSerie, firstIndex, lastIndex));
          }
       }
-      if (isTourSpeed) {
+      if (isDeviceSpeedSerie) {
          floatSerie = tourData.getSpeedSerieFromDevice();
          if (floatSerie != null) {
             tourData.setSpeedSerie(removeTimeSlices_Float(floatSerie, firstIndex, lastIndex));
