@@ -109,7 +109,7 @@ public class ActionMap25_ShowMarker extends ContributionItem implements IOpening
 
          _slideoutMarkerOptions = new SlideoutMap25_MarkerOptions(_parent, _toolBar, _state, _map25View);
 
-         updateUI();
+         updateUI_ActionTooltip();
       }
    }
 
@@ -125,7 +125,7 @@ public class ActionMap25_ShowMarker extends ContributionItem implements IOpening
 
    private void onAction() {
 
-      updateUI();
+      updateUI_ActionTooltip();
 
       final boolean isMarkerVisible = _actionToolItem.getSelection();
 
@@ -210,10 +210,10 @@ public class ActionMap25_ShowMarker extends ContributionItem implements IOpening
 
       _actionToolItem.setSelection(isSelected);
 
-      updateUI();
+      updateUI_ActionTooltip();
    }
 
-   private void updateUI() {
+   private void updateUI_ActionTooltip() {
 
       if (_actionToolItem.getSelection()) {
 

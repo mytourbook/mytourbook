@@ -98,7 +98,6 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
    private Button                _btnReset;
 
    private Button                _chkIsMarkerClustering;
-//   private Button               _chkIsShowMarkerLabel;
    private Button                _chkIsShowTourMarker;
    private Button                _chkIsShowBookmark;
 
@@ -1017,9 +1016,8 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
          /*
           * Marker
           */
-         _chkIsShowBookmark.setSelection(config.isShowBookmark);
-//       _chkIsShowMarkerLabel.setSelection(config.isShowMarkerLabel);
-         _chkIsShowTourMarker.setSelection(config.isShowMarkerPoint);
+         _chkIsShowBookmark.setSelection(config.isShowMapBookmark);
+         _chkIsShowTourMarker.setSelection(config.isShowTourMarker);
 
          _comboMarkerOrientation.select(getOrientationIndex(config.markerOrientation));
 
@@ -1062,9 +1060,9 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
       /*
        * Marker
        */
-//      config.isShowMarkerLabel = _chkIsShowMarkerLabel.getSelection();
-      config.isShowMarkerPoint = _chkIsShowTourMarker.getSelection();
-      config.isShowBookmark = _chkIsShowBookmark.getSelection();
+      config.isShowTourMarker = _chkIsShowTourMarker.getSelection();
+      config.isShowMapBookmark = _chkIsShowBookmark.getSelection();
+
       config.markerOrientation = getSelectedOrientation(_comboMarkerOrientation);
       config.markerSymbol_Size = _spinnerMarkerSymbol_Size.getSelection();
       config.markerOutline_Size = _spinnerMarkerOutline_Size.getSelection() / 1.0f;
