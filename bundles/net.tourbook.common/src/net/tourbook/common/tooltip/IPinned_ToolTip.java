@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.common.tooltip;
 
-import net.tourbook.common.PointLong;
-
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -36,6 +34,17 @@ public interface IPinned_ToolTip {
    void hide();
 
    /**
+    * Mouse has been moved to a new or still the old position.
+    *
+    * @param devMouseX
+    * @param devMouseY
+    * @param hoveredData
+    */
+   void setHoveredData(int devMouseX,
+                       int devMouseY,
+                       Object hoveredData);
+
+   /**
     * Set chart margins, this is used to position the value point tool tip correctly at the chart
     * border.
     *
@@ -43,21 +52,5 @@ public interface IPinned_ToolTip {
     * @param snapBorder_Bottom
     */
    void setSnapBorder(int snapBorder_Top, int snapBorder_Bottom);
-
-   /**
-    * Mouse has been moved to a new or still the old value index.
-    *
-    * @param valueIndex
-    * @param devXMouseMove
-    * @param devYMouseMove
-    * @param valueDevPosition
-    *           Position where the value is painted in the chart
-    * @param chartZoomFactor
-    */
-   void setValueIndex(int valueIndex,
-                      int devXMouseMove,
-                      int devYMouseMove,
-                      PointLong valueDevPosition,
-                      double chartZoomFactor);
 
 }

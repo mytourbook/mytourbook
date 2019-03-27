@@ -67,6 +67,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TourToolTip;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourWayPoint;
+import net.tourbook.map.HoveredTourData;
 import net.tourbook.map.HoveredTour_ToolTip_UI;
 import net.tourbook.map2.view.WayPointToolTipProvider;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -542,6 +543,8 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
    private boolean             _isFastMapPainting;
    private boolean             _isFastMapPainting_Active;
    private int                 _fastMapPainting_skippedValues;
+
+   private ArrayList<Long>     _allHoveredTours        = new ArrayList<>();
 
    /**
     * This observer is called in the {@link Tile} when a tile image is set into the tile
@@ -2253,19 +2256,22 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
          }
       }
 
+      _allHoveredTours.clear();
 
       if (hoveredTourId != null) {
 
-         final ArrayList<Long> allHoveredTours = new ArrayList<>();
+         _allHoveredTours.add(hoveredTourId);
 
-         allHoveredTours.add(hoveredTourId);
-
-         _hovered_ToolTip.setHoveredTour(allHoveredTours);
+         _hovered_ToolTip.setHoveredData(devMouseX, devMouseY, new HoveredTourData(_allHoveredTours));
 
          return true;
-      }
 
-      return false;
+      } else {
+
+         _hovered_ToolTip.setHoveredData(devMouseX, devMouseY, null);
+
+         return false;
+      }
    }
 
    /**
@@ -5360,6 +5366,21 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
       _isShowDebug_GeoGrid = isShowGeoGrid;
 
       paint();
+   }
+
+   public void setShowHoveredTourTooltip(final boolean isVisible) {
+
+      if (isVisible) {
+
+         _hovered_ToolTip.setHoveredData(
+               _mouseMove_DevPosition_X,
+               _mouseMove_DevPosition_Y,
+               _allHoveredTours.size() > 0 ? new HoveredTourData(_allHoveredTours) : null);
+
+      } else {
+
+         _hovered_ToolTip.setShellVisible(false);
+      }
    }
 
    /**

@@ -16,7 +16,7 @@
 package net.tourbook.common.tooltip;
 
 import net.tourbook.common.PointLong;
-import net.tourbook.common.util.Util; 
+import net.tourbook.common.util.Util;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.ColumnViewer;
@@ -87,10 +87,10 @@ public abstract class Pinned_ToolTip_Shell {
    private boolean                                   _isTTAboveValuePoint                 = true;
 
    /**
-    * Position where the hovered value is painted in the chart, the position is relative to the
+    * Position where the mouse is hovered, the position is relative to the
     * client.
     */
-   private PointLong                                 _ownerValueDevPosition               = new PointLong(0, 0);
+   private PointLong                                 _ownerValuePoint_DevPosition         = new PointLong(0, 0);
 
    protected int                                     snapBorder_Top;
    protected int                                     snapBorder_Bottom;
@@ -577,7 +577,7 @@ public abstract class Pinned_ToolTip_Shell {
        * get the tt vertical position
        */
       // value point position
-      final int devYValuePoint = _ownerControl.toDisplay(0, (int) _ownerValueDevPosition.y).y;
+      final int devYValuePoint = _ownerControl.toDisplay(0, (int) _ownerValuePoint_DevPosition.y).y;
 
       final Rectangle scrTTBounds = _ttShell.getBounds();
       final int srcTTTop = scrTTBounds.y;
@@ -769,8 +769,8 @@ public abstract class Pinned_ToolTip_Shell {
       final int screenEdgeBottom = screenOwnerBotton - ttHeight - snapBorder_Bottom;
 
       final Point screenValuePoint = _ownerControl.toDisplay(
-            (int) _ownerValueDevPosition.x,
-            (int) _ownerValueDevPosition.y);
+            (int) _ownerValuePoint_DevPosition.x,
+            (int) _ownerValuePoint_DevPosition.y);
       final int screenValuePointTop = screenValuePoint.y;
 
       boolean isSetLocation = isSetDefaultLocation;
@@ -977,16 +977,16 @@ public abstract class Pinned_ToolTip_Shell {
     *
     * @param devXMouseMove
     * @param devYMouseMove
-    * @param valueDevPosition
+    * @param valuePoint_DevPosition
     */
-   protected void setTTShellLocation(final int devXMouseMove, final int devYMouseMove, final PointLong valueDevPosition) {
+   protected void setTTShellLocation(final int devXMouseMove, final int devYMouseMove, final PointLong valuePoint_DevPosition) {
 
       _devXOwnerMouseMove = devXMouseMove;
 
-      if (valueDevPosition == null) {
-         _ownerValueDevPosition = new PointLong(0, 0);
+      if (valuePoint_DevPosition == null) {
+         _ownerValuePoint_DevPosition = new PointLong(0, 0);
       } else {
-         _ownerValueDevPosition = valueDevPosition;
+         _ownerValuePoint_DevPosition = valuePoint_DevPosition;
       }
 
       setTTShellLocation(false, true, false, true);

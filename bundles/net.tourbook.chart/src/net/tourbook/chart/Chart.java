@@ -301,7 +301,7 @@ public class Chart extends ViewForm {
 		}
 
 		final ChartComponentGraph componentGraph = _chartComponents.getChartComponentGraph();
-		final int hoveredLineValueIndex = componentGraph.getHoveredValuePointIndex();
+		final int hoveredLineValueIndex = componentGraph.getHoveredValue_PointIndex();
 		boolean isUseLeftSlider = false;
 		if (hoveredLineValueIndex == -1) {
 
@@ -660,7 +660,7 @@ public class Chart extends ViewForm {
 	 *         <code>-1</code> when a value is not hovered.
 	 */
 	public int getHoveredValuePointIndex() {
-		return _chartComponents.getChartComponentGraph().getHoveredValuePointIndex();
+		return _chartComponents.getChartComponentGraph().getHoveredValue_PointIndex();
 	}
 
 	public int getLeftAxisWidth() {

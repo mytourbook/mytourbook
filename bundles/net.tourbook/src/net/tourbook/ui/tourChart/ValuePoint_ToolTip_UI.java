@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ColorCache;
-import net.tourbook.common.PointLong;
+import net.tourbook.chart.HoveredValuePointData;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.tooltip.IPinned_ToolTip;
@@ -91,37 +91,37 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
 // SET_FORMATTING_ON
 
-   private final IPreferenceStore       _prefStore     = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore         _prefStore     = TourbookPlugin.getPrefStore();
 
-   private IPropertyChangeListener      _prefChangeListener;
+   private IPropertyChangeListener        _prefChangeListener;
 
-   private TourData                     _tourData;
+   private TourData                       _tourData;
 
    private ValuePoint_ToolTip_MenuManager _ttMenuMgr;
-   private ActionOpenTooltipMenu        _actionOpenTooltipMenu;
+   private ActionOpenTooltipMenu          _actionOpenTooltipMenu;
 
-   private int                          _devXMouse;
-   private int                          _devYMouse;
+   private int                            _devXMouse;
+   private int                            _devYMouse;
 
    /**
     * Global state if the tooltip is visible.
     */
-   private boolean                      _isToolTipVisible;
-   private int                          _currentValueIndex;
-   private int                          _valueUnitDistance;
-   private double                       _chartZoomFactor;
+   private boolean                        _isToolTipVisible;
+   private int                            _currentValueIndex;
+   private int                            _valueUnitDistance;
+   private double                         _chartZoomFactor;
 
-   private int[]                        _updateCounter = new int[] { 0 };
-   private long                         _lastUpdateUITime;
-   private boolean                      _isHorizontal;
+   private int[]                          _updateCounter = new int[] { 0 };
+   private long                           _lastUpdateUITime;
+   private boolean                        _isHorizontal;
 
-   private final NumberFormat           _nf0           = NumberFormat.getNumberInstance();
-   private final NumberFormat           _nf1           = NumberFormat.getNumberInstance();
-   private final NumberFormat           _nf1min        = NumberFormat.getNumberInstance();
-   private final NumberFormat           _nf1NoGroup    = NumberFormat.getNumberInstance();
-   private final NumberFormat           _nf2           = NumberFormat.getNumberInstance();
-   private final NumberFormat           _nf3           = NumberFormat.getNumberInstance();
-   private final NumberFormat           _nf3NoGroup    = NumberFormat.getNumberInstance();
+   private final NumberFormat             _nf0           = NumberFormat.getNumberInstance();
+   private final NumberFormat             _nf1           = NumberFormat.getNumberInstance();
+   private final NumberFormat             _nf1min        = NumberFormat.getNumberInstance();
+   private final NumberFormat             _nf1NoGroup    = NumberFormat.getNumberInstance();
+   private final NumberFormat             _nf2           = NumberFormat.getNumberInstance();
+   private final NumberFormat             _nf3           = NumberFormat.getNumberInstance();
+   private final NumberFormat             _nf3NoGroup    = NumberFormat.getNumberInstance();
    {
       _nf0.setMinimumFractionDigits(0);
       _nf0.setMaximumFractionDigits(0);
@@ -1259,6 +1259,37 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
    }
 
    @Override
+   public void setHoveredData(final int devXMouseMove, final int devYMouseMove, final Object hoveredData) {
+
+      if (_tourData == null || _isToolTipVisible == false) {
+         return;
+      }
+
+      final HoveredValuePointData hoveredValuePointData = (HoveredValuePointData) hoveredData;
+
+      _devXMouse = devXMouseMove;
+      _devYMouse = devYMouseMove;
+
+      _chartZoomFactor = hoveredValuePointData.graphZoomFactor;
+
+      if (_shellContainer == null || _shellContainer.isDisposed()) {
+
+         /*
+          * tool tip is disposed, this happens on a mouse exit, display the tooltip again
+          */
+         show(new Point(devXMouseMove, devYMouseMove));
+      }
+
+      // check again
+      if (_shellContainer != null && !_shellContainer.isDisposed()) {
+
+         setTTShellLocation(devXMouseMove, devYMouseMove, hoveredValuePointData.valueDevPosition);
+
+         updateUI(hoveredValuePointData.valueIndex);
+      }
+   }
+
+   @Override
    public void setSnapBorder(final int marginTop, final int marginBottom) {
 
       this.snapBorder_Top = marginTop;
@@ -1296,38 +1327,6 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
          // reopen when other tour data are set which has other graphs
          reopen();
-      }
-   }
-
-   @Override
-   public void setValueIndex(final int valueIndex,
-                             final int devXMouseMove,
-                             final int devYMouseMove,
-                             final PointLong valueDevPosition,
-                             final double chartZoomFactor) {
-
-      if (_tourData == null || _isToolTipVisible == false) {
-         return;
-      }
-
-      _devXMouse = devXMouseMove;
-      _devYMouse = devYMouseMove;
-      _chartZoomFactor = chartZoomFactor;
-
-      if (_shellContainer == null || _shellContainer.isDisposed()) {
-
-         /*
-          * tool tip is disposed, this happens on a mouse exit, display the tooltip again
-          */
-         show(new Point(devXMouseMove, devYMouseMove));
-      }
-
-      // check again
-      if (_shellContainer != null && !_shellContainer.isDisposed()) {
-
-         setTTShellLocation(devXMouseMove, devYMouseMove, valueDevPosition);
-
-         updateUI(valueIndex);
       }
    }
 
