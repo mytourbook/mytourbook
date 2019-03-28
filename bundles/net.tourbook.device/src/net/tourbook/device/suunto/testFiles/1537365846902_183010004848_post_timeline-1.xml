@@ -10,13 +10,13 @@
 	<startSecond>30</startSecond>
 	<startWeek>37</startWeek>
 	<tourRecordingTime>4299</tourRecordingTime>
-	<tourDrivingTime>3695</tourDrivingTime>
+	<tourDrivingTime>3357</tourDrivingTime>
 	<timeZoneId>America/Boise</timeZoneId>
 	<tourDistance>6608.0</tourDistance>
 	<tourAltUp>343</tourAltUp>
 	<tourAltDown>343</tourAltDown>
 	<restPulse>0</restPulse>
-	<avgPulse>137.06508</avgPulse>
+	<avgPulse>137.82156</avgPulse>
 	<maxPulse>184.79999</maxPulse>
 	<maxAltitude>2016.2</maxAltitude>
 	<maxSpeed>10.398374</maxSpeed>

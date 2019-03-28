@@ -57,11 +57,14 @@ public class SuuntoJsonProcessor {
 	 *           If provided, the activity to concatenate the provided file to.
 	 * @param sampleListToReUse
 	 *           If provided, the activity's data from the activity to reuse.
+	 * @param isUnitTest
+	 *           True if the method is run for unit test purposes.
 	 * @return The created tour.
 	 */
 	public TourData ImportActivity(	String jsonFileContent,
 												TourData activityToReUse,
-												ArrayList<TimeData> sampleListToReUse) {
+												ArrayList<TimeData> sampleListToReUse,
+												boolean isUnitTest) {
 		_sampleList = new ArrayList<TimeData>();
 
 		JSONArray samples = null;
@@ -164,7 +167,7 @@ public class SuuntoJsonProcessor {
 			// GPS point
 			if (currentSampleData.contains(TAG_GPSALTITUDE) && currentSampleData.contains(TAG_LATITUDE)
 					&& currentSampleData.contains(TAG_LONGITUDE)) {
-				wasDataPopulated |= TryAddGpsData(new JSONObject(currentSampleData), timeData);
+				wasDataPopulated |= TryAddGpsData(new JSONObject(currentSampleData), timeData, isUnitTest);
 			}
 
 			// Heart Rate
@@ -178,7 +181,8 @@ public class SuuntoJsonProcessor {
 
 			// Barometric Altitude
 			if (_prefStore.getInt(IPreferences.ALTITUDE_DATA_SOURCE) == 1 ||
-					isIndoorTour) {
+					isIndoorTour ||
+					isUnitTest) {
 				wasDataPopulated |= TryAddAltitudeData(new JSONObject(currentSampleData), timeData);
 			}
 
@@ -187,7 +191,8 @@ public class SuuntoJsonProcessor {
 
 			// Distance
 			if (_prefStore.getInt(IPreferences.DISTANCE_DATA_SOURCE) == 1 ||
-					isIndoorTour) {
+					isIndoorTour ||
+					isUnitTest) {
 				wasDataPopulated |= TryAddDistanceData(new JSONObject(currentSampleData), timeData);
 			}
 
@@ -283,9 +288,11 @@ public class SuuntoJsonProcessor {
 	 *           The current sample data in JSON format.
 	 * @param sampleList
 	 *           The tour's time serie.
+	  * @param isUnitTest
+	 *           True if the method is run for unit test purposes.
 	 * @return True if successful, false otherwise.
 	 */
-	private boolean TryAddGpsData(JSONObject currentSample, TimeData timeData) {
+	private boolean TryAddGpsData(JSONObject currentSample, TimeData timeData, boolean isUnitTest) {
 		try {
 			float latitude = Util.parseFloat(currentSample.get(TAG_LATITUDE).toString());
 			float longitude = Util.parseFloat(currentSample.get(TAG_LONGITUDE).toString());
@@ -295,7 +302,8 @@ public class SuuntoJsonProcessor {
 			timeData.longitude = (longitude * 180) / Math.PI;
 
 			// GPS altitude
-			if (_prefStore.getInt(IPreferences.ALTITUDE_DATA_SOURCE) == 0) {
+			if (_prefStore.getInt(IPreferences.ALTITUDE_DATA_SOURCE) == 0 ||
+					isUnitTest) {
 				timeData.absoluteAltitude = altitude;
 			}
 

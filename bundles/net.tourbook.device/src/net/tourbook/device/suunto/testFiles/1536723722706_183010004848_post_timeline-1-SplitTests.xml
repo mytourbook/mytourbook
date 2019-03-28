@@ -10,13 +10,13 @@
 	<startSecond>8</startSecond>
 	<startWeek>37</startWeek>
 	<tourRecordingTime>4862</tourRecordingTime>
-	<tourDrivingTime>4571</tourDrivingTime>
+	<tourDrivingTime>4450</tourDrivingTime>
 	<timeZoneId>America/Denver</timeZoneId>
 	<tourDistance>12172.0</tourDistance>
 	<tourAltUp>418</tourAltUp>
 	<tourAltDown>415</tourAltDown>
 	<restPulse>0</restPulse>
-	<avgPulse>125.80821</avgPulse>
+	<avgPulse>125.86463</avgPulse>
 	<maxPulse>162.0</maxPulse>
 	<maxAltitude>1735.4</maxAltitude>
 	<maxSpeed>12.329795</maxSpeed>

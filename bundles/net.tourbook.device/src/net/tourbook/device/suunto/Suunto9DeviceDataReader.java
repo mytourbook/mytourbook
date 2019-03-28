@@ -1,10 +1,14 @@
 package net.tourbook.device.suunto;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -39,6 +43,8 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
 	// For Unit testing
 	private static final boolean			UNITTESTS			= false;
+	// Make sure that the smoothing value is 10 (speed and gradient)
+	
 	public static final String				IMPORT_FILE_PATH	= "/net/tourbook/device/suunto/testFiles/";	//$NON-NLS-1$
 	private static Map<String, String>	testFiles			= new HashMap<>();									// Java 7
 
@@ -311,7 +317,8 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 			activity = suuntoJsonProcessor.ImportActivity(
 					jsonFileContent,
 					null,
-					null);
+					null,
+					UNITTESTS);
 
 			if (activity == null)
 				return false;
@@ -350,7 +357,8 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 				activity = suuntoJsonProcessor.ImportActivity(
 						jsonFileContent,
 						parentEntry.getKey(),
-						parentEntry.getValue());
+						parentEntry.getValue(),
+						UNITTESTS);
 
 				//We remove the parent activity to replace it with the
 				//updated one (parent activity concatenated with the current
@@ -422,7 +430,8 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 			suuntoJsonProcessor.ImportActivity(
 					childEntry.getValue(),
 					currentActivity,
-					sampleListToReUse);
+					sampleListToReUse,
+					UNITTESTS);
 
 			// We just concatenated a child activity so we can remove it
 			// from the list of activities to process
@@ -763,6 +772,27 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 				.withTest(Input.fromString(xmlTestDocument))
 				.ignoreWhitespace()
 				.build();
+		BufferedWriter bufferedWriter = null;
+		try {
+			File myFile = new
+File("C:/Users/frederic/git/MT/mytourbook/MyTestFile.xml");
+			// check if file exist, otherwise create the file before writing
+			if (!myFile.exists()) {
+				myFile.createNewFile();
+			}
+			Writer writer = new FileWriter(myFile);
+			bufferedWriter = new BufferedWriter(writer);
+			bufferedWriter.write(xmlTestDocument);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (bufferedWriter != null)
+					bufferedWriter.close();
+			} catch (Exception ex) {
+
+			}
+		}
 
 		return !myDiff.hasDifferences();
 	}
