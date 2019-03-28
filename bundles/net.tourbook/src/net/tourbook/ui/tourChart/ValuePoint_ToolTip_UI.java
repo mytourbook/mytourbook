@@ -287,7 +287,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       state.put(STATE_PINNED_TOOLTIP_PIN_LOCATION, DEFAULT_PIN_LOCATION.name());
 
-      actionPinLocation(DEFAULT_PIN_LOCATION);
+      setPinLocation(DEFAULT_PIN_LOCATION);
    }
 
    ToolItem actionVisibleValues(final long visibleValues) {
@@ -1197,6 +1197,11 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
    @Override
    public Shell getToolTipShell() {
       return super.getToolTipShell();
+   }
+
+   @Override
+   protected boolean isHideTooltipWhenOwnerShellIsInactive() {
+      return false;
    }
 
    public boolean isVisible() {

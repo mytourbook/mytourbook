@@ -17,12 +17,27 @@ package net.tourbook.map;
 
 import java.util.ArrayList;
 
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
+
 public class HoveredTourData {
 
    ArrayList<Long> allHoveredTours;
 
-   public HoveredTourData(final ArrayList<Long> allHoveredTours) {
+   /**
+    * Point in a tour which is hovered
+    */
+   Point           devHoveredTourPoint;
+
+   Rectangle       devHoveredTourRect;
+
+   public HoveredTourData(final ArrayList<Long> allHoveredTours,
+                          final Point devHoveredTourPoint,
+                          final Rectangle devHoveredTourRect) {
 
       this.allHoveredTours = allHoveredTours;
+
+      this.devHoveredTourPoint = devHoveredTourPoint;
+      this.devHoveredTourRect = devHoveredTourRect;
    }
 }

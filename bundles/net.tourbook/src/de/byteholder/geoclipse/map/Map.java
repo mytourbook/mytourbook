@@ -545,6 +545,8 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
    private int                 _fastMapPainting_skippedValues;
 
    private ArrayList<Long>     _allHoveredTours        = new ArrayList<>();
+   private Point               _devHoveredPoint;
+   private Rectangle           _devHoveredRect;
 
    /**
     * This observer is called in the {@link Tile} when a tile image is set into the tile
@@ -2238,9 +2240,12 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
       /*
        * Get mouse relative position in the tile
        */
-
       final int devMouseTileX = devMouseX - devHoveredTileX;
       final int devMouseTileY = devMouseY - devHoveredTileY;
+
+      _devHoveredPoint = null;
+      _devHoveredRect = null;
+      _allHoveredTours.clear();
 
       Long hoveredTourId = null;
 
@@ -2252,17 +2257,30 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
 
             hoveredTourId = hoveredTile.allHoverTourID.get(hoverIndex);
 
+            if (_devHoveredPoint == null) {
+
+               int hoveredRect_Center_X = hoveredRect.x + hoveredRect.width / 2;
+               int hoveredRect_Center_Y = hoveredRect.y + hoveredRect.height / 2;
+
+               // convert from tile position to device position
+               hoveredRect_Center_X += devHoveredTileX;
+               hoveredRect_Center_Y += devHoveredTileY;
+
+               _devHoveredPoint = new Point(hoveredRect_Center_X, hoveredRect_Center_Y);
+               _devHoveredRect = hoveredRect;
+            }
+
             break;
          }
       }
-
-      _allHoveredTours.clear();
 
       if (hoveredTourId != null) {
 
          _allHoveredTours.add(hoveredTourId);
 
-         _hovered_ToolTip.setHoveredData(devMouseX, devMouseY, new HoveredTourData(_allHoveredTours));
+         _hovered_ToolTip.setHoveredData(devMouseX,
+               devMouseY,
+               new HoveredTourData(_allHoveredTours, _devHoveredPoint, _devHoveredRect));
 
          return true;
 
@@ -2434,6 +2452,8 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
       if (_poi_Tooltip != null) {
          _poi_Tooltip.dispose();
       }
+
+      _hovered_ToolTip.hide();
 
       // stop overlay thread
       _overlayThread.interrupt();
@@ -5373,9 +5393,13 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
       if (isVisible) {
 
          _hovered_ToolTip.setHoveredData(
+
                _mouseMove_DevPosition_X,
                _mouseMove_DevPosition_Y,
-               _allHoveredTours.size() > 0 ? new HoveredTourData(_allHoveredTours) : null);
+
+               _allHoveredTours.size() > 0
+                     ? new HoveredTourData(_allHoveredTours, _devHoveredPoint, _devHoveredRect)
+                     : null);
 
       } else {
 

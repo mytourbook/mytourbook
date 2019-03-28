@@ -15,25 +15,31 @@
  *******************************************************************************/
 package net.tourbook.map;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 
+import net.tourbook.chart.ColorCache;
 import net.tourbook.common.PointLong;
 import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.IPinned_ToolTip;
 import net.tourbook.common.tooltip.IPinned_Tooltip_Owner;
+import net.tourbook.common.tooltip.Pinned_ToolTip_PinLocation;
 import net.tourbook.common.tooltip.Pinned_ToolTip_Shell;
 import net.tourbook.common.util.Util;
 import net.tourbook.map2.view.Map2View;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
@@ -57,6 +63,8 @@ public class HoveredTour_ToolTip_UI extends Pinned_ToolTip_Shell implements IPin
 
    private IDialogSettings _state;
 
+   private HoveredTourData _currentHoverData;
+
    /*
     * UI resources
     */
@@ -64,7 +72,8 @@ public class HoveredTour_ToolTip_UI extends Pinned_ToolTip_Shell implements IPin
    private final ArrayList<Control> _firstColumnControls          = new ArrayList<>();
    private final ArrayList<Control> _firstColumnContainerControls = new ArrayList<>();
 
-   private HoveredTourData          _currentHoverData;
+   private final ColorCache         _colorCache                   = new ColorCache();
+   private Color                    _fgBorder;
 
    /*
     * UI controls
@@ -82,6 +91,8 @@ public class HoveredTour_ToolTip_UI extends Pinned_ToolTip_Shell implements IPin
       _isToolTipVisible = Util.getStateBoolean(_state,
             Map2View.STATE_IS_SHOW_HOVERED_TOUR_TOOLTIP,
             Map2View.STATE_IS_SHOW_HOVERED_TOUR_TOOLTIP_DEFAULT);
+
+      setPinLocation(Pinned_ToolTip_PinLocation.Screen);
    }
 
    void actionHideToolTip() {
@@ -99,6 +110,8 @@ public class HoveredTour_ToolTip_UI extends Pinned_ToolTip_Shell implements IPin
 
    @Override
    protected Composite createToolTipContentArea(final Event event, final Composite parent) {
+
+      initUI(parent);
 
       createActions();
 
@@ -140,7 +153,8 @@ public class HoveredTour_ToolTip_UI extends Pinned_ToolTip_Shell implements IPin
       GridLayoutFactory
             .fillDefaults()//
             .spacing(0, 0)
-            .numColumns(2)
+//            .numColumns(2)
+
             // set margin to draw the border
             .extendedMargins(1, 1, 1, 1)
             .applyTo(_shellContainer);
@@ -151,11 +165,19 @@ public class HoveredTour_ToolTip_UI extends Pinned_ToolTip_Shell implements IPin
             onPaintShellContainer(e);
          }
       });
-//      _shellContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+      _shellContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
       {
-         _label = new Label(parent, SWT.NONE);
-//         GridDataFactory.fillDefaults().applyTo(_label);
-         _label.setText("Tooltip content");
+         final Composite container = new Composite(_shellContainer, SWT.NONE);
+         GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+         container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+         {
+            _label = new Label(container, SWT.NONE);
+            _label.setText("Tooltip content");
+            GridDataFactory.fillDefaults()
+                  .grab(true, true)
+                  .hint(200, 50)
+                  .applyTo(_label);
+         }
       }
 
       return _shellContainer;
@@ -166,12 +188,24 @@ public class HoveredTour_ToolTip_UI extends Pinned_ToolTip_Shell implements IPin
       return super.getToolTipShell();
    }
 
+   private void initUI(final Composite parent) {
+
+      _fgBorder = _colorCache.getColor(new RGB(0xe5, 0xe5, 0xcb));
+   }
+
+   @Override
+   protected boolean isHideTooltipWhenOwnerShellIsInactive() {
+      return false;
+   }
+
    public boolean isVisible() {
       return _isToolTipVisible;
    }
 
    @Override
    protected void onDispose() {
+
+      _colorCache.dispose();
 
       _firstColumnControls.clear();
       _firstColumnContainerControls.clear();
@@ -181,13 +215,13 @@ public class HoveredTour_ToolTip_UI extends Pinned_ToolTip_Shell implements IPin
 
    private void onPaintShellContainer(final PaintEvent event) {
 
-//      final GC gc = event.gc;
-//      final Point shellSize = _shellContainer.getSize();
-//
-//      // draw border
-//      gc.setForeground(_fgBorder);
-//      gc.drawRectangle(0, 0, shellSize.x - 1, shellSize.y - 1);
+      final GC gc = event.gc;
+      final Point shellSize = _shellContainer.getSize();
 
+      // draw tooltip border
+//      gc.setForeground(_fgBorder);
+      gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+      gc.drawRectangle(0, 0, shellSize.x - 1, shellSize.y - 1);
    }
 
    /**
@@ -222,9 +256,25 @@ public class HoveredTour_ToolTip_UI extends Pinned_ToolTip_Shell implements IPin
       // check again
       if (_shellContainer != null && !_shellContainer.isDisposed()) {
 
-         final PointLong toBeDefined_ValueDevPosition = new PointLong(devMouseX, devMouseY);
+         PointLong devHoveredTourPointLong = null;
 
-         setTTShellLocation(devMouseX, devMouseY, toBeDefined_ValueDevPosition);
+         if (hoveredData instanceof HoveredTourData) {
+
+            final HoveredTourData hoveredTourData = (HoveredTourData) hoveredData;
+            final Point devHoveredTourPoint = hoveredTourData.devHoveredTourPoint;
+
+            devHoveredTourPointLong = new PointLong(devHoveredTourPoint.x, devHoveredTourPoint.y);
+
+            System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ()")
+                  + ("\tdevHoveredTourPoint: " + devHoveredTourPoint)
+                  + ("\tdevHoveredTourRect: " + hoveredTourData.devHoveredTourRect)
+//                  + ("\t: " + )
+            );
+// TODO remove SYSTEM.OUT.PRINTLN
+
+         }
+
+         setTTShellLocation(devMouseX, devMouseY, devHoveredTourPointLong);
 
          updateUI(hoveredData);
       }
@@ -307,10 +357,24 @@ public class HoveredTour_ToolTip_UI extends Pinned_ToolTip_Shell implements IPin
       _lastUpdateUITime = System.currentTimeMillis();
 
       if (hoveredTourData == null) {
-         return;
+
+         // nothing is hovered
+
+         _label.setText("");
+
+      } else {
+
+         // a tour is hovered
+
+         final ArrayList<Long> allHoveredTours = hoveredTourData.allHoveredTours;
+
+         final String debugText = allHoveredTours.size() > 0 ? "" + allHoveredTours.get(0) : "";
+
+         _label.setText(debugText);
       }
 
-      _label.setText("" + LocalDateTime.now().toString());
+      _shellContainer.layout(true, true);
+//      _shellContainer.pack(true);
    }
 
 }

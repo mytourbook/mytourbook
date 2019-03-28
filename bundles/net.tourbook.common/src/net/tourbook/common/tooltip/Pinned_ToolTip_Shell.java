@@ -112,7 +112,7 @@ public abstract class Pinned_ToolTip_Shell {
 
    private Point                                     _screenRequestedAnimationLocation    = new Point(0, 0);
 
-   Pinned_ToolTip_PinLocation                        pinnedLocation;
+   private Pinned_ToolTip_PinLocation                pinnedLocation;
 
    /**
     * This value is > 0 when tooltip could not be set at the default location
@@ -162,7 +162,8 @@ public abstract class Pinned_ToolTip_Shell {
 
                   // hide tooltip when another shell is activated
 
-                  if (_display.getActiveShell() != _ttShell) {
+                  if (_display.getActiveShell() != _ttShell && isHideTooltipWhenOwnerShellIsInactive()) {
+
                      toolTipHide(_ttShell, event);
                   }
                }
@@ -174,6 +175,7 @@ public abstract class Pinned_ToolTip_Shell {
             break;
          }
       }
+
    }
 
    /**
@@ -365,30 +367,6 @@ public abstract class Pinned_ToolTip_Shell {
    }
 
    /**
-    * Pin the tooltip to a corder which is defined in PIN_LOCATION_...
-    *
-    * @param locationId
-    */
-   public void actionPinLocation(final Pinned_ToolTip_PinLocation locationId) {
-
-      // set new location
-      pinnedLocation = locationId;
-
-      if (_ttShell == null || _ttShell.isDisposed()) {
-         return;
-      }
-
-//      if (pinnedLocation == ValuePointToolTipPinLocation.Screen) {
-//         return;
-//      }
-
-      // display at default location without offset
-      _ttShellDiff = new Point(0, 0);
-
-      setTTShellLocation(false, true, true, true);
-   }
-
-   /**
     * Activate tooltip support for this control
     */
    private void addOwnerControlListener() {
@@ -448,8 +426,10 @@ public abstract class Pinned_ToolTip_Shell {
 
       int tipLeft = tipLocation.x;
       int tipTop = tipLocation.y;
+
       final int tipWidth = tipSize.x;
       final int tipHeight = tipSize.y;
+
       final int tipRight = tipLeft + tipWidth;
       final int tipBottom = tipTop + tipHeight;
 
@@ -458,6 +438,7 @@ public abstract class Pinned_ToolTip_Shell {
       final Monitor[] monitors = _display.getMonitors();
 
       if (monitors.length > 1) {
+
          // By default present in the monitor of the control
          screenBounds = _ownerControl.getMonitor().getBounds();
          final Point p = new Point(tipLeft, tipTop);
@@ -477,7 +458,6 @@ public abstract class Pinned_ToolTip_Shell {
       }
 
       // create a copy that the original value is not modified
-//      final Point newTipLocation = new Point(tipLeft, tipTop);
       final Point tipBottomRight = new Point(tipRight, tipBottom);
 
       if (!(screenBounds.contains(tipLocation) && screenBounds.contains(tipBottomRight))) {
@@ -557,10 +537,18 @@ public abstract class Pinned_ToolTip_Shell {
    }
 
    /**
-    * Hide the currently active tool tip
+    * Hide and dispose the currently active tool tip
     */
    public void hide() {
       toolTipHide(_ttShell, null);
+   }
+
+   /**
+    * @return When <code>true</code> (default) is returned, then the tooltip will be hidden
+    *         (disposed) when the owner shell is deactivated.
+    */
+   protected boolean isHideTooltipWhenOwnerShellIsInactive() {
+      return true;
    }
 
    protected void onDispose() {
@@ -660,11 +648,13 @@ public abstract class Pinned_ToolTip_Shell {
    }
 
    private void passOnEvent(final Shell tip, final Event event) {
+
       if (_ownerControl != null
             && !_ownerControl.isDisposed()
             && event != null
             && event.widget != _ownerControl
             && event.type == SWT.MouseDown) {
+
          // the following was left in order to fix bug 298770 with minimal change. In 3.7, the complete method should be removed.
          tip.close();
       }
@@ -725,6 +715,30 @@ public abstract class Pinned_ToolTip_Shell {
       state.put(STATE_PINNED_TOOLTIP_PIN_LOCATION, pinnedLocation.name());
       state.put(STATE_MOUSE_X_POSITION_RELATIVE, _devPinnedMouseXPositionRelative);
       state.put(STATE_IS_TOOLTIP_ABOVE_VALUE_POINT, _isTTAboveValuePoint);
+   }
+
+   /**
+    * Pin the tooltip to a border which is defined in {@link Pinned_ToolTip_PinLocation}
+    *
+    * @param locationId
+    */
+   public void setPinLocation(final Pinned_ToolTip_PinLocation locationId) {
+
+      // set new location
+      pinnedLocation = locationId;
+
+      if (_ttShell == null || _ttShell.isDisposed()) {
+         return;
+      }
+
+//      if (pinnedLocation == ValuePointToolTipPinLocation.Screen) {
+//         return;
+//      }
+
+      // display at default location without offset
+      _ttShellDiff = new Point(0, 0);
+
+      setTTShellLocation(false, true, true, true);
    }
 
    public void setShellVisible(final boolean isVisible) {
@@ -793,11 +807,6 @@ public abstract class Pinned_ToolTip_Shell {
          screenDefaultLocation.y = _screenScreenTTShellLocation.y + _ttShellDiff.y;
 
          if (isTTDragged) {
-
-//            if (screenDefaultLocation.y > 1100) {
-//               int a = 0;
-//               a++;
-//            }
 
             // ensure that the dragged tooltip is within the screen border
             final Point screenNewLocation = fixupDisplayBounds(
@@ -933,6 +942,7 @@ public abstract class Pinned_ToolTip_Shell {
             case TopLeft:
             case TopRight:
             default:
+
                // show tooltip above the value point
                screenUncoveredPosY = screenValuePointTop - VALUE_POINT_OFFSET - ttHeight;
                break;
@@ -963,7 +973,7 @@ public abstract class Pinned_ToolTip_Shell {
 
          if (_defaultOffsetY != 0 || _screenRequestedAnimationLocation.y != defaultY || isSetLocation) {
 
-            // move when default location is not yet reached
+            // move tooltip when default location is not yet reached
 
             _screenRequestedAnimationLocation = screenNewLocation;
 

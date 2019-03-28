@@ -188,7 +188,7 @@ public class ValuePoint_ToolTip_MenuManager {
       @Override
       public void run() {
 
-         _valuePointToolTipUI.actionPinLocation(_locationId);
+         _valuePointToolTipUI.setPinLocation(_locationId);
 
          // reopen tooltip menu with the new location
          if (_locationId == Pinned_ToolTip_PinLocation.TopLeft
