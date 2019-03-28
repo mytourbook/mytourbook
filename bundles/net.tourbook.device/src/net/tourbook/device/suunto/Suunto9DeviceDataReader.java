@@ -1,14 +1,10 @@
 package net.tourbook.device.suunto;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -772,28 +768,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 				.withTest(Input.fromString(xmlTestDocument))
 				.ignoreWhitespace()
 				.build();
-		BufferedWriter bufferedWriter = null;
-		try {
-			File myFile = new
-File("C:/Users/frederic/git/MT/mytourbook/MyTestFile.xml");
-			// check if file exist, otherwise create the file before writing
-			if (!myFile.exists()) {
-				myFile.createNewFile();
-			}
-			Writer writer = new FileWriter(myFile);
-			bufferedWriter = new BufferedWriter(writer);
-			bufferedWriter.write(xmlTestDocument);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (bufferedWriter != null)
-					bufferedWriter.close();
-			} catch (Exception ex) {
-
-			}
-		}
-
+		
 		return !myDiff.hasDifferences();
 	}
 }
