@@ -513,7 +513,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 		return _layer_mf_S3DB_Building;
 	}
 	
-   public ItemizedLayer<MarkerItem> getLayer_Bookmark() {
+   public ItemizedLayer<MarkerItem> getLayer_MapBookmark() {
       return _layer_Bookmark;
    }	
 	
@@ -529,7 +529,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 		return _layer_Label;
 	}
 
-	public MarkerLayer getLayer_Marker() {
+	public MarkerLayer getLayer_TourMarker() {
 		return _layer_Marker;
 	}
 
@@ -1047,7 +1047,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	         this);
 	   List<MarkerItem> pts = _markertoolkit.createMarkerItemList(_markerMode);
 	   _layer_Bookmark.addItems(pts);
-	   _layer_Bookmark.setEnabled(true);
+	   _layer_Bookmark.setEnabled(false);
 	   layers.add(_layer_Bookmark);	
 
 	   // label
@@ -1094,16 +1094,11 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
 		final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
-		final boolean isShowMarkerPoint = config.isShowMarkerPoint;
+		final boolean isShowTourMarker = config.isShowTourMarker;
 
-//		System.out.println(
-//				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//						+ ("\tisShowMarkerPoint:" + isShowMarkerPoint));
-		// TODO remove SYSTEM.OUT.PRINTLN
+		_layer_Marker.setEnabled(isShowTourMarker);
 
-		_layer_Marker.setEnabled(isShowMarkerPoint);
-
-		if (isShowMarkerPoint) {
+		if (isShowTourMarker) {
 
 			final MarkerRenderer markerRenderer = (MarkerRenderer) _layer_Marker.getRenderer();
 
@@ -1113,7 +1108,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
 	public void updateUI_BookmarkLayer() {
 	   final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
-	   final boolean isShowBookmark = config.isShowBookmark;
+	   final boolean isShowBookmark = config.isShowMapBookmark;
 	   _layer_Bookmark.removeAllItems();
 	   List<MarkerItem> pts = _markertoolkit.createMarkerItemList(_markerMode);
 	   _layer_Bookmark.addItems(pts);
