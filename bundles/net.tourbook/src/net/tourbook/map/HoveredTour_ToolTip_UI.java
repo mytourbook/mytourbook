@@ -53,7 +53,7 @@ public class HoveredTour_ToolTip_UI extends Pinned_ToolTip_Shell implements IPin
    private int             _devMouseY;
 
    /**
-    * Global state if the tooltip is visible.
+    * State if the tooltip is visible.
     */
    private boolean         _isToolTipVisible;
 
@@ -265,12 +265,12 @@ public class HoveredTour_ToolTip_UI extends Pinned_ToolTip_Shell implements IPin
 
             devHoveredTourPointLong = new PointLong(devHoveredTourPoint.x, devHoveredTourPoint.y);
 
-            System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ()")
-                  + ("\tdevHoveredTourPoint: " + devHoveredTourPoint)
-                  + ("\tdevHoveredTourRect: " + hoveredTourData.devHoveredTourRect)
-//                  + ("\t: " + )
-            );
-// TODO remove SYSTEM.OUT.PRINTLN
+//            System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ()")
+//                  + ("\tdevHoveredTourPoint: " + devHoveredTourPoint)
+//                  + ("\tdevHoveredTourRect: " + hoveredTourData.devHoveredTourRect)
+////                  + ("\t: " + )
+//            );
+//// TODO remove SYSTEM.OUT.PRINTLN
 
          }
 
@@ -278,6 +278,13 @@ public class HoveredTour_ToolTip_UI extends Pinned_ToolTip_Shell implements IPin
 
          updateUI(hoveredData);
       }
+   }
+
+   public void setIsToolTipVisible(final boolean isToolTipVisible) {
+
+      _isToolTipVisible = isToolTipVisible;
+
+      setShellVisible(isToolTipVisible);
    }
 
    @Override

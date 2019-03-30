@@ -741,6 +741,11 @@ public abstract class Pinned_ToolTip_Shell {
       setTTShellLocation(false, true, true, true);
    }
 
+   /**
+    * Set shell visible when shell is already created.
+    *
+    * @param isVisible
+    */
    public void setShellVisible(final boolean isVisible) {
 
       if (_ttShell == null || _ttShell.isDisposed()) {
@@ -957,17 +962,30 @@ public abstract class Pinned_ToolTip_Shell {
             // reset, very important !!!
             _defaultOffsetY = 0;
          }
+
+//         System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ()")
+//               + ("\t_defaultOffsetY: " + _defaultOffsetY)
+////               + ("\t: " + )
+//         );
+//// TODO remove SYSTEM.OUT.PRINTLN
+
       }
 
       _screenDefaultTTShellLocation = screenDefaultLocation;
 
       final Point screenNewLocation = fixupDisplayBounds(ttSize, screenDefaultLocation, screenValuePoint, isTTDragged);
 
+      final boolean isShellVisible = _ttShell.isVisible();
+
       if (isTTDragged || isAnimation == false) {
 
          // no animation, set location directly
 
          _ttShell.setLocation(screenNewLocation);
+
+         if (isShellVisible == false) {
+            _ttShell.setVisible(true);
+         }
 
       } else {
 
@@ -978,6 +996,12 @@ public abstract class Pinned_ToolTip_Shell {
             _screenRequestedAnimationLocation = screenNewLocation;
 
             setTTShellLocation10Start();
+
+         } else {
+
+            if (isShellVisible == false) {
+               _ttShell.setVisible(true);
+            }
          }
       }
    }
