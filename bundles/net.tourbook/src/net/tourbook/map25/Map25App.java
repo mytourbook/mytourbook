@@ -176,7 +176,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private float                 _mf_UserScale = 2.50f;
    private float                 _vtm_UserScale = 2.0f;	
 	
-   ItemizedLayer<MarkerItem> _layer_Bookmark;
+   ItemizedLayer<MarkerItem> _layer_MapBookmark;
    private MarkerToolkit _markertoolkit;
    private int _markerMode = MarkerToolkit.modeNormal; // MarkerToolkit.modeDemo or MarkerToolkit.modeNormal
 
@@ -514,7 +514,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	}
 	
    public ItemizedLayer<MarkerItem> getLayer_MapBookmark() {
-      return _layer_Bookmark;
+      return _layer_MapBookmark;
    }	
 	
 	public BitmapTileLayer getLayer_HillShading() {
@@ -638,7 +638,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
 		updateUI_MarkerLayer();
 
-		updateUI_BookmarkLayer();
+		updateUI_MapBookmarkLayer();
 		
 		mMap.render();
 	}
@@ -975,7 +975,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	private void setupMap_Layers() {
 	   System.out.println("################ setupMap_Layers:  entering"); //$NON-NLS-1$
 	   final Layers layers = mMap.layers();
-
+	   final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
+	   
 	   // hillshading with 1MB RAM Cache, using existing _httpfactory with diskcache
 	   _hillshadingSource =  DefaultSources.HIKEBIKE_HILLSHADE
 	         .httpFactory(_httpFactory)
@@ -1037,18 +1038,18 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 		}*/
 
 
-	   // bookmarks
+	   // MapBookmarks
 	   System.out.println("################ setupMap_Layers: calling constructor"); //$NON-NLS-1$
 	   _markertoolkit = new MarkerToolkit(MarkerToolkit.shape_star);
-	   _layer_Bookmark = new ItemizedLayer<>(
-	         mMap,
-	         new ArrayList<MarkerItem>(),
-	         _markertoolkit._markerRendererFactory,
-	         this);
+	   if (config.isMarkerClustered) {
+	      _layer_MapBookmark = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _markertoolkit._markerRendererFactory, this);
+	   } else {
+	      _layer_MapBookmark = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _markertoolkit._symbol, this);
+	   }
 	   List<MarkerItem> pts = _markertoolkit.createMarkerItemList(_markerMode);
-	   _layer_Bookmark.addItems(pts);
-	   _layer_Bookmark.setEnabled(false);
-	   layers.add(_layer_Bookmark);	
+	   _layer_MapBookmark.addItems(pts);
+	   _layer_MapBookmark.setEnabled(false);
+	   layers.add(_layer_MapBookmark);	
 
 	   // label
 	   _layer_Label = new LabelLayerMT(mMap, _layer_BaseMap);
@@ -1106,13 +1107,21 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 		}
 	}
 
-	public void updateUI_BookmarkLayer() {
+	public void updateUI_MapBookmarkLayer() {
 	   final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
-	   final boolean isShowBookmark = config.isShowMapBookmark;
-	   _layer_Bookmark.removeAllItems();
+	   final Layers layers = mMap.layers();
+	   final boolean isShowMapBookmark = config.isShowMapBookmark;
+	   layers.remove(_layer_MapBookmark);
+	   if (config.isMarkerClustered) {
+	      _layer_MapBookmark = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _markertoolkit._markerRendererFactory, this);
+	   } else {
+	      _layer_MapBookmark = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _markertoolkit._symbol, this);
+	   }
+	   //_layer_Bookmark.removeAllItems();
 	   List<MarkerItem> pts = _markertoolkit.createMarkerItemList(_markerMode);
-	   _layer_Bookmark.addItems(pts);
-	   _layer_Bookmark.setEnabled(isShowBookmark);
+	   _layer_MapBookmark.addItems(pts);
+	   _layer_MapBookmark.setEnabled(isShowMapBookmark);
+	   layers.add(_layer_MapBookmark);
 	}
 	
    @Override

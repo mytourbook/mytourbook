@@ -40,7 +40,7 @@ import net.tourbook.map25.Map25ConfigManager;
 
 
 public class MarkerToolkit {
-   ItemizedLayer<MarkerItem> mMarkerLayer;
+   //ItemizedLayer<MarkerItem> mMarkerLayer;
    private int _fgColor = 0xFF000000; // 100 percent black. AARRGGBB
    private int _bgColor = 0x80FF69B4; // 50 percent pink. AARRGGBB
    private int _clusterSymbolSizeDP = net.tourbook.map25.layer.marker.MarkerRenderer.MAP_MARKER_CLUSTER_SIZE_DP;

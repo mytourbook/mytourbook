@@ -364,7 +364,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
             // TODO Auto-generated method stub
             if (e.type == SWT.Selection){
                final Map25App mapApp = _map25View.getMapApp();
-               mapApp.updateUI_BookmarkLayer();
+               mapApp.updateUI_MapBookmarkLayer();
                //System.out.println("+++ SlideoutListener:  button pressed"); //$NON-NLS-1$
             }
          }
