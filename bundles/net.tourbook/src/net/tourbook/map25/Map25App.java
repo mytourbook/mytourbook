@@ -1110,18 +1110,28 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	public void updateUI_MapBookmarkLayer() {
 	   final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 	   final Layers layers = mMap.layers();
+	   final int layer_index_MapBookmark = layers.indexOf(_layer_MapBookmark);
 	   final boolean isShowMapBookmark = config.isShowMapBookmark;
-	   layers.remove(_layer_MapBookmark);
-	   if (config.isMarkerClustered) {
-	      _layer_MapBookmark = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _markertoolkit._markerRendererFactory, this);
+	   System.out.println("# updateUI_MapBookmarkLayer(): entering");
+	   if (config.isMarkerClustered != _markertoolkit._isMarkerClusteredLast) { // only recreate MapBookmarkLayer when changed in UI
+	      System.out.println("# updateUI_MapBookmarkLayer(): index was before: " + layer_index_MapBookmark);
+	      layers.remove(_layer_MapBookmark); 
+	      if (config.isMarkerClustered) {
+	         _layer_MapBookmark = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _markertoolkit._markerRendererFactory, this);
+	      } else {
+	         _layer_MapBookmark = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _markertoolkit._symbol, this);
+	      }
+	      layers.add(layer_index_MapBookmark, _layer_MapBookmark);
+	      System.out.println("# updateUI_MapBookmarkLayer(): index is now: " + layer_index_MapBookmark);
 	   } else {
-	      _layer_MapBookmark = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _markertoolkit._symbol, this);
-	   }
+	      _layer_MapBookmark.removeAllItems();
+	   }  
 	   //_layer_Bookmark.removeAllItems();
 	   List<MarkerItem> pts = _markertoolkit.createMarkerItemList(_markerMode);
 	   _layer_MapBookmark.addItems(pts);
 	   _layer_MapBookmark.setEnabled(isShowMapBookmark);
-	   layers.add(_layer_MapBookmark);
+	   _markertoolkit._isMarkerClusteredLast = config.isMarkerClustered;
+	   //
 	}
 	
    @Override

@@ -66,6 +66,8 @@ public class MarkerToolkit {
    public static int modeDemo = 0;
    public static int modeNormal = 1;
    
+   public boolean _isMarkerClusteredLast;
+   
    public MarkerToolkit(int shape) {
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
@@ -80,6 +82,7 @@ public class MarkerToolkit {
       
       _symbol = new MarkerSymbol(_bitmapPoi, MarkerSymbol.HotspotPlace.CENTER, false);
       
+      _isMarkerClusteredLast = config.isMarkerClustered;
       
       _markerRendererFactory = new MarkerRendererFactory() {
          @Override
