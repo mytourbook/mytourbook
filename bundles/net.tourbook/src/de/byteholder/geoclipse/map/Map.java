@@ -37,6 +37,8 @@ import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
 import de.byteholder.geoclipse.ui.TextWrapPainter;
 
+import gnu.trove.list.array.TLongArrayList;
+
 import java.awt.Dimension;
 import java.awt.geom.Point2D;
 import java.io.UnsupportedEncodingException;
@@ -469,9 +471,9 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
    private TourToolTip            _tour_ToolTip;
 
    private HoveredTour_ToolTip_UI _hovered_ToolTip;
-   private ArrayList<Long>        _allHoveredTours       = new ArrayList<>();
-   private Point                  _devHoveredPoint;
-   private Rectangle              _devHoveredRect;
+   private int                    _numHoveredTours;
+   private TLongArrayList         _allHoveredTourIds     = new TLongArrayList();
+   private ArrayList<Point>       _devHoveredPoint       = new ArrayList<>();
 
    /**
     * when <code>true</code> the loading... image is not displayed
@@ -479,15 +481,13 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
    private boolean                _isLiveView;
    private long                   _lastMapDrawTime;
    /*
-    * These 4 tile positions correspond to the tiles which are needed to draw the map
+    * All painted tiles in the map are within these 4 tile positions
     */
-   private int                    _tilePosMinX;
-   private int                    _tilePosMaxX;
-   private int                    _tilePosMinY;
-   private int                    _tilePosMaxY;
+   private int                    _tilePos_MinX;
+   private int                    _tilePos_MaxX;
+   private int                    _tilePos_MinY;
+   private int                    _tilePos_MaxY;
    //
-   private int                    _numTileWidth;
-   private int                    _numTileHeight;
    private Tile[][]               _allPaintedTiles;
    //
    private final Display          _display;
@@ -2175,6 +2175,11 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
       }
    }
 
+   /**
+    * The critical parts in this method is to convert mouse position into tile position.
+    *
+    * @return Returns <code>true</code> when a tour is hovered.
+    */
    private boolean isTourHovered() {
 
       Tile hoveredTile = null;
@@ -2183,27 +2188,26 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
       int hoveredTileIndex_Y = 0;
 
       /*
-       * Get hovered tile
+       * Get tile which is hovered
        */
       final int devMouseX = _mouseMove_DevPosition_X;
       final int devMouseY = _mouseMove_DevPosition_Y;
 
       final Tile[][] allPaintedTiles = _allPaintedTiles;
 
+      // top/left dev position for the hovered tile
       int devHoveredTileX = 0;
       int devHoveredTileY = 0;
 
       tileLoop:
 
-      for (int tilePosX = _tilePosMinX; tilePosX <= _tilePosMaxX; tilePosX++) {
+      for (int tilePosX = _tilePos_MinX; tilePosX <= _tilePos_MaxX; tilePosX++) {
 
          hoveredTileIndex_Y = 0;
 
-         for (int tilePosY = _tilePosMinY; tilePosY <= _tilePosMaxY; tilePosY++) {
+         for (int tilePosY = _tilePos_MinY; tilePosY <= _tilePos_MaxY; tilePosY++) {
 
-            /*
-             * convert tile world position into device position
-             */
+            // convert tile world position into device position
             devHoveredTileX = tilePosX * _tilePixelSize - _worldPixel_TopLeft_Viewport.x;
             devHoveredTileY = tilePosY * _tilePixelSize - _worldPixel_TopLeft_Viewport.y;
 
@@ -2213,7 +2217,7 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
             if (devMouseX >= devHoveredTileX && devMouseX < devTileXNext) {
                if (devMouseY >= devHoveredTileY && devMouseY < devTileYNext) {
 
-                  // this is the tile which is hovered by the mouse
+                  // this is the tile which is hovered with the mouse
 
                   hoveredTile = allPaintedTiles[hoveredTileIndex_X][hoveredTileIndex_Y];
 
@@ -2227,9 +2231,10 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
          hoveredTileIndex_X++;
       }
 
-      _devHoveredPoint = null;
-      _devHoveredRect = null;
-      _allHoveredTours.clear();
+      // reset hovered data
+      _allHoveredTourIds.clear();
+      _devHoveredPoint.clear();
+      _numHoveredTours = 0;
 
       if (hoveredTile == null) {
 
@@ -2237,53 +2242,67 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
          return false;
       }
 
-      final ArrayList<Rectangle> allHoverRectangle = hoveredTile.allHoverRectangle;
-      if (allHoverRectangle.size() == 0) {
+      final ArrayList<Rectangle> allPainted_HoveredRectangleList = hoveredTile.allPainted_HoverRectangle;
+      if (allPainted_HoveredRectangleList.size() == 0) {
 
          // nothing is painted in this tile
          return false;
       }
 
-      /*
-       * Get mouse relative position in the tile
-       */
+      // get mouse relative position in the tile
       final int devMouseTileX = devMouseX - devHoveredTileX;
       final int devMouseTileY = devMouseY - devHoveredTileY;
 
-      Long hoveredTourId = null;
+      // optimize performance by removing object references
+      final long[] allPainted_HoveredTourId = hoveredTile.allPainted_HoverTourID.toArray();
+      final Rectangle[] allPainted_HoveredRectangle = allPainted_HoveredRectangleList.toArray(new Rectangle[allPainted_HoveredRectangleList.size()]);
 
-      for (int hoverIndex = 0; hoverIndex < allHoverRectangle.size(); hoverIndex++) {
+      long painted_HoveredTourId = -1;
 
-         final Rectangle hoveredRect = allHoverRectangle.get(hoverIndex);
+      for (int hoverIndex = 0; hoverIndex < allPainted_HoveredTourId.length; hoverIndex++) {
 
-         if (hoveredRect.contains(devMouseTileX, devMouseTileY)) {
+         final Rectangle painted_HoveredRectangle = allPainted_HoveredRectangle[hoverIndex];
 
-            hoveredTourId = hoveredTile.allHoverTourID.get(hoverIndex);
+         // optimized: hoveredRectangle.contains(devMouseTileX, devMouseTileY)
+         if ((devMouseTileX >= painted_HoveredRectangle.x)
+               && (devMouseTileY >= painted_HoveredRectangle.y)
+               && devMouseTileX < (painted_HoveredRectangle.x + painted_HoveredRectangle.width)
+               && devMouseTileY < (painted_HoveredRectangle.y + painted_HoveredRectangle.height)) {
 
-            if (_devHoveredPoint == null) {
+            painted_HoveredTourId = allPainted_HoveredTourId[hoverIndex];
 
-               int hoveredRect_Center_X = hoveredRect.x + hoveredRect.width / 2;
-               int hoveredRect_Center_Y = hoveredRect.y + hoveredRect.height / 2;
+            int devHoveredRect_Center_X = painted_HoveredRectangle.x + painted_HoveredRectangle.width / 2;
+            int devHoveredRect_Center_Y = painted_HoveredRectangle.y + painted_HoveredRectangle.height / 2;
 
-               // convert from tile position to device position
-               hoveredRect_Center_X += devHoveredTileX;
-               hoveredRect_Center_Y += devHoveredTileY;
+            // convert from tile position to device position
+            devHoveredRect_Center_X += devHoveredTileX;
+            devHoveredRect_Center_Y += devHoveredTileY;
 
-               _devHoveredPoint = new Point(hoveredRect_Center_X, hoveredRect_Center_Y);
-               _devHoveredRect = hoveredRect;
+            _allHoveredTourIds.add(painted_HoveredTourId);
+            _devHoveredPoint.add(new Point(devHoveredRect_Center_X, devHoveredRect_Center_Y));
+
+            // advance to the next tour id
+            for (int hoverTourIdIndex = hoverIndex + 1; hoverTourIdIndex < allPainted_HoveredTourId.length; hoverTourIdIndex++) {
+
+               final long nextPainted_HoveredTourId = allPainted_HoveredTourId[hoverTourIdIndex];
+
+               if (nextPainted_HoveredTourId != painted_HoveredTourId) {
+
+                  // the next tour id is discovered
+
+                  hoverIndex = hoverTourIdIndex;
+
+                  break;
+               }
             }
-
-            break;
          }
       }
 
-      if (hoveredTourId != null) {
-
-         _allHoveredTours.add(hoveredTourId);
+      if (_allHoveredTourIds.size() > 0) {
 
          _hovered_ToolTip.setHoveredData(devMouseX,
                devMouseY,
-               new HoveredTourData(_allHoveredTours, _devHoveredPoint, _devHoveredRect));
+               new HoveredTourData(_allHoveredTourIds, _devHoveredPoint));
 
          return true;
 
@@ -3072,8 +3091,8 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
     */
    private void paint_30_Tiles(final GC gcMapImage) {
 
-      for (int tilePosX = _tilePosMinX, tileIndexX = 0; tilePosX <= _tilePosMaxX; tilePosX++, tileIndexX++) {
-         for (int tilePosY = _tilePosMinY, tileIndexY = 0; tilePosY <= _tilePosMaxY; tilePosY++, tileIndexY++) {
+      for (int tilePosX = _tilePos_MinX, tileIndexX = 0; tilePosX <= _tilePos_MaxX; tilePosX++, tileIndexX++) {
+         for (int tilePosY = _tilePos_MinY, tileIndexY = 0; tilePosY <= _tilePos_MaxY; tilePosY++, tileIndexY++) {
 
             /*
              * convert tile world position into device position
@@ -3343,7 +3362,7 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
 
       final Point devTopLeft = paint_GridBox_50_Rectangle(gc, mapGridData, false);
 
-      paint_GridBox_80_Info_Text(gc, mapGridData, devTopLeft);
+      paint_Text_WithBorder(gc, mapGridData.gridBox_Text, devTopLeft);
 
       gc.setLineStyle(SWT.LINE_SOLID);
       gc.setForeground(SYS_COLOR_BLACK);
@@ -3362,7 +3381,7 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
 
       final Point devTopLeft = paint_GridBox_50_Rectangle(gc, mapGridData, true);
 
-      paint_GridBox_80_Info_Text(gc, mapGridData, devTopLeft);
+      paint_Text_WithBorder(gc, mapGridData.gridBox_Text, devTopLeft);
    }
 
    /**
@@ -3459,49 +3478,13 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
       gc.drawString(sb.toString(), 0, 0);
    }
 
-   private void paint_GridBox_80_Info_Text(final GC gc, final MapGridData mapGridData, final Point topLeft) {
-
-      final String infoText = mapGridData.gridBox_Text;
-
-      if (infoText == null) {
-         return;
-      }
-
-      final Point textSize = gc.stringExtent(infoText);
-
-      final int devX = topLeft.x;
-      final int devY = topLeft.y - textSize.y - 5;
-
-      /*
-       * Draw border around text to make it more visible
-       */
-      gc.setForeground(SYS_COLOR_WHITE);
-      gc.drawString(infoText, devX + 1, devY + 1, true);
-      gc.drawString(infoText, devX - 1, devY - 1, true);
-
-      gc.drawString(infoText, devX + 1, devY - 1, true);
-      gc.drawString(infoText, devX - 1, devY + 1, true);
-
-      gc.drawString(infoText, devX + 1, devY, true);
-      gc.drawString(infoText, devX - 1, devY, true);
-
-      gc.drawString(infoText, devX, devY + 1, true);
-      gc.drawString(infoText, devX, devY - 1, true);
-
-      /*
-       * Draw text
-       */
-      gc.setForeground(SYS_COLOR_BLACK);
-      gc.drawString(infoText, devX, devY, true);
-   }
-
    private void paint_HoveredTour(final GC gc) {
 
-      if (_devHoveredPoint == null) {
+      final int numTours = _devHoveredPoint.size();
+
+      if (numTours == 0) {
          return;
       }
-
-      final int HOVERED_POINT_SIZE = 20;
 
       gc.setLineWidth(30);
       gc.setLineCap(SWT.CAP_ROUND);
@@ -3510,34 +3493,55 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
       gc.setAlpha(0x80);
       gc.setAntialias(SWT.ON);
       {
-
-         final int devX = _devHoveredPoint.x - HOVERED_POINT_SIZE / 2;
-         final int devY = _devHoveredPoint.y - HOVERED_POINT_SIZE / 2;
-
-         gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+         /*
+          * Paint hovered tour
+          */
          paint_HoveredTour_Tour(gc);
 
-         gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-         gc.fillRectangle(
-               _devHoveredPoint.x,
-               _devHoveredPoint.y,
-               HOVERED_POINT_SIZE,
-               HOVERED_POINT_SIZE);
+         /*
+          * Paint hovered rectangle
+          */
+         gc.setLineWidth(1);
 
-         gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-         gc.fillRectangle(
-               _devHoveredPoint.x,
-               _devHoveredPoint.y,
-               2,
-               2);
+         for (final Point hoveredPoint : _devHoveredPoint) {
+
+            gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+            gc.fillRectangle(
+                  hoveredPoint.x,
+                  hoveredPoint.y,
+                  EXPANDED_HOVER_SIZE,
+                  EXPANDED_HOVER_SIZE);
+
+            gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+            gc.drawRectangle(
+                  hoveredPoint.x,
+                  hoveredPoint.y,
+                  EXPANDED_HOVER_SIZE,
+                  EXPANDED_HOVER_SIZE);
+         }
       }
       gc.setAntialias(SWT.OFF);
       gc.setAlpha(0xff);
+
+      int devY = _mouseMove_DevPosition_Y;
+
+      for (final long tourId : _allHoveredTourIds.toArray()) {
+
+         final String hoverText = "" + tourId;
+
+         paint_Text_WithBorder(gc,
+               hoverText,
+               new Point(_mouseMove_DevPosition_X, devY));
+
+         devY -= 10;
+      }
    }
 
    private void paint_HoveredTour_Tour(final GC gc) {
 
-      final Long tourId = _allHoveredTours.get(0);
+      gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+
+      final Long tourId = _allHoveredTourIds.get(0);
       final TourData tourData = TourManager.getTour(tourId);
 
       final MP mp = getMapProvider();
@@ -3942,8 +3946,8 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
    private void paint_Overlay_22_PaintTileBasic(final Tile tile) {
 
       // cleanup previous positions
-      tile.allHoverRectangle.clear();
-      tile.allHoverTourID.clear();
+      tile.allPainted_HoverRectangle.clear();
+      tile.allPainted_HoverTourID.clear();
 
       boolean isOverlayPainted = false;
 
@@ -4265,6 +4269,46 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
             }
          }
       }
+   }
+
+   /**
+    * Draw border around text to make it more visible
+    */
+   private void paint_Text_Border(final GC gc, final String text, final int devX, final int devY) {
+
+      gc.setForeground(SYS_COLOR_WHITE);
+
+      gc.drawString(text, devX + 1, devY + 1, true);
+      gc.drawString(text, devX - 1, devY - 1, true);
+
+      gc.drawString(text, devX + 1, devY - 1, true);
+      gc.drawString(text, devX - 1, devY + 1, true);
+
+      gc.drawString(text, devX + 1, devY, true);
+      gc.drawString(text, devX - 1, devY, true);
+
+      gc.drawString(text, devX, devY + 1, true);
+      gc.drawString(text, devX, devY - 1, true);
+   }
+
+   private void paint_Text_WithBorder(final GC gc, final String text, final Point topLeft) {
+
+      if (text == null) {
+         return;
+      }
+
+      final Point textSize = gc.stringExtent(text);
+
+      final int devX = topLeft.x;
+      final int devY = topLeft.y - textSize.y - 5;
+
+      paint_Text_Border(gc, text, devX, devY);
+
+      /*
+       * Draw text
+       */
+      gc.setForeground(SYS_COLOR_BLACK);
+      gc.drawString(text, devX, devY, true);
    }
 
    private Tile paint_Tile(final GC gcMapImage,
@@ -5528,8 +5572,8 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
                mouseMove_DevPosition_X,
                mouseMove_DevPosition_Y,
 
-               _allHoveredTours.size() > 0
-                     ? new HoveredTourData(_allHoveredTours, _devHoveredPoint, _devHoveredRect)
+               _allHoveredTourIds.size() > 0
+                     ? new HoveredTourData(_allHoveredTourIds, _devHoveredPoint)
                      : null);
       }
    }
@@ -6020,8 +6064,8 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
       _tilePixelSize = _mp.getTileSize();
 
       // get the visible tiles which can be displayed in the viewport area
-      _numTileWidth = (int) Math.ceil((double) visiblePixelWidth / (double) _tilePixelSize);
-      _numTileHeight = (int) Math.ceil((double) visiblePixelHeight / (double) _tilePixelSize);
+      final int numTileWidth = (int) Math.ceil((double) visiblePixelWidth / (double) _tilePixelSize);
+      final int numTileHeight = (int) Math.ceil((double) visiblePixelHeight / (double) _tilePixelSize);
 
       /*
        * tileOffsetX and tileOffsetY are the x- and y-values for the offset of the visible screen to
@@ -6030,12 +6074,12 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
       final int tileOffsetX = (int) Math.floor((double) _worldPixel_TopLeft_Viewport.x / (double) _tilePixelSize);
       final int tileOffsetY = (int) Math.floor((double) _worldPixel_TopLeft_Viewport.y / (double) _tilePixelSize);
 
-      _tilePosMinX = tileOffsetX;
-      _tilePosMinY = tileOffsetY;
-      _tilePosMaxX = _tilePosMinX + _numTileWidth;
-      _tilePosMaxY = _tilePosMinY + _numTileHeight;
+      _tilePos_MinX = tileOffsetX;
+      _tilePos_MinY = tileOffsetY;
+      _tilePos_MaxX = _tilePos_MinX + numTileWidth;
+      _tilePos_MaxY = _tilePos_MinY + numTileHeight;
 
-      _allPaintedTiles = new Tile[_numTileWidth + 1][_numTileHeight + 1];
+      _allPaintedTiles = new Tile[numTileWidth + 1][numTileHeight + 1];
 
       /*
        * Pixel size for one geo grid, 0.01 degree

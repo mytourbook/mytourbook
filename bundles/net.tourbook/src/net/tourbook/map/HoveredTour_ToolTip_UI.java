@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.map;
 
+import gnu.trove.list.array.TLongArrayList;
+
 import java.util.ArrayList;
 
 import net.tourbook.chart.ColorCache;
@@ -261,7 +263,7 @@ public class HoveredTour_ToolTip_UI extends Pinned_ToolTip_Shell implements IPin
          if (hoveredData instanceof HoveredTourData) {
 
             final HoveredTourData hoveredTourData = (HoveredTourData) hoveredData;
-            final Point devHoveredTourPoint = hoveredTourData.devHoveredTourPoint;
+            final Point devHoveredTourPoint = hoveredTourData.allDevHoveredTourPoint.get(0);
 
             devHoveredTourPointLong = new PointLong(devHoveredTourPoint.x, devHoveredTourPoint.y);
 
@@ -297,11 +299,14 @@ public class HoveredTour_ToolTip_UI extends Pinned_ToolTip_Shell implements IPin
    @Override
    protected boolean shouldCreateToolTip(final Event event) {
 
+      // hide until it displays valid data
+      return false;
+
 //      if (_currentHoverData == null) {
 //         return false;
 //      }
 
-      return super.shouldCreateToolTip(event);
+//      return super.shouldCreateToolTip(event);
    }
 
    @Override
@@ -373,7 +378,7 @@ public class HoveredTour_ToolTip_UI extends Pinned_ToolTip_Shell implements IPin
 
          // a tour is hovered
 
-         final ArrayList<Long> allHoveredTours = hoveredTourData.allHoveredTours;
+         final TLongArrayList allHoveredTours = hoveredTourData.allHoveredTourIds;
 
          final String debugText = allHoveredTours.size() > 0 ? "" + allHoveredTours.get(0) : "";
 

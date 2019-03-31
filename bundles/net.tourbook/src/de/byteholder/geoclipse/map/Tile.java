@@ -11,6 +11,8 @@ package de.byteholder.geoclipse.map;
 import de.byteholder.geoclipse.mapprovider.ImageDataResources;
 import de.byteholder.geoclipse.mapprovider.MP;
 
+import gnu.trove.list.array.TLongArrayList;
+
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
@@ -189,10 +191,11 @@ public class Tile extends Observable {
    private final ArrayList<Rectangle>[]    _twpEnhancedBounds = new ArrayList[MAX_BOUNDS];
 
    /**
-    * The hover rectangles will be set when a tile is painted
+    * The hover rectangles will be set when a tile is painted, the rectangle position is relative to
+    * the tile
     */
-   public ArrayList<Rectangle>             allHoverRectangle  = new ArrayList<>();
-   public ArrayList<Long>                  allHoverTourID     = new ArrayList<>();
+   public ArrayList<Rectangle>             allPainted_HoverRectangle  = new ArrayList<>();
+   public TLongArrayList                   allPainted_HoverTourID     = new TLongArrayList();
 
    /**
     * Create a new Tile at the specified tile point and zoom level
@@ -1109,7 +1112,7 @@ public class Tile extends Observable {
             + " x=" + Integer.toString(_x) //$NON-NLS-1$
             + " y=" + Integer.toString(_y) + NL //$NON-NLS-1$
 
-            + "allHoverRectangle: " + allHoverRectangle.size() + NL
+            + "allHoverRectangle: " + allPainted_HoverRectangle.size() + NL
 
 //
 //            + (_isLoading ? " LOAD" : COLUMN_5) //$NON-NLS-1$

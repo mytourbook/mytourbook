@@ -15,29 +15,26 @@
  *******************************************************************************/
 package net.tourbook.map;
 
+import gnu.trove.list.array.TLongArrayList;
+
 import java.util.ArrayList;
 
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 
 public class HoveredTourData {
 
-   ArrayList<Long> allHoveredTours;
+   TLongArrayList   allHoveredTourIds;
 
    /**
     * Point in a tour which is hovered
     */
-   Point           devHoveredTourPoint;
+   ArrayList<Point> allDevHoveredTourPoint;
 
-   Rectangle       devHoveredTourRect;
+   public HoveredTourData(final TLongArrayList allHoveredTourIds,
+                          final ArrayList<Point> allDevHoveredPoint) {
 
-   public HoveredTourData(final ArrayList<Long> allHoveredTours,
-                          final Point devHoveredTourPoint,
-                          final Rectangle devHoveredTourRect) {
+      this.allHoveredTourIds = allHoveredTourIds;
 
-      this.allHoveredTours = allHoveredTours;
-
-      this.devHoveredTourPoint = devHoveredTourPoint;
-      this.devHoveredTourRect = devHoveredTourRect;
+      this.allDevHoveredTourPoint = allDevHoveredPoint;
    }
 }

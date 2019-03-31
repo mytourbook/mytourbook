@@ -1678,6 +1678,13 @@ public class TourMapPainter extends MapPainter {
                         devFrom_WithOffsetX = devX;
                         devFrom_WithOffsetY = devY;
                      }
+                  } else {
+
+//                     System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ()")
+//                           + ("\tskipped: " + devX + " " + devY)
+////                           + ("\t: " + )
+//                           );
+//// TODO remove SYSTEM.OUT.PRINTLN
                   }
                }
             }
@@ -1749,8 +1756,8 @@ public class TourMapPainter extends MapPainter {
             (_lineWidth + Map.EXPANDED_HOVER_SIZE),
             (_lineWidth + Map.EXPANDED_HOVER_SIZE));
 
-      tile.allHoverRectangle.add(hoveredRect);
-      tile.allHoverTourID.add(tourId);
+      tile.allPainted_HoverRectangle.add(hoveredRect);
+      tile.allPainted_HoverTourID.add(tourId);
    }
 
    /**
