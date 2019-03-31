@@ -2259,7 +2259,8 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
 
       long painted_HoveredTourId = -1;
 
-      for (int hoverIndex = 0; hoverIndex < allPainted_HoveredTourId.length; hoverIndex++) {
+      final int numPainted_HoveredTourId = allPainted_HoveredTourId.length;
+      for (int hoverIndex = 0; hoverIndex < numPainted_HoveredTourId; hoverIndex++) {
 
          final Rectangle painted_HoveredRectangle = allPainted_HoveredRectangle[hoverIndex];
 
@@ -2282,7 +2283,8 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
             _devHoveredPoint.add(new Point(devHoveredRect_Center_X, devHoveredRect_Center_Y));
 
             // advance to the next tour id
-            for (int hoverTourIdIndex = hoverIndex + 1; hoverTourIdIndex < allPainted_HoveredTourId.length; hoverTourIdIndex++) {
+            int hoverTourIdIndex;
+            for (hoverTourIdIndex = hoverIndex + 1; hoverTourIdIndex < numPainted_HoveredTourId; hoverTourIdIndex++) {
 
                final long nextPainted_HoveredTourId = allPainted_HoveredTourId[hoverTourIdIndex];
 
@@ -2294,6 +2296,11 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
 
                   break;
                }
+            }
+
+            // this must be checked again otherwise the last tour id occures multiple times
+            if (hoverTourIdIndex >= numPainted_HoveredTourId) {
+               break;
             }
          }
       }
@@ -3490,13 +3497,16 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
       gc.setLineCap(SWT.CAP_ROUND);
       gc.setLineJoin(SWT.JOIN_ROUND);
 
-      gc.setAlpha(0x80);
       gc.setAntialias(SWT.ON);
       {
          /*
           * Paint hovered tour
           */
-         paint_HoveredTour_Tour(gc);
+         if (_devHoveredPoint.size() == 1) {
+
+            gc.setAlpha(0x80);
+            paint_HoveredTour_Tour(gc);
+         }
 
          /*
           * Paint hovered rectangle
@@ -3505,6 +3515,7 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
 
          for (final Point hoveredPoint : _devHoveredPoint) {
 
+            gc.setAlpha(0x60);
             gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
             gc.fillRectangle(
                   hoveredPoint.x,
@@ -3512,6 +3523,7 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
                   EXPANDED_HOVER_SIZE,
                   EXPANDED_HOVER_SIZE);
 
+            gc.setAlpha(0xff);
             gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
             gc.drawRectangle(
                   hoveredPoint.x,
