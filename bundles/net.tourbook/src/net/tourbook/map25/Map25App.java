@@ -1112,9 +1112,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	   final Layers layers = mMap.layers();
 	   final int layer_index_MapBookmark = layers.indexOf(_layer_MapBookmark);
 	   final boolean isShowMapBookmark = config.isShowMapBookmark;
-	   System.out.println("# updateUI_MapBookmarkLayer(): entering");
+	   //System.out.println("# updateUI_MapBookmarkLayer(): entering");
 	   if (config.isMarkerClustered != _markertoolkit._isMarkerClusteredLast) { // only recreate MapBookmarkLayer when changed in UI
-	      System.out.println("# updateUI_MapBookmarkLayer(): index was before: " + layer_index_MapBookmark);
+	      //System.out.println("# updateUI_MapBookmarkLayer(): index was before: " + layer_index_MapBookmark);
 	      layers.remove(_layer_MapBookmark); 
 	      if (config.isMarkerClustered) {
 	         _layer_MapBookmark = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _markertoolkit._markerRendererFactory, this);
@@ -1122,7 +1122,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	         _layer_MapBookmark = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _markertoolkit._symbol, this);
 	      }
 	      layers.add(layer_index_MapBookmark, _layer_MapBookmark);
-	      System.out.println("# updateUI_MapBookmarkLayer(): index is now: " + layer_index_MapBookmark);
+	      //System.out.println("# updateUI_MapBookmarkLayer(): index is now: " + layer_index_MapBookmark);
 	   } else {
 	      _layer_MapBookmark.removeAllItems();
 	   }  
