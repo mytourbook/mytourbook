@@ -25,6 +25,7 @@ import de.byteholder.geoclipse.map.event.IMapInfoListener;
 import de.byteholder.geoclipse.map.event.IMapPositionListener;
 import de.byteholder.geoclipse.map.event.IPOIListener;
 import de.byteholder.geoclipse.map.event.IPositionListener;
+import de.byteholder.geoclipse.map.event.ITourSelectionListener;
 import de.byteholder.geoclipse.map.event.MapPOIEvent;
 import de.byteholder.geoclipse.map.event.MapPositionEvent;
 import de.byteholder.geoclipse.mapprovider.MP;
@@ -968,6 +969,18 @@ public class Map2View extends ViewPart implements
 
             _actionShowPOI.setEnabled(true);
             _actionShowPOI.setChecked(true);
+         }
+      });
+
+      _map.addTourSelectionListener(new ITourSelectionListener() {
+
+         @Override
+         public void onSelection(final SelectionTourId selection) {
+
+            TourManager.fireEventWithCustomData(
+                  TourEventId.TOUR_SELECTION,
+                  selection,
+                  Map2View.this);
          }
       });
 
