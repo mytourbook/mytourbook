@@ -15,7 +15,7 @@
  *******************************************************************************/
 package de.byteholder.geoclipse.map.event;
 
-import net.tourbook.tour.SelectionTourId;
+import org.eclipse.jface.viewers.ISelection;
 
 public interface ITourSelectionListener {
 
@@ -24,6 +24,6 @@ public interface ITourSelectionListener {
     *
     * @param selection
     */
-   public void onSelection(SelectionTourId selection);
+   public void onSelection(ISelection selection);
 
 }

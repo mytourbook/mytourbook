@@ -38,8 +38,6 @@ import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
 import de.byteholder.geoclipse.ui.TextWrapPainter;
 
-import gnu.trove.list.array.TLongArrayList;
-
 import java.awt.Dimension;
 import java.awt.geom.Point2D;
 import java.io.UnsupportedEncodingException;
@@ -76,6 +74,7 @@ import net.tourbook.map.HoveredTour_ToolTip_UI;
 import net.tourbook.map2.view.WayPointToolTipProvider;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.SelectionTourId;
+import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.filter.geo.TourGeoFilter;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
@@ -95,6 +94,7 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -475,7 +475,7 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
 
    private HoveredTour_ToolTip_UI _hovered_ToolTip;
    private long                   _hovered_SelectedTourId = Long.MIN_VALUE;
-   private TLongArrayList         _allHoveredTourIds      = new TLongArrayList();
+   private ArrayList<Long>        _allHoveredTourIds      = new ArrayList<>();
    private ArrayList<Point>       _devHoveredPoint        = new ArrayList<>();
 
    /**
@@ -1196,12 +1196,10 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
       }
    }
 
-   private void fireEvent_TourSelection(final Long tourId) {
-
-      final SelectionTourId tourSelection = new SelectionTourId(tourId);
+   private void fireEvent_TourSelection(final ISelection selection) {
 
       for (final Object selectionListener : _allTourSelectionListener.getListeners()) {
-         ((ITourSelectionListener) selectionListener).onSelection(tourSelection);
+         ((ITourSelectionListener) selectionListener).onSelection(selection);
       }
    }
 
@@ -2668,13 +2666,37 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
 
          redraw();
 
-      } else if (_allHoveredTourIds.size() == 1) {
+      } else if (_allHoveredTourIds.size() > 0) {
 
-         // select hovered tour
+         if (_allHoveredTourIds.size() == 1) {
 
-         _hovered_SelectedTourId = _allHoveredTourIds.get(0);
+            // select hovered tour
 
-         fireEvent_TourSelection(_hovered_SelectedTourId);
+            final long hoveredTour = _allHoveredTourIds.get(0);
+
+            if (_hovered_SelectedTourId != hoveredTour) {
+
+               // toggle selection -> select tour
+
+               _hovered_SelectedTourId = hoveredTour;
+
+               fireEvent_TourSelection(new SelectionTourId(_hovered_SelectedTourId));
+
+            } else {
+
+               // toggle selection -> hide tour selection
+
+               _hovered_SelectedTourId = Long.MIN_VALUE;
+            }
+
+
+         } else {
+
+            // hide single tour selection
+            _hovered_SelectedTourId = Long.MIN_VALUE;
+
+            fireEvent_TourSelection(new SelectionTourIds(_allHoveredTourIds));
+         }
 
          redraw();
 
@@ -3658,72 +3680,71 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
          }
       }
 
-      final boolean isShowNumTour = true;
+      final int devX = _mouseMove_DevPosition_X;
       int devY = _mouseMove_DevPosition_Y;
-      if (isShowNumTour) {
 
-         final int numTours = _allHoveredTourIds.size();
+      final int textMargin = 6;
+      final int textMargin2 = textMargin / 2;
 
-         if (numTours == 1) {
+      final int numTours = _allHoveredTourIds.size();
 
-            final TourData tourData = TourManager.getTour(_allHoveredTourIds.get(0));
+      if (numTours == 1) {
 
-            if (tourData == null) {
+         final TourData tourData = TourManager.getTour(_allHoveredTourIds.get(0));
 
-               // this occured, it can be that previously a history/multiple tour was displayed
+         if (tourData == null) {
 
-            } else {
-
-               final String hoverText = TourManager.getTourTitle(tourData);
-
-               paint_Text_WithBorder(gc,
-                     hoverText,
-                     new Point(_mouseMove_DevPosition_X, devY));
-
-               final String tourTitle = tourData.getTourTitle();
-               if (tourTitle.length() > 0) {
-
-                  devY -= 13;
-
-                  paint_Text_WithBorder(gc,
-                        tourTitle,
-                        new Point(_mouseMove_DevPosition_X, devY));
-               }
-            }
+            // this occured, it can be that previously a history/multiple tour was displayed
 
          } else {
 
-            final String hoverText = "Tours: " + Integer.toString(numTours);
+            final String hoverText = TourManager.getTourTitle(tourData);
 
             paint_Text_WithBorder(gc,
                   hoverText,
                   new Point(_mouseMove_DevPosition_X, devY));
+
+            final String tourTitle = tourData.getTourTitle();
+            if (tourTitle.length() > 0) {
+
+               devY -= 13;
+
+               paint_Text_WithBorder(gc,
+                     tourTitle,
+                     new Point(_mouseMove_DevPosition_X, devY));
+            }
          }
 
       } else {
 
-         final long[] allTourIds = _allHoveredTourIds.toArray();
+         final String hoverText = "Tours: " + Integer.toString(numTours);
 
-         for (int tourIndex = 0; tourIndex < allTourIds.length; tourIndex++) {
+         final Point textSize = gc.stringExtent(hoverText);
+         final int textWidth = textSize.x;
+         final int textHeight = textSize.y;
 
-            final long tourId = allTourIds[tourIndex];
-            final String hoverText = "" + tourId;
+         final int devYText = devY - textHeight - textMargin2;
 
-            paint_Text_WithBorder(gc,
-                  hoverText,
-                  new Point(_mouseMove_DevPosition_X, devY));
+         gc.setAlpha(0xff);
+         gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+         gc.fillRectangle(
+               devX,
+               devYText - textMargin,
+               textWidth + textMargin,
+               textHeight + textMargin);
 
-            devY -= 10;
+         gc.setAlpha(0xff);
+         gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
 
-            if (tourIndex > 10) {
+         gc.drawString(
+               hoverText,
+               devX + textMargin2,
+               devYText - textMargin2,
+               true);
 
-               paint_Text_WithBorder(gc,
-                     "...",
-                     new Point(_mouseMove_DevPosition_X, devY));
-
-               break;
-            }
-         }
+//         paint_Text_WithBorder(gc,
+//               hoverText,
+//               new Point(_mouseMove_DevPosition_X, devY));
       }
    }
 

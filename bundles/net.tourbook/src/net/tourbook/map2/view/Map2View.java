@@ -975,7 +975,7 @@ public class Map2View extends ViewPart implements
       _map.addTourSelectionListener(new ITourSelectionListener() {
 
          @Override
-         public void onSelection(final SelectionTourId selection) {
+         public void onSelection(final ISelection selection) {
 
             TourManager.fireEventWithCustomData(
                   TourEventId.TOUR_SELECTION,
