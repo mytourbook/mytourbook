@@ -1240,7 +1240,7 @@ public class Map2View extends ViewPart implements
 
                   // hide geo grid
 
-                  _map.showGeoGrid(null);
+                  hideGeoGrid();
                }
 
             } else if (eventId == TourEventId.SEGMENT_LAYER_CHANGED) {
@@ -2281,6 +2281,11 @@ public class Map2View extends ViewPart implements
       return mapPositions;
    }
 
+   private void hideGeoGrid() {
+
+      _map.showGeoGrid(null);
+   }
+
    private void keepMapPosition(final TourData tourData) {
 
       final GeoPosition centerPosition = _map.getMapGeoCenter();
@@ -2358,7 +2363,10 @@ public class Map2View extends ViewPart implements
          return;
       }
 
+
       if (selection instanceof SelectionTourData) {
+
+         hideGeoGrid();
 
          final SelectionTourData selectionTourData = (SelectionTourData) selection;
          final TourData tourData = selectionTourData.getTourData();
@@ -2369,6 +2377,8 @@ public class Map2View extends ViewPart implements
          enableActions();
 
       } else if (selection instanceof SelectionTourId) {
+
+         hideGeoGrid();
 
          final SelectionTourId tourIdSelection = (SelectionTourId) selection;
          final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
@@ -2381,6 +2391,8 @@ public class Map2View extends ViewPart implements
       } else if (selection instanceof SelectionTourIds) {
 
          // paint all selected tours
+
+         hideGeoGrid();
 
          final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
          if (tourIds.size() == 0) {

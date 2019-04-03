@@ -414,7 +414,8 @@ public class Messages extends NLS {
    public static String        App_Action_Columns;
    public static String        App_Action_Copy;
    public static String        App_Action_Delete;
-   public static String        App_Action_Delete_All;
+   public static String        App_Action_Delete_AllWithoutName;
+   public static String        App_Action_Delete_AllWithoutName_Tooltip;
    public static String        App_Action_Delete_WithConfirm;
    public static String        App_Action_DeleteProfile;
    public static String        App_Action_Dialog_ActionIsInProgress_Message;

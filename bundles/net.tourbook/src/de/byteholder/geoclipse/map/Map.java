@@ -2689,7 +2689,6 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
                _hovered_SelectedTourId = Long.MIN_VALUE;
             }
 
-
          } else {
 
             // hide single tour selection
@@ -3473,8 +3472,15 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
    private void paint_GridBox_20_Selected(final GC gc, final MapGridData mapGridData) {
 
       final Point devTopLeft = paint_GridBox_50_Rectangle(gc, mapGridData, true);
+//      final int x;
+//      paint_Text_WithBorder(gc, mapGridData.gridBox_Text, devTopLeft);
 
-      paint_Text_WithBorder(gc, mapGridData.gridBox_Text, devTopLeft);
+      paint_Text_Label(gc,
+            devTopLeft.x,
+            devTopLeft.y,
+            mapGridData.gridBox_Text,
+            Display.getCurrent().getSystemColor(SWT.COLOR_GREEN),
+            Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
    }
 
    /**
@@ -3683,9 +3689,6 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
       final int devX = _mouseMove_DevPosition_X;
       int devY = _mouseMove_DevPosition_Y;
 
-      final int textMargin = 6;
-      final int textMargin2 = textMargin / 2;
-
       final int numTours = _allHoveredTourIds.size();
 
       if (numTours == 1) {
@@ -3719,32 +3722,12 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
 
          final String hoverText = "Tours: " + Integer.toString(numTours);
 
-         final Point textSize = gc.stringExtent(hoverText);
-         final int textWidth = textSize.x;
-         final int textHeight = textSize.y;
-
-         final int devYText = devY - textHeight - textMargin2;
-
-         gc.setAlpha(0xff);
-         gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-         gc.fillRectangle(
+         paint_Text_Label(gc,
                devX,
-               devYText - textMargin,
-               textWidth + textMargin,
-               textHeight + textMargin);
-
-         gc.setAlpha(0xff);
-         gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-
-         gc.drawString(
+               devY,
                hoverText,
-               devX + textMargin2,
-               devYText - textMargin2,
-               true);
-
-//         paint_Text_WithBorder(gc,
-//               hoverText,
-//               new Point(_mouseMove_DevPosition_X, devY));
+               Display.getCurrent().getSystemColor(SWT.COLOR_BLUE),
+               Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
       }
    }
 
@@ -4431,6 +4414,43 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
 
       gc.drawString(text, devX, devY + 1, true);
       gc.drawString(text, devX, devY - 1, true);
+   }
+
+   private void paint_Text_Label(final GC gc,
+                                 final int devX,
+                                 final int devY,
+                                 final String text,
+                                 final Color foregroundColor,
+                                 final Color backgroundColor) {
+
+      if (text == null) {
+         return;
+      }
+
+      final int textMargin = 6;
+      final int textMargin2 = textMargin / 2;
+
+      final Point textSize = gc.stringExtent(text);
+      final int textWidth = textSize.x;
+      final int textHeight = textSize.y;
+
+      final int devYText = devY - textHeight - textMargin2;
+
+      gc.setAlpha(0xff);
+
+      gc.setBackground(foregroundColor);
+      gc.fillRectangle(
+            devX,
+            devYText - textMargin,
+            textWidth + textMargin,
+            textHeight + textMargin);
+
+      gc.setForeground(backgroundColor);
+      gc.drawString(
+            text,
+            devX + textMargin2,
+            devYText - textMargin2,
+            true);
    }
 
    private void paint_Text_WithBorder(final GC gc, final String text, final Point topLeft) {
@@ -5891,6 +5911,11 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
          return;
       }
 
+      // reset hovered data
+      _hovered_SelectedTourId = Long.MIN_VALUE;
+      _allHoveredTourIds.clear();
+      _devHoveredPoint.clear();
+
       grid_UpdatePaintingStateData();
 
       if (tourGeoFilter == null) {
@@ -5952,7 +5977,6 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
          /*
           * Reposition map
           */
-
          if (isSyncMapPosition) {
 
             // chck if gird box is already visible
@@ -5968,6 +5992,13 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
 
                setMapCenter(new GeoPosition(tourGeoFilter.mapGeoCenter.latitude, tourGeoFilter.mapGeoCenter.longitude));
             }
+
+         } else {
+
+            // map is not synched but location is wrong
+
+            updateViewPortData();
+            paint();
          }
       }
    }

@@ -103,10 +103,11 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
    private static final String            COLUMN_FILTER_NAME         = "filterName";                           //$NON-NLS-1$
    private static final String            COLUMN_GEO_PARTS           = "geoParts";                             //$NON-NLS-1$
    private static final String            COLUMN_LATITUDE_1          = "latitude1";                            //$NON-NLS-1$
-   private static final String            COLUMN_LONGITUDE_1         = "longitude1";                           //$NON-NLS-1$
    private static final String            COLUMN_LATITUDE_2          = "latitude2";                            //$NON-NLS-1$
+   private static final String            COLUMN_LONGITUDE_1         = "longitude1";                           //$NON-NLS-1$
    private static final String            COLUMN_LONGITUDE_2         = "longitude2";                           //$NON-NLS-1$
    private static final String            COLUMN_SEQUENCE            = "sequence";                             //$NON-NLS-1$
+   private static final String            COLUMN_ZOOM_LEVEL          = "zoomLevel";                            //$NON-NLS-1$
 
    private final static IDialogSettings   _state                     = TourGeoFilter_Manager.getState();
 
@@ -146,7 +147,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
    private Composite             _viewerContainer;
 
    private Button                _btnDeleteGeoFilter;
-   private Button                _btnDeleteGeoFilterAll;
+   private Button                _btnDeleteGeoFilterAllWithoutName;
 
    private Button                _chkIsAutoOpenSlideout;
    private Button                _chkIsSyncMapPosition;
@@ -190,7 +191,6 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
          case COLUMN_LATITUDE_1:
             rc = geoFilter1.geoLocation_TopLeft.latitude - geoFilter2.geoLocation_TopLeft.latitude;
             break;
-
          case COLUMN_LONGITUDE_1:
             rc = geoFilter1.geoLocation_TopLeft.longitude - geoFilter2.geoLocation_TopLeft.longitude;
             break;
@@ -198,7 +198,6 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
          case COLUMN_LATITUDE_2:
             rc = geoFilter1.geoLocation_BottomRight.latitude - geoFilter2.geoLocation_BottomRight.latitude;
             break;
-
          case COLUMN_LONGITUDE_2:
             rc = geoFilter1.geoLocation_BottomRight.longitude - geoFilter2.geoLocation_BottomRight.longitude;
             break;
@@ -210,6 +209,10 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
          case COLUMN_CREATED_DATE_TIME:
 
             // sorting by date is already set
+            break;
+
+         case COLUMN_ZOOM_LEVEL:
+            rc = geoFilter1.mapZoomLevel - geoFilter2.mapZoomLevel;
             break;
 
          default:
@@ -775,15 +778,16 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
             /*
              * Button: delete all geo filter
              */
-            _btnDeleteGeoFilterAll = new Button(container, SWT.NONE);
-            _btnDeleteGeoFilterAll.setText(Messages.App_Action_Delete_All);
-            _btnDeleteGeoFilterAll.addSelectionListener(new SelectionAdapter() {
+            _btnDeleteGeoFilterAllWithoutName = new Button(container, SWT.NONE);
+            _btnDeleteGeoFilterAllWithoutName.setText(Messages.App_Action_Delete_AllWithoutName);
+            _btnDeleteGeoFilterAllWithoutName.setToolTipText(Messages.App_Action_Delete_AllWithoutName_Tooltip);
+            _btnDeleteGeoFilterAllWithoutName.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
-                  onGeoFilter_Delete_All();
+                  onGeoFilter_Delete_AllWithoutName();
                }
             });
-            UI.setButtonLayoutData(_btnDeleteGeoFilterAll);
+            UI.setButtonLayoutData(_btnDeleteGeoFilterAllWithoutName);
          }
       }
    }
@@ -811,8 +815,6 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
       colDef.setColumnHeaderText(Messages.GeoCompare_View_Column_SequenceNumber_Header);
       colDef.setColumnHeaderToolTipText(Messages.GeoCompare_View_Column_SequenceNumber_Label);
 
-      colDef.setIsDefaultColumn();
-      colDef.setCanModifyVisibility(false);
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
 
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -913,7 +915,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
     */
    private void defineColumn_30_Zoomlevel() {
 
-      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "zoomLevel", SWT.TRAIL); //$NON-NLS-1$
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_ZOOM_LEVEL, SWT.TRAIL);
 
       colDef.setColumnLabel(Messages.Map_Bookmark_Column_ZoomLevel_Tooltip);
       colDef.setColumnHeaderText(Messages.Map_Bookmark_Column_ZoomLevel);
@@ -921,7 +923,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
 
       colDef.setIsDefaultColumn();
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(5));
-//    colDef.setColumnWeightData(new ColumnWeightData(5));
+      colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -947,7 +949,6 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
 
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
 
-      colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -974,7 +975,6 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
 
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
 
-      colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -1001,7 +1001,6 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
 
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
 
-      colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -1028,7 +1027,6 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
 
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
 
-      colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -1062,7 +1060,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
       final boolean isGeoFilterSelected = _selectedFilter != null;
 
       _btnDeleteGeoFilter.setEnabled(isGeoFilterSelected);
-      _btnDeleteGeoFilterAll.setEnabled(_allGeoFilter.size() > 0);
+      _btnDeleteGeoFilterAllWithoutName.setEnabled(_allGeoFilter.size() > 0);
    }
 
    @Override
@@ -1254,7 +1252,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
       _geoFilterViewer.getTable().setFocus();
    }
 
-   private void onGeoFilter_Delete_All() {
+   private void onGeoFilter_Delete_AllWithoutName() {
 
       if (_allGeoFilter.size() == 0) {
          return;
@@ -1271,7 +1269,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
                MessageDialog.QUESTION,
                0,
 
-               Messages.App_Action_Delete_All,
+               Messages.App_Action_Delete_AllWithoutName,
                IDialogConstants.CANCEL_LABEL
 
          ).open();
@@ -1283,7 +1281,16 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
       }
 
       // update model
+
+      // get all geo filter with name
+      final ArrayList<TourGeoFilter> allGeoFilter_WithName = new ArrayList<>();
+      for (final TourGeoFilter tourGeoFilter : _allGeoFilter) {
+         if (tourGeoFilter.filterName.length() > 0) {
+            allGeoFilter_WithName.add(tourGeoFilter);
+         }
+      }
       _allGeoFilter.clear();
+      _allGeoFilter.addAll(allGeoFilter_WithName);
 
       // update UI
       _geoFilterViewer.refresh();
