@@ -217,8 +217,8 @@ public class Map2View extends ViewPart implements
    private static final String   STATE_IS_SHOW_TOUR_IN_MAP                             = "STATE_IS_SHOW_TOUR_IN_MAP";                          //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_PHOTO_IN_MAP                            = "STATE_IS_SHOW_PHOTO_IN_MAP";                         //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_LEGEND_IN_MAP                           = "STATE_IS_SHOW_LEGEND_IN_MAP";                        //$NON-NLS-1$
-   public static final String    STATE_IS_SHOW_HOVERED_TOUR_TOOLTIP                    = "STATE_IS_SHOW_HOVERED_TOUR_TOOLTIP";                 //$NON-NLS-1$
-   public static final boolean   STATE_IS_SHOW_HOVERED_TOUR_TOOLTIP_DEFAULT            = true;
+   public static final String    STATE_IS_SHOW_HOVERED_SELECTED_TOUR                    = "STATE_IS_SHOW_HOVERED_SELECTED_TOUR";                 //$NON-NLS-1$
+   public static final boolean   STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT            = true;
    private static final String   STATE_IS_SYNC_MAP2_WITH_OTHER_MAP                     = "STATE_IS_SYNC_MAP2_WITH_OTHER_MAP";                  //$NON-NLS-1$
    private static final String   STATE_IS_SYNC_WITH_PHOTO                              = "STATE_IS_SYNC_WITH_PHOTO";                           //$NON-NLS-1$
    private static final String   STATE_IS_SYNC_WITH_TOURCHART_SLIDER                   = "STATE_IS_SYNC_WITH_TOURCHART_SLIDER";                //$NON-NLS-1$
@@ -1230,10 +1230,10 @@ public class Map2View extends ViewPart implements
 
                   final TourGeoFilter tourGeoFilter = (TourGeoFilter) eventData;
 
-                  // show search rectangle
-                  _map.showGeoGrid(tourGeoFilter);
+                     // show search rectangle
+                     _map.showGeoGrid(tourGeoFilter);
 
-                  // show tours in search rectangle
+                     // show tours in search rectangle
                   geoFilter_10_Loader(tourGeoFilter.mapGridData, tourGeoFilter);
 
                } else if (eventData == null) {
@@ -2363,7 +2363,6 @@ public class Map2View extends ViewPart implements
          return;
       }
 
-
       if (selection instanceof SelectionTourData) {
 
          hideGeoGrid();
@@ -3479,8 +3478,8 @@ public class Map2View extends ViewPart implements
             Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT));
 
       _map.setShowHoveredTourTooltip(Util.getStateBoolean(_state,
-            Map2View.STATE_IS_SHOW_HOVERED_TOUR_TOOLTIP,
-            Map2View.STATE_IS_SHOW_HOVERED_TOUR_TOOLTIP_DEFAULT));
+            Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR,
+            Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT));
    }
 
    void restoreState_Map2_TrackOptions(final boolean isUpdateMapUI) {

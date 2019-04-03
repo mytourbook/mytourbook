@@ -89,15 +89,15 @@ public class HoveredTour_ToolTip_UI extends Pinned_ToolTip_Shell implements IPin
 
       // get state if the tooltip is visible or hidden
       _isToolTipVisible = Util.getStateBoolean(_state,
-            Map2View.STATE_IS_SHOW_HOVERED_TOUR_TOOLTIP,
-            Map2View.STATE_IS_SHOW_HOVERED_TOUR_TOOLTIP_DEFAULT);
+            Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR,
+            Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT);
 
       setPinLocation(Pinned_ToolTip_PinLocation.Screen);
    }
 
    void actionHideToolTip() {
 
-      _state.put(Map2View.STATE_IS_SHOW_HOVERED_TOUR_TOOLTIP, false);
+      _state.put(Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR, false);
 
       _isToolTipVisible = false;
 

@@ -69,8 +69,7 @@ import net.tourbook.common.util.TourToolTip;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourWayPoint;
-import net.tourbook.map.HoveredTourData;
-import net.tourbook.map.HoveredTour_ToolTip_UI;
+import net.tourbook.map2.view.Map2View;
 import net.tourbook.map2.view.WayPointToolTipProvider;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.SelectionTourId;
@@ -450,76 +449,76 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
    private final ListenerList<IPOIListener>           _poiListeners             = new ListenerList<>(ListenerList.IDENTITY);
 
    // measurement system
-   private float                  _distanceUnitValue      = 1;
-   private String                 _distanceUnitLabel      = UI.EMPTY_STRING;
-   private boolean                _isScaleVisible;
+   private float            _distanceUnitValue         = 1;
+   private String           _distanceUnitLabel         = UI.EMPTY_STRING;
+   private boolean          _isScaleVisible;
 
-   private final Color            _transparentColor;
-   private final Color            _defaultBackgroundColor;
+   private final Color      _transparentColor;
+   private final Color      _defaultBackgroundColor;
    /*
     * POI image
     */
-   private boolean                _isPoiVisible;
-   private boolean                _isPoiPositionInViewport;
+   private boolean          _isPoiVisible;
+   private boolean          _isPoiPositionInViewport;
    //
-   private final Image            _poiImage;
-   private final Rectangle        _poiImageBounds;
-   private final Point            _poiImageDevPosition    = new Point(0, 0);
+   private final Image      _poiImage;
+   private final Rectangle  _poiImageBounds;
+   private final Point      _poiImageDevPosition       = new Point(0, 0);
    /*
     * POI tooltip
     */
-   private PoiToolTip             _poi_Tooltip;
-   private final int              _poi_Tooltip_OffsetY    = 5;
+   private PoiToolTip       _poi_Tooltip;
+   private final int        _poi_Tooltip_OffsetY       = 5;
 
-   private TourToolTip            _tour_ToolTip;
+   private TourToolTip      _tour_ToolTip;
 
-   private HoveredTour_ToolTip_UI _hovered_ToolTip;
-   private long                   _hovered_SelectedTourId = Long.MIN_VALUE;
-   private ArrayList<Long>        _allHoveredTourIds      = new ArrayList<>();
-   private ArrayList<Point>       _devHoveredPoint        = new ArrayList<>();
+   private boolean          _isShowHoveredSelectedTour = Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT;
+   private long             _hovered_SelectedTourId    = Long.MIN_VALUE;
+   private ArrayList<Long>  _allHoveredTourIds         = new ArrayList<>();
+   private ArrayList<Point> _devHoveredPoint           = new ArrayList<>();
 
    /**
     * when <code>true</code> the loading... image is not displayed
     */
-   private boolean                _isLiveView;
-   private long                   _lastMapDrawTime;
+   private boolean          _isLiveView;
+   private long             _lastMapDrawTime;
    /*
     * All painted tiles in the map are within these 4 tile positions
     */
-   private int                    _tilePos_MinX;
-   private int                    _tilePos_MaxX;
-   private int                    _tilePos_MinY;
-   private int                    _tilePos_MaxY;
+   private int              _tilePos_MinX;
+   private int              _tilePos_MaxX;
+   private int              _tilePos_MinY;
+   private int              _tilePos_MaxY;
    //
-   private Tile[][]               _allPaintedTiles;
+   private Tile[][]         _allPaintedTiles;
    //
-   private final Display          _display;
-   private final Thread           _displayThread;
+   private final Display    _display;
+   private final Thread     _displayThread;
    //
-   private int                    _jobCounterSplitImages  = 0;
-   private Object                 _splitJobFamily         = new Object();
-   private boolean                _isCancelSplitJobs;
+   private int              _jobCounterSplitImages     = 0;
+   private Object           _splitJobFamily            = new Object();
+   private boolean          _isCancelSplitJobs;
 
    /**
     * When <code>true</code> the tour is painted in the map in the enhanced mode otherwise in the
     * simple mode
     */
-   private boolean                _isTourPaintMethodEnhanced;
+   private boolean          _isTourPaintMethodEnhanced;
    /*
     * Download offline images
     */
-   private boolean                _offline_IsSelectingOfflineArea;
-   private boolean                _offline_IsOfflineSelectionStarted;
-   private boolean                _offline_IsPaintOfflineArea;
+   private boolean          _offline_IsSelectingOfflineArea;
+   private boolean          _offline_IsOfflineSelectionStarted;
+   private boolean          _offline_IsPaintOfflineArea;
 
-   private Point                  _offline_DevMouse_Start;
-   private Point                  _offline_DevMouse_End;
-   private Point                  _offline_DevTileStart;
-   private Point                  _offline_DevTileEnd;
+   private Point            _offline_DevMouse_Start;
+   private Point            _offline_DevMouse_End;
+   private Point            _offline_DevTileStart;
+   private Point            _offline_DevTileEnd;
 
-   private Point                  _offline_WorldMouse_Start;
-   private Point                  _offline_WorldMouse_End;
-   private Point                  _offline_WorldMouse_Move;
+   private Point            _offline_WorldMouse_Start;
+   private Point            _offline_WorldMouse_End;
+   private Point            _offline_WorldMouse_Move;
 
 //   private Rectangle _offline_CurrentOfflineArea;
 //   private Rectangle _offline_PreviousOfflineArea;
@@ -614,8 +613,6 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
 
       _poiImage = TourbookPlugin.getImageDescriptor(IMAGE_POI_IN_MAP).createImage();
       _poiImageBounds = _poiImage.getBounds();
-
-      _hovered_ToolTip = new HoveredTour_ToolTip_UI(this, _state);
 
       paint_Overlay_0_SetupThread();
    }
@@ -1277,10 +1274,6 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
    @Override
    public Control getControl() {
       return this;
-   }
-
-   public HoveredTour_ToolTip_UI getHoveredTooltip() {
-      return _hovered_ToolTip;
    }
 
    /**
@@ -2320,15 +2313,9 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
 
       if (_allHoveredTourIds.size() > 0) {
 
-         _hovered_ToolTip.setHoveredData(devMouseX,
-               devMouseY,
-               new HoveredTourData(_allHoveredTourIds, _devHoveredPoint));
-
          return true;
 
       } else {
-
-         _hovered_ToolTip.setHoveredData(devMouseX, devMouseY, null);
 
          // hide hovered tour
          paint();
@@ -2497,8 +2484,6 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
       if (_poi_Tooltip != null) {
          _poi_Tooltip.dispose();
       }
-
-      _hovered_ToolTip.hide();
 
       // stop overlay thread
       _overlayThread.interrupt();
@@ -2995,7 +2980,7 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
          }
 
          boolean isHoveredAndSelectedTour = false;
-         if (_hovered_ToolTip.isVisible()) {
+         if (_isShowHoveredSelectedTour) {
 
             final int numTours = _devHoveredPoint.size();
 
@@ -5722,7 +5707,7 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
          paint();
       }
 
-      _hovered_ToolTip.setIsToolTipVisible(isVisible);
+      _isShowHoveredSelectedTour = isVisible;
 
       if (isVisible) {
 
@@ -5736,15 +5721,6 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
             mouseMove_DevPosition_X = _mouseMove_DevPosition_X_Last;
             mouseMove_DevPosition_Y = _mouseMove_DevPosition_Y_Last;
          }
-
-         _hovered_ToolTip.setHoveredData(
-
-               mouseMove_DevPosition_X,
-               mouseMove_DevPosition_Y,
-
-               _allHoveredTourIds.size() > 0
-                     ? new HoveredTourData(_allHoveredTourIds, _devHoveredPoint)
-                     : null);
       }
    }
 
