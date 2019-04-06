@@ -660,6 +660,8 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 
 		// update UI
 		_bookmarkViewer.refresh();
+		
+		MapBookmarkManager.fireBookmarkEvent(selectedBookmark, net.tourbook.map.bookmark.IMapBookmarks.MapBookmarkEventType_modified);
 
 		enableActions();
 	}
@@ -707,6 +709,9 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 
 		// reselect bookmark
 		_bookmarkViewer.setSelection(new StructuredSelection(selectedBookmark), true);
+		
+		//update maps
+		MapBookmarkManager.fireBookmarkEvent(selectedBookmark, net.tourbook.map.bookmark.IMapBookmarks.MapBookmarkEventType_modified);
 	}
 
 	private void onBookmark_Select() {
@@ -718,7 +723,7 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 			return;
 		}
 
-		MapBookmarkManager.fireBookmarkEvent(selectedBookmark);
+		MapBookmarkManager.fireBookmarkEvent(selectedBookmark, net.tourbook.map.bookmark.IMapBookmarks.MapBookmarkEventType_moveto);
 
 		enableActions();
 	}

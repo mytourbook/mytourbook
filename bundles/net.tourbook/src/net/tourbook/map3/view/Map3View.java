@@ -1646,16 +1646,13 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 	}
 
 	@Override
-	public void onSelectBookmark(final MapBookmark mapBookmark) {
+	public void onMapBookmarkActionPerformed(final MapBookmark mapBookmark, final int mapBookmarkEventType) {
 
-		moveToMapLocation(mapBookmark);
+	   if (mapBookmarkEventType == MapBookmarkEventType_moveto) {   
+	      moveToMapLocation(mapBookmark);
+	   }
 	}
 	
-   @Override
-   public void onModifiedBookmark(MapBookmark mapbookmark) {
-      // TODO Auto-generated method stub
-      
-   }
 
 	private void onSelectionChanged(final ISelection selection) {
 
