@@ -975,13 +975,34 @@ public class Map2View extends ViewPart implements
       _map.addTourSelectionListener(new ITourSelectionListener() {
 
          @Override
-         public void onSelection(final ISelection selection) {
+         public void onSelection(final ISelection selection, final boolean isSelectAlsoInThisView) {
+
+            if (isSelectAlsoInThisView) {
+
+               _map.getDisplay().asyncExec(new Runnable() {
+                  @Override
+                  public void run() {
+
+                     if (selection instanceof SelectionTourIds) {
+
+                        // clone tour id's otherwise the original will be removed
+                        final SelectionTourIds selectionTourIds = (SelectionTourIds) selection;
+
+                        final ArrayList<Long> allTourIds = new ArrayList<>();
+                        allTourIds.addAll(selectionTourIds.getTourIds());
+
+                        onSelectionChanged(new SelectionTourIds(allTourIds));
+                     }
+                  }
+               });
+            }
 
             TourManager.fireEventWithCustomData(
                   TourEventId.TOUR_SELECTION,
                   selection,
                   Map2View.this);
          }
+
       });
 
       _map.addMapGridBoxListener(new IMapGridListener() {
@@ -1001,7 +1022,6 @@ public class Map2View extends ViewPart implements
                geoFilter_10_Loader(mapGridData, null);
             }
          }
-
       });
 
       _map.addMapInfoListener(this);
@@ -1230,10 +1250,10 @@ public class Map2View extends ViewPart implements
 
                   final TourGeoFilter tourGeoFilter = (TourGeoFilter) eventData;
 
-                     // show search rectangle
-                     _map.showGeoGrid(tourGeoFilter);
+                  // show search rectangle
+                  _map.showGeoGrid(tourGeoFilter);
 
-                     // show tours in search rectangle
+                  // show tours in search rectangle
                   geoFilter_10_Loader(tourGeoFilter.mapGridData, tourGeoFilter);
 
                } else if (eventData == null) {

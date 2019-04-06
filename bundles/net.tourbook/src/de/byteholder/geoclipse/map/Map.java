@@ -58,6 +58,7 @@ import java.util.regex.Pattern;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorCacheSWT;
+import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.tooltip.IPinned_Tooltip_Owner;
 import net.tourbook.common.util.HoveredAreaContext;
@@ -93,6 +94,7 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -121,6 +123,7 @@ import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
@@ -141,6 +144,9 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
    private static final String          IMAGE_POI_IN_MAP                      = de.byteholder.geoclipse.poi.Messages.Image_POI_InMap;
    private static final String          IMAGE_SEARCH_TOURS_BY_LOCATION        = net.tourbook.Messages.Image__SearchToursByLocation;
    private static final String          IMAGE_SEARCH_TOURS_BY_LOCATION_SCROLL = net.tourbook.Messages.Image__SearchToursByLocation_Scroll;
+
+   private static final String          TOUR_TOOLTIP_LABEL_DISTANCE           = net.tourbook.ui.Messages.Tour_Tooltip_Label_Distance;
+   private static final String          TOUR_TOOLTIP_LABEL_MOVING_TIME        = net.tourbook.ui.Messages.Tour_Tooltip_Label_MovingTime;
 
    private static final IDialogSettings _geoFilterState                       = TourGeoFilter_Manager.getState();
    /**
@@ -548,6 +554,8 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
    private boolean             _isFastMapPainting;
    private boolean             _isFastMapPainting_Active;
    private int                 _fastMapPainting_skippedValues;
+
+   private Font                _boldFont               = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
    /**
     * This observer is called in the {@link Tile} when a tile image is set into the tile
@@ -1193,10 +1201,10 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
       }
    }
 
-   private void fireEvent_TourSelection(final ISelection selection) {
+   private void fireEvent_TourSelection(final ISelection selection, final boolean isFireInThisView) {
 
       for (final Object selectionListener : _allTourSelectionListener.getListeners()) {
-         ((ITourSelectionListener) selectionListener).onSelection(selection);
+         ((ITourSelectionListener) selectionListener).onSelection(selection, isFireInThisView);
       }
    }
 
@@ -2665,7 +2673,7 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
 
                _hovered_SelectedTourId = hoveredTour;
 
-               fireEvent_TourSelection(new SelectionTourId(_hovered_SelectedTourId));
+               fireEvent_TourSelection(new SelectionTourId(_hovered_SelectedTourId), false);
 
             } else {
 
@@ -2679,7 +2687,7 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
             // hide single tour selection
             _hovered_SelectedTourId = Long.MIN_VALUE;
 
-            fireEvent_TourSelection(new SelectionTourIds(_allHoveredTourIds));
+            fireEvent_TourSelection(new SelectionTourIds(_allHoveredTourIds), true);
          }
 
          redraw();
@@ -2980,11 +2988,14 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
          }
 
          boolean isHoveredAndSelectedTour = false;
+         boolean isPaintTourInfo = false;
          if (_isShowHoveredSelectedTour) {
 
             final int numTours = _devHoveredPoint.size();
 
             if (numTours > 0) {
+
+               isPaintTourInfo = true;
 
                if (numTours == 1) {
 
@@ -3003,8 +3014,6 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
                      paint_HoveredTour(gc, hoveredTourId);
                   }
                }
-
-               paint_HoveredTour_20_TourInfo(gc);
             }
          }
 
@@ -3019,6 +3028,11 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
             }
 
             paint_HoveredTour(gc, _hovered_SelectedTourId);
+         }
+
+         // paint AFTER hovered/selected tour
+         if (isPaintTourInfo) {
+            paint_HoveredTour_20_TourInfo(gc);
          }
       }
    }
@@ -3643,12 +3657,13 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
 
    private void paint_HoveredTour_20_TourInfo(final GC gc) {
 
+      /*
+       * This is for debugging
+       */
       final boolean isShowHoverRectangle = false;
       if (isShowHoverRectangle) {
 
-         /*
-          * Paint hovered rectangle
-          */
+         // paint hovered rectangle
          gc.setLineWidth(1);
 
          for (final Point hoveredPoint : _devHoveredPoint) {
@@ -3671,8 +3686,8 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
          }
       }
 
-      final int devX = _mouseMove_DevPosition_X;
-      int devY = _mouseMove_DevPosition_Y;
+      final int devXMouse = _mouseMove_DevPosition_X;
+      final int devYMouse = _mouseMove_DevPosition_Y;
 
       final int numTours = _allHoveredTourIds.size();
 
@@ -3685,22 +3700,7 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
             // this occured, it can be that previously a history/multiple tour was displayed
 
          } else {
-
-            final String hoverText = TourManager.getTourTitle(tourData);
-
-            paint_Text_WithBorder(gc,
-                  hoverText,
-                  new Point(_mouseMove_DevPosition_X, devY));
-
-            final String tourTitle = tourData.getTourTitle();
-            if (tourTitle.length() > 0) {
-
-               devY -= 13;
-
-               paint_Text_WithBorder(gc,
-                     tourTitle,
-                     new Point(_mouseMove_DevPosition_X, devY));
-            }
+            paint_HoveredTour_30_TourDetail(gc, devXMouse, devYMouse, tourData);
          }
 
       } else {
@@ -3708,12 +3708,97 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
          final String hoverText = "Tours: " + Integer.toString(numTours);
 
          paint_Text_Label(gc,
-               devX,
-               devY,
+               devXMouse,
+               devYMouse,
                hoverText,
                Display.getCurrent().getSystemColor(SWT.COLOR_BLUE),
                Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
       }
+   }
+
+   private void paint_HoveredTour_30_TourDetail(final GC gc, final int devXMouse, final int devYMouse, final TourData tourData) {
+
+      final Font normalFont = gc.getFont();
+
+      final String tourDateTime = TourManager.getTourDateTimeFull(tourData);
+      final String tourTitle = tourData.getTourTitle();
+      final boolean isTourTitle = tourTitle.length() > 0;
+
+      final long movingTime = tourData.getTourDrivingTime();
+      final String textMovingTime = String.format("%s %s",
+            TOUR_TOOLTIP_LABEL_MOVING_TIME,
+            FormatManager.formatDrivingTime(movingTime));
+
+      final float distance = tourData.getTourDistance() / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+      final String textDistance = String.format("%s %s %s",
+            TOUR_TOOLTIP_LABEL_DISTANCE,
+            FormatManager.formatDistance(distance / 1000.0),
+            UI.UNIT_LABEL_DISTANCE);
+
+      final String valueText = textDistance + UI.DASH_WITH_DOUBLE_SPACE + textMovingTime;
+
+      final Point dateTimeSize = gc.textExtent(tourDateTime);
+      final Point valueSize = gc.textExtent(valueText);
+
+      Point titleSize = new Point(0, 0);
+      if (isTourTitle) {
+         gc.setFont(_boldFont);
+         titleSize = gc.textExtent(tourTitle);
+      }
+
+      final int contentWidth = Math.max(Math.max(dateTimeSize.x, valueSize.x), titleSize.x);
+
+      final int lineHeight = dateTimeSize.y;
+
+      final int marginHorizontal = 3;
+      final int marginVertical = 1;
+
+      final int contentHeight = lineHeight * 2 + (isTourTitle ? lineHeight : 0);
+
+      final int detailHeight = contentHeight + marginVertical * 2;
+      final int detailWidth = contentWidth + marginHorizontal * 2;
+
+      int devXDetail = devXMouse;
+      int devYDetail = devYMouse;
+      final int mouseHeight = 24;
+
+      // ensure that the tour detail is fully visible
+      final int viewportWidth = _devMapViewport.width;
+      if (devXDetail + detailWidth > viewportWidth) {
+         devXDetail = viewportWidth - detailWidth;
+      }
+      if (devYDetail - detailHeight - mouseHeight < 0) {
+         devYDetail = devYMouse + detailHeight + mouseHeight;
+      }
+
+      final Rectangle clippingRect = new Rectangle(
+            devXDetail,
+            devYDetail - detailHeight,
+            detailWidth,
+            detailHeight);
+
+      gc.setClipping(clippingRect);
+
+      gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+      gc.fillRectangle(clippingRect);
+
+      gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+
+      final int devXText = devXDetail + marginHorizontal;
+      int devYLine = devYDetail - contentHeight - marginVertical;
+
+      if (isTourTitle) {
+         gc.setFont(_boldFont);
+         gc.drawString(tourTitle, devXText, devYLine);
+         devYLine += lineHeight;
+      }
+
+      gc.setFont(normalFont);
+
+      gc.drawString(tourDateTime, devXText, devYLine);
+      devYLine += lineHeight;
+
+      gc.drawString(valueText, devXText, devYLine);
    }
 
    private void paint_OfflineArea(final GC gc) {
@@ -4402,8 +4487,8 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
    }
 
    private void paint_Text_Label(final GC gc,
-                                 final int devX,
-                                 final int devY,
+                                 final int devXMouse,
+                                 final int devYMouse,
                                  final String text,
                                  final Color foregroundColor,
                                  final Color backgroundColor) {
@@ -4419,13 +4504,26 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
       final int textWidth = textSize.x;
       final int textHeight = textSize.y;
 
-      final int devYText = devY - textHeight - textMargin2;
+      int devXDetail = devXMouse;
+      int devYDetail = devYMouse;
+
+      // ensure that the tour detail is fully visible
+      final int viewportWidth = _devMapViewport.width;
+      if (devXDetail + textWidth + textMargin > viewportWidth) {
+         devXDetail = viewportWidth - textWidth - textMargin;
+      }
+      final int mouseHeight = 24;
+      if (devYDetail - textHeight - textMargin - mouseHeight < 0) {
+         devYDetail = devYMouse + textHeight + textMargin + mouseHeight;
+      }
+
+      final int devYText = devYDetail - textHeight - textMargin2;
 
       gc.setAlpha(0xff);
 
       gc.setBackground(foregroundColor);
       gc.fillRectangle(
-            devX,
+            devXDetail,
             devYText - textMargin,
             textWidth + textMargin,
             textHeight + textMargin);
@@ -4433,7 +4531,7 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
       gc.setForeground(backgroundColor);
       gc.drawString(
             text,
-            devX + textMargin2,
+            devXDetail + textMargin2,
             devYText - textMargin2,
             true);
    }
@@ -5708,20 +5806,6 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
       }
 
       _isShowHoveredSelectedTour = isVisible;
-
-      if (isVisible) {
-
-         int mouseMove_DevPosition_X = _mouseMove_DevPosition_X;
-         int mouseMove_DevPosition_Y = _mouseMove_DevPosition_Y;
-
-         if (mouseMove_DevPosition_X == Integer.MIN_VALUE) {
-
-            // mouse was not yet moved or was reseted
-
-            mouseMove_DevPosition_X = _mouseMove_DevPosition_X_Last;
-            mouseMove_DevPosition_Y = _mouseMove_DevPosition_Y_Last;
-         }
-      }
    }
 
    /**

@@ -23,7 +23,8 @@ public interface ITourSelectionListener {
     * Is called when a tour is selected
     *
     * @param selection
+    * @param isSelectAlsoInThisView
     */
-   public void onSelection(ISelection selection);
+   public void onSelection(ISelection selection, boolean isSelectAlsoInThisView);
 
 }

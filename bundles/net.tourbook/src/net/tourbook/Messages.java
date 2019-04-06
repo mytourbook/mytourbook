@@ -414,8 +414,6 @@ public class Messages extends NLS {
    public static String        App_Action_Columns;
    public static String        App_Action_Copy;
    public static String        App_Action_Delete;
-   public static String        App_Action_Delete_AllWithoutName;
-   public static String        App_Action_Delete_AllWithoutName_Tooltip;
    public static String        App_Action_Delete_WithConfirm;
    public static String        App_Action_DeleteProfile;
    public static String        App_Action_Dialog_ActionIsInProgress_Message;
@@ -2027,6 +2025,9 @@ public class Messages extends NLS {
    public static String Slideout_TourFilter_Link_TextSearchHint;
    public static String Slideout_TourFilter_Link_TextSearchHint_Tooltip;
 
+   public static String Slideout_TourGeoFilter_Action_Delete_AllWithoutName;
+   public static String Slideout_TourGeoFilter_Action_Delete_WithoutName;
+   public static String Slideout_TourGeoFilter_Action_Delete_WithoutName_Tooltip;
    public static String Slideout_TourGeoFilter_Checkbox_IsAutoOpenSlideout;
    public static String Slideout_TourGeoFilter_Checkbox_IsAutoOpenSlideout_Tooltip;
    public static String Slideout_TourGeoFilter_Checkbox_IsSyncMapPosition;

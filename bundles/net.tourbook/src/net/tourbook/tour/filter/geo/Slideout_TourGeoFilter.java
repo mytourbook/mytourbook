@@ -779,8 +779,8 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
              * Button: delete all geo filter
              */
             _btnDeleteGeoFilterAllWithoutName = new Button(container, SWT.NONE);
-            _btnDeleteGeoFilterAllWithoutName.setText(Messages.App_Action_Delete_AllWithoutName);
-            _btnDeleteGeoFilterAllWithoutName.setToolTipText(Messages.App_Action_Delete_AllWithoutName_Tooltip);
+            _btnDeleteGeoFilterAllWithoutName.setText(Messages.Slideout_TourGeoFilter_Action_Delete_WithoutName);
+            _btnDeleteGeoFilterAllWithoutName.setToolTipText(Messages.Slideout_TourGeoFilter_Action_Delete_WithoutName_Tooltip);
             _btnDeleteGeoFilterAllWithoutName.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
@@ -1269,7 +1269,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
                MessageDialog.QUESTION,
                0,
 
-               Messages.App_Action_Delete_AllWithoutName,
+               Messages.Slideout_TourGeoFilter_Action_Delete_AllWithoutName,
                IDialogConstants.CANCEL_LABEL
 
          ).open();
