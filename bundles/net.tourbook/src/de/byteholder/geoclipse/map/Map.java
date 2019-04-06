@@ -60,7 +60,6 @@ import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorCacheSWT;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.map.GeoPosition;
-import net.tourbook.common.tooltip.IPinned_Tooltip_Owner;
 import net.tourbook.common.util.HoveredAreaContext;
 import net.tourbook.common.util.IToolTipHideListener;
 import net.tourbook.common.util.IToolTipProvider;
@@ -134,12 +133,11 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Resource;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
-public class Map extends Canvas implements IPinned_Tooltip_Owner {
+public class Map extends Canvas {
 
    private static final String          IMAGE_POI_IN_MAP                      = de.byteholder.geoclipse.poi.Messages.Image_POI_InMap;
    private static final String          IMAGE_SEARCH_TOURS_BY_LOCATION        = net.tourbook.Messages.Image__SearchToursByLocation;
@@ -252,7 +250,7 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
    private static RGB             MAP_TRANSPARENT_RGB;
 
    private final IPreferenceStore _prefStore                 = TourbookPlugin.getPrefStore();
-   private IDialogSettings        _state;
+
    {
       MAP_TRANSPARENT_RGB = net.tourbook.common.UI.IS_OSX //
 //            ? new RGB(0x7e, 0x7f, 0x80)
@@ -594,7 +592,6 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
 
       _display = getDisplay();
       _displayThread = _display.getThread();
-      _state = state;
 
       addAllListener();
       addDropTarget();
@@ -1277,11 +1274,6 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
          rect.add(new Rectangle(point.x, point.y, 0, 0));
       }
       return rect;
-   }
-
-   @Override
-   public Control getControl() {
-      return this;
    }
 
    /**
@@ -1988,12 +1980,6 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
             worldPosition.y - _worldPixel_TopLeft_Viewport.y);
 
       return gridGeoPos;
-   }
-
-   @Override
-   public void handleMouseEvent(final Event event, final Point mouseDisplayPosition) {
-      // TODO Auto-generated method stub
-
    }
 
    private void hideHoveredArea() {
@@ -2816,10 +2802,13 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
          }
       }
 
-      if (isTourHovered()) {
+      if (_isShowHoveredSelectedTour) {
 
-         // show hovered tour
-         paint();
+         if (isTourHovered()) {
+
+            // show hovered tour
+            paint();
+         }
       }
 
       fireEvent_MousePosition();
@@ -2971,8 +2960,8 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
             }
          }
 
+         // paint tooltip icon in the map
          if (_tour_ToolTip != null) {
-            // paint tooltip icon in the map
             _tour_ToolTip.paint(gc, _clientArea);
          }
 
@@ -2990,6 +2979,8 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
          boolean isHoveredAndSelectedTour = false;
          boolean isPaintTourInfo = false;
          if (_isShowHoveredSelectedTour) {
+
+//            _tourBreadcrumb.paint();
 
             final int numTours = _devHoveredPoint.size();
 
@@ -3758,17 +3749,19 @@ public class Map extends Canvas implements IPinned_Tooltip_Owner {
       final int detailHeight = contentHeight + marginVertical * 2;
       final int detailWidth = contentWidth + marginHorizontal * 2;
 
+      final int marginAboveMouse = 10;
+      final int marginBelowMouse = 25;
+
       int devXDetail = devXMouse;
-      int devYDetail = devYMouse;
-      final int mouseHeight = 24;
+      int devYDetail = devYMouse - marginAboveMouse;
 
       // ensure that the tour detail is fully visible
       final int viewportWidth = _devMapViewport.width;
       if (devXDetail + detailWidth > viewportWidth) {
          devXDetail = viewportWidth - detailWidth;
       }
-      if (devYDetail - detailHeight - mouseHeight < 0) {
-         devYDetail = devYMouse + detailHeight + mouseHeight;
+      if (devYDetail - detailHeight < 0) {
+         devYDetail = devYMouse + detailHeight + marginBelowMouse;
       }
 
       final Rectangle clippingRect = new Rectangle(

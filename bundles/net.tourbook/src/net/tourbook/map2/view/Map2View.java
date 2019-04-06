@@ -306,7 +306,7 @@ public class Map2View extends ViewPart implements
 
 // SET_FORMATTING_ON
 
-   private final TourInfoIconToolTipProvider _tourInfoToolTipProvider = new TourInfoIconToolTipProvider();
+   private final TourInfoIconToolTipProvider _tourInfoToolTipProvider = new TourInfoIconToolTipProvider(2, 32);
    private final ITourToolTipProvider        _wayPointToolTipProvider = new WayPointToolTipProvider();
 
    private final DirectMappingPainter        _directMappingPainter    = new DirectMappingPainter();
