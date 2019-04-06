@@ -526,7 +526,7 @@ public class MapBookmarkManager {
 
 		final Object[] allListeners = _bookmarkListeners.getListeners();
 		for (final Object listener : allListeners) {
-		   System.out.println("!!!! fireBookmarkEvent: listener: " + listener.toString()); //$NON-NLS-1$listener.toString());
+		   //System.out.println("!!!! fireBookmarkEvent: listener: " + listener.toString()); //$NON-NLS-1$listener.toString());
 			((IMapBookmarkListener) (listener)).onMapBookmarkActionPerformed(mapBookmark, MapBookmarkEventType);
 
 		}

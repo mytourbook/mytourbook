@@ -1024,10 +1024,10 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    public void onMapBookmarkActionPerformed(final MapBookmark mapBookmark, final int  mapBookmarkEventType) {
       
       if (mapBookmarkEventType == MapBookmarkEventType_moveto) { 
-         System.out.println("*** Map25View_onMapBookmarkActionPerformed moveto: " + mapBookmark.name);
+         //System.out.println("*** Map25View_onMapBookmarkActionPerformed moveto: " + mapBookmark.name);
          moveToMapLocation(mapBookmark);
       } else if (mapBookmarkEventType == MapBookmarkEventType_modified) {
-         System.out.println("*** Map25View_onMapBookmarkActionPerformed modify: " + mapBookmark.name);
+         //System.out.println("*** Map25View_onMapBookmarkActionPerformed modify: " + mapBookmark.name);
          _mapApp.updateUI_MapBookmarkLayer();
       }
    }
