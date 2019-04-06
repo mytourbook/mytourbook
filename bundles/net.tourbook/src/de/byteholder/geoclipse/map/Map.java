@@ -555,6 +555,8 @@ public class Map extends Canvas {
 
    private Font                _boldFont               = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
+   private MapTourBreadcrumb   _tourBreadcrumb;
+
    /**
     * This observer is called in the {@link Tile} when a tile image is set into the tile
     */
@@ -618,6 +620,8 @@ public class Map extends Canvas {
 
       _poiImage = TourbookPlugin.getImageDescriptor(IMAGE_POI_IN_MAP).createImage();
       _poiImageBounds = _poiImage.getBounds();
+
+      _tourBreadcrumb = new MapTourBreadcrumb(this);
 
       paint_Overlay_0_SetupThread();
    }
@@ -1198,7 +1202,7 @@ public class Map extends Canvas {
       }
    }
 
-   private void fireEvent_TourSelection(final ISelection selection, final boolean isFireInThisView) {
+   void fireEvent_TourSelection(final ISelection selection, final boolean isFireInThisView) {
 
       for (final Object selectionListener : _allTourSelectionListener.getListeners()) {
          ((ITourSelectionListener) selectionListener).onSelection(selection, isFireInThisView);
@@ -2980,7 +2984,7 @@ public class Map extends Canvas {
          boolean isPaintTourInfo = false;
          if (_isShowHoveredSelectedTour) {
 
-//            _tourBreadcrumb.paint();
+            _tourBreadcrumb.paint(gc);
 
             final int numTours = _devHoveredPoint.size();
 
@@ -6083,6 +6087,10 @@ public class Map extends Canvas {
          Job.getJobManager().cancel(_splitJobFamily);
       }
       _isCancelSplitJobs = false;
+   }
+
+   public MapTourBreadcrumb tourBreadcrumb() {
+      return _tourBreadcrumb;
    }
 
    public void updateGraphColors() {
