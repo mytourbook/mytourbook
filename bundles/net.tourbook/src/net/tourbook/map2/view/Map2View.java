@@ -985,7 +985,7 @@ public class Map2View extends ViewPart implements
 
                      if (selection instanceof SelectionTourIds) {
 
-                        // clone tour id's otherwise the original will be removed
+                        // clone tour id's otherwise the original couldl be removed
                         final SelectionTourIds selectionTourIds = (SelectionTourIds) selection;
 
                         final ArrayList<Long> allTourIds = new ArrayList<>();
@@ -1247,6 +1247,8 @@ public class Map2View extends ViewPart implements
                if (eventData instanceof TourGeoFilter) {
 
                   // show geo filter
+
+                  _map.tourBreadcrumb().resetTours();
 
                   final TourGeoFilter tourGeoFilter = (TourGeoFilter) eventData;
 

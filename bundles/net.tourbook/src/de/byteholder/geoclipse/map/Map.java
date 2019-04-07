@@ -621,7 +621,7 @@ public class Map extends Canvas {
       _poiImage = TourbookPlugin.getImageDescriptor(IMAGE_POI_IN_MAP).createImage();
       _poiImageBounds = _poiImage.getBounds();
 
-      _tourBreadcrumb = new MapTourBreadcrumb(this);
+      _tourBreadcrumb = new MapTourBreadcrumb();
 
       paint_Overlay_0_SetupThread();
    }
@@ -776,17 +776,7 @@ public class Map extends Canvas {
 
          @Override
          public void mouseExit(final MouseEvent e) {
-
-            // keep position for out of the map events, e.g. recenter map
-            _mouseMove_DevPosition_X_Last = _mouseMove_DevPosition_X;
-            _mouseMove_DevPosition_Y_Last = _mouseMove_DevPosition_Y;
-
-            // set position out of the map that the tool tip is not activated again
-            _mouseMove_DevPosition_X = Integer.MIN_VALUE;
-            _mouseMove_DevPosition_Y = Integer.MIN_VALUE;
-
-            // stop grid autoscrolling
-            _grid_IsGridAutoScroll = false;
+            onMouse_Exit();
          }
 
          @Override
@@ -2649,6 +2639,14 @@ public class Map extends Canvas {
 
          redraw();
 
+      } else if (_isShowHoveredSelectedTour && _tourBreadcrumb.onMouseDown(devMousePosition)) {
+
+         // tour breadcrumb is selected, show it's tours in the map
+
+         final ArrayList<Long> crumbTourIds = _tourBreadcrumb.getCrumbToursAndReset();
+
+         fireEvent_TourSelection(new SelectionTourIds(crumbTourIds), true);
+
       } else if (_allHoveredTourIds.size() > 0) {
 
          if (_allHoveredTourIds.size() == 1) {
@@ -2692,11 +2690,34 @@ public class Map extends Canvas {
       }
    }
 
+   private void onMouse_Exit() {
+
+      // keep position for out of the map events, e.g. recenter map
+      _mouseMove_DevPosition_X_Last = _mouseMove_DevPosition_X;
+      _mouseMove_DevPosition_Y_Last = _mouseMove_DevPosition_Y;
+
+      // set position out of the map that the tool tip is not activated again
+      _mouseMove_DevPosition_X = Integer.MIN_VALUE;
+      _mouseMove_DevPosition_Y = Integer.MIN_VALUE;
+
+      // stop grid autoscrolling
+      _grid_IsGridAutoScroll = false;
+
+      if (_isShowHoveredSelectedTour) {
+
+         _tourBreadcrumb.onMouseExit();
+
+         redraw();
+      }
+   }
+
    private void onMouse_Move(final MouseEvent mouseEvent) {
 
       if (_mp == null) {
          return;
       }
+
+      final Point devMousePosition = new Point(mouseEvent.x, mouseEvent.y);
 
       _mouseMove_DevPosition_X = mouseEvent.x;
       _mouseMove_DevPosition_Y = mouseEvent.y;
@@ -2730,6 +2751,8 @@ public class Map extends Canvas {
 
          _grid_Data_Hovered.geo_MouseMove = geoMouseMove;
          grid_UpdateEndPosition(mouseEvent, _grid_Data_Hovered);
+
+         _tourBreadcrumb.resetTours();
 
          // pan map when mouse is near map border
          final Point mouseBorderPosition = grid_GetMouseBorderPosition();
@@ -2808,10 +2831,20 @@ public class Map extends Canvas {
 
       if (_isShowHoveredSelectedTour) {
 
+         boolean isRedraw = false;
+
          if (isTourHovered()) {
 
             // show hovered tour
-            paint();
+            isRedraw = true;
+         }
+
+         if (_tourBreadcrumb.onMouseMove(devMousePosition)) {
+            isRedraw = true;
+         }
+
+         if (isRedraw) {
+            redraw();
          }
       }
 
@@ -3030,6 +3063,7 @@ public class Map extends Canvas {
             paint_HoveredTour_20_TourInfo(gc);
          }
       }
+
    }
 
    private void onResize() {
@@ -3466,15 +3500,14 @@ public class Map extends Canvas {
    private void paint_GridBox_20_Selected(final GC gc, final MapGridData mapGridData) {
 
       final Point devTopLeft = paint_GridBox_50_Rectangle(gc, mapGridData, true);
-//      final int x;
-//      paint_Text_WithBorder(gc, mapGridData.gridBox_Text, devTopLeft);
 
       paint_Text_Label(gc,
             devTopLeft.x,
             devTopLeft.y,
             mapGridData.gridBox_Text,
             Display.getCurrent().getSystemColor(SWT.COLOR_GREEN),
-            Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+            Display.getCurrent().getSystemColor(SWT.COLOR_BLACK),
+            false);
    }
 
    /**
@@ -3707,7 +3740,8 @@ public class Map extends Canvas {
                devYMouse,
                hoverText,
                Display.getCurrent().getSystemColor(SWT.COLOR_BLUE),
-               Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+               Display.getCurrent().getSystemColor(SWT.COLOR_WHITE),
+               true);
       }
    }
 
@@ -4085,6 +4119,10 @@ public class Map extends Canvas {
                   // set state that this tile is checked
                   tile.setOverlayTourStatus(OverlayTourState.TILE_IS_CHECKED);
 
+                  // cleanup previous positions
+                  tile.allPainted_HoverRectangle.clear();
+                  tile.allPainted_HoverTourID.clear();
+
                   /*
                    * check if a tour, marker or photo is within the current tile
                    */
@@ -4136,10 +4174,6 @@ public class Map extends Canvas {
     * @param tile
     */
    private void paint_Overlay_22_PaintTileBasic(final Tile tile) {
-
-      // cleanup previous positions
-      tile.allPainted_HoverRectangle.clear();
-      tile.allPainted_HoverTourID.clear();
 
       boolean isOverlayPainted = false;
 
@@ -4488,7 +4522,8 @@ public class Map extends Canvas {
                                  final int devYMouse,
                                  final String text,
                                  final Color foregroundColor,
-                                 final Color backgroundColor) {
+                                 final Color backgroundColor,
+                                 final boolean isAdjustToMousePosition) {
 
       if (text == null) {
          return;
@@ -4501,17 +4536,49 @@ public class Map extends Canvas {
       final int textWidth = textSize.x;
       final int textHeight = textSize.y;
 
+      final int contentWidth = textWidth + textMargin;
+      final int contentHeight = textHeight + textMargin;
+
       int devXDetail = devXMouse;
       int devYDetail = devYMouse;
 
       // ensure that the tour detail is fully visible
       final int viewportWidth = _devMapViewport.width;
-      if (devXDetail + textWidth + textMargin > viewportWidth) {
-         devXDetail = viewportWidth - textWidth - textMargin;
-      }
-      final int mouseHeight = 24;
-      if (devYDetail - textHeight - textMargin - mouseHeight < 0) {
-         devYDetail = devYMouse + textHeight + textMargin + mouseHeight;
+      final int viewportHeight = _devMapViewport.height;
+
+      if (isAdjustToMousePosition) {
+
+         final int mouseHeight = 24;
+
+         if (devXDetail + textWidth + textMargin > viewportWidth) {
+            devXDetail = viewportWidth - textWidth - textMargin;
+         }
+
+         if (devYDetail - textHeight - textMargin - mouseHeight < 0) {
+            devYDetail = devYMouse + textHeight + textMargin + mouseHeight;
+         }
+
+      } else {
+
+         // left border
+         if (devXDetail < 0) {
+            devXDetail = 0;
+         }
+
+         // right border
+         if (devXDetail + contentWidth > viewportWidth) {
+            devXDetail = viewportWidth - contentWidth;
+         }
+
+         // top border
+         if (devYDetail - contentHeight < 0) {
+            devYDetail = contentHeight;
+         }
+
+         // bottom border
+         if (devYDetail > viewportHeight) {
+            devYDetail = viewportHeight;
+         }
       }
 
       final int devYText = devYDetail - textHeight - textMargin2;
