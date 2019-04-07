@@ -2665,9 +2665,21 @@ public class Map extends Canvas {
 
             } else {
 
-               // toggle selection -> hide tour selection
+               if (_hovered_SelectedTourId == hoveredTour) {
 
-               _hovered_SelectedTourId = Long.MIN_VALUE;
+                  // show only the selected tour
+
+                  final ArrayList<Long> singleTourId = new ArrayList<>();
+                  singleTourId.add(hoveredTour);
+
+                  fireEvent_TourSelection(new SelectionTourIds(singleTourId), true);
+
+               } else {
+
+                  // toggle selection -> hide tour selection
+
+                  _hovered_SelectedTourId = Long.MIN_VALUE;
+               }
             }
 
          } else {

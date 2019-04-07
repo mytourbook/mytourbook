@@ -2908,6 +2908,13 @@ public class Map2View extends ViewPart implements
       final int allTourIds_Hash = allTourIds.hashCode();
       final int allTourData_Hash = _allTourData.hashCode();
       if (allTourIds_Hash == _hash_AllTourIds && allTourData_Hash == _hash_AllTourData) {
+
+         /*
+          * Ensure the tour breadcrumb shows the correct values, the value is hidden when a geo tour
+          * filter is reselected
+          */
+         _map.tourBreadcrumb().setTours(_allTourData);
+
          return;
       }
 
