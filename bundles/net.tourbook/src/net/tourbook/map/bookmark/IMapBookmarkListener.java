@@ -18,7 +18,5 @@ package net.tourbook.map.bookmark;
 public interface IMapBookmarkListener {
 
 	void onMapBookmarkActionPerformed(MapBookmark mapBookmark, int mapBookmarkEventType);
-	
-	//void onMapBookmarkActionPerformed(int keycode);
 
 }
