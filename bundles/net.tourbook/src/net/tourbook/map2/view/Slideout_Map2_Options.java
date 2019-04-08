@@ -56,7 +56,8 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
     */
 //   private Composite _parent;
 
-   private Button _chkZoomWithMousePosition;
+   private Button _chkIsShowHoveredTour;
+   private Button _chkIsZoomWithMousePosition;
 
    /**
     * @param ownerControl
@@ -166,15 +167,28 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
       {
          {
             /*
+             * Tour tooltip
+             */
+            {
+               // checkbox
+               _chkIsShowHoveredTour = new Button(container, SWT.CHECK);
+               _chkIsShowHoveredTour.setText(Messages.Slideout_Map_Options_Checkbox_ShowTourTooltip);
+               _chkIsShowHoveredTour.setToolTipText(Messages.Slideout_Map_Options_Checkbox_ShowTourTooltip_Tooltip);
+               _chkIsShowHoveredTour.addSelectionListener(_defaultState_SelectionListener);
+               GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsShowHoveredTour);
+            }
+         }
+         {
+            /*
              * Zoom to mouse position
              */
             {
                // checkbox
-               _chkZoomWithMousePosition = new Button(container, SWT.CHECK);
-               _chkZoomWithMousePosition.setText(Messages.Slideout_Map_Options_Checkbox_ZoomWithMousePosition);
-               _chkZoomWithMousePosition.setToolTipText(Messages.Slideout_Map_Options_Checkbox_ZoomWithMousePosition_Tooltip);
-               _chkZoomWithMousePosition.addSelectionListener(_defaultState_SelectionListener);
-               GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkZoomWithMousePosition);
+               _chkIsZoomWithMousePosition = new Button(container, SWT.CHECK);
+               _chkIsZoomWithMousePosition.setText(Messages.Slideout_Map_Options_Checkbox_ZoomWithMousePosition);
+               _chkIsZoomWithMousePosition.setToolTipText(Messages.Slideout_Map_Options_Checkbox_ZoomWithMousePosition_Tooltip);
+               _chkIsZoomWithMousePosition.addSelectionListener(_defaultState_SelectionListener);
+               GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsZoomWithMousePosition);
             }
          }
       }
@@ -209,9 +223,8 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
 
 // SET_FORMATTING_OFF
 
-
-      // mouse zooming
-      _chkZoomWithMousePosition.setSelection(   Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT);
+      _chkIsShowHoveredTour.setSelection(          Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT);
+      _chkIsZoomWithMousePosition.setSelection(    Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT);
 
 // SET_FORMATTING_ON
 
@@ -222,9 +235,8 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
 
 // SET_FORMATTING_OFF
 
-
-      // mouse zooming
-      _chkZoomWithMousePosition.setSelection(      Util.getStateBoolean(_state,    Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION,   Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT));
+      _chkIsShowHoveredTour.setSelection(       Util.getStateBoolean(_state,    Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR, Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT));
+      _chkIsZoomWithMousePosition.setSelection( Util.getStateBoolean(_state,    Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION,   Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT));
 
 // SET_FORMATTING_ON
    }
@@ -233,9 +245,8 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
 
 // SET_FORMATTING_OFF
 
-
-      // mouse zooming
-      _state.put(Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION,   _chkZoomWithMousePosition.getSelection());
+      _state.put(Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR,  _chkIsShowHoveredTour.getSelection());
+      _state.put(Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION,   _chkIsZoomWithMousePosition.getSelection());
 
 // SET_FORMATTING_ON
    }

@@ -18,6 +18,7 @@ package net.tourbook.chart;
 import java.util.HashMap;
 
 import net.tourbook.common.form.ViewForm;
+import net.tourbook.common.tooltip.IPinned_ToolTip;
 import net.tourbook.common.util.ITourToolTipProvider;
 
 import org.eclipse.core.runtime.ListenerList;
@@ -300,7 +301,7 @@ public class Chart extends ViewForm {
 		}
 
 		final ChartComponentGraph componentGraph = _chartComponents.getChartComponentGraph();
-		final int hoveredLineValueIndex = componentGraph.getHoveredValuePointIndex();
+		final int hoveredLineValueIndex = componentGraph.getHoveredValue_PointIndex();
 		boolean isUseLeftSlider = false;
 		if (hoveredLineValueIndex == -1) {
 
@@ -659,7 +660,7 @@ public class Chart extends ViewForm {
 	 *         <code>-1</code> when a value is not hovered.
 	 */
 	public int getHoveredValuePointIndex() {
-		return _chartComponents.getChartComponentGraph().getHoveredValuePointIndex();
+		return _chartComponents.getChartComponentGraph().getHoveredValue_PointIndex();
 	}
 
 	public int getLeftAxisWidth() {
@@ -1245,7 +1246,7 @@ public class Chart extends ViewForm {
 		getToolTipControl().setTourToolTipProvider(tourToolTip);
 	}
 
-	public void setValuePointToolTipProvider(final IValuePointToolTip valuePointToolTip) {
+	public void setValuePointToolTipProvider(final IPinned_ToolTip valuePointToolTip) {
 		_chartComponents.componentGraph.valuePointToolTip = valuePointToolTip;
 	}
 
