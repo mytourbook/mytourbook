@@ -57,6 +57,8 @@ public class MapTourBreadcrumb {
          _allCrumbs.remove(crumbIndex);
       }
 
+      _hoveredCrumbIndex = -1;
+
       return crumbTours;
    }
 
@@ -247,7 +249,24 @@ public class MapTourBreadcrumb {
 
       // keep only tour id's, allTourData list will be reused !!!
 
-      final ArrayList<Long> allTourIds = new ArrayList<>(allTourData.size());
+      final int numNewTours = allTourData.size();
+      final int numAllOldTours = _allTours.size();
+
+      int numPreviousTours = -1;
+
+      if (numAllOldTours > 0) {
+         numPreviousTours = _allTours.get(numAllOldTours - 1).size();
+      }
+
+      if (numNewTours == numPreviousTours) {
+
+         // prevent to show the same bread crumb again and again
+
+         return;
+      }
+
+
+      final ArrayList<Long> allTourIds = new ArrayList<>(numNewTours);
       for (final TourData tourData : allTourData) {
          allTourIds.add(tourData.getTourId());
       }

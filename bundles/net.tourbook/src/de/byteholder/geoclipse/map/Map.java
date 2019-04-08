@@ -2645,6 +2645,9 @@ public class Map extends Canvas {
 
          final ArrayList<Long> crumbTourIds = _tourBreadcrumb.getCrumbToursAndReset();
 
+         // hide crumb selection state, this must be done after the crumb is reset
+         redraw();
+
          fireEvent_TourSelection(new SelectionTourIds(crumbTourIds), true);
 
       } else if (_allHoveredTourIds.size() > 0) {
