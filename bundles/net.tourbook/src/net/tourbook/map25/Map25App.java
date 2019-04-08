@@ -41,6 +41,7 @@ import net.tourbook.map25.layer.marker.MarkerLayer;
 import net.tourbook.map25.layer.marker.MarkerLayer.OnItemGestureListener;
 import net.tourbook.map25.layer.marker.MarkerRenderer;
 import net.tourbook.map25.layer.marker.MarkerToolkit;
+import net.tourbook.map25.layer.marker.MarkerToolkit.markerMode;
 import net.tourbook.map25.layer.tourtrack.SliderLocation_Layer;
 import net.tourbook.map25.layer.tourtrack.SliderPath_Layer;
 import net.tourbook.map25.layer.tourtrack.TourLayer;
@@ -178,7 +179,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	
    ItemizedLayer<MarkerItem> _layer_MapBookmark;
    private MarkerToolkit _markertoolkit;
-   private int _markerMode = MarkerToolkit.modeNormal; // MarkerToolkit.modeDemo or MarkerToolkit.modeNormal
+   private markerMode _markerMode = MarkerToolkit.markerMode.NORMAL; // MarkerToolkit.modeDemo or MarkerToolkit.modeNormal
 
 	/**
 	 * Is <code>true</code> when a tour marker is hit.
@@ -1040,7 +1041,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
 	   // MapBookmarks
 	   System.out.println("################ setupMap_Layers: calling constructor"); //$NON-NLS-1$
-	   _markertoolkit = new MarkerToolkit(MarkerToolkit.shape_star);
+	   _markertoolkit = new MarkerToolkit(MarkerToolkit.markerShape.STAR);
 	   if (config.isMarkerClustered) {
 	      _layer_MapBookmark = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _markertoolkit._markerRendererFactory, this);
 	   } else {

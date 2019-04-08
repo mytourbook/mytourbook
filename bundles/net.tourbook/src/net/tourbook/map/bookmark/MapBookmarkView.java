@@ -661,7 +661,7 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 		_bookmarkViewer.refresh();
 		
 		// update maps
-		MapBookmarkManager.fireBookmarkEvent(selectedBookmark, net.tourbook.map.bookmark.IMapBookmarks.MapBookmarkEventType_modified);
+		MapBookmarkManager.fireBookmarkEvent(selectedBookmark, net.tourbook.map.bookmark.IMapBookmarks.MapBookmarkEventType.MODIFIED);
 
 		enableActions();
 	}
@@ -711,7 +711,7 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 		_bookmarkViewer.setSelection(new StructuredSelection(selectedBookmark), true);
 		
 		//update maps
-		MapBookmarkManager.fireBookmarkEvent(selectedBookmark, net.tourbook.map.bookmark.IMapBookmarks.MapBookmarkEventType_modified);
+		MapBookmarkManager.fireBookmarkEvent(null, net.tourbook.map.bookmark.IMapBookmarks.MapBookmarkEventType.MODIFIED);
 	}
 
 	private void onBookmark_Select() {
@@ -723,7 +723,7 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 			return;
 		}
 		
-		MapBookmarkManager.fireBookmarkEvent(selectedBookmark, net.tourbook.map.bookmark.IMapBookmarks.MapBookmarkEventType_moveto);
+		MapBookmarkManager.fireBookmarkEvent(selectedBookmark, net.tourbook.map.bookmark.IMapBookmarks.MapBookmarkEventType.MOVETO);
 
 		enableActions();
 	}
@@ -735,12 +735,9 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 
 	void onUpdateBookmark(final MapBookmark updatedBookmark) {
 
-	   final MapBookmark selectedBookmark = getSelectedBookmark();
-
 	   _bookmarkViewer.refresh(true, true);
  
-	   MapBookmarkManager.fireBookmarkEvent(selectedBookmark, net.tourbook.map.bookmark.IMapBookmarks.MapBookmarkEventType_modified);
-	   System.out.println("!!! mapbookmarkview onUpdateBookmark: starting");
+	   MapBookmarkManager.fireBookmarkEvent(null, net.tourbook.map.bookmark.IMapBookmarks.MapBookmarkEventType.MODIFIED);
 
 	}
 

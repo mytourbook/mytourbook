@@ -19,8 +19,7 @@ import net.tourbook.common.tooltip.ICloseOpenedDialogs;
 
 public interface IMapBookmarks extends ICloseOpenedDialogs {
 
-   public int MapBookmarkEventType_moveto = 0;
-   public int MapBookmarkEventType_modified = 1;
+   public enum MapBookmarkEventType {MOVETO, MODIFIED};
    
 	/**
 	 * @return

@@ -60,15 +60,13 @@ public class MarkerToolkit {
 
    public MarkerRendererFactory _markerRendererFactory;
    
-   public static int shape_star = 0;
-   public static int shape_circle = 1;
+   public enum markerShape {STAR, CIRCLE};
    
-   public static int modeDemo = 0;
-   public static int modeNormal = 1;
+   public enum markerMode {DEMO, NORMAL};
    
    public boolean _isMarkerClusteredLast;
    
-   public MarkerToolkit(int shape) {
+   public MarkerToolkit(markerShape shape) {
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
       loadConfig();
@@ -78,7 +76,7 @@ public class MarkerToolkit {
       
       _clusterBitmap = createClusterBitmap(1);
       
-      _bitmapPoi = createPoiBitmap(shape_star);
+      _bitmapPoi = createPoiBitmap(shape);
       
       _symbol = new MarkerSymbol(_bitmapPoi, MarkerSymbol.HotspotPlace.CENTER, false);
       
@@ -117,7 +115,7 @@ public class MarkerToolkit {
       _symbolSizeInt = (int) Math.ceil(_symbolSize);
    }
 
-   public Bitmap createPoiBitmap(int shape) {
+   public Bitmap createPoiBitmap(markerShape shape) {
       loadConfig();
 
       _bitmapPoi = CanvasAdapter.newBitmap(_symbolSizeInt, _symbolSizeInt, 0);
@@ -126,7 +124,7 @@ public class MarkerToolkit {
       defaultMarkerCanvas.setBitmap(_bitmapPoi);
       float half = _symbolSizeInt/2;
       
-      if(shape == shape_circle) {
+      if(shape == shape.CIRCLE) {
          _fillPainter.setColor(0x80FF69B4); // 50percent pink
          defaultMarkerCanvas.drawCircle(half, half, half, _fillPainter);
       } else {
@@ -159,9 +157,9 @@ public class MarkerToolkit {
    }
    
    
-   public List<MarkerItem> createMarkerItemList(int mode){
+   public List<MarkerItem> createMarkerItemList(markerMode MarkerMode){
       loadConfig();
-      createPoiBitmap(shape_star);
+      createPoiBitmap(markerShape.STAR);
       List<MarkerItem> pts = new ArrayList<>();
      
       for (final MapBookmark mapBookmark : net.tourbook.map.bookmark.MapBookmarkManager.getAllBookmarks()) {
@@ -173,7 +171,7 @@ public class MarkerToolkit {
          pts.add(item);
       }
 
-      if (mode == modeNormal) {return pts;};
+      if (MarkerMode == markerMode.NORMAL) {return pts;};
 
       int COUNT = 5;
       float STEP = 100f / 110000f; // roughly 100 meters
@@ -207,7 +205,7 @@ public class MarkerToolkit {
     */
    public MarkerSymbol createAdvanceSymbol(MarkerItem mItem, Bitmap poiBitmap) {
       loadConfig();
-      createPoiBitmap(shape_star);
+      createPoiBitmap(markerShape.STAR);
       final Paint textPainter = CanvasAdapter.newPaint();
       textPainter.setStyle(Paint.Style.STROKE);
       textPainter.setColor(_fgColor);
