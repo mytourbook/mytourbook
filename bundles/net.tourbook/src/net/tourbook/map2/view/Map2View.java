@@ -2319,20 +2319,16 @@ public class Map2View extends ViewPart implements
    }
 
    @Override
-   public void onSelectBookmark(final MapBookmark mapBookmark) {
-
-      _isInSelectBookmark = true;
+   public void onMapBookmarkActionPerformed(final MapBookmark mapBookmark, final int  mapBookmarkEventType) {
       {
-         moveToMapLocation(mapBookmark);
+         if (mapBookmarkEventType == MapBookmarkEventType_moveto) {
+            _isInSelectBookmark = true;
+            moveToMapLocation(mapBookmark);
+            _isInSelectBookmark = false;
+         } 
       }
-      _isInSelectBookmark = false;
    }
    
-   @Override
-   public void onModifiedBookmark(MapBookmark mapbookmark) {
-      // TODO Auto-generated method stub
-      
-   }
 
    private void onSelectionChanged(final ISelection selection) {
 

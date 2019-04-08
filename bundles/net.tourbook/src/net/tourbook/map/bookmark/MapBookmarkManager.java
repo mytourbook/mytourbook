@@ -522,11 +522,13 @@ public class MapBookmarkManager {
 		item.fill(menu, -1);
 	}
 
-	public static void fireBookmarkEvent(final MapBookmark mapBookmark) {
+	public static void fireBookmarkEvent(final MapBookmark mapBookmark, final int MapBookmarkEventType) {
 
 		final Object[] allListeners = _bookmarkListeners.getListeners();
 		for (final Object listener : allListeners) {
-			((IMapBookmarkListener) (listener)).onSelectBookmark(mapBookmark);
+		   //System.out.println("!!!! fireBookmarkEvent: listener: " + listener.toString()); //$NON-NLS-1$listener.toString());
+			((IMapBookmarkListener) (listener)).onMapBookmarkActionPerformed(mapBookmark, MapBookmarkEventType);
+
 		}
 	}
 

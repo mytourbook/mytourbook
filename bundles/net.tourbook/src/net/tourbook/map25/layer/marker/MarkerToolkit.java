@@ -40,7 +40,7 @@ import net.tourbook.map25.Map25ConfigManager;
 
 
 public class MarkerToolkit {
-   ItemizedLayer<MarkerItem> mMarkerLayer;
+   //ItemizedLayer<MarkerItem> mMarkerLayer;
    private int _fgColor = 0xFF000000; // 100 percent black. AARRGGBB
    private int _bgColor = 0x80FF69B4; // 50 percent pink. AARRGGBB
    private int _clusterSymbolSizeDP = net.tourbook.map25.layer.marker.MarkerRenderer.MAP_MARKER_CLUSTER_SIZE_DP;
@@ -66,6 +66,8 @@ public class MarkerToolkit {
    public static int modeDemo = 0;
    public static int modeNormal = 1;
    
+   public boolean _isMarkerClusteredLast;
+   
    public MarkerToolkit(int shape) {
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
@@ -80,6 +82,7 @@ public class MarkerToolkit {
       
       _symbol = new MarkerSymbol(_bitmapPoi, MarkerSymbol.HotspotPlace.CENTER, false);
       
+      _isMarkerClusteredLast = config.isMarkerClustered;
       
       _markerRendererFactory = new MarkerRendererFactory() {
          @Override

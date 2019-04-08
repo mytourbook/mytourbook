@@ -17,7 +17,6 @@ package net.tourbook.map.bookmark;
 
 public interface IMapBookmarkListener {
 
-	void onSelectBookmark(MapBookmark mapBookmark);
-	
-	void onModifiedBookmark(MapBookmark mapbookmark);
+	void onMapBookmarkActionPerformed(MapBookmark mapBookmark, int mapBookmarkEventType);
+
 }
