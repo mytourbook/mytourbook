@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui;
 
+import de.byteholder.geoclipse.preferences.IMappingPreferences;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -25,6 +27,27 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.Set;
+
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.chart.Chart;
+import net.tourbook.common.color.MapGraphId;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.Util;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourTag;
+import net.tourbook.data.TourType;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.SelectionTourId;
+import net.tourbook.tour.SelectionTourIds;
+import net.tourbook.tour.TourEvent;
+import net.tourbook.tour.TourManager;
+import net.tourbook.tour.filter.TourFilterManager;
+import net.tourbook.tour.photo.TourPhotoLinkView;
+import net.tourbook.tourType.TourTypeImage;
+import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
+import net.tourbook.web.WEB;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.FileLocator;
@@ -62,29 +85,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
-
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.chart.Chart;
-import net.tourbook.common.color.MapGraphId;
-import net.tourbook.common.util.StatusUtil;
-import net.tourbook.common.util.Util;
-import net.tourbook.data.TourData;
-import net.tourbook.data.TourTag;
-import net.tourbook.data.TourType;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.SelectionTourId;
-import net.tourbook.tour.SelectionTourIds;
-import net.tourbook.tour.TourEvent;
-import net.tourbook.tour.TourManager;
-import net.tourbook.tour.filter.TourFilterManager;
-import net.tourbook.tour.photo.TourPhotoLinkView;
-import net.tourbook.tourType.TourTypeImage;
-import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
-import net.tourbook.web.WEB;
-
-import de.byteholder.geoclipse.preferences.IMappingPreferences;
 
 public class UI {
 
@@ -186,6 +186,11 @@ public class UI {
     * Imperial system for distance
     */
    public static final float   UNIT_MILE                      = 1.609344f;
+
+   /**
+    * Nautical mile is exact 1852 meter
+    */
+   public static final float   UNIT_NAUTICAL_MILE             = 1.852f;
 
    /**
     * Imperial system for small distance, 1 yard = 3 feet = 36 inches = 0,9144 Meter
