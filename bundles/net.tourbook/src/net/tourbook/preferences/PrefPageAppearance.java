@@ -15,6 +15,13 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
+import de.byteholder.geoclipse.preferences.IMappingPreferences;
+
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
+import net.tourbook.common.font.FontFieldEditorExtended;
+
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -38,13 +45,6 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.PlatformUI;
-
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
-import net.tourbook.common.font.FontFieldEditorExtended;
-
-import de.byteholder.geoclipse.preferences.IMappingPreferences;
 
 public class PrefPageAppearance extends PreferencePage implements IWorkbenchPreferencePage {
 
@@ -327,6 +327,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_TEMPERATURE_VALUES, false);
       _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR, false);
       _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR_MARKER, false);
+      _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_SHOW_ENHANCED_PAINTING_WARNING, false);
       _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_SHOW_HISTORY_TOUR_SAVE_WARNING, false);
       _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_SHOW_STAR_RATING_SAVE_WARNING, false);
 

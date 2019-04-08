@@ -21,10 +21,13 @@ import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageMap2Appearance;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -34,6 +37,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 
@@ -174,7 +178,12 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
                _chkIsShowHoveredTour = new Button(container, SWT.CHECK);
                _chkIsShowHoveredTour.setText(Messages.Slideout_Map_Options_Checkbox_ShowTourTooltip);
                _chkIsShowHoveredTour.setToolTipText(Messages.Slideout_Map_Options_Checkbox_ShowTourTooltip_Tooltip);
-               _chkIsShowHoveredTour.addSelectionListener(_defaultState_SelectionListener);
+               _chkIsShowHoveredTour.addSelectionListener(new SelectionAdapter() {
+                  @Override
+                  public void widgetSelected(final SelectionEvent e) {
+                     onChangeUI_ShowHoveredTour();
+                  }
+               });
                GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsShowHoveredTour);
             }
          }
@@ -217,6 +226,41 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
       enableControls();
 
       _map2View.restoreState_Map2_Options();
+   }
+
+   private void onChangeUI_ShowHoveredTour() {
+
+      if (_chkIsShowHoveredTour.getSelection()) {
+
+         // get current painting method
+         final boolean isEnhancedPainting = PrefPageMap2Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(_prefStore.getString(
+               ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD));
+
+         if (isEnhancedPainting) {
+
+            // show warning that enhanced painting mode is selected
+
+            TBD
+            if (_prefStore.getBoolean(ITourbookPreferences.TOGGLE_STATE_SHOW_ENHANCED_PAINTING_WARNING) == false) {
+
+               final MessageDialogWithToggle dialog = MessageDialogWithToggle.openInformation(//
+                     Display.getCurrent().getActiveShell(),
+                     Messages.Photos_AndTours_Dialog_CannotSaveHistoryTour_Title,
+                     Messages.Photos_AndTours_Dialog_CannotSaveHistoryTour_Message,
+                     Messages.App_ToggleState_DoNotShowAgain,
+                     false, // toggle default state
+                     null,
+                     null);
+
+               // save toggle state
+               _prefStore.setValue(
+                     ITourbookPreferences.TOGGLE_STATE_SHOW_ENHANCED_PAINTING_WARNING,
+                     dialog.getToggleState());
+            }
+         }
+      }
+
+      onChangeUI_MapUpdate();
    }
 
    private void resetToDefaults() {
