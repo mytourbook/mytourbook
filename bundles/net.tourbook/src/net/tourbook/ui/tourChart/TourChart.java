@@ -81,7 +81,6 @@ import net.tourbook.chart.IHoveredValueListener;
 import net.tourbook.chart.IKeyListener;
 import net.tourbook.chart.ILineSelectionPainter;
 import net.tourbook.chart.IMouseListener;
-import net.tourbook.chart.ITooltipOwner;
 import net.tourbook.chart.MouseAdapter;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.PointLong;
@@ -90,6 +89,7 @@ import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.IOpeningDialog;
+import net.tourbook.common.tooltip.IPinned_Tooltip_Owner;
 import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.IToolTipHideListener;
@@ -326,7 +326,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private ChartMarkerToolTip					_tourMarkerTooltip;
 	private TourSegmenterTooltip				_tourSegmenterTooltip;
 	private ChartTitleToolTip					_tourTitleTooltip;
-	private ValuePointToolTipUI				_valuePointTooltip;
+	private ValuePoint_ToolTip_UI				_valuePointTooltip;
 	//
 	private ControlListener						_ttControlListener					= new ControlListener();
 	private IKeyListener							_chartKeyListener						= new ChartKeyListener();
@@ -839,7 +839,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		/*
 		 * setup value point tooltip
 		 */
-		final ITooltipOwner vpToolTipOwner = new ITooltipOwner() {
+		final IPinned_Tooltip_Owner vpToolTipOwner = new IPinned_Tooltip_Owner() {
 
 			@Override
 			public Control getControl() {
@@ -851,7 +851,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				handleTooltipMouseEvent(event, mouseDisplayPosition);
 			}
 		};
-		_valuePointTooltip = new ValuePointToolTipUI(vpToolTipOwner, _state);
+		_valuePointTooltip = new ValuePoint_ToolTip_UI(vpToolTipOwner, _state);
 		setValuePointToolTipProvider(_valuePointTooltip);
 
 		_photoTooltip = new ChartPhotoToolTip(this, _state);

@@ -125,7 +125,7 @@ public abstract class AnimatedToolTipShell2 {
 	 */
 	private CurrentShellWrapper			_currentShell;
 
-	private ArrayList<ShellWrapper>		_oldShells								= new ArrayList<ShellWrapper>();
+	private ArrayList<ShellWrapper>		_oldShells								= new ArrayList<>();
 
 	private Control						_ownerControl;
 
@@ -323,7 +323,6 @@ public abstract class AnimatedToolTipShell2 {
 	/**
 	 * Create new instance which add TooltipSupport to the widget
 	 * 
-	 * @param state
 	 * @param ownerControl
 	 *            the control on whose action the tooltip is shown
 	 */
@@ -855,7 +854,7 @@ public abstract class AnimatedToolTipShell2 {
 
 			// fade out and then dispose
 
-			final ArrayList<ShellWrapper> disposedShells = new ArrayList<ShellWrapper>();
+			final ArrayList<ShellWrapper> disposedShells = new ArrayList<>();
 
 			for (final ShellWrapper oldShellWrapper : _oldShells) {
 

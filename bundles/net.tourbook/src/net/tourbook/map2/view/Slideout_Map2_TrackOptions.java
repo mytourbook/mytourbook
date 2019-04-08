@@ -51,7 +51,7 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 
 /**
- * Map 2D properties slideout
+ * Slideout for 2D map track options
  */
 public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColorSelectorListener {
 

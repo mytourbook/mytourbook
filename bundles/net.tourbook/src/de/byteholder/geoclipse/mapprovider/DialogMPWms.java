@@ -1,19 +1,30 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package de.byteholder.geoclipse.mapprovider;
+
+import de.byteholder.geoclipse.Messages;
+import de.byteholder.geoclipse.map.Map;
+import de.byteholder.geoclipse.map.Tile;
+import de.byteholder.geoclipse.map.UI;
+import de.byteholder.geoclipse.map.event.IPositionListener;
+import de.byteholder.geoclipse.map.event.ITileListener;
+import de.byteholder.geoclipse.map.event.MapPositionEvent;
+import de.byteholder.geoclipse.map.event.TileEventId;
+import de.byteholder.geoclipse.preferences.PrefPageMapProviders;
+import de.byteholder.geoclipse.ui.ViewerDetailForm;
 
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -86,17 +97,6 @@ import org.eclipse.ui.forms.events.IExpansionListener;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
-import de.byteholder.geoclipse.Messages;
-import de.byteholder.geoclipse.map.Map;
-import de.byteholder.geoclipse.map.Tile;
-import de.byteholder.geoclipse.map.UI;
-import de.byteholder.geoclipse.map.event.IPositionListener;
-import de.byteholder.geoclipse.map.event.ITileListener;
-import de.byteholder.geoclipse.map.event.MapPositionEvent;
-import de.byteholder.geoclipse.map.event.TileEventId;
-import de.byteholder.geoclipse.preferences.PrefPageMapProviders;
-import de.byteholder.geoclipse.ui.ViewerDetailForm;
-
 public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultActions {
 
 	private static final String						DIALOG_SETTINGS_VIEWER_WIDTH			= "viewerWidth";							//$NON-NLS-1$
@@ -152,8 +152,8 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 	/**
 	 * all visible {@link MtLayer}'s
 	 */
-	private final ArrayList<MtLayer>				_allMtLayers							= new ArrayList<MtLayer>();
-	private final ArrayList<MtLayer>				_displayedLayers						= new ArrayList<MtLayer>();
+	private final ArrayList<MtLayer>				_allMtLayers							= new ArrayList<>();
+	private final ArrayList<MtLayer>				_displayedLayers						= new ArrayList<>();
 
 	private int										_statIsQueued;
 	private int										_statStartLoading;
@@ -181,7 +181,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 	// load tile image logging
 	private boolean									_isTileImageLogging;
-	private final ConcurrentLinkedQueue<LogEntry>	_logEntries								= new ConcurrentLinkedQueue<LogEntry>();
+	private final ConcurrentLinkedQueue<LogEntry>	_logEntries								= new ConcurrentLinkedQueue<>();
 
 	private PixelConverter							_pc;
 
@@ -210,7 +210,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 		final MtLayer mtLayer = _displayedLayers.get(0);
 
-		final HashSet<GeoPosition> layerBounds = new HashSet<GeoPosition>();
+		final HashSet<GeoPosition> layerBounds = new HashSet<>();
 		layerBounds.add(mtLayer.getUpperGeoPosition());
 		layerBounds.add(mtLayer.getLowerGeoPosition());
 
@@ -221,17 +221,20 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		_map.paint();
 	}
 
-	public void actionZoomIn() {
+	@Override
+   public void actionZoomIn() {
 		_map.setZoom(_map.getZoom() + 1);
 		_map.paint();
 	}
 
-	public void actionZoomOut() {
+	@Override
+   public void actionZoomOut() {
 		_map.setZoom(_map.getZoom() - 1);
 		_map.paint();
 	}
 
-	public void actionZoomOutToMinZoom() {
+	@Override
+   public void actionZoomOutToMinZoom() {
 		_map.setZoom(_map.getMapProvider().getMinimumZoomLevel());
 		_map.paint();
 	}
@@ -290,7 +293,8 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		shell.setText(Messages.Dialog_WmsConfig_DialogTitle);
 
 		shell.addDisposeListener(new DisposeListener() {
-			public void widgetDisposed(final DisposeEvent e) {
+			@Override
+         public void widgetDisposed(final DisposeEvent e) {
 				onDispose();
 			}
 		});
@@ -562,9 +566,11 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		tableLayout.setColumnData(tvcColumn, new ColumnWeightData(20, true));
 
 		_layerViewer.setContentProvider(new IStructuredContentProvider() {
-			public void dispose() {}
+			@Override
+         public void dispose() {}
 
-			public Object[] getElements(final Object inputElement) {
+			@Override
+         public Object[] getElements(final Object inputElement) {
 				final int mtLayerSize = _allMtLayers.size();
 				if (mtLayerSize == 0) {
 					return null;
@@ -573,11 +579,13 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 				}
 			}
 
-			public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
+			@Override
+         public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 		});
 
 		_layerViewer.addCheckStateListener(new ICheckStateListener() {
-			public void checkStateChanged(final CheckStateChangedEvent event) {
+			@Override
+         public void checkStateChanged(final CheckStateChangedEvent event) {
 
 				// select the checked item
 				_layerViewer.setSelection(new StructuredSelection(event.getElement()));
@@ -590,7 +598,8 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		});
 
 		_layerViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			public void selectionChanged(final SelectionChangedEvent event) {
+			@Override
+         public void selectionChanged(final SelectionChangedEvent event) {
 				onSelectLayer();
 			}
 		});
@@ -603,7 +612,8 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 				new Transfer[] { LocalSelectionTransfer.getTransfer() },
 				new DragSourceListener() {
 
-					public void dragFinished(final DragSourceEvent event) {
+					@Override
+               public void dragFinished(final DragSourceEvent event) {
 
 						final LocalSelectionTransfer transfer = LocalSelectionTransfer.getTransfer();
 
@@ -615,11 +625,13 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 						transfer.setSelectionSetTime(0);
 					}
 
-					public void dragSetData(final DragSourceEvent event) {
+					@Override
+               public void dragSetData(final DragSourceEvent event) {
 						// data are set in LocalSelectionTransfer
 					}
 
-					public void dragStart(final DragSourceEvent event) {
+					@Override
+               public void dragStart(final DragSourceEvent event) {
 
 						final LocalSelectionTransfer transfer = LocalSelectionTransfer.getTransfer();
 						final ISelection selection = _layerViewer.getSelection();
@@ -858,11 +870,13 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		_logContainer.setToolTipText(Messages.Dialog_MapConfig_Button_ShowTileLog_Tooltip);
 		_logContainer.addExpansionListener(new IExpansionListener() {
 
-			public void expansionStateChanged(final ExpansionEvent e) {
+			@Override
+         public void expansionStateChanged(final ExpansionEvent e) {
 				_logContainer.getParent().layout(true);
 			}
 
-			public void expansionStateChanging(final ExpansionEvent e) {}
+			@Override
+         public void expansionStateChanging(final ExpansionEvent e) {}
 		});
 
 		{
@@ -947,7 +961,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 					.applyTo(_toolbar);
 		}
 
-		_map = new Map(parent, SWT.BORDER | SWT.FLAT);
+      _map = new Map(parent, SWT.BORDER | SWT.FLAT, _dialogSettings);
 		GridDataFactory.fillDefaults()//
 				.grab(true, true)
 				.applyTo(_map);
@@ -956,7 +970,8 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 		_map.addMousePositionListener(new IPositionListener() {
 
-			public void setPosition(final MapPositionEvent event) {
+			@Override
+         public void setPosition(final MapPositionEvent event) {
 
 				final GeoPosition mousePosition = event.mapGeoPosition;
 
@@ -1162,7 +1177,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		/*
 		 * check layers
 		 */
-		final ArrayList<MtLayer> checkedLayers = new ArrayList<MtLayer>();
+		final ArrayList<MtLayer> checkedLayers = new ArrayList<>();
 		for (final MtLayer mtLayer : allMtLayers) {
 			if (mtLayer.isDisplayedInMap()) {
 				checkedLayers.add(mtLayer);
@@ -1189,7 +1204,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 	/**
 	 * a layer is checked
-	 * 
+	 *
 	 * @param checkedLayer
 	 *            layer which is checked/unchecked
 	 */
@@ -1426,7 +1441,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 	 * Calculates a zoom level so that all points in the specified set will be visible on screen.
 	 * This is useful if you have a bunch of points in an area like a city and you want to zoom out
 	 * so that the entire city and it's points are visible without panning.
-	 * 
+	 *
 	 * @param positions
 	 *            A set of GeoPositions to calculate the new zoom from
 	 * @param adjustZoomLevel
@@ -1526,7 +1541,8 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		_map.setZoom(zoom);
 	}
 
-	public void tileEvent(final TileEventId tileEventId, final Tile tile) {
+	@Override
+   public void tileEvent(final TileEventId tileEventId, final Tile tile) {
 
 		// check if logging is enable
 		if (_isTileImageLogging == false) {
@@ -1577,7 +1593,8 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 			final int	fRunnableCounter	= _statUpdateCounter;
 
-			public void run() {
+			@Override
+         public void run() {
 
 				// check if this is the last created runnable
 				if (fRunnableCounter != _statUpdateCounter) {
@@ -1615,7 +1632,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 	/**
 	 * update position and check state in all layers
-	 * 
+	 *
 	 * @return Returns the number of layers which are displayed in the map
 	 */
 	private int updateLayerState() {

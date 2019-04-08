@@ -22,17 +22,31 @@ Improvements
   - Option for fast map drawing 
 
 
+* 2.5D Map
+
+  - Map bookmarks can be displayed in the map
+
+
+
 Changes
 =======
 
 * 2D Map
 
-  - Move option "Zoom + center to the mouse position" into new "2D Map Option" slideout
+  - Moved option "Zoom + center to the mouse position" into new "2D Map Option" slideout
+  
+
+* Tour Chart
+
+  - Value point tooltip is reseted to defaults
 
 
 Bugfix   
 ======
 
+* 2D Map
+
+  - Fixed issue which lasted forever, that basic painting skipped values
 
 
 * Tour View

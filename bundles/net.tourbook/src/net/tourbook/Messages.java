@@ -414,7 +414,6 @@ public class Messages extends NLS {
    public static String        App_Action_Columns;
    public static String        App_Action_Copy;
    public static String        App_Action_Delete;
-   public static String        App_Action_Delete_All;
    public static String        App_Action_Delete_WithConfirm;
    public static String        App_Action_DeleteProfile;
    public static String        App_Action_Dialog_ActionIsInProgress_Message;
@@ -1935,6 +1934,10 @@ public class Messages extends NLS {
    public static String Slideout_Map_Options_Checkbox_ZoomWithMousePosition_Tooltip;
    public static String Slideout_Map_Options_Label_SliderPath_Segements;
    public static String Slideout_Map_Options_Checkbox_ChartSlider;
+   public static String Slideout_Map_Options_Checkbox_ShowTourTooltip;
+
+   public static String Slideout_Map_Options_Checkbox_ShowTourTooltip_Tooltip;
+
    public static String Slideout_Map_Options_Checkbox_SliderPath;
    public static String Slideout_Map_Options_Checkbox_SliderPath_Tooltip;
    public static String Slideout_Map_Options_Checkbox_TrackOpacity;
@@ -2028,6 +2031,9 @@ public class Messages extends NLS {
    public static String Slideout_TourFilter_Link_TextSearchHint;
    public static String Slideout_TourFilter_Link_TextSearchHint_Tooltip;
 
+   public static String Slideout_TourGeoFilter_Action_Delete_AllWithoutName;
+   public static String Slideout_TourGeoFilter_Action_Delete_WithoutName;
+   public static String Slideout_TourGeoFilter_Action_Delete_WithoutName_Tooltip;
    public static String Slideout_TourGeoFilter_Checkbox_IsAutoOpenSlideout;
    public static String Slideout_TourGeoFilter_Checkbox_IsAutoOpenSlideout_Tooltip;
    public static String Slideout_TourGeoFilter_Checkbox_IsSyncMapPosition;
