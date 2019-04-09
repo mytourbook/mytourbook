@@ -1064,7 +1064,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    /**
     * Contains the rough geo parts of the tour or <code>null</code> when geo data are not available. A
-    * grid square is an integer of lat + 90° and lon + 180° multiplied by 100 (1570 m)
+    * grid square is an integer of lat + 90Â° and lon + 180Â° multiplied by 100 (1570 m)
     *
     * <pre>
 
@@ -9117,6 +9117,28 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       _zonedStartTime = zonedStartTime;
    }
 
+   public void setTourStartTimeMS(final long tourStartTimeUTC_MS) {
+     
+      tourStartTime = tourStartTimeUTC_MS;
+
+      final Instant tourStartMills = Instant.ofEpochMilli(tourStartTime);
+      final ZoneId tourStartTimeZoneId = getTimeZoneIdWithDefault();
+
+      final ZonedDateTime zonedStartTime = ZonedDateTime.ofInstant(tourStartMills, tourStartTimeZoneId);
+      
+      startYear = (short) zonedStartTime.getYear();
+      startMonth = (short) zonedStartTime.getMonthValue();
+      startDay = (short) zonedStartTime.getDayOfMonth();
+      startHour = (short) zonedStartTime.getHour();
+      startMinute = (short) zonedStartTime.getMinute();
+      startSecond = zonedStartTime.getSecond();
+
+      setCalendarWeek(zonedStartTime);
+
+      // cache zoned date time
+      _zonedStartTime = zonedStartTime;
+   }
+   
    public void setTourTags(final Set<TourTag> tourTags) {
       this.tourTags = tourTags;
    }
