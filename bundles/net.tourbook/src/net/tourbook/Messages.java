@@ -1918,6 +1918,10 @@ public class Messages extends NLS {
    public static String Slideout_Map25Provider_Label_MapProvider_Title;
    public static String Slideout_Map25Provider_Label_ThemeStyle;
 
+   public static String Slideout_Map2MapOptions_Action_SetTourPaintingModeBasic;
+   public static String Slideout_Map2MapOptions_Dialog_EnhancePaintingWarning_Message;
+   public static String Slideout_Map2MapOptions_Dialog_EnhancePaintingWarning_Title;
+
    public static String Slideout_Map_Bookmark_Label_NumBookmarkListItems;
    public static String Slideout_Map_Bookmark_Label_NumBookmarkListItems_Tooltip;
    public static String Slideout_Map_Bookmark_Label_NumContextMenuItems;

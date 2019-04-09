@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.map2.view;
 
+import java.util.LinkedHashMap;
+
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.color.IColorSelectorListener;
@@ -26,7 +28,9 @@ import net.tourbook.preferences.PrefPageMap2Appearance;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -37,7 +41,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 
@@ -58,10 +61,10 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
    /*
     * UI controls
     */
-//   private Composite _parent;
+   private Composite _parent;
 
-   private Button _chkIsShowHoveredTour;
-   private Button _chkIsZoomWithMousePosition;
+   private Button    _chkIsShowHoveredTour;
+   private Button    _chkIsZoomWithMousePosition;
 
    /**
     * @param ownerControl
@@ -209,7 +212,7 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
 
    private void initUI(final Composite parent) {
 
-//      _parent = parent;
+      _parent = parent;
 
       _defaultState_SelectionListener = new SelectionAdapter() {
          @Override
@@ -233,29 +236,48 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
       if (_chkIsShowHoveredTour.getSelection()) {
 
          // get current painting method
-         final boolean isEnhancedPainting = PrefPageMap2Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(_prefStore.getString(
-               ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD));
+         final String prefPaintingMethod = _prefStore.getString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD);
+         final boolean isEnhancedPainting = PrefPageMap2Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(prefPaintingMethod);
 
          if (isEnhancedPainting) {
 
             // show warning that enhanced painting mode is selected
 
-            TBD
             if (_prefStore.getBoolean(ITourbookPreferences.TOGGLE_STATE_SHOW_ENHANCED_PAINTING_WARNING) == false) {
 
-               final MessageDialogWithToggle dialog = MessageDialogWithToggle.openInformation(//
-                     Display.getCurrent().getActiveShell(),
-                     Messages.Photos_AndTours_Dialog_CannotSaveHistoryTour_Title,
-                     Messages.Photos_AndTours_Dialog_CannotSaveHistoryTour_Message,
-                     Messages.App_ToggleState_DoNotShowAgain,
-                     false, // toggle default state
+               final LinkedHashMap<String, Integer> buttonLabelToIdMap = new LinkedHashMap<>();
+               buttonLabelToIdMap.put(Messages.Slideout_Map2MapOptions_Action_SetTourPaintingModeBasic, IDialogConstants.OK_ID);
+               buttonLabelToIdMap.put(Messages.App_Action_Cancel, IDialogConstants.CANCEL_ID);
+
+               final MessageDialogWithToggle dialog = new MessageDialogWithToggle(
+                     _parent.getShell(),
+                     Messages.Slideout_Map2MapOptions_Dialog_EnhancePaintingWarning_Title,
                      null,
-                     null);
+                     Messages.Slideout_Map2MapOptions_Dialog_EnhancePaintingWarning_Message,
+                     MessageDialog.QUESTION,
+                     buttonLabelToIdMap,
+                     0,
+                     Messages.App_ToggleState_DoNotShowAgain,
+                     false // toggle default state
+               );
 
                // save toggle state
                _prefStore.setValue(
                      ITourbookPreferences.TOGGLE_STATE_SHOW_ENHANCED_PAINTING_WARNING,
                      dialog.getToggleState());
+
+               setIsAnotherDialogOpened(true);
+               {
+                  final int choice = dialog.open();
+
+                  if (choice == IDialogConstants.OK_ID) {
+
+                     // set painting method to basic
+                     _prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD,
+                           PrefPageMap2Appearance.TOUR_PAINT_METHOD_SIMPLE);
+                  }
+               }
+               setIsAnotherDialogOpened(false);
             }
          }
       }

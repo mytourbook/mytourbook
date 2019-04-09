@@ -3703,31 +3703,31 @@ public class Map extends Canvas {
       /*
        * This is for debugging
        */
-      final boolean isShowHoverRectangle = false;
-      if (isShowHoverRectangle) {
-
-         // paint hovered rectangle
-         gc.setLineWidth(1);
-
-         for (final Point hoveredPoint : _devHoveredPoint) {
-
-            gc.setAlpha(0x60);
-            gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
-            gc.fillRectangle(
-                  hoveredPoint.x,
-                  hoveredPoint.y,
-                  EXPANDED_HOVER_SIZE,
-                  EXPANDED_HOVER_SIZE);
-
-            gc.setAlpha(0xff);
-            gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
-            gc.drawRectangle(
-                  hoveredPoint.x,
-                  hoveredPoint.y,
-                  EXPANDED_HOVER_SIZE,
-                  EXPANDED_HOVER_SIZE);
-         }
-      }
+//      final boolean isShowHoverRectangle = false;
+//      if (isShowHoverRectangle) {
+//
+//         // paint hovered rectangle
+//         gc.setLineWidth(1);
+//
+//         for (final Point hoveredPoint : _devHoveredPoint) {
+//
+//            gc.setAlpha(0x60);
+//            gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+//            gc.fillRectangle(
+//                  hoveredPoint.x,
+//                  hoveredPoint.y,
+//                  EXPANDED_HOVER_SIZE,
+//                  EXPANDED_HOVER_SIZE);
+//
+//            gc.setAlpha(0xff);
+//            gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+//            gc.drawRectangle(
+//                  hoveredPoint.x,
+//                  hoveredPoint.y,
+//                  EXPANDED_HOVER_SIZE,
+//                  EXPANDED_HOVER_SIZE);
+//         }
+//      }
 
       final int devXMouse = _mouseMove_DevPosition_X;
       final int devYMouse = _mouseMove_DevPosition_Y;
