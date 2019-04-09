@@ -1937,6 +1937,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       tourDataCopy.setTourPerson(this.getTourPerson());
       tourDataCopy.setDeviceId(this.getDeviceId());
 
+      tourDataCopy.setTimeZoneId(this.getTimeZoneId());
       tourDataCopy.setTourStartTime(this.getTourStartTime());
 
       tourDataCopy.setTourTitle(this.getTourTitle());
@@ -7581,15 +7582,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          return null;
       }
 
-      final ZonedDateTime tourStartDefaultZone = getTourStartTime();
-      final int utcZoneOffset = tourStartDefaultZone.getOffset().getTotalSeconds();
-
-      final long tourStartUTC = tourStartDefaultZone.plusSeconds(utcZoneOffset).toInstant().toEpochMilli();
-      final long tourEnd = tourEndTime;
-
-      final ZoneId defaultZone = TimeTools.getDefaultTimeZone();
-
+      final ZoneId defaultZone = getTimeZoneIdWithDefault();
+      
       if (defaultZone.getId().equals(TIME_ZONE_ID_EUROPE_BERLIN)) {
+
+         final ZonedDateTime tourStartDefaultZone = getTourStartTime();
+         final int utcZoneOffset = tourStartDefaultZone.getOffset().getTotalSeconds();
+
+         final long tourStartUTC = tourStartDefaultZone.plusSeconds(utcZoneOffset).toInstant().toEpochMilli();
+         final long tourEnd = tourEndTime;
 
          if (tourStartUTC < net.tourbook.common.UI.beforeCET && tourEnd > net.tourbook.common.UI.afterCETBegin) {
 
@@ -9074,7 +9075,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             tourStartMinute,
             tourStartSecond,
             0,
-            TimeTools.getDefaultTimeZone());
+            getTimeZoneIdWithDefault());
 
       tourStartTime = zonedStartTime.toInstant().toEpochMilli();
 

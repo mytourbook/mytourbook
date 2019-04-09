@@ -833,7 +833,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 					_dtTourTime.getMinutes(),
 					_dtTourTime.getSeconds(),
 					0,
-					TimeTools.getDefaultTimeZone());
+					_tourDataSource.getTimeZoneIdWithDefault());
 		}
 
 		int relTourStartTime = 0;
@@ -980,6 +980,8 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		/*
 		 * set target tour data
 		 */
+		_tourDataTarget.setTimeZoneId(extractedTourStart.getZone().getId());
+
 		_tourDataTarget.setTourStartTime(extractedTourStart);
 
 		// tour id must be created after the tour date/time is set

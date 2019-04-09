@@ -1054,9 +1054,10 @@ public class TourManager {
       joinedTourData.setTourPhotos(allTourPhoto, null);
 
       final TourData firstTour = validatedMultipleTours.get(0);
-      final ZonedDateTime tourStartTime = TimeTools.getZonedDateTime(firstTour.getTourStartTimeMS());
+      
+      joinedTourData.setTimeZoneId(firstTour.getTimeZoneId());
+      joinedTourData.setTourStartTimeMS(firstTour.getTourStartTimeMS());
 
-      joinedTourData.setTourStartTime(tourStartTime);
       joinedTourData.setTourRecordingTime(tourRecordingTime);
       joinedTourData.setTourDistance(tourDistance);
 

@@ -1939,6 +1939,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
       TourManager.removeTimeSlices(_tourData, firstIndex, lastIndex, isRemoveTime);
 
+      // set ui start date/time with time zone
+      final ZonedDateTime tourStartTime = _tourData.getTourStartTime();
+      _dtTourDate.setData(FIX_LINUX_ASYNC_EVENT_1, true);
+      _dtTourDate.setData(FIX_LINUX_ASYNC_EVENT_2, true);
+      _dtStartTime.setData(FIX_LINUX_ASYNC_EVENT_1, true);
+      _dtStartTime.setData(FIX_LINUX_ASYNC_EVENT_2, true);
+      _dtTourDate.setDate(tourStartTime.getYear(), tourStartTime.getMonthValue() - 1, tourStartTime.getDayOfMonth());
+      _dtStartTime.setTime(tourStartTime.getHour(), tourStartTime.getMinute(), tourStartTime.getSecond());
+
       getDataSeriesFromTourData();
 
       // update UI
@@ -7838,7 +7847,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       _spinTemperature.setDigits(1);
       _spinTemperature.setSelection((int) ((avgTemperature * 10) + 0.5));
 
-      // set start date/time without time zone
+      // set ui start date/time with time zone
       final ZonedDateTime tourStartTime = _tourData.getTourStartTime();
       _dtTourDate.setData(FIX_LINUX_ASYNC_EVENT_1, true);
       _dtTourDate.setData(FIX_LINUX_ASYNC_EVENT_2, true);
