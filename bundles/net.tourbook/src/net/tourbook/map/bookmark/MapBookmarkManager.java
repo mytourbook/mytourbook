@@ -27,6 +27,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
+import net.tourbook.map.bookmark.IMapBookmarks.MapBookmarkEventType;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.ListenerList;
@@ -522,12 +523,12 @@ public class MapBookmarkManager {
 		item.fill(menu, -1);
 	}
 
-	public static void fireBookmarkEvent(final MapBookmark mapBookmark, final int MapBookmarkEventType) {
+	public static void fireBookmarkEvent(final MapBookmark mapBookmark, final MapBookmarkEventType mapBookmarkEventType) {
 
 		final Object[] allListeners = _bookmarkListeners.getListeners();
 		for (final Object listener : allListeners) {
 		   //System.out.println("!!!! fireBookmarkEvent: listener: " + listener.toString()); //$NON-NLS-1$listener.toString());
-			((IMapBookmarkListener) (listener)).onMapBookmarkActionPerformed(mapBookmark, MapBookmarkEventType);
+			((IMapBookmarkListener) (listener)).onMapBookmarkActionPerformed(mapBookmark, mapBookmarkEventType);
 
 		}
 	}

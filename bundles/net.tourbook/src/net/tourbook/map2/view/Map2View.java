@@ -25,6 +25,7 @@ import de.byteholder.geoclipse.map.event.IMapInfoListener;
 import de.byteholder.geoclipse.map.event.IMapPositionListener;
 import de.byteholder.geoclipse.map.event.IPOIListener;
 import de.byteholder.geoclipse.map.event.IPositionListener;
+import de.byteholder.geoclipse.map.event.ITourSelectionListener;
 import de.byteholder.geoclipse.map.event.MapPOIEvent;
 import de.byteholder.geoclipse.map.event.MapPositionEvent;
 import de.byteholder.geoclipse.mapprovider.MP;
@@ -72,6 +73,7 @@ import net.tourbook.map.bookmark.IMapBookmarks;
 import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map.bookmark.MapBookmarkManager;
 import net.tourbook.map.bookmark.MapLocation;
+import net.tourbook.map.bookmark.IMapBookmarks.MapBookmarkEventType;
 import net.tourbook.map2.Messages;
 import net.tourbook.map2.action.ActionDimMap;
 import net.tourbook.map2.action.ActionManageMapProviders;
@@ -216,6 +218,8 @@ public class Map2View extends ViewPart implements
    private static final String   STATE_IS_SHOW_TOUR_IN_MAP                             = "STATE_IS_SHOW_TOUR_IN_MAP";                          //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_PHOTO_IN_MAP                            = "STATE_IS_SHOW_PHOTO_IN_MAP";                         //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_LEGEND_IN_MAP                           = "STATE_IS_SHOW_LEGEND_IN_MAP";                        //$NON-NLS-1$
+   public static final String    STATE_IS_SHOW_HOVERED_SELECTED_TOUR                    = "STATE_IS_SHOW_HOVERED_SELECTED_TOUR";                 //$NON-NLS-1$
+   public static final boolean   STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT            = true;
    private static final String   STATE_IS_SYNC_MAP2_WITH_OTHER_MAP                     = "STATE_IS_SYNC_MAP2_WITH_OTHER_MAP";                  //$NON-NLS-1$
    private static final String   STATE_IS_SYNC_WITH_PHOTO                              = "STATE_IS_SYNC_WITH_PHOTO";                           //$NON-NLS-1$
    private static final String   STATE_IS_SYNC_WITH_TOURCHART_SLIDER                   = "STATE_IS_SYNC_WITH_TOURCHART_SLIDER";                //$NON-NLS-1$
@@ -292,6 +296,7 @@ public class Map2View extends ViewPart implements
          MapGraphId.HrZone,
    };
 
+
    private final IPreferenceStore   _prefStore                             = TourbookPlugin.getPrefStore();
    private final IDialogSettings    _state                                 = TourbookPlugin.getState(ID);
 
@@ -302,7 +307,7 @@ public class Map2View extends ViewPart implements
 
 // SET_FORMATTING_ON
 
-   private final TourInfoIconToolTipProvider _tourInfoToolTipProvider = new TourInfoIconToolTipProvider();
+   private final TourInfoIconToolTipProvider _tourInfoToolTipProvider = new TourInfoIconToolTipProvider(2, 32);
    private final ITourToolTipProvider        _wayPointToolTipProvider = new WayPointToolTipProvider();
 
    private final DirectMappingPainter        _directMappingPainter    = new DirectMappingPainter();
@@ -968,6 +973,39 @@ public class Map2View extends ViewPart implements
          }
       });
 
+      _map.addTourSelectionListener(new ITourSelectionListener() {
+
+         @Override
+         public void onSelection(final ISelection selection, final boolean isSelectAlsoInThisView) {
+
+            if (isSelectAlsoInThisView) {
+
+               _map.getDisplay().asyncExec(new Runnable() {
+                  @Override
+                  public void run() {
+
+                     if (selection instanceof SelectionTourIds) {
+
+                        // clone tour id's otherwise the original couldl be removed
+                        final SelectionTourIds selectionTourIds = (SelectionTourIds) selection;
+
+                        final ArrayList<Long> allTourIds = new ArrayList<>();
+                        allTourIds.addAll(selectionTourIds.getTourIds());
+
+                        onSelectionChanged(new SelectionTourIds(allTourIds), false);
+                     }
+                  }
+               });
+            }
+
+            TourManager.fireEventWithCustomData(
+                  TourEventId.TOUR_SELECTION,
+                  selection,
+                  Map2View.this);
+         }
+
+      });
+
       _map.addMapGridBoxListener(new IMapGridListener() {
 
          @Override
@@ -985,7 +1023,6 @@ public class Map2View extends ViewPart implements
                geoFilter_10_Loader(mapGridData, null);
             }
          }
-
       });
 
       _map.addMapInfoListener(this);
@@ -1008,7 +1045,7 @@ public class Map2View extends ViewPart implements
 
                   if (_selectionWhenHidden != null) {
 
-                     onSelectionChanged(_selectionWhenHidden);
+                     onSelectionChanged(_selectionWhenHidden, true);
 
                      _selectionWhenHidden = null;
                   }
@@ -1155,7 +1192,7 @@ public class Map2View extends ViewPart implements
       _postSelectionListener = new ISelectionListener() {
          @Override
          public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
-            onSelectionChanged(selection);
+            onSelectionChanged(selection, true);
          }
       };
 
@@ -1200,17 +1237,19 @@ public class Map2View extends ViewPart implements
 
             } else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
 
-               onSelectionChanged((ISelection) eventData);
+               onSelectionChanged((ISelection) eventData, true);
 
             } else if (eventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof ISelection) {
 
-               onSelectionChanged((ISelection) eventData);
+               onSelectionChanged((ISelection) eventData, true);
 
             } else if (eventId == TourEventId.MAP_SHOW_GEO_GRID) {
 
                if (eventData instanceof TourGeoFilter) {
 
                   // show geo filter
+
+                  _map.tourBreadcrumb().resetTours();
 
                   final TourGeoFilter tourGeoFilter = (TourGeoFilter) eventData;
 
@@ -1224,7 +1263,7 @@ public class Map2View extends ViewPart implements
 
                   // hide geo grid
 
-                  _map.showGeoGrid(null);
+                  hideGeoGrid();
                }
 
             } else if (eventId == TourEventId.SEGMENT_LAYER_CHANGED) {
@@ -1312,6 +1351,8 @@ public class Map2View extends ViewPart implements
       _tourPainterConfig.setPhotos(null, false, false);
 
       _tourInfoToolTipProvider.setTourData(null);
+
+      _map.tourBreadcrumb().resetTours();
 
       showDefaultMap(false);
 
@@ -1542,7 +1583,7 @@ public class Map2View extends ViewPart implements
 
       _mapLegend = new MapLegend();
 
-      _map = new Map(parent, SWT.NONE);
+      _map = new Map(parent, SWT.NONE, _state);
       _map.setPainting(false);
 
       _map.setDirectPainter(_directMappingPainter);
@@ -2265,6 +2306,11 @@ public class Map2View extends ViewPart implements
       return mapPositions;
    }
 
+   private void hideGeoGrid() {
+
+      _map.showGeoGrid(null);
+   }
+
    private void keepMapPosition(final TourData tourData) {
 
       final GeoPosition centerPosition = _map.getMapGeoCenter();
@@ -2319,9 +2365,9 @@ public class Map2View extends ViewPart implements
    }
 
    @Override
-   public void onMapBookmarkActionPerformed(final MapBookmark mapBookmark, final int  mapBookmarkEventType) {
+   public void onMapBookmarkActionPerformed(final MapBookmark mapBookmark, final MapBookmarkEventType  mapBookmarkEventType) {
       {
-         if (mapBookmarkEventType == MapBookmarkEventType_moveto) {
+         if (mapBookmarkEventType == MapBookmarkEventType.MOVETO) {
             _isInSelectBookmark = true;
             moveToMapLocation(mapBookmark);
             _isInSelectBookmark = false;
@@ -2330,7 +2376,13 @@ public class Map2View extends ViewPart implements
    }
    
 
-   private void onSelectionChanged(final ISelection selection) {
+   /**
+    * @param selection
+    * @param isExternalEvent
+    *           Is <code>true</code> when the event is from another part, otherwise
+    *           <code>false</code> when the event is internal
+    */
+   private void onSelectionChanged(final ISelection selection, final boolean isExternalEvent) {
 
       if (_isPartVisible == false) {
 
@@ -2344,7 +2396,13 @@ public class Map2View extends ViewPart implements
          return;
       }
 
+      if (isExternalEvent) {
+         _map.tourBreadcrumb().resetTours();
+      }
+
       if (selection instanceof SelectionTourData) {
+
+         hideGeoGrid();
 
          final SelectionTourData selectionTourData = (SelectionTourData) selection;
          final TourData tourData = selectionTourData.getTourData();
@@ -2355,6 +2413,8 @@ public class Map2View extends ViewPart implements
          enableActions();
 
       } else if (selection instanceof SelectionTourId) {
+
+         hideGeoGrid();
 
          final SelectionTourId tourIdSelection = (SelectionTourId) selection;
          final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
@@ -2367,6 +2427,8 @@ public class Map2View extends ViewPart implements
       } else if (selection instanceof SelectionTourIds) {
 
          // paint all selected tours
+
+         hideGeoGrid();
 
          final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
          if (tourIds.size() == 0) {
@@ -2754,6 +2816,7 @@ public class Map2View extends ViewPart implements
 
       _directMappingPainter.disablePaintContext();
 
+      _map.tourBreadcrumb().setTours(_allTourData);
       _map.setShowOverlays(_isShowTour || _isShowPhoto);
       _map.setShowLegend(_isShowTour && _isShowLegend);
 
@@ -2848,6 +2911,13 @@ public class Map2View extends ViewPart implements
       final int allTourIds_Hash = allTourIds.hashCode();
       final int allTourData_Hash = _allTourData.hashCode();
       if (allTourIds_Hash == _hash_AllTourIds && allTourData_Hash == _hash_AllTourData) {
+
+         /*
+          * Ensure the tour breadcrumb shows the correct values, the value is hidden when a geo tour
+          * filter is reselected
+          */
+         _map.tourBreadcrumb().setTours(_allTourData);
+
          return;
       }
 
@@ -2878,6 +2948,8 @@ public class Map2View extends ViewPart implements
       _tourPainterConfig.setPhotos(_filteredPhotos, _isShowPhoto, _isLinkPhotoDisplayed);
 
       _tourInfoToolTipProvider.setTourDataList(_allTourData);
+
+      _map.tourBreadcrumb().setTours(_allTourData);
 
       if (_previousOverlayKey != newOverlayKey) {
 
@@ -3000,6 +3072,7 @@ public class Map2View extends ViewPart implements
 
       _tourPainterConfig.setTourBounds(tourBoundsSet);
 
+      _map.tourBreadcrumb().setTours(tourData);
       _map.setShowOverlays(_isShowTour || _isShowPhoto);
       _map.setShowLegend(_isShowTour && _isShowLegend);
 
@@ -3065,6 +3138,7 @@ public class Map2View extends ViewPart implements
 
       _directMappingPainter.disablePaintContext();
 
+      _map.tourBreadcrumb().setTours(_allTourData);
       _map.setShowOverlays(_isShowTour || _isShowPhoto);
       _map.setShowLegend(_isShowTour && _isShowLegend);
 
@@ -3097,11 +3171,11 @@ public class Map2View extends ViewPart implements
 
          if (data instanceof TourPhotoLinkSelection) {
 
-            onSelectionChanged((TourPhotoLinkSelection) data);
+            onSelectionChanged((TourPhotoLinkSelection) data, true);
 
          } else if (data instanceof PhotoSelection) {
 
-            onSelectionChanged((PhotoSelection) data);
+            onSelectionChanged((PhotoSelection) data, true);
          }
 
       } else if (photoEventId == PhotoEventId.PHOTO_ATTRIBUTES_ARE_MODIFIED) {
@@ -3452,6 +3526,9 @@ public class Map2View extends ViewPart implements
             Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION,
             Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT));
 
+      _map.setShowHoveredTourTooltip(Util.getStateBoolean(_state,
+            Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR,
+            Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT));
    }
 
    void restoreState_Map2_TrackOptions(final boolean isUpdateMapUI) {
@@ -3695,6 +3772,8 @@ public class Map2View extends ViewPart implements
 
       // update direct painter to draw nothing
       _directMappingPainter.setPaintContext(_map, false, null, 0, 0, false, false, _sliderPathPaintingData);
+
+      _map.tourBreadcrumb().resetTours();
 
       _map.setShowOverlays(isShowOverlays);
       _map.setShowLegend(false);

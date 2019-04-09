@@ -217,7 +217,7 @@ public class MarkerRenderer extends BucketRenderer {
 
 		_symbolBucket = new SymbolBucket();
 		
-		_markertoolkit = new MarkerToolkit(MarkerToolkit.shape_circle);
+		_markertoolkit = new MarkerToolkit(MarkerToolkit.markerShape.CIRCLE);
 
 		configureRenderer();
 	}

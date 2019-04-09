@@ -17,16 +17,6 @@ package net.tourbook.tour;
 
 import java.util.ArrayList;
 
-import org.eclipse.jface.resource.ImageRegistry;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
-
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.HoveredAreaContext;
 import net.tourbook.common.util.IHoveredArea;
@@ -37,40 +27,62 @@ import net.tourbook.ui.IInfoToolTipProvider;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.Messages;
 
+import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+
 public class TourInfoIconToolTipProvider implements ITourToolTipProvider, IInfoToolTipProvider, IHoveredArea, ITourProvider {
 
-   private static final int   HOVER_AREA_POSITION = 2;
+   private static final int   HOVER_AREA_POSITION_X = 2;
+   private static final int   HOVER_AREA_POSITION_Y = 2;
 
    private static Image       _tourInfoImage;
    private static Image       _tourInfoImageHovered;
    private static Rectangle   _tourInfoImageSize;
 
    private TourToolTip        _tourToolTip;
-   
+
    /**
     * Tour which is displayed in the tool tip
     */
    private TourData           _tourData;
-   private long               _tourId             = -1;
+   private long               _tourId               = -1;
 
-   private final TourInfoUI   _tourInfoUI         = new TourInfoUI();
+   private final TourInfoUI   _tourInfoUI           = new TourInfoUI();
 
    private HoveredAreaContext _tourInfoHoveredAreaContext;
 
    /**
     * is <code>true</code> when the mouse is hovering a hovered location
     */
-   private boolean            _isHovered          = false;
+   private boolean            _isHovered            = false;
+
+   private int                _xPos;
+   private int                _yPos;
 
    public TourInfoIconToolTipProvider() {
+
+      this(HOVER_AREA_POSITION_X, HOVER_AREA_POSITION_Y);
+   }
+
+   public TourInfoIconToolTipProvider(final int xPos, final int yPos) {
+
+      _xPos = xPos;
+      _yPos = yPos;
 
       createInfoIcon();
 
       _tourInfoHoveredAreaContext = new HoveredAreaContext(
             this,
             this,
-            HOVER_AREA_POSITION,
-            HOVER_AREA_POSITION,
+            xPos,
+            yPos,
             _tourInfoImageSize.width,
             _tourInfoImageSize.height);
    }
@@ -146,10 +158,12 @@ public class TourInfoIconToolTipProvider implements ITourToolTipProvider, IInfoT
       /*
        * hovered area which is hit by the mouse is extendet in the width
        */
-      if (devMouseX >= 0 //HOVER_AREA_POSITION
-            && devMouseX <= HOVER_AREA_POSITION + _tourInfoImageSize.width + 2
-            && devMouseY >= 0 //HOVER_AREA_POSITION
-            && devMouseY <= HOVER_AREA_POSITION + _tourInfoImageSize.height + 2) {
+      final int margin = 5;
+
+      if (devMouseX >= _xPos - margin
+            && devMouseX <= _xPos + _tourInfoImageSize.width + margin
+            && devMouseY >= _yPos - margin
+            && devMouseY <= _yPos + _tourInfoImageSize.height + margin) {
 
          _isHovered = true;
 
@@ -193,7 +207,7 @@ public class TourInfoIconToolTipProvider implements ITourToolTipProvider, IInfoT
       final Image tourInfoImage = _isHovered ? _tourInfoImageHovered : _tourInfoImage;
 
       // paint static image
-      gc.drawImage(tourInfoImage, HOVER_AREA_POSITION, HOVER_AREA_POSITION);
+      gc.drawImage(tourInfoImage, _xPos, _yPos);
    }
 
    private void resetToolTip() {

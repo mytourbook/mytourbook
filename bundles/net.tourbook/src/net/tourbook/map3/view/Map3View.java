@@ -73,6 +73,7 @@ import net.tourbook.map.bookmark.IMapBookmarks;
 import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map.bookmark.MapBookmarkManager;
 import net.tourbook.map.bookmark.MapLocation;
+import net.tourbook.map.bookmark.IMapBookmarks.MapBookmarkEventType;
 import net.tourbook.map2.view.IDiscreteColorProvider;
 import net.tourbook.map2.view.SelectionMapPosition;
 import net.tourbook.map3.Messages;
@@ -1646,9 +1647,9 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 	}
 
 	@Override
-	public void onMapBookmarkActionPerformed(final MapBookmark mapBookmark, final int mapBookmarkEventType) {
+	public void onMapBookmarkActionPerformed(final MapBookmark mapBookmark, final MapBookmarkEventType  mapBookmarkEventType) {
 
-	   if (mapBookmarkEventType == MapBookmarkEventType_moveto) {   
+	   if (mapBookmarkEventType == MapBookmarkEventType.MOVETO) {   
 	      moveToMapLocation(mapBookmark);
 	   }
 	}

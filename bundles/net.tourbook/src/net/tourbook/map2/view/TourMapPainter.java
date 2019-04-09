@@ -1409,6 +1409,7 @@ public class TourMapPainter extends MapPainter {
                                       final int refTourEndIndex) {
 
       boolean isTourInTile = false;
+      final Long tourId = tourData.getTourId();
 
       final MP mp = map.getMapProvider();
       final int mapZoomLevel = map.getZoom();
@@ -1581,7 +1582,7 @@ public class TourMapPainter extends MapPainter {
                               gcTile.setForeground(color);
                            }
 
-                           drawTour_40_Dot(gcTile, devFrom_WithOffsetX, devFrom_WithOffsetY, color);
+                           drawTour_40_Dot(gcTile, devFrom_WithOffsetX, devFrom_WithOffsetY, color, tile, tourId);
 
                         }
 
@@ -1591,7 +1592,9 @@ public class TourMapPainter extends MapPainter {
                               devFrom_WithOffsetY,
                               devTo_WithOffsetX,
                               devTo_WithOffsetY,
-                              color);
+                              color,
+                              tile,
+                              tourId);
                      }
                   }
 
@@ -1615,7 +1618,9 @@ public class TourMapPainter extends MapPainter {
                            devFrom_WithOffsetY,
                            devTo_WithOffsetX,
                            devTo_WithOffsetY,
-                           color);
+                           color,
+                           tile,
+                           tourId);
                   }
                }
 
@@ -1639,7 +1644,7 @@ public class TourMapPainter extends MapPainter {
                   // current position is inside the tile
 
                   // optimize drawing: check if position has changed
-                  if (devX != devFrom_WithOffsetX && devY != devFrom_WithOffsetY) {
+                  if (!(devX == devFrom_WithOffsetX && devY == devFrom_WithOffsetY)) {
 
                      boolean isVisibleDataPoint = true;
 
@@ -1663,8 +1668,8 @@ public class TourMapPainter extends MapPainter {
                               isGeoCompareRefTour,
                               isInRefTourPart);
 
-                        if (!_prefIsDrawSquare || _isFastPainting) {
-                           drawTour_40_Dot(gcTile, devX, devY, color);
+                        if (_prefIsDrawSquare == false || _isFastPainting) {
+                           drawTour_40_Dot(gcTile, devX, devY, color, tile, tourId);
                         } else {
                            drawTour_30_Square(gcTile, devX, devY, color);
                         }
@@ -1673,6 +1678,13 @@ public class TourMapPainter extends MapPainter {
                         devFrom_WithOffsetX = devX;
                         devFrom_WithOffsetY = devY;
                      }
+                  } else {
+
+//                     System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ()")
+//                           + ("\tskipped: " + devX + " " + devY)
+////                           + ("\t: " + )
+//                           );
+//// TODO remove SYSTEM.OUT.PRINTLN
                   }
                }
             }
@@ -1687,13 +1699,15 @@ public class TourMapPainter extends MapPainter {
                                  final int devYFrom,
                                  final int devXTo,
                                  final int devYTo,
-                                 final Color color) {
+                                 final Color color,
+                                 final Tile tile,
+                                 final Long tourId) {
 
       if (color != null) {
          gc.setForeground(color);
       }
 
-      drawTour_40_Dot(gc, devXTo, devYTo, color);
+      drawTour_40_Dot(gc, devXTo, devYTo, color, tile, tourId);
 
       // draw line with the color from the legend provider
       gc.drawLine(devXFrom, devYFrom, devXTo, devYTo);
@@ -1709,18 +1723,41 @@ public class TourMapPainter extends MapPainter {
       gc.fillRectangle(devX - _lineWidth2, devY - _lineWidth2, _lineWidth, _lineWidth);
    }
 
-   private void drawTour_40_Dot(final GC gc, final int devX, final int devY, final Color color) {
+   private void drawTour_40_Dot(final GC gc, final int devX, final int devY, final Color color, final Tile tile, final Long tourId) {
 
       if (color != null) {
          gc.setBackground(color);
       }
 
+      int paintedDevX;
+      int paintedDevY;
+
       if (_lineWidth == 2) {
+
          // oval is not filled by a width of 2
-         gc.fillRectangle(devX, devY, _lineWidth, _lineWidth);
+
+         paintedDevX = devX;
+         paintedDevY = devY;
+
+         gc.fillRectangle(paintedDevX, paintedDevY, _lineWidth, _lineWidth);
+
       } else {
-         gc.fillOval(devX - _lineWidth2, devY - _lineWidth2, _lineWidth, _lineWidth);
+
+         paintedDevX = devX - _lineWidth2;
+         paintedDevY = devY - _lineWidth2;
+
+         gc.fillOval(paintedDevX, paintedDevY, _lineWidth, _lineWidth);
       }
+
+      // keep area to detect hovered segments, enlarge it with the hover border to easier hit the label
+      final Rectangle hoveredRect = new Rectangle(
+            (paintedDevX - Map.EXPANDED_HOVER_SIZE2),
+            (paintedDevY - Map.EXPANDED_HOVER_SIZE2),
+            (_lineWidth + Map.EXPANDED_HOVER_SIZE),
+            (_lineWidth + Map.EXPANDED_HOVER_SIZE));
+
+      tile.allPainted_HoverRectangle.add(hoveredRect);
+      tile.allPainted_HoverTourID.add(tourId);
    }
 
    /**

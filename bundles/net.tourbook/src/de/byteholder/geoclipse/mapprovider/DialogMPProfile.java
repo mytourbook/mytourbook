@@ -1,19 +1,30 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2017  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package de.byteholder.geoclipse.mapprovider;
+
+import de.byteholder.geoclipse.Messages;
+import de.byteholder.geoclipse.map.Map;
+import de.byteholder.geoclipse.map.Tile;
+import de.byteholder.geoclipse.map.UI;
+import de.byteholder.geoclipse.map.event.IPositionListener;
+import de.byteholder.geoclipse.map.event.ITileListener;
+import de.byteholder.geoclipse.map.event.MapPositionEvent;
+import de.byteholder.geoclipse.map.event.TileEventId;
+import de.byteholder.geoclipse.preferences.PrefPageMapProviders;
+import de.byteholder.geoclipse.ui.ViewerDetailForm;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -107,17 +118,6 @@ import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.events.IExpansionListener;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
-
-import de.byteholder.geoclipse.Messages;
-import de.byteholder.geoclipse.map.Map;
-import de.byteholder.geoclipse.map.Tile;
-import de.byteholder.geoclipse.map.UI;
-import de.byteholder.geoclipse.map.event.IPositionListener;
-import de.byteholder.geoclipse.map.event.ITileListener;
-import de.byteholder.geoclipse.map.event.MapPositionEvent;
-import de.byteholder.geoclipse.map.event.TileEventId;
-import de.byteholder.geoclipse.preferences.PrefPageMapProviders;
-import de.byteholder.geoclipse.ui.ViewerDetailForm;
 
 public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefaultActions {
 
@@ -220,7 +220,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 	// image logging
 	private boolean									_isTileImageLogging;
-	private final ConcurrentLinkedQueue<LogEntry>	_logEntries								= new ConcurrentLinkedQueue<LogEntry>();
+	private final ConcurrentLinkedQueue<LogEntry>	_logEntries								= new ConcurrentLinkedQueue<>();
 
 	private int										_statUpdateCounter						= 0;
 
@@ -726,7 +726,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 	/**
 	 * create columns for the tree viewer
-	 * 
+	 *
 	 * @param pixelConverter
 	 */
 	private void createUI116ViewerColumns(final TreeColumnLayout treeLayout) {
@@ -1462,7 +1462,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 					.applyTo(_toolbar);
 		}
 
-		_map = new Map(parent, SWT.BORDER | SWT.FLAT);
+      _map = new Map(parent, SWT.BORDER | SWT.FLAT, _dialogSettings);
 		GridDataFactory.fillDefaults()//
 				.grab(true, true)
 				.applyTo(_map);
@@ -2149,7 +2149,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 	/**
 	 * A map provider is selected in the mp list
-	 * 
+	 *
 	 * @param selection
 	 */
 	private void onSelectMP(final ISelection selection) {
@@ -2615,7 +2615,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 	/**
 	 * Update visibility of the wms map provider according to the visible layers
-	 * 
+	 *
 	 * @param tviLayer
 	 */
 	private void updateMVMapProvider(final TVIWmsLayer tviLayer) {
@@ -2641,7 +2641,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 	/**
 	 * Initialize UI from the model and display the viewer content
-	 * 
+	 *
 	 * @param mapProfile
 	 */
 	private void updateUIFromModel(final MPProfile mapProfile) {
