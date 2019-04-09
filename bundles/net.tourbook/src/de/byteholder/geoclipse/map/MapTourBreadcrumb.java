@@ -159,8 +159,9 @@ public class MapTourBreadcrumb {
       final int devY = 0;
 
       final Color bgColor = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
-      final Color bgColorHovered = Display.getCurrent().getSystemColor(SWT.COLOR_GREEN);
+      final Color bgColorHovered = Display.getCurrent().getSystemColor(SWT.COLOR_BLUE);
       final Color fgColor = Display.getCurrent().getSystemColor(SWT.COLOR_BLACK);
+      final Color fgColorHovered = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
 
       final String crumbSepText = ">";
       final Point crumbSepSize = gc.textExtent(crumbSepText);
@@ -221,12 +222,13 @@ public class MapTourBreadcrumb {
 
          _allCrumbs.add(crumb);
 
+         final Color crumbFgColor = crumbIndex == _hoveredCrumbIndex ? fgColorHovered : fgColor;
          final Color crumbBgColor = crumbIndex == _hoveredCrumbIndex ? bgColorHovered : bgColor;
 
          gc.setBackground(crumbBgColor);
          gc.fillRectangle(crumb);
 
-         gc.setForeground(fgColor);
+         gc.setForeground(crumbFgColor);
          gc.drawText(crumbText,
                devX + marginHorizontal,
                devY + marginVertical);
