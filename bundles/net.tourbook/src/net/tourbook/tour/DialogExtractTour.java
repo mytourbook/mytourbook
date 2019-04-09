@@ -1069,7 +1069,8 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		// check if time slices should be removed
 		if (getStateSplitMethod().equals(STATE_EXTRACT_METHOD_REMOVE)) {
 
-			TourManager.removeTimeSlices(_tourDataSource, _extractStartIndex, _extractEndIndex, true);
+			// Keep Time after "Remove time slices and markers from current tour"
+			TourManager.removeTimeSlices(_tourDataSource, _extractStartIndex, _extractEndIndex, false);
 
 			_tourDataEditor.updateUI(_tourDataSource, true);
 
