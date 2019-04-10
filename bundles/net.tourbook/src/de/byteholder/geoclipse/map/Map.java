@@ -453,107 +453,103 @@ public class Map extends Canvas {
    private final ListenerList<IPOIListener>           _poiListeners             = new ListenerList<>(ListenerList.IDENTITY);
 
    // measurement system
-   private float            _distanceUnitValue         = 1;
-   private String           _distanceUnitLabel         = UI.EMPTY_STRING;
-   private boolean          _isScaleVisible;
+   private float               _distanceUnitValue         = 1;
+   private String              _distanceUnitLabel         = UI.EMPTY_STRING;
+   private boolean             _isScaleVisible;
 
-   private final Color      _transparentColor;
-   private final Color      _defaultBackgroundColor;
+   private final Color         _transparentColor;
+   private final Color         _defaultBackgroundColor;
    /*
     * POI image
     */
-   private boolean          _isPoiVisible;
-   private boolean          _isPoiPositionInViewport;
+   private boolean             _isPoiVisible;
+   private boolean             _isPoiPositionInViewport;
    //
-   private final Image      _poiImage;
-   private final Rectangle  _poiImageBounds;
-   private final Point      _poiImageDevPosition       = new Point(0, 0);
+   private final Image         _poiImage;
+   private final Rectangle     _poiImageBounds;
+   private final Point         _poiImageDevPosition       = new Point(0, 0);
    /*
     * POI tooltip
     */
-   private PoiToolTip       _poi_Tooltip;
-   private final int        _poi_Tooltip_OffsetY       = 5;
+   private PoiToolTip          _poi_Tooltip;
+   private final int           _poi_Tooltip_OffsetY       = 5;
 
-   private TourToolTip      _tour_ToolTip;
+   private TourToolTip         _tour_ToolTip;
 
-   private boolean          _isShowHoveredSelectedTour = Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT;
-   private long             _hovered_SelectedTourId    = Long.MIN_VALUE;
-   private ArrayList<Long>  _allHoveredTourIds         = new ArrayList<>();
-   private ArrayList<Point> _devHoveredPoint           = new ArrayList<>();
+   private boolean             _isShowHoveredSelectedTour = Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT;
+   private long                _hovered_SelectedTourId    = Long.MIN_VALUE;
+   private ArrayList<Long>     _allHoveredTourIds         = new ArrayList<>();
+   private ArrayList<Point>    _allDevHoveredPoints       = new ArrayList<>();
 
    /**
     * when <code>true</code> the loading... image is not displayed
     */
-   private boolean          _isLiveView;
-   private long             _lastMapDrawTime;
+   private boolean             _isLiveView;
+   private long                _lastMapDrawTime;
    /*
     * All painted tiles in the map are within these 4 tile positions
     */
-   private int              _tilePos_MinX;
-   private int              _tilePos_MaxX;
-   private int              _tilePos_MinY;
-   private int              _tilePos_MaxY;
+   private int                 _tilePos_MinX;
+   private int                 _tilePos_MaxX;
+   private int                 _tilePos_MinY;
+   private int                 _tilePos_MaxY;
    //
-   private Tile[][]         _allPaintedTiles;
+   private Tile[][]            _allPaintedTiles;
    //
-   private final Display    _display;
-   private final Thread     _displayThread;
+   private final Display       _display;
+   private final Thread        _displayThread;
    //
-   private int              _jobCounterSplitImages     = 0;
-   private Object           _splitJobFamily            = new Object();
-   private boolean          _isCancelSplitJobs;
-
-   /**
-    * When <code>true</code> the tour is painted in the map in the enhanced mode otherwise in the
-    * simple mode
-    */
-   private boolean          _isTourPaintMethodEnhanced;
+   private int                 _jobCounterSplitImages     = 0;
+   private Object              _splitJobFamily            = new Object();
+   private boolean             _isCancelSplitJobs;
    /*
     * Download offline images
     */
-   private boolean          _offline_IsSelectingOfflineArea;
-   private boolean          _offline_IsOfflineSelectionStarted;
-   private boolean          _offline_IsPaintOfflineArea;
+   private boolean             _offline_IsSelectingOfflineArea;
+   private boolean             _offline_IsOfflineSelectionStarted;
+   private boolean             _offline_IsPaintOfflineArea;
 
-   private Point            _offline_DevMouse_Start;
-   private Point            _offline_DevMouse_End;
-   private Point            _offline_DevTileStart;
-   private Point            _offline_DevTileEnd;
+   private Point               _offline_DevMouse_Start;
+   private Point               _offline_DevMouse_End;
+   private Point               _offline_DevTileStart;
+   private Point               _offline_DevTileEnd;
 
-   private Point            _offline_WorldMouse_Start;
-   private Point            _offline_WorldMouse_End;
-   private Point            _offline_WorldMouse_Move;
-
-//   private Rectangle _offline_CurrentOfflineArea;
-//   private Rectangle _offline_PreviousOfflineArea;
-//   private int       _offline_PreviousOfflineArea_MapZoomLevel;
+   private Point               _offline_WorldMouse_Start;
+   private Point               _offline_WorldMouse_End;
+   private Point               _offline_WorldMouse_Move;
 
    private IMapContextProvider _mapContextProvider;
 
    /**
     * Is <code>true</code> when the map context menu can be displayed
     */
-   private boolean             _isContextMenuEnabled   = true;
+   private boolean             _isContextMenuEnabled      = true;
 
    private DropTarget          _dropTarget;
 
-   private boolean             _isRedrawEnabled        = true;
+   private boolean             _isRedrawEnabled           = true;
 
    private HoveredAreaContext  _hoveredAreaContext;
 
-   private int                 _overlayAlpha           = 0xff;
+   private int                 _overlayAlpha              = 0xff;
 
    private MapGridData         _grid_Data_Hovered;
    private MapGridData         _grid_Data_Selected;
 
-   private int[]               _grid_AutoScrollCounter = new int[1];
+   private int[]               _grid_AutoScrollCounter    = new int[1];
    private boolean             _grid_IsGridAutoScroll;
+
+   /**
+    * When <code>true</code> the tour is painted in the map in the enhanced mode otherwise in the
+    * simple mode
+    */
+   private boolean             _isTourPaintMethodEnhanced;
 
    private boolean             _isFastMapPainting;
    private boolean             _isFastMapPainting_Active;
    private int                 _fastMapPainting_skippedValues;
 
-   private Font                _boldFont               = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
+   private Font                _boldFont                  = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
    private MapTourBreadcrumb   _tourBreadcrumb;
 
@@ -657,29 +653,6 @@ public class Map extends Canvas {
 
          return;
       }
-
-//      if (_offline_DevMouse_Start != null //
-//
-//            && _offline_CurrentOfflineArea != null
-//            && (event.stateMask & SWT.CONTROL) != 0) {
-//
-//         /*
-//          * use old offline area when the ctrl-key is pressed
-//          */
-//
-//         _offline_PreviousOfflineArea = null;
-//         _offline_IsPaintOfflineArea = true;
-//
-//         redraw();
-//         paint();
-//
-//         offline_OpenOfflineImageDialog();
-//
-//         return;
-//      }
-
-//      _offline_PreviousOfflineArea = _offline_CurrentOfflineArea;
-//      _offline_PreviousOfflineArea_MapZoomLevel = _mapZoomLevel;
 
       _offline_IsPaintOfflineArea = true;
       _offline_IsSelectingOfflineArea = true;
@@ -2235,7 +2208,7 @@ public class Map extends Canvas {
 
       // reset hovered data
       _allHoveredTourIds.clear();
-      _devHoveredPoint.clear();
+      _allDevHoveredPoints.clear();
 
       if (hoveredTile == null) {
 
@@ -2281,7 +2254,7 @@ public class Map extends Canvas {
             devHoveredRect_Center_Y += devHoveredTileY;
 
             _allHoveredTourIds.add(painted_HoveredTourId);
-            _devHoveredPoint.add(new Point(devHoveredRect_Center_X, devHoveredRect_Center_Y));
+            _allDevHoveredPoints.add(new Point(devHoveredRect_Center_X, devHoveredRect_Center_Y));
 
             // advance to the next tour id
             int hoverTourIdIndex;
@@ -2733,7 +2706,7 @@ public class Map extends Canvas {
 
          // reset hovered data to hide hovered tour background
          _allHoveredTourIds.clear();
-         _devHoveredPoint.clear();
+         _allDevHoveredPoints.clear();
 
          redraw();
       }
@@ -2863,7 +2836,7 @@ public class Map extends Canvas {
 
             // do not show hovered tour info -> reset hovered data
             _allHoveredTourIds.clear();
-            _devHoveredPoint.clear();
+            _allDevHoveredPoints.clear();
 
             redraw();
 
@@ -3619,7 +3592,7 @@ public class Map extends Canvas {
 
          isPaintBreadCrumb = true;
 
-         final int numTours = _devHoveredPoint.size();
+         final int numTours = _allDevHoveredPoints.size();
 
          if (numTours > 0) {
 
@@ -3652,7 +3625,7 @@ public class Map extends Canvas {
 
          if (isHoveredAndSelectedTour) {
             gc.setAlpha(0x40);
-            gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+            gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
          } else {
             gc.setAlpha(0x40);
             gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
@@ -5533,6 +5506,7 @@ public class Map extends Canvas {
    public void setLegend(final MapLegend legend) {
 
       if ((legend == null) && (_mapLegend != null)) {
+
          // dispose legend image
          disposeResource(_mapLegend.getImage());
       }
@@ -5924,17 +5898,22 @@ public class Map extends Canvas {
       paint();
    }
 
-   public void setShowHoveredTourTooltip(final boolean isVisible) {
+   public void setShowHoveredSelectedTour(final boolean isVisible) {
 
       if (isVisible == false) {
 
          // hide hovered/selected tour
          _hovered_SelectedTourId = Long.MIN_VALUE;
-
-         paint();
       }
 
       _isShowHoveredSelectedTour = isVisible;
+
+      _allHoveredTourIds.clear();
+      _allDevHoveredPoints.clear();
+
+      disposeOverlayImageCache();
+
+      paint();
    }
 
    /**
@@ -6103,7 +6082,7 @@ public class Map extends Canvas {
       // reset hovered data
       _hovered_SelectedTourId = Long.MIN_VALUE;
       _allHoveredTourIds.clear();
-      _devHoveredPoint.clear();
+      _allDevHoveredPoints.clear();
 
       grid_UpdatePaintingStateData();
 

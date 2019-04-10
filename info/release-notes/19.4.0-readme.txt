@@ -11,7 +11,11 @@ It is still possible that there are undiscovered issue. So check your data after
 New
 ===
 
-*
+* 2D Map
+  
+  - Hover and select a tour
+  - Tour breadcrumb to show selected tours
+  - Warning: No tour selection !
 
 
 Improvements
