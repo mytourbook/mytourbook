@@ -31,7 +31,6 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -243,42 +242,38 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
 
             // show warning that enhanced painting mode is selected
 
-            if (_prefStore.getBoolean(ITourbookPreferences.TOGGLE_STATE_SHOW_ENHANCED_PAINTING_WARNING) == false) {
+            final LinkedHashMap<String, Integer> buttonLabelToIdMap = new LinkedHashMap<>();
+            buttonLabelToIdMap.put(Messages.Slideout_Map2MapOptions_Action_SetTourPaintingModeBasic, IDialogConstants.OK_ID);
+            buttonLabelToIdMap.put(Messages.App_Action_Cancel, IDialogConstants.CANCEL_ID);
 
-               final LinkedHashMap<String, Integer> buttonLabelToIdMap = new LinkedHashMap<>();
-               buttonLabelToIdMap.put(Messages.Slideout_Map2MapOptions_Action_SetTourPaintingModeBasic, IDialogConstants.OK_ID);
-               buttonLabelToIdMap.put(Messages.App_Action_Cancel, IDialogConstants.CANCEL_ID);
+            final MessageDialog dialog = new MessageDialog(
 
-               final MessageDialogWithToggle dialog = new MessageDialogWithToggle(
-                     _parent.getShell(),
-                     Messages.Slideout_Map2MapOptions_Dialog_EnhancePaintingWarning_Title,
-                     null,
-                     Messages.Slideout_Map2MapOptions_Dialog_EnhancePaintingWarning_Message,
-                     MessageDialog.QUESTION,
-                     buttonLabelToIdMap,
-                     0,
-                     Messages.App_ToggleState_DoNotShowAgain,
-                     false // toggle default state
-               );
+                  _parent.getShell(),
 
-               // save toggle state
-               _prefStore.setValue(
-                     ITourbookPreferences.TOGGLE_STATE_SHOW_ENHANCED_PAINTING_WARNING,
-                     dialog.getToggleState());
+                  Messages.Slideout_Map2MapOptions_Dialog_EnhancePaintingWarning_Title,
+                  null,
 
-               setIsAnotherDialogOpened(true);
-               {
-                  final int choice = dialog.open();
+                  Messages.Slideout_Map2MapOptions_Dialog_EnhancePaintingWarning_Message,
+                  MessageDialog.INFORMATION,
 
-                  if (choice == IDialogConstants.OK_ID) {
+                  // default index
+                  0,
 
-                     // set painting method to basic
-                     _prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD,
-                           PrefPageMap2Appearance.TOUR_PAINT_METHOD_SIMPLE);
-                  }
+                  Messages.Slideout_Map2MapOptions_Action_SetTourPaintingModeBasic,
+                  Messages.App_Action_Cancel);
+
+            setIsAnotherDialogOpened(true);
+            {
+               final int choice = dialog.open();
+
+               if (choice == IDialogConstants.OK_ID) {
+
+                  // set painting method to basic
+                  _prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD,
+                        PrefPageMap2Appearance.TOUR_PAINT_METHOD_SIMPLE);
                }
-               setIsAnotherDialogOpened(false);
             }
+            setIsAnotherDialogOpened(false);
          }
       }
 
@@ -311,7 +306,7 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
 
 // SET_FORMATTING_OFF
 
-      _state.put(Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR,  _chkIsShowHoveredTour.getSelection());
+      _state.put(Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR, _chkIsShowHoveredTour.getSelection());
       _state.put(Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION,   _chkIsZoomWithMousePosition.getSelection());
 
 // SET_FORMATTING_ON
