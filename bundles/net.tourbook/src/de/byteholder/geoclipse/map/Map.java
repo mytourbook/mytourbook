@@ -315,6 +315,7 @@ public class Map extends Canvas {
 
    private final Cursor           _cursorCross;
    private final Cursor           _cursorDefault;
+   private final Cursor           _cursorHand;
    private final Cursor           _cursorPan;
    private final Cursor           _cursorSearchTour;
    private final Cursor           _cursorSearchTour_Scroll;
@@ -605,9 +606,11 @@ public class Map extends Canvas {
       updateGraphColors();
       grid_UpdatePaintingStateData();
 
-      _cursorPan = new Cursor(_display, SWT.CURSOR_SIZEALL);
       _cursorCross = new Cursor(_display, SWT.CURSOR_CROSS);
       _cursorDefault = new Cursor(_display, SWT.CURSOR_ARROW);
+      _cursorHand = new Cursor(_display, SWT.CURSOR_HAND);
+      _cursorPan = new Cursor(_display, SWT.CURSOR_SIZEALL);
+
       _cursorSearchTour = UI.createCursorFromImage(TourbookPlugin.getImageDescriptor(IMAGE_SEARCH_TOURS_BY_LOCATION));
       _cursorSearchTour_Scroll = UI.createCursorFromImage(TourbookPlugin.getImageDescriptor(IMAGE_SEARCH_TOURS_BY_LOCATION_SCROLL));
 
@@ -2433,6 +2436,7 @@ public class Map extends Canvas {
 
       disposeResource(_cursorCross);
       disposeResource(_cursorDefault);
+      disposeResource(_cursorHand);
       disposeResource(_cursorPan);
       disposeResource(_cursorSearchTour);
       disposeResource(_cursorSearchTour_Scroll);
@@ -2645,6 +2649,8 @@ public class Map extends Canvas {
          // hide hover color
          _grid_Label_IsHovered = false;
 
+         setCursor(_cursorDefault);
+
          // prevent recenter
          final boolean isZoomWithMousePosition = _isZoomWithMousePosition;
          _isZoomWithMousePosition = false;
@@ -2736,6 +2742,8 @@ public class Map extends Canvas {
 
          redraw();
       }
+
+      setCursor(_cursorDefault);
    }
 
    private void onMouse_Move(final MouseEvent mouseEvent) {
@@ -2759,6 +2767,8 @@ public class Map extends Canvas {
 
       final GeoPosition geoMouseMove = _mp.pixelToGeo(new Point2D.Double(worldMouseX, worldMouseY), _mapZoomLevel);
       _mouseMove_GeoPosition = geoMouseMove;
+
+      boolean isSomethingHit = false;
 
       if (_offline_IsSelectingOfflineArea) {
 
@@ -2832,9 +2842,8 @@ public class Map extends Canvas {
          }
 
          if (isContextValid == false) {
-            /*
-             * old hovered context is not valid any more, update the hovered context
-             */
+
+            // old hovered context is not valid any more, update the hovered context
             updateTourToolTip_HoveredArea();
          }
       }
@@ -2856,7 +2865,7 @@ public class Map extends Canvas {
          }
       }
 
-      if (_grid_Label_Outline != null) {
+      if (!isSomethingHit && _grid_Label_Outline != null) {
 
          // check if mouse has hovered the grid label
 
@@ -2868,31 +2877,56 @@ public class Map extends Canvas {
 
             _grid_Label_IsHovered = true;
 
+            setCursor(_cursorHand);
+
             redraw();
+
+            isSomethingHit = true;
 
          } else if (isHovered) {
 
             // hide hovered state
 
+            setCursor(_cursorDefault);
+
             redraw();
          }
-
       }
 
-      if (_isShowHoveredSelectedTour) {
+      if (!isSomethingHit && _isShowHoveredSelectedTour) {
+
+         final int numOldHoveredTours = _allHoveredTourIds.size();
 
          if (_tourBreadcrumb.onMouseMove(devMousePosition)) {
+
+            // breadcrumb is hovered
 
             // do not show hovered tour info -> reset hovered data
             _allHoveredTourIds.clear();
             _allDevHoveredPoints.clear();
 
+            if (_tourBreadcrumb.isCrumbHovered()) {
+               setCursor(_cursorHand);
+            } else {
+               setCursor(_cursorDefault);
+            }
+
             redraw();
 
          } else if (isTourHovered()) {
 
+            // tour is hovered
+
+            setCursor(_cursorHand);
+
             // show hovered tour
             redraw();
+
+         } else if (numOldHoveredTours > 0 || _tourBreadcrumb.isCrumbHovered() == false) {
+
+            // reset cursor
+
+            setCursor(_cursorDefault);
          }
       }
 
@@ -3833,7 +3867,7 @@ public class Map extends Canvas {
 
       } else {
 
-         final String hoverText = "Tours: " + Integer.toString(numTours);
+         final String hoverText = "Tours " + Integer.toString(numTours);
 
          paint_Text_Label(gc,
                devXMouse,
