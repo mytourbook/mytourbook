@@ -536,6 +536,12 @@ public class Map extends Canvas {
    private MapGridData         _grid_Data_Hovered;
    private MapGridData         _grid_Data_Selected;
 
+   private boolean             _grid_Label_IsHovered;
+   private Rectangle           _grid_Label_Outline;
+   private String              _grid_Label_Text;
+   private GeoPosition         _grid_MapGeoCenter;
+   private int                 _grid_MapZoomLevel;
+
    private int[]               _grid_AutoScrollCounter    = new int[1];
    private boolean             _grid_IsGridAutoScroll;
 
@@ -2632,6 +2638,24 @@ public class Map extends Canvas {
 
          fireEvent_TourSelection(new SelectionTourIds(crumbTourIds), true);
 
+      } else if (_grid_Label_IsHovered) {
+
+         // set map location to the selected geo filter default position
+
+         // hide hover color
+         _grid_Label_IsHovered = false;
+
+         // prevent recenter
+         final boolean isZoomWithMousePosition = _isZoomWithMousePosition;
+         _isZoomWithMousePosition = false;
+         {
+            // set zoom level first, that recalculation is correct
+            setZoom(_grid_MapZoomLevel);
+         }
+         _isZoomWithMousePosition = isZoomWithMousePosition;
+
+         setMapCenter(new GeoPosition(_grid_MapGeoCenter.latitude, _grid_MapGeoCenter.longitude));
+
       } else if (_allHoveredTourIds.size() > 0) {
 
          if (_allHoveredTourIds.size() == 1) {
@@ -2699,6 +2723,8 @@ public class Map extends Canvas {
 
       // stop grid autoscrolling
       _grid_IsGridAutoScroll = false;
+
+      _grid_Label_IsHovered = false;
 
       if (_isShowHoveredSelectedTour) {
 
@@ -2828,6 +2854,29 @@ public class Map extends Canvas {
          } else {
             setPoiVisible(false);
          }
+      }
+
+      if (_grid_Label_Outline != null) {
+
+         // check if mouse has hovered the grid label
+
+         final boolean isHovered = _grid_Label_IsHovered;
+
+         _grid_Label_IsHovered = false;
+
+         if (_grid_Label_Outline.contains(_mouseMove_DevPosition_X, _mouseMove_DevPosition_Y)) {
+
+            _grid_Label_IsHovered = true;
+
+            redraw();
+
+         } else if (isHovered) {
+
+            // hide hovered state
+
+            redraw();
+         }
+
       }
 
       if (_isShowHoveredSelectedTour) {
@@ -3015,6 +3064,7 @@ public class Map extends Canvas {
 
          final boolean isPaintTourInfo = paint_HoveredTour(gc);
 
+         _grid_Label_Outline = null;
          if (_grid_Data_Selected != null) {
             paint_GridBox_10_Selected(gc, _grid_Data_Selected);
          }
@@ -3389,12 +3439,24 @@ public class Map extends Canvas {
 
       final Point devTopLeft = paint_GridBox_50_Rectangle(gc, mapGridData, true);
 
-      paint_Text_Label(gc,
+      Color fgColor;
+      Color bgColor;
+
+      if (_grid_Label_IsHovered) {
+         fgColor = Display.getCurrent().getSystemColor(SWT.COLOR_BLACK);
+         bgColor = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
+      } else {
+         fgColor = Display.getCurrent().getSystemColor(SWT.COLOR_BLACK);
+         bgColor = Display.getCurrent().getSystemColor(SWT.COLOR_GREEN);
+      }
+
+      _grid_Label_Text = mapGridData.gridBox_Text;
+      _grid_Label_Outline = paint_Text_Label(gc,
             devTopLeft.x,
             devTopLeft.y,
             mapGridData.gridBox_Text,
-            Display.getCurrent().getSystemColor(SWT.COLOR_GREEN),
-            Display.getCurrent().getSystemColor(SWT.COLOR_BLACK),
+            fgColor,
+            bgColor,
             false);
    }
 
@@ -3777,8 +3839,8 @@ public class Map extends Canvas {
                devXMouse,
                devYMouse,
                hoverText,
-               Display.getCurrent().getSystemColor(SWT.COLOR_BLUE),
                Display.getCurrent().getSystemColor(SWT.COLOR_WHITE),
+               Display.getCurrent().getSystemColor(SWT.COLOR_BLUE),
                true);
       }
    }
@@ -4555,16 +4617,26 @@ public class Map extends Canvas {
       gc.drawString(text, devX, devY - 1, true);
    }
 
-   private void paint_Text_Label(final GC gc,
-                                 final int devXMouse,
-                                 final int devYMouse,
-                                 final String text,
-                                 final Color foregroundColor,
-                                 final Color backgroundColor,
-                                 final boolean isAdjustToMousePosition) {
+   /**
+    * @param gc
+    * @param devXMouse
+    * @param devYMouse
+    * @param text
+    * @param fgColor
+    * @param bgColor
+    * @param isAdjustToMousePosition
+    * @return Returns outline of the painted text or <code>null</code> when text is not painted
+    */
+   private Rectangle paint_Text_Label(final GC gc,
+                                      final int devXMouse,
+                                      final int devYMouse,
+                                      final String text,
+                                      final Color fgColor,
+                                      final Color bgColor,
+                                      final boolean isAdjustToMousePosition) {
 
       if (text == null) {
-         return;
+         return null;
       }
 
       final int textMargin = 6;
@@ -4598,6 +4670,8 @@ public class Map extends Canvas {
 
       } else {
 
+         // make sure that the text is fully visible
+
          // left border
          if (devXDetail < 0) {
             devXDetail = 0;
@@ -4621,21 +4695,24 @@ public class Map extends Canvas {
 
       final int devYText = devYDetail - textHeight - textMargin2;
 
-      gc.setAlpha(0xff);
-
-      gc.setBackground(foregroundColor);
-      gc.fillRectangle(
-            devXDetail,
+      final Rectangle textOutline = new Rectangle(devXDetail,
             devYText - textMargin,
             textWidth + textMargin,
             textHeight + textMargin);
 
-      gc.setForeground(backgroundColor);
+      gc.setAlpha(0xff);
+
+      gc.setBackground(bgColor);
+      gc.fillRectangle(textOutline);
+
+      gc.setForeground(fgColor);
       gc.drawString(
             text,
             devXDetail + textMargin2,
             devYText - textMargin2,
             true);
+
+      return textOutline;
    }
 
    private void paint_Text_WithBorder(final GC gc, final String text, final Point topLeft) {
@@ -6104,16 +6181,17 @@ public class Map extends Canvas {
                TourGeoFilter_Manager.STATE_IS_SYNC_MAP_POSITION,
                TourGeoFilter_Manager.STATE_IS_SYNC_MAP_POSITION_DEFAULT);
 
-         if (isSyncMapPosition) {
+         _grid_MapZoomLevel = tourGeoFilter.mapZoomLevel;
+         _grid_MapGeoCenter = tourGeoFilter.mapGeoCenter;
 
-            final int mapZoomLevel = tourGeoFilter.mapZoomLevel;
+         if (isSyncMapPosition) {
 
             // prevent recenter
             final boolean isZoomWithMousePosition = _isZoomWithMousePosition;
             _isZoomWithMousePosition = false;
             {
                // set zoom level first, that recalculation is correct
-               setZoom(mapZoomLevel);
+               setZoom(_grid_MapZoomLevel);
             }
             _isZoomWithMousePosition = isZoomWithMousePosition;
          }
@@ -6147,7 +6225,7 @@ public class Map extends Canvas {
           */
          if (isSyncMapPosition) {
 
-            // chck if gird box is already visible
+            // chck if grid box is already visible
 
             if (world_MapViewPort.contains(_grid_Data_Selected.world_Start)
                   && world_MapViewPort.contains(_grid_Data_Selected.world_End)) {
@@ -6158,7 +6236,7 @@ public class Map extends Canvas {
 
                // recenter map to make it visible
 
-               setMapCenter(new GeoPosition(tourGeoFilter.mapGeoCenter.latitude, tourGeoFilter.mapGeoCenter.longitude));
+               setMapCenter(new GeoPosition(_grid_MapGeoCenter.latitude, _grid_MapGeoCenter.longitude));
             }
 
          } else {

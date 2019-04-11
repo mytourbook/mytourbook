@@ -1138,10 +1138,15 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
          @Override
          public void widgetSelected(final SelectionEvent e) {
 
+            // state must be saved BEFORE overlay is reseted because this is reading the options
+            saveState_Options();
+
             // force repainting
             disposeMapOverlayImages();
 
-            onChangeUI();
+            if (_selectedFilter != null) {
+               onSelect_GeoFilter(_selectedFilter);
+            }
          }
       };
 
