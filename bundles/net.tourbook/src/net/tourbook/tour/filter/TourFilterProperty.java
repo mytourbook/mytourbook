@@ -31,8 +31,8 @@ import org.eclipse.swt.widgets.Text;
 
 public class TourFilterProperty implements Cloneable {
 
-	static final LocalDateTime	DEFAULT_DATE_1		= LocalDateTime.now().withDayOfMonth(1).withMonth(1);
-	static final LocalDateTime	DEFAULT_DATE_2		= LocalDateTime.now();
+	static final LocalDateTime	DEFAULT_DATE_1		= LocalDateTime.now().withDayOfMonth(1).withMonth(1).withHour(0).withMinute(0).withSecond(0);
+	static final LocalDateTime	DEFAULT_DATE_2		= LocalDateTime.now().withHour(23).withMinute(59).withSecond(59);
 	static final MonthDay		DEFAULT_SEASON_1	= MonthDay.of(1, 1);
 	static final MonthDay		DEFAULT_SEASON_2	= MonthDay.now();
 
@@ -82,6 +82,10 @@ public class TourFilterProperty implements Cloneable {
 
 	DateTime					uiDateTime1;
 	DateTime					uiDateTime2;
+
+	DateTime					uiDateTime1_Time;
+	DateTime					uiDateTime2_Time;
+
 	TimeDuration				uiDuration1;
 	TimeDuration				uiDuration2;
 
@@ -135,6 +139,10 @@ public class TourFilterProperty implements Cloneable {
 
 		uiDateTime1 = null;
 		uiDateTime2 = null;
+		
+		uiDateTime1_Time = null;
+		uiDateTime2_Time = null;
+		
 		uiDuration1 = null;
 		uiDuration2 = null;
 
