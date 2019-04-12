@@ -920,7 +920,8 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
          switch (fieldType) {
          case DATE:
-            numColumns += createUI_Field_Date(fieldContainer, filterProp, 1);
+            numColumns += createUI_Field_DateTime(fieldContainer, filterProp, 1);
+            numColumns++;
             break;
 
          case TIME:
@@ -947,9 +948,9 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
          switch (fieldType) {
          case DATE:
-            numColumns += createUI_Field_Date(fieldContainer, filterProp, 1);
+            numColumns += createUI_Field_DateTime(fieldContainer, filterProp, 1);
             numColumns += createUI_Operator_And(fieldContainer);
-            numColumns += createUI_Field_Date(fieldContainer, filterProp, 2);
+            numColumns += createUI_Field_DateTime(fieldContainer, filterProp, 2);
             break;
 
          case TIME:
@@ -1154,6 +1155,38 @@ public class SlideoutTourFilter extends AdvancedSlideout {
          filterProperty.uiDateTime1 = dtTourDate;
       } else {
          filterProperty.uiDateTime2 = dtTourDate;
+      }
+
+      return 1;
+   }
+
+   private int createUI_Field_DateTime(final Composite parent,
+                                       final TourFilterProperty filterProperty,
+                                       final int fieldNo) {
+
+      final DateTime dtTourDate = new DateTime(parent, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
+           
+      dtTourDate.setData(filterProperty);
+      dtTourDate.setData(FIELD_NO, fieldNo);
+    
+      dtTourDate.addFocusListener(_keepOpenListener);
+      dtTourDate.addSelectionListener(_fieldSelectionListener_DateTime);
+      
+      GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(dtTourDate);
+
+      final DateTime dtTourTime = new DateTime(parent, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
+      dtTourTime.setData(filterProperty);
+      dtTourTime.setData(FIELD_NO, fieldNo);
+      dtTourTime.addFocusListener(_keepOpenListener);
+      dtTourTime.addSelectionListener(_fieldSelectionListener_DateTime);
+      GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(dtTourTime);
+
+      if (fieldNo == 1) {
+         filterProperty.uiDateTime1 = dtTourDate;
+         filterProperty.uiDateTime1_Time = dtTourTime;
+      } else {
+         filterProperty.uiDateTime2 = dtTourDate;
+         filterProperty.uiDateTime2_Time = dtTourTime;
       }
 
       return 1;
@@ -1456,7 +1489,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
                                    final TourFilterProperty filterProperty,
                                    final int fieldNo) {
 
-      final DateTime dtTourTime = new DateTime(parent, SWT.TIME | SWT.SHORT | SWT.BORDER);
+      final DateTime dtTourTime = new DateTime(parent, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
 
       dtTourTime.setData(filterProperty);
       dtTourTime.setData(FIELD_NO, fieldNo);
@@ -1649,7 +1682,8 @@ public class SlideoutTourFilter extends AdvancedSlideout {
             dateTime.getMonth() + 1,
             dateTime.getDay(),
             dateTime.getHours(),
-            dateTime.getMinutes());
+            dateTime.getMinutes(),
+            dateTime.getSeconds());
 
       if (fieldNo == 1) {
          filterProperty.dateTime1 = localDateTime;
@@ -1657,6 +1691,8 @@ public class SlideoutTourFilter extends AdvancedSlideout {
          filterProperty.dateTime2 = localDateTime;
       }
 
+      updateUI_PropertyDetail_Date(filterProperty, fieldNo);
+      
       fireModifyEvent();
    }
 
@@ -2294,23 +2330,32 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
    private void updateUI_PropertyDetail_Date(final TourFilterProperty filterProperty, final int fieldNo) {
 
-      DateTime uiDateTime;
+      DateTime uiDateTime, uiDateTime_Time;
       LocalDateTime dateTime;
 
       if (fieldNo == 1) {
 
          uiDateTime = filterProperty.uiDateTime1;
+         uiDateTime_Time = filterProperty.uiDateTime1_Time;
          dateTime = filterProperty.dateTime1;
 
       } else {
 
          uiDateTime = filterProperty.uiDateTime2;
+         uiDateTime_Time = filterProperty.uiDateTime2_Time;
          dateTime = filterProperty.dateTime2;
       }
 
-      uiDateTime.setYear(dateTime.getYear());
-      uiDateTime.setMonth(dateTime.getMonthValue() - 1);
-      uiDateTime.setDay(dateTime.getDayOfMonth());
+      int year = dateTime.getYear(),
+        month = dateTime.getMonthValue() - 1,
+        day = dateTime.getDayOfMonth(),
+        hour = dateTime.getHour(),
+        minute = dateTime.getMinute(),
+        second = dateTime.getSecond();
+      uiDateTime.setDate(year, month, day);
+      uiDateTime.setTime(hour, minute, second);
+      uiDateTime_Time.setDate(year, month, day);
+      uiDateTime_Time.setTime(hour, minute, second);  
    }
 
    private void updateUI_PropertyDetail_Duration(final TourFilterProperty filterProperty, final int fieldNo) {
@@ -2441,8 +2486,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
          dateTime = filterProperty.dateTime2;
       }
 
-      uiDateTime.setHours(dateTime.getHour());
-      uiDateTime.setMinutes(dateTime.getMinute());
+      uiDateTime.setTime(dateTime.getHour(), dateTime.getMinute(), dateTime.getSecond());
    }
 
 }

@@ -659,7 +659,8 @@ public class Messages extends NLS {
    public static String        Dialog_JoinTours_Label_TourType;
    public static String        Dialog_JoinTours_Link_TourType;
 
-   public static String        Dialog_SetTimeZone_Button_AdjustTimeZone;
+   public static String        Dialog_SetTimeZone_Button_AdjustTimeZone_AdjustTime;
+   public static String        Dialog_SetTimeZone_Button_AdjustTimeZone_KeepTime;
    public static String        Dialog_SetTimeZone_Dialog_Title;
    public static String        Dialog_SetTimeZone_Label_Info;
    public static String        Dialog_SetTimeZone_Label_Progress_SubTask;

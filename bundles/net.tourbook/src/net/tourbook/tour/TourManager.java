@@ -1054,9 +1054,10 @@ public class TourManager {
       joinedTourData.setTourPhotos(allTourPhoto, null);
 
       final TourData firstTour = validatedMultipleTours.get(0);
-      final ZonedDateTime tourStartTime = TimeTools.getZonedDateTime(firstTour.getTourStartTimeMS());
+      
+      joinedTourData.setTimeZoneId(firstTour.getTimeZoneId());
+      joinedTourData.setTourStartTimeMS(firstTour.getTourStartTimeMS());
 
-      joinedTourData.setTourStartTime(tourStartTime);
       joinedTourData.setTourRecordingTime(tourRecordingTime);
       joinedTourData.setTourDistance(tourDistance);
 
@@ -1789,9 +1790,9 @@ public class TourManager {
                                        final int lastIndex,
                                        final boolean isRemoveTime) {
 
-      if (isRemoveTime) {
+      if (isRemoveTime || firstIndex == 0) {
          // this must be done before the time series are modified
-         removeTimeSlices_TimeAndDistance(tourData, firstIndex, lastIndex);
+         removeTimeSlices_TimeAndDistance(tourData, firstIndex, lastIndex, isRemoveTime);
       }
 
       short[] shortSerie;
@@ -2066,7 +2067,8 @@ public class TourManager {
 
    private static void removeTimeSlices_TimeAndDistance(final TourData _tourData,
                                                         final int firstIndex,
-                                                        final int lastIndex) {
+                                                        final int lastIndex,
+                                                        final boolean isRemoveTime) {
 
       final int[] timeSerie = _tourData.timeSerie;
       final float[] distSerie = _tourData.distanceSerie;
@@ -2098,6 +2100,11 @@ public class TourManager {
             distSerie[serieIndex] = distSerie[serieIndex] - distDiff;
          }
       }
+
+      // Keep Time after removing time slice from beginning of track
+      if (firstIndex == 0 && isRemoveTime == false) {   	  
+    	  _tourData.setTourStartTimeMS(_tourData.getTourStartTimeMS() + (timeDiff * 1000));
+      }      
    }
 
    /**
