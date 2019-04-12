@@ -95,7 +95,7 @@ public class TourFilterManager {
    private static final String TOUR_DATA_TOUR_DISTANCE           = "TourData.tourDistance";                                         //$NON-NLS-1$
    private static final String TOUR_DATA_TOUR_DRIVING_TIME       = "TourData.tourDrivingTime";                                      //$NON-NLS-1$
    private static final String TOUR_DATA_TOUR_RECORDING_TIME     = "TourData.tourRecordingTime";                                    //$NON-NLS-1$
-   private static final String TOUR_DATA_TOUR_START_TIME         = "TourData.tourStartTime";                                        //$NON-NLS-1$
+   private static final String TOUR_DATA_TOUR_START_TIME         = "((CAST(TourData.startYear AS BIGINT) * 1099511627776) + (TourData.startMonth * 4294967296) + (TourData.startDay * 16777216) + (TourData.startHour * 65536) + (TourData.startMinute * 256) + TourData.startSecond)";                                        //$NON-NLS-1$
    private static final String TOUR_DATA_TOUR_TITLE              = "TourData.tourTitle";                                            //$NON-NLS-1$
 
    private static final String TOUR_FILTER_FILE_NAME             = "tour-filter.xml";                                               //$NON-NLS-1$
@@ -120,6 +120,7 @@ public class TourFilterManager {
    private static final String ATTR_DATE_DAY                     = "dateDay";                                                       //$NON-NLS-1$
    private static final String ATTR_TIME_HOUR                    = "timeHour";                                                      //$NON-NLS-1$
    private static final String ATTR_TIME_MINUTE                  = "timeMinute";                                                    //$NON-NLS-1$
+   private static final String ATTR_TIME_SECOND                  = "timeSecond";                                                    //$NON-NLS-1$
 
    private static final String OP_BR_OPEN                        = "(";                                                             //$NON-NLS-1$
    private static final String OP_BR_CLOSE                       = ")";                                                             //$NON-NLS-1$
@@ -892,25 +893,32 @@ public class TourFilterManager {
 
          case TIME_TOUR_DATE:
 
-            sql = TOUR_DATA_TOUR_START_TIME;
+            // Use tour timestamp in tour timezone as filter instead of tourStartTime date in UTC timezone
+         	sql = TOUR_DATA_TOUR_START_TIME;
 
-            value1 = (LocalDate
-                  .of(dateTime1.getYear(), dateTime1.getMonthValue(), dateTime1.getDayOfMonth())
-                  .toEpochDay() + 1) * 86400_000;
+            value1  = dateTime1.getYear() * 1099511627776L;
+            value1 += dateTime1.getMonthValue() * 4294967296L;
+            value1 += dateTime1.getDayOfMonth() * 16777216L;
+            value1 += dateTime1.getHour() * 65536;
+            value1 += dateTime1.getMinute() * 256;
+            value1 += dateTime1.getSecond();
 
-            value2 = (LocalDate
-                  .of(dateTime2.getYear(), dateTime2.getMonthValue(), dateTime2.getDayOfMonth())
-                  .toEpochDay() + 1) * 86400_000;
-
+            value2  = dateTime2.getYear() * 1099511627776L;
+            value2 += dateTime2.getMonthValue() * 4294967296L;
+            value2 += dateTime2.getDayOfMonth() * 16777216L;
+            value2 += dateTime2.getHour() * 65536;
+            value2 += dateTime2.getMinute() * 256;
+            value2 += dateTime2.getSecond();
+            
             getSQL__FieldOperators_DateTime(sqlWhere, sqlParameters, fieldOperator, sql, value1, value2);
             break;
 
          case TIME_TOUR_TIME:
 
-            sql = "(TourData.startHour * 3600 + TourData.startMinute)"; //$NON-NLS-1$
+            sql = "(TourData.startHour * 3600 + TourData.startMinute * 60 + TourData.startSecond)"; //$NON-NLS-1$
 
-            value1 = dateTime1.getHour() * 3600 + dateTime1.getMinute();
-            value2 = dateTime2.getHour() * 3600 + dateTime2.getMinute();
+            value1 = dateTime1.getHour() * 3600 + dateTime1.getMinute() * 60 + dateTime1.getSecond();
+            value2 = dateTime2.getHour() * 3600 + dateTime2.getMinute() * 60 + dateTime2.getSecond();
 
             getSQL__FieldOperators_DateTime(sqlWhere, sqlParameters, fieldOperator, sql, value1, value2);
             break;
@@ -1542,7 +1550,11 @@ public class TourFilterManager {
       final int month = Util.getXmlInteger(xmlProperty, ATTR_DATE_MONTH + fieldNo, defaultDate.getMonthValue());
       final int day = Util.getXmlInteger(xmlProperty, ATTR_DATE_DAY + fieldNo, defaultDate.getDayOfMonth());
 
-      final LocalDateTime date = LocalDateTime.of(year, month, day, 0, 0);
+      final int hour = Util.getXmlInteger(xmlProperty, ATTR_TIME_HOUR + fieldNo, defaultDate.getHour());
+      final int minute = Util.getXmlInteger(xmlProperty, ATTR_TIME_MINUTE + fieldNo, defaultDate.getMinute());
+      final int second = Util.getXmlInteger(xmlProperty, ATTR_TIME_SECOND + fieldNo, defaultDate.getSecond());
+      
+      final LocalDateTime date = LocalDateTime.of(year, month, day, hour, minute, second);
 
       if (fieldNo == 1) {
          filterProperty.dateTime1 = date;
@@ -1616,8 +1628,9 @@ public class TourFilterManager {
 
       final int hour = Util.getXmlInteger(xmlProperty, ATTR_TIME_HOUR + fieldNo, defaultTime.getHour());
       final int minute = Util.getXmlInteger(xmlProperty, ATTR_TIME_MINUTE + fieldNo, defaultTime.getMinute());
-
-      final LocalDateTime date = LocalDateTime.now().withHour(hour).withMinute(minute);
+      final int second = Util.getXmlInteger(xmlProperty, ATTR_TIME_SECOND + fieldNo, defaultTime.getSecond());
+      
+      final LocalDateTime date = LocalDateTime.now().withHour(hour).withMinute(minute).withSecond(second);
 
       if (fieldNo == 1) {
          filterProperty.dateTime1 = date;
@@ -1849,6 +1862,10 @@ public class TourFilterManager {
       xmlProperty.putInteger(ATTR_DATE_YEAR + fieldNo, dateTime.getYear());
       xmlProperty.putInteger(ATTR_DATE_MONTH + fieldNo, dateTime.getMonthValue());
       xmlProperty.putInteger(ATTR_DATE_DAY + fieldNo, dateTime.getDayOfMonth());
+
+      xmlProperty.putInteger(ATTR_TIME_HOUR + fieldNo, dateTime.getHour());
+      xmlProperty.putInteger(ATTR_TIME_MINUTE + fieldNo, dateTime.getMinute());
+      xmlProperty.putInteger(ATTR_TIME_SECOND + fieldNo, dateTime.getSecond());
    }
 
    private static void writeXml_Number_Float(final IMemento xmlProperty, final double value, final int fieldNo) {
@@ -1871,6 +1888,7 @@ public class TourFilterManager {
 
       xmlProperty.putInteger(ATTR_TIME_HOUR + fieldNo, dateTime.getHour());
       xmlProperty.putInteger(ATTR_TIME_MINUTE + fieldNo, dateTime.getMinute());
+      xmlProperty.putInteger(ATTR_TIME_SECOND + fieldNo, dateTime.getSecond());
    }
 
 }

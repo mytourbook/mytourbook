@@ -1064,7 +1064,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    /**
     * Contains the rough geo parts of the tour or <code>null</code> when geo data are not available. A
-    * grid square is an integer of lat + 90° and lon + 180° multiplied by 100 (1570 m)
+    * grid square is an integer of lat + 90Â° and lon + 180Â° multiplied by 100 (1570 m)
     *
     * <pre>
 
@@ -1937,6 +1937,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       tourDataCopy.setTourPerson(this.getTourPerson());
       tourDataCopy.setDeviceId(this.getDeviceId());
 
+      tourDataCopy.setTimeZoneId(this.getTimeZoneId());
       tourDataCopy.setTourStartTime(this.getTourStartTime());
 
       tourDataCopy.setTourTitle(this.getTourTitle());
@@ -7581,15 +7582,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          return null;
       }
 
-      final ZonedDateTime tourStartDefaultZone = getTourStartTime();
-      final int utcZoneOffset = tourStartDefaultZone.getOffset().getTotalSeconds();
-
-      final long tourStartUTC = tourStartDefaultZone.plusSeconds(utcZoneOffset).toInstant().toEpochMilli();
-      final long tourEnd = tourEndTime;
-
-      final ZoneId defaultZone = TimeTools.getDefaultTimeZone();
-
+      final ZoneId defaultZone = getTimeZoneIdWithDefault();
+      
       if (defaultZone.getId().equals(TIME_ZONE_ID_EUROPE_BERLIN)) {
+
+         final ZonedDateTime tourStartDefaultZone = getTourStartTime();
+         final int utcZoneOffset = tourStartDefaultZone.getOffset().getTotalSeconds();
+
+         final long tourStartUTC = tourStartDefaultZone.plusSeconds(utcZoneOffset).toInstant().toEpochMilli();
+         final long tourEnd = tourEndTime;
 
          if (tourStartUTC < net.tourbook.common.UI.beforeCET && tourEnd > net.tourbook.common.UI.afterCETBegin) {
 
@@ -9074,7 +9075,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             tourStartMinute,
             tourStartSecond,
             0,
-            TimeTools.getDefaultTimeZone());
+            getTimeZoneIdWithDefault());
 
       tourStartTime = zonedStartTime.toInstant().toEpochMilli();
 
@@ -9117,6 +9118,28 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       _zonedStartTime = zonedStartTime;
    }
 
+   public void setTourStartTimeMS(final long tourStartTimeUTC_MS) {
+     
+      tourStartTime = tourStartTimeUTC_MS;
+
+      final Instant tourStartMills = Instant.ofEpochMilli(tourStartTime);
+      final ZoneId tourStartTimeZoneId = getTimeZoneIdWithDefault();
+
+      final ZonedDateTime zonedStartTime = ZonedDateTime.ofInstant(tourStartMills, tourStartTimeZoneId);
+      
+      startYear = (short) zonedStartTime.getYear();
+      startMonth = (short) zonedStartTime.getMonthValue();
+      startDay = (short) zonedStartTime.getDayOfMonth();
+      startHour = (short) zonedStartTime.getHour();
+      startMinute = (short) zonedStartTime.getMinute();
+      startSecond = zonedStartTime.getSecond();
+
+      setCalendarWeek(zonedStartTime);
+
+      // cache zoned date time
+      _zonedStartTime = zonedStartTime;
+   }
+   
    public void setTourTags(final Set<TourTag> tourTags) {
       this.tourTags = tourTags;
    }

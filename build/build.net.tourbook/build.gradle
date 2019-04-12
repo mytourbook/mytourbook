@@ -151,12 +151,11 @@ task mt_50_CreateExeFiles {
 		
 			println '\twin 64'
 		
-			commandLine 'cmd', '/c', _pathInnoSetupCompilerApp
+			commandLine 'cmd', '/c', '"'+_pathInnoSetupCompilerApp+'"'
 			args		win64SetupConfigFilename
 		}
 	}
 }
-
 
 /*
  Cleanup win zip files

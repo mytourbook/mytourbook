@@ -24,6 +24,7 @@ import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
@@ -37,6 +38,8 @@ public class DialogSetTimeZone extends WizardDialog {
 	private IDialogSettings	_state									= TourbookPlugin
 																			.getState("net.tourbook.tour.DialogSetTimeZone");	//$NON-NLS-1$
 
+	private Button button_ChangeTimezoneKeepTime;
+	
 	public DialogSetTimeZone(final Shell parentShell, final IWizard wizard) {
 
 		super(parentShell, wizard);
@@ -45,16 +48,22 @@ public class DialogSetTimeZone extends WizardDialog {
 	@Override
 	protected final void createButtonsForButtonBar(final Composite parent) {
 
+		button_ChangeTimezoneKeepTime = createButton(parent, IDialogConstants.HELP_ID, Messages.Dialog_SetTimeZone_Button_AdjustTimeZone_KeepTime, false);
+		
 		super.createButtonsForButtonBar(parent);
-
+		
 		// set text for the OK button
 		final Button button = getButton(IDialogConstants.FINISH_ID);
 
-		button.setText(Messages.Dialog_SetTimeZone_Button_AdjustTimeZone);
-
+		button.setText(Messages.Dialog_SetTimeZone_Button_AdjustTimeZone_AdjustTime);
+		
 		// ensure the button is wide enough
 		final GridData gd = (GridData) button.getLayoutData();
 		gd.widthHint = SWT.DEFAULT;
+		
+		// ensure the button is wide enough
+		final GridData gdKT = (GridData) button_ChangeTimezoneKeepTime.getLayoutData();
+		gdKT.widthHint = SWT.DEFAULT;	
 	}
 
 	@Override
@@ -64,4 +73,14 @@ public class DialogSetTimeZone extends WizardDialog {
 		return _state;
 	}
 
+	@Override
+	protected final void buttonPressed(int buttonId) {
+		
+		if (buttonId == IDialogConstants.HELP_ID) {
+			getWizard().isHelpAvailable();
+			buttonId = IDialogConstants.FINISH_ID;
+		}
+		
+		super.buttonPressed(buttonId);
+	}
 }

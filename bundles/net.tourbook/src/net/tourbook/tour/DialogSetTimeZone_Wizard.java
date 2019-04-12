@@ -17,6 +17,8 @@ package net.tourbook.tour;
 
 import java.lang.reflect.InvocationTargetException;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -57,6 +59,9 @@ public class DialogSetTimeZone_Wizard extends Wizard {
 	private ArrayList<TourData>				_selectedTours;
 	private ITourProvider2					_tourProvider;
 
+	private boolean _isHelpAvailable;
+	private boolean	_keepTime;
+	
 	public DialogSetTimeZone_Wizard(final ArrayList<TourData> selectedTours, final ITourProvider2 tourProvider) {
 
 		super();
@@ -65,6 +70,9 @@ public class DialogSetTimeZone_Wizard extends Wizard {
 
 		_selectedTours = selectedTours;
 		_tourProvider = tourProvider;
+		
+		_isHelpAvailable = true;
+		_keepTime = false;
 	}
 
 	@Override
@@ -80,6 +88,17 @@ public class DialogSetTimeZone_Wizard extends Wizard {
 		return Messages.Dialog_SetTimeZone_Dialog_Title;
 	}
 
+    @Override
+	public boolean isHelpAvailable() {
+    	    	
+    	if (_isHelpAvailable) {
+    		_isHelpAvailable = false;
+    	} else {
+	    	_keepTime = true;
+    	}
+        return false;
+    }
+    
 	@Override
 	public boolean performFinish() {
 
@@ -161,14 +180,16 @@ public class DialogSetTimeZone_Wizard extends Wizard {
 
 					final String tourDateTime = TourManager.getTourDateTimeShort(tourData);
 
+			        final long tourStartTimeUTC_MS = tourData.getTourStartTimeMS();
+			        final ZonedDateTime tourStartPrevZone = tourData.getTourStartTime();
+			         
 					switch (timeZoneAction) {
 
 					case DialogSetTimeZone.TIME_ZONE_ACTION_SET_FROM_LIST:
 
 						// set time zone which is selected in a list
-
 						tourData.setTimeZoneId(selectedzoneId.getId());
-
+				        
 						TourLogManager.addLog(
 								TourLogState.DEFAULT,
 								NLS.bind(LOG_SET_TIMEZONE_010_SET_SELECTED, tourDateTime));
@@ -218,6 +239,13 @@ public class DialogSetTimeZone_Wizard extends Wizard {
 					default:
 						// this should not happen
 						continue;
+					}
+
+					if(_keepTime) {
+				        final ZonedDateTime tourStartNewZone = tourData.getTourStartTime();
+				        final int prevZoneOffsetMS = tourStartPrevZone.getOffset().getTotalSeconds() * 1000;
+				        final int newZoneOffsetMS = tourStartNewZone.getOffset().getTotalSeconds() * 1000;
+				        tourData.setTourStartTimeMS(tourStartTimeUTC_MS + prevZoneOffsetMS - newZoneOffsetMS);
 					}
 
 					final TourData savedTourData = TourManager.saveModifiedTour(tourData, false);

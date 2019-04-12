@@ -1020,7 +1020,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
                      _dtTourTime.getMinutes(),
                      _dtTourTime.getSeconds(),
                      0,
-                     TimeTools.getDefaultTimeZone());
+                     tourTourData.getTimeZoneIdWithDefault());
             }
 
             // tour start in absolute seconds
@@ -1342,8 +1342,9 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       /*
        * setup tour data
        */
-      _joinedTourData.setTourStartTime(joinedTourStart);
       _joinedTourData.setTimeZoneId(joinedTourStart.getZone().getId());
+
+      _joinedTourData.setTourStartTime(joinedTourStart);
 
       // tour id must be created after the tour date/time is set
       _joinedTourData.createTourId();
