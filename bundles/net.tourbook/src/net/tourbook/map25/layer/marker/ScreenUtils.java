@@ -96,16 +96,16 @@ public class ScreenUtils {
 			final Canvas canvas = CanvasAdapter.newCanvas();
 			canvas.setBitmap(bitmap);
 			
-			{  //(testing block
+		//	{  //(testing block
 			   /*
-			    * the following three lines displaying a transparent box.
+			    * the following three or four lines displaying a transparent box.
 			    * only for testing purposes, normally uncommented
 			    */
-			   int oldColor = _fillPainter.getColor();
-			   _fillPainter.setColor(0x60ffffff);
-			   canvas.drawCircle(0, 0, bitmapSizeInt*2, _fillPainter);
-			   _fillPainter.setColor(oldColor);
-			}
+		//	   int oldColor = _fillPainter.getColor();
+		//	   _fillPainter.setColor(0x60ffffff);
+		//	   canvas.drawCircle(0, 0, bitmapSizeInt*2, _fillPainter);
+		//	   _fillPainter.setColor(oldColor);
+		//	}
 
 			// fill symbol
 			canvas.drawCircle(noClippingPos, noClippingPos, fillRadius, _fillPainter);
