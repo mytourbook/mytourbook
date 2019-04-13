@@ -41,7 +41,7 @@ import net.tourbook.map25.layer.marker.MarkerLayer;
 import net.tourbook.map25.layer.marker.MarkerLayer.OnItemGestureListener;
 import net.tourbook.map25.layer.marker.MarkerRenderer;
 import net.tourbook.map25.layer.marker.MarkerToolkit;
-import net.tourbook.map25.layer.marker.MarkerToolkit.markerMode;
+import net.tourbook.map25.layer.marker.MarkerToolkit.MarkerMode;
 import net.tourbook.map25.layer.tourtrack.SliderLocation_Layer;
 import net.tourbook.map25.layer.tourtrack.SliderPath_Layer;
 import net.tourbook.map25.layer.tourtrack.TourLayer;
@@ -179,7 +179,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	
    ItemizedLayer<MarkerItem> _layer_MapBookmark;
    private MarkerToolkit _markertoolkit;
-   private markerMode _markerMode = MarkerToolkit.markerMode.NORMAL; // MarkerToolkit.modeDemo or MarkerToolkit.modeNormal
+   private MarkerMode _markerMode = MarkerToolkit.MarkerMode.NORMAL; // MarkerToolkit.modeDemo or MarkerToolkit.modeNormal
 
 	/**
 	 * Is <code>true</code> when a tour marker is hit.
@@ -1041,7 +1041,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
 	   // MapBookmarks
 	   System.out.println("################ setupMap_Layers: calling constructor"); //$NON-NLS-1$
-	   _markertoolkit = new MarkerToolkit(MarkerToolkit.markerShape.STAR);
+	   _markertoolkit = new MarkerToolkit(MarkerToolkit.MarkerShape.STAR);
 	   if (config.isMarkerClustered) {
 	      _layer_MapBookmark = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _markertoolkit._markerRendererFactory, this);
 	   } else {
@@ -1135,29 +1135,31 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	   //
 	}
 	
-   @Override
-   public boolean onItemSingleTapUp(int index, MarkerItem item) {
-       if (item.getMarker() == null)
-          ;
-          // item.setMarker(symbol);
-       else
-           item.setMarker(null);
+	@Override
+	public boolean onItemSingleTapUp(int index, MarkerItem item) {
+	   if (item.getMarker() == null)
+	      ;
+	   // item.setMarker(symbol);
+	   else
+	      ;
+	   // item.setMarker(null);
 
-       System.out.println("Marker tap " + item.getTitle());
-       return true;
-   }
+	   System.out.println("Marker tap " + item.getTitle());
+	   return true;
+	}
 
-   @Override
-   public boolean onItemLongPress(int index, MarkerItem item) {
-       if (item.getMarker() == null)
-          ;
-          // item.setMarker(symbol);
-       else
-           item.setMarker(null);
+	@Override
+	public boolean onItemLongPress(int index, MarkerItem item) {
+	   if (item.getMarker() == null)
+	      ;
+	   // item.setMarker(symbol);
+	   else
+	      ;
+	   // item.setMarker(null);
 
-       System.out.println("Marker long press " + item.getTitle());
-       return true;
-   }
+	   System.out.println("Marker long press " + item.getTitle());
+	   return true;
+	}
 	
 	
 	/**

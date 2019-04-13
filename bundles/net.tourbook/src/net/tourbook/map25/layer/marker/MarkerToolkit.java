@@ -49,6 +49,7 @@ public class MarkerToolkit {
    private int  _clusterSymbolWeight;
    private float  _clusterOutlineSize;
    private Bitmap _clusterBitmap;
+   private boolean _isBillboard;
    
    public MarkerSymbol _symbol;
    private float _symbolSize = 10f;
@@ -60,13 +61,13 @@ public class MarkerToolkit {
 
    public MarkerRendererFactory _markerRendererFactory;
    
-   public enum markerShape {STAR, CIRCLE};
+   public enum MarkerShape {STAR, CIRCLE};
    
-   public enum markerMode {DEMO, NORMAL};
+   public enum MarkerMode {DEMO, NORMAL};
    
    public boolean _isMarkerClusteredLast;
    
-   public MarkerToolkit(markerShape shape) {
+   public MarkerToolkit(MarkerShape shape) {
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
       loadConfig();
@@ -113,9 +114,10 @@ public class MarkerToolkit {
       _clusterOutlineSize = config.clusterOutline_Size;
       _symbolSize = ScreenUtils.getPixels(config.markerSymbol_Size);
       _symbolSizeInt = (int) Math.ceil(_symbolSize);
+      _isBillboard = config.clusterOrientation == Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
    }
 
-   public Bitmap createPoiBitmap(markerShape shape) {
+   public Bitmap createPoiBitmap(MarkerShape shape) {
       loadConfig();
 
       _bitmapPoi = CanvasAdapter.newBitmap(_symbolSizeInt, _symbolSizeInt, 0);
@@ -157,9 +159,9 @@ public class MarkerToolkit {
    }
    
    
-   public List<MarkerItem> createMarkerItemList(markerMode MarkerMode){
+   public List<MarkerItem> createMarkerItemList(MarkerMode MarkerMode){
       loadConfig();
-      createPoiBitmap(markerShape.STAR);
+      createPoiBitmap(MarkerShape.STAR);
       List<MarkerItem> pts = new ArrayList<>();
      
       for (final MapBookmark mapBookmark : net.tourbook.map.bookmark.MapBookmarkManager.getAllBookmarks()) {
@@ -171,7 +173,7 @@ public class MarkerToolkit {
          pts.add(item);
       }
 
-      if (MarkerMode == markerMode.NORMAL) {return pts;};
+      if (MarkerMode == MarkerMode.NORMAL) {return pts;};
 
       int COUNT = 5;
       float STEP = 100f / 110000f; // roughly 100 meters
@@ -205,7 +207,7 @@ public class MarkerToolkit {
     */
    public MarkerSymbol createAdvanceSymbol(MarkerItem mItem, Bitmap poiBitmap) {
       loadConfig();
-      createPoiBitmap(markerShape.STAR);
+      createPoiBitmap(MarkerShape.STAR);
       final Paint textPainter = CanvasAdapter.newPaint();
       textPainter.setStyle(Paint.Style.STROKE);
       textPainter.setColor(_fgColor);
@@ -281,7 +283,13 @@ public class MarkerToolkit {
       markerCanvas.drawBitmap(titleBitmap, xSize/2-(titleWidth/2), 0);
       markerCanvas.drawBitmap(poiBitmap, xSize/2-(symbolWidth/2), ySize/2-(symbolWidth/2));
       
-      return (new MarkerSymbol(markerBitmap, HotspotPlace.CENTER, true));
+      if (_isBillboard) {
+         return (new MarkerSymbol(markerBitmap, HotspotPlace.CENTER));
+      } else {
+         return (new MarkerSymbol(markerBitmap, HotspotPlace.CENTER, false));
+      }
+      
+      //return (new MarkerSymbol(markerBitmap, HotspotPlace.CENTER, true));
    }
    
    
