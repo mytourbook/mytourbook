@@ -239,9 +239,9 @@ public class MarkerRenderer extends BucketRenderer {
 		_fgColor = ColorUtil.getARGB(config.markerOutline_Color, (int) (config.markerOutline_Opacity / 100.0 * 0xff));
 		_bgColor = ColorUtil.getARGB(config.markerFill_Color,    (int) (config.markerFill_Opacity    / 100.0 * 0xff));
 		
-		/*System.out.println("***textOpacy: " + config.markerOutline_Opacity);
-		System.out.println("***FillOpacy: " + config.markerFill_Opacity);
-		System.out.println("***bgColor: " + _bgColor);*/
+		/*System.out.println("***textOpacy: " + config.markerOutline_Opacity); //$NON-NLS-1$
+		System.out.println("***FillOpacy: " + config.markerFill_Opacity); //$NON-NLS-1$
+		System.out.println("***bgColor: " + _bgColor); //$NON-NLS-1$ */
 		
 		_clusterSymbolSizeDP = config.clusterSymbol_Size;
 		_clusterSymbolWeight = config.clusterSymbol_Weight;
@@ -610,7 +610,7 @@ public class MarkerRenderer extends BucketRenderer {
 			return;
 		}
 
-//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tupdate()"));
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tupdate()")); //$NON-NLS-1$  //$NON-NLS-2$  //$NON-NLS-3$
 //		// TODO remove SYSTEM.OUT.PRINTLN
 
 		final MapPosition mapPosition = viewport.pos;
@@ -821,7 +821,7 @@ public class MarkerRenderer extends BucketRenderer {
 			   
             String title = projItem.mapMarker.title;
             String subtitle = projItem.mapMarker.description;
-            //System.out.println("***** subtitle: " +  subtitle + " and length: " + subtitle.length());
+            //System.out.println("***** subtitle: " +  subtitle + " and length: " + subtitle.length()); //$NON-NLS-1$  //$NON-NLS-2$
 
             //create dummy MarkerItem with dummy coordinates. only need it for create the label
 			   MarkerItem item = new MarkerItem(title, subtitle, new GeoPoint(5.0, 5.0));

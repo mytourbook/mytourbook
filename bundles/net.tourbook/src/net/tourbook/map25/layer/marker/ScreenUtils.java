@@ -95,6 +95,17 @@ public class ScreenUtils {
 			final Bitmap bitmap = CanvasAdapter.newBitmap(bitmapSizeInt, bitmapSizeInt, 0);
 			final Canvas canvas = CanvasAdapter.newCanvas();
 			canvas.setBitmap(bitmap);
+			
+			{  //(testing block
+			   /*
+			    * the following three lines displaying a transparent box.
+			    * only for testing purposes, normally uncommented
+			    */
+			   int oldColor = _fillPainter.getColor();
+			   _fillPainter.setColor(0x60ffffff);
+			   canvas.drawCircle(0, 0, bitmapSizeInt*2, _fillPainter);
+			   _fillPainter.setColor(oldColor);
+			}
 
 			// fill symbol
 			canvas.drawCircle(noClippingPos, noClippingPos, fillRadius, _fillPainter);
@@ -107,7 +118,7 @@ public class ScreenUtils {
 			// draw additional symbol
 			if (additionalBitmap != null) {
 			   if (additionalBitmap.getWidth() <= bitmapSizeInt) {
-			      canvas.drawBitmap(additionalBitmap, bitmapSizeInt / 2 - additionalBitmap.getWidth() / 2, bitmapSizeInt / 2 - additionalBitmap.getHeight() / 2);
+			      canvas.drawBitmap(additionalBitmap, (bitmapSizeInt / 2 - additionalBitmap.getWidth() / 2) + 1, (bitmapSizeInt / 2 - additionalBitmap.getHeight() / 2) + 1);
 			   } else {
 			      canvas.drawBitmapScaled(additionalBitmap);
 			   }
