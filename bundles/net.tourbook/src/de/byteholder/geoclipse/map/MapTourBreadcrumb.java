@@ -34,12 +34,14 @@ public class MapTourBreadcrumb {
 
    private static final String        CRUMB_SEPARATOR    = " >";                                                                //$NON-NLS-1$
 
+   private static final int           NOT_HOVERED_INDEX  = -1;
+
    private ArrayList<ArrayList<Long>> _allTours          = new ArrayList<>();
    private ArrayList<Rectangle>       _allCrumbs         = new ArrayList<>();
 
    private Rectangle                  _outline;
 
-   private int                        _hoveredCrumbIndex = -1;
+   private int                        _hoveredCrumbIndex = NOT_HOVERED_INDEX;
 
    private Font                       _boldFont          = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
@@ -52,7 +54,7 @@ public class MapTourBreadcrumb {
     */
    public ArrayList<Long> getCrumbToursAndReset() {
 
-      if (_hoveredCrumbIndex == -1) {
+      if (_hoveredCrumbIndex == NOT_HOVERED_INDEX) {
          return null;
       }
 
@@ -65,9 +67,17 @@ public class MapTourBreadcrumb {
          _allCrumbs.remove(crumbIndex);
       }
 
-      _hoveredCrumbIndex = -1;
+      _hoveredCrumbIndex = NOT_HOVERED_INDEX;
 
       return crumbTours;
+   }
+
+   /**
+    * @return Returns <code>true</code> when a crumb is hovered, otherwise <code>false</code>
+    */
+   public boolean isCrumbHovered() {
+
+      return _hoveredCrumbIndex != NOT_HOVERED_INDEX;
    }
 
    /**
@@ -76,7 +86,7 @@ public class MapTourBreadcrumb {
     */
    public boolean onMouseDown(final Point devMousePosition) {
 
-      if (_hoveredCrumbIndex == -1) {
+      if (_hoveredCrumbIndex == NOT_HOVERED_INDEX) {
          return false;
       }
 
@@ -101,7 +111,7 @@ public class MapTourBreadcrumb {
    public void onMouseExit() {
 
       // reset hovered crumb
-      _hoveredCrumbIndex = -1;
+      _hoveredCrumbIndex = NOT_HOVERED_INDEX;
    }
 
    /**
@@ -112,7 +122,7 @@ public class MapTourBreadcrumb {
 
       final int oldHoveredCrumbIndex = _hoveredCrumbIndex;
 
-      _hoveredCrumbIndex = -1;
+      _hoveredCrumbIndex = NOT_HOVERED_INDEX;
 
       if (_outline != null && _outline.contains(devMousePosition)) {
 
@@ -252,7 +262,6 @@ public class MapTourBreadcrumb {
 
          final int devXWarning = devX + 0;
          final int devYWarning = 0;
-
 
          gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
          gc.fillRectangle(

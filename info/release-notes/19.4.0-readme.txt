@@ -24,6 +24,8 @@ Improvements
 * Search Tour by Location
 
   - Option for fast map drawing 
+  - Relocate map to the geo filter original position by selecting the geo filter label in the map
+  - Delete geo filter without name
 
 
 * 2.5D Map
