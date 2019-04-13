@@ -1039,24 +1039,24 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 		}*/
 
 
-	   // MapBookmarks
-	   System.out.println("################ setupMap_Layers: calling constructor"); //$NON-NLS-1$
-	   _markertoolkit = new MarkerToolkit(MarkerToolkit.MarkerShape.STAR);
-	   if (config.isMarkerClustered) {
-	      _layer_MapBookmark = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _markertoolkit._markerRendererFactory, this);
-	   } else {
-	      _layer_MapBookmark = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _markertoolkit._symbol, this);
-	   }
-	   List<MarkerItem> pts = _markertoolkit.createMarkerItemList(_markerMode);
-	   _layer_MapBookmark.addItems(pts);
-	   _layer_MapBookmark.setEnabled(false);
-	   layers.add(_layer_MapBookmark);	
-
 	   // label
 	   _layer_Label = new LabelLayerMT(mMap, _layer_BaseMap);
 	   _layer_Label.setEnabled(false);
 	   layers.add(_layer_Label);
 
+      // MapBookmarks
+      System.out.println("################ setupMap_Layers: calling constructor"); //$NON-NLS-1$
+      _markertoolkit = new MarkerToolkit(MarkerToolkit.MarkerShape.STAR);
+      if (config.isMarkerClustered) {
+         _layer_MapBookmark = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _markertoolkit._markerRendererFactory, this);
+      } else {
+         _layer_MapBookmark = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _markertoolkit._symbol, this);
+      }
+      List<MarkerItem> pts = _markertoolkit.createMarkerItemList(_markerMode);
+      _layer_MapBookmark.addItems(pts);
+      _layer_MapBookmark.setEnabled(false);
+      layers.add(_layer_MapBookmark);	   
+	   
 	   // marker
 	   _layer_Marker = new MarkerLayer(mMap, this);
 	   _layer_Marker.setEnabled(false);
