@@ -58,7 +58,7 @@ public class SplashManager {
    private static SplashManager _instance;
 
    private String               pluginId;
-   private String               splashPath = "splash.bmp";
+   private String               splashPath = "splash.bmp"; //$NON-NLS-1$
    private String               nextMessage;
 
    private Rectangle            textRect;
@@ -110,11 +110,11 @@ public class SplashManager {
 
       try {
 
-         if (!path.startsWith("/")) {
-            path = "/" + path;
+         if (!path.startsWith("/")) { //$NON-NLS-1$
+            path = "/" + path; //$NON-NLS-1$
          }
 
-         URL url = new URL("platform:/plugin/" + pluginId + path);
+         URL url = new URL("platform:/plugin/" + pluginId + path); //$NON-NLS-1$
          url = FileLocator.resolve(url);
 
          return ImageDescriptor.createFromURL(url);
@@ -122,7 +122,7 @@ public class SplashManager {
       } catch (final MalformedURLException e) {
 
          final String msg = NLS
-               .bind("The image path {0} in not a valid location in the bundle {1}.",
+               .bind("The image path {0} in not a valid location in the bundle {1}.", //$NON-NLS-1$
                      path,
                      pluginId);
          throw new RuntimeException(msg, e);
@@ -130,7 +130,7 @@ public class SplashManager {
       } catch (final IOException e) {
 
          final String msg = NLS.bind(
-               "The image {0} was not found in the bundle {1}.",
+               "The image {0} was not found in the bundle {1}.", //$NON-NLS-1$
                path,
                pluginId);
          throw new RuntimeException(msg, e);
@@ -283,7 +283,6 @@ public class SplashManager {
    }
 
    private void onDispose() {
-      // TODO Auto-generated method stub
 
    }
 
@@ -335,46 +334,16 @@ public class SplashManager {
 
       if (pluginId == null) {
          throw new IllegalStateException(
-               "The SplashPluginId has not been set.");
+               "The SplashPluginId has not been set."); //$NON-NLS-1$
       }
 
       if (splashPath == null) {
          throw new IllegalStateException(
-               "The SplashImagePath has not been set.");
+               "The SplashImagePath has not been set."); //$NON-NLS-1$
       }
 
       splashShell = createUI_SplashShell();
       splashShell.open();
-   }
-
-   private Rectangle parseRect(final String string) {
-
-      if (string == null) {
-         return null;
-      }
-
-      int x, y, w, h;
-      int lastPos = 0;
-
-      try {
-         int i = string.indexOf(',', lastPos);
-         x = Integer.parseInt(string.substring(lastPos, i));
-         lastPos = i + 1;
-         i = string.indexOf(',', lastPos);
-         y = Integer.parseInt(string.substring(lastPos, i));
-         lastPos = i + 1;
-         i = string.indexOf(',', lastPos);
-         w = Integer.parseInt(string.substring(lastPos, i));
-         lastPos = i + 1;
-         h = Integer.parseInt(string.substring(lastPos));
-
-      } catch (final RuntimeException e) {
-
-         // sloppy error handling
-         return null;
-      }
-
-      return new Rectangle(x, y, w, h);
    }
 
    public void setMessage(final String message) {
@@ -409,13 +378,13 @@ public class SplashManager {
 
    public void setSplashImagePath(final String splashPath) {
 
-      Assert.isLegal(splashPath != null && !splashPath.equals(""));
+      Assert.isLegal(splashPath != null && !splashPath.equals(UI.EMPTY_STRING));
       this.splashPath = splashPath;
    }
 
    public void setSplashPluginId(final String pluginId) {
 
-      Assert.isLegal(pluginId != null && !pluginId.equals(""));
+      Assert.isLegal(pluginId != null && !pluginId.equals(UI.EMPTY_STRING));
       this.pluginId = pluginId;
    }
 

@@ -172,7 +172,7 @@ public class HoveredTour_ToolTip_UI extends Pinned_ToolTip_Shell implements IPin
          container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
          {
             _label = new Label(container, SWT.NONE);
-            _label.setText("Tooltip content");
+            _label.setText("Tooltip content"); //$NON-NLS-1$
             GridDataFactory.fillDefaults()
                   .grab(true, true)
                   .hint(200, 50)
@@ -370,7 +370,7 @@ public class HoveredTour_ToolTip_UI extends Pinned_ToolTip_Shell implements IPin
 
          // nothing is hovered
 
-         _label.setText("");
+         _label.setText(""); //$NON-NLS-1$
 
       } else {
 
@@ -378,7 +378,7 @@ public class HoveredTour_ToolTip_UI extends Pinned_ToolTip_Shell implements IPin
 
          final ArrayList<Long> allHoveredTours = hoveredTourData.allHoveredTourIds;
 
-         final String debugText = allHoveredTours.size() > 0 ? "" + allHoveredTours.get(0) : "";
+         final String debugText = allHoveredTours.size() > 0 ? "" + allHoveredTours.get(0) : ""; //$NON-NLS-1$ //$NON-NLS-2$
 
          _label.setText(debugText);
       }

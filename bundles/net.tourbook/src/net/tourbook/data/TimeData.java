@@ -184,7 +184,7 @@ public class TimeData implements Serializable {
 //            + (", gpxDistance=" + gpxDistance)
 //            + (", absoluteDistance=" + absoluteDistance)
 //            + (", power=" + power)
-            + (", speed=" + speed)
+            + (", speed=" + speed) //$NON-NLS-1$
 //            + (", latitude=" + latitude)
 //            + (", longitude=" + longitude)
 //            + (", marker=" + marker)

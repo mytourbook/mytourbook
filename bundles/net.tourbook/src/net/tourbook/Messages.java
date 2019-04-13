@@ -2662,6 +2662,11 @@ public class Messages extends NLS {
    public static String TourEditor_Dialog_SetAltitudeFromSRTM_Message;
    public static String TourEditor_Dialog_SetAltitudeFromSRTM_Title;
 
+   public static String TourGeoFilter_Loader_Loading;
+   public static String TourGeoFilter_Loader_LoadingError;
+   public static String TourGeoFilter_Loader_LoadingParts;
+   public static String TourGeoFilter_Loader_Tours;
+
    public static String Training_Action_EditHrZones;
    public static String Training_Action_EditHrZones_Tooltip;
 

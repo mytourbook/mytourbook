@@ -145,6 +145,8 @@ public class Messages extends NLS {
    public static String        Map_Action_ZoomOut_Tooltip;
    public static String        Map_Action_ZoomOutToMinZoom_Tooltip;
 
+   public static String        Map2_Hovered_Tours;
+
    public static String        Map2_TourBreadcrumb_Info_EnhancedPaintingWarning;
    public static String        Map2_TourBreadcrumb_Label_Tours;
 

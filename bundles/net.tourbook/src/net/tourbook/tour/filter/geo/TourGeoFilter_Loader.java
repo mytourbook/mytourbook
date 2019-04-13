@@ -30,6 +30,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicLong;
 
+import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
@@ -43,12 +44,14 @@ import org.eclipse.swt.graphics.Point;
 
 public class TourGeoFilter_Loader {
 
-   private static final char                                      NL                  = UI.NEW_LINE;
+   private static final String                                    VALUE_FORMAT_LOADING_STATE = "%s: %d %s";                     //$NON-NLS-1$
 
-   private final static IDialogSettings                           _state              = TourGeoFilter_Manager.getState();
+   private static final char                                      NL                         = UI.NEW_LINE;
 
-   private static final AtomicLong                                _loaderExecuterId   = new AtomicLong();
-   private static final LinkedBlockingDeque<GeoFilter_LoaderData> _loaderWaitingQueue = new LinkedBlockingDeque<>();
+   private final static IDialogSettings                           _state                     = TourGeoFilter_Manager.getState();
+
+   private static final AtomicLong                                _loaderExecuterId          = new AtomicLong();
+   private static final LinkedBlockingDeque<GeoFilter_LoaderData> _loaderWaitingQueue        = new LinkedBlockingDeque<>();
    private static ExecutorService                                 _loadingExecutor;
 
    static {
@@ -121,10 +124,10 @@ public class TourGeoFilter_Loader {
                // show loading state
                final String loadingMessage;
                if (mapGridData == null || mapGridData.numWidth == -1) {
-                  loadingMessage = "Loading ...";
+                  loadingMessage = Messages.TourGeoFilter_Loader_Loading;
                } else {
                   final int numParts = mapGridData.numWidth * mapGridData.numHeight;
-                  loadingMessage = MessageFormat.format("Loading {0} parts...", numParts);
+                  loadingMessage = MessageFormat.format(Messages.TourGeoFilter_Loader_LoadingParts, numParts);
                }
                geoLoaderData.mapGridData.gridBox_Text = loadingMessage;
                map2View.redrawMap();
@@ -141,7 +144,8 @@ public class TourGeoFilter_Loader {
                   // update loading state - this should not occure but is helpfull for testing
 
                   // show loading state
-                  geoLoaderData.mapGridData.gridBox_Text = "Loading error: " + TimeTools.Formatter_DateTime_SM.format(LocalDateTime.now());
+                  geoLoaderData.mapGridData.gridBox_Text = Messages.TourGeoFilter_Loader_LoadingError + UI.SPACE + 
+                        TimeTools.Formatter_DateTime_SM.format(LocalDateTime.now());
                   map2View.redrawMap();
                }
 
@@ -198,7 +202,7 @@ public class TourGeoFilter_Loader {
          // get app filter without geo location, this is added here
          appFilter = new SQLFilter(SQLFilter.NO_GEO_LOCATION);
 
-         sqlSelect = ""
+         sqlSelect = "" //$NON-NLS-1$
 
                + "SELECT" + NL //                                       //$NON-NLS-1$
 
@@ -207,7 +211,7 @@ public class TourGeoFilter_Loader {
 
                + " WHERE 1=1 " + appFilter.getWhereClause() + NL//      //$NON-NLS-1$
 
-               + " AND TourId " + sqlIncludeExcludeGeoParts + " IN (" + selectTourIdsFromGeoParts + ")"; //         //$NON-NLS-1$ //$NON-NLS-2$
+               + " AND TourId " + sqlIncludeExcludeGeoParts + " IN (" + selectTourIdsFromGeoParts + ")"; //         //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
       } else {
 
@@ -221,7 +225,7 @@ public class TourGeoFilter_Loader {
 
             // exclude geo parts
 
-            sqlSelect = ""
+            sqlSelect = "" //$NON-NLS-1$
 
                   + "SELECT" + NL //                                       //$NON-NLS-1$
 
@@ -290,12 +294,14 @@ public class TourGeoFilter_Loader {
 
       final String title = tourGeoFilter != null && tourGeoFilter.filterName.length() > 0
             ? tourGeoFilter.filterName
-            : "Tours";
+            : Messages.TourGeoFilter_Loader_Tours;
 
       final int numTours = allTourIds.size();
-      final String timeInMs = timeDiff > 0 ? " - " + Long.toString(timeDiff) + " ms" : "";
+      final String timeInMs = timeDiff > 0
+            ? UI.DASH_WITH_SPACE + Long.toString(timeDiff) + UI.SPACE + Messages.App_Unit_Milliseconds
+            : UI.EMPTY_STRING;
 
-      geoLoaderData.mapGridData.gridBox_Text = String.format("%s: %d %s", title, numTours, timeInMs);
+      geoLoaderData.mapGridData.gridBox_Text = String.format(VALUE_FORMAT_LOADING_STATE, title, numTours, timeInMs);
 
       geoLoaderData.allLoadedTourIds = allTourIds;
 

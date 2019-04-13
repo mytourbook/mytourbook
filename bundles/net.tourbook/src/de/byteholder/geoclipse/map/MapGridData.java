@@ -69,34 +69,34 @@ public class MapGridData {
 
    @Override
    public String toString() {
-      return ""
+      return "" //$NON-NLS-1$
 
-            + "MapGridData\n"
+            + "MapGridData\n" //$NON-NLS-1$
 
-            + "[" + "\n"
+            + "[" + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "devGrid_X1           =" + devGrid_X1 + "\n"
-            + "devGrid_Y1           =" + devGrid_Y1 + "\n"
-            + "devWidth             =" + devWidth + "\n"
-            + "devHeight            =" + devHeight + "\n"
+            + "devGrid_X1           =" + devGrid_X1 + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "devGrid_Y1           =" + devGrid_Y1 + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "devWidth             =" + devWidth + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "devHeight            =" + devHeight + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "world_Start          =" + world_Start + "\n"
-            + "world_End            =" + world_End + "\n"
+            + "world_Start          =" + world_Start + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "world_End            =" + world_End + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "geo_MouseMove        =" + geo_MouseMove + "\n"
-            + "geo_Start            =" + geo_Start + "\n"
-            + "geo_End              =" + geo_End + "\n"
+            + "geo_MouseMove        =" + geo_MouseMove + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "geo_Start            =" + geo_Start + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "geo_End              =" + geo_End + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "geoLocation_TopLeft_E2        =" + geoLocation_TopLeft_E2 + "\n"
-            + "geoLocation_BottomRight_E2    =" + geoLocation_BottomRight_E2 + "\n"
-            + "geoParts_TopLeft_E2           =" + geoParts_TopLeft_E2 + "\n"
-            + "geoParts_BottomRight_E2       =" + geoParts_BottomRight_E2 + "\n"
+            + "geoLocation_TopLeft_E2        =" + geoLocation_TopLeft_E2 + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "geoLocation_BottomRight_E2    =" + geoLocation_BottomRight_E2 + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "geoParts_TopLeft_E2           =" + geoParts_TopLeft_E2 + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "geoParts_BottomRight_E2       =" + geoParts_BottomRight_E2 + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "isSelectionStarted   =" + isSelectionStarted + "\n"
-            + "numWidth             =" + numWidth + "\n"
-            + "numHeight            =" + numHeight + "\n"
-            + "gridBox_Text         =" + gridBox_Text + "\n"
-            + "]";
+            + "isSelectionStarted   =" + isSelectionStarted + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "numWidth             =" + numWidth + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "numHeight            =" + numHeight + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "gridBox_Text         =" + gridBox_Text + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "]"; //$NON-NLS-1$
    }
 
 }

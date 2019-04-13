@@ -170,6 +170,9 @@ public class Map extends Canvas {
    private static final String          DIRECTION_E                           = "E";                                                      //$NON-NLS-1$
    private static final String          DIRECTION_N                           = "N";                                                      //$NON-NLS-1$
 
+   private static final String          VALUE_FORMAT_2                        = "%s %s";                                                  //$NON-NLS-1$
+   private static final String          VALUE_FORMAT_3                        = "%s %s %s";                                               //$NON-NLS-1$
+
    /*
     * Wikipedia data
     */
@@ -3867,7 +3870,7 @@ public class Map extends Canvas {
 
       } else {
 
-         final String hoverText = "Tours " + Integer.toString(numTours);
+         final String hoverText = Messages.Map2_Hovered_Tours + UI.SPACE + Integer.toString(numTours);
 
          paint_Text_Label(gc,
                devXMouse,
@@ -3888,12 +3891,12 @@ public class Map extends Canvas {
       final boolean isTourTitle = tourTitle.length() > 0;
 
       final long movingTime = tourData.getTourDrivingTime();
-      final String textMovingTime = String.format("%s %s",
+      final String textMovingTime = String.format(VALUE_FORMAT_2,
             TOUR_TOOLTIP_LABEL_MOVING_TIME,
             FormatManager.formatDrivingTime(movingTime));
 
       final float distance = tourData.getTourDistance() / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
-      final String textDistance = String.format("%s %s %s",
+      final String textDistance = String.format(VALUE_FORMAT_3,
             TOUR_TOOLTIP_LABEL_DISTANCE,
             FormatManager.formatDistance(distance / 1000.0),
             UI.UNIT_LABEL_DISTANCE);
