@@ -3526,9 +3526,11 @@ public class Map2View extends ViewPart implements
             Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION,
             Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT));
 
-      _map.setShowHoveredTourTooltip(Util.getStateBoolean(_state,
+      _map.setShowHoveredSelectedTour(Util.getStateBoolean(_state,
             Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR,
             Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT));
+
+      _map.redraw();
    }
 
    void restoreState_Map2_TrackOptions(final boolean isUpdateMapUI) {
