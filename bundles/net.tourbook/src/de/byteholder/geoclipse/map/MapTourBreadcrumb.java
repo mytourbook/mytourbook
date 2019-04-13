@@ -15,12 +15,16 @@
  *******************************************************************************/
 package de.byteholder.geoclipse.map;
 
+import de.byteholder.geoclipse.Messages;
+
 import java.util.ArrayList;
 
 import net.tourbook.data.TourData;
 
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -28,12 +32,18 @@ import org.eclipse.swt.widgets.Display;
 
 public class MapTourBreadcrumb {
 
+   private static final String        CRUMB_SEPARATOR    = " >";                                                                //$NON-NLS-1$
+
+   private static final int           NOT_HOVERED_INDEX  = -1;
+
    private ArrayList<ArrayList<Long>> _allTours          = new ArrayList<>();
    private ArrayList<Rectangle>       _allCrumbs         = new ArrayList<>();
 
    private Rectangle                  _outline;
 
-   private int                        _hoveredCrumbIndex = -1;
+   private int                        _hoveredCrumbIndex = NOT_HOVERED_INDEX;
+
+   private Font                       _boldFont          = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
    public MapTourBreadcrumb() {}
 
@@ -44,7 +54,7 @@ public class MapTourBreadcrumb {
     */
    public ArrayList<Long> getCrumbToursAndReset() {
 
-      if (_hoveredCrumbIndex == -1) {
+      if (_hoveredCrumbIndex == NOT_HOVERED_INDEX) {
          return null;
       }
 
@@ -57,9 +67,17 @@ public class MapTourBreadcrumb {
          _allCrumbs.remove(crumbIndex);
       }
 
-      _hoveredCrumbIndex = -1;
+      _hoveredCrumbIndex = NOT_HOVERED_INDEX;
 
       return crumbTours;
+   }
+
+   /**
+    * @return Returns <code>true</code> when a crumb is hovered, otherwise <code>false</code>
+    */
+   public boolean isCrumbHovered() {
+
+      return _hoveredCrumbIndex != NOT_HOVERED_INDEX;
    }
 
    /**
@@ -68,7 +86,7 @@ public class MapTourBreadcrumb {
     */
    public boolean onMouseDown(final Point devMousePosition) {
 
-      if (_hoveredCrumbIndex == -1) {
+      if (_hoveredCrumbIndex == NOT_HOVERED_INDEX) {
          return false;
       }
 
@@ -93,18 +111,18 @@ public class MapTourBreadcrumb {
    public void onMouseExit() {
 
       // reset hovered crumb
-      _hoveredCrumbIndex = -1;
+      _hoveredCrumbIndex = NOT_HOVERED_INDEX;
    }
 
    /**
     * @param devMousePosition
-    * @return Returns <code>true</code> when the map must be repainted
+    * @return Returns <code>true</code> when the breadcrumb is hovered and the map must be repainted
     */
    public boolean onMouseMove(final Point devMousePosition) {
 
       final int oldHoveredCrumbIndex = _hoveredCrumbIndex;
 
-      _hoveredCrumbIndex = -1;
+      _hoveredCrumbIndex = NOT_HOVERED_INDEX;
 
       if (_outline != null && _outline.contains(devMousePosition)) {
 
@@ -141,28 +159,28 @@ public class MapTourBreadcrumb {
       return false;
    }
 
-   public void paint(final GC gc) {
+   public void paint(final GC gc, final boolean isTourPaintMethodEnhanced) {
 
       if (_allTours.size() == 0) {
          return;
       }
 
-      if (_allTours.size() > 1) {
-         int a = 0;
-         a++;
-      }
-
       final int marginVertical = 2;
-      final int marginHorizontal = 4;
+      final int marginHorizontal_Crumb = 6;
+      final int marginHorizontal_Separator = 1;
 
       int devX = 0;
       final int devY = 0;
 
       final Color bgColor = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
-      final Color bgColorHovered = Display.getCurrent().getSystemColor(SWT.COLOR_GREEN);
+      final Color bgColorHovered = Display.getCurrent().getSystemColor(SWT.COLOR_BLUE);
       final Color fgColor = Display.getCurrent().getSystemColor(SWT.COLOR_BLACK);
+      final Color fgColorHovered = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
 
-      final String crumbSepText = ">";
+      // this is VERY important otherwise hovered tours have another spacing !!!
+      gc.setAntialias(SWT.ON);
+
+      final String crumbSepText = CRUMB_SEPARATOR;
       final Point crumbSepSize = gc.textExtent(crumbSepText);
       final int crumbHeight = crumbSepSize.y + 2 * marginVertical;
 
@@ -182,15 +200,15 @@ public class MapTourBreadcrumb {
             final Rectangle crumbSeparator = new Rectangle(
                   devX,
                   devY,
-                  crumbSepSize.x + 2 * marginHorizontal,
+                  crumbSepSize.x + 2 * marginHorizontal_Separator,
                   crumbHeight);
 
             gc.setBackground(bgColor);
             gc.fillRectangle(crumbSeparator);
 
             gc.setForeground(fgColor);
-            gc.drawText(crumbSepText,
-                  devX + marginHorizontal,
+            gc.drawString(crumbSepText,
+                  devX + marginHorizontal_Separator,
                   devY + marginVertical);
 
             devX += crumbSeparator.width;
@@ -201,37 +219,64 @@ public class MapTourBreadcrumb {
           */
 
          final ArrayList<Long> tourDataCrumb = _allTours.get(crumbIndex);
+         final String numTourDataCrumbs = Integer.toString(tourDataCrumb.size());
 
-         String crumbText;
-         if (crumbIndex == 0) {
-
-            crumbText = "Tours: " + tourDataCrumb.size();
-         } else {
-
-            crumbText = Integer.toString(tourDataCrumb.size());
-         }
+         final String crumbText = crumbIndex == 0
+               ? Messages.Map2_TourBreadcrumb_Label_Tours + UI.SPACE + UI.SPACE + UI.SPACE + numTourDataCrumbs
+               : numTourDataCrumbs;
 
          final Point contentSize = gc.textExtent(crumbText);
 
-         final Rectangle crumb = new Rectangle(
+         final Rectangle crumbRectangle = new Rectangle(
                devX,
                devY,
-               contentSize.x + 2 * marginHorizontal,
+               contentSize.x + 2 * marginHorizontal_Crumb,
                contentSize.y + 2 * marginVertical);
 
-         _allCrumbs.add(crumb);
+         _allCrumbs.add(crumbRectangle);
 
+         final Color crumbFgColor = crumbIndex == _hoveredCrumbIndex ? fgColorHovered : fgColor;
          final Color crumbBgColor = crumbIndex == _hoveredCrumbIndex ? bgColorHovered : bgColor;
 
          gc.setBackground(crumbBgColor);
-         gc.fillRectangle(crumb);
+         gc.fillRectangle(crumbRectangle);
 
-         gc.setForeground(fgColor);
-         gc.drawText(crumbText,
-               devX + marginHorizontal,
+         gc.setForeground(crumbFgColor);
+         gc.drawString(crumbText,
+               devX + marginHorizontal_Crumb,
                devY + marginVertical);
 
-         devX += crumb.width;
+         devX += crumbRectangle.width;
+      }
+
+      if (isTourPaintMethodEnhanced) {
+
+         // show message that enhanced painting method is used and a tour cannot be selected
+
+         final Font oldFont = gc.getFont();
+         gc.setFont(_boldFont);
+         gc.setAntialias(SWT.OFF);
+
+         final String warningText = Messages.Map2_TourBreadcrumb_Info_EnhancedPaintingWarning;
+         final Point warningSize = gc.textExtent(warningText);
+
+         final int devXWarning = devX + 0;
+         final int devYWarning = 0;
+
+         gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+         gc.fillRectangle(
+               devXWarning,
+               devYWarning,
+               warningSize.x + 2 * marginHorizontal_Crumb,
+               warningSize.y + 2 * marginVertical);
+
+         gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+         gc.drawString(
+               warningText,
+               devXWarning + marginHorizontal_Crumb,
+               devYWarning + marginVertical);
+
+         gc.setFont(oldFont);
       }
 
       _outline = new Rectangle(0, 0, devX, crumbHeight);
@@ -264,7 +309,6 @@ public class MapTourBreadcrumb {
 
          return;
       }
-
 
       final ArrayList<Long> allTourIds = new ArrayList<>(numNewTours);
       for (final TourData tourData : allTourData) {

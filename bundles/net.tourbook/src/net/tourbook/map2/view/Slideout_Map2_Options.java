@@ -15,16 +15,22 @@
  *******************************************************************************/
 package net.tourbook.map2.view;
 
+import java.util.LinkedHashMap;
+
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageMap2Appearance;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -54,10 +60,10 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
    /*
     * UI controls
     */
-//   private Composite _parent;
+   private Composite _parent;
 
-   private Button _chkIsShowHoveredTour;
-   private Button _chkIsZoomWithMousePosition;
+   private Button    _chkIsShowHoveredTour;
+   private Button    _chkIsZoomWithMousePosition;
 
    /**
     * @param ownerControl
@@ -174,7 +180,12 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
                _chkIsShowHoveredTour = new Button(container, SWT.CHECK);
                _chkIsShowHoveredTour.setText(Messages.Slideout_Map_Options_Checkbox_ShowTourTooltip);
                _chkIsShowHoveredTour.setToolTipText(Messages.Slideout_Map_Options_Checkbox_ShowTourTooltip_Tooltip);
-               _chkIsShowHoveredTour.addSelectionListener(_defaultState_SelectionListener);
+               _chkIsShowHoveredTour.addSelectionListener(new SelectionAdapter() {
+                  @Override
+                  public void widgetSelected(final SelectionEvent e) {
+                     onChangeUI_ShowHoveredTour();
+                  }
+               });
                GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsShowHoveredTour);
             }
          }
@@ -200,7 +211,7 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
 
    private void initUI(final Composite parent) {
 
-//      _parent = parent;
+      _parent = parent;
 
       _defaultState_SelectionListener = new SelectionAdapter() {
          @Override
@@ -217,6 +228,56 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
       enableControls();
 
       _map2View.restoreState_Map2_Options();
+   }
+
+   private void onChangeUI_ShowHoveredTour() {
+
+      if (_chkIsShowHoveredTour.getSelection()) {
+
+         // get current painting method
+         final String prefPaintingMethod = _prefStore.getString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD);
+         final boolean isEnhancedPainting = PrefPageMap2Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(prefPaintingMethod);
+
+         if (isEnhancedPainting) {
+
+            // show warning that enhanced painting mode is selected
+
+            final LinkedHashMap<String, Integer> buttonLabelToIdMap = new LinkedHashMap<>();
+            buttonLabelToIdMap.put(Messages.Slideout_Map2MapOptions_Action_SetTourPaintingModeBasic, IDialogConstants.OK_ID);
+            buttonLabelToIdMap.put(Messages.App_Action_Cancel, IDialogConstants.CANCEL_ID);
+
+            final MessageDialog dialog = new MessageDialog(
+
+                  _parent.getShell(),
+
+                  Messages.Slideout_Map2MapOptions_Dialog_EnhancePaintingWarning_Title,
+                  null,
+
+                  Messages.Slideout_Map2MapOptions_Dialog_EnhancePaintingWarning_Message,
+                  MessageDialog.INFORMATION,
+
+                  // default index
+                  0,
+
+                  Messages.Slideout_Map2MapOptions_Action_SetTourPaintingModeBasic,
+                  Messages.App_Action_Cancel);
+
+            setIsAnotherDialogOpened(true);
+            {
+               final int choice = dialog.open();
+
+               if (choice == IDialogConstants.OK_ID) {
+
+                  // set painting method to basic
+                  _prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD,
+                        PrefPageMap2Appearance.TOUR_PAINT_METHOD_SIMPLE);
+               }
+            }
+            setIsAnotherDialogOpened(false);
+         }
+      }
+
+      onChangeUI_MapUpdate();
    }
 
    private void resetToDefaults() {
@@ -245,7 +306,7 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
 
 // SET_FORMATTING_OFF
 
-      _state.put(Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR,  _chkIsShowHoveredTour.getSelection());
+      _state.put(Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR, _chkIsShowHoveredTour.getSelection());
       _state.put(Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION,   _chkIsZoomWithMousePosition.getSelection());
 
 // SET_FORMATTING_ON

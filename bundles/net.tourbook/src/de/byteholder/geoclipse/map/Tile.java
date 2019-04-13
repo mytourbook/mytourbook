@@ -1102,7 +1102,7 @@ public class Tile extends Observable {
                   false
                   : true;
 
-      return ""
+      return "" //$NON-NLS-1$
 
 //            + " z=" + Integer.toString(_zoom).concat(COLUMN_2).substring(0, 2) // //$NON-NLS-1$
 //            + " x=" + Integer.toString(_x).concat(COLUMN_5).substring(0, 5) //$NON-NLS-1$
@@ -1112,7 +1112,7 @@ public class Tile extends Observable {
             + " x=" + Integer.toString(_x) //$NON-NLS-1$
             + " y=" + Integer.toString(_y) + NL //$NON-NLS-1$
 
-            + "allHoverRectangle: " + allPainted_HoverRectangle.size() + NL
+            + "allHoverRectangle: " + allPainted_HoverRectangle.size() + NL //$NON-NLS-1$
 
 //
 //            + (_isLoading ? " LOAD" : COLUMN_5) //$NON-NLS-1$

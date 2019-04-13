@@ -104,7 +104,7 @@ public class GeoPartTourLoader {
 
          final char NL = UI.NEW_LINE;
 
-         final String selectGeoPart = ""
+         final String selectGeoPart = "" //$NON-NLS-1$
 
                + "SELECT" + NL //                       //$NON-NLS-1$
 
@@ -116,7 +116,7 @@ public class GeoPartTourLoader {
 
          if (isAppFilter) {
 
-            final String selectAppFilter = ""
+            final String selectAppFilter = "" //$NON-NLS-1$
 
                   + "SELECT" + NL //                    //$NON-NLS-1$
 
