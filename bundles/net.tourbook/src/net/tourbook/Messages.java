@@ -1888,7 +1888,13 @@ public class Messages extends NLS {
    public static String Slideout_Map25MapOptions_Spinner_Layer_Hillshading;
 
    public static String Slideout_Map25MarkerOptions_Checkbox_IsMarkerClustering;
+   public static String Slideout_Map25MarkerOptions_Checkbox_IsShowBookmarks;
+
    public static String Slideout_Map25MarkerOptions_Checkbox_IsShowMarkerPoint;
+
+   public static String Slideout_Map25MarkerOptions_Checkbox_IsShowTourMarker;
+
+   public static String Slideout_Map25MarkerOptions_Group_MarkerLayout;
    public static String Slideout_Map25MarkerOptions_Label_ClusterGridSize;
    public static String Slideout_Map25MarkerOptions_Label_ClusterOpacity;
    public static String Slideout_Map25MarkerOptions_Label_ClusterOpacity_Tooltip;
@@ -2157,6 +2163,7 @@ public class Messages extends NLS {
    public static String Tour_Action_GeoCompare_Tooltip;
    public static String Tour_Action_GraphGears;
    public static String Tour_Action_GraphOverlapped;
+   public static String Tour_Action_MapMarkerOptions_Tooltip;
    public static String Tour_Action_Marker_Delete;
    public static String Tour_Action_Marker_Delete_WithConfirm;
    public static String Tour_Action_Marker_PositionHorizontal;

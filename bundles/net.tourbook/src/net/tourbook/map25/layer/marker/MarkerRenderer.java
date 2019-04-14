@@ -29,6 +29,7 @@ import net.tourbook.map25.layer.marker.algorithm.distance.ClusterItem;
 import net.tourbook.map25.layer.marker.algorithm.distance.DistanceClustering;
 import net.tourbook.map25.layer.marker.algorithm.distance.QuadItem;
 import net.tourbook.map25.layer.marker.algorithm.distance.StaticCluster;
+import net.tourbook.map25.layer.marker.MarkerToolkit;
 
 import org.oscim.backend.CanvasAdapter;
 import org.oscim.backend.canvas.Bitmap;
@@ -39,6 +40,7 @@ import org.oscim.core.MercatorProjection;
 import org.oscim.core.Point;
 import org.oscim.core.PointF;
 import org.oscim.core.Tile;
+import org.oscim.layers.marker.MarkerItem;
 import org.oscim.layers.marker.utils.SparseIntArray;
 import org.oscim.renderer.BucketRenderer;
 import org.oscim.renderer.GLViewport;
@@ -58,12 +60,12 @@ public class MarkerRenderer extends BucketRenderer {
 	/**
 	 * default color of number inside the icon. Would be super-cool to cook this into the map theme
 	 */
-	private static final int						CLUSTER_COLOR_TEXT			= 0xff8000c0;
+	public static final int						CLUSTER_COLOR_TEXT			= 0xff8000c0;
 
 	/**
 	 * default color of circle background
 	 */
-	private static final int						CLUSTER_COLOR_BACK			= 0xffffffff;
+	public static final int						CLUSTER_COLOR_BACK			= 0xffffffff;
 
 	/**
 	 * Map Cluster Icon Size. This is the biggest size for clusters of CLUSTER_MAXSIZE elements.
@@ -172,6 +174,8 @@ public class MarkerRenderer extends BucketRenderer {
 	private ClusterAlgorithm				_clusterAlgorithm;
 
 	private DistanceClustering<ClusterItem>	_distanceAlgorithm		= new DistanceClustering<ClusterItem>();
+	
+	private MarkerToolkit _markertoolkit;
 
 	/**
 	 * Class to wrap the cluster icon style properties
@@ -212,6 +216,8 @@ public class MarkerRenderer extends BucketRenderer {
 		_markerLayer = markerLayer;
 
 		_symbolBucket = new SymbolBucket();
+		
+		_markertoolkit = new MarkerToolkit(MarkerToolkit.MarkerShape.CIRCLE);
 
 		configureRenderer();
 	}
@@ -233,9 +239,9 @@ public class MarkerRenderer extends BucketRenderer {
 		_fgColor = ColorUtil.getARGB(config.markerOutline_Color, (int) (config.markerOutline_Opacity / 100.0 * 0xff));
 		_bgColor = ColorUtil.getARGB(config.markerFill_Color,    (int) (config.markerFill_Opacity    / 100.0 * 0xff));
 		
-		/*System.out.println("***textOpacy: " + config.markerOutline_Opacity);
-		System.out.println("***FillOpacy: " + config.markerFill_Opacity);
-		System.out.println("***bgColor: " + _bgColor);*/
+		/*System.out.println("***textOpacy: " + config.markerOutline_Opacity); //$NON-NLS-1$
+		System.out.println("***FillOpacy: " + config.markerFill_Opacity); //$NON-NLS-1$
+		System.out.println("***bgColor: " + _bgColor); //$NON-NLS-1$ */
 		
 		_clusterSymbolSizeDP = config.clusterSymbol_Size;
 		_clusterSymbolWeight = config.clusterSymbol_Weight;
@@ -604,7 +610,7 @@ public class MarkerRenderer extends BucketRenderer {
 			return;
 		}
 
-//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tupdate()"));
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tupdate()")); //$NON-NLS-1$  //$NON-NLS-2$  //$NON-NLS-3$
 //		// TODO remove SYSTEM.OUT.PRINTLN
 
 		final MapPosition mapPosition = viewport.pos;
@@ -812,93 +818,16 @@ public class MarkerRenderer extends BucketRenderer {
 			   if (markerSymbol == null) {
 			      markerSymbol = _defaultMarkerSymbol;
 			   }
-
-			   final Paint textPainter = CanvasAdapter.newPaint();
-			   textPainter.setStyle(Paint.Style.STROKE);
-			   textPainter.setColor(_fgColor);
-
-			   final Paint fillPainter = CanvasAdapter.newPaint();
-			   fillPainter.setStyle(Paint.Style.FILL);
-
-			   String title = projItem.mapMarker.title;
-			   String subtitle = projItem.mapMarker.description;
-			   //System.out.println("***** subtitle: " +  subtitle + " and length: " + subtitle.length());
-
-			   int margin = 3;
-			   int dist2symbol = 20;
 			   
-			   int titleWidth  = ((int) textPainter.getTextWidth(title) + 2 * margin);
-			   int titleHeight = ((int) textPainter.getTextHeight(title) + 2 * margin);
+            String title = projItem.mapMarker.title;
+            String subtitle = projItem.mapMarker.description;
+            //System.out.println("***** subtitle: " +  subtitle + " and length: " + subtitle.length()); //$NON-NLS-1$  //$NON-NLS-2$
 
-            int symbolWidth = markerSymbol.getBitmap().getWidth();
-
-            int subtitleWidth = 0;
-            int subtitleHeight = 0;
-            boolean hasSubtitle = false;
-			   if (subtitle.length()>1) {
-               if (subtitle.startsWith("#")){
-                  subtitle = subtitle.substring(1); // not the first # char
-                  subtitle = subtitle.split("\\R", 2)[0]; // only first line
-                  subtitleWidth  = ((int) textPainter.getTextWidth(subtitle)) + 2 * margin;
-                  subtitleHeight = ((int) textPainter.getTextHeight(subtitle)) + 2 * margin;
-                  hasSubtitle = true;
-               }
-			   }
+            //create dummy MarkerItem with dummy coordinates. only need it for create the label
+			   MarkerItem item = new MarkerItem(title, subtitle, new GeoPoint(5.0, 5.0));
+			   item.setMarker(_markertoolkit.createAdvanceSymbol(item, markerSymbol.getBitmap()));
 			   
-			   int xSize = java.lang.Math.max(titleWidth, subtitleWidth);
-			   xSize = java.lang.Math.max(xSize, symbolWidth);
-
-			   int ySize = titleHeight + symbolWidth + dist2symbol;
-
-			   Bitmap markerBitmap = CanvasAdapter.newBitmap(xSize, ySize, 0);
-			   org.oscim.backend.canvas.Canvas markerCanvas = CanvasAdapter.newCanvas();
-
-			   /*canvas.fillRectangle does not support a painter object
-			    * so i could not use transparent colors
-			    * as workaround i created a bitmap with the size of the box 
-			    * this box i filled totally with an oversized filled circle
-			    * (Canvas.drawCircle does support a painter object)
-			    * */
-
-			   Bitmap titleBitmap = CanvasAdapter.newBitmap( titleWidth + margin, titleHeight + margin, 0);
-			   org.oscim.backend.canvas.Canvas titleCanvas = CanvasAdapter.newCanvas();
-
-			   markerCanvas.setBitmap(markerBitmap);
-			   
-			   { // testing block
-			   /*
-			    * the following two lines displaying a transparent box.
-			    * only for testing purposes, normaly uncommented
-			    */
-			   //fillPainter.setColor(0x40ffffff);
-			   //markerCanvas.drawCircle(0, 0, xSize*2, fillPainter);
-			   }
-			   
-			   fillPainter.setColor(_bgColor);
-			   titleCanvas.setBitmap(titleBitmap);	
-
-			   //titleCanvas.fillRectangle(0, 0, xSize, textheight+5, _bgColor); //wont work with painter, so no transparency
-			   titleCanvas.drawCircle(0, 0, xSize*2, fillPainter);
-
-			   titleCanvas.drawText(title, margin, titleHeight - margin , textPainter);
-
-
-			   if (hasSubtitle) {
-	            Bitmap subtitleBitmap = CanvasAdapter.newBitmap( subtitleWidth + margin, subtitleHeight + margin, 0);
-	            org.oscim.backend.canvas.Canvas subtitleCanvas = CanvasAdapter.newCanvas();
-	            subtitleCanvas.setBitmap(subtitleBitmap); 
-	            subtitleCanvas.drawCircle(0, 0, xSize*2, fillPainter);
-	            subtitleCanvas.drawText(subtitle, margin, titleHeight - margin, textPainter);
-	            markerCanvas.drawBitmap(subtitleBitmap, xSize/2-(subtitleWidth/2), ySize - (subtitleHeight + margin));
-			   } else {
-			      ;
-			   }
-			   
-			   markerCanvas.drawBitmap(titleBitmap, xSize/2-(titleWidth/2), 0);
-			   markerCanvas.drawBitmap(markerSymbol.getBitmap(), xSize/2-(symbolWidth/2), ySize/2-(symbolWidth/2));
-
-			   //mapSymbol.set(projItem.mapX, projItem.mapY, markerSymbol.getBitmap(), markerSymbol.mBillboard);
-			   mapSymbol.set(projItem.mapX, projItem.mapY, markerBitmap, markerSymbol.mBillboard);
+			   mapSymbol.set(projItem.mapX, projItem.mapY, item.getMarker().getBitmap(), markerSymbol.mBillboard); 
 			   mapSymbol.offset = markerSymbol.getHotspot();
 			   mapSymbol.billboard = markerSymbol.isBillboard();
 			}

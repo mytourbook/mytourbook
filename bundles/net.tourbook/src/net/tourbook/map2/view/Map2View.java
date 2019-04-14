@@ -73,6 +73,7 @@ import net.tourbook.map.bookmark.IMapBookmarks;
 import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map.bookmark.MapBookmarkManager;
 import net.tourbook.map.bookmark.MapLocation;
+import net.tourbook.map.bookmark.IMapBookmarks.MapBookmarkEventType;
 import net.tourbook.map2.Messages;
 import net.tourbook.map2.action.ActionDimMap;
 import net.tourbook.map2.action.ActionManageMapProviders;
@@ -2364,14 +2365,16 @@ public class Map2View extends ViewPart implements
    }
 
    @Override
-   public void onSelectBookmark(final MapBookmark mapBookmark) {
-
-      _isInSelectBookmark = true;
+   public void onMapBookmarkActionPerformed(final MapBookmark mapBookmark, final MapBookmarkEventType  mapBookmarkEventType) {
       {
-         moveToMapLocation(mapBookmark);
+         if (mapBookmarkEventType == MapBookmarkEventType.MOVETO) {
+            _isInSelectBookmark = true;
+            moveToMapLocation(mapBookmark);
+            _isInSelectBookmark = false;
+         } 
       }
-      _isInSelectBookmark = false;
    }
+   
 
    /**
     * @param selection
@@ -3972,4 +3975,6 @@ public class Map2View extends ViewPart implements
          paintTours_10_All();
       }
    }
+
+
 }
