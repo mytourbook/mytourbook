@@ -20,6 +20,7 @@ import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -60,6 +61,8 @@ public class TileImageCache {
 
    private static final ConcurrentHashMap<String, Image> _imageCache                = new ConcurrentHashMap<>();
    private static final ConcurrentLinkedQueue<String>    _imageCacheFifo            = new ConcurrentLinkedQueue<>();
+
+   private static final ArrayList<Image>                 _allImages                 = new ArrayList();
 
    /**
     * Path from user preferences where tile images are stored
@@ -160,8 +163,18 @@ public class TileImageCache {
          }
       }
 
+      for (final Image image : _allImages) {
+         if (image != null) {
+            try {
+               image.dispose();
+            } catch (final Exception e) {}
+         }
+      }
+
       _imageCache.clear();
       _imageCacheFifo.clear();
+
+      _allImages.clear();
    }
 
    /**
@@ -240,7 +253,15 @@ public class TileImageCache {
                 * image with an imageloader
                 */
 
-               return new Image(_display, osTileImagePath);
+               final Image loadedImage = new Image(_display, osTileImagePath);
+
+               /*
+                * It can happen that these images are not in the image cache. Keep all created
+                * images in an separated image list.
+                */
+               _allImages.add(loadedImage);
+
+               return loadedImage;
 
             } catch (final Exception e) {
 

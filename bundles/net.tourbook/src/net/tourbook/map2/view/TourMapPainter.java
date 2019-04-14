@@ -904,6 +904,8 @@ public class TourMapPainter extends MapPainter {
       Util.disposeResource(_tourEndMarker);
       Util.disposeResource(_tourStartMarker);
 
+      Util.disposeResource(_twpImage);
+
       _isImageAvailable = false;
    }
 
