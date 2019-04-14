@@ -49,7 +49,7 @@ public class MarkerToolkit {
    private int  _clusterSymbolWeight;
    private float  _clusterOutlineSize;
    private Bitmap _clusterBitmap;
-   private boolean _isBillboard;
+   //private boolean _isBillboard;
    
    public MarkerSymbol _symbol;
    private float _symbolSize = 10f;
@@ -114,7 +114,8 @@ public class MarkerToolkit {
       _clusterOutlineSize = config.clusterOutline_Size;
       _symbolSize = ScreenUtils.getPixels(config.markerSymbol_Size);
       _symbolSizeInt = (int) Math.ceil(_symbolSize);
-      _isBillboard = config.clusterOrientation == Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
+      //_isBillboard = config.clusterOrientation == Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
+      //_isBillboard = config.markerOrientation == Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
    }
 
    public Bitmap createPoiBitmap(MarkerShape shape) {
@@ -146,7 +147,6 @@ public class MarkerToolkit {
    }
    
    public Bitmap createClusterBitmap(int size) {
-      //final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
       final ScreenUtils.ClusterDrawable drawable = new ScreenUtils.ClusterDrawable(
             _clusterSymbolSizeDP,
             _clusterForegroundColor,
@@ -154,7 +154,8 @@ public class MarkerToolkit {
             Integer.toString(size),
             _clusterSymbolWeight,
             _clusterOutlineSize);
-      final Bitmap paintedBitmap = drawable.getBitmap();
+      //final Bitmap paintedBitmap = drawable.getBitmap();
+      final Bitmap paintedBitmap = drawable.getBitmap(_bitmapPoi);
       return paintedBitmap;
    }
    
@@ -207,6 +208,8 @@ public class MarkerToolkit {
     */
    public MarkerSymbol createAdvanceSymbol(MarkerItem mItem, Bitmap poiBitmap) {
       loadConfig();
+      final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
+      final boolean isBillboard = config.markerOrientation == Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
       createPoiBitmap(MarkerShape.STAR);
       final Paint textPainter = CanvasAdapter.newPaint();
       textPainter.setStyle(Paint.Style.STROKE);
@@ -283,13 +286,12 @@ public class MarkerToolkit {
       markerCanvas.drawBitmap(titleBitmap, xSize/2-(titleWidth/2), 0);
       markerCanvas.drawBitmap(poiBitmap, xSize/2-(symbolWidth/2), ySize/2-(symbolWidth/2));
       
-      if (_isBillboard) {
+      if (isBillboard) {
          return (new MarkerSymbol(markerBitmap, HotspotPlace.CENTER));
       } else {
          return (new MarkerSymbol(markerBitmap, HotspotPlace.CENTER, false));
       }
-      
-      //return (new MarkerSymbol(markerBitmap, HotspotPlace.CENTER, true));
+
    }
    
    

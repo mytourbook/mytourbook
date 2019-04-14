@@ -1924,6 +1924,10 @@ public class Messages extends NLS {
    public static String Slideout_Map25Provider_Label_MapProvider_Title;
    public static String Slideout_Map25Provider_Label_ThemeStyle;
 
+   public static String Slideout_Map2MapOptions_Action_SetTourPaintingModeBasic;
+   public static String Slideout_Map2MapOptions_Dialog_EnhancePaintingWarning_Message;
+   public static String Slideout_Map2MapOptions_Dialog_EnhancePaintingWarning_Title;
+
    public static String Slideout_Map_Bookmark_Label_NumBookmarkListItems;
    public static String Slideout_Map_Bookmark_Label_NumBookmarkListItems_Tooltip;
    public static String Slideout_Map_Bookmark_Label_NumContextMenuItems;
@@ -2664,6 +2668,11 @@ public class Messages extends NLS {
    public static String TourEditor_Dialog_DeleteDistanceValues_Title;
    public static String TourEditor_Dialog_SetAltitudeFromSRTM_Message;
    public static String TourEditor_Dialog_SetAltitudeFromSRTM_Title;
+
+   public static String TourGeoFilter_Loader_Loading;
+   public static String TourGeoFilter_Loader_LoadingError;
+   public static String TourGeoFilter_Loader_LoadingParts;
+   public static String TourGeoFilter_Loader_Tours;
 
    public static String Training_Action_EditHrZones;
    public static String Training_Action_EditHrZones_Tooltip;

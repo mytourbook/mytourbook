@@ -397,6 +397,7 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
             // border color
             _colorBorderColor = new ColorSelectorExtended(containerBorderColor);
             _colorBorderColor.addListener(_defaultChangePropertyListener);
+            _colorBorderColor.addOpenListener(this);
          }
       }
    }

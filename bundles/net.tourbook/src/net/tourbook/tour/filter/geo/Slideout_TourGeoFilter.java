@@ -20,6 +20,7 @@ import de.byteholder.geoclipse.map.Map;
 import java.text.NumberFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -34,6 +35,7 @@ import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.common.util.Util;
 import net.tourbook.map2.view.Map2View;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 
@@ -45,9 +47,11 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellEditor;
@@ -109,6 +113,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
    private static final String            COLUMN_SEQUENCE            = "sequence";                             //$NON-NLS-1$
    private static final String            COLUMN_ZOOM_LEVEL          = "zoomLevel";                            //$NON-NLS-1$
 
+   final static IPreferenceStore          _prefStore                 = TourbookPlugin.getPrefStore();
    private final static IDialogSettings   _state                     = TourGeoFilter_Manager.getState();
 
    private TableViewer                    _geoFilterViewer;
@@ -1133,10 +1138,15 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
          @Override
          public void widgetSelected(final SelectionEvent e) {
 
+            // state must be saved BEFORE overlay is reseted because this is reading the options
+            saveState_Options();
+
             // force repainting
             disposeMapOverlayImages();
 
-            onChangeUI();
+            if (_selectedFilter != null) {
+               onSelect_GeoFilter(_selectedFilter);
+            }
          }
       };
 
@@ -1258,26 +1268,70 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
          return;
       }
 
-      setIsKeepOpenInternally(true);
-      int confirmDialogResult;
-      {
-         confirmDialogResult = new MessageDialog(
+//      setIsKeepOpenInternally(true);
+//      int confirmDialogResult;
+//      {
+//         confirmDialogResult = new MessageDialog(
+//               getToolTipShell(),
+//               Messages.Slideout_TourGeoFilter_Dialog_DeleteAllFilter_Title,
+//               null,
+//               Messages.Slideout_TourGeoFilter_Dialog_DeleteAllFilter_Message,
+//               MessageDialog.QUESTION,
+//
+//               0, // default index
+//
+//               Messages.Slideout_TourGeoFilter_Action_Delete_AllWithoutName,
+//               IDialogConstants.CANCEL_LABEL
+//
+//         ).open();
+//
+//      }
+//      setIsKeepOpenInternally(false);
+//
+//      if (confirmDialogResult != 0) {
+//         return;
+//      }
+
+      // check if deletion must be confirmed
+      if (_prefStore.getBoolean(ITourbookPreferences.TOGGLE_STATE_GEO_FILTER_DELETE_ALL_WITHOUT_NAME) == false) {
+
+         // confirm deletion
+
+         final LinkedHashMap<String, Integer> buttonLabelToIdMap = new LinkedHashMap<>();
+         buttonLabelToIdMap.put(Messages.Slideout_TourGeoFilter_Action_Delete_AllWithoutName, IDialogConstants.OK_ID);
+         buttonLabelToIdMap.put(Messages.App_Action_Cancel, IDialogConstants.CANCEL_ID);
+
+         final MessageDialogWithToggle dialog = new MessageDialogWithToggle(
+
                getToolTipShell(),
+
                Messages.Slideout_TourGeoFilter_Dialog_DeleteAllFilter_Title,
                null,
+
                Messages.Slideout_TourGeoFilter_Dialog_DeleteAllFilter_Message,
                MessageDialog.QUESTION,
-               0,
 
-               Messages.Slideout_TourGeoFilter_Action_Delete_AllWithoutName,
-               IDialogConstants.CANCEL_LABEL
+               buttonLabelToIdMap,
+               0, // default index
 
-         ).open();
-      }
-      setIsKeepOpenInternally(false);
+               Messages.App_ToggleState_DoNotShowAgain,
+               false // toggle default state
+         );
 
-      if (confirmDialogResult != 0) {
-         return;
+         int dialogReturnCode;
+
+         setIsAnotherDialogOpened(true);
+         {
+            dialogReturnCode = dialog.open();
+         }
+         setIsAnotherDialogOpened(false);
+
+         // save toggle state
+         _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_GEO_FILTER_DELETE_ALL_WITHOUT_NAME, dialog.getToggleState());
+
+         if (dialogReturnCode != IDialogConstants.OK_ID) {
+            return;
+         }
       }
 
       // update model
