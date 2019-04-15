@@ -214,7 +214,8 @@ public class SuuntoJsonProcessor {
 			// Removing the entries that don't have GPS data
 			// In the case where the activity is an indoor tour,
 			// we remove the entries that don't have altitude data
-			if ((!isIndoorTour && currentTimeData.longitude == Double.MIN_VALUE && currentTimeData.latitude == Double.MIN_VALUE) ||
+			if (currentTimeData.marker == 0 &&
+				(!isIndoorTour && currentTimeData.longitude == Double.MIN_VALUE && currentTimeData.latitude == Double.MIN_VALUE) ||
 					(isIndoorTour && currentTimeData.absoluteAltitude == Float.MIN_VALUE) ||
 					currentTimeData.absoluteTime <= previousAbsoluteTime)
 				sampleListIterator.remove();
