@@ -580,6 +580,13 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		controlFilePath =
 				IMPORT_FILE_PATH + "1536723722706_183010004848_post_timeline-1.xml"; //$NON-NLS-1$
 		testFiles.put(controlFilePath, filePath); // Single file tests SuuntoJsonProcessor
+		
+		//Shoreline - with laps/markers
+		filePath = IMPORT_FILE_PATH +
+				"1555291925128_183010004848_post_timeline-1.json.gz"; //$NON-NLS-1$
+		controlFilePath =
+				IMPORT_FILE_PATH + "1555291925128_183010004848_post_timeline-1.xml"; //$NON-NLS-1$
+		testFiles.put(controlFilePath, filePath); // Single file tests SuuntoJsonProcessor
 
 		TourData entry;
 		String xml;
@@ -761,9 +768,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 	 *           The test Suunto 9 GZip file's content.
 	 * @return True if no differences were found, false otherwise.
 	 */
-	private static boolean CompareAgainstControl(String controlDocument,
-																String xmlTestDocument) {
-
+	private static boolean CompareAgainstControl(String controlDocument, String xmlTestDocument) {
 		Diff myDiff = DiffBuilder.compare(Input.fromString(controlDocument))
 				.withTest(Input.fromString(xmlTestDocument))
 				.ignoreWhitespace()
