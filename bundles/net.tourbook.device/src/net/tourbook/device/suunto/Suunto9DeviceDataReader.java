@@ -579,15 +579,43 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 				"Original-1536723722706_183010004848_post_timeline-1.json.gz"; //$NON-NLS-1$
 		controlFilePath =
 				IMPORT_FILE_PATH + "1536723722706_183010004848_post_timeline-1.xml"; //$NON-NLS-1$
-		testFiles.put(controlFilePath, filePath); // Single file tests SuuntoJsonProcessor
+		testFiles.put(controlFilePath, filePath); 
 		
 		//Shoreline - with laps/markers
 		filePath = IMPORT_FILE_PATH +
 				"1555291925128_183010004848_post_timeline-1.json.gz"; //$NON-NLS-1$
 		controlFilePath =
 				IMPORT_FILE_PATH + "1555291925128_183010004848_post_timeline-1.xml"; //$NON-NLS-1$
-		testFiles.put(controlFilePath, filePath); // Single file tests SuuntoJsonProcessor
+		testFiles.put(controlFilePath, filePath); 
+		
+		// Reservoir Ridge with MoveSense HR belt
+		// TODO : Activating this unit test will cause this file to have its markers unsorted. WHY?
+		// 1536723722706_183010004848_post_timeline-1-SplitTests.xml
+		filePath = IMPORT_FILE_PATH +
+				"1549250450458_183010004848_post_timeline-1.json.gz"; //$NON-NLS-1$
+		controlFilePath =
+				IMPORT_FILE_PATH + "1549250450458_183010004848_post_timeline-1.xml"; //$NON-NLS-1$
+		testFiles.put(controlFilePath, filePath); 
+		
+				
+		// SWIMMING
 
+		// Start -> 100m -> LAP -> LAP -> 100m -> LAP -> LAP -> 100m -> LAP -> LAP -> 100m -> Stop
+		filePath = IMPORT_FILE_PATH +
+				"1547628896209_184710003036_post_timeline-1.json.gz"; //$NON-NLS-1$
+		controlFilePath =
+				IMPORT_FILE_PATH + "1547628896209_184710003036_post_timeline-1.xml"; //$NON-NLS-1$
+		testFiles.put(controlFilePath, filePath);
+				
+		// Start -> 100m -> Stop
+		filePath = IMPORT_FILE_PATH +
+				"1547628897243_184710003036_post_timeline-1.json.gz"; //$NON-NLS-1$
+		controlFilePath =
+				IMPORT_FILE_PATH + "1547628897243_184710003036_post_timeline-1.xml"; //$NON-NLS-1$
+		testFiles.put(controlFilePath, filePath); 
+				
+		// Single file tests SuuntoJsonProcessor
+		
 		TourData entry;
 		String xml;
 		String controlFileContent;
@@ -606,7 +634,11 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 			//create conflict in the unit tests as we reuse files
 			cleanUpActivities();
 		}
+		
+		return testResults;
 
+	}
+	private boolean unusedCodeForNow() {
 		// ------------------------------------------
 		// Split files test
 		// ------------------------------------------
@@ -637,10 +669,10 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		//jump from 1 file to another
 		String controlDocumentPath = IMPORT_FILE_PATH +
 				"1536723722706_183010004848_post_timeline-1-SplitTests.xml"; //$NON-NLS-1$
-		controlFileContent = GetContentFromResource(controlDocumentPath, false);
-		entry = GetLastTourDataImported();
-		xml = entry.toXml();
-		testResults &= CompareAgainstControl(controlFileContent, xml);
+	String	controlFileContent = GetContentFromResource(controlDocumentPath, false);
+	TourData	entry = GetLastTourDataImported();
+	String	xml = entry.toXml();
+	boolean	testResults = CompareAgainstControl(controlFileContent, xml);
 
 		cleanUpActivities();
 		// ORDER 2 - 3 - 1
