@@ -132,25 +132,25 @@ public class TourGeoFilter {
    @Override
    public String toString() {
 
-      return ""
+      return "" //$NON-NLS-1$
 
-            + "TourGeoFilter\n"
+            + "TourGeoFilter\n" //$NON-NLS-1$
 
-            + "[\n"
+            + "[\n" //$NON-NLS-1$
 
-            + "geoLocation_TopLeft           =" + geoLocation_TopLeft + "\n"
-            + "geoLocation_BottomRight       =" + geoLocation_BottomRight + "\n"
-            + "geoParts_TopLeft              =" + geoParts_TopLeft + "\n"
-            + "geoParts_BottomRight          =" + geoParts_BottomRight + "\n"
+            + "geoLocation_TopLeft           =" + geoLocation_TopLeft + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "geoLocation_BottomRight       =" + geoLocation_BottomRight + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "geoParts_TopLeft              =" + geoParts_TopLeft + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "geoParts_BottomRight          =" + geoParts_BottomRight + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "geoLocation_TopLeft_E2        =" + geoLocation_TopLeft_E2 + "\n"
-            + "geoLocation_BottomRight_E2    =" + geoLocation_BottomRight_E2 + "\n"
-            + "geoParts_TopLeft_E2           =" + geoParts_TopLeft_E2 + "\n"
-            + "geoParts_BottomRight_E2       =" + geoParts_BottomRight_E2 + "\n"
+            + "geoLocation_TopLeft_E2        =" + geoLocation_TopLeft_E2 + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "geoLocation_BottomRight_E2    =" + geoLocation_BottomRight_E2 + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "geoParts_TopLeft_E2           =" + geoParts_TopLeft_E2 + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "geoParts_BottomRight_E2       =" + geoParts_BottomRight_E2 + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "geoParts_Width       =" + geoParts_Width + "\n"
-            + "geoParts_Height      =" + geoParts_Height + "\n"
-            + "numGeoParts          =" + numGeoParts + "\n"
+            + "geoParts_Width       =" + geoParts_Width + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "geoParts_Height      =" + geoParts_Height + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "numGeoParts          =" + numGeoParts + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
 //            + "mapZoomLevel         =" + mapZoomLevel + "\n"
 //            + "mapGeoCenter         =" + mapGeoCenter + "\n"
@@ -159,9 +159,9 @@ public class TourGeoFilter {
 //            + "created              =" + created + "\n"
 //            + "createdMS            =" + createdMS + "\n"
 
-            + "mapGridData          =" + mapGridData + "\n"
+            + "mapGridData          =" + mapGridData + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "]";
+            + "]"; //$NON-NLS-1$
    }
 
 }

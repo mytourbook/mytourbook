@@ -11,7 +11,11 @@ It is still possible that there are undiscovered issue. So check your data after
 New
 ===
 
-*
+* 2D Map
+  
+  - Hover and select a tour
+  - Tour breadcrumb to show selected tours
+  - Warning: No tour selection !
 
 
 Improvements
@@ -20,6 +24,14 @@ Improvements
 * Search Tour by Location
 
   - Option for fast map drawing 
+  - Relocate map to the geo filter original position by selecting the geo filter label in the map
+  - Delete geo filter without name
+
+
+* 2.5D Map
+
+  - Map bookmarks can be displayed in the map
+
 
 
 Changes
@@ -27,12 +39,21 @@ Changes
 
 * 2D Map
 
-  - Move option "Zoom + center to the mouse position" into new "2D Map Option" slideout
+  - Moved option "Zoom + center to the mouse position" into new "2D Map Option" slideout
+  
+
+* Tour Chart
+
+  - Value point tooltip is reseted to defaults
 
 
 Bugfix   
 ======
 
+* 2D Map
+
+  - Fixed issue which lasted forever, the basic painting skipped values
+  - Fixed some SWT resource leaks which caused a "No more handles" exception
 
 
 * Tour View

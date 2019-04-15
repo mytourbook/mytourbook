@@ -51,7 +51,7 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 
 /**
- * Map 2D properties slideout
+ * Slideout for 2D map track options
  */
 public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColorSelectorListener {
 
@@ -397,6 +397,7 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
             // border color
             _colorBorderColor = new ColorSelectorExtended(containerBorderColor);
             _colorBorderColor.addListener(_defaultChangePropertyListener);
+            _colorBorderColor.addOpenListener(this);
          }
       }
    }

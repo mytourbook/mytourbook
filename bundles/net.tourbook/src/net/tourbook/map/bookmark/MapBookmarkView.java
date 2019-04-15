@@ -646,7 +646,6 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 	}
 
 	private void onBookmark_Delete() {
-
 		final MapBookmark selectedBookmark = getSelectedBookmark();
 
 		if (selectedBookmark == null) {
@@ -660,6 +659,9 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 
 		// update UI
 		_bookmarkViewer.refresh();
+		
+		// update maps
+		MapBookmarkManager.fireBookmarkEvent(selectedBookmark, net.tourbook.map.bookmark.IMapBookmarks.MapBookmarkEventType.MODIFIED);
 
 		enableActions();
 	}
@@ -670,9 +672,9 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 	 *           keyboard
 	 */
 	private void onBookmark_Rename(final boolean isOpenedWithMouse) {
-
+      
 		final MapBookmark selectedBookmark = getSelectedBookmark();
-
+		
 		final BookmarkRenameDialog renameDialog = new BookmarkRenameDialog(
 
 				_parent.getShell(),
@@ -707,6 +709,9 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 
 		// reselect bookmark
 		_bookmarkViewer.setSelection(new StructuredSelection(selectedBookmark), true);
+		
+		//update maps
+		MapBookmarkManager.fireBookmarkEvent(null, net.tourbook.map.bookmark.IMapBookmarks.MapBookmarkEventType.MODIFIED);
 	}
 
 	private void onBookmark_Select() {
@@ -717,8 +722,8 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 			// this happened when deleting a bookmark
 			return;
 		}
-
-		MapBookmarkManager.fireBookmarkEvent(selectedBookmark);
+		
+		MapBookmarkManager.fireBookmarkEvent(selectedBookmark, net.tourbook.map.bookmark.IMapBookmarks.MapBookmarkEventType.MOVETO);
 
 		enableActions();
 	}
@@ -730,7 +735,10 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 
 	void onUpdateBookmark(final MapBookmark updatedBookmark) {
 
-		_bookmarkViewer.refresh(true, true);
+	   _bookmarkViewer.refresh(true, true);
+ 
+	   MapBookmarkManager.fireBookmarkEvent(null, net.tourbook.map.bookmark.IMapBookmarks.MapBookmarkEventType.MODIFIED);
+
 	}
 
 	@Override
@@ -778,3 +786,4 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 		enableActions();
 	}
 }
+

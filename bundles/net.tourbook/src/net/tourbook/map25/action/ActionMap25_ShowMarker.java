@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -19,6 +19,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.IOpeningDialog;
+import net.tourbook.common.util.Util;
 import net.tourbook.map25.Map25View;
 import net.tourbook.map25.ui.SlideoutMap25_MarkerOptions;
 
@@ -40,194 +41,204 @@ import org.eclipse.swt.widgets.ToolItem;
 
 public class ActionMap25_ShowMarker extends ContributionItem implements IOpeningDialog {
 
-	private static final String		IMAGE_EDIT_TOUR_MARKER			= Messages.Image__edit_tour_marker;
-	private static final String		IMAGE_EDIT_TOUR_MARKER_DISABLED	= Messages.Image__edit_tour_marker_disabled;
+   private static final String         IMAGE_EDIT_TOUR_MARKER          = Messages.Image__edit_tour_marker;
+   private static final String         IMAGE_EDIT_TOUR_MARKER_DISABLED = Messages.Image__edit_tour_marker_disabled;
 
-// SET_FORMATTING_OFF
-	
-	private IDialogSettings			_state							= TourbookPlugin.getState("net.tourbook.map25.action.ActionTourMapMarker");													//$NON-NLS-1$
-	
-// SET_FORMATTING_ON
+   private IDialogSettings             _state                          = TourbookPlugin.getState("net.tourbook.map25.action.ActionTourMapMarker"); //$NON-NLS-1$
 
-	private final String			_dialogId						= getClass().getCanonicalName();
+   private final String                _dialogId                       = getClass().getCanonicalName();
 
-	private Map25View				_map25View;
+   private Map25View                   _map25View;
 
-	private ToolBar					_toolBar;
-	private ToolItem				_actionToolItem;
+   private ToolBar                     _toolBar;
+   private ToolItem                    _actionToolItem;
 
-	private SlideoutMap25_MarkerOptions	_slideoutMarkerOptions;
+   private SlideoutMap25_MarkerOptions _slideoutMarkerOptions;
 
-	/*
-	 * UI controls
-	 */
-	private Control					_parent;
+   /*
+    * UI controls
+    */
+   private Control _parent;
 
-	private Image					_imageEnabled;
-	private Image					_imageDisabled;
+   private Image   _imageEnabled;
+   private Image   _imageDisabled;
 
-	public ActionMap25_ShowMarker(final Map25View map25View, final Control parent) {
+   public ActionMap25_ShowMarker(final Map25View map25View, final Control parent) {
 
-		_map25View = map25View;
-		_parent = parent;
+      _map25View = map25View;
+      _parent = parent;
 
-		_imageEnabled = TourbookPlugin.getImageDescriptor(IMAGE_EDIT_TOUR_MARKER).createImage();
-		_imageDisabled = TourbookPlugin.getImageDescriptor(IMAGE_EDIT_TOUR_MARKER_DISABLED).createImage();
-	}
+      _imageEnabled = TourbookPlugin.getImageDescriptor(IMAGE_EDIT_TOUR_MARKER).createImage();
+      _imageDisabled = TourbookPlugin.getImageDescriptor(IMAGE_EDIT_TOUR_MARKER_DISABLED).createImage();
 
-	@Override
-	public void fill(final ToolBar toolbar, final int index) {
+      parent.addDisposeListener(new DisposeListener() {
 
-		if (_actionToolItem == null && toolbar != null) {
+         @Override
+         public void widgetDisposed(final DisposeEvent e) {
+            onDispose();
+         }
+      });
+   }
 
-			toolbar.addDisposeListener(new DisposeListener() {
-				@Override
-				public void widgetDisposed(final DisposeEvent e) {
-					_actionToolItem.dispose();
-					_actionToolItem = null;
-				}
-			});
+   @Override
+   public void fill(final ToolBar toolbar, final int index) {
 
-			_toolBar = toolbar;
+      if (_actionToolItem == null && toolbar != null) {
 
-			_actionToolItem = new ToolItem(toolbar, SWT.CHECK);
-			_actionToolItem.setImage(_imageEnabled);
-			_actionToolItem.setDisabledImage(_imageDisabled);
-			_actionToolItem.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onAction();
-				}
-			});
+         toolbar.addDisposeListener(new DisposeListener() {
+            @Override
+            public void widgetDisposed(final DisposeEvent e) {
+               _actionToolItem.dispose();
+               _actionToolItem = null;
+            }
+         });
 
-			toolbar.addMouseMoveListener(new MouseMoveListener() {
-				@Override
-				public void mouseMove(final MouseEvent e) {
+         _toolBar = toolbar;
 
-					final Point mousePosition = new Point(e.x, e.y);
-					final ToolItem hoveredItem = toolbar.getItem(mousePosition);
+         _actionToolItem = new ToolItem(toolbar, SWT.CHECK);
+         _actionToolItem.setImage(_imageEnabled);
+         _actionToolItem.setDisabledImage(_imageDisabled);
+         _actionToolItem.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               onAction();
+            }
+         });
 
-					onMouseMove(hoveredItem, e);
-				}
-			});
+         toolbar.addMouseMoveListener(new MouseMoveListener() {
+            @Override
+            public void mouseMove(final MouseEvent e) {
 
-			_slideoutMarkerOptions = new SlideoutMap25_MarkerOptions(_parent, _toolBar, _state, _map25View);
+               final Point mousePosition = new Point(e.x, e.y);
+               final ToolItem hoveredItem = toolbar.getItem(mousePosition);
 
-			updateUI();
-		}
-	}
+               onMouseMove(hoveredItem, e);
+            }
+         });
 
-	@Override
-	public String getDialogId() {
-		return _dialogId;
-	}
+         _slideoutMarkerOptions = new SlideoutMap25_MarkerOptions(_parent, _toolBar, _state, _map25View);
 
-	@Override
-	public void hideDialog() {
-		_slideoutMarkerOptions.hide();
-	}
+         updateUI_ActionTooltip();
+      }
+   }
 
-	private void onAction() {
+   @Override
+   public String getDialogId() {
+      return _dialogId;
+   }
 
-		updateUI();
+   @Override
+   public void hideDialog() {
+      _slideoutMarkerOptions.hide();
+   }
 
-		final boolean isMarkerVisible = _actionToolItem.getSelection();
+   private void onAction() {
 
-		if (isMarkerVisible) {
+      updateUI_ActionTooltip();
 
-			final Rectangle itemBounds = _actionToolItem.getBounds();
+      final boolean isMarkerVisible = _actionToolItem.getSelection();
 
-			final Point itemDisplayPosition = _toolBar.toDisplay(itemBounds.x, itemBounds.y);
+      if (isMarkerVisible) {
 
-			itemBounds.x = itemDisplayPosition.x;
-			itemBounds.y = itemDisplayPosition.y;
+         final Rectangle itemBounds = _actionToolItem.getBounds();
 
-			openSlideout(itemBounds, false);
+         final Point itemDisplayPosition = _toolBar.toDisplay(itemBounds.x, itemBounds.y);
 
-		} else {
+         itemBounds.x = itemDisplayPosition.x;
+         itemBounds.y = itemDisplayPosition.y;
 
-			_slideoutMarkerOptions.close();
-		}
+         openSlideout(itemBounds, false);
 
-		_map25View.actionShowTourMarker(isMarkerVisible);
-	}
+      } else {
 
-	private void onMouseMove(final ToolItem item, final MouseEvent mouseEvent) {
+         _slideoutMarkerOptions.close();
+      }
 
-		// ignore other items
-		if (item != _actionToolItem) {
-			return;
-		}
+      _map25View.actionShowTourMarker(isMarkerVisible);
+   }
 
-		if (_actionToolItem.getSelection() == false || _actionToolItem.isEnabled() == false) {
+   private void onDispose() {
 
-			// marker is not displayed
+      Util.disposeResource(_imageEnabled);
+      Util.disposeResource(_imageDisabled);
+   }
 
-			return;
-		}
+   private void onMouseMove(final ToolItem item, final MouseEvent mouseEvent) {
 
-		final boolean isToolItemHovered = item == _actionToolItem;
+      // ignore other items
+      if (item != _actionToolItem) {
+         return;
+      }
 
-		Rectangle itemBounds = null;
+      if (_actionToolItem.getSelection() == false || _actionToolItem.isEnabled() == false) {
 
-		if (isToolItemHovered) {
+         // marker is not displayed
 
-			itemBounds = item.getBounds();
+         return;
+      }
 
-			final Point itemDisplayPosition = _toolBar.toDisplay(itemBounds.x, itemBounds.y);
+      final boolean isToolItemHovered = item == _actionToolItem;
 
-			itemBounds.x = itemDisplayPosition.x;
-			itemBounds.y = itemDisplayPosition.y;
-		}
+      Rectangle itemBounds = null;
 
-		openSlideout(itemBounds, true);
-	}
+      if (isToolItemHovered) {
 
-	private void openSlideout(final Rectangle itemBounds, final boolean isOpenDelayed) {
+         itemBounds = item.getBounds();
 
-		_map25View.closeOpenedDialogs(this);
-		_slideoutMarkerOptions.open(itemBounds, isOpenDelayed);
-	}
+         final Point itemDisplayPosition = _toolBar.toDisplay(itemBounds.x, itemBounds.y);
 
-	public void setEnabled(final boolean isEnabled) {
+         itemBounds.x = itemDisplayPosition.x;
+         itemBounds.y = itemDisplayPosition.y;
+      }
 
-		if (_actionToolItem == null) {
-			// this happened
-			return;
-		}
+      openSlideout(itemBounds, true);
+   }
 
-		_actionToolItem.setEnabled(isEnabled);
+   private void openSlideout(final Rectangle itemBounds, final boolean isOpenDelayed) {
 
-		if (isEnabled && _actionToolItem.getSelection() == false) {
+      _map25View.closeOpenedDialogs(this);
+      _slideoutMarkerOptions.open(itemBounds, isOpenDelayed);
+   }
 
-			// show default icon
-			_actionToolItem.setImage(_imageEnabled);
-		}
-	}
+   public void setEnabled(final boolean isEnabled) {
 
-	public void setSelected(final boolean isSelected) {
+      if (_actionToolItem == null) {
+         // this happened
+         return;
+      }
 
-		if (_actionToolItem == null) {
-			// this happened
-			return;
-		}
+      _actionToolItem.setEnabled(isEnabled);
 
-		_actionToolItem.setSelection(isSelected);
+      if (isEnabled && _actionToolItem.getSelection() == false) {
 
-		updateUI();
-	}
+         // show default icon
+         _actionToolItem.setImage(_imageEnabled);
+      }
+   }
 
-	private void updateUI() {
+   public void setSelected(final boolean isSelected) {
 
-		if (_actionToolItem.getSelection()) {
+      if (_actionToolItem == null) {
+         // this happened
+         return;
+      }
 
-			// hide tooltip because the marker options slideout is displayed
+      _actionToolItem.setSelection(isSelected);
 
-			_actionToolItem.setToolTipText(UI.EMPTY_STRING);
+      updateUI_ActionTooltip();
+   }
 
-		} else {
+   private void updateUI_ActionTooltip() {
 
-			_actionToolItem.setToolTipText(Messages.Tour_Action_MarkerOptions_Tooltip);
-		}
-	}
+      if (_actionToolItem.getSelection()) {
+
+         // hide tooltip because the marker options slideout is displayed
+
+         _actionToolItem.setToolTipText(UI.EMPTY_STRING);
+
+      } else {
+
+         _actionToolItem.setToolTipText(Messages.Tour_Action_MapMarkerOptions_Tooltip);
+      }
+   }
 }

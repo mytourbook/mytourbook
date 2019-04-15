@@ -414,7 +414,6 @@ public class Messages extends NLS {
    public static String        App_Action_Columns;
    public static String        App_Action_Copy;
    public static String        App_Action_Delete;
-   public static String        App_Action_Delete_All;
    public static String        App_Action_Delete_WithConfirm;
    public static String        App_Action_DeleteProfile;
    public static String        App_Action_Dialog_ActionIsInProgress_Message;
@@ -743,7 +742,6 @@ public class Messages extends NLS {
    public static String        Geo_Compare_Label_ReferenceTour;
 
    public static String        GeoCompare_View_Action_AppFilter_Tooltip;
-   public static String        GeoCompare_View_Action_IsSyncMapPosition_Tooltip;
    public static String        GeoCompare_View_Action_OnOff_Tooltip;
    public static String        GeoCompare_View_Column_GeoDiff_Header;
    public static String        GeoCompare_View_Column_GeoDiff_Label;
@@ -1889,7 +1887,9 @@ public class Messages extends NLS {
    public static String Slideout_Map25MapOptions_Spinner_Layer_Hillshading;
 
    public static String Slideout_Map25MarkerOptions_Checkbox_IsMarkerClustering;
-   public static String Slideout_Map25MarkerOptions_Checkbox_IsShowMarkerPoint;
+   public static String Slideout_Map25MarkerOptions_Checkbox_IsShowBookmarks;
+   public static String Slideout_Map25MarkerOptions_Checkbox_IsShowTourMarker;
+   public static String Slideout_Map25MarkerOptions_Group_MarkerLayout;
    public static String Slideout_Map25MarkerOptions_Label_ClusterGridSize;
    public static String Slideout_Map25MarkerOptions_Label_ClusterOpacity;
    public static String Slideout_Map25MarkerOptions_Label_ClusterOpacity_Tooltip;
@@ -1919,6 +1919,10 @@ public class Messages extends NLS {
    public static String Slideout_Map25Provider_Label_MapProvider_Title;
    public static String Slideout_Map25Provider_Label_ThemeStyle;
 
+   public static String Slideout_Map2MapOptions_Action_SetTourPaintingModeBasic;
+   public static String Slideout_Map2MapOptions_Dialog_EnhancePaintingWarning_Message;
+   public static String Slideout_Map2MapOptions_Dialog_EnhancePaintingWarning_Title;
+
    public static String Slideout_Map_Bookmark_Label_NumBookmarkListItems;
    public static String Slideout_Map_Bookmark_Label_NumBookmarkListItems_Tooltip;
    public static String Slideout_Map_Bookmark_Label_NumContextMenuItems;
@@ -1929,6 +1933,8 @@ public class Messages extends NLS {
    public static String Slideout_Map_Options_Checkbox_ZoomWithMousePosition_Tooltip;
    public static String Slideout_Map_Options_Label_SliderPath_Segements;
    public static String Slideout_Map_Options_Checkbox_ChartSlider;
+   public static String Slideout_Map_Options_Checkbox_ShowHoveredSelectedTour;
+   public static String Slideout_Map_Options_Checkbox_ShowHoveredSelectedTour_Tooltip;
    public static String Slideout_Map_Options_Checkbox_SliderPath;
    public static String Slideout_Map_Options_Checkbox_SliderPath_Tooltip;
    public static String Slideout_Map_Options_Checkbox_TrackOpacity;
@@ -2022,14 +2028,17 @@ public class Messages extends NLS {
    public static String Slideout_TourFilter_Link_TextSearchHint;
    public static String Slideout_TourFilter_Link_TextSearchHint_Tooltip;
 
+   public static String Slideout_TourGeoFilter_Action_Delete_AllWithoutName;
+   public static String Slideout_TourGeoFilter_Action_Delete_WithoutName;
+   public static String Slideout_TourGeoFilter_Action_Delete_WithoutName_Tooltip;
    public static String Slideout_TourGeoFilter_Checkbox_IsAutoOpenSlideout;
    public static String Slideout_TourGeoFilter_Checkbox_IsAutoOpenSlideout_Tooltip;
    public static String Slideout_TourGeoFilter_Checkbox_IsSyncMapPosition;
+   public static String Slideout_TourGeoFilter_Checkbox_IsSyncMapPosition_Tooltip;
    public static String Slideout_TourGeoFilter_Checkbox_IsUseFastMapPainting;
    public static String Slideout_TourGeoFilter_Checkbox_IsUseFastMapPainting_Tooltip;
    public static String Slideout_TourGeoFilter_Checkbox_UseAppFilter;
    public static String Slideout_TourGeoFilter_Color_GeoPartHover_Tooltip;
-   public static String Slideout_TourGeoFilter_Color_GeoParts_HoverSelecting;
    public static String Slideout_TourGeoFilter_Color_GeoPartSelected_Tooltip;
    public static String Slideout_TourGeoFilter_Column_Created_Label;
    public static String Slideout_TourGeoFilter_Column_FilterName_Label;
@@ -2047,7 +2056,6 @@ public class Messages extends NLS {
    public static String Slideout_TourGeoFilter_Dialog_DeleteAllFilter_Title;
    public static String Slideout_TourGeoFilter_Label_FilterIncludeExclude;
    public static String Slideout_TourGeoFilter_Label_GeoPartColor;
-   public static String Slideout_TourGeoFilter_Label_GeoPartColor_Tooltip;
    public static String Slideout_TourGeoFilter_Label_Hint;
    public static String Slideout_TourGeoFilter_Label_History;
    public static String Slideout_TourGeoFilter_Label_Title;
@@ -2056,7 +2064,6 @@ public class Messages extends NLS {
    public static String Slideout_TourGeoFilter_Radio_GeoParts_Include;
    public static String Slideout_TourGeoFilter_Radio_GeoParts_Include_Tooltip;
    public static String Slideout_TourGeoFilter_Spinner_FastMapPainting_SkippedValues_Tooltip;
-   public static String Slideout_TourGeoFilter_Spinner_GridBoxSize;
 
    public static String Slideout_TourInfoOptions_Checkbox_IsShowInfoTooltip;
    public static String Slideout_TourInfoOptions_Checkbox_IsShowTourSeparator;
@@ -2147,6 +2154,7 @@ public class Messages extends NLS {
    public static String Tour_Action_GeoCompare_Tooltip;
    public static String Tour_Action_GraphGears;
    public static String Tour_Action_GraphOverlapped;
+   public static String Tour_Action_MapMarkerOptions_Tooltip;
    public static String Tour_Action_Marker_Delete;
    public static String Tour_Action_Marker_Delete_WithConfirm;
    public static String Tour_Action_Marker_PositionHorizontal;
@@ -2651,6 +2659,11 @@ public class Messages extends NLS {
    public static String TourEditor_Dialog_DeleteDistanceValues_Title;
    public static String TourEditor_Dialog_SetAltitudeFromSRTM_Message;
    public static String TourEditor_Dialog_SetAltitudeFromSRTM_Title;
+
+   public static String TourGeoFilter_Loader_Loading;
+   public static String TourGeoFilter_Loader_LoadingError;
+   public static String TourGeoFilter_Loader_LoadingParts;
+   public static String TourGeoFilter_Loader_Tours;
 
    public static String Training_Action_EditHrZones;
    public static String Training_Action_EditHrZones_Tooltip;

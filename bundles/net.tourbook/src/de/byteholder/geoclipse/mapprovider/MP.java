@@ -44,6 +44,10 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.locks.ReentrantLock;
 
+import net.tourbook.common.map.CommonMapProvider;
+import net.tourbook.common.map.GeoPosition;
+import net.tourbook.common.util.StatusUtil;
+
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.osgi.util.NLS;
@@ -53,10 +57,6 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
-
-import net.tourbook.common.map.CommonMapProvider;
-import net.tourbook.common.map.GeoPosition;
-import net.tourbook.common.util.StatusUtil;
 
 /**
  * This is the base class for map providers (MP) which provides all data which are necessary to draw
@@ -108,7 +108,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
     * Listener which throws {@link ITileListener} events
     */
    private final static ListenerList<ITileListener>        _tileListeners               = new ListenerList<>(ListenerList.IDENTITY);
-   
+
    private static final ListenerList<IOfflineInfoListener> _offlineReloadEventListeners = new ListenerList<>(ListenerList.IDENTITY);
 
    private int                                             _dimmingAlphaValue           = 0xFF;
@@ -441,10 +441,12 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
    }
 
    public void disposeTileImages() {
+
       _tileImageCache.dispose();
    }
 
    public void disposeTiles() {
+
       _tileCache.removeAll();
       _errorTiles.removeAll();
       _tileImageCache.dispose();
