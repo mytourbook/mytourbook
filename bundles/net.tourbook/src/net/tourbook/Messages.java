@@ -1933,10 +1933,8 @@ public class Messages extends NLS {
    public static String Slideout_Map_Options_Checkbox_ZoomWithMousePosition_Tooltip;
    public static String Slideout_Map_Options_Label_SliderPath_Segements;
    public static String Slideout_Map_Options_Checkbox_ChartSlider;
-   public static String Slideout_Map_Options_Checkbox_ShowTourTooltip;
-
-   public static String Slideout_Map_Options_Checkbox_ShowTourTooltip_Tooltip;
-
+   public static String Slideout_Map_Options_Checkbox_ShowHoveredSelectedTour;
+   public static String Slideout_Map_Options_Checkbox_ShowHoveredSelectedTour_Tooltip;
    public static String Slideout_Map_Options_Checkbox_SliderPath;
    public static String Slideout_Map_Options_Checkbox_SliderPath_Tooltip;
    public static String Slideout_Map_Options_Checkbox_TrackOpacity;
