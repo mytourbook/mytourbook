@@ -22,15 +22,15 @@
 	<maxSpeed>12.329795</maxSpeed>
 	<avgCadence>81.91306</avgCadence>
 	<TourMarkers>
-		<TourMarker serieIndex="2276">
-			<time>2797</time>
-			<distance20>6765.0</distance20>
-			<label>2</label>
-		</TourMarker>
 		<TourMarker serieIndex="1976">
 			<time>2415</time>
 			<distance20>5917.0</distance20>
 			<label>1</label>
+		</TourMarker>
+		<TourMarker serieIndex="2276">
+			<time>2797</time>
+			<distance20>6765.0</distance20>
+			<label>2</label>
 		</TourMarker>
 	</TourMarkers>
 	<TimeSeries>
