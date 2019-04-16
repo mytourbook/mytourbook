@@ -1,5 +1,7 @@
 package net.tourbook.device.suunto;
 
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -42,6 +44,8 @@ public class SuuntoJsonProcessor {
 	private static final String	TAG_START			= "Type";														//$NON-NLS-1$
 	private static final String	TAG_PAUSE			= "Pause";														//$NON-NLS-1$
 	private static final String	TAG_HR				= "HR";															//$NON-NLS-1$
+	private static final String	TAG_RR				= "R-R";															//$NON-NLS-1$
+	private static final String	TAG_DATA			= "Data";															//$NON-NLS-1$
 	private static final String	TAG_SPEED			= "Speed";														//$NON-NLS-1$
 	private static final String	TAG_CADENCE			= "Cadence";													//$NON-NLS-1$
 	public static final String		TAG_ALTITUDE		= "Altitude";													//$NON-NLS-1$
@@ -88,21 +92,29 @@ public class SuuntoJsonProcessor {
 		boolean isPaused = false;
 
 		boolean reusePreviousTimeEntry;
+		ArrayList<Integer> rrIntervalsList = new ArrayList<Integer>();
+		Instant minInstant = Instant.ofEpochMilli(Long.MIN_VALUE);
+		ZonedDateTime pauseStartTime = minInstant.atZone(ZoneOffset.UTC);
 		for (int i = 0; i < samples.length(); ++i) {
+			String currentSampleSml;
 			String currentSampleData;
 			String sampleTime;
 			try {
 				JSONObject sample = samples.getJSONObject(i);
+				if (!sample.toString().contains(TAG_TIMEISO8601))
+					continue;
+				
 				String attributesContent = sample.get(TAG_ATTRIBUTES).toString();
 				if (attributesContent == null || attributesContent == "") //$NON-NLS-1$
 					continue;
 
 				JSONObject currentSampleAttributes = new JSONObject(sample.get(TAG_ATTRIBUTES).toString());
-				String currentSampleSml = currentSampleAttributes.get(TAG_SUUNTOSML).toString();
-				if (!currentSampleSml.contains(TAG_SAMPLE))
-					continue;
-
-				currentSampleData = new JSONObject(currentSampleSml).get(TAG_SAMPLE).toString();
+				currentSampleSml = currentSampleAttributes.get(TAG_SUUNTOSML).toString();
+				
+				if (currentSampleSml.contains(TAG_SAMPLE))
+					currentSampleData = new JSONObject(currentSampleSml).get(TAG_SAMPLE).toString();
+				else
+					currentSampleData = "{}";
 
 				sampleTime = sample.get(TAG_TIMEISO8601).toString();
 			} catch (Exception e) {
@@ -145,16 +157,23 @@ public class SuuntoJsonProcessor {
 				if (!isPaused) {
 					if (currentSampleData.contains(Boolean.TRUE.toString())) {
 						isPaused = true;
+						pauseStartTime = currentZonedDateTime;
 					}
 				} else {
-					if (currentSampleData.contains(Boolean.FALSE.toString()))
+					if (currentSampleData.contains(Boolean.FALSE.toString())) {
 						isPaused = false;
+					}
 				}
 			}
 
-			if (isPaused)
+			//We check if the current sample date is greater/less than
+			//the pause date because in the JSON file, the samples are
+			//not necessarily in chronological order and we could have
+			//the potential to miss data
+			if (isPaused && currentZonedDateTime.isAfter(pauseStartTime))
 				continue;
-
+			if (currentSampleData.contains(TAG_RR) )
+				System.out.println("dd");
 			if (currentSampleData.contains(TAG_LAP) &&
 					(currentSampleData.contains(TAG_MANUAL) ||
 							currentSampleData.contains(TAG_DISTANCE))) {
@@ -172,6 +191,7 @@ public class SuuntoJsonProcessor {
 
 			// Heart Rate
 			wasDataPopulated |= TryAddHeartRateData(new JSONObject(currentSampleData), timeData);
+			wasDataPopulated |=	TryComputeHeartRateData(rrIntervalsList, new JSONObject(currentSampleSml), timeData);
 
 			// Speed
 			wasDataPopulated |= TryAddSpeedData(new JSONObject(currentSampleData), timeData);
@@ -333,6 +353,71 @@ public class SuuntoJsonProcessor {
 
 		return false;
 	}
+	
+	/**
+	 * Attempts to retrieve and add HR data from the MoveSense HR belt to
+	 * the current activity.
+	 * @param rrIntervalsList
+	 * The list containing all the R-R intervals being gathered until they
+	 * are saved in the activity's heart rate list.
+	 * @param currentSample
+	 * The current sample data in JSON format.
+	 * @param currentSampleDate
+	 * The date of the current data.
+	 * @param previousSampleDate
+	 * The last date for which we saved heart rate data from R-R intervals
+	 * in the current activity.
+	 */
+	private boolean TryComputeHeartRateData(
+		ArrayList<Integer> rrIntervalsList,
+		JSONObject currentSample,
+		TimeData timeData)
+	{
+		if(!currentSample.toString().contains(TAG_RR))
+			return false;
+		
+		ArrayList<Integer> RRValues = TryRetrieveIntegerListElementValue(
+			currentSample.getJSONObject(TAG_RR),
+			TAG_DATA);
+		
+		if(RRValues.size() == 0)
+			return false;
+		
+		for(int index = 0; index < RRValues.size(); ++index)
+		{
+			TimeData toto = FindSpecificTimeData(timeData.absoluteTime, index);
+			if (toto == null) continue;
+			toto.pulse  = RRValues.get(index);
+			
+			// Heart rate (bpm) = 60 / R-R (seconds)
+			float convertedNumber = 60 / (RRValues.get(index) / 1000f);
+			toto.pulse = convertedNumber;
+		}
+	
+		return true;
+	}
+	
+	/**
+	 * Searches a specific time slice.
+	 * 
+	 * @param absoluteTime
+	 *           The absolute time of the time slice to find.
+	 * @param offsetSeconds
+	 *           The offset in number of seconds.
+	 * @return The found time slice, null otherwise.
+	 */
+	private TimeData FindSpecificTimeData(long absoluteTime, int offsetSeconds) {
+		long computedTime = absoluteTime + offsetSeconds * 1000;
+		
+		for (int index = 0; index < _sampleList.size(); ++index)
+		{
+			if(_sampleList.get(index).absoluteTime == computedTime)
+				return _sampleList.get(index);
+		}
+		
+		return null;
+	}
+
 
 	/**
 	 * Attempts to retrieve and add speed data to the current tour.
@@ -463,5 +548,30 @@ public class SuuntoJsonProcessor {
 			return null;
 
 		return result;
+	}
+	
+	/**
+	 * Searches for an element and returns its value as a list of integer.
+	 * 
+	 * @param token
+	 *           The JSON token in which to look for a given element.
+	 * @param elementName
+	 *           The element name to look for in a JSON content.
+	 * @return The element value, if found.
+	 */
+	private ArrayList<Integer> TryRetrieveIntegerListElementValue(JSONObject token, String elementName) {
+		ArrayList<Integer> elementValues = new ArrayList<Integer>();
+		String elements = TryRetrieveStringElementValue(token, elementName);
+		
+		if(elements == null) return elementValues;
+		
+		String[] stringValues = elements.split(",");
+		for(int index = 0; index < stringValues.length; ++index)
+		{
+			Integer rrValue = Integer.parseInt(stringValues[index]);
+			elementValues.add(rrValue);
+		}
+		return elementValues;
+		
 	}
 }
