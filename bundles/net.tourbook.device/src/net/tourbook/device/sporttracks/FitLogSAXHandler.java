@@ -69,6 +69,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 	private static final String						ATTRIB_AVERAGE_RPM			= "AverageRPM";					//$NON-NLS-1$
 	private static final String						ATTRIB_WEATHER_TEMP			= "Temp";							//$NON-NLS-1$
 	private static final String						ATTRIB_WEATHER_CONDITIONS	= "Conditions";					//$NON-NLS-1$
+	private static final String						WIND_SPEED					= "Wind Speed:";					//$NON-NLS-1$
 	//
 	private static final String						TAG_TRACK					= "Track";							//$NON-NLS-1$
 	private static final String						TAG_TRACK_PT				= "pt";							//$NON-NLS-1$
@@ -160,6 +161,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 		private String				weatherText;
 		private String				weatherConditions;
 		private float				weatherTemperature	= Float.MIN_VALUE;
+		private int				    weatherWindSpeed	= Integer.MIN_VALUE;
 	}
 
 	private class Lap {
@@ -260,6 +262,10 @@ public class FitLogSAXHandler extends DefaultHandler {
 		final float weatherTemperature = _currentActivity.weatherTemperature;
 		if (weatherTemperature != Float.MIN_VALUE) {
 			tourData.setAvgTemperature(weatherTemperature);
+		}
+		
+		if (_currentActivity.weatherWindSpeed != Integer.MIN_VALUE) {
+			tourData.setWeatherWindSpeed(_currentActivity.weatherWindSpeed);
 		}
 
 		tourData.setImportFilePath(_importFilePath);
@@ -671,6 +677,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 
 			_isInWeather = false;
 			_currentActivity.weatherText = _characters.toString();
+			_currentActivity.weatherWindSpeed = parseWindSpeed(_characters.toString());
 		}
 	}
 
@@ -749,6 +756,24 @@ public class FitLogSAXHandler extends DefaultHandler {
 			_currentActivity.timeSlices.add(timeSlice);
 		}
 	}
+	
+	private int parseWindSpeed(final String weatherText) {
+		
+		if(!weatherText.contains(WIND_SPEED))
+			return Integer.MIN_VALUE;
+		
+		int windSpeedIndex = weatherText.indexOf(WIND_SPEED) + WIND_SPEED.length();
+		int windSpeedUnitIndex = weatherText.indexOf("mph");
+		
+		String windSpeed = weatherText.substring(windSpeedIndex, windSpeedUnitIndex);
+		float windSpeedValue = Float.parseFloat(windSpeed);
+		
+		// Converting to the current unit
+		windSpeedValue *= net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+		
+		return Math.round(windSpeedValue);
+	}
+
 
 	@Override
 	public void startElement(final String uri, final String localName, final String name, final Attributes attributes)
