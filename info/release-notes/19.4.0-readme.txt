@@ -30,8 +30,8 @@ Improvements
 
 * 2.5D Map
 
-  - Map bookmarks can be displayed in the map
-
+   - Show map bookmarks in the map
+   - Show tour marker label
 
 
 Changes
