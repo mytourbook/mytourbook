@@ -742,7 +742,6 @@ public class Messages extends NLS {
    public static String        Geo_Compare_Label_ReferenceTour;
 
    public static String        GeoCompare_View_Action_AppFilter_Tooltip;
-   public static String        GeoCompare_View_Action_IsSyncMapPosition_Tooltip;
    public static String        GeoCompare_View_Action_OnOff_Tooltip;
    public static String        GeoCompare_View_Column_GeoDiff_Header;
    public static String        GeoCompare_View_Column_GeoDiff_Label;
@@ -1889,11 +1888,7 @@ public class Messages extends NLS {
 
    public static String Slideout_Map25MarkerOptions_Checkbox_IsMarkerClustering;
    public static String Slideout_Map25MarkerOptions_Checkbox_IsShowBookmarks;
-
-   public static String Slideout_Map25MarkerOptions_Checkbox_IsShowMarkerPoint;
-
    public static String Slideout_Map25MarkerOptions_Checkbox_IsShowTourMarker;
-
    public static String Slideout_Map25MarkerOptions_Group_MarkerLayout;
    public static String Slideout_Map25MarkerOptions_Label_ClusterGridSize;
    public static String Slideout_Map25MarkerOptions_Label_ClusterOpacity;
@@ -1938,10 +1933,8 @@ public class Messages extends NLS {
    public static String Slideout_Map_Options_Checkbox_ZoomWithMousePosition_Tooltip;
    public static String Slideout_Map_Options_Label_SliderPath_Segements;
    public static String Slideout_Map_Options_Checkbox_ChartSlider;
-   public static String Slideout_Map_Options_Checkbox_ShowTourTooltip;
-
-   public static String Slideout_Map_Options_Checkbox_ShowTourTooltip_Tooltip;
-
+   public static String Slideout_Map_Options_Checkbox_ShowHoveredSelectedTour;
+   public static String Slideout_Map_Options_Checkbox_ShowHoveredSelectedTour_Tooltip;
    public static String Slideout_Map_Options_Checkbox_SliderPath;
    public static String Slideout_Map_Options_Checkbox_SliderPath_Tooltip;
    public static String Slideout_Map_Options_Checkbox_TrackOpacity;
@@ -2041,11 +2034,11 @@ public class Messages extends NLS {
    public static String Slideout_TourGeoFilter_Checkbox_IsAutoOpenSlideout;
    public static String Slideout_TourGeoFilter_Checkbox_IsAutoOpenSlideout_Tooltip;
    public static String Slideout_TourGeoFilter_Checkbox_IsSyncMapPosition;
+   public static String Slideout_TourGeoFilter_Checkbox_IsSyncMapPosition_Tooltip;
    public static String Slideout_TourGeoFilter_Checkbox_IsUseFastMapPainting;
    public static String Slideout_TourGeoFilter_Checkbox_IsUseFastMapPainting_Tooltip;
    public static String Slideout_TourGeoFilter_Checkbox_UseAppFilter;
    public static String Slideout_TourGeoFilter_Color_GeoPartHover_Tooltip;
-   public static String Slideout_TourGeoFilter_Color_GeoParts_HoverSelecting;
    public static String Slideout_TourGeoFilter_Color_GeoPartSelected_Tooltip;
    public static String Slideout_TourGeoFilter_Column_Created_Label;
    public static String Slideout_TourGeoFilter_Column_FilterName_Label;
@@ -2063,7 +2056,6 @@ public class Messages extends NLS {
    public static String Slideout_TourGeoFilter_Dialog_DeleteAllFilter_Title;
    public static String Slideout_TourGeoFilter_Label_FilterIncludeExclude;
    public static String Slideout_TourGeoFilter_Label_GeoPartColor;
-   public static String Slideout_TourGeoFilter_Label_GeoPartColor_Tooltip;
    public static String Slideout_TourGeoFilter_Label_Hint;
    public static String Slideout_TourGeoFilter_Label_History;
    public static String Slideout_TourGeoFilter_Label_Title;
@@ -2072,7 +2064,6 @@ public class Messages extends NLS {
    public static String Slideout_TourGeoFilter_Radio_GeoParts_Include;
    public static String Slideout_TourGeoFilter_Radio_GeoParts_Include_Tooltip;
    public static String Slideout_TourGeoFilter_Spinner_FastMapPainting_SkippedValues_Tooltip;
-   public static String Slideout_TourGeoFilter_Spinner_GridBoxSize;
 
    public static String Slideout_TourInfoOptions_Checkbox_IsShowInfoTooltip;
    public static String Slideout_TourInfoOptions_Checkbox_IsShowTourSeparator;

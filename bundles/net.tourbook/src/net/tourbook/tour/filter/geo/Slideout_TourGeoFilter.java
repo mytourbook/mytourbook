@@ -527,7 +527,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
             // checkbox
             _chkIsSyncMapPosition = new Button(container, SWT.CHECK);
             _chkIsSyncMapPosition.setText(Messages.Slideout_TourGeoFilter_Checkbox_IsSyncMapPosition);
-            _chkIsSyncMapPosition.setToolTipText(Messages.GeoCompare_View_Action_IsSyncMapPosition_Tooltip);
+            _chkIsSyncMapPosition.setToolTipText(Messages.Slideout_TourGeoFilter_Checkbox_IsSyncMapPosition_Tooltip);
             _chkIsSyncMapPosition.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {

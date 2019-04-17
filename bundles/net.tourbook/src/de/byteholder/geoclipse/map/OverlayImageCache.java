@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,101 +19,101 @@ import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.eclipse.swt.graphics.Image;
-
 import net.tourbook.common.util.StatusUtil;
+
+import org.eclipse.swt.graphics.Image;
 
 /**
  * cache for overlay images
  */
 class OverlayImageCache {
 
-	private static final int						MAX_CACHE_ENTRIES	= 200;
+   private static final int                       MAX_CACHE_ENTRIES = 200;
 
-	private final ConcurrentHashMap<String, Image>	_imageCache			= new ConcurrentHashMap<>();
-	private final ConcurrentLinkedQueue<String>		_imageCacheFifo		= new ConcurrentLinkedQueue<>();
+   private final ConcurrentHashMap<String, Image> _imageCache       = new ConcurrentHashMap<>();
+   private final ConcurrentLinkedQueue<String>    _imageCacheFifo   = new ConcurrentLinkedQueue<>();
 
-	public void add(final String tileKey, final Image overlayImage) {
+   public void add(final String tileKey, final Image overlayImage) {
 
-		final int cacheSize = _imageCacheFifo.size();
-		if (cacheSize > MAX_CACHE_ENTRIES) {
+      final int cacheSize = _imageCacheFifo.size();
+      if (cacheSize > MAX_CACHE_ENTRIES) {
 
-			// remove cache items
-			for (int cacheIndex = MAX_CACHE_ENTRIES; cacheIndex < cacheSize; cacheIndex++) {
+         // remove cache items
+         for (int cacheIndex = MAX_CACHE_ENTRIES; cacheIndex < cacheSize; cacheIndex++) {
 
-				// remove and dispose oldest image
+            // remove and dispose oldest image
 
-				final String headTileKey = _imageCacheFifo.poll();
-				final Image headImage = _imageCache.remove(headTileKey);
+            final String headTileKey = _imageCacheFifo.poll();
+            final Image headImage = _imageCache.remove(headTileKey);
 
-				if (headImage != null) {
-					try {
-						headImage.dispose();
-					} catch (final Exception e) {
-						// it is possible that the image is already disposed by another thread
-					}
-				}
-			}
-		}
+            if (headImage != null) {
+               try {
+                  headImage.dispose();
+               } catch (final Exception e) {
+                  // it is possible that the image is already disposed by another thread
+               }
+            }
+         }
+      }
 
-		try {
+      try {
 
-			/*
-			 * check if the image is already in the cache
-			 */
-			final Image cachedImage = _imageCache.get(tileKey);
-			if (cachedImage == null) {
+         /*
+          * check if the image is already in the cache
+          */
+         final Image cachedImage = _imageCache.get(tileKey);
+         if (cachedImage == null) {
 
-				// this is a new image
+            // this is a new image
 
-				_imageCache.put(tileKey, overlayImage);
-				_imageCacheFifo.add(tileKey);
+            _imageCache.put(tileKey, overlayImage);
+            _imageCacheFifo.add(tileKey);
 
-				return;
+            return;
 
-			} else {
+         } else {
 
-				// an image for the key already exists
+            // an image for the key already exists
 
-				if (cachedImage == overlayImage) {
+            if (cachedImage == overlayImage) {
 
-					// image is already in the cache
+               // image is already in the cache
 
-					return;
+               return;
 
-				} else {
+            } else {
 
-					// dispose cached image which has the same key but is another image
+               // dispose cached image which has the same key but is another image
 
-					if (cachedImage != null) {
-						try {
-							cachedImage.dispose();
-						} catch (final Exception e) {
-							// it is possible that the image is already disposed by another thread
-						}
-					}
+               if (cachedImage != null) {
+                  try {
+                     cachedImage.dispose();
+                  } catch (final Exception e) {
+                     // it is possible that the image is already disposed by another thread
+                  }
+               }
 
-					// replace existing image, the image must be already in the fifo queue
-					_imageCache.put(tileKey, overlayImage);
+               // replace existing image, the image must be already in the fifo queue
+               _imageCache.put(tileKey, overlayImage);
 
-					return;
-				}
+               return;
+            }
 
-			}
+         }
 
-		} catch (final Exception e) {
-			StatusUtil.log(e.getMessage(), e);
-		}
-	}
+      } catch (final Exception e) {
+         StatusUtil.log(e.getMessage(), e);
+      }
+   }
 
-	/**
-	 * Dispose all overlay images in the cache
-	 */
-	public synchronized void dispose() {
+   /**
+    * Dispose all overlay images in the cache
+    */
+   public synchronized void dispose() {
 
-		// dispose cached images
-		final Collection<Image> images = _imageCache.values();
-		for (final Image image : images) {
+      // dispose cached images
+      final Collection<Image> images = _imageCache.values();
+      for (final Image image : images) {
 
          try {
 
@@ -132,25 +132,25 @@ class OverlayImageCache {
             //   at org.eclipse.ui.preferences.ScopedPreferenceStore$2.run(ScopedPreferenceStore.java:345)
             //   at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
          }
-		}
+      }
 
-		_imageCache.clear();
-		_imageCacheFifo.clear();
-	}
+      _imageCache.clear();
+      _imageCacheFifo.clear();
+   }
 
-	/**
-	 * @param tileKey
-	 * @return Returns the overlay image or <code>null</code> when the image is not available or
-	 *         disposed
-	 */
-	public Image get(final String tileKey) {
+   /**
+    * @param tileKey
+    * @return Returns the overlay image or <code>null</code> when the image is not available or
+    *         disposed
+    */
+   public Image get(final String tileKey) {
 
-		final Image image = _imageCache.get(tileKey);
-		if (image != null && !image.isDisposed()) {
-			return image;
-		}
+      final Image image = _imageCache.get(tileKey);
+      if (image != null && !image.isDisposed()) {
+         return image;
+      }
 
-		return null;
-	}
+      return null;
+   }
 
 }
