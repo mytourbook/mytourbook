@@ -39,6 +39,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.device.InvalidDeviceSAXException;
 import net.tourbook.device.Messages;
 import net.tourbook.preferences.TourTypeColorDefinition;
+import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.ChartLabel;
 
 public class FitLogSAXHandler extends DefaultHandler {
@@ -757,19 +758,20 @@ public class FitLogSAXHandler extends DefaultHandler {
 		}
 	}
 	
-	private int parseWindSpeed(final String weatherText) {
+	private  int parseWindSpeed(final String weatherText) {
 		
-		if(!weatherText.contains(WIND_SPEED))
+		if(!weatherText.contains(WIND_SPEED) ||
+				!weatherText.contains(net.tourbook.common.UI.UNIT_SPEED_MPH))
 			return Integer.MIN_VALUE;
 		
 		int windSpeedIndex = weatherText.indexOf(WIND_SPEED) + WIND_SPEED.length();
-		int windSpeedUnitIndex = weatherText.indexOf("mph");
+		int windSpeedUnitIndex = weatherText.indexOf(net.tourbook.common.UI.UNIT_SPEED_MPH);
 		
 		String windSpeed = weatherText.substring(windSpeedIndex, windSpeedUnitIndex);
 		float windSpeedValue = Float.parseFloat(windSpeed);
 		
 		// Converting to the current unit
-		windSpeedValue *= net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+		windSpeedValue *= UI.UNIT_VALUE_DISTANCE;
 		
 		return Math.round(windSpeedValue);
 	}
