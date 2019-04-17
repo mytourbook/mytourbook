@@ -52,7 +52,8 @@ Bugfix
 
 * 2D Map
 
-  - Fixed issue which lasted forever, that basic painting skipped values
+  - Fixed issue which lasted forever, the basic painting skipped values
+  - Fixed some SWT resource leaks which caused a "No more handles" exception
 
 
 * Tour View

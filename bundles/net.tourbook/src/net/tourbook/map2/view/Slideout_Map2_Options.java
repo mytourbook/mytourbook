@@ -178,8 +178,8 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
             {
                // checkbox
                _chkIsShowHoveredTour = new Button(container, SWT.CHECK);
-               _chkIsShowHoveredTour.setText(Messages.Slideout_Map_Options_Checkbox_ShowTourTooltip);
-               _chkIsShowHoveredTour.setToolTipText(Messages.Slideout_Map_Options_Checkbox_ShowTourTooltip_Tooltip);
+               _chkIsShowHoveredTour.setText(Messages.Slideout_Map_Options_Checkbox_ShowHoveredSelectedTour);
+               _chkIsShowHoveredTour.setToolTipText(Messages.Slideout_Map_Options_Checkbox_ShowHoveredSelectedTour_Tooltip);
                _chkIsShowHoveredTour.addSelectionListener(new SelectionAdapter() {
                   @Override
                   public void widgetSelected(final SelectionEvent e) {

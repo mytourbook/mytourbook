@@ -213,6 +213,8 @@ public class Map2View extends ViewPart implements
    private static final String   IMAGE_GRAPH_RUN_DYN_STEP_LENGTH                       = net.tourbook.Messages.Image__Graph_RunDyn_StepLength;
    private static final String   IMAGE_GRAPH_RUN_DYN_STEP_LENGTH_DISABLED              = net.tourbook.Messages.Image__Graph_RunDyn_StepLength_Disabled;
    private static final String   IMAGE_SEARCH_TOURS_BY_LOCATION                        = net.tourbook.Messages.Image__SearchToursByLocation;
+   private static final String   IMAGE_MAP_OPTIONS                                     = net.tourbook.Messages.Image__MapOptions;
+   private static final String   IMAGE_MAP_OPTIONS_DISABLED                            = net.tourbook.Messages.Image__MapOptions_Disabled;
 
    private static final String   STATE_IS_SHOW_TOUR_IN_MAP                             = "STATE_IS_SHOW_TOUR_IN_MAP";                          //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_PHOTO_IN_MAP                            = "STATE_IS_SHOW_PHOTO_IN_MAP";                         //$NON-NLS-1$
@@ -491,6 +493,12 @@ public class Map2View extends ViewPart implements
    }
 
    private class ActionMap2_Options extends ActionToolbarSlideout {
+
+      public ActionMap2_Options() {
+
+         super(TourbookPlugin.getImageDescriptor(IMAGE_MAP_OPTIONS),
+               TourbookPlugin.getImageDescriptor(IMAGE_MAP_OPTIONS_DISABLED));
+      }
 
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
@@ -2333,6 +2341,17 @@ public class Map2View extends ViewPart implements
    }
 
    @Override
+   public void onMapBookmarkActionPerformed(final MapBookmark mapBookmark, final MapBookmarkEventType mapBookmarkEventType) {
+      {
+         if (mapBookmarkEventType == MapBookmarkEventType.MOVETO) {
+            _isInSelectBookmark = true;
+            moveToMapLocation(mapBookmark);
+            _isInSelectBookmark = false;
+         }
+      }
+   }
+
+   @Override
    public void onMapInfo(final GeoPosition mapCenter, final int mapZoomLevel) {
 
       _mapInfoManager.setMapPosition(mapCenter.latitude, mapCenter.longitude, mapZoomLevel);
@@ -2361,16 +2380,6 @@ public class Map2View extends ViewPart implements
       final MapPosition mapPosition = new MapLocation(geoCenter, zoomLevel - 1).getMapPosition();
 
       MapManager.fireSyncMapEvent(mapPosition, this, 0);
-   }
-
-   @Override
-   public void onSelectBookmark(final MapBookmark mapBookmark) {
-
-      _isInSelectBookmark = true;
-      {
-         moveToMapLocation(mapBookmark);
-      }
-      _isInSelectBookmark = false;
    }
 
    /**
@@ -3972,4 +3981,5 @@ public class Map2View extends ViewPart implements
          paintTours_10_All();
       }
    }
+
 }

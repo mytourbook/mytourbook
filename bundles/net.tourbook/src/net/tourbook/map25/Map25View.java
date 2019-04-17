@@ -123,6 +123,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    private static final String            STATE_IS_LAYER_BASE_MAP_VISIBLE                  = "STATE_IS_LAYER_BASE_MAP_VISIBLE";                        //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_BUILDING_VISIBLE                  = "STATE_IS_LAYER_BUILDING_VISIBLE";                        //$NON-NLS-1$
    //private static final String          STATE_IS_LAYER_S3DB_VISIBLE                      = "STATE_IS_LAYER_S3DB_VISIBLE";                            //$NON-NLS-1$
+   private static final String            STATE_IS_LAYER_BOOKMARK_VISIBLE                  = "STATE_IS_LAYER_BOOKMARK_VISIBLE";                        //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_HILLSHADING_VISIBLE               = "STATE_IS_LAYER_HILLSHADING_VISIBLE";                     //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_LABEL_VISIBLE                     = "STATE_IS_LAYER_LABEL_VISIBLE";                           //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_MARKER_VISIBLE                    = "STATE_IS_LAYER_MARKER_VISIBLE";                          //$NON-NLS-1$
@@ -347,7 +348,9 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
    public void actionShowTourMarker(final boolean isMarkerVisible) {
 
-      _mapApp.getLayer_Marker().setEnabled(isMarkerVisible);
+      _mapApp.getLayer_MapBookmark().setEnabled(isMarkerVisible);
+      _mapApp.getLayer_TourMarker().setEnabled(isMarkerVisible);
+      
       _mapApp.getMap().render();
 
       enableActions();
@@ -1018,10 +1021,17 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    }
 
    @Override
-   public void onSelectBookmark(final MapBookmark mapBookmark) {
-
-      moveToMapLocation(mapBookmark);
+   public void onMapBookmarkActionPerformed(final MapBookmark mapBookmark, final MapBookmarkEventType  mapBookmarkEventType) {
+      
+      if (mapBookmarkEventType == MapBookmarkEventType.MOVETO) { 
+         //System.out.println("*** Map25View_onMapBookmarkActionPerformed moveto: " + mapBookmark.name);
+         moveToMapLocation(mapBookmark);
+      } else if (mapBookmarkEventType == MapBookmarkEventType.MODIFIED) {
+         //System.out.println("*** Map25View_onMapBookmarkActionPerformed modify: " + mapBookmark.name);
+         _mapApp.updateUI_MapBookmarkLayer();
+      }
    }
+
 
    private void onSelectionChanged(final ISelection selection) {
 
@@ -1345,7 +1355,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       /*
        * Markers
        */
-      final MarkerLayer markerLayer = _mapApp.getLayer_Marker();
+      final MarkerLayer markerLayer = _mapApp.getLayer_TourMarker();
       if (markerLayer.isEnabled()) {
 
          final List<MapMarker> allMarkers = createMapMarkers(_allTourData);
@@ -1398,10 +1408,10 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       _actionShowTour_WithOptions.setSelection(_isShowTour);
       _mapApp.getLayer_Tour().setEnabled(_isShowTour);
 
-      // marker layer
+      // tour marker layer
       final boolean isMarkerVisible = Util.getStateBoolean(_state, STATE_IS_LAYER_MARKER_VISIBLE, true);
       _actionShowMarker_WithOptions.setSelected(isMarkerVisible);
-      _mapApp.getLayer_Marker().setEnabled(isMarkerVisible);
+      _mapApp.getLayer_TourMarker().setEnabled(isMarkerVisible);
 
       // hillshading layer
       final BitmapTileLayer layer_HillShading = _mapApp.getLayer_HillShading();
@@ -1414,6 +1424,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       // other layers
       _mapApp.getLayer_BaseMap().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_BASE_MAP_VISIBLE, true));
       _mapApp.getLayer_Building().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_BUILDING_VISIBLE, true));
+      _mapApp.getLayer_MapBookmark().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_BOOKMARK_VISIBLE, true));
       //_mapApp.getLayer_S3DB().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_S3DB_VISIBLE, true));
 
       _mapApp.getLayer_Label().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_LABEL_VISIBLE, true));
@@ -1438,9 +1449,10 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
       _state.put(STATE_IS_LAYER_BASE_MAP_VISIBLE, _mapApp.getLayer_BaseMap().isEnabled());
       _state.put(STATE_IS_LAYER_BUILDING_VISIBLE, _mapApp.getLayer_Building().isEnabled());
+      _state.put(STATE_IS_LAYER_BOOKMARK_VISIBLE, _mapApp.getLayer_MapBookmark().isEnabled());
       //_state.put(STATE_IS_LAYER_S3DB_VISIBLE, _mapApp.getLayer_S3DB().isEnabled());
       _state.put(STATE_IS_LAYER_LABEL_VISIBLE, _mapApp.getLayer_Label().isEnabled());
-      _state.put(STATE_IS_LAYER_MARKER_VISIBLE, _mapApp.getLayer_Marker().isEnabled());
+      _state.put(STATE_IS_LAYER_MARKER_VISIBLE, _mapApp.getLayer_TourMarker().isEnabled());
       _state.put(STATE_IS_LAYER_TILE_INFO_VISIBLE, _mapApp.getLayer_TileInfo().isEnabled());
       _state.put(STATE_IS_LAYER_TOUR_VISIBLE, _mapApp.getLayer_Tour().isEnabled());
       _state.put(STATE_IS_LAYER_SCALE_BAR_VISIBLE, _mapApp.getLayer_ScaleBar().isEnabled());

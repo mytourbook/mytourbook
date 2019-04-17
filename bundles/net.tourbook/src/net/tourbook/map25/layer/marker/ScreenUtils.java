@@ -35,6 +35,7 @@ public class ScreenUtils {
 		private int		_symbolSize;
 		private String	_text;
 		private float	_outlineWidth;
+		private Bitmap _bitmapPoi = null;
 
 		/**
 		 * Generates a circle with a number inside
@@ -63,7 +64,12 @@ public class ScreenUtils {
 			setup(sizedp, foregroundColor, backgroundColor, symbolSizeWeight);
 		}
 
-		public Bitmap getBitmap() {
+		/**
+		 * creates a cluster Bitmap.
+		 * @param additionalBitmap , null when no additional bitmap wanted
+		 * @return
+		 */
+		public Bitmap getBitmap(Bitmap additionalBitmap) {
 
 			/**
 			 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -89,6 +95,17 @@ public class ScreenUtils {
 			final Bitmap bitmap = CanvasAdapter.newBitmap(bitmapSizeInt, bitmapSizeInt, 0);
 			final Canvas canvas = CanvasAdapter.newCanvas();
 			canvas.setBitmap(bitmap);
+			
+		//	{  //(testing block
+			   /*
+			    * the following three or four lines displaying a transparent box.
+			    * only for testing purposes, normally uncommented
+			    */
+		//	   int oldColor = _fillPainter.getColor();
+		//	   _fillPainter.setColor(0x60ffffff);
+		//	   canvas.drawCircle(0, 0, bitmapSizeInt*2, _fillPainter);
+		//	   _fillPainter.setColor(oldColor);
+		//	}
 
 			// fill symbol
 			canvas.drawCircle(noClippingPos, noClippingPos, fillRadius, _fillPainter);
@@ -96,6 +113,15 @@ public class ScreenUtils {
 			// draw outline
 			if (_outlineWidth > 0) {
 				canvas.drawCircle(noClippingPos, noClippingPos, outlineRadius, _outlinePainter);
+			}
+			
+			// draw additional symbol
+			if (additionalBitmap != null) {
+			   if (additionalBitmap.getWidth() <= bitmapSizeInt) {
+			      canvas.drawBitmap(additionalBitmap, (bitmapSizeInt / 2 - additionalBitmap.getWidth() / 2) + 1, (bitmapSizeInt / 2 - additionalBitmap.getHeight() / 2) + 1);
+			   } else {
+			      canvas.drawBitmapScaled(additionalBitmap);
+			   }
 			}
 
 			// draw the number at the center
@@ -108,6 +134,10 @@ public class ScreenUtils {
 			return bitmap;
 		}
 
+		public Bitmap  getBitmap() {
+		   return getBitmap(null);
+		}
+		
 		/**
 		 * @param symbolSizeDP
 		 * @param foregroundColor
