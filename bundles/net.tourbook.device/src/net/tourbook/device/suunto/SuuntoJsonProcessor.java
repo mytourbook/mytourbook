@@ -28,18 +28,18 @@ public class SuuntoJsonProcessor {
 	private int							_lapCounter;
 	final IPreferenceStore			_prefStore			= TourbookPlugin.getDefault().getPreferenceStore();
 
-	public static final String		TAG_SAMPLES			= "Samples";													//$NON-NLS-1$
-	public static final String		TAG_SAMPLE			= "Sample";														//$NON-NLS-1$
-	public static final String		TAG_TIMEISO8601	= "TimeISO8601";												//$NON-NLS-1$
-	public static final String		TAG_ATTRIBUTES		= "Attributes";												//$NON-NLS-1$
-	public static final String		TAG_SOURCE			= "Source";														//$NON-NLS-1$
+	public static final String	TAG_SAMPLES			= "Samples";													//$NON-NLS-1$
+	public static final String	TAG_SAMPLE			= "Sample";														//$NON-NLS-1$
+	public static final String	TAG_TIMEISO8601		= "TimeISO8601";												//$NON-NLS-1$
+	public static final String	TAG_ATTRIBUTES		= "Attributes";												//$NON-NLS-1$
+	public static final String	TAG_SOURCE			= "Source";														//$NON-NLS-1$
 	private static final String	TAG_SUUNTOSML		= "suunto/sml";												//$NON-NLS-1$
 	private static final String	TAG_LAP				= "Lap";															//$NON-NLS-1$
 	private static final String	TAG_MANUAL			= "Manual";														//$NON-NLS-1$
 	private static final String	TAG_DISTANCE		= "Distance";													//$NON-NLS-1$
-	public static final String		TAG_GPSALTITUDE	= "GPSAltitude";												//$NON-NLS-1$
-	public static final String		TAG_LATITUDE		= "Latitude";													//$NON-NLS-1$
-	public static final String		TAG_LONGITUDE		= "Longitude";													//$NON-NLS-1$
+	public static final String	TAG_GPSALTITUDE		= "GPSAltitude";												//$NON-NLS-1$
+	public static final String	TAG_LATITUDE		= "Latitude";													//$NON-NLS-1$
+	public static final String	TAG_LONGITUDE		= "Longitude";													//$NON-NLS-1$
 	private static final String	TAG_TYPE				= "Start";														//$NON-NLS-1$
 	private static final String	TAG_START			= "Type";														//$NON-NLS-1$
 	private static final String	TAG_PAUSE			= "Pause";														//$NON-NLS-1$
@@ -48,9 +48,19 @@ public class SuuntoJsonProcessor {
 	private static final String	TAG_DATA			= "Data";															//$NON-NLS-1$
 	private static final String	TAG_SPEED			= "Speed";														//$NON-NLS-1$
 	private static final String	TAG_CADENCE			= "Cadence";													//$NON-NLS-1$
-	public static final String		TAG_ALTITUDE		= "Altitude";													//$NON-NLS-1$
+	public static final String	TAG_ALTITUDE		= "Altitude";													//$NON-NLS-1$
 	private static final String	TAG_POWER			= "Power";														//$NON-NLS-1$
-	private static final String	TAG_TEMPERATURE	= "Temperature";												//$NON-NLS-1$
+	private static final String	TAG_TEMPERATURE		= "Temperature";
+	
+	// Swimming
+	private static final String Breaststroke 		= "Breaststroke";
+	private static final String Freestyle			= "Freestyle";
+	private static final String PoolLengthDuration  = "PrevPoolLengthDuration";
+	private static final String PoolLengthStyle 	= "PrevPoolLengthStyle";
+	private static final String Stroke 				= "Stroke";
+	private static final String TotalLengths 		= "TotalLengths";
+	private static final String Turn 				= "Turn";
+	private static final String Type				= "Type";
 
 	/**
 	 * Processes and imports a Suunto activity (from a Suunto 9 or Spartan watch).
@@ -84,6 +94,9 @@ public class SuuntoJsonProcessor {
 
 		TourData tourData = InitializeActivity(firstSample, activityToReUse, sampleListToReUse);
 
+		tourData.swim_Time
+		
+		
 		if (tourData == null)
 			return null;
 
