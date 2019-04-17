@@ -19,6 +19,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.IOpeningDialog;
+import net.tourbook.common.util.Util;
 import net.tourbook.map25.Map25View;
 import net.tourbook.map25.ui.SlideoutMap25_MarkerOptions;
 
@@ -69,6 +70,14 @@ public class ActionMap25_ShowMarker extends ContributionItem implements IOpening
 
       _imageEnabled = TourbookPlugin.getImageDescriptor(IMAGE_EDIT_TOUR_MARKER).createImage();
       _imageDisabled = TourbookPlugin.getImageDescriptor(IMAGE_EDIT_TOUR_MARKER_DISABLED).createImage();
+
+      parent.addDisposeListener(new DisposeListener() {
+
+         @Override
+         public void widgetDisposed(final DisposeEvent e) {
+            onDispose();
+         }
+      });
    }
 
    @Override
@@ -146,6 +155,12 @@ public class ActionMap25_ShowMarker extends ContributionItem implements IOpening
       }
 
       _map25View.actionShowTourMarker(isMarkerVisible);
+   }
+
+   private void onDispose() {
+
+      Util.disposeResource(_imageEnabled);
+      Util.disposeResource(_imageDisabled);
    }
 
    private void onMouseMove(final ToolItem item, final MouseEvent mouseEvent) {
