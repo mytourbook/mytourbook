@@ -53,6 +53,7 @@ public class SuuntoJsonProcessor {
 	private static final String	TAG_TEMPERATURE		= "Temperature";
 	
 	// Swimming
+	private static final String Swimming 		= "Swimming";
 	private static final String Breaststroke 		= "Breaststroke";
 	private static final String Freestyle			= "Freestyle";
 	private static final String PoolLengthDuration  = "PrevPoolLengthDuration";
@@ -94,8 +95,8 @@ public class SuuntoJsonProcessor {
 
 		TourData tourData = InitializeActivity(firstSample, activityToReUse, sampleListToReUse);
 
-		tourData.swim_Time
-		
+		//tourData.swim_Time
+		//see finalizeTour_SwimData
 		
 		if (tourData == null)
 			return null;
@@ -108,6 +109,7 @@ public class SuuntoJsonProcessor {
 		ArrayList<Integer> rrIntervalsList = new ArrayList<Integer>();
 		Instant minInstant = Instant.ofEpochMilli(Long.MIN_VALUE);
 		ZonedDateTime pauseStartTime = minInstant.atZone(ZoneOffset.UTC);
+		int previousTotalLength = 0;
 		for (int i = 0; i < samples.length(); ++i) {
 			String currentSampleSml;
 			String currentSampleData;
@@ -231,6 +233,46 @@ public class SuuntoJsonProcessor {
 
 			// Temperature
 			wasDataPopulated |= TryAddTemperatureData(new JSONObject(currentSampleData), timeData);
+			
+			//Swimming data
+			if (currentSampleData.contains(Swimming))
+			{
+				int currentTotalLength = TryAddSwimmingData(
+					null,
+					new JSONObject(currentSampleData),
+					currentZonedDateTime,
+					previousTotalLength);
+
+				// if (previousTotalLength == 0) => It is likely to be
+				// a Stroke
+/*
+				if (previousTotalLength > 0 &&
+					previousTotalLength == currentTotalLength)
+				{
+					// If the current total length equals the previous
+					// total length, it was likely a "rest" and we retrieve
+					// the very last pool length in order to create a
+					// rest lap.
+					IPoolLengthInfo lastPoolLengthInfo = null;
+					foreach (ILapInfo laps in activity.Laps)
+					{
+						foreach (IPoolLengthInfo lapsPoolLength in laps.PoolLengths)
+						{
+							lastPoolLengthInfo = lapsPoolLength;
+						}
+					}
+					//activity.Laps.Add(
+					//	currentSampleDate,
+					//	currentSampleDate - toto.StartTime.ToLocalTime());
+
+					previousLapStartTime = currentSampleDate;
+				}
+
+				if (currentTotalLength > 0)
+					previousTotalLength = currentTotalLength;
+					*/
+			}
+
 
 			if (wasDataPopulated && !reusePreviousTimeEntry)
 				_sampleList.add(timeData);
@@ -538,6 +580,145 @@ public class SuuntoJsonProcessor {
 		}
 		return false;
 	}
+	
+	/**
+	 * Attempts to retrieve, process and add swimming data into an activity.
+	 * 
+	 * @param tour
+	 *           A given tour.
+	 * @param currentSample
+	 *           The current sample data in JSON format.
+	 * @param currentSampleDate
+	 *           The DateTime of the current data.
+	 * @param previousTotalLengths
+	 *           The previous SuuntoDataNames.TotalLengths value.
+	 * @return The total number of pool lengths
+	 */
+			private int TryAddSwimmingData(
+				TourData tour,
+				JSONObject currentSample,
+				ZonedDateTime currentSampleDate,
+				int previousTotalLengths)
+			{
+				//ILapInfo lap;
+				int lapIndex = 0;
+				JSONArray Events = (JSONArray) currentSample.get("Events");
+				JSONObject array = (JSONObject) Events.get(0);
+				JSONObject swimmingSample = (JSONObject) array.get(Swimming);
+
+			String currentTotalLengthStr =	TryRetrieveStringElementValue(
+					swimmingSample,
+					TotalLengths);
+			
+			int currentTotalLength = Integer.parseInt(currentTotalLengthStr);
+
+				if (currentTotalLength > 0 &&
+					currentTotalLength == previousTotalLengths)
+					return currentTotalLength;
+
+				if (tour.getTourMarkers() == null || tour.getTourMarkers().size() == 0)
+				{
+					//lap = tour.Laps.Add(
+					//	currentSampleDate,
+					//	new TimeSpan());
+
+					//It is very likely that we are at the first lap and hence
+					//there is no data to import.
+					if (currentTotalLength == 0)
+						return currentTotalLength;
+				}
+				else
+				{
+				//	if (activity.Laps.Count == 1)
+					//	lapIndex = 0;
+					//else
+					//	lapIndex = activity.Laps.Count - 1;
+
+					//lap = this.activity.Laps[lapIndex];
+
+					// We initialize the total distance otherwise we can't increment
+					// the distance
+				//	if (lap.PoolLengths.Count == 0)
+				//		lap.TotalDistanceMeters = 0f;
+				}
+/*
+				if (TryRetrieveElementValue(
+					swimmingSample,
+					SuuntoDataNames.Type,
+					out object type))
+				{
+					IPoolLengthInfo currentPoolLength =
+						GetCurrentPoolLength(activity, lapIndex);
+					switch (type.ToString())
+					{
+						case SuuntoDataNames.Turn:
+							if (currentPoolLength == null)
+								break;
+
+							if (TryRetrieveElementValue(
+								swimmingSample,
+								SuuntoDataNames.PoolLengthDuration,
+								out object durationValue))
+							{
+								currentPoolLength.TotalTime =
+									TimeSpan.Parse($"00:00:{durationValue:F2}");
+							}
+
+							if (TryRetrieveElementValue(
+								swimmingSample,
+								SuuntoDataNames.PoolLengthStyle,
+								out object poolLengthStyle))
+							{
+								switch (poolLengthStyle.ToString())
+								{
+									case SuuntoDataNames.Breaststroke:
+										currentPoolLength.StrokeType =
+											SwimStroke.Type.Breaststroke;
+										break;
+									case Freestyle:
+										currentPoolLength.StrokeType =
+											SwimStroke.Type.Freestyle;
+										break;
+									//TODO What are all the possible swim styles ???
+									default:
+										currentPoolLength.StrokeType =
+											SwimStroke.Type.Unspecified;
+										break;
+								}
+							}
+
+							if (TryRetrieveFloatElementValue(
+								currentSample,
+								SuuntoDataNames.Distance,
+								out float distanceValue))
+							{
+								currentPoolLength.TotalDistanceMeters +=
+									distanceValue -
+									activity.TotalDistanceMetersEntered;
+								activity.TotalDistanceMetersEntered = distanceValue;
+								lap.TotalDistanceMeters += currentPoolLength
+									.TotalDistanceMeters;
+							}
+							break;
+						case SuuntoDataNames.Stroke:
+							// If there is no previous pool length or if the
+							// previous one is finished (total time is not equal to
+							// 0), we create a new one.
+							if (currentPoolLength == null || currentPoolLength.TotalTime != TimeSpan.Zero)
+							{
+								currentPoolLength = lap.PoolLengths.Add(
+									currentSampleDate,
+									new TimeSpan());
+							}
+
+							++currentPoolLength.StrokeCount;
+							break;
+					}
+				}
+*/
+				return currentTotalLength;
+			}
+
 
 	/**
 	 * Searches for an element and returns its value as a string.
