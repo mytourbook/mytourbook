@@ -28,7 +28,7 @@ import org.oscim.backend.canvas.Color;
 import org.oscim.backend.canvas.Paint;
 import org.oscim.core.GeoPoint;
 import org.oscim.layers.marker.ClusterMarkerRenderer;
-import org.oscim.layers.marker.ItemizedLayer;
+//import org.oscim.layers.marker.ItemizedLayer;
 import org.oscim.layers.marker.MarkerItem;
 import org.oscim.layers.marker.MarkerRendererFactory;
 import org.oscim.layers.marker.MarkerSymbol;
@@ -46,6 +46,7 @@ public class MarkerToolkit {
    private int _clusterSymbolSizeDP = net.tourbook.map25.layer.marker.MarkerRenderer.MAP_MARKER_CLUSTER_SIZE_DP;
    private int _clusterForegroundColor = net.tourbook.map25.layer.marker.MarkerRenderer.CLUSTER_COLOR_TEXT;
    private int _clusterBackgroundColor = net.tourbook.map25.layer.marker.MarkerRenderer.CLUSTER_COLOR_BACK;
+   
    private int  _clusterSymbolWeight;
    private float  _clusterOutlineSize;
    private Bitmap _clusterBitmap;
@@ -54,8 +55,11 @@ public class MarkerToolkit {
    public MarkerSymbol _symbol;
    private float _symbolSize = 10f;
    private int _symbolSizeInt = 10;
+   private int _clusterSymbol_Size;
 
    private Bitmap _bitmapPoi;
+   private Bitmap _bitmapStar;
+   private Bitmap _BitmapClusterStar;
 
    final Paint _fillPainter = CanvasAdapter.newPaint();
 
@@ -78,6 +82,8 @@ public class MarkerToolkit {
       _clusterBitmap = createClusterBitmap(1);
       
       _bitmapPoi = createPoiBitmap(shape);
+      
+      _BitmapClusterStar = drawStar((int)_clusterOutlineSize);
       
       _symbol = new MarkerSymbol(_bitmapPoi, MarkerSymbol.HotspotPlace.CENTER, false);
       
@@ -114,8 +120,10 @@ public class MarkerToolkit {
       _clusterOutlineSize = config.clusterOutline_Size;
       _symbolSize = ScreenUtils.getPixels(config.markerSymbol_Size);
       _symbolSizeInt = (int) Math.ceil(_symbolSize);
-      //_isBillboard = config.clusterOrientation == Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
-      //_isBillboard = config.markerOrientation == Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
+      
+      _clusterSymbol_Size = config.clusterSymbol_Size;
+      
+      //System.out.println("*** Markertoolkit:  fillradius for star: " + config.clusterSymbol_Size + " " + config.clusterSymbol_Weight); //$NON-NLS-1$
    }
 
    public Bitmap createPoiBitmap(MarkerShape shape) {
@@ -131,22 +139,33 @@ public class MarkerToolkit {
          _fillPainter.setColor(0x80FF69B4); // 50percent pink
          defaultMarkerCanvas.drawCircle(half, half, half, _fillPainter);
       } else {
-         /*
-          * link: https://stackoverflow.com/questions/16327588/how-to-make-star-shape-in-java
-          */
-         _fillPainter.setColor(0xFFFFFF00); // 100percent yellow
-         _fillPainter.setStrokeWidth(2);
-         defaultMarkerCanvas.drawLine(half * 0.1f  , half * 0.65f, half * 1.9f  , half * 0.65f, _fillPainter);
-         defaultMarkerCanvas.drawLine(half * 1.9f , half * 0.65f , half * 0.40f , half * 1.65f, _fillPainter);
-         defaultMarkerCanvas.drawLine(half * 0.40f , half * 1.65f, half         ,   0         , _fillPainter);
-         defaultMarkerCanvas.drawLine(half         ,   0         , half * 1.60f , half * 1.65f, _fillPainter);
-         defaultMarkerCanvas.drawLine(half * 1.60f , half * 1.65f, half * 0.1f  , half * 0.65f, _fillPainter);
+         _bitmapPoi = drawStar(_symbolSizeInt);
       }
      return _bitmapPoi;
       
    }
    
+   public Bitmap drawStar(int bitmapStarSize) {
+      _bitmapStar = CanvasAdapter.newBitmap(bitmapStarSize, bitmapStarSize, 0);
+      org.oscim.backend.canvas.Canvas defaultMarkerCanvas = CanvasAdapter.newCanvas();
+      defaultMarkerCanvas.setBitmap(_bitmapStar);
+      float half = bitmapStarSize/2;
+      _fillPainter.setColor(0xFFFFFF00); // 100percent yellow
+      _fillPainter.setStrokeWidth(2);
+      /*
+       * link: https://stackoverflow.com/questions/16327588/how-to-make-star-shape-in-java
+       */
+      defaultMarkerCanvas.drawLine(half * 0.1f  , half * 0.65f, half * 1.9f  , half * 0.65f, _fillPainter);
+      defaultMarkerCanvas.drawLine(half * 1.9f , half * 0.65f , half * 0.40f , half * 1.65f, _fillPainter);
+      defaultMarkerCanvas.drawLine(half * 0.40f , half * 1.65f, half         ,   0         , _fillPainter);
+      defaultMarkerCanvas.drawLine(half         ,   0         , half * 1.60f , half * 1.65f, _fillPainter);
+      defaultMarkerCanvas.drawLine(half * 1.60f , half * 1.65f, half * 0.1f  , half * 0.65f, _fillPainter);
+      return _bitmapStar;
+   }
+   
+   
    public Bitmap createClusterBitmap(int size) {
+      
       final ScreenUtils.ClusterDrawable drawable = new ScreenUtils.ClusterDrawable(
             _clusterSymbolSizeDP,
             _clusterForegroundColor,
@@ -154,8 +173,8 @@ public class MarkerToolkit {
             Integer.toString(size),
             _clusterSymbolWeight,
             _clusterOutlineSize);
-      //final Bitmap paintedBitmap = drawable.getBitmap();
-      final Bitmap paintedBitmap = drawable.getBitmap(_bitmapPoi);
+
+      final Bitmap paintedBitmap = drawable.getBitmap(_BitmapClusterStar);
       return paintedBitmap;
    }
    
@@ -163,6 +182,7 @@ public class MarkerToolkit {
    public List<MarkerItem> createMarkerItemList(MarkerMode MarkerMode){
       loadConfig();
       createPoiBitmap(MarkerShape.STAR);
+      _BitmapClusterStar = drawStar(_clusterSymbol_Size);
       List<MarkerItem> pts = new ArrayList<>();
      
       for (final MapBookmark mapBookmark : net.tourbook.map.bookmark.MapBookmarkManager.getAllBookmarks()) {
