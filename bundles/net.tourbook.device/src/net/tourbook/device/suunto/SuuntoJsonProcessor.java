@@ -385,13 +385,12 @@ public class SuuntoJsonProcessor {
 		
 		for(int index = 0; index < RRValues.size(); ++index)
 		{
-			TimeData toto = FindSpecificTimeData(timeData.absoluteTime, index);
-			if (toto == null) continue;
-			toto.pulse  = RRValues.get(index);
+			TimeData specificTimeData = FindSpecificTimeData(timeData.absoluteTime, index);
+			if (specificTimeData == null) continue;
 			
 			// Heart rate (bpm) = 60 / R-R (seconds)
 			float convertedNumber = 60 / (RRValues.get(index) / 1000f);
-			toto.pulse = convertedNumber;
+			specificTimeData.pulse = convertedNumber;
 		}
 	
 		return true;
