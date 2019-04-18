@@ -7,6 +7,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -15,8 +16,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.swimming.SwimStroke;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
+import net.tourbook.data.LengthType;
+import net.tourbook.data.SwimData;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -28,40 +32,40 @@ public class SuuntoJsonProcessor {
 	private int							_lapCounter;
 	final IPreferenceStore			_prefStore			= TourbookPlugin.getDefault().getPreferenceStore();
 
-	public static final String	TAG_SAMPLES			= "Samples";													//$NON-NLS-1$
-	public static final String	TAG_SAMPLE			= "Sample";														//$NON-NLS-1$
-	public static final String	TAG_TIMEISO8601		= "TimeISO8601";												//$NON-NLS-1$
-	public static final String	TAG_ATTRIBUTES		= "Attributes";												//$NON-NLS-1$
-	public static final String	TAG_SOURCE			= "Source";														//$NON-NLS-1$
+	public static final String		TAG_SAMPLES			= "Samples";													//$NON-NLS-1$
+	public static final String		TAG_SAMPLE			= "Sample";														//$NON-NLS-1$
+	public static final String		TAG_TIMEISO8601	= "TimeISO8601";												//$NON-NLS-1$
+	public static final String		TAG_ATTRIBUTES		= "Attributes";												//$NON-NLS-1$
+	public static final String		TAG_SOURCE			= "Source";														//$NON-NLS-1$
 	private static final String	TAG_SUUNTOSML		= "suunto/sml";												//$NON-NLS-1$
 	private static final String	TAG_LAP				= "Lap";															//$NON-NLS-1$
 	private static final String	TAG_MANUAL			= "Manual";														//$NON-NLS-1$
 	private static final String	TAG_DISTANCE		= "Distance";													//$NON-NLS-1$
-	public static final String	TAG_GPSALTITUDE		= "GPSAltitude";												//$NON-NLS-1$
-	public static final String	TAG_LATITUDE		= "Latitude";													//$NON-NLS-1$
-	public static final String	TAG_LONGITUDE		= "Longitude";													//$NON-NLS-1$
+	public static final String		TAG_GPSALTITUDE	= "GPSAltitude";												//$NON-NLS-1$
+	public static final String		TAG_LATITUDE		= "Latitude";													//$NON-NLS-1$
+	public static final String		TAG_LONGITUDE		= "Longitude";													//$NON-NLS-1$
 	private static final String	TAG_TYPE				= "Start";														//$NON-NLS-1$
 	private static final String	TAG_START			= "Type";														//$NON-NLS-1$
 	private static final String	TAG_PAUSE			= "Pause";														//$NON-NLS-1$
 	private static final String	TAG_HR				= "HR";															//$NON-NLS-1$
 	private static final String	TAG_RR				= "R-R";															//$NON-NLS-1$
-	private static final String	TAG_DATA			= "Data";															//$NON-NLS-1$
+	private static final String	TAG_DATA				= "Data";														//$NON-NLS-1$
 	private static final String	TAG_SPEED			= "Speed";														//$NON-NLS-1$
 	private static final String	TAG_CADENCE			= "Cadence";													//$NON-NLS-1$
-	public static final String	TAG_ALTITUDE		= "Altitude";													//$NON-NLS-1$
+	public static final String		TAG_ALTITUDE		= "Altitude";													//$NON-NLS-1$
 	private static final String	TAG_POWER			= "Power";														//$NON-NLS-1$
-	private static final String	TAG_TEMPERATURE		= "Temperature";
-	
+	private static final String	TAG_TEMPERATURE	= "Temperature";
+
 	// Swimming
-	private static final String Swimming 		= "Swimming";
-	private static final String Breaststroke 		= "Breaststroke";
-	private static final String Freestyle			= "Freestyle";
-	private static final String PoolLengthDuration  = "PrevPoolLengthDuration";
-	private static final String PoolLengthStyle 	= "PrevPoolLengthStyle";
-	private static final String Stroke 				= "Stroke";
-	private static final String TotalLengths 		= "TotalLengths";
-	private static final String Turn 				= "Turn";
-	private static final String Type				= "Type";
+	private static final String	Swimming					= "Swimming";
+	private static final String	Breaststroke			= "Breaststroke";
+	private static final String	Freestyle				= "Freestyle";
+	private static final String	PoolLengthDuration	= "PrevPoolLengthDuration";
+	private static final String	PoolLengthStyle		= "PrevPoolLengthStyle";
+	private static final String	Stroke					= "Stroke";
+	private static final String	TotalLengths			= "TotalLengths";
+	private static final String	Turn						= "Turn";
+	private static final String	Type						= "Type";
 
 	/**
 	 * Processes and imports a Suunto activity (from a Suunto 9 or Spartan watch).
@@ -97,7 +101,7 @@ public class SuuntoJsonProcessor {
 
 		//tourData.swim_Time
 		//see finalizeTour_SwimData
-		
+
 		if (tourData == null)
 			return null;
 
@@ -110,6 +114,9 @@ public class SuuntoJsonProcessor {
 		Instant minInstant = Instant.ofEpochMilli(Long.MIN_VALUE);
 		ZonedDateTime pauseStartTime = minInstant.atZone(ZoneOffset.UTC);
 		int previousTotalLength = 0;
+
+		List<SwimData> _allSwimData = new ArrayList<>();
+
 		for (int i = 0; i < samples.length(); ++i) {
 			String currentSampleSml;
 			String currentSampleData;
@@ -118,14 +125,14 @@ public class SuuntoJsonProcessor {
 				JSONObject sample = samples.getJSONObject(i);
 				if (!sample.toString().contains(TAG_TIMEISO8601))
 					continue;
-				
+
 				String attributesContent = sample.get(TAG_ATTRIBUTES).toString();
 				if (attributesContent == null || attributesContent == "") //$NON-NLS-1$
 					continue;
 
 				JSONObject currentSampleAttributes = new JSONObject(sample.get(TAG_ATTRIBUTES).toString());
 				currentSampleSml = currentSampleAttributes.get(TAG_SUUNTOSML).toString();
-				
+
 				if (currentSampleSml.contains(TAG_SAMPLE))
 					currentSampleData = new JSONObject(currentSampleSml).get(TAG_SAMPLE).toString();
 				else
@@ -148,7 +155,7 @@ public class SuuntoJsonProcessor {
 				currentZonedDateTime = currentZonedDateTime.plusSeconds(1);
 
 			long currentTime = currentZonedDateTime.toInstant().toEpochMilli();
-			if(currentTime <= tourData.getTourStartTimeMS())
+			if (currentTime <= tourData.getTourStartTimeMS())
 				continue;
 
 			if (_sampleList.size() > 0) {
@@ -187,7 +194,7 @@ public class SuuntoJsonProcessor {
 			//the potential to miss data
 			if (isPaused && currentZonedDateTime.isAfter(pauseStartTime))
 				continue;
-			if (currentSampleData.contains(TAG_RR) )
+			if (currentSampleData.contains(TAG_RR))
 				System.out.println("dd");
 			if (currentSampleData.contains(TAG_LAP) &&
 					(currentSampleData.contains(TAG_MANUAL) ||
@@ -206,7 +213,7 @@ public class SuuntoJsonProcessor {
 
 			// Heart Rate
 			wasDataPopulated |= TryAddHeartRateData(new JSONObject(currentSampleData), timeData);
-			wasDataPopulated |=	TryComputeHeartRateData(rrIntervalsList, new JSONObject(currentSampleSml), timeData);
+			wasDataPopulated |= TryComputeHeartRateData(rrIntervalsList, new JSONObject(currentSampleSml), timeData);
 
 			// Speed
 			wasDataPopulated |= TryAddSpeedData(new JSONObject(currentSampleData), timeData);
@@ -233,72 +240,59 @@ public class SuuntoJsonProcessor {
 
 			// Temperature
 			wasDataPopulated |= TryAddTemperatureData(new JSONObject(currentSampleData), timeData);
-			
+
 			//Swimming data
-			if (currentSampleData.contains(Swimming))
-			{
-				int currentTotalLength = TryAddSwimmingData(
-					null,
-					new JSONObject(currentSampleData),
-					currentZonedDateTime,
-					previousTotalLength);
+			if (currentSampleData.contains(Swimming)) {
+				wasDataPopulated |= TryAddSwimmingData(
+						_allSwimData,
+						new JSONObject(currentSampleData),
+						currentZonedDateTime,
+						timeData.absoluteTime,
+						previousTotalLength);
 
 				// if (previousTotalLength == 0) => It is likely to be
 				// a Stroke
 /*
-				if (previousTotalLength > 0 &&
-					previousTotalLength == currentTotalLength)
-				{
-					// If the current total length equals the previous
-					// total length, it was likely a "rest" and we retrieve
-					// the very last pool length in order to create a
-					// rest lap.
-					IPoolLengthInfo lastPoolLengthInfo = null;
-					foreach (ILapInfo laps in activity.Laps)
-					{
-						foreach (IPoolLengthInfo lapsPoolLength in laps.PoolLengths)
-						{
-							lastPoolLengthInfo = lapsPoolLength;
-						}
-					}
-					//activity.Laps.Add(
-					//	currentSampleDate,
-					//	currentSampleDate - toto.StartTime.ToLocalTime());
-
-					previousLapStartTime = currentSampleDate;
-				}
-
-				if (currentTotalLength > 0)
-					previousTotalLength = currentTotalLength;
-					*/
+ * if (previousTotalLength > 0 && previousTotalLength == currentTotalLength) { // If the current
+ * total length equals the previous // total length, it was likely a "rest" and we retrieve // the
+ * very last pool length in order to create a // rest lap. IPoolLengthInfo lastPoolLengthInfo =
+ * null; foreach (ILapInfo laps in activity.Laps) { foreach (IPoolLengthInfo lapsPoolLength in
+ * laps.PoolLengths) { lastPoolLengthInfo = lapsPoolLength; } } //activity.Laps.Add( //
+ * currentSampleDate, // currentSampleDate - toto.StartTime.ToLocalTime()); previousLapStartTime =
+ * currentSampleDate; } if (currentTotalLength > 0) previousTotalLength = currentTotalLength;
+ */
 			}
-
 
 			if (wasDataPopulated && !reusePreviousTimeEntry)
 				_sampleList.add(timeData);
 		}
 
-		// Cleaning-up the processed entries as there should only be entries
-		// every x seconds, no entries should be in between (entries with milliseconds).
-		// Also, we need to make sure that they truly are in chronological order.
-		Iterator<TimeData> sampleListIterator = _sampleList.iterator();
-		long previousAbsoluteTime = 0;
-		while (sampleListIterator.hasNext()) {
-			TimeData currentTimeData = sampleListIterator.next();
+		// We clean-up the data series ONLY if we're not in a swimming activity
+		if (_allSwimData.size() == 0) {
+			// Cleaning-up the processed entries as there should only be entries
+			// every x seconds, no entries should be in between (entries with milliseconds).
+			// Also, we need to make sure that they truly are in chronological order.
+			Iterator<TimeData> sampleListIterator = _sampleList.iterator();
+			long previousAbsoluteTime = 0;
+			while (sampleListIterator.hasNext()) {
+				TimeData currentTimeData = sampleListIterator.next();
 
-			// Removing the entries that don't have GPS data
-			// In the case where the activity is an indoor tour,
-			// we remove the entries that don't have altitude data
-			if (currentTimeData.marker == 0 &&
-				(!isIndoorTour && currentTimeData.longitude == Double.MIN_VALUE && currentTimeData.latitude == Double.MIN_VALUE) ||
-					(isIndoorTour && currentTimeData.absoluteAltitude == Float.MIN_VALUE) ||
-					currentTimeData.absoluteTime <= previousAbsoluteTime)
-				sampleListIterator.remove();
-			else
-				previousAbsoluteTime = currentTimeData.absoluteTime;
+				// Removing the entries that don't have GPS data
+				// In the case where the activity is an indoor tour,
+				// we remove the entries that don't have altitude data
+				if (currentTimeData.marker == 0 &&
+						(!isIndoorTour && currentTimeData.longitude == Double.MIN_VALUE && currentTimeData.latitude == Double.MIN_VALUE) ||
+						(isIndoorTour && currentTimeData.absoluteAltitude == Float.MIN_VALUE) ||
+						currentTimeData.absoluteTime <= previousAbsoluteTime)
+					sampleListIterator.remove();
+				else
+					previousAbsoluteTime = currentTimeData.absoluteTime;
+			}
 		}
-		
+
 		tourData.createTimeSeries(_sampleList, true);
+
+		finalizeTour_SwimData(tourData, _allSwimData);
 
 		return tourData;
 	}
@@ -364,7 +358,7 @@ public class SuuntoJsonProcessor {
 	 *           The current sample data in JSON format.
 	 * @param sampleList
 	 *           The tour's time serie.
-	  * @param isUnitTest
+	 * @param isUnitTest
 	 *           True if the method is run for unit test purposes.
 	 * @return True if successful, false otherwise.
 	 */
@@ -408,49 +402,48 @@ public class SuuntoJsonProcessor {
 
 		return false;
 	}
-	
+
 	/**
-	 * Attempts to retrieve and add HR data from the MoveSense HR belt to
-	 * the current activity.
+	 * Attempts to retrieve and add HR data from the MoveSense HR belt to the current activity.
+	 * 
 	 * @param rrIntervalsList
-	 * The list containing all the R-R intervals being gathered until they
-	 * are saved in the activity's heart rate list.
+	 *           The list containing all the R-R intervals being gathered until they are saved in the
+	 *           activity's heart rate list.
 	 * @param currentSample
-	 * The current sample data in JSON format.
+	 *           The current sample data in JSON format.
 	 * @param currentSampleDate
-	 * The date of the current data.
+	 *           The date of the current data.
 	 * @param previousSampleDate
-	 * The last date for which we saved heart rate data from R-R intervals
-	 * in the current activity.
+	 *           The last date for which we saved heart rate data from R-R intervals in the current
+	 *           activity.
 	 */
 	private boolean TryComputeHeartRateData(
-		ArrayList<Integer> rrIntervalsList,
-		JSONObject currentSample,
-		TimeData timeData)
-	{
-		if(!currentSample.toString().contains(TAG_RR))
+															ArrayList<Integer> rrIntervalsList,
+															JSONObject currentSample,
+															TimeData timeData) {
+		if (!currentSample.toString().contains(TAG_RR))
 			return false;
-		
+
 		ArrayList<Integer> RRValues = TryRetrieveIntegerListElementValue(
-			currentSample.getJSONObject(TAG_RR),
-			TAG_DATA);
-		
-		if(RRValues.size() == 0)
+				currentSample.getJSONObject(TAG_RR),
+				TAG_DATA);
+
+		if (RRValues.size() == 0)
 			return false;
-		
-		for(int index = 0; index < RRValues.size(); ++index)
-		{
+
+		for (int index = 0; index < RRValues.size(); ++index) {
 			TimeData specificTimeData = FindSpecificTimeData(timeData.absoluteTime, index);
-			if (specificTimeData == null) continue;
-			
+			if (specificTimeData == null)
+				continue;
+
 			// Heart rate (bpm) = 60 / R-R (seconds)
 			float convertedNumber = 60 / (RRValues.get(index) / 1000f);
 			specificTimeData.pulse = convertedNumber;
 		}
-	
+
 		return true;
 	}
-	
+
 	/**
 	 * Searches a specific time slice.
 	 * 
@@ -462,16 +455,14 @@ public class SuuntoJsonProcessor {
 	 */
 	private TimeData FindSpecificTimeData(long absoluteTime, int offsetSeconds) {
 		long computedTime = absoluteTime + offsetSeconds * 1000;
-		
-		for (int index = 0; index < _sampleList.size(); ++index)
-		{
-			if(_sampleList.get(index).absoluteTime == computedTime)
+
+		for (int index = 0; index < _sampleList.size(); ++index) {
+			if (_sampleList.get(index).absoluteTime == computedTime)
 				return _sampleList.get(index);
 		}
-		
+
 		return null;
 	}
-
 
 	/**
 	 * Attempts to retrieve and add speed data to the current tour.
@@ -580,7 +571,7 @@ public class SuuntoJsonProcessor {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Attempts to retrieve, process and add swimming data into an activity.
 	 * 
@@ -594,131 +585,120 @@ public class SuuntoJsonProcessor {
 	 *           The previous SuuntoDataNames.TotalLengths value.
 	 * @return The total number of pool lengths
 	 */
-			private int TryAddSwimmingData(
-				TourData tour,
-				JSONObject currentSample,
-				ZonedDateTime currentSampleDate,
-				int previousTotalLengths)
-			{
-				//ILapInfo lap;
-				int lapIndex = 0;
-				JSONArray Events = (JSONArray) currentSample.get("Events");
-				JSONObject array = (JSONObject) Events.get(0);
-				JSONObject swimmingSample = (JSONObject) array.get(Swimming);
+	private boolean TryAddSwimmingData(
+													List<SwimData> allSwimData,
+													JSONObject currentSample,
+													ZonedDateTime currentSampleDate,
+													long absoluteTime, //TODO to rename better
+													int previousTotalLengths) {
+		boolean wasDataPopulated = false;
+		//ILapInfo lap;
+		int lapIndex = 0;
+		JSONArray Events = (JSONArray) currentSample.get("Events");
+		JSONObject array = (JSONObject) Events.get(0);
+		JSONObject swimmingSample = (JSONObject) array.get(Swimming);
 
-			String currentTotalLengthStr =	TryRetrieveStringElementValue(
+		SwimData previousSwimData = allSwimData.size() == 0 ? null : allSwimData.get(allSwimData.size() - 1);
+
+		String swimmingType = TryRetrieveStringElementValue(
+				swimmingSample,
+				Type);
+
+		switch (swimmingType) {
+		case Stroke:
+			++previousSwimData.swim_Strokes;
+			wasDataPopulated = true;
+			break;
+		case Turn:
+
+			String currentTotalLengthStr = TryRetrieveStringElementValue(
 					swimmingSample,
 					TotalLengths);
-			
+
 			int currentTotalLength = Integer.parseInt(currentTotalLengthStr);
 
-				if (currentTotalLength > 0 &&
+			if (currentTotalLength > 0 &&
 					currentTotalLength == previousTotalLengths)
-					return currentTotalLength;
+				return false;
 
-				if (tour.getTourMarkers() == null || tour.getTourMarkers().size() == 0)
-				{
-					//lap = tour.Laps.Add(
-					//	currentSampleDate,
-					//	new TimeSpan());
+			SwimData swimData = new SwimData();
+			swimData.swim_Strokes = 0;
+			//If ArrayBegin==0 then we wait till next one
 
-					//It is very likely that we are at the first lap and hence
-					//there is no data to import.
-					if (currentTotalLength == 0)
-						return currentTotalLength;
-				}
-				else
-				{
-				//	if (activity.Laps.Count == 1)
-					//	lapIndex = 0;
-					//else
-					//	lapIndex = activity.Laps.Count - 1;
+			// TODO ? 
+			swimData.swim_LengthType = LengthType.ACTIVE.getValue();
 
-					//lap = this.activity.Laps[lapIndex];
-
-					// We initialize the total distance otherwise we can't increment
-					// the distance
-				//	if (lap.PoolLengths.Count == 0)
-				//		lap.TotalDistanceMeters = 0f;
-				}
-/*
-				if (TryRetrieveElementValue(
+			// Stroke Type
+			String poolLengthStyle = TryRetrieveStringElementValue(
 					swimmingSample,
-					SuuntoDataNames.Type,
-					out object type))
-				{
-					IPoolLengthInfo currentPoolLength =
-						GetCurrentPoolLength(activity, lapIndex);
-					switch (type.ToString())
-					{
-						case SuuntoDataNames.Turn:
-							if (currentPoolLength == null)
-								break;
+					PoolLengthStyle);
 
-							if (TryRetrieveElementValue(
-								swimmingSample,
-								SuuntoDataNames.PoolLengthDuration,
-								out object durationValue))
-							{
-								currentPoolLength.TotalTime =
-									TimeSpan.Parse($"00:00:{durationValue:F2}");
-							}
+			switch (poolLengthStyle) {
+			case "Breaststroke":
 
-							if (TryRetrieveElementValue(
-								swimmingSample,
-								SuuntoDataNames.PoolLengthStyle,
-								out object poolLengthStyle))
-							{
-								switch (poolLengthStyle.ToString())
-								{
-									case SuuntoDataNames.Breaststroke:
-										currentPoolLength.StrokeType =
-											SwimStroke.Type.Breaststroke;
-										break;
-									case Freestyle:
-										currentPoolLength.StrokeType =
-											SwimStroke.Type.Freestyle;
-										break;
-									//TODO What are all the possible swim styles ???
-									default:
-										currentPoolLength.StrokeType =
-											SwimStroke.Type.Unspecified;
-										break;
-								}
-							}
-
-							if (TryRetrieveFloatElementValue(
-								currentSample,
-								SuuntoDataNames.Distance,
-								out float distanceValue))
-							{
-								currentPoolLength.TotalDistanceMeters +=
-									distanceValue -
-									activity.TotalDistanceMetersEntered;
-								activity.TotalDistanceMetersEntered = distanceValue;
-								lap.TotalDistanceMeters += currentPoolLength
-									.TotalDistanceMeters;
-							}
-							break;
-						case SuuntoDataNames.Stroke:
-							// If there is no previous pool length or if the
-							// previous one is finished (total time is not equal to
-							// 0), we create a new one.
-							if (currentPoolLength == null || currentPoolLength.TotalTime != TimeSpan.Zero)
-							{
-								currentPoolLength = lap.PoolLengths.Add(
-									currentSampleDate,
-									new TimeSpan());
-							}
-
-							++currentPoolLength.StrokeCount;
-							break;
-					}
-				}
-*/
-				return currentTotalLength;
+				swimData.swim_StrokeStyle = SwimStroke.BREASTSTROKE.getValue();
+				break;
 			}
 
+			// Length duration
+			String poolLengthDurationValue = TryRetrieveStringElementValue(
+					swimmingSample,
+					PoolLengthDuration);
+
+			float poolLengthDuration = Float.parseFloat(poolLengthDurationValue);
+			// Converting the pool length duration to ms
+			poolLengthDuration *= 1000;
+
+			//TODO Take care of the case where we are on the first one
+			long previousPoolLengthAbsoluteTime = 0;
+			if (allSwimData.size() == 0)
+				previousPoolLengthAbsoluteTime = absoluteTime;
+			else
+				previousPoolLengthAbsoluteTime = allSwimData.get(allSwimData.size() - 1).absoluteTime;
+
+			swimData.absoluteTime = previousPoolLengthAbsoluteTime + Math.round(poolLengthDuration);
+			allSwimData.add(swimData);
+			wasDataPopulated = true;
+			break;
+		}
+
+		//It is very likely that we are at the first lap and hence
+		//there is no data to import.
+		//if (currentTotalLength == 0)
+		//		return currentTotalLength;
+		//	if (activity.Laps.Count == 1)
+		//	lapIndex = 0;
+		//else
+		//	lapIndex = activity.Laps.Count - 1;
+
+		//lap = this.activity.Laps[lapIndex];
+
+		// We initialize the total distance otherwise we can't increment
+		// the distance
+		//	if (lap.PoolLengths.Count == 0)
+		//		lap.TotalDistanceMeters = 0f;
+/*
+ * if (TryRetrieveElementValue( swimmingSample, SuuntoDataNames.Type, out object type)) {
+ * IPoolLengthInfo currentPoolLength = GetCurrentPoolLength(activity, lapIndex); switch
+ * (type.ToString()) { case SuuntoDataNames.Turn: if (currentPoolLength == null) break; if
+ * (TryRetrieveElementValue( swimmingSample, SuuntoDataNames.PoolLengthDuration, out object
+ * durationValue)) { currentPoolLength.TotalTime = TimeSpan.Parse($"00:00:{durationValue:F2}"); } if
+ * (TryRetrieveElementValue( swimmingSample, SuuntoDataNames.PoolLengthStyle, out object
+ * poolLengthStyle)) { switch (poolLengthStyle.ToString()) { case SuuntoDataNames.Breaststroke:
+ * currentPoolLength.StrokeType = SwimStroke.Type.Breaststroke; break; case Freestyle:
+ * currentPoolLength.StrokeType = SwimStroke.Type.Freestyle; break; //TODO What are all the possible
+ * swim styles ??? default: currentPoolLength.StrokeType = SwimStroke.Type.Unspecified; break; } }
+ * if (TryRetrieveFloatElementValue( currentSample, SuuntoDataNames.Distance, out float
+ * distanceValue)) { currentPoolLength.TotalDistanceMeters += distanceValue -
+ * activity.TotalDistanceMetersEntered; activity.TotalDistanceMetersEntered = distanceValue;
+ * lap.TotalDistanceMeters += currentPoolLength .TotalDistanceMeters; } break; case
+ * SuuntoDataNames.Stroke: // If there is no previous pool length or if the // previous one is
+ * finished (total time is not equal to // 0), we create a new one. if (currentPoolLength == null ||
+ * currentPoolLength.TotalTime != TimeSpan.Zero) { currentPoolLength = lap.PoolLengths.Add(
+ * currentSampleDate, new TimeSpan()); } ++currentPoolLength.StrokeCount; break; } }
+ */
+		return wasDataPopulated;//currentTotalLength;
+	}
 
 	/**
 	 * Searches for an element and returns its value as a string.
@@ -736,13 +716,14 @@ public class SuuntoJsonProcessor {
 		String result = null;
 		try {
 			result = token.get(elementName).toString();
-		} catch (Exception e) {}
+		} catch (Exception e) {
+		}
 		if (result == "null") //$NON-NLS-1$
 			return null;
 
 		return result;
 	}
-	
+
 	/**
 	 * Searches for an element and returns its value as a list of integer.
 	 * 
@@ -755,16 +736,136 @@ public class SuuntoJsonProcessor {
 	private ArrayList<Integer> TryRetrieveIntegerListElementValue(JSONObject token, String elementName) {
 		ArrayList<Integer> elementValues = new ArrayList<Integer>();
 		String elements = TryRetrieveStringElementValue(token, elementName);
-		
-		if(elements == null) return elementValues;
-		
+
+		if (elements == null)
+			return elementValues;
+
 		String[] stringValues = elements.split(",");
-		for(int index = 0; index < stringValues.length; ++index)
-		{
+		for (int index = 0; index < stringValues.length; ++index) {
 			Integer rrValue = Integer.parseInt(stringValues[index]);
 			elementValues.add(rrValue);
 		}
 		return elementValues;
-		
+
+	}
+
+	/**
+	 * Fill swim data into tourdata.
+	 *
+	 * @param tourData
+	 * @param allTourSwimData
+	 */
+	private void finalizeTour_SwimData(final TourData tourData, final List<SwimData> allTourSwimData) {
+
+		// check if swim data are available
+		if (allTourSwimData == null) {
+			return;
+		}
+
+		final long tourStartTime = tourData.getTourStartTimeMS();
+
+		final int swimDataSize = allTourSwimData.size();
+
+		final short[] lengthType = new short[swimDataSize];
+		final short[] cadence = new short[swimDataSize];
+		final short[] strokes = new short[swimDataSize];
+		final short[] strokeStyle = new short[swimDataSize];
+		final int[] swimTime = new int[swimDataSize];
+
+		tourData.swim_LengthType = lengthType;
+		tourData.swim_Cadence = cadence;
+		tourData.swim_Strokes = strokes;
+		tourData.swim_StrokeStyle = strokeStyle;
+		tourData.swim_Time = swimTime;
+
+		boolean isSwimLengthType = false;
+		boolean isSwimCadence = false;
+		boolean isSwimStrokes = false;
+		boolean isSwimStrokeStyle = false;
+		boolean isSwimTime = false;
+
+		for (int swimSerieIndex = 0; swimSerieIndex < allTourSwimData.size(); swimSerieIndex++) {
+
+			final SwimData swimData = allTourSwimData.get(swimSerieIndex);
+
+			final long absoluteSwimTime = swimData.absoluteTime;
+			final short relativeSwimTime = (short) ((absoluteSwimTime - tourStartTime) / 1000);
+
+			final short swimLengthType = swimData.swim_LengthType;
+			short swimCadence = swimData.swim_Cadence;
+			short swimStrokes = swimData.swim_Strokes;
+			final short swimStrokeStyle = swimData.swim_StrokeStyle;
+
+			/*
+			 * Length type
+			 */
+			if (swimLengthType != Short.MIN_VALUE && swimLengthType > 0) {
+				isSwimLengthType = true;
+			}
+
+			/*
+			 * Cadence
+			 */
+			if (swimCadence == Short.MIN_VALUE) {
+				swimCadence = 0;
+			}
+			if (swimCadence > 0) {
+				isSwimCadence = true;
+			}
+
+			/*
+			 * Strokes
+			 */
+			if (swimStrokes == Short.MIN_VALUE) {
+				swimStrokes = 0;
+			}
+			if (swimStrokes > 0) {
+				isSwimStrokes = true;
+			}
+
+			/*
+			 * Stroke style
+			 */
+			if (swimStrokeStyle != Short.MIN_VALUE && swimStrokeStyle > 0) {
+				isSwimStrokeStyle = true;
+			}
+
+			/*
+			 * Swim time
+			 */
+			if (relativeSwimTime > 0) {
+				isSwimTime = true;
+			}
+
+			lengthType[swimSerieIndex] = swimLengthType;
+			cadence[swimSerieIndex] = swimCadence;
+			strokes[swimSerieIndex] = swimStrokes;
+			strokeStyle[swimSerieIndex] = swimStrokeStyle;
+			swimTime[swimSerieIndex] = relativeSwimTime;
+		}
+
+		/*
+		 * Cleanup data series
+		 */
+		if (isSwimLengthType == false) {
+			tourData.swim_LengthType = null;
+		}
+		if (isSwimStrokes == false) {
+			tourData.swim_Strokes = null;
+		}
+		if (isSwimStrokeStyle == false) {
+			tourData.swim_StrokeStyle = null;
+		}
+		if (isSwimTime == false) {
+			tourData.swim_Time = null;
+		}
+
+		// cadence is very special
+		if (isSwimCadence) {
+			// removed 'normal' cadence data serie when swim cadence is available
+			tourData.setCadenceSerie(null);
+		} else {
+			tourData.swim_Cadence = null;
+		}
 	}
 }
