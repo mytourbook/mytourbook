@@ -292,7 +292,7 @@ public class SuuntoJsonProcessor {
 
 		tourData.createTimeSeries(_sampleList, true);
 
-		finalizeTour_SwimData(tourData, _allSwimData);
+		tourData.finalizeTour_SwimData(tourData, _allSwimData);
 
 		return tourData;
 	}
@@ -592,8 +592,6 @@ public class SuuntoJsonProcessor {
 													long absoluteTime, //TODO to rename better
 													int previousTotalLengths) {
 		boolean wasDataPopulated = false;
-		//ILapInfo lap;
-		int lapIndex = 0;
 		JSONArray Events = (JSONArray) currentSample.get("Events");
 		JSONObject array = (JSONObject) Events.get(0);
 		JSONObject swimmingSample = (JSONObject) array.get(Swimming);
@@ -634,18 +632,20 @@ public class SuuntoJsonProcessor {
 					PoolLengthStyle);
 
 			switch (poolLengthStyle) {
-			case "Breaststroke":
-
+			case Breaststroke:
 				swimData.swim_StrokeStyle = SwimStroke.BREASTSTROKE.getValue();
+				break;
+			case Freestyle:
+				swimData.swim_StrokeStyle = SwimStroke.FREESTYLE.getValue();
 				break;
 			}
 
 			// Length duration
-			String poolLengthDurationValue = TryRetrieveStringElementValue(
+			String poolLengthDurationStr = TryRetrieveStringElementValue(
 					swimmingSample,
 					PoolLengthDuration);
 
-			float poolLengthDuration = Float.parseFloat(poolLengthDurationValue);
+			float poolLengthDuration = Float.parseFloat(poolLengthDurationStr);
 			// Converting the pool length duration to ms
 			poolLengthDuration *= 1000;
 
@@ -747,125 +747,5 @@ public class SuuntoJsonProcessor {
 		}
 		return elementValues;
 
-	}
-
-	/**
-	 * Fill swim data into tourdata.
-	 *
-	 * @param tourData
-	 * @param allTourSwimData
-	 */
-	private void finalizeTour_SwimData(final TourData tourData, final List<SwimData> allTourSwimData) {
-
-		// check if swim data are available
-		if (allTourSwimData == null) {
-			return;
-		}
-
-		final long tourStartTime = tourData.getTourStartTimeMS();
-
-		final int swimDataSize = allTourSwimData.size();
-
-		final short[] lengthType = new short[swimDataSize];
-		final short[] cadence = new short[swimDataSize];
-		final short[] strokes = new short[swimDataSize];
-		final short[] strokeStyle = new short[swimDataSize];
-		final int[] swimTime = new int[swimDataSize];
-
-		tourData.swim_LengthType = lengthType;
-		tourData.swim_Cadence = cadence;
-		tourData.swim_Strokes = strokes;
-		tourData.swim_StrokeStyle = strokeStyle;
-		tourData.swim_Time = swimTime;
-
-		boolean isSwimLengthType = false;
-		boolean isSwimCadence = false;
-		boolean isSwimStrokes = false;
-		boolean isSwimStrokeStyle = false;
-		boolean isSwimTime = false;
-
-		for (int swimSerieIndex = 0; swimSerieIndex < allTourSwimData.size(); swimSerieIndex++) {
-
-			final SwimData swimData = allTourSwimData.get(swimSerieIndex);
-
-			final long absoluteSwimTime = swimData.absoluteTime;
-			final short relativeSwimTime = (short) ((absoluteSwimTime - tourStartTime) / 1000);
-
-			final short swimLengthType = swimData.swim_LengthType;
-			short swimCadence = swimData.swim_Cadence;
-			short swimStrokes = swimData.swim_Strokes;
-			final short swimStrokeStyle = swimData.swim_StrokeStyle;
-
-			/*
-			 * Length type
-			 */
-			if (swimLengthType != Short.MIN_VALUE && swimLengthType > 0) {
-				isSwimLengthType = true;
-			}
-
-			/*
-			 * Cadence
-			 */
-			if (swimCadence == Short.MIN_VALUE) {
-				swimCadence = 0;
-			}
-			if (swimCadence > 0) {
-				isSwimCadence = true;
-			}
-
-			/*
-			 * Strokes
-			 */
-			if (swimStrokes == Short.MIN_VALUE) {
-				swimStrokes = 0;
-			}
-			if (swimStrokes > 0) {
-				isSwimStrokes = true;
-			}
-
-			/*
-			 * Stroke style
-			 */
-			if (swimStrokeStyle != Short.MIN_VALUE && swimStrokeStyle > 0) {
-				isSwimStrokeStyle = true;
-			}
-
-			/*
-			 * Swim time
-			 */
-			if (relativeSwimTime > 0) {
-				isSwimTime = true;
-			}
-
-			lengthType[swimSerieIndex] = swimLengthType;
-			cadence[swimSerieIndex] = swimCadence;
-			strokes[swimSerieIndex] = swimStrokes;
-			strokeStyle[swimSerieIndex] = swimStrokeStyle;
-			swimTime[swimSerieIndex] = relativeSwimTime;
-		}
-
-		/*
-		 * Cleanup data series
-		 */
-		if (isSwimLengthType == false) {
-			tourData.swim_LengthType = null;
-		}
-		if (isSwimStrokes == false) {
-			tourData.swim_Strokes = null;
-		}
-		if (isSwimStrokeStyle == false) {
-			tourData.swim_StrokeStyle = null;
-		}
-		if (isSwimTime == false) {
-			tourData.swim_Time = null;
-		}
-
-		// cadence is very special
-		if (isSwimCadence) {
-			// removed 'normal' cadence data serie when swim cadence is available
-			tourData.setCadenceSerie(null);
-		} else {
-			tourData.swim_Cadence = null;
-		}
 	}
 }
