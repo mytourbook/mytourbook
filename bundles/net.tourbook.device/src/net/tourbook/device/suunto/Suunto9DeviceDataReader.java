@@ -1,10 +1,14 @@
 package net.tourbook.device.suunto;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -38,9 +42,9 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 	private HashMap<Long, TourData>						_alreadyImportedTours			= new HashMap<Long, TourData>();
 
 	// For Unit testing
-	private static final boolean			UNITTESTS			= false;
+	private static final boolean UNITTESTS = true;
 	// Make sure that the smoothing value is 10 (speed and gradient)
-	
+
 	public static final String				IMPORT_FILE_PATH	= "/net/tourbook/device/suunto/testFiles/";	//$NON-NLS-1$
 	private static Map<String, String>	testFiles			= new HashMap<>();									// Java 7
 
@@ -206,7 +210,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 	 * 
 	 * @param gzipFilePath
 	 *           The absolute file path of the Suunto file.
-	 * @param isValidatingFile 
+	 * @param isValidatingFile
 	 * @return Returns the JSON content.
 	 */
 	private String GetJsonContentFromGZipFile(String gzipFilePath, boolean isValidatingFile) {
@@ -223,17 +227,17 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
 		} catch (IOException e) {
 
-         if (isValidatingFile) {
-            
-            /*
-             * Log only when reading the zip file, during a validation, an exception can be very
-             * likely and should not be displayed
-             */
-            
-         } else {
-            StatusUtil.log(e);
-         }
-         
+			if (isValidatingFile) {
+
+				/*
+				 * Log only when reading the zip file, during a validation, an exception can be very
+				 * likely and should not be displayed
+				 */
+
+			} else {
+				StatusUtil.log(e);
+			}
+
 			return ""; //$NON-NLS-1$
 		}
 
@@ -579,15 +583,15 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 				"Original-1536723722706_183010004848_post_timeline-1.json.gz"; //$NON-NLS-1$
 		controlFilePath =
 				IMPORT_FILE_PATH + "1536723722706_183010004848_post_timeline-1.xml"; //$NON-NLS-1$
-		testFiles.put(controlFilePath, filePath); 
-		
+		testFiles.put(controlFilePath, filePath);
+
 		//Shoreline - with laps/markers
 		filePath = IMPORT_FILE_PATH +
 				"1555291925128_183010004848_post_timeline-1.json.gz"; //$NON-NLS-1$
 		controlFilePath =
 				IMPORT_FILE_PATH + "1555291925128_183010004848_post_timeline-1.xml"; //$NON-NLS-1$
-		testFiles.put(controlFilePath, filePath); 
-		
+		testFiles.put(controlFilePath, filePath);
+
 		// Reservoir Ridge with MoveSense HR belt
 		// TODO : Activating this unit test will cause this file to have its markers unsorted. WHY?
 		// 1536723722706_183010004848_post_timeline-1-SplitTests.xml
@@ -595,9 +599,8 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 				"1549250450458_183010004848_post_timeline-1.json.gz"; //$NON-NLS-1$
 		controlFilePath =
 				IMPORT_FILE_PATH + "1549250450458_183010004848_post_timeline-1.xml"; //$NON-NLS-1$
-		testFiles.put(controlFilePath, filePath); 
-		
-				
+		testFiles.put(controlFilePath, filePath);
+
 		// SWIMMING
 
 		// Start -> 100m -> LAP -> LAP -> 100m -> LAP -> LAP -> 100m -> LAP -> LAP -> 100m -> Stop
@@ -606,16 +609,16 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		controlFilePath =
 				IMPORT_FILE_PATH + "1547628896209_184710003036_post_timeline-1.xml"; //$NON-NLS-1$
 		testFiles.put(controlFilePath, filePath);
-				
+
 		// Start -> 100m -> Stop
 		filePath = IMPORT_FILE_PATH +
 				"1547628897243_184710003036_post_timeline-1.json.gz"; //$NON-NLS-1$
 		controlFilePath =
 				IMPORT_FILE_PATH + "1547628897243_184710003036_post_timeline-1.xml"; //$NON-NLS-1$
-		testFiles.put(controlFilePath, filePath); 
-				
+		testFiles.put(controlFilePath, filePath);
+
 		// Single file tests SuuntoJsonProcessor
-		
+
 		TourData entry;
 		String xml;
 		String controlFileContent;
@@ -634,10 +637,11 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 			//create conflict in the unit tests as we reuse files
 			cleanUpActivities();
 		}
-		
+
 		return testResults;
 
 	}
+
 	private boolean unusedCodeForNow() {
 		// ------------------------------------------
 		// Split files test
@@ -669,10 +673,10 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		//jump from 1 file to another
 		String controlDocumentPath = IMPORT_FILE_PATH +
 				"1536723722706_183010004848_post_timeline-1-SplitTests.xml"; //$NON-NLS-1$
-	String	controlFileContent = GetContentFromResource(controlDocumentPath, false);
-	TourData	entry = GetLastTourDataImported();
-	String	xml = entry.toXml();
-	boolean	testResults = CompareAgainstControl(controlFileContent, xml);
+		String controlFileContent = GetContentFromResource(controlDocumentPath, false);
+		TourData entry = GetLastTourDataImported();
+		String xml = entry.toXml();
+		boolean testResults = CompareAgainstControl(controlFileContent, xml);
 
 		cleanUpActivities();
 		// ORDER 2 - 3 - 1
@@ -805,7 +809,29 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 				.withTest(Input.fromString(xmlTestDocument))
 				.ignoreWhitespace()
 				.build();
-		
+		BufferedWriter bufferedWriter = null;
+		try {
+			File myFile = new File("C:/Users/frederic/git/MT/mytourbook/MyTestFile.xml");
+			// check if file exist, otherwise create the file before writing
+			if (!myFile.exists()) {
+				myFile.createNewFile();
+			}
+			Writer writer = new FileWriter(myFile);
+			bufferedWriter = new BufferedWriter(writer);
+			bufferedWriter.write(xmlTestDocument);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (bufferedWriter != null)
+					bufferedWriter.close();
+			} catch (Exception ex) {
+
+			}
+		}
+		if (myDiff.hasDifferences())
+			System.out.println("dd");
+
 		return !myDiff.hasDifferences();
 	}
 }

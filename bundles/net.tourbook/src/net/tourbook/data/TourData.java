@@ -1484,12 +1484,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Swimming data: Relative time in seconds to the tour start time. Contains
     * {@link Short#MIN_VALUE} when value is not set.
     */
+   @XmlElementWrapper(name = "SwimTimes")
+   @XmlElement(name = "SwimTime")
    @Transient
    public int[]         swim_Time;
    /**
     * Swimming data: Activity is defined in {@link LengthType} e.g. active, idle. Contains
     * {@link Short#MIN_VALUE} when value is not set.
     */
+   @XmlElementWrapper(name = "SwimLengthTypes")
+   @XmlElement(name = "SwimLengthType")
    @Transient
    public short[]       swim_LengthType;
 
@@ -1498,6 +1502,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * Swimming data: Number of strokes. Contains {@link Short#MIN_VALUE} when value is not set.
     */
+   @XmlElementWrapper(name = "SwimStrokes")
+   @XmlElement(name = "SwimStroke")
    @Transient
    public short[]       swim_Strokes;
 
@@ -1507,6 +1513,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Swimming data: Stroke style is defined in {@link SwimStroke} e.g. freestyle, breaststroke...
     * Contains {@link Short#MIN_VALUE} when value is not set.
     */
+   @XmlElementWrapper(name = "SwimStrokeStyles")
+   @XmlElement(name = "SwimStrokeStyle")
    @Transient
    public short[]       swim_StrokeStyle;
 
@@ -1516,6 +1524,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Swimming data: Swimming cadence in strokes/min. Contains {@link Short#MIN_VALUE} when value is
     * not set.
     */
+   @XmlElementWrapper(name = "SwimCadences")
+   @XmlElement(name = "SwimCadence")
    @Transient
    public short[]       swim_Cadence;
 
@@ -1532,6 +1542,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * Computed swim data serie
     */
+   @XmlElementWrapper(name = "SwimSwolfs")
+   @XmlElement(name = "SwimSwolf")
    @Transient
    private float[]      _swim_Swolf;
 
