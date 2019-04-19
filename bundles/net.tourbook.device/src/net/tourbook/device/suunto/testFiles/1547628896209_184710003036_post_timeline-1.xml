@@ -2529,17 +2529,17 @@
 		<SwimLengthType>1</SwimLengthType>
 		<SwimLengthType>1</SwimLengthType>
 		<SwimLengthType>1</SwimLengthType>
+		<SwimLengthType>0</SwimLengthType>
 		<SwimLengthType>1</SwimLengthType>
 		<SwimLengthType>1</SwimLengthType>
 		<SwimLengthType>1</SwimLengthType>
 		<SwimLengthType>1</SwimLengthType>
+		<SwimLengthType>0</SwimLengthType>
 		<SwimLengthType>1</SwimLengthType>
 		<SwimLengthType>1</SwimLengthType>
 		<SwimLengthType>1</SwimLengthType>
 		<SwimLengthType>1</SwimLengthType>
-		<SwimLengthType>1</SwimLengthType>
-		<SwimLengthType>1</SwimLengthType>
-		<SwimLengthType>1</SwimLengthType>
+		<SwimLengthType>0</SwimLengthType>
 		<SwimLengthType>1</SwimLengthType>
 		<SwimLengthType>1</SwimLengthType>
 		<SwimLengthType>1</SwimLengthType>
@@ -2569,7 +2569,6 @@
 		<SwimStroke>0</SwimStroke>
 	</SwimStrokes>
 	<SwimStrokeStyles>
-		<SwimStrokeStyle>-32768</SwimStrokeStyle>
 		<SwimStrokeStyle>2</SwimStrokeStyle>
 		<SwimStrokeStyle>2</SwimStrokeStyle>
 		<SwimStrokeStyle>2</SwimStrokeStyle>
@@ -2589,6 +2588,7 @@
 		<SwimStrokeStyle>2</SwimStrokeStyle>
 		<SwimStrokeStyle>2</SwimStrokeStyle>
 		<SwimStrokeStyle>2</SwimStrokeStyle>
+		<SwimStrokeStyle>-32768</SwimStrokeStyle>
 	</SwimStrokeStyles>
 	<test>jokl</test>
 </TourData>

@@ -528,11 +528,11 @@
 		<SwimStroke>0</SwimStroke>
 	</SwimStrokes>
 	<SwimStrokeStyles>
+		<SwimStrokeStyle>2</SwimStrokeStyle>
+		<SwimStrokeStyle>2</SwimStrokeStyle>
+		<SwimStrokeStyle>2</SwimStrokeStyle>
+		<SwimStrokeStyle>2</SwimStrokeStyle>
 		<SwimStrokeStyle>-32768</SwimStrokeStyle>
-		<SwimStrokeStyle>2</SwimStrokeStyle>
-		<SwimStrokeStyle>2</SwimStrokeStyle>
-		<SwimStrokeStyle>2</SwimStrokeStyle>
-		<SwimStrokeStyle>2</SwimStrokeStyle>
 	</SwimStrokeStyles>
 	<test>jokl</test>
 </TourData>

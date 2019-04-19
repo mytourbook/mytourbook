@@ -58,9 +58,11 @@ public class SuuntoJsonProcessor {
 	private static final String	Freestyle				= "Freestyle";
    private static final String Other           = "Other";
 	private static final String	PoolLengthStyle		= "PrevPoolLengthStyle";
+   private static final String TotalLengths    = "TotalLengths";
 	private static final String	Stroke					= "Stroke";
 	private static final String	Turn						= "Turn";
 	private static final String	Type						= "Type";
+   private static int          previousTotalLengths = 0;
 
 	private ArrayList<TimeData>	_sampleList;
 	private int							_lapCounter;
@@ -539,10 +541,26 @@ public class SuuntoJsonProcessor {
          wasDataPopulated = true;
 			break;
 		case Turn:
+         final String currentTotalLengthsString = TryRetrieveStringElementValue(
+               swimmingSample,
+               TotalLengths);
+         final int currentTotalLengths = Integer.parseInt(currentTotalLengthsString);
+         // If the current total length equals the previous
+         // total length, it was likely a "rest" and we retrieve
+         // the very last pool length in order to create a
+         // rest lap.
+
+         if (currentTotalLengths > 0 && currentTotalLengths == previousTotalLengths) {
+            if (previousSwimData != null) {
+               previousSwimData.swim_LengthType = LengthType.IDLE.getValue();
+            }
+         }
+
 			final SwimData swimData = new SwimData();
 			swimData.swim_Strokes = 0;
 			swimData.swim_LengthType = LengthType.ACTIVE.getValue();
 
+         if (previousSwimData != null) {
          // Swimming Type
 			final String poolLengthStyle = TryRetrieveStringElementValue(
 					swimmingSample,
@@ -550,18 +568,21 @@ public class SuuntoJsonProcessor {
 
 			switch (poolLengthStyle) {
 			case Breaststroke:
-				swimData.swim_StrokeStyle = SwimStroke.BREASTSTROKE.getValue();
+               previousSwimData.swim_StrokeStyle = SwimStroke.BREASTSTROKE.getValue();
 				break;
 			case Freestyle:
-				swimData.swim_StrokeStyle = SwimStroke.FREESTYLE.getValue();
+               previousSwimData.swim_StrokeStyle = SwimStroke.FREESTYLE.getValue();
 				break;
          case Other:
-            swimData.swim_StrokeStyle = SwimStroke.MIXED.getValue();
+               break;
 			}
+         }
 
          swimData.absoluteTime = currentSampleDate;
 			allSwimData.add(swimData);
+
          wasDataPopulated = true;
+         previousTotalLengths = currentTotalLengths;
 			break;
 		}
 
