@@ -56,14 +56,11 @@ public class SuuntoJsonProcessor {
 	private static final String	Swimming					= "Swimming";
 	private static final String	Breaststroke			= "Breaststroke";
 	private static final String	Freestyle				= "Freestyle";
-   private static final String	PoolLengthDuration	= "PrevPoolLengthDuration";
-
 	private static final String	PoolLengthStyle		= "PrevPoolLengthStyle";
 	private static final String	Stroke					= "Stroke";
-	private static final String	TotalLengths			= "TotalLengths";
 	private static final String	Turn						= "Turn";
 	private static final String	Type						= "Type";
-	private final float				Kelvin				= 273.1499938964845f;
+
 	private ArrayList<TimeData>	_sampleList;
 	private int							_lapCounter;
 	final IPreferenceStore			_prefStore			= TourbookPlugin.getDefault().getPreferenceStore();
@@ -583,7 +580,7 @@ public class SuuntoJsonProcessor {
 	private boolean TryAddTemperatureData(final JSONObject currentSample, final TimeData timeData) {
 		String value = null;
 		if ((value = TryRetrieveStringElementValue(currentSample, TAG_TEMPERATURE)) != null) {
-			timeData.temperature = Util.parseFloat(value) - Kelvin;
+         timeData.temperature = (float) (Util.parseFloat(value) + net.tourbook.math.Fmath.T_ABS);
 			return true;
 		}
 		return false;
