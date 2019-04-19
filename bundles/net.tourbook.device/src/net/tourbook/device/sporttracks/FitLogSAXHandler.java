@@ -56,6 +56,7 @@ public class FitLogSAXHandler extends DefaultHandler {
    private static final String                  TAG_ACTIVITY_LOCATION       = "Location";            //$NON-NLS-1$
    private static final String                  TAG_ACTIVITY_NAME           = "Name";                //$NON-NLS-1$
    private static final String                  TAG_ACTIVITY_NOTES          = "Notes";               //$NON-NLS-1$
+   private static final String                  TAG_ACTIVITY_POWER          = "Power";               //$NON-NLS-1$
    private static final String                  TAG_ACTIVITY_WEATHER        = "Weather";             //$NON-NLS-1$
 
    private static final String                  ATTRIB_NAME                 = "Name";                //$NON-NLS-1$
@@ -70,7 +71,6 @@ public class FitLogSAXHandler extends DefaultHandler {
    private static final String                  ATTRIB_AVERAGE_RPM          = "AverageRPM";          //$NON-NLS-1$
    private static final String                  ATTRIB_WEATHER_TEMP         = "Temp";                //$NON-NLS-1$
    private static final String                  ATTRIB_WEATHER_CONDITIONS   = "Conditions";          //$NON-NLS-1$
-   private static final String                  WIND_SPEED                  = "Wind Speed:";         //$NON-NLS-1$
    //
    private static final String                  TAG_TRACK                   = "Track";               //$NON-NLS-1$
    private static final String                  TAG_TRACK_PT                = "pt";                  //$NON-NLS-1$
@@ -85,6 +85,8 @@ public class FitLogSAXHandler extends DefaultHandler {
    //
    private static final String                  TAG_LAPS                    = "Laps";                //$NON-NLS-1$
    private static final String                  TAG_LAP                     = "Lap";                 //$NON-NLS-1$
+
+   private static final String                  SUB_ATTRIB_WIND_SPEED       = "Wind Speed:";         //$NON-NLS-1$
    private static final HashMap<String, String> _weatherId                  = new HashMap<>();
    //
    private String                               _importFilePath;
@@ -758,14 +760,25 @@ public class FitLogSAXHandler extends DefaultHandler {
       }
    }
 
+   /**
+    * @param weatherText
+    *           Example:
+    *
+    *           <pre>
+    *              <Weather Conditions="Clear" Temp=
+   "15.5003">Min./Max.: 55.6 °F/63.9 °F; Pressure: 1004.5 mbar; Humidity: 74.9%; Dew point: 49.0 °F; Wind Speed: 1.9 mph; Precipitation: 0.0mm</Weather>
+    *           </pre>
+    *
+    * @return
+    */
    private int parseWindSpeed(final String weatherText) {
 
-      if (!weatherText.contains(WIND_SPEED) ||
+      if (!weatherText.contains(SUB_ATTRIB_WIND_SPEED) ||
             !weatherText.contains(net.tourbook.common.UI.UNIT_SPEED_MPH)) {
          return Integer.MIN_VALUE;
       }
 
-      final int windSpeedIndex = weatherText.indexOf(WIND_SPEED) + WIND_SPEED.length();
+      final int windSpeedIndex = weatherText.indexOf(SUB_ATTRIB_WIND_SPEED) + SUB_ATTRIB_WIND_SPEED.length();
       final int windSpeedUnitIndex = weatherText.indexOf(net.tourbook.common.UI.UNIT_SPEED_MPH);
 
       final String windSpeed = weatherText.substring(windSpeedIndex, windSpeedUnitIndex);
