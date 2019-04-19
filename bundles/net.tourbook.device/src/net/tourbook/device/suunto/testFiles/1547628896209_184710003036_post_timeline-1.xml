@@ -2503,26 +2503,26 @@
 		<SpeedSerie>0.73618454</SpeedSerie>
 	</SpeedSeries>
 	<SwimTimes>
-		<SwimTime>3</SwimTime>
-		<SwimTime>26</SwimTime>
-		<SwimTime>50</SwimTime>
-		<SwimTime>71</SwimTime>
-		<SwimTime>100</SwimTime>
-		<SwimTime>121</SwimTime>
-		<SwimTime>142</SwimTime>
-		<SwimTime>171</SwimTime>
+		<SwimTime>1</SwimTime>
+		<SwimTime>24</SwimTime>
+		<SwimTime>48</SwimTime>
+		<SwimTime>70</SwimTime>
+		<SwimTime>98</SwimTime>
+		<SwimTime>120</SwimTime>
+		<SwimTime>141</SwimTime>
+		<SwimTime>170</SwimTime>
 		<SwimTime>196</SwimTime>
 		<SwimTime>217</SwimTime>
 		<SwimTime>235</SwimTime>
-		<SwimTime>260</SwimTime>
+		<SwimTime>261</SwimTime>
 		<SwimTime>283</SwimTime>
-		<SwimTime>307</SwimTime>
-		<SwimTime>327</SwimTime>
-		<SwimTime>355</SwimTime>
-		<SwimTime>374</SwimTime>
-		<SwimTime>402</SwimTime>
-		<SwimTime>423</SwimTime>
-		<SwimTime>446</SwimTime>
+		<SwimTime>308</SwimTime>
+		<SwimTime>328</SwimTime>
+		<SwimTime>356</SwimTime>
+		<SwimTime>375</SwimTime>
+		<SwimTime>403</SwimTime>
+		<SwimTime>425</SwimTime>
+		<SwimTime>448</SwimTime>
 	</SwimTimes>
 	<SwimLengthTypes>
 		<SwimLengthType>1</SwimLengthType>
