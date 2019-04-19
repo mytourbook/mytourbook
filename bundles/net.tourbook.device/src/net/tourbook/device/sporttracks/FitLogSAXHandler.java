@@ -68,20 +68,23 @@ public class FitLogSAXHandler extends DefaultHandler {
    private static final String                  ATTRIB_DESCEND_METERS       = "DescendMeters";       //$NON-NLS-1$
    private static final String                  ATTRIB_AVERAGE_BPM          = "AverageBPM";          //$NON-NLS-1$
    private static final String                  ATTRIB_MAXIMUM_BPM          = "MaximumBPM";          //$NON-NLS-1$
+   private static final String                  ATTRIB_AVERAGE_WATTS        = "AverageWatts";        //$NON-NLS-1$
+   private static final String                  ATTRIB_MAXIMUM_WATTS        = "MaximumWatts";        //$NON-NLS-1$
    private static final String                  ATTRIB_AVERAGE_RPM          = "AverageRPM";          //$NON-NLS-1$
    private static final String                  ATTRIB_WEATHER_TEMP         = "Temp";                //$NON-NLS-1$
    private static final String                  ATTRIB_WEATHER_CONDITIONS   = "Conditions";          //$NON-NLS-1$
    //
    private static final String                  TAG_TRACK                   = "Track";               //$NON-NLS-1$
    private static final String                  TAG_TRACK_PT                = "pt";                  //$NON-NLS-1$
-   private static final String                  ATTRIB_PT_TM                = "tm";                  //$NON-NLS-1$
-   private static final String                  ATTRIB_PT_LAT               = "lat";                 //$NON-NLS-1$
-   private static final String                  ATTRIB_PT_LON               = "lon";                 //$NON-NLS-1$
+   private static final String                  ATTRIB_PT_CADENCE           = "cadence";             //$NON-NLS-1$
    private static final String                  ATTRIB_PT_DIST              = "dist";                //$NON-NLS-1$
    private static final String                  ATTRIB_PT_ELE               = "ele";                 //$NON-NLS-1$
    private static final String                  ATTRIB_PT_HR                = "hr";                  //$NON-NLS-1$
-   private static final String                  ATTRIB_PT_CADENCE           = "cadence";             //$NON-NLS-1$
+   private static final String                  ATTRIB_PT_LAT               = "lat";                 //$NON-NLS-1$
+   private static final String                  ATTRIB_PT_LON               = "lon";                 //$NON-NLS-1$
    private static final String                  ATTRIB_PT_POWER             = "power";               //$NON-NLS-1$
+   private static final String                  ATTRIB_PT_TEMP              = "temp";                //$NON-NLS-1$
+   private static final String                  ATTRIB_PT_TM                = "tm";                  //$NON-NLS-1$
    //
    private static final String                  TAG_LAPS                    = "Laps";                //$NON-NLS-1$
    private static final String                  TAG_LAP                     = "Lap";                 //$NON-NLS-1$
@@ -116,23 +119,25 @@ public class FitLogSAXHandler extends DefaultHandler {
    private ArrayList<TourType>                  _allTourTypes;
    {
       /*
-       * entries which are marked with *) have not a corresponding id/image within MyTourbook
+       * Entries which are marked with *) have not a corresponding id/image within MyTourbook
        */
-      _weatherId.put("Clear", IWeather.WEATHER_ID_CLEAR); //                        //$NON-NLS-1$
-      _weatherId.put("ScatterClouds", IWeather.WEATHER_ID_PART_CLOUDS); //          *)   //$NON-NLS-1$
-      _weatherId.put("PartClouds", IWeather.WEATHER_ID_PART_CLOUDS); //               //$NON-NLS-1$
-      _weatherId.put("Overcast", IWeather.WEATHER_ID_OVERCAST); //                  //$NON-NLS-1$
-      _weatherId.put("MostClouds", IWeather.WEATHER_ID_OVERCAST); //               *)   //$NON-NLS-1$
-      _weatherId.put("Clouds", IWeather.WEATHER_ID_PART_CLOUDS); //               *)   //$NON-NLS-1$
-      _weatherId.put("ChanceRain", IWeather.WEATHER_ID_SCATTERED_SHOWERS); //         *)   //$NON-NLS-1$
-      _weatherId.put("LightDrizzle", IWeather.WEATHER_ID_SCATTERED_SHOWERS); //      *)   //$NON-NLS-1$
-      _weatherId.put("LightRain", IWeather.WEATHER_ID_SCATTERED_SHOWERS); //            //$NON-NLS-1$
-      _weatherId.put("Rain", IWeather.WEATHER_ID_RAIN); //                        //$NON-NLS-1$
-      _weatherId.put("HeavyRain", IWeather.WEATHER_ID_RAIN); //                  *)   //$NON-NLS-1$
-      _weatherId.put("ChanceThunder", IWeather.WEATHER_ID_LIGHTNING); //            *)   //$NON-NLS-1$
-      _weatherId.put("Thunder", IWeather.WEATHER_ID_LIGHTNING); //                  //$NON-NLS-1$
-      _weatherId.put("Snow", IWeather.WEATHER_ID_SNOW); //                        //$NON-NLS-1$
-      _weatherId.put("Haze", IWeather.WEATHER_ID_PART_CLOUDS); //                  *)   //$NON-NLS-1$
+// SET_FORMATTING_OFF
+      _weatherId.put("Clear",          IWeather.WEATHER_ID_CLEAR); //                     //$NON-NLS-1$
+      _weatherId.put("ScatterClouds",  IWeather.WEATHER_ID_PART_CLOUDS); //         *)    //$NON-NLS-1$
+      _weatherId.put("PartClouds",     IWeather.WEATHER_ID_PART_CLOUDS); //               //$NON-NLS-1$
+      _weatherId.put("Overcast",       IWeather.WEATHER_ID_OVERCAST); //                  //$NON-NLS-1$
+      _weatherId.put("MostClouds",     IWeather.WEATHER_ID_OVERCAST); //            *)    //$NON-NLS-1$
+      _weatherId.put("Clouds",         IWeather.WEATHER_ID_PART_CLOUDS); //         *)    //$NON-NLS-1$
+      _weatherId.put("ChanceRain",     IWeather.WEATHER_ID_SCATTERED_SHOWERS); //   *)    //$NON-NLS-1$
+      _weatherId.put("LightDrizzle",   IWeather.WEATHER_ID_SCATTERED_SHOWERS); //   *)    //$NON-NLS-1$
+      _weatherId.put("LightRain",      IWeather.WEATHER_ID_SCATTERED_SHOWERS); //         //$NON-NLS-1$
+      _weatherId.put("Rain",           IWeather.WEATHER_ID_RAIN); //                      //$NON-NLS-1$
+      _weatherId.put("HeavyRain",      IWeather.WEATHER_ID_RAIN); //                *)    //$NON-NLS-1$
+      _weatherId.put("ChanceThunder",  IWeather.WEATHER_ID_LIGHTNING); //           *)    //$NON-NLS-1$
+      _weatherId.put("Thunder",        IWeather.WEATHER_ID_LIGHTNING); //                 //$NON-NLS-1$
+      _weatherId.put("Snow",           IWeather.WEATHER_ID_SNOW); //                      //$NON-NLS-1$
+      _weatherId.put("Haze",           IWeather.WEATHER_ID_PART_CLOUDS); //         *)    //$NON-NLS-1$
+// SET_FORMATTING_ON
    }
 
    private class Activity {
@@ -154,10 +159,16 @@ public class FitLogSAXHandler extends DefaultHandler {
       private int    calories;
       private int    duration;
       private int    distance;
+
       private int    elevationUp;
       private int    elevationDown;
+
       private int    avgPulse;
       private int    maxPulse;
+
+      private int    avgPower;
+      private int    maxPower;
+
       private int    avgCadence;
 //      private int               maxCadence;      is not yet supported
 
@@ -201,7 +212,7 @@ public class FitLogSAXHandler extends DefaultHandler {
        * get values
        */
       if (_isInName || _isInNotes || _isInWeather) {
-         parseActivity02End(name);
+         parseActivity_02_End(name);
       }
 
       /*
@@ -293,6 +304,13 @@ public class FitLogSAXHandler extends DefaultHandler {
          // create 'normal' tour
 
          tourData.createTimeSeries(_currentActivity.timeSlices, false);
+      }
+
+      if (_currentActivity.avgPower != 0) {
+         tourData.setPower_Avg(_currentActivity.avgPower);
+      }
+      if (_currentActivity.maxPower != 0) {
+         tourData.setPower_Max(_currentActivity.maxPower);
       }
 
       if (tourData.pulseSerie == null) {
@@ -569,7 +587,7 @@ public class FitLogSAXHandler extends DefaultHandler {
       return _isNewTourType;
    }
 
-   private void parseActivity01Start(final String name, final Attributes attributes) {
+   private void parseActivity_01_Start(final String name, final Attributes attributes) {
 
       if (name.equals(TAG_ACTIVITY_NAME)) {
 
@@ -639,6 +657,11 @@ public class FitLogSAXHandler extends DefaultHandler {
          _currentActivity.avgPulse = Util.parseInt0(attributes, ATTRIB_AVERAGE_BPM);
          _currentActivity.maxPulse = Util.parseInt0(attributes, ATTRIB_MAXIMUM_BPM);
 
+      } else if (name.equals(TAG_ACTIVITY_POWER)) {
+
+         _currentActivity.avgPower = Util.parseInt0(attributes, ATTRIB_AVERAGE_WATTS);
+         _currentActivity.maxPower = Util.parseInt0(attributes, ATTRIB_MAXIMUM_WATTS);
+
       } else if (name.equals(TAG_ACTIVITY_CADENCE)) {
 
          //      <xs:element name="Cadence">
@@ -664,7 +687,7 @@ public class FitLogSAXHandler extends DefaultHandler {
       _characters.delete(0, _characters.length());
    }
 
-   private void parseActivity02End(final String name) {
+   private void parseActivity_02_End(final String name) {
 
       if (_isInName) {
 
@@ -753,6 +776,7 @@ public class FitLogSAXHandler extends DefaultHandler {
          timeSlice.cadence = Util.parseFloat(attributes, ATTRIB_PT_CADENCE);
          timeSlice.pulse = Util.parseFloat(attributes, ATTRIB_PT_HR);
          timeSlice.power = Util.parseFloat(attributes, ATTRIB_PT_POWER);
+         timeSlice.temperature = Util.parseFloat(attributes, ATTRIB_PT_TEMP);
          timeSlice.latitude = latitude;
          timeSlice.longitude = longitude;
 
@@ -801,7 +825,7 @@ public class FitLogSAXHandler extends DefaultHandler {
          } else if (_isInLaps) {
             parseLaps(name, attributes);
          } else {
-            parseActivity01Start(name, attributes);
+            parseActivity_01_Start(name, attributes);
          }
       }
 
