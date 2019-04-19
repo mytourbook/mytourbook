@@ -10,11 +10,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.swimming.SwimStroke;
 import net.tourbook.common.util.StatusUtil;
@@ -25,17 +20,18 @@ import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 
-public class SuuntoJsonProcessor {
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-	private final float				Kelvin				= 273.1499938964845f;
-	private ArrayList<TimeData>	_sampleList;
-	private int							_lapCounter;
-	final IPreferenceStore			_prefStore			= TourbookPlugin.getDefault().getPreferenceStore();
+public class SuuntoJsonProcessor {
 
 	public static final String		TAG_SAMPLES			= "Samples";													//$NON-NLS-1$
 	public static final String		TAG_SAMPLE			= "Sample";														//$NON-NLS-1$
 	public static final String		TAG_TIMEISO8601	= "TimeISO8601";												//$NON-NLS-1$
 	public static final String		TAG_ATTRIBUTES		= "Attributes";												//$NON-NLS-1$
+
 	public static final String		TAG_SOURCE			= "Source";														//$NON-NLS-1$
 	private static final String	TAG_SUUNTOSML		= "suunto/sml";												//$NON-NLS-1$
 	private static final String	TAG_LAP				= "Lap";															//$NON-NLS-1$
@@ -60,16 +56,51 @@ public class SuuntoJsonProcessor {
 	private static final String	Swimming					= "Swimming";
 	private static final String	Breaststroke			= "Breaststroke";
 	private static final String	Freestyle				= "Freestyle";
-	private static final String	PoolLengthDuration	= "PrevPoolLengthDuration";
+   private static final String	PoolLengthDuration	= "PrevPoolLengthDuration";
+
 	private static final String	PoolLengthStyle		= "PrevPoolLengthStyle";
 	private static final String	Stroke					= "Stroke";
 	private static final String	TotalLengths			= "TotalLengths";
 	private static final String	Turn						= "Turn";
 	private static final String	Type						= "Type";
+	private final float				Kelvin				= 273.1499938964845f;
+	private ArrayList<TimeData>	_sampleList;
+	private int							_lapCounter;
+	final IPreferenceStore			_prefStore			= TourbookPlugin.getDefault().getPreferenceStore();
+
+	/**
+	 * Searches a specific time slice.
+	 *
+	 * @param absoluteTime
+	 *           The absolute time of the time slice to find.
+	 * @param offsetSeconds
+	 *           The offset in number of seconds.
+	 * @return The found time slice, null otherwise.
+	 */
+	private TimeData FindSpecificTimeData(final long absoluteTime, final int offsetSeconds) {
+		final long computedTime = absoluteTime + offsetSeconds * 1000;
+
+		for (int index = 0; index < _sampleList.size(); ++index) {
+			if (_sampleList.get(index).absoluteTime == computedTime) {
+            return _sampleList.get(index);
+         }
+		}
+
+		return null;
+	}
+
+	/**
+	 * Retrieves the current activity's data.
+	 *
+	 * @return The list of data.
+	 */
+	public ArrayList<TimeData> getSampleList() {
+		return _sampleList;
+	}
 
 	/**
 	 * Processes and imports a Suunto activity (from a Suunto 9 or Spartan watch).
-	 * 
+	 *
 	 * @param jsonFileContent
 	 *           The Suunto's file content in JSON format.
 	 * @param activityToReUse
@@ -80,66 +111,69 @@ public class SuuntoJsonProcessor {
 	 *           True if the method is run for unit test purposes.
 	 * @return The created tour.
 	 */
-	public TourData ImportActivity(	String jsonFileContent,
-												TourData activityToReUse,
-												ArrayList<TimeData> sampleListToReUse,
-												boolean isUnitTest) {
+	public TourData ImportActivity(	final String jsonFileContent,
+												final TourData activityToReUse,
+												final ArrayList<TimeData> sampleListToReUse,
+												final boolean isUnitTest) {
 		_sampleList = new ArrayList<TimeData>();
 
 		JSONArray samples = null;
 		try {
-			JSONObject jsonContent = new JSONObject(jsonFileContent);
+			final JSONObject jsonContent = new JSONObject(jsonFileContent);
 			samples = (JSONArray) jsonContent.get(TAG_SAMPLES);
-		} catch (JSONException ex) {
+		} catch (final JSONException ex) {
 			StatusUtil.log(ex);
 			return null;
 		}
 
-		JSONObject firstSample = (JSONObject) samples.get(0);
+		final JSONObject firstSample = (JSONObject) samples.get(0);
 
-		TourData tourData = InitializeActivity(firstSample, activityToReUse, sampleListToReUse);
+		final TourData tourData = InitializeActivity(firstSample, activityToReUse, sampleListToReUse);
 
 		//tourData.swim_Time
 		//see finalizeTour_SwimData
 
-		if (tourData == null)
-			return null;
+		if (tourData == null) {
+         return null;
+      }
 
-		boolean isIndoorTour = !jsonFileContent.contains(TAG_GPSALTITUDE);
+		final boolean isIndoorTour = !jsonFileContent.contains(TAG_GPSALTITUDE);
 
 		boolean isPaused = false;
 
 		boolean reusePreviousTimeEntry;
-		ArrayList<Integer> rrIntervalsList = new ArrayList<Integer>();
-		Instant minInstant = Instant.ofEpochMilli(Long.MIN_VALUE);
+		final ArrayList<Integer> rrIntervalsList = new ArrayList<Integer>();
+		final Instant minInstant = Instant.ofEpochMilli(Long.MIN_VALUE);
 		ZonedDateTime pauseStartTime = minInstant.atZone(ZoneOffset.UTC);
-		int previousTotalLength = 0;
 
-		List<SwimData> _allSwimData = new ArrayList<>();
+		final List<SwimData> _allSwimData = new ArrayList<>();
 
 		for (int i = 0; i < samples.length(); ++i) {
 			String currentSampleSml;
 			String currentSampleData;
 			String sampleTime;
 			try {
-				JSONObject sample = samples.getJSONObject(i);
-				if (!sample.toString().contains(TAG_TIMEISO8601))
-					continue;
+				final JSONObject sample = samples.getJSONObject(i);
+				if (!sample.toString().contains(TAG_TIMEISO8601)) {
+               continue;
+            }
 
-				String attributesContent = sample.get(TAG_ATTRIBUTES).toString();
-				if (attributesContent == null || attributesContent == "") //$NON-NLS-1$
-					continue;
+				final String attributesContent = sample.get(TAG_ATTRIBUTES).toString();
+				if (attributesContent == null || attributesContent == "") {
+               continue;
+            }
 
-				JSONObject currentSampleAttributes = new JSONObject(sample.get(TAG_ATTRIBUTES).toString());
+				final JSONObject currentSampleAttributes = new JSONObject(sample.get(TAG_ATTRIBUTES).toString());
 				currentSampleSml = currentSampleAttributes.get(TAG_SUUNTOSML).toString();
 
-				if (currentSampleSml.contains(TAG_SAMPLE))
-					currentSampleData = new JSONObject(currentSampleSml).get(TAG_SAMPLE).toString();
-				else
-					currentSampleData = "{}";
+				if (currentSampleSml.contains(TAG_SAMPLE)) {
+               currentSampleData = new JSONObject(currentSampleSml).get(TAG_SAMPLE).toString();
+            } else {
+               currentSampleData = "{}";
+            }
 
 				sampleTime = sample.get(TAG_TIMEISO8601).toString();
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				StatusUtil.log(e);
 				continue;
 			}
@@ -151,12 +185,14 @@ public class SuuntoJsonProcessor {
 			ZonedDateTime currentZonedDateTime = ZonedDateTime.parse(sampleTime);
 			currentZonedDateTime = currentZonedDateTime.truncatedTo(ChronoUnit.SECONDS);
 			// Rounding to the nearest second
-			if (Character.getNumericValue(sampleTime.charAt(20)) >= 5)
-				currentZonedDateTime = currentZonedDateTime.plusSeconds(1);
+			if (Character.getNumericValue(sampleTime.charAt(20)) >= 5) {
+            currentZonedDateTime = currentZonedDateTime.plusSeconds(1);
+         }
 
-			long currentTime = currentZonedDateTime.toInstant().toEpochMilli();
-			if (currentTime <= tourData.getTourStartTimeMS())
-				continue;
+			final long currentTime = currentZonedDateTime.toInstant().toEpochMilli();
+			if (currentTime <= tourData.getTourStartTimeMS()) {
+            continue;
+         }
 
 			if (_sampleList.size() > 0) {
 				// Looking in the last 10 entries to see if their time is identical to the
@@ -192,17 +228,20 @@ public class SuuntoJsonProcessor {
 			//the pause date because in the JSON file, the samples are
 			//not necessarily in chronological order and we could have
 			//the potential to miss data
-			if (isPaused && currentZonedDateTime.isAfter(pauseStartTime))
-				continue;
-			if (currentSampleData.contains(TAG_RR))
-				System.out.println("dd");
+			if (isPaused && currentZonedDateTime.isAfter(pauseStartTime)) {
+            continue;
+         }
+			if (currentSampleData.contains(TAG_RR)) {
+            System.out.println("dd");
+         }
 			if (currentSampleData.contains(TAG_LAP) &&
 					(currentSampleData.contains(TAG_MANUAL) ||
 							currentSampleData.contains(TAG_DISTANCE))) {
 				timeData.marker = 1;
 				timeData.markerLabel = Integer.toString(++_lapCounter);
-				if (!reusePreviousTimeEntry)
-					_sampleList.add(timeData);
+				if (!reusePreviousTimeEntry) {
+               _sampleList.add(timeData);
+            }
 			}
 
 			// GPS point
@@ -246,12 +285,12 @@ public class SuuntoJsonProcessor {
 				wasDataPopulated |= TryAddSwimmingData(
 						_allSwimData,
 						new JSONObject(currentSampleData),
-						timeData.absoluteTime,
-						previousTotalLength);
+                  timeData.absoluteTime);
 			}
 
-			if (wasDataPopulated && !reusePreviousTimeEntry)
-				_sampleList.add(timeData);
+			if (wasDataPopulated && !reusePreviousTimeEntry) {
+            _sampleList.add(timeData);
+         }
 		}
 
 		// We clean-up the data series ONLY if we're not in a swimming activity
@@ -259,10 +298,10 @@ public class SuuntoJsonProcessor {
 			// Cleaning-up the processed entries as there should only be entries
 			// every x seconds, no entries should be in between (entries with milliseconds).
 			// Also, we need to make sure that they truly are in chronological order.
-			Iterator<TimeData> sampleListIterator = _sampleList.iterator();
+			final Iterator<TimeData> sampleListIterator = _sampleList.iterator();
 			long previousAbsoluteTime = 0;
 			while (sampleListIterator.hasNext()) {
-				TimeData currentTimeData = sampleListIterator.next();
+				final TimeData currentTimeData = sampleListIterator.next();
 
 				// Removing the entries that don't have GPS data
 				// In the case where the activity is an indoor tour,
@@ -270,10 +309,11 @@ public class SuuntoJsonProcessor {
 				if (currentTimeData.marker == 0 &&
 						(!isIndoorTour && currentTimeData.longitude == Double.MIN_VALUE && currentTimeData.latitude == Double.MIN_VALUE) ||
 						(isIndoorTour && currentTimeData.absoluteAltitude == Float.MIN_VALUE) ||
-						currentTimeData.absoluteTime <= previousAbsoluteTime)
-					sampleListIterator.remove();
-				else
-					previousAbsoluteTime = currentTimeData.absoluteTime;
+						currentTimeData.absoluteTime <= previousAbsoluteTime) {
+               sampleListIterator.remove();
+            } else {
+               previousAbsoluteTime = currentTimeData.absoluteTime;
+            }
 			}
 		}
 
@@ -286,7 +326,7 @@ public class SuuntoJsonProcessor {
 
 	/**
 	 * Creates a new activity and initializes all the needed fields.
-	 * 
+	 *
 	 * @param firstSample
 	 *           The activity start time as a string.
 	 * @param activityToReuse
@@ -295,24 +335,23 @@ public class SuuntoJsonProcessor {
 	 *           If provided, the activity's data from the activity to reuse.
 	 * @return If valid, the initialized tour
 	 */
-	private TourData InitializeActivity(JSONObject firstSample,
-													TourData activityToReUse,
-													ArrayList<TimeData> sampleListToReUse) {
+	private TourData InitializeActivity(final JSONObject firstSample,
+													final TourData activityToReUse,
+													final ArrayList<TimeData> sampleListToReUse) {
 		TourData tourData = new TourData();
-		String firstSampleAttributes = firstSample.get(TAG_ATTRIBUTES).toString();
+		final String firstSampleAttributes = firstSample.get(TAG_ATTRIBUTES).toString();
 
 		if (firstSampleAttributes.contains(TAG_LAP) &&
 				firstSampleAttributes.contains(TAG_TYPE) &&
 				firstSampleAttributes.contains(TAG_START)) {
 
-			ZonedDateTime startTime = ZonedDateTime.parse(firstSample.get(TAG_TIMEISO8601).toString());
+			final ZonedDateTime startTime = ZonedDateTime.parse(firstSample.get(TAG_TIMEISO8601).toString());
 			tourData.setTourStartTime(startTime);
 
 		} else if (activityToReUse != null) {
 
-			Set<TourMarker> tourMarkers = activityToReUse.getTourMarkers();
-			for (Iterator<TourMarker> it = tourMarkers.iterator(); it.hasNext();) {
-				TourMarker tourMarker = it.next();
+			final Set<TourMarker> tourMarkers = activityToReUse.getTourMarkers();
+			for (final TourMarker tourMarker : tourMarkers) {
 				_lapCounter = Integer.valueOf(tourMarker.getLabel());
 			}
 			activityToReUse.setTourMarkers(new HashSet<TourMarker>());
@@ -322,25 +361,71 @@ public class SuuntoJsonProcessor {
 			tourData.clearComputedSeries();
 			tourData.timeSerie = null;
 
-		} else
-			return null;
+		} else {
+         return null;
+      }
 
 		return tourData;
 
 	}
 
 	/**
-	 * Retrieves the current activity's data.
-	 * 
-	 * @return The list of data.
+	 * Attempts to retrieve and add barometric altitude data to the current tour.
+	 *
+	 * @param currentSample
+	 *           The current sample data in JSON format.
+	 * @param sampleList
+	 *           The tour's time serie.
+	 * @return True if successful, false otherwise.
 	 */
-	public ArrayList<TimeData> getSampleList() {
-		return _sampleList;
+	private boolean TryAddAltitudeData(final JSONObject currentSample, final TimeData timeData) {
+		String value = null;
+		if ((value = TryRetrieveStringElementValue(currentSample, TAG_ALTITUDE)) != null) {
+			timeData.absoluteAltitude = Util.parseFloat(value);
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Attempts to retrieve and add cadence data to the current tour.
+	 *
+	 * @param currentSample
+	 *           The current sample data in JSON format.
+	 * @param sampleList
+	 *           The tour's time serie.
+	 * @return True if successful, false otherwise.
+	 */
+	private boolean TryAddCadenceData(final JSONObject currentSample, final TimeData timeData) {
+		String value = null;
+		if ((value = TryRetrieveStringElementValue(currentSample, TAG_CADENCE)) != null) {
+			timeData.cadence = Util.parseFloat(value) * 60.0f;
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Attempts to retrieve and add power data to the current tour.
+	 *
+	 * @param currentSample
+	 *           The current sample data in JSON format.
+	 * @param sampleList
+	 *           The tour's time serie.
+	 * @return True if successful, false otherwise.
+	 */
+	private boolean TryAddDistanceData(final JSONObject currentSample, final TimeData timeData) {
+		String value = null;
+		if ((value = TryRetrieveStringElementValue(currentSample, TAG_DISTANCE)) != null) {
+			timeData.absoluteDistance = Util.parseFloat(value);
+			return true;
+		}
+		return false;
 	}
 
 	/**
 	 * Attempts to retrieve and add GPS data to the current tour.
-	 * 
+	 *
 	 * @param currentSample
 	 *           The current sample data in JSON format.
 	 * @param sampleList
@@ -349,11 +434,11 @@ public class SuuntoJsonProcessor {
 	 *           True if the method is run for unit test purposes.
 	 * @return True if successful, false otherwise.
 	 */
-	private boolean TryAddGpsData(JSONObject currentSample, TimeData timeData, boolean isUnitTest) {
+	private boolean TryAddGpsData(final JSONObject currentSample, final TimeData timeData, final boolean isUnitTest) {
 		try {
-			float latitude = Util.parseFloat(currentSample.get(TAG_LATITUDE).toString());
-			float longitude = Util.parseFloat(currentSample.get(TAG_LONGITUDE).toString());
-			float altitude = Util.parseFloat(currentSample.get(TAG_GPSALTITUDE).toString());
+			final float latitude = Util.parseFloat(currentSample.get(TAG_LATITUDE).toString());
+			final float longitude = Util.parseFloat(currentSample.get(TAG_LONGITUDE).toString());
+			final float altitude = Util.parseFloat(currentSample.get(TAG_GPSALTITUDE).toString());
 
 			timeData.latitude = (latitude * 180) / Math.PI;
 			timeData.longitude = (longitude * 180) / Math.PI;
@@ -365,7 +450,7 @@ public class SuuntoJsonProcessor {
 			}
 
 			return true;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			StatusUtil.log(e);
 		}
 		return false;
@@ -373,14 +458,14 @@ public class SuuntoJsonProcessor {
 
 	/**
 	 * Attempts to retrieve and add HR data to the current tour.
-	 * 
+	 *
 	 * @param currentSample
 	 *           The current sample data in JSON format.
 	 * @param sampleList
 	 *           The tour's time serie.
 	 * @return True if successful, false otherwise.
 	 */
-	private boolean TryAddHeartRateData(JSONObject currentSample, TimeData timeData) {
+	private boolean TryAddHeartRateData(final JSONObject currentSample, final TimeData timeData) {
 		String value = null;
 		if ((value = TryRetrieveStringElementValue(currentSample, TAG_HR)) != null) {
 			timeData.pulse = Util.parseFloat(value) * 60.0f;
@@ -391,130 +476,15 @@ public class SuuntoJsonProcessor {
 	}
 
 	/**
-	 * Attempts to retrieve and add HR data from the MoveSense HR belt to the current activity.
-	 * 
-	 * @param rrIntervalsList
-	 *           The list containing all the R-R intervals being gathered until they are saved in the
-	 *           activity's heart rate list.
-	 * @param currentSample
-	 *           The current sample data in JSON format.
-	 * @param currentSampleDate
-	 *           The date of the current data.
-	 * @param previousSampleDate
-	 *           The last date for which we saved heart rate data from R-R intervals in the current
-	 *           activity.
-	 */
-	private boolean TryComputeHeartRateData(
-															ArrayList<Integer> rrIntervalsList,
-															JSONObject currentSample,
-															TimeData timeData) {
-		if (!currentSample.toString().contains(TAG_RR))
-			return false;
-
-		ArrayList<Integer> RRValues = TryRetrieveIntegerListElementValue(
-				currentSample.getJSONObject(TAG_RR),
-				TAG_DATA);
-
-		if (RRValues.size() == 0)
-			return false;
-
-		for (int index = 0; index < RRValues.size(); ++index) {
-			TimeData specificTimeData = FindSpecificTimeData(timeData.absoluteTime, index);
-			if (specificTimeData == null)
-				continue;
-
-			// Heart rate (bpm) = 60 / R-R (seconds)
-			float convertedNumber = 60 / (RRValues.get(index) / 1000f);
-			specificTimeData.pulse = convertedNumber;
-		}
-
-		return true;
-	}
-
-	/**
-	 * Searches a specific time slice.
-	 * 
-	 * @param absoluteTime
-	 *           The absolute time of the time slice to find.
-	 * @param offsetSeconds
-	 *           The offset in number of seconds.
-	 * @return The found time slice, null otherwise.
-	 */
-	private TimeData FindSpecificTimeData(long absoluteTime, int offsetSeconds) {
-		long computedTime = absoluteTime + offsetSeconds * 1000;
-
-		for (int index = 0; index < _sampleList.size(); ++index) {
-			if (_sampleList.get(index).absoluteTime == computedTime)
-				return _sampleList.get(index);
-		}
-
-		return null;
-	}
-
-	/**
-	 * Attempts to retrieve and add speed data to the current tour.
-	 * 
-	 * @param currentSample
-	 *           The current sample data in JSON format.
-	 * @param sampleList
-	 *           The tour's time serie.
-	 * @return True if successful, false otherwise.
-	 */
-	private boolean TryAddSpeedData(JSONObject currentSample, TimeData timeData) {
-		String value = null;
-		if ((value = TryRetrieveStringElementValue(currentSample, TAG_SPEED)) != null) {
-			timeData.speed = Util.parseFloat(value);
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Attempts to retrieve and add cadence data to the current tour.
-	 * 
-	 * @param currentSample
-	 *           The current sample data in JSON format.
-	 * @param sampleList
-	 *           The tour's time serie.
-	 * @return True if successful, false otherwise.
-	 */
-	private boolean TryAddCadenceData(JSONObject currentSample, TimeData timeData) {
-		String value = null;
-		if ((value = TryRetrieveStringElementValue(currentSample, TAG_CADENCE)) != null) {
-			timeData.cadence = Util.parseFloat(value) * 60.0f;
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Attempts to retrieve and add barometric altitude data to the current tour.
-	 * 
-	 * @param currentSample
-	 *           The current sample data in JSON format.
-	 * @param sampleList
-	 *           The tour's time serie.
-	 * @return True if successful, false otherwise.
-	 */
-	private boolean TryAddAltitudeData(JSONObject currentSample, TimeData timeData) {
-		String value = null;
-		if ((value = TryRetrieveStringElementValue(currentSample, TAG_ALTITUDE)) != null) {
-			timeData.absoluteAltitude = Util.parseFloat(value);
-			return true;
-		}
-		return false;
-	}
-
-	/**
 	 * Attempts to retrieve and add power data to the current tour.
-	 * 
+	 *
 	 * @param currentSample
 	 *           The current sample data in JSON format.
 	 * @param sampleList
 	 *           The tour's time serie.
 	 * @return True if successful, false otherwise.
 	 */
-	private boolean TryAddPowerData(JSONObject currentSample, TimeData timeData) {
+	private boolean TryAddPowerData(final JSONObject currentSample, final TimeData timeData) {
 		String value = null;
 		if ((value = TryRetrieveStringElementValue(currentSample, TAG_POWER)) != null) {
 			timeData.power = Util.parseFloat(value);
@@ -524,36 +494,18 @@ public class SuuntoJsonProcessor {
 	}
 
 	/**
-	 * Attempts to retrieve and add power data to the current tour.
-	 * 
+	 * Attempts to retrieve and add speed data to the current tour.
+	 *
 	 * @param currentSample
 	 *           The current sample data in JSON format.
 	 * @param sampleList
 	 *           The tour's time serie.
 	 * @return True if successful, false otherwise.
 	 */
-	private boolean TryAddDistanceData(JSONObject currentSample, TimeData timeData) {
+	private boolean TryAddSpeedData(final JSONObject currentSample, final TimeData timeData) {
 		String value = null;
-		if ((value = TryRetrieveStringElementValue(currentSample, TAG_DISTANCE)) != null) {
-			timeData.absoluteDistance = Util.parseFloat(value);
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Attempts to retrieve and add power data to the current tour.
-	 * 
-	 * @param currentSample
-	 *           The current sample data in JSON format.
-	 * @param sampleList
-	 *           The tour's time serie.
-	 * @return True if successful, false otherwise.
-	 */
-	private boolean TryAddTemperatureData(JSONObject currentSample, TimeData timeData) {
-		String value = null;
-		if ((value = TryRetrieveStringElementValue(currentSample, TAG_TEMPERATURE)) != null) {
-			timeData.temperature = Util.parseFloat(value) - Kelvin;
+		if ((value = TryRetrieveStringElementValue(currentSample, TAG_SPEED)) != null) {
+			timeData.speed = Util.parseFloat(value);
 			return true;
 		}
 		return false;
@@ -561,7 +513,7 @@ public class SuuntoJsonProcessor {
 
 	/**
 	 * Attempts to retrieve, process and add swimming data into an activity.
-	 * 
+	 *
 	 * @param tour
 	 *           A given tour.
 	 * @param currentSample
@@ -572,47 +524,32 @@ public class SuuntoJsonProcessor {
 	 *           The previous SuuntoDataNames.TotalLengths value.
 	 * @return The total number of pool lengths
 	 */
-	private boolean TryAddSwimmingData(	List<SwimData> allSwimData,
-													JSONObject currentSample,
-													long currentSampleDate,
-													int previousTotalLengths) {
-		boolean wasDataPopulated = false;
-		JSONArray Events = (JSONArray) currentSample.get("Events");
-		JSONObject array = (JSONObject) Events.get(0);
-		JSONObject swimmingSample = (JSONObject) array.get(Swimming);
+	private boolean TryAddSwimmingData(	final List<SwimData> allSwimData,
+													final JSONObject currentSample,
+                                      final long currentSampleDate) {
+      boolean wasDataPopulated = false;
+		final JSONArray Events = (JSONArray) currentSample.get("Events");
+		final JSONObject array = (JSONObject) Events.get(0);
+		final JSONObject swimmingSample = (JSONObject) array.get(Swimming);
 
-		SwimData previousSwimData = allSwimData.size() == 0 ? null : allSwimData.get(allSwimData.size() - 1);
+		final SwimData previousSwimData = allSwimData.size() == 0 ? null : allSwimData.get(allSwimData.size() - 1);
 
-		String swimmingType = TryRetrieveStringElementValue(
+		final String swimmingType = TryRetrieveStringElementValue(
 				swimmingSample,
 				Type);
 
 		switch (swimmingType) {
 		case Stroke:
 			++previousSwimData.swim_Strokes;
-			wasDataPopulated = true;
+         wasDataPopulated = true;
 			break;
 		case Turn:
-
-			String currentTotalLengthStr = TryRetrieveStringElementValue(
-					swimmingSample,
-					TotalLengths);
-
-			int currentTotalLength = Integer.parseInt(currentTotalLengthStr);
-
-			if (currentTotalLength > 0 &&
-					currentTotalLength == previousTotalLengths)
-				return false;
-
-			SwimData swimData = new SwimData();
+			final SwimData swimData = new SwimData();
 			swimData.swim_Strokes = 0;
-			//If ArrayBegin==0 then we wait till next one
-
-			// TODO ? 
 			swimData.swim_LengthType = LengthType.ACTIVE.getValue();
 
-			// Stroke Type
-			String poolLengthStyle = TryRetrieveStringElementValue(
+         // Swimming Type
+			final String poolLengthStyle = TryRetrieveStringElementValue(
 					swimmingSample,
 					PoolLengthStyle);
 
@@ -625,77 +562,126 @@ public class SuuntoJsonProcessor {
 				break;
 			}
 
-			// Length duration
-			String poolLengthDurationStr = TryRetrieveStringElementValue(
-					swimmingSample,
-					PoolLengthDuration);
-
-			float poolLengthDuration = Float.parseFloat(poolLengthDurationStr);
-			// Converting the pool length duration to ms
-			poolLengthDuration *= 1000;
-
-			//TODO Take care of the case where we are on the first one
-			long previousPoolLengthAbsoluteTime = 0;
-			if (allSwimData.size() == 0)
-				previousPoolLengthAbsoluteTime = currentSampleDate;
-			else
-				previousPoolLengthAbsoluteTime = allSwimData.get(allSwimData.size() - 1).absoluteTime;
-
-			swimData.absoluteTime = previousPoolLengthAbsoluteTime + Math.round(poolLengthDuration);
+         swimData.absoluteTime = currentSampleDate;
 			allSwimData.add(swimData);
-			wasDataPopulated = true;
+         wasDataPopulated = true;
 			break;
 		}
 
-		return wasDataPopulated;
+      return wasDataPopulated;
 	}
 
 	/**
-	 * Searches for an element and returns its value as a string.
-	 * 
-	 * @param token
-	 *           The JSON token in which to look for a given element.
-	 * @param elementName
-	 *           The element name to look for in a JSON content.
-	 * @return The element value, if found.
+	 * Attempts to retrieve and add power data to the current tour.
+	 *
+	 * @param currentSample
+	 *           The current sample data in JSON format.
+	 * @param sampleList
+	 *           The tour's time serie.
+	 * @return True if successful, false otherwise.
 	 */
-	private String TryRetrieveStringElementValue(JSONObject token, String elementName) {
-		if (!token.toString().contains(elementName))
-			return null;
-
-		String result = null;
-		try {
-			result = token.get(elementName).toString();
-		} catch (Exception e) {
+	private boolean TryAddTemperatureData(final JSONObject currentSample, final TimeData timeData) {
+		String value = null;
+		if ((value = TryRetrieveStringElementValue(currentSample, TAG_TEMPERATURE)) != null) {
+			timeData.temperature = Util.parseFloat(value) - Kelvin;
+			return true;
 		}
-		if (result == "null") //$NON-NLS-1$
-			return null;
+		return false;
+	}
 
-		return result;
+	/**
+	 * Attempts to retrieve and add HR data from the MoveSense HR belt to the current activity.
+	 *
+	 * @param rrIntervalsList
+	 *           The list containing all the R-R intervals being gathered until they are saved in the
+	 *           activity's heart rate list.
+	 * @param currentSample
+	 *           The current sample data in JSON format.
+	 * @param currentSampleDate
+	 *           The date of the current data.
+	 * @param previousSampleDate
+	 *           The last date for which we saved heart rate data from R-R intervals in the current
+	 *           activity.
+	 */
+	private boolean TryComputeHeartRateData(
+															final ArrayList<Integer> rrIntervalsList,
+															final JSONObject currentSample,
+															final TimeData timeData) {
+		if (!currentSample.toString().contains(TAG_RR)) {
+         return false;
+      }
+
+		final ArrayList<Integer> RRValues = TryRetrieveIntegerListElementValue(
+				currentSample.getJSONObject(TAG_RR),
+				TAG_DATA);
+
+		if (RRValues.size() == 0) {
+         return false;
+      }
+
+		for (int index = 0; index < RRValues.size(); ++index) {
+			final TimeData specificTimeData = FindSpecificTimeData(timeData.absoluteTime, index);
+			if (specificTimeData == null) {
+            continue;
+         }
+
+			// Heart rate (bpm) = 60 / R-R (seconds)
+			final float convertedNumber = 60 / (RRValues.get(index) / 1000f);
+			specificTimeData.pulse = convertedNumber;
+		}
+
+		return true;
 	}
 
 	/**
 	 * Searches for an element and returns its value as a list of integer.
-	 * 
+	 *
 	 * @param token
 	 *           The JSON token in which to look for a given element.
 	 * @param elementName
 	 *           The element name to look for in a JSON content.
 	 * @return The element value, if found.
 	 */
-	private ArrayList<Integer> TryRetrieveIntegerListElementValue(JSONObject token, String elementName) {
-		ArrayList<Integer> elementValues = new ArrayList<Integer>();
-		String elements = TryRetrieveStringElementValue(token, elementName);
+	private ArrayList<Integer> TryRetrieveIntegerListElementValue(final JSONObject token, final String elementName) {
+		final ArrayList<Integer> elementValues = new ArrayList<Integer>();
+		final String elements = TryRetrieveStringElementValue(token, elementName);
 
-		if (elements == null)
-			return elementValues;
+		if (elements == null) {
+         return elementValues;
+      }
 
-		String[] stringValues = elements.split(",");
-		for (int index = 0; index < stringValues.length; ++index) {
-			Integer rrValue = Integer.parseInt(stringValues[index]);
+		final String[] stringValues = elements.split(",");
+		for (final String stringValue : stringValues) {
+			final Integer rrValue = Integer.parseInt(stringValue);
 			elementValues.add(rrValue);
 		}
 		return elementValues;
 
+	}
+
+	/**
+	 * Searches for an element and returns its value as a string.
+	 *
+	 * @param token
+	 *           The JSON token in which to look for a given element.
+	 * @param elementName
+	 *           The element name to look for in a JSON content.
+	 * @return The element value, if found.
+	 */
+	private String TryRetrieveStringElementValue(final JSONObject token, final String elementName) {
+		if (!token.toString().contains(elementName)) {
+         return null;
+      }
+
+		String result = null;
+		try {
+			result = token.get(elementName).toString();
+		} catch (final Exception e) {
+		}
+		if (result == "null") {
+         return null;
+      }
+
+		return result;
 	}
 }
