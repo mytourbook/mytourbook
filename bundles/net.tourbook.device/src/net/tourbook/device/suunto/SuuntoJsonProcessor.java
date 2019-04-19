@@ -139,7 +139,6 @@ public class SuuntoJsonProcessor {
 		boolean isPaused = false;
 
 		boolean reusePreviousTimeEntry;
-		final ArrayList<Integer> rrIntervalsList = new ArrayList<Integer>();
 		final Instant minInstant = Instant.ofEpochMilli(Long.MIN_VALUE);
 		ZonedDateTime pauseStartTime = minInstant.atZone(ZoneOffset.UTC);
 
@@ -155,6 +154,10 @@ public class SuuntoJsonProcessor {
                continue;
             }
 
+            if (sample.toString().contains("R-R")) {
+               System.out.println("ddd");
+            }
+
 				final String attributesContent = sample.get(TAG_ATTRIBUTES).toString();
 				if (attributesContent == null || attributesContent == "") {
                continue;
@@ -166,7 +169,7 @@ public class SuuntoJsonProcessor {
 				if (currentSampleSml.contains(TAG_SAMPLE)) {
                currentSampleData = new JSONObject(currentSampleSml).get(TAG_SAMPLE).toString();
             } else {
-               currentSampleData = "{}";
+               currentSampleData = new JSONObject(currentSampleSml).toString();
             }
 
 				sampleTime = sample.get(TAG_TIMEISO8601).toString();
@@ -186,8 +189,18 @@ public class SuuntoJsonProcessor {
             currentZonedDateTime = currentZonedDateTime.plusSeconds(1);
          }
 
-			final long currentTime = currentZonedDateTime.toInstant().toEpochMilli();
-			if (currentTime <= tourData.getTourStartTimeMS()) {
+         final long currentTime = currentZonedDateTime.toInstant().toEpochMilli();
+
+         if (currentSampleData.toString().contains(TAG_RR)) {
+            // Heart Rate
+            TryComputeHeartRateData(new JSONObject(currentSampleSml), currentTime);
+            continue;
+         }
+
+         // If the current time is before the actual tour start time, we ignore the data
+         // Except if it's a R-R interval data as it can contain R-R data that belong to later
+         // samples
+         if (currentTime <= tourData.getTourStartTimeMS()) {
             continue;
          }
 
@@ -228,9 +241,7 @@ public class SuuntoJsonProcessor {
 			if (isPaused && currentZonedDateTime.isAfter(pauseStartTime)) {
             continue;
          }
-			if (currentSampleData.contains(TAG_RR)) {
-            System.out.println("dd");
-         }
+
 			if (currentSampleData.contains(TAG_LAP) &&
 					(currentSampleData.contains(TAG_MANUAL) ||
 							currentSampleData.contains(TAG_DISTANCE))) {
@@ -249,7 +260,6 @@ public class SuuntoJsonProcessor {
 
 			// Heart Rate
          wasDataPopulated |= TryAddHeartRateData(currentSampleData, timeData);
-			wasDataPopulated |= TryComputeHeartRateData(rrIntervalsList, new JSONObject(currentSampleSml), timeData);
 
 			// Speed
          wasDataPopulated |= TryAddSpeedData(currentSampleData, timeData);
@@ -278,12 +288,10 @@ public class SuuntoJsonProcessor {
          wasDataPopulated |= TryAddTemperatureData(currentSampleData, timeData);
 
 			//Swimming data
-			if (currentSampleData.contains(Swimming)) {
 				wasDataPopulated |= TryAddSwimmingData(
 						_allSwimData,
                   currentSampleData,
                   timeData.absoluteTime);
-			}
 
 			if (wasDataPopulated && !reusePreviousTimeEntry) {
             _sampleList.add(timeData);
@@ -454,14 +462,14 @@ public class SuuntoJsonProcessor {
 	}
 
 	/**
-	 * Attempts to retrieve and add HR data to the current tour.
-	 *
-	 * @param currentSample
-	 *           The current sample data in JSON format.
-	 * @param sampleList
-	 *           The tour's time serie.
-	 * @return True if successful, false otherwise.
-	 */
+    * Attempts to retrieve and add HR data (from the optical sensor) to the current tour.
+    *
+    * @param currentSample
+    *           The current sample data in JSON format.
+    * @param sampleList
+    *           The tour's time serie.
+    * @return True if successful, false otherwise.
+    */
    private boolean TryAddHeartRateData(final String currentSample, final TimeData timeData) {
 		String value = null;
 		if ((value = TryRetrieveStringElementValue(currentSample, TAG_HR)) != null) {
@@ -472,23 +480,23 @@ public class SuuntoJsonProcessor {
 		return false;
 	}
 
-	/**
-	 * Attempts to retrieve and add power data to the current tour.
-	 *
-	 * @param currentSample
-	 *           The current sample data in JSON format.
-	 * @param sampleList
-	 *           The tour's time serie.
-	 * @return True if successful, false otherwise.
-	 */
+   /**
+    * Attempts to retrieve and add power data to the current tour.
+    *
+    * @param currentSample
+    *           The current sample data in JSON format.
+    * @param sampleList
+    *           The tour's time serie.
+    * @return True if successful, false otherwise.
+    */
    private boolean TryAddPowerData(final String currentSample, final TimeData timeData) {
-		String value = null;
-		if ((value = TryRetrieveStringElementValue(currentSample, TAG_POWER)) != null) {
-			timeData.power = Util.parseFloat(value);
-			return true;
-		}
-		return false;
-	}
+      String value = null;
+      if ((value = TryRetrieveStringElementValue(currentSample, TAG_POWER)) != null) {
+         timeData.power = Util.parseFloat(value);
+         return true;
+      }
+      return false;
+   }
 
 	/**
 	 * Attempts to retrieve and add speed data to the current tour.
@@ -524,6 +532,10 @@ public class SuuntoJsonProcessor {
 	private boolean TryAddSwimmingData(	final List<SwimData> allSwimData,
                                       final String currentSample,
                                       final long currentSampleDate) {
+
+      if (!currentSample.contains(Swimming)) {
+         return false;
+      }
       boolean wasDataPopulated = false;
       final JSONArray Events = (JSONArray) new JSONObject(currentSample).get("Events");
 		final JSONObject array = (JSONObject) Events.get(0);
@@ -608,48 +620,39 @@ public class SuuntoJsonProcessor {
 	}
 
 	/**
-	 * Attempts to retrieve and add HR data from the MoveSense HR belt to the current activity.
-	 *
-	 * @param rrIntervalsList
-	 *           The list containing all the R-R intervals being gathered until they are saved in the
-	 *           activity's heart rate list.
-	 * @param currentSample
-	 *           The current sample data in JSON format.
-	 * @param currentSampleDate
-	 *           The date of the current data.
-	 * @param previousSampleDate
-	 *           The last date for which we saved heart rate data from R-R intervals in the current
-	 *           activity.
-	 */
-	private boolean TryComputeHeartRateData(
-															final ArrayList<Integer> rrIntervalsList,
-															final JSONObject currentSample,
-															final TimeData timeData) {
-		if (!currentSample.toString().contains(TAG_RR)) {
-         return false;
+    * Attempts to retrieve and add HR data from the MoveSense HR belt to the current tour.
+    *
+    * @param currentSample
+    *           The current sample data in JSON format.
+    * @param currentSampleDate
+    *           The date of the current data.
+    */
+   private void TryComputeHeartRateData(final JSONObject currentSample,
+                                           final long currentSampleDate) {
+      if (!currentSample.toString().contains(TAG_RR)) {
+         return;
       }
 
-		final ArrayList<Integer> RRValues = TryRetrieveIntegerListElementValue(
+      final ArrayList<Integer> RRValues = TryRetrieveIntegerListElementValue(
             currentSample.getJSONObject(TAG_RR).toString(),
-				TAG_DATA);
+            TAG_DATA);
 
-		if (RRValues.size() == 0) {
-         return false;
+      if (RRValues.size() == 0) {
+         return;
       }
 
-		for (int index = 0; index < RRValues.size(); ++index) {
-			final TimeData specificTimeData = FindSpecificTimeData(timeData.absoluteTime, index);
-			if (specificTimeData == null) {
+      for (int index = 0; index < RRValues.size(); ++index) {
+         final TimeData specificTimeData = FindSpecificTimeData(currentSampleDate, index);
+         if (specificTimeData == null) {
             continue;
          }
 
-			// Heart rate (bpm) = 60 / R-R (seconds)
-			final float convertedNumber = 60 / (RRValues.get(index) / 1000f);
-			specificTimeData.pulse = convertedNumber;
-		}
+         // Heart rate (bpm) = 60 / R-R (seconds)
+         final float convertedNumber = 60 / (RRValues.get(index) / 1000f);
+         specificTimeData.pulse = convertedNumber;
+      }
+   }
 
-		return true;
-	}
 
 	/**
 	 * Searches for an element and returns its value as a list of integer.
