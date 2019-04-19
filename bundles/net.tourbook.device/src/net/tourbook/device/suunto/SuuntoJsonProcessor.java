@@ -56,6 +56,7 @@ public class SuuntoJsonProcessor {
 	private static final String	Swimming					= "Swimming";
 	private static final String	Breaststroke			= "Breaststroke";
 	private static final String	Freestyle				= "Freestyle";
+   private static final String Other           = "Other";
 	private static final String	PoolLengthStyle		= "PrevPoolLengthStyle";
 	private static final String	Stroke					= "Stroke";
 	private static final String	Turn						= "Turn";
@@ -126,9 +127,6 @@ public class SuuntoJsonProcessor {
 		final JSONObject firstSample = (JSONObject) samples.get(0);
 
 		final TourData tourData = InitializeActivity(firstSample, activityToReUse, sampleListToReUse);
-
-		//tourData.swim_Time
-		//see finalizeTour_SwimData
 
 		if (tourData == null) {
          return null;
@@ -248,40 +246,40 @@ public class SuuntoJsonProcessor {
 			}
 
 			// Heart Rate
-			wasDataPopulated |= TryAddHeartRateData(new JSONObject(currentSampleData), timeData);
+         wasDataPopulated |= TryAddHeartRateData(currentSampleData, timeData);
 			wasDataPopulated |= TryComputeHeartRateData(rrIntervalsList, new JSONObject(currentSampleSml), timeData);
 
 			// Speed
-			wasDataPopulated |= TryAddSpeedData(new JSONObject(currentSampleData), timeData);
+         wasDataPopulated |= TryAddSpeedData(currentSampleData, timeData);
 
 			// Cadence
-			wasDataPopulated |= TryAddCadenceData(new JSONObject(currentSampleData), timeData);
+         wasDataPopulated |= TryAddCadenceData(currentSampleData, timeData);
 
 			// Barometric Altitude
 			if (_prefStore.getInt(IPreferences.ALTITUDE_DATA_SOURCE) == 1 ||
 					isIndoorTour ||
 					isUnitTest) {
-				wasDataPopulated |= TryAddAltitudeData(new JSONObject(currentSampleData), timeData);
+            wasDataPopulated |= TryAddAltitudeData(currentSampleData, timeData);
 			}
 
 			// Power
-			wasDataPopulated |= TryAddPowerData(new JSONObject(currentSampleData), timeData);
+         wasDataPopulated |= TryAddPowerData(currentSampleData, timeData);
 
 			// Distance
 			if (_prefStore.getInt(IPreferences.DISTANCE_DATA_SOURCE) == 1 ||
 					isIndoorTour ||
 					isUnitTest) {
-				wasDataPopulated |= TryAddDistanceData(new JSONObject(currentSampleData), timeData);
+            wasDataPopulated |= TryAddDistanceData(currentSampleData, timeData);
 			}
 
 			// Temperature
-			wasDataPopulated |= TryAddTemperatureData(new JSONObject(currentSampleData), timeData);
+         wasDataPopulated |= TryAddTemperatureData(currentSampleData, timeData);
 
 			//Swimming data
 			if (currentSampleData.contains(Swimming)) {
 				wasDataPopulated |= TryAddSwimmingData(
 						_allSwimData,
-						new JSONObject(currentSampleData),
+                  currentSampleData,
                   timeData.absoluteTime);
 			}
 
@@ -375,7 +373,7 @@ public class SuuntoJsonProcessor {
 	 *           The tour's time serie.
 	 * @return True if successful, false otherwise.
 	 */
-	private boolean TryAddAltitudeData(final JSONObject currentSample, final TimeData timeData) {
+   private boolean TryAddAltitudeData(final String currentSample, final TimeData timeData) {
 		String value = null;
 		if ((value = TryRetrieveStringElementValue(currentSample, TAG_ALTITUDE)) != null) {
 			timeData.absoluteAltitude = Util.parseFloat(value);
@@ -393,7 +391,7 @@ public class SuuntoJsonProcessor {
 	 *           The tour's time serie.
 	 * @return True if successful, false otherwise.
 	 */
-	private boolean TryAddCadenceData(final JSONObject currentSample, final TimeData timeData) {
+   private boolean TryAddCadenceData(final String currentSample, final TimeData timeData) {
 		String value = null;
 		if ((value = TryRetrieveStringElementValue(currentSample, TAG_CADENCE)) != null) {
 			timeData.cadence = Util.parseFloat(value) * 60.0f;
@@ -411,7 +409,7 @@ public class SuuntoJsonProcessor {
 	 *           The tour's time serie.
 	 * @return True if successful, false otherwise.
 	 */
-	private boolean TryAddDistanceData(final JSONObject currentSample, final TimeData timeData) {
+   private boolean TryAddDistanceData(final String currentSample, final TimeData timeData) {
 		String value = null;
 		if ((value = TryRetrieveStringElementValue(currentSample, TAG_DISTANCE)) != null) {
 			timeData.absoluteDistance = Util.parseFloat(value);
@@ -462,7 +460,7 @@ public class SuuntoJsonProcessor {
 	 *           The tour's time serie.
 	 * @return True if successful, false otherwise.
 	 */
-	private boolean TryAddHeartRateData(final JSONObject currentSample, final TimeData timeData) {
+   private boolean TryAddHeartRateData(final String currentSample, final TimeData timeData) {
 		String value = null;
 		if ((value = TryRetrieveStringElementValue(currentSample, TAG_HR)) != null) {
 			timeData.pulse = Util.parseFloat(value) * 60.0f;
@@ -481,7 +479,7 @@ public class SuuntoJsonProcessor {
 	 *           The tour's time serie.
 	 * @return True if successful, false otherwise.
 	 */
-	private boolean TryAddPowerData(final JSONObject currentSample, final TimeData timeData) {
+   private boolean TryAddPowerData(final String currentSample, final TimeData timeData) {
 		String value = null;
 		if ((value = TryRetrieveStringElementValue(currentSample, TAG_POWER)) != null) {
 			timeData.power = Util.parseFloat(value);
@@ -499,7 +497,7 @@ public class SuuntoJsonProcessor {
 	 *           The tour's time serie.
 	 * @return True if successful, false otherwise.
 	 */
-	private boolean TryAddSpeedData(final JSONObject currentSample, final TimeData timeData) {
+   private boolean TryAddSpeedData(final String currentSample, final TimeData timeData) {
 		String value = null;
 		if ((value = TryRetrieveStringElementValue(currentSample, TAG_SPEED)) != null) {
 			timeData.speed = Util.parseFloat(value);
@@ -522,17 +520,17 @@ public class SuuntoJsonProcessor {
 	 * @return The total number of pool lengths
 	 */
 	private boolean TryAddSwimmingData(	final List<SwimData> allSwimData,
-													final JSONObject currentSample,
+                                      final String currentSample,
                                       final long currentSampleDate) {
       boolean wasDataPopulated = false;
-		final JSONArray Events = (JSONArray) currentSample.get("Events");
+      final JSONArray Events = (JSONArray) new JSONObject(currentSample).get("Events");
 		final JSONObject array = (JSONObject) Events.get(0);
-		final JSONObject swimmingSample = (JSONObject) array.get(Swimming);
+      final String swimmingSample = ((JSONObject) array.get(Swimming)).toString();
 
 		final SwimData previousSwimData = allSwimData.size() == 0 ? null : allSwimData.get(allSwimData.size() - 1);
 
 		final String swimmingType = TryRetrieveStringElementValue(
-				swimmingSample,
+            swimmingSample,
 				Type);
 
 		switch (swimmingType) {
@@ -557,6 +555,8 @@ public class SuuntoJsonProcessor {
 			case Freestyle:
 				swimData.swim_StrokeStyle = SwimStroke.FREESTYLE.getValue();
 				break;
+         case Other:
+            swimData.swim_StrokeStyle = SwimStroke.MIXED.getValue();
 			}
 
          swimData.absoluteTime = currentSampleDate;
@@ -569,17 +569,17 @@ public class SuuntoJsonProcessor {
 	}
 
 	/**
-	 * Attempts to retrieve and add power data to the current tour.
-	 *
-	 * @param currentSample
-	 *           The current sample data in JSON format.
-	 * @param sampleList
-	 *           The tour's time serie.
-	 * @return True if successful, false otherwise.
-	 */
-	private boolean TryAddTemperatureData(final JSONObject currentSample, final TimeData timeData) {
+    * Attempts to retrieve and add power data to the current tour.
+    *
+    * @param currentSample
+    *           The current sample data.
+    * @param sampleList
+    *           The tour's time serie.
+    * @return True if successful, false otherwise.
+    */
+	private boolean TryAddTemperatureData(final String currentSample, final TimeData timeData) {
 		String value = null;
-		if ((value = TryRetrieveStringElementValue(currentSample, TAG_TEMPERATURE)) != null) {
+      if ((value = TryRetrieveStringElementValue(currentSample, TAG_TEMPERATURE)) != null) {
          timeData.temperature = (float) (Util.parseFloat(value) + net.tourbook.math.Fmath.T_ABS);
 			return true;
 		}
@@ -609,7 +609,7 @@ public class SuuntoJsonProcessor {
       }
 
 		final ArrayList<Integer> RRValues = TryRetrieveIntegerListElementValue(
-				currentSample.getJSONObject(TAG_RR),
+            currentSample.getJSONObject(TAG_RR).toString(),
 				TAG_DATA);
 
 		if (RRValues.size() == 0) {
@@ -639,7 +639,7 @@ public class SuuntoJsonProcessor {
 	 *           The element name to look for in a JSON content.
 	 * @return The element value, if found.
 	 */
-	private ArrayList<Integer> TryRetrieveIntegerListElementValue(final JSONObject token, final String elementName) {
+   private ArrayList<Integer> TryRetrieveIntegerListElementValue(final String token, final String elementName) {
 		final ArrayList<Integer> elementValues = new ArrayList<Integer>();
 		final String elements = TryRetrieveStringElementValue(token, elementName);
 
@@ -665,14 +665,14 @@ public class SuuntoJsonProcessor {
 	 *           The element name to look for in a JSON content.
 	 * @return The element value, if found.
 	 */
-	private String TryRetrieveStringElementValue(final JSONObject token, final String elementName) {
+   private String TryRetrieveStringElementValue(final String token, final String elementName) {
 		if (!token.toString().contains(elementName)) {
          return null;
       }
 
 		String result = null;
 		try {
-			result = token.get(elementName).toString();
+         result = new JSONObject(token).get(elementName).toString();
 		} catch (final Exception e) {
 		}
 		if (result == "null") {
