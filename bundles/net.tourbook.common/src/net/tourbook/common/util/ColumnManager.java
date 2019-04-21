@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -161,7 +161,7 @@ public class ColumnManager {
    private AdvancedSlideoutShell             _slideoutShell;
 
    /**
-    * Context menu listener.
+    * Context menu listener
     */
    private Listener                          _tableMenuDetectListener;
    private Listener                          _treeMenuDetectListener;
@@ -607,7 +607,7 @@ public class ColumnManager {
     * @param defaultContextMenu
     * @return
     */
-   private Menu createHCM_0_Menu(final Composite composite, final Menu defaultContextMenu, final Shell shell) {
+   private Menu createHCM_0_Menu(final Composite composite, final Shell shell, final Menu defaultContextMenu) {
 
       final Menu headerContextMenu = new Menu(shell, SWT.POP_UP);
 
@@ -897,7 +897,7 @@ public class ColumnManager {
          table.removeListener(SWT.MenuDetect, _tableMenuDetectListener);
       }
 
-      final Menu headerContextMenu = createHCM_0_Menu(table, defaultContextMenu, contextMenuShell);
+      final Menu headerContextMenu = createHCM_0_Menu(table, contextMenuShell, defaultContextMenu);
 
       // add the context menu to the table
       _tableMenuDetectListener = new Listener() {
@@ -962,27 +962,28 @@ public class ColumnManager {
     *           can be <code>null</code>
     */
    public void createHeaderContextMenu(final Tree tree, final Menu defaultContextMenu) {
-      this.createHeaderContextMenu(tree, defaultContextMenu, tree.getShell());
+
+      this.createHeaderContextMenu(tree, tree.getShell(), defaultContextMenu);
    }
 
    /**
     * Set context menu depending on the position of the mouse
     *
     * @param tree
-    * @param defaultContextMenu
-    *           can be <code>null</code>
     * @param contextMenuShell
     *           Shell for the context menu. For reparented dialogs, the correct shell must be
     *           provided.
+    * @param defaultContextMenu
+    *           can be <code>null</code>
     */
-   public void createHeaderContextMenu(final Tree tree, final Menu defaultContextMenu, final Shell contextMenuShell) {
+   private void createHeaderContextMenu(final Tree tree, final Shell contextMenuShell, final Menu defaultContextMenu) {
 
       // remove old listener
       if (_treeMenuDetectListener != null) {
          tree.removeListener(SWT.MenuDetect, _treeMenuDetectListener);
       }
 
-      final Menu headerContextMenu = createHCM_0_Menu(tree, defaultContextMenu, contextMenuShell);
+      final Menu headerContextMenu = createHCM_0_Menu(tree, contextMenuShell, defaultContextMenu);
 
       // add the context menu to the tree viewer
       _treeMenuDetectListener = new Listener() {
@@ -1005,7 +1006,24 @@ public class ColumnManager {
 
             final Menu contextMenu = getContextMenu(isTreeHeaderHit, headerContextMenu, defaultContextMenu);
 
-            tree.setMenu(contextMenu);
+            try {
+
+               tree.setMenu(contextMenu);
+
+            } catch (final IllegalArgumentException e) {
+
+               // this occured: Widget has the wrong parent
+
+               // after some debugging, could not find the reason, this view is very similar to the tourbook view
+
+               /*
+                * The problem can occure when tours are compared with 2 different perspectives (ref
+                * tour and compare result), the system measurement is changed and the context menu
+                * for the ref tours will be opened
+                */
+
+               StatusUtil.showStatus(e);
+            }
 
             /*
              * Set context menu position to the right border of the column

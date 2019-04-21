@@ -2768,7 +2768,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return (float) (timeSquare == 0 ? 0 : cadenceSquare / timeSquare);
    }
 
-   public float computeAvg_FromValues(final short[] valueSerie, final int firstIndex, final int lastIndex) {
+   public float computeAvg_FromValues(final float[] valueSerie, final int firstIndex, final int lastIndex) {
 
       // check if data are available
       if (valueSerie == null || valueSerie.length == 0 || timeSerie == null || timeSerie.length == 0) {
@@ -2867,6 +2867,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
 
       return (float) (timeSquare == 0 ? 0 : valueSquare / timeSquare);
+   }
+
+   public float computeAvg_FromValues(final short[] valueSerie, final int firstIndex, final int lastIndex) {
+
+      // convert short[] into float[]
+      final float[] floatValueSerie = new float[valueSerie.length];
+
+      for (int valueIndex = 0; valueIndex < floatValueSerie.length; valueIndex++) {
+         floatValueSerie[valueIndex] = valueSerie[valueIndex];
+      }
+
+      return computeAvg_FromValues(floatValueSerie, firstIndex, lastIndex);
    }
 
    public void computeAvg_Pulse() {
