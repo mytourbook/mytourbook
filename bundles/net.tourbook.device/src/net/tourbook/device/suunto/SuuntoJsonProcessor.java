@@ -64,12 +64,52 @@ public class SuuntoJsonProcessor {
 	private static final String	Stroke					= "Stroke";
 	private static final String	Turn						= "Turn";
 	private static final String	Type						= "Type";
-   private static final String Stop                 = "Stop";
    private static int          previousTotalLengths = 0;
 
 	private ArrayList<TimeData>	_sampleList;
 	private int							_lapCounter;
 	final IPreferenceStore			_prefStore			= TourbookPlugin.getDefault().getPreferenceStore();
+
+   private void cleanUpActivity(final ArrayList<TimeData> activityData, final boolean isIndoorTour)
+	{
+	// Cleaning-up the processed entries as there should only be entries
+      // every x seconds, no entries should be in between (entries with milliseconds).
+
+      // Also, we first need to make sure that they truly are in chronological order.
+      Collections.sort(activityData, new Comparator<TimeData>() {
+         @Override
+         public int compare(final TimeData firstTimeData, final TimeData secondTimeData) {
+            // -1 - less than, 1 - greater than, 0 - equal, all inversed for descending
+            return firstTimeData.absoluteTime > secondTimeData.absoluteTime ? 1 : (firstTimeData.absoluteTime < secondTimeData.absoluteTime) ? -1
+                  : 0;
+         }
+      });
+
+      final Iterator<TimeData> sampleListIterator = activityData.iterator();
+      long previousAbsoluteTime = 0;
+      while (sampleListIterator.hasNext()) {
+         final TimeData currentTimeData = sampleListIterator.next();
+
+         // Removing the entries that don't have GPS data
+         // In the case where the activity is an indoor tour,
+         // we remove the entries that don't have altitude data
+         if (currentTimeData.marker == 0 &&
+               (!isIndoorTour && currentTimeData.longitude == Double.MIN_VALUE && currentTimeData.latitude == Double.MIN_VALUE) ||
+               (isIndoorTour && currentTimeData.absoluteAltitude == Float.MIN_VALUE) ||
+               currentTimeData.absoluteTime == previousAbsoluteTime) {
+            sampleListIterator.remove();
+         }else {
+            previousAbsoluteTime = currentTimeData.absoluteTime;
+         }
+      }
+
+      // If the activity contains laps, we need to close the last lap.
+      if (_lapCounter != 0) {
+         final TimeData lastTimeData = activityData.get(activityData.size() - 1);
+         lastTimeData.marker = 1;
+         lastTimeData.markerLabel = Integer.toString(++_lapCounter);
+      }
+   }
 
 	/**
 	 * Searches a specific time slice.
@@ -101,7 +141,8 @@ public class SuuntoJsonProcessor {
 		return _sampleList;
 	}
 
-	/**
+
+   /**
 	 * Processes and imports a Suunto activity (from a Suunto 9 or Spartan watch).
 	 *
 	 * @param jsonFileContent
@@ -144,7 +185,6 @@ public class SuuntoJsonProcessor {
 		boolean reusePreviousTimeEntry;
 		final Instant minInstant = Instant.ofEpochMilli(Long.MIN_VALUE);
 		ZonedDateTime pauseStartTime = minInstant.atZone(ZoneOffset.UTC);
-      boolean activityContainsLaps = false;
 		final List<SwimData> _allSwimData = new ArrayList<>();
 
 		for (int i = 0; i < samples.length(); ++i) {
@@ -237,17 +277,6 @@ public class SuuntoJsonProcessor {
 				}
 			}
 
-         if (currentSampleData.contains(Type) &&
-               currentSampleData.contains(Stop) &&
-               activityContainsLaps) {
-            // Note : Because the user first needs to pause the
-            // watch before saving the activity, we don't save
-            // anything in between those 2 events.
-            timeData.marker = 1;
-            _sampleList.add(timeData);
-            timeData.markerLabel = Integer.toString(++_lapCounter);
-         }
-
 			//We check if the current sample date is greater/less than
 			//the pause date because in the JSON file, the samples are
 			//not necessarily in chronological order and we could have
@@ -260,7 +289,6 @@ public class SuuntoJsonProcessor {
 					(currentSampleData.contains(TAG_MANUAL) ||
 							currentSampleData.contains(TAG_DISTANCE))) {
 				timeData.marker = 1;
-            activityContainsLaps = true;
 				timeData.markerLabel = Integer.toString(++_lapCounter);
 				if (!reusePreviousTimeEntry) {
                _sampleList.add(timeData);
@@ -315,36 +343,7 @@ public class SuuntoJsonProcessor {
 
 		// We clean-up the data series ONLY if we're not in a swimming activity
 		if (_allSwimData.size() == 0) {
-			// Cleaning-up the processed entries as there should only be entries
-			// every x seconds, no entries should be in between (entries with milliseconds).
-
-         // Also, we first need to make sure that they truly are in chronological order.
-         Collections.sort(_sampleList, new Comparator<TimeData>() {
-            @Override
-            public int compare(final TimeData firstTimeData, final TimeData secondTimeData) {
-               // -1 - less than, 1 - greater than, 0 - equal, all inversed for descending
-               return firstTimeData.absoluteTime > secondTimeData.absoluteTime ? 1 : (firstTimeData.absoluteTime < secondTimeData.absoluteTime) ? -1
-                     : 0;
-            }
-         });
-
-			final Iterator<TimeData> sampleListIterator = _sampleList.iterator();
-         long previousAbsoluteTime = 0;
-			while (sampleListIterator.hasNext()) {
-				final TimeData currentTimeData = sampleListIterator.next();
-
-				// Removing the entries that don't have GPS data
-				// In the case where the activity is an indoor tour,
-				// we remove the entries that don't have altitude data
-				if (currentTimeData.marker == 0 &&
-						(!isIndoorTour && currentTimeData.longitude == Double.MIN_VALUE && currentTimeData.latitude == Double.MIN_VALUE) ||
-                  (isIndoorTour && currentTimeData.absoluteAltitude == Float.MIN_VALUE) ||
-                  currentTimeData.absoluteTime == previousAbsoluteTime) {
-               sampleListIterator.remove();
-            }else {
-               previousAbsoluteTime = currentTimeData.absoluteTime;
-            }
-			}
+         cleanUpActivity(_sampleList, isIndoorTour);
 		}
 
 		tourData.createTimeSeries(_sampleList, true);
