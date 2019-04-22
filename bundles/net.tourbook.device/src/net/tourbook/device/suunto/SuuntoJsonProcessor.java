@@ -70,7 +70,28 @@ public class SuuntoJsonProcessor {
 	private int							_lapCounter;
 	final IPreferenceStore			_prefStore			= TourbookPlugin.getDefault().getPreferenceStore();
 
-   private void cleanUpActivity(final ArrayList<TimeData> activityData, final boolean isIndoorTour)
+   /**
+    * Attempts to retrieve and add HR data from the MoveSense HR belt to the current tour.
+    *
+    * @param currentSample
+    *           The current sample data in JSON format.
+    * @param currentSampleDate
+    *           The date of the current data.
+    */
+   private void BuildRRDataList(final List<Integer> rrDataList, final String currentSample) {
+      final JSONObject currentSampleJson = new JSONObject(currentSample);
+      final ArrayList<Integer> RRValues = TryRetrieveIntegerListElementValue(
+            currentSampleJson.getJSONObject(TAG_RR).toString(),
+            TAG_DATA);
+
+      if (RRValues.size() == 0) {
+         return;
+      }
+
+      rrDataList.addAll(RRValues);
+   }
+
+	private void cleanUpActivity(final ArrayList<TimeData> activityData, final boolean isIndoorTour)
 	{
 	// Cleaning-up the processed entries as there should only be entries
       // every x seconds, no entries should be in between (entries with milliseconds).
@@ -132,7 +153,8 @@ public class SuuntoJsonProcessor {
 		return null;
 	}
 
-	/**
+
+   /**
 	 * Retrieves the current activity's data.
 	 *
 	 * @return The list of data.
@@ -141,8 +163,7 @@ public class SuuntoJsonProcessor {
 		return _sampleList;
 	}
 
-
-   /**
+	/**
 	 * Processes and imports a Suunto activity (from a Suunto 9 or Spartan watch).
 	 *
 	 * @param jsonFileContent
@@ -186,6 +207,7 @@ public class SuuntoJsonProcessor {
 		final Instant minInstant = Instant.ofEpochMilli(Long.MIN_VALUE);
 		ZonedDateTime pauseStartTime = minInstant.atZone(ZoneOffset.UTC);
 		final List<SwimData> _allSwimData = new ArrayList<>();
+      final List<Integer> _allRRData = new ArrayList<>();
 
 		for (int i = 0; i < samples.length(); ++i) {
 			String currentSampleSml;
@@ -195,10 +217,6 @@ public class SuuntoJsonProcessor {
 				final JSONObject sample = samples.getJSONObject(i);
 				if (!sample.toString().contains(TAG_TIMEISO8601)) {
                continue;
-            }
-
-            if (sample.toString().contains("R-R")) {
-               System.out.println("ddd");
             }
 
 				final String attributesContent = sample.get(TAG_ATTRIBUTES).toString();
@@ -235,8 +253,7 @@ public class SuuntoJsonProcessor {
          final long currentTime = currentZonedDateTime.toInstant().toEpochMilli();
 
          if (currentSampleData.toString().contains(TAG_RR)) {
-            // Heart Rate
-            TryComputeHeartRateData(new JSONObject(currentSampleSml), currentTime);
+            BuildRRDataList(_allRRData, currentSampleSml);
             continue;
          }
 
@@ -298,7 +315,7 @@ public class SuuntoJsonProcessor {
 			// GPS point
 			if (currentSampleData.contains(TAG_GPSALTITUDE) && currentSampleData.contains(TAG_LATITUDE)
 					&& currentSampleData.contains(TAG_LONGITUDE)) {
-				wasDataPopulated |= TryAddGpsData(new JSONObject(currentSampleData), timeData, isUnitTest);
+				wasDataPopulated |= TryAddGpsData(currentSampleData, timeData, isUnitTest);
 			}
 
 			// Heart Rate
@@ -340,6 +357,9 @@ public class SuuntoJsonProcessor {
             _sampleList.add(timeData);
          }
 		}
+
+      // TODO Compute HR before or after the clean up ?
+      TryComputeHeartRateData(_sampleList, _allRRData);
 
 		// We clean-up the data series ONLY if we're not in a swimming activity
 		if (_allSwimData.size() == 0) {
@@ -463,11 +483,12 @@ public class SuuntoJsonProcessor {
 	 *           True if the method is run for unit test purposes.
 	 * @return True if successful, false otherwise.
 	 */
-	private boolean TryAddGpsData(final JSONObject currentSample, final TimeData timeData, final boolean isUnitTest) {
+   private boolean TryAddGpsData(final String currentSample, final TimeData timeData, final boolean isUnitTest) {
 		try {
-			final float latitude = Util.parseFloat(currentSample.get(TAG_LATITUDE).toString());
-			final float longitude = Util.parseFloat(currentSample.get(TAG_LONGITUDE).toString());
-			final float altitude = Util.parseFloat(currentSample.get(TAG_GPSALTITUDE).toString());
+         final JSONObject currentSampleJson = new JSONObject(currentSample);
+         final float latitude = Util.parseFloat(currentSampleJson.get(TAG_LATITUDE).toString());
+         final float longitude = Util.parseFloat(currentSampleJson.get(TAG_LONGITUDE).toString());
+         final float altitude = Util.parseFloat(currentSampleJson.get(TAG_GPSALTITUDE).toString());
 
 			timeData.latitude = (latitude * 180) / Math.PI;
 			timeData.longitude = (longitude * 180) / Math.PI;
@@ -485,7 +506,7 @@ public class SuuntoJsonProcessor {
 		return false;
 	}
 
-	/**
+   /**
     * Attempts to retrieve and add HR data (from the optical sensor) to the current tour.
     *
     * @param currentSample
@@ -504,7 +525,7 @@ public class SuuntoJsonProcessor {
 		return false;
 	}
 
-   /**
+	/**
     * Attempts to retrieve and add power data to the current tour.
     *
     * @param currentSample
@@ -643,37 +664,45 @@ public class SuuntoJsonProcessor {
 		return false;
 	}
 
-	/**
-    * Attempts to retrieve and add HR data from the MoveSense HR belt to the current tour.
+   /**
+    * Computed the heart rate data from the R-R intervals generated by the
+    * MoveSense HR belt to the current tour.
     *
-    * @param currentSample
-    *           The current sample data in JSON format.
+    * @param activityData
+    *           The current activity.
     * @param currentSampleDate
     *           The date of the current data.
     */
-   private void TryComputeHeartRateData(final JSONObject currentSample,
-                                           final long currentSampleDate) {
-      if (!currentSample.toString().contains(TAG_RR)) {
+   private void TryComputeHeartRateData(final ArrayList<TimeData> activityData,
+                                        final List<Integer> rrDataList) {
+      if (rrDataList.size() == 0) {
          return;
       }
 
-      final ArrayList<Integer> RRValues = TryRetrieveIntegerListElementValue(
-            currentSample.getJSONObject(TAG_RR).toString(),
-            TAG_DATA);
+      int currentActivityIndex = 0;
+      long currentRRSum = 0;
+      int lastRRIndex = 0;
+      long RRsum = activityData.get(currentActivityIndex).absoluteTime;
+      int CurrentRRindex = 0;
+      for (currentActivityIndex = 1; currentActivityIndex < activityData.size() && CurrentRRindex < rrDataList.size(); ++currentActivityIndex) {
+      for (; RRsum < activityData.get(currentActivityIndex).absoluteTime &&
+            CurrentRRindex < rrDataList.size();) {
 
-      if (RRValues.size() == 0) {
-         return;
-      }
-
-      for (int index = 0; index < RRValues.size(); ++index) {
-         final TimeData specificTimeData = FindSpecificTimeData(currentSampleDate, index);
-         if (specificTimeData == null) {
-            continue;
+         currentRRSum += rrDataList.get(CurrentRRindex);
+         RRsum += rrDataList.get(CurrentRRindex);
+         ++CurrentRRindex;
          }
 
-         // Heart rate (bpm) = 60 / R-R (seconds)
-         final float convertedNumber = 60 / (RRValues.get(index) / 1000f);
-         specificTimeData.pulse = convertedNumber;
+      // Heart rate (bpm) = 60 / R-R (seconds)
+      final float convertedNumber = 60 / (currentRRSum / 1000f) * (CurrentRRindex - lastRRIndex + 1);
+      activityData.get(currentActivityIndex).pulse = convertedNumber;
+
+         //TEMPO
+         if (CurrentRRindex >= rrDataList.size()) {
+         return;
+      }
+      currentRRSum = rrDataList.get(CurrentRRindex);
+      lastRRIndex = CurrentRRindex;
       }
    }
 
