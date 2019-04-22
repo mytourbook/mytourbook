@@ -5,6 +5,8 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -62,6 +64,7 @@ public class SuuntoJsonProcessor {
 	private static final String	Stroke					= "Stroke";
 	private static final String	Turn						= "Turn";
 	private static final String	Type						= "Type";
+   private static final String Stop                 = "Stop";
    private static int          previousTotalLengths = 0;
 
 	private ArrayList<TimeData>	_sampleList;
@@ -141,7 +144,7 @@ public class SuuntoJsonProcessor {
 		boolean reusePreviousTimeEntry;
 		final Instant minInstant = Instant.ofEpochMilli(Long.MIN_VALUE);
 		ZonedDateTime pauseStartTime = minInstant.atZone(ZoneOffset.UTC);
-
+      boolean activityContainsLaps = false;
 		final List<SwimData> _allSwimData = new ArrayList<>();
 
 		for (int i = 0; i < samples.length(); ++i) {
@@ -234,6 +237,17 @@ public class SuuntoJsonProcessor {
 				}
 			}
 
+         if (currentSampleData.contains(Type) &&
+               currentSampleData.contains(Stop) &&
+               activityContainsLaps) {
+            // Note : Because the user first needs to pause the
+            // watch before saving the activity, we don't save
+            // anything in between those 2 events.
+            timeData.marker = 1;
+            _sampleList.add(timeData);
+            timeData.markerLabel = Integer.toString(++_lapCounter);
+         }
+
 			//We check if the current sample date is greater/less than
 			//the pause date because in the JSON file, the samples are
 			//not necessarily in chronological order and we could have
@@ -246,6 +260,7 @@ public class SuuntoJsonProcessor {
 					(currentSampleData.contains(TAG_MANUAL) ||
 							currentSampleData.contains(TAG_DISTANCE))) {
 				timeData.marker = 1;
+            activityContainsLaps = true;
 				timeData.markerLabel = Integer.toString(++_lapCounter);
 				if (!reusePreviousTimeEntry) {
                _sampleList.add(timeData);
@@ -302,9 +317,18 @@ public class SuuntoJsonProcessor {
 		if (_allSwimData.size() == 0) {
 			// Cleaning-up the processed entries as there should only be entries
 			// every x seconds, no entries should be in between (entries with milliseconds).
-			// Also, we need to make sure that they truly are in chronological order.
+
+         // Also, we first need to make sure that they truly are in chronological order.
+         Collections.sort(_sampleList, new Comparator<TimeData>() {
+            @Override
+            public int compare(final TimeData firstTimeData, final TimeData secondTimeData) {
+               // -1 - less than, 1 - greater than, 0 - equal, all inversed for descending
+               return firstTimeData.absoluteTime > secondTimeData.absoluteTime ? 1 : (firstTimeData.absoluteTime < secondTimeData.absoluteTime) ? -1
+                     : 0;
+            }
+         });
+
 			final Iterator<TimeData> sampleListIterator = _sampleList.iterator();
-			long previousAbsoluteTime = 0;
 			while (sampleListIterator.hasNext()) {
 				final TimeData currentTimeData = sampleListIterator.next();
 
@@ -313,11 +337,8 @@ public class SuuntoJsonProcessor {
 				// we remove the entries that don't have altitude data
 				if (currentTimeData.marker == 0 &&
 						(!isIndoorTour && currentTimeData.longitude == Double.MIN_VALUE && currentTimeData.latitude == Double.MIN_VALUE) ||
-						(isIndoorTour && currentTimeData.absoluteAltitude == Float.MIN_VALUE) ||
-						currentTimeData.absoluteTime <= previousAbsoluteTime) {
+                  (isIndoorTour && currentTimeData.absoluteAltitude == Float.MIN_VALUE)) {
                sampleListIterator.remove();
-            } else {
-               previousAbsoluteTime = currentTimeData.absoluteTime;
             }
 			}
 		}
