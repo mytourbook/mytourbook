@@ -18,6 +18,12 @@ package net.tourbook.data;
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.EAGER;
 
+import com.skedgo.converter.TimezoneMapper;
+
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.set.hash.TIntHashSet;
+
 import java.awt.Point;
 import java.io.File;
 import java.io.PrintStream;
@@ -61,16 +67,6 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.widgets.Display;
-import org.hibernate.annotations.Cascade;
-
-import com.skedgo.converter.TimezoneMapper;
-
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.set.hash.TIntHashSet;
 import net.tourbook.Messages;
 import net.tourbook.algorithm.DPPoint;
 import net.tourbook.algorithm.DouglasPeuckerSimplifier;
@@ -107,6 +103,11 @@ import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.ISmoothingAlgorithm;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.widgets.Display;
+import org.hibernate.annotations.Cascade;
+
 /**
  * Tour data contains all data for a tour (except markers), an entity will be saved in the database
  */
@@ -116,98 +117,98 @@ import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 @XmlAccessorType(XmlAccessType.NONE)
 public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable {
 
-	public static final int					DB_LENGTH_DEVICE_TOUR_TYPE				= 2;
-	public static final int					DB_LENGTH_DEVICE_PLUGIN_ID				= 255;
-	public static final int					DB_LENGTH_DEVICE_PLUGIN_NAME			= 255;
-	public static final int					DB_LENGTH_DEVICE_MODE_NAME				= 255;
-	public static final int					DB_LENGTH_DEVICE_FIRMWARE_VERSION	= 255;
+   public static final int             DB_LENGTH_DEVICE_TOUR_TYPE        = 2;
+   public static final int             DB_LENGTH_DEVICE_PLUGIN_ID        = 255;
+   public static final int             DB_LENGTH_DEVICE_PLUGIN_NAME      = 255;
+   public static final int             DB_LENGTH_DEVICE_MODE_NAME        = 255;
+   public static final int             DB_LENGTH_DEVICE_FIRMWARE_VERSION = 255;
 
-	public static final int					DB_LENGTH_TOUR_TITLE						= 255;
-	public static final int					DB_LENGTH_TOUR_DESCRIPTION				= 4096;
-	public static final int					DB_LENGTH_TOUR_DESCRIPTION_V10		= 32000;
-	public static final int					DB_LENGTH_TOUR_START_PLACE				= 255;
-	public static final int					DB_LENGTH_TOUR_END_PLACE				= 255;
-	public static final int					DB_LENGTH_TOUR_IMPORT_FILE_PATH		= 255;
-	public static final int					DB_LENGTH_TOUR_IMPORT_FILE_NAME		= 255;
-	public static final int					DB_LENGTH_TIME_ZONE_ID					= 255;
+   public static final int             DB_LENGTH_TOUR_TITLE              = 255;
+   public static final int             DB_LENGTH_TOUR_DESCRIPTION        = 4096;
+   public static final int             DB_LENGTH_TOUR_DESCRIPTION_V10    = 32000;
+   public static final int             DB_LENGTH_TOUR_START_PLACE        = 255;
+   public static final int             DB_LENGTH_TOUR_END_PLACE          = 255;
+   public static final int             DB_LENGTH_TOUR_IMPORT_FILE_PATH   = 255;
+   public static final int             DB_LENGTH_TOUR_IMPORT_FILE_NAME   = 255;
+   public static final int             DB_LENGTH_TIME_ZONE_ID            = 255;
 
-	public static final int					DB_LENGTH_WEATHER							= 1000;
-	public static final int					DB_LENGTH_WEATHER_CLOUDS				= 255;
+   public static final int             DB_LENGTH_WEATHER                 = 1000;
+   public static final int             DB_LENGTH_WEATHER_CLOUDS          = 255;
 
-	/**
-	 * <pre>
-	 *
-	 *   decimal  decimal
-	 *   places   degrees      DMS                  qualitative scale that           N/S or E/W      E/W at         E/W at       E/W at
-	 *                                              can be identified                at equator      23N/S          45N/S        67N/S
-	 *
-	 *    0       1.0          1° 00′ 0″       country or large region            111.32   km   102.47   km     78.71  km    43.496  km
-	 *    1       0.1          0° 06′ 0″       large city or district              11.132  km    10.247  km      7.871 km     4.3496 km
-	 *    2       0.01         0° 00′ 36″      town or village                      1.1132 km     1.0247 km    787.1   m    434.96   m
-	 *    3       0.001        0° 00′ 3.6″     neighborhood, street               111.32   m    102.47   m      78.71  m     43.496  m
-	 *    4       0.0001       0° 00′ 0.36″    individual street, land parcel      11.132  m     10.247  m       7.871 m      4.3496 m
-	 *    5       0.00001      0° 00′ 0.036″   individual trees                     1.1132 m      1.0247 m     787.1   mm   434.96   mm
-	 *    6       0.000001     0° 00′ 0.0036″  individual humans                  111.32   mm   102.47   mm     78.71  mm    43.496  mm
-	 *
-	 * https://en.wikipedia.org/wiki/Decimal_degrees
-	 *
-	 * Factor to normalize lat/lon
-	 *
-	 * Degree * INT    resolution
-	 * ---------------------------------------
-	 * Deg * 100      1570 m
-	 * Deg * 1000      157 m
-	 * Deg * 10000      16 m
-	 * Deg * 100000    1.6 m
-	 * </pre>
-	 */
-	public static final double				MAX_GEO_DIFF								= 0.0001;
+   /**
+    * <pre>
+    *
+    *   decimal  decimal
+    *   places   degrees      DMS                  qualitative scale that           N/S or E/W      E/W at         E/W at       E/W at
+    *                                              can be identified                at equator      23N/S          45N/S        67N/S
+    *
+    *    0       1.0          1° 00′ 0″       country or large region            111.32   km   102.47   km     78.71  km    43.496  km
+    *    1       0.1          0° 06′ 0″       large city or district              11.132  km    10.247  km      7.871 km     4.3496 km
+    *    2       0.01         0° 00′ 36″      town or village                      1.1132 km     1.0247 km    787.1   m    434.96   m
+    *    3       0.001        0° 00′ 3.6″     neighborhood, street               111.32   m    102.47   m      78.71  m     43.496  m
+    *    4       0.0001       0° 00′ 0.36″    individual street, land parcel      11.132  m     10.247  m       7.871 m      4.3496 m
+    *    5       0.00001      0° 00′ 0.036″   individual trees                     1.1132 m      1.0247 m     787.1   mm   434.96   mm
+    *    6       0.000001     0° 00′ 0.0036″  individual humans                  111.32   mm   102.47   mm     78.71  mm    43.496  mm
+    *
+    * https://en.wikipedia.org/wiki/Decimal_degrees
+    *
+    * Factor to normalize lat/lon
+    *
+    * Degree * INT    resolution
+    * ---------------------------------------
+    * Deg * 100      1570 m
+    * Deg * 1000      157 m
+    * Deg * 10000      16 m
+    * Deg * 100000    1.6 m
+    * </pre>
+    */
+   public static final double          MAX_GEO_DIFF                      = 0.0001;
 
-	public static final double				NORMALIZED_LATITUDE_OFFSET				= 90.0;
-	public static final int					NORMALIZED_LATITUDE_OFFSET_E2			= 9000;
-	public static final double				NORMALIZED_LONGITUDE_OFFSET			= 180.0;
-	public static final int					NORMALIZED_LONGITUDE_OFFSET_E2		= 18000;
+   public static final double          NORMALIZED_LATITUDE_OFFSET        = 90.0;
+   public static final int             NORMALIZED_LATITUDE_OFFSET_E2     = 9000;
+   public static final double          NORMALIZED_LONGITUDE_OFFSET       = 180.0;
+   public static final int             NORMALIZED_LONGITUDE_OFFSET_E2    = 18000;
 
-	private static final String			TIME_ZONE_ID_EUROPE_BERLIN				= "Europe/Berlin";									//$NON-NLS-1$
+   private static final String         TIME_ZONE_ID_EUROPE_BERLIN        = "Europe/Berlin";                         //$NON-NLS-1$
 
-	public static final int					MIN_TIMEINTERVAL_FOR_MAX_SPEED		= 20;
+   public static final int             MIN_TIMEINTERVAL_FOR_MAX_SPEED    = 20;
 
-	public static final float				MAX_BIKE_SPEED								= 120f;
+   public static final float           MAX_BIKE_SPEED                    = 120f;
 
-	/**
-	 * Number of defined hr zone fields which is currently {@link #hrZone0} ... {@link #hrZone9} = 10
-	 */
-	public static final int					MAX_HR_ZONES								= 10;
+   /**
+    * Number of defined hr zone fields which is currently {@link #hrZone0} ... {@link #hrZone9} = 10
+    */
+   public static final int             MAX_HR_ZONES                      = 10;
 
-	public static final Float				RUN_DYN_DATA_MULTIPLIER					= 100f;
+   public static final Float           RUN_DYN_DATA_MULTIPLIER           = 100f;
 
-	public static final short				SURFING_VALUE_IS_NOT_SET				= -1;
+   public static final short           SURFING_VALUE_IS_NOT_SET          = -1;
 
-	/**
-	 * Device Id for manually created tours
-	 */
-	public static final String				DEVICE_ID_FOR_MANUAL_TOUR				= "manual";												//$NON-NLS-1$
+   /**
+    * Device Id for manually created tours
+    */
+   public static final String          DEVICE_ID_FOR_MANUAL_TOUR         = "manual";                                //$NON-NLS-1$
 
-	/**
-	 * Device id for csv files which behave like manually created tours, marker and timeslices are
-	 * disabled because they are not available, tour duration can be edited<br>
-	 * this is the id of the deviceDataReader
-	 */
-	public static final String				DEVICE_ID_CSV_TOUR_DATA_READER		= "net.tourbook.device.CSVTourDataReader";	//$NON-NLS-1$
+   /**
+    * Device id for csv files which behave like manually created tours, marker and timeslices are
+    * disabled because they are not available, tour duration can be edited<br>
+    * this is the id of the deviceDataReader
+    */
+   public static final String          DEVICE_ID_CSV_TOUR_DATA_READER    = "net.tourbook.device.CSVTourDataReader"; //$NON-NLS-1$
 
-	/**
-	 * THIS IS NOT UNUSED !!!<br>
-	 * <br>
-	 * it initializes SRTM
-	 */
-	@Transient
-	private static final NumberForm		srtmNumberForm								= new NumberForm();
+   /**
+    * THIS IS NOT UNUSED !!!<br>
+    * <br>
+    * it initializes SRTM
+    */
+   @Transient
+   private static final NumberForm     srtmNumberForm                    = new NumberForm();
 
-	@Transient
-	private static final ElevationSRTM3	elevationSRTM3								= new ElevationSRTM3();
+   @Transient
+   private static final ElevationSRTM3 elevationSRTM3                    = new ElevationSRTM3();
 
-	@Transient
-	private static IPreferenceStore		_prefStore									= TourbookPlugin.getPrefStore();
+   @Transient
+   private static IPreferenceStore     _prefStore                        = TourbookPlugin.getPrefStore();
 
 // SET_FORMATTING_OFF
 
@@ -1484,16 +1485,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Swimming data: Relative time in seconds to the tour start time. Contains
     * {@link Short#MIN_VALUE} when value is not set.
     */
-   @XmlElementWrapper(name = "SwimTimes")
-   @XmlElement(name = "SwimTime")
    @Transient
    public int[]         swim_Time;
    /**
     * Swimming data: Activity is defined in {@link LengthType} e.g. active, idle. Contains
     * {@link Short#MIN_VALUE} when value is not set.
     */
-   @XmlElementWrapper(name = "SwimLengthTypes")
-   @XmlElement(name = "SwimLengthType")
    @Transient
    public short[]       swim_LengthType;
 
@@ -1502,8 +1499,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * Swimming data: Number of strokes. Contains {@link Short#MIN_VALUE} when value is not set.
     */
-   @XmlElementWrapper(name = "SwimStrokes")
-   @XmlElement(name = "SwimStroke")
    @Transient
    public short[]       swim_Strokes;
 
@@ -1513,8 +1508,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Swimming data: Stroke style is defined in {@link SwimStroke} e.g. freestyle, breaststroke...
     * Contains {@link Short#MIN_VALUE} when value is not set.
     */
-   @XmlElementWrapper(name = "SwimStrokeStyles")
-   @XmlElement(name = "SwimStrokeStyle")
    @Transient
    public short[]       swim_StrokeStyle;
 
@@ -1524,8 +1517,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Swimming data: Swimming cadence in strokes/min. Contains {@link Short#MIN_VALUE} when value is
     * not set.
     */
-   @XmlElementWrapper(name = "SwimCadences")
-   @XmlElement(name = "SwimCadence")
    @Transient
    public short[]       swim_Cadence;
 
@@ -1542,8 +1533,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * Computed swim data serie
     */
-   @XmlElementWrapper(name = "SwimSwolfs")
-   @XmlElement(name = "SwimSwolf")
    @Transient
    private float[]      _swim_Swolf;
 
@@ -1564,491 +1553,490 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 // SET_FORMATTING_ON
 
-	public TourData() {
-	}
-
-	/**
-	 * Removed data series when the sum of all values is 0.
-	 */
-	public void cleanupDataSeries() {
-
-		if (timeSerie == null) {
-			return;
-		}
-
-		int sumAltitude = 0;
-		int sumCadence = 0;
-		int sumDistance = 0;
-		int sumPulse = 0;
-		int sumTemperature = 0;
-		int sumPower = 0;
-		int sumSpeed = 0;
-
-		int sumRunDyn_StanceTime = 0;
-		int sumRunDyn_StanceTimeBalance = 0;
-		int sumRunDyn_StepLength = 0;
-		int sumRunDyn_VerticalOscillation = 0;
-		int sumRunDyn_VerticalRatio = 0;
-
-		double mapMinLatitude = 0;
-		double mapMaxLatitude = 0;
-		double mapMinLongitude = 0;
-		double mapMaxLongitude = 0;
-
-		// get FIRST VALID latitude/longitude
-		hasGeoData = false;
-		if ((latitudeSerie != null) && (longitudeSerie != null)) {
-
-			for (int timeIndex = 0; timeIndex < timeSerie.length; timeIndex++) {
-				if ((latitudeSerie[timeIndex] != Double.MIN_VALUE) && (longitudeSerie[timeIndex] != Double.MIN_VALUE)) {
-
-					mapMinLatitude = mapMaxLatitude = latitudeSerie[timeIndex] + 90;
-					mapMinLongitude = mapMaxLongitude = longitudeSerie[timeIndex] + 180;
-
-					hasGeoData = true;
-
-					break;
-				}
-			}
-		}
-		double lastValidLatitude = mapMinLatitude - 90;
-		double lastValidLongitude = mapMinLongitude - 180;
-		boolean isLatitudeValid = false;
-
-		for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
-
-			if (altitudeSerie != null) {
-				sumAltitude += altitudeSerie[serieIndex];
-			}
-
-			if (cadenceSerie != null) {
-				sumCadence += cadenceSerie[serieIndex];
-			}
-			if (distanceSerie != null) {
-				sumDistance += distanceSerie[serieIndex];
-			}
-			if (pulseSerie != null) {
-				sumPulse += pulseSerie[serieIndex];
-			}
-			if (temperatureSerie != null) {
-
-				final float temp = temperatureSerie[serieIndex];
-
-				if (temp == Float.MIN_VALUE) {
-					// remove invalid values which are set temporaritly
-					temperatureSerie[serieIndex] = 0;
-				} else {
-					sumTemperature += temp < 0 ? -temp : temp;
-				}
-			}
-			if (powerSerie != null) {
-				sumPower += powerSerie[serieIndex];
-			}
-			if (speedSerie != null) {
-				sumSpeed += speedSerie[serieIndex];
-			}
-
-			if (runDyn_StanceTime != null && sumRunDyn_StanceTime == 0) {
-				sumRunDyn_StanceTime += runDyn_StanceTime[serieIndex];
-			}
-			if (runDyn_StanceTimeBalance != null && sumRunDyn_StanceTimeBalance == 0) {
-				sumRunDyn_StanceTimeBalance += runDyn_StanceTimeBalance[serieIndex];
-			}
-			if (runDyn_StepLength != null && sumRunDyn_StepLength == 0) {
-				sumRunDyn_StepLength += runDyn_StepLength[serieIndex];
-			}
-			if (runDyn_VerticalOscillation != null && sumRunDyn_VerticalOscillation == 0) {
-				sumRunDyn_VerticalOscillation += runDyn_VerticalOscillation[serieIndex];
-			}
-			if (runDyn_VerticalRatio != null && sumRunDyn_VerticalRatio == 0) {
-				sumRunDyn_VerticalRatio += runDyn_VerticalRatio[serieIndex];
-			}
-
-			if (hasGeoData) {
-
-				final double latitude = latitudeSerie[serieIndex];
-				final double longitude = longitudeSerie[serieIndex];
-
-				if ((latitude == Double.MIN_VALUE) || (longitude == Double.MIN_VALUE)) {
-					latitudeSerie[serieIndex] = lastValidLatitude;
-					longitudeSerie[serieIndex] = lastValidLongitude;
-				} else {
-					latitudeSerie[serieIndex] = lastValidLatitude = latitude;
-					longitudeSerie[serieIndex] = lastValidLongitude = longitude;
-				}
-
-				// optimized performance for Math.min/max
-				final double lastValidLatAdjusted = lastValidLatitude + 90;
-				final double lastValidLonAdjusted = lastValidLongitude + 180;
-
-				mapMinLatitude = mapMinLatitude < lastValidLatAdjusted ? mapMinLatitude : lastValidLatAdjusted;
-				mapMaxLatitude = mapMaxLatitude > lastValidLatAdjusted ? mapMaxLatitude : lastValidLatAdjusted;
-				mapMinLongitude = mapMinLongitude < lastValidLonAdjusted ? mapMinLongitude : lastValidLonAdjusted;
-				mapMaxLongitude = mapMaxLongitude > lastValidLonAdjusted ? mapMaxLongitude : lastValidLonAdjusted;
-
-				/*
-				 * check if latitude is not 0, there was a bug until version 1.3.0 where latitude and
-				 * longitude has been saved with 0 values
-				 */
-				if ((isLatitudeValid == false) && (lastValidLatitude != 0)) {
-					isLatitudeValid = true;
-				}
-			}
-		}
-
-		mapMinLatitude -= 90;
-		mapMaxLatitude -= 90;
-		mapMinLongitude -= 180;
-		mapMaxLongitude -= 180;
-
-		/*
-		 * remove data series when the summary of the values is 0, for temperature this can be a
-		 * problem but for a longer tour the temperature varies
-		 */
-
-		if (sumAltitude == 0) {
-			altitudeSerie = null;
-		}
-		if (sumCadence == 0) {
-			cadenceSerie = null;
-		}
-		if (sumDistance == 0) {
-			distanceSerie = null;
-		}
-		if (sumPulse == 0) {
-			pulseSerie = null;
-		}
-		if (sumTemperature == 0) {
-			temperatureSerie = null;
-		}
-		if (sumPower == 0) {
-			powerSerie = null;
-		}
-		if (sumSpeed == 0) {
-			speedSerie = null;
-		}
-
-		if (powerSerie != null) {
-			isPowerSerieFromDevice = true;
-		}
-
-		if (speedSerie != null) {
-			isSpeedSerieFromDevice = true;
-		}
-
-		if (isLatitudeValid == false) {
-			latitudeSerie = null;
-			longitudeSerie = null;
-			_rasterizedLatLon = null;
-			geoGrid = null;
-			hasGeoData = false;
-		}
-
-		if (sumRunDyn_StanceTime == 0) {
-			clear_RunDyn_StanceTime();
-		}
-
-		if (sumRunDyn_StanceTimeBalance == 0) {
-			clear_RunDyn_StanceTimeBalance();
-		}
-
-		if (sumRunDyn_StepLength == 0) {
-			clear_RunDyn_StepLength();
-		}
-
-		if (sumRunDyn_VerticalOscillation == 0) {
-			clear_RunDyn_VerticalOscillation();
-		}
-
-		if (sumRunDyn_VerticalRatio == 0) {
-			clear_RunDyn_VerticalRatio();
-		}
-	}
-
-	public void clear_RunDyn_StanceTime() {
-
-		runDyn_StanceTime = null;
-		runDyn_StanceTime_Min = 0;
-		runDyn_StanceTime_Max = 0;
-		runDyn_StanceTime_Avg = 0;
-
-		_runDyn_StanceTime_UI = null;
-	}
-
-	public void clear_RunDyn_StanceTimeBalance() {
-
-		runDyn_StanceTimeBalance = null;
-		runDyn_StanceTimeBalance_Min = 0;
-		runDyn_StanceTimeBalance_Max = 0;
-		runDyn_StanceTimeBalance_Avg = 0;
-
-		_runDyn_StanceTimeBalance_UI = null;
-	}
-
-	public void clear_RunDyn_StepLength() {
-
-		runDyn_StepLength = null;
-		runDyn_StepLength_Min = 0;
-		runDyn_StepLength_Max = 0;
-		runDyn_StepLength_Avg = 0;
-
-		_runDyn_StepLength_UI = null;
-		_runDyn_StepLength_UI_Imperial = null;
-	}
-
-	public void clear_RunDyn_VerticalOscillation() {
-
-		runDyn_VerticalOscillation = null;
-		runDyn_VerticalOscillation_Min = 0;
-		runDyn_VerticalOscillation_Max = 0;
-		runDyn_VerticalOscillation_Avg = 0;
-
-		_runDyn_VerticalOscillation_UI = null;
-		_runDyn_VerticalOscillation_UI_Imperial = null;
-	}
-
-	public void clear_RunDyn_VerticalRatio() {
-
-		runDyn_VerticalRatio = null;
-		runDyn_VerticalRatio_Min = 0;
-		runDyn_VerticalRatio_Max = 0;
-		runDyn_VerticalRatio_Avg = 0;
-
-		_runDyn_VerticalRatio_UI = null;
-	}
-
-	public void clear_Swim_Cadence() {
-
-		swim_Cadence = null;
-		_swim_Cadence_UI = null;
-	}
-
-	public void clear_swim_LengthType() {
-
-		swim_LengthType = null;
-		_swim_LengthType_UI = null;
-	}
-
-	public void clear_Swim_Strokes() {
-
-		swim_Strokes = null;
-		_swim_Strokes_UI = null;
-	}
-
-	public void clear_Swim_StrokeStyle() {
-
-		swim_StrokeStyle = null;
-		_swim_StrokeStyle_UI = null;
-	}
-
-	public void clear_Swim_Time() {
-
-		swim_Time = null;
-	}
-
-	/**
-	 * clear imperial altitude series so the next time when it's needed it will be recomputed
-	 */
-	public void clearAltitudeSeries() {
-
-		altitudeSerieSmoothed = null;
-
-		altitudeSerieImperial = null;
-		altitudeSerieImperialSmoothed = null;
-	}
-
-	/**
-	 * Clear computed data series so the next time, when they are needed, they are recomputed.
-	 */
-	public void clearComputedSeries() {
-
-		if (isSpeedSerieFromDevice == false) {
-			speedSerie = null;
-		}
-		speedSerieImperial = null;
-
-		if (isPowerSerieFromDevice == false) {
-			powerSerie = null;
-		}
-
-		timeSerieDouble = null;
-		timeSerieWithTimeZoneAdjustment = null;
-		distanceSerieDouble = null;
-		distanceSerieDoubleImperial = null;
-
-		breakTimeSerie = null;
-
-		pulseSerieSmoothed = null;
-		gradientSerie = null;
-
-		paceSerieSeconds = null;
-		paceSerieSecondsImperial = null;
-		paceSerieMinute = null;
-		paceSerieMinuteImperial = null;
-
-		altimeterSerie = null;
-		altimeterSerieImperial = null;
-
-		altitudeSerieSmoothed = null;
-		altitudeSerieImperial = null;
-		altitudeSerieImperialSmoothed = null;
-
-		cadenceSerieWithMultiplier = null;
-
-		_runDyn_StanceTime_UI = null;
-		_runDyn_StanceTimeBalance_UI = null;
-		_runDyn_StepLength_UI = null;
-		_runDyn_StepLength_UI_Imperial = null;
-		_runDyn_VerticalOscillation_UI = null;
-		_runDyn_VerticalOscillation_UI_Imperial = null;
-		_runDyn_VerticalRatio_UI = null;
-
-		_swim_LengthType_UI = null;
-		_swim_Cadence_UI = null;
-		_swim_Strokes_UI = null;
-		_swim_StrokeStyle_UI = null;
-		_swim_Swolf = null;
-
-		if (isSwimCadence) {
-			// cadence is from swim cadence
-			cadenceSerie = null;
-		}
-
-		srtmSerie = null;
-		srtmSerieImperial = null;
-
-		_gpsBounds = null;
-		_rasterizedLatLon = null;
-		geoGrid = null;
+   public TourData() {}
+
+   /**
+    * Removed data series when the sum of all values is 0.
+    */
+   public void cleanupDataSeries() {
+
+      if (timeSerie == null) {
+         return;
+      }
+
+      int sumAltitude = 0;
+      int sumCadence = 0;
+      int sumDistance = 0;
+      int sumPulse = 0;
+      int sumTemperature = 0;
+      int sumPower = 0;
+      int sumSpeed = 0;
+
+      int sumRunDyn_StanceTime = 0;
+      int sumRunDyn_StanceTimeBalance = 0;
+      int sumRunDyn_StepLength = 0;
+      int sumRunDyn_VerticalOscillation = 0;
+      int sumRunDyn_VerticalRatio = 0;
+
+      double mapMinLatitude = 0;
+      double mapMaxLatitude = 0;
+      double mapMinLongitude = 0;
+      double mapMaxLongitude = 0;
+
+      // get FIRST VALID latitude/longitude
+      hasGeoData = false;
+      if ((latitudeSerie != null) && (longitudeSerie != null)) {
+
+         for (int timeIndex = 0; timeIndex < timeSerie.length; timeIndex++) {
+            if ((latitudeSerie[timeIndex] != Double.MIN_VALUE) && (longitudeSerie[timeIndex] != Double.MIN_VALUE)) {
+
+               mapMinLatitude = mapMaxLatitude = latitudeSerie[timeIndex] + 90;
+               mapMinLongitude = mapMaxLongitude = longitudeSerie[timeIndex] + 180;
+
+               hasGeoData = true;
+
+               break;
+            }
+         }
+      }
+      double lastValidLatitude = mapMinLatitude - 90;
+      double lastValidLongitude = mapMinLongitude - 180;
+      boolean isLatitudeValid = false;
+
+      for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
+
+         if (altitudeSerie != null) {
+            sumAltitude += altitudeSerie[serieIndex];
+         }
+
+         if (cadenceSerie != null) {
+            sumCadence += cadenceSerie[serieIndex];
+         }
+         if (distanceSerie != null) {
+            sumDistance += distanceSerie[serieIndex];
+         }
+         if (pulseSerie != null) {
+            sumPulse += pulseSerie[serieIndex];
+         }
+         if (temperatureSerie != null) {
+
+            final float temp = temperatureSerie[serieIndex];
+
+            if (temp == Float.MIN_VALUE) {
+               // remove invalid values which are set temporaritly
+               temperatureSerie[serieIndex] = 0;
+            } else {
+               sumTemperature += temp < 0 ? -temp : temp;
+            }
+         }
+         if (powerSerie != null) {
+            sumPower += powerSerie[serieIndex];
+         }
+         if (speedSerie != null) {
+            sumSpeed += speedSerie[serieIndex];
+         }
+
+         if (runDyn_StanceTime != null && sumRunDyn_StanceTime == 0) {
+            sumRunDyn_StanceTime += runDyn_StanceTime[serieIndex];
+         }
+         if (runDyn_StanceTimeBalance != null && sumRunDyn_StanceTimeBalance == 0) {
+            sumRunDyn_StanceTimeBalance += runDyn_StanceTimeBalance[serieIndex];
+         }
+         if (runDyn_StepLength != null && sumRunDyn_StepLength == 0) {
+            sumRunDyn_StepLength += runDyn_StepLength[serieIndex];
+         }
+         if (runDyn_VerticalOscillation != null && sumRunDyn_VerticalOscillation == 0) {
+            sumRunDyn_VerticalOscillation += runDyn_VerticalOscillation[serieIndex];
+         }
+         if (runDyn_VerticalRatio != null && sumRunDyn_VerticalRatio == 0) {
+            sumRunDyn_VerticalRatio += runDyn_VerticalRatio[serieIndex];
+         }
+
+         if (hasGeoData) {
+
+            final double latitude = latitudeSerie[serieIndex];
+            final double longitude = longitudeSerie[serieIndex];
+
+            if ((latitude == Double.MIN_VALUE) || (longitude == Double.MIN_VALUE)) {
+               latitudeSerie[serieIndex] = lastValidLatitude;
+               longitudeSerie[serieIndex] = lastValidLongitude;
+            } else {
+               latitudeSerie[serieIndex] = lastValidLatitude = latitude;
+               longitudeSerie[serieIndex] = lastValidLongitude = longitude;
+            }
+
+            // optimized performance for Math.min/max
+            final double lastValidLatAdjusted = lastValidLatitude + 90;
+            final double lastValidLonAdjusted = lastValidLongitude + 180;
+
+            mapMinLatitude = mapMinLatitude < lastValidLatAdjusted ? mapMinLatitude : lastValidLatAdjusted;
+            mapMaxLatitude = mapMaxLatitude > lastValidLatAdjusted ? mapMaxLatitude : lastValidLatAdjusted;
+            mapMinLongitude = mapMinLongitude < lastValidLonAdjusted ? mapMinLongitude : lastValidLonAdjusted;
+            mapMaxLongitude = mapMaxLongitude > lastValidLonAdjusted ? mapMaxLongitude : lastValidLonAdjusted;
+
+            /*
+             * check if latitude is not 0, there was a bug until version 1.3.0 where latitude and
+             * longitude has been saved with 0 values
+             */
+            if ((isLatitudeValid == false) && (lastValidLatitude != 0)) {
+               isLatitudeValid = true;
+            }
+         }
+      }
+
+      mapMinLatitude -= 90;
+      mapMaxLatitude -= 90;
+      mapMinLongitude -= 180;
+      mapMaxLongitude -= 180;
+
+      /*
+       * remove data series when the summary of the values is 0, for temperature this can be a
+       * problem but for a longer tour the temperature varies
+       */
+
+      if (sumAltitude == 0) {
+         altitudeSerie = null;
+      }
+      if (sumCadence == 0) {
+         cadenceSerie = null;
+      }
+      if (sumDistance == 0) {
+         distanceSerie = null;
+      }
+      if (sumPulse == 0) {
+         pulseSerie = null;
+      }
+      if (sumTemperature == 0) {
+         temperatureSerie = null;
+      }
+      if (sumPower == 0) {
+         powerSerie = null;
+      }
+      if (sumSpeed == 0) {
+         speedSerie = null;
+      }
+
+      if (powerSerie != null) {
+         isPowerSerieFromDevice = true;
+      }
+
+      if (speedSerie != null) {
+         isSpeedSerieFromDevice = true;
+      }
+
+      if (isLatitudeValid == false) {
+         latitudeSerie = null;
+         longitudeSerie = null;
+         _rasterizedLatLon = null;
+         geoGrid = null;
+         hasGeoData = false;
+      }
+
+      if (sumRunDyn_StanceTime == 0) {
+         clear_RunDyn_StanceTime();
+      }
+
+      if (sumRunDyn_StanceTimeBalance == 0) {
+         clear_RunDyn_StanceTimeBalance();
+      }
+
+      if (sumRunDyn_StepLength == 0) {
+         clear_RunDyn_StepLength();
+      }
+
+      if (sumRunDyn_VerticalOscillation == 0) {
+         clear_RunDyn_VerticalOscillation();
+      }
+
+      if (sumRunDyn_VerticalRatio == 0) {
+         clear_RunDyn_VerticalRatio();
+      }
+   }
+
+   public void clear_RunDyn_StanceTime() {
+
+      runDyn_StanceTime = null;
+      runDyn_StanceTime_Min = 0;
+      runDyn_StanceTime_Max = 0;
+      runDyn_StanceTime_Avg = 0;
+
+      _runDyn_StanceTime_UI = null;
+   }
+
+   public void clear_RunDyn_StanceTimeBalance() {
+
+      runDyn_StanceTimeBalance = null;
+      runDyn_StanceTimeBalance_Min = 0;
+      runDyn_StanceTimeBalance_Max = 0;
+      runDyn_StanceTimeBalance_Avg = 0;
+
+      _runDyn_StanceTimeBalance_UI = null;
+   }
+
+   public void clear_RunDyn_StepLength() {
+
+      runDyn_StepLength = null;
+      runDyn_StepLength_Min = 0;
+      runDyn_StepLength_Max = 0;
+      runDyn_StepLength_Avg = 0;
+
+      _runDyn_StepLength_UI = null;
+      _runDyn_StepLength_UI_Imperial = null;
+   }
+
+   public void clear_RunDyn_VerticalOscillation() {
+
+      runDyn_VerticalOscillation = null;
+      runDyn_VerticalOscillation_Min = 0;
+      runDyn_VerticalOscillation_Max = 0;
+      runDyn_VerticalOscillation_Avg = 0;
+
+      _runDyn_VerticalOscillation_UI = null;
+      _runDyn_VerticalOscillation_UI_Imperial = null;
+   }
+
+   public void clear_RunDyn_VerticalRatio() {
+
+      runDyn_VerticalRatio = null;
+      runDyn_VerticalRatio_Min = 0;
+      runDyn_VerticalRatio_Max = 0;
+      runDyn_VerticalRatio_Avg = 0;
+
+      _runDyn_VerticalRatio_UI = null;
+   }
+
+   public void clear_Swim_Cadence() {
+
+      swim_Cadence = null;
+      _swim_Cadence_UI = null;
+   }
+
+   public void clear_swim_LengthType() {
+
+      swim_LengthType = null;
+      _swim_LengthType_UI = null;
+   }
+
+   public void clear_Swim_Strokes() {
+
+      swim_Strokes = null;
+      _swim_Strokes_UI = null;
+   }
+
+   public void clear_Swim_StrokeStyle() {
+
+      swim_StrokeStyle = null;
+      _swim_StrokeStyle_UI = null;
+   }
+
+   public void clear_Swim_Time() {
+
+      swim_Time = null;
+   }
+
+   /**
+    * clear imperial altitude series so the next time when it's needed it will be recomputed
+    */
+   public void clearAltitudeSeries() {
+
+      altitudeSerieSmoothed = null;
+
+      altitudeSerieImperial = null;
+      altitudeSerieImperialSmoothed = null;
+   }
+
+   /**
+    * Clear computed data series so the next time, when they are needed, they are recomputed.
+    */
+   public void clearComputedSeries() {
+
+      if (isSpeedSerieFromDevice == false) {
+         speedSerie = null;
+      }
+      speedSerieImperial = null;
+
+      if (isPowerSerieFromDevice == false) {
+         powerSerie = null;
+      }
+
+      timeSerieDouble = null;
+      timeSerieWithTimeZoneAdjustment = null;
+      distanceSerieDouble = null;
+      distanceSerieDoubleImperial = null;
+
+      breakTimeSerie = null;
+
+      pulseSerieSmoothed = null;
+      gradientSerie = null;
+
+      paceSerieSeconds = null;
+      paceSerieSecondsImperial = null;
+      paceSerieMinute = null;
+      paceSerieMinuteImperial = null;
+
+      altimeterSerie = null;
+      altimeterSerieImperial = null;
+
+      altitudeSerieSmoothed = null;
+      altitudeSerieImperial = null;
+      altitudeSerieImperialSmoothed = null;
+
+      cadenceSerieWithMultiplier = null;
+
+      _runDyn_StanceTime_UI = null;
+      _runDyn_StanceTimeBalance_UI = null;
+      _runDyn_StepLength_UI = null;
+      _runDyn_StepLength_UI_Imperial = null;
+      _runDyn_VerticalOscillation_UI = null;
+      _runDyn_VerticalOscillation_UI_Imperial = null;
+      _runDyn_VerticalRatio_UI = null;
+
+      _swim_LengthType_UI = null;
+      _swim_Cadence_UI = null;
+      _swim_Strokes_UI = null;
+      _swim_StrokeStyle_UI = null;
+      _swim_Swolf = null;
+
+      if (isSwimCadence) {
+         // cadence is from swim cadence
+         cadenceSerie = null;
+      }
+
+      srtmSerie = null;
+      srtmSerieImperial = null;
+
+      _gpsBounds = null;
+      _rasterizedLatLon = null;
+      geoGrid = null;
 //      latitudeMinE6 = 0;
 //      longitudeMinE6 = 0;
 //      latitudeMaxE6 = 0;
 //      longitudeMaxE6 = 0;
 
-		_hrZones = null;
-		_hrZoneContext = null;
+      _hrZones = null;
+      _hrZoneContext = null;
 
-		_gears = null;
+      _gears = null;
 
-		_cadenceGaps = null;
-	}
+      _cadenceGaps = null;
+   }
 
-	/**
-	 * clears the cached world positions, this is necessary when the data serie have been modified
-	 */
-	public void clearWorldPositions() {
+   /**
+    * clears the cached world positions, this is necessary when the data serie have been modified
+    */
+   public void clearWorldPositions() {
 
-		_tourWorldPosition.clear();
-	}
+      _tourWorldPosition.clear();
+   }
 
-	@Override
-	public Object clone() throws CloneNotSupportedException {
+   @Override
+   public Object clone() throws CloneNotSupportedException {
 
-		final TourData tourDataCopy = new TourData();
+      final TourData tourDataCopy = new TourData();
 
-		tourDataCopy.setTourPerson(this.getTourPerson());
-		tourDataCopy.setDeviceId(this.getDeviceId());
+      tourDataCopy.setTourPerson(this.getTourPerson());
+      tourDataCopy.setDeviceId(this.getDeviceId());
 
-		tourDataCopy.setTourStartTime(this.getTourStartTime());
+      tourDataCopy.setTourStartTime(this.getTourStartTime());
 
-		tourDataCopy.setTourTitle(this.getTourTitle());
-		tourDataCopy.setTourDescription(this.getTourDescription());
+      tourDataCopy.setTourTitle(this.getTourTitle());
+      tourDataCopy.setTourDescription(this.getTourDescription());
 
-		tourDataCopy.setTourTags(new HashSet<>(this.getTourTags()));
-		tourDataCopy.setTourType(this.getTourType());
+      tourDataCopy.setTourTags(new HashSet<>(this.getTourTags()));
+      tourDataCopy.setTourType(this.getTourType());
 
-		return tourDataCopy;
-	}
+      return tourDataCopy;
+   }
 
-	@Override
-	public int compareTo(final Object obj) {
+   @Override
+   public int compareTo(final Object obj) {
 
-		if (obj instanceof TourData) {
+      if (obj instanceof TourData) {
 
-			final TourData otherTourData = (TourData) obj;
+         final TourData otherTourData = (TourData) obj;
 
-			final long tourStartTime2 = otherTourData.tourStartTime;
+         final long tourStartTime2 = otherTourData.tourStartTime;
 
-			return tourStartTime > tourStartTime2 ? 1 : tourStartTime < tourStartTime2 ? -1 : 0;
-		}
+         return tourStartTime > tourStartTime2 ? 1 : tourStartTime < tourStartTime2 ? -1 : 0;
+      }
 
-		return 0;
-	}
+      return 0;
+   }
 
-	/**
-	 * Complete tour marker with altitude/lat/lon.
-	 *
-	 * @param tourMarker
-	 * @param serieIndex
-	 */
-	public void completeTourMarker(final TourMarker tourMarker, final int serieIndex) {
+   /**
+    * Complete tour marker with altitude/lat/lon.
+    *
+    * @param tourMarker
+    * @param serieIndex
+    */
+   public void completeTourMarker(final TourMarker tourMarker, final int serieIndex) {
 
-		if (altitudeSerie != null) {
-			tourMarker.setAltitude(altitudeSerie[serieIndex]);
-		}
+      if (altitudeSerie != null) {
+         tourMarker.setAltitude(altitudeSerie[serieIndex]);
+      }
 
-		if (latitudeSerie != null) {
-			tourMarker.setGeoPosition(latitudeSerie[serieIndex], longitudeSerie[serieIndex]);
-		}
-	}
+      if (latitudeSerie != null) {
+         tourMarker.setGeoPosition(latitudeSerie[serieIndex], longitudeSerie[serieIndex]);
+      }
+   }
 
-	/**
-	 * Complete all tour marker after all data are imported.
-	 * <p>
-	 * Relative tour time must be available that the absolute time can be set.
-	 */
-	public void completeTourMarkerWithRelativeTime() {
+   /**
+    * Complete all tour marker after all data are imported.
+    * <p>
+    * Relative tour time must be available that the absolute time can be set.
+    */
+   public void completeTourMarkerWithRelativeTime() {
 
-		for (final TourMarker tourMarker : this.getTourMarkers()) {
+      for (final TourMarker tourMarker : this.getTourMarkers()) {
 
-			final int serieIndex = tourMarker.getSerieIndex();
-			final int relativeTourTime = tourMarker.getTime();
+         final int serieIndex = tourMarker.getSerieIndex();
+         final int relativeTourTime = tourMarker.getTime();
 
-			tourMarker.setTime(relativeTourTime, tourStartTime + (relativeTourTime * 1000));
+         tourMarker.setTime(relativeTourTime, tourStartTime + (relativeTourTime * 1000));
 
-			completeTourMarker(tourMarker, serieIndex);
-		}
-	}
+         completeTourMarker(tourMarker, serieIndex);
+      }
+   }
 
-	public void computeAltimeterGradientSerie() {
+   public void computeAltimeterGradientSerie() {
 
-		// check if needed data are available
-		if (timeSerie == null || timeSerie.length < 2 || distanceSerie == null || altitudeSerie == null) {
-			return;
-		}
+      // check if needed data are available
+      if (timeSerie == null || timeSerie.length < 2 || distanceSerie == null || altitudeSerie == null) {
+         return;
+      }
 
-		// optimization: don't recreate the data series when they are available
-		if ((altimeterSerie != null) && (altimeterSerieImperial != null) && (gradientSerie != null)) {
-			return;
-		}
+      // optimization: don't recreate the data series when they are available
+      if ((altimeterSerie != null) && (altimeterSerieImperial != null) && (gradientSerie != null)) {
+         return;
+      }
 
-		if (_prefStore
-				.getString(ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM)//
-				.equals(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_JAMET)) {
+      if (_prefStore
+            .getString(ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM)//
+            .equals(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_JAMET)) {
 
-			computeSmoothedDataSeries();
+         computeSmoothedDataSeries();
 
-		} else {
-			if (deviceTimeInterval == -1) {
-				computeAltimeterGradientSerieWithVariableInterval();
-			} else {
-				computeAltimeterGradientSerieWithFixedInterval();
-			}
-		}
-	}
+      } else {
+         if (deviceTimeInterval == -1) {
+            computeAltimeterGradientSerieWithVariableInterval();
+         } else {
+            computeAltimeterGradientSerieWithFixedInterval();
+         }
+      }
+   }
 
-	/**
-	 * Computes the data serie for altimeters with the internal algorithm for a fix time interval
-	 */
-	private void computeAltimeterGradientSerieWithFixedInterval() {
+   /**
+    * Computes the data serie for altimeters with the internal algorithm for a fix time interval
+    */
+   private void computeAltimeterGradientSerieWithFixedInterval() {
 
-		final int serieLength = timeSerie.length;
+      final int serieLength = timeSerie.length;
 
-		final float dataSerieAltimeter[] = new float[serieLength];
-		final float dataSerieGradient[] = new float[serieLength];
+      final float dataSerieAltimeter[] = new float[serieLength];
+      final float dataSerieGradient[] = new float[serieLength];
 
-		int adjustIndexLow;
-		int adjustmentIndexHigh;
+      int adjustIndexLow;
+      int adjustmentIndexHigh;
 
 //      if (prefStore.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_VALUE_COMPUTING)) {
 //
@@ -2068,87 +2056,87 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 //
 //      } else {
 
-		// use internal algorithm to compute altimeter and gradient
+      // use internal algorithm to compute altimeter and gradient
 
-		if (deviceTimeInterval <= 2) {
-			adjustIndexLow = 15;
-			adjustmentIndexHigh = 15;
+      if (deviceTimeInterval <= 2) {
+         adjustIndexLow = 15;
+         adjustmentIndexHigh = 15;
 
-		} else if (deviceTimeInterval <= 5) {
-			adjustIndexLow = 4;
-			adjustmentIndexHigh = 4;
+      } else if (deviceTimeInterval <= 5) {
+         adjustIndexLow = 4;
+         adjustmentIndexHigh = 4;
 
-		} else if (deviceTimeInterval <= 10) {
-			adjustIndexLow = 2;
-			adjustmentIndexHigh = 3;
-		} else {
-			adjustIndexLow = 1;
-			adjustmentIndexHigh = 2;
-		}
+      } else if (deviceTimeInterval <= 10) {
+         adjustIndexLow = 2;
+         adjustmentIndexHigh = 3;
+      } else {
+         adjustIndexLow = 1;
+         adjustmentIndexHigh = 2;
+      }
 //      }
 
-		/*
-		 * compute values
-		 */
+      /*
+       * compute values
+       */
 
-		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
+      for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 
-			/*
-			 * adjust index to the array size, this is optimized to NOT use Math.min or Math.max
-			 */
-			final int serieLengthLow = serieLength - 1;
+         /*
+          * adjust index to the array size, this is optimized to NOT use Math.min or Math.max
+          */
+         final int serieLengthLow = serieLength - 1;
 
-			final int indexLowTemp = serieIndex - adjustIndexLow;
-			final int indexLowTempMax = ((0 >= indexLowTemp) ? 0 : indexLowTemp);
-			final int indexLow = ((indexLowTempMax <= serieLengthLow) ? indexLowTempMax : serieLengthLow);
+         final int indexLowTemp = serieIndex - adjustIndexLow;
+         final int indexLowTempMax = ((0 >= indexLowTemp) ? 0 : indexLowTemp);
+         final int indexLow = ((indexLowTempMax <= serieLengthLow) ? indexLowTempMax : serieLengthLow);
 
-			final int indexHighTemp = serieIndex + adjustmentIndexHigh;
-			final int indexHighTempMin = ((indexHighTemp <= serieLengthLow) ? indexHighTemp : serieLengthLow);
-			final int indexHigh = ((0 >= indexHighTempMin) ? 0 : indexHighTempMin);
+         final int indexHighTemp = serieIndex + adjustmentIndexHigh;
+         final int indexHighTempMin = ((indexHighTemp <= serieLengthLow) ? indexHighTemp : serieLengthLow);
+         final int indexHigh = ((0 >= indexHighTempMin) ? 0 : indexHighTempMin);
 
-			final float distanceDiff = distanceSerie[indexHigh] - distanceSerie[indexLow];
-			final float altitudeDiff = altitudeSerie[indexHigh] - altitudeSerie[indexLow];
+         final float distanceDiff = distanceSerie[indexHigh] - distanceSerie[indexLow];
+         final float altitudeDiff = altitudeSerie[indexHigh] - altitudeSerie[indexLow];
 
-			final float timeDiff = deviceTimeInterval * (indexHigh - indexLow);
+         final float timeDiff = deviceTimeInterval * (indexHigh - indexLow);
 
-			// keep altimeter data
-			dataSerieAltimeter[serieIndex] = 3600 * altitudeDiff / timeDiff / UI.UNIT_VALUE_ALTITUDE;
+         // keep altimeter data
+         dataSerieAltimeter[serieIndex] = 3600 * altitudeDiff / timeDiff / UI.UNIT_VALUE_ALTITUDE;
 
-			// keep gradient data
-			dataSerieGradient[serieIndex] = distanceDiff == 0 ? 0 : altitudeDiff * 100 / distanceDiff;
-		}
+         // keep gradient data
+         dataSerieGradient[serieIndex] = distanceDiff == 0 ? 0 : altitudeDiff * 100 / distanceDiff;
+      }
 
-		if (UI.UNIT_VALUE_ALTITUDE != 1) {
+      if (UI.UNIT_VALUE_ALTITUDE != 1) {
 
-			// set imperial system
+         // set imperial system
 
-			altimeterSerieImperial = dataSerieAltimeter;
+         altimeterSerieImperial = dataSerieAltimeter;
 
-		} else {
+      } else {
 
-			// set metric system
+         // set metric system
 
-			altimeterSerie = dataSerieAltimeter;
-		}
+         altimeterSerie = dataSerieAltimeter;
+      }
 
-		gradientSerie = dataSerieGradient;
-	}
+      gradientSerie = dataSerieGradient;
+   }
 
-	/**
-	 * Computes the data serie for gradient and altimeters for a variable time interval
-	 */
-	private void computeAltimeterGradientSerieWithVariableInterval() {
+   /**
+    * Computes the data serie for gradient and altimeters for a variable time interval
+    */
+   private void computeAltimeterGradientSerieWithVariableInterval() {
 
-		final float[] checkSpeedSerie = getSpeedSerie();
+      final float[] checkSpeedSerie = getSpeedSerie();
 
-		final int serieLength = timeSerie.length;
-		final int serieLengthLast = serieLength - 1;
+      final int serieLength = timeSerie.length;
+      final int serieLengthLast = serieLength - 1;
 
-		final float dataSerieAltimeter[] = new float[serieLength];
-		final float dataSerieGradient[] = new float[serieLength];
+      final float dataSerieAltimeter[] = new float[serieLength];
+      final float dataSerieGradient[] = new float[serieLength];
 
-		// get minimum time/distance differences
-		final int minTimeDiff = _prefStore.getInt(ITourbookPreferences.APP_DATA_SPEED_MIN_TIMESLICE_VALUE);
+      // get minimum time/distance differences
+      final int minTimeDiff = _prefStore.getInt(ITourbookPreferences.APP_DATA_SPEED_MIN_TIMESLICE_VALUE);
 
 //      if (isCustomProperty) {
 //         // use custom settings to compute altimeter and gradient
@@ -2158,1032 +2146,1044 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 //         minTimeDiff = 16;
 //      }
 
-		final int minDistanceDiff = minTimeDiff;
+      final int minDistanceDiff = minTimeDiff;
 
-		final boolean checkPosition = (latitudeSerie != null) && (longitudeSerie != null);
+      final boolean checkPosition = (latitudeSerie != null) && (longitudeSerie != null);
 
-		for (int serieIndex = 1; serieIndex < serieLength; serieIndex++) {
+      for (int serieIndex = 1; serieIndex < serieLength; serieIndex++) {
 
-			if (checkSpeedSerie[serieIndex] == 0) {
-				// continue when no speed is available
+         if (checkSpeedSerie[serieIndex] == 0) {
+            // continue when no speed is available
 //            dataSerieAltimeter[serieIndex] = 2000;
-				continue;
-			}
+            continue;
+         }
 
-			final int sliceTimeDiff = timeSerie[serieIndex] - timeSerie[serieIndex - 1];
+         final int sliceTimeDiff = timeSerie[serieIndex] - timeSerie[serieIndex - 1];
 
-			// check if a lat and long diff is available
-			if (checkPosition && (serieIndex > 0) && (serieIndex < serieLengthLast - 1)) {
+         // check if a lat and long diff is available
+         if (checkPosition && (serieIndex > 0) && (serieIndex < serieLengthLast - 1)) {
 
-				if (sliceTimeDiff > 10) {
+            if (sliceTimeDiff > 10) {
 
-					if ((latitudeSerie[serieIndex] == latitudeSerie[serieIndex - 1])
-							&& (longitudeSerie[serieIndex] == longitudeSerie[serieIndex - 1])) {
+               if ((latitudeSerie[serieIndex] == latitudeSerie[serieIndex - 1])
+                     && (longitudeSerie[serieIndex] == longitudeSerie[serieIndex - 1])) {
 //                  dataSerieAltimeter[serieIndex] = 100;
-						continue;
-					}
+                  continue;
+               }
 
-					if (distanceSerie[serieIndex] == distanceSerie[serieIndex - 1]) {
+               if (distanceSerie[serieIndex] == distanceSerie[serieIndex - 1]) {
 //                  dataSerieAltimeter[serieIndex] = 120;
-						continue;
-					}
+                  continue;
+               }
 
-					if (altitudeSerie[serieIndex] == altitudeSerie[serieIndex - 1]) {
+               if (altitudeSerie[serieIndex] == altitudeSerie[serieIndex - 1]) {
 //                  dataSerieAltimeter[serieIndex] = 130;
-						continue;
-					}
-				}
-			}
-			final int serieIndexPrev = serieIndex - 1;
+                  continue;
+               }
+            }
+         }
+         final int serieIndexPrev = serieIndex - 1;
 
-			// adjust index to the array size
-			int lowIndex = ((0 >= serieIndexPrev) ? 0 : serieIndexPrev);
-			int highIndex = ((serieIndex <= serieLengthLast) ? serieIndex : serieLengthLast);
+         // adjust index to the array size
+         int lowIndex = ((0 >= serieIndexPrev) ? 0 : serieIndexPrev);
+         int highIndex = ((serieIndex <= serieLengthLast) ? serieIndex : serieLengthLast);
 
-			int timeDiff = timeSerie[highIndex] - timeSerie[lowIndex];
-			float distanceDiff = distanceSerie[highIndex] - distanceSerie[lowIndex];
-			float altitudeDiff = altitudeSerie[highIndex] - altitudeSerie[lowIndex];
+         int timeDiff = timeSerie[highIndex] - timeSerie[lowIndex];
+         float distanceDiff = distanceSerie[highIndex] - distanceSerie[lowIndex];
+         float altitudeDiff = altitudeSerie[highIndex] - altitudeSerie[lowIndex];
 
-			boolean toggleIndex = true;
+         boolean toggleIndex = true;
 
-			while ((timeDiff < minTimeDiff) || (distanceDiff < minDistanceDiff)) {
+         while ((timeDiff < minTimeDiff) || (distanceDiff < minDistanceDiff)) {
 
-				// toggle between low and high index
-				if (toggleIndex) {
-					lowIndex--;
-				} else {
-					highIndex++;
-				}
-				toggleIndex = !toggleIndex;
+            // toggle between low and high index
+            if (toggleIndex) {
+               lowIndex--;
+            } else {
+               highIndex++;
+            }
+            toggleIndex = !toggleIndex;
 
-				// check array scope
-				if ((lowIndex < 0) || (highIndex >= serieLength)) {
-					break;
-				}
+            // check array scope
+            if ((lowIndex < 0) || (highIndex >= serieLength)) {
+               break;
+            }
 
-				timeDiff = timeSerie[highIndex] - timeSerie[lowIndex];
-				distanceDiff = distanceSerie[highIndex] - distanceSerie[lowIndex];
-				altitudeDiff = altitudeSerie[highIndex] - altitudeSerie[lowIndex];
+            timeDiff = timeSerie[highIndex] - timeSerie[lowIndex];
+            distanceDiff = distanceSerie[highIndex] - distanceSerie[lowIndex];
+            altitudeDiff = altitudeSerie[highIndex] - altitudeSerie[lowIndex];
 
-			}
+         }
 
-			highIndex = (highIndex <= serieLengthLast) ? highIndex : serieLengthLast;
-			lowIndex = (lowIndex >= 0) ? lowIndex : 0;
+         highIndex = (highIndex <= serieLengthLast) ? highIndex : serieLengthLast;
+         lowIndex = (lowIndex >= 0) ? lowIndex : 0;
 
-			/*
-			 * check if a time difference is available between 2 time data, this can happen in gps data
-			 * that lat+long is available but no time
-			 */
-			boolean isTimeValid = true;
-			int prevTime = timeSerie[lowIndex];
-			for (int timeIndex = lowIndex + 1; timeIndex <= highIndex; timeIndex++) {
-				final int currentTime = timeSerie[timeIndex];
-				if (prevTime == currentTime) {
-					isTimeValid = false;
-					break;
-				}
-				prevTime = currentTime;
-			}
+         /*
+          * check if a time difference is available between 2 time data, this can happen in gps data
+          * that lat+long is available but no time
+          */
+         boolean isTimeValid = true;
+         int prevTime = timeSerie[lowIndex];
+         for (int timeIndex = lowIndex + 1; timeIndex <= highIndex; timeIndex++) {
+            final int currentTime = timeSerie[timeIndex];
+            if (prevTime == currentTime) {
+               isTimeValid = false;
+               break;
+            }
+            prevTime = currentTime;
+         }
 
-			if (isTimeValid) {
+         if (isTimeValid) {
 
-				if (timeDiff > 50 /* && isCustomProperty == false */) {
+            if (timeDiff > 50 /* && isCustomProperty == false */) {
 //               dataSerieAltimeter[serieIndex] = 300;
-					continue;
-				}
+               continue;
+            }
 
-				// check if lat and long diff is available
-				if (checkPosition && (lowIndex > 0) && (highIndex < serieLengthLast - 1)) {
+            // check if lat and long diff is available
+            if (checkPosition && (lowIndex > 0) && (highIndex < serieLengthLast - 1)) {
 
-					if (sliceTimeDiff > 10) {
+               if (sliceTimeDiff > 10) {
 
-						if ((latitudeSerie[lowIndex] == latitudeSerie[lowIndex - 1])
-								&& (longitudeSerie[lowIndex] == longitudeSerie[lowIndex - 1])) {
+                  if ((latitudeSerie[lowIndex] == latitudeSerie[lowIndex - 1])
+                        && (longitudeSerie[lowIndex] == longitudeSerie[lowIndex - 1])) {
 //                     dataSerieAltimeter[serieIndex] = 210;
-							continue;
-						}
-						if ((latitudeSerie[highIndex] == latitudeSerie[highIndex + 1])
-								&& (longitudeSerie[highIndex] == longitudeSerie[highIndex + 1])) {
+                     continue;
+                  }
+                  if ((latitudeSerie[highIndex] == latitudeSerie[highIndex + 1])
+                        && (longitudeSerie[highIndex] == longitudeSerie[highIndex + 1])) {
 //                     dataSerieAltimeter[serieIndex] = 220;
-							continue;
-						}
-					}
-				}
+                     continue;
+                  }
+               }
+            }
 
-				// compute altimeter
-				if (timeDiff > 0) {
-					final float altimeter = 3600f * altitudeDiff / timeDiff / UI.UNIT_VALUE_ALTITUDE;
-					dataSerieAltimeter[serieIndex] = altimeter;
-				} else {
+            // compute altimeter
+            if (timeDiff > 0) {
+               final float altimeter = 3600f * altitudeDiff / timeDiff / UI.UNIT_VALUE_ALTITUDE;
+               dataSerieAltimeter[serieIndex] = altimeter;
+            } else {
 //               dataSerieAltimeter[serieIndex] = -100;
-				}
+            }
 
-				// compute gradient
-				if (distanceDiff > 0) {
-					final float gradient = altitudeDiff * 100 / distanceDiff;
-					dataSerieGradient[serieIndex] = gradient;
-				} else {
+            // compute gradient
+            if (distanceDiff > 0) {
+               final float gradient = altitudeDiff * 100 / distanceDiff;
+               dataSerieGradient[serieIndex] = gradient;
+            } else {
 //               dataSerieAltimeter[serieIndex] = -200;
-				}
+            }
 
-			} else {
+         } else {
 //            dataSerieAltimeter[serieIndex] = -300;
-			}
-		}
+         }
+      }
 
-		if (UI.UNIT_VALUE_ALTITUDE != 1) {
+      if (UI.UNIT_VALUE_ALTITUDE != 1) {
 
-			// set imperial system
+         // set imperial system
 
-			altimeterSerieImperial = dataSerieAltimeter;
+         altimeterSerieImperial = dataSerieAltimeter;
 
-		} else {
+      } else {
 
-			// set metric system
+         // set metric system
 
-			altimeterSerie = dataSerieAltimeter;
-		}
+         altimeterSerie = dataSerieAltimeter;
+      }
 
-		gradientSerie = dataSerieGradient;
-	}
+      gradientSerie = dataSerieGradient;
+   }
 
-	/**
-	 * Computes and sets the altitude up/down values into {@link TourData}
-	 *
-	 * @return Returns <code>true</code> when altitude was computed otherwise <code>false</code>
-	 */
-	public boolean computeAltitudeUpDown() {
+   /**
+    * Computes and sets the altitude up/down values into {@link TourData}
+    *
+    * @return Returns <code>true</code> when altitude was computed otherwise <code>false</code>
+    */
+   public boolean computeAltitudeUpDown() {
 
-		float prefDPTolerance;
+      float prefDPTolerance;
 
-		if (_isImportedMTTour) {
-			// use imported value
-			prefDPTolerance = dpTolerance / 10;
-		} else {
-			prefDPTolerance = _prefStore.getFloat(ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE);
-		}
+      if (_isImportedMTTour) {
+         // use imported value
+         prefDPTolerance = dpTolerance / 10;
+      } else {
+         prefDPTolerance = _prefStore.getFloat(ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE);
+      }
 
-		AltitudeUpDown altiUpDown;
-		if (distanceSerie != null) {
+      AltitudeUpDown altiUpDown;
+      if (distanceSerie != null) {
 
-			// DP needs distance
+         // DP needs distance
 
-			altiUpDown = computeAltitudeUpDown_20_Algorithm_DP(prefDPTolerance);
+         altiUpDown = computeAltitudeUpDown_20_Algorithm_DP(prefDPTolerance);
 
-			// keep this value to see in the UI (toursegmenter) the value and how it is computed
-			dpTolerance = (short) (prefDPTolerance * 10);
+         // keep this value to see in the UI (toursegmenter) the value and how it is computed
+         dpTolerance = (short) (prefDPTolerance * 10);
 
-		} else {
+      } else {
 
-			altiUpDown = computeAltitudeUpDown_30_Algorithm_9_08(null, prefDPTolerance);
-		}
+         altiUpDown = computeAltitudeUpDown_30_Algorithm_9_08(null, prefDPTolerance);
+      }
 
-		if (altiUpDown == null) {
-			return false;
-		}
+      if (altiUpDown == null) {
+         return false;
+      }
 
-		setTourAltUp(altiUpDown.altitudeUp);
-		setTourAltDown(altiUpDown.altitudeDown);
+      setTourAltUp(altiUpDown.altitudeUp);
+      setTourAltDown(altiUpDown.altitudeDown);
 
-		return true;
-	}
+      return true;
+   }
 
-	public AltitudeUpDown computeAltitudeUpDown(	final ArrayList<AltitudeUpDownSegment> segmentSerieIndexParameter,
-																final float selectedMinAltiDiff) {
+   public AltitudeUpDown computeAltitudeUpDown(final ArrayList<AltitudeUpDownSegment> segmentSerieIndexParameter,
+                                               final float selectedMinAltiDiff) {
 
-		return computeAltitudeUpDown_30_Algorithm_9_08(segmentSerieIndexParameter, selectedMinAltiDiff);
-	}
+      return computeAltitudeUpDown_30_Algorithm_9_08(segmentSerieIndexParameter, selectedMinAltiDiff);
+   }
 
-	/**
-	 * Compute altitude up/down with Douglas Peuker algorithm.
-	 *
-	 * @param dpTolerance
-	 * @return Returns <code>null</code> when altitude up/down cannot be computed
-	 */
-	private AltitudeUpDown computeAltitudeUpDown_20_Algorithm_DP(final float dpTolerance) {
+   /**
+    * Compute altitude up/down with Douglas Peuker algorithm.
+    *
+    * @param dpTolerance
+    * @return Returns <code>null</code> when altitude up/down cannot be computed
+    */
+   private AltitudeUpDown computeAltitudeUpDown_20_Algorithm_DP(final float dpTolerance) {
 
-		// check if all necessary data are available
-		if (altitudeSerie == null || altitudeSerie.length < 2) {
-			return null;
-		}
+      // check if all necessary data are available
+      if (altitudeSerie == null || altitudeSerie.length < 2) {
+         return null;
+      }
 
-		// convert data series into DP points
-		final DPPoint dpPoints[] = new DPPoint[distanceSerie.length];
-		for (int serieIndex = 0; serieIndex < dpPoints.length; serieIndex++) {
-			dpPoints[serieIndex] = new DPPoint(distanceSerie[serieIndex], altitudeSerie[serieIndex], serieIndex);
-		}
+      // convert data series into DP points
+      final DPPoint dpPoints[] = new DPPoint[distanceSerie.length];
+      for (int serieIndex = 0; serieIndex < dpPoints.length; serieIndex++) {
+         dpPoints[serieIndex] = new DPPoint(distanceSerie[serieIndex], altitudeSerie[serieIndex], serieIndex);
+      }
 
-		int[] forcedIndices = null;
-		if (isMultipleTours) {
-			forcedIndices = multipleTourStartIndex;
-		}
+      int[] forcedIndices = null;
+      if (isMultipleTours) {
+         forcedIndices = multipleTourStartIndex;
+      }
 
-		final DPPoint[] simplifiedPoints = new DouglasPeuckerSimplifier(dpTolerance, dpPoints, forcedIndices).simplify();
+      final DPPoint[] simplifiedPoints = new DouglasPeuckerSimplifier(dpTolerance, dpPoints, forcedIndices).simplify();
 
-		float altitudeUpTotal = 0;
-		float altitudeDownTotal = 0;
+      float altitudeUpTotal = 0;
+      float altitudeDownTotal = 0;
 
-		float prevAltitude = altitudeSerie[0];
+      float prevAltitude = altitudeSerie[0];
 
-		/*
-		 * Get altitude up/down from the tour altitude values which are found by DP
-		 */
-		for (int dbIndex = 1; dbIndex < simplifiedPoints.length; dbIndex++) {
+      /*
+       * Get altitude up/down from the tour altitude values which are found by DP
+       */
+      for (int dbIndex = 1; dbIndex < simplifiedPoints.length; dbIndex++) {
 
-			final DPPoint point = simplifiedPoints[dbIndex];
-			final float currentAltitude = altitudeSerie[point.serieIndex];
-			final float altiDiff = currentAltitude - prevAltitude;
+         final DPPoint point = simplifiedPoints[dbIndex];
+         final float currentAltitude = altitudeSerie[point.serieIndex];
+         final float altiDiff = currentAltitude - prevAltitude;
 
-			if (altiDiff > 0) {
-				altitudeUpTotal += altiDiff;
-			} else {
-				altitudeDownTotal += altiDiff;
-			}
+         if (altiDiff > 0) {
+            altitudeUpTotal += altiDiff;
+         } else {
+            altitudeDownTotal += altiDiff;
+         }
 
-			prevAltitude = currentAltitude;
-		}
+         prevAltitude = currentAltitude;
+      }
 
-		return new AltitudeUpDown(altitudeUpTotal, -altitudeDownTotal);
-	}
+      return new AltitudeUpDown(altitudeUpTotal, -altitudeDownTotal);
+   }
 
-	/**
-	 * Compute altitude up/down since version 9.08
-	 * <p>
-	 * This algorithm is abandond because it can cause very wrong values dependend on the terrain. DP
-	 * is the preferred algorithm since 14.7.
-	 *
-	 * @param segmentSerie
-	 *           segments are created for each gradient alternation when segmentSerie is not
-	 *           <code>null</code>
-	 * @param minAltiDiff
-	 * @return Returns <code>null</code> when altitude up/down cannot be computed
-	 */
-	private AltitudeUpDown computeAltitudeUpDown_30_Algorithm_9_08(final ArrayList<AltitudeUpDownSegment> segmentSerie,
-																						final float minAltiDiff) {
+   /**
+    * Compute altitude up/down since version 9.08
+    * <p>
+    * This algorithm is abandond because it can cause very wrong values dependend on the terrain. DP
+    * is the preferred algorithm since 14.7.
+    *
+    * @param segmentSerie
+    *           segments are created for each gradient alternation when segmentSerie is not
+    *           <code>null</code>
+    * @param minAltiDiff
+    * @return Returns <code>null</code> when altitude up/down cannot be computed
+    */
+   private AltitudeUpDown computeAltitudeUpDown_30_Algorithm_9_08(final ArrayList<AltitudeUpDownSegment> segmentSerie,
+                                                                  final float minAltiDiff) {
 
-		// check if all necessary data are available
-		if ((altitudeSerie == null) || (timeSerie == null) || (timeSerie.length < 2)) {
-			return null;
-		}
+      // check if all necessary data are available
+      if ((altitudeSerie == null) || (timeSerie == null) || (timeSerie.length < 2)) {
+         return null;
+      }
 
-		final boolean isCreateSegments = segmentSerie != null;
+      final boolean isCreateSegments = segmentSerie != null;
 
-		float prevAltitude = 0;
-		float prevSegmentAltitude = 0;
-		float prevAltiDiff = 0;
+      float prevAltitude = 0;
+      float prevSegmentAltitude = 0;
+      float prevAltiDiff = 0;
 
-		float angleAltiUp = 0;
-		float angleAltiDown = 0;
+      float angleAltiUp = 0;
+      float angleAltiDown = 0;
 
-		float segmentAltitudeMin = 0;
-		float segmentAltitudeMax = 0;
+      float segmentAltitudeMin = 0;
+      float segmentAltitudeMax = 0;
 
-		float altitudeUpTotal = 0;
-		float altitudeDownTotal = 0;
+      float altitudeUpTotal = 0;
+      float altitudeDownTotal = 0;
 
-		final int serieLength = timeSerie.length;
-		int currentSegmentSerieIndex = 0;
+      final int serieLength = timeSerie.length;
+      int currentSegmentSerieIndex = 0;
 
-		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
+      for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 
-			final float altitude = altitudeSerie[serieIndex];
-			float altiDiff = 0;
+         final float altitude = altitudeSerie[serieIndex];
+         float altiDiff = 0;
 
-			if (serieIndex == 0) {
+         if (serieIndex == 0) {
 
-				// first data point
+            // first data point
 
-				if (isCreateSegments) {
+            if (isCreateSegments) {
 
-					// create start for the first segment
-					segmentSerie.add(new AltitudeUpDownSegment(currentSegmentSerieIndex, 0));
-				}
+               // create start for the first segment
+               segmentSerie.add(new AltitudeUpDownSegment(currentSegmentSerieIndex, 0));
+            }
 
-				segmentAltitudeMin = altitude;
-				segmentAltitudeMax = altitude;
+            segmentAltitudeMin = altitude;
+            segmentAltitudeMax = altitude;
 
-				prevSegmentAltitude = altitude;
+            prevSegmentAltitude = altitude;
 
-			} else if (serieIndex == serieLength - 1) {
+         } else if (serieIndex == serieLength - 1) {
 
-				// last data point
+            // last data point
 
-				// check if last segment is set
-				if (serieIndex != currentSegmentSerieIndex) {
+            // check if last segment is set
+            if (serieIndex != currentSegmentSerieIndex) {
 
-					// create end point for the last segment
+               // create end point for the last segment
 
-					float segmentMinMaxDiff = segmentAltitudeMax - segmentAltitudeMin;
-					segmentMinMaxDiff = altitude > prevSegmentAltitude ? segmentMinMaxDiff : -segmentMinMaxDiff;
+               float segmentMinMaxDiff = segmentAltitudeMax - segmentAltitudeMin;
+               segmentMinMaxDiff = altitude > prevSegmentAltitude ? segmentMinMaxDiff : -segmentMinMaxDiff;
 
-					if (isCreateSegments) {
-						segmentSerie.add(new AltitudeUpDownSegment(serieIndex, segmentMinMaxDiff));
-					}
+               if (isCreateSegments) {
+                  segmentSerie.add(new AltitudeUpDownSegment(serieIndex, segmentMinMaxDiff));
+               }
 
-					if (segmentMinMaxDiff > 0) {
-						altitudeUpTotal += segmentMinMaxDiff;
-					}
-					if (segmentMinMaxDiff < 0) {
-						altitudeDownTotal += segmentMinMaxDiff;
-					}
-				}
+               if (segmentMinMaxDiff > 0) {
+                  altitudeUpTotal += segmentMinMaxDiff;
+               }
+               if (segmentMinMaxDiff < 0) {
+                  altitudeDownTotal += segmentMinMaxDiff;
+               }
+            }
 
-			} else if (serieIndex > 0) {
+         } else if (serieIndex > 0) {
 
-				altiDiff = altitude - prevAltitude;
+            altiDiff = altitude - prevAltitude;
 
-				if (altiDiff > 0) {
+            if (altiDiff > 0) {
 
-					// altitude is ascending
+               // altitude is ascending
 
-					/*
-					 * compares with equal 0 (== 0) to prevent initialization error, otherwise the value
-					 * is >0 or <0
-					 */
-					if (prevAltiDiff >= 0) {
+               /*
+                * compares with equal 0 (== 0) to prevent initialization error, otherwise the value
+                * is >0 or <0
+                */
+               if (prevAltiDiff >= 0) {
 
-						// tour is ascending again
+                  // tour is ascending again
 
-						angleAltiUp += altiDiff;
+                  angleAltiUp += altiDiff;
 
-						segmentAltitudeMax = segmentAltitudeMax < altitude ? altitude : segmentAltitudeMax;
+                  segmentAltitudeMax = segmentAltitudeMax < altitude ? altitude : segmentAltitudeMax;
 
-					} else if (prevAltiDiff < 0) {
+               } else if (prevAltiDiff < 0) {
 
-						// angel changed, tour was descending and is now ascending
+                  // angel changed, tour was descending and is now ascending
 
-						if (angleAltiDown <= -minAltiDiff) {
+                  if (angleAltiDown <= -minAltiDiff) {
 
-							final float segmentAltiDiff = segmentAltitudeMin - segmentAltitudeMax;
-							altitudeDownTotal += segmentAltiDiff;
+                     final float segmentAltiDiff = segmentAltitudeMin - segmentAltitudeMax;
+                     altitudeDownTotal += segmentAltiDiff;
 
-							if (isCreateSegments) {
+                     if (isCreateSegments) {
 
-								// create segment point for the descending altitude
+                        // create segment point for the descending altitude
 
-								currentSegmentSerieIndex = serieIndex - 1;
+                        currentSegmentSerieIndex = serieIndex - 1;
 
-								segmentSerie.add(
-										new AltitudeUpDownSegment(
-												currentSegmentSerieIndex, //
-												segmentAltiDiff));
-							}
+                        segmentSerie.add(
+                              new AltitudeUpDownSegment(
+                                    currentSegmentSerieIndex, //
+                                    segmentAltiDiff));
+                     }
 
-							segmentAltitudeMin = prevAltitude;
-							segmentAltitudeMax = prevAltitude + altiDiff;
+                     segmentAltitudeMin = prevAltitude;
+                     segmentAltitudeMax = prevAltitude + altiDiff;
 
-							prevSegmentAltitude = prevAltitude;
-						}
+                     prevSegmentAltitude = prevAltitude;
+                  }
 
-						angleAltiUp = altiDiff;
-						angleAltiDown = 0;
-					}
+                  angleAltiUp = altiDiff;
+                  angleAltiDown = 0;
+               }
 
-				} else if (altiDiff < 0) {
+            } else if (altiDiff < 0) {
 
-					// altitude is descending
+               // altitude is descending
 
-					/*
-					 * compares to == 0 to prevent initialization error, otherwise the value is >0 or <0
-					 */
-					if (prevAltiDiff <= 0) {
+               /*
+                * compares to == 0 to prevent initialization error, otherwise the value is >0 or <0
+                */
+               if (prevAltiDiff <= 0) {
 
-						// tour is descending again
+                  // tour is descending again
 
-						angleAltiDown += altiDiff;
+                  angleAltiDown += altiDiff;
 
-						segmentAltitudeMin = segmentAltitudeMin > altitude ? altitude : segmentAltitudeMin;
+                  segmentAltitudeMin = segmentAltitudeMin > altitude ? altitude : segmentAltitudeMin;
 
-					} else if (prevAltiDiff > 0) {
+               } else if (prevAltiDiff > 0) {
 
-						// angel changed, tour was ascending and is now descending
+                  // angel changed, tour was ascending and is now descending
 
-						if (angleAltiUp >= minAltiDiff) {
+                  if (angleAltiUp >= minAltiDiff) {
 
-							final float segmentAltiDiff = segmentAltitudeMax - segmentAltitudeMin;
-							altitudeUpTotal += segmentAltiDiff;
+                     final float segmentAltiDiff = segmentAltitudeMax - segmentAltitudeMin;
+                     altitudeUpTotal += segmentAltiDiff;
 
-							// create segment
-							if (isCreateSegments) {
+                     // create segment
+                     if (isCreateSegments) {
 
-								currentSegmentSerieIndex = serieIndex - 1;
+                        currentSegmentSerieIndex = serieIndex - 1;
 
-								segmentSerie.add(new AltitudeUpDownSegment(currentSegmentSerieIndex, segmentAltiDiff));
-							}
+                        segmentSerie.add(new AltitudeUpDownSegment(currentSegmentSerieIndex, segmentAltiDiff));
+                     }
 
-							// initialize new segment
-							segmentAltitudeMin = prevAltitude + altiDiff;
-							segmentAltitudeMax = prevAltitude;
+                     // initialize new segment
+                     segmentAltitudeMin = prevAltitude + altiDiff;
+                     segmentAltitudeMax = prevAltitude;
 
-							prevSegmentAltitude = prevAltitude;
-						}
+                     prevSegmentAltitude = prevAltitude;
+                  }
 
-						angleAltiUp = 0;
-						angleAltiDown = altiDiff;
-					}
-				}
-			}
+                  angleAltiUp = 0;
+                  angleAltiDown = altiDiff;
+               }
+            }
+         }
 
-			// prevent setting previous alti to 0
-			if (altiDiff != 0) {
-				prevAltiDiff = altiDiff;
-			}
+         // prevent setting previous alti to 0
+         if (altiDiff != 0) {
+            prevAltiDiff = altiDiff;
+         }
 
-			prevAltitude = altitude;
-		}
+         prevAltitude = altitude;
+      }
 
-		return new AltitudeUpDown(altitudeUpTotal, -altitudeDownTotal);
-	}
+      return new AltitudeUpDown(altitudeUpTotal, -altitudeDownTotal);
+   }
 
-	public float computeAvg_Altitude(final int valueIndexLeft, final int valueIndexRight) {
+   public float computeAvg_Altitude(final int valueIndexLeft, final int valueIndexRight) {
 
-		// check if all necessary data are available
-		if (altitudeSerie == null || altitudeSerie.length < 2
-				|| distanceSerie == null || distanceSerie.length < 2
-				|| valueIndexLeft == valueIndexRight) {
+      // check if all necessary data are available
+      if (altitudeSerie == null || altitudeSerie.length < 2
+            || distanceSerie == null || distanceSerie.length < 2
+            || valueIndexLeft == valueIndexRight) {
 
-			return 0;
-		}
+         return 0;
+      }
 
-		final int serieLength = Math.abs(valueIndexRight - valueIndexLeft);
+      final int serieLength = Math.abs(valueIndexRight - valueIndexLeft);
 
-		// convert data series into DP points
-		final DPPoint dpPoints[] = new DPPoint[serieLength];
-		for (int serieIndex = 0; serieIndex < dpPoints.length; serieIndex++) {
+      // convert data series into DP points
+      final DPPoint dpPoints[] = new DPPoint[serieLength];
+      for (int serieIndex = 0; serieIndex < dpPoints.length; serieIndex++) {
 
-			dpPoints[serieIndex] = new DPPoint(
-					distanceSerie[serieIndex + valueIndexLeft],
-					altitudeSerie[serieIndex + valueIndexLeft],
-					serieIndex);
-		}
+         dpPoints[serieIndex] = new DPPoint(
+               distanceSerie[serieIndex + valueIndexLeft],
+               altitudeSerie[serieIndex + valueIndexLeft],
+               serieIndex);
+      }
 
-		int[] forcedIndices = null;
-		if (isMultipleTours) {
-			forcedIndices = multipleTourStartIndex;
-		}
+      int[] forcedIndices = null;
+      if (isMultipleTours) {
+         forcedIndices = multipleTourStartIndex;
+      }
 
-		final DPPoint[] simplifiedPoints = new DouglasPeuckerSimplifier(dpTolerance / 10.0f, dpPoints, forcedIndices).simplify();
+      final DPPoint[] simplifiedPoints = new DouglasPeuckerSimplifier(dpTolerance / 10.0f, dpPoints, forcedIndices).simplify();
 
-		float altitudeUpTotal = 0;
-		float altitudeDownTotal = 0;
+      float altitudeUpTotal = 0;
+      float altitudeDownTotal = 0;
 
-		float prevAltitude = altitudeSerie[valueIndexLeft];
+      float prevAltitude = altitudeSerie[valueIndexLeft];
 
-		/*
-		 * Get altitude up/down from the tour altitude values which are found by DP
-		 */
-		for (int dbIndex = 1; dbIndex < simplifiedPoints.length; dbIndex++) {
+      /*
+       * Get altitude up/down from the tour altitude values which are found by DP
+       */
+      for (int dbIndex = 1; dbIndex < simplifiedPoints.length; dbIndex++) {
 
-			final DPPoint point = simplifiedPoints[dbIndex];
-			final float currentAltitude = altitudeSerie[point.serieIndex + valueIndexLeft];
-			final float altiDiff = currentAltitude - prevAltitude;
+         final DPPoint point = simplifiedPoints[dbIndex];
+         final float currentAltitude = altitudeSerie[point.serieIndex + valueIndexLeft];
+         final float altiDiff = currentAltitude - prevAltitude;
 
-			if (altiDiff > 0) {
-				altitudeUpTotal += altiDiff;
-			} else {
-				altitudeDownTotal += altiDiff;
-			}
+         if (altiDiff > 0) {
+            altitudeUpTotal += altiDiff;
+         } else {
+            altitudeDownTotal += altiDiff;
+         }
 
-			prevAltitude = currentAltitude;
-		}
+         prevAltitude = currentAltitude;
+      }
 
-		/**
-		 * Very special behaviour until the tour chart analyzer can show both values:
-		 * <p>
-		 * Returns the up values, when 0 then the down values
-		 */
+      /**
+       * Very special behaviour until the tour chart analyzer can show both values:
+       * <p>
+       * Returns the up values, when 0 then the down values
+       */
 
-		return altitudeUpTotal > 0 ? altitudeUpTotal : altitudeDownTotal;
-	}
+      return altitudeUpTotal > 0 ? altitudeUpTotal : altitudeDownTotal;
+   }
 
-	private void computeAvg_Cadence() {
+   private void computeAvg_Cadence() {
 
-		if (cadenceSerie == null) {
-			return;
-		}
+      if (cadenceSerie == null) {
+         return;
+      }
 
-		float cadenceSum = 0;
-		int cadenceCount = 0;
+      float cadenceSum = 0;
+      int cadenceCount = 0;
 
-		for (final float cadence : cadenceSerie) {
+      for (final float cadence : cadenceSerie) {
 
-			if (cadence > 0) {
-				cadenceCount++;
-				cadenceSum += cadence;
-			}
-		}
-		if (cadenceCount > 0) {
-			avgCadence = cadenceSum / cadenceCount;
-		}
-	}
+         if (cadence > 0) {
+            cadenceCount++;
+            cadenceSum += cadence;
+         }
+      }
+      if (cadenceCount > 0) {
+         avgCadence = cadenceSum / cadenceCount;
+      }
+   }
 
-	public float computeAvg_CadenceSegment(final int firstIndex, final int lastIndex) {
+   public float computeAvg_CadenceSegment(final int firstIndex, final int lastIndex) {
 
-		// check if data are available
-		if (cadenceSerie == null || cadenceSerie.length == 0 || timeSerie == null || timeSerie.length == 0) {
-			return 0;
-		}
+      // check if data are available
+      if (cadenceSerie == null || cadenceSerie.length == 0 || timeSerie == null || timeSerie.length == 0) {
+         return 0;
+      }
 
-		// check for 1 point
-		if (firstIndex == lastIndex) {
-			return cadenceSerie[firstIndex];
-		}
+      // check for 1 point
+      if (firstIndex == lastIndex) {
+         return cadenceSerie[firstIndex];
+      }
 
-		// check for 2 points
-		if (lastIndex - firstIndex == 1) {
-			return (cadenceSerie[firstIndex] + cadenceSerie[lastIndex]) / 2;
-		}
+      // check for 2 points
+      if (lastIndex - firstIndex == 1) {
+         return (cadenceSerie[firstIndex] + cadenceSerie[lastIndex]) / 2;
+      }
 
-		// get break time when not yet set
-		if (breakTimeSerie == null) {
-			getBreakTime();
-		}
+      // get break time when not yet set
+      if (breakTimeSerie == null) {
+         getBreakTime();
+      }
 
-		// at least 3 points are available
-		int prevTime = timeSerie[firstIndex];
-		int currentTime = timeSerie[firstIndex];
-		int nextTime = timeSerie[firstIndex + 1];
+      // at least 3 points are available
+      int prevTime = timeSerie[firstIndex];
+      int currentTime = timeSerie[firstIndex];
+      int nextTime = timeSerie[firstIndex + 1];
 
-		/**
-		 * a break is set from the previous to the current time slice
-		 */
-		final boolean hasBreakTime = breakTimeSerie != null;
-		boolean isPrevBreak = hasBreakTime ? breakTimeSerie[firstIndex] : false;
-		boolean isNextBreak = hasBreakTime ? breakTimeSerie[firstIndex + 1] : false;
+      /**
+       * a break is set from the previous to the current time slice
+       */
+      final boolean hasBreakTime = breakTimeSerie != null;
+      boolean isPrevBreak = hasBreakTime ? breakTimeSerie[firstIndex] : false;
+      boolean isNextBreak = hasBreakTime ? breakTimeSerie[firstIndex + 1] : false;
 
-		double cadenceSquare = 0;
-		double timeSquare = 0;
+      double cadenceSquare = 0;
+      double timeSquare = 0;
 
-		final float[] cadenceWithMuliplier = getCadenceSerieWithMuliplier();
+      final float[] cadenceWithMuliplier = getCadenceSerieWithMuliplier();
 
-		for (int serieIndex = firstIndex; serieIndex <= lastIndex; serieIndex++) {
+      for (int serieIndex = firstIndex; serieIndex <= lastIndex; serieIndex++) {
 
-			if (hasBreakTime) {
+         if (hasBreakTime) {
 
-				/*
-				 * break time requires distance data, so it's possible that break time data are not
-				 * available
-				 */
+            /*
+             * break time requires distance data, so it's possible that break time data are not
+             * available
+             */
 
-				if (breakTimeSerie[serieIndex] == true) {
+            if (breakTimeSerie[serieIndex] == true) {
 
-					// break has occured in this time slice
+               // break has occured in this time slice
 
-					if (serieIndex < lastIndex) {
+               if (serieIndex < lastIndex) {
 
-						isPrevBreak = isNextBreak;
-						isNextBreak = breakTimeSerie[serieIndex + 1];
+                  isPrevBreak = isNextBreak;
+                  isNextBreak = breakTimeSerie[serieIndex + 1];
 
-						prevTime = currentTime;
-						currentTime = nextTime;
-						nextTime = timeSerie[serieIndex + 1];
-					}
+                  prevTime = currentTime;
+                  currentTime = nextTime;
+                  nextTime = timeSerie[serieIndex + 1];
+               }
 
-					continue;
-				}
-			}
+               continue;
+            }
+         }
 
-			final float cadence = cadenceWithMuliplier[serieIndex];
+         final float cadence = cadenceWithMuliplier[serieIndex];
 
-			float timeDiffPrev = 0;
-			float timeDiffNext = 0;
+         float timeDiffPrev = 0;
+         float timeDiffNext = 0;
 
-			if (serieIndex > firstIndex && isPrevBreak == false) {
-				// prev is available
-				timeDiffPrev = ((float) currentTime - prevTime) / 2;
-			}
+         if (serieIndex > firstIndex && isPrevBreak == false) {
+            // prev is available
+            timeDiffPrev = ((float) currentTime - prevTime) / 2;
+         }
 
-			if (serieIndex < lastIndex && isNextBreak == false) {
-				// next is available
-				timeDiffNext = ((float) nextTime - currentTime) / 2;
-			}
+         if (serieIndex < lastIndex && isNextBreak == false) {
+            // next is available
+            timeDiffNext = ((float) nextTime - currentTime) / 2;
+         }
 
-			// ignore 0 values
-			if (cadence > 0) {
+         // ignore 0 values
+         if (cadence > 0) {
 
-				cadenceSquare += cadence * timeDiffPrev + cadence * timeDiffNext;
-				timeSquare += timeDiffPrev + timeDiffNext;
-			}
+            cadenceSquare += cadence * timeDiffPrev + cadence * timeDiffNext;
+            timeSquare += timeDiffPrev + timeDiffNext;
+         }
 
-			if (serieIndex < lastIndex) {
+         if (serieIndex < lastIndex) {
 
-				isPrevBreak = isNextBreak;
-				isNextBreak = hasBreakTime ? breakTimeSerie[serieIndex + 1] : false;
+            isPrevBreak = isNextBreak;
+            isNextBreak = hasBreakTime ? breakTimeSerie[serieIndex + 1] : false;
 
-				prevTime = currentTime;
-				currentTime = nextTime;
-				nextTime = timeSerie[serieIndex + 1];
-			}
+            prevTime = currentTime;
+            currentTime = nextTime;
+            nextTime = timeSerie[serieIndex + 1];
+         }
 
-		}
+      }
 
-		return (float) (timeSquare == 0 ? 0 : cadenceSquare / timeSquare);
-	}
+      return (float) (timeSquare == 0 ? 0 : cadenceSquare / timeSquare);
+   }
 
-	public float computeAvg_FromValues(final short[] valueSerie, final int firstIndex, final int lastIndex) {
+   public float computeAvg_FromValues(final float[] valueSerie, final int firstIndex, final int lastIndex) {
 
-		// check if data are available
-		if (valueSerie == null || valueSerie.length == 0 || timeSerie == null || timeSerie.length == 0) {
-			return 0;
-		}
+      // check if data are available
+      if (valueSerie == null || valueSerie.length == 0 || timeSerie == null || timeSerie.length == 0) {
+         return 0;
+      }
 
-		// check for 1 point
-		if (firstIndex == lastIndex) {
-			return valueSerie[firstIndex];
-		}
+      // check for 1 point
+      if (firstIndex == lastIndex) {
+         return valueSerie[firstIndex];
+      }
 
-		// check for 2 points
-		if (lastIndex - firstIndex == 1) {
-			return (valueSerie[firstIndex] + valueSerie[lastIndex]) / 2;
-		}
+      // check for 2 points
+      if (lastIndex - firstIndex == 1) {
+         return (valueSerie[firstIndex] + valueSerie[lastIndex]) / 2;
+      }
 
-		// get break time when not yet set
-		if (breakTimeSerie == null) {
-			getBreakTime();
-		}
+      // get break time when not yet set
+      if (breakTimeSerie == null) {
+         getBreakTime();
+      }
 
-		// at least 3 points are available
-		int prevTime = timeSerie[firstIndex];
-		int currentTime = timeSerie[firstIndex];
-		int nextTime = timeSerie[firstIndex + 1];
+      // at least 3 points are available
+      int prevTime = timeSerie[firstIndex];
+      int currentTime = timeSerie[firstIndex];
+      int nextTime = timeSerie[firstIndex + 1];
 
-		/**
-		 * a break is set from the previous to the current time slice
-		 */
-		final boolean hasBreakTime = breakTimeSerie != null;
-		boolean isPrevBreak = hasBreakTime ? breakTimeSerie[firstIndex] : false;
-		boolean isNextBreak = hasBreakTime ? breakTimeSerie[firstIndex + 1] : false;
+      /**
+       * a break is set from the previous to the current time slice
+       */
+      final boolean hasBreakTime = breakTimeSerie != null;
+      boolean isPrevBreak = hasBreakTime ? breakTimeSerie[firstIndex] : false;
+      boolean isNextBreak = hasBreakTime ? breakTimeSerie[firstIndex + 1] : false;
 
-		double valueSquare = 0;
-		double timeSquare = 0;
+      double valueSquare = 0;
+      double timeSquare = 0;
 
-		for (int serieIndex = firstIndex; serieIndex <= lastIndex; serieIndex++) {
+      for (int serieIndex = firstIndex; serieIndex <= lastIndex; serieIndex++) {
 
-			if (hasBreakTime) {
+         if (hasBreakTime) {
 
-				/*
-				 * break time requires distance data, so it's possible that break time data are not
-				 * available
-				 */
+            /*
+             * break time requires distance data, so it's possible that break time data are not
+             * available
+             */
 
-				if (breakTimeSerie[serieIndex] == true) {
+            if (breakTimeSerie[serieIndex] == true) {
 
-					// break has occured in this time slice
+               // break has occured in this time slice
 
-					if (serieIndex < lastIndex) {
+               if (serieIndex < lastIndex) {
 
-						isPrevBreak = isNextBreak;
-						isNextBreak = breakTimeSerie[serieIndex + 1];
+                  isPrevBreak = isNextBreak;
+                  isNextBreak = breakTimeSerie[serieIndex + 1];
 
-						prevTime = currentTime;
-						currentTime = nextTime;
-						nextTime = timeSerie[serieIndex + 1];
-					}
+                  prevTime = currentTime;
+                  currentTime = nextTime;
+                  nextTime = timeSerie[serieIndex + 1];
+               }
 
-					continue;
-				}
-			}
+               continue;
+            }
+         }
 
-			final float value = valueSerie[serieIndex];
+         final float value = valueSerie[serieIndex];
 
-			float timeDiffPrev = 0;
-			float timeDiffNext = 0;
+         float timeDiffPrev = 0;
+         float timeDiffNext = 0;
 
-			if (serieIndex > firstIndex && isPrevBreak == false) {
-				// prev is available
-				timeDiffPrev = ((float) currentTime - prevTime) / 2;
-			}
+         if (serieIndex > firstIndex && isPrevBreak == false) {
+            // prev is available
+            timeDiffPrev = ((float) currentTime - prevTime) / 2;
+         }
 
-			if (serieIndex < lastIndex && isNextBreak == false) {
-				// next is available
-				timeDiffNext = ((float) nextTime - currentTime) / 2;
-			}
+         if (serieIndex < lastIndex && isNextBreak == false) {
+            // next is available
+            timeDiffNext = ((float) nextTime - currentTime) / 2;
+         }
 
-			// ignore 0 values
-			if (value > 0) {
+         // ignore 0 values
+         if (value > 0) {
 
-				valueSquare += value * timeDiffPrev + value * timeDiffNext;
-				timeSquare += timeDiffPrev + timeDiffNext;
-			}
+            valueSquare += value * timeDiffPrev + value * timeDiffNext;
+            timeSquare += timeDiffPrev + timeDiffNext;
+         }
 
-			if (serieIndex < lastIndex) {
+         if (serieIndex < lastIndex) {
 
-				isPrevBreak = isNextBreak;
-				isNextBreak = hasBreakTime ? breakTimeSerie[serieIndex + 1] : false;
+            isPrevBreak = isNextBreak;
+            isNextBreak = hasBreakTime ? breakTimeSerie[serieIndex + 1] : false;
 
-				prevTime = currentTime;
-				currentTime = nextTime;
-				nextTime = timeSerie[serieIndex + 1];
-			}
+            prevTime = currentTime;
+            currentTime = nextTime;
+            nextTime = timeSerie[serieIndex + 1];
+         }
 
-		}
+      }
 
-		return (float) (timeSquare == 0 ? 0 : valueSquare / timeSquare);
-	}
+      return (float) (timeSquare == 0 ? 0 : valueSquare / timeSquare);
+   }
 
-	public void computeAvg_Pulse() {
+   public float computeAvg_FromValues(final short[] valueSerie, final int firstIndex, final int lastIndex) {
 
-		if ((pulseSerie == null) || (pulseSerie.length == 0) || (timeSerie == null) || (timeSerie.length == 0)) {
-			return;
-		}
+      // convert short[] into float[]
+      final float[] floatValueSerie = new float[valueSerie.length];
 
-		avgPulse = computeAvg_PulseSegment(0, timeSerie.length - 1);
-	}
+      for (int valueIndex = 0; valueIndex < floatValueSerie.length; valueIndex++) {
+         floatValueSerie[valueIndex] = valueSerie[valueIndex];
+      }
 
-	/**
-	 * @param firstIndex
-	 * @param lastIndex
-	 * @return Returns the average pulse or 0 when not available.
-	 */
-	public float computeAvg_PulseSegment(final int firstIndex, final int lastIndex) {
+      return computeAvg_FromValues(floatValueSerie, firstIndex, lastIndex);
+   }
 
-		// check if data are available
-		if ((pulseSerie == null) || (pulseSerie.length == 0) || (timeSerie == null) || (timeSerie.length == 0)) {
-			return 0;
-		}
+   public void computeAvg_Pulse() {
 
-		if (pulseSerieSmoothed == null) {
-			computePulseSmoothed();
-		}
+      if ((pulseSerie == null) || (pulseSerie.length == 0) || (timeSerie == null) || (timeSerie.length == 0)) {
+         return;
+      }
 
-		// check for 1 point
-		if (firstIndex == lastIndex) {
-			return pulseSerieSmoothed[firstIndex];
-		}
+      avgPulse = computeAvg_PulseSegment(0, timeSerie.length - 1);
+   }
 
-		// check for 2 points
-		if (lastIndex - firstIndex == 1) {
-			return (pulseSerieSmoothed[firstIndex] + pulseSerieSmoothed[lastIndex]) / 2;
-		}
+   /**
+    * @param firstIndex
+    * @param lastIndex
+    * @return Returns the average pulse or 0 when not available.
+    */
+   public float computeAvg_PulseSegment(final int firstIndex, final int lastIndex) {
 
-		// get break time when not yet set
-		if (breakTimeSerie == null) {
-			getBreakTime();
-		}
+      // check if data are available
+      if ((pulseSerie == null) || (pulseSerie.length == 0) || (timeSerie == null) || (timeSerie.length == 0)) {
+         return 0;
+      }
 
-		// at least 3 points are available
-		int prevTime = timeSerie[firstIndex];
-		int currentTime = timeSerie[firstIndex];
-		int nextTime = timeSerie[firstIndex + 1];
+      if (pulseSerieSmoothed == null) {
+         computePulseSmoothed();
+      }
 
-		/**
-		 * a break is set from the previous to the current time slice
-		 */
-		boolean isPrevBreak = breakTimeSerie == null ? false : breakTimeSerie[firstIndex];
-		boolean isNextBreak = breakTimeSerie == null ? false : breakTimeSerie[firstIndex + 1];
+      // check for 1 point
+      if (firstIndex == lastIndex) {
+         return pulseSerieSmoothed[firstIndex];
+      }
 
-		double pulseSquare = 0;
-		double timeSquare = 0;
+      // check for 2 points
+      if (lastIndex - firstIndex == 1) {
+         return (pulseSerieSmoothed[firstIndex] + pulseSerieSmoothed[lastIndex]) / 2;
+      }
 
-		for (int serieIndex = firstIndex; serieIndex <= lastIndex; serieIndex++) {
+      // get break time when not yet set
+      if (breakTimeSerie == null) {
+         getBreakTime();
+      }
 
-			if (breakTimeSerie != null) {
+      // at least 3 points are available
+      int prevTime = timeSerie[firstIndex];
+      int currentTime = timeSerie[firstIndex];
+      int nextTime = timeSerie[firstIndex + 1];
 
-				/*
-				 * break time requires distance data, so it's possible that break time data are not
-				 * available
-				 */
+      /**
+       * a break is set from the previous to the current time slice
+       */
+      boolean isPrevBreak = breakTimeSerie == null ? false : breakTimeSerie[firstIndex];
+      boolean isNextBreak = breakTimeSerie == null ? false : breakTimeSerie[firstIndex + 1];
 
-				if (breakTimeSerie[serieIndex] == true) {
+      double pulseSquare = 0;
+      double timeSquare = 0;
 
-					// break has occured in this time slice
+      for (int serieIndex = firstIndex; serieIndex <= lastIndex; serieIndex++) {
 
-					if (serieIndex < lastIndex) {
+         if (breakTimeSerie != null) {
 
-						isPrevBreak = isNextBreak;
-						isNextBreak = breakTimeSerie == null ? false : breakTimeSerie[serieIndex + 1];
+            /*
+             * break time requires distance data, so it's possible that break time data are not
+             * available
+             */
 
-						prevTime = currentTime;
-						currentTime = nextTime;
-						nextTime = timeSerie[serieIndex + 1];
-					}
+            if (breakTimeSerie[serieIndex] == true) {
 
-					continue;
-				}
-			}
+               // break has occured in this time slice
 
-			final float pulse = pulseSerieSmoothed[serieIndex];
+               if (serieIndex < lastIndex) {
 
-			float timeDiffPrev = 0;
-			float timeDiffNext = 0;
+                  isPrevBreak = isNextBreak;
+                  isNextBreak = breakTimeSerie == null ? false : breakTimeSerie[serieIndex + 1];
 
-			if (serieIndex > firstIndex && isPrevBreak == false) {
-				// prev is available
-				timeDiffPrev = ((float) currentTime - prevTime) / 2;
-			}
+                  prevTime = currentTime;
+                  currentTime = nextTime;
+                  nextTime = timeSerie[serieIndex + 1];
+               }
 
-			if (serieIndex < lastIndex && isNextBreak == false) {
-				// next is available
-				timeDiffNext = ((float) nextTime - currentTime) / 2;
-			}
+               continue;
+            }
+         }
 
-			if (pulse > 0) {
-				pulseSquare += pulse * timeDiffPrev + pulse * timeDiffNext;
-				timeSquare += timeDiffPrev + timeDiffNext;
-			}
+         final float pulse = pulseSerieSmoothed[serieIndex];
 
-			if (serieIndex < lastIndex) {
+         float timeDiffPrev = 0;
+         float timeDiffNext = 0;
 
-				isPrevBreak = isNextBreak;
-				isNextBreak = breakTimeSerie == null ? false : breakTimeSerie[serieIndex + 1];
+         if (serieIndex > firstIndex && isPrevBreak == false) {
+            // prev is available
+            timeDiffPrev = ((float) currentTime - prevTime) / 2;
+         }
 
-				prevTime = currentTime;
-				currentTime = nextTime;
-				nextTime = timeSerie[serieIndex + 1];
-			}
+         if (serieIndex < lastIndex && isNextBreak == false) {
+            // next is available
+            timeDiffNext = ((float) nextTime - currentTime) / 2;
+         }
 
-		}
+         if (pulse > 0) {
+            pulseSquare += pulse * timeDiffPrev + pulse * timeDiffNext;
+            timeSquare += timeDiffPrev + timeDiffNext;
+         }
 
-		return (float) (timeSquare == 0 ? 0 : pulseSquare / timeSquare);
-	}
+         if (serieIndex < lastIndex) {
 
-	public void computeAvg_Temperature() {
+            isPrevBreak = isNextBreak;
+            isNextBreak = breakTimeSerie == null ? false : breakTimeSerie[serieIndex + 1];
 
-		if (temperatureSerie == null) {
-			return;
-		}
+            prevTime = currentTime;
+            currentTime = nextTime;
+            nextTime = timeSerie[serieIndex + 1];
+         }
 
-		float temperatureSum = 0;
-		int tempLength = temperatureSerie.length;
+      }
 
-		for (final float temperature : temperatureSerie) {
-			if (temperature == Float.MIN_VALUE) {
-				// ignore invalid values
-				tempLength--;
-			} else {
-				temperatureSum += temperature;
-			}
-		}
+      return (float) (timeSquare == 0 ? 0 : pulseSquare / timeSquare);
+   }
 
-		if (tempLength > 0) {
-			avgTemperature = temperatureSum / tempLength;
-		}
-	}
+   public void computeAvg_Temperature() {
 
-	private int computeBreakTime(final int startIndex, int endIndex) {
+      if (temperatureSerie == null) {
+         return;
+      }
 
-		int totalBreakTime = 0;
+      float temperatureSum = 0;
+      int tempLength = temperatureSerie.length;
 
-		endIndex = Math.min(endIndex, timeSerie.length - 1);
+      for (final float temperature : temperatureSerie) {
+         if (temperature == Float.MIN_VALUE) {
+            // ignore invalid values
+            tempLength--;
+         } else {
+            temperatureSum += temperature;
+         }
+      }
 
-		int prevTime = timeSerie[startIndex];
+      if (tempLength > 0) {
+         avgTemperature = temperatureSum / tempLength;
+      }
+   }
 
-		for (int serieIndex = startIndex + 1; serieIndex <= endIndex; serieIndex++) {
+   private int computeBreakTime(final int startIndex, int endIndex) {
 
-			final int currentTime = timeSerie[serieIndex];
-			final boolean isBreak = breakTimeSerie[serieIndex];
+      int totalBreakTime = 0;
 
-			if (isBreak) {
-				totalBreakTime += currentTime - prevTime;
-			}
+      endIndex = Math.min(endIndex, timeSerie.length - 1);
 
-			prevTime = currentTime;
-		}
+      int prevTime = timeSerie[startIndex];
 
-		return totalBreakTime;
-	}
+      for (int serieIndex = startIndex + 1; serieIndex <= endIndex; serieIndex++) {
 
-	/**
-	 * calculate the driving time, ignore the time when the distance is 0 within a time period which
-	 * is defined by <code>sliceMin</code>
-	 *
-	 * @param minSlices
-	 *           A break will occure when the distance will not change within the minimum number of
-	 *           time slices.
-	 * @return Returns the number of slices which can be ignored
-	 */
-	private void computeBreakTimeFixed(int minSlices) {
+         final int currentTime = timeSerie[serieIndex];
+         final boolean isBreak = breakTimeSerie[serieIndex];
 
-		final float[] distanceSerieMetric = getMetricDistanceSerie();
+         if (isBreak) {
+            totalBreakTime += currentTime - prevTime;
+         }
 
-		breakTimeSerie = new boolean[timeSerie.length];
+         prevTime = currentTime;
+      }
 
-		float minSlicesDistance = 0;
+      return totalBreakTime;
+   }
 
-		minSlices = (minSlices >= 1) ? minSlices : 1;
+   /**
+    * calculate the driving time, ignore the time when the distance is 0 within a time period which
+    * is defined by <code>sliceMin</code>
+    *
+    * @param minSlices
+    *           A break will occure when the distance will not change within the minimum number of
+    *           time slices.
+    * @return Returns the number of slices which can be ignored
+    */
+   private void computeBreakTimeFixed(int minSlices) {
 
-		for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
+      final float[] distanceSerieMetric = getMetricDistanceSerie();
 
-			breakTimeSerie[serieIndex] = distanceSerieMetric[serieIndex] == minSlicesDistance;
+      breakTimeSerie = new boolean[timeSerie.length];
 
-			int minSlicesIndex = serieIndex - minSlices;
-			if (minSlicesIndex < 0) {
-				minSlicesIndex = 0;
-			}
+      float minSlicesDistance = 0;
 
-			minSlicesDistance = distanceSerieMetric[minSlicesIndex];
-		}
-	}
+      minSlices = (minSlices >= 1) ? minSlices : 1;
 
-	/**
-	 * Computes tour break time
-	 *
-	 * @param startIndex
-	 * @param endIndex
-	 * @param btConfig
-	 * @return Returns break time for the whole tour.
-	 */
-	private int computeBreakTimeVariable(final int startIndex, final int endIndex, final BreakTimeTool btConfig) {
+      for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
 
-		/*
-		 * compute break time according to the selected method
-		 */
-		BreakTimeResult breakTimeResult = null;
+         breakTimeSerie[serieIndex] = distanceSerieMetric[serieIndex] == minSlicesDistance;
 
-		if (btConfig.breakTimeMethodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_TIME_DISTANCE)) {
+         int minSlicesIndex = serieIndex - minSlices;
+         if (minSlicesIndex < 0) {
+            minSlicesIndex = 0;
+         }
 
-			breakTimeResult = BreakTimeTool.computeBreakTimeByTimeDistance(
-					this,
-					btConfig.breakShortestTime,
-					btConfig.breakMaxDistance,
-					btConfig.breakSliceDiff);
+         minSlicesDistance = distanceSerieMetric[minSlicesIndex];
+      }
+   }
 
-		} else if (btConfig.breakTimeMethodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_SLICE_SPEED)) {
+   /**
+    * Computes tour break time
+    *
+    * @param startIndex
+    * @param endIndex
+    * @param btConfig
+    * @return Returns break time for the whole tour.
+    */
+   private int computeBreakTimeVariable(final int startIndex, final int endIndex, final BreakTimeTool btConfig) {
 
-			breakTimeResult = BreakTimeTool.computeBreakTimeBySpeed(//
-					this,
-					btConfig.breakTimeMethodId,
-					btConfig.breakMinSliceSpeed);
+      /*
+       * compute break time according to the selected method
+       */
+      BreakTimeResult breakTimeResult = null;
 
-		} else if (btConfig.breakTimeMethodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_AVG_SPEED)) {
+      if (btConfig.breakTimeMethodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_TIME_DISTANCE)) {
 
-			breakTimeResult = BreakTimeTool.computeBreakTimeBySpeed(//
-					this,
-					btConfig.breakTimeMethodId,
-					btConfig.breakMinAvgSpeed);
+         breakTimeResult = BreakTimeTool.computeBreakTimeByTimeDistance(
+               this,
+               btConfig.breakShortestTime,
+               btConfig.breakMaxDistance,
+               btConfig.breakSliceDiff);
 
-		} else if (btConfig.breakTimeMethodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_AVG_SLICE_SPEED)) {
+      } else if (btConfig.breakTimeMethodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_SLICE_SPEED)) {
 
-			breakTimeResult = BreakTimeTool.computeBreakTimeByAvgSliceSpeed(
-					this,
-					btConfig.breakMinAvgSpeedAS,
-					btConfig.breakMinSliceSpeedAS,
-					btConfig.breakMinSliceTimeAS);
-		}
+         breakTimeResult = BreakTimeTool.computeBreakTimeBySpeed(//
+               this,
+               btConfig.breakTimeMethodId,
+               btConfig.breakMinSliceSpeed);
 
-		breakTimeSerie = breakTimeResult.breakTimeSerie;
+      } else if (btConfig.breakTimeMethodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_AVG_SPEED)) {
 
-		return breakTimeResult.tourBreakTime;
-	}
+         breakTimeResult = BreakTimeTool.computeBreakTimeBySpeed(//
+               this,
+               btConfig.breakTimeMethodId,
+               btConfig.breakMinAvgSpeed);
 
-	/**
-	 * Compute min/max/avg and other computed fields.
-	 */
-	public void computeComputedValues() {
+      } else if (btConfig.breakTimeMethodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_AVG_SLICE_SPEED)) {
 
-		computePulseSmoothed();
-		computeSmoothedDataSeries();
+         breakTimeResult = BreakTimeTool.computeBreakTimeByAvgSliceSpeed(
+               this,
+               btConfig.breakMinAvgSpeedAS,
+               btConfig.breakMinSliceSpeedAS,
+               btConfig.breakMinSliceTimeAS);
+      }
 
-		computeMaxAltitude();
-		computeMaxPulse();
-		computeMaxSpeed();
+      breakTimeSerie = breakTimeResult.breakTimeSerie;
 
-		computeAvg_Pulse();
-		computeAvg_Cadence();
-		computeAvg_Temperature();
+      return breakTimeResult.tourBreakTime;
+   }
 
-		computeHrZones();
-		computeRunningDynamics();
+   /**
+    * Compute min/max/avg and other computed fields.
+    */
+   public void computeComputedValues() {
 
-		computeGeo_Bounds();
-		computeGeo_Grid();
-	}
+      computePulseSmoothed();
+      computeSmoothedDataSeries();
 
-	/**
-	 * Computes geo bounds when data are available.
-	 *
-	 * @return Returns geo min/max positions when data are available, otherwise <code>null</code>.
-	 */
-	public void computeGeo_Bounds() {
+      computeMaxAltitude();
+      computeMaxPulse();
+      computeMaxSpeed();
 
-		if (latitudeSerie == null || longitudeSerie == null) {
-			return;
-		}
+      computeAvg_Pulse();
+      computeAvg_Cadence();
+      computeAvg_Temperature();
 
-		/*
-		 * get min/max longitude/latitude
-		 */
+      computeHrZones();
+      computeRunningDynamics();
 
-		double minLatitude = latitudeSerie[0];
-		double maxLatitude = latitudeSerie[0];
-		double minLongitude = longitudeSerie[0];
-		double maxLongitude = longitudeSerie[0];
+      computeGeo_Bounds();
+      computeGeo_Grid();
+   }
 
-		for (int serieIndex = 1; serieIndex < latitudeSerie.length; serieIndex++) {
+   /**
+    * Computes geo bounds when data are available.
+    *
+    * @return Returns geo min/max positions when data are available, otherwise <code>null</code>.
+    */
+   public void computeGeo_Bounds() {
 
-			final double latitude = latitudeSerie[serieIndex];
-			final double longitude = longitudeSerie[serieIndex];
+      if (latitudeSerie == null || longitudeSerie == null) {
+         return;
+      }
 
-			minLatitude = latitude < minLatitude ? latitude : minLatitude;
-			maxLatitude = latitude > maxLatitude ? latitude : maxLatitude;
+      /*
+       * get min/max longitude/latitude
+       */
 
-			minLongitude = longitude < minLongitude ? longitude : minLongitude;
-			maxLongitude = longitude > maxLongitude ? longitude : maxLongitude;
+      double minLatitude = latitudeSerie[0];
+      double maxLatitude = latitudeSerie[0];
+      double minLongitude = longitudeSerie[0];
+      double maxLongitude = longitudeSerie[0];
 
-			if (minLatitude == 0) {
-				minLatitude = -180.0;
-			}
-		}
+      for (int serieIndex = 1; serieIndex < latitudeSerie.length; serieIndex++) {
+
+         final double latitude = latitudeSerie[serieIndex];
+         final double longitude = longitudeSerie[serieIndex];
+
+         minLatitude = latitude < minLatitude ? latitude : minLatitude;
+         maxLatitude = latitude > maxLatitude ? latitude : maxLatitude;
+
+         minLongitude = longitude < minLongitude ? longitude : minLongitude;
+         maxLongitude = longitude > maxLongitude ? longitude : maxLongitude;
+
+         if (minLatitude == 0) {
+            minLatitude = -180.0;
+         }
+      }
 
 //      latitudeMinE6 = (int) (minLatitude * 1_000_000);
 //      longitudeMinE6 = (int) (minLongitude * 1_000_000);
@@ -3191,81 +3191,81 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 //      latitudeMaxE6 = (int) (maxLatitude * 1_000_000);
 //      longitudeMaxE6 = (int) (maxLongitude * 1_000_000);
 
-		_gpsBounds = new GeoPosition[] {
-				new GeoPosition(minLatitude, minLongitude),
-				new GeoPosition(maxLatitude, maxLongitude) };
-	}
+      _gpsBounds = new GeoPosition[] {
+            new GeoPosition(minLatitude, minLongitude),
+            new GeoPosition(maxLatitude, maxLongitude) };
+   }
 
-	/**
-	 * Computes geo partitions from {@link #latitudeSerie} and {@link #latitudeSerie} into
-	 * {@link #geoGrid} when geo data are available, otherwise {@link #geoGrid} is <code>null</code>.
-	 */
-	public void computeGeo_Grid() {
+   /**
+    * Computes geo partitions from {@link #latitudeSerie} and {@link #latitudeSerie} into
+    * {@link #geoGrid} when geo data are available, otherwise {@link #geoGrid} is <code>null</code>.
+    */
+   public void computeGeo_Grid() {
 
-		if (latitudeSerie == null || longitudeSerie == null) {
-			return;
-		}
+      if (latitudeSerie == null || longitudeSerie == null) {
+         return;
+      }
 
-		geoGrid = computeGeo_Grid(latitudeSerie, longitudeSerie, 0, latitudeSerie.length).toArray();
-	}
+      geoGrid = computeGeo_Grid(latitudeSerie, longitudeSerie, 0, latitudeSerie.length).toArray();
+   }
 
-	/**
-	 * Computes geo partitions when geo data are available, a geo partition is a square which was
-	 * touched by the tour
-	 *
-	 * @param partLatitude
-	 * @param partLongitude
-	 * @param indexStart
-	 * @param indexEnd
-	 *           Last index + 1
-	 * @return Returns all geo partitions or <code>null</code> when geo data are not available.
-	 */
-	private TIntHashSet computeGeo_Grid(final double[] partLatitude,
-													final double[] partLongitude,
-													final int indexStart,
-													final int indexEnd) {
+   /**
+    * Computes geo partitions when geo data are available, a geo partition is a square which was
+    * touched by the tour
+    *
+    * @param partLatitude
+    * @param partLongitude
+    * @param indexStart
+    * @param indexEnd
+    *           Last index + 1
+    * @return Returns all geo partitions or <code>null</code> when geo data are not available.
+    */
+   private TIntHashSet computeGeo_Grid(final double[] partLatitude,
+                                       final double[] partLongitude,
+                                       final int indexStart,
+                                       final int indexEnd) {
 
-		if (partLatitude == null || partLongitude == null) {
-			return null;
-		}
+      if (partLatitude == null || partLongitude == null) {
+         return null;
+      }
 
-		// validate indices
-		int firstIndex = indexStart < indexEnd ? indexStart : indexEnd;
-		int lastIndex = indexStart > indexEnd ? indexStart : indexEnd;
+      // validate indices
+      int firstIndex = indexStart < indexEnd ? indexStart : indexEnd;
+      int lastIndex = indexStart > indexEnd ? indexStart : indexEnd;
 
-		if (firstIndex < 0) {
-			firstIndex = 0;
-		}
+      if (firstIndex < 0) {
+         firstIndex = 0;
+      }
 
-		if (lastIndex > partLatitude.length) {
-			lastIndex = partLatitude.length;
-		}
+      if (lastIndex > partLatitude.length) {
+         lastIndex = partLatitude.length;
+      }
 
-		// unique set with all geo parts
-		final TIntHashSet allGeoParts = new TIntHashSet();
+      // unique set with all geo parts
+      final TIntHashSet allGeoParts = new TIntHashSet();
 
-		for (int serieIndex = firstIndex; serieIndex < lastIndex; serieIndex++) {
+      for (int serieIndex = firstIndex; serieIndex < lastIndex; serieIndex++) {
 
-			//         int latPart = (int) (latitude * 100);
-			//         int lonPart = (int) (longitude * 100);
-			//
-			//         lat      ( -90 ... + 90) * 100 =  -9_000 +  9_000 = 18_000
-			//         lon      (-180 ... +180) * 100 = -18_000 + 18_000 = 36_000
-			//
-			//         max      (9_000 + 9_000) * 100_000 = 18_000 * 100_000  = 1_800_000_000
-			//
-			//                                    Integer.MAX_VALUE = 2_147_483_647
+         //         int latPart = (int) (latitude * 100);
+         //         int lonPart = (int) (longitude * 100);
+         //
+         //         lat      ( -90 ... + 90) * 100 =  -9_000 +  9_000 = 18_000
+         //         lon      (-180 ... +180) * 100 = -18_000 + 18_000 = 36_000
+         //
+         //         max      (9_000 + 9_000) * 100_000 = 18_000 * 100_000  = 1_800_000_000
+         //
+         //                                    Integer.MAX_VALUE = 2_147_483_647
 
-			final double latitude = partLatitude[serieIndex];
-			final double longitude = partLongitude[serieIndex];
+         final double latitude = partLatitude[serieIndex];
+         final double longitude = partLongitude[serieIndex];
 
-			final int latPart = (int) (latitude * 100);
-			final int lonPart = (int) (longitude * 100);
+         final int latPart = (int) (latitude * 100);
+         final int lonPart = (int) (longitude * 100);
 
-			final int latLonPart = (latPart + 9_000) * 100_000 + (lonPart + 18_000);
+         final int latLonPart = (latPart + 9_000) * 100_000 + (lonPart + 18_000);
 
-			allGeoParts.add(latLonPart);
-		}
+         allGeoParts.add(latLonPart);
+      }
 
 //      System.out.println();
 //      System.out.println();
@@ -3287,1973 +3287,1973 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 //            (net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
 //                  + ("\tsize: " + allGeoParts.toArray().length));
 
-		return allGeoParts;
-	}
+      return allGeoParts;
+   }
 
-	/**
-	 * @param firstIndex
-	 * @param lastIndex
-	 * @return Returns the geo partitions or <code>null</code> when geo data are not available
-	 */
-	public int[] computeGeo_Grid(final int firstIndex, final int lastIndex) {
+   /**
+    * @param firstIndex
+    * @param lastIndex
+    * @return Returns the geo partitions or <code>null</code> when geo data are not available
+    */
+   public int[] computeGeo_Grid(final int firstIndex, final int lastIndex) {
 
-		if (latitudeSerie == null || longitudeSerie == null) {
-			return null;
-		}
+      if (latitudeSerie == null || longitudeSerie == null) {
+         return null;
+      }
 
-		final TIntHashSet computedGeoParts = computeGeo_Grid(
-				latitudeSerie,
-				longitudeSerie,
-				firstIndex,
-				lastIndex);
+      final TIntHashSet computedGeoParts = computeGeo_Grid(
+            latitudeSerie,
+            longitudeSerie,
+            firstIndex,
+            lastIndex);
 
-		return computedGeoParts.toArray();
-	}
+      return computedGeoParts.toArray();
+   }
 
-	public NormalizedGeoData computeGeo_NormalizeLatLon(	final int measureStartIndex,
-																			final int measureEndIndex,
-																			final int geoAccuracy,
-																			final int distanceInterval) {
+   public NormalizedGeoData computeGeo_NormalizeLatLon(final int measureStartIndex,
+                                                       final int measureEndIndex,
+                                                       final int geoAccuracy,
+                                                       final int distanceInterval) {
 
-		final float[] measureAllDistance = distanceSerie;
-		final double[] measureAllLat = latitudeSerie;
-		final double[] measureAllLon = longitudeSerie;
+      final float[] measureAllDistance = distanceSerie;
+      final double[] measureAllLat = latitudeSerie;
+      final double[] measureAllLon = longitudeSerie;
 
-		if (measureAllLat == null || measureAllDistance == null) {
-			return null;
-		}
+      if (measureAllLat == null || measureAllDistance == null) {
+         return null;
+      }
 
-		// create normalized data, the distance will be normalized to 100m
-		final float measureStartDistance = measureAllDistance[measureStartIndex];
-		final float measureEndDistance = measureAllDistance[measureEndIndex];
+      // create normalized data, the distance will be normalized to 100m
+      final float measureStartDistance = measureAllDistance[measureStartIndex];
+      final float measureEndDistance = measureAllDistance[measureEndIndex];
 
-		final float normalizedStartDistance = measureStartDistance / distanceInterval;
-		final float normalizedEndDistance = measureEndDistance / distanceInterval;
-		final int normalizedSize = (int) (normalizedEndDistance - normalizedStartDistance + 1);
+      final float normalizedStartDistance = measureStartDistance / distanceInterval;
+      final float normalizedEndDistance = measureEndDistance / distanceInterval;
+      final int normalizedSize = (int) (normalizedEndDistance - normalizedStartDistance + 1);
 
-		final float[] normalizedAllDist = new float[normalizedSize];
-		final int[] normalizedAllLat = new int[normalizedSize];
-		final int[] normalizedAllLon = new int[normalizedSize];
-		final int[] allNormalized2OriginalIndex = new int[normalizedSize];
+      final float[] normalizedAllDist = new float[normalizedSize];
+      final int[] normalizedAllLat = new int[normalizedSize];
+      final int[] normalizedAllLon = new int[normalizedSize];
+      final int[] allNormalized2OriginalIndex = new int[normalizedSize];
 
-		float normalizedDistance = normalizedStartDistance * distanceInterval;
+      float normalizedDistance = normalizedStartDistance * distanceInterval;
 
-		int measureIndex = measureStartIndex;
+      int measureIndex = measureStartIndex;
 
-		float measureNextDistance = 0;
+      float measureNextDistance = 0;
 
-		for (int normIndex = 0; normIndex < normalizedSize; normIndex++) {
+      for (int normIndex = 0; normIndex < normalizedSize; normIndex++) {
 
-			// get the last measure point before the next normalized distance
-			while (measureNextDistance <= normalizedDistance && measureIndex < measureAllDistance.length - 1) {
+         // get the last measure point before the next normalized distance
+         while (measureNextDistance <= normalizedDistance && measureIndex < measureAllDistance.length - 1) {
 
-				// move index to the next measure point
-				measureIndex++;
+            // move index to the next measure point
+            measureIndex++;
 
-				measureNextDistance = measureAllDistance[measureIndex];
-			}
+            measureNextDistance = measureAllDistance[measureIndex];
+         }
 
-			// convert lat + lon into a positive value
-			final double latValueWithOffset = measureAllLat[measureIndex] + NORMALIZED_LATITUDE_OFFSET;
-			final double lonValueWithOffset = measureAllLon[measureIndex] + NORMALIZED_LONGITUDE_OFFSET;
+         // convert lat + lon into a positive value
+         final double latValueWithOffset = measureAllLat[measureIndex] + NORMALIZED_LATITUDE_OFFSET;
+         final double lonValueWithOffset = measureAllLon[measureIndex] + NORMALIZED_LONGITUDE_OFFSET;
 
-			final int latNormalized = (int) (latValueWithOffset * geoAccuracy);
-			final int lonNormalized = (int) (lonValueWithOffset * geoAccuracy);
+         final int latNormalized = (int) (latValueWithOffset * geoAccuracy);
+         final int lonNormalized = (int) (lonValueWithOffset * geoAccuracy);
 
-			normalizedAllDist[normIndex] = normalizedDistance;
+         normalizedAllDist[normIndex] = normalizedDistance;
 
-			normalizedAllLat[normIndex] = latNormalized;
-			normalizedAllLon[normIndex] = lonNormalized;
+         normalizedAllLat[normIndex] = latNormalized;
+         normalizedAllLon[normIndex] = lonNormalized;
 
-			allNormalized2OriginalIndex[normIndex] = measureIndex;
+         allNormalized2OriginalIndex[normIndex] = measureIndex;
 
-			// next normalized distance
-			normalizedDistance += distanceInterval;
-		}
+         // next normalized distance
+         normalizedDistance += distanceInterval;
+      }
 
-		final NormalizedGeoData returnData = new NormalizedGeoData();
+      final NormalizedGeoData returnData = new NormalizedGeoData();
 
-		returnData.tourId = tourId;
+      returnData.tourId = tourId;
 
-		returnData.originalFirstIndex = measureStartIndex;
-		returnData.originalLastIndex = measureEndIndex;
+      returnData.originalFirstIndex = measureStartIndex;
+      returnData.originalLastIndex = measureEndIndex;
 
-		returnData.normalizedLat = normalizedAllLat;
-		returnData.normalizedLon = normalizedAllLon;
+      returnData.normalizedLat = normalizedAllLat;
+      returnData.normalizedLon = normalizedAllLon;
 
-		returnData.normalized2OriginalIndices = allNormalized2OriginalIndex;
+      returnData.normalized2OriginalIndices = allNormalized2OriginalIndex;
 
-		returnData.geoAccuracy = geoAccuracy;
-		returnData.distanceAccuracy = distanceInterval;
-		returnData.normalizedDistance = normalizedDistance - measureStartDistance;
+      returnData.geoAccuracy = geoAccuracy;
+      returnData.distanceAccuracy = distanceInterval;
+      returnData.normalizedDistance = normalizedDistance - measureStartDistance;
 
-		return returnData;
-	}
-
-	/**
-	 * Computes seconds for each hr zone and sets the number of available HR zones in
-	 * {@link #numberOfHrZones}.
-	 */
-	private void computeHrZones() {
-
-		final TourPerson hrPerson = getDataPerson();
-
-		if (timeSerie == null || pulseSerie == null || hrPerson == null) {
-			return;
-		}
-
-		if (pulseSerieSmoothed == null) {
-			computePulseSmoothed();
-
-		}
-		_hrZoneContext = hrPerson.getHrZoneContext(
-				hrPerson.getHrMaxFormula(),
-				hrPerson.getMaxPulse(),
-				hrPerson.getBirthDayWithDefault(),
-				getTourStartTime());
-
-		if (_hrZoneContext == null) {
-			// hr zones are not defined
-			return;
-		}
-
-		if (breakTimeSerie == null) {
-			getBreakTime();
-		}
-
-		final float[] zoneMinBpm = _hrZoneContext.zoneMinBpm;
-		final float[] zoneMaxBpm = _hrZoneContext.zoneMaxBpm;
-
-		final int zoneSize = zoneMinBpm.length;
-		final int[] hrZones = new int[zoneSize];
-		int prevTime = 0;
-
-		// compute zone values
-		for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
-
-			final float pulse = pulseSerieSmoothed[serieIndex];
-			final int time = timeSerie[serieIndex];
-
-			final int timeDiff = time - prevTime;
-			prevTime = time;
-
-			// check if a break occured, break time is ignored
-			if (breakTimeSerie != null) {
-
-				/*
-				 * break time requires distance data, so it's possible that break time data are not
-				 * available
-				 */
-
-				if (breakTimeSerie[serieIndex] == true) {
-					// hr zones are not set for break time
-					continue;
-				}
-			}
-
-			boolean isZoneAvailable = false;
-			int zoneIndex = 0;
-
-			for (; zoneIndex < zoneSize; zoneIndex++) {
-
-				final float minValue = zoneMinBpm[zoneIndex];
-				final float maxValue = zoneMaxBpm[zoneIndex];
-
-				if (pulse >= minValue && pulse <= maxValue) {
-					hrZones[zoneIndex] += timeDiff;
-					isZoneAvailable = true;
-					break;
-				}
-			}
-
-			if (isZoneAvailable == false) {
-				@SuppressWarnings("unused")
-				int a = 0;
-				a++;
-			}
-		}
-
-		numberOfHrZones = zoneSize;
-
-		hrZone0 = zoneSize > 0 ? hrZones[0] : -1;
-		hrZone1 = zoneSize > 1 ? hrZones[1] : -1;
-		hrZone2 = zoneSize > 2 ? hrZones[2] : -1;
-		hrZone3 = zoneSize > 3 ? hrZones[3] : -1;
-		hrZone4 = zoneSize > 4 ? hrZones[4] : -1;
-		hrZone5 = zoneSize > 5 ? hrZones[5] : -1;
-		hrZone6 = zoneSize > 6 ? hrZones[6] : -1;
-		hrZone7 = zoneSize > 7 ? hrZones[7] : -1;
-		hrZone8 = zoneSize > 8 ? hrZones[8] : -1;
-		hrZone9 = zoneSize > 9 ? hrZones[9] : -1;
-
-		_hrZones = new int[] {
-				hrZone0, //
-				hrZone1,
-				hrZone2,
-				hrZone3,
-				hrZone4,
-				hrZone5,
-				hrZone6,
-				hrZone7,
-				hrZone8,
-				hrZone9 };
-	}
+      return returnData;
+   }
+
+   /**
+    * Computes seconds for each hr zone and sets the number of available HR zones in
+    * {@link #numberOfHrZones}.
+    */
+   private void computeHrZones() {
+
+      final TourPerson hrPerson = getDataPerson();
+
+      if (timeSerie == null || pulseSerie == null || hrPerson == null) {
+         return;
+      }
+
+      if (pulseSerieSmoothed == null) {
+         computePulseSmoothed();
+
+      }
+      _hrZoneContext = hrPerson.getHrZoneContext(
+            hrPerson.getHrMaxFormula(),
+            hrPerson.getMaxPulse(),
+            hrPerson.getBirthDayWithDefault(),
+            getTourStartTime());
+
+      if (_hrZoneContext == null) {
+         // hr zones are not defined
+         return;
+      }
+
+      if (breakTimeSerie == null) {
+         getBreakTime();
+      }
+
+      final float[] zoneMinBpm = _hrZoneContext.zoneMinBpm;
+      final float[] zoneMaxBpm = _hrZoneContext.zoneMaxBpm;
+
+      final int zoneSize = zoneMinBpm.length;
+      final int[] hrZones = new int[zoneSize];
+      int prevTime = 0;
+
+      // compute zone values
+      for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
+
+         final float pulse = pulseSerieSmoothed[serieIndex];
+         final int time = timeSerie[serieIndex];
+
+         final int timeDiff = time - prevTime;
+         prevTime = time;
+
+         // check if a break occured, break time is ignored
+         if (breakTimeSerie != null) {
+
+            /*
+             * break time requires distance data, so it's possible that break time data are not
+             * available
+             */
+
+            if (breakTimeSerie[serieIndex] == true) {
+               // hr zones are not set for break time
+               continue;
+            }
+         }
+
+         boolean isZoneAvailable = false;
+         int zoneIndex = 0;
+
+         for (; zoneIndex < zoneSize; zoneIndex++) {
+
+            final float minValue = zoneMinBpm[zoneIndex];
+            final float maxValue = zoneMaxBpm[zoneIndex];
+
+            if (pulse >= minValue && pulse <= maxValue) {
+               hrZones[zoneIndex] += timeDiff;
+               isZoneAvailable = true;
+               break;
+            }
+         }
+
+         if (isZoneAvailable == false) {
+            @SuppressWarnings("unused")
+            int a = 0;
+            a++;
+         }
+      }
+
+      numberOfHrZones = zoneSize;
+
+      hrZone0 = zoneSize > 0 ? hrZones[0] : -1;
+      hrZone1 = zoneSize > 1 ? hrZones[1] : -1;
+      hrZone2 = zoneSize > 2 ? hrZones[2] : -1;
+      hrZone3 = zoneSize > 3 ? hrZones[3] : -1;
+      hrZone4 = zoneSize > 4 ? hrZones[4] : -1;
+      hrZone5 = zoneSize > 5 ? hrZones[5] : -1;
+      hrZone6 = zoneSize > 6 ? hrZones[6] : -1;
+      hrZone7 = zoneSize > 7 ? hrZones[7] : -1;
+      hrZone8 = zoneSize > 8 ? hrZones[8] : -1;
+      hrZone9 = zoneSize > 9 ? hrZones[9] : -1;
+
+      _hrZones = new int[] {
+            hrZone0, //
+            hrZone1,
+            hrZone2,
+            hrZone3,
+            hrZone4,
+            hrZone5,
+            hrZone6,
+            hrZone7,
+            hrZone8,
+            hrZone9 };
+   }
 
-	private void computeMaxAltitude() {
+   private void computeMaxAltitude() {
 
-		if (altitudeSerie == null) {
-			return;
-		}
+      if (altitudeSerie == null) {
+         return;
+      }
 
-		if (altitudeSerieSmoothed == null) {
-			computeSmoothedDataSeries();
-		}
+      if (altitudeSerieSmoothed == null) {
+         computeSmoothedDataSeries();
+      }
 
-		// double check was necessary because this case occured but it should not
-		if (altitudeSerieSmoothed == null) {
-			return;
-		}
+      // double check was necessary because this case occured but it should not
+      if (altitudeSerieSmoothed == null) {
+         return;
+      }
 
-		float maxAltitude = 0;
-		for (final float altitude : altitudeSerieSmoothed) {
-			if (altitude > maxAltitude) {
-				maxAltitude = altitude;
-			}
-		}
+      float maxAltitude = 0;
+      for (final float altitude : altitudeSerieSmoothed) {
+         if (altitude > maxAltitude) {
+            maxAltitude = altitude;
+         }
+      }
 
-		this.maxAltitude = maxAltitude;
-	}
+      this.maxAltitude = maxAltitude;
+   }
 
-	private void computeMaxPulse() {
+   private void computeMaxPulse() {
 
-		if (pulseSerie == null) {
-			return;
-		}
+      if (pulseSerie == null) {
+         return;
+      }
 
-		if (pulseSerieSmoothed == null) {
-			computePulseSmoothed();
-		}
+      if (pulseSerieSmoothed == null) {
+         computePulseSmoothed();
+      }
 
-		float maxPulse = 0;
+      float maxPulse = 0;
 
-		for (final float pulse : pulseSerieSmoothed) {
-			if (pulse > maxPulse) {
-				maxPulse = pulse;
-			}
-		}
+      for (final float pulse : pulseSerieSmoothed) {
+         if (pulse > maxPulse) {
+            maxPulse = pulse;
+         }
+      }
 
-		this.maxPulse = maxPulse;
-	}
+      this.maxPulse = maxPulse;
+   }
 
-	private void computeMaxSpeed() {
-		if (distanceSerie != null) {
-			computeSmoothedDataSeries();
-		}
-	}
+   private void computeMaxSpeed() {
+      if (distanceSerie != null) {
+         computeSmoothedDataSeries();
+      }
+   }
 
-	private void computePhotoTimeAdjustment() {
+   private void computePhotoTimeAdjustment() {
 
-		long allPhotoTimeAdjustment = 0;
-		int photoCounter = 0;
+      long allPhotoTimeAdjustment = 0;
+      int photoCounter = 0;
 
-		for (final TourPhoto tourPhoto : tourPhotos) {
+      for (final TourPhoto tourPhoto : tourPhotos) {
 
-			allPhotoTimeAdjustment += (tourPhoto.getAdjustedTime() - tourPhoto.getImageExifTime()) / 1000;
+         allPhotoTimeAdjustment += (tourPhoto.getAdjustedTime() - tourPhoto.getImageExifTime()) / 1000;
 
-			photoCounter++;
-		}
+         photoCounter++;
+      }
 
-		photoTimeAdjustment = photoCounter == 0 ? 0 : (int) (allPhotoTimeAdjustment / photoCounter);
-	}
+      photoTimeAdjustment = photoCounter == 0 ? 0 : (int) (allPhotoTimeAdjustment / photoCounter);
+   }
 
-	private void computePulseSmoothed() {
+   private void computePulseSmoothed() {
 
-		if (pulseSerie == null || timeSerie == null) {
-			return;
-		}
+      if (pulseSerie == null || timeSerie == null) {
+         return;
+      }
 
-		if (pulseSerieSmoothed != null) {
-			return;
-		}
+      if (pulseSerieSmoothed != null) {
+         return;
+      }
 
-		final boolean isInitialAlgorithm = _prefStore
-				.getString(ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM)
-				.equals(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_INITIAL);
+      final boolean isInitialAlgorithm = _prefStore
+            .getString(ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM)
+            .equals(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_INITIAL);
 
-		if (isInitialAlgorithm) {
+      if (isInitialAlgorithm) {
 
-			// smoothing is disabled for pulse values
-			pulseSerieSmoothed = Arrays.copyOf(pulseSerie, pulseSerie.length);
+         // smoothing is disabled for pulse values
+         pulseSerieSmoothed = Arrays.copyOf(pulseSerie, pulseSerie.length);
 
-			return;
-		}
+         return;
+      }
 
-		final boolean isPulseSmoothed = _prefStore.getBoolean(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_IS_PULSE);
+      final boolean isPulseSmoothed = _prefStore.getBoolean(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_IS_PULSE);
 
-		if (isPulseSmoothed == false) {
+      if (isPulseSmoothed == false) {
 
-			// pulse is not smoothed
-			pulseSerieSmoothed = Arrays.copyOf(pulseSerie, pulseSerie.length);
+         // pulse is not smoothed
+         pulseSerieSmoothed = Arrays.copyOf(pulseSerie, pulseSerie.length);
 
-			return;
-		}
+         return;
+      }
 
-		final int repeatedSmoothing = _prefStore.getInt(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_REPEATED_SMOOTHING);
-		final double repeatedTau = _prefStore.getDouble(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_REPEATED_TAU);
-		final double tauPulse = _prefStore.getDouble(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_PULSE_TAU);
+      final int repeatedSmoothing = _prefStore.getInt(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_REPEATED_SMOOTHING);
+      final double repeatedTau = _prefStore.getDouble(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_REPEATED_TAU);
+      final double tauPulse = _prefStore.getDouble(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_PULSE_TAU);
 
-		final int size = timeSerie.length;
-		final double[] heart_rate = new double[size];
-		final double[] heart_rate_sc = new double[size];
+      final int size = timeSerie.length;
+      final double[] heart_rate = new double[size];
+      final double[] heart_rate_sc = new double[size];
 
-		// convert float into double
-		for (int serieIndex = 0; serieIndex < size; serieIndex++) {
-			heart_rate[serieIndex] = pulseSerie[serieIndex];
-		}
+      // convert float into double
+      for (int serieIndex = 0; serieIndex < size; serieIndex++) {
+         heart_rate[serieIndex] = pulseSerie[serieIndex];
+      }
 
-		Smooth.smoothing(timeSerie, heart_rate, heart_rate_sc, tauPulse, false, repeatedSmoothing, repeatedTau);
+      Smooth.smoothing(timeSerie, heart_rate, heart_rate_sc, tauPulse, false, repeatedSmoothing, repeatedTau);
 
-		pulseSerieSmoothed = new float[size];
+      pulseSerieSmoothed = new float[size];
 
-		// convert double into float
-		for (int serieIndex = 0; serieIndex < size; serieIndex++) {
-			pulseSerieSmoothed[serieIndex] = (float) heart_rate_sc[serieIndex];
-		}
-	}
+      // convert double into float
+      for (int serieIndex = 0; serieIndex < size; serieIndex++) {
+         pulseSerieSmoothed[serieIndex] = (float) heart_rate_sc[serieIndex];
+      }
+   }
 
-	private void computeRunningDynamics() {
+   private void computeRunningDynamics() {
 
-		/*
-		 * Stance time
-		 */
-		if (runDyn_StanceTime != null && runDyn_StanceTime.length > 0) {
+      /*
+       * Stance time
+       */
+      if (runDyn_StanceTime != null && runDyn_StanceTime.length > 0) {
 
-			short minValue;
-			short maxValue;
+         short minValue;
+         short maxValue;
 
-			minValue = maxValue = getFirstNot0Value(runDyn_StanceTime);
+         minValue = maxValue = getFirstNot0Value(runDyn_StanceTime);
 
-			int numValues = 0;
-			float sumValue = 0;
+         int numValues = 0;
+         float sumValue = 0;
 
-			for (final short value : runDyn_StanceTime) {
+         for (final short value : runDyn_StanceTime) {
 
-				// ignore 0 values
-				if (value == 0) {
-					continue;
-				}
+            // ignore 0 values
+            if (value == 0) {
+               continue;
+            }
 
-				if (value > maxValue) {
-					maxValue = value;
-				}
+            if (value > maxValue) {
+               maxValue = value;
+            }
 
-				if (value < minValue) {
-					minValue = value;
-				}
+            if (value < minValue) {
+               minValue = value;
+            }
 
-				numValues++;
-				sumValue += value;
-			}
+            numValues++;
+            sumValue += value;
+         }
 
-			runDyn_StanceTime_Min = minValue;
-			runDyn_StanceTime_Max = maxValue;
-			runDyn_StanceTime_Avg = numValues == 0 ? 0 : sumValue / numValues;
-		}
+         runDyn_StanceTime_Min = minValue;
+         runDyn_StanceTime_Max = maxValue;
+         runDyn_StanceTime_Avg = numValues == 0 ? 0 : sumValue / numValues;
+      }
 
-		/*
-		 * Stance time balance
-		 */
-		if (runDyn_StanceTimeBalance != null && runDyn_StanceTimeBalance.length > 0) {
+      /*
+       * Stance time balance
+       */
+      if (runDyn_StanceTimeBalance != null && runDyn_StanceTimeBalance.length > 0) {
 
-			short minValue;
-			short maxValue;
+         short minValue;
+         short maxValue;
 
-			minValue = maxValue = getFirstNot0Value(runDyn_StanceTimeBalance);
+         minValue = maxValue = getFirstNot0Value(runDyn_StanceTimeBalance);
 
-			int numValues = 0;
-			float sumValue = 0;
+         int numValues = 0;
+         float sumValue = 0;
 
-			for (final short value : runDyn_StanceTimeBalance) {
+         for (final short value : runDyn_StanceTimeBalance) {
 
-				// ignore 0 values
-				if (value == 0) {
-					continue;
-				}
+            // ignore 0 values
+            if (value == 0) {
+               continue;
+            }
 
-				if (value > maxValue) {
-					maxValue = value;
-				}
+            if (value > maxValue) {
+               maxValue = value;
+            }
 
-				if (value < minValue) {
-					minValue = value;
-				}
+            if (value < minValue) {
+               minValue = value;
+            }
 
-				numValues++;
-				sumValue += value;
-			}
+            numValues++;
+            sumValue += value;
+         }
 
-			runDyn_StanceTimeBalance_Min = minValue;
-			runDyn_StanceTimeBalance_Max = maxValue;
-			runDyn_StanceTimeBalance_Avg = numValues == 0 ? 0 : sumValue / numValues;
-		}
+         runDyn_StanceTimeBalance_Min = minValue;
+         runDyn_StanceTimeBalance_Max = maxValue;
+         runDyn_StanceTimeBalance_Avg = numValues == 0 ? 0 : sumValue / numValues;
+      }
 
-		/*
-		 * Step length
-		 */
-		if (runDyn_StepLength != null && runDyn_StepLength.length > 0) {
+      /*
+       * Step length
+       */
+      if (runDyn_StepLength != null && runDyn_StepLength.length > 0) {
 
-			short minValue;
-			short maxValue;
+         short minValue;
+         short maxValue;
 
-			minValue = maxValue = getFirstNot0Value(runDyn_StepLength);
+         minValue = maxValue = getFirstNot0Value(runDyn_StepLength);
 
-			int numValues = 0;
-			float sumValue = 0;
+         int numValues = 0;
+         float sumValue = 0;
 
-			for (final short value : runDyn_StepLength) {
+         for (final short value : runDyn_StepLength) {
 
-				// ignore 0 values
-				if (value == 0) {
-					continue;
-				}
+            // ignore 0 values
+            if (value == 0) {
+               continue;
+            }
 
-				if (value > maxValue) {
-					maxValue = value;
-				}
+            if (value > maxValue) {
+               maxValue = value;
+            }
 
-				if (value < minValue) {
-					minValue = value;
-				}
+            if (value < minValue) {
+               minValue = value;
+            }
 
-				numValues++;
-				sumValue += value;
-			}
+            numValues++;
+            sumValue += value;
+         }
 
-			runDyn_StepLength_Min = minValue;
-			runDyn_StepLength_Max = maxValue;
-			runDyn_StepLength_Avg = numValues == 0 ? 0 : sumValue / numValues;
-		}
+         runDyn_StepLength_Min = minValue;
+         runDyn_StepLength_Max = maxValue;
+         runDyn_StepLength_Avg = numValues == 0 ? 0 : sumValue / numValues;
+      }
 
-		/*
-		 * Vertical oscillation
-		 */
-		if (runDyn_VerticalOscillation != null && runDyn_VerticalOscillation.length > 0) {
+      /*
+       * Vertical oscillation
+       */
+      if (runDyn_VerticalOscillation != null && runDyn_VerticalOscillation.length > 0) {
 
-			short minValue;
-			short maxValue;
+         short minValue;
+         short maxValue;
 
-			minValue = maxValue = getFirstNot0Value(runDyn_VerticalOscillation);
+         minValue = maxValue = getFirstNot0Value(runDyn_VerticalOscillation);
 
-			int numValues = 0;
-			float sumValue = 0;
+         int numValues = 0;
+         float sumValue = 0;
 
-			for (final short value : runDyn_VerticalOscillation) {
+         for (final short value : runDyn_VerticalOscillation) {
 
-				// ignore 0 values
-				if (value == 0) {
-					continue;
-				}
+            // ignore 0 values
+            if (value == 0) {
+               continue;
+            }
 
-				if (value > maxValue) {
-					maxValue = value;
-				}
+            if (value > maxValue) {
+               maxValue = value;
+            }
 
-				if (value < minValue) {
-					minValue = value;
-				}
+            if (value < minValue) {
+               minValue = value;
+            }
 
-				numValues++;
-				sumValue += value;
-			}
+            numValues++;
+            sumValue += value;
+         }
 
-			runDyn_VerticalOscillation_Min = minValue;
-			runDyn_VerticalOscillation_Max = maxValue;
-			runDyn_VerticalOscillation_Avg = numValues == 0 ? 0 : sumValue / numValues;
-		}
+         runDyn_VerticalOscillation_Min = minValue;
+         runDyn_VerticalOscillation_Max = maxValue;
+         runDyn_VerticalOscillation_Avg = numValues == 0 ? 0 : sumValue / numValues;
+      }
 
-		/*
-		 * Vertical ratio
-		 */
-		if (runDyn_VerticalRatio != null && runDyn_VerticalRatio.length > 0) {
+      /*
+       * Vertical ratio
+       */
+      if (runDyn_VerticalRatio != null && runDyn_VerticalRatio.length > 0) {
 
-			short minValue;
-			short maxValue;
+         short minValue;
+         short maxValue;
 
-			minValue = maxValue = getFirstNot0Value(runDyn_VerticalRatio);
+         minValue = maxValue = getFirstNot0Value(runDyn_VerticalRatio);
 
-			int numValues = 0;
-			float sumValue = 0;
+         int numValues = 0;
+         float sumValue = 0;
 
-			for (final short value : runDyn_VerticalRatio) {
+         for (final short value : runDyn_VerticalRatio) {
 
-				// ignore 0 values
-				if (value == 0) {
-					continue;
-				}
+            // ignore 0 values
+            if (value == 0) {
+               continue;
+            }
 
-				if (value > maxValue) {
-					maxValue = value;
-				}
+            if (value > maxValue) {
+               maxValue = value;
+            }
 
-				if (value < minValue) {
-					minValue = value;
-				}
+            if (value < minValue) {
+               minValue = value;
+            }
 
-				numValues++;
-				sumValue += value;
-			}
+            numValues++;
+            sumValue += value;
+         }
 
-			runDyn_VerticalRatio_Min = minValue;
-			runDyn_VerticalRatio_Max = maxValue;
-			runDyn_VerticalRatio_Avg = numValues == 0 ? 0 : sumValue / numValues;
-		}
-	}
+         runDyn_VerticalRatio_Min = minValue;
+         runDyn_VerticalRatio_Max = maxValue;
+         runDyn_VerticalRatio_Avg = numValues == 0 ? 0 : sumValue / numValues;
+      }
+   }
 
-	/**
-	 * Compute smoothed data series which depend on the distance, this is speed, pace, gradient and
-	 * altimeter.<br>
-	 * Additionally the altitude smoothed data series is computed.
-	 * <p>
-	 * This smoothing is based on the algorithm from Didier Jamet.
-	 */
-	private void computeSmoothedDataSeries() {
+   /**
+    * Compute smoothed data series which depend on the distance, this is speed, pace, gradient and
+    * altimeter.<br>
+    * Additionally the altitude smoothed data series is computed.
+    * <p>
+    * This smoothing is based on the algorithm from Didier Jamet.
+    */
+   private void computeSmoothedDataSeries() {
 
-		// check if the tour was created manually
-		if (timeSerie == null || timeSerie.length == 0) {
-			return;
-		}
+      // check if the tour was created manually
+      if (timeSerie == null || timeSerie.length == 0) {
+         return;
+      }
 
-		final boolean isAltitudeAvailable = altitudeSerie != null;
+      final boolean isAltitudeAvailable = altitudeSerie != null;
 
-		// check if smoothed data are already computed
-		if (speedSerie != null && (isAltitudeAvailable && altitudeSerieSmoothed != null)) {
-			return;
-		}
+      // check if smoothed data are already computed
+      if (speedSerie != null && (isAltitudeAvailable && altitudeSerieSmoothed != null)) {
+         return;
+      }
 
-		final int size = timeSerie.length;
+      final int size = timeSerie.length;
 
-		final double altitude[] = new double[size];
-		final double altitude_sc[] = new double[size];
+      final double altitude[] = new double[size];
+      final double altitude_sc[] = new double[size];
 
-		final double tauGradient = _prefStore.getDouble(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_GRADIENT_TAU);
-		final double tauSpeed = _prefStore.getDouble(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_SPEED_TAU);
+      final double tauGradient = _prefStore.getDouble(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_GRADIENT_TAU);
+      final double tauSpeed = _prefStore.getDouble(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_SPEED_TAU);
 
-		final int repeatedSmoothing = _prefStore.getInt(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_REPEATED_SMOOTHING);
-		final double repeatedTau = _prefStore.getDouble(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_REPEATED_TAU);
+      final int repeatedSmoothing = _prefStore.getInt(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_REPEATED_SMOOTHING);
+      final double repeatedTau = _prefStore.getDouble(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_REPEATED_TAU);
 
-		/*
-		 * smooth altitude
-		 */
+      /*
+       * smooth altitude
+       */
 
-		if (isAltitudeAvailable) {
+      if (isAltitudeAvailable) {
 
-			final boolean isAltitudeSmoothed = _prefStore.getBoolean(//
-					ITourbookPreferences.GRAPH_JAMET_SMOOTHING_IS_ALTITUDE);
+         final boolean isAltitudeSmoothed = _prefStore.getBoolean(//
+               ITourbookPreferences.GRAPH_JAMET_SMOOTHING_IS_ALTITUDE);
 
-			// convert altitude into double
-			for (int serieIndex = 0; serieIndex < size; serieIndex++) {
-				altitude[serieIndex] = altitudeSerie[serieIndex];
-			}
+         // convert altitude into double
+         for (int serieIndex = 0; serieIndex < size; serieIndex++) {
+            altitude[serieIndex] = altitudeSerie[serieIndex];
+         }
 
-			// altitude MUST be smoothed because the values are used in the vertical speed
-			Smooth.smoothing(timeSerie, altitude, altitude_sc, tauGradient, false, repeatedSmoothing, repeatedTau);
+         // altitude MUST be smoothed because the values are used in the vertical speed
+         Smooth.smoothing(timeSerie, altitude, altitude_sc, tauGradient, false, repeatedSmoothing, repeatedTau);
 
-			altitudeSerieSmoothed = new float[size];
-			altitudeSerieImperialSmoothed = new float[size];
+         altitudeSerieSmoothed = new float[size];
+         altitudeSerieImperialSmoothed = new float[size];
 
-			altimeterSerie = new float[size];
-			altimeterSerieImperial = new float[size];
+         altimeterSerie = new float[size];
+         altimeterSerieImperial = new float[size];
 
-			if (isAltitudeSmoothed) {
+         if (isAltitudeSmoothed) {
 
-				for (int serieIndex = 0; serieIndex < size; serieIndex++) {
-					altitudeSerieSmoothed[serieIndex] = (float) altitude_sc[serieIndex];
-					altitudeSerieImperialSmoothed[serieIndex] = (float) (altitude_sc[serieIndex]
-							/ UI.UNIT_VALUE_ALTITUDE);
-				}
-			} else {
+            for (int serieIndex = 0; serieIndex < size; serieIndex++) {
+               altitudeSerieSmoothed[serieIndex] = (float) altitude_sc[serieIndex];
+               altitudeSerieImperialSmoothed[serieIndex] = (float) (altitude_sc[serieIndex]
+                     / UI.UNIT_VALUE_ALTITUDE);
+            }
+         } else {
 
-				// altitude is NOT smoothed, copy original values
+            // altitude is NOT smoothed, copy original values
 
-				for (int serieIndex = 0; serieIndex < size; serieIndex++) {
-					altitudeSerieSmoothed[serieIndex] = altitudeSerie[serieIndex];
-					altitudeSerieImperialSmoothed[serieIndex] = (altitudeSerie[serieIndex] / UI.UNIT_VALUE_ALTITUDE);
-				}
-			}
-		}
+            for (int serieIndex = 0; serieIndex < size; serieIndex++) {
+               altitudeSerieSmoothed[serieIndex] = altitudeSerie[serieIndex];
+               altitudeSerieImperialSmoothed[serieIndex] = (altitudeSerie[serieIndex] / UI.UNIT_VALUE_ALTITUDE);
+            }
+         }
+      }
 
-		// check if required data for speed, gradient... are available
-		if (distanceSerie == null && (latitudeSerie == null || longitudeSerie == null)) {
-			return;
-		}
+      // check if required data for speed, gradient... are available
+      if (distanceSerie == null && (latitudeSerie == null || longitudeSerie == null)) {
+         return;
+      }
 
-		speedSerie = new float[size];
-		speedSerieImperial = new float[size];
+      speedSerie = new float[size];
+      speedSerieImperial = new float[size];
 
-		paceSerieSeconds = new float[size];
-		paceSerieSecondsImperial = new float[size];
-		paceSerieMinute = new float[size];
-		paceSerieMinuteImperial = new float[size];
+      paceSerieSeconds = new float[size];
+      paceSerieSecondsImperial = new float[size];
+      paceSerieMinute = new float[size];
+      paceSerieMinuteImperial = new float[size];
 
-		// ensure data series are created to prevent exceptions
-		if (size < 2) {
-			return;
-		}
+      // ensure data series are created to prevent exceptions
+      if (size < 2) {
+         return;
+      }
 
-		final double[] distance = new double[size];
-		final double[] distance_sc = new double[size];
+      final double[] distance = new double[size];
+      final double[] distance_sc = new double[size];
 
-		final double Vh_ini[] = new double[size];
-		final double Vh[] = new double[size];
-		final double Vh_sc[] = new double[size];
+      final double Vh_ini[] = new double[size];
+      final double Vh[] = new double[size];
+      final double Vh_sc[] = new double[size];
 
-		final double Vv_ini[] = new double[size];
-		final double Vv[] = new double[size];
-		final double Vv_sc[] = new double[size];
+      final double Vv_ini[] = new double[size];
+      final double Vv[] = new double[size];
+      final double Vv_sc[] = new double[size];
 
-		/*
-		 * get distance
-		 */
-		if (distanceSerie == null) {
+      /*
+       * get distance
+       */
+      if (distanceSerie == null) {
 
-			// compute distance from latitude and longitude data
-			distance[0] = 0.;
-			for (int serieIndex = 1; serieIndex < size; serieIndex++) {
-				distance[serieIndex] = distance[serieIndex - 1]
-						+ MtMath.distanceVincenty(
-								latitudeSerie[serieIndex],
-								latitudeSerie[serieIndex - 1],
-								longitudeSerie[serieIndex],
-								longitudeSerie[serieIndex - 1]);
-			}
+         // compute distance from latitude and longitude data
+         distance[0] = 0.;
+         for (int serieIndex = 1; serieIndex < size; serieIndex++) {
+            distance[serieIndex] = distance[serieIndex - 1]
+                  + MtMath.distanceVincenty(
+                        latitudeSerie[serieIndex],
+                        latitudeSerie[serieIndex - 1],
+                        longitudeSerie[serieIndex],
+                        longitudeSerie[serieIndex - 1]);
+         }
 
-		} else {
+      } else {
 
-			// convert distance into double
-			for (int serieIndex = 0; serieIndex < size; serieIndex++) {
-				distance[serieIndex] = distanceSerie[serieIndex];
-			}
-		}
+         // convert distance into double
+         for (int serieIndex = 0; serieIndex < size; serieIndex++) {
+            distance[serieIndex] = distanceSerie[serieIndex];
+         }
+      }
 
-		/*
-		 * Compute the horizontal and vertical speeds from the raw distance and altitude data
-		 */
-		for (int serieIndex = 0; serieIndex < size - 1; serieIndex++) {
+      /*
+       * Compute the horizontal and vertical speeds from the raw distance and altitude data
+       */
+      for (int serieIndex = 0; serieIndex < size - 1; serieIndex++) {
 
-			if (timeSerie[serieIndex + 1] == timeSerie[serieIndex]) {
+         if (timeSerie[serieIndex + 1] == timeSerie[serieIndex]) {
 
-				if (serieIndex == 0) {
-					Vh_ini[serieIndex] = 0.;
-					Vv_ini[serieIndex] = 0.;
-				} else {
-					Vh_ini[serieIndex] = Vh_ini[serieIndex - 1];
-					Vv_ini[serieIndex] = Vv_ini[serieIndex - 1];
-				}
+            if (serieIndex == 0) {
+               Vh_ini[serieIndex] = 0.;
+               Vv_ini[serieIndex] = 0.;
+            } else {
+               Vh_ini[serieIndex] = Vh_ini[serieIndex - 1];
+               Vv_ini[serieIndex] = Vv_ini[serieIndex - 1];
+            }
 
-			} else {
+         } else {
 
-				Vh_ini[serieIndex] = (distance[serieIndex + 1] - distance[serieIndex])
-						/ (timeSerie[serieIndex + 1] - timeSerie[serieIndex]);
+            Vh_ini[serieIndex] = (distance[serieIndex + 1] - distance[serieIndex])
+                  / (timeSerie[serieIndex + 1] - timeSerie[serieIndex]);
 
-				if (isAltitudeAvailable) {
-					Vv_ini[serieIndex] = (altitude[serieIndex + 1] - altitude[serieIndex])
-							/ (timeSerie[serieIndex + 1] - timeSerie[serieIndex]);
-				}
-			}
-		}
-		Vh_ini[size - 1] = Vh_ini[size - 2];
-		Vv_ini[size - 1] = Vv_ini[size - 2];
+            if (isAltitudeAvailable) {
+               Vv_ini[serieIndex] = (altitude[serieIndex + 1] - altitude[serieIndex])
+                     / (timeSerie[serieIndex + 1] - timeSerie[serieIndex]);
+            }
+         }
+      }
+      Vh_ini[size - 1] = Vh_ini[size - 2];
+      Vv_ini[size - 1] = Vv_ini[size - 2];
 
-		/*
-		 * Smooth out the time variations of the distance
-		 */
-		Smooth.smoothing(timeSerie, distance, distance_sc, tauSpeed, false, repeatedSmoothing, repeatedTau);
+      /*
+       * Smooth out the time variations of the distance
+       */
+      Smooth.smoothing(timeSerie, distance, distance_sc, tauSpeed, false, repeatedSmoothing, repeatedTau);
 
-		/*
-		 * Compute the horizontal and vertical speeds from the smoothed distance and altitude
-		 */
-		for (int serieIndex = 0; serieIndex < size - 1; serieIndex++) {
+      /*
+       * Compute the horizontal and vertical speeds from the smoothed distance and altitude
+       */
+      for (int serieIndex = 0; serieIndex < size - 1; serieIndex++) {
 
-			if (timeSerie[serieIndex + 1] == timeSerie[serieIndex]) {
+         if (timeSerie[serieIndex + 1] == timeSerie[serieIndex]) {
 
-				// time has not changed
+            // time has not changed
 
-				if (serieIndex == 0) {
-					Vh[serieIndex] = 0.;
-					Vv[serieIndex] = 0.;
-				} else {
-					Vh[serieIndex] = Vh[serieIndex - 1];
-					Vv[serieIndex] = Vv[serieIndex - 1];
-				}
+            if (serieIndex == 0) {
+               Vh[serieIndex] = 0.;
+               Vv[serieIndex] = 0.;
+            } else {
+               Vh[serieIndex] = Vh[serieIndex - 1];
+               Vv[serieIndex] = Vv[serieIndex - 1];
+            }
 
-			} else {
+         } else {
 
-				Vh[serieIndex] = (distance_sc[serieIndex + 1] - distance_sc[serieIndex])
-						/ (timeSerie[serieIndex + 1] - timeSerie[serieIndex]);
+            Vh[serieIndex] = (distance_sc[serieIndex + 1] - distance_sc[serieIndex])
+                  / (timeSerie[serieIndex + 1] - timeSerie[serieIndex]);
 
-				if (isAltitudeAvailable) {
-					Vv[serieIndex] = (altitude_sc[serieIndex + 1] - altitude_sc[serieIndex])
-							/ (timeSerie[serieIndex + 1] - timeSerie[serieIndex]);
-				}
-			}
-		}
-		Vh[size - 1] = Vh[size - 2];
-		Vv[size - 1] = Vv[size - 2];
+            if (isAltitudeAvailable) {
+               Vv[serieIndex] = (altitude_sc[serieIndex + 1] - altitude_sc[serieIndex])
+                     / (timeSerie[serieIndex + 1] - timeSerie[serieIndex]);
+            }
+         }
+      }
+      Vh[size - 1] = Vh[size - 2];
+      Vv[size - 1] = Vv[size - 2];
 
-		/*
-		 * Smooth out the time variations of the horizontal and vertical speeds
-		 */
-		Smooth.smoothing(timeSerie, Vh, Vh_sc, tauSpeed, false, repeatedSmoothing, repeatedTau);
-		if (isAltitudeAvailable) {
-			Smooth.smoothing(timeSerie, Vv, Vv_sc, tauGradient, false, repeatedSmoothing, repeatedTau);
-		}
+      /*
+       * Smooth out the time variations of the horizontal and vertical speeds
+       */
+      Smooth.smoothing(timeSerie, Vh, Vh_sc, tauSpeed, false, repeatedSmoothing, repeatedTau);
+      if (isAltitudeAvailable) {
+         Smooth.smoothing(timeSerie, Vv, Vv_sc, tauGradient, false, repeatedSmoothing, repeatedTau);
+      }
 
-		/*
-		 * Compute the terrain slope
-		 */
-		if (isAltitudeAvailable) {
+      /*
+       * Compute the terrain slope
+       */
+      if (isAltitudeAvailable) {
 
-			gradientSerie = new float[size];
+         gradientSerie = new float[size];
 
-			for (int serieIndex = 0; serieIndex < size; serieIndex++) {
+         for (int serieIndex = 0; serieIndex < size; serieIndex++) {
 
-				final double vh_sc_Value = Vh_sc[serieIndex];
+            final double vh_sc_Value = Vh_sc[serieIndex];
 
-				// check divide by 0
-				gradientSerie[serieIndex] = vh_sc_Value == 0.0 //
-						? 0
-						: (float) (Vv_sc[serieIndex] / vh_sc_Value * 100.0);
+            // check divide by 0
+            gradientSerie[serieIndex] = vh_sc_Value == 0.0 //
+                  ? 0
+                  : (float) (Vv_sc[serieIndex] / vh_sc_Value * 100.0);
 
-				final double vSpeedSmoothed = Vv_sc[serieIndex] * 3600.0;
-				altimeterSerie[serieIndex] = (float) (vSpeedSmoothed);
-				altimeterSerieImperial[serieIndex] = (float) (vSpeedSmoothed / UI.UNIT_VALUE_ALTITUDE);
-			}
-		}
+            final double vSpeedSmoothed = Vv_sc[serieIndex] * 3600.0;
+            altimeterSerie[serieIndex] = (float) (vSpeedSmoothed);
+            altimeterSerieImperial[serieIndex] = (float) (vSpeedSmoothed / UI.UNIT_VALUE_ALTITUDE);
+         }
+      }
 
-		maxSpeed = 0.0f;
-		for (int serieIndex = 0; serieIndex < Vh.length; serieIndex++) {
+      maxSpeed = 0.0f;
+      for (int serieIndex = 0; serieIndex < Vh.length; serieIndex++) {
 
-			final double speedMetric = Vh[serieIndex] * 3.6;
-			final double speedImperial = speedMetric / UI.UNIT_MILE;
+         final double speedMetric = Vh[serieIndex] * 3.6;
+         final double speedImperial = speedMetric / UI.UNIT_MILE;
 
-			if (speedMetric > maxSpeed) {
-				maxSpeed = (float) speedMetric;
-			}
+         if (speedMetric > maxSpeed) {
+            maxSpeed = (float) speedMetric;
+         }
 
-			speedSerie[serieIndex] = (float) speedMetric;
-			speedSerieImperial[serieIndex] = (float) speedImperial;
+         speedSerie[serieIndex] = (float) speedMetric;
+         speedSerieImperial[serieIndex] = (float) speedImperial;
 
-			final float paceMetricSeconds = speedMetric < 1.0 ? 0 : (float) (3600.0 / speedMetric);
-			final float paceImperialSeconds = speedMetric < 0.6 ? 0 : (float) (3600.0 / speedImperial);
+         final float paceMetricSeconds = speedMetric < 1.0 ? 0 : (float) (3600.0 / speedMetric);
+         final float paceImperialSeconds = speedMetric < 0.6 ? 0 : (float) (3600.0 / speedImperial);
 
-			paceSerieSeconds[serieIndex] = paceMetricSeconds;
-			paceSerieSecondsImperial[serieIndex] = paceImperialSeconds;
+         paceSerieSeconds[serieIndex] = paceMetricSeconds;
+         paceSerieSecondsImperial[serieIndex] = paceImperialSeconds;
 
-			paceSerieMinute[serieIndex] = paceMetricSeconds / 60;
-			paceSerieMinuteImperial[serieIndex] = paceImperialSeconds / 60;
-		}
-	}
+         paceSerieMinute[serieIndex] = paceMetricSeconds / 60;
+         paceSerieMinuteImperial[serieIndex] = paceImperialSeconds / 60;
+      }
+   }
 
-	/**
-	 * computes the speed data serie which can be retrieved with {@link TourData#getSpeedSerie()}
-	 */
-	public void computeSpeedSerie() {
+   /**
+    * computes the speed data serie which can be retrieved with {@link TourData#getSpeedSerie()}
+    */
+   public void computeSpeedSerie() {
 
 //      final long start = System.nanoTime();
 
-		if ((speedSerie != null)
-				&& (speedSerieImperial != null)
-				&& (paceSerieSeconds != null)
-				&& (paceSerieSecondsImperial != null)
-				&& (paceSerieMinute != null)
-				&& (paceSerieMinuteImperial != null)) {
-			return;
-		}
+      if ((speedSerie != null)
+            && (speedSerieImperial != null)
+            && (paceSerieSeconds != null)
+            && (paceSerieSecondsImperial != null)
+            && (paceSerieMinute != null)
+            && (paceSerieMinuteImperial != null)) {
+         return;
+      }
 
-		if (isSpeedSerieFromDevice) {
+      if (isSpeedSerieFromDevice) {
 
-			// speed is from the device
+         // speed is from the device
 
-			computeSpeedSerieFromDevice();
+         computeSpeedSerieFromDevice();
 
-		} else {
+      } else {
 
-			// speed is computed from distance and time
+         // speed is computed from distance and time
 
-			if (_prefStore
-					.getString(ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM)//
-					.equals(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_JAMET)) {
+         if (_prefStore
+               .getString(ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM)//
+               .equals(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_JAMET)) {
 
-				computeSmoothedDataSeries();
+            computeSmoothedDataSeries();
 
-			} else {
+         } else {
 
-				if (deviceTimeInterval == -1) {
-					computeSpeedSerieInternalWithVariableInterval();
-				} else {
-					computeSpeedSerieInternalWithFixedInterval();
-				}
-			}
-		}
+            if (deviceTimeInterval == -1) {
+               computeSpeedSerieInternalWithVariableInterval();
+            } else {
+               computeSpeedSerieInternalWithFixedInterval();
+            }
+         }
+      }
 
 //      final long end = System.nanoTime();
 //
 //      System.out.println("computeSpeedSerie():\t" + ((end - start) / 1000000.0) + "ms");
-	}
+   }
 
-	/**
-	 * Computes the imperial speed data serie and max speed
-	 *
-	 * @return
-	 */
-	private void computeSpeedSerieFromDevice() {
+   /**
+    * Computes the imperial speed data serie and max speed
+    *
+    * @return
+    */
+   private void computeSpeedSerieFromDevice() {
 
-		if (speedSerie == null) {
-			return;
-		}
+      if (speedSerie == null) {
+         return;
+      }
 
-		final int serieLength = speedSerie.length;
+      final int serieLength = speedSerie.length;
 
-		speedSerieImperial = new float[serieLength];
+      speedSerieImperial = new float[serieLength];
 
-		maxSpeed = 0;
+      maxSpeed = 0;
 
-		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
+      for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 
-			/*
-			 * speed
-			 */
+         /*
+          * speed
+          */
 
-			final float speedMetric = speedSerie[serieIndex];
+         final float speedMetric = speedSerie[serieIndex];
 
-			speedSerieImperial[serieIndex] = speedMetric / UI.UNIT_MILE;
-			maxSpeed = Math.max(maxSpeed, speedMetric);
-		}
-	}
-
-	/**
-	 * Computes the speed data serie with the internal algorithm for a fix time interval
-	 *
-	 * @return
-	 */
-	private void computeSpeedSerieInternalWithFixedInterval() {
+         speedSerieImperial[serieIndex] = speedMetric / UI.UNIT_MILE;
+         maxSpeed = Math.max(maxSpeed, speedMetric);
+      }
+   }
+
+   /**
+    * Computes the speed data serie with the internal algorithm for a fix time interval
+    *
+    * @return
+    */
+   private void computeSpeedSerieInternalWithFixedInterval() {
 
-		// distance is required
-		if (distanceSerie == null) {
-			return;
-		}
+      // distance is required
+      if (distanceSerie == null) {
+         return;
+      }
 
-		final int serieLength = timeSerie.length;
+      final int serieLength = timeSerie.length;
 
-		maxSpeed = 0;
+      maxSpeed = 0;
 
-		speedSerie = new float[serieLength];
-		speedSerieImperial = new float[serieLength];
+      speedSerie = new float[serieLength];
+      speedSerieImperial = new float[serieLength];
 
-		paceSerieSeconds = new float[serieLength];
-		paceSerieSecondsImperial = new float[serieLength];
-		paceSerieMinute = new float[serieLength];
-		paceSerieMinuteImperial = new float[serieLength];
+      paceSerieSeconds = new float[serieLength];
+      paceSerieSecondsImperial = new float[serieLength];
+      paceSerieMinute = new float[serieLength];
+      paceSerieMinuteImperial = new float[serieLength];
 
-		int lowIndexAdjustmentDefault = 0;
-		int highIndexAdjustmentDefault = 0;
+      int lowIndexAdjustmentDefault = 0;
+      int highIndexAdjustmentDefault = 0;
 
-		if (deviceTimeInterval <= 2) {
-			lowIndexAdjustmentDefault = 3;
-			highIndexAdjustmentDefault = 3;
+      if (deviceTimeInterval <= 2) {
+         lowIndexAdjustmentDefault = 3;
+         highIndexAdjustmentDefault = 3;
 
-		} else if (deviceTimeInterval <= 5) {
-			lowIndexAdjustmentDefault = 1;
-			highIndexAdjustmentDefault = 1;
+      } else if (deviceTimeInterval <= 5) {
+         lowIndexAdjustmentDefault = 1;
+         highIndexAdjustmentDefault = 1;
 
-		} else if (deviceTimeInterval <= 10) {
-			lowIndexAdjustmentDefault = 0;
-			highIndexAdjustmentDefault = 1;
-		} else {
-			lowIndexAdjustmentDefault = 0;
-			highIndexAdjustmentDefault = 1;
-		}
+      } else if (deviceTimeInterval <= 10) {
+         lowIndexAdjustmentDefault = 0;
+         highIndexAdjustmentDefault = 1;
+      } else {
+         lowIndexAdjustmentDefault = 0;
+         highIndexAdjustmentDefault = 1;
+      }
 
-		final int serieLengthLast = serieLength - 1;
+      final int serieLengthLast = serieLength - 1;
 
-		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
+      for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 
-			// adjust index to the array size
-			final int serieIndexLow = serieIndex - lowIndexAdjustmentDefault;
-			final int serieIndexLowMax = ((0 >= serieIndexLow) ? 0 : serieIndexLow);
-			int distIndexLow = ((serieIndexLowMax <= serieLengthLast) ? serieIndexLowMax : serieLengthLast);
+         // adjust index to the array size
+         final int serieIndexLow = serieIndex - lowIndexAdjustmentDefault;
+         final int serieIndexLowMax = ((0 >= serieIndexLow) ? 0 : serieIndexLow);
+         int distIndexLow = ((serieIndexLowMax <= serieLengthLast) ? serieIndexLowMax : serieLengthLast);
 
-			final int serieIndexHigh = serieIndex + highIndexAdjustmentDefault;
-			final int serieIndexHighMax = ((serieIndexHigh <= serieLengthLast) ? serieIndexHigh : serieLengthLast);
-			int distIndexHigh = ((0 >= serieIndexHighMax) ? 0 : serieIndexHighMax);
+         final int serieIndexHigh = serieIndex + highIndexAdjustmentDefault;
+         final int serieIndexHighMax = ((serieIndexHigh <= serieLengthLast) ? serieIndexHigh : serieLengthLast);
+         int distIndexHigh = ((0 >= serieIndexHighMax) ? 0 : serieIndexHighMax);
 
-			final float distanceDefault = distanceSerie[distIndexHigh] - distanceSerie[distIndexLow];
+         final float distanceDefault = distanceSerie[distIndexHigh] - distanceSerie[distIndexLow];
 
-			// adjust the accuracy for the distance
-			int lowIndexAdjustment = lowIndexAdjustmentDefault;
-			int highIndexAdjustment = highIndexAdjustmentDefault;
+         // adjust the accuracy for the distance
+         int lowIndexAdjustment = lowIndexAdjustmentDefault;
+         int highIndexAdjustment = highIndexAdjustmentDefault;
 
-			if (distanceDefault < 30) {
-				lowIndexAdjustment = lowIndexAdjustmentDefault + 3;
-				highIndexAdjustment = highIndexAdjustmentDefault + 3;
-			} else if (distanceDefault < 50) {
-				lowIndexAdjustment = lowIndexAdjustmentDefault + 2;
-				highIndexAdjustment = highIndexAdjustmentDefault + 2;
-			} else if (distanceDefault < 100) {
-				lowIndexAdjustment = lowIndexAdjustmentDefault + 1;
-				highIndexAdjustment = highIndexAdjustmentDefault + 1;
-			}
+         if (distanceDefault < 30) {
+            lowIndexAdjustment = lowIndexAdjustmentDefault + 3;
+            highIndexAdjustment = highIndexAdjustmentDefault + 3;
+         } else if (distanceDefault < 50) {
+            lowIndexAdjustment = lowIndexAdjustmentDefault + 2;
+            highIndexAdjustment = highIndexAdjustmentDefault + 2;
+         } else if (distanceDefault < 100) {
+            lowIndexAdjustment = lowIndexAdjustmentDefault + 1;
+            highIndexAdjustment = highIndexAdjustmentDefault + 1;
+         }
 
-			// adjust index to the array size
-			final int serieIndexLowAdjusted = serieIndex - lowIndexAdjustment;
-			final int serieIndexLowAdjustedMax = ((0 >= serieIndexLowAdjusted) ? 0 : serieIndexLowAdjusted);
+         // adjust index to the array size
+         final int serieIndexLowAdjusted = serieIndex - lowIndexAdjustment;
+         final int serieIndexLowAdjustedMax = ((0 >= serieIndexLowAdjusted) ? 0 : serieIndexLowAdjusted);
 
-			distIndexLow = (serieIndexLowAdjustedMax <= serieLengthLast) ? serieIndexLowAdjustedMax : serieLengthLast;
+         distIndexLow = (serieIndexLowAdjustedMax <= serieLengthLast) ? serieIndexLowAdjustedMax : serieLengthLast;
 
-			final int serieIndexHighAdjusted = serieIndex + highIndexAdjustment;
-			final int serieIndexHighAdjustedMin = ((serieIndexHighAdjusted <= serieLengthLast)
-					? serieIndexHighAdjusted
-					: serieLengthLast);
+         final int serieIndexHighAdjusted = serieIndex + highIndexAdjustment;
+         final int serieIndexHighAdjustedMin = ((serieIndexHighAdjusted <= serieLengthLast)
+               ? serieIndexHighAdjusted
+               : serieLengthLast);
 
-			distIndexHigh = (0 >= serieIndexHighAdjustedMin) ? 0 : serieIndexHighAdjustedMin;
+         distIndexHigh = (0 >= serieIndexHighAdjustedMin) ? 0 : serieIndexHighAdjustedMin;
 
-			final float distDiff = distanceSerie[distIndexHigh] - distanceSerie[distIndexLow];
-			final float timeDiff = timeSerie[distIndexHigh] - timeSerie[distIndexLow];
+         final float distDiff = distanceSerie[distIndexHigh] - distanceSerie[distIndexLow];
+         final float timeDiff = timeSerie[distIndexHigh] - timeSerie[distIndexLow];
 
-			/*
-			 * speed
-			 */
-			float speedMetric = 0;
-			float speedImperial = 0;
-			if (timeDiff != 0) {
-				final float speed = (distDiff * 3.6f) / timeDiff;
-				speedMetric = speed;
-				speedImperial = speed / UI.UNIT_MILE;
-			}
+         /*
+          * speed
+          */
+         float speedMetric = 0;
+         float speedImperial = 0;
+         if (timeDiff != 0) {
+            final float speed = (distDiff * 3.6f) / timeDiff;
+            speedMetric = speed;
+            speedImperial = speed / UI.UNIT_MILE;
+         }
 
-			speedSerie[serieIndex] = speedMetric;
-			speedSerieImperial[serieIndex] = speedImperial;
+         speedSerie[serieIndex] = speedMetric;
+         speedSerieImperial[serieIndex] = speedImperial;
 
-			maxSpeed = Math.max(maxSpeed, speedMetric);
+         maxSpeed = Math.max(maxSpeed, speedMetric);
 
-			final float paceMetricSeconds = speedMetric < 1.0 ? 0 : (float) (3600.0 / speedMetric);
-			final float paceImperialSeconds = speedMetric < 0.6 ? 0 : (float) (3600.0 / speedImperial);
+         final float paceMetricSeconds = speedMetric < 1.0 ? 0 : (float) (3600.0 / speedMetric);
+         final float paceImperialSeconds = speedMetric < 0.6 ? 0 : (float) (3600.0 / speedImperial);
 
-			paceSerieSeconds[serieIndex] = paceMetricSeconds;
-			paceSerieSecondsImperial[serieIndex] = paceImperialSeconds;
+         paceSerieSeconds[serieIndex] = paceMetricSeconds;
+         paceSerieSecondsImperial[serieIndex] = paceImperialSeconds;
 
-			paceSerieMinute[serieIndex] = paceMetricSeconds / 60;
-			paceSerieMinuteImperial[serieIndex] = paceImperialSeconds / 60;
-		}
-	}
+         paceSerieMinute[serieIndex] = paceMetricSeconds / 60;
+         paceSerieMinuteImperial[serieIndex] = paceImperialSeconds / 60;
+      }
+   }
 
-	/**
-	 * compute the speed when the time serie has unequal time intervalls, with Wolfgangs algorithm
-	 */
-	private void computeSpeedSerieInternalWithVariableInterval() {
+   /**
+    * compute the speed when the time serie has unequal time intervalls, with Wolfgangs algorithm
+    */
+   private void computeSpeedSerieInternalWithVariableInterval() {
 
-		// distance is required
-		if (distanceSerie == null) {
-			return;
-		}
+      // distance is required
+      if (distanceSerie == null) {
+         return;
+      }
 
-		final int minTimeDiff = _prefStore.getInt(ITourbookPreferences.APP_DATA_SPEED_MIN_TIMESLICE_VALUE);
+      final int minTimeDiff = _prefStore.getInt(ITourbookPreferences.APP_DATA_SPEED_MIN_TIMESLICE_VALUE);
 
-		final int serieLength = timeSerie.length;
-		final int lastSerieIndex = serieLength - 1;
+      final int serieLength = timeSerie.length;
+      final int lastSerieIndex = serieLength - 1;
 
-		maxSpeed = 0;
+      maxSpeed = 0;
 
-		speedSerie = new float[serieLength];
-		speedSerieImperial = new float[serieLength];
+      speedSerie = new float[serieLength];
+      speedSerieImperial = new float[serieLength];
 
-		paceSerieSeconds = new float[serieLength];
-		paceSerieSecondsImperial = new float[serieLength];
-		paceSerieMinute = new float[serieLength];
-		paceSerieMinuteImperial = new float[serieLength];
+      paceSerieSeconds = new float[serieLength];
+      paceSerieSecondsImperial = new float[serieLength];
+      paceSerieMinute = new float[serieLength];
+      paceSerieMinuteImperial = new float[serieLength];
 
-		final boolean isUseLatLon = (latitudeSerie != null) && //
-				(longitudeSerie != null) && (isDistanceFromSensor == 0); // --> distance is measured with the gps device and not from a sensor
+      final boolean isUseLatLon = (latitudeSerie != null) && //
+            (longitudeSerie != null) && (isDistanceFromSensor == 0); // --> distance is measured with the gps device and not from a sensor
 
-		boolean isLatLongEqual = false;
-		int equalStartIndex = 0;
+      boolean isLatLongEqual = false;
+      int equalStartIndex = 0;
 
-		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
+      for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 
-			final int prevSerieIndex = serieIndex - 1;
+         final int prevSerieIndex = serieIndex - 1;
 
-			// adjust index to the array size
-			int lowIndex = ((0 >= prevSerieIndex) ? 0 : prevSerieIndex);
-			int highIndex = ((serieIndex <= lastSerieIndex) ? serieIndex : lastSerieIndex);
+         // adjust index to the array size
+         int lowIndex = ((0 >= prevSerieIndex) ? 0 : prevSerieIndex);
+         int highIndex = ((serieIndex <= lastSerieIndex) ? serieIndex : lastSerieIndex);
 
-			int timeDiff = timeSerie[highIndex] - timeSerie[lowIndex];
-			float distDiff = distanceSerie[highIndex] - distanceSerie[lowIndex];
+         int timeDiff = timeSerie[highIndex] - timeSerie[lowIndex];
+         float distDiff = distanceSerie[highIndex] - distanceSerie[lowIndex];
 
-			// check if a lat and long diff is available
-			if (isUseLatLon && (serieIndex > 0) && (serieIndex < lastSerieIndex - 1)) {
+         // check if a lat and long diff is available
+         if (isUseLatLon && (serieIndex > 0) && (serieIndex < lastSerieIndex - 1)) {
 
-				if ((latitudeSerie[serieIndex] == latitudeSerie[prevSerieIndex])
-						&& (longitudeSerie[serieIndex] == longitudeSerie[prevSerieIndex])) {
+            if ((latitudeSerie[serieIndex] == latitudeSerie[prevSerieIndex])
+                  && (longitudeSerie[serieIndex] == longitudeSerie[prevSerieIndex])) {
 
-					if (isLatLongEqual == false) {
-						equalStartIndex = prevSerieIndex;
-						isLatLongEqual = true;
-					}
+               if (isLatLongEqual == false) {
+                  equalStartIndex = prevSerieIndex;
+                  isLatLongEqual = true;
+               }
 
-					continue;
+               continue;
 
-				} else if (isLatLongEqual) {
+            } else if (isLatLongEqual) {
 
-					/*
-					 * lat/long equality ended, compute distance for all datapoints which has the same
-					 * lat/long because this was not correctly computed from the device
-					 */
+               /*
+                * lat/long equality ended, compute distance for all datapoints which has the same
+                * lat/long because this was not correctly computed from the device
+                */
 
-					isLatLongEqual = false;
+               isLatLongEqual = false;
 
-					final int equalTimeDiff = timeSerie[serieIndex] - timeSerie[equalStartIndex];
-					final float equalDistDiff = distanceSerie[serieIndex] - distanceSerie[equalStartIndex];
+               final int equalTimeDiff = timeSerie[serieIndex] - timeSerie[equalStartIndex];
+               final float equalDistDiff = distanceSerie[serieIndex] - distanceSerie[equalStartIndex];
 
-					float speedMetric = 0;
-					float speedImperial = 0;
+               float speedMetric = 0;
+               float speedImperial = 0;
 
-					if ((equalTimeDiff > 20) && (equalDistDiff < 10)) {
-						// speed must be greater than 1.8 km/h
-					} else {
-
-						for (int equalSerieIndex = equalStartIndex
-								+ 1; equalSerieIndex < serieIndex; equalSerieIndex++) {
+               if ((equalTimeDiff > 20) && (equalDistDiff < 10)) {
+                  // speed must be greater than 1.8 km/h
+               } else {
+
+                  for (int equalSerieIndex = equalStartIndex
+                        + 1; equalSerieIndex < serieIndex; equalSerieIndex++) {
 
-							final int equalSegmentTimeDiff = timeSerie[equalSerieIndex]
-									- timeSerie[equalSerieIndex - 1];
-
-							final float equalSegmentDistDiff = equalTimeDiff == 0 ? 0 : //
-									(float) equalSegmentTimeDiff / equalTimeDiff * equalDistDiff;
-
-							distanceSerie[equalSerieIndex] = distanceSerie[equalSerieIndex - 1] + equalSegmentDistDiff;
-
-							// compute speed for this segment
-							if ((equalSegmentTimeDiff == 0) || (equalSegmentDistDiff == 0)) {
-								speedMetric = 0;
-							} else {
-								speedMetric = ((equalSegmentDistDiff * 3.6f) / equalSegmentTimeDiff);
-								speedMetric = speedMetric < 0 ? 0 : speedMetric;
-
-								speedImperial = equalSegmentDistDiff * 3.6f / (equalSegmentTimeDiff * UI.UNIT_MILE);
-								speedImperial = speedImperial < 0 ? 0 : speedImperial;
-							}
-
-							setSpeed(
-									equalSerieIndex,
-									speedMetric,
-									speedImperial,
-									equalSegmentTimeDiff,
-									equalSegmentDistDiff);
-						}
-					}
-				}
-			}
-
-			boolean swapIndexDirection = true;
-
-			while (timeDiff < minTimeDiff) {
-
-				// toggle between low and high index
-				if (swapIndexDirection) {
-					highIndex++;
-				} else {
-					lowIndex--;
-				}
-				swapIndexDirection = !swapIndexDirection;
-
-				// check bounds
-				if ((lowIndex < 0) || (highIndex >= serieLength)) {
-					break;
-				}
-
-				timeDiff = timeSerie[highIndex] - timeSerie[lowIndex];
-				distDiff = distanceSerie[highIndex] - distanceSerie[lowIndex];
-			}
-
-			/*
-			 * speed
-			 */
-			float speedMetric = 0;
-			float speedImperial = 0;
-
-			/*
-			 * check if a time difference is available between 2 time data, this can happen in gps data
-			 * that lat+long is available but no time
-			 */
-			highIndex = (highIndex <= lastSerieIndex) ? highIndex : lastSerieIndex;
-			lowIndex = (lowIndex >= 0) ? lowIndex : 0;
-
-			boolean isTimeValid = true;
-			int prevTime = timeSerie[lowIndex];
-
-			for (int timeIndex = lowIndex + 1; timeIndex <= highIndex; timeIndex++) {
-				final int currentTime = timeSerie[timeIndex];
-				if (prevTime == currentTime) {
-					isTimeValid = false;
-					break;
-				}
-				prevTime = currentTime;
-			}
-
-			if (isTimeValid && (serieIndex > 0) && (timeDiff != 0)) {
-
-				// check if a lat and long diff is available
-				if (isUseLatLon && (lowIndex > 0) && (highIndex < lastSerieIndex - 1)) {
-
-					if ((latitudeSerie[lowIndex] == latitudeSerie[lowIndex - 1])
-							&& (longitudeSerie[lowIndex] == longitudeSerie[lowIndex - 1])) {
+                     final int equalSegmentTimeDiff = timeSerie[equalSerieIndex]
+                           - timeSerie[equalSerieIndex - 1];
+
+                     final float equalSegmentDistDiff = equalTimeDiff == 0 ? 0 : //
+                           (float) equalSegmentTimeDiff / equalTimeDiff * equalDistDiff;
+
+                     distanceSerie[equalSerieIndex] = distanceSerie[equalSerieIndex - 1] + equalSegmentDistDiff;
+
+                     // compute speed for this segment
+                     if ((equalSegmentTimeDiff == 0) || (equalSegmentDistDiff == 0)) {
+                        speedMetric = 0;
+                     } else {
+                        speedMetric = ((equalSegmentDistDiff * 3.6f) / equalSegmentTimeDiff);
+                        speedMetric = speedMetric < 0 ? 0 : speedMetric;
+
+                        speedImperial = equalSegmentDistDiff * 3.6f / (equalSegmentTimeDiff * UI.UNIT_MILE);
+                        speedImperial = speedImperial < 0 ? 0 : speedImperial;
+                     }
+
+                     setSpeed(
+                           equalSerieIndex,
+                           speedMetric,
+                           speedImperial,
+                           equalSegmentTimeDiff,
+                           equalSegmentDistDiff);
+                  }
+               }
+            }
+         }
+
+         boolean swapIndexDirection = true;
+
+         while (timeDiff < minTimeDiff) {
+
+            // toggle between low and high index
+            if (swapIndexDirection) {
+               highIndex++;
+            } else {
+               lowIndex--;
+            }
+            swapIndexDirection = !swapIndexDirection;
+
+            // check bounds
+            if ((lowIndex < 0) || (highIndex >= serieLength)) {
+               break;
+            }
+
+            timeDiff = timeSerie[highIndex] - timeSerie[lowIndex];
+            distDiff = distanceSerie[highIndex] - distanceSerie[lowIndex];
+         }
+
+         /*
+          * speed
+          */
+         float speedMetric = 0;
+         float speedImperial = 0;
+
+         /*
+          * check if a time difference is available between 2 time data, this can happen in gps data
+          * that lat+long is available but no time
+          */
+         highIndex = (highIndex <= lastSerieIndex) ? highIndex : lastSerieIndex;
+         lowIndex = (lowIndex >= 0) ? lowIndex : 0;
+
+         boolean isTimeValid = true;
+         int prevTime = timeSerie[lowIndex];
+
+         for (int timeIndex = lowIndex + 1; timeIndex <= highIndex; timeIndex++) {
+            final int currentTime = timeSerie[timeIndex];
+            if (prevTime == currentTime) {
+               isTimeValid = false;
+               break;
+            }
+            prevTime = currentTime;
+         }
+
+         if (isTimeValid && (serieIndex > 0) && (timeDiff != 0)) {
+
+            // check if a lat and long diff is available
+            if (isUseLatLon && (lowIndex > 0) && (highIndex < lastSerieIndex - 1)) {
+
+               if ((latitudeSerie[lowIndex] == latitudeSerie[lowIndex - 1])
+                     && (longitudeSerie[lowIndex] == longitudeSerie[lowIndex - 1])) {
 
-						if (distDiff == 0) {
-							continue;
-						}
-					}
+                  if (distDiff == 0) {
+                     continue;
+                  }
+               }
 
-					if ((longitudeSerie[highIndex] == longitudeSerie[highIndex + 1])
-							&& (latitudeSerie[highIndex] == latitudeSerie[highIndex + 1])) {
-						if (distDiff == 0) {
-							continue;
-						}
-					}
-				}
+               if ((longitudeSerie[highIndex] == longitudeSerie[highIndex + 1])
+                     && (latitudeSerie[highIndex] == latitudeSerie[highIndex + 1])) {
+                  if (distDiff == 0) {
+                     continue;
+                  }
+               }
+            }
 
-				if ((timeDiff > 20) && (distDiff < 10)) {
-					// speed must be greater than 1.8 km/h
-					speedMetric = 0;
-				} else {
-					speedMetric = distDiff * 3.6f / timeDiff;
-					speedMetric = speedMetric < 0 ? 0 : speedMetric;
+            if ((timeDiff > 20) && (distDiff < 10)) {
+               // speed must be greater than 1.8 km/h
+               speedMetric = 0;
+            } else {
+               speedMetric = distDiff * 3.6f / timeDiff;
+               speedMetric = speedMetric < 0 ? 0 : speedMetric;
 
-					speedImperial = distDiff * 3.6f / (timeDiff * UI.UNIT_MILE);
-					speedImperial = speedImperial < 0 ? 0 : speedImperial;
-				}
-			}
+               speedImperial = distDiff * 3.6f / (timeDiff * UI.UNIT_MILE);
+               speedImperial = speedImperial < 0 ? 0 : speedImperial;
+            }
+         }
 
-			setSpeed(serieIndex, speedMetric, speedImperial, timeDiff, distDiff);
-		}
-	}
+         setSpeed(serieIndex, speedMetric, speedImperial, timeDiff, distDiff);
+      }
+   }
 
-	/**
-	 * Computes the tour driving time in seconds, this is the tour recording time - tour break time.
-	 * This value is store in {@link #tourDrivingTime}.
-	 */
-	public void computeTourDrivingTime() {
+   /**
+    * Computes the tour driving time in seconds, this is the tour recording time - tour break time.
+    * This value is store in {@link #tourDrivingTime}.
+    */
+   public void computeTourDrivingTime() {
 
-		if (isManualTour()) {
-			// manual tours do not have data series
-			return;
-		}
+      if (isManualTour()) {
+         // manual tours do not have data series
+         return;
+      }
 
-		if (_isImportedMTTour) {
-			// these types of tour are setting the driving time
-			return;
-		}
+      if (_isImportedMTTour) {
+         // these types of tour are setting the driving time
+         return;
+      }
 
-		if ((timeSerie == null) || (timeSerie.length == 0)) {
-			tourDrivingTime = 0;
-		} else {
-			final int tourDrivingTimeRaw = timeSerie[timeSerie.length - 1] - getBreakTime();
-			tourDrivingTime = Math.max(0, tourDrivingTimeRaw);
-		}
-	}
+      if ((timeSerie == null) || (timeSerie.length == 0)) {
+         tourDrivingTime = 0;
+      } else {
+         final int tourDrivingTimeRaw = timeSerie[timeSerie.length - 1] - getBreakTime();
+         tourDrivingTime = Math.max(0, tourDrivingTimeRaw);
+      }
+   }
 
-	private float[] convertDataSeries(final int[] intDataSerie, final int scale) {
+   private float[] convertDataSeries(final int[] intDataSerie, final int scale) {
 
-		if (intDataSerie == null) {
-			return null;
-		}
+      if (intDataSerie == null) {
+         return null;
+      }
 
-		final float[] floatDataSerie = new float[intDataSerie.length];
+      final float[] floatDataSerie = new float[intDataSerie.length];
 
-		for (int serieIndex = 0; serieIndex < intDataSerie.length; serieIndex++) {
+      for (int serieIndex = 0; serieIndex < intDataSerie.length; serieIndex++) {
 
-			final int intValue = intDataSerie[serieIndex];
+         final int intValue = intDataSerie[serieIndex];
 
-			floatDataSerie[serieIndex] = scale > 0 //
-					? (float) intValue / scale
-					: (float) intValue;
-		}
+         floatDataSerie[serieIndex] = scale > 0 //
+               ? (float) intValue / scale
+               : (float) intValue;
+      }
 
-		return floatDataSerie;
-	}
+      return floatDataSerie;
+   }
 
-	/**
-	 * Converts all waypoints into {@link TourMarker}s when position and time are the same.
-	 */
-	public void convertWayPoints() {
+   /**
+    * Converts all waypoints into {@link TourMarker}s when position and time are the same.
+    */
+   public void convertWayPoints() {
 
-		if (timeSerie == null || latitudeSerie == null || longitudeSerie == null) {
-			return;
-		}
+      if (timeSerie == null || latitudeSerie == null || longitudeSerie == null) {
+         return;
+      }
 
-		// get a copy of the way points
-		final Set<TourWayPoint> remainingWayPoints = new HashSet<>();
-		remainingWayPoints.addAll(tourWayPoints);
+      // get a copy of the way points
+      final Set<TourWayPoint> remainingWayPoints = new HashSet<>();
+      remainingWayPoints.addAll(tourWayPoints);
 
-		final ArrayList<TourWayPoint> allRemovedWayPoints = new ArrayList<>();
+      final ArrayList<TourWayPoint> allRemovedWayPoints = new ArrayList<>();
 
-		/**
-		 * Approach waypoint time to the nearest time slice time
-		 */
-		for (int timeDiffRange = 0; timeDiffRange < 10; timeDiffRange++) {
+      /**
+       * Approach waypoint time to the nearest time slice time
+       */
+      for (int timeDiffRange = 0; timeDiffRange < 10; timeDiffRange++) {
 
-			final int timeDiffRangeMS = timeDiffRange * 1000;
+         final int timeDiffRangeMS = timeDiffRange * 1000;
 
-			final ArrayList<TourWayPoint> removedWayPoints = new ArrayList<>();
+         final ArrayList<TourWayPoint> removedWayPoints = new ArrayList<>();
 
-			for (final TourWayPoint wp : remainingWayPoints) {
+         for (final TourWayPoint wp : remainingWayPoints) {
 
-				final long wpTime = wp.getTime();
-				final double wpLat = wp.getLatitude();
-				final double wpLon = wp.getLongitude();
+            final long wpTime = wp.getTime();
+            final double wpLat = wp.getLatitude();
+            final double wpLon = wp.getLongitude();
 
-				for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
+            for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
 
-					final int relativeTime = timeSerie[serieIndex];
-					final long tourTime = tourStartTime + relativeTime * 1000;
+               final int relativeTime = timeSerie[serieIndex];
+               final long tourTime = tourStartTime + relativeTime * 1000;
 
-					// get absolute time diff
-					long timeDiff = tourTime - wpTime;
-					if (timeDiff < 0) {
-						timeDiff = -timeDiff;
-					}
+               // get absolute time diff
+               long timeDiff = tourTime - wpTime;
+               if (timeDiff < 0) {
+                  timeDiff = -timeDiff;
+               }
 
-					if (timeDiff <= timeDiffRangeMS) {
+               if (timeDiff <= timeDiffRangeMS) {
 
-						final double tourLat = latitudeSerie[serieIndex];
-						final double tourLon = longitudeSerie[serieIndex];
+                  final double tourLat = latitudeSerie[serieIndex];
+                  final double tourLon = longitudeSerie[serieIndex];
 
-						double latDiff = tourLat - wpLat;
-						double lonDiff = tourLon - wpLon;
+                  double latDiff = tourLat - wpLat;
+                  double lonDiff = tourLon - wpLon;
 
-						if (latDiff < 0) {
-							latDiff = -latDiff;
-						}
-						if (lonDiff < 0) {
-							lonDiff = -lonDiff;
-						}
+                  if (latDiff < 0) {
+                     latDiff = -latDiff;
+                  }
+                  if (lonDiff < 0) {
+                     lonDiff = -lonDiff;
+                  }
 
-						if (latDiff < MAX_GEO_DIFF && lonDiff < MAX_GEO_DIFF) {
+                  if (latDiff < MAX_GEO_DIFF && lonDiff < MAX_GEO_DIFF) {
 
-							// time and position is the same
+                     // time and position is the same
 
-							final TourMarker tourMarker = new TourMarker(this, ChartLabel.MARKER_TYPE_CUSTOM);
+                     final TourMarker tourMarker = new TourMarker(this, ChartLabel.MARKER_TYPE_CUSTOM);
 
-							tourMarker.setSerieIndex(serieIndex);
-							tourMarker.setTime(relativeTime, wpTime);
+                     tourMarker.setSerieIndex(serieIndex);
+                     tourMarker.setTime(relativeTime, wpTime);
 
-							tourMarker.setLatitude(wpLat);
-							tourMarker.setLongitude(wpLon);
+                     tourMarker.setLatitude(wpLat);
+                     tourMarker.setLongitude(wpLon);
 
-							tourMarker.setDescription(wp.getDescription());
-							tourMarker.setLabel(wp.getName());
+                     tourMarker.setDescription(wp.getDescription());
+                     tourMarker.setLabel(wp.getName());
 
-							tourMarker.setUrlAddress(wp.getUrlAddress());
-							tourMarker.setUrlText(wp.getUrlText());
+                     tourMarker.setUrlAddress(wp.getUrlAddress());
+                     tourMarker.setUrlText(wp.getUrlText());
 
-							final float altitude = wp.getAltitude();
-							if (altitude != Float.MIN_VALUE) {
-								tourMarker.setAltitude(altitude);
-							}
+                     final float altitude = wp.getAltitude();
+                     if (altitude != Float.MIN_VALUE) {
+                        tourMarker.setAltitude(altitude);
+                     }
 
-							tourMarkers.add(tourMarker);
+                     tourMarkers.add(tourMarker);
 
-							removedWayPoints.add(wp);
-							allRemovedWayPoints.add(wp);
+                     removedWayPoints.add(wp);
+                     allRemovedWayPoints.add(wp);
 
-							break;
-						}
-					}
-				}
-			}
+                     break;
+                  }
+               }
+            }
+         }
 
-			remainingWayPoints.removeAll(removedWayPoints);
+         remainingWayPoints.removeAll(removedWayPoints);
 
-			if (remainingWayPoints.size() == 0) {
+         if (remainingWayPoints.size() == 0) {
 
-				// all waypoints are converted
+            // all waypoints are converted
 
-				break;
-			}
-		}
+            break;
+         }
+      }
 
-		// collapse waypoints
-		tourWayPoints.removeAll(allRemovedWayPoints);
-	}
+      // collapse waypoints
+      tourWayPoints.removeAll(allRemovedWayPoints);
+   }
 
-	/**
-	 * Create {@link Photo}'s from {@link TourPhoto}'s
-	 */
-	public void createGalleryPhotos() {
+   /**
+    * Create {@link Photo}'s from {@link TourPhoto}'s
+    */
+   public void createGalleryPhotos() {
 
-		_galleryPhotos.clear();
+      _galleryPhotos.clear();
 
-		// create gallery photos for all tour photos
-		for (final TourPhoto tourPhoto : tourPhotos) {
+      // create gallery photos for all tour photos
+      for (final TourPhoto tourPhoto : tourPhotos) {
 
-			final String imageFilePathName = tourPhoto.getImageFilePathName();
+         final String imageFilePathName = tourPhoto.getImageFilePathName();
 
-			Photo galleryPhoto = PhotoCache.getPhoto(imageFilePathName);
-			if (galleryPhoto == null) {
+         Photo galleryPhoto = PhotoCache.getPhoto(imageFilePathName);
+         if (galleryPhoto == null) {
 
-				/*
-				 * photo is not found in the photo cache, create a new photo
-				 */
+            /*
+             * photo is not found in the photo cache, create a new photo
+             */
 
-				final File photoFile = new File(imageFilePathName);
+            final File photoFile = new File(imageFilePathName);
 
-				galleryPhoto = new Photo(photoFile);
-			}
+            galleryPhoto = new Photo(photoFile);
+         }
 
-			/*
-			 * when a photo is in the photo cache it is possible that the tour is from the file system,
-			 * update tour relevant fields
-			 */
-			galleryPhoto.isSavedInTour = true;
+         /*
+          * when a photo is in the photo cache it is possible that the tour is from the file system,
+          * update tour relevant fields
+          */
+         galleryPhoto.isSavedInTour = true;
 
-			// ensure this tour is set in the photo
-			galleryPhoto.addTour(tourPhoto.getTourId(), tourPhoto.getPhotoId());
+         // ensure this tour is set in the photo
+         galleryPhoto.addTour(tourPhoto.getTourId(), tourPhoto.getPhotoId());
 
-			galleryPhoto.adjustedTimeTour = tourPhoto.getAdjustedTime();
-			galleryPhoto.imageExifTime = tourPhoto.getImageExifTime();
+         galleryPhoto.adjustedTimeTour = tourPhoto.getAdjustedTime();
+         galleryPhoto.imageExifTime = tourPhoto.getImageExifTime();
 
-			final double tourLatitude = tourPhoto.getLatitude();
+         final double tourLatitude = tourPhoto.getLatitude();
 
-			if (tourLatitude != 0) {
-				galleryPhoto.setTourGeoPosition(tourLatitude, tourPhoto.getLongitude());
-			}
+         if (tourLatitude != 0) {
+            galleryPhoto.setTourGeoPosition(tourLatitude, tourPhoto.getLongitude());
+         }
 
-			galleryPhoto.isTourPhotoWithGps = tourLatitude != 0;
-			galleryPhoto.isGeoFromExif = tourPhoto.isGeoFromExif();
+         galleryPhoto.isTourPhotoWithGps = tourLatitude != 0;
+         galleryPhoto.isGeoFromExif = tourPhoto.isGeoFromExif();
 
-			galleryPhoto.ratingStars = tourPhoto.getRatingStars();
+         galleryPhoto.ratingStars = tourPhoto.getRatingStars();
 
-			// add photo after it's initialized
-			PhotoCache.setPhoto(galleryPhoto);
+         // add photo after it's initialized
+         PhotoCache.setPhoto(galleryPhoto);
 
-			_galleryPhotos.add(galleryPhoto);
-		}
+         _galleryPhotos.add(galleryPhoto);
+      }
 
-		Collections.sort(_galleryPhotos, TourPhotoManager.AdjustTimeComparatorTour);
-	}
+      Collections.sort(_galleryPhotos, TourPhotoManager.AdjustTimeComparatorTour);
+   }
 
-	public void createHistoryTimeSerie(final ArrayList<HistoryData> historySlices) {
+   public void createHistoryTimeSerie(final ArrayList<HistoryData> historySlices) {
 
-		final int serieSize = historySlices.size();
-		if (serieSize == 0) {
-			return;
-		}
+      final int serieSize = historySlices.size();
+      if (serieSize == 0) {
+         return;
+      }
 
-		final HistoryData[] timeDataSerie = historySlices.toArray(new HistoryData[serieSize]);
+      final HistoryData[] timeDataSerie = historySlices.toArray(new HistoryData[serieSize]);
 
-		/*
-		 * time serie is always available, except when tours are created manually
-		 */
-		timeSerieHistory = new long[serieSize];
+      /*
+       * time serie is always available, except when tours are created manually
+       */
+      timeSerieHistory = new long[serieSize];
 
-		// time is in seconds relative to the tour start
-		long recordingTime = 0;
+      // time is in seconds relative to the tour start
+      long recordingTime = 0;
 
-		long tourStartTime = 0;
+      long tourStartTime = 0;
 
-		// convert data from the tour format into long[] array
-		for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
+      // convert data from the tour format into long[] array
+      for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
 
-			final HistoryData timeData = timeDataSerie[serieIndex];
+         final HistoryData timeData = timeDataSerie[serieIndex];
 
-			final long absoluteTime = timeData.absoluteTime;
+         final long absoluteTime = timeData.absoluteTime;
 
-			if (serieIndex == 0) {
+         if (serieIndex == 0) {
 
-				// 1st trackpoint
+            // 1st trackpoint
 
-				timeSerieHistory[serieIndex] = 0;
-				tourStartTime = absoluteTime;
+            timeSerieHistory[serieIndex] = 0;
+            tourStartTime = absoluteTime;
 
-			} else {
+         } else {
 
-				// 1..Nth trackpoint
+            // 1..Nth trackpoint
 
-				recordingTime = (absoluteTime - tourStartTime) / 1000;
-				timeSerieHistory[serieIndex] = (recordingTime);
+            recordingTime = (absoluteTime - tourStartTime) / 1000;
+            timeSerieHistory[serieIndex] = (recordingTime);
 
-			}
-		}
+         }
+      }
 
-		tourRecordingTime = recordingTime;
+      tourRecordingTime = recordingTime;
 
-		setTourEndTimeMS();
-	}
+      setTourEndTimeMS();
+   }
 
-	/**
-	 * Create the tour segment list from the segment index array
-	 *
-	 * @param breakMinSpeedDiff
-	 * @param breakMaxDistance
-	 * @param breakMinTime
-	 * @param segmenterBreakDistance
-	 * @param breakMinSpeedDiff
-	 *           in km/h
-	 * @param breakMinSpeed2
-	 * @param breakDistance
-	 * @return
-	 */
-	public ArrayList<TourSegment> createSegmenterSegments(final BreakTimeTool btConfig) {
+   /**
+    * Create the tour segment list from the segment index array
+    *
+    * @param breakMinSpeedDiff
+    * @param breakMaxDistance
+    * @param breakMinTime
+    * @param segmenterBreakDistance
+    * @param breakMinSpeedDiff
+    *           in km/h
+    * @param breakMinSpeed2
+    * @param breakDistance
+    * @return
+    */
+   public ArrayList<TourSegment> createSegmenterSegments(final BreakTimeTool btConfig) {
 
-		if ((segmentSerieIndex == null) || (segmentSerieIndex.length < 2)) {
+      if ((segmentSerieIndex == null) || (segmentSerieIndex.length < 2)) {
 
-			// at least two points are required to build a segment
-			return null;
-		}
+         // at least two points are required to build a segment
+         return null;
+      }
 
-		final float[] segmenterAltitudeSerie = getAltitudeSmoothedSerie(false);
+      final float[] segmenterAltitudeSerie = getAltitudeSmoothedSerie(false);
 
-		final boolean isAltitudeSerie = (segmenterAltitudeSerie != null) && (segmenterAltitudeSerie.length > 0);
-		final boolean isCadenceSerie = (cadenceSerie != null) && (cadenceSerie.length > 0);
-		final boolean isDistanceSerie = (distanceSerie != null) && (distanceSerie.length > 0);
-		final boolean isPulseSerie = (pulseSerie != null) && (pulseSerie.length > 0);
+      final boolean isAltitudeSerie = (segmenterAltitudeSerie != null) && (segmenterAltitudeSerie.length > 0);
+      final boolean isCadenceSerie = (cadenceSerie != null) && (cadenceSerie.length > 0);
+      final boolean isDistanceSerie = (distanceSerie != null) && (distanceSerie.length > 0);
+      final boolean isPulseSerie = (pulseSerie != null) && (pulseSerie.length > 0);
 
-		final float[] localPowerSerie = getPowerSerie();
-		final boolean isPowerSerie = (localPowerSerie != null) && (localPowerSerie.length > 0);
+      final float[] localPowerSerie = getPowerSerie();
+      final boolean isPowerSerie = (localPowerSerie != null) && (localPowerSerie.length > 0);
 
-		final int segmentSerieLength = segmentSerieIndex.length;
+      final int segmentSerieLength = segmentSerieIndex.length;
 
-		final ArrayList<TourSegment> tourSegments = new ArrayList<>(segmentSerieLength);
-		final int firstSerieIndex = segmentSerieIndex[0];
+      final ArrayList<TourSegment> tourSegments = new ArrayList<>(segmentSerieLength);
+      final int firstSerieIndex = segmentSerieIndex[0];
 
-		/*
-		 * get start values
-		 */
-		int segmentStartTime = timeSerie[firstSerieIndex];
+      /*
+       * get start values
+       */
+      int segmentStartTime = timeSerie[firstSerieIndex];
 
-		float altitudeStart = 0;
-		if (isAltitudeSerie) {
-			altitudeStart = segmenterAltitudeSerie[firstSerieIndex];
-		}
+      float altitudeStart = 0;
+      if (isAltitudeSerie) {
+         altitudeStart = segmenterAltitudeSerie[firstSerieIndex];
+      }
 
-		float distanceStart = 0;
-		if (isDistanceSerie) {
-			distanceStart = distanceSerie[firstSerieIndex];
-		}
+      float distanceStart = 0;
+      if (isDistanceSerie) {
+         distanceStart = distanceSerie[firstSerieIndex];
+      }
 
-		int timeTotal = 0;
-		float distanceTotal = 0;
+      int timeTotal = 0;
+      float distanceTotal = 0;
 
-		float altitudeUpSummarizedBorder = 0;
-		float altitudeUpSummarizedComputed = 0;
-		float altitudeDownSummarizedBorder = 0;
-		float altitudeDownSummarizedComputed = 0;
+      float altitudeUpSummarizedBorder = 0;
+      float altitudeUpSummarizedComputed = 0;
+      float altitudeDownSummarizedBorder = 0;
+      float altitudeDownSummarizedComputed = 0;
 
-		final float tourPace = tourDistance == 0 //
-				? 0
-				: tourDrivingTime * 1000 / (tourDistance * UI.UNIT_VALUE_DISTANCE);
+      final float tourPace = tourDistance == 0 //
+            ? 0
+            : tourDrivingTime * 1000 / (tourDistance * UI.UNIT_VALUE_DISTANCE);
 
-		segmentSerie_Time_Recording = new int[segmentSerieLength];
-		segmentSerie_Time_Driving = new int[segmentSerieLength];
-		segmentSerie_Time_Break = new int[segmentSerieLength];
-		segmentSerie_Time_Total = new int[segmentSerieLength];
+      segmentSerie_Time_Recording = new int[segmentSerieLength];
+      segmentSerie_Time_Driving = new int[segmentSerieLength];
+      segmentSerie_Time_Break = new int[segmentSerieLength];
+      segmentSerie_Time_Total = new int[segmentSerieLength];
 
-		segmentSerie_Distance_Diff = new float[segmentSerieLength];
-		segmentSerie_Distance_Total = new float[segmentSerieLength];
+      segmentSerie_Distance_Diff = new float[segmentSerieLength];
+      segmentSerie_Distance_Total = new float[segmentSerieLength];
 
-		segmentSerie_Altitude_Diff = new float[segmentSerieLength];
-		segmentSerie_Altitude_UpDown_Hour = new float[segmentSerieLength];
+      segmentSerie_Altitude_Diff = new float[segmentSerieLength];
+      segmentSerie_Altitude_UpDown_Hour = new float[segmentSerieLength];
 
-		segmentSerie_Speed = new float[segmentSerieLength];
-		segmentSerie_Pace = new float[segmentSerieLength];
+      segmentSerie_Speed = new float[segmentSerieLength];
+      segmentSerie_Pace = new float[segmentSerieLength];
 
-		segmentSerie_Cadence = new float[segmentSerieLength];
-		segmentSerie_Gradient = new float[segmentSerieLength];
-		segmentSerie_Power = new float[segmentSerieLength];
-		segmentSerie_Pulse = new float[segmentSerieLength];
+      segmentSerie_Cadence = new float[segmentSerieLength];
+      segmentSerie_Gradient = new float[segmentSerieLength];
+      segmentSerie_Power = new float[segmentSerieLength];
+      segmentSerie_Pulse = new float[segmentSerieLength];
 
-		int segmentIndex2nd = 0;
+      int segmentIndex2nd = 0;
 
-		int totalTime_Recording = 0;
-		int totalTime_Driving = 0;
-		int totalTime_Break = 0;
-		float totalDistance = 0;
-		float totalAltitude_Up = 0;
-		float totalAltitude_Down = 0;
+      int totalTime_Recording = 0;
+      int totalTime_Driving = 0;
+      int totalTime_Break = 0;
+      float totalDistance = 0;
+      float totalAltitude_Up = 0;
+      float totalAltitude_Down = 0;
 
-		// compute segment values between tour start and tour end
-		for (int segmentIndex = 1; segmentIndex < segmentSerieLength; segmentIndex++) {
+      // compute segment values between tour start and tour end
+      for (int segmentIndex = 1; segmentIndex < segmentSerieLength; segmentIndex++) {
 
-			final int segmentStartIndex = segmentSerieIndex[segmentIndex - 1];
-			final int segmentEndIndex = segmentSerieIndex[segmentIndex];
+         final int segmentStartIndex = segmentSerieIndex[segmentIndex - 1];
+         final int segmentEndIndex = segmentSerieIndex[segmentIndex];
 
-			final TourSegment segment = new TourSegment();
-			tourSegments.add(segment);
+         final TourSegment segment = new TourSegment();
+         tourSegments.add(segment);
 
-			segment.sequence = segmentIndex;
+         segment.sequence = segmentIndex;
 
-			segment.serieIndex_Start = segmentStartIndex;
-			segment.serieIndex_End = segmentEndIndex;
+         segment.serieIndex_Start = segmentStartIndex;
+         segment.serieIndex_End = segmentEndIndex;
 
-			if (segmentSerieFilter != null) {
-				segment.filter = segmentSerieFilter[segmentIndex];
-			}
+         if (segmentSerieFilter != null) {
+            segment.filter = segmentSerieFilter[segmentIndex];
+         }
 
-			/*
-			 * time
-			 */
-			final int segmentEndTime = timeSerie[segmentEndIndex];
-			final int segmentRecordingTime = segmentEndTime - segmentStartTime;
-			final int segmentBreakTime = getBreakTime(segmentStartIndex, segmentEndIndex, btConfig);
+         /*
+          * time
+          */
+         final int segmentEndTime = timeSerie[segmentEndIndex];
+         final int segmentRecordingTime = segmentEndTime - segmentStartTime;
+         final int segmentBreakTime = getBreakTime(segmentStartIndex, segmentEndIndex, btConfig);
 
-			final float segmentDrivingTime = segmentRecordingTime - segmentBreakTime;
+         final float segmentDrivingTime = segmentRecordingTime - segmentBreakTime;
 
-			segmentSerie_Time_Recording[segmentIndex] = segment.time_Recording = segmentRecordingTime;
-			segmentSerie_Time_Driving[segmentIndex] = segment.time_Driving = (int) segmentDrivingTime;
-			segmentSerie_Time_Break[segmentIndex] = segment.time_Break = segmentBreakTime;
-			segmentSerie_Time_Total[segmentIndex] = segment.time_Total = timeTotal += segmentRecordingTime;
+         segmentSerie_Time_Recording[segmentIndex] = segment.time_Recording = segmentRecordingTime;
+         segmentSerie_Time_Driving[segmentIndex] = segment.time_Driving = (int) segmentDrivingTime;
+         segmentSerie_Time_Break[segmentIndex] = segment.time_Break = segmentBreakTime;
+         segmentSerie_Time_Total[segmentIndex] = segment.time_Total = timeTotal += segmentRecordingTime;
 
-			totalTime_Recording += segmentRecordingTime;
-			totalTime_Driving += segmentDrivingTime;
-			totalTime_Break += segmentBreakTime;
+         totalTime_Recording += segmentRecordingTime;
+         totalTime_Driving += segmentDrivingTime;
+         totalTime_Break += segmentBreakTime;
 
-			float segmentDistance = 0.0f;
+         float segmentDistance = 0.0f;
 
-			/*
-			 * distance
-			 */
-			if (isDistanceSerie) {
+         /*
+          * distance
+          */
+         if (isDistanceSerie) {
 
-				final float distanceEnd = distanceSerie[segmentEndIndex];
-				final float distanceDiff = distanceEnd - distanceStart;
+            final float distanceEnd = distanceSerie[segmentEndIndex];
+            final float distanceDiff = distanceEnd - distanceStart;
 
-				segmentSerie_Distance_Diff[segmentIndex] = segment.distance_Diff = distanceDiff;
-				segmentSerie_Distance_Total[segmentIndex] = segment.distance_Total = distanceTotal += distanceDiff;
+            segmentSerie_Distance_Diff[segmentIndex] = segment.distance_Diff = distanceDiff;
+            segmentSerie_Distance_Total[segmentIndex] = segment.distance_Total = distanceTotal += distanceDiff;
 
-				// end point of current segment is the start of the next segment
-				distanceStart = distanceEnd;
+            // end point of current segment is the start of the next segment
+            distanceStart = distanceEnd;
 
-				segmentDistance = segment.distance_Diff;
-				if (segmentDistance != 0.0) {
+            segmentDistance = segment.distance_Diff;
+            if (segmentDistance != 0.0) {
 
-					// speed
-					segmentSerie_Speed[segmentIndex] = segment.speed = segmentDrivingTime == 0.0f //
-							? 0.0f
-							: segmentDistance / segmentDrivingTime * 3.6f / UI.UNIT_VALUE_DISTANCE;
+               // speed
+               segmentSerie_Speed[segmentIndex] = segment.speed = segmentDrivingTime == 0.0f //
+                     ? 0.0f
+                     : segmentDistance / segmentDrivingTime * 3.6f / UI.UNIT_VALUE_DISTANCE;
 
-					// pace
-					final float segmentPace = segmentDrivingTime * 1000 / (segmentDistance / UI.UNIT_VALUE_DISTANCE);
-					segment.pace = segmentPace;
-					segment.pace_Diff = segment.pace - tourPace;
-					segmentSerie_Pace[segmentIndex] = segmentPace;
+               // pace
+               final float segmentPace = segmentDrivingTime * 1000 / (segmentDistance / UI.UNIT_VALUE_DISTANCE);
+               segment.pace = segmentPace;
+               segment.pace_Diff = segment.pace - tourPace;
+               segmentSerie_Pace[segmentIndex] = segmentPace;
 
-					totalDistance += segmentDistance;
-				}
-			}
+               totalDistance += segmentDistance;
+            }
+         }
 
-			/*
-			 * altitude
-			 */
-			if (isAltitudeSerie) {
+         /*
+          * altitude
+          */
+         if (isAltitudeSerie) {
 
-				final float altitudeEnd = segmenterAltitudeSerie[segmentEndIndex];
-				final float altitudeDiff = altitudeEnd - altitudeStart;
+            final float altitudeEnd = segmenterAltitudeSerie[segmentEndIndex];
+            final float altitudeDiff = altitudeEnd - altitudeStart;
 
-				final float altiUpDownHour = segmentDrivingTime == 0 //
-						? 0
-						: (altitudeDiff / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE) / segmentDrivingTime * 3600;
+            final float altiUpDownHour = segmentDrivingTime == 0 //
+                  ? 0
+                  : (altitudeDiff / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE) / segmentDrivingTime * 3600;
 
-				segmentSerie_Altitude_Diff[segmentIndex] = segment.altitude_Segment_Border_Diff = altitudeDiff;
-				segmentSerie_Altitude_UpDown_Hour[segmentIndex] = altiUpDownHour;
+            segmentSerie_Altitude_Diff[segmentIndex] = segment.altitude_Segment_Border_Diff = altitudeDiff;
+            segmentSerie_Altitude_UpDown_Hour[segmentIndex] = altiUpDownHour;
 
-				if (altitudeDiff > 0) {
-					segment.altitude_Summarized_Border_Up = altitudeUpSummarizedBorder += altitudeDiff;
-					segment.altitude_Summarized_Border_Down = altitudeDownSummarizedBorder;
-					segment.altitude_Segment_Up = altitudeDiff;
+            if (altitudeDiff > 0) {
+               segment.altitude_Summarized_Border_Up = altitudeUpSummarizedBorder += altitudeDiff;
+               segment.altitude_Summarized_Border_Down = altitudeDownSummarizedBorder;
+               segment.altitude_Segment_Up = altitudeDiff;
 
-				} else {
-					segment.altitude_Summarized_Border_Up = altitudeUpSummarizedBorder;
-					segment.altitude_Summarized_Border_Down = altitudeDownSummarizedBorder += altitudeDiff;
-					segment.altitude_Segment_Down = altitudeDiff;
-				}
+            } else {
+               segment.altitude_Summarized_Border_Up = altitudeUpSummarizedBorder;
+               segment.altitude_Summarized_Border_Down = altitudeDownSummarizedBorder += altitudeDiff;
+               segment.altitude_Segment_Down = altitudeDiff;
+            }
 
-				if ((segmentSerie_Altitude_Diff_Computed != null)
-						&& (segmentIndex < segmentSerie_Altitude_Diff_Computed.length)) {
+            if ((segmentSerie_Altitude_Diff_Computed != null)
+                  && (segmentIndex < segmentSerie_Altitude_Diff_Computed.length)) {
 
-					final float segmentDiff = segmentSerie_Altitude_Diff_Computed[segmentIndex];
+               final float segmentDiff = segmentSerie_Altitude_Diff_Computed[segmentIndex];
 
-					segment.altitude_Segment_Computed_Diff = segmentDiff;
+               segment.altitude_Segment_Computed_Diff = segmentDiff;
 
-					if (segmentDiff > 0) {
+               if (segmentDiff > 0) {
 
-						segment.altitude_Summarized_Computed_Up = altitudeUpSummarizedComputed += segmentDiff;
-						segment.altitude_Summarized_Computed_Down = altitudeDownSummarizedComputed;
+                  segment.altitude_Summarized_Computed_Up = altitudeUpSummarizedComputed += segmentDiff;
+                  segment.altitude_Summarized_Computed_Down = altitudeDownSummarizedComputed;
 
-					} else {
+               } else {
 
-						segment.altitude_Summarized_Computed_Up = altitudeUpSummarizedComputed;
-						segment.altitude_Summarized_Computed_Down = altitudeDownSummarizedComputed += segmentDiff;
-					}
-				}
+                  segment.altitude_Summarized_Computed_Up = altitudeUpSummarizedComputed;
+                  segment.altitude_Summarized_Computed_Down = altitudeDownSummarizedComputed += segmentDiff;
+               }
+            }
 
-				// get computed values: altitude up/down from the 2nd index
-				if (segmentSerieIndex2nd != null) {
+            // get computed values: altitude up/down from the 2nd index
+            if (segmentSerieIndex2nd != null) {
 
-					float sumSegmentAltitude_Up = 0;
-					float sumSegmentAltitude_Down = 0;
+               float sumSegmentAltitude_Up = 0;
+               float sumSegmentAltitude_Down = 0;
 
-					// get initial altitude
-					float altitude1 = segmenterAltitudeSerie[segmentStartIndex];
+               // get initial altitude
+               float altitude1 = segmenterAltitudeSerie[segmentStartIndex];
 
-					for (; segmentIndex2nd < segmentSerieIndex2nd.length; segmentIndex2nd++) {
+               for (; segmentIndex2nd < segmentSerieIndex2nd.length; segmentIndex2nd++) {
 
-						final int serieIndex2nd = segmentSerieIndex2nd[segmentIndex2nd];
+                  final int serieIndex2nd = segmentSerieIndex2nd[segmentIndex2nd];
 
-						if (serieIndex2nd > segmentEndIndex) {
-							break;
-						}
+                  if (serieIndex2nd > segmentEndIndex) {
+                     break;
+                  }
 
-						final float altitude2 = segmenterAltitudeSerie[serieIndex2nd];
-						final float altitude2Diff = altitude2 - altitude1;
+                  final float altitude2 = segmenterAltitudeSerie[serieIndex2nd];
+                  final float altitude2Diff = altitude2 - altitude1;
 
-						altitude1 = altitude2;
+                  altitude1 = altitude2;
 
-						sumSegmentAltitude_Up += altitude2Diff > 0 ? altitude2Diff : 0;
-						sumSegmentAltitude_Down += altitude2Diff < 0 ? altitude2Diff : 0;
-					}
+                  sumSegmentAltitude_Up += altitude2Diff > 0 ? altitude2Diff : 0;
+                  sumSegmentAltitude_Down += altitude2Diff < 0 ? altitude2Diff : 0;
+               }
 
-					segment.altitude_Segment_Up = sumSegmentAltitude_Up;
-					segment.altitude_Segment_Down = sumSegmentAltitude_Down;
+               segment.altitude_Segment_Up = sumSegmentAltitude_Up;
+               segment.altitude_Segment_Down = sumSegmentAltitude_Down;
 
-					totalAltitude_Up += sumSegmentAltitude_Up;
-					totalAltitude_Down += sumSegmentAltitude_Down;
-				}
+               totalAltitude_Up += sumSegmentAltitude_Up;
+               totalAltitude_Down += sumSegmentAltitude_Down;
+            }
 
-				// get computed values: power for a segment
-				float sumPower = 0;
-				for (int serieIndex = segmentStartIndex + 1; serieIndex <= segmentEndIndex; serieIndex++) {
+            // get computed values: power for a segment
+            float sumPower = 0;
+            for (int serieIndex = segmentStartIndex + 1; serieIndex <= segmentEndIndex; serieIndex++) {
 
-					if (isPowerSerie) {
-						sumPower += localPowerSerie[serieIndex];
-					}
-				}
-				final int segmentIndexDiff = segmentEndIndex - segmentStartIndex;
-				segmentSerie_Power[segmentIndex] = segment.power = segmentIndexDiff == 0 //
-						? 0
-						: sumPower / segmentIndexDiff;
+               if (isPowerSerie) {
+                  sumPower += localPowerSerie[serieIndex];
+               }
+            }
+            final int segmentIndexDiff = segmentEndIndex - segmentStartIndex;
+            segmentSerie_Power[segmentIndex] = segment.power = segmentIndexDiff == 0 //
+                  ? 0
+                  : sumPower / segmentIndexDiff;
 
-				// end point of the current segment is the start of the next segment
-				altitudeStart = altitudeEnd;
-			}
+            // end point of the current segment is the start of the next segment
+            altitudeStart = altitudeEnd;
+         }
 
-			if (isDistanceSerie && isAltitudeSerie && (segmentDistance != 0.0)) {
+         if (isDistanceSerie && isAltitudeSerie && (segmentDistance != 0.0)) {
 
-				// gradient
-				segmentSerie_Gradient[segmentIndex] = segment.gradient = //
-						segment.altitude_Segment_Border_Diff * 100 / segmentDistance;
-			}
+            // gradient
+            segmentSerie_Gradient[segmentIndex] = segment.gradient = //
+                  segment.altitude_Segment_Border_Diff * 100 / segmentDistance;
+         }
 
-			if (isPulseSerie) {
-				final float segmentAvgPulse = computeAvg_PulseSegment(segmentStartIndex, segmentEndIndex);
-				segmentSerie_Pulse[segmentIndex] = segment.pulse = segmentAvgPulse;
-				segment.pulse_Diff = segmentAvgPulse - avgPulse;
-			} else {
-				// hide pulse in the view
-				segment.pulse_Diff = Float.MIN_VALUE;
-			}
+         if (isPulseSerie) {
+            final float segmentAvgPulse = computeAvg_PulseSegment(segmentStartIndex, segmentEndIndex);
+            segmentSerie_Pulse[segmentIndex] = segment.pulse = segmentAvgPulse;
+            segment.pulse_Diff = segmentAvgPulse - avgPulse;
+         } else {
+            // hide pulse in the view
+            segment.pulse_Diff = Float.MIN_VALUE;
+         }
 
-			if (isCadenceSerie) {
+         if (isCadenceSerie) {
 
-				final float segmentAvgCadence = computeAvg_CadenceSegment(segmentStartIndex, segmentEndIndex);
-				segmentSerie_Cadence[segmentIndex] = segment.cadence = segmentAvgCadence;
+            final float segmentAvgCadence = computeAvg_CadenceSegment(segmentStartIndex, segmentEndIndex);
+            segmentSerie_Cadence[segmentIndex] = segment.cadence = segmentAvgCadence;
 
-				// stride length with rule of 3
-				final float revolutionTotal = segmentAvgCadence / 60 * segment.time_Driving;
-				segment.strideLength = segment.distance_Diff / revolutionTotal;
-			}
+            // stride length with rule of 3
+            final float revolutionTotal = segmentAvgCadence / 60 * segment.time_Driving;
+            segment.strideLength = segment.distance_Diff / revolutionTotal;
+         }
 
-			// end point of current segment is the start of the next segment
-			segmentStartTime = segmentEndTime;
-		}
+         // end point of current segment is the start of the next segment
+         segmentStartTime = segmentEndTime;
+      }
 
-		/*
-		 * Add total segment
-		 */
-		final float totalSpeed = totalTime_Driving == 0 //
-				? 0
-				: totalDistance / totalTime_Driving * 3.6f / UI.UNIT_VALUE_DISTANCE;
+      /*
+       * Add total segment
+       */
+      final float totalSpeed = totalTime_Driving == 0 //
+            ? 0
+            : totalDistance / totalTime_Driving * 3.6f / UI.UNIT_VALUE_DISTANCE;
 
-		final float totalPace = totalDistance == 0 //
-				? 0
-				: totalTime_Driving * 1000 / (totalDistance / UI.UNIT_VALUE_DISTANCE);
+      final float totalPace = totalDistance == 0 //
+            ? 0
+            : totalTime_Driving * 1000 / (totalDistance / UI.UNIT_VALUE_DISTANCE);
 
-		final TourSegment totalSegment = new TourSegment();
+      final TourSegment totalSegment = new TourSegment();
 
-		totalSegment.isTotal = true;
+      totalSegment.isTotal = true;
 
-		totalSegment.time_Recording = totalTime_Recording;
-		totalSegment.time_Driving = totalTime_Driving;
-		totalSegment.time_Break = totalTime_Break;
+      totalSegment.time_Recording = totalTime_Recording;
+      totalSegment.time_Driving = totalTime_Driving;
+      totalSegment.time_Break = totalTime_Break;
 
-		totalSegment.distance_Diff = totalDistance;
-		totalSegment.pace = totalPace;
-		totalSegment.speed = totalSpeed;
+      totalSegment.distance_Diff = totalDistance;
+      totalSegment.pace = totalPace;
+      totalSegment.speed = totalSpeed;
 
-		totalSegment.cadence = avgCadence;
-		totalSegment.pulse = avgPulse;
+      totalSegment.cadence = avgCadence;
+      totalSegment.pulse = avgPulse;
 
-		totalSegment.altitude_Segment_Down = totalAltitude_Down;
-		totalSegment.altitude_Segment_Up = totalAltitude_Up;
+      totalSegment.altitude_Segment_Down = totalAltitude_Down;
+      totalSegment.altitude_Segment_Up = totalAltitude_Up;
 
-		tourSegments.add(totalSegment);
+      tourSegments.add(totalSegment);
 
-		segmentSerieTotal_Altitude_Up = totalAltitude_Up;
-		segmentSerieTotal_Altitude_Down = totalAltitude_Down;
+      segmentSerieTotal_Altitude_Up = totalAltitude_Up;
+      segmentSerieTotal_Altitude_Down = totalAltitude_Down;
 
-		return tourSegments;
-	}
+      return tourSegments;
+   }
 
-	private void createSRTMDataSerie() {
+   private void createSRTMDataSerie() {
 
-		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+      BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
 
-			@Override
-			public void run() {
+         @Override
+         public void run() {
 
-				int serieIndex = 0;
-				float lastValidSRTM = 0;
-				boolean isSRTMValid = false;
+            int serieIndex = 0;
+            float lastValidSRTM = 0;
+            boolean isSRTMValid = false;
 
-				final int serieLength = timeSerie.length;
+            final int serieLength = timeSerie.length;
 
-				final float[] newSRTMSerie = new float[serieLength];
-				final float[] newSRTMSerieImperial = new float[serieLength];
+            final float[] newSRTMSerie = new float[serieLength];
+            final float[] newSRTMSerieImperial = new float[serieLength];
 
-				for (final double latitude : latitudeSerie) {
+            for (final double latitude : latitudeSerie) {
 
-					final double longitude = longitudeSerie[serieIndex];
+               final double longitude = longitudeSerie[serieIndex];
 
-					float srtmValue = 0;
+               float srtmValue = 0;
 
-					// ignore lat/lon 0/0, this is in the ocean
-					if (latitude != 0 || longitude != 0) {
-						srtmValue = elevationSRTM3.getElevation(new GeoLat(latitude), new GeoLon(longitude));
-					}
+               // ignore lat/lon 0/0, this is in the ocean
+               if (latitude != 0 || longitude != 0) {
+                  srtmValue = elevationSRTM3.getElevation(new GeoLat(latitude), new GeoLon(longitude));
+               }
 
-					/*
-					 * set invalid values to the previous valid value
-					 */
-					if (srtmValue == Float.MIN_VALUE) {
-						// invalid data
-						srtmValue = lastValidSRTM;
-					} else {
-						// valid data are available
-						isSRTMValid = true;
-						lastValidSRTM = srtmValue;
-					}
+               /*
+                * set invalid values to the previous valid value
+                */
+               if (srtmValue == Float.MIN_VALUE) {
+                  // invalid data
+                  srtmValue = lastValidSRTM;
+               } else {
+                  // valid data are available
+                  isSRTMValid = true;
+                  lastValidSRTM = srtmValue;
+               }
 
-					// adjust wrong values
-					if (srtmValue < -1000) {
-						srtmValue = 0;
-					} else if (srtmValue > 10000) {
-						srtmValue = 10000;
-					}
+               // adjust wrong values
+               if (srtmValue < -1000) {
+                  srtmValue = 0;
+               } else if (srtmValue > 10000) {
+                  srtmValue = 10000;
+               }
 
-					newSRTMSerie[serieIndex] = srtmValue;
-					newSRTMSerieImperial[serieIndex] = srtmValue / UI.UNIT_FOOT;
+               newSRTMSerie[serieIndex] = srtmValue;
+               newSRTMSerieImperial[serieIndex] = srtmValue / UI.UNIT_FOOT;
 
-					serieIndex++;
-				}
+               serieIndex++;
+            }
 
-				if (isSRTMValid) {
-					srtmSerie = newSRTMSerie;
-					srtmSerieImperial = newSRTMSerieImperial;
-				} else {
-					// set state that srtm altitude is invalid
-					srtmSerie = new float[0];
-				}
-			}
-		});
-	}
+            if (isSRTMValid) {
+               srtmSerie = newSRTMSerie;
+               srtmSerieImperial = newSRTMSerieImperial;
+            } else {
+               // set state that srtm altitude is invalid
+               srtmSerie = new float[0];
+            }
+         }
+      });
+   }
 
-	private float[] createSwimUI_DataSerie(final short[] swimDataSerie) {
+   private float[] createSwimUI_DataSerie(final short[] swimDataSerie) {
 
-		if (timeSerie == null || swim_Time == null || swim_Time.length == 0 || swimDataSerie == null) {
-			return null;
-		}
+      if (timeSerie == null || swim_Time == null || swim_Time.length == 0 || swimDataSerie == null) {
+         return null;
+      }
 
-		// create UI data serie
+      // create UI data serie
 
-		float[] swimUIValues = null;
+      float[] swimUIValues = null;
 
-		final int timeSerieSize = timeSerie.length;
-		final int swimSerieSize = swimDataSerie.length;
+      final int timeSerieSize = timeSerie.length;
+      final int swimSerieSize = swimDataSerie.length;
 
-		swimUIValues = new float[timeSerieSize];
+      swimUIValues = new float[timeSerieSize];
 
-		if (isMultipleTours) {
+      if (isMultipleTours) {
 
-			// tour data contains multiple tours
+         // tour data contains multiple tours
 
-			final int numTours = multipleSwimStartIndex.length;
+         final int numTours = multipleSwimStartIndex.length;
 
-			for (int tourIndex = 0; tourIndex < numTours; tourIndex++) {
+         for (int tourIndex = 0; tourIndex < numTours; tourIndex++) {
 
-				final int timeSerieStartIndex = multipleTourStartIndex[tourIndex];
-				final int swimSerieStartIndex = multipleSwimStartIndex[tourIndex];
+            final int timeSerieStartIndex = multipleTourStartIndex[tourIndex];
+            final int swimSerieStartIndex = multipleSwimStartIndex[tourIndex];
 
-				if (swimSerieStartIndex >= swimSerieSize) {
+            if (swimSerieStartIndex >= swimSerieSize) {
 
-					// there are no further swim data, this can occure when the last tour(s) have no swim data
-					break;
-				}
+               // there are no further swim data, this can occure when the last tour(s) have no swim data
+               break;
+            }
 
-				final int timeSerieEndIndex = tourIndex < numTours - 1 ? multipleTourStartIndex[tourIndex + 1] : timeSerieSize;
-				final int swimSerieEndIndex = tourIndex < numTours - 1 ? multipleSwimStartIndex[tourIndex + 1] : swimSerieSize;
+            final int timeSerieEndIndex = tourIndex < numTours - 1 ? multipleTourStartIndex[tourIndex + 1] : timeSerieSize;
+            final int swimSerieEndIndex = tourIndex < numTours - 1 ? multipleSwimStartIndex[tourIndex + 1] : swimSerieSize;
 
-				final long swimTourStartTime = tourStartTime + (timeSerie[timeSerieStartIndex] * 1000);
-				long swimTime = tourStartTime + (swim_Time[swimSerieStartIndex] * 1000);
+            final long swimTourStartTime = tourStartTime + (timeSerie[timeSerieStartIndex] * 1000);
+            long swimTime = tourStartTime + (swim_Time[swimSerieStartIndex] * 1000);
 
-				short swimValue = 0;
-				int swimSerieIndex = swimSerieStartIndex;
+            short swimValue = 0;
+            int swimSerieIndex = swimSerieStartIndex;
 
-				for (int timeSerieIndex = timeSerieStartIndex; timeSerieIndex < timeSerieEndIndex; timeSerieIndex++) {
+            for (int timeSerieIndex = timeSerieStartIndex; timeSerieIndex < timeSerieEndIndex; timeSerieIndex++) {
 
-					final long tourTime = swimTourStartTime + (timeSerie[timeSerieIndex] * 1000);
+               final long tourTime = swimTourStartTime + (timeSerie[timeSerieIndex] * 1000);
 
-					if (tourTime >= swimTime) {
+               if (tourTime >= swimTime) {
 
-						// advance to the next swim slice, swim slices are less frequent than tour slices
+                  // advance to the next swim slice, swim slices are less frequent than tour slices
 
-						swimSerieIndex++;
+                  swimSerieIndex++;
 
-						// check bounds
-						if (swimSerieIndex < swimSerieEndIndex) {
+                  // check bounds
+                  if (swimSerieIndex < swimSerieEndIndex) {
 
-							swimValue = swimDataSerie[swimSerieIndex];
+                     swimValue = swimDataSerie[swimSerieIndex];
 
-							if (swimValue == Short.MIN_VALUE) {
+                     if (swimValue == Short.MIN_VALUE) {
 
-								// use MIN_VALUE that the original color is displayed which makes a rest time more visible
-								//   swimValue = 0;
-							}
+                        // use MIN_VALUE that the original color is displayed which makes a rest time more visible
+                        //   swimValue = 0;
+                     }
 
-							swimTime = swimTourStartTime + (swim_Time[swimSerieIndex] * 1000);
-						}
-					}
+                     swimTime = swimTourStartTime + (swim_Time[swimSerieIndex] * 1000);
+                  }
+               }
 
-					swimUIValues[timeSerieIndex] = swimValue;
-				}
-			}
+               swimUIValues[timeSerieIndex] = swimValue;
+            }
+         }
 
-		} else {
+      } else {
 
-			// tour data contains 1 tour
+         // tour data contains 1 tour
 
-			// set values for 1st swim slice
-			long swimTime = tourStartTime + (swim_Time[0] * 1000);
-			short swimValue = swimDataSerie[0];
+         // set values for 1st swim slice
+         long swimTime = tourStartTime + (swim_Time[0] * 1000);
+         short swimValue = swimDataSerie[0];
 
-			int swimSerieIndex = 0;
+         int swimSerieIndex = 0;
 
-			for (int timeSerieIndex = 0; timeSerieIndex < timeSerieSize; timeSerieIndex++) {
+         for (int timeSerieIndex = 0; timeSerieIndex < timeSerieSize; timeSerieIndex++) {
 
-				final long tourTime = tourStartTime + (timeSerie[timeSerieIndex] * 1000);
+            final long tourTime = tourStartTime + (timeSerie[timeSerieIndex] * 1000);
 
-				if (tourTime >= swimTime) {
+            if (tourTime >= swimTime) {
 
-					// advance to the next swim slice, swim slices are less frequent than tour slices
+               // advance to the next swim slice, swim slices are less frequent than tour slices
 
-					swimSerieIndex++;
+               swimSerieIndex++;
 
-					// check bounds
-					if (swimSerieIndex < swimSerieSize) {
+               // check bounds
+               if (swimSerieIndex < swimSerieSize) {
 
-						swimValue = swimDataSerie[swimSerieIndex];
+                  swimValue = swimDataSerie[swimSerieIndex];
 
-						if (swimValue == Short.MIN_VALUE) {
+                  if (swimValue == Short.MIN_VALUE) {
 
-							// use MIN_VALUE that the original color is displayed which makes a rest time more visible
-							//   swimValue = 0;
-						}
+                     // use MIN_VALUE that the original color is displayed which makes a rest time more visible
+                     //   swimValue = 0;
+                  }
 
-						swimTime = tourStartTime + (swim_Time[swimSerieIndex] * 1000);
-					}
-				}
+                  swimTime = tourStartTime + (swim_Time[swimSerieIndex] * 1000);
+               }
+            }
 
-				swimUIValues[timeSerieIndex] = swimValue;
-			}
+            swimUIValues[timeSerieIndex] = swimValue;
+         }
 
-		}
+      }
 
-		return swimUIValues;
-	}
+      return swimUIValues;
+   }
 
-	/**
-	 * Compute swim Swolf data and convert it into a 'normal' data serie
-	 *
-	 * @return
-	 */
-	private float[] createSwimUI_SwolfDataSerie() {
+   /**
+    * Compute swim Swolf data and convert it into a 'normal' data serie
+    *
+    * @return
+    */
+   private float[] createSwimUI_SwolfDataSerie() {
 
-		if (timeSerie == null
-				|| swim_Time == null || swim_Time.length == 0
-				|| swim_Strokes == null || swim_Strokes.length == 0) {
+      if (timeSerie == null
+            || swim_Time == null || swim_Time.length == 0
+            || swim_Strokes == null || swim_Strokes.length == 0) {
 
-			return null;
-		}
+         return null;
+      }
 
-		final int swimSerieSize = swim_Time.length;
+      final int swimSerieSize = swim_Time.length;
 
-		final short[] swolfData = new short[swimSerieSize];
+      final short[] swolfData = new short[swimSerieSize];
 
-		int prevSwimTime = swim_Time[0];
+      int prevSwimTime = swim_Time[0];
 
-		for (int swimIndex = 0; swimIndex < swim_Time.length; swimIndex++) {
+      for (int swimIndex = 0; swimIndex < swim_Time.length; swimIndex++) {
 
-			final int currentSwimTime = swim_Time[swimIndex];
-			final short strokes = swim_Strokes[swimIndex];
+         final int currentSwimTime = swim_Time[swimIndex];
+         final short strokes = swim_Strokes[swimIndex];
 
-			final int timeDiff = currentSwimTime - prevSwimTime;
+         final int timeDiff = currentSwimTime - prevSwimTime;
 
-			swolfData[swimIndex] = (short) (strokes == Short.MIN_VALUE || strokes == 0
-					? 0
-					: strokes + timeDiff);
+         swolfData[swimIndex] = (short) (strokes == Short.MIN_VALUE || strokes == 0
+               ? 0
+               : strokes + timeDiff);
 
-			prevSwimTime = currentSwimTime;
-		}
+         prevSwimTime = currentSwimTime;
+      }
 
-		return createSwimUI_DataSerie(swolfData);
-	}
+      return createSwimUI_DataSerie(swolfData);
+   }
 
-	/**
-	 * Convert {@link TimeData} into {@link TourData} this will be done after data are imported or
-	 * transfered.
-	 * <p>
-	 * The array {@link #timeSerie} is always created even when the time is not available.
-	 *
-	 * @param isCreateMarker
-	 *           creates markers when <code>true</code>
-	 */
-	public void createTimeSeries(final List<TimeData> timeDataList, final boolean isCreateMarker) {
+   /**
+    * Convert {@link TimeData} into {@link TourData} this will be done after data are imported or
+    * transfered.
+    * <p>
+    * The array {@link #timeSerie} is always created even when the time is not available.
+    *
+    * @param isCreateMarker
+    *           creates markers when <code>true</code>
+    */
+   public void createTimeSeries(final List<TimeData> timeDataList, final boolean isCreateMarker) {
 
-		final int serieSize = timeDataList.size();
-		if (serieSize == 0) {
-			return;
-		}
+      final int serieSize = timeDataList.size();
+      if (serieSize == 0) {
+         return;
+      }
 
-		final TimeData[] timeDataSerie = timeDataList.toArray(new TimeData[serieSize]);
-		final TimeData firstTimeDataItem = timeDataSerie[0];
+      final TimeData[] timeDataSerie = timeDataList.toArray(new TimeData[serieSize]);
+      final TimeData firstTimeDataItem = timeDataSerie[0];
 
-		/*
-		 * absolute time is set when absolute data are available which are mostly data from GPS
-		 * devices
-		 */
-		final boolean isAbsoluteData = firstTimeDataItem.absoluteTime != Long.MIN_VALUE;
+      /*
+       * absolute time is set when absolute data are available which are mostly data from GPS
+       * devices
+       */
+      final boolean isAbsoluteData = firstTimeDataItem.absoluteTime != Long.MIN_VALUE;
 
-		/*
-		 * time serie is always available, except when tours are created manually
-		 */
-		timeSerie = new int[serieSize];
+      /*
+       * time serie is always available, except when tours are created manually
+       */
+      timeSerie = new int[serieSize];
 
 // SET_FORMATTING_OFF
 
@@ -5275,577 +5275,577 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 // SET_FORMATTING_ON
 
-		// time in seconds relative to the tour start
-		long recordingTime = 0;
-
-		if (isAbsoluteData) {
-
-			/*
-			 * absolute data are available when data are from GPS devices
-			 */
-
-			long tourStartTime = 0;
-			long lastValidTime = 0;
-			long lastValidAbsoluteTime = 0;
-
-			// convert data from the tour format into interger[] arrays
-			for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
-
-				final TimeData timeData = timeDataSerie[serieIndex];
-
-				final long absoluteTime = timeData.absoluteTime;
-
-				if (serieIndex == 0) {
-
-					// first trackpoint
-
-					/*
-					 * time
-					 */
-					timeSerie[serieIndex] = 0;
-					if (absoluteTime == Long.MIN_VALUE) {
-						tourStartTime = 0;
-					} else {
-						tourStartTime = absoluteTime;
-					}
-
-					recordingTime = 0;
-					lastValidTime = tourStartTime;
-					lastValidAbsoluteTime = tourStartTime;
-
-					/*
-					 * distance
-					 */
-					if (isDistance) {
-
-						final float absoluteDistance = timeData.absoluteDistance;
-						if ((absoluteDistance == Float.MIN_VALUE) || (absoluteDistance >= Integer.MAX_VALUE)) {
-							distanceSerie[serieIndex] = 0;
-						} else {
-							/**
-							 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-							 * <p>
-							 * rounding cannot be used because the tour id contains the last value from the
-							 * distance serie so rounding creates another tour id
-							 * <p>
-							 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-							 */
-							distanceSerie[serieIndex] = (int) (absoluteDistance);
-						}
-					}
-
-				} else {
-
-					// 1..n trackpoint
-
-					/*
-					 * time: absolute time is checked against last valid time because this case happened
-					 * but time can NOT be in the past.
-					 */
-					if (absoluteTime == Long.MIN_VALUE || absoluteTime < lastValidAbsoluteTime) {
-						recordingTime = lastValidTime;
-					} else {
-						recordingTime = (absoluteTime - tourStartTime) / 1000;
-						lastValidAbsoluteTime = absoluteTime;
-					}
-					timeSerie[serieIndex] = (int) (lastValidTime = recordingTime);
-
-					/*
-					 * distance
-					 */
-					if (isDistance) {
-
-						final float absoluteDistance = timeData.absoluteDistance;
-						if ((absoluteDistance == Float.MIN_VALUE) || (absoluteDistance >= Integer.MAX_VALUE)) {
-							distanceSerie[serieIndex] = Float.MIN_VALUE;
-						} else {
-							/**
-							 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-							 * <p>
-							 * rounding cannot be used because the tour id contains the last value from the
-							 * distance serie so rounding creates another tour id
-							 * <p>
-							 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-							 */
-							distanceSerie[serieIndex] = absoluteDistance;
-						}
-					}
-				}
-
-				/*
-				 * altitude
-				 */
-				if (isAltitude) {
-					final float absoluteAltitude = timeData.absoluteAltitude;
-					altitudeSerie[serieIndex] = (absoluteAltitude == Float.MIN_VALUE
-							|| (absoluteAltitude >= Integer.MAX_VALUE)) //
-									? Float.MIN_VALUE
-									: absoluteAltitude;
-				}
-
-				/*
-				 * latitude & longitude
-				 */
-				if (isGPS) {
-					latitudeSerie[serieIndex] = timeData.latitude;
-					longitudeSerie[serieIndex] = timeData.longitude;
-				}
-
-				/*
-				 * pulse
-				 */
-				if (isPulse) {
-					pulseSerie[serieIndex] = timeData.pulse;
-				}
-
-				/*
-				 * temperature
-				 */
-				if (isTemperature) {
-					temperatureSerie[serieIndex] = timeData.temperature;
-				}
-
-				/*
-				 * cadence
-				 */
-				if (isCadence) {
-					// cadence is not interpolated, ensure to set valid values
-					final float tdCadence = timeData.cadence;
-					cadenceSerie[serieIndex] = tdCadence == Float.MIN_VALUE ? 0 : tdCadence;
-				}
-
-				/*
-				 * Gear
-				 */
-				if (isGear) {
-					gearSerie[serieIndex] = timeData.gear;
-				}
-
-				/*
-				 * power
-				 */
-				if (isPower) {
-					final float tdPower = timeData.power;
-					powerSerie[serieIndex] = tdPower == Float.MIN_VALUE ? 0 : tdPower;
-				}
-
-				/*
-				 * speed
-				 */
-				if (isSpeed) {
-					// speed is not interpolated, ensure to set valid values
-					final float tdSpeed = timeData.speed;
-					speedSerie[serieIndex] = tdSpeed == Float.MIN_VALUE ? 0 : tdSpeed;
-				}
-
-				/*
-				 * Running Dynamics
-				 */
-				if (isRunDyn_StanceTime) {
-					final short tdValue = timeData.runDyn_StanceTime;
-					runDyn_StanceTime[serieIndex] = tdValue == Short.MIN_VALUE ? 0 : tdValue;
-				}
-				if (isRunDyn_StanceTimeBalance) {
-					final short tdValue = timeData.runDyn_StanceTimeBalance;
-					runDyn_StanceTimeBalance[serieIndex] = tdValue == Short.MIN_VALUE ? 0 : tdValue;
-				}
-				if (isRunDyn_StepLength) {
-					final short tdValue = timeData.runDyn_StepLength;
-					runDyn_StepLength[serieIndex] = tdValue == Short.MIN_VALUE ? 0 : tdValue;
-				}
-				if (isRunDyn_VerticalOscillation) {
-					final short tdValue = timeData.runDyn_VerticalOscillation;
-					runDyn_VerticalOscillation[serieIndex] = tdValue == Short.MIN_VALUE ? 0 : tdValue;
-				}
-				if (isRunDyn_VerticalRatio) {
-					final short tdValue = timeData.runDyn_VerticalRatio;
-					runDyn_VerticalRatio[serieIndex] = tdValue == Short.MIN_VALUE ? 0 : tdValue;
-				}
-			}
-
-		} else {
-
-			/*
-			 * relativ data is available, these data are NOT from GPS devices
-			 */
-
-			int distanceAbsolute = 0;
-			int altitudeAbsolute = 0;
-
-			// convert data from the tour format into an interger[]
-			for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
-
-				final TimeData timeData = timeDataSerie[serieIndex];
-
-				final int tdTime = timeData.time;
-
-				// set time
-				timeSerie[serieIndex] = (int) (recordingTime += tdTime == Integer.MIN_VALUE ? 0 : tdTime);
-
-				if (isDistance) {
-					final float tdDistance = timeData.distance;
-					if (tdDistance == Float.MIN_VALUE) {
-						distanceSerie[serieIndex] = Float.MIN_VALUE;
-					} else {
-						distanceSerie[serieIndex] = distanceAbsolute += tdDistance;
-					}
-				}
-
-				if (isAltitude) {
-					final float tdAltitude = timeData.altitude;
-					if (tdAltitude == Float.MIN_VALUE) {
-						altitudeSerie[serieIndex] = Float.MIN_VALUE;
-					} else {
-						altitudeSerie[serieIndex] = altitudeAbsolute += tdAltitude;
-					}
-				}
-
-				if (isPulse) {
-					pulseSerie[serieIndex] = timeData.pulse;
-				}
-
-				if (isTemperature) {
-					temperatureSerie[serieIndex] = timeData.temperature;
-				}
-
-				if (isCadence) {
-					final float tdCadence = timeData.cadence;
-					cadenceSerie[serieIndex] = tdCadence == Float.MIN_VALUE ? 0 : tdCadence;
-				}
-
-				if (isPower) {
-					final float tdPower = timeData.power;
-					powerSerie[serieIndex] = tdPower == Float.MIN_VALUE ? 0 : tdPower;
-				}
-
-				if (isSpeed) {
-					final float tdSpeed = timeData.speed;
-					speedSerie[serieIndex] = tdSpeed == Float.MIN_VALUE ? 0 : tdSpeed;
-				}
-			}
-		}
-
-		createTimeSeries_10_DataCompleting();
-		createTimeSeries_50_PulseTimes(timeDataSerie);
-
-		tourDistance = isDistance ? distanceSerie[serieSize - 1] : 0;
-		tourRecordingTime = recordingTime;
-		setTourEndTimeMS();
-
-		if (isGear) {
-			// set shift counts
-			setGears(gearSerie);
-		}
-
-		cleanupDataSeries();
-
-		/*
-		 * Try to get distance values from lat/long values, this must be done after the cleanup which
-		 * can set distanceSerie = null.
-		 */
-		if (distanceSerie == null) {
-			TourManager.computeDistanceValuesFromGeoPosition(this);
-		}
-
-		/*
-		 * Set time zone from geo position
-		 */
-		if (latitudeSerie != null) {
-
-			// latitude can be null AFTER cleanup data series
-
-			// get time zone from lat/lon
-			final double lat = latitudeSerie[0];
-			final double lon = longitudeSerie[0];
-
-			final String rawZoneId = TimezoneMapper.latLngToTimezoneString(lat, lon);
-			final ZoneId zoneId = ZoneId.of(rawZoneId);
-
-			setTimeZoneId(zoneId.getId());
-		}
-
-		/*
-		 * create marker after all other data are setup
-		 */
-		if (isCreateMarker) {
-
-			for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
-
-				final TimeData timeData = timeDataSerie[serieIndex];
-
-				if (timeData.marker != 0) {
-
-					int relativeTime = 0;
-					float distanceValue = 0;
-
-					if (timeSerie != null) {
-						relativeTime = timeSerie[serieIndex];
-					}
-					if (distanceSerie != null) {
-						distanceValue = distanceSerie[serieIndex];
-					}
-
-					createTourMarker(timeData, serieIndex, relativeTime, distanceValue);
-				}
-			}
-		}
-		resetSortedMarkers();
-	}
-
-	/**
-	 * Interpolations of missing data
-	 */
-	private void createTimeSeries_10_DataCompleting() {
-
-		createTimeSeries_12_RemoveInvalidDistanceValues();
-		createTimeSeries_14_RemoveInvalidDistanceValues();
-
-		createTimeSeries_20_data_completing(latitudeSerie, timeSerie);
-		createTimeSeries_20_data_completing(longitudeSerie, timeSerie);
-
-		createTimeSeries_30_data_completing(altitudeSerie, timeSerie);
-		createTimeSeries_30_data_completing(distanceSerie, timeSerie);
-		createTimeSeries_30_data_completing(temperatureSerie, timeSerie);
-		createTimeSeries_30_data_completing(pulseSerie, timeSerie);
-	}
-
-	private void createTimeSeries_12_RemoveInvalidDistanceValues() {
-
-		if (isDistanceFromSensor == 1 || latitudeSerie == null || distanceSerie == null) {
-			return;
-		}
-
-		/*
-		 * Distance is measured with the gps device and not with a sensor. Remove all distance values
-		 * which are set but lat/lon is not available, this case can happen when a device is in a
-		 * tunnel. Distance values will be interpolited later.
-		 */
-
-		final int size = timeSerie.length;
-
-		for (int serieIndex = 0; serieIndex < size; serieIndex++) {
-			if (latitudeSerie[serieIndex] == Double.MIN_VALUE) {
-				distanceSerie[serieIndex] = Float.MIN_VALUE;
-			}
-		}
-	}
-
-	/**
-	 * Because of the current algorithm, the first distance value can be <code>0</code> and the other
-	 * values can be {@link Float#MIN_VALUE}.
-	 * <p>
-	 * When this occures, set all distance values to {@link Float#MIN_VALUE}, that distance values
-	 * are not recognized.
-	 */
-	private void createTimeSeries_14_RemoveInvalidDistanceValues() {
-
-		if (distanceSerie == null || distanceSerie.length < 2) {
-			return;
-		}
-
-		boolean isDataValid = false;
-
-		for (int serieIndex = 1; serieIndex < distanceSerie.length; serieIndex++) {
-
-			final float distanceValue = distanceSerie[serieIndex];
-
-			if (distanceValue < 0) {
-
-				// distance is invalid, set to a 'valid' value which is corrected in DataCompleting
-
-				distanceSerie[serieIndex] = Float.MIN_VALUE;
-
-			} else if (distanceValue != Float.MIN_VALUE) {
-
-				// there are valid values, data are OK
-				isDataValid = true;
-			}
-		}
-
-		if (isDataValid) {
-			return;
-		}
-
-		if (distanceSerie[0] == 0.0) {
-
-			// set distance to be unavailable
-
-			distanceSerie[0] = Float.MIN_VALUE;
-
-		} else {
-
-			// this case needs more investigation if it occures
-		}
-	}
-
-	private void createTimeSeries_20_data_completing(final double[] field, final int[] time) {
-
-		if (field == null) {
-			return;
-		}
-
-		final int size = time.length;
-
-		for (int serieIndex = 0; serieIndex < size; serieIndex++) {
-
-			if (field[serieIndex] == Double.MIN_VALUE) {
-
-				// search forward to the next valid data
-				int invalidIndex = serieIndex;
-				while (field[invalidIndex] == Double.MIN_VALUE && invalidIndex < size - 1) {
-					invalidIndex++;
-				}
-
-				final int nextValidIndex = invalidIndex;
-
-				if (field[nextValidIndex] == Double.MIN_VALUE) {
-
-					double lastValidValue;
-					if (serieIndex - 1 < 0) {
-						// ??????????????????
-						lastValidValue = 0;
-					} else {
-						lastValidValue = field[serieIndex - 1];
-					}
-
-					field[nextValidIndex] = lastValidValue;
-				}
-
-				final int time1 = time[serieIndex - 1];
-				final int time2 = time[nextValidIndex];
-				final double val1 = field[serieIndex - 1];
-				final double val2 = field[nextValidIndex];
-
-				for (int interpolationIndex = serieIndex; interpolationIndex < nextValidIndex; interpolationIndex++) {
-
-					final double interpolationValue = createTimeSeries_40_linear_interpolation(
-							time1,
-							time2,
-							val1,
-							val2,
-							time[interpolationIndex]);
-
-					field[interpolationIndex] = interpolationValue;
-				}
-
-				serieIndex = nextValidIndex - 1;
-			}
-		}
-	}
-
-	private void createTimeSeries_30_data_completing(final float[] field, final int[] time) {
-
-		if (field == null) {
-			return;
-		}
-
-		final int size = time.length;
-
-		for (int serieIndex = 0; serieIndex < size; serieIndex++) {
-
-			if (field[serieIndex] == Float.MIN_VALUE) {
-
-				// search forward to the next valid data
-				int invalidIndex = serieIndex;
-				while (field[invalidIndex] == Float.MIN_VALUE && invalidIndex < size - 1) {
-					invalidIndex++;
-				}
-
-				final int nextValidIndex = invalidIndex;
-
-				if (field[nextValidIndex] == Float.MIN_VALUE) {
-
-					float lastValidValue;
-					if (serieIndex - 1 < 0) {
-						// ??????????????????
-						lastValidValue = 0;
-					} else {
-						lastValidValue = field[serieIndex - 1];
-					}
-
-					field[nextValidIndex] = lastValidValue;
-				}
-
-				final int validValueIndex = serieIndex == 0 ? 0 : serieIndex - 1;
-
-				final int time1 = time[validValueIndex];
-				final int time2 = time[nextValidIndex];
-				final double val1 = field[validValueIndex];
-				final double val2 = field[nextValidIndex];
-
-				for (int interpolationIndex = serieIndex; interpolationIndex < nextValidIndex; interpolationIndex++) {
-
-					final double linearInterpolation = createTimeSeries_40_linear_interpolation(
-							time1,
-							time2,
-							val1,
-							val2,
-							time[interpolationIndex]);
-
-					field[interpolationIndex] = (float) linearInterpolation;
-				}
-
-				serieIndex = nextValidIndex - 1;
-			}
-		}
-	}
-
-	private double createTimeSeries_40_linear_interpolation(	final double time1,
-																				final double time2,
-																				final double val1,
-																				final double val2,
-																				final double time) {
-		if (time2 == time1) {
-			return ((val1 + val2) / 2.);
-		} else {
-			return (val1 + (val2 - val1) / (time2 - time1) * (time - time1));
-		}
-	}
-
-	private void createTimeSeries_50_PulseTimes(final TimeData[] allTimeData) {
-
-		boolean isPulseTimes = false;
-
-		PULSE_TIMES:
-
-		// check if any pulse time data is available
-		for (final TimeData timeData : allTimeData) {
-
-			final int[] pulseTimes = timeData.pulseTime;
-
-			if (pulseTimes != null) {
-
-				for (final int pulseTime : pulseTimes) {
-					if (pulseTime != 0) {
-						isPulseTimes = true;
-						break PULSE_TIMES;
-					}
-				}
-			}
-		}
-
-		if (isPulseTimes == false) {
-			// no data
-			return;
-		}
-
-		final TIntArrayList pulseTimes = new TIntArrayList(allTimeData.length * 3);
-
-		for (final TimeData timeData : allTimeData) {
-
-			final int[] pulseTimes2 = timeData.pulseTime;
-
-			if (pulseTimes2 != null) {
-
-				for (final int pulseTime : pulseTimes2) {
-					if (pulseTime != 0) {
-
-						if (pulseTime == 65535) {
-							// ignore, this value occured in daum data
-						} else {
-
-							pulseTimes.add(pulseTime);
-						}
+      // time in seconds relative to the tour start
+      long recordingTime = 0;
+
+      if (isAbsoluteData) {
+
+         /*
+          * absolute data are available when data are from GPS devices
+          */
+
+         long tourStartTime = 0;
+         long lastValidTime = 0;
+         long lastValidAbsoluteTime = 0;
+
+         // convert data from the tour format into interger[] arrays
+         for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
+
+            final TimeData timeData = timeDataSerie[serieIndex];
+
+            final long absoluteTime = timeData.absoluteTime;
+
+            if (serieIndex == 0) {
+
+               // first trackpoint
+
+               /*
+                * time
+                */
+               timeSerie[serieIndex] = 0;
+               if (absoluteTime == Long.MIN_VALUE) {
+                  tourStartTime = 0;
+               } else {
+                  tourStartTime = absoluteTime;
+               }
+
+               recordingTime = 0;
+               lastValidTime = tourStartTime;
+               lastValidAbsoluteTime = tourStartTime;
+
+               /*
+                * distance
+                */
+               if (isDistance) {
+
+                  final float absoluteDistance = timeData.absoluteDistance;
+                  if ((absoluteDistance == Float.MIN_VALUE) || (absoluteDistance >= Integer.MAX_VALUE)) {
+                     distanceSerie[serieIndex] = 0;
+                  } else {
+                     /**
+                      * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                      * <p>
+                      * rounding cannot be used because the tour id contains the last value from the
+                      * distance serie so rounding creates another tour id
+                      * <p>
+                      * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                      */
+                     distanceSerie[serieIndex] = (int) (absoluteDistance);
+                  }
+               }
+
+            } else {
+
+               // 1..n trackpoint
+
+               /*
+                * time: absolute time is checked against last valid time because this case happened
+                * but time can NOT be in the past.
+                */
+               if (absoluteTime == Long.MIN_VALUE || absoluteTime < lastValidAbsoluteTime) {
+                  recordingTime = lastValidTime;
+               } else {
+                  recordingTime = (absoluteTime - tourStartTime) / 1000;
+                  lastValidAbsoluteTime = absoluteTime;
+               }
+               timeSerie[serieIndex] = (int) (lastValidTime = recordingTime);
+
+               /*
+                * distance
+                */
+               if (isDistance) {
+
+                  final float absoluteDistance = timeData.absoluteDistance;
+                  if ((absoluteDistance == Float.MIN_VALUE) || (absoluteDistance >= Integer.MAX_VALUE)) {
+                     distanceSerie[serieIndex] = Float.MIN_VALUE;
+                  } else {
+                     /**
+                      * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                      * <p>
+                      * rounding cannot be used because the tour id contains the last value from the
+                      * distance serie so rounding creates another tour id
+                      * <p>
+                      * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                      */
+                     distanceSerie[serieIndex] = absoluteDistance;
+                  }
+               }
+            }
+
+            /*
+             * altitude
+             */
+            if (isAltitude) {
+               final float absoluteAltitude = timeData.absoluteAltitude;
+               altitudeSerie[serieIndex] = (absoluteAltitude == Float.MIN_VALUE
+                     || (absoluteAltitude >= Integer.MAX_VALUE)) //
+                           ? Float.MIN_VALUE
+                           : absoluteAltitude;
+            }
+
+            /*
+             * latitude & longitude
+             */
+            if (isGPS) {
+               latitudeSerie[serieIndex] = timeData.latitude;
+               longitudeSerie[serieIndex] = timeData.longitude;
+            }
+
+            /*
+             * pulse
+             */
+            if (isPulse) {
+               pulseSerie[serieIndex] = timeData.pulse;
+            }
+
+            /*
+             * temperature
+             */
+            if (isTemperature) {
+               temperatureSerie[serieIndex] = timeData.temperature;
+            }
+
+            /*
+             * cadence
+             */
+            if (isCadence) {
+               // cadence is not interpolated, ensure to set valid values
+               final float tdCadence = timeData.cadence;
+               cadenceSerie[serieIndex] = tdCadence == Float.MIN_VALUE ? 0 : tdCadence;
+            }
+
+            /*
+             * Gear
+             */
+            if (isGear) {
+               gearSerie[serieIndex] = timeData.gear;
+            }
+
+            /*
+             * power
+             */
+            if (isPower) {
+               final float tdPower = timeData.power;
+               powerSerie[serieIndex] = tdPower == Float.MIN_VALUE ? 0 : tdPower;
+            }
+
+            /*
+             * speed
+             */
+            if (isSpeed) {
+               // speed is not interpolated, ensure to set valid values
+               final float tdSpeed = timeData.speed;
+               speedSerie[serieIndex] = tdSpeed == Float.MIN_VALUE ? 0 : tdSpeed;
+            }
+
+            /*
+             * Running Dynamics
+             */
+            if (isRunDyn_StanceTime) {
+               final short tdValue = timeData.runDyn_StanceTime;
+               runDyn_StanceTime[serieIndex] = tdValue == Short.MIN_VALUE ? 0 : tdValue;
+            }
+            if (isRunDyn_StanceTimeBalance) {
+               final short tdValue = timeData.runDyn_StanceTimeBalance;
+               runDyn_StanceTimeBalance[serieIndex] = tdValue == Short.MIN_VALUE ? 0 : tdValue;
+            }
+            if (isRunDyn_StepLength) {
+               final short tdValue = timeData.runDyn_StepLength;
+               runDyn_StepLength[serieIndex] = tdValue == Short.MIN_VALUE ? 0 : tdValue;
+            }
+            if (isRunDyn_VerticalOscillation) {
+               final short tdValue = timeData.runDyn_VerticalOscillation;
+               runDyn_VerticalOscillation[serieIndex] = tdValue == Short.MIN_VALUE ? 0 : tdValue;
+            }
+            if (isRunDyn_VerticalRatio) {
+               final short tdValue = timeData.runDyn_VerticalRatio;
+               runDyn_VerticalRatio[serieIndex] = tdValue == Short.MIN_VALUE ? 0 : tdValue;
+            }
+         }
+
+      } else {
+
+         /*
+          * relativ data is available, these data are NOT from GPS devices
+          */
+
+         int distanceAbsolute = 0;
+         int altitudeAbsolute = 0;
+
+         // convert data from the tour format into an interger[]
+         for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
+
+            final TimeData timeData = timeDataSerie[serieIndex];
+
+            final int tdTime = timeData.time;
+
+            // set time
+            timeSerie[serieIndex] = (int) (recordingTime += tdTime == Integer.MIN_VALUE ? 0 : tdTime);
+
+            if (isDistance) {
+               final float tdDistance = timeData.distance;
+               if (tdDistance == Float.MIN_VALUE) {
+                  distanceSerie[serieIndex] = Float.MIN_VALUE;
+               } else {
+                  distanceSerie[serieIndex] = distanceAbsolute += tdDistance;
+               }
+            }
+
+            if (isAltitude) {
+               final float tdAltitude = timeData.altitude;
+               if (tdAltitude == Float.MIN_VALUE) {
+                  altitudeSerie[serieIndex] = Float.MIN_VALUE;
+               } else {
+                  altitudeSerie[serieIndex] = altitudeAbsolute += tdAltitude;
+               }
+            }
+
+            if (isPulse) {
+               pulseSerie[serieIndex] = timeData.pulse;
+            }
+
+            if (isTemperature) {
+               temperatureSerie[serieIndex] = timeData.temperature;
+            }
+
+            if (isCadence) {
+               final float tdCadence = timeData.cadence;
+               cadenceSerie[serieIndex] = tdCadence == Float.MIN_VALUE ? 0 : tdCadence;
+            }
+
+            if (isPower) {
+               final float tdPower = timeData.power;
+               powerSerie[serieIndex] = tdPower == Float.MIN_VALUE ? 0 : tdPower;
+            }
+
+            if (isSpeed) {
+               final float tdSpeed = timeData.speed;
+               speedSerie[serieIndex] = tdSpeed == Float.MIN_VALUE ? 0 : tdSpeed;
+            }
+         }
+      }
+
+      createTimeSeries_10_DataCompleting();
+      createTimeSeries_50_PulseTimes(timeDataSerie);
+
+      tourDistance = isDistance ? distanceSerie[serieSize - 1] : 0;
+      tourRecordingTime = recordingTime;
+      setTourEndTimeMS();
+
+      if (isGear) {
+         // set shift counts
+         setGears(gearSerie);
+      }
+
+      cleanupDataSeries();
+
+      /*
+       * Try to get distance values from lat/long values, this must be done after the cleanup which
+       * can set distanceSerie = null.
+       */
+      if (distanceSerie == null) {
+         TourManager.computeDistanceValuesFromGeoPosition(this);
+      }
+
+      /*
+       * Set time zone from geo position
+       */
+      if (latitudeSerie != null) {
+
+         // latitude can be null AFTER cleanup data series
+
+         // get time zone from lat/lon
+         final double lat = latitudeSerie[0];
+         final double lon = longitudeSerie[0];
+
+         final String rawZoneId = TimezoneMapper.latLngToTimezoneString(lat, lon);
+         final ZoneId zoneId = ZoneId.of(rawZoneId);
+
+         setTimeZoneId(zoneId.getId());
+      }
+
+      /*
+       * create marker after all other data are setup
+       */
+      if (isCreateMarker) {
+
+         for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
+
+            final TimeData timeData = timeDataSerie[serieIndex];
+
+            if (timeData.marker != 0) {
+
+               int relativeTime = 0;
+               float distanceValue = 0;
+
+               if (timeSerie != null) {
+                  relativeTime = timeSerie[serieIndex];
+               }
+               if (distanceSerie != null) {
+                  distanceValue = distanceSerie[serieIndex];
+               }
+
+               createTourMarker(timeData, serieIndex, relativeTime, distanceValue);
+            }
+         }
+      }
+      resetSortedMarkers();
+   }
+
+   /**
+    * Interpolations of missing data
+    */
+   private void createTimeSeries_10_DataCompleting() {
+
+      createTimeSeries_12_RemoveInvalidDistanceValues();
+      createTimeSeries_14_RemoveInvalidDistanceValues();
+
+      createTimeSeries_20_data_completing(latitudeSerie, timeSerie);
+      createTimeSeries_20_data_completing(longitudeSerie, timeSerie);
+
+      createTimeSeries_30_data_completing(altitudeSerie, timeSerie);
+      createTimeSeries_30_data_completing(distanceSerie, timeSerie);
+      createTimeSeries_30_data_completing(temperatureSerie, timeSerie);
+      createTimeSeries_30_data_completing(pulseSerie, timeSerie);
+   }
+
+   private void createTimeSeries_12_RemoveInvalidDistanceValues() {
+
+      if (isDistanceFromSensor == 1 || latitudeSerie == null || distanceSerie == null) {
+         return;
+      }
+
+      /*
+       * Distance is measured with the gps device and not with a sensor. Remove all distance values
+       * which are set but lat/lon is not available, this case can happen when a device is in a
+       * tunnel. Distance values will be interpolited later.
+       */
+
+      final int size = timeSerie.length;
+
+      for (int serieIndex = 0; serieIndex < size; serieIndex++) {
+         if (latitudeSerie[serieIndex] == Double.MIN_VALUE) {
+            distanceSerie[serieIndex] = Float.MIN_VALUE;
+         }
+      }
+   }
+
+   /**
+    * Because of the current algorithm, the first distance value can be <code>0</code> and the other
+    * values can be {@link Float#MIN_VALUE}.
+    * <p>
+    * When this occures, set all distance values to {@link Float#MIN_VALUE}, that distance values
+    * are not recognized.
+    */
+   private void createTimeSeries_14_RemoveInvalidDistanceValues() {
+
+      if (distanceSerie == null || distanceSerie.length < 2) {
+         return;
+      }
+
+      boolean isDataValid = false;
+
+      for (int serieIndex = 1; serieIndex < distanceSerie.length; serieIndex++) {
+
+         final float distanceValue = distanceSerie[serieIndex];
+
+         if (distanceValue < 0) {
+
+            // distance is invalid, set to a 'valid' value which is corrected in DataCompleting
+
+            distanceSerie[serieIndex] = Float.MIN_VALUE;
+
+         } else if (distanceValue != Float.MIN_VALUE) {
+
+            // there are valid values, data are OK
+            isDataValid = true;
+         }
+      }
+
+      if (isDataValid) {
+         return;
+      }
+
+      if (distanceSerie[0] == 0.0) {
+
+         // set distance to be unavailable
+
+         distanceSerie[0] = Float.MIN_VALUE;
+
+      } else {
+
+         // this case needs more investigation if it occures
+      }
+   }
+
+   private void createTimeSeries_20_data_completing(final double[] field, final int[] time) {
+
+      if (field == null) {
+         return;
+      }
+
+      final int size = time.length;
+
+      for (int serieIndex = 0; serieIndex < size; serieIndex++) {
+
+         if (field[serieIndex] == Double.MIN_VALUE) {
+
+            // search forward to the next valid data
+            int invalidIndex = serieIndex;
+            while (field[invalidIndex] == Double.MIN_VALUE && invalidIndex < size - 1) {
+               invalidIndex++;
+            }
+
+            final int nextValidIndex = invalidIndex;
+
+            if (field[nextValidIndex] == Double.MIN_VALUE) {
+
+               double lastValidValue;
+               if (serieIndex - 1 < 0) {
+                  // ??????????????????
+                  lastValidValue = 0;
+               } else {
+                  lastValidValue = field[serieIndex - 1];
+               }
+
+               field[nextValidIndex] = lastValidValue;
+            }
+
+            final int time1 = time[serieIndex - 1];
+            final int time2 = time[nextValidIndex];
+            final double val1 = field[serieIndex - 1];
+            final double val2 = field[nextValidIndex];
+
+            for (int interpolationIndex = serieIndex; interpolationIndex < nextValidIndex; interpolationIndex++) {
+
+               final double interpolationValue = createTimeSeries_40_linear_interpolation(
+                     time1,
+                     time2,
+                     val1,
+                     val2,
+                     time[interpolationIndex]);
+
+               field[interpolationIndex] = interpolationValue;
+            }
+
+            serieIndex = nextValidIndex - 1;
+         }
+      }
+   }
+
+   private void createTimeSeries_30_data_completing(final float[] field, final int[] time) {
+
+      if (field == null) {
+         return;
+      }
+
+      final int size = time.length;
+
+      for (int serieIndex = 0; serieIndex < size; serieIndex++) {
+
+         if (field[serieIndex] == Float.MIN_VALUE) {
+
+            // search forward to the next valid data
+            int invalidIndex = serieIndex;
+            while (field[invalidIndex] == Float.MIN_VALUE && invalidIndex < size - 1) {
+               invalidIndex++;
+            }
+
+            final int nextValidIndex = invalidIndex;
+
+            if (field[nextValidIndex] == Float.MIN_VALUE) {
+
+               float lastValidValue;
+               if (serieIndex - 1 < 0) {
+                  // ??????????????????
+                  lastValidValue = 0;
+               } else {
+                  lastValidValue = field[serieIndex - 1];
+               }
+
+               field[nextValidIndex] = lastValidValue;
+            }
+
+            final int validValueIndex = serieIndex == 0 ? 0 : serieIndex - 1;
+
+            final int time1 = time[validValueIndex];
+            final int time2 = time[nextValidIndex];
+            final double val1 = field[validValueIndex];
+            final double val2 = field[nextValidIndex];
+
+            for (int interpolationIndex = serieIndex; interpolationIndex < nextValidIndex; interpolationIndex++) {
+
+               final double linearInterpolation = createTimeSeries_40_linear_interpolation(
+                     time1,
+                     time2,
+                     val1,
+                     val2,
+                     time[interpolationIndex]);
+
+               field[interpolationIndex] = (float) linearInterpolation;
+            }
+
+            serieIndex = nextValidIndex - 1;
+         }
+      }
+   }
+
+   private double createTimeSeries_40_linear_interpolation(final double time1,
+                                                           final double time2,
+                                                           final double val1,
+                                                           final double val2,
+                                                           final double time) {
+      if (time2 == time1) {
+         return ((val1 + val2) / 2.);
+      } else {
+         return (val1 + (val2 - val1) / (time2 - time1) * (time - time1));
+      }
+   }
+
+   private void createTimeSeries_50_PulseTimes(final TimeData[] allTimeData) {
+
+      boolean isPulseTimes = false;
+
+      PULSE_TIMES:
+
+      // check if any pulse time data is available
+      for (final TimeData timeData : allTimeData) {
+
+         final int[] pulseTimes = timeData.pulseTime;
+
+         if (pulseTimes != null) {
+
+            for (final int pulseTime : pulseTimes) {
+               if (pulseTime != 0) {
+                  isPulseTimes = true;
+                  break PULSE_TIMES;
+               }
+            }
+         }
+      }
+
+      if (isPulseTimes == false) {
+         // no data
+         return;
+      }
+
+      final TIntArrayList pulseTimes = new TIntArrayList(allTimeData.length * 3);
+
+      for (final TimeData timeData : allTimeData) {
+
+         final int[] pulseTimes2 = timeData.pulseTime;
+
+         if (pulseTimes2 != null) {
+
+            for (final int pulseTime : pulseTimes2) {
+               if (pulseTime != 0) {
+
+                  if (pulseTime == 65535) {
+                     // ignore, this value occured in daum data
+                  } else {
+
+                     pulseTimes.add(pulseTime);
+                  }
 
 //                  445
 //                  480
@@ -5889,262 +5889,262 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 //                  575
 //                  575
 //                  575
-					}
-				}
-			}
-		}
+               }
+            }
+         }
+      }
 
-		if (pulseTimes.size() > 0) {
-			pulseTimeSerie = pulseTimes.toArray();
-		}
-	}
+      if (pulseTimes.size() > 0) {
+         pulseTimeSerie = pulseTimes.toArray();
+      }
+   }
 
-	/**
-	 * Creates a unique tour id depending on the tour start time and current time
-	 */
-	public void createTourId() {
+   /**
+    * Creates a unique tour id depending on the tour start time and current time
+    */
+   public void createTourId() {
 
-		final String uniqueKey = Long.toString(System.currentTimeMillis());
+      final String uniqueKey = Long.toString(System.currentTimeMillis());
 
-		createTourId(uniqueKey.substring(uniqueKey.length() - 5, uniqueKey.length()));
-	}
+      createTourId(uniqueKey.substring(uniqueKey.length() - 5, uniqueKey.length()));
+   }
 
-	/**
-	 * Creates the unique tour id from the tour date/time and the unique key.
-	 *
-	 * @param uniqueKeySuffix
-	 *           Unique key to identify a tour, this <b>MUST</b> be an {@link Integer} value.
-	 * @return
-	 */
-	public Long createTourId(final String uniqueKeySuffix) {
+   /**
+    * Creates the unique tour id from the tour date/time and the unique key.
+    *
+    * @param uniqueKeySuffix
+    *           Unique key to identify a tour, this <b>MUST</b> be an {@link Integer} value.
+    * @return
+    */
+   public Long createTourId(final String uniqueKeySuffix) {
 
 //      final String uniqueKey = Integer.toString(Math.abs(getStartDistance()));
 
-		String tourIdKey;
+      String tourIdKey;
 
-		try {
-			/*
-			 * this is the default implementation to create a tour id, but on the 5.5.2007 a
-			 * NumberFormatException occured so the calculation for the tour id was adjusted
-			 */
-			tourIdKey = Short.toString(startYear)
-					+ Short.toString(startMonth)
-					+ Short.toString(startDay)
-					+ Short.toString(startHour)
-					+ Short.toString(startMinute)
-					//
-					+ uniqueKeySuffix;
+      try {
+         /*
+          * this is the default implementation to create a tour id, but on the 5.5.2007 a
+          * NumberFormatException occured so the calculation for the tour id was adjusted
+          */
+         tourIdKey = Short.toString(startYear)
+               + Short.toString(startMonth)
+               + Short.toString(startDay)
+               + Short.toString(startHour)
+               + Short.toString(startMinute)
+               //
+               + uniqueKeySuffix;
 
-			tourId = Long.valueOf(tourIdKey);
+         tourId = Long.valueOf(tourIdKey);
 
-		} catch (final NumberFormatException e) {
+      } catch (final NumberFormatException e) {
 
-			/*
-			 * the distance is shorted that the maximum of a Long datatype is not exceeded
-			 */
-			try {
+         /*
+          * the distance is shorted that the maximum of a Long datatype is not exceeded
+          */
+         try {
 
-				tourIdKey = Short.toString(startYear)
-						+ Short.toString(startMonth)
-						+ Short.toString(startDay)
-						+ Short.toString(startHour)
-						+ Short.toString(startMinute)
-						//
-						+ uniqueKeySuffix.substring(0, Math.min(5, uniqueKeySuffix.length()));
+            tourIdKey = Short.toString(startYear)
+                  + Short.toString(startMonth)
+                  + Short.toString(startDay)
+                  + Short.toString(startHour)
+                  + Short.toString(startMinute)
+                  //
+                  + uniqueKeySuffix.substring(0, Math.min(5, uniqueKeySuffix.length()));
 
-				tourId = Long.valueOf(tourIdKey);
+            tourId = Long.valueOf(tourIdKey);
 
-			} catch (final NumberFormatException e2) {
+         } catch (final NumberFormatException e2) {
 
-				// this case happened when startMonth had a wrong value
+            // this case happened when startMonth had a wrong value
 
-				tourId = Long.valueOf(TimeTools.now().toInstant().toEpochMilli());
-			}
-		}
+            tourId = Long.valueOf(TimeTools.now().toInstant().toEpochMilli());
+         }
+      }
 
-		return tourId;
-	}
+      return tourId;
+   }
 
-	/**
-	 * Creates a dummy tour id which should be replaced by setting the tour id with
-	 * {@link #createTourId()} or {@link #createTourId(String)}
-	 */
-	public void createTourIdDummy() {
-		tourId = System.nanoTime();
-	}
+   /**
+    * Creates a dummy tour id which should be replaced by setting the tour id with
+    * {@link #createTourId()} or {@link #createTourId(String)}
+    */
+   public void createTourIdDummy() {
+      tourId = System.nanoTime();
+   }
 
-	/**
-	 * Create a device marker at the current position
-	 *
-	 * @param timeData
-	 * @param serieIndex
-	 * @param relativeTime
-	 * @param distanceAbsolute
-	 */
-	private void createTourMarker(final TimeData timeData,
-											final int serieIndex,
-											final int relativeTime,
-											final float distanceAbsolute) {
+   /**
+    * Create a device marker at the current position
+    *
+    * @param timeData
+    * @param serieIndex
+    * @param relativeTime
+    * @param distanceAbsolute
+    */
+   private void createTourMarker(final TimeData timeData,
+                                 final int serieIndex,
+                                 final int relativeTime,
+                                 final float distanceAbsolute) {
 
-		// create a new marker
-		final TourMarker tourMarker = new TourMarker(this, ChartLabel.MARKER_TYPE_DEVICE);
+      // create a new marker
+      final TourMarker tourMarker = new TourMarker(this, ChartLabel.MARKER_TYPE_DEVICE);
 
-		/*
-		 * ??? timeData.marker was added until version 14.9 but I have no idea why this was added ???
-		 */
+      /*
+       * ??? timeData.marker was added until version 14.9 but I have no idea why this was added ???
+       */
 //      tourMarker.setTime((int) (relativeTime + timeData.marker));
 
-		tourMarker.setTime(relativeTime, tourStartTime + (relativeTime * 1000));
-		tourMarker.setDistance(distanceAbsolute);
-		tourMarker.setSerieIndex(serieIndex);
+      tourMarker.setTime(relativeTime, tourStartTime + (relativeTime * 1000));
+      tourMarker.setDistance(distanceAbsolute);
+      tourMarker.setSerieIndex(serieIndex);
 
-		if (timeData.markerLabel == null) {
-			tourMarker.setLabel(Messages.tour_data_label_device_marker);
-		} else {
-			tourMarker.setLabel(timeData.markerLabel);
-		}
+      if (timeData.markerLabel == null) {
+         tourMarker.setLabel(Messages.tour_data_label_device_marker);
+      } else {
+         tourMarker.setLabel(timeData.markerLabel);
+      }
 
-		tourMarkers.add(tourMarker);
-	}
+      tourMarkers.add(tourMarker);
+   }
 
-	public void dumpData() {
+   public void dumpData() {
 
-		final PrintStream out = System.out;
+      final PrintStream out = System.out;
 
-		out.println("----------------------------------------------------"); //$NON-NLS-1$
-		out.println("TOUR DATA"); //$NON-NLS-1$
-		out.println("----------------------------------------------------"); //$NON-NLS-1$
+      out.println("----------------------------------------------------"); //$NON-NLS-1$
+      out.println("TOUR DATA"); //$NON-NLS-1$
+      out.println("----------------------------------------------------"); //$NON-NLS-1$
 // out.println("Typ: " + getDeviceTourType()); //$NON-NLS-1$
-		out.println("Date:               " + startDay + "." + startMonth + "." + startYear); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		out.println("Time:               " + startHour + ":" + startMinute); //$NON-NLS-1$ //$NON-NLS-2$
-		out.println("Total distance:     " + getStartDistance()); //$NON-NLS-1$
-		// out.println("Distance:           " + getDistance());
-		out.println("Altitude:           " + getStartAltitude()); //$NON-NLS-1$
-		out.println("Pulse:              " + getStartPulse()); //$NON-NLS-1$
-		out.println("Offset DD record:   " + offsetDDRecord); //$NON-NLS-1$
-	}
+      out.println("Date:               " + startDay + "." + startMonth + "." + startYear); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      out.println("Time:               " + startHour + ":" + startMinute); //$NON-NLS-1$ //$NON-NLS-2$
+      out.println("Total distance:     " + getStartDistance()); //$NON-NLS-1$
+      // out.println("Distance:           " + getDistance());
+      out.println("Altitude:           " + getStartAltitude()); //$NON-NLS-1$
+      out.println("Pulse:              " + getStartPulse()); //$NON-NLS-1$
+      out.println("Offset DD record:   " + offsetDDRecord); //$NON-NLS-1$
+   }
 
-	public void dumpTime() {
-		final PrintStream out = System.out;
+   public void dumpTime() {
+      final PrintStream out = System.out;
 
-		out.print(
-				(getTourRecordingTime() / 3600)
-						+ ":" //$NON-NLS-1$
-						+ ((getTourRecordingTime() % 3600) / 60)
-						+ ":" //$NON-NLS-1$
-						+ ((getTourRecordingTime() % 3600) % 60)
-						+ "  "); //$NON-NLS-1$
-		out.print(getTourDistance());
-	}
+      out.print(
+            (getTourRecordingTime() / 3600)
+                  + ":" //$NON-NLS-1$
+                  + ((getTourRecordingTime() % 3600) / 60)
+                  + ":" //$NON-NLS-1$
+                  + ((getTourRecordingTime() % 3600) % 60)
+                  + "  "); //$NON-NLS-1$
+      out.print(getTourDistance());
+   }
 
-	public void dumpTourTotal() {
+   public void dumpTourTotal() {
 
-		final PrintStream out = System.out;
+      final PrintStream out = System.out;
 
-		out.println("Tour distance (m):   " + getTourDistance()); //$NON-NLS-1$
+      out.println("Tour distance (m):   " + getTourDistance()); //$NON-NLS-1$
 
-		out.println(
-				"Tour time:      " //$NON-NLS-1$
-						+ (getTourRecordingTime() / 3600)
-						+ ":" //$NON-NLS-1$
-						+ ((getTourRecordingTime() % 3600) / 60)
-						+ ":" //$NON-NLS-1$
-						+ (getTourRecordingTime() % 3600) % 60);
+      out.println(
+            "Tour time:      " //$NON-NLS-1$
+                  + (getTourRecordingTime() / 3600)
+                  + ":" //$NON-NLS-1$
+                  + ((getTourRecordingTime() % 3600) / 60)
+                  + ":" //$NON-NLS-1$
+                  + (getTourRecordingTime() % 3600) % 60);
 
-		out.println(
-				"Driving time:      " //$NON-NLS-1$
-						+ (getTourDrivingTime() / 3600)
-						+ ":" //$NON-NLS-1$
-						+ ((getTourDrivingTime() % 3600) / 60)
-						+ ":" //$NON-NLS-1$
-						+ (getTourDrivingTime() % 3600) % 60);
+      out.println(
+            "Driving time:      " //$NON-NLS-1$
+                  + (getTourDrivingTime() / 3600)
+                  + ":" //$NON-NLS-1$
+                  + ((getTourDrivingTime() % 3600) / 60)
+                  + ":" //$NON-NLS-1$
+                  + (getTourDrivingTime() % 3600) % 60);
 
-		out.println("Altitude up (m):   " + getTourAltUp()); //$NON-NLS-1$
-		out.println("Altitude down (m):   " + getTourAltDown()); //$NON-NLS-1$
-	}
+      out.println("Altitude up (m):   " + getTourAltUp()); //$NON-NLS-1$
+      out.println("Altitude down (m):   " + getTourAltDown()); //$NON-NLS-1$
+   }
 
-	@Override
-	public boolean equals(final Object obj) {
+   @Override
+   public boolean equals(final Object obj) {
 
-		if (this == obj) {
-			return true;
-		}
+      if (this == obj) {
+         return true;
+      }
 
-		if (obj instanceof TourData) {
-			return tourId.longValue() == ((TourData) obj).tourId.longValue();
-		}
+      if (obj instanceof TourData) {
+         return tourId.longValue() == ((TourData) obj).tourId.longValue();
+      }
 
-		return false;
-	}
+      return false;
+   }
 
-	/**
-	 * @return Returns the metric or imperial altimeter serie depending on the active measurement
-	 */
-	public float[] getAltimeterSerie() {
+   /**
+    * @return Returns the metric or imperial altimeter serie depending on the active measurement
+    */
+   public float[] getAltimeterSerie() {
 
-		if (UI.UNIT_VALUE_ALTITUDE != 1) {
+      if (UI.UNIT_VALUE_ALTITUDE != 1) {
 
-			// use imperial system
+         // use imperial system
 
-			if (altimeterSerieImperial == null) {
-				computeAltimeterGradientSerie();
-			}
-			return altimeterSerieImperial;
+         if (altimeterSerieImperial == null) {
+            computeAltimeterGradientSerie();
+         }
+         return altimeterSerieImperial;
 
-		} else {
+      } else {
 
-			// use metric system
+         // use metric system
 
-			if (altimeterSerie == null) {
-				computeAltimeterGradientSerie();
-			}
-			return altimeterSerie;
-		}
-	}
+         if (altimeterSerie == null) {
+            computeAltimeterGradientSerie();
+         }
+         return altimeterSerie;
+      }
+   }
 
-	/**
-	 * @return Returns the metric or imperial altitude serie depending on the active measurement or
-	 *         <code>null</code> when altitude data serie is not available
-	 */
-	public float[] getAltitudeSerie() {
+   /**
+    * @return Returns the metric or imperial altitude serie depending on the active measurement or
+    *         <code>null</code> when altitude data serie is not available
+    */
+   public float[] getAltitudeSerie() {
 
-		if (altitudeSerie == null) {
-			return null;
-		}
+      if (altitudeSerie == null) {
+         return null;
+      }
 
-		if (UI.UNIT_VALUE_ALTITUDE != 1) {
+      if (UI.UNIT_VALUE_ALTITUDE != 1) {
 
-			// imperial system is used
+         // imperial system is used
 
-			if (altitudeSerieImperial == null) {
+         if (altitudeSerieImperial == null) {
 
-				// compute imperial altitude
+            // compute imperial altitude
 
-				altitudeSerieImperial = new float[altitudeSerie.length];
+            altitudeSerieImperial = new float[altitudeSerie.length];
 
-				for (int valueIndex = 0; valueIndex < altitudeSerie.length; valueIndex++) {
-					altitudeSerieImperial[valueIndex] = altitudeSerie[valueIndex] / UI.UNIT_VALUE_ALTITUDE;
-				}
-			}
-			return altitudeSerieImperial;
+            for (int valueIndex = 0; valueIndex < altitudeSerie.length; valueIndex++) {
+               altitudeSerieImperial[valueIndex] = altitudeSerie[valueIndex] / UI.UNIT_VALUE_ALTITUDE;
+            }
+         }
+         return altitudeSerieImperial;
 
-		} else {
+      } else {
 
-			return altitudeSerie;
-		}
-	}
+         return altitudeSerie;
+      }
+   }
 
-	/**
-	 * @param isForceSmoothing
-	 * @return Returns smoothed altitude values (according to the measurement system) when they are
-	 *         set to be smoothed otherwise it returns normal altitude values or <code>null</code>
-	 *         when altitude is not available.
-	 */
-	public float[] getAltitudeSmoothedSerie(final boolean isForceSmoothing) {
+   /**
+    * @param isForceSmoothing
+    * @return Returns smoothed altitude values (according to the measurement system) when they are
+    *         set to be smoothed otherwise it returns normal altitude values or <code>null</code>
+    *         when altitude is not available.
+    */
+   public float[] getAltitudeSmoothedSerie(final boolean isForceSmoothing) {
 
-		if (altitudeSerie == null) {
-			return null;
-		}
+      if (altitudeSerie == null) {
+         return null;
+      }
 
 // ??? HAVE NO IDEA WHY THIS IS USED ???
 //      if (isForceSmoothing) {
@@ -6154,3871 +6154,3752 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 //
 //      } else {
 //
-		if (altitudeSerieSmoothed != null) {
+      if (altitudeSerieSmoothed != null) {
 
-			// return already smoothed altitude values
+         // return already smoothed altitude values
 
-			if (UI.UNIT_VALUE_ALTITUDE != 1) {
+         if (UI.UNIT_VALUE_ALTITUDE != 1) {
 
-				// imperial system is used
+            // imperial system is used
 
-				return altitudeSerieImperialSmoothed;
+            return altitudeSerieImperialSmoothed;
 
-			} else {
-				return altitudeSerieSmoothed;
-			}
-		}
+         } else {
+            return altitudeSerieSmoothed;
+         }
+      }
 //      }
 
-		if (altitudeSerieSmoothed == null) {
+      if (altitudeSerieSmoothed == null) {
 
-			// smoothed altitude values are not available
-			return getAltitudeSerie();
+         // smoothed altitude values are not available
+         return getAltitudeSerie();
 
-		} else {
+      } else {
 
-			if (UI.UNIT_VALUE_ALTITUDE != 1) {
+         if (UI.UNIT_VALUE_ALTITUDE != 1) {
 
-				// imperial system is used
+            // imperial system is used
 
-				return altitudeSerieImperialSmoothed;
+            return altitudeSerieImperialSmoothed;
 
-			} else {
-				return altitudeSerieSmoothed;
-			}
-		}
-	}
+         } else {
+            return altitudeSerieSmoothed;
+         }
+      }
+   }
 
-	/**
-	 * @return the avgCadence
-	 */
-	public float getAvgCadence() {
-		return avgCadence;
-	}
+   /**
+    * @return the avgCadence
+    */
+   public float getAvgCadence() {
+      return avgCadence;
+   }
 
-	/**
-	 * @return the avgPulse
-	 */
-	public float getAvgPulse() {
-		return avgPulse;
-	}
+   /**
+    * @return the avgPulse
+    */
+   public float getAvgPulse() {
+      return avgPulse;
+   }
 
-	/**
-	 * @return Returns metric average temperature
-	 */
-	public float getAvgTemperature() {
-		return avgTemperature;
-	}
+   /**
+    * @return Returns metric average temperature
+    */
+   public float getAvgTemperature() {
+      return avgTemperature;
+   }
 
-	/**
-	 * @return Returns the body weight.
-	 */
-	public float getBodyWeight() {
-		return bikerWeight;
-	}
+   /**
+    * @return Returns the body weight.
+    */
+   public float getBodyWeight() {
+      return bikerWeight;
+   }
 
-	private int getBreakTime() {
+   private int getBreakTime() {
 
-		if (timeSerie == null) {
-			return 0;
-		}
+      if (timeSerie == null) {
+         return 0;
+      }
 
-		return getBreakTime(0, timeSerie.length, BreakTimeTool.getPrefValues());
-	}
+      return getBreakTime(0, timeSerie.length, BreakTimeTool.getPrefValues());
+   }
 
-	public int getBreakTime(final int startIndex, final int endIndex) {
+   public int getBreakTime(final int startIndex, final int endIndex) {
 
-		if (timeSerie == null) {
-			return 0;
-		}
+      if (timeSerie == null) {
+         return 0;
+      }
 
-		return getBreakTime(startIndex, endIndex, BreakTimeTool.getPrefValues());
-	}
+      return getBreakTime(startIndex, endIndex, BreakTimeTool.getPrefValues());
+   }
 
-	/**
-	 * Computes break time between start and end index when and when a break occures
-	 *
-	 * @param startIndex
-	 * @param endIndex
-	 * @param breakTimeTool
-	 * @return Returns the break time in seconds
-	 */
-	private int getBreakTime(final int startIndex, final int endIndex, final BreakTimeTool breakTimeTool) {
+   /**
+    * Computes break time between start and end index when and when a break occures
+    *
+    * @param startIndex
+    * @param endIndex
+    * @param breakTimeTool
+    * @return Returns the break time in seconds
+    */
+   private int getBreakTime(final int startIndex, final int endIndex, final BreakTimeTool breakTimeTool) {
 
-		// check required data
-		if (timeSerie == null || distanceSerie == null) {
-			return 0;
-		}
+      // check required data
+      if (timeSerie == null || distanceSerie == null) {
+         return 0;
+      }
 
-		// check if break time for each time slice is already computed (for the whole tour)
-		if (breakTimeSerie == null) {
+      // check if break time for each time slice is already computed (for the whole tour)
+      if (breakTimeSerie == null) {
 
-			if (deviceTimeInterval == -1) {
+         if (deviceTimeInterval == -1) {
 
-				// variable time slices
+            // variable time slices
 
-				computeBreakTimeVariable(startIndex, endIndex, breakTimeTool);
+            computeBreakTimeVariable(startIndex, endIndex, breakTimeTool);
 
-			} else {
+         } else {
 
-				// fixed time slices
+            // fixed time slices
 
-				if (deviceTimeInterval == 0) {
-					return 0;
-				}
+            if (deviceTimeInterval == 0) {
+               return 0;
+            }
 
-				final int minBreakTime = 20;
+            final int minBreakTime = 20;
 
-				computeBreakTimeFixed(minBreakTime / deviceTimeInterval);
-			}
+            computeBreakTimeFixed(minBreakTime / deviceTimeInterval);
+         }
 
-			computeTourDrivingTime();
-		}
+         computeTourDrivingTime();
+      }
 
-		return computeBreakTime(startIndex, endIndex);
-	}
+      return computeBreakTime(startIndex, endIndex);
+   }
 
-	public boolean[] getBreakTimeSerie() {
+   public boolean[] getBreakTimeSerie() {
 
-		if (breakTimeSerie == null) {
-			getBreakTime();
-		}
+      if (breakTimeSerie == null) {
+         getBreakTime();
+      }
 
-		return breakTimeSerie;
-	}
+      return breakTimeSerie;
+   }
 
-	public boolean[] getCadenceGaps() {
+   public boolean[] getCadenceGaps() {
 
-		if (cadenceSerie == null) {
-			return null;
-		}
+      if (cadenceSerie == null) {
+         return null;
+      }
 
-		if (_cadenceGaps != null) {
-			return _cadenceGaps;
-		}
+      if (_cadenceGaps != null) {
+         return _cadenceGaps;
+      }
 
-		_cadenceGaps = new boolean[cadenceSerie.length];
+      _cadenceGaps = new boolean[cadenceSerie.length];
 
-		for (int serieIndex = 0; serieIndex < cadenceSerie.length; serieIndex++) {
+      for (int serieIndex = 0; serieIndex < cadenceSerie.length; serieIndex++) {
 
-			final float cadence = cadenceSerie[serieIndex];
-			_cadenceGaps[serieIndex] = cadence == 0 ? true : false;
-		}
+         final float cadence = cadenceSerie[serieIndex];
+         _cadenceGaps[serieIndex] = cadence == 0 ? true : false;
+      }
 
-		return _cadenceGaps;
-	}
+      return _cadenceGaps;
+   }
 
-	public float getCadenceMultiplier() {
-		return cadenceMultiplier;
-	}
+   public float getCadenceMultiplier() {
+      return cadenceMultiplier;
+   }
 
-	public float[] getCadenceSerie() {
+   public float[] getCadenceSerie() {
 
-		if (isSwimCadence) {
+      if (isSwimCadence) {
 
-			// cadence is computed from swim cadence, these cadence values are not saaved
+         // cadence is computed from swim cadence, these cadence values are not saaved
 
-			return getSwim_Cadence();
+         return getSwim_Cadence();
 
-		} else {
+      } else {
 
-			return cadenceSerie;
-		}
-	}
+         return cadenceSerie;
+      }
+   }
 
-	/**
-	 * @return Returns cadence data serie which is multiplied with the {@link #cadenceMultiplier}
-	 */
-	public float[] getCadenceSerieWithMuliplier() {
+   /**
+    * @return Returns cadence data serie which is multiplied with the {@link #cadenceMultiplier}
+    */
+   public float[] getCadenceSerieWithMuliplier() {
 
-		if (isSwimCadence) {
+      if (isSwimCadence) {
 
-			return getSwim_Cadence();
+         return getSwim_Cadence();
 
-		} else {
+      } else {
 
-			if (cadenceMultiplier != 1.0 && cadenceSerie != null) {
+         if (cadenceMultiplier != 1.0 && cadenceSerie != null) {
 
-				if (cadenceSerieWithMultiplier == null) {
+            if (cadenceSerieWithMultiplier == null) {
 
-					// create cadence with multiplier
+               // create cadence with multiplier
 
-					cadenceSerieWithMultiplier = new float[cadenceSerie.length];
+               cadenceSerieWithMultiplier = new float[cadenceSerie.length];
 
-					for (int serieIndex = 0; serieIndex < cadenceSerie.length; serieIndex++) {
-						cadenceSerieWithMultiplier[serieIndex] = cadenceSerie[serieIndex] * cadenceMultiplier;
-					}
-				}
+               for (int serieIndex = 0; serieIndex < cadenceSerie.length; serieIndex++) {
+                  cadenceSerieWithMultiplier[serieIndex] = cadenceSerie[serieIndex] * cadenceMultiplier;
+               }
+            }
 
-				return cadenceSerieWithMultiplier;
-			}
+            return cadenceSerieWithMultiplier;
+         }
 
-			return cadenceSerie;
-		}
-	}
+         return cadenceSerie;
+      }
+   }
 
-	/**
-	 * @return Returns the calories or <code>0</code> when calories are not available.
-	 */
-	public int getCalories() {
+   /**
+    * @return Returns the calories or <code>0</code> when calories are not available.
+    */
+   public int getCalories() {
 
-		if (calories == null) {
-			return 0;
-		}
+      if (calories == null) {
+         return 0;
+      }
 
-		return calories;
-	}
+      return calories;
+   }
 
-	public int getConconiDeflection() {
-		return conconiDeflection;
-	}
+   public int getConconiDeflection() {
+      return conconiDeflection;
+   }
 
-	/**
-	 * @return Returns the person for which the tour is saved or the active person when
-	 *         {@link TourData} contains multiple tours or <code>null</code> when the tour is not
-	 *         saved in the database.
-	 */
-	public TourPerson getDataPerson() {
+   /**
+    * @return Returns the person for which the tour is saved or the active person when
+    *         {@link TourData} contains multiple tours or <code>null</code> when the tour is not
+    *         saved in the database.
+    */
+   public TourPerson getDataPerson() {
 
-		TourPerson dataPerson = null;
+      TourPerson dataPerson = null;
 
-		if (isMultipleTours) {
+      if (isMultipleTours) {
 
-			// multiple tours do not have a person, get active person
+         // multiple tours do not have a person, get active person
 
-			dataPerson = TourbookPlugin.getActivePerson();
+         dataPerson = TourbookPlugin.getActivePerson();
 
-		} else {
+      } else {
 
-			dataPerson = tourPerson;
-		}
+         dataPerson = tourPerson;
+      }
 
-		return dataPerson;
-	}
+      return dataPerson;
+   }
 
-	/**
-	 * @return Returns {@link ZonedDateTime} when the tour was created or <code>null</code> when
-	 *         date/time is not available
-	 */
-	public ZonedDateTime getDateTimeCreated() {
+   /**
+    * @return Returns {@link ZonedDateTime} when the tour was created or <code>null</code> when
+    *         date/time is not available
+    */
+   public ZonedDateTime getDateTimeCreated() {
 
-		if (_dateTimeCreated != null || dateTimeCreated == 0) {
-			return _dateTimeCreated;
-		}
+      if (_dateTimeCreated != null || dateTimeCreated == 0) {
+         return _dateTimeCreated;
+      }
 
-		_dateTimeCreated = Util.createDateTimeFromYMDhms(dateTimeCreated);
+      _dateTimeCreated = Util.createDateTimeFromYMDhms(dateTimeCreated);
 
-		return _dateTimeCreated;
-	}
+      return _dateTimeCreated;
+   }
 
-	/**
-	 * @return Returns {@link ZonedDateTime} when the tour was modified or <code>null</code> when
-	 *         date/time is not available
-	 */
-	public ZonedDateTime getDateTimeModified() {
+   /**
+    * @return Returns {@link ZonedDateTime} when the tour was modified or <code>null</code> when
+    *         date/time is not available
+    */
+   public ZonedDateTime getDateTimeModified() {
 
-		if (_dateTimeModified != null || dateTimeModified == 0) {
-			return _dateTimeModified;
-		}
+      if (_dateTimeModified != null || dateTimeModified == 0) {
+         return _dateTimeModified;
+      }
 
-		_dateTimeModified = Util.createDateTimeFromYMDhms(dateTimeModified);
+      _dateTimeModified = Util.createDateTimeFromYMDhms(dateTimeModified);
 
-		return _dateTimeModified;
-	}
+      return _dateTimeModified;
+   }
 
-	public String getDeviceFirmwareVersion() {
-		return deviceFirmwareVersion == null ? UI.EMPTY_STRING : deviceFirmwareVersion;
-	}
+   public String getDeviceFirmwareVersion() {
+      return deviceFirmwareVersion == null ? UI.EMPTY_STRING : deviceFirmwareVersion;
+   }
 
-	public String getDeviceId() {
-		return devicePluginId;
-	}
+   public String getDeviceId() {
+      return devicePluginId;
+   }
 
-	/**
-	 * This info is only displayed in viewer columns
-	 *
-	 * @return
-	 */
-	public String getDeviceModeName() {
-		return deviceModeName;
-	}
+   /**
+    * This info is only displayed in viewer columns
+    *
+    * @return
+    */
+   public String getDeviceModeName() {
+      return deviceModeName;
+   }
 
-	/**
-	 * @return Returns device name which is displayed in the tour editor info tab
-	 */
-	public String getDeviceName() {
-		if ((devicePluginId != null) && devicePluginId.equals(DEVICE_ID_FOR_MANUAL_TOUR)) {
-			return Messages.tour_data_label_manually_created_tour;
-		} else if ((devicePluginName == null) || (devicePluginName.length() == 0)) {
-			return UI.EMPTY_STRING;
-		} else {
-			return devicePluginName;
-		}
-	}
+   /**
+    * @return Returns device name which is displayed in the tour editor info tab
+    */
+   public String getDeviceName() {
+      if ((devicePluginId != null) && devicePluginId.equals(DEVICE_ID_FOR_MANUAL_TOUR)) {
+         return Messages.tour_data_label_manually_created_tour;
+      } else if ((devicePluginName == null) || (devicePluginName.length() == 0)) {
+         return UI.EMPTY_STRING;
+      } else {
+         return devicePluginName;
+      }
+   }
 
-	public String getDevicePluginName() {
-		return devicePluginName;
-	}
+   public String getDevicePluginName() {
+      return devicePluginName;
+   }
 
-	/**
-	 * @return Returns the time difference between 2 time slices or <code>-1</code> when the time
-	 *         slices are unequally
-	 */
-	public short getDeviceTimeInterval() {
-		return deviceTimeInterval;
-	}
+   /**
+    * @return Returns the time difference between 2 time slices or <code>-1</code> when the time
+    *         slices are unequally
+    */
+   public short getDeviceTimeInterval() {
+      return deviceTimeInterval;
+   }
 
-	public String getDeviceTourType() {
-		return deviceTourType;
-	}
+   public String getDeviceTourType() {
+      return deviceTourType;
+   }
 
-	/**
-	 * @return Returns the distance data serie for the current measurement system, this can be metric
-	 *         or imperial
-	 */
-	public double[] getDistanceSerieDouble() {
+   /**
+    * @return Returns the distance data serie for the current measurement system, this can be metric
+    *         or imperial
+    */
+   public double[] getDistanceSerieDouble() {
 
-		if (distanceSerie == null) {
-			return null;
-		}
+      if (distanceSerie == null) {
+         return null;
+      }
 
-		double[] serie;
+      double[] serie;
 
-		final float unitValueDistance = UI.UNIT_VALUE_DISTANCE;
+      final float unitValueDistance = UI.UNIT_VALUE_DISTANCE;
 
-		if (unitValueDistance == 1) {
+      if (unitValueDistance == 1) {
 
-			// use metric system
+         // use metric system
 
-			if (distanceSerieDouble == null) {
+         if (distanceSerieDouble == null) {
 
-				distanceSerieDouble = new double[distanceSerie.length];
+            distanceSerieDouble = new double[distanceSerie.length];
 
-				for (int valueIndex = 0; valueIndex < distanceSerie.length; valueIndex++) {
-					distanceSerieDouble[valueIndex] = distanceSerie[valueIndex];
-				}
-			}
+            for (int valueIndex = 0; valueIndex < distanceSerie.length; valueIndex++) {
+               distanceSerieDouble[valueIndex] = distanceSerie[valueIndex];
+            }
+         }
 
-			serie = distanceSerieDouble;
+         serie = distanceSerieDouble;
 
-		} else {
+      } else {
 
-			// use imperial system
+         // use imperial system
 
-			if (distanceSerieDoubleImperial == null) {
+         if (distanceSerieDoubleImperial == null) {
 
-				// compute imperial data
+            // compute imperial data
 
-				distanceSerieDoubleImperial = new double[distanceSerie.length];
+            distanceSerieDoubleImperial = new double[distanceSerie.length];
 
-				for (int valueIndex = 0; valueIndex < distanceSerie.length; valueIndex++) {
-					distanceSerieDoubleImperial[valueIndex] = distanceSerie[valueIndex] / unitValueDistance;
-				}
-			}
+            for (int valueIndex = 0; valueIndex < distanceSerie.length; valueIndex++) {
+               distanceSerieDoubleImperial[valueIndex] = distanceSerie[valueIndex] / unitValueDistance;
+            }
+         }
 
-			serie = distanceSerieDoubleImperial;
-		}
+         serie = distanceSerieDoubleImperial;
+      }
 
-		return serie;
-	}
+      return serie;
+   }
 
-	public short getDpTolerance() {
-		return dpTolerance;
-	}
+   public short getDpTolerance() {
+      return dpTolerance;
+   }
 
-	/**
-	 * @param values
-	 * @return Returns first value which is not 0
-	 */
-	private short getFirstNot0Value(final short[] values) {
+   /**
+    * @param values
+    * @return Returns first value which is not 0
+    */
+   private short getFirstNot0Value(final short[] values) {
 
-		for (final short value : values) {
+      for (final short value : values) {
 
-			if (value > 0 || value < 0) {
-				return value;
-			}
-		}
+         if (value > 0 || value < 0) {
+            return value;
+         }
+      }
 
-		return 0;
-	}
+      return 0;
+   }
 
-	public int getFrontShiftCount() {
-		return frontShiftCount;
-	}
+   public int getFrontShiftCount() {
+      return frontShiftCount;
+   }
 
-	/**
-	 * @return Returns <code>null</code> when tour do not contain photos, otherwise a list of
-	 *         {@link Photo}'s is returned.
-	 */
-	public ArrayList<Photo> getGalleryPhotos() {
+   /**
+    * @return Returns <code>null</code> when tour do not contain photos, otherwise a list of
+    *         {@link Photo}'s is returned.
+    */
+   public ArrayList<Photo> getGalleryPhotos() {
 
-		if (tourPhotos.size() == 0) {
-			return null;
-		}
+      if (tourPhotos.size() == 0) {
+         return null;
+      }
 
-		// photos are available in this tour
+      // photos are available in this tour
 
-		if (_galleryPhotos.size() > 0) {
+      if (_galleryPhotos.size() > 0) {
 
-			// photos are set
-			return _galleryPhotos;
-		}
+         // photos are set
+         return _galleryPhotos;
+      }
 
-		// photos are not yet set
+      // photos are not yet set
 
-		createGalleryPhotos();
+      createGalleryPhotos();
 
-		return _galleryPhotos;
-	}
+      return _galleryPhotos;
+   }
 
-	/**
-	 * @return Returns <code>null</code> when gears are not available otherwise it returns gears with
-	 *         this format
-	 *         <p>
-	 *         _gears[0] = gear ratio<br>
-	 *         _gears[1] = front gear teeth<br>
-	 *         _gears[2] = rear gear teeth<br>
-	 *         _gears[3] = front gear number, starting with 1<br>
-	 *         _gears[4] = rear gear number, starting with 1<br>
-	 */
-	public float[][] getGears() {
+   /**
+    * @return Returns <code>null</code> when gears are not available otherwise it returns gears with
+    *         this format
+    *         <p>
+    *         _gears[0] = gear ratio<br>
+    *         _gears[1] = front gear teeth<br>
+    *         _gears[2] = rear gear teeth<br>
+    *         _gears[3] = front gear number, starting with 1<br>
+    *         _gears[4] = rear gear number, starting with 1<br>
+    */
+   public float[][] getGears() {
 
-		if (gearSerie == null || timeSerie == null) {
-			return null;
-		}
+      if (gearSerie == null || timeSerie == null) {
+         return null;
+      }
 
-		if (_gears != null) {
-			return _gears;
-		}
+      if (_gears != null) {
+         return _gears;
+      }
 
-		/*
-		 * Create gears from gear raw data
-		 */
+      /*
+       * Create gears from gear raw data
+       */
 
-		final int gearSize = timeSerie.length;
+      final int gearSize = timeSerie.length;
 
-		_gears = new float[5][gearSize];
+      _gears = new float[5][gearSize];
 
-		for (int gearIndex = 0; gearIndex < gearSize; gearIndex++) {
+      for (int gearIndex = 0; gearIndex < gearSize; gearIndex++) {
 
-			final long gearRaw = gearSerie[gearIndex];
+         final long gearRaw = gearSerie[gearIndex];
 
-			final float frontTeeth = (gearRaw >> 24 & 0xff);
-			final float rearTeeth = (gearRaw >> 8 & 0xff);
+         final float frontTeeth = (gearRaw >> 24 & 0xff);
+         final float rearTeeth = (gearRaw >> 8 & 0xff);
 
-			final float frontGearNo = (gearRaw >> 16 & 0xff);
-			final float rearGearNo = (gearRaw >> 0 & 0xff);
+         final float frontGearNo = (gearRaw >> 16 & 0xff);
+         final float rearGearNo = (gearRaw >> 0 & 0xff);
 
-			final float gearRatio = frontTeeth / rearTeeth;
+         final float gearRatio = frontTeeth / rearTeeth;
 
-			_gears[0][gearIndex] = gearRatio;
-			_gears[1][gearIndex] = frontTeeth;
-			_gears[2][gearIndex] = rearTeeth;
-			_gears[3][gearIndex] = frontGearNo;
-			_gears[4][gearIndex] = rearGearNo;
-		}
+         _gears[0][gearIndex] = gearRatio;
+         _gears[1][gearIndex] = frontTeeth;
+         _gears[2][gearIndex] = rearTeeth;
+         _gears[3][gearIndex] = frontGearNo;
+         _gears[4][gearIndex] = rearGearNo;
+      }
 
-		return _gears;
-	}
+      return _gears;
+   }
 
-	/**
-	 * @return Returns bounds of the tour in latitude/longitude:
-	 *         <p>
-	 *         1st item contains lat/lon minimum values<br>
-	 *         2nd item contains lat/lon maximum values
-	 *         <p>
-	 *         Returns <code>null</code> when geo positions are not available.
-	 */
+   /**
+    * @return Returns bounds of the tour in latitude/longitude:
+    *         <p>
+    *         1st item contains lat/lon minimum values<br>
+    *         2nd item contains lat/lon maximum values
+    *         <p>
+    *         Returns <code>null</code> when geo positions are not available.
+    */
 
-	public GeoPosition[] getGeoBounds() {
+   public GeoPosition[] getGeoBounds() {
 
-		if (_gpsBounds == null) {
-			computeGeo_Bounds();
-		}
+      if (_gpsBounds == null) {
+         computeGeo_Bounds();
+      }
 
-		return _gpsBounds;
-	}
+      return _gpsBounds;
+   }
 
-	/**
-	 * @return Returns the metric or imperial altimeter serie depending on the active measurement
-	 */
-	public float[] getGradientSerie() {
+   /**
+    * @return Returns the metric or imperial altimeter serie depending on the active measurement
+    */
+   public float[] getGradientSerie() {
 
-		if (gradientSerie == null) {
-			computeAltimeterGradientSerie();
-		}
+      if (gradientSerie == null) {
+         computeAltimeterGradientSerie();
+      }
 
-		return gradientSerie;
-	}
+      return gradientSerie;
+   }
 
-	public HrZoneContext getHrZoneContext() {
+   public HrZoneContext getHrZoneContext() {
 
-		if (_hrZoneContext == null) {
-			computeHrZones();
-		}
+      if (_hrZoneContext == null) {
+         computeHrZones();
+      }
 
-		return _hrZoneContext;
-	}
+      return _hrZoneContext;
+   }
 
-	/**
-	 * @return Returns all available HR zones. How many zones are really used, depends on the
-	 *         {@link TourPerson} and how many zones are defined for the person.
-	 *         <p>
-	 *         Each tour can have up to 10 HR zones, when HR zone is <code>-1</code> then this zone
-	 *         is not set.
-	 */
-	public int[] getHrZones() {
+   /**
+    * @return Returns all available HR zones. How many zones are really used, depends on the
+    *         {@link TourPerson} and how many zones are defined for the person.
+    *         <p>
+    *         Each tour can have up to 10 HR zones, when HR zone is <code>-1</code> then this zone
+    *         is not set.
+    */
+   public int[] getHrZones() {
 
-		if (_hrZones == null) {
-			computeHrZones();
-		}
+      if (_hrZones == null) {
+         computeHrZones();
+      }
 
-		return _hrZones;
-	}
+      return _hrZones;
+   }
 
-	/**
-	 * @return Returns the import file name or <code>null</code> when not available.
-	 */
-	public String getImportFileName() {
+   /**
+    * @return Returns the import file name or <code>null</code> when not available.
+    */
+   public String getImportFileName() {
 
-		if (tourImportFileName == null || tourImportFileName.length() == 0) {
-			return null;
-		}
+      if (tourImportFileName == null || tourImportFileName.length() == 0) {
+         return null;
+      }
 
-		return tourImportFileName;
-	}
+      return tourImportFileName;
+   }
 
-	/**
-	 * @return Returns the import file path (folder) or <code>null</code> when not available.
-	 */
-	public String getImportFilePath() {
+   /**
+    * @return Returns the import file path (folder) or <code>null</code> when not available.
+    */
+   public String getImportFilePath() {
 
-		if (tourImportFilePath == null || tourImportFilePath.length() == 0) {
-			return null;
-		}
+      if (tourImportFilePath == null || tourImportFilePath.length() == 0) {
+         return null;
+      }
 
-		return tourImportFilePath;
-	}
+      return tourImportFilePath;
+   }
 
-	/**
-	 * @return Returns the full import file path name or <code>null</code> when not available.
-	 */
-	public String getImportFilePathName() {
+   /**
+    * @return Returns the full import file path name or <code>null</code> when not available.
+    */
+   public String getImportFilePathName() {
 
-		if (tourImportFilePath != null && tourImportFilePath.length() > 0) {
+      if (tourImportFilePath != null && tourImportFilePath.length() > 0) {
 
-			try {
+         try {
 
-				final Path importPath = Paths.get(tourImportFilePath, tourImportFileName);
+            final Path importPath = Paths.get(tourImportFilePath, tourImportFileName);
 
-				return importPath.toString();
+            return importPath.toString();
 
-			} catch (final Exception e) {
-				// folder can be invalid
-			}
-		}
+         } catch (final Exception e) {
+            // folder can be invalid
+         }
+      }
 
-		return null;
-	}
+      return null;
+   }
 
-	/**
-	 * @return Returns the full import file path name or an empty string when not available.
-	 */
-	public String getImportFilePathNameText() {
+   /**
+    * @return Returns the full import file path name or an empty string when not available.
+    */
+   public String getImportFilePathNameText() {
 
-		if (tourImportFilePath == null || tourImportFilePath.length() == 0) {
+      if (tourImportFilePath == null || tourImportFilePath.length() == 0) {
 
-			if (isManualTour()) {
-				return UI.EMPTY_STRING;
-			} else {
-				return Messages.tour_data_label_feature_since_version_9_01;
-			}
+         if (isManualTour()) {
+            return UI.EMPTY_STRING;
+         } else {
+            return Messages.tour_data_label_feature_since_version_9_01;
+         }
 
-		} else {
+      } else {
 
-			try {
+         try {
 
-				final Path importPath = Paths.get(tourImportFilePath, tourImportFileName);
+            final Path importPath = Paths.get(tourImportFilePath, tourImportFileName);
 
-				return importPath.toString();
+            return importPath.toString();
 
-			} catch (final Exception e) {
-				// folder can be invalid
-			}
-		}
+         } catch (final Exception e) {
+            // folder can be invalid
+         }
+      }
 
-		return UI.EMPTY_STRING;
-	}
+      return UI.EMPTY_STRING;
+   }
 
-	/**
-	 * @return the maxAltitude
-	 */
-	public float getMaxAltitude() {
-		return maxAltitude;
-	}
+   /**
+    * @return the maxAltitude
+    */
+   public float getMaxAltitude() {
+      return maxAltitude;
+   }
 
-	/**
-	 * @return the maxPulse
-	 */
-	public float getMaxPulse() {
-		return maxPulse;
-	}
+   /**
+    * @return the maxPulse
+    */
+   public float getMaxPulse() {
+      return maxPulse;
+   }
 
-	/**
-	 * @return the maxSpeed
-	 */
-	public float getMaxSpeed() {
-		return maxSpeed;
-	}
+   /**
+    * @return the maxSpeed
+    */
+   public float getMaxSpeed() {
+      return maxSpeed;
+   }
 
-	public int getMergedAltitudeOffset() {
-		return mergedAltitudeOffset;
-	}
+   public int getMergedAltitudeOffset() {
+      return mergedAltitudeOffset;
+   }
 
-	public int getMergedTourTimeOffset() {
-		return mergedTourTimeOffset;
-	}
+   public int getMergedTourTimeOffset() {
+      return mergedTourTimeOffset;
+   }
 
-	public TourData getMergeSourceTourData() {
-		return _mergeSourceTourData;
-	}
+   public TourData getMergeSourceTourData() {
+      return _mergeSourceTourData;
+   }
 
-	/**
-	 * @return tour id which is merged into this tour
-	 */
-	public Long getMergeSourceTourId() {
-		return mergeSourceTourId;
-	}
+   /**
+    * @return tour id which is merged into this tour
+    */
+   public Long getMergeSourceTourId() {
+      return mergeSourceTourId;
+   }
 
-	/**
-	 * @return tour Id into which this tour is merged or <code>null</code> when this tour is not
-	 *         merged into another tour
-	 */
-	public Long getMergeTargetTourId() {
-		return mergeTargetTourId;
-	}
+   /**
+    * @return tour Id into which this tour is merged or <code>null</code> when this tour is not
+    *         merged into another tour
+    */
+   public Long getMergeTargetTourId() {
+      return mergeTargetTourId;
+   }
 
-	/**
-	 * @return Returns the distance serie from the metric system, the distance serie is <b>always</b>
-	 *         saved in the database with the metric system
-	 */
-	public float[] getMetricDistanceSerie() {
-		return distanceSerie;
-	}
+   /**
+    * @return Returns the distance serie from the metric system, the distance serie is <b>always</b>
+    *         saved in the database with the metric system
+    */
+   public float[] getMetricDistanceSerie() {
+      return distanceSerie;
+   }
 
-	/**
-	 * @param geoAccuracy
-	 * @param distanceAccuracy
-	 * @return Returns tour lat/lon data multiplied by {@link #NORMALIZED_GEO_DATA_FACTOR} and
-	 *         normalized (removed duplicates), or <code>null</code> when not available
-	 */
-	public NormalizedGeoData getNormalizedLatLon(final int geoAccuracy, final int distanceAccuracy) {
+   /**
+    * @param geoAccuracy
+    * @param distanceAccuracy
+    * @return Returns tour lat/lon data multiplied by {@link #NORMALIZED_GEO_DATA_FACTOR} and
+    *         normalized (removed duplicates), or <code>null</code> when not available
+    */
+   public NormalizedGeoData getNormalizedLatLon(final int geoAccuracy, final int distanceAccuracy) {
 
-		if (latitudeSerie == null) {
-			return null;
-		}
+      if (latitudeSerie == null) {
+         return null;
+      }
 
-		if (_rasterizedLatLon == null || _normalizedGeoAccuracy != geoAccuracy) {
-			_rasterizedLatLon = computeGeo_NormalizeLatLon(0, latitudeSerie.length - 1, geoAccuracy, distanceAccuracy);
-		}
+      if (_rasterizedLatLon == null || _normalizedGeoAccuracy != geoAccuracy) {
+         _rasterizedLatLon = computeGeo_NormalizeLatLon(0, latitudeSerie.length - 1, geoAccuracy, distanceAccuracy);
+      }
 
-		return _rasterizedLatLon;
-	}
+      return _rasterizedLatLon;
+   }
 
-	/**
-	 * @return Returns number of HR zones which are available for this tour. Will be 0 when HR zones
-	 *         are not defined.
-	 */
-	public int getNumberOfHrZones() {
+   /**
+    * @return Returns number of HR zones which are available for this tour. Will be 0 when HR zones
+    *         are not defined.
+    */
+   public int getNumberOfHrZones() {
 
-		if (_hrZones == null) {
-			computeHrZones();
-		}
+      if (_hrZones == null) {
+         computeHrZones();
+      }
 
-		return numberOfHrZones;
-	}
+      return numberOfHrZones;
+   }
 
-	public int getNumberOfTimeSlices() {
-		return numberOfTimeSlices;
-	}
+   public int getNumberOfTimeSlices() {
+      return numberOfTimeSlices;
+   }
 
-	/**
-	 * @return Returns pace minute data serie in the current measurement system
-	 */
-	public float[] getPaceSerie() {
+   /**
+    * @return Returns pace minute data serie in the current measurement system
+    */
+   public float[] getPaceSerie() {
 
-		if (UI.UNIT_VALUE_DISTANCE == 1) {
+      if (UI.UNIT_VALUE_DISTANCE == 1) {
 
-			// use metric system
+         // use metric system
 
-			if (paceSerieMinute == null) {
-				computeSpeedSerie();
-			}
+         if (paceSerieMinute == null) {
+            computeSpeedSerie();
+         }
 
-			return paceSerieMinute;
+         return paceSerieMinute;
 
-		} else {
+      } else {
 
-			// use imperial system
+         // use imperial system
 
-			if (paceSerieMinuteImperial == null) {
-				computeSpeedSerie();
-			}
+         if (paceSerieMinuteImperial == null) {
+            computeSpeedSerie();
+         }
 
-			return paceSerieMinuteImperial;
-		}
-	}
+         return paceSerieMinuteImperial;
+      }
+   }
 
-	public float[] getPaceSerieSeconds() {
+   public float[] getPaceSerieSeconds() {
 
-		if (UI.UNIT_VALUE_DISTANCE == 1) {
+      if (UI.UNIT_VALUE_DISTANCE == 1) {
 
-			// use metric system
+         // use metric system
 
-			if (paceSerieSeconds == null) {
-				computeSpeedSerie();
-			}
+         if (paceSerieSeconds == null) {
+            computeSpeedSerie();
+         }
 
-			return paceSerieSeconds;
+         return paceSerieSeconds;
 
-		} else {
+      } else {
 
-			// use imperial system
+         // use imperial system
 
-			if (paceSerieSecondsImperial == null) {
-				computeSpeedSerie();
-			}
+         if (paceSerieSecondsImperial == null) {
+            computeSpeedSerie();
+         }
 
-			return paceSerieSecondsImperial;
-		}
-	}
+         return paceSerieSecondsImperial;
+      }
+   }
 
-	public int getPhotoTimeAdjustment() {
-		return photoTimeAdjustment;
-	}
+   public int getPhotoTimeAdjustment() {
+      return photoTimeAdjustment;
+   }
 
-	public float getPower_Avg() {
-		return power_Avg;
-	}
+   public float getPower_Avg() {
+      return power_Avg;
+   }
 
-	public float getPower_AvgLeftPedalSmoothness() {
-		return power_AvgLeftPedalSmoothness;
-	}
+   public float getPower_AvgLeftPedalSmoothness() {
+      return power_AvgLeftPedalSmoothness;
+   }
 
-	public float getPower_AvgLeftTorqueEffectiveness() {
-		return power_AvgLeftTorqueEffectiveness;
-	}
+   public float getPower_AvgLeftTorqueEffectiveness() {
+      return power_AvgLeftTorqueEffectiveness;
+   }
 
-	public float getPower_AvgRightPedalSmoothness() {
-		return power_AvgRightPedalSmoothness;
-	}
+   public float getPower_AvgRightPedalSmoothness() {
+      return power_AvgRightPedalSmoothness;
+   }
 
-	public float getPower_AvgRightTorqueEffectiveness() {
-		return power_AvgRightTorqueEffectiveness;
-	}
+   public float getPower_AvgRightTorqueEffectiveness() {
+      return power_AvgRightTorqueEffectiveness;
+   }
 
-	/**
-	 * @return Returns Functional Threshold Power (FTP)
-	 */
-	public int getPower_FTP() {
-		return power_FTP;
-	}
+   /**
+    * @return Returns Functional Threshold Power (FTP)
+    */
+   public int getPower_FTP() {
+      return power_FTP;
+   }
 
-	public float getPower_IntensityFactor() {
-		return power_IntensityFactor;
-	}
+   public float getPower_IntensityFactor() {
+      return power_IntensityFactor;
+   }
 
-	public int getPower_Max() {
-		return power_Max;
-	}
+   public int getPower_Max() {
+      return power_Max;
+   }
 
-	public int getPower_Normalized() {
-		return power_Normalized;
-	}
+   public int getPower_Normalized() {
+      return power_Normalized;
+   }
 
-	public int getPower_PedalLeftRightBalance() {
-		return power_PedalLeftRightBalance;
-	}
+   public int getPower_PedalLeftRightBalance() {
+      return power_PedalLeftRightBalance;
+   }
 
-	public long getPower_TotalWork() {
-		return power_TotalWork;
-	}
+   public long getPower_TotalWork() {
+      return power_TotalWork;
+   }
 
-	public float getPower_TrainingStressScore() {
-		return power_TrainingStressScore;
-	}
+   public float getPower_TrainingStressScore() {
+      return power_TrainingStressScore;
+   }
 
-	public float[] getPowerSerie() {
+   public float[] getPowerSerie() {
 
-		if (powerSerie != null || isPowerSerieFromDevice) {
-			return powerSerie;
-		}
+      if (powerSerie != null || isPowerSerieFromDevice) {
+         return powerSerie;
+      }
 
-		if (speedSerie == null || gradientSerie == null) {
-			computeSmoothedDataSeries();
-		}
+      if (speedSerie == null || gradientSerie == null) {
+         computeSmoothedDataSeries();
+      }
 
-		// check if required data series are available
-		if ((speedSerie == null) || (gradientSerie == null)) {
-			return null;
-		}
+      // check if required data series are available
+      if ((speedSerie == null) || (gradientSerie == null)) {
+         return null;
+      }
 
-		powerSerie = new float[timeSerie.length];
+      powerSerie = new float[timeSerie.length];
 
-		final float weightBody = 75;
-		final float weightBike = 10;
-		final float bodyHeight = 188;
+      final float weightBody = 75;
+      final float weightBike = 10;
+      final float bodyHeight = 188;
 
-		final float cR = 0.008f; // Rollreibungskoeffizient Asphalt
-		final float cD = 0.8f; // Streomungskoeffizient
-		final float p = 1.145f; // 20C / 400m
+      final float cR = 0.008f; // Rollreibungskoeffizient Asphalt
+      final float cD = 0.8f; // Streomungskoeffizient
+      final float p = 1.145f; // 20C / 400m
 //      float p = 0.968f; // 10C / 2000m
 
-		final float weightTotal = weightBody + weightBike;
-		final float bsa = (float) (0.007184f * Math.pow(weightBody, 0.425) * Math.pow(bodyHeight, 0.725));
-		final float aP = bsa * 0.185f;
+      final float weightTotal = weightBody + weightBike;
+      final float bsa = (float) (0.007184f * Math.pow(weightBody, 0.425) * Math.pow(bodyHeight, 0.725));
+      final float aP = bsa * 0.185f;
 
-		final float roll = weightTotal * 9.81f * cR;
-		final float slope = weightTotal * 9.81f; // * gradient/100
-		final float air = 0.5f * p * cD * aP; // * v2;
+      final float roll = weightTotal * 9.81f * cR;
+      final float slope = weightTotal * 9.81f; // * gradient/100
+      final float air = 0.5f * p * cD * aP; // * v2;
 
 //      int joule = 0;
 //      int prefTime = 0;
 
-		for (int timeIndex = 0; timeIndex < timeSerie.length; timeIndex++) {
+      for (int timeIndex = 0; timeIndex < timeSerie.length; timeIndex++) {
 
-			final float speed = speedSerie[timeIndex] / 3.6f; // speed km/h -> m/s
-			float gradient = gradientSerie[timeIndex] / 100; // gradient (%) /100
+         final float speed = speedSerie[timeIndex] / 3.6f; // speed km/h -> m/s
+         float gradient = gradientSerie[timeIndex] / 100; // gradient (%) /100
 
-			// adjust computed errors
+         // adjust computed errors
 //         if (gradient < 0.04 && gradient > 0) {
 //            gradient *= 0.5;
 ////            gradient = 0;
 //         }
 
-			if (gradient < 0) {
-				if (gradient < -0.02) {
-					gradient *= 3;
-				} else {
-					gradient *= 1.5;
-				}
-			}
+         if (gradient < 0) {
+            if (gradient < -0.02) {
+               gradient *= 3;
+            } else {
+               gradient *= 1.5;
+            }
+         }
 
-			final float slopeTotal = slope * gradient;
-			final float airTotal = air * speed * speed;
+         final float slopeTotal = slope * gradient;
+         final float airTotal = air * speed * speed;
 
-			final float total = roll + airTotal + slopeTotal;
+         final float total = roll + airTotal + slopeTotal;
 
-			float pTotal = total * speed;
+         float pTotal = total * speed;
 
 //         if (pTotal > 600) {
 //            pTotal = pTotal * 1;
 //         }
-			pTotal = pTotal < 0 ? 0 : pTotal;
+         pTotal = pTotal < 0 ? 0 : pTotal;
 
-			powerSerie[timeIndex] = pTotal;
+         powerSerie[timeIndex] = pTotal;
 
 //         final int currentTime = timeSerie[timeIndex];
 //         joule += pTotal * (currentTime - prefTime);
 
 //         prefTime = currentTime;
-		}
+      }
 
-		return powerSerie;
-	}
+      return powerSerie;
+   }
 
-	public float[] getPulseSmoothedSerie() {
+   public float[] getPulseSmoothedSerie() {
 
-		if (pulseSerie == null) {
-			return null;
-		}
+      if (pulseSerie == null) {
+         return null;
+      }
 
-		if (pulseSerieSmoothed != null) {
-			return pulseSerieSmoothed;
-		}
+      if (pulseSerieSmoothed != null) {
+         return pulseSerieSmoothed;
+      }
 
-		computePulseSmoothed();
+      computePulseSmoothed();
 
-		return pulseSerieSmoothed;
-	}
+      return pulseSerieSmoothed;
+   }
 
-	public int getRearShiftCount() {
-		return rearShiftCount;
-	}
+   public int getRearShiftCount() {
+      return rearShiftCount;
+   }
 
-	public int getRestPulse() {
-		return restPulse;
-	}
+   public int getRestPulse() {
+      return restPulse;
+   }
 
-	/**
-	 * @return Returns the UI values for stance time.
-	 */
-	public float[] getRunDyn_StanceTime() {
+   /**
+    * @return Returns the UI values for stance time.
+    */
+   public float[] getRunDyn_StanceTime() {
 
-		if (_runDyn_StanceTime_UI == null) {
+      if (_runDyn_StanceTime_UI == null) {
 
-			if (runDyn_StanceTime != null) {
+         if (runDyn_StanceTime != null) {
 
-				// create UI data serie
+            // create UI data serie
 
-				final int serieSize = runDyn_StanceTime.length;
+            final int serieSize = runDyn_StanceTime.length;
 
-				_runDyn_StanceTime_UI = new float[serieSize];
+            _runDyn_StanceTime_UI = new float[serieSize];
 
-				for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
-					_runDyn_StanceTime_UI[serieIndex] = runDyn_StanceTime[serieIndex];
-				}
-			}
-		}
+            for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
+               _runDyn_StanceTime_UI[serieIndex] = runDyn_StanceTime[serieIndex];
+            }
+         }
+      }
 
-		return _runDyn_StanceTime_UI;
-	}
+      return _runDyn_StanceTime_UI;
+   }
 
-	public float getRunDyn_StanceTime_Avg() {
-		return runDyn_StanceTime_Avg;
-	}
+   public float getRunDyn_StanceTime_Avg() {
+      return runDyn_StanceTime_Avg;
+   }
 
-	public short getRunDyn_StanceTime_Max() {
-		return runDyn_StanceTime_Max;
-	}
+   public short getRunDyn_StanceTime_Max() {
+      return runDyn_StanceTime_Max;
+   }
 
-	public short getRunDyn_StanceTime_Min() {
-		return runDyn_StanceTime_Min;
-	}
+   public short getRunDyn_StanceTime_Min() {
+      return runDyn_StanceTime_Min;
+   }
 
-	/**
-	 * @return Returns the UI values for stance time balance
-	 */
-	public float[] getRunDyn_StanceTimeBalance() {
+   /**
+    * @return Returns the UI values for stance time balance
+    */
+   public float[] getRunDyn_StanceTimeBalance() {
 
-		if (_runDyn_StanceTimeBalance_UI == null) {
+      if (_runDyn_StanceTimeBalance_UI == null) {
 
-			if (runDyn_StanceTimeBalance != null) {
+         if (runDyn_StanceTimeBalance != null) {
 
-				// create UI data serie
+            // create UI data serie
 
-				final int serieSize = runDyn_StanceTimeBalance.length;
+            final int serieSize = runDyn_StanceTimeBalance.length;
 
-				_runDyn_StanceTimeBalance_UI = new float[serieSize];
+            _runDyn_StanceTimeBalance_UI = new float[serieSize];
 
-				for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
-					_runDyn_StanceTimeBalance_UI[serieIndex] = runDyn_StanceTimeBalance[serieIndex] / RUN_DYN_DATA_MULTIPLIER;
-				}
-			}
-		}
+            for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
+               _runDyn_StanceTimeBalance_UI[serieIndex] = runDyn_StanceTimeBalance[serieIndex] / RUN_DYN_DATA_MULTIPLIER;
+            }
+         }
+      }
 
-		return _runDyn_StanceTimeBalance_UI;
-	}
+      return _runDyn_StanceTimeBalance_UI;
+   }
 
-	public float getRunDyn_StanceTimeBalance_Avg() {
-		return runDyn_StanceTimeBalance_Avg / TourData.RUN_DYN_DATA_MULTIPLIER;
-	}
+   public float getRunDyn_StanceTimeBalance_Avg() {
+      return runDyn_StanceTimeBalance_Avg / TourData.RUN_DYN_DATA_MULTIPLIER;
+   }
 
-	public float getRunDyn_StanceTimeBalance_Max() {
-		return runDyn_StanceTimeBalance_Max / TourData.RUN_DYN_DATA_MULTIPLIER;
-	}
+   public float getRunDyn_StanceTimeBalance_Max() {
+      return runDyn_StanceTimeBalance_Max / TourData.RUN_DYN_DATA_MULTIPLIER;
+   }
 
-	public float getRunDyn_StanceTimeBalance_Min() {
-		return runDyn_StanceTimeBalance_Min / TourData.RUN_DYN_DATA_MULTIPLIER;
-	}
+   public float getRunDyn_StanceTimeBalance_Min() {
+      return runDyn_StanceTimeBalance_Min / TourData.RUN_DYN_DATA_MULTIPLIER;
+   }
 
-	/**
-	 * @return Returns the metric/imperial UI values for step length
-	 */
-	public float[] getRunDyn_StepLength() {
+   /**
+    * @return Returns the metric/imperial UI values for step length
+    */
+   public float[] getRunDyn_StepLength() {
 
-		if (UI.UNIT_VALUE_DISTANCE == 1) {
+      if (UI.UNIT_VALUE_DISTANCE == 1) {
 
-			// use metric system
+         // use metric system
 
-			if (_runDyn_StepLength_UI == null) {
+         if (_runDyn_StepLength_UI == null) {
 
-				if (runDyn_StepLength != null) {
+            if (runDyn_StepLength != null) {
 
-					// create UI data serie
+               // create UI data serie
 
-					final int serieSize = runDyn_StepLength.length;
+               final int serieSize = runDyn_StepLength.length;
 
-					_runDyn_StepLength_UI = new float[serieSize];
+               _runDyn_StepLength_UI = new float[serieSize];
 
-					for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
-						_runDyn_StepLength_UI[serieIndex] = runDyn_StepLength[serieIndex];
-					}
-				}
-			}
+               for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
+                  _runDyn_StepLength_UI[serieIndex] = runDyn_StepLength[serieIndex];
+               }
+            }
+         }
 
-			return _runDyn_StepLength_UI;
+         return _runDyn_StepLength_UI;
 
-		} else {
+      } else {
 
-			// use imperial system
+         // use imperial system
 
-			if (_runDyn_StepLength_UI_Imperial == null) {
+         if (_runDyn_StepLength_UI_Imperial == null) {
 
-				if (runDyn_StepLength != null) {
+            if (runDyn_StepLength != null) {
 
-					// create UI data serie
+               // create UI data serie
 
-					final int serieSize = runDyn_StepLength.length;
+               final int serieSize = runDyn_StepLength.length;
 
-					_runDyn_StepLength_UI_Imperial = new float[serieSize];
+               _runDyn_StepLength_UI_Imperial = new float[serieSize];
 
-					for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
-						_runDyn_StepLength_UI_Imperial[serieIndex] = runDyn_StepLength[serieIndex] * UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
-					}
-				}
-			}
+               for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
+                  _runDyn_StepLength_UI_Imperial[serieIndex] = runDyn_StepLength[serieIndex] * UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
+               }
+            }
+         }
 
-			return _runDyn_StepLength_UI_Imperial;
-		}
-	}
+         return _runDyn_StepLength_UI_Imperial;
+      }
+   }
 
-	public float getRunDyn_StepLength_Avg() {
-		return runDyn_StepLength_Avg;
-	}
+   public float getRunDyn_StepLength_Avg() {
+      return runDyn_StepLength_Avg;
+   }
 
-	public short getRunDyn_StepLength_Max() {
-		return runDyn_StepLength_Max;
-	}
+   public short getRunDyn_StepLength_Max() {
+      return runDyn_StepLength_Max;
+   }
 
-	public short getRunDyn_StepLength_Min() {
-		return runDyn_StepLength_Min;
-	}
+   public short getRunDyn_StepLength_Min() {
+      return runDyn_StepLength_Min;
+   }
 
-	/**
-	 * @return Returns the metric/imperial UI values for vertical oscillation
-	 */
-	public float[] getRunDyn_VerticalOscillation() {
+   /**
+    * @return Returns the metric/imperial UI values for vertical oscillation
+    */
+   public float[] getRunDyn_VerticalOscillation() {
 
-		if (UI.UNIT_VALUE_DISTANCE == 1) {
+      if (UI.UNIT_VALUE_DISTANCE == 1) {
 
-			// use metric system
+         // use metric system
 
-			if (_runDyn_VerticalOscillation_UI == null) {
+         if (_runDyn_VerticalOscillation_UI == null) {
 
-				if (runDyn_VerticalOscillation != null) {
+            if (runDyn_VerticalOscillation != null) {
 
-					// create UI data serie
+               // create UI data serie
 
-					final int serieSize = runDyn_VerticalOscillation.length;
+               final int serieSize = runDyn_VerticalOscillation.length;
 
-					_runDyn_VerticalOscillation_UI = new float[serieSize];
+               _runDyn_VerticalOscillation_UI = new float[serieSize];
 
-					for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
-						_runDyn_VerticalOscillation_UI[serieIndex] = runDyn_VerticalOscillation[serieIndex] / RUN_DYN_DATA_MULTIPLIER;
-					}
-				}
-			}
+               for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
+                  _runDyn_VerticalOscillation_UI[serieIndex] = runDyn_VerticalOscillation[serieIndex] / RUN_DYN_DATA_MULTIPLIER;
+               }
+            }
+         }
 
-			return _runDyn_VerticalOscillation_UI;
+         return _runDyn_VerticalOscillation_UI;
 
-		} else {
+      } else {
 
-			// use imperial system
+         // use imperial system
 
-			if (_runDyn_VerticalOscillation_UI_Imperial == null) {
+         if (_runDyn_VerticalOscillation_UI_Imperial == null) {
 
-				if (runDyn_VerticalOscillation != null) {
+            if (runDyn_VerticalOscillation != null) {
 
-					// create UI data serie
+               // create UI data serie
 
-					final int serieSize = runDyn_VerticalOscillation.length;
+               final int serieSize = runDyn_VerticalOscillation.length;
 
-					_runDyn_VerticalOscillation_UI_Imperial = new float[serieSize];
+               _runDyn_VerticalOscillation_UI_Imperial = new float[serieSize];
 
-					for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
-						_runDyn_VerticalOscillation_UI_Imperial[serieIndex] = runDyn_VerticalOscillation[serieIndex] / RUN_DYN_DATA_MULTIPLIER
-								* UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
-					}
-				}
-			}
+               for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
+                  _runDyn_VerticalOscillation_UI_Imperial[serieIndex] = runDyn_VerticalOscillation[serieIndex] / RUN_DYN_DATA_MULTIPLIER
+                        * UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
+               }
+            }
+         }
 
-			return _runDyn_VerticalOscillation_UI_Imperial;
-		}
-	}
+         return _runDyn_VerticalOscillation_UI_Imperial;
+      }
+   }
 
-	public float getRunDyn_VerticalOscillation_Avg() {
-		return runDyn_VerticalOscillation_Avg / TourData.RUN_DYN_DATA_MULTIPLIER;
-	}
+   public float getRunDyn_VerticalOscillation_Avg() {
+      return runDyn_VerticalOscillation_Avg / TourData.RUN_DYN_DATA_MULTIPLIER;
+   }
 
-	public float getRunDyn_VerticalOscillation_Max() {
-		return runDyn_VerticalOscillation_Max / TourData.RUN_DYN_DATA_MULTIPLIER;
-	}
+   public float getRunDyn_VerticalOscillation_Max() {
+      return runDyn_VerticalOscillation_Max / TourData.RUN_DYN_DATA_MULTIPLIER;
+   }
 
-	public float getRunDyn_VerticalOscillation_Min() {
-		return runDyn_VerticalOscillation_Min / TourData.RUN_DYN_DATA_MULTIPLIER;
-	}
+   public float getRunDyn_VerticalOscillation_Min() {
+      return runDyn_VerticalOscillation_Min / TourData.RUN_DYN_DATA_MULTIPLIER;
+   }
 
-	/**
-	 * @return Returns the UI values for vertical ratio
-	 */
-	public float[] getRunDyn_VerticalRatio() {
+   /**
+    * @return Returns the UI values for vertical ratio
+    */
+   public float[] getRunDyn_VerticalRatio() {
 
-		if (_runDyn_VerticalRatio_UI == null) {
+      if (_runDyn_VerticalRatio_UI == null) {
 
-			if (runDyn_VerticalRatio != null) {
+         if (runDyn_VerticalRatio != null) {
 
-				// create UI data serie
+            // create UI data serie
 
-				final int serieSize = runDyn_VerticalRatio.length;
+            final int serieSize = runDyn_VerticalRatio.length;
 
-				_runDyn_VerticalRatio_UI = new float[serieSize];
+            _runDyn_VerticalRatio_UI = new float[serieSize];
 
-				for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
-					_runDyn_VerticalRatio_UI[serieIndex] = runDyn_VerticalRatio[serieIndex] / RUN_DYN_DATA_MULTIPLIER;
-				}
-			}
-		}
+            for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
+               _runDyn_VerticalRatio_UI[serieIndex] = runDyn_VerticalRatio[serieIndex] / RUN_DYN_DATA_MULTIPLIER;
+            }
+         }
+      }
 
-		return _runDyn_VerticalRatio_UI;
-	}
+      return _runDyn_VerticalRatio_UI;
+   }
 
-	public float getRunDyn_VerticalRatio_Avg() {
-		return runDyn_VerticalRatio_Avg / TourData.RUN_DYN_DATA_MULTIPLIER;
-	}
+   public float getRunDyn_VerticalRatio_Avg() {
+      return runDyn_VerticalRatio_Avg / TourData.RUN_DYN_DATA_MULTIPLIER;
+   }
 
-	public float getRunDyn_VerticalRatio_Max() {
-		return runDyn_VerticalRatio_Max / TourData.RUN_DYN_DATA_MULTIPLIER;
-	}
+   public float getRunDyn_VerticalRatio_Max() {
+      return runDyn_VerticalRatio_Max / TourData.RUN_DYN_DATA_MULTIPLIER;
+   }
 
-	public float getRunDyn_VerticalRatio_Min() {
-		return runDyn_VerticalRatio_Min / TourData.RUN_DYN_DATA_MULTIPLIER;
-	}
+   public float getRunDyn_VerticalRatio_Min() {
+      return runDyn_VerticalRatio_Min / TourData.RUN_DYN_DATA_MULTIPLIER;
+   }
 
-	/**
-	 * @return the speed data in the current measurement system, which is defined in
-	 *         {@link UI#UNIT_VALUE_DISTANCE}
-	 */
-	public float[] getSpeedSerie() {
+   /**
+    * @return the speed data in the current measurement system, which is defined in
+    *         {@link UI#UNIT_VALUE_DISTANCE}
+    */
+   public float[] getSpeedSerie() {
 
-		if (isSpeedSerieFromDevice) {
-			return getSpeedSerieInternal();
-		}
-		if (distanceSerie == null) {
-			return null;
-		}
+      if (isSpeedSerieFromDevice) {
+         return getSpeedSerieInternal();
+      }
+      if (distanceSerie == null) {
+         return null;
+      }
 
-		return getSpeedSerieInternal();
-	}
+      return getSpeedSerieInternal();
+   }
 
-	public float[] getSpeedSerieFromDevice() {
+   public float[] getSpeedSerieFromDevice() {
 
-		if (isSpeedSerieFromDevice) {
-			return speedSerie;
-		}
+      if (isSpeedSerieFromDevice) {
+         return speedSerie;
+      }
 
-		return null;
-	}
+      return null;
+   }
 
-	private float[] getSpeedSerieInternal() {
+   private float[] getSpeedSerieInternal() {
 
-		computeSpeedSerie();
+      computeSpeedSerie();
 
-		/*
-		 * when the speed series are not computed, the internal algorithm will be used to create the
-		 * speed data serie
-		 */
-		if (UI.UNIT_VALUE_DISTANCE == 1) {
+      /*
+       * when the speed series are not computed, the internal algorithm will be used to create the
+       * speed data serie
+       */
+      if (UI.UNIT_VALUE_DISTANCE == 1) {
 
-			// use metric system
+         // use metric system
 
-			return speedSerie;
+         return speedSerie;
 
-		} else {
+      } else {
 
-			// use imperial system
+         // use imperial system
 
-			return speedSerieImperial;
-		}
-	}
+         return speedSerieImperial;
+      }
+   }
 
-	/**
-	 * @return returns the speed data in the metric measurement system
-	 */
-	public float[] getSpeedSerieMetric() {
+   /**
+    * @return returns the speed data in the metric measurement system
+    */
+   public float[] getSpeedSerieMetric() {
 
-		computeSpeedSerie();
+      computeSpeedSerie();
 
-		return speedSerie;
-	}
+      return speedSerie;
+   }
 
-	/**
-	 * @return Returns SRTM metric or imperial data serie depending on the active measurement or
-	 *         <code>null</code> when SRTM data serie is not available
-	 */
-	public float[] getSRTMSerie() {
+   /**
+    * @return Returns SRTM metric or imperial data serie depending on the active measurement or
+    *         <code>null</code> when SRTM data serie is not available
+    */
+   public float[] getSRTMSerie() {
 
-		if (latitudeSerie == null) {
-			return null;
-		}
+      if (latitudeSerie == null) {
+         return null;
+      }
 
-		if (srtmSerie == null) {
-			createSRTMDataSerie();
-		}
+      if (srtmSerie == null) {
+         createSRTMDataSerie();
+      }
 
-		if (srtmSerie.length == 0) {
-			// SRTM data are invalid
-			return null;
-		}
+      if (srtmSerie.length == 0) {
+         // SRTM data are invalid
+         return null;
+      }
 
-		if (UI.UNIT_VALUE_ALTITUDE != 1) {
+      if (UI.UNIT_VALUE_ALTITUDE != 1) {
 
-			// imperial system is used
+         // imperial system is used
 
-			return srtmSerieImperial;
+         return srtmSerieImperial;
 
-		} else {
+      } else {
 
-			return srtmSerie;
-		}
-	}
+         return srtmSerie;
+      }
+   }
 
-	/**
-	 * @return Returned SRTM values:
-	 *         <p>
-	 *         metric <br>
-	 *         imperial
-	 *         <p>
-	 *         or <code>null</code> when SRTM data serie is not available
-	 */
-	public float[][] getSRTMValues() {
+   /**
+    * @return Returned SRTM values:
+    *         <p>
+    *         metric <br>
+    *         imperial
+    *         <p>
+    *         or <code>null</code> when SRTM data serie is not available
+    */
+   public float[][] getSRTMValues() {
 
-		if (latitudeSerie == null) {
-			return null;
-		}
+      if (latitudeSerie == null) {
+         return null;
+      }
 
-		if (srtmSerie == null) {
-			createSRTMDataSerie();
-		}
+      if (srtmSerie == null) {
+         createSRTMDataSerie();
+      }
 
-		if (srtmSerie.length == 0) {
-			// invalid SRTM values
-			return null;
-		}
+      if (srtmSerie.length == 0) {
+         // invalid SRTM values
+         return null;
+      }
 
-		return new float[][] { srtmSerie, srtmSerieImperial };
-	}
+      return new float[][] { srtmSerie, srtmSerieImperial };
+   }
 
-	public short getStartAltitude() {
-		return startAltitude;
-	}
+   public short getStartAltitude() {
+      return startAltitude;
+   }
 
-	public float getStartDistance() {
-		return startDistance;
-	}
+   public float getStartDistance() {
+      return startDistance;
+   }
 
-	public short getStartPulse() {
-		return startPulse;
-	}
+   public short getStartPulse() {
+      return startPulse;
+   }
 
-	/**
-	 * @return Returns the tour start date time in seconds of the day.
-	 */
-	public int getStartTimeOfDay() {
-		return (startHour * 3600) + (startMinute * 60) + startSecond;
+   /**
+    * @return Returns the tour start date time in seconds of the day.
+    */
+   public int getStartTimeOfDay() {
+      return (startHour * 3600) + (startMinute * 60) + startSecond;
 
-	}
+   }
 
-	public short getStartWeek() {
-		return startWeek;
-	}
+   public short getStartWeek() {
+      return startWeek;
+   }
 
-	public short getStartWeekYear() {
-		return startWeekYear;
-	}
+   public short getStartWeekYear() {
+      return startWeekYear;
+   }
 
-	public short getSurfing_MinDistance() {
-		return surfing_MinDistance;
-	}
+   public short getSurfing_MinDistance() {
+      return surfing_MinDistance;
+   }
 
-	public short getSurfing_MinSpeed_StartStop() {
-		return surfing_MinSpeed_StartStop;
-	}
+   public short getSurfing_MinSpeed_StartStop() {
+      return surfing_MinSpeed_StartStop;
+   }
 
-	public short getSurfing_MinSpeed_Surfing() {
-		return surfing_MinSpeed_Surfing;
-	}
+   public short getSurfing_MinSpeed_Surfing() {
+      return surfing_MinSpeed_Surfing;
+   }
 
-	public short getSurfing_MinTimeDuration() {
-		return surfing_MinTimeDuration;
-	}
+   public short getSurfing_MinTimeDuration() {
+      return surfing_MinTimeDuration;
+   }
 
-	public short getSurfing_NumberOfEvents() {
-		return surfing_NumberOfEvents;
-	}
+   public short getSurfing_NumberOfEvents() {
+      return surfing_NumberOfEvents;
+   }
 
-	/**
-	 * @return Returns the UI values for cadence.
-	 */
-	public float[] getSwim_Cadence() {
+   /**
+    * @return Returns the UI values for cadence.
+    */
+   public float[] getSwim_Cadence() {
 
-		if (_swim_Cadence_UI == null) {
-			_swim_Cadence_UI = createSwimUI_DataSerie(swim_Cadence);
-		}
+      if (_swim_Cadence_UI == null) {
+         _swim_Cadence_UI = createSwimUI_DataSerie(swim_Cadence);
+      }
 
-		return _swim_Cadence_UI;
-	}
+      return _swim_Cadence_UI;
+   }
 
-	/**
-	 * @return Returns the UI values for number of strokes.
-	 */
-	public float[] getSwim_Strokes() {
+   /**
+    * @return Returns the UI values for number of strokes.
+    */
+   public float[] getSwim_Strokes() {
 
-		if (_swim_Strokes_UI == null) {
-			_swim_Strokes_UI = createSwimUI_DataSerie(swim_Strokes);
-		}
+      if (_swim_Strokes_UI == null) {
+         _swim_Strokes_UI = createSwimUI_DataSerie(swim_Strokes);
+      }
 
-		return _swim_Strokes_UI;
-	}
+      return _swim_Strokes_UI;
+   }
 
-	/**
-	 * @return Returns the UI values for number of strokes.
-	 */
-	public float[] getSwim_StrokeStyle() {
+   /**
+    * @return Returns the UI values for number of strokes.
+    */
+   public float[] getSwim_StrokeStyle() {
 
-		if (_swim_StrokeStyle_UI == null) {
-			_swim_StrokeStyle_UI = createSwimUI_DataSerie(swim_StrokeStyle);
-		}
+      if (_swim_StrokeStyle_UI == null) {
+         _swim_StrokeStyle_UI = createSwimUI_DataSerie(swim_StrokeStyle);
+      }
 
-		return _swim_StrokeStyle_UI;
-	}
+      return _swim_StrokeStyle_UI;
+   }
 
-	/**
-	 * @return Returns the UI values for number of strokes.
-	 */
-	public float[] getSwim_Swolf() {
+   /**
+    * @return Returns the UI values for number of strokes.
+    */
+   public float[] getSwim_Swolf() {
 
-		if (_swim_Swolf == null) {
-			_swim_Swolf = createSwimUI_SwolfDataSerie();
-		}
+      if (_swim_Swolf == null) {
+         _swim_Swolf = createSwimUI_SwolfDataSerie();
+      }
 
-		return _swim_Swolf;
-	}
+      return _swim_Swolf;
+   }
 
-	/**
-	 * @return Returns the temperature serie for the current measurement system or <code>null</code>
-	 *         when temperature is not available
-	 */
-	public float[] getTemperatureSerie() {
+   /**
+    * @return Returns the temperature serie for the current measurement system or <code>null</code>
+    *         when temperature is not available
+    */
+   public float[] getTemperatureSerie() {
 
-		if (temperatureSerie == null) {
-			return null;
-		}
+      if (temperatureSerie == null) {
+         return null;
+      }
 
-		float[] serie;
+      float[] serie;
 
-		final float unitValueTempterature = UI.UNIT_VALUE_TEMPERATURE;
-		final float fahrenheitMulti = UI.UNIT_FAHRENHEIT_MULTI;
-		final float fahrenheitAdd = UI.UNIT_FAHRENHEIT_ADD;
+      final float unitValueTempterature = UI.UNIT_VALUE_TEMPERATURE;
+      final float fahrenheitMulti = UI.UNIT_FAHRENHEIT_MULTI;
+      final float fahrenheitAdd = UI.UNIT_FAHRENHEIT_ADD;
 
-		if (unitValueTempterature != 1) {
+      if (unitValueTempterature != 1) {
 
-			// use imperial system
+         // use imperial system
 
-			if (temperatureSerieImperial == null) {
+         if (temperatureSerieImperial == null) {
 
-				// compute imperial data
+            // compute imperial data
 
-				temperatureSerieImperial = new float[temperatureSerie.length];
+            temperatureSerieImperial = new float[temperatureSerie.length];
 
-				for (int valueIndex = 0; valueIndex < temperatureSerie.length; valueIndex++) {
+            for (int valueIndex = 0; valueIndex < temperatureSerie.length; valueIndex++) {
 
-					final float scaledTemperature = temperatureSerie[valueIndex];
+               final float scaledTemperature = temperatureSerie[valueIndex];
 
-					temperatureSerieImperial[valueIndex] = scaledTemperature * fahrenheitMulti + fahrenheitAdd;
-				}
-			}
-			serie = temperatureSerieImperial;
+               temperatureSerieImperial[valueIndex] = scaledTemperature * fahrenheitMulti + fahrenheitAdd;
+            }
+         }
+         serie = temperatureSerieImperial;
 
-		} else {
+      } else {
 
-			// use metric system
+         // use metric system
 
-			serie = temperatureSerie;
-		}
+         serie = temperatureSerie;
+      }
 
-		return serie;
-	}
+      return serie;
+   }
 
-	@XmlElement
-	public String getTest() {
-		return "jokl"; //$NON-NLS-1$
-	}
+   @XmlElement
+   public String getTest() {
+      return "jokl"; //$NON-NLS-1$
+   }
 
-	/**
-	 * @return Returns time data serie in floating points which is used for drawing charts.
-	 */
-	public double[] getTimeSerieDouble() {
+   /**
+    * @return Returns time data serie in floating points which is used for drawing charts.
+    */
+   public double[] getTimeSerieDouble() {
 
-		if (timeSerieDouble != null) {
-			return timeSerieDouble;
-		}
+      if (timeSerieDouble != null) {
+         return timeSerieDouble;
+      }
 
-		if (timeSerie == null && timeSerieHistory == null) {
-			return null;
-		}
+      if (timeSerie == null && timeSerieHistory == null) {
+         return null;
+      }
 
-		if (timeSerie != null) {
+      if (timeSerie != null) {
 
-			timeSerieDouble = new double[timeSerie.length];
+         timeSerieDouble = new double[timeSerie.length];
 
-			for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
-				timeSerieDouble[serieIndex] = timeSerie[serieIndex];
-			}
+         for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
+            timeSerieDouble[serieIndex] = timeSerie[serieIndex];
+         }
 
-		} else if (timeSerieHistory != null) {
+      } else if (timeSerieHistory != null) {
 
-			timeSerieDouble = new double[timeSerieHistory.length];
+         timeSerieDouble = new double[timeSerieHistory.length];
 
-			for (int serieIndex = 0; serieIndex < timeSerieHistory.length; serieIndex++) {
-				timeSerieDouble[serieIndex] = timeSerieHistory[serieIndex];
-			}
-		}
+         for (int serieIndex = 0; serieIndex < timeSerieHistory.length; serieIndex++) {
+            timeSerieDouble[serieIndex] = timeSerieHistory[serieIndex];
+         }
+      }
 
-		return timeSerieDouble;
-	}
+      return timeSerieDouble;
+   }
 
-	/**
-	 * @return Returns time data serie in floating points which is used for drawing charts. Time
-	 *         serie is adjusted to the time shift 6:32 when CET (central european time) started at
-	 *         1. April 1893.
-	 */
-	public double[] getTimeSerieWithTimeZoneAdjusted() {
+   /**
+    * @return Returns time data serie in floating points which is used for drawing charts. Time
+    *         serie is adjusted to the time shift 6:32 when CET (central european time) started at
+    *         1. April 1893.
+    */
+   public double[] getTimeSerieWithTimeZoneAdjusted() {
 
-		if (timeSerieWithTimeZoneAdjustment != null) {
-			return timeSerieWithTimeZoneAdjustment;
-		}
+      if (timeSerieWithTimeZoneAdjustment != null) {
+         return timeSerieWithTimeZoneAdjustment;
+      }
 
-		if (timeSerie == null && timeSerieHistory == null) {
-			return null;
-		}
+      if (timeSerie == null && timeSerieHistory == null) {
+         return null;
+      }
 
-		final ZonedDateTime tourStartDefaultZone = getTourStartTime();
-		final int utcZoneOffset = tourStartDefaultZone.getOffset().getTotalSeconds();
+      final ZonedDateTime tourStartDefaultZone = getTourStartTime();
+      final int utcZoneOffset = tourStartDefaultZone.getOffset().getTotalSeconds();
 
-		final long tourStartUTC = tourStartDefaultZone.plusSeconds(utcZoneOffset).toInstant().toEpochMilli();
-		final long tourEnd = tourEndTime;
+      final long tourStartUTC = tourStartDefaultZone.plusSeconds(utcZoneOffset).toInstant().toEpochMilli();
+      final long tourEnd = tourEndTime;
 
-		final ZoneId defaultZone = TimeTools.getDefaultTimeZone();
+      final ZoneId defaultZone = TimeTools.getDefaultTimeZone();
 
-		if (defaultZone.getId().equals(TIME_ZONE_ID_EUROPE_BERLIN)) {
+      if (defaultZone.getId().equals(TIME_ZONE_ID_EUROPE_BERLIN)) {
 
-			if (tourStartUTC < net.tourbook.common.UI.beforeCET && tourEnd > net.tourbook.common.UI.afterCETBegin) {
+         if (tourStartUTC < net.tourbook.common.UI.beforeCET && tourEnd > net.tourbook.common.UI.afterCETBegin) {
 
-				// tour overlaps CET begin
+            // tour overlaps CET begin
 
-				if (timeSerie != null) {
+            if (timeSerie != null) {
 
-					timeSerieWithTimeZoneAdjustment = new double[timeSerie.length];
+               timeSerieWithTimeZoneAdjustment = new double[timeSerie.length];
 
-					for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
-						timeSerieWithTimeZoneAdjustment[serieIndex] = timeSerie[serieIndex];
-					}
+               for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
+                  timeSerieWithTimeZoneAdjustment[serieIndex] = timeSerie[serieIndex];
+               }
 
-				} else if (timeSerieHistory != null) {
+            } else if (timeSerieHistory != null) {
 
-					timeSerieWithTimeZoneAdjustment = new double[timeSerieHistory.length];
+               timeSerieWithTimeZoneAdjustment = new double[timeSerieHistory.length];
 
-					for (int serieIndex = 0; serieIndex < timeSerieHistory.length; serieIndex++) {
+               for (int serieIndex = 0; serieIndex < timeSerieHistory.length; serieIndex++) {
 
-						long historyTimeSlice = timeSerieHistory[serieIndex];
+                  long historyTimeSlice = timeSerieHistory[serieIndex];
 
-						final long absoluteUTCTime = tourStartUTC + historyTimeSlice * 1000;
+                  final long absoluteUTCTime = tourStartUTC + historyTimeSlice * 1000;
 
-						if (absoluteUTCTime > net.tourbook.common.UI.beforeCET) {
-							historyTimeSlice += net.tourbook.common.UI.BERLIN_HISTORY_ADJUSTMENT;
-						}
+                  if (absoluteUTCTime > net.tourbook.common.UI.beforeCET) {
+                     historyTimeSlice += net.tourbook.common.UI.BERLIN_HISTORY_ADJUSTMENT;
+                  }
 
-						timeSerieWithTimeZoneAdjustment[serieIndex] = historyTimeSlice;
-					}
-				}
+                  timeSerieWithTimeZoneAdjustment[serieIndex] = historyTimeSlice;
+               }
+            }
 
-				return timeSerieWithTimeZoneAdjustment;
-			}
-		}
+            return timeSerieWithTimeZoneAdjustment;
+         }
+      }
 
-		return getTimeSerieDouble();
-	}
+      return getTimeSerieDouble();
+   }
 
-	/**
-	 * @return Returns Tour time zone ID or <code>null</code> when the time zone ID is not available.
-	 */
-	public String getTimeZoneId() {
-		return timeZoneId;
-	}
+   /**
+    * @return Returns Tour time zone ID or <code>null</code> when the time zone ID is not available.
+    */
+   public String getTimeZoneId() {
+      return timeZoneId;
+   }
 
-	/**
-	 * @return Returns the tour time zone id, when the tour time zone is not set in the tour, then
-	 *         the default time zone is returned which is defined in the preferences.
-	 */
-	public ZoneId getTimeZoneIdWithDefault() {
+   /**
+    * @return Returns the tour time zone id, when the tour time zone is not set in the tour, then
+    *         the default time zone is returned which is defined in the preferences.
+    */
+   public ZoneId getTimeZoneIdWithDefault() {
 
-		final String zoneIdRaw = timeZoneId == null //
+      final String zoneIdRaw = timeZoneId == null //
 
-				? TimeTools.getDefaultTimeZoneId()
-				: timeZoneId;
+            ? TimeTools.getDefaultTimeZoneId()
+            : timeZoneId;
 
-		final ZoneId tzId = ZoneId.of(zoneIdRaw);
+      final ZoneId tzId = ZoneId.of(zoneIdRaw);
 
-		return tzId;
-	}
+      return tzId;
+   }
 
-	public int getTourAltDown() {
-		return tourAltDown;
-	}
+   public int getTourAltDown() {
+      return tourAltDown;
+   }
 
-	public int getTourAltUp() {
-		return tourAltUp;
-	}
+   public int getTourAltUp() {
+      return tourAltUp;
+   }
 
-	public TourBike getTourBike() {
-		return tourBike;
-	}
+   public TourBike getTourBike() {
+      return tourBike;
+   }
 
-	/**
-	 * !!! THIS VALUE IS NOT CACHED BECAUSE WHEN THE DEFAULT TIME ZONE IS CHANGING THEN THIS VALUE IS
-	 * WRONG !!!
-	 */
-	public TourDateTime getTourDateTime() {
+   /**
+    * !!! THIS VALUE IS NOT CACHED BECAUSE WHEN THE DEFAULT TIME ZONE IS CHANGING THEN THIS VALUE IS
+    * WRONG !!!
+    */
+   public TourDateTime getTourDateTime() {
 
-		return TimeTools.createTourDateTime(tourStartTime, timeZoneId);
-	}
+      return TimeTools.createTourDateTime(tourStartTime, timeZoneId);
+   }
 
-	/**
-	 * @return Returns {@link #tourDescription} or an empty string when value is not set.
-	 */
-	public String getTourDescription() {
-		return tourDescription == null ? UI.EMPTY_STRING : tourDescription;
-	}
+   /**
+    * @return Returns {@link #tourDescription} or an empty string when value is not set.
+    */
+   public String getTourDescription() {
+      return tourDescription == null ? UI.EMPTY_STRING : tourDescription;
+   }
 
-	/**
-	 * @return the tour distance in metric measurement system
-	 */
-	public float getTourDistance() {
-		return tourDistance;
-	}
+   /**
+    * @return the tour distance in metric measurement system
+    */
+   public float getTourDistance() {
+      return tourDistance;
+   }
 
-	/**
-	 * @return Returns driving/moving time in seconds.
-	 */
-	public long getTourDrivingTime() {
-		return tourDrivingTime;
-	}
+   /**
+    * @return Returns driving/moving time in seconds.
+    */
+   public long getTourDrivingTime() {
+      return tourDrivingTime;
+   }
 
-	/**
-	 * @return Returns {@link #tourEndPlace} or an empty string when value is not set.
-	 */
-	public String getTourEndPlace() {
-		return tourEndPlace == null ? UI.EMPTY_STRING : tourEndPlace;
-	}
+   /**
+    * @return Returns {@link #tourEndPlace} or an empty string when value is not set.
+    */
+   public String getTourEndPlace() {
+      return tourEndPlace == null ? UI.EMPTY_STRING : tourEndPlace;
+   }
 
-	/**
-	 * @return Returns tour end time in ms, this value should be {@link #tourStartTime} +
-	 *         {@link #tourRecordingTime}
-	 */
-	public long getTourEndTimeMS() {
-		return tourEndTime;
-	}
+   /**
+    * @return Returns tour end time in ms, this value should be {@link #tourStartTime} +
+    *         {@link #tourRecordingTime}
+    */
+   public long getTourEndTimeMS() {
+      return tourEndTime;
+   }
 
-	/**
-	 * @return Returns the unique key in the database for this {@link TourData} entity
-	 */
-	public Long getTourId() {
-		return tourId;
-	}
+   /**
+    * @return Returns the unique key in the database for this {@link TourData} entity
+    */
+   public Long getTourId() {
+      return tourId;
+   }
 
-	/**
-	 * @return Returns a set with all {@link TourMarker} for the tour or an empty set when markers
-	 *         are not available.
-	 */
-	public Set<TourMarker> getTourMarkers() {
-		return tourMarkers;
-	}
+   /**
+    * @return Returns a set with all {@link TourMarker} for the tour or an empty set when markers
+    *         are not available.
+    */
+   public Set<TourMarker> getTourMarkers() {
+      return tourMarkers;
+   }
 
-	/**
-	 * @return Returns {@link TourMarker}'s sorted by serie index.
-	 */
-	public ArrayList<TourMarker> getTourMarkersSorted() {
+   /**
+    * @return Returns {@link TourMarker}'s sorted by serie index.
+    */
+   public ArrayList<TourMarker> getTourMarkersSorted() {
 
-		if (_sortedMarkers != null) {
-			return _sortedMarkers;
-		}
+      if (_sortedMarkers != null) {
+         return _sortedMarkers;
+      }
 
-		// sort markers by serie index
-		_sortedMarkers = new ArrayList<>(tourMarkers);
+      // sort markers by serie index
+      _sortedMarkers = new ArrayList<>(tourMarkers);
 
-		Collections.sort(_sortedMarkers, new Comparator<TourMarker>() {
-			@Override
-			public int compare(final TourMarker marker1, final TourMarker marker2) {
-				return marker1.getSerieIndex() - marker2.getSerieIndex();
-			}
-		});
+      Collections.sort(_sortedMarkers, new Comparator<TourMarker>() {
+         @Override
+         public int compare(final TourMarker marker1, final TourMarker marker2) {
+            return marker1.getSerieIndex() - marker2.getSerieIndex();
+         }
+      });
 
-		return _sortedMarkers;
-	}
+      return _sortedMarkers;
+   }
 
-	/**
-	 * @return Returns the person for which the tour is saved or <code>null</code> when the tour is
-	 *         not saved in the database.
-	 */
-	public TourPerson getTourPerson() {
-		return tourPerson;
-	}
+   /**
+    * @return Returns the person for which the tour is saved or <code>null</code> when the tour is
+    *         not saved in the database.
+    */
+   public TourPerson getTourPerson() {
+      return tourPerson;
+   }
 
-	/**
-	 * @return Returns all {@link TourPhoto}'s which are saved in this tour.
-	 */
-	public Set<TourPhoto> getTourPhotos() {
-		return tourPhotos;
-	}
+   /**
+    * @return Returns all {@link TourPhoto}'s which are saved in this tour.
+    */
+   public Set<TourPhoto> getTourPhotos() {
+      return tourPhotos;
+   }
 
-	/**
-	 * @return Returns total recording time in seconds
-	 */
-	public long getTourRecordingTime() {
-		return tourRecordingTime;
-	}
+   /**
+    * @return Returns total recording time in seconds
+    */
+   public long getTourRecordingTime() {
+      return tourRecordingTime;
+   }
 
-	public Collection<TourReference> getTourReferences() {
-		return tourReferences;
-	}
+   public Collection<TourReference> getTourReferences() {
+      return tourReferences;
+   }
 
-	/**
-	 * @return Returns {@link #tourStartPlace} or an empty string when value is not set
-	 */
-	public String getTourStartPlace() {
-		return tourStartPlace == null ? UI.EMPTY_STRING : tourStartPlace;
-	}
+   /**
+    * @return Returns {@link #tourStartPlace} or an empty string when value is not set
+    */
+   public String getTourStartPlace() {
+      return tourStartPlace == null ? UI.EMPTY_STRING : tourStartPlace;
+   }
 
-	/**
-	 * @return Returns the tour start date time with the tour time zone, when not available with the
-	 *         default time zone.
-	 */
-	public ZonedDateTime getTourStartTime() {
+   /**
+    * @return Returns the tour start date time with the tour time zone, when not available with the
+    *         default time zone.
+    */
+   public ZonedDateTime getTourStartTime() {
 
-		if (_zonedStartTime == null) {
+      if (_zonedStartTime == null) {
 
-			final Instant tourStartMills = Instant.ofEpochMilli(tourStartTime);
-			final ZoneId tourStartTimeZoneId = getTimeZoneIdWithDefault();
+         final Instant tourStartMills = Instant.ofEpochMilli(tourStartTime);
+         final ZoneId tourStartTimeZoneId = getTimeZoneIdWithDefault();
 
-			final ZonedDateTime zonedStartTime = ZonedDateTime.ofInstant(tourStartMills, tourStartTimeZoneId);
+         final ZonedDateTime zonedStartTime = ZonedDateTime.ofInstant(tourStartMills, tourStartTimeZoneId);
 
-			if (timeZoneId == null) {
+         if (timeZoneId == null) {
 
-				/*
-				 * Tour has no time zone but this can be changed in the preferences, so this value is
-				 * not cached
-				 */
+            /*
+             * Tour has no time zone but this can be changed in the preferences, so this value is
+             * not cached
+             */
 
-				setCalendarWeek(zonedStartTime);
+            setCalendarWeek(zonedStartTime);
 
-				return zonedStartTime;
+            return zonedStartTime;
 
-			} else {
+         } else {
 
-				/*
-				 * Cache this values until the tour zone is modified
-				 */
+            /*
+             * Cache this values until the tour zone is modified
+             */
 
-				_zonedStartTime = zonedStartTime;
+            _zonedStartTime = zonedStartTime;
 
-				setCalendarWeek(_zonedStartTime);
-			}
-		}
+            setCalendarWeek(_zonedStartTime);
+         }
+      }
 
-		return _zonedStartTime;
-	}
+      return _zonedStartTime;
+   }
 
-	/**
-	 * @return Returns the tour start time in milliseconds since 1970-01-01T00:00:00Z with the
-	 *         default time zone.
-	 */
-	public long getTourStartTimeMS() {
-		return tourStartTime;
-	}
+   /**
+    * @return Returns the tour start time in milliseconds since 1970-01-01T00:00:00Z with the
+    *         default time zone.
+    */
+   public long getTourStartTimeMS() {
+      return tourStartTime;
+   }
 
-	/**
-	 * @return Returns the tags {@link #tourTags} which are defined for this tour
-	 */
-	public Set<TourTag> getTourTags() {
-		return tourTags;
-	}
+   /**
+    * @return Returns the tags {@link #tourTags} which are defined for this tour
+    */
+   public Set<TourTag> getTourTags() {
+      return tourTags;
+   }
 
-	/**
-	 * @return Returns {@link #tourTitle} or an empty string when value is not set
-	 */
-	public String getTourTitle() {
-		return tourTitle == null ? UI.EMPTY_STRING : tourTitle;
-	}
+   /**
+    * @return Returns {@link #tourTitle} or an empty string when value is not set
+    */
+   public String getTourTitle() {
+      return tourTitle == null ? UI.EMPTY_STRING : tourTitle;
+   }
 
-	/**
-	 * @return Returns the {@link TourType} for the tour or <code>null</code> when tour type is not
-	 *         defined
-	 */
-	public TourType getTourType() {
-		return tourType;
-	}
+   /**
+    * @return Returns the {@link TourType} for the tour or <code>null</code> when tour type is not
+    *         defined
+    */
+   public TourType getTourType() {
+      return tourType;
+   }
 
-	public Set<TourWayPoint> getTourWayPoints() {
-		return tourWayPoints;
-	}
+   public Set<TourWayPoint> getTourWayPoints() {
+      return tourWayPoints;
+   }
 
-	/**
-	 * @return Returns weather text or an empty string when weather text is not set.
-	 */
-	public String getWeather() {
-		return weather == null ? UI.EMPTY_STRING : weather;
-	}
+   /**
+    * @return Returns weather text or an empty string when weather text is not set.
+    */
+   public String getWeather() {
+      return weather == null ? UI.EMPTY_STRING : weather;
+   }
 
-	/**
-	 * @return Returns the {@link IWeather#WEATHER_ID_}... or <code>null</code> when weather is not
-	 *         set.
-	 */
-	public String getWeatherClouds() {
-		return weatherClouds;
-	}
+   /**
+    * @return Returns the {@link IWeather#WEATHER_ID_}... or <code>null</code> when weather is not
+    *         set.
+    */
+   public String getWeatherClouds() {
+      return weatherClouds;
+   }
 
-	/**
-	 * @return Returns the index for the cloud values in {@link IWeather#cloudIcon} and
-	 *         {@link IWeather#cloudText} or 0 when the clouds are not defined
-	 */
-	public int getWeatherIndex() {
+   /**
+    * @return Returns the index for the cloud values in {@link IWeather#cloudIcon} and
+    *         {@link IWeather#cloudText} or 0 when the clouds are not defined
+    */
+   public int getWeatherIndex() {
 
-		int weatherCloudsIndex = -1;
+      int weatherCloudsIndex = -1;
 
-		if (weatherClouds != null) {
-			// binary search cannot be done because it requires sorting which we cannot...
-			for (int cloudIndex = 0; cloudIndex < IWeather.cloudIcon.length; ++cloudIndex) {
-				if (IWeather.cloudIcon[cloudIndex].equalsIgnoreCase(weatherClouds)) {
-					weatherCloudsIndex = cloudIndex;
-					break;
-				}
-			}
-		}
+      if (weatherClouds != null) {
+         // binary search cannot be done because it requires sorting which we cannot...
+         for (int cloudIndex = 0; cloudIndex < IWeather.cloudIcon.length; ++cloudIndex) {
+            if (IWeather.cloudIcon[cloudIndex].equalsIgnoreCase(weatherClouds)) {
+               weatherCloudsIndex = cloudIndex;
+               break;
+            }
+         }
+      }
 
-		return weatherCloudsIndex < 0 ? 0 : weatherCloudsIndex;
-	}
+      return weatherCloudsIndex < 0 ? 0 : weatherCloudsIndex;
+   }
 
-	public int getWeatherWindDir() {
-		return weatherWindDir;
-	}
+   public int getWeatherWindDir() {
+      return weatherWindDir;
+   }
 
-	public int getWeatherWindSpeed() {
-		return weatherWindSpd;
-	}
+   public int getWeatherWindSpeed() {
+      return weatherWindSpd;
+   }
 
-	/**
-	 * @param zoomLevel
-	 * @param projectionId
-	 * @return Returns the world position for the suplied zoom level and projection id
-	 */
-	public Point[] getWorldPositionForTour(final String projectionId, final int zoomLevel) {
-		return _tourWorldPosition.get(projectionId.hashCode() + zoomLevel);
-	}
+   /**
+    * @param zoomLevel
+    * @param projectionId
+    * @return Returns the world position for the suplied zoom level and projection id
+    */
+   public Point[] getWorldPositionForTour(final String projectionId, final int zoomLevel) {
+      return _tourWorldPosition.get(projectionId.hashCode() + zoomLevel);
+   }
 
-	/**
-	 * @param zoomLevel
-	 * @param projectionId
-	 * @return Returns the world position for way points
-	 */
-	public TIntObjectHashMap<Point> getWorldPositionForWayPoints(final String projectionId, final int zoomLevel) {
-		return _twpWorldPosition.get(projectionId.hashCode() + zoomLevel);
-	}
+   /**
+    * @param zoomLevel
+    * @param projectionId
+    * @return Returns the world position for way points
+    */
+   public TIntObjectHashMap<Point> getWorldPositionForWayPoints(final String projectionId, final int zoomLevel) {
+      return _twpWorldPosition.get(projectionId.hashCode() + zoomLevel);
+   }
 
-	/**
-	 * @return Returns <code>true</code> when the tour has a time zone.
-	 */
-	public boolean hasATimeZone() {
-		return timeZoneId != null;
-	}
+   /**
+    * @return Returns <code>true</code> when the tour has a time zone.
+    */
+   public boolean hasATimeZone() {
+      return timeZoneId != null;
+   }
 
-	public boolean hasGeoData() {
-		return hasGeoData;
-	}
+   public boolean hasGeoData() {
+      return hasGeoData;
+   }
 
-	/**
-	 * @return Returns <code>true</code> when latitude/longitude data are available
-	 */
-	/**
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode() {
+   /**
+    * @return Returns <code>true</code> when latitude/longitude data are available
+    */
+   /**
+    * @see java.lang.Object#hashCode()
+    */
+   @Override
+   public int hashCode() {
 
-		int result = 17;
+      int result = 17;
 
-		result = 37 * result + startYear;
-		result = 37 * result + startMonth;
-		result = 37 * result + startDay;
-		result = 37 * result + startHour;
-		result = 37 * result + startMinute;
-		result = 37 * result + (int) this.getTourDistance();
-		result = 37 * result + (int) this.getTourRecordingTime();
+      result = 37 * result + startYear;
+      result = 37 * result + startMonth;
+      result = 37 * result + startDay;
+      result = 37 * result + startHour;
+      result = 37 * result + startMinute;
+      result = 37 * result + (int) this.getTourDistance();
+      result = 37 * result + (int) this.getTourRecordingTime();
 
-		return result;
-	}
+      return result;
+   }
 
-	/**
-	 * @return Returns <code>true</code> when cadence of the tour is spm, otherwise it is rpm.
-	 */
-	public boolean isCadenceSpm() {
+   /**
+    * @return Returns <code>true</code> when cadence of the tour is spm, otherwise it is rpm.
+    */
+   public boolean isCadenceSpm() {
 
-		return cadenceMultiplier != 1.0;
-	}
+      return cadenceMultiplier != 1.0;
+   }
 
-	/**
-	 * @return Returns <code>true</code> when {@link TourData} contains refreence tours, otherwise
-	 *         <code>false</code>
-	 */
-	public boolean isContainReferenceTour() {
+   /**
+    * @return Returns <code>true</code> when {@link TourData} contains refreence tours, otherwise
+    *         <code>false</code>
+    */
+   public boolean isContainReferenceTour() {
 
-		if (tourReferences == null) {
-			return false;
-		} else {
-			return tourReferences.size() > 0;
-		}
-	}
+      if (tourReferences == null) {
+         return false;
+      } else {
+         return tourReferences.size() > 0;
+      }
+   }
 
-	public boolean isDistanceSensorPresent() {
-		return isDistanceFromSensor == 1;
-	}
+   public boolean isDistanceSensorPresent() {
+      return isDistanceFromSensor == 1;
+   }
 
-	/**
-	 * @return <code>true</code> when the tour is manually created and not imported from a file or
-	 *         device
-	 */
-	public boolean isManualTour() {
+   /**
+    * @return <code>true</code> when the tour is manually created and not imported from a file or
+    *         device
+    */
+   public boolean isManualTour() {
 
-		if (devicePluginId == null) {
-			return false;
-		}
+      if (devicePluginId == null) {
+         return false;
+      }
 
-		return devicePluginId.equals(DEVICE_ID_FOR_MANUAL_TOUR)
-				|| devicePluginId.equals(DEVICE_ID_CSV_TOUR_DATA_READER);
-	}
+      return devicePluginId.equals(DEVICE_ID_FOR_MANUAL_TOUR)
+            || devicePluginId.equals(DEVICE_ID_CSV_TOUR_DATA_READER);
+   }
 
-	public boolean isMultipleTours() {
-		return isMultipleTours;
-	}
+   public boolean isMultipleTours() {
+      return isMultipleTours;
+   }
 
-	/**
-	 * This is the state of the device which is not related to the availability of power data. Power
-	 * data should be available but is not checked.
-	 *
-	 * @return Returns <code>true</code> when the device has a power sensor
-	 */
-	public boolean isPowerSensorPresent() {
-		return isPowerSensorPresent == 1;
-	}
+   /**
+    * This is the state of the device which is not related to the availability of power data. Power
+    * data should be available but is not checked.
+    *
+    * @return Returns <code>true</code> when the device has a power sensor
+    */
+   public boolean isPowerSensorPresent() {
+      return isPowerSensorPresent == 1;
+   }
 
-	/**
-	 * @return Returns <code>true</code> when the data in {@link #powerSerie} is from a device and
-	 *         not computed. Power data are normally available from an ergometer and not from a bike
-	 *         computer
-	 */
-	public boolean isPowerSerieFromDevice() {
-		return isPowerSerieFromDevice;
-	}
+   /**
+    * @return Returns <code>true</code> when the data in {@link #powerSerie} is from a device and
+    *         not computed. Power data are normally available from an ergometer and not from a bike
+    *         computer
+    */
+   public boolean isPowerSerieFromDevice() {
+      return isPowerSerieFromDevice;
+   }
 
-	/**
-	 * This is the state of the device which is not related to the availability of pulse data. Pulse
-	 * data should be available but is not checked.
-	 *
-	 * @return Returns <code>true</code> when the device has a pulse sensor
-	 */
-	public boolean isPulseSensorPresent() {
-		return isPulseSensorPresent == 1;
-	}
-
-	/**
-	 * @return Returns <code>true</code> when running dynamics data are available
-	 */
-	public boolean isRunDynAvailable() {
-
-		if (runDyn_StanceTime != null && runDyn_StanceTime.length > 0) {
-			return true;
-		}
-
-		if (runDyn_StanceTimeBalance != null && runDyn_StanceTimeBalance.length > 0) {
-			return true;
-		}
-
-		if (runDyn_StepLength != null && runDyn_StepLength.length > 0) {
-			return true;
-		}
-
-		if (runDyn_VerticalOscillation != null && runDyn_VerticalOscillation.length > 0) {
-			return true;
-		}
-
-		if (runDyn_VerticalRatio != null && runDyn_VerticalRatio.length > 0) {
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
-	 * @return Returns <code>true</code> when the data in {@link #speedSerie} are from the device and
-	 *         not computed. Speed data are normally available from an ergometer and not from a bike
-	 *         computer
-	 */
-	public boolean isSpeedSerieFromDevice() {
-		return isSpeedSerieFromDevice;
-	}
-
-	/**
-	 * @return Returns <code>true</code> when SRTM data are available or when they can be available
-	 *         but not yet computed.
-	 */
-	public boolean isSRTMAvailable() {
-
-		if (latitudeSerie == null) {
-			return false;
-		}
-
-		if (srtmSerie == null) {
-			// srtm data can be available but are not yet computed
-			return true;
-		}
-
-		if (srtmSerie.length == 0) {
-			// SRTM data are invalid
-			return false;
-		} else {
-			return true;
-		}
-	}
-
-	public boolean isStrideSensorPresent() {
-		return isStrideSensorPresent == 1;
-	}
-
-	public boolean isSurfing_IsMinDistance() {
-		return surfing_IsMinDistance;
-	}
-
-	public boolean isTimeSerieWithTimeZoneAdjustment() {
-
-		if (timeSerieWithTimeZoneAdjustment == null) {
-			// build time serie with time zone dataserie
-			getTimeSerieWithTimeZoneAdjusted();
-		}
-
-		return timeSerieWithTimeZoneAdjustment != null;
-	}
-
-	/**
-	 * @return Returns <code>true</code> when the tour is saved in the database.
-	 */
-	public boolean isTourSaved() {
-		return tourPerson != null;
-	}
-
-	/**
-	 * Checks if VARCHAR fields have the correct length
-	 *
-	 * @return Returns <code>true</code> when the data are valid and can be saved
-	 */
-	public boolean isValidForSave() {
-
-		/*
-		 * check: tour title
-		 */
-		FIELD_VALIDATION fieldValidation = TourDatabase.isFieldValidForSave(//
-				tourTitle,
-				DB_LENGTH_TOUR_TITLE,
-				Messages.Db_Field_TourData_Title,
-				false);
-
-		if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
-			return false;
-		} else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
-			tourTitle = tourTitle.substring(0, DB_LENGTH_TOUR_TITLE);
-		}
-
-		/*
-		 * check: tour description
-		 */
-		fieldValidation = TourDatabase.isFieldValidForSave(
-				tourDescription,
-				DB_LENGTH_TOUR_DESCRIPTION_V10,
-				Messages.Db_Field_TourData_Description,
-				false);
-
-		if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
-			return false;
-		} else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
-			tourDescription = tourDescription.substring(0, DB_LENGTH_TOUR_DESCRIPTION_V10);
-		}
-
-		/*
-		 * check: tour start location
-		 */
-		fieldValidation = TourDatabase.isFieldValidForSave(
-				tourStartPlace,
-				DB_LENGTH_TOUR_START_PLACE,
-				Messages.Db_Field_TourData_StartPlace,
-				false);
-
-		if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
-			return false;
-		} else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
-			tourStartPlace = tourStartPlace.substring(0, DB_LENGTH_TOUR_START_PLACE);
-		}
-
-		/*
-		 * check: tour end location
-		 */
-		fieldValidation = TourDatabase.isFieldValidForSave(
-				tourEndPlace,
-				DB_LENGTH_TOUR_END_PLACE,
-				Messages.Db_Field_TourData_EndPlace,
-				false);
-
-		if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
-			return false;
-		} else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
-			tourEndPlace = tourEndPlace.substring(0, DB_LENGTH_TOUR_END_PLACE);
-		}
-
-		/*
-		 * check: tour import file path
-		 */
-		fieldValidation = TourDatabase.isFieldValidForSave(
-				tourImportFilePath,
-				DB_LENGTH_TOUR_IMPORT_FILE_PATH,
-				Messages.Db_Field_TourData_TourImportFilePath,
-				true);
-
-		if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
-			return false;
-		} else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
-			tourImportFilePath = tourImportFilePath.substring(0, DB_LENGTH_TOUR_IMPORT_FILE_PATH);
-		}
-
-		/*
-		 * check: tour import file name
-		 */
-		fieldValidation = TourDatabase.isFieldValidForSave(
-				tourImportFileName,
-				DB_LENGTH_TOUR_IMPORT_FILE_NAME,
-				Messages.Db_Field_TourData_TourImportFilePath,
-				true);
-
-		if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
-			return false;
-		} else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
-			tourImportFileName = tourImportFileName.substring(0, DB_LENGTH_TOUR_IMPORT_FILE_NAME);
-		}
-
-		/*
-		 * check: weather
-		 */
-		fieldValidation = TourDatabase.isFieldValidForSave(//
-				weather,
-				DB_LENGTH_WEATHER,
-				Messages.Db_Field_TourData_Weather,
-				false);
-
-		if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
-			return false;
-		} else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
-			weather = weather.substring(0, DB_LENGTH_WEATHER);
-		}
-
-		return true;
-	}
-
-	/**
-	 * @return Returns <code>true</code> when the {@link SerieData#visiblePoints_Surfing} is saved in
-	 *         the tour.
-	 */
-	public boolean isVisiblePointsSaved_ForSurfing() {
-
-		// serieData can be null for multiple tours
-
-		return serieData != null && serieData.visiblePoints_Surfing != null;
-	}
-
-	/**
-	 * Called after the object was loaded from the persistence store
-	 */
-	@PostLoad
-	@PostUpdate
-	public void onPostLoad() {
-
-		/*
-		 * disable post load when database is updated from 19 to 20 because data are converted
-		 */
-		if (TourDatabase.IS_POST_UPDATE_019_to_020) {
-			return;
-		}
-
-		onPostLoadGetDataSeries();
-	}
-
-	private void onPostLoadGetDataSeries() {
-
-		timeSerie = serieData.timeSerie;
-
-		// manually created tours have currently no time series
-		if (timeSerie == null) {
-			return;
-		}
-
-		altitudeSerie = serieData.altitudeSerie20;
-		cadenceSerie = serieData.cadenceSerie20;
-		distanceSerie = serieData.distanceSerie20;
-		pulseSerie = serieData.pulseSerie20;
-		temperatureSerie = serieData.temperatureSerie20;
-		powerSerie = serieData.powerSerie20;
-		speedSerie = serieData.speedSerie20;
-
-		latitudeSerie = serieData.latitude;
-		longitudeSerie = serieData.longitude;
-		computeGeo_Grid();
-
-		gearSerie = serieData.gears;
-
-		pulseTimeSerie = serieData.pulseTimes;
-
-		if (powerSerie != null) {
-			isPowerSerieFromDevice = true;
-		}
-
-		if (speedSerie != null) {
-			isSpeedSerieFromDevice = true;
-		}
-
-		hasGeoData = latitudeSerie != null && latitudeSerie.length > 0;
-
-		// running dynamics
-		runDyn_StanceTime = serieData.runDyn_StanceTime;
-		runDyn_StanceTimeBalance = serieData.runDyn_StanceTimeBalance;
-		runDyn_StepLength = serieData.runDyn_StepLength;
-		runDyn_VerticalOscillation = serieData.runDyn_VerticalOscillation;
-		runDyn_VerticalRatio = serieData.runDyn_VerticalRatio;
-
-		// swimming
-		swim_LengthType = serieData.swim_LengthType;
-		swim_Cadence = serieData.swim_Cadence;
-		swim_Strokes = serieData.swim_Strokes;
-		swim_StrokeStyle = serieData.swim_StrokeStyle;
-		swim_Time = serieData.swim_Time;
-		isSwimCadence = swim_Cadence != null;
-
-		// currently only surfing data can be made visible/hidden
-		visibleDataPointSerie = serieData.visiblePoints_Surfing;
-	}
-
-	/**
-	 * Called before this object gets persisted, copy data from the tourdata object into the object
-	 * which gets serialized
-	 */
-	/*
-	 * @PrePersist + @PreUpdate is currently disabled for EJB events because of bug
-	 * http://opensource.atlassian.com/projects/hibernate/browse/HHH-1921 2006-08-11
-	 */
-	public void onPrePersist() {
-
-		/*
-		 * Create new data series
-		 */
-		serieData = new SerieData();
-
-		serieData.timeSerie = timeSerie;
-		serieData.altitudeSerie20 = altitudeSerie;
-		serieData.cadenceSerie20 = cadenceSerie;
-		serieData.distanceSerie20 = distanceSerie;
-		serieData.pulseSerie20 = pulseSerie;
-		serieData.temperatureSerie20 = temperatureSerie;
-
-		/*
-		 * don't save computed data series
-		 */
-		if (isSpeedSerieFromDevice) {
-			serieData.speedSerie20 = speedSerie;
-		}
-
-		if (isPowerSerieFromDevice) {
-			serieData.powerSerie20 = powerSerie;
-		}
-
-		serieData.latitude = latitudeSerie;
-		serieData.longitude = longitudeSerie;
-
-		serieData.gears = gearSerie;
-
-		serieData.pulseTimes = pulseTimeSerie;
-
-		// running dynamics
-		serieData.runDyn_StanceTime = runDyn_StanceTime;
-		serieData.runDyn_StanceTimeBalance = runDyn_StanceTimeBalance;
-		serieData.runDyn_StepLength = runDyn_StepLength;
-		serieData.runDyn_VerticalRatio = runDyn_VerticalRatio;
-		serieData.runDyn_VerticalOscillation = runDyn_VerticalOscillation;
-
-		// swimming
-		serieData.swim_LengthType = swim_LengthType;
-		serieData.swim_Cadence = swim_Cadence;
-		serieData.swim_Strokes = swim_Strokes;
-		serieData.swim_StrokeStyle = swim_StrokeStyle;
-		serieData.swim_Time = swim_Time;
-
-		if (isSwimCadence) {
-			// cadence is computed from cadence swim data
-			serieData.cadenceSerie20 = null;
-		}
-
-		serieData.visiblePoints_Surfing = visiblePoints_ForSurfing;
-
-		// time serie size
-		numberOfTimeSlices = timeSerie == null ? 0 : timeSerie.length;
-	}
-
-	public boolean replaceAltitudeWithSRTM() {
-
-		if (getSRTMSerie() == null) {
-			return false;
-		}
-
-		altitudeSerie = Arrays.copyOf(srtmSerie, srtmSerie.length);
-		altitudeSerieImperial = Arrays.copyOf(srtmSerieImperial, srtmSerieImperial.length);
-
-		altitudeSerieSmoothed = null;
-		altitudeSerieImperialSmoothed = null;
-
-		// adjust computed altitude values
-		computeAltitudeUpDown();
-		computeMaxAltitude();
-
-		return true;
-	}
-
-	/**
-	 * Reset sorted markers that they are sorted again.
-	 */
-	private void resetSortedMarkers() {
-
-		if (_sortedMarkers != null) {
-			_sortedMarkers.clear();
-			_sortedMarkers = null;
-		}
-	}
-
-	/**
-	 * Set {@link #visibleDataPointSerie} to it's saved values.
-	 */
-	public void restoreVisiblePoints_ForSurfing() {
-
-		if (serieData != null) {
-			visibleDataPointSerie = serieData.visiblePoints_Surfing;
-		}
-	}
-
-	/**
-	 * @param avgCadence
-	 *           the avgCadence to set
-	 */
-	public void setAvgCadence(final float avgCadence) {
-		this.avgCadence = avgCadence;
-	}
-
-	/**
-	 * @param avgPulse
-	 *           the avgPulse to set
-	 */
-	public void setAvgPulse(final float avgPulse) {
-		this.avgPulse = avgPulse;
-	}
-
-	/**
-	 * @param avgTemperature
-	 *           the avgTemperature to set
-	 */
-	public void setAvgTemperature(final float avgTemperature) {
-		this.avgTemperature = avgTemperature;
-	}
-
-	/**
-	 * @param bikerWeight
-	 *           Sets the body weight.
-	 */
-	public void setBodyWeight(final float bikerWeight) {
-		this.bikerWeight = bikerWeight;
-	}
-
-	public void setBreakTimeSerie(final boolean[] breakTimeSerie) {
-		this.breakTimeSerie = breakTimeSerie;
-	}
-
-	public void setCadenceMultiplier(final float cadenceMultiplier) {
-		this.cadenceMultiplier = cadenceMultiplier;
-	}
-
-	public void setCadenceSerie(final float[] cadenceSerieData) {
-		cadenceSerie = cadenceSerieData;
-	}
-
-	/**
-	 * Set the calendar week in the tour.
-	 *
-	 * @param dateTime
-	 */
-	private void setCalendarWeek(final ZonedDateTime dateTime) {
-
-		final WeekFields cw = TimeTools.calendarWeek;
-
-		startWeek = (short) dateTime.get(cw.weekOfWeekBasedYear());
-		startWeekYear = (short) dateTime.get(cw.weekBasedYear());
-	}
-
-	/**
-	 * @param calories
-	 *           the calories to set
-	 */
-	public void setCalories(final int calories) {
-		this.calories = calories;
-	}
-
-	public void setConconiDeflection(final int conconiDeflection) {
-		this.conconiDeflection = conconiDeflection;
-	}
-
-	public void setDateTimeCreated(final long dateTimeCreated) {
-		this.dateTimeCreated = dateTimeCreated;
-	}
-
-	public void setDateTimeModified(final long dateTimeModified) {
-		this.dateTimeModified = dateTimeModified;
-	}
-
-	public void setDeviceFirmwareVersion(final String deviceFirmwareVersion) {
-		this.deviceFirmwareVersion = deviceFirmwareVersion;
-	}
-
-	public void setDeviceId(final String deviceId) {
-		this.devicePluginId = deviceId;
-	}
-
-	public void setDeviceMode(final short deviceMode) {
-		this.deviceMode = deviceMode;
-	}
-
-	public void setDeviceModeName(final String deviceModeName) {
-		this.deviceModeName = deviceModeName;
-	}
-
-	public void setDeviceName(final String deviceName) {
-		devicePluginName = deviceName;
-	}
-
-	/**
-	 * Time difference in seconds between 2 time slices when the interval is constant for the whole
-	 * tour or <code>-1</code> for GPS devices or ergometer when the time slice duration are not
-	 * equally
-	 *
-	 * @param deviceTimeInterval
-	 */
-	public void setDeviceTimeInterval(final short deviceTimeInterval) {
-		this.deviceTimeInterval = deviceTimeInterval;
-	}
-
-	public void setDeviceTourType(final String tourType) {
-		this.deviceTourType = tourType;
-	}
-
-	public void setDpTolerance(final short dpTolerance) {
-		this.dpTolerance = dpTolerance;
-	}
-
-	public void setFrontShiftCount(final int frontShiftCount) {
-		this.frontShiftCount = frontShiftCount;
-	}
-
-	public void setGears(final List<GearData> gears) {
-
-		final int gearSize = gears.size();
-
-		if (gearSize == 0) {
-			return;
-		}
-
-		// convert gear data into a gearSerie
-
-		final long[] gearSerie = new long[timeSerie.length];
-
-		int gearIndex = 0;
-		final int nextGearIndex = gearSize > 0 ? 1 : 0;
-
-		GearData currentGear = gears.get(0);
-		GearData nextGear = gears.get(nextGearIndex);
-
-		long nextGearTime;
-		if (gearIndex >= nextGearIndex) {
-			// there are no further gears
-			nextGearTime = Long.MAX_VALUE;
-		} else {
-			nextGearTime = nextGear.absoluteTime;
-		}
-
-		int frontShiftCount = 0;
-		int rearShiftCount = 0;
-		int currentFrontGear = currentGear.getFrontGearTeeth();
-		int currentRearGear = currentGear.getRearGearTeeth();
-
-		for (int timeIndex = 0; timeIndex < gearSerie.length; timeIndex++) {
-
-			final long currentTime = tourStartTime + timeSerie[timeIndex] * 1000;
-
-			if (currentTime >= nextGearTime) {
-
-				// advance to the next gear
-
-				gearIndex++;
-
-				if (gearIndex < gearSize - 1) {
-
-					// next gear is available
-
-					currentGear = nextGear;
-
-					nextGear = gears.get(gearIndex);
-					nextGearTime = nextGear.absoluteTime;
-
-					final int nextFrontGear = nextGear.getFrontGearTeeth();
-					final int nextRearGear = nextGear.getRearGearTeeth();
-
-					if (currentFrontGear != nextFrontGear) {
-
-						frontShiftCount++;
-					}
-
-					if (currentRearGear != nextRearGear) {
-
-						rearShiftCount++;
-					}
-
-					currentFrontGear = nextFrontGear;
-					currentRearGear = nextRearGear;
-
-				} else {
-
-					// there are no further gears
-
-					nextGearTime = Long.MAX_VALUE;
-
-					currentGear = nextGear;
-				}
-			}
-
-			gearSerie[timeIndex] = currentGear.gears;
-		}
-
-		this.gearSerie = gearSerie;
-
-		this.frontShiftCount = frontShiftCount;
-		this.rearShiftCount = rearShiftCount;
-	}
-
-	public void setGears(final long[] gearSerieData) {
-
-		if (gearSerieData.length < 1) {
-			return;
-		}
-
-		int frontShifts = 0;
-		int rearShifts = 0;
-
-		int currentFrontGear = (int) (gearSerieData[0] >> 24 & 0xff);
-		int currentRearGear = (int) (gearSerieData[0] >> 8 & 0xff);
-
-		for (final long gear : gearSerieData) {
-
-			final int nextFrontGear = (int) (gear >> 24 & 0xff);
-			final int nextRearGear = (int) (gear >> 8 & 0xff);
-
-			if (currentFrontGear != nextFrontGear) {
-				frontShifts++;
-			}
-
-			if (currentRearGear != nextRearGear) {
-				rearShifts++;
-			}
-
-			currentFrontGear = nextFrontGear;
-			currentRearGear = nextRearGear;
-		}
-
-		this.gearSerie = gearSerieData;
-
-		this.frontShiftCount = frontShifts;
-		this.rearShiftCount = rearShifts;
-	}
-
-	public void setHasGeoData(final boolean hasGeoData) {
-		this.hasGeoData = hasGeoData;
-	}
-
-	/**
-	 * Set only the import folder.
-	 *
-	 * @param backupOSFolder
-	 */
-	public void setImportBackupFileFolder(final String backupOSFolder) {
-
-		// keep original which is used when this file and the backup file should be deleted
-		this.importFilePathOriginal = tourImportFilePath;
-
-		// overwrite import file path with the backup folder
-		this.tourImportFilePath = backupOSFolder;
-	}
-
-	/**
-	 * Sets the file path (folder + file name) for the imported file, this is displayed in the
-	 * {@link TourDataEditorView}
-	 *
-	 * @param tourImportFilePath
-	 */
-	public void setImportFilePath(final String tourImportFilePath) {
-
-		try {
-
-			final Path filePath = Paths.get(tourImportFilePath);
-
-			final Path fileName = filePath.getFileName();
-			final Path folderPath = filePath.getParent();
-
-			// extract file name
-			this.tourImportFileName = fileName == null ? UI.EMPTY_STRING : fileName.toString();
-			this.tourImportFilePath = folderPath == null ? UI.EMPTY_STRING : folderPath.toString();
-
-		} catch (final Exception e) {
-			// folder can be invalid
-		}
-	}
-
-	/**
-	 * Set state if the distance is from a sensor or not, default is <code>false</code>
-	 *
-	 * @param isFromSensor
-	 */
-	public void setIsDistanceFromSensor(final boolean isFromSensor) {
-		this.isDistanceFromSensor = (short) (isFromSensor ? 1 : 0);
-	}
-
-	public void setIsImportedMTTour(final boolean isImportedMTTour) {
-		_isImportedMTTour = isImportedMTTour;
-	}
-
-	public void setIsPowerSensorPresent(final boolean isFromSensor) {
-		this.isPowerSensorPresent = (short) (isFromSensor ? 1 : 0);
-	}
-
-	public void setIsPulseSensorPresent(final boolean isFromSensor) {
-		this.isPulseSensorPresent = (short) (isFromSensor ? 1 : 0);
-	}
-
-	public void setIsStrideSensorPresent(final boolean isFromSensor) {
-
-		this.isStrideSensorPresent = (short) (isFromSensor ? 1 : 0);
-
-		if (isFromSensor) {
-			cadenceMultiplier = 2.0f;
-		}
-	}
-
-	public void setMaxPulse(final float maxPulse) {
-		this.maxPulse = maxPulse;
-	}
-
-	public void setMergedAltitudeOffset(final int altitudeDiff) {
-		mergedAltitudeOffset = altitudeDiff;
-	}
-
-	public void setMergedTourTimeOffset(final int mergedTourTimeOffset) {
-		this.mergedTourTimeOffset = mergedTourTimeOffset;
-	}
-
-	public void setMergeSourceTour(final TourData mergeSourceTour) {
-		_mergeSourceTourData = mergeSourceTour;
-	}
-
-	public void setMergeSourceTourId(final Long mergeSourceTourId) {
-		this.mergeSourceTourId = mergeSourceTourId;
-	}
-
-	public void setMergeTargetTourId(final Long mergeTargetTourId) {
-		this.mergeTargetTourId = mergeTargetTourId;
-	}
-
-	public void setPower_Avg(final float avgPower) {
-		this.power_Avg = avgPower;
-	}
-
-	public void setPower_AvgLeftPedalSmoothness(final float avgLeftPedalSmoothness) {
-		this.power_AvgLeftPedalSmoothness = avgLeftPedalSmoothness;
-	}
-
-	public void setPower_AvgLeftTorqueEffectiveness(final float avgLeftTorqueEffectiveness) {
-		this.power_AvgLeftTorqueEffectiveness = avgLeftTorqueEffectiveness;
-	}
-
-	public void setPower_AvgRightPedalSmoothness(final float avgRightPedalSmoothness) {
-		this.power_AvgRightPedalSmoothness = avgRightPedalSmoothness;
-	}
-
-	public void setPower_AvgRightTorqueEffectiveness(final float avgRightTorqueEffectiveness) {
-		this.power_AvgRightTorqueEffectiveness = avgRightTorqueEffectiveness;
-	}
-
-	/**
-	 * Sets Functional Threshold Power (FTP)
-	 *
-	 * @param ftp
-	 */
-	public void setPower_FTP(final int ftp) {
-		this.power_FTP = ftp;
-	}
-
-	public void setPower_IntensityFactor(final float intensityFactor) {
-		this.power_IntensityFactor = intensityFactor;
-	}
-
-	public void setPower_Max(final int maxPower) {
-		this.power_Max = maxPower;
-	}
-
-	public void setPower_Normalized(final int normalizedPower) {
-		this.power_Normalized = normalizedPower;
-	}
-
-	public void setPower_PedalLeftRightBalance(final int leftRightBalance) {
-		this.power_PedalLeftRightBalance = leftRightBalance;
-	}
-
-	public void setPower_TotalWork(final long totalWork) {
-		this.power_TotalWork = totalWork;
-	}
-
-	public void setPower_TrainingStressScore(final float trainingStressScore) {
-		this.power_TrainingStressScore = trainingStressScore;
-	}
-
-	/**
-	 * Sets the power data serie and set's a flag that the data serie is from a device
-	 *
-	 * @param powerSerie
-	 */
-	public void setPowerSerie(final float[] powerSerie) {
-		this.powerSerie = powerSerie;
-		this.isPowerSerieFromDevice = true;
-	}
-
-	public void setRearShiftCount(final int rearShiftCount) {
-		this.rearShiftCount = rearShiftCount;
-	}
-
-	public void setRestPulse(final int restPulse) {
-		this.restPulse = restPulse;
-	}
-
-	private void setSpeed(	final int serieIndex,
-									final float speedMetric,
-									final float speedImperial,
-									final int timeDiff,
-									final float distDiff) {
-
-		speedSerie[serieIndex] = speedMetric;
-		speedSerieImperial[serieIndex] = speedImperial;
-
-		maxSpeed = Math.max(maxSpeed, speedMetric);
-
-		final float paceMetricSeconds = speedMetric < 1.0 ? 0 : (float) (3600.0 / speedMetric);
-		final float paceImperialSeconds = speedMetric < 0.6 ? 0 : (float) (3600.0 / speedImperial);
-
-		paceSerieSeconds[serieIndex] = paceMetricSeconds;
-		paceSerieSecondsImperial[serieIndex] = paceImperialSeconds;
-
-		paceSerieMinute[serieIndex] = paceMetricSeconds / 60;
-		paceSerieMinuteImperial[serieIndex] = paceImperialSeconds / 60;
-	}
-
-	/**
-	 * Sets the speed data serie and set's a flag that the data serie is from a device
-	 *
-	 * @param speedSerie
-	 */
-	public void setSpeedSerie(final float[] speedSerie) {
-		this.speedSerie = speedSerie;
-		this.isSpeedSerieFromDevice = speedSerie != null;
-	}
-
-	public void setSRTMValues(final float[] srtm, final float[] srtmImperial) {
-		srtmSerie = srtm;
-		srtmSerieImperial = srtmImperial;
-	}
-
-	public void setStartAltitude(final short startAltitude) {
-		this.startAltitude = startAltitude;
-	}
-
-	/**
-	 * Odometer value, this is the distance which the device is accumulating
-	 *
-	 * @param startDistance
-	 */
-	public void setStartDistance(final float startDistance) {
-		this.startDistance = startDistance;
-	}
-
-	public void setStartPulse(final short startPulse) {
-		this.startPulse = startPulse;
-	}
-
-	public void setSurfing_IsMinDistance(final boolean surfing_IsMinDistance) {
-		this.surfing_IsMinDistance = surfing_IsMinDistance;
-	}
-
-	public void setSurfing_MinDistance(final short surfing_MinDistance) {
-		this.surfing_MinDistance = surfing_MinDistance;
-	}
-
-	public void setSurfing_MinSpeed_StartStop(final short surfing_MinSpeed_StartStop) {
-		this.surfing_MinSpeed_StartStop = surfing_MinSpeed_StartStop;
-	}
-
-	public void setSurfing_MinSpeed_Surfing(final short surfing_MinSpeed_Surfing) {
-		this.surfing_MinSpeed_Surfing = surfing_MinSpeed_Surfing;
-	}
-
-	public void setSurfing_MinTimeDuration(final short surfing_MinTimeDuration) {
-		this.surfing_MinTimeDuration = surfing_MinTimeDuration;
-	}
-
-	public void setSurfing_NumberOfEvents(final short surfing_NumberOfEvents) {
-		this.surfing_NumberOfEvents = surfing_NumberOfEvents;
-	}
-
-	public void setTimeSerieDouble(final double[] timeSerieDouble) {
-		this.timeSerieDouble = timeSerieDouble;
-	}
-
-	public void setTimeZoneId(final String timeZoneId) {
-
-		this.timeZoneId = timeZoneId;
-
-		// reset cached date time with time zone to recognize the new time zone
-		_zonedStartTime = null;
-	}
-
-	public void setTourAltDown(final float tourAltDown) {
-		this.tourAltDown = (int) (tourAltDown + 0.5);
-	}
-
-	public void setTourAltUp(final float tourAltUp) {
-		this.tourAltUp = (int) (tourAltUp + 0.5);
-	}
-
-	public void setTourBike(final TourBike tourBike) {
-		this.tourBike = tourBike;
-	}
-
-	/**
-	 * @param tourDescription
-	 *           the tourDescription to set
-	 */
-	public void setTourDescription(final String tourDescription) {
-		this.tourDescription = tourDescription;
-	}
-
-	public void setTourDistance(final float tourDistance) {
-		this.tourDistance = tourDistance;
-	}
-
-	/**
-	 * Set total driving/moving time in seconds.
-	 *
-	 * @param tourDrivingTime
-	 */
-	public void setTourDrivingTime(final int tourDrivingTime) {
-		this.tourDrivingTime = tourDrivingTime;
-	}
-
-	/**
-	 * @param tourEndPlace
-	 *           the tourEndPlace to set
-	 */
-	public void setTourEndPlace(final String tourEndPlace) {
-		this.tourEndPlace = tourEndPlace;
-	}
-
-	private void setTourEndTimeMS() {
-
-		tourEndTime = tourStartTime + (tourRecordingTime * 1000);
-	}
-
-	public void setTourMarkers(final Set<TourMarker> tourMarkers) {
-
-		if (this.tourMarkers != null) {
-			this.tourMarkers.clear();
-		}
-
-		this.tourMarkers = tourMarkers;
-
-		resetSortedMarkers();
-	}
-
-	/**
-	 * Sets the {@link TourPerson} for the tour or <code>null</code> when the tour is not saved in
-	 * the database
-	 *
-	 * @param tourPerson
-	 */
-	public void setTourPerson(final TourPerson tourPerson) {
-		this.tourPerson = tourPerson;
-	}
-
-	/**
-	 * Set new photos into the tour, existing photos will be replaced.
-	 *
-	 * @param newTourPhotos
-	 * @param linkPhotos
-	 */
-	public void setTourPhotos(final HashSet<TourPhoto> newTourPhotos, final ArrayList<Photo> newGalleryPhotos) {
-
-		/*
-		 * reset state for photos which are not saved any more in this tour
-		 */
-		final ArrayList<Photo> oldGalleryPhotos = getGalleryPhotos();
-
-		if (oldGalleryPhotos != null) {
-
-			for (final Photo oldGalleryPhoto : oldGalleryPhotos) {
-
-				final String oldImageFilePathName = oldGalleryPhoto.imageFilePathName;
-				boolean isPhotoUsed = false;
-
-				for (final Photo newGalleryPhoto : newGalleryPhotos) {
-
-					if (oldImageFilePathName.equals(newGalleryPhoto.imageFilePathName)) {
-						isPhotoUsed = true;
-						break;
-					}
-				}
-
-				if (isPhotoUsed == false) {
-
-					/*
-					 * photo is not saved any more in this tour, remove tour reference
-					 */
-
-					oldGalleryPhoto.removeTour(tourId);
-
-					final HashMap<Long, TourPhotoReference> photoRefs = oldGalleryPhoto.getTourPhotoReferences();
-
-					if (photoRefs.size() == 0) {
-
-						oldGalleryPhoto.isSavedInTour = false;
-						oldGalleryPhoto.ratingStars = 0;
-
-						oldGalleryPhoto.resetTourExifState();
-					}
-				}
-			}
-		}
-
-		// force photos to be recreated
-		_galleryPhotos.clear();
-
-		tourPhotos.clear();
-		tourPhotos.addAll(newTourPhotos);
-
-		numberOfPhotos = tourPhotos.size();
-
-		computePhotoTimeAdjustment();
-	}
-
-	/**
-	 * Set total recording time in seconds
-	 *
-	 * @param tourRecordingTime
-	 */
-	public void setTourRecordingTime(final long tourRecordingTime) {
-
-		this.tourRecordingTime = tourRecordingTime;
-
-		setTourEndTimeMS();
-	}
-
-	/**
-	 * @param tourStartPlace
-	 *           the tourStartPlace to set
-	 */
-	public void setTourStartPlace(final String tourStartPlace) {
-		this.tourStartPlace = tourStartPlace;
-	}
-
-	/**
-	 * Set tour start date/time and week.
-	 *
-	 * @param tourStartYear
-	 * @param tourStartMonth
-	 *           1...12
-	 * @param tourStartDay
-	 * @param tourStartHour
-	 * @param tourStartMinute
-	 * @param tourStartSecond
-	 */
-	public void setTourStartTime(	final int tourStartYear,
-											final int tourStartMonth,
-											final int tourStartDay,
-											final int tourStartHour,
-											final int tourStartMinute,
-											final int tourStartSecond) {
-
-		final ZonedDateTime zonedStartTime = ZonedDateTime.of(
-				tourStartYear,
-				tourStartMonth,
-				tourStartDay,
-				tourStartHour,
-				tourStartMinute,
-				tourStartSecond,
-				0,
-				TimeTools.getDefaultTimeZone());
-
-		tourStartTime = zonedStartTime.toInstant().toEpochMilli();
-
-		if (tourStartMonth < 1 || tourStartMonth > 12) {
-			StatusUtil.log(new Exception("Month is invalid: " + tourStartMonth)); //$NON-NLS-1$
-			startMonth = 1;
-		} else {
-			startMonth = (short) tourStartMonth;
-		}
-
-		startYear = (short) tourStartYear;
+   /**
+    * This is the state of the device which is not related to the availability of pulse data. Pulse
+    * data should be available but is not checked.
+    *
+    * @return Returns <code>true</code> when the device has a pulse sensor
+    */
+   public boolean isPulseSensorPresent() {
+      return isPulseSensorPresent == 1;
+   }
+
+   /**
+    * @return Returns <code>true</code> when running dynamics data are available
+    */
+   public boolean isRunDynAvailable() {
+
+      if (runDyn_StanceTime != null && runDyn_StanceTime.length > 0) {
+         return true;
+      }
+
+      if (runDyn_StanceTimeBalance != null && runDyn_StanceTimeBalance.length > 0) {
+         return true;
+      }
+
+      if (runDyn_StepLength != null && runDyn_StepLength.length > 0) {
+         return true;
+      }
+
+      if (runDyn_VerticalOscillation != null && runDyn_VerticalOscillation.length > 0) {
+         return true;
+      }
+
+      if (runDyn_VerticalRatio != null && runDyn_VerticalRatio.length > 0) {
+         return true;
+      }
+
+      return false;
+   }
+
+   /**
+    * @return Returns <code>true</code> when the data in {@link #speedSerie} are from the device and
+    *         not computed. Speed data are normally available from an ergometer and not from a bike
+    *         computer
+    */
+   public boolean isSpeedSerieFromDevice() {
+      return isSpeedSerieFromDevice;
+   }
+
+   /**
+    * @return Returns <code>true</code> when SRTM data are available or when they can be available
+    *         but not yet computed.
+    */
+   public boolean isSRTMAvailable() {
+
+      if (latitudeSerie == null) {
+         return false;
+      }
+
+      if (srtmSerie == null) {
+         // srtm data can be available but are not yet computed
+         return true;
+      }
+
+      if (srtmSerie.length == 0) {
+         // SRTM data are invalid
+         return false;
+      } else {
+         return true;
+      }
+   }
+
+   public boolean isStrideSensorPresent() {
+      return isStrideSensorPresent == 1;
+   }
+
+   public boolean isSurfing_IsMinDistance() {
+      return surfing_IsMinDistance;
+   }
+
+   public boolean isTimeSerieWithTimeZoneAdjustment() {
+
+      if (timeSerieWithTimeZoneAdjustment == null) {
+         // build time serie with time zone dataserie
+         getTimeSerieWithTimeZoneAdjusted();
+      }
+
+      return timeSerieWithTimeZoneAdjustment != null;
+   }
+
+   /**
+    * @return Returns <code>true</code> when the tour is saved in the database.
+    */
+   public boolean isTourSaved() {
+      return tourPerson != null;
+   }
+
+   /**
+    * Checks if VARCHAR fields have the correct length
+    *
+    * @return Returns <code>true</code> when the data are valid and can be saved
+    */
+   public boolean isValidForSave() {
+
+      /*
+       * check: tour title
+       */
+      FIELD_VALIDATION fieldValidation = TourDatabase.isFieldValidForSave(//
+            tourTitle,
+            DB_LENGTH_TOUR_TITLE,
+            Messages.Db_Field_TourData_Title,
+            false);
+
+      if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
+         return false;
+      } else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
+         tourTitle = tourTitle.substring(0, DB_LENGTH_TOUR_TITLE);
+      }
+
+      /*
+       * check: tour description
+       */
+      fieldValidation = TourDatabase.isFieldValidForSave(
+            tourDescription,
+            DB_LENGTH_TOUR_DESCRIPTION_V10,
+            Messages.Db_Field_TourData_Description,
+            false);
+
+      if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
+         return false;
+      } else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
+         tourDescription = tourDescription.substring(0, DB_LENGTH_TOUR_DESCRIPTION_V10);
+      }
+
+      /*
+       * check: tour start location
+       */
+      fieldValidation = TourDatabase.isFieldValidForSave(
+            tourStartPlace,
+            DB_LENGTH_TOUR_START_PLACE,
+            Messages.Db_Field_TourData_StartPlace,
+            false);
+
+      if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
+         return false;
+      } else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
+         tourStartPlace = tourStartPlace.substring(0, DB_LENGTH_TOUR_START_PLACE);
+      }
+
+      /*
+       * check: tour end location
+       */
+      fieldValidation = TourDatabase.isFieldValidForSave(
+            tourEndPlace,
+            DB_LENGTH_TOUR_END_PLACE,
+            Messages.Db_Field_TourData_EndPlace,
+            false);
+
+      if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
+         return false;
+      } else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
+         tourEndPlace = tourEndPlace.substring(0, DB_LENGTH_TOUR_END_PLACE);
+      }
+
+      /*
+       * check: tour import file path
+       */
+      fieldValidation = TourDatabase.isFieldValidForSave(
+            tourImportFilePath,
+            DB_LENGTH_TOUR_IMPORT_FILE_PATH,
+            Messages.Db_Field_TourData_TourImportFilePath,
+            true);
+
+      if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
+         return false;
+      } else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
+         tourImportFilePath = tourImportFilePath.substring(0, DB_LENGTH_TOUR_IMPORT_FILE_PATH);
+      }
+
+      /*
+       * check: tour import file name
+       */
+      fieldValidation = TourDatabase.isFieldValidForSave(
+            tourImportFileName,
+            DB_LENGTH_TOUR_IMPORT_FILE_NAME,
+            Messages.Db_Field_TourData_TourImportFilePath,
+            true);
+
+      if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
+         return false;
+      } else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
+         tourImportFileName = tourImportFileName.substring(0, DB_LENGTH_TOUR_IMPORT_FILE_NAME);
+      }
+
+      /*
+       * check: weather
+       */
+      fieldValidation = TourDatabase.isFieldValidForSave(//
+            weather,
+            DB_LENGTH_WEATHER,
+            Messages.Db_Field_TourData_Weather,
+            false);
+
+      if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
+         return false;
+      } else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
+         weather = weather.substring(0, DB_LENGTH_WEATHER);
+      }
+
+      return true;
+   }
+
+   /**
+    * @return Returns <code>true</code> when the {@link SerieData#visiblePoints_Surfing} is saved in
+    *         the tour.
+    */
+   public boolean isVisiblePointsSaved_ForSurfing() {
+
+      // serieData can be null for multiple tours
+
+      return serieData != null && serieData.visiblePoints_Surfing != null;
+   }
+
+   /**
+    * Called after the object was loaded from the persistence store
+    */
+   @PostLoad
+   @PostUpdate
+   public void onPostLoad() {
+
+      /*
+       * disable post load when database is updated from 19 to 20 because data are converted
+       */
+      if (TourDatabase.IS_POST_UPDATE_019_to_020) {
+         return;
+      }
+
+      onPostLoadGetDataSeries();
+   }
+
+   private void onPostLoadGetDataSeries() {
+
+      timeSerie = serieData.timeSerie;
+
+      // manually created tours have currently no time series
+      if (timeSerie == null) {
+         return;
+      }
+
+      altitudeSerie = serieData.altitudeSerie20;
+      cadenceSerie = serieData.cadenceSerie20;
+      distanceSerie = serieData.distanceSerie20;
+      pulseSerie = serieData.pulseSerie20;
+      temperatureSerie = serieData.temperatureSerie20;
+      powerSerie = serieData.powerSerie20;
+      speedSerie = serieData.speedSerie20;
+
+      latitudeSerie = serieData.latitude;
+      longitudeSerie = serieData.longitude;
+      computeGeo_Grid();
+
+      gearSerie = serieData.gears;
+
+      pulseTimeSerie = serieData.pulseTimes;
+
+      if (powerSerie != null) {
+         isPowerSerieFromDevice = true;
+      }
+
+      if (speedSerie != null) {
+         isSpeedSerieFromDevice = true;
+      }
+
+      hasGeoData = latitudeSerie != null && latitudeSerie.length > 0;
+
+      // running dynamics
+      runDyn_StanceTime = serieData.runDyn_StanceTime;
+      runDyn_StanceTimeBalance = serieData.runDyn_StanceTimeBalance;
+      runDyn_StepLength = serieData.runDyn_StepLength;
+      runDyn_VerticalOscillation = serieData.runDyn_VerticalOscillation;
+      runDyn_VerticalRatio = serieData.runDyn_VerticalRatio;
+
+      // swimming
+      swim_LengthType = serieData.swim_LengthType;
+      swim_Cadence = serieData.swim_Cadence;
+      swim_Strokes = serieData.swim_Strokes;
+      swim_StrokeStyle = serieData.swim_StrokeStyle;
+      swim_Time = serieData.swim_Time;
+      isSwimCadence = swim_Cadence != null;
+
+      // currently only surfing data can be made visible/hidden
+      visibleDataPointSerie = serieData.visiblePoints_Surfing;
+   }
+
+   /**
+    * Called before this object gets persisted, copy data from the tourdata object into the object
+    * which gets serialized
+    */
+   /*
+    * @PrePersist + @PreUpdate is currently disabled for EJB events because of bug
+    * http://opensource.atlassian.com/projects/hibernate/browse/HHH-1921 2006-08-11
+    */
+   public void onPrePersist() {
+
+      /*
+       * Create new data series
+       */
+      serieData = new SerieData();
+
+      serieData.timeSerie = timeSerie;
+      serieData.altitudeSerie20 = altitudeSerie;
+      serieData.cadenceSerie20 = cadenceSerie;
+      serieData.distanceSerie20 = distanceSerie;
+      serieData.pulseSerie20 = pulseSerie;
+      serieData.temperatureSerie20 = temperatureSerie;
+
+      /*
+       * don't save computed data series
+       */
+      if (isSpeedSerieFromDevice) {
+         serieData.speedSerie20 = speedSerie;
+      }
+
+      if (isPowerSerieFromDevice) {
+         serieData.powerSerie20 = powerSerie;
+      }
+
+      serieData.latitude = latitudeSerie;
+      serieData.longitude = longitudeSerie;
+
+      serieData.gears = gearSerie;
+
+      serieData.pulseTimes = pulseTimeSerie;
+
+      // running dynamics
+      serieData.runDyn_StanceTime = runDyn_StanceTime;
+      serieData.runDyn_StanceTimeBalance = runDyn_StanceTimeBalance;
+      serieData.runDyn_StepLength = runDyn_StepLength;
+      serieData.runDyn_VerticalRatio = runDyn_VerticalRatio;
+      serieData.runDyn_VerticalOscillation = runDyn_VerticalOscillation;
+
+      // swimming
+      serieData.swim_LengthType = swim_LengthType;
+      serieData.swim_Cadence = swim_Cadence;
+      serieData.swim_Strokes = swim_Strokes;
+      serieData.swim_StrokeStyle = swim_StrokeStyle;
+      serieData.swim_Time = swim_Time;
+
+      if (isSwimCadence) {
+         // cadence is computed from cadence swim data
+         serieData.cadenceSerie20 = null;
+      }
+
+      serieData.visiblePoints_Surfing = visiblePoints_ForSurfing;
+
+      // time serie size
+      numberOfTimeSlices = timeSerie == null ? 0 : timeSerie.length;
+   }
+
+   public boolean replaceAltitudeWithSRTM() {
+
+      if (getSRTMSerie() == null) {
+         return false;
+      }
+
+      altitudeSerie = Arrays.copyOf(srtmSerie, srtmSerie.length);
+      altitudeSerieImperial = Arrays.copyOf(srtmSerieImperial, srtmSerieImperial.length);
+
+      altitudeSerieSmoothed = null;
+      altitudeSerieImperialSmoothed = null;
+
+      // adjust computed altitude values
+      computeAltitudeUpDown();
+      computeMaxAltitude();
+
+      return true;
+   }
+
+   /**
+    * Reset sorted markers that they are sorted again.
+    */
+   private void resetSortedMarkers() {
+
+      if (_sortedMarkers != null) {
+         _sortedMarkers.clear();
+         _sortedMarkers = null;
+      }
+   }
+
+   /**
+    * Set {@link #visibleDataPointSerie} to it's saved values.
+    */
+   public void restoreVisiblePoints_ForSurfing() {
+
+      if (serieData != null) {
+         visibleDataPointSerie = serieData.visiblePoints_Surfing;
+      }
+   }
+
+   /**
+    * @param avgCadence
+    *           the avgCadence to set
+    */
+   public void setAvgCadence(final float avgCadence) {
+      this.avgCadence = avgCadence;
+   }
+
+   /**
+    * @param avgPulse
+    *           the avgPulse to set
+    */
+   public void setAvgPulse(final float avgPulse) {
+      this.avgPulse = avgPulse;
+   }
+
+   /**
+    * @param avgTemperature
+    *           the avgTemperature to set
+    */
+   public void setAvgTemperature(final float avgTemperature) {
+      this.avgTemperature = avgTemperature;
+   }
+
+   /**
+    * @param bikerWeight
+    *           Sets the body weight.
+    */
+   public void setBodyWeight(final float bikerWeight) {
+      this.bikerWeight = bikerWeight;
+   }
+
+   public void setBreakTimeSerie(final boolean[] breakTimeSerie) {
+      this.breakTimeSerie = breakTimeSerie;
+   }
+
+   public void setCadenceMultiplier(final float cadenceMultiplier) {
+      this.cadenceMultiplier = cadenceMultiplier;
+   }
+
+   public void setCadenceSerie(final float[] cadenceSerieData) {
+      cadenceSerie = cadenceSerieData;
+   }
+
+   /**
+    * Set the calendar week in the tour.
+    *
+    * @param dateTime
+    */
+   private void setCalendarWeek(final ZonedDateTime dateTime) {
+
+      final WeekFields cw = TimeTools.calendarWeek;
+
+      startWeek = (short) dateTime.get(cw.weekOfWeekBasedYear());
+      startWeekYear = (short) dateTime.get(cw.weekBasedYear());
+   }
+
+   /**
+    * @param calories
+    *           the calories to set
+    */
+   public void setCalories(final int calories) {
+      this.calories = calories;
+   }
+
+   public void setConconiDeflection(final int conconiDeflection) {
+      this.conconiDeflection = conconiDeflection;
+   }
+
+   public void setDateTimeCreated(final long dateTimeCreated) {
+      this.dateTimeCreated = dateTimeCreated;
+   }
+
+   public void setDateTimeModified(final long dateTimeModified) {
+      this.dateTimeModified = dateTimeModified;
+   }
+
+   public void setDeviceFirmwareVersion(final String deviceFirmwareVersion) {
+      this.deviceFirmwareVersion = deviceFirmwareVersion;
+   }
+
+   public void setDeviceId(final String deviceId) {
+      this.devicePluginId = deviceId;
+   }
+
+   public void setDeviceMode(final short deviceMode) {
+      this.deviceMode = deviceMode;
+   }
+
+   public void setDeviceModeName(final String deviceModeName) {
+      this.deviceModeName = deviceModeName;
+   }
+
+   public void setDeviceName(final String deviceName) {
+      devicePluginName = deviceName;
+   }
+
+   /**
+    * Time difference in seconds between 2 time slices when the interval is constant for the whole
+    * tour or <code>-1</code> for GPS devices or ergometer when the time slice duration are not
+    * equally
+    *
+    * @param deviceTimeInterval
+    */
+   public void setDeviceTimeInterval(final short deviceTimeInterval) {
+      this.deviceTimeInterval = deviceTimeInterval;
+   }
+
+   public void setDeviceTourType(final String tourType) {
+      this.deviceTourType = tourType;
+   }
+
+   public void setDpTolerance(final short dpTolerance) {
+      this.dpTolerance = dpTolerance;
+   }
+
+   public void setFrontShiftCount(final int frontShiftCount) {
+      this.frontShiftCount = frontShiftCount;
+   }
+
+   public void setGears(final List<GearData> gears) {
+
+      final int gearSize = gears.size();
+
+      if (gearSize == 0) {
+         return;
+      }
+
+      // convert gear data into a gearSerie
+
+      final long[] gearSerie = new long[timeSerie.length];
+
+      int gearIndex = 0;
+      final int nextGearIndex = gearSize > 0 ? 1 : 0;
+
+      GearData currentGear = gears.get(0);
+      GearData nextGear = gears.get(nextGearIndex);
+
+      long nextGearTime;
+      if (gearIndex >= nextGearIndex) {
+         // there are no further gears
+         nextGearTime = Long.MAX_VALUE;
+      } else {
+         nextGearTime = nextGear.absoluteTime;
+      }
+
+      int frontShiftCount = 0;
+      int rearShiftCount = 0;
+      int currentFrontGear = currentGear.getFrontGearTeeth();
+      int currentRearGear = currentGear.getRearGearTeeth();
+
+      for (int timeIndex = 0; timeIndex < gearSerie.length; timeIndex++) {
+
+         final long currentTime = tourStartTime + timeSerie[timeIndex] * 1000;
+
+         if (currentTime >= nextGearTime) {
+
+            // advance to the next gear
+
+            gearIndex++;
+
+            if (gearIndex < gearSize - 1) {
+
+               // next gear is available
+
+               currentGear = nextGear;
+
+               nextGear = gears.get(gearIndex);
+               nextGearTime = nextGear.absoluteTime;
+
+               final int nextFrontGear = nextGear.getFrontGearTeeth();
+               final int nextRearGear = nextGear.getRearGearTeeth();
+
+               if (currentFrontGear != nextFrontGear) {
+
+                  frontShiftCount++;
+               }
+
+               if (currentRearGear != nextRearGear) {
+
+                  rearShiftCount++;
+               }
+
+               currentFrontGear = nextFrontGear;
+               currentRearGear = nextRearGear;
+
+            } else {
+
+               // there are no further gears
+
+               nextGearTime = Long.MAX_VALUE;
+
+               currentGear = nextGear;
+            }
+         }
+
+         gearSerie[timeIndex] = currentGear.gears;
+      }
+
+      this.gearSerie = gearSerie;
+
+      this.frontShiftCount = frontShiftCount;
+      this.rearShiftCount = rearShiftCount;
+   }
+
+   public void setGears(final long[] gearSerieData) {
+
+      if (gearSerieData.length < 1) {
+         return;
+      }
+
+      int frontShifts = 0;
+      int rearShifts = 0;
+
+      int currentFrontGear = (int) (gearSerieData[0] >> 24 & 0xff);
+      int currentRearGear = (int) (gearSerieData[0] >> 8 & 0xff);
+
+      for (final long gear : gearSerieData) {
+
+         final int nextFrontGear = (int) (gear >> 24 & 0xff);
+         final int nextRearGear = (int) (gear >> 8 & 0xff);
+
+         if (currentFrontGear != nextFrontGear) {
+            frontShifts++;
+         }
+
+         if (currentRearGear != nextRearGear) {
+            rearShifts++;
+         }
+
+         currentFrontGear = nextFrontGear;
+         currentRearGear = nextRearGear;
+      }
+
+      this.gearSerie = gearSerieData;
+
+      this.frontShiftCount = frontShifts;
+      this.rearShiftCount = rearShifts;
+   }
+
+   public void setHasGeoData(final boolean hasGeoData) {
+      this.hasGeoData = hasGeoData;
+   }
+
+   /**
+    * Set only the import folder.
+    *
+    * @param backupOSFolder
+    */
+   public void setImportBackupFileFolder(final String backupOSFolder) {
+
+      // keep original which is used when this file and the backup file should be deleted
+      this.importFilePathOriginal = tourImportFilePath;
+
+      // overwrite import file path with the backup folder
+      this.tourImportFilePath = backupOSFolder;
+   }
+
+   /**
+    * Sets the file path (folder + file name) for the imported file, this is displayed in the
+    * {@link TourDataEditorView}
+    *
+    * @param tourImportFilePath
+    */
+   public void setImportFilePath(final String tourImportFilePath) {
+
+      try {
+
+         final Path filePath = Paths.get(tourImportFilePath);
+
+         final Path fileName = filePath.getFileName();
+         final Path folderPath = filePath.getParent();
+
+         // extract file name
+         this.tourImportFileName = fileName == null ? UI.EMPTY_STRING : fileName.toString();
+         this.tourImportFilePath = folderPath == null ? UI.EMPTY_STRING : folderPath.toString();
+
+      } catch (final Exception e) {
+         // folder can be invalid
+      }
+   }
+
+   /**
+    * Set state if the distance is from a sensor or not, default is <code>false</code>
+    *
+    * @param isFromSensor
+    */
+   public void setIsDistanceFromSensor(final boolean isFromSensor) {
+      this.isDistanceFromSensor = (short) (isFromSensor ? 1 : 0);
+   }
+
+   public void setIsImportedMTTour(final boolean isImportedMTTour) {
+      _isImportedMTTour = isImportedMTTour;
+   }
+
+   public void setIsPowerSensorPresent(final boolean isFromSensor) {
+      this.isPowerSensorPresent = (short) (isFromSensor ? 1 : 0);
+   }
+
+   public void setIsPulseSensorPresent(final boolean isFromSensor) {
+      this.isPulseSensorPresent = (short) (isFromSensor ? 1 : 0);
+   }
+
+   public void setIsStrideSensorPresent(final boolean isFromSensor) {
+
+      this.isStrideSensorPresent = (short) (isFromSensor ? 1 : 0);
+
+      if (isFromSensor) {
+         cadenceMultiplier = 2.0f;
+      }
+   }
+
+   public void setMaxPulse(final float maxPulse) {
+      this.maxPulse = maxPulse;
+   }
+
+   public void setMergedAltitudeOffset(final int altitudeDiff) {
+      mergedAltitudeOffset = altitudeDiff;
+   }
+
+   public void setMergedTourTimeOffset(final int mergedTourTimeOffset) {
+      this.mergedTourTimeOffset = mergedTourTimeOffset;
+   }
+
+   public void setMergeSourceTour(final TourData mergeSourceTour) {
+      _mergeSourceTourData = mergeSourceTour;
+   }
+
+   public void setMergeSourceTourId(final Long mergeSourceTourId) {
+      this.mergeSourceTourId = mergeSourceTourId;
+   }
+
+   public void setMergeTargetTourId(final Long mergeTargetTourId) {
+      this.mergeTargetTourId = mergeTargetTourId;
+   }
+
+   public void setPower_Avg(final float avgPower) {
+      this.power_Avg = avgPower;
+   }
+
+   public void setPower_AvgLeftPedalSmoothness(final float avgLeftPedalSmoothness) {
+      this.power_AvgLeftPedalSmoothness = avgLeftPedalSmoothness;
+   }
+
+   public void setPower_AvgLeftTorqueEffectiveness(final float avgLeftTorqueEffectiveness) {
+      this.power_AvgLeftTorqueEffectiveness = avgLeftTorqueEffectiveness;
+   }
+
+   public void setPower_AvgRightPedalSmoothness(final float avgRightPedalSmoothness) {
+      this.power_AvgRightPedalSmoothness = avgRightPedalSmoothness;
+   }
+
+   public void setPower_AvgRightTorqueEffectiveness(final float avgRightTorqueEffectiveness) {
+      this.power_AvgRightTorqueEffectiveness = avgRightTorqueEffectiveness;
+   }
+
+   /**
+    * Sets Functional Threshold Power (FTP)
+    *
+    * @param ftp
+    */
+   public void setPower_FTP(final int ftp) {
+      this.power_FTP = ftp;
+   }
+
+   public void setPower_IntensityFactor(final float intensityFactor) {
+      this.power_IntensityFactor = intensityFactor;
+   }
+
+   public void setPower_Max(final int maxPower) {
+      this.power_Max = maxPower;
+   }
+
+   public void setPower_Normalized(final int normalizedPower) {
+      this.power_Normalized = normalizedPower;
+   }
+
+   public void setPower_PedalLeftRightBalance(final int leftRightBalance) {
+      this.power_PedalLeftRightBalance = leftRightBalance;
+   }
+
+   public void setPower_TotalWork(final long totalWork) {
+      this.power_TotalWork = totalWork;
+   }
+
+   public void setPower_TrainingStressScore(final float trainingStressScore) {
+      this.power_TrainingStressScore = trainingStressScore;
+   }
+
+   /**
+    * Sets the power data serie and set's a flag that the data serie is from a device
+    *
+    * @param powerSerie
+    */
+   public void setPowerSerie(final float[] powerSerie) {
+      this.powerSerie = powerSerie;
+      this.isPowerSerieFromDevice = true;
+   }
+
+   public void setRearShiftCount(final int rearShiftCount) {
+      this.rearShiftCount = rearShiftCount;
+   }
+
+   public void setRestPulse(final int restPulse) {
+      this.restPulse = restPulse;
+   }
+
+   private void setSpeed(final int serieIndex,
+                         final float speedMetric,
+                         final float speedImperial,
+                         final int timeDiff,
+                         final float distDiff) {
+
+      speedSerie[serieIndex] = speedMetric;
+      speedSerieImperial[serieIndex] = speedImperial;
+
+      maxSpeed = Math.max(maxSpeed, speedMetric);
+
+      final float paceMetricSeconds = speedMetric < 1.0 ? 0 : (float) (3600.0 / speedMetric);
+      final float paceImperialSeconds = speedMetric < 0.6 ? 0 : (float) (3600.0 / speedImperial);
+
+      paceSerieSeconds[serieIndex] = paceMetricSeconds;
+      paceSerieSecondsImperial[serieIndex] = paceImperialSeconds;
+
+      paceSerieMinute[serieIndex] = paceMetricSeconds / 60;
+      paceSerieMinuteImperial[serieIndex] = paceImperialSeconds / 60;
+   }
+
+   /**
+    * Sets the speed data serie and set's a flag that the data serie is from a device
+    *
+    * @param speedSerie
+    */
+   public void setSpeedSerie(final float[] speedSerie) {
+      this.speedSerie = speedSerie;
+      this.isSpeedSerieFromDevice = speedSerie != null;
+   }
+
+   public void setSRTMValues(final float[] srtm, final float[] srtmImperial) {
+      srtmSerie = srtm;
+      srtmSerieImperial = srtmImperial;
+   }
+
+   public void setStartAltitude(final short startAltitude) {
+      this.startAltitude = startAltitude;
+   }
+
+   /**
+    * Odometer value, this is the distance which the device is accumulating
+    *
+    * @param startDistance
+    */
+   public void setStartDistance(final float startDistance) {
+      this.startDistance = startDistance;
+   }
+
+   public void setStartPulse(final short startPulse) {
+      this.startPulse = startPulse;
+   }
+
+   public void setSurfing_IsMinDistance(final boolean surfing_IsMinDistance) {
+      this.surfing_IsMinDistance = surfing_IsMinDistance;
+   }
+
+   public void setSurfing_MinDistance(final short surfing_MinDistance) {
+      this.surfing_MinDistance = surfing_MinDistance;
+   }
+
+   public void setSurfing_MinSpeed_StartStop(final short surfing_MinSpeed_StartStop) {
+      this.surfing_MinSpeed_StartStop = surfing_MinSpeed_StartStop;
+   }
+
+   public void setSurfing_MinSpeed_Surfing(final short surfing_MinSpeed_Surfing) {
+      this.surfing_MinSpeed_Surfing = surfing_MinSpeed_Surfing;
+   }
+
+   public void setSurfing_MinTimeDuration(final short surfing_MinTimeDuration) {
+      this.surfing_MinTimeDuration = surfing_MinTimeDuration;
+   }
+
+   public void setSurfing_NumberOfEvents(final short surfing_NumberOfEvents) {
+      this.surfing_NumberOfEvents = surfing_NumberOfEvents;
+   }
+
+   public void setTimeSerieDouble(final double[] timeSerieDouble) {
+      this.timeSerieDouble = timeSerieDouble;
+   }
+
+   public void setTimeZoneId(final String timeZoneId) {
+
+      this.timeZoneId = timeZoneId;
+
+      // reset cached date time with time zone to recognize the new time zone
+      _zonedStartTime = null;
+   }
+
+   public void setTourAltDown(final float tourAltDown) {
+      this.tourAltDown = (int) (tourAltDown + 0.5);
+   }
+
+   public void setTourAltUp(final float tourAltUp) {
+      this.tourAltUp = (int) (tourAltUp + 0.5);
+   }
+
+   public void setTourBike(final TourBike tourBike) {
+      this.tourBike = tourBike;
+   }
+
+   /**
+    * @param tourDescription
+    *           the tourDescription to set
+    */
+   public void setTourDescription(final String tourDescription) {
+      this.tourDescription = tourDescription;
+   }
+
+   public void setTourDistance(final float tourDistance) {
+      this.tourDistance = tourDistance;
+   }
+
+   /**
+    * Set total driving/moving time in seconds.
+    *
+    * @param tourDrivingTime
+    */
+   public void setTourDrivingTime(final int tourDrivingTime) {
+      this.tourDrivingTime = tourDrivingTime;
+   }
+
+   /**
+    * @param tourEndPlace
+    *           the tourEndPlace to set
+    */
+   public void setTourEndPlace(final String tourEndPlace) {
+      this.tourEndPlace = tourEndPlace;
+   }
+
+   private void setTourEndTimeMS() {
+
+      tourEndTime = tourStartTime + (tourRecordingTime * 1000);
+   }
+
+   public void setTourMarkers(final Set<TourMarker> tourMarkers) {
+
+      if (this.tourMarkers != null) {
+         this.tourMarkers.clear();
+      }
+
+      this.tourMarkers = tourMarkers;
+
+      resetSortedMarkers();
+   }
+
+   /**
+    * Sets the {@link TourPerson} for the tour or <code>null</code> when the tour is not saved in
+    * the database
+    *
+    * @param tourPerson
+    */
+   public void setTourPerson(final TourPerson tourPerson) {
+      this.tourPerson = tourPerson;
+   }
+
+   /**
+    * Set new photos into the tour, existing photos will be replaced.
+    *
+    * @param newTourPhotos
+    * @param linkPhotos
+    */
+   public void setTourPhotos(final HashSet<TourPhoto> newTourPhotos, final ArrayList<Photo> newGalleryPhotos) {
+
+      /*
+       * reset state for photos which are not saved any more in this tour
+       */
+      final ArrayList<Photo> oldGalleryPhotos = getGalleryPhotos();
+
+      if (oldGalleryPhotos != null) {
+
+         for (final Photo oldGalleryPhoto : oldGalleryPhotos) {
+
+            final String oldImageFilePathName = oldGalleryPhoto.imageFilePathName;
+            boolean isPhotoUsed = false;
+
+            for (final Photo newGalleryPhoto : newGalleryPhotos) {
+
+               if (oldImageFilePathName.equals(newGalleryPhoto.imageFilePathName)) {
+                  isPhotoUsed = true;
+                  break;
+               }
+            }
+
+            if (isPhotoUsed == false) {
+
+               /*
+                * photo is not saved any more in this tour, remove tour reference
+                */
+
+               oldGalleryPhoto.removeTour(tourId);
+
+               final HashMap<Long, TourPhotoReference> photoRefs = oldGalleryPhoto.getTourPhotoReferences();
+
+               if (photoRefs.size() == 0) {
+
+                  oldGalleryPhoto.isSavedInTour = false;
+                  oldGalleryPhoto.ratingStars = 0;
+
+                  oldGalleryPhoto.resetTourExifState();
+               }
+            }
+         }
+      }
+
+      // force photos to be recreated
+      _galleryPhotos.clear();
+
+      tourPhotos.clear();
+      tourPhotos.addAll(newTourPhotos);
+
+      numberOfPhotos = tourPhotos.size();
+
+      computePhotoTimeAdjustment();
+   }
+
+   /**
+    * Set total recording time in seconds
+    *
+    * @param tourRecordingTime
+    */
+   public void setTourRecordingTime(final long tourRecordingTime) {
+
+      this.tourRecordingTime = tourRecordingTime;
+
+      setTourEndTimeMS();
+   }
+
+   /**
+    * @param tourStartPlace
+    *           the tourStartPlace to set
+    */
+   public void setTourStartPlace(final String tourStartPlace) {
+      this.tourStartPlace = tourStartPlace;
+   }
+
+   /**
+    * Set tour start date/time and week.
+    *
+    * @param tourStartYear
+    * @param tourStartMonth
+    *           1...12
+    * @param tourStartDay
+    * @param tourStartHour
+    * @param tourStartMinute
+    * @param tourStartSecond
+    */
+   public void setTourStartTime(final int tourStartYear,
+                                final int tourStartMonth,
+                                final int tourStartDay,
+                                final int tourStartHour,
+                                final int tourStartMinute,
+                                final int tourStartSecond) {
+
+      final ZonedDateTime zonedStartTime = ZonedDateTime.of(
+            tourStartYear,
+            tourStartMonth,
+            tourStartDay,
+            tourStartHour,
+            tourStartMinute,
+            tourStartSecond,
+            0,
+            TimeTools.getDefaultTimeZone());
+
+      tourStartTime = zonedStartTime.toInstant().toEpochMilli();
+
+      if (tourStartMonth < 1 || tourStartMonth > 12) {
+         StatusUtil.log(new Exception("Month is invalid: " + tourStartMonth)); //$NON-NLS-1$
+         startMonth = 1;
+      } else {
+         startMonth = (short) tourStartMonth;
+      }
+
+      startYear = (short) tourStartYear;
 //      startMonth = tourStartMonth;
-		startDay = (short) tourStartDay;
-		startHour = (short) tourStartHour;
-		startMinute = (short) tourStartMinute;
-		startSecond = tourStartSecond;
+      startDay = (short) tourStartDay;
+      startHour = (short) tourStartHour;
+      startMinute = (short) tourStartMinute;
+      startSecond = tourStartSecond;
 
-		setCalendarWeek(zonedStartTime);
+      setCalendarWeek(zonedStartTime);
 
-		// cache zoned date time
-		_zonedStartTime = zonedStartTime;
-	}
+      // cache zoned date time
+      _zonedStartTime = zonedStartTime;
+   }
 
-	public void setTourStartTime(final ZonedDateTime zonedStartTime) {
+   public void setTourStartTime(final ZonedDateTime zonedStartTime) {
 
-		// set the start of the tour
+      // set the start of the tour
 
-		tourStartTime = zonedStartTime.toInstant().toEpochMilli();
+      tourStartTime = zonedStartTime.toInstant().toEpochMilli();
 
-		startYear = (short) zonedStartTime.getYear();
-		startMonth = (short) zonedStartTime.getMonthValue();
-		startDay = (short) zonedStartTime.getDayOfMonth();
-		startHour = (short) zonedStartTime.getHour();
-		startMinute = (short) zonedStartTime.getMinute();
-		startSecond = zonedStartTime.getSecond();
+      startYear = (short) zonedStartTime.getYear();
+      startMonth = (short) zonedStartTime.getMonthValue();
+      startDay = (short) zonedStartTime.getDayOfMonth();
+      startHour = (short) zonedStartTime.getHour();
+      startMinute = (short) zonedStartTime.getMinute();
+      startSecond = zonedStartTime.getSecond();
 
-		setCalendarWeek(zonedStartTime);
+      setCalendarWeek(zonedStartTime);
 
-		// cache zoned date time
-		_zonedStartTime = zonedStartTime;
-	}
+      // cache zoned date time
+      _zonedStartTime = zonedStartTime;
+   }
 
-	public void setTourTags(final Set<TourTag> tourTags) {
-		this.tourTags = tourTags;
-	}
+   public void setTourTags(final Set<TourTag> tourTags) {
+      this.tourTags = tourTags;
+   }
 
-	/**
-	 * @param tourTitle
-	 *           the tourTitle to set
-	 */
-	public void setTourTitle(final String tourTitle) {
-		this.tourTitle = tourTitle;
-	}
+   /**
+    * @param tourTitle
+    *           the tourTitle to set
+    */
+   public void setTourTitle(final String tourTitle) {
+      this.tourTitle = tourTitle;
+   }
 
-	public void setTourType(final TourType tourType) {
-		this.tourType = tourType;
-	}
+   public void setTourType(final TourType tourType) {
+      this.tourType = tourType;
+   }
 
-	public void setupHistoryTour() {
+   public void setupHistoryTour() {
 
-		// each tourData requires a tour id to identify it in equals();
-		tourId = System.nanoTime();
+      // each tourData requires a tour id to identify it in equals();
+      tourId = System.nanoTime();
 
-		isHistoryTour = true;
-	}
+      isHistoryTour = true;
+   }
 
-	public void setupMultipleTour() {
+   public void setupMultipleTour() {
 
-		// each tourData requires a tour id to identify it in equals();
-		tourId = System.nanoTime();
+      // each tourData requires a tour id to identify it in equals();
+      tourId = System.nanoTime();
 
-		isMultipleTours = true;
-	}
+      isMultipleTours = true;
+   }
 
-	/**
-	 * Search for first valid value and fill up the data serie until the first valid value is
-	 * reached.
-	 * <p>
-	 *
-	 * @param timeDataSerie
-	 * @param isAbsoluteData
-	 * @return Returns <code>true</code> when values are available in the data serie and
-	 *         {@link #altitudeSerie} has valid start values.
-	 */
-	private boolean setupStartingValues_Altitude(final TimeData[] timeDataSerie, final boolean isAbsoluteData) {
+   /**
+    * Search for first valid value and fill up the data serie until the first valid value is
+    * reached.
+    * <p>
+    *
+    * @param timeDataSerie
+    * @param isAbsoluteData
+    * @return Returns <code>true</code> when values are available in the data serie and
+    *         {@link #altitudeSerie} has valid start values.
+    */
+   private boolean setupStartingValues_Altitude(final TimeData[] timeDataSerie, final boolean isAbsoluteData) {
 
-		final TimeData firstTimeData = timeDataSerie[0];
-		final int serieSize = timeDataSerie.length;
+      final TimeData firstTimeData = timeDataSerie[0];
+      final int serieSize = timeDataSerie.length;
 
-		boolean isAvailable = false;
+      boolean isAvailable = false;
 
-		if (isAbsoluteData) {
+      if (isAbsoluteData) {
 
-			if (firstTimeData.absoluteAltitude == Float.MIN_VALUE) {
+         if (firstTimeData.absoluteAltitude == Float.MIN_VALUE) {
 
-				for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
+            for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
 
-					final TimeData timeData = timeDataSerie[timeDataIndex];
-					if (timeData.absoluteAltitude != Float.MIN_VALUE) {
+               final TimeData timeData = timeDataSerie[timeDataIndex];
+               if (timeData.absoluteAltitude != Float.MIN_VALUE) {
 
-						// valid value is available
+                  // valid value is available
 
-						altitudeSerie = new float[serieSize];
-						isAvailable = true;
+                  altitudeSerie = new float[serieSize];
+                  isAvailable = true;
 
-						// update values to the first valid value
+                  // update values to the first valid value
 
-						final float firstValidValue = timeData.absoluteAltitude;
+                  final float firstValidValue = timeData.absoluteAltitude;
 
-						for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
-							timeDataSerie[invalidIndex].absoluteAltitude = firstValidValue;
-						}
+                  for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
+                     timeDataSerie[invalidIndex].absoluteAltitude = firstValidValue;
+                  }
 
-						break;
-					}
-				}
+                  break;
+               }
+            }
 
-			} else {
+         } else {
 
-				// altitude is available
+            // altitude is available
 
-				altitudeSerie = new float[serieSize];
-				isAvailable = true;
-			}
+            altitudeSerie = new float[serieSize];
+            isAvailable = true;
+         }
 
-		} else if (firstTimeData.altitude != Float.MIN_VALUE) {
+      } else if (firstTimeData.altitude != Float.MIN_VALUE) {
 
-			// altitude is available
+         // altitude is available
 
-			altitudeSerie = new float[serieSize];
-			isAvailable = true;
-		}
+         altitudeSerie = new float[serieSize];
+         isAvailable = true;
+      }
 
-		return isAvailable;
-	}
+      return isAvailable;
+   }
 
-	private boolean setupStartingValues_Cadence(final TimeData[] timeDataSerie) {
+   private boolean setupStartingValues_Cadence(final TimeData[] timeDataSerie) {
 
-		final TimeData firstTimeData = timeDataSerie[0];
-		final int serieSize = timeDataSerie.length;
+      final TimeData firstTimeData = timeDataSerie[0];
+      final int serieSize = timeDataSerie.length;
 
-		boolean isAvailable = false;
+      boolean isAvailable = false;
 
-		if (firstTimeData.cadence == Float.MIN_VALUE) {
+      if (firstTimeData.cadence == Float.MIN_VALUE) {
 
-			// search for first cadence value
+         // search for first cadence value
 
-			for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
+         for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
 
-				final TimeData timeData = timeDataSerie[timeDataIndex];
-				if (timeData.cadence != Float.MIN_VALUE) {
+            final TimeData timeData = timeDataSerie[timeDataIndex];
+            if (timeData.cadence != Float.MIN_VALUE) {
 
-					// cadence is available, starting values are set to 0
+               // cadence is available, starting values are set to 0
 
-					cadenceSerie = new float[serieSize];
-					isAvailable = true;
+               cadenceSerie = new float[serieSize];
+               isAvailable = true;
 
-					for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
-						timeDataSerie[invalidIndex].cadence = 0;
-					}
-					break;
-				}
-			}
+               for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
+                  timeDataSerie[invalidIndex].cadence = 0;
+               }
+               break;
+            }
+         }
 
-		} else {
+      } else {
 
-			// cadence is available
+         // cadence is available
 
-			cadenceSerie = new float[serieSize];
-			isAvailable = true;
-		}
+         cadenceSerie = new float[serieSize];
+         isAvailable = true;
+      }
 
-		return isAvailable;
-	}
+      return isAvailable;
+   }
 
-	private boolean setupStartingValues_Distance(final TimeData[] timeDataSerie, final boolean isAbsoluteData) {
+   private boolean setupStartingValues_Distance(final TimeData[] timeDataSerie, final boolean isAbsoluteData) {
 
-		final TimeData firstTimeData = timeDataSerie[0];
-		final int serieSize = timeDataSerie.length;
+      final TimeData firstTimeData = timeDataSerie[0];
+      final int serieSize = timeDataSerie.length;
 
-		boolean isAvailable = false;
+      boolean isAvailable = false;
 
-		if ((firstTimeData.distance != Float.MIN_VALUE) || isAbsoluteData) {
-			distanceSerie = new float[serieSize];
-			isAvailable = true;
-		}
+      if ((firstTimeData.distance != Float.MIN_VALUE) || isAbsoluteData) {
+         distanceSerie = new float[serieSize];
+         isAvailable = true;
+      }
 
-		return isAvailable;
-	}
+      return isAvailable;
+   }
 
-	private boolean setupStartingValues_Gear(final TimeData[] timeDataSerie) {
+   private boolean setupStartingValues_Gear(final TimeData[] timeDataSerie) {
 
-		final TimeData firstTimeData = timeDataSerie[0];
-		final int serieSize = timeDataSerie.length;
+      final TimeData firstTimeData = timeDataSerie[0];
+      final int serieSize = timeDataSerie.length;
 
-		boolean isAvailable = false;
+      boolean isAvailable = false;
 
-		if (firstTimeData.gear == 0) {
+      if (firstTimeData.gear == 0) {
 
-			// search for first gear value
+         // search for first gear value
 
-			for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
+         for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
 
-				final TimeData timeData = timeDataSerie[timeDataIndex];
-				final long gearValue = timeData.gear;
+            final TimeData timeData = timeDataSerie[timeDataIndex];
+            final long gearValue = timeData.gear;
 
-				if (gearValue != 0) {
+            if (gearValue != 0) {
 
-					// gear is available, starting values are set to first valid gear value
+               // gear is available, starting values are set to first valid gear value
 
-					gearSerie = new long[serieSize];
-					isAvailable = true;
+               gearSerie = new long[serieSize];
+               isAvailable = true;
 
-					for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
-						timeDataSerie[invalidIndex].gear = gearValue;
-					}
-					break;
-				}
-			}
+               for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
+                  timeDataSerie[invalidIndex].gear = gearValue;
+               }
+               break;
+            }
+         }
 
-		} else {
+      } else {
 
-			// gear is available
+         // gear is available
 
-			gearSerie = new long[serieSize];
-			isAvailable = true;
-		}
+         gearSerie = new long[serieSize];
+         isAvailable = true;
+      }
 
-		return isAvailable;
-	}
+      return isAvailable;
+   }
 
-	private boolean setupStartingValues_LatLon(final TimeData[] timeDataSerie) {
+   private boolean setupStartingValues_LatLon(final TimeData[] timeDataSerie) {
 
-		final int serieSize = timeDataSerie.length;
-		boolean isGPS = false;
+      final int serieSize = timeDataSerie.length;
+      boolean isGPS = false;
 
-		for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
+      for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
 
-			final TimeData timeData = timeDataSerie[timeDataIndex];
+         final TimeData timeData = timeDataSerie[timeDataIndex];
 
-			if (timeData.latitude != Double.MIN_VALUE) {
+         if (timeData.latitude != Double.MIN_VALUE) {
 
-				isGPS = true;
+            isGPS = true;
 
-				final double firstValidLatitude = timeData.latitude;
-				final double firstValidLongitude = timeData.longitude;
+            final double firstValidLatitude = timeData.latitude;
+            final double firstValidLongitude = timeData.longitude;
 
-				latitudeSerie = new double[serieSize];
-				longitudeSerie = new double[serieSize];
+            latitudeSerie = new double[serieSize];
+            longitudeSerie = new double[serieSize];
 
-				// fill beginning of lat/lon data series with first valid values
+            // fill beginning of lat/lon data series with first valid values
 
-				for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
-					timeDataSerie[invalidIndex].latitude = firstValidLatitude;
-					timeDataSerie[invalidIndex].longitude = firstValidLongitude;
-				}
+            for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
+               timeDataSerie[invalidIndex].latitude = firstValidLatitude;
+               timeDataSerie[invalidIndex].longitude = firstValidLongitude;
+            }
 
-				break;
-			}
-		}
+            break;
+         }
+      }
 
-		return isGPS;
-	}
+      return isGPS;
+   }
 
-	private boolean setupStartingValues_Power(final TimeData[] timeDataSerie) {
+   private boolean setupStartingValues_Power(final TimeData[] timeDataSerie) {
 
-		final TimeData firstTimeData = timeDataSerie[0];
-		final int serieSize = timeDataSerie.length;
+      final TimeData firstTimeData = timeDataSerie[0];
+      final int serieSize = timeDataSerie.length;
 
-		boolean isAvailable = false;
+      boolean isAvailable = false;
 
-		if (firstTimeData.power == Float.MIN_VALUE) {
+      if (firstTimeData.power == Float.MIN_VALUE) {
 
-			for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
+         for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
 
-				final TimeData timeData = timeDataSerie[timeDataIndex];
-				final float power = timeData.power;
+            final TimeData timeData = timeDataSerie[timeDataIndex];
+            final float power = timeData.power;
 
-				if (power != Float.MIN_VALUE) {
+            if (power != Float.MIN_VALUE) {
 
-					// power values are available, starting values are set to 0
+               // power values are available, starting values are set to 0
 
-					powerSerie = new float[serieSize];
-					isAvailable = true;
+               powerSerie = new float[serieSize];
+               isAvailable = true;
 
-					// update values to 0
-					for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
-						timeDataSerie[invalidIndex].power = 0;
-					}
+               // update values to 0
+               for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
+                  timeDataSerie[invalidIndex].power = 0;
+               }
 
-					break;
-				}
-			}
+               break;
+            }
+         }
 
-		} else {
+      } else {
 
-			// power values are available
+         // power values are available
 
-			powerSerie = new float[serieSize];
-			isAvailable = true;
-		}
+         powerSerie = new float[serieSize];
+         isAvailable = true;
+      }
 
-		isPowerSerieFromDevice = isAvailable;
+      isPowerSerieFromDevice = isAvailable;
 
-		return isAvailable;
-	}
+      return isAvailable;
+   }
 
-	private boolean setupStartingValues_Pulse(final TimeData[] timeDataSerie) {
+   private boolean setupStartingValues_Pulse(final TimeData[] timeDataSerie) {
 
-		final TimeData firstTimeData = timeDataSerie[0];
-		final int serieSize = timeDataSerie.length;
+      final TimeData firstTimeData = timeDataSerie[0];
+      final int serieSize = timeDataSerie.length;
 
-		boolean isAvailable = false;
+      boolean isAvailable = false;
 
-		if (firstTimeData.pulse == Float.MIN_VALUE) {
+      if (firstTimeData.pulse == Float.MIN_VALUE) {
 
-			for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
+         for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
 
-				final TimeData timeData = timeDataSerie[timeDataIndex];
-				final float pulse = timeData.pulse;
+            final TimeData timeData = timeDataSerie[timeDataIndex];
+            final float pulse = timeData.pulse;
 
-				if (pulse > 0) {
+            if (pulse > 0) {
 
-					// pulse values are available, starting values are set to the first valid value
+               // pulse values are available, starting values are set to the first valid value
 
-					pulseSerie = new float[serieSize];
-					isAvailable = true;
+               pulseSerie = new float[serieSize];
+               isAvailable = true;
 
-					for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
-						timeDataSerie[invalidIndex].pulse = pulse;
-					}
+               for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
+                  timeDataSerie[invalidIndex].pulse = pulse;
+               }
 
-					break;
-				}
-			}
+               break;
+            }
+         }
 
-		} else {
+      } else {
 
-			// pulse values are available
+         // pulse values are available
 
-			pulseSerie = new float[serieSize];
-			isAvailable = true;
-		}
+         pulseSerie = new float[serieSize];
+         isAvailable = true;
+      }
 
-		return isAvailable;
-	}
+      return isAvailable;
+   }
 
-	private boolean setupStartingValues_RunDyn_StanceTime(final TimeData[] timeDataSerie) {
+   private boolean setupStartingValues_RunDyn_StanceTime(final TimeData[] timeDataSerie) {
 
-		final TimeData firstTimeData = timeDataSerie[0];
-		final int serieSize = timeDataSerie.length;
+      final TimeData firstTimeData = timeDataSerie[0];
+      final int serieSize = timeDataSerie.length;
 
-		boolean isAvailable = false;
+      boolean isAvailable = false;
 
-		if (firstTimeData.runDyn_StanceTime == Short.MIN_VALUE) {
+      if (firstTimeData.runDyn_StanceTime == Short.MIN_VALUE) {
 
-			// search for first valid value
+         // search for first valid value
 
-			for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
+         for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
 
-				final short value = timeDataSerie[timeDataIndex].runDyn_StanceTime;
+            final short value = timeDataSerie[timeDataIndex].runDyn_StanceTime;
 
-				if (value != Short.MIN_VALUE) {
+            if (value != Short.MIN_VALUE) {
 
-					// data are available, starting values are set to first valid value
+               // data are available, starting values are set to first valid value
 
-					runDyn_StanceTime = new short[serieSize];
-					isAvailable = true;
+               runDyn_StanceTime = new short[serieSize];
+               isAvailable = true;
 
-					for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
-						timeDataSerie[invalidIndex].runDyn_StanceTime = value;
-					}
-					break;
-				}
-			}
+               for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
+                  timeDataSerie[invalidIndex].runDyn_StanceTime = value;
+               }
+               break;
+            }
+         }
 
-		} else {
+      } else {
 
-			// data are available
+         // data are available
 
-			runDyn_StanceTime = new short[serieSize];
-			isAvailable = true;
-		}
+         runDyn_StanceTime = new short[serieSize];
+         isAvailable = true;
+      }
 
-		return isAvailable;
-	}
+      return isAvailable;
+   }
 
-	private boolean setupStartingValues_RunDyn_StanceTimeBalance(final TimeData[] timeDataSerie) {
+   private boolean setupStartingValues_RunDyn_StanceTimeBalance(final TimeData[] timeDataSerie) {
 
-		final TimeData firstTimeData = timeDataSerie[0];
-		final int serieSize = timeDataSerie.length;
+      final TimeData firstTimeData = timeDataSerie[0];
+      final int serieSize = timeDataSerie.length;
 
-		boolean isAvailable = false;
+      boolean isAvailable = false;
 
-		if (firstTimeData.runDyn_StanceTimeBalance == Short.MIN_VALUE) {
+      if (firstTimeData.runDyn_StanceTimeBalance == Short.MIN_VALUE) {
 
-			// search for first valid value
+         // search for first valid value
 
-			for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
+         for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
 
-				final short value = timeDataSerie[timeDataIndex].runDyn_StanceTimeBalance;
+            final short value = timeDataSerie[timeDataIndex].runDyn_StanceTimeBalance;
 
-				if (value != Short.MIN_VALUE) {
+            if (value != Short.MIN_VALUE) {
 
-					// data are available, starting values are set to first valid value
+               // data are available, starting values are set to first valid value
 
-					runDyn_StanceTimeBalance = new short[serieSize];
-					isAvailable = true;
+               runDyn_StanceTimeBalance = new short[serieSize];
+               isAvailable = true;
 
-					for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
-						timeDataSerie[invalidIndex].runDyn_StanceTimeBalance = value;
-					}
-					break;
-				}
-			}
+               for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
+                  timeDataSerie[invalidIndex].runDyn_StanceTimeBalance = value;
+               }
+               break;
+            }
+         }
 
-		} else {
+      } else {
 
-			// data are available
+         // data are available
 
-			runDyn_StanceTimeBalance = new short[serieSize];
-			isAvailable = true;
-		}
+         runDyn_StanceTimeBalance = new short[serieSize];
+         isAvailable = true;
+      }
 
-		return isAvailable;
-	}
+      return isAvailable;
+   }
 
-	private boolean setupStartingValues_RunDyn_StepLength(final TimeData[] timeDataSerie) {
+   private boolean setupStartingValues_RunDyn_StepLength(final TimeData[] timeDataSerie) {
 
-		final TimeData firstTimeData = timeDataSerie[0];
-		final int serieSize = timeDataSerie.length;
+      final TimeData firstTimeData = timeDataSerie[0];
+      final int serieSize = timeDataSerie.length;
 
-		boolean isAvailable = false;
+      boolean isAvailable = false;
 
-		if (firstTimeData.runDyn_StepLength == Short.MIN_VALUE) {
+      if (firstTimeData.runDyn_StepLength == Short.MIN_VALUE) {
 
-			// search for first valid value
+         // search for first valid value
 
-			for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
+         for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
 
-				final short value = timeDataSerie[timeDataIndex].runDyn_StepLength;
+            final short value = timeDataSerie[timeDataIndex].runDyn_StepLength;
 
-				if (value != Short.MIN_VALUE) {
+            if (value != Short.MIN_VALUE) {
 
-					// data are available, starting values are set to first valid value
+               // data are available, starting values are set to first valid value
 
-					runDyn_StepLength = new short[serieSize];
-					isAvailable = true;
+               runDyn_StepLength = new short[serieSize];
+               isAvailable = true;
 
-					for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
-						timeDataSerie[invalidIndex].runDyn_StepLength = value;
-					}
-					break;
-				}
-			}
+               for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
+                  timeDataSerie[invalidIndex].runDyn_StepLength = value;
+               }
+               break;
+            }
+         }
 
-		} else {
+      } else {
 
-			// data are available
+         // data are available
 
-			runDyn_StepLength = new short[serieSize];
-			isAvailable = true;
-		}
+         runDyn_StepLength = new short[serieSize];
+         isAvailable = true;
+      }
 
-		return isAvailable;
-	}
+      return isAvailable;
+   }
 
-	private boolean setupStartingValues_RunDyn_VerticalOscillation(final TimeData[] timeDataSerie) {
+   private boolean setupStartingValues_RunDyn_VerticalOscillation(final TimeData[] timeDataSerie) {
 
-		final TimeData firstTimeData = timeDataSerie[0];
-		final int serieSize = timeDataSerie.length;
+      final TimeData firstTimeData = timeDataSerie[0];
+      final int serieSize = timeDataSerie.length;
 
-		boolean isAvailable = false;
+      boolean isAvailable = false;
 
-		if (firstTimeData.runDyn_VerticalOscillation == Short.MIN_VALUE) {
+      if (firstTimeData.runDyn_VerticalOscillation == Short.MIN_VALUE) {
 
-			// search for first valid value
+         // search for first valid value
 
-			for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
+         for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
 
-				final short value = timeDataSerie[timeDataIndex].runDyn_VerticalOscillation;
+            final short value = timeDataSerie[timeDataIndex].runDyn_VerticalOscillation;
 
-				if (value != Short.MIN_VALUE) {
+            if (value != Short.MIN_VALUE) {
 
-					// data are available, starting values are set to first valid value
+               // data are available, starting values are set to first valid value
 
-					runDyn_VerticalOscillation = new short[serieSize];
-					isAvailable = true;
+               runDyn_VerticalOscillation = new short[serieSize];
+               isAvailable = true;
 
-					for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
-						timeDataSerie[invalidIndex].runDyn_VerticalOscillation = value;
-					}
-					break;
-				}
-			}
+               for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
+                  timeDataSerie[invalidIndex].runDyn_VerticalOscillation = value;
+               }
+               break;
+            }
+         }
 
-		} else {
+      } else {
 
-			// data are available
+         // data are available
 
-			runDyn_VerticalOscillation = new short[serieSize];
-			isAvailable = true;
-		}
+         runDyn_VerticalOscillation = new short[serieSize];
+         isAvailable = true;
+      }
 
-		return isAvailable;
-	}
+      return isAvailable;
+   }
 
-	private boolean setupStartingValues_RunDyn_VerticalRatio(final TimeData[] timeDataSerie) {
+   private boolean setupStartingValues_RunDyn_VerticalRatio(final TimeData[] timeDataSerie) {
 
-		final TimeData firstTimeData = timeDataSerie[0];
-		final int serieSize = timeDataSerie.length;
+      final TimeData firstTimeData = timeDataSerie[0];
+      final int serieSize = timeDataSerie.length;
 
-		boolean isAvailable = false;
+      boolean isAvailable = false;
 
-		if (firstTimeData.runDyn_VerticalRatio == Short.MIN_VALUE) {
+      if (firstTimeData.runDyn_VerticalRatio == Short.MIN_VALUE) {
 
-			// search for first valid value
+         // search for first valid value
 
-			for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
+         for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
 
-				final short value = timeDataSerie[timeDataIndex].runDyn_VerticalRatio;
+            final short value = timeDataSerie[timeDataIndex].runDyn_VerticalRatio;
 
-				if (value != Short.MIN_VALUE) {
+            if (value != Short.MIN_VALUE) {
 
-					// data are available, starting values are set to first valid value
+               // data are available, starting values are set to first valid value
 
-					runDyn_VerticalRatio = new short[serieSize];
-					isAvailable = true;
+               runDyn_VerticalRatio = new short[serieSize];
+               isAvailable = true;
 
-					for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
-						timeDataSerie[invalidIndex].runDyn_VerticalRatio = value;
-					}
-					break;
-				}
-			}
+               for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
+                  timeDataSerie[invalidIndex].runDyn_VerticalRatio = value;
+               }
+               break;
+            }
+         }
 
-		} else {
+      } else {
 
-			// data are available
+         // data are available
 
-			runDyn_VerticalRatio = new short[serieSize];
-			isAvailable = true;
-		}
+         runDyn_VerticalRatio = new short[serieSize];
+         isAvailable = true;
+      }
 
-		return isAvailable;
-	}
+      return isAvailable;
+   }
 
-	private boolean setupStartingValues_Speed(final TimeData[] timeDataSerie) {
+   private boolean setupStartingValues_Speed(final TimeData[] timeDataSerie) {
 
-		boolean isAvailable = false;
+      boolean isAvailable = false;
 
-		// find valid speed slices
-		for (final TimeData timeData : timeDataSerie) {
+      // find valid speed slices
+      for (final TimeData timeData : timeDataSerie) {
 
-			if (timeData.speed != Float.MIN_VALUE) {
-				isAvailable = true;
-				break;
-			}
-		}
+         if (timeData.speed != Float.MIN_VALUE) {
+            isAvailable = true;
+            break;
+         }
+      }
 
-		if (isAvailable) {
+      if (isAvailable) {
 
-			// cleanup speed serie, remove invalid values
+         // cleanup speed serie, remove invalid values
 
-			for (final TimeData timeData : timeDataSerie) {
+         for (final TimeData timeData : timeDataSerie) {
 
-				if (timeData.speed == Float.MIN_VALUE) {
-					timeData.speed = 0;
-				}
-			}
+            if (timeData.speed == Float.MIN_VALUE) {
+               timeData.speed = 0;
+            }
+         }
 
-			speedSerie = new float[timeDataSerie.length];
-			isSpeedSerieFromDevice = true;
-		}
+         speedSerie = new float[timeDataSerie.length];
+         isSpeedSerieFromDevice = true;
+      }
 
-		return isAvailable;
-	}
+      return isAvailable;
+   }
 
-	private boolean setupStartingValues_Temperature(final TimeData[] timeDataSerie) {
+   private boolean setupStartingValues_Temperature(final TimeData[] timeDataSerie) {
 
-		final TimeData firstTimeData = timeDataSerie[0];
-		final int serieSize = timeDataSerie.length;
+      final TimeData firstTimeData = timeDataSerie[0];
+      final int serieSize = timeDataSerie.length;
 
-		boolean isAvailable = false;
+      boolean isAvailable = false;
 
-		if (firstTimeData.temperature == Float.MIN_VALUE) {
+      if (firstTimeData.temperature == Float.MIN_VALUE) {
 
-			for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
+         for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
 
-				final TimeData timeData = timeDataSerie[timeDataIndex];
-				final float temperature = timeData.temperature;
+            final TimeData timeData = timeDataSerie[timeDataIndex];
+            final float temperature = timeData.temperature;
 
-				if (temperature != Float.MIN_VALUE) {
+            if (temperature != Float.MIN_VALUE) {
 
-					// temperature values are available, starting values are set to the first valid value
+               // temperature values are available, starting values are set to the first valid value
 
-					temperatureSerie = new float[serieSize];
-					isAvailable = true;
+               temperatureSerie = new float[serieSize];
+               isAvailable = true;
 
-					// update values to the first valid value
-					for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
-						timeDataSerie[invalidIndex].temperature = temperature;
-					}
+               // update values to the first valid value
+               for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
+                  timeDataSerie[invalidIndex].temperature = temperature;
+               }
 
-					break;
-				}
-			}
+               break;
+            }
+         }
 
-		} else {
+      } else {
 
-			// temperature values are available
+         // temperature values are available
 
-			temperatureSerie = new float[serieSize];
-			isAvailable = true;
-		}
+         temperatureSerie = new float[serieSize];
+         isAvailable = true;
+      }
 
-		return isAvailable;
-	}
+      return isAvailable;
+   }
 
-	/**
-	 * Set surfing visible points which can be saved in the tour.
-	 *
-	 * @param visiblePoints_ForSurfing
-	 */
-	public void setVisiblePoints_ForSurfing(final boolean[] visiblePoints_ForSurfing) {
+   /**
+    * Set surfing visible points which can be saved in the tour.
+    *
+    * @param visiblePoints_ForSurfing
+    */
+   public void setVisiblePoints_ForSurfing(final boolean[] visiblePoints_ForSurfing) {
 
-		this.visiblePoints_ForSurfing = visiblePoints_ForSurfing;
-	}
+      this.visiblePoints_ForSurfing = visiblePoints_ForSurfing;
+   }
 
-	public void setWayPoints(final ArrayList<TourWayPoint> wptList) {
+   public void setWayPoints(final ArrayList<TourWayPoint> wptList) {
 
-		// remove old way points
-		tourWayPoints.clear();
+      // remove old way points
+      tourWayPoints.clear();
 
-		if ((wptList == null) || (wptList.size() == 0)) {
-			return;
-		}
+      if ((wptList == null) || (wptList.size() == 0)) {
+         return;
+      }
 
-		// set new way points
-		for (final TourWayPoint tourWayPoint : wptList) {
+      // set new way points
+      for (final TourWayPoint tourWayPoint : wptList) {
 
-			/**
-			 * !!!! <br>
-			 * Way point must be cloned because the entity could be saved within different tour data
-			 * instances, otherwise hibernate exceptions occure this also sets the createId. <br>
-			 * !!!!
-			 */
-			final TourWayPoint clonedWP = tourWayPoint.clone(this);
+         /**
+          * !!!! <br>
+          * Way point must be cloned because the entity could be saved within different tour data
+          * instances, otherwise hibernate exceptions occure this also sets the createId. <br>
+          * !!!!
+          */
+         final TourWayPoint clonedWP = tourWayPoint.clone(this);
 
-			tourWayPoints.add(clonedWP);
-		}
-	}
+         tourWayPoints.add(clonedWP);
+      }
+   }
 
-	public void setWeather(final String weather) {
-		this.weather = weather;
-	}
+   public void setWeather(final String weather) {
+      this.weather = weather;
+   }
 
-	/**
-	 * Sets the weather id which is defined in {@link IWeather#WEATHER_ID_}... or <code>null</code>
-	 * when weather id is not defined
-	 *
-	 * @param weatherClouds
-	 */
-	public void setWeatherClouds(final String weatherClouds) {
-		this.weatherClouds = weatherClouds;
-	}
+   /**
+    * Sets the weather id which is defined in {@link IWeather#WEATHER_ID_}... or <code>null</code>
+    * when weather id is not defined
+    *
+    * @param weatherClouds
+    */
+   public void setWeatherClouds(final String weatherClouds) {
+      this.weatherClouds = weatherClouds;
+   }
 
-	public void setWeatherWindDir(final int weatherWindDir) {
-		this.weatherWindDir = weatherWindDir;
-	}
+   public void setWeatherWindDir(final int weatherWindDir) {
+      this.weatherWindDir = weatherWindDir;
+   }
 
-	public void setWeatherWindSpeed(final int weatherWindSpeed) {
-		this.weatherWindSpd = weatherWindSpeed;
-	}
+   public void setWeatherWindSpeed(final int weatherWindSpeed) {
+      this.weatherWindSpd = weatherWindSpeed;
+   }
 
-	/**
-	 * Set world positions which are cached
-	 *
-	 * @param worldPositions
-	 * @param zoomLevel
-	 * @param projectionId
-	 */
-	public void setWorldPixelForTour(final Point[] worldPositions, final int zoomLevel, final String projectionId) {
-		_tourWorldPosition.put(projectionId.hashCode() + zoomLevel, worldPositions);
-	}
+   /**
+    * Set world positions which are cached
+    *
+    * @param worldPositions
+    * @param zoomLevel
+    * @param projectionId
+    */
+   public void setWorldPixelForTour(final Point[] worldPositions, final int zoomLevel, final String projectionId) {
+      _tourWorldPosition.put(projectionId.hashCode() + zoomLevel, worldPositions);
+   }
 
-	/**
-	 * Set world positions which are cached
-	 *
-	 * @param worldPositions
-	 * @param zoomLevel
-	 * @param projectionId
-	 */
-	public void setWorldPixelForWayPoints(	final TIntObjectHashMap<Point> worldPositions,
-														final int zoomLevel,
-														final String projectionId) {
+   /**
+    * Set world positions which are cached
+    *
+    * @param worldPositions
+    * @param zoomLevel
+    * @param projectionId
+    */
+   public void setWorldPixelForWayPoints(final TIntObjectHashMap<Point> worldPositions,
+                                         final int zoomLevel,
+                                         final String projectionId) {
 
-		_twpWorldPosition.put(projectionId.hashCode() + zoomLevel, worldPositions);
-	}
+      _twpWorldPosition.put(projectionId.hashCode() + zoomLevel, worldPositions);
+   }
 
-	@Override
-	public String toString() {
-		return "TourData [\n" //                                                      //$NON-NLS-1$
+   @Override
+   public String toString() {
+      return "TourData [\n" //                                                      //$NON-NLS-1$
 
-				+ ("start=" + startYear + "-" + startMonth + "-" + startDay + " ") //               //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-				+ (startHour + ":" + startMinute + ":" + startSecond + "\n") //                     //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            + ("start=" + startYear + "-" + startMonth + "-" + startDay + " ") //               //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+            + (startHour + ":" + startMinute + ":" + startSecond + "\n") //                     //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-				+ ("tourId=" + tourId + "\n") //                                          //$NON-NLS-1$ //$NON-NLS-2$
+            + ("tourId=" + tourId + "\n") //                                          //$NON-NLS-1$ //$NON-NLS-2$
 
-				+ ("object=" + super.toString() + "\n") //                                    //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("identityHashCode=" + System.identityHashCode(this) + "\n") //                  //$NON-NLS-1$ //$NON-NLS-2$
+            + ("object=" + super.toString() + "\n") //                                    //$NON-NLS-1$ //$NON-NLS-2$
+            + ("identityHashCode=" + System.identityHashCode(this) + "\n") //                  //$NON-NLS-1$ //$NON-NLS-2$
 
-				//            + ("marker size:" + tourMarkers.size() + " " + tourMarkers+"\n") //$NON-NLS-1$
+            //            + ("marker size:" + tourMarkers.size() + " " + tourMarkers+"\n") //$NON-NLS-1$
 
-				+ "]"; //$NON-NLS-1$
-	}
+            + "]"; //$NON-NLS-1$
+   }
 
-	public String toStringWithHash() {
+   public String toStringWithHash() {
 
-		final String string = "" //$NON-NLS-1$
-				+ ("   tourId: " + tourId) //$NON-NLS-1$
-				+ ("   identityHashCode: " + System.identityHashCode(this)); //$NON-NLS-1$
+      final String string = "" //$NON-NLS-1$
+            + ("   tourId: " + tourId) //$NON-NLS-1$
+            + ("   identityHashCode: " + System.identityHashCode(this)); //$NON-NLS-1$
 
-		return string;
-	}
+      return string;
+   }
 
-	@Override
-	public String toXml() {
+   @Override
+   public String toXml() {
 
-		try {
-			final JAXBContext context = JAXBContext.newInstance(TourData.class);
-			final Marshaller marshaller = context.createMarshaller();
-			final StringWriter sw = new StringWriter();
-			marshaller.marshal(this, sw);
-			return sw.toString();
+      try {
+         final JAXBContext context = JAXBContext.newInstance(TourData.class);
+         final Marshaller marshaller = context.createMarshaller();
+         final StringWriter sw = new StringWriter();
+         marshaller.marshal(this, sw);
+         return sw.toString();
 
-		} catch (final JAXBException e) {
-			e.printStackTrace();
-		}
+      } catch (final JAXBException e) {
+         e.printStackTrace();
+      }
 
-		return null;
-	}
+      return null;
+   }
 
-	/**
-	 * Converts data series from db version 19 to 20
-	 */
-	public void updateDatabase_019_to_020() {
+   /**
+    * Converts data series from db version 19 to 20
+    */
+   public void updateDatabase_019_to_020() {
 
-		updateDatabase_019_to_020_10DataSeries();
-		updateDatabase_019_to_020_20TourMarker();
-	}
+      updateDatabase_019_to_020_10DataSeries();
+      updateDatabase_019_to_020_20TourMarker();
+   }
 
-	private void updateDatabase_019_to_020_10DataSeries() {
+   private void updateDatabase_019_to_020_10DataSeries() {
 
-		/*
-		 * cleanup dataseries because dataseries has been saved before version 1.3.0 even when no data
-		 * are available
-		 */
+      /*
+       * cleanup dataseries because dataseries has been saved before version 1.3.0 even when no data
+       * are available
+       */
 // this DO NOT WORK because time serie is not set !!!!
 //      cleanupDataSeries();
 
-		final SerieData serieData19 = serieData;
-		final SerieData serieData20 = new SerieData();
+      final SerieData serieData19 = serieData;
+      final SerieData serieData20 = new SerieData();
 
-		serieData20.timeSerie = serieData19.timeSerie;
+      serieData20.timeSerie = serieData19.timeSerie;
 
-		serieData20.altitudeSerie20 = convertDataSeries(serieData19.altitudeSerie, 0);
-		serieData20.altitudeSerie = null;
+      serieData20.altitudeSerie20 = convertDataSeries(serieData19.altitudeSerie, 0);
+      serieData20.altitudeSerie = null;
 
-		serieData20.cadenceSerie20 = convertDataSeries(serieData19.cadenceSerie, 0);
-		serieData20.cadenceSerie = null;
+      serieData20.cadenceSerie20 = convertDataSeries(serieData19.cadenceSerie, 0);
+      serieData20.cadenceSerie = null;
 
-		serieData20.distanceSerie20 = convertDataSeries(serieData19.distanceSerie, 0);
-		serieData20.distanceSerie = null;
+      serieData20.distanceSerie20 = convertDataSeries(serieData19.distanceSerie, 0);
+      serieData20.distanceSerie = null;
 
-		serieData20.pulseSerie20 = convertDataSeries(serieData19.pulseSerie, 0);
-		serieData20.pulseSerie = null;
+      serieData20.pulseSerie20 = convertDataSeries(serieData19.pulseSerie, 0);
+      serieData20.pulseSerie = null;
 
-		serieData20.temperatureSerie20 = convertDataSeries(serieData19.temperatureSerie, temperatureScale);
-		serieData20.temperatureSerie = null;
+      serieData20.temperatureSerie20 = convertDataSeries(serieData19.temperatureSerie, temperatureScale);
+      serieData20.temperatureSerie = null;
 
-		/*
-		 * don't convert computed data series
-		 */
+      /*
+       * don't convert computed data series
+       */
 
-		if (serieData19.speedSerie != null) {
-			isSpeedSerieFromDevice = true;
-			serieData20.speedSerie20 = convertDataSeries(serieData19.speedSerie, 10);
-		}
-		serieData20.speedSerie = null;
+      if (serieData19.speedSerie != null) {
+         isSpeedSerieFromDevice = true;
+         serieData20.speedSerie20 = convertDataSeries(serieData19.speedSerie, 10);
+      }
+      serieData20.speedSerie = null;
 
-		if (serieData19.powerSerie != null) {
-			isPowerSerieFromDevice = true;
-			serieData20.powerSerie20 = convertDataSeries(serieData19.powerSerie, 0);
-		}
-		serieData20.powerSerie = null;
+      if (serieData19.powerSerie != null) {
+         isPowerSerieFromDevice = true;
+         serieData20.powerSerie20 = convertDataSeries(serieData19.powerSerie, 0);
+      }
+      serieData20.powerSerie = null;
 
-		serieData20.latitude = serieData19.latitude;
-		serieData20.longitude = serieData19.longitude;
+      serieData20.latitude = serieData19.latitude;
+      serieData20.longitude = serieData19.longitude;
 
-		// this serie is never used
-		serieData20.deviceMarker = null;
+      // this serie is never used
+      serieData20.deviceMarker = null;
 
-		serieData = serieData20;
+      serieData = serieData20;
 
-		onPostLoadGetDataSeries();
-	}
+      onPostLoadGetDataSeries();
+   }
 
-	private void updateDatabase_019_to_020_20TourMarker() {
+   private void updateDatabase_019_to_020_20TourMarker() {
 
-		for (final TourMarker tourMarker : tourMarkers) {
-			tourMarker.updateDatabase_019_to_020();
-		}
-	}
+      for (final TourMarker tourMarker : tourMarkers) {
+         tourMarker.updateDatabase_019_to_020();
+      }
+   }
 
-	/**
-	 * Fill swim data into tourdata.
-	 *
-	 * @param tourData
-	 * @param allTourSwimData
-	 */
-	public void finalizeTour_SwimData(final TourData tourData, final List<SwimData> allTourSwimData) {
-
-		// check if swim data are available
-		if (allTourSwimData == null) {
-			return;
-		}
-
-		final long tourStartTime = tourData.getTourStartTimeMS();
-
-		final int swimDataSize = allTourSwimData.size();
-
-		final short[] lengthType = new short[swimDataSize];
-		final short[] cadence = new short[swimDataSize];
-		final short[] strokes = new short[swimDataSize];
-		final short[] strokeStyle = new short[swimDataSize];
-		final int[] swimTime = new int[swimDataSize];
-
-		tourData.swim_LengthType = lengthType;
-		tourData.swim_Cadence = cadence;
-		tourData.swim_Strokes = strokes;
-		tourData.swim_StrokeStyle = strokeStyle;
-		tourData.swim_Time = swimTime;
-
-		boolean isSwimLengthType = false;
-		boolean isSwimCadence = false;
-		boolean isSwimStrokes = false;
-		boolean isSwimStrokeStyle = false;
-		boolean isSwimTime = false;
-
-		for (int swimSerieIndex = 0; swimSerieIndex < allTourSwimData.size(); swimSerieIndex++) {
-
-			final SwimData swimData = allTourSwimData.get(swimSerieIndex);
-
-			final long absoluteSwimTime = swimData.absoluteTime;
-			final short relativeSwimTime = (short) ((absoluteSwimTime - tourStartTime) / 1000);
-
-			final short swimLengthType = swimData.swim_LengthType;
-			short swimCadence = swimData.swim_Cadence;
-			short swimStrokes = swimData.swim_Strokes;
-			final short swimStrokeStyle = swimData.swim_StrokeStyle;
-
-			/*
-			 * Length type
-			 */
-			if (swimLengthType != Short.MIN_VALUE && swimLengthType > 0) {
-				isSwimLengthType = true;
-			}
-
-			/*
-			 * Cadence
-			 */
-			if (swimCadence == Short.MIN_VALUE) {
-				swimCadence = 0;
-			}
-			if (swimCadence > 0) {
-				isSwimCadence = true;
-			}
-
-			/*
-			 * Strokes
-			 */
-			if (swimStrokes == Short.MIN_VALUE) {
-				swimStrokes = 0;
-			}
-			if (swimStrokes > 0) {
-				isSwimStrokes = true;
-			}
-
-			/*
-			 * Stroke style
-			 */
-			if (swimStrokeStyle != Short.MIN_VALUE && swimStrokeStyle > 0) {
-				isSwimStrokeStyle = true;
-			}
-
-			/*
-			 * Swim time
-			 */
-			if (relativeSwimTime > 0) {
-				isSwimTime = true;
-			}
-
-			lengthType[swimSerieIndex] = swimLengthType;
-			cadence[swimSerieIndex] = swimCadence;
-			strokes[swimSerieIndex] = swimStrokes;
-			strokeStyle[swimSerieIndex] = swimStrokeStyle;
-			swimTime[swimSerieIndex] = relativeSwimTime;
-		}
-
-		/*
-		 * Cleanup data series
-		 */
-		if (isSwimLengthType == false) {
-			tourData.swim_LengthType = null;
-		}
-		if (isSwimStrokes == false) {
-			tourData.swim_Strokes = null;
-		}
-		if (isSwimStrokeStyle == false) {
-			tourData.swim_StrokeStyle = null;
-		}
-		if (isSwimTime == false) {
-			tourData.swim_Time = null;
-		}
-
-		// cadence is very special
-		if (isSwimCadence) {
-			// removed 'normal' cadence data serie when swim cadence is available
-			tourData.setCadenceSerie(null);
-		} else {
-			tourData.swim_Cadence = null;
-		}
-	}
 }
