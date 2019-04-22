@@ -329,6 +329,7 @@ public class SuuntoJsonProcessor {
          });
 
 			final Iterator<TimeData> sampleListIterator = _sampleList.iterator();
+         long previousAbsoluteTime = 0;
 			while (sampleListIterator.hasNext()) {
 				final TimeData currentTimeData = sampleListIterator.next();
 
@@ -337,8 +338,11 @@ public class SuuntoJsonProcessor {
 				// we remove the entries that don't have altitude data
 				if (currentTimeData.marker == 0 &&
 						(!isIndoorTour && currentTimeData.longitude == Double.MIN_VALUE && currentTimeData.latitude == Double.MIN_VALUE) ||
-                  (isIndoorTour && currentTimeData.absoluteAltitude == Float.MIN_VALUE)) {
+                  (isIndoorTour && currentTimeData.absoluteAltitude == Float.MIN_VALUE) ||
+                  currentTimeData.absoluteTime == previousAbsoluteTime) {
                sampleListIterator.remove();
+            }else {
+               previousAbsoluteTime = currentTimeData.absoluteTime;
             }
 			}
 		}

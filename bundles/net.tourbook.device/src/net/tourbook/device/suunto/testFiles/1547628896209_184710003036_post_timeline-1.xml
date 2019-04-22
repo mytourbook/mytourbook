@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <TourData>
 	<tourStartTime>1547626269134</tourStartTime>
-	<tourEndTime>1547626731134</tourEndTime>
+	<tourEndTime>1547626744134</tourEndTime>
 	<startYear>2019</startYear>
 	<startMonth>1</startMonth>
 	<startDay>16</startDay>
@@ -9,13 +9,13 @@
 	<startMinute>11</startMinute>
 	<startSecond>9</startSecond>
 	<startWeek>3</startWeek>
-	<tourRecordingTime>462</tourRecordingTime>
+	<tourRecordingTime>475</tourRecordingTime>
 	<tourDrivingTime>453</tourDrivingTime>
 	<tourDistance>400.0</tourDistance>
 	<tourAltUp>0</tourAltUp>
 	<tourAltDown>0</tourAltDown>
 	<restPulse>0</restPulse>
-	<avgPulse>129.43114</avgPulse>
+	<avgPulse>130.60559</avgPulse>
 	<maxPulse>307.69232</maxPulse>
 	<maxAltitude>0.0</maxAltitude>
 	<maxSpeed>4.500155</maxSpeed>
@@ -55,6 +55,11 @@
 			<time>451</time>
 			<distance20>400.0</distance20>
 			<label>7</label>
+		</TourMarker>
+		<TourMarker serieIndex="469">
+			<time>475</time>
+			<distance20>400.0</distance20>
+			<label>8</label>
 		</TourMarker>
 	</TourMarkers>
 	<TimeSeries>
@@ -527,24 +532,7 @@
 		<TimeSerie>461</TimeSerie>
 		<TimeSerie>462</TimeSerie>
 		<TimeSerie>462</TimeSerie>
-		<TimeSerie>462</TimeSerie>
-		<TimeSerie>462</TimeSerie>
-		<TimeSerie>462</TimeSerie>
-		<TimeSerie>462</TimeSerie>
-		<TimeSerie>462</TimeSerie>
-		<TimeSerie>462</TimeSerie>
-		<TimeSerie>462</TimeSerie>
-		<TimeSerie>462</TimeSerie>
-		<TimeSerie>462</TimeSerie>
-		<TimeSerie>462</TimeSerie>
-		<TimeSerie>462</TimeSerie>
-		<TimeSerie>462</TimeSerie>
-		<TimeSerie>462</TimeSerie>
-		<TimeSerie>462</TimeSerie>
-		<TimeSerie>462</TimeSerie>
-		<TimeSerie>462</TimeSerie>
-		<TimeSerie>462</TimeSerie>
-		<TimeSerie>462</TimeSerie>
+		<TimeSerie>475</TimeSerie>
 	</TimeSeries>
 	<DistanceSeries>
 		<DistanceSerie>0.0</DistanceSerie>
@@ -1017,46 +1005,29 @@
 		<DistanceSerie>400.0</DistanceSerie>
 		<DistanceSerie>400.0</DistanceSerie>
 		<DistanceSerie>400.0</DistanceSerie>
-		<DistanceSerie>400.0</DistanceSerie>
-		<DistanceSerie>400.0</DistanceSerie>
-		<DistanceSerie>400.0</DistanceSerie>
-		<DistanceSerie>400.0</DistanceSerie>
-		<DistanceSerie>400.0</DistanceSerie>
-		<DistanceSerie>400.0</DistanceSerie>
-		<DistanceSerie>400.0</DistanceSerie>
-		<DistanceSerie>400.0</DistanceSerie>
-		<DistanceSerie>400.0</DistanceSerie>
-		<DistanceSerie>400.0</DistanceSerie>
-		<DistanceSerie>400.0</DistanceSerie>
-		<DistanceSerie>400.0</DistanceSerie>
-		<DistanceSerie>400.0</DistanceSerie>
-		<DistanceSerie>400.0</DistanceSerie>
-		<DistanceSerie>400.0</DistanceSerie>
-		<DistanceSerie>400.0</DistanceSerie>
-		<DistanceSerie>400.0</DistanceSerie>
 	</DistanceSeries>
 	<PulseSeries>
-		<PulseSerie>1.4E-45</PulseSerie>
-		<PulseSerie>40.431267</PulseSerie>
-		<PulseSerie>44.92363</PulseSerie>
-		<PulseSerie>49.415993</PulseSerie>
-		<PulseSerie>53.908356</PulseSerie>
-		<PulseSerie>58.40072</PulseSerie>
-		<PulseSerie>62.89308</PulseSerie>
-		<PulseSerie>67.385445</PulseSerie>
-		<PulseSerie>71.87781</PulseSerie>
-		<PulseSerie>76.37017</PulseSerie>
-		<PulseSerie>80.86253</PulseSerie>
-		<PulseSerie>85.3549</PulseSerie>
-		<PulseSerie>89.84726</PulseSerie>
-		<PulseSerie>94.33962</PulseSerie>
-		<PulseSerie>98.831985</PulseSerie>
-		<PulseSerie>103.32435</PulseSerie>
-		<PulseSerie>107.81671</PulseSerie>
-		<PulseSerie>112.309074</PulseSerie>
-		<PulseSerie>116.80144</PulseSerie>
-		<PulseSerie>121.2938</PulseSerie>
-		<PulseSerie>121.2938</PulseSerie>
+		<PulseSerie>114.068436</PulseSerie>
+		<PulseSerie>114.722755</PulseSerie>
+		<PulseSerie>114.94253</PulseSerie>
+		<PulseSerie>114.28572</PulseSerie>
+		<PulseSerie>107.52688</PulseSerie>
+		<PulseSerie>108.303246</PulseSerie>
+		<PulseSerie>108.303246</PulseSerie>
+		<PulseSerie>110.09174</PulseSerie>
+		<PulseSerie>111.94029</PulseSerie>
+		<PulseSerie>111.11111</PulseSerie>
+		<PulseSerie>110.49724</PulseSerie>
+		<PulseSerie>112.35956</PulseSerie>
+		<PulseSerie>112.14953</PulseSerie>
+		<PulseSerie>111.94029</PulseSerie>
+		<PulseSerie>114.94253</PulseSerie>
+		<PulseSerie>112.57036</PulseSerie>
+		<PulseSerie>112.99435</PulseSerie>
+		<PulseSerie>113.421555</PulseSerie>
+		<PulseSerie>145.9854</PulseSerie>
+		<PulseSerie>126.8499</PulseSerie>
+		<PulseSerie>126.8499</PulseSerie>
 		<PulseSerie>125.78616</PulseSerie>
 		<PulseSerie>119.76048</PulseSerie>
 		<PulseSerie>121.21212</PulseSerie>
@@ -1505,24 +1476,7 @@
 		<PulseSerie>137.61469</PulseSerie>
 		<PulseSerie>137.61469</PulseSerie>
 		<PulseSerie>137.61469</PulseSerie>
-		<PulseSerie>137.61469</PulseSerie>
-		<PulseSerie>137.61469</PulseSerie>
-		<PulseSerie>137.61469</PulseSerie>
-		<PulseSerie>137.61469</PulseSerie>
-		<PulseSerie>137.61469</PulseSerie>
-		<PulseSerie>137.61469</PulseSerie>
-		<PulseSerie>137.61469</PulseSerie>
-		<PulseSerie>137.61469</PulseSerie>
-		<PulseSerie>137.61469</PulseSerie>
-		<PulseSerie>137.61469</PulseSerie>
-		<PulseSerie>137.61469</PulseSerie>
-		<PulseSerie>137.61469</PulseSerie>
-		<PulseSerie>137.61469</PulseSerie>
-		<PulseSerie>137.61469</PulseSerie>
-		<PulseSerie>137.61469</PulseSerie>
-		<PulseSerie>137.61469</PulseSerie>
-		<PulseSerie>137.61469</PulseSerie>
-		<PulseSerie>137.61469</PulseSerie>
+		<PulseSerie>132.15858</PulseSerie>
 	</PulseSeries>
 	<TemperatureSeries>
 		<TemperatureSerie>25.570002</TemperatureSerie>
@@ -1991,23 +1945,6 @@
 		<TemperatureSerie>26.570002</TemperatureSerie>
 		<TemperatureSerie>26.570002</TemperatureSerie>
 		<TemperatureSerie>26.570002</TemperatureSerie>
-		<TemperatureSerie>26.580011</TemperatureSerie>
-		<TemperatureSerie>26.580011</TemperatureSerie>
-		<TemperatureSerie>26.580011</TemperatureSerie>
-		<TemperatureSerie>26.580011</TemperatureSerie>
-		<TemperatureSerie>26.580011</TemperatureSerie>
-		<TemperatureSerie>26.580011</TemperatureSerie>
-		<TemperatureSerie>26.580011</TemperatureSerie>
-		<TemperatureSerie>26.580011</TemperatureSerie>
-		<TemperatureSerie>26.580011</TemperatureSerie>
-		<TemperatureSerie>26.580011</TemperatureSerie>
-		<TemperatureSerie>26.580011</TemperatureSerie>
-		<TemperatureSerie>26.580011</TemperatureSerie>
-		<TemperatureSerie>26.580011</TemperatureSerie>
-		<TemperatureSerie>26.580011</TemperatureSerie>
-		<TemperatureSerie>26.580011</TemperatureSerie>
-		<TemperatureSerie>26.580011</TemperatureSerie>
-		<TemperatureSerie>26.580011</TemperatureSerie>
 		<TemperatureSerie>26.580011</TemperatureSerie>
 		<TemperatureSerie>26.580011</TemperatureSerie>
 		<TemperatureSerie>26.580011</TemperatureSerie>
@@ -2482,25 +2419,8 @@
 		<SpeedSerie>0.80405897</SpeedSerie>
 		<SpeedSerie>0.73618454</SpeedSerie>
 		<SpeedSerie>0.73618454</SpeedSerie>
-		<SpeedSerie>0.73618454</SpeedSerie>
-		<SpeedSerie>0.73618454</SpeedSerie>
-		<SpeedSerie>0.73618454</SpeedSerie>
-		<SpeedSerie>0.73618454</SpeedSerie>
-		<SpeedSerie>0.73618454</SpeedSerie>
-		<SpeedSerie>0.73618454</SpeedSerie>
-		<SpeedSerie>0.73618454</SpeedSerie>
-		<SpeedSerie>0.73618454</SpeedSerie>
-		<SpeedSerie>0.73618454</SpeedSerie>
-		<SpeedSerie>0.73618454</SpeedSerie>
-		<SpeedSerie>0.73618454</SpeedSerie>
-		<SpeedSerie>0.73618454</SpeedSerie>
-		<SpeedSerie>0.73618454</SpeedSerie>
-		<SpeedSerie>0.73618454</SpeedSerie>
-		<SpeedSerie>0.73618454</SpeedSerie>
-		<SpeedSerie>0.73618454</SpeedSerie>
-		<SpeedSerie>0.73618454</SpeedSerie>
-		<SpeedSerie>0.73618454</SpeedSerie>
-		<SpeedSerie>0.73618454</SpeedSerie>
+		<SpeedSerie>0.0</SpeedSerie>
+		<SpeedSerie>0.0</SpeedSerie>
 	</SpeedSeries>
 	<SwimTimes>
 		<SwimTime>1</SwimTime>

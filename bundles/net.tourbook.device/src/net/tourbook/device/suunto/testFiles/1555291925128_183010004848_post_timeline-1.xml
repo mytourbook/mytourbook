@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <TourData>
 	<tourStartTime>1554903336257</tourStartTime>
-	<tourEndTime>1554907889257</tourEndTime>
+	<tourEndTime>1554907893257</tourEndTime>
 	<startYear>2019</startYear>
 	<startMonth>4</startMonth>
 	<startDay>10</startDay>
@@ -9,7 +9,7 @@
 	<startMinute>35</startMinute>
 	<startSecond>36</startSecond>
 	<startWeek>15</startWeek>
-	<tourRecordingTime>4553</tourRecordingTime>
+	<tourRecordingTime>4557</tourRecordingTime>
 	<tourDrivingTime>4411</tourDrivingTime>
 	<timeZoneId>America/Denver</timeZoneId>
 	<tourDistance>12500.0</tourDistance>
@@ -117,10 +117,15 @@
 			<distance20>7995.0</distance20>
 			<label>19</label>
 		</TourMarker>
-		<TourMarker serieIndex="2638">
+		<TourMarker serieIndex="2639">
 			<time>3138</time>
 			<distance20>8352.0</distance20>
 			<label>20</label>
+		</TourMarker>
+		<TourMarker serieIndex="3883">
+			<time>4557</time>
+			<distance20>12500.0</distance20>
+			<label>21</label>
 		</TourMarker>
 	</TourMarkers>
 	<TimeSeries>
@@ -2735,6 +2740,7 @@
 		<TimeSerie>3107</TimeSerie>
 		<TimeSerie>3108</TimeSerie>
 		<TimeSerie>3109</TimeSerie>
+		<TimeSerie>3110</TimeSerie>
 		<TimeSerie>3111</TimeSerie>
 		<TimeSerie>3112</TimeSerie>
 		<TimeSerie>3113</TimeSerie>
@@ -4006,6 +4012,7 @@
 		<TimeSerie>4551</TimeSerie>
 		<TimeSerie>4552</TimeSerie>
 		<TimeSerie>4553</TimeSerie>
+		<TimeSerie>4557</TimeSerie>
 	</TimeSeries>
 	<DistanceSeries>
 		<DistanceSerie>0.0</DistanceSerie>
@@ -6619,6 +6626,7 @@
 		<DistanceSerie>8235.0</DistanceSerie>
 		<DistanceSerie>8239.0</DistanceSerie>
 		<DistanceSerie>8242.0</DistanceSerie>
+		<DistanceSerie>8244.0</DistanceSerie>
 		<DistanceSerie>8246.0</DistanceSerie>
 		<DistanceSerie>8250.0</DistanceSerie>
 		<DistanceSerie>8258.0</DistanceSerie>
@@ -7889,6 +7897,7 @@
 		<DistanceSerie>12490.0</DistanceSerie>
 		<DistanceSerie>12497.0</DistanceSerie>
 		<DistanceSerie>12497.0</DistanceSerie>
+		<DistanceSerie>12500.0</DistanceSerie>
 		<DistanceSerie>12500.0</DistanceSerie>
 	</DistanceSeries>
 	<AltitudeSeries>
@@ -10508,6 +10517,7 @@
 		<AltitudeSerie>1675.4</AltitudeSerie>
 		<AltitudeSerie>1675.4</AltitudeSerie>
 		<AltitudeSerie>1675.4</AltitudeSerie>
+		<AltitudeSerie>1675.4</AltitudeSerie>
 		<AltitudeSerie>1675.2</AltitudeSerie>
 		<AltitudeSerie>1675.2</AltitudeSerie>
 		<AltitudeSerie>1675.2</AltitudeSerie>
@@ -11772,6 +11782,7 @@
 		<AltitudeSerie>1585.0</AltitudeSerie>
 		<AltitudeSerie>1585.2</AltitudeSerie>
 		<AltitudeSerie>1585.2</AltitudeSerie>
+		<AltitudeSerie>1585.4</AltitudeSerie>
 		<AltitudeSerie>1585.4</AltitudeSerie>
 		<AltitudeSerie>1585.4</AltitudeSerie>
 	</AltitudeSeries>
@@ -14387,6 +14398,7 @@
 		<CadenceSerie>88.020004</CadenceSerie>
 		<CadenceSerie>88.020004</CadenceSerie>
 		<CadenceSerie>88.020004</CadenceSerie>
+		<CadenceSerie>0.0</CadenceSerie>
 		<CadenceSerie>88.020004</CadenceSerie>
 		<CadenceSerie>87.0</CadenceSerie>
 		<CadenceSerie>87.0</CadenceSerie>
@@ -15658,6 +15670,7 @@
 		<CadenceSerie>82.02</CadenceSerie>
 		<CadenceSerie>82.02</CadenceSerie>
 		<CadenceSerie>82.02</CadenceSerie>
+		<CadenceSerie>0.0</CadenceSerie>
 	</CadenceSeries>
 	<TemperatureSeries>
 		<TemperatureSerie>17.490015</TemperatureSerie>
@@ -18272,6 +18285,7 @@
 		<TemperatureSerie>6.85</TemperatureSerie>
 		<TemperatureSerie>6.83999</TemperatureSerie>
 		<TemperatureSerie>6.83999</TemperatureSerie>
+		<TemperatureSerie>6.83999</TemperatureSerie>
 		<TemperatureSerie>6.820001</TemperatureSerie>
 		<TemperatureSerie>6.8099914</TemperatureSerie>
 		<TemperatureSerie>6.8099914</TemperatureSerie>
@@ -19539,6 +19553,7 @@
 		<TemperatureSerie>7.050012</TemperatureSerie>
 		<TemperatureSerie>7.050012</TemperatureSerie>
 		<TemperatureSerie>7.050012</TemperatureSerie>
+		<TemperatureSerie>7.0400023</TemperatureSerie>
 		<TemperatureSerie>7.0400023</TemperatureSerie>
 		<TemperatureSerie>7.0400023</TemperatureSerie>
 		<TemperatureSerie>7.0400023</TemperatureSerie>
@@ -22035,217 +22050,218 @@
 		<SpeedSerie>11.638607</SpeedSerie>
 		<SpeedSerie>11.641227</SpeedSerie>
 		<SpeedSerie>11.523736</SpeedSerie>
-		<SpeedSerie>11.416626</SpeedSerie>
+		<SpeedSerie>11.416625</SpeedSerie>
 		<SpeedSerie>11.3008585</SpeedSerie>
-		<SpeedSerie>11.194681</SpeedSerie>
+		<SpeedSerie>11.19468</SpeedSerie>
 		<SpeedSerie>11.058452</SpeedSerie>
 		<SpeedSerie>10.950434</SpeedSerie>
-		<SpeedSerie>10.80561</SpeedSerie>
+		<SpeedSerie>10.805609</SpeedSerie>
 		<SpeedSerie>10.682051</SpeedSerie>
 		<SpeedSerie>10.55461</SpeedSerie>
-		<SpeedSerie>10.412959</SpeedSerie>
+		<SpeedSerie>10.412958</SpeedSerie>
 		<SpeedSerie>10.234922</SpeedSerie>
-		<SpeedSerie>10.143784</SpeedSerie>
-		<SpeedSerie>9.963059</SpeedSerie>
-		<SpeedSerie>9.783653</SpeedSerie>
-		<SpeedSerie>9.63438</SpeedSerie>
+		<SpeedSerie>10.143783</SpeedSerie>
+		<SpeedSerie>9.963058</SpeedSerie>
+		<SpeedSerie>9.783652</SpeedSerie>
+		<SpeedSerie>9.634379</SpeedSerie>
 		<SpeedSerie>9.450669</SpeedSerie>
 		<SpeedSerie>9.20448</SpeedSerie>
-		<SpeedSerie>8.873434</SpeedSerie>
-		<SpeedSerie>8.5614605</SpeedSerie>
-		<SpeedSerie>8.293762</SpeedSerie>
-		<SpeedSerie>8.047478</SpeedSerie>
-		<SpeedSerie>7.8704596</SpeedSerie>
-		<SpeedSerie>7.7152357</SpeedSerie>
-		<SpeedSerie>7.648217</SpeedSerie>
-		<SpeedSerie>7.574383</SpeedSerie>
-		<SpeedSerie>7.5049767</SpeedSerie>
-		<SpeedSerie>7.4881644</SpeedSerie>
-		<SpeedSerie>7.3989244</SpeedSerie>
-		<SpeedSerie>7.3684664</SpeedSerie>
-		<SpeedSerie>7.3095384</SpeedSerie>
-		<SpeedSerie>7.2640576</SpeedSerie>
-		<SpeedSerie>7.266929</SpeedSerie>
-		<SpeedSerie>7.208776</SpeedSerie>
-		<SpeedSerie>7.319051</SpeedSerie>
-		<SpeedSerie>7.4132385</SpeedSerie>
-		<SpeedSerie>7.5237484</SpeedSerie>
-		<SpeedSerie>7.5660496</SpeedSerie>
-		<SpeedSerie>7.660636</SpeedSerie>
-		<SpeedSerie>7.672431</SpeedSerie>
-		<SpeedSerie>7.7640514</SpeedSerie>
-		<SpeedSerie>7.793974</SpeedSerie>
-		<SpeedSerie>7.8346124</SpeedSerie>
-		<SpeedSerie>7.8636193</SpeedSerie>
-		<SpeedSerie>7.906283</SpeedSerie>
-		<SpeedSerie>7.9375067</SpeedSerie>
-		<SpeedSerie>7.9828205</SpeedSerie>
-		<SpeedSerie>7.998595</SpeedSerie>
-		<SpeedSerie>8.041892</SpeedSerie>
-		<SpeedSerie>8.114451</SpeedSerie>
-		<SpeedSerie>8.10451</SpeedSerie>
-		<SpeedSerie>8.203078</SpeedSerie>
-		<SpeedSerie>8.2077</SpeedSerie>
-		<SpeedSerie>8.234544</SpeedSerie>
-		<SpeedSerie>8.296291</SpeedSerie>
-		<SpeedSerie>8.315721</SpeedSerie>
-		<SpeedSerie>8.340284</SpeedSerie>
-		<SpeedSerie>8.355258</SpeedSerie>
-		<SpeedSerie>8.378672</SpeedSerie>
-		<SpeedSerie>8.388447</SpeedSerie>
-		<SpeedSerie>8.457369</SpeedSerie>
-		<SpeedSerie>8.459264</SpeedSerie>
-		<SpeedSerie>8.48472</SpeedSerie>
-		<SpeedSerie>8.511591</SpeedSerie>
-		<SpeedSerie>8.547402</SpeedSerie>
-		<SpeedSerie>8.567007</SpeedSerie>
-		<SpeedSerie>8.599009</SpeedSerie>
-		<SpeedSerie>8.64193</SpeedSerie>
-		<SpeedSerie>8.712084</SpeedSerie>
-		<SpeedSerie>8.740424</SpeedSerie>
-		<SpeedSerie>8.7741585</SpeedSerie>
-		<SpeedSerie>8.783406</SpeedSerie>
-		<SpeedSerie>8.865943</SpeedSerie>
-		<SpeedSerie>8.862796</SpeedSerie>
-		<SpeedSerie>8.922379</SpeedSerie>
-		<SpeedSerie>8.917833</SpeedSerie>
-		<SpeedSerie>8.9753275</SpeedSerie>
-		<SpeedSerie>8.9905405</SpeedSerie>
-		<SpeedSerie>9.00355</SpeedSerie>
-		<SpeedSerie>9.039667</SpeedSerie>
-		<SpeedSerie>9.04117</SpeedSerie>
-		<SpeedSerie>9.043868</SpeedSerie>
-		<SpeedSerie>9.1131935</SpeedSerie>
-		<SpeedSerie>9.105289</SpeedSerie>
-		<SpeedSerie>9.116323</SpeedSerie>
-		<SpeedSerie>9.123904</SpeedSerie>
-		<SpeedSerie>9.170209</SpeedSerie>
-		<SpeedSerie>9.194664</SpeedSerie>
-		<SpeedSerie>9.212304</SpeedSerie>
-		<SpeedSerie>9.248586</SpeedSerie>
-		<SpeedSerie>9.271122</SpeedSerie>
-		<SpeedSerie>9.272953</SpeedSerie>
-		<SpeedSerie>9.382022</SpeedSerie>
-		<SpeedSerie>9.488694</SpeedSerie>
-		<SpeedSerie>9.5203085</SpeedSerie>
-		<SpeedSerie>9.574549</SpeedSerie>
-		<SpeedSerie>9.621678</SpeedSerie>
-		<SpeedSerie>9.686976</SpeedSerie>
-		<SpeedSerie>9.737835</SpeedSerie>
-		<SpeedSerie>9.814369</SpeedSerie>
-		<SpeedSerie>9.866204</SpeedSerie>
-		<SpeedSerie>9.926206</SpeedSerie>
-		<SpeedSerie>9.964982</SpeedSerie>
-		<SpeedSerie>10.111582</SpeedSerie>
-		<SpeedSerie>10.170185</SpeedSerie>
-		<SpeedSerie>10.309849</SpeedSerie>
-		<SpeedSerie>10.430304</SpeedSerie>
-		<SpeedSerie>10.511881</SpeedSerie>
-		<SpeedSerie>10.601583</SpeedSerie>
-		<SpeedSerie>10.698979</SpeedSerie>
-		<SpeedSerie>10.778508</SpeedSerie>
-		<SpeedSerie>10.865167</SpeedSerie>
-		<SpeedSerie>10.929042</SpeedSerie>
-		<SpeedSerie>11.067735</SpeedSerie>
-		<SpeedSerie>11.129386</SpeedSerie>
-		<SpeedSerie>11.218963</SpeedSerie>
-		<SpeedSerie>11.288688</SpeedSerie>
-		<SpeedSerie>11.363579</SpeedSerie>
-		<SpeedSerie>11.435981</SpeedSerie>
-		<SpeedSerie>11.513021</SpeedSerie>
-		<SpeedSerie>11.569134</SpeedSerie>
-		<SpeedSerie>11.647304</SpeedSerie>
-		<SpeedSerie>11.752393</SpeedSerie>
-		<SpeedSerie>11.834384</SpeedSerie>
-		<SpeedSerie>11.835859</SpeedSerie>
-		<SpeedSerie>11.857384</SpeedSerie>
-		<SpeedSerie>11.869191</SpeedSerie>
-		<SpeedSerie>11.871301</SpeedSerie>
-		<SpeedSerie>11.863765</SpeedSerie>
-		<SpeedSerie>11.854106</SpeedSerie>
-		<SpeedSerie>11.8098545</SpeedSerie>
-		<SpeedSerie>11.781724</SpeedSerie>
-		<SpeedSerie>11.737331</SpeedSerie>
-		<SpeedSerie>11.669506</SpeedSerie>
-		<SpeedSerie>11.5991335</SpeedSerie>
-		<SpeedSerie>11.606188</SpeedSerie>
-		<SpeedSerie>11.495888</SpeedSerie>
-		<SpeedSerie>11.423812</SpeedSerie>
-		<SpeedSerie>11.334936</SpeedSerie>
-		<SpeedSerie>11.229219</SpeedSerie>
-		<SpeedSerie>11.131857</SpeedSerie>
-		<SpeedSerie>11.017581</SpeedSerie>
-		<SpeedSerie>10.886376</SpeedSerie>
-		<SpeedSerie>10.76349</SpeedSerie>
-		<SpeedSerie>10.608855</SpeedSerie>
-		<SpeedSerie>10.450562</SpeedSerie>
-		<SpeedSerie>10.383291</SpeedSerie>
-		<SpeedSerie>10.161856</SpeedSerie>
-		<SpeedSerie>9.992613</SpeedSerie>
-		<SpeedSerie>9.798791</SpeedSerie>
-		<SpeedSerie>9.613617</SpeedSerie>
-		<SpeedSerie>9.405103</SpeedSerie>
-		<SpeedSerie>9.206687</SpeedSerie>
-		<SpeedSerie>8.877182</SpeedSerie>
-		<SpeedSerie>8.456403</SpeedSerie>
-		<SpeedSerie>8.174124</SpeedSerie>
-		<SpeedSerie>7.9066024</SpeedSerie>
-		<SpeedSerie>7.5315256</SpeedSerie>
-		<SpeedSerie>6.676568</SpeedSerie>
-		<SpeedSerie>6.623168</SpeedSerie>
-		<SpeedSerie>6.559776</SpeedSerie>
-		<SpeedSerie>6.336872</SpeedSerie>
-		<SpeedSerie>6.183492</SpeedSerie>
-		<SpeedSerie>6.015199</SpeedSerie>
-		<SpeedSerie>5.7242618</SpeedSerie>
-		<SpeedSerie>5.6126785</SpeedSerie>
-		<SpeedSerie>5.413122</SpeedSerie>
-		<SpeedSerie>5.383067</SpeedSerie>
-		<SpeedSerie>5.3699822</SpeedSerie>
-		<SpeedSerie>5.380117</SpeedSerie>
-		<SpeedSerie>5.336549</SpeedSerie>
-		<SpeedSerie>5.294547</SpeedSerie>
-		<SpeedSerie>5.2872386</SpeedSerie>
-		<SpeedSerie>5.3069525</SpeedSerie>
-		<SpeedSerie>5.3178496</SpeedSerie>
-		<SpeedSerie>5.331107</SpeedSerie>
-		<SpeedSerie>5.3581514</SpeedSerie>
-		<SpeedSerie>5.339986</SpeedSerie>
-		<SpeedSerie>5.3882017</SpeedSerie>
-		<SpeedSerie>5.3491864</SpeedSerie>
-		<SpeedSerie>5.369984</SpeedSerie>
-		<SpeedSerie>5.3787494</SpeedSerie>
-		<SpeedSerie>5.3749537</SpeedSerie>
-		<SpeedSerie>5.426206</SpeedSerie>
-		<SpeedSerie>5.4142756</SpeedSerie>
-		<SpeedSerie>5.3834276</SpeedSerie>
-		<SpeedSerie>5.4079843</SpeedSerie>
-		<SpeedSerie>5.3874545</SpeedSerie>
-		<SpeedSerie>5.379875</SpeedSerie>
-		<SpeedSerie>5.373549</SpeedSerie>
-		<SpeedSerie>5.356885</SpeedSerie>
-		<SpeedSerie>5.365131</SpeedSerie>
-		<SpeedSerie>5.398246</SpeedSerie>
-		<SpeedSerie>5.4208827</SpeedSerie>
-		<SpeedSerie>5.4445</SpeedSerie>
-		<SpeedSerie>5.450155</SpeedSerie>
-		<SpeedSerie>5.5260134</SpeedSerie>
-		<SpeedSerie>5.4917927</SpeedSerie>
-		<SpeedSerie>5.492107</SpeedSerie>
-		<SpeedSerie>5.489583</SpeedSerie>
-		<SpeedSerie>5.4715567</SpeedSerie>
-		<SpeedSerie>5.484229</SpeedSerie>
-		<SpeedSerie>5.4589176</SpeedSerie>
+		<SpeedSerie>8.873433</SpeedSerie>
+		<SpeedSerie>8.56146</SpeedSerie>
+		<SpeedSerie>8.293761</SpeedSerie>
+		<SpeedSerie>8.047477</SpeedSerie>
+		<SpeedSerie>7.870458</SpeedSerie>
+		<SpeedSerie>7.7152343</SpeedSerie>
+		<SpeedSerie>7.648215</SpeedSerie>
+		<SpeedSerie>7.5743804</SpeedSerie>
+		<SpeedSerie>7.504974</SpeedSerie>
+		<SpeedSerie>7.4881616</SpeedSerie>
+		<SpeedSerie>7.398921</SpeedSerie>
+		<SpeedSerie>7.3684626</SpeedSerie>
+		<SpeedSerie>7.309534</SpeedSerie>
+		<SpeedSerie>7.2640524</SpeedSerie>
+		<SpeedSerie>7.266923</SpeedSerie>
+		<SpeedSerie>7.2087684</SpeedSerie>
+		<SpeedSerie>7.3190417</SpeedSerie>
+		<SpeedSerie>7.4132276</SpeedSerie>
+		<SpeedSerie>7.5237365</SpeedSerie>
+		<SpeedSerie>7.5660353</SpeedSerie>
+		<SpeedSerie>7.6606207</SpeedSerie>
+		<SpeedSerie>7.6724143</SpeedSerie>
+		<SpeedSerie>7.7640333</SpeedSerie>
+		<SpeedSerie>7.793954</SpeedSerie>
+		<SpeedSerie>7.834591</SpeedSerie>
+		<SpeedSerie>7.863596</SpeedSerie>
+		<SpeedSerie>7.9062576</SpeedSerie>
+		<SpeedSerie>7.937479</SpeedSerie>
+		<SpeedSerie>7.9827905</SpeedSerie>
+		<SpeedSerie>7.99856</SpeedSerie>
+		<SpeedSerie>8.041851</SpeedSerie>
+		<SpeedSerie>8.114408</SpeedSerie>
+		<SpeedSerie>8.104463</SpeedSerie>
+		<SpeedSerie>8.203026</SpeedSerie>
+		<SpeedSerie>8.207638</SpeedSerie>
+		<SpeedSerie>8.234473</SpeedSerie>
+		<SpeedSerie>8.296214</SpeedSerie>
+		<SpeedSerie>8.315637</SpeedSerie>
+		<SpeedSerie>8.340194</SpeedSerie>
+		<SpeedSerie>8.35516</SpeedSerie>
+		<SpeedSerie>8.378565</SpeedSerie>
+		<SpeedSerie>8.388331</SpeedSerie>
+		<SpeedSerie>8.457244</SpeedSerie>
+		<SpeedSerie>8.459128</SpeedSerie>
+		<SpeedSerie>8.484574</SpeedSerie>
+		<SpeedSerie>8.511434</SpeedSerie>
+		<SpeedSerie>8.547232</SpeedSerie>
+		<SpeedSerie>8.566822</SpeedSerie>
+		<SpeedSerie>8.598807</SpeedSerie>
+		<SpeedSerie>8.641699</SpeedSerie>
+		<SpeedSerie>8.711834</SpeedSerie>
+		<SpeedSerie>8.740155</SpeedSerie>
+		<SpeedSerie>8.773869</SpeedSerie>
+		<SpeedSerie>8.7830925</SpeedSerie>
+		<SpeedSerie>8.865605</SpeedSerie>
+		<SpeedSerie>8.862432</SpeedSerie>
+		<SpeedSerie>8.921983</SpeedSerie>
+		<SpeedSerie>8.917382</SpeedSerie>
+		<SpeedSerie>8.974843</SpeedSerie>
+		<SpeedSerie>8.990019</SpeedSerie>
+		<SpeedSerie>9.002989</SpeedSerie>
+		<SpeedSerie>9.039065</SpeedSerie>
+		<SpeedSerie>9.0405245</SpeedSerie>
+		<SpeedSerie>9.043176</SpeedSerie>
+		<SpeedSerie>9.112452</SpeedSerie>
+		<SpeedSerie>9.104495</SpeedSerie>
+		<SpeedSerie>9.115463</SpeedSerie>
+		<SpeedSerie>9.122939</SpeedSerie>
+		<SpeedSerie>9.169178</SpeedSerie>
+		<SpeedSerie>9.193564</SpeedSerie>
+		<SpeedSerie>9.211132</SpeedSerie>
+		<SpeedSerie>9.247339</SpeedSerie>
+		<SpeedSerie>9.269797</SpeedSerie>
+		<SpeedSerie>9.271523</SpeedSerie>
+		<SpeedSerie>9.380448</SpeedSerie>
+		<SpeedSerie>9.48703</SpeedSerie>
+		<SpeedSerie>9.518551</SpeedSerie>
+		<SpeedSerie>9.572696</SpeedSerie>
+		<SpeedSerie>9.619729</SpeedSerie>
+		<SpeedSerie>9.68493</SpeedSerie>
+		<SpeedSerie>9.735691</SpeedSerie>
+		<SpeedSerie>9.812129</SpeedSerie>
+		<SpeedSerie>9.863872</SpeedSerie>
+		<SpeedSerie>9.923782</SpeedSerie>
+		<SpeedSerie>9.962475</SpeedSerie>
+		<SpeedSerie>10.108921</SpeedSerie>
+		<SpeedSerie>10.167387</SpeedSerie>
+		<SpeedSerie>10.307074</SpeedSerie>
+		<SpeedSerie>10.427522</SpeedSerie>
+		<SpeedSerie>10.509119</SpeedSerie>
+		<SpeedSerie>10.598874</SpeedSerie>
+		<SpeedSerie>10.6963625</SpeedSerie>
+		<SpeedSerie>10.776031</SpeedSerie>
+		<SpeedSerie>10.862883</SpeedSerie>
+		<SpeedSerie>10.927014</SpeedSerie>
+		<SpeedSerie>11.06604</SpeedSerie>
+		<SpeedSerie>11.128111</SpeedSerie>
+		<SpeedSerie>11.218208</SpeedSerie>
+		<SpeedSerie>11.288571</SpeedSerie>
+		<SpeedSerie>11.364236</SpeedSerie>
+		<SpeedSerie>11.437568</SpeedSerie>
+		<SpeedSerie>11.515719</SpeedSerie>
+		<SpeedSerie>11.573148</SpeedSerie>
+		<SpeedSerie>11.627317</SpeedSerie>
+		<SpeedSerie>11.6881275</SpeedSerie>
+		<SpeedSerie>11.762259</SpeedSerie>
+		<SpeedSerie>11.842874</SpeedSerie>
+		<SpeedSerie>11.843141</SpeedSerie>
+		<SpeedSerie>11.863606</SpeedSerie>
+		<SpeedSerie>11.874488</SpeedSerie>
+		<SpeedSerie>11.875789</SpeedSerie>
+		<SpeedSerie>11.867546</SpeedSerie>
+		<SpeedSerie>11.857273</SpeedSerie>
+		<SpeedSerie>11.812488</SpeedSerie>
+		<SpeedSerie>11.783894</SpeedSerie>
+		<SpeedSerie>11.739101</SpeedSerie>
+		<SpeedSerie>11.67093</SpeedSerie>
+		<SpeedSerie>11.60026</SpeedSerie>
+		<SpeedSerie>11.6070595</SpeedSerie>
+		<SpeedSerie>11.496541</SpeedSerie>
+		<SpeedSerie>11.42428</SpeedSerie>
+		<SpeedSerie>11.335247</SpeedSerie>
+		<SpeedSerie>11.229398</SpeedSerie>
+		<SpeedSerie>11.131925</SpeedSerie>
+		<SpeedSerie>11.017557</SpeedSerie>
+		<SpeedSerie>10.886277</SpeedSerie>
+		<SpeedSerie>10.763329</SpeedSerie>
+		<SpeedSerie>10.6086445</SpeedSerie>
+		<SpeedSerie>10.450312</SpeedSerie>
+		<SpeedSerie>10.383011</SpeedSerie>
+		<SpeedSerie>10.161553</SpeedSerie>
+		<SpeedSerie>9.992295</SpeedSerie>
+		<SpeedSerie>9.798463</SpeedSerie>
+		<SpeedSerie>9.613283</SpeedSerie>
+		<SpeedSerie>9.404767</SpeedSerie>
+		<SpeedSerie>9.206353</SpeedSerie>
+		<SpeedSerie>8.876846</SpeedSerie>
+		<SpeedSerie>8.456085</SpeedSerie>
+		<SpeedSerie>8.173827</SpeedSerie>
+		<SpeedSerie>7.9063196</SpeedSerie>
+		<SpeedSerie>7.531267</SpeedSerie>
+		<SpeedSerie>6.6763587</SpeedSerie>
+		<SpeedSerie>6.622984</SpeedSerie>
+		<SpeedSerie>6.559602</SpeedSerie>
+		<SpeedSerie>6.3367205</SpeedSerie>
+		<SpeedSerie>6.18336</SpeedSerie>
+		<SpeedSerie>6.015077</SpeedSerie>
+		<SpeedSerie>5.724166</SpeedSerie>
+		<SpeedSerie>5.612597</SpeedSerie>
+		<SpeedSerie>5.413058</SpeedSerie>
+		<SpeedSerie>5.383012</SpeedSerie>
+		<SpeedSerie>5.3699317</SpeedSerie>
+		<SpeedSerie>5.3800693</SpeedSerie>
+		<SpeedSerie>5.336509</SpeedSerie>
+		<SpeedSerie>5.294513</SpeedSerie>
+		<SpeedSerie>5.2872095</SpeedSerie>
+		<SpeedSerie>5.306927</SpeedSerie>
+		<SpeedSerie>5.3178277</SpeedSerie>
+		<SpeedSerie>5.3310885</SpeedSerie>
+		<SpeedSerie>5.3581357</SpeedSerie>
+		<SpeedSerie>5.339971</SpeedSerie>
+		<SpeedSerie>5.388189</SpeedSerie>
+		<SpeedSerie>5.3491755</SpeedSerie>
+		<SpeedSerie>5.3699746</SpeedSerie>
+		<SpeedSerie>5.3787413</SpeedSerie>
+		<SpeedSerie>5.374946</SpeedSerie>
+		<SpeedSerie>5.4262</SpeedSerie>
+		<SpeedSerie>5.41427</SpeedSerie>
+		<SpeedSerie>5.3834224</SpeedSerie>
+		<SpeedSerie>5.40798</SpeedSerie>
+		<SpeedSerie>5.387451</SpeedSerie>
+		<SpeedSerie>5.3798723</SpeedSerie>
+		<SpeedSerie>5.3735466</SpeedSerie>
+		<SpeedSerie>5.3568826</SpeedSerie>
+		<SpeedSerie>5.365129</SpeedSerie>
+		<SpeedSerie>5.398244</SpeedSerie>
+		<SpeedSerie>5.4208813</SpeedSerie>
+		<SpeedSerie>5.4444985</SpeedSerie>
+		<SpeedSerie>5.450154</SpeedSerie>
+		<SpeedSerie>5.5260124</SpeedSerie>
+		<SpeedSerie>5.491792</SpeedSerie>
+		<SpeedSerie>5.4921064</SpeedSerie>
+		<SpeedSerie>5.4895825</SpeedSerie>
+		<SpeedSerie>5.4715557</SpeedSerie>
+		<SpeedSerie>5.4842286</SpeedSerie>
+		<SpeedSerie>5.458917</SpeedSerie>
 		<SpeedSerie>5.478446</SpeedSerie>
-		<SpeedSerie>5.4681506</SpeedSerie>
-		<SpeedSerie>5.442371</SpeedSerie>
+		<SpeedSerie>5.46815</SpeedSerie>
+		<SpeedSerie>5.4423704</SpeedSerie>
 		<SpeedSerie>5.4260187</SpeedSerie>
 		<SpeedSerie>5.3937454</SpeedSerie>
 		<SpeedSerie>5.353083</SpeedSerie>
-		<SpeedSerie>5.2827992</SpeedSerie>
+		<SpeedSerie>5.282799</SpeedSerie>
 		<SpeedSerie>5.200311</SpeedSerie>
 		<SpeedSerie>4.06485</SpeedSerie>
-		<SpeedSerie>6.1780415</SpeedSerie>
+		<SpeedSerie>6.178041</SpeedSerie>
 		<SpeedSerie>6.442465</SpeedSerie>
 		<SpeedSerie>6.680927</SpeedSerie>
 		<SpeedSerie>6.9075813</SpeedSerie>
@@ -22274,7 +22290,7 @@
 		<SpeedSerie>10.931737</SpeedSerie>
 		<SpeedSerie>11.015019</SpeedSerie>
 		<SpeedSerie>11.076673</SpeedSerie>
-		<SpeedSerie>11.149754</SpeedSerie>
+		<SpeedSerie>11.149753</SpeedSerie>
 		<SpeedSerie>11.17973</SpeedSerie>
 		<SpeedSerie>11.290074</SpeedSerie>
 		<SpeedSerie>11.322145</SpeedSerie>
@@ -23272,7 +23288,7 @@
 		<SpeedSerie>12.5966</SpeedSerie>
 		<SpeedSerie>12.662863</SpeedSerie>
 		<SpeedSerie>12.618096</SpeedSerie>
-		<SpeedSerie>12.617878</SpeedSerie>
+		<SpeedSerie>12.617879</SpeedSerie>
 		<SpeedSerie>12.607209</SpeedSerie>
 		<SpeedSerie>12.593525</SpeedSerie>
 		<SpeedSerie>12.569478</SpeedSerie>
@@ -23284,148 +23300,149 @@
 		<SpeedSerie>12.480844</SpeedSerie>
 		<SpeedSerie>12.435589</SpeedSerie>
 		<SpeedSerie>12.403484</SpeedSerie>
-		<SpeedSerie>12.380333</SpeedSerie>
+		<SpeedSerie>12.380334</SpeedSerie>
 		<SpeedSerie>12.358995</SpeedSerie>
 		<SpeedSerie>12.347108</SpeedSerie>
 		<SpeedSerie>12.319624</SpeedSerie>
 		<SpeedSerie>12.3094</SpeedSerie>
-		<SpeedSerie>12.291462</SpeedSerie>
+		<SpeedSerie>12.291463</SpeedSerie>
 		<SpeedSerie>12.266162</SpeedSerie>
 		<SpeedSerie>12.2517395</SpeedSerie>
-		<SpeedSerie>12.218908</SpeedSerie>
-		<SpeedSerie>12.265863</SpeedSerie>
+		<SpeedSerie>12.218909</SpeedSerie>
+		<SpeedSerie>12.265864</SpeedSerie>
 		<SpeedSerie>12.165493</SpeedSerie>
-		<SpeedSerie>12.231784</SpeedSerie>
-		<SpeedSerie>12.385347</SpeedSerie>
-		<SpeedSerie>12.548775</SpeedSerie>
-		<SpeedSerie>12.726792</SpeedSerie>
-		<SpeedSerie>12.617707</SpeedSerie>
-		<SpeedSerie>12.697315</SpeedSerie>
-		<SpeedSerie>12.6714735</SpeedSerie>
-		<SpeedSerie>12.663637</SpeedSerie>
-		<SpeedSerie>12.662354</SpeedSerie>
-		<SpeedSerie>12.668042</SpeedSerie>
-		<SpeedSerie>12.6632395</SpeedSerie>
-		<SpeedSerie>12.648286</SpeedSerie>
-		<SpeedSerie>12.619021</SpeedSerie>
-		<SpeedSerie>12.666077</SpeedSerie>
-		<SpeedSerie>12.645387</SpeedSerie>
-		<SpeedSerie>12.637021</SpeedSerie>
-		<SpeedSerie>12.618773</SpeedSerie>
-		<SpeedSerie>12.616007</SpeedSerie>
-		<SpeedSerie>12.596201</SpeedSerie>
-		<SpeedSerie>12.592124</SpeedSerie>
-		<SpeedSerie>12.578669</SpeedSerie>
-		<SpeedSerie>12.555994</SpeedSerie>
-		<SpeedSerie>12.549531</SpeedSerie>
-		<SpeedSerie>12.504531</SpeedSerie>
-		<SpeedSerie>12.551646</SpeedSerie>
-		<SpeedSerie>12.506801</SpeedSerie>
-		<SpeedSerie>12.493223</SpeedSerie>
-		<SpeedSerie>12.488786</SpeedSerie>
-		<SpeedSerie>12.460975</SpeedSerie>
-		<SpeedSerie>12.467752</SpeedSerie>
-		<SpeedSerie>12.451241</SpeedSerie>
-		<SpeedSerie>12.451481</SpeedSerie>
-		<SpeedSerie>12.435791</SpeedSerie>
-		<SpeedSerie>12.436811</SpeedSerie>
-		<SpeedSerie>12.421902</SpeedSerie>
-		<SpeedSerie>12.3939905</SpeedSerie>
-		<SpeedSerie>12.458287</SpeedSerie>
-		<SpeedSerie>12.412713</SpeedSerie>
-		<SpeedSerie>12.4056225</SpeedSerie>
-		<SpeedSerie>12.407418</SpeedSerie>
-		<SpeedSerie>12.393001</SpeedSerie>
-		<SpeedSerie>12.3877125</SpeedSerie>
-		<SpeedSerie>12.391647</SpeedSerie>
-		<SpeedSerie>12.379642</SpeedSerie>
-		<SpeedSerie>12.384426</SpeedSerie>
-		<SpeedSerie>12.366014</SpeedSerie>
-		<SpeedSerie>12.352592</SpeedSerie>
-		<SpeedSerie>12.416641</SpeedSerie>
-		<SpeedSerie>12.395986</SpeedSerie>
-		<SpeedSerie>12.388299</SpeedSerie>
-		<SpeedSerie>12.396448</SpeedSerie>
-		<SpeedSerie>12.387755</SpeedSerie>
-		<SpeedSerie>12.3948555</SpeedSerie>
-		<SpeedSerie>12.385086</SpeedSerie>
-		<SpeedSerie>12.391097</SpeedSerie>
-		<SpeedSerie>12.380241</SpeedSerie>
-		<SpeedSerie>12.385183</SpeedSerie>
-		<SpeedSerie>12.373292</SpeedSerie>
-		<SpeedSerie>12.347497</SpeedSerie>
-		<SpeedSerie>12.405554</SpeedSerie>
-		<SpeedSerie>12.377953</SpeedSerie>
-		<SpeedSerie>12.362452</SpeedSerie>
-		<SpeedSerie>12.36199</SpeedSerie>
-		<SpeedSerie>12.343949</SpeedSerie>
-		<SpeedSerie>12.341014</SpeedSerie>
-		<SpeedSerie>12.327998</SpeedSerie>
-		<SpeedSerie>12.304993</SpeedSerie>
-		<SpeedSerie>12.297368</SpeedSerie>
-		<SpeedSerie>12.272634</SpeedSerie>
-		<SpeedSerie>12.233862</SpeedSerie>
-		<SpeedSerie>12.286394</SpeedSerie>
-		<SpeedSerie>12.220851</SpeedSerie>
-		<SpeedSerie>12.210869</SpeedSerie>
-		<SpeedSerie>12.201591</SpeedSerie>
-		<SpeedSerie>12.175245</SpeedSerie>
-		<SpeedSerie>12.157074</SpeedSerie>
-		<SpeedSerie>12.147062</SpeedSerie>
-		<SpeedSerie>12.119945</SpeedSerie>
-		<SpeedSerie>12.108344</SpeedSerie>
-		<SpeedSerie>12.079607</SpeedSerie>
-		<SpeedSerie>12.036654</SpeedSerie>
-		<SpeedSerie>12.077254</SpeedSerie>
-		<SpeedSerie>12.031928</SpeedSerie>
-		<SpeedSerie>11.998489</SpeedSerie>
-		<SpeedSerie>11.972517</SpeedSerie>
-		<SpeedSerie>11.954092</SpeedSerie>
-		<SpeedSerie>11.918043</SpeedSerie>
-		<SpeedSerie>11.889664</SpeedSerie>
-		<SpeedSerie>11.861562</SpeedSerie>
-		<SpeedSerie>11.833702</SpeedSerie>
-		<SpeedSerie>11.813404</SpeedSerie>
-		<SpeedSerie>11.782747</SpeedSerie>
-		<SpeedSerie>11.734252</SpeedSerie>
-		<SpeedSerie>11.650293</SpeedSerie>
-		<SpeedSerie>11.694112</SpeedSerie>
-		<SpeedSerie>11.555356</SpeedSerie>
-		<SpeedSerie>11.573503</SpeedSerie>
-		<SpeedSerie>11.502433</SpeedSerie>
-		<SpeedSerie>11.439799</SpeedSerie>
-		<SpeedSerie>11.381005</SpeedSerie>
-		<SpeedSerie>11.318495</SpeedSerie>
-		<SpeedSerie>11.22972</SpeedSerie>
-		<SpeedSerie>11.226985</SpeedSerie>
-		<SpeedSerie>11.122734</SpeedSerie>
-		<SpeedSerie>11.014637</SpeedSerie>
-		<SpeedSerie>10.91607</SpeedSerie>
-		<SpeedSerie>10.819738</SpeedSerie>
-		<SpeedSerie>10.700526</SpeedSerie>
-		<SpeedSerie>10.583777</SpeedSerie>
-		<SpeedSerie>10.462159</SpeedSerie>
-		<SpeedSerie>10.328271</SpeedSerie>
-		<SpeedSerie>10.214681</SpeedSerie>
-		<SpeedSerie>10.070761</SpeedSerie>
-		<SpeedSerie>9.906671</SpeedSerie>
-		<SpeedSerie>9.668216</SpeedSerie>
-		<SpeedSerie>9.24287</SpeedSerie>
-		<SpeedSerie>9.1735325</SpeedSerie>
-		<SpeedSerie>8.909376</SpeedSerie>
-		<SpeedSerie>8.676105</SpeedSerie>
-		<SpeedSerie>8.230691</SpeedSerie>
-		<SpeedSerie>8.021806</SpeedSerie>
-		<SpeedSerie>7.747926</SpeedSerie>
-		<SpeedSerie>7.4560566</SpeedSerie>
-		<SpeedSerie>7.1636724</SpeedSerie>
-		<SpeedSerie>6.837937</SpeedSerie>
-		<SpeedSerie>6.5040216</SpeedSerie>
-		<SpeedSerie>6.1545496</SpeedSerie>
-		<SpeedSerie>5.707652</SpeedSerie>
-		<SpeedSerie>5.019434</SpeedSerie>
-		<SpeedSerie>4.6361017</SpeedSerie>
-		<SpeedSerie>4.6361017</SpeedSerie>
+		<SpeedSerie>12.231785</SpeedSerie>
+		<SpeedSerie>12.385348</SpeedSerie>
+		<SpeedSerie>12.548776</SpeedSerie>
+		<SpeedSerie>12.726793</SpeedSerie>
+		<SpeedSerie>12.617709</SpeedSerie>
+		<SpeedSerie>12.697317</SpeedSerie>
+		<SpeedSerie>12.671476</SpeedSerie>
+		<SpeedSerie>12.663639</SpeedSerie>
+		<SpeedSerie>12.662356</SpeedSerie>
+		<SpeedSerie>12.668045</SpeedSerie>
+		<SpeedSerie>12.663242</SpeedSerie>
+		<SpeedSerie>12.64829</SpeedSerie>
+		<SpeedSerie>12.619025</SpeedSerie>
+		<SpeedSerie>12.666081</SpeedSerie>
+		<SpeedSerie>12.645391</SpeedSerie>
+		<SpeedSerie>12.637026</SpeedSerie>
+		<SpeedSerie>12.618778</SpeedSerie>
+		<SpeedSerie>12.616014</SpeedSerie>
+		<SpeedSerie>12.596208</SpeedSerie>
+		<SpeedSerie>12.592132</SpeedSerie>
+		<SpeedSerie>12.578677</SpeedSerie>
+		<SpeedSerie>12.556003</SpeedSerie>
+		<SpeedSerie>12.5495405</SpeedSerie>
+		<SpeedSerie>12.504541</SpeedSerie>
+		<SpeedSerie>12.551658</SpeedSerie>
+		<SpeedSerie>12.506813</SpeedSerie>
+		<SpeedSerie>12.493237</SpeedSerie>
+		<SpeedSerie>12.488801</SpeedSerie>
+		<SpeedSerie>12.460992</SpeedSerie>
+		<SpeedSerie>12.467771</SpeedSerie>
+		<SpeedSerie>12.4512615</SpeedSerie>
+		<SpeedSerie>12.451504</SpeedSerie>
+		<SpeedSerie>12.435816</SpeedSerie>
+		<SpeedSerie>12.436839</SpeedSerie>
+		<SpeedSerie>12.421931</SpeedSerie>
+		<SpeedSerie>12.394024</SpeedSerie>
+		<SpeedSerie>12.4583235</SpeedSerie>
+		<SpeedSerie>12.412753</SpeedSerie>
+		<SpeedSerie>12.405666</SpeedSerie>
+		<SpeedSerie>12.407467</SpeedSerie>
+		<SpeedSerie>12.393054</SpeedSerie>
+		<SpeedSerie>12.387772</SpeedSerie>
+		<SpeedSerie>12.391712</SpeedSerie>
+		<SpeedSerie>12.379712</SpeedSerie>
+		<SpeedSerie>12.384504</SpeedSerie>
+		<SpeedSerie>12.366099</SpeedSerie>
+		<SpeedSerie>12.352687</SpeedSerie>
+		<SpeedSerie>12.416745</SpeedSerie>
+		<SpeedSerie>12.396101</SpeedSerie>
+		<SpeedSerie>12.388426</SpeedSerie>
+		<SpeedSerie>12.396587</SpeedSerie>
+		<SpeedSerie>12.387908</SpeedSerie>
+		<SpeedSerie>12.395023</SpeedSerie>
+		<SpeedSerie>12.385271</SpeedSerie>
+		<SpeedSerie>12.391301</SpeedSerie>
+		<SpeedSerie>12.380465</SpeedSerie>
+		<SpeedSerie>12.385429</SpeedSerie>
+		<SpeedSerie>12.373562</SpeedSerie>
+		<SpeedSerie>12.347795</SpeedSerie>
+		<SpeedSerie>12.405881</SpeedSerie>
+		<SpeedSerie>12.378313</SpeedSerie>
+		<SpeedSerie>12.362847</SpeedSerie>
+		<SpeedSerie>12.362426</SpeedSerie>
+		<SpeedSerie>12.344429</SpeedSerie>
+		<SpeedSerie>12.34154</SpeedSerie>
+		<SpeedSerie>12.328577</SpeedSerie>
+		<SpeedSerie>12.305631</SpeedSerie>
+		<SpeedSerie>12.29807</SpeedSerie>
+		<SpeedSerie>12.273405</SpeedSerie>
+		<SpeedSerie>12.234711</SpeedSerie>
+		<SpeedSerie>12.287329</SpeedSerie>
+		<SpeedSerie>12.221878</SpeedSerie>
+		<SpeedSerie>12.211999</SpeedSerie>
+		<SpeedSerie>12.202833</SpeedSerie>
+		<SpeedSerie>12.176613</SpeedSerie>
+		<SpeedSerie>12.158578</SpeedSerie>
+		<SpeedSerie>12.148717</SpeedSerie>
+		<SpeedSerie>12.121764</SpeedSerie>
+		<SpeedSerie>12.110346</SpeedSerie>
+		<SpeedSerie>12.081808</SpeedSerie>
+		<SpeedSerie>12.039076</SpeedSerie>
+		<SpeedSerie>12.079919</SpeedSerie>
+		<SpeedSerie>12.034859</SpeedSerie>
+		<SpeedSerie>12.001713</SpeedSerie>
+		<SpeedSerie>11.976063</SpeedSerie>
+		<SpeedSerie>11.957993</SpeedSerie>
+		<SpeedSerie>11.922334</SpeedSerie>
+		<SpeedSerie>11.894382</SpeedSerie>
+		<SpeedSerie>11.866753</SpeedSerie>
+		<SpeedSerie>11.839413</SpeedSerie>
+		<SpeedSerie>11.819685</SpeedSerie>
+		<SpeedSerie>11.789657</SpeedSerie>
+		<SpeedSerie>11.741853</SpeedSerie>
+		<SpeedSerie>11.658654</SpeedSerie>
+		<SpeedSerie>11.704981</SpeedSerie>
+		<SpeedSerie>11.568399</SpeedSerie>
+		<SpeedSerie>11.58785</SpeedSerie>
+		<SpeedSerie>11.518214</SpeedSerie>
+		<SpeedSerie>11.457159</SpeedSerie>
+		<SpeedSerie>11.400102</SpeedSerie>
+		<SpeedSerie>11.3395</SpeedSerie>
+		<SpeedSerie>11.252827</SpeedSerie>
+		<SpeedSerie>11.252402</SpeedSerie>
+		<SpeedSerie>11.150692</SpeedSerie>
+		<SpeedSerie>11.045391</SpeedSerie>
+		<SpeedSerie>10.9499</SpeedSerie>
+		<SpeedSerie>10.856952</SpeedSerie>
+		<SpeedSerie>10.741461</SpeedSerie>
+		<SpeedSerie>10.628805</SpeedSerie>
+		<SpeedSerie>10.511689</SpeedSerie>
+		<SpeedSerie>10.382754</SpeedSerie>
+		<SpeedSerie>10.274612</SpeedSerie>
+		<SpeedSerie>10.136685</SpeedSerie>
+		<SpeedSerie>9.979188</SpeedSerie>
+		<SpeedSerie>9.747985</SpeedSerie>
+		<SpeedSerie>9.354547</SpeedSerie>
+		<SpeedSerie>9.296377</SpeedSerie>
+		<SpeedSerie>9.044505</SpeedSerie>
+		<SpeedSerie>8.824746</SpeedSerie>
+		<SpeedSerie>8.409061</SpeedSerie>
+		<SpeedSerie>8.218013</SpeedSerie>
+		<SpeedSerie>7.963754</SpeedSerie>
+		<SpeedSerie>7.6934676</SpeedSerie>
+		<SpeedSerie>7.424824</SpeedSerie>
+		<SpeedSerie>7.125204</SpeedSerie>
+		<SpeedSerie>6.8200154</SpeedSerie>
+		<SpeedSerie>6.502143</SpeedSerie>
+		<SpeedSerie>6.0900044</SpeedSerie>
+		<SpeedSerie>5.4782567</SpeedSerie>
+		<SpeedSerie>5.140807</SpeedSerie>
+		<SpeedSerie>4.229267</SpeedSerie>
+		<SpeedSerie>4.229267</SpeedSerie>
 	</SpeedSeries>
 	<LatitudeSeries>
 		<LatitudeSerie>40.5565631757334</LatitudeSerie>
@@ -26039,6 +26056,7 @@
 		<LatitudeSerie>40.580865292364265</LatitudeSerie>
 		<LatitudeSerie>40.580899291528134</LatitudeSerie>
 		<LatitudeSerie>40.58092600515689</LatitudeSerie>
+		<LatitudeSerie>40.58096728985587</LatitudeSerie>
 		<LatitudeSerie>40.58100128901974</LatitudeSerie>
 		<LatitudeSerie>40.58103528818361</LatitudeSerie>
 		<LatitudeSerie>40.581069287347475</LatitudeSerie>
@@ -27309,6 +27327,7 @@
 		<LatitudeSerie>40.55670402941228</LatitudeSerie>
 		<LatitudeSerie>40.55667731578353</LatitudeSerie>
 		<LatitudeSerie>40.55665545917819</LatitudeSerie>
+		<LatitudeSerie>40.55663845959625</LatitudeSerie>
 		<LatitudeSerie>40.55663845959625</LatitudeSerie>
 	</LatitudeSeries>
 	<LongitudeSeries>
@@ -29924,6 +29943,7 @@
 		<LongitudeSerie>-105.15999668810416</LongitudeSerie>
 		<LongitudeSerie>-105.16000640215098</LongitudeSerie>
 		<LongitudeSerie>-105.15999668810416</LongitudeSerie>
+		<LongitudeSerie>-105.15999668810416</LongitudeSerie>
 		<LongitudeSerie>-105.16000640215098</LongitudeSerie>
 		<LongitudeSerie>-105.16000640215098</LongitudeSerie>
 		<LongitudeSerie>-105.15999668810416</LongitudeSerie>
@@ -31193,6 +31213,7 @@
 		<LongitudeSerie>-105.14380337205593</LongitudeSerie>
 		<LongitudeSerie>-105.14381308610275</LongitudeSerie>
 		<LongitudeSerie>-105.14381308610275</LongitudeSerie>
+		<LongitudeSerie>-105.14383251419639</LongitudeSerie>
 		<LongitudeSerie>-105.14383251419639</LongitudeSerie>
 	</LongitudeSeries>
 	<test>jokl</test>
