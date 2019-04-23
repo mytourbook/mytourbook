@@ -28,6 +28,7 @@ public class SuuntoJsonProcessor {
 
 	public static final String		TAG_SAMPLES			= "Samples";													//$NON-NLS-1$
 	public static final String		TAG_SAMPLE			= "Sample";														//$NON-NLS-1$
+   public static final String  TAG_EVENTS      = "Events";      //$NON-NLS-1$
 	public static final String		TAG_TIMEISO8601	= "TimeISO8601";												//$NON-NLS-1$
 	public static final String		TAG_ATTRIBUTES		= "Attributes";												//$NON-NLS-1$
 
@@ -52,15 +53,15 @@ public class SuuntoJsonProcessor {
    private static final String TAG_TEMPERATURE = "Temperature"; //$NON-NLS-1$
 
 	// Swimming
-	private static final String	Swimming					= "Swimming";
-	private static final String	Breaststroke			= "Breaststroke";
-	private static final String	Freestyle				= "Freestyle";
-   private static final String Other           = "Other";
-	private static final String	PoolLengthStyle		= "PrevPoolLengthStyle";
-   private static final String TotalLengths    = "TotalLengths";
-	private static final String	Stroke					= "Stroke";
-	private static final String	Turn						= "Turn";
-	private static final String	Type						= "Type";
+	private static final String	Swimming					= "Swimming"; //$NON-NLS-1$
+	private static final String	Breaststroke			= "Breaststroke"; //$NON-NLS-1$
+	private static final String	Freestyle				= "Freestyle"; //$NON-NLS-1$
+   private static final String Other           = "Other"; //$NON-NLS-1$
+	private static final String	PoolLengthStyle		= "PrevPoolLengthStyle"; //$NON-NLS-1$
+   private static final String TotalLengths    = "TotalLengths"; //$NON-NLS-1$
+	private static final String	Stroke					= "Stroke"; //$NON-NLS-1$
+	private static final String	Turn						= "Turn"; //$NON-NLS-1$
+	private static final String	Type						= "Type"; //$NON-NLS-1$
    private static int          previousTotalLengths = 0;
 
 	private ArrayList<TimeData>	_sampleList;
@@ -149,7 +150,7 @@ public class SuuntoJsonProcessor {
 	 */
 	public TourData ImportActivity(	final String jsonFileContent,
 												final boolean isUnitTest) {
-		_sampleList = new ArrayList<TimeData>();
+		_sampleList = new ArrayList<>();
 
 		JSONArray samples = null;
 		try {
@@ -190,7 +191,7 @@ public class SuuntoJsonProcessor {
             }
 
 				final String attributesContent = sample.get(TAG_ATTRIBUTES).toString();
-				if (attributesContent == null || attributesContent == "") {
+				if (attributesContent == null || attributesContent == "") { //$NON-NLS-1$
                continue;
             }
 
@@ -537,7 +538,7 @@ public class SuuntoJsonProcessor {
          return false;
       }
       boolean wasDataPopulated = false;
-      final JSONArray Events = (JSONArray) new JSONObject(currentSample).get("Events");
+      final JSONArray Events = (JSONArray) new JSONObject(currentSample).get(TAG_EVENTS);
 		final JSONObject array = (JSONObject) Events.get(0);
       final String swimmingSample = ((JSONObject) array.get(Swimming)).toString();
 
@@ -673,14 +674,14 @@ public class SuuntoJsonProcessor {
 	 * @return The element value, if found.
 	 */
    private ArrayList<Integer> TryRetrieveIntegerListElementValue(final String token, final String elementName) {
-		final ArrayList<Integer> elementValues = new ArrayList<Integer>();
+		final ArrayList<Integer> elementValues = new ArrayList<>();
 		final String elements = TryRetrieveStringElementValue(token, elementName);
 
 		if (elements == null) {
          return elementValues;
       }
 
-		final String[] stringValues = elements.split(",");
+		final String[] stringValues = elements.split(","); //$NON-NLS-1$
 		for (final String stringValue : stringValues) {
 			final Integer rrValue = Integer.parseInt(stringValue);
 			elementValues.add(rrValue);
@@ -708,7 +709,7 @@ public class SuuntoJsonProcessor {
          result = new JSONObject(token).get(elementName).toString();
 		} catch (final Exception e) {
 		}
-		if (result == "null") {
+		if (result == "null") { //$NON-NLS-1$
          return null;
       }
 
