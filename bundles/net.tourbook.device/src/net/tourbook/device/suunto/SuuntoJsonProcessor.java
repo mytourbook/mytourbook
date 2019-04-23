@@ -65,7 +65,6 @@ public class SuuntoJsonProcessor {
    private static int          previousTotalLengths = 0;
 
    private ArrayList<TimeData> _sampleList;
-   private int                 _lapCounter;
    final IPreferenceStore      _prefStore           = TourbookPlugin.getDefault().getPreferenceStore();
 
    /**
@@ -100,8 +99,10 @@ public class SuuntoJsonProcessor {
     *           The current activity.
     * @param isIndoorTour
     *           True if the current tour is an indoor activity (i.e. No GPS data).
+    * @param numLaps
+    *           The number of laps in the activity.
     */
-   private void cleanUpActivity(final ArrayList<TimeData> activityData, final boolean isIndoorTour) {
+   private void cleanUpActivity(final ArrayList<TimeData> activityData, final boolean isIndoorTour, final int numLaps) {
 
       // Also, we first need to make sure that they truly are in chronological order.
       Collections.sort(activityData, new Comparator<TimeData>() {
@@ -132,10 +133,10 @@ public class SuuntoJsonProcessor {
       }
 
       // If the activity contains laps, we need to close the last lap.
-      if (_lapCounter != 0) {
+      if (numLaps != 0) {
          final TimeData lastTimeData = activityData.get(activityData.size() - 1);
          lastTimeData.marker = 1;
-         lastTimeData.markerLabel = Integer.toString(++_lapCounter);
+         lastTimeData.markerLabel = Integer.toString(numLaps + 1);
       }
    }
 
@@ -188,6 +189,7 @@ public class SuuntoJsonProcessor {
       final List<SwimData> _allSwimData = new ArrayList<>();
       final List<Integer> _allRRData = new ArrayList<>();
       long _rrDataStartTime = Integer.MIN_VALUE;
+      int numLaps = 0;
 
       for (int i = 0; i < samples.length(); ++i) {
          String currentSampleSml;
@@ -289,7 +291,7 @@ public class SuuntoJsonProcessor {
                (currentSampleData.contains(TAG_MANUAL) ||
                      currentSampleData.contains(TAG_DISTANCE))) {
             timeData.marker = 1;
-            timeData.markerLabel = Integer.toString(++_lapCounter);
+            timeData.markerLabel = Integer.toString(++numLaps);
             if (!reusePreviousTimeEntry) {
                _sampleList.add(timeData);
             }
@@ -343,7 +345,7 @@ public class SuuntoJsonProcessor {
 
       // We clean-up the data series ONLY if we're not in a swimming activity.
       if (_allSwimData.size() == 0) {
-         cleanUpActivity(_sampleList, isIndoorTour);
+         cleanUpActivity(_sampleList, isIndoorTour, numLaps);
       }
 
       TryComputeHeartRateData(_sampleList, _allRRData, _rrDataStartTime);

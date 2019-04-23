@@ -145,14 +145,11 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
       } catch (final IOException e) {
 
-         if (isValidatingFile) {
-
             /*
              * Log only when reading the zip file, during a validation, an exception can be very
              * likely and should not be displayed
              */
-
-         } else {
+         if (!isValidatingFile) {
             StatusUtil.log(e);
          }
 
