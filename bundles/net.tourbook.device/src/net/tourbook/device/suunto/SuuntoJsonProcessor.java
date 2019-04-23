@@ -7,10 +7,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.swimming.SwimStroke;
@@ -20,7 +18,6 @@ import net.tourbook.data.LengthType;
 import net.tourbook.data.SwimData;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
-import net.tourbook.data.TourMarker;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.json.JSONArray;
@@ -146,17 +143,11 @@ public class SuuntoJsonProcessor {
 	 *
 	 * @param jsonFileContent
 	 *           The Suunto's file content in JSON format.
-	 * @param activityToReUse
-	 *           If provided, the activity to concatenate the provided file to.
-	 * @param sampleListToReUse
-	 *           If provided, the activity's data from the activity to reuse.
 	 * @param isUnitTest
 	 *           True if the method is run for unit test purposes.
 	 * @return The created tour.
 	 */
 	public TourData ImportActivity(	final String jsonFileContent,
-												final TourData activityToReUse,
-												final ArrayList<TimeData> sampleListToReUse,
 												final boolean isUnitTest) {
 		_sampleList = new ArrayList<TimeData>();
 
@@ -171,7 +162,7 @@ public class SuuntoJsonProcessor {
 
 		final JSONObject firstSample = (JSONObject) samples.get(0);
 
-		final TourData tourData = InitializeActivity(firstSample, activityToReUse, sampleListToReUse);
+      final TourData tourData = InitializeActivity(firstSample);
 
 		if (tourData == null) {
          return null;
@@ -361,16 +352,10 @@ public class SuuntoJsonProcessor {
 	 *
 	 * @param firstSample
 	 *           The activity start time as a string.
-	 * @param activityToReuse
-	 *           If provided, the activity to concatenate the current activity with.
-	 * @param sampleListToReUse
-	 *           If provided, the activity's data from the activity to reuse.
 	 * @return If valid, the initialized tour
 	 */
-	private TourData InitializeActivity(final JSONObject firstSample,
-													final TourData activityToReUse,
-													final ArrayList<TimeData> sampleListToReUse) {
-		TourData tourData = new TourData();
+   private TourData InitializeActivity(final JSONObject firstSample) {
+		final TourData tourData = new TourData();
 		final String firstSampleAttributes = firstSample.get(TAG_ATTRIBUTES).toString();
 
 		if (firstSampleAttributes.contains(TAG_LAP) &&
@@ -379,19 +364,6 @@ public class SuuntoJsonProcessor {
 
 			final ZonedDateTime startTime = ZonedDateTime.parse(firstSample.get(TAG_TIMEISO8601).toString());
 			tourData.setTourStartTime(startTime);
-
-		} else if (activityToReUse != null) {
-
-			final Set<TourMarker> tourMarkers = activityToReUse.getTourMarkers();
-			for (final TourMarker tourMarker : tourMarkers) {
-				_lapCounter = Integer.valueOf(tourMarker.getLabel());
-			}
-			activityToReUse.setTourMarkers(new HashSet<TourMarker>());
-
-			tourData = activityToReUse;
-			_sampleList = sampleListToReUse;
-			tourData.clearComputedSeries();
-			tourData.timeSerie = null;
 
 		} else {
          return null;

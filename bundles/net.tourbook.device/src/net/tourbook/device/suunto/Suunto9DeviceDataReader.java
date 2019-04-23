@@ -33,13 +33,11 @@ import org.xmlunit.diff.Diff;
 public class Suunto9DeviceDataReader extends TourbookDevice {
 
 	// For Unit testing
-   private static final boolean                   UNITTESTS                    = false;
+   private static final boolean                   UNITTESTS             = false;
 	// Make sure that the smoothing value is 10 (speed and gradient)
 	public static final String				IMPORT_FILE_PATH	= "/net/tourbook/device/suunto/testFiles/";	//$NON-NLS-1$
 	private static Map<String, String>	testFiles			= new HashMap<>();									// Java 7
-	private HashMap<TourData, ArrayList<TimeData>>	_processedActivities				= new HashMap<TourData, ArrayList<TimeData>>();
-
-	private HashMap<String, String>						_childrenActivitiesToProcess	= new HashMap<String, String>();
+   private HashMap<TourData, ArrayList<TimeData>> _processedActivities  = new HashMap<TourData, ArrayList<TimeData>>();
 
 	private HashMap<Long, TourData>						_newlyImportedTours				= new HashMap<Long, TourData>();
 	private HashMap<Long, TourData>						_alreadyImportedTours			= new HashMap<Long, TourData>();
@@ -78,80 +76,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 	 * begin clean.
 	 */
 	private void cleanUpActivities() {
-		_childrenActivitiesToProcess.clear();
 		_processedActivities.clear();
-	}
-
-	/**
-	 * Concatenates children activities with a given activity.
-	 *
-	 * @param filePath
-	 *           The absolute path of a given activity.
-	 * @param currentFileNumber
-	 *           The file number of the given activity. Example : If the current activity file is
-	 *           1536723722706_{DeviceSerialNumber}_-2.json.gz its file number will be 2.
-	 * @param currentActivity
-	 *           The current activity processed and created.
-	 */
-	private void ConcatenateChildrenActivities(	final String filePath,
-																int currentFileNumber,
-																final TourData currentActivity,
-																final ArrayList<TimeData> sampleListToReUse) {
-		final SuuntoJsonProcessor suuntoJsonProcessor = new SuuntoJsonProcessor();
-
-		final ArrayList<String> keysToRemove = new ArrayList<String>();
-		for (@SuppressWarnings("unused") final
-		Map.Entry<String, String> unused : _childrenActivitiesToProcess.entrySet()) {
-
-			final String parentFileName = GetFileNameWithoutNumber(
-					FilenameUtils.getBaseName(filePath)) +
-					"-" + //$NON-NLS-1$
-					String.valueOf(++currentFileNumber) +
-					".json.gz"; //$NON-NLS-1$
-
-			final Map.Entry<String, String> childEntry = getChildActivity(parentFileName);
-
-			if (childEntry == null) {
-				continue;
-			}
-
-			suuntoJsonProcessor.ImportActivity(
-					childEntry.getValue(),
-					currentActivity,
-					sampleListToReUse,
-					UNITTESTS);
-
-			// We just concatenated a child activity so we can remove it
-			// from the list of activities to process
-			keysToRemove.add(childEntry.getKey());
-
-			// We need to update the activity we just concatenated by
-			// updating the file path and the activity object.
-			removeProcessedActivity(currentActivity.getImportFilePath());
-			currentActivity.setImportFilePath(childEntry.getKey());
-			_processedActivities.put(currentActivity, suuntoJsonProcessor.getSampleList());
-		}
-
-		for (int index = 0; index < keysToRemove.size(); ++index) {
-			_childrenActivitiesToProcess.remove(keysToRemove.get(index));
-		}
-	}
-
-	/**
-	 * Retrieves an unprocessed activity that is the child of a given processed activity.
-	 *
-	 * @param filePath
-	 *           The absolute path of a given activity.
-	 * @return If found, the child activity.
-	 */
-	private Entry<String, String> getChildActivity(final String filePath) {
-		for (final Entry<String, String> childEntry : _childrenActivitiesToProcess.entrySet()) {
-			if (childEntry.getKey().contains(filePath)) {
-            return childEntry;
-         }
-		}
-
-		return null;
 	}
 
 	/**
@@ -196,20 +121,6 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 	@Override
    public String getDeviceModeName(final int profileId) {
 		return UI.EMPTY_STRING;
-	}
-
-	/**
-	 * Returns a file name without its number. Example : Input :
-	 * C:\Users\fbard\Downloads\S9\IMTUF100\1537365863086_{DeviceSerialNumber}_post_timeline-1.json.gz
-	 * Output : 1537365863086_183010004848_post_timeline-
-	 *
-	 * @param fileName
-	 *           The file name to process.
-	 * @return The processed file name.
-	 */
-
-	private String GetFileNameWithoutNumber(final String fileName) {
-		return fileName.substring(0, fileName.lastIndexOf('-'));
 	}
 
 	/**
@@ -437,23 +348,8 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 			fileName = FilenameUtils.removeExtension(fileName);
 		}
 
-		final String fileNumberString =
-				fileName.substring(fileName.lastIndexOf('-') + 1, fileName.lastIndexOf('-') + 2);
-
-		int fileNumber;
-		try {
-			fileNumber = Integer.parseInt(fileNumberString);
-		} catch (final NumberFormatException e) {
-			StatusUtil.log(e);
-			return false;
-		}
-
-		TourData activity = null;
-		if (fileNumber == 1) {
-			activity = suuntoJsonProcessor.ImportActivity(
+      final TourData activity = suuntoJsonProcessor.ImportActivity(
 					jsonFileContent,
-					null,
-					null,
 					UNITTESTS);
 
 			if (activity == null) {
@@ -467,89 +363,9 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
             _processedActivities.put(activity, suuntoJsonProcessor.getSampleList());
          }
 
-		} else if (fileNumber > 1) {
-			// if we find the parent (e.g: The activity just before the
-			// current one. Example : If the current is xxx-3, we find xxx-2)
-			// then we import it reusing the parent activity AND we check that there is no children waiting to be imported
-			// If nothing is found, we store it for (hopefully) future use.
-			Map.Entry<TourData, ArrayList<TimeData>> parentEntry = null;
-			for (final Map.Entry<TourData, ArrayList<TimeData>> entry : _processedActivities.entrySet()) {
-				final TourData key = entry.getKey();
-
-				final String parentFileName = GetFileNameWithoutNumber(
-						FilenameUtils.getBaseName(filePath)) +
-						"-" + //$NON-NLS-1$
-						String.valueOf(fileNumber - 1) +
-						".json.gz"; //$NON-NLS-1$
-
-				if (key.getImportFileName().contains(parentFileName)) {
-					parentEntry = entry;
-					break;
-				}
-			}
-
-			if (parentEntry == null) {
-				if (!_childrenActivitiesToProcess.containsKey(filePath)) {
-               _childrenActivitiesToProcess.put(filePath, jsonFileContent);
-            }
-			} else {
-				activity = suuntoJsonProcessor.ImportActivity(
-						jsonFileContent,
-						parentEntry.getKey(),
-						parentEntry.getValue(),
-						UNITTESTS);
-
-				//We remove the parent activity to replace it with the
-				//updated one (parent activity concatenated with the current
-				//one).
-				final Iterator<Entry<TourData, ArrayList<TimeData>>> it = _processedActivities.entrySet().iterator();
-				while (it.hasNext()) {
-					final Map.Entry<TourData, ArrayList<TimeData>> entry = it.next();
-					if (entry.getKey().getTourId() == parentEntry.getKey().getTourId()) {
-                  it.remove();
-               }
-				}
-
-				if (!processedActivityExists(activity.getTourId())) {
-               _processedActivities.put(activity, suuntoJsonProcessor.getSampleList());
-            }
-			}
-		}
-
-		//We check if the child(ren) has(ve) been provided earlier.
-		//In this case, we concatenate it(them) with the parent
-		//activity
-		if (activity != null) {
-
-			activity.setImportFilePath(filePath);
-
-			ConcatenateChildrenActivities(
-					filePath,
-					fileNumber,
-					activity,
-					suuntoJsonProcessor.getSampleList());
-
-			TryFinalizeTour(activity);
-		}
+      TryFinalizeTour(activity);
 
 		return true;
-	}
-
-	/**
-	 * Removes an already processed activity.
-	 *
-	 * @param filePath
-	 *           The absolute path of a given activity.
-	 */
-	private void removeProcessedActivity(final String filePath) {
-		final Iterator<Entry<TourData, ArrayList<TimeData>>> it = _processedActivities.entrySet().iterator();
-		while (it.hasNext()) {
-			final Map.Entry<TourData, ArrayList<TimeData>> entry = it.next();
-			if (entry.getKey().getImportFilePath() == filePath) {
-				it.remove();
-				return;
-			}
-		}
 	}
 
 	/**
