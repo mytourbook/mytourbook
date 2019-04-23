@@ -15,8 +15,8 @@
 	<tourAltUp>0</tourAltUp>
 	<tourAltDown>0</tourAltDown>
 	<restPulse>0</restPulse>
-	<avgPulse>125.56776</avgPulse>
-	<maxPulse>204.08163</maxPulse>
+	<avgPulse>126.193596</avgPulse>
+	<maxPulse>157.37704</maxPulse>
 	<maxAltitude>0.0</maxAltitude>
 	<maxSpeed>4.5905457</maxSpeed>
 	<avgCadence>0.0</avgCadence>
@@ -210,98 +210,98 @@
 		<DistanceSerie>100.0</DistanceSerie>
 	</DistanceSeries>
 	<PulseSeries>
-		<PulseSerie>118.81188</PulseSerie>
-		<PulseSerie>121.70386</PulseSerie>
-		<PulseSerie>122.69939</PulseSerie>
-		<PulseSerie>111.11111</PulseSerie>
-		<PulseSerie>111.52417</PulseSerie>
-		<PulseSerie>113.421555</PulseSerie>
-		<PulseSerie>112.35956</PulseSerie>
-		<PulseSerie>112.57036</PulseSerie>
-		<PulseSerie>113.20755</PulseSerie>
-		<PulseSerie>113.63637</PulseSerie>
-		<PulseSerie>116.05415</PulseSerie>
-		<PulseSerie>112.99435</PulseSerie>
+		<PulseSerie>119.047615</PulseSerie>
+		<PulseSerie>108.71754</PulseSerie>
+		<PulseSerie>112.711334</PulseSerie>
+		<PulseSerie>114.2422</PulseSerie>
 		<PulseSerie>115.38462</PulseSerie>
-		<PulseSerie>115.38462</PulseSerie>
-		<PulseSerie>114.722755</PulseSerie>
-		<PulseSerie>117.647064</PulseSerie>
-		<PulseSerie>116.95906</PulseSerie>
-		<PulseSerie>116.05415</PulseSerie>
-		<PulseSerie>117.87819</PulseSerie>
-		<PulseSerie>120.72434</PulseSerie>
-		<PulseSerie>120.72434</PulseSerie>
+		<PulseSerie>115.90469</PulseSerie>
+		<PulseSerie>116.88312</PulseSerie>
+		<PulseSerie>117.26384</PulseSerie>
+		<PulseSerie>118.18778</PulseSerie>
+		<PulseSerie>118.18778</PulseSerie>
+		<PulseSerie>117.724</PulseSerie>
+		<PulseSerie>117.8782</PulseSerie>
+		<PulseSerie>157.37704</PulseSerie>
+		<PulseSerie>119.3634</PulseSerie>
+		<PulseSerie>120.1602</PulseSerie>
+		<PulseSerie>120.886505</PulseSerie>
+		<PulseSerie>120.32085</PulseSerie>
+		<PulseSerie>121.2938</PulseSerie>
+		<PulseSerie>122.365746</PulseSerie>
 		<PulseSerie>121.70386</PulseSerie>
-		<PulseSerie>122.19959</PulseSerie>
-		<PulseSerie>120.481926</PulseSerie>
-		<PulseSerie>124.48133</PulseSerie>
-		<PulseSerie>122.19959</PulseSerie>
-		<PulseSerie>123.711334</PulseSerie>
-		<PulseSerie>123.711334</PulseSerie>
-		<PulseSerie>123.711334</PulseSerie>
-		<PulseSerie>122.69939</PulseSerie>
-		<PulseSerie>125.26096</PulseSerie>
-		<PulseSerie>126.582275</PulseSerie>
-		<PulseSerie>124.74012</PulseSerie>
-		<PulseSerie>126.31579</PulseSerie>
-		<PulseSerie>126.050415</PulseSerie>
-		<PulseSerie>127.118645</PulseSerie>
-		<PulseSerie>125.26096</PulseSerie>
-		<PulseSerie>128.47966</PulseSerie>
-		<PulseSerie>130.15184</PulseSerie>
-		<PulseSerie>125.52302</PulseSerie>
-		<PulseSerie>127.118645</PulseSerie>
+		<PulseSerie>121.70386</PulseSerie>
+		<PulseSerie>121.45749</PulseSerie>
+		<PulseSerie>122.365746</PulseSerie>
+		<PulseSerie>123.20329</PulseSerie>
+		<PulseSerie>123.37218</PulseSerie>
+		<PulseSerie>124.82663</PulseSerie>
+		<PulseSerie>125.91815</PulseSerie>
+		<PulseSerie>126.13875</PulseSerie>
+		<PulseSerie>127.93178</PulseSerie>
+		<PulseSerie>127.5691</PulseSerie>
+		<PulseSerie>127.75018</PulseSerie>
 		<PulseSerie>128.20512</PulseSerie>
-		<PulseSerie>127.93177</PulseSerie>
-		<PulseSerie>130.43478</PulseSerie>
-		<PulseSerie>126.31579</PulseSerie>
-		<PulseSerie>131.00436</PulseSerie>
-		<PulseSerie>130.15184</PulseSerie>
-		<PulseSerie>127.65958</PulseSerie>
-		<PulseSerie>129.87013</PulseSerie>
-		<PulseSerie>129.58963</PulseSerie>
-		<PulseSerie>129.58963</PulseSerie>
-		<PulseSerie>128.20512</PulseSerie>
-		<PulseSerie>130.15184</PulseSerie>
-		<PulseSerie>128.75537</PulseSerie>
-		<PulseSerie>129.87013</PulseSerie>
-		<PulseSerie>128.47966</PulseSerie>
-		<PulseSerie>128.47966</PulseSerie>
-		<PulseSerie>127.38854</PulseSerie>
-		<PulseSerie>128.47966</PulseSerie>
+		<PulseSerie>127.29845</PulseSerie>
 		<PulseSerie>129.03226</PulseSerie>
+		<PulseSerie>129.683</PulseSerie>
+		<PulseSerie>130.52937</PulseSerie>
+		<PulseSerie>129.87013</PulseSerie>
+		<PulseSerie>130.24602</PulseSerie>
+		<PulseSerie>130.90909</PulseSerie>
+		<PulseSerie>131.14754</PulseSerie>
+		<PulseSerie>131.29103</PulseSerie>
+		<PulseSerie>131.96481</PulseSerie>
+		<PulseSerie>131.09978</PulseSerie>
+		<PulseSerie>131.00438</PulseSerie>
+		<PulseSerie>130.81395</PulseSerie>
+		<PulseSerie>130.71896</PulseSerie>
 		<PulseSerie>129.58963</PulseSerie>
-		<PulseSerie>128.20512</PulseSerie>
-		<PulseSerie>126.8499</PulseSerie>
-		<PulseSerie>128.75537</PulseSerie>
-		<PulseSerie>128.20512</PulseSerie>
-		<PulseSerie>128.20512</PulseSerie>
-		<PulseSerie>127.118645</PulseSerie>
-		<PulseSerie>128.20512</PulseSerie>
-		<PulseSerie>127.118645</PulseSerie>
+		<PulseSerie>129.03226</PulseSerie>
+		<PulseSerie>129.12482</PulseSerie>
+		<PulseSerie>129.03226</PulseSerie>
 		<PulseSerie>129.03226</PulseSerie>
 		<PulseSerie>128.20512</PulseSerie>
-		<PulseSerie>204.08163</PulseSerie>
-		<PulseSerie>125.52302</PulseSerie>
-		<PulseSerie>127.118645</PulseSerie>
-		<PulseSerie>127.118645</PulseSerie>
-		<PulseSerie>125.0</PulseSerie>
-		<PulseSerie>127.118645</PulseSerie>
-		<PulseSerie>125.0</PulseSerie>
-		<PulseSerie>126.050415</PulseSerie>
-		<PulseSerie>126.050415</PulseSerie>
-		<PulseSerie>126.8499</PulseSerie>
-		<PulseSerie>126.050415</PulseSerie>
-		<PulseSerie>123.45679</PulseSerie>
-		<PulseSerie>126.050415</PulseSerie>
-		<PulseSerie>127.118645</PulseSerie>
-		<PulseSerie>125.0</PulseSerie>
-		<PulseSerie>125.0</PulseSerie>
-		<PulseSerie>127.93177</PulseSerie>
-		<PulseSerie>124.2236</PulseSerie>
-		<PulseSerie>126.582275</PulseSerie>
-		<PulseSerie>124.74012</PulseSerie>
+		<PulseSerie>129.03226</PulseSerie>
+		<PulseSerie>128.20512</PulseSerie>
+		<PulseSerie>127.93178</PulseSerie>
+		<PulseSerie>127.84091</PulseSerie>
+		<PulseSerie>127.47876</PulseSerie>
+		<PulseSerie>128.11389</PulseSerie>
+		<PulseSerie>127.86362</PulseSerie>
+		<PulseSerie>127.29845</PulseSerie>
 		<PulseSerie>127.65958</PulseSerie>
+		<PulseSerie>128.02275</PulseSerie>
+		<PulseSerie>128.47966</PulseSerie>
+		<PulseSerie>127.20848</PulseSerie>
+		<PulseSerie>127.29845</PulseSerie>
+		<PulseSerie>127.84091</PulseSerie>
+		<PulseSerie>128.06831</PulseSerie>
+		<PulseSerie>127.84091</PulseSerie>
+		<PulseSerie>127.93178</PulseSerie>
+		<PulseSerie>126.939354</PulseSerie>
+		<PulseSerie>127.11865</PulseSerie>
+		<PulseSerie>126.64908</PulseSerie>
+		<PulseSerie>105.07881</PulseSerie>
+		<PulseSerie>126.31579</PulseSerie>
+		<PulseSerie>125.52302</PulseSerie>
+		<PulseSerie>125.87413</PulseSerie>
+		<PulseSerie>125.78616</PulseSerie>
+		<PulseSerie>126.31579</PulseSerie>
+		<PulseSerie>125.43555</PulseSerie>
+		<PulseSerie>125.52301</PulseSerie>
+		<PulseSerie>125.69832</PulseSerie>
+		<PulseSerie>125.69832</PulseSerie>
+		<PulseSerie>125.17385</PulseSerie>
+		<PulseSerie>125.78616</PulseSerie>
+		<PulseSerie>126.05042</PulseSerie>
+		<PulseSerie>125.78616</PulseSerie>
+		<PulseSerie>126.78288</PulseSerie>
+		<PulseSerie>127.29845</PulseSerie>
+		<PulseSerie>127.5691</PulseSerie>
+		<PulseSerie>128.57143</PulseSerie>
+		<PulseSerie>128.11389</PulseSerie>
+		<PulseSerie>128.02275</PulseSerie>
 	</PulseSeries>
 	<TemperatureSeries>
 		<TemperatureSerie>26.550013</TemperatureSerie>
