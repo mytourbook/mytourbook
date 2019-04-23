@@ -108,6 +108,13 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourCompareResultView extends ViewPart implements ITourViewer, ITourProvider, ITreeViewer {
 
+// SET_FORMATTING_OFF
+
+   private static final String COLUMN_FACTORY_MOTION_ALTIMETER          = net.tourbook.ui.Messages.ColumnFactory_Motion_Altimeter;
+   private static final String COLUMN_FACTORY_MOTION_ALTIMETER_TOOLTIP  = net.tourbook.ui.Messages.ColumnFactory_Motion_Altimeter_Tooltip;
+
+// SET_FORMATTING_ON
+
    public static final String                 ID                  = "net.tourbook.views.tourCatalog.CompareResultView"; //$NON-NLS-1$
 
    private final IPreferenceStore             _prefStore          = TourbookPlugin.getPrefStore();
@@ -832,8 +839,8 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
       colDef.setIsDefaultColumn();
       colDef.setColumnHeaderText(UI.UNIT_LABEL_ALTIMETER);
       colDef.setColumnUnit(UI.UNIT_LABEL_ALTIMETER);
-      colDef.setColumnHeaderToolTipText(Messages.Compare_Result_Column_Altimeter_Tooltip);
-      colDef.setColumnLabel(Messages.Compare_Result_Column_Altimeter);
+      colDef.setColumnHeaderToolTipText(COLUMN_FACTORY_MOTION_ALTIMETER_TOOLTIP);
+      colDef.setColumnLabel(COLUMN_FACTORY_MOTION_ALTIMETER);
 
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
       colDef.setValueFormats(//

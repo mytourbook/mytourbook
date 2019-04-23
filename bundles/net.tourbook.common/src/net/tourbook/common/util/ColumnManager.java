@@ -37,6 +37,7 @@ import net.tourbook.common.formatter.ValueFormatter_Number_1_3;
 import net.tourbook.common.formatter.ValueFormatter_Time_HH;
 import net.tourbook.common.formatter.ValueFormatter_Time_HHMM;
 import net.tourbook.common.formatter.ValueFormatter_Time_HHMMSS;
+import net.tourbook.common.formatter.ValueFormatter_Time_SSS;
 import net.tourbook.common.tooltip.AdvancedSlideoutShell;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -175,6 +176,7 @@ public class ColumnManager {
    private IValueFormatter                   _valueFormatter_Time_HH       = new ValueFormatter_Time_HH();
    private IValueFormatter                   _valueFormatter_Time_HHMM     = new ValueFormatter_Time_HHMM();
    private IValueFormatter                   _valueFormatter_Time_HHMMSS   = new ValueFormatter_Time_HHMMSS();
+   private IValueFormatter                   _valueFormatter_Time_SSS      = new ValueFormatter_Time_SSS();
 
    {
       _colItemListener = new Listener() {
@@ -1453,6 +1455,9 @@ public class ColumnManager {
 
       case TIME_HH_MM_SS:
          return _valueFormatter_Time_HHMMSS;
+
+      case TIME_SSS:
+         return _valueFormatter_Time_SSS;
 
       default:
          return null;

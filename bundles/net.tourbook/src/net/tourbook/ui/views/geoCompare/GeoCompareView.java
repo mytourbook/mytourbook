@@ -349,6 +349,22 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
             rc = item1.tourTitle.compareTo(item2.tourTitle);
             break;
 
+         case TableColumnFactory.MOTION_ALTIMETER_ID:
+            rc = item1.avgAltimeter - item2.avgAltimeter;
+            break;
+
+         case TableColumnFactory.MOTION_DISTANCE_ID:
+            rc = item1.distance - item2.distance;
+            break;
+
+         case TableColumnFactory.TIME_DRIVING_TIME_ID:
+            rc = item1.movingTime - item2.movingTime;
+            break;
+
+         case TableColumnFactory.TIME_RECORDING_TIME_ID:
+            rc = item1.recordingTime - item2.recordingTime;
+            break;
+
          default:
             _isSortByTime = true;
          }
@@ -1290,14 +1306,20 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    private void defineAllColumns() {
 
       defineColumn_00_SequenceNumber();
-      defineColumn_10_GeoDiff();
-      defineColumn_12_GeoDiff_Relative();
-      defineColumn_20_Time_TourStartDate();
-      defineColumn_30_Motion_AvgSpeed();
-      defineColumn_40_Body_AvgPulse();
+      defineColumn_GeoDiff();
+      defineColumn_GeoDiff_Relative();
+      defineColumn_Time_TourStartDate();
+      defineColumn_Motion_AvgSpeed();
+      defineColumn_Motion_Altimeter();
+      defineColumn_Motion_Distance();
 
-      defineColumn_50_Tour_Type();
-      defineColumn_52_Tour_Title();
+      defineColumn_Body_AvgPulse();
+
+      defineColumn_Time_DrivingTime();
+      defineColumn_Time_RecordingTime();
+
+      defineColumn_Tour_Type();
+      defineColumn_Tour_Title();
 
 //		defineColumn_80_StartIndex();
 //		defineColumn_82_EndIndex();
@@ -1328,9 +1350,33 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    }
 
    /**
+    * column: average pulse
+    */
+   private void defineColumn_Body_AvgPulse() {
+
+      final ColumnDefinition colDef = TableColumnFactory.BODY_AVG_PULSE.createColumn(_columnManager, _pc);
+
+      // overwrite column id to identify the column when table is sorted
+      colDef.setColumnId(COLUMN_AVG_PULSE);
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
+
+            colDef.printDetailValue(cell, item.avgPulse);
+         }
+      });
+   }
+
+   /**
     * Column: Geo Diff
     */
-   private void defineColumn_10_GeoDiff() {
+   private void defineColumn_GeoDiff() {
 
       final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_GEO_DIFF, SWT.TRAIL);
 
@@ -1365,7 +1411,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    /**
     * Column: Geo Diff
     */
-   private void defineColumn_12_GeoDiff_Relative() {
+   private void defineColumn_GeoDiff_Relative() {
 
       final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager,
             COLUMN_GEO_DIFF_RELATIVE,
@@ -1398,9 +1444,129 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    }
 
    /**
+    * Column: Vertical speed (VAM average ascent speed)
+    */
+   private void defineColumn_Motion_Altimeter() {
+
+      final TableColumnDefinition colDef = TableColumnFactory.MOTION_ALTIMETER.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
+
+            final double value = item.avgAltimeter;
+
+            colDef.printDetailValue(cell, value);
+         }
+      });
+   }
+
+   /**
     * column: Tour start date
     */
-   private void defineColumn_20_Time_TourStartDate() {
+   private void defineColumn_Motion_AvgSpeed() {
+
+      final ColumnDefinition colDef = TableColumnFactory.MOTION_AVG_SPEED.createColumn(_columnManager, _pc);
+
+      // overwrite column id to identify the column when table is sorted
+      colDef.setColumnId(COLUMN_AVG_SPEED);
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
+
+            final double speed = item.avgSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+
+            colDef.printDetailValue(cell, speed);
+         }
+      });
+   }
+
+   /**
+    * Column: Distance
+    */
+   private void defineColumn_Motion_Distance() {
+
+      final TableColumnDefinition colDef = TableColumnFactory.MOTION_DISTANCE.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
+
+            final double value = item.distance
+                  / 1000.0
+                  / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+
+            colDef.printDetailValue(cell, value);
+         }
+      });
+   }
+
+   /**
+    * Column: Driving time (h)
+    */
+   private void defineColumn_Time_DrivingTime() {
+
+      final TableColumnDefinition colDef = TableColumnFactory.TIME_DRIVING_TIME.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
+
+            final long value = item.movingTime;
+
+            colDef.printLongValue(cell, value, true);
+         }
+      });
+   }
+
+   /**
+    * Column: Driving time (h)
+    */
+   private void defineColumn_Time_RecordingTime() {
+
+      final TableColumnDefinition colDef = TableColumnFactory.TIME_RECORDING_TIME.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
+
+            final long value = item.recordingTime;
+
+            colDef.printLongValue(cell, value, true);
+         }
+      });
+   }
+
+   /**
+    * column: Tour start date
+    */
+   private void defineColumn_Time_TourStartDate() {
 
       final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_START_DATE.createColumn(_columnManager, _pc);
 
@@ -1425,17 +1591,16 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    }
 
    /**
-    * column: Tour start date
+    * Column: Tour title
     */
-   private void defineColumn_30_Motion_AvgSpeed() {
+   private void defineColumn_Tour_Title() {
 
-      final ColumnDefinition colDef = TableColumnFactory.MOTION_AVG_SPEED.createColumn(_columnManager, _pc);
-
-      // overwrite column id to identify the column when table is sorted
-      colDef.setColumnId(COLUMN_AVG_SPEED);
-      colDef.setColumnSelectionListener(_columnSortListener);
+      final ColumnDefinition colDef = TableColumnFactory.TOUR_TITLE.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setColumnId(COLUMN_TOUR_TITLE);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -1443,33 +1608,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
             final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
 
-            final double speed = item.avgSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
-
-            colDef.printDetailValue(cell, speed);
-         }
-      });
-   }
-
-   /**
-    * column: average pulse
-    */
-   private void defineColumn_40_Body_AvgPulse() {
-
-      final ColumnDefinition colDef = TableColumnFactory.BODY_AVG_PULSE.createColumn(_columnManager, _pc);
-
-      // overwrite column id to identify the column when table is sorted
-      colDef.setColumnId(COLUMN_AVG_PULSE);
-      colDef.setColumnSelectionListener(_columnSortListener);
-
-      colDef.setIsDefaultColumn();
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
-
-            colDef.printDetailValue(cell, item.avgPulse);
+            cell.setText(item.tourTitle);
          }
       });
    }
@@ -1477,7 +1616,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    /**
     * Column: Tour type image
     */
-   private void defineColumn_50_Tour_Type() {
+   private void defineColumn_Tour_Type() {
 
       final ColumnDefinition colDef = TableColumnFactory.TOUR_TYPE.createColumn(_columnManager, _pc);
 
@@ -1498,29 +1637,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
                cell.setImage(tourTypeImage);
             }
-         }
-      });
-   }
-
-   /**
-    * Column: Tour title
-    */
-   private void defineColumn_52_Tour_Title() {
-
-      final ColumnDefinition colDef = TableColumnFactory.TOUR_TITLE.createColumn(_columnManager, _pc);
-
-      colDef.setIsDefaultColumn();
-      colDef.setColumnSelectionListener(_columnSortListener);
-
-      colDef.setColumnId(COLUMN_TOUR_TITLE);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
-
-            cell.setText(item.tourTitle);
          }
       });
    }
