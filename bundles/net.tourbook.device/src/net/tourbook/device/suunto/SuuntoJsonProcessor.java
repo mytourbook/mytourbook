@@ -132,28 +132,6 @@ public class SuuntoJsonProcessor {
       }
    }
 
-	/**
-	 * Searches a specific time slice.
-	 *
-	 * @param absoluteTime
-	 *           The absolute time of the time slice to find.
-	 * @param offsetSeconds
-	 *           The offset in number of seconds.
-	 * @return The found time slice, null otherwise.
-	 */
-	private TimeData FindSpecificTimeData(final long absoluteTime, final int offsetSeconds) {
-		final long computedTime = absoluteTime + offsetSeconds * 1000;
-
-		for (int index = 0; index < _sampleList.size(); ++index) {
-			if (_sampleList.get(index).absoluteTime == computedTime) {
-            return _sampleList.get(index);
-         }
-		}
-
-		return null;
-	}
-
-
    /**
 	 * Retrieves the current activity's data.
 	 *
@@ -208,6 +186,7 @@ public class SuuntoJsonProcessor {
 		ZonedDateTime pauseStartTime = minInstant.atZone(ZoneOffset.UTC);
 		final List<SwimData> _allSwimData = new ArrayList<>();
       final List<Integer> _allRRData = new ArrayList<>();
+      long _rrDataStartTime = Integer.MIN_VALUE;
 
 		for (int i = 0; i < samples.length(); ++i) {
 			String currentSampleSml;
@@ -254,6 +233,11 @@ public class SuuntoJsonProcessor {
 
          if (currentSampleData.toString().contains(TAG_RR)) {
             BuildRRDataList(_allRRData, currentSampleSml);
+
+            if (_rrDataStartTime == Integer.MIN_VALUE) {
+               _rrDataStartTime = currentTime;
+            }
+
             continue;
          }
 
@@ -358,13 +342,12 @@ public class SuuntoJsonProcessor {
          }
 		}
 
-      // TODO Compute HR before or after the clean up ?
-      TryComputeHeartRateData(_sampleList, _allRRData);
-
 		// We clean-up the data series ONLY if we're not in a swimming activity
 		if (_allSwimData.size() == 0) {
          cleanUpActivity(_sampleList, isIndoorTour);
 		}
+
+      TryComputeHeartRateData(_sampleList, _allRRData, _rrDataStartTime);
 
 		tourData.createTimeSeries(_sampleList, true);
 
@@ -670,39 +653,40 @@ public class SuuntoJsonProcessor {
     *
     * @param activityData
     *           The current activity.
-    * @param currentSampleDate
-    *           The date of the current data.
+    * @param rrDataList
+    *           The list of R-R intervals for the given activity.
     */
    private void TryComputeHeartRateData(final ArrayList<TimeData> activityData,
-                                        final List<Integer> rrDataList) {
+                                        final List<Integer> rrDataList,
+                                        final long rrDataStartTime) {
       if (rrDataList.size() == 0) {
          return;
       }
 
-      int currentActivityIndex = 0;
       long currentRRSum = 0;
       int lastRRIndex = 0;
-      long RRsum = activityData.get(currentActivityIndex).absoluteTime;
-      int CurrentRRindex = 0;
-      for (currentActivityIndex = 1; currentActivityIndex < activityData.size() && CurrentRRindex < rrDataList.size(); ++currentActivityIndex) {
-      for (; RRsum < activityData.get(currentActivityIndex).absoluteTime &&
-            CurrentRRindex < rrDataList.size();) {
+      long RRsum = rrDataStartTime;
+      int currentRRindex = -1;
 
-         currentRRSum += rrDataList.get(CurrentRRindex);
-         RRsum += rrDataList.get(CurrentRRindex);
-         ++CurrentRRindex;
+      for (int currentActivityIndex = 0; currentActivityIndex < activityData.size() &&
+            currentRRindex < rrDataList.size() - 1; ++currentActivityIndex) {
+
+         for (; RRsum < activityData.get(currentActivityIndex).absoluteTime &&
+               currentRRindex < rrDataList.size() - 1;) {
+            ++currentRRindex;
+            currentRRSum += rrDataList.get(currentRRindex);
+            RRsum += rrDataList.get(currentRRindex);
          }
 
-      // Heart rate (bpm) = 60 / R-R (seconds)
-      final float convertedNumber = 60 / (currentRRSum / 1000f) * (CurrentRRindex - lastRRIndex + 1);
-      activityData.get(currentActivityIndex).pulse = convertedNumber;
+         if (currentRRindex >= lastRRIndex) {
+         // Heart rate (bpm) = 60 / R-R (seconds)
+         // If the RR value is the sum of several intervals, we average it
+         final float convertedNumber = 60 / (currentRRSum / 1000f) * (currentRRindex - lastRRIndex + 1);
+         activityData.get(currentActivityIndex).pulse = convertedNumber;
 
-         //TEMPO
-         if (CurrentRRindex >= rrDataList.size()) {
-         return;
-      }
-      currentRRSum = rrDataList.get(CurrentRRindex);
-      lastRRIndex = CurrentRRindex;
+         currentRRSum = rrDataList.get(currentRRindex);
+         lastRRIndex = currentRRindex;
+         }
       }
    }
 
