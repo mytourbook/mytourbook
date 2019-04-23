@@ -570,7 +570,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		//Maxwell, CO
 
 		filePath = IMPORT_FILE_PATH +
-				"Original-1536723722706_183010004848_post_timeline-1.json.gz"; //$NON-NLS-1$
+            "1536723722706_183010004848_post_timeline-1.json.gz"; //$NON-NLS-1$
 		controlFilePath =
 				IMPORT_FILE_PATH + "1536723722706_183010004848_post_timeline-1.xml"; //$NON-NLS-1$
 		testFiles.put(controlFilePath, filePath);
@@ -583,8 +583,6 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 		testFiles.put(controlFilePath, filePath);
 
 		// Reservoir Ridge with MoveSense HR belt
-		// TODO : Activating this unit test will cause this file to have its markers unsorted. WHY?
-		// 1536723722706_183010004848_post_timeline-1-SplitTests.xml
 		filePath = IMPORT_FILE_PATH +
 				"1549250450458_183010004848_post_timeline-1.json.gz"; //$NON-NLS-1$
 		controlFilePath =
@@ -668,151 +666,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 			tourData.computeAltitudeUpDown();
 			tourData.computeTourDrivingTime();
 			tourData.computeComputedValues();
-
 		}
-	}
-
-	private boolean unusedCodeForNow() {
-		// ------------------------------------------
-		// Split files test
-		// ------------------------------------------
-
-		// Maxwell, CO (Split manually)
-
-		// ORDER 2 - 1 - 3
-
-		// File #2
-		final String maxWell2FilePath = IMPORT_FILE_PATH +
-				"1536723722706_183010004848_post_timeline-2.json.gz"; //$NON-NLS-1$
-		String jsonContent = GetContentFromResource(maxWell2FilePath, true);
-		ProcessFile(maxWell2FilePath, jsonContent);
-
-		// File #1
-		final String maxWell1FilePath = IMPORT_FILE_PATH +
-				"1536723722706_183010004848_post_timeline-1.json.gz"; //$NON-NLS-1$
-		jsonContent = GetContentFromResource(maxWell1FilePath, true);
-		ProcessFile(maxWell1FilePath, jsonContent);
-
-		// File #3
-		final String maxWell3FilePath = IMPORT_FILE_PATH +
-				"1536723722706_183010004848_post_timeline-3.json.gz"; //$NON-NLS-1$
-		jsonContent = GetContentFromResource(maxWell3FilePath, true);
-		ProcessFile(maxWell3FilePath, jsonContent);
-
-		//Because the files are split, it causes small discrepancies in the data whenever
-		//jump from 1 file to another
-		String controlDocumentPath = IMPORT_FILE_PATH +
-				"1536723722706_183010004848_post_timeline-1-SplitTests.xml"; //$NON-NLS-1$
-		String controlFileContent = GetContentFromResource(controlDocumentPath, false);
-		TourData entry = GetLastTourDataImported();
-		String xml = entry.toXml();
-		boolean testResults = CompareAgainstControl(controlFileContent, xml);
-
-		cleanUpActivities();
-		// ORDER 2 - 3 - 1
-
-		// File #2
-		jsonContent = GetContentFromResource(maxWell2FilePath, true);
-		ProcessFile(maxWell2FilePath, jsonContent);
-
-		// File #3
-		jsonContent = GetContentFromResource(maxWell3FilePath, true);
-		ProcessFile(maxWell3FilePath, jsonContent);
-
-		// File #1
-		jsonContent = GetContentFromResource(maxWell1FilePath, true);
-		ProcessFile(maxWell1FilePath, jsonContent);
-
-		entry = GetLastTourDataImported();
-		xml = entry.toXml();
-		testResults &= CompareAgainstControl(controlFileContent, xml);
-
-		cleanUpActivities();
-		// ORDER 1 - 2 - 3
-
-		// File #1
-		jsonContent = GetContentFromResource(maxWell1FilePath, true);
-		ProcessFile(maxWell1FilePath, jsonContent);
-
-		// File #2
-		jsonContent = GetContentFromResource(maxWell2FilePath, true);
-		ProcessFile(maxWell2FilePath, jsonContent);
-
-		// File #3
-		jsonContent = GetContentFromResource(maxWell3FilePath, true);
-		ProcessFile(maxWell3FilePath, jsonContent);
-
-		entry = GetLastTourDataImported();
-		xml = entry.toXml();
-		testResults &= CompareAgainstControl(controlFileContent, xml);
-
-		cleanUpActivities();
-		// ORDER 1 - 3 - 2
-
-		// File #1
-		jsonContent = GetContentFromResource(maxWell1FilePath, true);
-		ProcessFile(maxWell1FilePath, jsonContent);
-
-		// File #3
-		jsonContent = GetContentFromResource(maxWell3FilePath, true);
-		ProcessFile(maxWell3FilePath, jsonContent);
-
-		// File #2
-		jsonContent = GetContentFromResource(maxWell2FilePath, true);
-		ProcessFile(maxWell2FilePath, jsonContent);
-
-		entry = GetLastTourDataImported();
-		xml = entry.toXml();
-		testResults &= CompareAgainstControl(controlFileContent, xml);
-
-		cleanUpActivities();
-		// ORDER 3 - 2 - 1
-
-		// File #3
-		jsonContent = GetContentFromResource(maxWell3FilePath, true);
-		ProcessFile(maxWell3FilePath, jsonContent);
-
-		// File #2
-		jsonContent = GetContentFromResource(maxWell2FilePath, true);
-		ProcessFile(maxWell2FilePath, jsonContent);
-
-		// File #1
-		jsonContent = GetContentFromResource(maxWell1FilePath, true);
-		ProcessFile(maxWell1FilePath, jsonContent);
-
-		//Because we start with the 3rd file, it causes different discrepancies
-		//when we jump from 1 file to another.
-		controlDocumentPath = IMPORT_FILE_PATH +
-				"1536723722706_183010004848_post_timeline-1-SplitTests-LastFileFirst.xml"; //$NON-NLS-1$
-		controlFileContent = GetContentFromResource(controlDocumentPath, false);
-		entry = GetLastTourDataImported();
-		xml = entry.toXml();
-		testResults &= CompareAgainstControl(controlFileContent, xml);
-
-		cleanUpActivities();
-		// ORDER 3 - 1 - 2
-
-		// File #3
-		jsonContent = GetContentFromResource(maxWell3FilePath, true);
-		ProcessFile(maxWell3FilePath, jsonContent);
-
-		// File #1
-		jsonContent = GetContentFromResource(maxWell1FilePath, true);
-		ProcessFile(maxWell1FilePath, jsonContent);
-
-		// File #2
-		jsonContent = GetContentFromResource(maxWell2FilePath, true);
-		ProcessFile(maxWell2FilePath, jsonContent);
-
-		//Small discrepancies as the tour markers are out of order.
-		controlDocumentPath = IMPORT_FILE_PATH +
-				"1536723722706_183010004848_post_timeline-1-SplitTests.xml"; //$NON-NLS-1$
-		controlFileContent = GetContentFromResource(controlDocumentPath, false);
-		entry = GetLastTourDataImported();
-		xml = entry.toXml();
-		testResults &= CompareAgainstControl(controlFileContent, xml);
-
-		return testResults;
 	}
 
 	@Override
