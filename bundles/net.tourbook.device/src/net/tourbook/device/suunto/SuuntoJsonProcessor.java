@@ -49,7 +49,7 @@ public class SuuntoJsonProcessor {
 	private static final String	TAG_CADENCE			= "Cadence";													//$NON-NLS-1$
 	public static final String		TAG_ALTITUDE		= "Altitude";													//$NON-NLS-1$
 	private static final String	TAG_POWER			= "Power";														//$NON-NLS-1$
-	private static final String	TAG_TEMPERATURE	= "Temperature";
+   private static final String TAG_TEMPERATURE = "Temperature"; //$NON-NLS-1$
 
 	// Swimming
 	private static final String	Swimming					= "Swimming";
