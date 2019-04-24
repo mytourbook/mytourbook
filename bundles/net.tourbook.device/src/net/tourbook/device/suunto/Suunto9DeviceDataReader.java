@@ -364,6 +364,8 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
          _processedActivities.put(activity, suuntoJsonProcessor.getSampleList());
       }
 
+      activity.setImportFilePath(filePath);
+
       TryFinalizeTour(activity);
 
       return true;

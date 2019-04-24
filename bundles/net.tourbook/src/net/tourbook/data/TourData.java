@@ -540,9 +540,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private long                  dateTimeModified;                                       // db-version 11
 
    /** Folder path from the import file. */
+   @XmlElement
    private String                tourImportFilePath;                                    // db-version 6
 
    /** File name from the import file. */
+   @XmlElement
    private String                tourImportFileName;                                    // db-version 29
 
    /**

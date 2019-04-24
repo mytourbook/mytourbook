@@ -20,6 +20,8 @@
 	<maxAltitude>0.0</maxAltitude>
 	<maxSpeed>4.500155</maxSpeed>
 	<avgCadence>0.0</avgCadence>
+	<tourImportFilePath>\net\tourbook\device\suunto\testFiles</tourImportFilePath>
+	<tourImportFileName>1547628896209_184710003036_post_timeline-1.json.gz</tourImportFileName>
 	<TourMarkers>
 		<TourMarker serieIndex="91">
 			<time>97</time>
