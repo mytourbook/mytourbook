@@ -7399,8 +7399,17 @@ public class ChartComponentGraph extends Canvas {
             // zoom the chart
 
             if (isEventFromAxis) {
+
                // set zoom center position to the left or right side, that
                _zoomRatioCenter = isLeftAxis ? 0.0 : 1.0;
+
+               if (isLeftAxis == false) {
+
+                  // right axis
+
+                  // this ensures that the right slider is not moved behind the right axis !!!
+                  _devXMouseMove = getDevVisibleChartWidth();
+               }
             }
 
             // reduce zoom factor when accelerator key <Alt> is pressed

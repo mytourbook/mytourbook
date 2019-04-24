@@ -10,7 +10,8 @@ New
 Improvements   
 ============
 
-* 
+* Adjust Altitude
+  - Whole tour is selected for SRTM adjustments
 
  
 Changes  
