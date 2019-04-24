@@ -140,6 +140,8 @@ public class Messages extends NLS {
    public static String        dialog_export_shell_text;
    public static String        dialog_export_txt_filePath_tooltip;
 
+   public static String        Dialog_AdjustAltitude_Link_ApproachWholeTour;
+
    public static String        Dialog_AdjustTemperature_Button_AdjustTemperature;
    public static String        Dialog_AdjustTemperature_Dialog_Message;
    public static String        Dialog_AdjustTemperature_Dialog_Title;
@@ -316,7 +318,6 @@ public class Messages extends NLS {
 
    public static String        Action_TourType_ModifyTourTypeFilter;
 
-   public static String        Adjust_Altitude_Checkbox_SRTM_SelectWholeTour;
    public static String        Adjust_Altitude_CreateDummyAltitudeData_Message;
    public static String        Adjust_Altitude_CreateDummyAltitudeData_Title;
    public static String        Adjust_Altitude_Group_GeoPosition;

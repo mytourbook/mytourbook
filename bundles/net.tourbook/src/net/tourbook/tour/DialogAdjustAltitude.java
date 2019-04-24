@@ -1262,17 +1262,17 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
       GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
       {
          /*
-          * checkbox: initial area
+          * Link: Select whole tour
           */
          _linkSRTMSelectWholeTour = new Link(container, SWT.NONE);
-         GridDataFactory.swtDefaults().applyTo(_linkSRTMSelectWholeTour);
-         _linkSRTMSelectWholeTour.setText("<a>" + Messages.Adjust_Altitude_Checkbox_SRTM_SelectWholeTour + "</a>"); //$NON-NLS-1$ //$NON-NLS-2$
+         _linkSRTMSelectWholeTour.setText(Messages.Dialog_AdjustAltitude_Link_ApproachWholeTour);
          _linkSRTMSelectWholeTour.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent e) {
                onModifySRTMSelection();
             }
          });
+         GridDataFactory.swtDefaults().applyTo(_linkSRTMSelectWholeTour);
       }
    }
 
