@@ -1,0 +1,25 @@
+Version 19.5.0                                            ?. May 2019
+
+
+New   
+===
+
+*
+  
+ 
+Improvements   
+============
+
+* 
+
+ 
+Changes  
+=======
+
+* 
+
+ 
+Bugfix   
+======
+
+* 
