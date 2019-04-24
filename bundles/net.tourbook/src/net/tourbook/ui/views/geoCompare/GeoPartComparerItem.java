@@ -48,9 +48,14 @@ public class GeoPartComparerItem {
 
    float          avgPulse;
    float          avgSpeed;
+   double         avgAltimeter;
 
    ZonedDateTime  tourStartTime;
    long           tourStartTimeMS;
+
+   long           movingTime;
+   int            recordingTime;
+   float          distance;
 
    /**
     * Ensure title it is set for sorting

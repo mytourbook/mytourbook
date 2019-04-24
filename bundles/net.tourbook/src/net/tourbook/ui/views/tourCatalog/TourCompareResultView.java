@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,6 +21,41 @@ import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
+import net.tourbook.common.formatter.ValueFormat;
+import net.tourbook.common.formatter.ValueFormatSet;
+import net.tourbook.common.util.ColumnDefinition;
+import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.ITourViewer;
+import net.tourbook.common.util.ITreeViewer;
+import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.TreeColumnDefinition;
+import net.tourbook.common.util.TreeViewerItem;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourTag;
+import net.tourbook.data.TourType;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tag.TagMenuManager;
+import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.TourEvent;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
+import net.tourbook.tour.TourTypeMenuManager;
+import net.tourbook.tourType.TourTypeImage;
+import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.TreeColumnFactory;
+import net.tourbook.ui.action.ActionCollapseAll;
+import net.tourbook.ui.action.ActionEditQuick;
+import net.tourbook.ui.action.ActionEditTour;
+import net.tourbook.ui.action.ActionModifyColumns;
+import net.tourbook.ui.action.ActionOpenTour;
+import net.tourbook.ui.action.ActionSetTourTypeMenu;
+import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
+import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.IMenuListener;
@@ -61,7 +96,6 @@ import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
@@ -72,1535 +106,1574 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
 import org.eclipse.ui.part.ViewPart;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
-import net.tourbook.common.formatter.ValueFormat;
-import net.tourbook.common.formatter.ValueFormatSet;
-import net.tourbook.common.util.ColumnDefinition;
-import net.tourbook.common.util.ColumnManager;
-import net.tourbook.common.util.ITourViewer;
-import net.tourbook.common.util.ITreeViewer;
-import net.tourbook.common.util.PostSelectionProvider;
-import net.tourbook.common.util.TreeColumnDefinition;
-import net.tourbook.common.util.TreeViewerItem;
-import net.tourbook.data.TourData;
-import net.tourbook.data.TourTag;
-import net.tourbook.data.TourType;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tag.TagMenuManager;
-import net.tourbook.tour.ITourEventListener;
-import net.tourbook.tour.TourEvent;
-import net.tourbook.tour.TourEventId;
-import net.tourbook.tour.TourManager;
-import net.tourbook.tour.TourTypeMenuManager;
-import net.tourbook.tourType.TourTypeImage;
-import net.tourbook.ui.ITourProvider;
-import net.tourbook.ui.TreeColumnFactory;
-import net.tourbook.ui.action.ActionCollapseAll;
-import net.tourbook.ui.action.ActionEditQuick;
-import net.tourbook.ui.action.ActionEditTour;
-import net.tourbook.ui.action.ActionModifyColumns;
-import net.tourbook.ui.action.ActionOpenTour;
-import net.tourbook.ui.action.ActionSetTourTypeMenu;
-import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
-import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
-
 public class TourCompareResultView extends ViewPart implements ITourViewer, ITourProvider, ITreeViewer {
 
-	public static final String							ID							= "net.tourbook.views.tourCatalog.CompareResultView";										//$NON-NLS-1$
+// SET_FORMATTING_OFF
 
-	private final IPreferenceStore					_prefStore				= TourbookPlugin.getPrefStore();
-	private final IDialogSettings						_state					= TourbookPlugin.getState(ID);
+   private static final String COLUMN_FACTORY_MOTION_ALTIMETER          = net.tourbook.ui.Messages.ColumnFactory_Motion_Altimeter;
+   private static final String COLUMN_FACTORY_MOTION_ALTIMETER_TOOLTIP  = net.tourbook.ui.Messages.ColumnFactory_Motion_Altimeter_Tooltip;
 
-	private TVICompareResultRootItem					_rootItem;
+// SET_FORMATTING_ON
 
-	private PostSelectionProvider						_postSelectionProvider;
+   public static final String                 ID                  = "net.tourbook.views.tourCatalog.CompareResultView"; //$NON-NLS-1$
 
-	private ISelectionListener							_postSelectionListener;
-	private IPartListener2								_partListener;
-	private IPropertyChangeListener					_prefChangeListener;
-	private ITourEventListener							_tourPropertyListener;
-	private ITourEventListener							_compareTourPropertyListener;
+   private final IPreferenceStore             _prefStore          = TourbookPlugin.getPrefStore();
+   private final IDialogSettings              _state              = TourbookPlugin.getState(ID);
 
-	private boolean										_isToolbarCreated;
+   private TVICompareResultRootItem           _rootItem;
 
-	private ColumnManager								_columnManager;
-	private TagMenuManager								_tagMenuMgr;
+   private PostSelectionProvider              _postSelectionProvider;
 
-	private SelectionRemovedComparedTours			_oldRemoveSelection	= null;
+   private ISelectionListener                 _postSelectionListener;
+   private IPartListener2                     _partListener;
+   private IPropertyChangeListener            _prefChangeListener;
+   private ITourEventListener                 _tourPropertyListener;
+   private ITourEventListener                 _compareTourPropertyListener;
 
-	/*
-	 * resources
-	 */
-	private Image											_dbImage					= TourbookPlugin.getImageDescriptor(Messages.Image__database).createImage(true);
+   private boolean                            _isToolbarCreated;
 
-	private TreeViewerTourInfoToolTip				_tourInfoToolTip;
-	private PixelConverter								_pc;
+   private ColumnManager                      _columnManager;
+   private TagMenuManager                     _tagMenuMgr;
 
-	/*
-	 * UI controls
-	 */
-	private Composite										_viewerContainer;
-	private CheckboxTreeViewer							_tourViewer;
+   private SelectionRemovedComparedTours      _oldRemoveSelection = null;
 
-	private ActionSaveComparedTours					_actionSaveComparedTours;
-	private ActionRemoveComparedTourSaveStatus	_actionRemoveComparedTourSaveStatus;
-	private ActionCheckTours							_actionCheckTours;
-	private ActionUncheckTours							_actionUncheckTours;
-	private ActionModifyColumns						_actionModifyColumns;
-	private ActionCollapseAll							_actionCollapseAll;
+   private ActionSaveComparedTours            _actionSaveComparedTours;
+   private ActionRemoveComparedTourSaveStatus _actionRemoveComparedTourSaveStatus;
+   private ActionCheckTours                   _actionCheckTours;
+   private ActionUncheckTours                 _actionUncheckTours;
+   private ActionModifyColumns                _actionModifyColumns;
+   private ActionCollapseAll                  _actionCollapseAll;
 
-	private ActionEditQuick								_actionEditQuick;
-	private ActionEditTour								_actionEditTour;
-	private ActionSetTourTypeMenu						_actionSetTourType;
-	private ActionOpenTour								_actionOpenTour;
+   private ActionEditQuick                    _actionEditQuick;
+   private ActionEditTour                     _actionEditTour;
+   private ActionSetTourTypeMenu              _actionSetTourType;
+   private ActionOpenTour                     _actionOpenTour;
 
-	class ResultContentProvider implements ITreeContentProvider {
+   /*
+    * resources
+    */
+   private Image                     _dbImage = TourbookPlugin.getImageDescriptor(Messages.Image__database).createImage(true);
 
-		@Override
-		public void dispose() {}
+   private TreeViewerTourInfoToolTip _tourInfoToolTip;
+   private PixelConverter            _pc;
 
-		@Override
-		public Object[] getChildren(final Object parentElement) {
-			return ((TreeViewerItem) parentElement).getFetchedChildrenAsArray();
-		}
+   /*
+    * UI controls
+    */
+   private Composite          _viewerContainer;
+   private CheckboxTreeViewer _tourViewer;
 
-		@Override
-		public Object[] getElements(final Object inputElement) {
-			return _rootItem.getFetchedChildrenAsArray();
-		}
+   class ResultContentProvider implements ITreeContentProvider {
 
-		@Override
-		public Object getParent(final Object element) {
-			return ((TreeViewerItem) element).getParentItem();
-		}
+      @Override
+      public void dispose() {}
 
-		@Override
-		public boolean hasChildren(final Object element) {
-			return ((TreeViewerItem) element).hasChildren();
-		}
+      @Override
+      public Object[] getChildren(final Object parentElement) {
+         return ((TreeViewerItem) parentElement).getFetchedChildrenAsArray();
+      }
 
-		@Override
-		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
-	}
+      @Override
+      public Object[] getElements(final Object inputElement) {
+         return _rootItem.getFetchedChildrenAsArray();
+      }
 
-	public TourCompareResultView() {}
+      @Override
+      public Object getParent(final Object element) {
+         return ((TreeViewerItem) element).getParentItem();
+      }
 
-	private void addCompareTourPropertyListener() {
+      @Override
+      public boolean hasChildren(final Object element) {
+         return ((TreeViewerItem) element).hasChildren();
+      }
 
-		_compareTourPropertyListener = new ITourEventListener() {
-			@Override
-			public void tourChanged(final IWorkbenchPart part, final TourEventId propertyId, final Object propertyData) {
+      @Override
+      public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
+   }
 
-				if (propertyId == TourEventId.COMPARE_TOUR_CHANGED
-						&& propertyData instanceof TourPropertyCompareTourChanged) {
+   public TourCompareResultView() {}
 
-					final TourPropertyCompareTourChanged compareTourProperty = (TourPropertyCompareTourChanged) propertyData;
+   private void addCompareTourPropertyListener() {
 
-					final long compareId = compareTourProperty.compareId;
+      _compareTourPropertyListener = new ITourEventListener() {
+         @Override
+         public void tourChanged(final IWorkbenchPart part, final TourEventId propertyId, final Object propertyData) {
 
-					final ArrayList<Long> compareIds = new ArrayList<>();
-					compareIds.add(compareId);
+            if (propertyId == TourEventId.COMPARE_TOUR_CHANGED
+                  && propertyData instanceof TourPropertyCompareTourChanged) {
 
-					if (compareId == -1) {
+               final TourPropertyCompareTourChanged compareTourProperty = (TourPropertyCompareTourChanged) propertyData;
 
-						// compare result is not saved
+               final long compareId = compareTourProperty.compareId;
 
-						final Object comparedTourItem = compareTourProperty.comparedTourItem;
+               final ArrayList<Long> compareIds = new ArrayList<>();
+               compareIds.add(compareId);
 
-						if (comparedTourItem instanceof TVICompareResultComparedTour) {
-							final TVICompareResultComparedTour resultItem = (TVICompareResultComparedTour) comparedTourItem;
+               if (compareId == -1) {
 
-//							resultItem.movedStartIndex = compareTourProperty.startIndex;
-//							resultItem.movedEndIndex = compareTourProperty.endIndex;
+                  // compare result is not saved
 
-							resultItem.movedSpeed = compareTourProperty.speed;
+                  final Object comparedTourItem = compareTourProperty.comparedTourItem;
 
-							// update viewer
-							_tourViewer.update(comparedTourItem, null);
-						}
+                  if (comparedTourItem instanceof TVICompareResultComparedTour) {
+                     final TVICompareResultComparedTour resultItem = (TVICompareResultComparedTour) comparedTourItem;
 
-					} else {
+//                     resultItem.movedStartIndex = compareTourProperty.startIndex;
+//                     resultItem.movedEndIndex = compareTourProperty.endIndex;
 
-						// compare result is saved
+                     resultItem.movedSpeed = compareTourProperty.speed;
 
-						// find compared tour in the viewer
-						final ArrayList<TVICompareResultComparedTour> comparedTours = new ArrayList<>();
-						getComparedTours(comparedTours, _rootItem, compareIds);
+                     // update viewer
+                     _tourViewer.update(comparedTourItem, null);
+                  }
 
-						if (comparedTours.size() > 0) {
+               } else {
 
-							final TVICompareResultComparedTour compareTourItem = comparedTours.get(0);
+                  // compare result is saved
 
-							if (compareTourProperty.isDataSaved) {
+                  // find compared tour in the viewer
+                  final ArrayList<TVICompareResultComparedTour> comparedTours = new ArrayList<>();
+                  getComparedTours(comparedTours, _rootItem, compareIds);
 
-								// compared tour was saved
+                  if (comparedTours.size() > 0) {
 
-								compareTourItem.dbStartIndex = compareTourProperty.startIndex;
-								compareTourItem.dbEndIndex = compareTourProperty.endIndex;
+                     final TVICompareResultComparedTour compareTourItem = comparedTours.get(0);
 
-								compareTourItem.dbSpeed = compareTourProperty.speed;
+                     if (compareTourProperty.isDataSaved) {
 
-							} else {
+                        // compared tour was saved
 
-//								compareTourItem.movedStartIndex = compareTourProperty.startIndex;
-//								compareTourItem.movedEndIndex = compareTourProperty.endIndex;
+                        compareTourItem.dbStartIndex = compareTourProperty.startIndex;
+                        compareTourItem.dbEndIndex = compareTourProperty.endIndex;
 
-								compareTourItem.movedSpeed = compareTourProperty.speed;
-							}
+                        compareTourItem.dbSpeed = compareTourProperty.speed;
 
-							// update viewer
-							_tourViewer.update(compareTourItem, null);
-						}
-					}
-				}
-			}
-		};
+                     } else {
 
-		TourManager.getInstance().addTourEventListener(_compareTourPropertyListener);
-	}
+//                        compareTourItem.movedStartIndex = compareTourProperty.startIndex;
+//                        compareTourItem.movedEndIndex = compareTourProperty.endIndex;
 
-	/**
-	 * set the part listener to save the view settings, the listeners are called before the controls
-	 * are disposed
-	 */
-	private void addPartListeners() {
+                        compareTourItem.movedSpeed = compareTourProperty.speed;
+                     }
 
-		_partListener = new IPartListener2() {
+                     // update viewer
+                     _tourViewer.update(compareTourItem, null);
+                  }
+               }
+            }
+         }
+      };
 
-			@Override
-			public void partActivated(final IWorkbenchPartReference partRef) {}
+      TourManager.getInstance().addTourEventListener(_compareTourPropertyListener);
+   }
 
-			@Override
-			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
+   /**
+    * set the part listener to save the view settings, the listeners are called before the controls
+    * are disposed
+    */
+   private void addPartListeners() {
 
-			@Override
-			public void partClosed(final IWorkbenchPartReference partRef) {
+      _partListener = new IPartListener2() {
 
-				if (partRef.getPart(false) == TourCompareResultView.this) {
+         @Override
+         public void partActivated(final IWorkbenchPartReference partRef) {}
 
-					TourCompareManager.getInstance().clearCompareResult();
-				}
-			}
+         @Override
+         public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
-			@Override
-			public void partDeactivated(final IWorkbenchPartReference partRef) {}
+         @Override
+         public void partClosed(final IWorkbenchPartReference partRef) {
 
-			@Override
-			public void partHidden(final IWorkbenchPartReference partRef) {}
+            if (partRef.getPart(false) == TourCompareResultView.this) {
 
-			@Override
-			public void partInputChanged(final IWorkbenchPartReference partRef) {}
+               TourCompareManager.getInstance().clearCompareResult();
+            }
+         }
 
-			@Override
-			public void partOpened(final IWorkbenchPartReference partRef) {
+         @Override
+         public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
-				/*
-				 * add the actions in the part open event so they are appended AFTER the actions which
-				 * are defined in the plugin.xml
-				 */
-				fillToolbar();
-			}
+         @Override
+         public void partHidden(final IWorkbenchPartReference partRef) {}
 
-			@Override
-			public void partVisible(final IWorkbenchPartReference partRef) {}
-		};
+         @Override
+         public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
-		getViewSite().getPage().addPartListener(_partListener);
-	}
+         @Override
+         public void partOpened(final IWorkbenchPartReference partRef) {
 
-	private void addPrefListener() {
+            /*
+             * add the actions in the part open event so they are appended AFTER the actions which
+             * are defined in the plugin.xml
+             */
+            fillToolbar();
+         }
 
-		_prefChangeListener = new IPropertyChangeListener() {
-			@Override
-			public void propertyChange(final PropertyChangeEvent event) {
+         @Override
+         public void partVisible(final IWorkbenchPartReference partRef) {}
+      };
 
-				final String property = event.getProperty();
+      getViewSite().getPage().addPartListener(_partListener);
+   }
 
-				if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
+   private void addPrefListener() {
 
-					// measurement system has changed
+      _prefChangeListener = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
 
-					net.tourbook.ui.UI.updateUnits();
+            final String property = event.getProperty();
 
-					_columnManager.saveState(_state);
-					_columnManager.clearColumns();
-					defineAllColumns(_viewerContainer);
+            if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
 
-					recreateViewer(null);
+               // measurement system has changed
 
-				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
+               _columnManager.saveState(_state);
+               _columnManager.clearColumns();
+               defineAllColumns(_viewerContainer);
 
-					_tourViewer.getTree().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+               recreateViewer(null);
 
-					_tourViewer.refresh();
+            } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
-					/*
-					 * the tree must be redrawn because the styled text does not show with the new color
-					 */
-					_tourViewer.getTree().redraw();
-				}
-			}
-		};
+               _tourViewer.getTree().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
-		_prefStore.addPropertyChangeListener(_prefChangeListener);
-	}
+               _tourViewer.refresh();
 
-	/**
-	 * Listen to post selections
-	 */
-	private void addSelectionListeners() {
+               /*
+                * the tree must be redrawn because the styled text does not show with the new color
+                */
+               _tourViewer.getTree().redraw();
+            }
+         }
+      };
 
-		_postSelectionListener = new ISelectionListener() {
+      _prefStore.addPropertyChangeListener(_prefChangeListener);
+   }
 
-			@Override
-			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
-				onSelectionChanged(part, selection);
-			}
-		};
+   /**
+    * Listen to post selections
+    */
+   private void addSelectionListeners() {
 
-		// register selection listener in the page
-		getSite().getPage().addPostSelectionListener(_postSelectionListener);
+      _postSelectionListener = new ISelectionListener() {
 
-	}
+         @Override
+         public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
+            onSelectionChanged(part, selection);
+         }
+      };
 
-	private void addTourEventListener() {
+      // register selection listener in the page
+      getSite().getPage().addPostSelectionListener(_postSelectionListener);
 
-		_tourPropertyListener = new ITourEventListener() {
-			@Override
-			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+   }
 
-				if (part == TourCompareResultView.this) {
-					return;
-				}
+   private void addTourEventListener() {
 
-				if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
+      _tourPropertyListener = new ITourEventListener() {
+         @Override
+         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
-					final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
-					if (modifiedTours != null) {
-						updateTourViewer(_rootItem, modifiedTours);
-					}
+            if (part == TourCompareResultView.this) {
+               return;
+            }
 
-				} else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED) {
+            if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
 
-					reloadViewer();
-				}
-			}
-		};
-		TourManager.getInstance().addTourEventListener(_tourPropertyListener);
-	}
+               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+               if (modifiedTours != null) {
+                  updateTourViewer(_rootItem, modifiedTours);
+               }
 
-	private void createActions() {
+            } else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED) {
 
-		_actionSaveComparedTours = new ActionSaveComparedTours(this);
-		_actionRemoveComparedTourSaveStatus = new ActionRemoveComparedTourSaveStatus(this);
+               reloadViewer();
+            }
+         }
+      };
+      TourManager.getInstance().addTourEventListener(_tourPropertyListener);
+   }
 
-		_actionCheckTours = new ActionCheckTours(this);
-		_actionUncheckTours = new ActionUncheckTours(this);
+   private void createActions() {
 
-		_actionSetTourType = new ActionSetTourTypeMenu(this);
+      _actionSaveComparedTours = new ActionSaveComparedTours(this);
+      _actionRemoveComparedTourSaveStatus = new ActionRemoveComparedTourSaveStatus(this);
 
-		_tagMenuMgr = new TagMenuManager(this, true);
+      _actionCheckTours = new ActionCheckTours(this);
+      _actionUncheckTours = new ActionUncheckTours(this);
 
-		_actionEditQuick = new ActionEditQuick(this);
-		_actionEditTour = new ActionEditTour(this);
-		_actionOpenTour = new ActionOpenTour(this);
+      _actionSetTourType = new ActionSetTourTypeMenu(this);
 
-		_actionModifyColumns = new ActionModifyColumns(this);
-		_actionCollapseAll = new ActionCollapseAll(this);
-	}
+      _tagMenuMgr = new TagMenuManager(this, true);
 
-	@Override
-	public void createPartControl(final Composite parent) {
+      _actionEditQuick = new ActionEditQuick(this);
+      _actionEditTour = new ActionEditTour(this);
+      _actionOpenTour = new ActionOpenTour(this);
 
-		_pc = new PixelConverter(parent);
+      _actionModifyColumns = new ActionModifyColumns(this);
+      _actionCollapseAll = new ActionCollapseAll(this);
+   }
 
-		// define all columns for the viewer
-		_columnManager = new ColumnManager(this, _state);
-//		_columnManager.setIsCategoryAvailable(true);
-		defineAllColumns(parent);
+   @Override
+   public void createPartControl(final Composite parent) {
 
-		createUI(parent);
+      _pc = new PixelConverter(parent);
 
-		addPartListeners();
-		addSelectionListeners();
-		addCompareTourPropertyListener();
-		addPrefListener();
-		addTourEventListener();
+      // define all columns for the viewer
+      _columnManager = new ColumnManager(this, _state);
 
-		createActions();
-		fillViewMenu();
+      defineAllColumns(parent);
 
-		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
+      createUI(parent);
 
-		_tourViewer.setInput(_rootItem = new TVICompareResultRootItem());
-	}
+      addPartListeners();
+      addSelectionListeners();
+      addCompareTourPropertyListener();
+      addPrefListener();
+      addTourEventListener();
 
-	private void createUI(final Composite parent) {
+      createActions();
+      fillViewMenu();
 
-		_viewerContainer = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
-		{
-			createUI_10_TourViewer(_viewerContainer);
-		}
-	}
+      getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
-	private Control createUI_10_TourViewer(final Composite parent) {
+      _tourViewer.setInput(_rootItem = new TVICompareResultRootItem());
+   }
 
-		// tour tree
-		final Tree tree = new Tree(parent,
-				SWT.H_SCROLL
-						| SWT.V_SCROLL
-						| SWT.BORDER
-						| SWT.MULTI
-						| SWT.FULL_SELECTION
-						| SWT.CHECK);
+   private void createUI(final Composite parent) {
 
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(tree);
+      _viewerContainer = new Composite(parent, SWT.NONE);
+      GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
+      {
+         createUI_10_TourViewer(_viewerContainer);
+      }
+   }
 
-		tree.setHeaderVisible(true);
-		tree.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+   private void createUI_10_TourViewer(final Composite parent) {
 
-		_tourViewer = new ContainerCheckedTreeViewer(tree);
-		_columnManager.createColumns(_tourViewer);
+      // tour tree
+      final Tree tree = new Tree(parent,
+            SWT.H_SCROLL
+                  | SWT.V_SCROLL
+                  | SWT.BORDER
+                  | SWT.MULTI
+                  | SWT.FULL_SELECTION
+                  | SWT.CHECK);
 
-		_tourViewer.setContentProvider(new ResultContentProvider());
-		_tourViewer.setUseHashlookup(true);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(tree);
 
-		_tourViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			@Override
-			public void selectionChanged(final SelectionChangedEvent event) {
-				onSelect(event);
-			}
-		});
+      tree.setHeaderVisible(true);
+      tree.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
-		_tourViewer.addDoubleClickListener(new IDoubleClickListener() {
-			@Override
-			public void doubleClick(final DoubleClickEvent event) {
+      _tourViewer = new ContainerCheckedTreeViewer(tree);
+      _columnManager.createColumns(_tourViewer);
 
-				// expand/collapse current item
+      _tourViewer.setContentProvider(new ResultContentProvider());
+      _tourViewer.setUseHashlookup(true);
 
-				final Object treeItem = ((IStructuredSelection) event.getSelection()).getFirstElement();
+      _tourViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+         @Override
+         public void selectionChanged(final SelectionChangedEvent event) {
+            onSelect(event);
+         }
+      });
 
-				if (_tourViewer.getExpandedState(treeItem)) {
-					_tourViewer.collapseToLevel(treeItem, 1);
-				} else {
-					_tourViewer.expandToLevel(treeItem, 1);
-				}
-			}
-		});
+      _tourViewer.addDoubleClickListener(new IDoubleClickListener() {
+         @Override
+         public void doubleClick(final DoubleClickEvent event) {
 
-		_tourViewer.getTree().addKeyListener(new KeyAdapter() {
-			@Override
-			public void keyPressed(final KeyEvent keyEvent) {
-				if (keyEvent.keyCode == SWT.DEL) {
-					removeComparedTourFromDb();
-				}
-			}
-		});
+            // expand/collapse current item
 
-		_tourViewer.addCheckStateListener(new ICheckStateListener() {
-			@Override
-			public void checkStateChanged(final CheckStateChangedEvent event) {
+            final Object treeItem = ((IStructuredSelection) event.getSelection()).getFirstElement();
 
-				if (event.getElement() instanceof TVICompareResultComparedTour) {
+            if (_tourViewer.getExpandedState(treeItem)) {
+               _tourViewer.collapseToLevel(treeItem, 1);
+            } else {
+               _tourViewer.expandToLevel(treeItem, 1);
+            }
+         }
+      });
 
-					final TVICompareResultComparedTour compareResult = (TVICompareResultComparedTour) event
-							.getElement();
+      _tourViewer.getTree().addKeyListener(new KeyAdapter() {
+         @Override
+         public void keyPressed(final KeyEvent keyEvent) {
+            if (keyEvent.keyCode == SWT.DEL) {
+               removeComparedTourFromDb();
+            }
+         }
+      });
 
-					if (event.getChecked() && compareResult.isSaved()) {
-						/*
-						 * uncheck elements which are already stored for the reftour, it would be better
-						 * to disable them, but this is not possible because this is a limitation by the
-						 * OS
-						 */
-						_tourViewer.setChecked(compareResult, false);
-					} else {
-						enableActions();
-					}
-				} else {
-					// uncheck all other tree items
-					_tourViewer.setChecked(event.getElement(), false);
-				}
-			}
-		});
+      _tourViewer.addCheckStateListener(new ICheckStateListener() {
+         @Override
+         public void checkStateChanged(final CheckStateChangedEvent event) {
 
-		createUI_20_ContextMenu();
+            if (event.getElement() instanceof TVICompareResultComparedTour) {
 
-		// set tour info tooltip provider
-		_tourInfoToolTip = new TreeViewerTourInfoToolTip(_tourViewer);
+               final TVICompareResultComparedTour compareResult = (TVICompareResultComparedTour) event
+                     .getElement();
 
-		return tree;
-	}
+               if (event.getChecked() && compareResult.isSaved()) {
+                  /*
+                   * uncheck elements which are already stored for the reftour, it would be better
+                   * to disable them, but this is not possible because this is a limitation by the
+                   * OS
+                   */
+                  _tourViewer.setChecked(compareResult, false);
+               } else {
+                  enableActions();
+               }
+            } else {
+               // uncheck all other tree items
+               _tourViewer.setChecked(event.getElement(), false);
+            }
+         }
+      });
 
-	/**
-	 * create the views context menu
-	 */
-	private void createUI_20_ContextMenu() {
+      createUI_20_ContextMenu();
 
-		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
-		menuMgr.setRemoveAllWhenShown(true);
-		menuMgr.addMenuListener(new IMenuListener() {
-			@Override
-			public void menuAboutToShow(final IMenuManager manager) {
-				fillContextMenu(manager);
-			}
-		});
+      // set tour info tooltip provider
+      _tourInfoToolTip = new TreeViewerTourInfoToolTip(_tourViewer);
+   }
 
-		final Tree tree = (Tree) _tourViewer.getControl();
-		final Menu treeContextMenu = menuMgr.createContextMenu(tree);
-		treeContextMenu.addMenuListener(new MenuAdapter() {
-			@Override
-			public void menuHidden(final MenuEvent e) {
-				_tagMenuMgr.onHideMenu();
-			}
+   /**
+    * create the views context menu
+    */
+   private void createUI_20_ContextMenu() {
 
-			@Override
-			public void menuShown(final MenuEvent menuEvent) {
-				_tagMenuMgr.onShowMenu(menuEvent, tree, Display.getCurrent().getCursorLocation(), _tourInfoToolTip);
-			}
-		});
+      final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+      menuMgr.setRemoveAllWhenShown(true);
+      menuMgr.addMenuListener(new IMenuListener() {
+         @Override
+         public void menuAboutToShow(final IMenuManager manager) {
+            fillContextMenu(manager);
+         }
+      });
 
-		_columnManager.createHeaderContextMenu(tree, treeContextMenu);
-	}
+      final Tree tree = (Tree) _tourViewer.getControl();
+      final Menu treeContextMenu = menuMgr.createContextMenu(tree);
+      treeContextMenu.addMenuListener(new MenuAdapter() {
+         @Override
+         public void menuHidden(final MenuEvent e) {
+            _tagMenuMgr.onHideMenu();
+         }
 
-	private void defineAllColumns(final Composite parent) {
+         @Override
+         public void menuShown(final MenuEvent menuEvent) {
+            _tagMenuMgr.onShowMenu(menuEvent, tree, Display.getCurrent().getCursorLocation(), _tourInfoToolTip);
+         }
+      });
 
-		defineColumn_1st_ComparedTour();
-		defineColumn_Data_Diff();
+      _columnManager.createHeaderContextMenu(tree, treeContextMenu);
+   }
 
-		defineColumn_Motion_SpeedComputed();
-		defineColumn_Motion_SpeedSaved();
-		defineColumn_Motion_SpeedMoved();
-		defineColumn_Motion_Distance();
+   private void defineAllColumns(final Composite parent) {
 
-		defineColumn_Data_TimeInterval();
+      defineColumn_1st_ComparedTour();
+      defineColumn_Data_Diff();
 
-		defineColumn_Tour_Type();
-		defineColumn_Tour_Title();
-		defineColumn_Tour_Tags();
-	}
+      defineColumn_Tour_Type();
 
-	/**
-	 * tree column: reference tour/date
-	 */
-	private void defineColumn_1st_ComparedTour() {
+      defineColumn_Motion_SpeedComputed();
+      defineColumn_Motion_SpeedSaved();
+      defineColumn_Motion_SpeedMoved();
+      defineColumn_Motion_VerticalSpeed();
+      defineColumn_Motion_Distance();
 
-		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "comparedTour", SWT.LEAD); //$NON-NLS-1$
+      defineColumn_Time_DrivingTime();
 
-		colDef.setIsDefaultColumn();
-		colDef.setColumnLabel(Messages.Compare_Result_Column_tour);
-		colDef.setColumnHeaderText(Messages.Compare_Result_Column_tour);
-		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(25) + 16);
-		colDef.setCanModifyVisibility(false);
-		colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
+      defineColumn_Data_TimeInterval();
 
-			@Override
-			public Long getTourId(final ViewerCell cell) {
+      defineColumn_Tour_Title();
+      defineColumn_Tour_Tags();
+   }
 
-				final Object element = cell.getElement();
-				if (element instanceof TVICompareResultReferenceTour) {
+   /**
+    * tree column: reference tour/date
+    */
+   private void defineColumn_1st_ComparedTour() {
 
-					return ((TVICompareResultReferenceTour) element).tourId;
+      final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "comparedTour", SWT.LEAD); //$NON-NLS-1$
 
-				} else if (element instanceof TVICompareResultComparedTour) {
+      colDef.setIsDefaultColumn();
+      colDef.setColumnLabel(Messages.Compare_Result_Column_tour);
+      colDef.setColumnHeaderText(Messages.Compare_Result_Column_tour);
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(25) + 16);
+      colDef.setCanModifyVisibility(false);
+      colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
 
-					return ((TVICompareResultComparedTour) element).comparedTourData.getTourId();
-				}
+         @Override
+         public Long getTourId(final ViewerCell cell) {
 
-				return null;
-			}
+            final Object element = cell.getElement();
+            if (element instanceof TVICompareResultReferenceTour) {
 
-			@Override
-			public void update(final ViewerCell cell) {
+               return ((TVICompareResultReferenceTour) element).tourId;
 
-				final Object element = cell.getElement();
-				if (element instanceof TVICompareResultReferenceTour) {
+            } else if (element instanceof TVICompareResultComparedTour) {
 
-					final TVICompareResultReferenceTour refItem = (TVICompareResultReferenceTour) element;
-					cell.setText(refItem.label);
+               return ((TVICompareResultComparedTour) element).comparedTourData.getTourId();
+            }
 
-				} else if (element instanceof TVICompareResultComparedTour) {
+            return null;
+         }
 
-					final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
-					cell.setText(TourManager.getTourDateShort(compareItem.comparedTourData));
+         @Override
+         public void update(final ViewerCell cell) {
 
-					// display an image when a tour is saved
-					if (compareItem.isSaved()) {
-						cell.setImage(_dbImage);
-					} else {
-						cell.setImage(null);
-					}
-				}
+            final Object element = cell.getElement();
+            if (element instanceof TVICompareResultReferenceTour) {
 
-				setCellColor(cell, element);
-			}
-		});
-	}
+               final TVICompareResultReferenceTour refItem = (TVICompareResultReferenceTour) element;
+               cell.setText(refItem.label);
 
-	/**
-	 * column: altitude difference
-	 */
-	private void defineColumn_Data_Diff() {
+            } else if (element instanceof TVICompareResultComparedTour) {
 
-		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "diff", SWT.TRAIL); //$NON-NLS-1$
+               final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
+               cell.setText(TourManager.getTourDateShort(compareItem.comparedTourData));
 
-		colDef.setIsDefaultColumn();
-		colDef.setColumnHeaderText(Messages.Compare_Result_Column_diff);
-		colDef.setColumnHeaderToolTipText(Messages.Compare_Result_Column_diff_tooltip);
-		colDef.setColumnLabel(Messages.Compare_Result_Column_diff_label);
-		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final Object element = cell.getElement();
-				if (element instanceof TVICompareResultComparedTour) {
+               // display an image when a tour is saved
+               if (compareItem.isSaved()) {
+                  cell.setImage(_dbImage);
+               } else {
+                  cell.setImage(null);
+               }
+            }
 
-					final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
+            setCellColor(cell, element);
+         }
+      });
+   }
 
-					final float value = (compareItem.minAltitudeDiff * 100)
-							/ (compareItem.normalizedEndIndex - compareItem.normalizedStartIndex);
+   /**
+    * column: altitude difference
+    */
+   private void defineColumn_Data_Diff() {
 
-					cell.setText(Integer.toString((int) value));
+      final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "diff", SWT.TRAIL); //$NON-NLS-1$
 
-					setCellColor(cell, element);
-				}
-			}
-		});
-	}
+      colDef.setIsDefaultColumn();
+      colDef.setColumnHeaderText(Messages.Compare_Result_Column_diff);
+      colDef.setColumnHeaderToolTipText(Messages.Compare_Result_Column_diff_tooltip);
+      colDef.setColumnLabel(Messages.Compare_Result_Column_diff_label);
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+            final Object element = cell.getElement();
+            if (element instanceof TVICompareResultComparedTour) {
 
-	/**
-	 * column: time interval
-	 */
-	private void defineColumn_Data_TimeInterval() {
+               final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.DATA_TIME_INTERVAL.createColumn(_columnManager, _pc);
+               final float value = (compareItem.minAltitudeDiff * 100)
+                     / (compareItem.normalizedEndIndex - compareItem.normalizedStartIndex);
 
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final Object element = cell.getElement();
-				if (element instanceof TVICompareResultComparedTour) {
+               cell.setText(Integer.toString((int) value));
 
-					cell.setText(Integer.toString(((TVICompareResultComparedTour) element).timeIntervall));
-					setCellColor(cell, element);
-				}
-			}
-		});
-	}
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
 
-	/**
-	 * column: distance
-	 */
-	private void defineColumn_Motion_Distance() {
+   /**
+    * column: time interval
+    */
+   private void defineColumn_Data_TimeInterval() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.MOTION_DISTANCE.createColumn(_columnManager, _pc);
+      final TreeColumnDefinition colDef = TreeColumnFactory.DATA_TIME_INTERVAL.createColumn(_columnManager, _pc);
 
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final Object element = cell.getElement();
-				if (element instanceof TVICompareResultComparedTour) {
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+            final Object element = cell.getElement();
+            if (element instanceof TVICompareResultComparedTour) {
 
-					final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
+               cell.setText(Integer.toString(((TVICompareResultComparedTour) element).timeIntervall));
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
 
-					final float value = compareItem.compareDistance / (1000 * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
+   /**
+    * column: distance
+    */
+   private void defineColumn_Motion_Distance() {
 
-					colDef.printDetailValue(cell, value);
-					setCellColor(cell, element);
-				}
-			}
-		});
-	}
+      final TreeColumnDefinition colDef = TreeColumnFactory.MOTION_DISTANCE.createColumn(_columnManager, _pc);
 
-	/**
-	 * column: speed computed
-	 */
-	private void defineColumn_Motion_SpeedComputed() {
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+            final Object element = cell.getElement();
+            if (element instanceof TVICompareResultComparedTour) {
 
-		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "speedComputed", SWT.TRAIL); //$NON-NLS-1$
+               final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
 
-		colDef.setIsDefaultColumn();
-		colDef.setColumnHeaderText(UI.UNIT_LABEL_SPEED);
-		colDef.setColumnUnit(UI.UNIT_LABEL_SPEED);
-		colDef.setColumnHeaderToolTipText(Messages.Compare_Result_Column_kmh_tooltip);
-		colDef.setColumnLabel(Messages.Compare_Result_Column_kmh_label);
+               final float value = compareItem.compareDistance / (1000 * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
 
-		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
-		colDef.setValueFormats(//
-				ValueFormatSet.Number,
-				ValueFormat.NUMBER_1_1,
-				_columnManager);
+               colDef.printDetailValue(cell, value);
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
 
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final Object element = cell.getElement();
-				if (element instanceof TVICompareResultComparedTour) {
+   /**
+    * column: speed computed
+    */
+   private void defineColumn_Motion_SpeedComputed() {
 
-					final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
-					final double value = compareItem.compareSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+      final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "speedComputed", SWT.TRAIL); //$NON-NLS-1$
 
-					colDef.printDetailValue(cell, value);
+      colDef.setIsDefaultColumn();
+      colDef.setColumnHeaderText(UI.UNIT_LABEL_SPEED);
+      colDef.setColumnUnit(UI.UNIT_LABEL_SPEED);
+      colDef.setColumnHeaderToolTipText(Messages.Compare_Result_Column_kmh_tooltip);
+      colDef.setColumnLabel(Messages.Compare_Result_Column_kmh_label);
 
-					setCellColor(cell, element);
-				}
-			}
-		});
-	}
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
+      colDef.setValueFormats(//
+            ValueFormatSet.Number,
+            ValueFormat.NUMBER_1_1,
+            _columnManager);
 
-	/**
-	 * column: speed moved
-	 */
-	private void defineColumn_Motion_SpeedMoved() {
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+            final Object element = cell.getElement();
+            if (element instanceof TVICompareResultComparedTour) {
 
-		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "speedMoved", SWT.TRAIL); //$NON-NLS-1$
+               final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
+               final double value = compareItem.compareSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
-		colDef.setColumnHeaderText(UI.UNIT_LABEL_SPEED);
-		colDef.setColumnUnit(UI.UNIT_LABEL_SPEED);
-		colDef.setColumnHeaderToolTipText(Messages.Compare_Result_Column_kmh_moved_tooltip);
-		colDef.setColumnLabel(Messages.Compare_Result_Column_kmh_moved_label);
+               colDef.printDetailValue(cell, value);
 
-		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
-		colDef.setValueFormats(//
-				ValueFormatSet.Number,
-				ValueFormat.NUMBER_1_1,
-				_columnManager);
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
 
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final Object element = cell.getElement();
-				if (element instanceof TVICompareResultComparedTour) {
+   /**
+    * column: speed moved
+    */
+   private void defineColumn_Motion_SpeedMoved() {
 
-					final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
+      final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "speedMoved", SWT.TRAIL); //$NON-NLS-1$
 
-					final double value = compareItem.movedSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+      colDef.setColumnHeaderText(UI.UNIT_LABEL_SPEED);
+      colDef.setColumnUnit(UI.UNIT_LABEL_SPEED);
+      colDef.setColumnHeaderToolTipText(Messages.Compare_Result_Column_kmh_moved_tooltip);
+      colDef.setColumnLabel(Messages.Compare_Result_Column_kmh_moved_label);
 
-					colDef.printDetailValue(cell, value);
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
+      colDef.setValueFormats(//
+            ValueFormatSet.Number,
+            ValueFormat.NUMBER_1_1,
+            _columnManager);
 
-					setCellColor(cell, element);
-				}
-			}
-		});
-	}
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+            final Object element = cell.getElement();
+            if (element instanceof TVICompareResultComparedTour) {
 
-	/**
-	 * column: speed saved
-	 */
-	private void defineColumn_Motion_SpeedSaved() {
+               final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
 
-		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "speedSaved", SWT.TRAIL); //$NON-NLS-1$
+               final double value = compareItem.movedSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
-		colDef.setColumnHeaderText(UI.UNIT_LABEL_SPEED);
-		colDef.setColumnUnit(UI.UNIT_LABEL_SPEED);
-		colDef.setColumnHeaderToolTipText(Messages.Compare_Result_Column_kmh_db_tooltip);
-		colDef.setColumnLabel(Messages.Compare_Result_Column_kmh_db_label);
+               colDef.printDetailValue(cell, value);
 
-		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
-		colDef.setValueFormats(//
-				ValueFormatSet.Number,
-				ValueFormat.NUMBER_1_1,
-				_columnManager);
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
 
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final Object element = cell.getElement();
-				if (element instanceof TVICompareResultComparedTour) {
+   /**
+    * column: speed saved
+    */
+   private void defineColumn_Motion_SpeedSaved() {
 
-					final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
+      final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "speedSaved", SWT.TRAIL); //$NON-NLS-1$
 
-					final double value = compareItem.dbSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+      colDef.setColumnHeaderText(UI.UNIT_LABEL_SPEED);
+      colDef.setColumnUnit(UI.UNIT_LABEL_SPEED);
+      colDef.setColumnHeaderToolTipText(Messages.Compare_Result_Column_kmh_db_tooltip);
+      colDef.setColumnLabel(Messages.Compare_Result_Column_kmh_db_label);
 
-					colDef.printDetailValue(cell, value);
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
+      colDef.setValueFormats(//
+            ValueFormatSet.Number,
+            ValueFormat.NUMBER_1_1,
+            _columnManager);
 
-					setCellColor(cell, element);
-				}
-			}
-		});
-	}
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+            final Object element = cell.getElement();
+            if (element instanceof TVICompareResultComparedTour) {
 
-	/**
-	 * column: tags
-	 */
-	private void defineColumn_Tour_Tags() {
+               final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TAGS.createColumn(_columnManager, _pc);
+               final double value = compareItem.dbSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final Object element = cell.getElement();
-				if (element instanceof TVICompareResultComparedTour) {
+               colDef.printDetailValue(cell, value);
 
-					final Set<TourTag> tourTags = ((TVICompareResultComparedTour) element).comparedTourData
-							.getTourTags();
-					if (tourTags.size() == 0) {
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
 
-						// the tags could have been removed, set empty field
+   /**
+    * Column: Vertical speed (VAM average ascent speed)
+    */
+   private void defineColumn_Motion_VerticalSpeed() {
 
-						cell.setText(UI.EMPTY_STRING);
+      final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "motionAltimeter", SWT.TRAIL); //$NON-NLS-1$
 
-					} else {
+      colDef.setIsDefaultColumn();
+      colDef.setColumnHeaderText(UI.UNIT_LABEL_ALTIMETER);
+      colDef.setColumnUnit(UI.UNIT_LABEL_ALTIMETER);
+      colDef.setColumnHeaderToolTipText(COLUMN_FACTORY_MOTION_ALTIMETER_TOOLTIP);
+      colDef.setColumnLabel(COLUMN_FACTORY_MOTION_ALTIMETER);
 
-						cell.setText(TourDatabase.getTagNames(tourTags));
-						setCellColor(cell, element);
-					}
-				}
-			}
-		});
-	}
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
+      colDef.setValueFormats(//
+            ValueFormatSet.Number,
+            ValueFormat.NUMBER_1_0,
+            _columnManager);
 
-	/**
-	 * column: title
-	 */
-	private void defineColumn_Tour_Title() {
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+            final Object element = cell.getElement();
+            if (element instanceof TVICompareResultComparedTour) {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TITLE.createColumn(_columnManager, _pc);
+               final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
 
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final Object element = cell.getElement();
-				if (element instanceof TVICompareResultComparedTour) {
-					cell.setText(((TVICompareResultComparedTour) element).comparedTourData.getTourTitle());
-					setCellColor(cell, element);
-				}
-			}
-		});
-	}
+               final double value = compareItem.avgAltimeter;
 
-	/**
-	 * column: tour type
-	 */
-	private void defineColumn_Tour_Type() {
+               colDef.printDetailValue(cell, value);
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TYPE.createColumn(_columnManager, _pc);
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
 
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final Object element = cell.getElement();
-				if (element instanceof TVICompareResultComparedTour) {
-					final TourData comparedTourData = ((TVICompareResultComparedTour) element).comparedTourData;
-					final TourType tourType = comparedTourData.getTourType();
-					if (tourType != null) {
-						cell.setImage(TourTypeImage.getTourTypeImage(tourType.getTypeId()));
-					}
-				}
-			}
-		});
-	}
+   /**
+    * column: driving time (h)
+    */
+   private void defineColumn_Time_DrivingTime() {
 
-	@Override
-	public void dispose() {
+      final TreeColumnDefinition colDef = TreeColumnFactory.TIME_DRIVING_TIME_NO_CATEGORY.createColumn(_columnManager, _pc);
 
-		getSite().getPage().removePostSelectionListener(_postSelectionListener);
-		getSite().getPage().removePartListener(_partListener);
-		TourManager.getInstance().removeTourEventListener(_compareTourPropertyListener);
-		TourManager.getInstance().removeTourEventListener(_tourPropertyListener);
-		_prefStore.removePropertyChangeListener(_prefChangeListener);
+      colDef.setIsDefaultColumn();
 
-		_dbImage.dispose();
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
 
-		super.dispose();
-	}
+            final Object element = cell.getElement();
+            if (element instanceof TVICompareResultComparedTour) {
 
-	private void enableActions() {
+               final long value = ((TVICompareResultComparedTour) element).compareDrivingTime;
 
-		final ITreeSelection selection = (ITreeSelection) _tourViewer.getSelection();
+               colDef.printLongValue(cell, value, true);
 
-		int tourItems = 0;
-		int otherItems = 0;
-		int savedTourItems = 0;
-		int unsavedTourItems = 0;
-		TVICompareResultComparedTour firstTourItem = null;
-		TVICompareResultComparedTour firstCheckedItem = null;
-		TVICompareResultComparedTour firstSelectedItem = null;
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
 
-		/*
-		 * count selected items
-		 */
-		int selectedTours = 0;
-		for (final Iterator<?> iter = selection.iterator(); iter.hasNext();) {
+   /**
+    * column: tags
+    */
+   private void defineColumn_Tour_Tags() {
 
-			final Object treeItem = iter.next();
+      final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TAGS.createColumn(_columnManager, _pc);
 
-			if (treeItem instanceof TVICompareResultComparedTour) {
-				final TVICompareResultComparedTour comparedTourItem = (TVICompareResultComparedTour) treeItem;
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
 
-				// count tours
-				if (tourItems == 0) {
-					firstTourItem = comparedTourItem;
-					firstSelectedItem = comparedTourItem;
-				}
-				tourItems++;
+            final Object element = cell.getElement();
 
-				// count saved tours
-				if (comparedTourItem.isSaved()) {
-					savedTourItems++;
-				} else {
-					unsavedTourItems++;
-				}
+            if (element instanceof TVICompareResultComparedTour) {
 
-				selectedTours++;
+               final Set<TourTag> tourTags = ((TVICompareResultComparedTour) element).comparedTourData
+                     .getTourTags();
+               if (tourTags.size() == 0) {
 
-			} else {
-				otherItems++;
-			}
-		}
+                  // the tags could have been removed, set empty field
 
-		/*
-		 * count checked items
-		 */
-		int checkedTours = 0;
-		for (final Object checkedElement : _tourViewer.getCheckedElements()) {
+                  cell.setText(UI.EMPTY_STRING);
 
-			if (checkedElement instanceof TVICompareResultComparedTour) {
-				final TVICompareResultComparedTour comparedTourItem = (TVICompareResultComparedTour) checkedElement;
+               } else {
 
-				// count tours
-				if (tourItems <= 1) {
-					firstTourItem = comparedTourItem;
-					firstCheckedItem = comparedTourItem;
-				}
-				tourItems++;
+                  cell.setText(TourDatabase.getTagNames(tourTags));
+                  setCellColor(cell, element);
+               }
+            }
+         }
+      });
+   }
 
-				// count saved tours
-				if (comparedTourItem.isSaved()) {
-					savedTourItems++;
-				} else {
-					unsavedTourItems++;
-				}
+   /**
+    * column: title
+    */
+   private void defineColumn_Tour_Title() {
 
-				checkedTours++;
-			}
-		}
+      final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TITLE.createColumn(_columnManager, _pc);
 
-		final boolean isTourSelected = tourItems > 0 && otherItems == 0;
-		boolean isOneTour = tourItems == 1 && otherItems == 0;
-		boolean isOneTourSelected = selectedTours == 1;
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+            final Object element = cell.getElement();
+            if (element instanceof TVICompareResultComparedTour) {
+               cell.setText(((TVICompareResultComparedTour) element).comparedTourData.getTourTitle());
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
 
-		// check if the same tour is selected and/or checked
-		if (tourItems == 2 && otherItems == 0 && firstSelectedItem == firstCheckedItem) {
-			isOneTour = true;
-			isOneTourSelected = true;
-		}
+   /**
+    * column: tour type
+    */
+   private void defineColumn_Tour_Type() {
 
-		_actionCheckTours.setEnabled(unsavedTourItems > 0);
-		_actionUncheckTours.setEnabled(checkedTours > 0);
+      final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TYPE.createColumn(_columnManager, _pc);
 
-		// action: save compare result
-		_actionSaveComparedTours.setEnabled(unsavedTourItems > 0);
+      colDef.setIsDefaultColumn();
 
-		// action: remove tour from saved compare result, currently only one tour item is supported
-		_actionRemoveComparedTourSaveStatus.setEnabled(savedTourItems > 0);
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+            final Object element = cell.getElement();
+            if (element instanceof TVICompareResultComparedTour) {
+               final TourData comparedTourData = ((TVICompareResultComparedTour) element).comparedTourData;
+               final TourType tourType = comparedTourData.getTourType();
+               if (tourType != null) {
+                  cell.setImage(TourTypeImage.getTourTypeImage(tourType.getTypeId()));
+               }
+            }
+         }
+      });
+   }
 
-		// actions: edit tour
-		_actionEditQuick.setEnabled(isOneTourSelected);
-		_actionEditTour.setEnabled(isOneTourSelected);
-		_actionOpenTour.setEnabled(isOneTourSelected);
+   @Override
+   public void dispose() {
 
-		// action: tour type
-		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
-		_actionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
+      getSite().getPage().removePostSelectionListener(_postSelectionListener);
+      getSite().getPage().removePartListener(_partListener);
+      TourManager.getInstance().removeTourEventListener(_compareTourPropertyListener);
+      TourManager.getInstance().removeTourEventListener(_tourPropertyListener);
+      _prefStore.removePropertyChangeListener(_prefChangeListener);
 
-		// tags: add/remove/remove all
-		Set<TourTag> allExistingTags = null;
-		long existingTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
+      _dbImage.dispose();
 
-		if (isOneTour) {
+      super.dispose();
+   }
 
-			// one tour is selected
+   private void enableActions() {
 
-			allExistingTags = firstTourItem.comparedTourData.getTourTags();
+      final ITreeSelection selection = (ITreeSelection) _tourViewer.getSelection();
 
-			final TourType tourType = firstTourItem.comparedTourData.getTourType();
-			existingTourTypeId = tourType == null ? TourDatabase.ENTITY_IS_NOT_SAVED : tourType.getTypeId();
-		}
-		_tagMenuMgr.enableTagActions(isTourSelected, isOneTour, allExistingTags);
+      int tourItems = 0;
+      int otherItems = 0;
+      int savedTourItems = 0;
+      int unsavedTourItems = 0;
+      TVICompareResultComparedTour firstTourItem = null;
+      TVICompareResultComparedTour firstCheckedItem = null;
+      TVICompareResultComparedTour firstSelectedItem = null;
 
-		TourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, existingTourTypeId);
-	}
+      /*
+       * count selected items
+       */
+      int selectedTours = 0;
+      for (final Iterator<?> iter = selection.iterator(); iter.hasNext();) {
 
-	private void fillContextMenu(final IMenuManager menuMgr) {
+         final Object treeItem = iter.next();
 
-		menuMgr.add(_actionSaveComparedTours);
-		menuMgr.add(_actionRemoveComparedTourSaveStatus);
-		menuMgr.add(_actionCheckTours);
-		menuMgr.add(_actionUncheckTours);
+         if (treeItem instanceof TVICompareResultComparedTour) {
+            final TVICompareResultComparedTour comparedTourItem = (TVICompareResultComparedTour) treeItem;
 
-		menuMgr.add(new Separator());
-		menuMgr.add(_actionEditQuick);
-		menuMgr.add(_actionEditTour);
-		menuMgr.add(_actionOpenTour);
+            // count tours
+            if (tourItems == 0) {
+               firstTourItem = comparedTourItem;
+               firstSelectedItem = comparedTourItem;
+            }
+            tourItems++;
 
-		// tour tag actions
-		_tagMenuMgr.fillTagMenu(menuMgr);
+            // count saved tours
+            if (comparedTourItem.isSaved()) {
+               savedTourItems++;
+            } else {
+               unsavedTourItems++;
+            }
 
-		// tour type actions
-		menuMgr.add(new Separator());
-		menuMgr.add(_actionSetTourType);
-		TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, this, true);
+            selectedTours++;
 
-		enableActions();
-	}
+         } else {
+            otherItems++;
+         }
+      }
 
-	private void fillToolbar() {
+      /*
+       * count checked items
+       */
+      int checkedTours = 0;
+      for (final Object checkedElement : _tourViewer.getCheckedElements()) {
 
-		// check if toolbar is created
-		if (_isToolbarCreated) {
-			return;
-		}
-		_isToolbarCreated = true;
+         if (checkedElement instanceof TVICompareResultComparedTour) {
+            final TVICompareResultComparedTour comparedTourItem = (TVICompareResultComparedTour) checkedElement;
 
-		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+            // count tours
+            if (tourItems <= 1) {
+               firstTourItem = comparedTourItem;
+               firstCheckedItem = comparedTourItem;
+            }
+            tourItems++;
 
-		tbm.add(_actionCollapseAll);
+            // count saved tours
+            if (comparedTourItem.isSaved()) {
+               savedTourItems++;
+            } else {
+               unsavedTourItems++;
+            }
 
-		tbm.update(true);
-	}
+            checkedTours++;
+         }
+      }
 
-	private void fillViewMenu() {
+      final boolean isTourSelected = tourItems > 0 && otherItems == 0;
+      boolean isOneTour = tourItems == 1 && otherItems == 0;
+      boolean isOneTourSelected = selectedTours == 1;
 
-		/*
-		 * fill view menu
-		 */
-		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
-		menuMgr.add(_actionModifyColumns);
-	}
+      // check if the same tour is selected and/or checked
+      if (tourItems == 2 && otherItems == 0 && firstSelectedItem == firstCheckedItem) {
+         isOneTour = true;
+         isOneTourSelected = true;
+      }
 
-	@Override
-	public ColumnManager getColumnManager() {
-		return _columnManager;
-	}
+      _actionCheckTours.setEnabled(unsavedTourItems > 0);
+      _actionUncheckTours.setEnabled(checkedTours > 0);
 
-	/**
-	 * Recursive method to walk down the tour tree items and find the compared tours
-	 *
-	 * @param parentItem
-	 * @param CompareIds
-	 */
-	private void getComparedTours(final ArrayList<TVICompareResultComparedTour> comparedTours,
-											final TreeViewerItem parentItem,
-											final ArrayList<Long> CompareIds) {
+      // action: save compare result
+      _actionSaveComparedTours.setEnabled(unsavedTourItems > 0);
 
-		final ArrayList<TreeViewerItem> unfetchedChildren = parentItem.getUnfetchedChildren();
+      // action: remove tour from saved compare result, currently only one tour item is supported
+      _actionRemoveComparedTourSaveStatus.setEnabled(savedTourItems > 0);
 
-		if (unfetchedChildren != null) {
+      // actions: edit tour
+      _actionEditQuick.setEnabled(isOneTourSelected);
+      _actionEditTour.setEnabled(isOneTourSelected);
+      _actionOpenTour.setEnabled(isOneTourSelected);
 
-			// children are available
+      // action: tour type
+      final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
+      _actionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
 
-			for (final TreeViewerItem treeItem : unfetchedChildren) {
+      // tags: add/remove/remove all
+      Set<TourTag> allExistingTags = null;
+      long existingTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
 
-				if (treeItem instanceof TVICompareResultComparedTour) {
-					final TVICompareResultComparedTour ttiCompResult = (TVICompareResultComparedTour) treeItem;
-					final long compId = ttiCompResult.compId;
-					for (final Long removedCompId : CompareIds) {
-						if (compId == removedCompId) {
-							comparedTours.add(ttiCompResult);
-						}
-					}
-				} else {
-					// this is a child which can be the parent for other childs
-					getComparedTours(comparedTours, treeItem, CompareIds);
-				}
-			}
-		}
-	}
+      if (isOneTour) {
 
-	private TVICompareResultComparedTour getSelectedComparedTour() {
+         // one tour is selected
 
-		final TreeSelection selection = (TreeSelection) _tourViewer.getSelection();
-		for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
+         allExistingTags = firstTourItem.comparedTourData.getTourTags();
 
-			final Object treeItem = iterator.next();
-			if (treeItem instanceof TVICompareResultComparedTour) {
+         final TourType tourType = firstTourItem.comparedTourData.getTourType();
+         existingTourTypeId = tourType == null ? TourDatabase.ENTITY_IS_NOT_SAVED : tourType.getTypeId();
+      }
+      _tagMenuMgr.enableTagActions(isTourSelected, isOneTour, allExistingTags);
 
-				return (TVICompareResultComparedTour) treeItem;
-			}
-		}
+      TourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, existingTourTypeId);
+   }
 
-		return null;
-	}
+   private void fillContextMenu(final IMenuManager menuMgr) {
 
-	private TVICompareResultReferenceTour getSelectedRefTour() {
+      menuMgr.add(_actionSaveComparedTours);
+      menuMgr.add(_actionRemoveComparedTourSaveStatus);
+      menuMgr.add(_actionCheckTours);
+      menuMgr.add(_actionUncheckTours);
 
-		final TreeSelection selection = (TreeSelection) _tourViewer.getSelection();
-		for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
+      menuMgr.add(new Separator());
+      menuMgr.add(_actionEditQuick);
+      menuMgr.add(_actionEditTour);
+      menuMgr.add(_actionOpenTour);
 
-			final Object treeItem = iterator.next();
-			if (treeItem instanceof TVICompareResultReferenceTour) {
+      // tour tag actions
+      _tagMenuMgr.fillTagMenu(menuMgr);
 
-				return (TVICompareResultReferenceTour) treeItem;
-			}
-		}
+      // tour type actions
+      menuMgr.add(new Separator());
+      menuMgr.add(_actionSetTourType);
+      TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, this, true);
 
-		return null;
-	}
+      enableActions();
+   }
 
-	@Override
-	public ArrayList<TourData> getSelectedTours() {
+   private void fillToolbar() {
 
-		// get selected tours
+      // check if toolbar is created
+      if (_isToolbarCreated) {
+         return;
+      }
+      _isToolbarCreated = true;
 
-		final IStructuredSelection selectedTours = ((IStructuredSelection) _tourViewer.getSelection());
-		final ArrayList<TourData> selectedTourData = new ArrayList<>();
+      final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
-		// loop: all selected tours
-		for (final Iterator<?> iter = selectedTours.iterator(); iter.hasNext();) {
+      tbm.add(_actionCollapseAll);
 
-			final Object treeItem = iter.next();
+      tbm.update(true);
+   }
 
-			if (treeItem instanceof TVICompareResultComparedTour) {
+   private void fillViewMenu() {
 
-				final TVICompareResultComparedTour compareItem = ((TVICompareResultComparedTour) treeItem);
-				final TourData tourData = TourManager.getInstance().getTourData(compareItem.comparedTourData.getTourId());
-				if (tourData != null) {
-					selectedTourData.add(tourData);
-				}
-			}
-		}
+      /*
+       * fill view menu
+       */
+      final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
+      menuMgr.add(_actionModifyColumns);
+   }
 
-		return selectedTourData;
-	}
+   @Override
+   public ColumnManager getColumnManager() {
+      return _columnManager;
+   }
 
-	@Override
-	public TreeViewer getTreeViewer() {
-		return _tourViewer;
-	}
+   /**
+    * Recursive method to walk down the tour tree items and find the compared tours
+    *
+    * @param parentItem
+    * @param CompareIds
+    */
+   private void getComparedTours(final ArrayList<TVICompareResultComparedTour> comparedTours,
+                                 final TreeViewerItem parentItem,
+                                 final ArrayList<Long> CompareIds) {
 
-	/**
-	 * @return Returns the tour viewer
-	 */
-	@Override
-	public CheckboxTreeViewer getViewer() {
-		return _tourViewer;
-	}
+      final ArrayList<TreeViewerItem> unfetchedChildren = parentItem.getUnfetchedChildren();
 
-	TVICompareResultComparedTour navigateTour(final boolean isNextTour) {
+      if (unfetchedChildren != null) {
 
-		final TVICompareResultComparedTour selectedCompareResult = getSelectedComparedTour();
-		if (selectedCompareResult != null) {
+         // children are available
 
-			// compared tour is selected
+         for (final TreeViewerItem treeItem : unfetchedChildren) {
 
-			final TreeViewerItem parentItem = selectedCompareResult.getParentItem();
-			if (parentItem instanceof TVICompareResultReferenceTour) {
+            if (treeItem instanceof TVICompareResultComparedTour) {
+               final TVICompareResultComparedTour ttiCompResult = (TVICompareResultComparedTour) treeItem;
+               final long compId = ttiCompResult.compId;
+               for (final Long removedCompId : CompareIds) {
+                  if (compId == removedCompId) {
+                     comparedTours.add(ttiCompResult);
+                  }
+               }
+            } else {
+               // this is a child which can be the parent for other childs
+               getComparedTours(comparedTours, treeItem, CompareIds);
+            }
+         }
+      }
+   }
 
-				final TVICompareResultReferenceTour refTourItem = (TVICompareResultReferenceTour) parentItem;
+   private TVICompareResultComparedTour getSelectedComparedTour() {
 
-				final ArrayList<TreeViewerItem> children = refTourItem.getChildren();
-				for (int childIndex = 0; childIndex < children.size(); childIndex++) {
+      final TreeSelection selection = (TreeSelection) _tourViewer.getSelection();
+      for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
 
-					final TreeViewerItem refTourChild = children.get(childIndex);
-					if (refTourChild == selectedCompareResult) {
+         final Object treeItem = iterator.next();
+         if (treeItem instanceof TVICompareResultComparedTour) {
 
-						if (isNextTour) {
+            return (TVICompareResultComparedTour) treeItem;
+         }
+      }
 
-							// navigate next
+      return null;
+   }
 
-							if (childIndex < children.size() - 1) {
+   private TVICompareResultReferenceTour getSelectedRefTour() {
 
-								// next tour is available
+      final TreeSelection selection = (TreeSelection) _tourViewer.getSelection();
+      for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
 
-								final TreeViewerItem nextRefTourChild = children.get(childIndex + 1);
-								if (nextRefTourChild instanceof TVICompareResultComparedTour) {
-									return (TVICompareResultComparedTour) nextRefTourChild;
-								}
+         final Object treeItem = iterator.next();
+         if (treeItem instanceof TVICompareResultReferenceTour) {
 
-							} else {
+            return (TVICompareResultReferenceTour) treeItem;
+         }
+      }
 
-								// return first tour
+      return null;
+   }
 
-								final TreeViewerItem nextRefTourChild = children.get(0);
-								if (nextRefTourChild instanceof TVICompareResultComparedTour) {
-									return (TVICompareResultComparedTour) nextRefTourChild;
-								}
-							}
+   @Override
+   public ArrayList<TourData> getSelectedTours() {
 
-						} else {
+      // get selected tours
 
-							// navigate previous
+      final IStructuredSelection selectedTours = ((IStructuredSelection) _tourViewer.getSelection());
+      final ArrayList<TourData> selectedTourData = new ArrayList<>();
 
-							if (childIndex > 0) {
+      // loop: all selected tours
+      for (final Iterator<?> iter = selectedTours.iterator(); iter.hasNext();) {
 
-								// previous tour is available
+         final Object treeItem = iter.next();
 
-								final TreeViewerItem nextChild = children.get(childIndex - 1);
-								if (nextChild instanceof TVICompareResultComparedTour) {
-									return (TVICompareResultComparedTour) nextChild;
-								}
+         if (treeItem instanceof TVICompareResultComparedTour) {
 
-							} else {
+            final TVICompareResultComparedTour compareItem = ((TVICompareResultComparedTour) treeItem);
+            final TourData tourData = TourManager.getInstance().getTourData(compareItem.comparedTourData.getTourId());
+            if (tourData != null) {
+               selectedTourData.add(tourData);
+            }
+         }
+      }
 
-								// return last tour
+      return selectedTourData;
+   }
 
-								final TreeViewerItem prevChild = children.get(children.size() - 1);
-								if (prevChild instanceof TVICompareResultComparedTour) {
-									return (TVICompareResultComparedTour) prevChild;
-								}
-							}
-						}
-					}
-				}
-			}
+   @Override
+   public TreeViewer getTreeViewer() {
+      return _tourViewer;
+   }
 
-		} else {
+   /**
+    * @return Returns the tour viewer
+    */
+   @Override
+   public CheckboxTreeViewer getViewer() {
+      return _tourViewer;
+   }
 
-			final TVICompareResultReferenceTour selectedRefTour = getSelectedRefTour();
-			if (selectedRefTour != null) {
+   TVICompareResultComparedTour navigateTour(final boolean isNextTour) {
 
-				// ref tour is selected
+      final TVICompareResultComparedTour selectedCompareResult = getSelectedComparedTour();
+      if (selectedCompareResult != null) {
 
-				final ArrayList<TreeViewerItem> refChildren = selectedRefTour.getFetchedChildren();
-				if (refChildren.size() > 0) {
+         // compared tour is selected
 
-					// navigate to the first child and ignore direction
+         final TreeViewerItem parentItem = selectedCompareResult.getParentItem();
+         if (parentItem instanceof TVICompareResultReferenceTour) {
 
-					_tourViewer.expandToLevel(selectedRefTour, 1);
+            final TVICompareResultReferenceTour refTourItem = (TVICompareResultReferenceTour) parentItem;
 
-					// return first tour
-					final TreeViewerItem nextRefTourChild = refChildren.get(0);
-					if (nextRefTourChild instanceof TVICompareResultComparedTour) {
-						return (TVICompareResultComparedTour) nextRefTourChild;
-					}
-				}
-			}
-		}
+            final ArrayList<TreeViewerItem> children = refTourItem.getChildren();
+            for (int childIndex = 0; childIndex < children.size(); childIndex++) {
 
-		return null;
-	}
+               final TreeViewerItem refTourChild = children.get(childIndex);
+               if (refTourChild == selectedCompareResult) {
 
-	private void onSelect(final SelectionChangedEvent event) {
+                  if (isNextTour) {
 
-		final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+                     // navigate next
 
-		final Object treeItem = selection.getFirstElement();
+                     if (childIndex < children.size() - 1) {
 
-		if (treeItem instanceof TVICompareResultReferenceTour) {
+                        // next tour is available
 
-			final TVICompareResultReferenceTour refItem = (TVICompareResultReferenceTour) treeItem;
+                        final TreeViewerItem nextRefTourChild = children.get(childIndex + 1);
+                        if (nextRefTourChild instanceof TVICompareResultComparedTour) {
+                           return (TVICompareResultComparedTour) nextRefTourChild;
+                        }
 
-			_postSelectionProvider.setSelection(new SelectionTourCatalogView(refItem.refTourItem.refId));
+                     } else {
 
-		} else if (treeItem instanceof TVICompareResultComparedTour) {
+                        // return first tour
 
-			final TVICompareResultComparedTour resultItem = (TVICompareResultComparedTour) treeItem;
+                        final TreeViewerItem nextRefTourChild = children.get(0);
+                        if (nextRefTourChild instanceof TVICompareResultComparedTour) {
+                           return (TVICompareResultComparedTour) nextRefTourChild;
+                        }
+                     }
 
-			_postSelectionProvider.setSelection(new StructuredSelection(resultItem));
-		}
-	}
+                  } else {
 
-	private void onSelectionChanged(final IWorkbenchPart part, final ISelection selection) {
+                     // navigate previous
 
-		if (part == TourCompareResultView.this) {
-			return;
-		}
+                     if (childIndex > 0) {
 
-		if (selection instanceof StructuredSelection) {
+                        // previous tour is available
 
-			final Object firstElement = ((StructuredSelection) selection).getFirstElement();
+                        final TreeViewerItem nextChild = children.get(childIndex - 1);
+                        if (nextChild instanceof TVICompareResultComparedTour) {
+                           return (TVICompareResultComparedTour) nextChild;
+                        }
 
-			if (firstElement instanceof TVICompareResultComparedTour) {
+                     } else {
 
-				_tourViewer.setSelection(selection, true);
-			}
+                        // return last tour
 
-		} else if (selection instanceof SelectionRemovedComparedTours) {
+                        final TreeViewerItem prevChild = children.get(children.size() - 1);
+                        if (prevChild instanceof TVICompareResultComparedTour) {
+                           return (TVICompareResultComparedTour) prevChild;
+                        }
+                     }
+                  }
+               }
+            }
+         }
 
-			removeComparedToursFromViewer(selection);
+      } else {
 
-		} else if (selection instanceof SelectionPersistedCompareResults) {
+         final TVICompareResultReferenceTour selectedRefTour = getSelectedRefTour();
+         if (selectedRefTour != null) {
 
-			final SelectionPersistedCompareResults selectionPersisted = (SelectionPersistedCompareResults) selection;
+            // ref tour is selected
 
-			final ArrayList<TVICompareResultComparedTour> persistedCompareResults = selectionPersisted.persistedCompareResults;
+            final ArrayList<TreeViewerItem> refChildren = selectedRefTour.getFetchedChildren();
+            if (refChildren.size() > 0) {
 
-			if (persistedCompareResults.size() > 0) {
+               // navigate to the first child and ignore direction
 
-				final TVICompareResultComparedTour comparedTourItem = persistedCompareResults.get(0);
+               _tourViewer.expandToLevel(selectedRefTour, 1);
 
-				// uncheck persisted tours
-				_tourViewer.setChecked(comparedTourItem, false);
+               // return first tour
+               final TreeViewerItem nextRefTourChild = refChildren.get(0);
+               if (nextRefTourChild instanceof TVICompareResultComparedTour) {
+                  return (TVICompareResultComparedTour) nextRefTourChild;
+               }
+            }
+         }
+      }
 
-				// update changed item
-				_tourViewer.update(comparedTourItem, null);
+      return null;
+   }
 
-			}
-		}
-	}
+   private void onSelect(final SelectionChangedEvent event) {
 
-	@Override
-	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
+      final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
 
-		_viewerContainer.setRedraw(false);
-		{
-			final Object[] expandedElements = _tourViewer.getExpandedElements();
-			final ISelection selection = _tourViewer.getSelection();
+      final Object treeItem = selection.getFirstElement();
 
-			_tourViewer.getTree().dispose();
+      if (treeItem instanceof TVICompareResultReferenceTour) {
 
-			createUI_10_TourViewer(_viewerContainer);
-			_viewerContainer.layout();
+         final TVICompareResultReferenceTour refItem = (TVICompareResultReferenceTour) treeItem;
 
-			_tourViewer.setInput(_rootItem = new TVICompareResultRootItem());
+         _postSelectionProvider.setSelection(new SelectionTourCatalogView(refItem.refTourItem.refId));
 
-			_tourViewer.setExpandedElements(expandedElements);
-			_tourViewer.setSelection(selection);
-		}
-		_viewerContainer.setRedraw(true);
+      } else if (treeItem instanceof TVICompareResultComparedTour) {
 
-		return _tourViewer;
-	}
+         final TVICompareResultComparedTour resultItem = (TVICompareResultComparedTour) treeItem;
 
-	@Override
-	public void reloadViewer() {
+         _postSelectionProvider.setSelection(new StructuredSelection(resultItem));
+      }
+   }
 
-		final Tree tree = _tourViewer.getTree();
-		tree.setRedraw(false);
-		{
-			final Object[] expandedElements = _tourViewer.getExpandedElements();
-			final ISelection selection = _tourViewer.getSelection();
+   private void onSelectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
-			_tourViewer.setInput(_rootItem = new TVICompareResultRootItem());
+      if (part == TourCompareResultView.this) {
+         return;
+      }
 
-			_tourViewer.setExpandedElements(expandedElements);
-			_tourViewer.setSelection(selection);
-		}
-		tree.setRedraw(true);
-	}
+      if (selection instanceof StructuredSelection) {
 
-	/**
-	 * Remove compared tour from the database
-	 */
-	void removeComparedTourFromDb() {
+         final Object firstElement = ((StructuredSelection) selection).getFirstElement();
 
-		final StructuredSelection selection = (StructuredSelection) _tourViewer.getSelection();
-		final SelectionRemovedComparedTours selectionRemovedCompareTours = new SelectionRemovedComparedTours();
-		final ArrayList<Long> removedComparedTours = selectionRemovedCompareTours.removedComparedTours;
+         if (firstElement instanceof TVICompareResultComparedTour) {
 
-		for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
+            _tourViewer.setSelection(selection, true);
+         }
 
-			final Object selectedElement = iterator.next();
+      } else if (selection instanceof SelectionRemovedComparedTours) {
 
-			if (selectedElement instanceof TVICompareResultComparedTour) {
-				final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) selectedElement;
+         removeComparedToursFromViewer(selection);
 
-				if (TourCompareManager.removeComparedTourFromDb(compareItem.compId)) {
-					removedComparedTours.add(compareItem.compId);
-				}
-			}
-		}
+      } else if (selection instanceof SelectionPersistedCompareResults) {
 
-		if (removedComparedTours.size() > 0) {
+         final SelectionPersistedCompareResults selectionPersisted = (SelectionPersistedCompareResults) selection;
 
-			_postSelectionProvider.setSelection(selectionRemovedCompareTours);
+         final ArrayList<TVICompareResultComparedTour> persistedCompareResults = selectionPersisted.persistedCompareResults;
 
-			removeComparedToursFromViewer(selectionRemovedCompareTours);
-		}
-	}
+         if (persistedCompareResults.size() > 0) {
 
-	private void removeComparedToursFromViewer(final ISelection selection) {
+            final TVICompareResultComparedTour comparedTourItem = persistedCompareResults.get(0);
 
-		final SelectionRemovedComparedTours removedTourSelection = (SelectionRemovedComparedTours) selection;
-		final ArrayList<Long> removedTourCompareIds = removedTourSelection.removedComparedTours;
+            // uncheck persisted tours
+            _tourViewer.setChecked(comparedTourItem, false);
 
-		/*
-		 * return when there are no removed tours or when the selection has not changed
-		 */
-		if (removedTourCompareIds.size() == 0 || removedTourSelection == _oldRemoveSelection) {
-			return;
-		}
+            // update changed item
+            _tourViewer.update(comparedTourItem, null);
 
-		_oldRemoveSelection = removedTourSelection;
+         }
+      }
+   }
 
-		/*
-		 * find/update the removed compared tours in the viewer
-		 */
+   @Override
+   public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
-		final ArrayList<TVICompareResultComparedTour> comparedTourItems = new ArrayList<>();
-		getComparedTours(comparedTourItems, _rootItem, removedTourCompareIds);
+      _viewerContainer.setRedraw(false);
+      {
+         final Object[] expandedElements = _tourViewer.getExpandedElements();
+         final ISelection selection = _tourViewer.getSelection();
 
-		// reset entity for the removed compared tours
-		for (final TVICompareResultComparedTour removedTourItem : comparedTourItems) {
+         _tourViewer.getTree().dispose();
 
-			removedTourItem.compId = -1;
+         createUI_10_TourViewer(_viewerContainer);
+         _viewerContainer.layout();
 
-			removedTourItem.dbStartIndex = -1;
-			removedTourItem.dbEndIndex = -1;
-			removedTourItem.dbSpeed = 0;
+         _tourViewer.setInput(_rootItem = new TVICompareResultRootItem());
 
-//			removedTourItem.movedStartIndex = -1;
-//			removedTourItem.movedEndIndex = -1;
-			removedTourItem.movedSpeed = 0;
-		}
+         _tourViewer.setExpandedElements(expandedElements);
+         _tourViewer.setSelection(selection);
+      }
+      _viewerContainer.setRedraw(true);
 
-		// update viewer
-		_tourViewer.update(comparedTourItems.toArray(), null);
-	}
+      return _tourViewer;
+   }
 
-	/**
-	 * Persist the compared tours which are checked or selected
-	 */
-	@SuppressWarnings("unchecked")
-	void saveCompareResults() {
+   @Override
+   public void reloadViewer() {
 
-		final EntityManager em = TourDatabase.getInstance().getEntityManager();
-		if (em != null) {
+      final Tree tree = _tourViewer.getTree();
+      tree.setRedraw(false);
+      {
+         final Object[] expandedElements = _tourViewer.getExpandedElements();
+         final ISelection selection = _tourViewer.getSelection();
 
-			final EntityTransaction ts = em.getTransaction();
+         _tourViewer.setInput(_rootItem = new TVICompareResultRootItem());
 
-			try {
+         _tourViewer.setExpandedElements(expandedElements);
+         _tourViewer.setSelection(selection);
+      }
+      tree.setRedraw(true);
+   }
 
-				final ArrayList<TVICompareResultComparedTour> updatedItems = new ArrayList<>();
-				final SelectionPersistedCompareResults compareResultSelection = new SelectionPersistedCompareResults();
-				final ArrayList<TVICompareResultComparedTour> persistedCompareResults = compareResultSelection.persistedCompareResults;
+   /**
+    * Remove compared tour from the database
+    */
+   void removeComparedTourFromDb() {
 
-				/*
-				 * save checked items
-				 */
-				for (final Object checkedItem : _tourViewer.getCheckedElements()) {
-					if (checkedItem instanceof TVICompareResultComparedTour) {
+      final StructuredSelection selection = (StructuredSelection) _tourViewer.getSelection();
+      final SelectionRemovedComparedTours selectionRemovedCompareTours = new SelectionRemovedComparedTours();
+      final ArrayList<Long> removedComparedTours = selectionRemovedCompareTours.removedComparedTours;
 
-						final TVICompareResultComparedTour checkedCompareItem = (TVICompareResultComparedTour) checkedItem;
-						if (checkedCompareItem.isSaved() == false) {
-							TourCompareManager.saveComparedTourItem(checkedCompareItem, em, ts);
+      for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
 
-							persistedCompareResults.add(checkedCompareItem);
+         final Object selectedElement = iterator.next();
 
-							updatedItems.add(checkedCompareItem);
-						}
-					}
-				}
+         if (selectedElement instanceof TVICompareResultComparedTour) {
+            final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) selectedElement;
 
-				/*
-				 * save selected items which are not checked
-				 */
-				final TreeSelection selection = (TreeSelection) _tourViewer.getSelection();
-				for (final Iterator<Object> iterator = selection.iterator(); iterator.hasNext();) {
+            if (TourCompareManager.removeComparedTourFromDb(compareItem.compId)) {
+               removedComparedTours.add(compareItem.compId);
+            }
+         }
+      }
 
-					final Object treeItem = iterator.next();
-					if (treeItem instanceof TVICompareResultComparedTour) {
+      if (removedComparedTours.size() > 0) {
 
-						final TVICompareResultComparedTour selectedComparedItem = (TVICompareResultComparedTour) treeItem;
-						if (selectedComparedItem.isSaved() == false) {
+         _postSelectionProvider.setSelection(selectionRemovedCompareTours);
 
-							TourCompareManager.saveComparedTourItem(selectedComparedItem, em, ts);
+         removeComparedToursFromViewer(selectionRemovedCompareTours);
+      }
+   }
 
-							persistedCompareResults.add(selectedComparedItem);
+   private void removeComparedToursFromViewer(final ISelection selection) {
 
-							updatedItems.add(selectedComparedItem);
-						}
-					}
-				}
+      final SelectionRemovedComparedTours removedTourSelection = (SelectionRemovedComparedTours) selection;
+      final ArrayList<Long> removedTourCompareIds = removedTourSelection.removedComparedTours;
 
-				// uncheck all
-				_tourViewer.setCheckedElements(new Object[0]);
+      /*
+       * return when there are no removed tours or when the selection has not changed
+       */
+      if (removedTourCompareIds.size() == 0 || removedTourSelection == _oldRemoveSelection) {
+         return;
+      }
 
-				// update persistent status
-				_tourViewer.update(updatedItems.toArray(), null);
+      _oldRemoveSelection = removedTourSelection;
 
-				// fire post selection to update the tour catalog view
-				_postSelectionProvider.setSelection(compareResultSelection);
+      /*
+       * find/update the removed compared tours in the viewer
+       */
 
-			} catch (final Exception e) {
-				e.printStackTrace();
-			} finally {
-				if (ts.isActive()) {
-					ts.rollback();
-				}
-				em.close();
-			}
-		}
-	}
+      final ArrayList<TVICompareResultComparedTour> comparedTourItems = new ArrayList<>();
+      getComparedTours(comparedTourItems, _rootItem, removedTourCompareIds);
 
-	@PersistState
-	private void saveState() {
+      // reset entity for the removed compared tours
+      for (final TVICompareResultComparedTour removedTourItem : comparedTourItems) {
 
-		_columnManager.saveState(_state);
-	}
+         removedTourItem.compId = -1;
 
-	private void setCellColor(final ViewerCell cell, final Object element) {
+         removedTourItem.dbStartIndex = -1;
+         removedTourItem.dbEndIndex = -1;
+         removedTourItem.dbSpeed = 0;
 
-		if (element instanceof TVICompareResultReferenceTour) {
+//         removedTourItem.movedStartIndex = -1;
+//         removedTourItem.movedEndIndex = -1;
+         removedTourItem.movedSpeed = 0;
+      }
 
-			cell.setForeground(JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_TITLE));
+      // update viewer
+      _tourViewer.update(comparedTourItems.toArray(), null);
+   }
 
-		} else if (element instanceof TVICompareResultComparedTour) {
+   /**
+    * Persist the compared tours which are checked or selected
+    */
+   @SuppressWarnings("unchecked")
+   void saveCompareResults() {
 
-			// show the saved tours in a different color
+      final EntityManager em = TourDatabase.getInstance().getEntityManager();
+      if (em != null) {
 
-			if (((TVICompareResultComparedTour) (element)).isSaved()) {
-				cell.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_GRAY));
-			} else {
-				// show the text with tour color
-				cell.setForeground(JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_TOUR));
-//				cell.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
-			}
-		}
-	}
+         final EntityTransaction ts = em.getTransaction();
 
-	@Override
-	public void setFocus() {
+         try {
 
-		_tourViewer.getTree().setFocus();
-	}
+            final ArrayList<TVICompareResultComparedTour> updatedItems = new ArrayList<>();
+            final SelectionPersistedCompareResults compareResultSelection = new SelectionPersistedCompareResults();
+            final ArrayList<TVICompareResultComparedTour> persistedCompareResults = compareResultSelection.persistedCompareResults;
 
-	@Override
-	public void updateColumnHeader(final ColumnDefinition colDef) {}
+            /*
+             * save checked items
+             */
+            for (final Object checkedItem : _tourViewer.getCheckedElements()) {
+               if (checkedItem instanceof TVICompareResultComparedTour) {
 
-	/**
-	 * !!!Recursive !!! update all tour items with new data
-	 *
-	 * @param rootItem
-	 * @param modifiedTours
-	 */
-	private void updateTourViewer(final TreeViewerItem parentItem, final ArrayList<TourData> modifiedTours) {
+                  final TVICompareResultComparedTour checkedCompareItem = (TVICompareResultComparedTour) checkedItem;
+                  if (checkedCompareItem.isSaved() == false) {
+                     TourCompareManager.saveComparedTourItem(checkedCompareItem, em, ts);
 
-		final ArrayList<TreeViewerItem> children = parentItem.getUnfetchedChildren();
+                     persistedCompareResults.add(checkedCompareItem);
 
-		if (children == null) {
-			return;
-		}
+                     updatedItems.add(checkedCompareItem);
+                  }
+               }
+            }
 
-		// loop: all children
-		for (final Object object : children) {
+            /*
+             * save selected items which are not checked
+             */
+            final TreeSelection selection = (TreeSelection) _tourViewer.getSelection();
+            for (final Iterator<Object> iterator = selection.iterator(); iterator.hasNext();) {
 
-			final TreeViewerItem treeItem = (TreeViewerItem) object;
+               final Object treeItem = iterator.next();
+               if (treeItem instanceof TVICompareResultComparedTour) {
 
-			if (object instanceof TVICompareResultComparedTour) {
+                  final TVICompareResultComparedTour selectedComparedItem = (TVICompareResultComparedTour) treeItem;
+                  if (selectedComparedItem.isSaved() == false) {
 
-				// update compared items
+                     TourCompareManager.saveComparedTourItem(selectedComparedItem, em, ts);
 
-				final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) treeItem;
-				final TourData comparedTourData = compareItem.comparedTourData;
-				final long tourItemId = comparedTourData.getTourId();
+                     persistedCompareResults.add(selectedComparedItem);
 
-				for (final TourData modifiedTourData : modifiedTours) {
-					if (modifiedTourData.getTourId().longValue() == tourItemId) {
+                     updatedItems.add(selectedComparedItem);
+                  }
+               }
+            }
 
-						comparedTourData.setTourType(modifiedTourData.getTourType());
-						comparedTourData.setTourTitle(modifiedTourData.getTourTitle());
-						comparedTourData.setTourTags(modifiedTourData.getTourTags());
+            // uncheck all
+            _tourViewer.setCheckedElements(new Object[0]);
 
-						// update item in the viewer
-						_tourViewer.update(compareItem, null);
+            // update persistent status
+            _tourViewer.update(updatedItems.toArray(), null);
 
-						break;
-					}
-				}
+            // fire post selection to update the tour catalog view
+            _postSelectionProvider.setSelection(compareResultSelection);
 
-			} else {
+         } catch (final Exception e) {
+            e.printStackTrace();
+         } finally {
+            if (ts.isActive()) {
+               ts.rollback();
+            }
+            em.close();
+         }
+      }
+   }
 
-				// update children
+   @PersistState
+   private void saveState() {
 
-				updateTourViewer(treeItem, modifiedTours);
-			}
-		}
-	}
+      _columnManager.saveState(_state);
+   }
+
+   private void setCellColor(final ViewerCell cell, final Object element) {
+
+      if (element instanceof TVICompareResultReferenceTour) {
+
+         cell.setForeground(JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_TITLE));
+
+      } else if (element instanceof TVICompareResultComparedTour) {
+
+         // show the saved tours in a different color
+
+         if (((TVICompareResultComparedTour) (element)).isSaved()) {
+            cell.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_GRAY));
+         } else {
+            // show the text with tour color
+            cell.setForeground(JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_TOUR));
+//            cell.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
+         }
+      }
+   }
+
+   @Override
+   public void setFocus() {
+
+      _tourViewer.getTree().setFocus();
+   }
+
+   @Override
+   public void updateColumnHeader(final ColumnDefinition colDef) {}
+
+   /**
+    * !!!Recursive !!! update all tour items with new data
+    *
+    * @param rootItem
+    * @param modifiedTours
+    */
+   private void updateTourViewer(final TreeViewerItem parentItem, final ArrayList<TourData> modifiedTours) {
+
+      final ArrayList<TreeViewerItem> children = parentItem.getUnfetchedChildren();
+
+      if (children == null) {
+         return;
+      }
+
+      // loop: all children
+      for (final Object object : children) {
+
+         final TreeViewerItem treeItem = (TreeViewerItem) object;
+
+         if (object instanceof TVICompareResultComparedTour) {
+
+            // update compared items
+
+            final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) treeItem;
+            final TourData comparedTourData = compareItem.comparedTourData;
+            final long tourItemId = comparedTourData.getTourId();
+
+            for (final TourData modifiedTourData : modifiedTours) {
+               if (modifiedTourData.getTourId().longValue() == tourItemId) {
+
+                  comparedTourData.setTourType(modifiedTourData.getTourType());
+                  comparedTourData.setTourTitle(modifiedTourData.getTourTitle());
+                  comparedTourData.setTourTags(modifiedTourData.getTourTags());
+
+                  // update item in the viewer
+                  _tourViewer.update(compareItem, null);
+
+                  break;
+               }
+            }
+
+         } else {
+
+            // update children
+
+            updateTourViewer(treeItem, modifiedTours);
+         }
+      }
+   }
 
 }

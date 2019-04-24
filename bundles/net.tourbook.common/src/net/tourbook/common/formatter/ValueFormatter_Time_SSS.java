@@ -15,34 +15,31 @@
  *******************************************************************************/
 package net.tourbook.common.formatter;
 
-public class ValueFormatSet {
+import net.tourbook.common.Messages;
+import net.tourbook.common.UI;
 
-   public static ValueFormat[] Number    = new ValueFormat[] {
+public class ValueFormatter_Time_SSS implements IValueFormatter {
 
-         ValueFormat.NUMBER_1_0,
-         ValueFormat.NUMBER_1_1,
-         ValueFormat.NUMBER_1_2,
-         ValueFormat.NUMBER_1_3
+   @Override
+   public String printDouble(final double value) {
+      return Messages.App_Error_NotSupportedValueFormatter;
+   }
 
-   };
+   @Override
+   public String printLong(final long value) {
 
-   public static ValueFormat[] Time      = new ValueFormat[] {
+      if (value == 0) {
+         return UI.EMPTY_STRING;
+      }
 
-         ValueFormat.TIME_HH,
-         ValueFormat.TIME_HH_MM,
-         ValueFormat.TIME_HH_MM_SS,
-         ValueFormat.TIME_SSS
+      return Long.toString(value);
+   }
 
-   };
-
-   /**
-    * Only {@link ValueFormatter_Time_HHMM} or {@link ValueFormatter_Time_HHMMSS}
-    */
-   public static ValueFormat[] Time_mmss = new ValueFormat[] {
-
-         ValueFormat.TIME_HH_MM,
-         ValueFormat.TIME_HH_MM_SS
-
-   };
+   @Override
+   public String toString() {
+      return "ValueFormatter_Time_SSS [" // //$NON-NLS-1$
+            + "printLong()" //$NON-NLS-1$
+            + "]"; //$NON-NLS-1$
+   }
 
 }
