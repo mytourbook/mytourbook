@@ -23,21 +23,24 @@ Improvements
 
 * 2.5D Map
 
-  Provided by Thomas
+  (Thomas)
 
   - Show map bookmarks in the map
   - Show tour marker label
  
 
-Import
-======
+* Import
 
-* .fitlog File
-
-  - Wind speed, provided by Frederic
-  - Max/average power
-  - Temperature data serie
+  - .fitlog File  
+    - Wind speed (Frederic)
+    - Max/average power
+    - Temperature data serie
  
+
+  - Suunto (Frederic)
+    - Added support for swimming activities
+    - Added support for Movesense heart rate belt data
+
 
 * Compare Result Views
 
@@ -76,18 +79,19 @@ Bugfix
     19.3.1 but was not yet discovered
 
  
-Import
-======
+* Import
 
-* .gpx File
+  - .gpx File
+    - Fixed ConcurrentModificationException when converting waypoints 
+      into tour markers
 
-  - Fixed ConcurrentModificationException when converting waypoints into
-    tour markers
+  - .fit File
+    - Fixed total altitude values for Ciclo(CM 9.3A)
+    - Display GARMIN EDGE 1030 in data format field instead of 
+      GARMIN 2713
 
-* .fit File
-
-  - Fixed total altitude values for Ciclo(CM 9.3A)
-  - Display GARMIN EDGE 1030 in data format field instead of GARMIN 2713
+  - Suunto (Frederic)
+    - Fixed a bug where markers/laps would not all be imported
 
  
 Important Infos
