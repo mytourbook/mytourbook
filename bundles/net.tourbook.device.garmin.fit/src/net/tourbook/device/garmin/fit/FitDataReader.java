@@ -47,6 +47,7 @@ import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.tour.TourLogManager;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
 /**
@@ -434,6 +435,10 @@ public class FitDataReader extends TourbookDevice {
       FileInputStream fis = null;
 
       try {
+
+         if (!FilenameUtils.getExtension(fileName).equals("fit")) {
+            return false;
+         }
 
          fis = new FileInputStream(fileName);
          returnValue = new Decode().checkFileIntegrity(fis);

@@ -238,49 +238,6 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
       return false;
    }
 
-   /**
-    * Checks if the file is a valid device JSON file.
-    *
-    * @param jsonFileContent
-    *           The content to check.
-    * @return Returns <code>true</code> when the file contains content with the requested tag.
-    */
-   protected boolean isValidJSONFile(final String jsonFileContent) {
-      final BufferedReader fileReader = null;
-      try {
-
-         if (jsonFileContent == null ||
-               jsonFileContent == "") { //$NON-NLS-1$
-            return false;
-         }
-
-         try {
-            final JSONObject jsonContent = new JSONObject(jsonFileContent);
-            final JSONArray samples = (JSONArray) jsonContent.get(SuuntoJsonProcessor.TAG_SAMPLES);
-
-            final String firstSample = samples.get(0).toString();
-            if (firstSample.contains(SuuntoJsonProcessor.TAG_ATTRIBUTES) &&
-                  firstSample.contains(SuuntoJsonProcessor.TAG_SOURCE) &&
-                  firstSample.contains(SuuntoJsonProcessor.TAG_TIMEISO8601)) {
-               Util.closeReader(fileReader);
-               return true;
-            }
-
-         } catch (final JSONException ex) {
-            StatusUtil.log(ex);
-            return false;
-         }
-
-      } catch (final Exception e) {
-         StatusUtil.log(e);
-         return false;
-      } finally {
-         Util.closeReader(fileReader);
-      }
-
-      return false;
-   }
-
    @Override
    public boolean processDeviceData(final String importFilePath,
                                     final DeviceData deviceData,
@@ -300,14 +257,6 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
       final String jsonFileContent =
             GetJsonContentFromGZipFile(importFilePath, false);
-
-      // At this point, we know that the given file is a valid JSON file.
-      // But to avoid for invalid activities to be parsed by other
-      // parsers, we return true when a Suunto JSON file is not
-      // a valid activity.
-      if (!isValidActivity(jsonFileContent)) {
-         return true;
-      }
 
       return ProcessFile(importFilePath, jsonFileContent);
    }
@@ -340,6 +289,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
     * @return The Suunto activity as a tour.
     */
    private boolean ProcessFile(final String filePath, final String jsonFileContent) {
+
       final SuuntoJsonProcessor suuntoJsonProcessor = new SuuntoJsonProcessor();
 
       String fileName =
@@ -489,6 +439,6 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
    @Override
    public boolean validateRawData(final String fileName) {
       final String jsonFileContent = GetJsonContentFromGZipFile(fileName, true);
-      return isValidJSONFile(jsonFileContent);
+      return isValidActivity(jsonFileContent);
    }
 }
