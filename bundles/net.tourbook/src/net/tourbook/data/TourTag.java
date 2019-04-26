@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -29,177 +29,217 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Transient;
 
+import net.tourbook.Messages;
+import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
 
 @Entity
 public class TourTag implements Comparable<Object> {
 
-	public static final int		DB_LENGTH_NAME				= 255;
+   public static final int DB_LENGTH_NAME             = 255;
+   public static final int DB_LENGTH_NOTES            = 32000;
 
-	public static final int		EXPAND_TYPE_YEAR_MONTH_DAY	= 0;
-	public static final int		EXPAND_TYPE_FLAT			= 1;
-	public static final int		EXPAND_TYPE_YEAR_DAY		= 2;
+   public static final int EXPAND_TYPE_YEAR_MONTH_DAY = 0;
+   public static final int EXPAND_TYPE_FLAT           = 1;
+   public static final int EXPAND_TYPE_YEAR_DAY       = 2;
 
-	/*
-	 * DON'T USE THE FINAL KEYWORD FOR THE ID otherwise the Id cannot be set.
-	 */
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long				tagId						= TourDatabase.ENTITY_IS_NOT_SAVED;
+   /**
+    * Manually created marker or imported marker create a unique id to identify them, saved marker
+    * are compared with the marker id
+    */
+   private static int      _createCounter             = 0;
 
-	/**
-	 * This is a root tag when set to <code>1</code>, derby does not support BOOLEAN, 1 =
-	 * <code>true</code>, 0 = <code>false</code>
-	 */
-	private int					isRoot						= 0;
+   /*
+    * DON'T USE THE FINAL KEYWORD FOR THE ID otherwise the Id cannot be set.
+    */
+   @Id
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
+   private long   tagId      = TourDatabase.ENTITY_IS_NOT_SAVED;
 
-	/**
-	 * Display name of the tag
-	 */
-	@Basic(optional = false)
-	private String				name;
+   /**
+    * This is a root tag when set to <code>1</code>, derby does not support BOOLEAN, 1 =
+    * <code>true</code>, 0 = <code>false</code>
+    */
+   private int    isRoot     = 0;
 
-	/**
-	 * when a tag is expanded in the tag tree viewer, the tours can be displayed in different
-	 * structures
-	 */
-	private int					expandType					= EXPAND_TYPE_FLAT;
+   /**
+    * Display name of the tag
+    */
+   @Basic(optional = false)
+   private String name;
 
-	/**
-	 * Contains all tours are associated with this tag.
-	 */
-	@ManyToMany(mappedBy = "tourTags", cascade = ALL, fetch = LAZY)
-	private final Set<TourData>	tourData					= new HashSet<TourData>();
+   /**
+    * Notes for this tag
+    */
+   private String notes;                                        // db-version 38
 
-//	/**
-//	 * A tag belongs to <b>ONE</b> category and not to many as it was implemented in version 14.4
-//	 * and before.
-//	 * <p>
-//	 * This new field needs a column in the db table but the column in the db is empty for entities
-//	 * which are created before 14.4 but it's still working ???
-//	 * <p>
-//	 * <p>
-//	 * <b>Old Implementation</b>
-//	 *
-//	 * <pre>
-//	 * &#064;ManyToMany(mappedBy = &quot;tourTags&quot;, cascade = ALL, fetch = LAZY)
-//	 * private final Set&lt;TourTagCategory&gt;	tourTagCategory	= new HashSet&lt;TourTagCategory&gt;();
-//	 * </pre>
-//	 */
-//	@ManyToOne()
-//	private TourTagCategory		tourTagCategory;
+   /**
+    * When a tag is expanded in the tag tree viewer, the tours can be displayed in different
+    * structures
+    */
+   private int    expandType = EXPAND_TYPE_FLAT;
 
-	/**
-	 * unique id for manually created tour types because the {@link #tagId} is -1 when it's not
-	 * persisted
-	 */
-	@Transient
-	private long				_createId					= 0;
+//   /**
+//    * A tag belongs to <b>ONE</b> category and not to many as it was implemented in version 14.4
+//    * and before.
+//    * <p>
+//    * This new field needs a column in the db table but the column in the db is empty for entities
+//    * which are created before 14.4 but it's still working ???
+//    * <p>
+//    * <p>
+//    * <b>Old Implementation</b>
+//    *
+//    * <pre>
+//    * &#064;ManyToMany(mappedBy = &quot;tourTags&quot;, cascade = ALL, fetch = LAZY)
+//    * private final Set&lt;TourTagCategory&gt;   tourTagCategory   = new HashSet&lt;TourTagCategory&gt;();
+//    * </pre>
+//    */
+//   @ManyToOne()
+//   private TourTagCategory      tourTagCategory;
 
-	/**
-	 * manually created marker or imported marker create a unique id to identify them, saved marker
-	 * are compared with the marker id
-	 */
-	private static int			_createCounter				= 0;
+   /**
+    * Contains all tours are associated with this tag.
+    */
+   @ManyToMany(mappedBy = "tourTags", cascade = ALL, fetch = LAZY)
+   private final Set<TourData> tourData  = new HashSet<>();
 
-	public TourTag() {}
+   /**
+    * unique id for manually created tour types because the {@link #tagId} is -1 when it's not
+    * persisted
+    */
+   @Transient
+   private long                _createId = 0;
 
-	public TourTag(final String tagName) {
-		name = tagName.trim();
-		_createId = ++_createCounter;
-	}
+   public TourTag() {}
 
-	@Override
-	public int compareTo(final Object obj) {
+   public TourTag(final String tagName) {
+      name = tagName.trim();
+      _createId = ++_createCounter;
+   }
 
-		if (obj instanceof TourTag) {
-			final TourTag otherTag = (TourTag) obj;
-			return name.compareTo(otherTag.name);
-		}
+   @Override
+   public int compareTo(final Object obj) {
 
-		return 0;
-	}
+      if (obj instanceof TourTag) {
+         final TourTag otherTag = (TourTag) obj;
+         return name.compareTo(otherTag.name);
+      }
 
-	@Override
-	public boolean equals(final Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
+      return 0;
+   }
 
-		final TourTag other = (TourTag) obj;
+   @Override
+   public boolean equals(final Object obj) {
+      if (this == obj) {
+         return true;
+      }
+      if (obj == null) {
+         return false;
+      }
+      if (getClass() != obj.getClass()) {
+         return false;
+      }
 
-		if (_createId == 0) {
+      final TourTag other = (TourTag) obj;
 
-			// tour tag is from the database
-			if (tagId != other.tagId) {
-				return false;
-			}
-		} else {
+      if (_createId == 0) {
 
-			// tour tag was create or imported
-			if (_createId != other._createId) {
-				return false;
-			}
-		}
+         // tour tag is from the database
+         if (tagId != other.tagId) {
+            return false;
+         }
+      } else {
 
-		return true;
-	}
+         // tour tag was create or imported
+         if (_createId != other._createId) {
+            return false;
+         }
+      }
 
-	public int getExpandType() {
-		return expandType;
-	}
+      return true;
+   }
 
-	public long getTagId() {
-		return tagId;
-	}
+   public int getExpandType() {
+      return expandType;
+   }
 
-	public String getTagName() {
-		return name;
-	}
+   public String getNotes() {
+      return notes;
+   }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (int) (_createId ^ (_createId >>> 32));
-		result = prime * result + (int) (tagId ^ (tagId >>> 32));
-		return result;
-	}
+   public long getTagId() {
+      return tagId;
+   }
 
-	public boolean isRoot() {
-		return isRoot == 1;
-	}
+   public String getTagName() {
+      return name;
+   }
 
-	public void setExpandType(final int expandType) {
-		this.expandType = expandType;
-	}
+   @Override
+   public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + (int) (_createId ^ (_createId >>> 32));
+      result = prime * result + (int) (tagId ^ (tagId >>> 32));
+      return result;
+   }
 
-	/**
-	 * set root flag if this tag is a root item or not, 1 = <code>true</code>, 0 =
-	 * <code>false</code>
-	 */
-	public void setRoot(final boolean isRoot) {
-		this.isRoot = isRoot ? 1 : 0;
-	}
+   public boolean isRoot() {
+      return isRoot == 1;
+   }
 
-	/**
-	 * Set the name for the tour tag
-	 * 
-	 * @param tagName
-	 */
-	public void setTagName(final String tagName) {
-		this.name = tagName;
-	}
+   /**
+    * Checks if VARCHAR fields have the correct length
+    *
+    * @return Returns <code>true</code> when the data are valid and can be saved
+    */
+   public boolean isValidForSave() {
 
-	@Override
-	public String toString() {
-		return "tag: " + name + " (id:" + tagId + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-	}
+      /*
+       * Check: notes
+       */
+      final FIELD_VALIDATION fieldValidation = TourDatabase.isFieldValidForSave(
+            notes,
+            DB_LENGTH_NOTES,
+            Messages.Db_Field_TourTag_Notes);
+
+      if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
+         return false;
+      } else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
+         notes = notes.substring(0, DB_LENGTH_NOTES);
+      }
+
+      return true;
+   }
+
+   public void setExpandType(final int expandType) {
+      this.expandType = expandType;
+   }
+
+   public void setNotes(final String notes) {
+      this.notes = notes;
+   }
+
+   /**
+    * set root flag if this tag is a root item or not, 1 = <code>true</code>, 0 =
+    * <code>false</code>
+    */
+   public void setRoot(final boolean isRoot) {
+      this.isRoot = isRoot ? 1 : 0;
+   }
+
+   /**
+    * Set the name for the tour tag
+    *
+    * @param tagName
+    */
+   public void setTagName(final String tagName) {
+      this.name = tagName;
+   }
+
+   @Override
+   public String toString() {
+      return "tag: " + name + " (id:" + tagId + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+   }
 
 }
