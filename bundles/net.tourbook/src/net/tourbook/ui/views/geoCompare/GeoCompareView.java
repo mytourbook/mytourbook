@@ -930,7 +930,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          }
       }
 
-      // make shure the selection is visible
+      // make sure the selection is visible
 //		if (_selectedComparerItem != null) {
 //
 ////			_geoPartViewer.setSelection(new StructuredSelection(_selectedComparerItem), true);
