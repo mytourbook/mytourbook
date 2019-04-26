@@ -53,7 +53,7 @@ public class FitData {
    private boolean                 _isSetLastMarker;
    private int                     _lastMarkerTimeSlices;
 
-   private FitDataReader           _fitDataReader2;
+   private FitDataReader           _fitDataReader;
    private String                  _importFilePathName;
 
    private HashMap<Long, TourData> _alreadyImportedTours;
@@ -82,12 +82,12 @@ public class FitData {
 
    private long                    _timeDiffMS;
 
-   public FitData(final FitDataReader fitDataReader2,
+   public FitData(final FitDataReader fitDataReader,
                   final String importFilePath,
                   final HashMap<Long, TourData> alreadyImportedTours,
                   final HashMap<Long, TourData> newlyImportedTours) {
 
-      this._fitDataReader2 = fitDataReader2;
+      this._fitDataReader = fitDataReader;
       this._importFilePathName = importFilePath;
       this._alreadyImportedTours = alreadyImportedTours;
       this._newlyImportedTours = newlyImportedTours;
@@ -144,7 +144,7 @@ public class FitData {
       _tourData.createTimeSeries(_allTimeData, false);
 
       // after all data are added, the tour id can be created
-      final String uniqueId = _fitDataReader2.createUniqueId(_tourData, Util.UNIQUE_ID_SUFFIX_GARMIN_FIT);
+      final String uniqueId = _fitDataReader.createUniqueId(_tourData, Util.UNIQUE_ID_SUFFIX_GARMIN_FIT);
       final Long tourId = _tourData.createTourId(uniqueId);
 
       if (_alreadyImportedTours.containsKey(tourId) == false) {
