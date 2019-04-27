@@ -625,6 +625,7 @@ public class Messages extends NLS {
    public static String        Db_Field_TourData_Weather;
    public static String        Db_Field_TourMarker_UrlAddress;
    public static String        Db_Field_TourMarker_UrlText;
+   public static String        Db_Field_TourTag_Name;
    public static String        Db_Field_TourTag_Notes;
    public static String        Db_Field_TourTagCategory_Notes;
 
@@ -692,6 +693,14 @@ public class Messages extends NLS {
    public static String        Dialog_SplitTour_Label_TourStartDateTime;
    public static String        Dialog_SplitTour_Label_TourTitle;
    public static String        Dialog_SplitTour_Label_TourTitle_Tooltip;
+
+   public static String        Dialog_TourTag_Label_Notes;
+   public static String        Dialog_TourTag_Label_TagName;
+   public static String        Dialog_TourTag_Message_RenameTag;
+   
+   public static String Dialog_TourTagCategory_Label_CategoryName;
+
+   public static String        Dialog_TourTagCategory_Message_RenameCategory;
 
    public static String        Dlg_AdjustAltitude_Group_options;
    public static String        Dlg_AdjustAltitude_Label_end_altitude;

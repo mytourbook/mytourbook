@@ -30,11 +30,12 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Transient;
 
 import net.tourbook.Messages;
+import net.tourbook.common.UI;
 import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
 
 @Entity
-public class TourTag implements Comparable<Object> {
+public class TourTag implements Cloneable, Comparable<Object> {
 
    public static final int DB_LENGTH_NAME             = 255;
    public static final int DB_LENGTH_NOTES            = 32000;
@@ -98,13 +99,13 @@ public class TourTag implements Comparable<Object> {
 //   private TourTagCategory      tourTagCategory;
 
    /**
-    * Contains all tours are associated with this tag.
+    * Contains all tours which are associated with this tag
     */
    @ManyToMany(mappedBy = "tourTags", cascade = ALL, fetch = LAZY)
    private final Set<TourData> tourData  = new HashSet<>();
 
    /**
-    * unique id for manually created tour types because the {@link #tagId} is -1 when it's not
+    * Unique id for manually created tour tags because the {@link #tagId} is -1 when it's not
     * persisted
     */
    @Transient
@@ -115,6 +116,20 @@ public class TourTag implements Comparable<Object> {
    public TourTag(final String tagName) {
       name = tagName.trim();
       _createId = ++_createCounter;
+   }
+
+   @Override
+   public TourTag clone() {
+
+      TourTag newTourTag = null;
+
+      try {
+         newTourTag = (TourTag) super.clone();
+      } catch (final CloneNotSupportedException e) {
+         e.printStackTrace();
+      }
+
+      return newTourTag;
    }
 
    @Override
@@ -164,6 +179,11 @@ public class TourTag implements Comparable<Object> {
    }
 
    public String getNotes() {
+
+      if (notes == null) {
+         return UI.EMPTY_STRING;
+      }
+
       return notes;
    }
 
@@ -195,10 +215,26 @@ public class TourTag implements Comparable<Object> {
     */
    public boolean isValidForSave() {
 
+      FIELD_VALIDATION fieldValidation;
+
+      /*
+       * Check: name
+       */
+      fieldValidation = TourDatabase.isFieldValidForSave(
+            name,
+            DB_LENGTH_NAME,
+            Messages.Db_Field_TourTag_Name);
+
+      if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
+         return false;
+      } else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
+         name = name.substring(0, DB_LENGTH_NAME);
+      }
+
       /*
        * Check: notes
        */
-      final FIELD_VALIDATION fieldValidation = TourDatabase.isFieldValidForSave(
+      fieldValidation = TourDatabase.isFieldValidForSave(
             notes,
             DB_LENGTH_NOTES,
             Messages.Db_Field_TourTag_Notes);
@@ -240,6 +276,17 @@ public class TourTag implements Comparable<Object> {
    @Override
    public String toString() {
       return "tag: " + name + " (id:" + tagId + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+   }
+
+   /**
+    * Updates values from a modified {@link TourTag}
+    *
+    * @param modifiedTourTag
+    */
+   public void updateFromModified(final TourTag modifiedTourTag) {
+
+      name = modifiedTourTag.name;
+      notes = modifiedTourTag.notes;
    }
 
 }

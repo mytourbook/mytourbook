@@ -30,13 +30,12 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Transient;
 
 import net.tourbook.Messages;
+import net.tourbook.common.UI;
 import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
 
 @Entity
-public class TourTagCategory implements Comparable<Object> {
-
-   public static final int            DB_LENGTH_NAME   = 255;
+public class TourTagCategory implements Cloneable, Comparable<Object> {
 
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -81,12 +80,26 @@ public class TourTagCategory implements Comparable<Object> {
    private int                        _tagCounter      = -1;
 
    /**
-    * default constructor used in ejb
+    * Default constructor used in ejb
     */
    public TourTagCategory() {}
 
    public TourTagCategory(final String categoryName) {
       name = categoryName;
+   }
+
+   @Override
+   public TourTagCategory clone() {
+
+      TourTagCategory newTagCategory = null;
+
+      try {
+         newTagCategory = (TourTagCategory) super.clone();
+      } catch (final CloneNotSupportedException e) {
+         e.printStackTrace();
+      }
+
+      return newTagCategory;
    }
 
    @Override
@@ -103,6 +116,7 @@ public class TourTagCategory implements Comparable<Object> {
    public int getCategoryCounter() {
       return _categoryCounter;
    }
+
    public long getCategoryId() {
       return tagCategoryId;
    }
@@ -112,6 +126,11 @@ public class TourTagCategory implements Comparable<Object> {
    }
 
    public String getNotes() {
+
+      if (notes == null) {
+         return UI.EMPTY_STRING;
+      }
+
       return notes;
    }
 
@@ -142,13 +161,29 @@ public class TourTagCategory implements Comparable<Object> {
     */
    public boolean isValidForSave() {
 
+      FIELD_VALIDATION fieldValidation;
+
+      /*
+       * Check: name
+       */
+      fieldValidation = TourDatabase.isFieldValidForSave(
+            name,
+            TourTag.DB_LENGTH_NAME,
+            Messages.Db_Field_TourTag_Name);
+
+      if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
+         return false;
+      } else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
+         name = name.substring(0, TourTag.DB_LENGTH_NAME);
+      }
+
       /*
        * Check: notes
        */
-      final FIELD_VALIDATION fieldValidation = TourDatabase.isFieldValidForSave(
+      fieldValidation = TourDatabase.isFieldValidForSave(
             notes,
             TourTag.DB_LENGTH_NOTES,
-            Messages.Db_Field_TourTagCategory_Notes);
+            Messages.Db_Field_TourTag_Notes);
 
       if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
          return false;
@@ -199,6 +234,17 @@ public class TourTagCategory implements Comparable<Object> {
       ;
 
       return category;
+   }
+
+   /**
+    * Updates values from a modified {@link TourTagCategory}
+    *
+    * @param modifiedTagCategory
+    */
+   public void updateFromModified(final TourTagCategory modifiedTagCategory) {
+
+      name = modifiedTagCategory.name;
+      notes = modifiedTagCategory.notes;
    }
 
 }
