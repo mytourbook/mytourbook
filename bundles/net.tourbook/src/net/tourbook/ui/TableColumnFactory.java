@@ -65,6 +65,8 @@ public abstract class TableColumnFactory {
    public static final TableColumnFactory MARKER_TIME_DELTA;
    public static final TableColumnFactory MARKER_URL;
 
+   public static final TableColumnFactory MOTION_ALTIMETER;
+   public static final String             MOTION_ALTIMETER_ID           = "MOTION_ALTIMETER";           //$NON-NLS-1$
    public static final TableColumnFactory MOTION_AVG_PACE;
    public static final String             MOTION_AVG_PACE_ID            = "MOTION_AVG_PACE";            //$NON-NLS-1$
    public static final TableColumnFactory MOTION_AVG_PACE_DIFFERENCE;
@@ -111,6 +113,7 @@ public abstract class TableColumnFactory {
 
    public static final TableColumnFactory TIME_BREAK_TIME;
    public static final TableColumnFactory TIME_DRIVING_TIME;
+   public static final String             TIME_DRIVING_TIME_ID          = "TIME_DRIVING_TIME_ID";       //$NON-NLS-1$
    public static final TableColumnFactory TIME_PAUSED_TIME;
    public static final TableColumnFactory TIME_RECORDING_TIME;
    public static final String             TIME_RECORDING_TIME_ID        = "TIME_RECORDING_TIME";        //$NON-NLS-1$
@@ -841,6 +844,29 @@ public abstract class TableColumnFactory {
       /*
        * Motion
        */
+
+      MOTION_ALTIMETER = new TableColumnFactory() {
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, MOTION_ALTIMETER_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Motion);
+            colDef.setColumnHeaderText(UI.UNIT_LABEL_ALTIMETER);
+            colDef.setColumnUnit(UI.UNIT_LABEL_ALTIMETER);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Motion_Altimeter_Tooltip);
+            colDef.setColumnLabel(Messages.ColumnFactory_Motion_Altimeter);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+            colDef.setValueFormats(//
+                  ValueFormatSet.Number,
+                  ValueFormat.NUMBER_1_0,
+                  columnManager);
+
+            return colDef;
+         }
+      };
 
       MOTION_AVG_PACE = new TableColumnFactory() {
          @Override
