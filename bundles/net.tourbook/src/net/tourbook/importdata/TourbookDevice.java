@@ -143,6 +143,10 @@ public abstract class TourbookDevice implements IRawDataReader {
    public String createUniqueId(final TourData tourData, final String defaultKey) {
 
       if (_isCreateRandomTourId) {
+
+         System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] createUniqueId()") //$NON-NLS-1$ //$NON-NLS-2$
+               + (" - System property \"createRandomTourId\" is recognized -> Every imported tour has a unique tour id")); //$NON-NLS-1$
+
          return Double.valueOf(Math.random()).toString();
       }
 
