@@ -1419,7 +1419,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       _mapApp.setLayer_HillShading_Opacity(layerHillshadingOpacity);
 
       layer_HillShading.setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_HILLSHADING_VISIBLE, true));
-      layer_HillShading.setBitmapAlpha(layerHillshadingOpacity / 100f);
+      layer_HillShading.setBitmapAlpha(layerHillshadingOpacity / 100f, true);
 
       // other layers
       _mapApp.getLayer_BaseMap().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_BASE_MAP_VISIBLE, true));

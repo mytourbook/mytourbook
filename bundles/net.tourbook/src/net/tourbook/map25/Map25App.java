@@ -102,6 +102,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
+import com.badlogic.gdx.graphics.glutils.GLVersion;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.utils.SharedLibraryLoader;
 import okhttp3.Cache;
@@ -1035,7 +1036,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 //		}
 
 	   // building Block II
-	   _layer_Building = new BuildingLayer(mMap, _layer_BaseMap);
+	   _layer_Building = new BuildingLayer(mMap, _layer_BaseMap, true, true);
 	   _layer_Building.setEnabled(false);
 	   layers.add(_layer_Building);
 
@@ -1278,6 +1279,12 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 		//return file;
 		return file.getAbsolutePath();
 	}
+
+@Override
+protected void initGLAdapter(GLVersion arg0) {
+   // TODO Auto-generated method stub
+   
+}
 	
 
 
