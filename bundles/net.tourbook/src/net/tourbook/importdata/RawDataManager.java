@@ -668,7 +668,7 @@ public class RawDataManager {
          @Override
          public void run() {
 
-            final Shell activeShell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();;
+            final Shell activeShell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 
             // get import file name
             final String oldImportFilePathName = tourData.getImportFilePathName();
