@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -45,15 +45,18 @@ import org.eclipse.swt.widgets.Event;
  */
 public abstract class ColumnViewerTourInfoToolTip extends ToolTip implements ITourProvider, ITourToolTipProvider {
 
-   private final TourInfoUI _tourInfoUI = new TourInfoUI();
+   private final TourInfoUI   _tourInfoUI = new TourInfoUI();
 
-   private Long             _tourId;
-   private TourData         _tourData;
+   private Long               _tourId;
+   private TourData           _tourData;
 
-   private Control          _ttControl;
+   private Control            _ttControl;
 
-   private ColumnViewer     _columnViewer;
-   private ViewerCell       _viewerCell;
+   private ColumnViewer       _columnViewer;
+   private ViewerCell         _viewerCell;
+   private Object             _viewerCell_Data;
+
+   private ITooltipUIProvider _tooltipUIProvider;
 
    public ColumnViewerTourInfoToolTip(final Control control, final int style, final ColumnViewer columnViewer) {
 
@@ -83,38 +86,53 @@ public abstract class ColumnViewerTourInfoToolTip extends ToolTip implements ITo
 
       Composite container;
 
-      if (_tourId != null && _tourId != -1) {
-         // first get data from the tour id when it is set
-         _tourData = TourManager.getInstance().getTourData(_tourId);
-      }
+      if (_viewerCell_Data != null && _tooltipUIProvider != null) {
 
-      if (_tourData == null) {
+         // a cell with custom data is hovered
 
-         // there are no data available
-
-         container = _tourInfoUI.createUI_NoData(parent);
-
-         // allow the actions to be selected
-         setHideOnMouseDown(true);
-
-      } else {
-
-         // tour data is available
-
-         container = _tourInfoUI.createContentArea(parent, _tourData, this, this);
-
-         _tourInfoUI.setActionsEnabled(true);
+         container = _tooltipUIProvider.createTooltipUI(parent, _viewerCell_Data, this);
 
          // allow the actions to be selected
          setHideOnMouseDown(false);
-      }
 
-      parent.addDisposeListener(new DisposeListener() {
-         @Override
-         public void widgetDisposed(final DisposeEvent e) {
-            _tourInfoUI.dispose();
+      } else {
+
+         // a tour is hovered
+
+         if (_tourId != null && _tourId != -1) {
+
+            // first get data from the tour id when it is set
+            _tourData = TourManager.getInstance().getTourData(_tourId);
          }
-      });
+
+         if (_tourData == null) {
+
+            // there are no data available
+
+            container = _tourInfoUI.createUI_NoData(parent);
+
+            // allow the actions to be selected
+            setHideOnMouseDown(true);
+
+         } else {
+
+            // tour data is available
+
+            container = _tourInfoUI.createContentArea(parent, _tourData, this, this);
+
+            _tourInfoUI.setActionsEnabled(true);
+
+            // allow the actions to be selected
+            setHideOnMouseDown(false);
+         }
+
+         parent.addDisposeListener(new DisposeListener() {
+            @Override
+            public void widgetDisposed(final DisposeEvent e) {
+               _tourInfoUI.dispose();
+            }
+         });
+      }
 
       return container;
    }
@@ -202,6 +220,7 @@ public abstract class ColumnViewerTourInfoToolTip extends ToolTip implements ITo
    protected Object getToolTipArea(final Event event) {
 
       _viewerCell = _columnViewer.getCell(new Point(event.x, event.y));
+      _viewerCell_Data = null;
 
       if (_viewerCell != null) {
 
@@ -212,13 +231,18 @@ public abstract class ColumnViewerTourInfoToolTip extends ToolTip implements ITo
          final CellLabelProvider labelProvider = _columnViewer.getLabelProvider(_viewerCell.getColumnIndex());
 
          if (labelProvider instanceof IColumnViewerTourIdProvider) {
-            tourId = ((IColumnViewerTourIdProvider) labelProvider).getTourId(_viewerCell);
+
+            final IColumnViewerTourIdProvider columnViewerTourIdProvider = (IColumnViewerTourIdProvider) labelProvider;
+
+            tourId = columnViewerTourIdProvider.getTourId(_viewerCell);
+
+            _viewerCell_Data = columnViewerTourIdProvider.getData(_viewerCell);
          }
 
          _tourId = tourId;
 
          // hide current tooltip when a cell without tooltip is hovered
-         if (tourId == null) {
+         if (tourId == null && _viewerCell_Data == null) {
             _viewerCell = null;
          }
       }
@@ -246,6 +270,10 @@ public abstract class ColumnViewerTourInfoToolTip extends ToolTip implements ITo
       _tourInfoUI.setNoTourTooltip(noTourTooltip);
    }
 
+   public void setTooltipUIProvider(final ITooltipUIProvider tooltipUIProvider) {
+      _tooltipUIProvider = tooltipUIProvider;
+   }
+
    @Override
    public void setTourToolTip(final TourToolTip tourToolTip) {
       // not used
@@ -262,7 +290,9 @@ public abstract class ColumnViewerTourInfoToolTip extends ToolTip implements ITo
          return false;
       }
 
-      if (_tourId == null) {
+      boolean isShowTooltip = false;
+
+      if (_tourId == null && _viewerCell_Data == null) {
 
          // show default tooltip
          _ttControl.setToolTipText(null);
@@ -271,8 +301,10 @@ public abstract class ColumnViewerTourInfoToolTip extends ToolTip implements ITo
 
          // hide default tooltip and display the custom tooltip
          _ttControl.setToolTipText(UI.EMPTY_STRING);
+
+         isShowTooltip = true;
       }
 
-      return _tourId != null;
+      return isShowTooltip;
    }
 }

@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *
+ * 
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
@@ -15,22 +15,19 @@
  *******************************************************************************/
 package net.tourbook.ui.views;
 
-import org.eclipse.jface.viewers.ViewerCell;
+import net.tourbook.common.util.IToolTipProvider;
 
-public interface IColumnViewerTourIdProvider {
+import org.eclipse.swt.widgets.Composite;
 
-   /**
-    * @param cell
-    * @return Returns custom data when a {@link ViewerCell} is hovered or <code>null</code> when it
-    *         should be ignored
-    */
-   public abstract Object getData(final ViewerCell cell);
+public interface ITooltipUIProvider {
 
    /**
-    * @param cell
-    * @return Returns a tour id which is selected in a {@link ViewerCell} or <code>null</code> when
-    *         a tour is not available.
+    * Create UI for the tooltip
+    *
+    * @param parent
+    * @param viewerCellData
+    * @param toolTip
+    * @return
     */
-   public abstract Long getTourId(final ViewerCell cell);
-
+   Composite createTooltipUI(Composite parent, Object viewerCellData, IToolTipProvider toolTip);
 }

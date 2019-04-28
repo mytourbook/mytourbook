@@ -41,7 +41,6 @@ public class Dialog_TourTag extends TitleAreaDialog {
    private final IDialogSettings _state = TourbookPlugin.getState(ID);
 
    private String                _dlgMessage;
-   private String                _dlgTitle;
 
    private TourTag               _tourTag_Original;
    private TourTag               _tourTag_Clone;
@@ -52,11 +51,10 @@ public class Dialog_TourTag extends TitleAreaDialog {
    private Text _txtNotes;
    private Text _txtName;
 
-   public Dialog_TourTag(final Shell parentShell, final String dlgTitle, final String dlgMessage, final TourTag tourTag) {
+   public Dialog_TourTag(final Shell parentShell, final String dlgMessage, final TourTag tourTag) {
 
       super(parentShell);
 
-      _dlgTitle = dlgTitle;
       _dlgMessage = dlgMessage;
 
       _tourTag_Original = tourTag;
@@ -71,7 +69,8 @@ public class Dialog_TourTag extends TitleAreaDialog {
 
       super.configureShell(shell);
 
-      shell.setText(_dlgTitle);
+      // set window title
+      shell.setText(Messages.Dialog_TourTag_EditTag_Title);
    }
 
    @Override
@@ -79,7 +78,7 @@ public class Dialog_TourTag extends TitleAreaDialog {
 
       super.create();
 
-      setTitle(_dlgTitle);
+      setTitle(Messages.Dialog_TourTag_EditTag_Title);
       setMessage(_dlgMessage);
    }
 

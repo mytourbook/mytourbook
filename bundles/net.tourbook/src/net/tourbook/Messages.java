@@ -315,6 +315,11 @@ public class Messages extends NLS {
    public static String        Action_Tag_Add_RecentTags;
    public static String        Action_Tag_AutoOpenCancel;
    public static String        Action_Tag_AutoOpenOK;
+   public static String        Action_Tag_Edit;
+   public static String        Action_Tag_Edit_Tooltip;
+
+   public static String        Action_TagCategory_Edit;
+   public static String        Action_TagCategory_Edit_Tooltip;
 
    public static String        Action_TourType_ModifyTourTypeFilter;
 
@@ -694,13 +699,15 @@ public class Messages extends NLS {
    public static String        Dialog_SplitTour_Label_TourTitle;
    public static String        Dialog_SplitTour_Label_TourTitle_Tooltip;
 
+   public static String        Dialog_TourTag_EditTag_Title;
+   public static String        Dialog_TourTag_EditTagCategory_Title;
    public static String        Dialog_TourTag_Label_Notes;
    public static String        Dialog_TourTag_Label_TagName;
    public static String        Dialog_TourTag_Message_RenameTag;
-   
-   public static String Dialog_TourTagCategory_Label_CategoryName;
 
+   public static String        Dialog_TourTagCategory_Label_CategoryName;
    public static String        Dialog_TourTagCategory_Message_RenameCategory;
+   public static String        Dialog_TourTagCategory_Title;
 
    public static String        Dlg_AdjustAltitude_Group_options;
    public static String        Dlg_AdjustAltitude_Label_end_altitude;

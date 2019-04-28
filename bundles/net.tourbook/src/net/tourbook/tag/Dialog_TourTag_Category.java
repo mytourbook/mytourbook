@@ -42,7 +42,6 @@ public class Dialog_TourTag_Category extends TitleAreaDialog {
    private final IDialogSettings _state = TourbookPlugin.getState(ID);
 
    private String                _dlgMessage;
-   private String                _dlgTitle;
 
    private TourTagCategory       _tagCategory_Original;
    private TourTagCategory       _tagCategory_Clone;
@@ -54,13 +53,11 @@ public class Dialog_TourTag_Category extends TitleAreaDialog {
    private Text _txtName;
 
    public Dialog_TourTag_Category(final Shell parentShell,
-                                  final String dlgTitle,
                                   final String dlgMessage,
                                   final TourTagCategory tagCategory) {
 
       super(parentShell);
 
-      _dlgTitle = dlgTitle;
       _dlgMessage = dlgMessage;
 
       _tagCategory_Original = tagCategory;
@@ -75,7 +72,7 @@ public class Dialog_TourTag_Category extends TitleAreaDialog {
 
       super.configureShell(shell);
 
-      shell.setText(_dlgTitle);
+      shell.setText(Messages.Dialog_TourTagCategory_Title);
    }
 
    @Override
@@ -83,7 +80,7 @@ public class Dialog_TourTag_Category extends TitleAreaDialog {
 
       super.create();
 
-      setTitle(_dlgTitle);
+      setTitle(Messages.Dialog_TourTagCategory_Title);
       setMessage(_dlgMessage);
    }
 

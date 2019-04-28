@@ -958,7 +958,6 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
       final Object firstElement = _tagViewer.getStructuredSelection().getFirstElement();
 
-      String dlgTitle = UI.EMPTY_STRING;
       String dlgMessage = UI.EMPTY_STRING;
 
       if (firstElement instanceof TVIPrefTag) {
@@ -966,10 +965,9 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
          final TVIPrefTag tourTagItem = ((TVIPrefTag) firstElement);
          final TourTag tourTag = tourTagItem.getTourTag();
 
-         dlgTitle = Messages.pref_tourtag_dlg_rename_title;
          dlgMessage = NLS.bind(Messages.Dialog_TourTag_Message_RenameTag, tourTag.getTagName());
 
-         if (new Dialog_TourTag(getShell(), dlgTitle, dlgMessage, tourTag).open() != Window.OK) {
+         if (new Dialog_TourTag(getShell(), dlgMessage, tourTag).open() != Window.OK) {
 
             setFocusToViewer();
 
@@ -987,10 +985,9 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
          final TVIPrefTagCategory tagCategoryItem = (TVIPrefTagCategory) firstElement;
          final TourTagCategory tourTagCategory = tagCategoryItem.getTourTagCategory();
 
-         dlgTitle = Messages.pref_tourtag_dlg_rename_title_category;
          dlgMessage = NLS.bind(Messages.Dialog_TourTagCategory_Message_RenameCategory, tourTagCategory.getCategoryName());
 
-         if (new Dialog_TourTag_Category(getShell(), dlgTitle, dlgMessage, tourTagCategory).open() != Window.OK) {
+         if (new Dialog_TourTag_Category(getShell(), dlgMessage, tourTagCategory).open() != Window.OK) {
 
             setFocusToViewer();
 

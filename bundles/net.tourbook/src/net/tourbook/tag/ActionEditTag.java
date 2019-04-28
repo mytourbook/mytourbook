@@ -14,7 +14,7 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.tag;
-
+ 
 import java.util.HashMap;
 
 import net.tourbook.Messages;
@@ -31,23 +31,25 @@ import net.tourbook.ui.views.tagging.TVITagView_TagCategory;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.window.Window;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 
-public class ActionRenameTag extends Action {
+/**
+ * Action to edit {@link TourTag} or {@link TourTagCategory}
+ */
+public class ActionEditTag extends Action {
 
    private ITourViewer _tourViewer;
 
-   public ActionRenameTag(final ITourViewer tourViewer) {
+   public ActionEditTag(final ITourViewer tourViewer) {
 
-      super(Messages.action_tag_rename_tag, AS_PUSH_BUTTON);
+      super(Messages.Action_Tag_Edit, AS_PUSH_BUTTON);
 
       _tourViewer = tourViewer;
    }
 
    /**
-    * Rename selected tag/category
+    * Edit selected tag/category
     */
    @Override
    public void run() {
@@ -56,7 +58,6 @@ public class ActionRenameTag extends Action {
 
       final Object firstElement = tagViewer.getStructuredSelection().getFirstElement();
 
-      String dlgTitle = UI.EMPTY_STRING;
       String dlgMessage = UI.EMPTY_STRING;
 
       final TourTag[] finalTourTag = { null };
@@ -72,11 +73,15 @@ public class ActionRenameTag extends Action {
          final HashMap<Long, TourTag> allTourTags = TourDatabase.getAllTourTags();
 
          final TourTag tourTag = finalTourTag[0] = allTourTags.get(tourTagItem.getTagId());
+         final String tagName = tourTag.getTagName();
 
-         dlgTitle = Messages.pref_tourtag_dlg_rename_title;
-         dlgMessage = NLS.bind(Messages.Dialog_TourTag_Message_RenameTag, tourTag.getTagName());
+         dlgMessage = tagName == null ? UI.EMPTY_STRING : tagName;
 
-         if (new Dialog_TourTag(Display.getCurrent().getActiveShell(), dlgTitle, dlgMessage, tourTag).open() != Window.OK) {
+         if (new Dialog_TourTag(
+               Display.getCurrent().getActiveShell(),
+               dlgMessage,
+               tourTag).open() != Window.OK) {
+
             return;
          }
 
@@ -87,10 +92,15 @@ public class ActionRenameTag extends Action {
          final HashMap<Long, TourTagCategory> allTourTagCategories = TourDatabase.getAllTourTagCategories();
          final TourTagCategory tagCategory = finalTagCategory[0] = allTourTagCategories.get(tagCategoryItem.getCategoryId());
 
-         dlgTitle = Messages.pref_tourtag_dlg_rename_title_category;
-         dlgMessage = NLS.bind(Messages.Dialog_TourTagCategory_Message_RenameCategory, tagCategory.getCategoryName());
+         final String tagCategoryName = tagCategory.getCategoryName();
 
-         if (new Dialog_TourTag_Category(Display.getCurrent().getActiveShell(), dlgTitle, dlgMessage, tagCategory).open() != Window.OK) {
+         dlgMessage = tagCategoryName == null ? UI.EMPTY_STRING : tagCategoryName;
+
+         if (new Dialog_TourTag_Category(
+               Display.getCurrent().getActiveShell(),
+               dlgMessage,
+               tagCategory).open() != Window.OK) {
+
             return;
          }
       }

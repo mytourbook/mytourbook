@@ -42,9 +42,9 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageTags;
+import net.tourbook.tag.ActionEditTag;
 import net.tourbook.tag.ActionMenuSetAllTagStructures;
 import net.tourbook.tag.ActionMenuSetTagStructure;
-import net.tourbook.tag.ActionRenameTag;
 import net.tourbook.tag.ChangedTags;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ITourEventListener;
@@ -114,6 +114,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IPartListener2;
@@ -199,7 +200,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    private ActionOpenTour                _actionOpenTour;
    private ActionOpenPrefDialog          _actionOpenTagPrefs;
    private ActionRefreshView             _actionRefreshView;
-   private ActionRenameTag               _actionRenameTag;
+   private ActionEditTag                 _actionEditTag;
    private ActionSetLayoutHierarchical   _actionSetLayoutHierarchical;
    private ActionSetLayoutFlat           _actionSetLayoutFlat;
    private ActionSetTourTypeMenu         _actionSetTourType;
@@ -518,7 +519,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       _actionOpenTagPrefs = new ActionOpenPrefDialog(Messages.action_tag_open_tagging_structure, PrefPageTags.ID);
       _actionOpenTour = new ActionOpenTour(this);
       _actionRefreshView = new ActionRefreshView(this);
-      _actionRenameTag = new ActionRenameTag(this);
+      _actionEditTag = new ActionEditTag(this);
       _actionSetAllTagStructures = new ActionMenuSetAllTagStructures(this);
       _actionSetTagStructure = new ActionMenuSetTagStructure(this);
       _actionSetTourType = new ActionSetTourTypeMenu(this);
@@ -608,7 +609,9 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
          }
       });
 
-      _tagViewer.getTree().addKeyListener(new KeyListener() {
+      tree.addListener(SWT.MouseDoubleClick, event -> onTagTree_DoubleClick(event));
+
+      tree.addKeyListener(new KeyListener() {
 
          @Override
          public void keyPressed(final KeyEvent e) {
@@ -635,6 +638,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
       // set tour info tooltip provider
       _tourInfoToolTip = new TreeViewerTourInfoToolTip(_tagViewer);
+      _tourInfoToolTip.setTooltipUIProvider(new TaggingView_TooltipUIProvider());
    }
 
    /**
@@ -711,6 +715,25 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       colDef.setIsDefaultColumn();
       colDef.setCanModifyVisibility(false);
       colDef.setLabelProvider(new TourInfoToolTipStyledCellLabelProvider() {
+
+         @Override
+         public Object getData(final ViewerCell cell) {
+
+            if (_isToolTipInTag == false) {
+               return null;
+            }
+
+            final TVITagViewItem viewItem = (TVITagViewItem) cell.getElement();
+
+            if (viewItem instanceof TVITagView_Tag || viewItem instanceof TVITagView_TagCategory) {
+
+               // return tag/category to show it's notes fields in the tooltip
+
+               return viewItem;
+            }
+
+            return null;
+         }
 
          @Override
          public Long getTourId(final ViewerCell cell) {
@@ -1276,18 +1299,23 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
       // enable rename action
       if (selectedItems == 1) {
+
          if (isTagSelected) {
-            _actionRenameTag.setText(Messages.action_tag_rename_tag);
-            _actionRenameTag.setEnabled(true);
+
+            _actionEditTag.setText(Messages.Action_Tag_Edit);
+            _actionEditTag.setEnabled(true);
+
          } else if (isCategorySelected) {
-            _actionRenameTag.setText(Messages.action_tag_rename_tag_category);
-            _actionRenameTag.setEnabled(true);
+
+            _actionEditTag.setText(Messages.Action_TagCategory_Edit);
+            _actionEditTag.setEnabled(true);
 
          } else {
-            _actionRenameTag.setEnabled(false);
+            _actionEditTag.setEnabled(false);
          }
+
       } else {
-         _actionRenameTag.setEnabled(false);
+         _actionEditTag.setEnabled(false);
       }
 
       /*
@@ -1323,7 +1351,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       menuMgr.add(_actionCollapseAll);
 
       menuMgr.add(new Separator());
-      menuMgr.add(_actionRenameTag);
+      menuMgr.add(_actionEditTag);
       menuMgr.add(_actionSetTagStructure);
       menuMgr.add(_actionSetAllTagStructures);
       menuMgr.add(_actionOpenTagPrefs);
@@ -1484,6 +1512,28 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       return _tagViewer;
    }
 
+   /**
+    * Ctrl state is not available in the tree viewer selection event -> use tree event
+    *
+    * @param event
+    */
+   private void onTagTree_DoubleClick(final Event event) {
+
+      final boolean isCtrl = (event.stateMask & SWT.CTRL) != 0;
+
+      if (isCtrl) {
+
+         final Object selection = ((IStructuredSelection) _tagViewer.getSelection()).getFirstElement();
+
+         if (selection instanceof TVITagView_Tag || selection instanceof TVITagView_TagCategory) {
+
+            // edit tag/category
+
+            _actionEditTag.run();
+         }
+      }
+   }
+
    private void onTagViewer_DoubleClick() {
 
       final Object selection = ((IStructuredSelection) _tagViewer.getSelection()).getFirstElement();
@@ -1491,14 +1541,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       if (selection instanceof TVITagView_Tour) {
 
          TourManager.getInstance().tourDoubleClickAction(TaggingView.this, _tourDoubleClickState);
-
-      } else if (selection instanceof TVITagView_Tag) {
-
-         _actionRenameTag.run();
-
-//      } else if (selection instanceof TVITagView_TagCategory && (event.stateMask & SWT.CONTROL) != 0) {
-//
-//         _actionRenameTag.run();
 
       } else if (selection != null) {
 
@@ -1521,7 +1563,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       if (selection instanceof TVITagView_Tag ||
             selection instanceof TVITagView_TagCategory) {
 
-         _actionRenameTag.run();
+         _actionEditTag.run();
       }
    }
 
@@ -1909,8 +1951,11 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       String description = UI.EMPTY_STRING;
 
       if (newInput instanceof TVITagView_Tag) {
+
          description = Messages.tag_view_title_tag + ((TVITagView_Tag) newInput).getName();
+
       } else if (newInput instanceof TVITagView_TagCategory) {
+
          description = Messages.tag_view_title_tag_category + ((TVITagView_TagCategory) newInput).name;
       }
 
