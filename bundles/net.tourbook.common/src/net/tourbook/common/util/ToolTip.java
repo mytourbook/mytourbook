@@ -33,7 +33,7 @@ import org.eclipse.swt.widgets.Shell;
  * <p>
  * <b>This class is a copy from the ToolTip in org.eclipse.jface.window</b>, <br>
  * the method {@link TooltipHideListener} is adjusted
- * 
+ *
  * @since 3.3
  */
 public abstract class ToolTip {
@@ -41,43 +41,43 @@ public abstract class ToolTip {
    /**
     * Recreate the tooltip on every mouse move
     */
-   public static final int             RECREATE    = 1;
+   public static final int             RECREATE               = 1;
 
    /**
     * Don't recreate the tooltip as long the mouse doesn't leave the area triggering the tooltip
     * creation
     */
-   public static final int             NO_RECREATE = 1 << 1;
+   public static final int             NO_RECREATE            = 1 << 1;
 
    private Control                     control;
 
-   private int                         xShift      = 3;
-   private int                         yShift      = 0;
+   private int                         xShift                 = 3;
+   private int                         yShift                 = 0;
 
-   private int                         popupDelay  = 0;
-   private int                         hideDelay   = 0;
+   private int                         popupDelay             = 0;
+   private int                         hideDelay              = 0;
 
+   private TooltipHideListener         hideListener           = new TooltipHideListener();
    private ToolTipOwnerControlListener listener;
+   private Listener                    shellListener;
 
    private HashMap<String, Object>     data;
 
-   // Ensure that only one tooltip is active in time
-//	private static Shell				CURRENT_TOOLTIP;
-   private Shell               CURRENT_TOOLTIP;
+   /**
+    * Ensure that only one tooltip is active in time
+    */
+   private Shell                       _tooltipShell;
 
-   private TooltipHideListener hideListener           = new TooltipHideListener();
 
-   private Listener            shellListener;
+   private boolean                     isHideOnMouseDown      = true;
+   private boolean                     isRespectDisplayBounds = true;
+   private boolean                     isRespectMonitorBounds = true;
 
-   private boolean             isHideOnMouseDown      = true;
-   private boolean             isRespectDisplayBounds = true;
-   private boolean             isRespectMonitorBounds = true;
+   private int                         style;
 
-   private int                 style;
+   private Object                      currentArea;
 
-   private Object              currentArea;
-
-   private boolean             _isHideOnMouseMove;
+   private boolean                     _isHideOnMouseMove;
 
    private class TooltipHideListener implements Listener {
 
@@ -174,7 +174,7 @@ public abstract class ToolTip {
 
    /**
     * Create new instance which add TooltipSupport to the widget
-    * 
+    *
     * @param control
     *           the control on whose action the tooltip is shown
     */
@@ -193,8 +193,10 @@ public abstract class ToolTip {
     * @see #NO_RECREATE
     */
    public ToolTip(final Control control, final int style, final boolean manualActivation) {
+
       this.control = control;
       this.style = style;
+
       this.control.addDisposeListener(new DisposeListener() {
 
          @Override
@@ -216,24 +218,22 @@ public abstract class ToolTip {
                return;
             }
 
-            ttControl.getDisplay().asyncExec(new Runnable() {
+            ttControl.getDisplay()
+                  .asyncExec(
 
-               @Override
-               public void run() {
+                        () -> {
 
-                  // check again, NPE has occured during debugging
+                           // check again, NPE has occured during debugging
 
-                  if (ttControl == null || ttControl.isDisposed()) {
-                     return;
-                  }
+                           if (ttControl == null || ttControl.isDisposed()) {
+                              return;
+                           }
 
-                  // Check if the new active shell is the tooltip itself
-                  if (ttControl.getDisplay().getActiveShell() != CURRENT_TOOLTIP) {
-                     toolTipHide(CURRENT_TOOLTIP, event);
-                  }
-               }
-
-            });
+                           // Check if the new active shell is the tooltip itself
+                           if (ttControl.getDisplay().getActiveShell() != _tooltipShell) {
+                              toolTipHide(_tooltipShell, event);
+                           }
+                        });
          }
       };
 
@@ -261,7 +261,7 @@ public abstract class ToolTip {
     * <p>
     * <b>Subclasses may override to clean up requested system resources</b>
     * </p>
-    * 
+    *
     * @param event
     *           event triggered the hiding action (may be <code>null</code> if event wasn't
     *           triggered by user actions directly)
@@ -272,7 +272,7 @@ public abstract class ToolTip {
 
    /**
     * Creates the content area of the the tooltip.
-    * 
+    *
     * @param event
     *           the event that triggered the activation of the tooltip
     * @param parent
@@ -400,7 +400,7 @@ public abstract class ToolTip {
 
    /**
     * Get the data restored under the key
-    * 
+    *
     * @param key
     *           the key
     * @return data or <code>null</code> if no entry is restored under the key
@@ -415,7 +415,7 @@ public abstract class ToolTip {
    /**
     * Get the display relative location where the tooltip is displayed. Subclasses may overwrite to
     * implement custom positioning.
-    * 
+    *
     * @param tipSize
     *           the size of the tooltip to be shown
     * @param event
@@ -431,11 +431,11 @@ public abstract class ToolTip {
     */
    protected Shell getShell() {
 
-      if (CURRENT_TOOLTIP == null || CURRENT_TOOLTIP.isDisposed()) {
+      if (_tooltipShell == null || _tooltipShell.isDisposed()) {
          return null;
       }
 
-      return CURRENT_TOOLTIP;
+      return _tooltipShell;
    }
 
    /**
@@ -443,7 +443,7 @@ public abstract class ToolTip {
     * {@link #NO_RECREATE} this is used to decide if the tooltip is hidden recreated.
     * <code>By the default it is the widget the tooltip is created for but could be any object. To decide if
     * the area changed the {@link Object#equals(Object)} method is used.</code>
-    * 
+    *
     * @param event
     *           the event
     * @return the area responsible for the tooltip creation or <code>null</code> this could be any
@@ -459,12 +459,12 @@ public abstract class ToolTip {
     * Hide the currently active tool tip
     */
    public void hide() {
-      toolTipHide(CURRENT_TOOLTIP, null);
+      toolTipHide(_tooltipShell, null);
    }
 
    /**
     * Return if hiding on mouse down is set.
-    * 
+    *
     * @return <code>true</code> if hiding on mouse down in the tool tip is on
     */
    public boolean isHideOnMouseDown() {
@@ -477,7 +477,7 @@ public abstract class ToolTip {
 
    /**
     * Return whether the tooltip respects bounds of the display.
-    * 
+    *
     * @return <code>true</code> if the tooltip respects bounds of the display
     */
    public boolean isRespectDisplayBounds() {
@@ -486,7 +486,7 @@ public abstract class ToolTip {
 
    /**
     * Return whether the tooltip respects bounds of the monitor.
-    * 
+    *
     * @return <code>true</code> if tooltip respects the bounds of the monitor
     */
    public boolean isRespectMonitorBounds() {
@@ -506,22 +506,24 @@ public abstract class ToolTip {
 
    /**
     * Restore arbitrary data under the given key
-    * 
+    *
     * @param key
     *           the key
     * @param value
     *           the value
     */
    public void setData(final String key, final Object value) {
+
       if (data == null) {
-         data = new HashMap<String, Object>();
+         data = new HashMap<>();
       }
+
       data.put(key, value);
    }
 
    /**
     * Set the hide delay.
-    * 
+    *
     * @param hideDelay
     *           the delay before the tooltip is hidden. If <code>0</code> the tooltip is shown until
     *           user moves to other item
@@ -534,25 +536,24 @@ public abstract class ToolTip {
     * If you don't want the tool tip to be hidden when the user clicks inside the tool tip set this
     * to <code>false</code>. You maybe also need to hide the tool tip yourself depending on what you
     * do after clicking in the tooltip (e.g. if you open a new {@link Shell})
-    * 
+    *
     * @param hideOnMouseDown
     *           flag to indicate of tooltip is hidden automatically on mouse down inside the tool
     *           tip
     */
    public void setHideOnMouseDown(final boolean hideOnMouseDown) {
+
       // Only needed if there's currently a tooltip active
-      if (CURRENT_TOOLTIP != null && !CURRENT_TOOLTIP.isDisposed()) {
+      if (_tooltipShell != null && !_tooltipShell.isDisposed()) {
+
          // Only change if value really changed
          if (hideOnMouseDown != this.isHideOnMouseDown) {
-            control.getDisplay().syncExec(new Runnable() {
 
-               @Override
-               public void run() {
-                  if (CURRENT_TOOLTIP != null && CURRENT_TOOLTIP.isDisposed()) {
-                     toolTipHookByTypeRecursively(CURRENT_TOOLTIP, hideOnMouseDown, SWT.MouseDown);
-                  }
+            control.getDisplay().syncExec(() -> {
+
+               if (_tooltipShell != null && _tooltipShell.isDisposed()) {
+                  toolTipHookByTypeRecursively(_tooltipShell, hideOnMouseDown, SWT.MouseDown);
                }
-
             });
          }
       }
@@ -566,7 +567,7 @@ public abstract class ToolTip {
 
    /**
     * Set the popup delay.
-    * 
+    *
     * @param popupDelay
     *           the delay before the tooltip is shown to the user. If <code>0</code> the tooltip is
     *           shown immediately
@@ -581,7 +582,7 @@ public abstract class ToolTip {
     * <p>
     * Default is <code>true</code>
     * </p>
-    * 
+    *
     * @param respectDisplayBounds
     */
    public void setRespectDisplayBounds(final boolean respectDisplayBounds) {
@@ -595,7 +596,7 @@ public abstract class ToolTip {
     * <p>
     * Default is <code>true</code>
     * </p>
-    * 
+    *
     * @param respectMonitorBounds
     */
    public void setRespectMonitorBounds(final boolean respectMonitorBounds) {
@@ -607,7 +608,7 @@ public abstract class ToolTip {
     * <p>
     * By default the tooltip is shifted 3 pixels to the right.
     * </p>
-    * 
+    *
     * @param p
     *           the new shift
     */
@@ -621,7 +622,7 @@ public abstract class ToolTip {
     * <p>
     * <b>Subclasses may overwrite this to get custom behavior</b>
     * </p>
-    * 
+    *
     * @param event
     *           the event
     * @return <code>true</code> if tooltip should be displayed
@@ -652,7 +653,7 @@ public abstract class ToolTip {
 
    /**
     * This method is called before the tooltip is hidden
-    * 
+    *
     * @param event
     *           the event trying to hide the tooltip
     * @return <code>true</code> if the tooltip should be hidden
@@ -684,15 +685,17 @@ public abstract class ToolTip {
 
    /**
     * Start up the tooltip programmatically
-    * 
+    *
     * @param location
     *           the location relative to the control the tooltip is shown
     */
    public void show(final Point location) {
+
       final Event event = new Event();
       event.x = location.x;
       event.y = location.y;
       event.widget = control;
+
       toolTipCreate(event);
    }
 
@@ -711,20 +714,22 @@ public abstract class ToolTip {
       return null;
    }
 
-   private void toolTipHide(final Shell tip, final Event event) {
+   private void toolTipHide(final Shell tooltipShell, final Event event) {
 
-      boolean isShouldHideToolTip = shouldHideToolTip(event);
+      final boolean isShouldHideToolTip = shouldHideToolTip(event);
 
       if (control != null && !control.isDisposed() && isShouldHideToolTip) {
          control.getShell().removeListener(SWT.Deactivate, shellListener);
       }
 
-      if (tip != null && !tip.isDisposed() && isShouldHideToolTip) {
+      if (tooltipShell != null && !tooltipShell.isDisposed() && isShouldHideToolTip) {
 
          currentArea = null;
-         passOnEvent(tip, event);
-         tip.dispose();
-         CURRENT_TOOLTIP = null;
+         passOnEvent(tooltipShell, event);
+
+         tooltipShell.dispose();
+         _tooltipShell = null;
+
          afterHideToolTip(event);
       }
    }
@@ -760,40 +765,45 @@ public abstract class ToolTip {
    }
 
    private void toolTipOpen(final Shell shell, final Event event) {
-      // Ensure that only one Tooltip is shown in time
-      if (CURRENT_TOOLTIP != null) {
-         toolTipHide(CURRENT_TOOLTIP, null);
+
+      // ensure that only one Tooltip is shown in time
+      if (_tooltipShell != null) {
+         toolTipHide(_tooltipShell, null);
       }
 
-      CURRENT_TOOLTIP = shell;
+      _tooltipShell = shell;
 
       control.getShell().addListener(SWT.Deactivate, shellListener);
 
       if (popupDelay > 0) {
-         control.getDisplay().timerExec(popupDelay, new Runnable() {
-            @Override
-            public void run() {
-               toolTipShow(shell, event);
-            }
+
+         control.getDisplay().timerExec(popupDelay, () -> {
+
+            toolTipShow(shell, event);
          });
+
       } else {
-         toolTipShow(CURRENT_TOOLTIP, event);
+
+         // open without delay
+
+         toolTipShow(_tooltipShell, event);
       }
 
       if (hideDelay > 0) {
-         control.getDisplay().timerExec(popupDelay + hideDelay, new Runnable() {
 
-            @Override
-            public void run() {
-               toolTipHide(shell, null);
-            }
+         control.getDisplay().timerExec(popupDelay + hideDelay, () -> {
+
+            toolTipHide(shell, null);
          });
       }
    }
 
    private void toolTipShow(final Shell tip, final Event event) {
+
       if (!tip.isDisposed()) {
+
          currentArea = getToolTipArea(event);
+
          final Composite contentArea = createToolTipContentArea(event, tip);
          if (contentArea != null) {
 
