@@ -68,7 +68,6 @@ public abstract class ToolTip {
     */
    private Shell                       _tooltipShell;
 
-
    private boolean                     isHideOnMouseDown      = true;
    private boolean                     isRespectDisplayBounds = true;
    private boolean                     isRespectMonitorBounds = true;
@@ -219,21 +218,19 @@ public abstract class ToolTip {
             }
 
             ttControl.getDisplay()
-                  .asyncExec(
+                  .asyncExec(() -> {
 
-                        () -> {
+                     // check again, NPE has occured during debugging
 
-                           // check again, NPE has occured during debugging
+                     if (ttControl == null || ttControl.isDisposed()) {
+                        return;
+                     }
 
-                           if (ttControl == null || ttControl.isDisposed()) {
-                              return;
-                           }
-
-                           // Check if the new active shell is the tooltip itself
-                           if (ttControl.getDisplay().getActiveShell() != _tooltipShell) {
-                              toolTipHide(_tooltipShell, event);
-                           }
-                        });
+                     // Check if the new active shell is the tooltip itself
+                     if (ttControl.getDisplay().getActiveShell() != _tooltipShell) {
+                        toolTipHide(_tooltipShell, event);
+                     }
+                  });
          }
       };
 

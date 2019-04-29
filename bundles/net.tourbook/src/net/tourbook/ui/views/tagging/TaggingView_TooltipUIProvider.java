@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
@@ -69,10 +69,11 @@ public class TaggingView_TooltipUIProvider implements ITooltipUIProvider {
    /*
     * UI controls
     */
-   private Composite _ttContainer;
+   private Composite   _ttContainer;
 
-   private Label     _lblTitle;
-   private Text      _txtNotes;
+   private Label       _lblTitle;
+   private Text        _txtNotes;
+   private TaggingView _taggingView;
 
    private class ActionCloseTooltip extends Action {
 
@@ -105,7 +106,15 @@ public class TaggingView_TooltipUIProvider implements ITooltipUIProvider {
       @Override
       public void run() {
 
+         _toolTipProvider.hideToolTip();
+
+         _taggingView.editTag(_viewerCellData);
       }
+   }
+
+   public TaggingView_TooltipUIProvider(final TaggingView taggingView) {
+
+      _taggingView = taggingView;
    }
 
    @Override

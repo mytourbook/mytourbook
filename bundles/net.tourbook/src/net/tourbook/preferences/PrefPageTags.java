@@ -56,6 +56,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -90,6 +91,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.ToolBar;
@@ -338,8 +340,26 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
             | SWT.MULTI
             | SWT.FULL_SELECTION);
 
-      tree.setHeaderVisible(false);
+      tree.setHeaderVisible(true);
       tree.setLinesVisible(getPreferenceStore().getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+
+      tree.addListener(SWT.MouseDoubleClick, event -> onTagTree_DoubleClick(event));
+
+      tree.addKeyListener(new KeyListener() {
+
+         @Override
+         public void keyPressed(final KeyEvent e) {
+
+            switch (e.keyCode) {
+            case SWT.F2:
+               onAction_EditTag();
+               break;
+            }
+         }
+
+         @Override
+         public void keyReleased(final KeyEvent e) {}
+      });
 
       _tagViewer = new TreeViewer(tree);
 
@@ -403,79 +423,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
             new Transfer[] { LocalSelectionTransfer.getTransfer() },
             new TagDropAdapter(this, _tagViewer));
 
-      _tagViewer.getTree().addKeyListener(new KeyListener() {
-
-         @Override
-         public void keyPressed(final KeyEvent e) {
-
-            switch (e.keyCode) {
-            case SWT.F2:
-               onAction_RenameTourTag();
-               break;
-            }
-         }
-
-         @Override
-         public void keyReleased(final KeyEvent e) {}
-      });
-
-      /*
-       * create columns
-       */
-      TreeViewerColumn tvc;
-      TreeColumn tvcColumn;
-
-      // column: tags + tag categories
-      tvc = new TreeViewerColumn(_tagViewer, SWT.LEAD);
-      tvcColumn = tvc.getColumn();
-      tvc.setLabelProvider(new StyledCellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final StyledString styledString = new StyledString();
-
-            final Object element = cell.getElement();
-            if (element instanceof TVIPrefTag) {
-
-               final TourTag tourTag = ((TVIPrefTag) element).getTourTag();
-
-               styledString.append(tourTag.getTagName(), UI.TAG_STYLER);
-               cell.setImage(tourTag.isRoot() ? _imgTagRoot : _imgTag);
-
-            } else if (element instanceof TVIPrefTagCategory) {
-
-               final TVIPrefTagCategory tourTagCategoryItem = (TVIPrefTagCategory) element;
-               final TourTagCategory tourTagCategory = tourTagCategoryItem.getTourTagCategory();
-
-               cell.setImage(_imgTagCategory);
-
-               styledString.append(tourTagCategory.getCategoryName(), UI.TAG_CATEGORY_STYLER);
-
-               // get number of categories
-               final int categoryCounter = tourTagCategory.getCategoryCounter();
-               final int tagCounter = tourTagCategory.getTagCounter();
-               if (categoryCounter == -1 && tagCounter == -1) {
-
-//                  styledString.append("  ...", StyledString.COUNTER_STYLER);
-
-               } else {
-
-                  String categoryString = UI.EMPTY_STRING;
-                  if (categoryCounter > 0) {
-                     categoryString = "/" + categoryCounter; //$NON-NLS-1$
-                  }
-                  styledString.append("   " + tagCounter + categoryString, StyledString.QUALIFIER_STYLER); //$NON-NLS-1$
-               }
-
-            } else {
-               styledString.append(element.toString());
-            }
-
-            cell.setText(styledString.getString());
-            cell.setStyleRanges(styledString.getStyleRanges());
-         }
-      });
-      treeLayout.setColumnData(tvcColumn, new ColumnWeightData(100, true));
+      defineAllColumns(treeLayout);
    }
 
    private void createUI_30_Buttons(final Composite parent) {
@@ -520,7 +468,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
             _btnRename.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
-                  onAction_RenameTourTag();
+                  onAction_EditTag();
                }
             });
             setButtonLayoutData(_btnRename);
@@ -573,6 +521,98 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
                PreferencesUtil.createPreferenceDialogOn(getShell(), PrefPageAppearance.ID, null, null);
             }
          });
+      }
+   }
+
+   private void defineAllColumns(final TreeColumnLayout treeLayout) {
+      
+      TreeViewerColumn tvc;
+      TreeColumn tvcColumn;
+
+      {
+         // column: tags + tag categories
+
+         tvc = new TreeViewerColumn(_tagViewer, SWT.LEAD);
+         tvcColumn = tvc.getColumn();
+         tvcColumn.setText("Tags + Categories");
+         tvc.setLabelProvider(new StyledCellLabelProvider() {
+            @Override
+            public void update(final ViewerCell cell) {
+
+               final StyledString styledString = new StyledString();
+
+               final Object element = cell.getElement();
+               if (element instanceof TVIPrefTag) {
+
+                  final TourTag tourTag = ((TVIPrefTag) element).getTourTag();
+
+                  styledString.append(tourTag.getTagName(), UI.TAG_STYLER);
+                  cell.setImage(tourTag.isRoot() ? _imgTagRoot : _imgTag);
+
+               } else if (element instanceof TVIPrefTagCategory) {
+
+                  final TVIPrefTagCategory tourTagCategoryItem = (TVIPrefTagCategory) element;
+                  final TourTagCategory tourTagCategory = tourTagCategoryItem.getTourTagCategory();
+
+                  cell.setImage(_imgTagCategory);
+
+                  styledString.append(tourTagCategory.getCategoryName(), UI.TAG_CATEGORY_STYLER);
+
+                  // get number of categories
+                  final int categoryCounter = tourTagCategory.getCategoryCounter();
+                  final int tagCounter = tourTagCategory.getTagCounter();
+                  if (categoryCounter == -1 && tagCounter == -1) {
+
+//                  styledString.append("  ...", StyledString.COUNTER_STYLER);
+
+                  } else {
+
+                     String categoryString = UI.EMPTY_STRING;
+                     if (categoryCounter > 0) {
+                        categoryString = "/" + categoryCounter; //$NON-NLS-1$
+                     }
+                     styledString.append("   " + tagCounter + categoryString, StyledString.QUALIFIER_STYLER); //$NON-NLS-1$
+                  }
+
+               } else {
+                  styledString.append(element.toString());
+               }
+
+               cell.setText(styledString.getString());
+               cell.setStyleRanges(styledString.getStyleRanges());
+            }
+         });
+         treeLayout.setColumnData(tvcColumn, new ColumnWeightData(100, true));
+      }
+      {
+         // column: notes
+
+         tvc = new TreeViewerColumn(_tagViewer, SWT.LEAD);
+         tvcColumn = tvc.getColumn();
+         tvcColumn.setText("Notes");
+         tvc.setLabelProvider(new CellLabelProvider() {
+            @Override
+            public void update(final ViewerCell cell) {
+
+               String notes = UI.EMPTY_STRING;
+
+               final Object element = cell.getElement();
+               if (element instanceof TVIPrefTag) {
+
+                  final TourTag tourTag = ((TVIPrefTag) element).getTourTag();
+
+                  notes = tourTag.getNotes();
+
+               } else if (element instanceof TVIPrefTagCategory) {
+
+                  final TourTagCategory tourTagCategory = ((TVIPrefTagCategory) element).getTourTagCategory();
+
+                  notes = tourTagCategory.getNotes();
+               }
+               cell.setText(notes);
+            }
+         });
+         treeLayout.setColumnData(tvcColumn, new ColumnWeightData(100, true));
       }
    }
 
@@ -673,6 +713,65 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 //      saveFilterList();
 
       return true;
+   }
+
+   /**
+    * Rename selected tag/category
+    */
+   private void onAction_EditTag() {
+
+      final Object firstElement = _tagViewer.getStructuredSelection().getFirstElement();
+
+      String dlgMessage = UI.EMPTY_STRING;
+
+      if (firstElement instanceof TVIPrefTag) {
+
+         final TVIPrefTag tourTagItem = ((TVIPrefTag) firstElement);
+         final TourTag tourTag = tourTagItem.getTourTag();
+
+         dlgMessage = NLS.bind(Messages.Dialog_TourTag_Message_RenameTag, tourTag.getTagName());
+
+         if (new Dialog_TourTag(getShell(), dlgMessage, tourTag).open() != Window.OK) {
+
+            setFocusToViewer();
+
+            return;
+         }
+
+         // update model
+         TourDatabase.saveEntity(tourTag, tourTag.getTagId(), TourTag.class);
+
+         // update UI
+         _tagViewer.update(tourTagItem, new String[] { SORT_PROPERTY });
+
+      } else if (firstElement instanceof TVIPrefTagCategory) {
+
+         final TVIPrefTagCategory tagCategoryItem = (TVIPrefTagCategory) firstElement;
+         final TourTagCategory tourTagCategory = tagCategoryItem.getTourTagCategory();
+
+         dlgMessage = NLS.bind(Messages.Dialog_TourTagCategory_Message_RenameCategory, tourTagCategory.getCategoryName());
+
+         if (new Dialog_TourTag_Category(getShell(), dlgMessage, tourTagCategory).open() != Window.OK) {
+
+            setFocusToViewer();
+
+            return;
+         }
+
+         // update model
+         TourDatabase.saveEntity(tourTagCategory, tourTagCategory.getCategoryId(), TourTagCategory.class);
+
+         // update UI
+         _tagViewer.update(tagCategoryItem, new String[] { SORT_PROPERTY });
+
+      } else {
+
+         return;
+      }
+
+      _isModified = true;
+
+      setFocusToViewer();
    }
 
    private void onAction_NewCategory() {
@@ -951,61 +1050,6 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
       setFocusToViewer();
    }
 
-   /**
-    * Rename selected tag/category
-    */
-   private void onAction_RenameTourTag() {
-
-      final Object firstElement = _tagViewer.getStructuredSelection().getFirstElement();
-
-      String dlgMessage = UI.EMPTY_STRING;
-
-      if (firstElement instanceof TVIPrefTag) {
-
-         final TVIPrefTag tourTagItem = ((TVIPrefTag) firstElement);
-         final TourTag tourTag = tourTagItem.getTourTag();
-
-         dlgMessage = NLS.bind(Messages.Dialog_TourTag_Message_RenameTag, tourTag.getTagName());
-
-         if (new Dialog_TourTag(getShell(), dlgMessage, tourTag).open() != Window.OK) {
-
-            setFocusToViewer();
-
-            return;
-         }
-
-         // update model
-         TourDatabase.saveEntity(tourTag, tourTag.getTagId(), TourTag.class);
-
-         // update UI
-         _tagViewer.update(tourTagItem, new String[] { SORT_PROPERTY });
-
-      } else if (firstElement instanceof TVIPrefTagCategory) {
-
-         final TVIPrefTagCategory tagCategoryItem = (TVIPrefTagCategory) firstElement;
-         final TourTagCategory tourTagCategory = tagCategoryItem.getTourTagCategory();
-
-         dlgMessage = NLS.bind(Messages.Dialog_TourTagCategory_Message_RenameCategory, tourTagCategory.getCategoryName());
-
-         if (new Dialog_TourTag_Category(getShell(), dlgMessage, tourTagCategory).open() != Window.OK) {
-
-            setFocusToViewer();
-
-            return;
-         }
-
-         // update model
-         TourDatabase.saveEntity(tourTagCategory, tourTagCategory.getCategoryId(), TourTagCategory.class);
-
-         // update UI
-         _tagViewer.update(tagCategoryItem, new String[] { SORT_PROPERTY });
-      }
-
-      _isModified = true;
-
-      setFocusToViewer();
-   }
-
    private void onAction_Reset() {
 
       final MessageDialog dialog = new MessageDialog(
@@ -1089,6 +1133,16 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
       setFocusToViewer();
    }
 
+   private void onTagTree_DoubleClick(final Event event) {
+
+      final boolean isCtrl = (event.stateMask & SWT.CTRL) != 0;
+
+      if (isCtrl) {
+
+         onAction_EditTag();
+      }
+   }
+
    private void onTagViewer_DoubleClick() {
 
       final Object selection = ((IStructuredSelection) _tagViewer.getSelection()).getFirstElement();
@@ -1097,7 +1151,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
          // tag is selected
 
-         onAction_RenameTourTag();
+         onAction_EditTag();
 
       } else if (selection instanceof TVIPrefTagCategory) {
 

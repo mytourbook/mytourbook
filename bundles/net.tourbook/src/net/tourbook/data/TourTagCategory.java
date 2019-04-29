@@ -125,6 +125,9 @@ public class TourTagCategory implements Cloneable, Comparable<Object> {
       return name;
    }
 
+   /**
+    * @return Returns notes or an empty string when not available
+    */
    public String getNotes() {
 
       if (notes == null) {

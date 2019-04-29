@@ -13,8 +13,8 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.tag;
- 
+package net.tourbook.ui.views.tagging;
+
 import java.util.HashMap;
 
 import net.tourbook.Messages;
@@ -22,11 +22,12 @@ import net.tourbook.common.util.ITourViewer;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.tag.Dialog_TourTag;
+import net.tourbook.tag.Dialog_TourTag_Category;
+import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
-import net.tourbook.ui.views.tagging.TVITagView_Tag;
-import net.tourbook.ui.views.tagging.TVITagView_TagCategory;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ColumnViewer;
@@ -48,15 +49,7 @@ public class ActionEditTag extends Action {
       _tourViewer = tourViewer;
    }
 
-   /**
-    * Edit selected tag/category
-    */
-   @Override
-   public void run() {
-
-      final ColumnViewer tagViewer = _tourViewer.getViewer();
-
-      final Object firstElement = tagViewer.getStructuredSelection().getFirstElement();
+   void editTag(final Object viewerCellData) {
 
       String dlgMessage = UI.EMPTY_STRING;
 
@@ -66,9 +59,9 @@ public class ActionEditTag extends Action {
       /*
        * Open dialog
        */
-      if (firstElement instanceof TVITagView_Tag) {
+      if (viewerCellData instanceof TVITagView_Tag) {
 
-         final TVITagView_Tag tourTagItem = ((TVITagView_Tag) firstElement);
+         final TVITagView_Tag tourTagItem = ((TVITagView_Tag) viewerCellData);
 
          final HashMap<Long, TourTag> allTourTags = TourDatabase.getAllTourTags();
 
@@ -85,9 +78,9 @@ public class ActionEditTag extends Action {
             return;
          }
 
-      } else if (firstElement instanceof TVITagView_TagCategory) {
+      } else if (viewerCellData instanceof TVITagView_TagCategory) {
 
-         final TVITagView_TagCategory tagCategoryItem = (TVITagView_TagCategory) firstElement;
+         final TVITagView_TagCategory tagCategoryItem = (TVITagView_TagCategory) viewerCellData;
 
          final HashMap<Long, TourTagCategory> allTourTagCategories = TourDatabase.getAllTourTagCategories();
          final TourTagCategory tagCategory = finalTagCategory[0] = allTourTagCategories.get(tagCategoryItem.getCategoryId());
@@ -103,6 +96,10 @@ public class ActionEditTag extends Action {
 
             return;
          }
+
+      } else {
+
+         return;
       }
 
       /*
@@ -110,24 +107,26 @@ public class ActionEditTag extends Action {
        */
       BusyIndicator.showWhile(Display.getCurrent(), () -> {
 
-         if (firstElement instanceof TVITagView_Tag) {
+         final ColumnViewer tagViewer = _tourViewer.getViewer();
+
+         if (viewerCellData instanceof TVITagView_Tag) {
 
             // update model
             final TourTag tourTag = finalTourTag[0];
             TourDatabase.saveEntity(tourTag, tourTag.getTagId(), TourTag.class);
 
             // update UI
-            final TVITagView_Tag tourTagItem = ((TVITagView_Tag) firstElement);
+            final TVITagView_Tag tourTagItem = ((TVITagView_Tag) viewerCellData);
             tagViewer.update(tourTagItem, null);
 
-         } else if (firstElement instanceof TVITagView_TagCategory) {
+         } else if (viewerCellData instanceof TVITagView_TagCategory) {
 
             // update model
             final TourTagCategory tagCategory = finalTagCategory[0];
             TourDatabase.saveEntity(tagCategory, tagCategory.getCategoryId(), TourTagCategory.class);
 
             // update UI
-            final TVITagView_TagCategory tagCategory_Item = ((TVITagView_TagCategory) firstElement);
+            final TVITagView_TagCategory tagCategory_Item = ((TVITagView_TagCategory) viewerCellData);
             tagViewer.update(tagCategory_Item, null);
          }
 
@@ -140,5 +139,18 @@ public class ActionEditTag extends Action {
          // fire modify event
          TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED);
       });
+   }
+
+   /**
+    * Edit selected tag/category
+    */
+   @Override
+   public void run() {
+
+      final ColumnViewer tagViewer = _tourViewer.getViewer();
+
+      final Object firstElement = tagViewer.getStructuredSelection().getFirstElement();
+
+      editTag(firstElement);
    }
 }

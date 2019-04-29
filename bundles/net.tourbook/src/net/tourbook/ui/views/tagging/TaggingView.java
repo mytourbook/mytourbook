@@ -42,7 +42,6 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageTags;
-import net.tourbook.tag.ActionEditTag;
 import net.tourbook.tag.ActionMenuSetAllTagStructures;
 import net.tourbook.tag.ActionMenuSetTagStructure;
 import net.tourbook.tag.ChangedTags;
@@ -191,6 +190,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    private ActionCollapseAll             _actionCollapseAll;
    private ActionCollapseOthers          _actionCollapseOthers;
    private ActionEditQuick               _actionEditQuick;
+   private ActionEditTag                 _actionEditTag;
    private ActionEditTour                _actionEditTour;
    private ActionExpandSelection         _actionExpandSelection;
    private ActionExport                  _actionExportTour;
@@ -200,7 +200,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    private ActionOpenTour                _actionOpenTour;
    private ActionOpenPrefDialog          _actionOpenTagPrefs;
    private ActionRefreshView             _actionRefreshView;
-   private ActionEditTag                 _actionEditTag;
    private ActionSetLayoutHierarchical   _actionSetLayoutHierarchical;
    private ActionSetLayoutFlat           _actionSetLayoutFlat;
    private ActionSetTourTypeMenu         _actionSetTourType;
@@ -638,7 +637,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
       // set tour info tooltip provider
       _tourInfoToolTip = new TreeViewerTourInfoToolTip(_tagViewer);
-      _tourInfoToolTip.setTooltipUIProvider(new TaggingView_TooltipUIProvider());
+      _tourInfoToolTip.setTooltipUIProvider(new TaggingView_TooltipUIProvider(this));
    }
 
    /**
@@ -1231,6 +1230,11 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       super.dispose();
    }
 
+   void editTag(final Object viewerCellData) {
+
+      _actionEditTag.editTag(viewerCellData);
+   }
+
    private void enableActions(final boolean isIterateTours) {
 
       final StructuredSelection selection = (StructuredSelection) _tagViewer.getSelection();
@@ -1560,8 +1564,9 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
       final Object selection = ((IStructuredSelection) _tagViewer.getSelection()).getFirstElement();
 
-      if (selection instanceof TVITagView_Tag ||
-            selection instanceof TVITagView_TagCategory) {
+      if (selection instanceof TVITagView_Tag || selection instanceof TVITagView_TagCategory) {
+
+         // edit tag/category
 
          _actionEditTag.run();
       }
