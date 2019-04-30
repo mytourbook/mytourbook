@@ -3173,11 +3173,11 @@ public class TourDatabase {
             //
             + "   isRoot               INTEGER,                                           \n" //$NON-NLS-1$
             + "   expandType           INTEGER,                                           \n" //$NON-NLS-1$
-            + "   name                 VARCHAR(" + TourTag.DB_LENGTH_NAME + ")            \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   name                 VARCHAR(" + TourTag.DB_LENGTH_NAME + "),           \n" //$NON-NLS-1$ //$NON-NLS-2$
 
             // version 38 start
             //
-            + "   notes                VARCHAR(" + TourTag.DB_LENGTH_NOTES + ")            \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   notes                VARCHAR(" + TourTag.DB_LENGTH_NOTES + ")           \n" //$NON-NLS-1$ //$NON-NLS-2$
             //
             // version 38 end ---------
 
@@ -3222,11 +3222,11 @@ public class TourDatabase {
             + SQL.CreateField_EntityId(ENTITY_ID_TAG_CATEGORY, true)
             //
             + "   isRoot               INTEGER,                                           \n" //$NON-NLS-1$
-            + "   name                 VARCHAR(" + TourTag.DB_LENGTH_NAME + ")    \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   name                 VARCHAR(" + TourTag.DB_LENGTH_NAME + "),           \n" //$NON-NLS-1$ //$NON-NLS-2$
 
             // version 38 start
             //
-            + "   notes                VARCHAR(" + TourTag.DB_LENGTH_NOTES + ")            \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   notes                VARCHAR(" + TourTag.DB_LENGTH_NOTES + ")           \n" //$NON-NLS-1$ //$NON-NLS-2$
             //
             // version 38 end ---------
 
