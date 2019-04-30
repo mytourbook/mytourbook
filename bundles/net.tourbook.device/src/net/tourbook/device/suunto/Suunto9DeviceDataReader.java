@@ -430,6 +430,8 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
          }
          _newlyImportedTours.put(tourId, tourData);
 
+         tourData.setDeviceName(SuuntoJsonProcessor.DeviceName);
+         
          tourData.computeAltitudeUpDown();
          tourData.computeTourDrivingTime();
          tourData.computeComputedValues();
