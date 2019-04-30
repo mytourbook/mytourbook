@@ -4,13 +4,22 @@ Version 19.5.0                                            ?. May 2019
 New   
 ===
 
-*
+* Tour Tag + Category
+
+  - New text field for tour tag/category which can contain text notes
+   
+  - Tagged Tours view
+    - Show tag/category notes in the new tooltip for tags/categories 
+  
+  - Tagging preferences
+    - New column to show tag/category notes
   
  
 Improvements   
 ============
 
 * Adjust Altitude
+
   - Whole tour is selected for SRTM adjustments
 
  

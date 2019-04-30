@@ -23,6 +23,7 @@ import javax.persistence.EntityManager;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
@@ -39,7 +40,6 @@ import net.tourbook.tag.TVIPrefTagRoot;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionCollapseAll;
 import net.tourbook.ui.action.ActionExpandSelection;
 
@@ -86,7 +86,6 @@ import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -132,7 +131,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
    private Button     _btnNewTag;
    private Button     _btnNewTagCategory;
-   private Button     _btnRename;
+   private Button     _btnEditTagOrCategory;
    private Button     _btnReset;
 
    /*
@@ -433,7 +432,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
       GridLayoutFactory.fillDefaults().applyTo(container);
       {
          {
-            // button: new tag
+            // Button: new tag
 
             _btnNewTag = new Button(container, SWT.NONE);
             _btnNewTag.setText(Messages.pref_tourtag_btn_new_tag);
@@ -443,11 +442,12 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
                   onAction_NewTag();
                }
             });
-            setButtonLayoutData(_btnNewTag);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_btnNewTag);
+//            setButtonLayoutData(_btnNewTag);
          }
 
          {
-            // button: new tag category
+            // Button: new tag category
 
             _btnNewTagCategory = new Button(container, SWT.NONE);
             _btnNewTagCategory.setText(Messages.pref_tourtag_btn_new_tag_category);
@@ -457,25 +457,28 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
                   onAction_NewCategory();
                }
             });
-            setButtonLayoutData(_btnNewTagCategory);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_btnNewTagCategory);
+//            setButtonLayoutData(_btnNewTagCategory);
          }
 
          {
-            // button: rename
+            // Button: edit tag or category
 
-            _btnRename = new Button(container, SWT.NONE);
-            _btnRename.setText(Messages.pref_tourtag_btn_rename);
-            _btnRename.addSelectionListener(new SelectionAdapter() {
+            _btnEditTagOrCategory = new Button(container, SWT.NONE);
+            // use wider text that the layout is not too small
+            _btnEditTagOrCategory.setText(Messages.Action_TagCategory_EditCategory);
+            _btnEditTagOrCategory.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
                   onAction_EditTag();
                }
             });
-            setButtonLayoutData(_btnRename);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_btnEditTagOrCategory);
+//            setButtonLayoutData(_btnEditTagOrCategory);
          }
 
          {
-            // button: reset
+            // Button: reset
 
             _btnReset = new Button(container, SWT.NONE);
             _btnReset.setText(Messages.pref_tourtag_btn_reset);
@@ -485,9 +488,10 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
                   onAction_Reset();
                }
             });
-            setButtonLayoutData(_btnReset);
-            final GridData gd = (GridData) _btnReset.getLayoutData();
-            gd.verticalIndent = 50;
+            GridDataFactory.fillDefaults().grab(true, false).indent(0, 50).applyTo(_btnReset);
+//            setButtonLayoutData(_btnReset);
+//            final GridData gd = (GridData) _btnReset.getLayoutData();
+//            gd.verticalIndent = 50;
          }
       }
    }
@@ -525,7 +529,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
    }
 
    private void defineAllColumns(final TreeColumnLayout treeLayout) {
-      
+
       TreeViewerColumn tvc;
       TreeColumn tvcColumn;
 
@@ -534,7 +538,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
          tvc = new TreeViewerColumn(_tagViewer, SWT.LEAD);
          tvcColumn = tvc.getColumn();
-         tvcColumn.setText("Tags + Categories");
+         tvcColumn.setText(Messages.PrefPageTags_1);
          tvc.setLabelProvider(new StyledCellLabelProvider() {
             @Override
             public void update(final ViewerCell cell) {
@@ -546,7 +550,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
                   final TourTag tourTag = ((TVIPrefTag) element).getTourTag();
 
-                  styledString.append(tourTag.getTagName(), UI.TAG_STYLER);
+                  styledString.append(tourTag.getTagName(), net.tourbook.ui.UI.TAG_STYLER);
                   cell.setImage(tourTag.isRoot() ? _imgTagRoot : _imgTag);
 
                } else if (element instanceof TVIPrefTagCategory) {
@@ -556,7 +560,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
                   cell.setImage(_imgTagCategory);
 
-                  styledString.append(tourTagCategory.getCategoryName(), UI.TAG_CATEGORY_STYLER);
+                  styledString.append(tourTagCategory.getCategoryName(), net.tourbook.ui.UI.TAG_CATEGORY_STYLER);
 
                   // get number of categories
                   final int categoryCounter = tourTagCategory.getCategoryCounter();
@@ -589,7 +593,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
          tvc = new TreeViewerColumn(_tagViewer, SWT.LEAD);
          tvcColumn = tvc.getColumn();
-         tvcColumn.setText("Notes");
+         tvcColumn.setText(Messages.PrefPageTags_2);
          tvc.setLabelProvider(new CellLabelProvider() {
             @Override
             public void update(final ViewerCell cell) {
@@ -609,7 +613,10 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
                   notes = tourTagCategory.getNotes();
                }
-               cell.setText(notes);
+
+               final String shortedNotes = UI.shortenText(notes, 200, true);
+
+               cell.setText(shortedNotes);
             }
          });
          treeLayout.setColumnData(tvcColumn, new ColumnWeightData(100, true));
@@ -630,22 +637,39 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
    private void enableButtons() {
 
-      final IStructuredSelection selectedTags = (IStructuredSelection) _tagViewer.getSelection();
-      final Object selection = selectedTags.getFirstElement();
+      final IStructuredSelection selectedItems = (IStructuredSelection) _tagViewer.getSelection();
+      final Object selection = selectedItems.getFirstElement();
 
-      boolean isTourTag = false;
-      boolean isTagCategory = false;
+      boolean isTagSelected = false;
+      boolean isCategorySelected = false;
       final boolean isSelection = selection != null;
 
       if (selection instanceof TVIPrefTag) {
-         isTourTag = true;
+         isTagSelected = true;
       } else if (selection instanceof TVIPrefTagCategory) {
-         isTagCategory = true;
+         isCategorySelected = true;
       }
 
-      _btnNewTag.setEnabled(isSelection == false || isTagCategory == true && isTourTag == false);
-      _btnNewTagCategory.setEnabled(isSelection == false || isTagCategory == true && isTourTag == false);
-      _btnRename.setEnabled(selectedTags.size() == 1);
+      _btnNewTag.setEnabled(isSelection == false || isCategorySelected == true && isTagSelected == false);
+      _btnNewTagCategory.setEnabled(isSelection == false || isCategorySelected == true && isTagSelected == false);
+
+      if (selectedItems.size() == 1) {
+
+         if (isTagSelected) {
+
+            _btnEditTagOrCategory.setText(Messages.Action_Tag_Edit);
+            _btnEditTagOrCategory.setEnabled(true);
+
+         } else if (isCategorySelected) {
+
+            _btnEditTagOrCategory.setText(Messages.Action_TagCategory_EditCategory);
+            _btnEditTagOrCategory.setEnabled(true);
+         }
+
+      } else {
+
+         _btnEditTagOrCategory.setEnabled(false);
+      }
    }
 
    /**
@@ -655,7 +679,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
       final ToolBarManager tbm = new ToolBarManager(_toolBar);
 
-      tbm.add(new ActionExpandSelection(this));
+      tbm.add(new ActionExpandSelection(this, true));
       tbm.add(new ActionCollapseAll(this));
 
       tbm.update(true);
@@ -1127,7 +1151,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
          _isModified = true;
 
       } catch (final SQLException e) {
-         UI.showSQLException(e);
+         net.tourbook.ui.UI.showSQLException(e);
       }
 
       setFocusToViewer();

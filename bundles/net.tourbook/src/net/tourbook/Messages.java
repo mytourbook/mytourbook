@@ -320,6 +320,7 @@ public class Messages extends NLS {
 
    public static String        Action_TagCategory_Edit;
    public static String        Action_TagCategory_Edit_Tooltip;
+   public static String        Action_TagCategory_EditCategory;
 
    public static String        Action_TourType_ModifyTourTypeFilter;
 
@@ -1720,6 +1721,10 @@ public class Messages extends NLS {
    public static String PrefPage_ViewTooltip_Label_Title;
    public static String PrefPage_ViewTooltip_Label_TourBook;
    public static String PrefPage_ViewTooltip_Label_WeekDay;
+
+   public static String PrefPageTags_1;
+
+   public static String PrefPageTags_2;
 
    public static String PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_down;
    public static String PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_up;
