@@ -9,7 +9,7 @@
 plugins {
 
     // osgi bundle support
-	id 'com.diffplug.gradle.osgi.bndmanifest' version '3.7.0'
+	id 'com.diffplug.gradle.osgi.bndmanifest' version '3.17.6'
 }
 
 apply plugin: 'java'
