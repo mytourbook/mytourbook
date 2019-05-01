@@ -2,7 +2,7 @@
 <classpath>
 	<classpathentry path="bin" kind="output"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8/"/>
-	<classpathentry kind="lib" path="libs/vtm.jar" exported="true" sourcepath="/vtm"/>
+	<classpathentry kind="lib" path="libs/vtm.jar" exported="true" sourcepath="/vtm-parent"/>
 	<classpathentry kind="lib" path="libs/vtm-desktop.jar" exported="true" sourcepath="/vtm-desktop"/>
 	<classpathentry kind="lib" path="libs/vtm-gdx.jar" exported="true" sourcepath="/vtm-gdx"/>
 	<classpathentry kind="lib" path="libs/vtm-themes.jar" exported="true" sourcepath="/vtm-themes"/>
