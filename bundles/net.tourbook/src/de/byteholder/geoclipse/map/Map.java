@@ -69,6 +69,7 @@ import net.tourbook.common.util.TourToolTip;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourWayPoint;
+import net.tourbook.map2.action.ActionCreateMarker;
 import net.tourbook.map2.view.Map2View;
 import net.tourbook.map2.view.WayPointToolTipProvider;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -1253,6 +1254,20 @@ public class Map extends Canvas {
          rect.add(new Rectangle(point.x, point.y, 0, 0));
       }
       return rect;
+   }
+
+   public long getHoveredTourId()
+   {
+      if (isTourHovered()) {
+      if (_allHoveredTourIds != null) {
+         if (_allHoveredTourIds.size() == 1) {
+            return _allHoveredTourIds.get(0);
+         }
+      }
+      }
+
+      return Integer.MIN_VALUE;
+      // return _allHoveredTourIds != null && _allHoveredTourIds.size() == 1 ? _allHoveredTourIds.get(0) : null;
    }
 
    /**
@@ -2585,6 +2600,11 @@ public class Map extends Canvas {
          final double x = _worldPixel_TopLeft_Viewport.x + mouseEvent.x;
          final double y = _worldPixel_TopLeft_Viewport.y + mouseEvent.y;
 
+         // TODO: We need the lat lon of the current mouse cursor
+         //Big picture : double click, or activate first the marker creation and then click on a point ?, right click?
+
+         final ActionCreateMarker toto = new ActionCreateMarker(null, this);
+         toto.run();
          setMapCenterInWorldPixel(new Point2D.Double(x, y));
 
          // ensure that all internal data are correctly setup
@@ -3901,6 +3921,11 @@ public class Map extends Canvas {
       final String textMovingTime = String.format(VALUE_FORMAT_2,
             TOUR_TOOLTIP_LABEL_MOVING_TIME,
             FormatManager.formatDrivingTime(movingTime));
+
+      final Point2D.Double worldPixel_Start = new Point2D.Double(devXMouse, devYMouse);
+
+      final GeoPosition geoStart = _mp.pixelToGeo(worldPixel_Start, _mapZoomLevel);
+
 
       final float distance = tourData.getTourDistance() / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
       final String textDistance = String.format(VALUE_FORMAT_3,
