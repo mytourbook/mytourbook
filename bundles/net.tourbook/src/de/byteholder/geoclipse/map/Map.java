@@ -757,7 +757,8 @@ public class Map extends Canvas {
       addMouseTrackListener(new MouseTrackListener() {
 
          @Override
-         public void mouseEnter(final MouseEvent e) {}
+         public void mouseEnter(final MouseEvent e) {
+         }
 
          @Override
          public void mouseExit(final MouseEvent e) {
@@ -765,7 +766,8 @@ public class Map extends Canvas {
          }
 
          @Override
-         public void mouseHover(final MouseEvent e) {}
+         public void mouseHover(final MouseEvent e) {
+         }
       });
 
       addMouseMoveListener(new MouseMoveListener() {
@@ -1255,19 +1257,17 @@ public class Map extends Canvas {
       return rect;
    }
 
-   public long getHoveredTourId()
-   {
-      final long toto = _hovered_SelectedTourId;
-      if (isTourHovered()) {
-      if (_allHoveredTourIds != null) {
-         if (_allHoveredTourIds.size() == 1) {
-            return _allHoveredTourIds.get(0);
-         }
-      }
+   /**
+    * Retrieve, if any, the current tour hovered by the user.
+    *
+    * @return If found, the current hovered tour, the smallest integer otherwise.
+    */
+   public long getHoveredTourId() {
+      if (_allHoveredTourIds != null && _allHoveredTourIds.size() == 1) {
+         return _allHoveredTourIds.get(0);
       }
 
       return Integer.MIN_VALUE;
-      // return _allHoveredTourIds != null && _allHoveredTourIds.size() == 1 ? _allHoveredTourIds.get(0) : null;
    }
 
    /**
@@ -3916,11 +3916,6 @@ public class Map extends Canvas {
       final String textMovingTime = String.format(VALUE_FORMAT_2,
             TOUR_TOOLTIP_LABEL_MOVING_TIME,
             FormatManager.formatDrivingTime(movingTime));
-
-      final Point2D.Double worldPixel_Start = new Point2D.Double(devXMouse, devYMouse);
-
-      final GeoPosition geoStart = _mp.pixelToGeo(worldPixel_Start, _mapZoomLevel);
-
 
       final float distance = tourData.getTourDistance() / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
       final String textDistance = String.format(VALUE_FORMAT_3,
