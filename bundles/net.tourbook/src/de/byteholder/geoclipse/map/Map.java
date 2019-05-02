@@ -69,7 +69,6 @@ import net.tourbook.common.util.TourToolTip;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourWayPoint;
-import net.tourbook.map2.action.ActionCreateMarker;
 import net.tourbook.map2.view.Map2View;
 import net.tourbook.map2.view.WayPointToolTipProvider;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -1258,6 +1257,7 @@ public class Map extends Canvas {
 
    public long getHoveredTourId()
    {
+      final long toto = _hovered_SelectedTourId;
       if (isTourHovered()) {
       if (_allHoveredTourIds != null) {
          if (_allHoveredTourIds.size() == 1) {
@@ -2600,11 +2600,6 @@ public class Map extends Canvas {
          final double x = _worldPixel_TopLeft_Viewport.x + mouseEvent.x;
          final double y = _worldPixel_TopLeft_Viewport.y + mouseEvent.y;
 
-         // TODO: We need the lat lon of the current mouse cursor
-         //Big picture : double click, or activate first the marker creation and then click on a point ?, right click?
-
-         final ActionCreateMarker toto = new ActionCreateMarker(null, this);
-         toto.run();
          setMapCenterInWorldPixel(new Point2D.Double(x, y));
 
          // ensure that all internal data are correctly setup

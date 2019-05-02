@@ -1451,7 +1451,7 @@ public class Map2View extends ViewPart implements
       _actionEditMap2Preferences = new ActionOpenPrefDialog(Messages.Map_Action_Edit2DMapPreferences, PrefPageMap2Appearance.ID);
 
       _actionMap2_Color = new ActionMap2Color();
-      _actionMap2_CreateMarker = new ActionCreateMarker(this, null);
+      _actionMap2_CreateMarker = new ActionCreateMarker(this);
       _actionMap2_Options = new ActionMap2_Options();
       _actionSearchTourByLocation = new ActionSearchTourByLocation();
       _actionSelectMapProvider = new ActionSelectMapProvider(this);
@@ -1922,6 +1922,12 @@ public class Map2View extends ViewPart implements
       menuMgr.add(_actionShowSliderInMap);
       menuMgr.add(_actionShowSliderInLegend);
       menuMgr.add(_actionMap2_CreateMarker);
+      if (_map.getHoveredTourId() == Integer.MIN_VALUE) {
+         _actionMap2_CreateMarker.setEnabled(false);
+      } else {
+         _actionMap2_CreateMarker.setEnabled(true);
+         _actionMap2_CreateMarker.setCurrentHoverTourId(_map.getHoveredTourId());
+      }
 
       menuMgr.add(new Separator());
       menuMgr.add(_actionShowTourMarker);
