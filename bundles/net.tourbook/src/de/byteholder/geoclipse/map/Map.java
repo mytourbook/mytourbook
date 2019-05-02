@@ -542,7 +542,6 @@ public class Map extends Canvas {
 
    private boolean             _grid_Label_IsHovered;
    private Rectangle           _grid_Label_Outline;
-   private String              _grid_Label_Text;
    private GeoPosition         _grid_MapGeoCenter;
    private int                 _grid_MapZoomLevel;
 
@@ -3509,7 +3508,6 @@ public class Map extends Canvas {
          bgColor = Display.getCurrent().getSystemColor(SWT.COLOR_GREEN);
       }
 
-      _grid_Label_Text = mapGridData.gridBox_Text;
       _grid_Label_Outline = paint_Text_Label(gc,
             devTopLeft.x,
             devTopLeft.y,
