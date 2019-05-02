@@ -15,6 +15,10 @@
  *******************************************************************************/
 package net.tourbook.map2.action;
 
+import com.javadocmd.simplelatlng.LatLng;
+import com.javadocmd.simplelatlng.LatLngTool;
+import com.javadocmd.simplelatlng.util.LengthUnit;
+
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -44,13 +48,6 @@ public class ActionCreateMarker extends Action {
 
    @Override
 public void run() {
-   //TODO was the click made on the track ??
-      final double lat = this._mapView.getMapLocation().getMapPosition().getLatitude();
-      final double lon = this._mapView.getMapLocation().getMapPosition().getLongitude();
-
-
-
-
 
       final TourData tourData = TourManager.getTour(_currentHoverTourId);
 
@@ -58,27 +55,31 @@ public void run() {
          return;
       }
 
-      int tourClickedIndex = -1;
-      final double closestLatitudeDistance = Double.MAX_VALUE;
-      final int closestLatitudeIndex = -1;
+      final double clickedTourPointLatitude = this._mapView.getMapLocation().getMapPosition().getLatitude();
+      final double clickedTourPointLongitude = this._mapView.getMapLocation().getMapPosition().getLongitude();
+
+      final LatLng clickedTourPoint = new LatLng(clickedTourPointLatitude, clickedTourPointLongitude);
+      double closestDistance = Double.MAX_VALUE;
+      int closestLatLongIndex = -1;
       for (int index = 0; index < tourData.latitudeSerie.length; ++index)
       {
-         final long currentDistanceDifference = Math.abs(tourData.latitudeSerie[index] - lat);
-         if (currentDistanceDifference < closestLatitudeDistance) {
-            closestLatitudeDistance = currentDistanceDifference;
-            closestLatitudeIndex = index;
-         }
-
-         if (tourData.latitudeSerie[index] == lat && tourData.longitudeSerie[index] == lon) {
-            tourClickedIndex = index;
-            break;
+         final LatLng currentLocation = new LatLng(tourData.latitudeSerie[index],
+               tourData.longitudeSerie[index]);
+         final double currentDistanceToClickedTourPoint = LatLngTool.distance(clickedTourPoint, currentLocation, LengthUnit.METER);
+         if (currentDistanceToClickedTourPoint < closestDistance) {
+            closestDistance = currentDistanceToClickedTourPoint;
+            closestLatLongIndex = index;
          }
       }
 
-      final TourMarker newTourMarker = new TourMarker();
-      newTourMarker.setGeoPosition(lat, lon);
+      if(closestLatLongIndex == -1) {
+         return;
+      }
 
-      final int relativeTourTime = tourData.timeSerie[tourClickedIndex];
+      final TourMarker newTourMarker = new TourMarker();
+      newTourMarker.setGeoPosition(tourData.latitudeSerie[closestLatLongIndex], tourData.longitudeSerie[closestLatLongIndex]);
+
+      final int relativeTourTime = tourData.timeSerie[closestLatLongIndex];
       final float[] altitudeSerie = tourData.altitudeSerie;
       final float[] distSerie = tourData.getMetricDistanceSerie();
       final double[] latitudeSerie = tourData.latitudeSerie;
@@ -86,21 +87,21 @@ public void run() {
 
       // create a new marker
       final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_CUSTOM);
-      tourMarker.setSerieIndex(tourClickedIndex);
+      tourMarker.setSerieIndex(closestLatLongIndex);
       tourMarker.setLabel("Tdedededed");
       tourMarker.setTime(relativeTourTime, tourData.getTourStartTimeMS() + (relativeTourTime * 1000));
 
       if (altitudeSerie != null) {
-         tourMarker.setAltitude(altitudeSerie[tourClickedIndex]);
+         tourMarker.setAltitude(altitudeSerie[closestLatLongIndex]);
          //tourMarker.setDescription("#alti: " + (int)altitudeSerie[serieIndex] + " m");
       }
 
       if (distSerie != null) {
-         tourMarker.setDistance(distSerie[tourClickedIndex]);
+         tourMarker.setDistance(distSerie[closestLatLongIndex]);
       }
 
       if (latitudeSerie != null) {
-         tourMarker.setGeoPosition(latitudeSerie[tourClickedIndex], longitudeSerie[tourClickedIndex]);
+         tourMarker.setGeoPosition(latitudeSerie[closestLatLongIndex], longitudeSerie[closestLatLongIndex]);
       }
 
    final DialogMarker markerDialog = new DialogMarker(Display.getCurrent().getActiveShell(), tourData, newTourMarker);

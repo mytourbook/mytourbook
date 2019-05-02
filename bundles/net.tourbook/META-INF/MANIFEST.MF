@@ -55,6 +55,7 @@ Export-Package: de.byteholder.geoclipse.map,
  net.tourbook.ui.tourChart,
  net.tourbook.ui.views.rawData
 Import-Package: cop.swt.widgets.viewers.table.celleditors,
+ com.javadocmd.simplelatlng,
  net.tourbook.chart,
  net.tourbook.common,
  net.tourbook.common.action,
