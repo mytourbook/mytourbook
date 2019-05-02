@@ -34,6 +34,7 @@ public class Messages extends NLS {
    public static String        Image_Action_POI;
    public static String        Image_Action_POI_Disabled;
 
+   public static String        Image_Action_CreateMarkerFromMap;
    public static String        Image_Action_ShowAllPhotosInMap;
    public static String        Image_Action_ShowAllPhotosInMap_Disabled;
    public static String        Image_Action_ShowPhotosInMap;
@@ -96,6 +97,7 @@ public class Messages extends NLS {
    public static String        map_action_save_default_position;
    public static String        map_action_set_default_position;
 
+   public static String        Map_Action_CreateMarkerFromMap;
    public static String        Map_Action_Edit2DMapPreferences;
 
    public static String        Map_Action_ManageMapProviders;

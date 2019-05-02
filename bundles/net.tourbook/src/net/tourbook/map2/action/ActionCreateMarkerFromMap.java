@@ -32,26 +32,26 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Display;
 
-public class ActionCreateMarker extends Action {
+public class ActionCreateMarkerFromMap extends Action {
 
-	private Map2View	_mapView;
+   private Map2View _mapView;
    private long     _currentHoverTourId;
 
-   public ActionCreateMarker(final Map2View mapView) {
+   public ActionCreateMarkerFromMap(final Map2View mapView) {
 
-      super("TOTO", AS_CHECK_BOX);
+      super(Messages.Map_Action_CreateMarkerFromMap, AS_PUSH_BUTTON);
 
-		_mapView = mapView;
+      _mapView = mapView;
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_Action_ShowSliderInMap));
-	}
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_Action_CreateMarkerFromMap));
+   }
 
    @Override
-public void run() {
+   public void run() {
 
       final TourData tourData = TourManager.getTour(_currentHoverTourId);
 
-      if(tourData == null) {
+      if (tourData == null) {
          return;
       }
 
@@ -61,8 +61,7 @@ public void run() {
       final LatLng clickedTourPoint = new LatLng(clickedTourPointLatitude, clickedTourPointLongitude);
       double closestDistance = Double.MAX_VALUE;
       int closestLatLongIndex = -1;
-      for (int index = 0; index < tourData.latitudeSerie.length; ++index)
-      {
+      for (int index = 0; index < tourData.latitudeSerie.length; ++index) {
          final LatLng currentLocation = new LatLng(tourData.latitudeSerie[index],
                tourData.longitudeSerie[index]);
          final double currentDistanceToClickedTourPoint = LatLngTool.distance(clickedTourPoint, currentLocation, LengthUnit.METER);
@@ -72,12 +71,9 @@ public void run() {
          }
       }
 
-      if(closestLatLongIndex == -1) {
+      if (closestLatLongIndex == -1) {
          return;
       }
-
-      final TourMarker newTourMarker = new TourMarker();
-      newTourMarker.setGeoPosition(tourData.latitudeSerie[closestLatLongIndex], tourData.longitudeSerie[closestLatLongIndex]);
 
       final int relativeTourTime = tourData.timeSerie[closestLatLongIndex];
       final float[] altitudeSerie = tourData.altitudeSerie;
@@ -88,12 +84,10 @@ public void run() {
       // create a new marker
       final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_CUSTOM);
       tourMarker.setSerieIndex(closestLatLongIndex);
-      tourMarker.setLabel("Tdedededed");
       tourMarker.setTime(relativeTourTime, tourData.getTourStartTimeMS() + (relativeTourTime * 1000));
 
       if (altitudeSerie != null) {
          tourMarker.setAltitude(altitudeSerie[closestLatLongIndex]);
-         //tourMarker.setDescription("#alti: " + (int)altitudeSerie[serieIndex] + " m");
       }
 
       if (distSerie != null) {
@@ -104,19 +98,18 @@ public void run() {
          tourMarker.setGeoPosition(latitudeSerie[closestLatLongIndex], longitudeSerie[closestLatLongIndex]);
       }
 
-   final DialogMarker markerDialog = new DialogMarker(Display.getCurrent().getActiveShell(), tourData, newTourMarker);
+      final DialogMarker markerDialog = new DialogMarker(Display.getCurrent().getActiveShell(), tourData, tourMarker);
 
-   markerDialog.create();
-   markerDialog.addTourMarker(newTourMarker);
+      markerDialog.create();
+      markerDialog.addTourMarker(tourMarker);
 
-   if (markerDialog.open() == Window.OK) {
-      TourManager.saveModifiedTour(tourData);
+      if (markerDialog.open() == Window.OK) {
+         TourManager.saveModifiedTour(tourData);
+      }
    }
-}
 
-	public void setCurrentHoverTourId(final long tourId)
-     {
-        _currentHoverTourId = tourId;
-     }
+   public void setCurrentHoverTourId(final long tourId) {
+      _currentHoverTourId = tourId;
+   }
 
 }
