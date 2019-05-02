@@ -53,7 +53,8 @@ import org.eclipse.swt.widgets.Display;
 import org.oscim.awt.AwtGraphics;
 import org.oscim.backend.GLAdapter;
 import org.oscim.backend.CanvasAdapter;
-
+import org.oscim.backend.DateTime;
+import org.oscim.backend.DateTimeAdapter;
 //import org.ocsim.backend
 import org.oscim.core.MapPosition;
 import org.oscim.core.MercatorProjection;
@@ -252,6 +253,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 		GLAdapter.init(new LwjglGL20());
 
 		GLAdapter.GDX_DESKTOP_QUIRKS = true;
+		
+      DateTimeAdapter.init(new DateTime());
 	}
 
 	@Override
