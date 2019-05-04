@@ -2877,6 +2877,13 @@ public class TourDatabase {
             //
             // version 37 end ---------
 
+            // version 38 start  -  19.5
+            //
+            + " training_ImpactOfTraining             FLOAT    DEFAULT 0,                 \n" //$NON-NLS-1$
+            + " training_PerformanceLevel             FLOAT    DEFAULT 0,                 \n" //$NON-NLS-1$
+            //
+            // version 38 end 
+
             //            // version 35 start  -  18.?
             //            //
             //            + " LatitudeMinE6         INTEGER DEFAULT 0,                        \n" //$NON-NLS-1$
@@ -6982,8 +6989,11 @@ public class TourDatabase {
 // SET_FORMATTING_OFF
 
             // Add new columns
-            SQL.AddCol_VarCar(stmt, TABLE_TOUR_TAG,            "notes", TourTag.DB_LENGTH_NOTES); //$NON-NLS-1$
-            SQL.AddCol_VarCar(stmt, TABLE_TOUR_TAG_CATEGORY,   "notes", TourTag.DB_LENGTH_NOTES); //$NON-NLS-1$
+            SQL.AddCol_VarCar (stmt, TABLE_TOUR_TAG,              "notes", TourTag.DB_LENGTH_NOTES);        //$NON-NLS-1$
+            SQL.AddCol_VarCar (stmt, TABLE_TOUR_TAG_CATEGORY,     "notes", TourTag.DB_LENGTH_NOTES);        //$NON-NLS-1$
+
+            SQL.AddCol_Float  (stmt, TABLE_TOUR_DATA,             "training_ImpactOfTraining",  DEFAULT_0); //$NON-NLS-1$
+            SQL.AddCol_Float  (stmt, TABLE_TOUR_DATA,             "training_PerformanceLevel",  DEFAULT_0); //$NON-NLS-1$
 
 // SET_FORMATTING_ON
          }

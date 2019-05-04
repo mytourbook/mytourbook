@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -174,7 +174,13 @@ public class TVITourBookYearSub extends TVITourBookItem {
             + "surfing_MinSpeed_Surfing, " //               72   //$NON-NLS-1$
             + "surfing_MinTimeDuration, " //                73   //$NON-NLS-1$
             + "surfing_IsMinDistance, " //                  74   //$NON-NLS-1$
-            + "surfing_MinDistance" //                      75   //$NON-NLS-1$
+            + "surfing_MinDistance," //                     75   //$NON-NLS-1$
+
+            //
+            // ---------- TRAINING -------------
+            //
+            + "training_ImpactOfTraining, " //              76   //$NON-NLS-1$
+            + "training_PerformanceLevel " //               77   //$NON-NLS-1$
 
             + UI.NEW_LINE
 
@@ -357,6 +363,11 @@ public class TVITourBookYearSub extends TVITourBookItem {
 
                tourItem.col_Surfing_IsMinDistance           = result.getBoolean(74);
                tourItem.col_Surfing_MinDistance             = result.getShort(75);
+
+               // ---------- TRAINING -------------
+
+               tourItem.colTraining_ImpactOfTraining        = result.getFloat(76);
+               tourItem.colTraining_PerformanceLevel        = result.getFloat(77);
 
 // SET_FORMATTING_ON
 

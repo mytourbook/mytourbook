@@ -49,7 +49,7 @@ public class MesgListener_Session extends AbstractMesgListener implements Sessio
 //
 // !!!!
 //      This problem is corrected in FIT SDK 14.10 but it took me several days to investigate it
-//		and then came the idea to check for a new FIT SDK which solved this problem.
+//    and then came the idea to check for a new FIT SDK which solved this problem.
 // !!!!
 
       final ZonedDateTime tourStartTime = TimeTools.getZonedDateTime(startTime.getDate().getTime());
@@ -169,7 +169,7 @@ public class MesgListener_Session extends AbstractMesgListener implements Sessio
       
       Float totalTrainingEffect = mesg.getTotalTrainingEffect();
       if (totalTrainingEffect != null) {
-//         tourData.setTraining_TotalTrainingEffect(totalTrainingEffect);
+         tourData.setTraining_ImpactOfTraining(totalTrainingEffect);
       }
 
       fitData.onSetup_Session_20_Finalize();

@@ -116,8 +116,10 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory TOUR_TYPE;
    public static final TreeColumnFactory TOUR_TYPE_TEXT;
 
-   public static final TreeColumnFactory TRAINING_INTENSITY_FACTOR;
    public static final TreeColumnFactory TRAINING_FTP;
+   public static final TreeColumnFactory TRAINING_IMPACT_OF_TRAINING;
+   public static final TreeColumnFactory TRAINING_INTENSITY_FACTOR;
+   public static final TreeColumnFactory TRAINING_PERFORMANCE_LEVEL;
    public static final TreeColumnFactory TRAINING_POWER_TO_WEIGHT;
    public static final TreeColumnFactory TRAINING_STRESS_SCORE;
 
@@ -1724,7 +1726,7 @@ public abstract class TreeColumnFactory {
             colDef.setColumnHeaderText(Messages.ColumnFactory_TimeZoneDifference_Header);
 
 // !!! THIS MUST BE SET IN THE VIEW TO SET THE CORRECT DEFAULT TIME ZONE !!!
-//				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_TimeZone_Tooltip);
+//          colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_TimeZone_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
@@ -2025,6 +2027,32 @@ public abstract class TreeColumnFactory {
          }
       };
 
+      TRAINING_IMPACT_OF_TRAINING = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(//
+                  columnManager,
+                  "TRAINING_IMPACT_OF_TRAINING", //$NON-NLS-1$
+                  SWT.TRAIL);
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Training);
+            colDef.setColumnLabel(Messages.ColumnFactory_Training_ImpactOfTraining_Label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_Training_ImpactOfTraining_Header);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Training_ImpactOfTraining_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
+            colDef.setValueFormats(
+                  ValueFormatSet.Number,
+                  ValueFormat.NUMBER_1_2,
+                  ValueFormat.NUMBER_1_2,
+                  columnManager);
+
+            return colDef;
+         }
+      };
+
       TRAINING_INTENSITY_FACTOR = new TreeColumnFactory() {
          @Override
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
@@ -2039,6 +2067,32 @@ public abstract class TreeColumnFactory {
             colDef.setColumnLabel(Messages.ColumnFactory_Power_IntensityFactor_Label);
             colDef.setColumnHeaderText(Messages.ColumnFactory_Power_IntensityFactor_Header);
             colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Power_IntensityFactor_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
+            colDef.setValueFormats(
+                  ValueFormatSet.Number,
+                  ValueFormat.NUMBER_1_2,
+                  ValueFormat.NUMBER_1_2,
+                  columnManager);
+
+            return colDef;
+         }
+      };
+
+      TRAINING_PERFORMANCE_LEVEL = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(//
+                  columnManager,
+                  "TRAINING_PERFORMANCE_LEVEL", //$NON-NLS-1$
+                  SWT.TRAIL);
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Training);
+            colDef.setColumnLabel(Messages.ColumnFactory_Training_PerformanceLevel_Label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_Training_PerformanceLevel_Header);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Training_PerformanceLevel_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
             colDef.setValueFormats(

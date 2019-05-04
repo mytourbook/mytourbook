@@ -153,8 +153,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 // SET_FORMATTING_OFF
 
-	private static final String				COLUMN_FACTORY_TIME_ZONE_DIFF_TOOLTIP				= net.tourbook.ui.Messages.ColumnFactory_TimeZoneDifference_Tooltip;
-	private static final String				GRAPH_LABEL_HEARTBEAT_UNIT								= net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
+   private static final String            COLUMN_FACTORY_TIME_ZONE_DIFF_TOOLTIP           = net.tourbook.ui.Messages.ColumnFactory_TimeZoneDifference_Tooltip;
+   private static final String            GRAPH_LABEL_HEARTBEAT_UNIT                      = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
 
 // SET_FORMATTING_ON
 
@@ -479,10 +479,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       exportCSV(selection, selectedFilePath);
 
-//		// DEBUGGING: USING DEFAULT PATH
-//		final IPath path = new Path(defaultExportFilePath).removeLastSegments(1).append(defaultExportFileName);
+//    // DEBUGGING: USING DEFAULT PATH
+//    final IPath path = new Path(defaultExportFilePath).removeLastSegments(1).append(defaultExportFileName);
 //
-//		exportCSV(selection, path.toOSString());
+//    exportCSV(selection, path.toOSString());
    }
 
    void actionSelectYearMonthTours() {
@@ -962,6 +962,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       defineColumn_Training_PowerToWeightRatio();
       defineColumn_Training_IntensityFactor();
       defineColumn_Training_StressScore();
+      defineColumn_Training_ImpactOfTraining();
+      defineColumn_Training_PerformanceLevel();
 
       // Running dynamics
       defineColumn_RunDyn_StanceTime_Min();
@@ -2774,6 +2776,27 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    }
 
    /**
+    * Column: Training: Impact of training
+    */
+   private void defineColumn_Training_ImpactOfTraining() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.TRAINING_IMPACT_OF_TRAINING.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            final double value = ((TVITourBookItem) element).colTraining_ImpactOfTraining;
+
+            colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
     * column: PowerIntensityFactor
     */
    private void defineColumn_Training_IntensityFactor() {
@@ -2788,6 +2811,27 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
             final Object element = cell.getElement();
             final double value = ((TVITourBookItem) element).colPower_IntensityFactor;
+
+            colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
+    * Column: Training - Performance level
+    */
+   private void defineColumn_Training_PerformanceLevel() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.TRAINING_PERFORMANCE_LEVEL.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            final double value = ((TVITourBookItem) element).colTraining_PerformanceLevel;
 
             colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
@@ -2816,7 +2860,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    }
 
    /**
-    * column: PowerTrainingStressScore
+    * Column: PowerTrainingStressScore
     */
    private void defineColumn_Training_StressScore() {
 
@@ -4344,29 +4388,29 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
                      /**
                       * <code>
 
-                     	Caused by: java.lang.NullPointerException
-                     	at org.eclipse.jface.viewers.AbstractTreeViewer.getSelection(AbstractTreeViewer.java:2956)
-                     	at org.eclipse.jface.viewers.StructuredViewer.handleSelect(StructuredViewer.java:1211)
-                     	at org.eclipse.jface.viewers.StructuredViewer$4.widgetSelected(StructuredViewer.java:1241)
-                     	at org.eclipse.jface.util.OpenStrategy.fireSelectionEvent(OpenStrategy.java:239)
-                     	at org.eclipse.jface.util.OpenStrategy.access$4(OpenStrategy.java:233)
-                     	at org.eclipse.jface.util.OpenStrategy$1.handleEvent(OpenStrategy.java:403)
-                     	at org.eclipse.swt.widgets.EventTable.sendEvent(EventTable.java:84)
-                     	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1053)
-                     	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1077)
-                     	at org.eclipse.swt.widgets.Widget.sendSelectionEvent(Widget.java:1094)
-                     	at org.eclipse.swt.widgets.TreeItem.setExpanded(TreeItem.java:1385)
-                     	at org.eclipse.jface.viewers.TreeViewer.setExpanded(TreeViewer.java:332)
-                     	at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1571)
-                     	at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1586)
-                     	at org.eclipse.jface.viewers.AbstractTreeViewer.collapseToLevel(AbstractTreeViewer.java:751)
-                     	at org.eclipse.jface.viewers.AbstractTreeViewer.collapseAll(AbstractTreeViewer.java:733)
+                        Caused by: java.lang.NullPointerException
+                        at org.eclipse.jface.viewers.AbstractTreeViewer.getSelection(AbstractTreeViewer.java:2956)
+                        at org.eclipse.jface.viewers.StructuredViewer.handleSelect(StructuredViewer.java:1211)
+                        at org.eclipse.jface.viewers.StructuredViewer$4.widgetSelected(StructuredViewer.java:1241)
+                        at org.eclipse.jface.util.OpenStrategy.fireSelectionEvent(OpenStrategy.java:239)
+                        at org.eclipse.jface.util.OpenStrategy.access$4(OpenStrategy.java:233)
+                        at org.eclipse.jface.util.OpenStrategy$1.handleEvent(OpenStrategy.java:403)
+                        at org.eclipse.swt.widgets.EventTable.sendEvent(EventTable.java:84)
+                        at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1053)
+                        at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1077)
+                        at org.eclipse.swt.widgets.Widget.sendSelectionEvent(Widget.java:1094)
+                        at org.eclipse.swt.widgets.TreeItem.setExpanded(TreeItem.java:1385)
+                        at org.eclipse.jface.viewers.TreeViewer.setExpanded(TreeViewer.java:332)
+                        at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1571)
+                        at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1586)
+                        at org.eclipse.jface.viewers.AbstractTreeViewer.collapseToLevel(AbstractTreeViewer.java:751)
+                        at org.eclipse.jface.viewers.AbstractTreeViewer.collapseAll(AbstractTreeViewer.java:733)
 
-                     	at net.tourbook.ui.views.tourBook.TourBookView$70.run(TourBookView.java:3406)
+                        at net.tourbook.ui.views.tourBook.TourBookView$70.run(TourBookView.java:3406)
 
-                     	at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:35)
-                     	at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:135)
-                     	... 22 more
+                        at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:35)
+                        at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:135)
+                        ... 22 more
 
                       * </code>
                       */
@@ -4405,8 +4449,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             cell.setForeground(JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_SUB));
          } else if (element instanceof TVITourBookYearSub) {
             cell.setForeground(JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_SUB_SUB));
-//			} else if (element instanceof TVITourBookTour) {
-//				cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_TOUR));
+//       } else if (element instanceof TVITourBookTour) {
+//          cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_TOUR));
          }
       }
    }

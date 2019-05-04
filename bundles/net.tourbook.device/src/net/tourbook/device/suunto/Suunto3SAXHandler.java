@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -44,758 +44,808 @@ import net.tourbook.tour.TourManager;
  */
 public class Suunto3SAXHandler extends DefaultHandler {
 
-	private static final double				RADIANT_TO_DEGREE			= 57.2957795131;
-
-	private static final SimpleDateFormat	TIME_FORMAT					= new SimpleDateFormat(		//
-			"yyyy-MM-dd'T'HH:mm:ss'Z'");																			//$NON-NLS-1$
-	private static final SimpleDateFormat	TIME_FORMAT_SSSZ			= new SimpleDateFormat(		//
-			"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");																		//$NON-NLS-1$
-	private static final SimpleDateFormat	TIME_FORMAT_RFC822		= new SimpleDateFormat(		//
-			"yyyy-MM-dd'T'HH:mm:ssZ");                                                          //$NON-NLS-1$
-	private static final SimpleDateFormat	TIME_FORMAT_LOCAL			= new SimpleDateFormat(		//
-			"yyyy-MM-dd'T'HH:mm:ss");																				//$NON-NLS-1$
-
-	private static final String				SAMPLE_TYPE_GPS_BASE		= "gps-base";					//$NON-NLS-1$
-	private static final String				SAMPLE_TYPE_GPS_TINY		= "gps-tiny";					//$NON-NLS-1$
-	private static final String				SAMPLE_TYPE_GPS_SMALL	= "gps-small";					//$NON-NLS-1$
-	private static final String				SAMPLE_TYPE_PERIODIC		= "periodic";					//$NON-NLS-1$
-
-	// root tags
-	private static final String	TAG_DEVLOG				= "DeviceLog";	//$NON-NLS-1$
-	private static final String	TAG_DEVLOG_DEVICE		= "Device";		//$NON-NLS-1$
-	private static final String	TAG_DEVLOG_HEADER		= "Header";		//$NON-NLS-1$
-	private static final String	TAG_DEVLOG_SAMPLES	= "Samples";	//$NON-NLS-1$
-
-	// header tags
-	private static final String	TAG_ENERGY		= "Energy";		//$NON-NLS-1$
-	private static final String	TAG_DATETIME	= "DateTime";	//$NON-NLS-1$
-
-	// device tags
-	private static final String	TAG_DEVICE_SW		= "SW";		//$NON-NLS-1$
-	private static final String	TAG_DEVICE_NAME	= "Name";	//$NON-NLS-1$
-
-	// sample tags
-	private static final String	TAG_ALTITUDE		= "Altitude";		//$NON-NLS-1$
-	private static final String	TAG_CADENCE			= "Cadence";		//$NON-NLS-1$
-	private static final String	TAG_DISTANCE		= "Distance";		//$NON-NLS-1$
-	private static final String	TAG_EVENTS			= "Events";			//$NON-NLS-1$
-	private static final String	TAG_HR				= "HR";				//$NON-NLS-1$
-	private static final String	TAG_LAP				= "Lap";				//$NON-NLS-1$
-	private static final String	TAG_LATITUDE		= "Latitude";		//$NON-NLS-1$
-	private static final String	TAG_LONGITUDE		= "Longitude";		//$NON-NLS-1$
-	private static final String	TAG_SAMPLE			= "Sample";			//$NON-NLS-1$
-	private static final String	TAG_SAMPLE_TYPE	= "SampleType";	//$NON-NLS-1$
-	private static final String	TAG_TEMPERATURE	= "Temperature";	//$NON-NLS-1$
-	private static final String	TAG_UTC				= "UTC";				//$NON-NLS-1$
-	private static final String	TAG_TIME				= "Time";			//$NON-NLS-1$
-
-	//
-	private HashMap<Long, TourData>	_alreadyImportedTours;
-	private HashMap<Long, TourData>	_newlyImportedTours;
-	private TourbookDevice				_device;
-	private String							_importFilePath;
-	//
-	private TimeData						_sampleData;
-	private ArrayList<TimeData>		_sampleList	= new ArrayList<TimeData>();
-
-	private TimeData						_gpsData;
-	private ArrayList<TimeData>		_gpsList		= new ArrayList<TimeData>();
-
-	private TimeData						_markerData;
-	private ArrayList<TimeData>		_markerList	= new ArrayList<TimeData>();
-
-	private boolean						_isImported;
-
-	private StringBuilder				_characters	= new StringBuilder();
-	private String							_currentSampleType;
-	private long							_currentUtcTime;
-	private long							_currentTime;
-	private long							_prevSampleTime;
-
-	private boolean						_isInDevice;
-	private boolean						_isInDeviceSW;
-	private boolean						_isInDeviceName;
-
-	private boolean						_isInSamples;
-	private boolean						_isInHeader;
-
-	private boolean						_isInAltitude;
-	private boolean						_isInCadence;
-	private boolean						_isInDistance;
-	private boolean						_isInEnergy;
-	private boolean						_isInDateTime;
-	private boolean						_isInEvents;
-	private boolean						_isInHR;
-	private boolean						_isInLatitude;
-	private boolean						_isInLongitude;
-	private boolean						_isInSample;
-	private boolean						_isInSampleType;
-	private boolean						_isInUTC;
-	private boolean						_isInTime;
-	private boolean						_isInTemperature;
+   private static final double           RADIANT_TO_DEGREE     = 57.2957795131;
+
+   private static final SimpleDateFormat TIME_FORMAT           = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");     //$NON-NLS-1$
+   private static final SimpleDateFormat TIME_FORMAT_SSSZ      = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); //$NON-NLS-1$
+   private static final SimpleDateFormat TIME_FORMAT_RFC822    = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");       //$NON-NLS-1$
+   private static final SimpleDateFormat TIME_FORMAT_LOCAL     = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");        //$NON-NLS-1$
+
+   private static final String           SAMPLE_TYPE_GPS_BASE  = "gps-base";                                           //$NON-NLS-1$
+   private static final String           SAMPLE_TYPE_GPS_TINY  = "gps-tiny";                                           //$NON-NLS-1$
+   private static final String           SAMPLE_TYPE_GPS_SMALL = "gps-small";                                          //$NON-NLS-1$
+   private static final String           SAMPLE_TYPE_PERIODIC  = "periodic";                                           //$NON-NLS-1$
+
+   // root tags
+   private static final String TAG_DEVLOG         = "DeviceLog"; //$NON-NLS-1$
+   private static final String TAG_DEVLOG_DEVICE  = "Device";    //$NON-NLS-1$
+   private static final String TAG_DEVLOG_HEADER  = "Header";    //$NON-NLS-1$
+   private static final String TAG_DEVLOG_SAMPLES = "Samples";   //$NON-NLS-1$
+
+   // header tags
+   private static final String TAG_ENERGY               = "Energy";             //$NON-NLS-1$
+   private static final String TAG_DATETIME             = "DateTime";           //$NON-NLS-1$
+   private static final String TAG_PEAK_TRAINING_EFFECT = "PeakTrainingEffect"; //$NON-NLS-1$
+
+   // device tags
+   private static final String TAG_DEVICE_SW   = "SW";   //$NON-NLS-1$
+   private static final String TAG_DEVICE_NAME = "Name"; //$NON-NLS-1$
+
+   // sample tags
+   private static final String TAG_ALTITUDE          = "Altitude";         //$NON-NLS-1$
+   private static final String TAG_CADENCE           = "Cadence";          //$NON-NLS-1$
+   private static final String TAG_DISTANCE          = "Distance";         //$NON-NLS-1$
+   private static final String TAG_EVENTS            = "Events";           //$NON-NLS-1$
+   private static final String TAG_HR                = "HR";               //$NON-NLS-1$
+   private static final String TAG_LAP               = "Lap";              //$NON-NLS-1$
+   private static final String TAG_LATITUDE          = "Latitude";         //$NON-NLS-1$
+   private static final String TAG_LONGITUDE         = "Longitude";        //$NON-NLS-1$
+   private static final String TAG_SAMPLE            = "Sample";           //$NON-NLS-1$
+   private static final String TAG_SAMPLE_TYPE       = "SampleType";       //$NON-NLS-1$
+   private static final String TAG_TEMPERATURE       = "Temperature";      //$NON-NLS-1$
+   private static final String TAG_UTC               = "UTC";              //$NON-NLS-1$
+   private static final String TAG_TIME              = "Time";             //$NON-NLS-1$
+   private static final String TAG_PERFORMANCE_LEVEL = "PerformanceLevel"; //$NON-NLS-1$
+
+   //
+   private HashMap<Long, TourData> _alreadyImportedTours;
+   private HashMap<Long, TourData> _newlyImportedTours;
+   private TourbookDevice          _device;
+   private String                  _importFilePath;
+   //
+   private TimeData                _sampleData;
+   private ArrayList<TimeData>     _sampleList = new ArrayList<TimeData>();
+
+   private TimeData                _gpsData;
+   private ArrayList<TimeData>     _gpsList    = new ArrayList<TimeData>();
+
+   private TimeData                _markerData;
+   private ArrayList<TimeData>     _markerList = new ArrayList<TimeData>();
+
+   private boolean                 _isImported;
+
+   private StringBuilder           _characters = new StringBuilder();
+   private String                  _currentSampleType;
+   private long                    _currentUtcTime;
+   private long                    _currentTime;
+   private long                    _prevSampleTime;
+
+   private boolean                 _isInDevice;
+   private boolean                 _isInDeviceSW;
+   private boolean                 _isInDeviceName;
+
+   private boolean                 _isInSamples;
+   private boolean                 _isInHeader;
+
+   private boolean                 _isInAltitude;
+   private boolean                 _isInCadence;
+   private boolean                 _isInDistance;
+   private boolean                 _isInEnergy;
+   private boolean                 _isInDateTime;
+   private boolean                 _isInEvents;
+   private boolean                 _isInHR;
+   private boolean                 _isInLatitude;
+   private boolean                 _isInLongitude;
+   private boolean                 _isInSample;
+   private boolean                 _isInSampleType;
+   private boolean                 _isInUTC;
+   private boolean                 _isInTime;
+   private boolean                 _isInTemperature;
+
+   private boolean                 _isInPeakTrainingEffect;
+   private boolean                 _isInPerformanceLevel;
+
+   private float                   _tourPeakTrainingEffect;
+   private float                   _tourPerformanceLevel;
+
+   private int                     _tourCalories;
+
+   /**
+    * This time is used when a time is not available.
+    */
+   private long                    _tourStartTime;
+   private String                  _tourDeviceSW;
+   private String                  _tourDeviceName;
 
-	private int								_tourCalories;
-	/**
-	 * This time is used when a time is not available.
-	 */
-	private long							_tourStartTime;
-	private String							_tourDeviceSW;
-	private String							_tourDeviceName;
+   static {
 
-	static {
+      final TimeZone utc = TimeZone.getTimeZone("UTC"); //$NON-NLS-1$
 
-		final TimeZone utc = TimeZone.getTimeZone("UTC"); //$NON-NLS-1$
+      TIME_FORMAT.setTimeZone(utc);
+      TIME_FORMAT_SSSZ.setTimeZone(utc);
+      TIME_FORMAT_RFC822.setTimeZone(utc);
 
-		TIME_FORMAT.setTimeZone(utc);
-		TIME_FORMAT_SSSZ.setTimeZone(utc);
-		TIME_FORMAT_RFC822.setTimeZone(utc);
+      // TIME_FORMAT_LOCAL
+      // For indoor activities, even though the time is provided in the UTC element
+      // is the actual recorded local time.
+   }
 
-		// TIME_FORMAT_LOCAL
-		// For indoor activities, even though the time is provided in the UTC element
-		// is the actual recorded local time.
-	}
+   public Suunto3SAXHandler(final TourbookDevice deviceDataReader,
+                            final String importFileName,
+                            final HashMap<Long, TourData> alreadyImportedTours,
+                            final HashMap<Long, TourData> newlyImportedTours) {
 
-	public Suunto3SAXHandler(	final TourbookDevice deviceDataReader,
-										final String importFileName,
-										final HashMap<Long, TourData> alreadyImportedTours,
-										final HashMap<Long, TourData> newlyImportedTours) {
+      _device = deviceDataReader;
+      _importFilePath = importFileName;
+      _alreadyImportedTours = alreadyImportedTours;
+      _newlyImportedTours = newlyImportedTours;
+   }
 
-		_device = deviceDataReader;
-		_importFilePath = importFileName;
-		_alreadyImportedTours = alreadyImportedTours;
-		_newlyImportedTours = newlyImportedTours;
-	}
+   @Override
+   public void characters(final char[] chars, final int startIndex, final int length) throws SAXException {
 
-	@Override
-	public void characters(final char[] chars, final int startIndex, final int length) throws SAXException {
+      if (_isInSampleType
+            || _isInAltitude
+            || _isInCadence
+            || _isInDistance
+            || _isInEnergy
+            || _isInDateTime
+            || _isInHR
+            || _isInLatitude
+            || _isInLongitude
+            || _isInDeviceSW
+            || _isInDeviceName
+            || _isInTemperature
+            || _isInUTC
+            || _isInTime
 
-		if (_isInSampleType
-				|| _isInAltitude || _isInCadence || _isInDistance || _isInEnergy || _isInDateTime || _isInHR || _isInLatitude
-				|| _isInLongitude || _isInDeviceSW || _isInDeviceName || _isInTemperature || _isInUTC || _isInTime) {
-			_characters.append(chars, startIndex, length);
-		}
-	}
+            || _isInPerformanceLevel
+            || _isInPeakTrainingEffect
 
-	public void dispose() {
+      ) {
 
-		_sampleList.clear();
-		_gpsList.clear();
-		_markerList.clear();
-	}
+         _characters.append(chars, startIndex, length);
+      }
+   }
 
-	@Override
-	public void endElement(final String uri, final String localName, final String name) throws SAXException {
+   public void dispose() {
 
-		if (_isInSamples) {
+      _sampleList.clear();
+      _gpsList.clear();
+      _markerList.clear();
+   }
 
-			endElement_InSamples(name);
+   @Override
+   public void endElement(final String uri, final String localName, final String name) throws SAXException {
 
-		} else if (_isInHeader) {
+      if (_isInSamples) {
 
-			endElement_InHeader(name);
+         endElement_InSamples(name);
 
-		} else if (_isInDevice) {
+      } else if (_isInHeader) {
 
-			endElement_InDevice(name);
-		}
+         endElement_InHeader(name);
 
-		if (name.equals(TAG_SAMPLE)) {
+      } else if (_isInDevice) {
 
-			_isInSample = false;
+         endElement_InDevice(name);
+      }
 
-			finalizeSample();
+      if (name.equals(TAG_SAMPLE)) {
 
-		} else if (name.equals(TAG_DEVLOG_SAMPLES)) {
+         _isInSample = false;
 
-			_isInSamples = false;
+         finalizeSample();
 
-		} else if (name.equals(TAG_DEVLOG_HEADER)) {
+      } else if (name.equals(TAG_DEVLOG_SAMPLES)) {
 
-			_isInHeader = false;
+         _isInSamples = false;
 
-		} else if (name.equals(TAG_DEVLOG_DEVICE)) {
+      } else if (name.equals(TAG_DEVLOG_HEADER)) {
 
-			_isInDevice = false;
+         _isInHeader = false;
 
-		} else if (name.equals(TAG_DEVLOG)) {
+      } else if (name.equals(TAG_DEVLOG_DEVICE)) {
 
-			finalizeTour();
-		}
-	}
+         _isInDevice = false;
 
-	private void endElement_InDevice(final String name) {
+      } else if (name.equals(TAG_DEVLOG)) {
 
-		if (name.equals(TAG_DEVICE_SW)) {
+         finalizeTour();
+      }
+   }
 
-			_isInDeviceSW = false;
+   private void endElement_InDevice(final String name) {
 
-			_tourDeviceSW = _characters.toString();
+      if (name.equals(TAG_DEVICE_SW)) {
 
-		} else if (name.equals(TAG_DEVICE_NAME)) {
+         _isInDeviceSW = false;
 
-			_isInDeviceName = false;
+         _tourDeviceSW = _characters.toString();
 
-			_tourDeviceName = _characters.toString();
-		}
-	}
+      } else if (name.equals(TAG_DEVICE_NAME)) {
 
-	private void endElement_InHeader(final String name) {
+         _isInDeviceName = false;
 
-		if (name.equals(TAG_ENERGY)) {
+         _tourDeviceName = _characters.toString();
+      }
+   }
 
-			_isInEnergy = false;
+   private void endElement_InHeader(final String name) {
 
-			_tourCalories = (int) (Util.parseFloat(_characters.toString()) / 4184);
-		} else if (name.equals(TAG_DATETIME)) {
+      if (name.equals(TAG_ENERGY)) {
 
-			_isInDateTime = false;
+         _isInEnergy = false;
 
-			try {
-				_tourStartTime = TIME_FORMAT_LOCAL.parse(_characters.toString()).getTime();
-			} catch (ParseException e) {
-				openError(e);
-			}
-		}
-	}
+         _tourCalories = (int) (Util.parseFloat(_characters.toString()) / 4184);
 
-	private void endElement_InSamples(final String name) {
+      } else if (name.equals(TAG_PEAK_TRAINING_EFFECT)) {
 
-		if (name.equals(TAG_SAMPLE_TYPE)) {
+         _isInPeakTrainingEffect = false;
+         _tourPeakTrainingEffect = Util.parseFloat(_characters.toString());
 
-			_isInSampleType = false;
+      } else if (name.equals(TAG_DATETIME)) {
 
-			_currentSampleType = _characters.toString();
+         _isInDateTime = false;
 
-		} else if (name.equals(TAG_ALTITUDE)) {
+         try {
+            _tourStartTime = TIME_FORMAT_LOCAL.parse(_characters.toString()).getTime();
+         } catch (ParseException e) {
+            openError(e);
+         }
+      }
+   }
 
-			_isInAltitude = false;
+   private void endElement_InSamples(final String name) {
 
-			_sampleData.absoluteAltitude = Util.parseFloat(_characters.toString());
+      if (name.equals(TAG_SAMPLE_TYPE)) {
 
-		} else if (name.equals(TAG_CADENCE)) {
+         _isInSampleType = false;
 
-			_isInCadence = false;
+         _currentSampleType = _characters.toString();
 
-			_sampleData.cadence = Util.parseFloat(_characters.toString()) * 60.0f;
+      } else if (name.equals(TAG_ALTITUDE)) {
 
-		} else if (name.equals(TAG_DISTANCE)) {
+         _isInAltitude = false;
 
-			_isInDistance = false;
+         _sampleData.absoluteAltitude = Util.parseFloat(_characters.toString());
 
-			if (_isInEvents) {
+      } else if (name.equals(TAG_CADENCE)) {
 
-				// ignore this value because <Distance> can also occur within <Events>
+         _isInCadence = false;
 
-			} else {
+         _sampleData.cadence = Util.parseFloat(_characters.toString()) * 60.0f;
 
-				_sampleData.absoluteDistance = Util.parseFloat(_characters.toString());
-			}
+      } else if (name.equals(TAG_DISTANCE)) {
 
-		} else if (name.equals(TAG_EVENTS)) {
+         _isInDistance = false;
 
-			_isInEvents = false;
+         if (_isInEvents) {
 
-		} else if (name.equals(TAG_HR)) {
+            // ignore this value because <Distance> can also occur within <Events>
 
-			_isInHR = false;
+         } else {
 
-			// HR * 60 = bpm
-			final float hr = Util.parseFloat(_characters.toString());
-			_sampleData.pulse = hr * 60.0f;
+            _sampleData.absoluteDistance = Util.parseFloat(_characters.toString());
+         }
 
-		} else if (name.equals(TAG_LAP)) {
+      } else if (name.equals(TAG_EVENTS)) {
 
-			// set a marker
-			_markerData.marker = 1;
+         _isInEvents = false;
 
-		} else if (name.equals(TAG_LATITUDE)) {
+      } else if (name.equals(TAG_HR)) {
 
-			_isInLatitude = false;
+         _isInHR = false;
 
-			_gpsData.latitude = Util.parseDouble(_characters.toString()) * RADIANT_TO_DEGREE;
+         // HR * 60 = bpm
+         final float hr = Util.parseFloat(_characters.toString());
+         _sampleData.pulse = hr * 60.0f;
 
-		} else if (name.equals(TAG_LONGITUDE)) {
+      } else if (name.equals(TAG_LAP)) {
 
-			_isInLongitude = false;
+         // set a marker
+         _markerData.marker = 1;
 
-			_gpsData.longitude = Util.parseDouble(_characters.toString()) * RADIANT_TO_DEGREE;
+      } else if (name.equals(TAG_LATITUDE)) {
 
-		} else if (name.equals(TAG_TEMPERATURE)) {
+         _isInLatitude = false;
 
-			_isInTemperature = false;
+         _gpsData.latitude = Util.parseDouble(_characters.toString()) * RADIANT_TO_DEGREE;
 
-			final float kelvin = Util.parseFloat(_characters.toString());
-			_sampleData.temperature = kelvin - 273.15f;
+      } else if (name.equals(TAG_LONGITUDE)) {
 
-		} else if (name.equals(TAG_UTC)) {
+         _isInLongitude = false;
 
-			_isInUTC = false;
+         _gpsData.longitude = Util.parseDouble(_characters.toString()) * RADIANT_TO_DEGREE;
 
-			final String timeString = _characters.toString();
+      } else if (name.equals(TAG_PEAK_TRAINING_EFFECT)) {
 
-			try {
-				_currentUtcTime = ZonedDateTime.parse(timeString).toInstant().toEpochMilli();
-			} catch (final Exception e0) {
-				try {
-					_currentUtcTime = TIME_FORMAT.parse(timeString).getTime();
-				} catch (final ParseException e1) {
-					try {
-						_currentUtcTime = TIME_FORMAT_SSSZ.parse(timeString).getTime();
-					} catch (final ParseException e2) {
-						try {
-							_currentUtcTime = TIME_FORMAT_RFC822.parse(timeString).getTime();
-						} catch (final ParseException e3) {
-							try {
-								_currentUtcTime = TIME_FORMAT_LOCAL.parse(timeString).getTime();
-							} catch (final ParseException e4) {
-								openError(e4);
-							}
-						}
-					}
-				}
-			}
-		} else if (name.equals(TAG_TIME))
+         _isInPerformanceLevel = false;
+         _tourPerformanceLevel = Util.parseFloat(_characters.toString());
 
-		{
-			_isInTime = false;
-			_currentTime = Double.valueOf(_characters.toString()).longValue();
-		}
-	}
+      } else if (name.equals(TAG_TEMPERATURE)) {
 
-	private void finalizeSample() {
+         _isInTemperature = false;
 
-		final long sampleTime;
-		if (_currentUtcTime == Long.MIN_VALUE &&
-				_currentTime != Long.MIN_VALUE) {
+         final float kelvin = Util.parseFloat(_characters.toString());
+         _sampleData.temperature = kelvin - 273.15f;
 
-			if (!_sampleList.isEmpty() && _sampleList.get(0).absoluteTime != Long.MIN_VALUE) {
-				sampleTime = ((_sampleList.get(0).absoluteTime / 1000) + _currentTime) * 1000;
-			} else {
-				sampleTime = _tourStartTime;
-			}
+      } else if (name.equals(TAG_UTC)) {
 
-		} else {
+         _isInUTC = false;
 
-			/*
-			 * Remove milliseconds because this can cause wrong data. Position of a marker can be at
-			 * the wrong second and multiple samples can have the same second but other milliseconds.
-			 */
-			sampleTime = _currentUtcTime / 1000 * 1000;
-		}
+         final String timeString = _characters.toString();
 
-		/*
-		 * A lap do not contain a sample type
-		 */
-		if (_markerData.marker == 1) {
+         try {
+            _currentUtcTime = ZonedDateTime.parse(timeString).toInstant().toEpochMilli();
+         } catch (final Exception e0) {
+            try {
+               _currentUtcTime = TIME_FORMAT.parse(timeString).getTime();
+            } catch (final ParseException e1) {
+               try {
+                  _currentUtcTime = TIME_FORMAT_SSSZ.parse(timeString).getTime();
+               } catch (final ParseException e2) {
+                  try {
+                     _currentUtcTime = TIME_FORMAT_RFC822.parse(timeString).getTime();
+                  } catch (final ParseException e3) {
+                     try {
+                        _currentUtcTime = TIME_FORMAT_LOCAL.parse(timeString).getTime();
+                     } catch (final ParseException e4) {
+                        openError(e4);
+                     }
+                  }
+               }
+            }
+         }
 
-			// set virtual time if time is not available
-			_markerData.absoluteTime = sampleTime;
+      } else if (name.equals(TAG_TIME))
 
-			_markerList.add(_markerData);
+      {
+         _isInTime = false;
+         _currentTime = Double.valueOf(_characters.toString()).longValue();
+      }
+   }
 
-		} else {
+   private void finalizeSample() {
 
-			if (_currentSampleType != null) {
+      final long sampleTime;
+      if (_currentUtcTime == Long.MIN_VALUE &&
+            _currentTime != Long.MIN_VALUE) {
 
-				if (_currentSampleType.equals(SAMPLE_TYPE_PERIODIC)) {
+         if (!_sampleList.isEmpty() && _sampleList.get(0).absoluteTime != Long.MIN_VALUE) {
+            sampleTime = ((_sampleList.get(0).absoluteTime / 1000) + _currentTime) * 1000;
+         } else {
+            sampleTime = _tourStartTime;
+         }
 
-					/*
-					 * Skip samples with the same time in seconds
-					 */
-					boolean isSkipSample = false;
+      } else {
 
-					if ((_currentUtcTime != Long.MIN_VALUE || _currentTime != Long.MIN_VALUE)
-							&& _prevSampleTime != Long.MIN_VALUE && sampleTime == _prevSampleTime) {
+         /*
+          * Remove milliseconds because this can cause wrong data. Position of a marker can be at
+          * the wrong second and multiple samples can have the same second but other milliseconds.
+          */
+         sampleTime = _currentUtcTime / 1000 * 1000;
+      }
 
-						isSkipSample = true;
-					}
+      /*
+       * A lap do not contain a sample type
+       */
+      if (_markerData.marker == 1) {
 
-					if (isSkipSample == false) {
+         // set virtual time if time is not available
+         _markerData.absoluteTime = sampleTime;
 
-						// set virtual time if time is not available
-						_sampleData.absoluteTime = sampleTime;
+         _markerList.add(_markerData);
 
-						_sampleList.add(_sampleData);
+      } else {
 
-						_prevSampleTime = sampleTime;
-					}
+         if (_currentSampleType != null) {
 
-				} else if (_currentSampleType.equals(SAMPLE_TYPE_GPS_BASE)
-						|| _currentSampleType.equals(SAMPLE_TYPE_GPS_SMALL)
-						|| _currentSampleType.equals(SAMPLE_TYPE_GPS_TINY)) {
+            if (_currentSampleType.equals(SAMPLE_TYPE_PERIODIC)) {
 
-					// set virtual time if time is not available
-					_gpsData.absoluteTime = sampleTime;
+               /*
+                * Skip samples with the same time in seconds
+                */
+               boolean isSkipSample = false;
 
-					_gpsList.add(_gpsData);
-				}
-			}
-		}
+               if ((_currentUtcTime != Long.MIN_VALUE || _currentTime != Long.MIN_VALUE)
+                     && _prevSampleTime != Long.MIN_VALUE && sampleTime == _prevSampleTime) {
 
-		_sampleData = null;
-		_gpsData = null;
-		_markerData = null;
+                  isSkipSample = true;
+               }
 
-		_currentUtcTime = Long.MIN_VALUE;
-		_currentTime = Long.MIN_VALUE;
-		_currentSampleType = null;
-	}
+               if (isSkipSample == false) {
 
-	private void finalizeTour() {
+                  // set virtual time if time is not available
+                  _sampleData.absoluteTime = sampleTime;
 
-		// check if data are available
-		if (_sampleList.size() == 0) {
-			return;
-		}
+                  _sampleList.add(_sampleData);
 
-		setData_GPS();
-		setData_Marker();
+                  _prevSampleTime = sampleTime;
+               }
 
-		// create data object for each tour
-		final TourData tourData = new TourData();
+            } else if (_currentSampleType.equals(SAMPLE_TYPE_GPS_BASE)
+                  || _currentSampleType.equals(SAMPLE_TYPE_GPS_SMALL)
+                  || _currentSampleType.equals(SAMPLE_TYPE_GPS_TINY)) {
 
-		/*
-		 * set tour start date/time
-		 */
-		tourData.setTourStartTime(TimeTools.getZonedDateTime(_sampleList.get(0).absoluteTime));
+               // set virtual time if time is not available
+               _gpsData.absoluteTime = sampleTime;
 
-		tourData.setDeviceTimeInterval((short) -1);
-		tourData.setImportFilePath(_importFilePath);
+               _gpsList.add(_gpsData);
+            }
+         }
+      }
 
-		tourData.setCalories(_tourCalories);
+      _sampleData = null;
+      _gpsData = null;
+      _markerData = null;
 
-		tourData.setDeviceId(_device.deviceId);
-		tourData.setDeviceName(_tourDeviceName == null ? _device.visibleName : _tourDeviceName);
-		tourData.setDeviceFirmwareVersion(_tourDeviceSW == null ? UI.EMPTY_STRING : _tourDeviceSW);
+      _currentUtcTime = Long.MIN_VALUE;
+      _currentTime = Long.MIN_VALUE;
+      _currentSampleType = null;
+   }
 
-		tourData.createTimeSeries(_sampleList, true);
+   private void finalizeTour() {
 
-		setDistanceSerie(tourData);
+      // check if data are available
+      if (_sampleList.size() == 0) {
+         return;
+      }
 
-		// after all data are added, the tour id can be created
-		final String uniqueId = _device.createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_SUUNTO3);
-		final Long tourId = tourData.createTourId(uniqueId);
+      setData_GPS();
+      setData_Marker();
 
-		// check if the tour is already imported
-		if (_alreadyImportedTours.containsKey(tourId) == false) {
+      // create data object for each tour
+      final TourData tourData = new TourData();
 
-			// add new tour to other tours
-			_newlyImportedTours.put(tourId, tourData);
+      /*
+       * set tour start date/time
+       */
+      tourData.setTourStartTime(TimeTools.getZonedDateTime(_sampleList.get(0).absoluteTime));
 
-			// create additional data
-			tourData.computeAltitudeUpDown();
-			tourData.computeTourDrivingTime();
-			tourData.computeComputedValues();
-		}
+      tourData.setDeviceTimeInterval((short) -1);
+      tourData.setImportFilePath(_importFilePath);
 
-		_isImported = true;
-	}
+      tourData.setCalories(_tourCalories);
+      
+      tourData.setTraining_ImpactOfTraining(_tourPeakTrainingEffect);
+      tourData.setTraining_PerformanceLevel(_tourPerformanceLevel);
 
-	/**
-	 * @return Returns <code>true</code> when a tour was imported
-	 */
-	public boolean isImported() {
-		return _isImported;
-	}
+      tourData.setDeviceId(_device.deviceId);
+      tourData.setDeviceName(_tourDeviceName == null ? _device.visibleName : _tourDeviceName);
+      tourData.setDeviceFirmwareVersion(_tourDeviceSW == null ? UI.EMPTY_STRING : _tourDeviceSW);
 
-	/**
-	 * Merge GPS data into tour data by time.
-	 * <p>
-	 * Merge is necessary because there are separate time slices for GPS data and not every 'normal'
-	 * time slice has it's own GPS time slice.
-	 */
-	private void setData_GPS() {
+      tourData.createTimeSeries(_sampleList, true);
 
-		if (_gpsList.size() == 0) {
-			return;
-		}
+      setDistanceSerie(tourData);
 
-		final int gpsSize = _gpsList.size();
+      // after all data are added, the tour id can be created
+      final String uniqueId = _device.createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_SUUNTO3);
+      final Long tourId = tourData.createTourId(uniqueId);
 
-		TimeData nextGPSData = _gpsList.get(0);
-		TimeData prevGPSData = nextGPSData;
+      // check if the tour is already imported
+      if (_alreadyImportedTours.containsKey(tourId) == false) {
 
-		long nextGpsTime = nextGPSData.absoluteTime;
-		long prevGpsTime = nextGpsTime;
+         // add new tour to other tours
+         _newlyImportedTours.put(tourId, tourData);
 
-		int gpsIndex = 0;
+         // create additional data
+         tourData.computeAltitudeUpDown();
+         tourData.computeTourDrivingTime();
+         tourData.computeComputedValues();
+      }
 
-		for (final TimeData sampleData : _sampleList) {
+      _isImported = true;
+   }
 
-			final long sampleTime = sampleData.absoluteTime;
+   /**
+    * @return Returns <code>true</code> when a tour was imported
+    */
+   public boolean isImported() {
+      return _isImported;
+   }
 
-			while (true) {
+   /**
+    * Merge GPS data into tour data by time.
+    * <p>
+    * Merge is necessary because there are separate time slices for GPS data and not every 'normal'
+    * time slice has it's own GPS time slice.
+    */
+   private void setData_GPS() {
 
-				if (sampleTime > nextGpsTime) {
+      if (_gpsList.size() == 0) {
+         return;
+      }
 
-					gpsIndex++;
+      final int gpsSize = _gpsList.size();
 
-					if (gpsIndex < gpsSize) {
+      TimeData nextGPSData = _gpsList.get(0);
+      TimeData prevGPSData = nextGPSData;
 
-						prevGpsTime = nextGpsTime;
-						prevGPSData = nextGPSData;
+      long nextGpsTime = nextGPSData.absoluteTime;
+      long prevGpsTime = nextGpsTime;
 
-						nextGPSData = _gpsList.get(gpsIndex);
-						nextGpsTime = nextGPSData.absoluteTime;
-					} else {
-						break;
-					}
-				} else {
-					break;
-				}
-			}
+      int gpsIndex = 0;
 
-			if (sampleTime == prevGpsTime) {
+      for (final TimeData sampleData : _sampleList) {
 
-				sampleData.latitude = prevGPSData.latitude;
-				sampleData.longitude = prevGPSData.longitude;
+         final long sampleTime = sampleData.absoluteTime;
 
-			} else if (sampleTime == nextGpsTime) {
+         while (true) {
 
-				sampleData.latitude = nextGPSData.latitude;
-				sampleData.longitude = nextGPSData.longitude;
+            if (sampleTime > nextGpsTime) {
 
-			} else {
+               gpsIndex++;
 
-				// interpolate position
+               if (gpsIndex < gpsSize) {
 
-				final double gpsTimeDiff = nextGpsTime - prevGpsTime;
-				final double sampleDiff = sampleTime - prevGpsTime;
+                  prevGpsTime = nextGpsTime;
+                  prevGPSData = nextGPSData;
 
-				final double sampleRatio = gpsTimeDiff == 0 ? 0 : sampleDiff / gpsTimeDiff;
+                  nextGPSData = _gpsList.get(gpsIndex);
+                  nextGpsTime = nextGPSData.absoluteTime;
+               } else {
+                  break;
+               }
+            } else {
+               break;
+            }
+         }
 
-				final double latDiff = nextGPSData.latitude - prevGPSData.latitude;
-				final double lonDiff = nextGPSData.longitude - prevGPSData.longitude;
+         if (sampleTime == prevGpsTime) {
 
-				sampleData.latitude = prevGPSData.latitude + latDiff * sampleRatio;
-				sampleData.longitude = prevGPSData.longitude + lonDiff * sampleRatio;
-			}
-		}
-	}
+            sampleData.latitude = prevGPSData.latitude;
+            sampleData.longitude = prevGPSData.longitude;
 
-	/**
-	 * Merge Marker data into tour data by time.
-	 * <p>
-	 * Merge is necessary because there are separate time slices for markers.
-	 */
-	private void setData_Marker() {
+         } else if (sampleTime == nextGpsTime) {
 
-		final int markerSize = _markerList.size();
+            sampleData.latitude = nextGPSData.latitude;
+            sampleData.longitude = nextGPSData.longitude;
 
-		if (markerSize == 0) {
-			return;
-		}
+         } else {
 
-		int markerIndex = 0;
+            // interpolate position
 
-		long markerTime = _markerList.get(markerIndex).absoluteTime;
+            final double gpsTimeDiff = nextGpsTime - prevGpsTime;
+            final double sampleDiff = sampleTime - prevGpsTime;
 
-		for (final TimeData sampleData : _sampleList) {
+            final double sampleRatio = gpsTimeDiff == 0 ? 0 : sampleDiff / gpsTimeDiff;
 
-			final long sampleTime = sampleData.absoluteTime;
+            final double latDiff = nextGPSData.latitude - prevGPSData.latitude;
+            final double lonDiff = nextGPSData.longitude - prevGPSData.longitude;
 
-			if (sampleTime < markerTime) {
+            sampleData.latitude = prevGPSData.latitude + latDiff * sampleRatio;
+            sampleData.longitude = prevGPSData.longitude + lonDiff * sampleRatio;
+         }
+      }
+   }
 
-				continue;
+   /**
+    * Merge Marker data into tour data by time.
+    * <p>
+    * Merge is necessary because there are separate time slices for markers.
+    */
+   private void setData_Marker() {
 
-			} else {
+      final int markerSize = _markerList.size();
 
-				// markerTime >= sampleTime
+      if (markerSize == 0) {
+         return;
+      }
 
-				sampleData.marker = 1;
-				sampleData.markerLabel = Integer.toString(markerIndex + 1);
+      int markerIndex = 0;
 
-				/*
-				 * check if another marker is available
-				 */
-				markerIndex++;
+      long markerTime = _markerList.get(markerIndex).absoluteTime;
 
-				if (markerIndex >= markerSize) {
-					break;
-				}
+      for (final TimeData sampleData : _sampleList) {
 
-				markerTime = _markerList.get(markerIndex).absoluteTime;
-			}
-		}
-	}
+         final long sampleTime = sampleData.absoluteTime;
 
-	/**
-	 * Check if distance values are not changed when geo position changed, when <code>true</code>
-	 * compute distance values from geo position.
-	 * 
-	 * @param tourData
-	 */
-	private void setDistanceSerie(final TourData tourData) {
+         if (sampleTime < markerTime) {
 
-		/*
-		 * There are currently no data available to check if distance is changing, current data keep
-		 * distance for some slices and then jumps to the next value.
-		 */
-		TourManager.computeDistanceValuesFromGeoPosition(tourData);
-	}
+            continue;
 
-	@Override
-	public void startElement(final String uri, final String localName, final String name, final Attributes attributes)
-			throws SAXException {
+         } else {
 
-		if (_isInSamples) {
+            // markerTime >= sampleTime
 
-			if (_isInSample) {
+            sampleData.marker = 1;
+            sampleData.markerLabel = Integer.toString(markerIndex + 1);
 
-				startElement_InSample(name);
+            /*
+             * check if another marker is available
+             */
+            markerIndex++;
 
-			} else if (name.equals(TAG_SAMPLE)) {
+            if (markerIndex >= markerSize) {
+               break;
+            }
 
-				_isInSample = true;
+            markerTime = _markerList.get(markerIndex).absoluteTime;
+         }
+      }
+   }
 
-				// create new time items, "sampleType" defines which time data are used
-				_gpsData = new TimeData();
-				_markerData = new TimeData();
-				_sampleData = new TimeData();
-			}
+   /**
+    * Check if distance values are not changed when geo position changed, when <code>true</code>
+    * compute distance values from geo position.
+    * 
+    * @param tourData
+    */
+   private void setDistanceSerie(final TourData tourData) {
 
-		} else if (_isInHeader) {
+      /*
+       * There are currently no data available to check if distance is changing, current data keep
+       * distance for some slices and then jumps to the next value.
+       */
+      TourManager.computeDistanceValuesFromGeoPosition(tourData);
+   }
 
-			startElement_InHeader(name);
+   @Override
+   public void startElement(final String uri, final String localName, final String name, final Attributes attributes)
+         throws SAXException {
 
-		} else if (_isInDevice) {
+      if (_isInSamples) {
 
-			startElement_InDevice(name);
+         if (_isInSample) {
 
-		} else if (name.equals(TAG_DEVLOG_SAMPLES)) {
+            startElement_InSample(name);
 
-			_isInSamples = true;
+         } else if (name.equals(TAG_SAMPLE)) {
 
-		} else if (name.equals(TAG_DEVLOG_HEADER)) {
+            _isInSample = true;
 
-			_isInHeader = true;
+            // create new time items, "sampleType" defines which time data are used
+            _gpsData = new TimeData();
+            _markerData = new TimeData();
+            _sampleData = new TimeData();
+         }
 
-		} else if (name.equals(TAG_DEVLOG_DEVICE)) {
+      } else if (_isInHeader) {
 
-			_isInDevice = true;
-		}
+         startElement_InHeader(name);
 
-	}
+      } else if (_isInDevice) {
 
-	private void startElement_InDevice(final String name) {
+         startElement_InDevice(name);
 
-		boolean isData = false;
+      } else if (name.equals(TAG_DEVLOG_SAMPLES)) {
 
-		if (name.equals(TAG_DEVICE_SW)) {
+         _isInSamples = true;
 
-			isData = true;
-			_isInDeviceSW = true;
+      } else if (name.equals(TAG_DEVLOG_HEADER)) {
 
-		} else if (name.equals(TAG_DEVICE_NAME)) {
+         _isInHeader = true;
 
-			isData = true;
-			_isInDeviceName = true;
-		}
+      } else if (name.equals(TAG_DEVLOG_DEVICE)) {
 
-		if (isData) {
+         _isInDevice = true;
+      }
 
-			// clear char buffer
-			_characters.delete(0, _characters.length());
-		}
-	}
+   }
 
-	private void startElement_InHeader(final String name) {
+   private void startElement_InDevice(final String name) {
 
-		boolean isData = false;
+      boolean isData = false;
 
-		if (name.equals(TAG_ENERGY)) {
+      if (name.equals(TAG_DEVICE_SW)) {
 
-			isData = true;
-			_isInEnergy = true;
-		} else if (name.equals(TAG_DATETIME)) {
+         isData = true;
+         _isInDeviceSW = true;
 
-			isData = true;
-			_isInDateTime = true;
-		}
+      } else if (name.equals(TAG_DEVICE_NAME)) {
 
-		if (isData) {
+         isData = true;
+         _isInDeviceName = true;
+      }
 
-			// clear char buffer
-			_characters.delete(0, _characters.length());
-		}
-	}
+      if (isData) {
 
-	private void startElement_InSample(final String name) {
+         // clear char buffer
+         _characters.delete(0, _characters.length());
+      }
+   }
 
-		boolean isData = false;
+   private void startElement_InHeader(final String name) {
 
-		if (name.equals(TAG_SAMPLE_TYPE)) {
+      boolean isData = false;
 
-			isData = true;
-			_isInSampleType = true;
+      if (name.equals(TAG_ENERGY)) {
 
-		} else if (name.equals(TAG_ALTITUDE)) {
+         isData = true;
+         _isInEnergy = true;
 
-			isData = true;
-			_isInAltitude = true;
+      } else if (name.equals(TAG_PEAK_TRAINING_EFFECT)) {
 
-		} else if (name.equals(TAG_CADENCE)) {
+         isData = true;
+         _isInPeakTrainingEffect = true;
 
-			isData = true;
-			_isInCadence = true;
+      } else if (name.equals(TAG_DATETIME)) {
 
-		} else if (name.equals(TAG_DISTANCE)) {
+         isData = true;
+         _isInDateTime = true;
+      }
 
-			isData = true;
-			_isInDistance = true;
+      if (isData) {
 
-		} else if (name.equals(TAG_EVENTS)) {
+         // clear char buffer
+         _characters.delete(0, _characters.length());
+      }
+   }
 
-			isData = true;
-			_isInEvents = true;
+   private void startElement_InSample(final String name) {
 
-		} else if (name.equals(TAG_HR)) {
+      boolean isData = false;
 
-			isData = true;
-			_isInHR = true;
+      if (name.equals(TAG_SAMPLE_TYPE)) {
 
-		} else if (name.equals(TAG_LATITUDE)) {
+         isData = true;
+         _isInSampleType = true;
 
-			isData = true;
-			_isInLatitude = true;
+      } else if (name.equals(TAG_ALTITUDE)) {
 
-		} else if (name.equals(TAG_LONGITUDE)) {
+         isData = true;
+         _isInAltitude = true;
 
-			isData = true;
-			_isInLongitude = true;
+      } else if (name.equals(TAG_CADENCE)) {
 
-		} else if (name.equals(TAG_TEMPERATURE)) {
+         isData = true;
+         _isInCadence = true;
 
-			isData = true;
-			_isInTemperature = true;
+      } else if (name.equals(TAG_DISTANCE)) {
 
-		} else if (name.equals(TAG_UTC)) {
+         isData = true;
+         _isInDistance = true;
 
-			isData = true;
-			_isInUTC = true;
-		} else if (name.equals(TAG_TIME)) {
+      } else if (name.equals(TAG_EVENTS)) {
 
-			isData = true;
-			_isInTime = true;
-		}
+         isData = true;
+         _isInEvents = true;
 
-		if (isData) {
+      } else if (name.equals(TAG_HR)) {
 
-			// clear char buffer
-			_characters.delete(0, _characters.length());
-		}
-	}
+         isData = true;
+         _isInHR = true;
 
-	private void openError(final Exception e) {
-		Display.getDefault().syncExec(new Runnable() {
-			@Override
-			public void run() {
-				final String message = e.getMessage();
-				MessageDialog.openError(Display.getCurrent().getActiveShell(),
-						"Error", //$NON-NLS-1$
-						message);
-				System.err.println(message + " in " + _importFilePath); //$NON-NLS-1$
-			}
-		});
-	}
+      } else if (name.equals(TAG_LATITUDE)) {
+
+         isData = true;
+         _isInLatitude = true;
+
+      } else if (name.equals(TAG_LONGITUDE)) {
+
+         isData = true;
+         _isInLongitude = true;
+
+      } else if (name.equals(TAG_TEMPERATURE)) {
+
+         isData = true;
+         _isInTemperature = true;
+
+      } else if (name.equals(TAG_UTC)) {
+
+         isData = true;
+         _isInUTC = true;
+
+      } else if (name.equals(TAG_TIME)) {
+
+         isData = true;
+         _isInTime = true;
+
+      } else if (name.equals(TAG_PERFORMANCE_LEVEL)) {
+
+         isData = true;
+         _isInPerformanceLevel = true;
+      }
+
+      if (isData) {
+
+         // clear char buffer
+         _characters.delete(0, _characters.length());
+      }
+   }
+
+   private void openError(final Exception e) {
+
+      Display.getDefault().syncExec(new Runnable() {
+         @Override
+         public void run() {
+            final String message = e.getMessage();
+            MessageDialog.openError(Display.getCurrent().getActiveShell(),
+                  "Error", //$NON-NLS-1$
+                  message);
+            System.err.println(message + " in " + _importFilePath); //$NON-NLS-1$
+         }
+      });
+   }
 }
