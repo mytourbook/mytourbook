@@ -18,6 +18,7 @@ package net.tourbook.device.garmin.fit.listeners;
 import com.garmin.fit.ActivityMesg;
 import com.garmin.fit.ActivityMesgListener;
 
+import net.tourbook.device.garmin.fit.FitData;
 import net.tourbook.tour.TourLogManager;
 
 public class MesgListener_Activity extends AbstractMesgListener implements ActivityMesgListener {

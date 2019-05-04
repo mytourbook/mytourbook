@@ -24,6 +24,7 @@ import java.time.ZonedDateTime;
 
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.data.TourData;
+import net.tourbook.device.garmin.fit.FitData;
 import net.tourbook.device.garmin.fit.FitDataReaderException;
 
 public class MesgListener_Session extends AbstractMesgListener implements SessionMesgListener {
@@ -162,6 +163,13 @@ public class MesgListener_Session extends AbstractMesgListener implements Sessio
       final Integer ftp = mesg.getThresholdPower();
       if (ftp != null) {
          tourData.setPower_FTP(ftp);
+      }
+
+      // -----------------------TRAINING -----------------------
+      
+      Float totalTrainingEffect = mesg.getTotalTrainingEffect();
+      if (totalTrainingEffect != null) {
+//         tourData.setTraining_TotalTrainingEffect(totalTrainingEffect);
       }
 
       fitData.onSetup_Session_20_Finalize();

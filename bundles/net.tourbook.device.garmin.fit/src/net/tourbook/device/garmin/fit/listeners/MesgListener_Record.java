@@ -25,6 +25,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.device.garmin.fit.Activator;
 import net.tourbook.device.garmin.fit.DataConverters;
+import net.tourbook.device.garmin.fit.FitData;
 import net.tourbook.device.garmin.fit.IPreferences;
 import net.tourbook.device.garmin.fit.Messages;
 

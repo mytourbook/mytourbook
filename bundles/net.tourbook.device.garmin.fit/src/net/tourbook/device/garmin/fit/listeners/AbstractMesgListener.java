@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.device.garmin.fit.listeners;
 
+import net.tourbook.device.garmin.fit.FitData;
+
 /**
  * Super class for all message listeners, provides access to the {@link FitData}.
  */

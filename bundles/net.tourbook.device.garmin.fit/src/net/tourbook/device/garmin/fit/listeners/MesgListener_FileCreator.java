@@ -19,6 +19,7 @@ import com.garmin.fit.FileCreatorMesg;
 import com.garmin.fit.FileCreatorMesgListener;
 
 import net.tourbook.device.garmin.fit.DataConverters;
+import net.tourbook.device.garmin.fit.FitData;
 
 public class MesgListener_FileCreator extends AbstractMesgListener implements FileCreatorMesgListener {
 

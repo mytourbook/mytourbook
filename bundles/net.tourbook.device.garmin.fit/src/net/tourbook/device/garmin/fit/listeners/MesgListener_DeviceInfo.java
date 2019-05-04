@@ -19,6 +19,8 @@ import com.garmin.fit.AntplusDeviceType;
 import com.garmin.fit.DeviceInfoMesg;
 import com.garmin.fit.DeviceInfoMesgListener;
 
+import net.tourbook.device.garmin.fit.FitData;
+
 public class MesgListener_DeviceInfo extends AbstractMesgListener implements DeviceInfoMesgListener {
 
 

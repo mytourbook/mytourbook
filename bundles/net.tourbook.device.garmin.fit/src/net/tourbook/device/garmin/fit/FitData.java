@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.device.garmin.fit.listeners;
+package net.tourbook.device.garmin.fit;
 
 import com.garmin.fit.SessionMesg;
 
@@ -32,9 +32,6 @@ import net.tourbook.data.SwimData;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
-import net.tourbook.device.garmin.fit.Activator;
-import net.tourbook.device.garmin.fit.FitDataReader;
-import net.tourbook.device.garmin.fit.IPreferences;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.ui.tourChart.ChartLabel;
 
@@ -346,11 +343,11 @@ public class FitData {
       tourData.setTourMarkers(tourTourMarkers);
    }
 
-   List<TimeData> getAllTimeData() {
+   public List<TimeData> getAllTimeData() {
       return _allTimeData;
    }
 
-   TimeData getCurrent_TimeData() {
+   public TimeData getCurrent_TimeData() {
 
       if (_current_TimeData == null) {
          throw new IllegalArgumentException("Time data is not initialized"); //$NON-NLS-1$
@@ -360,7 +357,7 @@ public class FitData {
 
    }
 
-   TourMarker getCurrent_TourMarker() {
+   public TourMarker getCurrent_TourMarker() {
 
       if (_current_TourMarker == null) {
          throw new IllegalArgumentException("Tour marker is not initialized"); //$NON-NLS-1$
@@ -369,7 +366,7 @@ public class FitData {
       return _current_TourMarker;
    }
 
-   String getDeviceName() {
+   private String getDeviceName() {
 
       final StringBuilder deviceName = new StringBuilder();
 
@@ -384,28 +381,28 @@ public class FitData {
       return deviceName.toString();
    }
 
-   List<GearData> getGearData() {
+   public List<GearData> getGearData() {
       return _allGearData;
    }
 
-   List<SwimData> getSwimData() {
+   public List<SwimData> getSwimData() {
       return _allSwimData;
    }
 
-   long getTimeDiffMS() {
+   public long getTimeDiffMS() {
       return _timeDiffMS;
    }
 
-   TourData getTourData() {
+   public TourData getTourData() {
       return _tourData;
    }
 
-   String getTourTitle() {
+   public String getTourTitle() {
 
       return String.format("%s (Session: %s)", _importFilePathName, _sessionIndex); //$NON-NLS-1$
    }
 
-   void onSetup_Lap_10_Initialize() {
+   public void onSetup_Lap_10_Initialize() {
 
       final List<TourMarker> tourMarkers = _allTourMarker;
 
@@ -414,17 +411,17 @@ public class FitData {
       tourMarkers.add(_current_TourMarker);
    }
 
-   void onSetup_Lap_20_Finalize() {
+   public void onSetup_Lap_20_Finalize() {
 
       _current_TourMarker = null;
    }
 
-   void onSetup_Record_10_Initialize() {
+   public void onSetup_Record_10_Initialize() {
 
       _current_TimeData = new TimeData();
    }
 
-   void onSetup_Record_20_Finalize() {
+   public void onSetup_Record_20_Finalize() {
 
       if (_current_TimeData == null) {
          // this occured
@@ -493,34 +490,34 @@ public class FitData {
       _current_TimeData = null;
    }
 
-   void onSetup_Session_20_Finalize() {
+   public void onSetup_Session_20_Finalize() {
 
       onSetup_Record_20_Finalize();
 
       _timeDiffMS = Long.MIN_VALUE;
    }
 
-   void setDeviceId(final String deviceId) {
+   public void setDeviceId(final String deviceId) {
       _deviceId = deviceId;
    }
 
-   void setGarminProduct(final String garminProduct) {
+   public void setGarminProduct(final String garminProduct) {
       _garminProduct = garminProduct;
    }
 
-   void setHeartRateSensorPresent(final boolean isHeartRateSensorPresent) {
+   public void setHeartRateSensorPresent(final boolean isHeartRateSensorPresent) {
       _tourData.setIsPulseSensorPresent(isHeartRateSensorPresent);
    }
 
-   void setManufacturer(final String manufacturer) {
+   public void setManufacturer(final String manufacturer) {
       _manufacturer = manufacturer;
    }
 
-   void setPowerSensorPresent(final boolean isPowerSensorPresent) {
+   public void setPowerSensorPresent(final boolean isPowerSensorPresent) {
       _tourData.setIsPowerSensorPresent(isPowerSensorPresent);
    }
 
-   void setSessionIndex(final SessionMesg mesg) {
+   public void setSessionIndex(final SessionMesg mesg) {
 
       final Integer fitMessageIndex = mesg.getFieldIntegerValue(254);
 
@@ -529,23 +526,23 @@ public class FitData {
       _sessionIndex = messageIndex.toString();
    }
 
-   void setSessionStartTime(final ZonedDateTime dateTime) {
+   public void setSessionStartTime(final ZonedDateTime dateTime) {
       _sessionStartTime = dateTime;
    }
 
-   void setSoftwareVersion(final String softwareVersion) {
+   public void setSoftwareVersion(final String softwareVersion) {
       _softwareVersion = softwareVersion;
    }
 
-   void setSpeedSensorPresent(final boolean isSpeedSensorPresent) {
+   public void setSpeedSensorPresent(final boolean isSpeedSensorPresent) {
       _tourData.setIsDistanceFromSensor(isSpeedSensorPresent);
    }
 
-   void setStrideSensorPresent(final boolean isStrideSensorPresent) {
+   public void setStrideSensorPresent(final boolean isStrideSensorPresent) {
       _tourData.setIsStrideSensorPresent(isStrideSensorPresent);
    }
 
-   void setTimeDiffMS(final long timeDiffMS) {
+   public void setTimeDiffMS(final long timeDiffMS) {
 
       _timeDiffMS = timeDiffMS;
    }

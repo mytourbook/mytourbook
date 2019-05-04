@@ -21,6 +21,7 @@ import com.garmin.fit.FileIdMesgListener;
 import com.garmin.fit.GarminProduct;
 import com.garmin.fit.Manufacturer;
 
+import net.tourbook.device.garmin.fit.FitData;
 import net.tourbook.tour.TourLogManager;
 
 public class MesgListener_FileId extends AbstractMesgListener implements FileIdMesgListener {
