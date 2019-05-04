@@ -1039,7 +1039,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 //		}
 
 	   // building Block II
-	   _layer_Building = new BuildingLayer(mMap, _layer_BaseMap, true, true);
+	   //_layer_Building = new BuildingLayer(mMap, _layer_BaseMap, true, true);
+	   _layer_Building = new BuildingLayer(mMap, _layer_BaseMap, false, true);
 	   _layer_Building.setEnabled(false);
 	   layers.add(_layer_Building);
 
