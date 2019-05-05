@@ -10,7 +10,7 @@
    <name>MyTourbook App</name>
 
    <artifactId>mytourbook-app</artifactId>   <groupId>net.tourbook</groupId>
-                                             <version>19.4.0-SNAPSHOT</version>
+                                             <version>19.5.0-SNAPSHOT</version>
    <packaging>pom</packaging>
    
    <properties>

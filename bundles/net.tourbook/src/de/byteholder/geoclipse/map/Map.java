@@ -542,7 +542,6 @@ public class Map extends Canvas {
 
    private boolean             _grid_Label_IsHovered;
    private Rectangle           _grid_Label_Outline;
-   private String              _grid_Label_Text;
    private GeoPosition         _grid_MapGeoCenter;
    private int                 _grid_MapZoomLevel;
 
@@ -757,7 +756,8 @@ public class Map extends Canvas {
       addMouseTrackListener(new MouseTrackListener() {
 
          @Override
-         public void mouseEnter(final MouseEvent e) {}
+         public void mouseEnter(final MouseEvent e) {
+         }
 
          @Override
          public void mouseExit(final MouseEvent e) {
@@ -765,7 +765,8 @@ public class Map extends Canvas {
          }
 
          @Override
-         public void mouseHover(final MouseEvent e) {}
+         public void mouseHover(final MouseEvent e) {
+         }
       });
 
       addMouseMoveListener(new MouseMoveListener() {
@@ -1253,6 +1254,19 @@ public class Map extends Canvas {
          rect.add(new Rectangle(point.x, point.y, 0, 0));
       }
       return rect;
+   }
+
+   /**
+    * Retrieve, if any, the current tour hovered by the user.
+    *
+    * @return If found, the current hovered tour, the smallest integer otherwise.
+    */
+   public long getHoveredTourId() {
+      if (_allHoveredTourIds != null && _allHoveredTourIds.size() == 1) {
+         return _allHoveredTourIds.get(0);
+      }
+
+      return Integer.MIN_VALUE;
    }
 
    /**
@@ -3494,7 +3508,6 @@ public class Map extends Canvas {
          bgColor = Display.getCurrent().getSystemColor(SWT.COLOR_GREEN);
       }
 
-      _grid_Label_Text = mapGridData.gridBox_Text;
       _grid_Label_Outline = paint_Text_Label(gc,
             devTopLeft.x,
             devTopLeft.y,

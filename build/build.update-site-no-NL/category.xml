@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/feature.net.tourbook.app_19.4.0.qualifier.jar" id="feature.net.tourbook.app" version="19.4.0.qualifier">
+   <feature url="features/feature.net.tourbook.app_19.5.0.qualifier.jar" id="feature.net.tourbook.app" version="19.5.0.qualifier">
       <category name="MyTourbook"/>
    </feature>
    <category-def name="MyTourbook" label="MyTourbook"/>

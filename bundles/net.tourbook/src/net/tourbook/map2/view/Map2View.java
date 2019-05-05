@@ -74,6 +74,7 @@ import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map.bookmark.MapBookmarkManager;
 import net.tourbook.map.bookmark.MapLocation;
 import net.tourbook.map2.Messages;
+import net.tourbook.map2.action.ActionCreateMarkerFromMap;
 import net.tourbook.map2.action.ActionDimMap;
 import net.tourbook.map2.action.ActionManageMapProviders;
 import net.tourbook.map2.action.ActionMap2Color;
@@ -363,7 +364,7 @@ public class Map2View extends ViewPart implements
    private GeoPosition                       _defaultPosition;
 
    /**
-    * when <code>true</code> a tour is painted, <code>false</code> a point of interrest is painted
+    * when <code>true</code> a tour is painted, <code>false</code> a point of interest is painted
     */
    private boolean                           _isTourOrWayPoint;
 
@@ -426,6 +427,7 @@ public class Map2View extends ViewPart implements
    private ActionMap2_Options             _actionMap2_Options;
    private ActionMapBookmarks             _actionMap2_Bookmarks;
    private ActionMap2Color                _actionMap2_Color;
+   private ActionCreateMarkerFromMap      _actionCreateMarkerFromMap;
    private ActionMap2_Graphs              _actionMap2_TourColors;
    private ActionManageMapProviders       _actionManageProvider;
    private ActionPhotoProperties          _actionPhotoFilter;
@@ -559,7 +561,8 @@ public class Map2View extends ViewPart implements
       }
    }
 
-   public Map2View() {}
+   public Map2View() {
+   }
 
    public void action_SyncWith_ChartSlider() {
 
@@ -1079,7 +1082,8 @@ public class Map2View extends ViewPart implements
          }
 
          @Override
-         public void partDeactivated(final IWorkbenchPartReference partRef) {}
+         public void partDeactivated(final IWorkbenchPartReference partRef) {
+         }
 
          @Override
          public void partHidden(final IWorkbenchPartReference partRef) {
@@ -1089,7 +1093,8 @@ public class Map2View extends ViewPart implements
          }
 
          @Override
-         public void partInputChanged(final IWorkbenchPartReference partRef) {}
+         public void partInputChanged(final IWorkbenchPartReference partRef) {
+         }
 
          @Override
          public void partOpened(final IWorkbenchPartReference partRef) {
@@ -1449,6 +1454,7 @@ public class Map2View extends ViewPart implements
       _actionEditMap2Preferences = new ActionOpenPrefDialog(Messages.Map_Action_Edit2DMapPreferences, PrefPageMap2Appearance.ID);
 
       _actionMap2_Color = new ActionMap2Color();
+      _actionCreateMarkerFromMap = new ActionCreateMarkerFromMap(this);
       _actionMap2_Options = new ActionMap2_Options();
       _actionSearchTourByLocation = new ActionSearchTourByLocation();
       _actionSelectMapProvider = new ActionSelectMapProvider(this);
@@ -1791,6 +1797,7 @@ public class Map2View extends ViewPart implements
       final boolean isOneTour = _isTourOrWayPoint && (isMultipleTours == false) && _isShowTour;
 
       _actionMap2_Color.setEnabled(isTourAvailable);
+      _actionCreateMarkerFromMap.setEnabled(isTourAvailable);
       _actionShowLegendInMap.setEnabled(_isTourOrWayPoint);
       _actionShowSliderInLegend.setEnabled(_isTourOrWayPoint && _isShowLegend);
       _actionShowSliderInMap.setEnabled(_isTourOrWayPoint);
@@ -1919,6 +1926,13 @@ public class Map2View extends ViewPart implements
       menuMgr.add(_actionShowSliderInLegend);
 
       menuMgr.add(new Separator());
+      menuMgr.add(_actionCreateMarkerFromMap);
+      if (_map.getHoveredTourId() == Integer.MIN_VALUE) {
+         _actionCreateMarkerFromMap.setEnabled(false);
+      } else {
+         _actionCreateMarkerFromMap.setEnabled(true);
+         _actionCreateMarkerFromMap.setCurrentHoverTourId(_map.getHoveredTourId());
+      }
       menuMgr.add(_actionShowTourMarker);
       menuMgr.add(_actionShowWayPoints);
       menuMgr.add(_actionShowPOI);
