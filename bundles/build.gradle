@@ -1,20 +1,20 @@
 buildscript {
 
-    repositories {
-        jcenter()
-    }
+   repositories {
+      jcenter()
+   }
 }
 
 subprojects {
 
-    repositories {
-        mavenCentral()
-        jcenter()
-    }
+   repositories {
+      mavenCentral()
+      jcenter()
+   }
 }
 
 allprojects {
 
-    ext.gdxVersion		= '1.9.8'
-    ext.slf4jVersion	= '1.7.25'
+   ext.gdxVersion    = '1.9.9'
+   ext.slf4jVersion  = '1.7.25'
 }

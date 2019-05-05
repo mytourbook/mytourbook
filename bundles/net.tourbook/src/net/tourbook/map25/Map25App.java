@@ -53,7 +53,8 @@ import org.eclipse.swt.widgets.Display;
 import org.oscim.awt.AwtGraphics;
 import org.oscim.backend.GLAdapter;
 import org.oscim.backend.CanvasAdapter;
-
+import org.oscim.backend.DateTime;
+import org.oscim.backend.DateTimeAdapter;
 //import org.ocsim.backend
 import org.oscim.core.MapPosition;
 import org.oscim.core.MercatorProjection;
@@ -102,6 +103,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
+import com.badlogic.gdx.graphics.glutils.GLVersion;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.utils.SharedLibraryLoader;
 import okhttp3.Cache;
@@ -251,6 +253,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 		GLAdapter.init(new LwjglGL20());
 
 		GLAdapter.GDX_DESKTOP_QUIRKS = true;
+		
+      DateTimeAdapter.init(new DateTime());
 	}
 
 	@Override
@@ -1035,7 +1039,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 //		}
 
 	   // building Block II
-	   _layer_Building = new BuildingLayer(mMap, _layer_BaseMap);
+	   //_layer_Building = new BuildingLayer(mMap, _layer_BaseMap, true, true);
+	   _layer_Building = new BuildingLayer(mMap, _layer_BaseMap, false, true);
 	   _layer_Building.setEnabled(false);
 	   layers.add(_layer_Building);
 
@@ -1278,6 +1283,12 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 		//return file;
 		return file.getAbsolutePath();
 	}
+
+@Override
+protected void initGLAdapter(GLVersion arg0) {
+   // TODO Auto-generated method stub
+   
+}
 	
 
 
