@@ -389,7 +389,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
       // update UI
       final float hillshadingAlpha = hillShadingOpacity / 100f;
-      mapApp.getLayer_HillShading().setBitmapAlpha(hillshadingAlpha);
+      mapApp.getLayer_HillShading().setBitmapAlpha(hillshadingAlpha, true);
 
       enableActions();
 
