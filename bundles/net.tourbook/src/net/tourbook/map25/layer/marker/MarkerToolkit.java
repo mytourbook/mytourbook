@@ -83,7 +83,7 @@ public class MarkerToolkit {
       
       _bitmapPoi = createPoiBitmap(shape);
       
-      _BitmapClusterStar = drawStar((int)_clusterOutlineSize);
+      _BitmapClusterStar = drawStar(_clusterSymbol_Size);
       
       _symbol = new MarkerSymbol(_bitmapPoi, MarkerSymbol.HotspotPlace.CENTER, false);
       
@@ -124,6 +124,8 @@ public class MarkerToolkit {
       _clusterSymbol_Size = config.clusterSymbol_Size;
       
       //System.out.println("*** Markertoolkit:  fillradius for star: " + config.clusterSymbol_Size + " " + config.clusterSymbol_Weight); //$NON-NLS-1$
+      //System.out.println("*** Markertoolkit:  _clusterOutlineSize for star: " + _clusterOutlineSize + " , _clusterSymbol_Size: " + _clusterSymbol_Size); //$NON-NLS-1$
+
    }
 
    public Bitmap createPoiBitmap(MarkerShape shape) {
