@@ -230,6 +230,14 @@ public class GeoCompareManager {
 
          comparerItem.tourTitle = tourData.getTourTitle();
          comparerItem.tourType = tourData.getTourType();
+
+         comparerItem.avgAltimeter = tourData.computeAvg_FromValues(tourData.getAltimeterSerie(), origStartIndex, origEndIndex);
+
+         final int recordingTime = tourData.timeSerie[origEndIndex] - tourData.timeSerie[origStartIndex];
+         final int drivingTime = Math.max(0, recordingTime - tourData.getBreakTime(origStartIndex, origEndIndex));
+         comparerItem.recordingTime = recordingTime;
+         comparerItem.movingTime = drivingTime;
+         comparerItem.distance = tourData.distanceSerie[origEndIndex] - tourData.distanceSerie[origStartIndex];
       }
 
       final ZonedDateTime tourStartTime = tourData.getTourStartTime();

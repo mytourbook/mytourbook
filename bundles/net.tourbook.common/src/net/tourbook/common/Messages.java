@@ -292,6 +292,7 @@ public class Messages extends NLS {
    public static String        Value_Formatter_Time_HH;
    public static String        Value_Formatter_Time_HH_MM;
    public static String        Value_Formatter_Time_HH_MM_SS;
+   public static String        Value_Formatter_Time_SSS;
 
    static {
       // initialize resource bundle

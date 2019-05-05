@@ -1485,12 +1485,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Swimming data: Relative time in seconds to the tour start time. Contains
     * {@link Short#MIN_VALUE} when value is not set.
     */
+   @XmlElementWrapper(name = "SwimTimes")
+   @XmlElement(name = "SwimTime")
    @Transient
    public int[]         swim_Time;
    /**
     * Swimming data: Activity is defined in {@link LengthType} e.g. active, idle. Contains
     * {@link Short#MIN_VALUE} when value is not set.
     */
+   @XmlElementWrapper(name = "SwimLengthTypes")
+   @XmlElement(name = "SwimLengthType")
    @Transient
    public short[]       swim_LengthType;
 
@@ -1499,6 +1503,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * Swimming data: Number of strokes. Contains {@link Short#MIN_VALUE} when value is not set.
     */
+   @XmlElementWrapper(name = "SwimStrokes")
+   @XmlElement(name = "SwimStroke")
    @Transient
    public short[]       swim_Strokes;
 
@@ -1508,6 +1514,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Swimming data: Stroke style is defined in {@link SwimStroke} e.g. freestyle, breaststroke...
     * Contains {@link Short#MIN_VALUE} when value is not set.
     */
+   @XmlElementWrapper(name = "SwimStrokeStyles")
+   @XmlElement(name = "SwimStrokeStyle")
    @Transient
    public short[]       swim_StrokeStyle;
 
@@ -1517,6 +1525,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Swimming data: Swimming cadence in strokes/min. Contains {@link Short#MIN_VALUE} when value is
     * not set.
     */
+   @XmlElementWrapper(name = "SwimCadences")
+   @XmlElement(name = "SwimCadence")
    @Transient
    public short[]       swim_Cadence;
 
@@ -1533,6 +1543,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * Computed swim data serie
     */
+   @XmlElementWrapper(name = "SwimSwolfs")
+   @XmlElement(name = "SwimSwolf")
    @Transient
    private float[]      _swim_Swolf;
 
@@ -1553,7 +1565,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 // SET_FORMATTING_ON
 
-   public TourData() {}
+   public TourData() {
+   }
 
    /**
     * Removed data series when the sum of all values is 0.
@@ -2768,7 +2781,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return (float) (timeSquare == 0 ? 0 : cadenceSquare / timeSquare);
    }
 
-   public float computeAvg_FromValues(final short[] valueSerie, final int firstIndex, final int lastIndex) {
+   public float computeAvg_FromValues(final float[] valueSerie, final int firstIndex, final int lastIndex) {
 
       // check if data are available
       if (valueSerie == null || valueSerie.length == 0 || timeSerie == null || timeSerie.length == 0) {
@@ -2867,6 +2880,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
 
       return (float) (timeSquare == 0 ? 0 : valueSquare / timeSquare);
+   }
+
+   public float computeAvg_FromValues(final short[] valueSerie, final int firstIndex, final int lastIndex) {
+
+      // convert short[] into float[]
+      final float[] floatValueSerie = new float[valueSerie.length];
+
+      for (int valueIndex = 0; valueIndex < floatValueSerie.length; valueIndex++) {
+         floatValueSerie[valueIndex] = valueSerie[valueIndex];
+      }
+
+      return computeAvg_FromValues(floatValueSerie, firstIndex, lastIndex);
    }
 
    public void computeAvg_Pulse() {
@@ -6063,6 +6088,126 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
 
       return false;
+   }
+
+   /**
+    * Fill swim data into tourdata.
+    *
+    * @param tourData
+    * @param allTourSwimData
+    */
+   public void finalizeTour_SwimData(final TourData tourData, final List<SwimData> allTourSwimData) {
+
+      // check if swim data are available
+      if (allTourSwimData == null) {
+         return;
+      }
+
+      final long tourStartTime = tourData.getTourStartTimeMS();
+
+      final int swimDataSize = allTourSwimData.size();
+
+      final short[] lengthType = new short[swimDataSize];
+      final short[] cadence = new short[swimDataSize];
+      final short[] strokes = new short[swimDataSize];
+      final short[] strokeStyle = new short[swimDataSize];
+      final int[] swimTime = new int[swimDataSize];
+
+      tourData.swim_LengthType = lengthType;
+      tourData.swim_Cadence = cadence;
+      tourData.swim_Strokes = strokes;
+      tourData.swim_StrokeStyle = strokeStyle;
+      tourData.swim_Time = swimTime;
+
+      boolean isSwimLengthType = false;
+      boolean isSwimCadence = false;
+      boolean isSwimStrokes = false;
+      boolean isSwimStrokeStyle = false;
+      boolean isSwimTime = false;
+
+      for (int swimSerieIndex = 0; swimSerieIndex < allTourSwimData.size(); swimSerieIndex++) {
+
+         final SwimData swimData = allTourSwimData.get(swimSerieIndex);
+
+         final long absoluteSwimTime = swimData.absoluteTime;
+         final short relativeSwimTime = (short) ((absoluteSwimTime - tourStartTime) / 1000);
+
+         final short swimLengthType = swimData.swim_LengthType;
+         short swimCadence = swimData.swim_Cadence;
+         short swimStrokes = swimData.swim_Strokes;
+         final short swimStrokeStyle = swimData.swim_StrokeStyle;
+
+         /*
+          * Length type
+          */
+         if (swimLengthType != Short.MIN_VALUE && swimLengthType > 0) {
+            isSwimLengthType = true;
+         }
+
+         /*
+          * Cadence
+          */
+         if (swimCadence == Short.MIN_VALUE) {
+            swimCadence = 0;
+         }
+         if (swimCadence > 0) {
+            isSwimCadence = true;
+         }
+
+         /*
+          * Strokes
+          */
+         if (swimStrokes == Short.MIN_VALUE) {
+            swimStrokes = 0;
+         }
+         if (swimStrokes > 0) {
+            isSwimStrokes = true;
+         }
+
+         /*
+          * Stroke style
+          */
+         if (swimStrokeStyle != Short.MIN_VALUE && swimStrokeStyle > 0) {
+            isSwimStrokeStyle = true;
+         }
+
+         /*
+          * Swim time
+          */
+         if (relativeSwimTime > 0) {
+            isSwimTime = true;
+         }
+
+         lengthType[swimSerieIndex] = swimLengthType;
+         cadence[swimSerieIndex] = swimCadence;
+         strokes[swimSerieIndex] = swimStrokes;
+         strokeStyle[swimSerieIndex] = swimStrokeStyle;
+         swimTime[swimSerieIndex] = relativeSwimTime;
+      }
+
+      /*
+       * Cleanup data series
+       */
+      if (isSwimLengthType == false) {
+         tourData.swim_LengthType = null;
+      }
+      if (isSwimStrokes == false) {
+         tourData.swim_Strokes = null;
+      }
+      if (isSwimStrokeStyle == false) {
+         tourData.swim_StrokeStyle = null;
+      }
+      if (isSwimTime == false) {
+         tourData.swim_Time = null;
+      }
+
+      // cadence is very special
+      if (isSwimCadence) {
+         // removed 'normal' cadence data serie when swim cadence is available
+         tourData.setCadenceSerie(null);
+      } else {
+         tourData.swim_Cadence = null;
+      }
    }
 
    /**
@@ -9889,5 +10034,4 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          tourMarker.updateDatabase_019_to_020();
       }
    }
-
 }

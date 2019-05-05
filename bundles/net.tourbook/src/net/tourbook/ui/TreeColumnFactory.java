@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,14 +15,14 @@
  *******************************************************************************/
 package net.tourbook.ui;
 
-import org.eclipse.jface.layout.PixelConverter;
-import org.eclipse.swt.SWT;
-
 import net.tourbook.common.UI;
 import net.tourbook.common.formatter.ValueFormat;
 import net.tourbook.common.formatter.ValueFormatSet;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.TreeColumnDefinition;
+
+import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.swt.SWT;
 
 public abstract class TreeColumnFactory {
 
@@ -88,6 +88,7 @@ public abstract class TreeColumnFactory {
 
    public static final TreeColumnFactory TIME_DATE;
    public static final TreeColumnFactory TIME_DRIVING_TIME;
+   public static final TreeColumnFactory TIME_DRIVING_TIME_NO_CATEGORY;
    public static final TreeColumnFactory TIME_PAUSED_TIME;
    public static final TreeColumnFactory TIME_PAUSED_TIME_RELATIVE;
    public static final TreeColumnFactory TIME_RECORDING_TIME;
@@ -148,7 +149,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
             return colDef;
-         };
+         }
       };
 
       ALTITUDE_MAX = new TreeColumnFactory() {
@@ -168,7 +169,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
             return colDef;
-         };
+         }
       };
 
       ALTITUDE_UP = new TreeColumnFactory() {
@@ -188,7 +189,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
             return colDef;
-         };
+         }
       };
 
       /*
@@ -216,7 +217,7 @@ public abstract class TreeColumnFactory {
                   columnManager);
 
             return colDef;
-         };
+         }
       };
 
       BODY_PERSON = new TreeColumnFactory() {
@@ -234,7 +235,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
 
             return colDef;
-         };
+         }
       };
 
       BODY_PULSE_AVG = new TreeColumnFactory() {
@@ -258,7 +259,7 @@ public abstract class TreeColumnFactory {
                   columnManager);
 
             return colDef;
-         };
+         }
       };
 
       BODY_PULSE_MAX = new TreeColumnFactory() {
@@ -277,7 +278,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
 
             return colDef;
-         };
+         }
       };
 
       BODY_RESTPULSE = new TreeColumnFactory() {
@@ -296,7 +297,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(7));
 
             return colDef;
-         };
+         }
       };
 
       BODY_WEIGHT = new TreeColumnFactory() {
@@ -315,7 +316,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(7));
 
             return colDef;
-         };
+         }
       };
 
       /*
@@ -339,7 +340,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(6));
 
             return colDef;
-         };
+         }
       };
 
       DATA_IMPORT_FILE_NAME = new TreeColumnFactory() {
@@ -359,7 +360,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
 
             return colDef;
-         };
+         }
       };
 
       DATA_IMPORT_FILE_PATH = new TreeColumnFactory() {
@@ -379,7 +380,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
 
             return colDef;
-         };
+         }
       };
 
       DATA_NUM_TIME_SLICES = new TreeColumnFactory() {
@@ -399,7 +400,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
             return colDef;
-         };
+         }
       };
 
       DATA_NUM_TOURS = new TreeColumnFactory() {
@@ -417,7 +418,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
             return colDef;
-         };
+         }
       };
 
       DATA_TIME_INTERVAL = new TreeColumnFactory() {
@@ -438,7 +439,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
             return colDef;
-         };
+         }
       };
 
       /*
@@ -465,7 +466,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(13));
 
             return colDef;
-         };
+         }
       };
 
       DEVICE_NAME = new TreeColumnFactory() {
@@ -483,7 +484,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
             return colDef;
-         };
+         }
       };
 
       /*
@@ -509,7 +510,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
 
             return colDef;
-         };
+         }
       };
 
       MOTION_AVG_SPEED = new TreeColumnFactory() {
@@ -536,7 +537,7 @@ public abstract class TreeColumnFactory {
                   columnManager);
 
             return colDef;
-         };
+         }
       };
 
       MOTION_DISTANCE = new TreeColumnFactory() {
@@ -562,7 +563,7 @@ public abstract class TreeColumnFactory {
                   columnManager);
 
             return colDef;
-         };
+         }
       };
 
       MOTION_MAX_SPEED = new TreeColumnFactory() {
@@ -590,7 +591,7 @@ public abstract class TreeColumnFactory {
                   columnManager);
 
             return colDef;
-         };
+         }
       };
 
       /*
@@ -620,7 +621,7 @@ public abstract class TreeColumnFactory {
                   columnManager);
 
             return colDef;
-         };
+         }
       };
 
       POWER_MAX = new TreeColumnFactory() {
@@ -647,7 +648,7 @@ public abstract class TreeColumnFactory {
                   columnManager);
 
             return colDef;
-         };
+         }
       };
 
       POWER_NORMALIZED = new TreeColumnFactory() {
@@ -669,7 +670,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
 
             return colDef;
-         };
+         }
       };
 
       POWER_TOTAL_WORK = new TreeColumnFactory() {
@@ -696,7 +697,7 @@ public abstract class TreeColumnFactory {
                   columnManager);
 
             return colDef;
-         };
+         }
       };
 
       /*
@@ -726,7 +727,7 @@ public abstract class TreeColumnFactory {
                   columnManager);
 
             return colDef;
-         };
+         }
       };
 
       POWERTRAIN_AVG_LEFT_PEDAL_SMOOTHNESS = new TreeColumnFactory() {
@@ -753,7 +754,7 @@ public abstract class TreeColumnFactory {
                   columnManager);
 
             return colDef;
-         };
+         }
       };
 
       POWERTRAIN_AVG_RIGHT_PEDAL_SMOOTHNESS = new TreeColumnFactory() {
@@ -780,7 +781,7 @@ public abstract class TreeColumnFactory {
                   columnManager);
 
             return colDef;
-         };
+         }
       };
 
       POWERTRAIN_AVG_LEFT_TORQUE_EFFECTIVENESS = new TreeColumnFactory() {
@@ -807,7 +808,7 @@ public abstract class TreeColumnFactory {
                   columnManager);
 
             return colDef;
-         };
+         }
       };
 
       POWERTRAIN_AVG_RIGHT_TORQUE_EFFECTIVENESS = new TreeColumnFactory() {
@@ -834,7 +835,7 @@ public abstract class TreeColumnFactory {
                   columnManager);
 
             return colDef;
-         };
+         }
       };
 
       POWERTRAIN_CADENCE_MULTIPLIER = new TreeColumnFactory() {
@@ -856,7 +857,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(4));
 
             return colDef;
-         };
+         }
       };
 
       POWERTRAIN_GEAR_FRONT_SHIFT_COUNT = new TreeColumnFactory() {
@@ -877,7 +878,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
             return colDef;
-         };
+         }
       };
 
       POWERTRAIN_GEAR_REAR_SHIFT_COUNT = new TreeColumnFactory() {
@@ -898,7 +899,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
             return colDef;
-         };
+         }
       };
 
       POWERTRAIN_PEDAL_LEFT_RIGHT_BALANCE = new TreeColumnFactory() {
@@ -919,7 +920,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
 
             return colDef;
-         };
+         }
       };
 
       /*
@@ -946,7 +947,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
             return colDef;
-         };
+         }
       };
 
       RUN_DYN_STANCE_TIME_MAX = new TreeColumnFactory() {
@@ -969,7 +970,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
             return colDef;
-         };
+         }
       };
 
       RUN_DYN_STANCE_TIME_AVG = new TreeColumnFactory() {
@@ -992,7 +993,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
             return colDef;
-         };
+         }
       };
 
       RUN_DYN_STANCE_TIME_BALANCE_MIN = new TreeColumnFactory() {
@@ -1020,7 +1021,7 @@ public abstract class TreeColumnFactory {
                   columnManager);
 
             return colDef;
-         };
+         }
       };
 
       RUN_DYN_STANCE_TIME_BALANCE_MAX = new TreeColumnFactory() {
@@ -1048,7 +1049,7 @@ public abstract class TreeColumnFactory {
                   columnManager);
 
             return colDef;
-         };
+         }
       };
 
       RUN_DYN_STANCE_TIME_BALANCE_AVG = new TreeColumnFactory() {
@@ -1076,7 +1077,7 @@ public abstract class TreeColumnFactory {
                   columnManager);
 
             return colDef;
-         };
+         }
       };
 
       RUN_DYN_STEP_LENGTH_MIN = new TreeColumnFactory() {
@@ -1117,7 +1118,7 @@ public abstract class TreeColumnFactory {
             }
 
             return colDef;
-         };
+         }
       };
 
       RUN_DYN_STEP_LENGTH_MAX = new TreeColumnFactory() {
@@ -1158,7 +1159,7 @@ public abstract class TreeColumnFactory {
             }
 
             return colDef;
-         };
+         }
       };
 
       RUN_DYN_STEP_LENGTH_AVG = new TreeColumnFactory() {
@@ -1199,7 +1200,7 @@ public abstract class TreeColumnFactory {
             }
 
             return colDef;
-         };
+         }
       };
 
       RUN_DYN_VERTICAL_OSCILLATION_MIN = new TreeColumnFactory() {
@@ -1240,7 +1241,7 @@ public abstract class TreeColumnFactory {
             }
 
             return colDef;
-         };
+         }
       };
 
       RUN_DYN_VERTICAL_OSCILLATION_MAX = new TreeColumnFactory() {
@@ -1281,7 +1282,7 @@ public abstract class TreeColumnFactory {
             }
 
             return colDef;
-         };
+         }
       };
 
       RUN_DYN_VERTICAL_OSCILLATION_AVG = new TreeColumnFactory() {
@@ -1322,7 +1323,7 @@ public abstract class TreeColumnFactory {
             }
 
             return colDef;
-         };
+         }
       };
 
       RUN_DYN_VERTICAL_RATIO_MIN = new TreeColumnFactory() {
@@ -1357,7 +1358,7 @@ public abstract class TreeColumnFactory {
                   columnManager);
 
             return colDef;
-         };
+         }
       };
 
       RUN_DYN_VERTICAL_RATIO_MAX = new TreeColumnFactory() {
@@ -1392,7 +1393,7 @@ public abstract class TreeColumnFactory {
                   columnManager);
 
             return colDef;
-         };
+         }
       };
 
       RUN_DYN_VERTICAL_RATIO_AVG = new TreeColumnFactory() {
@@ -1427,7 +1428,7 @@ public abstract class TreeColumnFactory {
                   columnManager);
 
             return colDef;
-         };
+         }
       };
 
       /*
@@ -1453,7 +1454,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
             return colDef;
-         };
+         }
       };
 
       SURFING_MIN_SPEED_START_STOP = new TreeColumnFactory() {
@@ -1475,7 +1476,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(11));
 
             return colDef;
-         };
+         }
       };
 
       SURFING_MIN_SPEED_SURFING = new TreeColumnFactory() {
@@ -1497,7 +1498,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
             return colDef;
-         };
+         }
       };
 
       SURFING_MIN_TIME_DURATION = new TreeColumnFactory() {
@@ -1517,7 +1518,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
             return colDef;
-         };
+         }
       };
 
       SURFING_NUMBER_OF_EVENTS = new TreeColumnFactory() {
@@ -1537,7 +1538,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
             return colDef;
-         };
+         }
       };
 
       /*
@@ -1559,7 +1560,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(18));
 
             return colDef;
-         };
+         }
       };
 
       TIME_DRIVING_TIME = new TreeColumnFactory() {
@@ -1578,14 +1579,39 @@ public abstract class TreeColumnFactory {
             colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_driving_time_tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
-            colDef.setValueFormats(//
+            colDef.setValueFormats(
                   ValueFormatSet.Time,
                   ValueFormat.TIME_HH,
                   ValueFormat.TIME_HH_MM,
                   columnManager);
 
             return colDef;
-         };
+         }
+      };
+
+      TIME_DRIVING_TIME_NO_CATEGORY = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager,
+                  "TIME_DRIVING_TIME", //$NON-NLS-1$
+                  SWT.TRAIL);
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
+            colDef.setColumnLabel(Messages.ColumnFactory_driving_time_label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_driving_time);
+            colDef.setColumnUnit(Messages.ColumnFactory_driving_time);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_driving_time_tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+            colDef.setValueFormats(
+                  ValueFormatSet.Time,
+                  ValueFormat.TIME_HH,
+                  columnManager);
+
+            return colDef;
+         }
       };
 
       TIME_PAUSED_TIME = new TreeColumnFactory() {
@@ -1611,7 +1637,7 @@ public abstract class TreeColumnFactory {
                   columnManager);
 
             return colDef;
-         };
+         }
       };
 
       TIME_PAUSED_TIME_RELATIVE = new TreeColumnFactory() {
@@ -1633,7 +1659,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
             return colDef;
-         };
+         }
       };
 
       TIME_RECORDING_TIME = new TreeColumnFactory() {
@@ -1659,7 +1685,7 @@ public abstract class TreeColumnFactory {
                   columnManager);
 
             return colDef;
-         };
+         }
       };
 
       TIME_TIME_ZONE = new TreeColumnFactory() {
@@ -1679,7 +1705,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(25));
 
             return colDef;
-         };
+         }
       };
 
       TIME_TIME_ZONE_DIFFERENCE = new TreeColumnFactory() {
@@ -1703,7 +1729,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
             return colDef;
-         };
+         }
       };
 
       TIME_TOUR_START_TIME = new TreeColumnFactory() {
@@ -1724,7 +1750,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
 
             return colDef;
-         };
+         }
       };
 
       TIME_WEEK_DAY = new TreeColumnFactory() {
@@ -1742,7 +1768,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
 
             return colDef;
-         };
+         }
       };
 
       TIME_WEEK_NO = new TreeColumnFactory() {
@@ -1760,7 +1786,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(7));
 
             return colDef;
-         };
+         }
       };
 
       TIME_WEEKYEAR = new TreeColumnFactory() {
@@ -1778,7 +1804,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(14));
 
             return colDef;
-         };
+         }
       };
 
       /*
@@ -1802,7 +1828,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(18));
 
             return colDef;
-         };
+         }
       };
 
       TOUR_COUNTER = new TreeColumnFactory() {
@@ -1820,7 +1846,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
 
             return colDef;
-         };
+         }
       };
 
       TOUR_NUM_MARKERS = new TreeColumnFactory() {
@@ -1840,7 +1866,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
 
             return colDef;
-         };
+         }
       };
 
       TOUR_NUM_PHOTOS = new TreeColumnFactory() {
@@ -1860,7 +1886,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
             return colDef;
-         };
+         }
       };
 
       TOUR_REFTOUR_TOUR = new TreeColumnFactory() {
@@ -1880,7 +1906,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
 
             return colDef;
-         };
+         }
       };
 
       TOUR_TAG_AND_TAGS = new TreeColumnFactory() {
@@ -1900,7 +1926,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
 
             return colDef;
-         };
+         }
       };
 
       TOUR_TAGS = new TreeColumnFactory() {
@@ -1918,7 +1944,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
 
             return colDef;
-         };
+         }
       };
 
       TOUR_TITLE = new TreeColumnFactory() {
@@ -1936,7 +1962,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
 
             return colDef;
-         };
+         }
       };
 
       TOUR_TYPE = new TreeColumnFactory() {
@@ -1953,7 +1979,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
 
             return colDef;
-         };
+         }
       };
 
       TOUR_TYPE_TEXT = new TreeColumnFactory() {
@@ -1970,7 +1996,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(18));
 
             return colDef;
-         };
+         }
       };
 
       /*
@@ -1996,7 +2022,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
 
             return colDef;
-         };
+         }
       };
 
       TRAINING_INTENSITY_FACTOR = new TreeColumnFactory() {
@@ -2022,7 +2048,7 @@ public abstract class TreeColumnFactory {
                   columnManager);
 
             return colDef;
-         };
+         }
       };
 
       TRAINING_POWER_TO_WEIGHT = new TreeColumnFactory() {
@@ -2049,7 +2075,7 @@ public abstract class TreeColumnFactory {
                   columnManager);
 
             return colDef;
-         };
+         }
       };
 
       TRAINING_STRESS_SCORE = new TreeColumnFactory() {
@@ -2075,7 +2101,7 @@ public abstract class TreeColumnFactory {
                   columnManager);
 
             return colDef;
-         };
+         }
       };
 
       /*
@@ -2107,7 +2133,7 @@ public abstract class TreeColumnFactory {
                   columnManager);
 
             return colDef;
-         };
+         }
       };
 
       WEATHER_CLOUDS = new TreeColumnFactory() {
@@ -2125,7 +2151,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(25);
 
             return colDef;
-         };
+         }
       };
 
       WEATHER_WIND_DIR = new TreeColumnFactory() {
@@ -2148,7 +2174,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(7));
 
             return colDef;
-         };
+         }
       };
 
       WEATHER_WIND_SPEED = new TreeColumnFactory() {
@@ -2169,7 +2195,7 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(11));
 
             return colDef;
-         };
+         }
       };
    }
 

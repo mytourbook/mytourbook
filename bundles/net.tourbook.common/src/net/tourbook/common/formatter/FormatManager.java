@@ -36,6 +36,7 @@ public class FormatManager {
    private static IValueFormatter        _valueFormatter_Time_HH     = new ValueFormatter_Time_HH();
    private static IValueFormatter        _valueFormatter_Time_HHMM   = new ValueFormatter_Time_HHMM();
    private static IValueFormatter        _valueFormatter_Time_HHMMSS = new ValueFormatter_Time_HHMMSS();
+   private static IValueFormatter        _valueFormatter_Time_SSS    = new ValueFormatter_Time_SSS();
 
    private static IValueFormatter        _altitudeFormatter;
    private static IValueFormatter        _cadenceFormatter;
@@ -135,6 +136,10 @@ public class FormatManager {
 
          return _valueFormatter_Time_HHMMSS;
 
+      } else if (formatName.equals(ValueFormat.TIME_SSS.name())) {
+
+         return _valueFormatter_Time_SSS;
+
       } else {
 
          return _valueFormatter_Time_HHMMSS;
@@ -168,6 +173,9 @@ public class FormatManager {
 
       case TIME_HH_MM_SS:
          return Messages.Value_Formatter_Time_HH_MM_SS;
+
+      case TIME_SSS:
+         return Messages.Value_Formatter_Time_SSS;
 
       case DEFAULT:
       case DUMMY_VALUE:

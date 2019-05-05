@@ -8,44 +8,44 @@
 
 plugins {
 
-    // osgi bundle support
-	id 'com.diffplug.gradle.osgi.bndmanifest' version '3.7.0'
+   // osgi bundle support
+   id 'com.diffplug.gradle.osgi.bndmanifest' version '3.17.6'
 }
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
 
 repositories {
-	mavenCentral()
-	maven { url 'https://jitpack.io' }
+   mavenCentral()
+   maven { url 'https://jitpack.io' }
 }
 
 dependencies {
 
-	compile project(':net.tourbook.ext.vtm.linux')
-	compile project(':net.tourbook.ext.vtm.macosx')
-	compile project(':net.tourbook.ext.vtm.windows')
-	
-	compile project(':vtm')
-	compile project(':vtm-desktop')
-	compile project(':vtm-gdx')
-	compile project(':vtm-http')
-	compile project(':vtm-themes')
-	
-	// !!! STRING MUST BE CREATED WITH " OTHERWISE IT IS NOT WORKING !!!
-	compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-	 	
-	/*
-		This error is fixed with slf4j-simple
-	
-		SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
-		SLF4J: Defaulting to no-operation (NOP) logger implementation
-		SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
-	*/
+   compile project(':net.tourbook.ext.vtm.linux')
+   compile project(':net.tourbook.ext.vtm.macosx')
+   compile project(':net.tourbook.ext.vtm.windows')
+   
+   compile project(':vtm')
+   compile project(':vtm-desktop')
+   compile project(':vtm-gdx')
+   compile project(':vtm-http')
+   compile project(':vtm-themes')
+   
+   // !!! STRING MUST BE CREATED WITH " OTHERWISE IT IS NOT WORKING !!!
+   compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+       
+   /*
+      This error is fixed with slf4j-simple
+   
+      SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+      SLF4J: Defaulting to no-operation (NOP) logger implementation
+      SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+   */
     compile 'org.slf4j:slf4j-simple:1.7.25'
     
     // http logging
-    compile 'com.squareup.okhttp3:logging-interceptor:3.8.0'
+    compile 'com.squareup.okhttp3:logging-interceptor:3.14.1'
 }
 
 // -----------------------------------
@@ -55,234 +55,234 @@ eclipse {
 
     project {
 
-		buildCommand 'org.eclipse.jdt.core.javabuilder'
+      buildCommand 'org.eclipse.jdt.core.javabuilder'
 
-		natures = [
-		        'org.eclipse.pde.PluginNature',
-		        'org.eclipse.jdt.core.javanature'
-		] 
+      natures = [
+              'org.eclipse.pde.PluginNature',
+              'org.eclipse.jdt.core.javanature'
+      ] 
     }
 }
 
 task logCompileConfig {
 
-	doLast {
-	    
-		println 'configurations.compile'
-		
-	    configurations.compile.each {
-	    	println '\t' + it.name
-	    }         
-	}
+   doLast {
+       
+      println 'configurations.compile'
+      
+       configurations.compile.each {
+          println '\t' + it.name
+       }         
+   }
 }
 
-def nativesDir_Linux	= project(':net.tourbook.ext.vtm.linux'		).projectDir.toString() + '/natives'
-def nativesDir_MacOS	= project(':net.tourbook.ext.vtm.macosx'	).projectDir.toString() + '/natives'
-def nativesDir_Windows	= project(':net.tourbook.ext.vtm.windows'	).projectDir.toString() + '/natives'
-def nativesDir_Vtm		= project(':vtm-desktop'					).projectDir.toString() + '/natives'
+def nativesDir_Linux    = project(':net.tourbook.ext.vtm.linux'   ).projectDir.toString() + '/natives'
+def nativesDir_MacOS    = project(':net.tourbook.ext.vtm.macosx'  ).projectDir.toString() + '/natives'
+def nativesDir_Windows  = project(':net.tourbook.ext.vtm.windows' ).projectDir.toString() + '/natives'
+def nativesDir_Vtm      = project(':vtm-desktop'                  ).projectDir.toString() + '/natives'
 
 // extract natives from jar files
 task extractNatives {
 
-	doLast {
+   doLast {
 
-		println 'extractNatives'
-	
-		configurations.compile.files.each { file ->
-		
-			if (file.name.contains('gdx-platform')) {
-	
-				println "\t$file.name - $file.path"
-	
-				// copy gdx linux natives		    
-				copy {
-				   from zipTree("$file.path")
-				   into nativesDir_Linux
-				   include '*.so'
-				}
-	
-				// copy gdx macos natives		    
-				copy {
-				   from zipTree("$file.path")
-				   into nativesDir_MacOS
-				   include '*.dylib'
-				}
-	
-				// copy gdx windows natives		    
-				copy {
-				   from zipTree("$file.path")
-				   into nativesDir_Windows
-				   include '*.dll'
-				}
-				
-			} else if (file.name.contains('natives-linux')) {
-	
-				println "\t$file.name - $file.path"
-	
-				// copy linux natives		    
-				copy {
-				   from zipTree("$file.path")
-				   into nativesDir_Linux
-				   include '*.so'
-				}
-				
-			} else if (file.name.contains('natives-osx')) {
-	
-				println "\t$file.name - $file.path"
-	
-				// copy macos natives		    
-				copy {
-				   from zipTree("$file.path")
-				   into nativesDir_MacOS
-				   include '*.dylib'
-				}
-				
-			} else if (file.name.contains('natives-windows')) {
-	
-				println "\t$file.name - $file.path"
-	
-				// copy windows natives		    
-				copy {
-				   from zipTree("$file.path")
-				   into nativesDir_Windows
-				   include '*.dll'
-				}
-			}
-		}
-	}
+      println 'extractNatives'
+   
+      configurations.compile.files.each { file ->
+      
+         if (file.name.contains('gdx-platform')) {
+   
+            println "\t$file.name - $file.path"
+   
+            // copy gdx linux natives          
+            copy {
+               from zipTree("$file.path")
+               into nativesDir_Linux
+               include '*.so'
+            }
+   
+            // copy gdx macos natives          
+            copy {
+               from zipTree("$file.path")
+               into nativesDir_MacOS
+               include '*.dylib'
+            }
+   
+            // copy gdx windows natives          
+            copy {
+               from zipTree("$file.path")
+               into nativesDir_Windows
+               include '*.dll'
+            }
+            
+         } else if (file.name.contains('natives-linux')) {
+   
+            println "\t$file.name - $file.path"
+   
+            // copy linux natives          
+            copy {
+               from zipTree("$file.path")
+               into nativesDir_Linux
+               include '*.so'
+            }
+            
+         } else if (file.name.contains('natives-osx')) {
+   
+            println "\t$file.name - $file.path"
+   
+            // copy macos natives          
+            copy {
+               from zipTree("$file.path")
+               into nativesDir_MacOS
+               include '*.dylib'
+            }
+            
+         } else if (file.name.contains('natives-windows')) {
+   
+            println "\t$file.name - $file.path"
+   
+            // copy windows natives          
+            copy {
+               from zipTree("$file.path")
+               into nativesDir_Windows
+               include '*.dll'
+            }
+         }
+      }
+   }
 }
 
 // copy vtm natives into plugin fragment
 task copyVtmNatives_Linux(type: Copy) {
 
-	from nativesDir_Vtm + '/linux'
-	into nativesDir_Linux
+   from nativesDir_Vtm + '/linux'
+   into nativesDir_Linux
     include '**/*'
 }
 task copyVtmNatives_MacOS(type: Copy) {
 
-	from nativesDir_Vtm + '/osx'
-	into nativesDir_MacOS
+   from nativesDir_Vtm + '/osx'
+   into nativesDir_MacOS
     include '**/*'
 }
 task copyVtmNatives_Windows(type: Copy) {
 
-	from nativesDir_Vtm + '/windows'
-	into nativesDir_Windows
+   from nativesDir_Vtm + '/windows'
+   into nativesDir_Windows
     include '**/*'
 }
 
 // sync will remove old jar's !!!
 task copyDependenciesIntoLibFolder(type: Sync) {
 
-	// sync compile jar's (dependencies) into the lib folder
-    into 'libs'
-    from configurations.compile
+   // sync compile jar's (dependencies) into the lib folder
+   into 'libs'
+   from configurations.compile
     
-    exclude '*natives*.jar'
-	exclude	'net.tourbook.*.jar' 
+   exclude '*natives*.jar'
+   exclude   'net.tourbook.*.jar' 
 }
 
 // MUST be set AFTER task declaration !!!
 tasks.classes.dependsOn(
 
-	logCompileConfig,
+   logCompileConfig,
 
-	// copy natives into platform plugin fragments
-	extractNatives,
-	copyVtmNatives_Linux,
-	copyVtmNatives_MacOS,
-	copyVtmNatives_Windows,
+   // copy natives into platform plugin fragments
+   extractNatives,
+   copyVtmNatives_Linux,
+   copyVtmNatives_MacOS,
+   copyVtmNatives_Windows,
 
-	// copy jars from dependencies to 'public' project folder
-	copyDependenciesIntoLibFolder,
-	
-	// recreate eclipse files
-	cleanEclipseClasspath, 
-	cleanEclipseProject, 
-	cleanEclipseJdt, 
-	
-	eclipseClasspath, 
-	eclipseProject, 
-	eclipseJdt, 
+   // copy jars from dependencies to 'public' project folder
+   copyDependenciesIntoLibFolder,
+   
+   // recreate eclipse files
+   cleanEclipseClasspath, 
+   cleanEclipseProject, 
+   cleanEclipseJdt, 
+   
+   eclipseClasspath, 
+   eclipseProject, 
+   eclipseJdt, 
 
-	// !!! THIS IS NOT WORKING !!!
-	// cleanEclipse, 
-	// eclipse, 
+   // !!! THIS IS NOT WORKING !!!
+   // cleanEclipse, 
+   // eclipse, 
 )
 
 // Convert created .classpath entries from
 //
-//	<classpathentry 
-//		kind		="lib" 
-//		path		="C:/Users/<user>/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-lang3/3.5/6c6c702c89bfff3cd9e80b04d668c5e190d588c6/commons-lang3-3.5.jar"
-//		sourcepath	="C:/Users/<user>/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-lang3/3.5/f7d878153e86a1cdddf6b37850e00a9f8bff726f/commons-lang3-3.5-sources.jar" 
-//	/>
+//   <classpathentry 
+//      kind      ="lib" 
+//      path      ="C:/Users/<user>/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-lang3/3.5/6c6c702c89bfff3cd9e80b04d668c5e190d588c6/commons-lang3-3.5.jar"
+//      sourcepath   ="C:/Users/<user>/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-lang3/3.5/f7d878153e86a1cdddf6b37850e00a9f8bff726f/commons-lang3-3.5-sources.jar" 
+//   />
 //
 // into plugin "local" folders
 //
-//	<classpathentry 
-//		kind		="lib" 
-//		exported	="true" 
-//		path		="libs/commons-lang3-3.5.jar"
-//		sourcepath	="libs/commons-lang3-3.5-sources.jar" 
-//	/>
+//   <classpathentry 
+//      kind      ="lib" 
+//      exported   ="true" 
+//      path      ="libs/commons-lang3-3.5.jar"
+//      sourcepath   ="libs/commons-lang3-3.5-sources.jar" 
+//   />
 eclipse.classpath.file { 
 
-	// cleanup classpath
-    whenMerged { classpath ->
-    
-		// remove natives classpath entries, they causes errors
-        classpath.entries.removeAll{ entry -> entry.path.contains('vtm-parent/vtm-desktop/natives') }
+   // cleanup classpath
+   whenMerged { classpath ->
 
-        // remove natives which are put into platform features
-        classpath.entries.removeAll{ entry -> entry.path.contains('net.tourbook') }
-        classpath.entries.removeAll{ entry -> entry.path.contains('gdx-platform') }
-        classpath.entries.removeAll{ entry -> entry.path.contains('lwjgl-platform') }
-        classpath.entries.removeAll{ entry -> entry.path.contains('jinput-platform') }
-    }
+      // remove natives classpath entries, they causes errors
+      classpath.entries.removeAll{ entry -> entry.path.contains('vtm-parent/vtm-desktop/natives') }
 
-    
-	withXml { xml ->
+      // remove natives which are put into platform features
+      classpath.entries.removeAll{ entry -> entry.path.contains('net.tourbook') }
+      classpath.entries.removeAll{ entry -> entry.path.contains('gdx-platform') }
+      classpath.entries.removeAll{ entry -> entry.path.contains('lwjgl-platform') }
+      classpath.entries.removeAll{ entry -> entry.path.contains('jinput-platform') }
+   }
 
-		def node = xml.asNode()
-	
-		// log all classpath items
-		println 'All classpathentry items'
-		node.classpathentry.each {
-			println '\t' + it
-		}
-	
-		// add 'libs/' folder for jar files
-		node.classpathentry.findAll { it.@kind == 'lib'}.each {
-		
-			//remove path from dependency name
-			def jarFileName = it.@path.tokenize('/')[-1]
-		
-			it.@exported	= 'true'
-			it.@path		= 'libs/' + jarFileName
-		}
-		
-		// src from a project dependency is not working, convert it into a jar, jar's are already created :-)
-		node.findAll { it.@kind == 'src'}.each {
-		
-			println 'converted'
-			println '\tfrom:\t' + it
-		
-			def srcPath = it.@path
-			
-			it.@kind		= 'lib'
-			it.@exported	= 'true'
-			it.@path		= 'libs' + srcPath + '.jar'
-			it.@sourcepath	= srcPath
-	
-			println '\tinto:\t' + it
-		}
-		
-		// add libs/ which contains the vtm natives
-		//	<classpathentry exported="true" kind="lib" path="libs/"/>
-	    node.appendNode('classpathentry', [ exported: true, kind: 'lib', path: 'libs/' ])
-	}
+
+   withXml { xml ->
+
+      def node = xml.asNode()
+
+      // log all classpath items
+      println 'All classpathentry items'
+      node.classpathentry.each {
+         println '\t' + it
+      }
+   
+      // add 'libs/' folder for jar files
+      node.classpathentry.findAll { it.@kind == 'lib'}.each {
+      
+         //remove path from dependency name
+         def jarFileName = it.@path.tokenize('/')[-1]
+      
+         it.@exported   = 'true'
+         it.@path      = 'libs/' + jarFileName
+      }
+      
+      // src from a project dependency is not working, convert it into a jar, jar's are already created :-)
+      node.findAll { it.@kind == 'src'}.each {
+      
+         println 'converted'
+         println '\tfrom:\t' + it
+      
+         def srcPath = it.@path
+         
+         it.@kind      = 'lib'
+         it.@exported   = 'true'
+         it.@path      = 'libs' + srcPath + '.jar'
+         it.@sourcepath   = srcPath
+   
+         println '\tinto:\t' + it
+      }
+      
+      // add libs/ which contains the vtm natives
+      //   <classpathentry exported="true" kind="lib" path="libs/"/>
+      node.appendNode('classpathentry', [ exported: true, kind: 'lib', path: 'libs/' ])
+   }
 }
 
 
@@ -293,69 +293,69 @@ eclipse.classpath.file {
 // copy manifest
 apply plugin: 'com.diffplug.gradle.osgi.bndmanifest'
 osgiBndManifest {
-	copyTo 'META-INF/MANIFEST.MF'
+   copyTo 'META-INF/MANIFEST.MF'
 }
 
 def createBundleClassPath() {
 
     def list = []
 
-	// use only compile time resources and not runtime resources, this trick excludes :sources 
+   // use only compile time resources and not runtime resources, this trick excludes :sources 
     configurations.compile.each {
     
-    	def name = it.name
-    	
-//   	println '\t' + name
-    	
-    	if(name.equals('linux') || name.equals('osx') || name.equals('windows')){ 
-	    	
-	    	// skip /natives/ items: linux, osx, windows
-	    	
-    	} else if (name.startsWith('net.tourbook') 
-    		|| name.startsWith('gdx-platform') 
-    		|| name.startsWith('lwjgl-platform') 
-    		|| name.startsWith('jinput-platform')) { 
-    	
-    		// skip dummy jars (net.tourbook) and platform jars
-    	
-    	} else { 
-	        list += 'libs/' + name
-    	}
+       def name = it.name
+       
+//      println '\t' + name
+       
+       if(name.equals('linux') || name.equals('osx') || name.equals('windows')){ 
+          
+          // skip /natives/ items: linux, osx, windows
+          
+       } else if (name.startsWith('net.tourbook') 
+          || name.startsWith('gdx-platform') 
+          || name.startsWith('lwjgl-platform') 
+          || name.startsWith('jinput-platform')) { 
+       
+          // skip dummy jars (net.tourbook) and platform jars
+       
+       } else { 
+           list += 'libs/' + name
+       }
     }
 
-	// add libs/ which contains the vtm natives
+   // add libs/ which contains the vtm natives
     list += 'libs/'
 
-	// add log4j.properties
+   // add log4j.properties
     list += 'resources/'
 
     return list.join(',')
 }
 
 // get MT version and remove quotes
-def _mtVersionRaw	= project(':mytourbook').ext.myTourbookVersion		// '18.2.0'
-def _mtVersion		= _mtVersionRaw.replaceAll('\'', '')				// 18.2.0
+def _mtVersionRaw   = project(':mytourbook').ext.myTourbookVersion      // '18.2.0'
+def _mtVersion      = _mtVersionRaw.replaceAll('\'', '')            // 18.2.0
 
 
 // set MANIFEST.MF properties to configure OSGi bundle
 jar.manifest.attributes(
 
-	'Bundle-SymbolicName': 							project.name,
-	'Bundle-Name': 									'Vector map from Mapsforge',
-	
-	// qualifier is an easy readable time stamp
-	'Bundle-Version':									_mtVersion + '.v${tstamp;yyyyMMdd-HHmm}',
+   'Bundle-SymbolicName':                    project.name,
+   'Bundle-Name':                            'Vector map from Mapsforge',
+   
+   // qualifier is an easy readable time stamp
+   'Bundle-Version':                         _mtVersion + '.v${tstamp;yyyyMMdd-HHmm}',
 
-	'Bundle-Vendor':									"MyTourbook",
-	'Bundle-License': 								'http://www.apache.org/licenses/LICENSE-2.0',
-	
-	// eclipse 4.6 manifest editor creates this property and not 'Require-Capability'
-	'Bundle-RequiredExecutionEnvironment':		'JavaSE-1.7',
+   'Bundle-Vendor':                          "MyTourbook",
+   'Bundle-License':                         'http://www.apache.org/licenses/LICENSE-2.0',
+   
+   // eclipse 4.6 manifest editor creates this property and not 'Require-Capability'
+   'Bundle-RequiredExecutionEnvironment':    'JavaSE-1.8',
 
-	// export all packages from all included jar's
-	'Export-Package': 								'*',
-    'Bundle-ClassPath': 							createBundleClassPath(),
+   // export all packages from all included jar's
+   'Export-Package':                         '*',
+    'Bundle-ClassPath':                      createBundleClassPath(),
 
-	'-removeheaders':									'Bnd-LastModified, Created-By, Tool, Private-Package, Require-Capability',
+   '-removeheaders':                         'Bnd-LastModified, Created-By, Tool, Private-Package, Require-Capability',
 )
 

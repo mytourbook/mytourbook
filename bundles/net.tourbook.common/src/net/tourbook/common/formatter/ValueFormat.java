@@ -32,5 +32,6 @@ public enum ValueFormat {
 	TIME_HH, //
 	TIME_HH_MM, //
 	TIME_HH_MM_SS, //
+   TIME_SSS, //
 
 }

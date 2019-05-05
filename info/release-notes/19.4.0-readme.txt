@@ -1,73 +1,114 @@
-Version 19.4.0                                             ?. April 2019
+Version 19.4.0                                            24. April 2019
 
 
-.fit Import
-===========
-
-The importer for .fit files has been simplified/restructured to fix an issue. Afterwards it was tested with several different .fit files. 
-
-It is still possible that there are undiscovered issue. So check your data after the next imports to ensure that all values are valid.
-
-New
+New   
 ===
 
-* 2D Map
+*2D Map
   
   - Hover and select a tour
-  - Tour breadcrumb to show selected tours
-  - Warning: No tour selection !
+  - Tour breadcrumb to navigate selected tours
 
+  There can still be some minor issues and room for improvements
 
-Improvements
+ 
+Improvements   
 ============
 
 * Search Tour by Location
 
-  - Option for fast map drawing 
-  - Relocate map to the geo filter original position by selecting the geo filter label in the map
+  - Fast map drawing option
+  - Relocate map to the original position of the geo filter
   - Delete geo filter without name
-
 
 * 2.5D Map
 
-  - Map bookmarks can be displayed in the map
+  (Thomas)
+
+  - Show map bookmarks in the map
+  - Show tour marker label
+ 
+
+* Import
+
+  - .fitlog File  
+    - Wind speed (Frederic)
+    - Max/average power
+    - Temperature data serie
+ 
+
+  - Suunto (Frederic)
+    - Added support for swimming activities
+    - Added support for Movesense heart rate belt data
 
 
+* Compare Result Views
 
-Changes
+  - New columns
+    - Moving time
+    - Altimeter - Average ascent speed (VAM)
+
+ 
+Changes  
 =======
 
 * 2D Map
 
-  - Moved option "Zoom + center to the mouse position" into new "2D Map Option" slideout
-  
+  - Moved option Zoom + center to the mouse position into 2D Map Option
 
+ 
 * Tour Chart
 
-  - Value point tooltip is reseted to defaults
+  - Value point tooltip settings are reseted to defaults
 
-
+ 
 Bugfix   
 ======
 
 * 2D Map
 
-  - Fixed issue which lasted forever, the basic painting skipped values
-  - Fixed some SWT resource leaks which caused a "No more handles" exception
+  - Fixed issue which lasted forever, the basic painting mode skipped 
+    values
+  - Fixed some SWT resource leaks which could cause a "No more handles" 
+    exception
 
+ 
+* Tour Chart
 
-* Tour View
+  - Fixed ClassCastException, this was the same issue which was fixed in
+    19.3.1 but was not yet discovered
 
-  - Fixed ClassCastException, this was the same issue as in the other views Photos, Tour Photos and Training but was not yet discovered
-    
-    
-
+ 
 * Import
 
   - .gpx File
-    - Fixed ConcurrentModificationException when converting waypoints into tour markers
-    
+    - Fixed ConcurrentModificationException when converting waypoints 
+      into tour markers
+
   - .fit File
     - Fixed total altitude values for Ciclo(CM 9.3A)
-    - Display 'GARMIN EDGE 1030' instead of 'GARMIN 2713' in Data format 
-  
+    - Display GARMIN EDGE 1030 in data format field instead of 
+      GARMIN 2713
+
+  - Suunto (Frederic)
+    - Fixed a bug where markers/laps would not all be imported
+
+ 
+Important Infos
+===============
+
+* .fit Import
+
+  The .fit file importer is simplified/restructured to fix an issue. 
+  Afterwards it was tested with several different .fit files.
+
+  It is still possible that there are undiscovered issues. So check your 
+  tour data after the next imports to ensure that all values are 
+  available and valid.
+
+
+* Bad News for 3D Map
+
+  3D Map will be suspended after May 3, 2019
+
+  https://worldwind.arc.nasa.gov/news/2019-03-21-suspension-faq/

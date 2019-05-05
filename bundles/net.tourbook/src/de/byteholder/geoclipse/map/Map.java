@@ -2167,6 +2167,13 @@ public class Map extends Canvas {
     */
    private boolean isTourHovered() {
 
+      if (_worldPixel_TopLeft_Viewport == null) {
+
+         // this occured when comparing tours
+
+         return false;
+      }
+
       final int numPrevHoveredTours = _allHoveredTourIds.size();
 
       Tile hoveredTile = null;

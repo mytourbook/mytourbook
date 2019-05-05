@@ -1,0 +1,26 @@
+Version 19.5.0                                            ?. May 2019
+
+
+New   
+===
+
+*
+  
+ 
+Improvements   
+============
+
+* Adjust Altitude
+  - Whole tour is selected for SRTM adjustments
+
+ 
+Changes  
+=======
+
+* 
+
+ 
+Bugfix   
+======
+
+* 
