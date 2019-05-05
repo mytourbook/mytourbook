@@ -166,8 +166,8 @@ public class FitLogSAXHandler extends DefaultHandler {
       private int    avgPulse;
       private int    maxPulse;
 
-      private int    avgPower;
-      private int    maxPower;
+      private float  avgPower;
+      private float  maxPower;
 
       private int    avgCadence;
 //      private int               maxCadence;      is not yet supported
@@ -310,7 +310,7 @@ public class FitLogSAXHandler extends DefaultHandler {
          tourData.setPower_Avg(_currentActivity.avgPower);
       }
       if (_currentActivity.maxPower != 0) {
-         tourData.setPower_Max(_currentActivity.maxPower);
+         tourData.setPower_Max((int) (_currentActivity.maxPower + 0.5));
       }
 
       if (tourData.pulseSerie == null) {
@@ -659,8 +659,8 @@ public class FitLogSAXHandler extends DefaultHandler {
 
       } else if (name.equals(TAG_ACTIVITY_POWER)) {
 
-         _currentActivity.avgPower = Util.parseInt0(attributes, ATTRIB_AVERAGE_WATTS);
-         _currentActivity.maxPower = Util.parseInt0(attributes, ATTRIB_MAXIMUM_WATTS);
+         _currentActivity.avgPower = Util.parseFloat0(attributes, ATTRIB_AVERAGE_WATTS);
+         _currentActivity.maxPower = Util.parseFloat0(attributes, ATTRIB_MAXIMUM_WATTS);
 
       } else if (name.equals(TAG_ACTIVITY_CADENCE)) {
 
