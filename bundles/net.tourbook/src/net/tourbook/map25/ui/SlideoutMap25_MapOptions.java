@@ -408,8 +408,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
       // switching off both building layers
       mapApp.getLayer_Building().setEnabled(_chkShowLayer_Building.getSelection());
-      //##### off for testing, but following line must be active
-      //mapApp.getLayer_S3DB().setEnabled(_chkShowLayer_Building.getSelection());    
+      mapApp.getLayer_S3DB().setEnabled(_chkShowLayer_Building.getSelection());    
       
       enableActions();
 

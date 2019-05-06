@@ -955,29 +955,30 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	    * i have also to check if the layers becomes more, if i switch the mapprovider
 	    */
 //		// Buildings or S3DB  Block I
-//		_layer_mf_S3DB_Building = new S3DBLayer(mMap,_layer_BaseMap);  //this is working for mf, onlinemaps missing 2 walls and roof
-//		//_layer_mf_S3DB_Building = new S3DBLayer(mMap,l);  //private S3DBLayer	_layer_mf_S3DB_Building; //is working, but S3DB only once after programm start
-//		_layer_Building = new BuildingLayer(mMap, _layer_BaseMap);
-//		if(_is_mf_Map) {
+		//_layer_S3DB_Building = new S3DBLayer(mMap,_layer_BaseMap, true);  //this is working for mf, onlinemaps missing 2 walls and roof
+	   _layer_S3DB_Building = new S3DBLayer(mMap,_l, true);  //private S3DBLayer	_layer_mf_S3DB_Building; //is working, but S3DB only once after programm start
+		_layer_Building = new BuildingLayer(mMap, _layer_BaseMap, false, true);
+		if(_isOfflineMap) {
 //			// S3DB
-//			_layer_mf_S3DB_Building.setEnabled(true);
-//			debugPrint("################ setupMap_Layers: adding S3DBlayer "); //$NON-NLS-1$
+			_layer_S3DB_Building.setEnabled(true);
+			_layer_S3DB_Building.setColored(true);
+			debugPrint("################ setupMap_Layers: adding S3DBlayer "); //$NON-NLS-1$
 //			//_l.setRenderTheme(_mf_IRenderTheme); //again??
-//			layers.remove(_layer_Building);
-//			layers.add(_layer_mf_S3DB_Building);
-//		} else {
+			layers.remove(_layer_Building);
+			layers.add(_layer_S3DB_Building);
+		} else {
 //			// building
-//			_layer_Building.setEnabled(true);
-//			debugPrint("################ setupMap_Layers:Building Layer "); //$NON-NLS-1$
-//			layers.remove(_layer_mf_S3DB_Building);
-//			layers.add(_layer_Building);
-//		}
+			_layer_Building.setEnabled(true);
+			debugPrint("################ setupMap_Layers:Building Layer "); //$NON-NLS-1$
+			layers.remove(_layer_S3DB_Building);
+			layers.add(_layer_Building);
+		}
 
 	   // building Block II
 	   //_layer_Building = new BuildingLayer(mMap, _layer_BaseMap, true, true);
-	   _layer_Building = new BuildingLayer(mMap, _layer_BaseMap, false, true);
+/*	   _layer_Building = new BuildingLayer(mMap, _layer_BaseMap, false, true);
 	   _layer_Building.setEnabled(false);
-	   layers.add(_layer_Building);
+	   layers.add(_layer_Building); */ //prior to s3db
 
 	   // S3DB Block II, S3DB is complicate -> removed
 	   /*_layer_mf_S3DB_Building = new S3DBLayer(mMap,_l);
