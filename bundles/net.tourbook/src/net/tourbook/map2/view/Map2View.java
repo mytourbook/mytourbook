@@ -74,7 +74,7 @@ import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map.bookmark.MapBookmarkManager;
 import net.tourbook.map.bookmark.MapLocation;
 import net.tourbook.map2.Messages;
-import net.tourbook.map2.action.ActionCreateMarkerFromMap;
+import net.tourbook.map2.action.ActionCreateTourMarkerFromMap;
 import net.tourbook.map2.action.ActionDimMap;
 import net.tourbook.map2.action.ActionManageMapProviders;
 import net.tourbook.map2.action.ActionMap2Color;
@@ -427,7 +427,7 @@ public class Map2View extends ViewPart implements
    private ActionMap2_Options             _actionMap2_Options;
    private ActionMapBookmarks             _actionMap2_Bookmarks;
    private ActionMap2Color                _actionMap2_Color;
-   private ActionCreateMarkerFromMap      _actionCreateMarkerFromMap;
+   private ActionCreateTourMarkerFromMap      _actionCreateMarkerFromMap;
    private ActionMap2_Graphs              _actionMap2_TourColors;
    private ActionManageMapProviders       _actionManageProvider;
    private ActionPhotoProperties          _actionPhotoFilter;
@@ -1454,7 +1454,7 @@ public class Map2View extends ViewPart implements
       _actionEditMap2Preferences = new ActionOpenPrefDialog(Messages.Map_Action_Edit2DMapPreferences, PrefPageMap2Appearance.ID);
 
       _actionMap2_Color = new ActionMap2Color();
-      _actionCreateMarkerFromMap = new ActionCreateMarkerFromMap(this);
+      _actionCreateMarkerFromMap = new ActionCreateTourMarkerFromMap(this);
       _actionMap2_Options = new ActionMap2_Options();
       _actionSearchTourByLocation = new ActionSearchTourByLocation();
       _actionSelectMapProvider = new ActionSelectMapProvider(this);
