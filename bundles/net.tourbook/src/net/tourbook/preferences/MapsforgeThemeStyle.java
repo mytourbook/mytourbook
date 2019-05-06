@@ -26,6 +26,7 @@ public class MapsforgeThemeStyle {
     * @return Returns localized style name
     */
    public String getLocaleName() {
+      //System.out.println("#### MapsforgeThemeStyle: language , name: " + USER_LOCALE + " , " + getName(USER_LOCALE));
       return getName(USER_LOCALE);
    }
 
@@ -46,7 +47,8 @@ public class MapsforgeThemeStyle {
     * @return a String with the local name like "hiking"
     */
    public String getName(final String language) {
-
+      //System.out.println("#### MapsforgeThemeStyle: language: " + language);
+      //System.out.println("#### MapsforgeThemeStyle: toString: " + toString("de"));
       if ("default".equals(language)) { //$NON-NLS-1$
          return name.get(defaultlanguage);
       } else if (name.containsKey(language)) {
@@ -92,4 +94,14 @@ public class MapsforgeThemeStyle {
             + "name= " + name.get(defaultlanguage) + " " //$NON-NLS-1$ //$NON-NLS-2$
             + "\n"; //$NON-NLS-1$
    }
+   
+   public String toString(final String language) {
+
+      return "MapsforgeThemeStyle " //$NON-NLS-1$
+
+            + "xmlLayer=" + xmlLayer + " " //$NON-NLS-1$ //$NON-NLS-2$
+            + "name= " + name.get(defaultlanguage) + " " //$NON-NLS-1$ //$NON-NLS-2$
+            + "\n"; //$NON-NLS-1$
+   } 
+   
 }

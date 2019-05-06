@@ -401,14 +401,16 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
       final Map25App mapApp = _map25View.getMapApp();
 
       mapApp.getLayer_BaseMap().setEnabled(_chkShowLayer_BaseMap.getSelection());
-      mapApp.getLayer_Building().setEnabled(_chkShowLayer_Building.getSelection());
       mapApp.getLayer_HillShading().setEnabled(_chkShowLayer_Hillshading.getSelection());
       mapApp.getLayer_Label().setEnabled(_chkShowLayer_Label.getSelection());
-//      mapApp.getLayer_Bookmark().setEnabled(_chkShowLayer_Bookmark.getSelection());
-//      mapApp.getLayer_S3DB().setEnabled(_chkShowLayer_S3DB.getSelection());
       mapApp.getLayer_ScaleBar().setEnabled(_chkShowLayer_Scale.getSelection());
       mapApp.getLayer_TileInfo().setEnabled(_chkShowLayer_TileInfo.getSelection());
 
+      // switching off both building layers
+      mapApp.getLayer_Building().setEnabled(_chkShowLayer_Building.getSelection());
+      //##### off for testing, but following line must be active
+      //mapApp.getLayer_S3DB().setEnabled(_chkShowLayer_Building.getSelection());    
+      
       enableActions();
 
       mapApp.getMap().updateMap(true);
@@ -419,15 +421,13 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
       final Map25App mapApp = _map25View.getMapApp();
 
       _chkShowLayer_BaseMap.setSelection(mapApp.getLayer_BaseMap().isEnabled());
-      _chkShowLayer_Building.setSelection(mapApp.getLayer_Building().isEnabled());
       _chkShowLayer_Hillshading.setSelection(mapApp.getLayer_HillShading().isEnabled());
       _chkShowLayer_Label.setSelection(mapApp.getLayer_Label().isEnabled());
-//      _chkShowLayer_Bookmark.setSelection(mapApp.getLayer_Bookmark().isEnabled());
-//      _chkShowLayer_S3DB.setSelection(mapApp.getLayer_S3DB().isEnabled());
-
       _chkShowLayer_Scale.setSelection(mapApp.getLayer_ScaleBar().isEnabled());
       _chkShowLayer_TileInfo.setSelection(mapApp.getLayer_TileInfo().isEnabled());
 
+      _chkShowLayer_Building.setSelection(mapApp.getLayer_Building().isEnabled());   
+      
       _spinnerHillshadingOpacity.setSelection(mapApp.getLayer_HillShading_Opacity());
 
       _chkUseDraggedKeyboardNavigation.setSelection(Map25ConfigManager.useDraggedKeyboardNavigation);
