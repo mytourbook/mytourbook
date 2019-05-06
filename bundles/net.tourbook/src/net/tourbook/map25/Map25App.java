@@ -834,17 +834,17 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 		mMap.setTheme(getTheme(mapProvider));
 		//mMap.setTheme((ThemeFile) Map25ProviderManager.getDefaultTheme(TileEncoding.VTM));
 
-		// ###### the rest should be moved into createlayers 
+		// ###### the rest should be moved into createlayers ,  this was prior to s3db
 		/**
 		 * Map Viewport
 		 */
-		final ViewController mapViewport = mMap.viewport();
+	//	final ViewController mapViewport = mMap.viewport();
 
 		// extend default tilt
-		mapViewport.setMaxTilt((float) MercatorProjection.LATITUDE_MAX);
+	//	mapViewport.setMaxTilt((float) MercatorProjection.LATITUDE_MAX);
 //		mapViewport.setMaxTilt(77.0f);
 
-		mapViewport.setMinScale(2);
+	//	mapViewport.setMinScale(2);
 		debugPrint("############# setupMap:  leaving"); //$NON-NLS-1$
 	}
 
@@ -907,17 +907,17 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
 		//setupMap_Layers();	  // this was prior to s3db
 
-    	// ###### the rest should be moved into createlayers 
+    	// ###### the rest should be moved into createlayers, this was prior to s3db
 		/**
 		 * Map Viewport
 		 */
-		final ViewController mapViewport = mMap.viewport();
+	//	final ViewController mapViewport = mMap.viewport();
 
 		// extend default tilt
-		mapViewport.setMaxTilt((float) MercatorProjection.LATITUDE_MAX);
+	//	mapViewport.setMaxTilt((float) MercatorProjection.LATITUDE_MAX);
 //		mapViewport.setMaxTilt(77.0f);
 
-		mapViewport.setMinScale(2);
+	//	mapViewport.setMinScale(2);
 		debugPrint("############# setupMap:  leaving"); //$NON-NLS-1$
 	}
 
