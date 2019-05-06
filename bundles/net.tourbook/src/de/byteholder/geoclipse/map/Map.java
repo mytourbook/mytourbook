@@ -24,6 +24,7 @@
 package de.byteholder.geoclipse.map;
 
 import de.byteholder.geoclipse.Messages;
+import de.byteholder.geoclipse.map.event.IHoveredTourListener;
 import de.byteholder.geoclipse.map.event.IMapGridListener;
 import de.byteholder.geoclipse.map.event.IMapInfoListener;
 import de.byteholder.geoclipse.map.event.IMapPositionListener;
@@ -456,6 +457,7 @@ public class Map extends Canvas {
    private final ListenerList<ITourSelectionListener> _allTourSelectionListener  = new ListenerList<>(ListenerList.IDENTITY);
    private final ListenerList<IPositionListener>      _mousePositionListeners    = new ListenerList<>(ListenerList.IDENTITY);
    private final ListenerList<IPOIListener>           _poiListeners              = new ListenerList<>(ListenerList.IDENTITY);
+   private final ListenerList<IHoveredTourListener>   _hoveredTourListeners      = new ListenerList<>(ListenerList.IDENTITY);
    // measurement system
    private float                                      _distanceUnitValue         = 1;
 
@@ -861,6 +863,10 @@ public class Map extends Canvas {
             });
          }
       });
+   }
+
+   public void addHoveredTourListener(final IHoveredTourListener hoveredTourListener) {
+      _hoveredTourListeners.add(hoveredTourListener);
    }
 
    public void addMapGridBoxListener(final IMapGridListener mapListener) {
