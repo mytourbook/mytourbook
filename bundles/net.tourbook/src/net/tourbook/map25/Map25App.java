@@ -390,6 +390,18 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 			debugPrint("# create Layers: leaving"); //$NON-NLS-1$
 		}  // end offline_ maps
 
+		setupMap_Layers();
+
+		this._last_isOfflineMap = _isOfflineMap;
+
+		/**
+		 * Map Viewport
+		 */
+		final ViewController mapViewport = mMap.viewport();
+		// extend default tilt
+		mapViewport.setMaxTilt((float) MercatorProjection.LATITUDE_MAX);
+		mapViewport.setMinScale(2);
+
 
 		//setupMap(_selectedMapProvider, tileSource);
 		updateUI_MarkerLayer();
@@ -406,7 +418,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	}  // end createLayers()
 
 	protected void loadTheme(final String styleId) {
-		debugPrint("##### loadtheme: entering styleID: " + styleId); //$NON-NLS-1$
+		debugPrint("####### loadtheme: entering styleID: " + styleId); //$NON-NLS-1$
 		
 		if (!_isOfflineMap) { // NOT mapsforge
 			debugPrint("####### loadtheme: is online map setting textscale " +   _vtm_TextScale); //$NON-NLS-1$
@@ -429,6 +441,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 			//debugPrint("####### loadtheme: is mf map IsThemeFileFromFile " +  _mf_offline_IsThemeFromFile); //$NON-NLS-1$
 			
 			if (_offline_IsThemeFromFile) { //external theme
+			   debugPrint("####### loadtheme: using external theme"); //$NON-NLS-1$
 				mMap.setTheme(new ExternalRenderTheme(_offline_themeFilePath, new XmlRenderThemeMenuCallback() {
 					@Override
 					public Set<String> getCategories(XmlRenderThemeStyleMenu renderThemeStyleMenu) {
@@ -639,9 +652,11 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    }  
 
 	public void setMapProvider(final Map25Provider mapProvider) {
+	   Boolean onlineOfflineStatusHasChanged = false;
+      debugPrint("############# setMapProvider entering setMapProvider: _mf_mapFilePath:" + _offline_mapFilePath + " _last_mf_mapFilePath: " + _last_mf_mapFilePath); //$NON-NLS-1$
+      //debugPrint("############# setMapProvider layers before: " + mMap.layers().toString() + " size: " + mMap.layers().size()); //$NON-NLS-1$
 
-	   debugPrint("############# setMapProvider entering setMapProvider"); //$NON-NLS-1$
-		debugPrint("############# setMapProvider layers before: " + mMap.layers().toString() + " size: " + mMap.layers().size()); //$NON-NLS-1$
+      debugPrint("############# setMapProvider layers before: " + mMap.layers().toString() + " size: " + mMap.layers().size()); //$NON-NLS-1$
 		/*boolean label_layer_was_enabled = getLayer_Label().isEnabled();
 		boolean building_layer_was_enabled = getLayer_Building().isEnabled();
 		mMap.layers().remove(_layer_Label);
@@ -774,6 +789,20 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 		_selectedMapProvider = mapProvider;
 	}
 
+	  /**
+    * when switching from offline to online or Vice versa all layers must be removed first
+    * this is done here, after that all layers must be added again. but that is a different story.
+    */
+   private void removeLayers() {
+      debugPrint("### removeLayers: layers before: " + mMap.layers().toString() + " size: " + mMap.layers().size());
+      saveState();
+      for( int n = mMap.layers().size() - 1; n > 0 ;n--) { 
+         debugPrint("### removeLayers: layer " + n + "/" + mMap.layers().size()+ " " + mMap.layers().get(n).toString());
+         mMap.layers().remove(n);
+      }
+      debugPrint("### removeLayers: layers after: " + mMap.layers().toString() + " size: " + mMap.layers().size());
+   }
+	
 	/**
 	 * setupMap for online maps
 	 * @param mapProvider
@@ -798,13 +827,14 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
 		mMap.setBaseMap(_layer_BaseMap);
 
-		setupMap_Layers();
+		//setupMap_Layers();  // this was prior to s3db
 
 		//debugPrint("############# setupMap:  mMap.setTheme(getTheme(mapProvider))" + getTheme(mapProvider)); //$NON-NLS-1$
 		//debugPrint("############# setupMap:  Map25ProviderManager.getDefaultTheme(TileEncoding.VTM)" + Map25ProviderManager.getDefaultTheme(TileEncoding.VTM));  //$NON-NLS-1$
 		mMap.setTheme(getTheme(mapProvider));
 		//mMap.setTheme((ThemeFile) Map25ProviderManager.getDefaultTheme(TileEncoding.VTM));
 
+		// ###### the rest should be moved into createlayers 
 		/**
 		 * Map Viewport
 		 */
@@ -875,8 +905,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 			////loadTheme(mapProvider.offline_ThemeStyle); //neccercary?
 		}
 
-		setupMap_Layers();	
+		//setupMap_Layers();	  // this was prior to s3db
 
+    	// ###### the rest should be moved into createlayers 
 		/**
 		 * Map Viewport
 		 */
