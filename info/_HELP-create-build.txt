@@ -14,15 +14,25 @@
 
    Setup Gradle environment
    - Set org.gradle.java.home=C:/Program Files/Java/jdk1.8 in C:\Users\WolfgangSchramm\.gradle\gradle.properties
-
-   Update manifest.MF
-   - Select 'EGradle virtual root project' in 'Package Explorer'
-   - Select in the contextmenu 'Egradle/Refresh eclipse dependencies'  
    
+
    Build plugin
-   - Open 'Gradle Tasks' view
-   - Select 'net.tourbook.ext.vtm'
-   - Double click 'assemble'
+   - Check versions in (gdxVersion)          /mytourbook/bundles/build.gradle 
+   - Update VTM files, run task assemble:    C:\DAT\MT\vtm-parent>gradlew ass
+   - Update VTM plugin, run task assemble:   C:\DAT\MT\mytourbook\bundles\net.tourbook.ext.vtm>gradle ass
+
+   OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD
+    
+      Update manifest.MF
+      - Select 'EGradle virtual root project' in 'Package Explorer'
+      - Select in the contextmenu 'Egradle/Refresh eclipse dependencies'  
+      
+      Build plugin
+      - Open 'Gradle Tasks' view
+      - Select 'net.tourbook.ext.vtm'
+      - Double click 'assemble'
+   
+   OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD 
 
 
 
