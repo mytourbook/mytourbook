@@ -135,7 +135,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	private static Map25View		_map25View;
 	private static LwjglApplication	_lwjglApp;
 
-	private String 					_mf_prefered_language = "en"; //$NON-NLS-1$
+	private String 					_offline_prefered_language = "en"; //$NON-NLS-1$
 
 	private Map25Provider			_selectedMapProvider;
 	private TileManager				_tileManager;
@@ -175,17 +175,16 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	private OkHttpFactoryMT			_httpFactory;
 
 	private long						_lastRenderTime;
-	private String						_last_mf_themeFilePath = "uninitialized"; //$NON-NLS-1$
-	private String						_last_mf_theme_styleID = "";	 //$NON-NLS-1$
-	//private Boolean               _last_is_mf_Map = true;
+	private String						_last_offline_themeFilePath = "uninitialized"; //$NON-NLS-1$
+	private String						_last_offline_theme_styleID = "";	 //$NON-NLS-1$
 	private Boolean               _last_isOfflineMap = true;
-	private String                _last_mf_mapFilePath = "uninitialized"; //$NON-NLS-1$
+	private String                _last_offline_mapFilePath = "uninitialized"; //$NON-NLS-1$
 	private Boolean					_last_offline_IsThemeFromFile;
 
-	private IRenderTheme				_mf_IRenderTheme;
-	private float						_mf_TextScale = 0.75f;
+	private IRenderTheme				_offline_IRenderTheme;
+	private float						_offline_TextScale = 0.75f;
 	private float						_vtm_TextScale = 0.75f;
-   private float                 _mf_UserScale = 2.50f;
+   private float                 _offline_UserScale = 2.50f;
    private float                 _vtm_UserScale = 2.0f;	
 	
    ItemizedLayer<MarkerItem> _layer_MapBookmark;
@@ -323,16 +322,16 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
 		_selectedMapProvider = restoreState_MapProvider();
 		_map25View.updateUI_SelectedMapProvider(_selectedMapProvider);
-		_mf_prefered_language = Locale.getDefault().toString();
+		_offline_prefered_language = Locale.getDefault().toString();
 		_httpFactory = new OkHttpEngineMT.OkHttpFactoryMT();
 		
-      debugPrint("# create Layers: prefered language:           " + _mf_prefered_language);//$NON-NLS-1$
+      debugPrint("# create Layers: prefered language:           " + _offline_prefered_language);//$NON-NLS-1$
       debugPrint("# create Layers: Map Name:                    " +_selectedMapProvider.name); //$NON-NLS-1$
       debugPrint("# create Layers: Map ONLINE/OFFLINE:          " +_selectedMapProvider.isOfflineMap); //$NON-NLS-1$
       debugPrint("# create Layers: Map offline_MapFilepath:     " +_selectedMapProvider.offline_MapFilepath); //$NON-NLS-1$
       debugPrint("# create Layers: Map offline_ThemeFilepath:   " +_selectedMapProvider.offline_ThemeFilepath); //$NON-NLS-1$
       debugPrint("# create Layers: Map encoding:                " +_selectedMapProvider.tileEncoding.toString()); //$NON-NLS-1$
-      debugPrint("# create Layers: prefered language:           " + _mf_prefered_language); //$NON-NLS-1$
+      debugPrint("# create Layers: prefered language:           " + _offline_prefered_language); //$NON-NLS-1$
 
 		if (_selectedMapProvider.tileEncoding  != TileEncoding.MF) { // NOT mapsforge
 			_isOfflineMap = false;
@@ -355,7 +354,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 				throw new IllegalArgumentException("cannot read mapfile: " + _offline_mapFilePath); //$NON-NLS-1$
 			}
 
-			/*final MultiMapFileTileSource MMtileSource = getMapFile(_mf_mapFilePath);
+			/*final MultiMapFileTileSource MMtileSource = getMapFile(_offline_mapFilePath);
 			if (_tileSourceOfflineMapCount == 0) {
 				throw new IllegalArgumentException("cannot read (any) mapfile: " + _selectedMapProvider.offline_MapFilepath);
 			}
@@ -366,7 +365,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 			
 			final MapFileTileSource tileSource = new MapFileTileSource();
 			tileSource.setMapFile(_offline_mapFilePath);
-			tileSource.setPreferredLanguage(_mf_prefered_language);
+			tileSource.setPreferredLanguage(_offline_prefered_language);
          debugPrint("# create Layers: mf step 2: " + mMap.layers().toString() + " size: " + mMap.layers().size());  // result 1
 			_l = mMap.setBaseMap(tileSource);
 		
@@ -437,8 +436,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 		
 		else {  //is mapsforge map
 
-			//debugPrint("####### loadtheme: is mf map setting textscale " +   _mf_TextScale); //$NON-NLS-1$
-			//debugPrint("####### loadtheme: is mf map IsThemeFileFromFile " +  _mf_offline_IsThemeFromFile); //$NON-NLS-1$
+			//debugPrint("####### loadtheme: is offline map setting textscale " +   _offline_TextScale); //$NON-NLS-1$
+			//debugPrint("####### loadtheme: is offline map IsThemeFileFromFile " +  _offline_offline_IsThemeFromFile); //$NON-NLS-1$
 			
 			if (_offline_IsThemeFromFile) { //external theme
 			   debugPrint("####### loadtheme: using external theme"); //$NON-NLS-1$
@@ -454,7 +453,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 							return null;
 						} else 
 						   ;
-							debugPrint("####### loadtheme:  selected Style: " + renderThemeStyleLayer.getTitle(_mf_prefered_language)); //$NON-NLS-1$
+							debugPrint("####### loadtheme:  selected Style: " + renderThemeStyleLayer.getTitle(_offline_prefered_language)); //$NON-NLS-1$
 						Set<String> categories = renderThemeStyleLayer.getCategories();
 						int n = 0;
 						int overlaycount = renderThemeStyleLayer.getOverlays().size();
@@ -653,7 +652,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
 	public void setMapProvider(final Map25Provider mapProvider) {
 	   Boolean onlineOfflineStatusHasChanged = false;
-      debugPrint("############# setMapProvider entering setMapProvider: _mf_mapFilePath:" + _offline_mapFilePath + " _last_mf_mapFilePath: " + _last_mf_mapFilePath); //$NON-NLS-1$
+      debugPrint("############# setMapProvider entering setMapProvider: _offline_mapFilePath:" + _offline_mapFilePath + " _last_offline_mapFilePath: " + _last_offline_mapFilePath); //$NON-NLS-1$
       //debugPrint("############# setMapProvider layers before: " + mMap.layers().toString() + " size: " + mMap.layers().size()); //$NON-NLS-1$
 
       debugPrint("############# setMapProvider layers before: " + mMap.layers().toString() + " size: " + mMap.layers().size()); //$NON-NLS-1$
@@ -691,8 +690,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 			_offline_themeFilePath = ""; // so if mf is next themefile is parsed //$NON-NLS-1$
 		} else { //it mapsforge map
 			this._isOfflineMap = true;
-			CanvasAdapter.textScale = _mf_TextScale;
-			CanvasAdapter.userScale = _mf_UserScale;
+			CanvasAdapter.textScale = _offline_TextScale;
+			CanvasAdapter.userScale = _offline_UserScale;
 			debugPrint("############# setMapProvider: setMapProvider its mf Map"); //$NON-NLS-1$
 			//_httpFactory = null;  //was uncommented, trying what happen when active
 			final MapFileTileSource tileSource = new MapFileTileSource();
@@ -706,7 +705,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 			//debugPrint("############# setMapProvider: name             " + mapProvider.name); //$NON-NLS-1$
 
 
-			//_mf_mapFilePath = _selectedMapProvider.offline_MapFilepath;
+			//_offline_mapFilePath = _selectedMapProvider.offline_MapFilepath;
 			_offline_mapFilePath =  mapProvider.offline_MapFilepath;
 			
 			if (!checkMapFile(new File(_offline_mapFilePath))) {
@@ -722,19 +721,19 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 			}
 			
 			tileSource.setMapFile(_offline_mapFilePath);
-			tileSource.setPreferredLanguage(_mf_prefered_language);
+			tileSource.setPreferredLanguage(_offline_prefered_language);
 
 			_layer_BaseMap.setTileSource(tileSource);
-			//_mf_mapFilePath = checkFile(mapProvider.offline_MapFilepath);
+			//_offline_mapFilePath = checkFile(mapProvider.offline_MapFilepath);
 
 			_offline_IsThemeFromFile = _selectedMapProvider.offline_IsThemeFromFile;
 			
-//			_mf_themeFilePath = checkFile(_selectedMapProvider.offline_ThemeFilepath);
-//			_mf_theme_styleID = mapProvider.offline_ThemeStyle;
+//			_offline_themeFilePath = checkFile(_selectedMapProvider.offline_ThemeFilepath);
+//			__theme_styleID = mapProvider.offline_ThemeStyle;
 			
 			// i wish i could use loadTheme instead of this Block:
 			if (mapProvider.offline_IsThemeFromFile) { //external theme
-				//debugPrint("############# setMapProvider: _mf_offline_IsThemeFromFile " + _mf_offline_IsThemeFromFile);	 //$NON-NLS-1$
+				//debugPrint("############# setMapProvider: _offline_IsThemeFromFile " + _offline_IsThemeFromFile);	 //$NON-NLS-1$
 				//debugPrint("############# setMapProvider: _last_offline_IsThemeFromFile " + _last_offline_IsThemeFromFile); //$NON-NLS-1$
 				
 				_offline_themeFilePath = checkFile(mapProvider.offline_ThemeFilepath);
@@ -743,17 +742,17 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 		
 				if (_offline_themeFilePath == null) {
 					debugPrint("############# setMapProvider: Theme not found: " + _offline_mapFilePath + " using default DEFAULT"); //$NON-NLS-1$ //$NON-NLS-2$
-					mMap.setTheme(VtmThemes.DEFAULT);   // ThemeLoader.load(_mf_themeFilePath));
+					mMap.setTheme(VtmThemes.DEFAULT);   // ThemeLoader.load(_offline_themeFilePath));
 				} else {
-					if (!_offline_themeFilePath.equals(_last_mf_themeFilePath) || !_offline_theme_styleID.equals(_last_mf_theme_styleID) || _offline_IsThemeFromFile != _last_offline_IsThemeFromFile ) {  //only parsing when different file	
+					if (!_offline_themeFilePath.equals(_last_offline_themeFilePath) || !_offline_theme_styleID.equals(_last_offline_theme_styleID) || _offline_IsThemeFromFile != _last_offline_IsThemeFromFile ) {  //only parsing when different file	
 					   debugPrint("############# setMapProvider: Theme loader started"); //$NON-NLS-1$
-						this._mf_IRenderTheme = ThemeLoader.load(_offline_themeFilePath);
+						this._offline_IRenderTheme = ThemeLoader.load(_offline_themeFilePath);
 						debugPrint("############# setMapProvider: Theme loader done, now activating..."); //$NON-NLS-1$
-						_l.setRenderTheme(_mf_IRenderTheme);
-						////mMap.setTheme(_mf_IRenderTheme);
+						_l.setRenderTheme(_offline_IRenderTheme);
+						////mMap.setTheme(_offline_IRenderTheme);
 						loadTheme(mapProvider.offline_ThemeStyle);  //whene starting with onlinemaps and switching to mf, osmarender is used ??? when uncommented it ok
 						debugPrint("############# setMapProvider: ...activaded"); //$NON-NLS-1$
-						//_mf_offline_IsThemeFromFile = true;
+						//_offline_offline_IsThemeFromFile = true;
 					} else {
 					   ;
 						debugPrint("############# setMapProvider: mapprovider has the same theme file and style"); //$NON-NLS-1$
@@ -782,9 +781,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       mMap.clearMap();
       mMap.updateMap(true);	
 
-		//debugPrint("############# setMapProvider: set language : " + _mf_prefered_language); //$NON-NLS-1$
-		this._last_mf_themeFilePath = _offline_themeFilePath;
-		this._last_mf_theme_styleID = _offline_theme_styleID;
+		//debugPrint("############# setMapProvider: set language : " + _offline_prefered_language); //$NON-NLS-1$
+		this._last_offline_themeFilePath = _offline_themeFilePath;
+		this._last_offline_theme_styleID = _offline_theme_styleID;
 		this._last_offline_IsThemeFromFile = _offline_IsThemeFromFile;
 		_selectedMapProvider = mapProvider;
 	}
@@ -834,17 +833,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 		mMap.setTheme(getTheme(mapProvider));
 		//mMap.setTheme((ThemeFile) Map25ProviderManager.getDefaultTheme(TileEncoding.VTM));
 
-		// ###### the rest should be moved into createlayers ,  this was prior to s3db
-		/**
-		 * Map Viewport
-		 */
-	//	final ViewController mapViewport = mMap.viewport();
-
-		// extend default tilt
-	//	mapViewport.setMaxTilt((float) MercatorProjection.LATITUDE_MAX);
-//		mapViewport.setMaxTilt(77.0f);
-
-	//	mapViewport.setMinScale(2);
 		debugPrint("############# setupMap:  leaving"); //$NON-NLS-1$
 	}
 
@@ -857,9 +845,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	private void setupMap(final Map25Provider mapProvider, final MapFileTileSource tileSource) {
 	//private void setupMap(final Map25Provider mapProvider, final MultiMapFileTileSource tileSource) {	
 	   debugPrint("############# setupMap:  mapsforge entering"); //$NON-NLS-1$
-		
-      CanvasAdapter.textScale = _mf_TextScale;
-      CanvasAdapter.userScale = _mf_UserScale;
+      debugPrint("############# setupMap: layers before: " + mMap.layers().toString() + " size: " + mMap.layers().size());		
+      CanvasAdapter.textScale = _offline_TextScale;
+      CanvasAdapter.userScale = _offline_UserScale;
 		
 		_layer_BaseMap = new OsmTileLayerMT(mMap);
 
@@ -874,7 +862,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
 		mMap.setBaseMap(_layer_BaseMap);
 
-		//_mf_mapFilePath = checkFile(_selectedMapProvider.offline_MapFilepath);
+		//_offline_mapFilePath = checkFile(_selectedMapProvider.offline_MapFilepath);
 		_offline_mapFilePath = _selectedMapProvider.offline_MapFilepath;
 		
 		if (!checkMapFile(new File(_offline_mapFilePath))) {
@@ -888,36 +876,25 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 			;
 			//throw new IllegalArgumentException("cannot read mapfile: " + _selectedMapProvider.offline_MapFilepath); //$NON-NLS-1$
 		} else {
-			//debugPrint("############# setupMap: Map Path: " + _mf_mapFilePath); //$NON-NLS-1$
+			//debugPrint("############# setupMap: Map Path: " + _offline_mapFilePath); //$NON-NLS-1$
 		}*/
 
 		_offline_themeFilePath = checkFile(_selectedMapProvider.offline_ThemeFilepath);
 
 		if (_offline_themeFilePath == null) {
 			debugPrint("############# setupMap:  Theme not found: " + _offline_themeFilePath + " using default OSMARENDER"); //$NON-NLS-1$ //$NON-NLS-2$
-			//mMap.setTheme(VtmThemes.OSMARENDER);   // ThemeLoader.load(_mf_themeFilePath));
+			//mMap.setTheme(VtmThemes.OSMARENDER);   // ThemeLoader.load(_offline_themeFilePath));
 		} else {
 			;
 			//_l.setRenderTheme(ThemeLoader.load(VtmThemes.DEFAULT));  //to avoid errors
-			this._mf_IRenderTheme = ThemeLoader.load(_offline_themeFilePath);  // because of changes in loadtheme
-			_l.setRenderTheme(_mf_IRenderTheme);
+			this._offline_IRenderTheme = ThemeLoader.load(_offline_themeFilePath);  // because of changes in loadtheme
+			_l.setRenderTheme(_offline_IRenderTheme);
 			mMap.setTheme(ThemeLoader.load(_offline_themeFilePath)); //neccercary?seem so
 			////loadTheme(mapProvider.offline_ThemeStyle); //neccercary?
 		}
 
 		//setupMap_Layers();	  // this was prior to s3db
 
-    	// ###### the rest should be moved into createlayers, this was prior to s3db
-		/**
-		 * Map Viewport
-		 */
-	//	final ViewController mapViewport = mMap.viewport();
-
-		// extend default tilt
-	//	mapViewport.setMaxTilt((float) MercatorProjection.LATITUDE_MAX);
-//		mapViewport.setMaxTilt(77.0f);
-
-	//	mapViewport.setMinScale(2);
 		debugPrint("############# setupMap:  leaving"); //$NON-NLS-1$
 	}
 
@@ -956,14 +933,14 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	    */
 //		// Buildings or S3DB  Block I
 		//_layer_S3DB_Building = new S3DBLayer(mMap,_layer_BaseMap, true);  //this is working for mf, onlinemaps missing 2 walls and roof
-	   _layer_S3DB_Building = new S3DBLayer(mMap,_l, true);  //private S3DBLayer	_layer_mf_S3DB_Building; //is working, but S3DB only once after programm start
+	   _layer_S3DB_Building = new S3DBLayer(mMap,_l, true);  //private S3DBLayer	_layer_S3DB_Building; //is working, but S3DB only once after programm start
 		_layer_Building = new BuildingLayer(mMap, _layer_BaseMap, false, true);
 		if(_isOfflineMap) {
 //			// S3DB
 			_layer_S3DB_Building.setEnabled(true);
 			_layer_S3DB_Building.setColored(true);
 			debugPrint("################ setupMap_Layers: adding S3DBlayer "); //$NON-NLS-1$
-//			//_l.setRenderTheme(_mf_IRenderTheme); //again??
+//			//_l.setRenderTheme(_offline_IRenderTheme); //again??
 			layers.remove(_layer_Building);
 			layers.add(_layer_S3DB_Building);
 		} else {
@@ -981,11 +958,11 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	   layers.add(_layer_Building); */ //prior to s3db
 
 	   // S3DB Block II, S3DB is complicate -> removed
-	   /*_layer_mf_S3DB_Building = new S3DBLayer(mMap,_l);
-		if(_is_mf_Map) {
-			_layer_mf_S3DB_Building.setEnabled(true);
+	   /*_layer_S3DB_Building = new S3DBLayer(mMap,_l);
+		if(_isOfflineMap) {
+			_layer_S3DB_Building.setEnabled(true);
 			//debugPrint("############ setupMaplayer: adding S3DBlayer "); //$NON-NLS-1$
-			layers.add(_layer_mf_S3DB_Building);
+			layers.add(_layer_S3DB_Building);
 		}*/
 
 
@@ -1115,7 +1092,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 		
 		if(checkMapFile(file)){
 			tileSourceOfflinePrimary.setMapFile(file.getAbsolutePath());
-			tileSourceOfflinePrimary.setPreferredLanguage(_mf_prefered_language);
+			tileSourceOfflinePrimary.setPreferredLanguage(_offline_prefered_language);
 			mMFileTileSource.add(tileSourceOfflinePrimary);   // adding primary map first
 			_tileSourceOfflineMapCount += 1;
 			debugPrint("#### getMapFile: Adding primary map: " + file + " size: " +  file.length() + " bytes)"); //$NON-NLS-1$
@@ -1132,7 +1109,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 				if(!f.getAbsolutePath().equalsIgnoreCase(filename)) { //add all mapfiles except the primary map, which is already added
 					MapFileTileSource tileSourceOffline = new MapFileTileSource();
 					tileSourceOffline.setMapFile(f.getAbsolutePath());
-					tileSourceOffline.setPreferredLanguage(_mf_prefered_language);
+					tileSourceOffline.setPreferredLanguage(_offline_prefered_language);
 					mMFileTileSource.add(tileSourceOffline);
 					_tileSourceOfflineMapCount += 1;
 					//long size = FileUtils.sizeOf(f);
