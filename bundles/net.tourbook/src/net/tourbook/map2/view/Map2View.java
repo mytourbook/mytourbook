@@ -990,7 +990,7 @@ public class Map2View extends ViewPart implements
          public void setHoveredTourId(final MapHoveredTourEvent hoveredTourId) {
 
             _actionCreateTourMarkerFromMap.setCurrentHoverTourId(hoveredTourId.hoveredTourId);
-            _actionCreateTourMarkerFromMap.setEnabled(true);
+            _actionCreateTourMarkerFromMap.setEnabled(hoveredTourId.hoveredTourId != Integer.MIN_VALUE);
          }
       });
 
@@ -1809,12 +1809,7 @@ public class Map2View extends ViewPart implements
 
       _actionMap2_Color.setEnabled(isTourAvailable);
 
-      if (isTourAvailable && _map.getHoveredTourId() != Integer.MIN_VALUE) {
-         _actionCreateTourMarkerFromMap.setCurrentHoverTourId(_map.getHoveredTourId());
-         _actionCreateTourMarkerFromMap.setEnabled(true);
-      } else {
-         _actionCreateTourMarkerFromMap.setEnabled(false);
-      }
+      _actionCreateTourMarkerFromMap.setEnabled(isTourAvailable && _map.getHoveredTourId() != Integer.MIN_VALUE);
       _actionShowLegendInMap.setEnabled(_isTourOrWayPoint);
       _actionShowSliderInLegend.setEnabled(_isTourOrWayPoint && _isShowLegend);
       _actionShowSliderInMap.setEnabled(_isTourOrWayPoint);

@@ -31,6 +31,7 @@ import de.byteholder.geoclipse.map.event.IMapPositionListener;
 import de.byteholder.geoclipse.map.event.IPOIListener;
 import de.byteholder.geoclipse.map.event.IPositionListener;
 import de.byteholder.geoclipse.map.event.ITourSelectionListener;
+import de.byteholder.geoclipse.map.event.MapHoveredTourEvent;
 import de.byteholder.geoclipse.map.event.MapPOIEvent;
 import de.byteholder.geoclipse.map.event.MapPositionEvent;
 import de.byteholder.geoclipse.mapprovider.ImageDataResources;
@@ -2321,6 +2322,12 @@ public class Map extends Canvas {
                break;
             }
          }
+      }
+
+      final Object[] listeners = _hoveredTourListeners.getListeners();
+      final MapHoveredTourEvent event = new MapHoveredTourEvent(this.getHoveredTourId());
+      for (final Object listener : listeners) {
+         ((IHoveredTourListener) listener).setHoveredTourId(event);
       }
 
       if (_allHoveredTourIds.size() > 0) {
@@ -5582,8 +5589,8 @@ public class Map extends Canvas {
       paint();
    }
 
-   public void removeMousePositionListener(final IPositionListener listner) {
-      _mousePositionListeners.remove(listner);
+   public void removeMousePositionListener(final IPositionListener listener) {
+      _mousePositionListeners.remove(listener);
    }
 
    /**

@@ -111,7 +111,6 @@ public class ActionCreateTourMarkerFromMap extends Action {
 
       //We save the tour again to take into account the action of the user (renamed the marker, cancelled the dialog...)
       TourManager.saveModifiedTour(tourData);
-
    }
 
    public void setCurrentHoverTourId(final long tourId) {
