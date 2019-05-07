@@ -16,8 +16,10 @@
 	<tourAltUp>418</tourAltUp>
 	<tourAltDown>415</tourAltDown>
 	<restPulse>0</restPulse>
+	<isPowerSensorPresent>0</isPowerSensorPresent>
 	<avgPulse>125.864494</avgPulse>
 	<maxPulse>162.0</maxPulse>
+	<isPulseSensorPresent>1</isPulseSensorPresent>
 	<maxAltitude>1735.4</maxAltitude>
 	<maxSpeed>12.329795</maxSpeed>
 	<avgCadence>81.91281</avgCadence>

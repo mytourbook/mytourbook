@@ -1,6 +1,23 @@
+/*******************************************************************************
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation version 2 of the License.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+ *******************************************************************************/
 package net.tourbook.device.suunto;
 
 import java.util.ArrayList;
+
+import net.tourbook.application.TourbookPlugin;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -14,119 +31,118 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-import net.tourbook.application.TourbookPlugin;
-
 public class Suunto9ImportPreferences extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-	@SuppressWarnings("serial")
-	private final static ArrayList<String>	AltitudeData	= new ArrayList<String>() {
-																				{
-																					add(Messages.pref_altitude_gps);
-																					add(Messages.pref_altitude_barometer);
-																				}
-																			};
-	@SuppressWarnings("serial")
-	private final static ArrayList<String>	DistanceData	= new ArrayList<String>() {
-																				{
-																					add(Messages.pref_distance_gps);
-																					add(Messages.pref_distance_providedvalues);
-																				}
-																			};
+   @SuppressWarnings("serial")
+   private final static ArrayList<String> AltitudeData = new ArrayList<String>() {
+                                                          {
+                                                             add(Messages.pref_altitude_gps);
+                                                             add(Messages.pref_altitude_barometer);
+                                                          }
+                                                       };
+   @SuppressWarnings("serial")
+   private final static ArrayList<String> DistanceData = new ArrayList<String>() {
+                                                          {
+                                                             add(Messages.pref_distance_gps);
+                                                             add(Messages.pref_distance_providedvalues);
+                                                          }
+                                                       };
 
-	private final IPreferenceStore			_prefStore		= TourbookPlugin.getDefault().getPreferenceStore();
+   private final IPreferenceStore         _prefStore   = TourbookPlugin.getDefault().getPreferenceStore();
 
-	/*
-	 * UI controls
-	 */
-	private Group	_groupData;
+   /*
+    * UI controls
+    */
+   private Group _groupData;
 
-	private Combo	_comboAltitudeDataSource;
-	private Combo	_comboDistanceDataSource;
+   private Combo _comboAltitudeDataSource;
+   private Combo _comboDistanceDataSource;
 
-	private Label	_lblAltitudeDataSource;
-	private Label	_lblDistanceDataSource;
+   private Label _lblAltitudeDataSource;
+   private Label _lblDistanceDataSource;
 
-	@Override
-	protected void createFieldEditors() {
+   @Override
+   protected void createFieldEditors() {
 
-		createUI();
+      createUI();
 
-		setupUI();
+      setupUI();
 
-	}
+   }
 
-	private void createUI() {
+   private void createUI() {
 
-		final Composite parent = getFieldEditorParent();
-		GridLayoutFactory.fillDefaults().applyTo(parent);
+      final Composite parent = getFieldEditorParent();
+      GridLayoutFactory.fillDefaults().applyTo(parent);
 
-		/*
-		 * Data
-		 */
-		_groupData = new Group(parent, SWT.NONE);
-		_groupData.setText(Messages.pref_data_source);
-		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(_groupData);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(_groupData);
-		{
-			// label: Altitude data source
-			_lblAltitudeDataSource = new Label(_groupData, SWT.NONE);
-			_lblAltitudeDataSource.setText(Messages.pref_altitude_source);
-			/*
-			 * combo: Altitude source
-			 */
-			_comboAltitudeDataSource = new Combo(_groupData, SWT.READ_ONLY | SWT.BORDER);
-			_comboAltitudeDataSource.setVisibleItemCount(2);
+      /*
+       * Data
+       */
+      _groupData = new Group(parent, SWT.NONE);
+      _groupData.setText(Messages.pref_data_source);
+      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(_groupData);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(_groupData);
+      {
+         // label: Altitude data source
+         _lblAltitudeDataSource = new Label(_groupData, SWT.NONE);
+         _lblAltitudeDataSource.setText(Messages.pref_altitude_source);
+         /*
+          * combo: Altitude source
+          */
+         _comboAltitudeDataSource = new Combo(_groupData, SWT.READ_ONLY | SWT.BORDER);
+         _comboAltitudeDataSource.setVisibleItemCount(2);
 
-			// label: Distance data source
-			_lblDistanceDataSource = new Label(_groupData, SWT.NONE);
-			_lblDistanceDataSource.setText(Messages.pref_distance_source);
+         // label: Distance data source
+         _lblDistanceDataSource = new Label(_groupData, SWT.NONE);
+         _lblDistanceDataSource.setText(Messages.pref_distance_source);
 
-			/*
-			 * combo: Distance source
-			 */
-			_comboDistanceDataSource = new Combo(_groupData, SWT.READ_ONLY | SWT.BORDER);
-			_comboDistanceDataSource.setVisibleItemCount(2);
-		}
-	}
+         /*
+          * combo: Distance source
+          */
+         _comboDistanceDataSource = new Combo(_groupData, SWT.READ_ONLY | SWT.BORDER);
+         _comboDistanceDataSource.setVisibleItemCount(2);
+      }
+   }
 
-	private void setupUI() {
+   @Override
+   public void init(final IWorkbench workbench) {
+   }
 
-		/*
-		 * Fill-up the altitude data choices
-		 */
-		for (int index = 0; index < AltitudeData.size(); ++index) {
-			_comboAltitudeDataSource.add(AltitudeData.get(index));
-		}
-		_comboAltitudeDataSource.select(_prefStore.getInt(IPreferences.ALTITUDE_DATA_SOURCE));
-		/*
-		 * Fill-up the distance data choices
-		 */
-		for (String distanceChoice : DistanceData) {
-			_comboDistanceDataSource.add(distanceChoice);
-		}
-		_comboDistanceDataSource.select(_prefStore.getInt(IPreferences.DISTANCE_DATA_SOURCE));
-	}
+   @Override
+   protected void performDefaults() {
 
-	@Override
-	public void init(final IWorkbench workbench) {}
+      _comboAltitudeDataSource.select(0);
+      _comboDistanceDataSource.select(0);
+   }
 
-	@Override
-	protected void performDefaults() {
+   @Override
+   public boolean performOk() {
 
-		_comboAltitudeDataSource.select(0);
-		_comboDistanceDataSource.select(0);
-	}
+      final boolean isOK = super.performOk();
 
-	@Override
-	public boolean performOk() {
+      if (isOK) {
+         _prefStore.setValue(IPreferences.ALTITUDE_DATA_SOURCE, _comboAltitudeDataSource.getSelectionIndex());
+         _prefStore.setValue(IPreferences.DISTANCE_DATA_SOURCE, _comboDistanceDataSource.getSelectionIndex());
+      }
+      return isOK;
+   }
 
-		final boolean isOK = super.performOk();
+   private void setupUI() {
 
-		if (isOK) {
-			_prefStore.setValue(IPreferences.ALTITUDE_DATA_SOURCE, _comboAltitudeDataSource.getSelectionIndex());
-			_prefStore.setValue(IPreferences.DISTANCE_DATA_SOURCE, _comboDistanceDataSource.getSelectionIndex());
-		}
-		return isOK;
-	}
+      /*
+       * Fill-up the altitude data choices
+       */
+      for (int index = 0; index < AltitudeData.size(); ++index) {
+         _comboAltitudeDataSource.add(AltitudeData.get(index));
+      }
+      _comboAltitudeDataSource.select(_prefStore.getInt(IPreferences.ALTITUDE_DATA_SOURCE));
+      /*
+       * Fill-up the distance data choices
+       */
+      for (final String distanceChoice : DistanceData) {
+         _comboDistanceDataSource.add(distanceChoice);
+      }
+      _comboDistanceDataSource.select(_prefStore.getInt(IPreferences.DISTANCE_DATA_SOURCE));
+   }
 
 }

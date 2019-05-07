@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation version 2 of the License.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+ *******************************************************************************/
 package net.tourbook.device.suunto;
 
 import java.io.BufferedReader;
@@ -145,10 +160,10 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
       } catch (final IOException e) {
 
-            /*
-             * Log only when reading the zip file, during a validation, an exception can be very
-             * likely and should not be displayed
-             */
+         /*
+          * Log only when reading the zip file, during a validation, an exception can be very
+          * likely and should not be displayed
+          */
          if (!isValidatingFile) {
             StatusUtil.log(e);
          }
@@ -374,6 +389,13 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
             IMPORT_FILE_PATH + "1547628897243_184710003036_post_timeline-1.xml"; //$NON-NLS-1$
       testFiles.put(controlFilePath, filePath);
 
+      // File with power data
+      filePath = IMPORT_FILE_PATH +
+            "1539801501658_174510001687_post_timeline-1.json.gz"; //$NON-NLS-1$
+      controlFilePath =
+            IMPORT_FILE_PATH + "1539801501658_174510001687_post_timeline-1.xml"; //$NON-NLS-1$
+      testFiles.put(controlFilePath, filePath);
+
       TourData entry;
       String xml;
       String controlFileContent;
@@ -431,7 +453,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
          _newlyImportedTours.put(tourId, tourData);
 
          tourData.setDeviceName(SuuntoJsonProcessor.DeviceName);
-         
+
          tourData.computeAltitudeUpDown();
          tourData.computeTourDrivingTime();
          tourData.computeComputedValues();

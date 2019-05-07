@@ -61,7 +61,6 @@ public class FitDataReader extends TourbookDevice {
 
    private boolean        _isVersionLogged;
 
-
    private void addDebugLogListener(final MesgBroadcaster broadcaster) {
 
       broadcaster.addListener(new MesgListener() {
@@ -359,7 +358,6 @@ public class FitDataReader extends TourbookDevice {
                                     final DeviceData deviceData,
                                     final HashMap<Long, TourData> alreadyImportedTours,
                                     final HashMap<Long, TourData> newlyImportedTours) {
-
 
       boolean returnValue = false;
 

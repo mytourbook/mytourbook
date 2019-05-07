@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation version 2 of the License.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+ *******************************************************************************/
 package net.tourbook.device.suunto;
 
 import java.time.Instant;
@@ -10,11 +25,6 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.swimming.SwimStroke;
 import net.tourbook.common.util.StatusUtil;
@@ -23,6 +33,11 @@ import net.tourbook.data.LengthType;
 import net.tourbook.data.SwimData;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
+
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class SuuntoJsonProcessor {
 
@@ -179,6 +194,12 @@ public class SuuntoJsonProcessor {
          return null;
       }
 
+      // We detect the available sensors
+      if(jsonFileContent.contains(TAG_HR) ||
+            jsonFileContent.contains(TAG_RR)) {
+         tourData.setIsPulseSensorPresent(true);
+      }
+
       final boolean isIndoorTour = !jsonFileContent.contains(TAG_GPSALTITUDE);
 
       boolean isPaused = false;
@@ -320,7 +341,13 @@ public class SuuntoJsonProcessor {
          }
 
          // Power
-         wasDataPopulated |= TryAddPowerData(currentSampleData, timeData);
+         final boolean wasPowerDataPopulated = TryAddPowerData(currentSampleData, timeData);
+         if (wasPowerDataPopulated && !tourData.isPowerSensorPresent()) {
+            // If we have found valid power data and we didn't know yet that power was
+            // available, we set the power sensor presence to true only this time.
+            tourData.setIsPowerSensorPresent(true);
+         }
+         wasDataPopulated |= wasPowerDataPopulated;
 
          // Distance
          if (_prefStore.getInt(IPreferences.DISTANCE_DATA_SOURCE) == 1 ||
@@ -718,7 +745,8 @@ public class SuuntoJsonProcessor {
       String result = null;
       try {
          result = new JSONObject(token).get(elementName).toString();
-      } catch (final Exception e) {}
+      } catch (final Exception e) {
+      }
       if (result == "null") { //$NON-NLS-1$
          return null;
       }
