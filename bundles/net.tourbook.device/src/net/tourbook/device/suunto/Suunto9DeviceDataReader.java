@@ -352,7 +352,6 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
       testFiles.put(controlFilePath, filePath);
 
       //Maxwell, CO
-
       filePath = IMPORT_FILE_PATH +
             "1536723722706_183010004848_post_timeline-1.json.gz"; //$NON-NLS-1$
       controlFilePath =
@@ -376,20 +375,21 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
       // SWIMMING
 
       // Start -> 100m -> LAP -> LAP -> 100m -> LAP -> LAP -> 100m -> LAP -> LAP -> 100m -> Stop
+      // (courtesy of Z74)
       filePath = IMPORT_FILE_PATH +
             "1547628896209_184710003036_post_timeline-1.json.gz"; //$NON-NLS-1$
       controlFilePath =
             IMPORT_FILE_PATH + "1547628896209_184710003036_post_timeline-1.xml"; //$NON-NLS-1$
       testFiles.put(controlFilePath, filePath);
 
-      // Start -> 100m -> Stop
+      // Start -> 100m -> Stop (courtesy of Z74)
       filePath = IMPORT_FILE_PATH +
             "1547628897243_184710003036_post_timeline-1.json.gz"; //$NON-NLS-1$
       controlFilePath =
             IMPORT_FILE_PATH + "1547628897243_184710003036_post_timeline-1.xml"; //$NON-NLS-1$
       testFiles.put(controlFilePath, filePath);
 
-      // File with power data
+      // File with power data (courtesy of MrMen)
       filePath = IMPORT_FILE_PATH +
             "1539801501658_174510001687_post_timeline-1.json.gz"; //$NON-NLS-1$
       controlFilePath =
