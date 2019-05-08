@@ -113,7 +113,29 @@ public class FitData {
       _tourData.setDeviceFirmwareVersion(_softwareVersion);
       _tourData.setDeviceTimeInterval((short) -1);
 
-      final long recordStartTime = _allTimeData.get(0).absoluteTime;
+      long recordStartTime;
+      if (_allTimeData.size() > 0) {
+
+         // this is the normal case
+
+         recordStartTime = _allTimeData.get(0).absoluteTime;
+
+      } else if (_sessionStartTime != null) {
+
+         // fallback case 1
+
+         recordStartTime = _sessionStartTime.toInstant().toEpochMilli();
+
+         TourLogManager.logError("There are no time data, using session date/time");//$NON-NLS-1$
+
+      } else {
+
+         // fallback case 2
+
+         recordStartTime = TimeTools.now().toEpochSecond();
+
+         TourLogManager.logError("There are no time data and there is no session date/time");//$NON-NLS-1$
+      }
 
       if (_sessionStartTime != null) {
 
@@ -167,10 +189,14 @@ public class FitData {
          return;
       }
 
+      final int[] timeSerie = tourData.timeSerie;
+      if (timeSerie == null) {
+         return;
+      }
+
       /*
        * validate gear list
        */
-      final int[] timeSerie = tourData.timeSerie;
       final long tourStartTime = tourData.getTourStartTimeMS();
       final long tourEndTime = tourStartTime + (timeSerie[timeSerie.length - 1] * 1000);
 
