@@ -13,6 +13,11 @@ New
   
   - Tagging preferences
     - New column to show tag/category notes
+
+
+* Tour Book
+
+  - Training Effects + Training Performance columns
   
  
 Improvements   
@@ -32,4 +37,13 @@ Changes
 Bugfix   
 ======
 
-* 
+* .fitlog File 
+
+  - Fixed avg power issue when value was a floating point
+
+
+
+System
+======
+
+* FITSDK 20.90

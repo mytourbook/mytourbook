@@ -962,8 +962,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       defineColumn_Training_PowerToWeightRatio();
       defineColumn_Training_IntensityFactor();
       defineColumn_Training_StressScore();
-      defineColumn_Training_ImpactOfTraining();
-      defineColumn_Training_PerformanceLevel();
+      defineColumn_Training_TrainingEffect();
+      defineColumn_Training_TrainingPerformance();
 
       // Running dynamics
       defineColumn_RunDyn_StanceTime_Min();
@@ -2776,27 +2776,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    }
 
    /**
-    * Column: Training: Impact of training
-    */
-   private void defineColumn_Training_ImpactOfTraining() {
-
-      final TreeColumnDefinition colDef = TreeColumnFactory.TRAINING_IMPACT_OF_TRAINING.createColumn(_columnManager, _pc);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final Object element = cell.getElement();
-            final double value = ((TVITourBookItem) element).colTraining_ImpactOfTraining;
-
-            colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
-
-            setCellColor(cell, element);
-         }
-      });
-   }
-
-   /**
     * column: PowerIntensityFactor
     */
    private void defineColumn_Training_IntensityFactor() {
@@ -2811,27 +2790,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
             final Object element = cell.getElement();
             final double value = ((TVITourBookItem) element).colPower_IntensityFactor;
-
-            colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
-
-            setCellColor(cell, element);
-         }
-      });
-   }
-
-   /**
-    * Column: Training - Performance level
-    */
-   private void defineColumn_Training_PerformanceLevel() {
-
-      final TreeColumnDefinition colDef = TreeColumnFactory.TRAINING_PERFORMANCE_LEVEL.createColumn(_columnManager, _pc);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final Object element = cell.getElement();
-            final double value = ((TVITourBookItem) element).colTraining_PerformanceLevel;
 
             colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
@@ -2872,6 +2830,48 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
             final Object element = cell.getElement();
             final double value = ((TVITourBookItem) element).colPower_TrainingStressScore;
+
+            colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
+    * Column: Training: Training Effect
+    */
+   private void defineColumn_Training_TrainingEffect() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.TRAINING_TRAINING_EFFECT.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            final double value = ((TVITourBookItem) element).colTraining_TrainingEffect;
+
+            colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
+    * Column: Training - Training Performance
+    */
+   private void defineColumn_Training_TrainingPerformance() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.TRAINING_TRAINING_PERFORMANCE.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            final double value = ((TVITourBookItem) element).colTraining_TrainingPerformance;
 
             colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 

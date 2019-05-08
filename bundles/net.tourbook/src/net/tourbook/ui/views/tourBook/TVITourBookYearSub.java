@@ -366,8 +366,8 @@ public class TVITourBookYearSub extends TVITourBookItem {
 
                // ---------- TRAINING -------------
 
-               tourItem.colTraining_ImpactOfTraining        = result.getFloat(76);
-               tourItem.colTraining_PerformanceLevel        = result.getFloat(77);
+               tourItem.colTraining_TrainingEffect          = result.getFloat(76);
+               tourItem.colTraining_TrainingPerformance     = result.getFloat(77);
 
 // SET_FORMATTING_ON
 
