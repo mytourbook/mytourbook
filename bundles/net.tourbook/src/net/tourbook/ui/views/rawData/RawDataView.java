@@ -595,10 +595,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    private class TourDataContentProvider implements IStructuredContentProvider {
 
-      public TourDataContentProvider() {}
+      public TourDataContentProvider() {
+      }
 
       @Override
-      public void dispose() {}
+      public void dispose() {
+      }
 
       @Override
       public Object[] getElements(final Object parent) {
@@ -606,7 +608,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       }
 
       @Override
-      public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
+      public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {
+      }
    }
 
    private void action_Easy_SetDeviceWatching_OnOff() {
@@ -700,7 +703,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       final ArrayList<TourData> selectedTours = getAnySelectedTours();
 
-      runEasyImport_100_DeleteTourFiles(true, selectedTours, false);
+      runEasyImport_100_DeleteTourFiles(true, selectedTours, null, false);
    }
 
    void actionMergeTours(final TourData mergeFromTour, final TourData mergeIntoTour) {
@@ -772,10 +775,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       _partListener = new IPartListener2() {
 
          @Override
-         public void partActivated(final IWorkbenchPartReference partRef) {}
+         public void partActivated(final IWorkbenchPartReference partRef) {
+         }
 
          @Override
-         public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
+         public void partBroughtToTop(final IWorkbenchPartReference partRef) {
+         }
 
          @Override
          public void partClosed(final IWorkbenchPartReference partRef) {
@@ -790,7 +795,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          }
 
          @Override
-         public void partDeactivated(final IWorkbenchPartReference partRef) {}
+         public void partDeactivated(final IWorkbenchPartReference partRef) {
+         }
 
          @Override
          public void partHidden(final IWorkbenchPartReference partRef) {
@@ -800,10 +806,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          }
 
          @Override
-         public void partInputChanged(final IWorkbenchPartReference partRef) {}
+         public void partInputChanged(final IWorkbenchPartReference partRef) {
+         }
 
          @Override
-         public void partOpened(final IWorkbenchPartReference partRef) {}
+         public void partOpened(final IWorkbenchPartReference partRef) {
+         }
 
          @Override
          public void partVisible(final IWorkbenchPartReference partRef) {
@@ -4059,7 +4067,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             return true;
          }
 
-      } catch (final Exception e) {}
+      } catch (final Exception e) {
+      }
 
       return false;
    }
@@ -4566,7 +4575,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       }
 
       if (importLauncher == null) {
-         // this should not occure
+         // this should not occur
          return;
       }
 
@@ -4670,7 +4679,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             // use newly saved/not saved tours
 
-            runEasyImport_100_DeleteTourFiles(false, importedAndSavedTours, true);
+            final ArrayList<String> invalidFiles = _rawDataMgr.getInvalidFilesList();
+
+            runEasyImport_100_DeleteTourFiles(false, importedAndSavedTours, invalidFiles, true);
          }
 
          /*
@@ -4955,24 +4966,21 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                monitor.worked(1);
             }
 
-            for (final String invalidFile : invalidFiles) {
+            if (invalidFiles != null) {
 
-               //TODO
-               monitor.subTask(NLS.bind(
-                     Messages.Import_Data_Monitor_DeleteTourFiles_Subtask,
-                     ++saveCounter,
-                     selectionSize));
+               for (final String invalidFilePath : invalidFiles) {
 
-               // delete device files
-               deleteFile(
-                     deletedFiles,
-                     notDeletedFiles,
-                     invalidFile,
-                     "", //TODOimportFileName,
-                     TourLogState.EASY_IMPORT_DELETE_DEVICE);
-
-               monitor.worked(1);
+                  deleteFile(
+                        deletedFiles,
+                        notDeletedFiles,
+                        Paths.get(invalidFilePath).getParent().toString(),
+                        Paths.get(invalidFilePath).getFileName().toString(),
+                        TourLogState.EASY_IMPORT_DELETE_DEVICE);
+//TODO
+                  monitor.worked(1);
+               }
             }
+
          }
       };
 
@@ -5285,7 +5293,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                         deviceFolderPath.register(folderWatcher, ENTRY_CREATE, ENTRY_DELETE);
                      }
 
-                  } catch (final Exception e) {}
+                  } catch (final Exception e) {
+                  }
                }
 
                if (isDeviceFolderValid) {
@@ -5315,7 +5324,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                         watchBackupFolder.register(folderWatcher, ENTRY_CREATE, ENTRY_DELETE);
                      }
 
-                  } catch (final Exception e) {}
+                  } catch (final Exception e) {
+                  }
                }
 
                // do not update the device state when the import is running otherwise the import file list can be wrong
