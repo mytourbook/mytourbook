@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -122,7 +122,6 @@ public class EasyImportManager {
    public static final String  LOG_EASY_IMPORT_101_TURN_WATCHING_OFF    = Messages.Log_EasyImport_101_TurnWatchingOff;
    public static final String  LOG_EASY_IMPORT_999_IMPORT_END           = Messages.Log_EasyImport_999_ImportEnd;
 
-   //
    private static EasyImportManager _instance;
 
    private final IDialogSettings    _state     = TourbookPlugin.getState(ID);

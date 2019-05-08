@@ -108,9 +108,7 @@ public class RawDataManager {
    private static final String LOG_REIMPORT_ONLY_TEMPERATURE      = Messages.Log_Reimport_Only_Temperature;
    private static final String LOG_REIMPORT_TOUR                  = Messages.Log_Reimport_Tour;
 
-   /*
-    * list of files to ignore
-    */
+   //
    private static final String INVALIDFILES_TO_IGNORE = "invalidfiles_to_ignore.txt"; //$NON-NLS-1$
 
    //
@@ -284,7 +282,7 @@ public class RawDataManager {
    }
 
    /**
-    * Writes the list of files to ignore into a text file
+    * Writes the list of files to ignore into a text file.
     */
    private static void save_InvalidFilesToIgnore_InTxt() {
 

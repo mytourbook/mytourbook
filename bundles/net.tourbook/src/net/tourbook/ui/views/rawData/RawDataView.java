@@ -4976,7 +4976,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                         Paths.get(invalidFilePath).getParent().toString(),
                         Paths.get(invalidFilePath).getFileName().toString(),
                         TourLogState.EASY_IMPORT_DELETE_DEVICE);
-//TODO
+
                   monitor.worked(1);
                }
             }
