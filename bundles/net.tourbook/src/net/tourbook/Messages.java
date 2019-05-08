@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1064,6 +1064,7 @@ public class Messages extends NLS {
    public static String        Import_Data_Action_Reimport_OnlyTemperatureValues;
    public static String        Import_Data_Action_Reimport_OnlyTimeSlices;
    public static String        Import_Data_Action_Reimport_OnlyTourMarker;
+   public static String        Import_Data_Action_Reimport_OnlyTrainingValues;
    public static String        Import_Data_Action_Reimport_Tour;
    public static String        Import_Data_Action_RemoveTour;
    public static String        Import_Data_Action_RemoveToursWhenClosed;
@@ -1082,6 +1083,7 @@ public class Messages extends NLS {
    public static String        Import_Data_Dialog_ConfirmReimportTemperatureValues_Message;
    public static String        Import_Data_Dialog_ConfirmReimportTimeSlices_Message;
    public static String        Import_Data_Dialog_ConfirmReimportTourMarker_Message;
+   public static String        Import_Data_Dialog_ConfirmReimportTraining_Message;
    public static String        Import_Data_Dialog_DeleteTourFiles_LastChance_Message;
    public static String        Import_Data_Dialog_DeleteTourFiles_Message;
    public static String        Import_Data_Dialog_DeleteTourFiles_Title;
@@ -1202,6 +1204,7 @@ public class Messages extends NLS {
    public static String        Log_Reimport_Only_Swimming;
    public static String        Log_Reimport_Only_Temperature;
    public static String        Log_Reimport_Only_TourMarker;
+   public static String        Log_Reimport_Only_Training;
    public static String        Log_Reimport_PreviousFiles;
    public static String        Log_Reimport_PreviousFiles_End;
    public static String        Log_Reimport_Tour;

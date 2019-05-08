@@ -529,8 +529,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @param trainingEffect
     */
-   private float                 training_ImpactOfTraining;                            // db-version 38
-   private float                 training_PerformanceLevel;                            // db-version 38
+   private float                 training_TrainingEffect;                              // db-version 38
+   private float                 training_TrainingPerformance;                         // db-version 38
 
    // ############################################# OTHER TOUR/DEVICE DATA #############################################
 
@@ -8018,12 +8018,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return tourWayPoints;
    }
 
-   public float getTraining_ImpactOfTraining() {
-      return training_ImpactOfTraining;
+   public float getTraining_TrainingEffect() {
+      return training_TrainingEffect;
    }
 
-   public float getTraining_PerformanceLevel() {
-      return training_PerformanceLevel;
+   public float getTraining_TrainingPerformance() {
+      return training_TrainingPerformance;
    }
 
    /**
@@ -9308,12 +9308,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       this.tourType = tourType;
    }
 
-   public void setTraining_ImpactOfTraining(final float trainingEffect) {
-      this.training_ImpactOfTraining = trainingEffect;
+   public void setTraining_TrainingEffect(final float trainingEffect) {
+      this.training_TrainingEffect = trainingEffect;
    }
 
-   public void setTraining_PerformanceLevel(final float performanceLevel) {
-      this.training_PerformanceLevel = performanceLevel;
+   public void setTraining_TrainingPerformance(final float trainingPerformance) {
+      this.training_TrainingPerformance = trainingPerformance;
    }
 
    public void setupHistoryTour() {

@@ -169,7 +169,7 @@ public class MesgListener_Session extends AbstractMesgListener implements Sessio
       
       Float totalTrainingEffect = mesg.getTotalTrainingEffect();
       if (totalTrainingEffect != null) {
-         tourData.setTraining_ImpactOfTraining(totalTrainingEffect);
+         tourData.setTraining_TrainingEffect(totalTrainingEffect);
       }
 
       fitData.onSetup_Session_20_Finalize();

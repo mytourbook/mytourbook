@@ -179,8 +179,8 @@ public class TVITourBookYearSub extends TVITourBookItem {
             //
             // ---------- TRAINING -------------
             //
-            + "training_ImpactOfTraining, " //              76   //$NON-NLS-1$
-            + "training_PerformanceLevel " //               77   //$NON-NLS-1$
+            + "training_TrainingEffect, " //              76   //$NON-NLS-1$
+            + "training_TrainingPerformance " //               77   //$NON-NLS-1$
 
             + UI.NEW_LINE
 

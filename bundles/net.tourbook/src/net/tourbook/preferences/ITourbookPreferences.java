@@ -476,7 +476,11 @@ public interface ITourbookPreferences {
     * Dialog toggle states
     */
    public static final String TOGGLE_STATE_GEO_FILTER_DELETE_ALL_WITHOUT_NAME = "TOGGLE_STATE_GEO_FILTER_DELETE_ALL_WITHOUT_NAME";//$NON-NLS-1$
+
    public static final String TOGGLE_STATE_REIMPORT_ALL_TIME_SLICES           = "TOGGLE_STATE_REIMPORT_ALL_TIME_SLICES";          //$NON-NLS-1$
+   public static final String TOGGLE_STATE_REIMPORT_TOUR                      = "TOGGLE_STATE_REIMPORT_TOUR";                     //$NON-NLS-1$
+   public static final String TOGGLE_STATE_REIMPORT_TOUR_MARKER               = "TOGGLE_STATE_REIMPORT_TOUR_MARKER";              //$NON-NLS-1$
+
    public static final String TOGGLE_STATE_REIMPORT_ALTITUDE_VALUES           = "TOGGLE_STATE_REIMPORT_ALTITUDE_VALUES";          //$NON-NLS-1$
    public static final String TOGGLE_STATE_REIMPORT_CADENCE_VALUES            = "TOGGLE_STATE_REIMPORT_CADENCE_VALUES";           //$NON-NLS-1$
    public static final String TOGGLE_STATE_REIMPORT_GEAR_VALUES               = "TOGGLE_STATE_REIMPORT_GEAR_VALUES";              //$NON-NLS-1$
@@ -485,8 +489,8 @@ public interface ITourbookPreferences {
    public static final String TOGGLE_STATE_REIMPORT_RUNNING_DYNAMICS_VALUES   = "TOGGLE_STATE_REIMPORT_RUNNING_DYNAMICS_VALUES";  //$NON-NLS-1$
    public static final String TOGGLE_STATE_REIMPORT_SWIMMING_VALUES           = "TOGGLE_STATE_REIMPORT_SWIMMING_VALUES";          //$NON-NLS-1$
    public static final String TOGGLE_STATE_REIMPORT_TEMPERATURE_VALUES        = "TOGGLE_STATE_REIMPORT_TEMPERATURE_VALUES";       //$NON-NLS-1$
-   public static final String TOGGLE_STATE_REIMPORT_TOUR                      = "TOGGLE_STATE_REIMPORT_TOUR";                     //$NON-NLS-1$
-   public static final String TOGGLE_STATE_REIMPORT_TOUR_MARKER               = "TOGGLE_STATE_REIMPORT_TOUR_MARKER";              //$NON-NLS-1$
+   public static final String TOGGLE_STATE_REIMPORT_TRAINING_VALUES           = "TOGGLE_STATE_REIMPORT_TRAINING_VALUES";          //$NON-NLS-1$
+
    public static final String TOGGLE_STATE_SHOW_HISTORY_TOUR_SAVE_WARNING     = "TOGGLE_STATE_SHOW_HISTORY_TOUR_SAVE_WARNING";    //$NON-NLS-1$
    public static final String TOGGLE_STATE_SHOW_STAR_RATING_SAVE_WARNING      = "TOGGLE_STATE_SHOW_STAR_RATING_SAVE_WARNING";     //$NON-NLS-1$
 
