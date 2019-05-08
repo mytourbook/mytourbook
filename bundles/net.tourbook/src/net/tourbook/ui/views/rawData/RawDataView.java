@@ -639,7 +639,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     */
    void action_Easy_SetupImport(final int selectedTab) {
 
-      // prevent that the dialog is opened multiple times, this occured when testing
+      // prevent that the dialog is opened multiple times, this occurred when testing
       if (_dialogImportConfig != null) {
          return;
       }
@@ -5241,7 +5241,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             try {
 
-               // it occured that the join never ended
+               // it occurred that the join never ended
 //               _watchingFolderThread.join();
                _watchingFolderThread.join(10000);
 
@@ -5607,7 +5607,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       if (_dashboard_PageBook == null) {
 
          /*
-          * This occures when the app is started the first time and the measurement selection dialog
+          * This occurs when the app is started the first time and the measurement selection dialog
           * which fires an event
           */
 
@@ -5639,7 +5639,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          public void run() {
 
             if (_browser.isDisposed()) {
-               // this occured
+               // this occurred
                return;
             }
 

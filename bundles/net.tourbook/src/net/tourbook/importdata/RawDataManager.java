@@ -1418,10 +1418,8 @@ public class RawDataManager {
                      }
 
                      break;
-                  } else // The file is invalid
-                  {
-
                   }
+
                   if (_isImportCanceled) {
                      break;
                   }
