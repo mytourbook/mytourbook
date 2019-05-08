@@ -4858,6 +4858,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     */
    private void runEasyImport_100_DeleteTourFiles(final boolean isDeleteAllFiles,
                                                   final ArrayList<TourData> allTourData,
+                                                  final ArrayList<String> invalidFiles,
                                                   final boolean isEasyImport) {
 
       // open log view always then tour files are deleted
@@ -4922,7 +4923,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
                final String originalFilePath = tourData.importFilePathOriginal;
 
-               // this is the backup folder when an backup is created
+               // this is the backup folder when a backup is created
                final String importFilePath = tourData.getImportFilePath();
                final String importFileName = tourData.getImportFileName();
 
@@ -4950,6 +4951,25 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                } else {
                   tourData.isTourFileMoved = true;
                }
+
+               monitor.worked(1);
+            }
+
+            for (final String invalidFile : invalidFiles) {
+
+               //TODO
+               monitor.subTask(NLS.bind(
+                     Messages.Import_Data_Monitor_DeleteTourFiles_Subtask,
+                     ++saveCounter,
+                     selectionSize));
+
+               // delete device files
+               deleteFile(
+                     deletedFiles,
+                     notDeletedFiles,
+                     invalidFile,
+                     "", //TODOimportFileName,
+                     TourLogState.EASY_IMPORT_DELETE_DEVICE);
 
                monitor.worked(1);
             }

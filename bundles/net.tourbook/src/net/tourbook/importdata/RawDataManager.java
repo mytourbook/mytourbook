@@ -15,11 +15,13 @@
  *******************************************************************************/
 package net.tourbook.importdata;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -34,6 +36,7 @@ import java.util.List;
 import net.tourbook.Messages;
 import net.tourbook.application.PerspectiveFactoryRawData;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.ITourViewer3;
@@ -55,6 +58,7 @@ import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -102,6 +106,17 @@ public class RawDataManager {
    private static final String      LOG_REIMPORT_ONLY_SWIMMING         = Messages.Log_Reimport_Only_Swimming;
    private static final String      LOG_REIMPORT_ONLY_TEMPERATURE      = Messages.Log_Reimport_Only_Temperature;
    private static final String      LOG_REIMPORT_TOUR                  = Messages.Log_Reimport_Tour;
+   /*
+    * list of files to ignore
+    */
+
+   // My vision : if a file is not valid, ad it to the xml file below
+   // add a checkbox for user to know if they want to ignore invalid files ?
+
+   //Will invalid files be moved too ?? i think so
+
+   private static final String IMPORTFILES_TO_IGNORE = "importfiles_to_ignore.xml"; //$NON-NLS-1$
+
    //
    public static final int          ADJUST_IMPORT_YEAR_IS_DISABLED     = -1;
    //
@@ -229,6 +244,42 @@ public class RawDataManager {
 
    public static boolean isAutoOpenImportLog() {
       return _importState_IsAutoOpenImportLog;
+   }
+
+   /**
+    * Writes the list of files to ignore into a text file
+    */
+   private static void save_FilesToIgnore_InTxt(final ArrayList<String> invalidFiles) {
+
+      BufferedWriter writer = null;
+
+      try {
+
+         final IPath stateLocation = Platform.getStateLocation(CommonActivator.getDefault().getBundle());
+         final File file = stateLocation.append(IMPORTFILES_TO_IGNORE).toFile();
+
+         writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, true), "UTF-8")); //$NON-NLS-1$
+
+         if (!file.exists()) {
+            file.createNewFile();
+         }
+
+         for (final String invalidFile : invalidFiles) {
+            writer.write(invalidFile);
+            writer.newLine();
+         }
+
+      } catch (final IOException e) {
+         e.printStackTrace();
+      } finally {
+         if (writer != null) {
+            try {
+               writer.close();
+            } catch (final IOException e) {
+               e.printStackTrace();
+            }
+         }
+      }
    }
 
    public void actionImportFromDevice() {
@@ -1330,6 +1381,10 @@ public class RawDataManager {
 
                      break;
                   }
+                  else // The file is invalid
+                  {
+
+                  }
                   if (_isImportCanceled) {
                      break;
                   }
@@ -1372,6 +1427,7 @@ public class RawDataManager {
                   _importedFileNamesChildren.addAll(additionalImportedFiles);
                }
             }
+
 
             // cleanup
             additionalImportedFiles.clear();
@@ -1811,6 +1867,12 @@ public class RawDataManager {
                   TourLogManager.addSubLog(TourLogState.IMPORT_ERROR, osFilePath);
                }
             }
+
+            //make sure that the not imported file are invalid
+            //Move the not imported files to the backup folder
+            //for each not imported file, if it doesnt exist in the txt file, add its name in the file
+
+            save_FilesToIgnore_InTxt(notImportedFiles);
 
             if (importCounter > 0) {
 

@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -121,6 +121,9 @@ public class EasyImportManager {
 	public static final String			LOG_EASY_IMPORT_100_DELETE_TOUR_FILES		= Messages.Log_EasyImport_100_DeleteTourFiles;
 	public static final String			LOG_EASY_IMPORT_101_TURN_WATCHING_OFF		= Messages.Log_EasyImport_101_TurnWatchingOff;
 	public static final String			LOG_EASY_IMPORT_999_IMPORT_END				= Messages.Log_EasyImport_999_ImportEnd;
+
+
+
 	//
 	private static EasyImportManager	_instance;
 
@@ -141,6 +144,7 @@ public class EasyImportManager {
 		return _instance;
 	}
 
+
 	/**
 	 * @param isForceRetrieveFiles
 	 *            When <code>true</code> files will be retrieved even when the stores have not
@@ -155,7 +159,7 @@ public class EasyImportManager {
 
 		final DeviceImportState returnState = new DeviceImportState();
 
-		// this is called from multiple threads and propably cause problems
+      // this is called from multiple threads and probably cause problems
 		STORE_LOCK.lock();
 		{
 			try {
@@ -1103,75 +1107,76 @@ public class EasyImportManager {
 		}
 	}
 
-	/**
-	 * Set tour type by speed
-	 * 
-	 * @param tourData
-	 * @param importLauncher
-	 */
-	private void setTourType(final TourData tourData, final ImportLauncher importLauncher) {
+   /**
+    * Set tour type by speed
+    *
+    * @param tourData
+    * @param importLauncher
+    */
+   private void setTourType(final TourData tourData, final ImportLauncher importLauncher) {
 
-		String tourTypeName = UI.EMPTY_STRING;
+      String tourTypeName = UI.EMPTY_STRING;
 
-		final Enum<TourTypeConfig> ttConfig = importLauncher.tourTypeConfig;
+      final Enum<TourTypeConfig> ttConfig = importLauncher.tourTypeConfig;
 
-		if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(ttConfig)) {
+      if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(ttConfig)) {
 
-			// set tour type by speed
+         // set tour type by speed
 
-			final float tourDistanceKm = tourData.getTourDistance();
-			final long drivingTime = tourData.getTourDrivingTime();
+         final float tourDistanceKm = tourData.getTourDistance();
+         final long drivingTime = tourData.getTourDrivingTime();
 
-			double tourAvgSpeed = 0;
+         double tourAvgSpeed = 0;
 
-			if (drivingTime != 0) {
-				tourAvgSpeed = tourDistanceKm / drivingTime * 3.6;
-			}
+         if (drivingTime != 0) {
+            tourAvgSpeed = tourDistanceKm / drivingTime * 3.6;
+         }
 
-			final ArrayList<SpeedTourType> speedTourTypes = importLauncher.speedTourTypes;
-			long tourTypeId = -1;
+         final ArrayList<SpeedTourType> speedTourTypes = importLauncher.speedTourTypes;
+         long tourTypeId = -1;
 
-			// find tour type for the tour avg speed
-			for (final SpeedTourType speedTourType : speedTourTypes) {
+         // find tour type for the tour avg speed
+         for (final SpeedTourType speedTourType : speedTourTypes) {
 
-				if (tourAvgSpeed <= speedTourType.avgSpeed) {
+            if (tourAvgSpeed <= speedTourType.avgSpeed) {
 
-					tourTypeId = speedTourType.tourTypeId;
-					break;
-				}
-			}
+               tourTypeId = speedTourType.tourTypeId;
+               break;
+            }
+         }
 
-			if (tourTypeId != -1) {
+         if (tourTypeId != -1) {
 
-				final TourType tourType = net.tourbook.ui.UI.getTourType(tourTypeId);
-				tourTypeName = tourType.getName();
+            final TourType tourType = net.tourbook.ui.UI.getTourType(tourTypeId);
+            tourTypeName = tourType.getName();
 
-				tourData.setTourType(tourType);
-			}
+            tourData.setTourType(tourType);
+         }
 
-		} else if (TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL.equals(ttConfig)) {
+      } else if (TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL.equals(ttConfig)) {
 
-			// set one tour type
+         // set one tour type
 
-			final TourType tourType = importLauncher.oneTourType;
+         final TourType tourType = importLauncher.oneTourType;
 
-			if (tourType != null) {
+         if (tourType != null) {
 
-				tourTypeName = tourType.getName();
+            tourTypeName = tourType.getName();
 
-				tourData.setTourType(tourType);
-			}
+            tourData.setTourType(tourType);
+         }
 
-		} else {
+      } else {
 
-			// tour type is not set
-		}
+         // tour type is not set
+      }
 
-		TourLogManager.addSubLog(//
-				TourLogState.DEFAULT,
-				String.format(//
-						LOG_EASY_IMPORT_003_TOUR_TYPE_ITEM,
-						tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
-						tourTypeName));
-	}
+      TourLogManager.addSubLog(//
+            TourLogState.DEFAULT,
+            String.format(//
+                  LOG_EASY_IMPORT_003_TOUR_TYPE_ITEM,
+                  tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
+                  tourTypeName));
+   }
+
 }
