@@ -32,6 +32,7 @@ import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.ICloseOpenedDialogs;
 import net.tourbook.common.tooltip.IOpeningDialog;
@@ -1419,12 +1420,15 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       _mapApp.setLayer_HillShading_Opacity(layerHillshadingOpacity);
 
       layer_HillShading.setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_HILLSHADING_VISIBLE, true));
-      layer_HillShading.setBitmapAlpha(layerHillshadingOpacity / 100f);
+      layer_HillShading.setBitmapAlpha(layerHillshadingOpacity / 100f, true);
 
       // other layers
       _mapApp.getLayer_BaseMap().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_BASE_MAP_VISIBLE, true));
       _mapApp.getLayer_Building().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_BUILDING_VISIBLE, true));
+      
       _mapApp.getLayer_MapBookmark().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_BOOKMARK_VISIBLE, true));
+
+      
       //_mapApp.getLayer_S3DB().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_S3DB_VISIBLE, true));
 
       _mapApp.getLayer_Label().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_LABEL_VISIBLE, true));
@@ -1449,7 +1453,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
       _state.put(STATE_IS_LAYER_BASE_MAP_VISIBLE, _mapApp.getLayer_BaseMap().isEnabled());
       _state.put(STATE_IS_LAYER_BUILDING_VISIBLE, _mapApp.getLayer_Building().isEnabled());
-      _state.put(STATE_IS_LAYER_BOOKMARK_VISIBLE, _mapApp.getLayer_MapBookmark().isEnabled());
+      //_state.put(STATE_IS_LAYER_BOOKMARK_VISIBLE, _mapApp.getLayer_MapBookmark().isEnabled());
       //_state.put(STATE_IS_LAYER_S3DB_VISIBLE, _mapApp.getLayer_S3DB().isEnabled());
       _state.put(STATE_IS_LAYER_LABEL_VISIBLE, _mapApp.getLayer_Label().isEnabled());
       _state.put(STATE_IS_LAYER_MARKER_VISIBLE, _mapApp.getLayer_TourMarker().isEnabled());
@@ -1457,6 +1461,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       _state.put(STATE_IS_LAYER_TOUR_VISIBLE, _mapApp.getLayer_Tour().isEnabled());
       _state.put(STATE_IS_LAYER_SCALE_BAR_VISIBLE, _mapApp.getLayer_ScaleBar().isEnabled());
 
+      _state.put(STATE_IS_LAYER_BOOKMARK_VISIBLE, _mapApp.getLayer_MapBookmark().isEnabled());
+    
       // hillshading layer
       _state.put(STATE_IS_LAYER_HILLSHADING_VISIBLE, _mapApp.getLayer_HillShading().isEnabled());
       _state.put(STATE_LAYER_HILLSHADING_OPACITY, _mapApp.getLayer_HillShading_Opacity());

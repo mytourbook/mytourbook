@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -78,7 +78,7 @@ import org.xml.sax.Attributes;
 
 public class Util {
 
-//	public static final String	UNIQUE_ID_SUFFIX_CICLO_TOUR				= "83582";				//$NON-NLS-1$
+// public static final String UNIQUE_ID_SUFFIX_CICLO_TOUR          = "83582";           //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_GARMIN_FIT          = "12653"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_GARMIN_TCX          = "42984"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_GPX                 = "31683"; //$NON-NLS-1$
@@ -148,11 +148,11 @@ public class Util {
       Collections.reverse(list);
 
       final String[] stringArray = new String[list.size()];
-      
+
       for (int index = 0; index < list.size(); index++) {
          stringArray[index] = list.get(index);
       }
-      
+
       return stringArray;
    }
 
@@ -638,11 +638,11 @@ public class Util {
       if (UI.IS_OSX) {
          isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
          isShiftKey = (event.stateMask & SWT.MOD3) > 0;
-//			isAltKey = (event.stateMask & SWT.MOD3) > 0;
+//       isAltKey = (event.stateMask & SWT.MOD3) > 0;
       } else {
          isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
          isShiftKey = (event.stateMask & SWT.MOD2) > 0;
-//			isAltKey = (event.stateMask & SWT.MOD3) > 0;
+//       isAltKey = (event.stateMask & SWT.MOD3) > 0;
       }
 
       // accelerate with Ctrl + Shift key
@@ -1759,7 +1759,7 @@ public class Util {
     *
     * @param attributes
     * @param attributeName
-    * @return Returns integer value or 0 when attribute is not available or cannot be parsed.
+    * @return Returns an integer value or 0 when attribute is not available or cannot be parsed.
     */
    public static int parseInt0(final Attributes attributes, final String attributeName) {
 
@@ -1767,6 +1767,26 @@ public class Util {
          final String valueString = attributes.getValue(attributeName);
          if (valueString != null) {
             return Integer.parseInt(valueString);
+         }
+      } catch (final NumberFormatException e) {
+         // do nothing
+      }
+      return 0;
+   }
+
+   /**
+    * Parses SAX attribute
+    *
+    * @param attributes
+    * @param attributeName
+    * @return Returns a float value or 0 when attribute is not available or cannot be parsed.
+    */
+   public static float parseFloat0(final Attributes attributes, final String attributeName) {
+
+      try {
+         final String valueString = attributes.getValue(attributeName);
+         if (valueString != null) {
+            return Float.parseFloat(valueString);
          }
       } catch (final NumberFormatException e) {
          // do nothing
@@ -1867,7 +1887,7 @@ public class Util {
          unit /= 10;
       }
 
-//		unit = unitValue / multiplier;
+//    unit = unitValue / multiplier;
 
       unit = unit > 50 ? 50 : //
             unit > 20 ? 20 : //
@@ -2090,13 +2110,13 @@ public class Util {
                                  unit > 120 ? 120 : //
                                        unit > 24 ? 24 : //
                                              10;
-//					unit = //
-//							//
-//					unit > 1000 ? 1000 : //
-//							unit > 500 ? 500 : //
-//									unit > 100 ? 100 : //
-//											unit > 50 ? 50 : //
-//													10;
+//             unit = //
+//                   //
+//             unit > 1000 ? 1000 : //
+//                   unit > 500 ? 500 : //
+//                         unit > 100 ? 100 : //
+//                               unit > 50 ? 50 : //
+//                                     10;
 
             } else {
 
