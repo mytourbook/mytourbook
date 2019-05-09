@@ -20,12 +20,14 @@ import de.byteholder.geoclipse.map.IMapContextProvider;
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.MapGridData;
 import de.byteholder.geoclipse.map.MapLegend;
+import de.byteholder.geoclipse.map.event.IHoveredTourListener;
 import de.byteholder.geoclipse.map.event.IMapGridListener;
 import de.byteholder.geoclipse.map.event.IMapInfoListener;
 import de.byteholder.geoclipse.map.event.IMapPositionListener;
 import de.byteholder.geoclipse.map.event.IPOIListener;
 import de.byteholder.geoclipse.map.event.IPositionListener;
 import de.byteholder.geoclipse.map.event.ITourSelectionListener;
+import de.byteholder.geoclipse.map.event.MapHoveredTourEvent;
 import de.byteholder.geoclipse.map.event.MapPOIEvent;
 import de.byteholder.geoclipse.map.event.MapPositionEvent;
 import de.byteholder.geoclipse.mapprovider.MP;
@@ -74,6 +76,7 @@ import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map.bookmark.MapBookmarkManager;
 import net.tourbook.map.bookmark.MapLocation;
 import net.tourbook.map2.Messages;
+import net.tourbook.map2.action.ActionCreateTourMarkerFromMap;
 import net.tourbook.map2.action.ActionDimMap;
 import net.tourbook.map2.action.ActionManageMapProviders;
 import net.tourbook.map2.action.ActionMap2Color;
@@ -363,7 +366,7 @@ public class Map2View extends ViewPart implements
    private GeoPosition                       _defaultPosition;
 
    /**
-    * when <code>true</code> a tour is painted, <code>false</code> a point of interrest is painted
+    * when <code>true</code> a tour is painted, <code>false</code> a point of interest is painted
     */
    private boolean                           _isTourOrWayPoint;
 
@@ -426,6 +429,7 @@ public class Map2View extends ViewPart implements
    private ActionMap2_Options             _actionMap2_Options;
    private ActionMapBookmarks             _actionMap2_Bookmarks;
    private ActionMap2Color                _actionMap2_Color;
+   private ActionCreateTourMarkerFromMap  _actionCreateTourMarkerFromMap;
    private ActionMap2_Graphs              _actionMap2_TourColors;
    private ActionManageMapProviders       _actionManageProvider;
    private ActionPhotoProperties          _actionPhotoFilter;
@@ -559,7 +563,8 @@ public class Map2View extends ViewPart implements
       }
    }
 
-   public Map2View() {}
+   public Map2View() {
+   }
 
    public void action_SyncWith_ChartSlider() {
 
@@ -980,6 +985,15 @@ public class Map2View extends ViewPart implements
          }
       });
 
+      _map.addHoveredTourListener(new IHoveredTourListener() {
+         @Override
+         public void setHoveredTourId(final MapHoveredTourEvent hoveredTourId) {
+
+            _actionCreateTourMarkerFromMap.setCurrentHoverTourId(hoveredTourId.hoveredTourId);
+            _actionCreateTourMarkerFromMap.setEnabled(hoveredTourId.hoveredTourId != Integer.MIN_VALUE);
+         }
+      });
+
       _map.addTourSelectionListener(new ITourSelectionListener() {
 
          @Override
@@ -1079,7 +1093,8 @@ public class Map2View extends ViewPart implements
          }
 
          @Override
-         public void partDeactivated(final IWorkbenchPartReference partRef) {}
+         public void partDeactivated(final IWorkbenchPartReference partRef) {
+         }
 
          @Override
          public void partHidden(final IWorkbenchPartReference partRef) {
@@ -1089,7 +1104,8 @@ public class Map2View extends ViewPart implements
          }
 
          @Override
-         public void partInputChanged(final IWorkbenchPartReference partRef) {}
+         public void partInputChanged(final IWorkbenchPartReference partRef) {
+         }
 
          @Override
          public void partOpened(final IWorkbenchPartReference partRef) {
@@ -1449,6 +1465,7 @@ public class Map2View extends ViewPart implements
       _actionEditMap2Preferences = new ActionOpenPrefDialog(Messages.Map_Action_Edit2DMapPreferences, PrefPageMap2Appearance.ID);
 
       _actionMap2_Color = new ActionMap2Color();
+      _actionCreateTourMarkerFromMap = new ActionCreateTourMarkerFromMap(this);
       _actionMap2_Options = new ActionMap2_Options();
       _actionSearchTourByLocation = new ActionSearchTourByLocation();
       _actionSelectMapProvider = new ActionSelectMapProvider(this);
@@ -1791,6 +1808,8 @@ public class Map2View extends ViewPart implements
       final boolean isOneTour = _isTourOrWayPoint && (isMultipleTours == false) && _isShowTour;
 
       _actionMap2_Color.setEnabled(isTourAvailable);
+
+      _actionCreateTourMarkerFromMap.setEnabled(isTourAvailable && _map.getHoveredTourId() != Integer.MIN_VALUE);
       _actionShowLegendInMap.setEnabled(_isTourOrWayPoint);
       _actionShowSliderInLegend.setEnabled(_isTourOrWayPoint && _isShowLegend);
       _actionShowSliderInMap.setEnabled(_isTourOrWayPoint);
@@ -1919,6 +1938,7 @@ public class Map2View extends ViewPart implements
       menuMgr.add(_actionShowSliderInLegend);
 
       menuMgr.add(new Separator());
+      menuMgr.add(_actionCreateTourMarkerFromMap);
       menuMgr.add(_actionShowTourMarker);
       menuMgr.add(_actionShowWayPoints);
       menuMgr.add(_actionShowPOI);
