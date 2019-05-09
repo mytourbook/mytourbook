@@ -29,21 +29,20 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.tourChart.ChartLabel;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Display;
 
-public class ActionCreateMarkerFromMap extends Action {
+public class ActionCreateTourMarkerFromMap extends Action {
 
    private Map2View _mapView;
    private long     _currentHoverTourId;
 
-   public ActionCreateMarkerFromMap(final Map2View mapView) {
+   public ActionCreateTourMarkerFromMap(final Map2View mapView) {
 
-      super(Messages.Map_Action_CreateMarkerFromMap, AS_PUSH_BUTTON);
+      super(Messages.Map_Action_CreateTourMarkerFromMap, AS_PUSH_BUTTON);
 
       _mapView = mapView;
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_Action_CreateMarkerFromMap));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_Action_CreateTourMarkerFromMap));
    }
 
    @Override
@@ -55,8 +54,8 @@ public class ActionCreateMarkerFromMap extends Action {
          return;
       }
 
-      final double clickedTourPointLatitude = this._mapView.getMapLocation().getMapPosition().getLatitude();
-      final double clickedTourPointLongitude = this._mapView.getMapLocation().getMapPosition().getLongitude();
+      final double clickedTourPointLatitude = this._mapView.getMap().get_mouseMove_GeoPosition().latitude;
+      final double clickedTourPointLongitude = this._mapView.getMap().get_mouseMove_GeoPosition().longitude;
 
       final LatLng clickedTourPoint = new LatLng(clickedTourPointLatitude, clickedTourPointLongitude);
       double closestDistance = Double.MAX_VALUE;
@@ -85,6 +84,7 @@ public class ActionCreateMarkerFromMap extends Action {
       final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_CUSTOM);
       tourMarker.setSerieIndex(closestLatLongIndex);
       tourMarker.setTime(relativeTourTime, tourData.getTourStartTimeMS() + (relativeTourTime * 1000));
+      tourMarker.setLabel(Messages.TourData_Label_new_tour_marker);
 
       if (altitudeSerie != null) {
          tourMarker.setAltitude(altitudeSerie[closestLatLongIndex]);
@@ -103,9 +103,14 @@ public class ActionCreateMarkerFromMap extends Action {
       markerDialog.create();
       markerDialog.addTourMarker(tourMarker);
 
-      if (markerDialog.open() == Window.OK) {
-         TourManager.saveModifiedTour(tourData);
-      }
+      //We save instantly the marker so that it is displayed on the map while the user renames the marker name.
+      //I found that otherwise, it's easy for the user to forget where the click was made.
+      TourManager.saveModifiedTour(tourData);
+
+      markerDialog.open();
+
+      //We save the tour again to take into account the action of the user (renamed the marker, cancelled the dialog...)
+      TourManager.saveModifiedTour(tourData);
    }
 
    public void setCurrentHoverTourId(final long tourId) {
