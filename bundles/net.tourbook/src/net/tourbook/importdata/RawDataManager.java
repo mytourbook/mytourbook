@@ -301,8 +301,7 @@ public class RawDataManager {
          }
 
          writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, true), "UTF-8")); //$NON-NLS-1$
-         final EasyConfig easyConfig = getEasyConfig();
-         final ImportConfig importConfig = easyConfig.getActiveImportConfig();
+         final ImportConfig importConfig = getEasyConfig().getActiveImportConfig();
 
          for (final String invalidFile : _invalidFilesList) {
             //If the invalid files are backed up and deleted from the device folder,
