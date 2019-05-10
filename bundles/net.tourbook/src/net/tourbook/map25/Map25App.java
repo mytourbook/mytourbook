@@ -354,18 +354,23 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 				throw new IllegalArgumentException("cannot read mapfile: " + _offline_mapFilePath); //$NON-NLS-1$
 			}
 
-			/*final MultiMapFileTileSource MMtileSource = getMapFile(_offline_mapFilePath);
+			
+			
+			final MultiMapFileTileSource tileSource = getMapFile(_offline_mapFilePath);
 			if (_tileSourceOfflineMapCount == 0) {
 				throw new IllegalArgumentException("cannot read (any) mapfile: " + _selectedMapProvider.offline_MapFilepath);
 			}
-			_l = mMap.setBaseMap(MMtileSource);*/
+			//_l = mMap.setBaseMap(tileSource);
+			
 			
          debugPrint("# create Layers: mf step 1: " + mMap.layers().toString() + " size: " + mMap.layers().size());  // result 1
          // here we have only one layer, that we need for mapsource switching
 			
-			final MapFileTileSource tileSource = new MapFileTileSource();
-			tileSource.setMapFile(_offline_mapFilePath);
-			tileSource.setPreferredLanguage(_offline_prefered_language);
+         // the next block was active for single mapsource
+			//final MapFileTileSource tileSource = new MapFileTileSource();
+			//tileSource.setMapFile(_offline_mapFilePath);
+			//tileSource.setPreferredLanguage(_offline_prefered_language);
+         
          debugPrint("# create Layers: mf step 2: " + mMap.layers().toString() + " size: " + mMap.layers().size());  // result 1
 			//_l = mMap.setBaseMap(tileSource);
 		
@@ -380,8 +385,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 			debugPrint("# create Layers: is mapsforge theme : " + _offline_themeFilePath); //$NON-NLS-1$
 			debugPrint("# create Layers: is mapsforge style : " + _offline_theme_styleID); //$NON-NLS-1$
 					
-			setupMap(_selectedMapProvider, tileSource); //single map file
-			//setupMap(_selectedMapProvider, MMtileSource); //multi map file
+			//setupMap(_selectedMapProvider, tileSource); //single map file
+			setupMap(_selectedMapProvider, tileSource); //multi map file
 			
 			loadTheme(_offline_theme_styleID);
 			
@@ -756,12 +761,23 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 			 * apears again when switching also the mapprovider
 			 * codeblock mustbe outside of the if statement otherwise all themes are allways on
 			 */
-			final MapFileTileSource tileSource = new MapFileTileSource();
+			
+			//singlefile mapsource
+			/*final MapFileTileSource tileSource = new MapFileTileSource();
 			tileSource.setMapFile(_offline_mapFilePath);
 			tileSource.setPreferredLanguage(_offline_prefered_language);
-			_layer_BaseMap.setTileSource(tileSource);
+			_layer_BaseMap.setTileSource(tileSource);*/
 			_offline_mapFilePath = checkFile(mapProvider.offline_MapFilepath);
-
+			
+         final MultiMapFileTileSource tileSource = getMapFile(_offline_mapFilePath);
+         if (_tileSourceOfflineMapCount == 0) {
+            throw new IllegalArgumentException("cannot read (any) mapfile: " + _selectedMapProvider.offline_MapFilepath);
+         }
+         //_l = mMap.setBaseMap(tileSource);
+         
+         tileSource.setPreferredLanguage(_offline_prefered_language);
+         _layer_BaseMap.setTileSource(tileSource);
+         
          if (onlineOfflineStatusHasChanged) {
             // when this code inside this if staements, subthemes are not working and always on
             /*final MapFileTileSource tileSource = new MapFileTileSource();
@@ -908,8 +924,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	 * @param mapProvider
 	 * @param tileSource
 	 */
-	private void setupMap(final Map25Provider mapProvider, final MapFileTileSource tileSource) {
-	//private void setupMap(final Map25Provider mapProvider, final MultiMapFileTileSource tileSource) {	
+	//private void setupMap(final Map25Provider mapProvider, final MapFileTileSource tileSource) {
+	private void setupMap(final Map25Provider mapProvider, final MultiMapFileTileSource tileSource) {	
 	   debugPrint("############# setupMap:  mapsforge entering"); //$NON-NLS-1$
       debugPrint("############# setupMap: layers before: " + mMap.layers().toString() + " size: " + mMap.layers().size());		
       CanvasAdapter.textScale = _offline_TextScale;
