@@ -234,6 +234,10 @@ public class RawDataManager {
       return false;
    }
 
+   private static EasyConfig getEasyConfig() {
+      return EasyImportManager.getInstance().getEasyConfig();
+   }
+
    public static RawDataManager getInstance() {
 
       if (_instance == null) {
@@ -292,14 +296,24 @@ public class RawDataManager {
 
          final File file = getInvalidFilesToIgnoreFile();
 
-         writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, true), "UTF-8")); //$NON-NLS-1$
-
          if (!file.exists()) {
             file.createNewFile();
          }
 
+         writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, true), "UTF-8")); //$NON-NLS-1$
+         final EasyConfig easyConfig = getEasyConfig();
+         final ImportConfig importConfig = easyConfig.getActiveImportConfig();
+
          for (final String invalidFile : _invalidFilesList) {
-            writer.write(invalidFile);
+            //If the invalid files are backed up and deleted from the device folder,
+            //then we save their backup path and not their device path.
+            if (importConfig.isCreateBackup && importConfig.isDeleteDeviceFiles) {
+               final Path invalidFileBackupPath = Paths.get(importConfig.getBackupFolder(), Paths.get(invalidFile).getFileName().toString());
+               writer.write(invalidFileBackupPath.toString());
+            } else {
+               writer.write(invalidFile);
+            }
+
             writer.newLine();
          }
 
@@ -1901,10 +1915,6 @@ public class RawDataManager {
                   TourLogManager.addSubLog(TourLogState.IMPORT_ERROR, osFilePath);
                }
             }
-
-            //make sure that the not imported file are invalid
-            //Move the not imported files to the backup folder
-            //for each not imported file, if it doesn't exist in the txt file, add its name in the file
 
             save_InvalidFilesToIgnore_InTxt();
 
