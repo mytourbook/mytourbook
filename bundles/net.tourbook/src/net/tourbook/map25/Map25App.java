@@ -656,16 +656,13 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    }  
 
 	public void setMapProvider(final Map25Provider mapProvider) {
+	   //saveState();  //doesnt help
 	   Boolean onlineOfflineStatusHasChanged = false;
       _offline_mapFilePath =  mapProvider.offline_MapFilepath;
       debugPrint("############# setMapProvider entering setMapProvider: _offline_mapFilePath:" + _offline_mapFilePath + " _last_offline_mapFilePath: " + _last_offline_mapFilePath); //$NON-NLS-1$
       //debugPrint("############# setMapProvider layers before: " + mMap.layers().toString() + " size: " + mMap.layers().size()); //$NON-NLS-1$
 
       debugPrint("############# setMapProvider layers before: " + mMap.layers().toString() + " size: " + mMap.layers().size()); //$NON-NLS-1$
-		/*boolean label_layer_was_enabled = getLayer_Label().isEnabled();
-		boolean building_layer_was_enabled = getLayer_Building().isEnabled();
-		mMap.layers().remove(_layer_Label);
-		mMap.layers().remove(_layer_Building);*/
 		
 		//if NOT mapsforge map
       if (!_offline_mapFilePath.equals(_last_offline_mapFilePath) || mapProvider.isOfflineMap !=  _last_isOfflineMap  ) {  //only reloading layers when neccercary 
@@ -731,7 +728,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 			CanvasAdapter.textScale = _offline_TextScale;
 			CanvasAdapter.userScale = _offline_UserScale;
 			debugPrint("############# setMapProvider: setMapProvider its mf Map"); //$NON-NLS-1$
-			//_httpFactory = null;  //was uncommented, trying what happen when active
 			//final MapFileTileSource tileSource = new MapFileTileSource();
 			//final MultiMapFileTileSource tileSource = getMapFile(mapProvider.offline_MapFilepath);
 			
@@ -742,8 +738,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 			debugPrint("############# setMapProvider: isThemeFromFile  " + mapProvider.offline_IsThemeFromFile); //$NON-NLS-1$
 			//debugPrint("############# setMapProvider: name             " + mapProvider.name); //$NON-NLS-1$
 
-
-			//_offline_mapFilePath = _selectedMapProvider.offline_MapFilepath;
 			_offline_mapFilePath =  mapProvider.offline_MapFilepath;
 			
 			if (!checkMapFile(new File(_offline_mapFilePath))) {
@@ -776,7 +770,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
             _layer_BaseMap.setTileSource(tileSource);*/
             setupMap(mapProvider, tileSource);
             setupMap_Layers();
-            restoreState();
+            //restoreState();
             
             /**
              * Map Viewport
@@ -799,13 +793,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
             }
          });
          
-   /*      if (_layer_Building != null) {
-            _layer_Building.setEnabled(true);
-         }
-         if (_layer_S3DB_Building != null) {
-            _layer_S3DB_Building.setEnabled(true);
-         }
-*/
+         restoreState();
+
 			
 			_offline_IsThemeFromFile = _selectedMapProvider.offline_IsThemeFromFile;
 			
@@ -814,9 +803,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 			
 			// i wish i could use loadTheme instead of this Block:
 			if (mapProvider.offline_IsThemeFromFile) { //external theme
-				//debugPrint("############# setMapProvider: _offline_IsThemeFromFile " + _offline_IsThemeFromFile);	 //$NON-NLS-1$
-				//debugPrint("############# setMapProvider: _last_offline_IsThemeFromFile " + _last_offline_IsThemeFromFile); //$NON-NLS-1$
-				
+	
 				_offline_themeFilePath = checkFile(mapProvider.offline_ThemeFilepath);
 				_offline_theme_styleID = mapProvider.offline_ThemeStyle;
 				this._offline_IsThemeFromFile = true;
@@ -849,15 +836,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 				}
 				_offline_IsThemeFromFile = false;
 			}
-			//_layer_Building = new BuildingLayer(mMap, _layer_BaseMap);
 		}
 		
-      /*_layer_Label = new LabelLayerMT(mMap, _layer_BaseMap);
-      _layer_Label.setEnabled(label_layer_was_enabled);
-      mMap.layers().add(_layer_Label);
-
-      _layer_Building.setEnabled(building_layer_was_enabled);
-      mMap.layers().add(_layer_Building);*/
       
       mMap.clearMap();
       mMap.updateMap(true);	
@@ -878,7 +858,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
     */
    private void removeLayers() {
       debugPrint("### removeLayers: layers before: " + mMap.layers().toString() + " size: " + mMap.layers().size());
-      saveState();
+      //saveState();
       for( int n = mMap.layers().size() - 1; n > 0 ;n--) { 
          debugPrint("### removeLayers: layer " + n + "/" + mMap.layers().size()+ " " + mMap.layers().get(n).toString());
          mMap.layers().remove(n);
@@ -1023,30 +1003,30 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	   layers.add(_layer_SliderPath);
 
 
-
-	   //buildings
-	   /**
-	    * here i have to investigate
-	    * with this code i got always good S3DB, but online buildings did not look good
-	    * i have also to check if the layers becomes more, if i switch the mapprovider
-	    */
-//		// Buildings or S3DB  Block I
-		_layer_S3DB_Building = new S3DBLayer(mMap,_layer_BaseMap, true);  //this is working for mf, onlinemaps missing 2 walls and roof
-	   //_layer_S3DB_Building = new S3DBLayer(mMap,_l, true);  //private S3DBLayer	_layer_S3DB_Building; //is working, but S3DB only once after programm start
-		_layer_Building = new BuildingLayer(mMap, _layer_BaseMap, false, true);
+      //buildings
+      /**
+       * here i have to investigate
+       * with this code i got always good S3DB, but online buildings did not look good with: "new S3DBLayer(mMap,_layer_BaseMap, true)"
+       * 
+       */
+//    // Buildings or S3DB  Block I
+      //_layer_S3DB_Building = new S3DBLayer(mMap,_layer_BaseMap, true);  //this is working with subtheme  switching, but no online buildings anymore
+      _layer_S3DB_Building = new S3DBLayer(mMap,_l, true);  //is working online and offline, but S3DB only until subtheme switching
+      _layer_Building = new BuildingLayer(mMap, _layer_BaseMap, false, true);
+      
 		if(_isOfflineMap) {
 //			// S3DB
 			_layer_S3DB_Building.setEnabled(true);
 			_layer_S3DB_Building.setColored(true);
 			debugPrint("################ setupMap_Layers: adding S3DBlayer "); //$NON-NLS-1$
 //			//_l.setRenderTheme(_offline_IRenderTheme); //again??
-			layers.remove(_layer_Building);
+			//layers.remove(_layer_Building);
 			layers.add(_layer_S3DB_Building);
 		} else {
 //			// building
 			_layer_Building.setEnabled(true);
 			debugPrint("################ setupMap_Layers:Building Layer "); //$NON-NLS-1$
-			layers.remove(_layer_S3DB_Building);
+			//layers.remove(_layer_S3DB_Building);
 			layers.add(_layer_Building);
 		}
 
@@ -1055,14 +1035,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 /*	   _layer_Building = new BuildingLayer(mMap, _layer_BaseMap, false, true);
 	   _layer_Building.setEnabled(false);
 	   layers.add(_layer_Building); */ //prior to s3db
-
-	   // S3DB Block II, S3DB is complicate -> removed
-	   /*_layer_S3DB_Building = new S3DBLayer(mMap,_l);
-		if(_isOfflineMap) {
-			_layer_S3DB_Building.setEnabled(true);
-			//debugPrint("############ setupMaplayer: adding S3DBlayer "); //$NON-NLS-1$
-			layers.add(_layer_S3DB_Building);
-		}*/
 
 
 	   // label
@@ -1160,9 +1132,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	   _markertoolkit._isMarkerClusteredLast = config.isMarkerClustered;
 	   //
 	}
-	
 
-	
 	
 	/**
 	 * gget a sorted list with mapsforgemap files
