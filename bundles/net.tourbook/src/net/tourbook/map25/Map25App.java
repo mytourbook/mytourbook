@@ -1031,8 +1031,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	    * i have also to check if the layers becomes more, if i switch the mapprovider
 	    */
 //		// Buildings or S3DB  Block I
-		//_layer_S3DB_Building = new S3DBLayer(mMap,_layer_BaseMap, true);  //this is working for mf, onlinemaps missing 2 walls and roof
-	   _layer_S3DB_Building = new S3DBLayer(mMap,_l, true);  //private S3DBLayer	_layer_S3DB_Building; //is working, but S3DB only once after programm start
+		_layer_S3DB_Building = new S3DBLayer(mMap,_layer_BaseMap, true);  //this is working for mf, onlinemaps missing 2 walls and roof
+	   //_layer_S3DB_Building = new S3DBLayer(mMap,_l, true);  //private S3DBLayer	_layer_S3DB_Building; //is working, but S3DB only once after programm start
 		_layer_Building = new BuildingLayer(mMap, _layer_BaseMap, false, true);
 		if(_isOfflineMap) {
 //			// S3DB
