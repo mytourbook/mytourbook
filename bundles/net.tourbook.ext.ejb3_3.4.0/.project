@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
- 	<name>net.tourbook.ext.ejb3_3.4.0</name>
+	<name>net.tourbook.ext.ejb3_3.4.0</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -17,11 +17,6 @@
 		</buildCommand>
 		<buildCommand>
 			<name>org.eclipse.pde.SchemaBuilder</name>
-			<arguments>
-			</arguments>
-		</buildCommand>
-		<buildCommand>
-			<name>org.eclipse.babel.editor.rbeBuilder</name>
 			<arguments>
 			</arguments>
 		</buildCommand>
