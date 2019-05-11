@@ -50,7 +50,9 @@ public class ActionCreateTourMarkerFromMap extends Action {
 
       final TourData tourData = TourManager.getTour(_currentHoverTourId);
 
-      if (tourData == null) {
+      if (tourData == null ||
+      // make sure the tour editor does not contain a modified tour
+            TourManager.isTourEditorModified()) {
          return;
       }
 
