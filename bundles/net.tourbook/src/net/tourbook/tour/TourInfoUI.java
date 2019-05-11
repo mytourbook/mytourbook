@@ -21,6 +21,27 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Set;
 
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.UI;
+import net.tourbook.common.font.MTFont;
+import net.tourbook.common.formatter.FormatManager;
+import net.tourbook.common.preferences.ICommonPreferences;
+import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.time.TourDateTime;
+import net.tourbook.common.util.IToolTipProvider;
+import net.tourbook.common.util.Util;
+import net.tourbook.common.weather.IWeather;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourTag;
+import net.tourbook.data.TourType;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.PrefPageAppearanceDisplayFormat;
+import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.Messages;
+import net.tourbook.ui.action.ActionTourToolTip_EditPreferences;
+import net.tourbook.ui.action.ActionTourToolTip_EditQuick;
+import net.tourbook.ui.action.ActionTourToolTip_EditTour;
+
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.fieldassist.ControlDecoration;
@@ -44,27 +65,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.joda.time.Period;
 import org.joda.time.PeriodType;
-
-import net.tourbook.common.CommonActivator;
-import net.tourbook.common.UI;
-import net.tourbook.common.font.MTFont;
-import net.tourbook.common.formatter.FormatManager;
-import net.tourbook.common.preferences.ICommonPreferences;
-import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.time.TourDateTime;
-import net.tourbook.common.util.IToolTipProvider;
-import net.tourbook.common.util.Util;
-import net.tourbook.common.weather.IWeather;
-import net.tourbook.data.TourData;
-import net.tourbook.data.TourTag;
-import net.tourbook.data.TourType;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.preferences.PrefPageAppearanceDisplayFormat;
-import net.tourbook.ui.ITourProvider;
-import net.tourbook.ui.Messages;
-import net.tourbook.ui.action.ActionTourToolTip_EditPreferences;
-import net.tourbook.ui.action.ActionTourToolTip_EditQuick;
-import net.tourbook.ui.action.ActionTourToolTip_EditTour;
 
 public class TourInfoUI {
 
@@ -1476,7 +1476,7 @@ public class TourInfoUI {
 
       // calories
       final double calories = _tourData.getCalories();
-      _lblCalories.setText(FormatManager.formatNumber_0(calories));
+      _lblCalories.setText(FormatManager.formatNumber_0(calories / 1000));
 
       // body
       _lblRestPulse.setText(Integer.toString(_tourData.getRestPulse()));
