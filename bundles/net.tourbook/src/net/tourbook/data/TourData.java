@@ -7680,6 +7680,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @XmlElement
    public String getTest() {
       return "jokl"; //$NON-NLS-1$
+
    }
 
    /**
