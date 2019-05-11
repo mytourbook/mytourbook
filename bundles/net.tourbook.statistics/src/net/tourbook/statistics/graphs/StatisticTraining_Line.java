@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
@@ -18,21 +18,21 @@ package net.tourbook.statistics.graphs;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartType;
 
-public class StatisticTraining_Effect extends StatisticDay {
+public class StatisticTraining_Line extends StatisticTraining {
 
-	@Override
-	ChartDataModel getChartDataModel() {
+   @Override
+   ChartDataModel getChartDataModel() {
 
-		final ChartDataModel chartDataModel = new ChartDataModel(ChartType.BAR);
+      final ChartDataModel chartDataModel = new ChartDataModel(ChartType.BAR);
 
-		createXDataDay(chartDataModel);
-		createYDataAltitude(chartDataModel);
+      createXData_Day(chartDataModel);
+      createYData_TrainingEffect_Line(chartDataModel);
 
-		return chartDataModel;
-	}
+      return chartDataModel;
+   }
 
-	@Override
-	protected String getGridPrefPrefix() {
+   @Override
+   protected String getGridPrefPrefix() {
       return GRID_TRAINING_EFFECT;
-	}
+   }
 }

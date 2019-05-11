@@ -289,17 +289,17 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 						net.tourbook.ui.UI.SYSTEM_NEW_LINE,
 						UI.NEW_LINE1);
 
-		final int[] startValue = _tourDayData.tourStartValues;
-		final int[] endValue = _tourDayData.tourEndValues;
+		final int[] startValue = _tourDayData.allStartTime;
+		final int[] endValue = _tourDayData.allEndTime;
 
-		final int recordingTime = _tourDayData.recordingTime[valueIndex];
-		final int drivingTime = _tourDayData.drivingTime[valueIndex];
+		final int recordingTime = _tourDayData.allRecordingTime[valueIndex];
+		final int drivingTime = _tourDayData.allDrivingTime[valueIndex];
 		final int breakTime = recordingTime - drivingTime;
 
-		final ZonedDateTime zdtTourStart = _tourDayData.tourStartDateTimes.get(valueIndex);
+		final ZonedDateTime zdtTourStart = _tourDayData.allStartDateTimes.get(valueIndex);
 		final ZonedDateTime zdtTourEnd = zdtTourStart.plusSeconds(recordingTime);
 
-		final float distance = _tourDayData.tourDistanceValues[valueIndex];
+		final float distance = _tourDayData.allDistance[valueIndex];
 		final float speed = drivingTime == 0 ? 0 : distance / (drivingTime / 3.6f);
 		final float pace = distance == 0 ? 0 : drivingTime * 1000 / distance;
 
@@ -357,7 +357,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 				UI.UNIT_LABEL_DISTANCE,
 				//
 				// altitude
-				(int) _tourDayData.tourAltitudeValues[valueIndex],
+				(int) _tourDayData.allAltitude[valueIndex],
 				UI.UNIT_LABEL_ALTITUDE,
 				//
 				// start time
@@ -427,8 +427,8 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 
 		final ChartDataYSerie yData = new ChartDataYSerie(
 				ChartType.BAR,
-				_tourDayData.altitudeLow,
-				_tourDayData.altitudeHigh);
+				_tourDayData.altitude_Low,
+				_tourDayData.altitude_High);
 
 		yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
 		yData.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
@@ -448,8 +448,8 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 
 		final ChartDataYSerie yData = new ChartDataYSerie(
 				ChartType.BAR,
-				_tourDayData.avgPaceLow,
-				_tourDayData.avgPaceHigh);
+				_tourDayData.avgPace_Low,
+				_tourDayData.avgPace_High);
 
 		yData.setYTitle(Messages.LABEL_GRAPH_PACE);
 		yData.setUnitLabel(UI.UNIT_LABEL_PACE);
@@ -469,8 +469,8 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 
 		final ChartDataYSerie yData = new ChartDataYSerie(
 				ChartType.BAR,
-				_tourDayData.avgSpeedLow,
-				_tourDayData.avgSpeedHigh);
+				_tourDayData.avgSpeed_Low,
+				_tourDayData.avgSpeed_High);
 
 		yData.setYTitle(Messages.LABEL_GRAPH_SPEED);
 		yData.setUnitLabel(UI.UNIT_LABEL_SPEED);
@@ -493,8 +493,8 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 
 		final ChartDataYSerie yData = new ChartDataYSerie(
 				ChartType.BAR,
-				_tourDayData.distanceLow,
-				_tourDayData.distanceHigh);
+				_tourDayData.distance_Low,
+				_tourDayData.distance_High);
 
 		yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
 		yData.setUnitLabel(UI.UNIT_LABEL_DISTANCE);

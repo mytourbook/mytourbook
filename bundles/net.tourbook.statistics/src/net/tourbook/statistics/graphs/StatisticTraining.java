@@ -8,13 +8,14 @@
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.statistics.graphs;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
 import net.tourbook.chart.Chart;
@@ -35,6 +36,7 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.IToolTipHideListener;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.statistic.StatisticContext;
 import net.tourbook.statistic.StatisticView;
 import net.tourbook.statistic.TourbookStatistic;
@@ -60,16 +62,22 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
 
 public abstract class StatisticTraining extends TourbookStatistic implements IBarSelectionProvider, ITourProvider {
 
+   private static final String         TOUR_TOOLTIP_FORMAT_DATE_WEEK_TIME = net.tourbook.ui.Messages.Tour_Tooltip_Format_DateWeekTime;
+
+   private static final String         NL                                 = UI.NEW_LINE1;
+   private static final String         NL2                                = NL + NL;
+
    private TourTypeFilter              _activeTourTypeFilter;
    private TourPerson                  _activePerson;
 
-   private long                        _selectedTourId          = -1;
+   private long                        _selectedTourId                    = -1;
 
    private int                         _currentYear;
    private int                         _numberOfYears;
@@ -77,7 +85,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
    private Chart                       _chart;
    private StatisticContext            _statContext;
 
-   private final MinMaxKeeper_YData    _minMaxKeeper            = new MinMaxKeeper_YData();
+   private final MinMaxKeeper_YData    _minMaxKeeper                      = new MinMaxKeeper_YData();
    private TourData_Day                _tourDayData;
 
    private boolean                     _isSynchScaleEnabled;
@@ -85,7 +93,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
    private ITourEventListener          _tourPropertyListener;
    private StatisticTourToolTip        _tourToolTip;
 
-   private TourInfoIconToolTipProvider _tourInfoToolTipProvider = new TourInfoIconToolTipProvider();
+   private TourInfoIconToolTipProvider _tourInfoToolTipProvider           = new TourInfoIconToolTipProvider();
 
    private void addTourPropertyListener() {
 
@@ -260,15 +268,145 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       addTourPropertyListener();
    }
 
-   private ChartToolTipInfo createToolTipData(final int valueIndex) {
+   private ChartToolTipInfo createToolTipData(int valueIndex) {
 
-      return null;
+      final int[] tourDOYValues = _tourDayData.getDoyValues();
+
+      if (valueIndex >= tourDOYValues.length) {
+         valueIndex -= tourDOYValues.length;
+      }
+
+      if (tourDOYValues == null || valueIndex >= tourDOYValues.length) {
+         return null;
+      }
+
+      final long tooltipTourId = _tourDayData.tourIds[valueIndex];
+
+      final String tourTypeName = TourDatabase.getTourTypeName(_tourDayData.typeIds[valueIndex]);
+      final String tourTags = TourDatabase.getTagNames(_tourDayData.tagIds.get(tooltipTourId));
+      final String tourDescription = _tourDayData.tourDescription.get(valueIndex)
+            .replace(
+                  net.tourbook.ui.UI.SYSTEM_NEW_LINE,
+                  UI.NEW_LINE1);
+
+      final int[] startValue = _tourDayData.allStartTime;
+      final int[] endValue = _tourDayData.allEndTime;
+
+      final int recordingTime = _tourDayData.allRecordingTime[valueIndex];
+      final int drivingTime = _tourDayData.allDrivingTime[valueIndex];
+      final int breakTime = recordingTime - drivingTime;
+
+      final ZonedDateTime zdtTourStart = _tourDayData.allStartDateTimes.get(valueIndex);
+      final ZonedDateTime zdtTourEnd = zdtTourStart.plusSeconds(recordingTime);
+
+      final float distance = _tourDayData.allDistance[valueIndex];
+      final float speed = drivingTime == 0 ? 0 : distance / (drivingTime / 3.6f);
+      final float pace = distance == 0 ? 0 : drivingTime * 1000 / distance;
+
+      final StringBuilder toolTipFormat = new StringBuilder();
+
+      toolTipFormat.append(TOUR_TOOLTIP_FORMAT_DATE_WEEK_TIME + NL2); //      %s - %s - %s - CW %d
+
+      toolTipFormat.append(Messages.tourtime_info_distance_tour + NL);
+      toolTipFormat.append(Messages.tourtime_info_altitude + NL);
+      toolTipFormat.append(Messages.tourtime_info_time + NL2);
+
+      toolTipFormat.append(Messages.tourtime_info_recording_time_tour + NL);
+      toolTipFormat.append(Messages.tourtime_info_driving_time_tour + NL);
+      toolTipFormat.append(Messages.tourtime_info_break_time_tour + NL2);
+
+      toolTipFormat.append(Messages.tourtime_info_avg_speed + NL);
+      toolTipFormat.append(Messages.tourtime_info_avg_pace + NL2);
+
+      toolTipFormat.append(Messages.tourtime_info_tour_type + NL);
+      toolTipFormat.append(Messages.tourtime_info_tags);
+
+      if (tourDescription.length() > 0) {
+
+         toolTipFormat.append(NL2);
+         toolTipFormat.append(Messages.tourtime_info_description + NL);
+         toolTipFormat.append(Messages.tourtime_info_description_text);
+      }
+
+      final int tourStartTime = startValue[valueIndex];
+      final int tourEndTime = endValue[valueIndex];
+
+      final String toolTipLabel = String.format(
+
+            toolTipFormat.toString(),
+
+            // date/time
+            zdtTourStart.format(TimeTools.Formatter_Date_F),
+            zdtTourStart.format(TimeTools.Formatter_Time_M),
+            zdtTourEnd.format(TimeTools.Formatter_Time_M),
+            zdtTourStart.get(TimeTools.calendarWeek.weekOfWeekBasedYear()),
+
+            // distance
+            distance / 1000,
+            UI.UNIT_LABEL_DISTANCE,
+
+            // altitude
+            (int) _tourDayData.allAltitude[valueIndex],
+            UI.UNIT_LABEL_ALTITUDE,
+
+            // start time
+            tourStartTime / 3600,
+            (tourStartTime % 3600) / 60,
+
+            // end time
+            (tourEndTime / 3600) % 24,
+            (tourEndTime % 3600) / 60,
+
+            // recording time
+            recordingTime / 3600,
+            (recordingTime % 3600) / 60,
+            (recordingTime % 3600) % 60,
+
+            // driving time
+            drivingTime / 3600,
+            (drivingTime % 3600) / 60,
+            (drivingTime % 3600) % 60,
+
+            // break time
+            breakTime / 3600,
+            (breakTime % 3600) / 60,
+            (breakTime % 3600) % 60,
+
+            // speed
+            speed,
+            UI.UNIT_LABEL_SPEED,
+
+            // pace
+            (int) (pace / 60),
+            (int) (pace % 60),
+            UI.UNIT_LABEL_PACE,
+
+            // tour type / tags
+            tourTypeName,
+            tourTags,
+
+            // description
+            tourDescription
+
+      );
+
+      // set title
+      String tourTitle = _tourDayData.tourTitle.get(valueIndex);
+      if (tourTitle == null || tourTitle.trim().length() == 0) {
+         tourTitle = tourTypeName;
+      }
+
+      final ChartToolTipInfo tt1 = new ChartToolTipInfo();
+      tt1.setTitle(tourTitle);
+      tt1.setLabel(toolTipLabel);
+
+      return tt1;
    }
 
    /**
     * create data for the x-axis
     */
-   void createXDataDay(final ChartDataModel chartModel) {
+   void createXData_Day(final ChartDataModel chartModel) {
 
       final ChartDataXSerie xData = new ChartDataXSerie(_tourDayData.getDoyValuesDouble());
       xData.setAxisUnit(ChartDataXSerie.X_AXIS_UNIT_DAY);
@@ -279,116 +417,50 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
    }
 
    /**
-    * Altitude
+    * Training effect - Line
     */
-   void createYDataAltitude(final ChartDataModel chartModel) {
+   void createYData_TrainingEffect_Bar(final ChartDataModel chartModel) {
 
       final ChartDataYSerie yData = new ChartDataYSerie(
             ChartType.BAR,
-            _tourDayData.altitudeLow,
-            _tourDayData.altitudeHigh);
+            _tourDayData.trainingEffect_Low,
+            _tourDayData.trainingEffect_High);
 
-      yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
-      yData.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
+      yData.setYTitle(Messages.LABEL_GRAPH_TRAINING_EFFECT);
       yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
       yData.setAllValueColors(0);
       yData.setShowYSlider(true);
       yData.setVisibleMinValue(0);
       yData.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
 
-      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE);
+//      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE);
+      yData.setDefaultRGB(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY).getRGB());
+
       StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE, _activeTourTypeFilter);
 
       chartModel.addYData(yData);
    }
 
-   void createYDataAvgPace(final ChartDataModel chartDataModel) {
+   /**
+    * Training effect - Line
+    */
+   void createYData_TrainingEffect_Line(final ChartDataModel chartModel) {
 
       final ChartDataYSerie yData = new ChartDataYSerie(
-            ChartType.BAR,
-            _tourDayData.avgPaceLow,
-            _tourDayData.avgPaceHigh);
+            ChartType.LINE,
+            _tourDayData.trainingEffect_Low,
+            _tourDayData.trainingEffect_High);
 
-      yData.setYTitle(Messages.LABEL_GRAPH_PACE);
-      yData.setUnitLabel(UI.UNIT_LABEL_PACE);
+      yData.setYTitle(Messages.LABEL_GRAPH_TRAINING_EFFECT);
       yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
       yData.setAllValueColors(0);
       yData.setShowYSlider(true);
       yData.setVisibleMinValue(0);
       yData.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
 
-      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_PACE);
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_PACE, _activeTourTypeFilter);
-
-      chartDataModel.addYData(yData);
-   }
-
-   void createYDataAvgSpeed(final ChartDataModel chartDataModel) {
-
-      final ChartDataYSerie yData = new ChartDataYSerie(
-            ChartType.BAR,
-            _tourDayData.avgSpeedLow,
-            _tourDayData.avgSpeedHigh);
-
-      yData.setYTitle(Messages.LABEL_GRAPH_SPEED);
-      yData.setUnitLabel(UI.UNIT_LABEL_SPEED);
-      yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
-      yData.setAllValueColors(0);
-      yData.setShowYSlider(true);
-      yData.setVisibleMinValue(0);
-      yData.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
-
-      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_SPEED);
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_SPEED, _activeTourTypeFilter);
-
-      chartDataModel.addYData(yData);
-   }
-
-   /**
-    * Distance
-    */
-   void createYDataDistance(final ChartDataModel chartModel) {
-
-      final ChartDataYSerie yData = new ChartDataYSerie(
-            ChartType.BAR,
-            _tourDayData.distanceLow,
-            _tourDayData.distanceHigh);
-
-      yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
-      yData.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
-      yData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_NUMBER);
-      yData.setAllValueColors(0);
-      yData.setShowYSlider(true);
-      yData.setVisibleMinValue(0);
-      yData.setValueDivisor(1000);
-      yData.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
-
-      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE);
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE, _activeTourTypeFilter);
-
-      chartModel.addYData(yData);
-   }
-
-   /**
-    * Time
-    */
-   void createYDataDuration(final ChartDataModel chartModel) {
-
-      final ChartDataYSerie yData = new ChartDataYSerie(
-            ChartType.BAR,
-            _tourDayData.getDurationLowFloat(),
-            _tourDayData.getDurationHighFloat());
-
-      yData.setYTitle(Messages.LABEL_GRAPH_TIME);
-      yData.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
-      yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
-      yData.setAllValueColors(0);
-      yData.setShowYSlider(true);
-      yData.setVisibleMinValue(0);
-      yData.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
-
-      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_TIME);
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TIME, _activeTourTypeFilter);
+//      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE);
+      yData.setDefaultRGB(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY).getRGB());
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE, _activeTourTypeFilter);
 
       chartModel.addYData(yData);
    }
@@ -449,12 +521,12 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
    }
 
    @Override
-   public void restoreState(final IDialogSettings viewState) {
+   public void restoreState(final IDialogSettings state) {
 
-      final String mementoTourId = viewState.get(STATE_SELECTED_TOUR_ID);
-      if (mementoTourId != null) {
+      final String stateTourId = state.get(STATE_SELECTED_TOUR_ID);
+      if (stateTourId != null) {
          try {
-            final long tourId = Long.parseLong(mementoTourId);
+            final long tourId = Long.parseLong(stateTourId);
             selectTour(tourId);
          } catch (final Exception e) {
             // ignore
@@ -463,7 +535,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
    }
 
    @Override
-   public void saveState(final IDialogSettings viewState) {
+   public void saveState(final IDialogSettings state) {
 
       if (_chart == null || _chart.isDisposed()) {
          return;
@@ -476,7 +548,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
 
          // check array bounds
          if (valueIndex < _tourDayData.tourIds.length) {
-            viewState.put(STATE_SELECTED_TOUR_ID, Long.toString(_tourDayData.tourIds[valueIndex]));
+            state.put(STATE_SELECTED_TOUR_ID, Long.toString(_tourDayData.tourIds[valueIndex]));
          }
       }
    }

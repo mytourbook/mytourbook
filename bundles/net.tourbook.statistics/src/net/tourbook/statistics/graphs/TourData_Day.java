@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -21,93 +21,102 @@ import java.util.HashMap;
 
 public class TourData_Day {
 
-	long[]							tourIds;
+   long[]                         tourIds;
 
-	long[]							typeIds;
-	int[]							typeColorIndex;
+   long[]                         typeIds;
+   int[]                          typeColorIndex;
 
-	int[]							yearValues;
-	int[]							monthValues;
-	int[]							weekValues;
-	private int[]					_doyValues;
-	private double[]				_doyValuesDouble;
+   int[]                          yearValues;
+   int[]                          monthValues;
+   int[]                          weekValues;
 
-	int[]							years;
-	int[]							yearDays;
-	int								allDaysInAllYears;
+   private int[]                  _doyValues;
+   private double[]               _doyValuesDouble;
 
-	float[]							altitudeLow;
-	float[]							altitudeHigh;
-	float[]							avgPaceLow;
-	float[]							avgPaceHigh;
-	float[]							avgSpeedLow;
-	float[]							avgSpeedHigh;
-	float[]							distanceLow;
-	float[]							distanceHigh;
+   int[]                          years;
+   int[]                          yearDays;
+   int                            allDaysInAllYears;
 
-	private float[]					_durationLowFloat;
-	private float[]					_durationHighFloat;
+   float[]                        altitude_Low;
+   float[]                        altitude_High;
+   float[]                        avgPace_Low;
+   float[]                        avgPace_High;
+   float[]                        avgSpeed_Low;
+   float[]                        avgSpeed_High;
+   float[]                        distance_Low;
+   float[]                        distance_High;
 
-	int[]							recordingTime;
-	int[]							drivingTime;
+   float[]                        trainingEffect_Low;
+   float[]                        trainingEffect_High;
+   float[]                        trainingPerformance_Low;
+   float[]                        trainingPerformance_High;
 
-	int[]							tourStartValues;
-	int[]							tourEndValues;
-	ArrayList<ZonedDateTime>		tourStartDateTimes;
+   private float[]                _durationLowFloat;
+   private float[]                _durationHighFloat;
 
-	float[]							tourDistanceValues;
-	float[]							tourAltitudeValues;
+   int[]                          allRecordingTime;
+   int[]                          allDrivingTime;
 
-	ArrayList<String>				tourTitle;
-	ArrayList<String>				tourDescription;
+   int[]                          allStartTime;
+   int[]                          allEndTime;
+   ArrayList<ZonedDateTime>       allStartDateTimes;
 
-	/**
-	 * Contains the tags for the tour where the key is the tour ID
-	 */
-	HashMap<Long, ArrayList<Long>>	tagIds;
+   float[]                        allDistance;
+   float[]                        allAltitude;
 
-	public int[] getDoyValues() {
-		return _doyValues;
-	}
+   float[]                        allTrainingEffect;
+   float[]                        allTrainingPerformance;
 
-	public double[] getDoyValuesDouble() {
-		return _doyValuesDouble;
-	}
+   ArrayList<String>              tourTitle;
+   ArrayList<String>              tourDescription;
 
-	public float[] getDurationHighFloat() {
-		return _durationHighFloat;
-	}
+   /**
+    * Contains the tags for the tour where the key is the tour ID
+    */
+   HashMap<Long, ArrayList<Long>> tagIds;
 
-	public float[] getDurationLowFloat() {
-		return _durationLowFloat;
-	}
+   public int[] getDoyValues() {
+      return _doyValues;
+   }
 
-	public void setDoyValues(final int[] doyValues) {
+   public double[] getDoyValuesDouble() {
+      return _doyValuesDouble;
+   }
 
-		_doyValues = doyValues;
-		_doyValuesDouble = new double[doyValues.length];
+   public float[] getDurationHighFloat() {
+      return _durationHighFloat;
+   }
 
-		for (int valueIndex = 0; valueIndex < doyValues.length; valueIndex++) {
-			_doyValuesDouble[valueIndex] = doyValues[valueIndex];
-		}
-	}
+   public float[] getDurationLowFloat() {
+      return _durationLowFloat;
+   }
 
-	public void setDurationHigh(final int[] timeHigh) {
+   public void setDoyValues(final int[] doyValues) {
 
-		_durationHighFloat = new float[timeHigh.length];
+      _doyValues = doyValues;
+      _doyValuesDouble = new double[doyValues.length];
 
-		for (int valueIndex = 0; valueIndex < timeHigh.length; valueIndex++) {
-			_durationHighFloat[valueIndex] = timeHigh[valueIndex];
-		}
-	}
+      for (int valueIndex = 0; valueIndex < doyValues.length; valueIndex++) {
+         _doyValuesDouble[valueIndex] = doyValues[valueIndex];
+      }
+   }
 
-	public void setDurationLow(final int[] timeLow) {
+   public void setDurationHigh(final int[] timeHigh) {
 
-		_durationLowFloat = new float[timeLow.length];
+      _durationHighFloat = new float[timeHigh.length];
 
-		for (int valueIndex = 0; valueIndex < timeLow.length; valueIndex++) {
-			_durationLowFloat[valueIndex] = timeLow[valueIndex];
-		}
-	}
+      for (int valueIndex = 0; valueIndex < timeHigh.length; valueIndex++) {
+         _durationHighFloat[valueIndex] = timeHigh[valueIndex];
+      }
+   }
+
+   public void setDurationLow(final int[] timeLow) {
+
+      _durationLowFloat = new float[timeLow.length];
+
+      for (int valueIndex = 0; valueIndex < timeLow.length; valueIndex++) {
+         _durationLowFloat[valueIndex] = timeLow[valueIndex];
+      }
+   }
 
 }

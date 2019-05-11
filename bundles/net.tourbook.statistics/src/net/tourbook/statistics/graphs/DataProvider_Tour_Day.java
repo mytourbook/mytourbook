@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -30,6 +30,7 @@ import java.util.HashMap;
 
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
@@ -40,338 +41,366 @@ import net.tourbook.ui.UI;
 
 public class DataProvider_Tour_Day extends DataProvider {
 
-	private static DataProvider_Tour_Day	_instance;
-
-	private TourData_Day					_tourDayData;
-
-	private DataProvider_Tour_Day() {}
-
-	public static DataProvider_Tour_Day getInstance() {
-
-		if (_instance == null) {
-			_instance = new DataProvider_Tour_Day();
-		}
-
-		return _instance;
-	}
-
-	TourData_Day getDayData(final TourPerson person,
-							final TourTypeFilter tourTypeFilter,
-							final int lastYear,
-							final int numberOfYears,
-							final boolean refreshData) {
+   private static DataProvider_Tour_Day _instance;
 
-		// dont reload data which are already here
-		if (person == _activePerson
-				&& tourTypeFilter == _activeTourTypeFilter
-				&& lastYear == _lastYear
-				&& numberOfYears == _numberOfYears
-				&& refreshData == false) {
-			return _tourDayData;
-		}
+   private TourData_Day                 _tourDayData;
 
-		_activePerson = person;
-		_activeTourTypeFilter = tourTypeFilter;
+   private DataProvider_Tour_Day() {}
 
-		_lastYear = lastYear;
-		_numberOfYears = numberOfYears;
+   public static DataProvider_Tour_Day getInstance() {
 
-		initYearNumbers();
+      if (_instance == null) {
+         _instance = new DataProvider_Tour_Day();
+      }
 
-		int colorOffset = 0;
-		if (tourTypeFilter.showUndefinedTourTypes()) {
-			colorOffset = StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
-		}
+      return _instance;
+   }
 
-		// get the tour types
-		final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
-		final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
+   TourData_Day getDayData(final TourPerson person,
+                           final TourTypeFilter tourTypeFilter,
+                           final int lastYear,
+                           final int numberOfYears,
+                           final boolean refreshData) {
 
-		final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+      // don't reload data which are already available
+      if (person == _activePerson
+            && tourTypeFilter == _activeTourTypeFilter
+            && lastYear == _lastYear
+            && numberOfYears == _numberOfYears
+            && refreshData == false) {
 
-		final String sqlString = "\n\n" //$NON-NLS-1$
+         return _tourDayData;
+      }
 
-				+ "SELECT " // 							//$NON-NLS-1$
-				//
-				+ " TourId, " //					1 	//$NON-NLS-1$
+      _activePerson = person;
+      _activeTourTypeFilter = tourTypeFilter;
 
-				+ " StartYear, " // 				2	//$NON-NLS-1$
-				+ " StartWeek," //					3	//$NON-NLS-1$
-				+ " TourStartTime, " // 			4	//$NON-NLS-1$
-				+ " TimeZoneId, "//					5	//$NON-NLS-1$
+      _lastYear = lastYear;
+      _numberOfYears = numberOfYears;
 
-				+ " TourDrivingTime, " // 			6	//$NON-NLS-1$
-				+ " TourRecordingTime, " // 		7	//$NON-NLS-1$
+      initYearNumbers();
 
-				+ " TourDistance, " // 				8	//$NON-NLS-1$
-				+ " TourAltUp, " // 				9	//$NON-NLS-1$
-				+ " TourTitle, " //					10	//$NON-NLS-1$
-				+ " TourDescription, " // 			11	//$NON-NLS-1$
-				//
-				+ " TourType_typeId, " // 			12	//$NON-NLS-1$
-				+ " jTdataTtag.TourTag_tagId"//		13	//$NON-NLS-1$
-				//
-				+ "\n" //								//$NON-NLS-1$
-				//
-				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + "\n") //$NON-NLS-1$ //$NON-NLS-2$
-				//
-				// get tag id's
-				+ (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag") //$NON-NLS-1$ //$NON-NLS-2$
-				+ (" ON tourID = jTdataTtag.TourData_tourId \n") //$NON-NLS-1$
-				//
-				+ (" WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + ")\n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ sqlFilter.getWhereClause()
-				//
-				+ (" ORDER BY TourStartTime \n\n"); //$NON-NLS-1$
+      int colorOffset = 0;
+      if (tourTypeFilter.showUndefinedTourTypes()) {
+         colorOffset = StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
+      }
 
-		try {
+      // get the tour types
+      final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
+      final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
 
-			final TLongArrayList allTourIds = new TLongArrayList();
+      final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
 
-			final TIntArrayList allYears = new TIntArrayList();
-			final TIntArrayList allMonths = new TIntArrayList();
-			final TIntArrayList allYearsDOY = new TIntArrayList(); // DOY...Day Of Year
+// SET_FORMATTING_OFF
 
-			final TIntArrayList allTourStartTime = new TIntArrayList();
-			final TIntArrayList allTourEndTime = new TIntArrayList();
-			final TIntArrayList allTourStartWeek = new TIntArrayList();
-			final ArrayList<ZonedDateTime> allTourStartDateTime = new ArrayList<>();
+      final String sqlString = NL
 
-			final TIntArrayList allTourDuration = new TIntArrayList();
-			final TIntArrayList allTourRecordingTime = new TIntArrayList();
-			final TIntArrayList allTourDrivingTime = new TIntArrayList();
+            + "SELECT "                            + NL //        //$NON-NLS-1$
 
-			final TFloatArrayList allDistance = new TFloatArrayList();
-			final TFloatArrayList allAvgSpeed = new TFloatArrayList();
-			final TFloatArrayList allAvgPace = new TFloatArrayList();
-			final TFloatArrayList allAltitudeUp = new TFloatArrayList();
+            + " TourId,"                           + NL //  1     //$NON-NLS-1$
 
-			final ArrayList<String> allTourTitle = new ArrayList<String>();
-			final ArrayList<String> allTourDescription = new ArrayList<String>();
+            + " StartYear,"                        + NL //  2     //$NON-NLS-1$
+            + " StartWeek,"                        + NL //  3     //$NON-NLS-1$
+            + " TourStartTime,"                    + NL //  4     //$NON-NLS-1$
+            + " TimeZoneId,"                       + NL //  5     //$NON-NLS-1$
 
-			final TLongArrayList allTypeIds = new TLongArrayList();
-			final TIntArrayList allTypeColorIndex = new TIntArrayList();
+            + " TourDrivingTime,"                  + NL //  6     //$NON-NLS-1$
+            + " TourRecordingTime,"                + NL //  7     //$NON-NLS-1$
 
-			final HashMap<Long, ArrayList<Long>> allTagIds = new HashMap<Long, ArrayList<Long>>();
+            + " TourDistance,"                     + NL //  8     //$NON-NLS-1$
+            + " TourAltUp,"                        + NL //  9     //$NON-NLS-1$
+            + " TourTitle,"                        + NL //  10    //$NON-NLS-1$
+            + " TourDescription,"                  + NL //  11    //$NON-NLS-1$
 
-			long lastTourId = -1;
-			ArrayList<Long> tagIds = null;
+            + " training_TrainingEffect,"          + NL //  12    //$NON-NLS-1$
+            + " training_TrainingPerformance,"     + NL //  13    //$NON-NLS-1$
 
-			final Connection conn = TourDatabase.getInstance().getConnection();
+            + " TourType_typeId,"                  + NL //  14    //$NON-NLS-1$
+            + " jTdataTtag.TourTag_tagId"          + NL //  15    //$NON-NLS-1$
 
-			final PreparedStatement statement = conn.prepareStatement(sqlString);
-			sqlFilter.setParameters(statement, 1);
+            + NL
 
-			final ResultSet result = statement.executeQuery();
+            + (" FROM " + TourDatabase.TABLE_TOUR_DATA + NL) //$NON-NLS-1$
 
-			while (result.next()) {
+            // get tag id's
+            + (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag") //$NON-NLS-1$ //$NON-NLS-2$
+            + (" ON tourID = jTdataTtag.TourData_tourId" + NL) //$NON-NLS-1$
 
-				final long dbTourId = result.getLong(1);
-				final Object dbTagId = result.getObject(13);
+            + (" WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + ")" + NL) //$NON-NLS-1$ //$NON-NLS-2$
+            + sqlFilter.getWhereClause()
 
-				if (dbTourId == lastTourId) {
+            + (" ORDER BY TourStartTime" + NL + NL); //$NON-NLS-1$
 
-					// get additional tags from outer join
+// SET_FORMATTING_ON
 
-					if (dbTagId instanceof Long) {
-						tagIds.add((Long) dbTagId);
-					}
+      try {
 
-				} else {
+         final TLongArrayList allTourIds = new TLongArrayList();
 
-					// get first record from a tour
+         final TIntArrayList allYears = new TIntArrayList();
+         final TIntArrayList allMonths = new TIntArrayList();
+         final TIntArrayList allYearsDOY = new TIntArrayList(); // DOY...Day Of Year
 
-					final int dbTourYear = result.getShort(2);
-					final int dbTourStartWeek = result.getInt(3);
+         final TIntArrayList allTourStartTime = new TIntArrayList();
+         final TIntArrayList allTourEndTime = new TIntArrayList();
+         final TIntArrayList allTourStartWeek = new TIntArrayList();
+         final ArrayList<ZonedDateTime> allTourStartDateTime = new ArrayList<>();
 
-					final long dbStartTimeMilli = result.getLong(4);
-					final String dbTimeZoneId = result.getString(5);
+         final TIntArrayList allTourDuration = new TIntArrayList();
+         final TIntArrayList allTourRecordingTime = new TIntArrayList();
+         final TIntArrayList allTourDrivingTime = new TIntArrayList();
 
-					final int dbDrivingTime = result.getInt(6);
-					final int dbRecordingTime = result.getInt(7);
+         final TFloatArrayList allDistance = new TFloatArrayList();
+         final TFloatArrayList allAvgSpeed = new TFloatArrayList();
+         final TFloatArrayList allAvgPace = new TFloatArrayList();
+         final TFloatArrayList allAltitudeUp = new TFloatArrayList();
 
-					final float dbDistance = result.getFloat(8);
-					final int dbAltitudeUp = result.getInt(9);
+         final TFloatArrayList allTrainingEffect = new TFloatArrayList();
+         final TFloatArrayList allTrainingPerformance = new TFloatArrayList();
 
-					final String dbTourTitle = result.getString(10);
-					final String dbDescription = result.getString(11);
-					final Object dbTypeIdObject = result.getObject(12);
+         final ArrayList<String> allTourTitle = new ArrayList<>();
+         final ArrayList<String> allTourDescription = new ArrayList<>();
 
-					final TourDateTime tourDateTime = TimeTools.createTourDateTime(dbStartTimeMilli, dbTimeZoneId);
-					final ZonedDateTime zonedStartDateTime = tourDateTime.tourZonedDateTime;
+         final TLongArrayList allTypeIds = new TLongArrayList();
+         final TIntArrayList allTypeColorIndex = new TIntArrayList();
 
-					// get number of days for the year, start with 0
-					final int tourDOY = tourDateTime.tourZonedDateTime.get(ChronoField.DAY_OF_YEAR) - 1;
+         final HashMap<Long, ArrayList<Long>> allTagIds = new HashMap<>();
 
-					final int startDayTime = (zonedStartDateTime.getHour() * 3600)
-							+ (zonedStartDateTime.getMinute() * 60)
-							+ zonedStartDateTime.getSecond();
+         long lastTourId = -1;
+         ArrayList<Long> tagIds = null;
 
-					allTourIds.add(dbTourId);
+         final Connection conn = TourDatabase.getInstance().getConnection();
 
-					allYears.add(dbTourYear);
-					allMonths.add(zonedStartDateTime.getMonthValue());
-					allYearsDOY.add(getYearDOYs(dbTourYear) + tourDOY);
-					allTourStartWeek.add(dbTourStartWeek);
+         final PreparedStatement statement = conn.prepareStatement(sqlString);
+         sqlFilter.setParameters(statement, 1);
 
-					allTourStartDateTime.add(zonedStartDateTime);
-					allTourStartTime.add(startDayTime);
-					allTourEndTime.add((startDayTime + dbRecordingTime));
-					allTourRecordingTime.add(dbRecordingTime);
-					allTourDrivingTime.add(dbDrivingTime);
+         final ResultSet result = statement.executeQuery();
 
-					allTourDuration.add(dbDrivingTime == 0 ? dbRecordingTime : dbDrivingTime);
+         while (result.next()) {
 
-					// round distance
-					final float distance = dbDistance / UI.UNIT_VALUE_DISTANCE;
+            final long dbTourId = result.getLong(1);
+            final Object dbTagId = result.getObject(15);
 
-					allDistance.add(distance);
-					allAltitudeUp.add(dbAltitudeUp / UI.UNIT_VALUE_ALTITUDE);
+            if (dbTourId == lastTourId) {
 
-					allAvgPace.add(distance == 0 ? 0 : dbDrivingTime * 1000f / distance / 60.0f);
-					allAvgSpeed.add(dbDrivingTime == 0 ? 0 : 3.6f * distance / dbDrivingTime);
+               // get additional tags from outer join
 
-					allTourTitle.add(dbTourTitle);
-					allTourDescription.add(dbDescription == null ? UI.EMPTY_STRING : dbDescription);
+               if (dbTagId instanceof Long) {
+                  tagIds.add((Long) dbTagId);
+               }
 
-					if (dbTagId instanceof Long) {
+            } else {
 
-						tagIds = new ArrayList<Long>();
-						tagIds.add((Long) dbTagId);
+               // get first record from a tour
 
-						allTagIds.put(dbTourId, tagIds);
-					}
+               final int dbTourYear = result.getShort(2);
+               final int dbTourStartWeek = result.getInt(3);
 
-					/*
-					 * convert type id to the type index in the tour types list which is also the
-					 * color index
-					 */
-					int colorIndex = 0;
-					long dbTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
+               final long dbStartTimeMilli = result.getLong(4);
+               final String dbTimeZoneId = result.getString(5);
 
-					if (dbTypeIdObject instanceof Long) {
+               final int dbDrivingTime = result.getInt(6);
+               final int dbRecordingTime = result.getInt(7);
 
-						dbTypeId = (Long) dbTypeIdObject;
+               final float dbDistance = result.getFloat(8);
+               final int dbAltitudeUp = result.getInt(9);
 
-						for (int typeIndex = 0; typeIndex < tourTypes.length; typeIndex++) {
-							if (dbTypeId == tourTypes[typeIndex].getTypeId()) {
-								colorIndex = colorOffset + typeIndex;
-								break;
-							}
-						}
-					}
+               final String dbTourTitle = result.getString(10);
+               final String dbDescription = result.getString(11);
 
-					allTypeColorIndex.add(colorIndex);
-					allTypeIds.add(dbTypeId);
-				}
+               final float trainingEffect = result.getFloat(12);
+               final float trainingPerformance = result.getFloat(13);
 
-				lastTourId = dbTourId;
-			}
+               final Object dbTypeIdObject = result.getObject(14);
 
-			conn.close();
+               final TourDateTime tourDateTime = TimeTools.createTourDateTime(dbStartTimeMilli, dbTimeZoneId);
+               final ZonedDateTime zonedStartDateTime = tourDateTime.tourZonedDateTime;
 
-			final int[] tourYear = allYears.toArray();
-			final int[] tourAllYearsDOY = allYearsDOY.toArray();
+               // get number of days for the year, start with 0
+               final int tourDOY = tourDateTime.tourZonedDateTime.get(ChronoField.DAY_OF_YEAR) - 1;
 
-			final int[] durationHigh = allTourDuration.toArray();
+               final int startDayTime = (zonedStartDateTime.getHour() * 3600)
+                     + (zonedStartDateTime.getMinute() * 60)
+                     + zonedStartDateTime.getSecond();
 
-			final float[] altitudeHigh = allAltitudeUp.toArray();
-			final float[] avgPaceHigh = allAvgPace.toArray();
-			final float[] avgSpeedHigh = allAvgSpeed.toArray();
-			final float[] distanceHigh = allDistance.toArray();
+               allTourIds.add(dbTourId);
 
-			final int serieLength = durationHigh.length;
-			final int[] durationLow = new int[serieLength];
-			final float[] altitudeLow = new float[serieLength];
-			final float[] avgPaceLow = new float[serieLength];
-			final float[] avgSpeedLow = new float[serieLength];
-			final float[] distanceLow = new float[serieLength];
+               allYears.add(dbTourYear);
+               allMonths.add(zonedStartDateTime.getMonthValue());
+               allYearsDOY.add(getYearDOYs(dbTourYear) + tourDOY);
+               allTourStartWeek.add(dbTourStartWeek);
 
-			/*
-			 * adjust low/high values when a day has multiple tours
-			 */
-			int prevTourDOY = -1;
+               allTourStartDateTime.add(zonedStartDateTime);
+               allTourStartTime.add(startDayTime);
+               allTourEndTime.add((startDayTime + dbRecordingTime));
+               allTourRecordingTime.add(dbRecordingTime);
+               allTourDrivingTime.add(dbDrivingTime);
 
-			for (int tourIndex = 0; tourIndex < tourAllYearsDOY.length; tourIndex++) {
+               allTourDuration.add(dbDrivingTime == 0 ? dbRecordingTime : dbDrivingTime);
 
-				final int tourDOY = tourAllYearsDOY[tourIndex];
+               // round distance
+               final float distance = dbDistance / UI.UNIT_VALUE_DISTANCE;
 
-				if (prevTourDOY == tourDOY) {
+               allDistance.add(distance);
+               allAltitudeUp.add(dbAltitudeUp / UI.UNIT_VALUE_ALTITUDE);
 
-					// current tour is at the same day as the tour before
+               allAvgPace.add(distance == 0 ? 0 : dbDrivingTime * 1000f / distance / 60.0f);
+               allAvgSpeed.add(dbDrivingTime == 0 ? 0 : 3.6f * distance / dbDrivingTime);
 
-					durationHigh[tourIndex] += durationLow[tourIndex] = durationHigh[tourIndex - 1];
+               allTrainingEffect.add(trainingEffect);
+               allTrainingPerformance.add(trainingPerformance);
 
-					altitudeHigh[tourIndex] += altitudeLow[tourIndex] = altitudeHigh[tourIndex - 1];
-					avgPaceHigh[tourIndex] += avgPaceLow[tourIndex] = avgPaceHigh[tourIndex - 1];
-					avgSpeedHigh[tourIndex] += avgSpeedLow[tourIndex] = avgSpeedHigh[tourIndex - 1];
-					distanceHigh[tourIndex] += distanceLow[tourIndex] = distanceHigh[tourIndex - 1];
+               allTourTitle.add(dbTourTitle);
+               allTourDescription.add(dbDescription == null ? UI.EMPTY_STRING : dbDescription);
 
-				} else {
+               if (dbTagId instanceof Long) {
 
-					// current tour is on another day as the tour before
+                  tagIds = new ArrayList<>();
+                  tagIds.add((Long) dbTagId);
 
-					prevTourDOY = tourDOY;
-				}
-			}
+                  allTagIds.put(dbTourId, tagIds);
+               }
 
-			// get number of days for all years
-			int yearDays = 0;
-			for (final int doy : _yearDays) {
-				yearDays += doy;
-			}
+               /*
+                * Convert type id to the type index in the tour types list which is also the color
+                * index
+                */
+               int colorIndex = 0;
+               long dbTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
 
-			_tourDayData = new TourData_Day();
+               if (dbTypeIdObject instanceof Long) {
 
-			_tourDayData.tourIds = allTourIds.toArray();
+                  dbTypeId = (Long) dbTypeIdObject;
 
-			_tourDayData.yearValues = tourYear;
-			_tourDayData.monthValues = allMonths.toArray();
-			_tourDayData.setDoyValues(tourAllYearsDOY);
-			_tourDayData.weekValues = allTourStartWeek.toArray();
+                  for (int typeIndex = 0; typeIndex < tourTypes.length; typeIndex++) {
+                     if (dbTypeId == tourTypes[typeIndex].getTypeId()) {
+                        colorIndex = colorOffset + typeIndex;
+                        break;
+                     }
+                  }
+               }
 
-			_tourDayData.allDaysInAllYears = yearDays;
-			_tourDayData.yearDays = _yearDays;
-			_tourDayData.years = _years;
+               allTypeColorIndex.add(colorIndex);
+               allTypeIds.add(dbTypeId);
+            }
 
-			_tourDayData.typeIds = allTypeIds.toArray();
-			_tourDayData.typeColorIndex = allTypeColorIndex.toArray();
+            lastTourId = dbTourId;
+         }
 
-			_tourDayData.tagIds = allTagIds;
+         conn.close();
 
-			_tourDayData.setDurationLow(durationLow);
-			_tourDayData.setDurationHigh(durationHigh);
+         final int[] tourYear = allYears.toArray();
+         final int[] tourAllYearsDOY = allYearsDOY.toArray();
 
-			_tourDayData.distanceLow = distanceLow;
-			_tourDayData.distanceHigh = distanceHigh;
+         final int[] durationHigh = allTourDuration.toArray();
 
-			_tourDayData.altitudeLow = altitudeLow;
-			_tourDayData.altitudeHigh = altitudeHigh;
+         final float[] altitude_High = allAltitudeUp.toArray();
+         final float[] avgPace_High = allAvgPace.toArray();
+         final float[] avgSpeed_High = allAvgSpeed.toArray();
+         final float[] distance_High = allDistance.toArray();
+         final float[] trainingEffect_High = allTrainingEffect.toArray();
 
-			_tourDayData.avgPaceLow = avgPaceLow;
-			_tourDayData.avgPaceHigh = avgPaceHigh;
+         final int serieLength = durationHigh.length;
+         final int[] durationLow = new int[serieLength];
+         final float[] altitudeLow = new float[serieLength];
+         final float[] avgPaceLow = new float[serieLength];
+         final float[] avgSpeedLow = new float[serieLength];
+         final float[] distanceLow = new float[serieLength];
+         final float[] trainingEffect_Low = new float[serieLength];
 
-			_tourDayData.avgSpeedLow = avgSpeedLow;
-			_tourDayData.avgSpeedHigh = avgSpeedHigh;
+         /*
+          * adjust low/high values when a day has multiple tours
+          */
+         int prevTourDOY = -1;
 
-			_tourDayData.tourStartValues = allTourStartTime.toArray();
-			_tourDayData.tourEndValues = allTourEndTime.toArray();
-			_tourDayData.tourStartDateTimes = allTourStartDateTime;
+         for (int tourIndex = 0; tourIndex < tourAllYearsDOY.length; tourIndex++) {
 
-			_tourDayData.tourDistanceValues = allDistance.toArray();
-			_tourDayData.tourAltitudeValues = allAltitudeUp.toArray();
+            final int tourDOY = tourAllYearsDOY[tourIndex];
 
-			_tourDayData.recordingTime = allTourRecordingTime.toArray();
-			_tourDayData.drivingTime = allTourDrivingTime.toArray();
+            if (prevTourDOY == tourDOY) {
 
-			_tourDayData.tourTitle = allTourTitle;
-			_tourDayData.tourDescription = allTourDescription;
+               // current tour is at the same day as the tour before
 
-		} catch (final SQLException e) {
-			UI.showSQLException(e);
-		}
+               durationHigh[tourIndex] += durationLow[tourIndex] = durationHigh[tourIndex - 1];
 
-		return _tourDayData;
-	}
+               altitude_High[tourIndex] += altitudeLow[tourIndex] = altitude_High[tourIndex - 1];
+               avgPace_High[tourIndex] += avgPaceLow[tourIndex] = avgPace_High[tourIndex - 1];
+               avgSpeed_High[tourIndex] += avgSpeedLow[tourIndex] = avgSpeed_High[tourIndex - 1];
+               distance_High[tourIndex] += distanceLow[tourIndex] = distance_High[tourIndex - 1];
+
+               trainingEffect_High[tourIndex] += trainingEffect_Low[tourIndex] = trainingEffect_High[tourIndex - 1];
+
+            } else {
+
+               // current tour is at another day as the tour before
+
+               prevTourDOY = tourDOY;
+            }
+         }
+
+         // get number of days for all years
+         int yearDays = 0;
+         for (final int doy : _yearDays) {
+            yearDays += doy;
+         }
+
+         _tourDayData = new TourData_Day();
+
+         _tourDayData.tourIds = allTourIds.toArray();
+
+         _tourDayData.yearValues = tourYear;
+         _tourDayData.monthValues = allMonths.toArray();
+         _tourDayData.setDoyValues(tourAllYearsDOY);
+         _tourDayData.weekValues = allTourStartWeek.toArray();
+
+         _tourDayData.allDaysInAllYears = yearDays;
+         _tourDayData.yearDays = _yearDays;
+         _tourDayData.years = _years;
+
+         _tourDayData.typeIds = allTypeIds.toArray();
+         _tourDayData.typeColorIndex = allTypeColorIndex.toArray();
+
+         _tourDayData.tagIds = allTagIds;
+
+         _tourDayData.setDurationLow(durationLow);
+         _tourDayData.setDurationHigh(durationHigh);
+
+         _tourDayData.altitude_Low = altitudeLow;
+         _tourDayData.altitude_High = altitude_High;
+         _tourDayData.distance_Low = distanceLow;
+         _tourDayData.distance_High = distance_High;
+
+         _tourDayData.avgPace_Low = avgPaceLow;
+         _tourDayData.avgPace_High = avgPace_High;
+         _tourDayData.avgSpeed_Low = avgSpeedLow;
+         _tourDayData.avgSpeed_High = avgSpeed_High;
+
+         _tourDayData.trainingEffect_Low = trainingEffect_Low;
+         _tourDayData.trainingEffect_High = trainingEffect_High;
+
+         _tourDayData.allStartTime = allTourStartTime.toArray();
+         _tourDayData.allEndTime = allTourEndTime.toArray();
+         _tourDayData.allStartDateTimes = allTourStartDateTime;
+
+         _tourDayData.allDistance = allDistance.toArray();
+         _tourDayData.allAltitude = allAltitudeUp.toArray();
+
+         _tourDayData.allTrainingEffect = allTrainingEffect.toArray();
+         _tourDayData.allTrainingPerformance = allTrainingPerformance.toArray();
+
+         _tourDayData.allRecordingTime = allTourRecordingTime.toArray();
+         _tourDayData.allDrivingTime = allTourDrivingTime.toArray();
+
+         _tourDayData.tourTitle = allTourTitle;
+         _tourDayData.tourDescription = allTourDescription;
+
+      } catch (final SQLException e) {
+
+         StatusUtil.log(sqlString);
+         UI.showSQLException(e);
+      }
+
+      return _tourDayData;
+   }
 
 }
