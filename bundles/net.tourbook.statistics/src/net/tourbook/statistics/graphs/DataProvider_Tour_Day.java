@@ -299,6 +299,7 @@ public class DataProvider_Tour_Day extends DataProvider {
          final float[] avgSpeed_High = allAvgSpeed.toArray();
          final float[] distance_High = allDistance.toArray();
          final float[] trainingEffect_High = allTrainingEffect.toArray();
+         final float[] trainingPerformance_High = allTrainingPerformance.toArray();
 
          final int serieLength = durationHigh.length;
          final int[] durationLow = new int[serieLength];
@@ -307,6 +308,7 @@ public class DataProvider_Tour_Day extends DataProvider {
          final float[] avgSpeedLow = new float[serieLength];
          final float[] distanceLow = new float[serieLength];
          final float[] trainingEffect_Low = new float[serieLength];
+         final float[] trainingPerformance_Low = new float[serieLength];
 
          /*
           * adjust low/high values when a day has multiple tours
@@ -329,6 +331,7 @@ public class DataProvider_Tour_Day extends DataProvider {
                distance_High[tourIndex] += distanceLow[tourIndex] = distance_High[tourIndex - 1];
 
                trainingEffect_High[tourIndex] += trainingEffect_Low[tourIndex] = trainingEffect_High[tourIndex - 1];
+               trainingPerformance_High[tourIndex] += trainingPerformance_Low[tourIndex] = trainingPerformance_High[tourIndex - 1];
 
             } else {
 
@@ -377,6 +380,8 @@ public class DataProvider_Tour_Day extends DataProvider {
 
          _tourDayData.trainingEffect_Low = trainingEffect_Low;
          _tourDayData.trainingEffect_High = trainingEffect_High;
+         _tourDayData.trainingPerformance_Low = trainingPerformance_Low;
+         _tourDayData.trainingPerformance_High = trainingPerformance_High;
 
          _tourDayData.allStartTime = allTourStartTime.toArray();
          _tourDayData.allEndTime = allTourEndTime.toArray();

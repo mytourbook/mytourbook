@@ -98,6 +98,15 @@ public interface ITourbookPreferences {
    public static final String STAT_YEAR_IS_SHOW_YEAR_SEPARATOR   = "STAT_YEAR_IS_SHOW_YEAR_SEPARATOR";   //$NON-NLS-1$
 
    /*
+    * Statistic: Training
+    */
+   public static final String STAT_TRAINING_BAR_IS_SHOW_TRAINING_EFFECT       = "STAT_TRAINING_BAR_IS_SHOW_TRAINING_EFFECT";       //$NON-NLS-1$
+   public static final String STAT_TRAINING_BAR_IS_SHOW_TRAINING_PERFORMANCE  = "STAT_TRAINING_BAR_IS_SHOW_TRAINING_PERFORMANCE";  //$NON-NLS-1$
+
+   public static final String STAT_TRAINING_LINE_IS_SHOW_TRAINING_EFFECT      = "STAT_TRAINING_LINE_IS_SHOW_TRAINING_EFFECT";      //$NON-NLS-1$
+   public static final String STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE = "STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE"; //$NON-NLS-1$
+
+   /*
     * Graphs
     */
    public static final String GRAPH_ALL                                  = "graphs.all";                                 //$NON-NLS-1$

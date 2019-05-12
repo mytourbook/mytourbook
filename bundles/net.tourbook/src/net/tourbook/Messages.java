@@ -1607,9 +1607,9 @@ public class Messages extends NLS {
    public static String        pref_view_layout_label_sub_sub;
    public static String        pref_view_layout_label_title;
 
-//	public static String		Pref_SignImages_Dialog_ConfirmDelete_Message;
-//	public static String		Pref_SignImages_Dialog_Delete_Title;
-//	public static String		Pref_SignImages_Dialog_NoSelectedSignImage_Message;
+// public static String    Pref_SignImages_Dialog_ConfirmDelete_Message;
+// public static String    Pref_SignImages_Dialog_Delete_Title;
+// public static String    Pref_SignImages_Dialog_NoSelectedSignImage_Message;
 
    public static String Pref_Statistic_Action_SortByData;
    public static String Pref_Statistic_Action_SortByTime;
@@ -1620,12 +1620,15 @@ public class Messages extends NLS {
    public static String Pref_Statistic_Checkbox_Distance;
    public static String Pref_Statistic_Checkbox_Duration;
    public static String Pref_Statistic_Checkbox_NumberOfTours;
+   public static String Pref_Statistic_Checkbox_TrainingEffect;
+   public static String Pref_Statistic_Checkbox_TrainingPerformance;
    public static String Pref_Statistic_Checkbox_YearSeparator;
 
    public static String Pref_Statistic_Group_ChartType;
    public static String Pref_Statistic_Group_DaySummary;
    public static String Pref_Statistic_Group_MonthSummary;
    public static String Pref_Statistic_Group_TourFrequency;
+   public static String Pref_Statistic_Group_Training;
    public static String Pref_Statistic_Group_WeekSummary;
    public static String Pref_Statistic_Group_YearSummary;
 
@@ -1732,16 +1735,16 @@ public class Messages extends NLS {
    public static String PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_down;
    public static String PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_up;
 
-//	public static String		SignImage_View_Action_CreateSignCategory;
-//	public static String		SignImage_View_Action_ImportSignImage;
-//	public static String		SignImage_Viewer_Column_Dimension_Label;
-//	public static String		SignImage_Viewer_Column_Dimension_Tooltip;
-//	public static String		SignImage_Viewer_Column_FilePathName_Label;
-//	public static String		SignImage_Viewer_Column_FilePathName_Tooltip;
-//	public static String		SignImage_Viewer_Column_Image_Header;
-//	public static String		SignImage_Viewer_Column_Image_Label;
-//	public static String		SignImage_Viewer_Column_Image_Tooltip;
-//	public static String		SignImage_Viewer_Column_Name_Label;
+// public static String    SignImage_View_Action_CreateSignCategory;
+// public static String    SignImage_View_Action_ImportSignImage;
+// public static String    SignImage_Viewer_Column_Dimension_Label;
+// public static String    SignImage_Viewer_Column_Dimension_Tooltip;
+// public static String    SignImage_Viewer_Column_FilePathName_Label;
+// public static String    SignImage_Viewer_Column_FilePathName_Tooltip;
+// public static String    SignImage_Viewer_Column_Image_Header;
+// public static String    SignImage_Viewer_Column_Image_Label;
+// public static String    SignImage_Viewer_Column_Image_Tooltip;
+// public static String    SignImage_Viewer_Column_Name_Label;
 
    public static String Search_Manager_CreateFTIndex;
    public static String Search_Manager_Log_DeletingLuceneRootFolder;

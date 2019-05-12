@@ -417,12 +417,12 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
    }
 
    /**
-    * Training effect - Line
+    * Training effect
     */
-   void createYData_TrainingEffect_Bar(final ChartDataModel chartModel) {
+   void createYData_TrainingEffect(final ChartDataModel chartModel, final ChartType chartType) {
 
       final ChartDataYSerie yData = new ChartDataYSerie(
-            ChartType.BAR,
+            chartType,
             _tourDayData.trainingEffect_Low,
             _tourDayData.trainingEffect_High);
 
@@ -433,7 +433,6 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       yData.setVisibleMinValue(0);
       yData.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
 
-//      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE);
       yData.setDefaultRGB(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY).getRGB());
 
       StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE, _activeTourTypeFilter);
@@ -442,23 +441,22 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
    }
 
    /**
-    * Training effect - Line
+    * Training performance - Bar
     */
-   void createYData_TrainingEffect_Line(final ChartDataModel chartModel) {
+   void createYData_TrainingPerformance(final ChartDataModel chartModel, final ChartType chartType) {
 
       final ChartDataYSerie yData = new ChartDataYSerie(
-            ChartType.LINE,
-            _tourDayData.trainingEffect_Low,
-            _tourDayData.trainingEffect_High);
+            chartType,
+            _tourDayData.trainingPerformance_Low,
+            _tourDayData.trainingPerformance_High);
 
-      yData.setYTitle(Messages.LABEL_GRAPH_TRAINING_EFFECT);
+      yData.setYTitle(Messages.LABEL_GRAPH_TRAINING_PERFORMANCE);
       yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
       yData.setAllValueColors(0);
       yData.setShowYSlider(true);
       yData.setVisibleMinValue(0);
       yData.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
 
-//      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE);
       yData.setDefaultRGB(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY).getRGB());
       StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE, _activeTourTypeFilter);
 
