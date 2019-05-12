@@ -532,6 +532,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @param trainingEffect
     */
    private float                 training_TrainingEffect;                              // db-version 38
+   private float                 training_TrainingEffect_Anaerobic;                    // db-version 38
    private float                 training_TrainingPerformance;                         // db-version 38
 
    // ############################################# OTHER TOUR/DEVICE DATA #############################################
@@ -8027,6 +8028,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return training_TrainingEffect;
    }
 
+   public float getTraining_TrainingEffect_Anaerobic() {
+      return training_TrainingEffect_Anaerobic;
+   }
+
    public float getTraining_TrainingPerformance() {
       return training_TrainingPerformance;
    }
@@ -9315,6 +9320,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public void setTraining_TrainingEffect(final float trainingEffect) {
       this.training_TrainingEffect = trainingEffect;
+   }
+
+   public void setTraining_TrainingEffect_Anaerobic(final float trainingEffect_Anaerobic) {
+      this.training_TrainingEffect_Anaerobic = trainingEffect_Anaerobic;
    }
 
    public void setTraining_TrainingPerformance(final float trainingPerformance) {

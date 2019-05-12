@@ -1621,6 +1621,7 @@ public class Messages extends NLS {
    public static String Pref_Statistic_Checkbox_Duration;
    public static String Pref_Statistic_Checkbox_NumberOfTours;
    public static String Pref_Statistic_Checkbox_TrainingEffect;
+   public static String Pref_Statistic_Checkbox_TrainingEffect_Anaerobic;
    public static String Pref_Statistic_Checkbox_TrainingPerformance;
    public static String Pref_Statistic_Checkbox_YearSeparator;
 

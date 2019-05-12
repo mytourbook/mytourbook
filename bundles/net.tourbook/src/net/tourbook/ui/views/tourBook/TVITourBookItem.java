@@ -212,6 +212,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
    // ----------- TRAINING ---------
 
    float colTraining_TrainingEffect;
+   float colTraining_TrainingEffect_Anaerobic;
    float colTraining_TrainingPerformance;
 
    // ----------- SURFING ---------

@@ -39,15 +39,19 @@ public class ChartOptions_Training implements IStatisticOptions {
     * UI controls
     */
    private Button _chkShow_TrainingEffect;
+   private Button _chkShow_TrainingEffect_Anaerobic;
    private Button _chkShow_TrainingPerformance;
 
    private String _prefKey_IsShowTrainingEffect;
+   private String _prefKey_IsShowTrainingEffect_Anaerobic;
    private String _prefKey_IsShowTrainingPerformance;
 
    public ChartOptions_Training(final String prefKey_IsShowTrainingEffect,
+                                final String prefKey_IsShowTrainingEffect_Anaerobic,
                                 final String prefKey_IsShowTrainingPerformance) {
 
       _prefKey_IsShowTrainingEffect = prefKey_IsShowTrainingEffect;
+      _prefKey_IsShowTrainingEffect_Anaerobic = prefKey_IsShowTrainingEffect_Anaerobic;
       _prefKey_IsShowTrainingPerformance = prefKey_IsShowTrainingPerformance;
    }
 
@@ -81,6 +85,14 @@ public class ChartOptions_Training implements IStatisticOptions {
             _chkShow_TrainingEffect = new Button(container, SWT.CHECK);
             _chkShow_TrainingEffect.setText(Messages.Pref_Statistic_Checkbox_TrainingEffect);
             _chkShow_TrainingEffect.addSelectionListener(_defaultSelectionListener);
+         }
+         {
+            /*
+             * Show training effect anaerobic
+             */
+            _chkShow_TrainingEffect_Anaerobic = new Button(container, SWT.CHECK);
+            _chkShow_TrainingEffect_Anaerobic.setText(Messages.Pref_Statistic_Checkbox_TrainingEffect_Anaerobic);
+            _chkShow_TrainingEffect_Anaerobic.addSelectionListener(_defaultSelectionListener);
          }
          {
             /*
@@ -120,6 +132,7 @@ public class ChartOptions_Training implements IStatisticOptions {
    public void resetToDefaults() {
 
       _chkShow_TrainingEffect.setSelection(_prefStore.getDefaultBoolean(_prefKey_IsShowTrainingEffect));
+      _chkShow_TrainingEffect_Anaerobic.setSelection(_prefStore.getDefaultBoolean(_prefKey_IsShowTrainingEffect_Anaerobic));
       _chkShow_TrainingPerformance.setSelection(_prefStore.getDefaultBoolean(_prefKey_IsShowTrainingPerformance));
    }
 
@@ -127,6 +140,7 @@ public class ChartOptions_Training implements IStatisticOptions {
    public void restoreState() {
 
       _chkShow_TrainingEffect.setSelection(_prefStore.getBoolean(_prefKey_IsShowTrainingEffect));
+      _chkShow_TrainingEffect_Anaerobic.setSelection(_prefStore.getBoolean(_prefKey_IsShowTrainingEffect_Anaerobic));
       _chkShow_TrainingPerformance.setSelection(_prefStore.getBoolean(_prefKey_IsShowTrainingPerformance));
    }
 
@@ -134,6 +148,7 @@ public class ChartOptions_Training implements IStatisticOptions {
    public void saveState() {
 
       _prefStore.setValue(_prefKey_IsShowTrainingEffect, _chkShow_TrainingEffect.getSelection());
+      _prefStore.setValue(_prefKey_IsShowTrainingEffect_Anaerobic, _chkShow_TrainingEffect_Anaerobic.getSelection());
       _prefStore.setValue(_prefKey_IsShowTrainingPerformance, _chkShow_TrainingPerformance.getSelection());
    }
 }

@@ -121,6 +121,7 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory TRAINING_POWER_TO_WEIGHT;
    public static final TreeColumnFactory TRAINING_STRESS_SCORE;
    public static final TreeColumnFactory TRAINING_TRAINING_EFFECT;
+   public static final TreeColumnFactory TRAINING_TRAINING_EFFECT_ANAEROBIC;
    public static final TreeColumnFactory TRAINING_TRAINING_PERFORMANCE;
 
    public static final TreeColumnFactory WEATHER_AVG_TEMPERATURE;
@@ -2060,7 +2061,7 @@ public abstract class TreeColumnFactory {
 
             final TreeColumnDefinition colDef = new TreeColumnDefinition(//
                   columnManager,
-                  "TRAINING_IMPACT_OF_TRAINING", //$NON-NLS-1$
+                  "TRAINING_TRAINING_EFFECT", //$NON-NLS-1$
                   SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Training);
@@ -2079,8 +2080,31 @@ public abstract class TreeColumnFactory {
          }
       };
 
-//    "Training Effect": Repercussion, rated from 1 to 5, of the impact of training on the body. The greater the number, the longer the recovery time.
-//    "Training Performance": Performance level of a training that can be compared with previous and subsequent sessions to observe the evolution of the physical form.
+      TRAINING_TRAINING_EFFECT_ANAEROBIC = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(//
+                  columnManager,
+                  "TRAINING_TRAINING_EFFECT_ANAEROBIC", //$NON-NLS-1$
+                  SWT.TRAIL);
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Training);
+            colDef.setColumnLabel(Messages.ColumnFactory_Training_TrainingEffect_Anaerobic_Label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_Training_TrainingEffect_Anaerobic_Header);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Training_TrainingEffect_Anaerobic_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
+            colDef.setValueFormats(
+                  ValueFormatSet.Number,
+                  ValueFormat.NUMBER_1_2,
+                  ValueFormat.NUMBER_1_2,
+                  columnManager);
+
+            return colDef;
+         }
+      };
 
       TRAINING_TRAINING_PERFORMANCE = new TreeColumnFactory() {
          @Override

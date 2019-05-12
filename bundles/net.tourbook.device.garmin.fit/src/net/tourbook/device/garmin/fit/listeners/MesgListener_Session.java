@@ -166,10 +166,15 @@ public class MesgListener_Session extends AbstractMesgListener implements Sessio
       }
 
       // -----------------------TRAINING -----------------------
-      
-      Float totalTrainingEffect = mesg.getTotalTrainingEffect();
+
+      final Float totalTrainingEffect = mesg.getTotalTrainingEffect();
       if (totalTrainingEffect != null) {
          tourData.setTraining_TrainingEffect(totalTrainingEffect);
+      }
+
+      final Float totalAnaerobicTrainingEffect = mesg.getTotalAnaerobicTrainingEffect();
+      if (totalAnaerobicTrainingEffect != null) {
+         tourData.setTraining_TrainingEffect_Anaerobic(totalAnaerobicTrainingEffect);
       }
 
       fitData.onSetup_Session_20_Finalize();

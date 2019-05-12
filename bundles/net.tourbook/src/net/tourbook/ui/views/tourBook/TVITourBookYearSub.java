@@ -179,8 +179,9 @@ public class TVITourBookYearSub extends TVITourBookItem {
             //
             // ---------- TRAINING -------------
             //
-            + "training_TrainingEffect, " //              76   //$NON-NLS-1$
-            + "training_TrainingPerformance " //               77   //$NON-NLS-1$
+            + "training_TrainingEffect, " //                76   //$NON-NLS-1$
+            + "training_TrainingEffect_Anaerobic, " //      77   //$NON-NLS-1$
+            + "training_TrainingPerformance " //            78   //$NON-NLS-1$
 
             + UI.NEW_LINE
 
@@ -322,11 +323,11 @@ public class TVITourBookYearSub extends TVITourBookItem {
 
                // --------------------- IMPORT ------------------
 
-               tourItem.col_ImportFileName                  = result.getString(50);
-               tourItem.col_ImportFilePath                  = result.getString(51);
+               tourItem.col_ImportFileName                     = result.getString(50);
+               tourItem.col_ImportFilePath                     = result.getString(51);
 
-               String dbDeviceName                          = result.getString(52);
-               String dbFirmwareVersion                     = result.getString(53);
+               String dbDeviceName                             = result.getString(52);
+               String dbFirmwareVersion                        = result.getString(53);
 
                // -----------------------------------------------
 
@@ -334,40 +335,41 @@ public class TVITourBookYearSub extends TVITourBookItem {
 
                // ---------- RUNNING DYNAMICS -------------
 
-               tourItem.colRunDyn_StanceTime_Min            = result.getInt(55);
-               tourItem.colRunDyn_StanceTime_Max            = result.getInt(56);
-               tourItem.colRunDyn_StanceTime_Avg            = result.getFloat(57);
+               tourItem.colRunDyn_StanceTime_Min               = result.getInt(55);
+               tourItem.colRunDyn_StanceTime_Max               = result.getInt(56);
+               tourItem.colRunDyn_StanceTime_Avg               = result.getFloat(57);
 
-               tourItem.colRunDyn_StanceTimeBalance_Min     = result.getInt(58)     / TourData.RUN_DYN_DATA_MULTIPLIER;
-               tourItem.colRunDyn_StanceTimeBalance_Max     = result.getInt(59)     / TourData.RUN_DYN_DATA_MULTIPLIER;
-               tourItem.colRunDyn_StanceTimeBalance_Avg     = result.getFloat(60)   / TourData.RUN_DYN_DATA_MULTIPLIER;
+               tourItem.colRunDyn_StanceTimeBalance_Min        = result.getInt(58)     / TourData.RUN_DYN_DATA_MULTIPLIER;
+               tourItem.colRunDyn_StanceTimeBalance_Max        = result.getInt(59)     / TourData.RUN_DYN_DATA_MULTIPLIER;
+               tourItem.colRunDyn_StanceTimeBalance_Avg        = result.getFloat(60)   / TourData.RUN_DYN_DATA_MULTIPLIER;
 
-               tourItem.colRunDyn_StepLength_Min            = result.getInt(61);
-               tourItem.colRunDyn_StepLength_Max            = result.getInt(62);
-               tourItem.colRunDyn_StepLength_Avg            = result.getFloat(63);
+               tourItem.colRunDyn_StepLength_Min               = result.getInt(61);
+               tourItem.colRunDyn_StepLength_Max               = result.getInt(62);
+               tourItem.colRunDyn_StepLength_Avg               = result.getFloat(63);
 
-               tourItem.colRunDyn_VerticalOscillation_Min   = result.getInt(64)     / TourData.RUN_DYN_DATA_MULTIPLIER;
-               tourItem.colRunDyn_VerticalOscillation_Max   = result.getInt(65)     / TourData.RUN_DYN_DATA_MULTIPLIER;
-               tourItem.colRunDyn_VerticalOscillation_Avg   = result.getFloat(66)   / TourData.RUN_DYN_DATA_MULTIPLIER;
+               tourItem.colRunDyn_VerticalOscillation_Min      = result.getInt(64)     / TourData.RUN_DYN_DATA_MULTIPLIER;
+               tourItem.colRunDyn_VerticalOscillation_Max      = result.getInt(65)     / TourData.RUN_DYN_DATA_MULTIPLIER;
+               tourItem.colRunDyn_VerticalOscillation_Avg      = result.getFloat(66)   / TourData.RUN_DYN_DATA_MULTIPLIER;
 
-               tourItem.colRunDyn_VerticalRatio_Min         = result.getInt(67)     / TourData.RUN_DYN_DATA_MULTIPLIER;
-               tourItem.colRunDyn_VerticalRatio_Max         = result.getInt(68)     / TourData.RUN_DYN_DATA_MULTIPLIER;
-               tourItem.colRunDyn_VerticalRatio_Avg         = result.getFloat(69)   / TourData.RUN_DYN_DATA_MULTIPLIER;
+               tourItem.colRunDyn_VerticalRatio_Min            = result.getInt(67)     / TourData.RUN_DYN_DATA_MULTIPLIER;
+               tourItem.colRunDyn_VerticalRatio_Max            = result.getInt(68)     / TourData.RUN_DYN_DATA_MULTIPLIER;
+               tourItem.colRunDyn_VerticalRatio_Avg            = result.getFloat(69)   / TourData.RUN_DYN_DATA_MULTIPLIER;
 
                // ---------- SURFING -------------
 
-               tourItem.col_Surfing_NumberOfEvents          = result.getShort(70);
-               tourItem.col_Surfing_MinSpeed_StartStop      = result.getShort(71);
-               tourItem.col_Surfing_MinSpeed_Surfing        = result.getShort(72);
-               tourItem.col_Surfing_MinTimeDuration         = result.getShort(73);
+               tourItem.col_Surfing_NumberOfEvents             = result.getShort(70);
+               tourItem.col_Surfing_MinSpeed_StartStop         = result.getShort(71);
+               tourItem.col_Surfing_MinSpeed_Surfing           = result.getShort(72);
+               tourItem.col_Surfing_MinTimeDuration            = result.getShort(73);
 
-               tourItem.col_Surfing_IsMinDistance           = result.getBoolean(74);
-               tourItem.col_Surfing_MinDistance             = result.getShort(75);
+               tourItem.col_Surfing_IsMinDistance              = result.getBoolean(74);
+               tourItem.col_Surfing_MinDistance                = result.getShort(75);
 
                // ---------- TRAINING -------------
 
-               tourItem.colTraining_TrainingEffect          = result.getFloat(76);
-               tourItem.colTraining_TrainingPerformance     = result.getFloat(77);
+               tourItem.colTraining_TrainingEffect             = result.getFloat(76);
+               tourItem.colTraining_TrainingEffect_Anaerobic   = result.getFloat(77);
+               tourItem.colTraining_TrainingPerformance        = result.getFloat(78);
 
 // SET_FORMATTING_ON
 

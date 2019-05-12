@@ -36,6 +36,7 @@ public class StatisticTraining_Line extends StatisticTraining {
    private IPropertyChangeListener _prefChangeListener;
 
    private boolean                 _isShowTrainingEffect;
+   private boolean                 _isShowTrainingEffect_Anaerobic;
    private boolean                 _isShowTrainingPerformance;
 
    private void addPrefListener(final Composite container) {
@@ -49,6 +50,7 @@ public class StatisticTraining_Line extends StatisticTraining {
 
             // observe which data are displayed
             if (property.equals(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_EFFECT)
+                  || property.equals(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_EFFECT_ANAEROBIC)
                   || property.equals(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE)) {
 
                // get the changed preferences
@@ -92,6 +94,10 @@ public class StatisticTraining_Line extends StatisticTraining {
          createYData_TrainingEffect(chartDataModel, ChartType.LINE);
       }
 
+      if (_isShowTrainingEffect_Anaerobic) {
+         createYData_TrainingEffect_Anaerobic(chartDataModel, ChartType.LINE);
+      }
+
       if (_isShowTrainingPerformance) {
          createYData_TrainingPerformance(chartDataModel, ChartType.LINE);
       }
@@ -107,6 +113,7 @@ public class StatisticTraining_Line extends StatisticTraining {
    private void getPreferences() {
 
       _isShowTrainingEffect = _prefStore.getBoolean(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_EFFECT);
+      _isShowTrainingEffect_Anaerobic = _prefStore.getBoolean(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_EFFECT_ANAEROBIC);
       _isShowTrainingPerformance = _prefStore.getBoolean(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE);
    }
 
@@ -115,6 +122,7 @@ public class StatisticTraining_Line extends StatisticTraining {
 
       slideout.setStatisticOptions(new ChartOptions_Training(
             ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_EFFECT,
+            ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_EFFECT_ANAEROBIC,
             ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE));
    }
 }

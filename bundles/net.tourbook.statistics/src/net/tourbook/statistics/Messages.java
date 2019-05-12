@@ -30,6 +30,7 @@ public class Messages extends NLS {
    public static String        LABEL_GRAPH_TIME;
    public static String        LABEL_GRAPH_TIME_UNIT;
    public static String        LABEL_GRAPH_TRAINING_EFFECT;
+   public static String        LABEL_GRAPH_TRAINING_EFFECT_ANAEROBIC;
    public static String        LABEL_GRAPH_TRAINING_PERFORMANCE;
 
    public static String        numbers_info_altitude_between;

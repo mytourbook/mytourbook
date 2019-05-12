@@ -95,28 +95,29 @@ public class DataProvider_Tour_Day extends DataProvider {
 
       final String sqlString = NL
 
-            + "SELECT "                            + NL //        //$NON-NLS-1$
+            + "SELECT "                               + NL //        //$NON-NLS-1$
 
-            + " TourId,"                           + NL //  1     //$NON-NLS-1$
+            + " TourId,"                              + NL //  1     //$NON-NLS-1$
 
-            + " StartYear,"                        + NL //  2     //$NON-NLS-1$
-            + " StartWeek,"                        + NL //  3     //$NON-NLS-1$
-            + " TourStartTime,"                    + NL //  4     //$NON-NLS-1$
-            + " TimeZoneId,"                       + NL //  5     //$NON-NLS-1$
+            + " StartYear,"                           + NL //  2     //$NON-NLS-1$
+            + " StartWeek,"                           + NL //  3     //$NON-NLS-1$
+            + " TourStartTime,"                       + NL //  4     //$NON-NLS-1$
+            + " TimeZoneId,"                          + NL //  5     //$NON-NLS-1$
 
-            + " TourDrivingTime,"                  + NL //  6     //$NON-NLS-1$
-            + " TourRecordingTime,"                + NL //  7     //$NON-NLS-1$
+            + " TourDrivingTime,"                     + NL //  6     //$NON-NLS-1$
+            + " TourRecordingTime,"                   + NL //  7     //$NON-NLS-1$
 
-            + " TourDistance,"                     + NL //  8     //$NON-NLS-1$
-            + " TourAltUp,"                        + NL //  9     //$NON-NLS-1$
-            + " TourTitle,"                        + NL //  10    //$NON-NLS-1$
-            + " TourDescription,"                  + NL //  11    //$NON-NLS-1$
+            + " TourDistance,"                        + NL //  8     //$NON-NLS-1$
+            + " TourAltUp,"                           + NL //  9     //$NON-NLS-1$
+            + " TourTitle,"                           + NL //  10    //$NON-NLS-1$
+            + " TourDescription,"                     + NL //  11    //$NON-NLS-1$
 
-            + " training_TrainingEffect,"          + NL //  12    //$NON-NLS-1$
-            + " training_TrainingPerformance,"     + NL //  13    //$NON-NLS-1$
+            + " training_TrainingEffect,"             + NL //  12    //$NON-NLS-1$
+            + " training_TrainingEffect_Anaerobic,"   + NL //  13    //$NON-NLS-1$
+            + " training_TrainingPerformance,"        + NL //  14    //$NON-NLS-1$
 
-            + " TourType_typeId,"                  + NL //  14    //$NON-NLS-1$
-            + " jTdataTtag.TourTag_tagId"          + NL //  15    //$NON-NLS-1$
+            + " TourType_typeId,"                     + NL //  15    //$NON-NLS-1$
+            + " jTdataTtag.TourTag_tagId"             + NL //  16    //$NON-NLS-1$
 
             + NL
 
@@ -156,6 +157,7 @@ public class DataProvider_Tour_Day extends DataProvider {
          final TFloatArrayList allAltitudeUp = new TFloatArrayList();
 
          final TFloatArrayList allTrainingEffect = new TFloatArrayList();
+         final TFloatArrayList allTrainingEffect_Anaerobic = new TFloatArrayList();
          final TFloatArrayList allTrainingPerformance = new TFloatArrayList();
 
          final ArrayList<String> allTourTitle = new ArrayList<>();
@@ -179,7 +181,7 @@ public class DataProvider_Tour_Day extends DataProvider {
          while (result.next()) {
 
             final long dbTourId = result.getLong(1);
-            final Object dbTagId = result.getObject(15);
+            final Object dbTagId = result.getObject(16);
 
             if (dbTourId == lastTourId) {
 
@@ -209,9 +211,10 @@ public class DataProvider_Tour_Day extends DataProvider {
                final String dbDescription = result.getString(11);
 
                final float trainingEffect = result.getFloat(12);
-               final float trainingPerformance = result.getFloat(13);
+               final float trainingEffect_Anaerobic = result.getFloat(13);
+               final float trainingPerformance = result.getFloat(14);
 
-               final Object dbTypeIdObject = result.getObject(14);
+               final Object dbTypeIdObject = result.getObject(15);
 
                final TourDateTime tourDateTime = TimeTools.createTourDateTime(dbStartTimeMilli, dbTimeZoneId);
                final ZonedDateTime zonedStartDateTime = tourDateTime.tourZonedDateTime;
@@ -248,6 +251,7 @@ public class DataProvider_Tour_Day extends DataProvider {
                allAvgSpeed.add(dbDrivingTime == 0 ? 0 : 3.6f * distance / dbDrivingTime);
 
                allTrainingEffect.add(trainingEffect);
+               allTrainingEffect_Anaerobic.add(trainingEffect_Anaerobic);
                allTrainingPerformance.add(trainingPerformance);
 
                allTourTitle.add(dbTourTitle);
@@ -299,6 +303,7 @@ public class DataProvider_Tour_Day extends DataProvider {
          final float[] avgSpeed_High = allAvgSpeed.toArray();
          final float[] distance_High = allDistance.toArray();
          final float[] trainingEffect_High = allTrainingEffect.toArray();
+         final float[] trainingEffect_Anaerobic_High = allTrainingEffect_Anaerobic.toArray();
          final float[] trainingPerformance_High = allTrainingPerformance.toArray();
 
          final int serieLength = durationHigh.length;
@@ -308,6 +313,7 @@ public class DataProvider_Tour_Day extends DataProvider {
          final float[] avgSpeedLow = new float[serieLength];
          final float[] distanceLow = new float[serieLength];
          final float[] trainingEffect_Low = new float[serieLength];
+         final float[] trainingEffect_Anaerobic_Low = new float[serieLength];
          final float[] trainingPerformance_Low = new float[serieLength];
 
          /*
@@ -331,6 +337,7 @@ public class DataProvider_Tour_Day extends DataProvider {
                distance_High[tourIndex] += distanceLow[tourIndex] = distance_High[tourIndex - 1];
 
                trainingEffect_High[tourIndex] += trainingEffect_Low[tourIndex] = trainingEffect_High[tourIndex - 1];
+               trainingEffect_Anaerobic_High[tourIndex] += trainingEffect_Anaerobic_Low[tourIndex] = trainingEffect_Anaerobic_High[tourIndex - 1];
                trainingPerformance_High[tourIndex] += trainingPerformance_Low[tourIndex] = trainingPerformance_High[tourIndex - 1];
 
             } else {
@@ -380,6 +387,8 @@ public class DataProvider_Tour_Day extends DataProvider {
 
          _tourDayData.trainingEffect_Low = trainingEffect_Low;
          _tourDayData.trainingEffect_High = trainingEffect_High;
+         _tourDayData.trainingEffect_Anaerobic_Low = trainingEffect_Anaerobic_Low;
+         _tourDayData.trainingEffect_Anaerobic_High = trainingEffect_Anaerobic_High;
          _tourDayData.trainingPerformance_Low = trainingPerformance_Low;
          _tourDayData.trainingPerformance_High = trainingPerformance_High;
 

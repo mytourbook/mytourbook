@@ -441,6 +441,30 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
    }
 
    /**
+    * Training effect anaerobic
+    */
+   void createYData_TrainingEffect_Anaerobic(final ChartDataModel chartModel, final ChartType chartType) {
+
+      final ChartDataYSerie yData = new ChartDataYSerie(
+            chartType,
+            _tourDayData.trainingEffect_Anaerobic_Low,
+            _tourDayData.trainingEffect_Anaerobic_High);
+
+      yData.setYTitle(Messages.LABEL_GRAPH_TRAINING_EFFECT_ANAEROBIC);
+      yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
+      yData.setAllValueColors(0);
+      yData.setShowYSlider(true);
+      yData.setVisibleMinValue(0);
+      yData.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
+
+      yData.setDefaultRGB(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY).getRGB());
+
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE, _activeTourTypeFilter);
+
+      chartModel.addYData(yData);
+   }
+
+   /**
     * Training performance - Bar
     */
    void createYData_TrainingPerformance(final ChartDataModel chartModel, final ChartType chartType) {
