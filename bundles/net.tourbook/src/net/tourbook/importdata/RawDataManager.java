@@ -15,11 +15,13 @@
  *******************************************************************************/
 package net.tourbook.importdata;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -30,10 +32,12 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Scanner;
 
 import net.tourbook.Messages;
 import net.tourbook.application.PerspectiveFactoryRawData;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.ITourViewer3;
@@ -55,6 +59,7 @@ import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -79,36 +84,40 @@ import org.eclipse.ui.WorkbenchException;
 
 public class RawDataManager {
 
-   private static final String      RAW_DATA_LAST_SELECTED_PATH        = "raw-data-view.last-selected-import-path";             //$NON-NLS-1$
-   private static final String      TEMP_IMPORTED_FILE                 = "received-device-data.txt";                            //$NON-NLS-1$
+   private static final String RAW_DATA_LAST_SELECTED_PATH        = "raw-data-view.last-selected-import-path"; //$NON-NLS-1$
+   private static final String TEMP_IMPORTED_FILE                 = "received-device-data.txt";                //$NON-NLS-1$
    //
-   public static final String       LOG_IMPORT_DELETE_TOUR_FILE        = Messages.Log_Import_DeleteTourFiles;
-   public static final String       LOG_IMPORT_DELETE_TOUR_FILE_END    = Messages.Log_Import_DeleteTourFiles_End;
-   private static final String      LOG_IMPORT_TOUR                    = Messages.Log_Import_Tour;
-   public static final String       LOG_IMPORT_TOUR_IMPORTED           = Messages.Log_Import_Tour_Imported;
-   private static final String      LOG_IMPORT_TOUR_END                = Messages.Log_Import_Tour_End;
+   public static final String  LOG_IMPORT_DELETE_TOUR_FILE        = Messages.Log_Import_DeleteTourFiles;
+   public static final String  LOG_IMPORT_DELETE_TOUR_FILE_END    = Messages.Log_Import_DeleteTourFiles_End;
+   private static final String LOG_IMPORT_TOUR                    = Messages.Log_Import_Tour;
+   public static final String  LOG_IMPORT_TOUR_IMPORTED           = Messages.Log_Import_Tour_Imported;
+   private static final String LOG_IMPORT_TOUR_END                = Messages.Log_Import_Tour_End;
    //
-   public static final String       LOG_REIMPORT_PREVIOUS_FILES        = Messages.Log_Reimport_PreviousFiles;
-   public static final String       LOG_REIMPORT_END                   = Messages.Log_Reimport_PreviousFiles_End;
+   public static final String  LOG_REIMPORT_PREVIOUS_FILES        = Messages.Log_Reimport_PreviousFiles;
+   public static final String  LOG_REIMPORT_END                   = Messages.Log_Reimport_PreviousFiles_End;
    //
-   private static final String      LOG_REIMPORT_ALL_TIME_SLICES       = Messages.Log_Reimport_AllTimeSlices;
-   private static final String      LOG_REIMPORT_ONLY_ALTITUDE         = Messages.Log_Reimport_Only_Altitude;
-   private static final String      LOG_REIMPORT_ONLY_CADENCE          = Messages.Log_Reimport_Only_Cadence;
-   private static final String      LOG_REIMPORT_ONLY_GEAR             = Messages.Log_Reimport_Only_Gear;
-   private static final String      LOG_REIMPORT_ONLY_MARKER           = Messages.Log_Reimport_Only_TourMarker;
-   private static final String      LOG_REIMPORT_ONLY_POWER_SPEED      = Messages.Log_Reimport_Only_PowerSpeed;
-   private static final String      LOG_REIMPORT_ONLY_POWER_PULSE      = Messages.Log_Reimport_Only_PowerPulse;
-   private static final String      LOG_REIMPORT_ONLY_RUNNING_DYNAMICS = Messages.Log_Reimport_Only_RunningDynamics;
+   private static final String LOG_REIMPORT_ALL_TIME_SLICES       = Messages.Log_Reimport_AllTimeSlices;
+   private static final String LOG_REIMPORT_ONLY_ALTITUDE         = Messages.Log_Reimport_Only_Altitude;
+   private static final String LOG_REIMPORT_ONLY_CADENCE          = Messages.Log_Reimport_Only_Cadence;
+   private static final String LOG_REIMPORT_ONLY_GEAR             = Messages.Log_Reimport_Only_Gear;
+   private static final String LOG_REIMPORT_ONLY_MARKER           = Messages.Log_Reimport_Only_TourMarker;
+   private static final String LOG_REIMPORT_ONLY_POWER_SPEED      = Messages.Log_Reimport_Only_PowerSpeed;
+   private static final String LOG_REIMPORT_ONLY_POWER_PULSE      = Messages.Log_Reimport_Only_PowerPulse;
+   private static final String LOG_REIMPORT_ONLY_RUNNING_DYNAMICS = Messages.Log_Reimport_Only_RunningDynamics;
    private static final String      LOG_REIMPORT_ONLY_TRAINING         = Messages.Log_Reimport_Only_Training;
-   private static final String      LOG_REIMPORT_ONLY_SWIMMING         = Messages.Log_Reimport_Only_Swimming;
-   private static final String      LOG_REIMPORT_ONLY_TEMPERATURE      = Messages.Log_Reimport_Only_Temperature;
-   private static final String      LOG_REIMPORT_TOUR                  = Messages.Log_Reimport_Tour;
+   private static final String LOG_REIMPORT_ONLY_SWIMMING         = Messages.Log_Reimport_Only_Swimming;
+   private static final String LOG_REIMPORT_ONLY_TEMPERATURE      = Messages.Log_Reimport_Only_Temperature;
+   private static final String LOG_REIMPORT_TOUR                  = Messages.Log_Reimport_Tour;
+
    //
-   public static final int          ADJUST_IMPORT_YEAR_IS_DISABLED     = -1;
+   private static final String INVALIDFILES_TO_IGNORE = "invalidfiles_to_ignore.txt"; //$NON-NLS-1$
+
+   //
+   public static final int          ADJUST_IMPORT_YEAR_IS_DISABLED   = -1;
    //
    static final ComboEnumEntry<?>[] ALL_IMPORT_TOUR_TYPE_CONFIG;
    //
-   private static boolean           _importState_IsAutoOpenImportLog   = RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT;
+   private static boolean           _importState_IsAutoOpenImportLog = RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT;
    //
    static {
 
@@ -127,7 +136,9 @@ public class RawDataManager {
 
    private static RawDataManager           _instance                           = null;
 
+   private static ArrayList<String>        _invalidFilesList                   = new ArrayList<>();
    private final IPreferenceStore          _prefStore                          = TourbookPlugin.getPrefStore();
+
    private final IDialogSettings           _importState                        = TourbookPlugin.getState(RawDataView.ID);
 
    /**
@@ -156,23 +167,22 @@ public class RawDataManager {
     * Contains filenames which are not directly imported but is imported from other imported files
     */
    private final HashSet<String>           _importedFileNamesChildren          = new HashSet<>();
-
    private boolean                         _isImported;
    private boolean                         _isImportCanceled;
    //
    private int                             _importState_ImportYear             = ADJUST_IMPORT_YEAR_IS_DISABLED;
+
    private boolean                         _importState_IsConvertWayPoints     = Util.getStateBoolean(_importState,
          RawDataView.STATE_IS_CONVERT_WAYPOINTS,
          RawDataView.STATE_IS_CONVERT_WAYPOINTS_DEFAULT);
-
    private boolean                         _importState_IsCreateTourIdWithTime = RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT;
    private boolean                         _importState_IsChecksumValidation   = RawDataView.STATE_IS_CHECKSUM_VALIDATION_DEFAULT;
+
    private boolean                         _importState_IsMergeTracks          = RawDataView.STATE_IS_MERGE_TRACKS_DEFAULT;
 
    private List<TourbookDevice>            _devicesBySortPriority;
 
    private HashMap<String, TourbookDevice> _devicesByExtension;
-
    private final ArrayList<TourType>       _tempTourTypes                      = new ArrayList<>();
    private final ArrayList<TourTag>        _tempTourTags                       = new ArrayList<>();
 
@@ -212,7 +222,24 @@ public class RawDataManager {
       OnlyTourMarker, //
    }
 
-   private RawDataManager() {}
+   private RawDataManager() {
+   }
+
+   public static boolean doesInvalidFileExist(final String fileName) {
+      final ArrayList<String> invalidFilesList = readInvalidFilesToIgnoreFile();
+
+      for (final String invalidFilePath : invalidFilesList) {
+         if (Paths.get(invalidFilePath).getFileName().toString().equals(fileName)) {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
+   private static EasyConfig getEasyConfig() {
+      return EasyImportManager.getInstance().getEasyConfig();
+   }
 
    public static RawDataManager getInstance() {
 
@@ -221,6 +248,11 @@ public class RawDataManager {
       }
 
       return _instance;
+   }
+
+   private static File getInvalidFilesToIgnoreFile() {
+      final IPath stateLocation = Platform.getStateLocation(CommonActivator.getDefault().getBundle());
+      return stateLocation.append(INVALIDFILES_TO_IGNORE).toFile();
    }
 
    /**
@@ -232,6 +264,72 @@ public class RawDataManager {
 
    public static boolean isAutoOpenImportLog() {
       return _importState_IsAutoOpenImportLog;
+   }
+
+   private static ArrayList<String> readInvalidFilesToIgnoreFile() {
+      Scanner s;
+      final ArrayList<String> invalidFilesList = new ArrayList<>();
+
+      final File invalidFilesToIgnoreFile = getInvalidFilesToIgnoreFile();
+      if (!invalidFilesToIgnoreFile.exists()) {
+         return invalidFilesList;
+      }
+
+      try {
+         s = new Scanner(invalidFilesToIgnoreFile);
+         while (s.hasNext()) {
+            invalidFilesList.add(s.next());
+         }
+         s.close();
+      } catch (final IOException e) {
+         e.printStackTrace();
+      }
+
+      return invalidFilesList;
+   }
+
+   /**
+    * Writes the list of files to ignore into a text file.
+    */
+   private static void save_InvalidFilesToIgnore_InTxt() {
+
+      BufferedWriter writer = null;
+
+      try {
+
+         final File file = getInvalidFilesToIgnoreFile();
+
+         if (!file.exists()) {
+            file.createNewFile();
+         }
+
+         writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, true), "UTF-8")); //$NON-NLS-1$
+         final ImportConfig importConfig = getEasyConfig().getActiveImportConfig();
+
+         for (final String invalidFile : _invalidFilesList) {
+            //If the invalid files are backed up and deleted from the device folder,
+            //then we save their backup path and not their device path.
+            if (importConfig.isCreateBackup && importConfig.isDeleteDeviceFiles) {
+               final Path invalidFileBackupPath = Paths.get(importConfig.getBackupFolder(), Paths.get(invalidFile).getFileName().toString());
+               writer.write(invalidFileBackupPath.toString());
+            } else {
+               writer.write(invalidFile);
+            }
+
+            writer.newLine();
+         }
+
+      } catch (final IOException e) {
+         e.printStackTrace();
+      } finally {
+         if (writer != null) {
+            try {
+               writer.close();
+            } catch (final IOException e) {
+               e.printStackTrace();
+            }
+         }
+      }
    }
 
    public void actionImportFromDevice() {
@@ -800,7 +898,7 @@ public class RawDataManager {
       final String reimportFileNamePath = reimportedFile.getAbsolutePath();
 
       /*
-       * tour must be removed otherwise it would be recognized as a duplicate and therefor not
+       * tour must be removed otherwise it would be recognized as a duplicate and therefore not
        * imported
        */
       final TourData oldTourDataInImportView = _toursInImportView.remove(oldTourId);
@@ -1229,6 +1327,10 @@ public class RawDataManager {
       return _importState_ImportYear;
    }
 
+   public ArrayList<String> getInvalidFilesList() {
+      return _invalidFilesList;
+   }
+
    public ArrayList<TourTag> getTempTourTags() {
       return _tempTourTags;
    }
@@ -1360,6 +1462,7 @@ public class RawDataManager {
 
                      break;
                   }
+
                   if (_isImportCanceled) {
                      break;
                   }
@@ -1647,6 +1750,7 @@ public class RawDataManager {
 
       _tempTourTags.clear();
       _tempTourTypes.clear();
+      _invalidFilesList.clear();
    }
 
    public void removeTours(final TourData[] removedTours) {
@@ -1781,7 +1885,6 @@ public class RawDataManager {
             setImportId();
 
             int importCounter = 0;
-            final ArrayList<String> notImportedFiles = new ArrayList<>();
 
             // loop: import all selected files
             for (final ImportFile filePath : importFilePaths) {
@@ -1836,11 +1939,13 @@ public class RawDataManager {
 
                } else {
 
-                  notImportedFiles.add(osFilePath);
+                  _invalidFilesList.add(osFilePath);
 
                   TourLogManager.addSubLog(TourLogState.IMPORT_ERROR, osFilePath);
                }
             }
+
+            save_InvalidFilesToIgnore_InTxt();
 
             if (importCounter > 0) {
 
