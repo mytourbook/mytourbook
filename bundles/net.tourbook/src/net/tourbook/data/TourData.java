@@ -376,6 +376,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * <br>
     * 0 == false, 1 == true
     */
+   @XmlElement
    private int                   isPowerSensorPresent            = 0;                     // db-version 12
 
    // ############################################# PULSE #############################################
@@ -424,6 +425,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * <br>
     * 0 == false, 1 == true
     */
+   @XmlElement
    private int                   isPulseSensorPresent            = 0;                     // db-version 12
 
    // ############################################# DEVICE TOUR TYPE #############################################
@@ -540,9 +542,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private long                  dateTimeModified;                                       // db-version 11
 
    /** Folder path from the import file. */
+   @XmlElement
    private String                tourImportFilePath;                                    // db-version 6
 
    /** File name from the import file. */
+   @XmlElement
    private String                tourImportFileName;                                    // db-version 29
 
    /**
@@ -7676,6 +7680,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @XmlElement
    public String getTest() {
       return "jokl"; //$NON-NLS-1$
+
    }
 
    /**

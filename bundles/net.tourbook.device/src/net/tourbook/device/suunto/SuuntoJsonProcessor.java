@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation version 2 of the License.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+ *******************************************************************************/
 package net.tourbook.device.suunto;
 
 import java.time.Instant;
@@ -26,31 +41,32 @@ import org.json.JSONObject;
 
 public class SuuntoJsonProcessor {
 
-   public static final String  TAG_SAMPLES     = "Samples";     //$NON-NLS-1$
-   public static final String  TAG_SAMPLE      = "Sample";      //$NON-NLS-1$
-   public static final String  TAG_EVENTS      = "Events";      //$NON-NLS-1$
-   public static final String  TAG_TIMEISO8601 = "TimeISO8601"; //$NON-NLS-1$
-   public static final String  TAG_ATTRIBUTES  = "Attributes";  //$NON-NLS-1$
+   public static final String  DeviceName      = "Suunto Spartan/9"; //$NON-NLS-1$
+   public static final String  TAG_SAMPLES     = "Samples";          //$NON-NLS-1$
+   public static final String  TAG_SAMPLE      = "Sample";           //$NON-NLS-1$
+   public static final String  TAG_EVENTS      = "Events";           //$NON-NLS-1$
+   public static final String  TAG_TIMEISO8601 = "TimeISO8601";      //$NON-NLS-1$
+   public static final String  TAG_ATTRIBUTES  = "Attributes";       //$NON-NLS-1$
 
-   public static final String  TAG_SOURCE      = "Source";      //$NON-NLS-1$
-   private static final String TAG_SUUNTOSML   = "suunto/sml";  //$NON-NLS-1$
-   private static final String TAG_LAP         = "Lap";         //$NON-NLS-1$
-   private static final String TAG_MANUAL      = "Manual";      //$NON-NLS-1$
-   private static final String TAG_DISTANCE    = "Distance";    //$NON-NLS-1$
-   public static final String  TAG_GPSALTITUDE = "GPSAltitude"; //$NON-NLS-1$
-   public static final String  TAG_LATITUDE    = "Latitude";    //$NON-NLS-1$
-   public static final String  TAG_LONGITUDE   = "Longitude";   //$NON-NLS-1$
-   private static final String TAG_TYPE        = "Start";       //$NON-NLS-1$
-   private static final String TAG_START       = "Type";        //$NON-NLS-1$
-   private static final String TAG_PAUSE       = "Pause";       //$NON-NLS-1$
-   private static final String TAG_HR          = "HR";          //$NON-NLS-1$
-   private static final String TAG_RR          = "R-R";         //$NON-NLS-1$
-   private static final String TAG_DATA        = "Data";        //$NON-NLS-1$
-   private static final String TAG_SPEED       = "Speed";       //$NON-NLS-1$
-   private static final String TAG_CADENCE     = "Cadence";     //$NON-NLS-1$
-   public static final String  TAG_ALTITUDE    = "Altitude";    //$NON-NLS-1$
-   private static final String TAG_POWER       = "Power";       //$NON-NLS-1$
-   private static final String TAG_TEMPERATURE = "Temperature"; //$NON-NLS-1$
+   public static final String  TAG_SOURCE      = "Source";           //$NON-NLS-1$
+   private static final String TAG_SUUNTOSML   = "suunto/sml";       //$NON-NLS-1$
+   private static final String TAG_LAP         = "Lap";              //$NON-NLS-1$
+   private static final String TAG_MANUAL      = "Manual";           //$NON-NLS-1$
+   private static final String TAG_DISTANCE    = "Distance";         //$NON-NLS-1$
+   public static final String  TAG_GPSALTITUDE = "GPSAltitude";      //$NON-NLS-1$
+   public static final String  TAG_LATITUDE    = "Latitude";         //$NON-NLS-1$
+   public static final String  TAG_LONGITUDE   = "Longitude";        //$NON-NLS-1$
+   private static final String TAG_TYPE        = "Start";            //$NON-NLS-1$
+   private static final String TAG_START       = "Type";             //$NON-NLS-1$
+   private static final String TAG_PAUSE       = "Pause";            //$NON-NLS-1$
+   private static final String TAG_HR          = "HR";               //$NON-NLS-1$
+   private static final String TAG_RR          = "R-R";              //$NON-NLS-1$
+   private static final String TAG_DATA        = "Data";             //$NON-NLS-1$
+   private static final String TAG_SPEED       = "Speed";            //$NON-NLS-1$
+   private static final String TAG_CADENCE     = "Cadence";          //$NON-NLS-1$
+   public static final String  TAG_ALTITUDE    = "Altitude";         //$NON-NLS-1$
+   private static final String TAG_POWER       = "Power";            //$NON-NLS-1$
+   private static final String TAG_TEMPERATURE = "Temperature";      //$NON-NLS-1$
 
    // Swimming
    private static final String Swimming             = "Swimming";                                      //$NON-NLS-1$
@@ -87,7 +103,6 @@ public class SuuntoJsonProcessor {
 
       rrDataList.addAll(RRValues);
    }
-
 
    /**
     * Cleans a processes activity and performs the following actions :
@@ -177,6 +192,12 @@ public class SuuntoJsonProcessor {
 
       if (tourData == null) {
          return null;
+      }
+
+      // We detect the available sensors
+      if(jsonFileContent.contains(TAG_HR) ||
+            jsonFileContent.contains(TAG_RR)) {
+         tourData.setIsPulseSensorPresent(true);
       }
 
       final boolean isIndoorTour = !jsonFileContent.contains(TAG_GPSALTITUDE);
@@ -320,7 +341,13 @@ public class SuuntoJsonProcessor {
          }
 
          // Power
-         wasDataPopulated |= TryAddPowerData(currentSampleData, timeData);
+         final boolean wasPowerDataPopulated = TryAddPowerData(currentSampleData, timeData);
+         if (wasPowerDataPopulated && !tourData.isPowerSensorPresent()) {
+            // If we have found valid power data and we didn't know yet that power was
+            // available, we set the power sensor presence to true only this time.
+            tourData.setIsPowerSensorPresent(true);
+         }
+         wasDataPopulated |= wasPowerDataPopulated;
 
          // Distance
          if (_prefStore.getInt(IPreferences.DISTANCE_DATA_SOURCE) == 1 ||
