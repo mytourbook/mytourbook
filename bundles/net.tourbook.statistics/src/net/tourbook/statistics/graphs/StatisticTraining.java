@@ -303,6 +303,10 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       final float speed = drivingTime == 0 ? 0 : distance / (drivingTime / 3.6f);
       final float pace = distance == 0 ? 0 : drivingTime * 1000 / distance;
 
+      final float training_Effect = _tourDayData.allTraining_Effect[valueIndex];
+      final float training_Effect_Anaerobic = _tourDayData.allTraining_Effect_Anaerobic[valueIndex];
+      final float training_Performance = _tourDayData.allTraining_Performance[valueIndex];
+
       final StringBuilder toolTipFormat = new StringBuilder();
 
       toolTipFormat.append(TOUR_TOOLTIP_FORMAT_DATE_WEEK_TIME + NL2); //      %s - %s - %s - CW %d
@@ -317,6 +321,10 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
 
       toolTipFormat.append(Messages.tourtime_info_avg_speed + NL);
       toolTipFormat.append(Messages.tourtime_info_avg_pace + NL2);
+
+      toolTipFormat.append(Messages.Tourtime_Info_Training_Effect + NL);
+      toolTipFormat.append(Messages.Tourtime_Info_Training_Effect_Anaerob + NL);
+      toolTipFormat.append(Messages.Tourtime_Info_Training_Performance + NL2);
 
       toolTipFormat.append(Messages.tourtime_info_tour_type + NL);
       toolTipFormat.append(Messages.tourtime_info_tags);
@@ -380,6 +388,11 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
             (int) (pace / 60),
             (int) (pace % 60),
             UI.UNIT_LABEL_PACE,
+
+            // training
+            training_Effect,
+            training_Effect_Anaerobic,
+            training_Performance,
 
             // tour type / tags
             tourTypeName,

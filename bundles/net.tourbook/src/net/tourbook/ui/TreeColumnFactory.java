@@ -2072,8 +2072,8 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
             colDef.setValueFormats(
                   ValueFormatSet.Number,
-                  ValueFormat.NUMBER_1_2,
-                  ValueFormat.NUMBER_1_2,
+                  ValueFormat.NUMBER_1_1,
+                  ValueFormat.NUMBER_1_1,
                   columnManager);
 
             return colDef;
@@ -2098,8 +2098,8 @@ public abstract class TreeColumnFactory {
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
             colDef.setValueFormats(
                   ValueFormatSet.Number,
-                  ValueFormat.NUMBER_1_2,
-                  ValueFormat.NUMBER_1_2,
+                  ValueFormat.NUMBER_1_1,
+                  ValueFormat.NUMBER_1_1,
                   columnManager);
 
             return colDef;

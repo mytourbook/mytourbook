@@ -66,8 +66,9 @@ public class TourData_Day {
    float[]                        allDistance;
    float[]                        allAltitude;
 
-   float[]                        allTrainingEffect;
-   float[]                        allTrainingPerformance;
+   float[]                        allTraining_Effect;
+   float[]                        allTraining_Effect_Anaerobic;
+   float[]                        allTraining_Performance;
 
    ArrayList<String>              tourTitle;
    ArrayList<String>              tourDescription;
