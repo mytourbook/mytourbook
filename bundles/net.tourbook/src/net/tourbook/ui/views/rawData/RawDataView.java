@@ -4911,7 +4911,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             int saveCounter = 0;
 
-            final int selectionSize = allTourData.size();
+            int selectionSize = allTourData.size();
+            selectionSize += invalidFiles != null ? invalidFiles.size() : 0;
 
             monitor.beginTask(Messages.Import_Data_Monitor_DeleteTourFiles, selectionSize);
 
@@ -4922,6 +4923,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                      Messages.Import_Data_Monitor_DeleteTourFiles_Subtask,
                      ++saveCounter,
                      selectionSize));
+
+               monitor.worked(1);
 
                if (tourData.isBackupImportFile && isDeleteAllFiles == false) {
 
@@ -4963,7 +4966,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                   tourData.isTourFileMoved = true;
                }
 
-               monitor.worked(1);
             }
 
             if (invalidFiles != null) {
@@ -4980,7 +4982,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                   monitor.worked(1);
                }
             }
-
          }
       };
 
