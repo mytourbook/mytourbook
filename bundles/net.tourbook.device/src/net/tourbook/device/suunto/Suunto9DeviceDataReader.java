@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation version 2 of the License.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+ *******************************************************************************/
 package net.tourbook.device.suunto;
 
 import java.io.BufferedReader;
@@ -145,10 +160,10 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
       } catch (final IOException e) {
 
-            /*
-             * Log only when reading the zip file, during a validation, an exception can be very
-             * likely and should not be displayed
-             */
+         /*
+          * Log only when reading the zip file, during a validation, an exception can be very
+          * likely and should not be displayed
+          */
          if (!isValidatingFile) {
             StatusUtil.log(e);
          }
@@ -238,49 +253,6 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
       return false;
    }
 
-   /**
-    * Checks if the file is a valid device JSON file.
-    *
-    * @param jsonFileContent
-    *           The content to check.
-    * @return Returns <code>true</code> when the file contains content with the requested tag.
-    */
-   protected boolean isValidJSONFile(final String jsonFileContent) {
-      final BufferedReader fileReader = null;
-      try {
-
-         if (jsonFileContent == null ||
-               jsonFileContent == "") { //$NON-NLS-1$
-            return false;
-         }
-
-         try {
-            final JSONObject jsonContent = new JSONObject(jsonFileContent);
-            final JSONArray samples = (JSONArray) jsonContent.get(SuuntoJsonProcessor.TAG_SAMPLES);
-
-            final String firstSample = samples.get(0).toString();
-            if (firstSample.contains(SuuntoJsonProcessor.TAG_ATTRIBUTES) &&
-                  firstSample.contains(SuuntoJsonProcessor.TAG_SOURCE) &&
-                  firstSample.contains(SuuntoJsonProcessor.TAG_TIMEISO8601)) {
-               Util.closeReader(fileReader);
-               return true;
-            }
-
-         } catch (final JSONException ex) {
-            StatusUtil.log(ex);
-            return false;
-         }
-
-      } catch (final Exception e) {
-         StatusUtil.log(e);
-         return false;
-      } finally {
-         Util.closeReader(fileReader);
-      }
-
-      return false;
-   }
-
    @Override
    public boolean processDeviceData(final String importFilePath,
                                     final DeviceData deviceData,
@@ -300,14 +272,6 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
       final String jsonFileContent =
             GetJsonContentFromGZipFile(importFilePath, false);
-
-      // At this point, we know that the given file is a valid JSON file.
-      // But to avoid for invalid activities to be parsed by other
-      // parsers, we return true when a Suunto JSON file is not
-      // a valid activity.
-      if (!isValidActivity(jsonFileContent)) {
-         return true;
-      }
 
       return ProcessFile(importFilePath, jsonFileContent);
    }
@@ -340,6 +304,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
     * @return The Suunto activity as a tour.
     */
    private boolean ProcessFile(final String filePath, final String jsonFileContent) {
+
       final SuuntoJsonProcessor suuntoJsonProcessor = new SuuntoJsonProcessor();
 
       String fileName =
@@ -364,6 +329,8 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
          _processedActivities.put(activity, suuntoJsonProcessor.getSampleList());
       }
 
+      activity.setImportFilePath(filePath);
+
       TryFinalizeTour(activity);
 
       return true;
@@ -385,7 +352,6 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
       testFiles.put(controlFilePath, filePath);
 
       //Maxwell, CO
-
       filePath = IMPORT_FILE_PATH +
             "1536723722706_183010004848_post_timeline-1.json.gz"; //$NON-NLS-1$
       controlFilePath =
@@ -409,17 +375,25 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
       // SWIMMING
 
       // Start -> 100m -> LAP -> LAP -> 100m -> LAP -> LAP -> 100m -> LAP -> LAP -> 100m -> Stop
+      // (courtesy of Z74)
       filePath = IMPORT_FILE_PATH +
             "1547628896209_184710003036_post_timeline-1.json.gz"; //$NON-NLS-1$
       controlFilePath =
             IMPORT_FILE_PATH + "1547628896209_184710003036_post_timeline-1.xml"; //$NON-NLS-1$
       testFiles.put(controlFilePath, filePath);
 
-      // Start -> 100m -> Stop
+      // Start -> 100m -> Stop (courtesy of Z74)
       filePath = IMPORT_FILE_PATH +
             "1547628897243_184710003036_post_timeline-1.json.gz"; //$NON-NLS-1$
       controlFilePath =
             IMPORT_FILE_PATH + "1547628897243_184710003036_post_timeline-1.xml"; //$NON-NLS-1$
+      testFiles.put(controlFilePath, filePath);
+
+      // File with power data (courtesy of MrMen)
+      filePath = IMPORT_FILE_PATH +
+            "1539801501658_174510001687_post_timeline-1.json.gz"; //$NON-NLS-1$
+      controlFilePath =
+            IMPORT_FILE_PATH + "1539801501658_174510001687_post_timeline-1.xml"; //$NON-NLS-1$
       testFiles.put(controlFilePath, filePath);
 
       TourData entry;
@@ -478,6 +452,8 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
          }
          _newlyImportedTours.put(tourId, tourData);
 
+         tourData.setDeviceName(SuuntoJsonProcessor.DeviceName);
+
          tourData.computeAltitudeUpDown();
          tourData.computeTourDrivingTime();
          tourData.computeComputedValues();
@@ -487,6 +463,6 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
    @Override
    public boolean validateRawData(final String fileName) {
       final String jsonFileContent = GetJsonContentFromGZipFile(fileName, true);
-      return isValidJSONFile(jsonFileContent);
+      return isValidActivity(jsonFileContent);
    }
 }
