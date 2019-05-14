@@ -434,7 +434,7 @@ public class FitDataReader extends TourbookDevice {
 
       try {
 
-         if (!FilenameUtils.getExtension(fileName).equals("fit")) {
+         if (!FilenameUtils.getExtension(fileName).equalsIgnoreCase("fit")) {
             return false;
          }
 
