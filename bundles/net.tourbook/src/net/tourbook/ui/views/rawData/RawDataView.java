@@ -595,12 +595,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    private class TourDataContentProvider implements IStructuredContentProvider {
 
-      public TourDataContentProvider() {
-      }
+      public TourDataContentProvider() {}
 
       @Override
-      public void dispose() {
-      }
+      public void dispose() {}
 
       @Override
       public Object[] getElements(final Object parent) {
@@ -608,8 +606,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       }
 
       @Override
-      public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {
-      }
+      public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
    }
 
    private void action_Easy_SetDeviceWatching_OnOff() {
@@ -775,12 +772,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       _partListener = new IPartListener2() {
 
          @Override
-         public void partActivated(final IWorkbenchPartReference partRef) {
-         }
+         public void partActivated(final IWorkbenchPartReference partRef) {}
 
          @Override
-         public void partBroughtToTop(final IWorkbenchPartReference partRef) {
-         }
+         public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
          @Override
          public void partClosed(final IWorkbenchPartReference partRef) {
@@ -795,8 +790,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          }
 
          @Override
-         public void partDeactivated(final IWorkbenchPartReference partRef) {
-         }
+         public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
          @Override
          public void partHidden(final IWorkbenchPartReference partRef) {
@@ -806,12 +800,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          }
 
          @Override
-         public void partInputChanged(final IWorkbenchPartReference partRef) {
-         }
+         public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
          @Override
-         public void partOpened(final IWorkbenchPartReference partRef) {
-         }
+         public void partOpened(final IWorkbenchPartReference partRef) {}
 
          @Override
          public void partVisible(final IWorkbenchPartReference partRef) {
@@ -4067,8 +4059,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             return true;
          }
 
-      } catch (final Exception e) {
-      }
+      } catch (final Exception e) {}
 
       return false;
    }
@@ -5294,8 +5285,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                         deviceFolderPath.register(folderWatcher, ENTRY_CREATE, ENTRY_DELETE);
                      }
 
-                  } catch (final Exception e) {
-                  }
+                  } catch (final Exception e) {}
                }
 
                if (isDeviceFolderValid) {
@@ -5325,8 +5315,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                         watchBackupFolder.register(folderWatcher, ENTRY_CREATE, ENTRY_DELETE);
                      }
 
-                  } catch (final Exception e) {
-                  }
+                  } catch (final Exception e) {}
                }
 
                // do not update the device state when the import is running otherwise the import file list can be wrong
