@@ -560,8 +560,8 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       yData.setVisibleMinValue(0);
       yData.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
 
-      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_SPEED);
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_SPEED, _activeTourTypeFilter);
+      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_TRINING_EFFECT_AEROB);
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TRINING_EFFECT_AEROB, _activeTourTypeFilter);
 
       chartModel.addYData(yData);
    }
@@ -583,8 +583,8 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       yData.setVisibleMinValue(0);
       yData.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
 
-      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_PACE);
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_PACE, _activeTourTypeFilter);
+      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_TRINING_EFFECT_ANAEROB);
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TRINING_EFFECT_ANAEROB, _activeTourTypeFilter);
 
       chartModel.addYData(yData);
    }
@@ -606,8 +606,8 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       yData.setVisibleMinValue(0);
       yData.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
 
-      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_POWER);
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_POWER, _activeTourTypeFilter);
+      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_TRINING_PERFORMANCE);
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TRINING_PERFORMANCE, _activeTourTypeFilter);
 
       chartModel.addYData(yData);
    }
