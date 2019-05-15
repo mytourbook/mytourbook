@@ -2844,7 +2844,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Training_TrainingEffect() {
 
-      final TreeColumnDefinition colDef = TreeColumnFactory.TRAINING_TRAINING_EFFECT.createColumn(_columnManager, _pc);
+      final TreeColumnDefinition colDef = TreeColumnFactory.TRAINING_TRAINING_EFFECT_AEROB.createColumn(_columnManager, _pc);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -2865,7 +2865,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Training_TrainingEffect_Anaerobic() {
 
-      final TreeColumnDefinition colDef = TreeColumnFactory.TRAINING_TRAINING_EFFECT_ANAEROBIC.createColumn(_columnManager, _pc);
+      final TreeColumnDefinition colDef = TreeColumnFactory.TRAINING_TRAINING_EFFECT_ANAEROB.createColumn(_columnManager, _pc);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override

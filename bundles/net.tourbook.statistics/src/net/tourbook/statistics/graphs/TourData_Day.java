@@ -46,10 +46,10 @@ public class TourData_Day {
    float[]                        distance_Low;
    float[]                        distance_High;
 
-   float[]                        trainingEffect_Low;
-   float[]                        trainingEffect_High;
-   float[]                        trainingEffect_Anaerobic_Low;
-   float[]                        trainingEffect_Anaerobic_High;
+   float[]                        trainingEffect_Aerob_Low;
+   float[]                        trainingEffect_Aerob_High;
+   float[]                        trainingEffect_Anaerob_Low;
+   float[]                        trainingEffect_Anaerob_High;
    float[]                        trainingPerformance_Low;
    float[]                        trainingPerformance_High;
 

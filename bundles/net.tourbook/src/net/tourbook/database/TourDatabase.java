@@ -2879,8 +2879,8 @@ public class TourDatabase {
 
             // version 38 start  -  19.5
             //
-            + " training_TrainingEffect               FLOAT    DEFAULT 0,                 \n" //$NON-NLS-1$
-            + " training_TrainingEffect_Anaerobic     FLOAT    DEFAULT 0,                 \n" //$NON-NLS-1$
+            + " training_TrainingEffect_Aerob         FLOAT    DEFAULT 0,                 \n" //$NON-NLS-1$
+            + " training_TrainingEffect_Anaerob       FLOAT    DEFAULT 0,                 \n" //$NON-NLS-1$
             + " training_TrainingPerformance          FLOAT    DEFAULT 0,                 \n" //$NON-NLS-1$
             //
             // version 38 end
@@ -6993,8 +6993,8 @@ public class TourDatabase {
             SQL.AddCol_VarCar (stmt, TABLE_TOUR_TAG,              "notes", TourTag.DB_LENGTH_NOTES);                 //$NON-NLS-1$
             SQL.AddCol_VarCar (stmt, TABLE_TOUR_TAG_CATEGORY,     "notes", TourTag.DB_LENGTH_NOTES);                 //$NON-NLS-1$
 
-            SQL.AddCol_Float  (stmt, TABLE_TOUR_DATA,             "training_TrainingEffect",             DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_Float  (stmt, TABLE_TOUR_DATA,             "training_TrainingEffect_Anaerobic",   DEFAULT_0); //$NON-NLS-1$
+            SQL.AddCol_Float  (stmt, TABLE_TOUR_DATA,             "training_TrainingEffect_Aerob",       DEFAULT_0); //$NON-NLS-1$
+            SQL.AddCol_Float  (stmt, TABLE_TOUR_DATA,             "training_TrainingEffect_Anaerob",     DEFAULT_0); //$NON-NLS-1$
             SQL.AddCol_Float  (stmt, TABLE_TOUR_DATA,             "training_TrainingPerformance",        DEFAULT_0); //$NON-NLS-1$
 
 // SET_FORMATTING_ON

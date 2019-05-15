@@ -266,7 +266,7 @@ public class Suunto3_STAXHandler {
 
       tourData.setCalories(_tourCalories);
 
-      tourData.setTraining_TrainingEffect(_tourPeakTrainingEffect);
+      tourData.setTraining_TrainingEffect_Aerob(_tourPeakTrainingEffect);
       tourData.setTraining_TrainingPerformance(_tourPerformanceLevel);
 
       tourData.setDeviceId(_device.deviceId);

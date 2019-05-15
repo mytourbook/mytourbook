@@ -388,12 +388,12 @@ public class Messages extends NLS {
    public static String        ColumnFactory_TourWeekYear_Header;
    public static String        ColumnFactory_TourWeekYear_Label;
    public static String        ColumnFactory_TourWeekYear_Tooltip;
-   public static String        ColumnFactory_Training_TrainingEffect_Anaerobic_Header;
-   public static String        ColumnFactory_Training_TrainingEffect_Anaerobic_Label;
-   public static String        ColumnFactory_Training_TrainingEffect_Anaerobic_Tooltip;
-   public static String        ColumnFactory_Training_TrainingEffect_Header;
-   public static String        ColumnFactory_Training_TrainingEffect_Label;
-   public static String        ColumnFactory_Training_TrainingEffect_Tooltip;
+   public static String        ColumnFactory_Training_TrainingEffect_Aerob_Header;
+   public static String        ColumnFactory_Training_TrainingEffect_Aerob_Label;
+   public static String        ColumnFactory_Training_TrainingEffect_Aerob_Tooltip;
+   public static String        ColumnFactory_Training_TrainingEffect_Anaerob_Header;
+   public static String        ColumnFactory_Training_TrainingEffect_Anaerob_Label;
+   public static String        ColumnFactory_Training_TrainingEffect_Anaerob_Tooltip;
    public static String        ColumnFactory_Training_TrainingPerformance_Header;
    public static String        ColumnFactory_Training_TrainingPerformance_Label;
    public static String        ColumnFactory_Training_TrainingPerformance_Tooltip;

@@ -1237,8 +1237,8 @@ public class RawDataManager {
 
          // reimport training only
 
-         oldTourData.setTraining_TrainingEffect(reimportedTourData.getTraining_TrainingEffect());
-         oldTourData.setTraining_TrainingEffect_Anaerobic(reimportedTourData.getTraining_TrainingEffect_Anaerobic());
+         oldTourData.setTraining_TrainingEffect_Aerob(reimportedTourData.getTraining_TrainingEffect_Aerob());
+         oldTourData.setTraining_TrainingEffect_Anaerob(reimportedTourData.getTraining_TrainingEffect_Anaerob());
          oldTourData.setTraining_TrainingPerformance(reimportedTourData.getTraining_TrainingPerformance());
       }
 

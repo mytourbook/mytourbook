@@ -2424,6 +2424,31 @@ public class TourManager {
    }
 
    /**
+    * Set the graph default color from the pref store
+    *
+    * @param yData
+    * @param graphName
+    */
+   public static void setGraphAxisColor(final ChartDataYSerie yData, final String graphName) {
+
+      // get line color from common pref store
+      final IPreferenceStore commonPrefStore = CommonActivator.getPrefStore();
+
+      final RGB prefLineColor = PreferenceConverter.getColor(commonPrefStore,
+            ICommonPreferences.GRAPH_COLORS + graphName + "." + GraphColorManager.PREF_COLOR_LINE);
+
+      /**
+       * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+       * <p>
+       * Default color is used to draw the y-axis text, using the prefTextColor can cause problems
+       * when the color is white for a dark gradient color.
+       * <p>
+       * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+       */
+      yData.setDefaultRGB(prefLineColor);
+   }
+
+   /**
     * set the graph colors from the pref store
     *
     * @param yData

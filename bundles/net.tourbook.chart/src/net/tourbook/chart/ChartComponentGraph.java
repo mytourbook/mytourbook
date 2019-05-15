@@ -2750,7 +2750,7 @@ public class ChartComponentGraph extends Canvas {
       int prevValueIndex = startIndex;
 
       /*
-       * set the hovered index only ONCE because when autoscrolling is done to the right side this
+       * Set the hovered index only ONCE because when autoscrolling is done to the right side this
        * can cause that the last value is used for the hovered index instead of the previous before
        * the last
        */

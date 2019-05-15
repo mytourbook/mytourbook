@@ -74,7 +74,7 @@ public class Messages extends NLS {
    public static String        TourTime_Info_NumberOfTours;
    public static String        Tourtime_Info_TimeZone;
    public static String        Tourtime_Info_TimeZoneDifference;
-   public static String        Tourtime_Info_Training_Effect;
+   public static String        Tourtime_Info_Training_Effect_Aerob;
    public static String        Tourtime_Info_Training_Effect_Anaerob;
    public static String        Tourtime_Info_Training_Performance;
    public static String        tourtime_info_tour_type;

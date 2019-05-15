@@ -120,8 +120,8 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory TRAINING_INTENSITY_FACTOR;
    public static final TreeColumnFactory TRAINING_POWER_TO_WEIGHT;
    public static final TreeColumnFactory TRAINING_STRESS_SCORE;
-   public static final TreeColumnFactory TRAINING_TRAINING_EFFECT;
-   public static final TreeColumnFactory TRAINING_TRAINING_EFFECT_ANAEROBIC;
+   public static final TreeColumnFactory TRAINING_TRAINING_EFFECT_AEROB;
+   public static final TreeColumnFactory TRAINING_TRAINING_EFFECT_ANAEROB;
    public static final TreeColumnFactory TRAINING_TRAINING_PERFORMANCE;
 
    public static final TreeColumnFactory WEATHER_AVG_TEMPERATURE;
@@ -2054,7 +2054,7 @@ public abstract class TreeColumnFactory {
          }
       };
 
-      TRAINING_TRAINING_EFFECT = new TreeColumnFactory() {
+      TRAINING_TRAINING_EFFECT_AEROB = new TreeColumnFactory() {
          @Override
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
                                                   final PixelConverter pixelConverter) {
@@ -2065,9 +2065,9 @@ public abstract class TreeColumnFactory {
                   SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Training);
-            colDef.setColumnLabel(Messages.ColumnFactory_Training_TrainingEffect_Label);
-            colDef.setColumnHeaderText(Messages.ColumnFactory_Training_TrainingEffect_Header);
-            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Training_TrainingEffect_Tooltip);
+            colDef.setColumnLabel(Messages.ColumnFactory_Training_TrainingEffect_Aerob_Label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_Training_TrainingEffect_Aerob_Header);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Training_TrainingEffect_Aerob_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
             colDef.setValueFormats(
@@ -2080,7 +2080,7 @@ public abstract class TreeColumnFactory {
          }
       };
 
-      TRAINING_TRAINING_EFFECT_ANAEROBIC = new TreeColumnFactory() {
+      TRAINING_TRAINING_EFFECT_ANAEROB = new TreeColumnFactory() {
          @Override
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
                                                   final PixelConverter pixelConverter) {
@@ -2091,9 +2091,9 @@ public abstract class TreeColumnFactory {
                   SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Training);
-            colDef.setColumnLabel(Messages.ColumnFactory_Training_TrainingEffect_Anaerobic_Label);
-            colDef.setColumnHeaderText(Messages.ColumnFactory_Training_TrainingEffect_Anaerobic_Header);
-            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Training_TrainingEffect_Anaerobic_Tooltip);
+            colDef.setColumnLabel(Messages.ColumnFactory_Training_TrainingEffect_Anaerob_Label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_Training_TrainingEffect_Anaerob_Header);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Training_TrainingEffect_Anaerob_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
             colDef.setValueFormats(

@@ -62,7 +62,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
@@ -322,7 +321,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       toolTipFormat.append(Messages.tourtime_info_avg_speed + NL);
       toolTipFormat.append(Messages.tourtime_info_avg_pace + NL2);
 
-      toolTipFormat.append(Messages.Tourtime_Info_Training_Effect + NL);
+      toolTipFormat.append(Messages.Tourtime_Info_Training_Effect_Aerob + NL);
       toolTipFormat.append(Messages.Tourtime_Info_Training_Effect_Anaerob + NL);
       toolTipFormat.append(Messages.Tourtime_Info_Training_Performance + NL2);
 
@@ -430,14 +429,14 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
    }
 
    /**
-    * Training effect
+    * Training effect aerob
     */
    void createYData_TrainingEffect(final ChartDataModel chartModel, final ChartType chartType) {
 
       final ChartDataYSerie yData = new ChartDataYSerie(
             chartType,
-            _tourDayData.trainingEffect_Low,
-            _tourDayData.trainingEffect_High);
+            _tourDayData.trainingEffect_Aerob_Low,
+            _tourDayData.trainingEffect_Aerob_High);
 
       yData.setYTitle(Messages.LABEL_GRAPH_TRAINING_EFFECT);
       yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
@@ -446,9 +445,8 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       yData.setVisibleMinValue(0);
       yData.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
 
-      yData.setDefaultRGB(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY).getRGB());
-
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE, _activeTourTypeFilter);
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_SPEED, _activeTourTypeFilter);
+      TourManager.setGraphAxisColor(yData, GraphColorManager.PREF_GRAPH_SPEED);
 
       chartModel.addYData(yData);
    }
@@ -460,8 +458,8 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
 
       final ChartDataYSerie yData = new ChartDataYSerie(
             chartType,
-            _tourDayData.trainingEffect_Anaerobic_Low,
-            _tourDayData.trainingEffect_Anaerobic_High);
+            _tourDayData.trainingEffect_Anaerob_Low,
+            _tourDayData.trainingEffect_Anaerob_High);
 
       yData.setYTitle(Messages.LABEL_GRAPH_TRAINING_EFFECT_ANAEROBIC);
       yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
@@ -470,15 +468,14 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       yData.setVisibleMinValue(0);
       yData.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
 
-      yData.setDefaultRGB(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY).getRGB());
-
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE, _activeTourTypeFilter);
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_PACE, _activeTourTypeFilter);
+      TourManager.setGraphAxisColor(yData, GraphColorManager.PREF_GRAPH_PACE);
 
       chartModel.addYData(yData);
    }
 
    /**
-    * Training performance - Bar
+    * Training performance
     */
    void createYData_TrainingPerformance(final ChartDataModel chartModel, final ChartType chartType) {
 
@@ -494,8 +491,8 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       yData.setVisibleMinValue(0);
       yData.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
 
-      yData.setDefaultRGB(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY).getRGB());
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE, _activeTourTypeFilter);
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_POWER, _activeTourTypeFilter);
+      TourManager.setGraphAxisColor(yData, GraphColorManager.PREF_GRAPH_POWER);
 
       chartModel.addYData(yData);
    }

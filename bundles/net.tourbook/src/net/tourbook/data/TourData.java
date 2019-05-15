@@ -531,8 +531,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @param trainingEffect
     */
-   private float                 training_TrainingEffect;                              // db-version 38
-   private float                 training_TrainingEffect_Anaerobic;                    // db-version 38
+   private float                 training_TrainingEffect_Aerob;                        // db-version 38
+   private float                 training_TrainingEffect_Anaerob;                      // db-version 38
    private float                 training_TrainingPerformance;                         // db-version 38
 
    // ############################################# OTHER TOUR/DEVICE DATA #############################################
@@ -8024,12 +8024,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return tourWayPoints;
    }
 
-   public float getTraining_TrainingEffect() {
-      return training_TrainingEffect;
+   public float getTraining_TrainingEffect_Aerob() {
+      return training_TrainingEffect_Aerob;
    }
 
-   public float getTraining_TrainingEffect_Anaerobic() {
-      return training_TrainingEffect_Anaerobic;
+   public float getTraining_TrainingEffect_Anaerob() {
+      return training_TrainingEffect_Anaerob;
    }
 
    public float getTraining_TrainingPerformance() {
@@ -9318,12 +9318,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       this.tourType = tourType;
    }
 
-   public void setTraining_TrainingEffect(final float trainingEffect) {
-      this.training_TrainingEffect = trainingEffect;
+   public void setTraining_TrainingEffect_Aerob(final float trainingEffect) {
+      this.training_TrainingEffect_Aerob = trainingEffect;
    }
 
-   public void setTraining_TrainingEffect_Anaerobic(final float trainingEffect_Anaerobic) {
-      this.training_TrainingEffect_Anaerobic = trainingEffect_Anaerobic;
+   public void setTraining_TrainingEffect_Anaerob(final float trainingEffect_Anaerobic) {
+      this.training_TrainingEffect_Anaerob = trainingEffect_Anaerobic;
    }
 
    public void setTraining_TrainingPerformance(final float trainingPerformance) {

@@ -83,7 +83,7 @@ public class ChartOptions_Training implements IStatisticOptions {
              * Show training effect
              */
             _chkShow_TrainingEffect = new Button(container, SWT.CHECK);
-            _chkShow_TrainingEffect.setText(Messages.Pref_Statistic_Checkbox_TrainingEffect);
+            _chkShow_TrainingEffect.setText(Messages.Pref_Statistic_Checkbox_TrainingEffect_Aerob);
             _chkShow_TrainingEffect.addSelectionListener(_defaultSelectionListener);
          }
          {
@@ -91,7 +91,7 @@ public class ChartOptions_Training implements IStatisticOptions {
              * Show training effect anaerobic
              */
             _chkShow_TrainingEffect_Anaerobic = new Button(container, SWT.CHECK);
-            _chkShow_TrainingEffect_Anaerobic.setText(Messages.Pref_Statistic_Checkbox_TrainingEffect_Anaerobic);
+            _chkShow_TrainingEffect_Anaerobic.setText(Messages.Pref_Statistic_Checkbox_TrainingEffect_Anaerob);
             _chkShow_TrainingEffect_Anaerobic.addSelectionListener(_defaultSelectionListener);
          }
          {
