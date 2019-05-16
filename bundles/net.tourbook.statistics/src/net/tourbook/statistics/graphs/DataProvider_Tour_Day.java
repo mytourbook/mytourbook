@@ -328,16 +328,20 @@ public class DataProvider_Tour_Day extends DataProvider {
 
                // current tour is at the same day as the tour before
 
-               durationHigh[tourIndex] += durationLow[tourIndex] = durationHigh[tourIndex - 1];
+// SET_FORMATTING_OFF
 
-               altitude_High[tourIndex] += altitudeLow[tourIndex] = altitude_High[tourIndex - 1];
-               avgPace_High[tourIndex] += avgPaceLow[tourIndex] = avgPace_High[tourIndex - 1];
-               avgSpeed_High[tourIndex] += avgSpeedLow[tourIndex] = avgSpeed_High[tourIndex - 1];
-               distance_High[tourIndex] += distanceLow[tourIndex] = distance_High[tourIndex - 1];
+               durationHigh[tourIndex]    += durationLow[tourIndex]  = durationHigh[tourIndex - 1];
 
-               trainingEffect_High[tourIndex] += trainingEffect_Low[tourIndex] = trainingEffect_High[tourIndex - 1];
-               trainingEffect_Anaerobic_High[tourIndex] += trainingEffect_Anaerobic_Low[tourIndex] = trainingEffect_Anaerobic_High[tourIndex - 1];
-               trainingPerformance_High[tourIndex] += trainingPerformance_Low[tourIndex] = trainingPerformance_High[tourIndex - 1];
+               altitude_High[tourIndex]   += altitudeLow[tourIndex]  = altitude_High[tourIndex - 1];
+               avgPace_High[tourIndex]    += avgPaceLow[tourIndex]   = avgPace_High[tourIndex - 1];
+               avgSpeed_High[tourIndex]   += avgSpeedLow[tourIndex]  = avgSpeed_High[tourIndex - 1];
+               distance_High[tourIndex]   += distanceLow[tourIndex]  = distance_High[tourIndex - 1];
+
+               trainingEffect_High[tourIndex]            += trainingEffect_Low[tourIndex]             = trainingEffect_High[tourIndex - 1];
+               trainingEffect_Anaerobic_High[tourIndex]  += trainingEffect_Anaerobic_Low[tourIndex]   = trainingEffect_Anaerobic_High[tourIndex - 1];
+               trainingPerformance_High[tourIndex]       += trainingPerformance_Low[tourIndex]        = trainingPerformance_High[tourIndex - 1];
+
+// SET_FORMATTING_ON
 
             } else {
 
