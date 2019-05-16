@@ -19,7 +19,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-   private static final String BUNDLE_NAME = "net.tourbook.messages";                            //$NON-NLS-1$
+   private static final String BUNDLE_NAME                                 = "net.tourbook.messages"; //$NON-NLS-1$
 
    public static String        Action_Cadence_Set;
    public static String        Action_Cadence_Set_Rpm;
@@ -1672,6 +1672,8 @@ public class Messages extends NLS {
    public static String PrefPage_Import_Checkbox_CreateTourIdWithTime;
    public static String PrefPage_Import_Checkbox_CreateTourIdWithTime_Tooltip;
    public static String PrefPage_Import_Label_Info;
+   public static String PrefPage_Import_Checkbox_IgnoreInvalidFiles;
+   public static String PrefPage_Import_Checkbox_IgnoreInvalidFiles_Tooltip;
 
    public static String PrefPage_ViewActions_Group;
    public static String PrefPage_ViewActions_Label_DoubleClick;

@@ -53,8 +53,10 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
     */
    private Button _chkAutoOpenImportLog;
    private Button _chkCreateTourIdWithTime;
+   private Button _chkIgnoreInvalidFile;
 
    private Label  _lblIdInfo;
+   private Label  _lblInvalidFilesInfo;
 
    @Override
    protected Control createContents(final Composite parent) {
@@ -132,14 +134,38 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
                   .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
                   .applyTo(_lblIdInfo);
          }
+         {
+            /*
+             * Checkbox: Ignore invalid files
+             */
+            _chkIgnoreInvalidFile = new Button(container, SWT.CHECK);
+            _chkIgnoreInvalidFile.setText(Messages.PrefPage_Import_Checkbox_IgnoreInvalidFiles);
+            _chkIgnoreInvalidFile.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults()
+                  .applyTo(_chkIgnoreInvalidFile);
+         }
+         {
+            /*
+             * Label:
+             */
+            _lblInvalidFilesInfo = new Label(container, SWT.WRAP | SWT.READ_ONLY);
+            _lblInvalidFilesInfo.setText(Messages.PrefPage_Import_Checkbox_IgnoreInvalidFiles_Tooltip);
+            GridDataFactory.fillDefaults()//
+                  .grab(true, false)
+                  .indent(_checkboxIndent, 0)
+                  .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
+                  .applyTo(_lblInvalidFilesInfo);
+         }
       }
    }
 
    private void enableControls() {
 
       final boolean isTourIdWithTime = _chkCreateTourIdWithTime.getSelection();
-
       _lblIdInfo.setEnabled(isTourIdWithTime);
+
+      final boolean areInvalidFilesToBeIgnored = _chkIgnoreInvalidFile.getSelection();
+      _lblInvalidFilesInfo.setEnabled(areInvalidFilesToBeIgnored);
    }
 
    @Override
@@ -165,6 +191,7 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
    protected void performDefaults() {
 
       _chkCreateTourIdWithTime.setSelection(RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT);
+      _chkIgnoreInvalidFile.setSelection(RawDataView.STATE_IS_IGNORE_INVALID_FILE_DEFAULT);
 
       enableControls();
 
@@ -197,18 +224,26 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
 
       _chkCreateTourIdWithTime.setSelection(isCreateTourIdWithTime);
       _chkAutoOpenImportLog.setSelection(isOpenImportLog);
+
+      final boolean isIgnoreInvalidFile = Util.getStateBoolean(
+            _state,
+            RawDataView.STATE_IS_IGNORE_INVALID_FILE,
+            RawDataView.STATE_IS_IGNORE_INVALID_FILE_DEFAULT);
+      _chkIgnoreInvalidFile.setSelection(isIgnoreInvalidFile);
    }
 
    private void saveState() {
 
       final boolean isCreateTourIdWithTime = _chkCreateTourIdWithTime.getSelection();
       final boolean isOpenImportLog = _chkAutoOpenImportLog.getSelection();
+      final boolean isIgnoreInvalidFile = _chkIgnoreInvalidFile.getSelection();
 
       _state.put(RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME, isCreateTourIdWithTime);
       _state.put(RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW, isOpenImportLog);
+      _state.put(RawDataView.STATE_IS_IGNORE_INVALID_FILE, isIgnoreInvalidFile);
 
       _rawDataMgr.setState_CreateTourIdWithTime(isCreateTourIdWithTime);
       _rawDataMgr.setState_IsOpenImportLogView(isOpenImportLog);
+      _rawDataMgr.setState_IsIgnoreInvalidFile(isIgnoreInvalidFile);
    }
-
 }

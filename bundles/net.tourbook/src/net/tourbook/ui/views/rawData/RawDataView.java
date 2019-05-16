@@ -245,6 +245,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private static final String STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED     = "STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED";                         //$NON-NLS-1$
    public static final String  STATE_IS_MERGE_TRACKS                      = "isMergeTracks";                                                  //$NON-NLS-1$
    public static final boolean STATE_IS_MERGE_TRACKS_DEFAULT              = false;
+   public static final String  STATE_IS_IGNORE_INVALID_FILE               = "isIgnoreInvalidFile";                                            //$NON-NLS-1$
+   public static final boolean STATE_IS_IGNORE_INVALID_FILE_DEFAULT       = true;
    //
    private static final String HREF_TOKEN                                 = "#";                                                              //$NON-NLS-1$
    private static final String PAGE_ABOUT_BLANK                           = "about:blank";                                                    //$NON-NLS-1$
@@ -4508,6 +4510,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final boolean isCreateTourIdWithTime = _state.getBoolean(STATE_IS_CREATE_TOUR_ID_WITH_TIME);
       _rawDataMgr.setState_CreateTourIdWithTime(isCreateTourIdWithTime);
 
+      // restore: set ignore invalid files status before the tours are imported
+      final boolean isIgnoreInvalidFile = _state.getBoolean(STATE_IS_IGNORE_INVALID_FILE);
+      _rawDataMgr.setState_IsIgnoreInvalidFile(isIgnoreInvalidFile);
+
       // auto open import log view
       final boolean isAutoOpenLogView = Util.getStateBoolean(_state, //
             STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW,
@@ -4670,7 +4676,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             // use newly saved/not saved tours
 
-            final ArrayList<String> invalidFiles = _rawDataMgr.getInvalidFilesList();
+            final ArrayList<String> invalidFiles = RawDataManager.isIgnoreInvalidFile() ? _rawDataMgr.getInvalidFilesList() : null;
 
             runEasyImport_100_DeleteTourFiles(false, importedAndSavedTours, invalidFiles, true);
          }
