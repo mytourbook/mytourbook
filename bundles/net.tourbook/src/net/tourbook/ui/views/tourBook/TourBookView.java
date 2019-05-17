@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -42,6 +42,7 @@ import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.IContextMenuProvider;
 import net.tourbook.common.util.ITourViewer3;
 import net.tourbook.common.util.ITreeViewer;
 import net.tourbook.common.util.PostSelectionProvider;
@@ -149,7 +150,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
-public class TourBookView extends ViewPart implements ITourProvider2, ITourViewer3, ITourProviderByID, ITreeViewer {
+public class TourBookView extends ViewPart implements ITourProvider2, ITourViewer3, ITourProviderByID, ITreeViewer, IContextMenuProvider {
 
 // SET_FORMATTING_OFF
 
@@ -871,7 +872,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          }
       });
 
-      _columnManager.createHeaderContextMenu(tree, treeContextMenu);
+//      _columnManager.createHeaderContextMenu(tree, treeContextMenu);
+      _columnManager.createHeaderContextMenu(tree, this);
    }
 
    private void csvField(final StringBuilder sb, final int fieldValue) {

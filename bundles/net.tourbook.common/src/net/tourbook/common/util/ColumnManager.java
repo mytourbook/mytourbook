@@ -606,10 +606,10 @@ public class ColumnManager {
     * Create header context menu which has the action to modify columns
     *
     * @param composite
-    * @param defaultContextMenu
+    * @param defaultContextMenuProvider
     * @return
     */
-   private Menu createHCM_0_Menu(final Composite composite, final Shell shell, final Menu defaultContextMenu) {
+   private Menu createHCM_0_Menu(final Composite composite, final Shell shell, final IContextMenuProvider defaultContextMenuProvider) {
 
       final Menu headerContextMenu = new Menu(shell, SWT.POP_UP);
 
@@ -623,8 +623,8 @@ public class ColumnManager {
 
             headerContextMenu.dispose();
 
-            if (defaultContextMenu != null) {
-               defaultContextMenu.dispose();
+            if (defaultContextMenuProvider != null) {
+               defaultContextMenuProvider.disposeContextMenu();
             }
          }
       });
@@ -878,28 +878,28 @@ public class ColumnManager {
     * @param defaultContextMenu
     *           can be <code>null</code>
     */
-   public void createHeaderContextMenu(final Table table, final Menu defaultContextMenu) {
-      this.createHeaderContextMenu(table, defaultContextMenu, table.getShell());
+   public void createHeaderContextMenu(final Table table, final IContextMenuProvider defaultContextMenuProvider) {
+      this.createHeaderContextMenu(table, defaultContextMenuProvider, table.getShell());
    }
 
    /**
     * Set context menu depending on the position of the mouse
     *
     * @param table
-    * @param defaultContextMenu
+    * @param defaultContextMenuProvider
     *           can be <code>null</code>
     * @param contextMenuShell
     *           Shell for the context menu. For reparented dialogs, the correct shell must be
     *           provided.
     */
-   public void createHeaderContextMenu(final Table table, final Menu defaultContextMenu, final Shell contextMenuShell) {
+   public void createHeaderContextMenu(final Table table, final IContextMenuProvider defaultContextMenuProvider, final Shell contextMenuShell) {
 
       // remove old listener
       if (_tableMenuDetectListener != null) {
          table.removeListener(SWT.MenuDetect, _tableMenuDetectListener);
       }
 
-      final Menu headerContextMenu[] = { createHCM_0_Menu(table, contextMenuShell, defaultContextMenu) };
+      final Menu headerContextMenu[] = { createHCM_0_Menu(table, contextMenuShell, defaultContextMenuProvider) };
 
       // add the context menu to the table
       _tableMenuDetectListener = new Listener() {
@@ -919,7 +919,7 @@ public class ColumnManager {
 
             _headerColumn = getHeaderColumn(table, mousePosition, isTableHeaderHit);
 
-            Menu contextMenu = getContextMenu(isTableHeaderHit, headerContextMenu[0], defaultContextMenu);
+            Menu contextMenu = getContextMenu(isTableHeaderHit, headerContextMenu[0], defaultContextMenuProvider);
 
             if (contextMenu == headerContextMenu[0] && contextMenu.getShell() != table.getShell()) {
 
@@ -932,9 +932,9 @@ public class ColumnManager {
 
                headerContextMenu[0].dispose();
 
-               headerContextMenu[0] = createHCM_0_Menu(table, table.getShell(), defaultContextMenu);
+               headerContextMenu[0] = createHCM_0_Menu(table, table.getShell(), defaultContextMenuProvider);
 
-               contextMenu = getContextMenu(isTableHeaderHit, headerContextMenu[0], defaultContextMenu);
+               contextMenu = getContextMenu(isTableHeaderHit, headerContextMenu[0], defaultContextMenuProvider);
 
                StatusUtil.log("Context menu has had the wrong parent, header context menu has been recreated.");
             }
@@ -998,9 +998,9 @@ public class ColumnManager {
     * @param defaultContextMenu
     *           can be <code>null</code>
     */
-   public void createHeaderContextMenu(final Tree tree, final Menu defaultContextMenu) {
+   public void createHeaderContextMenu(final Tree tree, final IContextMenuProvider defaultContextMenuProvider) {
 
-      this.createHeaderContextMenu(tree, tree.getShell(), defaultContextMenu);
+      this.createHeaderContextMenu(tree, tree.getShell(), defaultContextMenuProvider);
    }
 
    /**
@@ -1013,14 +1013,14 @@ public class ColumnManager {
     * @param defaultContextMenu
     *           can be <code>null</code>
     */
-   private void createHeaderContextMenu(final Tree tree, final Shell contextMenuShell, final Menu defaultContextMenu) {
+   private void createHeaderContextMenu(final Tree tree, final Shell contextMenuShell, final IContextMenuProvider defaultContextMenuProvider) {
 
       // remove old listener
       if (_treeMenuDetectListener != null) {
          tree.removeListener(SWT.MenuDetect, _treeMenuDetectListener);
       }
 
-      final Menu headerContextMenu[] = { createHCM_0_Menu(tree, contextMenuShell, defaultContextMenu) };
+      final Menu headerContextMenu[] = { createHCM_0_Menu(tree, contextMenuShell, defaultContextMenuProvider) };
 
       // add the context menu to the tree viewer
       _treeMenuDetectListener = new Listener() {
@@ -1041,7 +1041,7 @@ public class ColumnManager {
 
             _headerColumn = getHeaderColumn(tree, mousePosition, isTreeHeaderHit);
 
-            Menu contextMenu = getContextMenu(isTreeHeaderHit, headerContextMenu[0], defaultContextMenu);
+            Menu contextMenu = getContextMenu(isTreeHeaderHit, headerContextMenu[0], defaultContextMenuProvider);
 
             if (contextMenu == headerContextMenu[0] && contextMenu.getShell() != tree.getShell()) {
 
@@ -1054,9 +1054,9 @@ public class ColumnManager {
 
                headerContextMenu[0].dispose();
 
-               headerContextMenu[0] = createHCM_0_Menu(tree, tree.getShell(), defaultContextMenu);
+               headerContextMenu[0] = createHCM_0_Menu(tree, tree.getShell(), defaultContextMenuProvider);
 
-               contextMenu = getContextMenu(isTreeHeaderHit, headerContextMenu[0], defaultContextMenu);
+               contextMenu = getContextMenu(isTreeHeaderHit, headerContextMenu[0], defaultContextMenuProvider);
 
                StatusUtil.log("Context menu has had the wrong parent, header context menu has been recreated.");
             }
@@ -1306,10 +1306,10 @@ public class ColumnManager {
    /**
     * @param isHeaderHit
     * @param headerContextMenu
-    * @param defaultContextMenu
+    * @param defaultContextMenuProvider
     * @return
     */
-   private Menu getContextMenu(final boolean isHeaderHit, final Menu headerContextMenu, final Menu defaultContextMenu) {
+   private Menu getContextMenu(final boolean isHeaderHit, final Menu headerContextMenu, final IContextMenuProvider defaultContextMenuProvider) {
 
       Menu contextMenu;
 
@@ -1326,7 +1326,7 @@ public class ColumnManager {
 
       } else {
 
-         contextMenu = defaultContextMenu;
+         contextMenu = defaultContextMenuProvider.getContextMenu();
       }
 
       return contextMenu;
