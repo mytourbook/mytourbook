@@ -1059,6 +1059,10 @@ public class ColumnManager {
                contextMenu = getContextMenu(isTreeHeaderHit, headerContextMenu[0], defaultContextMenuProvider);
 
                StatusUtil.log("Context menu has had the wrong parent, header context menu has been recreated.");
+
+            } else if (contextMenu == defaultContextMenuProvider.getContextMenu() && contextMenu.getShell() != tree.getShell()) {
+
+               contextMenu = defaultContextMenuProvider.recreateContextMenu();
             }
 
             try {

@@ -18,6 +18,13 @@ package net.tourbook.common.util;
 import org.eclipse.swt.widgets.Menu;
 
 /**
+ * This context menu provider will fix
+ * <p>
+ * <b>IllegalArgumentException: Widget has the wrong parent</b>
+ * <p>
+ * When a view is minimized, then the context menu is already created but has the wrong parent when
+ * the view is displayed later.
+ *
  * @since version 19.5
  */
 public interface IContextMenuProvider {
@@ -31,5 +38,10 @@ public interface IContextMenuProvider {
     * @return Returns the {@link Menu} for the context menu.
     */
    public Menu getContextMenu();
+
+   /**
+    * @return Returns the recreated context menu, the old context menu must be disposed.
+    */
+   public Menu recreateContextMenu();
 
 }

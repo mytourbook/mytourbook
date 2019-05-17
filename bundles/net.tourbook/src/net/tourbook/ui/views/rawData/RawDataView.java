@@ -56,6 +56,7 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.IContextMenuProvider;
 import net.tourbook.common.util.ITourViewer3;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
@@ -295,8 +296,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    //
    private final IPreferenceStore     _prefStore       = TourbookPlugin.getPrefStore();
-   private final IPreferenceStore     _prefStoreCommon = CommonActivator
-         .getPrefStore();
+   private final IPreferenceStore     _prefStoreCommon = CommonActivator.getPrefStore();
    private final IDialogSettings      _state           = TourbookPlugin.getState(ID);
    //
    private RawDataManager             _rawDataMgr      = RawDataManager.getInstance();
@@ -307,18 +307,23 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private TableColumnDefinition      _timeZoneOffsetColDef;
    private ImportComparator           _importComparator;
    //
-   private String                     _columnId_DeviceName;
-   private String                     _columnId_ImportFileName;
-   private String                     _columnId_TimeZone;
-   private String                     _columnId_Title;
-   private String                     _columnId_TourStartDate;
    //
-   private PostSelectionProvider      _postSelectionProvider;
-   private IPartListener2             _partListener;
-   private ISelectionListener         _postSelectionListener;
-   private IPropertyChangeListener    _prefChangeListener;
-   private IPropertyChangeListener    _prefChangeListenerCommon;
-   private ITourEventListener         _tourEventListener;
+   private String                  _columnId_DeviceName;
+   private String                  _columnId_ImportFileName;
+   private String                  _columnId_TimeZone;
+   private String                  _columnId_Title;
+   private String                  _columnId_TourStartDate;
+   //
+   private PostSelectionProvider   _postSelectionProvider;
+   private IPartListener2          _partListener;
+   private ISelectionListener      _postSelectionListener;
+   private IPropertyChangeListener _prefChangeListener;
+   private IPropertyChangeListener _prefChangeListenerCommon;
+   private ITourEventListener      _tourEventListener;
+   //
+   private TagMenuManager          _tagMenuManager;
+   private MenuManager             _viewerMenuManager;
+   private IContextMenuProvider    _viewerContextMenuProvider = new TableContextMenuProvider();
    //
    // context menu actions
    private ActionClearView                _actionClearView;
@@ -373,7 +378,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private boolean                _isToolTipInTitle;
    private boolean                _isToolTipInTags;
    //
-   private TagMenuManager         _tagMenuMgr;
    private TourDoubleClickState   _tourDoubleClickState       = new TourDoubleClickState();
    //
    private Thread                 _watchingStoresThread;
@@ -451,6 +455,35 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private Link      _linkImport;
 
    private Browser   _browser;
+
+   private Menu      _tableContextMenu;
+
+   public class TableContextMenuProvider implements IContextMenuProvider {
+
+      @Override
+      public void disposeContextMenu() {
+
+         if (_tableContextMenu != null) {
+            _tableContextMenu.dispose();
+         }
+      }
+
+      @Override
+      public Menu getContextMenu() {
+         return _tableContextMenu;
+      }
+
+      @Override
+      public Menu recreateContextMenu() {
+
+         disposeContextMenu();
+
+         _tableContextMenu = createUI_96_CreateViewerContextMenu();
+
+         return _tableContextMenu;
+      }
+
+   }
 
    private class ImportComparator extends ViewerComparator {
 
@@ -595,12 +628,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    private class TourDataContentProvider implements IStructuredContentProvider {
 
-      public TourDataContentProvider() {
-      }
+      public TourDataContentProvider() {}
 
       @Override
-      public void dispose() {
-      }
+      public void dispose() {}
 
       @Override
       public Object[] getElements(final Object parent) {
@@ -608,8 +639,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       }
 
       @Override
-      public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {
-      }
+      public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
    }
 
    private void action_Easy_SetDeviceWatching_OnOff() {
@@ -775,12 +805,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       _partListener = new IPartListener2() {
 
          @Override
-         public void partActivated(final IWorkbenchPartReference partRef) {
-         }
+         public void partActivated(final IWorkbenchPartReference partRef) {}
 
          @Override
-         public void partBroughtToTop(final IWorkbenchPartReference partRef) {
-         }
+         public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
          @Override
          public void partClosed(final IWorkbenchPartReference partRef) {
@@ -795,8 +823,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          }
 
          @Override
-         public void partDeactivated(final IWorkbenchPartReference partRef) {
-         }
+         public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
          @Override
          public void partHidden(final IWorkbenchPartReference partRef) {
@@ -806,12 +833,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          }
 
          @Override
-         public void partInputChanged(final IWorkbenchPartReference partRef) {
-         }
+         public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
          @Override
-         public void partOpened(final IWorkbenchPartReference partRef) {
-         }
+         public void partOpened(final IWorkbenchPartReference partRef) {}
 
          @Override
          public void partVisible(final IWorkbenchPartReference partRef) {
@@ -975,9 +1000,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    private void createActions() {
 
-      _actionEditImportPreferences = new ActionOpenPrefDialog(
-            Messages.Import_Data_Action_EditImportPreferences,
-            PrefPageImport.ID);
+      _actionEditImportPreferences = new ActionOpenPrefDialog(Messages.Import_Data_Action_EditImportPreferences, PrefPageImport.ID);
 
       _actionClearView = new ActionClearView(this);
       _actionDeleteTourFile = new ActionDeleteTourFiles(this);
@@ -999,8 +1022,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       _actionSaveTourWithPerson = new ActionSaveTourInDatabase(this, true);
       _actionSetupImport = new ActionSetupImport(this);
       _actionSetTourType = new ActionSetTourTypeMenu(this);
-
-      _tagMenuMgr = new TagMenuManager(this, true);
    }
 
    /**
@@ -2067,10 +2088,26 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       return "<div style='float: right;" + imageBgStyle + "' class='action-button-16'></div>"; //$NON-NLS-1$ //$NON-NLS-2$
    }
 
+   private void createMenuManager() {
+
+      _tagMenuManager = new TagMenuManager(this, true);
+
+      _viewerMenuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+      _viewerMenuManager.setRemoveAllWhenShown(true);
+      _viewerMenuManager.addMenuListener(new IMenuListener() {
+         @Override
+         public void menuAboutToShow(final IMenuManager manager) {
+
+            fillContextMenu(manager);
+         }
+      });
+   }
+
    @Override
    public void createPartControl(final Composite parent) {
 
       initUI(parent);
+      createMenuManager();
 
       // define all columns
       _columnManager = new ColumnManager(this, _state);
@@ -2574,33 +2611,35 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     */
    private void createUI_94_ContextMenu() {
 
-      final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
-      menuMgr.setRemoveAllWhenShown(true);
-      menuMgr.addMenuListener(new IMenuListener() {
-         @Override
-         public void menuAboutToShow(final IMenuManager manager) {
-            fillContextMenu(manager);
-         }
-      });
+      _tableContextMenu = createUI_96_CreateViewerContextMenu();
 
       final Table table = (Table) _tourViewer.getControl();
-      final Menu tableContextMenu = menuMgr.createContextMenu(table);
+
+      _columnManager.createHeaderContextMenu(table, _viewerContextMenuProvider);
+
+      // this is from the beginning of the MT development and may not be needed
+      getSite().registerContextMenu(_viewerMenuManager, _tourViewer);
+   }
+
+   private Menu createUI_96_CreateViewerContextMenu() {
+
+      final Table table = (Table) _tourViewer.getControl();
+
+      final Menu tableContextMenu = _viewerMenuManager.createContextMenu(table);
 
       tableContextMenu.addMenuListener(new MenuAdapter() {
          @Override
          public void menuHidden(final MenuEvent e) {
-            _tagMenuMgr.onHideMenu();
+            _tagMenuManager.onHideMenu();
          }
 
          @Override
          public void menuShown(final MenuEvent menuEvent) {
-            _tagMenuMgr.onShowMenu(menuEvent, table, Display.getCurrent().getCursorLocation(), _tourInfoToolTip);
+            _tagMenuManager.onShowMenu(menuEvent, table, Display.getCurrent().getCursorLocation(), _tourInfoToolTip);
          }
       });
 
-      getSite().registerContextMenu(menuMgr, _tourViewer);
-
-      _columnManager.createHeaderContextMenu(table, tableContextMenu);
+      return tableContextMenu;
    }
 
    private void createUI_NewUI() {
@@ -3615,7 +3654,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       }
 
       // enable/disable actions for tags/tour types
-      _tagMenuMgr.enableTagActions(isSavedTourSelected, isOneTour, existingTagIds);
+      _tagMenuManager.enableTagActions(isSavedTourSelected, isOneTour, existingTagIds);
       TourTypeMenuManager.enableRecentTourTypeActions(isSavedTourSelected, existingTourTypeId);
 
       /*
@@ -3658,7 +3697,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, this, true);
 
       // tour tag actions
-      _tagMenuMgr.fillTagMenu(menuMgr);
+      _tagMenuManager.fillTagMenu(menuMgr);
 
       // add standard group which allows other plug-ins to contribute here
       menuMgr.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
@@ -4067,8 +4106,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             return true;
          }
 
-      } catch (final Exception e) {
-      }
+      } catch (final Exception e) {}
 
       return false;
    }
@@ -5294,8 +5332,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                         deviceFolderPath.register(folderWatcher, ENTRY_CREATE, ENTRY_DELETE);
                      }
 
-                  } catch (final Exception e) {
-                  }
+                  } catch (final Exception e) {}
                }
 
                if (isDeviceFolderValid) {
@@ -5325,8 +5362,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                         watchBackupFolder.register(folderWatcher, ENTRY_CREATE, ENTRY_DELETE);
                      }
 
-                  } catch (final Exception e) {
-                  }
+                  } catch (final Exception e) {}
                }
 
                // do not update the device state when the import is running otherwise the import file list can be wrong
