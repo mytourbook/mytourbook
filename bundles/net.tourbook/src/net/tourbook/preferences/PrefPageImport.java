@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -38,177 +38,212 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageImport extends PreferencePage implements IWorkbenchPreferencePage {
 
-	public static final String		ID			= "net.tourbook.preferences.PrefPageImport";	//$NON-NLS-1$
+   public static final String    ID          = "net.tourbook.preferences.PrefPageImport"; //$NON-NLS-1$
 
-	private final IDialogSettings	_state		= TourbookPlugin.getState(RawDataView.ID);
+   private final IDialogSettings _state      = TourbookPlugin.getState(RawDataView.ID);
 
-	private RawDataManager			_rawDataMgr	= RawDataManager.getInstance();
+   private RawDataManager        _rawDataMgr = RawDataManager.getInstance();
 
-	private PixelConverter			_pc;
-	private SelectionAdapter		_defaultSelectionListener;
-	private int						_checkboxIndent;
+   private PixelConverter        _pc;
+   private SelectionAdapter      _defaultSelectionListener;
+   private int                   _checkboxIndent;
 
-	/*
-	 * UI controls
-	 */
-	private Button					_chkAutoOpenImportLog;
-	private Button					_chkCreateTourIdWithTime;
+   /*
+    * UI controls
+    */
+   private Button _chkAutoOpenImportLog;
+   private Button _chkCreateTourIdWithTime;
+   private Button _chkIgnoreInvalidFile;
 
-	private Label					_lblIdInfo;
+   private Label  _lblIdInfo;
+   private Label  _lblInvalidFilesInfo;
 
-	@Override
-	protected Control createContents(final Composite parent) {
+   @Override
+   protected Control createContents(final Composite parent) {
 
-		initUI(parent);
+      initUI(parent);
 
-		final Composite ui = createUI(parent);
+      final Composite ui = createUI(parent);
 
-		restoreState();
-		enableControls();
+      restoreState();
+      enableControls();
 
-		return ui;
-	}
+      return ui;
+   }
 
-	private Composite createUI(final Composite parent) {
+   private Composite createUI(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-		{
-			createUI_10_General(container);
-		}
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      {
+         createUI_10_General(container);
+      }
 
-		return container;
-	}
+      return container;
+   }
 
-	private void createUI_10_General(final Composite parent) {
+   private void createUI_10_General(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-		{
-			{
-				/*
-				 * Label: common info
-				 */
-				final Label label = new Label(container, SWT.NONE);
-				label.setText(Messages.PrefPage_Import_Label_Info);
-				GridDataFactory.fillDefaults().applyTo(label);
-			}
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      {
+         {
+            /*
+             * Label: common info
+             */
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(Messages.PrefPage_Import_Label_Info);
+            GridDataFactory.fillDefaults().applyTo(label);
+         }
 
-			{
-				/*
-				 * Checkbox: Open import log
-				 */
-				_chkAutoOpenImportLog = new Button(container, SWT.CHECK);
-				_chkAutoOpenImportLog.setText(Messages.PrefPage_Import_Checkbox_AutoOpenTourLogView);
-				_chkAutoOpenImportLog.addSelectionListener(_defaultSelectionListener);
-				GridDataFactory.fillDefaults()//
-						.indent(0, _pc.convertVerticalDLUsToPixels(4))
-						.applyTo(_chkAutoOpenImportLog);
-			}
+         {
+            /*
+             * Checkbox: Open import log
+             */
+            _chkAutoOpenImportLog = new Button(container, SWT.CHECK);
+            _chkAutoOpenImportLog.setText(Messages.PrefPage_Import_Checkbox_AutoOpenTourLogView);
+            _chkAutoOpenImportLog.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults()//
+                  .indent(0, _pc.convertVerticalDLUsToPixels(4))
+                  .applyTo(_chkAutoOpenImportLog);
+         }
 
-			{
-				/*
-				 * Checkbox: create tour id with time
-				 */
-				_chkCreateTourIdWithTime = new Button(container, SWT.CHECK);
-				_chkCreateTourIdWithTime.setText(Messages.PrefPage_Import_Checkbox_CreateTourIdWithTime);
-				_chkCreateTourIdWithTime.addSelectionListener(_defaultSelectionListener);
-				GridDataFactory.fillDefaults()//
+         {
+            /*
+             * Checkbox: create tour id with time
+             */
+            _chkCreateTourIdWithTime = new Button(container, SWT.CHECK);
+            _chkCreateTourIdWithTime.setText(Messages.PrefPage_Import_Checkbox_CreateTourIdWithTime);
+            _chkCreateTourIdWithTime.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults()//
 //						.indent(0, _pc.convertVerticalDLUsToPixels(4))
-						.applyTo(_chkCreateTourIdWithTime);
-			}
+                  .applyTo(_chkCreateTourIdWithTime);
+         }
 
-			{
-				/*
-				 * Label: id info
-				 */
-				_lblIdInfo = new Label(container, SWT.WRAP | SWT.READ_ONLY);
-				_lblIdInfo.setText(Messages.PrefPage_Import_Checkbox_CreateTourIdWithTime_Tooltip);
-				GridDataFactory.fillDefaults()//
-						.grab(true, false)
-						.indent(_checkboxIndent, 0)
-						.hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
-						.applyTo(_lblIdInfo);
-			}
-		}
-	}
+         {
+            /*
+             * Label: id info
+             */
+            _lblIdInfo = new Label(container, SWT.WRAP | SWT.READ_ONLY);
+            _lblIdInfo.setText(Messages.PrefPage_Import_Checkbox_CreateTourIdWithTime_Tooltip);
+            GridDataFactory.fillDefaults()//
+                  .grab(true, false)
+                  .indent(_checkboxIndent, 0)
+                  .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
+                  .applyTo(_lblIdInfo);
+         }
+         {
+            /*
+             * Checkbox: Ignore invalid files
+             */
+            _chkIgnoreInvalidFile = new Button(container, SWT.CHECK);
+            _chkIgnoreInvalidFile.setText(Messages.PrefPage_Import_Checkbox_IgnoreInvalidFiles);
+            _chkIgnoreInvalidFile.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults()
+                  .applyTo(_chkIgnoreInvalidFile);
+         }
+         {
+            /*
+             * Label:
+             */
+            _lblInvalidFilesInfo = new Label(container, SWT.WRAP | SWT.READ_ONLY);
+            _lblInvalidFilesInfo.setText(Messages.PrefPage_Import_Checkbox_IgnoreInvalidFiles_Tooltip);
+            GridDataFactory.fillDefaults()//
+                  .grab(true, false)
+                  .indent(_checkboxIndent, 0)
+                  .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
+                  .applyTo(_lblInvalidFilesInfo);
+         }
+      }
+   }
 
-	private void enableControls() {
+   private void enableControls() {
 
-		final boolean isTourIdWithTime = _chkCreateTourIdWithTime.getSelection();
+      final boolean isTourIdWithTime = _chkCreateTourIdWithTime.getSelection();
+      _lblIdInfo.setEnabled(isTourIdWithTime);
 
-		_lblIdInfo.setEnabled(isTourIdWithTime);
-	}
+      final boolean areInvalidFilesToBeIgnored = _chkIgnoreInvalidFile.getSelection();
+      _lblInvalidFilesInfo.setEnabled(areInvalidFilesToBeIgnored);
+   }
 
-	@Override
-	public void init(final IWorkbench workbench) {
+   @Override
+   public void init(final IWorkbench workbench) {
 
-	}
+   }
 
-	private void initUI(final Composite parent) {
+   private void initUI(final Composite parent) {
 
-		_pc = new PixelConverter(parent);
+      _pc = new PixelConverter(parent);
 
-		_checkboxIndent = _pc.convertHorizontalDLUsToPixels(10);
+      _checkboxIndent = _pc.convertHorizontalDLUsToPixels(10);
 
-		_defaultSelectionListener = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				enableControls();
-			}
-		};
-	}
+      _defaultSelectionListener = new SelectionAdapter() {
+         @Override
+         public void widgetSelected(final SelectionEvent e) {
+            enableControls();
+         }
+      };
+   }
 
-	@Override
-	protected void performDefaults() {
+   @Override
+   protected void performDefaults() {
 
-		_chkCreateTourIdWithTime.setSelection(RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT);
+      _chkCreateTourIdWithTime.setSelection(RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT);
+      _chkIgnoreInvalidFile.setSelection(RawDataView.STATE_IS_IGNORE_INVALID_FILE_DEFAULT);
 
-		enableControls();
+      enableControls();
 
-		super.performDefaults();
-	}
+      super.performDefaults();
+   }
 
-	@Override
-	public boolean performOk() {
+   @Override
+   public boolean performOk() {
 
-		final boolean isOK = super.performOk();
+      final boolean isOK = super.performOk();
 
-		if (isOK) {
-			saveState();
-		}
+      if (isOK) {
+         saveState();
+      }
 
-		return isOK;
-	}
+      return isOK;
+   }
 
-	private void restoreState() {
+   private void restoreState() {
 
-		final boolean isCreateTourIdWithTime = Util.getStateBoolean(
-				_state,
-				RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME,
-				RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT);
+      final boolean isCreateTourIdWithTime = Util.getStateBoolean(
+            _state,
+            RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME,
+            RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT);
 
-		final boolean isOpenImportLog = Util.getStateBoolean(
-				_state,
-				RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW,
-				RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT);
+      final boolean isOpenImportLog = Util.getStateBoolean(
+            _state,
+            RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW,
+            RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT);
 
-		_chkCreateTourIdWithTime.setSelection(isCreateTourIdWithTime);
-		_chkAutoOpenImportLog.setSelection(isOpenImportLog);
-	}
+      _chkCreateTourIdWithTime.setSelection(isCreateTourIdWithTime);
+      _chkAutoOpenImportLog.setSelection(isOpenImportLog);
 
-	private void saveState() {
+      final boolean isIgnoreInvalidFile = Util.getStateBoolean(
+            _state,
+            RawDataView.STATE_IS_IGNORE_INVALID_FILE,
+            RawDataView.STATE_IS_IGNORE_INVALID_FILE_DEFAULT);
+      _chkIgnoreInvalidFile.setSelection(isIgnoreInvalidFile);
+   }
 
-		final boolean isCreateTourIdWithTime = _chkCreateTourIdWithTime.getSelection();
-		final boolean isOpenImportLog = _chkAutoOpenImportLog.getSelection();
+   private void saveState() {
 
-		_state.put(RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME, isCreateTourIdWithTime);
-		_state.put(RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW, isOpenImportLog);
+      final boolean isCreateTourIdWithTime = _chkCreateTourIdWithTime.getSelection();
+      final boolean isOpenImportLog = _chkAutoOpenImportLog.getSelection();
+      final boolean isIgnoreInvalidFile = _chkIgnoreInvalidFile.getSelection();
 
-		_rawDataMgr.setState_CreateTourIdWithTime(isCreateTourIdWithTime);
-		_rawDataMgr.setState_IsOpenImportLogView(isOpenImportLog);
-	}
+      _state.put(RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME, isCreateTourIdWithTime);
+      _state.put(RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW, isOpenImportLog);
+      _state.put(RawDataView.STATE_IS_IGNORE_INVALID_FILE, isIgnoreInvalidFile);
 
+      _rawDataMgr.setState_CreateTourIdWithTime(isCreateTourIdWithTime);
+      _rawDataMgr.setState_IsOpenImportLogView(isOpenImportLog);
+      _rawDataMgr.setState_IsIgnoreInvalidFile(isIgnoreInvalidFile);
+   }
 }
