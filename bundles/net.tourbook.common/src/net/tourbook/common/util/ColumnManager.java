@@ -883,7 +883,7 @@ public class ColumnManager {
    }
 
    /**
-    * set context menu depending on the position of the mouse
+    * Set context menu depending on the position of the mouse
     *
     * @param table
     * @param defaultContextMenu
@@ -899,7 +899,7 @@ public class ColumnManager {
          table.removeListener(SWT.MenuDetect, _tableMenuDetectListener);
       }
 
-      final Menu headerContextMenu = createHCM_0_Menu(table, contextMenuShell, defaultContextMenu);
+      final Menu headerContextMenu[] = { createHCM_0_Menu(table, contextMenuShell, defaultContextMenu) };
 
       // add the context menu to the table
       _tableMenuDetectListener = new Listener() {
@@ -919,9 +919,44 @@ public class ColumnManager {
 
             _headerColumn = getHeaderColumn(table, mousePosition, isTableHeaderHit);
 
-            final Menu contextMenu = getContextMenu(isTableHeaderHit, headerContextMenu, defaultContextMenu);
+            Menu contextMenu = getContextMenu(isTableHeaderHit, headerContextMenu[0], defaultContextMenu);
 
-            table.setMenu(contextMenu);
+            if (contextMenu == headerContextMenu[0] && contextMenu.getShell() != table.getShell()) {
+
+               /**
+                * java.lang.IllegalArgumentException: Widget has the wrong parent
+                * <p>
+                * When a view is minimized, then the context menu is already created
+                * but has the wrong parent when the view is displayed lateron.
+                */
+
+               headerContextMenu[0].dispose();
+
+               headerContextMenu[0] = createHCM_0_Menu(table, table.getShell(), defaultContextMenu);
+
+               contextMenu = getContextMenu(isTableHeaderHit, headerContextMenu[0], defaultContextMenu);
+
+               StatusUtil.log("Context menu has had the wrong parent, header context menu has been recreated.");
+            }
+
+            try {
+
+               table.setMenu(contextMenu);
+
+            } catch (final IllegalArgumentException e) {
+
+               // This occured: Widget has the wrong parent
+
+               // after some debugging, could not find the reason, this view is very similar to the tourbook view
+
+               /*
+                * The problem can occure when tours are compared with 2 different perspectives (ref
+                * tour and compare result), the system measurement is changed and the context menu
+                * for the ref tours will be opened
+                */
+
+               StatusUtil.showStatus(e);
+            }
 
             /*
              * Set context menu position to the right border of the column
@@ -985,7 +1020,7 @@ public class ColumnManager {
          tree.removeListener(SWT.MenuDetect, _treeMenuDetectListener);
       }
 
-      final Menu headerContextMenu = createHCM_0_Menu(tree, contextMenuShell, defaultContextMenu);
+      final Menu headerContextMenu[] = { createHCM_0_Menu(tree, contextMenuShell, defaultContextMenu) };
 
       // add the context menu to the tree viewer
       _treeMenuDetectListener = new Listener() {
@@ -1006,7 +1041,25 @@ public class ColumnManager {
 
             _headerColumn = getHeaderColumn(tree, mousePosition, isTreeHeaderHit);
 
-            final Menu contextMenu = getContextMenu(isTreeHeaderHit, headerContextMenu, defaultContextMenu);
+            Menu contextMenu = getContextMenu(isTreeHeaderHit, headerContextMenu[0], defaultContextMenu);
+
+            if (contextMenu == headerContextMenu[0] && contextMenu.getShell() != tree.getShell()) {
+
+               /**
+                * java.lang.IllegalArgumentException: Widget has the wrong parent
+                * <p>
+                * When a view is minimized, then the context menu is already created
+                * but has the wrong parent when the view is displayed lateron.
+                */
+
+               headerContextMenu[0].dispose();
+
+               headerContextMenu[0] = createHCM_0_Menu(tree, tree.getShell(), defaultContextMenu);
+
+               contextMenu = getContextMenu(isTreeHeaderHit, headerContextMenu[0], defaultContextMenu);
+
+               StatusUtil.log("Context menu has had the wrong parent, header context menu has been recreated.");
+            }
 
             try {
 
@@ -1014,7 +1067,7 @@ public class ColumnManager {
 
             } catch (final IllegalArgumentException e) {
 
-               // this occured: Widget has the wrong parent
+               // This occured: Widget has the wrong parent
 
                // after some debugging, could not find the reason, this view is very similar to the tourbook view
 
