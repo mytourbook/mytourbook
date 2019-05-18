@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -47,504 +47,506 @@ import org.eclipse.swt.widgets.Composite;
 
 public class PhotoGallery extends ImageGallery {
 
-	private static final String			STATE_GALLERY_SORTING				= "STATE_GALLERY_SORTING";					//$NON-NLS-1$
-	private static final String			STATE_GALLERY_TYPE					= "STATE_GALLERY_TYPE";					//$NON-NLS-1$
-	private static final String			STATE_PHOTO_FILTER_GPS				= "STATE_PHOTO_FILTER_GPS";				//$NON-NLS-1$
-	private static final String			STATE_PHOTO_FILTER_TOUR				= "STATE_PHOTO_FILTER_TOUR";				//$NON-NLS-1$
-	private static final String			STATE_IS_SHOW_PHOTO_GPS_ANNOTATION	= "STATE_IS_SHOW_PHOTO_GPS_ANNOTATION";	//$NON-NLS-1$
-	private static final String			STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY	= "STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY";	//$NON-NLS-1$
-	private static final String			STATE_IS_SHOW_PHOTO_TOOLTIP			= "STATE_IS_SHOW_PHOTO_TOOLTIP";			//$NON-NLS-1$
-	private static final String			STATE_PHOTO_INFO_DATE				= "STATE_PHOTO_INFO_DATE";					//$NON-NLS-1$
-	private static final String			STATE_RATING_STAR_BEHAVIOUR			= "STATE_RATING_STAR_BEHAVIOUR";			//$NON-NLS-1$
+   private static final String        STATE_GALLERY_SORTING               = "STATE_GALLERY_SORTING";               //$NON-NLS-1$
+   private static final String        STATE_GALLERY_TYPE                  = "STATE_GALLERY_TYPE";                  //$NON-NLS-1$
+   private static final String        STATE_PHOTO_FILTER_GPS              = "STATE_PHOTO_FILTER_GPS";              //$NON-NLS-1$
+   private static final String        STATE_PHOTO_FILTER_TOUR             = "STATE_PHOTO_FILTER_TOUR";             //$NON-NLS-1$
+   private static final String        STATE_IS_SHOW_PHOTO_GPS_ANNOTATION  = "STATE_IS_SHOW_PHOTO_GPS_ANNOTATION";  //$NON-NLS-1$
+   private static final String        STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY = "STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY"; //$NON-NLS-1$
+   private static final String        STATE_IS_SHOW_PHOTO_TOOLTIP         = "STATE_IS_SHOW_PHOTO_TOOLTIP";         //$NON-NLS-1$
+   private static final String        STATE_PHOTO_INFO_DATE               = "STATE_PHOTO_INFO_DATE";               //$NON-NLS-1$
+   private static final String        STATE_RATING_STAR_BEHAVIOUR         = "STATE_RATING_STAR_BEHAVIOUR";         //$NON-NLS-1$
 
-	private IDialogSettings				_state;
-	private PhotoDateInfo				_photoDateInfo;
+   private IDialogSettings            _state;
+   private PhotoDateInfo              _photoDateInfo;
 
-	private boolean						_isShowActionFiltering				= true;
-	private boolean						_isShowActionSorting				= true;
+   private boolean                    _isShowActionFiltering              = true;
+   private boolean                    _isShowActionSorting                = true;
 
-	private ActionPhotoFilterGPS		_actionPhotoFilterGPS;
-	private ActionPhotoFilterNoGPS		_actionPhotoFilterNoGPS;
-	private ActionPhotoFilterTour		_actionPhotoFilterTour;
-	private ActionPhotoFilterNoTour		_actionPhotoFilterNoTour;
-	private ActionPhotoGalleryType		_actionPhotoGalleryType;
-	private ActionShowPhotoName			_actionShowPhotoName;
-	private ActionShowPhotoDate			_actionShowPhotoDate;
-	private ActionShowPhotoRatingStars	_actionShowPhotoRatingStars;
-	private ActionShowPhotoTooltip		_actionShowPhotoTooltip;
-	private ActionShowAnnotations		_actionShowGPSAnnotation;
-	private ActionSortByFileDate		_actionSortFileByDate;
-	private ActionSortByFileName		_actionSortByFileName;
+   private ActionPhotoFilterGPS       _actionPhotoFilterGPS;
+   private ActionPhotoFilterNoGPS     _actionPhotoFilterNoGPS;
+   private ActionPhotoFilterTour      _actionPhotoFilterTour;
+   private ActionPhotoFilterNoTour    _actionPhotoFilterNoTour;
+   private ActionPhotoGalleryType     _actionPhotoGalleryType;
+   private ActionShowPhotoName        _actionShowPhotoName;
+   private ActionShowPhotoDate        _actionShowPhotoDate;
+   private ActionShowPhotoRatingStars _actionShowPhotoRatingStars;
+   private ActionShowPhotoTooltip     _actionShowPhotoTooltip;
+   private ActionShowAnnotations      _actionShowGPSAnnotation;
+   private ActionSortByFileDate       _actionSortFileByDate;
+   private ActionSortByFileName       _actionSortByFileName;
 
-	private PhotoFilterGPS				_photoFilterGPS						= PhotoFilterGPS.NO_FILTER;
-	private PhotoFilterTour				_photoFilterTour					= PhotoFilterTour.NO_FILTER;
+   private PhotoFilterGPS             _photoFilterGPS                     = PhotoFilterGPS.NO_FILTER;
+   private PhotoFilterTour            _photoFilterTour                    = PhotoFilterTour.NO_FILTER;
 
-	private GallerySorting				_gallerySorting;
-	private GalleryType					_galleryType;
+   private GallerySorting             _gallerySorting;
+   private GalleryType                _galleryType;
 
-	private RatingStarBehaviour			_ratingStarBehaviour;
+   private RatingStarBehaviour        _ratingStarBehaviour;
 
-	public PhotoGallery(final IDialogSettings state) {
+   public PhotoGallery(final IDialogSettings state) {
 
-		super(state);
+      super(state);
 
-		_state = state;
-	}
+      _state = state;
+   }
 
-	public void actionImageFilterGPS(final Action filterAction) {
+   public void actionImageFilterGPS(final Action filterAction) {
 
-		/*
-		 * get selected filter, uncheck other
-		 */
-		if (filterAction == _actionPhotoFilterGPS) {
+      /*
+       * get selected filter, uncheck other
+       */
+      if (filterAction == _actionPhotoFilterGPS) {
 
-			_photoFilterGPS = filterAction.isChecked() ? PhotoFilterGPS.WITH_GPS : PhotoFilterGPS.NO_FILTER;
+         _photoFilterGPS = filterAction.isChecked() ? PhotoFilterGPS.WITH_GPS : PhotoFilterGPS.NO_FILTER;
 
-			_actionPhotoFilterNoGPS.setChecked(false);
+         _actionPhotoFilterNoGPS.setChecked(false);
 
-		} else if (filterAction == _actionPhotoFilterNoGPS) {
+      } else if (filterAction == _actionPhotoFilterNoGPS) {
 
-			_photoFilterGPS = filterAction.isChecked() ? PhotoFilterGPS.NO_GPS : PhotoFilterGPS.NO_FILTER;
+         _photoFilterGPS = filterAction.isChecked() ? PhotoFilterGPS.NO_GPS : PhotoFilterGPS.NO_FILTER;
 
-			_actionPhotoFilterGPS.setChecked(false);
-		}
+         _actionPhotoFilterGPS.setChecked(false);
+      }
 
-		// update gallery
+      // update gallery
 
-		filterGallery(_photoFilterGPS, _photoFilterTour);
-	}
+      filterGallery(_photoFilterGPS, _photoFilterTour);
+   }
 
-	public void actionImageFilterTour(final Action filterAction) {
+   public void actionImageFilterTour(final Action filterAction) {
 
-		/*
-		 * get selected filter, uncheck other
-		 */
-		if (filterAction == _actionPhotoFilterTour) {
+      /*
+       * get selected filter, uncheck other
+       */
+      if (filterAction == _actionPhotoFilterTour) {
 
-			_photoFilterTour = filterAction.isChecked() ? PhotoFilterTour.WITH_TOURS : PhotoFilterTour.NO_FILTER;
+         _photoFilterTour = filterAction.isChecked() ? PhotoFilterTour.WITH_TOURS : PhotoFilterTour.NO_FILTER;
 
-			_actionPhotoFilterNoTour.setChecked(false);
+         _actionPhotoFilterNoTour.setChecked(false);
 
-		} else if (filterAction == _actionPhotoFilterNoTour) {
+      } else if (filterAction == _actionPhotoFilterNoTour) {
 
-			_photoFilterTour = filterAction.isChecked() ? PhotoFilterTour.NO_TOURS : PhotoFilterTour.NO_FILTER;
+         _photoFilterTour = filterAction.isChecked() ? PhotoFilterTour.NO_TOURS : PhotoFilterTour.NO_FILTER;
 
-			_actionPhotoFilterTour.setChecked(false);
-		}
+         _actionPhotoFilterTour.setChecked(false);
+      }
 
-		// update gallery
+      // update gallery
 
-		filterGallery(_photoFilterGPS, _photoFilterTour);
-	}
+      filterGallery(_photoFilterGPS, _photoFilterTour);
+   }
 
-	public void actionPhotoGalleryType() {
+   public void actionPhotoGalleryType() {
 
-		/*
-		 * toggle gallery type
-		 */
-		if (_galleryType == GalleryType.THUMBNAIL) {
-			_galleryType = GalleryType.DETAILS;
-		} else {
-			_galleryType = GalleryType.THUMBNAIL;
-		}
-		updateUI_GalleryType(_galleryType);
+      /*
+       * toggle gallery type
+       */
+      if (_galleryType == GalleryType.THUMBNAIL) {
+         _galleryType = GalleryType.DETAILS;
+      } else {
+         _galleryType = GalleryType.THUMBNAIL;
+      }
+      updateUI_GalleryType(_galleryType);
 
-		selectGalleryType(_galleryType);
-	}
+      selectGalleryType(_galleryType);
+   }
 
-	public void actionShowPhotoInfo(final Action action) {
+   public void actionShowPhotoInfo(final Action action) {
 
-		if (action == _actionShowPhotoDate) {
+      if (action == _actionShowPhotoDate) {
 
-			// toggle date info
+         // toggle date info
 
-			if (_photoDateInfo == PhotoDateInfo.NoDateTime) {
+         if (_photoDateInfo == PhotoDateInfo.NoDateTime) {
 
-				// nothing -> date
+            // nothing -> date
 
-				_photoDateInfo = PhotoDateInfo.Date;
+            _photoDateInfo = PhotoDateInfo.Date;
 
-			} else if (_photoDateInfo == PhotoDateInfo.Date) {
+         } else if (_photoDateInfo == PhotoDateInfo.Date) {
 
-				// date -> time
+            // date -> time
 
-				_photoDateInfo = PhotoDateInfo.Time;
+            _photoDateInfo = PhotoDateInfo.Time;
 
-			} else if (_photoDateInfo == PhotoDateInfo.Time) {
+         } else if (_photoDateInfo == PhotoDateInfo.Time) {
 
-				// time -> date/time
+            // time -> date/time
 
-				_photoDateInfo = PhotoDateInfo.DateTime;
+            _photoDateInfo = PhotoDateInfo.DateTime;
 
-			} else {
+         } else {
 
-				// time -> nothing
+            // time -> nothing
 
-				_photoDateInfo = PhotoDateInfo.NoDateTime;
-			}
+            _photoDateInfo = PhotoDateInfo.NoDateTime;
+         }
 
-			_actionShowPhotoDate.setChecked(_photoDateInfo != PhotoDateInfo.NoDateTime);
-		}
+         _actionShowPhotoDate.setChecked(_photoDateInfo != PhotoDateInfo.NoDateTime);
+      }
 
-		showInfo(//
-				_actionShowPhotoName.isChecked(),
-				_photoDateInfo,
-				_actionShowGPSAnnotation.isChecked(),
-				_actionShowPhotoTooltip.isChecked());
-	}
+      showInfo(//
+            _actionShowPhotoName.isChecked(),
+            _photoDateInfo,
+            _actionShowGPSAnnotation.isChecked(),
+            _actionShowPhotoTooltip.isChecked());
+   }
 
-	public void actionShowPhotoRatingStars() {
+   public void actionShowPhotoRatingStars() {
 
-		/*
-		 * toggle rating stars
-		 */
-		if (_ratingStarBehaviour == RatingStarBehaviour.NO_STARS) {
+      /*
+       * toggle rating stars
+       */
+      if (_ratingStarBehaviour == RatingStarBehaviour.NO_STARS) {
 
-			_ratingStarBehaviour = RatingStarBehaviour.HOVERED_STARS;
+         _ratingStarBehaviour = RatingStarBehaviour.HOVERED_STARS;
 
-		} else if (_ratingStarBehaviour == RatingStarBehaviour.HOVERED_STARS) {
+      } else if (_ratingStarBehaviour == RatingStarBehaviour.HOVERED_STARS) {
 
-			_ratingStarBehaviour = RatingStarBehaviour.NO_HOVERED_STARS;
+         _ratingStarBehaviour = RatingStarBehaviour.NO_HOVERED_STARS;
 
-		} else {
+      } else {
 
-			_ratingStarBehaviour = RatingStarBehaviour.NO_STARS;
-		}
+         _ratingStarBehaviour = RatingStarBehaviour.NO_STARS;
+      }
 
-		updateUI_RatingStarBehaviour(_ratingStarBehaviour);
+      updateUI_RatingStarBehaviour(_ratingStarBehaviour);
 
-		setShowPhotoRatingStars(_ratingStarBehaviour);
-	}
+      setShowPhotoRatingStars(_ratingStarBehaviour);
+   }
 
-	public void actionSortByDate() {
+   public void actionSortByDate() {
 
-		final boolean isChecked = _actionSortFileByDate.isChecked();
+      final boolean isChecked = _actionSortFileByDate.isChecked();
 
-		if (isChecked) {
-			_gallerySorting = GallerySorting.FILE_DATE;
-			_actionSortByFileName.setChecked(false);
-		} else {
-			_gallerySorting = GallerySorting.FILE_NAME;
-			_actionSortByFileName.setChecked(true);
-		}
+      if (isChecked) {
+         _gallerySorting = GallerySorting.FILE_DATE;
+         _actionSortByFileName.setChecked(false);
+      } else {
+         _gallerySorting = GallerySorting.FILE_NAME;
+         _actionSortByFileName.setChecked(true);
+      }
 
-		sortGallery(_gallerySorting);
-	}
+      sortGallery(_gallerySorting);
+   }
 
-	public void actionSortByName() {
+   public void actionSortByName() {
 
-		final boolean isChecked = _actionSortByFileName.isChecked();
+      final boolean isChecked = _actionSortByFileName.isChecked();
 
-		if (isChecked) {
-			_gallerySorting = GallerySorting.FILE_NAME;
-			_actionSortFileByDate.setChecked(false);
-		} else {
-			_gallerySorting = GallerySorting.FILE_DATE;
-			_actionSortFileByDate.setChecked(true);
-		}
+      if (isChecked) {
+         _gallerySorting = GallerySorting.FILE_NAME;
+         _actionSortFileByDate.setChecked(false);
+      } else {
+         _gallerySorting = GallerySorting.FILE_DATE;
+         _actionSortFileByDate.setChecked(true);
+      }
 
-		sortGallery(_gallerySorting);
-	}
+      sortGallery(_gallerySorting);
+   }
 
-	/**
-	 * Creates action bar with default actions.
-	 */
-	public void createActionBar() {
-		createActions();
-		fillActionBars();
-	}
+   /**
+    * Creates action bar with default actions.
+    */
+   public void createActionBar() {
+      createActions();
+      fillActionBars();
+   }
 
-	private void createActions() {
+   private void createActions() {
 
-		_actionPhotoGalleryType = new ActionPhotoGalleryType(this);
+      _actionPhotoGalleryType = new ActionPhotoGalleryType(this);
 
-		_actionPhotoFilterGPS = new ActionPhotoFilterGPS(this);
-		_actionPhotoFilterNoGPS = new ActionPhotoFilterNoGPS(this);
-		_actionPhotoFilterTour = new ActionPhotoFilterTour(this);
-		_actionPhotoFilterNoTour = new ActionPhotoFilterNoTour(this);
+      _actionPhotoFilterGPS = new ActionPhotoFilterGPS(this);
+      _actionPhotoFilterNoGPS = new ActionPhotoFilterNoGPS(this);
+      _actionPhotoFilterTour = new ActionPhotoFilterTour(this);
+      _actionPhotoFilterNoTour = new ActionPhotoFilterNoTour(this);
 
-		_actionShowGPSAnnotation = new ActionShowAnnotations(this);
+      _actionShowGPSAnnotation = new ActionShowAnnotations(this);
 
-		_actionShowPhotoName = new ActionShowPhotoName(this);
-		_actionShowPhotoDate = new ActionShowPhotoDate(this);
-		_actionShowPhotoRatingStars = new ActionShowPhotoRatingStars(this);
-		_actionShowPhotoTooltip = new ActionShowPhotoTooltip(this);
+      _actionShowPhotoName = new ActionShowPhotoName(this);
+      _actionShowPhotoDate = new ActionShowPhotoDate(this);
+      _actionShowPhotoRatingStars = new ActionShowPhotoRatingStars(this);
+      _actionShowPhotoTooltip = new ActionShowPhotoTooltip(this);
 
-		_actionSortByFileName = new ActionSortByFileName(this);
-		_actionSortFileByDate = new ActionSortByFileDate(this);
-	}
+      _actionSortByFileName = new ActionSortByFileName(this);
+      _actionSortFileByDate = new ActionSortByFileDate(this);
+   }
 
-	public void createPhotoGallery(	final Composite parent,
-									final int style,
-									final IPhotoGalleryProvider photoGalleryProvider) {
+   public void createPhotoGallery(final Composite parent,
+                                  final int style,
+                                  final IPhotoGalleryProvider photoGalleryProvider) {
 
-		super.createImageGallery(parent, style, photoGalleryProvider);
-	}
+      super.createImageGallery(parent, style, photoGalleryProvider);
+   }
 
-	@Override
-	protected void enableActions(final boolean isItemAvailable) {
+   @Override
+   protected void enableActions(final boolean isItemAvailable) {
 
-		_actionPhotoGalleryType.setEnabled(isItemAvailable);
+      _actionPhotoGalleryType.setEnabled(isItemAvailable);
 
-		_actionPhotoFilterGPS.setEnabled(isItemAvailable);
-		_actionPhotoFilterNoGPS.setEnabled(isItemAvailable);
-		_actionPhotoFilterTour.setEnabled(isItemAvailable);
-		_actionPhotoFilterNoTour.setEnabled(isItemAvailable);
+      _actionPhotoFilterGPS.setEnabled(isItemAvailable);
+      _actionPhotoFilterNoGPS.setEnabled(isItemAvailable);
+      _actionPhotoFilterTour.setEnabled(isItemAvailable);
+      _actionPhotoFilterNoTour.setEnabled(isItemAvailable);
 
-		_actionShowGPSAnnotation.setEnabled(isItemAvailable);
+      _actionShowGPSAnnotation.setEnabled(isItemAvailable);
 
-		_actionShowPhotoTooltip.setEnabled(isItemAvailable);
+      _actionShowPhotoTooltip.setEnabled(isItemAvailable);
 
-		_actionSortByFileName.setEnabled(isItemAvailable);
-		_actionSortFileByDate.setEnabled(isItemAvailable);
-	}
+      _actionSortByFileName.setEnabled(isItemAvailable);
+      _actionSortFileByDate.setEnabled(isItemAvailable);
+   }
 
-	@Override
-	protected void enableAttributeActions(final boolean isAttributesPainted) {
+   @Override
+   protected void enableAttributeActions(final boolean isAttributesPainted) {
 
-		_actionShowPhotoRatingStars.setEnabled(isAttributesPainted);
-		_actionShowPhotoDate.setEnabled(isAttributesPainted);
-		_actionShowPhotoName.setEnabled(isAttributesPainted);
-	}
+      _actionShowPhotoRatingStars.setEnabled(isAttributesPainted);
+      _actionShowPhotoDate.setEnabled(isAttributesPainted);
+      _actionShowPhotoName.setEnabled(isAttributesPainted);
+   }
 
-	/**
-	 * fill view toolbar
-	 */
-	private void fillActionBars() {
+   /**
+    * Fill view toolbar
+    */
+   private void fillActionBars() {
 
-		/*
-		 * fill view toolbar
-		 */
-		final IToolBarManager tbm = _photoGalleryProvider.getToolBarManager();
+      /*
+       * fill view toolbar
+       */
+      final IToolBarManager tbm = _photoGalleryProvider.getToolBarManager();
 
-		if (tbm == null) {
-			return;
-		}
+      if (tbm == null) {
+         return;
+      }
 
 // disabled 2.1.2013: is not yet fully implemented, delayed for a later version
-//		tbm.add(_actionPhotoGalleryType);
+//      tbm.add(_actionPhotoGalleryType);
 
-		tbm.add(new Separator());
-		tbm.add(_actionShowPhotoTooltip);
+      tbm.add(new Separator());
+      tbm.add(_actionShowPhotoTooltip);
 
-		tbm.add(new Separator());
-		tbm.add(_actionShowPhotoRatingStars);
-		tbm.add(_actionShowGPSAnnotation);
-		tbm.add(_actionShowPhotoDate);
-		tbm.add(_actionShowPhotoName);
+      tbm.add(new Separator());
+      tbm.add(_actionShowPhotoRatingStars);
+      tbm.add(_actionShowGPSAnnotation);
+      tbm.add(_actionShowPhotoDate);
+      tbm.add(_actionShowPhotoName);
 
-		if (_isShowActionFiltering) {
-			tbm.add(new Separator());
-			tbm.add(_actionPhotoFilterTour);
-			tbm.add(_actionPhotoFilterNoTour);
-			tbm.add(_actionPhotoFilterGPS);
-			tbm.add(_actionPhotoFilterNoGPS);
-		}
+      if (_isShowActionFiltering) {
+         tbm.add(new Separator());
+         tbm.add(_actionPhotoFilterTour);
+         tbm.add(_actionPhotoFilterNoTour);
+         tbm.add(_actionPhotoFilterGPS);
+         tbm.add(_actionPhotoFilterNoGPS);
+      }
 
-		if (_isShowActionSorting) {
-			tbm.add(new Separator());
-			tbm.add(_actionSortFileByDate);
-			tbm.add(_actionSortByFileName);
-		}
-	}
+      if (_isShowActionSorting) {
+         tbm.add(new Separator());
+         tbm.add(_actionSortFileByDate);
+         tbm.add(_actionSortByFileName);
+      }
+   }
 
-	public void hideActionFiltering() {
-		_isShowActionFiltering = false;
-	}
+   public void hideActionFiltering() {
+      _isShowActionFiltering = false;
+   }
 
-	public void hideActionSorting() {
-		_isShowActionSorting = false;
-	}
+   public void hideActionSorting() {
+      _isShowActionSorting = false;
+   }
 
-	@Override
-	public void restoreState() {
+   @Override
+   public void restoreState() {
 
-		/*
-		 * photo filter: gps
-		 */
-		final String prefPhotoFilterGPS = Util.getStateString(
-				_state,
-				STATE_PHOTO_FILTER_GPS,
-				PhotoFilterGPS.NO_FILTER.name());
-		try {
-			_photoFilterGPS = PhotoFilterGPS.valueOf(prefPhotoFilterGPS);
-		} catch (final Exception e) {
-			_photoFilterGPS = PhotoFilterGPS.NO_FILTER;
-		}
-		_actionPhotoFilterGPS.setChecked(_photoFilterGPS == PhotoFilterGPS.WITH_GPS);
-		_actionPhotoFilterNoGPS.setChecked(_photoFilterGPS == PhotoFilterGPS.NO_GPS);
+      /*
+       * photo filter: gps
+       */
+      final String prefPhotoFilterGPS = Util.getStateString(
+            _state,
+            STATE_PHOTO_FILTER_GPS,
+            PhotoFilterGPS.NO_FILTER.name());
+      try {
+         _photoFilterGPS = PhotoFilterGPS.valueOf(prefPhotoFilterGPS);
+      } catch (final Exception e) {
+         _photoFilterGPS = PhotoFilterGPS.NO_FILTER;
+      }
+      _actionPhotoFilterGPS.setChecked(_photoFilterGPS == PhotoFilterGPS.WITH_GPS);
+      _actionPhotoFilterNoGPS.setChecked(_photoFilterGPS == PhotoFilterGPS.NO_GPS);
 
-		/*
-		 * photo filter: tour
-		 */
-		final String prefPhotoFilterTour = Util.getStateString(
-				_state,
-				STATE_PHOTO_FILTER_TOUR,
-				PhotoFilterTour.NO_FILTER.name());
-		try {
-			_photoFilterTour = PhotoFilterTour.valueOf(prefPhotoFilterTour);
-		} catch (final Exception e) {
-			_photoFilterTour = PhotoFilterTour.NO_FILTER;
-		}
-		_actionPhotoFilterTour.setChecked(_photoFilterTour == PhotoFilterTour.WITH_TOURS);
-		_actionPhotoFilterNoTour.setChecked(_photoFilterTour == PhotoFilterTour.NO_TOURS);
+      /*
+       * photo filter: tour
+       */
+      final String prefPhotoFilterTour = Util.getStateString(
+            _state,
+            STATE_PHOTO_FILTER_TOUR,
+            PhotoFilterTour.NO_FILTER.name());
+      try {
+         _photoFilterTour = PhotoFilterTour.valueOf(prefPhotoFilterTour);
+      } catch (final Exception e) {
+         _photoFilterTour = PhotoFilterTour.NO_FILTER;
+      }
+      _actionPhotoFilterTour.setChecked(_photoFilterTour == PhotoFilterTour.WITH_TOURS);
+      _actionPhotoFilterNoTour.setChecked(_photoFilterTour == PhotoFilterTour.NO_TOURS);
 
-		/*
-		 * photo date / time / name / tooltip / annotation
-		 */
-		final PhotoDateInfo photoDateDefault = PhotoDateInfo.NoDateTime;
-		final String prefDateInfo = Util.getStateString(_state, STATE_PHOTO_INFO_DATE, photoDateDefault.name());
-		try {
-			_photoDateInfo = PhotoDateInfo.valueOf(prefDateInfo);
-		} catch (final Exception e) {
-			_photoDateInfo = photoDateDefault;
-		}
+      /*
+       * photo date / time / name / tooltip / annotation
+       */
+      final PhotoDateInfo photoDateDefault = PhotoDateInfo.NoDateTime;
+      final String prefDateInfo = Util.getStateString(_state, STATE_PHOTO_INFO_DATE, photoDateDefault.name());
+      try {
+         _photoDateInfo = PhotoDateInfo.valueOf(prefDateInfo);
+      } catch (final Exception e) {
+         _photoDateInfo = photoDateDefault;
+      }
 
-		final boolean isShowPhotoName = Util.getStateBoolean(_state, STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY, false);
-		final boolean isShowTooltip = Util.getStateBoolean(_state, STATE_IS_SHOW_PHOTO_TOOLTIP, true);
-		final boolean isShowPhotoAnnotations = Util.getStateBoolean(_state, //
-				STATE_IS_SHOW_PHOTO_GPS_ANNOTATION,
-				true);
+      final boolean isShowPhotoName = Util.getStateBoolean(_state, STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY, false);
+      final boolean isShowTooltip = Util.getStateBoolean(_state, STATE_IS_SHOW_PHOTO_TOOLTIP, true);
+      final boolean isShowPhotoAnnotations = Util.getStateBoolean(_state, //
+            STATE_IS_SHOW_PHOTO_GPS_ANNOTATION,
+            true);
 
-		_actionShowGPSAnnotation.setChecked(isShowPhotoAnnotations);
-		_actionShowPhotoDate.setChecked(_photoDateInfo != PhotoDateInfo.NoDateTime);
-		_actionShowPhotoName.setChecked(isShowPhotoName);
-		_actionShowPhotoTooltip.setChecked(isShowTooltip);
+      _actionShowGPSAnnotation.setChecked(isShowPhotoAnnotations);
+      _actionShowPhotoDate.setChecked(_photoDateInfo != PhotoDateInfo.NoDateTime);
+      _actionShowPhotoName.setChecked(isShowPhotoName);
+      _actionShowPhotoTooltip.setChecked(isShowTooltip);
 
-		setPhotoInfo(isShowPhotoName, _photoDateInfo, isShowPhotoAnnotations, isShowTooltip);
+      setPhotoInfo(isShowPhotoName, _photoDateInfo, isShowPhotoAnnotations, isShowTooltip);
 
-		/*
-		 * gallery sorting
-		 */
-		final String prefSorting = Util.getStateString(_state, STATE_GALLERY_SORTING, GallerySorting.FILE_DATE.name());
-		try {
-			_gallerySorting = GallerySorting.valueOf(prefSorting);
-		} catch (final Exception e) {
-			_gallerySorting = GallerySorting.FILE_DATE;
-		}
-		_actionSortFileByDate.setChecked(_gallerySorting == GallerySorting.FILE_DATE);
-		_actionSortByFileName.setChecked(_gallerySorting == GallerySorting.FILE_NAME);
+      /*
+       * gallery sorting
+       */
+      final String prefSorting = Util.getStateString(_state, STATE_GALLERY_SORTING, GallerySorting.FILE_DATE.name());
+      try {
+         _gallerySorting = GallerySorting.valueOf(prefSorting);
+      } catch (final Exception e) {
+         _gallerySorting = GallerySorting.FILE_DATE;
+      }
+      _actionSortFileByDate.setChecked(_gallerySorting == GallerySorting.FILE_DATE);
+      _actionSortByFileName.setChecked(_gallerySorting == GallerySorting.FILE_NAME);
 
-		/*
-		 * gallery type
-		 */
-		final String prefGalleryType = Util.getStateString(_state, STATE_GALLERY_TYPE, GalleryType.THUMBNAIL.name());
-		try {
-			_galleryType = GalleryType.valueOf(prefGalleryType);
-		} catch (final Exception e) {
-			// set default
-			_galleryType = GalleryType.THUMBNAIL;
-		}
-		updateUI_GalleryType(_galleryType);
-		selectGalleryType(_galleryType);
+      /*
+       * gallery type
+       */
+      final String prefGalleryType = Util.getStateString(_state, STATE_GALLERY_TYPE, GalleryType.THUMBNAIL.name());
+      try {
+         _galleryType = GalleryType.valueOf(prefGalleryType);
+      } catch (final Exception e) {
+         // set default
+         _galleryType = GalleryType.THUMBNAIL;
+      }
+      updateUI_GalleryType(_galleryType);
+      selectGalleryType(_galleryType);
 
-		/*
-		 * rating star behaviour
-		 */
-		final String stateValue = Util.getStateString(
-				_state,
-				STATE_RATING_STAR_BEHAVIOUR,
-				RatingStarBehaviour.HOVERED_STARS.name());
-		try {
-			_ratingStarBehaviour = RatingStarBehaviour.valueOf(stateValue);
-		} catch (final Exception e) {
-			// set default
-			_ratingStarBehaviour = RatingStarBehaviour.HOVERED_STARS;
-		}
-		updateUI_RatingStarBehaviour(_ratingStarBehaviour);
-		setShowPhotoRatingStars(_ratingStarBehaviour);
+      /*
+       * rating star behaviour
+       */
+      final String stateValue = Util.getStateString(
+            _state,
+            STATE_RATING_STAR_BEHAVIOUR,
+            RatingStarBehaviour.HOVERED_STARS.name());
+      try {
+         _ratingStarBehaviour = RatingStarBehaviour.valueOf(stateValue);
+      } catch (final Exception e) {
+         // set default
+         _ratingStarBehaviour = RatingStarBehaviour.HOVERED_STARS;
+      }
+      updateUI_RatingStarBehaviour(_ratingStarBehaviour);
+      setShowPhotoRatingStars(_ratingStarBehaviour);
 
-		super.restoreState();
+      super.restoreState();
 
-		// !!! overwrite super settings !!!
-		setSorting(_gallerySorting);
-		setFilter(_photoFilterGPS, _photoFilterTour);
-	}
+      // !!! overwrite super settings !!!
+      setSorting(_gallerySorting);
+      setFilter(_photoFilterGPS, _photoFilterTour);
+   }
 
-	@Override
-	public void saveState() {
+   @Override
+   public void saveState() {
 
-		_state.put(STATE_GALLERY_SORTING, _actionSortFileByDate.isChecked()
-				? GallerySorting.FILE_DATE.name()
-				: GallerySorting.FILE_NAME.name());
+      _state.put(STATE_GALLERY_SORTING,
+            _actionSortFileByDate.isChecked()
+                  ? GallerySorting.FILE_DATE.name()
+                  : GallerySorting.FILE_NAME.name());
 
-		_state.put(STATE_GALLERY_TYPE, _galleryType == GalleryType.DETAILS
-				? GalleryType.DETAILS.name()
-				: GalleryType.THUMBNAIL.name());
+      _state.put(STATE_GALLERY_TYPE,
+            _galleryType == GalleryType.DETAILS
+                  ? GalleryType.DETAILS.name()
+                  : GalleryType.THUMBNAIL.name());
 
-		_state.put(STATE_IS_SHOW_PHOTO_GPS_ANNOTATION, _actionShowGPSAnnotation.isChecked());
-		_state.put(STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY, _actionShowPhotoName.isChecked());
-		_state.put(STATE_IS_SHOW_PHOTO_TOOLTIP, _actionShowPhotoTooltip.isChecked());
+      _state.put(STATE_IS_SHOW_PHOTO_GPS_ANNOTATION, _actionShowGPSAnnotation.isChecked());
+      _state.put(STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY, _actionShowPhotoName.isChecked());
+      _state.put(STATE_IS_SHOW_PHOTO_TOOLTIP, _actionShowPhotoTooltip.isChecked());
 
-		_state.put(STATE_PHOTO_FILTER_GPS, _photoFilterGPS.name());
-		_state.put(STATE_PHOTO_FILTER_TOUR, _photoFilterTour.name());
+      _state.put(STATE_PHOTO_FILTER_GPS, _photoFilterGPS.name());
+      _state.put(STATE_PHOTO_FILTER_TOUR, _photoFilterTour.name());
 
-		_state.put(STATE_PHOTO_INFO_DATE, _photoDateInfo.name());
-		_state.put(STATE_RATING_STAR_BEHAVIOUR, _ratingStarBehaviour.name());
+      _state.put(STATE_PHOTO_INFO_DATE, _photoDateInfo.name());
+      _state.put(STATE_RATING_STAR_BEHAVIOUR, _ratingStarBehaviour.name());
 
-		super.saveState();
-	}
+      super.saveState();
+   }
 
-	@Override
-	public void updateColumnHeader(final ColumnDefinition colDef) {
-		// TODO Auto-generated method stub
-		
-	}
+   @Override
+   public void updateColumnHeader(final ColumnDefinition colDef) {
+      // TODO Auto-generated method stub
 
-	private void updateUI_GalleryType(final GalleryType galleryType) {
+   }
 
-		String text;
-		String toolTipText;
-		ImageDescriptor imageDescriptor;
+   private void updateUI_GalleryType(final GalleryType galleryType) {
 
-		if (galleryType == GalleryType.DETAILS) {
+      String text;
+      String toolTipText;
+      ImageDescriptor imageDescriptor;
 
-			text = Messages.Photo_Gallery_Action_PhotoGalleryThumbnail;
-			toolTipText = Messages.Photo_Gallery_Action_PhotoGalleryThumbnail_Tooltip;
-			imageDescriptor = Activator.getImageDescriptor(Messages.Image__PotoGalleryThumbnail);
+      if (galleryType == GalleryType.DETAILS) {
 
-		} else {
+         text = Messages.Photo_Gallery_Action_PhotoGalleryThumbnail;
+         toolTipText = Messages.Photo_Gallery_Action_PhotoGalleryThumbnail_Tooltip;
+         imageDescriptor = Activator.getImageDescriptor(Messages.Image__PotoGalleryThumbnail);
 
-			// thumbnail view
+      } else {
 
-			text = Messages.Photo_Gallery_Action_ShowPhotoGalleryDetails;
-			toolTipText = Messages.Photo_Gallery_Action_ShowPhotoGalleryDetails_Tooltip;
-			imageDescriptor = Activator.getImageDescriptor(Messages.Image__PotoGalleryDetails);
-		}
+         // thumbnail view
 
-		_actionPhotoGalleryType.setText(text);
-		_actionPhotoGalleryType.setToolTipText(toolTipText);
-		_actionPhotoGalleryType.setImageDescriptor(imageDescriptor);
-	}
+         text = Messages.Photo_Gallery_Action_ShowPhotoGalleryDetails;
+         toolTipText = Messages.Photo_Gallery_Action_ShowPhotoGalleryDetails_Tooltip;
+         imageDescriptor = Activator.getImageDescriptor(Messages.Image__PotoGalleryDetails);
+      }
 
-	private void updateUI_RatingStarBehaviour(final RatingStarBehaviour ratingStarBehaviour) {
+      _actionPhotoGalleryType.setText(text);
+      _actionPhotoGalleryType.setToolTipText(toolTipText);
+      _actionPhotoGalleryType.setImageDescriptor(imageDescriptor);
+   }
 
-		String toolTipText;
-		ImageDescriptor imageDescriptor;
+   private void updateUI_RatingStarBehaviour(final RatingStarBehaviour ratingStarBehaviour) {
 
-		if (ratingStarBehaviour == RatingStarBehaviour.NO_STARS) {
+      String toolTipText;
+      ImageDescriptor imageDescriptor;
 
-			toolTipText = Messages.Photo_Gallery_Action_ShowPhotoRatingStars_NoStars_Tooltip;
-			imageDescriptor = Activator.getImageDescriptor(Messages.Image__PhotoRatingStarAndHovered);
+      if (ratingStarBehaviour == RatingStarBehaviour.NO_STARS) {
 
-		} else if (ratingStarBehaviour == RatingStarBehaviour.NO_HOVERED_STARS) {
+         toolTipText = Messages.Photo_Gallery_Action_ShowPhotoRatingStars_NoStars_Tooltip;
+         imageDescriptor = Activator.getImageDescriptor(Messages.Image__PhotoRatingStarAndHovered);
 
-			toolTipText = Messages.Photo_Gallery_Action_ShowPhotoRatingStars_NoHoveredStars_Tooltip;
-			imageDescriptor = Activator.getImageDescriptor(Messages.Image__PhotoRatingStar);
+      } else if (ratingStarBehaviour == RatingStarBehaviour.NO_HOVERED_STARS) {
 
-		} else {
+         toolTipText = Messages.Photo_Gallery_Action_ShowPhotoRatingStars_NoHoveredStars_Tooltip;
+         imageDescriptor = Activator.getImageDescriptor(Messages.Image__PhotoRatingStar);
 
-			// set default: RatingStarBehaviour.HOVERED_STARS
+      } else {
 
-			toolTipText = Messages.Photo_Gallery_Action_ShowPhotoRatingStars_Tooltip;
-			imageDescriptor = Activator.getImageDescriptor(Messages.Image__PhotoRatingStarHovered);
-		}
+         // set default: RatingStarBehaviour.HOVERED_STARS
 
-		final boolean isShowRatingStars = ratingStarBehaviour != RatingStarBehaviour.NO_STARS;
+         toolTipText = Messages.Photo_Gallery_Action_ShowPhotoRatingStars_Tooltip;
+         imageDescriptor = Activator.getImageDescriptor(Messages.Image__PhotoRatingStarHovered);
+      }
 
-		_actionShowPhotoRatingStars.setChecked(isShowRatingStars);
-		_actionShowPhotoRatingStars.setToolTipText(toolTipText);
-		_actionShowPhotoRatingStars.setImageDescriptor(imageDescriptor);
-	}
+      final boolean isShowRatingStars = ratingStarBehaviour != RatingStarBehaviour.NO_STARS;
+
+      _actionShowPhotoRatingStars.setChecked(isShowRatingStars);
+      _actionShowPhotoRatingStars.setToolTipText(toolTipText);
+      _actionShowPhotoRatingStars.setImageDescriptor(imageDescriptor);
+   }
 
 }
