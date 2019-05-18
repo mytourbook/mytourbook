@@ -2624,7 +2624,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private Menu createUI_96_CreateViewerContextMenu() {
 
       final Table table = (Table) _tourViewer.getControl();
-
       final Menu tableContextMenu = _viewerMenuManager.createContextMenu(table);
 
       tableContextMenu.addMenuListener(new MenuAdapter() {

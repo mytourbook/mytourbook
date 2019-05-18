@@ -58,6 +58,7 @@ import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.IContextMenuProvider;
 import net.tourbook.common.util.ITourViewer2;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
@@ -449,15 +450,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
    private boolean                            _isWindSpeedManuallyModified;
 
    /*
-    * measurement unit values
+    * Measurement unit values
     */
-   private float _unitValueAltitude;
-   private float _unitValueDistance;
-   private int[] _unitValueWindSpeed;
+   private float                            _unitValueAltitude;
+   private float                            _unitValueDistance;
+   private int[]                            _unitValueWindSpeed;
    //
-   /*
-    * actions
-    */
+   private MenuManager                      _swimViewer_MenuManager;
+   private MenuManager                      _timeViewer_MenuManager;
+   private IContextMenuProvider             _swimViewer_ContextMenuProvider = new SwimSlice_ViewerContextMenuProvider();
+   private IContextMenuProvider             _timeViewer_ContextMenuProvider = new TimeSlice_ViewerContextMenuProvider();
+   //
    private Action_RemoveSwimStyle           _action_RemoveSwimStyle;
    private Action_SetSwimStyle_Header       _action_SetSwimStyle_Header;
    private ActionComputeDistanceValues      _actionComputeDistanceValues;
@@ -491,7 +494,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
     */
    private int                              _latLonDigits;
 
-   private final NumberFormat               _nfLatLon = NumberFormat.getNumberInstance();
+   private final NumberFormat               _nfLatLon                       = NumberFormat.getNumberInstance();
 
    private TourData                         _tourData;
 
@@ -604,6 +607,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
    private TimeDuration      _timeDriving;
    private TimeDuration      _timePaused;
    private TimeDuration      _timeRecording;
+
+   private Menu              _swimViewer_ContextMenu;
+   private Menu              _timeViewer_ContextMenu;
 
    private class Action_RemoveSwimStyle extends Action {
 
@@ -1231,6 +1237,32 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
    }
 
+   public class SwimSlice_ViewerContextMenuProvider implements IContextMenuProvider {
+
+      @Override
+      public void disposeContextMenu() {
+
+         if (_swimViewer_ContextMenu != null) {
+            _swimViewer_ContextMenu.dispose();
+         }
+      }
+
+      @Override
+      public Menu getContextMenu() {
+         return _swimViewer_ContextMenu;
+      }
+
+      @Override
+      public Menu recreateContextMenu() {
+
+         disposeContextMenu();
+
+         _swimViewer_ContextMenu = createUI_Tab_36_SwimSliceViewerContextMenu_Menu();
+
+         return _swimViewer_ContextMenu;
+      }
+   }
+
    private class TimeDuration {
 
       private static final String timeFormat      = "%5d:%02d:%02d"; //$NON-NLS-1$
@@ -1559,6 +1591,32 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
       @Override
       public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
+   }
+
+   public class TimeSlice_ViewerContextMenuProvider implements IContextMenuProvider {
+
+      @Override
+      public void disposeContextMenu() {
+
+         if (_timeViewer_ContextMenu != null) {
+            _timeViewer_ContextMenu.dispose();
+         }
+      }
+
+      @Override
+      public Menu getContextMenu() {
+         return _timeViewer_ContextMenu;
+      }
+
+      @Override
+      public Menu recreateContextMenu() {
+
+         disposeContextMenu();
+
+         _timeViewer_ContextMenu = createUI_Tab_26_TimeSliceViewerContextMenu_Menu();
+
+         return _timeViewer_ContextMenu;
+      }
    }
 
    /**
@@ -2698,6 +2756,35 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       };
    }
 
+   private void createMenuManager() {
+
+      /*
+       * Swim slice viewer
+       */
+      _swimViewer_MenuManager = new MenuManager();
+
+      _swimViewer_MenuManager.setRemoveAllWhenShown(true);
+      _swimViewer_MenuManager.addMenuListener(new IMenuListener() {
+         @Override
+         public void menuAboutToShow(final IMenuManager manager) {
+            fillContextMenu_SwimSlice(manager);
+         }
+      });
+
+      /*
+       * Time slice viewer
+       */
+      _timeViewer_MenuManager = new MenuManager();
+
+      _timeViewer_MenuManager.setRemoveAllWhenShown(true);
+      _timeViewer_MenuManager.addMenuListener(new IMenuListener() {
+         @Override
+         public void menuAboutToShow(final IMenuManager manager) {
+            fillContextMenu_TimeSlice(manager);
+         }
+      });
+   }
+
    /**
     * create the drop down menus, this must be created after the parent control is created
     */
@@ -2769,6 +2856,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
    public void createPartControl(final Composite parent) {
 
       initUI(parent);
+      createMenuManager();
 
       updateInternalUnitValues();
 
@@ -4149,8 +4237,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       table.setLinesVisible(true);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
 
-      createUI_Tab_24_SliceViewerContextMenu(table);
-
 //		table.addTraverseListener(new TraverseListener() {
 //			public void keyTraversed(final TraverseEvent e) {
 //				e.doit = e.keyCode != SWT.CR; // vetoes all CR traversals
@@ -4213,23 +4299,25 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
       // hide first column, this is a hack to align the "first" visible column to right
       table.getColumn(0).setWidth(0);
+
+      createUI_Tab_24_TimeSliceViewerContextMenu();
    }
 
-   private void createUI_Tab_24_SliceViewerContextMenu(final Table table) {
+   private void createUI_Tab_24_TimeSliceViewerContextMenu() {
 
-      final MenuManager menuMgr = new MenuManager();
+      _timeViewer_ContextMenu = createUI_Tab_26_TimeSliceViewerContextMenu_Menu();
 
-      menuMgr.setRemoveAllWhenShown(true);
-      menuMgr.addMenuListener(new IMenuListener() {
-         @Override
-         public void menuAboutToShow(final IMenuManager manager) {
-            fillTimeSlice_ContextMenu(manager);
-         }
-      });
+      final Table table = _timeSlice_Viewer.getTable();
 
-      final Menu tableContextMenu = menuMgr.createContextMenu(table);
+      _timeSlice_ColumnManager.createHeaderContextMenu(table, _timeViewer_ContextMenuProvider);
+   }
 
-      _timeSlice_ColumnManager.createHeaderContextMenu(table, tableContextMenu);
+   private Menu createUI_Tab_26_TimeSliceViewerContextMenu_Menu() {
+
+      final Table table = _timeSlice_Viewer.getTable();
+      final Menu tableContextMenu = _timeViewer_MenuManager.createContextMenu(table);
+
+      return tableContextMenu;
    }
 
    private Control createUI_Tab_30_SwimSlices(final Composite parent) {
@@ -4265,8 +4353,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 //		table.setHeaderBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
       table.setLinesVisible(true);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
-
-      createUI_Tab_34_SwimSliceViewerContextMenu(table);
 
 //		table.addKeyListener(new KeyAdapter() {
 //			@Override
@@ -4319,25 +4405,28 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
          }
       });
 
+      createUI_Tab_34_SwimSliceViewerContextMenu();
+
       // hide first column, this is a hack to align the "first" visible column to right
       table.getColumn(0).setWidth(0);
    }
 
-   private void createUI_Tab_34_SwimSliceViewerContextMenu(final Table table) {
+   private void createUI_Tab_34_SwimSliceViewerContextMenu() {
 
-      final MenuManager menuMgr = new MenuManager();
+      _swimViewer_ContextMenu = createUI_Tab_36_SwimSliceViewerContextMenu_Menu();
 
-      menuMgr.setRemoveAllWhenShown(true);
-      menuMgr.addMenuListener(new IMenuListener() {
-         @Override
-         public void menuAboutToShow(final IMenuManager manager) {
-            fillSwimSlice_ContextMenu(manager);
-         }
-      });
+      final Table table = _swimSlice_Viewer.getTable();
 
-      final Menu tableContextMenu = menuMgr.createContextMenu(table);
+      _swimSlice_ColumnManager.createHeaderContextMenu(table, _swimViewer_ContextMenuProvider);
+   }
 
-      _swimSlice_ColumnManager.createHeaderContextMenu(table, tableContextMenu);
+   private Menu createUI_Tab_36_SwimSliceViewerContextMenu_Menu() {
+
+      final Table table = _swimSlice_Viewer.getTable();
+
+      final Menu tableContextMenu = _swimViewer_MenuManager.createContextMenu(table);
+
+      return tableContextMenu;
    }
 
    private void defineAllColumns_SwimSlices() {
@@ -5613,7 +5702,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       _timeSlice_Viewer.getTable().setEnabled(isDeviceTour);
    }
 
-   private void fillSwimSlice_ContextMenu(final IMenuManager menuMgr) {
+   private void fillContextMenu_SwimSlice(final IMenuManager menuMgr) {
 
       menuMgr.add(_action_SetSwimStyle_Header);
 
@@ -5626,7 +5715,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       enableActions_SwimSlices();
    }
 
-   private void fillTimeSlice_ContextMenu(final IMenuManager menuMgr) {
+   private void fillContextMenu_TimeSlice(final IMenuManager menuMgr) {
 
       menuMgr.add(_actionCreateTourMarker);
       menuMgr.add(_actionOpenMarkerDialog);

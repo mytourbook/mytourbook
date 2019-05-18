@@ -13,16 +13,14 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.common.ui;
-
-import net.tourbook.common.util.IContextMenuProvider;
+package net.tourbook.common.util;
 
 import org.eclipse.swt.widgets.Menu;
 
 /**
  * This menu provider is used when a context menu is not used
  */
-public class EmptyTableContextMenuProvider implements IContextMenuProvider {
+public class EmptyContextMenuProvider implements IContextMenuProvider {
 
    @Override
    public void disposeContextMenu() {}

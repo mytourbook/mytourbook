@@ -33,9 +33,9 @@ import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.tooltip.ToolbarSlideout;
-import net.tourbook.common.ui.EmptyTableContextMenuProvider;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.EmptyContextMenuProvider;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.TableColumnDefinition;
@@ -1286,7 +1286,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       final Table table = _geoPartViewer.getTable();
 
-      _columnManager.createHeaderContextMenu(table, new EmptyTableContextMenuProvider());
+      _columnManager.createHeaderContextMenu(table, new EmptyContextMenuProvider());
    }
 
    private void defineAllColumns() {

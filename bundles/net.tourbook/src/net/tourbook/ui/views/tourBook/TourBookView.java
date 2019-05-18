@@ -373,33 +373,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       }
    }
 
-   public class TreeContextMenuProvider implements IContextMenuProvider {
-
-      @Override
-      public void disposeContextMenu() {
-
-         if (_treeContextMenu != null) {
-            _treeContextMenu.dispose();
-         }
-      }
-
-      @Override
-      public Menu getContextMenu() {
-         return _treeContextMenu;
-      }
-
-      @Override
-      public Menu recreateContextMenu() {
-
-         disposeContextMenu();
-
-         _treeContextMenu = createUI_22_CreateViewerContextMenu();
-
-         return _treeContextMenu;
-      }
-
-   }
-
    private static class ItemComparer implements IElementComparer {
 
       @Override
@@ -466,6 +439,33 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       @Override
       public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
+   }
+
+   public class TreeContextMenuProvider implements IContextMenuProvider {
+
+      @Override
+      public void disposeContextMenu() {
+
+         if (_treeContextMenu != null) {
+            _treeContextMenu.dispose();
+         }
+      }
+
+      @Override
+      public Menu getContextMenu() {
+         return _treeContextMenu;
+      }
+
+      @Override
+      public Menu recreateContextMenu() {
+
+         disposeContextMenu();
+
+         _treeContextMenu = createUI_22_CreateViewerContextMenu();
+
+         return _treeContextMenu;
+      }
+
    }
 
    void actionExportViewCSV() {
@@ -892,7 +892,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    }
 
    /**
-    * Create the views context menu
+    * Setup context menu for the viewer
     */
    private void createUI_20_ContextMenu() {
 
@@ -904,7 +904,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    }
 
    /**
-    * Creates the context menu for the viewer
+    * Creates context menu for the viewer
     *
     * @return Returns the {@link Menu} widget
     */
