@@ -33,6 +33,7 @@ import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.common.ui.EmptyTableContextMenuProvider;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
@@ -66,10 +67,7 @@ import net.tourbook.ui.views.tourCatalog.TourCompareConfig;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuListener;
-import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -102,7 +100,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -186,10 +183,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    private int                            _lastCompare_GeoAccuracy;
    private boolean                        _lastCompare_IsUseAppFilter;
    //
-   private ActionAppTourFilter            _actionAppTourFilter;
-   private ActionOnOff                    _actionOnOff;
-   private ActionGeoCompareOptions        _actionGeoCompareOptions;
-   //
    private TableViewer                    _geoPartViewer;
    private ColumnManager                  _columnManager;
    private CompareResultComparator        _geoPartComparator       = new CompareResultComparator();
@@ -202,12 +195,17 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    private SlideoutGeoCompareOptions      _slideoutGeoCompareOptions;
    private GeoCompareState                _slideoutGeoCompareState = new GeoCompareState();
    //
+   private PixelConverter                 _pc;
+   //
+   private ActionAppTourFilter            _actionAppTourFilter;
+   private ActionOnOff                    _actionOnOff;
+   private ActionGeoCompareOptions        _actionGeoCompareOptions;
+
    private final NumberFormat             _nf1                     = NumberFormat.getInstance();
    {
       _nf1.setMinimumFractionDigits(1);
       _nf1.setMaximumFractionDigits(1);
    }
-   private PixelConverter _pc;
 
    /*
     * UI controls
@@ -1286,21 +1284,9 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
     */
    private void createUI_82_ContextMenu() {
 
-      final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
-
-      menuMgr.setRemoveAllWhenShown(true);
-
-      menuMgr.addMenuListener(new IMenuListener() {
-         @Override
-         public void menuAboutToShow(final IMenuManager manager) {
-//				fillContextMenu(manager);
-         }
-      });
-
       final Table table = _geoPartViewer.getTable();
-      final Menu tableHeaderContextMenu = menuMgr.createContextMenu(table);
 
-      _columnManager.createHeaderContextMenu(table, tableHeaderContextMenu);
+      _columnManager.createHeaderContextMenu(table, new EmptyTableContextMenuProvider());
    }
 
    private void defineAllColumns() {

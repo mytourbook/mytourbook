@@ -297,37 +297,35 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    }
 
    //
-   private final IPreferenceStore     _prefStore       = TourbookPlugin.getPrefStore();
-   private final IPreferenceStore     _prefStoreCommon = CommonActivator.getPrefStore();
-   private final IDialogSettings      _state           = TourbookPlugin.getState(ID);
+   private final IPreferenceStore         _prefStore                 = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore         _prefStoreCommon           = CommonActivator.getPrefStore();
+   private final IDialogSettings          _state                     = TourbookPlugin.getState(ID);
    //
-   private RawDataManager             _rawDataMgr      = RawDataManager.getInstance();
-   private TableViewer                _tourViewer;
-   private TableViewerTourInfoToolTip _tourInfoToolTip;
-   private ColumnManager              _columnManager;
-   private SelectionAdapter           _columnSortListener;
-   private TableColumnDefinition      _timeZoneOffsetColDef;
-   private ImportComparator           _importComparator;
+   private RawDataManager                 _rawDataMgr                = RawDataManager.getInstance();
+   private TableViewer                    _tourViewer;
+   private TableViewerTourInfoToolTip     _tourInfoToolTip;
+   private ColumnManager                  _columnManager;
+   private SelectionAdapter               _columnSortListener;
+   private TableColumnDefinition          _timeZoneOffsetColDef;
+   private ImportComparator               _importComparator;
    //
+   private String                         _columnId_DeviceName;
+   private String                         _columnId_ImportFileName;
+   private String                         _columnId_TimeZone;
+   private String                         _columnId_Title;
+   private String                         _columnId_TourStartDate;
    //
-   private String                  _columnId_DeviceName;
-   private String                  _columnId_ImportFileName;
-   private String                  _columnId_TimeZone;
-   private String                  _columnId_Title;
-   private String                  _columnId_TourStartDate;
+   private PostSelectionProvider          _postSelectionProvider;
+   private IPartListener2                 _partListener;
+   private ISelectionListener             _postSelectionListener;
+   private IPropertyChangeListener        _prefChangeListener;
+   private IPropertyChangeListener        _prefChangeListenerCommon;
+   private ITourEventListener             _tourEventListener;
    //
-   private PostSelectionProvider   _postSelectionProvider;
-   private IPartListener2          _partListener;
-   private ISelectionListener      _postSelectionListener;
-   private IPropertyChangeListener _prefChangeListener;
-   private IPropertyChangeListener _prefChangeListenerCommon;
-   private ITourEventListener      _tourEventListener;
+   private TagMenuManager                 _tagMenuManager;
+   private MenuManager                    _viewerMenuManager;
+   private IContextMenuProvider           _tableViewerContextMenuProvider = new TableContextMenuProvider();
    //
-   private TagMenuManager          _tagMenuManager;
-   private MenuManager             _viewerMenuManager;
-   private IContextMenuProvider    _viewerContextMenuProvider = new TableContextMenuProvider();
-   //
-   // context menu actions
    private ActionClearView                _actionClearView;
    private ActionOpenTourLogView          _actionOpenTourLogView;
    private ActionDeleteTourFiles          _actionDeleteTourFile;
@@ -353,8 +351,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    protected TourPerson                   _activePerson;
    protected TourPerson                   _newActivePerson;
    //
-   protected boolean                      _isPartVisible           = false;
-   protected boolean                      _isViewerPersonDataDirty = false;
+   protected boolean                      _isPartVisible             = false;
+   protected boolean                      _isViewerPersonDataDirty   = false;
    //
    private final NumberFormat             _nf1;
    private final NumberFormat             _nf3;
@@ -459,33 +457,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private Browser   _browser;
 
    private Menu      _tableContextMenu;
-
-   public class TableContextMenuProvider implements IContextMenuProvider {
-
-      @Override
-      public void disposeContextMenu() {
-
-         if (_tableContextMenu != null) {
-            _tableContextMenu.dispose();
-         }
-      }
-
-      @Override
-      public Menu getContextMenu() {
-         return _tableContextMenu;
-      }
-
-      @Override
-      public Menu recreateContextMenu() {
-
-         disposeContextMenu();
-
-         _tableContextMenu = createUI_96_CreateViewerContextMenu();
-
-         return _tableContextMenu;
-      }
-
-   }
 
    private class ImportComparator extends ViewerComparator {
 
@@ -626,6 +597,33 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
          return null;
       }
+   }
+
+   public class TableContextMenuProvider implements IContextMenuProvider {
+
+      @Override
+      public void disposeContextMenu() {
+
+         if (_tableContextMenu != null) {
+            _tableContextMenu.dispose();
+         }
+      }
+
+      @Override
+      public Menu getContextMenu() {
+         return _tableContextMenu;
+      }
+
+      @Override
+      public Menu recreateContextMenu() {
+
+         disposeContextMenu();
+
+         _tableContextMenu = createUI_96_CreateViewerContextMenu();
+
+         return _tableContextMenu;
+      }
+
    }
 
    private class TourDataContentProvider implements IStructuredContentProvider {
@@ -2617,7 +2615,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       final Table table = (Table) _tourViewer.getControl();
 
-      _columnManager.createHeaderContextMenu(table, _viewerContextMenuProvider);
+      _columnManager.createHeaderContextMenu(table, _tableViewerContextMenuProvider);
 
       // this is from the beginning of the MT development and may not be needed
       getSite().registerContextMenu(_viewerMenuManager, _tourViewer);
