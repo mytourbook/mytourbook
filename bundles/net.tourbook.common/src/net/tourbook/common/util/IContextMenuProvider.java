@@ -18,7 +18,7 @@ package net.tourbook.common.util;
 import org.eclipse.swt.widgets.Menu;
 
 /**
- * This context menu provider will fix
+ * This context menu provider do fix the
  * <p>
  * <b>IllegalArgumentException: Widget has the wrong parent</b>
  * <p>
@@ -35,12 +35,14 @@ public interface IContextMenuProvider {
    public void disposeContextMenu();
 
    /**
-    * @return Returns the {@link Menu} for the context menu.
+    * @return Returns the {@link Menu} for the context menu. Can be <code>null</code> which will not
+    *         display a context menu.
     */
    public Menu getContextMenu();
 
    /**
-    * @return Returns the recreated context menu, the old context menu must be disposed.
+    * @return Returns the recreated context menu, the old context menu must be disposed. Can be
+    *         <code>null</code> which will not display a context menu.
     */
    public Menu recreateContextMenu();
 

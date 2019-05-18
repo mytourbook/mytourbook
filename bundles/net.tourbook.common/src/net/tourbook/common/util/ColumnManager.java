@@ -921,22 +921,33 @@ public class ColumnManager {
 
             Menu contextMenu = getContextMenu(isTableHeaderHit, headerContextMenu[0], defaultContextMenuProvider);
 
-            if (contextMenu == headerContextMenu[0] && contextMenu.getShell() != table.getShell()) {
+            if (contextMenu != null) {
 
-               /**
-                * java.lang.IllegalArgumentException: Widget has the wrong parent
-                * <p>
-                * When a view is minimized, then the context menu is already created
-                * but has the wrong parent when the view is displayed lateron.
-                */
+               // can be null when context menu is not set
 
-               headerContextMenu[0].dispose();
+               if (contextMenu == headerContextMenu[0] && contextMenu.getShell() != table.getShell()) {
 
-               headerContextMenu[0] = createHCM_0_Menu(table, table.getShell(), defaultContextMenuProvider);
+                  /**
+                   * java.lang.IllegalArgumentException: Widget has the wrong parent
+                   * <p>
+                   * When a view is minimized, then the context menu is already created
+                   * but has the wrong parent when the view is displayed lateron.
+                   */
 
-               contextMenu = getContextMenu(isTableHeaderHit, headerContextMenu[0], defaultContextMenuProvider);
+                  headerContextMenu[0].dispose();
 
-               StatusUtil.log("Context menu has had the wrong parent, header context menu has been recreated.");
+                  headerContextMenu[0] = createHCM_0_Menu(table, table.getShell(), defaultContextMenuProvider);
+
+                  contextMenu = getContextMenu(isTableHeaderHit, headerContextMenu[0], defaultContextMenuProvider);
+
+                  StatusUtil.log("Table header context menu has had the wrong parent and is recreated.");
+
+               } else if (contextMenu == defaultContextMenuProvider.getContextMenu() && contextMenu.getShell() != table.getShell()) {
+
+                  contextMenu = defaultContextMenuProvider.recreateContextMenu();
+
+                  StatusUtil.log("Table context menu has had the wrong parent and is recreated.");
+               }
             }
 
             try {
@@ -944,16 +955,6 @@ public class ColumnManager {
                table.setMenu(contextMenu);
 
             } catch (final IllegalArgumentException e) {
-
-               // This occured: Widget has the wrong parent
-
-               // after some debugging, could not find the reason, this view is very similar to the tourbook view
-
-               /*
-                * The problem can occure when tours are compared with 2 different perspectives (ref
-                * tour and compare result), the system measurement is changed and the context menu
-                * for the ref tours will be opened
-                */
 
                StatusUtil.showStatus(e);
             }
@@ -1043,26 +1044,33 @@ public class ColumnManager {
 
             Menu contextMenu = getContextMenu(isTreeHeaderHit, headerContextMenu[0], defaultContextMenuProvider);
 
-            if (contextMenu == headerContextMenu[0] && contextMenu.getShell() != tree.getShell()) {
+            if (contextMenu != null) {
 
-               /**
-                * java.lang.IllegalArgumentException: Widget has the wrong parent
-                * <p>
-                * When a view is minimized, then the context menu is already created
-                * but has the wrong parent when the view is displayed lateron.
-                */
+               // can be null when context menu is not set
 
-               headerContextMenu[0].dispose();
+               if (contextMenu == headerContextMenu[0] && contextMenu.getShell() != tree.getShell()) {
 
-               headerContextMenu[0] = createHCM_0_Menu(tree, tree.getShell(), defaultContextMenuProvider);
+                  /**
+                   * java.lang.IllegalArgumentException: Widget has the wrong parent
+                   * <p>
+                   * When a view is minimized, then the context menu is already created
+                   * but has the wrong parent when the view is displayed lateron.
+                   */
 
-               contextMenu = getContextMenu(isTreeHeaderHit, headerContextMenu[0], defaultContextMenuProvider);
+                  headerContextMenu[0].dispose();
 
-               StatusUtil.log("Context menu has had the wrong parent, header context menu has been recreated.");
+                  headerContextMenu[0] = createHCM_0_Menu(tree, tree.getShell(), defaultContextMenuProvider);
 
-            } else if (contextMenu == defaultContextMenuProvider.getContextMenu() && contextMenu.getShell() != tree.getShell()) {
+                  contextMenu = getContextMenu(isTreeHeaderHit, headerContextMenu[0], defaultContextMenuProvider);
 
-               contextMenu = defaultContextMenuProvider.recreateContextMenu();
+                  StatusUtil.log("Tree header context menu has had the wrong parent and is recreated.");
+
+               } else if (contextMenu == defaultContextMenuProvider.getContextMenu() && contextMenu.getShell() != tree.getShell()) {
+
+                  contextMenu = defaultContextMenuProvider.recreateContextMenu();
+
+                  StatusUtil.log("Tree context menu has had the wrong parent and is recreated.");
+               }
             }
 
             try {
