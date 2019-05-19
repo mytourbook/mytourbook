@@ -23,7 +23,7 @@ import de.byteholder.geoclipse.map.event.IPositionListener;
 import de.byteholder.geoclipse.map.event.ITileListener;
 import de.byteholder.geoclipse.map.event.MapPositionEvent;
 import de.byteholder.geoclipse.map.event.TileEventId;
-import de.byteholder.geoclipse.preferences.PrefPageMapProviders;
+import de.byteholder.geoclipse.preferences.PrefPage_Map2_Providers;
 import de.byteholder.geoclipse.ui.ViewerDetailForm;
 
 import java.text.NumberFormat;
@@ -275,7 +275,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 	}
 
 	public DialogMPProfile(	final Shell parentShell,
-							final PrefPageMapProviders prefPageMapProvider,
+							final PrefPage_Map2_Providers prefPageMapProvider,
 							final MPProfile dialogMapProfile) {
 
 		super(parentShell, dialogMapProfile);

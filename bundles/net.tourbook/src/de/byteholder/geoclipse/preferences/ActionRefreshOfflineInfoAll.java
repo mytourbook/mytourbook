@@ -22,9 +22,9 @@ import org.eclipse.jface.action.Action;
 
 public class ActionRefreshOfflineInfoAll extends Action {
 
-	private PrefPageMapProviders	_prefPageMapFactories;
+	private PrefPage_Map2_Providers	_prefPageMapFactories;
 
-	public ActionRefreshOfflineInfoAll(final PrefPageMapProviders prefPageMapFactories) {
+	public ActionRefreshOfflineInfoAll(final PrefPage_Map2_Providers prefPageMapFactories) {
 
 		setToolTipText(Messages.Pref_Map_Button_RefreshTileInfo_Tooltip);
 
