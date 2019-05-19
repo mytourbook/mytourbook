@@ -875,8 +875,9 @@ public class ColumnManager {
     * set context menu depending on the position of the mouse
     *
     * @param table
+    *           Table control
     * @param defaultContextMenu
-    *           can be <code>null</code>
+    *           Can be <code>null</code> when a default context menu is not available
     */
    public void createHeaderContextMenu(final Table table, final IContextMenuProvider defaultContextMenuProvider) {
       this.createHeaderContextMenu(table, defaultContextMenuProvider, table.getShell());
@@ -886,8 +887,9 @@ public class ColumnManager {
     * Set context menu depending on the position of the mouse
     *
     * @param table
+    *           Table control
     * @param defaultContextMenuProvider
-    *           can be <code>null</code>
+    *           Can be <code>null</code> when a default context menu is not available
     * @param contextMenuShell
     *           Shell for the context menu. For reparented dialogs, the correct shell must be
     *           provided.
@@ -996,25 +998,27 @@ public class ColumnManager {
     * Set context menu depending on the position of the mouse
     *
     * @param tree
+    *           Tree control
     * @param defaultContextMenu
-    *           can be <code>null</code>
+    *           Can be <code>null</code> when a default context menu is not available
     */
    public void createHeaderContextMenu(final Tree tree, final IContextMenuProvider defaultContextMenuProvider) {
 
-      this.createHeaderContextMenu(tree, tree.getShell(), defaultContextMenuProvider);
+      this.createHeaderContextMenu(tree, defaultContextMenuProvider, tree.getShell());
    }
 
    /**
     * Set context menu depending on the position of the mouse
     *
     * @param tree
+    *           Tree control
+    * @param defaultContextMenu
+    *           Can be <code>null</code> when a default context menu is not available
     * @param contextMenuShell
     *           Shell for the context menu. For reparented dialogs, the correct shell must be
     *           provided.
-    * @param defaultContextMenu
-    *           can be <code>null</code>
     */
-   private void createHeaderContextMenu(final Tree tree, final Shell contextMenuShell, final IContextMenuProvider defaultContextMenuProvider) {
+   private void createHeaderContextMenu(final Tree tree, final IContextMenuProvider defaultContextMenuProvider, final Shell contextMenuShell) {
 
       // remove old listener
       if (_treeMenuDetectListener != null) {

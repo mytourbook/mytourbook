@@ -18,7 +18,7 @@ package net.tourbook.common.util;
 import org.eclipse.swt.widgets.Menu;
 
 /**
- * This menu provider is used when a context menu is not used
+ * This menu provider is used when a default context menu is not available.
  */
 public class EmptyContextMenuProvider implements IContextMenuProvider {
 
