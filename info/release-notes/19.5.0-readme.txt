@@ -18,6 +18,8 @@ New
 * Tour Book
 
   - Training Effects + Training Performance columns
+  - Reimport training values
+    - Currently used for Suunto 3 files
   
  
 Improvements   
@@ -25,7 +27,29 @@ Improvements
 
 * Adjust Altitude
 
-  - Whole tour is selected for SRTM adjustments
+  - Whole tour is selected for SRTM adjustments when dialog is opened (previously only half of the tour was selected)
+  
+  
+* Import
+
+  - .fit File
+  
+    import .fit developer fields
+   
+      Supported fields:
+      
+      - Cadence
+      - Ground Time (Stance time)
+      - Power
+      - Elevation
+      - Vertical Oscillation
+      
+      
+      Not yet supported fields:
+      
+      - Leg Spring Stiffness
+      - Form Power
+     
 
  
 Changes  

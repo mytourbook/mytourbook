@@ -119,7 +119,7 @@ public class FitDataReader extends TourbookDevice {
           */
          if (fieldName.equals("") // //$NON-NLS-1$
 
-//         // this is the profile name
+//               // this is the profile name
 //               || fieldName.equals("name") //                                                            //$NON-NLS-1$
 //
 //               // Time
@@ -281,13 +281,13 @@ public class FitDataReader extends TourbookDevice {
 //               || fieldName.equals("stance_time_balance") //                           51.31 percent     //$NON-NLS-1$
 //               || fieldName.equals("step_length") //                                  1526.0 mm          //$NON-NLS-1$
 //               || fieldName.equals("avg_step_length") //                                                 //$NON-NLS-1$
-//               || fieldName.equals("vertical_oscillation") //                           7.03 percent     //$NON-NLS-1$
-//               || fieldName.equals("vertical_ratio") //                                114.2 mm          //$NON-NLS-1$
+//               || fieldName.equals("vertical_oscillation") //                         105.2  mm          //$NON-NLS-1$
+//               || fieldName.equals("vertical_ratio") //                                 8.96 percent     //$NON-NLS-1$
 //               || fieldName.equals("avg_stance_time") //                                                 //$NON-NLS-1$
 //               || fieldName.equals("avg_stance_time_balance") //                                         //$NON-NLS-1$
 //               || fieldName.equals("avg_stance_time_percent") //                                         //$NON-NLS-1$
-//               || fieldName.equals("avg_vertical_oscillation") //                                        //$NON-NLS-1$
-//               || fieldName.equals("avg_vertical_ratio") //                                              //$NON-NLS-1$
+//               || fieldName.equals("avg_vertical_oscillation") //                    103.8   mm          //$NON-NLS-1$
+//               || fieldName.equals("avg_vertical_ratio") //                            8.17  percent     //$NON-NLS-1$
 //               || fieldName.equals("avg_vam") //                                       0.348 m/s         //$NON-NLS-1$
 //               || fieldName.equals("user_running_step_length") //                        0.0 m           //$NON-NLS-1$
 //               || fieldName.equals("user_walking_step_length") //                        0.0 m           //$NON-NLS-1$
