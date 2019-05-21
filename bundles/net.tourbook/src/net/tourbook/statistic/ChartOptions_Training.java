@@ -40,9 +40,11 @@ public class ChartOptions_Training implements IStatisticOptions {
    private String                 _prefKey_IsShow_Avg_Speed;
    private String                 _prefKey_IsShow_Distance;
    private String                 _prefKey_IsShow_Duration;
+
    private String                 _prefKey_IsShow_TrainingEffect;
    private String                 _prefKey_IsShow_TrainingEffect_Anaerobic;
    private String                 _prefKey_IsShow_TrainingPerformance;
+   private String                 _prefKey_IsShow_TrainingPerformance_AvgValue;
 
    /*
     * UI controls
@@ -50,6 +52,7 @@ public class ChartOptions_Training implements IStatisticOptions {
    private Button _chkShow_TrainingEffect;
    private Button _chkShow_TrainingEffect_Anaerobic;
    private Button _chkShow_TrainingPerformance;
+   private Button _chkShow_TrainingPerformance_AvgValue;
 
    private Button _chkShowAltitude;
    private Button _chkShowDistance;
@@ -64,16 +67,19 @@ public class ChartOptions_Training implements IStatisticOptions {
                                 final String prefKey_IsShow_Duration,
                                 final String prefKey_IsShowTrainingEffect,
                                 final String prefKey_IsShowTrainingEffect_Anaerobic,
-                                final String prefKey_IsShowTrainingPerformance) {
+                                final String prefKey_IsShowTrainingPerformance,
+                                final String prefKey_IsShowTrainingPerformance_AvgValue) {
 
       _prefKey_IsShow_Altitude = prefKey_IsShow_Altitude;
       _prefKey_IsShow_Avg_Pace = prefKey_IsShow_Avg_Pace;
       _prefKey_IsShow_Avg_Speed = prefKey_IsShow_Avg_Speed;
       _prefKey_IsShow_Distance = prefKey_IsShow_Distance;
       _prefKey_IsShow_Duration = prefKey_IsShow_Duration;
+
       _prefKey_IsShow_TrainingEffect = prefKey_IsShowTrainingEffect;
       _prefKey_IsShow_TrainingEffect_Anaerobic = prefKey_IsShowTrainingEffect_Anaerobic;
       _prefKey_IsShow_TrainingPerformance = prefKey_IsShowTrainingPerformance;
+      _prefKey_IsShow_TrainingPerformance_AvgValue = prefKey_IsShowTrainingPerformance_AvgValue;
    }
 
    @Override
@@ -130,6 +136,16 @@ public class ChartOptions_Training implements IStatisticOptions {
             _chkShow_TrainingPerformance = new Button(group, SWT.CHECK);
             _chkShow_TrainingPerformance.setText(Messages.Pref_Statistic_Checkbox_TrainingPerformance);
             _chkShow_TrainingPerformance.addSelectionListener(_defaultSelectionListener);
+         }
+         {
+            /*
+             * Show training performance average value
+             */
+            _chkShow_TrainingPerformance_AvgValue = new Button(group, SWT.CHECK);
+            _chkShow_TrainingPerformance_AvgValue.setText(Messages.Pref_Statistic_Checkbox_TrainingPerformance_AvgValue);
+            _chkShow_TrainingPerformance_AvgValue.setToolTipText(Messages.Pref_Statistic_Checkbox_TrainingPerformance_AvgValue_Tooltip);
+            _chkShow_TrainingPerformance_AvgValue.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults().indent(16, 0).applyTo(_chkShow_TrainingPerformance_AvgValue);
          }
       }
    }
@@ -192,6 +208,13 @@ public class ChartOptions_Training implements IStatisticOptions {
       }
    }
 
+   private void enableControls() {
+
+      final boolean isShowTrainingPerformance = _chkShow_TrainingPerformance.getSelection();
+
+      _chkShow_TrainingPerformance_AvgValue.setEnabled(isShowTrainingPerformance);
+   }
+
    private void initUI(final Composite parent) {
 
       _defaultSelectionListener = new SelectionAdapter() {
@@ -205,6 +228,8 @@ public class ChartOptions_Training implements IStatisticOptions {
    private void onChangeUI() {
 
       // update chart async (which is done when a pref store value is modified) that the UI is updated immediately
+
+      enableControls();
 
       Display.getCurrent().asyncExec(new Runnable() {
          @Override
@@ -227,6 +252,9 @@ public class ChartOptions_Training implements IStatisticOptions {
       _chkShow_TrainingEffect.setSelection(_prefStore.getDefaultBoolean(_prefKey_IsShow_TrainingEffect));
       _chkShow_TrainingEffect_Anaerobic.setSelection(_prefStore.getDefaultBoolean(_prefKey_IsShow_TrainingEffect_Anaerobic));
       _chkShow_TrainingPerformance.setSelection(_prefStore.getDefaultBoolean(_prefKey_IsShow_TrainingPerformance));
+      _chkShow_TrainingPerformance_AvgValue.setSelection(_prefStore.getDefaultBoolean(_prefKey_IsShow_TrainingPerformance_AvgValue));
+
+      enableControls();
    }
 
    @Override
@@ -241,6 +269,9 @@ public class ChartOptions_Training implements IStatisticOptions {
       _chkShow_TrainingEffect.setSelection(_prefStore.getBoolean(_prefKey_IsShow_TrainingEffect));
       _chkShow_TrainingEffect_Anaerobic.setSelection(_prefStore.getBoolean(_prefKey_IsShow_TrainingEffect_Anaerobic));
       _chkShow_TrainingPerformance.setSelection(_prefStore.getBoolean(_prefKey_IsShow_TrainingPerformance));
+      _chkShow_TrainingPerformance_AvgValue.setSelection(_prefStore.getBoolean(_prefKey_IsShow_TrainingPerformance_AvgValue));
+
+      enableControls();
    }
 
    @Override
@@ -255,5 +286,6 @@ public class ChartOptions_Training implements IStatisticOptions {
       _prefStore.setValue(_prefKey_IsShow_TrainingEffect, _chkShow_TrainingEffect.getSelection());
       _prefStore.setValue(_prefKey_IsShow_TrainingEffect_Anaerobic, _chkShow_TrainingEffect_Anaerobic.getSelection());
       _prefStore.setValue(_prefKey_IsShow_TrainingPerformance, _chkShow_TrainingPerformance.getSelection());
+      _prefStore.setValue(_prefKey_IsShow_TrainingPerformance_AvgValue, _chkShow_TrainingPerformance_AvgValue.getSelection());
    }
 }

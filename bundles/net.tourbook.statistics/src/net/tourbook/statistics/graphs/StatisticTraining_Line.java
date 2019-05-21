@@ -57,6 +57,7 @@ public class StatisticTraining_Line extends StatisticTraining {
             if (property.equals(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_EFFECT)
                   || property.equals(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_EFFECT_ANAEROBIC)
                   || property.equals(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE)
+                  || property.equals(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE_AVG_VALUE)
 
                   || property.equals(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_ALTITUDE)
                   || property.equals(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_AVG_PACE)
@@ -69,6 +70,10 @@ public class StatisticTraining_Line extends StatisticTraining {
                // get the changed preferences
                getPreferences();
 
+               // data needs to be recalculated
+               if (property.equals(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE_AVG_VALUE)) {
+                  setIsForceReloadData(true);
+               }
                // update chart
                preferencesHasChanged();
             }
@@ -145,15 +150,19 @@ public class StatisticTraining_Line extends StatisticTraining {
 
    private void getPreferences() {
 
-      _isShow_Altitude = _prefStore.getBoolean(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_ALTITUDE);
-      _isShow_Avg_Pace = _prefStore.getBoolean(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_AVG_PACE);
-      _isShow_Avg_Speed = _prefStore.getBoolean(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_AVG_SPEED);
-      _isShow_Distance = _prefStore.getBoolean(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_DISTANCE);
-      _isShow_Duration = _prefStore.getBoolean(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_DURATION);
+// SET_FORMATTING_OFF
 
-      _isShow_TrainingEffect = _prefStore.getBoolean(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_EFFECT);
-      _isShow_TrainingEffect_Anaerob = _prefStore.getBoolean(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_EFFECT_ANAEROBIC);
-      _isShow_TrainingPerformance = _prefStore.getBoolean(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE);
+      _isShow_Altitude                 = _prefStore.getBoolean(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_ALTITUDE);
+      _isShow_Avg_Pace                 = _prefStore.getBoolean(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_AVG_PACE);
+      _isShow_Avg_Speed                = _prefStore.getBoolean(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_AVG_SPEED);
+      _isShow_Distance                 = _prefStore.getBoolean(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_DISTANCE);
+      _isShow_Duration                 = _prefStore.getBoolean(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_DURATION);
+
+      _isShow_TrainingEffect           = _prefStore.getBoolean(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_EFFECT);
+      _isShow_TrainingEffect_Anaerob   = _prefStore.getBoolean(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_EFFECT_ANAEROBIC);
+      _isShow_TrainingPerformance      = _prefStore.getBoolean(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE);
+
+// SET_FORMATTING_ON
    }
 
    @Override
@@ -169,7 +178,8 @@ public class StatisticTraining_Line extends StatisticTraining {
 
             ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_EFFECT,
             ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_EFFECT_ANAEROBIC,
-            ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE
+            ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE,
+            ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE_AVG_VALUE
 
       ));
    }

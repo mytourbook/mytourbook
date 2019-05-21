@@ -1623,6 +1623,8 @@ public class Messages extends NLS {
    public static String Pref_Statistic_Checkbox_TrainingEffect_Aerob;
    public static String Pref_Statistic_Checkbox_TrainingEffect_Anaerob;
    public static String Pref_Statistic_Checkbox_TrainingPerformance;
+   public static String Pref_Statistic_Checkbox_TrainingPerformance_AvgValue;
+   public static String Pref_Statistic_Checkbox_TrainingPerformance_AvgValue_Tooltip;
    public static String Pref_Statistic_Checkbox_YearSeparator;
 
    public static String Pref_Statistic_Group_ChartType;

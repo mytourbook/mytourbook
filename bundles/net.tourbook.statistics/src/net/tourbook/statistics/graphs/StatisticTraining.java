@@ -37,6 +37,7 @@ import net.tourbook.common.util.IToolTipHideListener;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.statistic.StatisticContext;
 import net.tourbook.statistic.StatisticView;
 import net.tourbook.statistic.TourbookStatistic;
@@ -80,6 +81,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
 
    private int                         _currentYear;
    private int                         _numberOfYears;
+   private boolean                     _isForceReloadData;
 
    private Chart                       _chart;
    private StatisticContext            _statContext;
@@ -742,6 +744,10 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       chartModel.setCustomData(ChartDataModel.BAR_CONTEXT_PROVIDER, new TourChartContextProvider(_chart, this));
    }
 
+   public void setIsForceReloadData(final boolean isForceReloadData) {
+      _isForceReloadData = isForceReloadData;
+   }
+
    @Override
    public void setSynchScale(final boolean isSynchScaleEnabled) {
 
@@ -787,18 +793,35 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
          }
       }
 
-      _tourDayData = DataProvider_Tour_Day.getInstance()
-            .getDayData(
-                  statContext.appPerson,
-                  statContext.appTourTypeFilter,
-                  statContext.statFirstYear,
-                  statContext.statNumberOfYears,
-                  isDataDirtyWithReset() || statContext.isRefreshData);
+      final DataProvider_Tour_Day tourDayDataProvider = DataProvider_Tour_Day.getInstance();
+
+      // set state if average values should be displayed or not, set it BEFORE retrieving data
+      boolean isComputeAvgValue;
+      if (this instanceof StatisticTraining_Bar) {
+
+         isComputeAvgValue = _prefStore.getBoolean(ITourbookPreferences.STAT_TRAINING_BAR_IS_SHOW_TRAINING_PERFORMANCE_AVG_VALUE);
+         tourDayDataProvider.setIsShowTrainingPerformance_AvgValue(isComputeAvgValue);
+
+      } else if (this instanceof StatisticTraining_Line) {
+
+         isComputeAvgValue = _prefStore.getBoolean(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE_AVG_VALUE);
+         tourDayDataProvider.setIsShowTrainingPerformance_AvgValue(isComputeAvgValue);
+      }
+
+      _tourDayData = tourDayDataProvider.getDayData(
+            statContext.appPerson,
+            statContext.appTourTypeFilter,
+            statContext.statFirstYear,
+            statContext.statNumberOfYears,
+            isDataDirtyWithReset() || statContext.isRefreshData || _isForceReloadData);
 
       // reset min/max values
-      if (_isSynchScaleEnabled == false && statContext.isRefreshData) {
+      if (_isSynchScaleEnabled == false && (statContext.isRefreshData || _isForceReloadData)) {
          resetMinMaxKeeper();
       }
+
+      // reset force loading state as it is done now
+      _isForceReloadData = false;
 
       final ChartDataModel chartModel = getChartDataModel();
 
