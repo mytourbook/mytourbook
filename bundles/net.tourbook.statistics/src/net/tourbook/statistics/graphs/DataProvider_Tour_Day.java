@@ -45,6 +45,7 @@ public class DataProvider_Tour_Day extends DataProvider {
 
    private TourData_Day                 _tourDayData;
 
+   private boolean                      _isAdjustSamePosition;
    private boolean                      _isShowTrainingPerformance_AvgValue;
 
    private DataProvider_Tour_Day() {}
@@ -58,23 +59,85 @@ public class DataProvider_Tour_Day extends DataProvider {
       return _instance;
    }
 
-   private void computePerformanceAverage(final TIntArrayList dbAllTourDuration,
-                                          final TFloatArrayList dbAllTrainingPerformance,
-                                          final float[] trainingPerformance_High,
-                                          final float[] trainingPerformance_Low,
-                                          final int avgValue_FirstIndex,
-                                          final int avgValue_LastIndex) {
+   private void adjustValues(final TFloatArrayList dbAllValues,
+                             final float[] lowValues,
+                             final float[] highValues,
+                             final int sameDOY_FirstIndex,
+                             final int sameDOY_LastIndex) {
 
-      if (_isShowTrainingPerformance_AvgValue && avgValue_LastIndex != -1) {
+      if (_isAdjustSamePosition && sameDOY_LastIndex != -1) {
+
+         /*
+          * This will ensure that a painted line graph do not move to the smallest value when it's
+          * on the same day
+          */
+
+         float maxValue = 0;
+
+         for (int valueIndex = sameDOY_FirstIndex; valueIndex <= sameDOY_LastIndex; valueIndex++) {
+            maxValue += dbAllValues.get(valueIndex);
+         }
+
+         /*
+          * Draw value to all points that the line graph is not moved to the bottom
+          */
+         for (int avgIndex = sameDOY_FirstIndex; avgIndex <= sameDOY_LastIndex; avgIndex++) {
+
+            lowValues[avgIndex] = 0;
+            highValues[avgIndex] = maxValue;
+         }
+      }
+   }
+
+   private void adjustValues(final TIntArrayList dbAllTourDuration,
+                             final int[] duration_Low,
+                             final int[] duration_High,
+                             final int sameDOY_FirstIndex,
+                             final int sameDOY_LastIndex) {
+
+      if (_isAdjustSamePosition && sameDOY_LastIndex != -1) {
+
+         /*
+          * This will ensure that a painted line graph do not move to the smallest value when it's
+          * on the same day
+          */
+
+         int maxValue = 0;
+
+         for (int valueIndex = sameDOY_FirstIndex; valueIndex <= sameDOY_LastIndex; valueIndex++) {
+            maxValue += dbAllTourDuration.get(valueIndex);
+         }
+
+         /*
+          * Draw value to all points that the line graph is not moved to the bottom
+          */
+         for (int avgIndex = sameDOY_FirstIndex; avgIndex <= sameDOY_LastIndex; avgIndex++) {
+
+            duration_Low[avgIndex] = 0;
+            duration_High[avgIndex] = maxValue;
+         }
+      }
+   }
+
+   private void adjustValues_Avg(final TIntArrayList dbAllTourDuration,
+
+                                 final TFloatArrayList dbAllValues,
+                                 final float[] lowValues,
+                                 final float[] highValues,
+
+                                 final int sameDOY_FirstIndex,
+                                 final int sameDOY_LastIndex) {
+
+      if (_isShowTrainingPerformance_AvgValue && sameDOY_LastIndex != -1) {
 
          // compute average values
 
          double valueSquare = 0;
          double timeSquare = 0;
 
-         for (int avgIndex = avgValue_FirstIndex; avgIndex <= avgValue_LastIndex; avgIndex++) {
+         for (int avgIndex = sameDOY_FirstIndex; avgIndex <= sameDOY_LastIndex; avgIndex++) {
 
-            final float value = dbAllTrainingPerformance.get(avgIndex);
+            final float value = dbAllValues.get(avgIndex);
             final float duration = dbAllTourDuration.get(avgIndex);
 
             // ignore 0 values
@@ -90,10 +153,35 @@ public class DataProvider_Tour_Day extends DataProvider {
          /*
           * Draw value to all points that the line graph is not moved to the bottom
           */
-         for (int avgIndex = avgValue_FirstIndex; avgIndex <= avgValue_LastIndex; avgIndex++) {
+         for (int avgIndex = sameDOY_FirstIndex; avgIndex <= sameDOY_LastIndex; avgIndex++) {
 
-            trainingPerformance_Low[avgIndex] = 0;
-            trainingPerformance_High[avgIndex] = avgValue;
+            lowValues[avgIndex] = 0;
+            highValues[avgIndex] = avgValue;
+         }
+
+      } else if (_isAdjustSamePosition && sameDOY_LastIndex != -1) {
+
+         /*
+          * This will ensure that a painted line graph do not move to the smallest value when it's
+          * on the same day
+          */
+
+         float maxValue = 0;
+
+         for (int valueIndex = sameDOY_FirstIndex; valueIndex <= sameDOY_LastIndex; valueIndex++) {
+
+            final float value = dbAllValues.get(valueIndex);
+
+            maxValue += value;
+         }
+
+         /*
+          * Draw value to all points that the line graph is not moved to the bottom
+          */
+         for (int avgIndex = sameDOY_FirstIndex; avgIndex <= sameDOY_LastIndex; avgIndex++) {
+
+            lowValues[avgIndex] = 0;
+            highValues[avgIndex] = maxValue;
          }
       }
    }
@@ -198,9 +286,9 @@ public class DataProvider_Tour_Day extends DataProvider {
          final TFloatArrayList dbAllAvgPace = new TFloatArrayList();
          final TFloatArrayList dbAllAltitudeUp = new TFloatArrayList();
 
-         final TFloatArrayList dbAllTrainingEffect_Aerob = new TFloatArrayList();
-         final TFloatArrayList dbAllTrainingEffect_Anaerob = new TFloatArrayList();
-         final TFloatArrayList dbAllTrainingPerformance = new TFloatArrayList();
+         final TFloatArrayList dbAllTrain_Effect_Aerob = new TFloatArrayList();
+         final TFloatArrayList dbAllTrain_Effect_Anaerob = new TFloatArrayList();
+         final TFloatArrayList dbAllTrain_Performance = new TFloatArrayList();
 
          final ArrayList<String> dbAllTourTitle = new ArrayList<>();
          final ArrayList<String> dbAllTourDescription = new ArrayList<>();
@@ -293,9 +381,9 @@ public class DataProvider_Tour_Day extends DataProvider {
                dbAllAvgPace.add(distance == 0 ? 0 : dbDrivingTime * 1000f / distance / 60.0f);
                dbAllAvgSpeed.add(dbDrivingTime == 0 ? 0 : 3.6f * distance / dbDrivingTime);
 
-               dbAllTrainingEffect_Aerob.add(trainingEffect);
-               dbAllTrainingEffect_Anaerob.add(trainingEffect_Anaerobic);
-               dbAllTrainingPerformance.add(trainingPerformance);
+               dbAllTrain_Effect_Aerob.add(trainingEffect);
+               dbAllTrain_Effect_Anaerob.add(trainingEffect_Anaerobic);
+               dbAllTrain_Performance.add(trainingPerformance);
 
                dbAllTourTitle.add(dbTourTitle);
                dbAllTourDescription.add(dbDescription == null ? UI.EMPTY_STRING : dbDescription);
@@ -338,35 +426,35 @@ public class DataProvider_Tour_Day extends DataProvider {
 
          final int[] allYearsDOY = dbAllYearsDOY.toArray();
 
-         final int[] durationHigh = dbAllTourDuration.toArray();
-         final int serieLength = durationHigh.length;
+         final int[] duration_High = dbAllTourDuration.toArray();
+         final int serieLength = duration_High.length;
 
          final float[] altitude_High = dbAllAltitudeUp.toArray();
          final float[] avgPace_High = dbAllAvgPace.toArray();
          final float[] avgSpeed_High = dbAllAvgSpeed.toArray();
          final float[] distance_High = dbAllDistance.toArray();
 
-         final float[] trainingEffect_High = dbAllTrainingEffect_Aerob.toArray();
-         final float[] trainingEffect_Anaerobic_High = dbAllTrainingEffect_Anaerob.toArray();
-         final float[] trainingPerformance_High = dbAllTrainingPerformance.toArray();
+         final float[] trainEffect_Aerob_High = dbAllTrain_Effect_Aerob.toArray();
+         final float[] trainEffect_Anaerob_High = dbAllTrain_Effect_Anaerob.toArray();
+         final float[] trainPerformance_High = dbAllTrain_Performance.toArray();
 
-         final int[] durationLow = new int[serieLength];
-         final float[] altitudeLow = new float[serieLength];
-         final float[] avgPaceLow = new float[serieLength];
-         final float[] avgSpeedLow = new float[serieLength];
-         final float[] distanceLow = new float[serieLength];
+         final int[] duration_Low = new int[serieLength];
+         final float[] altitude_Low = new float[serieLength];
+         final float[] avgPace_Low = new float[serieLength];
+         final float[] avgSpeed_Low = new float[serieLength];
+         final float[] distance_Low = new float[serieLength];
 
-         final float[] trainingEffect_Low = new float[serieLength];
-         final float[] trainingEffect_Anaerobic_Low = new float[serieLength];
-         final float[] trainingPerformance_Low = new float[serieLength];
+         final float[] trainEffect_Aerob_Low = new float[serieLength];
+         final float[] trainEffect_Anaerob_Low = new float[serieLength];
+         final float[] trainPerformance_Low = new float[serieLength];
 
          /*
           * Adjust low/high values when a day has multiple tours
           */
          int prevTourDOY = -1;
 
-         int avgValue_FirstIndex = -1;
-         int avgValue_LastIndex = -1;
+         int sameDOY_FirstIndex = -1;
+         int sameDOY_LastIndex = -1;
 
          for (int tourIndex = 0; tourIndex < allYearsDOY.length; tourIndex++) {
 
@@ -376,25 +464,26 @@ public class DataProvider_Tour_Day extends DataProvider {
 
                // current tour is at the same day as the previous tour
 
-               avgValue_LastIndex = tourIndex;
+               sameDOY_LastIndex = tourIndex;
 
-               if (avgValue_FirstIndex == -1) {
+               if (sameDOY_FirstIndex == -1) {
+
                   // use previous index as first time slice
-                  avgValue_FirstIndex = tourIndex - 1;
+                  sameDOY_FirstIndex = tourIndex - 1;
                }
 
 // SET_FORMATTING_OFF
 
-               durationHigh[tourIndex]    += durationLow[tourIndex]  = durationHigh[tourIndex - 1];
+               duration_High[tourIndex]   += duration_Low[tourIndex]  = duration_High[tourIndex - 1];
 
-               altitude_High[tourIndex]   += altitudeLow[tourIndex]  = altitude_High[tourIndex - 1];
-               avgPace_High[tourIndex]    += avgPaceLow[tourIndex]   = avgPace_High[tourIndex - 1];
-               avgSpeed_High[tourIndex]   += avgSpeedLow[tourIndex]  = avgSpeed_High[tourIndex - 1];
-               distance_High[tourIndex]   += distanceLow[tourIndex]  = distance_High[tourIndex - 1];
+               altitude_High[tourIndex]   += altitude_Low[tourIndex]  = altitude_High[tourIndex - 1];
+               avgPace_High[tourIndex]    += avgPace_Low[tourIndex]   = avgPace_High[tourIndex - 1];
+               avgSpeed_High[tourIndex]   += avgSpeed_Low[tourIndex]  = avgSpeed_High[tourIndex - 1];
+               distance_High[tourIndex]   += distance_Low[tourIndex]  = distance_High[tourIndex - 1];
 
-               trainingEffect_High[tourIndex]            += trainingEffect_Low[tourIndex]             = trainingEffect_High[tourIndex - 1];
-               trainingEffect_Anaerobic_High[tourIndex]  += trainingEffect_Anaerobic_Low[tourIndex]   = trainingEffect_Anaerobic_High[tourIndex - 1];
-               trainingPerformance_High[tourIndex]       += trainingPerformance_Low[tourIndex]        = trainingPerformance_High[tourIndex - 1];
+               trainEffect_Aerob_High[tourIndex]      += trainEffect_Aerob_Low[tourIndex]    = trainEffect_Aerob_High[tourIndex - 1];
+               trainEffect_Anaerob_High[tourIndex]    += trainEffect_Anaerob_Low[tourIndex]  = trainEffect_Anaerob_High[tourIndex - 1];
+               trainPerformance_High[tourIndex]       += trainPerformance_Low[tourIndex]     = trainPerformance_High[tourIndex - 1];
 
 // SET_FORMATTING_ON
 
@@ -404,25 +493,43 @@ public class DataProvider_Tour_Day extends DataProvider {
 
                prevTourDOY = tourDOY;
 
-               computePerformanceAverage(dbAllTourDuration,
-                     dbAllTrainingPerformance,
-                     trainingPerformance_High,
-                     trainingPerformance_Low,
-                     avgValue_FirstIndex,
-                     avgValue_LastIndex);
+// SET_FORMATTING_OFF
 
-               avgValue_FirstIndex = -1;
-               avgValue_LastIndex = -1;
+               adjustValues(dbAllTourDuration,  duration_Low,  duration_High,    sameDOY_FirstIndex,  sameDOY_LastIndex);
+
+               adjustValues(dbAllDistance,      distance_Low,  distance_High,    sameDOY_FirstIndex,  sameDOY_LastIndex);
+               adjustValues(dbAllAltitudeUp,    altitude_Low,  altitude_High,    sameDOY_FirstIndex,  sameDOY_LastIndex);
+               adjustValues(dbAllAvgPace,       avgPace_Low,   avgPace_High,     sameDOY_FirstIndex,  sameDOY_LastIndex);
+               adjustValues(dbAllAvgSpeed,      avgSpeed_Low,  avgSpeed_High,    sameDOY_FirstIndex,  sameDOY_LastIndex);
+
+               adjustValues(dbAllTrain_Effect_Aerob,     trainEffect_Aerob_Low,     trainEffect_Aerob_High,    sameDOY_FirstIndex,     sameDOY_LastIndex);
+               adjustValues(dbAllTrain_Effect_Anaerob,   trainEffect_Anaerob_Low,   trainEffect_Anaerob_High,  sameDOY_FirstIndex,     sameDOY_LastIndex);
+
+               adjustValues_Avg(dbAllTourDuration,       dbAllTrain_Performance,    trainPerformance_Low,      trainPerformance_High,  sameDOY_FirstIndex,  sameDOY_LastIndex);
+
+// SET_FORMATTING_ON
+
+               sameDOY_FirstIndex = -1;
+               sameDOY_LastIndex = -1;
             }
          }
 
          // compute for the last values
-         computePerformanceAverage(dbAllTourDuration,
-               dbAllTrainingPerformance,
-               trainingPerformance_High,
-               trainingPerformance_Low,
-               avgValue_FirstIndex,
-               avgValue_LastIndex);
+// SET_FORMATTING_OFF
+
+         adjustValues(dbAllTourDuration,  duration_Low,  duration_High,    sameDOY_FirstIndex,  sameDOY_LastIndex);
+
+         adjustValues(dbAllDistance,      distance_Low,  distance_High,    sameDOY_FirstIndex,  sameDOY_LastIndex);
+         adjustValues(dbAllAltitudeUp,    altitude_Low,  altitude_High,    sameDOY_FirstIndex,  sameDOY_LastIndex);
+         adjustValues(dbAllAvgPace,       avgPace_Low,   avgPace_High,     sameDOY_FirstIndex,  sameDOY_LastIndex);
+         adjustValues(dbAllAvgSpeed,      avgSpeed_Low,  avgSpeed_High,    sameDOY_FirstIndex,  sameDOY_LastIndex);
+
+         adjustValues(dbAllTrain_Effect_Aerob,     trainEffect_Aerob_Low,     trainEffect_Aerob_High,    sameDOY_FirstIndex,     sameDOY_LastIndex);
+         adjustValues(dbAllTrain_Effect_Anaerob,   trainEffect_Anaerob_Low,   trainEffect_Anaerob_High,  sameDOY_FirstIndex,     sameDOY_LastIndex);
+
+         adjustValues_Avg(dbAllTourDuration,       dbAllTrain_Performance,    trainPerformance_Low,      trainPerformance_High,  sameDOY_FirstIndex,  sameDOY_LastIndex);
+
+//SET_FORMATTING_ON
 
          // get number of days for all years
          int yearDays = 0;
@@ -448,25 +555,25 @@ public class DataProvider_Tour_Day extends DataProvider {
 
          _tourDayData.tagIds = allTagIds;
 
-         _tourDayData.setDurationLow(durationLow);
-         _tourDayData.setDurationHigh(durationHigh);
+         _tourDayData.setDurationLow(duration_Low);
+         _tourDayData.setDurationHigh(duration_High);
 
-         _tourDayData.altitude_Low = altitudeLow;
+         _tourDayData.altitude_Low = altitude_Low;
          _tourDayData.altitude_High = altitude_High;
-         _tourDayData.distance_Low = distanceLow;
+         _tourDayData.distance_Low = distance_Low;
          _tourDayData.distance_High = distance_High;
 
-         _tourDayData.avgPace_Low = avgPaceLow;
+         _tourDayData.avgPace_Low = avgPace_Low;
          _tourDayData.avgPace_High = avgPace_High;
-         _tourDayData.avgSpeed_Low = avgSpeedLow;
+         _tourDayData.avgSpeed_Low = avgSpeed_Low;
          _tourDayData.avgSpeed_High = avgSpeed_High;
 
-         _tourDayData.trainingEffect_Aerob_Low = trainingEffect_Low;
-         _tourDayData.trainingEffect_Aerob_High = trainingEffect_High;
-         _tourDayData.trainingEffect_Anaerob_Low = trainingEffect_Anaerobic_Low;
-         _tourDayData.trainingEffect_Anaerob_High = trainingEffect_Anaerobic_High;
-         _tourDayData.trainingPerformance_Low = trainingPerformance_Low;
-         _tourDayData.trainingPerformance_High = trainingPerformance_High;
+         _tourDayData.trainingEffect_Aerob_Low = trainEffect_Aerob_Low;
+         _tourDayData.trainingEffect_Aerob_High = trainEffect_Aerob_High;
+         _tourDayData.trainingEffect_Anaerob_Low = trainEffect_Anaerob_Low;
+         _tourDayData.trainingEffect_Anaerob_High = trainEffect_Anaerob_High;
+         _tourDayData.trainingPerformance_Low = trainPerformance_Low;
+         _tourDayData.trainingPerformance_High = trainPerformance_High;
 
          _tourDayData.allStartTime = dbAllTourStartTime.toArray();
          _tourDayData.allEndTime = dbAllTourEndTime.toArray();
@@ -475,9 +582,9 @@ public class DataProvider_Tour_Day extends DataProvider {
          _tourDayData.allDistance = dbAllDistance.toArray();
          _tourDayData.allAltitude = dbAllAltitudeUp.toArray();
 
-         _tourDayData.allTraining_Effect = dbAllTrainingEffect_Aerob.toArray();
-         _tourDayData.allTraining_Effect_Anaerobic = dbAllTrainingEffect_Anaerob.toArray();
-         _tourDayData.allTraining_Performance = dbAllTrainingPerformance.toArray();
+         _tourDayData.allTraining_Effect = dbAllTrain_Effect_Aerob.toArray();
+         _tourDayData.allTraining_Effect_Anaerobic = dbAllTrain_Effect_Anaerob.toArray();
+         _tourDayData.allTraining_Performance = dbAllTrain_Performance.toArray();
 
          _tourDayData.allRecordingTime = dbAllTourRecordingTime.toArray();
          _tourDayData.allDrivingTime = dbAllTourDrivingTime.toArray();
@@ -583,7 +690,9 @@ public class DataProvider_Tour_Day extends DataProvider {
       System.out.println();
    }
 
-   public void setIsShowTrainingPerformance_AvgValue(final boolean isShowTrainingPerformance_AvgValue) {
+   public void setGraphContext(final boolean isShowTrainingPerformance_AvgValue, final boolean isAdjustmentSamePosition) {
+
       _isShowTrainingPerformance_AvgValue = isShowTrainingPerformance_AvgValue;
+      _isAdjustSamePosition = isAdjustmentSamePosition;
    }
 }

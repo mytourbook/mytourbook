@@ -74,6 +74,7 @@ public class StatisticTraining_Line extends StatisticTraining {
                if (property.equals(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE_AVG_VALUE)) {
                   setIsForceReloadData(true);
                }
+
                // update chart
                preferencesHasChanged();
             }

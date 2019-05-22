@@ -88,6 +88,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
 
    private final MinMaxKeeper_YData    _minMaxKeeper                      = new MinMaxKeeper_YData();
    private TourData_Day                _tourDayData;
+   private ChartDataYSerie             _yData_TrainingPerformance;
 
    private boolean                     _isSynchScaleEnabled;
 
@@ -596,22 +597,22 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
     */
    void createYData_TrainingPerformance(final ChartDataModel chartModel, final ChartType chartType) {
 
-      final ChartDataYSerie yData = new ChartDataYSerie(
+      _yData_TrainingPerformance = new ChartDataYSerie(
             chartType,
             _tourDayData.trainingPerformance_Low,
             _tourDayData.trainingPerformance_High);
 
-      yData.setYTitle(Messages.LABEL_GRAPH_TRAINING_PERFORMANCE);
-      yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
-      yData.setAllValueColors(0);
-      yData.setShowYSlider(true);
-      yData.setVisibleMinValue(0);
-      yData.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
+      _yData_TrainingPerformance.setYTitle(Messages.LABEL_GRAPH_TRAINING_PERFORMANCE);
+      _yData_TrainingPerformance.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
+      _yData_TrainingPerformance.setAllValueColors(0);
+      _yData_TrainingPerformance.setShowYSlider(true);
+      _yData_TrainingPerformance.setVisibleMinValue(0);
+      _yData_TrainingPerformance.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
 
-      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_TRINING_PERFORMANCE);
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TRINING_PERFORMANCE, _activeTourTypeFilter);
+      StatisticServices.setDefaultColors(_yData_TrainingPerformance, GraphColorManager.PREF_GRAPH_TRINING_PERFORMANCE);
+      StatisticServices.setTourTypeColors(_yData_TrainingPerformance, GraphColorManager.PREF_GRAPH_TRINING_PERFORMANCE, _activeTourTypeFilter);
 
-      chartModel.addYData(yData);
+      chartModel.addYData(_yData_TrainingPerformance);
    }
 
    @Override
@@ -795,17 +796,26 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
 
       final DataProvider_Tour_Day tourDayDataProvider = DataProvider_Tour_Day.getInstance();
 
+      boolean isAvgValue = false;
+
       // set state if average values should be displayed or not, set it BEFORE retrieving data
-      boolean isComputeAvgValue;
       if (this instanceof StatisticTraining_Bar) {
 
-         isComputeAvgValue = _prefStore.getBoolean(ITourbookPreferences.STAT_TRAINING_BAR_IS_SHOW_TRAINING_PERFORMANCE_AVG_VALUE);
-         tourDayDataProvider.setIsShowTrainingPerformance_AvgValue(isComputeAvgValue);
+         // ensure the data are comuted with the correct graph context, otherwise it do not work depending what was previously selected
+         _isForceReloadData = true;
+
+         isAvgValue = _prefStore.getBoolean(ITourbookPreferences.STAT_TRAINING_BAR_IS_SHOW_TRAINING_PERFORMANCE_AVG_VALUE);
+
+         tourDayDataProvider.setGraphContext(isAvgValue, false);
 
       } else if (this instanceof StatisticTraining_Line) {
 
-         isComputeAvgValue = _prefStore.getBoolean(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE_AVG_VALUE);
-         tourDayDataProvider.setIsShowTrainingPerformance_AvgValue(isComputeAvgValue);
+         // ensure the data are comuted with the correct graph context, otherwise it do not work depending what was previously selected
+         _isForceReloadData = true;
+
+         isAvgValue = _prefStore.getBoolean(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE_AVG_VALUE);
+
+         tourDayDataProvider.setGraphContext(isAvgValue, true);
       }
 
       _tourDayData = tourDayDataProvider.getDayData(
@@ -835,6 +845,11 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
 
       if (_isSynchScaleEnabled) {
          _minMaxKeeper.setMinMaxValues(chartModel);
+      }
+
+      if (isAvgValue) {
+         // show avg sign in the title
+         _yData_TrainingPerformance.setYTitle(Messages.LABEL_GRAPH_TRAINING_PERFORMANCE + UI.SPACE + UI.SYMBOL_AVERAGE);
       }
 
       StatisticServices.updateChartProperties(_chart, getGridPrefPrefix());
