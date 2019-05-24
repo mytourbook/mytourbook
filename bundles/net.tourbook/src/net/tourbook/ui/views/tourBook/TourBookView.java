@@ -87,6 +87,7 @@ import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.action.ActionMultiplyCaloriesBy1000;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionRefreshView;
+import net.tourbook.ui.action.ActionRetrieveWeatherData;
 import net.tourbook.ui.action.ActionSetAltitudeValuesFromSRTM;
 import net.tourbook.ui.action.ActionSetPerson;
 import net.tourbook.ui.action.ActionSetTimeZone;
@@ -291,6 +292,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private ActionCollapseOthers                       _actionCollapseOthers;
    private ActionComputeDistanceValuesFromGeoposition _actionComputeDistanceValuesFromGeoposition;
    private ActionComputeElevationGain                 _actionComputeElevationGain;
+   private ActionRetrieveWeatherData                  _actionRetrieveWeatherData;
    private ActionDuplicateTour                        _actionDuplicateTour;
    private ActionEditQuick                            _actionEditQuick;
    private ActionExpandSelection                      _actionExpandSelection;
@@ -717,6 +719,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    private void createActions() {
 
+      _actionRetrieveWeatherData = new ActionRetrieveWeatherData(this);
       _actionAdjustTemperature = new ActionAdjustTemperature(this);
       _actionCollapseAll = new ActionCollapseAll(this);
       _actionCollapseOthers = new ActionCollapseOthers(this);
@@ -3068,6 +3071,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       _actionComputeDistanceValuesFromGeoposition.setEnabled(isTourSelected);
       _actionComputeElevationGain.setEnabled(true);
+      _actionRetrieveWeatherData.setEnabled(true); //TODO We should only enable it when the API keyh is filled
       _actionDeleteTour.setEnabled(isTourSelected);
       _actionDuplicateTour.setEnabled(isOneTour && !isDeviceTour);
       _actionEditQuick.setEnabled(isOneTour);
@@ -3748,6 +3752,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       menuMgr.add(_actionPrintTour);
 
       menuMgr.add(new Separator());
+      menuMgr.add(_actionRetrieveWeatherData);
       menuMgr.add(_actionAdjustTemperature);
       menuMgr.add(_actionComputeElevationGain);
       menuMgr.add(_actionComputeDistanceValuesFromGeoposition);
