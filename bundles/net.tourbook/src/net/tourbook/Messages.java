@@ -1645,6 +1645,12 @@ public class Messages extends NLS {
    public static String Pref_Statistic_Radio_BarAdjacent;
    public static String Pref_Statistic_Radio_BarStacked;
 
+   public static String Pref_Statistic_Radio_Duration_MovingTime;
+
+   public static String Pref_Statistic_Radio_Duration_PausedTime;
+
+   public static String Pref_Statistic_Radio_Duration_RecordingTime;
+
    public static String Pref_Swimming_Label_Info;
 
    public static String Pref_Tour_Button_FailedUpdate;

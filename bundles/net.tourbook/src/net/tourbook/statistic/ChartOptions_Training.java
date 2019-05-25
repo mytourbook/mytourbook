@@ -35,51 +35,29 @@ public class ChartOptions_Training implements IStatisticOptions {
 
    private SelectionAdapter       _defaultSelectionListener;
 
-   private String                 _prefKey_IsShow_Altitude;
-   private String                 _prefKey_IsShow_Avg_Pace;
-   private String                 _prefKey_IsShow_Avg_Speed;
-   private String                 _prefKey_IsShow_Distance;
-   private String                 _prefKey_IsShow_Duration;
-
-   private String                 _prefKey_IsShow_TrainingEffect;
-   private String                 _prefKey_IsShow_TrainingEffect_Anaerobic;
-   private String                 _prefKey_IsShow_TrainingPerformance;
-   private String                 _prefKey_IsShow_TrainingPerformance_AvgValue;
-
    /*
     * UI controls
     */
-   private Button _chkShow_TrainingEffect;
-   private Button _chkShow_TrainingEffect_Anaerobic;
-   private Button _chkShow_TrainingPerformance;
-   private Button _chkShow_TrainingPerformance_AvgValue;
+   private Button           _chkShow_TrainingEffect;
+   private Button           _chkShow_TrainingEffect_Anaerobic;
+   private Button           _chkShow_TrainingPerformance;
+   private Button           _chkShow_TrainingPerformance_AvgValue;
 
-   private Button _chkShowAltitude;
-   private Button _chkShowDistance;
-   private Button _chkShowDuration;
-   private Button _chkShowAvgSpeed;
-   private Button _chkShowAvgPace;
+   private Button           _chkShowAltitude;
+   private Button           _chkShowDistance;
+   private Button           _chkShowDuration;
+   private Button           _chkShowAvgSpeed;
+   private Button           _chkShowAvgPace;
 
-   public ChartOptions_Training(final String prefKey_IsShow_Altitude,
-                                final String prefKey_IsShow_Avg_Pace,
-                                final String prefKey_IsShow_Avg_Speed,
-                                final String prefKey_IsShow_Distance,
-                                final String prefKey_IsShow_Duration,
-                                final String prefKey_IsShowTrainingEffect,
-                                final String prefKey_IsShowTrainingEffect_Anaerobic,
-                                final String prefKey_IsShowTrainingPerformance,
-                                final String prefKey_IsShowTrainingPerformance_AvgValue) {
+   private Button           _rdoDuration_BreakTime;
+   private Button           _rdoDuration_MovingTime;
+   private Button           _rdoDuration_RecordingTime;
 
-      _prefKey_IsShow_Altitude = prefKey_IsShow_Altitude;
-      _prefKey_IsShow_Avg_Pace = prefKey_IsShow_Avg_Pace;
-      _prefKey_IsShow_Avg_Speed = prefKey_IsShow_Avg_Speed;
-      _prefKey_IsShow_Distance = prefKey_IsShow_Distance;
-      _prefKey_IsShow_Duration = prefKey_IsShow_Duration;
+   private TrainingPrefKeys _prefKeys;
 
-      _prefKey_IsShow_TrainingEffect = prefKey_IsShowTrainingEffect;
-      _prefKey_IsShow_TrainingEffect_Anaerobic = prefKey_IsShowTrainingEffect_Anaerobic;
-      _prefKey_IsShow_TrainingPerformance = prefKey_IsShowTrainingPerformance;
-      _prefKey_IsShow_TrainingPerformance_AvgValue = prefKey_IsShowTrainingPerformance_AvgValue;
+   public ChartOptions_Training(final TrainingPrefKeys prefKeys) {
+
+      _prefKeys = prefKeys;
    }
 
    @Override
@@ -98,8 +76,8 @@ public class ChartOptions_Training implements IStatisticOptions {
       GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
 //    group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
       {
-         createUI_50_DaySummary_Left(group);
-         createUI_20_DaySummary_Right(group);
+         createUI_20_DaySummary_Left(group);
+         createUI_30_DaySummary_Right(group);
       }
    }
 
@@ -150,32 +128,7 @@ public class ChartOptions_Training implements IStatisticOptions {
       }
    }
 
-   private void createUI_20_DaySummary_Right(final Composite parent) {
-
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-      {
-         {
-            /*
-             * Show avg speed
-             */
-            _chkShowAvgSpeed = new Button(container, SWT.CHECK);
-            _chkShowAvgSpeed.setText(Messages.Pref_Statistic_Checkbox_AvgSpeed);
-            _chkShowAvgSpeed.addSelectionListener(_defaultSelectionListener);
-         }
-         {
-            /*
-             * Show avg pace
-             */
-            _chkShowAvgPace = new Button(container, SWT.CHECK);
-            _chkShowAvgPace.setText(Messages.Pref_Statistic_Checkbox_AvgPace);
-            _chkShowAvgPace.addSelectionListener(_defaultSelectionListener);
-         }
-      }
-   }
-
-   private void createUI_50_DaySummary_Left(final Composite parent) {
+   private void createUI_20_DaySummary_Left(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -204,15 +157,82 @@ public class ChartOptions_Training implements IStatisticOptions {
             _chkShowDuration = new Button(container, SWT.CHECK);
             _chkShowDuration.setText(Messages.Pref_Statistic_Checkbox_Duration);
             _chkShowDuration.addSelectionListener(_defaultSelectionListener);
+
+            /*
+             * Moving, recording + break time
+             */
+            final Composite timeContainer = new Composite(container, SWT.NONE);
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .indent(16, 0)
+                  .applyTo(timeContainer);
+            GridLayoutFactory.fillDefaults().numColumns(1).applyTo(timeContainer);
+            {
+               {
+                  /*
+                   * Recording time
+                   */
+                  _rdoDuration_RecordingTime = new Button(timeContainer, SWT.RADIO);
+                  _rdoDuration_RecordingTime.setText(Messages.Pref_Statistic_Radio_Duration_RecordingTime);
+                  _rdoDuration_RecordingTime.addSelectionListener(_defaultSelectionListener);
+               }
+               {
+                  /*
+                   * Moving time
+                   */
+                  _rdoDuration_MovingTime = new Button(timeContainer, SWT.RADIO);
+                  _rdoDuration_MovingTime.setText(Messages.Pref_Statistic_Radio_Duration_MovingTime);
+                  _rdoDuration_MovingTime.addSelectionListener(_defaultSelectionListener);
+               }
+               {
+                  /*
+                   * Break time
+                   */
+                  _rdoDuration_BreakTime = new Button(timeContainer, SWT.RADIO);
+                  _rdoDuration_BreakTime.setText(Messages.Pref_Statistic_Radio_Duration_PausedTime);
+                  _rdoDuration_BreakTime.addSelectionListener(_defaultSelectionListener);
+               }
+            }
+         }
+      }
+   }
+
+   private void createUI_30_DaySummary_Right(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      {
+         {
+            /*
+             * Show avg speed
+             */
+            _chkShowAvgSpeed = new Button(container, SWT.CHECK);
+            _chkShowAvgSpeed.setText(Messages.Pref_Statistic_Checkbox_AvgSpeed);
+            _chkShowAvgSpeed.addSelectionListener(_defaultSelectionListener);
+         }
+         {
+            /*
+             * Show avg pace
+             */
+            _chkShowAvgPace = new Button(container, SWT.CHECK);
+            _chkShowAvgPace.setText(Messages.Pref_Statistic_Checkbox_AvgPace);
+            _chkShowAvgPace.addSelectionListener(_defaultSelectionListener);
          }
       }
    }
 
    private void enableControls() {
 
+      final boolean isShowDuration = _chkShowDuration.getSelection();
       final boolean isShowTrainingPerformance = _chkShow_TrainingPerformance.getSelection();
 
       _chkShow_TrainingPerformance_AvgValue.setEnabled(isShowTrainingPerformance);
+
+      _rdoDuration_MovingTime.setEnabled(isShowDuration);
+      _rdoDuration_BreakTime.setEnabled(isShowDuration);
+      _rdoDuration_RecordingTime.setEnabled(isShowDuration);
+
    }
 
    private void initUI(final Composite parent) {
@@ -243,16 +263,21 @@ public class ChartOptions_Training implements IStatisticOptions {
    @Override
    public void resetToDefaults() {
 
-      _chkShowAltitude.setSelection(_prefStore.getDefaultBoolean(_prefKey_IsShow_Altitude));
-      _chkShowAvgPace.setSelection(_prefStore.getDefaultBoolean(_prefKey_IsShow_Avg_Pace));
-      _chkShowAvgSpeed.setSelection(_prefStore.getDefaultBoolean(_prefKey_IsShow_Avg_Speed));
-      _chkShowDistance.setSelection(_prefStore.getDefaultBoolean(_prefKey_IsShow_Distance));
-      _chkShowDuration.setSelection(_prefStore.getDefaultBoolean(_prefKey_IsShow_Duration));
+      _chkShowAltitude.setSelection(_prefStore.getDefaultBoolean(_prefKeys.isShow_Altitude));
+      _chkShowAvgPace.setSelection(_prefStore.getDefaultBoolean(_prefKeys.isShow_Avg_Pace));
+      _chkShowAvgSpeed.setSelection(_prefStore.getDefaultBoolean(_prefKeys.isShow_Avg_Speed));
+      _chkShowDistance.setSelection(_prefStore.getDefaultBoolean(_prefKeys.isShow_Distance));
+      _chkShowDuration.setSelection(_prefStore.getDefaultBoolean(_prefKeys.isShow_Duration));
 
-      _chkShow_TrainingEffect.setSelection(_prefStore.getDefaultBoolean(_prefKey_IsShow_TrainingEffect));
-      _chkShow_TrainingEffect_Anaerobic.setSelection(_prefStore.getDefaultBoolean(_prefKey_IsShow_TrainingEffect_Anaerobic));
-      _chkShow_TrainingPerformance.setSelection(_prefStore.getDefaultBoolean(_prefKey_IsShow_TrainingPerformance));
-      _chkShow_TrainingPerformance_AvgValue.setSelection(_prefStore.getDefaultBoolean(_prefKey_IsShow_TrainingPerformance_AvgValue));
+      final String durationTime = _prefStore.getDefaultString(_prefKeys.durationTime);
+      _rdoDuration_BreakTime.setSelection(durationTime.equals(TourbookStatistic.STATE_DURATION_TIME_BREAK));
+      _rdoDuration_MovingTime.setSelection(durationTime.equals(TourbookStatistic.STATE_DURATION_TIME_MOVING));
+      _rdoDuration_RecordingTime.setSelection(durationTime.equals(TourbookStatistic.STATE_DURATION_TIME_RECORDING));
+
+      _chkShow_TrainingEffect.setSelection(_prefStore.getDefaultBoolean(_prefKeys.isShow_TrainingEffect));
+      _chkShow_TrainingEffect_Anaerobic.setSelection(_prefStore.getDefaultBoolean(_prefKeys.isShow_TrainingEffect_Anaerobic));
+      _chkShow_TrainingPerformance.setSelection(_prefStore.getDefaultBoolean(_prefKeys.isShow_TrainingPerformance));
+      _chkShow_TrainingPerformance_AvgValue.setSelection(_prefStore.getDefaultBoolean(_prefKeys.isShow_TrainingPerformance_AvgValue));
 
       enableControls();
    }
@@ -260,16 +285,21 @@ public class ChartOptions_Training implements IStatisticOptions {
    @Override
    public void restoreState() {
 
-      _chkShowAltitude.setSelection(_prefStore.getBoolean(_prefKey_IsShow_Altitude));
-      _chkShowAvgPace.setSelection(_prefStore.getBoolean(_prefKey_IsShow_Avg_Pace));
-      _chkShowAvgSpeed.setSelection(_prefStore.getBoolean(_prefKey_IsShow_Avg_Speed));
-      _chkShowDistance.setSelection(_prefStore.getBoolean(_prefKey_IsShow_Distance));
-      _chkShowDuration.setSelection(_prefStore.getBoolean(_prefKey_IsShow_Duration));
+      _chkShowAltitude.setSelection(_prefStore.getBoolean(_prefKeys.isShow_Altitude));
+      _chkShowAvgPace.setSelection(_prefStore.getBoolean(_prefKeys.isShow_Avg_Pace));
+      _chkShowAvgSpeed.setSelection(_prefStore.getBoolean(_prefKeys.isShow_Avg_Speed));
+      _chkShowDistance.setSelection(_prefStore.getBoolean(_prefKeys.isShow_Distance));
+      _chkShowDuration.setSelection(_prefStore.getBoolean(_prefKeys.isShow_Duration));
 
-      _chkShow_TrainingEffect.setSelection(_prefStore.getBoolean(_prefKey_IsShow_TrainingEffect));
-      _chkShow_TrainingEffect_Anaerobic.setSelection(_prefStore.getBoolean(_prefKey_IsShow_TrainingEffect_Anaerobic));
-      _chkShow_TrainingPerformance.setSelection(_prefStore.getBoolean(_prefKey_IsShow_TrainingPerformance));
-      _chkShow_TrainingPerformance_AvgValue.setSelection(_prefStore.getBoolean(_prefKey_IsShow_TrainingPerformance_AvgValue));
+      final String durationTime = _prefStore.getString(_prefKeys.durationTime);
+      _rdoDuration_BreakTime.setSelection(durationTime.equals(TourbookStatistic.STATE_DURATION_TIME_BREAK));
+      _rdoDuration_MovingTime.setSelection(durationTime.equals(TourbookStatistic.STATE_DURATION_TIME_MOVING));
+      _rdoDuration_RecordingTime.setSelection(durationTime.equals(TourbookStatistic.STATE_DURATION_TIME_RECORDING));
+
+      _chkShow_TrainingEffect.setSelection(_prefStore.getBoolean(_prefKeys.isShow_TrainingEffect));
+      _chkShow_TrainingEffect_Anaerobic.setSelection(_prefStore.getBoolean(_prefKeys.isShow_TrainingEffect_Anaerobic));
+      _chkShow_TrainingPerformance.setSelection(_prefStore.getBoolean(_prefKeys.isShow_TrainingPerformance));
+      _chkShow_TrainingPerformance_AvgValue.setSelection(_prefStore.getBoolean(_prefKeys.isShow_TrainingPerformance_AvgValue));
 
       enableControls();
    }
@@ -277,15 +307,26 @@ public class ChartOptions_Training implements IStatisticOptions {
    @Override
    public void saveState() {
 
-      _prefStore.setValue(_prefKey_IsShow_Altitude, _chkShowAltitude.getSelection());
-      _prefStore.setValue(_prefKey_IsShow_Avg_Pace, _chkShowAvgPace.getSelection());
-      _prefStore.setValue(_prefKey_IsShow_Avg_Speed, _chkShowAvgSpeed.getSelection());
-      _prefStore.setValue(_prefKey_IsShow_Distance, _chkShowDistance.getSelection());
-      _prefStore.setValue(_prefKey_IsShow_Duration, _chkShowDuration.getSelection());
+      _prefStore.setValue(_prefKeys.isShow_Altitude, _chkShowAltitude.getSelection());
+      _prefStore.setValue(_prefKeys.isShow_Avg_Pace, _chkShowAvgPace.getSelection());
+      _prefStore.setValue(_prefKeys.isShow_Avg_Speed, _chkShowAvgSpeed.getSelection());
+      _prefStore.setValue(_prefKeys.isShow_Distance, _chkShowDistance.getSelection());
+      _prefStore.setValue(_prefKeys.isShow_Duration, _chkShowDuration.getSelection());
 
-      _prefStore.setValue(_prefKey_IsShow_TrainingEffect, _chkShow_TrainingEffect.getSelection());
-      _prefStore.setValue(_prefKey_IsShow_TrainingEffect_Anaerobic, _chkShow_TrainingEffect_Anaerobic.getSelection());
-      _prefStore.setValue(_prefKey_IsShow_TrainingPerformance, _chkShow_TrainingPerformance.getSelection());
-      _prefStore.setValue(_prefKey_IsShow_TrainingPerformance_AvgValue, _chkShow_TrainingPerformance_AvgValue.getSelection());
+      // duration time
+      _prefStore.setValue(_prefKeys.durationTime,
+
+            _rdoDuration_BreakTime.getSelection()
+                  ? TourbookStatistic.STATE_DURATION_TIME_BREAK
+
+                  : _rdoDuration_MovingTime.getSelection()
+                        ? TourbookStatistic.STATE_DURATION_TIME_MOVING
+
+                        : TourbookStatistic.STATE_DURATION_TIME_RECORDING);
+
+      _prefStore.setValue(_prefKeys.isShow_TrainingEffect, _chkShow_TrainingEffect.getSelection());
+      _prefStore.setValue(_prefKeys.isShow_TrainingEffect_Anaerobic, _chkShow_TrainingEffect_Anaerobic.getSelection());
+      _prefStore.setValue(_prefKeys.isShow_TrainingPerformance, _chkShow_TrainingPerformance.getSelection());
+      _prefStore.setValue(_prefKeys.isShow_TrainingPerformance_AvgValue, _chkShow_TrainingPerformance_AvgValue.getSelection());
    }
 }

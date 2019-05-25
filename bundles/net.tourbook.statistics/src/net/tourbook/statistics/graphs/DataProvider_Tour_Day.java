@@ -190,7 +190,8 @@ public class DataProvider_Tour_Day extends DataProvider {
                            final TourTypeFilter tourTypeFilter,
                            final int lastYear,
                            final int numberOfYears,
-                           final boolean refreshData) {
+                           final boolean refreshData,
+                           final String durationTime) {
 
       // don't reload data which are already available
       if (person == _activePerson

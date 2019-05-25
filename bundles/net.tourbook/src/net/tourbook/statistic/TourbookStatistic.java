@@ -47,6 +47,10 @@ public abstract class TourbookStatistic {
 
    protected static final String STATE_BAR_ORDERING_HR_ZONE_START_FOR_MONTH = "STATE_BAR_ORDERING_HR_ZONE_START_FOR_MONTH"; ////$NON-NLS-1$
 
+   public static final String    STATE_DURATION_TIME_BREAK                  = "STATE_DURATION_TIME_BREAK";                  //$NON-NLS-1$
+   public static final String    STATE_DURATION_TIME_MOVING                 = "STATE_DURATION_TIME_MOVING";                 //$NON-NLS-1$
+   public static final String    STATE_DURATION_TIME_RECORDING              = "STATE_DURATION_TIME_RECORDING";              //$NON-NLS-1$
+
    /*
     * Grid prefixes
     */
@@ -97,12 +101,14 @@ public abstract class TourbookStatistic {
 
    private IPropertyChangeListener  _prefChangeListener;
 
+   private boolean                  _isInPrefUpdate;
+
+   protected boolean                _isReloadData;
+
    /*
     * UI controls
     */
    private Composite _container;
-
-   private boolean   _isInPrefUpdate;
 
    /**
     * Add the pref listener which is called when the color was changed

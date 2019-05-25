@@ -847,7 +847,8 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
          _minMaxKeeper.setMinMaxValues(chartModel);
       }
 
-      if (isAvgValue) {
+      if (isAvgValue && _yData_TrainingPerformance != null) {
+
          // show avg sign in the title
          _yData_TrainingPerformance.setYTitle(Messages.LABEL_GRAPH_TRAINING_PERFORMANCE + UI.SPACE + UI.SYMBOL_AVERAGE);
       }
